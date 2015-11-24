@@ -49,7 +49,6 @@ foreach ($results as $result) {
 	$result['actors'] = $movie->makeFieldLinks($result, 'actors');
 	$result['director'] = $movie->makeFieldLinks($result, 'director');
 	$result['languages'] = explode(", ", $result['language']);
-	$result['failed'] = $fail->getFailedCount($result['grp_release_id']);
 
 	$movies[] = $result;
 }

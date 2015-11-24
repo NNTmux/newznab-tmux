@@ -1,4 +1,5 @@
 2015-11-24 DariusIII
+	Fix: Fix failed count display, improve books, consoles and music cover view speeds
 	Fix: Indexing of release files with SphinxSearch
 	Upd: update create_se_tables and populate_rt_indexes scripts for sphinxsearch
 	Upd: Update templates to font-awesome 4.5.0

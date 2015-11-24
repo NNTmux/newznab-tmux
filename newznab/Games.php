@@ -158,33 +158,14 @@ class Games
 		return ($res === false ? 0 : $res["num"]);
 	}
 
-	public function getGamesCount($cat, $maxage = -1, $excludedcats = [])
-	{
-		$catsrch = '';
-		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
-		}
-
-		$res = $this->pdo->query(
-				sprintf("
-				SELECT COUNT(DISTINCT r.gamesinfo_id) AS num
-				FROM releases r
-				INNER JOIN gamesinfo con ON con.id = r.gamesinfo_id
-				WHERE r.nzbstatus = 1
-				AND con.title != ''
-				AND con.cover = 1
-				AND r.passwordstatus %s
-				AND %s %s %s %s",
-						Releases::showPasswords($this->pdo),
-						$this->getBrowseBy(),
-						$catsrch,
-						($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
-						(count($excludedcats) > 0 ? " AND r.categoryid NOT IN (" . implode(",", $excludedcats) . ")" : '')
-				), true, NN_CACHE_EXPIRY_MEDIUM
-		);
-		return (isset($res[0]["num"]) ? $res[0]["num"] : 0);
-	}
-
+	/**
+	 * @param       $cat
+	 * @param       $start
+	 * @param       $num
+	 * @param       $orderby
+	 * @param int   $maxage
+	 * @param array $excludedcats
+	 */
 	public function getGamesRange($cat, $start, $num, $orderby, $maxage = -1, $excludedcats = [])
 	{
 		$browseby = $this->getBrowseBy();
@@ -207,9 +188,10 @@ class Games
 
 		$order = $this->getGamesOrder($orderby);
 
-		$games = $this->pdo->query(
+		$games = $this->pdo->queryCalc(
 				sprintf("
-				SELECT con.id
+				SELECT SQL_CALC_FOUND_ROWS con.id,
+					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
 				FROM gamesinfo con
 				LEFT JOIN releases r ON con.id = r.gamesinfo_id
 				WHERE r.nzbstatus = 1
@@ -230,15 +212,16 @@ class Games
 				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 
-		$gameIDs = false;
+		$gameIDs = $releaseIDs = false;
 
-		if (is_array($games)) {
-			foreach ($games AS $game => $id) {
+		if (is_array($games['result'])) {
+			foreach ($games['result'] AS $game => $id) {
 				$gameIDs[] = $id['id'];
+				$releaseIDs[] = $id['grp_release_id'];
 			}
 		}
 
-		return $this->pdo->query(
+		$return = $this->pdo->query(
 				sprintf("
 				SELECT
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
@@ -246,37 +229,38 @@ class Games
 					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
 					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
 					GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-					GROUP_CONCAT(rn.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-					GROUP_CONCAT(groups.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
+					GROUP_CONCAT(rn.releaseid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
+					GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
 					GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
 					GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
 					GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
 					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
 					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
 					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-				con.*, YEAR (con.releasedate) as year, r.gamesinfo_id, groups.name AS group_name,
-				rn.id as nfoid
+					GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
+				con.*, YEAR (con.releasedate) as year, r.gamesinfo_id, g.name AS group_name,
+				rn.releaseid AS nfoid
 				FROM releases r
-				LEFT OUTER JOIN groups ON groups.id = r.groupid
+				LEFT OUTER JOIN groups g ON g.id = r.groupid
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				INNER JOIN gamesinfo con ON con.id = r.gamesinfo_id
-				WHERE r.nzbstatus = 1
-				AND con.id IN (%s)
-				AND con.title != ''
-				AND r.passwordstatus %s
-				AND %s %s %s %s
+				WHERE con.id IN (%s)
+				AND r.id IN (%s)
+				AND %s
 				GROUP BY con.id
 				ORDER BY %s %s",
 						(is_array($gameIDs) ? implode(',', $gameIDs) : -1),
-						Releases::showPasswords($this->pdo),
-						$browseby,
+						(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
 						$catsrch,
-						$maxage,
-						$exccatlist,
 						$order[0],
 						$order[1]
 				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
+		if (!empty($return)) {
+			$return[0]['_totalcount'] = (isset($games['total']) ? $games['total'] : 0);
+		}
+		return $return;
 	}
 
 	public function getGamesOrder($orderby)
