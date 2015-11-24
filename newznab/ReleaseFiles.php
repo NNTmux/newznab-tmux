@@ -70,28 +70,28 @@ class ReleaseFiles
 		$insert = 0;
 
 		$duplicateCheck = $this->pdo->queryOneRow(
-			sprintf('
+				sprintf('
 				SELECT releaseid
 				FROM release_files
 				WHERE releaseid = %d AND name = %s',
-				$id,
-				$this->pdo->escapeString(utf8_encode($name))
-			)
+						$id,
+						$this->pdo->escapeString(utf8_encode($name))
+				)
 		);
 
 		if ($duplicateCheck === false) {
 			$insert = $this->pdo->queryInsert(
-				sprintf("
+					sprintf("
 						INSERT INTO release_files
 						(releaseid, name, size, createddate, passworded)
 						VALUES
 						(%d, %s, %s, %s, %d)",
-					$id,
-					$this->pdo->escapeString(utf8_encode($name)),
-					$this->pdo->escapeString($size),
-					$this->pdo->from_unixtime($createdTime),
-					$hasPassword
-				)
+							$id,
+							$this->pdo->escapeString(utf8_encode($name)),
+							$this->pdo->escapeString($size),
+							$this->pdo->from_unixtime($createdTime),
+							$hasPassword
+					)
 			);
 		}
 		return $insert;

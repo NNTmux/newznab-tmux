@@ -1,8 +1,8 @@
 <?php
 namespace newznab;
 
-use newznab\db\Settings;
 use newznab\db\DB;
+use newznab\db\Settings;
 
 class SphinxSearch
 {
@@ -106,14 +106,14 @@ class SphinxSearch
 	{
 		if (!is_null($this->sphinxQL)) {
 			$new = $pdo->queryOneRow(
-				sprintf('
+						sprintf('
 							SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
 							FROM releases r
 							LEFT JOIN release_files rf ON (r.id=rf.releaseid)
 							WHERE r.id = %d
 							GROUP BY r.id LIMIT 1',
-					$releaseID
-				)
+							$releaseID
+						)
 			);
 			if ($new !== false) {
 				$this->insertRelease($new);
