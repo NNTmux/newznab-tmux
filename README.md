@@ -1,4 +1,4 @@
-https://travis-ci.org/DariusIII/newznab-tmux.svg
+![alt tag](https://travis-ci.org/DariusIII/newznab-tmux.svg )
 
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
 Support is given on irc.synirc.net #tmux channel.
