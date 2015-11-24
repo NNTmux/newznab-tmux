@@ -1,9 +1,9 @@
 <div class="header">
-	<h2>Your > <strong>Cart</strong></h2>
+	<h2><strong>My Download Basket</strong></h2>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/ Cart
+			/ Download Basket
 		</ol>
 	</div>
 </div>
