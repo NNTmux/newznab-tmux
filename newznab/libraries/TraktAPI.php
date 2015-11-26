@@ -1,7 +1,7 @@
 <?php
 namespace newznab\libraries;
 
-use newznab\utility\Misc;
+use newznab\utility\Utility;
 
 /**
  * Class TraktAPI
@@ -143,7 +143,7 @@ Class TraktAPI {
 
 		if (!empty($this->requestHeaders)) {
 
-			$json = Misc::getUrl([
+			$json = Utility::getUrl([
 							'url'            => $URI . $extendedString,
 							'requestheaders' => $this->requestHeaders
 					]
