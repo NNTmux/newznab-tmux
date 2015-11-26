@@ -301,6 +301,12 @@ class Movie
 			}
 		}
 
+		$catsrchCheck = '';	
+		if(!empty($catsrch))
+		{
+			$catsrchCheck = 'AND ' . $catsrch;
+		}
+		
 		$sql = sprintf("
 			SELECT
 				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
@@ -326,13 +332,12 @@ class Movie
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			INNER JOIN movieinfo m ON m.imdbid = r.imdbid
 			WHERE m.imdbid IN (%s)
-			AND r.id IN (%s)
-			AND %s
+			AND r.id IN (%s) %s
 			GROUP BY m.imdbid
 			ORDER BY %s %s",
 				(is_array($movieIDs) ? implode(',', $movieIDs) : -1),
 				(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-				$catsrch,
+				$catsrchCheck,
 				$order[0],
 				$order[1]
 		);
@@ -396,7 +401,7 @@ class Movie
 					$bbv .= '.';
 				}
 				if ($bb === 'imdb') {
-					$browseBy .= 'm.' . $bb . 'id = ' . $bbv . ' AND ';
+					$browseBy .= 'm.' . $bb . 'id = ' . $bbv;
 				} else {
 					$browseBy .= 'm.' . $bb . ' ' . $this->pdo->likeString($bbv, true, true) . ' AND ';
 				}
