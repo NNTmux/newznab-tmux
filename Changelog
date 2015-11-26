@@ -1,3 +1,5 @@
+2015-11-26 DariusIII
+	Fix: Fix the full movie view
 2015-11-24 DariusIII
 	Fix: Fix failed releases count, improve cover view speeds in books, music and console view
 	Rmv: Remove travis, PITA to set up

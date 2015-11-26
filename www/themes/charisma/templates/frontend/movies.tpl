@@ -139,7 +139,7 @@
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
 													{foreach from=$msplits item=m name=loop}
 													{if $smarty.foreach.loop.first}
-													<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}"><img
+													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}themes_shared/images/no-cover.png{/if}"
 																width="100" border="0"
@@ -162,7 +162,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$result.title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}
 															<b>Genre: </b>
 															{$result.genre}, {/if}</div>
@@ -207,7 +207,7 @@
 															{if isset($sabintegrated)}
 																<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																	  title="Send to my Queue"><i
-																			class="fa fa-send"></i></span>
+																			class="fa fa-share"></i></span>
 															{/if}
 															{if $cpurl != '' && $cpapi != ''}
 																<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
@@ -257,7 +257,7 @@
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
 													{foreach from=$msplits item=m name=loop}
 													{if $smarty.foreach.loop.first}
-													<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}"><img
+													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}themes_shared/images/no-cover.png{/if}"
 																width="100" border="0"
@@ -280,7 +280,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$result.title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}
 															<b>Genre: </b>
 															{$result.genre}, {/if}</div>
@@ -325,7 +325,7 @@
 															{if isset($sabintegrated)}
 																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																	  title="Send to my Queue"><i
-																			class="fa fa-send"></i></span>
+																			class="fa fa-share"></i></span>
 															{/if}
 															{if $cpurl != '' && $cpapi != ''}
 																<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted"

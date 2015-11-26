@@ -107,7 +107,7 @@
 														{if $mfailed[$m@index] > 0}
 														<span class="btn btn-hover btn-default btn-xs"><i class="fa fa-thumbs-o-down"></i><span
 																	class="badge"> {$mfailed[$m@index]}
-																Failed Download{if $mfailed[$m@index] != 1}s{/if}</span>
+																Failed Download{if $mfailed[$m@index] > 1}s{/if}</span>
 															{/if}
 													</div>
 													<div class="col-md-10 small-gutter-left">
@@ -165,7 +165,7 @@
 																		{if isset($sabintegrated)}
 																			<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																				  title="Send to my Queue"><i
-																						class="fa fa-send"></i></span>
+																						class="fa fa-share"></i></span>
 																		{/if}
 																	</div>
 																</td>

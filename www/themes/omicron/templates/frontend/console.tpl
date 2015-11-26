@@ -189,7 +189,7 @@
 																{if isset($sabintegrated)}
 																	<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																		  title="Send to my Queue"><i
-																				class="fa fa-send"></i></span>
+																				class="fa fa-share"></i></span>
 																{/if}
 															</div>
 														</td>
