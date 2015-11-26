@@ -6,11 +6,13 @@ use newznab\NNTP;
 use newznab\db\Settings;
 use newznab\Categorize;
 use newznab\Releases;
+use newznab\SphinxSearch;
 
 $pdo = new Settings();
 $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 $cat = new Categorize(['Settings' => $pdo]);
 $releases = new Releases(['Settings' => $pdo]);
+$sphinxsearch = new SphinxSearch(['Settings' => $pdo]);
 
 // Backfill settings
 $group = 'alt.binaries.erotica';
@@ -33,19 +35,19 @@ if(isset($argv[2]) && !empty($argv[2]))
 }
 
 $sql = 	sprintf ('
-SELECT r.id, r.name, r.searchname, r.guid, r.fromname, r.reqid, r.groupid, g.name AS groupname, r.categoryid
-FROM releases r
-INNER JOIN groups g ON r.groupid = g.id
-WHERE r.nzbstatus = 1
-AND r.prehashid = 0
-AND r.isrequestid = 1
-AND r.isrenamed = 0
-%s
-ORDER BY r.postdate DESC
-LIMIT %d',
-'AND  g.name = ' .  $pdo->escapeString($group),
-$limit);
-			
+	SELECT r.id, r.name, r.searchname, r.guid, r.fromname, r.reqid, r.groupid, g.name AS groupname, r.categoryid, r.postdate
+	FROM releases r
+	INNER JOIN groups g ON r.groupid = g.id
+	WHERE r.nzbstatus = 1
+	AND (r.searchname = r.reqid OR r.isrequestid = 1)
+	AND r.prehashid = 0
+	AND r.isrenamed = 0
+	AND  g.name = %s
+	ORDER BY r.postdate DESC
+	LIMIT %s',
+	$pdo->escapeString($group),
+	$limit);
+	
 $releasesResults = $pdo->queryDirect($sql);	
 
 if ($releasesResults instanceof \Traversable) {
@@ -74,13 +76,17 @@ if ($releasesResults instanceof \Traversable) {
 			
 			if($outputOnly == false)
 			{
+				// Update release
 				$pdo->queryExec($query);
 		
+				// Update Sphinx
+				$sphinxsearch->updateRelease($release['id'], $pdo);
+				
 				echo $pdo->log->primary(sprintf(
-						"Updated release: \nOriginal title: %s\nNew title: %s\nNew category: %s\nGUID: %s\n",
-						$release['name'], $newtitle, $catId, $release['guid']
+						"Updated release: \nOriginal title: %s\nNew title: %s\nNew category: %s\nPosted: %s\nGUID: %s\n",
+						$release['name'], $newtitle, $catId, $release['postdate'], $release['guid']
 					)
-				);
+				);			
 			}
 			else
 			{
