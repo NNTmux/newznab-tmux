@@ -331,7 +331,6 @@ class TraktTv extends TV
 				}
 			}
 		}
-		var_dump($return);
 		return $return;
 	}
 
