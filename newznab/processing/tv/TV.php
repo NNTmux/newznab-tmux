@@ -240,9 +240,9 @@ abstract class TV extends Videos
 					(type, title, countries_id, started, source, tvdb, trakt, tvrage, tvmaze, imdb, tmdb)
 					VALUES (%d, %s, %s, %s, %d, %d, %d, %d, %d, %d, %d)',
 						$show['type'],
-					$this->pdo->escapeString($show['title']),
-					$this->pdo->escapeString((isset($show['country']) ? $show['country'] : '')),
-					$this->pdo->escapeString($show['started']),
+						$this->pdo->escapeString($show['title']),
+						$this->pdo->escapeString((isset($show['country']) ? $show['country'] : '')),
+						$this->pdo->escapeString($show['started']),
 						$show['source'],
 						$show['tvdb'],
 						$show['trakt'],
@@ -254,13 +254,14 @@ abstract class TV extends Videos
 			);
 			// Insert the supplementary show info
 			$this->pdo->queryInsert(
-				sprintf("
-					INSERT INTO tv_info (videos_id, summary, publisher)
-					VALUES (%d, %s, %s)",
-					$videoId,
-					$this->pdo->escapeString($show['summary']),
-					$this->pdo->escapeString($show['publisher'])
-				)
+					sprintf("
+					INSERT INTO tv_info (videos_id, summary, publisher, localzone)
+					VALUES (%d, %s, %s, %s)",
+							$videoId,
+							$this->pdo->escapeString($show['summary']),
+							$this->pdo->escapeString($show['publisher']),
+							$this->pdo->escapeString($show['localzone'])
+					)
 			);
 			// If we have AKAs\aliases, insert those as well
 			if (!empty($show['aliases'])) {
@@ -287,19 +288,19 @@ abstract class TV extends Videos
 
 		if ($episodeId === false) {
 			$episodeId = $this->pdo->queryInsert(
-				sprintf('
+					sprintf('
 					INSERT INTO tv_episodes (videos_id, series, episode, se_complete, title, firstaired, summary)
 					VALUES (%d, %d, %d, %s, %s, %s, %s)
 					ON DUPLICATE KEY update se_complete = %s',
-					$videoId,
-						$episode['series'],
-						$episode['episode'],
-					$this->pdo->escapeString($episode['se_complete']),
-					$this->pdo->escapeString($episode['title']),
-					($episode['firstaired'] != "" ? $this->pdo->escapeString($episode['firstaired']) : "null"),
-					$this->pdo->escapeString($episode['summary']),
-					$this->pdo->escapeString($episode['se_complete'])
-				)
+							$videoId,
+							$episode['series'],
+							$episode['episode'],
+							$this->pdo->escapeString($episode['se_complete']),
+							$this->pdo->escapeString($episode['title']),
+							($episode['firstaired'] != "" ? $this->pdo->escapeString($episode['firstaired']) : "null"),
+							$this->pdo->escapeString($episode['summary']),
+							$this->pdo->escapeString($episode['se_complete'])
+					)
 			);
 		}
 		return $episodeId;
@@ -322,24 +323,25 @@ abstract class TV extends Videos
 		$ifStringInfo = "IF(%s = '', %s, %s)";
 
 		$this->pdo->queryExec(
-			sprintf('
+				sprintf('
 				UPDATE videos v
 				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
 				SET v.countries_id = %s, v.tvdb = %s, v.trakt = %s, v.tvrage = %s,
 					v.tvmaze = %s, v.imdb = %s, v.tmdb = %s,
-					tvi.summary = %s, tvi.publisher = %s
+					tvi.summary = %s, tvi.publisher = %s, tvi.localzone = %s
 				WHERE v.id = %d',
-				sprintf($ifStringInfo, 'v.countries_id', $this->pdo->escapeString($show['country']), 'v.countries_id'),
-				sprintf($ifStringID, 'v.tvdb', $show['tvdb'], 'v.tvdb'),
-				sprintf($ifStringID, 'v.trakt', $show['trakt'], 'v.trakt'),
-				sprintf($ifStringID, 'v.tvrage', $show['tvrage'], 'v.tvrage'),
-				sprintf($ifStringID, 'v.tvmaze', $show['tvmaze'], 'v.tvmaze'),
-				sprintf($ifStringID, 'v.imdb', $show['imdb'], 'v.imdb'),
-				sprintf($ifStringID, 'v.tmdb', $show['tmdb'], 'v.tmdb'),
-				sprintf($ifStringInfo, 'tvi.summary', $this->pdo->escapeString($show['summary']), 'tvi.summary'),
-				sprintf($ifStringInfo, 'tvi.publisher', $this->pdo->escapeString($show['publisher']), 'tvi.publisher'),
-				$videoId
-			)
+						sprintf($ifStringInfo, 'v.countries_id', $this->pdo->escapeString($show['country']), 'v.countries_id'),
+						sprintf($ifStringID, 'v.tvdb', $show['tvdb'], 'v.tvdb'),
+						sprintf($ifStringID, 'v.trakt', $show['trakt'], 'v.trakt'),
+						sprintf($ifStringID, 'v.tvrage', $show['tvrage'], 'v.tvrage'),
+						sprintf($ifStringID, 'v.tvmaze', $show['tvmaze'], 'v.tvmaze'),
+						sprintf($ifStringID, 'v.imdb', $show['imdb'], 'v.imdb'),
+						sprintf($ifStringID, 'v.tmdb', $show['tmdb'], 'v.tmdb'),
+						sprintf($ifStringInfo, 'tvi.summary', $this->pdo->escapeString($show['summary']), 'tvi.summary'),
+						sprintf($ifStringInfo, 'tvi.publisher', $this->pdo->escapeString($show['publisher']), 'tvi.publisher'),
+						sprintf($ifStringInfo, 'tvi.localzone', $this->pdo->escapeString($show['localzone']), 'tvi.localzone'),
+						$videoId
+				)
 		);
 		if (!empty($show['aliases'])) {
 			$this->addAliases($videoId, $show['aliases']);
@@ -785,11 +787,17 @@ abstract class TV extends Videos
 			case 'tmdbE':
 				$required = ['name', 'season_number', 'episode_number', 'air_date', 'overview'];
 				break;
+			case 'traktS':
+				$required = ['title', 'ids', 'overview', 'first_aired', 'airs', 'country'];
+				break;
+			case 'traktE':
+				$required = ['title', 'season', 'episode', 'overview', 'first_aired'];
+				break;
 		}
 
 		if (is_array($required)) {
 			foreach ($required as $req) {
-				if (!in_array($type, ['tmdbS', 'tmdbE'])){
+				if (!in_array($type, ['tmdbS', 'tmdbE', 'traktS', 'traktE'])){
 					if (!isset($array->$req)) {
 						return false;
 					}
