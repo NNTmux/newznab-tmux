@@ -1,3 +1,6 @@
+[![Code Climate](https://codeclimate.com/github/DariusIII/newznab-tmux/badges/gpa.svg)](https://codeclimate.com/github/DariusIII/newznab-tmux)  [![Build Status](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/badges/build.png?b=master)](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/?branch=master)
+
+
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
 Support is given on irc.synirc.net #tmux channel.
 
@@ -8,8 +11,6 @@ I started adapting some of more interesting scripts from nZEDb, but they require
  CD to the root of your newznab install, ie.  cd /var/www/newznab
  Next steps are very important:
  
- 		If you are already a tmux user, you need to remove the .git folder from tmux folder. 
- 
  		git init 
  		git remote add origin https://github.com/DariusIII/newznab-tmux.git
  		git fetch
@@ -17,6 +18,8 @@ I started adapting some of more interesting scripts from nZEDb, but they require
  		git checkout -t origin/your_wanted_branch, ie. git checkout -t origin/master
 
 	Schema for first database update is located in resources/db/schema/ folder. Import it to your database.
+	There is another file in that folder nntmux_fi_schema.sql, use that if you don't have any releases and users on your site, AKA, completely fresh install of newznab+.
+	BE WARNED: If you import this schema it WILL NUKE YOUR DATABASE.
 	If you are updating from latest newznab svn (aka tvmaze version), you need to rename back tvinfoID columns into rageid
 	(located in releases and userseries tables, maybe some more), before you import the schema.sql.
 	After that you update your database by running update_db.php from cli folder (ie. php cli/update_db.php true)
@@ -84,5 +87,3 @@ I started adapting some of more interesting scripts from nZEDb, but they require
   This version of tmux has many core newznab files modified, use at your own risk.
 
 Tmux is started by following command in cli, from tmux folder: php tmux-ui.php start. Tmux can be gracefuly stopped in similar manner php tmux-ui.php stop.
-
-
