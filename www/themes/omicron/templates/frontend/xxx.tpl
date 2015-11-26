@@ -133,7 +133,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/ade.png"></a>
 													{else}
 														<a
@@ -141,7 +141,7 @@
 																href="{$site->dereferrer_link}http://www.adultdvdempire.com/dvd/search?q={$result.title}"
 																name="viewade{$result.title}"
 																title="Search AdultdvdEmpire page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/ade.png"></a>
 													{/if}
 													{if $result.classused == "hm"}
@@ -150,7 +150,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewhm{$result.title}"
 																title="View Hot Movies page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/hotmovies.png"></a>
 													{else}
 														<a
@@ -158,7 +158,7 @@
 																href="{$site->dereferrer_link}http://www.hotmovies.com/search.php?words={$result.title}&complete=on&search_in=video_title"
 																name="viewhm{$result.title}"
 																title="Search Hot Movies page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/hotmovies.png"></a>
 													{/if}
 													{if $result.classused == "pop"}
@@ -167,7 +167,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewpop{$result.id}"
 																title="View Popporn page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/popporn.png"></a>
 													{else}
 														<a
@@ -175,7 +175,7 @@
 																href="{$site->dereferrer_link}http://www.popporn.com/results/index.cfm?v=4&g=0&searchtext={$result.title}"
 																name="viewpop{$result.id}"
 																title="Search Popporn page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/popporn.png"></a>
 													{/if}
 													<a
@@ -183,7 +183,7 @@
 															href="{$site->dereferrer_link}http://www.iafd.com/results.asp?searchtype=title&searchstring={$result.title}"
 															name="viewiafd{$result.title}"
 															title="Search Internet Adult Film Database"
-															><img
+													><img
 																src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
@@ -222,9 +222,9 @@
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}|escape:"htmlall"}"><i
-																		class="fa fa-cloud-download"></i><span
-																		class="badge"> {$mgrabs[$m@index]}
-																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
+																	class="fa fa-cloud-download"></i><span
+																	class="badge"> {$mgrabs[$m@index]}
+																Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 															<a role="button" class="btn btn-default btn-xs"
 															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
 																		class="fa fa-comment-o"></i><span
@@ -236,7 +236,7 @@
 															{if isset($sabintegrated)}
 																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																	  title="Send to my Queue"><i
-																			class="fa fa-send"></i></span>
+																			class="fa fa-share"></i></span>
 															{/if}
 														</div>
 													</div>
@@ -285,7 +285,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/ade.png"></a>
 													{else}
 														<a
@@ -293,7 +293,7 @@
 																href="{$site->dereferrer_link}http://www.adultdvdempire.com/dvd/search?q={$result.title}"
 																name="viewade{$result.title}"
 																title="Search AdultdvdEmpire page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/ade.png"></a>
 													{/if}
 													{if $result.classused == "hm"}
@@ -302,7 +302,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewhm{$result.title}"
 																title="View Hot Movies page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/hotmovies.png"></a>
 													{else}
 														<a
@@ -310,7 +310,7 @@
 																href="{$site->dereferrer_link}http://www.hotmovies.com/search.php?words={$result.title}&complete=on&search_in=video_title"
 																name="viewhm{$result.title}"
 																title="Search Hot Movies page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/hotmovies.png"></a>
 													{/if}
 													{if $result.classused == "pop"}
@@ -319,7 +319,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewpop{$result.id}"
 																title="View Popporn page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/popporn.png"></a>
 													{else}
 														<a
@@ -327,7 +327,7 @@
 																href="{$site->dereferrer_link}http://www.popporn.com/results/index.cfm?v=4&g=0&searchtext={$result.title}"
 																name="viewpop{$result.id}"
 																title="Search Popporn page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/popporn.png"></a>
 													{/if}
 													<a
@@ -335,7 +335,7 @@
 															href="{$site->dereferrer_link}http://www.iafd.com/results.asp?searchtype=title&searchstring={$result.title}"
 															name="viewiafd{$result.title}"
 															title="Search Internet Adult Film Database"
-															><img
+													><img
 																src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
@@ -374,9 +374,9 @@
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}|escape:"htmlall"}"><i
-																		class="fa fa-cloud-download"></i><span
-																		class="badge"> {$mgrabs[$m@index]}
-																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
+																	class="fa fa-cloud-download"></i><span
+																	class="badge"> {$mgrabs[$m@index]}
+																Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 															<a role="button" class="btn btn-default btn-xs"
 															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
 																		class="fa fa-comment-o"></i><span
@@ -388,7 +388,7 @@
 															{if isset($sabintegrated)}
 																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																	  title="Send to my Queue"><i
-																			class="fa fa-send"></i></span>
+																			class="fa fa-share"></i></span>
 															{/if}
 														</div>
 													</div>

@@ -177,9 +177,9 @@
 															<div>
 																<a role="button" class="btn btn-default btn-xs"
 																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}|escape:"htmlall"}"><i
-																			class="fa fa-cloud-download"></i><span
-																			class="badge">{$mgrabs[$m@index]}
-																		Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
+																		class="fa fa-cloud-download"></i><span
+																		class="badge">{$mgrabs[$m@index]}
+																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																<a role="button" class="btn btn-default btn-xs"
 																   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}#comments"><i
 																			class="fa fa-comment-o"></i><span
@@ -191,7 +191,7 @@
 																{if isset($sabintegrated)}
 																	<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																		  title="Send to my Queue"><i
-																				class="fa fa-send"></i></span>
+																				class="fa fa-share"></i></span>
 																{/if}
 															</div>
 														</td>
