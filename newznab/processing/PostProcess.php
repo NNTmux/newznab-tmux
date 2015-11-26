@@ -264,7 +264,7 @@ class PostProcess
 			(new TVDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
 			(new TVMaze(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
 			(new TMDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
-			//(new TraktTv(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTrakt($groupID, $guidChar, $processTV);
+			(new TraktTv(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
 			//(new TvRage(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvRage($groupID, $guidChar, $processTV);
 		}
 	}
