@@ -585,7 +585,7 @@ CREATE TABLE IF NOT EXISTS dnzb_failures (
   release_id INT(11) UNSIGNED NOT NULL,
   userid INT(11) UNSIGNED NOT NULL,
   failed INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  PRIMARY KEY (release_id, userid),
+  PRIMARY KEY (release_id, userid)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
@@ -2289,7 +2289,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('spotnabsiteprvkey', '', '', '', 'spotnabsiteprvkey', ''),
 ('spotnabsitepubkey', '', '', '', 'spotnabsitepubkey', ''),
 ('spotnabuser', '', '', '', 'spotnabuser', ''),
-('sqlpatch', '212', '', '', 'sqlpatch', ''),
+('sqlpatch', '213', '', '', 'sqlpatch', ''),
 ('storeuserips', '0', '', '', 'storeuserips', ''),
 ('strapline', 'A great usenet indexer','', '', 'strapline', ''),
 ('style', 'omicron', '', '', 'style', ''),
