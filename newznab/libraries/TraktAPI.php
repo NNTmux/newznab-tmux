@@ -12,12 +12,9 @@ Class TraktAPI {
 	const API_URL = 'https://api-v2launch.trakt.tv/';
 
 	/**
-	 * The Trakt.tv API v2 Client ID (SHA256 hash - 64 characters long string). Used for movie and tv lookups.
-	 * Create one here: https://trakt.tv/oauth/applications/new
-	 *
-	 * @var array|bool|string
+	 * @var array	List of site IDs that trakt,tv supports. Only trakt is guaranteed to exist.
 	 */
-	private $clientId;
+	private $types = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvrage'];
 
 	/**
 	 * List of headers to send to Trakt.tv when making a request.
@@ -28,41 +25,26 @@ Class TraktAPI {
 	private $requestHeaders;
 
 	/**
-	 * @var array	List of site IDs that trakt,tv supports. Only trakt is guaranteed to exist.
-	 */
-	private $types = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvrage'];
-
-	/**
-	 * Construct. Set up API key.
-	 *
-	 * @param array $options Class instances.
+	 * Construct. Assign passed request headers.  Headers should be complete with API key.
 	 *
 	 * @access public
+	 *
+	 * @param $headers
 	 */
-	public function __construct(array $options = [])
+	public function __construct($headers)
 	{
-		$defaults = [
-				'clientId' => '',
-		];
-		$options += $defaults;
-
-		if (empty($options['clientId'])) {
-			// Can't work without an ID.
-			return null;
+		if (empty($headers)) {
+			// Can't work without headers.
+			exit;
+		} else {
+			$this->requestHeaders = $headers;
 		}
-		$this->clientId = $options['clientId'];
-		$this->requestHeaders = [
-				'Content-Type: application/json',
-				'trakt-api-version: 2',
-				'trakt-api-key: ' . $this->clientId,
-				'Content-Lenghth: 0'
-		];
 	}
 
 	/**
-	 * Fetches summary from trakt.tv for the TV show using the title/season/episode.
+	 * Fetches summary from trakt.tv for the TV show using the trakt ID/season/episode.
 	 *
-	 * @param string $title
+	 * @param int    $id
 	 * @param string $season
 	 * @param string $ep
 	 * @param string $type
@@ -72,26 +54,24 @@ Class TraktAPI {
 	 *
 	 * @access public
 	 */
-	public function episodeSummary($title = '', $season = '', $ep = '', $type = 'min')
+	public function episodeSummary($id, $season = '', $ep = '', $type = 'min')
 	{
 		switch($type) {
+			case 'aliases':
 			case 'full':
 			case 'images':
 			case 'full,images':
+			case 'full,images,aliases':
 				$extended = $type;
 				break;
 			default:
 				$extended = 'min';
 		}
 
-		$array = $this->getJsonArray(
-				self::API_URL . 'shows/' .
-				$this->slugify($title) .
-				'/seasons/' . str_replace(['S', 's'], '', $season) .
-				'/episodes/' . str_replace(['E', 'e'], '', $ep),
-				$extended
-		);
-		if (!$array) {
+		$url = self::API_URL . "shows/{$id}/seasons/{$season}/episodes/{$ep}";
+
+		$array = $this->getJsonArray($url, $extended);
+		if (!is_array($array)) {
 			return false;
 		}
 		return $array;
@@ -160,7 +140,9 @@ Class TraktAPI {
 		} else {
 			$extendedString = "?extended=" . $extended;
 		}
-		if (!empty($this->clientId)) {
+
+		if (!empty($this->requestHeaders)) {
+
 			$json = Utility::getUrl([
 							'url'            => $URI . $extendedString,
 							'requestheaders' => $this->requestHeaders
@@ -172,7 +154,6 @@ Class TraktAPI {
 				if (!is_array($json) || (isset($json['status']) && $json['status'] === 'failure')) {
 					return false;
 				}
-
 				return $json;
 			}
 		}
@@ -271,7 +252,7 @@ Class TraktAPI {
 	public function showSearch($show = '', $type = 'show')
 	{
 		$searchUrl = self::API_URL . 'search?query=' .
-				$this->slugify($show) .
+				str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $show)) .
 				'&type=' . $type;
 
 		return $this->getJsonArray($searchUrl, '');
@@ -279,7 +260,7 @@ Class TraktAPI {
 
 	/**
 	 * Fetches summary from trakt.tv for the show.
-	 * Accept a trakt slug (game-of-thrones), a IMDB id, or Trakt id.
+	 * Accepts a trakt slug (game-of-thrones), a IMDB id, or Trakt id.
 	 *
 	 * @param string $show  Title or IMDB id.
 	 * @param string $type  full:        Return all extended properties (minus images). (returns array)
@@ -310,20 +291,21 @@ Class TraktAPI {
 			default:
 				$extended = '';
 		}
+
 		return $this->getJsonArray($showUrl, $extended);
 	}
 
 	/**
 	 * Generate and return a slug for a given ``$phrase``.
 	 *
-	 * @param string $phrase
+	 * @param $phrase
 	 *
 	 * @return mixed
 	 */
 	public function slugify($phrase)
 	{
-		$result = preg_replace('#[^a-z0-9\s-]#', '-', strtolower($phrase));
-		$result = preg_replace('#\s#', '-', trim(preg_replace('#[\s-]+#', '-', $result)));
+		$result = preg_replace('#[^a-z0-9\s-]#', '', strtolower($phrase));
+		$result = preg_replace('#\s#', '-', trim(preg_replace('#[\s-]+#', ' ', $result)));
 
 		return $result;
 	}
