@@ -16,8 +16,8 @@ class AdminPage extends BasePage
 
 		$tplpaths = [];
 		if ($this->settings->getSetting('style') != "default")
-			$tplpaths["style_admin"] = NN_WWW.'themes_shared/templates/admin';
-		$tplpaths["admin"] = NN_WWW.'themes_shared/templates/admin';
+			$tplpaths["style_admin"] = NN_THEMES.'shared/templates/admin';
+		$tplpaths["admin"] = NN_THEMES.'shared/templates/admin';
 		$tplpaths["frontend"] = NN_WWW.'themes/Omicron/templates/frontend';
 		$this->smarty->setTemplateDir($tplpaths);
 

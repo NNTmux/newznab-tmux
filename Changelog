@@ -1,3 +1,5 @@
+2015-11-28 DariusIII
+	Chg: Move themes_shared folder into themes/shared. Add new Gamma template (still WIP)
 2015-11-27 DariusIII
 	Chg: rename template folders to Omicron and Charisma
 	Rmv: Remove nntmux theme, it has been out of sync for some time now
