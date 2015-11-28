@@ -6,14 +6,14 @@
 	<meta name="keywords" content="" />
 	<meta name="description" content="" />
 	<title>{$site->title|default:'newznab'} - {$page->meta_title|default:$page->title}</title>
-	<link href="{$smarty.const.WWW_TOP}/../themes_shared/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_TOP}/../themes_shared/styles/admin.css" rel="stylesheet" type="text/css" media="screen" />
-	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/../themes_shared/images/favicon.ico"/>
+	<link href="{$smarty.const.WWW_THEMES}/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_THEMES}/styles/admin.css" rel="stylesheet" type="text/css" media="screen" />
+	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWWWWW_THEMES}/images/favicon.ico"/>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes_shared/scripts/sorttable.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes_shared/scripts/utils-admin.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes_shared/scripts/jquery.multifile.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../themes_shared/scripts/jquery.autosize-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/scripts/sorttable.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/scripts/utils-admin.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/scripts/jquery.multifile.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/scripts/jquery.autosize-min.js"></script>
 	<script type="text/javascript">var WWW_TOP = "{$smarty.const.WWW_TOP}/..";</script>
 
 	{$page->head}

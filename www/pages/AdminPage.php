@@ -18,7 +18,7 @@ class AdminPage extends BasePage
 		if ($this->settings->getSetting('style') != "default")
 			$tplpaths["style_admin"] = NN_WWW.'themes_shared/templates/admin';
 		$tplpaths["admin"] = NN_WWW.'themes_shared/templates/admin';
-		$tplpaths["frontend"] = NN_WWW.'themes/omicron/templates/frontend';
+		$tplpaths["frontend"] = NN_WWW.'themes/Omicron/templates/frontend';
 		$this->smarty->setTemplateDir($tplpaths);
 
 		if (!$this->users->isLoggedIn() || !isset($this->userdata["role"]) || $this->userdata["role"] != Users::ROLE_ADMIN)
