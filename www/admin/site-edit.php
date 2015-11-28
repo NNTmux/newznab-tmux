@@ -170,7 +170,7 @@ $page->smarty->assign('book_reqids_selected', $books_selected);
 $themelist = [];
 $themes    = scandir(NN_WWW . "/themes");
 foreach ($themes as $theme) {
-	if (strpos($theme, ".") === false && is_dir(nZEDb_THEMES . $theme) && ucfirst($theme) === $theme) {
+	if (strpos($theme, ".") === false && is_dir(NN_THEMES . $theme) && ucfirst($theme) === $theme) {
 		$themelist[] = $theme;
 	}
 }
