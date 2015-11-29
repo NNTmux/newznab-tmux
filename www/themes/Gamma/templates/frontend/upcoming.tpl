@@ -39,10 +39,7 @@
 				{else}
 					<br/><br/>
 				{/if}
-				<a style="display:{if $userimdbs[$result->alternate_ids->imdb] != ""}inline{else}none;{/if}" onclick="mymovie_del('{$result->alternate_ids->imdb}', this);return false;" href="#" class="rndbtn btn btn-mini btn-danger">Remove From My Movies</a>
 				<br/>
-
-
 			</td>
 		</tr>
 		{/foreach}
