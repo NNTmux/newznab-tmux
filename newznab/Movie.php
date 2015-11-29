@@ -560,8 +560,7 @@ class Movie
 	{
 		return [
 			'actors','backdrop','cover','director','genre','imdbid','language',
-			'plot','rating','tagline','title','tmdbid', 'trailer','type','year',
-			'traktid'
+			'plot','rating','tagline','title','tmdbid', 'trailer','type','year'
 		];
 	}
 
@@ -677,7 +676,6 @@ class Movie
 
 		$mov['imdbid'] = $imdbId;
 		$mov['tmdbid'] = (!isset($tmdb['tmdbid']) || $tmdb['tmdbid'] == '') ? 0 : $tmdb['tmdbid'];
-		$mov['traktid'] = $trakt['id'];
 
 		// Prefer Fanart.tv cover over TRAKT, TRAKT over TMDB and TMDB over IMDB.
 		if ($this->checkVariable($fanart['cover'])) {
@@ -749,8 +747,7 @@ class Movie
 			'title'     => $mov['title'],
 			'tmdbid'    => $mov['tmdbid'],
 			'type'      => html_entity_decode(ucwords(preg_replace('/[\.\_]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8'),
-			'year'      => $mov['year'],
-			'traktid'   => $mov['traktid']
+			'year'      => $mov['year']
 		]);
 
 		if ($this->echooutput && $this->service !== '') {

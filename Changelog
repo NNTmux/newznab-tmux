@@ -1,3 +1,5 @@
+2015-11-29 DariusIII
+	Chg: Remove traktid from Movie lookups
 2015-11-28 DariusIII
 	Chg: Move themes_shared folder into themes/shared. Add new Gamma template (still WIP)
 2015-11-27 DariusIII
