@@ -1,20 +1,5 @@
 <h1>{$page->title}</h1>
 
-<br/>
-<table>
-{foreach $lists as $key=>$result}
-    <tr>
-        <th style="vertical-align:top;text-align:right;width:80px;">{$key} :</th>
-        <td>
-            {foreach $result as $row}
-                <a style="display:inline-block;margin:0 0 3px 0" class="btn btn-small" href="{$smarty.const.WWW_TOP}/upcoming/{$row.typeid}">{$row.title|escape:htmlall}</a>
-            {/foreach}
-        </td>
-    </tr>
-{/foreach}
-</table>
-<br/>
-
 {$site->adbrowse}
 
 {if $data|@count > 0}
@@ -52,12 +37,6 @@
 					{/foreach}
 				{else}
 					<br/><br/>
-				{/if}
-
-				{if $ourmovies[$result->alternate_ids->imdb] != ""}
-					<a class="rndbtn btn btn-mini btn-success" href="{$smarty.const.WWW_TOP}/movies?imdb={$result->alternate_ids->imdb}">Download</a>
-				{else}
-					<a {if $userimdbs[$result->alternate_ids->imdb] != ""}style="display:none;"{/if} onclick="mymovie_add('{$result->alternate_ids->imdb}', this);return false;" class="rndbtn btn btn-mini btn-info" href="#">Add To My Movies</a>
 				{/if}
 				<a style="display:{if $userimdbs[$result->alternate_ids->imdb] != ""}inline{else}none;{/if}" onclick="mymovie_del('{$result->alternate_ids->imdb}', this);return false;" href="#" class="rndbtn btn btn-mini btn-danger">Remove From My Movies</a>
 				<br/>
