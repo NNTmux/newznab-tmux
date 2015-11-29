@@ -15,7 +15,8 @@
 			<td class="mid">
 				<div class="movcover">
 					<center>
-					<img class="shadow img img-polaroid" src="{$result->posters->profile|regex_replace:"/(http:\/\/resizing\.flixster\.com\/[a-z0-9\=\-\+\_]+\/[a-z0-9\=\-\+\_]+\/[a-z0-9\=\-\+\_]+\.cloudfront\.net)/i":"https://content6.flixster.com"|replace:array("tmb","ori"):"pro"}" width="120" border="0" alt="{$result->title|escape:"htmlall"}" />
+					<img class="shadow img img-polaroid" src="{replace_url($result->posters->original)}" width="120" border="0"
+						 alt="{$result->title|escape:"htmlall"}"/>
 					</center>
 					<div class="movextra">
 						<center>
