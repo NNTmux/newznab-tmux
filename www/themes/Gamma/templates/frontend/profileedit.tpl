@@ -2,7 +2,7 @@
 	<li><h5><a href="{$smarty.const.WWW_TOP}/profile">Profile</a> <span class="divider">/</span></li>
 	<li class="active">Edit profile</h5></li>
 </ul>
-	
+
 {if $error != ''}
 <div class="alert alert-error">
 	<strong>Error!</strong>
@@ -60,7 +60,7 @@
 				{/if}
 			</div>
 		</div>
-		
+
 		<div class="control-group">
 			<label class="control-label" for="movieview">View Movie Page</label>
 			<div class="controls">
@@ -84,7 +84,7 @@
 				<span class="help-block">Browse console covers. Only shows games with known lookup info.</span>
 			</div>
 		</div>
-		
+
 		<div class="control-group">
 			<label class="control-label" for="gameview">View Games Page</label>
 			<div class="controls">
@@ -100,8 +100,8 @@
 				<span class="help-block">Browse book covers. Only shows books with known lookup info.</span>
 			</div>
 		</div>
-		
-				
+
+
 		<div class="control-group">
 			<label class="control-label" for="xxxview">View XXX Page</label>
 			<div class="controls">
@@ -120,7 +120,7 @@
 	</fieldset>
 
 	{if $page->settings->getSetting('sabintegrationtype') > 0}
-	
+
 	{if $page->settings->getSetting('sabintegrationtype') != 1}
 		<legend>Queue type (NZBget / Sabnzbd)</legend>
 
@@ -175,10 +175,10 @@
 		</div>
 
 	</fieldset>
-	
+
 	<fieldset>
     <legend>NZBGet Integration</legend>
-	
+
 	<div class="control-group">
             <label class="control-label" for="nzbgeturl">NZBGet Url</label>
 			<div class="controls">
@@ -200,14 +200,6 @@
 			<div class="controls">
                 <input id="nzbgetpassword" class="input input-xxlarge" name="nzbgetpassword" type="text" value="{$user.nzbgetpassword}" />
                 <div class="hint">The NZBGet ControlPassword e.g. tegbzn6789</div>
-			</div>
-	</div>
-
-	<div class="control-group">
-            <label class="control-label" for="nzbgetsetting">Setting Storage</label>
-			<div class="controls">
-                {html_radios id="nzbgetsetting" name='nzbgetsetting' values=$nzbgetsetting_ids output=$nzbgetsetting_names selected=$nzbgetsetting_selected separator='&nbsp;&nbsp;'}{if $nzbgetsetting_selected == 2}&nbsp;&nbsp;[<a class="confirm_action" href="?action=clearcookies">Clear Cookies</a>]{/if}
-                <span class="help-block">Where to store the NZBGet settings.<br />&bull; <b>Cookie</b> will store the setting in your browsers coookies and will only work when using your current browser.<br/>&bull; <b>Site</b> will store the setting in your user account enabling it to work no matter where you are logged in from.<br /><span class="warning"><b>Please Note:</b></span> You should only store your NZBGet credentials with sites you trust.</span>
 			</div>
 	</div>
 	</fieldset>
