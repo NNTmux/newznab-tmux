@@ -1,5 +1,5 @@
 body {background:#ffffff;background-image:none; padding:0}
-               
+
 /* Original hacks by Jonathon Joyce (edited) */
 .row {margin:0;margin-left:-20px}
 .span1, .span2, .span3, .span4, .span5, .span6, .span7, .span8, .span9, .span10, .span11, .span12  {float:left;display:inline}
@@ -14,19 +14,19 @@ body {background:#ffffff;background-image:none; padding:0}
         .navbar .nav li a {float:none;line-height:19px;padding:10px 10px 11px}
         .navbar .nav li a:hover {background-color:transparent;color:#ffffff;text-decoration:none}
 
-        .navbar .nav .active a, 
+        .navbar .nav .active a,
             .navbar .nav .active a:hover {color:#ffffff;text-decoration:none;background-color:#222222;background-color:#000}
-        .navbar .nav .open .dropdown-toggle, 
+        .navbar .nav .open .dropdown-toggle,
             .navbar .nav .active .dropdown-toggle,
             .navbar .nav .open.active .dropdown-toggle{background-color:transparent}
         .navbar .nav .active .dropdown-toggle:hover {color:#ffffff}
 
     .dropdown .dropdown-toggle {margin-bottom:1px;position:relative;top:2px;left:0px}
-    
+
     .dropdown-menu li {width:100%}
         .dropdown-menu li a {width:100%;padding:3px 0px 3px 5px}
-        .dropdown-menu li a:hover, 
-        .dropdown-menu .active a, 
+        .dropdown-menu li a:hover,
+        .dropdown-menu .active a,
         .dropdown-menu .active a:hover {background-color:#0088CC;color:#FFFFFF;text-decoration:none}
 
 /* Tabs */
@@ -36,7 +36,7 @@ body {background:#ffffff;background-image:none; padding:0}
 
 .tab-content .tab-pane {display:none}
 .tab-content .tab-pane.active {display:block;background-color:transparent}
-               
+
 
 /* Forms */
 .button-reset {height:auto;width:auto;margin-bottom:0px}
@@ -52,7 +52,7 @@ label.radio {display:block;line-height:18px;height:18px;width:100%;padding-left:
 .form-inline label.checkbox {display:inline-block;line-height:18px;height:18px;width:auto;padding-left:0px;margin: 0px}
 .form-inline .input-checkbox {width:auto;float:left;display:inline-block;padding:0px;margin:0px;height:auto;border:none}
 
-legend { width:auto}	
+legend { width:auto}
 
 .form-horizontal .help-block {display:inline-block;margin-left: 3px}
 .form-horizontal .control-label {float:left;display:inline-block;width:140px;text-align:right;padding-top:5px}
@@ -75,7 +75,7 @@ input.btn, a.btn, button.btn {height:auto;width:auto}
 .input-prepend input {margin-top:1px}
 
 /* Icons */
-.icon-sprite {background-image:url("../../themes/gamma/images/glyphicons-halflings.png");background-repeat:no-repeat;display:inline-block;height:14px;line-height:14px;vertical-align:text-top;width:14px;padding-left:3px}
+.icon-sprite {background-image:url("../../themes/Gamma/images/glyphicons-halflings.png");background-repeat:no-repeat;display:inline-block;height:14px;line-height:14px;vertical-align:text-top;width:14px;padding-left:3px}
 
 /* Navbar */
 .dropdown .caret {font-size:1px;height:2px;background:none;background-color:#292929;color:#292929}

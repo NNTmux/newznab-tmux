@@ -37,7 +37,7 @@ View:
 				{assign var="icon" value=$result.pathinfo.extension}
 			{/if}
 
-			<td><img title=".{$result.pathinfo.extension}" alt="{$result.pathinfo.extension}" src="{$smarty.const.WWW_TOP}/themes/gamma/images/fileicons/{$icon}.png" /></td>
+			<td><img title=".{$result.pathinfo.extension}" alt="{$result.pathinfo.extension}" src="{$smarty.const.WWW_TOP}/themes/Gamma/images/fileicons/{$icon}.png" /></td>
 			<td class="item">
 				{if $result.isdir == 1}
 					<a href="?sp={$subpath|escape:"url"}{$result.name|escape:"url"}&lm={if $lm}1{else}0{/if}">{$result.name|escape:"htmlall"}</a>

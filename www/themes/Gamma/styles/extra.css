@@ -52,7 +52,7 @@
         padding: 9px 14px;
         position: relative;
         overflow: hidden;
-        
+
         background-color: #ffffff;
         border: 1px solid rgba(0, 0, 0, 0.2);
         -webkit-border-bottom-right-radius: 6px;
@@ -75,7 +75,7 @@
         overflow: hidden;
         font-weight: normal;
         line-height: 18px;
-        
+
         background-color: #f7f7f7;
 
         border-bottom: 1px solid #ebebeb;
@@ -106,7 +106,7 @@
             border-width: 1px;
             border-style: solid;
         }
-        
+
         * html .ui-tooltip-titlebar .ui-state-default{
             top: 16px;
         }
@@ -199,31 +199,31 @@
 /*
 movie, console and music modals with backdrop images.
 */
-#movieinfo { 
-    background-position: center center; 
-    background-repeat: no-repeat; 
-    position: absolute; 
+#movieinfo {
+    background-position: center center;
+    background-repeat: no-repeat;
+    position: absolute;
     z-index: 2;
 }
-#movieinfo h1 { 
-    font-size: 28px; 
-    line-height:100%; 
-    padding: 10px 10px 0px 20px; 
-    color: #fff; 
-    text-shadow: 0px 0px 4px #000; 
+#movieinfo h1 {
+    font-size: 28px;
+    line-height:100%;
+    padding: 10px 10px 0px 20px;
+    color: #fff;
+    text-shadow: 0px 0px 4px #000;
 }
-#movieinfo h2, #movieinfo h3 { 
-    font-size: 18px; 
-    padding: 0px 20px 0px 20px; 
-    color: #fff; 
-    text-shadow: 0px 0px 4px #000; 
+#movieinfo h2, #movieinfo h3 {
+    font-size: 18px;
+    padding: 0px 20px 0px 20px;
+    color: #fff;
+    text-shadow: 0px 0px 4px #000;
     font-weight: normal;
     line-height: 20px;
     text-rendering: optimizelegibility;
 }
 
-#movieinfo img.cover { 
-    margin-right: 20px; 
+#movieinfo img.cover {
+    margin-right: 20px;
     padding: 4px;
     background-color: #fff;
     border: 1px solid #ccc;
@@ -233,62 +233,62 @@ movie, console and music modals with backdrop images.
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     border-collapse:separate;
     /*
-    margin-right: 20px; 
-    -webkit-box-shadow: 0px 0px 4px #000; 
-    -moz-box-shadow: 0px 0px 4px #000; 
-    box-shadow: 0px 0px 4px #000; 
+    margin-right: 20px;
+    -webkit-box-shadow: 0px 0px 4px #000;
+    -moz-box-shadow: 0px 0px 4px #000;
+    box-shadow: 0px 0px 4px #000;
     border-collapse:separate;*/
 }
-#backdrop { 
-    position: absolute; 
-    width: 1010px; 
-    height: 655px; 
-    left: -1px; 
-    top: 5px; 
-    background-color: #000; 
+#backdrop {
+    position: absolute;
+    width: 1010px;
+    height: 655px;
+    left: -1px;
+    top: 5px;
+    background-color: #000;
     overflow: hidden;
 }
-#backdrop img { 
-    opacity:0.5; 
-    width: 100%; 
+#backdrop img {
+    opacity:0.5;
+    width: 100%;
     height: 100%;
 }
 
 
-#moviefull .pic { 
-    margin-left: 20px; 
-    float: right; 
+#moviefull .pic {
+    margin-left: 20px;
+    float: right;
 }
 
-#musicinfo { 
-    color:#FFF; 
-    min-height:635px; 
-    background-color:#7F7F7F; 
-    background-image:url('../../covers/music/backdrop.jpg'); 
+#musicinfo {
+    color:#FFF;
+    min-height:635px;
+    background-color:#7F7F7F;
+    background-image:url('../../covers/music/backdrop.jpg');
     background-repeat: repeat-x;
 }
-#musicinfo h1 { 
-    font-size: 32px; 
-    padding: 10px 10px 0px 20px; 
-    color: #fff; 
-}
-#musicinfo h2, #musicinfo h3, #musicinfo p { 
-    padding: 10px 20px 0px 20px; 
+#musicinfo h1 {
+    font-size: 32px;
+    padding: 10px 10px 0px 20px;
     color: #fff;
 }
-#musicinfo img.cover { 
-    float:right;  
-    margin:20px 20px 0 20px; 
-    padding: 5px 5px 5px 5px; 
-    background: #FFF; 
-    border:1px solid #EEE; 
-    -moz-box-shadow: 3px 6px 8px -4px #333; 
-    -webkit-box-shadow: 3px 6px 8px -4px #333; 
-    box-shadow: 3px 6px 8px -4px #333; 
-    border-collapse:separate; 
+#musicinfo h2, #musicinfo h3, #musicinfo p {
+    padding: 10px 20px 0px 20px;
+    color: #fff;
+}
+#musicinfo img.cover {
+    float:right;
+    margin:20px 20px 0 20px;
+    padding: 5px 5px 5px 5px;
+    background: #FFF;
+    border:1px solid #EEE;
+    -moz-box-shadow: 3px 6px 8px -4px #333;
+    -webkit-box-shadow: 3px 6px 8px -4px #333;
+    box-shadow: 3px 6px 8px -4px #333;
+    border-collapse:separate;
 }
 #musicinfo p {
-    text-align: left; 
+    text-align: left;
     line-height: 180%;
 }
 
@@ -315,20 +315,20 @@ a.external { background: url('../../images/newwindow.png') center right no-repea
 #cboxOverlay{background:#fff;}
 
 #colorbox{}
-    #cboxTopLeft{width:25px; height:25px; background:url(../../themes/gamma/images/colorbox/colorboxborder1-dark.png) 0 0 no-repeat;}
-    #cboxTopCenter{height:25px; background:url(../../themes/gamma/images/colorbox/border1-dark.png) 0 -50px repeat-x;}
-    #cboxTopRight{width:25px; height:25px; background:url(../../themes/gamma/images/colorbox/border1-dark.png) -25px 0 no-repeat;}
-    #cboxBottomLeft{width:25px; height:25px; background:url(../../themes/gamma/images/colorbox/border1-dark.png) 0 -25px no-repeat;}
-    #cboxBottomCenter{height:25px; background:url(../../themes/gamma/images/colorbox/border1-dark.png) 0 -75px repeat-x;}
-    #cboxBottomRight{width:25px; height:25px; background:url(../../themes/gamma/images/colorbox/border1-dark.png) -25px -25px no-repeat;}
-    #cboxMiddleLeft{width:25px; background:url(../../themes/gamma/images/colorbox/border2-dark.png) 0 0 repeat-y;}
-    #cboxMiddleRight{width:25px; background:url(../../themes/gamma/images/colorbox/border2-dark.png) -25px 0 repeat-y;}
+    #cboxTopLeft{width:25px; height:25px; background:url(../../themes/Gamma/images/colorbox/colorboxborder1-dark.png) 0 0 no-repeat;}
+    #cboxTopCenter{height:25px; background:url(../../themes/Gamma/images/colorbox/border1-dark.png) 0 -50px repeat-x;}
+    #cboxTopRight{width:25px; height:25px; background:url(../../themes/Gamma/images/colorbox/border1-dark.png) -25px 0 no-repeat;}
+    #cboxBottomLeft{width:25px; height:25px; background:url(../../themes/Gamma/images/colorbox/border1-dark.png) 0 -25px no-repeat;}
+    #cboxBottomCenter{height:25px; background:url(../../themes/Gamma/images/colorbox/border1-dark.png) 0 -75px repeat-x;}
+    #cboxBottomRight{width:25px; height:25px; background:url(../../themes/Gamma/images/colorbox/border1-dark.png) -25px -25px no-repeat;}
+    #cboxMiddleLeft{width:25px; background:url(../../themes/Gamma/images/colorbox/border2-dark.png) 0 0 repeat-y;}
+    #cboxMiddleRight{width:25px; background:url(../../themes/Gamma/images/colorbox/border2-dark.png) -25px 0 repeat-y;}
     #cboxContent{background:#000;}
         #cboxLoadedContent{background:#000; margin-top:32px; padding:1px; }
         #cboxLoadingOverlay{background:#000;}
         #cboxTitle{position:absolute; font-size:125%; top:-2px; left:0; color:#fff; background:#000;}
         #cboxCurrent{position:absolute; top:-1px; right:205px; text-indent:-9999px;}
-        #cboxSlideshow, #cboxPrevious, #cboxNext, #cboxClose{text-indent:-9999px; width:20px; height:20px; position:absolute; top:-1px; background:url(../../themes/gamma/images/colorbox/controls-dark.png) 0 0 no-repeat;}
+        #cboxSlideshow, #cboxPrevious, #cboxNext, #cboxClose{text-indent:-9999px; width:20px; height:20px; position:absolute; top:-1px; background:url(../../themes/Gamma/images/colorbox/controls-dark.png) 0 0 no-repeat;}
         #cboxPrevious{background-position:0px 0px; right:44px;}
         #cboxPrevious.hover{background-position:0px -25px;}
         #cboxNext{background-position:-25px 0px; right:22px;}
@@ -359,7 +359,7 @@ a.external { background: url('../../images/newwindow.png') center right no-repea
         .cboxMovie #cboxLoadingOverlay{background:#000;}
         .cboxMovie #cboxTitle{position:absolute; top:-22px; left:0; color:#000;}
         .cboxMovie #cboxCurrent{position:absolute; top:-22px; right:205px; text-indent:-9999px;}
-        .cboxMovie #cboxSlideshow, .cboxMovie #cboxPrevious, .cboxMovie #cboxNext, .cboxMovie #cboxClose{text-indent:-9999px; width:20px; height:20px; position:absolute; top:-20px; background:url(../../themes/gamma/images/colorbox/controls-dark.png) 0 0 no-repeat;}
+        .cboxMovie #cboxSlideshow, .cboxMovie #cboxPrevious, .cboxMovie #cboxNext, .cboxMovie #cboxClose{text-indent:-9999px; width:20px; height:20px; position:absolute; top:-20px; background:url(../../themes/Gamma/images/colorbox/controls-dark.png) 0 0 no-repeat;}
         .cboxMovie #cboxPrevious{background-position:0px 0px; right:44px;}
         .cboxMovie #cboxPrevious.hover{background-position:0px -25px;}
         .cboxMovie #cboxNext{background-position:-25px 0px; right:22px;}

@@ -237,7 +237,7 @@
                                 {if $weHasVortex}
                                     <li>
                                         <a class="icon icon_nzb fa fa-downloadvortex" href="#" title="Send to NZBVortex">
-                                            <img class="icon icon_nzb fa fa-downloadvortex" alt="Send to my NZBVortex" src="{$smarty.const.WWW_TOP}/themes/gamma/images/icons/vortex/bigsmile.png">
+                                            <img class="icon icon_nzb fa fa-downloadvortex" alt="Send to my NZBVortex" src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/vortex/bigsmile.png">
                                         </a>
                                     </li>
                                 {/if}

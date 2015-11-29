@@ -21,32 +21,32 @@
 {if $site->google_adsense_acc != ''}
 	<link href="http://www.google.com/cse/api/branding.css" rel="stylesheet" type="text/css" media="screen" />
 {/if}
-	<link href="{$smarty.const.WWW_TOP}/themes/gamma/styles/bootstrap.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_TOP}/themes/gamma/styles/font-awesome.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_TOP}/themes/gamma/styles/extra.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_TOP}/themes/gamma/styles/jquery.pnotify.default.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_TOP}/themes/gamma/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_TOP}/themes/gamma/styles/bootstrap.cyborg.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_TOP}/themes/gamma/styles/bootstrap-fixes.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/themes/Gamma/styles/bootstrap.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/themes/Gamma/styles/font-awesome.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/themes/Gamma/styles/extra.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/themes/Gamma/styles/jquery.pnotify.default.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/themes/Gamma/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/themes/Gamma/styles/bootstrap.cyborg.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/themes/Gamma/styles/bootstrap-fixes.css" rel="stylesheet" type="text/css" media="screen" />
 
 	<!-- FAVICON -->
 	<link rel="search" type="application/opensearchdescription+xml" href="/opensearch" title="{$site->title|escape}" />
-	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/themes/gamma/images/favicon.ico"/>
+	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/themes/Gamma/images/favicon.ico"/>
 
 	<!-- Javascripts -->
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/gamma/scripts/jquery.colorbox-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/gamma/scripts/jquery.qtip2.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/gamma/scripts/utils.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/gamma/scripts/jquery.autosize-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/gamma/scripts/sorttable.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/gamma/scripts/jquery.qtip2.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Gamma/scripts/jquery.colorbox-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Gamma/scripts/jquery.qtip2.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Gamma/scripts/utils.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Gamma/scripts/jquery.autosize-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Gamma/scripts/sorttable.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Gamma/scripts/jquery.qtip2.js"></script>
 
 	<!-- Added the Bootstrap JS -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/gamma/scripts/bootstrap.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Gamma/scripts/bootstrap.js"></script>
 
 	<!-- Pines Notify -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/gamma/scripts/jquery.pnotify.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Gamma/scripts/jquery.pnotify.js"></script>
 
 	<script type="text/javascript">
 	/* <![CDATA[ */

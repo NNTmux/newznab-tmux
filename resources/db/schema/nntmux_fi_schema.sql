@@ -4140,7 +4140,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('sqlpatch', '226', '', '', 'sqlpatch', ''),
 ('storeuserips', '0', '', '', 'storeuserips', ''),
 ('strapline', 'A great usenet indexer','', '', 'strapline', ''),
-('style', 'omicron', '', '', 'style', ''),
+('style', 'Omicron', '', '', 'style', ''),
 ('tablepergroup', '1', '', '', 'tablepergroup', ''),
 ('tandc', '<p>All information within this database is indexed by an automated process, without any human intervention. It is obtained from global Usenet newsgroups over which this site has no control. We cannot prevent that you might find obscene or objectionable material by using this service. If you do come across obscene, incorrect or objectionable results, let us know by using the contact form.</p>','', '', 'tandc', ''),
 ('timeoutpath', '', '', '', 'timeoutpath', ''),

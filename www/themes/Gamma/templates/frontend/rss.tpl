@@ -10,7 +10,7 @@
 		<webMaster></webMaster>
 		<category>{$site->meta_keywords}</category>
 		<image>
-			<url>{$smarty.const.WWW_TOP}themes/gamma/images/logo.png</url>
+			<url>{$smarty.const.WWW_TOP}themes/Gamma/images/logo.png</url>
 			<title>{$site->title|escape}</title>
 			<link href="{$smarty.const.WWW_TOP}"/>
 			<description>Visit {$site->title|escape} - {$site->strapline|escape}</description>
@@ -57,9 +57,9 @@
 									<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$smarty.const.WWW_TOP}/covers/preview/{$release.guid}_thumb.jpg" border="0" alt="{$release.searchname|escape:"htmlall"}" />
 							{else}
 									<img style="margin-left:10px;margin-bottom:10px;float:right;" width="500" height="300" src="{$smarty.const.WWW_TOP}/covers/preview/{$release.guid}_thumb.jpg" border="0" alt="{$release.searchname|escape:"htmlall"}" />
-							{/if}		
+							{/if}
 						{/if}
-						
+
 						<ul>
 							<li>ID: <a href="{$smarty.const.WWW_TOP}details/{$release.guid}">{$release.guid}</a></li>
 							<li>Name: {$release.searchname}</li>

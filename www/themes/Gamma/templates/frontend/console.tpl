@@ -208,7 +208,7 @@
 						{if isset($nzbgetintegrated)}
 						<div>
 							<a href="#" class="icon icon_nzb fa fa-downloadget" title="Send to my NZBGet">
-								<img src="{$smarty.const.WWW_TOP}/themes/gamma/images/icons/nzbgetup.png">
+								<img src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/nzbgetup.png">
 							</a>
 						</div>
 						{/if}
@@ -216,7 +216,7 @@
                     <li style="vertical-align:text-bottom;">
                         {if $weHasVortex}
                             <div>
-                                <a href="#" class="icon icon_nzb fa fa-downloadvortex" title="Send to my NZBVortex"><img src="{$smarty.const.WWW_TOP}/themes/gamma/images/icons/vortex/bigsmile.png"></a>
+                                <a href="#" class="icon icon_nzb fa fa-downloadvortex" title="Send to my NZBVortex"><img src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/vortex/bigsmile.png"></a>
                             </div>
                         {/if}
                     </li>
