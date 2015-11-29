@@ -77,7 +77,7 @@ class NZBGet
 	 * Construct.
 	 * Set up full URL.
 	 *
-	 * @var BasePage $page
+	 * @var \BasePage $page
 	 *
 	 * @access public
 	 */

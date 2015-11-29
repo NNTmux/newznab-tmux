@@ -510,7 +510,7 @@ class Movie
 	 */
 	private function checkTraktValue($value)
 	{
-		if (is_array($value)) {
+		if (is_array($value) && !empty($value)) {
 			$temp = '';
 			foreach($value as $val) {
 				if (!is_array($val) && !is_object($val)) {

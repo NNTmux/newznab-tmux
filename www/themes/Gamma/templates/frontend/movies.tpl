@@ -128,7 +128,7 @@
 			<td class="mid">
 				<div class="movcover">
 					<a target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/" name="name{$result.imdbid}" title="View movie info" class="modal_imdb" rel="movie" >
-						<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.cover == 1}{$result.imdbid}-cover.jpg{else}no-cover.jpg{/if}" style="max-width: 120px; /*width: auto;*/" width="120" border="0" alt="{$result.title|escape:"htmlall"}" />
+						<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/movies/{if isset($result.cover) && $result.cover == 1}{$result.imdbid}-cover.jpg{else}no-cover.jpg{/if}" style="max-width: 120px; /*width: auto;*/" width="120" border="0" alt="{$result.title|escape:"htmlall"}" />
 					</a>
 					<div class="movextra">
 						<center>
