@@ -1,45 +1,33 @@
 {if $results|@count > 0}
 	{foreach from=$results item=result}
-
 		<div id="moviefull" style="min-height:340px;">
 		{if $result.cover == 1}<img class="shadow pic img-polaroid pull-right" style="margin-right:50px;" width="200px" alt="{$result.title|escape:"htmlall"} Logo" src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg" />{/if}
-
-
 		<h2 style="display:inline;">{$result.title|escape:"htmlall"} ({$result.year})</h2>    <a class="rndbtn badge badge-imdb" target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/" name="imdb{$result.imdbid}" title="View imdb page">Imdb</a>
 		<a class="rndbtn badge badge-trakt" target="_blank" href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbid}/" name="trakt{$result.imdbid}" title="View trakt page">Trakt</a>
-		{if $result.imdbid != ""}
-			<a {if $userimdbs[$result.imdbid] != ""}style="display:none;"{/if} onclick="mymovie_add('{$result.imdbid}', this);return false;" class="rndbtn btn btn-mini btn-info" href="#">Add To My Movies</a>
-		{/if}
-		<h4>{if $result.genre != ''}{$result.genre|replace:"|":" / "}{/if}</h4>
-
-
+		<h4>{if isset($result.genre) && $result.genre != ''}{$result.genre|replace:"|":" / "}{/if}</h4>
 		{if $result.tagline != ''}
 			<p class="lead" style="margin-right:300px;">"{$result.tagline|escape:"htmlall"}"</p>
 		{/if}
 
-
 		<dl style="margin-right:300px;">
-			{if $result.plot != ''}
+			{if isset($result.plot) && $result.plot != ''}
 				<dt>Plot</dt>
 				<dd>{$result.plot|escape:"htmlall"}</dd>
 			{/if}
-			{if $result.rating != ''}
+			{if isset($result.rating) && $result.rating != ''}
 				<dt>Rating</dt>
-				<dd>{$result.rating}/10 {if $result.ratingcount != ''}({$result.ratingcount|number_format} votes)</dd>{/if}
+				<dd>{$result.rating}/10
 			{/if}
-			{if $result.director != ''}
+			{if isset($result.director) && $result.director != ''}
 				<dt>Director</dt>
 				<dd>{$result.director|replace:"|":", "}</dd>
 			{/if}
-			{if $result.actors != ''}
+			{if isset($result.actor) && $result.actors != ''}
 				<dt>Actors</dt>
 				<dd>{$result.actors|replace:"|":", "}</dd>
 			{/if}
 		</dl>
-
-
 		</div>
-
 		<form id="nzb_multi_operations_form" action="get">
 		<div class="well well-small">
 			<div class="nzb_multi_operations">
@@ -50,20 +38,17 @@
 					{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 					{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
 				</div>
-
 				<div class="btn-group pull-right">
 					<div class="input-append">
 						<input class="span2"  id="filter-text" type="text" placeholder="Filter">
 					</div>
 				</div>
-
 				<div class="btn-group pull-right" data-toggle="buttons-radio" id="filter-quality">
 					<button data-quality="" class="btn active">Any</button>
 					<button data-quality="hdtv" class="btn">HDTV</button>
 					<button data-quality="720p" class="btn">720p</button>
 					<button data-quality="1080p" class="btn">1080p</button>
 				</div>
-
 				{if $isadmin}
 				<div class="pull-right">
 					Admin:
@@ -75,14 +60,12 @@
 				{/if}
 			</div>
 		</div>
-
 		<table style="width:100%;" class="data highlight icons table table-striped" id="browsetable">
 			<tr class="dont-filter">
 				<th>
 					<input id="chkSelectAll" type="checkbox" class="nzb_check_all" />
 					<label for="chkSelectAll" style="display:none;">Select All</label>
 				</th>
-
 				<th>name<br/>
 					<a title="Sort Descending" href="{$orderbyname_desc}">
 						<i class="fa fa-caret-down"></i>
@@ -91,7 +74,6 @@
 						<i class="fa fa-caret-up"></i>
 					</a>
 				</th>
-
 				<th>category<br/>
 					<a title="Sort Descending" href="{$orderbycat_desc}">
 						<i class="fa fa-caret-down"></i>
@@ -100,7 +82,6 @@
 						<i class="fa fa-caret-up"></i>
 					</a>
 				</th>
-
 				<th>posted<br/>
 					<a title="Sort Descending" href="{$orderbyposted_desc}">
 						<i class="fa fa-caret-down"></i>
@@ -109,7 +90,6 @@
 						<i class="fa fa-caret-up"></i>
 					</a>
 				</th>
-
 				<th>size<br/>
 					<a title="Sort Descending" href="{$orderbysize_desc}">
 						<i class="fa fa-caret-down"></i>
@@ -118,7 +98,6 @@
 						<i class="fa fa-caret-up"></i>
 					</a>
 				</th>
-
 				<th>files<br/>
 					<a title="Sort Descending" href="{$orderbyfiles_desc}">
 						<i class="fa fa-caret-down"></i>
@@ -127,10 +106,8 @@
 						<i class="fa fa-caret-up"></i>
 					</a>
 				</th>
-
 				<th>action</th>
 			</tr>
-
 		{assign var="msplits" value=","|explode:$result.grp_release_id}
 		{assign var="mguid" value=","|explode:$result.grp_release_guid}
 		{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
@@ -144,24 +121,19 @@
 		{assign var="mpass" value=","|explode:$result.grp_release_password}
 		{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 		{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-		{assign var="mcat" value=","|explode:$result.grp_release_categoryid}
-		{assign var="mcatname" value=","|explode:$result.grp_release_categoryName}
-
+		{assign var="mcatname" value=","|explode:$result.grp_release_catname}
 		{foreach from=$msplits item=m}
-
 			<tr class="{cycle values=",alt"} filter"data-name="{$mname[$m@index]|escape:"htmlall"|replace:".":" "|lower}" id="guid{$mguid[$m@index]}">
 				<td class="check"><input id="chk{$mguid[$m@index]|substr:0:7}" type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" /></td>
 				<td class="item">
 					<label for="chk{$mguid[$m@index]|substr:0:7}">
 						<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
 					</label>
-
 					{if $mpass[$m@index] == 2}
 						<i class="fa fa-lock"></i>
 					{elseif $mpass[$m@index] == 1}
 						<i class="fa fa-lock"></i>
 					{/if}
-
 					<div class="resextra">
 						<div class="btns">{strip}
 							{if $mnfo[$m@index] > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="modal_nfo rndbtn badge" rel="nfo">Nfo</a>{/if}
@@ -209,11 +181,9 @@
 					</td>
 			</tr>
 		{/foreach}
-
 	</table>
 	</div>
 	<br/>
-
 	{$pager}
 	{if $results|@count > 10}
 		<div class="well well-small">
@@ -232,14 +202,12 @@
 						<span class="add-on"><i class="icon-search"></i></span>
 					</div>
 				</div>
-
 				<div class="btn-group pull-right" data-toggle="buttons-radio" id="filter-quality">
 					<button data-quality="" class="btn active">Any</button>
 					<button data-quality="720p" class="btn">720p</button>
 					<button data-quality="1080p" class="btn">1080p</button>
 					<button data-quality="complete Rbluray" class="BDISK">HDTV</button>
 				</div>
-
 				{if $isadmin}
 				<div class="pull-right">
 					Admin:
@@ -251,7 +219,6 @@
 				{/if}
 			</div>
 		</div>
-
 		</form>
 	{/if}
 	{/foreach}
@@ -261,7 +228,6 @@
 		function filter(event){
 			var elements = $('table.data:visible tr.filter');
 			elements.hide();
-
 			/* quality filter */
 			x = event;
 			//if(event.currentTarget.at)
