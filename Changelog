@@ -1,4 +1,5 @@
 2015-11-30 DariusIII
+	Fix: Add back AND to getBrowseBy function in Movie.php
 	Upd: Update Gamma font awesome to 4.5.0
 2015-11-29 DariusIII
 	Chg: Remove traktid from Movie lookups
