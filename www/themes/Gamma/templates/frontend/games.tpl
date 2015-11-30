@@ -174,8 +174,7 @@
 																			 name="desura{$result.gamesinfo_id}"
 																			 title="View Desura page">
 												Desura</a>{/if}
-										{if isset($mnfo[$m@index]) && {$mnfo[$m@index]} > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="rndbtn modal_nfo badge" rel="nfo">Nfo</a>{/if}
-										{if $result.url != ""}<a class="rndbtn badge badge-amaz" target="_blank" href="{$site->dereferrer_link}{$result.url}" name="amazon{$result.gamesinfo_id}" title="View amazon page">Amazon</a>{/if}
+										{if $mnfo[$m@index] > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="rndbtn modal_nfo badge" rel="nfo">Nfo</a>{/if}
 										<a class="rndbtn badge" href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Grp</a>
 									</center>
 								</div>
@@ -319,6 +318,6 @@
 {else}
 	<div class="alert">
 		<button type="button" class="close" data-dismiss="alert">&times;</button>
-		<strong>Sorry!</strong> Either some amazon key is wrong, or there is nothing in this section.
+		<strong>Sorry!</strong> There is nothing in this section.
 	</div>
 {/if}
