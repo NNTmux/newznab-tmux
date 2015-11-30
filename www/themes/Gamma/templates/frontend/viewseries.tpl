@@ -1,4 +1,4 @@
-{if $nodata != ""}
+{if isset($nodata) && $nodata != ""}
 
 <h2>View TV Series</h2>
 

@@ -1,3 +1,9 @@
+{if isset($nodata) && $nodata !=''}
+<div class="header">
+	<h2>View > <strong>Anime</strong></h2>
+	<p>{$nodata}</p>
+</div>
+{else}
 <h1>
 {if $isadmin}
 	<a title="Edit AniDB data" href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeAnidbid}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">{$animeTitle} </a>
@@ -134,3 +140,4 @@
 </table>
 
 </form>
+{/if}
