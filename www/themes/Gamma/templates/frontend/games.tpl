@@ -1,5 +1,4 @@
-<h2>Browse Console</h2>
-
+<h2>Browse Games</h2>
 <div class="well well-small">
 	<center>
 		<form class="form-inline" name="browseby" action="console" style="margin:0;">
@@ -307,3 +306,4 @@
 						</td>
 					</div>
 </form>
+{/if}
