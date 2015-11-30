@@ -145,7 +145,7 @@
 								<center>
 									<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
 										<img class="shadow img img-polaroid" src="{$smarty.const.WWW_TOP}/covers/games/{if isset($result.cover) && $result.cover == 1}{$result.gamesinfo_id}.jpg{else}no-cover.jpg{/if}"
-											 width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
+											 width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 									</a>
 								</center>
 								<div class="movextra">
