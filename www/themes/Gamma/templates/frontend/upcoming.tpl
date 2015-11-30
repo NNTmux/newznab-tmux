@@ -1,15 +1,11 @@
 <h1>{$page->title}</h1>
-
 {$site->adbrowse}
-
 {if $data|@count > 0}
-
 <table style="width:100%;" class="data highlight icons" id="coverstable">
 		<tr>
 			<th></th>
 			<th>&nbsp;</th>
 		</tr>
-
 		{foreach $data as $result}
 		<tr class="{cycle values=",alt"}">
 			<td class="mid">
@@ -44,7 +40,6 @@
 		</tr>
 		{/foreach}
 </table>
-
 {else}
 <h2>No results</h2>
 {/if}
