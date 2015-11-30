@@ -62,7 +62,7 @@
 		{/if}
 		{if $show.tmdb > 0}
 			<a class="btn btn-sm btn-info" target="_blank"
-			   href="{$site->dereferrer_link}https://www.themoviedb.org/shows/{$show.tmdb}"
+			   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$show.tmdb}"
 			   title="View at TheMovieDB">TMDB</a>
 		{/if}
 	</div>

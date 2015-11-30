@@ -62,7 +62,13 @@
 			<a class="btn btn-small btn-primary btn-info" target="_blank"
 			   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
 			   title="View at TV Rage">TV Rage</a>
-		{/if}	</div>
+		{/if}
+		{if $show.tmdb > 0}
+			<a class="btn btn-small btn-primary btn-info" target="_blank"
+			   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$show.tmdb}"
+			   title="View at TheMovieDB">TMDB</a>
+		{/if}
+	</div>
 </center>
 
 <br/>
