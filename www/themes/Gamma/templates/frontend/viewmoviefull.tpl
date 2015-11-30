@@ -138,7 +138,6 @@
 						<div class="btns">{strip}
 							{if $mnfo[$m@index] > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="modal_nfo rndbtn badge" rel="nfo">Nfo</a>{/if}
 							{if $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1}<a href="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg" name="name{$mguid[$m@index]}" title="Screenshot" class="modal_prev rndbtn badge" rel="preview">Preview</a>{/if}
-							{if $mre[$m@index] > 0}<span class="mediainfo rndbtn badge" title="{$mguid[$m@index]}">Media</span>{/if}
 						{/strip}</div>
 					</div>
 				</td>
