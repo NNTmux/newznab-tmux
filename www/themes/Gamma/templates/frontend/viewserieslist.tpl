@@ -34,16 +34,14 @@
 		</tr>
 		<tr>
 			<th width="35%">Name</th>
-			<th>Country</th>
-			<th width="35%">Genre</th>
+			<th>Network</th>
 			<th class="mid">Option</th>
 			<th class="mid">View</th>
 		</tr>
 		{foreach $series as $s}
 			<tr class="{cycle values=",alt"}">
 				<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.id}">{$s.title|escape:"htmlall"}</a>{if $s.prevdate != ''}<br /><span class="label">Last: {$s.previnfo|escape:"htmlall"} aired {$s.prevdate|date_format}</span>{/if}</td>
-				<td>{$s.country|escape:"htmlall"}</td>
-				<td>{$s.genre|escape:"htmlall"|replace:'|':', '}</td>
+				<td>{$s.publisher|escape:"htmlall"}</td>
 				<td class="mid">
 					{if $s.userseriesid != ''}
 						<div class="btn-group">
@@ -68,6 +66,9 @@
 							{/if}
 							{if $s.tvrage > 0}
 								<a title="View at TVRage" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$s.tvrage}">TVRage</a>
+							{/if}
+							{if $s.tmdb > 0}
+								<a title="View at TheMovieDB" target="_blank" href="{$site->dereferrer_link}https://www.themoviedb.org/shows/{$s.tmdb}">TMDB</a>
 							{/if}
 							<a title="RSS Feed for {$s.title|escape:"htmlall"}" href="{$smarty.const.WWW_TOP}/rss?show={$s.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}"><i class="fa fa-rss"></i></a>
 						{/if}

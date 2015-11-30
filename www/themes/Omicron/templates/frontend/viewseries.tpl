@@ -60,6 +60,11 @@
 			   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
 			   title="View at TV Rage">TV Rage</a>
 		{/if}
+		{if $show.tmdb > 0}
+			<a class="btn btn-sm btn-info" target="_blank"
+			   href="{$site->dereferrer_link}https://www.themoviedb.org/shows/{$show.tmdb}"
+			   title="View at TheMovieDB">TMDB</a>
+		{/if}
 	</div>
 	<br/>
 	<div class="box-body"
