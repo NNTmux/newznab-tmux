@@ -27,7 +27,8 @@
 			{if $con && $con.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/console/{$con.id}.jpg" width="160" alt="{$con.title|escape:"htmlall"}" />{/if}
 			{if $music && $music.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/music/{$music.id}.jpg" width="160" alt="{$music.title|escape:"htmlall"}" />{/if}
 			{if $book && $book.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg" width="160" alt="{$book.title|escape:"htmlall"}" />{/if}
-
+			{if $game && $game.cover == 1}
+				<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;"  src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" width="160" alt="{$con.title|escape:"htmlall"}"/>{/if}
 				{if $isadmin}
 				<div class="well well-small pull-right">
 						Admin :
@@ -37,15 +38,12 @@
 						</div>
 				</div>
 				{/if}
-
 				<dl class="dl-horizontal" style="margin-right:300px;">
 					<dt>Name</dt>
 					<dd>{$release.name|escape:"htmlall"}</dd>
-
 					{if $show && $release.videos_id > 0}
 						<dt>Show:</dt>
 						<dd><strong>{if $show.title != ""}{$show.title|escape:"htmlall"}</strong></dd>
-
 						{if $show.summary != ""}
 							<dt>Descrition</dt>
 							<dd><span class="descinitial">{$show.summary|escape:"htmlall"|nl2br|magicurl|truncate:"350":"</span><a class=\"descmore\" href=\"#\"> more...</a>"}{if $show.summary|strlen > 350}<span class="descfull">{$show.summary|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}</dd>
@@ -70,37 +68,27 @@
 				<dl class="dl" style="margin-right:300px;">
 					<dt>Movie Info</dt>
 					<dd>{$movie.title|escape:"htmlall"}</dd>
-
 					<dt>Year</dt>
 					<dd>{$movie.year}</dd>
-
 					<dt>Rating</dt>
 					<dd><strong>{if $movie.rating == ''}N/A{/if}{$movie.rating}/10</strong></dd>
-
-
 					{if $movie.tagline != ''}
 						<dt>Tagline</dt>
 						<dd>{$movie.tagline|escape:"htmlall"}</dd>
 					{/if}
-
 					{if $movie.plot != ''}
 						<dt>Plot</dt>
 						<dd>{$movie.plot|escape:"htmlall"}</dd>
 					{/if}
-
 					{if $movie.director != ""}
 						<dt>Director</dt>
 						<dd>{$movie.director}</dd>
 					{/if}
-
 					<dt>Genre</dt>
 					<dd>{$movie.genre}</dd>
-
 					<dt>Starring</dt>
 					<dd>{$movie.actors}</dd>
-
 				</dl>
-
 					<div style="margin-left: 180px;">
 						<a class="rndbtn badge badge-imdb" target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbid}/" title="View at IMDB">IMDB</a>
 						{if $movie.tmdbid != ''}
@@ -108,51 +96,40 @@
 						{/if}
 						<a class="rndbtn badge" href="{$smarty.const.WWW_TOP}/movies?imdb={$release.imdbid}" title="View all versions">Movie View</a>
 					</div>
-
 				{/if}
-
 				{if $anidb && $release.anidbid > 0}
 				<dl class="dl-horizontal" style="margin-right:300px;">
 					<dt>Anime Info</dt>
 					<dd>{if $release.tvtitle != ""}{$release.tvtitle|escape:"htmlall"}{/if}</dd>
-
 					{if $anidb.description != ""}
 					<dt>Description</dt>
 					<dd><span class="descinitial">{$anidb.description|escape:"htmlall"|nl2br|magicurl|truncate:"350":"</span><a class=\"descmore\" href=\"#\"> more...</a>"}{if $anidb.description|strlen > 350}<span class="descfull">{$anidb.description|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}</dd>
 					{/if}
-
 					{if $anidb.categories != ""}
 					<dt>Categories</dt>
 					<dd>{$anidb.categories|escape:"htmlall"|replace:"|":", "}</dd>
 					{/if}
-
 					{if $release.tvairdate != "0000-00-00 00:00:00"}
 					<dt>Aired</dt>
 					<dd>{$release.tvairdate|date_format}</dd>
 					{/if}
-
 					{if $episode && $release.episodeinfoid > 0}
-
 						{if $episode.overview != ""}
 						<dt>Overview</dt>
 						<dd>{$episode.overview}</dd>
 						{/if}
-
 						{if $episode.rating > 0}
 						<dt>Rating</dt>
 						<dd>{$episode.rating}</dd>
 						{/if}
-
 						{if $episode.director != ""}
 						<dt>Director</dt>
 						<dd>{$episode.director|escape:"htmlall"|replace:"|":", "}</dd>
 						{/if}
-
 						{if $episode.gueststars != ""}
 						<dt>Guest Stars</dt>
 						<dd>{$episode.gueststars|escape:"htmlall"|replace:"|":", "}</dd>
 						{/if}
-
 						{if $episode.writer != ""}
 						<dt>Writer</dt>
 						<dd>{$episode.writer|escape:"htmlall"|replace:"|":", "}</dd>
@@ -310,7 +287,6 @@
 
 					<dt>Category</dt>
 					<dd><a title="Browse by {$release.category_name}" href="{$smarty.const.WWW_TOP}/browse?t={$release.categoryid}">{$release.category_name}</a></dd>
-
 				{if $nfo.id|@count > 0}
 					<dt>Nfo</dy>
 					<dd><a href="{$smarty.const.WWW_TOP}/nfo/{$release.guid}" title="View Nfo">View Nfo</a></dd>
@@ -325,7 +301,6 @@
 						<dd>{$predb.nukereason}</dd>
 					{/if}
 				{/if}
-
 				{if $release.haspreview == 2 && $userdata.canpreview == 1}
 					<dt>Preview</dt>
 					<dd><a href="#" name="audio{$release.guid}" title="Listen to {$release.searchname|escape:"htmlall"}" class="audioprev rndbtn" rel="audio">Listen</a><audio id="audprev{$release.guid}" src="{$smarty.const.WWW_TOP}/covers/audio/{$release.guid}.mp3" preload="none"></audio></dd>
