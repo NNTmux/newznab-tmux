@@ -35,6 +35,7 @@
 		<tr>
 			<th width="35%">Name</th>
 			<th>Network</th>
+			<th class="mid">Country</th>
 			<th class="mid">Option</th>
 			<th class="mid">View</th>
 		</tr>
@@ -42,6 +43,7 @@
 			<tr class="{cycle values=",alt"}">
 				<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.id}">{$s.title|escape:"htmlall"}</a>{if $s.prevdate != ''}<br /><span class="label">Last: {$s.previnfo|escape:"htmlall"} aired {$s.prevdate|date_format}</span>{/if}</td>
 				<td>{$s.publisher|escape:"htmlall"}</td>
+				<td>{$s.countries_id|escape:"htmlall"}</td>
 				<td class="mid">
 					{if $s.userseriesid != ''}
 						<div class="btn-group">
