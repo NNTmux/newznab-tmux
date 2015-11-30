@@ -208,7 +208,7 @@
 						{/if}
 					</li>
                     <li style="vertical-align:text-bottom;">
-                        {if isset($weHasVortex)}
+                        {if $weHasVortex}
                             <div>
                                 <a href="#" class="icon icon_nzb fa fa-downloadvortex" title="Send to my NZBVortex"><img src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/vortex/bigsmile.png"></a>
                             </div>
