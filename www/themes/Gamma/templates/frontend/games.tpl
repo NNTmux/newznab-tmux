@@ -1,87 +1,131 @@
-<div class="header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
-	 xmlns="http://www.w3.org/1999/html">
-	{assign var="catsplit" value=">"|explode:$catname}
-	<h2>{$catsplit[0]} > <strong>{if isset($catsplit[1])} {$catsplit[1]}{/if}</strong></h2>
-	<div class="breadcrumb-wrapper">
-		<ol class="breadcrumb">
-			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/ {$catname|escape:"htmlall"}
-		</ol>
-	</div>
-</div>
-<div class="well well-sm">
-	<form class="form-inline" role="form" name="browseby" action="games">
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="title">Title:</label>
-			<input type="text" class="form-control" id="title" name="title" value="{$title}" placeholder="Title">
-		</div>
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="genre">Genre:</label>
-			<select id="genre" name="genre" class="form-control">
-				<option class="grouping" value="" selected>Genre</option>
+<h2>Browse Console</h2>
+
+<div class="well well-small">
+	<center>
+		<form class="form-inline" name="browseby" action="console" style="margin:0;">
+			<i class="fa fa-font fa-midt"></i>
+			<input class="input input-medium" id="title" type="text" name="title" value="{$title}" placeholder="Title" />
+			<i class="fa fa-desktop fa-midt"></i>
+			<input class="input input-medium" id="platform" type="text" name="platform" value="{$platform}" placeholder="Platform" />
+			<i class="fa fa-inbox fa-midt"></i>
+			<select class="input input-small" id="genre" name="genre">
+				<option class="grouping" value=""></option>
 				{foreach from=$genres item=gen}
 					<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title}</option>
 				{/foreach}
 			</select>
-		</div>
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="year">Year:</label>
-			<select id="year" name="year" class="form-control">
-				<option class="grouping" value="" selected>Year</option>
-				{foreach from=$years item=yr}
-					<option {if $yr==$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
+			<i class="fa fa-flag fa-midt"></i>
+			<select class="input input-small" id="category" name="t">
+				<option class="grouping" value="1000"></option>
+				{foreach from=$catlist item=ct}
+					<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
-		</div>
-		<input type="submit" class="btn btn-primary" value="Search!"/>
-	</form>
+			<input class="btn btn-success" type="submit" value="Go" />
+		</form>
+	</center>
 </div>
+{$site->adbrowse}
+{if $results|@count > 0}
 <form id="nzb_multi_operations_form" action="get">
-	<div class="box-body"
-	<div class="row">
-		<div class="col-xlg-12 portlets">
-			<div class="panel panel-default">
-				<div class="panel-body pagination2">
-					<div class="row">
-						<div class="col-md-8">
-							<div class="nzb_multi_operations">
-								View: <strong>Covers</strong> | <a
-										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
-								With Selected:
-								<div class="btn-group">
-									<input type="button"
-										   class="nzb_multi_operations_download btn btn-sm btn-success"
-										   value="Download NZBs"/>
-									<input type="button"
-										   class="nzb_multi_operations_cart btn btn-sm btn-info"
-										   value="Add to Cart"/>
-									{if isset($sabintegrated)}
-										<input type="button"
-											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
-											   value="Send to Queue"/>
-									{/if}
-									{if isset($nzbgetintegrated)}
-										<input type="button"
-											   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
-											   value="Send to NZBGet"/>
-									{/if}
-									{if isset($isadmin)}
-										<input type="button"
-											   class="nzb_multi_operations_edit btn btn-sm btn-warning"
-											   value="Edit"/>
-										<input type="button"
-											   class="nzb_multi_operations_delete btn btn-sm btn-danger"
-											   value="Delete"/>
-									{/if}
-								</div>
-							</div>
+	<div class="well well-small">
+		<div class="nzb_multi_operations">
+			<table width="100%">
+				<tr>
+					<td width="30%">
+						With Selected:
+						<div class="btn-group">
+							<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download NZBs" />
+							<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Add to Cart" />
+							{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
+							{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
 						</div>
-						<div class="col-md-4">
+					</td>
+					<td width="50%">
+						<center>
 							{$pager}
+						</center>
+					</td>
+					<td width="20%">
+						<div class="pull-right">
+							{if $isadmin}
+								Admin:
+								<div class="btn-group">
+									<input type="button" class="nzb_multi_operations_edit btn btn-small btn-warning" value="Edit" />
+									<input type="button" class="nzb_multi_operations_delete btn btn-small btn-danger" value="Delete" />
+								</div>
+								&nbsp;
+							{/if}
+							<a href="{$smarty.const.WWW_TOP}/browse?t={$category}"><i class="fa fa-align-justify"></i></a>
+							&nbsp;
 						</div>
-					</div>
-					<hr>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<table style="width:100%;" class="data highlight icons table table-striped" id="coverstable">
+		<tr>
+			<th width="130">
+				<input type="checkbox" class="nzb_check_all" />
+			</th>
+			<th width="140" >title<br/>
+				<a title="Sort Descending" href="{$orderbytitle_desc}">
+					<i class="fa fa-caret-down"></i>
+				</a>
+				<a title="Sort Ascending" href="{$orderbytitle_asc}">
+					<i class="fa fa-caret-up"></i>
+				</a>
+			</th>
+			<th>genre<br/>
+				<a title="Sort Descending" href="{$orderbygenre_desc}">
+					<i class="fa fa-caret-down"></i>
+				</a>
+				<a title="Sort Ascending" href="{$orderbygenre_asc}">
+					<i class="fa fa-caret-up"></i>
+				</a>
+			</th>
+			<th>release date<br/>
+				<a title="Sort Descending" href="{$orderbyreleasedate_desc}">
+					<i class="fa fa-caret-down"></i>
+				</a>
+				<a title="Sort Ascending" href="{$orderbyreleasedate_asc}">
+					<i class="fa fa-caret-up"></i>
+				</a>
+			</th>
+			<th>posted<br/>
+				<a title="Sort Descending" href="{$orderbyposted_desc}">
+					<i class="fa fa-caret-down"></i>
+				</a>
+				<a title="Sort Ascending" href="{$orderbyposted_asc}">
+					<i class="fa fa-caret-up"></i>
+				</a>
+			</th>
+			<th>size<br/>
+				<a title="Sort Descending" href="{$orderbysize_desc}">
+					<i class="fa fa-caret-down"></i>
+				</a>
+				<a title="Sort Ascending" href="{$orderbysize_asc}">
+					<i class="fa fa-caret-up"></i>
+				</a>
+			</th>
+			<th>files<br/>
+				<a title="Sort Descending" href="{$orderbyfiles_desc}">
+					<i class="fa fa-caret-down"></i>
+				</a>
+				<a title="Sort Ascending" href="{$orderbyfiles_asc}">
+					<i class="fa fa-caret-up"></i>
+				</a>
+			</th>
+			<th>stats<br/>
+				<a title="Sort Descending" href="{$orderbystats_desc}">
+					<i class="fa fa-caret-down"></i>
+				</a>
+				<a title="Sort Ascending" href="{$orderbystats_asc}">
+					<i class="fa fa-caret-up"></i>
+				</a>
+			</th>
+		</tr>
 					{foreach from=$results item=result}
 						{assign var="msplits" value=","|explode:$result.grp_release_id}
 						{assign var="mguid" value=","|explode:$result.grp_release_guid}
@@ -102,7 +146,7 @@
 								<div class="panel panel-default">
 									<div class="panel-body">
 										<div class="row">
-											<div class="col-md-2 small-gutter-left">
+											<td colspan="2">
 												<a title="View details"
 												   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
 													<img src="{$smarty.const.WWW_TOP}/covers/games/{if $result.cover == 1}{$result.gamesinfo_id}.jpg{else}no-cover.jpg{/if}"
@@ -143,8 +187,8 @@
 												{if $mfailed[$m@index] > 0}
 													<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
 														<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} != 1}s{/if}</span>												{/if}
-											</div>
-											<div class="col-md-10 small-gutter-left">
+											</td>
+											<td colspan="10">
 												<h4><a title="View details"
 													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$result.title|escape:"htmlall"}</a>
 													(<a class="title" title="{$result.year}"
@@ -208,22 +252,23 @@
 																{if isset($sabintegrated)}
 																	<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																		  title="Send to my Queue"><i
-																				class="fa fa-send"></i></span>
+																				class="fa fa-share"></i></span>
 																{/if}
 															</div>
 														</td>
 													</tr>
 												</table>
-											</div>
+											</td>
 										</div>
 									</div>
 								</div>
 							{/if}
 						{/foreach}
 					{/foreach}
+		</table>
 					<hr>
 					<div class="row">
-						<div class="col-md-8">
+						<td colspan="8">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
@@ -256,13 +301,9 @@
 									{/if}
 								</div>
 							</div>
-						</div>
-						<div class="col-md-4">
+						</td>
+						<td colspan="4">
 							{$pager}
-						</div>
+						</td>
 					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 </form>
