@@ -145,11 +145,35 @@
 								<center>
 									<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
 										<img class="shadow img img-polaroid" src="{$smarty.const.WWW_TOP}/covers/games/{if isset($result.cover) && $result.cover == 1}{$result.gamesinfo_id}.jpg{else}no-cover.jpg{/if}"
-											 width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
+											 width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 									</a>
 								</center>
 								<div class="movextra">
 									<center>
+										{if $result.classused == "gb"}<a class="rndbtn badge"
+																		 target="_blank"
+																		 href="{$site->dereferrer_link}{$result.url}"
+																		 name="giantbomb{$result.gamesinfo_id}"
+																		 title="View GiantBomb page">
+												GiantBomb</a>{/if}
+										{if $result.classused == "steam"}<a class="rndbtn badge fa fa-steam"
+																			target="_blank"
+																			href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
+																			name="steam{$result.gamesinfo_id}"
+																			title="View Steam page">
+												Steam</a>{/if}
+										{if $result.classused == "gl"}<a class="rndbtn badge"
+																		 target="_blank"
+																		 href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
+																		 name="greenlight{$result.gamesinfo_id}"
+																		 title="View greenlight page">
+												GreenLight</a>{/if}
+										{if $result.classused == "desura"}<a class="rndbtn badge"
+																			 target="_blank"
+																			 href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
+																			 name="desura{$result.gamesinfo_id}"
+																			 title="View Desura page">
+												Desura</a>{/if}
 										{if {$mnfo[$m@index]} > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="rndbtn modal_nfo badge" rel="nfo">Nfo</a>{/if}
 										{if $result.url != ""}<a class="rndbtn badge badge-amaz" target="_blank" href="{$site->dereferrer_link}{$result.url}" name="amazon{$result.gamesinfo_id}" title="View amazon page">Amazon</a>{/if}
 										<a class="rndbtn badge" href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Grp</a>
@@ -204,11 +228,31 @@
 									{/if}
 								</li>
 							</ul>
-							{if $result.genre != ""}<b>Genre:</b> {$result.genre}<br />{/if}
-							{if $result.esrb != ""}<b>Rating:</b> {$result.esrb}<br />{/if}
-							{if $result.publisher != ""}<b>Publisher:</b> {$result.publisher}<br />{/if}
-							{if $result.releasedate != ""}<b>Released:</b> {$result.releasedate|date_format}<br />{/if}
-							{if $result.review != ""}<b>Review:</b> {$result.review|escape:'htmlall'}<br />{/if}
+							{if isset($result.genre) && $result.genre != ""}
+								<b>Genre:</b>
+								{$result.genre}
+								<br/>
+							{/if}
+							{if isset($result.esrb) && $result.esrb != ""}
+								<b>Rating:</b>
+								{$result.esrb}
+								<br/>
+							{/if}
+							{if isset($result.publisher) && $result.publisher != ""}
+								<b>Publisher:</b>
+								{$result.publisher}
+								<br/>
+							{/if}
+							{if isset($result.releasedate) && $result.releasedate != ""}
+								<b>Released:</b>
+								{$result.releasedate|date_format}
+								<br/>
+							{/if}
+							{if isset($result.review) && $result.review != ""}
+								<b>Review:</b>
+								{$result.review|stripslashes|escape:'htmlall'}
+								<br/>
+							{/if}
 							<br />
 							<div class="movextra">
 								{if $isadmin}
