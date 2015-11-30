@@ -169,7 +169,6 @@
 
 				<div class="movextra">
 					<table class="table" style="margin-bottom:0px; margin-top:10px">
-
 						{assign var="msplits" value=","|explode:$result.grp_release_id}
 						{assign var="mguid" value=","|explode:$result.grp_release_guid}
 						{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
@@ -238,9 +237,7 @@
 			</td>
 		</tr>
 	{/foreach}
-
 </table>
-
 {if $results|@count > 10}
 <div class="well well-small">
 		<div class="nzb_multi_operations">
@@ -279,5 +276,4 @@
 	</div>
 {/if}
 </form>
-
 {/if}
