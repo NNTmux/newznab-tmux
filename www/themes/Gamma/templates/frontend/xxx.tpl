@@ -301,20 +301,20 @@
 										<td class="icons" style='width:100px;'>
 											<ul class="inline">
 												<li>
-													<a class="icon icon_nzb fa fa-download"
+													<a class="icon icon_nzb fa fa-cloud-download"
 													   style="text-decoration: none; color: #7ab800;"
 													   title="Download Nzb"
 													   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"></a>
 												</li>
 												<li>
-													<a class="icon icon_cart fa fa-shopping-cart"
+													<a class="icon icon_cart fa fa-shopping-basket"
 													   style="text-decoration: none; color: #5c5c5c;"
 													   title="Add to Cart">
 													</a>
 												</li>
 												{if $sabintegrated}
 													<li>
-														<a class="icon icon_sab fa fa-cloud-download"
+														<a class="icon icon_sab fa fa-share"
 														   style="text-decoration: none; color: #008ab8;" href="#"
 														   title="Send to queue">
 														</a>
@@ -322,7 +322,7 @@
 												{/if}
 												{if isset($nzbgetintegrated)}
 													<li>
-														<a class="icon icon_nzb fa fa-downloadget" href="#"
+														<a class="icon icon_nzb fa fa-cloud-downloadget" href="#"
 														   title="Send to NZBGet">
 															<img src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/nzbgetup.png">
 														</a>
@@ -330,7 +330,7 @@
 												{/if}
 												{if $weHasVortex}
 													<li>
-														<a class="icon icon_nzb fa fa-downloadvortex" href="#"
+														<a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#"
 														   title="Send to NZBVortex">
 															<img src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/vortex/bigsmile.png">
 														</a>

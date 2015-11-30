@@ -153,7 +153,7 @@
 									<li width="80px">{$msize[$m@index]|fsize_format:"MB"}</li>
 									<li width="50px"><a title="View file list" href="{$smarty.const.WWW_TOP}/filelist/{$mguid[$m@index]}">{$mtotalparts[$m@index]}</a> <i class="fa fa-file"></i></li>
 									<li width="50px"><a title="View comments for {$mname[$m@index]|escape:"htmlall"}" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments">{$mcomments[$m@index]}</a> <i class="fa fa-comments-alt"></i></li>
-									<li width="50px">{$mgrabs[$m@index]} <i class="fa fa-download-alt"></i></li>
+									<li width="50px">{$mgrabs[$m@index]} <i class="fa fa-cloud-download-alt"></i></li>
 									{if $mnfo[$m@index] > 0}
 									<li width="50px"><a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="modal_nfo badge" rel="nfo">Nfo</a></li>
 									{/if}
@@ -174,20 +174,20 @@
 							<td class="icons" style='width:100px;'>
 								<ul class="inline">
 									<li>
-										<a class="icon icon_nzb fa fa-download" style="text-decoration: none; color: #7ab800;" title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"></a>
+										<a class="icon icon_nzb fa fa-cloud-download" style="text-decoration: none; color: #7ab800;" title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"></a>
 									</li>
 									<li>
-										<a href="#" class="icon icon_cart fa fa-shopping-cart" style="text-decoration: none; color: #5c5c5c;" title="Add to Cart">
+										<a href="#" class="icon icon_cart fa fa-shopping-basket" style="text-decoration: none; color: #5c5c5c;" title="Add to Cart">
 										</a>
 									</li>
 									{if $sabintegrated}
 									<li>
-										<a class="icon icon_sab fa fa-cloud-download" style="text-decoration: none; color: #008ab8;"  href="#" title="Send to queue"></a>
+										<a class="icon icon_sab fa fa-share" style="text-decoration: none; color: #008ab8;"  href="#" title="Send to queue"></a>
 									</li>
 									{/if}
                                     {if $weHasVortex}
                                         <li>
-                                            <a class="icon icon_nzb fa fa-downloadvortex" href="#" title="Send to NZBVortex">
+                                            <a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#" title="Send to NZBVortex">
                                                 <img src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/vortex/bigsmile.png">
                                             </a>
                                         </li>

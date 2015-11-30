@@ -194,7 +194,7 @@
 															<div>
 																<a role="button" class="btn btn-default btn-xs"
 																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}|escape:"htmlall"}"><i
-																			class="fa fa-download"></i><span
+																			class="fa fa-cloud-download"></i><span
 																			class="badge">{$mgrabs[$m@index]}
 																		Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																<a role="button" class="btn btn-default btn-xs"
@@ -204,7 +204,7 @@
 																		Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 																<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
 																	  title="Add to Cart"><i
-																			class="fa fa-shopping-cart"></i></span>
+																			class="fa fa-shopping-basket"></i></span>
 																{if isset($sabintegrated)}
 																	<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																		  title="Send to my Queue"><i
