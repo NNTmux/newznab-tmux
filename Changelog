@@ -1,3 +1,5 @@
+2015-12-01 DariusIII
+	Upd: Update binaryblacklist-edit.php
 2015-11-30 DariusIII
 	Fix: Add missing links to TMDB  in Charisma/Omicron/Gamma templates
 	Fix: Add back AND to getBrowseBy function in Movie.php
