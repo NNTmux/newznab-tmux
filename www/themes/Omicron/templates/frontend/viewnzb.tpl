@@ -35,6 +35,7 @@
 							   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}"
 							   title="View at TMDb">TMDb</a>
 						{/if}
+						<a class="label label-default" href="{$smarty.const.WWW_TOP}/movies?imdb={$release.imdbid}" title="View all versions">Movie View</a>
 					{/if}
 					{if $anidb && $release.anidbid > 0}
 						<a class="label label-default" href="{$serverroot}anime/{$release.anidbid}"
