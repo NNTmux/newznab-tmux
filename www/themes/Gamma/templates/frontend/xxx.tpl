@@ -62,7 +62,7 @@
 							</div>
 							&nbsp;&nbsp;&nbsp;&nbsp;<a title="Switch to List view"
 													   href="{$smarty.const.WWW_TOP}/browse?t={$category}"><i
-										class="fa fa-lg fa-align-justify"></i></a>
+										class="fa fa-lg fa-list-ol"></i></a>
 						</td>
 						<td width="50%">
 							<center>
@@ -379,7 +379,7 @@
 								</div>
 								&nbsp;&nbsp;&nbsp;&nbsp;<a title="Switch to List view"
 														   href="{$smarty.const.WWW_TOP}/browse?t={$category}"><i
-											class="fa fa-lg fa-align-justify"></i></a>
+											class="fa fa-lg fa-list-ol"></i></a>
 							</td>
 							<td width="50%">
 								<center>
