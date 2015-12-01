@@ -768,7 +768,7 @@ h3 {
 }
 
 h1 {
-	font-size: 38.5px;
+	font-size: 39px;
 }
 
 h2 {
@@ -776,7 +776,7 @@ h2 {
 }
 
 h3 {
-	font-size: 24.5px;
+	font-size: 25px;
 }
 
 h4 {
@@ -788,7 +788,7 @@ h5 {
 }
 
 h6 {
-	font-size: 11.9px;
+	font-size: 12px;
 }
 
 h1 small {
@@ -796,7 +796,7 @@ h1 small {
 }
 
 h2 small {
-	font-size: 17.5px;
+	font-size: 18px;
 }
 
 h3 small {
@@ -2138,8 +2138,8 @@ table {
 
 
 .table-striped th {
-	padding-top:0px;
-	padding-bottom:0px;
+	padding-top:0;
+	padding-bottom:0;
 }
 
 .table-hover tbody tr:hover td,
@@ -2281,9 +2281,7 @@ table th[class*="span"],
 	*margin-right: .3em;
 	line-height: 14px;
 	vertical-align: text-top;
-	background-image: url("../../themes/Gamma/images/glyphicons-halflings.png");
-	background-position: 14px 14px;
-	background-repeat: no-repeat;
+	background: url("../images/glyphicons-halflings.png") no-repeat 14px 14px;
 }
 
 /* White icons with optional class, or on hover/active states of certain elements */
@@ -2986,8 +2984,7 @@ table th[class*="span"],
 .dropdown-menu .disabled > a:hover {
 	text-decoration: none;
 	cursor: default;
-	background-color: transparent;
-	background-image: none;
+	background: transparent none;
 	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 }
 
@@ -3053,10 +3050,9 @@ table th[class*="span"],
 	height: 0;
 	margin-top: 5px;
 	margin-right: -10px;
-	border-color: transparent;
+	border: 5px solid transparent;
+	border-right-width: 0;
 	border-left-color: #cccccc;
-	border-style: solid;
-	border-width: 5px 0 5px 5px;
 	content: " ";
 }
 
@@ -3270,7 +3266,7 @@ button.close {
 
 .btn-large {
 	padding: 11px 19px;
-	font-size: 17.5px;
+	font-size: 18px;
 	-webkit-border-radius: 6px;
 	-moz-border-radius: 6px;
 	border-radius: 6px;
@@ -3301,7 +3297,7 @@ button.close {
 
 .btn-mini {
 	padding: 0 6px;
-	font-size: 10.5px;
+	font-size: 11px;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
@@ -3566,8 +3562,7 @@ input[type="submit"].btn.btn-mini {
 .btn-link,
 .btn-link:active,
 .btn-link[disabled] {
-	background-color: transparent;
-	background-image: none;
+	background: transparent none;
 	-webkit-box-shadow: none;
 	-moz-box-shadow: none;
 	box-shadow: none;
@@ -3646,7 +3641,7 @@ input[type="submit"].btn.btn-mini {
 }
 
 .btn-group > .btn-small {
-	font-size: 11.9px;
+	font-size: 12px;
 }
 
 .btn-group > .btn-large {
@@ -3877,13 +3872,12 @@ input[type="submit"].btn.btn-mini {
 	padding: 8px 35px 8px 14px;
 	margin-bottom: 20px;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-	border: 1px solid #d6e9c6;
 	-webkit-border-radius: 4px;
         -moz-border-radius: 4px;
         border-radius: 4px;
 	color: #468847;
 	background-color: #dff0d8;
-	border-color: #d6e9c6;
+	border: 1px solid #d6e9c6;
 }
 
 .alert-success h4 {
@@ -3895,13 +3889,12 @@ input[type="submit"].btn.btn-mini {
 	padding: 8px 35px 8px 14px;
 	margin-bottom: 20px;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-	border: 1px solid #eed3d7;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
 	color: #b94a48;
 	background-color: #f2dede;
-	border-color: #eed3d7;
+	border: 1px solid #eed3d7;
 }
 
 .alert-danger h4,
@@ -3913,13 +3906,12 @@ input[type="submit"].btn.btn-mini {
         padding: 8px 35px 8px 14px;
         margin-bottom: 20px;
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-        border: 1px solid ##bce8f1;
-        -webkit-border-radius: 4px;
+	-webkit-border-radius: 4px;
         -moz-border-radius: 4px;
         border-radius: 4px;
 	color: #3a87ad;
 	background-color: #d9edf7;
-	border-color: #bce8f1;
+	border: 1px solid #bce8f1;
 }
 
 .alert-info h4 {
@@ -3979,8 +3971,8 @@ input[type="submit"].btn.btn-mini {
 }
 
 .nav-list {
-	padding-right: 0px;
-	padding-left: 0px;
+	padding-right: 0;
+	padding-left: 0;
 	margin-bottom: 0;
 }
 
@@ -4677,9 +4669,8 @@ input[type="submit"].btn.btn-mini {
 	left: 9px;
 	display: inline-block;
 	border-right: 7px solid transparent;
-	border-bottom: 7px solid #ccc;
+	border-bottom: 7px solid rgba(0, 0, 0, 0.2);
 	border-left: 7px solid transparent;
-	border-bottom-color: rgba(0, 0, 0, 0.2);
 	content: '';
 }
 
@@ -4697,9 +4688,8 @@ input[type="submit"].btn.btn-mini {
 .navbar-fixed-bottom .nav > li > .dropdown-menu:before {
 	top: auto;
 	bottom: -7px;
-	border-top: 7px solid #ccc;
-	border-bottom: 0;
-	border-top-color: rgba(0, 0, 0, 0.2);
+	border-top: 7px solid rgba(0, 0, 0, 0.2);
+	border-bottom-width: 0;
 }
 
 .navbar-fixed-bottom .nav > li > .dropdown-menu:after {
@@ -4942,7 +4932,7 @@ input[type="submit"].btn.btn-mini {
 /* Frikish */
 .navigator {
 	line-height: 150%;
-	margin: 5px 0px 5px 20px;
+	margin: 5px 0 5px 20px;
 	list-style: none;
 }
 /*
@@ -5049,7 +5039,7 @@ input[type="submit"].btn.btn-mini {
 .pagination-large ul > li > a,
 .pagination-large ul > li > span {
 	padding: 11px 19px;
-	font-size: 17.5px;
+	font-size: 18px;
 }
 
 .pagination-large ul > li:first-child > a,
@@ -5105,7 +5095,7 @@ input[type="submit"].btn.btn-mini {
 .pagination-mini ul > li > a,
 .pagination-mini ul > li > span {
 	padding: 0 6px;
-	font-size: 10.5px;
+	font-size: 11px;
 }
 
 .pager {
@@ -5331,8 +5321,7 @@ input[type="submit"].btn.btn-mini {
 	position: absolute;
 	width: 0;
 	height: 0;
-	border-color: transparent;
-	border-style: solid;
+	border: solid transparent;
 }
 
 .tooltip.top .tooltip-arrow {
@@ -5430,8 +5419,7 @@ input[type="submit"].btn.btn-mini {
 	display: block;
 	width: 0;
 	height: 0;
-	border-color: transparent;
-	border-style: solid;
+	border: solid transparent;
 }
 
 .popover .arrow {
