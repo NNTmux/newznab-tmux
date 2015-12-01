@@ -1,8 +1,8 @@
-<h2>My Cart</h2>
+<h2>My Download Basket</h2>
 
 <div class="alert-info">
 	<p>
-		Your cart can be downloaded as an <a href="{$smarty.const.WWW_TOP}/rss?t=-2&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}&amp;del=1">RSS Feed</a>.
+		Your download basket can be downloaded as an <a href="{$smarty.const.WWW_TOP}/rss?t=-2&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}&amp;del=1">RSS Feed</a>.
 	</p>
 </div>
 {if $results|@count > 0}
@@ -36,7 +36,7 @@
 				<a title="View details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}">{$result.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 			</td>
 			<td class="less" title="Added on {$result.createddate}">{$result.createddate|date_format}</td>
-			<td><a class="btn btn-mini btn-danger" title="Delete from your cart" href="?delete={$result.id}">Delete</a></td>
+			<td><a class="btn btn-mini btn-danger" title="Delete from your Download Basket" href="?delete={$result.id}">Delete</a></td>
 		</tr>
 		{/foreach}
 
@@ -47,6 +47,6 @@
 <div class="alert">
 	<button type="button" class="close" data-dismiss="alert">&times;</button>
 	<h4>Sorry!</h4>
-	There are no NZBs in your cart.
+	There are no NZBs in your download basket.
 </div>
 {/if}
