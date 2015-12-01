@@ -1,4 +1,5 @@
 2015-12-01 DariusIII
+	Chg: Remove AND again from getBrowseBy
 	Upd: Update binaryblacklist-edit.php
 2015-11-30 DariusIII
 	Fix: Add missing links to TMDB  in Charisma/Omicron/Gamma templates

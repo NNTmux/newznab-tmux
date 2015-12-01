@@ -403,7 +403,7 @@ class Movie
 					$bbv .= '.';
 				}
 				if ($bb === 'imdb') {
-					$browseBy .= 'm.' . $bb . 'id = ' . $bbv . ' AND ';
+					$browseBy .= 'm.' . $bb . 'id = ' . $bbv;
 				} else {
 					$browseBy .= 'm.' . $bb . ' ' . $this->pdo->likeString($bbv, true, true) . ' AND ';
 				}
