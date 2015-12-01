@@ -1,4 +1,5 @@
 2015-12-01 DariusIII
+	Chg: Replace Cart with Download Basket
 	Fix: Add posterwall.css
 	Upd: Update bootstrap to version 3.3.6
 	Fix: Add None to list of themes to choose from

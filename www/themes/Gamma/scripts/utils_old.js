@@ -10,7 +10,7 @@ jQuery(function($){
 			return false;
 		}
 	});
-	
+
 	$(".forumreplysubmit").click(function(e) {
 		if ($.trim($("#addReply").val()) == "")
 		{
@@ -18,19 +18,19 @@ jQuery(function($){
 			return false;
 		}
 	});
-	
+
 	$(".check").click(function(e) {
 		if (!$(e.target).is('input'))
 			$(this).children(".nzb_check").attr('checked', !$(this).children(".nzb_check").attr('checked'));
 	});
-	
+
 	$(".descmore").click(function(e) {
 		$(this).prev(".descinitial").hide();
 		$(this).next(".descfull").show();
 		$(this).hide();
 		return false;
 	});
-	
+
 	$('.nzb_check_all').change(function(){
 		if($(this).attr('checked'))
 		{
@@ -38,8 +38,8 @@ jQuery(function($){
 		} else {
 			$('table.data tr td input:checkbox').removeAttr('checked');
 		}
-    }); 
-	
+    });
+
 	$('.nzb_check_all_season').change(function(){
 		var season = $(this).attr('name');
 		$('table.data tr td input:checkbox:visible').each( function(i, row) {
@@ -57,14 +57,14 @@ jQuery(function($){
 		var guid = $(this).parent().parent().parent().parent().attr('id').substring(4);
 		$.post( SERVERROOT + "cart?add=" + guid, function(resp){
 			$(e.target).addClass('icon_cart_clicked').attr('title','Added to Cart');
-	        
+
 	        $.pnotify({
 		        title: 'ADDED!',
-		        text: 'Its now in your Cart',
+		        text: 'Its now in your Download Basket',
 		        type: 'success',
 		        icon: 'fa-icon-info-sign'
 		    });
-	        
+
 		});
 		return false;
 	});
@@ -76,7 +76,7 @@ jQuery(function($){
 
 		$.post(nzburl, function(resp){
 			$(e.target).addClass('icon_sab_clicked').attr('title','Added to Queue');
-			
+
 	        $.pnotify({
 		        title: 'ADDED TO SAB!',
 		        text: 'Its now in the Queue',
@@ -94,7 +94,7 @@ jQuery(function($){
 
 		$.post(nzburl, function(resp){
 			$(e.target).addClass('icon_sabNZBinfo_clicked').attr('title','Added to Queue');
-			
+
 	        $.pnotify({
 		        title: 'ADDED TO NZBGET!',
 		        text: 'Its now in the Queue',
@@ -112,7 +112,7 @@ jQuery(function($){
 
 		$.post(nzburl, function(resp){
 			$(e.target).addClass('icon_sabMovieinfo_clicked').attr('title','Added to Queue');
-			
+
 	        $.pnotify({
 		        title: 'ADDED TO NZBGET!',
 		        text: 'Its now in the Queue',
@@ -130,7 +130,7 @@ jQuery(function($){
 
 		$.post(nzburl, function(resp){
 			$(e.target).addClass('icon_nzbget_clicked').attr('title','Added to Queue');
-			
+
 	        $.pnotify({
 		        title: 'ADDED TO NZBGET!',
 		        text: 'Its now in the Queue',
@@ -148,7 +148,7 @@ jQuery(function($){
 
 		$.post(nzburl, function(resp){
 			$(e.target).addClass('icon_nzbgetNZBinfoclicked').attr('title','Added to Queue');
-			
+
 	        $.pnotify({
 		        title: 'ADDED TO NZBGET!',
 		        text: 'Its now in the Queue',
@@ -166,7 +166,7 @@ jQuery(function($){
 
 		$.post(nzburl, function(resp){
 			$(e.target).addClass('icon_nzbgetMovieinfo_clicked').attr('title','Added to Queue');
-			
+
 	        $.pnotify({
 		        title: 'ADDED TO NZBGET!',
 		        text: 'Its now in the Queue',
@@ -176,14 +176,14 @@ jQuery(function($){
 		});
 		return false;
 	});
-	
-	// viewnzb.tpl, 
+
+	// viewnzb.tpl,
 	$('.icon_nzb_cart').click(function(e){
 		if ($(this).hasClass('icon_cart_clicked')) return false;
 		var guid = $(this).parent().attr('id');
 		$.post( SERVERROOT + "cart?add=" + guid, function(resp){
 			$(e.target).addClass('icon_cart_clicked').attr('title','Added to Cart');
-	        
+
 	        $.pnotify({
 		        title: 'ADDED!',
 		        text: 'Its now in your Cart! ^_^',
@@ -193,8 +193,8 @@ jQuery(function($){
 	    });
 		return false;
 	});
-/* END OFF - SMALL GREY ICONS CART - DOWNLOAD - SAB */	
-	
+/* END OFF - SMALL GREY ICONS CART - DOWNLOAD - SAB */
+
 /* MODAL */
 	$("table.data a.modal_nfo").colorbox({	 // NFO modal
 		href: function(){ return $(this).attr('href') +'&modal'; },
@@ -203,13 +203,13 @@ jQuery(function($){
 	});
 	// Screenshot modal
 	$("table.data a.modal_prev").colorbox({scrolling:false, maxWidth:"800px", maxHeight:"450px"});
-	
+
 	$("table.data a.modal_imdb").colorbox({	 // IMDB modal
 		href: function(){ return SERVERROOT + "movie/"+$(this).attr('name').substring(4)+'&modal'; },
 		title: function(){ return $(this).parent().parent().children('a.title').text(); },
 		innerWidth:"800px", innerHeight:"450px", initialWidth:"800px", initialHeight:"450px", speed:0, opacity:0.7
 	}).click(function(){
-		$('#colorbox').removeClass().addClass('cboxMovie');	
+		$('#colorbox').removeClass().addClass('cboxMovie');
 	});
     $("a.badge-trailer").colorbox({	 // IMDB trailer modal
         href: function(){ return SERVERROOT + "movietrailer/"+$(this).attr('name').substring(4)+'&modal'; },
@@ -225,22 +225,22 @@ jQuery(function($){
 		title: function(){ return $(this).parent().parent().children('a.title').text(); },
 		innerWidth:"800px", innerHeight:"450px", initialWidth:"800px", initialHeight:"450px", speed:0, opacity:0.7
 	}).click(function(){
-		$('#colorbox').removeClass().addClass('cboxMusic');	
+		$('#colorbox').removeClass().addClass('cboxMusic');
 	});
 	$("table.data a.modal_console").colorbox({	 // Console modal
 		href: function(){ return SERVERROOT + "consolemodal/"+$(this).attr('name').substring(4)+'&modal'; },
 		title: function(){ return $(this).parent().parent().children('a.title').text(); },
 		innerWidth:"800px", innerHeight:"450px", initialWidth:"800px", initialHeight:"450px", speed:0, opacity:0.7
 	}).click(function(){
-		$('#colorbox').removeClass().addClass('cboxConsole');	
+		$('#colorbox').removeClass().addClass('cboxConsole');
 	});
 	$("table.data a.modal_book").colorbox({	 // Book modal
 		href: function(){ return SERVERROOT + "bookmodal/"+$(this).attr('name').substring(4)+'&modal'; },
 		title: function(){ return $(this).parent().parent().children('a.title').text(); },
 		innerWidth:"800px", innerHeight:"450px", initialWidth:"800px", initialHeight:"450px", speed:0, opacity:0.7
 	}).click(function(){
-		$('#colorbox').removeClass().addClass('cboxBook');	
-	});	
+		$('#colorbox').removeClass().addClass('cboxBook');
+	});
 /* END OFF - MODAL */
 
 
@@ -288,7 +288,7 @@ jQuery(function($){
                 			        text: 'Its now in the queue!! ^_^',
                 			        type: 'info',
                 			        icon: 'fa-icon-info-sign'
-               			        });					
+               			        });
 				});
 			}
 			$(this).attr('checked', false);
@@ -307,13 +307,13 @@ jQuery(function($){
                 			        text: 'Its now in the queue!! ^_^',
                 			        type: 'info',
                 			        icon: 'fa-icon-info-sign'
-               			        });					
+               			        });
 				});
 			}
 			$(this).attr('checked', false);
 		});
 	});
-	
+
 	//front end admin functions
 	$('input.nzb_multi_operations_edit').click(function(){
 		var ids = "";
@@ -384,9 +384,9 @@ jQuery(function($){
                 		 });
 			});
 	    });
-	});	
+	});
 
-/* END OFF - nzb_multi_operations_form */	
+/* END OFF - nzb_multi_operations_form */
 
 	// headermenu.tpl
 	$('#headsearch')
@@ -399,7 +399,7 @@ jQuery(function($){
 	$('#headsearch_go').click(function(){
 		if ($('#headsearch').val() && $('#headsearch').val() != 'Enter keywords')
 		{
-		
+
 			var sText = $('#headsearch').val();
 			var sCat = ($("#headcat").val()!=-1 ? "?t="+$("#headcat").val() : "");
 			document.location= WWW_TOP + "/search/" +  sText + sCat;
@@ -414,8 +414,8 @@ jQuery(function($){
 	});
 
 	$('#search')
-		.focus(function(){this.select(); })	
-	
+		.focus(function(){this.select(); })
+
 	// searchraw.tpl
 	$('#searchraw_search_button').click(function(){
 		if ($('#search').val())
@@ -445,7 +445,7 @@ jQuery(function($){
 	$('.confirm_action').click(function(){ return confirm('Are you sure?'); });
 
 	// play audio preview
-	$('.audioprev').click(function(){ 
+	$('.audioprev').click(function(){
 		var a = document.getElementById($(this).next('audio').attr('ID'));
 		if (a != null) {
 			if ($(this).text() == "Listen") {
@@ -470,13 +470,13 @@ jQuery(function($){
 	$('.mmenu').click(function(){
 		document.location=$(this).children('a').attr('href');
 		return false;
-	});	
-	
+	});
+
 	// mmenu_new
 	$('.mmenu_new').click(function(){
 		window.open($(this).children('a').attr('href'));
 		return false;
-	});	
+	});
 
 	// searchraw.tpl, viewfilelist.tpl -- checkbox operations
 	// selections
@@ -507,7 +507,7 @@ jQuery(function($){
 		var rowNum = $(e.target).parent().parent()[0].rowIndex ;
 	    if (last1) last2 = last1;
 		last1 = rowNum;
-		
+
 		// perform range selection
 		if (e.shiftKey && last1 && last2) {
 			if (last1 < last2)
@@ -524,7 +524,7 @@ jQuery(function($){
 
 		var $checkbox = $('table.data tr:nth-child('+(rowNum+1)+') td.selection INPUT[type="checkbox"]');
 		$checkbox.attr('checked', !$checkbox.attr('checked'));
-    
+
 		return false;
 	});
 
@@ -535,20 +535,20 @@ jQuery(function($){
 		$('#divInvite').slideToggle('fast');
 		$("#lnkSendInvite").hide();
 	});
-	
+
 	$('#lnkCancelInvite').click(function()
 	{
 		$('#divInvite').slideToggle('fast');
 		$("#lnkSendInvite").show();
 	});
-	
+
 	// send an invite
-	$('#frmSendInvite').submit(function() 
+	$('#frmSendInvite').submit(function()
 	{
 		var inputEmailto = $("#txtInvite").val();
 		if (isValidEmailAddress(inputEmailto))
 		{
-		
+
 			// no caching of results
 			var rand_no = Math.random();
 			$.ajax({
@@ -565,12 +565,12 @@ jQuery(function($){
 					$("#divInviteSuccess").slideToggle(400);
 					$('#divInvite').slideToggle('fast');
 					$('#frmSendInvite').slideToggle('fast');
-					
+
 				}, 3500);
 				$("#lnkSendInvite").show();
 			  },
 			  error: function(xhr,err,e) { alert( "Error in ajax_profile: " + err ); }
-			});			
+			});
 		}
 		else
 		{
@@ -578,7 +578,7 @@ jQuery(function($){
 			$("#divInviteError").text("Invalid email").show();
 			setTimeout(function() {
 					$("#divInviteError").slideToggle(400);
-					
+
 				}, 3500);
 		}
 		return false;
@@ -594,7 +594,7 @@ jQuery(function($){
 
 
 	// lookup tmdb for a movie
-	$('#frmMyMovieLookup').submit(function() 
+	$('#frmMyMovieLookup').submit(function()
 	{
 		var movSearchText = $("#txtsearch").val();
 		// no caching of results
@@ -608,11 +608,11 @@ jQuery(function($){
 			$("#divMovResults").html(data);
 		  },
 		  error: function(xhr,err,e) { alert( "Error in ajax_mymovies: " + err ); }
-		});			
+		});
 
 		return false;
-	});	
-	
+	});
+
 	// file list tooltip
 	$(".rarfilelist").each(function() {
 		var guid = $(this).children('img').attr('alt');
@@ -623,7 +623,7 @@ jQuery(function($){
 			  },
 			  text: 'loading...',
 			  ajax: {
-			     url: SERVERROOT + 'ajax_rarfilelist', 
+			     url: SERVERROOT + 'ajax_rarfilelist',
 			     type: 'GET',
 			     data: { id: guid },
 			     success: function(data, status) {
@@ -638,17 +638,17 @@ jQuery(function($){
 			style: {
 			    classes: 'ui-tooltip-newznab',
 				width: { max: 500 },
-				tip: { 
-	        		corner: 'topRight', 
+				tip: {
+	        		corner: 'topRight',
 	        		size: {
-	                	x: 8, 
-	                	y : 8 
+	                	x: 8,
+	                	y : 8
 	             	}
 				}
 			}
 		});
 	});
-	
+
 	// seriesinfo tooltip
 
 	// seriesinfo tooltip
@@ -659,11 +659,11 @@ jQuery(function($){
 			  title: {
 				  text: 'Episode Info'
 			  },
-			  text: 'loading...', 
+			  text: 'loading...',
 			  ajax: {
-			     url: SERVERROOT + 'ajax_tvinfo', 
-			     type: 'GET', 
-			     data: { id: guid }, 
+			     url: SERVERROOT + 'ajax_tvinfo',
+			     type: 'GET',
+			     data: { id: guid },
 			     success: function(data, status) {
 			        this.set('content.text', data);
 			     }
@@ -675,7 +675,7 @@ jQuery(function($){
 		});
 	});
 
-	
+
 
 	// mediainfo tooltip
 	$(".mediainfo").each(function() {
@@ -685,10 +685,10 @@ jQuery(function($){
 			  title: {
 				  text: 'Extended Media Info'
 			  },
-			  text: 'loading...', 
+			  text: 'loading...',
 			  ajax: {
-			     url: SERVERROOT + 'ajax_mediainfo', 
-			     type: 'GET', 
+			     url: SERVERROOT + 'ajax_mediainfo',
+			     type: 'GET',
 			     data: { id: guid },
 			     success: function(data, status) {
 			        this.set('content.text', data);
@@ -698,17 +698,17 @@ jQuery(function($){
 			style: {
 				classes: 'ui-tooltip-newznab',
 				width: { max: 500 },
-				tip: { 
-					corner: 'topLeft', 
+				tip: {
+					corner: 'topLeft',
 					size: {
-				    	x: 8, 
-				    	y : 8 
+				    	x: 8,
+				    	y : 8
 				 	}
 				}
 			}
 		});
 	});
-	
+
 	// preinfo tooltip
 	$(".preinfo").each(function() {
 		var searchname = $(this).attr('title');
@@ -719,9 +719,9 @@ jQuery(function($){
 			  },
 			  text: 'loading...',
 			  ajax: {
-			     url: SERVERROOT + 'ajax_preinfo', 
+			     url: SERVERROOT + 'ajax_preinfo',
 			     type: 'GET',
-			     data: { searchname: searchname }, 
+			     data: { searchname: searchname },
 			     success: function(data, status) {
 			        this.set('content.text', data);
 			     }
@@ -767,13 +767,13 @@ URLDecode:function(s){var o=s;var binVal,t;var r=/(%[^%]{2})/;
 });
 
 
-function isValidEmailAddress(emailAddress) 
+function isValidEmailAddress(emailAddress)
 {
 	var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
 	return pattern.test(emailAddress);
 }
 
-function mymovie_del(imdbID, btn) 
+function mymovie_del(imdbID, btn)
 {
 		var rand_no = Math.random();
 		$.ajax({
@@ -786,12 +786,12 @@ function mymovie_del(imdbID, btn)
 				$(btn).prev("a").show();
 		  },
 		  error: function(xhr,err,e) {  }
-		});			
+		});
 
 		return false;
 }
 
-function mymovie_add(imdbID, btn) 
+function mymovie_add(imdbID, btn)
 {
 		$(btn).hide();
 		$(btn).next("a").show();
@@ -805,7 +805,7 @@ function mymovie_add(imdbID, btn)
 		  {
 		  },
 		  error: function(xhr,err,e) {  }
-		});			
+		});
 
 		return false;
 }
@@ -814,7 +814,7 @@ function mymovie_add(imdbID, btn)
 //reset users api counts
 function resetapireq(uid, type)
 {
-	$.post( SERVERROOT + "ajax_resetusergrabs-admin?id=" + uid + "&action=" + type, function(resp){ });	
+	$.post( SERVERROOT + "ajax_resetusergrabs-admin?id=" + uid + "&action=" + type, function(resp){ });
 }
 
 function getQueue()

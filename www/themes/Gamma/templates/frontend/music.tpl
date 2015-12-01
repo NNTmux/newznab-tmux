@@ -44,7 +44,7 @@
 						With Selected:
 						<div class="btn-group">
 							<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download NZBs" />
-							<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Add to Cart" />
+							<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Send to my Download Basket" />
 							{if isset($sabintegrated)}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 							{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
 						</div>
@@ -174,7 +174,7 @@
 					<li><h4><a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$result.artist|escape:"htmlall"} - {$result.title|escape:"htmlall"}</a> (<a class="title" title="{$result.year}" href="{$smarty.const.WWW_TOP}/music?year={$result.year}">{$result.year}</a>)</h4></li>
 					<li style="vertical-align:text-bottom;"><div class="icon"><input type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" /></div></li>
 					<li style="vertical-align:text-bottom;"><a class="icon icon_nzb fa fa-cloud-download" style="text-decoration: none; color: #7ab800;" title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"></a></li>
-					<li style="vertical-align:text-bottom;"><a href="#" class="icon icon_cart fa fa-shopping-basket" style="text-decoration: none; color: #5c5c5c;" title="Add to Cart"></a></li>
+					<li style="vertical-align:text-bottom;"><a href="#" class="icon icon_cart fa fa-shopping-basket" style="text-decoration: none; color: #5c5c5c;" title="Send to my Download Basket"></a></li>
 					<li style="vertical-align:text-bottom;">{if $sabintegrated}<div><a href="#" class="icon icon_sab fa fa-share" style="text-decoration: none; color: #008ab8;"  title="Send to my Queue"></a></div>{/if}</li>
 					<li style="vertical-align:text-bottom;">{if isset($nzbgetintegrated)}<div><a href="#" class="icon icon_nzb fa fa-cloud-downloadget" title="Send to my NZBGet"><img src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/nzbgetup.png"></a></div>{/if}</li>
                     <li style="vertical-align:text-bottom;">{if $weHasVortex}<div><a href="#" class="icon icon_nzb fa fa-cloud-downloadvortex" title="Send to my NZBVortex"><img src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/vortex/bigsmile.png"></a></div>{/if}</li>
@@ -214,7 +214,7 @@
 						With Selected:
 						<div class="btn-group">
 							<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download NZBs" />
-							<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Add to Cart" />
+							<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Send to my Download Basket" />
 							{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 							{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
 						</div>

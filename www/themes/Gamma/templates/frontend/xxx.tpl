@@ -50,7 +50,7 @@
 								<input type="button" class="nzb_multi_operations_download btn btn-small btn-success"
 									   value="Download NZBs"/>
 								<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info"
-									   value="Add to Cart"/>
+									   value="Send to my Download Basket"/>
 								{if $sabintegrated}
 									<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary"
 										   value="Send to queue"/>
@@ -309,7 +309,7 @@
 												<li>
 													<a class="icon icon_cart fa fa-shopping-basket"
 													   style="text-decoration: none; color: #5c5c5c;"
-													   title="Add to Cart">
+													   title="Send to my Download Basket">
 													</a>
 												</li>
 												{if $sabintegrated}
@@ -366,7 +366,7 @@
 									<input type="button" class="nzb_multi_operations_download btn btn-small btn-success"
 										   value="Download NZBs"/>
 									<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info"
-										   value="Add to Cart"/>
+										   value="Send to my Download Basket"/>
 									{if $sabintegrated}
 										<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary"
 											   value="Send to queue"/>
