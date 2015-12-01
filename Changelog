@@ -1,4 +1,5 @@
 2015-12-01 DariusIII
+	Fix: Add None to list of themes to choose from
 	Upd: Add Movie View link to movies detail page
 	Chg: Remove AND again from getBrowseBy
 	Upd: Update binaryblacklist-edit.php
