@@ -29,14 +29,26 @@
 						<div class="btn-group">
 							<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download NZBs" />
 							<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Add to Cart" />
-							{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
+							{if isset($sabintegrated)}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 							{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
 						</div>
-						{if (strpos($category, '60')  !== false)}
-							&nbsp;&nbsp;&nbsp;&nbsp;<a title="Switch to Cover view" href="{$smarty.const.WWW_TOP}/xxx"><i class="fa fa-lg fa-file-image-o"></i></a>
+						{if (strpos($category, '10')  !== false)}
+							&nbsp;&nbsp;&nbsp;&nbsp;<a title="Switch to Cover view" href="{$smarty.const.WWW_TOP}/console"><i class="fa fa-lg fa-file-image-o"></i></a>
 						{/if}
 						{if (strpos($category, '20') !== false)}
 							&nbsp;&nbsp;&nbsp;&nbsp;<a title="Switch to Cover view" href="{$smarty.const.WWW_TOP}/movies"><i class="fa fa-lg fa-file-image-o"></i></a>
+						{/if}
+						{if (strpos($category, '30') !== false)}
+							&nbsp;&nbsp;&nbsp;&nbsp;<a title="Switch to Cover view" href="{$smarty.const.WWW_TOP}/music"><i class="fa fa-lg fa-file-image-o"></i></a>
+						{/if}
+						{if $category == 4050}
+							&nbsp;&nbsp;&nbsp;&nbsp;<a title="Switch to Cover view" href="{$smarty.const.WWW_TOP}/games"><i class="fa fa-lg fa-file-image-o"></i></a>
+						{/if}
+						{if (strpos($category, '60')  !== false)}
+							&nbsp;&nbsp;&nbsp;&nbsp;<a title="Switch to Cover view" href="{$smarty.const.WWW_TOP}/xxx"><i class="fa fa-lg fa-file-image-o"></i></a>
+						{/if}
+						{if (strpos($category, '70')  !== false)}
+						&nbsp;&nbsp;&nbsp;&nbsp;<a title="Switch to Cover view" href="{$smarty.const.WWW_TOP}/books"><i class="fa fa-lg fa-file-image-o"></i></a>
 						{/if}
 					</td>
 					<td width="50%">
@@ -64,15 +76,12 @@
 			</table>
 		</div>
 	</div>
-
 	<table style="100%" class="data highlight icons table table-striped" id="browsetable">
-
 		<tr>
 			<th style="padding-top:0px; padding-bottom:0px;">
 				<input id="chkSelectAll" type="checkbox" class="nzb_check_all" />
 				<label for="chkSelectAll" style="display:none;">Select All</label>
 			</th>
-
 			<th style="padding-top:0px; padding-bottom:0px;">name<br/>
 				<a title="Sort Descending" href="{$orderbyname_desc}">
 					<i class="fa fa-caret-down"></i>
@@ -81,7 +90,6 @@
 					<i class="fa fa-caret-up"></i>
 				</a>
 			</th>
-
 			<th style="padding-top:0px; padding-bottom:0px;">category<br/>
 				<a title="Sort Descending" href="{$orderbycat_desc}">
 					<i class="fa fa-caret-down"></i>
@@ -90,7 +98,6 @@
 					<i class="fa fa-caret-up"></i>
 				</a>
 			</th>
-
 			<th style="padding-top:0px; padding-bottom:0px;">posted<br/>
 				<a title="Sort Descending" href="{$orderbyposted_desc}">
 					<i class="fa fa-caret-down"></i>
@@ -99,7 +106,6 @@
 					<i class="fa fa-caret-up"></i>
 				</a>
 			</th>
-
 			<th style="padding-top:0px; padding-bottom:0px;">size<br/>
 				<a title="Sort Descending" href="{$orderbysize_desc}">
 					<i class="fa fa-caret-down"></i>
@@ -108,7 +114,6 @@
 					<i class="fa fa-caret-up"></i>
 				</a>
 			</th>
-
 			<th style="padding-top:0px; padding-bottom:0px;">files<br/>
 				<a title="Sort Descending" href="{$orderbyfiles_desc}">
 					<i class="fa fa-caret-down"></i>
@@ -119,7 +124,6 @@
 			</th>
 			<th>action</th>
 		</tr>
-
 		{foreach from=$results item=result}
 		<tr class="{cycle values=",alt"}{if $lastvisit|strtotime<$result.adddate|strtotime} new{/if}" id="guid{$result.guid}">
 			{if (strpos($category, '60') !== false)}
@@ -139,32 +143,26 @@
 				 type="checkbox" class="nzb_check"
 				 value="{$result.guid}"/></td>
 			{/if}
-
 			<td class="item">
 				<label for="chk{$result.guid|substr:0:7}">
 					<a class="title" title="View details"  href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}"><h5>{$result.searchname|escape:"htmlall"|replace:".":" "}</h5></a>
 				</label>
-
 				{if $result.passwordstatus == 2}
 				<i class="fa fa-lock"></i>
 				{elseif $result.passwordstatus == 1}
 				<i class="fa fa-lock"></i>
 				{/if}
-
 				{if $userdata.canpre == 1 && isset($result.nuketype) && $result.nuketype != ''}
 				&nbsp;<img title="{$result.nuketype}" src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/nuke.png" width="10" height="10" alt="{$result.nuketype}" />
 				{/if}
-
 				<div class="resextra">
 					<div class="btns">{strip}
 						{if $result.nfoid > 0}
 						<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}" title="View Nfo" class="modal_nfo badge halffade" rel="nfo">Nfo</a>
 						{/if}
-
 						{if $result.imdbid > 0}
 						<a href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbid}" title="View movie info" class="badge badge-inverse halffade" rel="movie" >Movie</a>
 						{/if}
-
 						{if $result.jpgstatus == 1&& $userdata.canpreview == 1}
 							<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
 							title="Thumbnail" class="modal_prev badge badge-success halffade" rel="Thumbnail">Thumbnail</a>
@@ -174,32 +172,25 @@
 									title="Screenshot" class="modal_prev badge badge-success halffade" rel="preview">Preview</a>
 								{/if}
 						{/if}
-
 						{if $result.haspreview == 2 && $userdata.canpreview == 1}
 						<a href="#" name="audio{$result.guid}" title="Listen to Preview" class="audioprev badge badge-success halffade" rel="audio">Listen</a>
 						<audio id="audprev{$result.guid}" src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.mp3" preload="none"></audio>
 						{/if}
-
 						{if $result.musicinfoid > 0}
 						<a href="#" name="name{$result.musicinfoid}" title="View music info" class="modal_music badge badge-success halffade" rel="music" >Cover</a>
 						{/if}
-
 						{if $result.consoleinfoid > 0}
 						<a href="#" name="name{$result.consoleinfoid}" title="View console info" class="modal_console badge badge-success halffade" rel="console" >Cover</a>
 						{/if}
-
 						{if $result.bookinfoid > 0}
 						<a href="#" name="name{$result.bookinfoid}" title="View book info" class="modal_book badge badge-success halffade" rel="console" >Cover</a>
 						{/if}
-
 						{if $result.videos_id > 0}
 						<a class="badge badge-inverse halffade" href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}">View Series</a>
 						{/if}
-
 						{if $result.anidbid > 0}
 						<a class="badge badge-inverse halffade" href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}" title="View all episodes">View Anime</a>
 						{/if}
-
 						{if isset($result.firstaired) && $result.firstaired != ""}
 							<span class="seriesinfo badge badge-success halffade" title="{$result.guid}"> Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>
 						{/if}
