@@ -25,7 +25,7 @@
 	<meta charset="utf-8">
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<!-- Newposterwall -->
-	<link href="{$smarty.const.WWW_TOP}/themes_shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/themes/shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- The styles -->
 	<link id="bs-css" href="{$smarty.const.WWW_TOP}/themes/Charisma/css/bootstrap-spacelab.min.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_TOP}/themes/Charisma/css/Charisma-app.css" rel="stylesheet">
@@ -41,9 +41,9 @@
 	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/css/jquery.iphone.toggle.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/css/animate.min.css' rel='stylesheet'>
 	<!-- Normalize.css -->
-	<link href="{$smarty.const.WWW_TOP}/themes_shared/styles/normalize.css" rel="stylesheet" type="text/css">
+	<link href="{$smarty.const.WWW_TOP}/themes/shared/styles/normalize.css" rel="stylesheet" type="text/css">
 	<!-- The fav icon -->
-	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/themes_shared/images/favicon.ico">
+	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/themes/shared/images/favicon.ico">
 </head>
 {if ($loggedin)=="true"}
 	<body>

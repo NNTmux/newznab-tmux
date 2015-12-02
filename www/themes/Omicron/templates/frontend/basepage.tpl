@@ -15,7 +15,7 @@
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<!-- Newposterwall -->
-	<link href="{$smarty.const.WWW_TOP}/themes_shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/themes/shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- Bootstrap 3.3.4 -->
 	<link href="{$smarty.const.WWW_TOP}/themes/Omicron/bootstrap/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
@@ -23,7 +23,7 @@
 	<link href="{$smarty.const.WWW_TOP}/themes/Omicron/bootstrap/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- Normalize.css -->
-	<link href="{$smarty.const.WWW_TOP}/themes_shared/styles/normalize.css" rel="stylesheet" type="text/css">
+	<link href="{$smarty.const.WWW_TOP}/themes/shared/styles/normalize.css" rel="stylesheet" type="text/css">
 	<!-- Ionicons -->
 	<link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css"/>
 	<!-- Theme style -->
@@ -90,7 +90,7 @@
 							<!-- Menu Toggle Button -->
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<!-- The user image in the navbar-->
-								<img src="{$smarty.const.WWW_TOP}/themes_shared/images/userimage.png"
+								<img src="{$smarty.const.WWW_TOP}/themes/shared/images/userimage.png"
 									 class="user-image" alt="User Image"/>
 								<!-- hidden-xs hides the username on small devices so only the image appears. -->
 								<span class="hidden-xs">{$userdata.username}</span>
@@ -98,7 +98,7 @@
 							<ul class="dropdown-menu">
 								<!-- The user image in the menu -->
 								<li class="user-header">
-									<img src="{$smarty.const.WWW_TOP}/themes_shared/images/userimage.png"
+									<img src="{$smarty.const.WWW_TOP}/themes/shared/images/userimage.png"
 										 class="img-circle" alt="User Image"/>
 									<p>
 										{$userdata.username}
@@ -152,7 +152,7 @@
 				<!-- Sidebar user panel -->
 				<div class="user-panel">
 					<div class="pull-left image">
-						<img src="{$smarty.const.WWW_TOP}/themes_shared/images/user-loggedin.png" class="img-circle"
+						<img src="{$smarty.const.WWW_TOP}/themes/shared/images/user-loggedin.png" class="img-circle"
 							 alt="User Image"/>
 					</div>
 					<div class="pull-left info">

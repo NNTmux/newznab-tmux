@@ -46,7 +46,7 @@ define('NN_TMP', NN_RES . 'tmp' . DS);
 define('NN_THEMES', NN_WWW . 'themes' . DS);
 
 // Shared theme items (pictures, scripts).
-define('NN_THEMES_SHARED', NN_WWW . 'themes_shared' . DS);
+define('NN_THEMES_SHARED', NN_THEMES . 'shared' . DS);
 
 // Path where log files are stored.
 define('NN_LOGS', NN_RES . 'logs' . DS);
