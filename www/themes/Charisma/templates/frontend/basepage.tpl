@@ -28,7 +28,7 @@
 	<link href="{$smarty.const.WWW_TOP}/themes/shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- The styles -->
 	<link id="bs-css" href="{$smarty.const.WWW_TOP}/themes/Charisma/css/bootstrap-spacelab.min.css" rel="stylesheet">
-	<link href="{$smarty.const.WWW_TOP}/themes/Charisma/css/Charisma-app.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_TOP}/themes/Charisma/css/charisma-app.css" rel="stylesheet">
 	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/chosen/chosen.min.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/colorbox/example3/colorbox.css'
 		  rel='stylesheet'>
@@ -244,7 +244,7 @@
 	<!-- history.js for cross-browser state change on ajax -->
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/js/jquery.history.js"></script>
 	<!-- Charisma functions -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/js/Charisma.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/js/charisma.js"></script>
 	<!-- Functions with noty -->
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/js/functions.js"></script>
 	<!-- newznab default scripts, needed for stuff to work -->
