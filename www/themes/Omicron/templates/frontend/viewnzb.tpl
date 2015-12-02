@@ -35,6 +35,7 @@
 							   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}"
 							   title="View at TMDb">TMDb</a>
 						{/if}
+						<a class="label label-default" href="{$smarty.const.WWW_TOP}/movies?imdb={$release.imdbid}" title="View all versions">Movie View</a>
 					{/if}
 					{if $anidb && $release.anidbid > 0}
 						<a class="label label-default" href="{$serverroot}anime/{$release.anidbid}"
@@ -70,6 +71,11 @@
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
 							   title="View at TV Rage">TV Rage</a>
+						{/if}
+						{if $show.tmdb > 0}
+							<a class="label label-default" target="_blank"
+							   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$show.tmdb}"
+							   title="View at TheMovieDB">TMDb</a>
 						{/if}
 					{/if}
 					{if $con && $con.url != ""}<a href="{$site->dereferrer_link}{$con.url}/"
@@ -459,11 +465,11 @@
 																		time{if $release.grabs==1}{else}s{/if}</td>
 																</tr>
 																{if $failed != NULL && $failed >0}
-																<tr>
-																	<th width="140">Failed Download</th>
-																	<td>{$failed}
-																		time{if $failed==1}{else}s{/if}</td>
-																</tr>
+																	<tr>
+																		<th width="140">Failed Download</th>
+																		<td>{$failed}
+																			time{if $failed==1}{else}s{/if}</td>
+																	</tr>
 																{/if}
 																<tr>
 																	<th width="140">Password

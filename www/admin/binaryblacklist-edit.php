@@ -1,81 +1,77 @@
 <?php
-
-require_once("config.php");
+require_once './config.php';
 
 use newznab\Binaries;
 use newznab\Category;
 
 $page = new AdminPage();
-$bin = new Binaries();
-$id = 0;
+$bin  = new Binaries(['Settings' => $page->settings]);
+$error = '';
+$regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => ''];
 
-// set the current action
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
-
-switch($action)
-{
-    case 'submit':
-
-    	if ($_POST["groupname"] == "")
-    	{
-				$page->smarty->assign('error', "Group must be a valid usenet group");
-				break;
-    	}
-
-    	if ($_POST["regex"] == "")
-    	{
-				$page->smarty->assign('error', "Regex cannot be empty");
-				break;
-    	}
-
-	    if ($_POST["id"] == "")
-    	{
-				$bin->addBlacklist($_POST);
-			}
-			else
-			{
-				$ret = $bin->updateBlacklist($_POST);
-			}
-			header("Location:".WWW_TOP."/binaryblacklist-list.php");
+switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
+	case 'submit':
+		if ($_POST["groupname"] == '') {
+			$error = "Group must be a valid usenet group";
 			break;
-    case 'addtest':
-    	if (isset($_GET['regex']) && isset($_GET['groupname'])) {
-    		$r = array('groupname'=>$_GET['groupname'], 'regex'=>$_GET['regex'], 'ordinal'=>'1', 'status'=>'1');
-    		$page->smarty->assign('regex', $r);
-    	}
-    	break;
-    case 'view':
-    default:
+		}
 
-			if (isset($_GET["id"]))
-			{
-				$page->title = "Binary Black/Whitelist Edit";
-				$id = $_GET["id"];
+		if ($_POST["regex"] == '') {
+			$error = "Regex cannot be empty";
+			break;
+		}
 
-				$r = $bin->getBlacklistByID($id);
+		if ($_POST["id"] == '') {
+			$bin->addBlacklist($_POST);
+		} else {
+			$ret = $bin->updateBlacklist($_POST);
+		}
 
-			}
-			else
-			{
-				$page->title = "Binary Black/Whitelist Add";
-				$r = [];
-				$r["status"] = 1;
-				$r["optype"] = 1;
-				$r["msgcol"] = 1;
-			}
-			$page->smarty->assign('regex', $r);
+		header("Location:" . WWW_TOP . "/binaryblacklist-list.php");
+		break;
 
-      break;
+	case 'addtest':
+		if (isset($_GET['regex']) && isset($_GET['groupname'])) {
+			$regex += [
+					'groupname' => $_GET['groupname'],
+					'regex' => $_GET['regex'],
+					'ordinal' => '1',
+					'status'    => '1'
+			];
+		}
+		break;
+
+	case 'view':
+	default:
+		if (isset($_GET["id"])) {
+			$page->title = "Binary Black/Whitelist Edit";
+			$regex = $bin->getBlacklistByID($_GET["id"]);
+		} else {
+			$page->title = "Binary Black/Whitelist Add";
+			$regex += [
+					'status' => 1,
+					'optype' => 1,
+					'msgcol' => 1
+			];
+		}
+		break;
 }
 
-$page->smarty->assign('status_ids', array(Category::STATUS_ACTIVE,Category::STATUS_INACTIVE));
-$page->smarty->assign('status_names', array( 'Yes', 'No'));
-
-$page->smarty->assign('optype_ids', array(1,2));
-$page->smarty->assign('optype_names', array( 'Black', 'White'));
-
-$page->smarty->assign('msgcol_ids', array(Binaries::BLACKLIST_FIELD_SUBJECT, Binaries::BLACKLIST_FIELD_FROM, Binaries::BLACKLIST_FIELD_MESSAGEID));
-$page->smarty->assign('msgcol_names', array( 'Subject', 'Poster', 'MessageId'));
+$page->smarty->assign([
+				'error'        => $error,
+				'regex'        => $regex,
+				'status_ids'   => [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE],
+				'status_names' => ['Yes', 'No'],
+				'optype_ids'   => [1, 2],
+				'optype_names' => ['Black', 'White'],
+				'msgcol_ids'   => [
+						Binaries::BLACKLIST_FIELD_SUBJECT,
+						Binaries::BLACKLIST_FIELD_FROM,
+						Binaries::BLACKLIST_FIELD_MESSAGEID
+				],
+				'msgcol_names' => ['Subject', 'Poster', 'MessageId']
+		]
+);
 
 $page->content = $page->smarty->fetch('binaryblacklist-edit.tpl');
 $page->render();

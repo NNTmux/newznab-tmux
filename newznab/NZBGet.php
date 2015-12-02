@@ -111,11 +111,11 @@ class NZBGet
 	{
 		$relData = $this->Releases->getByGuid($guid);
 
-		$string = Utility::unzipGzipFile($this->NZB->getNZBPath($guid));
+		$string = Utility::unzipGzipFile($this->NZB->NZBPath($guid));
 		$string = ($string === false ? '' : $string);
 
 		$header =
-			'<?xml version="1.0"?>
+				'<?xml version="1.0"?>
 			<methodCall>
 				<methodName>append</methodName>
 				<params>
@@ -134,8 +134,8 @@ class NZBGet
 					<param>
 						<value>
 							<string>' .
-			base64_encode($string) .
-			'</string>
+				base64_encode($string) .
+				'</string>
 						</value>
 					</param>
 				</params>
@@ -157,7 +157,7 @@ class NZBGet
 		$reldata = $this->Releases->getByGuid($guid);
 
 		$header =
-			'<?xml version="1.0"?>
+				'<?xml version="1.0"?>
 			<methodCall>
 				<methodName>appendurl</methodName>
 				<params>
@@ -176,15 +176,15 @@ class NZBGet
 					<param>
 						<value>
 							<string>' .
-			$this->serverurl .
-			'getnzb/' .
-			$guid .
-			'%26i%3D' .
-			$this->uid .
-			'%26r%3D' .
-			$this->rsstoken
-			.
-			'</string>
+				$this->serverurl .
+				'getnzb/' .
+				$guid .
+				'%26i%3D' .
+				$this->uid .
+				'%26r%3D' .
+				$this->rsstoken
+				.
+				'</string>
 						</value>
 					</param>
 				</params>
@@ -202,7 +202,7 @@ class NZBGet
 	public function pauseAll()
 	{
 		$header =
-			'<?xml version="1.0"?>
+				'<?xml version="1.0"?>
 			<methodCall>
 				<methodName>pausedownload2</methodName>
 				<params>
@@ -224,7 +224,7 @@ class NZBGet
 	public function resumeAll()
 	{
 		$header =
-			'<?xml version="1.0"?>
+				'<?xml version="1.0"?>
 			<methodCall>
 				<methodName>resumedownload2</methodName>
 				<params>
@@ -246,7 +246,7 @@ class NZBGet
 	public function pauseFromQueue($id)
 	{
 		$header =
-			'<?xml version="1.0"?>
+				'<?xml version="1.0"?>
 			<methodCall>
 				<methodName>editqueue</methodName>
 				<params>
@@ -281,7 +281,7 @@ class NZBGet
 	public function resumeFromQueue($id)
 	{
 		$header =
-			'<?xml version="1.0"?>
+				'<?xml version="1.0"?>
 			<methodCall>
 				<methodName>editqueue</methodName>
 				<params>
@@ -316,7 +316,7 @@ class NZBGet
 	public function delFromQueue($id)
 	{
 		$header =
-			'<?xml version="1.0"?>
+				'<?xml version="1.0"?>
 			<methodCall>
 				<methodName>editqueue</methodName>
 				<params>
@@ -353,7 +353,7 @@ class NZBGet
 	public function rate($limit)
 	{
 		$header =
-			'<?xml version="1.0"?>
+				'<?xml version="1.0"?>
 			<methodCall>
 				<methodName>rate</methodName>
 				<params>
@@ -436,15 +436,15 @@ class NZBGet
 	{
 		if (preg_match('/(?P<protocol>https?):\/\/(?P<url>.+?)(:(?P<port>\d+\/)|\/)$/i', $url, $matches)) {
 			return
-				$matches['protocol'] .
-				'://' .
-				$this->userName .
-				':' .
-				$this->password .
-				'@' .
-				$matches['url'] .
-				(isset($matches['port']) ? ':' . $matches['port'] : (substr($matches['url'], -1) === '/' ? '' : '/')) .
-				'xmlrpc/';
+					$matches['protocol'] .
+					'://' .
+					$this->userName .
+					':' .
+					$this->password .
+					'@' .
+					$matches['url'] .
+					(isset($matches['port']) ? ':' . $matches['port'] : (substr($matches['url'], -1) === '/' ? '' : '/')) .
+					'xmlrpc/';
 		} else {
 			return false;
 		}

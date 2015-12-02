@@ -106,7 +106,7 @@ class BasePage
 		$this->smarty->setTemplateDir(
 			[
 				'user_frontend' => NN_WWW . 'themes/' . $this->settings->getSetting('style') . '/templates/frontend',
-				'frontend' => NN_WWW . 'themes/omicron/templates/frontend'
+				'frontend' => NN_WWW . 'themes/Omicron/templates/frontend'
 			]
 		);
 		$this->smarty->setCompileDir(SMARTY_DIR.'templates_c'.DIRECTORY_SEPARATOR);
@@ -137,7 +137,7 @@ class BasePage
 					$this->smarty->setTemplateDir(
 							[
 							'user_frontend' => NN_WWW . 'themes/' . $this->userdata['style'] . '/templates/frontend',
-							'frontend'      => NN_WWW . 'themes/omicron/templates/frontend'
+							'frontend'      => NN_WWW . 'themes/Omicron/templates/frontend'
 						]
 					);
 				}
