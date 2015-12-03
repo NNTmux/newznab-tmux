@@ -47,7 +47,6 @@ if (isset($argv[1]) && ($argv[1] === "true" || $argv[1] === "check")) {
 				echo $pdo->log->warning("Missing cover " . $nzbpath);
 				if ($argv[1] === "true") {
 					$row = $movie->updateMovieInfo($row['imdbid']);
-					var_dump($row);
 				}
 			}
 
