@@ -41,7 +41,7 @@ function run_query($query, $test)
 	}
 }
 
-$path = nZEDb_RES . 'db' . DS . 'schema' . DS . 'nntmux_fi_schema.sql';
+$path = NN_RES . 'db' . DS . 'schema' . DS . 'nntmux_fi_schema.sql';
 $handle = fopen($path, "r");
 if ($handle) {
 	while (($line = fgets($handle)) !== false) {
