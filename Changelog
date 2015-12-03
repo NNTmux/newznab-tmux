@@ -1,4 +1,5 @@
 2015-12-03 DariusIII
+	Fix: Login and register captcha on Gamma template
 	Chg: Remove tvrage scripts, add script to check for missing covers, nzb_reorg and unique indexes.
 	     Remove traktid columns from movieinfo and releases tables.
 2015-12-02 DariusIII
