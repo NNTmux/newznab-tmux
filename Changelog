@@ -1,3 +1,6 @@
+2015-12-03 DariusIII
+	Chg: remove traktid columns from movieinfo and releases table, add nzb_reorg script, add script to check
+	     missing unique indexes based on nntmux_fi_schema.sql
 2015-12-01 DariusIII
 	Chg: Replace Cart with Download Basket
 	Fix: Add posterwall.css

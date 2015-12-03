@@ -2268,7 +2268,6 @@ CREATE TABLE IF NOT EXISTS movieinfo (
   createddate DATETIME NOT NULL,
   updateddate DATETIME NOT NULL,
   banner TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  traktid INT(10) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
   UNIQUE KEY imdbid (imdbid),
   KEY ix_movieinfo_title (title)
@@ -2574,7 +2573,6 @@ CREATE TABLE IF NOT EXISTS releases (
   proc_sorter TINYINT(1) NOT NULL DEFAULT '0',
   nzbstatus TINYINT(1) NOT NULL DEFAULT '0',
   nzb_guid BINARY(16) DEFAULT NULL,
-  traktid INT(10) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (id,categoryid),
   KEY ix_releases_name (name),
   KEY ix_releases_group_id (groupid,passwordstatus),
