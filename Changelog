@@ -1,4 +1,5 @@
 2015-12-03 DariusIII
+	Add: Add script to check movies for missing covers.
 	Chg: remove traktid columns from movieinfo and releases table, add nzb_reorg script, add script to check
 	     missing unique indexes based on nntmux_fi_schema.sql
 2015-12-01 DariusIII
