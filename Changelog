@@ -1,3 +1,6 @@
+2015-12-03 DariusIII
+	Chg: Remove tvrage scripts, add script to check for missing covers, nzb_reorg and unique indexes.
+	     Remove traktid columns from movieinfo and releases tables.
 2015-12-02 DariusIII
 	Fix: Fix Charisma menu issues
 	Upd: Many changes in templates moved from regexless branch
