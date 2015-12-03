@@ -6,7 +6,8 @@
 			<file>228</file>
 		</sql>
 		<git>
-			<tag>0.4.2</tag>
+			<tag>0.0.0
+</tag>
 			<!-- commit count removed -->
 			<hooks>
 				<precommit>9</precommit>
