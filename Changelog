@@ -1,3 +1,5 @@
+2015-12-04 DariusIII
+	Upd: Update Version.php to not update commits and use tags only on master branch
 2015-12-03 DariusIII
 	Fix: Fix captcha on login/register and images in upcoming
 	Add: Add script to check movies for missing covers.

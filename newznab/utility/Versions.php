@@ -23,7 +23,7 @@ class Versions
 	public $git;
 
 	/**
-	 * @var object newznab\controllers\ColorCLI
+	 * @var object newznab\ColorCLI
 	 */
 	public $out;
 
@@ -102,7 +102,7 @@ class Versions
 	{
 		// Since Dec 2014 we no longer maintain the git commit count in the XML file, as it is no
 		// longer used in the code base.
-		if ((int)$this->_vers->sql->db >= 307) {
+		if ((int)$this->_vers->sql->db >= 200) {
 			return 0;
 		}
 
@@ -136,7 +136,7 @@ class Versions
 		$latest = $this->git->tagLatest();
 		$ver = preg_match('#v(\d+\.\d+\.\d+).*#', $latest, $matches) ? $matches[1] : $latest;
 
-		if ($this->git->getBranch() === 'dev') {
+		if ($this->git->getBranch() !== 'master') {
 			if (version_compare($this->_vers->git->tag, '0.0.0', '!=')) {
 				$this->_vers->git->tag = '0.0.0';
 				$this->_changes |= self::UPDATED_GIT_TAG;
@@ -152,7 +152,7 @@ class Versions
 				$this->_changes |= self::UPDATED_GIT_TAG;
 			} else {
 				echo $this->out->primaryOver("Leaving tag version at ") .
-					 $this->out->headerOver($this->_vers->git->tag);
+						$this->out->headerOver($this->_vers->git->tag);
 			}
 			return $this->_vers->git->tag;
 		} else {
@@ -196,12 +196,12 @@ class Versions
 	public function checkSQLFileLatest($update = true)
 	{
 		$options = [
-			'data'  => NN_RES . 'db' . DS . 'schema' . DS . 'data' . DS,
-			'ext'   => 'sql',
-			'path'  => NN_RES . 'db' . DS . 'patches' . DS . 'mysql',
-			'regex' =>
-				'#^' . Utility::PATH_REGEX . '(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
-			'safe'  => true,
+				'data'  => NN_RES . 'db' . DS . 'schema' . DS . 'data' . DS,
+				'ext'   => 'sql',
+				'path'  => NN_RES . 'db' . DS . 'patches' . DS . 'mysql',
+				'regex' =>
+						'#^' . Utility::PATH_REGEX . '(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
+				'safe'  => true,
 		];
 		$files = Utility::getDirFiles($options);
 		natsort($files);
@@ -222,7 +222,6 @@ class Versions
 		}
 		return $last;
 	}
-
 
 	public function getCommit()
 	{
