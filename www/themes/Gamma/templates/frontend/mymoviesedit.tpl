@@ -22,7 +22,7 @@
 		<tr class="{cycle values=",alt"}">
 
 			<td class="mid" style="width:140px">
-			
+
 				<div class="movcover">
 					<img class="shadow img img-polaroid" src="{$smarty.const.WWW_TOP}/covers/movies/{if $movie.cover == 1}{$movie.imdbid}-cover.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$movie.title|escape:"htmlall"}" />
 					<div class="movextra">
@@ -36,18 +36,18 @@
 
 			<td>
 				<h4>{$movie.title|escape:"htmlall"} ({$movie.year})</h4>
-				{if $movie.tagline != ''}<b>{$movie.tagline}</b><br />{/if}
-				{if $movie.plot != ''}{$movie.plot}<br /><br />{/if}
-				{if $movie.genre != ''}<b>Genre:</b> {$movie.genre}<br />{/if}
-				{if $movie.director != ''}<b>Director:</b> {$movie.director}<br />{/if}
-				{if $movie.actors != ''}<b>Starring:</b> {$movie.actors}<br /><br />{/if}
+				{if isset($movie.tagline) && $movie.tagline != ''}<b>{$movie.tagline}</b><br />{/if}
+				{if isset($movie.plot) && $movie.plot != ''}{$movie.plot}<br /><br />{/if}
+				{if isset($movie.genre) && $movie.genre != ''}<b>Genre:</b> {$movie.genre}<br />{/if}
+				{if isset($movie.director) && $movie.director != ''}<b>Director:</b> {$movie.director}<br />{/if}
+				{if isset($movie.actors) && $movie.actors != ''}<b>Starring:</b> {$movie.actors}<br /><br />{/if}
 			</td>
 			<td class="less" style="padding-top:20px;">{if $movie.categoryNames != ''}{$movie.categoryNames|escape:"htmlall"}{else}All{/if}</td>
 			<td class="less" style="width:100px; padding-top:20px;" title="Added on {$movie.createddate}">{$movie.createddate|date_format}</td>
 			<td class="mid" style="padding-top:20px;"><a class="btn btn-mini btn-danger" href="{$smarty.const.WWW_TOP}/mymoviesedit?del={$movie.imdbid}" rel="remove" title="Remove from my movies">Remove</a></td>
 		</tr>
 	{/foreach}
-	
+
 </table>
 
 {else}

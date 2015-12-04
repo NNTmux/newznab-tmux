@@ -10,7 +10,7 @@
 		{if $result['imdb_id'] != ""}
 		<tr class="{cycle values=",alt"}">
 			<td class="mid" style="width:140px;">
-			
+
 				<div class="movcover">
 					<center>
 					<img class="shadow img img-polaroid" src="{if $result['cover'] ==""}{$smarty.const.WWW_TOP}/covers/movies/no-cover.jpg{else}{$result['cover']}{/if}" width="120" border="0" alt="{$result['title']|escape:"htmlall"}" />
@@ -25,13 +25,11 @@
 			</td>
 			<td colspan="3" class="left">
 				<h4>
-				<a href="{$smarty.const.WWW_TOP}/movies?title={$result['title']}">{$result['title']|escape:"htmlall"}</a> 
+				<a href="{$smarty.const.WWW_TOP}/movies?title={$result['title']}">{$result['title']|escape:"htmlall"}</a>
 				{if $result['year'] != ""}(<a class="title" href="{$smarty.const.WWW_TOP}/movies?year={$result['year']}">{$result['year']}</a>){/if}
 				{if $result['rating'] > 0}{$result['rating']}/10{/if}
-				</h4>				
-				
+				</h4>
 				{$result['plot']}
-
 				<br/><br/>
 				{if $ourmovies[$result['imdb_id']] != ""}
 					<a class="rndbtn btn btn-mini btn-success" href="{$smarty.const.WWW_TOP}/movies?imdb={$result['imdb_id']}">Download</a>
