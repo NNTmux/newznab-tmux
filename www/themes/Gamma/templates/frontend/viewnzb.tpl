@@ -7,7 +7,7 @@
 		{if $reVideo.releaseid|@count > 0 || $reAudio|@count > 0}
 			<li><a href="#mediainfo" data-toggle="tab">Media info</a></li>
 		{/if}
-		{if $release.jpgstatus == 1&& $userdata.canpreview == 1}
+		{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
 			<li><a href="#thumbnail" data-toggle="tab">Thumbnail</a></li>
 			{else}
 				{if $release.haspreview == 1 && $userdata.canpreview == 1}
@@ -16,6 +16,12 @@
 		{/if}
 		{if ($release.videostatus == 1 && $userdata.canpreview == 1)}
 			<li><a href="#sample" data-toggle="tab">Sample</a></li>
+		{/if}
+		{if isset($xxx.backdrop) && $xxx.backdrop == 1}
+			<li><a href="#backcover" data-toggle="tab">Back Cover</a></li>
+		{/if}
+		{if isset($game.backdrop) && $game.backdrop == 1}
+			<li><a href="screenshot" data-toggle="tab">Screenshot</a></li>
 		{/if}
         <li><a href="#comments" data-toggle="tab">Comments</a></li>
     </ul>
@@ -28,7 +34,11 @@
 			{if $music && $music.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/music/{$music.id}.jpg" width="160" alt="{$music.title|escape:"htmlall"}" />{/if}
 			{if $book && $book.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg" width="160" alt="{$book.title|escape:"htmlall"}" />{/if}
 			{if $game && $game.cover == 1}
-				<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;"  src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" width="160" alt="{$con.title|escape:"htmlall"}"/>{/if}
+				<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;"  src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" width="160" alt="{$con.title|escape:"htmlall"}"/>
+			{/if}
+			{if $xxx && $xxx.cover == 1}
+				<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;"  src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg" width="160" alt="{$xxx.title|escape:"htmlall"}"/>
+			{/if}
 				{if $isadmin}
 				<div class="well well-small pull-right">
 						Admin :
@@ -543,6 +553,20 @@
 				</video>
 			{/if}
         </div>
+		{if isset($xxx.backdrop) && $xxx.backdrop == 1}
+			<div id="backcover" class="tab-pane">
+				<img src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-backdrop.jpg"
+					 alt="{$xxx.title|escape:"htmlall"}"
+					 />
+			</div>
+		{/if}
+		{if isset($game.backdrop) && $game.backdrop == 1}
+			<div id="screenshot" class="tab-pane">
+				<img src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}-backdrop.jpg"
+					 alt="{$game.title|escape:"htmlall"}"
+					 />
+			</div>
+		{/if}
         <div class="tab-pane" id="comments">
 			<div class="comments">
 				{if $comments|@count > 0}
