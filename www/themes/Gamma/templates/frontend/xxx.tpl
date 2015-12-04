@@ -145,13 +145,13 @@
 									<img class="shadow img-polaroid" src="
 								{if $result.cover == 1}
 									{$smarty.const.WWW_TOP}covers/xxx/{$result.id}-cover.jpg"
-										{if $previewguid == ''}
-											href="{$smarty.const.WWW_TOP}themes/shared/images/nocover.png"
-										{else} href="{$smarty.const.WWW_TOP}/covers/preview/{$previewguid}_thumb.jpg"
-									{/if}
-									{/if}
-									style="max-width: 120px; /*width: auto;*/" width="120" border="0"
-									alt="{$result.title|escape:"htmlall"}"
+											{if $previewguid == ''}
+												href="{$smarty.const.WWW_TOP}themes/shared/images/nocover.png"
+											{else} href="{$smarty.const.WWW_TOP}/covers/preview/{$previewguid}_thumb.jpg"
+											{/if}
+											{/if}
+										 style="max-width: 120px; /*width: auto;*/" width="120" border="0"
+										 alt="{$result.title|escape:"htmlall"}"
 									/>
 								</a>
 							</h4>
@@ -278,7 +278,7 @@
 												<li width="50px"><a title="View comments"
 																	href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments">{$mcomments[$m@index]}</a>
 													<i class="fa fa-comments"></i></li>
-												{if $mnfo[$m@index] > 0}
+												{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}
 													<li width="50px"><a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															title="View Nfo" class="modal_nfo fa fa-info-sign"
