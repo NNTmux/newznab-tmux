@@ -583,7 +583,6 @@
 							</tr>
 						{/foreach}
 					</table>
-
 				{/if}
 				<dl class="dl-horizontal" style="margin-right:300px;">
 					<form action="" method="post">
