@@ -1,3 +1,5 @@
+2015-12-04 DariusIII
+	Upd: Update Version.php to not update commits and use tags only on master branch
 2015-12-03 DariusIII
 	Fix: Login and register captcha on Gamma template
 	Chg: Remove tvrage scripts, add script to check for missing covers, nzb_reorg and unique indexes.
