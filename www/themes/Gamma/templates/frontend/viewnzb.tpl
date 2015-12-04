@@ -21,7 +21,7 @@
 			<li><a href="#backcover" data-toggle="tab">Back Cover</a></li>
 		{/if}
 		{if isset($game.backdrop) && $game.backdrop == 1}
-			<li><a href="screenshot" data-toggle="tab">Screenshot</a></li>
+			<li><a href="#screenshot" data-toggle="tab">Screenshot</a></li>
 		{/if}
         <li><a href="#comments" data-toggle="tab">Comments</a></li>
     </ul>
