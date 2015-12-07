@@ -69,8 +69,8 @@ jQuery(function($){
         $.post( SERVERROOT + "cart?add=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
             $.pnotify({
-                title: 'ADDED TO CART!',
-                text: 'Its now in your Cart',
+                title: 'ADDED TO YOUR DOWNLOAD BASKET!',
+                text: 'Its now in your Download Basket',
                 type: 'warning',
                 icon: 'fa-icon-info-sign'
             });        });
@@ -84,8 +84,8 @@ jQuery(function($){
         $.post( SERVERROOT + "cart?add=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
             $.pnotify({
-                title: 'ADDED TO CART!',
-                text: 'Its now in your Cart',
+                title: 'ADDED TO YOUR DOWNLOAD BASKET!',
+                text: 'Its now in your Download Basket',
                 type: 'warning',
                 icon: 'fa-icon-info-sign'
             });        });
@@ -388,8 +388,8 @@ jQuery(function($){
                 guids.push(guid);
                 //cart_notify() // consider doing this only upon success and maybe placing it outside of the loop
                 $.pnotify({
-                    title: 'ADDED TO CART!',
-                    text: 'Its now in your Cart',
+                    title: 'ADDED TO YOUR DOWNLOAD BASKET!',
+                    text: 'Its now in your Download Basket',
                     type: 'warning',
                     icon: 'fa-icon-info-sign'
                 });
