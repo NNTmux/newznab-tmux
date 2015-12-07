@@ -1,4 +1,5 @@
 2015-12-07 DariusIII
+	Upd: Update utils.js in Gamma template
 	Fix: Change registerstatus to 0 (open) in nntmux_fi_schema.sql
 2015-12-04 DariusIII
 	Fix: Fix the limits on Sphinx executable removal
