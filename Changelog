@@ -1,3 +1,5 @@
+2015-12-07 DariusIII
+	Fix: Change registerstatus to 0 (open) in nntmux_fi_schema.sql
 2015-12-04 DariusIII
 	Fix: Fix the limits on Sphinx executable removal
 	Chg: Add backcover for XXX and screenshot for games tabs in details page

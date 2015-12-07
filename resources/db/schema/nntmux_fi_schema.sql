@@ -4084,7 +4084,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('recaptchaprivatekey', '', '', '', 'recaptchaprivatekey', ''),
 ('recaptchapublickey', '', '', '', 'recaptchapublickey', ''),
 ('registerrecaptcha', '1', '', '', 'registerrecaptcha', ''),
-('registerstatus', '1', '', '', 'registerstatus', ''),
+('registerstatus', '0', '', '', 'registerstatus', ''),
 ('releaseretentiondays', '0','', '', 'releaseretentiondays', ''),
 ('releasethreads', '10', '', '', 'releasethreads', ''),
 ('removespam', '1','', '', 'removespam', ''),
