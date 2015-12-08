@@ -1,4 +1,5 @@
 2015-12-08 DariusIII
+	Fix: Fix missing / in paths
 	Fix: Fix queries for movies again(@Bart39), small arrangement of codecposter query in ReleaseRemover.
 2015-12-07 DariusIII
 	Upd: Update utils.js, change cart to download basket.

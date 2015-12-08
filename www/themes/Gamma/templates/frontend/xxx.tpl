@@ -144,14 +144,14 @@
 								   class="modal_xxx thumbnail" rel="viewxxx">
 									<img class="shadow img-polaroid" src="
 								{if $result.cover == 1}
-									{$smarty.const.WWW_TOP}covers/xxx/{$result.id}-cover.jpg"
-											{if $previewguid == ''}
-												href="{$smarty.const.WWW_TOP}themes/shared/images/nocover.png"
-											{else} href="{$smarty.const.WWW_TOP}/covers/preview/{$previewguid}_thumb.jpg"
-											{/if}
-											{/if}
-										 style="max-width: 120px; /*width: auto;*/" width="120" border="0"
-										 alt="{$result.title|escape:"htmlall"}"
+									{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg"
+										{if $previewguid == ''}
+											href="{$smarty.const.WWW_TOP}/themes/shared/images/nocover.png"
+										{else} href="{$smarty.const.WWW_TOP}/covers/preview/{$previewguid}_thumb.jpg"
+									{/if}
+									{/if}
+									style="max-width: 120px; /*width: auto;*/" width="120" border="0"
+									alt="{$result.title|escape:"htmlall"}"
 									/>
 								</a>
 							</h4>
