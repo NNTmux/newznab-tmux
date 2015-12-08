@@ -95,7 +95,7 @@
 			<td>
 				{if $result.release.movie_id != ""}
 					<img class="shadow"
-						 src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.release.cover == 1}{$result.release.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}themes/shared/images/no-cover.png{/if}"
+						 src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.release.cover == 1}{$result.release.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}/themes/shared/images/no-cover.png{/if}"
 						 width="120" border="0" alt="{$result.release.title|escape:"htmlall"}"/>
 				{/if}
 				{if $result.release.rage_hascover != "0"}
@@ -104,7 +104,7 @@
 				{/if}
 				{if $result.release.mu_cover == "1"}
 					<img class="shadow"
-						 src="{$smarty.const.WWW_TOP}/covers/music/{if $result.release.mu_cover == 1}{$result.release.music_id}.jpg{else}{$smarty.const.WWW_TOP}themes/shared/images/no-cover.png{/if}"
+						 src="{$smarty.const.WWW_TOP}/covers/music/{if $result.release.mu_cover == 1}{$result.release.music_id}.jpg{else}{$smarty.const.WWW_TOP}/themes/shared/images/no-cover.png{/if}"
 						 width="120" border="0" alt="{$result.release.title|escape:"htmlall"}"/>
 				{/if}
 			</td>
