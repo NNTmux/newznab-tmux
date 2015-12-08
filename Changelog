@@ -1,3 +1,5 @@
+2015-12-08 DariusIII
+	Fix: Fix queries for movies again(@Bart39), small arrangement of codecposter query in ReleaseRemover.
 2015-12-07 DariusIII
 	Upd: Update utils.js, change cart to download basket.
 	Fix: Change registerstatus to 0 (open) in nntmux_fi_schema.sql

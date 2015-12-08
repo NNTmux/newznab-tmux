@@ -1060,8 +1060,22 @@ class ReleaseRemover
 		switch (NN_RELEASE_SEARCH_TYPE) {
 			case ReleaseSearch::SPHINX:
 				$rs = new ReleaseSearch($this->pdo);
-				$codecFT1 = str_replace('=10000;', '=1000000;', $rs->getSearchSQL(['filename' => 'x264|wmv|avi|DVDrip|BRRip|R5|R6|HQ|Webrip|Xvid|AC3|HDRip|DD5']));
-				$codecFT2 = str_replace('=10000;', '=1000000;', $rs->getSearchSQL(['filename' => 'Codec|error|txt|installer|vlc']));
+				$codecFT1 =
+						str_replace('=10000;', '=1000000;',
+								$rs->getSearchSQL(
+										[
+												'filename' => 'x264|wmv|avi|DVDrip|BRRip|R5|R6|HQ|Webrip|Xvid|AC3|HDRip|DD5'
+										]
+								)
+						);
+				$codecFT2 =
+						str_replace('=10000;', '=1000000;',
+								$rs->getSearchSQL(
+										[
+												'filename' => 'Codec|error|txt|installer|vlc'
+										]
+								)
+						);
 				$ftJoin = $rs->getFullTextJoinString();
 				break;
 			default:
