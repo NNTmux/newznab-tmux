@@ -1,3 +1,5 @@
+2015-12-09 DariusIII
+	Chg: Move git-hooks out of newznab into build folder, update hooks, remove addGitHook.php, not used anymore (ported from nZEDb @niel)
 2015-12-08 DariusIII
 	Fix: Try to fix failing query when lastArticleDate is NULL (fix @kevin123)
 	Fix: Fix missing / in paths
