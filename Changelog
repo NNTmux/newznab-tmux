@@ -1,4 +1,5 @@
 2015-12-09 DariusIII
+	Fix: Forgot to enable TraktTv processing in PostProcess.php
 	Upd: Remove referencex to UC and womble from prehash pages
 	Chg: Move git-hooks out of newznab into build folder, update hooks, remove addGitHook.php, not used anymore (ported from nZEDb @niel)
 2015-12-08 DariusIII
