@@ -127,10 +127,9 @@
 								   guid="name{$previewguid}"
 								   title="View XXX info"
 								   class="modal_xxx thumbnail" rel="viewxxx">
-									<img class="shadow img-polaroid" src="
-								{if $result.cover == 1}
-									{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg"
-											{else} href="{$smarty.const.WWW_TOP}/themes/shared/images/no-cover.png"{/if}
+									{if $result.cover == 1}
+										<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg"
+												{else} <img class="shadow img-polaroid" src="{$smarty.const.WWW_THEMES}/shared/images/no-cover.png"/>{/if}
 									style="max-width: 120px; /*width: auto;*/" width="120" border="0"
 									alt="{$result.title|escape:"htmlall"}"/>
 								</a>
