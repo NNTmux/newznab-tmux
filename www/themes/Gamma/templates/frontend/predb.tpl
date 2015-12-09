@@ -57,10 +57,6 @@
 					<a title="Visit srrDB" href="{$site->dereferrer_link}http://www.srrdb.com/browse/{$result.title}" target="_blank">
 						srrDB.com
 					</a>
-				{elseif {$result.source} == womble}
-					<a title="Visit Womble" href="{$site->dereferrer_link}http://www.newshost.co.za/?s={$result.title}" target="_blank">
-						Womble's NZB Index
-					</a>
 				{elseif {$result.source} == zenet}
 					<a title="Visit ZEnet" href="{$site->dereferrer_link}http://pre.zenet.org/?search={$result.title}" target="_blank">
 						ZEnet.org
@@ -113,7 +109,6 @@
 			</td>
 			<td class="predb" style="width:60px;text-align:right;overflow:hidden;">
 			{if $result.size > 0}{$result.size|replace:'MB':'000000'|fsize_format:"MB"}{/if}
-
 			</td>
 		</tr>
 	{/foreach}
