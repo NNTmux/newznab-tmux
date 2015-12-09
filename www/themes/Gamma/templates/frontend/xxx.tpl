@@ -1,20 +1,15 @@
 <h2>Browse {$catname}</h2>
-
 <div class="well well-small">
 	<center>
 		<form class="form-inline" name="browseby" action="xxx" style="margin:0;">
-
 			<i class="fa fa-film fa-midt"></i>
 			<input class="input input-medium" id="title" type="text" name="title" value="{$title}" placeholder="Title"/>
-
 			<i class="fa fa-group fa-midt"></i>
 			<input class="input input-medium" id="actors" type="text" name="actors" value="{$actors}"
 				   placeholder="Actor"/>
-
 			<i class="fa fa-bullhorn fa-midt"></i>
 			<input class="input input-medium" id="director" type="text" name="director" value="{$director}"
 				   placeholder="Director"/>
-
 			<i class="fa fa-inbox fa-midt"></i>
 			<select class="input input-medium" id="genre" name="genre">
 				<option class="grouping" value=""></option>
@@ -22,7 +17,6 @@
 					<option {if $gen==$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
 				{/foreach}
 			</select>
-
 			<i class="fa fa-flag fa-midt"></i>
 			<select class="input input-medium" id="category" name="category">
 				<option class="grouping" value=""></option>
@@ -30,14 +24,11 @@
 					<option {if $cat.id==$category}selected="selected"{/if} value="{$cat.id}">{$cat.title}</option>
 				{/foreach}
 			</select>
-
 			<input class="btn btn-success" type="submit" value="Go"/>
 		</form>
 	</center>
 </div>
-
 {$site->adbrowse}
-
 {if $results|@count > 0}
 	<form id="nzb_multi_operations_form" action="get">
 		<div class="well well-small">
@@ -88,14 +79,11 @@
 				</table>
 			</div>
 		</div>
-
-
 		<table style="width:100%;" class="data highlight icons table table-striped" id="coverstable">
 			<tr>
 				<th width="130" style="padding-top:0px; padding-bottom:0px;">
 					<input type="checkbox" class="nzb_check_all"/>
 				</th>
-
 				<th style="padding-top:0px; padding-bottom:0px;">title<br/>
 					<a title="Sort Descending" href="{$orderbytitle_desc}">
 						<i class="fa fa-caret-down"></i>
@@ -105,7 +93,6 @@
 					</a>
 				</th>
 			</tr>
-
 			{foreach from=$results item=result}
 				{assign var="msplits" value=","|explode:$result.grp_release_id}
 				{assign var="mguid" value=","|explode:$result.grp_release_guid}
@@ -135,27 +122,19 @@
 												{/if}
 											{/if}
 										{/foreach}
-
 								   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"
 								   name="name{$result.id}"
 								   guid="name{$previewguid}"
-
 								   title="View XXX info"
 								   class="modal_xxx thumbnail" rel="viewxxx">
 									<img class="shadow img-polaroid" src="
 								{if $result.cover == 1}
 									{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg"
-										{if $previewguid == ''}
-											href="{$smarty.const.WWW_TOP}/themes/shared/images/nocover.png"
-										{else} href="{$smarty.const.WWW_TOP}/covers/preview/{$previewguid}_thumb.jpg"
-									{/if}
-									{/if}
+											{else} href="{$smarty.const.WWW_TOP}/themes/shared/images/no-cover.png"{/if}
 									style="max-width: 120px; /*width: auto;*/" width="120" border="0"
-									alt="{$result.title|escape:"htmlall"}"
-									/>
+									alt="{$result.title|escape:"htmlall"}"/>
 								</a>
 							</h4>
-
 							<div class="movextra">
 								<center>
 									{if $result.classused == "ade"}
@@ -227,24 +206,20 @@
 									href="{$smarty.const.WWW_TOP}/xxx?id={$result.id}">{$result.title|stripslashes|escape:"htmlall"}
 							</a>
 						</h4>
-
 						{if $result.tagline != ''}
 							<b>{$result.tagline}</b>
 							<br/>
 						{/if}
-
 						{if $result.plot != ''}
 							{$result.plot}
 							<br/>
 							<br/>
 						{/if}
-
 						{if $result.genre != ''}
 							<b>Genre:</b>
 							{$result.genre}
 							<br/>
 						{/if}
-
 						{if $result.director != ''}
 							<b>Director:</b>
 							{$result.director}
@@ -257,7 +232,6 @@
 							<br/>
 							<br/>
 						{/if}
-
 						<div class="movextra">
 							<table class="table" style="margin-bottom:0px; margin-top:10px">
 								{foreach from=$msplits item=m}
@@ -352,9 +326,7 @@
 					</td>
 				</tr>
 			{/foreach}
-
 		</table>
-
 		{if $results|@count > 10}
 			<div class="well well-small">
 				<div class="nzb_multi_operations">
