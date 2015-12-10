@@ -1037,6 +1037,7 @@ class ReleaseRemover
 			. "HDRip.*[. ]Xvid[. ]DD5).*[. ]avi$'";
 		$codec = '\\Codec%Setup.exe';
 		$codec2 ='\\Codec%Installer.exe';
+		$codec3 ='\\Codec.exe';
 		$iferror = 'If_you_get_error.txt';
 		$ifnotplaying = 'read me if the movie not playing.txt';
 		$frenchv = 'Lisez moi si le film ne demarre pas.txt';
@@ -1083,35 +1084,36 @@ class ReleaseRemover
 				break;
 		}
 
-		$codeclike = sprintf("
-				SELECT r.guid, r.searchname, r.id FROM releases r %s
+		$codeclike = sprintf(
+				"SELECT r.guid, r.searchname, r.id FROM releases r %s
 				STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
 				WHERE %s %s AND
 					(rf.name %s OR rf.name %s OR
 					rf.name %s OR rf.name %s OR
 					rf.name %s OR rf.name %s OR
-					rf.name %s OR rf.name %s)
+					rf.name %s OR rf.name %s OR rf.name %s)
 				%s",
-			$ftJoin,
-			$categories,
-			$codecFT2,
-			$this->pdo->likeString($codec, true, true),
-			$this->pdo->likeString($codec2, true, true),
-			$this->pdo->likeString($iferror, true, true),
-			$this->pdo->likeString($ifnotplaying, true, true),
-			$this->pdo->likeString($frenchv, true, true),
-			$this->pdo->likeString($nl, true, true),
-			$this->pdo->likeString($german, true, true),
-			$this->pdo->likeString($german2, true, true),
-			$this->crapTime
-		);
+				$ftJoin,
+				$categories,
+				$codecFT2,
+				$this->pdo->likeString($codec, true, true),
+				$this->pdo->likeString($codec2, true, true),
+				$this->pdo->likeString($codec3, true, true),
+				$this->pdo->likeString($iferror, true, true),
+				$this->pdo->likeString($ifnotplaying, true, true),
+				$this->pdo->likeString($frenchv, true, true),
+				$this->pdo->likeString($nl, true, true),
+				$this->pdo->likeString($german, true, true),
+				$this->pdo->likeString($german2, true, true),
+				$this->crapTime
+			);
 
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id FROM releases r %s
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
 			WHERE %s %s
 			AND (%s OR %s) %s
-			UNION %s",
+			UNION ALL %s",
 			$ftJoin,
 			$categories,
 			$codecFT1,

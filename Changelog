@@ -1,3 +1,5 @@
+2015-12-10 DariusIII
+	Upd: Switch to using UNION ALL in removeCodecPoster function, it increases the speed of that query dramaticaly.
 2015-12-09 DariusIII
 	Upd: Remove referencex to UC and womble from prehash pages
 	Chg: Move git-hooks out of newznab into build folder, update hooks, remove addGitHook.php, not used anymore (ported from nZEDb @niel)
