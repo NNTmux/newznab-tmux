@@ -1,4 +1,5 @@
 2015-12-10 DariusIII
+	Upd: Update pre-commit hook
 	Upd: Switch to using UNION ALL in removeCodecPoster function, it increases the speed of that query dramaticaly.
 2015-12-09 DariusIII
 	Upd: Remove referencex to UC and womble from prehash pages
