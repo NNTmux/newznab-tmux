@@ -161,10 +161,10 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 *
 	 * @access public
 	 */
-	public function Net_NNTP_Protocol_Client()
+	public function __construct()
 	{
 		// Init PEAR.
-		parent::PEAR();
+		parent::__construct();
 	}
 
 	/**
@@ -205,8 +205,8 @@ class Net_NNTP_Protocol_Client extends PEAR
 	public function setDebug($debug = true)
 	{
 		trigger_error(
-			'You are using deprecated API v1.0 in Net_NNTP_Protocol_Client: setDebug() ! Debugging in now automatically handled when a logger is given.',
-			E_USER_NOTICE
+				'You are using deprecated API v1.0 in Net_NNTP_Protocol_Client: setDebug() ! Debugging in now automatically handled when a logger is given.',
+				E_USER_NOTICE
 		);
 	}
 
@@ -249,10 +249,10 @@ class Net_NNTP_Protocol_Client extends PEAR
 			if ($this->_logger) {
 				foreach ($matches[0] as $match) {
 					$this->_logger->debug(
-						"Illegal character in command: " . htmlentities(str_replace(array("\r", "\n"),
-								array("'Carriage Return'", "'New Line'"), $match
+							"Illegal character in command: " . htmlentities(str_replace(array("\r", "\n"),
+											array("'Carriage Return'", "'New Line'"), $match
+									)
 							)
-						)
 					);
 				}
 			}
@@ -513,7 +513,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		// Attempt to connect to usenet.
 		$socket = @stream_socket_client(
-			$transport . '://' . $host . ':' . $port, $errorNumber, $errorString, $timeout
+				$transport . '://' . $host . ':' . $port, $errorNumber, $errorString, $timeout
 		);
 
 		if ($socket === false) {
@@ -713,9 +713,9 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 					default:
 						return $this->throwError(
-							'Internal error - unknown response from stream_socket_enable_crypto()',
-							$response,
-							$this->_currentStatusResponse()
+								'Internal error - unknown response from stream_socket_enable_crypto()',
+								$response,
+								$this->_currentStatusResponse()
 						);
 				}
 
@@ -752,10 +752,10 @@ class Net_NNTP_Protocol_Client extends PEAR
 				}
 
 				return array(
-					'group' => $response_arr[3],
-					'first' => $response_arr[1],
-					'last'  => $response_arr[2],
-					'count' => $response_arr[0]
+						'group' => $response_arr[3],
+						'first' => $response_arr[1],
+						'last'  => $response_arr[2],
+						'count' => $response_arr[0]
 				);
 
 			default:
@@ -803,25 +803,25 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 				// If server does not return group summary in status response, return null array.
 				if (!is_numeric($response_arr[0]) ||
-					!is_numeric($response_arr[1]) ||
-					!is_numeric($response_arr[2]) ||
-					empty($response_arr[3])
+						!is_numeric($response_arr[1]) ||
+						!is_numeric($response_arr[2]) ||
+						empty($response_arr[3])
 				) {
 					return array(
-						'group'    => null,
-						'first'    => null,
-						'last'     => null,
-						'count'    => null,
-						'articles' => $articles
+							'group'    => null,
+							'first'    => null,
+							'last'     => null,
+							'count'    => null,
+							'articles' => $articles
 					);
 				}
 
 				return array(
-					'group'    => $response_arr[3],
-					'first'    => $response_arr[1],
-					'last'     => $response_arr[2],
-					'count'    => $response_arr[0],
-					'articles' => $articles
+						'group'    => $response_arr[3],
+						'first'    => $response_arr[1],
+						'last'     => $response_arr[2],
+						'count'    => $response_arr[0],
+						'articles' => $articles
 				);
 
 			default:
@@ -877,7 +877,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 			// 223, RFC977: 'n a article retrieved - request text separately (n = article number, a = unique article id)'
 			case NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_SELECTED:
 				$response_arr = explode(' ',
-					trim($this->_currentStatusResponse()));
+						trim($this->_currentStatusResponse()));
 
 				if ($this->_logger) {
 					$this->_logger->info('Selected previous article: ' . $response_arr[0] . ' - ' . $response_arr[1]);
@@ -1046,7 +1046,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 			 */
 			case NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_SELECTED:
 				$response_arr = explode(' ',
-					trim($this->_currentStatusResponse()));
+						trim($this->_currentStatusResponse()));
 
 				if ($this->_logger) {
 					$this->_logger->info('Selected article: ' . $response_arr[0] . ' - ' . $response_arr[1]);
@@ -1136,7 +1136,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		switch ($response) {
 			// 335, RFC997: 'Send article to be transferred'
 			case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_SEND:
-			return true;
+				return true;
 
 			default:
 				return $this->_handleErrorResponse($response);
@@ -1167,7 +1167,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		switch ($response) {
 			// 235, RFC977: 'Article transferred OK'
 			case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_SUCCESS:
-			return true;
+				return true;
 
 			default:
 				return $this->_handleErrorResponse($response);
@@ -1217,7 +1217,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		switch ($response) {
 			// 100, RFC977: 'Help text follows'
 			case NET_NNTP_PROTOCOL_RESPONSECODE_HELP_FOLLOWS:
-			$data = $this->_getTextResponse();
+				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
 				}
@@ -1266,10 +1266,10 @@ class Net_NNTP_Protocol_Client extends PEAR
 					$arr = explode(' ', trim($line));
 
 					$group = array(
-						'group'   => $arr[0],
-						'last'    => $arr[1],
-						'first'   => $arr[2],
-						'posting' => $arr[3]
+							'group'   => $arr[0],
+							'last'    => $arr[1],
+							'first'   => $arr[2],
+							'posting' => $arr[3]
 					);
 
 					$groups[$group['group']] = $group;
@@ -1360,10 +1360,10 @@ class Net_NNTP_Protocol_Client extends PEAR
 					$arr = explode(' ', trim($line));
 
 					$group = array(
-						'group'   => $arr[0],
-						'last'    => $arr[1],
-						'first'   => $arr[2],
-						'posting' => $arr[3]
+							'group'   => $arr[0],
+							'last'    => $arr[1],
+							'first'   => $arr[2],
+							'posting' => $arr[3]
 					);
 
 					$groups[$group['group']] = $group;
@@ -1410,10 +1410,10 @@ class Net_NNTP_Protocol_Client extends PEAR
 					$arr = explode(' ', trim($line));
 
 					$group = array(
-						'group'   => $arr[0],
-						'last'    => $arr[1],
-						'first'   => $arr[2],
-						'posting' => $arr[3]
+							'group'   => $arr[0],
+							'last'    => $arr[1],
+							'first'   => $arr[2],
+							'posting' => $arr[3]
 					);
 
 					$groups[$group['group']] = $group;
@@ -1657,7 +1657,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		switch ($response) {
 			// 221, RFC2980: 'Header follows'
 			case NET_NNTP_PROTOCOL_RESPONSECODE_HEAD_FOLLOWS:
-			$data = $this->_getTextResponse();
+				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
 				}

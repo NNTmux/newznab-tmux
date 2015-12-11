@@ -494,7 +494,7 @@ class Forking extends \fork_daemon
 		$orderby = "ORDER BY guidchar ASC";
 		$rowLimit = "LIMIT 16";
 		$extrawhere = "AND r.prehashid = 0 AND r.nzbstatus = 1";
-		$select = "DISTINCT LEFT(r.guid, 1) AS guidchar, COUNT(*) AS count";
+		$select = "DISTINCT LEFT(r.guid, 1) AS guidchar, COUNT(r.id) AS count";
 
 
 		$threads = $this->pdo->getSetting('fixnamethreads');

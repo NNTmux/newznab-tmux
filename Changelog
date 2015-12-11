@@ -1,4 +1,5 @@
 2015-12-11 DariusIII
+	Chg: Change COUNT(*) queries to count the primary key columns to improve query performance. Re-work the count querying in PreHash class (fixes by @ruhllatio)
 	Fix: Fix doubled SET in RequestIDLocal class, change and fix cover/list selector in Gamma template
 2015-12-10 DariusIII
 	Upd: Update pre-commit hook

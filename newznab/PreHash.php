@@ -242,35 +242,41 @@ Class PreHash
 				$search = "LIKE '%" . $search[0] . "%'";
 			}
 			$search = 'WHERE title ' . $search;
-			$count = $this->pdo->queryOneRow(sprintf('SELECT COUNT(*) AS cnt FROM prehash %s', $search));
-			$count = $count['cnt'];
-		} else {
-			$count = $this->getCount();
 		}
 
-		$parr = $this->pdo->query(
-				sprintf('
-				SELECT p.*, r.guid
-				FROM prehash p
-				LEFT OUTER JOIN releases r ON p.id = r.prehashid %s
-				ORDER BY p.predate DESC LIMIT %d OFFSET %d',
-						$search,
-						$offset2,
-						$offset
-				)
+		$count = $this->getCount($search);
+
+		$sql = sprintf('
+			SELECT p.*, r.guid
+			FROM prehash p
+			LEFT OUTER JOIN releases r ON p.id = r.prehashid %s
+			ORDER BY p.predate DESC
+			LIMIT %d
+			OFFSET %d',
+				$search,
+				$offset2,
+				$offset
 		);
-		return array('arr' => $parr, 'count' => $count);
+		$parr = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+		return ['arr' => $parr, 'count' => $count];
 	}
 
 	/**
 	 * Get count of all PRE's.
 	 *
+	 * @param string $search
+	 *
 	 * @return int
 	 */
-	public function getCount()
+	public function getCount($search = '')
 	{
-		$count = $this->pdo->queryOneRow('SELECT COUNT(*) AS cnt FROM prehash');
-		return ($count === false ? 0 : $count['cnt']);
+		$count = $this->pdo->query("
+			SELECT COUNT(id) AS cnt
+			FROM prehash {$search}",
+				true,
+				NN_CACHE_EXPIRY_MEDIUM
+		);
+		return ($count === false ? 0 : $count[0]['cnt']);
 	}
 
 	/**
