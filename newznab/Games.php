@@ -165,6 +165,8 @@ class Games
 	 * @param       $orderby
 	 * @param int   $maxage
 	 * @param array $excludedcats
+	 *
+	 * @return array
 	 */
 	public function getGamesRange($cat, $start, $num, $orderby, $maxage = -1, $excludedcats = [])
 	{

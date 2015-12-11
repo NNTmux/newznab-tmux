@@ -123,6 +123,8 @@ class Install
 
 	/**
 	 * Populate default config values from provided string.
+	 *
+	 * @param $tmpCfg
 	 */
 	public function setConfig($tmpCfg)
 	{

@@ -141,6 +141,10 @@ class Category
 
 	/**
 	 * Determine if a category is a parent.
+	 *
+	 * @param $cid
+	 *
+	 * @return bool
 	 */
 	public function isParent($cid)
 	{
@@ -153,6 +157,10 @@ class Category
 
 	/**
 	 * Get a list of all child categories for a parent.
+	 *
+	 * @param $cid
+	 *
+	 * @return array
 	 */
 	public function getChildren($cid)
 	{
@@ -161,6 +169,10 @@ class Category
 
 	/**
 	 * Get a list of categories and their parents.
+	 *
+	 * @param bool $activeonly
+	 *
+	 * @return array
 	 */
 	public function getFlat($activeonly = false)
 	{
@@ -189,8 +201,13 @@ class Category
 	{
 		return $this->pdo->query("SELECT id FROM category WHERE status = 2 OR parentid IN (SELECT id FROM category WHERE status = 2 AND parentid IS NULL)");
 	}
+
 	/**
 	 * Get a category row by its id.
+	 *
+	 * @param $id
+	 *
+	 * @return array|bool
 	 */
 	public function getById($id)
 	{
@@ -241,6 +258,10 @@ class Category
 
 	/**
 	 * Get a list of categories by an array of IDs.
+	 *
+	 * @param $ids
+	 *
+	 * @return array
 	 */
 	public function getByIds($ids)
 	{
@@ -257,6 +278,15 @@ class Category
 
 	/**
 	 * Update a category.
+	 *
+	 * @param $id
+	 * @param $status
+	 * @param $desc
+	 * @param $disablepreview
+	 * @param $minsize
+	 * @param $maxsize
+	 *
+	 * @return bool|\PDOStatement
 	 */
 	public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
 	{
@@ -265,6 +295,10 @@ class Category
 
 	/**
 	 * Get the categories in a format for use by the headermenu.tpl.
+	 *
+	 * @param array $excludedcats
+	 *
+	 * @return array
 	 */
 	public function getForMenu($excludedcats = [])
 	{
@@ -302,6 +336,10 @@ class Category
 
 	/**
 	 * Return a list of categories for use in a dropdown.
+	 *
+	 * @param bool $blnIncludeNoneSelected
+	 *
+	 * @return array
 	 */
 	public function getForSelect($blnIncludeNoneSelected = true)
 	{
@@ -320,6 +358,11 @@ class Category
 
 	/**
 	 * Get a list of categories.
+	 *
+	 * @param bool  $activeonly
+	 * @param array $excludedcats
+	 *
+	 * @return array
 	 */
 	public function get($activeonly = false, $excludedcats = [])
 	{

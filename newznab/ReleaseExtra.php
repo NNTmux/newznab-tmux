@@ -29,6 +29,10 @@ class ReleaseExtra
 
 	/**
 	 * Convert a codec string to a user friendly format.
+	 *
+	 * @param $codec
+	 *
+	 * @return string
 	 */
 	public function makeCodecPretty($codec)
 	{
@@ -83,6 +87,9 @@ class ReleaseExtra
 
 	/**
 	 * Add releasevideo/audio/subs for a release based on the mediainfo xml.
+	 *
+	 * @param $releaseID
+	 * @param $xml
 	 */
 	public function addFromXml($releaseID, $xml)
 	{
@@ -182,6 +189,20 @@ class ReleaseExtra
 
 	/**
 	 * Add a releasevideo row.
+	 *
+	 * @param $releaseID
+	 * @param $containerformat
+	 * @param $overallbitrate
+	 * @param $videoduration
+	 * @param $videoformat
+	 * @param $videocodec
+	 * @param $videowidth
+	 * @param $videoheight
+	 * @param $videoaspect
+	 * @param $videoframerate
+	 * @param $videolibrary
+	 *
+	 * @return bool|int
 	 */
 	public function addVideo($releaseID, $containerformat, $overallbitrate, $videoduration, $videoformat, $videocodec, $videowidth, $videoheight, $videoaspect, $videoframerate, $videolibrary)
 	{
@@ -212,6 +233,11 @@ class ReleaseExtra
 
 	/**
 	 * Work out the res based on height and width
+	 *
+	 * @param $width
+	 * @param $height
+	 *
+	 * @return int
 	 */
 	public function determineVideoResolution($width, $height)
 	{
@@ -248,6 +274,20 @@ class ReleaseExtra
 
 	/**
 	 * Add a releaseaudio row.
+	 *
+	 * @param $releaseID
+	 * @param $audioID
+	 * @param $audioformat
+	 * @param $audiomode
+	 * @param $audiobitratemode
+	 * @param $audiobitrate
+	 * @param $audiochannels
+	 * @param $audiosamplerate
+	 * @param $audiolibrary
+	 * @param $audiolanguage
+	 * @param $audiotitle
+	 *
+	 * @return bool|int
 	 */
 	public function addAudio($releaseID, $audioID, $audioformat, $audiomode, $audiobitratemode, $audiobitrate, $audiochannels, $audiosamplerate, $audiolibrary, $audiolanguage, $audiotitle)
 	{

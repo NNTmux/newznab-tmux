@@ -25,6 +25,10 @@ class ReleaseComments
 
 	/**
 	 * Get a comment by id.
+	 *
+	 * @param $id
+	 *
+	 * @return array|bool
 	 */
 	public function getCommentById($id)
 	{
@@ -33,6 +37,10 @@ class ReleaseComments
 
 	/**
 	 * Get all comments for a GID.
+	 *
+	 * @param $gid
+	 *
+	 * @return array
 	 */
 	public function getCommentsByGid($gid)
 	{
@@ -41,6 +49,10 @@ class ReleaseComments
 
 	/**
 	 * Get all comments for a release.GUID.
+	 *
+	 * @param $guid
+	 *
+	 * @return array
 	 */
 	public function getCommentsByGuid($guid)
 	{
@@ -49,6 +61,11 @@ class ReleaseComments
 
 	/**
 	 * Get all count of all comments.
+	 *
+	 * @param null $refdate
+	 * @param null $localOnly
+	 *
+	 * @return
 	 */
 	public function getCommentCount($refdate=Null, $localOnly=Null)
 	{
@@ -88,6 +105,8 @@ class ReleaseComments
 
 	/**
 	 * Delete single comment on the site.
+	 *
+	 * @param $id
 	 */
 	public function deleteComment($id)
 	{
@@ -100,6 +119,8 @@ class ReleaseComments
 
 	/**
 	 * Delete all comments for a release.id.
+	 *
+	 * @param $id
 	 */
 	public function deleteCommentsForRelease($id)
 	{
@@ -113,6 +134,8 @@ class ReleaseComments
 
 	/**
 	 * Delete all comments for a users.id.
+	 *
+	 * @param $id
 	 */
 	public function deleteCommentsForUser($id)
 	{
@@ -163,8 +186,14 @@ class ReleaseComments
 		$this->updateReleaseCommentCount($id);
 		return $comid;
 	}
+
 	/**
 	 * Get release_comments rows by limit.
+	 *
+	 * @param $start
+	 * @param $num
+	 *
+	 * @return array
 	 */
 	public function getCommentsRange($start, $num)
 	{
@@ -181,6 +210,8 @@ class ReleaseComments
 
 	/**
 	 * Update the denormalised count of comments for a release.
+	 *
+	 * @param $gid
 	 */
 	public function updateReleaseCommentCount($gid)
 	{
@@ -191,6 +222,10 @@ class ReleaseComments
 
 	/**
 	 * Get a count of all comments for a user.
+	 *
+	 * @param $uid
+	 *
+	 * @return
 	 */
 	public function getCommentCountForUser($uid)
 	{
@@ -200,6 +235,12 @@ class ReleaseComments
 
 	/**
 	 * Get comments for a user by limit.
+	 *
+	 * @param $uid
+	 * @param $start
+	 * @param $num
+	 *
+	 * @return array
 	 */
 	public function getCommentsForUserRange($uid, $start, $num)
 	{

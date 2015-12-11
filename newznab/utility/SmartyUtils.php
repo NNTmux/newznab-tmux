@@ -20,6 +20,12 @@
  */
 
 // Function inspired by c0r3@newznabforums adds country flags on the browse page.
+/**
+ * @param $x
+ * @param $t
+ *
+ * @return bool|string
+ */
 function release_flag ($x, $t)
 {
 	$y = $d = "";

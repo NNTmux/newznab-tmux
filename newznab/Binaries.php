@@ -939,6 +939,12 @@ class Binaries
 
 	/**
 	 * Insert a missing part to the database.
+	 *
+	 * @param $numbers
+	 * @param $tablename
+	 * @param $groupID
+	 *
+	 * @return bool|int
 	 */
 	private function addMissingParts($numbers, $tablename, $groupID)
 	{
@@ -1045,6 +1051,12 @@ class Binaries
 
 	/**
 	 * Rawsearch. Perform a simple like match on binary subjects matching a pattern.
+	 *
+	 * @param       $search
+	 * @param int   $limit
+	 * @param array $excludedcats
+	 *
+	 * @return array
 	 */
 	public function search($search, $limit = 1000, $excludedcats = array())
 	{
@@ -1093,6 +1105,10 @@ class Binaries
 
 	/**
 	 * Get all binaries for a release.
+	 *
+	 * @param $id
+	 *
+	 * @return array
 	 */
 	public function getForReleaseId($id)
 	{
@@ -1103,6 +1119,10 @@ class Binaries
 
 	/**
 	 * Get a binary row.
+	 *
+	 * @param $id
+	 *
+	 * @return array|bool
 	 */
 	public function getById($id)
 	{
@@ -1154,6 +1174,10 @@ class Binaries
 
 	/**
 	 * Get a blacklist row from database.
+	 *
+	 * @param $id
+	 *
+	 * @return array|bool
 	 */
 	public function getBlacklistByID($id)
 	{
@@ -1164,6 +1188,10 @@ class Binaries
 
 	/**
 	 * Delete a blacklist row from database.
+	 *
+	 * @param $id
+	 *
+	 * @return bool|\PDOStatement
 	 */
 	public function deleteBlacklist($id)
 	{
@@ -1174,6 +1202,8 @@ class Binaries
 
 	/**
 	 * Update a blacklist row.
+	 *
+	 * @param $regex
 	 */
 	public function updateBlacklist($regex)
 	{
@@ -1192,6 +1222,10 @@ class Binaries
 
 	/**
 	 * Add a new blacklist row.
+	 *
+	 * @param $regex
+	 *
+	 * @return bool|int
 	 */
 	public function addBlacklist($regex)
 	{
@@ -1213,6 +1247,8 @@ class Binaries
 
 	/**
 	 * Add a new binary row and its associated parts.
+	 *
+	 * @param $id
 	 */
 	public function delete($id)
 	{

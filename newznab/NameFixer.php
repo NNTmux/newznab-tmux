@@ -802,6 +802,10 @@ class NameFixer
 
 	/**
 	 * Cleans file names for PreDB Match
+	 *
+	 * @param string $fileName
+	 *
+	 * @return string
 	 */
 	protected function _cleanMatchFiles($fileName = '')
 	{
@@ -844,11 +848,12 @@ class NameFixer
 	/**
 	 * Match a Hash from the prehash to a release.
 	 *
-	 * @param string $hash
-	 * @param $release
-	 * @param $namestatus
+	 * @param string  $hash
+	 * @param         $release
+	 * @param         $echo
+	 * @param         $namestatus
 	 * @param boolean $echooutput
-	 * @param $show
+	 * @param         $show
 	 *
 	 * @return int
 	 */

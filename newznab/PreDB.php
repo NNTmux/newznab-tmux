@@ -32,6 +32,10 @@ class PreDB
 
 	/**
 	 * Get a predb row by id.
+	 *
+	 * @param $preID
+	 *
+	 * @return bool
 	 */
 	public function getByID($preID)
 	{
@@ -42,6 +46,10 @@ class PreDB
 
 	/**
 	 * Get a predb row by name.
+	 *
+	 * @param $dirname
+	 *
+	 * @return bool
 	 */
 	public function getByDirname($dirname)
 	{
@@ -53,6 +61,11 @@ class PreDB
 
 	/**
 	 * Get count of all predb rows.
+	 *
+	 * @param string $dirname
+	 * @param string $category
+	 *
+	 * @return int
 	 */
 	public function getPreCount($dirname='', $category='')
 	{
@@ -78,6 +91,13 @@ class PreDB
 
 	/**
 	 * Get predb rows by limit and filter.
+	 *
+	 * @param int    $start
+	 * @param        $num
+	 * @param string $dirname
+	 * @param string $category
+	 *
+	 * @return array|false
 	 */
 	public function getPreRange($start=0, $num, $dirname='', $category='')
 	{
@@ -104,6 +124,8 @@ class PreDB
 
 	/**
 	 * Process all untagged releases to see if they are found in predb.
+	 *
+	 * @param int $daysback
 	 */
 	public function processReleases($daysback = 3)
 	{
@@ -185,6 +207,11 @@ class PreDB
 
 	/**
 	 * XOR decode a string with a key.
+	 *
+	 * @param $subject
+	 * @param $nzprekey
+	 *
+	 * @return int
 	 */
 	function xorDecode($subject, $nzprekey)
 	{
@@ -193,6 +220,11 @@ class PreDB
 
 	/**
 	 * Parse the nzpre details from the string.
+	 *
+	 * @param $msgHeader
+	 * @param $nzprekey
+	 *
+	 * @return bool
 	 */
 	private function nzpreParse($msgHeader, $nzprekey)
 	{

@@ -35,8 +35,13 @@ class Groups
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
 	}
+
 	/**
 	 * Get all group rows.
+	 *
+	 * @param null $orderby
+	 *
+	 * @return array
 	 */
 	public function getAll($orderby = null)
 	{
@@ -91,6 +96,10 @@ class Groups
 
 	/**
 	 * Get a group row by its id.
+	 *
+	 * @param $id
+	 *
+	 * @return array|bool
 	 */
 	public function getByID($id)
 	{
@@ -110,6 +119,10 @@ class Groups
 
 	/**
 	 * Get a group row by name.
+	 *
+	 * @param $grp
+	 *
+	 * @return array|bool
 	 */
 	public function getByName($grp)
 	{
@@ -148,6 +161,11 @@ class Groups
 
 	/**
 	 * Get count of all groups, filter by name.
+	 *
+	 * @param string $groupname
+	 * @param bool   $activeonly
+	 *
+	 * @return
 	 */
 	public function getCount($groupname = "", $activeonly = false)
 	{
@@ -167,6 +185,13 @@ class Groups
 
 	/**
 	 * Get groups rows for browse list by limit.
+	 *
+	 * @param        $start
+	 * @param        $num
+	 * @param string $groupname
+	 * @param bool   $activeonly
+	 *
+	 * @return array
 	 */
 	public function getRange($start, $num, $groupname = "", $activeonly = false)
 	{
@@ -304,6 +329,10 @@ class Groups
 
 	/**
 	 * Delete a group.
+	 *
+	 * @param $id
+	 *
+	 * @return bool|\PDOStatement
 	 */
 	public function delete($id)
 	{
@@ -368,6 +397,12 @@ class Groups
 
 	/**
 	 * Update the list of newsgroups from nntp provider matching a regex and return an array of messages.
+	 *
+	 * @param     $groupList
+	 * @param int $active
+	 * @param int $backfill
+	 *
+	 * @return array
 	 */
 	function addBulk($groupList, $active = 1, $backfill = 1)
 	{

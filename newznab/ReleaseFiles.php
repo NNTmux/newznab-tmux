@@ -30,6 +30,10 @@ class ReleaseFiles
 
 	/**
 	 * Get releasefiles row by id.
+	 *
+	 * @param $id
+	 *
+	 * @return array
 	 */
 	public function get($id)
 	{
@@ -38,6 +42,10 @@ class ReleaseFiles
 
 	/**
 	 * Get releasefiles row by release.GUID.
+	 *
+	 * @param $guid
+	 *
+	 * @return array
 	 */
 	public function getByGuid($guid)
 	{
@@ -46,6 +54,10 @@ class ReleaseFiles
 
 	/**
 	 * Delete a releasefiles row.
+	 *
+	 * @param $id
+	 *
+	 * @return bool|\PDOStatement
 	 */
 	public function delete($id)
 	{

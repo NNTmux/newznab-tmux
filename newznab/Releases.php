@@ -179,6 +179,10 @@ class Releases
 
 	/**
 	 * Get a list of releases by an array of names
+	 *
+	 * @param $names
+	 *
+	 * @return bool|\PDOStatement
 	 */
 	public function getByNames($names)
 	{
@@ -222,6 +226,11 @@ class Releases
 
 	/**
 	 * Get a range of releases. used in admin manage list
+	 *
+	 * @param $start
+	 * @param $num
+	 *
+	 * @return array
 	 */
 	public function getRange($start, $num)
 	{
@@ -237,6 +246,11 @@ class Releases
 
 	/**
 	 * Get a count of previews for pager. used in admin manage list
+	 *
+	 * @param $previewtype
+	 * @param $cat
+	 *
+	 * @return
 	 */
 	public function getPreviewCount($previewtype, $cat)
 	{
@@ -272,6 +286,13 @@ class Releases
 
 	/**
 	 * Get a range of releases. used in admin manage list
+	 *
+	 * @param $previewtype
+	 * @param $cat
+	 * @param $start
+	 * @param $num
+	 *
+	 * @return array
 	 */
 	public function getPreviewRange($previewtype, $cat, $start, $num)
 	{
@@ -428,6 +449,10 @@ class Releases
 
 	/**
 	 * Get a column names browse list to be ordered by
+	 *
+	 * @param $orderby
+	 *
+	 * @return array
 	 */
 	public function getBrowseOrder($orderby)
 	{
@@ -562,6 +587,10 @@ class Releases
 
 	/**
 	 * Get all groups for which there is a release for a html select
+	 *
+	 * @param bool $blnIncludeAll
+	 *
+	 * @return array
 	 */
 	public function getReleasedGroupsForSelect($blnIncludeAll = true)
 	{
@@ -686,6 +715,8 @@ class Releases
 
 	/**
 	 * Delete a preview associated with a release and update the release to indicate it doesnt have one.
+	 *
+	 * @param $guid
 	 */
 	public function deletePreview($guid)
 	{
@@ -696,6 +727,9 @@ class Releases
 
 	/**
 	 * Update whether a release has a preview.
+	 *
+	 * @param $guid
+	 * @param $haspreview
 	 */
 	public function updateHasPreview($guid, $haspreview)
 	{
@@ -757,6 +791,7 @@ class Releases
 	 * @param $grabs
 	 * @param $videoId
 	 * @param $episodeId
+	 * @param $anidbId
 	 * @param $imdbId
 	 *
 	 * @return array|bool|int
@@ -892,6 +927,19 @@ class Releases
 
 	/**
 	 * Search for releases by album/artist/musicinfo. Used by API.
+	 *
+	 * @param       $artist
+	 * @param       $album
+	 * @param       $label
+	 * @param       $track
+	 * @param       $year
+	 * @param array $genre
+	 * @param int   $offset
+	 * @param int   $limit
+	 * @param array $cat
+	 * @param int   $maxage
+	 *
+	 * @return array
 	 */
 	public function searchAudio($artist, $album, $label, $track, $year, $genre = [-1], $offset = 0, $limit = 100, $cat = [-1], $maxage = -1)
 	{
@@ -968,6 +1016,14 @@ class Releases
 
 	/**
 	 * Search for releases by author/bookinfo. Used by API.
+	 *
+	 * @param     $author
+	 * @param     $title
+	 * @param int $offset
+	 * @param int $limit
+	 * @param int $maxage
+	 *
+	 * @return array
 	 */
 	public function searchBook($author, $title, $offset = 0, $limit = 100, $maxage = -1)
 	{
@@ -1216,7 +1272,6 @@ class Releases
 		$whereSql = sprintf(
 			"%s
 			WHERE r.categoryid BETWEEN 5000 AND 5999
-			AND v.type = 0
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
 			AND (%s)
@@ -1245,7 +1300,7 @@ class Releases
 				rn.id AS nfoid,
 				re.releaseid AS reid
 			FROM releases r
-			INNER JOIN videos v ON r.videos_id = v.id
+			INNER JOIN videos v ON r.videos_id = v.id AND v.type = 0
 			INNER JOIN tv_info tvi ON v.id = tvi.videos_id
 			INNER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			INNER JOIN category c ON c.id = r.categoryid
@@ -1460,6 +1515,10 @@ class Releases
 
 	/**
 	 * Writes a zip file of an array of release guids directly to the stream
+	 *
+	 * @param $guids
+	 *
+	 * @return string
 	 */
 	public function getZipped($guids)
 	{
