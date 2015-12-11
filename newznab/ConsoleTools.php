@@ -19,6 +19,8 @@ class ConsoleTools
 
 	/**
 	 * Construct.
+	 *
+	 * @param array $options
 	 */
 	public function __construct(array $options = [])
 	{

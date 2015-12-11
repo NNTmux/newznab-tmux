@@ -211,6 +211,10 @@ class Category
 
 	/**
 	 * Get a category row by its id.
+	 *
+	 * @param $id
+	 *
+	 * @return array|bool
 	 */
 	public function getById($id)
 	{
@@ -293,6 +297,15 @@ class Category
 
 	/**
 	 * Update a category.
+	 *
+	 * @param $id
+	 * @param $status
+	 * @param $desc
+	 * @param $disablepreview
+	 * @param $minsize
+	 * @param $maxsize
+	 *
+	 * @return bool|\PDOStatement
 	 */
 	public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
 	{
@@ -345,6 +358,10 @@ class Category
 
 	/**
 	 * Return a list of categories for use in a dropdown.
+	 *
+	 * @param bool $blnIncludeNoneSelected
+	 *
+	 * @return array
 	 */
 	public function getForSelect($blnIncludeNoneSelected = true)
 	{
@@ -363,6 +380,11 @@ class Category
 
 	/**
 	 * Get a list of categories.
+	 *
+	 * @param bool  $activeonly
+	 * @param array $excludedcats
+	 *
+	 * @return array
 	 */
 	public function get($activeonly = false, $excludedcats = [])
 	{

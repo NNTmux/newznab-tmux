@@ -1,4 +1,5 @@
 2015-12-11 DariusIII
+	Upd: Update PHPDOC blocks
 	Fix: Anime in Gamma.
 	Fix: Fix path to config.php in pythonn scripts
 	Fix: Cover/list view selector (replaced icons with simple text), removed duplicated  list icon.

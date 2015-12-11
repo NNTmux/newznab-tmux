@@ -583,7 +583,7 @@ class Music
 	 * @param $title
 	 *
 	 * @return bool|mixed
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	public function fetchAmazonProperties($title)
 	{
@@ -671,7 +671,7 @@ class Music
 	}
 
 	/**
-	 *
+	 * @param bool $local
 	 */
 	public function processMusicReleases($local = false)
 	{

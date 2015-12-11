@@ -1011,6 +1011,8 @@ class Users
 	 * if site->userdownloadpurgedays set to 0 then all release history is removed but
 	 * the download/request rows must remain for at least one day to allow the role based
 	 * limits to apply.
+	 *
+	 * @param int $days
 	 */
 	public function pruneRequestHistory($days = 0)
 	{
@@ -1064,6 +1066,8 @@ class Users
 	 * If a user downloads a NZB, log it.
 	 *
 	 * @param int $userID id of the user.
+	 *
+	 * @param     $releaseID
 	 *
 	 * @return bool|int
 	 */

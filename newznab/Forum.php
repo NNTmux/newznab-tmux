@@ -10,6 +10,16 @@ class Forum
 {
 	/**
 	 * Add a forum post.
+	 *
+	 * @param     $parentid
+	 * @param     $userid
+	 * @param     $subject
+	 * @param     $message
+	 * @param int $locked
+	 * @param int $sticky
+	 * @param int $replies
+	 *
+	 * @return int
 	 */
 	public function add($parentid, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0)
 	{
@@ -33,6 +43,10 @@ class Forum
 
 	/**
 	 * Get the top level post in a thread.
+	 *
+	 * @param $parent
+	 *
+	 * @return array|bool
 	 */
 	public function getParent($parent)
 	{
@@ -42,6 +56,10 @@ class Forum
 
 	/**
 	 * Get recent posts.
+	 *
+	 * @param $limit
+	 *
+	 * @return array
 	 */
 	public function getRecentPosts($limit)
 	{
@@ -52,6 +70,10 @@ class Forum
 
 	/**
 	 * Get all child posts for a parent.
+	 *
+	 * @param $parent
+	 *
+	 * @return array
 	 */
 	public function getPosts($parent)
 	{
@@ -61,6 +83,10 @@ class Forum
 
 	/**
 	 * Get a forumpost by its id.
+	 *
+	 * @param $id
+	 *
+	 * @return array|bool
 	 */
 	public function getPost($id)
 	{
@@ -80,6 +106,11 @@ class Forum
 
 	/**
 	 * Get a list of forum posts for browse list by limit.
+	 *
+	 * @param $start
+	 * @param $num
+	 *
+	 * @return array
 	 */
 	public function getBrowseRange($start, $num)
 	{
@@ -95,6 +126,8 @@ class Forum
 
 	/**
 	 * Delete an entire thread.
+	 *
+	 * @param $parent
 	 */
 	public function deleteParent($parent)
 	{
@@ -104,6 +137,8 @@ class Forum
 
 	/**
 	 * Delete a forumpost row.
+	 *
+	 * @param $id
 	 */
 	public function deletePost($id)
 	{
@@ -120,6 +155,8 @@ class Forum
 
 	/**
 	 * Delete all forumposts for a user.
+	 *
+	 * @param $id
 	 */
 	public function deleteUser($id)
 	{
@@ -129,6 +166,10 @@ class Forum
 
 	/**
 	 * Count of all posts for a user.
+	 *
+	 * @param $uid
+	 *
+	 * @return
 	 */
 	public function getCountForUser($uid)
 	{
@@ -139,6 +180,12 @@ class Forum
 
 	/**
 	 * Get forum posts for a user for paged list in profile.
+	 *
+	 * @param $uid
+	 * @param $start
+	 * @param $num
+	 *
+	 * @return array
 	 */
 	public function getForUserRange($uid, $start, $num)
 	{

@@ -675,6 +675,7 @@ class Releases
 	 * @param $grabs
 	 * @param $videoId
 	 * @param $episodeId
+	 * @param $anidbId
 	 * @param $imdbId
 	 *
 	 * @return array|bool|int

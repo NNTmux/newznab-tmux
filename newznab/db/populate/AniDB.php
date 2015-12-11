@@ -132,12 +132,12 @@ class AniDB
 	/**
 	 * Retrieves supplemental anime info from the AniDB API
 	 *
-	 * @param int    $id    The AniDB id to be inserted
-	 * @param string $type  The title type
-	 * @param string $lang  The title language
-	 * @param string $title The title of the Anime
-	 *
 	 * @return array|bool
+	 * @internal param int $id The AniDB id to be inserted
+	 * @internal param string $type The title type
+	 * @internal param string $lang The title language
+	 * @internal param string $title The title of the Anime
+	 *
 	 */
 	private function getAniDbAPI()
 	{
@@ -225,7 +225,6 @@ class AniDB
 
 	/**
 	 * @param \SimpleXMLElement $element
-	 * @param string            $item
 	 * @param string            $property
 	 *
 	 * @return string

@@ -422,8 +422,10 @@ class Sphinx
      * Returns an array of all the indexes that are enabled.  If Sphinx support
      * isn't enabled, then this returns an empty array.
      *
-     * @param   boolean Whether or not to include the delta indexes as well.
-     * @return  array   An array of string of the enabled indexes.
+     * @param bool  $deltas Whether or not to include the delta indexes as well.
+     * @param array $exclude
+     *
+     * @return array An array of string of the enabled indexes.
      */
     public function getAllEnabledIndexes($deltas=false, $exclude=[])
     {
@@ -444,8 +446,10 @@ class Sphinx
      * ``$sphinxDir`` should be a string representing the directory in which to
      * store the indexes.
      *
-     * @param   string $sphinxDir   Path to where indexes should be stored.
-     * @return  string
+     * @param   string $sphinxDir Path to where indexes should be stored.
+     * @param string   $sphinxConf
+     *
+     * @return string
      */
     public function generateSphinxConf($sphinxDir="", $sphinxConf="")
     {
@@ -692,6 +696,7 @@ class Sphinx
 
         return $results;
     }
+
     /**
      * Constructs a SphinxQL query.
      *
@@ -708,6 +713,7 @@ class Sphinx
      * @param   array   $where
      * @param   string  $lookupQuery
      *
+     * @return mixed|string
      */
     public function buildQuery($search, $cat=[], $offset=0, $limit=100,
                            $order=array("postdate", "desc"), $maxage=-1,
@@ -889,17 +895,20 @@ class Sphinx
      *
      * .. _query syntax: http://sphinxsearch.com/docs/2.0.1/extended-syntax.html
      *
-     * @param   string          $search         Search term to query for.
-     * @param   array           $cat            Category IDs to filter for.
-     * @param   int             $offset         Offset from first result.
-     * @param   int             $limit          Number of results to return.
-     * @param   string          $orderby        Field to order results by.
-     * @param   int             $maxage         Don't include results older than this (in days).
-     * @param   array           $excludedcats   Category IDs to exclude.
-     * @param   array           $grp            Group IDs to filter for.
-     * @param   string|array    $indexes        Only search within certain indexes.
-     * @param   boolean         $lookup         Retrieve latest data from database.
-     * @return  array|false
+     * @param   string       $search       Search term to query for.
+     * @param   array        $cat          Category IDs to filter for.
+     * @param   int          $offset       Offset from first result.
+     * @param   int          $limit        Number of results to return.
+     * @param array          $order
+     * @param   int          $maxage       Don't include results older than this (in days).
+     * @param   array        $excludedcats Category IDs to exclude.
+     * @param   array        $grp          Group IDs to filter for.
+     * @param   string|array $indexes      Only search within certain indexes.
+     * @param   boolean      $lookup       Retrieve latest data from database.
+     * @param int            $minsize
+     * @param int            $maxsize
+     *
+     * @return array|false
      */
     public function search($search, $cat=[], $offset=0, $limit=1000,
                            $order=array("postdate", "desc"), $maxage=-1,
@@ -957,6 +966,19 @@ class Sphinx
     /**
      * Returns an array of all the releases matching the given query.  This
      * presents the same interface as :php:meth:`Releases::searchbyRageId`.
+     *
+     * @param        $rageId
+     * @param string $series
+     * @param string $episode
+     * @param int    $offset
+     * @param int    $limit
+     * @param string $name
+     * @param array  $cat
+     * @param int    $maxage
+     * @param array  $indexes
+     * @param bool   $lookup
+     *
+     * @return array|false
      */
     public function searchbyRageId($rageId, $series="", $episode="", $offset=0,
                                    $limit=100, $name="", $cat=array(-1),
@@ -1022,6 +1044,18 @@ class Sphinx
     /**
      * Returns an array of all the releases matching the given query.  This
      * presents the same interface as :php:meth:`Releases::searchbyImdbId`.
+     *
+     * @param        $imdbId
+     * @param int    $offset
+     * @param int    $limit
+     * @param string $name
+     * @param array  $cat
+     * @param string $genre
+     * @param int    $maxage
+     * @param array  $indexes
+     * @param bool   $lookup
+     *
+     * @return array|false
      */
     public function searchbyImdbId($imdbId, $offset=0, $limit=100, $name="",
                                    $cat=array(-1), $genre="", $maxage=-1,
@@ -1087,6 +1121,21 @@ class Sphinx
     /**
      * Returns an array of all the releases matching the given query.  This
      * presents the same interface as :php:meth:`Releases::searchAudio`.
+     *
+     * @param       $artist
+     * @param       $album
+     * @param       $label
+     * @param       $track
+     * @param       $year
+     * @param array $genre
+     * @param int   $offset
+     * @param int   $limit
+     * @param array $cat
+     * @param int   $maxage
+     * @param array $indexes
+     * @param bool  $lookup
+     *
+     * @return array|false
      */
     public function searchAudio($artist, $album, $label, $track, $year,
                                 $genre=array(-1), $offset=0, $limit=100,
@@ -1164,6 +1213,16 @@ class Sphinx
     /**
      * Returns an array of all the releases matching the given query.  This
      * presents the same interface as :php:meth:`Releases::searchBook`.
+     *
+     * @param       $author
+     * @param       $title
+     * @param int   $offset
+     * @param int   $limit
+     * @param int   $maxage
+     * @param array $indexes
+     * @param bool  $lookup
+     *
+     * @return array|false
      */
     public function searchBook($author, $title, $offset=0, $limit=100,
                                $maxage=-1, $indexes=[], $lookup=true)
@@ -1225,6 +1284,17 @@ class Sphinx
     /**
      * Returns an array of all the releases matching the given query.  This
      * presents the same interface as :php:meth:`Releases::searchbyAnidbId`.
+     *
+     * @param        $anidbID
+     * @param string $epno
+     * @param int    $offset
+     * @param int    $limit
+     * @param string $name
+     * @param int    $maxage
+     * @param array  $indexes
+     * @param bool   $lookup
+     *
+     * @return array|false
      */
     public function searchbyAnidbId($anidbID, $epno='', $offset=0, $limit=100,
                                     $name='', $maxage=-1, $indexes=[],
@@ -1275,6 +1345,13 @@ class Sphinx
     /**
      * Get predb rows by limit and filter.  This presents the same interface as
      * :php:meth:`PreDB::getPreRange`.
+     *
+     * @param int    $start
+     * @param        $num
+     * @param string $dirname
+     * @param string $category
+     *
+     * @return array|false
      */
     public function getPreRange($start=0, $num, $dirname='', $category='')
     {

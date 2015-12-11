@@ -153,6 +153,7 @@ class DnzbFailures
 	 *        update the failed count in dnzb_failures table
 	 *
 	 * @param $relid
+	 * @param $gid
 	 * @param $uid
 	 */
 	public function postComment($relid, $gid, $uid)

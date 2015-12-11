@@ -1565,11 +1565,12 @@ class Binaries
 	/**
 	 * Check if we should ignore the file count and return true or false.
 	 *
+	 * @param        $groupName
 	 * @param string $subject
 	 *
+	 * @return bool
 	 * @access protected
 	 *
-	 * @return boolean
 	 */
 	protected function _ignoreFileCount($groupName, $subject)
 	{
