@@ -1,3 +1,8 @@
+2015-12-11 DariusIII
+	Fix: Fix doubled SET in RequestIDLocal class, change and fix cover/list selector in Gamma template
+2015-12-10 DariusIII
+	Upd: Update pre-commit hook
+	Upd: Switch to using UNION ALL in removeCodecPoster function, it increases the speed of that query dramaticaly.
 2015-12-09 DariusIII
 	Fix: Forgot to enable TraktTv processing in PostProcess.php
 	Upd: Remove referencex to UC and womble from prehash pages
