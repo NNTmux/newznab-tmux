@@ -1,4 +1,5 @@
 2015-12-11 DariusIII
+	Fix: Fix path to config.php in pythonn scripts
 	Fix: Cover/list view selector (replaced icons with simple text), removed duplicated  list icon.
 	Fix: Fix doubled SET in RequestIDLocal class
 	Chg: Change COUNT(*) queries to count the primary key columns to improve query performance
