@@ -1,4 +1,5 @@
 2015-12-11 DariusIII
+	Fix: Fix doubled SET in RequestIDLocal class
 	Chg: Change COUNT(*) queries to count the primary key columns to improve query performance
 	Chg: Re-work the count querying in PreHash class
 2015-12-10 DariusIII
