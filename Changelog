@@ -1,5 +1,8 @@
+2015-12-11 DariusIII
+	Chg: Change COUNT(*) queries to count the primary key columns to improve query performance
+	Chg: Re-work the count querying in PreHash class
 2015-12-10 DariusIII
-	Upd: Update pre-commit hook
+	Upd: Update the pre-commit hook.
 	Upd: Switch to using UNION ALL in removeCodecPoster function, it increases the speed of that query dramaticaly.
 2015-12-09 DariusIII
 	Upd: Remove referencex to UC and womble from prehash pages

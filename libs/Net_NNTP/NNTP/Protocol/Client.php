@@ -161,10 +161,10 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 *
 	 * @access public
 	 */
-	public function Net_NNTP_Protocol_Client()
+	public function __construct()
 	{
 		// Init PEAR.
-		parent::PEAR();
+		parent::__construct();
 	}
 
 	/**

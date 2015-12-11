@@ -88,19 +88,19 @@ class Genres
 
 		if ($activeonly)
 			$sql = sprintf("
-						SELECT COUNT(*) AS num
+						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
-							(SELECT DISTINCT genreID FROM musicinfo) x
-							ON x.genreID = g.id %1\$s
+							(SELECT DISTINCT genreid FROM musicinfo) x
+							ON x.genreid = g.id %1\$s
 						+
-						SELECT COUNT(*) AS num
+						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
-							(SELECT DISTINCT genreID FROM consoleinfo) y
-							ON y.genreID = g.id %1\$s
+							(SELECT DISTINCT genreid FROM consoleinfo) y
+							ON y.genreid = g.id %1\$s
 						+
-						SELECT COUNT(*) AS num
+						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genre_id FROM gamesinfo) x
