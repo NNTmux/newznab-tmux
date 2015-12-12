@@ -1,3 +1,5 @@
+2015-12-12 DariusIII
+	Fix: Crap time was left out of codec poster removal query.
 2015-12-11 DariusIII
 	Upd: Update removeCodecPoster in terms of speed and precision.
 	Upd: Update PHPDOC blocks
