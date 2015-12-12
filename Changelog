@@ -1,3 +1,6 @@
+2015-12-12 DariusIII
+	Upd: Update pre-commit hook
+	Fix: Crap time was left out of codec poster removal query.
 2015-12-11 DariusIII
 	Fix: Update PHPDOC blocks. Improve  removeCodecPoster in speed and precision.
 	Fix: Fix path to config.php in python scripts
