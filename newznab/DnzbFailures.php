@@ -86,7 +86,7 @@ class DnzbFailures
 		}
 
 		return $this->pdo->query("
-			SELECT r.*, concat(cp.title, ' > ', c.title) AS category_name
+			SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name
 			FROM releases r
 			RIGHT JOIN dnzb_failures df ON df.release_id = r.id
 			LEFT OUTER JOIN category c ON c.id = r.categoryid
@@ -106,44 +106,44 @@ class DnzbFailures
 	public function getAlternate($guid, $searchname, $userid)
 	{
 		$rel = $this->pdo->queryOneRow(
-				sprintf('
-				SELECT id, gid, categoryid
+			sprintf('
+				SELECT id, categoryid
 				FROM releases
 				WHERE guid = %s',
-						$this->pdo->escapeString($guid)
-				)
+				$this->pdo->escapeString($guid)
+			)
 		);
 
-		// Specifying LAST_INSERT_ID on releaseid will return the releaseid
-		// if the row was actually inserted and not updated
 		$insert = $this->pdo->queryInsert(
-				sprintf('
-				INSERT INTO dnzb_failures (release_id, userid, failed)
-				VALUES (LAST_INSERT_ID(%d), %d, 1)
-				ON DUPLICATE KEY UPDATE failed = failed + 1',
-						$rel['id'],
-						$userid
-				)
+			sprintf('
+				INSERT IGNORE INTO dnzb_failures (release_id, userid, failed)
+				VALUES (%d, %d, 1)',
+				$rel['id'],
+				$userid
+			)
 		);
 
 		// If we didn't actually insert the row, don't add a comment
-		if ((int)$insert > 0) {
+		if (is_numeric($insert) && $insert > 0) {
 			$this->postComment($rel['id'], $rel['gid'], $userid);
 		}
 
 		$alternate = $this->pdo->queryOneRow(
-				sprintf('
-				SELECT r.*
+			sprintf('
+				SELECT r.guid
 				FROM releases r
 				LEFT JOIN dnzb_failures df ON r.id = df.release_id
 				WHERE r.searchname %s
 				AND df.release_id IS NULL
-				AND r.categoryid = %d',
-						$this->pdo->likeString($searchname, true, true),
-						$rel['categoryid'],
-						$userid
-				)
+				AND r.categoryid = %d
+				AND r.id != %d
+				ORDER BY r.postdate DESC',
+				$this->pdo->likeString($searchname, true, true),
+				$rel['categoryid'],
+				$rel['id']
+			)
 		);
+
 		return $alternate;
 	}
 

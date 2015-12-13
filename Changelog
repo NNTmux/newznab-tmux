@@ -1,3 +1,5 @@
+2015-12-13 DariusIII
+	Chg: Update DnzbFailures getAlternate function, add DNZB return code.
 2015-12-12 DariusIII
 	Upd: Update pre-commit hook
 	Fix: Crap time was left out of codec poster removal query.
