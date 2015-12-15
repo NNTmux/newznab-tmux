@@ -99,7 +99,6 @@ class DnzbFailures
 	 * Retrieve alternate release with same or similar searchname
 	 *
 	 * @param string $guid
-	 * @param string $searchname
 	 * @param string $userid
 	 * @return string
 	 */

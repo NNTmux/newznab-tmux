@@ -1,4 +1,5 @@
 2015-12-15 DariusIII
+	Fix: Allow emtpy NZBGet url in profile.
 	Upd: Update Failed releases and serchname handling
 2015-12-14 DariusIII
 	Upd: Clean up, remove unused functions, fix some small bugs in Binaries.php
