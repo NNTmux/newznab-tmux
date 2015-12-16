@@ -27,19 +27,19 @@
 	<!-- Newposterwall -->
 	<link href="{$smarty.const.WWW_TOP}/themes/shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- The styles -->
-	<link id="bs-css" href="{$smarty.const.WWW_TOP}/themes/Charisma/css/bootstrap-spacelab.min.css" rel="stylesheet">
-	<link href="{$smarty.const.WWW_TOP}/themes/Charisma/css/charisma-app.css" rel="stylesheet">
-	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/chosen/chosen.min.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/colorbox/example3/colorbox.css'
+	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/{$theme}/css/bootstrap-spacelab.min.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/charisma-app.css" rel="stylesheet">
+	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/chosen/chosen.min.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/colorbox/example3/colorbox.css'
 		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/responsive-tables/responsive-tables.css'
+	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/responsive-tables/responsive-tables.css'
 		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/bootstrap-tour/build/css/bootstrap-tour.min.css'
+	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/bootstrap-tour/build/css/bootstrap-tour.min.css'
 		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/css/elfinder.min.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/css/elfinder.theme.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/css/jquery.iphone.toggle.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_TOP}/themes/Charisma/css/animate.min.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.min.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.theme.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/jquery.iphone.toggle.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/animate.min.css' rel='stylesheet'>
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_TOP}/themes/shared/styles/normalize.css" rel="stylesheet" type="text/css">
 	<!-- The fav icon -->
@@ -57,7 +57,7 @@
 				<span class="icon-bar"></span>
 			</button>
 			<a class="navbar-brand" href="{$site->home_link}"> <img alt="newznab-tmux logo"
-																	src="{$smarty.const.WWW_TOP}/themes/Charisma/img/logo-tmux.png"
+																	src="{$smarty.const.WWW_THEMES}/{$theme}/img/logo-tmux.png"
 						/></a>
 			{$header_menu}
 			<!-- user dropdown starts -->
@@ -205,53 +205,53 @@
 	<!-- Scripts-->
 	<!-- jQuery -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/jquery/jquery.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/jquery/jquery.min.js"></script>
 	<!-- jQuery migrate script -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/themes/Charisma/js/jquery-migrate-1.2.1.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery-migrate-1.2.1.min.js"></script>
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 	<!-- Bootstrap hover on mouseover script -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/themes/Charisma/js/bootstrap-hover-dropdown.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/{$theme}/js/bootstrap-hover-dropdown.min.js"></script>
 	<!-- library for cookie management -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.cookie.js"></script>
 	<!-- data table plugin -->
 	<script type="text/javascript"
-			src='{$smarty.const.WWW_TOP}/themes/Charisma/js/jquery.dataTables.min.js'></script>
+			src='{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.dataTables.min.js'></script>
 	<!-- select or dropdown enhancer -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/chosen/chosen.jquery.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/chosen/chosen.jquery.min.js"></script>
 	<!-- plugin for gallery image view -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/colorbox/jquery.colorbox-min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/colorbox/jquery.colorbox-min.js"></script>
 	<!-- notification plugin -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/themes/Charisma/js/noty/packaged/jquery.noty.packaged.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/{$theme}/js/noty/packaged/jquery.noty.packaged.min.js"></script>
 	<!-- library for making tables responsive -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/responsive-tables/responsive-tables.js"></script>
+			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/responsive-tables/responsive-tables.js"></script>
 	<!-- tour plugin -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/themes/Charisma/bower_components/bootstrap-tour/build/js/bootstrap-tour.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/bootstrap-tour/build/js/bootstrap-tour.min.js"></script>
 	<!-- star rating plugin -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/js/jquery.raty.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.raty.min.js"></script>
 	<!-- for iOS style toggle switch -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/js/jquery.iphone.toggle.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.iphone.toggle.js"></script>
 	<!-- autogrowing textarea plugin -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/themes/Charisma/js/jquery.autogrow-textarea.js"></script>
+			src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.autogrow-textarea.js"></script>
 	<!-- history.js for cross-browser state change on ajax -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/js/jquery.history.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.history.js"></script>
 	<!-- Charisma functions -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/js/charisma.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/charisma.js"></script>
 	<!-- Functions with noty -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/js/functions.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/functions.js"></script>
 	<!-- newznab default scripts, needed for stuff to work -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/scripts/jquery.colorbox-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/scripts/jquery.autosize-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/scripts/jquery.qtip2.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/themes/Charisma/scripts/sorttable.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.colorbox-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.autosize-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.qtip2.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/sorttable.js"></script>
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
 	<script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>

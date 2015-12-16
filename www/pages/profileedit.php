@@ -106,7 +106,7 @@ switch ($action) {
 if ($page->settings->getSetting('userselstyle') ==1) {
 // Get the list of themes.
 	$themeList[] = 'None';
-	$themes    = scandir(NN_WWW . "/themes");
+	$themes    = scandir(NN_THEMES);
 	foreach ($themes as $theme) {
 		if (strpos($theme, ".") === false && is_dir(NN_THEMES . $theme) && ucfirst($theme) === $theme) {
 			$themeList[] = $theme;

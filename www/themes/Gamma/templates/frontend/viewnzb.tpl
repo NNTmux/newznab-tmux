@@ -369,10 +369,10 @@
 						<a id="guid{$release.guid}" class="icon icon_sabNZBinfo fa fa-share"  style="text-decoration: none; color: #008ab8;" href="#" title="Send to queue"></a>
 					{/if}
 					{if isset($nzbgetintegrated)}
-						<a id="guid{$release.guid}" class="icon icon_nzb fa fa-cloud-download nzbgetNZBinfo" href="#" title="Send to my NZBGet"><img src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/nzbgetup.png"/></a>
+						<a id="guid{$release.guid}" class="icon icon_nzb fa fa-cloud-download nzbgetNZBinfo" href="#" title="Send to my NZBGet"><img src="{$smarty.const.WWW_THEMES}/{$theme}/images/icons/nzbgetup.png"/></a>
 					{/if}
 					{if $weHasVortex}
-						<a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#" title="Send to my NZBVortex"><img src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/vortex/bigsmile.png"/></a>
+						<a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#" title="Send to my NZBVortex"><img src="{$smarty.const.WWW_THEMES}/{$theme}/images/icons/vortex/bigsmile.png"/></a>
 					{/if}
 				</dd>
 

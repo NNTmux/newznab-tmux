@@ -1,3 +1,5 @@
+2015-12-16 DariusIII
+	Upd: Refactor BasePage for new theme settings, adjust templates to use the new structure and constants.
 2015-12-15 DariusIII
 	Fix: Add contact page to Gamma template, fix menu item edit page
 	Drp: Drop tvrage, tvrage_episodes and tvrage_tables if they still exist in DB
