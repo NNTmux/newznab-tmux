@@ -52,15 +52,14 @@
 	<fieldset>
 		<legend>Site Preferences</legend>
 
+		{if $page->settings->getSetting('userselstyle') == 1}
 		<div class="control-group">
 			<label class="control-label">Change site theme</label>
 			<div class="controls">
-				{if $page->settings->getSetting('userselstyle') == 1}
 					{html_options id="style" name='style' values=$themelist output=$themelist selected=$user.style}
-				{/if}
 			</div>
 		</div>
-
+		{/if}
 		<div class="control-group">
 			<label class="control-label" for="movieview">View Movie Page</label>
 			<div class="controls">
@@ -68,7 +67,6 @@
 				<span class="help-block">Browse movie covers. Only shows movies with known IMDB info.</span>
 			</div>
 		</div>
-
 		<div class="control-group">
 			<label class="control-label" for="musicview">View Music Page</label>
 			<div class="controls">
@@ -76,7 +74,6 @@
 				<span class="help-block">Browse music covers. Only shows music with known lookup info.</span>
 			</div>
 		</div>
-
 		<div class="control-group">
 			<label class="control-label" for="consoleview">View Console Page</label>
 			<div class="controls">
@@ -84,7 +81,6 @@
 				<span class="help-block">Browse console covers. Only shows games with known lookup info.</span>
 			</div>
 		</div>
-
 		<div class="control-group">
 			<label class="control-label" for="gameview">View Games Page</label>
 			<div class="controls">
@@ -92,7 +88,6 @@
 				<span class="help-block">Browse games covers. Only shows games with known lookup info.</span>
 			</div>
 		</div>
-
 		<div class="control-group">
 			<label class="control-label" for="bookview">View Book Page</label>
 			<div class="controls">
@@ -100,8 +95,6 @@
 				<span class="help-block">Browse book covers. Only shows books with known lookup info.</span>
 			</div>
 		</div>
-
-
 		<div class="control-group">
 			<label class="control-label" for="xxxview">View XXX Page</label>
 			<div class="controls">
@@ -109,7 +102,6 @@
 				<span class="help-block">Browse XXX covers. Only shows XXX releases with known lookup info.</span>
 			</div>
 		</div>
-
 		<div class="control-group">
 			<label class="control-label" for="exclu">Excluded Categories</label>
 			<div class="controls">
@@ -118,12 +110,9 @@
 			</div>
 		</div>
 	</fieldset>
-
 	{if $page->settings->getSetting('sabintegrationtype') > 0}
-
 	{if $page->settings->getSetting('sabintegrationtype') != 1}
 		<legend>Queue type (NZBget / Sabnzbd)</legend>
-
 		<div class="control-group">
 			<label class="control-label">Queue type</label>
 				<div class="controls">
@@ -133,7 +122,6 @@
 	{/if}
 	<fieldset>
 		<legend>SABnzbd Integration</legend>
-
 		<div class="control-group">
 			<label class="control-label" for="saburl">SABnzbd Url</label>
 			<div class="controls">
@@ -141,7 +129,6 @@
 				<span class="help-block">The url of the SAB installation, for example: <code>http://localhost:8080/sabnzbd/</code></span>
 			</div>
 		</div>
-
 		<div class="control-group">
 			<label class="control-label" for="sabapikey">SABnzbd Api Key</label>
 			<div class="controls">
@@ -149,7 +136,6 @@
 				<span class="help-block">The api key of the SAB installation. Can be the full api key or the nzb api key (as of SAB 0.6)</span>
 			</div>
 		</div>
-
 		<div class="control-group">
 			<label class="control-label" for="sabapikeytype">Api Key Type</label>
 			<div class="controls">
@@ -157,7 +143,6 @@
 				<span class="help-block">Select the type of api key you entered in the above setting. Using your full SAB api key will allow you access to the SAB queue from within this site.</span>
 			</div>
 		</div>
-
 		<div class="control-group">
 			<label class="control-label" for="sabpriority">Priority Level</label>
 			<div class="controls">
@@ -165,7 +150,6 @@
 				<span class="help-block">Set the priority level for NZBs that are added to your queue</span>
 			</div>
 		</div>
-
 		<div class="control-group">
 			<label class="control-label" for="sabsetting">Setting Storage</label>
 			<div class="controls">
@@ -173,12 +157,9 @@
 				<span class="help-block">Where to store the SAB setting.<br />&bull; <b>Cookie</b> will store the setting in your browsers coookies and will only work when using your current browser.<br/>&bull; <b>Site</b> will store the setting in your user account enabling it to work no matter where you are logged in from.<br /><span style="color:#B94A48;"><b>Please Note:</b></span> You should only store your full SAB api key with sites you trust.</span>
 			</div>
 		</div>
-
 	</fieldset>
-
 	<fieldset>
     <legend>NZBGet Integration</legend>
-
 	<div class="control-group">
             <label class="control-label" for="nzbgeturl">NZBGet Url</label>
 			<div class="controls">
@@ -186,7 +167,6 @@
                 <div class="hint">The url of the NZBGet installation, for example: http://localhost:6789/</div>
             </div>
 	</div>
-
 	<div class="control-group">
             <label class="control-label" for="nzbgetusername">NZBGet Username</label>
 			<div class="controls">
@@ -194,7 +174,6 @@
                 <div class="hint">The NZBGet ControlUsername e.g. nzbget</div>
 			</div>
 	</div>
-
 	<div class="control-group">
             <label class="control-label" for="nzbgetpassword">NABGet Password</label>
 			<div class="controls">
