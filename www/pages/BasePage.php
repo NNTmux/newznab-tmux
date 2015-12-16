@@ -327,6 +327,8 @@ class BasePage
 				// TODO add redirect to error page telling the user their theme name is invalid (after SQL patch to update current users is added).
 				$this->theme = ucfirst($this->theme);
 			}
+		} else {
+			$this->theme = $this->settings->getSetting('style');
 		}
 
 		// Update last login every 15 mins.
