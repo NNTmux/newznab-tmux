@@ -85,5 +85,9 @@ $page->meta_title = "Browse XXX";
 $page->meta_keywords = "browse,xxx,nzb,description,details";
 $page->meta_description = "Browse for XXX Movies";
 
-$page->content = $page->smarty->fetch('xxx.tpl');
+if (isset($_GET["id"])) {
+	$page->content = $page->smarty->fetch('viewxxxfull.tpl');
+} else {
+	$page->content = $page->smarty->fetch('xxx.tpl');
+}
 $page->render();

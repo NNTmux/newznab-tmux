@@ -32,7 +32,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET["id"])) {
 		$page->smarty->assign('modal', true);
 	}
 
-	$page->content = $page->smarty->fetch('viewxxx.tpl');
+	$page->content = $page->smarty->fetch('viewxxxfull.tpl');
 
 	if ($modal) {
 		echo $page->content;

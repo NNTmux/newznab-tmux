@@ -119,7 +119,7 @@
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
 													{foreach from=$msplits item=m name=loop}
 													{if $smarty.foreach.loop.first}
-													<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}"><img
+													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_TOP}/themes/shared/images/no-cover.png{/if}"
 																width="100" border="0"
@@ -199,7 +199,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$result.title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|escape:"htmlall"}</a></span>
 
 													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
 													<div id="guid{$mguid[$m@index]}">
@@ -271,7 +271,7 @@
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
 													{foreach from=$msplits item=m name=loop}
 													{if $smarty.foreach.loop.first}
-													<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}"><img
+													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_TOP}/themes/shared/images/no-cover.png{/if}"
 																width="100" border="0"
@@ -351,7 +351,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$result.title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|escape:"htmlall"}</a></span>
 
 													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
 													<div id="guid{$mguid[$m@index]}">

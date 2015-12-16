@@ -1,4 +1,6 @@
 2015-12-16 DariusIII
+	Add: Add full XXX movie view to all the templates
+	Upd: Add new 2160p quality option to series and movies view in Gamma template.
 	Fix: Do not show site theme selection in profile edit if admin has disabled user selectable themes.
 	Fix: Templates could not be changed if user selectable templates were disabled.
 	Upd: Refactor BasePage for new theme settings, adjust templates to use the new structure and constants.
