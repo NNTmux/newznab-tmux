@@ -1,3 +1,5 @@
+2015-12-16 DariusIII
+	Upd: Refactor BasePage for new theme settings, adjust templates to use the new structure and constants.
 2015-12-15 DariusIII
 	Upd: Update nntmux_fi_schema
 	Fix: Add contact page to Gamma template, fix menu items edit page

@@ -210,7 +210,7 @@
                     <li style="vertical-align:text-bottom;">
                         {if $weHasVortex}
                             <div>
-                                <a href="#" class="icon icon_nzb fa fa-cloud-downloadvortex" title="Send to my NZBVortex"><img src="{$smarty.const.WWW_TOP}/themes/Gamma/images/icons/vortex/bigsmile.png"></a>
+                                <a href="#" class="icon icon_nzb fa fa-cloud-downloadvortex" title="Send to my NZBVortex"><img src="{$smarty.const.WWW_THEMES}/{$theme}/images/icons/vortex/bigsmile.png"></a>
                             </div>
                         {/if}
                     </li>
