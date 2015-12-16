@@ -95,6 +95,7 @@
 		        <button data-quality="hdtv" class="btn">HDTV</button>
 		        <button data-quality="720p" class="btn">720p</button>
 		        <button data-quality="1080p" class="btn">1080p</button>
+				<button data-quality="2160p" class="btn">2160p</button>
 		    </div>
 
 			{if $isadmin}
