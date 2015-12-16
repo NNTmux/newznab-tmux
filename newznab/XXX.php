@@ -202,6 +202,7 @@ class XXX
 				GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
 				GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
 				GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
+				GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_catname,
 			xxx.*, UNCOMPRESS(xxx.plot) AS plot,
 			g.name AS group_name,
 			rn.releaseid AS nfoid
@@ -209,6 +210,8 @@ class XXX
 			LEFT OUTER JOIN groups g ON g.id = r.groupid
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+			LEFT OUTER JOIN category c ON c.id = r.categoryid
+			LEFT OUTER JOIN category cp ON cp.id = c.parentid
 			INNER JOIN xxxinfo xxx ON xxx.id = r.xxxinfo_id
 			WHERE r.nzbstatus = 1
 			AND xxx.id IN (%s)
