@@ -17,6 +17,7 @@
 		<input class="span12" id="password" name="password" type="password" placeholder="Password" style="margin-bottom:20px;"><br />
 
 		<input id="rememberme" {if $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox"/> <span class="help-inline" style="vertical-align:sub;">Remember me </span>
+			<div class="pull-right"><a href="{$serverroot}forgottenpassword" class="text-center">I forgot my password</a></div>
 			<p>
 			{$page->smarty->fetch('captcha.tpl')}
 			</p>
