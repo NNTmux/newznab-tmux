@@ -909,7 +909,6 @@ class Sphinx
      * @param int            $maxsize
      *
      * @return array|false
-     * @internal param string $orderby Field to order results by.
      */
     public function search($search, $cat=[], $offset=0, $limit=1000,
                            $order=array("postdate", "desc"), $maxage=-1,
