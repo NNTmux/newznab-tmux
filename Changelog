@@ -1,4 +1,5 @@
 2015-12-16 DariusIII
+	Upd: Update the newznab/db/populate/AniDB class.
 	Add: Add full XXX movie view to all the templates
 	Upd: Add new 2160p quality option to series and movies view in Gamma template.
 	Fix: Do not show site theme selection in profile edit if admin has disabled user selectable themes.
