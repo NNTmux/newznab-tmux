@@ -1,4 +1,5 @@
 2015-12-17 DariusIII
+	Fix: Add forgotten password link to Gamma, fix forgottenpassword page
 	Upd: Update the newznab/db/populate/AniDB class.
 2015-12-16 DariusIII
 	Add: Add full XXX movie view to all the templates
