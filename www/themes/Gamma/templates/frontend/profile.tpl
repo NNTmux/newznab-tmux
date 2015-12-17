@@ -86,6 +86,10 @@
 	{/if}
 	<tr>
 		<th>UI Preferences:</th>
+		<tr>
+			<th>Theme:</th>
+			<td>{$user.style}</td>
+		</tr>
 		<td>
 			{if $user.movieview == "1"}View movie covers{else}View standard movie category{/if}<br/>
 			{if $user.musicview == "1"}View music covers{else}View standard music category{/if}<br/>

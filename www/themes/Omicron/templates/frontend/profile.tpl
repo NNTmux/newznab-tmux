@@ -94,6 +94,10 @@
 																<th>Downloads Total</th>
 																<td>{$user.grabs}</td>
 															</tr>
+															<tr>
+																<th>Theme:</th>
+																<td>{$user.style}</td>
+															</tr>
 															{if $isadmin || !$publicview}
 																<tr>
 																	<th title="Not public">API/RSS Key</th>
