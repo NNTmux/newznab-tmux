@@ -1,30 +1,6 @@
 DROP TABLE IF EXISTS site;
 DROP TABLE IF EXISTS anidb;
-CREATE TABLE IF NOT EXISTS anidb (
-  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  anidbid INT(7) UNSIGNED DEFAULT NULL,
-  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
-  type VARCHAR(32) COLLATE utf8_unicode_ci NOT NULL,
-  startdate DATE NOT NULL,
-  enddate DATE NOT NULL,
-  related VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
-  creators VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
-  description TEXT COLLATE utf8_unicode_ci NOT NULL,
-  rating VARCHAR(5) COLLATE utf8_unicode_ci NOT NULL,
-  picture VARCHAR(16) COLLATE utf8_unicode_ci NOT NULL,
-  categories VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
-  characters VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
-  epnos VARCHAR(2048) COLLATE utf8_unicode_ci NOT NULL,
-  airdates TEXT COLLATE utf8_unicode_ci NOT NULL,
-  episodetitles TEXT COLLATE utf8_unicode_ci NOT NULL,
-  createddate DATETIME DEFAULT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY anidbid (anidbid)
-)
-  ENGINE = MyISAM
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci
-  AUTO_INCREMENT = 1;
+DROP TABLE IF EXISTS animetitles;
 
 DROP TABLE IF EXISTS anidb_episodes;
 CREATE TABLE IF NOT EXISTS anidb_episodes (
@@ -68,17 +44,6 @@ CREATE TABLE IF NOT EXISTS anidb_titles (
   lang VARCHAR(25) COLLATE utf8_unicode_ci NOT NULL,
   title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (anidbid,type,lang,title)
-)
-  ENGINE = MyISAM
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci;
-
-DROP TABLE IF EXISTS animetitles;
-CREATE TABLE IF NOT EXISTS animetitles (
-  anidbid INT(7) UNSIGNED DEFAULT NULL,
-  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
-  unixtime INT(12) UNSIGNED NOT NULL,
-  UNIQUE KEY title (title)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
