@@ -2250,7 +2250,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('spotnabsiteprvkey', '', '', '', 'spotnabsiteprvkey', ''),
 ('spotnabsitepubkey', '', '', '', 'spotnabsitepubkey', ''),
 ('spotnabuser', '', '', '', 'spotnabuser', ''),
-('sqlpatch', '216', '', '', 'sqlpatch', ''),
+('sqlpatch', '217', '', '', 'sqlpatch', ''),
 ('storeuserips', '0', '', '', 'storeuserips', ''),
 ('strapline', 'A great usenet indexer','', '', 'strapline', ''),
 ('style', 'omicron', '', '', 'style', ''),
