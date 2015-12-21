@@ -1539,7 +1539,6 @@ INSERT INTO menu (id, href, title, newwindow, tooltip, role, ordinal, menueval) 
 (15, 'mymovies', 'My Movies', 0, 'Your Movie Wishlist', 1, 78, ''),
 (16, 'queue', 'My Queue', 0, 'View Your Download Queue', 1, 80, '{if (($userdata.saburl|count_characters+$userdata.nzbgeturl|count_characters == 0) && $site->sabintegrationtype==2) || $site->sabintegrationtype==0}-1{/if}'),
 (17, 'nzbvortex', 'My Queue', 0, 'View Your NZBVortex Queue', 1, 81, '{if $userdata.nzbvortex_server_url == ''''}-1{/if}'),
-(18, 'dlbrowse', 'My Downloads', 0, 'View Download Folder', 1, 83, '{if $site->sabcompletedir==''''}-1{/if}'),
 (19, 'forum', 'Forum', 0, 'Browse Forum', 1, 85, ''),
 (20, 'profile', 'Profile', 0, 'View your profile', 1, 90, ''),
 (21, 'logout', 'Logout', 0, 'Logout', 1, 95, ''),

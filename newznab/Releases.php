@@ -19,37 +19,43 @@ class Releases
 
 	/**
 	 * @access public
-	 * @var initial binary state after being added from usenet
+	 * @note Initial binary state after being added from usenet
+	 * @var
 	 */
 	const PROCSTAT_NEW = 0;
 
 	/**
 	 * @access public
-	 * @var after a binary has matched a releaseregex
+	 * @note After a binary has matched a releaseregex
+	 * @var
 	 */
 	const PROCSTAT_TITLEMATCHED = 5;
 
 	/**
 	 * @access public
-	 * @var after a binary has been confirmed as having the right number of parts
+	 * @note After a binary has been confirmed as having the right number of parts
+	 * @var
 	 */
 	const PROCSTAT_READYTORELEASE = 1;
 
 	/**
 	 * @access public
-	 * @var binary has not matched a releaseregex
+	 * @note Binary has not matched a releaseregex
+	 * @var
 	 */
 	const PROCSTAT_TITLENOTMATCHED = 3;
 
 	/**
+	 * @note Binary that has finished and successfully made it into a release
 	 * @access public
-	 * @var binary that has finished and successfully made it into a release
+	 * @var
 	 */
 	const PROCSTAT_RELEASED = 4;
 
 	/**
+	 * @note After a series of attempts to lookup the allfilled style reqid to get a name, its given up
 	 * @access public
-	 * @var after a series of attempts to lookup the allfilled style reqid to get a name, its given up
+	 * @var
 	 */
 	const PROCSTAT_NOREQIDNAMELOOKUPFOUND = 7;
 
@@ -174,43 +180,6 @@ class Releases
 			echo $this->pdo->log->error(PHP_EOL . 'You have an invalid setting for completion. It must be lower than 100.');
 		}
 		$this->showPasswords = self::showPasswords($this->pdo);
-	}
-
-
-	/**
-	 * Get a list of releases by an array of names
-	 *
-	 * @param $names
-	 *
-	 * @return bool|\PDOStatement
-	 */
-	public function getByNames($names)
-	{
-
-		$nsql = "1=2";
-		if (count($names) > 0) {
-			$n = [];
-			foreach ($names as $nm)
-				$n[] = " searchname = " . $this->pdo->escapeString($nm);
-
-			$nsql = "( " . implode(' or ', $n) . " )";
-		}
-
-		return $this->pdo->queryDirect(sprintf('SELECT releases.*, CONCAT(cp.title, ' > ', c.title) AS category_name,
-							m.id AS movie_id, m.title, m.rating, m.cover, m.plot, m.year, m.genre, m.director, m.actors, m.tagline,
-							mu.id AS music_id, mu.title AS mu_title, mu.cover AS mu_cover, mu.year AS mu_year, mu.artist AS mu_artist, mu.tracks AS mu_tracks, mu.review AS mu_review,
-							ep.id AS ep_id, ep.showtitle AS ep_showtitle, ep.airdate AS ep_airdate, ep.fullep AS ep_fullep, ep.overview AS ep_overview,
-							tvrage.hascover AS rage_hascover, tvrage.id AS rg_ID
-							FROM releases
-							LEFT OUTER JOIN category c ON c.id = releases.categoryid
-							LEFT OUTER JOIN category cp ON cp.id = c.parentid
-							LEFT OUTER JOIN movieinfo m ON m.imdbid = releases.imdbid
-							LEFT OUTER JOIN musicinfo mu ON mu.id = releases.musicinfoid
-							LEFT OUTER JOIN episodeinfo ep ON ep.id = releases.episodeinfoid
-							LEFT OUTER JOIN tvrage ON tvrage.rageid = releases.rageid
-						WHERE %s', $nsql
-						)
-				);
 	}
 
 	/**
