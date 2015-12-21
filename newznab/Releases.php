@@ -1097,7 +1097,8 @@ class Releases
 		);
 		$orderpos = strpos($sql, "ORDER BY");
 		$wherepos = strpos($sql, "WHERE");
-		$sqlcount = "SELECT count(releases.id) AS num FROM releases INNER JOIN bookinfo ON bookinfo.id = releases.bookinfoid " . substr($sql, $wherepos, $orderpos - $wherepos);
+		$sqlcount = "SELECT count(r.id) AS num FROM releases r
+							INNER JOIN bookinfo b ON b.id = r.bookinfoid " . substr($sql, $wherepos, $orderpos - $wherepos);
 
 		$res = $this->pdo->query($sql, true);
 
@@ -1459,7 +1460,7 @@ class Releases
 
 		$baseSql = sprintf(
 			"SELECT r.*,
-				(cp.title, ' > ', c.title) AS category_name,
+				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
 				rn.id AS nfoid
