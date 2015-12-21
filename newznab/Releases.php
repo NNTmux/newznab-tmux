@@ -203,14 +203,17 @@ class Releases
 	 */
 	public function getRange($start, $num)
 	{
-
-
 		if ($start === false)
 			$limit = "";
 		else
 			$limit = " LIMIT " . $start . "," . $num;
 
-		return $this->pdo->query(" SELECT releases.*, concat(cp.title, ' > ', c.title) AS category_name FROM releases LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN category cp ON cp.id = c.parentid ORDER BY postdate DESC" . $limit);
+		return $this->pdo->query("SELECT r.*, concat(cp.title, ' > ', c.title) AS category_name
+ 									  FROM releases r
+ 									  LEFT OUTER JOIN category c ON c.id = r.categoryid
+ 									  LEFT OUTER JOIN category cp ON cp.id = c.parentid
+ 									  ORDER BY postdate DESC" . $limit
+		);
 	}
 
 	/**
@@ -223,11 +226,9 @@ class Releases
 	 */
 	public function getPreviewCount($previewtype, $cat)
 	{
-
-
 		$catsrch = "";
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = " and (";
+			$catsrch = " AND (";
 			foreach ($cat as $category) {
 				if ($category != -1) {
 					$categ = new Categorize();
@@ -238,18 +239,21 @@ class Releases
 							$chlist .= ", " . $child["id"];
 
 						if ($chlist != "-99")
-							$catsrch .= " releases.categoryid in (" . $chlist . ") or ";
+							$catsrch .= " r.categoryid in (" . $chlist . ") or ";
 					} else {
-						$catsrch .= sprintf(" releases.categoryid = %d or ", $category);
+						$catsrch .= sprintf(" r.categoryid = %d or ", $category);
 					}
 				}
 			}
 			$catsrch .= "1=2 )";
 		}
-
-		$sql = sprintf("SELECT count(id) AS num FROM releases WHERE haspreview = %d %s ", $previewtype, $catsrch);
-		$res = $this->pdo->queryOneRow($sql);
-
+		$res = $this->pdo->queryOneRow(sprintf("SELECT count(id) AS num
+												FROM releases r
+												WHERE haspreview = %d %s",
+												$previewtype,
+												$catsrch
+												)
+											);
 		return $res["num"];
 	}
 
@@ -265,11 +269,9 @@ class Releases
 	 */
 	public function getPreviewRange($previewtype, $cat, $start, $num)
 	{
-
-
 		$catsrch = "";
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = " and (";
+			$catsrch = " AND (";
 			foreach ($cat as $category) {
 				if ($category != -1) {
 					$categ = new Categorize();
@@ -280,9 +282,9 @@ class Releases
 							$chlist .= ", " . $child["id"];
 
 						if ($chlist != "-99")
-							$catsrch .= " releases.categoryid in (" . $chlist . ") or ";
+							$catsrch .= " r.categoryid in (" . $chlist . ") or ";
 					} else {
-						$catsrch .= sprintf(" releases.categoryid = %d or ", $category);
+						$catsrch .= sprintf(" r.categoryid = %d or ", $category);
 					}
 				}
 			}
@@ -294,11 +296,19 @@ class Releases
 		else
 			$limit = " LIMIT " . $start . "," . $num;
 
-		$sql = sprintf(" SELECT releases.*, concat(cp.title, ' > ', c.title) AS category_name FROM releases LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE haspreview = %d %s ORDER BY postdate DESC %s", $previewtype, $catsrch, $limit);
-
-		return $this->pdo->query($sql);
+		return $this->pdo->query(sprintf("SELECT releases.*,
+						concat(cp.title, ' > ', c.title) AS category_name
+						FROM releases r
+						LEFT OUTER JOIN category c ON c.id = r.categoryid
+						LEFT OUTER JOIN category cp ON cp.id = c.parentid
+						WHERE haspreview = %d %s
+						ORDER BY postdate DESC %s",
+						$previewtype,
+						$catsrch,
+						$limit
+			)
+		);
 	}
-
 
 	/**
 	 * Used for pager on browse page.
@@ -351,7 +361,7 @@ class Releases
 		$qry = sprintf(
 			"SELECT r.*,
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
-					CONCAT(cp.id, ',', c.id) AS category_ids,
+					%s AS category_ids,
 					(SELECT df.failed) AS failed,
 					rn.id AS nfoid,
 					re.releaseid AS reid,
@@ -376,6 +386,7 @@ class Releases
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				GROUP BY r.id
 				ORDER BY %7\$s %8\$s",
+			$this->getConcatenatedCategoryIDs(),
 			NZB::NZB_ADDED,
 			$this->showPasswords,
 			$this->categorySQL($cat),
@@ -489,19 +500,20 @@ class Releases
 	{
 		return $this->pdo->query(
 			sprintf(
-				"SELECT searchname, guid, groups.name AS gname, CONCAT(cp.title,'_',category.title) AS catName
-				FROM releases r
-				INNER JOIN category ON r.categoryid = category.id
-				INNER JOIN groups ON r.groupid = groups.id
-				INNER JOIN category cp ON cp.id = category.parentid
-				WHERE r.nzbstatus = %d
-				%s %s %s",
-				NZB::NZB_ADDED,
-				$this->exportDateString($postFrom),
-				$this->exportDateString($postTo, false),
-				(($groupID != '' && $groupID != '-1') ? sprintf(' AND groupid = %d ', $groupID) : '')
-			)
-		);
+				"SELECT searchname, guid, groups.name AS gname,
+					CONCAT(cp.title,'_',c.title) AS catName
+					FROM releases r
+					INNER JOIN category c ON r.categoryid = c.id
+					INNER JOIN groups ON r.groupid = groups.id
+					INNER JOIN category cp ON cp.id = c.parentid
+					WHERE r.nzbstatus = %d
+					%s %s %s",
+					NZB::NZB_ADDED,
+					$this->exportDateString($postFrom),
+					$this->exportDateString($postTo, false),
+					(($groupID != '' && $groupID != '-1') ? sprintf(' AND groupid = %d ', $groupID) : '')
+				)
+			);
 	}
 
 	/**
@@ -548,9 +560,7 @@ class Releases
 	 */
 	public function getLatestUsenetPostDate()
 	{
-
 		$row = $this->pdo->queryOneRow("SELECT DATE_FORMAT(max(postdate), '%d/%m/%Y') AS postdate FROM releases");
-
 		return $row["postdate"];
 	}
 
@@ -564,7 +574,10 @@ class Releases
 	public function getReleasedGroupsForSelect($blnIncludeAll = true)
 	{
 
-		$groups = $this->pdo->query("SELECT DISTINCT groups.id, groups.name FROM releases INNER JOIN groups ON groups.id = releases.groupid");
+		$groups = $this->pdo->query("SELECT DISTINCT g.id, g.name
+										FROM releases r
+										INNER JOIN groups g ON g.id = r.groupid"
+		);
 		$temp_array = [];
 
 		if ($blnIncludeAll)
@@ -591,7 +604,9 @@ class Releases
 	{
 		if (is_null($this->concatenatedCategoryIDsCache)) {
 			$result = $this->pdo->query(
-				"SELECT CONCAT(cp.id, ',', c.id) AS category_ids FROM category c INNER JOIN category cp ON cp.id = c.parentid",
+				"SELECT CONCAT(cp.id, ',', c.id) AS category_ids
+					FROM category c
+					INNER JOIN category cp ON cp.id = c.parentid",
 				true, NN_CACHE_EXPIRY_LONG
 			);
 			if (isset($result[0]['category_ids'])) {
@@ -702,8 +717,13 @@ class Releases
 	 */
 	public function updateHasPreview($guid, $haspreview)
 	{
-
-		$this->pdo->queryExec(sprintf("UPDATE releases SET haspreview = %d WHERE guid = %s", $haspreview, $this->pdo->escapeString($guid)));
+		$this->pdo->queryExec(
+			sprintf(
+				"UPDATE releases
+					SET haspreview = %d
+					WHERE guid = %s",
+				$haspreview,
+				$this->pdo->escapeString($guid)));
 	}
 
 	/**
@@ -867,7 +887,7 @@ class Releases
 		$baseSql = sprintf(
 			"SELECT r.*,
 				concat(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
+				%s AS category_ids,
 				groups.name AS group_name,
 				rn.id AS nfoid,
 				re.releaseid AS reid
@@ -878,6 +898,7 @@ class Releases
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
 			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
+			$this->getConcatenatedCategoryIDs(),
 			$whereSql
 		);
 
@@ -924,21 +945,21 @@ class Releases
 		$searchsql = "";
 
 		if ($artist != "")
-			$searchsql .= sprintf(" and musicinfo.artist like %s ", $this->pdo->escapeString("%" . $artist . "%"));
+			$searchsql .= sprintf(" AND m.artist like %s ", $this->pdo->escapeString("%" . $artist . "%"));
 		if ($album != "")
-			$searchsql .= sprintf(" and musicinfo.title like %s ", $this->pdo->escapeString("%" . $album . "%"));
+			$searchsql .= sprintf(" AND m.title like %s ", $this->pdo->escapeString("%" . $album . "%"));
 		if ($label != "")
-			$searchsql .= sprintf(" and musicinfo.publisher like %s ", $this->pdo->escapeString("%" . $label . "%"));
+			$searchsql .= sprintf(" AND mu.publisher like %s ", $this->pdo->escapeString("%" . $label . "%"));
 		if ($track != "")
-			$searchsql .= sprintf(" and musicinfo.tracks like %s ", $this->pdo->escapeString("%" . $track . "%"));
+			$searchsql .= sprintf(" AND m.tracks like %s ", $this->pdo->escapeString("%" . $track . "%"));
 		if ($year != "")
-			$searchsql .= sprintf(" and musicinfo.year = %d ", $year);
+			$searchsql .= sprintf(" AND m.year = %d ", $year);
 
 
 		$catsrch = "";
 		$usecatindex = "";
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = " and (";
+			$catsrch = " AND (";
 			foreach ($cat as $category) {
 				if ($category != -1) {
 					$categ = new Categorize();
@@ -949,9 +970,9 @@ class Releases
 							$chlist .= ", " . $child["id"];
 
 						if ($chlist != "-99")
-							$catsrch .= " releases.categoryid in (" . $chlist . ") or ";
+							$catsrch .= " r.categoryid in (" . $chlist . ") or ";
 					} else {
-						$catsrch .= sprintf(" releases.categoryid = %d or ", $category);
+						$catsrch .= sprintf("r.categoryid = %d or ", $category);
 					}
 				}
 			}
@@ -960,26 +981,53 @@ class Releases
 		}
 
 		if ($maxage > 0)
-			$maxage = sprintf(" and postdate > now() - interval %d day ", $maxage);
+			$maxage = sprintf(" AND postdate > now() - interval %d day ", $maxage);
 		else
 			$maxage = "";
 
 		$genresql = "";
 		if (count($genre) > 0 && $genre[0] != -1) {
-			$genresql = " and (";
+			$genresql = " AND (";
 			foreach ($genre as $g) {
-				$genresql .= sprintf(" musicinfo.genreid = %d or ", $g);
+				$genresql .= sprintf(" m.genreid = %d or ", $g);
 			}
 			$genresql .= "1=2 )";
 		}
 
-		$sql = sprintf("SELECT releases.*, musicinfo.cover AS mi_cover, musicinfo.review AS mi_review, musicinfo.tracks AS mi_tracks, musicinfo.publisher AS mi_publisher, musicinfo.title AS mi_title, musicinfo.artist AS mi_artist, genres.title AS music_genrename, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, groups.name AS group_name, rn.id AS nfoid FROM releases %s LEFT OUTER JOIN musicinfo ON musicinfo.id = releases.musicinfoid LEFT JOIN genres ON genres.id = musicinfo.genreid LEFT OUTER JOIN groups ON groups.id = releases.groupid LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE releases.passwordstatus <= (SELECT VALUE FROM settings WHERE setting='showpasswordedrelease') %s %s %s %s ORDER BY postdate DESC LIMIT %d, %d ", $usecatindex, $searchsql, $catsrch, $maxage, $genresql, $offset, $limit);
-		$orderpos = strpos($sql, "order by");
-		$wherepos = strpos($sql, "where");
-		$sqlcount = "SELECT count(releases.id) AS num FROM releases INNER JOIN musicinfo ON musicinfo.id = releases.musicinfoid " . substr($sql, $wherepos, $orderpos - $wherepos);
-
-		$res = $this->pdo->query($sql, true);
-
+		$res = $this->pdo->query(sprintf(
+			"SELECT r.*,
+			m.cover AS mi_cover,
+			m.review AS mi_review,
+			m.tracks AS mi_tracks,
+			m.publisher AS mi_publisher,
+			m.title AS mi_title,
+			m.artist AS mi_artist,
+			g.title AS music_genrename,
+			CONCAT(cp.title, ' > ', c.title) AS category_name,
+			%s AS category_ids,
+			g.name AS group_name,
+			rn.id AS nfoid FROM releases r %s
+			LEFT OUTER JOIN musicinfo m ON m.id = r.musicinfoid
+			LEFT JOIN genres g ON g.id = m.genreid
+			LEFT OUTER JOIN groups g ON g.id = r.groupid
+			LEFT OUTER JOIN category c ON c.id = r.categoryid
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+			AND rn.nfo IS NOT NULL
+			LEFT OUTER JOIN category cp ON cp.id = c.parentid
+			WHERE r.passwordstatus <= (SELECT VALUE FROM settings WHERE setting='showpasswordedrelease')
+			%s %s %s %s
+			ORDER BY postdate DESC LIMIT %d, %d ",
+			$this->getConcatenatedCategoryIDs(),
+			$usecatindex,
+			$searchsql,
+			$catsrch,
+			$maxage,
+			$genresql,
+			$offset,
+			$limit
+			)
+			, true
+		);
 		return $res;
 	}
 
@@ -1008,18 +1056,47 @@ class Releases
 		$searchsql = "";
 
 		if ($author != "")
-			$searchsql .= sprintf(" and bookinfo.author like %s ", $this->pdo->escapeString("%" . $author . "%"));
+			$searchsql .= sprintf(" AND b.author like %s ", $this->pdo->escapeString("%" . $author . "%"));
 		if ($title != "")
-			$searchsql .= sprintf(" and bookinfo.title like %s ", $this->pdo->escapeString("%" . $title . "%"));
+			$searchsql .= sprintf(" AND b.title like %s ", $this->pdo->escapeString("%" . $title . "%"));
 
 		if ($maxage > 0)
-			$maxage = sprintf(" and postdate > now() - interval %d day ", $maxage);
+			$maxage = sprintf(" AND postdate > now() - interval %d day ", $maxage);
 		else
 			$maxage = "";
 
-		$sql = sprintf("SELECT releases.*, bookinfo.cover AS bi_cover, bookinfo.review AS bi_review, bookinfo.publisher AS bi_publisher, bookinfo.pages AS bi_pages, bookinfo.publishdate AS bi_publishdate, bookinfo.title AS bi_title, bookinfo.author AS bi_author, genres.title AS book_genrename, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, groups.name AS group_name, rn.id AS nfoid FROM releases LEFT OUTER JOIN bookinfo ON bookinfo.id = releases.bookinfoid LEFT JOIN genres ON genres.id = bookinfo.genreid LEFT OUTER JOIN groups ON groups.id = releases.groupid LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE releases.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') %s %s ORDER BY postdate DESC LIMIT %d, %d ", $searchsql, $maxage, $offset, $limit);
-		$orderpos = strpos($sql, "order by");
-		$wherepos = strpos($sql, "where");
+		$sql = sprintf(
+			"SELECT r.*, b.cover AS bi_cover,
+				b.review AS bi_review,
+				b.publisher AS bi_publisher,
+				b.pages AS bi_pages,
+				b.publishdate AS bi_publishdate,
+				b.title AS bi_title,
+				b.author AS bi_author,
+				gn.title AS book_genrename,
+				CONCAT(cp.title, ' > ', c.title) AS category_name,
+				%s AS category_ids,
+				g.name AS group_name,
+				rn.id AS nfoid
+				FROM releases r
+				LEFT OUTER JOIN bookinfo b ON b.id = r.bookinfoid
+				LEFT JOIN genres gn ON g.id = b.genreid
+				LEFT OUTER JOIN groups g ON g.id = r.groupid
+				LEFT OUTER JOIN category c ON c.id = r.categoryid
+				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+				AND rn.nfo IS NOT NULL
+				LEFT OUTER JOIN category cp ON cp.id = c.parentid
+				WHERE releases.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease')
+				%s %s
+				ORDER BY postdate DESC LIMIT %d, %d ",
+			$this->getConcatenatedCategoryIDs(),
+			$searchsql,
+			$maxage,
+			$offset,
+			$limit
+		);
+		$orderpos = strpos($sql, "ORDER BY");
+		$wherepos = strpos($sql, "WHERE");
 		$sqlcount = "SELECT count(releases.id) AS num FROM releases INNER JOIN bookinfo ON bookinfo.id = releases.bookinfoid " . substr($sql, $wherepos, $orderpos - $wherepos);
 
 		$res = $this->pdo->query($sql, true);
@@ -1382,7 +1459,7 @@ class Releases
 
 		$baseSql = sprintf(
 			"SELECT r.*,
-				concat(cp.title, ' > ', c.title) AS category_name,
+				(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
 				rn.id AS nfoid
@@ -1535,7 +1612,7 @@ class Releases
 		$sql = sprintf(
 			"SELECT r.*,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
+				%s AS category_ids,
 				g.name AS group_name,
 				v.title AS showtitle, v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.source,
 				tvi.summary, tvi.image,
@@ -1548,6 +1625,7 @@ class Releases
 			LEFT OUTER JOIN tv_info tvi ON r.videos_id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			WHERE %s",
+			$this->getConcatenatedCategoryIDs(),
 			$gSql
 		);
 
@@ -1637,7 +1715,7 @@ class Releases
 
 		$selnfo = ($incnfo) ? ', uncompress(nfo) as nfo' : '';
 
-		return $this->pdo->queryOneRow(sprintf("SELECT id, releaseid" . $selnfo . " FROM releasenfo where releaseid = %d AND nfo IS NOT NULL", $id));
+		return $this->pdo->queryOneRow(sprintf("SELECT id, releaseid" . $selnfo . " FROM releasenfo WHERE releaseid = %d AND nfo IS NOT NULL", $id));
 	}
 
 	public function updateGrab($guid)
@@ -1674,7 +1752,7 @@ class Releases
 		}
 
 		if (!file_exists($this->pdo->getSetting('nzbpath'))) {
-			$this->pdo->log->doEcho($this->pdo->log->primary('Bad or missing nzb directory - ' . $page->settings->getSetting('nzbpath')), true);
+			$this->pdo->log->doEcho($this->pdo->log->primary('Bad or missing nzb directory - ' . $this->pdo->getSetting('nzbpath')), true);
 
 			return -1;
 		}
@@ -1704,7 +1782,7 @@ class Releases
 				if ($this->echoCLI) {
 					$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Request id Threaded lookup."));
 					}
-				passthru("$PYTHON ${DIR}update_scripts/nix_scripts/tmux/python/requestid_threaded.py");
+				passthru("$PYTHON ${DIR}update_scripts/python/requestid_threaded.py");
 				if ($this->echoCLI) {
 					$this->pdo->log->doEcho(
 						$this->pdo->log->primary(
@@ -1811,7 +1889,7 @@ class Releases
 			$this->pdo->log->doEcho($this->pdo->log->primary('Complete - ' . $cc . ' rows affected'));
 		} else {
 			$this->pdo->log->doEcho($this->pdo->log->primary('Deleting unused binaries and parts'));
-			$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s  ON %s.id = %s.binaryid
+			$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s ON %s.id = %s.binaryid
 			WHERE %s.dateadded < %s - INTERVAL %d HOUR",
 					$group['pname'],
 					$group['bname'],
@@ -1838,10 +1916,25 @@ class Releases
 		// Move all binaries from releases which have the correct number of files on to the next stage.
 		//
 		$retcount = 0;
-		$currTime_ori = $this->pdo->queryOneRow("SELECT NOW() as now");
+		$currTime_ori = $this->pdo->queryOneRow("SELECT NOW() AS now");
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
 		$this->pdo->log->doEcho($this->pdo->log->primary('Marking binaries where all parts are available'));
-		$result = $this->pdo->queryDirect(sprintf("SELECT relname, date, SUM(reltotalpart) AS reltotalpart, groupid, reqid, fromname, SUM(num) AS num, coalesce(g.minfilestoformrelease, s.minfilestoformrelease) AS minfilestoformrelease FROM ( SELECT relname, reltotalpart, groupid, reqid, fromname, max(date) AS date, COUNT(id) AS num FROM %s WHERE procstat = %s GROUP BY relname, reltotalpart, groupid, reqid, fromname ORDER BY NULL ) x LEFT OUTER JOIN groups g ON g.id = x.groupid INNER JOIN ( SELECT value AS minfilestoformrelease FROM settings WHERE setting = 'minfilestoformrelease' ) s GROUP BY relname, groupid, reqid, fromname, minfilestoformrelease ORDER BY NULL", $group['bname'], Releases::PROCSTAT_TITLEMATCHED));
+		$result = $this->pdo->queryDirect(sprintf(
+			"SELECT relname, date, SUM(reltotalpart) AS reltotalpart,
+				groupid, reqid, fromname, SUM(num) AS num,
+				COALESCE (g.minfilestoformrelease, s.minfilestoformrelease) AS minfilestoformrelease
+				FROM
+				(SELECT relname, reltotalpart, groupid, reqid, fromname, max(date) AS date,
+				COUNT(id) AS num FROM %s
+				WHERE procstat = %s
+				GROUP BY relname, reltotalpart, groupid, reqid, fromname
+				ORDER BY NULL) x
+				LEFT OUTER JOIN groups g ON g.id = x.groupid
+				INNER JOIN (SELECT value AS minfilestoformrelease FROM settings WHERE setting = 'minfilestoformrelease' ) s
+				GROUP BY relname, groupid, reqid, fromname, minfilestoformrelease
+				ORDER BY NULL",
+			$group['bname'],
+			Releases::PROCSTAT_TITLEMATCHED));
 
 		while ($row = $this->pdo->getAssocArray($result)) {
 			$retcount++;
@@ -2467,7 +2560,7 @@ class Releases
 			WHERE r.categoryid BETWEEN 2000 AND 2999
 			AND m.imdbid > 0
 			AND m.cover = 1
-			AND r.id in (select max(id) from releases where imdbid > 0 group by imdbid)
+			AND r.id in (SELECT max(id) FROM releases WHERE imdbid > 0 GROUP BY imdbid)
 			ORDER BY r.postdate DESC
 			LIMIT 24"
 		);
@@ -2489,7 +2582,7 @@ class Releases
 			WHERE r.categoryid BETWEEN 1000 AND 1999
 			AND con.id > 0
 			AND con.cover > 0
-			AND r.id in (select max(id) from releases where consoleinfoid > 0 group by consoleinfoid)
+			AND r.id in (SELECT max(id) FROM releases WHERE consoleinfoid > 0 GROUP BY consoleinfoid)
 			ORDER BY r.postdate DESC
 			LIMIT 35"
 		);
@@ -2511,7 +2604,7 @@ class Releases
 			WHERE r.categoryid = 4050
 			AND gi.id > 0
 			AND gi.cover > 0
-			AND r.id in (select max(id) from releases where gamesinfo_id > 0 group by gamesinfo_id)
+			AND r.id in (SELECT max(id) FROM releases WHERE gamesinfo_id > 0 GROUP BY gamesinfo_id)
 			ORDER BY r.postdate DESC
 			LIMIT 35"
 		);
@@ -2534,7 +2627,7 @@ class Releases
 			AND r.categoryid != 3030
 			AND m.id > 0
 			AND m.cover > 0
-			AND r.id in (select max(id) from releases where musicinfoid > 0 group by musicinfoid)
+			AND r.id in (SELECT max(id) FROM releases WHERE musicinfoid > 0 GROUP BY musicinfoid)
 			ORDER BY r.postdate DESC
 			LIMIT 24"
 		);
@@ -2557,7 +2650,7 @@ class Releases
 			OR r.categoryid = 3030
 			AND b.id > 0
 			AND b.cover > 0
-			AND r.id in (select max(id) from releases where bookinfoid > 0 group by bookinfoid)
+			AND r.id in (SELECT max(id) FROM releases WHERE bookinfoid > 0 GROUP BY bookinfoid)
 			ORDER BY r.postdate DESC
 			LIMIT 24"
 		);
@@ -2579,7 +2672,7 @@ class Releases
 			WHERE r.categoryid BETWEEN 6000 AND 6999
 			AND xxx.id > 0
 			AND xxx.cover = 1
-			AND r.id in (select max(id) from releases where xxxinfo_id > 0 group by xxxinfo_id)
+			AND r.id in (SELECT max(id) FROM releases WHERE xxxinfo_id > 0 GROUP BY xxxinfo_id)
 			ORDER BY r.postdate DESC
 			LIMIT 24"
 		);
@@ -2604,7 +2697,7 @@ class Releases
 			AND v.id > 0
 			AND v.type = 0
 			AND tvi.image = 1
-			AND r.id in (select max(id) from releases where videos_id > 0 group by videos_id)
+			AND r.id in (SELECT max(id) FROM releases WHERE videos_id > 0 GROUP BY videos_id)
 			ORDER BY r.postdate DESC
 			LIMIT 24", true, NN_CACHE_EXPIRY_LONG
 		);

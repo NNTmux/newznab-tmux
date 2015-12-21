@@ -1,4 +1,5 @@
 2015-12-21 DariusIII
+	Upd: Rework some queries id Releases, fix one long standing bug (requestid python script).
 	Chg: Remove dlbrowse page and My Downloads link, as well as associated function from Releases and tpl files from themes.
 	Upd: Add noscript support to captcha (fix by zetas@nZEDb)
 2015-12-17 DariusIII
