@@ -1,4 +1,5 @@
 2015-12-21 DariusIII
+	Upd: Update smarty to 3.1.29
 	Upd: Remove dlbrowse page
 	Upd: Add noscript support to captcha (fix by zetas@nZEDb)
 	Fix: Fix wrong movie sample extension in Gamma
