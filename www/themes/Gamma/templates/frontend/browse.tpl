@@ -112,10 +112,10 @@
 				</a>
 			</th>
 			<th style="padding-top:0px; padding-bottom:0px;">Grabs<br/>
-				<a title="Sort Descending" href="{$orderbyfiles_desc}">
+				<a title="Sort Descending" href="{$orderbygrabs_desc}">
 					<i class="fa fa-caret-down"></i>
 				</a>
-				<a title="Sort Ascending" href="{$orderbyfiles_asc}">
+				<a title="Sort Ascending" href="{$orderbygrabs_asc}">
 					<i class="fa fa-caret-up"></i>
 				</a>
 			</th>
