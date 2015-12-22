@@ -1065,7 +1065,7 @@ class Releases
 		else
 			$maxage = "";
 
-		$sql = sprintf(
+		$res = $this->pdo->query(sprintf(
 			"SELECT r.*, b.cover AS bi_cover,
 				b.review AS bi_review,
 				b.publisher AS bi_publisher,
@@ -1094,13 +1094,8 @@ class Releases
 			$maxage,
 			$offset,
 			$limit
+			), true
 		);
-		$orderpos = strpos($sql, "ORDER BY");
-		$wherepos = strpos($sql, "WHERE");
-		$sqlcount = "SELECT count(r.id) AS num FROM releases r
-							INNER JOIN bookinfo b ON b.id = r.bookinfoid " . substr($sql, $wherepos, $orderpos - $wherepos);
-
-		$res = $this->pdo->query($sql, true);
 
 		return $res;
 	}
@@ -1206,7 +1201,7 @@ class Releases
 		if ($orderBy == '') {
 			$orderBy = [];
 			$orderBy[0] = 'postdate ';
-			$orderBy[1] = 'desc ';
+			$orderBy[1] = 'DESC ';
 		} else {
 			$orderBy = $this->getBrowseOrder($orderBy);
 		}
