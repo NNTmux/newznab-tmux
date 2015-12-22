@@ -464,7 +464,7 @@
 																	<td>{$release.grabs}
 																		time{if $release.grabs==1}{else}s{/if}</td>
 																</tr>
-																{if $failed != NULL && $failed >0}
+																{if $failed != NULL && $failed > 0}
 																<tr>
 																	<th width="140">Failed Download</th>
 																	<td>{$failed}

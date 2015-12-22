@@ -352,11 +352,11 @@
 						time{if $release.grabs==1}{else}s{/if}</dd>
 				</dl>
 				{if $failed != NULL && $failed >0}
-					<dd>
-						<dd> Failed Download</dd>
-						<dt>{$failed}
-							time{if $failed==1}{else}s{/if}</dt>
-					</dd>
+					<dl>
+						<dt> Failed Download</dt>
+						<dd>{$failed}
+							time{if $failed==1}{else}s{/if}</dd>
+					</dl>
 				{/if}
 				{if $site->checkpasswordedrar > 0}
 					<dt>Password</dt>
