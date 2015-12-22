@@ -253,6 +253,7 @@
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															title="View Nfo" class="modal_nfo fa fa-info-sign"
 															rel="nfo"></a></li>{/if}
+												<li width="50px">{$mgrabs[$m@index]} <i class="fa fa-cloud-download"></i></li>
 												<li width="50px"><a
 															href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
 															title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}"
