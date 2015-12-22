@@ -238,7 +238,7 @@
 				</div>
 				{/if}
 			</td>
-			<td class="less mid" title="{$result.grabs}{if $result.grabs != 1}s{/if}"></td>
+			<td class="less mid"><span class="label label-default">{$result.grabs} Grab{if $result.grabs != 1}s{/if}</span></td>
 			<td class="icons" style='width:100px;'>
 				<ul class="inline">
 					<li>
