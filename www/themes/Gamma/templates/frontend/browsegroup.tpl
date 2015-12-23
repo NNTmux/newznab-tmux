@@ -8,9 +8,9 @@
 
 <table style="width:100%;" class="data highlight Sortable" id="browsetable">
 	<tr>
-                <th>Name<</th>
+                <th>Name</th>
                 <th>Description</th>
-                <th>Updated<</th>
+                <th>Updated</th>
                 <th>Releases</th>
 	</tr>
 
