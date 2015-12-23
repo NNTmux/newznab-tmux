@@ -1,4 +1,5 @@
 2015-12-23 DariusIII
+	Chg: Add use statement for ReCaptcha
 	Fix: Change how grabs are sorted in Gamma
 2015-12-22 DariusIII
 	Fix: Fix icons and add grabs count to Gamma template
