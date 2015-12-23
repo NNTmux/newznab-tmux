@@ -6,7 +6,7 @@
 
 {if $results|@count > 0}
 
-<table style="width:100%;" class="data highlight sortable" id="browsetable">
+<table style="width:100%;" class="data highlight sortable table table-condensed table-striped table-responsive" id="browsetable">
 	<tr>
                 <th>Name</th>
                 <th>Description</th>
