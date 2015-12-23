@@ -1055,10 +1055,10 @@ class Binaries
 	{
 		switch ($opType) {
 			case self::OPTYPE_BLACKLIST:
-				$opType = 'AND binaryblacklist.optype = ' . self::OPTYPE_BLACKLIST;
+				$opType = 'AND bb.optype = ' . self::OPTYPE_BLACKLIST;
 				break;
 			case self::OPTYPE_WHITELIST:
-				$opType = 'AND binaryblacklist.optype = ' . self::OPTYPE_WHITELIST;
+				$opType = 'AND bb.optype = ' . self::OPTYPE_WHITELIST;
 				break;
 			default:
 				$opType = '';
