@@ -1,3 +1,5 @@
+2015-12-23 DariusIII
+	Chg: Change some query parts and fix one small error in Binaries.php
 2015-12-22 DariusIII
 	Upd: Fix small errors in Releases.php
 	Fix: Fix icons and add grabs count to Gamma template

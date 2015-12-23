@@ -299,7 +299,7 @@ class Binaries
 					UPDATE groups
 					SET first_record_postdate = %s
 					WHERE id = %d',
-					$this->_pdo->from_unixtime($groupMySQL['first_record_postdate']),
+					$this->_pdo->from_unixtime($this->_pdo->escapeString($groupMySQL['first_record_postdate'])),
 					$groupMySQL['id']
 				)
 			);
@@ -706,9 +706,9 @@ class Binaries
 							$sql = '';
 							if (!empty($regexMatches)) {
 								$relparts = explode("/", $regexMatches['parts']);
-								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupid, procstat, categoryid, regexid, reqid, relpart, reltotalpart, binaryhash, relname, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %d, %s, %d, %s, %d, %d, %s, %s, now())', $tableNames['bname'], $this->_pdo->escapeString($subject), $this->_pdo->escapeString(utf8_encode($data['From'])), $this->_pdo->escapeString($data['Date']), $this->_pdo->escapeString($data['Xref']), $this->_pdo->escapeString($data['MaxParts']), $groupArr['id'], Releases::PROCSTAT_TITLEMATCHED, $regexMatches['regcatid'], $regexMatches['regexid'], $this->_pdo->escapeString($regexMatches['reqid']), $relparts[0], $relparts[1], $this->_pdo->escapeString($binaryHash), $this->_pdo->escapeString(str_replace('_', ' ', $regexMatches['name'])));
+								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupid, procstat, categoryid, regexid, reqid, relpart, reltotalpart, binaryhash, relname, dateadded) VALUES (%s, %s, %s, %s, %s, %d, %d, %s, %d, %s, %d, %d, %s, %s, NOW())', $tableNames['bname'], $this->_pdo->escapeString($subject), $this->_pdo->escapeString(utf8_encode($data['From'])), $this->_pdo->from_unixtime($this->_pdo->escapeString($data['Date'])), $this->_pdo->escapeString($data['Xref']), $this->_pdo->escapeString($data['MaxParts']), $groupArr['id'], Releases::PROCSTAT_TITLEMATCHED, $regexMatches['regcatid'], $regexMatches['regexid'], $this->_pdo->escapeString($regexMatches['reqid']), $relparts[0], $relparts[1], $this->_pdo->escapeString($binaryHash), $this->_pdo->escapeString(str_replace('_', ' ', $regexMatches['name'])));
 							} elseif ($this->onlyProcessRegexBinaries === false) {
-								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupid, binaryhash, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %s, now())', $tableNames['bname'], $this->_pdo->escapeString($subject), $this->_pdo->escapeString(utf8_encode($data['From'])), $this->_pdo->escapeString($data['Date']), $this->_pdo->escapeString($data['Xref']), $this->_pdo->escapeString($data['MaxParts']), $groupArr['id'], $this->_pdo->escapeString($binaryHash));
+								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupid, binaryhash, dateadded) VALUES (%s, %s, %s, %s, %s, %d, %s, NOW())', $tableNames['bname'], $this->_pdo->escapeString($subject), $this->_pdo->escapeString(utf8_encode($data['From'])), $this->_pdo->from_unixtime($this->_pdo->escapeString($data['Date'])), $this->_pdo->escapeString($data['Xref']), $this->_pdo->escapeString($data['MaxParts']), $groupArr['id'], $this->_pdo->escapeString($binaryHash));
 							} //onlyProcessRegexBinaries is true, there was no regex match and we are doing part repair so delete them
 							elseif ($type == 'partrepair') {
 								$partIds = [];
@@ -1042,58 +1042,6 @@ class Binaries
 	}
 
 	/**
-	 * Rawsearch. Perform a simple like match on binary subjects matching a pattern.
-	 *
-	 * @param       $search
-	 * @param int   $limit
-	 * @param array $excludedcats
-	 *
-	 * @return array
-	 */
-	public function search($search, $limit = 1000, $excludedcats = [])
-	{
-		//
-		// if the query starts with a ^ it indicates the search is looking for items which start with the term
-		// still do the like match, but mandate that all items returned must start with the provided word
-		//
-		$words = explode(" ", $search);
-		$searchsql = "";
-		$intwordcount = 0;
-		if (count($words) > 0) {
-			foreach ($words as $word) {
-				//
-				// see if the first word had a caret, which indicates search must start with term
-				//
-				if ($intwordcount == 0 && (strpos($word, "^") === 0))
-					$searchsql .= sprintf(" and b.name like %s", $this->_pdo->escapeString(substr($word, 1) . "%"));
-				else
-					$searchsql .= sprintf(" and b.name like %s", $this->_pdo->escapeString("%" . $word . "%"));
-
-				$intwordcount++;
-			}
-		}
-
-		$exccatlist = "";
-		if (count($excludedcats) > 0)
-			$exccatlist = " and b.categoryid not in (" . implode(",", $excludedcats) . ") ";
-
-		$res = $this->_pdo->query(sprintf("
-					SELECT b.*,
-					g.name AS group_name,
-					r.guid,
-					(SELECT COUNT(id) FROM parts p WHERE p.binaryid = b.id) as 'binnum'
-					FROM binaries b
-					INNER JOIN groups g ON g.id = b.groupid
-					LEFT OUTER JOIN releases r ON r.id = b.releaseid
-					WHERE 1=1 %s %s order by DATE DESC LIMIT %d ",
-				$searchsql, $exccatlist, $limit
-			)
-		);
-
-		return $res;
-	}
-
-	/**
 	 * Return all blacklists.
 	 *
 	 * @param bool   $activeOnly Only display active blacklists ?
@@ -1119,17 +1067,17 @@ class Binaries
 		return $this->_pdo->query(
 			sprintf('
 				SELECT
-					binaryblacklist.id, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description,
-					binaryblacklist.groupname AS groupname, binaryblacklist.regex, groups.id AS group_id, binaryblacklist.msgcol,
-					binaryblacklist.last_activity as last_activity
-				FROM binaryblacklist
-				LEFT OUTER JOIN groups ON groups.name %s binaryblacklist.groupname
+					bb.id, bb.optype, bb.status, bb.description,
+					bb.groupname AS groupname, bb.regex, groups.id AS group_id, bb.msgcol,
+					bb.last_activity as last_activity
+				FROM binaryblacklist bb
+				LEFT OUTER JOIN groups g ON g.name %s bb.groupname
 				WHERE 1=1 %s %s %s
 				ORDER BY coalesce(groupname,\'zzz\')',
 				($groupRegex ? 'REGEXP' : '='),
-				($activeOnly ? 'AND binaryblacklist.status = 1' : ''),
+				($activeOnly ? 'AND bb.status = 1' : ''),
 				$opType,
-				($groupName ? ('AND groups.name REGEXP ' . $this->_pdo->escapeString($groupName)) : '')
+				($groupName ? ('AND g.name REGEXP ' . $this->_pdo->escapeString($groupName)) : '')
 			)
 		);
 	}
@@ -1208,18 +1156,6 @@ class Binaries
 	{
 		$this->_pdo->queryExec(sprintf("DELETE FROM parts WHERE binaryid = %d", $id));
 		$this->_pdo->queryExec(sprintf("DELETE FROM binaries WHERE id = %d", $id));
-	}
-
-	# http://php.net/manual/en/function.array-unique.php#97285
-	public function getSuperUniqueArray($array)
-	{
-		$result = array_map("unserialize", array_unique(array_map("serialize", $array)));
-		foreach ($result as $key => $value) {
-			if (is_array($value))
-				$result[$key] = $this->getSuperUniqueArray($value);
-		}
-
-		return $result;
 	}
 
 	/**
