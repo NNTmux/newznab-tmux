@@ -483,9 +483,7 @@ class Releases
 			'files_asc',
 			'files_desc',
 			'stats_asc',
-			'stats_desc',
-			'grabs_asc',
-			'grabs_desc'
+			'stats_desc'
 		];
 	}
 

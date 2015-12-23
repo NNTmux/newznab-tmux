@@ -1068,7 +1068,7 @@ class Binaries
 			sprintf('
 				SELECT
 					bb.id, bb.optype, bb.status, bb.description,
-					bb.groupname AS groupname, bb.regex, groups.id AS group_id, bb.msgcol,
+					bb.groupname AS groupname, bb.regex, g.id AS group_id, bb.msgcol,
 					bb.last_activity as last_activity
 				FROM binaryblacklist bb
 				LEFT OUTER JOIN groups g ON g.name %s bb.groupname
