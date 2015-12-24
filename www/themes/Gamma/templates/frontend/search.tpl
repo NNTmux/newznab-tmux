@@ -164,6 +164,7 @@
 		<th>Posted</th>
 		<th>Size</th>
 		<th>Files</th>
+		<th>Grabs</th>
 		<th>Action</th>
 	</tr>
 	{foreach from=$results item=result}
