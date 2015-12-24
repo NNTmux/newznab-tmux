@@ -206,7 +206,7 @@
 						<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}" title="View Nfo" class="modal_nfo badge halffade" rel="nfo">Nfo</a>
 						{/if}
 						{if $result.preid > 0 && $userdata.canpre == 1}
-						<span class="preinfo badge halffade" title="{$result.searchname}">Pre'd {$result.ctime|timeago}</span>
+						<span class="preinfo badge halffade" title="{$result.searchname}">Pre'd {if isset($result.ctime)}{$result.ctime|timeago}{else} N/A{/if} </span>
 						{/if}
 						{if $result.imdbid > 0}
 						<a href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbid}" title="View movie info" class="badge badge-inverse halffade" rel="movie" >Movie</a>
