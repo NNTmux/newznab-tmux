@@ -1201,7 +1201,7 @@ class Releases
 		if ($orderBy == '') {
 			$orderBy = [];
 			$orderBy[0] = 'postdate ';
-			$orderBy[1] = 'DESC ';
+			$orderBy[1] = 'desc ';
 		} else {
 			$orderBy = $this->getBrowseOrder($orderBy);
 		}
