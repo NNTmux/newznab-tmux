@@ -1,6 +1,8 @@
 <?php
 namespace newznab;
 
+use ReCaptcha\ReCaptcha;
+
 class Captcha {
 	/**
 	 * Smarty $page
@@ -176,7 +178,7 @@ class Captcha {
 	 * @return bool
 	 */
 	private function _bootstrapCaptcha() {
-		if ($this->recaptcha instanceof \ReCaptcha\ReCaptcha) {
+		if ($this->recaptcha instanceof ReCaptcha) {
 			return true;
 		}
 
@@ -185,7 +187,7 @@ class Captcha {
 
 		if ($this->sitekey != false && $this->sitekey != '') {
 			if ($this->secretkey != false && $this->secretkey != '') {
-				$this->recaptcha = new \ReCaptcha\ReCaptcha($this->secretkey);
+				$this->recaptcha = new ReCaptcha($this->secretkey);
 				return true;
 			}
 		}
