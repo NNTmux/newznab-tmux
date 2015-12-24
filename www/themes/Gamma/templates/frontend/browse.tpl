@@ -65,61 +65,19 @@
 			</table>
 		</div>
 	</div>
-	<table style="100%" class="data highlight icons table table-striped" id="browsetable">
+	<table style="100%" class="data highlight icons table table-striped Sortable" id="browsetable">
 		<tr>
 			<th style="padding-top:0px; padding-bottom:0px;">
 				<input id="chkSelectAll" type="checkbox" class="nzb_check_all" />
 				<label for="chkSelectAll" style="display:none;">Select All</label>
 			</th>
-			<th style="padding-top:0px; padding-bottom:0px;">Name<br/>
-				<a title="Sort Descending" href="{$orderbyname_desc}">
-					<i class="fa fa-caret-down"></i>
-				</a>
-				<a title="Sort Ascending" href="{$orderbyname_asc}">
-					<i class="fa fa-caret-up"></i>
-				</a>
-			</th>
-			<th style="padding-top:0px; padding-bottom:0px;">Category<br/>
-				<a title="Sort Descending" href="{$orderbycat_desc}">
-					<i class="fa fa-caret-down"></i>
-				</a>
-				<a title="Sort Ascending" href="{$orderbycat_asc}">
-					<i class="fa fa-caret-up"></i>
-				</a>
-			</th>
-			<th style="padding-top:0px; padding-bottom:0px;">Posted<br/>
-				<a title="Sort Descending" href="{$orderbyposted_desc}">
-					<i class="fa fa-caret-down"></i>
-				</a>
-				<a title="Sort Ascending" href="{$orderbyposted_asc}">
-					<i class="fa fa-caret-up"></i>
-				</a>
-			</th>
-			<th style="padding-top:0px; padding-bottom:0px;">Size<br/>
-				<a title="Sort Descending" href="{$orderbysize_desc}">
-					<i class="fa fa-caret-down"></i>
-				</a>
-				<a title="Sort Ascending" href="{$orderbysize_asc}">
-					<i class="fa fa-caret-up"></i>
-				</a>
-			</th>
-			<th style="padding-top:0px; padding-bottom:0px;">Files<br/>
-				<a title="Sort Descending" href="{$orderbyfiles_desc}">
-					<i class="fa fa-caret-down"></i>
-				</a>
-				<a title="Sort Ascending" href="{$orderbyfiles_asc}">
-					<i class="fa fa-caret-up"></i>
-				</a>
-			</th>
-			<th style="padding-top:0px; padding-bottom:0px;">Grabs<br/>
-				<a title="Sort Descending" href="{$orderbystats_desc}">
-					<i class="fa fa-caret-down"></i>
-				</a>
-				<a title="Sort Ascending" href="{$orderbystats_asc}">
-					<i class="fa fa-caret-up"></i>
-				</a>
-			</th>
-			<th>action</th>
+			<th>Name</th>
+			<th>Category</th>
+			<th>Posted</th>
+			<th>Size</th>
+			<th>Files</th>
+			<th>Grabs</th>
+			<th>Action</th>
 		</tr>
 		{foreach from=$results item=result}
 		<tr class="{cycle values=",alt"}{if $lastvisit|strtotime<$result.adddate|strtotime} new{/if}" id="guid{$result.guid}">
