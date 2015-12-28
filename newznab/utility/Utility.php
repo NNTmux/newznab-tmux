@@ -639,13 +639,12 @@ class Utility
 	 *
 	 * @return string File info. Empty string on failure.
 	 */
-	static public function fileInfo($path)
+	public static function fileInfo($path)
 	{
-		$output = '';
 		$magicPath = (new Settings())->getSetting('magic_file_path');
 		if (self::hasCommand('file') && (!self::isWin() || !empty($magicPath))) {
 			$magicSwitch = empty($magicPath) ? '' : " -m $magicPath";
-			$output = Utility::runCmd('file' . $magicSwitch . ' -b "' . $path . '"');
+			$output = self::runCmd('file' . $magicSwitch . ' -b "' . $path . '"');
 
 			if (is_array($output)) {
 				switch (count($output)) {
@@ -663,13 +662,13 @@ class Utility
 				$output = '';
 			}
 		} else {
-			$fileInfo = empty($magicPath) ? new \finfo(FILEINFO_RAW) : new \finfo(FILEINFO_RAW, $magicPath);
+			$fileInfo = empty($magicPath) ? finfo_open(FILEINFO_RAW) : finfo_open(FILEINFO_RAW, $magicPath);
 
-			$output = $fileInfo->file($path);
+			$output = finfo_file($fileInfo, $path);
 			if (empty($output)) {
 				$output = '';
 			}
-			$fileInfo->close();
+			finfo_close($fileInfo);
 		}
 
 		return $output;
