@@ -361,7 +361,7 @@ class Releases
 		$qry = sprintf(
 			"SELECT r.*,
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
-					%s AS category_ids,
+					CONCAT(cp.id, ',', c.id) AS category_ids,
 					(SELECT df.failed) AS failed,
 					rn.id AS nfoid,
 					re.releaseid AS reid,
@@ -386,7 +386,6 @@ class Releases
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				GROUP BY r.id
 				ORDER BY %7\$s %8\$s",
-			$this->getConcatenatedCategoryIDs(),
 			NZB::NZB_ADDED,
 			$this->showPasswords,
 			$this->categorySQL($cat),

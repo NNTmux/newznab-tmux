@@ -1,4 +1,5 @@
 2015-12-28 DariusIII
+	Fix: Revert the change in getBrowseRange function in Releases.php
 	Upd: Update fileInfo function in Utility.php
 2015-12-23 DariusIII
 	Fix: Error in Binaries, sorting by grabs in Gamma
