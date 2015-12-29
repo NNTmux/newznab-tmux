@@ -63,10 +63,10 @@ if (!isset($argv[1])) {
 								SELECT rf.name AS textstring, rf.releaseid AS fileid,
 									r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid
 								FROM releases r
-								INNER JOIN release_files rf ON r.id = rf.releaseid
+								INNER JOIN release_files rf ON (rf.releaseid = r.id)
 								WHERE r.guid %s
 								AND r.nzbstatus = 1 AND r.proc_files = 0
-								AND r.prehashid = 0
+								AND r.prehashid = 0 AND r.isrenamed = 0
 								ORDER BY r.postdate ASC
 								LIMIT %s',
 					$pdo->likeString($guidChar, false, true),
@@ -90,10 +90,10 @@ if (!isset($argv[1])) {
 								SELECT rf.name AS textstring, rf.releaseid AS fileid,
 									r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid
 								FROM releases r
-								INNER JOIN release_files rf ON r.id = rf.releaseid
+								INNER JOIN release_files rf ON (rf.releaseid = r.id)
 								WHERE r.guid %s
 								AND r.nzbstatus = 1 AND r.proc_srr = 0
-								AND r.prehashid = 0
+								AND r.prehashid = 0 AND r.isrenamed = 0
 								ORDER BY r.postdate ASC
 								LIMIT %s',
 					$pdo->likeString($guidChar, false, true),

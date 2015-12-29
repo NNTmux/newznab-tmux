@@ -389,10 +389,11 @@ class NameFixer
 			$query = sprintf('
 					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
-					WHERE (isrenamed = %d OR rel.categoryid = %d)
+					WHERE (isrenamed = %d OR rel.categoryid IN (%d, %d))
 					AND proc_par2 = %d',
 					self::IS_RENAMED_NONE,
 					Category::CAT_MISC_OTHER,
+					Category::CAT_MISC_HASHED,
 					self::PROC_PAR2_NONE
 			);
 		}
@@ -1002,7 +1003,7 @@ class NameFixer
 					break;
 				case "Srr, ":
 					$this->srrCheck($release, $echo, $type, $namestatus, $show);
-					break;
+					continue;
 				case "NFO, ":
 					$this->nfoCheckTV($release, $echo, $type, $namestatus, $show);
 					$this->nfoCheckMov($release, $echo, $type, $namestatus, $show);
