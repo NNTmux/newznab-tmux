@@ -19,6 +19,8 @@ class NameFixer
 	const PROC_FILES_DONE = 1;
 	const PROC_PAR2_NONE = 0;
 	const PROC_PAR2_DONE = 1;
+	const PROC_SRR_NONE = 0;
+	const PROC_SRR_DONE = 1;
 
 	// Constants for overall rename status
 	const IS_RENAMED_NONE = 0;
@@ -141,9 +143,9 @@ class NameFixer
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->relid = $this->fixed = $this->checked = 0;
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7010, 7020, 8050) GROUP BY rel.id ORDER BY postdate DESC';
+		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 8010, 8020) GROUP BY rel.id ORDER BY postdate DESC';
 		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.id ORDER BY postdate DESC';
-		$this->fullother = ' AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7010, 7020, 8050) GROUP BY rel.id';
+		$this->fullother = ' AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 8010, 8020) GROUP BY rel.id';
 		$this->fullall = '';
 		$this->_fileName = '';
 		$this->done = $this->matched = false;
@@ -297,6 +299,69 @@ class NameFixer
 		}
 	}
 
+	/**
+	 * Attempts to fix release names using the File name.
+	 *
+	 * @param int $time   1: 24 hours, 2: no time limit
+	 * @param boolean $echo   1: change the name, anything else: preview of what could have been changed.
+	 * @param int $cats   1: other categories, 2: all categories
+	 * @param $nameStatus
+	 * @param $show
+	 */
+	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show)
+	{
+		$this->_echoStartMessage($time, 'srr files');
+		$type = 'Srr, ';
+
+		$preId = false;
+		if ($cats === 3) {
+			$query = sprintf('
+					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
+						rf.releaseid AS fileid, rel.id AS releaseid
+					FROM releases rel
+					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
+					WHERE nzbstatus = %d
+					AND prehashid = 0',
+					NZB::NZB_ADDED
+			);
+			$cats = 2;
+			$preId = true;
+		} else {
+			$query = sprintf('
+					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
+						rf.releaseid AS fileid, rel.id AS releaseid
+					FROM releases rel
+					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
+					WHERE (isrenamed = %d OR rel.categoryid IN (%d, %d))
+					AND proc_srr = %d',
+				self::IS_RENAMED_NONE,
+				Category::CAT_MISC_OTHER,
+				Category::CAT_MISC_HASHED,
+				self::PROC_SRR_NONE
+			);
+		}
+
+		$releases = $this->_getReleases($time, $cats, $query);
+		if ($releases instanceof \Traversable && $releases !== false) {
+
+			$total = $releases->rowCount();
+			if ($total > 0) {
+				$this->_totalReleases = $total;
+				echo $this->pdo->log->primary(number_format($total) . ' srr files to process.');
+
+				foreach ($releases as $release) {
+					$this->done = $this->matched = false;
+					$this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
+					$this->checked++;
+					$this->_echoRenamed($show);
+				}
+
+				$this->_echoFoundCount($echo, ' files');
+			} else {
+				echo $this->pdo->log->info('Nothing to fix.');
+			}
+		}
+	}
 	/**
 	 * Attempts to fix release names using the Par2 File.
 	 *
@@ -490,6 +555,13 @@ class NameFixer
 					}
 				}
 
+				if ($type === "Srr, ") {
+					$newName = ucwords($newName);
+					if (preg_match('/(.+?)\.(srr)?$/i', $name, $match)) {
+						$newName = $match[1];
+					}
+				}
+
 				$this->fixed++;
 
 				$newName = explode("\\", $newName);
@@ -555,8 +627,11 @@ class NameFixer
 							case "PreDB FT Exact, ":
 								$status = "isrenamed = 1, iscategorized = 1,";
 								break;
-							case "sorter ":
+							case "sorter, ":
 								$status = "isrenamed = 1, iscategorized = 1, proc_sorter = 1,";
+								break;
+							case "Srr, ":
+								$status = "isrenamed = 1, iscategorized = 1, proc_srr = 1,";
 								break;
 						}
 						$this->pdo->queryExec(
@@ -925,6 +1000,9 @@ class NameFixer
 				case "PAR2, ":
 					$this->fileCheck($release, $echo, $type, $namestatus, $show);
 					break;
+				case "Srr, ":
+					$this->srrCheck($release, $echo, $type, $namestatus, $show);
+					break;
 				case "NFO, ":
 					$this->nfoCheckTV($release, $echo, $type, $namestatus, $show);
 					$this->nfoCheckMov($release, $echo, $type, $namestatus, $show);
@@ -953,6 +1031,9 @@ class NameFixer
 						break;
 					case "PAR2, ":
 						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releaseid']);
+						break;
+					case "Srr, ":
+						$this->_updateSingleColumn('proc_srr', self::PROC_SRR_DONE, $release['releaseid']);
 						break;
 				}
 			}
@@ -1489,6 +1570,26 @@ class NameFixer
 			} else if (preg_match('/\w.+?\.(epub|mobi|azw|opf|fb2|prc|djvu|cb[rz])/i', $release["textstring"], $result)) {
 				$result = str_replace("." . $result["1"], " (" . $result["1"] . ")", $result['0']);
 				$this->updateRelease($release, $result, $method = "fileCheck: EBook", $echo, $type, $namestatus, $show);
+			}
+		}
+	}
+
+	/**
+	 * Look for a name based on srr filename.
+	 *
+	 * @param $release
+	 * @param boolean $echo
+	 * @param string $type
+	 * @param $namestatus
+	 * @param $show
+	 */
+	public function srrCheck($release, $echo, $type, $namestatus, $show)
+	{
+		$result = [];
+
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
+			if (preg_match('/(.+?)\.(srr)$/i', $release["textstring"], $result)) {
+				$this->updateRelease($release, $result["1"], $method = "srrCheck: Srr filename", $echo, $type, $namestatus, $show);
 			}
 		}
 	}

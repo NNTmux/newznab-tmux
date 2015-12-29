@@ -8,6 +8,7 @@ use newznab\ColorCLI;
 use newznab\NameFixer;
 use newznab\NNTP;
 use newznab\NZBContents;
+use newznab\Nfo;
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
@@ -45,7 +46,18 @@ if (!isset($argv[1])) {
 			}
 			$namefixer->checked++;
 		}
-	} else if (isset($pieces[1]) && $pieces[0] == 'md5') {
+	} else if (isset($pieces[1]) && $pieces[0] == 'srr') {
+		$release = $pieces[1];
+		if ($res = $db->queryOneRow(sprintf('SELECT relfiles.name AS textstring, rel.categoryid, rel.searchname, '
+			. 'rel.groupid, relfiles.releaseid AS fileid, rel.id AS releaseid, rel.name FROM releases rel '
+			. 'INNER JOIN release_files relfiles ON (relfiles.releaseid = rel.id) WHERE rel.id = %d', $release))) {
+			$namefixer->done = $namefixer->matched = false;
+			if ($namefixer->checkName($res, true, 'Srr, ', 1, 1) !== true) {
+				echo '.';
+			}
+			$namefixer->checked++;
+		}
+	}else if (isset($pieces[1]) && $pieces[0] == 'md5') {
 		$release = $pieces[1];
 		if ($res = $db->queryOneRow(sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, dehashstatus, rf.name AS filename FROM releases r LEFT JOIN release_files rf ON r.id = rf.releaseid WHERE r.id = %d', $release))) {
 			if (preg_match('/[a-fA-F0-9]{32,40}/i', $res['name'], $matches)) {
