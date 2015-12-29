@@ -84,6 +84,33 @@ if (!isset($argv[1])) {
 				}
 			}
 			break;
+		case $pieces[0] === 'srr' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
+			$releases = $pdo->queryDirect(
+				sprintf('
+								SELECT rf.name AS textstring, rf.releaseid AS fileid,
+									r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid
+								FROM releases r
+								INNER JOIN release_files rf ON r.id = rf.releaseid
+								WHERE r.guid %s
+								AND r.nzbstatus = 1 AND r.proc_srr = 0
+								AND r.prehashid = 0
+								ORDER BY r.postdate ASC
+								LIMIT %s',
+					$pdo->likeString($guidChar, false, true),
+					$maxperrun
+				)
+			);
+
+			if ($releases instanceof Traversable) {
+				foreach ($releases as $release) {
+					$namefixer->done = $namefixer->matched = false;
+					if ($namefixer->checkName($release, true, 'Srr, ', 1, 1) !== true) {
+						echo '.';
+					}
+					$namefixer->checked++;
+				}
+			}
+			break;
 		case $pieces[0] === 'md5' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
