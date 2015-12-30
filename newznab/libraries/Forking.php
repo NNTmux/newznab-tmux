@@ -506,7 +506,7 @@ class Forking extends \fork_daemon
 		}
 		switch($this->workTypeOptions[0]) {
 			case "md5":
-				$join = "LEFT OUTER JOIN release_files rf ON r.id = rf.releaseid AND rf.ishashed = 1";
+				$join = "LEFT OUTER JOIN release_files rf ON (r.id = rf.releaseid) AND rf.ishashed = 1";
 				$where = "r.ishashed = 1 AND r.dehashstatus BETWEEN -6 AND 0";
 				break;
 
@@ -516,12 +516,12 @@ class Forking extends \fork_daemon
 
 			case "filename":
 				$join = "INNER JOIN release_files rf ON (rf.releaseid = r.id)";
-				$where = "r.proc_files = 0 AND r.isrenamed = 0";
+				$where = "r.proc_files = 0 AND (r.isrenamed = 0 OR r.categoryid = 8010)";
 				break;
 
 			case "srr":
 				$join = "INNER JOIN release_files rf ON (rf.releaseid = r.id)";
-				$where = "r.proc_srr = 0 AND r.isrenamed = 0";
+				$where = "r.proc_srr = 0 AND (r.isrenamed = 0 OR r.categoryid IN (8010, 8020))";
 				break;
 
 			case "par2":

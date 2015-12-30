@@ -60,13 +60,15 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'filename' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT rf.name AS textstring, rf.releaseid AS fileid,
-									r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid
+								SELECT rf.name AS textstring, r.categoryid, r.name, r.searchname, r.groupid,
+								rf.releaseid AS fileid, r.id AS releaseid
 								FROM releases r
 								INNER JOIN release_files rf ON (rf.releaseid = r.id)
-								WHERE r.guid %s
-								AND r.nzbstatus = 1 AND r.proc_files = 0
-								AND r.prehashid = 0 AND r.isrenamed = 0
+								WHERE (r.isrenamed = 0 OR r.categoryid = 8010)
+								AND r.nzbstatus = 1
+								AND r.proc_files = 0
+								AND r.prehashid = 0
+								AND r.guid %s
 								ORDER BY r.postdate ASC
 								LIMIT %s',
 					$pdo->likeString($guidChar, false, true),
@@ -87,15 +89,19 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'srr' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT rf.name AS textstring, rf.releaseid AS fileid,
-									r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid
+								SELECT rf.name AS textstring, r.categoryid, r.name, r.searchname, r.groupid,
+								rf.releaseid AS fileid, r.id AS releaseid
 								FROM releases r
 								INNER JOIN release_files rf ON (rf.releaseid = r.id)
-								WHERE r.guid %s
-								AND r.nzbstatus = 1 AND r.proc_srr = 0
-								AND r.prehashid = 0 AND r.isrenamed = 0
+								WHERE (r.isrenamed = 0 OR r.categoryid IN (8010, 8020))
+								AND r.nzbstatus = 1
+								AND r.proc_srr = 0
+								AND r.prehashid = 0
+								AND rf.name %s
+								AND r.guid %s
 								ORDER BY r.postdate ASC
 								LIMIT %s',
+					$pdo->likeString('.srr', true, true),
 					$pdo->likeString($guidChar, false, true),
 					$maxperrun
 				)
