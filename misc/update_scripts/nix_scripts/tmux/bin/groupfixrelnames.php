@@ -23,7 +23,7 @@ if (!isset($argv[1])) {
 	switch (true) {
 		case $pieces[0] === 'nfo' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
-					sprintf('
+				sprintf('
 								SELECT r.id AS releaseid, r.guid, r.groupid, r.categoryid, r.name, r.searchname,
 									uncompress(nfo) AS textstring
 								FROM releases r
@@ -35,9 +35,9 @@ if (!isset($argv[1])) {
 								AND r.prehashid = 0
 								ORDER BY r.postdate DESC
 								LIMIT %s',
-							$pdo->likeString($guidChar, false, true),
-							$maxperrun
-					)
+					$pdo->likeString($guidChar, false, true),
+					$maxperrun
+				)
 			);
 
 			if ($releases instanceof Traversable) {
@@ -59,19 +59,21 @@ if (!isset($argv[1])) {
 			break;
 		case $pieces[0] === 'filename' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
-					sprintf('
-								SELECT rf.name AS textstring, rf.releaseid AS fileid,
-									r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid
+				sprintf('
+								SELECT rf.name AS textstring, r.categoryid, r.name, r.searchname, r.groupid,
+								rf.releaseid AS fileid, r.id AS releaseid
 								FROM releases r
-								INNER JOIN release_files rf ON r.id = rf.releaseid
-								WHERE r.guid %s
-								AND r.nzbstatus = 1 AND r.proc_files = 0
+								INNER JOIN release_files rf ON (rf.releaseid = r.id)
+								WHERE (r.isrenamed = 0 OR r.categoryid = 8010)
+								AND r.nzbstatus = 1
+								AND r.proc_files = 0
 								AND r.prehashid = 0
+								AND r.guid %s
 								ORDER BY r.postdate ASC
 								LIMIT %s',
-							$pdo->likeString($guidChar, false, true),
-							$maxperrun
-					)
+					$pdo->likeString($guidChar, false, true),
+					$maxperrun
+				)
 			);
 
 			if ($releases instanceof Traversable) {
@@ -87,15 +89,19 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'srr' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT rf.name AS textstring, rf.releaseid AS fileid,
-									r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid
+								SELECT rf.name AS textstring, r.categoryid, r.name, r.searchname, r.groupid,
+								rf.releaseid AS fileid, r.id AS releaseid
 								FROM releases r
-								INNER JOIN release_files rf ON r.id = rf.releaseid
-								WHERE r.guid %s
-								AND r.nzbstatus = 1 AND r.proc_srr = 0
+								INNER JOIN release_files rf ON (rf.releaseid = r.id)
+								WHERE (r.isrenamed = 0 OR r.categoryid IN (8010, 8020))
+								AND r.nzbstatus = 1
+								AND r.proc_srr = 0
 								AND r.prehashid = 0
+								AND rf.name %s
+								AND r.guid %s
 								ORDER BY r.postdate ASC
 								LIMIT %s',
+					$pdo->likeString('.srr', true, true),
 					$pdo->likeString($guidChar, false, true),
 					$maxperrun
 				)
@@ -113,7 +119,7 @@ if (!isset($argv[1])) {
 			break;
 		case $pieces[0] === 'md5' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
-					sprintf('
+				sprintf('
 								SELECT DISTINCT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, r.dehashstatus,
 									rf.name AS filename
 								FROM releases r
@@ -124,9 +130,9 @@ if (!isset($argv[1])) {
 								AND r.prehashid = 0
 								ORDER BY r.dehashstatus DESC, r.postdate ASC
 								LIMIT %s',
-							$pdo->likeString($guidChar, false, true),
-							$maxperrun
-					)
+					$pdo->likeString($guidChar, false, true),
+					$maxperrun
+				)
 			);
 
 			if ($releases instanceof Traversable) {
@@ -144,7 +150,7 @@ if (!isset($argv[1])) {
 			break;
 		case $pieces[0] === 'par2' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
-					sprintf('
+				sprintf('
 								SELECT r.id AS releaseid, r.guid, r.groupid
 								FROM releases r
 								WHERE r.guid %s
@@ -153,9 +159,9 @@ if (!isset($argv[1])) {
 								AND r.prehashid = 0
 								ORDER BY r.postdate ASC
 								LIMIT %s',
-							$pdo->likeString($guidChar, false, true),
-							$maxperrun
-					)
+					$pdo->likeString($guidChar, false, true),
+					$maxperrun
+				)
 			);
 
 			if ($releases instanceof Traversable) {
@@ -166,10 +172,10 @@ if (!isset($argv[1])) {
 
 				$Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);
 				$nzbcontents = new NZBContents(
-						array(
-								'Echo' => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,
-								'PostProcess' => new PostProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer])
-						)
+					array(
+						'Echo' => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,
+						'PostProcess' => new PostProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer])
+					)
 				);
 				foreach ($releases as $release) {
 					$res = $nzbcontents->checkPAR2($release['guid'], $release['releaseid'], $release['groupid'], 1, 1);
@@ -181,7 +187,7 @@ if (!isset($argv[1])) {
 			break;
 		case $pieces[0] === 'miscsorter' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
-					sprintf('
+				sprintf('
 								SELECT r.id AS releaseid
 								FROM releases r
 								WHERE r.guid %s
@@ -190,9 +196,9 @@ if (!isset($argv[1])) {
 								AND r.prehashid = 0
 								ORDER BY r.postdate DESC
 								LIMIT %s',
-							$pdo->likeString($guidChar, false, true),
-							$maxperrun
-					)
+					$pdo->likeString($guidChar, false, true),
+					$maxperrun
+				)
 			);
 
 			if ($releases instanceof Traversable) {
@@ -204,7 +210,7 @@ if (!isset($argv[1])) {
 			break;
 		case $pieces[0] === 'predbft' && isset($maxperrun) && is_numeric($maxperrun) && isset($thread) && is_numeric($thread):
 			$pres = $pdo->queryDirect(
-					sprintf('
+				sprintf('
 							SELECT p.id AS prehashid, p.title, p.source, p.searched
 							FROM prehash p
 							WHERE LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"
@@ -213,9 +219,9 @@ if (!isset($argv[1])) {
 							ORDER BY predate ASC
 							LIMIT %s
 							OFFSET %s',
-							$maxperrun,
-							$thread * $maxperrun - $maxperrun
-					)
+					$maxperrun,
+					$thread * $maxperrun - $maxperrun
+				)
 			);
 
 			if ($pres instanceof Traversable) {
