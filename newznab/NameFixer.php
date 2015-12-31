@@ -184,7 +184,7 @@ class NameFixer
 			$query = sprintf('
 					SELECT rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
+					INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.id)
 					WHERE rel.nzbstatus = %d
 					AND rel.prehashid = 0',
 				NZB::NZB_ADDED
@@ -195,7 +195,7 @@ class NameFixer
 			$query = sprintf('
 					SELECT rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
+					INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categoryid = %d)
 					AND rel.proc_nfo = %d',
 				self::IS_RENAMED_NONE,
@@ -219,7 +219,7 @@ class NameFixer
 							SELECT nfo.releaseid AS nfoid, rel.groupid, rel.categoryid, rel.name, rel.searchname,
 								UNCOMPRESS(nfo) AS textstring, rel.id AS releaseid
 							FROM releases rel
-							INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
+							INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.id)
 							WHERE rel.id = %d',
 							$rel['releaseid']
 						)
@@ -277,9 +277,10 @@ class NameFixer
 						rf.releaseid AS fileid, rel.id AS releaseid
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
-					WHERE rel.isrenamed = %d
+					WHERE (rel.isrenamed = %d OR rel.categoryid = %d)
 					AND rel.proc_files = %d',
 				self::IS_RENAMED_NONE,
+				Category::CAT_MISC_OTHER,
 				self::PROC_FILES_NONE
 			);
 		}
@@ -339,10 +340,12 @@ class NameFixer
 					  rf.releaseid AS fileid, rel.id AS releaseid
 					  FROM releases rel
 					  INNER JOIN release_files rf ON (rf.releaseid = rel.id)
-					  WHERE rel.isrenamed = %d
+					  WHERE (rel.isrenamed = %d OR rel.categoryid IN (%d, %d))
 					  AND rf.name %s
 					  AND rel.proc_srr = %d',
 				self::IS_RENAMED_NONE,
+				Category::CAT_MISC_OTHER,
+				Category::CAT_MISC_HASHED,
 				$this->pdo->likeString('.srr', true, true),
 				self::PROC_SRR_NONE
 			);

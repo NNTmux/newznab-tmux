@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../../../config.php';
+require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
@@ -96,12 +96,11 @@ if (!isset($argv[1])) {
 								WHERE (r.isrenamed = 0 OR r.categoryid IN (8010, 8020))
 								AND r.nzbstatus = 1
 								AND r.proc_srr = 0
-								AND r.prehashid = 0
 								AND rf.name %s
 								AND r.guid %s
 								ORDER BY r.postdate ASC
 								LIMIT %s',
-					$pdo->likeString('.srr', true, true),
+					$pdo->likeString('.srr', true, false),
 					$pdo->likeString($guidChar, false, true),
 					$maxperrun
 				)

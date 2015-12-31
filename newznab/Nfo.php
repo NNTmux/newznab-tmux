@@ -401,7 +401,7 @@ class Nfo
 
 		if ($releases instanceof \Traversable) {
 			foreach ($releases as $release) {
-				// remove any release_nfos for failed
+				// remove any releasenfo for failed
 				$this->pdo->queryExec(sprintf('
 					DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d',
 						$release['id']

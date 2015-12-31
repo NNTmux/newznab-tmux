@@ -75,12 +75,12 @@ if (isset($argv[1]) && isset($argv[2]) && $argv[2] == "fmyisam") {
 	$tables = $pdo->query($sql);
 	foreach ($tables as $row) {
 		$tbl = $row['name'];
-		if ($tbl !== 'release_nfos' && $tbl !== 'releasesearch' && $tbl !== 'bookinfo' && $tbl !== 'consoleinfo' && $tbl !== 'musicinfo') {
+		if ($tbl !== 'releasenfo' && $tbl !== 'releasesearch' && $tbl !== 'bookinfo' && $tbl !== 'consoleinfo' && $tbl !== 'musicinfo') {
 			printf($cli->header("Converting $tbl"));
 			$pdo->queryExec("ALTER TABLE $tbl ENGINE=INNODB ROW_FORMAT=COMPRESSED");
 		}
 	}
-	$sql = 'SHOW TABLE STATUS WHERE Name = "release_nfos" AND (Engine != "InnoDB" || Row_format != "Dynamic")';
+	$sql = 'SHOW TABLE STATUS WHERE Name = "releasenfo" AND (Engine != "InnoDB" || Row_format != "Dynamic")';
 	$tables = $pdo->query($sql);
 	foreach ($tables as $row) {
 		$tbl = $row['name'];
@@ -103,12 +103,12 @@ if (isset($argv[1]) && isset($argv[2]) && $argv[2] == "fmyisam") {
 	$tables = $pdo->query($sql);
 	foreach ($tables as $row) {
 		$tbl = $row['name'];
-		if ($tbl !== 'release_nfos' && $tbl !== 'releasesearch' && $tbl !== 'bookinfo' && $tbl !== 'consoleinfo' && $tbl !== 'musicinfo' && !preg_match('/parts/', $tbl)) {
+		if ($tbl !== 'releasenfo' && $tbl !== 'releasesearch' && $tbl !== 'bookinfo' && $tbl !== 'consoleinfo' && $tbl !== 'musicinfo' && !preg_match('/parts/', $tbl)) {
 			printf($cli->header("Converting $tbl"));
 			$pdo->queryExec("ALTER TABLE $tbl ENGINE=INNODB ROW_FORMAT=COMPRESSED");
 		}
 	}
-	$sql = 'SHOW TABLE STATUS WHERE Name = "release_nfos" AND (Engine != "InnoDB" || Row_format != "Dynamic")';
+	$sql = 'SHOW TABLE STATUS WHERE Name = "releasenfo" AND (Engine != "InnoDB" || Row_format != "Dynamic")';
 	$tables = $pdo->query($sql);
 	foreach ($tables as $row) {
 		$tbl = $row['name'];
@@ -171,10 +171,10 @@ if (isset($argv[1]) && isset($argv[2]) && $argv[2] == "fmyisam") {
 		. "                                                                                 This will use much more space than dynamic.\n"
 		. "php convert_mysql_tables.php dinnodb                                        ...: Converts all the tables to InnoDB Dynamic. This is recommended when the total data and indexes can fit into the innodb_buffer_pool.\n"
 		. "                                                                                 NB if your innodb version < 5.6 bookinfo / consoleinfo / musicinfo / releasesearch will not be converted as fulltext indexes are not supported.\n"
-		. "php convert_mysql_tables.php cinnodb                                        ...: Converts all the tables to InnoDB Compressed. All tables except release_nfos will be converted to Compressed row format.\n"
+		. "php convert_mysql_tables.php cinnodb                                        ...: Converts all the tables to InnoDB Compressed. All tables except releasenfo will be converted to Compressed row format.\n"
 		. "                                                                                 This is recommended when the total data and indexes can not fit into the innodb_buffer_pool using DYNAMIC row format.\n"
 		. "                                                                                 NB if your innodb version < 5.6 bookinfo / consoleinfo / musicinfo / releasesearch will not be converted as fulltext indexes are not supported.\n"
-		. "php convert_mysql_tables.php cinnodb-noparts                                ...: Converts all the tables to InnoDB Compressed. All tables except parts and release_nfos will be converted to Compressed row format.\n"
+		. "php convert_mysql_tables.php cinnodb-noparts                                ...: Converts all the tables to InnoDB Compressed. All tables except parts and releasenfo will be converted to Compressed row format.\n"
 		. "                                                                                 Alls parts* will be converted to MyISAM Dynamic. This is recommended when using Table Per Group.\n"
 		. "                                                                                 NB if your innodb version < 5.6 bookinfo / consoleinfo / musicinfo / releasesearch will not be converted as fulltext indexes are not supported.\n"
 		. "php convert_mysql_tables.php collections                                    ...: Converts collections, binaries, parts to MyIsam.\n"

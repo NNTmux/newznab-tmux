@@ -296,7 +296,7 @@ if (isset($argv[1]) && ($argv[1] === "xxx" || $argv[1] === "all")) {
 if (isset($argv[1]) && ($argv[1] === "nfos" || $argv[1] === "all")) {
 	$ran = true;
 	if (isset($argv[3]) && $argv[3] === "truncate") {
-		$pdo->queryExec("TRUNCATE TABLE release_nfos");
+		$pdo->queryExec("TRUNCATE TABLE releasenfo");
 	}
 	if (isset($argv[2]) && $argv[2] === "true") {
 		echo $pdo->log->header("Resetting all NFO postprocessing");
