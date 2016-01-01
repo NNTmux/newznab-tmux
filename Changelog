@@ -1,3 +1,5 @@
+2016-01-01 DariusIII
+	Fix: Fix threaded filename and srr matching, switch tmux back to threaded matching.
 2015-12-31 DariusIII
 	Fix: Fix wrong table name, switch to non-threaded version of fixReleaseNames script for filenames and srr matching.
 2015-12-30 DariusIII
