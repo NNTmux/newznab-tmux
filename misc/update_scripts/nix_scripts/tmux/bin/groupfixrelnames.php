@@ -58,63 +58,10 @@ if (!isset($argv[1])) {
 			}
 			break;
 		case $pieces[0] === 'filename' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
-			$releases = $pdo->queryDirect(
-				sprintf('
-								SELECT rf.name AS textstring, r.categoryid, r.name, r.searchname, r.groupid,
-								rf.releaseid AS fileid, r.id AS releaseid
-								FROM releases r
-								INNER JOIN release_files rf ON (rf.releaseid = r.id)
-								WHERE (r.isrenamed = 0 OR r.categoryid = 8010)
-								AND r.nzbstatus = 1
-								AND r.proc_files = 0
-								AND r.prehashid = 0
-								AND r.guid %s
-								ORDER BY r.postdate ASC
-								LIMIT %s',
-					$pdo->likeString($guidChar, false, true),
-					$maxperrun
-				)
-			);
-
-			if ($releases instanceof Traversable) {
-				foreach ($releases as $release) {
-					$namefixer->done = $namefixer->matched = false;
-					if ($namefixer->checkName($release, true, 'Filenames, ', 1, 1) !== true) {
-						echo '.';
-					}
-					$namefixer->checked++;
-				}
-			}
+			$namefixer->fixNamesWithFiles(1, 1, 1, 1, 1, $guidChar, $maxperrun);
 			break;
 		case $pieces[0] === 'srr' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
-			$releases = $pdo->queryDirect(
-				sprintf('
-								SELECT rf.name AS textstring, r.categoryid, r.name, r.searchname, r.groupid,
-								rf.releaseid AS fileid, r.id AS releaseid
-								FROM releases r
-								INNER JOIN release_files rf ON (rf.releaseid = r.id)
-								WHERE (r.isrenamed = 0 OR r.categoryid IN (8010, 8020))
-								AND r.nzbstatus = 1
-								AND r.proc_srr = 0
-								AND rf.name %s
-								AND r.guid %s
-								ORDER BY r.postdate ASC
-								LIMIT %s',
-					$pdo->likeString('.srr', true, false),
-					$pdo->likeString($guidChar, false, true),
-					$maxperrun
-				)
-			);
-
-			if ($releases instanceof Traversable) {
-				foreach ($releases as $release) {
-					$namefixer->done = $namefixer->matched = false;
-					if ($namefixer->checkName($release, true, 'Srr, ', 1, 1) !== true) {
-						echo '.';
-					}
-					$namefixer->checked++;
-				}
-			}
+			$namefixer->fixNamesWithSrr(1, 1, 1, 1, 1, $guidChar, $maxperrun);
 			break;
 		case $pieces[0] === 'md5' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(

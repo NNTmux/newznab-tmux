@@ -253,10 +253,14 @@ class NameFixer
 	 * @param         $nameStatus
 	 * @param         $show
 	 */
-	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show)
+	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
-		$this->_echoStartMessage($time, 'file names');
 		$type = 'Filenames, ';
+		$guid = ($guidChar === '') ? '' : ('AND rel.guid '. $this->pdo->likeString($guidChar, false, true));
+		$queryLimit = ($limit === '') ? '' : $limit;
+		if ($guid === '') {
+			$this->_echoStartMessage($time, 'file names');
+		}
 
 		$preId = false;
 		if ($cats === 3) {
@@ -278,20 +282,24 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categoryid = %d)
-					AND rel.proc_files = %d',
+					AND rel.proc_files = %d
+					%s',
 				self::IS_RENAMED_NONE,
 				Category::CAT_MISC_OTHER,
-				self::PROC_FILES_NONE
+				self::PROC_FILES_NONE,
+				$guid
 			);
 		}
 
-		$releases = $this->_getReleases($time, $cats, $query);
+		$releases = $this->_getReleases($time, $cats, $query, $queryLimit);
 		if ($releases instanceof \Traversable && $releases !== false) {
 
 			$total = $releases->rowCount();
 			if ($total > 0) {
 				$this->_totalReleases = $total;
-				echo $this->pdo->log->primary(number_format($total) . ' file names to process.');
+				if ($guid === '') {
+					echo $this->pdo->log->primary(number_format($total) . ' file names to process.');
+				}
 
 				foreach ($releases as $release) {
 					$this->done = $this->matched = false;
@@ -301,8 +309,10 @@ class NameFixer
 				}
 
 				$this->_echoFoundCount($echo, ' files');
-			} else {
+			} elseif ($guid === '') {
 				echo $this->pdo->log->info('Nothing to fix.');
+			} else {
+				echo '.';
 			}
 		}
 	}
@@ -315,11 +325,17 @@ class NameFixer
 	 * @param int     $cats 1: other categories, 2: all categories
 	 * @param         $nameStatus
 	 * @param         $show
+	 * @param string  $guidChar
+	 * @param string  $limit
 	 */
-	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show)
+	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
-		$this->_echoStartMessage($time, 'srr files');
 		$type = 'Srr, ';
+		$guid = ($guidChar === '') ? '' : ('AND rel.guid '. $this->pdo->likeString($guidChar, false, true));
+		$queryLimit = ($limit === '') ? '' : $limit;
+		if ($guid === '') {
+			$this->_echoStartMessage($time, 'srr files');
+		}
 
 		$preId = false;
 		if ($cats === 3) {
@@ -342,22 +358,26 @@ class NameFixer
 					  INNER JOIN release_files rf ON (rf.releaseid = rel.id)
 					  WHERE (rel.isrenamed = %d OR rel.categoryid IN (%d, %d))
 					  AND rf.name %s
-					  AND rel.proc_srr = %d',
+					  AND rel.proc_srr = %d
+					  %s',
 				self::IS_RENAMED_NONE,
 				Category::CAT_MISC_OTHER,
 				Category::CAT_MISC_HASHED,
-				$this->pdo->likeString('.srr', true, true),
-				self::PROC_SRR_NONE
+				$this->pdo->likeString('.srr', true, false),
+				self::PROC_SRR_NONE,
+				$guid
 			);
 		}
 
-		$releases = $this->_getReleases($time, $cats, $query);
+		$releases = $this->_getReleases($time, $cats, $query, $queryLimit);
 		if ($releases instanceof \Traversable && $releases !== false) {
 
 			$total = $releases->rowCount();
 			if ($total > 0) {
 				$this->_totalReleases = $total;
-				echo $this->pdo->log->primary(number_format($total) . ' srr files to process.');
+				if ($guid === '') {
+					echo $this->pdo->log->primary(number_format($total) . ' srr files to process.');
+				}
 
 				foreach ($releases as $release) {
 					$this->done = $this->matched = false;
@@ -367,8 +387,10 @@ class NameFixer
 				}
 
 				$this->_echoFoundCount($echo, ' files');
-			} else {
+			} elseif ($guid === '') {
 				echo $this->pdo->log->info('Nothing to fix.');
+			} else {
+				echo '.';
 			}
 		}
 	}
@@ -447,27 +469,30 @@ class NameFixer
 	 * @param int    $cats  1: other categories, 2: all categories
 	 * @param string $query Query to execute.
 	 *
-	 * @return \PDOStatement|bool False on failure, PDOStatement with query results on success.
+	 * @param string $limit
+	 *
+	 * @return bool|\PDOStatement False on failure, PDOStatement with query results on success.
 	 */
-	protected function _getReleases($time, $cats, $query)
+	protected function _getReleases($time, $cats, $query, $limit = '')
 	{
 		$releases = false;
+		$queryLimit = ($limit === '') ? '' : ' LIMIT ' . $limit;
 		// 24 hours, other cats
 		if ($time == 1 && $cats == 1) {
 			//echo $this->pdo->log->header($query . $this->timeother . ";\n");
-			$releases = $this->pdo->queryDirect($query . $this->timeother);
+			$releases = $this->pdo->queryDirect($query . $this->timeother . $queryLimit);
 		} // 24 hours, all cats
 		else if ($time == 1 && $cats == 2) {
 			//echo $this->pdo->log->header($query . $this->timeall . ";\n");
-			$releases = $this->pdo->queryDirect($query . $this->timeall);
+			$releases = $this->pdo->queryDirect($query . $this->timeall . $queryLimit);
 		} //other cats
 		else if ($time == 2 && $cats == 1) {
 			//echo $this->pdo->log->header($query . $this->fullother . ";\n");
-			$releases = $this->pdo->queryDirect($query . $this->fullother);
+			$releases = $this->pdo->queryDirect($query . $this->fullother . $queryLimit);
 		} // all cats
 		else if ($time == 2 && $cats == 2) {
 			//echo $this->pdo->log->header($query . $this->fullall . ";\n");
-			$releases = $this->pdo->queryDirect($query . $this->fullall);
+			$releases = $this->pdo->queryDirect($query . $this->fullall . $queryLimit);
 		}
 
 		return $releases;

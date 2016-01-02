@@ -1,3 +1,5 @@
+2016-01-02 DariusIII
+	Fix: srr and filename threaded renaming
 2015-12-31 DariusIII
 	Fix: Fix wrong table name, switch to non-threaded version of fixReleaseNames script for filenames and srr matching.
 2015-12-30 DariusIII
