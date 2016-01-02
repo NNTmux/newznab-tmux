@@ -326,7 +326,7 @@ class NameFixer
 	{
 		$this->_echoStartMessage($time, 'srr files');
 		$type = 'Srr, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.guid '. $this->pdo->likeString($guidChar, true, false));
+		$guid = ($guidChar === '') ? '' : ('AND rel.guid '. $this->pdo->likeString($guidChar, false, true));
 		$queryLimit = ($limit === '') ? '' : $limit;
 
 		$preId = false;
@@ -377,8 +377,10 @@ class NameFixer
 				}
 
 				$this->_echoFoundCount($echo, ' files');
-			} else {
+			} elseif ($guid === '') {
 				echo $this->pdo->log->info('Nothing to fix.');
+			} else {
+				echo '.';
 			}
 		}
 	}
