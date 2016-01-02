@@ -255,10 +255,12 @@ class NameFixer
 	 */
 	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
-		$this->_echoStartMessage($time, 'file names');
 		$type = 'Filenames, ';
 		$guid = ($guidChar === '') ? '' : ('AND rel.guid '. $this->pdo->likeString($guidChar, false, true));
 		$queryLimit = ($limit === '') ? '' : $limit;
+		if ($guid === '') {
+			$this->_echoStartMessage($time, 'file names');
+		}
 
 		$preId = false;
 		if ($cats === 3) {
@@ -295,7 +297,9 @@ class NameFixer
 			$total = $releases->rowCount();
 			if ($total > 0) {
 				$this->_totalReleases = $total;
-				echo $this->pdo->log->primary(number_format($total) . ' file names to process.');
+				if ($guid === '') {
+					echo $this->pdo->log->primary(number_format($total) . ' file names to process.');
+				}
 
 				foreach ($releases as $release) {
 					$this->done = $this->matched = false;
@@ -326,10 +330,12 @@ class NameFixer
 	 */
 	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
-		$this->_echoStartMessage($time, 'srr files');
 		$type = 'Srr, ';
 		$guid = ($guidChar === '') ? '' : ('AND rel.guid '. $this->pdo->likeString($guidChar, false, true));
 		$queryLimit = ($limit === '') ? '' : $limit;
+		if ($guid === '') {
+			$this->_echoStartMessage($time, 'srr files');
+		}
 
 		$preId = false;
 		if ($cats === 3) {
@@ -369,7 +375,9 @@ class NameFixer
 			$total = $releases->rowCount();
 			if ($total > 0) {
 				$this->_totalReleases = $total;
-				echo $this->pdo->log->primary(number_format($total) . ' srr files to process.');
+				if ($guid === '') {
+					echo $this->pdo->log->primary(number_format($total) . ' srr files to process.');
+				}
 
 				foreach ($releases as $release) {
 					$this->done = $this->matched = false;
