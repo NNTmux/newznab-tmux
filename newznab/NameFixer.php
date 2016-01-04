@@ -252,6 +252,8 @@ class NameFixer
 	 * @param int     $cats 1: other categories, 2: all categories
 	 * @param         $nameStatus
 	 * @param         $show
+	 * @param string  $guidChar
+	 * @param string  $limit
 	 */
 	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
