@@ -1,3 +1,5 @@
+2016-01-04 DariusIII
+	Chg: Move frontend to templates dir, adjust Page to accomodate settings from BasePage (moved the template settings to Page)
 2016-01-02 DariusIII
 	Fix: Fix wrong likeString usage in NameFixer
 2016-01-01 DariusIII

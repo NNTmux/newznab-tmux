@@ -14,12 +14,14 @@ class AdminPage extends BasePage
 	{
 		parent::__construct();
 
-		$tplpaths = [];
-		if ($this->settings->getSetting('style') != "default")
-			$tplpaths["style_admin"] = NN_THEMES.'shared/templates/admin';
-		$tplpaths["admin"] = NN_THEMES.'shared/templates/admin';
-		$tplpaths["frontend"] = NN_WWW.'themes/Omicron/templates/frontend';
-		$this->smarty->setTemplateDir($tplpaths);
+		// Tell Smarty which directories to use for templates
+		$this->smarty->setTemplateDir(
+			[
+				'admin' 	=> NN_THEMES . 'shared/templates/admin',
+				'shared' 	=> NN_THEMES . 'shared/templates',
+				'default' 	=> NN_THEMES . 'Omicron/templates'
+			]
+		);
 
 		if (!$this->users->isLoggedIn() || !isset($this->userdata["role"]) || $this->userdata["role"] != Users::ROLE_ADMIN)
 			$this->show403(true);

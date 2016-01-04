@@ -18,6 +18,15 @@ class Page extends BasePage
 	{
 		parent::__construct();
 
+		// Tell Smarty which directories to use for templates
+		$this->smarty->setTemplateDir(
+			[
+				'user' 		=> NN_THEMES . $this->theme . '/templates',
+				'shared' 	=> NN_THEMES . 'shared/templates',
+				'default' 	=> NN_THEMES . 'Omicron/templates'
+			]
+		);
+
 		$role = Users::ROLE_GUEST;
 		if ($this->userdata != null)
 			$role = $this->userdata["role"];
