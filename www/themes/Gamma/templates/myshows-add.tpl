@@ -2,11 +2,8 @@
 	<h1>Add to category</h1>
 </div>
 <h3>{$type|ucwords} {$show.title|escape:"htmlall"} in</h3>
-
-
 <form class="form-horizontal" id="myshows" action="{$smarty.const.WWW_TOP}/myshows/do{$type}" method="post">
 	<input type="hidden" name="subpage" value="{$rid}" />
-	
 	<div class="control-group">
 		<label class="control-label" for="category">Choose</label>
 		<div class="controls">

@@ -117,12 +117,10 @@
 	<li class="dropdown">
 		<a id="drop{$parentcat.id}" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop{$parentcat.id}">
-
 			{if ($parentcat.id == 7000 && $userdata.bookview=="1")}
 				<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/books">Books</a></li>
 				<li class="divider"></li>
 			{/if}
-
 			{foreach from=$parentcat.subcatlist item=subcat}
 			{if ($subcat.id == 8010)}
 			<li class="divider"></li>
@@ -157,5 +155,3 @@
 		</form>
 	</li>
 </ul>
-
-

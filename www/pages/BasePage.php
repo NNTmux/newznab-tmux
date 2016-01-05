@@ -82,8 +82,7 @@ class BasePage
 	 *
 	 * @var string
 	 */
-	private $theme = 'Omicron';
-
+	protected $theme = 'Omicron';
 
 	/**
 	 * Set up session / smarty / user variables.
@@ -129,14 +128,6 @@ class BasePage
 			$this->smarty->assign('ismod', 'false');
 			$this->smarty->assign('loggedin', 'false');
 		}
-
-		// Tell Smarty which directories to use for templates
-		$this->smarty->setTemplateDir(
-			[
-				'user_frontend' => NN_THEMES . $this->theme . '/templates/frontend',
-				'frontend'      => NN_THEMES . 'Omicron/templates/frontend'
-			]
-		);
 
 		$this->smarty->assign('theme', $this->theme);
 		$this->smarty->assign('site', $this->settings);
