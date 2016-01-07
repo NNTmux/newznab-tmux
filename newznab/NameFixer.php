@@ -320,79 +320,72 @@ class NameFixer
 	}
 
 	/**
-	 * Attempts to fix release names using the File name.
+	 * Attempts to fix release names using the SRR File data.
 	 *
-	 * @param int     $time 1: 24 hours, 2: no time limit
-	 * @param boolean $echo 1: change the name, anything else: preview of what could have been changed.
-	 * @param int     $cats 1: other categories, 2: all categories
-	 * @param         $nameStatus
-	 * @param         $show
-	 * @param string  $guidChar
-	 * @param string  $limit
+	 * @param int $time   1: 24 hours, 2: no time limit
+	 * @param int $echo   1: change the name, anything else: preview of what could have been changed.
+	 * @param int $cats   1: other categories, 2: all categories
+	 * @param $nameStatus
+	 * @param $show
+	 * @param NNTP $nntp
 	 */
-	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
+	public function fixNamesWithSRR($time, $echo, $cats, $nameStatus, $show, $nntp)
 	{
-		$type = 'Srr, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.guid '. $this->pdo->likeString($guidChar, false, true));
-		$queryLimit = ($limit === '') ? '' : $limit;
-		if ($guid === '') {
-			$this->_echoStartMessage($time, 'srr files');
-		}
+		$this->_echoStartMessage($time, 'SRR files');
 
-		$preId = false;
 		if ($cats === 3) {
 			$query = sprintf('
-					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
-						rf.releaseid AS fileid, rel.id AS releaseid
+					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
-					WHERE rel.nzbstatus = %d
-					AND rel.prehashid = 0',
+					WHERE nzbstatus = %d
+					AND prehashid = 0',
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
-			$preId = true;
 		} else {
 			$query = sprintf('
-					  SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
-					  rf.releaseid AS fileid, rel.id AS releaseid
-					  FROM releases rel
-					  INNER JOIN release_files rf ON (rf.releaseid = rel.id)
-					  WHERE (rel.isrenamed = %d OR rel.categoryid IN (%d, %d))
-					  AND rf.name %s
-					  AND rel.proc_srr = %d
-					  %s',
+					SELECT rel.id AS releaseid, rel.guid, rel.groupid
+					FROM releases rel
+					WHERE (rel.isrenamed = %d OR rel.categoryid IN (%s))
+					AND prehashid = 0
+					AND proc_srr = %d',
 				self::IS_RENAMED_NONE,
-				Category::CAT_MISC_OTHER,
-				Category::CAT_MISC_HASHED,
-				$this->pdo->likeString('.srr', true, false),
-				self::PROC_SRR_NONE,
-				$guid
+				implode(',', Category::CAT_GROUP_OTHER),
+				self::PROC_SRR_NONE
 			);
 		}
 
-		$releases = $this->_getReleases($time, $cats, $query, $queryLimit);
+		$releases = $this->_getReleases($time, $cats, $query);
+
 		if ($releases instanceof \Traversable && $releases !== false) {
 
 			$total = $releases->rowCount();
 			if ($total > 0) {
 				$this->_totalReleases = $total;
-				if ($guid === '') {
-					echo $this->pdo->log->primary(number_format($total) . ' srr files to process.');
-				}
+
+				echo $this->pdo->log->primary(number_format($total) . ' releases to process.');
+				$Nfo = new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
+				$nzbContents = new NZBContents(
+					[
+						'Echo'        => $this->echooutput,
+						'NNTP'        => $nntp,
+						'Nfo'         => $Nfo,
+						'Settings'    => $this->pdo,
+						'PostProcess' => new PostProcess(['Settings' => $this->pdo, 'Nfo' => $Nfo])
+					]
+				);
 
 				foreach ($releases as $release) {
-					$this->done = $this->matched = false;
-					$this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
+					if (($nzbContents->checkSRR($release['guid'], $release['releaseid'], $nameStatus, $show)) === true) {
+						$this->fixed++;
+					}
+
 					$this->checked++;
 					$this->_echoRenamed($show);
 				}
-
 				$this->_echoFoundCount($echo, ' files');
-			} elseif ($guid === '') {
-				echo $this->pdo->log->info('Nothing to fix.');
 			} else {
-				echo '.';
+				echo $this->pdo->log->alternate('Nothing to fix.');
 			}
 		}
 	}
@@ -846,7 +839,6 @@ class NameFixer
 							INNER JOIN release_files rf ON r.id = rf.releaseid
 							AND rf.name IS NOT NULL
 							WHERE r.prehashid = 0
-							GROUP BY r.id
 							%s %s',
 				$orderby,
 				$limit
