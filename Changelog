@@ -1,4 +1,5 @@
 2016-01-08 DariusIII
+	Fix: Fix xxx modal in Gamma template
 	Upd: Improve filename matching function in NameFixer
 2016-01-06 DariusIII
 	Upd: Update the srr renaming functions.
