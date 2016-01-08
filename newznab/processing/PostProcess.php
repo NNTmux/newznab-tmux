@@ -12,7 +12,6 @@ use newznab\Music;
 use newznab\NameFixer;
 use newznab\Nfo;
 use newznab\Sharing;
-//use newznab\processing\tv\TvRage;
 use newznab\processing\tv\TVDB;
 use newznab\processing\tv\TVMaze;
 use newznab\processing\tv\TMDB;
@@ -23,7 +22,7 @@ use newznab\db\Settings;
 use newznab\processing\post\AniDB;
 use newznab\processing\post\ProcessAdditional;
 use newznab\SpotNab;
-use newznab\utility;
+use newznab\utility\Utility;
 
 require_once NN_LIBS . 'rarinfo/par2info.php';
 require_once NN_LIBS . 'rarinfo/srrinfo.php';
@@ -116,7 +115,6 @@ class PostProcess
 		$this->pdo = (($options['Settings'] instanceof Settings) ? $options['Settings'] : new Settings());
 		$this->groups = (($options['Groups'] instanceof Groups) ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
 		$this->_par2Info = new \Par2Info();
-		$this->_srrInfo = new \SrrInfo();
 		$this->debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
 		$this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
 		$this->Nfo = (($options['Nfo'] instanceof Nfo) ? $options['Nfo'] : new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
@@ -465,6 +463,9 @@ class PostProcess
 	 */
 	public function parseSRR($messageID, $relID, &$nntp, $show)
 	{
+		$this->_srrInfo = new \SrrInfo();
+		$foundMatch = false;
+
 		if ($messageID === '') {
 			return false;
 		}
@@ -479,9 +480,8 @@ class PostProcess
 				FROM releases r
 				LEFT JOIN groups g ON r.groupid = g.id
 				WHERE r.isrenamed = 0
-				AND r.categoryid IN (%s)
+				AND r.prehashid = 0
 				AND r.id = %d',
-				implode(',', Category::CAT_GROUP_OTHER),
 				$relID
 			)
 		);
@@ -492,32 +492,49 @@ class PostProcess
 
 		// Get the SRR file.
 		$srr = $nntp->getMessages($query['groupname'], $messageID, $this->alternateNNTP);
+
 		if ($nntp->isError($srr)) {
-			echo "Couldn't connect to usenet, dummy";
+			if ($srr->getMessage() === 'No such article found') {
+				$this->pdo->log->doEcho($this->pdo->log->primaryOver('f'));
+			}
 			return false;
 		}
 
 		// Put the SRR into SrrInfo, check if there's an error.
 		$this->_srrInfo->setData($srr);
 		if ($this->_srrInfo->error) {
+			$this->pdo->log->doEcho($this->pdo->log->primaryOver("-"));
 			return false;
 		}
 
 		// Get the file list from SrrInfo.
 		$summary = $this->_srrInfo->getSummary();
-		var_dump($summary);
 		if ($summary !== false && empty($summary['error'])) {
-			$foundName = false;
-			// Try to get a new name.
-			$query['textstring'] = $summary['file_name'];
-			if ($this->nameFixer->checkName($query, 1, 'SRR, ', 1, $show) === true) {
-				$foundName = true;
-			}
+			$this->pdo->log->doEcho($this->pdo->log->primaryOver("+"));
 
-			if ($foundName === true) {
-				return true;
+			// Try to get a Pre Match by the OSO release name.
+			if (isset($summary['oso_info']['name']) && !empty($summary['oso_info']['name'])) {
+				$query['textstring'] = $summary['oso_info']['name'];
+				$foundMatch = $this->nameFixer->checkName($query, 1, 'SRR, ', 1, $show, true);
+			}
+			// Loop through the stored files in the SRR and try to get a Pre Match
+			if ($foundMatch === false && is_array($summary['stored_files']) && !empty($summary['stored_files'])) {
+				foreach ($summary['stored_files'] AS $storedFile) {
+					if ($foundMatch === true) {
+						break;
+					} else if (isset($storedFile['name']) && !empty($storedFile['name'])) {
+						$query['textstring'] = Utility::cutStringUsingLast('.', $storedFile['name'], 'left', false);
+						$foundMatch = $this->nameFixer->checkName($query, 1, 'SRR, ', 1, $show, true);
+					}
+				}
+			}
+			// This field is rarely populated but worth a shot for a rename
+			if ($foundMatch === false && isset($summary['file_name']) && !empty($summary['file_name'])) {
+				$query['textstring'] = Utility::cutStringUsingLast('.', $summary['file_name'], 'left', false);
+				$foundMatch = $this->nameFixer->checkName($query, 1, 'SRR, ', 1, $show, true);
 			}
 		}
-		return false;
+		unset($this->_srrInfo);
+		return $foundMatch;
 	}
 }

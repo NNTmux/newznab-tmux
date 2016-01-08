@@ -482,20 +482,28 @@ class NameFixer
 		$queryLimit = ($limit === '') ? '' : ' LIMIT ' . $limit;
 		// 24 hours, other cats
 		if ($time == 1 && $cats == 1) {
-			//echo $this->pdo->log->header($query . $this->timeother . ";\n");
-			$releases = $this->pdo->queryDirect($query . $this->timeother . $queryLimit);
+			$queryTime = $this->timeother;
 		} // 24 hours, all cats
 		else if ($time == 1 && $cats == 2) {
-			//echo $this->pdo->log->header($query . $this->timeall . ";\n");
-			$releases = $this->pdo->queryDirect($query . $this->timeall . $queryLimit);
+			$queryTime = $this->timeall;
 		} //other cats
 		else if ($time == 2 && $cats == 1) {
-			//echo $this->pdo->log->header($query . $this->fullother . ";\n");
-			$releases = $this->pdo->queryDirect($query . $this->fullother . $queryLimit);
-		} // all cats
+			$queryTime = $this->fullother;
+		}
+		// all cats
 		else if ($time == 2 && $cats == 2) {
-			//echo $this->pdo->log->header($query . $this->fullall . ";\n");
-			$releases = $this->pdo->queryDirect($query . $this->fullall . $queryLimit);
+			$queryTime = $this->fullall;
+		}
+
+		if (isset($queryTime)) {
+			$query .= $queryTime;
+			// Remove GROUP BY if it exists for filename based renames
+			if (strpos($query, 'proc_files') !== false) {
+				$query = str_replace('GROUP BY r.id', '', $query);
+			}
+			echo $this->pdo->log->header("{$query};\n");
+
+			$releases = $this->pdo->queryDirect($query . $queryLimit);
 		}
 
 		return $releases;
