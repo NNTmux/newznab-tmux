@@ -152,9 +152,9 @@
 													<tr>
 														<td id="guid{$mguid[$m@index]}">
 															<label>
-																<input type="checkbox"
-																	   class="nzb_check"
-																	   value="{$mguid[$m@index]}" id="chksingle"/>
+															<input type="checkbox"
+																   class="nzb_check"
+																   value="{$mguid[$m@index]}" id="chksingle"/>
 															</label>
 															<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
 																	<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
@@ -191,10 +191,10 @@
 															{/if}
 															<div>
 																<a role="button" class="btn btn-default btn-xs"
-																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}|escape:"htmlall"}"><i
-																		class="fa fa-cloud-download"></i><span
-																		class="badge">{$mgrabs[$m@index]}
-																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
+																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
+																			class="fa fa-cloud-download"></i><span
+																			class="badge">{$mgrabs[$m@index]}
+																		Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																<a role="button" class="btn btn-default btn-xs"
 																   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}#comments"><i
 																			class="fa fa-comment-o"></i><span

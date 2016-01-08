@@ -174,10 +174,10 @@
 															{/if}
 															<div>
 																<a role="button" class="btn btn-default btn-xs"
-																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}|escape:"htmlall"}"><i
-																		class="fa fa-cloud-download"></i><span
-																		class="badge">{$mgrabs[$m@index]}
-																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
+																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
+																			class="fa fa-cloud-download"></i><span
+																			class="badge">{$mgrabs[$m@index]}
+																		Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																<a role="button" class="btn btn-default btn-xs"
 																   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}#comments"><i
 																			class="fa fa-comment-o"></i><span
