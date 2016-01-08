@@ -1866,7 +1866,7 @@ CREATE TABLE IF NOT EXISTS releases (
   proc_par2 TINYINT(1) NOT NULL DEFAULT '0',
   proc_nfo TINYINT(1) NOT NULL DEFAULT '0',
   proc_files TINYINT(1) NOT NULL DEFAULT '0',
-  proc_srr TINYINT(1) NOT NULL DEFAULT '0',
+  proc_srr TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Has the release been SRR processed?',
   gamesinfo_id INT(10) NOT NULL DEFAULT '0',
   xxxinfo_id INT(10) NOT NULL DEFAULT '0',
   proc_sorter TINYINT(1) NOT NULL DEFAULT '0',

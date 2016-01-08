@@ -26,6 +26,7 @@ use newznab\SpotNab;
 use newznab\utility;
 
 require_once NN_LIBS . 'rarinfo/par2info.php';
+require_once NN_LIBS . 'rarinfo/srrinfo.php';
 
 class PostProcess
 {
@@ -51,6 +52,11 @@ class PostProcess
 	 * @var \Par2Info
 	 */
 	protected $_par2Info;
+
+	/**
+	 * @var \srrInfo
+	 */
+	protected $_srrInfo;
 
 	/**
 	 * Use alternate NNTP provider when download fails?
@@ -93,13 +99,13 @@ class PostProcess
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-				'Echo'         => true,
-				'Logger'       => null,
-				'Groups'       => null,
-				'NameFixer'    => null,
-				'Nfo'          => null,
-				'ReleaseFiles' => null,
-				'Settings'     => null,
+			'Echo'         => true,
+			'Logger'       => null,
+			'Groups'       => null,
+			'NameFixer'    => null,
+			'Nfo'          => null,
+			'ReleaseFiles' => null,
+			'Settings'     => null,
 		];
 		$options += $defaults;
 
@@ -110,6 +116,7 @@ class PostProcess
 		$this->pdo = (($options['Settings'] instanceof Settings) ? $options['Settings'] : new Settings());
 		$this->groups = (($options['Groups'] instanceof Groups) ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
 		$this->_par2Info = new \Par2Info();
+		$this->_srrInfo = new \SrrInfo();
 		$this->debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
 		$this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
 		$this->Nfo = (($options['Nfo'] instanceof Nfo) ? $options['Nfo'] : new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
@@ -279,7 +286,7 @@ class PostProcess
 		if ($processed > 0) {
 			if ($this->echooutput) {
 				$this->pdo->log->doEcho(
-						$this->pdo->log->primary('Updating GID in releases table ' . $processed . ' release(s) updated')
+					$this->pdo->log->primary('Updating GID in releases table ' . $processed . ' release(s) updated')
 				);
 			}
 		}
@@ -336,13 +343,13 @@ class PostProcess
 		}
 
 		$query = $this->pdo->queryOneRow(
-				sprintf('
+			sprintf('
 				SELECT id, groupid, categoryid, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, id AS releaseid
 				FROM releases
 				WHERE isrenamed = 0
 				AND id = %d',
-						$relID
-				)
+				$relID
+			)
 		);
 
 		if ($query === false) {
@@ -352,18 +359,8 @@ class PostProcess
 		// Only get a new name if the category is OTHER.
 		$foundName = true;
 		if (!in_array(
-				(int)$query['categoryid'],
-				[
-						Category::CAT_BOOK_OTHER,
-						Category::CAT_GAME_OTHER,
-						Category::CAT_MOVIE_OTHER,
-						Category::CAT_MUSIC_OTHER,
-						Category::CAT_PC_MOBILEOTHER,
-						Category::CAT_TV_OTHER,
-						Category::CAT_MISC_HASHED,
-						Category::CAT_XXX_OTHER,
-						Category::CAT_MISC_OTHER
-				]
+			(int)$query['categoryid'],
+			Category::CAT_GROUP_OTHER
 		)
 		) {
 			$foundName = false;
@@ -402,16 +399,16 @@ class PostProcess
 				if ($this->addpar2) {
 					// Add to release files.
 					if ($filesAdded < 11 &&
-							$this->pdo->queryOneRow(
-									sprintf('
+						$this->pdo->queryOneRow(
+							sprintf('
 								SELECT releaseid
 								FROM release_files
 								WHERE releaseid = %d
 								AND name = %s',
-											$relID,
-											$this->pdo->escapeString($file['name'])
-									)
-							) === false
+								$relID,
+								$this->pdo->escapeString($file['name'])
+							)
+						) === false
 					) {
 
 						// Try to add the files to the DB.
@@ -438,15 +435,85 @@ class PostProcess
 
 				// Update the file count with the new file count + old file count.
 				$this->pdo->queryExec(
-						sprintf('
+					sprintf('
 						UPDATE releases
 						SET rarinnerfilecount = rarinnerfilecount + %d
 						WHERE id = %d',
-								$filesAdded,
-								$relID
-						)
+						$filesAdded,
+						$relID
+					)
 				);
 			}
+			if ($foundName === true) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Attempt to get a better name from a SRR file and categorize the release.
+	 *
+	 * @note Called from NZBContents.php
+	 *
+	 * @param string $messageID MessageID from NZB file.
+	 * @param int    $relID     ID of the release.
+	 * @param \newznab\NNTP   $nntp      Class NNTP
+	 * @param int    $show      Only show result or apply it.
+	 *
+	 * @return bool
+	 */
+	public function parseSRR($messageID, $relID, &$nntp, $show)
+	{
+		if ($messageID === '') {
+			return false;
+		}
+
+		$query = $this->pdo->queryOneRow(
+			sprintf('
+				SELECT
+					r.id, r.groupid, r.categoryid, r.name, r.searchname,
+					UNIX_TIMESTAMP(r.postdate) AS post_date,
+					r.id AS releaseid,
+					g.name AS groupname
+				FROM releases r
+				LEFT JOIN groups g ON r.groupid = g.id
+				WHERE r.isrenamed = 0
+				AND r.categoryid IN (%s)
+				AND r.id = %d',
+				implode(',', Category::CAT_GROUP_OTHER),
+				$relID
+			)
+		);
+
+		if ($query === false) {
+			return false;
+		}
+
+		// Get the SRR file.
+		$srr = $nntp->getMessages($query['groupname'], $messageID, $this->alternateNNTP);
+		if ($nntp->isError($srr)) {
+			echo "Couldn't connect to usenet, dummy";
+			return false;
+		}
+
+		// Put the SRR into SrrInfo, check if there's an error.
+		$this->_srrInfo->setData($srr);
+		if ($this->_srrInfo->error) {
+			return false;
+		}
+
+		// Get the file list from SrrInfo.
+		$summary = $this->_srrInfo->getSummary();
+		var_dump($summary);
+		if ($summary !== false && empty($summary['error'])) {
+			$foundName = false;
+			// Try to get a new name.
+			$query['textstring'] = $summary['file_name'];
+			if ($this->nameFixer->checkName($query, 1, 'SRR, ', 1, $show) === true) {
+				$foundName = true;
+			}
+
 			if ($foundName === true) {
 				return true;
 			}

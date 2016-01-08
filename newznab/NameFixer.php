@@ -252,13 +252,19 @@ class NameFixer
 	 * @param int     $cats 1: other categories, 2: all categories
 	 * @param         $nameStatus
 	 * @param         $show
+	 * @param bool    $fileExt
 	 * @param string  $guidChar
 	 * @param string  $limit
 	 */
-	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
+	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show, $fileExt = false, $guidChar = '', $limit = '')
 	{
-		$type = 'Filenames, ';
+		if ($fileExt === true){
+			$type = 'Extension, ';
+		} else {
+			$type = 'Filenames, ';
+		}
 		$guid = ($guidChar === '') ? '' : ('AND rel.guid '. $this->pdo->likeString($guidChar, false, true));
+		$ext = ($fileExt === false) ? '' : ('AND rf.name '. $this->pdo->likeString('.srr', true, false));
 		$queryLimit = ($limit === '') ? '' : $limit;
 		if ($guid === '') {
 			$this->_echoStartMessage($time, 'file names');
@@ -283,12 +289,14 @@ class NameFixer
 						rf.releaseid AS fileid, rel.id AS releaseid
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
-					WHERE (rel.isrenamed = %d OR rel.categoryid = %d)
+					WHERE (rel.isrenamed = %d OR rel.categoryid IN (%s))
+					AND rel.prehashid = 0
 					AND rel.proc_files = %d
-					%s',
+					%s %s',
 				self::IS_RENAMED_NONE,
-				Category::CAT_MISC_OTHER,
+				implode(',', Category::CAT_GROUP_OTHER),
 				self::PROC_FILES_NONE,
+				$ext,
 				$guid
 			);
 		}
@@ -320,79 +328,72 @@ class NameFixer
 	}
 
 	/**
-	 * Attempts to fix release names using the File name.
+	 * Attempts to fix release names using the SRR File data.
 	 *
-	 * @param int     $time 1: 24 hours, 2: no time limit
-	 * @param boolean $echo 1: change the name, anything else: preview of what could have been changed.
-	 * @param int     $cats 1: other categories, 2: all categories
-	 * @param         $nameStatus
-	 * @param         $show
-	 * @param string  $guidChar
-	 * @param string  $limit
+	 * @param int $time   1: 24 hours, 2: no time limit
+	 * @param int $echo   1: change the name, anything else: preview of what could have been changed.
+	 * @param int $cats   1: other categories, 2: all categories
+	 * @param $nameStatus
+	 * @param $show
+	 * @param NNTP $nntp
 	 */
-	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
+	public function fixNamesWithSRR($time, $echo, $cats, $nameStatus, $show, $nntp)
 	{
-		$type = 'Srr, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.guid '. $this->pdo->likeString($guidChar, false, true));
-		$queryLimit = ($limit === '') ? '' : $limit;
-		if ($guid === '') {
-			$this->_echoStartMessage($time, 'srr files');
-		}
+		$this->_echoStartMessage($time, 'SRR files');
 
-		$preId = false;
 		if ($cats === 3) {
 			$query = sprintf('
-					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
-						rf.releaseid AS fileid, rel.id AS releaseid
+					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
-					WHERE rel.nzbstatus = %d
-					AND rel.prehashid = 0',
+					WHERE nzbstatus = %d
+					AND prehashid = 0',
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
-			$preId = true;
 		} else {
 			$query = sprintf('
-					  SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
-					  rf.releaseid AS fileid, rel.id AS releaseid
-					  FROM releases rel
-					  INNER JOIN release_files rf ON (rf.releaseid = rel.id)
-					  WHERE (rel.isrenamed = %d OR rel.categoryid IN (%d, %d))
-					  AND rf.name %s
-					  AND rel.proc_srr = %d
-					  %s',
+					SELECT rel.id AS releaseid, rel.guid, rel.groupid
+					FROM releases rel
+					WHERE (rel.isrenamed = %d OR rel.categoryid IN (%s))
+					AND prehashid = 0
+					AND proc_srr = %d',
 				self::IS_RENAMED_NONE,
-				Category::CAT_MISC_OTHER,
-				Category::CAT_MISC_HASHED,
-				$this->pdo->likeString('.srr', true, false),
-				self::PROC_SRR_NONE,
-				$guid
+				implode(',', Category::CAT_GROUP_OTHER),
+				self::PROC_SRR_NONE
 			);
 		}
 
-		$releases = $this->_getReleases($time, $cats, $query, $queryLimit);
+		$releases = $this->_getReleases($time, $cats, $query);
+
 		if ($releases instanceof \Traversable && $releases !== false) {
 
 			$total = $releases->rowCount();
 			if ($total > 0) {
 				$this->_totalReleases = $total;
-				if ($guid === '') {
-					echo $this->pdo->log->primary(number_format($total) . ' srr files to process.');
-				}
+
+				echo $this->pdo->log->primary(number_format($total) . ' releases to process.');
+				$Nfo = new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
+				$nzbContents = new NZBContents(
+					[
+						'Echo'        => $this->echooutput,
+						'NNTP'        => $nntp,
+						'Nfo'         => $Nfo,
+						'Settings'    => $this->pdo,
+						'PostProcess' => new PostProcess(['Settings' => $this->pdo, 'Nfo' => $Nfo])
+					]
+				);
 
 				foreach ($releases as $release) {
-					$this->done = $this->matched = false;
-					$this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
+					if (($nzbContents->checkSRR($release['guid'], $release['releaseid'], $nameStatus, $show)) === true) {
+						$this->fixed++;
+					}
+
 					$this->checked++;
 					$this->_echoRenamed($show);
 				}
-
 				$this->_echoFoundCount($echo, ' files');
-			} elseif ($guid === '') {
-				echo $this->pdo->log->info('Nothing to fix.');
 			} else {
-				echo '.';
+				echo $this->pdo->log->alternate('Nothing to fix.');
 			}
 		}
 	}
@@ -592,7 +593,7 @@ class NameFixer
 					}
 				}
 
-				if ($type === "Srr, ") {
+				if ($type === "Extension, ") {
 					$newName = ucwords($newName);
 					if (preg_match('/(.+?)\.(srr)?$/i', $name, $match)) {
 						$newName = $match[1];
@@ -655,6 +656,7 @@ class NameFixer
 								break;
 							case "Filenames, ":
 							case "file matched source: ":
+							case "Extension, ":
 								$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
 								break;
 							case "SHA1, ":
@@ -666,9 +668,6 @@ class NameFixer
 								break;
 							case "sorter, ":
 								$status = "isrenamed = 1, iscategorized = 1, proc_sorter = 1,";
-								break;
-							case "Srr, ":
-								$status = "isrenamed = 1, iscategorized = 1, proc_srr = 1,";
 								break;
 						}
 						$this->pdo->queryExec(
@@ -846,7 +845,6 @@ class NameFixer
 							INNER JOIN release_files rf ON r.id = rf.releaseid
 							AND rf.name IS NOT NULL
 							WHERE r.prehashid = 0
-							GROUP BY r.id
 							%s %s',
 				$orderby,
 				$limit
@@ -1043,8 +1041,8 @@ class NameFixer
 				case "PAR2, ":
 					$this->fileCheck($release, $echo, $type, $namestatus, $show);
 					break;
-				case "Srr, ":
-					$this->srrCheck($release, $echo, $type, $namestatus, $show);
+				case "Extension, ":
+					$this->extCheck($release, $echo, $type, $namestatus, $show);
 					break;
 				case "NFO, ":
 					$this->nfoCheckTV($release, $echo, $type, $namestatus, $show);
@@ -1070,13 +1068,11 @@ class NameFixer
 						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release['releaseid']);
 						break;
 					case "Filenames, ":
+					case "Extension, ":
 						$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releaseid']);
 						break;
 					case "PAR2, ":
 						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releaseid']);
-						break;
-					case "Srr, ":
-						$this->_updateSingleColumn('proc_srr', self::PROC_SRR_DONE, $release['releaseid']);
 						break;
 				}
 			}
@@ -1626,13 +1622,13 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function srrCheck($release, $echo, $type, $namestatus, $show)
+	public function extCheck($release, $echo, $type, $namestatus, $show)
 	{
 		$result = [];
 
 		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 			if (preg_match('/(.+?)\.(srr)$/i', $release["textstring"], $result)) {
-				$this->updateRelease($release, $result["1"], $method = "srrCheck: Srr filename", $echo, $type, $namestatus, $show);
+				$this->updateRelease($release, $result["1"], $method = "Filenames: extension ", $echo, $type, $namestatus, $show);
 			}
 		}
 	}

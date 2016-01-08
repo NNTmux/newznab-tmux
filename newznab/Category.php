@@ -83,6 +83,20 @@ class Category
 	const STATUS_ACTIVE = 1;
 	const STATUS_DISABLED = 2;
 
+	const CAT_GROUP_OTHER =
+		[
+			self::CAT_BOOK_OTHER,
+			self::CAT_GAME_OTHER,
+			self::CAT_MOVIE_OTHER,
+			self::CAT_MUSIC_OTHER,
+			self::CAT_PC_MOBILEOTHER,
+			self::CAT_TV_OTHER,
+			self::CAT_MISC_HASHED,
+			self::CAT_XXX_OTHER,
+			self::CAT_MISC_OTHER
+		]
+	;
+
 	private $tmpCat = 0;
 
 	/**
