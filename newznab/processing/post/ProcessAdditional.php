@@ -421,7 +421,7 @@ class ProcessAdditional
 		$this->_releaseExtra = ($options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra($this->pdo));
 		$this->_releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 		$this->_par2Info = new \Par2Info();
-		$this->_SRRInfo = new \SrrInfo();
+		$this->_srrInfo = new \SrrInfo();
 		$this->_nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 		$this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
 
@@ -1328,11 +1328,10 @@ class ProcessAdditional
 				if (is_file($file)) {
 
 					// Process PAR2 files.
-					if ($this->_foundPAR2Info === false && preg_match('/\.par2$/', $file)) {
+					if ($this->_foundPAR2Info === false && preg_match('/\.par2$/i', $file)) {
 						$this->_siftPAR2Info($file);
 					} // Process SRR files
-					else if ($this->_foundSRRInfo === false && preg_match('/\.srr$/', $file)) {
-						exit;
+					else if ($this->_foundSRRInfo === false && preg_match('/\.srr$/i', $file)) {
 						$this->_siftSRRInfo($file);
 					} // Process NFO files.
 					else if ($this->_releaseHasNoNFO === true && preg_match('/(\.(nfo|inf|ofn)|info\.txt)$/i', $file)) {
@@ -2338,44 +2337,65 @@ class ProcessAdditional
 	/**
 	 * Get file info from inside SRR and attempt to get a release name.
 	 *
-	 * @param string $fileLocation
+	 * @param string $srr
 	 */
-	protected function _siftSRRInfo($fileLocation)
+	protected function _siftSRRInfo($srr)
 	{
-		$releaseInfo = $this->pdo->queryOneRow(
-			sprintf(
-				'
-				SELECT UNIX_TIMESTAMP(postdate) AS postdate, isrenamed
-				FROM releases
-				WHERE id = %d',
+		$foundMatch = false;
+
+		$query = $this->pdo->queryOneRow(
+			sprintf('
+				SELECT
+					r.id, r.groupid, r.categoryid, r.name, r.searchname,
+					UNIX_TIMESTAMP(r.postdate) AS post_date,
+					r.id AS releaseid
+				FROM releases r
+				WHERE r.isrenamed = 0
+				AND r.prehashid = 0
+				AND r.id = %d',
 				$this->_release['id']
 			)
 		);
 
-		if ($releaseInfo === false) {
+		if ($query === false) {
 			return;
 		}
 
-		// Only get a new name if the category is OTHER.
-		if ($releaseInfo['isrenamed'] == 0 &&
-			in_array(
-				((int)$this->_release['categoryid']),
-				Category::CAT_GROUP_OTHER
-			)
-		) {
-			$srr = $this->_SRRInfo->getSummary($fileLocation);
+		// Put the SRR into SrrInfo, check if there's an error.
+		$this->_srrInfo->open($srr);
+		if ($this->_srrInfo->error) {
+			$this->pdo->log->doEcho($this->pdo->log->primaryOver("-"));
+			return;
+		}
 
-			if ($this->_SRRInfo->error) {
-				return;
+		// Get the file list from SrrInfo.
+		$summary = $this->_srrInfo->getSummary();
+		if ($summary !== false && empty($summary['error'])) {
+			$this->pdo->log->doEcho($this->pdo->log->primaryOver("+"));
+
+			// Try to get a Pre Match by the OSO release name.
+			if (isset($summary['oso_info']['name']) && !empty($summary['oso_info']['name'])) {
+				$query['textstring'] = $summary['oso_info']['name'];
+				$foundMatch = $this->_nameFixer->checkName($query, $this->_echoCLI, 'SRR, ', 1, 1, true);
 			}
-
-			// Try to get a new name.
-			$this->_release['textstring'] = $srr['file_name'];
-			$this->_release['releaseid'] = $this->_release['id'];
-			if ($this->_nameFixer->checkName($this->_release, ($this->_echoCLI ? true : false), 'SRR, ', 1, 1) === true) {
-				$this->_foundSRRInfo = true;
+			// Loop through the stored files in the SRR and try to get a Pre Match
+			if ($foundMatch === false && is_array($summary['stored_files']) && !empty($summary['stored_files'])) {
+				foreach ($summary['stored_files'] AS $storedFile) {
+					if ($foundMatch === true) {
+						break;
+					} else if (isset($storedFile['name']) && !empty($storedFile['name'])) {
+						$query['textstring'] = Utility::cutStringUsingLast('.', $storedFile['name'], 'left', false);
+						$foundMatch = $this->_nameFixer->checkName($query, $this->_echoCLI, 'SRR, ', 1, 1, true);
+					}
+				}
+			}
+			// This field is rarely populated but worth a shot for a rename
+			if ($foundMatch === false && isset($summary['file_name']) && !empty($summary['file_name'])) {
+				$query['textstring'] = Utility::cutStringUsingLast('.', $summary['file_name'], 'left', false);
+				$foundMatch = $this->_nameFixer->checkName($query, $this->_echoCLI, 'SRR, ', 1, 1, true);
 			}
 		}
+		$this->_foundSRRInfo = $foundMatch;
 	}
 
 	/**

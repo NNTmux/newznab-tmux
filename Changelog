@@ -1,3 +1,7 @@
+2016-01-11 DariusIII
+	Upd: Move api*.tpl files to themes/shared/templates
+	Upd: Make sure we have a theme
+	Upd: Move captha.tpl to shared templates folder.
 2016-01-08 DariusIII
 	Fix: Fix getnzb links in all of the templates
 	Fix: Fix xxx modal in Gamma template
