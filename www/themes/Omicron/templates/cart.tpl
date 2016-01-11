@@ -9,7 +9,7 @@
 </div>
 <div class="alert alert-info" role="alert">
 	<strong>RSS Feed</strong> <br/>
-	Your cart can also be accessed via an <a
+	Your download basket can also be accessed via an <a
 			href="{$smarty.const.WWW_TOP}/rss?t=-2&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}&amp;del=1">RSS
 		feed</a>. Some NZB downloaders can read this feed and automatically start downloading.
 </div>
@@ -57,5 +57,5 @@
 						</table>
 	</form>
 {else}
-	<div class="alert alert-danger" role="alert">There are no NZBs in your cart.</div>
+	<div class="alert alert-danger" role="alert">There are no NZBs in your download basket.</div>
 {/if}
