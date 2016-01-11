@@ -1,4 +1,5 @@
 2016-01-11 DariusIII
+	Upd: Make sure we have a theme
 	Upd: Move captha.tpl to shared templates folder.
 2016-01-08 DariusIII
 	Fix: Fix getnzb links in all of the templates

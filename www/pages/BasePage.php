@@ -127,6 +127,9 @@ class BasePage
 			$this->smarty->assign('ismod', 'false');
 			$this->smarty->assign('loggedin', 'false');
 		}
+		if ($this->theme === '') {
+			$this->theme = 'Omicron';
+		}
 
 		$this->smarty->assign('theme', $this->theme);
 		$this->smarty->assign('site', $this->settings);
