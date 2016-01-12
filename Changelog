@@ -1,3 +1,5 @@
+2016-01-12 DariusIII
+	Fix: Revert ogg video processing to default ogv extension
 2016-01-11 DariusIII
 	Upd: Move api*.tpl files to themes/shared/templates
 	Upd: Make sure we have a theme
