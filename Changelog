@@ -1,3 +1,5 @@
+2016-01-12 DariusIII
+	Fix: 2 bugs in NZB and NZBContents classes.
 2016-01-11 DariusIII
 	Upd: Move api*.tpl files to themes/shared/templates
 	Upd: Make sure we have a theme
