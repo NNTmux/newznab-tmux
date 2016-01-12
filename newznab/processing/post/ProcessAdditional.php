@@ -1646,7 +1646,7 @@ class ProcessAdditional
 			$iSQL = ', haspreview = 1';
 		}
 
-		if (is_file($this->_releaseImage->vidSavePath . $this->_release['guid'] . '.ogg')) {
+		if (is_file($this->_releaseImage->vidSavePath . $this->_release['guid'] . '.ogv')) {
 			$vSQL = ', videostatus = 1';
 		}
 
@@ -2085,7 +2085,7 @@ class ProcessAdditional
 		if (is_file($fileLocation)) {
 
 			// Create a filename to store the temp file.
-			$fileName = ($this->tmpPath . 'zzzz' . $this->_release['guid'] . '.ogg');
+			$fileName = ($this->tmpPath . 'zzzz' . $this->_release['guid'] . '.ogv');
 
 			$newMethod = false;
 			// If wanted sample length is less than 60, try to get sample from the end of the video.
@@ -2156,7 +2156,7 @@ class ProcessAdditional
 			if (is_file($fileName)) {
 
 				// Create a path to where the file should be moved.
-				$newFile = ($this->_releaseImage->vidSavePath . $this->_release['guid'] . '.ogg');
+				$newFile = ($this->_releaseImage->vidSavePath . $this->_release['guid'] . '.ogv');
 
 				// Try to move the file to the new path.
 				$renamed = @rename($fileName, $newFile);
