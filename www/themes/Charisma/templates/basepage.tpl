@@ -210,7 +210,7 @@
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery-migrate-1.2.1.min.js"></script>
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/js/bootstrap.min.js"></script>
 	<!-- Bootstrap hover on mouseover script -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/{$theme}/js/bootstrap-hover-dropdown.min.js"></script>

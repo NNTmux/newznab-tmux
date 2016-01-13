@@ -51,7 +51,7 @@
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<!-- The fav icon -->
-	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/themes/shared/images/favicon.ico">
+	<link rel="shortcut icon" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico">
 </head>
 <body>
 {if $showregister != "0"}
@@ -112,7 +112,7 @@
 	<!--/.fluid-container-->
 {/if}
 <!-- external javascript -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/js/bootstrap.min.js"></script>
 <!-- library for cookie management -->
 <script src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.cookie.js"></script>
 <!-- calender plugin -->
