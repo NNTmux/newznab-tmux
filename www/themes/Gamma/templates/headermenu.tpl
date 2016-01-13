@@ -58,12 +58,7 @@
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop{$parentcat.id}">
 			<li><a href="{$smarty.const.WWW_TOP}/browse?t={$parentcat.id}">{$parentcat.title}</a></li>
 			<li class="divider"></li>
-			{foreach from=$parentcat.subcatlist item=subcat}
-			{if ($subcat.id == 7020 && $userdata.bookview=="1")}
-			<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/books">{$subcat.title}</a></li>
-			{else}
 			<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
-			{/if}
 			{/foreach}
 		</ul>
 	</li>
@@ -77,6 +72,7 @@
 			<b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="cat3">
 			<li><a href="{$smarty.const.WWW_TOP}/xxx">All {$parentcat.title}</a></li>
+			<li class="divider"></li>
 			{foreach from=$parentcat.subcatlist item=subcat}
 				{if $subcat.id == 6010 || $subcat.id == 6020 || $subcat.id == 6030 || $subcat.id == 6040}
 					<li><a title="Browse {$subcat.title}"
@@ -127,7 +123,7 @@
 			<li><a href="{$smarty.const.WWW_TOP}/browse">All</a></li>
 			<li class="divider"></li>
 			{/if}
-			{if ($subcat.id == 7020 && $userdata.bookview=="1")}
+			{if $userdata.bookview=="1"}
 			<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/books">{$subcat.title}</a></li>
 			{else}
 			<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
