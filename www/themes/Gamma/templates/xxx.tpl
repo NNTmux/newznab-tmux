@@ -295,7 +295,7 @@
 													<li>
 														<a class="icon icon_nzb fa fa-cloud-downloadget" href="#"
 														   title="Send to NZBGet">
-															<img src="{$smarty.const.WWW_THEMES}/{$theme}/images/icons/nzbgetup.png">
+															<img src="{$smarty.const.WWW_THEMES}/shared/images/icons/nzbgetup.png">
 														</a>
 													</li>
 												{/if}
@@ -303,7 +303,7 @@
 													<li>
 														<a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#"
 														   title="Send to NZBVortex">
-															<img src="{$smarty.const.WWW_THEMES}/{$theme}/images/icons/vortex/bigsmile.png">
+															<img src="{$smarty.const.WWW_THEMES}/shared/images/icons/vortex/bigsmile.png">
 														</a>
 													</li>
 												{/if}

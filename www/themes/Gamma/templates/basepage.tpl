@@ -28,7 +28,7 @@
 
 	<!-- FAVICON -->
 	<link rel="search" type="application/opensearchdescription+xml" href="/opensearch" title="{$site->title|escape}" />
-	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_THEMES}/{$theme}/images/favicon.ico"/>
+	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico"/>
 
 	<!-- Javascripts -->
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
