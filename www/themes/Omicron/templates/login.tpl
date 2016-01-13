@@ -33,7 +33,9 @@
       <div class="login-box-body">
         <p class="login-box-msg">Please sign in to access the site</p>
         <form action="login" method="post">
+          {if isset($redirect)}
           <input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}" />
+          {/if}
           <div class="form-group has-feedback">
             <input id="username" name="username" type="text" class="form-control" placeholder="Username"/>
             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
