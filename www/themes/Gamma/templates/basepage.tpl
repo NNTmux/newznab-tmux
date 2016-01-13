@@ -1,10 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<!--[if IE 6]>
-    <link href="ie6.min.css" rel="stylesheet">
-<![endif]-->
-
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=9" />
@@ -43,13 +38,16 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.autosize-min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/sorttable.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.qtip2.js"></script>
-
 	<!-- Added the Bootstrap JS -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/bootstrap.js"></script>
-
 	<!-- Pines Notify -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.pnotify.js"></script>
-
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
 	{literal}
 	<script>
 		/* <![CDATA[ */
@@ -60,18 +58,14 @@
 		/* ]]> */
 	</script>
 	{/literal}
-
 	{$page->head}
 </head>
 <body {$page->body}>
-
 <!-- NAV
 	================================================== -->
-
 	<!-- If you want the navbar "white" remove Navbar-inverse -->
 	<div class="navbar navbar-inverse navbar-fixed-top">
 		<div class="navbar-inner" style="padding-left:30px; padding-right:30px;">
-
 			<div class="container">
 						{if $loggedin=="true"}
 							{$header_menu}
@@ -109,7 +103,6 @@
 	</br>
 	</br>
 	</br>
-
 	<!-- Container
 		================================================== -->
 		<div class="container-fluid">
@@ -120,37 +113,14 @@
 					{$useful_menu}
 					</ul>
 				</div>
-
 				<div class="span10">
 					{$page->content}
 				</div>
 			</div>
 		</div>
-
-		        {if $site->google_analytics_acc != ''}
-		        {literal}
-		        <script type="text/javascript">
-		        /* <![CDATA[ */
-		          var _gaq = _gaq || [];
-		          _gaq.push(['_setAccount', '{/literal}{$site->google_analytics_acc}{literal}']);
-		          _gaq.push(['_trackPageview']);
-		          _gaq.push(['_trackPageLoadTime']);
-
-		          (function() {
-		                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		          })();
-		        /* ]]> */
-		        </script>
-
-		        {/literal}
-		        {/if}
-
 			{if $loggedin=="true"}
 				<input type="hidden" name="UID" value="{$userdata.id}" />
 				<input type="hidden" name="RSSTOKEN" value="{$userdata.rsstoken}" />
 			{/if}
-
 </body>
 </html>
