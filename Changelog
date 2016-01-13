@@ -1,3 +1,5 @@
+2016-01-13 DariusIII
+	Upd: Adjustments in templates, move common bootstrap file to shared/libs/bootstrap/v3/ folder
 2016-01-12 DariusIII
 	Fix: 2 bugs in NZB and NZBContents classes.
 2016-01-11 DariusIII

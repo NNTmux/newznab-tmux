@@ -18,12 +18,12 @@
 				{else}
 					<img class="pull-right" style="margin-right:50px; max-height:278px;"
 						 alt="{$result.title|escape:"htmlall"} Logo"
-						 src="{$serverroot}themes/shared/images/nomoviecover.jpg"/>
+						 src="{$smarty.const.WWW_THEMES}/shared/images/nomoviecover.jpg"/>
 				{/if}
 				<span class="h1" style="display:inline;">{$result.title|escape:"htmlall"} ({$result.year})</span>
 				<a class="btn btn-transparent btn-primary" target="_blank"
-				   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
-				   name="imdb{$result.imdbid}" title="View IMDB page">IMDB</a>
+						href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
+						name="imdb{$result.imdbid}" title="View IMDB page">IMDB</a>
 				<a class="btn btn-transparent btn-primary" target="_blank"
 				   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbid}/"
 				   name="trakt{$result.imdbid}" title="View Trakt page" rel="trakt">TRAKT</a>
@@ -179,7 +179,7 @@
 																							title="Send to my Download Basket"></i></a>
 												{if isset($sabintegrated)}
 													<a href="#" class="icon icon_sab text-muted"
-													   title="Send to my Queue"><i
+														  title="Send to my Queue"><i
 																class="fa fa-share"></i></a>
 												{/if}
 											</td>

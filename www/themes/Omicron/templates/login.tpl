@@ -10,10 +10,10 @@
     <meta charset="UTF-8">
     <title>{$site->title} | Log in</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
-    <!-- Bootstrap 3.3.4 -->
-    <link href="{$smarty.const.WWW_THEMES}/{$theme}/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <!-- Bootstrap 3.3.6 -->
+    <link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <!-- Font Awesome Icons -->
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
     <!-- Theme style -->
     <link href="{$smarty.const.WWW_THEMES}/{$theme}/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
     <!-- iCheck -->
@@ -33,7 +33,9 @@
       <div class="login-box-body">
         <p class="login-box-msg">Please sign in to access the site</p>
         <form action="login" method="post">
+          {if isset($redirect)}
           <input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}" />
+          {/if}
           <div class="form-group has-feedback">
             <input id="username" name="username" type="text" class="form-control" placeholder="Username"/>
             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
@@ -61,8 +63,8 @@
         <a href="{$smarty.const.WWW_TOP}register" class="text-center">Register a new membership</a>
     <!-- jQuery 2.1.4 -->
     <script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/jQuery/jQuery-2.1.4.min.js"></script>
-    <!-- Bootstrap 3.3.2 JS -->
-    <script src="{$smarty.const.WWW_THEMES}/{$theme}/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+    <!-- Bootstrap 3.3.6 JS -->
+    <script src="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/js/bootstrap.min.js" type="text/javascript"></script>
     <!-- iCheck -->
     <script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
     <script>

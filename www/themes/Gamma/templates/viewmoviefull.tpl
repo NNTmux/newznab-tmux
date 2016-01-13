@@ -166,14 +166,14 @@
 							{if isset($nzbgetintegrated)}
 							<li>
 								<a class="icon icon_nzb fa fa-cloud-downloadget" href="#" title="Send to NZBGet">
-									<img class="icon icon_nzb fa fa-cloud-downloadget" alt="Send to my NZBGet" src="{$smarty.const.WWW_THEMES}/{$theme}/images/icons/nzbgetup.png">
+									<img class="icon icon_nzb fa fa-cloud-downloadget" alt="Send to my NZBGet" src="{$smarty.const.WWW_THEMES}/shared/images/icons/nzbgetup.png">
 								</a>
 							</li>
 							{/if}
 							{if $weHasVortex}
 								<li>
 									<a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#" title="Send to NZBVortex">
-										<img class="icon icon_nzb fa fa-cloud-downloadvortex" alt="Send to my NZBVortex" src="{$smarty.const.WWW_THEMES}/{$theme}/images/icons/vortex/bigsmile.png">
+										<img class="icon icon_nzb fa fa-cloud-downloadvortex" alt="Send to my NZBVortex" src="{$smarty.const.WWW_THEMES}/shared/images/icons/vortex/bigsmile.png">
 									</a>
 								</li>
 							{/if}

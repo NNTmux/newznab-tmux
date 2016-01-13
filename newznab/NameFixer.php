@@ -664,7 +664,6 @@ class NameFixer
 								break;
 							case "Filenames, ":
 							case "file matched source: ":
-							case "Extension, ":
 								$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
 								break;
 							case "SHA1, ":
@@ -676,6 +675,9 @@ class NameFixer
 								break;
 							case "sorter, ":
 								$status = "isrenamed = 1, iscategorized = 1, proc_sorter = 1,";
+								break;
+							case "Extension, ":
+								$status = "isrenamed = 1, iscategorized = 1,";
 								break;
 						}
 						$this->pdo->queryExec(
@@ -1076,7 +1078,6 @@ class NameFixer
 						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release['releaseid']);
 						break;
 					case "Filenames, ":
-					case "Extension, ":
 						$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releaseid']);
 						break;
 					case "PAR2, ":
