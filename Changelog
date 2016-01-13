@@ -1,4 +1,5 @@
 2016-01-13 DariusIII
+	Fix: Fix setting name in update_binaries.php
 	Fix: Fix instances of NZBPath
 	Upd: Adjustments in templates, move common bootstrap file to shared/libs/bootstrap/v3/ folder
 2016-01-12 DariusIII
