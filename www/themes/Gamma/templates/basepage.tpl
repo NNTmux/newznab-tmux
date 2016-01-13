@@ -22,7 +22,7 @@
 	<link href="http://www.google.com/cse/api/branding.css" rel="stylesheet" type="text/css" media="screen" />
 {/if}
 	<!-- Newposterwall -->
-	<link href="{$smarty.const.WWW_TOP}/themes/shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_THEMES}/shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/bootstrap.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/font-awesome.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/extra.css" rel="stylesheet" type="text/css" media="screen" />
@@ -50,14 +50,16 @@
 	<!-- Pines Notify -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.pnotify.js"></script>
 
-	<script type="text/javascript">
-	/* <![CDATA[ */
-		var WWW_TOP = "{$smarty.const.WWW_TOP}";
-		var SERVERROOT = "/";
-		var UID = "{if $loggedin=="true"}{$userdata.id}{else}{/if}";
-		var RSSTOKEN = "{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}";
-	/* ]]> */
+	{literal}
+	<script>
+		/* <![CDATA[ */
+		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
+		var SERVERROOT = "{/literal}{$serverroot}{literal}";
+		var UID = "{/literal}{if $loggedin=="true"}{$userdata.id}{else}{/if}{literal}";
+		var RSSTOKEN = "{/literal}{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}{literal}";
+		/* ]]> */
 	</script>
+	{/literal}
 
 	{$page->head}
 </head>
