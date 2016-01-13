@@ -52,13 +52,14 @@
 				{/foreach}
 			</ul>
 		</li>
-	{elseif ($parentcat.id == 5000)}
+	{elseif $parentcat.id == 5000}
 	<li class="dropdown">
 		<a id="drop{$parentcat.id}" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop{$parentcat.id}">
 			<li><a href="{$smarty.const.WWW_TOP}/browse?t={$parentcat.id}">{$parentcat.title}</a></li>
 			<li class="divider"></li>
-			<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+			{foreach from=$parentcat.subcatlist item=subcat}
+				<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
 			{/foreach}
 		</ul>
 	</li>
