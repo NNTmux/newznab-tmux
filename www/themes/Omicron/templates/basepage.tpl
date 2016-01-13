@@ -43,7 +43,7 @@
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
 </head>
-{if ($loggedin)=="true"}
+{if $loggedin=="true"}
 	<!--
 	  BODY TAG OPTIONS:
 	  =================
@@ -369,6 +369,6 @@
 {elseif $smarty.server.REQUEST_URI == "/terms-and-conditions"}
 	{include file="terms.tpl"}
 {else}
-	{include file="login.tpl"}
+	<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a>
 {/if}
 </html>

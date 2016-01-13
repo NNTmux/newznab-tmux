@@ -267,6 +267,6 @@
 {elseif $smarty.server.REQUEST_URI == "/terms-and-conditions"}
 	{include file="terms.tpl"}
 {else}
-	{include file="login.tpl"}
+	<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a>
 {/if}
 </html>
