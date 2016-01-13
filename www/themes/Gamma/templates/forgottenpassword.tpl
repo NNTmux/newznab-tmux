@@ -14,8 +14,6 @@ border: 1px solid #e1e1e8;
 	<p>
 		<form class="form-horizontal" action="forgottenpassword?action=submit" method="post">
 			<table class="data">
-			<input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}" />
-
 			{if isset($error) && $error != ''}
 				<div class="alert alert-error">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>

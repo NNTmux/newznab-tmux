@@ -2,8 +2,8 @@
   <h1>Login</h1>
   <br>
 	<form class="form-horizontal" action="login" method="post">
-		<table class="data">
 		<input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}" />
+		<table class="data">
 		{if $error != ''}
 			<div class="alert alert-error">
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
