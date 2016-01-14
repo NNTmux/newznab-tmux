@@ -1,7 +1,7 @@
 {if $results|@count > 0}
 	{foreach from=$results item=result}
 		<div id="moviefull" style="min-height:340px;">
-		{if $result.cover == 1}<img class="shadow pic img-polaroid pull-right" style="margin-right:50px;" width="200px" alt="{$result.title|escape:"htmlall"} Logo" src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg" />{/if}
+			{if $result.cover == 1}<img class="shadow pic img-polaroid pull-right" width="200px" alt="{$result.title|escape:"htmlall"} Logo" src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg" />{/if}
 		<h2 style="display:inline;">{$result.title|escape:"htmlall"} ({$result.year})</h2>    <a class="rndbtn badge badge-imdb" target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/" name="imdb{$result.imdbid}" title="View imdb page">Imdb</a>
 		<a class="rndbtn badge badge-trakt" target="_blank" href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbid}/" name="trakt{$result.imdbid}" title="View trakt page">Trakt</a>
 		<h4>{if isset($result.genre) && $result.genre != ''}{$result.genre|replace:"|":" / "}{/if}</h4>
