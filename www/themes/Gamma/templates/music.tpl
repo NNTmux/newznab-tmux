@@ -202,7 +202,7 @@
 						{if isset($nzbgetintegrated)}
 							<div>
 								<a href="#" class="icon icon_nzb fa fa-cloud-downloadget" title="Send to my NZBGet">
-									<img src="{$smarty.const.WWW_THEMES}/Gamma/images/icons/nzbgetup.png">
+									<img src="{$smarty.const.WWW_THEMES}/shared/images/icons/nzbgetup.png">
 								</a>
 							</div>
 						{/if}

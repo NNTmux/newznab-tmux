@@ -75,7 +75,7 @@ input.btn, a.btn, button.btn {height:auto;width:auto}
 .input-prepend input {margin-top:1px}
 
 /* Icons */
-.icon-sprite {background-image:url("../../themes/Gamma/images/glyphicons-halflings.png");background-repeat:no-repeat;display:inline-block;height:14px;line-height:14px;vertical-align:text-top;width:14px;padding-left:3px}
+.icon-sprite {background-image:url("../../themes/shared/images/glyphicons-halflings.png");background-repeat:no-repeat;display:inline-block;height:14px;line-height:14px;vertical-align:text-top;width:14px;padding-left:3px}
 
 /* Navbar */
 .dropdown .caret {font-size:1px;height:2px;background:none;background-color:#292929;color:#292929}
