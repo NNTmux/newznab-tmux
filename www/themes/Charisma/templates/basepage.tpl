@@ -135,13 +135,10 @@
 									<li><a href="{$smarty.const.WWW_TOP}/series"><i
 													class="fa fa-television"></i><span> TV</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/xxx"><i class="fa fa-venus-mars"></i><span> Adult</span></a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/books"><i class="fa fa-book"></i><span> Books</span></a>
-									</li>
+									<li><a href="{$smarty.const.WWW_TOP}/books"><i class="fa fa-book"></i><span> Books</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/browse"><i class="fa fa-list-ul"></i><span> Browse All Releases</span></a>
 									<li><a href="{$smarty.const.WWW_TOP}/prehash"><i
-													class="fa fa-list-ol"></i><span> PreHash</span></a>
-									<li><a href="{$smarty.const.WWW_TOP}/predb"><i
-													class="fa fa-list-alt"></i><span> PreDB</span></a>
+													class="fa fa-list-ol"></i><span> PreHash</span></a></li>
 								</ul>
 							</li>
 							<li class="accordion">

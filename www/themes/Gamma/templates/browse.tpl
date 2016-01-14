@@ -155,9 +155,6 @@
 						{if $result.reid > 0}
 						<span class="mediainfo badge badge-inverse halffade" title="{$result.guid}">Media</span>
 						{/if}
-						{if $result.preid > 0 && $userdata.canpre == 1}
-						<span class="preinfo badge badge-inverse halffade" title="{$result.searchname}">PreDB</span>
-						{/if}
 						{if $result.prehashid > 0}
 						<span class="prehashinfo badge badge-inverse halffade" title="{$result.prehashid}">Prehash</span>
 						{/if}

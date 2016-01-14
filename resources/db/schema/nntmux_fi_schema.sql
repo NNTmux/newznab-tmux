@@ -2197,7 +2197,6 @@ INSERT INTO menu (id, href, title, newwindow, tooltip, role, ordinal, menueval) 
 (9, 'music', 'Music', 0, 'Browse for Music', 1, 60, ''),
 (10, 'console', 'Console', 0, 'Browse for Games', 1, 65, ''),
 (11, 'books', 'Books', 0, 'Browse for Books', 1, 66, ''),
-(12, 'predb', 'PreDB', 0, 'View PreDB', 1, 67, '{if $site->nzprekey==''''}-1{/if}'),
 (13, 'admin', 'Admin', 0, 'Admin', 2, 70, ''),
 (14, 'cart', 'My Cart', 0, 'Your Nzb cart', 1, 75, ''),
 (15, 'mymovies', 'My Movies', 0, 'Your Movie Wishlist', 1, 78, ''),

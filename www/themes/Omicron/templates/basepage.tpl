@@ -209,7 +209,6 @@
 											class="fa fa-list-ul"></i><span> Browse All Releases</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/prehash"><i class="fa fa-list-ol"></i><span> PreHash</span></a>
 							</li>
-							<li><a href="{$smarty.const.WWW_TOP}/predb"><i class="fa fa-list-alt"></i><span> PreDB</span></a></li>
 						</ul>
 					</li>
 					<li class="treeview">

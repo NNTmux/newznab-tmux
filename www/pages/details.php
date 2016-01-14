@@ -15,7 +15,6 @@ use newznab\Music;
 use newznab\AniDB;
 use newznab\Books;
 use newznab\PreHash;
-use newznab\PreDB;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();
@@ -129,13 +128,6 @@ if (isset($_GET["id"]))
 		$AniDBAPIArray = $AniDB->getAnimeInfo($data["anidbid"]);
 	}
 
-	$predbQuery = '';
-	if ($data["preid"] > 0)
-	{
-		$PreDB = new PreDB();
-		$predbQuery = $PreDB->getByID($data["preid"]);
-	}
-
 	$prehash = new PreHash();
 	$pre = $prehash->getForRelease($data["prehashid"]);
 
@@ -157,7 +149,6 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('con',$con);
 	$page->smarty->assign('game', $game);
 	$page->smarty->assign('book',$book);
-	$page->smarty->assign('predb',$predbQuery);
 	$page->smarty->assign('prehash', $pre);
 	$page->smarty->assign('comments',$comments);
 	$page->smarty->assign('searchname',$releases->getSimilarName($data['searchname']));
