@@ -14,7 +14,6 @@ unset($s->tmdbkey);
 unset($s->rottentomatokey);
 if ($s->newznabID != "") $s->newznabID = "SET";
 if ($s->spotnabsiteprvkey != "") $s->spotnabsiteprvkey = "SET";
-unset($s->nzprekey);
 unset($s->recaptchaprivatekey);
 unset($s->saburl);
 unset($s->sabapikey);

@@ -871,61 +871,6 @@
 </fieldset>
 
 <fieldset>
-<legend>nzpre Settings</legend>
-<table class="input">
-
-<tr>
-	<td style="width:130px;"><label for="nzpregroup">Group</label>:</td>
-	<td>
-		<input id="nzpregroup" class="medium" name="nzpregroup" type="text" value="{$site->nzpregroup}" />
-		<div class="hint">Group to search when looking up nzpre posts.</div>
-	</td>
-</tr>
-
-<tr>
-	<td style="width:130px;"><label for="nzpresubject">Subject</label>:</td>
-	<td>
-		<input id="nzpresubject" class="long" name="nzpresubject" type="text" value="{$site->nzpresubject}" />
-		<div class="hint">Subject line. eg. This is an nzpre post!</div>
-	</td>
-</tr>
-
-<tr>
-	<td style="width:130px;"><label for="nzpreposter">Poster</label>:</td>
-	<td>
-		<input id="nzpreposter" class="medium" name="nzpreposter" type="text" value="{$site->nzpreposter}" />
-		<div class="hint">Full poster field. eg. tester test@test.com</div>
-	</td>
-</tr>
-
-<tr>
-	<td style="width:130px;"><label for="nzprefield">Field</label>:</td>
-	<td>
-		<input id="nzprefield" class="medium" name="nzprefield" type="text" value="{$site->nzprefield}" />
-		<div class="hint">Which header field to parse.</div>
-	</td>
-</tr>
-
-<tr>
-	<td style="width:130px;"><label for="nzprearticles">Articles</label>:</td>
-	<td>
-		<input id="nzprearticles" class="short" name="nzprearticles" type="text" value="{$site->nzprearticles}" />
-		<div class="hint">Number of articles to parse when updating.</div>
-	</td>
-</tr>
-
-<tr>
-	<td style="width:130px;"><label for="nzprekey">Key</label>:</td>
-	<td>
-		<input id="nzprekey" class="long" name="nzprekey" type="text" value="{$site->nzprekey}" />
-		<div class="hint">Key to decode.</div>
-	</td>
-</tr>
-
-</table>
-</fieldset>
-
-<fieldset>
 <legend>Spotnab Settings</legend>
 <table class="input">
 
