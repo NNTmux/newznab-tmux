@@ -2,14 +2,14 @@
 // TODO: bunch of if/elses need converting to switches
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\Groups;
 use newznab\Categorize;
 use newznab\ColorCLI;
-use newznab\ReleaseFiles;
 use newznab\ConsoleTools;
+use newznab\Groups;
 use newznab\NameFixer;
 use newznab\ReleaseCleaning;
+use newznab\ReleaseFiles;
+use newznab\db\Settings;
 
 /*
  *
@@ -86,7 +86,7 @@ function preName($argv, $argc)
 		$where = ' AND groupid = ' . $argv[2];
 		$why = ' WHERE nzbstatus = 1 AND isrenamed = 0';
 	} else if ($full === true) {
-		$why = ' WHERE nzbstatus = 1 AND (isrenamed = 0 OR categoryid between 8000 AND 8999)';
+		$why = ' WHERE nzbstatus = 1 AND (isrenamed = 0 OR categoryid between 7000 AND 7999)';
 	} else if ($all === true) {
 		$why = ' WHERE nzbstatus = 1';
 	} else {
@@ -110,7 +110,7 @@ function preName($argv, $argc)
 				$cleanName = trim((string)$cleanerName);
 				$propername = $increment = true;
 				if ($cleanName != '' && $cleanerName != false) {
-					$run = $pdo->queryOneRow("SELECT id FROM prehash WHERE title = " . $pdo->escapeString($cleanName));
+					$run = $pdo->queryOneRow("SELECT id FROM predb WHERE title = " . $pdo->escapeString($cleanName));
 					if (isset($run['id'])) {
 						$preid = $run['id'];
 						$predb = true;
@@ -145,7 +145,7 @@ function preName($argv, $argc)
 					}
 				}
 				//try to match clean name against predb filename
-				$prefile = $pdo->queryOneRow("SELECT id, title FROM prehash WHERE filename = " . $pdo->escapeString($cleanName));
+				$prefile = $pdo->queryOneRow("SELECT id, title FROM predb WHERE filename = " . $pdo->escapeString($cleanName));
 				if (isset($prefile['id'])) {
 					$preid = $prefile['id'];
 					$cleanName = $prefile['title'];
@@ -159,7 +159,7 @@ function preName($argv, $argc)
 						if ($propername == true) {
 							$pdo->queryExec(
 								sprintf(
-									"UPDATE releases SET videos_id = 0, tv_episodes_id = 0,imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, "
+									"UPDATE releases SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, "
 									. "iscategorized = 1, isrenamed = 1, searchname = %s, categoryid = %d, prehashid = " . $preid . " WHERE id = %d", $pdo->escapeString($cleanName), $determinedcat, $row['id']
 								)
 							);
@@ -184,15 +184,15 @@ function preName($argv, $argc)
 							$oldcatname = $category->getNameByID($row["categoryid"]);
 							$newcatname = $category->getNameByID($determinedcat);
 
-							NameFixer::echoChangedReleaseName(array(
+							NameFixer::echoChangedReleaseName([
 									'new_name'     => $cleanName,
 									'old_name'     => $row["searchname"],
 									'new_category' => $newcatname,
 									'old_category' => $oldcatname,
 									'group'        => $groupname,
 									'release_id'   => $row["id"],
-									'method'       => 'lib/testing/Dev/renametopre.php'
-								)
+									'method'       => 'misc/testing/Various/renametopre.php'
+								]
 							);
 						}
 					}
@@ -251,7 +251,7 @@ function resetSearchnames()
 	global $pdo;
 	echo $pdo->log->header("Resetting blank searchnames.");
 	$bad = $pdo->queryDirect(
-		"UPDATE releases SET videos_id = 0, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, "
+		"UPDATE releases SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, "
 		. "prehashid = 0, searchname = name, isrenamed = 0, iscategorized = 0 WHERE searchname = ''"
 	);
 	$tot = $bad->rowCount();
@@ -260,7 +260,7 @@ function resetSearchnames()
 	}
 	echo $pdo->log->header("Resetting searchnames that are 8 characters or less.");
 	$run = $pdo->queryDirect(
-		"UPDATE releases SET videos_id = 0, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, "
+		"UPDATE releases SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, "
 		. "prehashid = 0, searchname = name, isrenamed = 0, iscategorized = 0 WHERE LENGTH(searchname) <= 8 AND LENGTH(name) > 8"
 	);
 	$total = $run->rowCount();
@@ -303,7 +303,7 @@ function releaseCleaner($subject, $fromName, $size, $groupname, $usepre)
 	$releaseCleaning = new ReleaseCleaning($groups->pdo);
 	$cleanerName = $releaseCleaning->releaseCleaner($subject, $fromName, $size, $groupname, $usepre);
 	if (!is_array($cleanerName) && $cleanerName != false) {
-		return array("cleansubject" => $cleanerName, "properlynamed" => true, "increment" => false);
+		return ["cleansubject" => $cleanerName, "properlynamed" => true, "increment" => false];
 	} else {
 		return $cleanerName;
 	}
