@@ -156,7 +156,7 @@ if (!isset($argv[1])) {
 			$pres = $pdo->queryDirect(
 				sprintf('
 							SELECT p.id AS prehashid, p.title, p.source, p.searched
-							FROM prehash p
+							FROM predb p
 							WHERE LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"
 							AND searched = 0
 							AND DATEDIFF(NOW(), predate) > 1
@@ -182,7 +182,7 @@ if (!isset($argv[1])) {
 						$searched = $pre['searched'] - 1;
 						echo ".";
 					}
-					$pdo->queryExec(sprintf("UPDATE prehash SET searched = %d WHERE id = %d", $searched, $pre['prehashid']));
+					$pdo->queryExec(sprintf("UPDATE predb SET searched = %d WHERE id = %d", $searched, $pre['prehashid']));
 					$namefixer->checked++;
 				}
 			}

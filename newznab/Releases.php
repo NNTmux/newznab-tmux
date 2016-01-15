@@ -2076,21 +2076,21 @@ class Releases
 
 			if (is_array($cleanedName)) {
 				$properName = $cleanedName['properlynamed'];
-				$prehashID = (isset($cleanerName['predb']) ? $cleanerName['predb'] : false);
+				$preID = (isset($cleanerName['predb']) ? $cleanerName['predb'] : false);
 				$isReqID = (isset($cleanerName['requestid']) ? $cleanerName['requestid'] : false);
 				$cleanedName = $cleanedName['cleansubject'];
 			} else {
 				$properName = true;
-				$isReqID = $prehashID = false;
+				$isReqID = $preID = false;
 			}
 
-			if ($prehashID === false && $cleanedName !== '') {
+			if ($preID === false && $cleanedName !== '') {
 				// try to match the cleaned searchname to predb title or filename here
-				$preHash = new PreHash();
+				$preHash = new PreDb();
 				$preMatch = $preHash->matchPre($cleanedName);
 				if ($preMatch !== false) {
 					$cleanedName = $preMatch['title'];
-					$prehashID = $preMatch['prehashid'];
+					$preID = $preMatch['preid'];
 					$properName = true;
 				}
 			}
@@ -2110,7 +2110,7 @@ class Releases
 					'nzbstatus'      => NZB::NZB_NONE,
 					'isrenamed'      => ($properName === true ? 1 : 0),
 					'reqidstatus'    => ($isReqID === true ? 1 : 0),
-					'prehashid'      => ($prehashID === false ? 0 : $prehashID)
+					'preid'      => ($preID === false ? 0 : $preID)
 				]
 			);
 			//
@@ -2400,7 +2400,7 @@ class Releases
 			$parameters['reqid'] = " null ";
 
 		$parameters['id'] = $this->pdo->queryInsert(sprintf("INSERT INTO releases (name, searchname, totalpart, groupid, adddate, guid, categoryid, regexid, postdate, fromname, size, reqid, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
-					isrenamed, iscategorized, reqidstatus, prehashid)
+					isrenamed, iscategorized, reqidstatus, preid)
                     VALUES (%s, %s, %d, %d, now(), %s, %d, %s, %s, %s, 0, %s, %d, 100,-1, -1, %d, %d, 1, %d, %d)",
 				$parameters['name'],
 				$parameters['searchname'],
@@ -2416,7 +2416,7 @@ class Releases
 				$parameters['nzbstatus'],
 				$parameters['isrenamed'],
 				$parameters['reqidstatus'],
-				$parameters['prehashid']
+				$parameters['preid']
 			)
 		);
 

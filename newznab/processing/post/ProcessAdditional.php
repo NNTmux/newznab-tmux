@@ -630,7 +630,7 @@ class ProcessAdditional
 		$this->_releases = $this->pdo->query(
 			sprintf(
 				'
-				SELECT r.id, r.guid, r.name, c.disablepreview, r.size, r.groupid, r.nfostatus, r.completion, r.categoryid, r.searchname, r.prehashid
+				SELECT r.id, r.guid, r.name, c.disablepreview, r.size, r.groupid, r.nfostatus, r.completion, r.categoryid, r.searchname, r.preid
 				FROM releases r
 				LEFT JOIN category c ON c.id = r.categoryid
 				WHERE r.nzbstatus = 1
@@ -1809,7 +1809,7 @@ class ProcessAdditional
 
 							if (isset($track['Album']) && isset($track['Performer'])) {
 
-								if (NN_RENAME_MUSIC_MEDIAINFO && $this->_release['prehashid'] == 0) {
+								if (NN_RENAME_MUSIC_MEDIAINFO && $this->_release['preid'] == 0) {
 									// Make the extension upper case.
 									$ext = strtoupper($fileExtension);
 
@@ -2351,7 +2351,7 @@ class ProcessAdditional
 					r.id AS releaseid
 				FROM releases r
 				WHERE r.isrenamed = 0
-				AND r.prehashid = 0
+				AND r.preid = 0
 				AND r.id = %d',
 				$this->_release['id']
 			)
@@ -2475,7 +2475,7 @@ class ProcessAdditional
 							'
 							UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
-								consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = 0,
+								consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, preid = 0,
 								searchname = %s, isrenamed = 1, iscategorized = 1, proc_files = 1, categoryid = %d
 							WHERE id = %d',
 							$newTitle,

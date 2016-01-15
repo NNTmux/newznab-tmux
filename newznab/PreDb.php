@@ -9,9 +9,9 @@ use newznab\db\Settings;
  * Class for inserting names/categories etc from PreDB sources into the DB,
  * also for matching names on files / subjects.
  *
- * Class PreHash
+ * Class PreDb
  */
-Class PreHash
+Class PreDb
 {
 	// Nuke status.
 	const PRE_NONUKE  = 0; // Pre is not nuked.
@@ -76,10 +76,10 @@ Class PreHash
 
 		$res = $this->pdo->queryDirect(
 				sprintf('
-							SELECT p.id AS prehashid, r.id AS releaseid
-							FROM prehash p
+							SELECT p.id AS preid, r.id AS releaseid
+							FROM predb p
 							INNER JOIN releases r ON p.title = r.searchname
-							WHERE r.prehashid < 1 %s',
+							WHERE r.preid < 1 %s',
 						$datesql
 				)
 		);
@@ -88,10 +88,10 @@ Class PreHash
 			$total = $res->rowCount();
 			echo $this->pdo->log->primary(number_format($total) . ' releases to match.');
 
-			if ($res instanceof Traversable) {
+			if ($res instanceof \Traversable) {
 				foreach ($res as $row) {
 					$this->pdo->queryExec(
-							sprintf('UPDATE releases SET prehashid = %d WHERE id = %d', $row['prehashid'], $row['releaseid'])
+							sprintf('UPDATE releases SET preid = %d WHERE id = %d', $row['preid'], $row['releaseid'])
 					);
 
 					if ($this->echooutput) {
@@ -127,25 +127,25 @@ Class PreHash
 		}
 
 		$titleCheck = $this->pdo->queryOneRow(
-				sprintf('SELECT id FROM prehash WHERE title = %s LIMIT 1', $this->pdo->escapeString($cleanerName))
+				sprintf('SELECT id FROM predb WHERE title = %s LIMIT 1', $this->pdo->escapeString($cleanerName))
 		);
 
 		if ($titleCheck !== false) {
 			return array(
 					'title' => $cleanerName,
-					'prehashid' => $titleCheck['id']
+					'preid' => $titleCheck['id']
 			);
 		}
 
 		// Check if clean name matches a PreDB filename.
 		$fileCheck = $this->pdo->queryOneRow(
-				sprintf('SELECT id, title FROM prehash WHERE filename = %s LIMIT 1', $this->pdo->escapeString($cleanerName))
+				sprintf('SELECT id, title FROM predb WHERE filename = %s LIMIT 1', $this->pdo->escapeString($cleanerName))
 		);
 
 		if ($fileCheck !== false) {
 			return array(
 					'title' => $fileCheck['title'],
-					'prehashid' => $fileCheck['id']
+					'preid' => $fileCheck['id']
 			);
 		}
 
@@ -191,7 +191,7 @@ Class PreHash
 			$query = sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, '
 					. 'dehashstatus, rf.name AS filename FROM releases r '
 					. 'LEFT OUTER JOIN release_files rf ON r.id = rf.releaseid '
-					. 'WHERE nzbstatus = 1 AND dehashstatus BETWEEN -6 AND 0 AND prehashid = 0 %s', $regex);
+					. 'WHERE nzbstatus = 1 AND dehashstatus BETWEEN -6 AND 0 AND preid = 0 %s', $regex);
 		} else {
 			$query = sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, '
 					. 'dehashstatus, rf.name AS filename FROM releases r '
@@ -202,7 +202,7 @@ Class PreHash
 		$res = $this->pdo->queryDirect($query);
 		$total = $res->rowCount();
 		echo $this->pdo->log->primary(number_format($total) . " releases to process.");
-		if ($res instanceof Traversable) {
+		if ($res instanceof \Traversable) {
 			foreach ($res as $row) {
 				if (preg_match('/[a-fA-F0-9]{32,40}/i', $row['name'], $matches)) {
 					$updated = $updated + $namefixer->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
@@ -248,8 +248,8 @@ Class PreHash
 
 		$sql = sprintf('
 			SELECT p.*, r.guid
-			FROM prehash p
-			LEFT OUTER JOIN releases r ON p.id = r.prehashid %s
+			FROM predb p
+			LEFT OUTER JOIN releases r ON p.id = r.preid %s
 			ORDER BY p.predate DESC
 			LIMIT %d
 			OFFSET %d',
@@ -272,7 +272,7 @@ Class PreHash
 	{
 		$count = $this->pdo->query("
 			SELECT COUNT(id) AS cnt
-			FROM prehash {$search}",
+			FROM predb {$search}",
 				true,
 				NN_CACHE_EXPIRY_MEDIUM
 		);
@@ -288,7 +288,7 @@ Class PreHash
 	 */
 	public function getForRelease($preID)
 	{
-		return $this->pdo->query(sprintf('SELECT * FROM prehash WHERE id = %d', $preID));
+		return $this->pdo->query(sprintf('SELECT * FROM predb WHERE id = %d', $preID));
 	}
 
 	/**
@@ -300,7 +300,7 @@ Class PreHash
 	 */
 	public function getOne($preID)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT * FROM prehash WHERE id = %d', $preID));
+		return $this->pdo->queryOneRow(sprintf('SELECT * FROM predb WHERE id = %d', $preID));
 	}
 
 }

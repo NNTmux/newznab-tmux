@@ -96,7 +96,7 @@ class ReleaseCleaning
 			$matches)) {
 			foreach ($matches as $match) {
 				foreach ($match as $val) {
-					$title = $this->pdo->queryOneRow("SELECT title, id from prehash WHERE title = " .
+					$title = $this->pdo->queryOneRow("SELECT title, id from predb WHERE title = " .
 						$this->pdo->escapeString(trim($val)));
 					// don't match against ab.teevee if title is for just the season
 					if ($this->groupName == 'alt.binaries.teevee' and preg_match('/\.S\d\d\./', $title['title'], $match)) {
@@ -122,12 +122,12 @@ class ReleaseCleaning
 		) {
 			$title = $this->pdo->queryOneRow(
 				sprintf(
-					'SELECT p.title , p.id from prehash p INNER JOIN groups g on g.id = p.groupid WHERE p.requestid = %d and g.name = %s',
+					'SELECT p.title , p.id from predb p INNER JOIN groups g on g.id = p.groupid WHERE p.requestid = %d and g.name = %s',
 					$match[1],
 					$this->pdo->escapeString($this->groupName)
 				)
 			);
-			//check for prehash title matches against other groups where it matches relative size / fromname
+			//check for predb title matches against other groups where it matches relative size / fromname
 			//known crossposted requests only atm
 			$reqGname = '';
 			switch ($this->groupName) {
@@ -152,7 +152,7 @@ class ReleaseCleaning
 			if ($title === false && !empty($reqGname)) {
 				$title = $this->pdo->queryOneRow(
 					sprintf(
-						"SELECT p.title as title, p.id as id from prehash p INNER JOIN groups g on g.id = p.groupid
+						"SELECT p.title as title, p.id as id from predb p INNER JOIN groups g on g.id = p.groupid
 								WHERE p.requestid = %d and g.name = %s",
 						$match[1],
 						$this->pdo->escapeString($reqGname)

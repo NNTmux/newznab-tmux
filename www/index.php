@@ -46,7 +46,6 @@ switch ($page->page) {
 	case 'nfo':
 	case 'nzbgetqueuedata':
 	case 'predb':
-	case 'prehash':
 	case 'profile':
 	case 'profileedit':
 	case 'queue':

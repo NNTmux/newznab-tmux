@@ -1440,7 +1440,7 @@ INSERT INTO groups (id, name, backfill_target, first_record, first_record_postda
 (161, 'alt.binaries.triballs', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (162, 'es.binarios.hd', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (163, 'alt.binaries.fz', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
-(164, 'alt.binaries.boneless', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, 'Added by predb import script'),
+(164, 'alt.binaries.boneless', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (165, 'alt.binaries.x.upper-case', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (166, 'alt.binaries.town.cine', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (167, 'alt.binaries.town.long.ding.dong', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
@@ -1533,7 +1533,6 @@ INSERT INTO menu (id, href, title, newwindow, tooltip, role, ordinal, menueval) 
 (9, 'music', 'Music', 0, 'Browse for Music', 1, 60, ''),
 (10, 'console', 'Console', 0, 'Browse for Games', 1, 65, ''),
 (11, 'books', 'Books', 0, 'Browse for Books', 1, 66, ''),
-(12, 'predb', 'PreDB', 0, 'View PreDB', 1, 67, '{if $site->nzprekey==''''}-1{/if}'),
 (13, 'admin', 'Admin', 0, 'Admin', 2, 70, ''),
 (14, 'cart', 'My Cart', 0, 'Your Nzb cart', 1, 75, ''),
 (15, 'mymovies', 'My Movies', 0, 'Your Movie Wishlist', 1, 78, ''),
@@ -1544,7 +1543,7 @@ INSERT INTO menu (id, href, title, newwindow, tooltip, role, ordinal, menueval) 
 (21, 'logout', 'Logout', 0, 'Logout', 1, 95, ''),
 (22, 'login', 'Login', 0, 'Login', 0, 100, ''),
 (23, 'register', 'Register', 0, 'Register', 0, 110, ''),
-(24, 'prehash', 'Prehash', 0, 'Prehash', 1, 68, ''),
+(24, 'predb', 'PreDb', 0, 'PreDb', 1, 68, ''),
 (25, 'newposterwall', 'New Releases', 0, 'Newest Releases Poster Wall', 1, 11, '');
 
 DROP TABLE IF EXISTS movieinfo;
@@ -1633,30 +1632,6 @@ CREATE TABLE IF NOT EXISTS parts (
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS predb;
-CREATE TABLE IF NOT EXISTS predb (
-  id INT(12) NOT NULL AUTO_INCREMENT,
-  ctime INT(12) NOT NULL,
-  dirname VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
-  category VARCHAR(20) COLLATE utf8_unicode_ci NOT NULL,
-  nuketype VARCHAR(20) COLLATE utf8_unicode_ci DEFAULT '',
-  nukereason VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT '',
-  nuketime INT(12) DEFAULT '0',
-  filesize FLOAT DEFAULT '0',
-  filecount INT(6) DEFAULT '0',
-  filename VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT '',
-  updatedate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (id),
-  UNIQUE KEY dirname (dirname),
-  KEY ix_predb_ctime (ctime),
-  KEY ix_predb_updatedate (updatedate),
-  KEY ix_predb_filename (filename)
-)
-  ENGINE = MyISAM
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci
-  AUTO_INCREMENT = 1;
-
 DROP TABLE IF EXISTS predbhash;
 CREATE TABLE IF NOT EXISTS predbhash (
   hash varbinary(20) NOT NULL DEFAULT '',
@@ -1667,8 +1642,8 @@ CREATE TABLE IF NOT EXISTS predbhash (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS prehash;
-CREATE TABLE IF NOT EXISTS prehash (
+DROP TABLE IF EXISTS predb;
+CREATE TABLE IF NOT EXISTS predb (
   id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   filename VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
@@ -1684,15 +1659,15 @@ CREATE TABLE IF NOT EXISTS prehash (
   files VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   searched TINYINT(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
-  UNIQUE KEY ix_prehash_title (title),
-  KEY ix_prehash_filename (filename),
-  KEY ix_prehash_nfo (nfo),
-  KEY ix_prehash_predate (predate),
-  KEY ix_prehash_source (source),
-  KEY ix_prehash_requestid (requestid,groupid),
-  KEY ix_prehash_size (size),
-  KEY ix_prehash_category (category),
-  KEY ix_prehash_searched (searched)
+  UNIQUE KEY ix_predb_title (title),
+  KEY ix_predb_filename (filename),
+  KEY ix_predb_nfo (nfo),
+  KEY ix_predb_predate (predate),
+  KEY ix_predb_source (source),
+  KEY ix_predb_requestid (requestid,groupid),
+  KEY ix_predb_size (size),
+  KEY ix_predb_category (category),
+  KEY ix_predb_searched (searched)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
@@ -1705,14 +1680,14 @@ DROP TRIGGER IF EXISTS update_hashes;
 
 DELIMITER $$
 
-CREATE TRIGGER delete_hashes AFTER DELETE ON prehash FOR EACH ROW BEGIN DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id  =  OLD.id; END $$
-CREATE TRIGGER insert_hashes AFTER INSERT ON prehash FOR EACH ROW BEGIN INSERT INTO predbhash (hash, pre_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id); END $$
-CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW BEGIN IF NEW.title !=  OLD.title THEN DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id  =  OLD.id; INSERT INTO predbhash (hash, pre_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id );END IF;END $$
+CREATE TRIGGER delete_hashes AFTER DELETE ON predb FOR EACH ROW BEGIN DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id  =  OLD.id; END $$
+CREATE TRIGGER insert_hashes AFTER INSERT ON predb FOR EACH ROW BEGIN INSERT INTO predbhash (hash, pre_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id); END $$
+CREATE TRIGGER update_hashes AFTER UPDATE ON predb FOR EACH ROW BEGIN IF NEW.title !=  OLD.title THEN DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id  =  OLD.id; INSERT INTO predbhash (hash, pre_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id );END IF;END $$
 
 DELIMITER ;
 
-DROP TABLE IF EXISTS prehash_imports;
-CREATE TABLE IF NOT EXISTS prehash_imports (
+DROP TABLE IF EXISTS predb_imports;
+CREATE TABLE IF NOT EXISTS predb_imports (
   title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   nfo VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   size VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -1842,7 +1817,6 @@ CREATE TABLE IF NOT EXISTS releases (
   musicinfoid INT(11) DEFAULT NULL,
   consoleinfoid INT(11) DEFAULT NULL,
   bookinfoid INT(11) DEFAULT NULL,
-  preid INT(12) DEFAULT NULL,
   anidbid INT(11) DEFAULT NULL,
   reqid VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   releasenfoid INT(11) DEFAULT NULL,
@@ -1857,7 +1831,7 @@ CREATE TABLE IF NOT EXISTS releases (
   audiostatus TINYINT(1) NOT NULL DEFAULT '0',
   videostatus TINYINT(1) NOT NULL DEFAULT '0',
   reqidstatus TINYINT(1) NOT NULL DEFAULT '0',
-  prehashid INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  preid INT(10) UNSIGNED NOT NULL DEFAULT '0',
   iscategorized TINYINT(1) NOT NULL DEFAULT '0',
   isrenamed TINYINT(1) NOT NULL DEFAULT '0',
   ishashed TINYINT(1) NOT NULL DEFAULT '0',
@@ -1885,7 +1859,7 @@ CREATE TABLE IF NOT EXISTS releases (
   KEY ix_releases_gamesinfo_id (gamesinfo_id),
   KEY ix_releases_bookinfoid (bookinfoid),
   KEY ix_releases_anidbid (anidbid),
-  KEY ix_releases_preid_searchname (prehashid,searchname),
+  KEY ix_releases_preid_searchname (preid,searchname),
   KEY ix_releases_haspreview_passwordstatus (haspreview,passwordstatus),
   KEY ix_releases_passwordstatus (passwordstatus),
   KEY ix_releases_nfostatus (nfostatus,size),
@@ -2178,12 +2152,6 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('nzbpath', '', '', '', 'nzbpath', ''),
 ('nzbsplitlevel', '1','', '', 'nzbsplitlevel', ''),
 ('nzbthreads', '5', '', '', 'nzbthreads', ''),
-('nzprearticles', '500','', '', 'nzprearticles', ''),
-('nzprefield', '', '', '', 'nzprefield', ''),
-('nzpregroup', '', '', '', 'nzpregroup', ''),
-('nzprekey', '', '', '', 'nzprekey', ''),
-('nzpreposter', '', '', '', 'nzpreposter', ''),
-('nzpresubject', '', '', '', 'nzpresubject', ''),
 ('partrepair', '1','', '', 'partrepair', ''),
 ('partrepairmaxtries', '3','', '', 'partrepairmaxtries', ''),
 ('partretentionhours', '72', '', '', 'partretentionhours', 'The number of hours incomplete parts and binaries will be retained'),

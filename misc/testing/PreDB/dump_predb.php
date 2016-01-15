@@ -29,7 +29,7 @@ if (isset($argv[1]) && $argv[1] == 'export' && isset($argv[2])) {
 	if (isset($argv[3])) {
 		$table = $argv[3];
 	} else {
-		$table = 'prehash';
+		$table = 'predb';
 	}
 	echo  $pdo->log->header("SELECT title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, g.name FROM " . $table . " p LEFT OUTER JOIN groups g ON p.groupid = g.id INTO OUTFILE '" . $path . "' FIELDS TERMINATED BY '\\t\\t' ENCLOSED BY \"'\" LINES TERMINATED BY '\\r\\n';n");
 	$pdo->queryExec("SELECT title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, g.name FROM " . $table . " p LEFT OUTER JOIN groups g ON p.groupid = g.id INTO OUTFILE '" . $path . "' FIELDS TERMINATED BY '\t\t' ENCLOSED BY \"'\" LINES TERMINATED BY '\r\n'");
@@ -80,15 +80,15 @@ SQL_ADD_GROUPS;
 INSERT INTO $table (title, nfo, size, files, filename, nuked, nukereason, category, predate, SOURCE, requestid, groupid)
   SELECT t.title, t.nfo, t.size, t.files, t.filename, t.nuked, t.nukereason, t.category, t.predate, t.source, t.requestid, IF(g.id IS NOT NULL, g.id, 0)
     FROM predb_imports AS t
-	LEFT OUTER JOIN groups g ON t.groupname = g.name ON DUPLICATE KEY UPDATE prehash.nfo = IF(prehash.nfo IS NULL, t.nfo, prehash.nfo),
-	  prehash.size = IF(prehash.size IS NULL, t.size, prehash.size),
-	  prehash.files = IF(prehash.files IS NULL, t.files, prehash.files),
-	  prehash.filename = IF(prehash.filename = '', t.filename, prehash.filename),
-	  prehash.nuked = IF(t.nuked > 0, t.nuked, prehash.nuked),
-	  prehash.nukereason = IF(t.nuked > 0, t.nukereason, prehash.nukereason),
-	  prehash.category = IF(prehash.category IS NULL, t.category, prehash.category),
-	  prehash.requestid = IF(prehash.requestid = 0, t.requestid, prehash.requestid),
-	  prehash.groupid = IF(g.id IS NOT NULL, g.id, 0);
+	LEFT OUTER JOIN groups g ON t.groupname = g.name ON DUPLICATE KEY UPDATE predb.nfo = IF(predb.nfo IS NULL, t.nfo, predb.nfo),
+	  predb.size = IF(predb.size IS NULL, t.size, predb.size),
+	  predb.files = IF(predb.files IS NULL, t.files, predb.files),
+	  predb.filename = IF(predb.filename = '', t.filename, predb.filename),
+	  predb.nuked = IF(t.nuked > 0, t.nuked, predb.nuked),
+	  predb.nukereason = IF(t.nuked > 0, t.nukereason, predb.nukereason),
+	  predb.category = IF(predb.category IS NULL, t.category, predb.category),
+	  predb.requestid = IF(predb.requestid = 0, t.requestid, predb.requestid),
+	  predb.groupid = IF(g.id IS NOT NULL, g.id, 0);
 SQL_INSERT;
 	echo $pdo->log->primary($sqlInsert);
 	$pdo->queryExec($sqlInsert);

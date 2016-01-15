@@ -43,8 +43,8 @@ class PreDb extends DB
 		$options += $defaults;
 		parent::__construct($options);
 
-		$this->tableMain = 'prehash';
-		$this->tableTemp = 'prehash_imports';
+		$this->tableMain = 'predb';
+		$this->tableTemp = 'predb_imports';
 	}
 
 	public function executeAddGroups()
@@ -224,7 +224,7 @@ SQL_EXPORT;
 		$sql = <<<SQL_ADD_GROUPS
 INSERT IGNORE INTO groups (name, description)
 	SELECT groupname, 'Added by predb import script'
-	FROM prehash_imports AS pi LEFT JOIN groups AS g ON pi.groupname = g.name
+	FROM predb_imports AS pi LEFT JOIN groups AS g ON pi.groupname = g.name
 	WHERE pi.groupname IS NOT NULL AND g.name IS NULL
 	GROUP BY groupname;
 SQL_ADD_GROUPS;
@@ -234,7 +234,7 @@ SQL_ADD_GROUPS;
 
 	protected function prepareSQLDeleteShort()
 	{
-		$this->prepareSQLStatement('DELETE FROM prehash_imports WHERE LENGTH(title) <= 8', 'DeleteShort');
+		$this->prepareSQLStatement('DELETE FROM predb_imports WHERE LENGTH(title) <= 8', 'DeleteShort');
 	}
 
 	protected function prepareSQLInsert()
@@ -242,16 +242,16 @@ SQL_ADD_GROUPS;
 		$sql = <<<SQL_INSERT
 INSERT INTO {$this->tableMain} (title, nfo, size, files, filename, nuked, nukereason, category, predate, SOURCE, requestid, groupid)
   SELECT pi.title, pi.nfo, pi.size, pi.files, pi.filename, pi.nuked, pi.nukereason, pi.category, pi.predate, pi.source, pi.requestid, groupid
-    FROM prehash_imports AS pi
-  ON DUPLICATE KEY UPDATE prehash.nfo = IF(prehash.nfo IS NULL, pi.nfo, prehash.nfo),
-	  prehash.size = IF(prehash.size IS NULL, pi.size, prehash.size),
-	  prehash.files = IF(prehash.files IS NULL, pi.files, prehash.files),
-	  prehash.filename = IF(prehash.filename = '', pi.filename, prehash.filename),
-	  prehash.nuked = IF(pi.nuked > 0, pi.nuked, prehash.nuked),
-	  prehash.nukereason = IF(pi.nuked > 0, pi.nukereason, prehash.nukereason),
-	  prehash.category = IF(prehash.category IS NULL, pi.category, prehash.category),
-	  prehash.requestid = IF(prehash.requestid = 0, pi.requestid, prehash.requestid),
-	  prehash.groupid = IF(prehash.groupid = 0, pi.groupid, prehash.groupid);
+    FROM predb_imports AS pi
+  ON DUPLICATE KEY UPDATE predb.nfo = IF(predb.nfo IS NULL, pi.nfo, predb.nfo),
+	  predb.size = IF(predb.size IS NULL, pi.size, predb.size),
+	  predb.files = IF(predb.files IS NULL, pi.files, predb.files),
+	  predb.filename = IF(predb.filename = '', pi.filename, predb.filename),
+	  predb.nuked = IF(pi.nuked > 0, pi.nuked, predb.nuked),
+	  predb.nukereason = IF(pi.nuked > 0, pi.nukereason, predb.nukereason),
+	  predb.category = IF(predb.category IS NULL, pi.category, predb.category),
+	  predb.requestid = IF(predb.requestid = 0, pi.requestid, predb.requestid),
+	  predb.groupid = IF(predb.groupid = 0, pi.groupid, predb.groupid);
 SQL_INSERT;
 
 		$this->prepareSQLStatement($sql, 'Insert');
@@ -276,7 +276,7 @@ SQL_INSERT;
 		}
 		$sql = <<<SQL_LOAD_DATA
 LOAD DATA $local INFILE :path
-  IGNORE INTO TABLE prehash_imports
+  IGNORE INTO TABLE predb_imports
   FIELDS TERMINATED BY '{$options['fields']}' {$enclosedby}
   LINES TERMINATED BY '{$options['lines']}'
   (title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, groupname);
@@ -290,12 +290,12 @@ SQL_LOAD_DATA;
 
 	protected function prepareSQLTruncate()
 	{
-		$this->prepareSQLStatement('TRUNCATE TABLE prehash_imports', 'Truncate');
+		$this->prepareSQLStatement('TRUNCATE TABLE predb_imports', 'Truncate');
 	}
 
 	protected function prepareSQLUpdateGroupIDs()
 	{
-		$sql = "UPDATE prehash_imports AS pi SET groupid = (SELECT id FROM groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL";
+		$sql = "UPDATE predb_imports AS pi SET groupid = (SELECT id FROM groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL";
 		$this->prepareSQLStatement($sql, 'UpdateGroupID');
 	}
 }
