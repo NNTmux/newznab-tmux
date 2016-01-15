@@ -10,9 +10,9 @@ $predb = new PreDb();
 
 $offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST["offset"] : 0;
 
-if (isset($_REQUEST['prehashsearch'])) {
-	$lastSearch = $_REQUEST['prehashsearch'];
-	$parr = $predb->getAll($offset, ITEMS_PER_PAGE, $_REQUEST['prehashsearch']);
+if (isset($_REQUEST['presearch'])) {
+	$lastSearch = $_REQUEST['presearch'];
+	$parr = $predb->getAll($offset, ITEMS_PER_PAGE, $_REQUEST['presearch']);
 } else {
 	$lastSearch = '';
 	$parr = $predb->getAll($offset, ITEMS_PER_PAGE);
@@ -21,7 +21,7 @@ if (isset($_REQUEST['prehashsearch'])) {
 $page->smarty->assign('pagertotalitems', $parr['count']);
 $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
-$page->smarty->assign('pagerquerybase', WWW_TOP . "/prehash/&amp;offset=");
+$page->smarty->assign('pagerquerybase', WWW_TOP . "/predb/&amp;offset=");
 $page->smarty->assign('pagerquerysuffix', "#results");
 $page->smarty->assign('lastSearch', $lastSearch);
 
@@ -30,10 +30,10 @@ $page->smarty->assign('pager', $pager);
 
 $page->smarty->assign('results', $parr['arr']);
 
-$page->title = "Browse Prehash";
-$page->meta_title = "View Prehash info";
-$page->meta_keywords = "view,prehash,info,description,details";
-$page->meta_description = "View Prehash info";
+$page->title = "Browse PreDb";
+$page->meta_title = "View PreDb info";
+$page->meta_keywords = "view,predb,info,description,details";
+$page->meta_description = "View PreDb info";
 
-$page->content = $page->smarty->fetch('prehash.tpl');
+$page->content = $page->smarty->fetch('predb.tpl');
 $page->render();

@@ -153,7 +153,7 @@ if (isset($_GET['type'])) {
 				$preData = $db->query(
 					sprintf('
 					SELECT p.*
-					FROM prehash p
+					FROM predb p
 					INNER JOIN groups g ON g.id = p.groupid
 					WHERE requestid = %d
 					AND g.name = %s
@@ -177,7 +177,7 @@ if (isset($_GET['type'])) {
 			if (isset($_GET['title'])) {
 				$db = new newznab\db\Settings();
 				$preData = $db->query(
-					sprintf('SELECT * FROM prehash p WHERE p.title %s %s %s LIKE %s LIMIT %d OFFSET %d',
+					sprintf('SELECT * FROM predb p WHERE p.title %s %s %s LIKE %s LIMIT %d OFFSET %d',
 						$newer,
 						$older,
 						$nuked,
@@ -195,7 +195,7 @@ if (isset($_GET['type'])) {
 			if (isset($_GET['md5']) && strlen($_GET['title']) === 32) {
 				$db = new newznab\db\Settings();
 				$preData = $db->query(
-					sprintf('SELECT * FROM prehash p INNER JOIN predbhash ph ON ph.pre_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
+					sprintf('SELECT * FROM predb p INNER JOIN predbhash ph ON ph.pre_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
 						$db->escapeString($_GET['md5']),
 						$newer,
 						$older,
@@ -212,7 +212,7 @@ if (isset($_GET['type'])) {
 			if (isset($_GET['sha1']) && strlen($_GET['sha1']) === 40) {
 				$db = new newznab\db\Settings();
 				$preData = $db->query(
-					sprintf('SELECT * FROM prehash p INNER JOIN predbhash ph ON ph.pre_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
+					sprintf('SELECT * FROM predb p INNER JOIN predbhash ph ON ph.pre_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
 						$db->escapeString($_GET['sha1']),
 						$newer,
 						$older,
@@ -228,7 +228,7 @@ if (isset($_GET['type'])) {
 		case 'all':
 			$db = new newznab\db\Settings();
 			$preData = $db->query(
-				sprintf('SELECT * FROM prehash p WHERE 1=1 %s %s %s ORDER BY p.predate DESC LIMIT %d OFFSET %d',
+				sprintf('SELECT * FROM predb p WHERE 1=1 %s %s %s ORDER BY p.predate DESC LIMIT %d OFFSET %d',
 					$newer,
 					$older,
 					$nuked,

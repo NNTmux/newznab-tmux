@@ -207,7 +207,7 @@
 							<li><a href="{$smarty.const.WWW_TOP}/books"><i class="fa fa-book"></i><span> Books</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/browse"><i
 											class="fa fa-list-ul"></i><span> Browse All Releases</span></a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/prehash"><i class="fa fa-list-ol"></i><span> PreDb</span></a>
+							<li><a href="{$smarty.const.WWW_TOP}/predb"><i class="fa fa-list-ol"></i><span> PreDb</span></a>
 							</li>
 						</ul>
 					</li>
