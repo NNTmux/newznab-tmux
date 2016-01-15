@@ -1,14 +1,12 @@
 <?php
 
-use libs\Tmdb\TmdbAPI;
-use newznab\db\Settings;
+use newznab\Movie;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-$pdo = new Settings();
-$tmdb = new TmdbAPI($pdo->getSetting('tmdbkey'));
+$m = new Movie();
 
 if (!isset($_GET["id"])) {
 	$_GET["id"] = 1;
@@ -19,8 +17,8 @@ $cpurl = $user['cp_url'];
 $page->smarty->assign('cpapi', $cpapi);
 $page->smarty->assign('cpurl', $cpurl);
 
-$data = $tmdb->upcomingMovies();
-
+$data = $m->getUpcoming($_GET["id"]);
+//print_r(json_decode($data["info"])->movies);die();
 if (!$data || $data["info"] == "") {
 	$page->smarty->assign("nodata", "No upcoming data.");
 } else {
