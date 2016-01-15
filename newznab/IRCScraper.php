@@ -257,7 +257,7 @@ class IRCScraper extends IRCClient
 	 */
 	protected function _checkForDupe()
 	{
-		$this->_oldPre = $this->_pdo->queryOneRow(sprintf('SELECT category, size FROM prehash WHERE title = %s', $this->_pdo->escapeString($this->_curPre['title'])));
+		$this->_oldPre = $this->_pdo->queryOneRow(sprintf('SELECT category, size FROM predb WHERE title = %s', $this->_pdo->escapeString($this->_curPre['title'])));
 		if ($this->_oldPre === false) {
 			$this->_insertNewPre();
 		} else {
@@ -277,7 +277,7 @@ class IRCScraper extends IRCClient
 			return;
 		}
 
-		$query = 'INSERT INTO prehash (';
+		$query = 'INSERT INTO predb (';
 
 		$query .= (!empty($this->_curPre['size'])     ? 'size, '       : '');
 		$query .= (!empty($this->_curPre['category']) ? 'category, '   : '');
@@ -327,7 +327,7 @@ class IRCScraper extends IRCClient
 			return;
 		}
 
-		$query = 'UPDATE prehash SET ';
+		$query = 'UPDATE predb SET ';
 
 		$query .= (!empty($this->_curPre['size'])     ? 'size = '       . $this->_pdo->escapeString($this->_curPre['size'])     . ', ' : '');
 		$query .= (!empty($this->_curPre['source'])   ? 'source = '     . $this->_pdo->escapeString($this->_curPre['source'])   . ', ' : '');
@@ -344,7 +344,7 @@ class IRCScraper extends IRCClient
 			: ''
 		);
 
-		if ($query === 'UPDATE prehash SET '){
+		if ($query === 'UPDATE predb SET '){
 			return;
 		}
 

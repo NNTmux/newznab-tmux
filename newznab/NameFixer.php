@@ -186,7 +186,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.id)
 					WHERE rel.nzbstatus = %d
-					AND rel.prehashid = 0',
+					AND rel.preid = 0',
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -278,7 +278,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
 					WHERE rel.nzbstatus = %d
-					AND rel.prehashid = 0',
+					AND rel.preid = 0',
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -290,7 +290,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categoryid IN (%s))
-					AND rel.prehashid = 0
+					AND rel.preid = 0
 					AND rel.proc_files = %d
 					%s %s',
 				self::IS_RENAMED_NONE,
@@ -346,7 +346,7 @@ class NameFixer
 					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
 					WHERE nzbstatus = %d
-					AND prehashid = 0',
+					AND preid = 0',
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -355,7 +355,7 @@ class NameFixer
 					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
 					WHERE (rel.isrenamed = %d OR rel.categoryid IN (%s))
-					AND prehashid = 0
+					AND preid = 0
 					AND proc_srr = %d',
 				self::IS_RENAMED_NONE,
 				implode(',', Category::CAT_GROUP_OTHER),
@@ -417,7 +417,7 @@ class NameFixer
 					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
 					WHERE rel.nzbstatus = %d
-					AND rel.prehashid = 0',
+					AND rel.preid = 0',
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -684,7 +684,7 @@ class NameFixer
 							sprintf('
 								UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
-									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
+									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, preid = %d,
 									searchname = %s, %s categoryid = %d
 								WHERE id = %d',
 								$preId,
@@ -701,7 +701,7 @@ class NameFixer
 							sprintf('
 								UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
-									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
+									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, preid = %d,
 									searchname = %s, iscategorized = 1, categoryid = %d
 								WHERE id = %d',
 								$preId,
@@ -774,7 +774,7 @@ class NameFixer
 							FROM releases r
 							%1\$s
 							AND (r.name %2\$s OR r.searchname %2\$s)
-							AND r.prehashid = 0
+							AND r.preid = 0
 							LIMIT 21",
 				$join,
 				$this->pdo->likeString($pre['title'], true, true)
@@ -789,10 +789,10 @@ class NameFixer
 		if ($total > 0 && $total <= 15 && $res instanceof \Traversable) {
 			foreach ($res as $row) {
 				if ($pre['title'] !== $row['searchname']) {
-					$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['prehashid']);
+					$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['preid']);
 					$matching++;
 				} else {
-					$this->_updateSingleColumn('prehashid', $pre['prehashid'], $row['releaseid']);
+					$this->_updateSingleColumn('preid', $pre['preid'], $row['releaseid']);
 				}
 			}
 		} elseif ($total >= 16) {
@@ -854,7 +854,7 @@ class NameFixer
 							FROM releases r
 							INNER JOIN release_files rf ON r.id = rf.releaseid
 							AND rf.name IS NOT NULL
-							WHERE r.prehashid = 0
+							WHERE r.preid = 0
 							%s %s',
 				$orderby,
 				$limit
@@ -903,8 +903,8 @@ class NameFixer
 		if ($this->_fileName !== '') {
 			$pre = $this->pdo->queryOneRow(
 				sprintf('
-							SELECT id AS prehashid, title, source
-							FROM prehash
+							SELECT id AS preid, title, source
+							FROM predb
 							WHERE filename = %s
 							OR title = %1$s',
 					$this->pdo->escapeString($this->_fileName)
@@ -914,9 +914,9 @@ class NameFixer
 
 		if (isset($pre) && $pre !== false) {
 			if ($pre['title'] !== $release['searchname']) {
-				$this->updateRelease($release, $pre['title'], $method = "file matched source: " . $pre['source'], $echo, "PreDB file match, ", $namestatus, $show, $pre['prehashid']);
+				$this->updateRelease($release, $pre['title'], $method = "file matched source: " . $pre['source'], $echo, "PreDB file match, ", $namestatus, $show, $pre['preid']);
 			} else {
-				$this->_updateSingleColumn('prehashid', $pre['prehashid'], $release['releaseid']);
+				$this->_updateSingleColumn('preid', $pre['preid'], $release['releaseid']);
 			}
 			$matching++;
 		}
@@ -971,7 +971,7 @@ class NameFixer
 	}
 
 	/**
-	 * Match a Hash from the prehash to a release.
+	 * Match a Hash from the predb to a release.
 	 *
 	 * @param string  $hash
 	 * @param         $release
@@ -997,8 +997,8 @@ class NameFixer
 
 		$row = $pdo->queryOneRow(
 			sprintf("
-						SELECT p.id AS prehashid, p.title, p.source
-						FROM prehash p INNER JOIN predbhash h ON h.pre_id = p.id
+						SELECT p.id AS preid, p.title, p.source
+						FROM predb p INNER JOIN predbhash h ON h.pre_id = p.id
 						WHERE h.hash = UNHEX(%s)
 						LIMIT 1",
 				$pdo->escapeString($hash)
@@ -1007,7 +1007,7 @@ class NameFixer
 
 		if ($row !== false) {
 			if ($row["title"] !== $release["searchname"]) {
-				$this->updateRelease($release, $row["title"], $method = "predb hash release name: " . $row["source"], $echo, $hashtype, $namestatus, $show, $row['prehashid']);
+				$this->updateRelease($release, $row["title"], $method = "predb hash release name: " . $row["source"], $echo, $hashtype, $namestatus, $show, $row['preid']);
 				$matching++;
 			}
 		} else {
@@ -1035,7 +1035,7 @@ class NameFixer
 		if (preg_match_all(self::PREDB_REGEX, $release['textstring'], $matches) && !preg_match('/Source\s\:/i', $release['textstring'])) {
 			foreach ($matches as $match) {
 				foreach ($match as $val) {
-					$title = $this->pdo->queryOneRow("SELECT title, id from prehash WHERE title = " . $this->pdo->escapeString(trim($val)));
+					$title = $this->pdo->queryOneRow("SELECT title, id from predb WHERE title = " . $this->pdo->escapeString(trim($val)));
 					if ($title !== false) {
 						$this->updateRelease($release, $title['title'], $method = "preDB: Match", $echo, $type, $namestatus, $show, $title['id']);
 						$preid = true;

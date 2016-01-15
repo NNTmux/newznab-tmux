@@ -1057,7 +1057,7 @@ class ReleaseRemover
 			AND nfostatus = 1
 			AND haspreview = 0
 			AND jpgstatus = 0
-			AND prehashid = 0
+			AND preid = 0
 			AND videostatus = 0
 			AND
 			(

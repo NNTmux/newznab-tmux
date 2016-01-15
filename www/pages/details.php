@@ -129,7 +129,7 @@ if (isset($_GET["id"]))
 	}
 
 	$prehash = new PreHash();
-	$pre = $prehash->getForRelease($data["prehashid"]);
+	$pre = $prehash->getForRelease($data["preid"]);
 
 	$rf = new ReleaseFiles;
 	$releasefiles = $rf->get($data["id"]);
@@ -149,7 +149,7 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('con',$con);
 	$page->smarty->assign('game', $game);
 	$page->smarty->assign('book',$book);
-	$page->smarty->assign('prehash', $pre);
+	$page->smarty->assign('predb', $pre);
 	$page->smarty->assign('comments',$comments);
 	$page->smarty->assign('searchname',$releases->getSimilarName($data['searchname']));
 	$page->smarty->assign('similars', $similars);

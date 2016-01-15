@@ -494,7 +494,7 @@ class Forking extends \fork_daemon
 		$groupby = "GROUP BY guidchar";
 		$orderby = "ORDER BY guidchar ASC";
 		$rowLimit = "LIMIT 16";
-		$extrawhere = "AND r.prehashid = 0 AND r.nzbstatus = 1";
+		$extrawhere = "AND r.preid = 0 AND r.nzbstatus = 1";
 		$select = "DISTINCT LEFT(r.guid, 1) AS guidchar, COUNT(r.id) AS count";
 
 
@@ -908,7 +908,7 @@ class Forking extends \fork_daemon
 				INNER JOIN releases r ON r.groupid = g.id
 				WHERE g.active = 1
 				AND r.nzbstatus = %d
-				AND r.prehashid = 0
+				AND r.preid = 0
 				AND r.isrequestid = 1
 				AND r.reqidstatus = %d',
 				NZB::NZB_ADDED,

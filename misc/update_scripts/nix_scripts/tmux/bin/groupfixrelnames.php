@@ -32,7 +32,7 @@ if (!isset($argv[1])) {
 								AND r.nzbstatus = 1
 								AND r.proc_nfo = 0
 								AND r.nfostatus = 1
-								AND r.prehashid = 0
+								AND r.preid = 0
 								ORDER BY r.postdate DESC
 								LIMIT %s',
 					$pdo->likeString($guidChar, false, true),
@@ -71,7 +71,7 @@ if (!isset($argv[1])) {
 								WHERE r.guid %s
 								AND nzbstatus = 1 AND r.ishashed = 1
 								AND r.dehashstatus BETWEEN -6 AND 0
-								AND r.prehashid = 0
+								AND r.preid = 0
 								ORDER BY r.dehashstatus DESC, r.postdate ASC
 								LIMIT %s',
 					$pdo->likeString($guidChar, false, true),
@@ -100,7 +100,7 @@ if (!isset($argv[1])) {
 								WHERE r.guid %s
 								AND r.nzbstatus = 1
 								AND r.proc_par2 = 0
-								AND r.prehashid = 0
+								AND r.preid = 0
 								ORDER BY r.postdate ASC
 								LIMIT %s',
 					$pdo->likeString($guidChar, false, true),
@@ -137,7 +137,7 @@ if (!isset($argv[1])) {
 								WHERE r.guid %s
 								AND r.nzbstatus = 1 AND r.nfostatus = 1
 								AND r.proc_sorter = 0 AND r.isrenamed = 0
-								AND r.prehashid = 0
+								AND r.preid = 0
 								ORDER BY r.postdate DESC
 								LIMIT %s',
 					$pdo->likeString($guidChar, false, true),
@@ -155,8 +155,8 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'predbft' && isset($maxperrun) && is_numeric($maxperrun) && isset($thread) && is_numeric($thread):
 			$pres = $pdo->queryDirect(
 				sprintf('
-							SELECT p.id AS prehashid, p.title, p.source, p.searched
-							FROM prehash p
+							SELECT p.id AS preid, p.title, p.source, p.searched
+							FROM predb p
 							WHERE LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"
 							AND searched = 0
 							AND DATEDIFF(NOW(), predate) > 1
@@ -182,7 +182,7 @@ if (!isset($argv[1])) {
 						$searched = $pre['searched'] - 1;
 						echo ".";
 					}
-					$pdo->queryExec(sprintf("UPDATE prehash SET searched = %d WHERE id = %d", $searched, $pre['prehashid']));
+					$pdo->queryExec(sprintf("UPDATE predb SET searched = %d WHERE id = %d", $searched, $pre['preid']));
 					$namefixer->checked++;
 				}
 			}

@@ -538,33 +538,9 @@ jQuery(function ($) {
         });
     });
 
-    // preinfo tooltip
-    $(".preinfo").each(function() {
-        var searchname = $(this).attr('title');
-        $(this).qtip({
-            content: {
-                title: {
-                    text: 'Pre Info'
-                },
-                text: 'loading...',
-                ajax: {
-                    url: SERVERROOT + 'ajax_preinfo',
-                    type: 'GET',
-                    data: { searchname: searchname },
-                    success: function(data, status) {
-                        this.set('content.text', data);
-                    }
-                }
-            },
-            style: {
-                classes: 'ui-tooltip-tmux'
-            }
-        });
-    });
-
     // prehashinfo tooltip
     $(".prehashinfo").each(function () {
-        var prehashid = $(this).attr('title');
+        var preid = $(this).attr('title');
         $(this).qtip({
             content: {
                 title: {
@@ -574,7 +550,7 @@ jQuery(function ($) {
                 ajax: {
                     url: SERVERROOT + 'ajax_prehashinfo', // URL to the local file
                     type: 'GET', // POST or GET
-                    data: { id: prehashid }, // Data to pass along with your request
+                    data: { id: preid }, // Data to pass along with your request
                     success: function (data, status) {
                         this.set('content.text', data);
                     }
