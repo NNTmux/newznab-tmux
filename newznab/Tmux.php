@@ -398,8 +398,6 @@ class Tmux
 						((reqidstatus = 0) OR (reqidstatus = -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL %s HOUR)),1,0)) AS requestid_inprogress,
 					SUM(IF(preid > 0 AND nzbstatus = 1 AND isrequestid = 1 AND reqidstatus = 1,1,0)) AS requestid_matched,
 					SUM(IF(preid > 0 AND searchname IS NOT NULL,1,0)) AS predb_matched,
-					SUM(IF(preid > 0 AND searchname IS NOT NULL,1,0)) AS predb_matched,
-					COUNT(DISTINCT(preid)) AS distinct_predb_matched,
 					COUNT(DISTINCT(preid)) AS distinct_predb_matched
 					FROM releases r", $bookreqids, Nfo::NfoQueryString($this->pdo), $request_hours);
 			case 2:
@@ -414,7 +412,6 @@ class Tmux
 			case 4:
 				return sprintf("
 					SELECT
-					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'predb' AND TABLE_SCHEMA = %1\$s) AS predb,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'predb' AND TABLE_SCHEMA = %1\$s) AS predb,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'partrepair' AND TABLE_SCHEMA = %1\$s) AS partrepair_table,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = %1\$s) AS parts_table,
@@ -432,8 +429,7 @@ class Tmux
 				return "SELECT
 					(SELECT searchname FROM releases ORDER BY id DESC LIMIT 1) AS newestrelname,
 					(SELECT UNIX_TIMESTAMP(MIN(dateadded)) FROM collections) AS oldestcollection,
-					(SELECT UNIX_TIMESTAMP(MAX(predate)) FROM predb) AS newestpredb,
-					(SELECT UNIX_TIMESTAMP(MAX(ctime)) FROM predb) AS newestpredb,
+					(SELECT UNIX_TIMESTAMP(MAX(predate)) FROM predb) AS newestpre,
 					(SELECT UNIX_TIMESTAMP(adddate) FROM releases ORDER BY id DESC LIMIT 1) AS newestrelease";
 			default:
 				return false;

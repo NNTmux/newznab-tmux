@@ -163,11 +163,11 @@ class TmuxOutput extends Tmux
 				)
 		);
 		$buffer .= sprintf($this->tmpMasks[1],
-			"Prehash Updated:",
+			"Predb Updated:",
 			sprintf(
 				"%s ago",
-				(isset($this->runVar['timers']['newOld']['newestpredb'])
-					? $this->relativeTime($this->runVar['timers']['newOld']['newestpredb'])
+				(isset($this->runVar['timers']['newOld']['newestpre'])
+					? $this->relativeTime($this->runVar['timers']['newOld']['newestpre'])
 					: 0)
 			)
 		);
@@ -233,20 +233,6 @@ class TmuxOutput extends Tmux
 				number_format($this->runVar['counts']['now']['predb_matched']),
 				$this->runVar['counts']['percent']['predb_matched']
 			)
-		);
-		$buffer .= sprintf($this->tmpMasks[4],
-							"predb",
-							sprintf(
-								"%s(%s)",
-							number_format($this->runVar['counts']['now']['predb'] -
-								$this->runVar['counts']['now']['distinct_predb_matched']),
-							$this->runVar['counts']['diff']['distinct_predb_matched']
-							),
-							sprintf(
-								"%s(%d%%)",
-								number_format($this->runVar['counts']['now']['predb_matched']),
-								$this->runVar['counts']['percent']['predb_matched']
-							)
 		);
 		$buffer .= sprintf($this->tmpMasks[4],
 						   "requestid",
