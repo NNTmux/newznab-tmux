@@ -1,3 +1,5 @@
+2016-01-15 DariusIII
+	Rmv: Remove the unused Sphinx class.
 2016-01-14 DariusIII
 	Upd: Remove all references to predb/nzpre from templates as it is non-functional since october
 	Add: Port match_prefiles.php from nZEDb
