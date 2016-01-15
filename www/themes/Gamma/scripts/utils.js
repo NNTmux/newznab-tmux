@@ -872,7 +872,7 @@ jQuery(function($){
         $(this).qtip({
             content: {
                 title: {
-                    text: 'PreHash Info'
+                    text: 'PreDb Info'
                 },
                 text: 'loading...', // The text to use whilst the AJAX request is loading
                 ajax: {

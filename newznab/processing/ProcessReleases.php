@@ -12,7 +12,7 @@ use newznab\Categorize;
 use newznab\Category;
 use newznab\RequestIDLocal;
 use newznab\RequestIDWeb;
-use newznab\PreHash;
+use newznab\PreDb;
 use newznab\Genres;
 use newznab\NNTP;
 
@@ -552,7 +552,7 @@ class ProcessReleases
 		}
 
 		if ($collections instanceof \Traversable) {
-			$preDB = new PreHash(['Echo' => $this->echoCLI, 'Settings' => $this->pdo]);
+			$preDB = new PreDb(['Echo' => $this->echoCLI, 'Settings' => $this->pdo]);
 
 			foreach ($collections as $collection) {
 

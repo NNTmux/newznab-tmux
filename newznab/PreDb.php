@@ -9,9 +9,9 @@ use newznab\db\Settings;
  * Class for inserting names/categories etc from PreDB sources into the DB,
  * also for matching names on files / subjects.
  *
- * Class PreHash
+ * Class PreDb
  */
-Class PreHash
+Class PreDb
 {
 	// Nuke status.
 	const PRE_NONUKE  = 0; // Pre is not nuked.

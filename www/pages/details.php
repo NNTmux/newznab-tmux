@@ -14,7 +14,7 @@ use newznab\Games;
 use newznab\Music;
 use newznab\AniDB;
 use newznab\Books;
-use newznab\PreHash;
+use newznab\PreDb;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();
@@ -128,7 +128,7 @@ if (isset($_GET["id"]))
 		$AniDBAPIArray = $AniDB->getAnimeInfo($data["anidbid"]);
 	}
 
-	$prehash = new PreHash();
+	$prehash = new PreDb();
 	$pre = $prehash->getForRelease($data["preid"]);
 
 	$rf = new ReleaseFiles;

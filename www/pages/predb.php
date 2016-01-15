@@ -1,12 +1,12 @@
 <?php
 
-use newznab\PreHash;
+use newznab\PreDb;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-$predb = new PreHash();
+$predb = new PreDb();
 
 $offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST["offset"] : 0;
 

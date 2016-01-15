@@ -1,6 +1,6 @@
 <?php
 
-use newznab\PreHash;
+use newznab\PreDb;
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
@@ -9,7 +9,7 @@ if (!isset($_REQUEST["id"])) {
 	$page->show404();
 }
 
-$pre = new PreHash();
+$pre = new PreDb();
 $predata = $pre->getOne($_REQUEST["id"]);
 
 if (!$predata) {
@@ -19,19 +19,19 @@ if (!$predata) {
 	if (isset($predata['nuked'])) {
 		$nuked = '';
 		switch($predata['nuked']) {
-			case PreHash::PRE_NUKED:
+			case PreDb::PRE_NUKED:
 				$nuked = 'NUKED';
 				break;
-			case PreHash::PRE_MODNUKE:
+			case PreDb::PRE_MODNUKE:
 				$nuked = 'MODNUKED';
 				break;
-			case PreHash::PRE_OLDNUKE:
+			case PreDb::PRE_OLDNUKE:
 				$nuked = 'OLDNUKE';
 				break;
-			case PreHash::PRE_RENUKED:
+			case PreDb::PRE_RENUKED:
 				$nuked = 'RENUKE';
 				break;
-			case PreHash::PRE_UNNUKED:
+			case PreDb::PRE_UNNUKED:
 				$nuked = 'UNNUKED';
 				break;
 		}

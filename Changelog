@@ -69,7 +69,7 @@
 	Fix: Cover/list view selector (replaced icons with simple text), removed duplicated  list icon.
 	Fix: Fix doubled SET in RequestIDLocal class
 	Chg: Change COUNT(*) queries to count the primary key columns to improve query performance
-	Chg: Re-work the count querying in PreHash class
+	Chg: Re-work the count querying in PreDb class
 2015-12-10 DariusIII
 	Upd: Update the pre-commit hook.
 	Upd: Switch to using UNION ALL in removeCodecPoster function, it increases the speed of that query dramaticaly.
