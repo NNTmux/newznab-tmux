@@ -9,7 +9,6 @@ switch ($page->page) {
 	case 'ajax_mediainfo':
 	case 'ajax_mymovies':
 	case 'ajax_preinfo':
-	case 'ajax_prehashinfo':
 	case 'ajax_profile':
 	case 'ajax_release-admin':
 	case 'ajax_rarfilelist':
