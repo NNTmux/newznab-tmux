@@ -513,6 +513,7 @@ CREATE TABLE category
   COLLATE utf8_unicode_ci
   AUTO_INCREMENT =100000;
 
+INSERT INTO category (id, title) VALUES (0000, 'Other');
 INSERT INTO category (id, title) VALUES (1000, 'Console');
 INSERT INTO category (id, title) VALUES (2000, 'Movies');
 INSERT INTO category (id, title) VALUES (3000, 'Audio');
@@ -520,7 +521,9 @@ INSERT INTO category (id, title) VALUES (4000, 'PC');
 INSERT INTO category (id, title) VALUES (5000, 'TV');
 INSERT INTO category (id, title) VALUES (6000, 'XXX');
 INSERT INTO category (id, title) VALUES (7000, 'Books');
-INSERT INTO category (id, title) VALUES (8000, 'Other');
+
+INSERT INTO category (id, title, parentid) VALUES (0010, 'Misc', 0000);
+INSERT INTO category (id, title, parentid) VALUES (0020, 'Hashed', 0000);
 
 INSERT INTO category (id, title, parentid) VALUES (1010, 'NDS', 1000);
 INSERT INTO category (id, title, parentid) VALUES (1020, 'PSP', 1000);
@@ -584,9 +587,6 @@ INSERT INTO category (id, title, parentid) VALUES (7030, 'Comics', 7000);
 INSERT INTO category (id, title, parentid) VALUES (7040, 'Technical', 7000);
 INSERT INTO category (id, title, parentid) VALUES (7050, 'Other', 7000);
 INSERT INTO category (id, title, parentid) VALUES (7060, 'Foreign', 7000);
-
-INSERT INTO category (id, title, parentid) VALUES (8010, 'Misc', 8000);
-INSERT INTO category (id, title, parentid) VALUES (8020, 'Hashed', 8000);
 
 DROP TABLE IF EXISTS sharing_sites;
 CREATE TABLE sharing_sites (

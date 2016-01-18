@@ -24,7 +24,7 @@ class Categorize extends Category
 	 * Temporary category while we sort through the name.
 	 * @var int
 	 */
-	protected $tmpCat = Category::CAT_MISC_OTHER;
+	protected $tmpCat = Category::CAT_OTHER_MISC;
 
 	/**
 	 * Release name to sort through.
@@ -60,7 +60,7 @@ class Categorize extends Category
 	/**
 	 * Look up the site to see which language of categorizing to use.
 	 * Then work out which category is applicable for either a group or a binary.
-	 * Returns Category::CAT_MISC_OTHER if no category is appropriate.
+	 * Returns Category::CAT_OTHER_MISC if no category is appropriate.
 	 *
 	 * @param string     $releaseName The name to parse.
 	 * @param int|string $groupID     The groupid.
@@ -71,7 +71,7 @@ class Categorize extends Category
 	{
 		$this->releaseName = $releaseName;
 		$this->groupid     = $groupID;
-		$this->tmpCat      = Category::CAT_MISC_OTHER;
+		$this->tmpCat      = Category::CAT_OTHER_MISC;
 
 		switch (true) {
 			case $this->isMisc():
@@ -229,7 +229,7 @@ class Categorize extends Category
 						case $this->isMovie():
 						break;
 						default:
-							$this->tmpCat = Category::CAT_MISC_OTHER;
+							$this->tmpCat = Category::CAT_OTHER_MISC;
 							break;
 					}
 					break;
@@ -237,7 +237,7 @@ class Categorize extends Category
 					if ($this->isMovie()) {
 						break;
 					}
-					$this->tmpCat = Category::CAT_MISC_OTHER;
+					$this->tmpCat = Category::CAT_OTHER_MISC;
 					break;
 				case preg_match('/alt\.binaries\.(dvdnordic\.org|nordic\.(dvdr?|xvid))|dk\.(binaer|binaries)\.film(\.divx)?/', $group):
 					if ($this->categorizeForeign && $this->isMovieForeign()) {
@@ -290,7 +290,7 @@ class Categorize extends Category
 							$this->tmpCat = Category::CAT_BOOK_EBOOK;
 							break;
 						default:
-							$this->tmpCat = Category::CAT_MISC_OTHER;
+							$this->tmpCat = Category::CAT_OTHER_MISC;
 							break;
 					}
 					break;
@@ -1432,11 +1432,11 @@ class Categorize extends Category
 			case preg_match('/[^a-z0-9]((480|720|1080)[ip]|s\d{1,3}[-._ ]?[ed]\d{1,3}([ex]\d{1,3}|[-.\w ]))[^a-z0-9]/i', $this->releaseName):
 				return false;
 			case preg_match('/[a-f0-9]{32,64}/i', $this->releaseName):
-				$this->tmpCat = Category::CAT_MISC_HASHED;
+				$this->tmpCat = Category::CAT_OTHER_HASHED;
 				break;
 			case preg_match('/[a-z0-9]{20,}/i', $this->releaseName):
 			case preg_match('/^[A-Z0-9]{1,}$/i', $this->releaseName):
-				$this->tmpCat = Category::CAT_MISC_OTHER;
+				$this->tmpCat = Category::CAT_OTHER_MISC;
 				break;
 			default:
 				return false;

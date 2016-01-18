@@ -1552,7 +1552,7 @@ class Releases
 				b.url,	b.cover, b.title as booktitle, b.author
 			FROM releases r
 			INNER JOIN bookinfo b ON r.bookinfoid = b.id
-			WHERE r.categoryid BETWEEN 8000 AND 8999
+			WHERE r.categoryid BETWEEN 0000 AND 0999
 			OR r.categoryid = 3030
 			AND b.id > 0
 			AND b.cover > 0

@@ -33,7 +33,7 @@ function reCategorize($argv)
 	} else if (isset($argv[1]) && preg_match('/\([\d, ]+\)/', $argv[1])) {
 		$where = ' AND groupid IN ' . $argv[1];
 	} else if (isset($argv[1]) && $argv[1] === 'misc') {
-		$where = ' AND categoryid IN (1090, 2020, 3050, 4040, 5050, 6050, 7050, 8010)';
+		$where = ' AND categoryid IN (1090, 2020, 3050, 4040, 5050, 6050, 7050, 0010)';
 	}
 	if (isset($argv[2]) && $argv[2] === 'test') {
 		$update = false;

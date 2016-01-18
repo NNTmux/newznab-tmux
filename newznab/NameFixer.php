@@ -151,9 +151,9 @@ class NameFixer
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->relid = $this->fixed = $this->checked = 0;
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 8010, 8020) GROUP BY rel.id ORDER BY postdate DESC';
+		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 0010, 0020) GROUP BY rel.id ORDER BY postdate DESC';
 		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.id ORDER BY postdate DESC';
-		$this->fullother = ' AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 8010, 8020) GROUP BY rel.id';
+		$this->fullother = ' AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 0010, 0020) GROUP BY rel.id';
 		$this->fullall = '';
 		$this->_fileName = '';
 		$this->done = $this->matched = false;
@@ -199,7 +199,7 @@ class NameFixer
 					WHERE (rel.isrenamed = %d OR rel.categoryid = %d)
 					AND rel.proc_nfo = %d',
 				self::IS_RENAMED_NONE,
-				Category::CAT_MISC_OTHER,
+				Category::CAT_OTHER_MISC,
 				self::PROC_NFO_NONE
 			);
 		}

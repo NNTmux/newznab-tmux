@@ -175,7 +175,7 @@ Class PreDb
 		}
 		$ct = '';
 		if ($cats == 1) {
-			$ct = 'AND r.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 8010)';
+			$ct = 'AND r.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 0010)';
 		}
 
 		if ($this->echooutput) {

@@ -145,6 +145,9 @@ CREATE TABLE IF NOT EXISTS category (
   AUTO_INCREMENT = 1000001;
 
 INSERT INTO category (id, title, parentid, status, minsizetoformrelease, maxsizetoformrelease, description, disablepreview) VALUES
+(0000, 'Other', NULL, 1, 0, 0, NULL, 0),
+(0010, 'Misc', 0000, 1, 0, 0, NULL, 0),
+(0020, 'Hashed', 0000, 1, 0, 0, NULL, 0),
 (1000, 'Console', NULL, 1, 0, 0, NULL, 0),
 (1010, 'NDS', 1000, 1, 0, 0, NULL, 0),
 (1020, 'PSP', 1000, 1, 0, 0, NULL, 0),
@@ -211,10 +214,7 @@ INSERT INTO category (id, title, parentid, status, minsizetoformrelease, maxsize
 (7030, 'Comics', 7000, 1, 0, 0, NULL, 0),
 (7040, 'Technical', 7000, 1, 0, 0, NULL, 0),
 (7050, 'Other', 7000, 1, 0, 0, NULL, 0),
-(7060, 'Foreign', 7000, 1, 0, 0, NULL, 0),
-(8000, 'Other', NULL, 1, 0, 0, NULL, 0),
-(8010, 'Misc', 8000, 1, 0, 0, NULL, 0),
-(8020, 'Hashed', 8000, 1, 0, 0, NULL, 0);
+(7060, 'Foreign', 7000, 1, 0, 0, NULL, 0);
 
 DROP TABLE IF EXISTS category_regexes;
 CREATE TABLE IF NOT EXISTS category_regexes (
@@ -3924,7 +3924,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('dereferrer_link', 'http://derefer.me/?','', '', 'dereferrer_link', ''),
 ('disablebackfillgroup', '1', '', '', 'disablebackfillgroup', 'Whether to disable backfill on a group if the target DATE has been reached.'),
 ('email', '', '', '', 'email', ''),
-('exepermittedcategories', '4000,4010,4020,4030,4040,4050,4060,4070,8010','', '', 'exepermittedcategories', ''),
+('exepermittedcategories', '4000,4010,4020,4030,4040,4050,4060,4070,0010','', '', 'exepermittedcategories', ''),
 ('extractusingrarinfo', '0','', '', 'extractusingrarinfo', ''),
 ('fanarttvkey', '', '', '', 'fanarttvkey', ''),
 ('ffmpeg_duration', '5','', '', 'ffmpeg_duration', ''),

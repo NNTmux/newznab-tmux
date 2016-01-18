@@ -1,3 +1,5 @@
+2016-01-18 DariusIII
+	Chg: Move Other category (Misc and Hashed) to categoryid 0000.
 2016-01-15 DariusIII
 	Rmv: Remove the unused Sphinx class.
 2016-01-14 DariusIII
