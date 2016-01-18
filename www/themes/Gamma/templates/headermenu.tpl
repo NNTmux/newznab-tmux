@@ -110,7 +110,7 @@
 				{/foreach}
 			</ul>
 		</li>
-	{else}
+	{elseif $parentcat.id == 7000}
 	<li class="dropdown">
 		<a id="drop{$parentcat.id}" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop{$parentcat.id}">
@@ -127,6 +127,14 @@
 	</li>
 	{/if}
 	{/foreach}
+	<li class="dropdown">
+		<a id="dropOther" class="dropdown-toggle" data-toggle="dropdown" href="#">Other <b class="caret"></b></a>
+		<ul class="dropdown-menu" role="menu" aria-labelledby="dropOther">
+			<hr>
+			<li><a href="/browse?t=0010">Misc</a></li>
+			<li><a href="/browse?t=0020">Hashed</a></li>
+		</ul>
+	</li>
 </ul>
 <ul class="nav pull-left">
 	<li class="">

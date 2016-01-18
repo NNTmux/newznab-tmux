@@ -177,12 +177,11 @@
 			{/foreach}
 			<li class="nav-parent">
 				<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" data-delay="30">
-					<i class="fa fa-bolt"></i> Misc<i class="fa fa-angle-down"></i>
+					<i class="fa fa-bolt"></i> Other<i class="fa fa-angle-down"></i>
 				</a>
 				<ul class="dropdown-menu">
-					<li><a href="/browse?t=0000">Other</a></li>
-					<li><a href="/browse?t=0020">Hashed</a></li>
 					<li><a href="/browse?t=0010">Misc</a></li>
+					<li><a href="/browse?t=0020">Hashed</a></li>
 					<hr>
 					<li><a href="/browse">All</a></li>
 					<li><a href="/browsegroup">Browse Groups</a></li>
