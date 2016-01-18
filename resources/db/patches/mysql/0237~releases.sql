@@ -1,3 +1,8 @@
+#Change categoryids of existing releases to new values.
+UPDATE releases SET categoryid = 0010 WHERE categoryid = 8010;
+UPDATE releases SET categoryid = 0020 WHERE categoryid = 8020;
+
+#Partition the releases table with new values.
 ALTER TABLE releases PARTITION BY RANGE (categoryid) (
 PARTITION misc VALUES LESS THAN (1000),
 PARTITION console VALUES LESS THAN (2000),
