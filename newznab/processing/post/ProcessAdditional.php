@@ -1358,7 +1358,7 @@ class ProcessAdditional
 					} // Check if it's alt.binaries.u4e file.
 					else if (in_array($this->_releaseGroupName, ['alt.binaries.u4e', 'alt.binaries.mom']) &&
 						preg_match('/Linux_2rename\.sh/i', $file) &&
-						($this->_release['categoryid'] == Category::CAT_MISC_HASHED || $this->_release['categoryid'] == Category::CAT_MISC_OTHER)
+						($this->_release['categoryid'] == Category::CAT_OTHER_HASHED || $this->_release['categoryid'] == Category::CAT_OTHER_MISC)
 					) {
 						$this->_processU4ETitle($file);
 					}
@@ -1779,7 +1779,7 @@ class ProcessAdditional
 				sprintf(
 					'/%d\d{3}|%d|%d|%d/',
 					$musicParent[0],
-					Category::CAT_MISC_OTHER,
+					Category::CAT_OTHER_MISC,
 					Category::CAT_MOVIE_OTHER,
 					Category::CAT_TV_OTHER
 				),

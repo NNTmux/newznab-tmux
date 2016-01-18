@@ -119,7 +119,7 @@
 				<li class="divider"></li>
 			{/if}
 			{foreach from=$parentcat.subcatlist item=subcat}
-			{if ($subcat.id == 8010)}
+			{if ($subcat.id == 0010)}
 			<li class="divider"></li>
 			<li><a href="{$smarty.const.WWW_TOP}/browse">All</a></li>
 			<li class="divider"></li>

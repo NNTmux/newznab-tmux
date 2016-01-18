@@ -226,9 +226,9 @@ INSERT INTO category (id, title, parentid, status, minsizetoformrelease, maxsize
 (7040, 'Technical', 7000, 1, 0, 0, NULL, 0),
 (7050, 'Other', 7000, 1, 0, 0, NULL, 0),
 (7060, 'Foreign', 7000, 1, 0, 0, NULL, 0),
-(8000, 'Other', NULL, 1, 0, 0, NULL, 0),
-(8010, 'Misc', 8000, 1, 0, 0, NULL, 0),
-(8020, 'Hashed', 8000, 1, 0, 0, NULL, 0);
+(0000, 'Other', NULL, 1, 0, 0, NULL, 0),
+(0010, 'Misc', 0000, 1, 0, 0, NULL, 0),
+(0020, 'Hashed', 0000, 1, 0, 0, NULL, 0);
 
 DROP TABLE IF EXISTS consoleinfo;
 CREATE TABLE IF NOT EXISTS consoleinfo (
@@ -1874,15 +1874,14 @@ CREATE TABLE IF NOT EXISTS releases (
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1
   PARTITION BY RANGE (categoryid)(
-  PARTITION unused VALUES LESS THAN (1000),
+  PARTITION misc VALUES LESS THAN (1000),
   PARTITION console VALUES LESS THAN (2000),
   PARTITION movies VALUES LESS THAN (3000),
   PARTITION audio VALUES LESS THAN (4000),
   PARTITION pc VALUES LESS THAN (5000),
   PARTITION tv VALUES LESS THAN (6000),
   PARTITION xxx VALUES LESS THAN (7000),
-  PARTITION books VALUES LESS THAN (8000),
-  PARTITION misc VALUES LESS THAN (9000)
+  PARTITION books VALUES LESS THAN (8000);
   );
 
 DROP TRIGGER IF EXISTS check_insert;
@@ -2075,7 +2074,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('dereferrer_link', 'http://derefer.me/?','', '', 'dereferrer_link', ''),
 ('disablebackfillgroup', '1', '', '', 'disablebackfillgroup', 'Whether to disable backfill on a group if the target date has been reached.'),
 ('email', '', '', '', 'email', ''),
-('exepermittedcategories', '4000,4010,4020,4030,4040,4050,4060,4070,8010','', '', 'exepermittedcategories', ''),
+('exepermittedcategories', '4000,4010,4020,4030,4040,4050,4060,4070,0010','', '', 'exepermittedcategories', ''),
 ('extractusingrarinfo', '0','', '', 'extractusingrarinfo', ''),
 ('fanarttvkey', '', '', '', 'fanarttvkey', ''),
 ('ffmpeg_duration', '5','', '', 'ffmpeg_duration', ''),

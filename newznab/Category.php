@@ -8,6 +8,8 @@ use newznab\db\Settings;
  */
 class Category
 {
+	const CAT_OTHER_MISC = 0010;
+	const CAT_OTHER_HASHED = 0020;
 	const CAT_GAME_NDS = 1010;
 	const CAT_GAME_PSP = 1020;
 	const CAT_GAME_WII = 1030;
@@ -68,8 +70,7 @@ class Category
 	const CAT_BOOK_TECHNICAL = 7040;
 	const CAT_BOOK_OTHER = 7050;
 	const CAT_BOOK_FOREIGN = 7060;
-	const CAT_MISC_OTHER = 8010;
-	const CAT_MISC_HASHED = 8020;
+	const CAT_PARENT_OTHER = 0000;
 	const CAT_PARENT_GAME = 1000;
 	const CAT_PARENT_MOVIE = 2000;
 	const CAT_PARENT_MUSIC = 3000;
@@ -77,7 +78,6 @@ class Category
 	const CAT_PARENT_TV = 5000;
 	const CAT_PARENT_XXX = 6000;
 	const CAT_PARENT_BOOK = 7000;
-	const CAT_PARENT_MISC = 8000;
 	const CAT_NOT_DETERMINED = 7900;
 	const STATUS_INACTIVE = 0;
 	const STATUS_ACTIVE = 1;
@@ -91,9 +91,9 @@ class Category
 			self::CAT_MUSIC_OTHER,
 			self::CAT_PC_MOBILEOTHER,
 			self::CAT_TV_OTHER,
-			self::CAT_MISC_HASHED,
+			self::CAT_OTHER_HASHED,
 			self::CAT_XXX_OTHER,
-			self::CAT_MISC_OTHER
+			self::CAT_OTHER_MISC
 		]
 	;
 
