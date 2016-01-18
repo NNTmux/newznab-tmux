@@ -135,7 +135,7 @@
 							{if $userdata.bookview == "1"}
 								<li><a href="{$smarty.const.WWW_TOP}/books">{$parentcat.title}</a></li>
 							{elseif $userdata.bookview != "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/browse?t=0000">{$parentcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse?t=7000">{$parentcat.title}</a></li>
 							{/if}
 							<hr>
 							{foreach from=$parentcat.subcatlist item=subcat}
