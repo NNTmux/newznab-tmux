@@ -1,12 +1,13 @@
                                     newznab Usenet Searching Web API
 
-                                                v0.4
-                                             2015-05-23
+                                                v0.5
+                                             2015-10-24
 
 Authors:
 ensi     ensisoft@gmail.com
 newznab  http://newznab.com/
 nZEDb    https://github.com/nZEDb/nZEDb
+newznab-tmux https://github.com/DariusIII/newznab-tmux
 
 1.  Introduction
 2.  Functions

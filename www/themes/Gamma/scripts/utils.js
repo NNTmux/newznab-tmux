@@ -876,7 +876,7 @@ jQuery(function($){
                 },
                 text: 'loading...', // The text to use whilst the AJAX request is loading
                 ajax: {
-                    url: SERVERROOT + 'ajax_prehashinfo', // URL to the local file
+                    url: SERVERROOT + 'ajax_preinfo', // URL to the local file
                     type: 'GET', // POST or GET
                     data: { id: preid }, // Data to pass along with your request
                     success: function (data, status) {
