@@ -254,7 +254,7 @@ if (isset($argv[1]) && ($argv[1] === "books" || $argv[1] === "all")) {
 		$where = ' WHERE bookinfoid IS NOT NULL';
 	} else {
 		echo $pdo->log->header("Resetting all failed Book postprocessing");
-		$where = " WHERE bookinfoid IN (-2, 0) AND categoryid BETWEEN 0000 AND 8999";
+		$where = " WHERE bookinfoid IN (-2, 0) AND categoryid BETWEEN 0000 AND 0999";
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
