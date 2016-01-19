@@ -298,18 +298,8 @@
 				<dt>Category</dt>
 				<dd><a title="Browse by {$release.category_name}" href="{$smarty.const.WWW_TOP}/browse?t={$release.categoryid}">{$release.category_name}</a></dd>
 				{if $nfo.releaseid|@count > 0}
-					<dt>Nfo</dy>
+					<dt>Nfo</dt>
 					<dd><a href="{$smarty.const.WWW_TOP}/nfo/{$release.guid}" title="View Nfo">View Nfo</a></dd>
-				{/if}
-
-				{if $predb && $userdata.canpre}
-					<dt>Pre:</th>
-					<dd>{$predb.ctime|date_format:"%b %e, %Y %T"} ({$predb.ctime|daysago})</dd>
-
-					{if $predb.nuketype != '' && $predb.nukereason != ''}
-						<dt>{$predb.nuketype|lower|capitalize}:</dt>
-						<dd>{$predb.nukereason}</dd>
-					{/if}
 				{/if}
 				{if $release.haspreview == 2 && $userdata.canpreview == 1}
 					<dt>Preview</dt>
