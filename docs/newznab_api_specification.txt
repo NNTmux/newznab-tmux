@@ -572,16 +572,15 @@ newznab-tmux https://github.com/DariusIII/newznab-tmux
    for an item to belong to several categories at the same time.
 
    Category Range                       Category Name                   Comments
-   0000-0999                            Reserved
+   0000-0999                            Other
    1000-1999                            Console
    2000-2999                            Movies
    3000-3999                            Audio
    4000-4999                            PC
    5000-5999                            TV
    6000-6999                            XXX
-   7000-7999                            Other
-   8000-8999                            Books
-   9000-99999                           Reserved                        Reserved for future expansion
+   7000-7999                            Books
+   8000-99999                           Reserved                        Reserved for future expansion
    100000-                              Custom                          Site specific category range. Defined in CAPS
 
    Categories                           Category Name
