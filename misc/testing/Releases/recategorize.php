@@ -1,15 +1,15 @@
 <?php
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
+use newznab\Categorize;
 use newznab\ColorCLI;
 use newznab\ConsoleTools;
-use newznab\Categorize;
+use newznab\db\Settings;
 
+$pdo = new Settings();
 
-$c = new ColorCLI();
 if (!(isset($argv[1]) && ($argv[1] == "all" || $argv[1] == "misc" || preg_match('/\([\d, ]+\)/', $argv[1]) || is_numeric($argv[1])))) {
-	exit($c->error(
+	exit($pdo->log->error(
 		"\nThis script will attempt to re-categorize releases and is useful if changes have been made to Category.php.\n"
 		. "No updates will be done unless the category changes\n"
 		. "An optional last argument, test, will display the number of category changes that would be made\n"
@@ -17,7 +17,7 @@ if (!(isset($argv[1]) && ($argv[1] == "all" || $argv[1] == "misc" || preg_match(
 		. "php $argv[0] all                     ...: To process all releases.\n"
 		. "php $argv[0] misc                    ...: To process all releases in misc categories.\n"
 		. "php $argv[0] 155                     ...: To process all releases in groupid 155.\n"
-		. "php $argv[0] '(155, 140)'            ...: To process all releases in group_ids 155 and 140.\n"
+		. "php $argv[0] '(155, 140)'            ...: To process all releases in groupids 155 and 140.\n"
 	));
 }
 
@@ -25,7 +25,7 @@ reCategorize($argv);
 
 function reCategorize($argv)
 {
-	$c = new ColorCLI();
+	global $pdo;
 	$where = '';
 	$update = true;
 	if (isset($argv[1]) && is_numeric($argv[1])) {
@@ -33,46 +33,45 @@ function reCategorize($argv)
 	} else if (isset($argv[1]) && preg_match('/\([\d, ]+\)/', $argv[1])) {
 		$where = ' AND groupid IN ' . $argv[1];
 	} else if (isset($argv[1]) && $argv[1] === 'misc') {
-		$where = ' AND categoryid IN (1090, 2020, 3050, 4040, 5050, 6050, 7050, 0010)';
+		$where = ' AND categoryid IN (0010, 0020, 1090, 2020, 3050, 4040, 5050, 6050, 7050)';
 	}
 	if (isset($argv[2]) && $argv[2] === 'test') {
 		$update = false;
 	}
 
 	if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1]))) {
-		echo $c->header("Categorizing all releases in ${argv[1]} using searchname. This can take a while, be patient.");
+		echo $pdo->log->header("Categorizing all releases in ${argv[1]} using searchname. This can take a while, be patient.");
 	} else if (isset($argv[1]) && $argv[1] == "misc") {
-		echo $c->header("Categorizing all releases in misc categories using searchname. This can take a while, be patient.");
+		echo $pdo->log->header("Categorizing all releases in misc categories using searchname. This can take a while, be patient.");
 	} else {
-		echo $c->header("Categorizing all releases using searchname. This can take a while, be patient.");
+		echo $pdo->log->header("Categorizing all releases using searchname. This can take a while, be patient.");
 	}
 	$timestart = TIME();
 	if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1])) || $argv[1] === 'misc') {
-		$chgcount = categorizeRelease($update, str_replace(" AND", "WHERE", $where), true);
+		$chgcount = categorizeRelease(str_replace(" AND", "WHERE", $where), $update, true);
 	} else {
-		$chgcount = categorizeRelease($update, "", true);
+		$chgcount = categorizeRelease('', $update, true);
 	}
-	$consoletools = new ConsoleTools();
+	$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 	$time = $consoletools->convertTime(TIME() - $timestart);
 	if ($update === true) {
-		echo $c->header("Finished re-categorizing " . number_format($chgcount) . " releases in " . $time . " , 	using the searchname.\n");
+		echo $pdo->log->header("Finished re-categorizing " . number_format($chgcount) . " releases in " . $time . " , using the searchname.\n");
 	} else {
-		echo $c->header("Finished re-categorizing in " . $time . " , using the searchname.\n"
-			. "This would have changed " . number_format($chgcount) . " releases but no updates were done.\n"
-		);
+		echo $pdo->log->header("Finished re-categorizing in " . $time . " , using the searchname.\n"
+			. "This would have changed " . number_format($chgcount) . " releases but no updates were done.\n");
 	}
 }
 
 // Categorizes releases.
 // Returns the quantity of categorized releases.
-function categorizeRelease($update = true, $where, $echooutput = false)
+function categorizeRelease($where, $update = true, $echooutput = false)
 {
-	$pdo = new Settings();
-	$cat = new Categorize();
-	$consoletools = new consoleTools();
+	global $pdo;
+	$cat = new Categorize(['Settings' => $pdo]);
+	$pdo->log = new ColorCLI();
+	$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 	$relcount = $chgcount = 0;
-	$c = new ColorCLI();
-	echo $c->primary("SELECT id, searchname, groupid, categoryid FROM releases " . $where);
+	echo $pdo->log->primary("SELECT id, searchname, groupid, categoryid FROM releases " . $where);
 	$resrel = $pdo->queryDirect("SELECT id, searchname, groupid, categoryid FROM releases " . $where);
 	$total = $resrel->rowCount();
 	if ($total > 0) {
@@ -84,19 +83,15 @@ function categorizeRelease($update = true, $where, $echooutput = false)
 						sprintf("
 							UPDATE releases
 							SET iscategorized = 1,
-								rageid = -1,
-								seriesfull = NULL,
-								season = NULL,
-								episode = NULL,
-								tvtitle = NULL,
-								tvairdate = NULL,
+								videos_id = 0,
+								tv_episodes_id = 0,
 								imdbid = NULL,
 								musicinfoid = NULL,
 								consoleinfoid = NULL,
 								gamesinfo_id = 0,
-								xxxinfo_id = 0,
 								bookinfoid = NULL,
 								anidbid = NULL,
+								xxxinfo_id = 0,
 								categoryid = %d
 							WHERE id = %d",
 							$catId,
@@ -115,6 +110,5 @@ function categorizeRelease($update = true, $where, $echooutput = false)
 	if ($echooutput !== false && $relcount > 0) {
 		echo "\n";
 	}
-
 	return $chgcount;
 }
