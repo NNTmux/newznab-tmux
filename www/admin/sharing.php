@@ -48,7 +48,7 @@ if (!empty($_POST)) {
 	$ourSite = $db->queryOneRow('SELECT * FROM sharing');
 }
 
-$total = $db->queryOneRow('SELECT COUNT(*) AS total FROM sharing_sites');
+$total = $db->queryOneRow('SELECT COUNT(id) AS total FROM sharing_sites');
 
 $page->smarty->assign('pagertotalitems', ($total === false ? 0 : $total['total']));
 $page->smarty->assign('pageroffset', $offset);

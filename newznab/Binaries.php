@@ -4,7 +4,7 @@ namespace newznab;
 use newznab\db\Settings;
 
 /**
- * This class manages the downloading of binaries and parts from usenet, and the
+ * This class manages the downloading of binaries and parts FROM usenet, and the
  * managing of data in the binaries and parts tables.
  *
 */
@@ -176,9 +176,8 @@ class Binaries
 		$this->_partRepairLimit = ($this->_pdo->getSetting('maxpartrepair') != '') ? (int)$this->_pdo->getSetting('maxpartrepair') : 15000;
 		$this->_partRepairMaxTries = ($this->_pdo->getSetting('partrepairmaxtries') != '' ? (int)$this->_pdo->getSetting('partrepairmaxtries') : 3);
 
-		$this->blackList = array(); //cache of our black/white list
-		$this->blackList_by_group = array();
-		$this->message = array();
+		$this->blackList_by_group = [];
+		$this->message = [];
 		$this->startUpdate = microtime(true);
 		$this->startLoop = microtime(true);
 		$this->startHeaders = microtime(true);
@@ -270,7 +269,7 @@ class Binaries
 		{
 			$this->onlyProcessRegexBinaries = true;
 			if ($this->_echoCLI) {
-				$this->_colorCLI->doEcho($this->_colorCLI->primary('Note: Discarding parts that do not match a regex', true));
+				$this->_colorCLI->doEcho($this->_colorCLI->primary('Note: Discarding parts that do not match a regex'), true);
 			}
 		}
 		else
@@ -300,7 +299,7 @@ class Binaries
 					UPDATE groups
 					SET first_record_postdate = %s
 					WHERE id = %d',
-					$this->_pdo->from_unixtime($groupMySQL['first_record_postdate']),
+					$this->_pdo->from_unixtime($this->_pdo->escapeString($groupMySQL['first_record_postdate'])),
 					$groupMySQL['id']
 				)
 			);
@@ -312,7 +311,7 @@ class Binaries
 				// For new newsgroups - determine here how far we want to go back using date.
 				$first = $this->daytopost($this->_newGroupDaysToScan, $groupNNTP);
 			} else if ($groupNNTP['first'] >= ($groupNNTP['last'] - ($this->_newGroupMessagesToScan + $this->messageBuffer))) {
-				// If what we want is lower than the groups first article, set the wanted first to the first.
+				// If what we want is lower than the groups first article, SET the wanted first to the first.
 				$first = $groupNNTP['first'];
 			} else {
 				// Or else, use the newest article minus how much we should get for new groups.
@@ -322,7 +321,7 @@ class Binaries
 			// We will use this to subtract so we leave articles for the next time (in case the server doesn't have them yet)
 			$leaveOver = $this->messageBuffer;
 
-			// If this is not a new group, go from our newest to the servers newest.
+			// If this is not a new group, go FROM our newest to the servers newest.
 		} else {
 			// Set our oldest wanted to our newest local article.
 			$first = $groupMySQL['last_record'];
@@ -343,7 +342,7 @@ class Binaries
 		// The last article we want, aka the newest.
 		$last = $groupLast = (string)($groupNNTP['last'] - $leaveOver);
 
-		// If the newest we want is older than the oldest we want somehow.. set them equal.
+		// If the newest we want is older than the oldest we want somehow.. SET them equal.
 		if ($last < $first) {
 			$last = $groupLast = $first;
 		}
@@ -398,19 +397,19 @@ class Binaries
 					$this->_colorCLI->doEcho(
 						$this->_colorCLI->header(
 							"\nGetting " . number_format($last - $first + 1) . ' articles (' . number_format($first) .
-							' to ' . number_format($last) . ') from ' . $groupMySQL['name'] . " - (" .
+							' to ' . number_format($last) . ') FROM ' . $groupMySQL['name'] . " - (" .
 							number_format($groupLast - $last) . " articles in queue)."
 						)
 					);
 				}
 
-				// Get article headers from newsgroup.
+				// Get article headers FROM newsgroup.
 				$scanSummary = $this->scan($groupMySQL, $first, $last);
 
 				// Check if we fetched headers.
 				if (!empty($scanSummary)) {
 
-					// If new group, update first record & postdate
+					// If new group, UPDATE first record & postdate
 					if (is_null($groupMySQL['first_record_postdate']) && $groupMySQL['first_record'] == 0) {
 						$groupMySQL['first_record'] = $scanSummary['firstArticleNumber'];
 
@@ -432,9 +431,8 @@ class Binaries
 						);
 					}
 
-					if (isset($scanSummary['lastArticleDate'])) {
-						$scanSummary['lastArticleDate'] = strtotime($scanSummary['lastArticleDate']);
-					} else {
+					$scanSummary['lastArticleDate'] = (isset($scanSummary['lastArticleDate']) ? strtotime($scanSummary['lastArticleDate']) : false);
+					if (!is_numeric($scanSummary['lastArticleDate'])) {
 						$scanSummary['lastArticleDate'] = $this->postdate($scanSummary['lastArticleNumber'], $groupNNTP);
 					}
 
@@ -449,7 +447,7 @@ class Binaries
 						)
 					);
 				} else {
-					// If we didn't fetch headers, update the record still.
+					// If we didn't fetch headers, UPDATE the record still.
 					$this->_pdo->queryExec(
 						sprintf('
 							UPDATE groups
@@ -499,9 +497,8 @@ class Binaries
 	 *
 	 * @return array
 	 */
-	function scan($groupArr, $first, $last, $type = 'update')
+	function scan($groupArr, $first, $last, $type = 'UPDATE')
 	{
-		$db = new Settings();
 		$releaseRegex = new ReleaseRegex;
 		$n = $this->n;
 		// Check if MySQL tables exist, create if they do not, get their names at the same time.
@@ -539,7 +536,7 @@ class Binaries
 				return $returnArray;
 			}
 
-			// Re-select group, download headers again without compression and re-enable compression.
+			// Re-SELECT group, download headers again without compression and re-enable compression.
 			$this->_nntp->selectGroup($groupArr['name']);
 			$msgs = $this->_nntp->getXOVER($first . '-' . $last);
 			$this->_nntp->enableCompression();
@@ -557,11 +554,11 @@ class Binaries
 		}
 
 		$rangerequested = range($first, $last);
-		$msgsreceived = array();
-		$msgsblacklisted = array();
-		$msgsignored = array();
-		$msgsinserted = array();
-		$msgsnotinserted = array();
+		$msgsreceived = [];
+		$msgsblacklisted = [];
+		$msgsignored = [];
+		$msgsinserted = [];
+		$msgsnotinserted = [];
 
 		$timeHeaders = number_format(microtime(true) - $this->startHeaders, 2);
 
@@ -636,7 +633,7 @@ class Binaries
 						$this->message[$subject]['Date'] = strtotime($this->message[$subject]['Date']);
 					}
 					if ((int)$msgPart > 0) {
-						$this->message[$subject]['Parts'][(int)$msgPart] = array('Message-ID' => substr($msg['Message-ID'], 1, -1), 'number' => $msg['Number'], 'part' => (int)$msgPart, 'size' => $msg['Bytes']);
+						$this->message[$subject]['Parts'][(int)$msgPart] = ['Message-ID' => substr($msg['Message-ID'], 1, -1), 'number' => $msg['Number'], 'part' => (int)$msgPart, 'size' => $msg['Bytes']];
 						$this->message[$subject]['PartNumbers'][(int)$msgPart] = $msg['Number'];
 					}
 				}
@@ -651,7 +648,7 @@ class Binaries
 			if ($type != 'partrepair')
 				echo "Received " . sizeof($msgsreceived) . " articles of " . ($last - $first + 1) . " requested, " . sizeof($msgsignored) . " not binaries $n";
 
-			if ($type == 'update' && sizeof($msgsreceived) == 0) {
+			if ($type == 'UPDATE' && sizeof($msgsreceived) == 0) {
 				echo "Error: Server did not return any articles.$n";
 				echo "Skipping group$n";
 
@@ -664,7 +661,7 @@ class Binaries
 						//don't add missing articles
 						break;
 					case 'partrepair':
-					case 'update':
+					case 'UPDATE':
 					default:
 						$this->addMissingParts($rangenotreceived, $tableNames['prname'], $groupArr['id']);
 						break;
@@ -675,16 +672,16 @@ class Binaries
 			if (isset($this->message) && count($this->message)) {
 				$groupRegexes = $releaseRegex->getForGroup($groupArr['name']);
 
-				//insert binaries and parts into database. when binary already exists; only insert new parts
+				//INSERT binaries and parts INTO database. when binary already exists; only INSERT new parts
 				foreach ($this->message AS $subject => $data) {
 					//Filter binaries based on black/white list
 					if ($this->isBlackListed($data, $groupArr['name'])) {
 						$msgsblacklisted[] = count($data['Parts']);
 						if ($type == 'partrepair') {
-							$partIds = array();
+							$partIds = [];
 							foreach ($data['Parts'] as $partdata)
 								$partIds[] = $partdata['number'];
-							$db->queryExec(sprintf("DELETE FROM %s WHERE numberid IN (%s) AND groupid=%d", $tableNames['prname'], implode(',', $partIds), $groupArr['id']));
+							$this->_pdo->queryExec(sprintf("DELETE FROM %s WHERE numberid IN (%s) AND groupid = %d", $tableNames['prname'], implode(',', $partIds), $groupArr['id']));
 						}
 						continue;
 					}
@@ -693,11 +690,11 @@ class Binaries
 						//Check for existing binary
 						$binaryID = 0;
 						$binaryHash = md5($subject . $data['From'] . $groupArr['id']);
-						$res = $db->queryOneRow(sprintf("SELECT id FROM %s WHERE binaryhash = %s", $tableNames['bname'], $db->escapeString($binaryHash)));
+						$res = $this->_pdo->queryOneRow(sprintf("SELECT id FROM %s WHERE binaryhash = %s", $tableNames['bname'], $this->_pdo->escapeString($binaryHash)));
 						if (!$res) {
 
 							//Apply Regexes
-							$regexMatches = array();
+							$regexMatches = [];
 							foreach ($groupRegexes as $groupRegex) {
 								$regexCheck = $releaseRegex->performMatch($groupRegex, $subject);
 								if ($regexCheck !== false) {
@@ -709,19 +706,19 @@ class Binaries
 							$sql = '';
 							if (!empty($regexMatches)) {
 								$relparts = explode("/", $regexMatches['parts']);
-								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupid, procstat, categoryid, regexid, reqid, relpart, reltotalpart, binaryhash, relname, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %d, %s, %d, %s, %d, %d, %s, %s, now())', $tableNames['bname'], $db->escapeString($subject), $db->escapeString(utf8_encode($data['From'])), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $db->escapeString($data['MaxParts']), $groupArr['id'], Releases::PROCSTAT_TITLEMATCHED, $regexMatches['regcatid'], $regexMatches['regexid'], $db->escapeString($regexMatches['reqid']), $relparts[0], $relparts[1], $db->escapeString($binaryHash), $db->escapeString(str_replace('_', ' ', $regexMatches['name'])));
+								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupid, procstat, categoryid, regexid, reqid, relpart, reltotalpart, binaryhash, relname, dateadded) VALUES (%s, %s, %s, %s, %s, %d, %d, %s, %d, %s, %d, %d, %s, %s, NOW())', $tableNames['bname'], $this->_pdo->escapeString($subject), $this->_pdo->escapeString(utf8_encode($data['From'])), $this->_pdo->from_unixtime($this->_pdo->escapeString($data['Date'])), $this->_pdo->escapeString($data['Xref']), $this->_pdo->escapeString($data['MaxParts']), $groupArr['id'], Releases::PROCSTAT_TITLEMATCHED, $regexMatches['regcatid'], $regexMatches['regexid'], $this->_pdo->escapeString($regexMatches['reqid']), $relparts[0], $relparts[1], $this->_pdo->escapeString($binaryHash), $this->_pdo->escapeString(str_replace('_', ' ', $regexMatches['name'])));
 							} elseif ($this->onlyProcessRegexBinaries === false) {
-								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupid, binaryhash, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %s, now())', $tableNames['bname'], $db->escapeString($subject), $db->escapeString(utf8_encode($data['From'])), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $db->escapeString($data['MaxParts']), $groupArr['id'], $db->escapeString($binaryHash));
+								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupid, binaryhash, dateadded) VALUES (%s, %s, %s, %s, %s, %d, %s, NOW())', $tableNames['bname'], $this->_pdo->escapeString($subject), $this->_pdo->escapeString(utf8_encode($data['From'])), $this->_pdo->from_unixtime($this->_pdo->escapeString($data['Date'])), $this->_pdo->escapeString($data['Xref']), $this->_pdo->escapeString($data['MaxParts']), $groupArr['id'], $this->_pdo->escapeString($binaryHash));
 							} //onlyProcessRegexBinaries is true, there was no regex match and we are doing part repair so delete them
 							elseif ($type == 'partrepair') {
-								$partIds = array();
+								$partIds = [];
 								foreach ($data['Parts'] as $partdata)
 									$partIds[] = $partdata['number'];
-								$db->queryExec(sprintf('DELETE FROM %s WHERE numberid IN (%s) AND groupid = %d', $tableNames['prname'], implode(',', $partIds), $groupArr['id']));
+								$this->_pdo->queryExec(sprintf('DELETE FROM %s WHERE numberid IN (%s) AND groupid = %d', $tableNames['prname'], implode(',', $partIds), $groupArr['id']));
 								continue;
 							}
 							if ($sql != '') {
-								$binaryID = $db->queryInsert($sql);
+								$binaryID = $this->_pdo->queryInsert($sql);
 								$count++;
 								//if ($count % 500 == 0) echo "$count bin adds...";
 							}
@@ -732,17 +729,17 @@ class Binaries
 						}
 
 						if ($binaryID != 0) {
-							$partParams = array();
-							$partNumbers = array();
+							$partParams = [];
+							$partNumbers = [];
 							foreach ($data['Parts'] AS $partdata) {
 								$partcount++;
 
-								$partParams[] = sprintf('(%d, %s, %s, %s, %s)', $binaryID, $db->escapeString($partdata['Message-ID']), $db->escapeString($partdata['number']), $db->escapeString(round($partdata['part'])), $db->escapeString($partdata['size']));
+								$partParams[] = sprintf('(%d, %s, %s, %s, %s)', $binaryID, $this->_pdo->escapeString($partdata['Message-ID']), $this->_pdo->escapeString($partdata['number']), $this->_pdo->escapeString(round($partdata['part'])), $this->_pdo->escapeString($partdata['size']));
 								$partNumbers[] = $partdata['number'];
 							}
 
 							$partSql = ('INSERT INTO ' . $tableNames['pname'] . ' (binaryid, messageid, number, partnumber, size) VALUES '.implode(', ', $partParams));
-							$pidata = $db->queryInsert($partSql);
+							$pidata = $this->_pdo->queryInsert($partSql);
 							if (!$pidata) {
 								$msgsnotinserted = array_merge($msgsnotinserted, $partNumbers);
 							} else {
@@ -761,9 +758,9 @@ class Binaries
 					$this->_binaryBlacklistIdsToUpdate = [];
 				}
 
-				//TODO: determine whether to add to missing articles if insert failed
+				//TODO: determine whether to add to missing articles if INSERT failed
 				if (sizeof($msgsnotinserted) > 0) {
-					echo 'WARNING: ' . count($msgsnotinserted) . ' Parts failed to insert' . $n;
+					echo 'WARNING: ' . count($msgsnotinserted) . ' Parts failed to INSERT' . $n;
 					$this->addMissingParts($msgsnotinserted, $tableNames['prname'], $groupArr['id']);
 				}
 				if (($count >= 500) || ($updatecount >= 500)) {
@@ -789,7 +786,7 @@ class Binaries
 						$this->_colorCLI->alternateOver($timeHeaders . 's') .
 						$this->_colorCLI->primaryOver(' to download articles, ') .
 						$this->_colorCLI->alternateOver($timeUpdate . 's') .
-						$this->_colorCLI->primaryOver(' to insert binaries/parts, ') .
+						$this->_colorCLI->primaryOver(' to INSERT binaries/parts, ') .
 						$this->_colorCLI->alternateOver($timeLoop . 's') .
 						$this->_colorCLI->primary(' total.')
 					);
@@ -800,7 +797,7 @@ class Binaries
 
 			return $returnArray;
 		} else {
-			echo "Error: Can't get parts from server (msgs not array) $n";
+			echo "Error: Can't get parts FROM server (msgs not array) $n";
 			echo "Skipping group$n";
 
 			return $returnArray;
@@ -810,7 +807,7 @@ class Binaries
 	/**
 	 * Attempt to get missing article headers.
 	 *
-	 * @param array $groupArr The info for this group from mysql.
+	 * @param array $groupArr The info for this group FROM mysql.
 	 *
 	 * @return void
 	 */
@@ -842,8 +839,8 @@ class Binaries
 				);
 			}
 
-			// Loop through each part to group into continuous ranges with a maximum range of messagebuffer/4.
-			$ranges = $partList = [];
+			// Loop through each part to group INTO continuous ranges with a maximum range of messagebuffer/4.
+			$ranges = [];
 			$firstPart = $lastNum = $missingParts[0]['numberid'];
 
 			foreach ($missingParts as $part) {
@@ -851,21 +848,17 @@ class Binaries
 
 					$ranges[] = [
 						'partfrom' => $firstPart,
-						'partto'   => $lastNum,
-						'partlist' => $partList
+						'partto'   => $lastNum
 					];
 
 					$firstPart = $part['numberid'];
-					$partList = [];
 				}
-				$partList[] = $part['numberid'];
 				$lastNum = $part['numberid'];
 			}
 
 			$ranges[] = [
 				'partfrom' => $firstPart,
 				'partto'   => $lastNum,
-				'partlist' => $partList
 			];
 
 			// Download missing parts in ranges.
@@ -873,14 +866,13 @@ class Binaries
 
 				$partFrom = $range['partfrom'];
 				$partTo   = $range['partto'];
-				$partList = $range['partlist'];
 
 				if ($this->_echoCLI) {
 					echo chr(rand(45,46)) . "\r";
 				}
 
-				// Get article headers from newsgroup.
-				$this->scan($groupArr, $partFrom, $partTo, 'partrepair', $partList);
+				// Get article headers FROM newsgroup.
+				$this->scan($groupArr, $partFrom, $partTo, 'partrepair');
 			}
 
 			// Calculate parts repaired
@@ -940,19 +932,24 @@ class Binaries
 
 	/**
 	 * Insert a missing part to the database.
+	 *
+	 * @param $numbers
+	 * @param $tablename
+	 * @param $groupID
+	 *
+	 * @return bool|int
 	 */
 	private function addMissingParts($numbers, $tablename, $groupID)
 	{
-		$db = new Settings();
 		$added = false;
 		$insertStr = "INSERT INTO $tablename (numberid, groupid) VALUES ";
 		foreach ($numbers as $number) {
 			if ($number > 0) {
-				$checksql = sprintf("select numberid from $tablename where numberid = %u and groupid = %d", $number, $groupID);
-				$chkrow = $db->queryOneRow($checksql);
+				$checksql = sprintf("SELECT numberid FROM $tablename WHERE numberid = %u and groupid = %d", $number, $groupID);
+				$chkrow = $this->_pdo->queryOneRow($checksql);
 				if ($chkrow) {
-					$updsql = sprintf('update ' . $tablename . ' set attempts = attempts + 1 where numberid = %u and groupid = %d', $number, $groupID);
-					$db->queryExec($updsql);
+					$updsql = sprintf('UPDATE ' . $tablename . ' SET attempts = attempts + 1 WHERE numberid = %u and groupid = %d', $number, $groupID);
+					$this->_pdo->queryExec($updsql);
 				} else {
 					$added = true;
 					$insertStr .= sprintf("(%u, %d), ", $number, $groupID);
@@ -962,7 +959,7 @@ class Binaries
 		if ($added) {
 			$insertStr = substr($insertStr, 0, -2);
 
-			return $db->queryInsert($insertStr, false);
+			return $this->_pdo->queryInsert($insertStr);
 		}
 
 		return -1;
@@ -1045,74 +1042,6 @@ class Binaries
 	}
 
 	/**
-	 * Rawsearch. Perform a simple like match on binary subjects matching a pattern.
-	 */
-	public function search($search, $limit = 1000, $excludedcats = array())
-	{
-		$db = new Settings();
-
-		//
-		// if the query starts with a ^ it indicates the search is looking for items which start with the term
-		// still do the like match, but mandate that all items returned must start with the provided word
-		//
-		$words = explode(" ", $search);
-		$searchsql = "";
-		$intwordcount = 0;
-		if (count($words) > 0) {
-			foreach ($words as $word) {
-				//
-				// see if the first word had a caret, which indicates search must start with term
-				//
-				if ($intwordcount == 0 && (strpos($word, "^") === 0))
-					$searchsql .= sprintf(" and b.name like %s", $db->escapeString(substr($word, 1) . "%"));
-				else
-					$searchsql .= sprintf(" and b.name like %s", $db->escapeString("%" . $word . "%"));
-
-				$intwordcount++;
-			}
-		}
-
-		$exccatlist = "";
-		if (count($excludedcats) > 0)
-			$exccatlist = " and b.categoryid not in (" . implode(",", $excludedcats) . ") ";
-
-		$res = $db->query(sprintf("
-					SELECT b.*,
-					g.name AS group_name,
-					r.guid,
-					(SELECT COUNT(id) FROM parts p where p.binaryid = b.id) as 'binnum'
-					FROM binaries b
-					INNER JOIN groups g ON g.id = b.groupid
-					LEFT OUTER JOIN releases r ON r.id = b.releaseid
-					WHERE 1=1 %s %s order by DATE DESC LIMIT %d ",
-				$searchsql, $exccatlist, $limit
-			)
-		);
-
-		return $res;
-	}
-
-	/**
-	 * Get all binaries for a release.
-	 */
-	public function getForReleaseId($id)
-	{
-		$db = new Settings();
-
-		return $db->query(sprintf("select binaries.* from binaries where releaseid = %d order by relpart", $id));
-	}
-
-	/**
-	 * Get a binary row.
-	 */
-	public function getById($id)
-	{
-		$db = new Settings();
-
-		return $db->queryOneRow(sprintf("select binaries.*, groups.name as groupname from binaries left outer join groups on binaries.groupid = groups.id where binaries.id = %d ", $id));
-	}
-
-	/**
 	 * Return all blacklists.
 	 *
 	 * @param bool   $activeOnly Only display active blacklists ?
@@ -1126,10 +1055,10 @@ class Binaries
 	{
 		switch ($opType) {
 			case self::OPTYPE_BLACKLIST:
-				$opType = 'AND binaryblacklist.optype = ' . self::OPTYPE_BLACKLIST;
+				$opType = 'AND bb.optype = ' . self::OPTYPE_BLACKLIST;
 				break;
 			case self::OPTYPE_WHITELIST:
-				$opType = 'AND binaryblacklist.optype = ' . self::OPTYPE_WHITELIST;
+				$opType = 'AND bb.optype = ' . self::OPTYPE_WHITELIST;
 				break;
 			default:
 				$opType = '';
@@ -1138,107 +1067,102 @@ class Binaries
 		return $this->_pdo->query(
 			sprintf('
 				SELECT
-					binaryblacklist.id, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description,
-					binaryblacklist.groupname AS groupname, binaryblacklist.regex, groups.id AS group_id, binaryblacklist.msgcol,
-					binaryblacklist.last_activity as last_activity
-				FROM binaryblacklist
-				LEFT OUTER JOIN groups ON groups.name %s binaryblacklist.groupname
+					bb.id, bb.optype, bb.status, bb.description,
+					bb.groupname AS groupname, bb.regex, g.id AS group_id, bb.msgcol,
+					bb.last_activity as last_activity
+				FROM binaryblacklist bb
+				LEFT OUTER JOIN groups g ON g.name %s bb.groupname
 				WHERE 1=1 %s %s %s
 				ORDER BY coalesce(groupname,\'zzz\')',
 				($groupRegex ? 'REGEXP' : '='),
-				($activeOnly ? 'AND binaryblacklist.status = 1' : ''),
+				($activeOnly ? 'AND bb.status = 1' : ''),
 				$opType,
-				($groupName ? ('AND groups.name REGEXP ' . $this->_pdo->escapeString($groupName)) : '')
+				($groupName ? ('AND g.name REGEXP ' . $this->_pdo->escapeString($groupName)) : '')
 			)
 		);
 	}
 
 	/**
-	 * Get a blacklist row from database.
+	 * Get a blacklist row FROM database.
+	 *
+	 * @param $id
+	 *
+	 * @return array|bool
 	 */
 	public function getBlacklistByID($id)
 	{
-		$db = new Settings();
-
-		return $db->queryOneRow(sprintf("select * from binaryblacklist where id = %d ", $id));
+		return $this->_pdo->queryOneRow(sprintf("SELECT * FROM binaryblacklist WHERE id = %d ", $id));
 	}
 
 	/**
-	 * Delete a blacklist row from database.
+	 * Delete a blacklist row FROM database.
+	 *
+	 * @param $id
+	 *
+	 * @return bool|\PDOStatement
 	 */
 	public function deleteBlacklist($id)
 	{
-		$db = new Settings();
-
-		return $db->queryExec(sprintf("DELETE from binaryblacklist where id = %d", $id));
+		return $this->_pdo->queryExec(sprintf("DELETE FROM binaryblacklist WHERE id = %d", $id));
 	}
 
 	/**
 	 * Update a blacklist row.
+	 *
+	 * @param $regex
 	 */
 	public function updateBlacklist($regex)
 	{
-		$db = new Settings();
-
 		$groupname = $regex["groupname"];
 		if ($groupname == "")
 			$groupname = "null";
 		else {
 			$groupname = preg_replace("/a\.b\./i", "alt.binaries.", $groupname);
-			$groupname = sprintf("%s", $db->escapeString($groupname));
+			$groupname = sprintf("%s", $this->_pdo->escapeString($groupname));
 		}
 
-		$db->queryExec(sprintf("update binaryblacklist set groupname=%s, regex=%s, status=%d, description=%s, optype=%d, msgcol=%d where id = %d ", $groupname, $db->escapeString($regex["regex"]), $regex["status"], $db->escapeString($regex["description"]), $regex["optype"], $regex["msgcol"], $regex["id"]));
+		$this->_pdo->queryExec(sprintf("UPDATE binaryblacklist SET groupname = %s, regex = %s, status = %d, description = %s, optype = %d, msgcol = %d WHERE id = %d ", $groupname, $this->_pdo->escapeString($regex["regex"]), $regex["status"], $this->_pdo->escapeString($regex["description"]), $regex["optype"], $regex["msgcol"], $regex["id"]));
 	}
 
 	/**
 	 * Add a new blacklist row.
+	 *
+	 * @param $regex
+	 *
+	 * @return bool|int
 	 */
 	public function addBlacklist($regex)
 	{
-		$db = new Settings();
-
 		$groupname = $regex["groupname"];
 		if ($groupname == "")
 			$groupname = "null";
 		else {
 			$groupname = preg_replace("/a\.b\./i", "alt.binaries.", $groupname);
-			$groupname = sprintf("%s", $db->escapeString($groupname));
+			$groupname = sprintf("%s", $this->_pdo->escapeString($groupname));
 		}
 
-		return $db->queryInsert(sprintf("insert into binaryblacklist (groupname, regex, status, description, optype, msgcol) values (%s, %s, %d, %s, %d, %d) ",
-				$groupname, $db->escapeString($regex["regex"]), $regex["status"], $db->escapeString($regex["description"]), $regex["optype"], $regex["msgcol"]
+		return $this->_pdo->queryInsert(sprintf("INSERT INTO binaryblacklist (groupname, regex, status, description, optype, msgcol) VALUES (%s, %s, %d, %s, %d, %d) ",
+				$groupname, $this->_pdo->escapeString($regex["regex"]), $regex["status"], $this->_pdo->escapeString($regex["description"]), $regex["optype"], $regex["msgcol"]
 			)
 		);
 	}
 
 	/**
 	 * Add a new binary row and its associated parts.
+	 *
+	 * @param $id
 	 */
 	public function delete($id)
 	{
-		$db = new Settings();
-		$db->queryExec(sprintf("DELETE from parts where binaryid = %d", $id));
-		$db->queryExec(sprintf("DELETE from binaries where id = %d", $id));
-	}
-
-	# http://php.net/manual/en/function.array-unique.php#97285
-	public function getSuperUniqueArray($array)
-	{
-		$result = array_map("unserialize", array_unique(array_map("serialize", $array)));
-		foreach ($result as $key => $value) {
-			if (is_array($value))
-				$result[$key] = $this->getSuperUniqueArray($value);
-		}
-
-		return $result;
+		$this->_pdo->queryExec(sprintf("DELETE FROM parts WHERE binaryid = %d", $id));
+		$this->_pdo->queryExec(sprintf("DELETE FROM binaries WHERE id = %d", $id));
 	}
 
 	/**
 	 * Returns article number based on # of days.
 	 *
 	 * @param int   $days      How many days back we want to go.
-	 * @param array $data      Group data from usenet.
+	 * @param array $data      Group data FROM usenet.
 	 *
 	 * @return string
 	 */
@@ -1326,7 +1250,7 @@ class Binaries
 			$this->_colorCLI->doEcho(
 				$this->_colorCLI->primary(
 					PHP_EOL . 'Found article #' . $wantedArticle . ' which has a date of ' . date('r', $articleTime) .
-					', vs wanted date of ' . date('r', $goalTime) . '. Difference from goal is ' . round(($goalTime - $articleTime) / 60 / 60 / 24, 1) . ' days.'
+					', vs wanted date of ' . date('r', $goalTime) . '. Difference FROM goal is ' . round(($goalTime - $articleTime) / 60 / 60 / 24, 1) . ' days.'
 				)
 			);
 		}
@@ -1349,8 +1273,8 @@ class Binaries
 	/**
 	 * Returns unix time for an article number.
 	 *
-	 * @param int    $post      The article number to get the time from.
-	 * @param array  $groupData Usenet group info from NNTP selectGroup method.
+	 * @param int    $post      The article number to get the time FROM.
+	 * @param array  $groupData Usenet group info FROM NNTP selectGroup method.
 	 *
 	 * @return bool|int
 	 */
@@ -1392,7 +1316,7 @@ class Binaries
 			// If we could not find it locally, try usenet.
 			$header = $this->_nntp->getXOVER($currentPost);
 			if (!$this->_nntp->isError($header)) {
-				// Check if the date is set.
+				// Check if the date is SET.
 				if (isset($header[0]['Date']) && strlen($header[0]['Date']) > 0) {
 					$date = $header[0]['Date'];
 					break;
@@ -1422,7 +1346,7 @@ class Binaries
 			}
 		} while ($attempts++ <= 20);
 
-		// If we didn't get a date, set it to now.
+		// If we didn't get a date, SET it to now.
 		if (!$date) {
 			$date = time();
 		} else {

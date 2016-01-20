@@ -426,7 +426,7 @@ class NZBImport
 					'categoryid' => $this->category->determineCategory($nzbDetails['groupid'], $cleanName),
 					'isrenamed' => $renamed,
 					'reqidstatus' => 0,
-					'prehashid' => 0,
+					'preid' => 0,
 					'regexid' => 0,
 					'reqid' => 0,
 					'nzbstatus' => NZB::NZB_ADDED,

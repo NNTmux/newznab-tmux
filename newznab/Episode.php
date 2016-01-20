@@ -10,6 +10,10 @@ class Episode
 {
 	/**
 	 * Get an episodeinfo row by id.
+	 *
+	 * @param $episodeinfoID
+	 *
+	 * @return array|bool
 	 */
 	public function getEpisodeInfoByID($episodeinfoID)
 	{
@@ -19,6 +23,12 @@ class Episode
 
 	/**
 	 * Get an episodeinfo row by name.
+	 *
+	 * @param        $showtitle
+	 * @param        $fullep
+	 * @param string $epabsolute
+	 *
+	 * @return array|bool
 	 */
 	public function getEpisodeInfoByName($showtitle, $fullep, $epabsolute='0')
 	{

@@ -1,30 +1,6 @@
 DROP TABLE IF EXISTS site;
 DROP TABLE IF EXISTS anidb;
-CREATE TABLE IF NOT EXISTS anidb (
-  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  anidbid INT(7) UNSIGNED DEFAULT NULL,
-  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
-  type VARCHAR(32) COLLATE utf8_unicode_ci NOT NULL,
-  startdate DATE NOT NULL,
-  enddate DATE NOT NULL,
-  related VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
-  creators VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
-  description TEXT COLLATE utf8_unicode_ci NOT NULL,
-  rating VARCHAR(5) COLLATE utf8_unicode_ci NOT NULL,
-  picture VARCHAR(16) COLLATE utf8_unicode_ci NOT NULL,
-  categories VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
-  characters VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
-  epnos VARCHAR(2048) COLLATE utf8_unicode_ci NOT NULL,
-  airdates TEXT COLLATE utf8_unicode_ci NOT NULL,
-  episodetitles TEXT COLLATE utf8_unicode_ci NOT NULL,
-  createddate DATETIME DEFAULT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY anidbid (anidbid)
-)
-  ENGINE = MyISAM
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci
-  AUTO_INCREMENT = 1;
+DROP TABLE IF EXISTS animetitles;
 
 DROP TABLE IF EXISTS anidb_episodes;
 CREATE TABLE IF NOT EXISTS anidb_episodes (
@@ -68,17 +44,6 @@ CREATE TABLE IF NOT EXISTS anidb_titles (
   lang VARCHAR(25) COLLATE utf8_unicode_ci NOT NULL,
   title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (anidbid,type,lang,title)
-)
-  ENGINE = MyISAM
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci;
-
-DROP TABLE IF EXISTS animetitles;
-CREATE TABLE IF NOT EXISTS animetitles (
-  anidbid INT(7) UNSIGNED DEFAULT NULL,
-  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
-  unixtime INT(12) UNSIGNED NOT NULL,
-  UNIQUE KEY title (title)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
@@ -261,9 +226,9 @@ INSERT INTO category (id, title, parentid, status, minsizetoformrelease, maxsize
 (7040, 'Technical', 7000, 1, 0, 0, NULL, 0),
 (7050, 'Other', 7000, 1, 0, 0, NULL, 0),
 (7060, 'Foreign', 7000, 1, 0, 0, NULL, 0),
-(8000, 'Other', NULL, 1, 0, 0, NULL, 0),
-(8010, 'Misc', 8000, 1, 0, 0, NULL, 0),
-(8020, 'Hashed', 8000, 1, 0, 0, NULL, 0);
+(0000, 'Other', NULL, 1, 0, 0, NULL, 0),
+(0010, 'Misc', 0000, 1, 0, 0, NULL, 0),
+(0020, 'Hashed', 0000, 1, 0, 0, NULL, 0);
 
 DROP TABLE IF EXISTS consoleinfo;
 CREATE TABLE IF NOT EXISTS consoleinfo (
@@ -1475,7 +1440,7 @@ INSERT INTO groups (id, name, backfill_target, first_record, first_record_postda
 (161, 'alt.binaries.triballs', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (162, 'es.binarios.hd', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (163, 'alt.binaries.fz', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
-(164, 'alt.binaries.boneless', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, 'Added by predb import script'),
+(164, 'alt.binaries.boneless', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (165, 'alt.binaries.x.upper-case', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (166, 'alt.binaries.town.cine', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (167, 'alt.binaries.town.long.ding.dong', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
@@ -1568,19 +1533,17 @@ INSERT INTO menu (id, href, title, newwindow, tooltip, role, ordinal, menueval) 
 (9, 'music', 'Music', 0, 'Browse for Music', 1, 60, ''),
 (10, 'console', 'Console', 0, 'Browse for Games', 1, 65, ''),
 (11, 'books', 'Books', 0, 'Browse for Books', 1, 66, ''),
-(12, 'predb', 'PreDB', 0, 'View PreDB', 1, 67, '{if $site->nzprekey==''''}-1{/if}'),
 (13, 'admin', 'Admin', 0, 'Admin', 2, 70, ''),
 (14, 'cart', 'My Cart', 0, 'Your Nzb cart', 1, 75, ''),
 (15, 'mymovies', 'My Movies', 0, 'Your Movie Wishlist', 1, 78, ''),
 (16, 'queue', 'My Queue', 0, 'View Your Download Queue', 1, 80, '{if (($userdata.saburl|count_characters+$userdata.nzbgeturl|count_characters == 0) && $site->sabintegrationtype==2) || $site->sabintegrationtype==0}-1{/if}'),
 (17, 'nzbvortex', 'My Queue', 0, 'View Your NZBVortex Queue', 1, 81, '{if $userdata.nzbvortex_server_url == ''''}-1{/if}'),
-(18, 'dlbrowse', 'My Downloads', 0, 'View Download Folder', 1, 83, '{if $site->sabcompletedir==''''}-1{/if}'),
 (19, 'forum', 'Forum', 0, 'Browse Forum', 1, 85, ''),
 (20, 'profile', 'Profile', 0, 'View your profile', 1, 90, ''),
 (21, 'logout', 'Logout', 0, 'Logout', 1, 95, ''),
 (22, 'login', 'Login', 0, 'Login', 0, 100, ''),
 (23, 'register', 'Register', 0, 'Register', 0, 110, ''),
-(24, 'prehash', 'Prehash', 0, 'Prehash', 1, 68, ''),
+(24, 'predb', 'PreDb', 0, 'PreDb', 1, 68, ''),
 (25, 'newposterwall', 'New Releases', 0, 'Newest Releases Poster Wall', 1, 11, '');
 
 DROP TABLE IF EXISTS movieinfo;
@@ -1669,30 +1632,6 @@ CREATE TABLE IF NOT EXISTS parts (
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS predb;
-CREATE TABLE IF NOT EXISTS predb (
-  id INT(12) NOT NULL AUTO_INCREMENT,
-  ctime INT(12) NOT NULL,
-  dirname VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
-  category VARCHAR(20) COLLATE utf8_unicode_ci NOT NULL,
-  nuketype VARCHAR(20) COLLATE utf8_unicode_ci DEFAULT '',
-  nukereason VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT '',
-  nuketime INT(12) DEFAULT '0',
-  filesize FLOAT DEFAULT '0',
-  filecount INT(6) DEFAULT '0',
-  filename VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT '',
-  updatedate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (id),
-  UNIQUE KEY dirname (dirname),
-  KEY ix_predb_ctime (ctime),
-  KEY ix_predb_updatedate (updatedate),
-  KEY ix_predb_filename (filename)
-)
-  ENGINE = MyISAM
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci
-  AUTO_INCREMENT = 1;
-
 DROP TABLE IF EXISTS predbhash;
 CREATE TABLE IF NOT EXISTS predbhash (
   hash varbinary(20) NOT NULL DEFAULT '',
@@ -1703,8 +1642,8 @@ CREATE TABLE IF NOT EXISTS predbhash (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS prehash;
-CREATE TABLE IF NOT EXISTS prehash (
+DROP TABLE IF EXISTS predb;
+CREATE TABLE IF NOT EXISTS predb (
   id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   filename VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
@@ -1720,15 +1659,15 @@ CREATE TABLE IF NOT EXISTS prehash (
   files VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   searched TINYINT(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
-  UNIQUE KEY ix_prehash_title (title),
-  KEY ix_prehash_filename (filename),
-  KEY ix_prehash_nfo (nfo),
-  KEY ix_prehash_predate (predate),
-  KEY ix_prehash_source (source),
-  KEY ix_prehash_requestid (requestid,groupid),
-  KEY ix_prehash_size (size),
-  KEY ix_prehash_category (category),
-  KEY ix_prehash_searched (searched)
+  UNIQUE KEY ix_predb_title (title),
+  KEY ix_predb_filename (filename),
+  KEY ix_predb_nfo (nfo),
+  KEY ix_predb_predate (predate),
+  KEY ix_predb_source (source),
+  KEY ix_predb_requestid (requestid,groupid),
+  KEY ix_predb_size (size),
+  KEY ix_predb_category (category),
+  KEY ix_predb_searched (searched)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
@@ -1741,14 +1680,14 @@ DROP TRIGGER IF EXISTS update_hashes;
 
 DELIMITER $$
 
-CREATE TRIGGER delete_hashes AFTER DELETE ON prehash FOR EACH ROW BEGIN DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id  =  OLD.id; END $$
-CREATE TRIGGER insert_hashes AFTER INSERT ON prehash FOR EACH ROW BEGIN INSERT INTO predbhash (hash, pre_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id); END $$
-CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW BEGIN IF NEW.title !=  OLD.title THEN DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id  =  OLD.id; INSERT INTO predbhash (hash, pre_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id );END IF;END $$
+CREATE TRIGGER delete_hashes AFTER DELETE ON predb FOR EACH ROW BEGIN DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id  =  OLD.id; END $$
+CREATE TRIGGER insert_hashes AFTER INSERT ON predb FOR EACH ROW BEGIN INSERT INTO predbhash (hash, pre_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id); END $$
+CREATE TRIGGER update_hashes AFTER UPDATE ON predb FOR EACH ROW BEGIN IF NEW.title !=  OLD.title THEN DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id  =  OLD.id; INSERT INTO predbhash (hash, pre_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id );END IF;END $$
 
 DELIMITER ;
 
-DROP TABLE IF EXISTS prehash_imports;
-CREATE TABLE IF NOT EXISTS prehash_imports (
+DROP TABLE IF EXISTS predb_imports;
+CREATE TABLE IF NOT EXISTS predb_imports (
   title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   nfo VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   size VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -1878,7 +1817,6 @@ CREATE TABLE IF NOT EXISTS releases (
   musicinfoid INT(11) DEFAULT NULL,
   consoleinfoid INT(11) DEFAULT NULL,
   bookinfoid INT(11) DEFAULT NULL,
-  preid INT(12) DEFAULT NULL,
   anidbid INT(11) DEFAULT NULL,
   reqid VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   releasenfoid INT(11) DEFAULT NULL,
@@ -1893,7 +1831,7 @@ CREATE TABLE IF NOT EXISTS releases (
   audiostatus TINYINT(1) NOT NULL DEFAULT '0',
   videostatus TINYINT(1) NOT NULL DEFAULT '0',
   reqidstatus TINYINT(1) NOT NULL DEFAULT '0',
-  prehashid INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  preid INT(10) UNSIGNED NOT NULL DEFAULT '0',
   iscategorized TINYINT(1) NOT NULL DEFAULT '0',
   isrenamed TINYINT(1) NOT NULL DEFAULT '0',
   ishashed TINYINT(1) NOT NULL DEFAULT '0',
@@ -1902,6 +1840,7 @@ CREATE TABLE IF NOT EXISTS releases (
   proc_par2 TINYINT(1) NOT NULL DEFAULT '0',
   proc_nfo TINYINT(1) NOT NULL DEFAULT '0',
   proc_files TINYINT(1) NOT NULL DEFAULT '0',
+  proc_srr TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Has the release been SRR processed?',
   gamesinfo_id INT(10) NOT NULL DEFAULT '0',
   xxxinfo_id INT(10) NOT NULL DEFAULT '0',
   proc_sorter TINYINT(1) NOT NULL DEFAULT '0',
@@ -1920,7 +1859,7 @@ CREATE TABLE IF NOT EXISTS releases (
   KEY ix_releases_gamesinfo_id (gamesinfo_id),
   KEY ix_releases_bookinfoid (bookinfoid),
   KEY ix_releases_anidbid (anidbid),
-  KEY ix_releases_preid_searchname (prehashid,searchname),
+  KEY ix_releases_preid_searchname (preid,searchname),
   KEY ix_releases_haspreview_passwordstatus (haspreview,passwordstatus),
   KEY ix_releases_passwordstatus (passwordstatus),
   KEY ix_releases_nfostatus (nfostatus,size),
@@ -1935,15 +1874,14 @@ CREATE TABLE IF NOT EXISTS releases (
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1
   PARTITION BY RANGE (categoryid)(
-  PARTITION unused VALUES LESS THAN (1000),
+  PARTITION misc VALUES LESS THAN (1000),
   PARTITION console VALUES LESS THAN (2000),
   PARTITION movies VALUES LESS THAN (3000),
   PARTITION audio VALUES LESS THAN (4000),
   PARTITION pc VALUES LESS THAN (5000),
   PARTITION tv VALUES LESS THAN (6000),
   PARTITION xxx VALUES LESS THAN (7000),
-  PARTITION books VALUES LESS THAN (8000),
-  PARTITION misc VALUES LESS THAN (9000)
+  PARTITION books VALUES LESS THAN (8000);
   );
 
 DROP TRIGGER IF EXISTS check_insert;
@@ -2136,7 +2074,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('dereferrer_link', 'http://derefer.me/?','', '', 'dereferrer_link', ''),
 ('disablebackfillgroup', '1', '', '', 'disablebackfillgroup', 'Whether to disable backfill on a group if the target date has been reached.'),
 ('email', '', '', '', 'email', ''),
-('exepermittedcategories', '4000,4010,4020,4030,4040,4050,4060,4070,8010','', '', 'exepermittedcategories', ''),
+('exepermittedcategories', '4000,4010,4020,4030,4040,4050,4060,4070,0010','', '', 'exepermittedcategories', ''),
 ('extractusingrarinfo', '0','', '', 'extractusingrarinfo', ''),
 ('fanarttvkey', '', '', '', 'fanarttvkey', ''),
 ('ffmpeg_duration', '5','', '', 'ffmpeg_duration', ''),
@@ -2213,12 +2151,6 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('nzbpath', '', '', '', 'nzbpath', ''),
 ('nzbsplitlevel', '1','', '', 'nzbsplitlevel', ''),
 ('nzbthreads', '5', '', '', 'nzbthreads', ''),
-('nzprearticles', '500','', '', 'nzprearticles', ''),
-('nzprefield', '', '', '', 'nzprefield', ''),
-('nzpregroup', '', '', '', 'nzpregroup', ''),
-('nzprekey', '', '', '', 'nzprekey', ''),
-('nzpreposter', '', '', '', 'nzpreposter', ''),
-('nzpresubject', '', '', '', 'nzpresubject', ''),
 ('partrepair', '1','', '', 'partrepair', ''),
 ('partrepairmaxtries', '3','', '', 'partrepairmaxtries', ''),
 ('partretentionhours', '72', '', '', 'partretentionhours', 'The number of hours incomplete parts and binaries will be retained'),
@@ -2235,7 +2167,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('recaptchaprivatekey', '', '', '', 'recaptchaprivatekey', ''),
 ('recaptchapublickey', '', '', '', 'recaptchapublickey', ''),
 ('registerrecaptcha', '1', '', '', 'registerrecaptcha', ''),
-('registerstatus', '1', '', '', 'registerstatus', ''),
+('registerstatus', '0', '', '', 'registerstatus', ''),
 ('releaseretentiondays', '0','', '', 'releaseretentiondays', ''),
 ('releasethreads', '10', '', '', 'releasethreads', ''),
 ('removespam', '1','', '', 'removespam', ''),
@@ -2286,7 +2218,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('spotnabsiteprvkey', '', '', '', 'spotnabsiteprvkey', ''),
 ('spotnabsitepubkey', '', '', '', 'spotnabsitepubkey', ''),
 ('spotnabuser', '', '', '', 'spotnabuser', ''),
-('sqlpatch', '215', '', '', 'sqlpatch', ''),
+('sqlpatch', '224', '', '', 'sqlpatch', ''),
 ('storeuserips', '0', '', '', 'storeuserips', ''),
 ('strapline', 'A great usenet indexer','', '', 'strapline', ''),
 ('style', 'omicron', '', '', 'style', ''),
@@ -2309,7 +2241,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('fetchlastcompressedfiles', '1', 'archive', 'fetch', 'end', 'Try to download the last rar or zip file? (This is good if most of the files are at the end.) Note: The first rar/zip is still downloaded.'),
 ('collection_timeout', '48', 'indexer', 'processing', 'collection_timeout', 'How many hours to wait before converting a collection into a release that is considered "stuck".'),
 ('last_run_time', '', 'indexer', 'processing', 'last_run_time', 'Last date the indexer (update_binaries or backfill) was run.'),
-('maxheadersiteration', '1000000', 'max', 'headers', 'iteration', 'The maximum number of headers that update binaries sees as the total range. This ensure that a total of no more than this is attempted to be downloaded at one time per group.'),
+('max.headers.iteration', '1000000', 'max', 'headers', 'iteration', 'The maximum number of headers that update binaries sees as the total range. This ensure that a total of no more than this is attempted to be downloaded at one time per group.'),
 ('trailers_display', '1', 'site', 'trailers', 'trailers_display', 'Display trailers on the details page?'),
 ('trailers_size_x', '480', 'site', 'trailers', 'trailers_size_x', 'Width of the displayed trailer. 480 by default.'),
 ('trailers_size_y', '345', 'site', 'trailers', 'trailers_size_y', 'Height of the displayed trailer. 345 by default.'),

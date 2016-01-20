@@ -34,6 +34,14 @@ class NZB
 	/**
 	 * Writes out the nzb when processing releases. Performed outside of smarty due to memory issues
 	 * of holding all parts in an array.
+	 *
+	 * @param $relid
+	 * @param $name
+	 * @param $catId
+	 * @param $path
+	 * @param $groupID
+	 *
+	 * @return bool
 	 */
 	function writeNZBforReleaseId($relid, $name, $catId, $path, $groupID)
 	{

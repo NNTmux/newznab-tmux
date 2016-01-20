@@ -1,3 +1,93 @@
+2016-01-20 DariusIII
+	Upd: Update isISO categorization, broaden triballs categories, move and update recategorize script.
+2016-01-18 DariusIII
+	Chg: Change Misc categories to be 0000
+2016-01-15 DariusIII
+	Rmv: Remove the unused Sphinx class.
+	Fix: Revert to low quality, good for nothing, RottenTomatoes poster images in upcoming pages.
+2016-01-14 DariusIII
+	Upd: Remove all references to predb/nzpre from templates as it is non-functional since october
+	Add: Port match_prefiles.php from nZEDb
+2016-01-13 DariusIII
+	Fix: Fix setting name in update_binaries.php
+	Fix: Fix instances of NZBPath
+	Upd: Adjustments in templates, move common bootstrap file to shared/libs/bootstrap/v3/ folder
+2016-01-12 DariusIII
+	Fix: 2 bugs in NZB and NZBContents classes.
+2016-01-11 DariusIII
+	Upd: Move api*.tpl files to themes/shared/templates
+	Upd: Make sure we have a theme
+	Upd: Move captha.tpl to shared templates folder.
+2016-01-08 DariusIII
+	Fix: Fix getnzb links in all of the templates
+	Fix: Fix xxx modal in Gamma template
+	Upd: Improve filename matching function in NameFixer
+2016-01-06 DariusIII
+	Upd: Update the srr renaming functions.
+2016-01-05 DariusIII
+	Chg: Move frontend to templates dir, adjust Page to accomodate settings from BasePage (moved the template settings to Page)
+2016-01-02 DariusIII
+	Fix: srr and filename threaded renaming
+2015-12-31 DariusIII
+	Fix: Fix wrong table name, switch to non-threaded version of fixReleaseNames script for filenames and srr matching.
+2015-12-30 DariusIII
+	Fix: Fix renaming of files when using threaded fixrelnames script.
+2015-12-29 DariusIII
+	Chg: Add release renaming based on included srr filename, fix one long standing bug in NameFixer
+2015-12-28 DariusIII
+	Fix: Revert the change in getBrowseRange function in Releases.php
+	Upd: Update fileInfo function in Utility.php
+2015-12-23 DariusIII
+	Fix: Error in Binaries, sorting by grabs in Gamma
+	Chg: Change some query parts and fix one small error in Binaries.php
+2015-12-22 DariusIII
+	Upd: Fix small errors in Releases.php
+	Fix: Fix icons and add grabs count to Gamma template
+2015-12-21 DariusIII
+	Upd: Update smarty to version 3.1.29
+	Upd: Rework some queries id Releases, fix one long standing bug (requestid python script).
+	Chg: Remove dlbrowse page and My Downloads link, as well as associated function from Releases and tpl files from themes.
+	Upd: Add noscript support to captcha (fix by zetas@nZEDb)
+2015-12-17 DariusIII
+	Fix: Add forgotten password link to Gamma, fix forgottenpassword page
+	Upd: Update the newznab/db/populate/AniDB class.
+2015-12-16 DariusIII
+	Add: Add full XXX movie view to all the templates
+	Upd: Add new 2160p quality option to series and movies view in Gamma template.
+	Fix: Do not show site theme selection in profile edit if admin has disabled user selectable themes.
+	Fix: Templates could not be changed if user selectable templates were disabled.
+	Upd: Refactor BasePage for new theme settings, adjust templates to use the new structure and constants.
+2015-12-15 DariusIII
+	Fix: Add contact page to Gamma template, fix menu item edit page
+	Drp: Drop tvrage, tvrage_episodes and tvrage_tables if they still exist in DB
+	Fix: Allow emtpy NZBGet url in profile.
+	Upd: Update Failed releases and serchname handling
+2015-12-14 DariusIII
+	Upd: Clean up, remove unused functions, fix some small bugs in Binaries.php
+2015-12-13 DariusIII
+	Chg: Update DnzbFailures getAlternate function, add DNZB return code.
+2015-12-12 DariusIII
+	Upd: Update pre-commit hook
+	Fix: Crap time was left out of codec poster removal query.
+2015-12-11 DariusIII
+	Fix: Update PHPDOC blocks. Improve  removeCodecPoster in speed and precision.
+	Fix: Fix path to config.php in python scripts
+	Chg: Change COUNT(*) queries to count the primary key columns to improve query performance. Re-work the count querying in PreHash class (fixes by @ruhllatio)
+	Fix: Fix doubled SET in RequestIDLocal class, change and fix cover/list selector in Gamma template
+2015-12-10 DariusIII
+	Upd: Update pre-commit hook
+	Upd: Switch to using UNION ALL in removeCodecPoster function, it increases the speed of that query dramaticaly.
+2015-12-09 DariusIII
+	Fix: Forgot to enable TraktTv processing in PostProcess.php
+	Upd: Remove referencex to UC and womble from prehash pages
+	Chg: Move git-hooks out of newznab into build folder, update hooks, remove addGitHook.php, not used anymore (ported from nZEDb @niel)
+2015-12-08 DariusIII
+	Fix: Try to fix failing query when lastArticleDate is NULL (fix @kevin123)
+	Fix: Fix missing / in paths
+	Fix: Fix queries for movies again(@Bart39), small arrangement of codecposter query in ReleaseRemover.
+2015-12-07 DariusIII
+	Upd: Update utils.js, change cart to download basket.
+	Fix: Change registerstatus to 0 (open) in nntmux_fi_schema.sql
 2015-12-04 DariusIII
 	Fix: Fix the limits on Sphinx executable removal
 	Fix: Adjust Gamma template

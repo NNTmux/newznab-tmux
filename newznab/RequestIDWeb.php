@@ -46,7 +46,7 @@ class RequestIDWeb extends RequestID
 				FROM releases r
 				INNER JOIN groups g ON r.groupid = g.id
 				WHERE r.nzbstatus = 1
-				AND r.prehashid = 0
+				AND r.preid = 0
 				AND r.isrequestid = 1
 				AND (
 					r.reqidstatus = %d
@@ -246,8 +246,8 @@ class RequestIDWeb extends RequestID
 	{
 		$dupeCheck = $this->pdo->queryOneRow(
 			sprintf('
-				SELECT id AS prehashid, requestid, groupid
-				FROM prehash
+				SELECT id AS preid, requestid, groupid
+				FROM predb
 				WHERE title = %s',
 				$this->pdo->escapeString($this->_newTitle['title'])
 			)
@@ -256,7 +256,7 @@ class RequestIDWeb extends RequestID
 		if ($dupeCheck === false) {
 			$this->_preDbID = (int)$this->pdo->queryInsert(
 				sprintf("
-					INSERT INTO prehash (title, source, requestid, groupid, predate)
+					INSERT INTO predb (title, source, requestid, groupid, predate)
 					VALUES (%s, %s, %d, %d, NOW())",
 					$this->pdo->escapeString($this->_newTitle['title']),
 					$this->pdo->escapeString('requestWEB'),
@@ -265,10 +265,10 @@ class RequestIDWeb extends RequestID
 				)
 			);
 		} else {
-			$this->_preDbID = $dupeCheck['prehashid'];
+			$this->_preDbID = $dupeCheck['preid'];
 			$this->pdo->queryExec(
 				sprintf('
-					UPDATE prehash
+					UPDATE predb
 					SET requestid = %d, groupid = %d
 					WHERE id = %d',
 					$this->_requestID,
@@ -289,9 +289,9 @@ class RequestIDWeb extends RequestID
 		$this->pdo->queryExec(
 			sprintf('
 				UPDATE releases
-					SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL,
+				SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL,
 				reqidstatus = %d, isrenamed = 1, proc_files = 1, searchname = %s, categoryid = %d,
-				prehashid = %d
+				preid = %d
 				WHERE id = %d',
 				self::REQID_FOUND,
 				$newTitle,

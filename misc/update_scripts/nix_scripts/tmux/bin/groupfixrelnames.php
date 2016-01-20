@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/../../../config.php';
+require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
@@ -23,7 +23,7 @@ if (!isset($argv[1])) {
 	switch (true) {
 		case $pieces[0] === 'nfo' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
-					sprintf('
+				sprintf('
 								SELECT r.id AS releaseid, r.guid, r.groupid, r.categoryid, r.name, r.searchname,
 									uncompress(nfo) AS textstring
 								FROM releases r
@@ -35,9 +35,9 @@ if (!isset($argv[1])) {
 								AND r.prehashid = 0
 								ORDER BY r.postdate DESC
 								LIMIT %s',
-							$pdo->likeString($guidChar, false, true),
-							$maxperrun
-					)
+					$pdo->likeString($guidChar, false, true),
+					$maxperrun
+				)
 			);
 
 			if ($releases instanceof Traversable) {
@@ -58,35 +58,12 @@ if (!isset($argv[1])) {
 			}
 			break;
 		case $pieces[0] === 'filename' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
-			$releases = $pdo->queryDirect(
-					sprintf('
-								SELECT rf.name AS textstring, rf.releaseid AS fileid,
-									r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid
-								FROM releases r
-								INNER JOIN release_files rf ON r.id = rf.releaseid
-								WHERE r.guid %s
-								AND r.nzbstatus = 1 AND r.proc_files = 0
-								AND r.prehashid = 0
-								ORDER BY r.postdate ASC
-								LIMIT %s',
-							$pdo->likeString($guidChar, false, true),
-							$maxperrun
-					)
-			);
-
-			if ($releases instanceof Traversable) {
-				foreach ($releases as $release) {
-					$namefixer->done = $namefixer->matched = false;
-					if ($namefixer->checkName($release, true, 'Filenames, ', 1, 1) !== true) {
-						echo '.';
-					}
-					$namefixer->checked++;
-				}
-			}
+			$namefixer->fixNamesWithFiles(1, true, 1, 1, 1, true, $guidChar, $maxperrun);
+			$namefixer->fixNamesWithFiles(1, true, 1, 1, 1, $guidChar, $maxperrun);
 			break;
 		case $pieces[0] === 'md5' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
-					sprintf('
+				sprintf('
 								SELECT DISTINCT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, r.dehashstatus,
 									rf.name AS filename
 								FROM releases r
@@ -97,9 +74,9 @@ if (!isset($argv[1])) {
 								AND r.prehashid = 0
 								ORDER BY r.dehashstatus DESC, r.postdate ASC
 								LIMIT %s',
-							$pdo->likeString($guidChar, false, true),
-							$maxperrun
-					)
+					$pdo->likeString($guidChar, false, true),
+					$maxperrun
+				)
 			);
 
 			if ($releases instanceof Traversable) {
@@ -117,7 +94,7 @@ if (!isset($argv[1])) {
 			break;
 		case $pieces[0] === 'par2' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
-					sprintf('
+				sprintf('
 								SELECT r.id AS releaseid, r.guid, r.groupid
 								FROM releases r
 								WHERE r.guid %s
@@ -126,9 +103,9 @@ if (!isset($argv[1])) {
 								AND r.prehashid = 0
 								ORDER BY r.postdate ASC
 								LIMIT %s',
-							$pdo->likeString($guidChar, false, true),
-							$maxperrun
-					)
+					$pdo->likeString($guidChar, false, true),
+					$maxperrun
+				)
 			);
 
 			if ($releases instanceof Traversable) {
@@ -139,10 +116,10 @@ if (!isset($argv[1])) {
 
 				$Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);
 				$nzbcontents = new NZBContents(
-						array(
-								'Echo' => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,
-								'PostProcess' => new PostProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer])
-						)
+					array(
+						'Echo' => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,
+						'PostProcess' => new PostProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer])
+					)
 				);
 				foreach ($releases as $release) {
 					$res = $nzbcontents->checkPAR2($release['guid'], $release['releaseid'], $release['groupid'], 1, 1);
@@ -154,7 +131,7 @@ if (!isset($argv[1])) {
 			break;
 		case $pieces[0] === 'miscsorter' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
-					sprintf('
+				sprintf('
 								SELECT r.id AS releaseid
 								FROM releases r
 								WHERE r.guid %s
@@ -163,9 +140,9 @@ if (!isset($argv[1])) {
 								AND r.prehashid = 0
 								ORDER BY r.postdate DESC
 								LIMIT %s',
-							$pdo->likeString($guidChar, false, true),
-							$maxperrun
-					)
+					$pdo->likeString($guidChar, false, true),
+					$maxperrun
+				)
 			);
 
 			if ($releases instanceof Traversable) {
@@ -177,18 +154,18 @@ if (!isset($argv[1])) {
 			break;
 		case $pieces[0] === 'predbft' && isset($maxperrun) && is_numeric($maxperrun) && isset($thread) && is_numeric($thread):
 			$pres = $pdo->queryDirect(
-					sprintf('
+				sprintf('
 							SELECT p.id AS prehashid, p.title, p.source, p.searched
-							FROM prehash p
+							FROM predb p
 							WHERE LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"
 							AND searched = 0
 							AND DATEDIFF(NOW(), predate) > 1
 							ORDER BY predate ASC
 							LIMIT %s
 							OFFSET %s',
-							$maxperrun,
-							$thread * $maxperrun - $maxperrun
-					)
+					$maxperrun,
+					$thread * $maxperrun - $maxperrun
+				)
 			);
 
 			if ($pres instanceof Traversable) {
@@ -205,7 +182,7 @@ if (!isset($argv[1])) {
 						$searched = $pre['searched'] - 1;
 						echo ".";
 					}
-					$pdo->queryExec(sprintf("UPDATE prehash SET searched = %d WHERE id = %d", $searched, $pre['prehashid']));
+					$pdo->queryExec(sprintf("UPDATE predb SET searched = %d WHERE id = %d", $searched, $pre['prehashid']));
 					$namefixer->checked++;
 				}
 			}

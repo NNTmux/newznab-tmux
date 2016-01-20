@@ -97,6 +97,10 @@ class ReleaseRegex
 
 	/**
 	 * Get a releaseregex row by id.
+	 *
+	 * @param $id
+	 *
+	 * @return array|bool
 	 */
 	public function getByID($id)
 	{
@@ -106,6 +110,10 @@ class ReleaseRegex
 
 	/**
 	 * Get a releaseregex row by id.
+	 *
+	 * @param $groupname
+	 *
+	 * @return array
 	 */
 	public function getForGroup($groupname)
 	{
@@ -139,6 +147,8 @@ class ReleaseRegex
 
 	/**
 	 * Update a releaseregex row.
+	 *
+	 * @param $regex
 	 */
 	public function update($regex)
 	{

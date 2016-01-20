@@ -1,6 +1,5 @@
 <?php
-
-require_once dirname(__FILE__) . '/../../../config.php';
+require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
@@ -8,6 +7,7 @@ use newznab\ColorCLI;
 use newznab\NameFixer;
 use newznab\NNTP;
 use newznab\NZBContents;
+use newznab\Nfo;
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
@@ -45,7 +45,18 @@ if (!isset($argv[1])) {
 			}
 			$namefixer->checked++;
 		}
-	} else if (isset($pieces[1]) && $pieces[0] == 'md5') {
+	} else if (isset($pieces[1]) && $pieces[0] == 'srr') {
+		$release = $pieces[1];
+		if ($res = $db->queryOneRow(sprintf('SELECT relfiles.name AS textstring, rel.categoryid, rel.searchname, '
+			. 'rel.groupid, relfiles.releaseid AS fileid, rel.id AS releaseid, rel.name FROM releases rel '
+			. 'INNER JOIN release_files relfiles ON (relfiles.releaseid = rel.id) WHERE rel.id = %d', $release))) {
+			$namefixer->done = $namefixer->matched = false;
+			if ($namefixer->checkName($res, true, 'Srr, ', 1, 1) !== true) {
+				echo '.';
+			}
+			$namefixer->checked++;
+		}
+	}else if (isset($pieces[1]) && $pieces[0] == 'md5') {
 		$release = $pieces[1];
 		if ($res = $db->queryOneRow(sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, dehashstatus, rf.name AS filename FROM releases r LEFT JOIN release_files rf ON r.id = rf.releaseid WHERE r.id = %d', $release))) {
 			if (preg_match('/[a-fA-F0-9]{32,40}/i', $res['name'], $matches)) {
@@ -76,7 +87,7 @@ if (!isset($argv[1])) {
 
 	} else if (isset($pieces[1]) && $pieces[0] == 'predbft') {
 		$pre = $pieces[1];
-		if ($res = $db->queryOneRow(sprintf('SELECT id AS preid, title, source, searched FROM prehash '
+		if ($res = $db->queryOneRow(sprintf('SELECT id AS preid, title, source, searched FROM predb '
 						. 'WHERE id = %d', $pre
 				)
 		)
@@ -93,7 +104,7 @@ if (!isset($argv[1])) {
 				$searched = $res['searched'] - 1;
 				echo ".";
 			}
-			$db->queryExec(sprintf("UPDATE prehash SET searched = %d WHERE id = %d", $searched, $res['preid']));
+			$db->queryExec(sprintf("UPDATE predb SET searched = %d WHERE id = %d", $searched, $res['preid']));
 			$namefixer->checked++;
 		}
 

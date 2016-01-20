@@ -11,16 +11,16 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 
 use newznab\NameFixer;
 use newznab\NNTP;
-use newznab\PreHash;
+use newznab\PreDb;
 use newznab\db\Settings;
 
 $n = "\n";
 $pdo = new Settings();
 $namefixer = new NameFixer(['Settings' => $pdo]);
-$predb = new PreHash(['Echo' => true, 'Settings' => $pdo]);
+$predb = new PreDb(['Echo' => true, 'Settings' => $pdo]);
 
 if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
-	$update = ($argv[2] == "true") ? 1 : 2;
+	$update = ($argv[2] == "true") ? true : false;
 	$other = 1;
 	if ($argv[3] === 'all') {
 		$other = 2;
@@ -67,6 +67,12 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 			break;
 		case 8:
 			$namefixer->fixNamesWithPar2(2, $update, $other, $setStatus, $show, $nntp);
+			break;
+		case 9:
+			$namefixer->fixNamesWithSrr(1, $update, $other, $setStatus, $show);
+			break;
+		case 10:
+			$namefixer->fixNamesWithSrr(2, $update, $other, $setStatus, $show);
 			break;
 		default :
 			exit($pdo->log->error("\nERROR: Wrong argument, type php $argv[0] to see a list of valid arguments." . $n));

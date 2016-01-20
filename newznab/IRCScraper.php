@@ -230,19 +230,19 @@ class IRCScraper extends IRCClient
 			if (isset($matches['nuked'])) {
 				switch ($matches['nuked']) {
 					case 'NUKED':
-						$this->_curPre['nuked'] = PreHash::PRE_NUKED;
+						$this->_curPre['nuked'] = PreDb::PRE_NUKED;
 						break;
 					case 'UNNUKED':
-						$this->_curPre['nuked'] = PreHash::PRE_UNNUKED;
+						$this->_curPre['nuked'] = PreDb::PRE_UNNUKED;
 						break;
 					case 'MODNUKED':
-						$this->_curPre['nuked'] = PreHash::PRE_MODNUKE;
+						$this->_curPre['nuked'] = PreDb::PRE_MODNUKE;
 						break;
 					case 'RENUKED':
-						$this->_curPre['nuked'] = PreHash::PRE_RENUKED;
+						$this->_curPre['nuked'] = PreDb::PRE_RENUKED;
 						break;
 					case 'OLDNUKE':
-						$this->_curPre['nuked'] = PreHash::PRE_OLDNUKE;
+						$this->_curPre['nuked'] = PreDb::PRE_OLDNUKE;
 						break;
 				}
 				$this->_curPre['reason'] = (isset($matches['reason']) ? substr($matches['reason'], 0, 255) : '');
@@ -258,7 +258,7 @@ class IRCScraper extends IRCClient
 	 */
 	protected function _checkForDupe()
 	{
-		$this->_oldPre = $this->_pdo->queryOneRow(sprintf('SELECT category, size FROM prehash WHERE title = %s', $this->_pdo->escapeString($this->_curPre['title'])));
+		$this->_oldPre = $this->_pdo->queryOneRow(sprintf('SELECT category, size FROM predb WHERE title = %s', $this->_pdo->escapeString($this->_curPre['title'])));
 		if ($this->_oldPre === false) {
 			$this->_insertNewPre();
 		} else {
@@ -278,7 +278,7 @@ class IRCScraper extends IRCClient
 			return;
 		}
 
-		$query = 'INSERT INTO prehash (';
+		$query = 'INSERT INTO predb (';
 
 		$query .= (!empty($this->_curPre['size'])     ? 'size, '       : '');
 		$query .= (!empty($this->_curPre['category']) ? 'category, '   : '');
@@ -328,7 +328,7 @@ class IRCScraper extends IRCClient
 			return;
 		}
 
-		$query = 'UPDATE prehash SET ';
+		$query = 'UPDATE predb SET ';
 
 		$query .= (!empty($this->_curPre['size'])     ? 'size = '       . $this->_pdo->escapeString($this->_curPre['size'])     . ', ' : '');
 		$query .= (!empty($this->_curPre['source'])   ? 'source = '     . $this->_pdo->escapeString($this->_curPre['source'])   . ', ' : '');
@@ -345,7 +345,7 @@ class IRCScraper extends IRCClient
 			: ''
 		);
 
-		if ($query === 'UPDATE prehash SET '){
+		if ($query === 'UPDATE predb SET '){
 			return;
 		}
 
@@ -373,19 +373,19 @@ class IRCScraper extends IRCClient
 			$nukeString = '';
 			if ($this->_nuked !== false) {
 				switch((int)$this->_curPre['nuked']) {
-					case PreHash::PRE_NUKED:
+					case PreDb::PRE_NUKED:
 						$nukeString = '[ NUKED ] ';
 						break;
-					case PreHash::PRE_UNNUKED:
+					case PreDb::PRE_UNNUKED:
 						$nukeString = '[UNNUKED] ';
 						break;
-					case PreHash::PRE_MODNUKE:
+					case PreDb::PRE_MODNUKE:
 						$nukeString = '[MODNUKE] ';
 						break;
-					case PreHash::PRE_OLDNUKE:
+					case PreDb::PRE_OLDNUKE:
 						$nukeString = '[OLDNUKE] ';
 						break;
-					case PreHash::PRE_RENUKED:
+					case PreDb::PRE_RENUKED:
 						$nukeString = '[RENUKED] ';
 						break;
 					default:

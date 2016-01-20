@@ -1,63 +1,54 @@
 <?php
-
-require_once("config.php");
+require_once './config.php';
 
 use newznab\Menu;
-use newznab\Users;
 
 $page = new AdminPage();
-$page->title = "Menu Add";
-$menu = new Menu();
-$users = new Users();
-$id = 0;
+$menu = new Menu($page->settings);
+$id   = 0;
 
-//get the user roles
-$userroles = $users->getRoles();
-$roles = [];
+// Get the user roles.
+$userroles = $page->users->getRoles();
+$roles     = [];
 foreach ($userroles as $r) {
-	$roles[$r['ID']] = $r['name'];
+	$roles[$r['id']] = $r['name'];
 }
 
 // set the current action
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
-switch($action)
-{
-    case 'submit':
-
-	    if ($_POST["id"] == "")
-    	{
-            $menu->add($_POST);
-        }
-        else
-        {
-            $ret = $menu->update($_POST);
-        }
-
-        header("Location:".WWW_TOP."/menu-list.php");
-        break;
-    case 'view':
-    default:
-
-		if (isset($_GET["id"]))
-		{
-			$page->title = "Menu Edit";
-			$id = $_GET["id"];
-
-			$menurow = $menu->getByID($id);
-
-			$page->smarty->assign('menu', $menurow);
+switch ($action) {
+	case 'submit':
+		if ($_POST["id"] == "") {
+			$menu->add($_POST);
+		} else {
+			$ret = $menu->update($_POST);
 		}
 
-      break;
+		header("Location:" . WWW_TOP . "/menu-list.php");
+		break;
+
+	case 'view':
+	default:
+		$menuRow = [
+			'id' => '', 'title' => '', 'href' => '', 'tooltip' => '',
+			'menueval' => '', 'role' => 0, 'ordinal' => 0, 'newwindow' => 0
+		];
+		if (isset($_GET["id"])) {
+
+			$id          = $_GET["id"];
+			$menuRow     = $menu->getByID($id);
+		}
+		$page->title = "Menu Edit";
+		$page->smarty->assign('menu', $menuRow);
+		break;
 }
 
-$page->smarty->assign('yesno_ids', array(1,0));
-$page->smarty->assign('yesno_names', array( 'Yes', 'No'));
+$page->smarty->assign('yesno_ids', [1, 0]);
+$page->smarty->assign('yesno_names', ['Yes', 'No']);
 
 $page->smarty->assign('role_ids', array_keys($roles));
 $page->smarty->assign('role_names', $roles);
 
 $page->content = $page->smarty->fetch('menu-edit.tpl');
 $page->render();
-

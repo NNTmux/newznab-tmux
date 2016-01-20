@@ -147,7 +147,6 @@ class TmuxRun extends Tmux
 			case 2:
 				$log = $this->writelog($runVar['panes']['one'][3]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/update_predb.php true $log; \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/bin/postprocess_pre.php {$runVar['constants']['pre_lim']} $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
 				);
@@ -155,7 +154,6 @@ class TmuxRun extends Tmux
 			case 3:
 				$log = $this->writelog($runVar['panes']['one'][3]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/update_predb.php true $log; \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/bin/postprocess_pre.php {$runVar['constants']['pre_lim']} $log; \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/decrypt_hashes.php 1000 $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"

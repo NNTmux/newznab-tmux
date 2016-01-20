@@ -1,27 +1,60 @@
 <?php
 
-use newznab\PreDB;
-
-if(!$page->users->isLoggedIn() || $page->userdata["canpre"] != 1)
+use newznab\PreDb;
+if (!$page->users->isLoggedIn()) {
 	$page->show403();
+}
 
-if(!isset($_REQUEST['searchname']))
+if (!isset($_REQUEST["id"])) {
 	$page->show404();
+}
 
-$PreDB = new PreDB(true);
-$preRow = $PreDB->getByDirname($_REQUEST['searchname']);
+$pre = new PreDb();
+$predata = $pre->getOne($_REQUEST["id"]);
 
-print "<table class=\"ui-tooltip-tmux\">\n";
-print "<tr><th>Date:</th><td>".htmlentities(date('Y-m-d H:i:s', $preRow['ctime']), ENT_QUOTES)."</td></tr>\n";
-print "<tr><th>Category:</th><td>".htmlentities($preRow['category'], ENT_QUOTES)."</td></tr>\n";
-if(!empty($preRow['filesize']))
-	print "<tr><th>Filesize:</th><td>".htmlentities($preRow['filesize'].'MB', ENT_QUOTES)."</td></tr>\n";
-if(!empty($preRow['filecount']))
-	print "<tr><th>Filecount:</th><td>".htmlentities($preRow['filecount'].'F', ENT_QUOTES)."</td></tr>\n";
-if(!empty($preRow['filename']))
-	print "<tr><th>Filename:</th><td>".htmlentities($preRow['filename'], ENT_QUOTES)."</td></tr>\n";
-if($preRow['nuketype'] && !empty($preRow['nukereason']))
-	print "\n<tr><th>".$preRow['nuketype'].":</th><td>".htmlentities($preRow['nukereason'], ENT_QUOTES)."</td></tr>\n";
-print "</table>";
-
-
+if (!$predata) {
+	print "No pre info";
+} else {
+	print "<table>\n";
+	if (isset($predata['nuked'])) {
+		$nuked = '';
+		switch($predata['nuked']) {
+			case PreDb::PRE_NUKED:
+				$nuked = 'NUKED';
+				break;
+			case PreDb::PRE_MODNUKE:
+				$nuked = 'MODNUKED';
+				break;
+			case PreDb::PRE_OLDNUKE:
+				$nuked = 'OLDNUKE';
+				break;
+			case PreDb::PRE_RENUKED:
+				$nuked = 'RENUKE';
+				break;
+			case PreDb::PRE_UNNUKED:
+				$nuked = 'UNNUKED';
+				break;
+		}
+		if ($nuked !== '') {
+			print "<tr><th>" . $nuked . ":</th><td>" . htmlentities((isset($predata['nukereason']) ? $predata['nukereason'] : ''), ENT_QUOTES) . "</td></tr>\n";
+		}
+	}
+	print "<tr><th>Title:</th><td>" . htmlentities($predata["title"], ENT_QUOTES) . "</td></tr>\n";
+	if (isset($predata["category"]) && $predata["category"] != "") {
+		print "<tr><th>Cat:</th><td>" . htmlentities($predata["category"], ENT_QUOTES) . "</td></tr>\n";
+	}
+	print "<tr><th>Source:</th><td>" . htmlentities($predata["source"], ENT_QUOTES) . "</td></tr>\n";
+	if (isset($predata["size"])) {
+		if (preg_match('/\d+/', $predata["size"], $size)) {
+			;
+		}
+		if (isset($size[0]) && $size[0] > 0) {
+			print "<tr><th>Size:</th><td>" . htmlentities($predata["size"], ENT_QUOTES) . "</td></tr>\n";
+		}
+	}
+	if (isset($predata['files'])) {
+		print "<tr><th>Files:</th><td>" . htmlentities((preg_match('/F|B/', $predata['files'], $match) ? $predata["files"] : ($predata["files"] . 'MB')), ENT_QUOTES) . "</td></tr>\n";
+	}
+	print "<tr><th>Pred:</th><td>" . htmlentities($predata["predate"], ENT_QUOTES) . "</td></tr>\n";
+	print "</table>";
+}

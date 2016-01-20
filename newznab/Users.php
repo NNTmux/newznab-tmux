@@ -812,14 +812,19 @@ class Users
 		);
 	}
 
+	/**
+	 * Get list of user signups by month.
+	 *
+	 * @return array
+	 */
 	public function getUsersByMonth()
 	{
-
-		return $this->pdo->query("SELECT DATE_FORMAT(createddate, '%M %Y') AS mth, COUNT(*) AS num
-							FROM users
-							WHERE createddate IS NOT NULL AND createddate != '0000-00-00 00:00:00'
-							GROUP BY DATE_FORMAT(createddate, '%M %Y')
-							ORDER BY createddate DESC"
+		return $this->pdo->query("
+			SELECT DATE_FORMAT(createddate, '%M %Y') AS mth, COUNT(id) AS num
+			FROM users
+			WHERE createddate IS NOT NULL AND createddate != '0000-00-00 00:00:00'
+			GROUP BY mth
+			ORDER BY createddate DESC"
 		);
 	}
 
@@ -1002,6 +1007,8 @@ class Users
 	 * if site->userdownloadpurgedays set to 0 then all release history is removed but
 	 * the download/request rows must remain for at least one day to allow the role based
 	 * limits to apply.
+	 *
+	 * @param int $days
 	 */
 	public function pruneRequestHistory($days = 0)
 	{
@@ -1055,6 +1062,8 @@ class Users
 	 * If a user downloads a NZB, log it.
 	 *
 	 * @param int $userID id of the user.
+	 *
+	 * @param     $releaseID
 	 *
 	 * @return bool|int
 	 */

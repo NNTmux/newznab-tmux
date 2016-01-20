@@ -1,35 +1,39 @@
 <?php
 
-use newznab\PreDB;
+use newznab\PreDb;
 
-$PreDB = new PreDB();
-
-if (!$page->users->isLoggedIn() || $page->userdata["canpre"] != 1)
+if (!$page->users->isLoggedIn()) {
 	$page->show403();
+}
 
-$page->title = 'PreDB';
-$page->meta_title = 'View PreDB';
-$page->meta_keywords = 'view,predb,scene,release,information';
-$page->meta_description = 'View PreDB';
+$predb = new PreDb();
 
-$query = (isset($_GET['q']) && !empty($_GET['q'])) ? $_GET['q'] : '';
-$category = (isset($_GET['c']) && !empty($_GET['c'])) ? $_GET['c'] : '';
-$preCount = $PreDB->getPreCount($query, $category);
+$offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST["offset"] : 0;
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
-$results = $PreDB->getPreRange($offset, ITEMS_PER_PAGE, $query, $category);
+if (isset($_REQUEST['presearch'])) {
+	$lastSearch = $_REQUEST['presearch'];
+	$parr = $predb->getAll($offset, ITEMS_PER_PAGE, $_REQUEST['presearch']);
+} else {
+	$lastSearch = '';
+	$parr = $predb->getAll($offset, ITEMS_PER_PAGE);
+}
 
-$page->smarty->assign('pagertotalitems', $preCount);
+$page->smarty->assign('pagertotalitems', $parr['count']);
 $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
-$page->smarty->assign('pagerquerybase', WWW_TOP."/predb?q=".$query."&amp;c=".$category."&amp;offset=");
+$page->smarty->assign('pagerquerybase', WWW_TOP . "/predb/&amp;offset=");
 $page->smarty->assign('pagerquerysuffix', "#results");
+$page->smarty->assign('lastSearch', $lastSearch);
 
 $pager = $page->smarty->fetch("pager.tpl");
 $page->smarty->assign('pager', $pager);
-$page->smarty->assign('results', $results);
-$page->smarty->assign('query', $query);
-$page->smarty->assign('category', $category);
 
-$page->content = $page->smarty->fetch('viewprelist.tpl');
+$page->smarty->assign('results', $parr['arr']);
+
+$page->title = "Browse PreDb";
+$page->meta_title = "View PreDb info";
+$page->meta_keywords = "view,predb,info,description,details";
+$page->meta_description = "View PreDb info";
+
+$page->content = $page->smarty->fetch('predb.tpl');
 $page->render();

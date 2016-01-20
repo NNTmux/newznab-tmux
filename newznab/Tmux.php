@@ -398,45 +398,40 @@ class Tmux
 					SUM(IF(nzbstatus = 1 AND categoryid BETWEEN 6000 AND 6040 AND xxxinfo_id = 0,1,0)) AS processxxx,
 					SUM(IF(1=1 %s,1,0)) AS processnfo,
 					SUM(IF(nzbstatus = 1 AND nfostatus = 1,1,0)) AS nfo,
-					SUM(IF(nzbstatus = 1 AND isrequestid = 1 AND prehashid = 0 AND
+					SUM(IF(nzbstatus = 1 AND isrequestid = 1 AND preid = 0 AND
 						((reqidstatus = 0) OR (reqidstatus = -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL %s HOUR)),1,0)) AS requestid_inprogress,
-					SUM(IF(prehashid > 0 AND nzbstatus = 1 AND isrequestid = 1 AND reqidstatus = 1,1,0)) AS requestid_matched,
-					SUM(IF(prehashid > 0 AND searchname IS NOT NULL,1,0)) AS prehash_matched,
+					SUM(IF(preid > 0 AND nzbstatus = 1 AND isrequestid = 1 AND reqidstatus = 1,1,0)) AS requestid_matched,
 					SUM(IF(preid > 0 AND searchname IS NOT NULL,1,0)) AS predb_matched,
-					COUNT(DISTINCT(preid)) AS distinct_predb_matched,
-					COUNT(DISTINCT(prehashid)) AS distinct_prehash_matched
+					COUNT(DISTINCT(preid)) AS distinct_predb_matched
 					FROM releases r", $bookreqids, Nfo::NfoQueryString($this->pdo), $request_hours);
 			case 2:
 				return "SELECT
-					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND nfostatus = 1) AS nfo,
-					(SELECT COUNT(*) FROM releases r
+					(SELECT COUNT(r.id) FROM releases r
 						INNER JOIN category c ON c.id = r.categoryid
 						WHERE r.nzbstatus = 1
 						AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0
 					) AS work,
-					(SELECT COUNT(*) FROM groups WHERE active = 1) AS active_groups,
-					(SELECT COUNT(*) FROM groups WHERE name IS NOT NULL) AS all_groups";
+					(SELECT COUNT(id) FROM groups WHERE active = 1) AS active_groups,
+					(SELECT COUNT(id) FROM groups WHERE name IS NOT NULL) AS all_groups";
 			case 4:
 				return sprintf("
 					SELECT
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'predb' AND TABLE_SCHEMA = %1\$s) AS predb,
-					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'prehash' AND TABLE_SCHEMA = %1\$s) AS prehash,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'partrepair' AND TABLE_SCHEMA = %1\$s) AS partrepair_table,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = %1\$s) AS parts_table,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = %1\$s) AS binaries_table,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'releases' AND TABLE_SCHEMA = %1\$s) AS releases,
-					(SELECT COUNT(*) FROM groups WHERE first_record IS NOT NULL AND backfill = 1
+					(SELECT COUNT(id) FROM groups WHERE first_record IS NOT NULL AND backfill = 1
 						AND (now() - INTERVAL backfill_target DAY) < first_record_postdate
 					) AS backfill_groups_days,
-					(SELECT COUNT(*) FROM groups WHERE first_record IS NOT NULL AND backfill = 1 AND (now() - INTERVAL datediff(curdate(),
+					(SELECT COUNT(id) FROM groups WHERE first_record IS NOT NULL AND backfill = 1 AND (now() - INTERVAL datediff(curdate(),
 					(SELECT VALUE FROM settings WHERE setting = 'safebackfilldate')) DAY) < first_record_postdate) AS backfill_groups_date",
 					$this->pdo->escapeString($db_name)
 				);
 			case 6:
 				return "SELECT
 					(SELECT searchname FROM releases ORDER BY id DESC LIMIT 1) AS newestrelname,
-					(SELECT UNIX_TIMESTAMP(MAX(predate)) FROM prehash) AS newestprehash,
-					(SELECT UNIX_TIMESTAMP(MAX(ctime)) FROM predb) AS newestpredb,
+					(SELECT UNIX_TIMESTAMP(MAX(predate)) FROM predb) AS newestpre,
 					(SELECT UNIX_TIMESTAMP(adddate) FROM releases ORDER BY id DESC LIMIT 1) AS newestrelease";
 			default:
 				return false;

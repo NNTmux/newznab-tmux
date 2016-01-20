@@ -23,7 +23,7 @@ class Genres
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-			'Settings' => null
+				'Settings' => null
 		];
 		$options += $defaults;
 
@@ -47,14 +47,14 @@ class Genres
 						SELECT g.*
 						FROM genres g
 						INNER JOIN
-							(SELECT DISTINCT genreid FROM musicinfo) x
-							ON x.genreid = g.id %1\$s
+							(SELECT DISTINCT genreID FROM musicinfo) x
+							ON x.genreID = g.id %1\$s
 						UNION
 						SELECT g.*
 						FROM genres g
 						INNER JOIN
-							(SELECT DISTINCT genreid FROM consoleinfo) x
-							ON x.genreid = g.id %1\$s
+							(SELECT DISTINCT genreID FROM consoleinfo) x
+							ON x.genreID = g.id %1\$s
 						UNION
 						SELECT g.*
 						FROM genres g
@@ -62,7 +62,7 @@ class Genres
 							(SELECT DISTINCT genre_id FROM gamesinfo) x
 							ON x.genre_id = g.id %1\$s
 							ORDER BY title",
-				$typesql
+					$typesql
 			);
 		} else {
 			$sql = sprintf("SELECT g.* FROM genres g WHERE 1 %s ORDER BY g.title", $typesql);
@@ -88,24 +88,24 @@ class Genres
 
 		if ($activeonly)
 			$sql = sprintf("
-						SELECT COUNT(*) AS num
+						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genreid FROM musicinfo) x
 							ON x.genreid = g.id %1\$s
 						+
-						SELECT COUNT(*) AS num
+						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genreid FROM consoleinfo) y
 							ON y.genreid = g.id %1\$s
 						+
-						SELECT COUNT(*) AS num
+						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genre_id FROM gamesinfo) x
 							ON x.genre_id = g.id %1\$s",
-				$typesql
+					$typesql
 			);
 		else
 			$sql = sprintf("SELECT COUNT(g.id) AS num FROM genres g WHERE 1 %s ORDER BY g.title", $typesql);

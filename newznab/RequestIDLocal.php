@@ -27,7 +27,7 @@ class RequestIDLocal extends RequestID
 			FROM releases r
 			INNER JOIN groups g ON r.groupid = g.id
 			WHERE r.nzbstatus = 1
-			AND r.prehashid = 0
+			AND r.preid = 0
 			AND r.isrequestID = 1'
 		);
 
@@ -108,7 +108,7 @@ class RequestIDLocal extends RequestID
 
 		$check = $this->pdo->queryDirect(
 			sprintf(
-				'SELECT id, title FROM prehash WHERE requestid = %d AND groupid = %d',
+				'SELECT id, title FROM predb WHERE requestid = %d AND groupid = %d',
 				$this->_requestID,
 				$this->_release['gid']
 			)
@@ -165,7 +165,7 @@ class RequestIDLocal extends RequestID
 			case preg_match($regex2, $this->_release['name'], $matches):
 				$check = $this->pdo->queryOneRow(
 					sprintf(
-						"SELECT id, title FROM prehash WHERE title = %s OR filename = %s %s",
+						"SELECT id, title FROM predb WHERE title = %s OR filename = %s %s",
 						$this->pdo->escapeString($matches['title']),
 						$this->pdo->escapeString($matches['title']),
 						(
@@ -237,7 +237,7 @@ class RequestIDLocal extends RequestID
 		}
 		$check = $this->pdo->queryOneRow(
 			sprintf("
-				SELECT id, title FROM prehash WHERE requestid = %d AND groupid = %d",
+				SELECT id, title FROM predb WHERE requestid = %d AND groupid = %d",
 				$this->_requestID,
 				($groupID === '' ? 0 : $groupID)
 			)
@@ -259,7 +259,7 @@ class RequestIDLocal extends RequestID
 			$this->pdo->queryExec(
 				sprintf('
 					UPDATE releases
-					SET prehashid = %d, reqidstatus = %d, isrenamed = 1, iscategorized = 1, searchname = %s
+					SET preid = %d, reqidstatus = %d, isrenamed = 1, iscategorized = 1, searchname = %s
 					WHERE id = %d',
 					$this->_newTitle['id'],
 					self::REQID_FOUND,
@@ -273,8 +273,8 @@ class RequestIDLocal extends RequestID
 			$this->pdo->queryExec(
 				sprintf('
 					UPDATE releases SET
-							SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL,
-						bookinfoid = NULL, anidbid = NULL, prehashid = %d, reqidstatus = %d, isrenamed = 1,
+						videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL,
+						bookinfoid = NULL, anidbid = NULL, preid = %d, reqidstatus = %d, isrenamed = 1,
 						iscategorized = 1, searchname = %s, categoryid = %d
 					WHERE id = %d',
 					$this->_newTitle['id'],

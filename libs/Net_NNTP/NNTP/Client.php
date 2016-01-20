@@ -113,10 +113,10 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 *
 	 * @access public
 	 */
-	public function Net_NNTP_Client()
+	public function __construct()
 	{
 		// Init parent construct.
-		parent::Net_NNTP_Protocol_Client();
+		parent::__construct();
 	}
 
 	/**
@@ -785,8 +785,8 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 			switch ($groups->getCode()) {
 				case NET_NNTP_PROTOCOL_RESPONSECODE_UNKNOWN_COMMAND:
 				case NET_NNTP_PROTOCOL_RESPONSECODE_SYNTAX_ERROR:
-				$backup = true;
-				break;
+					$backup = true;
+					break;
 				default:
 					return $groups;
 			}
@@ -796,9 +796,9 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 
 			if (!is_null($wildMat)) {
 				return $this->throwError(
-					"The server does not support the 'LIST ACTIVE' command, and the 'LIST' command does not support the wildmat parameter!",
-					null,
-					null
+						"The server does not support the 'LIST ACTIVE' command, and the 'LIST' command does not support the wildmat parameter!",
+						null,
+						null
 				);
 			}
 
@@ -1035,16 +1035,16 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 		if ($_forceNames) {
 			array_splice($format, 0, 7);
 			$format = array_merge(
-				array(
-					'Subject'    => false,
-					'From'       => false,
-					'Date'       => false,
-					'Message-ID' => false,
-					'References' => false,
-					':bytes'     => false,
-					':lines'     => false
-				),
-				$format
+					array(
+							'Subject'    => false,
+							'From'       => false,
+							'Date'       => false,
+							'Message-ID' => false,
+							'References' => false,
+							':bytes'     => false,
+							':lines'     => false
+					),
+					$format
 			);
 		}
 
@@ -1177,8 +1177,8 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 			switch ($references->getCode()) {
 				case NET_NNTP_PROTOCOL_RESPONSECODE_UNKNOWN_COMMAND:
 				case NET_NNTP_PROTOCOL_RESPONSECODE_SYNTAX_ERROR:
-				$backup = true;
-				break;
+					$backup = true;
+					break;
 
 				default:
 					return $references;

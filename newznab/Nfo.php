@@ -78,8 +78,8 @@ class Nfo
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-			'Echo'     => false,
-			'Settings' => null,
+				'Echo'     => false,
+				'Settings' => null,
 		];
 		$options += $defaults;
 		$this->echo = ($options['Echo'] && NN_ECHOCLI);
@@ -113,8 +113,8 @@ class Nfo
 		if (preg_match('/tvrage\.com\/shows\/id-(\d{1,6})/i', $str, $matches)) {
 			$return = (
 			[
-				'showid' => trim($matches[1]),
-				'site'   => 'tvrage'
+					'showid' => trim($matches[1]),
+					'site'   => 'tvrage'
 			]
 			);
 		}
@@ -139,10 +139,10 @@ class Nfo
 		// Make sure it's not too big or small, size needs to be at least 12 bytes for header checking. Ignore common file types.
 		$size = strlen($possibleNFO);
 		if ($size < 65535 &&
-			$size > 11 &&
-			!preg_match(
-				'/\A(\s*<\?xml|=newz\[NZB\]=|RIFF|\s*[RP]AR|.{0,10}(JFIF|matroska|ftyp|ID3))|;\s*Generated\s*by.*SF\w/i'
-				, $possibleNFO))
+				$size > 11 &&
+				!preg_match(
+						'/\A(\s*<\?xml|=newz\[NZB\]=|RIFF|\s*[RP]AR|.{0,10}(JFIF|matroska|ftyp|ID3))|;\s*Generated\s*by.*SF\w/i'
+						, $possibleNFO))
 		{
 			// File/GetId3 work with files, so save to disk.
 			$tmpPath = $this->tmpPath . $guid . '.nfo';
@@ -159,7 +159,7 @@ class Nfo
 
 					// Or binary.
 				} else if (preg_match('/^(JPE?G|Parity|PNG|RAR|XML|(7-)?[Zz]ip)/', $result) ||
-					preg_match('/[\x00-\x08\x12-\x1F\x0B\x0E\x0F]/', $possibleNFO))
+						preg_match('/[\x00-\x08\x12-\x1F\x0B\x0E\x0F]/', $possibleNFO))
 				{
 					@unlink($tmpPath);
 					return false;
@@ -208,10 +208,10 @@ class Nfo
 
 			if ($check === false) {
 				$this->pdo->queryInsert(
-					sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (compress(%s), %d)',
-						$this->pdo->escapeString($nfo),
-						$release['id']
-					)
+						sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (compress(%s), %d)',
+								$this->pdo->escapeString($nfo),
+								$release['id']
+						)
 				);
 			}
 
@@ -223,13 +223,13 @@ class Nfo
 
 			if ($release['completion'] == 0) {
 				$nzbContents = new NZBContents(
-					[
-						'Echo' => $this->echo,
-						'NNTP' => $nntp,
-						'Nfo'  => $this,
-						'Settings'   => $this->pdo,
-						'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this])
-					]
+						[
+								'Echo' => $this->echo,
+								'NNTP' => $nntp,
+								'Nfo'  => $this,
+								'Settings'   => $this->pdo,
+								'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this])
+						]
 				);
 				$nzbContents->parseNZB($release['guid'], $release['id'], $release['groupid']);
 			}
@@ -256,12 +256,12 @@ class Nfo
 		$maxRetries = (int)($pdo->getSetting('maxnforetries') >= 0 ? -((int)$pdo->getSetting('maxnforetries') + 1) : self::NFO_UNPROC);
 		return (
 		sprintf(
-			'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
-			NZB::NZB_ADDED,
-			($maxRetries < -8 ? -8 : $maxRetries),
-			self::NFO_UNPROC,
-			(($maxSize != '' && $maxSize > 0) ? ('AND r.size < ' . ($maxSize * 1073741824)) : ''),
-			(($minSize != '' && $minSize > 0) ? ('AND r.size > ' . ($minSize * 1048576)) : '')
+				'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
+				NZB::NZB_ADDED,
+				($maxRetries < -8 ? -8 : $maxRetries),
+				self::NFO_UNPROC,
+				(($maxSize != '' && $maxSize > 0) ? ('AND r.size < ' . ($maxSize * 1073741824)) : ''),
+				(($minSize != '' && $minSize > 0) ? ('AND r.size > ' . ($minSize * 1048576)) : '')
 		)
 		);
 	}
@@ -287,45 +287,45 @@ class Nfo
 		$optionsQuery = self::NfoQueryString($this->pdo);
 
 		$res = $this->pdo->query(
-			sprintf('
+				sprintf('
 				SELECT r.id, r.guid, r.groupid, r.name
 				FROM releases r
 				WHERE 1=1 %s %s %s
 				ORDER BY r.nfostatus ASC, r.postdate DESC
 				LIMIT %d',
-				$optionsQuery,
-				$guidCharQuery,
-				$groupIDQuery,
-				$this->nzbs
-			)
+						$optionsQuery,
+						$guidCharQuery,
+						$groupIDQuery,
+						$this->nzbs
+				)
 		);
 		$nfoCount = count($res);
 
 		if ($nfoCount > 0) {
 			$this->pdo->log->doEcho(
-				$this->pdo->log->primary(
-					PHP_EOL .
-					($guidChar === '' ? '' : '[' . $guidChar . '] ') .
-					($groupID === '' ? '' : '[' . $groupID . '] ') .
-					'Processing ' . $nfoCount .
-					' NFO(s), starting at ' . $this->nzbs .
-					' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
-				)
+					$this->pdo->log->primary(
+							PHP_EOL .
+							($guidChar === '' ? '' : '[' . $guidChar . '] ') .
+							($groupID === '' ? '' : '[' . $groupID . '] ') .
+							'Processing ' . $nfoCount .
+							' NFO(s), starting at ' . $this->nzbs .
+							' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
+					)
 			);
 
 			if ($this->echo) {
 				// Get count of releases per nfo status
 				$nfoStats = $this->pdo->queryDirect(
-					sprintf('
-						SELECT r.nfostatus AS status, COUNT(*) AS count
+						sprintf('
+						SELECT r.nfostatus AS status, COUNT(r.id) AS count
 						FROM releases r
 						WHERE 1=1 %s %s %s
 						GROUP BY r.nfostatus
 						ORDER BY r.nfostatus ASC',
-						$optionsQuery,
-						$guidCharQuery,
-						$groupIDQuery
-					)
+								$optionsQuery,
+								$guidCharQuery,
+								$groupIDQuery
+						)
 				);
 				if ($nfoStats instanceof \Traversable) {
 					$outString = PHP_EOL . 'Available to process';
@@ -338,13 +338,13 @@ class Nfo
 
 			$groups = new Groups(['Settings' => $this->pdo]);
 			$nzbContents = new NZBContents(
-				[
-					'Echo' => $this->echo,
-					'NNTP' => $nntp,
-					'Nfo' => $this,
-					'Settings' => $this->pdo,
-					'PostProcess' => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this, 'Settings' => $this->pdo])
-				]
+					[
+							'Echo' => $this->echo,
+							'NNTP' => $nntp,
+							'Nfo' => $this,
+							'Settings' => $this->pdo,
+							'PostProcess' => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this, 'Settings' => $this->pdo])
+					]
 			);
 			$movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
@@ -386,34 +386,34 @@ class Nfo
 
 		// Remove nfo that we cant fetch after 5 attempts.
 		$releases = $this->pdo->queryDirect(
-			sprintf(
-				'SELECT r.id
+				sprintf(
+						'SELECT r.id
 				FROM releases r
 				WHERE r.nzbstatus = %d
 				AND r.nfostatus < %d AND r.nfostatus > %d %s %s',
-				NZB::NZB_ADDED,
-				$this->maxRetries,
-				self::NFO_FAILED,
-				$groupIDQuery,
-				$guidCharQuery
-			)
+						NZB::NZB_ADDED,
+						$this->maxRetries,
+						self::NFO_FAILED,
+						$groupIDQuery,
+						$guidCharQuery
+				)
 		);
 
 		if ($releases instanceof \Traversable) {
 			foreach ($releases as $release) {
-				// remove any release_nfos for failed
+				// remove any releasenfo for failed
 				$this->pdo->queryExec(sprintf('
 					DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d',
-						$release['id']
-					)
+								$release['id']
+						)
 				);
 
 				// set release.nfostatus to failed
 				$this->pdo->queryExec(sprintf('
 					UPDATE releases r SET r.nfostatus = %d WHERE r.id = %d',
-						self::NFO_FAILED,
-						$release['id']
-					)
+								self::NFO_FAILED,
+								$release['id']
+						)
 				);
 			}
 		}

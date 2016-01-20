@@ -59,9 +59,9 @@ elif len(sys.argv) == 3 and sys.argv[2].isdigit() and len(sys.argv[2]) == 4:
 	elif sys.argv[2] == '7000':
 		groupid = 'AND categoryid BETWEEN 7000 AND 7999'
 		print(bcolors.HEADER + "Using categoryids 7000-7999" + bcolors.ENDC)
-	elif sys.argv[2] == '8000':
-		groupid = 'AND categoryid BETWEEN 8000 AND 8999'
-		print(bcolors.HEADER + "Using categoryids 8000-8999" + bcolors.ENDC)
+	elif sys.argv[2] == '0000':
+		groupid = 'AND categoryid BETWEEN 0000 AND 8999'
+		print(bcolors.HEADER + "Using categoryids 0000-8999" + bcolors.ENDC)
 	else:
 		groupid = 'AND categoryid = '+sys.argv[2]
 		print(bcolors.HEADER + "Using categoryid "+sys.argv[2] + bcolors.ENDC)
@@ -232,7 +232,7 @@ def main(args):
 		final = cur[0].fetchall()
 		if len(datas) > 0:
 			for item in final:
-				run = "DELETE FROM release_nfos WHERE nfo IS NULL AND releaseid = %s"
+				run = "DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %s"
 				cur[0].execute(run, (item[0]))
 				final = cur[0].fetchall()
 
