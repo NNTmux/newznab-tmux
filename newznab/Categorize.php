@@ -225,7 +225,7 @@ class Categorize extends Category
 				case $group === 'alt.binaries.triballs':
 					switch (true) {
 						case $this->isMusic():
-						case $this->isPCGame():
+						case $this->isPC():
 						case $this->isMovie():
 						break;
 						default:
@@ -826,7 +826,7 @@ class Categorize extends Category
 	{
 		switch (true) {
 			case preg_match('/[-._ ]([a-zA-Z]{2,10})?iso[ _.-]|[-. ]([a-z]{2,10})?iso$/i', $this->releaseName):
-			case preg_match('/[-._ ](DYNAMiCS|INFINITESKILLS|UDEMY|kEISO|PLURALSIGHT|DIGITALTUTORS|TUTSPLUS|OSTraining|PRODEV|CBT\.Nuggets)/i', $this->releaseName):
+			case preg_match('/[-._ ](DYNAMiCS|INFINITESKILLS|UDEMY|kEISO|PLURALSIGHT|DIGITALTUTORS|TUTSPLUS|OSTraining|PRODEV|CBT\.Nuggets|COMPRISED)/i', $this->releaseName):
 				$this->tmpCat = Category::CAT_PC_ISO;
 				return true;
 			default:

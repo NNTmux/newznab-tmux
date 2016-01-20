@@ -1,3 +1,5 @@
+2016-01-20 DariusIII
+	Upd: Update isISO categorization, broaden triballs categories.
 2016-01-18 DariusIII
 	Upd: Update newznab_api_specification and fix ajax_prehashinfo references.
 	Chg: Move Other category (Misc and Hashed) to categoryid 0000.
