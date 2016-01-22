@@ -342,8 +342,9 @@
 	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/slimScroll/jquery.slimscroll.min.js"></script>
 	<!-- Fastclick script -->
 	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/fastclick/fastclick.min.js"></script>
-	<!-- Notification script -->
-	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/noty/packaged/jquery.noty.packaged.min.js"></script>
+	<!-- notification plugin -->
+	<script type="text/javascript"
+			src="{$smarty.const.WWW_THEMES}/shared/libs/noty/packaged/jquery.noty.packaged.js"></script>
 	<!-- data table plugin -->
 	<script type="text/javascript"
 			src='{$smarty.const.WWW_THEMES}/{$theme}/dist/js/jquery.dataTables.min.js'></script>
