@@ -1,3 +1,5 @@
+2016-01-22 DariusIII
+	Upd: Update Noty package to version 2.3.8 and move it to themes/shared/libs/noty/ folder
 2016-01-21 DariusIII
 	Upd: Update getID3 to latest revision
 	Upd: Update ReleaseExtra class
