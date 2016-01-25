@@ -85,6 +85,11 @@ class NameFixer
 	/**
 	 * @var string
 	 */
+	protected $othercats;
+
+	/**
+	 * @var string
+	 */
 	protected $timeother;
 
 	/**
@@ -151,9 +156,10 @@ class NameFixer
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->relid = $this->fixed = $this->checked = 0;
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 0010, 0020) GROUP BY rel.id ORDER BY postdate DESC';
+		$this->othercats = implode(",", Category::CAT_OTHERS_GROUP);
+		$this->timeother = sprintf(' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categoryid IN (%s) GROUP BY rel.id ORDER BY postdate DESC', $this->othercats);
 		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.id ORDER BY postdate DESC';
-		$this->fullother = ' AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 0010, 0020) GROUP BY rel.id';
+		$this->fullother = sprintf(' AND rel.categoryid IN (%s) GROUP BY rel.id', $this->othercats);
 		$this->fullall = '';
 		$this->_fileName = '';
 		$this->done = $this->matched = false;
@@ -294,7 +300,7 @@ class NameFixer
 					AND rel.proc_files = %d
 					%s %s',
 				self::IS_RENAMED_NONE,
-				implode(',', Category::CAT_GROUP_OTHER),
+				implode(',', Category::CAT_OTHERS_GROUP),
 				self::PROC_FILES_NONE,
 				$ext,
 				$guid
@@ -358,7 +364,7 @@ class NameFixer
 					AND preid = 0
 					AND proc_srr = %d',
 				self::IS_RENAMED_NONE,
-				implode(',', Category::CAT_GROUP_OTHER),
+				implode(',', Category::CAT_OTHERS_GROUP),
 				self::PROC_SRR_NONE
 			);
 		}
@@ -501,7 +507,8 @@ class NameFixer
 			if (strpos($query, 'proc_files') !== false) {
 				$query = str_replace('GROUP BY r.id', '', $query);
 			}
-			echo $this->pdo->log->header("{$query};\n");
+			//Uncomment if debugging queries
+			//echo $this->pdo->log->header("{$query};\n");
 
 			$releases = $this->pdo->queryDirect($query . $queryLimit);
 		}
