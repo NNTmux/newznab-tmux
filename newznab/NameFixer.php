@@ -507,7 +507,8 @@ class NameFixer
 			if (strpos($query, 'proc_files') !== false) {
 				$query = str_replace('GROUP BY r.id', '', $query);
 			}
-			echo $this->pdo->log->header("{$query};\n");
+			//Uncomment if debugging queries
+			//echo $this->pdo->log->header("{$query};\n");
 
 			$releases = $this->pdo->queryDirect($query . $queryLimit);
 		}
