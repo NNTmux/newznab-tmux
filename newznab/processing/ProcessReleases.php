@@ -203,7 +203,7 @@ class ProcessReleases
 				if ($this->echoCLI) {
 					$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Request id Threaded lookup."));
 				}
-				passthru("$PYTHON ${DIR}update_scripts/nix_scripts/requestid_threaded.py");
+				passthru("$PYTHON ${DIR}update/nix/requestid_threaded.py");
 				if ($this->echoCLI) {
 					$this->pdo->log->doEcho(
 						$this->pdo->log->primary(
