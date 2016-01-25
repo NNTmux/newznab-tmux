@@ -22,10 +22,10 @@ define('NN_LIBS', NN_ROOT . 'libs' . DS);
 define('NN_MISC', NN_ROOT . 'misc' . DS);
 
 // /misc/update/
-define('NN_UPDATE', NN_MISC . 'update_scripts' . DS);
+define('NN_UPDATE', NN_MISC . 'update' . DS);
 
 // /misc/update/nix/
-define('NN_NIX', NN_UPDATE . 'nix_scripts' . DS);
+define('NN_NIX', NN_UPDATE . 'nix' . DS);
 
 // /misc/update/nix/multiprocessing/
 define('NN_MULTIPROCESSING', NN_NIX . 'multiprocessing' . DS);

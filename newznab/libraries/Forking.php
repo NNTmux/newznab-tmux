@@ -608,7 +608,7 @@ class Forking extends \fork_daemon
 				);
 			} else {
 				$this->_executeCommand(
-					PHP_BINARY . ' ' . NN_MISC . 'update_scripts' . DS . 'update_releases.php 1 false ' . $group['name']
+					PHP_BINARY . ' ' . NN_MISC . 'update' . DS . 'update_releases.php 1 false ' . $group['name']
 				);
 			}
 		}
