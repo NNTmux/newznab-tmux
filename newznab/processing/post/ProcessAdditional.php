@@ -2274,7 +2274,7 @@ class ProcessAdditional
 			$releaseInfo['proc_pp'] == 0 &&
 			in_array(
 				((int)$this->_release['categoryid']),
-				Category::CAT_GROUP_OTHER
+				Category::CAT_OTHERS_GROUP
 			)
 		) {
 			$foundName = false;

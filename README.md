@@ -4,7 +4,7 @@
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
 Support is given on irc.synirc.net #tmux channel.
 
-I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. By using newznab-tmux you will render your indexer incompatible with newznab (you can revert changes by forcing the svn checkout, it will replace the changed files. Newznab is not aware of the changes in database, so you are safe to leave them as they are). Scripts require PHP version >= 5.5.x and Python 2.7x or newer.
+I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. By using newznab-tmux you will render your indexer incompatible with newznab (you can revert changes by forcing the svn checkout, it will replace the changed files. Newznab is not aware of the changes in database, so you are safe to leave them as they are). Scripts require PHP version >= 5.6.x and Python 2.7x or newer.
 
 # Steps to have a working tmux install:
 
