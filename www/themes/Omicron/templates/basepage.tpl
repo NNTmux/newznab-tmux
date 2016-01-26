@@ -43,7 +43,6 @@
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
 </head>
-{if ($loggedin)=="true"}
 	<!--
 	  BODY TAG OPTIONS:
 	  =================
@@ -88,6 +87,7 @@
 						<!-- User Account Menu -->
 						<li class="dropdown user user-menu">
 							<!-- Menu Toggle Button -->
+							{if ($loggedin)=="true"}
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<!-- The user image in the navbar-->
 								<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png"
@@ -95,6 +95,8 @@
 								<!-- hidden-xs hides the username on small devices so only the image appears. -->
 								<span class="hidden-xs">{$userdata.username}</span>
 							</a>
+							{/if}
+							{if ($loggedin)=="true"}
 							<ul class="dropdown-menu">
 								<!-- The user image in the menu -->
 								<li class="user-header">
@@ -140,12 +142,16 @@
 									</div>
 								</li>
 							</ul>
-						</li>
+							{else}
+							<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a></li>
+							<li><a href="{$smarty.const.WWW_TOP}/register"><i class="fa fa-bookmark-o"></i><span> Register</span></a></li>
+					 		{/if}
 					</ul>
 				</div>
 			</nav>
 		</header>
 		<!-- Left side column. contains the logo and sidebar -->
+		{if ($loggedin)=="true"}
 		<aside class="main-sidebar">
 			<!-- sidebar: style can be found in sidebar.less -->
 			<section class="sidebar">
@@ -184,7 +190,6 @@
 				<!-- Sidebar Menu -->
 				<ul class="sidebar-menu">
 					<li class="header">Main</li>
-					{if ($loggedin)=="true"}
 					<!-- Optionally, you can add icons to the links -->
 					<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
 									class="fa arrow"></span></a></li>
@@ -223,8 +228,6 @@
 						</ul>
 					</li>
 					<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock"></i><span> Sign out</span></a>
-						{else}
-					<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a>
 						{/if}
 					</li>
 				</ul>
@@ -360,15 +363,4 @@
 		  user experience. Slimscroll is required when using the
 		  fixed layout. -->
 	</body>
-{elseif $smarty.server.REQUEST_URI == "/register" || $smarty.server.REQUEST_URI eq '/register?action=submit'}
-	{include file="register.tpl"}
-{elseif $smarty.server.REQUEST_URI == "/forgottenpassword" || $smarty.server.REQUEST_URI eq '/forgottenpassword?action=submit'}
-	{include file="forgottenpassword.tpl"}
-{elseif $smarty.server.REQUEST_URI == "/contact-us"}
-	{include file="contact.tpl"}
-{elseif $smarty.server.REQUEST_URI == "/terms-and-conditions"}
-	{include file="terms.tpl"}
-{else}
-	{include file="login.tpl"}
-{/if}
 </html>
