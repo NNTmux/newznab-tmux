@@ -45,7 +45,6 @@
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico">
 </head>
-{if ($loggedin)=="true"}
 	<body>
 	<!-- topbar starts -->
 	<div class="navbar navbar-default" role="navigation">
