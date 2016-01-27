@@ -61,6 +61,7 @@
 						/></a>
 			{$header_menu}
 			<!-- user dropdown starts -->
+			{if ($loggedin)=="true"}
 			<div class="btn-group pull-right">
 				<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 					<i class="fa fa-user"></i><span class="hidden-sm hidden-xs"><span
@@ -80,7 +81,11 @@
 					{/if}
 					<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock-alt"></i><span> Logout</span></a></li>
 				</ul>
+				{else}
+				<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/register"><i class="fa fa-bookmark-o"></i><span> Register</span></a></li>
 			</div>
+			{/if}
 			<!-- user dropdown ends -->
 		</div>
 	</div>
@@ -90,6 +95,7 @@
 			<!-- left menu starts -->
 			<div class="col-sm-2 col-lg-2">
 				<div class="sidebar-nav">
+					{if ($loggedin)=="true"}
 					<div class="nav-canvas">
 						<div class="nav-sm nav nav-stacked">
 						</div>
@@ -116,7 +122,6 @@
 							</form>
 							<!-- /.search form -->
 							<li class="nav-header">Main</li>
-							{if ($loggedin)=="true"}
 							<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
 											class="fa arrow"></span></a></li>
 							<li class="accordion">
@@ -141,20 +146,20 @@
 													class="fa fa-list-ol"></i><span> PreDb</span></a></li>
 								</ul>
 							</li>
+							{/if}
 							<li class="accordion">
 								<a href="#"><i class="fa fa-list-ol"></i><span> Articles & Links</span></a>
 								<ul class="nav nav-pills nav-stacked">
 									<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
 													class="fa fa-envelope-o"></i><span> Contact</span> <span
 													class="fa arrow"></span></a></li>
+									{if ($loggedin)=="true"}
 									<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a></li>
 								</ul>
 							</li>
 							<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock"></i><span> Logout</span></a>
-								{else}
-							<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a>
 								{/if}
 							</li>
 						</ul>
@@ -256,16 +261,4 @@
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
 	</body>
-	{* Start Login/Register Page *}
-{elseif $smarty.server.REQUEST_URI == "/register" || $smarty.server.REQUEST_URI eq '/register?action=submit'}
-	{include file="register.tpl"}
-{elseif $smarty.server.REQUEST_URI == "/forgottenpassword" || $smarty.server.REQUEST_URI eq '/forgottenpassword?action=submit'}
-	{include file="forgottenpassword.tpl"}
-{elseif $smarty.server.REQUEST_URI == "/contact-us"}
-	{include file="contact.tpl"}
-{elseif $smarty.server.REQUEST_URI == "/terms-and-conditions"}
-	{include file="terms.tpl"}
-{else}
-	{include file="login.tpl"}
-{/if}
 </html>

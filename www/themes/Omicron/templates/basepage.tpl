@@ -216,20 +216,21 @@
 							</li>
 						</ul>
 					</li>
+					{/if}
 					<li class="treeview">
 						<a href="#"><i class="fa fa-list-ol"></i><span> Articles & Links</span></a>
 						<ul class="treeview-menu">
 							<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
 											class="fa fa-envelope-o"></i><span> Contact</span> <span
 											class="fa arrow"></span></a></li>
+							{if ($loggedin)=="true"}
 							<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a></li>
 						</ul>
 					</li>
-					<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock"></i><span> Sign out</span></a>
-						{/if}
-					</li>
+							<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock"></i><span> Sign out</span></a></li>
+							{/if}
 				</ul>
 				<!-- /.sidebar-menu -->
 			</section>
