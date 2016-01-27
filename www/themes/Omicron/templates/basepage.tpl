@@ -95,8 +95,6 @@
 								<!-- hidden-xs hides the username on small devices so only the image appears. -->
 								<span class="hidden-xs">{$userdata.username}</span>
 							</a>
-							{/if}
-							{if ($loggedin)=="true"}
 							<ul class="dropdown-menu">
 								<!-- The user image in the menu -->
 								<li class="user-header">
