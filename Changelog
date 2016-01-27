@@ -1,3 +1,7 @@
+2016-01-27 DariusIII
+	Chg: Refactor Charisma basepage.
+2016-01-26 DariusIII
+	Chg: Refactor Omicron basepage
 2016-01-25 DariusIII
 	Upd: Update the folder structure, remove _scripts from update, nix and win folders.
 	Chg: Change the name of CAT_GROUP_OTHER constant to CAT_OTHERS_GROUP in Category class, update minimum supported PHP version to 5.6.
