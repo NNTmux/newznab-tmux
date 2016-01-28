@@ -19,6 +19,8 @@
 	<!-- Bootstrap 3.3.6 -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
+	<!-- iCheck -->
+	<link href="{$smarty.const.WWW_THEMES}/{$theme}/plugins/iCheck/square/blue.css" rel="stylesheet" type="text/css"/>
 	<!-- Font Awesome Icons -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
@@ -87,9 +89,9 @@
 						<!-- User Account Menu -->
 						<li class="dropdown user user-menu">
 							<!-- Menu Toggle Button -->
-							{if ($loggedin)=="true"}
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<!-- The user image in the navbar-->
+								{if ($loggedin)=="true"}
 								<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png"
 									 class="user-image" alt="User Image"/>
 								<!-- hidden-xs hides the username on small devices so only the image appears. -->
@@ -149,11 +151,11 @@
 			</nav>
 		</header>
 		<!-- Left side column. contains the logo and sidebar -->
-		{if ($loggedin)=="true"}
 		<aside class="main-sidebar">
 			<!-- sidebar: style can be found in sidebar.less -->
 			<section class="sidebar">
 				<!-- Sidebar user panel -->
+				{if ($loggedin)=="true"}
 				<div class="user-panel">
 					<div class="pull-left image">
 						<img src="{$smarty.const.WWW_THEMES}/shared/images/user-loggedin.png" class="img-circle"
@@ -184,6 +186,7 @@
 						</div>
 					</div>
 				</form>
+				{/if}
 				<!-- /.search form -->
 				<!-- Sidebar Menu -->
 				<ul class="sidebar-menu">
@@ -191,6 +194,7 @@
 					<!-- Optionally, you can add icons to the links -->
 					<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
 									class="fa arrow"></span></a></li>
+					{if ($loggedin)=="true"}
 					<li class="treeview">
 						<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
 						<ul class="treeview-menu">
