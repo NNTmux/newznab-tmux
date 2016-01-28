@@ -332,6 +332,8 @@
 	<!-- Bootstrap 3.3.6 JS -->
 	<script src="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/js/bootstrap.min.js"
 			type="text/javascript"></script>
+	<!-- iCheck -->
+	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
 	<!-- Bootstrap hover on mouseover script -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/hover/bootstrap-hover-dropdown.min.js"></script>

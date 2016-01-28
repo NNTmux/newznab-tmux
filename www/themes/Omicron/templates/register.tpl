@@ -57,7 +57,7 @@
           </div>
           <div class="row">
             <div class="col-xs-8">
-              <div class="checkbox">
+              <div class="checkbox icheck">
                 <label>
                   <input type="checkbox"> I agree to the <a href="{$serverroot}terms-and-conditions">terms</a>
                 </label>
@@ -66,8 +66,10 @@
             <div class="col-xs-4">
               <button type="submit" value="Register" class="btn btn-primary btn-block btn-flat">Register</button>
             </div><!-- /.col -->
-			  <hr>
-			  {$page->smarty->fetch('captcha.tpl')}
+            <hr>
+            <center>
+            {$page->smarty->fetch('captcha.tpl')}
+            </center>
           </div>
 			<a href="{$serverroot}login" class="text-center">I already have a membership</a>
         </form>
