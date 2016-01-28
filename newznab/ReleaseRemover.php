@@ -931,7 +931,7 @@ class ReleaseRemover
 					}
 				}
 
-				$regexSQL = sprintf("INNER JOIN release_files rf ON r.id = rf.releaseid
+				$regexSQL = sprintf("STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
 				WHERE rf.name REGEXP %s ", $this->pdo->escapeString($regex['regex'])
 				);
 
