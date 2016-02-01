@@ -203,7 +203,7 @@ class Categorize extends Category
 					if ($this->categorizeForeign && $this->isBookForeign()) {
 						break;
 					}
-					$this->tmpCat = Category::CAT_BOOK_COMICS;
+					$this->tmpCat = Category::CAT_BOOKS_COMICS;
 					break;
 				case $group === 'alt.binaries.console.ps3':
 					if ($this->isGamePS4()) {
@@ -258,13 +258,13 @@ class Categorize extends Category
 					if ($this->categorizeForeign && $this->isBookForeign()) {
 						break;
 					}
-					$this->tmpCat = Category::CAT_BOOK_TECHNICAL;
+					$this->tmpCat = Category::CAT_BOOKS_TECHNICAL;
 					break;
 				case $group === 'alt.binaries.e-book.magazines':
 					if ($this->categorizeForeign && $this->isBookForeign()) {
 						break;
 					}
-					$this->tmpCat = Category::CAT_BOOK_MAGS;
+					$this->tmpCat = Category::CAT_BOOKS_MAGAZINES;
 					break;
 				case $group === 'alt.binaries.e-book.rpg':
 					switch (true) {
@@ -274,7 +274,7 @@ class Categorize extends Category
 						case $this->isBook():
 							break;
 						default:
-							$this->tmpCat = Category::CAT_BOOK_OTHER;
+							$this->tmpCat = Category::CAT_BOOKS_OTHER;
 							break;
 					}
 					break;
@@ -287,7 +287,7 @@ class Categorize extends Category
 						case $this->categorizeForeign && $this->isBookForeign():
 							break;
 						case preg_match('/[a-z0-9 \',]+ - \[? ?[a-z0-9 \']+ ?\]? - [a-z0-9 \']+/i', $this->releaseName):
-							$this->tmpCat = Category::CAT_BOOK_EBOOK;
+							$this->tmpCat = Category::CAT_BOOKS_EBOOK;
 							break;
 						default:
 							$this->tmpCat = Category::CAT_OTHER_MISC;
@@ -1353,7 +1353,7 @@ class Categorize extends Category
 			case $this->categorizeForeign === false:
 				return false;
 			case preg_match('/[ \-\._](brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|ita|latin|mandarin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)[-._ ]/i', $this->releaseName):
-				$this->tmpCat = Category::CAT_BOOK_FOREIGN;
+				$this->tmpCat = Category::CAT_BOOKS_FOREIGN;
 				return true;
 			default:
 				return false;
@@ -1368,7 +1368,7 @@ class Categorize extends Category
 			case $this->isBookForeign():
 				break;
 			default:
-				$this->tmpCat = Category::CAT_BOOK_COMICS;
+				$this->tmpCat = Category::CAT_BOOKS_COMICS;
 				break;
 		}
 		return true;
@@ -1382,7 +1382,7 @@ class Categorize extends Category
 			case $this->isBookForeign():
 				break;
 			default:
-				$this->tmpCat = Category::CAT_BOOK_TECHNICAL;
+				$this->tmpCat = Category::CAT_BOOKS_TECHNICAL;
 				break;
 		}
 		return true;
@@ -1396,7 +1396,7 @@ class Categorize extends Category
 			case $this->isBookForeign():
 				break;
 			default:
-				$this->tmpCat = Category::CAT_BOOK_MAGS;
+				$this->tmpCat = Category::CAT_BOOKS_MAGAZINES;
 				break;
 		}
 		return true;
@@ -1405,7 +1405,7 @@ class Categorize extends Category
 	public function isBookOther()
 	{
 		if (preg_match('/"\d\d-\d\d-20\d\d\./i', $this->releaseName)) {
-			$this->tmpCat = Category::CAT_BOOK_OTHER;
+			$this->tmpCat = Category::CAT_BOOKS_OTHER;
 			return true;
 		}
 		return false;
@@ -1419,7 +1419,7 @@ class Categorize extends Category
 			case $this->isBookForeign():
 				break;
 			default:
-				$this->tmpCat = Category::CAT_BOOK_EBOOK;
+				$this->tmpCat = Category::CAT_BOOKS_EBOOK;
 				break;
 		}
 		return true;

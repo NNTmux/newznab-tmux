@@ -1,3 +1,5 @@
+2016-02-01 DariusIII
+	Chg: Rename CAT_BOOK_ to CAT_BOOKS_, change the book other category from 7050 to 7999
 2016-01-29 DariusIII
 	Chg: Remove utf8_encode to speed up processing of binaries and collections, fix by @izolight
 2016-01-28 DariusIII

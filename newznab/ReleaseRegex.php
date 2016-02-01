@@ -253,7 +253,7 @@ class ReleaseRegex
 					if ($cat->isPcGame($matches['name']))
 						$regcatid = Category::CAT_PC_GAMES;
 					if ($cat->isEBook($matches['name']))
-						$regcatid = Category::CAT_BOOK_EBOOK;
+						$regcatid = Category::CAT_BOOKS_EBOOK;
 				}
 
 				$reqID = "";

@@ -649,8 +649,8 @@ newznab-tmux https://github.com/DariusIII/newznab-tmux
    7020                                 Books/Comics                    Comics Ebooks
    7030                                 Books/Magazines                 Magazines
    7040                                 Books/Technical                 Technical books
-   7050                                 Books/Other                     Misc books
    7060                                 Books/Foreign                   Non english books
+   7999                                 Books/Other                     Misc books
    100000-                              Custom                          Specific to a site
 
 
