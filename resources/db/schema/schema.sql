@@ -586,7 +586,7 @@ INSERT INTO category (id, title, parentid) VALUES (7010, 'Mags', 7000);
 INSERT INTO category (id, title, parentid) VALUES (7020, 'Ebook', 7000);
 INSERT INTO category (id, title, parentid) VALUES (7030, 'Comics', 7000);
 INSERT INTO category (id, title, parentid) VALUES (7040, 'Technical', 7000);
-INSERT INTO category (id, title, parentid) VALUES (7050, 'Other', 7000);
+INSERT INTO category (id, title, parentid) VALUES (7999, 'Other', 7000);
 INSERT INTO category (id, title, parentid) VALUES (7060, 'Foreign', 7000);
 
 DROP TABLE IF EXISTS sharing_sites;

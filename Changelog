@@ -1,3 +1,5 @@
+2016-02-01 DariusIII
+	Upd: Change name of CAT_BOOK_ to CAT_BOOKS_, change cat number for book/other from 7050 to 7999
 2016-01-28 DariusIII
 	Upd: Update blacklist removal in ReleaseRemover class.
 2016-01-27 DariusIII

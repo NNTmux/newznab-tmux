@@ -65,12 +65,12 @@ class Category
 	const CAT_XXX_OTHER = '6070';
 	const CAT_XXX_SD = '6080';
 	const CAT_XXX_WEBDL = '6090';
-	const CAT_BOOK_MAGS = '7010';
-	const CAT_BOOK_EBOOK = '7020';
-	const CAT_BOOK_COMICS = '7030';
-	const CAT_BOOK_TECHNICAL = '7040';
-	const CAT_BOOK_OTHER = '7050';
-	const CAT_BOOK_FOREIGN = '7060';
+	const CAT_BOOKS_MAGAZINES = '7010';
+	const CAT_BOOKS_EBOOK = '7020';
+	const CAT_BOOKS_COMICS = '7030';
+	const CAT_BOOKS_TECHNICAL = '7040';
+	const CAT_BOOKS_OTHER = '7999';
+	const CAT_BOOKS_FOREIGN = '7060';
 	const CAT_PARENT_OTHER = '0000';
 	const CAT_PARENT_GAME = '1000';
 	const CAT_PARENT_MOVIE = '2000';
@@ -86,7 +86,7 @@ class Category
 
 	const CAT_OTHERS_GROUP =
 		[
-			self::CAT_BOOK_OTHER,
+			self::CAT_BOOKS_OTHER,
 			self::CAT_GAME_OTHER,
 			self::CAT_MOVIE_OTHER,
 			self::CAT_MUSIC_OTHER,
