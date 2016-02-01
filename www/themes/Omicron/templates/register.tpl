@@ -66,8 +66,10 @@
             <div class="col-xs-4">
               <button type="submit" value="Register" class="btn btn-primary btn-block btn-flat">Register</button>
             </div><!-- /.col -->
-			  <hr>
-			  {$page->smarty->fetch('captcha.tpl')}
+            <hr>
+            <center>
+            {$page->smarty->fetch('captcha.tpl')}
+            </center>
           </div>
 			<a href="{$serverroot}login" class="text-center">I already have a membership</a>
         </form>

@@ -1,3 +1,19 @@
+2016-02-01 DariusIII
+	Upd: Change name of CAT_BOOK_ to CAT_BOOKS_, change cat number for book/other from 7050 to 7999
+2016-01-28 DariusIII
+	Upd: Update blacklist removal in ReleaseRemover class.
+2016-01-27 DariusIII
+	Chg: Refactor Charisma basepage.
+2016-01-26 DariusIII
+	Chg: Refactor Omicron basepage
+2016-01-25 DariusIII
+	Upd: Update the folder structure, remove _scripts from update, nix and win folders.
+	Chg: Change the name of CAT_GROUP_OTHER constant to CAT_OTHERS_GROUP in Category class, update minimum supported PHP version to 5.6.
+2016-01-22 DariusIII
+	Upd: Update Noty package to version 2.3.8 and move it to themes/shared/libs/noty/ folder
+2016-01-21 DariusIII
+	Upd: Update getID3 to latest revision
+	Upd: Update ReleaseExtra class
 2016-01-20 DariusIII
 	Upd: Update isISO categorization, broaden triballs categories, move and update recategorize script.
 2016-01-18 DariusIII

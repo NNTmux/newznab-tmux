@@ -224,8 +224,8 @@ INSERT INTO category (id, title, parentid, status, minsizetoformrelease, maxsize
 (7020, 'Ebook', 7000, 1, 0, 0, NULL, 0),
 (7030, 'Comics', 7000, 1, 0, 0, NULL, 0),
 (7040, 'Technical', 7000, 1, 0, 0, NULL, 0),
-(7050, 'Other', 7000, 1, 0, 0, NULL, 0),
 (7060, 'Foreign', 7000, 1, 0, 0, NULL, 0),
+(7999, 'Other', 7000, 1, 0, 0, NULL, 0),
 (0000, 'Other', NULL, 1, 0, 0, NULL, 0),
 (0010, 'Misc', 0000, 1, 0, 0, NULL, 0),
 (0020, 'Hashed', 0000, 1, 0, 0, NULL, 0);

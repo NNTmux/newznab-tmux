@@ -19,6 +19,8 @@
 	<!-- Bootstrap 3.3.6 -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
+	<!-- iCheck -->
+	<link href="{$smarty.const.WWW_THEMES}/{$theme}/plugins/iCheck/square/blue.css" rel="stylesheet" type="text/css"/>
 	<!-- Font Awesome Icons -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
@@ -43,7 +45,6 @@
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
 </head>
-{if ($loggedin)=="true"}
 	<!--
 	  BODY TAG OPTIONS:
 	  =================
@@ -90,6 +91,7 @@
 							<!-- Menu Toggle Button -->
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<!-- The user image in the navbar-->
+								{if ($loggedin)=="true"}
 								<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png"
 									 class="user-image" alt="User Image"/>
 								<!-- hidden-xs hides the username on small devices so only the image appears. -->
@@ -140,7 +142,10 @@
 									</div>
 								</li>
 							</ul>
-						</li>
+							{else}
+							<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a></li>
+							<li><a href="{$smarty.const.WWW_TOP}/register"><i class="fa fa-bookmark-o"></i><span> Register</span></a></li>
+					 		{/if}
 					</ul>
 				</div>
 			</nav>
@@ -150,6 +155,7 @@
 			<!-- sidebar: style can be found in sidebar.less -->
 			<section class="sidebar">
 				<!-- Sidebar user panel -->
+				{if ($loggedin)=="true"}
 				<div class="user-panel">
 					<div class="pull-left image">
 						<img src="{$smarty.const.WWW_THEMES}/shared/images/user-loggedin.png" class="img-circle"
@@ -180,14 +186,15 @@
 						</div>
 					</div>
 				</form>
+				{/if}
 				<!-- /.search form -->
 				<!-- Sidebar Menu -->
 				<ul class="sidebar-menu">
 					<li class="header">Main</li>
-					{if ($loggedin)=="true"}
 					<!-- Optionally, you can add icons to the links -->
 					<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
 									class="fa arrow"></span></a></li>
+					{if ($loggedin)=="true"}
 					<li class="treeview">
 						<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
 						<ul class="treeview-menu">
@@ -211,22 +218,21 @@
 							</li>
 						</ul>
 					</li>
+					{/if}
 					<li class="treeview">
 						<a href="#"><i class="fa fa-list-ol"></i><span> Articles & Links</span></a>
 						<ul class="treeview-menu">
 							<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
 											class="fa fa-envelope-o"></i><span> Contact</span> <span
 											class="fa arrow"></span></a></li>
+							{if ($loggedin)=="true"}
 							<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a></li>
 						</ul>
 					</li>
-					<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock"></i><span> Sign out</span></a>
-						{else}
-					<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a>
-						{/if}
-					</li>
+							<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock"></i><span> Sign out</span></a></li>
+							{/if}
 				</ul>
 				<!-- /.sidebar-menu -->
 			</section>
@@ -330,6 +336,8 @@
 	<!-- Bootstrap 3.3.6 JS -->
 	<script src="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/js/bootstrap.min.js"
 			type="text/javascript"></script>
+	<!-- iCheck -->
+	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
 	<!-- Bootstrap hover on mouseover script -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/hover/bootstrap-hover-dropdown.min.js"></script>
@@ -342,8 +350,9 @@
 	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/slimScroll/jquery.slimscroll.min.js"></script>
 	<!-- Fastclick script -->
 	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/fastclick/fastclick.min.js"></script>
-	<!-- Notification script -->
-	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/noty/packaged/jquery.noty.packaged.min.js"></script>
+	<!-- notification plugin -->
+	<script type="text/javascript"
+			src="{$smarty.const.WWW_THEMES}/shared/libs/noty/packaged/jquery.noty.packaged.js"></script>
 	<!-- data table plugin -->
 	<script type="text/javascript"
 			src='{$smarty.const.WWW_THEMES}/{$theme}/dist/js/jquery.dataTables.min.js'></script>
@@ -359,15 +368,4 @@
 		  user experience. Slimscroll is required when using the
 		  fixed layout. -->
 	</body>
-{elseif $smarty.server.REQUEST_URI == "/register" || $smarty.server.REQUEST_URI eq '/register?action=submit'}
-	{include file="register.tpl"}
-{elseif $smarty.server.REQUEST_URI == "/forgottenpassword" || $smarty.server.REQUEST_URI eq '/forgottenpassword?action=submit'}
-	{include file="forgottenpassword.tpl"}
-{elseif $smarty.server.REQUEST_URI == "/contact-us"}
-	{include file="contact.tpl"}
-{elseif $smarty.server.REQUEST_URI == "/terms-and-conditions"}
-	{include file="terms.tpl"}
-{else}
-	{include file="login.tpl"}
-{/if}
 </html>
