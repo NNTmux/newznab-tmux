@@ -40,6 +40,9 @@
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.theme.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/jquery.iphone.toggle.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/animate.min.css' rel='stylesheet'>
+	<!-- Font Awesome Icons -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/font-awesome.min.css" rel="stylesheet"
+		  type="text/css"/>
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/styles/normalize.css" rel="stylesheet" type="text/css">
 	<!-- The fav icon -->
