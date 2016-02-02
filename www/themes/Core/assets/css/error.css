@@ -1,0 +1,17 @@
+body {
+  padding-top: 40px;
+}
+
+
+.logo h1 {
+  color: #000000;
+  font-size: 100px;
+}
+
+
+
+@media (max-width: 767px){
+  .logo h1 {
+    font-size: 55px;
+  }
+}

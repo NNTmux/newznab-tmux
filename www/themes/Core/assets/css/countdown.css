@@ -1,0 +1,81 @@
+
+body {
+    padding-top: 40px;
+    color:#000000;
+}
+
+
+#main {
+    width: 80%;
+    position: relative;
+    margin: 0 auto;
+
+    padding: 20px 20px 0;
+}
+
+
+.progress {
+    color: #000;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    margin-bottom: 0;
+}
+.progress.mini {
+    height: 6px;
+}
+
+
+/* jQuery Countdown styles 1.6.1. */
+
+#counter {
+   display: none;
+}
+#counter-default {
+    margin: 20px auto;
+}
+#counter-default .inner {
+    font-size: large;
+    text-align: center;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.3);
+    margin: 15px 0;
+    padding: 15px;
+}
+#counter-default .timer-number {
+    font-size: 36px;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+#counter-default  .timer-text {
+    padding: 12px;
+}
+
+.title {
+    margin:30px;
+    text-align:center;
+}
+.well {
+    background-color: #202020;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: none;
+}
+legend {
+    border-color: #333333;
+}
+.page-header {
+    border-bottom: 1px solid #333333;
+}
+
+.contact {
+    padding-top:20px;
+    text-align:center;
+    font-size:40px;
+    font-weight:800;
+
+}
+
+@media (max-width: 767px) {
+    body {padding-top: 10px;}
+    #main {width:auto;}
+}
