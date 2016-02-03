@@ -51,9 +51,9 @@
                   <input id="rememberme" {if isset($rememberme) && $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox"> Remember Me
                 </label>
 				  <hr>
-                <center>
+                <div style="text-align: center;">
 				  {$page->smarty->fetch('captcha.tpl')}
-                </center>
+                </div>
               </div>
             </div><!-- /.col -->
             <div class="col-xs-4">

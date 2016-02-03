@@ -30,9 +30,9 @@
 
 <div class="tvseriesheading">
 	{if $show.image != 0}
-	<center>
+	<div style="text-align: center;">
 		<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$seriestitles} Logo" src="{$smarty.const.WWW_TOP}/covers/tvshows/{$show.id}.jpg" />
-	</center>
+	</div>
 	<br/>
 	{/if}
 	<p>
@@ -41,7 +41,7 @@
 
 </div>
 
-<center>
+<div style="text-align: center;">
 	<div class="btn-group">
 		{if $show.tvdb > 0}
 			<a class="btn btn-small btn-primarybtn-info" target="_blank"
@@ -69,7 +69,7 @@
 			   title="View at TheMovieDB">TMDB</a>
 		{/if}
 	</div>
-</center>
+</div>
 
 <br/>
 
