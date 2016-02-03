@@ -25,7 +25,7 @@
 	<meta charset="utf-8">
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<!-- Newposterwall -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- The styles -->
 	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/{$theme}/css/bootstrap-spacelab.min.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/charisma-app.css" rel="stylesheet">
@@ -44,7 +44,7 @@
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- Normalize.css -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/styles/normalize.css" rel="stylesheet" type="text/css">
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico">
 </head>
