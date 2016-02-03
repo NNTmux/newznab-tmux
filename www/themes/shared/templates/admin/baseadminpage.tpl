@@ -58,8 +58,8 @@
 	<!-- end #page -->
 
 	<div id="searchfooter">
-		<center>
-		</center>
+		<div style="text-align: center;">
+		</div>
 	</div>
 
 	<div class="footer">

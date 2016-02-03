@@ -1,6 +1,6 @@
 <h2>Browse {$catname}</h2>
 <div class="well well-small">
-	<center>
+	<div style="text-align: center;">
 		<form class="form-inline" name="browseby" action="xxx" style="margin:0;">
 			<i class="fa fa-film fa-midt"></i>
 			<input class="input input-medium" id="title" type="text" name="title" value="{$title}" placeholder="Title"/>
@@ -26,7 +26,7 @@
 			</select>
 			<input class="btn btn-success" type="submit" value="Go"/>
 		</form>
-	</center>
+	</div>
 </div>
 {$site->adbrowse}
 {if $results|@count > 0}
@@ -55,9 +55,9 @@
 									href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
 						</td>
 						<td width="50%">
-							<center>
+							<div style="text-align: center;">
 								{$pager}
-							</center>
+							</div>
 						</td>
 						<td width="20%">
 							<div class="pull-right">
@@ -133,7 +133,7 @@
 								</a>
 							</h4>
 							<div class="movextra">
-								<center>
+								<div style="text-align: center;">
 									{if $result.classused == "ade"}
 										<a
 												target="_blank"
@@ -191,7 +191,7 @@
 											title="Search Internet Adult Film Database"
 									><img
 												src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
-								</center>
+								</div>
 							</div>
 						</div>
 					</td>
@@ -351,9 +351,9 @@
 											class="fa fa-lg fa-list-ol"></i></a>
 							</td>
 							<td width="50%">
-								<center>
+								<div style="text-align: center;">
 									{$pager}
-								</center>
+								</div>
 							</td>
 							<td width="20%">
 								<div class="pull-right">

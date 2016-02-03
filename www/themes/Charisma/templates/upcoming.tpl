@@ -7,7 +7,7 @@
 		</ol>
 	</div>
 </div>
-<center>
+<div style="text-align: center;">
 	<div class="btn-group">
 		<a class="btn btn-sm btn-primary btn-transparent" href="{$smarty.const.WWW_TOP}/upcoming/1">Box Office</a>
 		<a class="btn btn-sm btn-primary btn-transparent" href="{$smarty.const.WWW_TOP}/upcoming/2">In Theatre</a>
@@ -15,7 +15,7 @@
 		<a class="btn btn-sm btn-primary btn-transparent" href="{$smarty.const.WWW_TOP}/upcoming/4">Upcoming</a>
 		<a class="btn btn-sm btn-primary btn-transparent" href="{$smarty.const.WWW_TOP}/upcoming/5">DVD Releases</a>
 	</div>
-</center>
+</div>
 <br/>
 {$site->adbrowse}
 {if isset($data) && $data|@count > 0}
