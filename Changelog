@@ -1,4 +1,6 @@
-2013-02-03 DariusIII
+2016-02-04 DariusIII
+	Upd: Add function to fetch category values
+2016-02-03 DariusIII
 	Chg: Move fonts and css not related to bootstrap to css and fonts folders in shared respectively
 	Fix: Replace deprecated html tag <center> with proper CSS
 2016-02-01 DariusIII

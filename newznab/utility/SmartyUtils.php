@@ -19,6 +19,18 @@
  * @copyright 2014 nZEDb
  */
 
+use newznab\Category;
+
+/**
+ * Returns the value of the specified Category constant.
+ *
+ * @param string $category	Name of constant whose value to return.
+ */
+function getCategoryValue($category)
+{
+	Category::getCategoryValue($category);
+}
+
 // Function inspired by c0r3@newznabforums adds country flags on the browse page.
 /**
  * @param $x
