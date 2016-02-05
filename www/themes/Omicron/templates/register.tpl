@@ -16,7 +16,7 @@
     <!-- Bootstrap 3.3.6 -->
     <link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <!-- Font Awesome Icons -->
-    <link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="{$smarty.const.WWW_THEMES}/shared/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
     <!-- Theme style -->
     <link href="{$smarty.const.WWW_THEMES}/{$theme}/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
     <!-- iCheck -->

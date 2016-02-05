@@ -154,6 +154,27 @@ class Category
 		return $catsrch;
 	}
 
+	public static function getCategoryOthersGroup()
+	{
+		return implode(",",
+			[
+				self::CAT_BOOKS_OTHER,
+				self::CAT_GAME_OTHER,
+				self::CAT_MOVIE_OTHER,
+				self::CAT_MUSIC_OTHER,
+				self::CAT_PC_MOBILEOTHER,
+				self::CAT_TV_OTHER,
+				self::CAT_OTHER_HASHED,
+				self::CAT_XXX_OTHER,
+				self::CAT_OTHER_MISC
+			]);
+	}
+
+	public static function getCategoryValue($category)
+	{
+		return constant('self::' . $category);
+	}
+
 	/**
 	 * Check if category is parent.
 	 *
