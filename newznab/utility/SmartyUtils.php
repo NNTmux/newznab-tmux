@@ -162,7 +162,7 @@ function release_flag($text, $page)
 		}
 
 		return
-			'<img title="' . $language . '" alt="' . $language . '" src="' . $www . 'themes/shared/img/flags/' . $code . '.png"/>';
+			'<img title="' . $language . '" alt="' . $language . '" src="' . $www . 'themes/shared/images/flags/' . $code . '.png"/>';
 	} else if ($page == "search") {
 		if ($code == "") {
 			return false;
