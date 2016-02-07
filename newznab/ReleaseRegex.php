@@ -239,21 +239,21 @@ class ReleaseRegex
 				if ($regexArr["categoryid"] != "")
 					$regcatid = $regexArr["categoryid"];
 				//override
-				if ($regcatid == Category::CAT_PC_0DAY) {
+				if ($regcatid == Category::PC_0DAY) {
 					if ($cat->isPhone($matches['name']))
-						$regcatid = Category::CAT_PC_MOBILEANDROID;
+						$regcatid = Category::PC_MOBILEANDROID;
 					if ($cat->isPhone($matches['name']))
-						$regcatid = Category::CAT_PC_MOBILEIOS;
+						$regcatid = Category::PC_MOBILEIOS;
 					if ($cat->isPhone($matches['name']))
-						$regcatid = Category::CAT_PC_MOBILEOTHER;
+						$regcatid = Category::PC_MOBILEOTHER;
 					if ($cat->isIso($matches['name']))
-						$regcatid = Category::CAT_PC_ISO;
+						$regcatid = Category::PC_ISO;
 					if ($cat->isMac($matches['name']))
-						$regcatid = Category::CAT_PC_MAC;
+						$regcatid = Category::PC_MAC;
 					if ($cat->isPcGame($matches['name']))
-						$regcatid = Category::CAT_PC_GAMES;
+						$regcatid = Category::PC_GAMES;
 					if ($cat->isEBook($matches['name']))
-						$regcatid = Category::CAT_BOOKS_EBOOK;
+						$regcatid = Category::BOOKS_EBOOK;
 				}
 
 				$reqID = "";

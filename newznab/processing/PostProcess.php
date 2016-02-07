@@ -358,7 +358,7 @@ class PostProcess
 		$foundName = true;
 		if (!in_array(
 			(int)$query['categoryid'],
-			Category::CAT_OTHERS_GROUP
+			Category::OTHERS_GROUP
 		)
 		) {
 			$foundName = false;

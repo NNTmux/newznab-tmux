@@ -28,7 +28,7 @@ function reCategorize($argv)
 {
 	global $pdo;
 	$where = '';
-	$othercats = implode(",", Category::CAT_OTHERS_GROUP);
+	$othercats = implode(",", Category::OTHERS_GROUP);
 	$update = true;
 	if (isset($argv[1]) && is_numeric($argv[1])) {
 		$where = ' AND groupid = ' . $argv[1];
