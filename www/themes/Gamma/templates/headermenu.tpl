@@ -63,31 +63,7 @@
 			{/foreach}
 		</ul>
 	</li>
-	{elseif ($parentcat.id == 6000 && $userdata.xxxview=="1" && $site->lookupxxx=="1")}
-	<li class="dropdown">
-		<a id="cat3"
-		   class="dropdown-toggle"
-		   data-toggle="dropdown"
-		   data-hover="dropdown"
-		   href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}
-			<b class="caret"></b></a>
-		<ul class="dropdown-menu" role="menu" aria-labelledby="cat3">
-			<li><a href="{$smarty.const.WWW_TOP}/xxx">All {$parentcat.title}</a></li>
-			<li class="divider"></li>
-			{foreach from=$parentcat.subcatlist item=subcat}
-				{if $subcat.id == 6010 || $subcat.id == 6020 || $subcat.id == 6030 || $subcat.id == 6040}
-					<li><a title="Browse {$subcat.title}"
-						   href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a>
-					</li>
-				{else}
-					<li><a title="Browse {$subcat.title}"
-						   href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a>
-					</li>
-				{/if}
-			{/foreach}
-		</ul>
-	</li>
-	{elseif ($parentcat.id == 6000 && $userdata.xxxview=="0" && $site->lookupxxx=="1")}
+	{elseif $parentcat.id == 6000}
 		<li class="dropdown">
 			<a id="cat3"
 			   class="dropdown-toggle"
@@ -96,18 +72,27 @@
 			   href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}
 				<b class="caret"></b></a>
 			<ul class="dropdown-menu" role="menu" aria-labelledby="cat3">
-				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$parentcat.id}">All {$parentcat.title}</a></li>
-				{foreach from=$parentcat.subcatlist item=subcat}
-					{if $subcat.id == 6010 || $subcat.id == 6020 || $subcat.id == 6030 || $subcat.id == 6040}
-						<li><a title="Browse {$subcat.title}"
-							   href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a>
-						</li>
-					{else}
-						<li><a title="Browse {$subcat.title}"
-							   href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a>
-						</li>
-					{/if}
-				{/foreach}
+				{if $userdata.xxxview == "1"}
+					<li><a href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}</a></li>
+				{else}
+					<li><a href="{$smarty.const.WWW_TOP}/browse?t=6000">{$parentcat.title}</a></li>
+				{/if}
+				<hr>
+				{if $userdata.xxxview == "1"}
+					{foreach from=$parentcat.subcatlist item=subcat}
+						{if $subcat.id == 6010 OR $subcat.id == 6020 OR $subcat.id == 6030 OR $subcat.id == 6040}
+							<li><a href="{$smarty.const.WWW_TOP}/xxx?t={$subcat.id}">{$subcat.title}</a>
+							</li>
+						{else}
+							<li><a href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a>
+							</li>
+						{/if}
+					{/foreach}
+				{else}
+					{foreach from=$parentcat.subcatlist item=subcat}
+						<li><a href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+					{/foreach}
+				{/if}
 			</ul>
 		</li>
 	{elseif $parentcat.id == 7000}
