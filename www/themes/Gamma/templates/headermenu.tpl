@@ -95,21 +95,26 @@
 				{/if}
 			</ul>
 		</li>
-	{elseif $parentcat.id == 7000}
-	<li class="dropdown">
-		<a id="drop{$parentcat.id}" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
-		<ul class="dropdown-menu" role="menu" aria-labelledby="drop{$parentcat.id}">
-			{if $userdata.bookview == "1"}
-				<li><a href="{$smarty.const.WWW_TOP}/books">{$parentcat.title}</a></li>
-			{elseif $userdata.bookview != "1"}
-				<li><a href="{$smarty.const.WWW_TOP}/browse?t=7000">{$parentcat.title}</a></li>
-			{/if}
-			<hr>
-			{foreach from=$parentcat.subcatlist item=subcat}
-				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
-			{/foreach}
-		</ul>
-	</li>
+	{elseif $parentcat.id == {getcatval category=BOOKS_ROOT}}
+		<li class="dropdown">
+			<a id="drop{$parentcat.id}"
+			   class="dropdown-toggle"
+			   data-toggle="dropdown"
+			   data-hover="dropdown"
+			   href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}
+				<b class="caret"></b></a>
+			<ul class="dropdown-menu" role="menu" aria-labelledby="drop{$parentcat.id}">
+				{if $userdata.bookview == "1"}
+					<li><a href="{$smarty.const.WWW_TOP}/books">{$parentcat.title}</a></li>
+				{else}
+					<li><a href="{$smarty.const.WWW_TOP}/browse?t={getcatval category=BOOKS_ROOT}">{$parentcat.title}</a></li>
+				{/if}
+				<hr>
+				{foreach from=$parentcat.subcatlist item=subcat}
+					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
+				{/foreach}
+			</ul>
+		</li>
 	{/if}
 	{/foreach}
 	<li class="dropdown">

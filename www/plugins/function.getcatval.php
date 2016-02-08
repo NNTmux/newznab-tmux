@@ -23,7 +23,7 @@ use newznab\Category;
  * Returns the value of the specified Category constant.
  * @usage {getcatval category=BOOKS_COMICS}
  *
- *@param string $category Name of constant whose value to return.
+ *@param string $params Name of constant whose value to return.
  *
  *@return Value of the specified Category constant.
  */
