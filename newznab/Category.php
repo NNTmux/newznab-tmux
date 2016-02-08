@@ -70,7 +70,7 @@ class Category
 	const BOOKS_COMICS = '7030';
 	const BOOKS_TECHNICAL = '7040';
 	const BOOKS_FOREIGN = '7060';
-	const BOOKS_ROOT = '7999';
+	const BOOKS_ROOT = '7000';
 	const OTHER_ROOT = '0000';
 	const GAME_ROOT = '1000';
 	const MOVIE_ROOT = '2000';
