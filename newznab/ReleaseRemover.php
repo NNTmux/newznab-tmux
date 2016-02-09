@@ -627,7 +627,7 @@ class ReleaseRemover
 			Category::BOOKS_FOREIGN,
 			Category::BOOKS_MAGAZINES,
 			Category::BOOKS_TECHNICAL,
-			Category::BOOKS_ROOT,
+			Category::BOOKS_UNKNOWN,
 			Category::PC_0DAY,
 			Category::PC_GAMES,
 			Category::OTHER_MISC,

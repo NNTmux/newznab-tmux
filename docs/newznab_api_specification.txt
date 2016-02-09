@@ -597,7 +597,7 @@ newznab-tmux https://github.com/DariusIII/newznab-tmux
    1060                                 Console/Wiiware/VC              Wii homebrew
    1070                                 Console/XBOX 360 DLC            Microsoft XBox 360 Downloadable Content
    1080                                 Console/PS3                     Playstation 3
-   1090                                 Console/Other                   Misc Console
+   1999                                 Console/Other                   Misc Console
    1110                                 Console/3DS                     Nintendo 3DS
    1120                                 Console/PS Vita                 Playstation Vita
    1130                                 Console/WiiU                    Nintento Wii U
@@ -605,7 +605,7 @@ newznab-tmux https://github.com/DariusIII/newznab-tmux
    1180                                 Console/PS4                     Playstation 4
    2000                                 Movies                          All of movies
    2010                                 Movies/Foreign                  Non english movies
-   2020                                 Movies/Other                    Misc movies
+   2999                                 Movies/Other                    Misc movies
    2030                                 Movies/SD                       Standard definition movies
    2040                                 Movies/HD                       High definition movies (720p+)
    2050                                 Movies/3D                       3D movies
@@ -617,7 +617,7 @@ newznab-tmux https://github.com/DariusIII/newznab-tmux
    3020                                 Audio/Video                     Music videos
    3030                                 Audio/Audiobook                 Books in audio format
    3040                                 Audio/Lossless                  Lossless music
-   3050                                 Audio/Other                     Misc music
+   3999                                 Audio/Other                     Misc music
    3060                                 Audio/Foreign                   Non english music.
    4000                                 PC                              All of PC
    4010                                 PC/0day                         Apps and games not released in ISO.
@@ -632,7 +632,7 @@ newznab-tmux https://github.com/DariusIII/newznab-tmux
    5020                                 TV/FOREIGN                      FOREIGN TV
    5030                                 TV/SD                           SD TV
    5040                                 TV/HD                           HD TV
-   5050                                 TV/OTHER                        Other TV Content
+   5999                                 TV/OTHER                        Other TV Content
    5060                                 TV/Sport                        Sports
    5070                                 TV/Anime                        Anime
    5080                                 TV/Documentary                  Documentaries
@@ -643,7 +643,7 @@ newznab-tmux https://github.com/DariusIII/newznab-tmux
    6040                                 XXX/x264                        HD Porn
    6050                                 XXX/Other                       Misc Porn
    6060                                 XXX/Imageset                    Sets of porn images
-   6070                                 XXX/Packs                       Packs of multiple porn videos
+   6999                                 XXX/Packs                       Packs of multiple porn videos
    7000                                 Books                           All of Books
    7010                                 Books/Ebook                     Ebooks
    7020                                 Books/Comics                    Comics Ebooks

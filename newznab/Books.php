@@ -493,7 +493,7 @@ class Books
 						$this->pdo->log->headerOver('Changing category to misc books: ') . $this->pdo->log->primary($releasename)
 					);
 				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET categoryid = %s WHERE id = %d', Category::BOOKS_ROOT, $releaseID));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET categoryid = %s WHERE id = %d', Category::BOOKS_UNKNOWN, $releaseID));
 				return false;
 			} else if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun( |e|$)|Jul( |y|$)|Aug( |ust|$)|Sep( |tember|$)|O(c|k)t( |ober|$)|Nov( |ember|$)|De(c|z)( |ember|$))/i', $releasename) && !preg_match('/Part \d+/i', $releasename)) {
 
@@ -502,7 +502,7 @@ class Books
 						$this->pdo->log->headerOver('Changing category to magazines: ') . $this->pdo->log->primary($releasename)
 					);
 				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET categoryid = %s WHERE id = %d', Category::BOOKS_COMICS, $releaseID));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET categoryid = %s WHERE id = %d', Category::BOOKS_MAGAZINES, $releaseID));
 				return false;
 			} else if (!empty($releasename) && !preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
 				return $releasename;
