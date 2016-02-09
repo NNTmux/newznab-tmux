@@ -1,6 +1,7 @@
 <?php
 namespace newznab;
 
+use newznab\Category;
 use newznab\db\Settings;
 use libs\ApaiIO\Configuration\GenericConfiguration;
 use libs\ApaiIO\Operations\Search;
@@ -91,6 +92,7 @@ class Console
 			$this->renamed = 'AND isrenamed = 1';
 		}
 		//$this->cleanconsole = ($this->pdo->getSetting('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
+		$this->catWhere = "AND categoryid BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
 
 		$this->failCache =[];
 	}
@@ -753,12 +755,12 @@ class Console
 							SELECT searchname, id
 							FROM releases
 							WHERE nzbstatus = %d %s
-							AND consoleinfoid IS NULL
-							AND categoryid BETWEEN 1000 AND 1999
+							AND consoleinfoid IS NULL %s
 							ORDER BY postdate DESC
 							LIMIT %d',
 				NZB::NZB_ADDED,
 				$this->renamed,
+				$this->catWhere,
 				$this->gameqty
 			)
 		);
@@ -823,9 +825,10 @@ class Console
 					sprintf('
 								UPDATE releases
 								SET consoleinfoid = %d
-								WHERE id = %d',
+								WHERE id = %d %s',
 						$gameId,
-						$arr['id']
+						$arr['id'],
+						$this->catWhere
 					)
 				);
 

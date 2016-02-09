@@ -675,9 +675,22 @@ class Music
 	 */
 	public function processMusicReleases($local = false)
 	{
-		$res = $this->pdo->queryDirect(sprintf('SELECT searchname, id FROM releases '
-				. 'WHERE musicinfoid IS NULL AND nzbstatus = 1 %s AND categoryid IN (3010, 3040, 3999) '
-				. 'ORDER BY postdate DESC LIMIT %d', $this->renamed, $this->musicqty));
+		$res = $this->pdo->queryDirect(
+			sprintf('
+					SELECT searchname, id
+					FROM releases
+					WHERE musicinfoid IS NULL
+					AND nzbstatus = 1 %s
+					AND categoryid IN (%s, %s, %s)
+					ORDER BY postdate DESC
+					LIMIT %d',
+				$this->renamed,
+				Category::MUSIC_MP3,
+				Category::MUSIC_LOSSLESS,
+				Category::MUSIC_OTHER,
+				$this->musicqty
+			)
+		);
 		if ($res instanceof \Traversable && $res->rowCount() > 0) {
 			if ($this->echooutput) {
 				$this->pdo->log->doEcho(

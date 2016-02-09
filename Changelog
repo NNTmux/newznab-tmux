@@ -1,4 +1,5 @@
 2016-02-09 DariusIII
+	Upd: Switch to category constants from category numbers, part 1
 	Upd: Change other cat numbers to be the last number in their range x999
 2016-02-07 DariusIII
 	Chg: Remove CAT_ from categories names and rename parent categories to root.

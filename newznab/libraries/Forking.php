@@ -766,7 +766,7 @@ class Forking extends \fork_daemon
 						FROM releases
 						WHERE nzbstatus = %d
 						AND imdbid IS NULL
-						AND categoryid BETWEEN 2000 AND 2999
+						AND categoryid BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
 						%s %s
 						LIMIT 1',
 						NZB::NZB_ADDED,
@@ -791,7 +791,7 @@ class Forking extends \fork_daemon
 					FROM releases
 					WHERE nzbstatus = %d
 					AND imdbid IS NULL
-					AND categoryid BETWEEN 2000 AND 2999
+					AND categoryid BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
 					%s %s
 					GROUP BY LEFT(guid, 1)
 					LIMIT 16',
@@ -821,7 +821,7 @@ class Forking extends \fork_daemon
 						WHERE nzbstatus = %d
 						AND size > 1048576
 						AND tv_episodes_id BETWEEN -2 AND 0
-						AND categoryid BETWEEN 5000 AND 5999
+						AND categoryid BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
 						%s %s
 						LIMIT 1',
 					NZB::NZB_ADDED,
@@ -847,7 +847,7 @@ class Forking extends \fork_daemon
 					WHERE nzbstatus = %d
 					AND tv_episodes_id BETWEEN -2 AND 0
 					AND size > 1048576
-					AND categoryid BETWEEN 5000 AND 5999
+					AND categoryid BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
 					%s %s
 					GROUP BY LEFT(guid, 1)
 					LIMIT 16',
