@@ -2,6 +2,7 @@
 namespace newznab;
 
 use newznab\db\Settings;
+use newznab\Category;
 
 /**
  * Class Videos -- functions for site interaction
@@ -21,7 +22,7 @@ Class Videos
 		];
 		$options += $defaults;
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->catWhere = 'r.categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER';
+		$this->catWhere = "r.categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER;
 	}
 
 	/**

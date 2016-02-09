@@ -4,6 +4,7 @@ namespace newznab\processing\tv;
 use newznab\processing\Videos;
 use newznab\utility\Country;
 use newznab\utility\Utility;
+use newznab\Category;
 
 /**
  * Class TV -- abstract extension of Videos
@@ -59,7 +60,7 @@ abstract class TV extends Videos
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->catWhere = 'categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . " AND categoryid != " . Category::TV_ANIME . "';
+		$this->catWhere = "categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . " AND categoryid != " . Category::TV_ANIME;
 		$this->tvqty = ($this->pdo->getSetting('maxrageprocessed') != '') ? $this->pdo->getSetting('maxrageprocessed') : 75;
 		$this->imgSavePath = NN_COVERS . 'tvshows' . DS;
 		$this->siteColumns = ['tvdb', 'trakt', 'tvrage', 'tvmaze', 'imdb', 'tmdb'];
