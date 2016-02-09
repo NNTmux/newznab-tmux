@@ -62,6 +62,11 @@ class Console
 	public $renamed;
 
 	/**
+	 * @var array|bool|int|string
+	 */
+	public $catWhere;
+
+	/**
 	 * Store names of failed Amazon lookup items
 	 * @var array
 	 */
