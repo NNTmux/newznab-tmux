@@ -196,10 +196,10 @@ if (isset($argv[1]) && ($argv[1] === "tv" || $argv[1] === "all")) {
 	}
 	if (isset($argv[2]) && $argv[2] === "true") {
 		echo $pdo->log->header("Resetting all TV postprocessing");
-		$where = ' WHERE videos_id != 0 AND tv_episodes_id != 0 AND categoryid BETWEEN 5000 AND 5999';
+		$where = " WHERE videos_id != 0 AND tv_episodes_id != 0 AND categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER;
 	} else {
 		echo $pdo->log->header("Resetting all failed TV postprocessing");
-		$where = " WHERE tv_episodes_id < 0 AND categoryid BETWEEN 5000 AND 5999";
+		$where = " WHERE tv_episodes_id < 0 AND categoryid BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -228,7 +228,7 @@ if (isset($argv[1]) && ($argv[1] === "anime" || $argv[1] === "all")) {
 		$where = ' WHERE categoryid = 5070';
 	} else {
 		echo $pdo->log->header("Resetting all failed Anime postprocessing");
-		$where = " WHERE anidbid BETWEEN -2 AND -1 AND categoryid = 5070";
+		$where = " WHERE anidbid BETWEEN -2 AND -1 AND categoryid = " . Category::TV_ANIME;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -256,7 +256,7 @@ if (isset($argv[1]) && ($argv[1] === "books" || $argv[1] === "all")) {
 		$where = ' WHERE bookinfoid IS NOT NULL';
 	} else {
 		echo $pdo->log->header("Resetting all failed Book postprocessing");
-		$where = " WHERE bookinfoid IN (-2, 0) AND categoryid BETWEEN 0000 AND 0999";
+		$where = " WHERE bookinfoid IN (-2, 0) AND categoryid BETWEEN " . Category::BOOKS_ROOT . " AND " . Category::BOOKS_UNKNOWN;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -280,7 +280,7 @@ if (isset($argv[1]) && ($argv[1] === "xxx" || $argv[1] === "all")) {
 		$where = ' WHERE xxxinfo_id != 0';
 	} else {
 		echo $pdo->log->header("Resetting all failed XXX postprocessing");
-		$where = " WHERE xxxinfo_id IN (-2, 0) AND categoryid BETWEEN 6000 AND 6040";
+		$where = " WHERE xxxinfo_id IN (-2, 0) AND categoryid BETWEEN " . Category::XXX_ROOT . " AND " . Category::XXX_X264;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
