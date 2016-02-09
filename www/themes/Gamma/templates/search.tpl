@@ -152,7 +152,7 @@
 			</div>
 		</div>
 
-<table style="100%" class="data highlight icons table table-striped Sortable" id="browsetable">
+<table style="100%" class="data highlight icons table table-striped" id="browsetable">
 
 	<tr>
 		<th style="padding-top:0px; padding-bottom:0px;">
