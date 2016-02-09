@@ -8,6 +8,7 @@ use newznab\NZB;
 use newznab\RequestID;
 use newznab\NNTP;
 use newznab\Nfo;
+use newznab\Category;
 
 require_once(NN_LIBS . 'forkdaemon-php' . DS . 'fork_daemon.php');
 
