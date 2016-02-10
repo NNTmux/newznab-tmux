@@ -89,7 +89,7 @@
 							<hr>
 							{if $userdata.gameview eq "1"}
 								{foreach $parentcat.subcatlist as $subcat}
-									{if $subcat.id eq 4050}
+									{if $subcat.id eq {getCategoryValue('PC_GAMES')}}
 										<li><a href="{$smarty.const.WWW_TOP}/games?t={$subcat.id}">{$subcat.title}</a>
 										</li>
 									{else}
