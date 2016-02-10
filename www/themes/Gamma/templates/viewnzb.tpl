@@ -339,13 +339,13 @@
 				<dl>
 					<dt> Grabs</dt>
 					<dd>{$release.grabs}
-						time{if $release.grabseq1}{else}s{/if}</dd>
+						time{if $release.grabs eq 1}{else}s{/if}</dd>
 				</dl>
 				{if $failed != NULL && $failed >0}
 					<dl>
 						<dt> Failed Download</dt>
 						<dd>{$failed}
-							time{if $failedeq1}{else}s{/if}</dd>
+							time{if $failed eq 1}{else}s{/if}</dd>
 					</dl>
 				{/if}
 				{if $site->checkpasswordedrar > 0}

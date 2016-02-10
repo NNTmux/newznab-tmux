@@ -54,7 +54,7 @@
 		<th>Grabs Total:</th>
 		<td>{$user.grabs}</td>
 	</tr>
-	{if ($user.id eq $userdata.id || $userdata.roleeq2) && $site->registerstatuseq1}
+	{if ($user.id eq $userdata.id || $userdata.roleeq2) && $site->registerstatus eq 1}
 	<tr>
 		<th title="Not public">Invites</th>
 		<td>{$user.invites} </td>

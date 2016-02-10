@@ -462,13 +462,13 @@
 																<tr>
 																	<th width="140">Grabs</th>
 																	<td>{$release.grabs}
-																		time{if $release.grabseq1}{else}s{/if}</td>
+																		time{if $release.grabs eq 1}{else}s{/if}</td>
 																</tr>
 																{if $failed != NULL && $failed >0}
 																<tr>
 																	<th width="140">Failed Download</th>
 																	<td>{$failed}
-																		time{if $failedeq1}{else}s{/if}</td>
+																		time{if $failed eq 1}{else}s{/if}</td>
 																</tr>
 																{/if}
 																<tr>
@@ -489,7 +489,7 @@
 																	<td>
 																		<a title="View file list"
 																		   href="{$smarty.const.WWW_TOP}/filelist/{$release.guid}">{$release.totalpart}
-																			file{if $release.totalparteq1}{else}s{/if}</a>
+																			file{if $release.totalpart eq 1}{else}s{/if}</a>
 																	</td>
 																</tr>
 																<tr>
