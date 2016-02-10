@@ -199,7 +199,7 @@
 												{* Other *}
 												{if in_array($result.category, array('Other: E-Books'))}
 													<a class="title" title="View category Books Other"
-													   href="{$smarty.const.WWW_TOP}/browse?t={getCategoryValue('BOOKS_OTHER')}">Ebooks
+													   href="{$smarty.const.WWW_TOP}/browse?t={getCategoryValue('BOOKS_UNKNOWN')}">Ebooks
 														Other</a>
 												{/if}
 												{if in_array($result.category, array('', 'PRE'))}
