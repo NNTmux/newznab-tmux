@@ -110,9 +110,9 @@
 										<select id="headcat" name="t" class="form-control" data-search="true">
 											<option class="grouping" value="-1">All</option>
 											{foreach $parentcatlist as $parentcat}
-												<option {if $header_menu_cateq$parentcat.id}selected="selected"{/if} value="{$parentcat.id}"> [{$parentcat.title}]</option>
+												<option {if $header_menu_cat eq $parentcat.id}selected="selected"{/if} value="{$parentcat.id}"> [{$parentcat.title}]</option>
 												{foreach $parentcat.subcatlist as $subcat}
-													<option {if $header_menu_cateq$subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;&nbsp; > {$subcat.title}</option>
+													<option {if $header_menu_cat eq $subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;&nbsp; > {$subcat.title}</option>
 												{/foreach}
 											{/foreach}
 										</select>

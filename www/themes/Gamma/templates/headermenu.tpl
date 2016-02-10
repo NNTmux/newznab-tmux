@@ -138,7 +138,7 @@
 				<select class="input-small" id="headcat" name="t">
 					<option class="grouping" value="-1">All</option>
 					{foreach $parentcatlist as $parentcat}
-					<option {if $header_menu_cateq$parentcat.id}selected="selected"{/if} class="grouping" value="{$parentcat.id}">{$parentcat.title}</option>
+					<option {if $header_menu_cat eq $parentcat.id}selected="selected"{/if} class="grouping" value="{$parentcat.id}">{$parentcat.title}</option>
 					{foreach $parentcat.subcatlist as $subcat}
 					<option {if $header_menu_cat eq $subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;{$subcat.title}</option>
 					{/foreach}
