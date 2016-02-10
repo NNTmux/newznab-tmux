@@ -50,7 +50,7 @@ if (isset($argv[1]) && isset($argv[2])) {
 	} else if ($argv[1] == 6 && $argv[2] == 'false') {
 		echo $pdo->log->header("Categorizing releases in misc sections using the searchname. This can take a while, be patient.");
 		$timestart = TIME();
-		$relcount = $releases->categorizeRelease('searchname', 'WHERE categoryID IN (1090, 2020, 3050, 5050, 6050, 7010)');
+		$relcount = $releases->categorizeRelease('searchname', 'WHERE categoryID IN (1999, 2999, 3999, 5999, 6050, 7010)');
 		$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 		$time = $consoletools->convertTime(TIME() - $timestart);
 		echo $pdo->log->primary("\n" . 'Finished categorizing ' . $relcount . ' releases in ' . $time . " seconds, using the search name.");

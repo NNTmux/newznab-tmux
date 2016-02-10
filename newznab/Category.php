@@ -19,14 +19,14 @@ class Category
 	const GAME_WIIWARE = '1060';
 	const GAME_XBOX360DLC = '1070';
 	const GAME_PS3 = '1080';
-	const GAME_OTHER = '1090';
+	const GAME_OTHER = '1999';
 	const GAME_3DS = '1110';
 	const GAME_PSVITA = '1120';
 	const GAME_WIIU = '1130';
 	const GAME_XBOXONE = '1140';
 	const GAME_PS4 = '1180';
 	const MOVIE_FOREIGN = '2010';
-	const MOVIE_OTHER = '2020';
+	const MOVIE_OTHER = '2999';
 	const MOVIE_SD = '2030';
 	const MOVIE_HD = '2040';
 	const MOVIE_3D = '2050';
@@ -37,7 +37,7 @@ class Category
 	const MUSIC_VIDEO = '3020';
 	const MUSIC_AUDIOBOOK = '3030';
 	const MUSIC_LOSSLESS = '3040';
-	const MUSIC_OTHER = '3050';
+	const MUSIC_OTHER = '3999';
 	const MUSIC_FOREIGN = '3060';
 	const PC_0DAY = '4010';
 	const PC_ISO = '4020';
@@ -50,7 +50,7 @@ class Category
 	const TV_FOREIGN = '5020';
 	const TV_SD = '5030';
 	const TV_HD = '5040';
-	const TV_OTHER = '5050';
+	const TV_OTHER = '5999';
 	const TV_SPORT = '5060';
 	const TV_ANIME = '5070';
 	const TV_DOCU = '5080';
@@ -62,15 +62,16 @@ class Category
 	const XXX_CLIPSD = '6042';
 	const XXX_PACK = '6050';
 	const XXX_IMAGESET = '6060';
-	const XXX_OTHER = '6070';
+	const XXX_OTHER = '6999';
 	const XXX_SD = '6080';
 	const XXX_WEBDL = '6090';
 	const BOOKS_MAGAZINES = '7010';
 	const BOOKS_EBOOK = '7020';
 	const BOOKS_COMICS = '7030';
 	const BOOKS_TECHNICAL = '7040';
-	const BOOKS_OTHER = '7999';
 	const BOOKS_FOREIGN = '7060';
+	const BOOKS_UNKNOWN = '7999';
+	const BOOKS_ROOT = '7000';
 	const OTHER_ROOT = '0000';
 	const GAME_ROOT = '1000';
 	const MOVIE_ROOT = '2000';
@@ -78,14 +79,13 @@ class Category
 	const PC_ROOT = '4000';
 	const TV_ROOT = '5000';
 	const XXX_ROOT = '6000';
-	const BOOKS_ROOT = '7000';
 	const STATUS_INACTIVE = 0;
 	const STATUS_ACTIVE = 1;
 	const STATUS_DISABLED = 2;
 
 	const OTHERS_GROUP =
 		[
-			self::BOOKS_OTHER,
+			self::BOOKS_ROOT,
 			self::GAME_OTHER,
 			self::MOVIE_OTHER,
 			self::MUSIC_OTHER,
@@ -157,7 +157,7 @@ class Category
 	{
 		return implode(",",
 			[
-				self::BOOKS_OTHER,
+				self::BOOKS_ROOT,
 				self::GAME_OTHER,
 				self::MOVIE_OTHER,
 				self::MUSIC_OTHER,
