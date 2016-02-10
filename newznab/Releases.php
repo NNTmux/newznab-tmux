@@ -649,7 +649,7 @@ class Releases
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				WHERE %s %s
 				AND r.nzbstatus = %d
-				AND r.categoryid BETWEEN 5000 AND 5999
+				AND r.categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . "
 				AND r.passwordstatus %s
 				%s
 				GROUP BY r.id
@@ -684,7 +684,7 @@ class Releases
 				FROM releases r
 				WHERE %s %s
 				AND r.nzbstatus = %d
-				AND r.categoryid BETWEEN 5000 AND 5999
+				AND r.categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . "
 				AND r.passwordstatus %s
 				%s',
 				$this->uSQL($userShows, 'videos_id'),
@@ -869,7 +869,7 @@ class Releases
 	{
 		$whereSql = sprintf(
 			"%s
-			WHERE r.categoryid BETWEEN 5000 AND 5999
+			WHERE r.categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . "
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s %s %s %s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
@@ -1312,7 +1312,7 @@ class Releases
 
 		$whereSql = sprintf(
 			"%s
-			WHERE r.categoryid BETWEEN 5000 AND 5999
+			WHERE r.categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . "
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
 			AND (%s)
@@ -1439,7 +1439,7 @@ class Releases
 	{
 		$whereSql = sprintf(
 			"%s
-			WHERE r.categoryid BETWEEN 2000 AND 2999
+			WHERE r.categoryid BETWEEN " . Category::MOVIE_ROOT . " AND " . Category::MOVIE_OTHER . "
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
 			%s %s %s %s",
@@ -1657,7 +1657,7 @@ class Releases
 				INNER JOIN category cp ON cp.id = c.parentid
 				INNER JOIN videos v ON r.videos_id = v.id
 				%s
-				WHERE r.categoryid BETWEEN 5000 AND 5999
+				WHERE r.categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . "
 				AND r.passwordstatus %s
 				AND v.id = %d %s %s",
 				$tvWhere,
@@ -2552,7 +2552,7 @@ class Releases
 				m.cover
 			FROM releases r
 			INNER JOIN movieinfo m USING (imdbid)
-			WHERE r.categoryid BETWEEN 2000 AND 2999
+			WHERE r.categoryid BETWEEN " . Category::MOVIE_ROOT . " AND " . Category::MOVIE_OTHER . "
 			AND m.imdbid > 0
 			AND m.cover = 1
 			AND r.id in (SELECT max(id) FROM releases WHERE imdbid > 0 GROUP BY imdbid)
@@ -2574,7 +2574,7 @@ class Releases
 				con.cover
 			FROM releases r
 			INNER JOIN consoleinfo con ON r.consoleinfoid = con.id
-			WHERE r.categoryid BETWEEN 1000 AND 1999
+			WHERE r.categoryid BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER . "
 			AND con.id > 0
 			AND con.cover > 0
 			AND r.id in (SELECT max(id) FROM releases WHERE consoleinfoid > 0 GROUP BY consoleinfoid)
@@ -2618,8 +2618,8 @@ class Releases
 				m.cover
 			FROM releases r
 			INNER JOIN musicinfo m ON r.musicinfoid = m.id
-			WHERE r.categoryid BETWEEN 3000 AND 3999
-			AND r.categoryid != 3030
+			WHERE r.categoryid BETWEEN " . Category::MUSIC_ROOT . " AND " . Category::MUSIC_OTHER . "
+			AND r.categoryid != " . Category::MUSIC_AUDIOBOOK ."
 			AND m.id > 0
 			AND m.cover > 0
 			AND r.id in (SELECT max(id) FROM releases WHERE musicinfoid > 0 GROUP BY musicinfoid)
@@ -2641,8 +2641,8 @@ class Releases
 				b.url,	b.cover, b.title as booktitle, b.author
 			FROM releases r
 			INNER JOIN bookinfo b ON r.bookinfoid = b.id
-			WHERE r.categoryid BETWEEN 7000 AND 7999
-			OR r.categoryid = 3030
+			WHERE r.categoryid BETWEEN " . Category::BOOKS_ROOT . " AND " . Category::BOOKS_OTHER . "
+			OR r.categoryid = " . Category::MUSIC_AUDIOBOOK . "
 			AND b.id > 0
 			AND b.cover > 0
 			AND r.id in (SELECT max(id) FROM releases WHERE bookinfoid > 0 GROUP BY bookinfoid)
@@ -2664,7 +2664,7 @@ class Releases
 				xxx.cover, xxx.title
 			FROM releases r
 			INNER JOIN xxxinfo xxx ON r.xxxinfo_id = xxx.id
-			WHERE r.categoryid BETWEEN 6000 AND 6999
+			WHERE r.categoryid BETWEEN " . Category::XXX_ROOT . " AND " . Category::XXX_OTHER . "
 			AND xxx.id > 0
 			AND xxx.cover = 1
 			AND r.id in (SELECT max(id) FROM releases WHERE xxxinfo_id > 0 GROUP BY xxxinfo_id)
@@ -2688,7 +2688,7 @@ class Releases
 			FROM releases r
 			INNER JOIN videos v ON r.videos_id = v.id
 			INNER JOIN tv_info tvi ON r.videos_id = tvi.videos_id
-			WHERE r.categoryid BETWEEN 5000 AND 5999
+			WHERE r.categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . "
 			AND v.id > 0
 			AND v.type = 0
 			AND tvi.image = 1

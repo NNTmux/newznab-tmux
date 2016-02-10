@@ -195,7 +195,7 @@ class Music
 		$order = $this->getMusicOrder($orderby);
 
 		$music = $this->pdo->queryCalc(
-				sprintf("
+			sprintf("
 				SELECT SQL_CALC_FOUND_ROWS
 					m.id,
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
@@ -208,14 +208,14 @@ class Music
 				AND %s %s %s
 				GROUP BY m.id
 				ORDER BY %s %s %s",
-						Releases::showPasswords($this->pdo),
-						$browseby,
-						$catsrch,
-						$exccatlist,
-						$order[0],
-						$order[1],
-						($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
-				), true, NN_CACHE_EXPIRY_MEDIUM
+				Releases::showPasswords($this->pdo),
+				$browseby,
+				$catsrch,
+				$exccatlist,
+				$order[0],
+				$order[1],
+				($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 
 		$musicIDs = $releaseIDs = false;
@@ -257,11 +257,11 @@ class Music
 			AND %s
 			GROUP BY m.id
 			ORDER BY %s %s",
-				(is_array($musicIDs) ? implode(',', $musicIDs) : -1),
-				(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-				$catsrch,
-				$order[0],
-				$order[1]
+			(is_array($musicIDs) ? implode(',', $musicIDs) : -1),
+			(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+			$catsrch,
+			$order[0],
+			$order[1]
 		);
 		$return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 		if (!empty($return)) {
@@ -385,16 +385,16 @@ class Music
 	public function update($id, $title, $asin, $url, $salesrank, $artist, $publisher, $releasedate, $year, $tracks, $cover, $genreID)
 	{
 		$this->pdo->queryExec(
-					sprintf("
+			sprintf("
 						UPDATE musicinfo
 						SET title = %s, asin = %s, url = %s, salesrank = %s, artist = %s, publisher = %s, releasedate = %s,
 							year = %s, tracks = %s, cover = %d, genreID = %d, updateddate = NOW()
 						WHERE id = %d",
-						$this->pdo->escapeString($title), $this->pdo->escapeString($asin),
-						$this->pdo->escapeString($url), $salesrank, $this->pdo->escapeString($artist),
-						$this->pdo->escapeString($publisher), $this->pdo->escapeString($releasedate),
-						$this->pdo->escapeString($year), $this->pdo->escapeString($tracks), $cover, $genreID, $id
-					)
+				$this->pdo->escapeString($title), $this->pdo->escapeString($asin),
+				$this->pdo->escapeString($url), $salesrank, $this->pdo->escapeString($artist),
+				$this->pdo->escapeString($publisher), $this->pdo->escapeString($releasedate),
+				$this->pdo->escapeString($year), $this->pdo->escapeString($tracks), $cover, $genreID, $id
+			)
 		);
 	}
 
@@ -519,12 +519,12 @@ class Music
 				$genreKey = array_search(strtolower($genreName), $genreassoc);
 			} else {
 				$genreKey = $this->pdo->queryInsert(
-									sprintf("
+					sprintf("
 										INSERT INTO genres (title, type)
 										VALUES (%s, %d)",
-										$this->pdo->escapeString($genreName),
-										Genres::MUSIC_TYPE
-									)
+						$this->pdo->escapeString($genreName),
+						Genres::MUSIC_TYPE
+					)
 				);
 			}
 		}
@@ -534,13 +534,13 @@ class Music
 		$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM musicinfo WHERE asin = %s', $this->pdo->escapeString($mus['asin'])));
 		if ($check === false) {
 			$musicId = $this->pdo->queryInsert(sprintf("INSERT INTO musicinfo (title, asin, url, salesrank, artist, publisher, "
-					. "releasedate, review, year, genreID, tracks, cover, createddate, updateddate) VALUES "
-					. "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, now(), now())", $this->pdo->escapeString($mus['title']), $this->pdo->escapeString($mus['asin']), $this->pdo->escapeString($mus['url']), $mus['salesrank'], $this->pdo->escapeString($mus['artist']), $this->pdo->escapeString($mus['publisher']), $mus['releasedate'], $this->pdo->escapeString($mus['review']), $this->pdo->escapeString($mus['year']), ($mus['musicgenreid'] == -1 ? "null" : $mus['musicgenreid']), $this->pdo->escapeString($mus['tracks']), $mus['cover']));
+				. "releasedate, review, year, genreID, tracks, cover, createddate, updateddate) VALUES "
+				. "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, now(), now())", $this->pdo->escapeString($mus['title']), $this->pdo->escapeString($mus['asin']), $this->pdo->escapeString($mus['url']), $mus['salesrank'], $this->pdo->escapeString($mus['artist']), $this->pdo->escapeString($mus['publisher']), $mus['releasedate'], $this->pdo->escapeString($mus['review']), $this->pdo->escapeString($mus['year']), ($mus['musicgenreid'] == -1 ? "null" : $mus['musicgenreid']), $this->pdo->escapeString($mus['tracks']), $mus['cover']));
 		} else {
 			$musicId = $check['id'];
 			$this->pdo->queryExec(sprintf('UPDATE musicinfo SET title = %s, asin = %s, url = %s, salesrank = %s, artist = %s, '
-					. 'publisher = %s, releasedate = %s, review = %s, year = %s, genreID = %s, tracks = %s, cover = %s, '
-					. 'updateddate = NOW() WHERE id = %d', $this->pdo->escapeString($mus['title']), $this->pdo->escapeString($mus['asin']), $this->pdo->escapeString($mus['url']), $mus['salesrank'], $this->pdo->escapeString($mus['artist']), $this->pdo->escapeString($mus['publisher']), $mus['releasedate'], $this->pdo->escapeString($mus['review']), $this->pdo->escapeString($mus['year']), ($mus['musicgenreid'] == -1 ? "null" : $mus['musicgenreid']), $this->pdo->escapeString($mus['tracks']), $mus['cover'], $musicId));
+				. 'publisher = %s, releasedate = %s, review = %s, year = %s, genreID = %s, tracks = %s, cover = %s, '
+				. 'updateddate = NOW() WHERE id = %d', $this->pdo->escapeString($mus['title']), $this->pdo->escapeString($mus['asin']), $this->pdo->escapeString($mus['url']), $mus['salesrank'], $this->pdo->escapeString($mus['artist']), $this->pdo->escapeString($mus['publisher']), $mus['releasedate'], $this->pdo->escapeString($mus['review']), $this->pdo->escapeString($mus['year']), ($mus['musicgenreid'] == -1 ? "null" : $mus['musicgenreid']), $this->pdo->escapeString($mus['tracks']), $mus['cover'], $musicId));
 		}
 
 		if ($musicId) {

@@ -1,6 +1,7 @@
 <?php
 namespace newznab;
 
+use newznab\Category;
 use newznab\db\Settings;
 use libs\ApaiIO\Configuration\GenericConfiguration;
 use libs\ApaiIO\Operations\Search;
@@ -72,8 +73,8 @@ class Console
 	public function __construct(array $options =[])
 	{
 		$defaults = [
-				'Echo'     => false,
-				'Settings' => null,
+			'Echo'     => false,
+			'Settings' => null,
 		];
 		$options += $defaults;
 
@@ -91,6 +92,7 @@ class Console
 			$this->renamed = 'AND isrenamed = 1';
 		}
 		//$this->cleanconsole = ($this->pdo->getSetting('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
+		$this->catWhere = "AND categoryid BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
 
 		$this->failCache =[];
 	}
@@ -98,10 +100,10 @@ class Console
 	public function getConsoleInfo($id)
 	{
 		return $this->pdo->queryOneRow(
-				sprintf(
-						"SELECT consoleinfo.*, genres.title AS genres FROM consoleinfo LEFT OUTER JOIN genres ON genres.id = consoleinfo.genreid WHERE consoleinfo.id = %d ",
-						$id
-				)
+			sprintf(
+				"SELECT consoleinfo.*, genres.title AS genres FROM consoleinfo LEFT OUTER JOIN genres ON genres.id = consoleinfo.genreid WHERE consoleinfo.id = %d ",
+				$id
+			)
 		);
 	}
 
@@ -135,10 +137,10 @@ class Console
 	public function getRange($start, $num)
 	{
 		return $this->pdo->query(
-				sprintf(
-						"SELECT * FROM consoleinfo ORDER BY createddate DESC %s",
-						($start === false ? '' : ('LIMIT ' . $num . ' OFFSET ' . $start))
-				)
+			sprintf(
+				"SELECT * FROM consoleinfo ORDER BY createddate DESC %s",
+				($start === false ? '' : ('LIMIT ' . $num . ' OFFSET ' . $start))
+			)
 		);
 	}
 
@@ -174,7 +176,7 @@ class Console
 		$order = $this->getConsoleOrder($orderby);
 
 		$consoles = $this->pdo->queryCalc(
-				sprintf("
+			sprintf("
 					SELECT SQL_CALC_FOUND_ROWS
 						con.id,
 						GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
@@ -187,14 +189,14 @@ class Console
 					AND %s %s %s
 					GROUP BY con.id
 					ORDER BY %s %s %s",
-						Releases::showPasswords($this->pdo),
-						$browseby,
-						$catsrch,
-						$exccatlist,
-						$order[0],
-						$order[1],
-						($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
-				), true, NN_CACHE_EXPIRY_MEDIUM
+				Releases::showPasswords($this->pdo),
+				$browseby,
+				$catsrch,
+				$exccatlist,
+				$order[0],
+				$order[1],
+				($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 
 		$consoleIDs = $releaseIDs = false;
@@ -207,7 +209,7 @@ class Console
 		}
 
 		$return = $this->pdo->query(
-				sprintf("
+			sprintf("
 				SELECT
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
@@ -239,12 +241,12 @@ class Console
 				AND %s
 				GROUP BY con.id
 				ORDER BY %s %s",
-						(is_array($consoleIDs) ? implode(',', $consoleIDs) : -1),
-						(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-						$catsrch,
-						$order[0],
-						$order[1]
-				), true, NN_CACHE_EXPIRY_MEDIUM
+				(is_array($consoleIDs) ? implode(',', $consoleIDs) : -1),
+				(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+				$catsrch,
+				$order[0],
+				$order[1]
+			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 		if (!empty($return)) {
 			$return[0]['_totalcount'] = (isset($consoles['total']) ? $consoles['total'] : 0);
@@ -333,25 +335,25 @@ class Console
 	public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genreID, $review = 'review')
 	{
 		$this->pdo->queryExec(
-				sprintf("
+			sprintf("
 				UPDATE consoleinfo
 				SET
 					title = %s, asin = %s, url = %s, salesrank = %s, platform = %s, publisher = %s,
 					releasedate= %s, esrb = %s, cover = %d, genreid = %d, review = %s, updateddate = NOW()
 				WHERE id = %d",
-						$this->pdo->escapeString($title),
-						$this->pdo->escapeString($asin),
-						$this->pdo->escapeString($url),
-						$salesrank,
-						$this->pdo->escapeString($platform),
-						$this->pdo->escapeString($publisher),
-						($releasedate != "" ? $this->pdo->escapeString($releasedate) : "null"),
-						$this->pdo->escapeString($esrb),
-						$cover,
-						$genreID,
-						($review == 'review' ? $review : $this->pdo->escapeString(substr($review, 0, 3000))),
-						$id
-				)
+				$this->pdo->escapeString($title),
+				$this->pdo->escapeString($asin),
+				$this->pdo->escapeString($url),
+				$salesrank,
+				$this->pdo->escapeString($platform),
+				$this->pdo->escapeString($publisher),
+				($releasedate != "" ? $this->pdo->escapeString($releasedate) : "null"),
+				$this->pdo->escapeString($esrb),
+				$cover,
+				$genreID,
+				($review == 'review' ? $review : $this->pdo->escapeString(substr($review, 0, 3000))),
+				$id
+			)
 		);
 	}
 
@@ -392,13 +394,13 @@ class Console
 				if ($this->echooutput) {
 					if ($consoleId !== -2) {
 						$this->pdo->log->doEcho(
-								$this->pdo->log->header("Added/updated game: ") .
-								$this->pdo->log->alternateOver("   Title:    ") .
-								$this->pdo->log->primary($con['title']) .
-								$this->pdo->log->alternateOver("   Platform: ") .
-								$this->pdo->log->primary($con['platform']) .
-								$this->pdo->log->alternateOver("   Genre: ") .
-								$this->pdo->log->primary($con['consolegenre'])
+							$this->pdo->log->header("Added/updated game: ") .
+							$this->pdo->log->alternateOver("   Title:    ") .
+							$this->pdo->log->primary($con['title']) .
+							$this->pdo->log->alternateOver("   Platform: ") .
+							$this->pdo->log->primary($con['platform']) .
+							$this->pdo->log->alternateOver("   Genre: ") .
+							$this->pdo->log->primary($con['consolegenre'])
 						);
 					}
 				}
@@ -564,12 +566,12 @@ class Console
 			$genreKey = array_search(strtolower($genreName), $genreassoc);
 		} else {
 			$genreKey = $this->pdo->queryInsert(
-					sprintf("
+				sprintf("
 									INSERT INTO genres (title, type)
 									VALUES (%s, %d)",
-							$this->pdo->escapeString($genreName),
-							Genres::CONSOLE_TYPE
-					)
+					$this->pdo->escapeString($genreName),
+					Genres::CONSOLE_TYPE
+				)
 			);
 		}
 		return $genreKey;
@@ -661,31 +663,31 @@ class Console
 		$ri = new ReleaseImage($this->pdo);
 
 		$check = $this->pdo->queryOneRow(
-				sprintf('
+			sprintf('
 							SELECT id
 							FROM consoleinfo
 							WHERE asin = %s',
-						$this->pdo->escapeString($con['asin'])
-				)
+				$this->pdo->escapeString($con['asin'])
+			)
 		);
 
 		if ($check === false) {
 			$consoleId = $this->pdo->queryInsert(
-					sprintf(
-							"INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genreid, esrb, releasedate, review, cover, createddate, updateddate)
+				sprintf(
+					"INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genreid, esrb, releasedate, review, cover, createddate, updateddate)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, NOW(), NOW())",
-							$this->pdo->escapeString($con['title']),
-							$this->pdo->escapeString($con['asin']),
-							$this->pdo->escapeString($con['url']),
-							$con['salesrank'],
-							$this->pdo->escapeString($con['platform']),
-							$this->pdo->escapeString($con['publisher']),
-							($con['consolegenreid'] == -1 ? "null" : $con['consolegenreid']),
-							$this->pdo->escapeString($con['esrb']),
-							($con['releasedate'] != "" ? $this->pdo->escapeString($con['releasedate']) : "null"),
-							$this->pdo->escapeString(substr($con['review'], 0, 3000)),
-							$con['cover']
-					)
+					$this->pdo->escapeString($con['title']),
+					$this->pdo->escapeString($con['asin']),
+					$this->pdo->escapeString($con['url']),
+					$con['salesrank'],
+					$this->pdo->escapeString($con['platform']),
+					$this->pdo->escapeString($con['publisher']),
+					($con['consolegenreid'] == -1 ? "null" : $con['consolegenreid']),
+					$this->pdo->escapeString($con['esrb']),
+					($con['releasedate'] != "" ? $this->pdo->escapeString($con['releasedate']) : "null"),
+					$this->pdo->escapeString(substr($con['review'], 0, 3000)),
+					$con['cover']
+				)
 			);
 			if($con['cover'] === 1){
 				$con['cover'] = $ri->saveImage($consoleId, $con['coverurl'], $this->imgSavePath, 250, 250);
@@ -698,9 +700,9 @@ class Console
 			}
 
 			$this->update(
-					$consoleId, $con['title'], $con['asin'], $con['url'], $con['salesrank'],
-					$con['platform'], $con['publisher'], (isset($con['releasedate']) ? $con['releasedate']: null), $con['esrb'],
-					$con['cover'], $con['consolegenreid'], (isset($con['review']) ? $con['review'] : null)
+				$consoleId, $con['title'], $con['asin'], $con['url'], $con['salesrank'],
+				$con['platform'], $con['publisher'], (isset($con['releasedate']) ? $con['releasedate']: null), $con['esrb'],
+				$con['cover'], $con['consolegenreid'], (isset($con['review']) ? $con['review'] : null)
 			);
 		}
 		return $consoleId;
@@ -711,11 +713,11 @@ class Console
 		$conf = new GenericConfiguration();
 		try {
 			$conf
-					->setCountry('com')
-					->setAccessKey($this->pubkey)
-					->setSecretKey($this->privkey)
-					->setAssociateTag($this->asstag)
-					->setResponseTransformer('\libs\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
+				->setCountry('com')
+				->setAccessKey($this->pubkey)
+				->setSecretKey($this->privkey)
+				->setAssociateTag($this->asstag)
+				->setResponseTransformer('\libs\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
 		} catch (\Exception $e) {
 			echo $e->getMessage();
 		}
@@ -749,18 +751,18 @@ class Console
 	public function processConsoleReleases()
 	{
 		$res = $this->pdo->queryDirect(
-				sprintf('
+			sprintf('
 							SELECT searchname, id
 							FROM releases
 							WHERE nzbstatus = %d %s
-							AND consoleinfoid IS NULL
-							AND categoryid BETWEEN 1000 AND 1999
+							AND consoleinfoid IS NULL %s
 							ORDER BY postdate DESC
 							LIMIT %d',
-						NZB::NZB_ADDED,
-						$this->renamed,
-						$this->gameqty
-				)
+				NZB::NZB_ADDED,
+				$this->renamed,
+				$this->catWhere,
+				$this->gameqty
+			)
 		);
 
 		if ($res instanceof \Traversable && $res->rowCount() > 0) {
@@ -778,12 +780,12 @@ class Console
 				if ($gameInfo !== false) {
 					if ($this->echooutput) {
 						$this->pdo->log->doEcho(
-								$this->pdo->log->headerOver('Looking up: ') .
-								$this->pdo->log->primary(
-										$gameInfo['title'] .
-										' (' .
-										$gameInfo['platform'] . ')'
-								)
+							$this->pdo->log->headerOver('Looking up: ') .
+							$this->pdo->log->primary(
+								$gameInfo['title'] .
+								' (' .
+								$gameInfo['platform'] . ')'
+							)
 						);
 					}
 
@@ -806,9 +808,9 @@ class Console
 					} else {
 						if ($this->echooutput) {
 							$this->pdo->log->doEcho(
-									$this->pdo->log->headerOver("Found Local: ") .
-									$this->pdo->log->primary("{$gameCheck['title']} - {$gameCheck['platform']}") .
-									PHP_EOL
+								$this->pdo->log->headerOver("Found Local: ") .
+								$this->pdo->log->primary("{$gameCheck['title']} - {$gameCheck['platform']}") .
+								PHP_EOL
 							);
 						}
 						$gameId = $gameCheck['id'];
@@ -820,13 +822,14 @@ class Console
 
 				// Update release.
 				$this->pdo->queryExec(
-						sprintf('
+					sprintf('
 								UPDATE releases
 								SET consoleinfoid = %d
-								WHERE id = %d',
-								$gameId,
-								$arr['id']
-						)
+								WHERE id = %d %s',
+						$gameId,
+						$arr['id'],
+						$this->catWhere
+					)
 				);
 
 				// Sleep to not flood amazon.

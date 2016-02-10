@@ -1,6 +1,8 @@
 <?php
 namespace newznab\libraries;
 
+
+use newznab\Category;
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
 use newznab\ColorCLI;
@@ -21,7 +23,7 @@ require_once(NN_LIBS . 'forkdaemon-php' . DS . 'fork_daemon.php');
  * For example, you get all the id's of the active groups in the groups table, you then iterate over them and spawn
  * processes of misc/update_binaries.php passing the group id's.
  *
- * @package nzedb\libraries
+ * @package newznab\libraries
  */
 class Forking extends \fork_daemon
 {
@@ -37,6 +39,7 @@ class Forking extends \fork_daemon
 		parent::__construct();
 
 		$this->_colorCLI = new ColorCLI();
+		$this->pdo = new Settings();
 
 		$this->register_logging(
 			[0 => $this, 1 => 'logger'],

@@ -39,14 +39,14 @@ if (isset($argv[1]) && $argv[1] === "all") {
 			$total = $qry->rowCount();
 			foreach ($qry as $releases) {
 				$pdo->queryExec(
-						sprintf("
+					sprintf("
 						UPDATE releases
 						SET consoleinfoid = NULL, gamesinfo_id = 0, imdbid = NULL, musicinfoid = NULL,
 							bookinfoid = NULL, videos_id = 0, tv_episodes_id = 0, xxxinfo_id = 0, passwordstatus = -1, haspreview = -1,
 							jpgstatus = 0, videostatus = 0, audiostatus = 0, nfostatus = -1
 						WHERE id = %d",
-								$releases['id']
-						)
+						$releases['id']
+					)
 				);
 				$consoletools->overWritePrimary("Resetting Releases:  " . $consoletools->percentString(++$affected, $total));
 			}
@@ -256,7 +256,7 @@ if (isset($argv[1]) && ($argv[1] === "books" || $argv[1] === "all")) {
 		$where = ' WHERE bookinfoid IS NOT NULL';
 	} else {
 		echo $pdo->log->header("Resetting all failed Book postprocessing");
-		$where = " WHERE bookinfoid IN (-2, 0) AND categoryid BETWEEN 0000 AND 8999";
+		$where = " WHERE bookinfoid IN (-2, 0) AND categoryid BETWEEN 0000 AND 0999";
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -290,7 +290,7 @@ if (isset($argv[1]) && ($argv[1] === "xxx" || $argv[1] === "all")) {
 		foreach ($qry as $releases) {
 			$pdo->queryExec("UPDATE releases SET xxxinfo_id = 0 WHERE id = " . $releases['id']);
 			$consoletools->overWritePrimary("Resetting XXX Releases:  " . $consoletools->percentString(++$concount,
-							$total));
+					$total));
 		}
 	}
 	echo $pdo->log->header("\n" . number_format($concount) . " xxxinfo_ID's reset.");
@@ -323,22 +323,22 @@ if (isset($argv[1]) && ($argv[1] === "nfos" || $argv[1] === "all")) {
 if ($ran === false) {
 	exit(
 	$pdo->log->error(
-			"\nThis script will reset postprocessing per category. It can also truncate the associated tables."
-			. "\nTo reset only those that have previously failed, those without covers, samples, previews, etc. use the "
-			. "second argument false.\n"
-			. "To reset even those previously post processed, use the second argument true.\n"
-			. "To truncate the associated table, use the third argument truncate.\n\n"
-			. "php reset_postprocessing.php consoles true    ...: To reset all consoles.\n"
-			. "php reset_postprocessing.php games true       ...: To reset all games.\n"
-			. "php reset_postprocessing.php movies true      ...: To reset all movies.\n"
-			. "php reset_postprocessing.php music true       ...: To reset all music.\n"
-			. "php reset_postprocessing.php misc true        ...: To reset all misc.\n"
-			. "php reset_postprocessing.php tv true          ...: To reset all tv.\n"
-			. "php reset_postprocessing.php anime true       ...: To reset all anime.\n"
-			. "php reset_postprocessing.php books true       ...: To reset all books.\n"
-			. "php reset_postprocessing.php xxx true         ...: To reset all xxx.\n"
-			. "php reset_postprocessing.php nfos true        ...: To reset all nfos.\n"
-			. "php reset_postprocessing.php all true         ...: To reset everything.\n"
+		"\nThis script will reset postprocessing per category. It can also truncate the associated tables."
+		. "\nTo reset only those that have previously failed, those without covers, samples, previews, etc. use the "
+		. "second argument false.\n"
+		. "To reset even those previously post processed, use the second argument true.\n"
+		. "To truncate the associated table, use the third argument truncate.\n\n"
+		. "php reset_postprocessing.php consoles true    ...: To reset all consoles.\n"
+		. "php reset_postprocessing.php games true       ...: To reset all games.\n"
+		. "php reset_postprocessing.php movies true      ...: To reset all movies.\n"
+		. "php reset_postprocessing.php music true       ...: To reset all music.\n"
+		. "php reset_postprocessing.php misc true        ...: To reset all misc.\n"
+		. "php reset_postprocessing.php tv true          ...: To reset all tv.\n"
+		. "php reset_postprocessing.php anime true       ...: To reset all anime.\n"
+		. "php reset_postprocessing.php books true       ...: To reset all books.\n"
+		. "php reset_postprocessing.php xxx true         ...: To reset all xxx.\n"
+		. "php reset_postprocessing.php nfos true        ...: To reset all nfos.\n"
+		. "php reset_postprocessing.php all true         ...: To reset everything.\n"
 	)
 	);
 } else {
