@@ -81,14 +81,14 @@
 		</tr>
 		{foreach $results as $result}
 		<tr class="{cycle values=",alt"}{if $lastvisit|strtotime<$result.adddate|strtotime} new{/if}" id="guid{$result.guid}">
-			{if (strpos($category, '60') !eq false)}
+			{if (strpos($category, '60') !== false)}
 					<td class="check" width="25%"><input id="chk{$result.guid|substr:0:7}"
 					 type="checkbox" class="nzb_check"
 					 value="{$result.guid}"/>
-					{if $result.jpgstatus eq 1}
+					{if $result.jpgstatus == 1}
 						<img width="300" height="200" src="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg" />
 					{else}
-						{if $result.haspreview eq 1}
+						{if $result.haspreview == 1}
 							<img width="300" height="200" src="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg" />
 						{/if}
 					{/if}
@@ -102,12 +102,12 @@
 				<label for="chk{$result.guid|substr:0:7}">
 					<a class="title" title="View details"  href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}"><h5>{$result.searchname|escape:"htmlall"|replace:".":" "}</h5></a>
 				</label>
-				{if $result.passwordstatus eq 2}
+				{if $result.passwordstatus == 2}
 				<i class="fa fa-lock"></i>
-				{elseif $result.passwordstatus eq 1}
+				{elseif $result.passwordstatus == 1}
 				<i class="fa fa-lock"></i>
 				{/if}
-				{if $userdata.canpre eq 1 && isset($result.nuketype) && $result.nuketype != ''}
+				{if $userdata.canpre == 1 && isset($result.nuketype) && $result.nuketype != ''}
 				&nbsp;<img title="{$result.nuketype}" src="{$smarty.const.WWW_THEMES}/shared/images/icons/nuke.png" width="10" height="10" alt="{$result.nuketype}" />
 				{/if}
 				<div class="resextra">
@@ -118,16 +118,16 @@
 						{if $result.imdbid > 0}
 						<a href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbid}" title="View movie info" class="badge badge-inverse halffade" rel="movie" >Movie</a>
 						{/if}
-						{if $result.jpgstatus eq 1&& $userdata.canpreview eq 1}
+						{if $result.jpgstatus == 1&& $userdata.canpreview == 1}
 							<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
 							title="Thumbnail" class="modal_prev badge badge-success halffade" rel="Thumbnail">Thumbnail</a>
 							{else}
-								{if $result.haspreview eq 1 && $userdata.canpreview eq 1}
+								{if $result.haspreview == 1 && $userdata.canpreview == 1}
 									<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg" name="name{$result.guid}"
 									title="Screenshot" class="modal_prev badge badge-success halffade" rel="preview">Preview</a>
 								{/if}
 						{/if}
-						{if $result.haspreview eq 2 && $userdata.canpreview eq 1}
+						{if $result.haspreview == 2 && $userdata.canpreview == 1}
 						<a href="#" name="audio{$result.guid}" title="Listen to Preview" class="audioprev badge badge-success halffade" rel="audio">Listen</a>
 						<audio id="audprev{$result.guid}" src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.mp3" preload="none"></audio>
 						{/if}
@@ -265,10 +265,10 @@
 						{if isset($section) && $section != ''}
 							<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}"><i class="fa fa-th-list"></i></a>
 						{/if}
-						{if (strpos($category, '60')  !eq false)}
+						{if (strpos($category, '60')  !== false)}
 								<a href="{$smarty.const.WWW_TOP}/xxx"><i class="fa fa-lg fa-camera-retro"></i></a>
 						{/if}
-						{if (strpos($category, '20') !eq false)}
+						{if (strpos($category, '20') !== false)}
 							<a href="{$smarty.const.WWW_TOP}/movies"><i class="fa fa-lg fa-camera-retro"></i></a>
 						{/if}
 						&nbsp;

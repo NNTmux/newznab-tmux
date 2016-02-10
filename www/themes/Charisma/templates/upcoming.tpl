@@ -42,7 +42,7 @@
 						(<a class="title" title="{$result->year}"
 							href="{$smarty.const.WWW_TOP}/movies?year={$result->year}">{$result->year}</a>) {if $result->ratings->critics_score > 0}{$result->ratings->critics_score}/100{/if}
 					</h4>
-					{if $result->synopsis eq ""}No synopsis. Check
+					{if $result->synopsis == ""}No synopsis. Check
 						<a target="_blank" href="{$site->dereferrer_link}{$result->links->alternate}"
 						   title="View Rotten Tomatoes Details">Rotten Tomatoes</a>
 						for more information.{else}{$result->synopsis}{/if}

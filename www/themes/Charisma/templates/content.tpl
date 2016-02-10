@@ -1,4 +1,4 @@
-{if $smarty.server.REQUEST_URI eq "/"}
+{if $smarty.server.REQUEST_URI == "/"}
 	{foreach $content as $c}
 		<div class="header">
 			<h2>{$site->title} > <strong>{$c->title}</strong></h2>

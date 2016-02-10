@@ -18,7 +18,7 @@
 			<select id="genre" name="genre" class="form-control">
 				<option class="grouping" value="" selected>Genre</option>
 				{foreach $genres as $gen}
-					<option {if $gen.id eq $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title}</option>
+					<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -27,7 +27,7 @@
 			<select id="year" name="year" class="form-control">
 				<option class="grouping" value="" selected>Year</option>
 				{foreach $years as $yr}
-					<option {if $yr eq $year}selected="selected"{/if} value="{$yr}">{$yr}</option>
+					<option {if $yr == $year}selected="selected"{/if} value="{$yr}">{$yr}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -103,29 +103,29 @@
 											<div class="col-md-2 small-gutter-left">
 												<a title="View details"
 												   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
-													<img src="{$smarty.const.WWW_TOP}/covers/games/{if $result.cover eq 1}{$result.gamesinfo_id}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+													<img src="{$smarty.const.WWW_TOP}/covers/games/{if $result.cover == 1}{$result.gamesinfo_id}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 														 width="140" border="0"
 														 alt="{$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 												</a>
-												{if $result.classused eq "gb"}<a class="label label-default"
+												{if $result.classused == "gb"}<a class="label label-default"
 																				 target="_blank"
 																				 href="{$site->dereferrer_link}{$result.url}"
 																				 name="giantbomb{$result.gamesinfo_id}"
 																				 title="View GiantBomb page">
 														GiantBomb</a>{/if}
-												{if $result.classused eq "steam"}<a class="label label-default"
+												{if $result.classused == "steam"}<a class="label label-default"
 																					target="_blank"
 																					href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
 																					name="steam{$result.gamesinfo_id}"
 																					title="View Steam page">
 														Steam</a>{/if}
-												{if $result.classused eq "gl"}<a class="label label-default"
+												{if $result.classused == "gl"}<a class="label label-default"
 																				 target="_blank"
 																				 href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
 																				 name="greenlight{$result.gamesinfo_id}"
 																				 title="View greenlight page">
 														GreenLight</a>{/if}
-												{if $result.classused eq "desura"}<a class="label label-default"
+												{if $result.classused == "desura"}<a class="label label-default"
 																					 target="_blank"
 																					 href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
 																					 name="desura{$result.gamesinfo_id}"

@@ -27,7 +27,7 @@
 			<select id="genre" name="genre" class="form-control">
 				<option class="grouping" value="" selected>Genre</option>
 				{foreach $genres as $gen}
-					<option {if $gen eq $genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
+					<option {if $gen == $genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -36,7 +36,7 @@
 			<select id="category" name="t" class="form-control">
 				<option class="grouping" value="" selected>Category</option>
 				{foreach $catlist as $ct}
-					<option {if $ct.id eq $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+					<option {if $ct.id == $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -121,13 +121,13 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
 																class="cover"
-																src="{if $result.cover eq 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0}
 														<i class="fa fa-exclamation-circle" style="color: red"
 														   title="This release has failed to download for some users"></i>{/if}
 													</a>
-													{if $result.classused eq "ade"}
+													{if $result.classused == "ade"}
 														<a
 																target="_blank"
 																href="{$site->dereferrer_link}{$result.directurl}"
@@ -144,7 +144,7 @@
 																><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
 													{/if}
-													{if $result.classused eq "hm"}
+													{if $result.classused == "hm"}
 														<a
 																target="_blank"
 																href="{$site->dereferrer_link}{$result.directurl}"
@@ -161,7 +161,7 @@
 																><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
 													{/if}
-													{if $result.classused eq "pop"}
+													{if $result.classused == "pop"}
 														<a
 																target="_blank"
 																href="{$site->dereferrer_link}{$result.directurl}"
@@ -273,13 +273,13 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
 																class="cover"
-																src="{if $result.cover eq 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0}
 														<i class="fa fa-exclamation-circle" style="color: red"
 														   title="This release has failed to download for some users"></i>{/if}
 													</a>
-													{if $result.classused eq "ade"}
+													{if $result.classused == "ade"}
 														<a
 																target="_blank"
 																href="{$site->dereferrer_link}{$result.directurl}"
@@ -296,7 +296,7 @@
 																><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
 													{/if}
-													{if $result.classused eq "hm"}
+													{if $result.classused == "hm"}
 														<a
 																target="_blank"
 																href="{$site->dereferrer_link}{$result.directurl}"
@@ -313,7 +313,7 @@
 																><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
 													{/if}
-													{if $result.classused eq "pop"}
+													{if $result.classused == "pop"}
 														<a
 																target="_blank"
 																href="{$site->dereferrer_link}{$result.directurl}"

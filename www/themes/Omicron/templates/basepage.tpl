@@ -6,8 +6,8 @@
 		/* <![CDATA[ */
 		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
 		var SERVERROOT = "{/literal}{$serverroot}{literal}";
-		var UID = "{/literal}{if $loggedin eq "true"}{$userdata.id}{else}{/if}{literal}";
-		var RSSTOKEN = "{/literal}{if $loggedin eq "true"}{$userdata.rsstoken}{else}{/if}{literal}";
+		var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
+		var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
 		/* ]]> */
 	</script>
 	{/literal}
@@ -168,15 +168,15 @@
 				</div>
 				<!-- search form -->
 				<form id="headsearch_form" action="{$smarty.const.WWW_TOP}/search/" method="get">
-					<input id="headsearch" name="search" value="{if $header_menu_search eq ""}Search...{else}{$header_menu_search|escape:"htmlall"}{/if}" class="form-control" type="text" tabindex="1$" />
+					<input id="headsearch" name="search" value="{if $header_menu_search == ""}Search...{else}{$header_menu_search|escape:"htmlall"}{/if}" class="form-control" type="text" tabindex="1$" />
 					<div class="row small-gutter-left" style="padding-top:3px;">
 						<div class="col-md-8">
 							<select id="headcat" name="t" class="form-control" data-search="true">
 								<option class="grouping" value="-1">All</option>
 								{foreach $parentcatlist as $parentcat}
-									<option {if $header_menu_cat eq $parentcat.id}selected="selected"{/if} value="{$parentcat.id}"> [{$parentcat.title}]</option>
+									<option {if $header_menu_cat == $parentcat.id}selected="selected"{/if} value="{$parentcat.id}"> [{$parentcat.title}]</option>
 									{foreach $parentcat.subcatlist as $subcat}
-										<option {if $header_menu_cat eq $subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;&nbsp; > {$subcat.title}</option>
+										<option {if $header_menu_cat == $subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;&nbsp; > {$subcat.title}</option>
 									{/foreach}
 								{/foreach}
 							</select>

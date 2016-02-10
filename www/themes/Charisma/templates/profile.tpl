@@ -73,12 +73,12 @@
 															<tr>
 																<th>Cover view:</th>
 																<td>
-																	{if $user.movieview eq "1"}View movie covers{else}View standard movie category{/if}<br/>
-																	{if $user.musicview eq "1"}View music covers{else}View standard music category{/if}<br/>
-																	{if $user.consoleview eq "1"}View console covers{else}View standard console category{/if}<br/>
-																	{if $user.gameview eq "1"}View games covers{else}View standard games category{/if}<br/>
-																	{if $user.bookview eq "1"}View book covers{else}View standard book category{/if}<br/>
-																	{if $user.xxxview eq "1"}View xxx covers{else}View standard xxx category{/if}<br/>
+																	{if $user.movieview == "1"}View movie covers{else}View standard movie category{/if}<br/>
+																	{if $user.musicview == "1"}View music covers{else}View standard music category{/if}<br/>
+																	{if $user.consoleview == "1"}View console covers{else}View standard console category{/if}<br/>
+																	{if $user.gameview == "1"}View games covers{else}View standard games category{/if}<br/>
+																	{if $user.bookview == "1"}View book covers{else}View standard book category{/if}<br/>
+																	{if $user.xxxview == "1"}View xxx covers{else}View standard xxx category{/if}<br/>
 																</td>
 															</tr>
 															</tbody>
@@ -129,7 +129,7 @@
 															{/if}
 															</tbody>
 														</table>
-														{if ($user.id eq $userdata.id || $isadmin) && $site->registerstatus eq 1}
+														{if ($user.id == $userdata.id || $isadmin) && $site->registerstatus == 1}
 															<table class="data table table-condensed table-striped table-responsive table-hover">
 																<tbody>
 																<tr class="bg-aqua-active">
@@ -191,12 +191,12 @@
 																<th>release</th>
 															</tr>
 															{foreach $downloadlist as $download}
-																{if $download@iteration eq 10}
+																{if $download@iteration == 10}
 																	<tr class="more"><td colspan="3"><a onclick="$('tr.extra').toggle();$('tr.more').toggle();return false;" href="#">show all...</a></td></tr>
 																{/if}
 																<tr {if $download@iteration >= 10}class="extra" style="display:none;"{/if}>
 																	<td width="80" title="{$download.timestamp}">{$download.timestamp|date_format}</td>
-																	<td>{if $download.guid eq ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download.guid}/{$download.searchname|escape:"htmlall"}">{$download.searchname}</a>{/if}</td>
+																	<td>{if $download.guid == ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download.guid}/{$download.searchname|escape:"htmlall"}">{$download.searchname}</a>{/if}</td>
 																</tr>
 															{/foreach}
 														</table>

@@ -1,7 +1,7 @@
 <h1>{$page->title}</h1>
 <h2>Getting in touch</h2>
 {$msg}{* This is a message that appears if a email is sent. *}
-{if $msg eq ""}
+{if $msg == ""}
 	{if $site->email != ''}
 		<p>
 			Please send any questions or comments you have in an email to {mailto address=$site->email text=$site->title}.

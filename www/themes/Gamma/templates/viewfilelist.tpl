@@ -19,7 +19,7 @@
 		<td>{$file.title|escape:'htmlall'}</td>
 
 		{assign var="icon" value='themes/shared/images/fileicons/'|cat:$file.ext|cat:".png"}
-		{if $file.ext eq "" || !is_file("$icon")}
+		{if $file.ext == "" || !is_file("$icon")}
 			{assign var="icon" value='file'}
 		{else}
 			{assign var="icon" value=$file.ext}

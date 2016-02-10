@@ -13,7 +13,7 @@
 				<td width="15%;">
 					{if !$privateprofiles || $isadmin || $ismod}
 						<a {if $smarty.foreach.result.last}id="last"{/if}
-						   title="{if $result.isadmin eq 1}Admin{else}View profile{/if}"
+						   title="{if $result.isadmin == 1}Admin{else}View profile{/if}"
 						   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}">{$result.username}</a>
 					<br/>
 					{else}

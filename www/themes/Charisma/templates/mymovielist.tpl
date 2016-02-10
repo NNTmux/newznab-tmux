@@ -10,7 +10,7 @@
 					<td>
 						<div>
 							<img class="shadow"
-								 src="{if $result['cover'] eq""}{$serverroot}themes/shared/images/nocover.png{else}{$result['cover']}{/if}"
+								 src="{if $result['cover'] ==""}{$serverroot}themes/shared/images/nocover.png{else}{$result['cover']}{/if}"
 								 width="120" border="0" alt="{$result['title']|escape:"htmlall"}"/>
 							<div>
 								<a class="label label-default" target="_blank"
@@ -33,7 +33,7 @@
 						{if $ourmovies[$result['imdb_id']] != ""}<a class="btn btn-sm btn-default"
 																	href="{$smarty.const.WWW_TOP}/movies?imdb={$result['imdb_id']}">
 								Download <i class="fa fa-cloud-download"></i></a>{/if}
-						<a style="display:{if $userimdbs[$result['imdb_id']] eq ""}inline{else}none;{/if}"
+						<a style="display:{if $userimdbs[$result['imdb_id']] == ""}inline{else}none;{/if}"
 						   onclick="mymovie_add('{$result['imdb_id']}', this);return false;"
 						   class="btn btn-sm btn-success" href="#">Add To My Movies</a>
 						<a style="display:{if $userimdbs[$result['imdb_id']] != ""}inline{else}none;{/if}"

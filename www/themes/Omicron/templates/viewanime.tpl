@@ -105,7 +105,7 @@
 												{if $result.nfoid > 0}<span class="label label-default"><a
 															href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 															class="text-muted">NFO</a></span>{/if}
-												{if $result.haspreview eq 1 && $userdata.canpreview eq 1}<a
+												{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
 													href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 													name="name{$result.guid}"
 													title="Screenshot of {$result.animeTitle|escape:"htmlall"}"

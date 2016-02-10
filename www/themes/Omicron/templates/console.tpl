@@ -21,7 +21,7 @@
 			<select id="genre" name="genre" class="form-control">
 				<option class="grouping" value="" selected>Genre</option>
 				{foreach $genres as $gen}
-					<option {if $gen.id eq $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title|escape:"htmlall"}</option>
+					<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title|escape:"htmlall"}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -30,7 +30,7 @@
 			<select id="category" name="t" class="form-control">
 				<option class="grouping" value="" selected>Category</option>
 				{foreach $catlist as $ct}
-					<option {if $ct.id eq $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+					<option {if $ct.id == $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -106,7 +106,7 @@
 											<div class="col-md-2 small-gutter-left">
 												<a title="View details"
 												   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
-													<img src="{$smarty.const.WWW_TOP}/covers/console/{if $result.cover eq 1}{$result.consoleinfoid}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+													<img src="{$smarty.const.WWW_TOP}/covers/console/{if $result.cover == 1}{$result.consoleinfoid}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 														 width="140" border="0"
 														 alt="{$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 												</a>
