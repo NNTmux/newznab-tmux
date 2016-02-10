@@ -50,7 +50,7 @@
 						<br/>
 						<br/>
 						<b>Starring:</b>
-						{foreach $result->abridged_cast as $cast=>$cast}
+						{foreach $result->abridged_cast as $cast name="cast"}
 							<a href="{$smarty.const.WWW_TOP}/movies?actors={$cast->name|escape:"htmlall"}"
 							   title="Search for movies starring {$cast->name|escape:"htmlall"}">{$cast->name|escape:"htmlall"}</a>
 							{if $smarty.foreach.cast.last}<br/><br/>{else},{/if}
