@@ -7,7 +7,7 @@
 				<i>{$nzb['uiTitle']}</i>
 				<br/>
 				<div style="width: 20px; float: left; margin: 7px 0 0 0">
-					{if $nzb['isPaused'] eq 1}
+					{if $nzb['isPaused'] == 1}
 						<img src="{$smarty.const.WWW_THEMES}/shared/images/icons/vortex/blah.png"
 							 style="float: left; margin: 0 5px 0 0"/>
 					{else}
@@ -17,7 +17,7 @@
 				</div>
 				<div class="vortex-progressbar"
 					 style="margin: 5px 0 0 0; background-color: #eee; height: 15px; padding: 3px; border-radius: 2px; float: left; width: 720px">
-					<div style="float: left; background-color: {if $nzb['isPaused'] eq 1}#FB8084{else}#91BA98{/if}; height: 15px; width: {$nzb['progress']}%"></div>
+					<div style="float: left; background-color: {if $nzb['isPaused'] == 1}#FB8084{else}#91BA98{/if}; height: 15px; width: {$nzb['progress']}%"></div>
 				</div>
 				<br style="clear: both"/>
 				<strong>{$nzb['state']}{if $nzb['statusText'] neq ''} ({$nzb['statusText']|lower}){/if}</strong>: {$nzb['progress']|round}
@@ -25,7 +25,7 @@
 				MB {if $nzb['transferedSpeed'] neq 0}@ {math|string_format:"%.2f" equation="size / 1024 / 1024" size=$nzb['transferedSpeed']} MB/s{/if}
 				<div class="vortex-controls" style="margin: 5px 0 0 0">
 					<div style="border-right: 2px solid #eee; width: 41px; float: left; margin: 0 5px 0 0">
-						{if $nzb['isPaused'] eq 1}
+						{if $nzb['isPaused'] == 1}
 							<a class="vortex-resume" title="Resume" href="{$nzb['id']}"><img
 										src="{$smarty.const.WWW_THEMES}/shared/images/icons/vortex/play.png"/></a>
 						{else}

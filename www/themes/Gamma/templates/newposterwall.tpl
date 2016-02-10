@@ -9,7 +9,7 @@
 				<select name="MySelect" id="MySelect"
 						onchange="window.location='{$smarty.const.WWW_TOP}/newposterwall?t=' + this.value;">
 					{foreach $types as $newtype}
-						<option {if $type eq $newtype}selected="selected"{/if} value="{$newtype}">
+						<option {if $type == $newtype}selected="selected"{/if} value="{$newtype}">
 							{$newtype}
 						</option>
 					{/foreach}
@@ -22,49 +22,49 @@
 				<div class="library-wrapper">
 					{foreach $newest as $result}
 						<div
-								{if $type eq 'Console'}
+								{if $type == 'Console'}
 									class="library-console"
-								{elseif $type eq 'Movies'}
+								{elseif $type == 'Movies'}
 									class="library-show"
-								{elseif $type eq 'XXX'}
+								{elseif $type == 'XXX'}
 									class="library-show"
-								{elseif $type eq 'Audio'}
+								{elseif $type == 'Audio'}
 									class="library-music"
-								{elseif $type eq 'Books'}
+								{elseif $type == 'Books'}
 									class="library-show"
-								{elseif $type eq 'PC'}
+								{elseif $type == 'PC'}
 									class="library-games"
-								{elseif $type eq 'TV'}
+								{elseif $type == 'TV'}
 									class="library-show"
-								{elseif $type eq 'Anime'}
+								{elseif $type == 'Anime'}
 									class="library-show"
 								{/if}
 								>
 							<div class="poster">
 								<a class="titleinfo" title="{$result.guid}"
 								   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">
-									{if $type eq 'Console'}
+									{if $type == 'Console'}
 										<img width="130px" alt=""
 											 src="{$smarty.const.WWW_TOP}/covers/console/{$result.consoleinfoid}.jpg"/>
-									{elseif $type eq 'Movies'}
+									{elseif $type == 'Movies'}
 										<img width="140px" height="205px" alt=""
 											 src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg"/>
-									{elseif $type eq 'XXX'}
+									{elseif $type == 'XXX'}
 										<img width="140px" height="205px" alt=""
 											 src="{$smarty.const.WWW_TOP}/covers/xxx/{$result.xxxinfo_id}-cover.jpg"/>
-									{elseif $type eq 'Audio'}
+									{elseif $type == 'Audio'}
 										<img height="250px" width="250px" alt=""
 											 src="{$smarty.const.WWW_TOP}/covers/music/{$result.musicinfoid}.jpg"/>
-									{elseif $type eq 'Books'}
+									{elseif $type == 'Books'}
 										<img height="140px" width="205px" alt=""
 											 src="{$smarty.const.WWW_TOP}/covers/book/{$result.bookinfoid}.jpg"/>
-									{elseif $type eq 'PC'}
+									{elseif $type == 'PC'}
 										<img height="130px" width="130px" alt=""
 											 src="{$smarty.const.WWW_TOP}/covers/games/{$result.gamesinfo_id}.jpg"/>
-									{elseif $type eq 'TV'}
+									{elseif $type == 'TV'}
 										<img height="130px" width="130px" alt=""
 											 src="{$smarty.const.WWW_TOP}/covers/tvshows/{$result.videos_id}.jpg"/>
-									{elseif $type eq 'Anime'}
+									{elseif $type == 'Anime'}
 										<img width="130px" height="130px" alt=""
 											 src="{$smarty.const.WWW_TOP}/covers/anime/{$result.anidbid}.jpg"/>
 									{/if}

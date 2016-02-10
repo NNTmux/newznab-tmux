@@ -4,9 +4,9 @@
 
 <p>
 <b>Jump to</b>:
-&nbsp;[ {if $seriesletter eq '0-9'}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/series/0-9">0-9</a>{if $seriesletter eq '0-9'}</u></b>{/if}
+&nbsp;[ {if $seriesletter == '0-9'}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/series/0-9">0-9</a>{if $seriesletter == '0-9'}</u></b>{/if}
 {foreach $seriesrange as $range}
-{if $range eq $seriesletter}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/series/{$range}">{$range}</a>{if $range eq $seriesletter}</u></b>{/if}
+{if $range == $seriesletter}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/series/{$range}">{$range}</a>{if $range == $seriesletter}</u></b>{/if}
 {/foreach}]
 </p>
 <form class="form pull-right" style="margin-top:-35px;">

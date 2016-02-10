@@ -26,7 +26,7 @@
 			<select id="rating" name="rating" class="form-control" name="Score">
 				<option value="" selected>Rating</option>
 				{foreach $ratings as $rate}
-					<option {if $rating eq $rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
+					<option {if $rating == $rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -35,7 +35,7 @@
 			<select id="genre" name="genre" class="form-control">
 				<option class="grouping" value="" selected>Genre</option>
 				{foreach $genres as $gen}
-					<option {if $gen eq $genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
+					<option {if $gen == $genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -44,7 +44,7 @@
 			<select id="year" name="year" class="form-control">
 				<option class="grouping" value="" selected>Year</option>
 				{foreach $years as $yr}
-					<option {if $yr eq $year}selected="selected"{/if} value="{$yr}">{$yr}</option>
+					<option {if $yr == $year}selected="selected"{/if} value="{$yr}">{$yr}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -53,7 +53,7 @@
 			<select id="category" name="t" class="form-control">
 				<option class="grouping" value="" selected>Category</option>
 				{foreach $catlist as $ct}
-					<option {if $ct.id eq $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+					<option {if $ct.id == $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -141,7 +141,7 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover"
-																src="{if isset($result.cover) && $result.cover eq 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/> {if $mfailed[$m@index]} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed for some users"></i>{/if}</a>
 													<a target="_blank"
@@ -259,7 +259,7 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover"
-																src="{if isset($result.cover) && $result.cover eq 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/> {if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}</a>
 													<a target="_blank"

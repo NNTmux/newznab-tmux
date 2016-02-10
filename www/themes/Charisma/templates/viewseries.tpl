@@ -156,10 +156,10 @@
 												{foreach $episodes as $result}
 													<tr class="{cycle values=",alt"}"
 														id="guid{$result.guid}">
-														{if $result@total>1 && $result@index eq 0}
+														{if $result@total>1 && $result@index == 0}
 															<td rowspan="{$result@total}" width="30">
 																<h4>{$episodes@key}</h4></td>
-														{elseif $result@total eq 1}
+														{elseif $result@total == 1}
 															<td><h4>{$episodes@key}</h4></td>
 														{/if}
 														<td>
@@ -172,7 +172,7 @@
 																	<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 																	   class="text-muted">NFO</a>
 																	</span>{/if}
-																{if $result.image eq 1 && $userdata.canpreview eq 1}
+																{if $result.image == 1 && $userdata.canpreview == 1}
 																<a
 																		href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 																		name="name{$result.guid}"

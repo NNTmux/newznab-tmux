@@ -11,14 +11,14 @@
 			<select class="input input-small" id="genre" name="genre">
 				<option class="grouping" value=""></option>
 				{foreach $genres as $gen}
-					<option {if $gen.id eq $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title}</option>
+					<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title}</option>
 				{/foreach}
 			</select>
 		<i class="fa fa-flag fa-midt"></i>
 			<select class="input input-small" id="category" name="t">
 			<option class="grouping" value="1000"></option>
 				{foreach $catlist as $ct}
-				<option {if $ct.id eq $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+				<option {if $ct.id == $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 		<input class="btn btn-success" type="submit" value="Go" />
@@ -155,7 +155,7 @@
 				<div class="movcover">
 					<div style="text-align: center;">
 						<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
-							<img class="shadow img img-polaroid" src="{$smarty.const.WWW_TOP}/covers/console/{if isset($result.cover) && $result.cover eq 1}{$result.consoleinfoid}.jpg{else}no-cover.jpg{/if}"
+							<img class="shadow img img-polaroid" src="{$smarty.const.WWW_TOP}/covers/console/{if isset($result.cover) && $result.cover == 1}{$result.consoleinfoid}.jpg{else}no-cover.jpg{/if}"
 							width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
 						</a>
 					</div>

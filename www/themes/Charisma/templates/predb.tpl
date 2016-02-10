@@ -1,4 +1,4 @@
-{if $site->adbrowse ne ''}
+{if $site->adbrowse != ''}
 	{$site->adbrowse}
 {/if}
 <h1>{$page->title}</h1>
@@ -42,20 +42,20 @@
 											</td>
 											<td class="predb" style="text-align:center;">
 												{if isset($result.guid)}
-													<a style="font-style:italic;text-decoration:underline;color:#{if $result.nuked eq 1}009933{elseif $result.nuked > 1}990000{/if};"
+													<a style="font-style:italic;text-decoration:underline;color:#{if $result.nuked == 1}009933{elseif $result.nuked > 1}990000{/if};"
 													   class="title" title="View details"
 													   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.title|escape:"htmlall"}">
-														<span title="{if $result.nuked eq 1}UNNUKED: {$result.nukereason|escape:"htmlall"}{elseif $result.nuked > 1}NUKED: {$result.nukereason|escape:"htmlall"}{else}{$result.title|escape:"htmlall"}{/if}">{$result.title|escape:"htmlall"}</span>
+														<span title="{if $result.nuked == 1}UNNUKED: {$result.nukereason|escape:"htmlall"}{elseif $result.nuked > 1}NUKED: {$result.nukereason|escape:"htmlall"}{else}{$result.title|escape:"htmlall"}{/if}">{$result.title|escape:"htmlall"}</span>
 													</a>
 												{else}
-													<span style="color:#{if $result.nuked eq 1}009933{elseif $result.nuked > 1}990000{/if};"
-														  title="{if $result.nuked eq 1}UNNUKED: {$result.nukereason|escape:"htmlall"}{elseif $result.nuked > 1}NUKED: {$result.nukereason|escape:"htmlall"}{else}{$result.title|escape:"htmlall"}{/if}">{$result.title|escape:"htmlall"}</span>
+													<span style="color:#{if $result.nuked == 1}009933{elseif $result.nuked > 1}990000{/if};"
+														  title="{if $result.nuked == 1}UNNUKED: {$result.nukereason|escape:"htmlall"}{elseif $result.nuked > 1}NUKED: {$result.nukereason|escape:"htmlall"}{else}{$result.title|escape:"htmlall"}{/if}">{$result.title|escape:"htmlall"}</span>
 												{/if}
 											</td>
 											<td class="predb" style="text-align:center;">
 												{* Console *}
 												{* Xbox 360 *}
-												{if $result.category eq 'XBOX360'}
+												{if $result.category == 'XBOX360'}
 													<a class="title" title="View category XBOX 360"
 													   href="{$smarty.const.WWW_TOP}/browse?t={getCategoryValue('GAME_XBOX360')}">Console
 														Xbox
@@ -199,7 +199,7 @@
 												{* Other *}
 												{if in_array($result.category, array('Other: E-Books'))}
 													<a class="title" title="View category Books Other"
-													   href="{$smarty.const.WWW_TOP}/browse?t={getCategoryValue('BOOKS_OTHER')}">Ebooks
+													   href="{$smarty.const.WWW_TOP}/browse?t={getCategoryValue('BOOKS_UNKNOWN')}">Ebooks
 														Other</a>
 												{/if}
 												{if in_array($result.category, array('', 'PRE'))}
@@ -209,7 +209,7 @@
 												{/if}
 											</td>
 											<td class="predb" style="text-align:center;">
-												{if $result.source eq abgx}
+												{if $result.source == abgx}
 													<a title="Visit abgx"
 													   href="{$site->dereferrer_link}http://www.abgx.net/rss/x360/posted.rss"
 													   target="_blank">
@@ -223,88 +223,88 @@
 														$result.source
 													</a>
 												{/if}
-												{if $result.source|strpos:'#a.b.' ne false}
+												{if $result.source|strpos:'#a.b.' != false}
 													<a title="Visit $result.source on IRC"
 													   href="irc://irc.Prison.NET:6667/{str_replace('#a.b.', 'alt.binaries.', $result.source)}"
 													   target="_blank">
 														$result.source
 													</a>
 												{/if}
-												{if $result.source eq omgwtfnzbs}
+												{if $result.source == omgwtfnzbs}
 													<a title="Visit omgwtfnzbs"
 													   href="{$site->dereferrer_link}http://rss.omgwtfnzbs.org/rss-info.php"
 													   target="_blank">
 														omgwtfnzbs
 													</a>
 												{/if}
-												{if $result.source eq orlydb}
+												{if $result.source == orlydb}
 													<a title="Visit ORLYDB"
 													   href="{$site->dereferrer_link}http://orlydb.com/?q={$result.title}"
 													   target="_blank">
 														ORLYDB
 													</a>
 												{/if}
-												{if $result.source eq predbme}
+												{if $result.source == predbme}
 													<a title="Visit PreDB.me"
 													   href="{$site->dereferrer_link}http://predb.me/?search={$result.title}"
 													   target="_blank">
 														PreDB
 													</a>
 												{/if}
-												{if $result.source eq prelist}
+												{if $result.source == prelist}
 													<a title="Visit Prelist"
 													   href="{$site->dereferrer_link}http://www.prelist.ws/?search={$result.title}"
 													   target="_blank">
 														Prelist
 													</a>
 												{/if}
-												{if $result.source eq "#Pre@zenet"}
+												{if $result.source == "#Pre@zenet"}
 													<a title="Visit zenet on IRC" href="irc://irc.zenet.org:6667/Pre"
 													   target="_blank">
 														Zenet IRC
 													</a>
 												{/if}
-												{if $result.source eq "#pre@corrupt"}
+												{if $result.source == "#pre@corrupt"}
 													<a title="Visit corrupt on IRC"
 													   href="irc://irc.corrupt-net.org:6667/pre"
 													   target="_blank">
 														Corrupt-Net
 													</a>
 												{/if}
-												{if $result.source eq srrdb}
+												{if $result.source == srrdb}
 													<a title="Visit srrDB"
 													   href="{$site->dereferrer_link}http://www.srrdb.com/browse/{$result.title}"
 													   target="_blank">
 														srrDB
 													</a>
 												{/if}
-												{if $result.source eq "#scnzb"}
+												{if $result.source == "#scnzb"}
 													<a title="Visit srrDB" href="irc://irc.Prison.NET:6667/scnzb"
 													   target="_blank">
 														srrDB
 													</a>
 												{/if}
-												{if $result.source eq "#tvnzb"}
+												{if $result.source == "#tvnzb"}
 													<a title="Visit srrDB" href="irc://irc.Prison.NET:6667/tvnzb"
 													   target="_blank">
 														srrDB
 													</a>
 												{/if}
-												{if $result.source eq "usenet-crawler"}
+												{if $result.source == "usenet-crawler"}
 													<a title="Visit Usenet-Crawler"
 													   href="{$site->dereferrer_link}http://www.usenet-crawler.com/predb?q={$result.title}"
 													   target="_blank">
 														Usenet-Crawler
 													</a>
 												{/if}
-												{if $result.source eq womble}
+												{if $result.source == womble}
 													<a title="Visit Womble"
 													   href="{$site->dereferrer_link}http://www.newshost.co.za/?s={$result.title}"
 													   target="_blank">
 														Womble
 													</a>
 												{/if}
-												{if $result.source eq zenet}
+												{if $result.source == zenet}
 													<a title="Visit ZEnet"
 													   href="{$site->dereferrer_link}http://pre.zenet.org/?search={$result.title}"
 													   target="_blank">
@@ -315,7 +315,7 @@
 												{/if}
 											</td>
 											<td class="predb" style="text-align:center;">
-												{if is_numeric($result.requestid) && $result.requestid ne 0}
+												{if is_numeric($result.requestid) && $result.requestid != 0}
 													<a
 															class="requestid"
 															title="{$result.requestid}"
@@ -331,7 +331,7 @@
 											</td>
 											<td class="predb" style="text-align:center;">
 												{if not in_array($result.size, array('NULL', '', '0MB'))}
-													{if strpos($result.size, 'MB') ne false && ($result.size|regex_replace:"/(\.\d|,|MB)+/":''|count_characters) > 3}
+													{if strpos($result.size, 'MB') != false && ($result.size|regex_replace:"/(\.\d|,|MB)+/":''|count_characters) > 3}
 														{math equation=($result.size|regex_replace:'/(\.\d|,|MB)+/':'' / 1024)|round}GB
 													{else}
 														{$result.size|regex_replace:"/(\.\d|,)+/":''}

@@ -51,7 +51,7 @@
 										<div class="row">
 											<div class="col-sm-8">
 												{$msg}
-												{if $msg eq ""}
+												{if $msg == ""}
 												<h2>Have a question? <br> Don't hesitate to send us a message. Our team
 													will be
 													happy to help you.</h2>

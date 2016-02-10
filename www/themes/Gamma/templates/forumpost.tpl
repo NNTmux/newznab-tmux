@@ -10,9 +10,9 @@
 	{foreach $results as $result name=result}
 		<tr class="{cycle values=",alt"}">
 			<td width="15%;">
-				{if $result.isadmin eq 1}<strong>{/if}
-				<a {if $smarty.foreach.result.last}id="last"{/if} title="{if $result.isadmin eq 1}Admin{else}View profile{/if}" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}">{$result.username}</a>
-				{if $result.isadmin eq 1}</strong>{/if}
+				{if $result.isadmin == 1}<strong>{/if}
+				<a {if $smarty.foreach.result.last}id="last"{/if} title="{if $result.isadmin == 1}Admin{else}View profile{/if}" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}">{$result.username}</a>
+				{if $result.isadmin == 1}</strong>{/if}
 				<br/>
 				on <span title="{$result.createddate}">{$result.createddate|date_format}</span> <div class="hint">({$result.createddate|timeago})</div>
 				{if $userdata.roleeq2}

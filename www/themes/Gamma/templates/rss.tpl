@@ -19,41 +19,41 @@
 		<item>
 				<title>{$release.searchname|escape:html}</title>
 				<guid isPermaLink="true">{$smarty.const.WWW_TOP}details/{$release.guid}</guid>
-				<link href="{$smarty.const.WWW_TOP}{if $dl eq "1"}getnzb{else}details{/if}/{$release.guid}{if $dl eq "1"}.nzb&amp;i={$uid}&amp;r={$rsstoken}{/if}{if $del eq "1"}&amp;del=1{/if}"/>
+				<link href="{$smarty.const.WWW_TOP}{if $dl == "1"}getnzb{else}details{/if}/{$release.guid}{if $dl == "1"}.nzb&amp;i={$uid}&amp;r={$rsstoken}{/if}{if $del == "1"}&amp;del=1{/if}"/>
 				<comments>{$smarty.const.WWW_TOP}details/{$release.guid}#comments</comments>
 				<pubDate>{$release.adddate|phpdate_format:"DATE_RSS"}</pubDate>
 				<category>{$release.category_name|escape:html}</category>
-				<description>{if isset($api) && $api eq "1"}{$release.searchname}{else}
+				<description>{if isset($api) && $api == "1"}{$release.searchname}{else}
 					<![CDATA[{strip}
 					<div>
-						{if isset($release_cover) && $release.cover eq 1}
+						{if isset($release_cover) && $release.cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;"
 								 src="{$smarty.const.WWW_TOP}/covers/movies/{$release.imdbid}-cover.jpg" width="120" border="0"
 								 alt="{$release.searchname|escape:"htmlall"}"/>
 						{/if}
-						{if isset($release.mu_cover) && $release.mu_cover eq 1}
+						{if isset($release.mu_cover) && $release.mu_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;"
 								 src="{$smarty.const.WWW_TOP}/covers/music/{$release.musicinfoid}.jpg" width="120" border="0"
 								 alt="{$release.searchname|escape:"htmlall"}"/>
 						{/if}
-						{if isset($release.co_cover) && $release.co_cover eq 1}
+						{if isset($release.co_cover) && $release.co_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;"
 								 src="{$smarty.const.WWW_TOP}/covers/console/{$release.consoleinfoid}.jpg" width="120" border="0"
 								 alt="{$release.searchname|escape:"htmlall"}"/>
 						{/if}
-						{if isset($release.bo_cover) && $release.bo_cover eq 1}
+						{if isset($release.bo_cover) && $release.bo_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;"
 								 src="{$smarty.const.WWW_TOP}/covers/book/{$release.bookinfoid}.jpg" width="120" border="0"
 								 alt="{$release.searchname|escape:"htmlall"}"/>
 						{/if}
-						{if $dl eq "1"}<li><a href="{$serverroot}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}{if $del eq "1"}&amp;del=1{/if}">Download NZB</a></li>{/if}
-						{if $release.jpgstatus eq 1}
-							{if (strpos($release.categoryid, '60') !eq false)}
+						{if $dl == "1"}<li><a href="{$serverroot}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}{if $del == "1"}&amp;del=1{/if}">Download NZB</a></li>{/if}
+						{if $release.jpgstatus == 1}
+							{if (strpos($release.categoryid, '60') !== false)}
 									<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$smarty.const.WWW_TOP}/covers/sample/{$release.guid}_thumb.jpg" border="0" alt="{$release.searchname|escape:"htmlall"}" />
 							{/if}
 						{/if}
-						{if $release.haspreview eq 1}
-							{if (strpos($release.categoryid, '60') !eq false)}
+						{if $release.haspreview == 1}
+							{if (strpos($release.categoryid, '60') !== false)}
 									<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$smarty.const.WWW_TOP}/covers/preview/{$release.guid}_thumb.jpg" border="0" alt="{$release.searchname|escape:"htmlall"}" />
 							{else}
 									<img style="margin-left:10px;margin-bottom:10px;float:right;" width="500" height="300" src="{$smarty.const.WWW_TOP}/covers/preview/{$release.guid}_thumb.jpg" border="0" alt="{$release.searchname|escape:"htmlall"}" />
@@ -72,13 +72,13 @@
 							<li>Poster: {$release.fromname|escape:"htmlall"}</li>
 							<li>PostDate: {$release.postdate|phpdate_format:"DATE_RSS"}</li>
 							<li>
-								Password: {if $release.passwordstatus eq 0}None{elseif $release.passwordstatus eq 1}Possibly Passworded Archive{elseif $release.passwordstatus eq 2}Probably not viable{elseif $release.passwordstatus eq 10}Passworded Archive{else}Unknown{/if}</li>
+								Password: {if $release.passwordstatus == 0}None{elseif $release.passwordstatus == 1}Possibly Passworded Archive{elseif $release.passwordstatus == 2}Probably not viable{elseif $release.passwordstatus == 10}Passworded Archive{else}Unknown{/if}</li>
 							{if isset($release.nfoid) && $release.nfoid != ""}
 								<li>Nfo:
 									<a href="{$smarty.const.WWW_TOP}api?t=getnfo&amp;id={$release.guid}&amp;raw=1&amp;i={$uid}&amp;r={$rsstoken}">{$release.searchname}
 										.nfo</a></li>
 							{/if}
-							{if isset($release.parentCategoryid) && $release.parentCategoryid eq 2000}
+							{if isset($release.parentCategoryid) && $release.parentCategoryid == 2000}
 								{if $release.imdbid != ""}
 									<li>Imdb Info:
 										<ul>
@@ -101,7 +101,7 @@
 									</li>
 								{/if}
 							{/if}
-							{if isset($release.parentCategoryid) && $release.parentCategoryid eq 3000}
+							{if isset($release.parentCategoryid) && $release.parentCategoryid == 3000}
 								{if $release.musicinfoid > 0}
 									<li>Music Info:
 										<ul>
@@ -132,7 +132,7 @@
 									</li>
 								{/if}
 							{/if}
-							{if isset($release.parentCategoryid) && $release.parentCategoryid eq 1000}
+							{if isset($release.parentCategoryid) && $release.parentCategoryid == 1000}
 								{if $release.consoleinfoid > 0}
 									<li>Console Info:
 										<ul>
@@ -157,7 +157,7 @@
 						{/strip}]]>
 						{/if}
 				</description>
-				{if $dl eq "1"}<enclosure url="{$serverroot}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}{if $del eq "1"}&amp;del=1{/if}" length="{$release.size}" type="application/x-nzb" />{/if}
+				{if $dl == "1"}<enclosure url="{$serverroot}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}{if $del == "1"}&amp;del=1{/if}" length="{$release.size}" type="application/x-nzb" />{/if}
 				{foreach $release.category_ids|parray:"," as $cat}
 					<newznab:attr name="category" value="{$cat}"/>
 				{/foreach}

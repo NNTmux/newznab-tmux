@@ -104,10 +104,10 @@
 										{if $result.nfoid > 0}<span><a
 													href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 													class="modal_nfo label label-default" rel="nfo">NFO</a></span>{/if}
-										{if $result.jpgstatus eq 1 && $userdata.canpreview eq 1}<span><a
+										{if $result.jpgstatus == 1 && $userdata.canpreview == 1}<span><a
 													href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
 													name="name{$result.guid}" class="modal_prev label label-default" rel="preview">Sample</a></span>{/if}
-										{if $result.haspreview eq 1 && $userdata.canpreview eq 1}<span><a
+										{if $result.haspreview == 1 && $userdata.canpreview == 1}<span><a
 													href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 													name="name{$result.guid}" class="modal_prev label label-default" rel="preview">Preview</a></span>{/if}
 										{if $result.videos_id > 0}<span class="label label-default"><a

@@ -12,7 +12,7 @@
 </div>
 <div>
 	<div style="text-align: center;">
-		<a href="#" onclick="if (jQuery(this).text() eq 'Advanced Search')
+		<a href="#" onclick="if (jQuery(this).text() == 'Advanced Search')
 					jQuery(this).text('Basic Search');
 				else
 					jQuery(this).text('Advanced Search');
@@ -106,7 +106,7 @@
 		</div>
 	</div>
 </form>
-{if $results|@count eq 0 && ($search || $subject|| $searchadvr|| $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) != ""}
+{if $results|@count == 0 && ($search || $subject|| $searchadvr|| $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) != ""}
 	<div style="text-align: center;">
 		<div class="nosearchresults">
 			Your search did not match any releases.
@@ -129,7 +129,7 @@
 			</div>
 		</div>
 	</div>
-{elseif ($search || $subject || $searchadvr || $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) eq ""}
+{elseif ($search || $subject || $searchadvr || $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) == ""}
 {else}
 	<form style="padding-top:10px;" id="nzb_multi_operations_form" method="get" action="{$smarty.const.WWW_TOP}/search">
 		<div class="row">
@@ -221,15 +221,15 @@
 						<div class="resextra">
 							<div class="btns" style="float:right">
 								{release_flag($result.searchname, browse)}
-								{if $result.passwordstatus eq 1}
+								{if $result.passwordstatus == 1}
 									<img title="RAR/ZIP Possibly Passworded."
 										 src="{$smarty.const.WWW_THEMES}/shared/images/icons/lock2.png"
 										 alt="RAR/ZIP Possibly Passworded.">
-								{elseif $result.passwordstatus eq 2}
+								{elseif $result.passwordstatus == 2}
 									<img title="RAR/ZIP Possibly Damaged."
 										 src="{$smarty.const.WWW_THEMES}/shared/images/icons/broken.png"
 										 alt="RAR/ZIP Possibly Damaged.">
-								{elseif $result.passwordstatus eq 10}
+								{elseif $result.passwordstatus == 10}
 									<img title="RAR/ZIP is Passworded."
 										 src="{$smarty.const.WWW_THEMES}/shared/images/icons/lock.gif"
 										 alt="RAR/ZIP is Passworded.">
@@ -251,11 +251,11 @@
 									<a href="#" name="name{$result.imdbid}" title="View movie info"
 									   class="modal_imdb label label-default" rel="movie">Cover</a>
 								{/if}
-								{if $result.haspreview eq 1 && $userdata.canpreview eq 1}
+								{if $result.haspreview == 1 && $userdata.canpreview == 1}
 								<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 								   name="name{$result.guid}" title="Screenshot of {$result.searchname|escape:"htmlall"}"
 								   class="modal_prev label label-default" rel="preview">Preview</a>{/if}
-								{if $result.jpgstatus eq 1 && $userdata.canpreview eq 1}
+								{if $result.jpgstatus == 1 && $userdata.canpreview == 1}
 								<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
 								   name="name{$result.guid}" title="Sample of {$result.searchname|escape:"htmlall"}"
 								   class="modal_prev label label-default" rel="preview">Sample</a>{/if}

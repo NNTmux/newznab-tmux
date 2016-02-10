@@ -1,5 +1,5 @@
-{if $loggedin eq "true"}
-	{if $smarty.server.REQUEST_URI eq "/"}
+{if $loggedin == "true"}
+	{if $smarty.server.REQUEST_URI == "/"}
 		{foreach from=$content item=c}
 			<div class="header">
 				<h2><strong>{$c->title}</strong></h2>
