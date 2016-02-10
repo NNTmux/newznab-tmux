@@ -98,7 +98,7 @@
 						{assign var="mpass" value=","|explode:$result.grp_release_password}
 						{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 						{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-						{foreach $msplits as $m=>$loop}
+						{foreach $msplits as $loop=>$m name="loop"}
 							{if $smarty.foreach.loop.first}
 								<div class="panel panel-default">
 									<div class="panel-body">
