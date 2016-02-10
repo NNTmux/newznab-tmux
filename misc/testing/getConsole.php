@@ -10,7 +10,7 @@ $console = new Console(['Echo' => true, 'Settings' => $pdo]);
 
 $db = new Settings();
 
-$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where consoleinfoid IS NULL and categoryid in ( select ID from category where parentid = %d ) ORDER BY id DESC LIMIT %d", Category::CAT_PARENT_GAME, Console::NUMTOPROCESSPERTIME));
+$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where consoleinfoid IS NULL and categoryid in ( select ID from category where parentid = %d ) ORDER BY id DESC LIMIT %d", Category::GAME_ROOT, Console::NUMTOPROCESSPERTIME));
 
 if ($res != null) {
     while ($arr = $db->getAssocArray($res)) {

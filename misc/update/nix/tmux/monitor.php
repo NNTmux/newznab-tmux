@@ -80,7 +80,7 @@ while ($runVar['counts']['iterations'] > 0) {
 	$runVar['timers']['query']['tmux_time'] = (time() - $timer01);
 
 	$runVar['settings']['book_reqids'] = (!empty($runVar['settings']['book_reqids'])
-		? $runVar['settings']['book_reqids'] : Category::CAT_PARENT_BOOK);
+		? $runVar['settings']['book_reqids'] : Category::BOOKS_ROOT);
 
 	//get usenet connection info
 	$runVar['connections'] = $tOut->getConnectionsInfo($runVar['constants']);

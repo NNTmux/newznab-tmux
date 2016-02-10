@@ -51,6 +51,7 @@ class Page extends BasePage
 			$parentcatlist = $category->getForMenu();
 
 		$this->smarty->assign('parentcatlist',$parentcatlist);
+		$this->smarty->assign('category', $category);
 		$searchStr = '';
 		if ($this->page == 'search' && isset($_REQUEST["id"]))
 			$searchStr = (string) $_REQUEST["id"];

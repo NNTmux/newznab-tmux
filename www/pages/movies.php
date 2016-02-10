@@ -13,13 +13,13 @@ if (!$page->users->isLoggedIn()) {
 }
 
 
-$moviecats = $cat->getChildren(Category::CAT_PARENT_MOVIE);
+$moviecats = $cat->getChildren(Category::MOVIE_ROOT);
 $mtmp = [];
 foreach($moviecats as $mcat) {
 	$mtmp[$mcat['id']] = $mcat;
 }
 
-$category = (isset($_GET["imdb"]) ? -1 : Category::CAT_PARENT_MOVIE);
+$category = (isset($_GET["imdb"]) ? -1 : Category::MOVIE_ROOT);
 if (isset($_REQUEST["t"]) && array_key_exists($_REQUEST['t'], $mtmp)) {
 	$category = $_REQUEST["t"] + 0;
 }

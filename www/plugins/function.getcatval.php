@@ -1,12 +1,5 @@
 <?php
 /**
- * Smarty plugin
- *
- * @package    Smarty
- * @subpackage PluginsFunction
- */
-
-/**
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,14 +21,15 @@ use newznab\Category;
 
 /**
  * Returns the value of the specified Category constant.
+ * @usage {getcatval category=BOOKS_COMICS}
  *
- * @param string $category Name of constant whose value to return.
+ *@param string $params Name of constant whose value to return.
  *
- * @return Value of the specified Category constant.
+ *@return Value of the specified Category constant.
  */
-function smarty_function_getcatval($category)
+function smarty_function_getcatval($params)
 {
-	return Category::getCategoryValue($category);
+	return Category::getCategoryValue($params['category']);
 }
 
 ?>

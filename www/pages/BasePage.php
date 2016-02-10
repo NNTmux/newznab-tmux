@@ -104,6 +104,10 @@ class BasePage
 		$this->smarty->setCompileDir(SMARTY_DIR . 'templates_c/');
 		$this->smarty->setConfigDir(SMARTY_DIR . 'configs/');
 		$this->smarty->setCacheDir(SMARTY_DIR . 'cache/');
+		$this->smarty->setPluginsDir([
+			NN_WWW . 'plugins/',
+			SMARTY_DIR . 'plugins/',
+		]);
 		$this->smarty->error_reporting = ((NN_DEBUG ? E_ALL : E_ALL - E_NOTICE));
 
 		if (isset($_SERVER['SERVER_NAME'])) {
