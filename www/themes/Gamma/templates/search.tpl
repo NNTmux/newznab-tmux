@@ -1,5 +1,5 @@
 <h2>Search</h2>
-<div class="btn btn-info pull-right"  style="text-decoration: none; font-family: Droid Sans,sans-serif;" onclick="if (jQuery(this).text() == 'Basic Search')
+<div class="btn btn-info pull-right"  style="text-decoration: none; font-family: Droid Sans,sans-serif;" onclick="if (jQuery(this).text() eq 'Basic Search')
 				jQuery(this).text('Advanced Search');
 			else
 				jQuery(this).text('Basic Search');
@@ -94,7 +94,7 @@
 	</div>
 </form>
 
-{if $results|@count == 0 && $search != ""}
+{if $results|@count eq 0 && $search != ""}
 	<div class="alert alert-block">
 		<h4>No result!</h4>
 		Your search - <strong>{$search|escape:'htmlall'}</strong> - did not match any releases.
@@ -108,7 +108,7 @@
 		<li>Try fewer keywords.</li>
 		</ul>
 	</div>
-{elseif ($search || $subject || $searchadvr || $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) == ""}
+{elseif ($search || $subject || $searchadvr || $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) eq ""}
 {else}
 
 {$site->adbrowse}
@@ -167,16 +167,16 @@
 		<th>Grabs</th>
 		<th>Action</th>
 	</tr>
-	{foreach from=$results item=result}
+	{foreach $results as $result}
 		<tr class="{cycle values=",alt"}{if $lastvisit|strtotime<$result.adddate|strtotime} new{/if}" id="guid{$result.guid}">
-			{if (strpos($category[0], '60') !== false)}
+			{if (strpos($category[0], '60') !eq false)}
 					<td class="check" width="25%"><input id="chk{$result.guid|substr:0:7}"
 					 type="checkbox" class="nzb_check"
 					 value="{$result.guid}"/>
-					{if $result.jpgstatus == 1}
+					{if $result.jpgstatus eq 1}
 						<img width="300" height="200" src="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg" />
 					{else}
-						{if $result.haspreview == 1}
+						{if $result.haspreview eq 1}
 							<img width="300" height="200" src="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg" />
 						{/if}
 					{/if}
@@ -192,12 +192,12 @@
 						<h5>{$result.searchname|escape:"htmlall"|replace:".":" "}</h5>
 					</a>
 				</label>
-				{if $result.passwordstatus == 2}
+				{if $result.passwordstatus eq 2}
 				<i class="fa fa-lock"></i>
-				{elseif $result.passwordstatus == 1}
+				{elseif $result.passwordstatus eq 1}
 				<i class="fa fa-lock"></i>
 				{/if}
-				{if $userdata.canpre == 1 && isset($result.nuketype) && $result.nuketype != ''}
+				{if $userdata.canpre eq 1 && isset($result.nuketype) && $result.nuketype != ''}
 				&nbsp;<img title="{$result.nuketype}" src="{$smarty.const.WWW_THEMES}/shared/images/icons/nuke.png" width="10" height="10" alt="{$result.nuketype}" />
 				{/if}
 				<div class="resextra">
@@ -208,11 +208,11 @@
 						{if $result.imdbid > 0}
 						<a href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbid}" title="View movie info" class="badge badge-inverse halffade" rel="movie" >Movie</a>
 						{/if}
-						{if $result.haspreview == 1 && $userdata.canpreview == 1}
+						{if $result.haspreview eq 1 && $userdata.canpreview eq 1}
 						<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg" name="name{$result.guid}"
 						title="Screenshot" class="modal_prev badge badge-success halffade" rel="preview">Preview</a>
 						{/if}
-						{if $result.haspreview == 2 && $userdata.canpreview == 1}
+						{if $result.haspreview eq 2 && $userdata.canpreview eq 1}
 						<a href="#" name="audio{$result.guid}" title="Listen to Preview" class="audioprev badge badge-success halffade" rel="audio">Listen</a>
 						<audio id="audprev{$result.guid}" src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.mp3" preload="none"></audio>
 						{/if}

@@ -141,20 +141,20 @@
 									{if isset($similars) && $similars|@count > 1}
 										<li><a href="#pane4" data-toggle="tab">Similar</a></li>
 									{/if}
-									{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
+									{if $release.jpgstatus eq 1 && $userdata.canpreview eq 1}
 										<li><a href="#pane6" data-toggle="tab">Sample</a></li>
 									{/if}
 									<li><a href="#comments" data-toggle="tab">Comments</a></li>
-									{if ($release.haspreview == 1 && $userdata.canpreview == 1) || ($release.haspreview == 2 && $userdata.canpreview == 1)}
+									{if ($release.haspreview eq 1 && $userdata.canpreview eq 1) || ($release.haspreview eq 2 && $userdata.canpreview eq 1)}
 										<li><a href="#pane7" data-toggle="tab">Preview</a></li>
 									{/if}
 									{if $reVideo.releaseid|@count > 0 || $reAudio|@count > 0}
 										<li><a href="#pane8" data-toggle="tab">MediaInfo</a></li>
 									{/if}
-									{if isset($xxx.backdrop) && $xxx.backdrop == 1}
+									{if isset($xxx.backdrop) && $xxx.backdrop eq 1}
 										<li><a href="#pane9" data-toggle="tab">Back Cover</a></li>
 									{/if}
-									{if isset($game.backdrop) && $game.backdrop == 1}
+									{if isset($game.backdrop) && $game.backdrop eq 1}
 									<li><a href="#pane10" data-toggle="tab">Screenshot</a></li>
 									{/if}
 								</ul>
@@ -162,7 +162,7 @@
 									<div id="pane1" class="tab-pane active">
 										<div class="row small-gutter-left">
 											<div class="col-md-3 small-gutter-left">
-												{if $movie && $release.videos_id <= 0 && $movie.cover == 1}
+												{if $movie && $release.videos_id <= 0 && $movie.cover eq 1}
 													<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
 														 width="185"
 														 alt="{$movie.title|escape:"htmlall"}"
@@ -183,35 +183,35 @@
 														 data-toggle="modal"
 														 data-target="#modal-image"/>
 												{/if}
-												{if $con && $con.cover == 1}
+												{if $con && $con.cover eq 1}
 													<img src="{$smarty.const.WWW_TOP}/covers/console/{$con.id}.jpg"
 														 width="185"
 														 alt="{$con.title|escape:"htmlall"}"
 														 data-toggle="modal"
 														 data-target="#modal-image"/>
 												{/if}
-												{if $game && $game.cover == 1}
+												{if $game && $game.cover eq 1}
 													<img src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg"
 														 width="185"
 														 alt="{$con.title|escape:"htmlall"}"
 														 data-toggle="modal"
 														 data-target="#modal-image"/>
 												{/if}
-												{if $music && $music.cover == 1}
+												{if $music && $music.cover eq 1}
 													<img src="{$smarty.const.WWW_TOP}/covers/music/{$music.id}.jpg"
 														 width="185"
 														 alt="{$music.title|escape:"htmlall"}"
 														 data-toggle="modal"
 														 data-target="#modal-image"/>
 												{/if}
-												{if $book && $book.cover == 1}
+												{if $book && $book.cover eq 1}
 													<img src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg"
 														 width="185"
 														 alt="{$book.title|escape:"htmlall"}"
 														 data-toggle="modal"
 														 data-target="#modal-image"/>
 												{/if}
-												{if $xxx && $xxx.cover == 1}
+												{if $xxx && $xxx.cover eq 1}
 													<a href="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg"
 													   class="modal-image"><img
 																class="modal-image"
@@ -324,7 +324,7 @@
 																			Rating
 																		</th>
 																		<td>{$movie.year}
-																			- {if $movie.rating == ''}N/A{/if}{$movie.rating}
+																			- {if $movie.rating eq ''}N/A{/if}{$movie.rating}
 																			/10
 																		</td>
 																	</tr>
@@ -462,19 +462,19 @@
 																<tr>
 																	<th width="140">Grabs</th>
 																	<td>{$release.grabs}
-																		time{if $release.grabs==1}{else}s{/if}</td>
+																		time{if $release.grabs eq 1}{else}s{/if}</td>
 																</tr>
 																{if $failed != NULL && $failed > 0}
 																<tr>
 																	<th width="140">Failed Download</th>
 																	<td>{$failed}
-																		time{if $failed==1}{else}s{/if}</td>
+																		time{if $failed eq 1}{else}s{/if}</td>
 																</tr>
 																{/if}
 																<tr>
 																	<th width="140">Password
 																	</th>
-																	<td>{if $release.passwordstatus == 0}None{elseif $release.passwordstatus == 2}Passworded Rar Archive{elseif $release.passwordstatus == 1}Contains Cab/Ace/Rar Inside Archive{else}Unknown{/if}</td>
+																	<td>{if $release.passwordstatus eq 0}None{elseif $release.passwordstatus eq 2}Passworded Rar Archive{elseif $release.passwordstatus eq 1}Contains Cab/Ace/Rar Inside Archive{else}Unknown{/if}</td>
 																</tr>
 																<tr>
 																	<th width="140">Category
@@ -489,7 +489,7 @@
 																	<td>
 																		<a title="View file list"
 																		   href="{$smarty.const.WWW_TOP}/filelist/{$release.guid}">{$release.totalpart}
-																			file{if $release.totalpart==1}{else}s{/if}</a>
+																			file{if $release.totalpart eq 1}{else}s{/if}</a>
 																	</td>
 																</tr>
 																<tr>
@@ -497,7 +497,7 @@
 																	</th>
 																	<td>
 																		<strong>Files:</strong><br/>
-																		{foreach from=$releasefiles item=rf}
+																		{foreach $releasefiles as $rf}
 																			<code>{$rf.name}</code>
 																			<br/>
 																			{if $rf.passworded != 1}
@@ -574,7 +574,7 @@
 										{if isset($similars) && $similars|@count > 1}
 							Similar:
 							<ul>
-							{foreach from=$similars item=similar}
+							{foreach $similars as $similar}
 											<li>
 												<a title="View similar NZB details"
 												   href="{$smarty.const.WWW_TOP}/details/{$similar.guid}/{$similar.searchname|escape:"htmlall"}">{$similar.searchname|escape:"htmlall"}</a>
@@ -595,7 +595,7 @@
 													<th width="80">User</th>
 													<th>Comment</th>
 												</tr>
-												{foreach from=$comments|@array_reverse:true item=comment}
+												{foreach $comments|@array_reverse:true as $comment}
 													<tr>
 														<td class="less" title="{$comment.createddate}">
 															{if !$privateprofiles || $isadmin || $ismod}
@@ -605,7 +605,7 @@
 															{/if}
 															<br/>{$comment.createddate|daysago}
 														</td>
-														{if isset($comment.shared) && $comment.shared == 2}
+														{if isset($comment.shared) && $comment.shared eq 2}
 															<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>
 														{else}
 															<td>{$comment.text|escape:"htmlall"|nl2br}</td>
@@ -624,7 +624,7 @@
 											<input class="btn" type="submit" value="Submit"/>
 										</form>
 									</div>
-									{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
+									{if $release.jpgstatus eq 1 && $userdata.canpreview eq 1}
 										<div id="pane6" class="tab-pane">
 											<img src="{$smarty.const.WWW_TOP}/covers/sample/{$release.guid}_thumb.jpg"
 												 alt="{$release.searchname|escape:"htmlall"}"
@@ -632,7 +632,7 @@
 												 data-target="#modal-image"/>
 										</div>
 									{/if}
-									{if ($release.haspreview == 1 && $userdata.canpreview == 1) || ($release.haspreview == 2 && $userdata.canpreview == 1)}
+									{if ($release.haspreview eq 1 && $userdata.canpreview eq 1) || ($release.haspreview eq 2 && $userdata.canpreview eq 1)}
 										<div id="pane7" class="tab-pane">
 											<img src="{$smarty.const.WWW_TOP}/covers/preview/{$release.guid}_thumb.jpg"
 												 alt="{$release.searchname|escape:"htmlall"}"
@@ -713,7 +713,7 @@
 														<td class="right">{$reVideo.videolibrary}</td>
 													</tr>
 												{/if}
-												{foreach from=$reAudio item=audio}
+												{foreach $reAudio as $audio}
 													<tr>
 														<td><strong>Audio {$audio.audioid}</strong></td>
 														<td>Format</td>
@@ -786,7 +786,7 @@
 											</table>
 										</div>
 									{/if}
-									{if isset($xxx.backdrop) && $xxx.backdrop == 1}
+									{if isset($xxx.backdrop) && $xxx.backdrop eq 1}
 										<div id="pane9" class="tab-pane">
 											<img src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-backdrop.jpg"
 												 alt="{$xxx.title|escape:"htmlall"}"
@@ -794,7 +794,7 @@
 												 data-target="#modal-image"/>
 										</div>
 									{/if}
-									{if isset($game.backdrop) && $game.backdrop == 1}
+									{if isset($game.backdrop) && $game.backdrop eq 1}
 										<div id="pane10" class="tab-pane">
 											<img src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}-backdrop.jpg"
 												 alt="{$game.title|escape:"htmlall"}"
@@ -821,7 +821,7 @@
 							class="icons-office-52"></i></button>
 			</div>
 			<div class="modal-body">
-				{if $movie && $release.videos_id <= 0 && $movie.cover == 1}
+				{if $movie && $release.videos_id <= 0 && $movie.cover eq 1}
 					<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
 						 alt="{$movie.title|escape:"htmlall"}">
 				{/if}
@@ -833,24 +833,24 @@
 					<img src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbid}.jpg"
 						 alt="{$anidb.title|escape:"htmlall"}"/>
 				{/if}
-				{if $con && $con.cover == 1}
+				{if $con && $con.cover eq 1}
 					<img src="{$smarty.const.WWW_TOP}/covers/console/{$con.id}.jpg"
 						 alt="{$con.title|escape:"htmlall"}"/>
 				{/if}
-				{if $music && $music.cover == 1}
+				{if $music && $music.cover eq 1}
 					<img src="{$smarty.const.WWW_TOP}/covers/music/{$music.id}.jpg"
 						 alt="{$music.title|escape:"htmlall"}"/>
 				{/if}
-				{if $book && $book.cover == 1}
+				{if $book && $book.cover eq 1}
 					<img src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg"
 						 alt="{$book.title|escape:"htmlall"}"/>
 				{/if}
-				{if $xxx && $xxx.backdrop == 1}
+				{if $xxx && $xxx.backdrop eq 1}
 					<a href="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-backdrop.jpg"
 					   class="modal-image_back"><img class="modal-image_back"
 													 src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-backdrop.jpg"
 													 alt="{$xxx.title|escape:"htmlall"}"/></a>
-				{elseif $xxx && $xxx.cover == 1}
+				{elseif $xxx && $xxx.cover eq 1}
 					<a href="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg"
 					   class="modal-image"><img class="modal-image"
 												src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg"

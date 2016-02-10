@@ -14,11 +14,11 @@
 		<th style="padding-top:0px; padding-bottom:0px;">added</th>
  		<th class="mid" style="padding-top:0px; padding-bottom:0px;">options</th>
 	</tr>
-	{foreach from=$movies item=movie}
+	{foreach $movies as $movie}
 		<tr class="{cycle values=",alt"}">
 			<td class="mid" style="width:140px">
 				<div class="movcover">
-					<img class="shadow img img-polaroid" src="{$smarty.const.WWW_TOP}/covers/movies/{if $movie.cover == 1}{$movie.imdbid}-cover.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$movie.title|escape:"htmlall"}" />
+					<img class="shadow img img-polaroid" src="{$smarty.const.WWW_TOP}/covers/movies/{if $movie.cover eq 1}{$movie.imdbid}-cover.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$movie.title|escape:"htmlall"}" />
 					<div class="movextra">
 						<div style="text-align: center;">
 						<a class="rndbtn badge badge-imdb" target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$movie.imdbid}" title="View Imdb">Imdb</a>

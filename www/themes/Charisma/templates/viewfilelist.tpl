@@ -10,12 +10,12 @@
 		<th style="text-align:center;">completion</th>
 		<th style="text-align:center;">size</th>
 	</tr>
-	{foreach item=i name=iteration from=$files item=file}
+	{foreach $files as $file=>$i name="iteration"}
 		<tr class="{cycle values=",alt"}">
 			<td width="20">{$smarty.foreach.iteration.index+1}</td>
 			<td>{$file.title|escape:'htmlall'}</td>
 			{assign var="icon" value='themes/shared/images/fileicons/'|cat:$file.ext|cat:".png"}
-			{if $file.ext == "" || !is_file("$icon")}
+			{if $file.ext eq "" || !is_file("$icon")}
 				{assign var="icon" value='file'}
 			{else}
 				{assign var="icon" value=$file.ext}

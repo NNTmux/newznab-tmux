@@ -13,15 +13,15 @@
 			<i class="fa fa-inbox fa-midt"></i>
 			<select class="input input-medium" id="genre" name="genre">
 				<option class="grouping" value=""></option>
-				{foreach from=$genres item=gen}
-					<option {if $gen==$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
+				{foreach $genres as $gen}
+					<option {if $gen eq $genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
 				{/foreach}
 			</select>
 			<i class="fa fa-flag fa-midt"></i>
 			<select class="input input-medium" id="category" name="category">
 				<option class="grouping" value=""></option>
 				{foreach from=$catlist item=cat}
-					<option {if $cat.id==$category}selected="selected"{/if} value="{$cat.id}">{$cat.title}</option>
+					<option {if $cat.id eq $category}selected="selected"{/if} value="{$cat.id}">{$cat.title}</option>
 				{/foreach}
 			</select>
 			<input class="btn btn-success" type="submit" value="Go"/>
@@ -92,7 +92,7 @@
 					</a>
 				</th>
 			</tr>
-			{foreach from=$results item=result}
+			{foreach $results as $result}
 				{assign var="msplits" value=","|explode:$result.grp_release_id}
 				{assign var="mguid" value=","|explode:$result.grp_release_guid}
 				{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
@@ -113,9 +113,9 @@
 						<div class="movcover">
 							<h4>
 								<a target="_blank"
-										{foreach from=$msplits item=m}
-											{if $previewfound == 0}
-												{if $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1}
+										{foreach $msplits as $m}
+											{if $previewfound eq 0}
+												{if $mhaspreview[$m@index] eq 1 && $userdata.canpreview eq 1}
 													{$previewfound = 1}
 													{$previewguid = $mguid[$m@index]}
 												{/if}
@@ -126,7 +126,7 @@
 								   guid="name{$previewguid}"
 								   title="View XXX info"
 								   class="modal_xxx thumbnail" rel="viewxxx">
-									{if $result.cover == 1}
+									{if $result.cover eq 1}
 										<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg" width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
 									{else} <img class="shadow img-polaroid" src="{$smarty.const.WWW_THEMES}/shared/images/no-cover.png" width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
 									{/if}
@@ -134,7 +134,7 @@
 							</h4>
 							<div class="movextra">
 								<div style="text-align: center;">
-									{if $result.classused == "ade"}
+									{if $result.classused eq "ade"}
 										<a
 												target="_blank"
 												href="{$site->dereferrer_link}{$result.directurl}"
@@ -150,7 +150,7 @@
 										><img
 													src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
 									{/if}
-									{if $result.classused == "hm"}
+									{if $result.classused eq "hm"}
 										<a
 												target="_blank"
 												href="{$site->dereferrer_link}{$result.directurl}"
@@ -167,7 +167,7 @@
 										><img
 													src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
 									{/if}
-									{if $result.classused == "pop"}
+									{if $result.classused eq "pop"}
 										<a
 												target="_blank"
 												href="{$site->dereferrer_link}{$result.directurl}"
@@ -230,7 +230,7 @@
 						{/if}
 						<div class="movextra">
 							<table class="table" style="margin-bottom:0px; margin-top:10px">
-								{foreach from=$msplits item=m}
+								{foreach $msplits as $m}
 									<tr id="guid{$mguid[$m@index]}" {if $m@index > 0}class="mlextra"{/if}>
 										<td>
 											<div class="icon"><input type="checkbox" class="nzb_check"
@@ -258,7 +258,7 @@
 															href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
 															title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}"
 															class="fa fa-group"></a></li>
-												{if $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1}
+												{if $mhaspreview[$m@index] eq 1 && $userdata.canpreview eq 1}
 													<li width="80px"><a
 															href="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg"
 															name="name{$mguid[$m@index]}" title="Screenshot"
@@ -310,7 +310,7 @@
 											</ul>
 										</td>
 									</tr>
-									{if $m@index == 1 && $m@total > 2}
+									{if $m@index eq 1 && $m@total > 2}
 										<tr>
 											<td colspan="5">
 												<a class="mlmore" href="#">{$m@total-2} more...</a>

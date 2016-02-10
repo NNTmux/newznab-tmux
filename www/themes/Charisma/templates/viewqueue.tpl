@@ -7,18 +7,18 @@
 		</ol>
 	</div>
 </div>
-{if $error == ''}
-{if $page->settings->getSetting('sabintegrationtype') > 0 || $user.queuetype == 2}
+{if $error eq ''}
+{if $page->settings->getSetting('sabintegrationtype') > 0 || $user.queuetype eq 2}
 <p style="text-align:center;">
 	The following queue is pulled from
 	<a href="{$serverURL|escape:"htmlall"}">{$serverURL|escape:"htmlall"}</a>.
 	<br/>
-	{if $page->settings->getSetting('sabintegrationtype') == 2 || $user.queuetype == 2}Edit your queue settings in
+	{if $page->settings->getSetting('sabintegrationtype') eq 2 || $user.queuetype eq 2}Edit your queue settings in
 		<a href="{$smarty.const.WWW_TOP}/profileedit">your profile</a>
 		.{/if}
 </p>
 <div class="sab_queue"></div>
-{if $user.queuetype == 2}
+{if $user.queuetype eq 2}
 {literal}
 	<script type="text/javascript">
 		function getQueue() {

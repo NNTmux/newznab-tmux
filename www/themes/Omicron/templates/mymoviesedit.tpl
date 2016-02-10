@@ -26,11 +26,11 @@
 							<th>added</th>
 							<th class="mid">options</th>
 						</tr>
-						{foreach from=$movies item=movie}
+						{foreach $movies as $movie}
 							<tr>
 								<td>
 									<div>
-										<img src="{$smarty.const.WWW_TOP}/covers/movies/{if $movie.cover == 1}{$movie.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+										<img src="{$smarty.const.WWW_TOP}/covers/movies/{if $movie.cover eq 1}{$movie.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 											 width="120" border="0" alt="{$movie.title|escape:"htmlall"}"/>
 										<div>
 											<a class="label label-default" target="_blank"

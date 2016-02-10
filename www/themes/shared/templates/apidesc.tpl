@@ -1,6 +1,6 @@
 <h1>{$page->title}</h1>
 <p>Here lives the documentation for the api for accessing nzb and index data. Api functions can be called by either logged in users, or by providing an apikey.</p>
-{if $loggedin=="true"}
+{if $loggedin eq "true"}
 	<h2>API Credentials</h2>
 	<p>Your credentials should be provided as <span style="font-family:courier;">?apikey={$userdata.rsstoken}</span></p>
 {/if}

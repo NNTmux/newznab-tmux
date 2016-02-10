@@ -91,12 +91,12 @@
 		</th>
 	</tr>
 
-	{foreach from=$results item=result}
+	{foreach $results as $result}
 		<tr class="{cycle values=",alt"}">
 			<td class="mid">
 				<div class="movcover">
 					<a class="title" href="{$site->dereferrer_link}{$result.url}">
-						<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfoid}.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}" />
+						<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover eq 1}{$result.bookinfoid}.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}" />
 
 					</a>
 					<div class="movextra">
@@ -142,7 +142,7 @@
 						{assign var="mpass" value=","|explode:$result.grp_release_password}
 						{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 						{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-						{foreach from=$msplits item=m}
+						{foreach $msplits as $m}
 						<tr id="guid{$mguid[$m@index]}" {if $m@index > 1}class="mlextra"{/if}>
 							<td>
 								<div class="icon"><input type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" /></div>
@@ -159,11 +159,11 @@
 									{if $mnfo[$m@index] > 0}
 									<li width="50px"><a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="modal_nfo badge" rel="nfo">Nfo</a></li>
 									{/if}
-									{if $mpass[$m@index] == 1}
-									<li width="50px">Passworded, {elseif $mpass[$m@index] == 2}Potential Password</li>
+									{if $mpass[$m@index] eq 1}
+									<li width="50px">Passworded, {elseif $mpass[$m@index] eq 2}Potential Password</li>
 									{/if}
 									<li width="50px"><a href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}" class="badge" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Grp</a></li>
-									{if $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1}
+									{if $mhaspreview[$m@index] eq 1 && $userdata.canpreview eq 1}
 									<li width="50px"><a href="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg" name="name{$mguid[$m@index]}" title="Screenshot of {$mname[$m@index]|escape:"htmlall"}" class="modal_prev badge" rel="preview">Preview</a></li>
 									{/if}
 
@@ -197,7 +197,7 @@
 								</ul>
 							</td>
 						</tr>
-						{if $m@index == 1 && $m@total > 2}
+						{if $m@index eq 1 && $m@total > 2}
 							<tr><td colspan="5"><a class="mlmore" href="#">{$m@total-2} more...</a></td></tr>
 						{/if}
 						{/foreach}

@@ -1,5 +1,5 @@
-{if $smarty.server.REQUEST_URI == "/"}
-	{foreach from=$content item=c}
+{if $smarty.server.REQUEST_URI eq "/"}
+	{foreach $content as $c}
 		<div class="header">
 			<h2>{$site->title} > <strong>{$c->title}</strong></h2>
 			<div class="breadcrumb-wrapper">
@@ -11,7 +11,7 @@
 		{$c->body}
 	{/foreach}
 {else}
-	{foreach from=$content item=c}
+	{foreach $content as $c}
 		<div class="header">
 			<h2>Help > <strong>{$c->title}</strong></h2>
 			<div class="breadcrumb-wrapper">

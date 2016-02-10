@@ -53,7 +53,7 @@
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico">
 </head>
-{if $confirmed == '' && $sent == ''}
+{if $confirmed eq '' && $sent eq ''}
 	<div class="ch-container">
 		<div class="row">
 			<div class="row">

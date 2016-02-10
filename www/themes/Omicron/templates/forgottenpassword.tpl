@@ -28,7 +28,7 @@
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
 </head>
-{if $confirmed == '' && $sent == ''}
+{if $confirmed eq '' && $sent eq ''}
 <body class="login-page">
 <div class="login-box">
 	<div class="login-logo">

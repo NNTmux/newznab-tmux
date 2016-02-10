@@ -18,7 +18,7 @@
 						<input id="searchraw_search_button" type="submit" value="Search" class="btn btn-primary"/>
 					</div>
 				</form>
-				{if $results|@count == 0 && $search != ""}
+				{if $results|@count eq 0 && $search != ""}
 					<div class="nosearchresults">
 						Your search - <strong>{$search|escape:'htmlall'}</strong> - did not match any headers.
 						<br/><br/>
@@ -31,7 +31,7 @@
 							<li>Try fewer keywords.</li>
 						</ul>
 					</div>
-				{elseif $search == ""}
+				{elseif $search eq ""}
 				{else}
 					{$site->adbrowse}
 					<form method="post" id="dl" name="dl" action="{$serverroot}searchraw">
@@ -47,7 +47,7 @@
 								{/if}
 								<th>Nzb</th>
 							</tr>
-							{foreach from=$results item=result}
+							{foreach $results as $result}
 								<tr class="{cycle values=",alt"}">
 									<!--<td class="selection"><input name="file{$result.id}" id="file{$result.id}" value="{$result.id}" type="checkbox"/></td>-->
 									<td title="{$result.xref|escape:"htmlall"}">{$result.name|escape:"htmlall"}</td>
@@ -56,7 +56,7 @@
 									{if isset($isadmin)}
 										<td><span title="procstat">{$result.procstat}</span>/<span
 													title="totalparts">{$result.totalParts}</span>/<span
-													title="regex">{if $result.regexid==""}_{else}{$result.regexid}{/if}</span>/<span
+													title="regex">{if $result.regexid eq ""}_{else}{$result.regexid}{/if}</span>/<span
 													title="relpart">{$result.relpart}</span>/<span
 													title="reltotalpart">{$result.reltotalpart}</span></td>
 										<td class="less">{if $result.binnum < $result.totalParts}<span

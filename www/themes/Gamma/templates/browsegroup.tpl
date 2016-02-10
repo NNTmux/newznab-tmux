@@ -6,14 +6,15 @@
 
 {if $results|@count > 0}
 
-<table style="width:100%;" class="data highlight sortable table table-condensed table-striped table-responsive" id="browsetable">
+<table style="width:100%;" class="data highlight Sortable table table-condensed table-striped table-responsive" id="browsetable">
 	<tr>
                 <th>Name</th>
                 <th>Description</th>
                 <th>Updated</th>
                 <th>Releases</th>
 	</tr>
-	{foreach from=$results item=result}
+
+	{foreach $results as $result}
 		{if $result.num_releases > 0}
 		<tr class="{cycle values=",alt"}">
 			<td>
@@ -27,5 +28,7 @@
 		</tr>
 		{/if}
 	{/foreach}
+
 </table>
+
 {/if}

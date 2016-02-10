@@ -1,4 +1,5 @@
 2016-02-10 DariusIII
+	Upd: Templates use category constants, changed foreach loop syntax to smarty 3
 	Upd: Switch to category constants part1
 	Upd: Remove CAT_ from category names, change parent categories names to root
 2016-02-03 DariusIII

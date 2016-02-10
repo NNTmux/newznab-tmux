@@ -9,9 +9,9 @@
 </div>
 {if $results|@count > 0}
 	<div class="box-body">
-		{foreach from=$results item=result}
+		{foreach $results as $result}
 			<div id="moviefull" style="min-height:340px;">
-				{if $result.cover == 1}
+				{if $result.cover eq 1}
 					<img class="pull-right" style="margin-right:50px; max-height:278px;"
 						 alt="{$result.title|escape:"htmlall"} Logo"
 						 src="{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg"/>
@@ -137,7 +137,7 @@
 									{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 									{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
 									{assign var="mcatname" value=","|explode:$result.grp_release_catname}
-									{foreach from=$msplits item=m}
+									{foreach $msplits as $m}
 										<tr class="{cycle values=",alt"}" id="guid{$mguid[$m@index]}">
 											<td class="check"><input id="chk{$mguid[$m@index]|substr:0:7}"
 																	 type="checkbox"
@@ -153,9 +153,9 @@
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															class="text-muted">NFO</a>
 													</span>{/if}
-												{if $mpass[$m@index] == 2}
+												{if $mpass[$m@index] eq 2}
 													<i class="fa fa-icon-lock"></i>
-												{elseif $mpass[$m@index] == 1}
+												{elseif $mpass[$m@index] eq 1}
 													<i class="fa fa-icon-lock"></i>
 												{/if}
 											</td>

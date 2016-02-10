@@ -11,22 +11,22 @@
 		<i class="fa fa-inbox fa-midt"></i>
 			<select class="input input-small" id="genre" name="genre">
 				<option class="grouping" value=""></option>
-				{foreach from=$genres item=gen}
-					<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title|escape:"htmlall"}</option>
+				{foreach $genres as $gen}
+					<option {if $gen.id eq $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title|escape:"htmlall"}</option>
 				{/foreach}
 			</select>
 		<i class="fa fa-calendar fa-midt"></i>
 			<select class="input input-small" id="year" name="year">
 				<option class="grouping" value=""></option>
-				{foreach from=$years item=yr}
-					<option {if $yr==$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
+				{foreach $years as $yr}
+					<option {if $yr eq $year}selected="selected"{/if} value="{$yr}">{$yr}</option>
 				{/foreach}
 			</select>
 		<i class="fa fa-flag fa-midt"></i>
 			<select class="input input-small" id="category" name="t">
 			<option class="grouping" value="3000"></option>
-				{foreach from=$catlist item=ct}
-					<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+				{foreach $catlist as $ct}
+					<option {if $ct.id eq $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 		<input class="btn btn-success" type="submit" value="Go" />
@@ -137,7 +137,7 @@
 		</th>
 	</tr>
 
-	{foreach from=$results item=result}
+	{foreach $results as $result}
 		{assign var="msplits" value=","|explode:$result.grp_release_id}
 		{assign var="mguid" value=","|explode:$result.grp_release_guid}
 		{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
@@ -152,12 +152,12 @@
 		{assign var="mpass" value=","|explode:$result.grp_release_password}
 		{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 		{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-		{foreach from=$msplits item=m}
+		{foreach $msplits as $m}
 		<tr class="{cycle values=",alt"}">
 			<td class="mid">
 				<div class="movcover">
 					<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
-						<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover == 1}{$result.musicinfoid}.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$result.artist|escape:"htmlall"} - {$result.title|escape:"htmlall"}" />
+						<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover eq 1}{$result.musicinfoid}.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$result.artist|escape:"htmlall"} - {$result.title|escape:"htmlall"}" />
 					</a>
 					<div class="movextra">
 						<div style="text-align: center;">
@@ -218,7 +218,7 @@
 				{if $result.genre != ""}<b>Genre:</b> <a href="{$smarty.const.WWW_TOP}/music/?genre={$result.genreid}">{$result.genre|escape:"htmlall"}</a><br />{/if}
 				{if $result.publisher != ""}<b>Publisher:</b> {$result.publisher|escape:"htmlall"}<br />{/if}
 				{if $result.releasedate != ""}<b>Released:</b> {$result.releasedate|date_format}<br />{/if}
-				{if isset($result.haspreview) && $result.haspreview == 2 && $userdata.canpreview == 1}<b>Preview:</b> <a href="#" name="audio{$mguid[$m@index]}" title="Listen to {$result.title|escape:"htmlall"}" class="audioprev rndbtn" rel="audio">Listen</a><audio id="audprev{$mguid[$m@index]}" src="{$smarty.const.WWW_TOP}/covers/audio/{$mguid[$m@index]}.mp3" preload="none"></audio>{/if}
+				{if isset($result.haspreview) && $result.haspreview eq 2 && $userdata.canpreview eq 1}<b>Preview:</b> <a href="#" name="audio{$mguid[$m@index]}" title="Listen to {$result.title|escape:"htmlall"}" class="audioprev rndbtn" rel="audio">Listen</a><audio id="audprev{$mguid[$m@index]}" src="{$smarty.const.WWW_TOP}/covers/audio/{$mguid[$m@index]}.mp3" preload="none"></audio>{/if}
 				<div class="movextra">
 					<b>{$result.title|escape:"htmlall"}</b>
 					<a class="rndbtn btn btn-mini btn-info" href="{$smarty.const.WWW_TOP}/music?artist={$result.artist|escape:"url"}" title="View similar nzbs">Similar</a>

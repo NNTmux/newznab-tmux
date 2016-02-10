@@ -14,7 +14,7 @@
 			<link>{$serverroot}</link>
 			<description>Visit {$site->title|escape} - {$site->strapline|escape}</description>
 		</image>
-		{foreach from=$releases item=release}
+		{foreach $releases as $release}
 			<item>
 				<title>{$release.searchname|escape:html}</title>
 				<guid isPermaLink="true">{$serverroot}details/{$release.guid}</guid>
@@ -24,7 +24,7 @@
 				<category>{$release.category_name|escape:html}</category>
 				<description>{$release.searchname|escape:html}</description>
 				<enclosure url="{$serverroot}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}" length="{$release.size}" type="application/x-nzb" />
-				{foreach from=$release.category_ids|parray:"," item=cat}
+				{foreach $release.category_ids|parray:"," as $cat}
 					<newznab:attr name="category" value="{$cat}" />
 				{/foreach}
 				<newznab:attr name="size" value="{$release.size}" />
