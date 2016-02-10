@@ -5,7 +5,7 @@
 	{/if}
 
 	{foreach $usefulcontentlist as $content}
-		<li><a {if $menu.newwindow eq"1"}class="external" target="null"{/if} title="{$content.title}" href="{$smarty.const.WWW_TOP}/content/{$content.id}{$content.url}">{$content.title}</a></li>
+		<li><a {if $menu.newwindow eq "1"}class="external" target="null"{/if} title="{$content.title}" href="{$smarty.const.WWW_TOP}/content/{$content.id}{$content.url}">{$content.title}</a></li>
 	{/foreach}
 </li>
 <br><br><img src="{$smarty.const.WWW_THEMES}/shared/images/tmux_logo.png"/>

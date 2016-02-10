@@ -9,7 +9,7 @@
 			<li class="mmenu"><a title="{$site->title} Api" href="{$smarty.const.WWW_TOP}/apihelp">Api</a></li>
 		{/if}
 		{foreach $usefulcontentlist as $content}
-			<li class="mmenu{if $menu.newwindow eq"1"}_new{/if}"><a {if $menu.newwindow eq"1"}class="external"
+			<li class="mmenu{if $menu.newwindow eq "1"}_new{/if}"><a {if $menu.newwindow eq "1"}class="external"
 																	target="null"{/if} title="{$content->title}"
 																	href="{$smarty.const.WWW_TOP}/content/{$content->id}{$content->url}">{$content->title}</a>
 			</li>
