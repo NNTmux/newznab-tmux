@@ -5,7 +5,7 @@
     <option class="grouping" value="-1">All</option>
     {foreach from=$catlist item=parentcat}
         <option {if $previewcat==$parentcat.id}selected="selected"{/if} class="grouping" value="{$parentcat.id}">{$parentcat.title}</option>
-        {foreach from=$parentcat.subcatlist item=subcat}
+        {foreach $parentcat.subcatlist as $subcat}
             <option {if $previewcat==$subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;{$subcat.title}</option>
         {/foreach}
     {/foreach}

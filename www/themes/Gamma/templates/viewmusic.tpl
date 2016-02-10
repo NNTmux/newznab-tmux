@@ -1,6 +1,6 @@
 <div id="musicinfo">
 
-<img src="{$smarty.const.WWW_TOP}/covers/music/{if $music.cover == 1}{$music.id}{else}no-cover{/if}.jpg" class="cover" alt="{$movie.title|ss}"/>
+<img src="{$smarty.const.WWW_TOP}/covers/music/{if $music.cover eq 1}{$music.id}{else}no-cover{/if}.jpg" class="cover" alt="{$movie.title|ss}"/>
 
 <h1>{$music.title} {if $music.year != ""}({$music.year}){/if}</h1>
 
@@ -16,7 +16,7 @@
 <h3>Track Listing:</h3>
 <ol class="tracklist">
 	{assign var="tracksplits" value="|"|explode:$music.tracks}
-	{foreach from=$tracksplits item=tracksplit}
+	{foreach $tracksplits as $tracksplit}
 	<li>{$tracksplit|trim}</li>
 	{/foreach}
 </ol>

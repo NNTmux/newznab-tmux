@@ -2,9 +2,9 @@
 <p>
 <b>Jump to</b>:
 
-&nbsp;[ {if $animeletter == '0-9'}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/anime/0-9">0-9</a>{if $animeletter == '0-9'}</u></b>{/if}
+&nbsp;[ {if $animeletter eq '0-9'}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/anime/0-9">0-9</a>{if $animeletter eq '0-9'}</u></b>{/if}
 {foreach $animerange as $range}
-{if $range == $animeletter}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/anime/{$range}">{$range}</a>{if $range == $animeletter}</u></b>{/if}
+{if $range eq $animeletter}<b><u>{/if}<a href="{$smarty.const.WWW_TOP}/anime/{$range}">{$range}</a>{if $range eq $animeletter}</u></b>{/if}
 {/foreach}]
 </p>
 <form class="form pull-right" style="margin-top:-35px;">

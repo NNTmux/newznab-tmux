@@ -1,7 +1,7 @@
 <div class="span8">
 <ul class="inline">
 	<li><h2>Profile for {$user.username|escape:"htmlall"}</h2></li>
-	{if $user.id==$userdata.id}
+	{if $user.ideq$userdata.id}
 		<li style="vertical-align:text-bottom;"><a href="{$smarty.const.WWW_TOP}/profileedit" class="btn btn-small btn-warning">Edit</a></li>
 	{/if}
 </ul>
@@ -10,7 +10,7 @@
 		<th width="30%">Username:</th>
 		<td width="70%">{$user.username|escape:"htmlall"}</td>
 	</tr>
-	{if $user.id==$userdata.id || $userdata.role==2}
+	{if $user.ideq$userdata.id || $userdata.roleeq2}
 	<tr>
 		<th title="Not public">Email:</th>
 		<td>{$user.email}</td>
@@ -28,33 +28,33 @@
 		<th>Role:</th>
 		<td>{$user.rolename}</td>
 	</tr>
-	{if $userdata.role==2}
+	{if $userdata.roleeq2}
 		<tr>
 			<th title="Admin Notes">Notes:</th>
 			<td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}<br/>{/if}<a href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes" class="btn btn-mini btn-info">Add/Edit</a></td>
 		</tr>
 	{/if}
-	{if $user.id==$userdata.id || $userdata.role==2}
+	{if $user.ideq$userdata.id || $userdata.roleeq2}
 		<tr>
 			<th title="Not public">Site Api/Rss Key:</th>
 			<td><a href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$user.id}&amp;r={$user.rsstoken}">{$user.rsstoken}</a></td>
 		</tr>
 	{/if}
-	{if $user.id==$userdata.id || $userdata.role==2}
+	{if $user.ideq$userdata.id || $userdata.roleeq2}
 		<tr>
 			<th>API Hits Today:</th>
-			<td><span id="uatd">{$apirequests.num}</span> {if $userdata.role==2 && $apirequests.num > 0}&nbsp;&nbsp;&nbsp;<a onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;" class="btn btn-mini btn-info" href="#">Reset</a>{/if}</td>
+			<td><span id="uatd">{$apirequests.num}</span> {if $userdata.roleeq2 && $apirequests.num > 0}&nbsp;&nbsp;&nbsp;<a onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;" class="btn btn-mini btn-info" href="#">Reset</a>{/if}</td>
 		</tr>
 		<tr>
 			<th>Grabs Today:</th>
-			<td><span id="ugrtd">{$grabstoday}</span> {if $user.grabs >= $user.downloadrequests}&nbsp;&nbsp;<small>(Next DL in {($grabstoday.nextdl/3600)|intval}h {($grabstoday.nextdl/60) % 60}m)</small>{/if}{if $userdata.role==2 && $user.grabs> 0}&nbsp;&nbsp;&nbsp;<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;" class="btn btn-mini btn-info" href="#">Reset</a>{/if}</td>
+			<td><span id="ugrtd">{$grabstoday}</span> {if $user.grabs >= $user.downloadrequests}&nbsp;&nbsp;<small>(Next DL in {($grabstoday.nextdl/3600)|intval}h {($grabstoday.nextdl/60) % 60}m)</small>{/if}{if $userdata.roleeq2 && $user.grabs> 0}&nbsp;&nbsp;&nbsp;<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;" class="btn btn-mini btn-info" href="#">Reset</a>{/if}</td>
 		</tr>
 	{/if}
 	<tr>
 		<th>Grabs Total:</th>
 		<td>{$user.grabs}</td>
 	</tr>
-	{if ($user.id==$userdata.id || $userdata.role==2) && $site->registerstatus==1}
+	{if ($user.ideq$userdata.id || $userdata.roleeq2) && $site->registerstatuseq1}
 	<tr>
 		<th title="Not public">Invites</th>
 		<td>{$user.invites} </td>
@@ -91,33 +91,33 @@
 			<td>{$user.style}</td>
 		</tr>
 		<td>
-			{if $user.movieview == "1"}View movie covers{else}View standard movie category{/if}<br/>
-			{if $user.musicview == "1"}View music covers{else}View standard music category{/if}<br/>
-			{if $user.consoleview == "1"}View console covers{else}View standard console category{/if}<br/>
-			{if $user.gameview == "1"}View games covers{else}View standard games category{/if}<br/>
-			{if $user.bookview == "1"}View book covers{else}View standard book category{/if}<br/>
-			{if $user.xxxview == "1"}View xxx covers{else}View standard xxx category{/if}<br/>
+			{if $user.movieview eq "1"}View movie covers{else}View standard movie category{/if}<br/>
+			{if $user.musicview eq "1"}View music covers{else}View standard music category{/if}<br/>
+			{if $user.consoleview eq "1"}View console covers{else}View standard console category{/if}<br/>
+			{if $user.gameview eq "1"}View games covers{else}View standard games category{/if}<br/>
+			{if $user.bookview eq "1"}View book covers{else}View standard book category{/if}<br/>
+			{if $user.xxxview eq "1"}View xxx covers{else}View standard xxx category{/if}<br/>
 		</td>
 	</tr>
-	{if $user.id==$userdata.id || $userdata.role==2}
+	{if $user.ideq$userdata.id || $userdata.roleeq2}
 		<tr>
 			<th title="Not public">Excluded Categories:</th>
 			<td>{$exccats|replace:",":"<br/>"}</td>
 		</tr>
 	{/if}
-	{if $site->sabintegrationtype == 2 && $user.id==$userdata.id}
+	{if $site->sabintegrationtype eq 2 && $user.ideq$userdata.id}
 		<tr>
 			<th>SABnzbd Integration:</th>
 			<td>
-				<b>Url:</b> {if $saburl == ''}N/A{else}{$saburl}{/if}<br/>
-				<b>Key:</b> {if $sabapikey == ''}N/A{else}{$sabapikey}{/if}<br/>
-				<b>Type:</b> {if $sabapikeytype == ''}N/A{else}{$sabapikeytype}{/if}<br/>
-				<b>Priority:</b> {if $sabpriority == ''}N/A{else}{$sabpriority}{/if}<br/>
-				<b>Storage:</b> {if $sabsetting == ''}N/A{else}{$sabsetting}{/if}
+				<b>Url:</b> {if $saburl eq ''}N/A{else}{$saburl}{/if}<br/>
+				<b>Key:</b> {if $sabapikey eq ''}N/A{else}{$sabapikey}{/if}<br/>
+				<b>Type:</b> {if $sabapikeytype eq ''}N/A{else}{$sabapikeytype}{/if}<br/>
+				<b>Priority:</b> {if $sabpriority eq ''}N/A{else}{$sabpriority}{/if}<br/>
+				<b>Storage:</b> {if $sabsetting eq ''}N/A{else}{$sabsetting}{/if}
 			</td>
 		</tr>
 	{/if}
-	{if $user.id==$userdata.id}
+	{if $user.ideq$userdata.id}
 			<tr>
 				<th>My TV Shows:</th>
 				<td><a href="{$smarty.const.WWW_TOP}/myshows" class="btn btn-mini btn-info">Manage my shows</a></td>
@@ -128,7 +128,7 @@
 			</tr>
 	{/if}
 </table>
-{if $userdata.role==2 && $downloadlist|@count > 0}
+{if $userdata.roleeq2 && $downloadlist|@count > 0}
 <div style="padding-top:20px;">
 	<h3>Downloads for User and Host</h3>
 	<table class="data Sortable highlight table table-striped" id="downloadtable" style="margin-top:10px;">
@@ -137,16 +137,16 @@
 		<th>hosthash</th>
 		<th>release</th>
 	</tr>
-	{foreach from=$downloadlist item=download}
-		{if $download@iteration == 10}
+	{foreach $downloadlist as $download}
+		{if $download@iteration eq 10}
 			<tr class="more">
 				<td colspan="3"><a onclick="$('tr.extra').toggle();$('tr.more').toggle();return false;" href="#">show all...</a></td>
 			</tr>
 		{/if}
 		<tr {if $download@iteration >= 10}class="extra" style="display:none;"{/if}>
 			<td class="less" title="{$download.timestamp}">{$download.timestamp|date_format}</td>
-			<td title="{$download.hosthash}">{if $download.hosthash == ""}n/a{else}{$download.hosthash|truncate:10}{/if}</td>
-			<td>{if $download.guid == ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download.guid}/{$download.searchname|escape:"seourl"}">{$download.searchname}</a>{/if}</td>
+			<td title="{$download.hosthash}">{if $download.hosthash eq ""}n/a{else}{$download.hosthash|truncate:10}{/if}</td>
+			<td>{if $download.guid eq ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download.guid}/{$download.searchname|escape:"seourl"}">{$download.searchname}</a>{/if}</td>
 		</tr>
 		{/foreach}
 	</table>

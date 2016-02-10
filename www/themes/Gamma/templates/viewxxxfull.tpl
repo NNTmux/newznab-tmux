@@ -1,7 +1,7 @@
 {if $results|@count > 0}
-	{foreach from=$results item=result}
+	{foreach $results as $result}
 		<div id="moviefull" style="min-height:340px;">
-			{if $result.cover == 1}<img class="shadow pic img-polaroid pull-right" style="margin-right:50px;" width="200px" alt="{$result.title|escape:"htmlall"} Logo" src="{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg" />{/if}
+			{if $result.cover eq 1}<img class="shadow pic img-polaroid pull-right" style="margin-right:50px;" width="200px" alt="{$result.title|escape:"htmlall"} Logo" src="{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg" />{/if}
 			<h2 style="display:inline;">{$result.title|escape:"htmlall"}</h2>
 			<h4>{if isset($result.genre) && $result.genre != ''}{$result.genre|replace:"|":" / "}{/if}</h4>
 			{if $result.tagline != ''}
@@ -121,22 +121,22 @@
 			{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 			{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
 			{assign var="mcatname" value=","|explode:$result.grp_release_catname}
-			{foreach from=$msplits item=m}
+			{foreach $msplits as $m}
 				<tr class="{cycle values=",alt"} filter"data-name="{$mname[$m@index]|escape:"htmlall"|replace:".":" "|lower}" id="guid{$mguid[$m@index]}">
 					<td class="check"><input id="chk{$mguid[$m@index]|substr:0:7}" type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" /></td>
 					<td class="item">
 						<label for="chk{$mguid[$m@index]|substr:0:7}">
 							<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
 						</label>
-						{if $mpass[$m@index] == 2}
+						{if $mpass[$m@index] eq 2}
 							<i class="fa fa-lock"></i>
-						{elseif $mpass[$m@index] == 1}
+						{elseif $mpass[$m@index] eq 1}
 							<i class="fa fa-lock"></i>
 						{/if}
 						<div class="resextra">
 							<div class="btns">{strip}
 									{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="modal_nfo rndbtn badge" rel="nfo">Nfo</a>{/if}
-									{if $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1}<a href="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg" name="name{$mguid[$m@index]}" title="Screenshot" class="modal_prev rndbtn badge" rel="preview">Preview</a>{/if}
+									{if $mhaspreview[$m@index] eq 1 && $userdata.canpreview eq 1}<a href="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg" name="name{$mguid[$m@index]}" title="Screenshot" class="modal_prev rndbtn badge" rel="preview">Preview</a>{/if}
 								{/strip}</div>
 						</div>
 					</td>

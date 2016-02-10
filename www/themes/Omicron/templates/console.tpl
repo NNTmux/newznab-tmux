@@ -20,8 +20,8 @@
 			<label class="sr-only" for="genre">Genre:</label>
 			<select id="genre" name="genre" class="form-control">
 				<option class="grouping" value="" selected>Genre</option>
-				{foreach from=$genres item=gen}
-					<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title|escape:"htmlall"}</option>
+				{foreach $genres as $gen}
+					<option {if $gen.id eq $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title|escape:"htmlall"}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -29,8 +29,8 @@
 			<label class="sr-only" for="category">Category:</label>
 			<select id="category" name="t" class="form-control">
 				<option class="grouping" value="" selected>Category</option>
-				{foreach from=$catlist item=ct}
-					<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+				{foreach $catlist as $ct}
+					<option {if $ct.ideq$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -83,7 +83,7 @@
 						</div>
 					</div>
 					<hr>
-					{foreach from=$results item=result}
+					{foreach $results as $result}
 						{assign var="msplits" value=","|explode:$result.grp_release_id}
 						{assign var="mguid" value=","|explode:$result.grp_release_guid}
 						{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
@@ -98,7 +98,7 @@
 						{assign var="mpass" value=","|explode:$result.grp_release_password}
 						{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 						{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-						{foreach from=$msplits item=m name=loop}
+						{foreach $msplits as $m=>$loop}
 							{if $smarty.foreach.loop.first}
 								<div class="panel panel-default">
 									<div class="panel-body">
@@ -106,7 +106,7 @@
 											<div class="col-md-2 small-gutter-left">
 												<a title="View details"
 												   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
-													<img src="{$smarty.const.WWW_TOP}/covers/console/{if $result.cover == 1}{$result.consoleinfoid}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+													<img src="{$smarty.const.WWW_TOP}/covers/console/{if $result.cover eq 1}{$result.consoleinfoid}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 														 width="140" border="0"
 														 alt="{$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 												</a>

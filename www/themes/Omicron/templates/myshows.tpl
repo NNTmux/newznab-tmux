@@ -30,7 +30,7 @@
 								<th width="110">Added</th>
 								<th width="130" class="mid">Options</th>
 							</tr>
-							{foreach from=$shows item=show}
+							{foreach $shows as $show}
 								<tr>
 									<td>
 										<a title="View details"

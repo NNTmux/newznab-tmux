@@ -50,7 +50,7 @@
 </ul>
 <h3>Parent Category</h3>
 <ul style="text-align: left;">
-	{foreach from=$parentcategorylist item=category}
+	{foreach $parentcategorylist as $category}
 	<li>
 		<a href="{$smarty.const.WWW_TOP}/browse?t={$category.id}">{$category.title}</a></code> feed:
 		<code><a href="{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a></code>
@@ -59,7 +59,7 @@
 </ul>
 <h3>Sub Category</h3>
 <ul style="text-align: left;">
-	{foreach from=$categorylist item=category}
+	{foreach $categorylist as $category}
 	<li>
 		<a href="{$smarty.const.WWW_TOP}/browse?t={$category.id}">{$category.title}</a> feed:
 		<code><a href="{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a></code>

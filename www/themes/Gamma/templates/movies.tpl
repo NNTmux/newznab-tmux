@@ -16,31 +16,31 @@
 			<i class="fa fa-star fa-midt"></i>
 			<select class="input span1" id="rating" name="rating">
 				<option class="grouping" value=""></option>
-				{foreach from=$ratings item=rate}
-					<option {if $rating==$rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
+				{foreach $ratings as $rate}
+					<option {if $ratingeq$rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
 				{/foreach}
 			</select>
 			<i class="fa fa-inbox fa-midt"></i>
 			<select class="input input-small" id="genre" name="genre">
 				<option class="grouping" value=""></option>
-				{foreach from=$genres item=gen}
-					<option {if $gen==$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
+				{foreach $genres as $gen}
+					<option {if $geneq$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
 				{/foreach}
 			</select>
 
 			<i class="fa fa-calendar fa-midt"></i>
 			<select class="input input-small" id="year" name="year">
 				<option class="grouping" value=""></option>
-				{foreach from=$years item=yr}
-					<option {if $yr==$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
+				{foreach $years as $yr}
+					<option {if $yreq$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
 				{/foreach}
 			</select>
 
 			<i class="fa fa-flag fa-midt"></i>
 			<select class="input input-small" id="category" name="t">
 				<option class="grouping" value="2000"></option>
-				{foreach from=$catlist item=ct}
-					<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+				{foreach $catlist as $ct}
+					<option {if $ct.ideq$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 
@@ -124,12 +124,12 @@
 				</th>
 			</tr>
 
-			{foreach from=$results item=result}
+			{foreach $results as $result}
 				<tr class="{cycle values=",alt"}">
 					<td class="mid">
 						<div class="movcover">
 							<a target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/" name="name{$result.imdbid}" title="View movie info" class="modal_imdb" rel="movie" >
-								<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/movies/{if isset($result.cover) && $result.cover == 1}{$result.imdbid}-cover.jpg{else}no-cover.jpg{/if}" style="max-width: 120px; /*width: auto;*/" width="120" border="0" alt="{$result.title|escape:"htmlall"}" />
+								<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/movies/{if isset($result.cover) && $result.cover eq 1}{$result.imdbid}-cover.jpg{else}no-cover.jpg{/if}" style="max-width: 120px; /*width: auto;*/" width="120" border="0" alt="{$result.title|escape:"htmlall"}" />
 							</a>
 							<div class="movextra">
 								<div style="text-align: center;">
@@ -183,7 +183,7 @@
 								{assign var="mpass" value=","|explode:$result.grp_release_password}
 								{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 								{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-								{foreach from=$msplits item=m}
+								{foreach $msplits as $m}
 									<tr id="guid{$mguid[$m@index]}" {if $m@index > 0}class="mlextra"{/if}>
 										<td>
 											<div class="icon"><input type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" /></div>
@@ -198,7 +198,7 @@
 												<li width="50px">{$mgrabs[$m@index]} <i class="fa fa-cloud-download"></i></li>
 												<li width="50px">{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="modal_nfo fa fa-info-sign" rel="nfo"></a>{/if}</li>
 												<li width="50px"><a href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}" class="fa fa-group"></a></li>
-												<li width="80px">{if $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1}<a href="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg" name="name{$mguid[$m@index]}" title="Screenshot" class="modal_prev label" rel="preview">Preview</a>{/if}</li>
+												<li width="80px">{if $mhaspreview[$m@index] eq 1 && $userdata.canpreview eq 1}<a href="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg" name="name{$mguid[$m@index]}" title="Screenshot" class="modal_prev label" rel="preview">Preview</a>{/if}</li>
 												<li width="80px">{if $mhaspreview[$m@index]}<a href="#" onclick="return false;" class="mediainfo label" title="{$mguid[$m@index]}">Media</a>{/if}</li>
 											</ul>
 										</td>
@@ -226,7 +226,7 @@
 											</ul>
 										</td>
 									</tr>
-									{if $m@index == 1 && $m@total > 2}
+									{if $m@index eq 1 && $m@total > 2}
 										<tr>
 											<td colspan="5">
 												<a class="mlmore" href="#">{$m@total-2} more...</a>

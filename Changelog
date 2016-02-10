@@ -1,3 +1,6 @@
+2016-02-10 DariusIII
+	Upd: Switch foreach loops from smarty2 to smarty3 syntax
+	Chg: Switch templates from category numbers to category constants usage
 2016-02-09 DariusIII
 	Upd: Switch to category constants from category numbers, part 1
 	Upd: Change other cat numbers to be the last number in their range x999

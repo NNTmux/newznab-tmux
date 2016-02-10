@@ -88,7 +88,7 @@
 						<div class="clearfix"></div>
 						<div class="input-prepend">
 							<label class="rememberme" for="rememberme"><input id="rememberme"
-																			  {if isset($rememberme) && $rememberme == 1}checked="checked"{/if}
+																			  {if isset($rememberme) && $rememberme eq 1}checked="checked"{/if}
 																			  name="rememberme" type="checkbox">
 								Remember me</label>
 						</div>

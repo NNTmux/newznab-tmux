@@ -10,7 +10,7 @@ border: 1px solid #e1e1e8;
 	<p>
 		Please enter the email address you used to register and we will send an email to reset your password. If you cannot remember your email, or no longer have access to it, please <a href="{$smarty.const.WWW_TOP}/contact-us">contact us</a>.
 	</p>
-	{if isset($confirmed) && $confirmed == '' && isset($sent) && $sent == ''}
+	{if isset($confirmed) && $confirmed eq '' && isset($sent) && $sent eq ''}
 	<p>
 		<form class="form-horizontal" action="forgottenpassword?action=submit" method="post">
 			<table class="data">

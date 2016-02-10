@@ -7,20 +7,20 @@
 		{if $reVideo.releaseid|@count > 0 || $reAudio|@count > 0}
 			<li><a href="#mediainfo" data-toggle="tab">Media info</a></li>
 		{/if}
-		{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
+		{if $release.jpgstatus eq 1 && $userdata.canpreview eq 1}
 			<li><a href="#thumbnail" data-toggle="tab">Thumbnail</a></li>
 		{else}
-			{if $release.haspreview == 1 && $userdata.canpreview == 1}
+			{if $release.haspreview eq 1 && $userdata.canpreview eq 1}
 				<li><a href="#preview" data-toggle="tab">Preview</a></li>
 			{/if}
 		{/if}
-		{if ($release.videostatus == 1 && $userdata.canpreview == 1)}
+		{if ($release.videostatus eq 1 && $userdata.canpreview eq 1)}
 			<li><a href="#sample" data-toggle="tab">Sample</a></li>
 		{/if}
-		{if isset($xxx.backdrop) && $xxx.backdrop == 1}
+		{if isset($xxx.backdrop) && $xxx.backdrop eq 1}
 			<li><a href="#backcover" data-toggle="tab">Back Cover</a></li>
 		{/if}
-		{if isset($game.backdrop) && $game.backdrop == 1}
+		{if isset($game.backdrop) && $game.backdrop eq 1}
 			<li><a href="#screenshot" data-toggle="tab">Screenshot</a></li>
 		{/if}
 		<li><a href="#comments" data-toggle="tab">Comments</a></li>
@@ -28,15 +28,15 @@
 	<div id="my-tab-content" class="tab-content">
 		<div class="tab-pane active" id="info">
 			{if $show && $release.videos_id > 0 && $show.image != '0'}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/tvshows/{$release.videos_id}.jpg" width="180" alt="{$show.title|escape:"htmlall"}" />{/if}
-			{if $movie && $release.videos_id == 0 && $movie.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" width="180" alt="{$movie.title|escape:"htmlall"}" />{/if}
+			{if $movie && $release.videos_id eq 0 && $movie.cover eq 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" width="180" alt="{$movie.title|escape:"htmlall"}" />{/if}
 			{if $anidb && $release.anidbid > 0 && $anidb.picture != ""}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbid}.jpg" width="180" alt="{$anidb.title|escape:"htmlall"}" />{/if}
-			{if $con && $con.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/console/{$con.id}.jpg" width="160" alt="{$con.title|escape:"htmlall"}" />{/if}
-			{if $music && $music.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/music/{$music.id}.jpg" width="160" alt="{$music.title|escape:"htmlall"}" />{/if}
-			{if $book && $book.cover == 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg" width="160" alt="{$book.title|escape:"htmlall"}" />{/if}
-			{if $game && $game.cover == 1}
+			{if $con && $con.cover eq 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/console/{$con.id}.jpg" width="160" alt="{$con.title|escape:"htmlall"}" />{/if}
+			{if $music && $music.cover eq 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/music/{$music.id}.jpg" width="160" alt="{$music.title|escape:"htmlall"}" />{/if}
+			{if $book && $book.cover eq 1}<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;" src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg" width="160" alt="{$book.title|escape:"htmlall"}" />{/if}
+			{if $game && $game.cover eq 1}
 				<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;"  src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" width="160" alt="{$con.title|escape:"htmlall"}"/>
 			{/if}
-			{if $xxx && $xxx.cover == 1}
+			{if $xxx && $xxx.cover eq 1}
 				<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;"  src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg" width="160" alt="{$xxx.title|escape:"htmlall"}"/>
 			{/if}
 			{if $isadmin}
@@ -74,14 +74,14 @@
 				{if $show.tvdb > 0}<a class="label" target="_blank" href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}" title="View at TheTVDB">TheTVDB</a>{/if}
 			</div>
 			{/if}
-			{if $movie && $release.videos_id == 0}
+			{if $movie && $release.videos_id eq 0}
 				<dl class="dl" style="margin-right:300px;">
 					<dt>Movie Info</dt>
 					<dd>{$movie.title|escape:"htmlall"}</dd>
 					<dt>Year</dt>
 					<dd>{$movie.year}</dd>
 					<dt>Rating</dt>
-					<dd><strong>{if $movie.rating == ''}N/A{/if}{$movie.rating}/10</strong></dd>
+					<dd><strong>{if $movie.rating eq ''}N/A{/if}{$movie.rating}/10</strong></dd>
 					{if $movie.tagline != ''}
 						<dt>Tagline</dt>
 						<dd>{$movie.tagline|escape:"htmlall"}</dd>
@@ -283,7 +283,7 @@
 						<dd>
 							<ol>
 								{assign var="tracksplits" value="|"|explode:$music.tracks}
-								{foreach from=$tracksplits item=tracksplit}
+								{foreach $tracksplits as $tracksplit}
 									<li>{$tracksplit|trim|escape:"htmlall"}</li>
 								{/foreach}
 							</ol>
@@ -301,7 +301,7 @@
 					<dt>Nfo</dt>
 					<dd><a href="{$smarty.const.WWW_TOP}/nfo/{$release.guid}" title="View Nfo">View Nfo</a></dd>
 				{/if}
-				{if $release.haspreview == 2 && $userdata.canpreview == 1}
+				{if $release.haspreview eq 2 && $userdata.canpreview eq 1}
 					<dt>Preview</dt>
 					<dd><a href="#" name="audio{$release.guid}" title="Listen to {$release.searchname|escape:"htmlall"}" class="audioprev rndbtn" rel="audio">Listen</a><audio id="audprev{$release.guid}" src="{$smarty.const.WWW_TOP}/covers/audio/{$release.guid}.mp3" preload="none"></audio></dd>
 
@@ -325,7 +325,7 @@
 								<th class="mid">Size</th>
 								<th class="mid">Date</th>
 							</tr>
-							{foreach from=$releasefiles item=rf}
+							{foreach $releasefiles as $rf}
 								<tr>
 									<td>{$rf.name}</td>
 									<td class="mid">{if $rf.passworded != 1}No{else}Yes{/if}</td>
@@ -339,18 +339,18 @@
 				<dl>
 					<dt> Grabs</dt>
 					<dd>{$release.grabs}
-						time{if $release.grabs==1}{else}s{/if}</dd>
+						time{if $release.grabseq1}{else}s{/if}</dd>
 				</dl>
 				{if $failed != NULL && $failed >0}
 					<dl>
 						<dt> Failed Download</dt>
 						<dd>{$failed}
-							time{if $failed==1}{else}s{/if}</dd>
+							time{if $failedeq1}{else}s{/if}</dd>
 					</dl>
 				{/if}
 				{if $site->checkpasswordedrar > 0}
 					<dt>Password</dt>
-					<dd>{if $release.passwordstatus == 0}None{elseif $release.passwordstatus == 2}Passworded Rar Archive{elseif $release.passwordstatus == 1}Contains Cab/Ace/Rar Inside Archive{else}Unknown{/if}</dd>
+					<dd>{if $release.passwordstatus eq 0}None{elseif $release.passwordstatus eq 2}Passworded Rar Archive{elseif $release.passwordstatus eq 1}Contains Cab/Ace/Rar Inside Archive{else}Unknown{/if}</dd>
 				{/if}
 
 				<dt>Poster</dt>
@@ -465,7 +465,7 @@
 							<td class="right">{$reVideo.videolibrary}</td>
 						</tr>
 						{/if}
-						{foreach from=$reAudio item=audio}
+						{foreach $reAudio as $audio}
 						<tr>
 							<td><strong>Audio {$audio.audioid}</strong></td>
 							<td>Format</td>
@@ -547,21 +547,21 @@
 			<img class="shadow" height="100%" src="{$smarty.const.WWW_TOP}/covers/sample/{$release.guid}_thumb.jpg" alt="{$release.searchname|escape:"htmlall"} screenshot" />
 		</div>
 		<div class="tab-pane" id="sample">
-			{if ($release.videostatus == 1 && $userdata.canpreview == 1)}
+			{if ($release.videostatus eq 1 && $userdata.canpreview eq 1)}
 				<video width="75%" controls>
 					<source src="/covers/video/{$release.guid}.ogv" type="video/ogg">
 					Your browser does not support the video tag.
 				</video>
 			{/if}
 		</div>
-		{if isset($xxx.backdrop) && $xxx.backdrop == 1}
+		{if isset($xxx.backdrop) && $xxx.backdrop eq 1}
 			<div id="backcover" class="tab-pane">
 				<img src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-backdrop.jpg"
 					 alt="{$xxx.title|escape:"htmlall"}"
 				/>
 			</div>
 		{/if}
-		{if isset($game.backdrop) && $game.backdrop == 1}
+		{if isset($game.backdrop) && $game.backdrop eq 1}
 			<div id="screenshot" class="tab-pane">
 				<img src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}-backdrop.jpg"
 					 alt="{$game.title|escape:"htmlall"}"
@@ -579,7 +579,7 @@
 						</tr>
 						{foreach from=$comments item=comment}
 							<tr>
-								<td style="text-align:right;" class="less" title="{$comment.createddate}">{if $comment.sourceid == 0}<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>{else}{$comment.username}<br/><span style="color: #ce0000;">(syndicated)</span>{/if}<br/>{$comment.createddate|date_format}</td>
+								<td style="text-align:right;" class="less" title="{$comment.createddate}">{if $comment.sourceid eq 0}<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>{else}{$comment.username}<br/><span style="color: #ce0000;">(syndicated)</span>{/if}<br/>{$comment.createddate|date_format}</td>
 								<td style="margin-left:30px;">{$comment.text|escape:"htmlall"|nl2br}</td>
 							</tr>
 						{/foreach}

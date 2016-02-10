@@ -174,7 +174,7 @@
 					{foreach $season as $episodes}
 					{foreach $episodes as $result}
 
-					{if $result@index == 0}
+					{if $result@index eq 0}
 					<tr class="{cycle values=",alt"} dont-filter">
 						<td style="padding-top: 20px;" colspan="8" class="static"><h4 style="height: 0px; margin-top: 20px; margin-bottom: -50px;">{$episodes@key}</h4></td>
 					</tr>
@@ -193,10 +193,10 @@
 										{if $result.reid > 0}<span
 																	class="mediainfo label label-default"
 																	title="{$result.guid}">Media</span>{/if}
-										{if $result.jpgstatus == 1 && $userdata.canpreview == 1}<span><a
+										{if $result.jpgstatus eq 1 && $userdata.canpreview eq 1}<span><a
 													href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
 													name="name{$result.guid}" class="modal_prev label label-default" rel="preview">Sample</a></span>{/if}
-										{if $result.haspreview == 1 && $userdata.canpreview == 1}<span><a
+										{if $result.haspreview eq 1 && $userdata.canpreview eq 1}<span><a
 													href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 													name="name{$result.guid}" class="modal_prev label label-default" rel="preview">Preview</a></span>{/if}
 										{if $result.firstaired != ""}<span class="rndbtn badge badge-success halffade" title="{$result.title} Aired on {$result.firstaired|date_format}"> Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}

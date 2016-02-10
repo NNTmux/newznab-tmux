@@ -25,8 +25,8 @@
 			<label class="sr-only" for="rating">Rating:</label>
 			<select id="rating" name="rating" class="form-control" name="Score">
 				<option value="" selected>Rating</option>
-				{foreach from=$ratings item=rate}
-					<option {if $rating==$rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
+				{foreach $ratings as $rate}
+					<option {if $ratingeq$rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -34,8 +34,8 @@
 			<label class="sr-only" for="genre">Genre:</label>
 			<select id="genre" name="genre" class="form-control">
 				<option class="grouping" value="" selected>Genre</option>
-				{foreach from=$genres item=gen}
-					<option {if $gen==$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
+				{foreach $genres as $gen}
+					<option {if $geneq$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -43,8 +43,8 @@
 			<label class="sr-only" for="year">Year:</label>
 			<select id="year" name="year" class="form-control">
 				<option class="grouping" value="" selected>Year</option>
-				{foreach from=$years item=yr}
-					<option {if $yr==$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
+				{foreach $years as $yr}
+					<option {if $yreq$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -52,8 +52,8 @@
 			<label class="sr-only" for="category">Category:</label>
 			<select id="category" name="t" class="form-control">
 				<option class="grouping" value="" selected>Category</option>
-				{foreach from=$catlist item=ct}
-					<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+				{foreach $catlist as $ct}
+					<option {if $ct.ideq$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -120,7 +120,7 @@
 										<div class="panel-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
-													{foreach from=$result.languages item=movielanguage}
+													{foreach $result.languages as $movielanguage}
 														{release_flag($movielanguage, browse)}
 													{/foreach}
 													{assign var="msplits" value=","|explode:$result.grp_release_id}
@@ -137,11 +137,11 @@
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-													{foreach from=$msplits item=m name=loop}
+													{foreach $msplits as $m=>$loop}
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover"
-																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+																src="{if isset($result.cover) && $result.cover eq 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/> {if $mfailed[$m@index]} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed for some users"></i>{/if}</a>
 													<a target="_blank"
@@ -238,7 +238,7 @@
 										<div class="panel-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
-													{foreach from=$result.languages item=movielanguage}
+													{foreach $result.languages as $movielanguage}
 														{release_flag($movielanguage, browse)}
 													{/foreach}
 													{assign var="msplits" value=","|explode:$result.grp_release_id}
@@ -255,11 +255,11 @@
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-													{foreach from=$msplits item=m name=loop}
+													{foreach $msplits as $m=>$loop}
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover"
-																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+																src="{if isset($result.cover) && $result.cover eq 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/> {if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}</a>
 													<a target="_blank"

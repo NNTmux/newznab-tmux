@@ -13,7 +13,7 @@
 
 				<div class="movcover">
 					<div style="text-align: center;">
-					<img class="shadow img img-polaroid" src="{if $result['cover'] ==""}{$smarty.const.WWW_TOP}/covers/movies/no-cover.jpg{else}{$result['cover']}{/if}" width="120" border="0" alt="{$result['title']|escape:"htmlall"}" />
+					<img class="shadow img img-polaroid" src="{if $result['cover'] eq""}{$smarty.const.WWW_TOP}/covers/movies/no-cover.jpg{else}{$result['cover']}{/if}" width="120" border="0" alt="{$result['title']|escape:"htmlall"}" />
 					<div class="movextra">
 						{if $ourmovies[$result['imdb_id']] != ""}
 						<a href="#" name="name{$result['imdb_id']}" title="View movie info" class="rndbtn modal_imdb badge" rel="movie" >Cover</a>
@@ -36,7 +36,7 @@
 				{else}
 					<a {if $userimdbs[$result['imdb_id']] != ""}style="display:none;"{/if} onclick="mymovie_add('{$result['imdb_id']}', this);return false;" class="rndbtn btn btn-mini btn-info" href="#">Add To My Movies</a>
 				{/if}
-				<a {if $userimdbs[$result['imdb_id']] == ""}style="display:none;"{/if} onclick="mymovie_del('{$result['imdb_id']}', this);return false;" href="#" class="rndbtn btn btn-mini btn-danger">Remove From My Movies</a>
+				<a {if $userimdbs[$result['imdb_id']] eq ""}style="display:none;"{/if} onclick="mymovie_del('{$result['imdb_id']}', this);return false;" href="#" class="rndbtn btn btn-mini btn-danger">Remove From My Movies</a>
 			</td>
 		</tr>
 		{/if}
