@@ -15,7 +15,7 @@
 			<select class="input input-small" id="category" name="t">
 				<option class="grouping" value="1000"></option>
 				{foreach $catlist as $ct}
-					<option {if $ct.ideq$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+					<option {if $ct.id eq $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 			<input class="btn btn-success" type="submit" value="Go" />

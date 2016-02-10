@@ -17,14 +17,14 @@
 			<select class="input span1" id="rating" name="rating">
 				<option class="grouping" value=""></option>
 				{foreach $ratings as $rate}
-					<option {if $ratingeq$rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
+					<option {if $rating eq $rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
 				{/foreach}
 			</select>
 			<i class="fa fa-inbox fa-midt"></i>
 			<select class="input input-small" id="genre" name="genre">
 				<option class="grouping" value=""></option>
 				{foreach $genres as $gen}
-					<option {if $geneq$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
+					<option {if $gen eq $genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
 				{/foreach}
 			</select>
 
@@ -32,7 +32,7 @@
 			<select class="input input-small" id="year" name="year">
 				<option class="grouping" value=""></option>
 				{foreach $years as $yr}
-					<option {if $yreq$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
+					<option {if $yr eq $year}selected="selected"{/if} value="{$yr}">{$yr}</option>
 				{/foreach}
 			</select>
 
@@ -40,7 +40,7 @@
 			<select class="input input-small" id="category" name="t">
 				<option class="grouping" value="2000"></option>
 				{foreach $catlist as $ct}
-					<option {if $ct.ideq$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+					<option {if $ct.id eq $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 

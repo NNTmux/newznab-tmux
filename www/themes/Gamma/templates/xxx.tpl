@@ -14,14 +14,14 @@
 			<select class="input input-medium" id="genre" name="genre">
 				<option class="grouping" value=""></option>
 				{foreach $genres as $gen}
-					<option {if $geneq$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
+					<option {if $gen eq $genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
 				{/foreach}
 			</select>
 			<i class="fa fa-flag fa-midt"></i>
 			<select class="input input-medium" id="category" name="category">
 				<option class="grouping" value=""></option>
 				{foreach from=$catlist item=cat}
-					<option {if $cat.ideq$category}selected="selected"{/if} value="{$cat.id}">{$cat.title}</option>
+					<option {if $cat.id eq $category}selected="selected"{/if} value="{$cat.id}">{$cat.title}</option>
 				{/foreach}
 			</select>
 			<input class="btn btn-success" type="submit" value="Go"/>

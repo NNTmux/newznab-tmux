@@ -1,7 +1,7 @@
 <div class="span8">
 <ul class="inline">
 	<li><h2>Profile for {$user.username|escape:"htmlall"}</h2></li>
-	{if $user.ideq$userdata.id}
+	{if $user.id eq $userdata.id}
 		<li style="vertical-align:text-bottom;"><a href="{$smarty.const.WWW_TOP}/profileedit" class="btn btn-small btn-warning">Edit</a></li>
 	{/if}
 </ul>
@@ -10,7 +10,7 @@
 		<th width="30%">Username:</th>
 		<td width="70%">{$user.username|escape:"htmlall"}</td>
 	</tr>
-	{if $user.ideq$userdata.id || $userdata.roleeq2}
+	{if $user.id eq $userdata.id || $userdata.roleeq2}
 	<tr>
 		<th title="Not public">Email:</th>
 		<td>{$user.email}</td>
@@ -34,13 +34,13 @@
 			<td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}<br/>{/if}<a href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes" class="btn btn-mini btn-info">Add/Edit</a></td>
 		</tr>
 	{/if}
-	{if $user.ideq$userdata.id || $userdata.roleeq2}
+	{if $user.id eq $userdata.id || $userdata.roleeq2}
 		<tr>
 			<th title="Not public">Site Api/Rss Key:</th>
 			<td><a href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$user.id}&amp;r={$user.rsstoken}">{$user.rsstoken}</a></td>
 		</tr>
 	{/if}
-	{if $user.ideq$userdata.id || $userdata.roleeq2}
+	{if $user.id eq $userdata.id || $userdata.roleeq2}
 		<tr>
 			<th>API Hits Today:</th>
 			<td><span id="uatd">{$apirequests.num}</span> {if $userdata.roleeq2 && $apirequests.num > 0}&nbsp;&nbsp;&nbsp;<a onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;" class="btn btn-mini btn-info" href="#">Reset</a>{/if}</td>
@@ -54,7 +54,7 @@
 		<th>Grabs Total:</th>
 		<td>{$user.grabs}</td>
 	</tr>
-	{if ($user.ideq$userdata.id || $userdata.roleeq2) && $site->registerstatuseq1}
+	{if ($user.id eq $userdata.id || $userdata.roleeq2) && $site->registerstatuseq1}
 	<tr>
 		<th title="Not public">Invites</th>
 		<td>{$user.invites} </td>
@@ -99,13 +99,13 @@
 			{if $user.xxxview eq "1"}View xxx covers{else}View standard xxx category{/if}<br/>
 		</td>
 	</tr>
-	{if $user.ideq$userdata.id || $userdata.roleeq2}
+	{if $user.id eq $userdata.id || $userdata.roleeq2}
 		<tr>
 			<th title="Not public">Excluded Categories:</th>
 			<td>{$exccats|replace:",":"<br/>"}</td>
 		</tr>
 	{/if}
-	{if $site->sabintegrationtype eq 2 && $user.ideq$userdata.id}
+	{if $site->sabintegrationtype eq 2 && $user.id eq $userdata.id}
 		<tr>
 			<th>SABnzbd Integration:</th>
 			<td>
@@ -117,7 +117,7 @@
 			</td>
 		</tr>
 	{/if}
-	{if $user.ideq$userdata.id}
+	{if $user.id eq $userdata.id}
 			<tr>
 				<th>My TV Shows:</th>
 				<td><a href="{$smarty.const.WWW_TOP}/myshows" class="btn btn-mini btn-info">Manage my shows</a></td>

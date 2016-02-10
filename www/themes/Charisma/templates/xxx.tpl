@@ -27,7 +27,7 @@
 			<select id="genre" name="genre" class="form-control">
 				<option class="grouping" value="" selected>Genre</option>
 				{foreach $genres as $gen}
-					<option {if $geneq$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
+					<option {if $gen eq $genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
 				{/foreach}
 			</select>
 		</div>
@@ -36,7 +36,7 @@
 			<select id="category" name="t" class="form-control">
 				<option class="grouping" value="" selected>Category</option>
 				{foreach $catlist as $ct}
-					<option {if $ct.ideq$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+					<option {if $ct.id eq $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 		</div>

@@ -27,7 +27,7 @@
 			<select id="year" name="year" class="form-control">
 				<option class="grouping" value="" selected>Year</option>
 				{foreach $years as $yr}
-					<option {if $yreq$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
+					<option {if $yr eq $year}selected="selected"{/if} value="{$yr}">{$yr}</option>
 				{/foreach}
 			</select>
 		</div>

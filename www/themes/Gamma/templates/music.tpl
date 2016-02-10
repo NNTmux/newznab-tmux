@@ -19,14 +19,14 @@
 			<select class="input input-small" id="year" name="year">
 				<option class="grouping" value=""></option>
 				{foreach $years as $yr}
-					<option {if $yreq$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
+					<option {if $yr eq $year}selected="selected"{/if} value="{$yr}">{$yr}</option>
 				{/foreach}
 			</select>
 		<i class="fa fa-flag fa-midt"></i>
 			<select class="input input-small" id="category" name="t">
 			<option class="grouping" value="3000"></option>
 				{foreach $catlist as $ct}
-					<option {if $ct.ideq$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+					<option {if $ct.id eq $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 				{/foreach}
 			</select>
 		<input class="btn btn-success" type="submit" value="Go" />

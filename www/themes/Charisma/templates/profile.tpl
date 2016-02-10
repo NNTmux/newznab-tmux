@@ -129,7 +129,7 @@
 															{/if}
 															</tbody>
 														</table>
-														{if ($user.ideq$userdata.id || $isadmin) && $site->registerstatuseq1}
+														{if ($user.id eq $userdata.id || $isadmin) && $site->registerstatuseq1}
 															<table class="data table table-condensed table-striped table-responsive table-hover">
 																<tbody>
 																<tr class="bg-aqua-active">
