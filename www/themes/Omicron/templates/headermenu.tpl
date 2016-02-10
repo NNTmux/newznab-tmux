@@ -1,6 +1,6 @@
 <div id="menucontainer">
 	<div class="collapse navbar-collapse nav navbar-nav top-menu">
-		{if $loggedin eq true}
+		{if $loggedin eq "true"}
 			{foreach $parentcatlist as $parentcat}
 				{if $parentcat.id eq {getCategoryValue('TV_ROOT')}}
 					<li class="nav-parent">

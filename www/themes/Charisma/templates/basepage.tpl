@@ -6,8 +6,8 @@
 		/* <![CDATA[ */
 		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
 		var SERVERROOT = "{/literal}{$serverroot}{literal}";
-		var UID = "{/literal}{if $loggedin eq true}{$userdata.id}{else}{/if}{literal}";
-		var RSSTOKEN = "{/literal}{if $loggedin eq true}{$userdata.rsstoken}{else}{/if}{literal}";
+		var UID = "{/literal}{if $loggedin eq "true"}{$userdata.id}{else}{/if}{literal}";
+		var RSSTOKEN = "{/literal}{if $loggedin eq "true"}{$userdata.rsstoken}{else}{/if}{literal}";
 		/* ]]> */
 	</script>
 	{/literal}
@@ -63,7 +63,7 @@
 						/></a>
 			{$header_menu}
 			<!-- user dropdown starts -->
-			{if $loggedin eq true}
+			{if $loggedin eq "true"}
 			<div class="btn-group pull-right">
 				<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 					<i class="fa fa-user"></i><span class="hidden-sm hidden-xs"><span
@@ -102,7 +102,7 @@
 						</div>
 						<ul class="nav nav-pills nav-stacked main-menu">
 							<!-- search form -->
-							{if $loggedin eq true}
+							{if $loggedin eq "true"}
 							<form id="headsearch_form" action="{$smarty.const.WWW_TOP}/search/" method="get">
 								<input id="headsearch" name="search" value="{if $header_menu_search eq ""}Search...{else}{$header_menu_search|escape:"htmlall"}{/if}" class="form-control" type="text" tabindex="1$" />
 								<div class="row" style="padding-top:3px;">
@@ -155,7 +155,7 @@
 									<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
 													class="fa fa-envelope-o"></i><span> Contact</span> <span
 													class="fa arrow"></span></a></li>
-									{if $loggedin eq true}
+									{if $loggedin eq "true"}
 									<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a></li>

@@ -6,8 +6,8 @@
 		/* <![CDATA[ */
 		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
 		var SERVERROOT = "{/literal}{$serverroot}{literal}";
-		var UID = "{/literal}{if $loggedin eq true}{$userdata.id}{else}{/if}{literal}";
-		var RSSTOKEN = "{/literal}{if $loggedin eq true}{$userdata.rsstoken}{else}{/if}{literal}";
+		var UID = "{/literal}{if $loggedin eq "true"}{$userdata.id}{else}{/if}{literal}";
+		var RSSTOKEN = "{/literal}{if $loggedin eq "true"}{$userdata.rsstoken}{else}{/if}{literal}";
 		/* ]]> */
 	</script>
 	{/literal}
@@ -91,7 +91,7 @@
 							<!-- Menu Toggle Button -->
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<!-- The user image in the navbar-->
-								{if $loggedin eq true}
+								{if $loggedin == "true"}
 								<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png"
 									 class="user-image" alt="User Image"/>
 								<!-- hidden-xs hides the username on small devices so only the image appears. -->
@@ -155,7 +155,7 @@
 			<!-- sidebar: style can be found in sidebar.less -->
 			<section class="sidebar">
 				<!-- Sidebar user panel -->
-				{if $loggedin eq true}
+				{if $loggedin == "true"}
 				<div class="user-panel">
 					<div class="pull-left image">
 						<img src="{$smarty.const.WWW_THEMES}/shared/images/user-loggedin.png" class="img-circle"
@@ -194,7 +194,7 @@
 					<!-- Optionally, you can add icons to the links -->
 					<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
 									class="fa arrow"></span></a></li>
-					{if $loggedin eq true}
+					{if $loggedin == "true"}
 					<li class="treeview">
 						<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
 						<ul class="treeview-menu">
@@ -225,7 +225,7 @@
 							<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
 											class="fa fa-envelope-o"></i><span> Contact</span> <span
 											class="fa arrow"></span></a></li>
-							{if $loggedin eq true}
+							{if $loggedin == "true"}
 							<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a></li>

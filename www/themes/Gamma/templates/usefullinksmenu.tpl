@@ -1,5 +1,5 @@
 <li class="nav-header">Useful links</li>
-	{if $loggedin eq true}
+	{if $loggedin eq "true"}
 	<li><a title="{$site->title} Rss Feeds" href="{$smarty.const.WWW_TOP}/rss">Rss Feeds</a></li>
 	<li><a title="{$site->title} Api" href="{$smarty.const.WWW_TOP}/apihelp">Api</a></li>
 	{/if}
