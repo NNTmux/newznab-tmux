@@ -509,7 +509,7 @@ class Categorize extends Category
 					if ($this->isPhone()) {
 						break;
 					}
-					$this->tmpCat = Category::PC_MOBILEOTHER;
+					$this->tmpCat = Category::PC_PHONE_OTHER;
 					break;
 				case $this->categorizeForeign && $group === 'dk.binaer.tv':
 					$this->tmpCat = Category::TV_FOREIGN;
@@ -808,13 +808,13 @@ class Categorize extends Category
 	{
 		switch (true) {
 			case preg_match('/[^a-z0-9](IPHONE|ITOUCH|IPAD)[-._ ]/i', $this->releaseName):
-				$this->tmpCat = Category::PC_MOBILEIOS;
+				$this->tmpCat = Category::PC_PHONE_IOS;
 				break;
 			case preg_match('/[-._ ]?(ANDROID)[-._ ]/i', $this->releaseName):
-				$this->tmpCat = Category::PC_MOBILEANDROID;
+				$this->tmpCat = Category::PC_PHONE_ANDROID;
 				break;
 			case preg_match('/[^a-z0-9](symbian|xscale|wm5|wm6)[-._ ]/i', $this->releaseName):
-				$this->tmpCat = Category::PC_MOBILEOTHER;
+				$this->tmpCat = Category::PC_PHONE_OTHER;
 				break;
 			default:
 				return false;

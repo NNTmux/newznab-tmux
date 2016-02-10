@@ -46,10 +46,10 @@ class Category
 	const PC_0DAY = '4010';
 	const PC_ISO = '4020';
 	const PC_MAC = '4030';
-	const PC_MOBILEOTHER = '4040';
+	const PC_PHONE_OTHER = '4040';
 	const PC_GAMES = '4050';
-	const PC_MOBILEIOS = '4060';
-	const PC_MOBILEANDROID = '4070';
+	const PC_PHONE_IOS = '4060';
+	const PC_PHONE_ANDROID = '4070';
 	const TV_WEBDL = '5010';
 	const TV_FOREIGN = '5020';
 	const TV_SD = '5030';
@@ -93,7 +93,7 @@ class Category
 			self::GAME_OTHER,
 			self::MOVIE_OTHER,
 			self::MUSIC_OTHER,
-			self::PC_MOBILEOTHER,
+			self::PC_PHONE_OTHER,
 			self::TV_OTHER,
 			self::OTHER_HASHED,
 			self::XXX_OTHER,
@@ -165,7 +165,7 @@ class Category
 				self::GAME_OTHER,
 				self::MOVIE_OTHER,
 				self::MUSIC_OTHER,
-				self::PC_MOBILEOTHER,
+				self::PC_PHONE_OTHER,
 				self::TV_OTHER,
 				self::OTHER_HASHED,
 				self::XXX_OTHER,

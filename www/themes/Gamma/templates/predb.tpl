@@ -132,7 +132,7 @@
 												{* Phone-Other *}
 												{if in_array($result.category, array('Apps: Phone', 'PDA'))}
 													<a class="title" title="View category Phone Other"
-													   href="{$smarty.const.WWW_TOP}/browse?t={getCategoryValue('PC_MOBILEOTHER')}">Phone
+													   href="{$smarty.const.WWW_TOP}/browse?t={getCategoryValue('PC_PHONE_OTHER')}">Phone
 														Other</a>
 												{/if}
 												{* Games *}

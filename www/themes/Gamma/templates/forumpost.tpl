@@ -15,7 +15,7 @@
 				{if $result.isadmin == 1}</strong>{/if}
 				<br/>
 				on <span title="{$result.createddate}">{$result.createddate|date_format}</span> <div class="hint">({$result.createddate|timeago})</div>
-				{if $userdata.roleeq2}
+				{if $userdata.role == 2}
 				<br/>
 				<div>
 					<a class="rndbtn confirm_action btn btn-mini btn-danger" href="{$smarty.const.WWW_TOP}/admin/forum-delete.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}" title="Delete Post">Delete</a>

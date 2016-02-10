@@ -241,11 +241,11 @@ class ReleaseRegex
 				//override
 				if ($regcatid == Category::PC_0DAY) {
 					if ($cat->isPhone($matches['name']))
-						$regcatid = Category::PC_MOBILEANDROID;
+						$regcatid = Category::PC_PHONE_ANDROID;
 					if ($cat->isPhone($matches['name']))
-						$regcatid = Category::PC_MOBILEIOS;
+						$regcatid = Category::PC_PHONE_IOS;
 					if ($cat->isPhone($matches['name']))
-						$regcatid = Category::PC_MOBILEOTHER;
+						$regcatid = Category::PC_PHONE_OTHER;
 					if ($cat->isIso($matches['name']))
 						$regcatid = Category::PC_ISO;
 					if ($cat->isMac($matches['name']))
