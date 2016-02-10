@@ -1,4 +1,5 @@
 2016-02-10 DariusIII
+	Upd: Switch to category constants part1
 	Upd: Remove CAT_ from category names, change parent categories names to root
 2016-02-03 DariusIII
 	Chg: Move fonts and css not related to bootstrap to css and fonts folders in shared respectively

@@ -3,15 +3,23 @@
 
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
+use newznab\Category;
 use newznab\db\Settings;
 use newznab\Console;
 
 
 
+$category = new Category();
 $pdo = new Settings();
 $console = new Console(['Echo' => true, 'Settings' => $pdo]);
 
-$res = $pdo->queryDirect(sprintf("SELECT searchname, id FROM releases WHERE consoleinfoid IS NULL AND categoryid BETWEEN 1000 AND 1999 ORDER BY id DESC" ));
+$res = $pdo->queryDirect(
+	sprintf(
+		"SELECT searchname, id FROM releases WHERE consoleinfoid IS NULL AND categoryid
+				BETWEEN %s AND %s ORDER BY id DESC",
+		Category::GAME_ROOT,
+		Category::GAME_OTHER
+	));
 if ($res instanceof \Traversable) {
 	echo $pdo->log->header("Updating console info for " . number_format($res->rowCount()) . " releases.");
 

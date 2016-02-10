@@ -9,6 +9,10 @@ use newznab\db\Settings;
 class Category
 {
 
+	/**
+	 * Category constants.
+	 * Do NOT use the values, as they may change, always use the constant - that's what it's for.
+	 */
 	const OTHER_MISC = '0010';
 	const OTHER_HASHED = '0020';
 	const GAME_NDS = '1010';
