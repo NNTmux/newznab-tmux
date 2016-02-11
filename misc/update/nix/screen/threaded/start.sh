@@ -50,9 +50,9 @@ do
 	then
 		LASTOPTIMIZE=`date +%s`
 		echo "Cleaning DB..."
-		$PHP ${TEST_PATH}/Release/fixReleaseNames.php 1 true all yes
-		$PHP ${TEST_PATH}/Release/fixReleaseNames.php 3 true other yes
-		$PHP ${TEST_PATH}/Release/fixReleaseNames.php 5 true other yes
+		$PHP ${TEST_PATH}/Releases/fixReleaseNames.php 1 true all yes
+		$PHP ${TEST_PATH}/Releases/fixReleaseNames.php 3 true other yes
+		$PHP ${TEST_PATH}/Releases/fixReleaseNames.php 5 true other yes
 	fi
 
 	cd ${NNTMUX_PATH}

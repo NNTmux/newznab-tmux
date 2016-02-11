@@ -18,7 +18,7 @@ do
 	cd ${NNTMUX_PATH}
 	$PHP $NNTMUX_PATH/update_releases.php 1 false
 	cd ${TEST_PATH}
-	$PHP ${TEST_PATH}/Release/removeCrapReleases.php true 1
+	$PHP ${TEST_PATH}/Releases/removeCrapReleases.php true 1
 
 	echo "waiting ${NNTMUX_SLEEP_TIME} seconds..."
 	sleep ${NNTMUX_SLEEP_TIME}
