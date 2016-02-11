@@ -1,3 +1,5 @@
+2016-02-11 DariusIII
+	Upd: Add screen sequential and threaded scripts
 2016-02-10 DariusIII
 	Upd: Switch foreach loops from smarty2 to smarty3 syntax
 	Chg: Switch templates from category numbers to category constants usage
