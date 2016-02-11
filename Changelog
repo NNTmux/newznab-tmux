@@ -1,3 +1,5 @@
+2016-02-11 DariusIII
+	Upd: Add screen sequential and threaded scripts
 2016-02-10 DariusIII
 	Upd: Templates use category constants, changed foreach loop syntax to smarty 3
 	Upd: Switch to category constants part1
