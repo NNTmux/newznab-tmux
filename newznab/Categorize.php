@@ -212,7 +212,7 @@ class Categorize extends Category
 						case $this->isBook():
 							break;
 						default:
-							$this->tmpCat = Category::BOOKS_OTHER;
+							$this->tmpCat = Category::BOOKS_UNKNOWN;
 							break;
 					}
 					break;
@@ -1330,7 +1330,7 @@ class Categorize extends Category
 	public function isBookOther()
 	{
 		if (preg_match('/"\d\d-\d\d-20\d\d\./i', $this->releaseName)) {
-			$this->tmpCat = Category::BOOKS_OTHER;
+			$this->tmpCat = Category::BOOKS_UNKNOWN;
 			return true;
 		}
 		return false;
