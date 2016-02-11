@@ -78,7 +78,7 @@
 									<a href="{$smarty.const.WWW_TOP}api?t=getnfo&amp;id={$release.guid}&amp;raw=1&amp;i={$uid}&amp;r={$rsstoken}">{$release.searchname}
 										.nfo</a></li>
 							{/if}
-							{if isset($release.parentCategoryid) && $release.parentCategoryid == 2000}
+							{if isset($release.parentCategoryid) && $release.parentCategoryid == {getCategoryValue('MOVIE_ROOT')}}
 								{if $release.imdbid != ""}
 									<li>Imdb Info:
 										<ul>
