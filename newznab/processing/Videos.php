@@ -1,160 +1,328 @@
 <?php
-namespace newznab;
+/**
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program (see LICENSE.txt in the base directory.  If
+ * not, see:
+ *
+ * @link      <http://www.gnu.org/licenses/>.
+ * @author    niel
+ * @copyright 2015 nZEDb
+ */
+namespace newznab\processing;
 
 use newznab\db\Settings;
-use newznab\Category;
+
 
 /**
- * Class Videos -- functions for site interaction
+ * Parent class for TV/Film and any similar classes to inherit from.
  *
- * @package newznab
+ * @package newznab\processing
  */
-Class Videos
+abstract class Videos
 {
+	// Video Type Identifiers
+	const TYPE_TV		= 0; // Type of video is a TV Programme/Show
+	const TYPE_FILM		= 1; // Type of video is a Film/Movie
+	const TYPE_ANIME	= 2; // Type of video is a Anime
+
 	/**
-	 * @param array $options
+	 * @var \newznab\db\Settings
 	 */
-	public function __construct(array $options = []) {
+	public $pdo;
+
+	/**
+	 * @var bool
+	 */
+	public $echooutput;
+
+	/**
+	 * @var array	sites	The sites that we have an ID columns for in our video table.
+	 */
+	private $sites = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvmaze', 'tvrage'];
+
+	/**
+	 * @var array Temp Array of cached failed lookups
+	 */
+	public $titleCache;
+
+	public function __construct(array $options = [])
+	{
 		$defaults = [
-			'Echo'         => false,
-			'Logger'       => null,
-			'Settings'     => null,
+			'Echo'     => false,
+			'Settings' => null,
 		];
 		$options += $defaults;
+
+		// Sets the default timezone for this script (and its children).
+		//date_default_timezone_set('UTC'); TODO: Make this a DTO instead and use as needed
+
+		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->catWhere = "r.categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER;
+		$this->titleCache = [];
 	}
 
 	/**
-	 * Get info from tables for the provided ID.
+	 * Main processing director function for scrapers
+	 * Calls work query function and initiates processing
 	 *
-	 * @param $id
-	 *
-	 * @return array
+	 * @param      $groupID
+	 * @param      $guidChar
+	 * @param      $process
+	 * @param bool $local
 	 */
-	public function getByVideoID($id)
-	{
-		return $this->pdo->queryOneRow(
-			sprintf("
-					SELECT v.*, tvi.summary, tvi.publisher, tvi.image
-					FROM videos v
-					INNER JOIN tv_info tvi ON v.id = tvi.videos_id
-					WHERE id = %d",
-				$id
-			)
-		);
-	}
+	abstract protected function processSite($groupID, $guidChar, $process, $local = false);
 
 	/**
-	 * Retrieves a range of all shows for the show-edit admin list
+	 * Get video info from a Video ID and column.
 	 *
-	 * @param        $start
-	 * @param        $num
-	 * @param string $showname
+	 * @param string  $siteColumn
+	 * @param integer $videoID
 	 *
-	 * @return array
+	 * @return array|false    False if invalid site, or ID not found; Site id value otherwise.
 	 */
-	public function getRange($start, $num, $showname = "")
+	protected function getSiteIDFromVideoID($siteColumn, $videoID)
 	{
-		if ($start === false) {
-			$limit = "";
-		} else {
-			$limit = "LIMIT " . $num . " OFFSET " . $start;
+		if (in_array($siteColumn, $this->sites)) {
+			$result = $this->pdo->queryOneRow("SELECT $siteColumn FROM videos WHERE id = $videoID");
+
+			return isset($result[$siteColumn]) ? $result[$siteColumn] : false;
 		}
 
-		$rsql = '';
-		if ($showname != "") {
-			$rsql .= sprintf("AND v.title LIKE %s ", $this->pdo->escapeString("%" . $showname . "%"));
-		}
-
-		return $this->pdo->query(
-			sprintf("
-						SELECT v.*,
-							tvi.summary, tvi.publisher, tvi.image
-						FROM videos v
-						INNER JOIN tv_info tvi ON v.id = tvi.videos_id
-						WHERE 1=1 %s
-						ORDER BY v.id ASC %s",
-				$rsql,
-				$limit
-			)
-		);
+		return false;
 	}
 
 	/**
-	 * Returns a count of all shows -- usually used by pager
+	 * Get TV show local timezone from a Video ID
 	 *
-	 * @param string $showname
+	 * @param integer $videoID
 	 *
-	 * @return mixed
+	 * @return string Empty string if no query return or tz style timezone
 	 */
-	public function getCount($showname = "")
+	protected function getLocalZoneFromVideoID($videoID)
 	{
-		$rsql = '';
-		if ($showname != "") {
-			$rsql .= sprintf("AND v.title LIKE %s ", $this->pdo->escapeString("%" . $showname . "%"));
+		$result = $this->pdo->queryOneRow("SELECT localzone FROM tv_info WHERE videos_id = $videoID");
+
+		return (isset($result['localzone']) ? $result['localzone'] : '');
+	}
+
+
+	/**
+	 * Get video info from a Site ID and column.
+	 *
+	 * @param string	$siteColumn
+	 * @param integer	$siteID
+	 *
+	 * @return int|false	False if invalid site, or ID not found; video.id value otherwise.
+	 */
+	protected function getVideoIDFromSiteID($siteColumn, $siteID)
+	{
+		if (in_array($siteColumn, $this->sites)) {
+			$result = $this->pdo->queryOneRow("SELECT id FROM videos WHERE $siteColumn = $siteID");
+
+			return isset($result['id']) ? (int)$result['id'] : false;
 		}
-		$res = $this->pdo->queryOneRow(
-			sprintf("
-						SELECT COUNT(v.id) AS num
-						FROM videos v
-						INNER JOIN tv_info tvi ON v.id = tvi.videos_id
-						WHERE 1=1 %s",
-				$rsql
-			)
-		);
-		return $res["num"];
+		return false;
 	}
 
 	/**
-	 * Retrieves and returns a list of shows with eligible releases
+	 * Attempt a local lookup via the title first by exact match and then by like.
+	 * Returns a false for no match or the Video ID of the match.
 	 *
-	 * @param        $uid
-	 * @param string $letter
-	 * @param string $showname
+	 * @param        $title
+	 * @param        $type
+	 * @param int    $source
 	 *
-	 * @return array
+	 * @return false|int
 	 */
-	public function getSeriesList($uid, $letter = "", $showname = "")
+	public function getByTitle($title, $type, $source = 0)
 	{
-		$rsql = '';
-		if ($letter != "") {
-			if ($letter == '0-9') {
-				$letter = '[0-9]';
+		// Check if we already have an entry for this show.
+		$res = $this->getTitleExact($title, $type, $source);
+		if (isset($res['id'])) {
+			return $res['id'];
+		}
+
+		$title2 = str_replace(' and ', ' & ', $title);
+		if ($title != $title2) {
+			$res = $this->getTitleExact($title2, $type, $source);
+			if (isset($res['id'])) {
+				return $res['id'];
 			}
-
-			$rsql .= sprintf("AND v.title REGEXP %s", $this->pdo->escapeString('^' . $letter));
+			$pieces = explode(' ', $title2);
+			$title2 = '%';
+			foreach ($pieces as $piece) {
+				$title2 .= str_replace(["'", "!"], "", $piece) . '%';
+			}
+			$res = $this->getTitleLoose($title2, $type, $source);
+			if (isset($res['id'])) {
+				return $res['id'];
+			}
 		}
-		$tsql = '';
-		if ($showname != '') {
-			$tsql .= sprintf("AND v.title LIKE %s", $this->pdo->escapeString("%" . $showname . "%"));
+
+		// Some words are spelled correctly 2 ways
+		// example theatre and theater
+		$title2 = str_replace('er', 're', $title);
+		if ($title != $title2) {
+			$res = $this->getTitleExact($title2, $type, $source);
+			if (isset($res['id'])) {
+				return $res['id'];
+			}
+			$pieces = explode(' ', $title2);
+			$title2 = '%';
+			foreach ($pieces as $piece) {
+				$title2 .= str_replace(["'", "!"], "", $piece) . '%';
+			}
+			$res = $this->getTitleLoose($title2, $type, $source);
+			if (isset($res['id'])) {
+				return $res['id'];
+			}
 		}
 
-		$qry = 	sprintf("
-			SELECT v.* FROM
-				(SELECT v.*,
-					tve.firstaired AS prevdate, tve.title AS previnfo,
-					tvi.publisher,
-					us.id AS userseriesid
-				FROM videos v
-				INNER JOIN tv_info tvi ON v.id = tvi.videos_id
-				INNER JOIN tv_episodes tve ON v.id = tve.videos_id
-				LEFT OUTER JOIN userseries us ON v.id = us.videos_id AND us.userid = %d
-				WHERE 1=1
-				AND tve.firstaired <= NOW()
-				%s %s
-				ORDER BY tve.firstaired DESC) v
-			STRAIGHT_JOIN releases r ON r.videos_id = v.id
-			WHERE %s
-			GROUP BY v.id
-			ORDER BY v.title ASC",
-			$uid,
-			$rsql,
-			$tsql,
-			$this->catWhere
-		);
+		// If there was not an exact title match, look for title with missing chars
+		// example release name :Zorro 1990, tvrage name Zorro (1990)
+		// Only search if the title contains more than one word to prevent incorrect matches
+		$pieces = explode(' ', $title);
+		if (count($pieces) > 1) {
+			$title2 = '%';
+			foreach ($pieces as $piece) {
+				$title2 .= str_replace(["'", "!"], "", $piece) . '%';
+			}
+			$res = $this->getTitleLoose($title2, $type, $source);
+			if (isset($res['id'])) {
+				return $res['id'];
+			}
+		}
+		return false;
+	}
 
-		$sql = $this->pdo->query($qry);
-		return $sql;
+	/**
+	 * Supplementary function for getByTitle that queries for exact match
+	 *
+	 * @param        $title
+	 * @param        $type
+	 * @param int    $source
+	 *
+	 * @return array|false
+	 */
+	public function getTitleExact($title, $type, $source = 0)
+	{
+		$return = false;
+		if (!empty($title)) {
+			$return = $this->pdo->queryOneRow(
+				sprintf("
+					SELECT v.id
+					FROM videos v
+					LEFT JOIN videos_aliases va ON v.id = va.videos_id
+					WHERE (v.title = %1\$s OR va.title = %1\$s)
+					AND v.type = %2\$d %3\$s",
+					$this->pdo->escapeString($title),
+					$type,
+					($source > 0 ? 'AND v.source = ' . $source : '')
+				)
+			);
+		}
+		return $return;
+	}
+
+	/**
+	 * Supplementary function for getByTitle that queries for a like match
+	 *
+	 * @param        $title
+	 * @param        $type
+	 * @param int    $source
+	 *
+	 * @return array|false
+	 */
+	public function getTitleLoose($title, $type, $source = 0)
+	{
+		$return = false;
+
+		if (!empty($title)) {
+			$return = $this->pdo->queryOneRow(
+				sprintf("
+					SELECT v.id
+					FROM videos v
+					LEFT JOIN videos_aliases va ON v.id = va.videos_id
+					WHERE (v.title %1\$s
+					OR va.title %1\$s)
+					AND type = %2\$d %3\$s",
+					$this->pdo->likeString(rtrim($title, '%'), false, false),
+					$type,
+					($source > 0 ? 'AND v.source = ' . $source : '')
+				)
+			);
+		}
+		return $return;
+	}
+
+	/**
+	 * Inserts aliases for videos
+	 *
+	 * @param       $videoId
+	 * @param array $aliases
+	 */
+	public function addAliases($videoId, array $aliases = [])
+	{
+		if (!empty($aliases) && $videoId > 0) {
+			foreach ($aliases AS $key => $title) {
+				// Check for tvmaze style aka
+				if (is_array($title) && !empty($title['name'])) {
+					$title = $title['name'];
+				}
+				// Check if we have the AKA already
+				$check = $this->getAliases(0, $title);
+
+				if ($check === false) {
+					$this->pdo->queryInsert(
+						sprintf('
+							INSERT IGNORE INTO videos_aliases
+							(videos_id, title)
+							VALUES (%d, %s)',
+							$videoId,
+							$this->pdo->escapeString($title)
+						)
+					);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Retrieves all aliases for given VideoID or VideoID for a given alias
+	 *
+	 * @param int    $videoId
+	 * @param string $alias
+	 *
+	 * @return \PDOStatement|false
+	 */
+	public function getAliases($videoId = 0, $alias = '')
+	{
+		$return = false;
+		$sql = '';
+
+		if ($videoId > 0) {
+			$sql = 'videos_id = ' . $videoId;
+		} else if ($alias !== '') {
+			$sql = 'title = ' . $this->pdo->escapeString($alias);
+		}
+
+		if ($sql !== '') {
+			$return = $this->pdo->query('
+				SELECT *
+				FROM videos_aliases
+				WHERE ' . $sql, true, NN_CACHE_EXPIRY_MEDIUM
+			);
+		}
+		return (empty($return) ? false : $return);
 	}
 }
