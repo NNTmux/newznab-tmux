@@ -1,5 +1,7 @@
 <?php
-use libs\Tmdb\TMDB;
+
+use newznab\Category;
+use libs\Tmdb\TmdbAPI;
 use newznab\UserMovies;
 use newznab\Movie;
 
@@ -15,8 +17,8 @@ if (isset($_REQUEST['del'])) {
 } else if (isset($_REQUEST['add'])) {
 	// Derive cats from user preferences.
 	$cats = [];
-	$cats[] = '2030';
-	$cats[] = '2040';
+	$cats[] = Category::MOVIE_SD;
+	$cats[] = Category::MOVIE_HD;
 
 	$m = new Movie(['Settings' => $page->settings]);
 	$mi = $m->getMovieInfo($_REQUEST['add']);
@@ -30,7 +32,7 @@ if (isset($_REQUEST['del'])) {
 		$page->show404();
 	}
 
-	$tmdb = new TMDB($page->settings->getSetting('tmdbkey'), $page->settings->getSetting('imdblanguage'));
+	$tmdb = new TmdbAPI($page->settings->getSetting('tmdbkey'), $page->settings->getSetting('imdblanguage'));
 	$m = new Movie(['Settings' => $page->settings, 'TMDb' => $tmdb]);
 
 	if (is_numeric($_REQUEST['id'])) {

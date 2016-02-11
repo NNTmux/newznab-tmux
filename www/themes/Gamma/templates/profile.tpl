@@ -43,7 +43,7 @@
 	{if $user.id == $userdata.id || $userdata.role == 2}
 		<tr>
 			<th>API Hits Today:</th>
-			<td><span id="uatd">{$apirequests.num}</span> {if $userdata.role == 2 && $apirequests.num > 0}&nbsp;&nbsp;&nbsp;<a onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;" class="btn btn-mini btn-info" href="#">Reset</a>{/if}</td>
+			<td><span id="uatd">{$apirequests}</span> {if $userdata.role == 2 && $apirequests > 0}&nbsp;&nbsp;&nbsp;<a onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;" class="btn btn-mini btn-info" href="#">Reset</a>{/if}</td>
 		</tr>
 		<tr>
 			<th>Grabs Today:</th>
