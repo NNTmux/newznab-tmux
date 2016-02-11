@@ -54,6 +54,11 @@ class XXX
 	protected $cookie;
 
 	/**
+	 * @var array|bool|int|string
+	 */
+	public $catWhere;
+
+	/**
 	 * @param array $options Echo to cli / Class instances.
 	 */
 	public function __construct(array $options = [])
