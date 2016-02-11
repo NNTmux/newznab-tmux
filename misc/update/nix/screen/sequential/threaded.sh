@@ -26,7 +26,7 @@ fi
 export niceness=10
 export START_PATH="${NNTMUX_ROOT}"
 export NNTMUX_PATH="${NNTMUX_ROOT}/misc/update"
-export TEST_PATH="${NNTMUX_ROOT}/misc/testing/Release"
+export TEST_PATH="${NNTMUX_ROOT}/misc/testing/Releases"
 export DEV_PATH="${NNTMUX_ROOT}/misc/testing/Dev"
 export DB_PATH="${NNTMUX_ROOT}/misc/testing/DB"
 export THREADED_PATH="${NNTMUX_ROOT}/misc/update/python"
