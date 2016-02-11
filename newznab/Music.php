@@ -796,11 +796,26 @@ class Music
 	public function getGenres($activeOnly = false)
 	{
 		if ($activeOnly) {
-			return $this->pdo->query("SELECT musicgenre.* FROM musicgenre INNER JOIN (SELECT DISTINCT musicgenreid FROM musicinfo) x ON x.musicgenreID = musicgenre.id ORDER BY title");
+			return $this->pdo->query("
+				SELECT ge.*
+				FROM genres ge
+				INNER JOIN
+				(
+					SELECT DISTINCT musicgenreid
+					FROM musicinfo
+				) x ON x.genreid = ge.id
+				WHERE ge.type = " . Category::MUSIC_ROOT . "
+				ORDER BY title"
+			);
 		} else {
-			return $this->pdo->query("SELECT * FROM musicgenre ORDER BY title");
+			return $this->pdo->query("
+				SELECT * FROM genres
+				WHERE type = " . Category::MUSIC_ROOT . "
+				ORDER BY title"
+			);
 		}
 	}
+
 
 	/**
 	 * @param $nodeId
