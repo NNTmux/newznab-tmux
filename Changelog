@@ -1,3 +1,5 @@
+2016-02-13 DariusIII
+	Upd: Use $category for constants
 2016-02-11 DariusIII
 	Fix: Fix filelist view in themes
 	Upd: Add screen sequential and threaded scripts

@@ -25,7 +25,7 @@
 			{/foreach}
 		</select>
 		<select class="form-control" style="width: 150px;" id="category" name="t">
-			<option class="grouping" value="{getCategoryValue('MOVIE_ROOT')}">Category...</option>
+			<option class="grouping" value="{$category::MOVIE_ROOT}">Category...</option>
 			{foreach $catlist as $ct}
 				<option {if $ct.id == $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 			{/foreach}
@@ -67,7 +67,7 @@
 			{/foreach}
 		</select>
 		<select class="form-control" style="width: 150px;" id="category" name="t">
-			<option class="grouping" value="{getCategoryValue('MOVIE_ROOT')}">Category...</option>
+			<option class="grouping" value="{$category::MOVIE_ROOT}">Category...</option>
 			{foreach $catlist as $ct}
 				<option {if $ct.id == $category}selected="selected"{/if}
 						value="{$ct.id}">{$ct.title}</option>
@@ -105,7 +105,7 @@
 			{/foreach}
 		</select>
 		<select class="form-control" style="width: 150px;" id="category" name="t">
-			<option class="grouping" value="{getCategoryValue('MUSIC_ROOT')}">Category...</option>
+			<option class="grouping" value="{$category::MUSIC_ROOT}">Category...</option>
 			{foreach $catlist as $ct}
 				<option {if $ct.id == $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 			{/foreach}
@@ -126,7 +126,7 @@
 			{/foreach}
 		</select>
 		<select class="form-control" style="width: 150px;" id="category" name="t">
-			<option class="grouping" value="{getCategoryValue('GAME_ROOT')}">Category...</option>
+			<option class="grouping" value="{$category::GAME_ROOT}">Category...</option>
 			{foreach $catlist as $ct}
 				<option {if $ct.id == $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 			{/foreach}
@@ -172,7 +172,7 @@
 			{/foreach}
 		</select>
 		<select class="form-control" style="width: auto;" id="category" name="t">
-			<option class="grouping" value="{getCategoryValue('GAME_ROOT')}">Category...</option>
+			<option class="grouping" value="{$category::GAME_ROOT}">Category...</option>
 			{foreach $catlist as $ct}
 				<option {if $ct.id == $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 			{/foreach}
@@ -241,7 +241,7 @@
 			{/foreach}
 		</select>
 		<select class="form-control" style="width: auto;" id="category" name="t">
-			<option class="grouping" value="{getCategoryValue('MOVIE_ROOT')}">Category...</option>
+			<option class="grouping" value="{$category::MOVIE_ROOT}">Category...</option>
 			{foreach $catlist as $ct}
 				<option {if $ct.id == $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 			{/foreach}
@@ -283,7 +283,7 @@
 			{/foreach}
 		</select>
 		<select class="form-control" style="width: auto;" id="category" name="t">
-			<option class="grouping" value="{getCategoryValue('MOVIE_ROOT')}">Category...</option>
+			<option class="grouping" value="{$category::MOVIE_ROOT}">Category...</option>
 			{foreach $catlist as $ct}
 				<option {if $ct.id == $category}selected="selected"{/if}
 						value="{$ct.id}">{$ct.title}</option>
@@ -312,7 +312,7 @@
 			{/foreach}
 		</select>
 		<select class="form-control" style="width: auto;" id="category" name="t">
-			<option class="grouping" value="{getCategoryValue('MUSIC_ROOT')}">Category...</option>
+			<option class="grouping" value="{$category::MUSIC_ROOT}">Category...</option>
 			{foreach $catlist as $ct}
 				<option {if $ct.id == $category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 			{/foreach}
