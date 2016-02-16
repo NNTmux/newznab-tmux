@@ -404,7 +404,7 @@ class Category
 	 */
 	public function getForSelect($blnIncludeNoneSelected = true)
 	{
-		$categories = $this->get();
+		$categories = $this->getCategories();
 		$temp_array = [];
 
 		if ($blnIncludeNoneSelected) {
@@ -418,27 +418,28 @@ class Category
 	}
 
 	/**
-	 * Get a list of categories.
+	 * Get array of categories in DB.
 	 *
 	 * @param bool  $activeonly
 	 * @param array $excludedcats
 	 *
 	 * @return array
 	 */
-	public function get($activeonly = false, $excludedcats = [])
+	public function getCategories($activeonly = false, $excludedcats = [])
 	{
-		$exccatlist = "";
-		if (count($excludedcats) > 0)
-			$exccatlist = " and c.id not in (" . implode(",", $excludedcats) . ")";
-
-		$act = "";
-		if ($activeonly)
-			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
-
-		if ($exccatlist != "")
-			$act .= $exccatlist;
-
-		return $this->pdo->query("select c.id, concat(cp.title, ' > ',c.title) as title, cp.id as parentid, c.status from category c inner join category cp on cp.id = c.parentid " . $act . " ORDER BY c.id", true);
+		return $this->pdo->query(
+			"SELECT c.id, CONCAT(cp.title, ' > ',c.title) AS title, cp.id AS parentid, c.status, c.minsize
+			FROM category c
+			INNER JOIN category cp ON cp.id = c.parentid " .
+			($activeonly ?
+				sprintf(
+					" WHERE c.status = %d %s ",
+					Category::STATUS_ACTIVE,
+					(count($excludedcats) > 0 ? " AND c.id NOT IN (" . implode(",", $excludedcats) . ")" : '')
+				) : ''
+			) .
+			" ORDER BY c.id"
+		);
 	}
 
 }
