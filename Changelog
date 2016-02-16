@@ -1,3 +1,5 @@
+2016-02-16 DariusIII
+	Chg: Move showApiError function to Utility class, adjust pages that use it.
 2016-02-13 DariusIII
 	Upd: Use $category for constants
 2016-02-11 DariusIII
