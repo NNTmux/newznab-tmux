@@ -68,9 +68,9 @@
 		<li class="dropdown">
 			<a id="drop4" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 			<ul class="dropdown-menu" role="menu" aria-labelledby="drop4">
+				{if $userdata.gameview == "1"}
 				<li><a href="{$smarty.const.WWW_TOP}/games">{$parentcat.title}</a></li>
 				<li class="divider"></li>
-				{if $userdata.gameview == "1"}
 				{foreach $parentcat.subcatlist as $subcat}
 					{if $subcat.id != {$category::PC_GAMES}}
 						<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
