@@ -11,7 +11,7 @@
 					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/console?t={$subcat.id}">{$subcat.title}</a></li>
 				{/foreach}
 			{else}
-				<li><a href="{$smarty.const.WWW_TOP}/browse">{$parentcat.title}</a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::GAME_ROOT}">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
 					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
@@ -31,7 +31,7 @@
 				<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/movies?t={$subcat.id}">{$subcat.title}</a></li>
 			{/foreach}
 			{else}
-				<li><a href="{$smarty.const.WWW_TOP}/browse">{$parentcat.title}</a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::MOVIE_ROOT}">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
 					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
@@ -55,7 +55,7 @@
 			{/if}
 			{/foreach}
 			{else}
-				<li><a href="{$smarty.const.WWW_TOP}/music">{$parentcat.title}</a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::MUSIC_ROOT}">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
 						<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
@@ -137,7 +137,7 @@
 			   class="dropdown-toggle"
 			   data-toggle="dropdown"
 			   data-hover="dropdown"
-			   href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}
+			   href="{$smarty.const.WWW_TOP}/books">{$parentcat.title}
 				<b class="caret"></b></a>
 			<ul class="dropdown-menu" role="menu" aria-labelledby="drop{$parentcat.id}">
 				{if $userdata.bookview == "1"}
