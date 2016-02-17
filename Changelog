@@ -1,4 +1,5 @@
 2016-02-17 DariusIII
+	Fix: Broken nzbs on download
 	Fix: Fix missing $category in site edit page
 2016-02-16 DariusIII
 	Chg: Rename Categories class get function to getCategories
