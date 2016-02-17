@@ -1,4 +1,5 @@
 2016-02-17 DariusIII
+	Fix: Fix Gamma theme headermenu when coverview is disabled
 	Chg: Change position of browse groups from headermenu to left side menu
 2016-02-16 DariusIII
 	Chg: Rename Categories class get function to getCategories
