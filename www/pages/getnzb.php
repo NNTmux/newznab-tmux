@@ -3,9 +3,9 @@
 use newznab\Releases;
 use newznab\NZB;
 use newznab\utility\Utility;
-$uid = 0;
-
 use newznab\db\Settings;
+
+$uid = 0;
 
 // Page is accessible only by the rss token, or logged in users.
 if ($page->users->isLoggedIn()) {
@@ -34,6 +34,18 @@ if ($page->users->isLoggedIn()) {
 	if ($page->users->isDisabled($res['username'])) {
 		Utility::showApiError(101);
 	}
+}
+
+// Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
+if (isset($_GET['id'])) {
+	$_GET['id'] = str_ireplace('.nzb','', $_GET['id']);
+}
+//
+// A hash of the users ip to record against the download
+//
+$hosthash = "";
+if ($page->settings->getSetting('storeuserips') == 1) {
+	$hosthash = $page->users->getHostHash($_SERVER["REMOTE_ADDR"], $page->settings->getSetting('siteseed'));
 }
 
 // Check download limit on user role.
@@ -85,7 +97,7 @@ if (!file_exists($nzbPath)) {
 $relData = $rel->getByGuid($_GET["id"]);
 if ($relData) {
 	$rel->updateGrab($_GET["id"]);
-	$page->users->addDownloadRequest($uid, $guid);
+	$page->users->addDownloadRequest($uid, $relData['id']);
 	$page->users->incrementGrabs($uid);
 	if (isset($_GET["del"]) && $_GET["del"] == 1) {
 		$page->users->delCartByUserAndRelease($_GET["id"], $uid);
