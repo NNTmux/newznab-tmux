@@ -159,7 +159,7 @@
 							{if $userdata.xxxview == "1"}
 								<li><a href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}</a></li>
 							{elseif $userdata.xxxview != "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::TV_ROOT}">{$parentcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::XXX_ROOT}">{$parentcat.title}</a></li>
 							{/if}
 							<hr>
 							{if $userdata.xxxview == "1"}
@@ -186,11 +186,9 @@
 					<i class="fa fa-bolt"></i> Other<i class="fa fa-angle-down"></i>
 				</a>
 				<ul class="dropdown-menu">
+					<li><a href="/browse?t={$category::OTHER_ROOT}">Other</a></li>
 					<li><a href="/browse?t={$category::OTHER_MISC}">Misc</a></li>
 					<li><a href="/browse?t={$category::OTHER_HASHED}">Hashed</a></li>
-					<hr>
-					<li><a href="/browse">All</a></li>
-					<li><a href="/browsegroup">Browse Groups</a></li>
 				</ul>
 			</li>
 			<!-- End If logged in -->
