@@ -1,6 +1,6 @@
 <ul class="nav" role="navigation">
 	{foreach $parentcatlist as $parentcat}
-	{if $parentcat.id == {$category::GAME_ROOT}}
+	{if $parentcat.id == {$catClass::GAME_ROOT}}
 		<li class="dropdown">
 		<a id="drop1" role="button" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
@@ -11,7 +11,7 @@
 					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/console?t={$subcat.id}">{$subcat.title}</a></li>
 				{/foreach}
 			{else}
-				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::GAME_ROOT}">{$parentcat.title}</a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::GAME_ROOT}">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
 					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
@@ -20,7 +20,7 @@
 		</ul>
 		</li>
 	{/if}
-	{if $parentcat.id == {$category::MOVIE_ROOT}}
+	{if $parentcat.id == {$catClass::MOVIE_ROOT}}
 	<li class="dropdown">
 		<a id="drop2" role="button" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
@@ -31,7 +31,7 @@
 				<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/movies?t={$subcat.id}">{$subcat.title}</a></li>
 			{/foreach}
 			{else}
-				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::MOVIE_ROOT}">{$parentcat.title}</a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::MOVIE_ROOT}">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
 					<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
@@ -40,7 +40,7 @@
 		</ul>
 	</li>
 	{/if}
-	{if $parentcat.id == {$category::MUSIC_ROOT}}
+	{if $parentcat.id == {$catClass::MUSIC_ROOT}}
 	<li class="dropdown">
 		<a id="drop3" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
@@ -48,14 +48,14 @@
 			<li><a href="{$smarty.const.WWW_TOP}/music">{$parentcat.title}</a></li>
 			<li class="divider"></li>
 			{foreach $parentcat.subcatlist as $subcat}
-			{if $subcat.id == {$category::MUSIC_AUDIOBOOK}}
+			{if $subcat.id == {$catClass::MUSIC_AUDIOBOOK}}
 			<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
 			{else}
 			<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/music?t={$subcat.id}">{$subcat.title}</a></li>
 			{/if}
 			{/foreach}
 			{else}
-				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::MUSIC_ROOT}">{$parentcat.title}</a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::MUSIC_ROOT}">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
 						<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
@@ -64,7 +64,7 @@
 		</ul>
 	</li>
 	{/if}
-	{if $parentcat.id == {$category::PC_ROOT}}
+	{if $parentcat.id == {$catClass::PC_ROOT}}
 		<li class="dropdown">
 			<a id="drop4" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 			<ul class="dropdown-menu" role="menu" aria-labelledby="drop4">
@@ -72,14 +72,14 @@
 				<li><a href="{$smarty.const.WWW_TOP}/games">{$parentcat.title}</a></li>
 				<li class="divider"></li>
 				{foreach $parentcat.subcatlist as $subcat}
-					{if $subcat.id != {$category::PC_GAMES}}
+					{if $subcat.id != {$catClass::PC_GAMES}}
 						<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
 					{else}
 						<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/games?t={$subcat.id}">{$subcat.title}</a></li>
 					{/if}
 				{/foreach}
 				{else}
-					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::PC_ROOT}">{$parentcat.title}</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::PC_ROOT}">{$parentcat.title}</a></li>
 					{foreach $parentcat.subcatlist as $subcat}
 							<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
 					{/foreach}
@@ -87,7 +87,7 @@
 			</ul>
 		</li>
 	{/if}
-	{if $parentcat.id == {$category::TV_ROOT}}
+	{if $parentcat.id == {$catClass::TV_ROOT}}
 	<li class="dropdown">
 		<a id="drop{$parentcat.id}" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop{$parentcat.id}">
@@ -99,7 +99,7 @@
 		</ul>
 	</li>
 	{/if}
-	{if $parentcat.id == {$category::XXX_ROOT}}
+	{if $parentcat.id == {$catClass::XXX_ROOT}}
 		<li class="dropdown">
 			<a id="cat3"
 			   class="dropdown-toggle"
@@ -111,12 +111,12 @@
 				{if $userdata.xxxview == "1"}
 					<li><a href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}</a></li>
 				{else}
-					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::XXX_ROOT}">{$parentcat.title}</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::XXX_ROOT}">{$parentcat.title}</a></li>
 				{/if}
 				<hr>
 				{if $userdata.xxxview == "1"}
 					{foreach $parentcat.subcatlist as $subcat}
-						{if $subcat.id == {$category::XXX_DVD} OR $subcat.id == {$category::XXX_WMV} OR $subcat.id == {$category::XXX_XVID} OR $subcat.id == {$category::XXX_X264}}
+						{if $subcat.id == {$catClass::XXX_DVD} OR $subcat.id == {$catClass::XXX_WMV} OR $subcat.id == {$catClass::XXX_XVID} OR $subcat.id == {$catClass::XXX_X264}}
 							<li><a href="{$smarty.const.WWW_TOP}/xxx?t={$subcat.id}">{$subcat.title}</a>
 							</li>
 						{else}
@@ -132,7 +132,7 @@
 			</ul>
 		</li>
 	{/if}
-	{if $parentcat.id == {$category::BOOKS_ROOT}}
+	{if $parentcat.id == {$catClass::BOOKS_ROOT}}
 		<li class="dropdown">
 			<a id="drop{$parentcat.id}"
 			   class="dropdown-toggle"
@@ -144,7 +144,7 @@
 				{if $userdata.bookview == "1"}
 					<li><a href="{$smarty.const.WWW_TOP}/books">{$parentcat.title}</a></li>
 				{else}
-					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::BOOKS_ROOT}">{$parentcat.title}</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::BOOKS_ROOT}">{$parentcat.title}</a></li>
 				{/if}
 				<hr>
 				{foreach $parentcat.subcatlist as $subcat}
@@ -158,8 +158,8 @@
 		<a id="dropOther" class="dropdown-toggle" data-toggle="dropdown" href="#">Other <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="dropOther">
 			<hr>
-			<li><a href="/browse?t={$category::OTHER_MISC}">Misc</a></li>
-			<li><a href="/browse?t={$category::OTHER_HASHED}">Hashed</a></li>
+			<li><a href="/browse?t={$catClass::OTHER_MISC}">Misc</a></li>
+			<li><a href="/browse?t={$catClass::OTHER_HASHED}">Hashed</a></li>
 		</ul>
 	</li>
 </ul>
