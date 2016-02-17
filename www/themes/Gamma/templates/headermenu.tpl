@@ -79,6 +79,7 @@
 					{/if}
 				{/foreach}
 				{else}
+					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$category::PC_GAMES}">{$parentcat.title}</a></li>
 					{foreach $parentcat.subcatlist as $subcat}
 							<li><a title="Browse {$subcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a></li>
 					{/foreach}
