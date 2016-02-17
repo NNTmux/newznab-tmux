@@ -5,6 +5,7 @@ use newznab\Category;
 use newznab\db\Settings;
 use newznab\SABnzbd;
 
+$category = new Category();
 $page  = new AdminPage();
 $id    = 0;
 $error = '';
