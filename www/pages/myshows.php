@@ -45,7 +45,7 @@ switch ($action) {
 		}
 
 		if ($action == 'doadd') {
-			$category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] : array();
+			$category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
 			$us->addShow($page->users->currentUserId(), $videoId, $category);
 			if (isset($_REQUEST['from'])) {
 				header("Location:" . $_REQUEST['from']);
@@ -55,7 +55,7 @@ switch ($action) {
 		} else {
 			$cat = new Category(['Settings' => $page->settings]);
 			$tmpcats = $cat->getChildren(Category::TV_ROOT);
-			$categories = array();
+			$categories = [];
 			foreach ($tmpcats as $c) {
 				$categories[$c['id']] = $c['title'];
 			}
@@ -63,7 +63,7 @@ switch ($action) {
 			$page->smarty->assign('type', 'add');
 			$page->smarty->assign('cat_ids', array_keys($categories));
 			$page->smarty->assign('cat_names', $categories);
-			$page->smarty->assign('cat_selected', array());
+			$page->smarty->assign('cat_selected', []);
 			$page->smarty->assign('rid', $videoId);
 			$page->smarty->assign('show', $show);
 			if (isset($_REQUEST['from'])) {
@@ -82,7 +82,7 @@ switch ($action) {
 		}
 
 		if ($action == 'doedit') {
-			$category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] : array();
+			$category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
 			$us->updateShow($page->users->currentUserId(), $videoId, $category);
 			if (isset($_REQUEST['from'])) {
 				header("Location:" . WWW_TOP . $_REQUEST['from']);
@@ -93,7 +93,7 @@ switch ($action) {
 			$cat = new Category(['Settings' => $page->settings]);
 
 			$tmpcats = $cat->getChildren(Category::TV_ROOT);
-			$categories = array();
+			$categories = [];
 			foreach ($tmpcats as $c) {
 				$categories[$c['id']] = $c['title'];
 			}
@@ -127,7 +127,7 @@ switch ($action) {
 		$ordering = $releases->getBrowseOrdering();
 		$orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
 
-		$results = array();
+		$results = [];
 		$results = $releases->getShowsRange($shows, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata["categoryexclusions"]);
 
 		$page->smarty->assign('pagertotalitems', $browsecount);
@@ -161,17 +161,17 @@ switch ($action) {
 
 		$cat = new Category(['Settings' => $page->settings]);
 		$tmpcats = $cat->getChildren(Category::TV_ROOT);
-		$categories = array();
+		$categories = [];
 		foreach ($tmpcats as $c) {
 			$categories[$c['id']] = $c['title'];
 		}
 
 		$shows = $us->getShows($page->users->currentUserId());
-		$results = array();
+		$results = [];
 		foreach ($shows as $showk => $show) {
 			$showcats = explode('|', $show['categoryid']);
 			if (is_array($showcats) && sizeof($showcats) > 0) {
-				$catarr = array();
+				$catarr = [];
 				foreach ($showcats as $scat) {
 					if (!empty($scat)) {
 						$catarr[] = $categories[$scat];
