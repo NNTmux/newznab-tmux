@@ -1,3 +1,5 @@
+2016-02-18 DariusIII
+	Fix: Fix typo in link to myshows in Omicron template.
 2016-02-17 DariusIII
 	Chg: Rename category for smarty to catCLass to prevent conflicts
 	Upd: Update getCategoryExclusion and getCategoryExclusionNames functions.
