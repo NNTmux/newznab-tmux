@@ -428,7 +428,7 @@ class Category
 	public function getCategories($activeonly = false, $excludedcats = [])
 	{
 		return $this->pdo->query(
-			"SELECT c.id, CONCAT(cp.title, ' > ',c.title) AS title, cp.id AS parentid, c.status, c.minsize
+			"SELECT c.id, CONCAT(cp.title, ' > ',c.title) AS title, cp.id AS parentid, c.status
 			FROM category c
 			INNER JOIN category cp ON cp.id = c.parentid " .
 			($activeonly ?
