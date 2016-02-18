@@ -1,4 +1,5 @@
 2016-02-18 DariusIII
+	Upd: Update nntmux_fi_schema.sql
 	Fix: Fix typo in link to myshows in Omicron template.
 2016-02-17 DariusIII
 	Chg: Rename category for smarty to catCLass to prevent conflicts

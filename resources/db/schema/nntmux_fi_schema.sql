@@ -2540,15 +2540,14 @@ CREATE TABLE IF NOT EXISTS releases (
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1
   PARTITION BY RANGE (categoryid)(
-  PARTITION unused VALUES LESS THAN (1000),
+  PARTITION misc VALUES LESS THAN (1000),
   PARTITION console VALUES LESS THAN (2000),
   PARTITION movies VALUES LESS THAN (3000),
   PARTITION audio VALUES LESS THAN (4000),
   PARTITION pc VALUES LESS THAN (5000),
   PARTITION tv VALUES LESS THAN (6000),
   PARTITION xxx VALUES LESS THAN (7000),
-  PARTITION books VALUES LESS THAN (8000),
-  PARTITION misc VALUES LESS THAN (9000));
+  PARTITION books VALUES LESS THAN (8000));
 
 DROP TRIGGER IF EXISTS check_insert;
 DROP TRIGGER IF EXISTS check_update;
@@ -4068,7 +4067,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('spotnabsiteprvkey', '', '', '', 'spotnabsiteprvkey', ''),
 ('spotnabsitepubkey', '', '', '', 'spotnabsitepubkey', ''),
 ('spotnabuser', '', '', '', 'spotnabuser', ''),
-('sqlpatch', '237', '', '', 'sqlpatch', ''),
+('sqlpatch', '241', '', '', 'sqlpatch', ''),
 ('storeuserips', '0', '', '', 'storeuserips', ''),
 ('strapline', 'A great usenet indexer','', '', 'strapline', ''),
 ('style', 'Omicron', '', '', 'style', ''),
