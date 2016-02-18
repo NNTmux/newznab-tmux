@@ -1881,8 +1881,7 @@ CREATE TABLE IF NOT EXISTS releases (
   PARTITION pc VALUES LESS THAN (5000),
   PARTITION tv VALUES LESS THAN (6000),
   PARTITION xxx VALUES LESS THAN (7000),
-  PARTITION books VALUES LESS THAN (8000);
-  );
+  PARTITION books VALUES LESS THAN (8000));
 
 DROP TRIGGER IF EXISTS check_insert;
 DROP TRIGGER IF EXISTS check_update;
@@ -2218,7 +2217,7 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('spotnabsiteprvkey', '', '', '', 'spotnabsiteprvkey', ''),
 ('spotnabsitepubkey', '', '', '', 'spotnabsitepubkey', ''),
 ('spotnabuser', '', '', '', 'spotnabuser', ''),
-('sqlpatch', '224', '', '', 'sqlpatch', ''),
+('sqlpatch', '228', '', '', 'sqlpatch', ''),
 ('storeuserips', '0', '', '', 'storeuserips', ''),
 ('strapline', 'A great usenet indexer','', '', 'strapline', ''),
 ('style', 'omicron', '', '', 'style', ''),
