@@ -40,7 +40,7 @@ $sql = 	sprintf ('
 	INNER JOIN groups g ON r.groupid = g.id
 	WHERE r.nzbstatus = 1
 	AND (r.searchname = r.reqid OR r.isrequestid = 1)
-	AND r.prehashid = 0
+	AND r.preid = 0
 	AND r.isrenamed = 0
 	AND  g.name = %s
 	ORDER BY r.postdate DESC

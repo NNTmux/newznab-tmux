@@ -1,3 +1,5 @@
+2016-02-19 DariusIII
+	Fix: Fix missed references to prehashid in scripts (replaced them with proper preid)
 2016-02-18 DariusIII
 	Fix: Fix and update nntmux_fi_schema, fix patch numbers.
 2016-02-17 DariusIII
