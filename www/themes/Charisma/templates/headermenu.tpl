@@ -186,9 +186,9 @@
 					<i class="fa fa-bolt"></i> Other<i class="fa fa-angle-down"></i>
 				</a>
 				<ul class="dropdown-menu">
-					<li><a href="/browse?t={$catClass::OTHER_ROOT}">Other</a></li>
-					<li><a href="/browse?t={$catClass::OTHER_MISC}">Misc</a></li>
-					<li><a href="/browse?t={$catClass::OTHER_HASHED}">Hashed</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::OTHER_ROOT}">Other</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::OTHER_MISC}">Misc</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::OTHER_HASHED}">Hashed</a></li>
 				</ul>
 			</li>
 			<!-- End If logged in -->
