@@ -767,7 +767,7 @@ class Users
 	public function getCategoryExclusion($userID)
 	{
 		$ret = [];
-		$categories = $this->pdo->query(sprintf("SELECT categoryid FROM userexccat WHERE userid = %d", $userID));
+		$categories = $this->pdo->query(sprintf("SELECT categoryid FROM userexcat WHERE userid = %d", $userID));
 		foreach ($categories as $category) {
 			$ret[] = $category["categoryid"];
 		}

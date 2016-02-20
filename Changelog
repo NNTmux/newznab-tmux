@@ -1,3 +1,5 @@
+2016-02-20 DariusIII
+	Fix: Fix typo for userexcat table in Users.php
 2016-02-19 DariusIII
 	Fix: Fix missing smarty const from Charisma/Omicron headermenu.tpl
 2016-02-18 DariusIII
