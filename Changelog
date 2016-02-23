@@ -1,4 +1,5 @@
 2016-02-23 DariusIII
+	Add: Add ubuntu install guide when installer will be available
 	Chg: Update the removeWMV function on ReleaseRemover.
 	Chg: Remove unneccessary MYSQL_ATTR_INIT_COMMAND from PDO dsn options array. This was only
 		needed before PHP 5.3.6 as 'charset' was ignored.
