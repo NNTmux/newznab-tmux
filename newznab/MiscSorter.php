@@ -22,6 +22,7 @@ class MiscSorter
 	private $pdo;
 	private $category;
 	private $movie;
+	private $music;
 
 	/**
 	 * @var array|bool|string
@@ -52,6 +53,7 @@ class MiscSorter
 
 		$this->category = new Categorize(['Settings' => $this->pdo]);
 		$this->movie = new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
+		$this->music = new Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
 		$this->privkey = $this->pdo->getSetting('amazonprivkey');
 		$this->asstag = $this->pdo->getSetting('amazonassociatetag');

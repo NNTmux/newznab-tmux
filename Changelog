@@ -1,3 +1,5 @@
+2016-02-23 DariusIII
+	Fix: Add missing Music class to MiscSorter.
 2016-02-20 DariusIII
 	Fix: Fix typo for userexcat table in Users.php
 2016-02-19 DariusIII
