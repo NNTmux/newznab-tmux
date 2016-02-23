@@ -90,21 +90,21 @@
 														   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
 															<img src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfoid}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																 width="140" border="0"
-																 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
+																 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 														</a>
-														{if isset($resulturl) && $result.url != ""}<a
+														{if isset($result.url) && $result.url != ""}<a
 															class="label label-default" target="_blank"
 															href="{$site->dereferrer_link}{$result.url}"
 															name="amazon{$result.bookinfoid}" title="View amazon page">
 																Amazon</a>{/if}
-														{if isset($result.nfoid) && $result.nfoid > 0}<a
-															href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+														{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a
+															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															title="View Nfo" class="label label-default" rel="nfo">
 																NFO</a>{/if}
 														<a class="label label-default"
 														   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
 														   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-														{if $mfailed[$m@index] > 0}
+														{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0}
 														<span class="btn btn-hover btn-default btn-xs"><i class="fa fa-thumbs-o-down"></i><span
 																	class="badge"> {$mfailed[$m@index]}
 																Failed Download{if $mfailed[$m@index] > 1}s{/if}</span>
@@ -127,23 +127,23 @@
 																<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																	<br/>
-																	{if $result.review != ""}<span class="descinitial">{$result.review|escape:"htmlall"|nl2br|magicurl|truncate:350}</span>{if $result.review|strlen > 350}<a class="descmore" href="#">more...</a><span class="descfull">{$result.review|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}<br /><br />{/if}
-																	{if $result.publisher != ""}
+																	{if isset($result.review) && $result.review != ""}<span class="descinitial">{$result.review|escape:"htmlall"|nl2br|magicurl|truncate:350}</span>{if $result.review|strlen > 350}<a class="descmore" href="#">more...</a><span class="descfull">{$result.review|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}<br /><br />{/if}
+																	{if isset($result.publisher) && $result.publisher != ""}
 																		<b>Publisher:</b>
 																		{$result.publisher|escape:"htmlall"}
 																		<br/>
 																	{/if}
-																	{if $result.publishdate != ""}
+																	{if isset($result.publishdate) && $result.publishdate != ""}
 																		<b>Published:</b>
 																		{$result.publishdate|date_format}
 																		<br/>
 																	{/if}
-																	{if $result.pages != ""}
+																	{if isset($result.pages) && $result.pages != ""}
 																		<b>Pages:</b>
 																		{$result.pages}
 																		<br/>
 																	{/if}
-																	{if $result.isbn != ""}
+																	{if isset($result.isbn) && $result.isbn != ""}
 																		<b>ISBN:</b>
 																		{$result.isbn}
 																		<br/>

@@ -259,7 +259,7 @@
 			<!-- Default to the left -->
 			<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
 						href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is open source,
-			released under the GPLv2 license
+			released under the GPL license
 		</footer>
 		<!-- Control Sidebar -->
 		<aside class="control-sidebar control-sidebar-dark">
