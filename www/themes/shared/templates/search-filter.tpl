@@ -1,4 +1,4 @@
-{if $covergrp == "movies"}
+{if isset($covergrp) && $covergrp == "movies"}
 	<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 		<input class="form-control" style="width: 150px;" id="movietitle" type="text" name="title" value="{$title}"
 			   placeholder="Title">
@@ -33,7 +33,7 @@
 		<input class="btn btn-success" type="submit" value="Go">
 	</form>
 {/if}
-{if $covergrp == "xxx"}
+{if isset($covergrp) && $covergrp == "xxx"}
 	<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 		<input class="form-control"
 			   style="width: 150px;"
@@ -76,7 +76,7 @@
 		<input class="btn btn-success" type="submit" value="Go">
 	</form>
 {/if}
-{if $covergrp == "books"}
+{if isset($covergrp) && $covergrp == "books"}
 	<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 		<input class="form-control" style="width: 150px;" id="author" type="text" name="author" value="{$author}"
 			   placeholder="Author">
@@ -85,7 +85,7 @@
 		<input class="btn btn-success" type="submit" value="Go">
 	</form>
 {/if}
-{if $covergrp == "music"}
+{if isset($covergrp) && $covergrp == "music"}
 	<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 		<input class="form-control" style="width: 150px;" id="musicartist" type="text" name="artist" value="{$artist}"
 			   placeholder="Artist">
@@ -113,7 +113,7 @@
 		<input class="btn btn-success" type="submit" value="Go">
 	</form>
 {/if}
-{if $covergrp == "console"}
+{if isset($covergrp) && $covergrp == "console"}
 	<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 		<input class="form-control" style="width: 150px;" id="title" type="text" name="title" value="{$title}"
 			   placeholder="Title">
@@ -134,7 +134,7 @@
 		<input class="btn btn-success" type="submit" value="Go">
 	</form>
 {/if}
-{if $covergrp == "games"}
+{if isset($covergrp) && $covergrp == "games"}
 	<form class="form-inline" name="browseby" action="{$smarty.const.WWW_TOP}/search" method="get">
 		<input class="form-control" style="width: 150px;" id="title" type="text" name="title" value="{$title}"
 			   placeholder="Title">
