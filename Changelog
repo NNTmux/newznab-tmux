@@ -1,3 +1,8 @@
+2016-02-25 DariusIII
+	Chg: Replace custom filter code in templates with search-filter.tpl
+	Chg: Move rss, rssdesc and search-filter.tpl to shared folder
+	Fix: Fix Gamma theme rss.
+	Fix: Prevent undefined index userdata error on headermenu of all themes
 2016-02-23 DariusIII
 	Fix: Fix undefined index errors on book pages.
 	Add: Add LICENSE.txt.
