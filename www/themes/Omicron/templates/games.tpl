@@ -8,7 +8,7 @@
 	</div>
 </div>
 <div class="well well-sm">
-	{include file='search-filter.tpl'}put type="submit" class="btn btn-primary" value="Search!"/>
+	{include file='search-filter.tpl'}
 	</form>
 </div>
 <form id="nzb_multi_operations_form" action="get">
