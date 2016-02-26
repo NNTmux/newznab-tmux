@@ -34,8 +34,7 @@
 	<small>With Selected:</small>
 		<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download NZBs" />
 		<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Send to my Download Basket" />
-		{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
-		{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
+		{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 	{if $isadmin}
 	&nbsp;&nbsp;
 		<input type="button" class="nzb_multi_operations_edit btn btn-small btn-warning" value="Edit" />
@@ -74,7 +73,7 @@
 								title="Comments"></i></a>
 					<a href="#" class="icon_cart text-muted"><i
 								class="fa fa-shopping-basket" title="Send to my Download Basket"></i></a>
-					{if isset($sabintegrated)}
+					{if isset($sabintegrated) && $sabintegrated !=""}
 						<a href="#" class="icon_sab text-muted"><i class="fa fa-share"
 																   title="Send to my Queue"></i></a>
 					{/if}

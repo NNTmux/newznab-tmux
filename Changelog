@@ -1,3 +1,5 @@
+2016-02-26 DariusIII
+	Chg: Remove nzbgetintegrated check from templates, check for empty sabintegrated fields
 2016-02-25 DariusIII
 	Chg: Replace custom filter code in templates with search-filter.tpl
 	Chg: Move rss, rssdesc and search-filter.tpl to shared folder

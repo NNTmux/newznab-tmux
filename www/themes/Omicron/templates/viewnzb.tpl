@@ -233,7 +233,7 @@
 														   id="guid{$release.guid}"></i> Add to
 														Cart
 													</button>
-													{if isset($sabintegrated)}
+													{if isset($sabintegrated) && $sabintegrated !=""}
 														<button type="button"
 																class="btn btn-primary btn-sm btn-transparent sabsend">
 														<i class="icon_sab fa fa-arrow-right"

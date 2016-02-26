@@ -75,7 +75,7 @@
 											<i class="fa fa-cloud-download"></i></a>
 									</span>
 									<span class="btn btn-hover btn-default btn-sm icon_cart text-muted" title="Send to my Download Basket"><i class="fa fa-shopping-basket"></i></span>
-									{if isset($sabintegrated)}
+									{if isset($sabintegrated) && $sabintegrated !=""}
 										<span class="btn btn-hover btn-default btn-sm icon_sab text-muted" title="Send to my Queue"><i class="fa fa-share"></i></span>
 									{/if}
 								</div>
