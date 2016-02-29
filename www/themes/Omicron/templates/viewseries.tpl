@@ -77,7 +77,7 @@
 						   value="Download NZBs"/>
 					<input type="button" class="nzb_multi_operations_cart btn btn-sm btn-info"
 						   value="Send to my Download Basket"/>
-					{if isset($sabintegrated)}
+					{if isset($sabintegrated) && $sabintegrated !=""}
 						<input type="button" class="nzb_multi_operations_sab btn btn-sm btn-primary"
 							   value="Send to Queue"/>
 					{/if}
@@ -211,7 +211,7 @@
 															   href="#"
 															   title="Send to my Download Basket">
 															</a>
-															{if isset($sabintegrated)}
+															{if isset($sabintegrated) && $sabintegrated !=""}
 																<a class="fa fa-share icon_sab text-muted"
 																   href="#"
 																   title="Send to my Queue">

@@ -30,15 +30,10 @@
 									<input type="button"
 										   class="nzb_multi_operations_cart btn btn-sm btn-info"
 										   value="Send to my Download Basket"/>
-									{if isset($sabintegrated)}
+									{if isset($sabintegrated) && $sabintegrated !=""}
 										<input type="button"
 											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 											   value="Send to Queue"/>
-									{/if}
-									{if isset($nzbgetintegrated)}
-										<input type="button"
-											   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
-											   value="Send to NZBGet"/>
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"
@@ -179,7 +174,7 @@
 																<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
 																	  title="Send to my Download Basket"><i
 																			class="fa fa-shopping-basket"></i></span>
-																{if isset($sabintegrated)}
+																{if isset($sabintegrated) && $sabintegrated !=""}
 																	<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																		  title="Send to my Queue"><i
 																				class="fa fa-share"></i></span>
@@ -210,15 +205,10 @@
 									<input type="button"
 										   class="nzb_multi_operations_cart btn btn-sm btn-info"
 										   value="Send to my Download Basket"/>
-									{if isset($sabintegrated)}
+									{if isset($sabintegrated) && $sabintegrated !=""}
 										<input type="button"
 											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 											   value="Send to Queue"/>
-									{/if}
-									{if isset($nzbgetintegrated)}
-										<input type="button"
-											   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
-											   value="Send to NZBGet"/>
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"

@@ -66,7 +66,7 @@
 								   value="Download NZBs"/>
 							<input type="button" class="nntmux_multi_operations_cart btn btn-sm btn-info"
 								   value="Send to my Download Basket"/>
-							{if isset($sabintegrated)}
+							{if isset($sabintegrated) && $sabintegrated !=""}
 								<input type="button" class="nzb_multi_operations_sab btn btn-sm btn-primary"
 									   value="Send to Queue"/>
 							{/if}
@@ -177,7 +177,7 @@
 															class="icon icon_nzb fa fa-cloud-download text-muted"></i></a>
 												<a href="#" class="icon_cart text-muted"><i class="fa fa-shopping-basket"
 																							title="Send to my Download Basket"></i></a>
-												{if isset($sabintegrated)}
+												{if isset($sabintegrated) && $sabintegrated !=""}
 													<a href="#" class="icon icon_sab text-muted"
 													   title="Send to my Queue"><i
 																class="fa fa-share"></i></a>
@@ -205,15 +205,10 @@
 													<input type="button"
 														   class="nzb_multi_operations_cart btn btn-sm btn-info"
 														   value="Send to my Download Basket"/>
-													{if isset($sabintegrated)}
+													{if isset($sabintegrated) && $sabintegrated !=""}
 														<input type="button"
 															   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 															   value="Send to Queue"/>
-													{/if}
-													{if isset($nzbgetintegrated)}
-														<input type="button"
-															   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
-															   value="Send to NZBGet"/>
 													{/if}
 													{if isset($isadmin)}
 														<input type="button"

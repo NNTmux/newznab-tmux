@@ -18,13 +18,9 @@
 									   value="Download NZBs"/>
 								<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info"
 									   value="Send to my Download Basket"/>
-								{if $sabintegrated}
+								{if isset($sabintegrated) && $sabintegrated !=""}
 									<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary"
 										   value="Send to queue"/>
-								{/if}
-								{if isset($nzbgetintegrated)}
-									<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary"
-										   value="Send to NZBGet"/>
 								{/if}
 							</div>
 							View: <strong>Covers</strong> | <a
@@ -259,19 +255,11 @@
 													   title="Send to my Download Basket">
 													</a>
 												</li>
-												{if $sabintegrated}
+												{if isset($sabintegrated) && $sabintegrated !=""}
 													<li>
 														<a class="icon icon_sab fa fa-share"
 														   style="text-decoration: none; color: #008ab8;" href="#"
 														   title="Send to queue">
-														</a>
-													</li>
-												{/if}
-												{if isset($nzbgetintegrated)}
-													<li>
-														<a class="icon icon_nzb fa fa-cloud-downloadget" href="#"
-														   title="Send to NZBGet">
-															<img src="{$smarty.const.WWW_THEMES}/shared/images/icons/nzbgetup.png">
 														</a>
 													</li>
 												{/if}
@@ -312,14 +300,9 @@
 										   value="Download NZBs"/>
 									<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info"
 										   value="Send to my Download Basket"/>
-									{if $sabintegrated}
+									{if isset($sabintegrated) && $sabintegrated !=""}
 										<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary"
 											   value="Send to queue"/>
-									{/if}
-									{if isset($nzbgetintegrated)}
-										<input type="button"
-											   class="nzb_multi_operations_nzbget btn btn-small btn-primary"
-											   value="Send to NZBGet"/>
 									{/if}
 								</div>
 								&nbsp;&nbsp;&nbsp;&nbsp;<a title="Switch to List view"
