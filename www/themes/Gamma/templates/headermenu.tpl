@@ -3,7 +3,7 @@
 	{foreach $parentcatlist as $parentcat}
 	{if $parentcat.id == {$catClass::GAME_ROOT}}
 		<li class="dropdown">
-		<a id="drop1" role="button" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
+		<a id="drop1" role="button" class="dropdown-hover" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
 			{if $userdata.consoleview == "1"}
 				<li><a href="{$smarty.const.WWW_TOP}/console">{$parentcat.title}</a></li>
@@ -23,7 +23,7 @@
 	{/if}
 	{if $parentcat.id == {$catClass::MOVIE_ROOT}}
 	<li class="dropdown">
-		<a id="drop2" role="button" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
+		<a id="drop2" role="button" class="dropdown-hover" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
 			{if $userdata.movieview == "1"}
 				<li><a href="{$smarty.const.WWW_TOP}/movies">{$parentcat.title}</a></li>
@@ -43,7 +43,7 @@
 	{/if}
 	{if $parentcat.id == {$catClass::MUSIC_ROOT}}
 	<li class="dropdown">
-		<a id="drop3" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
+		<a id="drop3" class="dropdown-hover" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
 			{if $userdata.musicview == "1"}
 			<li><a href="{$smarty.const.WWW_TOP}/music">{$parentcat.title}</a></li>
@@ -67,7 +67,7 @@
 	{/if}
 	{if $parentcat.id == {$catClass::PC_ROOT}}
 		<li class="dropdown">
-			<a id="drop4" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
+			<a id="drop4" class="dropdown-hover" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 			<ul class="dropdown-menu" role="menu" aria-labelledby="drop4">
 				{if $userdata.gameview == "1"}
 				<li><a href="{$smarty.const.WWW_TOP}/games">{$parentcat.title}</a></li>
@@ -90,7 +90,7 @@
 	{/if}
 	{if $parentcat.id == {$catClass::TV_ROOT}}
 	<li class="dropdown">
-		<a id="drop{$parentcat.id}" class="dropdown-toggle" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
+		<a id="drop{$parentcat.id}" class="dropdown-hover" data-toggle="dropdown" href="#">{$parentcat.title} <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="drop{$parentcat.id}">
 			<li><a href="{$smarty.const.WWW_TOP}/browse?t={$parentcat.id}">{$parentcat.title}</a></li>
 			<li class="divider"></li>
@@ -103,7 +103,7 @@
 	{if $parentcat.id == {$catClass::XXX_ROOT}}
 		<li class="dropdown">
 			<a id="cat3"
-			   class="dropdown-toggle"
+			   class="dropdown-hover"
 			   data-toggle="dropdown"
 			   data-hover="dropdown"
 			   href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}
@@ -136,7 +136,7 @@
 	{if $parentcat.id == {$catClass::BOOKS_ROOT}}
 		<li class="dropdown">
 			<a id="drop{$parentcat.id}"
-			   class="dropdown-toggle"
+			   class="dropdown-hover"
 			   data-toggle="dropdown"
 			   data-hover="dropdown"
 			   href="{$smarty.const.WWW_TOP}/books">{$parentcat.title}
@@ -156,7 +156,7 @@
 	{/if}
 	{/foreach}
 	<li class="dropdown">
-		<a id="dropOther" class="dropdown-toggle" data-toggle="dropdown" href="#">Other <b class="caret"></b></a>
+		<a id="dropOther" class="dropdown-hover" data-toggle="dropdown" href="#">Other <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="dropOther">
 			<li><a href="/browse?t={$catClass::OTHER_ROOT}">Other</a></li>
 			<hr>

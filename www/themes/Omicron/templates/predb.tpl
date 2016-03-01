@@ -25,13 +25,13 @@
 							<div class="col-md-8">
 								<table class="data table table-condensed table-striped table-responsive table-hover">
 									<tr>
-										<th style="width: auto"> Date</th>
-										<th style="width: auto"> Title</th>
-										<th style="width: auto"> Category</th>
-										<th style="width: auto"> Source</th>
-										<th style="width: auto"> Reqid</th>
-										<th style="width: auto"> Size</th>
-										<th style="width: auto"> Files</th>
+										<th> Date</th>
+										<th> Title</th>
+										<th> Category</th>
+										<th> Source</th>
+										<th> Reqid</th>
+										<th> Size</th>
+										<th> Files</th>
 										<th></th>
 										<th></th>
 									</tr>
@@ -138,7 +138,7 @@
 												{* Games *}
 												{if in_array($result.category, array('GAMES', 'Games: PC', 'Games: Other'))}
 													<a class="title" title="View category PC Games"
-													   href="{$smarty.const.WWW_TOP}/browse?t={$catClass::PC_GAME}">PC
+													   href="{$smarty.const.WWW_TOP}/browse?t={$catClass::PC_GAMES}">PC
 														Games</a>
 												{/if}
 												{* TV *}

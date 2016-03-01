@@ -776,3 +776,16 @@ $(document).ready(function () {
     // Utilise delegate so we don't have to rebind for every qTip!
     $(document).delegate('.qtip.jgrowl', 'mouseover mouseout', timer);
 });
+
+$(document).ready(function(){
+    $(".dropdown").hover(
+        function() {
+            $('.dropdown-menu', this).stop( true, true ).slideDown("fast");
+            $(this).toggleClass('open');
+        },
+        function() {
+            $('.dropdown-menu', this).stop( true, true ).slideUp("fast");
+            $(this).toggleClass('open');
+        }
+    );
+});
