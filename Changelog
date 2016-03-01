@@ -1,3 +1,46 @@
+2016-02-29 DariusIII
+	Chg: Change occurences of form-search to form-inline in Charisma and Omicron templates
+2016-02-26 DariusIII
+	Chg: Remove nzbgetintegrated check from templates, check for empty sabintegrated fields
+2016-02-25 DariusIII
+	Chg: Replace custom filter code in templates with search-filter.tpl
+	Chg: Move rss, rssdesc and search-filter.tpl to shared folder
+	Fix: Fix Gamma theme rss.
+	Fix: Prevent undefined index userdata error on headermenu of all themes
+2016-02-23 DariusIII
+	Fix: Fix undefined index errors on book pages.
+	Add: Add LICENSE.txt.
+	Add: Add ubuntu install guide when installer will be available
+	Chg: Update the removeWMV function on ReleaseRemover.
+	Chg: Remove unneccessary MYSQL_ATTR_INIT_COMMAND from PDO dsn options array. This was only
+		needed before PHP 5.3.6 as 'charset' was ignored.
+	Fix: Add missing Music class to MiscSorter.
+2016-02-20 DariusIII
+	Fix: Fix typo for userexcat table in Users.php
+2016-02-19 DariusIII
+	Fix: Fix missed references to prehashid in scripts (replaced them with proper preid)
+2016-02-18 DariusIII
+	Fix: Fix and update nntmux_fi_schema, fix patch numbers.
+2016-02-17 DariusIII
+	Fix: Fix Gamma headermenu when coverview is not enabled
+	Fix: Broken nzbs on download
+	Fix: Fix missing $category in site edit page
+2016-02-16 DariusIII
+	Chg: Rename Categories class get function to getCategories
+	Fix: Prevent errors when pagertotalcount is not set
+	Chg: Move showApiError function to Utility class, adjust pages that use it.
+2016-02-13 DariusIII
+	Upd: Use $category for constants
+2016-02-11 DariusIII
+	Fix: Fix filelist view in themes
+	Upd: Add screen sequential and threaded scripts
+2016-02-10 DariusIII
+	Upd: Templates use category constants, changed foreach loop syntax to smarty 3
+	Upd: Switch to category constants part1
+	Upd: Remove CAT_ from category names, change parent categories names to root
+2016-02-03 DariusIII
+	Chg: Move fonts and css not related to bootstrap to css and fonts folders in shared respectively
+	Fix: Replace deprecated html tag <center> with proper CSS
 2016-02-01 DariusIII
 	Upd: Change name of CAT_BOOK_ to CAT_BOOKS_, change cat number for book/other from 7050 to 7999
 2016-01-28 DariusIII

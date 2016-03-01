@@ -1,4 +1,4 @@
-{if ($loggedin)=="true"}
+{if $loggedin == "true"}
 	{if $smarty.server.REQUEST_URI == "/"}
 		{foreach from=$content item=c}
 			<div class="header">

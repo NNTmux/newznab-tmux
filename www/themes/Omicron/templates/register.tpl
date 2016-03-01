@@ -16,7 +16,7 @@
     <!-- Bootstrap 3.3.6 -->
     <link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <!-- Font Awesome Icons -->
-    <link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="{$smarty.const.WWW_THEMES}/shared/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
     <!-- Theme style -->
     <link href="{$smarty.const.WWW_THEMES}/{$theme}/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
     <!-- iCheck -->
@@ -67,9 +67,9 @@
               <button type="submit" value="Register" class="btn btn-primary btn-block btn-flat">Register</button>
             </div><!-- /.col -->
             <hr>
-            <center>
+            <div style="text-align: center;">
             {$page->smarty->fetch('captcha.tpl')}
-            </center>
+            </div>
           </div>
 			<a href="{$serverroot}login" class="text-center">I already have a membership</a>
         </form>

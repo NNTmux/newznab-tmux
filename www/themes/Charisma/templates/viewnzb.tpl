@@ -233,7 +233,7 @@
 														   id="guid{$release.guid}"></i> Add to
 														Cart
 													</button>
-													{if isset($sabintegrated)}
+													{if isset($sabintegrated) && $sabintegrated !=""}
 														<button type="button"
 																class="btn btn-primary btn-sm btn-transparent sabsend">
 														<i class="icon_sab fa fa-arrow-right"
@@ -462,13 +462,13 @@
 																<tr>
 																	<th width="140">Grabs</th>
 																	<td>{$release.grabs}
-																		time{if $release.grabs==1}{else}s{/if}</td>
+																		time{if $release.grabs == 1}{else}s{/if}</td>
 																</tr>
 																{if $failed != NULL && $failed > 0}
 																<tr>
 																	<th width="140">Failed Download</th>
 																	<td>{$failed}
-																		time{if $failed==1}{else}s{/if}</td>
+																		time{if $failed == 1}{else}s{/if}</td>
 																</tr>
 																{/if}
 																<tr>
@@ -489,7 +489,7 @@
 																	<td>
 																		<a title="View file list"
 																		   href="{$smarty.const.WWW_TOP}/filelist/{$release.guid}">{$release.totalpart}
-																			file{if $release.totalpart==1}{else}s{/if}</a>
+																			file{if $release.totalpart == 1}{else}s{/if}</a>
 																	</td>
 																</tr>
 																<tr>
@@ -497,7 +497,7 @@
 																	</th>
 																	<td>
 																		<strong>Files:</strong><br/>
-																		{foreach from=$releasefiles item=rf}
+																		{foreach $releasefiles as $rf}
 																			<code>{$rf.name}</code>
 																			<br/>
 																			{if $rf.passworded != 1}
@@ -574,7 +574,7 @@
 										{if isset($similars) && $similars|@count > 1}
 							Similar:
 							<ul>
-							{foreach from=$similars item=similar}
+							{foreach $similars as $similar}
 											<li>
 												<a title="View similar NZB details"
 												   href="{$smarty.const.WWW_TOP}/details/{$similar.guid}/{$similar.searchname|escape:"htmlall"}">{$similar.searchname|escape:"htmlall"}</a>
@@ -595,7 +595,7 @@
 													<th width="80">User</th>
 													<th>Comment</th>
 												</tr>
-												{foreach from=$comments|@array_reverse:true item=comment}
+												{foreach $comments|@array_reverse:true as $comment}
 													<tr>
 														<td class="less" title="{$comment.createddate}">
 															{if !$privateprofiles || $isadmin || $ismod}
@@ -713,7 +713,7 @@
 														<td class="right">{$reVideo.videolibrary}</td>
 													</tr>
 												{/if}
-												{foreach from=$reAudio item=audio}
+												{foreach $reAudio as $audio}
 													<tr>
 														<td><strong>Audio {$audio.audioid}</strong></td>
 														<td>Format</td>

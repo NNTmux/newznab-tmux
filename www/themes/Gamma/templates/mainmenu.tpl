@@ -10,7 +10,7 @@
 	{if $menu.title == "Music releases"}<li class="nav-header">Music</li>{/if}
 	{if $menu.title == "Console"}<li class="nav-header">Misc</li>{/if}
 	<li>
-		<a {if $menu.newwindow =="1"}class="external" target="null"{/if} title="{$menu.tooltip}" href="{$menu.href|replace:"{$smarty.const.WWW_TOP}/":"/"}">{$menu.title}</a>
+		<a {if $menu.newwindow == "1"}class="external" target="null"{/if} title="{$menu.tooltip}" href="{$menu.href|replace:"{$smarty.const.WWW_TOP}/":"/"}">{$menu.title}</a>
 	</li>
 	{/if}
 	{/foreach}

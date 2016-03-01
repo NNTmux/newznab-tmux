@@ -22,6 +22,7 @@ namespace newznab\processing;
 
 use newznab\db\Settings;
 
+
 /**
  * Parent class for TV/Film and any similar classes to inherit from.
  *
@@ -57,8 +58,8 @@ abstract class Videos
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-				'Echo'     => false,
-				'Settings' => null,
+			'Echo'     => false,
+			'Settings' => null,
 		];
 		$options += $defaults;
 
@@ -218,16 +219,16 @@ abstract class Videos
 		$return = false;
 		if (!empty($title)) {
 			$return = $this->pdo->queryOneRow(
-					sprintf("
+				sprintf("
 					SELECT v.id
 					FROM videos v
 					LEFT JOIN videos_aliases va ON v.id = va.videos_id
 					WHERE (v.title = %1\$s OR va.title = %1\$s)
 					AND v.type = %2\$d %3\$s",
-							$this->pdo->escapeString($title),
-							$type,
-							($source > 0 ? 'AND v.source = ' . $source : '')
-					)
+					$this->pdo->escapeString($title),
+					$type,
+					($source > 0 ? 'AND v.source = ' . $source : '')
+				)
 			);
 		}
 		return $return;
@@ -248,17 +249,17 @@ abstract class Videos
 
 		if (!empty($title)) {
 			$return = $this->pdo->queryOneRow(
-					sprintf("
+				sprintf("
 					SELECT v.id
 					FROM videos v
 					LEFT JOIN videos_aliases va ON v.id = va.videos_id
 					WHERE (v.title %1\$s
 					OR va.title %1\$s)
 					AND type = %2\$d %3\$s",
-							$this->pdo->likeString(rtrim($title, '%'), false, false),
-							$type,
-							($source > 0 ? 'AND v.source = ' . $source : '')
-					)
+					$this->pdo->likeString(rtrim($title, '%'), false, false),
+					$type,
+					($source > 0 ? 'AND v.source = ' . $source : '')
+				)
 			);
 		}
 		return $return;
@@ -283,13 +284,13 @@ abstract class Videos
 
 				if ($check === false) {
 					$this->pdo->queryInsert(
-							sprintf('
+						sprintf('
 							INSERT IGNORE INTO videos_aliases
 							(videos_id, title)
 							VALUES (%d, %s)',
-									$videoId,
-									$this->pdo->escapeString($title)
-							)
+							$videoId,
+							$this->pdo->escapeString($title)
+						)
 					);
 				}
 			}

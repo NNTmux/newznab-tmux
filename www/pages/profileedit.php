@@ -161,7 +161,6 @@ $page->meta_description = "Edit User Profile for " . $data["username"];
 $page->smarty->assign('cp_url_selected', $data['cp_url']);
 $page->smarty->assign('cp_api_selected', $data['cp_api']);
 
-
 $page->smarty->assign('catlist', $category->getForSelect(false));
 
 $page->content = $page->smarty->fetch('profileedit.tpl');

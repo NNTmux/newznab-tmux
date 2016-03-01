@@ -1,5 +1,5 @@
 {if $results|@count > 0}
-	{foreach from=$results item=result}
+	{foreach $results as $result}
 		<div id="moviefull" style="min-height:340px;">
 			{if $result.cover == 1}<img class="shadow pic img-polaroid pull-right" style="margin-right:50px;" width="200px" alt="{$result.title|escape:"htmlall"} Logo" src="{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg" />{/if}
 			<h2 style="display:inline;">{$result.title|escape:"htmlall"}</h2>
@@ -34,8 +34,7 @@
 				<div class="btn-group">
 					<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download NZBs" />
 					<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Send to my Download Basket" />
-					{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
-					{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
+					{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 				</div>
 				<div class="btn-group pull-right">
 					<div class="input-append">
@@ -121,7 +120,7 @@
 			{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 			{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
 			{assign var="mcatname" value=","|explode:$result.grp_release_catname}
-			{foreach from=$msplits item=m}
+			{foreach $msplits as $m}
 				<tr class="{cycle values=",alt"} filter"data-name="{$mname[$m@index]|escape:"htmlall"|replace:".":" "|lower}" id="guid{$mguid[$m@index]}">
 					<td class="check"><input id="chk{$mguid[$m@index]|substr:0:7}" type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" /></td>
 					<td class="item">
@@ -155,16 +154,9 @@
 								<a  href="#" class="icon icon_cart fa fa-shopping-basket" style="text-decoration: none; color: #5c5c5c;" title="Send to my Download Basket">
 								</a>
 							</li>
-							{if $sabintegrated}
+							{if isset($sabintegrated) && $sabintegrated !=""}
 								<li>
 									<a class="icon icon_sab fa fa-share" style="text-decoration: none; color: #008ab8;"  href="#" title="Send to queue">
-									</a>
-								</li>
-							{/if}
-							{if isset($nzbgetintegrated)}
-								<li>
-									<a class="icon icon_nzb fa fa-cloud-downloadget" href="#" title="Send to NZBGet">
-										<img class="icon icon_nzb fa fa-cloud-downloadget" alt="Send to my NZBGet" src="{$smarty.const.WWW_THEMES}/shared/images/icons/nzbgetup.png">
 									</a>
 								</li>
 							{/if}
@@ -191,8 +183,7 @@
 					<div class="btn-group">
 						<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download NZBs" />
 						<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Send to my Download Basket" />
-						{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
-						{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
+						{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 					</div>
 					<div class="btn-group pull-right">
 						<div class="input-append">

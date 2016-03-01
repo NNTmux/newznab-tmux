@@ -8,7 +8,7 @@
 			<th>By</th>
 			<th>Message</th>
 		</tr>
-		{foreach from=$results item=result name=result}
+		{foreach $results as $result name=result}
 			<tr class="{cycle values=",alt"}">
 				<td width="15%;">
 					{if !$privateprofiles || $isadmin || $ismod}

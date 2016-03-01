@@ -24,10 +24,10 @@
 </h1>
 <div>
 	{if animePicture != ''}
-		<center>
+		<div style="text-align: center;">
 			<img class="shadow img img-polaroid" alt="{$animeTitle} Picture"
 				 src="{$smarty.const.WWW_TOP}/covers/anime/{$animeAnidbid}.jpg"/>
-		</center>
+		</div>
 		<br/>
 	{/if}
 	<p>
@@ -41,7 +41,7 @@
 		{if $animeRelated != ''}<br><i>Related Anime: {$animeRelated|escape:"htmlall"}</i><br/>{/if}
 	</p>
 </div>
-<center>
+<div style="text-align: center;">
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default"
 		   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={$animeAnidbid}"
@@ -50,7 +50,7 @@
 		   href="{$smarty.const.WWW_TOP}/rss?anidb={$animeAnidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
 			feed for this Anime <i class="fa fa-rss"></i></a>
 	</div>
-</center>
+</div>
 <form id="nzb_multi_operations_form" action="get">
 	<div class="well well-small">
 		<div class="nzb_multi_operations">
@@ -59,12 +59,8 @@
 				<input type="button" class="nzb_multi_operations_download btn btn-sm btn-success"
 					   value="Download NZBs"/>
 				<input type="button" class="nzb_multi_operations_cart btn btn-sm btn-info" value="Send to my Download Basket"/>
-				{if isset($sabintegrated)}
+				{if isset($sabintegrated) && $sabintegrated !=""}
 					<input type="button" class="nzb_multi_operations_sab btn btn-sm btn-primary" value="Send to Queue"/>
-				{/if}
-				{if isset($nzbgetintegrated)}
-					<input type="button" class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
-						   value="Send to NZBGet"/>
 				{/if}
 			</div>
 			{if isset($isadmin)}
@@ -129,7 +125,7 @@
 													title="Comments"></i></a>
 										<a href="#" class="icon_cart text-muted"><i
 													class="fa fa-shopping-basket" title="Send to my Download Basket"></i></a>
-										{if isset($sabintegrated)}
+										{if isset($sabintegrated) && $sabintegrated !=""}
 											<a href="#" class="icon_sab text-muted"><i class="fa fa-share"
 																					   title="Send to my Queue"></i></a>
 										{/if}

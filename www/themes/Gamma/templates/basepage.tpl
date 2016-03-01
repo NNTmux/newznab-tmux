@@ -9,7 +9,7 @@
 	<meta name="application-name" content="newznab-{$site->version}" />
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 
-{if $loggedin=="true"}
+{if $loggedin == "true"}
 	<link rel="alternate" type="application/rss+xml" title="{$site->title} Full Rss Feed" href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}" />
 {/if}
 
@@ -17,9 +17,9 @@
 	<link href="http://www.google.com/cse/api/branding.css" rel="stylesheet" type="text/css" media="screen" />
 {/if}
 	<!-- Newposterwall -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/bootstrap.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/font-awesome.min.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/font-awesome.min.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/extra.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/jquery.pnotify.default.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
@@ -53,8 +53,8 @@
 		/* <![CDATA[ */
 		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
 		var SERVERROOT = "{/literal}{$serverroot}{literal}";
-		var UID = "{/literal}{if $loggedin=="true"}{$userdata.id}{else}{/if}{literal}";
-		var RSSTOKEN = "{/literal}{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}{literal}";
+		var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
+		var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
 		/* ]]> */
 	</script>
 	{/literal}
@@ -67,10 +67,10 @@
 	<div class="navbar navbar-inverse navbar-fixed-top">
 		<div class="navbar-inner" style="padding-left:30px; padding-right:30px;">
 			<div class="container">
-						{if $loggedin=="true"}
+						{if $loggedin == "true"}
 							{$header_menu}
 						{/if}
-					{if $loggedin=="true"}
+					{if $loggedin == "true"}
 						    <div class="btn-group">
 								<a class="btn" href="{$smarty.const.WWW_TOP}/profile"><i class="icon-user icon-white"></i> {$userdata.username} </a>
 								<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
@@ -118,7 +118,7 @@
 				</div>
 			</div>
 		</div>
-			{if $loggedin=="true"}
+			{if $loggedin == "true"}
 				<input type="hidden" name="UID" value="{$userdata.id}" />
 				<input type="hidden" name="RSSTOKEN" value="{$userdata.rsstoken}" />
 			{/if}

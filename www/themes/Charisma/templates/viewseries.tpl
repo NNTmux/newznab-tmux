@@ -22,15 +22,15 @@
 		</div>
 	</div>
 	<h1>
-		<center>{$seriestitles} ({$show.publisher})</center>
+		<div style="text-align: center;">{$seriestitles} ({$show.publisher})</div>
 	</h1>
 	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 	<div class="tvseriesheading">
 		{if $show.image != 0}
-			<center>
+			<div style="text-align: center;">
 				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$seriestitles} Logo"
 					 src="{$smarty.const.WWW_TOP}/covers/tvshows/{$show.id}.jpg"/>
-			</center>
+			</div>
 			<br/>
 		{/if}
 		<p>
@@ -77,7 +77,7 @@
 						   value="Download NZBs"/>
 					<input type="button" class="nzb_multi_operations_cart btn btn-sm btn-info"
 						   value="Send to my Download Basket"/>
-					{if isset($sabintegrated)}
+					{if isset($sabintegrated) && $sabintegrated !=""}
 						<input type="button" class="nzb_multi_operations_sab btn btn-sm btn-primary"
 							   value="Send to Queue"/>
 					{/if}
@@ -211,7 +211,7 @@
 															   href="#"
 															   title="Send to my Download Basket">
 															</a>
-															{if isset($sabintegrated)}
+															{if isset($sabintegrated) && $sabintegrated !=""}
 																<a class="fa fa-share icon_sab text-muted"
 																   href="#"
 																   title="Send to my Queue">

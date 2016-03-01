@@ -8,57 +8,7 @@
 	</div>
 </div>
 <div class="well well-sm">
-	<form class="form-inline" role="form" name="browseby" action="movies">
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="movietitle">Title:</label>
-			<input type="text" class="form-control" id="movietitle" name="title" value="{$title}" placeholder="Title">
-		</div>
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="movieactors">Artist:</label>
-			<input type="text" class="form-control" id="movieactors" name="actors" value="{$actors}" placeholder="Actor">
-		</div>
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="moviedirector">Director:</label>
-			<input type="text" class="form-control col-xs-3" id="moviedirector" name="director" value="{$director}" placeholder="Director">
-		</div>
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="rating">Rating:</label>
-			<select id="rating" name="rating" class="form-control" name="Score">
-				<option value="" selected>Rating</option>
-				{foreach from=$ratings item=rate}
-					<option {if $rating==$rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
-				{/foreach}
-			</select>
-		</div>
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="genre">Genre:</label>
-			<select id="genre" name="genre" class="form-control">
-				<option class="grouping" value="" selected>Genre</option>
-				{foreach from=$genres item=gen}
-					<option {if $gen==$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
-				{/foreach}
-			</select>
-		</div>
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="year">Year:</label>
-			<select id="year" name="year" class="form-control">
-				<option class="grouping" value="" selected>Year</option>
-				{foreach from=$years item=yr}
-					<option {if $yr==$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
-				{/foreach}
-			</select>
-		</div>
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="category">Category:</label>
-			<select id="category" name="t" class="form-control">
-				<option class="grouping" value="" selected>Category</option>
-				{foreach from=$catlist item=ct}
-					<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
-				{/foreach}
-			</select>
-		</div>
-		<input type="submit" class="btn btn-primary" value="Search!"/>
-	</form>
+	{include file='search-filter.tpl'}
 </div>
 <form id="nzb_multi_operations_form" action="get">
 	<div class="box-body"
@@ -80,15 +30,10 @@
 									<input type="button"
 										   class="nzb_multi_operations_cart btn btn-sm btn-info"
 										   value="Send to my Download Basket"/>
-									{if isset($sabintegrated)}
+									{if isset($sabintegrated) && $sabintegrated !=""}
 										<input type="button"
 											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 											   value="Send to Queue"/>
-									{/if}
-									{if isset($nzbgetintegrated)}
-										<input type="button"
-											   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
-											   value="Send to NZBGet"/>
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"
@@ -120,7 +65,7 @@
 										<div class="panel-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
-													{foreach from=$result.languages item=movielanguage}
+													{foreach $result.languages as $movielanguage}
 														{release_flag($movielanguage, browse)}
 													{/foreach}
 													{assign var="msplits" value=","|explode:$result.grp_release_id}
@@ -137,7 +82,7 @@
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-													{foreach from=$msplits item=m name=loop}
+													{foreach $msplits as $loop=>$m name="loop"}
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover"
@@ -204,7 +149,7 @@
 															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																  title="Send to my Download Basket"><i
 																		class="fa fa-shopping-basket"></i></span>
-															{if isset($sabintegrated)}
+															{if isset($sabintegrated) && $sabintegrated !=""}
 																<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																	  title="Send to my Queue"><i
 																			class="fa fa-share"></i></span>
@@ -238,7 +183,7 @@
 										<div class="panel-body">
 											<div class="row small-gutter-left">
 												<div class="col-md-3 small-gutter-left">
-													{foreach from=$result.languages item=movielanguage}
+													{foreach $result.languages as $movielanguage}
 														{release_flag($movielanguage, browse)}
 													{/foreach}
 													{assign var="msplits" value=","|explode:$result.grp_release_id}
@@ -255,7 +200,7 @@
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-													{foreach from=$msplits item=m name=loop}
+													{foreach $msplits as $loop=>$m name="loop"}
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover"
@@ -322,7 +267,7 @@
 															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
 																  title="Send to my Download Basket"><i
 																		class="fa fa-shopping-basket"></i></span>
-															{if isset($sabintegrated)}
+															{if isset($sabintegrated) && $sabintegrated !=""}
 																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																	  title="Send to my Queue"><i
 																			class="fa fa-share"></i></span>
@@ -368,15 +313,10 @@
 									<input type="button"
 										   class="nzb_multi_operations_cart btn btn-sm btn-info"
 										   value="Send to my Download Basket"/>
-									{if isset($sabintegrated)}
+									{if isset($sabintegrated) && $sabintegrated !=""}
 										<input type="button"
 											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 											   value="Send to Queue"/>
-									{/if}
-									{if isset($nzbgetintegrated)}
-										<input type="button"
-											   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
-											   value="Send to NZBGet"/>
 									{/if}
 									{if $cpurl != '' && $cpapi != ''}
 										<a

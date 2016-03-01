@@ -156,7 +156,7 @@ class NameFixer
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->relid = $this->fixed = $this->checked = 0;
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->othercats = implode(",", Category::CAT_OTHERS_GROUP);
+		$this->othercats = implode(",", Category::OTHERS_GROUP);
 		$this->timeother = sprintf(' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categoryid IN (%s) GROUP BY rel.id ORDER BY postdate DESC', $this->othercats);
 		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.id ORDER BY postdate DESC';
 		$this->fullother = sprintf(' AND rel.categoryid IN (%s) GROUP BY rel.id', $this->othercats);
@@ -205,7 +205,7 @@ class NameFixer
 					WHERE (rel.isrenamed = %d OR rel.categoryid = %d)
 					AND rel.proc_nfo = %d',
 				self::IS_RENAMED_NONE,
-				Category::CAT_OTHER_MISC,
+				Category::OTHER_MISC,
 				self::PROC_NFO_NONE
 			);
 		}
@@ -300,7 +300,7 @@ class NameFixer
 					AND rel.proc_files = %d
 					%s %s',
 				self::IS_RENAMED_NONE,
-				implode(',', Category::CAT_OTHERS_GROUP),
+				implode(',', Category::OTHERS_GROUP),
 				self::PROC_FILES_NONE,
 				$ext,
 				$guid
@@ -364,7 +364,7 @@ class NameFixer
 					AND preid = 0
 					AND proc_srr = %d',
 				self::IS_RENAMED_NONE,
-				implode(',', Category::CAT_OTHERS_GROUP),
+				implode(',', Category::OTHERS_GROUP),
 				self::PROC_SRR_NONE
 			);
 		}

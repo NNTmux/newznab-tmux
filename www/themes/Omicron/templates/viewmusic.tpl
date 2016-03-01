@@ -10,7 +10,7 @@
 		<h3>Track Listing:</h3>
 		<ol class="tracklist">
 			{assign var="tracksplits" value="|"|explode:$music.tracks}
-			{foreach from=$tracksplits item=tracksplit}
+			{foreach $tracksplits as $tracksplit}
 				<li>{$tracksplit|trim}</li>
 			{/foreach}
 		</ol>

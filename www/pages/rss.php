@@ -12,7 +12,7 @@ if (!isset($_GET["t"]) && !isset($_GET["show"]) && !isset($_GET["anidb"])) {
 	// User has to either be logged in, or using rsskey.
 	if (!$page->users->isLoggedIn()) {
 		if ($page->settings->getSetting('registerstatus') != Settings::REGISTER_STATUS_API_ONLY) {
-			header('X-nntmux: ERROR: You must be logged in or provide a valid User ID and API key!');
+			header('X-NNTmux: ERROR: You must be logged in or provide a valid User ID and API key!');
 			$page->show403();
 		} else {
 			header("Location: " . $page->settings->getSetting('code'));
@@ -22,7 +22,7 @@ if (!isset($_GET["t"]) && !isset($_GET["show"]) && !isset($_GET["anidb"])) {
 	$page->title = "Rss Info";
 	$page->meta_title = "Rss Nzb Info";
 	$page->meta_keywords = "view,nzb,description,details,rss,atom";
-	$page->meta_description = "View information about nntmux RSS Feeds.";
+	$page->meta_description = "View information about NNTmux RSS Feeds.";
 
 	$firstShow = $rss->getFirstInstance('id', 'videos');
 	$firstAni = $rss->getFirstInstance('anidbid', 'releases');
@@ -40,7 +40,7 @@ if (!isset($_GET["t"]) && !isset($_GET["show"]) && !isset($_GET["anidb"])) {
 	}
 
 	$page->smarty->assign([
-			'categorylist'       => $category->get(true, $page->userdata["categoryexclusions"]),
+			'categorylist'       => $category->getCategories(true, $page->userdata["categoryexclusions"]),
 			'parentcategorylist' => $category->getForMenu($page->userdata["categoryexclusions"])
 		]
 	);
@@ -59,7 +59,7 @@ if (!isset($_GET["t"]) && !isset($_GET["show"]) && !isset($_GET["anidb"])) {
 			$res = $page->users->getById(0);
 		} else {
 			if (!isset($_GET["i"]) || !isset($_GET["r"])) {
-				header('X-nntmux: ERROR: Both the User ID and API key are required for viewing the RSS!');
+				header('X-NNTmux: ERROR: Both the User ID and API key are required for viewing the RSS!');
 				$page->show403();
 			}
 
@@ -67,7 +67,7 @@ if (!isset($_GET["t"]) && !isset($_GET["show"]) && !isset($_GET["anidb"])) {
 		}
 
 		if (!$res) {
-			header('X-nntmux: ERROR: Invalid API key or User ID!');
+			header('X-NNTmux: ERROR: Invalid API key or User ID!');
 			$page->show403();
 		}
 
@@ -77,7 +77,7 @@ if (!isset($_GET["t"]) && !isset($_GET["show"]) && !isset($_GET["anidb"])) {
 	}
 
 	if ($page->users->getApiRequests($uid) > $maxRequests) {
-		header('X-nntmux: ERROR: You have reached your daily limit for API requests!');
+		header('X-NNTmux: ERROR: You have reached your daily limit for API requests!');
 		$page->show503();
 	} else {
 		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);

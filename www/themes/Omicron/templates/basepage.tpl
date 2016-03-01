@@ -6,8 +6,8 @@
 		/* <![CDATA[ */
 		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
 		var SERVERROOT = "{/literal}{$serverroot}{literal}";
-		var UID = "{/literal}{if $loggedin=="true"}{$userdata.id}{else}{/if}{literal}";
-		var RSSTOKEN = "{/literal}{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}{literal}";
+		var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
+		var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
 		/* ]]> */
 	</script>
 	{/literal}
@@ -15,17 +15,17 @@
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<!-- Newposterwall -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- Bootstrap 3.3.6 -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- iCheck -->
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/plugins/iCheck/square/blue.css" rel="stylesheet" type="text/css"/>
 	<!-- Font Awesome Icons -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/font-awesome.min.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- Normalize.css -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/styles/normalize.css" rel="stylesheet" type="text/css">
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
 	<!-- Ionicons -->
 	<link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css"/>
 	<!-- Theme style -->
@@ -91,7 +91,7 @@
 							<!-- Menu Toggle Button -->
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<!-- The user image in the navbar-->
-								{if ($loggedin)=="true"}
+								{if $loggedin == "true"}
 								<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png"
 									 class="user-image" alt="User Image"/>
 								<!-- hidden-xs hides the username on small devices so only the image appears. -->
@@ -119,7 +119,7 @@
 										<a href="{$smarty.const.WWW_TOP}/mymovies"><i class="fa fa-film"></i> My Movies</a>
 									</div>
 									<div class="col-xs-12 text-center">
-										<a href="{$smarty.const.WWW_TOP}//myshows"><i class="fa fa-television"></i> My Shows</a>
+										<a href="{$smarty.const.WWW_TOP}/myshows"><i class="fa fa-television"></i> My Shows</a>
 									</div>
 									<div class="col-xs-12 text-center">
 										<a href="{$smarty.const.WWW_TOP}/profileedit"><i class="fa fa-cog fa-spin"></i> Account Settings</a>
@@ -155,7 +155,7 @@
 			<!-- sidebar: style can be found in sidebar.less -->
 			<section class="sidebar">
 				<!-- Sidebar user panel -->
-				{if ($loggedin)=="true"}
+				{if $loggedin == "true"}
 				<div class="user-panel">
 					<div class="pull-left image">
 						<img src="{$smarty.const.WWW_THEMES}/shared/images/user-loggedin.png" class="img-circle"
@@ -173,10 +173,10 @@
 						<div class="col-md-8">
 							<select id="headcat" name="t" class="form-control" data-search="true">
 								<option class="grouping" value="-1">All</option>
-								{foreach from=$parentcatlist item=parentcat}
-									<option {if $header_menu_cat==$parentcat.id}selected="selected"{/if} value="{$parentcat.id}"> [{$parentcat.title}]</option>
-									{foreach from=$parentcat.subcatlist item=subcat}
-										<option {if $header_menu_cat==$subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;&nbsp; > {$subcat.title}</option>
+								{foreach $parentcatlist as $parentcat}
+									<option {if $header_menu_cat == $parentcat.id}selected="selected"{/if} value="{$parentcat.id}"> [{$parentcat.title}]</option>
+									{foreach $parentcat.subcatlist as $subcat}
+										<option {if $header_menu_cat == $subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;&nbsp; > {$subcat.title}</option>
 									{/foreach}
 								{/foreach}
 							</select>
@@ -194,7 +194,7 @@
 					<!-- Optionally, you can add icons to the links -->
 					<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
 									class="fa arrow"></span></a></li>
-					{if ($loggedin)=="true"}
+					{if $loggedin == "true"}
 					<li class="treeview">
 						<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
 						<ul class="treeview-menu">
@@ -214,6 +214,7 @@
 							<li><a href="{$smarty.const.WWW_TOP}/books"><i class="fa fa-book"></i><span> Books</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/browse"><i
 											class="fa fa-list-ul"></i><span> Browse All Releases</span></a></li>
+							<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i class="fa fa-object-group"></i><span> Browse Groups</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/predb"><i class="fa fa-list-ol"></i><span> PreDb</span></a>
 							</li>
 						</ul>
@@ -225,7 +226,7 @@
 							<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
 											class="fa fa-envelope-o"></i><span> Contact</span> <span
 											class="fa arrow"></span></a></li>
-							{if ($loggedin)=="true"}
+							{if $loggedin == "true"}
 							<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a></li>
@@ -258,7 +259,7 @@
 			<!-- Default to the left -->
 			<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
 						href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is open source,
-			released under the GPLv2 license
+			released under the GPL license
 		</footer>
 		<!-- Control Sidebar -->
 		<aside class="control-sidebar control-sidebar-dark">

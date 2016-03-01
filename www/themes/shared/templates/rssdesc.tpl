@@ -56,7 +56,7 @@
 </ul>
 <h3>Parent Category</h3>
 <ul style="text-align: left;">
-	{foreach from=$parentcategorylist item=category}
+	{foreach $parentcategorylist as $category}
 		<li>
 			<a href="{$smarty.const.WWW_TOP}/browse?t={$category.id}">{$category.title}</a> feed <br/>
 			<a href="{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
@@ -66,7 +66,7 @@
 </ul>
 <h3>Sub Category</h3>
 <ul style="text-align: left;">
-	{foreach from=$categorylist item=category}
+	{foreach $categorylist as $category}
 		<li>
 			<a href="{$smarty.const.WWW_TOP}/browse?t={$category.id}">{$category.title}</a> feed <br/>
 			<a href="{$smarty.const.WWW_TOP}/rss?t={$category.id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
@@ -78,8 +78,7 @@
 <ul style="text-align: left;">
 	<li>
 		Multiple categories separated by comma.<br/>
-		<a href="{$smarty.const.WWW_TOP}/rss?t=1000,2000,3010&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}
-			/rss?t=1000,2000,3010&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
+		<a href="{$smarty.const.WWW_TOP}/rss?t={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT},{$catClass::MUSIC_MP3}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}/rss?t={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT},{$catClass::MUSIC_MP3}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 	</li>
 </ul>
 <h2>Additional Feeds</h2>

@@ -1,52 +1,9 @@
 <h2>Browse {$catname}</h2>
 
 <div class="well well-small">
-	<center>
-		<form class="form-inline" name="browseby" action="movies" style="margin:0;">
-
-			<i class="fa fa-film fa-midt"></i>
-			<input class="input input-medium" id="movietitle" type="text" name="title" value="{$title}" placeholder="Title" />
-
-			<i class="fa fa-group fa-midt"></i>
-			<input class="input input-medium" id="movieactors" type="text" name="actors" value="{$actors}" placeholder="Actor" />
-
-			<i class="fa fa-bullhorn fa-midt"></i>
-			<input class="input input-medium" id="moviedirector" type="text" name="director" value="{$director}"  placeholder="Director" />
-
-			<i class="fa fa-star fa-midt"></i>
-			<select class="input span1" id="rating" name="rating">
-				<option class="grouping" value=""></option>
-				{foreach from=$ratings item=rate}
-					<option {if $rating==$rate}selected="selected"{/if} value="{$rate}">{$rate}</option>
-				{/foreach}
-			</select>
-			<i class="fa fa-inbox fa-midt"></i>
-			<select class="input input-small" id="genre" name="genre">
-				<option class="grouping" value=""></option>
-				{foreach from=$genres item=gen}
-					<option {if $gen==$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
-				{/foreach}
-			</select>
-
-			<i class="fa fa-calendar fa-midt"></i>
-			<select class="input input-small" id="year" name="year">
-				<option class="grouping" value=""></option>
-				{foreach from=$years item=yr}
-					<option {if $yr==$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
-				{/foreach}
-			</select>
-
-			<i class="fa fa-flag fa-midt"></i>
-			<select class="input input-small" id="category" name="t">
-				<option class="grouping" value="2000"></option>
-				{foreach from=$catlist item=ct}
-					<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
-				{/foreach}
-			</select>
-
-			<input class="btn btn-success" type="submit" value="Go" />
-		</form>
-	</center>
+	<div style="text-align: center;">
+		{include file='search-filter.tpl'}
+	</div>
 </div>
 
 {$site->adbrowse}
@@ -63,16 +20,15 @@
 							<div class="btn-group">
 								<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download NZBs" />
 								<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Send to my Download Basket" />
-								{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
-								{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
+								{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 							</div>
 							View: <strong>Covers</strong> | <a
 									href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
 						</td>
 						<td width="50%">
-							<center>
+							<div style="text-align: center;">
 								{$pager}
-							</center>
+							</div>
 						</td>
 						<td width="20%">
 							<div class="pull-right">
@@ -124,7 +80,7 @@
 				</th>
 			</tr>
 
-			{foreach from=$results item=result}
+			{foreach $results as $result}
 				<tr class="{cycle values=",alt"}">
 					<td class="mid">
 						<div class="movcover">
@@ -132,11 +88,11 @@
 								<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/movies/{if isset($result.cover) && $result.cover == 1}{$result.imdbid}-cover.jpg{else}no-cover.jpg{/if}" style="max-width: 120px; /*width: auto;*/" width="120" border="0" alt="{$result.title|escape:"htmlall"}" />
 							</a>
 							<div class="movextra">
-								<center>
+								<div style="text-align: center;">
 									<a target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/" name="name{$result.imdbid}" title="View movie info" class="rndbtn modal_imdb badge" rel="movie" >Cover</a>
 									<a class="rndbtn badge badge-trakt" target="_blank" href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbid}/" name="trakt{$result.imdbid}" title="View trakt page">Trakt</a>
 									<a class="rndbtn badge badge-imdb" target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/" name="imdb{$result.imdbid}" title="View imdb page">Imdb</a>
-								</center>
+								</div>
 							</div>
 						</div>
 					</td>
@@ -183,7 +139,7 @@
 								{assign var="mpass" value=","|explode:$result.grp_release_password}
 								{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 								{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-								{foreach from=$msplits item=m}
+								{foreach $msplits as $m}
 									<tr id="guid{$mguid[$m@index]}" {if $m@index > 0}class="mlextra"{/if}>
 										<td>
 											<div class="icon"><input type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" /></div>
@@ -211,7 +167,7 @@
 													<a href="#" class="icon icon_cart fa fa-shopping-basket" style="text-decoration: none; color: #5c5c5c;" title="Send to my Download Basket">
 													</a>
 												</li>
-												{if $sabintegrated}
+												{if isset($sabintegrated) && $sabintegrated !=""}
 													<li>
 														<a class="icon icon_sab fa fa-share" style="text-decoration: none; color: #008ab8;"  href="#" title="Send to queue"></a>
 													</li>
@@ -250,15 +206,14 @@
 								<div class="btn-group">
 									<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download NZBs" />
 									<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Send to my Download Basket" />
-									{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
-									{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
+									{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 								</div>
 								&nbsp;&nbsp;&nbsp;&nbsp;<a title="Switch to List view" href="{$smarty.const.WWW_TOP}/browse?t={$category}"><i class="fa fa-lg fa-list-ol"></i></a>
 							</td>
 							<td width="50%">
-								<center>
+								<div style="text-align: center;">
 									{$pager}
-								</center>
+								</div>
 							</td>
 							<td width="20%">
 								<div class="pull-right">

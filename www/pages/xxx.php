@@ -12,12 +12,12 @@ $movie = new XXX();
 $cat = new Category();
 $fail = new DnzbFailures(['Settings' => $page->settings]);
 
-$moviecats = $cat->getChildren(Category::CAT_PARENT_XXX);
+$moviecats = $cat->getChildren(Category::XXX_ROOT);
 $mtmp = [];
 foreach ($moviecats as $mcat) {
 	$mtmp[$mcat['id']] = $mcat;
 }
-$category = Category::CAT_PARENT_XXX;
+$category = Category::XXX_ROOT;
 if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
 	$category = $_REQUEST['t'] + 0;
 }
@@ -55,7 +55,7 @@ $page->smarty->assign('genre', $genre);
 
 $browseby_link = '&amp;title=' . $title . '&amp;actors=' . $actors . '&amp;director=' . $director . '&amp;genre=' . $genre;
 
-$page->smarty->assign('pagertotalitems', $results[0]['_totalcount']);
+$page->smarty->assign('pagertotalitems', isset($results[0]['_totalcount']) ? $results[0]['_totalcount'] : 0);
 $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_COVER_PAGE);
 $page->smarty->assign('pagerquerybase', WWW_TOP . "/xxx?t=" . $category . $browseby_link . "&amp;ob=" . $orderby . "&amp;offset=");

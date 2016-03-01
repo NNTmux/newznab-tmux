@@ -6,8 +6,8 @@
 	<meta name="keywords" content="" />
 	<meta name="description" content="" />
 	<title>{$site->title|default:'newznab'} - {$page->meta_title|default:$page->title}</title>
-	<link href="{$smarty.const.WWW_THEMES}/shared/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_THEMES}/shared/styles/admin.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/style.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/admin.css" rel="stylesheet" type="text/css" media="screen" />
 	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico"/>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/sorttable.js"></script>
@@ -58,8 +58,8 @@
 	<!-- end #page -->
 
 	<div id="searchfooter">
-		<center>
-		</center>
+		<div style="text-align: center;">
+		</div>
 	</div>
 
 	<div class="footer">

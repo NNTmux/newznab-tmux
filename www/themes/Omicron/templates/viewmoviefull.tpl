@@ -9,7 +9,7 @@
 </div>
 {if $results|@count > 0}
 	<div class="box-body">
-		{foreach from=$results item=result}
+		{foreach $results as $result}
 			<div id="moviefull" style="min-height:340px;">
 				{if $result.cover == 1}
 					<img class="pull-right" style="margin-right:50px; max-height:278px;"
@@ -66,7 +66,7 @@
 								   value="Download NZBs"/>
 							<input type="button" class="nntmux_multi_operations_cart btn btn-sm btn-info"
 								   value="Send to my Download Basket"/>
-							{if isset($sabintegrated)}
+							{if isset($sabintegrated) && $sabintegrated !=""}
 								<input type="button" class="nzb_multi_operations_sab btn btn-sm btn-primary"
 									   value="Send to Queue"/>
 							{/if}
@@ -143,7 +143,7 @@
 									{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 									{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
 									{assign var="mcatname" value=","|explode:$result.grp_release_catname}
-									{foreach from=$msplits item=m}
+									{foreach $msplits as $m}
 										<tr class="{cycle values=",alt"}" id="guid{$mguid[$m@index]}">
 											<td class="check"><input id="chk{$mguid[$m@index]|substr:0:7}"
 																	 type="checkbox"
@@ -177,7 +177,7 @@
 															class="icon icon_nzb fa fa-cloud-download text-muted"></i></a>
 												<a href="#" class="icon_cart text-muted"><i class="fa fa-shopping-basket"
 																							title="Send to my Download Basket"></i></a>
-												{if isset($sabintegrated)}
+												{if isset($sabintegrated) && $sabintegrated !=""}
 													<a href="#" class="icon icon_sab text-muted"
 														  title="Send to my Queue"><i
 																class="fa fa-share"></i></a>
@@ -205,15 +205,10 @@
 													<input type="button"
 														   class="nzb_multi_operations_cart btn btn-sm btn-info"
 														   value="Send to my Download Basket"/>
-													{if isset($sabintegrated)}
+													{if isset($sabintegrated) && $sabintegrated !=""}
 														<input type="button"
 															   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 															   value="Send to Queue"/>
-													{/if}
-													{if isset($nzbgetintegrated)}
-														<input type="button"
-															   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
-															   value="Send to NZBGet"/>
 													{/if}
 													{if isset($isadmin)}
 														<input type="button"

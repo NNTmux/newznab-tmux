@@ -10,15 +10,15 @@
 		<tr class="{cycle values=",alt"}">
 			<td class="mid">
 				<div class="movcover">
-					<center>
-					<img class="shadow img img-polaroid" src="{$result->posters->original}" width="120" border="0"
+					<div style="text-align: center;">
+					<img class="shadow" src="{$result->posters->original}" width="120" border="0"
 						 alt="{$result->title|escape:"htmlall"}"/>
-					</center>
+					</div>
 					<div class="movextra">
-						<center>
+						<div style="text-align: center;">
 						<a class="rndbtn badge badge-success" target="_blank" href="{$site->dereferrer_link}{$result->links->alternate}" title="View Rotten Tomatoes Details">Rotten</a>
 						<a class="rndbtn badge badge-imdb" target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result->alternate_ids->imdb}" title="View Imdb Details">Imdb</a>
-						</center>
+						</div>
 					</div>
 				</div>
 			</td>
@@ -28,7 +28,7 @@
 				{if $result->abridged_cast|@count > 0}
 					<br /><br />
 					<b>Starring:</b>
-					{foreach from=$result->abridged_cast item=cast name=cast}
+					{foreach $result->abridged_cast as $cast name="cast"}
 						<a href="{$smarty.const.WWW_TOP}/movies?actors={$cast->name|escape:"htmlall"}" title="Search for movies starring {$cast->name|escape:"htmlall"}">{$cast->name|escape:"htmlall"}</a>
 						{if $smarty.foreach.cast.last}<br/><br/>{else},{/if}
 					{/foreach}

@@ -19,7 +19,7 @@
 			<small>With Selected:</small>
 			<div class="btn-group">
 				<input type="button" class="nzb_multi_operations_cartdelete btn btn-sm btn-danger" value="Delete"/>
-				{if isset($sabintegrated)}
+				{if isset($sabintegrated) && $sabintegrated !=""}
 					<input type="button" class="nzb_multi_operations_cartsab btn btn-sm btn-info"
 						   value="Send to queue"/>
 				{/if}
@@ -38,7 +38,7 @@
 								<th>Added</th>
 								<th>Action</th>
 							</tr>
-							{foreach from=$results item=result}
+							{foreach $results as $result}
 								<tr class="{cycle values=",alt"}">
 									<td class="check">
 										<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="nzb_check"

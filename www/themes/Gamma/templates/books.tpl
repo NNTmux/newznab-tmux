@@ -1,18 +1,9 @@
 <h2>Browse Books</h2>
 
 <div class="well well-small">
-<center>
-<form class="form-inline" name="browseby" action="books" style="margin:0;">
-
-		<i class="fa fa-user fa-midt"></i>
-		<input class="input input-medium" id="author" type="text" name="author" value="{$author}" placeholder="Author" />
-
-		<i class="fa fa-book fa-midt"></i>
-		<input class="input input-medium" id="title" type="text" name="title" value="{$title}" placeholder="Title" />
-
-		<input class="btn btn-success" type="submit" value="Go" />
-</form>
-</center>
+<div style="text-align: center;">
+	{include file='search-filter.tpl'}
+</div>
 </div>
 
 {$site->adbrowse}
@@ -30,16 +21,15 @@
 						<div class="btn-group">
 							<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download NZBs" />
 							<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Send to my Download Basket" />
-							{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
-							{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
+							{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 						</div>
 						View: <strong>Covers</strong> | <a
 								href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
 					</td>
 					<td width="50%">
-						<center>
+						<div style="text-align: center;">
 							{$pager}
-						</center>
+						</div>
 					</td>
 					<td width="20%">
 						{if isset($section) && $section != ''}
@@ -91,7 +81,7 @@
 		</th>
 	</tr>
 
-	{foreach from=$results item=result}
+	{foreach $results as $result}
 		<tr class="{cycle values=",alt"}">
 			<td class="mid">
 				<div class="movcover">
@@ -100,10 +90,10 @@
 
 					</a>
 					<div class="movextra">
-						<center>
+						<div style="text-align: center;">
 						{if $result.url != ""}<a class="rndbtn badge badge-amaz" target="_blank" href="{$site->dereferrer_link}{$result.url}" name="amazon{$result.bookinfoid}" title="View amazon page">Amazon</a>{/if}
 						<a class="rndbtn badge" href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name}" title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Grp</a>
-						</center>
+						</div>
 					</div>
 				</div>
 			</td>
@@ -142,7 +132,7 @@
 						{assign var="mpass" value=","|explode:$result.grp_release_password}
 						{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 						{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-						{foreach from=$msplits item=m}
+						{foreach $msplits as $m}
 						<tr id="guid{$mguid[$m@index]}" {if $m@index > 1}class="mlextra"{/if}>
 							<td>
 								<div class="icon"><input type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" /></div>
@@ -182,7 +172,7 @@
 										<a href="#" class="icon icon_cart fa fa-shopping-basket" style="text-decoration: none; color: #5c5c5c;" title="Send to my Download Basket">
 										</a>
 									</li>
-									{if $sabintegrated}
+									{if isset($sabintegrated) && $sabintegrated !=""}
 									<li>
 										<a class="icon icon_sab fa fa-share" style="text-decoration: none; color: #008ab8;"  href="#" title="Send to queue"></a>
 									</li>
@@ -219,14 +209,13 @@
 					<div class="btn-group">
 						<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download NZBs" />
 						<input type="button" class="nzb_multi_operations_cart btn btn-small btn-info" value="Send to my Download Basket" />
-						{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
-						{if isset($nzbgetintegrated)}<input type="button" class="nzb_multi_operations_nzbget btn btn-small btn-primary" value="Send to NZBGet" />{/if}
+						{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 					</div>
 				</td>
 				<td width="50%">
-					<center>
+					<div style="text-align: center;">
 						{$pager}
-					</center>
+					</div>
 				</td>
 				<td width="20%">
 					{if isset($section) && $section != ''}

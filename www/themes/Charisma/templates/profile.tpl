@@ -129,7 +129,7 @@
 															{/if}
 															</tbody>
 														</table>
-														{if ($user.id==$userdata.id || $isadmin) && $site->registerstatus==1}
+														{if ($user.id == $userdata.id || $isadmin) && $site->registerstatus == 1}
 															<table class="data table table-condensed table-striped table-responsive table-hover">
 																<tbody>
 																<tr class="bg-aqua-active">
@@ -190,7 +190,7 @@
 																<th>date</th>
 																<th>release</th>
 															</tr>
-															{foreach from=$downloadlist item=download}
+															{foreach $downloadlist as $download}
 																{if $download@iteration == 10}
 																	<tr class="more"><td colspan="3"><a onclick="$('tr.extra').toggle();$('tr.more').toggle();return false;" href="#">show all...</a></td></tr>
 																{/if}

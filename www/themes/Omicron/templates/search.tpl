@@ -11,7 +11,7 @@
 	</div>
 </div>
 <div>
-	<center>
+	<div style="text-align: center;">
 		<a href="#" onclick="if (jQuery(this).text() == 'Advanced Search')
 					jQuery(this).text('Basic Search');
 				else
@@ -19,7 +19,7 @@
 				jQuery('#sbasic,#sadvanced').toggle();
 				return false;">{if $sadvanced}Basic{else}Click For Advanced{/if} Search
 		</a>
-	</center>
+	</div>
 </div>
 <br>
 <div class="well well-sm">
@@ -39,7 +39,7 @@
 </div>
 <form method="get" action="{$smarty.const.WWW_TOP}/search">
 	<div id="sadvanced" {if not $sadvanced}style="display:none"{/if}>
-		<center>
+		<div style="text-align: center;">
 			<table class="data table table-striped table-condensed table-responsive">
 				<tr>
 					<th><label for="searchadvr">Release Name:</label></th>
@@ -103,32 +103,32 @@
 					</td>
 				</tr>
 			</table>
-		</center>
+		</div>
 	</div>
 </form>
 {if $results|@count == 0 && ($search || $subject|| $searchadvr|| $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) != ""}
-	<center>
+	<div style="text-align: center;">
 		<div class="nosearchresults">
 			Your search did not match any releases.
 			<br><br>
 			Suggestions:
 			<br><br>
 			<ul>
-				<center>
+				<div style="text-align: center;">
 					<li>Make sure all words are spelled correctly.</li>
-				</center>
-				<center>
+				</div>
+				<div style="text-align: center;">
 					<li>Try different keywords.</li>
-				</center>
-				<center>
+				</div>
+				<div style="text-align: center;">
 					<li>Try more general keywords.</li>
-				</center>
-				<center>
+				</div>
+				<div style="text-align: center;">
 					<li>Try fewer keywords.</li>
-				</center>
+				</div>
 			</ul>
 		</div>
-	</center>
+	</div>
 {elseif ($search || $subject || $searchadvr || $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) == ""}
 {else}
 	<form style="padding-top:10px;" id="nzb_multi_operations_form" method="get" action="{$smarty.const.WWW_TOP}/search">
@@ -160,15 +160,10 @@
 						<input type="button"
 							   class="nzb_multi_operations_cart btn btn-sm btn-info"
 							   value="Send to my Download Basket"/>
-						{if isset($sabintegrated)}
+						{if isset($sabintegrated) && $sabintegrated !=""}
 							<input type="button"
 								   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 								   value="Send to Queue"/>
-						{/if}
-						{if isset($nzbgetintegrated)}
-							<input type="button"
-								   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
-								   value="Send to NZBGet"/>
 						{/if}
 						{if isset($isadmin)}
 							<input type="button"
@@ -207,7 +202,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			{foreach from=$results item=result}
+			{foreach $results as $result}
 				<tr class="{cycle values=",alt"}{if $lastvisit|strtotime<$result.adddate|strtotime} new{/if}"
 					id="guid{$result.guid}">
 					<td class="check">
@@ -335,7 +330,7 @@
 									title="Comments"></i></a>
 						<a href="#" class="icon_cart text-muted"><i
 									class="fa fa-shopping-basket" title="Send to my Download Basket"></i></a>
-						{if isset($sabintegrated)}
+						{if isset($sabintegrated) && $sabintegrated !=""}
 							<a href="#" class="icon_sab text-muted"><i class="fa fa-share"
 																	   title="Send to my Queue"></i></a>
 						{/if}
@@ -360,15 +355,10 @@
 						<input type="button"
 							   class="nzb_multi_operations_cart btn btn-sm btn-info"
 							   value="Send to my Download Basket"/>
-						{if isset($sabintegrated)}
+						{if isset($sabintegrated) && $sabintegrated !=""}
 							<input type="button"
 								   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 								   value="Send to Queue"/>
-						{/if}
-						{if isset($nzbgetintegrated)}
-							<input type="button"
-								   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
-								   value="Send to NZBGet"/>
 						{/if}
 						{if isset($isadmin)}
 							<input type="button"

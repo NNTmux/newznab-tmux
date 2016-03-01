@@ -3,6 +3,7 @@
 namespace newznab;
 
 use newznab\db\Settings;
+use newznab\Category;
 
 /**
  * Class RSS -- contains specific functions for RSS
@@ -27,8 +28,8 @@ Class RSS
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-				'Settings' => null,
-				'Releases' => null
+			'Settings' => null,
+			'Releases' => null
 		];
 		$options += $defaults;
 
@@ -52,7 +53,7 @@ Class RSS
 	{
 		$catSearch = $cartSearch = '';
 
-		$catLimit = "AND r.categoryid BETWEEN 5000 AND 5999";
+		$catLimit = "AND r.categoryid BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '";
 
 		if (count($cat)) {
 			if ($cat[0] == -2) {
@@ -63,8 +64,8 @@ Class RSS
 		}
 
 		$sql = $this->pdo->query(
-				sprintf(
-						"SELECT r.*, m.cover, m.imdbid, m.rating, m.plot,
+			sprintf(
+				"SELECT r.*, m.cover, m.imdbid, m.rating, m.plot,
 					m.year, m.genre, m.director, m.actors, g.name AS group_name,
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
 					%s AS category_ids,
@@ -89,16 +90,16 @@ Class RSS
 				AND r.nzbstatus = %d
 				%s %s %s %s
 				ORDER BY postdate DESC %s",
-						$this->releases->getConcatenatedCategoryIDs(),
-						$cartSearch,
-						$this->releases->showPasswords,
-						NZB::NZB_ADDED,
-						$catSearch,
-						($videosId > 0 ? sprintf(' AND r.videos_id = %d %s ', $videosId, ($catSearch == '' ? $catLimit : '')) : ''),
-						($aniDbID > 0 ? sprintf(' AND r.anidbid = %d %s ', $aniDbID, ($catSearch == '' ? $catLimit : '')) : ''),
-						($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
-						(' LIMIT 0,' . ($offset > 100 ? 100 : $offset))
-				), true, NN_CACHE_EXPIRY_MEDIUM
+				$this->releases->getConcatenatedCategoryIDs(),
+				$cartSearch,
+				$this->releases->showPasswords,
+				NZB::NZB_ADDED,
+				$catSearch,
+				($videosId > 0 ? sprintf(' AND r.videos_id = %d %s ', $videosId, ($catSearch == '' ? $catLimit : '')) : ''),
+				($aniDbID > 0 ? sprintf(' AND r.anidbid = %d %s ', $aniDbID, ($catSearch == '' ? $catLimit : '')) : ''),
+				($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
+				(' LIMIT 0,' . ($offset > 100 ? 100 : $offset))
+			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 		return $sql;
 	}
@@ -116,7 +117,7 @@ Class RSS
 	public function getShowsRss($limit, $userID = 0, $excludedCats = [], $airDate = -1)
 	{
 		return $this->pdo->query(
-				sprintf("
+			sprintf("
 				SELECT r.*, v.id, v.title, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
@@ -129,17 +130,17 @@ Class RSS
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
 				WHERE %s %s %s
 				AND r.nzbstatus = %d
-				AND r.categoryid BETWEEN 5000 AND 5999
+				AND r.categoryid BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-						$this->releases->getConcatenatedCategoryIDs(),
-						$this->releases->uSQL($this->pdo->query(sprintf('SELECT videos_id, categoryid FROM userseries WHERE userid = %d', $userID), true), 'videos_id'),
-						(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
-						($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
-						NZB::NZB_ADDED,
-						$this->releases->showPasswords,
-						(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
-				), true, NN_CACHE_EXPIRY_MEDIUM
+				$this->releases->getConcatenatedCategoryIDs(),
+				$this->releases->uSQL($this->pdo->query(sprintf('SELECT videos_id, categoryid FROM userseries WHERE userid = %d', $userID), true), 'videos_id'),
+				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
+				NZB::NZB_ADDED,
+				$this->releases->showPasswords,
+				(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
+			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 	}
 
@@ -155,7 +156,7 @@ Class RSS
 	public function getMyMoviesRss($limit, $userID = 0, $excludedCats = [])
 	{
 		return $this->pdo->query(
-				sprintf("
+			sprintf("
 				SELECT r.*, mi.title AS releasetitle, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
@@ -167,16 +168,16 @@ Class RSS
 				LEFT OUTER JOIN movieinfo mi ON mi.imdbid = r.imdbid
 				WHERE %s %s
 				AND r.nzbstatus = %d
-				AND r.categoryid BETWEEN 2000 AND 2999
+				AND r.categoryid BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-						$this->releases->getConcatenatedCategoryIDs(),
-						$this->releases->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM usermovies WHERE userid = %d', $userID), true), 'imdbid'),
-						(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
-						NZB::NZB_ADDED,
-						$this->releases->showPasswords,
-						(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
-				), true, NN_CACHE_EXPIRY_MEDIUM
+				$this->releases->getConcatenatedCategoryIDs(),
+				$this->releases->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM usermovies WHERE userid = %d', $userID), true), 'imdbid'),
+				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				NZB::NZB_ADDED,
+				$this->releases->showPasswords,
+				(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
+			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 	}
 
@@ -189,13 +190,13 @@ Class RSS
 	public function getFirstInstance($column, $table)
 	{
 		return $this->pdo->queryOneRow(
-				sprintf("
+			sprintf("
 						SELECT %1\$s
 						FROM %2\$s
 						ORDER BY %1\$s ASC",
-						$column,
-						$table
-				)
+				$column,
+				$table
+			)
 		);
 	}
 }

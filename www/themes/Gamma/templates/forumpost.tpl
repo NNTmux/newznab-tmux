@@ -7,7 +7,7 @@
 		<th style="padding-top:0px; padding-bottom:0px;">By</th>
 		<th style="padding-top:0px; padding-bottom:0px;">Message</th>
 	</tr>
-	{foreach from=$results item=result name=result}
+	{foreach $results as $result name=result}
 		<tr class="{cycle values=",alt"}">
 			<td width="15%;">
 				{if $result.isadmin == 1}<strong>{/if}
@@ -15,7 +15,7 @@
 				{if $result.isadmin == 1}</strong>{/if}
 				<br/>
 				on <span title="{$result.createddate}">{$result.createddate|date_format}</span> <div class="hint">({$result.createddate|timeago})</div>
-				{if $userdata.role==2}
+				{if $userdata.role == 2}
 				<br/>
 				<div>
 					<a class="rndbtn confirm_action btn btn-mini btn-danger" href="{$smarty.const.WWW_TOP}/admin/forum-delete.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}" title="Delete Post">Delete</a>

@@ -1,9 +1,11 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
+use newznab\Category;
 use newznab\ConsoleTools;
 use newznab\db\Settings;
 
+$category = new Category();
 $pdo = new Settings();
 $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 $ran = false;
@@ -37,14 +39,14 @@ if (isset($argv[1]) && $argv[1] === "all") {
 			$total = $qry->rowCount();
 			foreach ($qry as $releases) {
 				$pdo->queryExec(
-						sprintf("
+					sprintf("
 						UPDATE releases
 						SET consoleinfoid = NULL, gamesinfo_id = 0, imdbid = NULL, musicinfoid = NULL,
 							bookinfoid = NULL, videos_id = 0, tv_episodes_id = 0, xxxinfo_id = 0, passwordstatus = -1, haspreview = -1,
 							jpgstatus = 0, videostatus = 0, audiostatus = 0, nfostatus = -1
 						WHERE id = %d",
-								$releases['id']
-						)
+						$releases['id']
+					)
 				);
 				$consoletools->overWritePrimary("Resetting Releases:  " . $consoletools->percentString(++$affected, $total));
 			}
@@ -61,7 +63,7 @@ if (isset($argv[1]) && ($argv[1] === "consoles" || $argv[1] === "all")) {
 		$where = ' WHERE consoleinfoid IS NOT NULL';
 	} else {
 		echo $pdo->log->header("Resetting all failed Console postprocessing");
-		$where = " WHERE consoleinfoid IN (-2, 0) AND categoryid BETWEEN 1000 AND 1999";
+		$where = " WHERE consoleinfoid IN (-2, 0) AND categoryid BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -117,7 +119,7 @@ if (isset($argv[1]) && ($argv[1] === "movies" || $argv[1] === "all")) {
 		$where = ' WHERE imdbid IS NOT NULL';
 	} else {
 		echo $pdo->log->header("Resetting all failed Movie postprocessing");
-		$where = " WHERE imdbid IN (-2, 0) AND categoryid BETWEEN 2000 AND 2999";
+		$where = " WHERE imdbid IN (-2, 0) AND categoryid BETWEEN " . Category::MOVIE_ROOT . " AND " . Category::MOVIE_OTHER;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -145,7 +147,7 @@ if (isset($argv[1]) && ($argv[1] === "music" || $argv[1] === "all")) {
 		$where = ' WHERE musicinfoid IS NOT NULL';
 	} else {
 		echo $pdo->log->header("Resetting all failed Music postprocessing");
-		$where = " WHERE musicinfoid IN (-2, 0) AND categoryid BETWEEN 3000 AND 3999";
+		$where = " WHERE musicinfoid IN (-2, 0) AND categoryid BETWEEN " . Category::MUSIC_ROOT . " AND " . Category::MUSIC_OTHER;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -194,10 +196,10 @@ if (isset($argv[1]) && ($argv[1] === "tv" || $argv[1] === "all")) {
 	}
 	if (isset($argv[2]) && $argv[2] === "true") {
 		echo $pdo->log->header("Resetting all TV postprocessing");
-		$where = ' WHERE videos_id != 0 AND tv_episodes_id != 0 AND categoryid BETWEEN 5000 AND 5999';
+		$where = " WHERE videos_id != 0 AND tv_episodes_id != 0 AND categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER;
 	} else {
 		echo $pdo->log->header("Resetting all failed TV postprocessing");
-		$where = " WHERE tv_episodes_id < 0 AND categoryid BETWEEN 5000 AND 5999";
+		$where = " WHERE tv_episodes_id < 0 AND categoryid BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -226,7 +228,7 @@ if (isset($argv[1]) && ($argv[1] === "anime" || $argv[1] === "all")) {
 		$where = ' WHERE categoryid = 5070';
 	} else {
 		echo $pdo->log->header("Resetting all failed Anime postprocessing");
-		$where = " WHERE anidbid BETWEEN -2 AND -1 AND categoryid = 5070";
+		$where = " WHERE anidbid BETWEEN -2 AND -1 AND categoryid = " . Category::TV_ANIME;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -254,7 +256,7 @@ if (isset($argv[1]) && ($argv[1] === "books" || $argv[1] === "all")) {
 		$where = ' WHERE bookinfoid IS NOT NULL';
 	} else {
 		echo $pdo->log->header("Resetting all failed Book postprocessing");
-		$where = " WHERE bookinfoid IN (-2, 0) AND categoryid BETWEEN 0000 AND 8999";
+		$where = " WHERE bookinfoid IN (-2, 0) AND categoryid BETWEEN " . Category::BOOKS_ROOT . " AND " . Category::BOOKS_UNKNOWN;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -278,7 +280,7 @@ if (isset($argv[1]) && ($argv[1] === "xxx" || $argv[1] === "all")) {
 		$where = ' WHERE xxxinfo_id != 0';
 	} else {
 		echo $pdo->log->header("Resetting all failed XXX postprocessing");
-		$where = " WHERE xxxinfo_id IN (-2, 0) AND categoryid BETWEEN 6000 AND 6040";
+		$where = " WHERE xxxinfo_id IN (-2, 0) AND categoryid BETWEEN " . Category::XXX_ROOT . " AND " . Category::XXX_X264;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -288,7 +290,7 @@ if (isset($argv[1]) && ($argv[1] === "xxx" || $argv[1] === "all")) {
 		foreach ($qry as $releases) {
 			$pdo->queryExec("UPDATE releases SET xxxinfo_id = 0 WHERE id = " . $releases['id']);
 			$consoletools->overWritePrimary("Resetting XXX Releases:  " . $consoletools->percentString(++$concount,
-							$total));
+					$total));
 		}
 	}
 	echo $pdo->log->header("\n" . number_format($concount) . " xxxinfo_ID's reset.");
@@ -321,22 +323,22 @@ if (isset($argv[1]) && ($argv[1] === "nfos" || $argv[1] === "all")) {
 if ($ran === false) {
 	exit(
 	$pdo->log->error(
-			"\nThis script will reset postprocessing per category. It can also truncate the associated tables."
-			. "\nTo reset only those that have previously failed, those without covers, samples, previews, etc. use the "
-			. "second argument false.\n"
-			. "To reset even those previously post processed, use the second argument true.\n"
-			. "To truncate the associated table, use the third argument truncate.\n\n"
-			. "php reset_postprocessing.php consoles true    ...: To reset all consoles.\n"
-			. "php reset_postprocessing.php games true       ...: To reset all games.\n"
-			. "php reset_postprocessing.php movies true      ...: To reset all movies.\n"
-			. "php reset_postprocessing.php music true       ...: To reset all music.\n"
-			. "php reset_postprocessing.php misc true        ...: To reset all misc.\n"
-			. "php reset_postprocessing.php tv true          ...: To reset all tv.\n"
-			. "php reset_postprocessing.php anime true       ...: To reset all anime.\n"
-			. "php reset_postprocessing.php books true       ...: To reset all books.\n"
-			. "php reset_postprocessing.php xxx true         ...: To reset all xxx.\n"
-			. "php reset_postprocessing.php nfos true        ...: To reset all nfos.\n"
-			. "php reset_postprocessing.php all true         ...: To reset everything.\n"
+		"\nThis script will reset postprocessing per category. It can also truncate the associated tables."
+		. "\nTo reset only those that have previously failed, those without covers, samples, previews, etc. use the "
+		. "second argument false.\n"
+		. "To reset even those previously post processed, use the second argument true.\n"
+		. "To truncate the associated table, use the third argument truncate.\n\n"
+		. "php reset_postprocessing.php consoles true    ...: To reset all consoles.\n"
+		. "php reset_postprocessing.php games true       ...: To reset all games.\n"
+		. "php reset_postprocessing.php movies true      ...: To reset all movies.\n"
+		. "php reset_postprocessing.php music true       ...: To reset all music.\n"
+		. "php reset_postprocessing.php misc true        ...: To reset all misc.\n"
+		. "php reset_postprocessing.php tv true          ...: To reset all tv.\n"
+		. "php reset_postprocessing.php anime true       ...: To reset all anime.\n"
+		. "php reset_postprocessing.php books true       ...: To reset all books.\n"
+		. "php reset_postprocessing.php xxx true         ...: To reset all xxx.\n"
+		. "php reset_postprocessing.php nfos true        ...: To reset all nfos.\n"
+		. "php reset_postprocessing.php all true         ...: To reset everything.\n"
 	)
 	);
 } else {

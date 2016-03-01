@@ -753,28 +753,42 @@ class Users
 		$this->pdo->queryExec(sprintf("DELETE from roleexcat where role = %d", $role));
 	}
 
-	public function getCategoryExclusionNames($uid)
+	/**
+	 * Get the list of categories the user has excluded.
+	 *
+	 * @param int $userID ID of the user.
+	 *
+	 * @return array
+	 */
+	public function getCategoryExclusion($userID)
 	{
-		$data = $this->getCategoryExclusion($uid);
 		$ret = [];
-
-		if ($data) {
-			$category = new Category();
-			$data = $category->getByIds($data);
-			foreach ($data as $d)
-				$ret[] = $d["title"];
+		$categories = $this->pdo->query(sprintf("SELECT categoryid FROM userexcat WHERE userid = %d", $userID));
+		foreach ($categories as $category) {
+			$ret[] = $category["categoryid"];
 		}
 
 		return $ret;
 	}
 
-	public function getCategoryExclusion($uid)
+	/**
+	 * Get list of category names excluded by the user.
+	 *
+	 * @param int $userID ID of the user.
+	 *
+	 * @return array
+	 */
+	public function getCategoryExclusionNames($userID)
 	{
+		$data = $this->getCategoryExclusion($userID);
+		$category = new Category(['Settings' => $this->pdo]);
+		$categories = $category->getByIds($data);
 		$ret = [];
-		$data = $this->pdo->query(sprintf("select categoryid from userexcat where userid = %d union distinct select categoryid from roleexcat inner join users on users.role = roleexcat.role where users.id = %d", $uid, $uid));
-		foreach ($data as $d)
-			$ret[] = $d["categoryid"];
-
+		if ($categories !== false) {
+			foreach ($categories as $cat) {
+				$ret[] = $cat["title"];
+			}
+		}
 		return $ret;
 	}
 

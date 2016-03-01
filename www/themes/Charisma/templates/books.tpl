@@ -8,17 +8,7 @@
 	</div>
 </div>
 <div class="well well-sm">
-	<form class="form-inline" role="form" name="browseby" action="books">
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="title">Title:</label>
-			<input type="text" class="form-control" id="title" name="title" value="{$title}" placeholder="Title">
-		</div>
-		<div class="form-group form-group-sm">
-			<label class="sr-only" for="author">Author:</label>
-			<input type="text" class="form-control" id="author" name="author" value="{$author}" placeholder="Author">
-		</div>
-		<input type="submit" class="btn btn-primary" value="Search!"/>
-	</form>
+	{include file='search-filter.tpl'}
 </div>
 <form id="nzb_multi_operations_form" action="get">
 	<div class="box-body"
@@ -43,15 +33,10 @@
 												<input type="button"
 													   class="nntmux_multi_operations_cart btn btn-sm btn-info"
 													   value="Send to my Download Basket"/>
-												{if isset($sabintegrated)}
+												{if isset($sabintegrated) && $sabintegrated !=""}
 													<input type="button"
 														   class="nntmux_multi_operations_sab btn btn-sm btn-primary"
 														   value="Send to Queue"/>
-												{/if}
-												{if isset($nzbgetintegrated)}
-													<input type="button"
-														   class="nntmux_multi_operations_nzbget btn btn-sm btn-primary"
-														   value="Send to NZBGet"/>
 												{/if}
 												{if isset($isadmin)}
 													<input type="button"
@@ -66,7 +51,7 @@
 									</div>
 								</div>
 								<hr>
-								{foreach from=$results item=result}
+								{foreach $results as $result}
 									{assign var="msplits" value=","|explode:$result.grp_release_id}
 									{assign var="mguid" value=","|explode:$result.grp_release_guid}
 									{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
@@ -81,7 +66,7 @@
 									{assign var="mpass" value=","|explode:$result.grp_release_password}
 									{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 									{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-									{foreach from=$msplits item=m}
+									{foreach $msplits as $m}
 										<div class="panel panel-default">
 											<div class="panel-body">
 												<div class="row">
@@ -90,21 +75,21 @@
 														   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
 															<img src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfoid}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																 width="140" border="0"
-																 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
+																 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 														</a>
-														{if isset($resulturl) && $result.url != ""}<a
+														{if isset($result.url) && $result.url != ""}<a
 															class="label label-default" target="_blank"
 															href="{$site->dereferrer_link}{$result.url}"
 															name="amazon{$result.bookinfoid}" title="View amazon page">
 																Amazon</a>{/if}
-														{if isset($result.nfoid) && $result.nfoid > 0}<a
-															href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+														{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a
+															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															title="View Nfo" class="label label-default" rel="nfo">
 																NFO</a>{/if}
 														<a class="label label-default"
 														   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
 														   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
-														{if $mfailed[$m@index] > 0}
+														{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0}
 														<span class="btn btn-hover btn-default btn-xs"><i class="fa fa-thumbs-o-down"></i><span
 																	class="badge"> {$mfailed[$m@index]}
 																Failed Download{if $mfailed[$m@index] > 1}s{/if}</span>
@@ -127,23 +112,23 @@
 																<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																	<br/>
-																	{if $result.review != ""}<span class="descinitial">{$result.review|escape:"htmlall"|nl2br|magicurl|truncate:350}</span>{if $result.review|strlen > 350}<a class="descmore" href="#">more...</a><span class="descfull">{$result.review|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}<br /><br />{/if}
-																	{if $result.publisher != ""}
+																	{if isset($result.review) && $result.review != ""}<span class="descinitial">{$result.review|escape:"htmlall"|nl2br|magicurl|truncate:350}</span>{if $result.review|strlen > 350}<a class="descmore" href="#">more...</a><span class="descfull">{$result.review|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}<br /><br />{/if}
+																	{if isset($result.publisher) && $result.publisher != ""}
 																		<b>Publisher:</b>
 																		{$result.publisher|escape:"htmlall"}
 																		<br/>
 																	{/if}
-																	{if $result.publishdate != ""}
+																	{if isset($result.publishdate) && $result.publishdate != ""}
 																		<b>Published:</b>
 																		{$result.publishdate|date_format}
 																		<br/>
 																	{/if}
-																	{if $result.pages != ""}
+																	{if isset($result.pages) && $result.pages != ""}
 																		<b>Pages:</b>
 																		{$result.pages}
 																		<br/>
 																	{/if}
-																	{if $result.isbn != ""}
+																	{if isset($result.isbn) && $result.isbn != ""}
 																		<b>ISBN:</b>
 																		{$result.isbn}
 																		<br/>
@@ -162,7 +147,7 @@
 																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
 																			  title="Send to my Download Basket"><i
 																					class="fa fa-shopping-basket"></i></span>
-																		{if isset($sabintegrated)}
+																		{if isset($sabintegrated) && $sabintegrated !=""}
 																			<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																				  title="Send to my Queue"><i
 																						class="fa fa-share"></i></span>
@@ -192,15 +177,10 @@
 													<input type="button"
 														   class="nntmux_multi_operations_cart btn btn-sm btn-info"
 														   value="Send to my Download Basket"/>
-													{if isset($sabintegrated)}
+													{if isset($sabintegrated) && $sabintegrated !=""}
 														<input type="button"
 															   class="nntmux_multi_operations_sab btn btn-sm btn-primary"
 															   value="Send to Queue"/>
-													{/if}
-													{if isset($nzbgetintegrated)}
-														<input type="button"
-															   class="nntmux_multi_operations_nzbget btn btn-sm btn-primary"
-															   value="Send to NZBGet"/>
 													{/if}
 													{if isset($isadmin)}
 														<input type="button"

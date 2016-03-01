@@ -14,7 +14,7 @@
 			With Selected:
 			<div class="btn-group">
 				<input type="button" class="nzb_multi_operations_cartdelete btn btn-small btn-danger" value="Delete"/>
-				{if $sabintegrated}<input type="button" class="nzb_multi_operations_cartsab btn btn-small btn-primary" value="Send to queue"/>{/if}
+				{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_cartsab btn btn-small btn-primary" value="Send to queue"/>{/if}
 				<input type="button" class="nzb_multi_operations_download btn btn-small btn-success" value="Download">
 			</div>
 		</div>
@@ -27,7 +27,7 @@
 			<th>options</th>
 		</tr>
 
-		{foreach from=$results item=result}
+		{foreach $results as $result}
 		<tr class="{cycle values=",alt"}">
 			<td class="check">
 				<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="nzb_check" value="{$result.id}" />

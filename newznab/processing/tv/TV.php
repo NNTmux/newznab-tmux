@@ -4,6 +4,7 @@ namespace newznab\processing\tv;
 use newznab\processing\Videos;
 use newznab\utility\Country;
 use newznab\utility\Utility;
+use newznab\Category;
 
 /**
  * Class TV -- abstract extension of Videos
@@ -49,12 +50,17 @@ abstract class TV extends Videos
 	public $siteColumns;
 
 	/**
+	 * @var array|bool|int|string
+	 */
+	public $catWhere;
+
+	/**
 	 * @param array $options Class instances / Echo to CLI.
 	 */
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->catWhere = 'categoryid BETWEEN 5000 AND 5999 AND categoryid NOT IN (5070)';
+		$this->catWhere = "categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . " AND categoryid != " . Category::TV_ANIME;
 		$this->tvqty = ($this->pdo->getSetting('maxrageprocessed') != '') ? $this->pdo->getSetting('maxrageprocessed') : 75;
 		$this->imgSavePath = NN_COVERS . 'tvshows' . DS;
 		$this->siteColumns = ['tvdb', 'trakt', 'tvrage', 'tvmaze', 'imdb', 'tmdb'];
@@ -139,7 +145,7 @@ abstract class TV extends Videos
 		}
 
 		$res = $this->pdo->queryDirect(
-				sprintf("
+			sprintf("
 				SELECT SQL_NO_CACHE r.searchname, r.id
 				FROM releases r
 				WHERE r.nzbstatus = 1
@@ -150,13 +156,13 @@ abstract class TV extends Videos
 				%s %s %s
 				ORDER BY r.postdate DESC
 				LIMIT %d",
-						$status,
-						$this->catWhere,
-						($groupID === '' ? '' : 'AND r.groupid = ' . $groupID),
-						($guidChar === '' ? '' : 'AND r.guid ' . $this->pdo->likeString($guidChar, false, true)),
-						($lookupSetting == 2 ? 'AND r.isrenamed = 1' : ''),
-						$this->tvqty
-				)
+				$status,
+				$this->catWhere,
+				($groupID === '' ? '' : 'AND r.groupid = ' . $groupID),
+				($guidChar === '' ? '' : 'AND r.guid ' . $this->pdo->likeString($guidChar, false, true)),
+				($lookupSetting == 2 ? 'AND r.isrenamed = 1' : ''),
+				$this->tvqty
+			)
 		);
 		return $res;
 	}
@@ -170,16 +176,16 @@ abstract class TV extends Videos
 	 */
 	public function setVideoIdFound($videoId, $releaseId, $episodeId) {
 		$this->pdo->queryExec(
-				sprintf('
+			sprintf('
 				UPDATE releases
 				SET videos_id = %d, tv_episodes_id = %d
 				WHERE %s
 				AND id = %d',
-						$videoId,
-						$episodeId,
-						$this->catWhere,
-						$releaseId
-				)
+				$videoId,
+				$episodeId,
+				$this->catWhere,
+				$releaseId
+			)
 		);
 	}
 
@@ -192,15 +198,15 @@ abstract class TV extends Videos
 	public function setVideoNotFound($status, $Id)
 	{
 		$this->pdo->queryExec(
-				sprintf('
+			sprintf('
 				UPDATE releases
 				SET tv_episodes_id = %d
 				WHERE %s
 				AND id = %d',
-						$status,
-						$this->catWhere,
-						$Id
-				)
+				$status,
+				$this->catWhere,
+				$Id
+			)
 		);
 	}
 
@@ -235,33 +241,33 @@ abstract class TV extends Videos
 		if ($videoId === false) {
 			// Insert the Show
 			$videoId = $this->pdo->queryInsert(
-					sprintf('
+				sprintf('
 					INSERT INTO videos
 					(type, title, countries_id, started, source, tvdb, trakt, tvrage, tvmaze, imdb, tmdb)
 					VALUES (%d, %s, %s, %s, %d, %d, %d, %d, %d, %d, %d)',
-							$show['type'],
-							$this->pdo->escapeString($show['title']),
-							$this->pdo->escapeString((isset($show['country']) ? $show['country'] : '')),
-							$this->pdo->escapeString($show['started']),
-							$show['source'],
-							$show['tvdb'],
-							$show['trakt'],
-							$show['tvrage'],
-							$show['tvmaze'],
-							$show['imdb'],
-							$show['tmdb']
-					)
+					$show['type'],
+					$this->pdo->escapeString($show['title']),
+					$this->pdo->escapeString((isset($show['country']) ? $show['country'] : '')),
+					$this->pdo->escapeString($show['started']),
+					$show['source'],
+					$show['tvdb'],
+					$show['trakt'],
+					$show['tvrage'],
+					$show['tvmaze'],
+					$show['imdb'],
+					$show['tmdb']
+				)
 			);
 			// Insert the supplementary show info
 			$this->pdo->queryInsert(
-					sprintf("
+				sprintf("
 					INSERT INTO tv_info (videos_id, summary, publisher, localzone)
 					VALUES (%d, %s, %s, %s)",
-							$videoId,
-							$this->pdo->escapeString($show['summary']),
-							$this->pdo->escapeString($show['publisher']),
-							$this->pdo->escapeString($show['localzone'])
-					)
+					$videoId,
+					$this->pdo->escapeString($show['summary']),
+					$this->pdo->escapeString($show['publisher']),
+					$this->pdo->escapeString($show['localzone'])
+				)
 			);
 			// If we have AKAs\aliases, insert those as well
 			if (!empty($show['aliases'])) {
@@ -288,19 +294,19 @@ abstract class TV extends Videos
 
 		if ($episodeId === false) {
 			$episodeId = $this->pdo->queryInsert(
-					sprintf('
+				sprintf('
 					INSERT INTO tv_episodes (videos_id, series, episode, se_complete, title, firstaired, summary)
 					VALUES (%d, %d, %d, %s, %s, %s, %s)
 					ON DUPLICATE KEY update se_complete = %s',
-							$videoId,
-							$episode['series'],
-							$episode['episode'],
-							$this->pdo->escapeString($episode['se_complete']),
-							$this->pdo->escapeString($episode['title']),
-							($episode['firstaired'] != "" ? $this->pdo->escapeString($episode['firstaired']) : "null"),
-							$this->pdo->escapeString($episode['summary']),
-							$this->pdo->escapeString($episode['se_complete'])
-					)
+					$videoId,
+					$episode['series'],
+					$episode['episode'],
+					$this->pdo->escapeString($episode['se_complete']),
+					$this->pdo->escapeString($episode['title']),
+					($episode['firstaired'] != "" ? $this->pdo->escapeString($episode['firstaired']) : "null"),
+					$this->pdo->escapeString($episode['summary']),
+					$this->pdo->escapeString($episode['se_complete'])
+				)
 			);
 		}
 		return $episodeId;
@@ -323,25 +329,25 @@ abstract class TV extends Videos
 		$ifStringInfo = "IF(%s = '', %s, %s)";
 
 		$this->pdo->queryExec(
-				sprintf('
+			sprintf('
 				UPDATE videos v
 				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
 				SET v.countries_id = %s, v.tvdb = %s, v.trakt = %s, v.tvrage = %s,
 					v.tvmaze = %s, v.imdb = %s, v.tmdb = %s,
 					tvi.summary = %s, tvi.publisher = %s, tvi.localzone = %s
 				WHERE v.id = %d',
-						sprintf($ifStringInfo, 'v.countries_id', $this->pdo->escapeString($show['country']), 'v.countries_id'),
-						sprintf($ifStringID, 'v.tvdb', $show['tvdb'], 'v.tvdb'),
-						sprintf($ifStringID, 'v.trakt', $show['trakt'], 'v.trakt'),
-						sprintf($ifStringID, 'v.tvrage', $show['tvrage'], 'v.tvrage'),
-						sprintf($ifStringID, 'v.tvmaze', $show['tvmaze'], 'v.tvmaze'),
-						sprintf($ifStringID, 'v.imdb', $show['imdb'], 'v.imdb'),
-						sprintf($ifStringID, 'v.tmdb', $show['tmdb'], 'v.tmdb'),
-						sprintf($ifStringInfo, 'tvi.summary', $this->pdo->escapeString($show['summary']), 'tvi.summary'),
-						sprintf($ifStringInfo, 'tvi.publisher', $this->pdo->escapeString($show['publisher']), 'tvi.publisher'),
-						sprintf($ifStringInfo, 'tvi.localzone', $this->pdo->escapeString($show['localzone']), 'tvi.localzone'),
-						$videoId
-				)
+				sprintf($ifStringInfo, 'v.countries_id', $this->pdo->escapeString($show['country']), 'v.countries_id'),
+				sprintf($ifStringID, 'v.tvdb', $show['tvdb'], 'v.tvdb'),
+				sprintf($ifStringID, 'v.trakt', $show['trakt'], 'v.trakt'),
+				sprintf($ifStringID, 'v.tvrage', $show['tvrage'], 'v.tvrage'),
+				sprintf($ifStringID, 'v.tvmaze', $show['tvmaze'], 'v.tvmaze'),
+				sprintf($ifStringID, 'v.imdb', $show['imdb'], 'v.imdb'),
+				sprintf($ifStringID, 'v.tmdb', $show['tmdb'], 'v.tmdb'),
+				sprintf($ifStringInfo, 'tvi.summary', $this->pdo->escapeString($show['summary']), 'tvi.summary'),
+				sprintf($ifStringInfo, 'tvi.publisher', $this->pdo->escapeString($show['publisher']), 'tvi.publisher'),
+				sprintf($ifStringInfo, 'tvi.localzone', $this->pdo->escapeString($show['localzone']), 'tvi.localzone'),
+				$videoId
+			)
 		);
 		if (!empty($show['aliases'])) {
 			$this->addAliases($videoId, $show['aliases']);
@@ -358,15 +364,15 @@ abstract class TV extends Videos
 	public function delete($id)
 	{
 		return $this->pdo->queryExec(
-				sprintf("
+			sprintf("
 				DELETE v, tvi, tve, va
 				FROM videos v
 				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
 				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
 				LEFT JOIN videos_aliases va ON v.id = va.videos_id
 				WHERE v.id = %d",
-						$id
-				)
+				$id
+			)
 		);
 	}
 
@@ -378,12 +384,12 @@ abstract class TV extends Videos
 	public function setCoverFound($videoId)
 	{
 		$this->pdo->queryExec(
-				sprintf("
+			sprintf("
 				UPDATE tv_info
 				SET image = 1
 				WHERE videos_id = %d",
-						$videoId
-				)
+				$videoId
+			)
 		);
 	}
 
@@ -400,13 +406,13 @@ abstract class TV extends Videos
 	{
 		$return = false;
 		$video = $this->pdo->queryOneRow(
-				sprintf("
+			sprintf("
 				SELECT %s
 				FROM videos
 				WHERE id = %d",
-						$column,
-						$id
-				)
+				$column,
+				$id
+			)
 		);
 		if ($column === '*') {
 			$return = $video;
@@ -440,14 +446,14 @@ abstract class TV extends Videos
 		}
 
 		$episodeArr = $this->pdo->queryOneRow(
-				sprintf("
+			sprintf("
 				SELECT id
 				FROM tv_episodes
 				WHERE videos_id = %d
 				AND %s",
-						$id,
-						$queryString
-				)
+				$id,
+				$queryString
+			)
 		);
 		return (isset($episodeArr['id']) ? $episodeArr['id'] : false);
 	}
@@ -462,12 +468,12 @@ abstract class TV extends Videos
 	public function countEpsByVideoID($videoId)
 	{
 		$count = $this->pdo->queryOneRow(
-				sprintf('
+			sprintf('
 				SELECT count(id) AS num
 				FROM tv_episodes
 				WHERE videos_id = %d',
-						$videoId
-				)
+				$videoId
+			)
 		);
 		return (isset($count['num']) && (int)$count['num'] > 0 ? true : false);
 	}
@@ -529,8 +535,8 @@ abstract class TV extends Videos
 		$showName = '';
 
 		$following = 	'[^a-z0-9](\d\d-\d\d|\d{1,3}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d' .
-				'|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|' .
-				'S\d+[^a-z0-9]?((E\d+)[abr]?)*|WEB[-_. ]?(DL|Rip)|XViD)[^a-z0-9]?';
+			'|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|' .
+			'S\d+[^a-z0-9]?((E\d+)[abr]?)*|WEB[-_. ]?(DL|Rip)|XViD)[^a-z0-9]?';
 
 		// For names that don't start with the title.
 		if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .-]*?)' . $following . '/i', $relname, $matches)) {

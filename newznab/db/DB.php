@@ -98,18 +98,18 @@ class DB extends \PDO
 		$this->cli = Utility::isCLI();
 
 		$defaults = [
-				'checkVersion'	=> false,
-				'createDb'		=> false, // create dbname if it does not exist?
-				'ct'			=> new ConsoleTools(),
-				'dbhost'		=> defined('DB_HOST') ? DB_HOST : '',
-				'dbname' 		=> defined('DB_NAME') ? DB_NAME : '',
-				'dbpass' 		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
-				'dbport'		=> defined('DB_PORT') ? DB_PORT : '',
-				'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
-				'dbtype'		=> defined('DB_TYPE') ? DB_TYPE : '',
-				'dbuser' 		=> defined('DB_USER') ? DB_USER : '',
-				'log'			=> new ColorCLI(),
-				'persist'		=> false,
+			'checkVersion'	=> false,
+			'createDb'		=> false, // create dbname if it does not exist?
+			'ct'			=> new ConsoleTools(),
+			'dbhost'		=> defined('DB_HOST') ? DB_HOST : '',
+			'dbname' 		=> defined('DB_NAME') ? DB_NAME : '',
+			'dbpass' 		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
+			'dbport'		=> defined('DB_PORT') ? DB_PORT : '',
+			'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
+			'dbtype'		=> defined('DB_TYPE') ? DB_TYPE : '',
+			'dbuser' 		=> defined('DB_USER') ? DB_USER : '',
+			'log'			=> new ColorCLI(),
+			'persist'		=> false,
 		];
 		$options += $defaults;
 
@@ -189,11 +189,11 @@ class DB extends \PDO
 	public function checkIndex($table, $index)
 	{
 		$result = $this->pdo->query(
-				sprintf(
-						"SHOW INDEX FROM %s WHERE key_name = '%s'",
-						trim($table),
-						trim($index)
-				)
+			sprintf(
+				"SHOW INDEX FROM %s WHERE key_name = '%s'",
+				trim($table),
+				trim($index)
+			)
 		);
 		if ($result === false) {
 			return false;
@@ -205,11 +205,11 @@ class DB extends \PDO
 	public function checkColumnIndex($table, $column)
 	{
 		$result = $this->pdo->query(
-				sprintf(
-						"SHOW INDEXES IN %s WHERE non_unique = 0 AND column_name = '%s'",
-						trim($table),
-						trim($column)
-				)
+			sprintf(
+				"SHOW INDEXES IN %s WHERE non_unique = 0 AND column_name = '%s'",
+				trim($table),
+				trim($column)
+			)
 		);
 		if ($result === false) {
 			return false;
@@ -279,11 +279,10 @@ class DB extends \PDO
 		$dsn .= ';charset=utf8';
 
 		$options = [
-				\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-				\PDO::ATTR_TIMEOUT => 180,
-				\PDO::ATTR_PERSISTENT => $this->opts['persist'],
-				\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
-				\PDO::MYSQL_ATTR_LOCAL_INFILE => true
+			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+			\PDO::ATTR_TIMEOUT => 180,
+			\PDO::ATTR_PERSISTENT => $this->opts['persist'],
+			\PDO::MYSQL_ATTR_LOCAL_INFILE => true
 		];
 
 		$this->dsn = $dsn;
@@ -320,10 +319,10 @@ class DB extends \PDO
 		// In case \PDO is not set to produce exceptions (PHP's default behaviour).
 		if ($this->pdo === false) {
 			$this->echoError(
-					"Unable to create connection to the Database!",
-					'initialiseDatabase',
-					1,
-					true
+				"Unable to create connection to the Database!",
+				'initialiseDatabase',
+				1,
+				true
 			);
 		}
 
@@ -392,12 +391,12 @@ class DB extends \PDO
 	public function likeString($str, $left=true, $right=true)
 	{
 		return (
-				'LIKE ' .
-				$this->escapeString(
-						($left  ? '%' : '') .
-						$str .
-						($right ? '%' : '')
-				)
+			'LIKE ' .
+			$this->escapeString(
+				($left  ? '%' : '') .
+				$str .
+				($right ? '%' : '')
+			)
 		);
 	}
 
@@ -524,10 +523,10 @@ class DB extends \PDO
 		} catch (\PDOException $e) {
 			// Deadlock or lock wait timeout, try 10 times.
 			if (
-					$e->errorInfo[1] == 1213 ||
-					$e->errorInfo[0] == 40001 ||
-					$e->errorInfo[1] == 1205 ||
-					$e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
+				$e->errorInfo[1] == 1213 ||
+				$e->errorInfo[0] == 40001 ||
+				$e->errorInfo[1] == 1205 ||
+				$e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
 			) {
 				return ['deadlock' => true, 'message' => $e->getMessage()];
 			}
@@ -1059,15 +1058,15 @@ class DB extends \PDO
 	public function uuid()
 	{
 		return sprintf(
-				'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-				mt_rand(0, 0xffff),
-				mt_rand(0, 0xffff),
-				mt_rand(0, 0xffff),
-				mt_rand(0, 0x0fff) | 0x4000,
-				mt_rand(0, 0x3fff) | 0x8000,
-				mt_rand(0, 0xffff),
-				mt_rand(0, 0xffff),
-				mt_rand(0, 0xffff)
+			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0x0fff) | 0x4000,
+			mt_rand(0, 0x3fff) | 0x8000,
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff)
 		);
 	}
 

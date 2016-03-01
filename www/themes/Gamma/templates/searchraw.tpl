@@ -47,14 +47,14 @@
 		<th>Nzb</th>
 	</tr>
 
-	{foreach from=$results item=result}
+	{foreach $results as $result}
 		<tr class="{cycle values=",alt"}">
 			<!--<td class="selection"><input name="file{$result.id}" id="file{$result.id}" value="{$result.id}" type="checkbox"/></td>-->
 			<td title="{$result.xref|escape:"htmlall"}">{$result.name|escape:"htmlall"}</td>
 			<td class="less">{$result.group_name|replace:"alt.binaries":"a.b"}</td>
 			<td class="less" title="{$result.date}">{$result.date|date_format}</td>
 			{if $isadmin}
-			<td><span title="procstat">{$result.procstat}</span>/<span title="totalparts">{$result.totalParts}</span>/<span title="regex">{if $result.regexid==""}_{else}{$result.regexid}{/if}</span>/<span title="relpart">{$result.relpart}</span>/<span title="reltotalpart">{$result.reltotalpart}</span></td>
+			<td><span title="procstat">{$result.procstat}</span>/<span title="totalparts">{$result.totalParts}</span>/<span title="regex">{if $result.regexid == ""}_{else}{$result.regexid}{/if}</span>/<span title="relpart">{$result.relpart}</span>/<span title="reltotalpart">{$result.reltotalpart}</span></td>
 			<td class="less">{if $result.binnum < $result.totalParts}<span class="label label-danger">{$result.binnum}/{$result.totalParts}</span>{else}<span class="label label-success">100%</span>{/if}</td>
 			{/if}
 			<td class="less">{if $result.releaseid > 0}<a class="btn btn-mini" title="View Nzb details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.filename|escape:"seourl"}">Yes</a>{/if}</td>

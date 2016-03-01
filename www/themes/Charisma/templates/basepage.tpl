@@ -6,8 +6,8 @@
 		/* <![CDATA[ */
 		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
 		var SERVERROOT = "{/literal}{$serverroot}{literal}";
-		var UID = "{/literal}{if $loggedin=="true"}{$userdata.id}{else}{/if}{literal}";
-		var RSSTOKEN = "{/literal}{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}{literal}";
+		var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
+		var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
 		/* ]]> */
 	</script>
 	{/literal}
@@ -25,7 +25,7 @@
 	<meta charset="utf-8">
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<!-- Newposterwall -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- The styles -->
 	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/{$theme}/css/bootstrap-spacelab.min.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/charisma-app.css" rel="stylesheet">
@@ -40,8 +40,11 @@
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.theme.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/jquery.iphone.toggle.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/animate.min.css' rel='stylesheet'>
+	<!-- Font Awesome Icons -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/font-awesome.min.css" rel="stylesheet"
+		  type="text/css"/>
 	<!-- Normalize.css -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/styles/normalize.css" rel="stylesheet" type="text/css">
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico">
 </head>
@@ -60,7 +63,7 @@
 						/></a>
 			{$header_menu}
 			<!-- user dropdown starts -->
-			{if ($loggedin)=="true"}
+			{if $loggedin == "true"}
 			<div class="btn-group pull-right">
 				<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 					<i class="fa fa-user"></i><span class="hidden-sm hidden-xs"><span
@@ -99,17 +102,17 @@
 						</div>
 						<ul class="nav nav-pills nav-stacked main-menu">
 							<!-- search form -->
-							{if ($loggedin)=="true"}
+							{if $loggedin == "true"}
 							<form id="headsearch_form" action="{$smarty.const.WWW_TOP}/search/" method="get">
 								<input id="headsearch" name="search" value="{if $header_menu_search == ""}Search...{else}{$header_menu_search|escape:"htmlall"}{/if}" class="form-control" type="text" tabindex="1$" />
 								<div class="row" style="padding-top:3px;">
 									<div class="col-md-8">
 										<select id="headcat" name="t" class="form-control" data-search="true">
 											<option class="grouping" value="-1">All</option>
-											{foreach from=$parentcatlist item=parentcat}
-												<option {if $header_menu_cat==$parentcat.id}selected="selected"{/if} value="{$parentcat.id}"> [{$parentcat.title}]</option>
-												{foreach from=$parentcat.subcatlist item=subcat}
-													<option {if $header_menu_cat==$subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;&nbsp; > {$subcat.title}</option>
+											{foreach $parentcatlist as $parentcat}
+												<option {if $header_menu_cat == $parentcat.id}selected="selected"{/if} value="{$parentcat.id}"> [{$parentcat.title}]</option>
+												{foreach $parentcat.subcatlist as $subcat}
+													<option {if $header_menu_cat == $subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;&nbsp; > {$subcat.title}</option>
 												{/foreach}
 											{/foreach}
 										</select>
@@ -141,6 +144,9 @@
 									<li><a href="{$smarty.const.WWW_TOP}/xxx"><i class="fa fa-venus-mars"></i><span> Adult</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/books"><i class="fa fa-book"></i><span> Books</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/browse"><i class="fa fa-list-ul"></i><span> Browse All Releases</span></a>
+									</li>
+									<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i class="fa fa-object-group"></i><span> Browse Groups</span></a>
+									</li>
 									<li><a href="{$smarty.const.WWW_TOP}/predb"><i
 													class="fa fa-list-ol"></i><span> PreDb</span></a></li>
 								</ul>
@@ -152,7 +158,7 @@
 									<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
 													class="fa fa-envelope-o"></i><span> Contact</span> <span
 													class="fa arrow"></span></a></li>
-									{if ($loggedin)=="true"}
+									{if $loggedin == "true"}
 									<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a></li>
