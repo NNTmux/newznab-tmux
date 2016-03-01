@@ -89,6 +89,11 @@ class Games
 	protected $_resultsFound = 0;
 
 	/**
+	 * @var array|bool|int|string
+	 */
+	public $catWhere;
+
+	/**
 	 * @param array $options Class instances / Echo to cli.
 	 */
 	public function __construct(array $options = [])
