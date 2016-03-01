@@ -332,8 +332,8 @@
 	</div>
 	<!-- ./wrapper -->
 	<!-- REQUIRED JS SCRIPTS -->
-	<!-- jQuery 2.1.4 -->
-	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/jQuery/jQuery-2.1.4.min.js"></script>
+	<!-- jQuery 2.2.1 -->
+	<script src="{$smarty.const.WWW_THEMES}/shared/scripts/jQuery-2.2.1.min.js"></script>
 	<!-- Bootstrap 3.3.6 JS -->
 	<script src="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/js/bootstrap.min.js"
 			type="text/javascript"></script>
@@ -346,7 +346,7 @@
 	<script src="{$smarty.const.WWW_THEMES}/{$theme}/dist/js/app.min.js" type="text/javascript"></script>
 	<!-- jQuery migrate script -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/migrate/jquery-migrate-1.2.1.min.js"></script>
+			src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
 	<!-- SlimScroll script -->
 	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/slimScroll/jquery.slimscroll.min.js"></script>
 	<!-- Fastclick script -->

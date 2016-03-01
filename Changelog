@@ -1,3 +1,7 @@
+2016-03-01 DariusIII
+	Chg: Make Gamma use Bootstrap 3.
+	Chg: Use jquery-migrate-1.4.0 in all the themes.
+	Add: Add jquery-2.2.1.min.js to shared/scripts folder and use it in all the themes
 2016-02-29 DariusIII
 	Chg: Change occurences of form-search to form-inline in Charisma and Omicron templates
 2016-02-26 DariusIII
