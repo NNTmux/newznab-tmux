@@ -10,7 +10,7 @@
 	{else}
 		{foreach from=$content item=c}
 			<div class="header">
-				<h2>Help > <strong>{$c->title}</strong></h2>
+				<h2><strong>{$c->title}</strong></h2>
 				<div class="breadcrumb-wrapper">
 					<ol class="breadcrumb">
 						/ {$c->title}
