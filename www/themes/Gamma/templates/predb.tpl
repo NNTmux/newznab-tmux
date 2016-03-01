@@ -3,7 +3,7 @@
 {/if}
 <h1>{$page->title}</h1>
 <form name="presearch" method="get" action="{$smarty.const.WWW_TOP}/predb" id="custom-search-form"
-	  class="form-search form-horizontal col-4 col-lg-4 pull-right">
+	  class="form-inline form-horizontal col-4 col-lg-4 pull-right">
 	<div id="search" class="input-group col-12 col-lg-12">
 		<input type="text" class="form-control" placeholder="Search predb" id="presearch" name="presearch"
 			   value="{$lastSearch|escape:'html'}">
@@ -44,7 +44,7 @@
 												{if isset($result.guid)}
 													<a style="font-style:italic;text-decoration:underline;color:#{if $result.nuked == 1}009933{elseif $result.nuked > 1}990000{/if};"
 													   class="title" title="View details"
-													   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.title|escape:"htmlall"}">
+													   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">
 														<span title="{if $result.nuked == 1}UNNUKED: {$result.nukereason|escape:"htmlall"}{elseif $result.nuked > 1}NUKED: {$result.nukereason|escape:"htmlall"}{else}{$result.title|escape:"htmlall"}{/if}">{$result.title|escape:"htmlall"}</span>
 													</a>
 												{else}
@@ -138,7 +138,7 @@
 												{* Games *}
 												{if in_array($result.category, array('GAMES', 'Games: PC', 'Games: Other'))}
 													<a class="title" title="View category PC Games"
-													   href="{$smarty.const.WWW_TOP}/browse?t={$catClass::PC_GAME}">PC
+													   href="{$smarty.const.WWW_TOP}/browse?t={$catClass::PC_GAMES}">PC
 														Games</a>
 												{/if}
 												{* TV *}
