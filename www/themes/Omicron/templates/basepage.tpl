@@ -333,7 +333,8 @@
 	<!-- ./wrapper -->
 	<!-- REQUIRED JS SCRIPTS -->
 	<!-- jQuery 2.2.1 -->
-	<script src="{$smarty.const.WWW_THEMES}/shared/scripts/jQuery-2.2.1.min.js"></script>
+	<script src="{$smarty.const.WWW_THEMES}/shared/scripts/jquery-2.2.1.min.js"
+			type="text/javascript" ></script>
 	<!-- Bootstrap 3.3.6 JS -->
 	<script src="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/js/bootstrap.min.js"
 			type="text/javascript"></script>
