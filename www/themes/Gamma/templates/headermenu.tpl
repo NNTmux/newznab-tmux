@@ -1,5 +1,5 @@
 {if isset($userdata)}
-<ul class="nav" role="navigation">
+<ul class="nav navbar-nav">
 	{foreach $parentcatlist as $parentcat}
 	{if $parentcat.id == {$catClass::GAME_ROOT}}
 		<li class="dropdown">
@@ -158,6 +158,7 @@
 	<li class="dropdown">
 		<a id="dropOther" class="dropdown-toggle" data-toggle="dropdown" href="#">Other <b class="caret"></b></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="dropOther">
+			<li><a href="/browse?t={$catClass::OTHER_ROOT}">Other</a></li>
 			<hr>
 			<li><a href="/browse?t={$catClass::OTHER_MISC}">Misc</a></li>
 			<li><a href="/browse?t={$catClass::OTHER_HASHED}">Hashed</a></li>

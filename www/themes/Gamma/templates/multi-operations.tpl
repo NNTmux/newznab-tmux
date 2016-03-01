@@ -1,4 +1,4 @@
-<div class="container nzb_multi_operations">
+<div class="nzb_multi_operations">
 	{$pager}
 	<div class="pull-right">
 		With Selected:

@@ -211,11 +211,11 @@
 	<!--/.fluid-container-->
 	<!-- Scripts-->
 	<!-- jQuery -->
-	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/jquery/jquery.min.js"></script>
+	<!-- jQuery 2.2.1 -->
+	<script src="{$smarty.const.WWW_THEMES}/shared/scripts/jQuery-2.2.1.min.js"></script>
 	<!-- jQuery migrate script -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery-migrate-1.2.1.min.js"></script>
+			src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/js/bootstrap.min.js"></script>
 	<!-- Bootstrap hover on mouseover script -->
