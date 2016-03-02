@@ -1,63 +1,64 @@
+2016-03-02 DariusIII
+	* Fix: Prevent undefined notices in Gamma theme books page
+	* Fix: Fix Gamma menu on hover, use shared script for menu hover in all the themes.
 2016-03-01 DariusIII
-	Fix: Fix Gamma menu on hover, use shared script for menu hover in all the themes.
-2016-03-01 DariusIII
-	Chg: Adjust Gamma theme, add dropdown on hover to menus.
-	Chg: Make Gamma use Bootstrap 3.
-	Chg: Use jquery-migrate-1.4.0 in all the themes.
-	Add: Add jquery-2.2.1.min.js to shared/scripts folder and use it in all the themes
+	* Chg: Adjust Gamma theme, add dropdown on hover to menus.
+	* Chg: Make Gamma use Bootstrap 3.
+	* Chg: Use jquery-migrate-1.4.0 in all the themes.
+	* Add: Add jquery-2.2.1.min.js to shared/scripts folder and use it in all the themes
 2016-02-29 DariusIII
-	Chg: Change occurences of form-search to form-inline in Charisma and Omicron templates
+	* Chg: Change occurences of form-search to form-inline in Charisma and Omicron templates
 2016-02-26 DariusIII
-	Chg: Remove nzbgetintegrated check from templates, check for empty sabintegrated fields
+	* Chg: Remove nzbgetintegrated check from templates, check for empty sabintegrated fields
 2016-02-25 DariusIII
-	Chg: Replace custom filter code in templates with search-filter.tpl
-	Chg: Move rss, rssdesc and search-filter.tpl to shared folder
-	Fix: Fix Gamma theme rss.
-	Fix: Prevent undefined index userdata error on headermenu of all themes
+	* Chg: Replace custom filter code in templates with search-filter.tpl
+	* Chg: Move rss, rssdesc and search-filter.tpl to shared folder
+	* Fix: Fix Gamma theme rss.
+	* Fix: Prevent undefined index userdata error on headermenu of all themes
 2016-02-23 DariusIII
-	Fix: Fix undefined index errors on book pages.
-	Add: Add LICENSE.txt.
-	Add: Add ubuntu install guide when installer will be available
-	Chg: Update the removeWMV function on ReleaseRemover.
-	Chg: Remove unneccessary MYSQL_ATTR_INIT_COMMAND from PDO dsn options array. This was only
+	* Fix: Fix undefined index errors on book pages.
+	* Add: Add LICENSE.txt.
+	* Add: Add ubuntu install guide when installer will be available
+	* Chg: Update the removeWMV function on ReleaseRemover.
+	* Chg: Remove unneccessary MYSQL_ATTR_INIT_COMMAND from PDO dsn options array. This was only
 		needed before PHP 5.3.6 as 'charset' was ignored.
-	Fix: Add missing Music class to MiscSorter.
+	* Fix: Add missing Music class to MiscSorter.
 2016-02-20 DariusIII
-	Fix: Fix typo for userexcat table in Users.php
+	* Fix: Fix typo for userexcat table in Users.php
 2016-02-19 DariusIII
-	Fix: Fix missing smarty const from Charisma/Omicron headermenu.tpl
+	* Fix: Fix missing smarty const from Charisma/Omicron headermenu.tpl
 2016-02-18 DariusIII
-	Upd: Update nntmux_fi_schema.sql
-	Fix: Fix typo in link to myshows in Omicron template.
+	* Upd: Update nntmux_fi_schema.sql
+	* Fix: Fix typo in link to myshows in Omicron template.
 2016-02-17 DariusIII
-	Chg: Rename category for smarty to catCLass to prevent conflicts
-	Upd: Update getCategoryExclusion and getCategoryExclusionNames functions.
-	Fix: Fix Gamma theme headermenu when coverview is disabled
-	Chg: Change position of browse groups from headermenu to left side menu
+	* Chg: Rename category for smarty to catCLass to prevent conflicts
+	* Upd: Update getCategoryExclusion and getCategoryExclusionNames functions.
+	* Fix: Fix Gamma theme headermenu when coverview is disabled
+	* Chg: Change position of browse groups from headermenu to left side menu
 2016-02-16 DariusIII
-	Chg: Rename Categories class get function to getCategories
-	Fix: Prevent errors when pagertotalcount is not set
-	Chg: Move showApiError function to Utility class, adjust pages that use it.
+	* Chg: Rename Categories class get function to getCategories
+	* Fix: Prevent errors when pagertotalcount is not set
+	* Chg: Move showApiError function to Utility class, adjust pages that use it.
 2016-02-13 DariusIII
-	Upd: Use $category for constants
+	* Upd: Use $category for constants
 2016-02-11 DariusIII
-	Fix: Fix filelist view in themes
-	Upd: Add screen sequential and threaded scripts
+	* Fix: Fix filelist view in themes
+	* Upd: Add screen sequential and threaded scripts
 2016-02-10 DariusIII
-	Upd: Switch foreach loops from smarty2 to smarty3 syntax
-	Chg: Switch templates from category numbers to category constants usage
+	* Upd: Switch foreach loops from smarty2 to smarty3 syntax
+	* Chg: Switch templates from category numbers to category constants usage
 2016-02-09 DariusIII
-	Upd: Switch to category constants from category numbers, part 1
-	Upd: Change other cat numbers to be the last number in their range x999
+	* Upd: Switch to category constants from category numbers, part 1
+	* Upd: Change other cat numbers to be the last number in their range x999
 2016-02-07 DariusIII
-	Chg: Remove CAT_ from categories names and rename parent categories to root.
+	* Chg: Remove CAT_ from categories names and rename parent categories to root.
 2016-02-04 DariusIII
-	Upd: Add function to fetch category values
+	* Upd: Add function to fetch category values
 2016-02-03 DariusIII
-	Chg: Move fonts and css not related to bootstrap to css and fonts folders in shared respectively
-	Fix: Replace deprecated html tag <center> with proper CSS
+	* Chg: Move fonts and css not related to bootstrap to css and fonts folders in shared respectively
+	* Fix: Replace deprecated html tag <center> with proper CSS
 2016-02-01 DariusIII
-	Chg: Rename CAT_BOOK_ to CAT_BOOKS_, change the book other category from 7050 to 7999
+	* Chg: Rename CAT_BOOK_ to CAT_BOOKS_, change the book other category from 7050 to 7999
 2016-01-29 DariusIII
 	Chg: Remove utf8_encode to speed up processing of binaries and collections, fix by @izolight
 2016-01-28 DariusIII

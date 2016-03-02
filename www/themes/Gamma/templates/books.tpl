@@ -146,18 +146,18 @@
 									<li width="50px"><a title="View file list" href="{$smarty.const.WWW_TOP}/filelist/{$mguid[$m@index]}">{$mtotalparts[$m@index]}</a> <i class="fa fa-file"></i></li>
 									<li width="50px"><a title="View comments for {$mname[$m@index]|escape:"htmlall"}" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments">{$mcomments[$m@index]}</a> <i class="fa fa-comments-o"></i></li>
 									<li width="50px">{$mgrabs[$m@index]} <i class="fa fa-cloud-download"></i></li>
-									{if $mnfo[$m@index] > 0}
+									{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}
 									<li width="50px"><a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="modal_nfo badge" rel="nfo">Nfo</a></li>
 									{/if}
-									{if $mpass[$m@index] == 1}
+									{if isset($mpass[$m@index]) && $mpass[$m@index] == 1}
 									<li width="50px">Passworded, {elseif $mpass[$m@index] == 2}Potential Password</li>
 									{/if}
 									<li width="50px"><a href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}" class="badge" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Grp</a></li>
-									{if $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1}
+									{if isset($mhaspreview[$m@index]) && $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1}
 									<li width="50px"><a href="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg" name="name{$mguid[$m@index]}" title="Screenshot of {$mname[$m@index]|escape:"htmlall"}" class="modal_prev badge" rel="preview">Preview</a></li>
 									{/if}
 
-									{if $minnerfiles[$m@index] > 0}
+									{if isset($minnerfiles[$m@index]) && $minnerfiles[$m@index] > 0}
 									<li width="50px"><a href="#" onclick="return false;" class="mediainfo badge" title="{$mguid[$m@index]}">Media</a></li>
 									{/if}
 
@@ -177,7 +177,7 @@
 										<a class="icon icon_sab fa fa-share" style="text-decoration: none; color: #008ab8;"  href="#" title="Send to queue"></a>
 									</li>
 									{/if}
-                                    {if $weHasVortex}
+                                    {if isset($weHasVortex) && $weHasVortex !=""}
                                         <li>
                                             <a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#" title="Send to NZBVortex">
                                                 <img src="{$smarty.const.WWW_THEMES}/shared/images/icons/vortex/bigsmile.png">
