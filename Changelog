@@ -1,4 +1,6 @@
 2016-03-01 DariusIII
+	Fix: Fix Gamma menu on hover, use shared script for menu hover in all the themes.
+2016-03-01 DariusIII
 	Chg: Adjust Gamma theme, add dropdown on hover to menus.
 	Chg: Make Gamma use Bootstrap 3.
 	Chg: Use jquery-migrate-1.4.0 in all the themes.
