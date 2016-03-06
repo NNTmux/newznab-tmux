@@ -76,7 +76,7 @@ switch ($action) {
 					(isset($_POST['nzbgeturl']) ? $_POST['nzbgeturl'] : ''),
 					(isset($_POST['nzbgetusername']) ? $_POST['nzbgetusername'] : ''),
 					(isset($_POST['nzbgetpassword']) ? $_POST['nzbgetpassword'] : ''),
-					(isset($_POST['saburl']) ? $_POST['saburl'] : ''),
+					(isset($_POST['saburl']) ? Utility::trailingSlash($_POST['saburl']) : ''),
 					(isset($_POST['sabapikey']) ? $_POST['sabapikey'] : ''),
 					(isset($_POST['sabpriority']) ? $_POST['sabpriority'] : ''),
 					(isset($_POST['sabapikeytype']) ? $_POST['sabapikeytype'] : ''),

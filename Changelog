@@ -1,3 +1,5 @@
+2016-03-06 DariusIII
+	* Upd: Add trailing slash to saburl on profile edit
 2016-03-02 DariusIII
 	* Fix: Prevent undefined notices in Gamma theme books page
 	* Fix: Fix Gamma menu on hover, use shared script for menu hover in all the themes.
