@@ -111,8 +111,8 @@ function daytopost($nntp, $group, $days, $debug = true, $bfcheck = true)
 		exit($pdo->log->error("Group data is coming back as php's max value. You should not see this since we use a patched Net_NNTP that fixes this bug."));
 	}
 
-	$firstDate = $binaries->postdate($data['first'], $data);
-	$lastDate = $binaries->postdate($data['last'], $data);
+	$firstDate = $binaries->postDate($data['first'], $data);
+	$lastDate = $binaries->postDate($data['last'], $data);
 
 	if ($goaldate < $firstDate && $bfcheck) {
 		if ($st === true) {
@@ -137,16 +137,16 @@ function daytopost($nntp, $group, $days, $debug = true, $bfcheck = true)
 	$dateofnextone = $lastDate;
 	// Match on days not timestamp to speed things up.
 	while (daysOld($dateofnextone) < $days) {
-		while (($tmpDate = $binaries->postdate(($upperbound - $interval), $data)) > $goaldate) {
+		while (($tmpDate = $binaries->postDate(($upperbound - $interval), $data)) > $goaldate) {
 			$upperbound = $upperbound - $interval;
 		}
 
 		if (!$templowered) {
 			$interval = ceil(($interval / 2));
 		}
-		$dateofnextone = $binaries->postdate(($upperbound - 1), $data);
+		$dateofnextone = $binaries->postDate(($upperbound - 1), $data);
 		while (!$dateofnextone) {
-			$dateofnextone = $binaries->postdate(($upperbound - 1), $data);
+			$dateofnextone = $binaries->postDate(($upperbound - 1), $data);
 		}
 	}
 	if ($st === true) {

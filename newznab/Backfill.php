@@ -263,7 +263,7 @@ class Backfill
 			?
 			round($groupArr['first_record'] - $articles)
 			:
-			$this->_binaries->daytopost($groupArr['backfill_target'], $data)
+			$this->_binaries->dayToPost($groupArr['backfill_target'], $data)
 		);
 
 		// Check if target post is smaller than server's oldest, set it to oldest if so.
@@ -355,7 +355,7 @@ class Backfill
 				$newdate = strtotime($lastMsg['firstArticleDate']);
 			} else {
 				// If above failed, try to get it with postdate method.
-				$newdate = $this->_binaries->postdate($first, $data);
+				$newdate = $this->_binaries->postDate($first, $data);
 			}
 
 			$this->pdo->queryExec(

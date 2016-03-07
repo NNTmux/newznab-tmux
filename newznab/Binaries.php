@@ -292,7 +292,7 @@ class Binaries
 		// Generate postdate for first record, for those that upgraded.
 		if (is_null($groupMySQL['first_record_postdate']) && $groupMySQL['first_record'] != 0) {
 
-			$groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
+			$groupMySQL['first_record_postdate'] = $this->postDate($groupMySQL['first_record'], $groupNNTP);
 
 			$this->_pdo->queryExec(
 				sprintf('
@@ -309,7 +309,7 @@ class Binaries
 		if ($groupMySQL['last_record'] == 0) {
 			if ($this->_newGroupScanByDays) {
 				// For new newsgroups - determine here how far we want to go back using date.
-				$first = $this->daytopost($this->_newGroupDaysToScan, $groupNNTP);
+				$first = $this->dayToPost($this->_newGroupDaysToScan, $groupNNTP);
 			} else if ($groupNNTP['first'] >= ($groupNNTP['last'] - ($this->_newGroupMessagesToScan + $this->messageBuffer))) {
 				// If what we want is lower than the groups first article, SET the wanted first to the first.
 				$first = $groupNNTP['first'];
@@ -416,7 +416,7 @@ class Binaries
 						if (isset($scanSummary['firstArticleDate'])) {
 							$groupMySQL['first_record_postdate'] = strtotime($scanSummary['firstArticleDate']);
 						} else {
-							$groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
+							$groupMySQL['first_record_postdate'] = $this->postDate($groupMySQL['first_record'], $groupNNTP);
 						}
 
 						$this->_pdo->queryExec(
@@ -433,7 +433,7 @@ class Binaries
 
 					$scanSummary['lastArticleDate'] = (isset($scanSummary['lastArticleDate']) ? strtotime($scanSummary['lastArticleDate']) : false);
 					if (!is_numeric($scanSummary['lastArticleDate'])) {
-						$scanSummary['lastArticleDate'] = $this->postdate($scanSummary['lastArticleNumber'], $groupNNTP);
+						$scanSummary['lastArticleDate'] = $this->postDate($scanSummary['lastArticleNumber'], $groupNNTP);
 					}
 
 					$this->_pdo->queryExec(
@@ -1166,21 +1166,21 @@ class Binaries
 	 *
 	 * @return string
 	 */
-	public function daytopost($days, $data)
+	public function dayToPost($days, $data)
 	{
 		$goalTime = time() - (86400 * $days);
 		// The time we want = current unix time (ex. 1395699114) - minus 86400 (seconds in a day)
 		// times days wanted. (ie 1395699114 - 2592000 (30days)) = 1393107114
 
 		// The servers oldest date.
-		$firstDate = $this->postdate($data['first'], $data);
+		$firstDate = $this->postDate($data['first'], $data);
 		if ($goalTime < $firstDate) {
 			// If the date we want is older than the oldest date in the group return the groups oldest article.
 			return $data['first'];
 		}
 
 		// The servers newest date.
-		$lastDate = $this->postdate($data['last'], $data);
+		$lastDate = $this->postDate($data['last'], $data);
 		if ($goalTime > $lastDate) {
 			// If the date we want is newer than the groups newest date, return the groups newest article.
 			return $data['last'];
@@ -1211,12 +1211,12 @@ class Binaries
 			$oldArticle = $wantedArticle;
 
 			// Get the date of this article
-			$articleTime = $this->postdate($wantedArticle, $data);
+			$articleTime = $this->postDate($wantedArticle, $data);
 
 			// Article doesn't exist, start again with something random
 			if (!$articleTime) {
 				$wantedArticle = mt_rand($aMin, $aMax);
-				$articleTime = $this->postdate($wantedArticle, $data);
+				$articleTime = $this->postDate($wantedArticle, $data);
 			}
 
 			if ($articleTime < $goalTime) {
@@ -1278,7 +1278,7 @@ class Binaries
 	 *
 	 * @return bool|int
 	 */
-	public function postdate($post, array $groupData)
+	public function postDate($post, array $groupData)
 	{
 		// Set table names
 		$groupID = $this->_groups->getIDByName($groupData['group']);
