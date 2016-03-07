@@ -1,4 +1,5 @@
 2016-03-07 DariusIII
+	* Fix: Fix another instantiation in Groups
 	* Fix: Fix instantiation of Binaries Class in Groups.php
 2016-03-06 DariusIII
 	* Upd: Add trailing slash to saburl on profile edit

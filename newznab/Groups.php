@@ -571,7 +571,7 @@ class Groups
 		);
 
 		if ($releaseArray instanceof \Traversable) {
-			$releases = new \Releases(['Settings' => $this->pdo, 'Groups' => $this]);
+			$releases = new Releases(['Settings' => $this->pdo, 'Groups' => $this]);
 			$nzb = new NZB($this->pdo);
 			$releaseImage = new ReleaseImage($this->pdo);
 			foreach ($releaseArray as $release) {
