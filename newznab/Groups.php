@@ -318,7 +318,7 @@ class Groups
 	public function reset($id)
 	{
 		// Remove rows from collections / binaries / parts.
-		(new \Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
+		(new Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
 
 		// Remove rows from part repair.
 		$this->pdo->queryExec(sprintf("DELETE FROM partrepair WHERE group_id = %d", $id));
