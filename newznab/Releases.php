@@ -1,8 +1,6 @@
 <?php
 namespace newznab;
 
-require_once NN_LIBS . 'ZipFile.php';
-
 use newznab\db\Settings;
 use newznab\utility\Utility;
 

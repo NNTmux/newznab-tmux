@@ -20,8 +20,6 @@
  */
 namespace newznab\config;
 
-require_once NN_LIBS . 'autoloader.php';
-
 class Configure
 {
 	private $environments = [

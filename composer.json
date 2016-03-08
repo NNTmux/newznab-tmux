@@ -2,18 +2,22 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/JPinkney/TVMaze-PHP-API-Wrapper"
-    },
-    {
-      "type": "vcs",
       "url": "https://github.com/kbjr/Git.php"
     }
   ],
 
   "autoload": {
-    "psr-0": {
-      "libs\\": "libs/"
-    }
+    "psr-4": {
+      "newznab\\": "newznab/"
+    },
+
+    "classmap": [
+      "www/pages/",
+      "libs/pixelead0/Tmdb/",
+      "libs/PEAR/Net_NNTP/NNTP/",
+      "libs/zeebinz/rarinfo/",
+      "libs/"
+    ]
   },
 
   "description": "A Usenet Indexer",

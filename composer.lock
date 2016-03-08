@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0a3f84f9d5db96b9186c06d0c96ef1ce",
-    "content-hash": "2712a32ca345e3388bbf24a4cc19e504",
+    "hash": "1a3c5a32761ec995c50fae5b1593ca73",
+    "content-hash": "5010febeee39df8e4e330d1ff4315651",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -258,6 +258,7 @@
                     "JPinkney": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "authors": [
                 {
                     "name": "Josh Pinkney",
@@ -265,10 +266,6 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "support": {
-                "source": "https://github.com/JPinkney/TVMaze-PHP-API-Wrapper/tree/master",
-                "issues": "https://github.com/JPinkney/TVMaze-PHP-API-Wrapper/issues"
-            },
             "time": "2016-03-08 02:23:27"
         },
         {
@@ -299,16 +296,16 @@
         },
         {
             "name": "moinax/tvdb",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Moinax/TvDb.git",
-                "reference": "7ddf816552966fcc75c85bb7f92ce4c6c9190dc2"
+                "reference": "68204c72efe99945cd49fe99ac23c8f9b068f2d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Moinax/TvDb/zipball/7ddf816552966fcc75c85bb7f92ce4c6c9190dc2",
-                "reference": "7ddf816552966fcc75c85bb7f92ce4c6c9190dc2",
+                "url": "https://api.github.com/repos/Moinax/TvDb/zipball/68204c72efe99945cd49fe99ac23c8f9b068f2d6",
+                "reference": "68204c72efe99945cd49fe99ac23c8f9b068f2d6",
                 "shasum": ""
             },
             "require": {
@@ -335,7 +332,7 @@
             "keywords": [
                 "api"
             ],
-            "time": "2016-02-03 08:52:14"
+            "time": "2016-03-08 12:37:26"
         },
         {
             "name": "phpmailer/phpmailer",
