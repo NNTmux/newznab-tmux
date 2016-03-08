@@ -1,8 +1,8 @@
 <?php
 namespace newznab\processing\tv;
 
-use JPinkney\Client;
 use newznab\ReleaseImage;
+require 'TVMazeIncludes.php';
 
 /**
  * Class TVMaze
