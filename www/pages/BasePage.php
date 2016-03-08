@@ -1,5 +1,4 @@
 <?php
-require_once SMARTY_DIR . 'Autoloader.php';
 
 Smarty_Autoloader::register();
 require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
