@@ -1,4 +1,5 @@
 2016-03-08 DariusIII
+	* Chg: Remove dependencies handled by composer
 	* Chg: Remove libraries handled by composer, move others to their respective folders
 	* Add: Add composer.json
 	* Upd: Update .gitignore

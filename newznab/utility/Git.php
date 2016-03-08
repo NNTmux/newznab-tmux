@@ -20,8 +20,6 @@
  */
 namespace newznab\utility;
 
-require_once NN_LIBS . 'Git.php' . DS . 'Git.php';
-
 /**
  * Class Git - Wrapper for various git operations.
  * @package newznab\utility
