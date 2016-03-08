@@ -35,6 +35,6 @@
     "moinax/tvdb": "~1.0",
     "phpmailer/phpmailer": "~5.2",
     "exeu/apai-io": "~1.0",
-    "smarty/smarty": "3.1.*"
+    "smarty/smarty": "~3.1"
   }
 }

@@ -1,4 +1,5 @@
 2016-03-08 DariusIII
+	* Upd: Update smarty handling in composer.json
 	* Fix: Remove require for GiantBomb as it should be handled by composer
 	* Fix: Fix errors related to changes to libraries.
 	* Fix: Remove require for getid3 from Nfo class, it is handled by composer autoload now
