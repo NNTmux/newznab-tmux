@@ -1,6 +1,5 @@
 <?php
 namespace newznab;
-require_once NN_LIBS . 'GiantBombAPI.php';
 
 use newznab\db\Settings;
 
