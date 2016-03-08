@@ -1,3 +1,5 @@
+2016-03-08 DariusIII
+	* Upd: Update .gitignore
 2016-03-07 DariusIII
 	* Fix: Fix another instantiation in Groups
 	* Fix: Fix instantiation of Binaries Class in Groups.php
