@@ -1,6 +1,5 @@
 <?php
 namespace newznab\processing\tv;
-
 use libs\Tmdb\TmdbAPI;
 use newznab\ReleaseImage;
 

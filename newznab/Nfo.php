@@ -4,8 +4,8 @@ use newznab\db\Settings;
 use \newznab\processing\PostProcess;
 use newznab\utility\Utility;
 
-require_once NN_LIBS . 'rarinfo/par2info.php';
-require_once NN_LIBS . 'rarinfo/sfvinfo.php';
+require_once NN_LIBS . 'zeebinz/rarinfo/par2info.php';
+require_once NN_LIBS . 'zeebinz/rarinfo/sfvinfo.php';
 
 /**
  * Class Nfo

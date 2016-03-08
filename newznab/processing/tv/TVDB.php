@@ -1,9 +1,9 @@
 <?php
 namespace newznab\processing\tv;
 
-use libs\Moinax\TVDB\Client;
-use libs\Moinax\TVDB\CurlException;
-use libs\Moinax\TVDB\XmlException;
+use Moinax\TvDb\Client;
+use Moinax\TvDb\CurlException;
+use Moinax\TvDb\XmlException;
 use newznab\ReleaseImage;
 
 /**
@@ -16,7 +16,7 @@ class TVDB extends TV
 	const MATCH_PROBABILITY = 75;
 
 	/**
-	 * @var \libs\Moinax\TVDB\Client
+	 * @var \Moinax\TvDb\Client
 	 */
 	public $client;
 
