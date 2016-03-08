@@ -24,8 +24,8 @@ use newznab\processing\post\ProcessAdditional;
 use newznab\SpotNab;
 use newznab\utility\Utility;
 
-require_once NN_LIBS . 'rarinfo/par2info.php';
-require_once NN_LIBS . 'rarinfo/srrinfo.php';
+require_once NN_LIBS . 'zeebinz/rarinfo/par2info.php';
+require_once NN_LIBS . 'zeebinz/rarinfo/srrinfo.php';
 
 class PostProcess
 {
