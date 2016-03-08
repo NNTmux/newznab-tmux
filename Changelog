@@ -1,4 +1,5 @@
 2016-03-08 DariusIII
+	* Fix: Remove require for getid3 from Nfo class, it is handled by composer autoload now
 	* Upd: Update Readme.md with composer info.
 	* Add: Add project composer.lock file to git, remove Git folder from libs.
 	* Chg: Remove dependencies handled by composer
