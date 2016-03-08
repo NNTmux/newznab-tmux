@@ -1,9 +1,9 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use libs\ApaiIO\Configuration\GenericConfiguration;
-use libs\ApaiIO\Operations\Search;
-use libs\ApaiIO\ApaiIO;
+use ApaiIO\Configuration\GenericConfiguration;
+use ApaiIO\Operations\Search;
+use ApaiIO\ApaiIO;
 use newznab\db\Settings;
 
 $s = new Settings();
@@ -18,7 +18,7 @@ $conf
 	->setAccessKey($pubkey)
 	->setSecretKey($privkey)
 	->setAssociateTag($asstag)
-	->setResponseTransformer('\libs\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
+	->setResponseTransformer('\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
 
 $search = new Search();
 $search->setCategory('VideoGames');
