@@ -10,8 +10,8 @@ I started adapting some of more interesting scripts from nZEDb, but they require
 
  CD to the root of your newznab install, ie.  cd /var/www/newznab
  Next steps are very important:
- 
- 		git init 
+
+ 		git init
  		git remote add origin https://github.com/DariusIII/newznab-tmux.git
  		git fetch
  		git reset --hard origin/your_wanted_branch, ie. git reset --hard origin/master
@@ -20,17 +20,25 @@ I started adapting some of more interesting scripts from nZEDb, but they require
 	Schema for first database update is located in resources/db/schema/ folder. Import it to your database.
 	There is another file in that folder nntmux_fi_schema.sql, use that if you don't have any releases and users on your site, AKA, completely fresh install of newznab+.
 	BE WARNED: If you import this schema it WILL NUKE YOUR DATABASE.
-	If you are updating from latest newznab svn (aka tvmaze version), you need to rename back tvinfoID columns into rageid 
+	If you are updating from latest newznab svn (aka tvmaze version), you need to rename back tvinfoID columns into rageid
 	(located in releases and userseries tables, maybe some more), before you import the schema.sql.
 	After that you update your database by running update_db.php from cli folder (ie. php cli/update_db.php true)
 
 	You need to chmod to 777 following folders now:
 	resources/*
 	libs/smarty/templates_c
-	nzbfiles/ 
+	nzbfiles/
 
 	You need to add an alias to your apache/nginx conf of your indexer:
 	Alias /covers /path/to/newznab/resources/covers
+
+# Composer
+
+  Note: Newznab-tmux uses composer to install required libraries. To install composer
+  		follow instructons located at: https://getcomposer.org/download/
+  		When you have downloaded and installed composer,
+  		run "php composer.phar install" to install dependencies and create required
+  		folders and autoloader for them.
 
 # yEnc:
 
