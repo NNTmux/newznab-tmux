@@ -1,9 +1,9 @@
 <?php
 namespace newznab\processing\post;
 
-require_once NN_LIBS . 'rarinfo/archiveinfo.php';
-require_once NN_LIBS . 'rarinfo/par2info.php';
-require_once NN_LIBS . 'rarinfo/srrinfo.php';
+require_once NN_LIBS . 'zeebinz/rarinfo/archiveinfo.php';
+require_once NN_LIBS . 'zeebinz/rarinfo/par2info.php';
+require_once NN_LIBS . 'zeebinz/rarinfo/srrinfo.php';
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
