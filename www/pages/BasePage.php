@@ -1,5 +1,7 @@
 <?php
 
+require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
+
 use newznab\db\Settings;
 use newznab\Users;
 use newznab\SABnzbd;
