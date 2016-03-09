@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1a3c5a32761ec995c50fae5b1593ca73",
-    "content-hash": "5010febeee39df8e4e330d1ff4315651",
+    "hash": "1bd5abd3e3763300dd61569bf1ee1429",
+    "content-hash": "a60a0a07b9db4cb5201490e08da7292b",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -333,6 +333,44 @@
                 "api"
             ],
             "time": "2016-03-08 12:37:26"
+        },
+        {
+            "name": "needim/noty",
+            "version": "v2.3.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/needim/noty.git",
+                "reference": "6fe2cf81c7b8ecdbdafaa875b82b78cf65e2f100"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/needim/noty/zipball/6fe2cf81c7b8ecdbdafaa875b82b78cf65e2f100",
+                "reference": "6fe2cf81c7b8ecdbdafaa875b82b78cf65e2f100",
+                "shasum": ""
+            },
+            "suggest": {
+                "components/jquery": ">=1.8",
+                "twbs/bootstrap": "~3.0.0"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nedim Arabaci",
+                    "homepage": "https://github.com/needim",
+                    "role": "Developer"
+                }
+            ],
+            "description": "noty is a jQuery plugin that makes it easy to create alert - success - error - warning - information - confirmation messages as an alternative the standard alert dialog.",
+            "homepage": "https://github.com/needim/noty",
+            "keywords": [
+                "notification",
+                "noty"
+            ],
+            "time": "2016-01-11 13:30:39"
         },
         {
             "name": "phpmailer/phpmailer",
