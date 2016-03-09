@@ -1,3 +1,5 @@
+2016-03-09 DariusIII
+	* Fix: Fix typo in serverroot and fix getID3 error in Nfo class.
 2016-03-08 DariusIII
 	* Upd: Many changes related to composer
 	* Upd: Update smarty handling in composer.json

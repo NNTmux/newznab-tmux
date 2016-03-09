@@ -28,7 +28,7 @@
   <body class="login-page">
     <div class="login-box">
 		<div class="login-logo">
-			<a href="{$serverrroot}"><b>{$site->title}</b></a>
+			<a href="{$serverroot}"><b>{$site->title}</b></a>
 		</div><!-- /.login-logo -->
       <div class="login-box-body">
         <p class="login-box-msg">Please sign in to access the site</p>
