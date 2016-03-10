@@ -39,7 +39,7 @@
     "giantbomb/giantbomb": "@dev",
     "google/recaptcha": "~1.1",
     "james-heinrich/getid3": "1.9.*",
-    "joshpinkney/tv-maze-php-api": "@dev",
+    "joshpinkney/tv-maze-php-api": "dev-master",
     "kbjr/Git.php": "@dev",
     "moinax/tvdb": "~1.0",
     "phpmailer/phpmailer": "~5.2",
