@@ -35,7 +35,7 @@ class TVMaze extends TV
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->client = new Client();
+		$this->client = new \JPinkney\TVMaze\TVMaze();
 	}
 
 	/**
