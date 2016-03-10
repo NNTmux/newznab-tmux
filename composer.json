@@ -1,4 +1,11 @@
 {
+  "authors": [
+    {
+      "name": "DariusIII",
+      "email": "dkrisan@gmail.com",
+      "role": "developer"
+    }
+  ],
   "repositories": [
     {
       "type": "vcs",
@@ -24,8 +31,6 @@
 
   "license": "GPL-3.0",
 
-  "minimum-requirement": "dev",
-
   "name": "DariusIII/newznab-tmux",
 
   "require": {
@@ -41,4 +46,7 @@
     "exeu/apai-io": "~1.0",
     "smarty/smarty": "~3.1"
   }
+
+  "require-dev": {},
+  "type": "project"
 }
