@@ -20,6 +20,7 @@
 
     "classmap": [
       "www/pages/",
+      "vendor/joshpinkney/tv-maze-php-api/",
       "libs/pixelead0/Tmdb/",
       "libs/PEAR/Net_NNTP/NNTP/",
       "libs/zeebinz/rarinfo/",
