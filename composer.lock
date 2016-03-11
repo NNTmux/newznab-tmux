@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "50eec1c4db6a35d3dedf749e4b3999c1",
+    "hash": "2b602e7d5bb44f9e55ee675cb940ca9c",
     "content-hash": "7c06c9b0053f5f9790d7d1d99edaeef8",
     "packages": [
         {
@@ -238,12 +238,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/JPinkney/TVMaze-PHP-API-Wrapper.git",
-                "reference": "d2109bdfbbbae50769391294c9a9ddd6ca537618"
+                "reference": "53f342562b10dd34a839ce1eaf45fc65679ff168"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JPinkney/TVMaze-PHP-API-Wrapper/zipball/d2109bdfbbbae50769391294c9a9ddd6ca537618",
-                "reference": "d2109bdfbbbae50769391294c9a9ddd6ca537618",
+                "url": "https://api.github.com/repos/JPinkney/TVMaze-PHP-API-Wrapper/zipball/53f342562b10dd34a839ce1eaf45fc65679ff168",
+                "reference": "53f342562b10dd34a839ce1eaf45fc65679ff168",
                 "shasum": ""
             },
             "type": "library",
@@ -263,7 +263,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2016-03-11 20:14:55"
+            "time": "2016-03-11 20:27:51"
         },
         {
             "name": "kbjr/Git.php",

@@ -1,7 +1,7 @@
 <?php
 namespace newznab\processing\tv;
 
-use JPinkney\Client;
+use JPinkney\TVMaze\Client;
 use newznab\ReleaseImage;
 
 /**
@@ -16,7 +16,7 @@ class TVMaze extends TV
 	/**
 	 * Client for TVMaze API
 	 *
-	 * @var \JPinkney\Client
+	 * @var \JPinkney\TVMaze\Client
 	 */
 	public $client;
 
@@ -241,7 +241,7 @@ class TVMaze extends TV
 		$cleanName = preg_replace('# \((19|20)\d{2}\)$#', '', $cleanName);
 
 		//Try for the best match with AKAs embedded
-		$response = $this->client->singleSearch($cleanName);
+		$response = $this->client->singleSearchAkas($cleanName);
 
 		sleep(1);
 
