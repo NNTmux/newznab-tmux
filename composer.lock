@@ -238,18 +238,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/JPinkney/TVMaze-PHP-API-Wrapper.git",
-                "reference": "356ad3e471f9a24b94173ebd15aa9784b6aee07d"
+                "reference": "d2109bdfbbbae50769391294c9a9ddd6ca537618"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JPinkney/TVMaze-PHP-API-Wrapper/zipball/356ad3e471f9a24b94173ebd15aa9784b6aee07d",
-                "reference": "356ad3e471f9a24b94173ebd15aa9784b6aee07d",
+                "url": "https://api.github.com/repos/JPinkney/TVMaze-PHP-API-Wrapper/zipball/d2109bdfbbbae50769391294c9a9ddd6ca537618",
+                "reference": "d2109bdfbbbae50769391294c9a9ddd6ca537618",
                 "shasum": ""
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "JPinkney": ""
+                "psr-4": {
+                    "JPinkney\\": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -263,7 +263,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2016-03-10 22:35:15"
+            "time": "2016-03-11 20:14:55"
         },
         {
             "name": "kbjr/Git.php",
