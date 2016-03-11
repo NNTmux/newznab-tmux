@@ -1,3 +1,5 @@
+2016-03-12 DariusIII
+	* Upd: Fix TVMaze processing
 2016-03-10 DariusIII
 	* Fix: Fix object to string conversion in processing/tv/TVDB.php
 	* Upd: Update composer.json of the project.

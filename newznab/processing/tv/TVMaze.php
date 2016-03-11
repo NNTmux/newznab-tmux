@@ -1,7 +1,7 @@
 <?php
 namespace newznab\processing\tv;
 
-use JPinkney\TVMaze\Client;
+use JPinkney\TVMaze\TVMaze as Client;
 use newznab\ReleaseImage;
 
 /**
@@ -16,7 +16,7 @@ class TVMaze extends TV
 	/**
 	 * Client for TVMaze API
 	 *
-	 * @var \JPinkney\TVMaze\Client
+	 * @var \JPinkney\TVMaze\TVMaze
 	 */
 	public $client;
 
@@ -35,7 +35,7 @@ class TVMaze extends TV
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->client = new \JPinkney\TVMaze\TVMaze();
+		$this->client = new Client();
 	}
 
 	/**
