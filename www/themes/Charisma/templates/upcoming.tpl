@@ -24,8 +24,7 @@
 			<tr class="{cycle values=",alt"}">
 				<td class="mid">
 					<div class="movcover">
-						<img class="shadow" src="{$result->posters->original}" width="120" border="0"
-							 alt="{$result->title|escape:"htmlall"}"/>
+						<img class="shadow" src="{$result->posters->profile|regex_replace:"/(http:\/\/resizing\.flixster\.com\/[a-z0-9\=\-\+\_]+\/[a-z0-9\=\-\+\_]+\/[a-z0-9\=\-\+\_]+\.cloudfront\.net)/i":"https://content6.flixster.com"|replace:array("tmb","pro"):"ori"}" width="120" border="0" alt="{$result->title|escape:"htmlall"}" />
 						<div class="movextra">
 							<a class="rndbtn badge badge-success" target="_blank"
 							   href="{$site->dereferrer_link}{$result->links->alternate}"
