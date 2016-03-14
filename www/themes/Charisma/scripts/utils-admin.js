@@ -492,19 +492,20 @@ function ajax_group_reset(id)
 function ajax_group_purge(id)
 {
     // no caching of results
-	$.ajax({
-	  url       : WWW_TOP + '/admin/ajax_group-edit.php?action=4&rand=' + $.now(),
-	  data      : { group_id: id},
-	  dataType  : "html",
-	  success   : function(data)
-	  {
-		  $('div#message').html(data);
-		  $('div#message').show('fast', function() {});
-		  $('#grouprow-'+id).fadeTo(2000, 0.5);
-		  $('#message').fadeOut(5000);
-	  },
-	  error: function(xhr,err,e) { alert( "Error in ajax_group_reset: " + err ); }
-	});
+    var rand_no = Math.random();
+    $.ajax({
+        url       : WWW_TOP + '/admin/ajax.php?action=group_edit_purge_single&rand=' + rand_no,
+        data      : { group_id: id},
+        dataType  : "html",
+        success   : function(data)
+        {
+            $('div#message').html(data);
+            $('div#message').show('fast', function() {});
+            $('#grouprow-'+id).fadeTo(2000, 0.5);
+            $('#message').fadeOut(5000);
+        },
+        error: function(xhr,err,e) { alert( "Error in ajax_group_purge: " + err ); }
+    });
 }
 
 /**
