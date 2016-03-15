@@ -1,3 +1,6 @@
+2016-03-15 DariusIII
+	* Fix: Fix max headers iteration for binaries update
+	* Chg: Change function used to check for empty NZBGet url field in profile edit
 2016-03-14 DariusIII
 	* Upd: Update composer.lock with new TVMaze update
 2016-03-12 DariusIII

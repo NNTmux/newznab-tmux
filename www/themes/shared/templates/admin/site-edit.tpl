@@ -649,9 +649,9 @@
     </td>
 </tr>
 	<tr>
-		<td><label for="maxheadersiteration">Max headers iteration</label>:</td>
+		<td><label for="max_headers_iteration">Max headers iteration</label>:</td>
 		<td>
-			<input class="small" id="maxheadersiteration" name="maxheadersiteration" type="text" value="{$site->maxheadersiteration}" />
+			<input class="small" id="max_headers_iteration" name="max_headers_iteration" type="text" value="{$site->max_headers_iteration}" />
 			<div class="hint">The maximum number of headers that update binaries sees as the total range. This ensure that a total of no more than this is attempted to be downloaded at one time per group.</div>
 		</td>
 	</tr>

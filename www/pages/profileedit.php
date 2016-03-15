@@ -42,7 +42,7 @@ switch ($action) {
 			$errorStr = "Password Mismatch";
 		} else if ($_POST['password'] != "" && !$page->users->isValidPassword($_POST['password'])) {
 			$errorStr = "Your password must be longer than five characters.";
-		} else if (isset($_POST['nzbgeturl']) && !empty($_POST['nzbgeturl']) && $nzbGet->verifyURL($_POST['nzbgeturl']) === false) {
+		} else if (!empty($_POST['nzbgeturl']) && $nzbGet->verifyURL($_POST['nzbgeturl']) === false) {
 			$errorStr = "The NZBGet URL you entered is invalid!";
 		} else if (!$page->users->isValidEmail($_POST['email'])) {
 			$errorStr = "Your email is not a valid format.";
