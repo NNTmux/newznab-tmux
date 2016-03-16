@@ -1,3 +1,5 @@
+2016-03-16 DariusIII
+	* Fix: Fix missing use statement for Category class in www/pages/anime
 2016-03-15 DariusIII
 	* Fix: Fix max headers iteration for binaries update
 	* Chg: Change function used to check for empty NZBGet url field in profile edit
