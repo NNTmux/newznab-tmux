@@ -1,4 +1,5 @@
 2016-03-16 DariusIII
+	* Upd: Update composer.lock with latest TVMaze update
 	* Fix: Fix missing use statement for Category class in www/pages/anime
 2016-03-15 DariusIII
 	* Fix: Fix max headers iteration for binaries update
