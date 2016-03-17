@@ -1,3 +1,5 @@
+2016-03-17 DariusIII
+	* Upd: Change semantics for failed download handling in themes.
 2016-03-16 DariusIII
 	* Upd: Update composer.lock with latest TVMaze update
 	* Fix: Fix missing use statement for Category class in www/pages/anime
