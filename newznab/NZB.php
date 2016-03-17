@@ -409,7 +409,7 @@ class NZB
 
 			// File size.
 			foreach ($file->segments->segment as $segment) {
-				array_push($result[$i]['segments'], (string)$segment);
+				$result[$i]['segments'][] = (string)$segment;
 				$fileSize += $segment->attributes()->bytes;
 				$numSegments++;
 			}
@@ -426,7 +426,7 @@ class NZB
 				$result[$i]['groups'] = [];
 			}
 			foreach ($file->groups->group as $g) {
-				array_push($result[$i]['groups'], (string)$g);
+				$result[$i]['groups'][] = (string)$g;
 			}
 
 			unset($result[$i]['segments']['@attributes']);

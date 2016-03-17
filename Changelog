@@ -1,4 +1,5 @@
 2016-03-17 DariusIII
+	* Chg: Replace 2 occurences of array_push with $array[] in NZB.php to reduce overhead.
 	* Upd: Change semantics for failed download handling in themes.
 2016-03-16 DariusIII
 	* Upd: Update composer.lock with latest TVMaze update
