@@ -39,6 +39,12 @@ I started adapting some of more interesting scripts from nZEDb, but they require
   		When you have downloaded and installed composer,
   		run "php composer.phar install" to install dependencies and create required
   		folders and autoloader for them.
+  Next: sudo cp composer.phar /usr/local/bin/composer
+        sudo chmod a+x /usr/local/bin/composer
+
+# Git hooks
+
+  Note: run addHooks.sh from build/git-hooks folder to add required git hooks.
 
 # yEnc:
 

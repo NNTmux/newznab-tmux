@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# MIT © Sindre Sorhus - sindresorhus.com
+# forked by Gianluca Guarini
+# phponly by Ivo Bathke ;)
+
+changed_files="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD)"
+
+check_run() {
+  echo "$changed_files" | grep --quiet "$1" && eval "$2"
+}
+
+# `composer install` if the `composer.lock` file gets changed
+# to update all the php dependencies
+check_run composer.lock "composer install --no-dev"
