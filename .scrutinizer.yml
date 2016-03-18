@@ -73,9 +73,5 @@ coding_style:
 
 filter:
     excluded_paths:
-        - libs/smarty/*
-        - libs/Net_NNTP/*
-        - libs/rarinfo/*
-        - libs/PHPMailer/*
-        - libs/getid3/*
-        - libs/forkdaemon-php/*
+        - libs/PEAR/Net_NNTP/*
+        - libs/zeebinz/rarinfo/*

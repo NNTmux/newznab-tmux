@@ -1,3 +1,38 @@
+2016-03-18 DariusIII
+	* Upd: Add post-merge hook to handle composer updates, update README.md
+	* Upd: Add back TV processing to NFO processing.
+	* Chg: Add match_prefiles to tmux.
+2016-03-17 DariusIII
+	* Chg: Replace 2 occurences of array_push with $array[] in NZB.php to reduce overhead.
+	* Upd: Change semantics for failed download handling in themes.
+2016-03-16 DariusIII
+	* Upd: Update composer.lock with latest TVMaze update
+	* Fix: Fix missing use statement for Category class in www/pages/anime
+2016-03-15 DariusIII
+	* Fix: Fix max headers iteration for binaries update
+	* Chg: Change function used to check for empty NZBGet url field in profile edit
+2016-03-14 DariusIII
+	* Upd: Update composer.lock with new TVMaze update
+2016-03-12 DariusIII
+	* Upd: Fix TVMaze processing
+2016-03-10 DariusIII
+	* Fix: Fix object to string conversion in processing/tv/TVDB.php
+	* Upd: Update composer.json of the project.
+	* Chg: Move smarty template and cache files to resources folder
+2016-03-09 DariusIII
+	* Fix: Fix typo in serverroot and fix getID3 error in Nfo class.
+2016-03-08 DariusIII
+	* Upd: Many changes related to composer
+	* Upd: Update smarty handling in composer.json
+	* Fix: Remove require for GiantBomb as it should be handled by composer
+	* Fix: Fix errors related to changes to libraries.
+	* Fix: Remove require for getid3 from Nfo class, it is handled by composer autoload now
+	* Upd: Update Readme.md with composer info.
+	* Add: Add project composer.lock file to git, remove Git folder from libs.
+	* Chg: Remove dependencies handled by composer
+	* Chg: Remove libraries handled by composer, move others to their respective folders
+	* Add: Add composer.json
+	* Upd: Update .gitignore
 2016-03-07 DariusIII
 	* Fix: Fix another instantiation in Groups
 	* Fix: Fix instantiation of Binaries Class in Groups.php

@@ -3,7 +3,6 @@ namespace newznab;
 /**
  * Attempt to include PEAR's nntp class if it has not already been included.
  */
-require_once NN_LIBS . 'Net_NNTP/NNTP/Client.php';
 
 use newznab\db\Settings;
 use newznab\utility\Utility;

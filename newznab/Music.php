@@ -2,9 +2,9 @@
 namespace newznab;
 
 use newznab\db\Settings;
-use libs\ApaiIO\Configuration\GenericConfiguration;
-use libs\ApaiIO\Operations\Search;
-use libs\ApaiIO\ApaiIO;
+use ApaiIO\Configuration\GenericConfiguration;
+use ApaiIO\Operations\Search;
+use ApaiIO\ApaiIO;
 
 /**
  * Class Music
@@ -595,7 +595,7 @@ class Music
 				->setAccessKey($this->pubkey)
 				->setSecretKey($this->privkey)
 				->setAssociateTag($this->asstag)
-				->setResponseTransformer('\libs\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
+				->setResponseTransformer('\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
 		} catch (\Exception $e) {
 			echo $e->getMessage();
 		}

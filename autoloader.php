@@ -18,14 +18,14 @@
  * @author    niel
  * @copyright 2014 nZEDb
  */
-
+/*
 spl_autoload_register(
 	function ($class) {
 		// Only continue if the class is in our namespace.
-		if (strpos($class, 'newznab\\') === 0) {
+		if (strpos($class, 'nzedb\\') === 0) {
 			// Replace namespace separators with directory separators in the class name, append
 			// with .php
-			$file = NN_ROOT . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+			$file = nZEDb_ROOT . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
 
 			// if the file exists, require it
 			if (file_exists($file)) {
@@ -34,5 +34,6 @@ spl_autoload_register(
 		}
 	}
 );
-
+*/
+require_once 'vendor/autoload.php'
 ?>

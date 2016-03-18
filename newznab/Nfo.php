@@ -4,10 +4,6 @@ use newznab\db\Settings;
 use \newznab\processing\PostProcess;
 use newznab\utility\Utility;
 
-require_once NN_LIBS . 'getid3/getid3/getid3.php';
-require_once NN_LIBS . 'rarinfo/par2info.php';
-require_once NN_LIBS . 'rarinfo/sfvinfo.php';
-
 /**
  * Class Nfo
  * Class for handling fetching/storing of NFO files.
@@ -167,7 +163,7 @@ class Nfo
 			}
 
 			// If above checks couldn't  make a categorical identification, Use GetId3 to check if it's an image/video/rar/zip etc..
-			$getid3 = new \getid3();
+			$getid3 = new \getID3();
 			$check = $getid3->analyze($tmpPath);
 			@unlink($tmpPath);
 			if (isset($check['error'])) {
@@ -273,13 +269,13 @@ class Nfo
 	 * @param string $groupID        (optional) Group ID.
 	 * @param string $guidChar       (optional) First character of the release GUID (used for multi-processing).
 	 * @param int    $processImdb    (optional) Attempt to find IMDB id's in the NZB?
-	 * @param int    $processTvrage  (optional) Attempt to find TvRage id's in the NZB?
+	 * @param int    $processTv      (optional) Attempt to find Tv id's in the NZB?
 	 *
 	 * @return int                   How many NFO's were processed?
 	 *
 	 * @access public
 	 */
-	public function processNfoFiles($nntp, $groupID = '', $guidChar = '', $processImdb = 1, $processTvrage = 1)
+	public function processNfoFiles($nntp, $groupID = '', $guidChar = '', $processImdb = 1, $processTv = 1)
 	{
 		$ret = 0;
 		$guidCharQuery = ($guidChar === '' ? '' : 'AND r.guid ' . $this->pdo->likeString($guidChar, false, true));
@@ -349,7 +345,7 @@ class Nfo
 			$movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
 			foreach ($res as $arr) {
-				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['id'], $arr['groupid'], $groups->getByNameByID($arr['groupid']));
+				$fetchedBinary = $nzbContents->getNfoFromNZB($arr['guid'], $arr['id'], $arr['groupid'], $groups->getByNameByID($arr['groupid']));
 				if ($fetchedBinary !== false) {
 					// Insert nfo into database.
 					$cp = 'COMPRESS(%s)';
@@ -363,8 +359,9 @@ class Nfo
 					$ret++;
 					$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb);
 
-					// If set scan for tvrage info. Disabled for now while TvRage is down. TODO: Add Other Scraper Checks
-					if ($processTvrage == 1) {
+					// If set scan for tv info.
+					if ($processTv == 1) {
+						(new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo]))->processTv($groupID, $guidChar, $processTv);
 						/*$tvRage = new TvRage(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 						$showId = $this->parseShowId($fetchedBinary);
 						if ($showId !== false) {

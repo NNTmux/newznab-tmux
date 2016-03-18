@@ -20,7 +20,8 @@
  */
 require_once 'constants.php';
 require_once 'autoloader.php';
-require_once 'libs/autoloader.php';
+//require_once 'libs/autoloader.php';
+//require_once 'vendor/autoload.php';
 
 use newznab\config\Configure;
 use newznab\utility\Utility;

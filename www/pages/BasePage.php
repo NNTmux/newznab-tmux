@@ -1,7 +1,5 @@
 <?php
-require_once SMARTY_DIR . 'Autoloader.php';
 
-Smarty_Autoloader::register();
 require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
 
 use newznab\db\Settings;
@@ -100,9 +98,9 @@ class BasePage
 		$this->settings = new Settings();
 		$this->smarty = new Smarty();
 
-		$this->smarty->setCompileDir(SMARTY_DIR . 'templates_c/');
-		$this->smarty->setConfigDir(SMARTY_DIR . 'configs/');
-		$this->smarty->setCacheDir(SMARTY_DIR . 'cache/');
+		$this->smarty->setCompileDir(NN_RES . DS . 'smarty' . DS . 'templates_c/');
+		$this->smarty->setConfigDir(NN_RES . DS . 'smarty' . DS . 'configs/');
+		$this->smarty->setCacheDir(NN_RES . DS . 'smarty' . DS . 'cache/');
 		$this->smarty->setPluginsDir([
 			NN_WWW . 'plugins/',
 			SMARTY_DIR . 'plugins/',

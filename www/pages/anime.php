@@ -2,6 +2,7 @@
 
 use newznab\AniDB;
 use newznab\Releases;
+use newznab\Category;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
