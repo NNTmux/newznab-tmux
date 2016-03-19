@@ -12,12 +12,10 @@
       "url": "https://github.com/kbjr/Git.php"
     }
   ],
-
   "autoload": {
     "psr-4": {
       "newznab\\": "newznab/"
     },
-
     "classmap": [
       "www/pages/",
       "libs/pixelead0/Tmdb/",
@@ -26,13 +24,14 @@
       "libs/"
     ]
   },
-
   "description": "A Usenet Indexer",
-
+  "extra": {
+    "branch-alias": {
+      "dev-master": "0.x-dev"
+    }
+  },
   "license": "GPL-3.0",
-
-  "name": "DariusIII/newznab-tmux",
-
+  "name": "dariusiii/newznab-tmux",
   "require": {
     "php": ">=5.6.0",
     "barracudanetworks/forkdaemon-php": "~1.0",

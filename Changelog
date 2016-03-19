@@ -1,3 +1,5 @@
+2016-03-19 DariusIII
+	* Upd: Update composer.json
 2016-03-18 DariusIII
 	* Upd: Add post-merge hook to handle composer updates, update README.md
 	* Upd: Add back TV processing to NFO processing.
