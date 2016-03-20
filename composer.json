@@ -43,7 +43,7 @@
     "google/recaptcha": "~1.1",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
-    "kbjr/Git.php": "@dev",
+    "kbjr/Git.php": "dev-master",
     "moinax/tvdb": "~1.0",
     "phpmailer/phpmailer": "~5.2",
     "exeu/apai-io": "~1.0",
