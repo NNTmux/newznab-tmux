@@ -27,7 +27,7 @@
   "description": "A Usenet Indexer",
   "extra": {
     "branch-alias": {
-      "dev-master": "0.x-dev"
+      "dev-master": "0.6.x-dev"
     }
   },
   "license": "GPL-3.0",

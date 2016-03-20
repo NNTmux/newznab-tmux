@@ -27,7 +27,7 @@ namespace newznab\utility;
 class Git extends \GitRepo
 {
 	private $branch;
-	private $mainBranches = ['dev', 'dev-regexless', 'master'];
+	private $mainBranches = ['0.6.x-dev', '0.5.x', '0.6.0'];
 
 	public function __construct(array $options = [])
 	{
