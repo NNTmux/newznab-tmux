@@ -6,6 +6,9 @@ use newznab\Releases;
 use newznab\db\Settings;
 use newznab\utility\Utility;
 
+if ($page->settings->getSetting('apienabled') != 1)
+	Utility::showApiError(910);
+
 // API functions.
 $function = 's';
 if (isset($_GET['t'])) {

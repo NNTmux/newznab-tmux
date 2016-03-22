@@ -9,7 +9,7 @@ if ($page->users->isLoggedIn()) {
 	header('Location: ' . WWW_TOP . '/');
 }
 
-$error = $firstName = $lastName = $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';
+$error = $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';
 $showRegister = 1;
 
 if ($page->settings->getSetting('registerstatus') == Settings::REGISTER_STATUS_CLOSED || $page->settings->getSetting('registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
@@ -37,7 +37,7 @@ if ($showRegister == 1) {
 				$password = htmlspecialchars($_POST['password']);
 				$confirmPassword = htmlspecialchars($_POST['confirmpassword']);
 				$email = htmlspecialchars($_POST['email']);
-				$inviteCode = htmlspecialchars($_POST["invitecode"]);
+				$inviteCode = htmlspecialchars($_POST['invitecode']);
 
 				// Check uname/email isn't in use, password valid. If all good create new user account and redirect back to home page.
 				if ($password != $confirmPassword) {
@@ -46,7 +46,7 @@ if ($showRegister == 1) {
 					// Get the default user role.
 					$userDefault = $page->users->getDefaultRole();
 
-					$ret = $page->users->signUp($userName, $password, $email,
+					$ret = $page->users->signup($userName, $password, $email,
 						$_SERVER['REMOTE_ADDR'], $userDefault['id'], $userDefault['defaultinvites'], $inviteCode
 					);
 					if ($ret > 0) {

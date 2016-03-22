@@ -962,6 +962,9 @@ class Utility
 				case 501:
 					$errorText = 'Download limit reached';
 					break;
+				case 910:
+					$errorText = 'API disabled';
+					break;
 				default:
 					$errorText = 'Unknown error';
 					break;
