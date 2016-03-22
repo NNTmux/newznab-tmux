@@ -1,6 +1,3 @@
-$('head').append('<link rel="stylesheet" href="themes/Charisma/css/animate.min.css" type="text/css" />');
-jQuery.getScript("themes/shared/libs/noty/packaged/jquery.noty.packaged.min.js");
-
 // event bindings
 jQuery(function($){
 
@@ -921,31 +918,6 @@ jQuery(function($){
             }
         });
     });
-
-    // preinfo tooltip
-    $(".preinfo").each(function() {
-        var searchname = $(this).attr('title');
-        $(this).qtip({
-            content: {
-                title: {
-                    text: 'Pre Info'
-                },
-                text: 'loading...',
-                ajax: {
-                    url: SERVERROOT + 'ajax_preinfo',
-                    type: 'GET',
-                    data: { searchname: searchname },
-                    success: function(data, status) {
-                        this.set('content.text', data);
-                    }
-                }
-            },
-            style: {
-                classes: 'ui-tooltip-newznab'
-            }
-        });
-    });
-
 });
 
 
@@ -1013,45 +985,45 @@ $(document).ready(function()
         var persistent = false;
 
         $(document.body).qtip({
-            content: {
-                text: tipText,
-                title: {
-                    text: tipTitle,
-                    button: true
-                }
-            },
-            position: {
-                my: 'top right',
-                at: (target.length ? 'bottom' : 'top') + ' right',
-                target: target.length ? target : $(document.body),
-                adjust: { y: 5 }
-            },
-            show: {
-                event: false,
-                ready: true,
-                effect: function() { $(this).stop(0,1).fadeIn(400); },
+                content: {
+                    text: tipText,
+                    title: {
+                        text: tipTitle,
+                        button: true
+                    }
+                },
+                position: {
+                    my: 'top right',
+                    at: (target.length ? 'bottom' : 'top') + ' right',
+                    target: target.length ? target : $(document.body),
+                    adjust: { y: 5 }
+                },
+                show: {
+                    event: false,
+                    ready: true,
+                    effect: function() { $(this).stop(0,1).fadeIn(400); },
 
-                persistent: persistent
-            },
-            hide: {
-                event: false,
-                effect: function(api) {
-                    $(this).stop(0,1).fadeOut(400).queue(function() {
-                        api.destroy();
-                        updateGrowls();
-                    })
+                    persistent: persistent
+                },
+                hide: {
+                    event: false,
+                    effect: function(api) {
+                        $(this).stop(0,1).fadeOut(400).queue(function() {
+                            api.destroy();
+                            updateGrowls();
+                        })
+                    }
+                },
+                style: {
+                    classes: 'jgrowl ui-tooltip-newznab ui-tooltip-rounded',
+                    tip: false
+                },
+                events: {
+                    render: function(event, api) {
+                        timer.call(api.elements.tooltip, event);
+                    }
                 }
-            },
-            style: {
-                classes: 'jgrowl ui-tooltip-newznab ui-tooltip-rounded',
-                tip: false
-            },
-            events: {
-                render: function(event, api) {
-                    timer.call(api.elements.tooltip, event);
-                }
-            }
-        })
+            })
             .removeData('qtip');
     };
 

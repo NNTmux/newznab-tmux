@@ -55,7 +55,8 @@
     "fxp/composer-asset-plugin": "~1.1",
     "bower-asset/bootstrap": "~3.3.6",
     "bower-asset/font-awesome": "~4.5.0",
-    "bower-asset/jquery-2.2.x": "~2.2.1"
+    "bower-asset/jquery-2.2.x": "~2.2.1",
+    "bower-asset/noty": "~2.3.8"
   },
 
   "require-dev": {},

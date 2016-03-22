@@ -112,7 +112,7 @@
 	<!--/.fluid-container-->
 {/if}
 <!-- external javascript -->
-<script src="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/js/bootstrap.min.js"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- library for cookie management -->
 <script src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.cookie.js"></script>
 <!-- calender plugin -->

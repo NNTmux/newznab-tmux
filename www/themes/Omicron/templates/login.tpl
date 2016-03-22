@@ -11,9 +11,9 @@
     <title>{$site->title} | Log in</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <!-- Bootstrap 3.3.6 -->
-    <link href="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <!-- Font Awesome Icons -->
-    <link href="{$smarty.const.WWW_THEMES}/shared/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
     <!-- Theme style -->
     <link href="{$smarty.const.WWW_THEMES}/{$theme}/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
     <!-- iCheck -->
@@ -63,10 +63,10 @@
         </form>
 		  <a href="{$smarty.const.WWW_TOP}forgottenpassword" class="text-center">I forgot my password</a><br>
         <a href="{$smarty.const.WWW_TOP}register" class="text-center">Register a new membership</a>
-    <!-- jQuery 2.1.4 -->
-    <script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/jQuery/jQuery-2.1.4.min.js"></script>
+    <!-- jQuery 2.2.x -->
+    <script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"></script>
     <!-- Bootstrap 3.3.6 JS -->
-    <script src="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
     <!-- iCheck -->
     <script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
     <script>

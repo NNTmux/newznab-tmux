@@ -41,7 +41,7 @@
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/jquery.iphone.toggle.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/animate.min.css' rel='stylesheet'>
 	<!-- Font Awesome Icons -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/css/font-awesome.min.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
@@ -217,7 +217,7 @@
 	<script type="text/javascript"
 			src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/shared/libs/bootstrap/v3/js/bootstrap.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js"></script>
 	<!-- Bootstrap hover on mouseover script -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/shared/scripts/bootstrap-hover-dropdown.min.js"></script>
@@ -234,7 +234,7 @@
 			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/colorbox/jquery.colorbox-min.js"></script>
 	<!-- notification plugin -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/shared/libs/noty/packaged/jquery.noty.packaged.js"></script>
+			src="{$smarty.const.WWW_THEMES}/shared/assets/noty/packaged/jquery.noty.packaged.js"></script>
 	<!-- library for making tables responsive -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/responsive-tables/responsive-tables.js"></script>
