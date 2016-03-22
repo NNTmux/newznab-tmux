@@ -28,6 +28,10 @@
   "extra": {
     "branch-alias": {
       "dev-master": "0.6.x-dev"
+    },
+    "asset-installer-paths": {
+      "npm-asset-library": "www/themes/shared/assets",
+      "bower-asset-library": "www/themes/shared/assets"
     }
   },
   "license": "GPL-3.0",
@@ -47,7 +51,11 @@
     "moinax/tvdb": "~1.0",
     "phpmailer/phpmailer": "~5.2",
     "exeu/apai-io": "~1.0",
-    "smarty/smarty": "~3.1"
+    "smarty/smarty": "~3.1",
+    "fxp/composer-asset-plugin": "~1.1",
+    "bower-asset/bootstrap": "~3.3.6",
+    "bower-asset/font-awesome": "~4.5.0",
+    "bower-asset/jquery-2.2.x": "~2.2.1"
   },
 
   "require-dev": {},
