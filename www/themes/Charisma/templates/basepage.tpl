@@ -212,7 +212,7 @@
 	<!-- Scripts-->
 	<!-- jQuery -->
 	<!-- jQuery 2.2.1 -->
-	<script src="{$smarty.const.WWW_THEMES}/shared/scripts/jQuery-2.2.1.min.js"></script>
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"></script>
 	<!-- jQuery migrate script -->
 	<script type="text/javascript"
 			src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
