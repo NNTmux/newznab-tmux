@@ -1,4 +1,5 @@
 2016-03-23 DariusIII
+	* Fix: Fix Undefined index isadmin on profile pages.
 	* Fix: Fix issue #116, invites not working
 2016-03-22 DariusIII
 	* Fix: Fix API when disabled in site edit.

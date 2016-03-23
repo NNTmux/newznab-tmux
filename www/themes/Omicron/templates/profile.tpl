@@ -37,7 +37,7 @@
 																<th width="200">Username</th>
 																<td>{$user.username|escape:"htmlall"}</td>
 															</tr>
-															{if $isadmin || !$publicview}
+															{if isset($isadmin) || !$publicview}
 																<tr>
 																	<th width="200" title="Not public">E-mail</th>
 																	<td>{$user.email}</td>
@@ -92,7 +92,7 @@
 															<tr>
 																<th>API Hits last 24 hours</th>
 																<td>
-																	<span id="uatd">{$apirequests}</span> {if $isadmin && $apirequests > 0}
+																	<span id="uatd">{$apirequests}</span> {if isset($isadmin) && $apirequests > 0}
 																	<a
 																			onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;"
 																			href="#" class="label label-danger">
@@ -106,7 +106,7 @@
 																		in {($grabstoday.nextdl/3600)|intval}
 																		h {($grabstoday.nextdl/60) % 60}
 																		m)</small> {else} {$user.downloadrequests} {/if}
-																	{if $isadmin && $grabstoday > 0}
+																	{if isset($isadmin) && $grabstoday > 0}
 																		<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
 																			href="#" class="label label-danger">
 																			Reset</a>
@@ -116,7 +116,7 @@
 																<th>Downloads Total</th>
 																<td>{$user.grabs}</td>
 															</tr>
-															{if $isadmin || !$publicview}
+															{if isset($isadmin) || !$publicview}
 																<tr>
 																	<th title="Not public">API/RSS Key</th>
 																	<td>
@@ -179,7 +179,7 @@
 																</tbody>
 															</table>
 														{/if}
-														{if $isadmin && $downloadlist|@count > 0}
+														{if isset($isadmin) && $downloadlist|@count > 0}
 														<table class="data table table-condensed table-striped table-responsive table-hover">
 															<tbody>
 															<tr class="bg-aqua-active">
@@ -209,7 +209,7 @@
 										</div>
 									</div>
 								</div>
-								{if $isadmin || !$publicview}
+								{if isset($isadmin) || !$publicview}
 									<a class="btn btn-primary" href="{$smarty.const.WWW_TOP}profileedit">Edit
 										Profile</a>
 								{/if}
