@@ -74,9 +74,9 @@
 					<a id="lnkCancelInvite" onclick="return false;" class="btn btn-warning" href="#">Cancel</a>
 				</form>
 			</div>
-		{/if}                                                         git pus
+		{/if}
 		</td>
-	</tr>                                                                                              git checkout
+	</tr>
 	{/if}
 	{if $userinvitedby && $userinvitedby.username != ""}
 	<tr>
