@@ -537,16 +537,22 @@ class Users
 		return (strlen($password) > 5);
 	}
 
-	public function checkAndUseInvite($invitecode)
+	/**
+	 * If a invite is used, decrement the person who invited's invite count.
+	 *
+	 * @param int $inviteCode
+	 *
+	 * @return int
+	 */
+	public function checkAndUseInvite($inviteCode)
 	{
-		$invite = $this->getInvite($invitecode);
-		if (!$invite)
+		$invite = $this->getInvite($inviteCode);
+		if (!$invite) {
 			return -1;
+		}
 
-
-		$this->pdo->queryExec(sprintf("UPDATE users SET invites = case when invites <= 0 then 0 else invites-1 end WHERE id = %d ", $invite["userid"]));
-		$this->deleteInvite($invitecode);
-
+		$this->pdo->queryExec(sprintf("UPDATE users SET invites = invites-1 WHERE id = %d ", $invite["userid"]));
+		$this->deleteInvite($inviteCode);
 		return $invite["userid"];
 	}
 

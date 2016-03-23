@@ -37,7 +37,7 @@ if ($showRegister == 1) {
 				$password = htmlspecialchars($_POST['password']);
 				$confirmPassword = htmlspecialchars($_POST['confirmpassword']);
 				$email = htmlspecialchars($_POST['email']);
-				$inviteCode = htmlspecialchars($_POST['invitecode']);
+				$inviteCode = htmlspecialchars($_REQUEST['invitecode']);
 
 				// Check uname/email isn't in use, password valid. If all good create new user account and redirect back to home page.
 				if ($password != $confirmPassword) {
@@ -47,8 +47,9 @@ if ($showRegister == 1) {
 					$userDefault = $page->users->getDefaultRole();
 
 					$ret = $page->users->signup($userName, $password, $email,
-						$_SERVER['REMOTE_ADDR'], $userDefault['id'], $userDefault['defaultinvites'], $inviteCode
+						$_SERVER['REMOTE_ADDR'], $userDefault['id'], '', $userDefault['defaultinvites'], $inviteCode
 					);
+
 					if ($ret > 0) {
 						$page->users->login($ret, $_SERVER['REMOTE_ADDR']);
 						header("Location: " . WWW_TOP . "/");
