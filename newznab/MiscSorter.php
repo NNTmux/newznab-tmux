@@ -379,7 +379,6 @@ class MiscSorter
 			echo $e->getMessage();
 		}
 
-		//$amazon = new AmazonProductAPI($this->pdo->getSetting('amazonpubkey, $this->pdo->getSetting('amazonprivkey, $this->pdo->getSetting('amazonassociatetag);
 		$amalookup = new Lookup();
 
 		$apaiIo = new ApaiIO($conf);

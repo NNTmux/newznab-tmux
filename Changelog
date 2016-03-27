@@ -1,3 +1,6 @@
+2016-03-27 DariusIII
+	* Upd: Remove unused AmazonProductAPI class.
+	+ Upd: Remove commented out AmazonProductAPI usage from MiscSorter class.
 2016-03-23 DariusIII
 	* Upd: Update scripts to handle the new dev branch
 	* Fix: Fix Undefined index isadmin on profile pages.
