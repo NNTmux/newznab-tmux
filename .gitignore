@@ -12,6 +12,8 @@ test.php
 *.orig
 
 /.idea/
+/app/libraries/*
+/app/resources/tmp/*
 /newznab/config/settings.php
 /newznab/config/ircscraper_settings.php
 /newznab/config/ircscraper.php
@@ -23,6 +25,5 @@ test.php
 /resources/nzb/*
 /resources/tmp/*
 /templates_c/*
-/libraries
-/app/libraries
+/libraries/*
 /www/themes/shared/assets
