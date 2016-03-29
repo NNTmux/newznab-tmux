@@ -1,3 +1,5 @@
+2016-03-29 DariusIII
+	* Upd: First push of lithium framework
 2016-03-27 DariusIII
 	* Upd: Remove unused AmazonProductAPI class.
 	+ Upd: Remove commented out AmazonProductAPI usage from MiscSorter class.

@@ -14,26 +14,30 @@
  * along with this program (see LICENSE.txt in the base directory.  If
  * not, see:
  *
- * @link      <http://www.gnu.org/licenses/>.
- * @author    niel
+ * @link	  <http://www.gnu.org/licenses/>.
+ * @author	niel
  * @copyright 2014 nZEDb
  */
-/*
-spl_autoload_register(
-	function ($class) {
-		// Only continue if the class is in our namespace.
-		if (strpos($class, 'nzedb\\') === 0) {
-			// Replace namespace separators with directory separators in the class name, append
-			// with .php
-			$file = nZEDb_ROOT . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+namespace app\extensions\qa\rules\syntax;
 
-			// if the file exists, require it
-			if (file_exists($file)) {
-				require_once $file;
+class EndsWithCloseTag extends \li3_quality\qa\rules\syntax\EndsWithCloseTag
+{
+	public function apply($testable, array $config = [])
+	{
+		$message = "File does not end with ?>";
+		$lines = $testable->lines();
+
+		$cnt = count($lines);
+		if ($cnt > 1) {
+			if (!((empty($lines[$cnt - 1]) && $lines[($cnt - 2)] === "?>") || ($lines[($cnt - 1)] === "?>"))) {
+				$this->addViolation(
+					[
+						'message' => $message,
+						'line' => $cnt - 1
+					]);
 			}
 		}
 	}
-);
-*/
-require_once 'app/libraries/autoload.php'
+}
+
 ?>

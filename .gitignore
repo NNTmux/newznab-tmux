@@ -23,5 +23,6 @@ test.php
 /resources/nzb/*
 /resources/tmp/*
 /templates_c/*
-/vendor
+/libraries
+/app/libraries
 /www/themes/shared/assets
