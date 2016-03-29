@@ -51,10 +51,10 @@
  * application's classes and files.  You don't need to change this unless your webroot folder is
  * stored outside of your app folder.
  */
-define('LITHIUM_APP_PATH', realpath(dirname(dirname(dirname(__DIR__)))));
+define('LITHIUM_APP_PATH', realpath(dirname(dirname(__DIR__))));
 
 if (!defined('NN_ROOT')) {
-	define('NN_ROOT', realpath(dirname(LITHIUM_APP_PATH)) . DS);
+	define('NN_ROOT', realpath(dirname(dirname(LITHIUM_APP_PATH)) . DS));
 }
 
 /**
