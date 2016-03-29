@@ -19,11 +19,11 @@ test.php
 /newznab/config/ircscraper.php
 /newznab/config/opensssl.php
 
+/libraries/*
 /nbproject/
 /nbproject/private/
 /resources/covers/*
 /resources/nzb/*
 /resources/tmp/*
 /templates_c/*
-/libraries/*
 /www/themes/shared/assets
