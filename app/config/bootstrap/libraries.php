@@ -69,7 +69,7 @@ define('LITHIUM_LIBRARY_PATH', NN_ROOT . 'libraries');
  * Locate and load Lithium core library files.  Throws a fatal error if the core can't be found.
  * If your Lithium core directory is named something other than `lithium`, change the string below.
  */
-if (!include LITHIUM_LIBRARY_PATH . '/lithium/core/Libraries.php') {
+if (!include LITHIUM_LIBRARY_PATH . DS . 'lithium' . DS . 'core' . DS . 'Libraries.php') {
 	$message  = "Lithium core could not be found.  Check the value of LITHIUM_LIBRARY_PATH in ";
 	$message .= __FILE__ . ".  It should point to the directory containing your ";
 	$message .= "/libraries directory.";
@@ -132,12 +132,12 @@ Libraries::add('app', array('default' => true));
  * Add some plugins:
  */
 if (is_dir(LITHIUM_LIBRARY_PATH . DS . 'li3_docs')) {
-	Libraries::add('li3_docs', ['index' => ['app', 'lithium']]);
+	Libraries::add('li3_docs', ['index' => ['app', 'lithium', 'li3_docs', 'manual']]);
 }
 
 if (is_dir(LITHIUM_LIBRARY_PATH . DS . 'li3_quality')) {
 	Libraries::add('li3_quality');
 }
 
-require_once LITHIUM_APP_PATH . DS . 'libraries/autoload.php';
+require_once LITHIUM_APP_PATH . DS . 'libraries' . DS . 'autoload.php';
 ?>
