@@ -54,7 +54,7 @@
 define('LITHIUM_APP_PATH', realpath(dirname(dirname(__DIR__))));
 
 if (!defined('NN_ROOT')) {
-	define('NN_ROOT', realpath(dirname(dirname(LITHIUM_APP_PATH)) . DS));
+	define('NN_ROOT', realpath(dirname(LITHIUM_APP_PATH)) . DS);
 }
 
 /**
