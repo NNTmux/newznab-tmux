@@ -23,6 +23,7 @@
   <!-- Bootstrap core CSS -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/animate.min.css" rel="stylesheet">
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
@@ -218,6 +219,9 @@
 
   <!-- PNotify -->
   <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.js"></script>
+  <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.animate.js"></script>
+  <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.desktop.js"></script>
+  <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.callback.js"></script>
   <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.buttons.js"></script>
   <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.nonblock.js"></script>
 
