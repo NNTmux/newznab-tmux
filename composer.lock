@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "627e89161f239e516ba10fff61d93e99",
-    "content-hash": "407252da1c63d7a6fc758a9d66437976",
+    "hash": "70db188de225a73dcf33890c09dcf385",
+    "content-hash": "29e10eef967f57e59d912c8c99454d39",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -207,6 +207,57 @@
                 "bower-asset-ignore": []
             },
             "description": "noty is a jQuery plugin that makes it easy to create alert - success - error - warning - information - confirmation messages as an alternative the standard alert dialog. Each notification is added to a queue. (Optional)"
+        },
+        {
+            "name": "bower-asset/pnotify",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sciactive/pnotify.git",
+                "reference": "2c6a12b5d8a6b55d21beae5b35c2a643fcfe4a90"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sciactive/pnotify/zipball/2c6a12b5d8a6b55d21beae5b35c2a643fcfe4a90",
+                "reference": "2c6a12b5d8a6b55d21beae5b35c2a643fcfe4a90",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.6"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "dist/pnotify.animate.js",
+                    "dist/pnotify.brighttheme.css",
+                    "dist/pnotify.buttons.css",
+                    "dist/pnotify.buttons.js",
+                    "dist/pnotify.callbacks.js",
+                    "dist/pnotify.confirm.js",
+                    "dist/pnotify.css",
+                    "dist/pnotify.js",
+                    "dist/pnotify.desktop.js",
+                    "dist/pnotify.history.css",
+                    "dist/pnotify.history.js",
+                    "dist/pnotify.mobile.css",
+                    "dist/pnotify.mobile.js",
+                    "dist/pnotify.nonblock.js"
+                ],
+                "bower-asset-ignore": [
+                    "build-tools/",
+                    "includes/",
+                    "devnote*.*",
+                    "index.html",
+                    "testing.html",
+                    "buildcustom.php",
+                    "package.json",
+                    "src/"
+                ]
+            },
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "JavaScript notification plugin."
         },
         {
             "name": "composer/installers",
