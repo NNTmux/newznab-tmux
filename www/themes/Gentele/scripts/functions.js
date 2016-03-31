@@ -23,7 +23,6 @@ jQuery(function($){
         var guid = $(".guid").attr('id').substring(4);
         $.post( SERVERROOT + "cart?add=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title','Added to Cart');
-            PNotify.desktop.permission();
             PNotify.prototype.options.styling = "fontawesome";
             new PNotify({
                 title: 'Release added to your Download Basket!',
@@ -54,7 +53,6 @@ jQuery(function($){
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_sab_clicked').attr('title','Added to Queue');
-            PNotify.desktop.permission();
             PNotify.prototype.options.styling = "fontawesome";
             new PNotify({
                 title: 'Release added to your download queue!',
@@ -84,7 +82,6 @@ jQuery(function($){
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_nzbget_clicked').attr('title','Added to Queue');
-            PNotify.desktop.permission();
             PNotify.prototype.options.styling = "fontawesome";
             new PNotify({
                 title: 'Release added to your download queue!',
@@ -122,7 +119,6 @@ jQuery(function($){
             {
                 var message = 'Added ' + guid + ' to queue.';
                 $(event.target).addClass('icon_nzbvortex_clicked').attr('title', message);
-                PNotify.desktop.permission();
                 PNotify.prototype.options.styling = "fontawesome";
                 new PNotify({
                     title: 'Release added to your download queue!',
@@ -187,7 +183,6 @@ jQuery(function($){
             if (guid && !$cartIcon.hasClass('icon_cart_clicked')){
                 $cartIcon.addClass('icon_cart_clicked').attr('title','Added to Cart');	// consider doing this only upon success
                 guids.push(guid);
-                PNotify.desktop.permission();
                 PNotify.prototype.options.styling = "fontawesome";
                 new PNotify({
                     title: 'Release added to your Download Basket!',
@@ -219,7 +214,6 @@ jQuery(function($){
                 var nzburl = SERVERROOT + "sendtoqueue/" + guid;
                 $.post( nzburl, function(resp){
                     $sabIcon.addClass('icon_sab_clicked').attr('title','Added to Queue');
-                    PNotify.desktop.permission();
                     PNotify.prototype.options.styling = "fontawesome";
                     new PNotify({
                         title: 'Release added to your download queue!',
@@ -251,7 +245,6 @@ jQuery(function($){
                 var nzburl = SERVERROOT + "sendtoqueue/" + guid;
                 $.post( nzburl, function(resp){
                     $nzbgetIcon.addClass('icon_nzbget_clicked').attr('title','Added to Queue');
-                    PNotify.desktop.permission();
                     PNotify.prototype.options.styling = "fontawesome";
                     new PNotify({
                         title: 'Release added to your download queue!',
@@ -389,7 +382,6 @@ jQuery(function($){
         var guid = $(this).parent().parent().attr('id').substring(4);
         $.post( SERVERROOT + "cart?add=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
-            PNotify.desktop.permission();
             PNotify.prototype.options.styling = "fontawesome";
             new PNotify({
                 title: 'Release added to your download basket!',
@@ -426,7 +418,6 @@ jQuery(function($){
             {
                 var message = 'Added ' + guid + ' to queue.';
                 $(event.target).addClass('icon_nzbvortex_clicked').attr('title', message);
-                PNotify.desktop.permission();
                 PNotify.prototype.options.styling = "fontawesome";
                 new PNotify({
                     title: 'ADDED TO NZBVORTEX!',
@@ -556,7 +547,6 @@ jQuery(function($){
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_sab_clicked').attr('title','Release added to Queue');
-            PNotify.desktop.permission();
             PNotify.prototype.options.styling = "fontawesome";
             new PNotify({
                 title: 'Release added to your download queue!',
@@ -586,7 +576,6 @@ jQuery(function($){
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_nzbget_clicked').attr('title','Added to Queue');
-            PNotify.desktop.permission();
             PNotify.prototype.options.styling = "fontawesome";
             new PNotify({
                 title: 'Release added to your download queue!',
@@ -681,7 +670,6 @@ jQuery(function($){
             if (guid && !$cartIcon.hasClass('icon_cart_clicked')){
                 $cartIcon.addClass('icon_cart_clicked').attr('title','Added to Cart');
                 guids.push(guid);
-                PNotify.desktop.permission();
                 PNotify.prototype.options.styling = "fontawesome";
                 new PNotify({
                     title: 'Release added to your Download Basket!',
@@ -716,7 +704,6 @@ jQuery(function($){
                 // alert(nzburl);
                 $.post( nzburl, function(resp){
                     $sabIcon.addClass('icon_sab_clicked').attr('title','Added to Queue');
-                    PNotify.desktop.permission();
                     PNotify.prototype.options.styling = "fontawesome";
                     new PNotify({
                         title: 'Release added to your download queue!',
@@ -747,7 +734,6 @@ jQuery(function($){
                 var nzburl = SERVERROOT + "sendtoqueue/" + guid;
                 $.post( nzburl, function(resp){
                     $nzbgetIcon.addClass('icon_nzbget_clicked').attr('title','Added to Queue');
-                    PNotify.desktop.permission();
                     PNotify.prototype.options.styling = "fontawesome";
                     new PNotify({
                         title: 'Release added to your download queue!',
@@ -833,7 +819,6 @@ jQuery(function($){
             var guid = $(row).val();
             var nzburl = SERVERROOT + "sendtoqueue/" + guid;
             $.post( nzburl, function(resp){
-                PNotify.desktop.permission();
                 PNotify.prototype.options.styling = "fontawesome";
                 new PNotify({
                     title: 'Releases sent to queue!',
