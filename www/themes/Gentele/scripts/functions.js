@@ -35,7 +35,8 @@ jQuery(function($){
                     nonblock_opacity: .2
                 },
                 desktop: {
-                    desktop: true
+                    desktop: true,
+                    text: 'Release added to your Download Basket.'
                 }}).get().click(function(e) {
                 if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                 alert('Release added to your Download Basket');
@@ -65,7 +66,8 @@ jQuery(function($){
                     nonblock_opacity: .2
                 },
                 desktop: {
-                    desktop: true
+                    desktop: true,
+                    text: 'Release added to your download queue.'
                 }}).get().click(function(e) {
                 if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                 alert('Release added to your download queue');
@@ -94,7 +96,8 @@ jQuery(function($){
                     nonblock_opacity: .2
                 },
                 desktop: {
-                    desktop: true
+                    desktop: true,
+                    text: 'Release added to your download queue.'
                 }}).get().click(function(e) {
                 if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                 alert('Release added to your download queue');
@@ -131,7 +134,8 @@ jQuery(function($){
                         nonblock_opacity: .2
                     },
                     desktop: {
-                        desktop: true
+                        desktop: true,
+                        text: 'Release added to your download queue.'
                     }}).get().click(function(e) {
                     if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                     alert('Release added to your download queue');
@@ -195,7 +199,8 @@ jQuery(function($){
                         nonblock_opacity: .2
                     },
                     desktop: {
-                        desktop: true
+                        desktop: true,
+                        text: 'Release added to your download basket.'
                     }}).get().click(function(e) {
                     if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                     alert('Release added to your Download Basket');
@@ -226,7 +231,8 @@ jQuery(function($){
                             nonblock_opacity: .2
                         },
                         desktop: {
-                            desktop: true
+                            desktop: true,
+                            text: 'Release added to your download queue.'
                         }}).get().click(function(e) {
                         if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                         alert('Release added to your download queue');
@@ -257,7 +263,8 @@ jQuery(function($){
                             nonblock_opacity: .2
                         },
                         desktop: {
-                            desktop: true
+                            desktop: true,
+                            text: 'Release added to your download queue.'
                         }}).get().click(function(e) {
                         if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                         alert('Release added to your download queue');
@@ -394,7 +401,8 @@ jQuery(function($){
                     nonblock_opacity: .2
                 },
                 desktop: {
-                    desktop: true
+                    desktop: true,
+                    text: 'Release added to your download basket.'
                 }}).get().click(function(e) {
                 if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                 alert('Release added to your download basket');
@@ -430,7 +438,8 @@ jQuery(function($){
                         nonblock_opacity: .2
                     },
                     desktop: {
-                        desktop: true
+                        desktop: true,
+                        text: 'Release added nzbvortex.'
                     }}).get().click(function(e) {
                     if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                     alert('Release added to NZBVortex');
@@ -559,7 +568,8 @@ jQuery(function($){
                     nonblock_opacity: .2
                 },
                 desktop: {
-                    desktop: true
+                    desktop: true,
+                    text: 'Release added to your download queue.'
                 }}).get().click(function(e) {
                 if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                 alert('Release added to your download queue');
@@ -588,7 +598,8 @@ jQuery(function($){
                     nonblock_opacity: .2
                 },
                 desktop: {
-                    desktop: true
+                    desktop: true,
+                    text: 'Release added to your download queue.'
                 }}).get().click(function(e) {
                 if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                 alert('Release added to your download queue');
@@ -682,7 +693,8 @@ jQuery(function($){
                         nonblock_opacity: .2
                     },
                     desktop: {
-                        desktop: true
+                        desktop: true,
+                        text: 'Release added to your download basket.'
                     }}).get().click(function(e) {
                     if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                     alert('Release added to your Download Basket');
@@ -716,7 +728,8 @@ jQuery(function($){
                             nonblock_opacity: .2
                         },
                         desktop: {
-                            desktop: true
+                            desktop: true,
+                            text: 'Release added to your download queue.'
                         }}).get().click(function(e) {
                         if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                         alert('Release added to your download queue');
@@ -746,7 +759,8 @@ jQuery(function($){
                             nonblock_opacity: .2
                         },
                         desktop: {
-                            desktop: true
+                            desktop: true,
+                            text: 'Release added to your download queue.'
                         }}).get().click(function(e) {
                         if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                         alert('Release added to your download queue');
@@ -831,7 +845,8 @@ jQuery(function($){
                         nonblock_opacity: .2
                     },
                     desktop: {
-                        desktop: true
+                        desktop: true,
+                        text: 'Release added to your download queue.'
                     }}).get().click(function(e) {
                     if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
                     alert('Release added to your download queue');
