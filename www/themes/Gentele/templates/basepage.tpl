@@ -168,9 +168,8 @@
                 </ul>
               </li>
             </ul>
-          </nav>
-        </div>
-
+    </nav>
+  </div>
       </div>
       <!-- /top navigation -->
 
