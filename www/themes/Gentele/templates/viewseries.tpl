@@ -21,11 +21,11 @@
 			</ol>
 		</div>
 	</div>
-	<h1>
-		<div style="text-align: center;">{$seriestitles} ({$show.publisher})</div>
-	</h1>
 	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
-	<div class="tvseriesheading">
+	<div class="tvseriesheading" style="background-color: white">
+		<h1>
+			<div style="text-align: center;">{$seriestitles} ({$show.publisher})</div>
+		</h1>
 		{if $show.image != 0}
 			<div style="text-align: center;">
 				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$seriestitles} Logo"
@@ -102,18 +102,22 @@
 				<a title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">My Shows</a> :
 				<div class="btn-group">
 					{if $myshows.id != ''}
-						<a class="btn btn-sm btn-warning"
+						<a class="myshows btn btn-sm btn-warning" data-toggle="tooltip" data-placement="top" title data-original-title="Edit Categories for this show"
 						   href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-						   class="myshows" rel="edit" name="series{$show.id}"
-						   title="Edit Categories for this show">Edit</a>
-						<a class="btn btn-sm btn-danger"
+						   rel="edit" name="series{$show.id}">
+							<i class="fa fa-pencil"></i>
+						</a>
+						<a class="myshows btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title data-original-title="Remove from My Shows"
 						   href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-						   class="myshows" rel="remove" name="series{$show.id}"
-						   title="Remove from My Shows">Remove</a>
+						   rel="remove" name="series{$show.id}">
+							<i class="fa fa-minus"></i>
+						</a>
 					{else}
-						<a class="btn btn-sm btn-success"
+						<a class="myshows btn btn-sm btn-success" data-toggle="tooltip" data-placement="top" title data-original-title="Add to My Shows"
 						   href="{$smarty.const.WWW_TOP}/myshows/add/{$show.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-						   class="myshows" rel="add" name="series{$show.id}" title="Add to My Shows">Add</a>
+						   rel="add" name="series{$show.id}">
+							<i class="fa fa-plus"></i>
+						</a>
 					{/if}
 				</div>
 			</div>

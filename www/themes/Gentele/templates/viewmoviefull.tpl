@@ -10,7 +10,7 @@
 {if $results|@count > 0}
 	<div class="box-body">
 		{foreach $results as $result}
-			<div id="moviefull" style="min-height:340px;">
+			<div id="moviefull" style="min-height:340px; background-color: white">
 				{if $result.cover == 1}
 					<img class="pull-right" style="margin-right:50px; max-height:278px;"
 						 alt="{$result.title|escape:"htmlall"} Logo"
