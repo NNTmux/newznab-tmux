@@ -168,7 +168,7 @@ body.nav-md .container.body .col-md-3.left_col {
   display: flex;
 }
 body .container.body .right_col {
-  background: #F7F7F7;
+  background: #73879C;
 }
 body.nav-md .container.body .right_col {
   padding: 10px 20px 0;
@@ -658,7 +658,7 @@ li.current-page a {
 }
 .x_content canvas {}
 footer {
-  background: #fff;
+  background: #CCCCCC;
   padding: 5px 20px 0;
   height: 45px;
   margin: 0 -17px;
@@ -800,7 +800,7 @@ h2 {
   margin-bottom: 10px;
   padding: 10px 17px;
   display: inline-block;
-  background: #fff;
+  background: #CCCCCC;
   border: 1px solid #E6E9ED;
   -webkit-column-break-inside: avoid;
   -moz-column-break-inside: avoid;
