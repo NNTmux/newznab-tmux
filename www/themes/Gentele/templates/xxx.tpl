@@ -187,7 +187,7 @@
 																	href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 														</div>
 														<div>
-															<a role="button" class="btn btn-default btn-xs"
+															<a role="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title data-original-title="Download NZB"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
 																		class="fa fa-cloud-download"></i><span
 																		class="badge"> {$mgrabs[$m@index]}
@@ -197,13 +197,16 @@
 																		class="fa fa-comment-o"></i><span
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																  title="Send to my Download Basket"><i
-																		class="fa fa-shopping-basket"></i></span>
+																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Send to my download basket"><i
+																					class="fa fa-shopping-basket"></i></span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
 																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																	  title="Send to my Queue"><i
+																	  data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Queue"><i
 																			class="fa fa-share"></i></span>
+															{/if}
+															{if !empty($mfailed[$m@index])}
+																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+																		<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
 															{/if}
 														</div>
 													</div>
@@ -339,7 +342,7 @@
 																	href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 														</div>
 														<div>
-															<a role="button" class="btn btn-default btn-xs"
+															<a role="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title data-original-title="Download NZB"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
 																		class="fa fa-cloud-download"></i><span
 																		class="badge"> {$mgrabs[$m@index]}
@@ -349,13 +352,16 @@
 																		class="fa fa-comment-o"></i><span
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																  title="Send to my Download Basket"><i
-																		class="fa fa-shopping-basket"></i></span>
+																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Send to my download basket"><i
+																					class="fa fa-shopping-basket"></i></span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
 																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																	  title="Send to my Queue"><i
+																	  data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Queue"><i
 																			class="fa fa-share"></i></span>
+															{/if}
+															{if !empty($mfailed[$m@index])}
+																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+																		<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
 															{/if}
 														</div>
 													</div>
