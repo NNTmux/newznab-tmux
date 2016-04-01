@@ -24,16 +24,21 @@
 								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
 								With Selected:
 								<div class="btn-group">
-									<input type="button"
+									<button type="button"
 										   class="nzb_multi_operations_download btn btn-sm btn-success"
-										   value="Download NZBs"/>
-									<input type="button"
+										   data-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
+											<i class="fa fa-cloud-download"></i></button>
+									<button type="button"
 										   class="nzb_multi_operations_cart btn btn-sm btn-info"
-										   value="Send to my Download Basket"/>
+										   data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket">
+										<i class="fa fa-shopping-basket"></i></button>
+
 									{if isset($sabintegrated) && $sabintegrated !=""}
-										<input type="button"
+										<button type="button"
 											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
-											   value="Send to Queue"/>
+											   data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
+												<i class="fa fa-share"></i></button>
+
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"
@@ -118,12 +123,6 @@
 															<b>Starring: </b>
 															{$result.actors} {/if}</div>
 													<div id="guid{$mguid[$m@index]}">
-														<label>
-															<input type="checkbox"
-																   class="nzb_check"
-																   value="{$mguid[$m@index]}"
-																   id="chksingle"/>
-														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
 														<span class="label label-default">{$result.year}</span>
@@ -132,11 +131,14 @@
 																	<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
 														<br/><br/><br/>
+														<div class="icon">
+															<input type="checkbox" class="nzb_check" value="{$mguid[$m@index]}"/>
+														</div>
 														<div class="release-name text-muted"><a
 																	href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 														</div>
 														<div>
-															<a role="button" class="btn btn-default btn-xs"
+															<a role="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title data-original-title="Download NZB"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
 																		class="fa fa-cloud-download"></i><span
 																		class="badge"> {$mgrabs[$m@index]}
@@ -146,12 +148,12 @@
 																		class="fa fa-comment-o"></i><span
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
-																  title="Send to my Download Basket"><i
+															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+																  data-toggle="tooltip" data-placement="top" title data-original-title="Send to my download basket"><i
 																		class="fa fa-shopping-basket"></i></span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
-																<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
-																	  title="Send to my Queue"><i
+																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																	  data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Queue"><i
 																			class="fa fa-share"></i></span>
 															{/if}
 															{if $cpurl != '' && $cpapi != ''}
@@ -161,11 +163,11 @@
 																	  rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
 																	  name="CP{$result.imdbid}"
 																	  title="Add to CouchPotato"
-																		><i class="fa fa-share"></i></span>
+																><i class="fa fa-share"></i></span>
 															{/if}
 															{if !empty($mfailed[$m@index])}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-																	<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>															{/if}
+																	<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>																{/if}
 														</div>
 													</div>
 													{/if}
@@ -236,12 +238,6 @@
 															<b>Starring: </b>
 															{$result.actors} {/if}</div>
 													<div id="guid{$mguid[$m@index]}">
-														<label>
-															<input type="checkbox"
-																   class="nzb_check"
-																   value="{$mguid[$m@index]}"
-																   id="chksingle"/>
-														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
 														<span class="label label-default">{$result.year}</span>
@@ -250,11 +246,12 @@
 																	<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
 														<br/><br/><br/>
+														<div class="icon"><input type="checkbox" class="nzb_check" value="{$mguid[$m@index]}"/></div>
 														<div class="release-name text-muted"><a
 																	href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 														</div>
 														<div>
-															<a role="button" class="btn btn-default btn-xs"
+															<a role="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title data-original-title="Download NZB"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
 																		class="fa fa-cloud-download"></i><span
 																		class="badge"> {$mgrabs[$m@index]}
@@ -265,11 +262,11 @@
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																  title="Send to my Download Basket"><i
+																  data-toggle="tooltip" data-placement="top" title data-original-title="Send to my download basket"><i
 																		class="fa fa-shopping-basket"></i></span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
 																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																	  title="Send to my Queue"><i
+																	  data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Queue"><i
 																			class="fa fa-share"></i></span>
 															{/if}
 															{if $cpurl != '' && $cpapi != ''}
@@ -307,27 +304,21 @@
 								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
 								With Selected:
 								<div class="btn-group">
-									<input type="button"
-										   class="nzb_multi_operations_download btn btn-sm btn-success"
-										   value="Download NZBs"/>
-									<input type="button"
-										   class="nzb_multi_operations_cart btn btn-sm btn-info"
-										   value="Send to my Download Basket"/>
+									<button type="button"
+											class="nzb_multi_operations_download btn btn-sm btn-success"
+											data-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
+										<i class="fa fa-cloud-download"></i></button>
+									<button type="button"
+											class="nzb_multi_operations_cart btn btn-sm btn-info"
+											data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket">
+										<i class="fa fa-shopping-basket"></i></button>
+
 									{if isset($sabintegrated) && $sabintegrated !=""}
-										<input type="button"
-											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
-											   value="Send to Queue"/>
-									{/if}
-									{if $cpurl != '' && $cpapi != ''}
-										<a
-												class="sendtocouch"
-												target="blackhole"
-												href="javascript:"
-												rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
-												name="CP{$result.imdbid}"
-												title="Add to CouchPotato"
-												><img
-													src="{$smarty.const.WWW_THEMES}/shared/images/icons/couch.png"></a>
+										<button type="button"
+												class="nzb_multi_operations_sab btn btn-sm btn-primary"
+												data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
+											<i class="fa fa-share"></i></button>
+
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"

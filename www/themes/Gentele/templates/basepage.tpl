@@ -127,14 +127,14 @@
               <a id="menu_toggle"><i class="fa fa-bars"></i></a>
             </div>
 			  {$header_menu}
-            <ul class="nav navbar-nav navbar-right">
+            <ul class="nav navbar-nav">
               <li class="">
                 <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 				{if $loggedin == "true"}
                   <img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png" alt="User Image"> {$userdata.username}
                   <span class=" fa fa-angle-down"></span>
                 </a>
-                <ul class="dropdown-menu dropdown-usermenu animated fadeInDown pull-right">
+                <ul class="dropdown-menu dropdown-usermenu animated jello pull-right">
                   <li><a href="{$smarty.const.WWW_TOP}/cart"><i class="fa fa-shopping-basket"></i> My Download Basket</a>
                   </li>
                   <li>

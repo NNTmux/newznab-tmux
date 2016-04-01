@@ -154,16 +154,21 @@
 					{/if}
 					With Selected:
 					<div class="btn-group">
-						<input type="button"
-							   class="nzb_multi_operations_download btn btn-sm btn-success"
-							   value="Download NZBs"/>
-						<input type="button"
-							   class="nzb_multi_operations_cart btn btn-sm btn-info"
-							   value="Send to my Download Basket"/>
+						<button type="button"
+								class="nzb_multi_operations_download btn btn-sm btn-success"
+								data-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
+							<i class="fa fa-cloud-download"></i></button>
+						<button type="button"
+								class="nzb_multi_operations_cart btn btn-sm btn-info"
+								data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket">
+							<i class="fa fa-shopping-basket"></i></button>
+
 						{if isset($sabintegrated) && $sabintegrated !=""}
-							<input type="button"
-								   class="nzb_multi_operations_sab btn btn-sm btn-primary"
-								   value="Send to Queue"/>
+							<button type="button"
+									class="nzb_multi_operations_sab btn btn-sm btn-primary"
+									data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
+								<i class="fa fa-share"></i></button>
+
 						{/if}
 						{if isset($isadmin)}
 							<input type="button"
@@ -349,16 +354,21 @@
 				<div class="nzb_multi_operations">
 					<small>With Selected:</small>
 					<div class="btn-group">
-						<input type="button"
-							   class="nzb_multi_operations_download btn btn-sm btn-success"
-							   value="Download NZBs"/>
-						<input type="button"
-							   class="nzb_multi_operations_cart btn btn-sm btn-info"
-							   value="Send to my Download Basket"/>
+						<button type="button"
+								class="nzb_multi_operations_download btn btn-sm btn-success"
+								data-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
+							<i class="fa fa-cloud-download"></i></button>
+						<button type="button"
+								class="nzb_multi_operations_cart btn btn-sm btn-info"
+								data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket">
+							<i class="fa fa-shopping-basket"></i></button>
+
 						{if isset($sabintegrated) && $sabintegrated !=""}
-							<input type="button"
-								   class="nzb_multi_operations_sab btn btn-sm btn-primary"
-								   value="Send to Queue"/>
+							<button type="button"
+									class="nzb_multi_operations_sab btn btn-sm btn-primary"
+									data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
+								<i class="fa fa-share"></i></button>
+
 						{/if}
 						{if isset($isadmin)}
 							<input type="button"

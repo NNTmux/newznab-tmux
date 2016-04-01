@@ -180,7 +180,7 @@ jQuery(function($){
     });
 
     $('input.nntmux_multi_operations_cart').click(function(){
-        var guids = [];
+        var guids = new Array();
         $("INPUT[type='checkbox']:checked").each( function(i, row) {
             var guid = $(row).val();
             var $cartIcon = $(row).parent().parent().children('td.icons').children('.icon_cart');
@@ -322,7 +322,7 @@ jQuery(function($){
             }
     });
 
-    var vortexStates = [];
+    var vortexStates = new Array();
     vortexStates[0] = 'Waiting';
     vortexStates[1] = 'Downloading';
     vortexStates[2] = 'Downloaded';
@@ -661,7 +661,7 @@ jQuery(function($){
 
 
 
-    $('input.nzb_multi_operations_download').click(function () {
+    $('button.nzb_multi_operations_download').on('click', (function(){
         var ids = "";
         $("table.data INPUT[type='checkbox']:checked").each( function (i, row) {
             if ($(row).val()!="on")
@@ -670,14 +670,14 @@ jQuery(function($){
         ids = ids.substring(0,ids.length-1);
         if (ids)
             window.location = SERVERROOT + "getnzb?zip=1&id="+ids;
-    });
+    }));
 
 
-    $('input.nzb_multi_operations_cart').click(function(){
-        var guids = [];
+    $('button.nzb_multi_operations_cart').on('click', (function(){
+        var guids = new Array();
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             var guid = $(row).val();
-            var $cartIcon = $(row).parent().parent().children('td.icons').children('.icon_cart');
+            var $cartIcon = $(row).parent().children('div.icons').children('.icon_cart');
             if (guid && !$cartIcon.hasClass('icon_cart_clicked')){
                 $cartIcon.addClass('icon_cart_clicked').attr('title','Added to Cart');
                 guids.push(guid);
@@ -705,8 +705,8 @@ jQuery(function($){
         var guidstring = guids.toString();
         // alert (guidstring); // This is just for testing shit
         $.post( SERVERROOT + "cart?add=" + guidstring);
-    });
-    $('input.nzb_multi_operations_sab').click(function(){
+    }));
+    $('button.nzb_multi_operations_sab').on('click', (function(){
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             var $sabIcon = $(row).parent().parent().children('td.icons').children('.icon_sab');
             var guid = $(row).val();
@@ -738,8 +738,8 @@ jQuery(function($){
             }
             $(this).attr('checked', false);
         });
-    });
-    $('input.nzb_multi_operations_nzbget').click(function(){
+    }));
+    $('input.nzb_multi_operations_nzbget').on('click', (function(){
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             var $nzbgetIcon = $(row).parent().parent().children('td.icons').children('.icon_nzbget');
             var guid = $(row).val();
@@ -769,7 +769,7 @@ jQuery(function($){
             }
             $(this).attr('checked', false);
         });
-    });
+    }));
 
     //front end admin functions
     $('input.nzb_multi_operations_edit').click(function(){
@@ -813,7 +813,7 @@ jQuery(function($){
     });
     //cart functions
     $('input.nzb_multi_operations_cartdelete').click(function(){
-        var ids = [];
+        var ids = new Array();
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             if ($(row).val()!="on")
                 ids.push($(row).val());
@@ -828,7 +828,7 @@ jQuery(function($){
         }
     });
     $('input.nzb_multi_operations_cartsab').click(function(){
-        var ids = [];
+        var ids = new Array();
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             var guid = $(row).val();
             var nzburl = SERVERROOT + "sendtoqueue/" + guid;
