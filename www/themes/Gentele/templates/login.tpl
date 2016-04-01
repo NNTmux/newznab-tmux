@@ -15,7 +15,7 @@
   <link href="css/bootstrap.min.css" rel="stylesheet">
 
   <link href="fonts/css/font-awesome.min.css" rel="stylesheet">
-  <link href="css/animate.min.css" rel="stylesheet">
+  <link href="{$smarty.const.WWW_THEMES}/shared/assets/animate.css/animate.min.css" rel="stylesheet">
 
   <!-- Custom styling plus plugins -->
   <link href="css/custom.css" rel="stylesheet">

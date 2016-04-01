@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "70db188de225a73dcf33890c09dcf385",
-    "content-hash": "29e10eef967f57e59d912c8c99454d39",
+    "hash": "787f3b210a98fdb349473d4c9a55ed64",
+    "content-hash": "82088ce08d626d6f6bacb2436b1b978e",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -42,6 +42,33 @@
                 "php"
             ],
             "time": "2016-01-12 19:40:56"
+        },
+        {
+            "name": "bower-asset/animate.css",
+            "version": "3.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/daneden/animate.css.git",
+                "reference": "010e06e11175840ae84ad9363f7269f03775d963"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/daneden/animate.css/zipball/010e06e11175840ae84ad9363f7269f03775d963",
+                "reference": "010e06e11175840ae84ad9363f7269f03775d963",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "./animate.css",
+                "bower-asset-ignore": [
+                    ".*",
+                    "source",
+                    "*.yml",
+                    "Gemfile",
+                    "Gemfile.lock",
+                    "*.md"
+                ]
+            }
         },
         {
             "name": "bower-asset/bootstrap",
@@ -420,16 +447,16 @@
         },
         {
             "name": "fxp/composer-asset-plugin",
-            "version": "v1.1.2",
+            "version": "v1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/francoispluchino/composer-asset-plugin.git",
-                "reference": "bae7a15712e9339a2439aeca3b7c5ecf65b087d1"
+                "reference": "62d2cdc302de2534f3985a1a2f5d4a783de4a5eb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/francoispluchino/composer-asset-plugin/zipball/bae7a15712e9339a2439aeca3b7c5ecf65b087d1",
-                "reference": "bae7a15712e9339a2439aeca3b7c5ecf65b087d1",
+                "url": "https://api.github.com/repos/francoispluchino/composer-asset-plugin/zipball/62d2cdc302de2534f3985a1a2f5d4a783de4a5eb",
+                "reference": "62d2cdc302de2534f3985a1a2f5d4a783de4a5eb",
                 "shasum": ""
             },
             "require": {
@@ -472,7 +499,7 @@
                 "npm",
                 "package"
             ],
-            "time": "2016-02-25 16:35:08"
+            "time": "2016-04-01 15:27:16"
         },
         {
             "name": "giantbomb/giantbomb",
@@ -663,16 +690,16 @@
         },
         {
             "name": "moinax/tvdb",
-            "version": "v1.0.4",
+            "version": "v1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Moinax/TvDb.git",
-                "reference": "68204c72efe99945cd49fe99ac23c8f9b068f2d6"
+                "reference": "772b24179b199bc1f17935c52613f95d318ad3cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Moinax/TvDb/zipball/68204c72efe99945cd49fe99ac23c8f9b068f2d6",
-                "reference": "68204c72efe99945cd49fe99ac23c8f9b068f2d6",
+                "url": "https://api.github.com/repos/Moinax/TvDb/zipball/772b24179b199bc1f17935c52613f95d318ad3cc",
+                "reference": "772b24179b199bc1f17935c52613f95d318ad3cc",
                 "shasum": ""
             },
             "require": {
@@ -699,7 +726,7 @@
             "keywords": [
                 "api"
             ],
-            "time": "2016-03-08 12:37:26"
+            "time": "2016-04-01 14:51:00"
         },
         {
             "name": "phpmailer/phpmailer",

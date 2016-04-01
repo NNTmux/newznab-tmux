@@ -43,7 +43,7 @@
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.theme.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/jquery.iphone.toggle.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/uploadify.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/animate.min.css' rel='stylesheet'>
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/animate.css/animate.min.css" rel="stylesheet">
 	<!-- jQuery -->
 	<script src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/jquery/jquery.min.js"></script>
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
