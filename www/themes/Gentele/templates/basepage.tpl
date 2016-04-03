@@ -61,10 +61,12 @@
             <div class="profile_pic">
               <img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png" alt="User Image" class="img-circle profile_img">
             </div>
+		  {if $loggedin == "true"}
             <div class="profile_info">
               <span>Welcome,</span>
               <h2>{$userdata.username}</h2>
             </div>
+		  {/if}
           </div>
           <!-- /menu profile quick info -->
 
@@ -76,6 +78,7 @@
             <div class="menu_section">
               <h3>Main</h3>
               <ul class="nav side-menu">
+			  {if $loggedin == "true"}
                 <li><a><i class="fa fa-home"></i><span> Browse</span> <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
 					  <li><a href="{$smarty.const.WWW_TOP}/newposterwall"><i
@@ -99,19 +102,20 @@
 					  </li>
                   </ul>
                 </li>
+	  			{/if}
                 <li><a><i class="fa fa-edit"></i> Articles & Links <span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu" style="display: none">
 					  <li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
 									  class="fa fa-envelope-o"></i><span> Contact</span> <span
 									  class="fa arrow"></span></a></li>
-					  {if $loggedin == "true"}
+				 {if $loggedin == "true"}
 					  <li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a></li>
 					  <li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
 					  <li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a></li>
                   </ul>
 				</li>
 				  <li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock"></i><span> Sign out</span></a></li>
-				  {/if}
+				{/if}
               </ul>
             </div>
           </div>
