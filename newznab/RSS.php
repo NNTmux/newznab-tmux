@@ -117,7 +117,7 @@ Class RSS
 	public function getShowsRss($limit, $userID = 0, $excludedCats = [], $airDate = -1)
 	{
 		return $this->pdo->query(
-				sprintf("
+			sprintf("
 				SELECT r.*, v.id, v.title, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
@@ -130,19 +130,23 @@ Class RSS
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
 				WHERE %s %s %s
 				AND r.nzbstatus = %d
-				AND r.categoryid BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
+				AND r.categoryid BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-						$this->releases->getConcatenatedCategoryIDs(),
-						$this->releases->uSQL($this->pdo->query(sprintf('SELECT videos_id, categoryid FROM userseries WHERE userid = %d', $userID), true), 'videos_id'),
-						(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
-						($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
-						NZB::NZB_ADDED,
-						$this->releases->showPasswords,
-						(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
-				), true, NN_CACHE_EXPIRY_MEDIUM
+
+				$this->releases->getConcatenatedCategoryIDs(),
+				$this->releases->uSQL($this->pdo->query(sprintf('SELECT videos_id, categoryid FROM userseries WHERE userid = %d', $userID), true), 'videos_id'),
+				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
+				NZB::NZB_ADDED,
+				Category::TV_ROOT,
+				Category::TV_OTHER,
+				$this->releases->showPasswords,
+				(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
+			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 	}
+
 
 	/**
 	 * Get movies for RSS.
