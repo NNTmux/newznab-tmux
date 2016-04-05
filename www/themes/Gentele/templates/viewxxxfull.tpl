@@ -10,7 +10,8 @@
 {if $results|@count > 0}
 	<div class="box-body">
 		{foreach $results as $result}
-			<div id="moviefull" style="min-height:340px; background-color: white">
+		<div class="well well small">
+			<div id="moviefull" style="min-height:340px;">
 				{if $result.cover == 1}
 					<img class="pull-right" style="margin-right:50px; max-height:278px;"
 						 alt="{$result.title|escape:"htmlall"} Logo"
@@ -45,6 +46,7 @@
 					{/if}
 				</dl>
 			</div>
+		</div>
 			<form id="nzb_multi_operations_form" action="get">
 				<div class="well well-small">
 					<div class="nzb_multi_operations">
@@ -170,15 +172,11 @@
 												title="{$mpostdate[$m@index]}">{$mpostdate[$m@index]|timeago}</td>
 											<td class="less right">{$msize[$m@index]|fsize_format:"MB"}</td>
 											<td class="icons">
-												<a title="Download NZB"
-												   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
-															class="icon icon_nzb fa fa-cloud-download text-muted"></i></a>
-												<a href="#" class="icon_cart text-muted"><i class="fa fa-shopping-basket"
-																							title="Send to my Download Basket"></i></a>
+												<a title="Download NZB" href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
+															class="icon icon_nzb fa fa-cloud-download text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Download NZB"></i></a>
+												<a href="#" class="icon_cart text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket"><i class="fa fa-shopping-basket"></i></a>
 												{if isset($sabintegrated) && $sabintegrated !=""}
-													<a href="#" class="icon icon_sab text-muted"
-													   title="Send to my Queue"><i
-																class="fa fa-share"></i></a>
+													<a href="#" class="icon icon_sab text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue"><i class="fa fa-share"></i></a>
 												{/if}
 											</td>
 										</tr>
