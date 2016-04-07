@@ -214,18 +214,11 @@
 															{$result.size|fsize_format:"MB"}
 														</td>
 														<td class="icons" style='width:100px;'>
-															<a title="Download Nzb"
-															   href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"><i
-																		class="fa fa-cloud-download text-muted"></i></a>
-															<a class="fa fa-shopping-basket icon_cart text-muted"
-															   href="#"
-															   title="Send to my Download Basket">
-															</a>
+															<a title="Download NZB" href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
+																		class="icon icon_nzb fa fa-cloud-download text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Download NZB"></i></a>
+															<a href="#" class="icon_cart text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket"><i class="fa fa-shopping-basket"></i></a>
 															{if isset($sabintegrated) && $sabintegrated !=""}
-																<a class="fa fa-share icon_sab text-muted"
-																   href="#"
-																   title="Send to my Queue">
-																</a>
+																<a href="#" class="icon icon_sab text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue"><i class="fa fa-share"></i></a
 															{/if}
 															{if isset($isadmin)}
 																<br/>
