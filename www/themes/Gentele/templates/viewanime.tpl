@@ -14,15 +14,14 @@
 	</div>
 </div>
 <h1>
-	{$animeTitle}
-	{if isset($isadmin)}
-		<a class="btn btn-xs btn-warning"
-		   title="Edit AniDB data"
-		   href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeAnidbid}&amp;
-					from={$smarty.server.REQUEST_URI|escape:"url"}">Edit</a>
+	<div class="well well-small">
+		{$animeTitle}
+		{if isset($isadmin)}
+			<a class="btn btn-xs btn-warning" title="Edit AniDB data" href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeAnidbid}&amp; from={$smarty.server.REQUEST_URI|escape:"url"}">Edit</a>
 	{/if}
+	</div>
 </h1>
-<div>
+<div class="well well-small">
 	{if animePicture != ''}
 		<div style="text-align: center;">
 			<img class="shadow img img-polaroid" alt="{$animeTitle} Picture"
