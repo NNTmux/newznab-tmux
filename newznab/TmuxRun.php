@@ -274,6 +274,7 @@ class TmuxRun extends Tmux
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/postprocess.php tv $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/postprocess.php mov $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/tmux/bin/postprocess.php anime true $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/PostProc/check_covers.php true $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_non']}' 2>&1 1> /dev/null"
 				);
 				break;

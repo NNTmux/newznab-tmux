@@ -10,6 +10,18 @@
     {
       "type": "vcs",
       "url": "https://github.com/kbjr/Git.php"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/niel/li3_quality"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/niel/li3_docs"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/unionofrad/manual"
     }
   ],
   "autoload": {
@@ -23,6 +35,9 @@
       "libs/zeebinz/rarinfo/",
       "libs/"
     ]
+  },
+  "config": {
+    "vendor-dir": "app/libraries"
   },
   "description": "A Usenet Indexer",
   "extra": {
@@ -53,12 +68,19 @@
     "exeu/apai-io": "~1.0",
     "smarty/smarty": "~3.1",
     "fxp/composer-asset-plugin": "~1.1",
+    "bower-asset/animate.css":"~3.5.1",
     "bower-asset/bootstrap": "~3.3.6",
     "bower-asset/font-awesome": "~4.5.0",
     "bower-asset/jquery-2.2.x": "~2.2.1",
-    "bower-asset/noty": "~2.3.8"
+    "bower-asset/noty": "~2.3.8",
+    "bower-asset/pnotify": "~3.0",
+    "unionofrad/lithium": "^1.1-dev"
   },
 
-  "require-dev": {},
+  "require-dev": {
+    "unionofrad/li3_docs": "1.1.x-dev",
+    "unionofrad/manual": "1.1.x-dev",
+    "unionofrad/li3_quality": "1.1.x-dev"
+  },
   "type": "project"
 }

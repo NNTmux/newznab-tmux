@@ -1,3 +1,21 @@
+2016-04-07 DariusIII
+	* Upd: Update series view in Gentele theme
+	* Upd: Update notifications in Gentele theme
+	* Upd: Update basepage and headermenu of Gentele theme.
+2016-04-05 DariusIII
+	* Fix: Fix full movie and xxx views on Gentele theme.
+2016-04-03 DariusIII
+	* Fix: Fix myshows RSS feed
+2016-04-01 DariusIII
+	* Upd: Change background color of Gentele theme
+	* Upd: Replace animate.min.css with bower version in assets folder.
+2016-03-31 DariusIII
+	* Add: Add new Gentele theme
+2016-03-30 DariusIII
+	* Chg: Add script to check for missing movie covers to postprocess Non Amazon pane.
+2016-03-29 DariusIII
+	* Upd: Update composer.
+	* Upd: First push of lithium framework
 2016-03-27 DariusIII
 	* Upd: Remove unused AmazonProductAPI class.
 	+ Upd: Remove commented out AmazonProductAPI usage from MiscSorter class.

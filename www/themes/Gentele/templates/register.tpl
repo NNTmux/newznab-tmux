@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+{if isset($error) && $error != ''}
+<div class="alert alert-danger">{$error}</div>
+{/if}
+{if isset($notice) && $notice != ''}
+<div class="alert alert-info">{$notice}</div>
+{/if}
+{if isset($sent) && $sent != ''}
+<div class="alert alert-info">A link to reset your password has been sent to your e-mail account.</div>
+{/if}
+  <head>
+    <meta charset="UTF-8">
+    <title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle} | Registration Page</title>
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <!-- Bootstrap 3.3.6 -->
+    <link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <!-- Font Awesome Icons -->
+    <link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <!-- Theme style -->
+    <link href="{$smarty.const.WWW_THEMES}/{$theme}/css/custom.css" rel="stylesheet" type="text/css" />
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+{if $showregister != "0"}
+  <body class="register-page">
+    <div class="register-box">
+      <div class="register-logo">
+        <a href="{$serverroot}"><b>{$site->title}</b></a>
+      </div>
+      <div class="register-box-body">
+        <p class="login-box-msg">Register a new membership</p>
+        <form method="post" action="register?action=submit{$invite_code_query}">
+          <div class="form-group has-feedback">
+            <input autocomplete="off" id="username" name="username" value="{$username}" type="text" class="form-control" placeholder="Username"/>
+            <span class="glyphicon glyphicon-user form-control-feedback"></span>
+			  <div class="hint">Should be at least three characters and start with a letter.</div>
+          </div>
+          <div class="form-group has-feedback">
+            <input autocomplete="off" id="email" name="email" value="{$email}" type="email" class="form-control" placeholder="Email"/>
+            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+          </div>
+          <div class="form-group has-feedback">
+            <input id="password" autocomplete="off" name="password" value="{$password}" type="password" class="form-control" placeholder="Password"/>
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+			  <div class="hint">Should be at least six characters long.</div>
+          </div>
+          <div class="form-group has-feedback">
+            <input autocomplete="off" id="confirmpassword" name="confirmpassword" value="{$confirmpassword}" type="password" class="form-control" placeholder="Retype password"/>
+            <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+          </div>
+          <div class="row">
+            <div class="col-xs-8">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox"> I agree to the <a href="{$serverroot}terms-and-conditions">terms</a>
+                </label>
+              </div>
+            </div><!-- /.col -->
+            <div class="col-xs-4">
+              <button type="submit" value="Register" class="btn btn-primary btn-block btn-flat">Register</button>
+            </div><!-- /.col -->
+            <hr>
+            <div style="text-align: center;">
+            {$page->smarty->fetch('captcha.tpl')}
+            </div>
+          </div>
+			<a href="{$serverroot}login" class="text-center">I already have a membership</a>
+        </form>
+      </div><!-- /.form-box -->
+    </div><!-- /.register-box -->
+    <!-- jQuery 2.2.x -->
+    <script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"></script>
+    <!-- Bootstrap 3.3.6 JS -->
+    <script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+  </body>
+{/if}
+</html>
