@@ -261,11 +261,31 @@ jQuery(function($){
                 ids += '&id[]='+$(row).val();
         });
         if (ids)
-            if (confirm('Are you sure you want to delete the selected releases?')) {
-                $.post(SERVERROOT + "ajax_release-admin?action=dodelete"+ids, function(resp){
+        {
+            PNotify.prototype.options.styling = "fontawesome";
+            (new PNotify({
+                title: 'Confirmation Needed',
+                text: 'Are you sure you want to delete the selected releases?',
+                icon: 'glyphicon glyphicon-question-sign',
+                hide: false,
+                confirm: {
+                    confirm: true
+                },
+                buttons: {
+                    closer: false,
+                    sticker: false
+                },
+                history: {
+                    history: false
+                }
+            })).get().on('pnotify.confirm', function() {
+                $.post( SERVERROOT + "ajax_release-admin?action=dodelete"+ids, function(resp){
                     location.reload(true);
                 });
-            }
+            }).on('pnotify.cancel', function() {
+                alert('Cancelled');
+            });
+        }
     });
 
     $('input.nntmux_multi_operations_deletereport').click(function(){
@@ -749,12 +769,31 @@ jQuery(function($){
             if ($(row).val()!="on")
                 ids += '&id[]='+$(row).val();
         });
-        if (ids)
-            if (confirm('Are you sure you want to delete the selected releases?')) {
-                $.post(SERVERROOT + "ajax_release-admin?action=dodelete"+ids, function(resp){
+        if (ids) {
+            PNotify.prototype.options.styling = "fontawesome";
+            (new PNotify({
+                title: 'Confirmation Needed',
+                text: 'Are you sure you want to delete the selected releases?',
+                icon: 'glyphicon glyphicon-question-sign',
+                hide: false,
+                confirm: {
+                    confirm: true
+                },
+                buttons: {
+                    closer: false,
+                    sticker: false
+                },
+                history: {
+                    history: false
+                }
+            })).get().on('pnotify.confirm', function() {
+                $.post( SERVERROOT + "ajax_release-admin?action=dodelete"+ids, function(resp){
                     location.reload(true);
                 });
-            }
+            }).on('pnotify.cancel', function() {
+                alert('Cancelled');
+            });
+        }
     });
     $('input.nzb_multi_operations_rebuild').click(function(){
         var ids = "";
@@ -778,11 +817,29 @@ jQuery(function($){
         });
         if (ids)
         {
-            if (confirm('Are you sure you want to delete the selected releases from your cart?')) {
+            PNotify.prototype.options.styling = "fontawesome";
+            (new PNotify({
+                title: 'Confirmation Needed',
+                text: 'Are you sure you want to delete the selected releases from your cart?',
+                icon: 'glyphicon glyphicon-question-sign',
+                hide: false,
+                confirm: {
+                    confirm: true
+                },
+                buttons: {
+                    closer: false,
+                    sticker: false
+                },
+                history: {
+                    history: false
+                }
+            })).get().on('pnotify.confirm', function() {
                 $.post( SERVERROOT + "cart?delete", { 'delete': ids }, function(resp){
                     location.reload(true);
                 });
-            }
+            }).on('pnotify.cancel', function() {
+                alert('Cancelled');
+            });
         }
     });
     $('input.nzb_multi_operations_cartsab').click(function(){

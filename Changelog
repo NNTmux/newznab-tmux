@@ -1,4 +1,5 @@
 2016-04-07 DariusIII
+	* Upd: Use PNotify confirmation notifications on multi_operations_delete functions in Gentele theme.
 	* Chg: Change tooltips for actions on series view in Gentele theme
 	* Upd: Update series view in Gentele theme
 	* Upd: Update notifications in Gentele theme
