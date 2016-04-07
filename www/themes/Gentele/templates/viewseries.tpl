@@ -22,7 +22,8 @@
 		</div>
 	</div>
 	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
-	<div class="tvseriesheading" style="background-color: white">
+	<div class="well well-small">
+		<div class="tvseriesheading">
 		<h1>
 			<div style="text-align: center;">{$seriestitles} ({$show.publisher})</div>
 		</h1>
@@ -36,6 +37,7 @@
 		<p>
 			<span class="descinitial">{$seriessummary|escape:"htmlall"|nl2br|magicurl}</span>
 		</p>
+		</div>
 	</div>
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default"

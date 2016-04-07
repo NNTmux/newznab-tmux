@@ -27,9 +27,9 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your Download Basket!',
-                text: 'Its now in your Download Basket',
-                type: 'warning',
-                icon: 'fa-icon-info-sign',
+                text: 'It is now in your Download Basket',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
                 nonblock: {
                     nonblock: true,
                     nonblock_opacity: .2
@@ -58,9 +58,9 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
-                text: 'Its now in the Queue',
-                type: 'info',
-                icon: 'fa-icon-info-sign',
+                text: 'It is now in the Queue',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
                 nonblock: {
                     nonblock: true,
                     nonblock_opacity: .2
@@ -88,9 +88,9 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
-                text: 'Its now in the Queue',
-                type: 'info',
-                icon: 'fa-icon-info-sign',
+                text: 'It is now in the Queue',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
                 nonblock: {
                     nonblock: true,
                     nonblock_opacity: .2
@@ -126,9 +126,9 @@ jQuery(function($){
                 PNotify.desktop.permission();
                 (new PNotify({
                     title: 'Release added to your download queue!',
-                    text: 'Its now in your download queue',
-                    type: 'warning',
-                    icon: 'fa-icon-info-sign',
+                    text: 'It is now in your download queue',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
                     nonblock: {
                         nonblock: true,
                         nonblock_opacity: .2
@@ -191,9 +191,9 @@ jQuery(function($){
                 PNotify.desktop.permission();
                 (new PNotify({
                     title: 'Release added to your Download Basket!',
-                    text: 'Its now in your Download Basket',
-                    type: 'warning',
-                    icon: 'fa-icon-info-sign',
+                    text: 'It is now in your Download Basket',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
                     nonblock: {
                         nonblock: true,
                         nonblock_opacity: .2
@@ -223,9 +223,9 @@ jQuery(function($){
                     PNotify.desktop.permission();
                     (new PNotify({
                         title: 'Release added to your download queue!',
-                        text: 'Its now in your download queue',
-                        type: 'warning',
-                        icon: 'fa-icon-info-sign',
+                        text: 'It is now in your download queue',
+                        type: 'success',
+                        icon: 'fa fa-info fa-3x',
                         nonblock: {
                             nonblock: true,
                             nonblock_opacity: .2
@@ -255,9 +255,9 @@ jQuery(function($){
                     PNotify.desktop.permission();
                     (new PNotify({
                         title: 'Release added to your download queue!',
-                        text: 'Its now in your queue',
-                        type: 'warning',
-                        icon: 'fa-icon-info-sign',
+                        text: 'It is now in your queue',
+                        type: 'success',
+                        icon: 'fa fa-info fa-3x',
                         nonblock: {
                             nonblock: true,
                             nonblock_opacity: .2
@@ -393,9 +393,9 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download basket!',
-                text: 'Its now in your Download Basket',
-                type: 'warning',
-                icon: 'fa-icon-info-sign',
+                text: 'It is now in your Download Basket',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
                 nonblock: {
                     nonblock: true,
                     nonblock_opacity: .2
@@ -430,9 +430,9 @@ jQuery(function($){
                 PNotify.desktop.permission();
                 (new PNotify({
                     title: 'ADDED TO NZBVORTEX!',
-                    text: 'Its now in your nzbvortex queue',
-                    type: 'warning',
-                    icon: 'fa-icon-info-sign',
+                    text: 'It is now in your nzbvortex queue',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
                     nonblock: {
                         nonblock: true,
                         nonblock_opacity: .2
@@ -560,9 +560,9 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
-                text: 'Its now in your download queue',
-                type: 'warning',
-                icon: 'fa-icon-info-sign',
+                text: 'It is now in your download queue',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
                 nonblock: {
                     nonblock: true,
                     nonblock_opacity: .2
@@ -590,9 +590,9 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
-                text: 'Its now in your download queue',
-                type: 'warning',
-                icon: 'fa-icon-info-sign',
+                text: 'It is now in your download queue',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
                 nonblock: {
                     nonblock: true,
                     nonblock_opacity: .2
@@ -685,9 +685,9 @@ jQuery(function($){
                 PNotify.desktop.permission();
                 (new PNotify({
                     title: 'Release added to your Download Basket!',
-                    text: 'Its now in your Download Basket',
-                    type: 'warning',
-                    icon: 'fa-icon-info-sign',
+                    text: 'It is now in your Download Basket',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
                     nonblock: {
                         nonblock: true,
                         nonblock_opacity: .2
@@ -720,9 +720,9 @@ jQuery(function($){
                     PNotify.desktop.permission();
                     (new PNotify({
                         title: 'Release added to your download queue!',
-                        text: 'Its now in your download queue',
-                        type: 'warning',
-                        icon: 'fa-icon-info-sign',
+                        text: 'It is now in your download queue',
+                        type: 'success',
+                        icon: 'fa fa-info fa-3x',
                         nonblock: {
                             nonblock: true,
                             nonblock_opacity: .2
@@ -751,9 +751,9 @@ jQuery(function($){
                     PNotify.desktop.permission();
                     (new PNotify({
                         title: 'Release added to your download queue!',
-                        text: 'Its now in your download queue',
-                        type: 'warning',
-                        icon: 'fa-icon-info-sign',
+                        text: 'It is now in your download queue',
+                        type: 'success',
+                        icon: 'fa fa-info fa-3x',
                         nonblock: {
                             nonblock: true,
                             nonblock_opacity: .2
@@ -837,9 +837,9 @@ jQuery(function($){
                 PNotify.desktop.permission();
                 (new PNotify({
                     title: 'Releases sent to queue!',
-                    text: 'Its now in your download queue',
-                    type: 'warning',
-                    icon: 'fa-icon-info-sign',
+                    text: 'It is now in your download queue',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
                     nonblock: {
                         nonblock: true,
                         nonblock_opacity: .2
