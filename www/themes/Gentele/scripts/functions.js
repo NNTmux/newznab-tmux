@@ -27,20 +27,17 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your Download Basket!',
-                text: 'It is now in your Download Basket',
                 type: 'success',
                 icon: 'fa fa-info fa-3x',
-                nonblock: {
-                    nonblock: true,
-                    nonblock_opacity: .2
-                },
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
                 desktop: {
-                    desktop: true,
-                    text: 'Release added to your Download Basket.'
-                }}).get().click(function(e) {
-                if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                alert('Release added to your Download Basket');
-            }));
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
@@ -58,20 +55,17 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
-                text: 'It is now in the Queue',
                 type: 'success',
                 icon: 'fa fa-info fa-3x',
-                nonblock: {
-                    nonblock: true,
-                    nonblock_opacity: .2
-                },
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
                 desktop: {
-                    desktop: true,
-                    text: 'Release added to your download queue.'
-                }}).get().click(function(e) {
-                if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                alert('Release added to your download queue');
-            }));
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
@@ -88,20 +82,17 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
-                text: 'It is now in the Queue',
                 type: 'success',
                 icon: 'fa fa-info fa-3x',
-                nonblock: {
-                    nonblock: true,
-                    nonblock_opacity: .2
-                },
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
                 desktop: {
-                    desktop: true,
-                    text: 'Release added to your download queue.'
-                }}).get().click(function(e) {
-                if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                alert('Release added to your download queue');
-            }));
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
@@ -126,20 +117,17 @@ jQuery(function($){
                 PNotify.desktop.permission();
                 (new PNotify({
                     title: 'Release added to your download queue!',
-                    text: 'It is now in your download queue',
                     type: 'success',
                     icon: 'fa fa-info fa-3x',
-                    nonblock: {
-                        nonblock: true,
-                        nonblock_opacity: .2
-                    },
+                        animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight'
+                        },
                     desktop: {
-                        desktop: true,
-                        text: 'Release added to your download queue.'
-                    }}).get().click(function(e) {
-                    if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                    alert('Release added to your download queue');
-                }));
+                        desktop: true
+                    }})
+                );
             }).fail(function(response)
             {
                 alert(response.responseText);
@@ -191,20 +179,17 @@ jQuery(function($){
                 PNotify.desktop.permission();
                 (new PNotify({
                     title: 'Release added to your Download Basket!',
-                    text: 'It is now in your Download Basket',
                     type: 'success',
                     icon: 'fa fa-info fa-3x',
-                    nonblock: {
-                        nonblock: true,
-                        nonblock_opacity: .2
-                    },
+                        animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight'
+                        },
                     desktop: {
-                        desktop: true,
-                        text: 'Release added to your download basket.'
-                    }}).get().click(function(e) {
-                    if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                    alert('Release added to your Download Basket');
-                }));
+                        desktop: true
+                    }})
+                );
             }
             $(this).attr('checked', false);
         });
@@ -223,20 +208,17 @@ jQuery(function($){
                     PNotify.desktop.permission();
                     (new PNotify({
                         title: 'Release added to your download queue!',
-                        text: 'It is now in your download queue',
                         type: 'success',
                         icon: 'fa fa-info fa-3x',
-                        nonblock: {
-                            nonblock: true,
-                            nonblock_opacity: .2
-                        },
+                            animate: {
+                                animate: true,
+                                in_class: 'bounceInLeft',
+                                out_class: 'bounceOutRight'
+                            },
                         desktop: {
-                            desktop: true,
-                            text: 'Release added to your download queue.'
-                        }}).get().click(function(e) {
-                        if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                        alert('Release added to your download queue');
-                    }));
+                            desktop: true
+                        }})
+                    );
                 });
             }
             $(this).attr('checked', false);
@@ -255,20 +237,17 @@ jQuery(function($){
                     PNotify.desktop.permission();
                     (new PNotify({
                         title: 'Release added to your download queue!',
-                        text: 'It is now in your queue',
                         type: 'success',
                         icon: 'fa fa-info fa-3x',
-                        nonblock: {
-                            nonblock: true,
-                            nonblock_opacity: .2
+                        animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight'
                         },
                         desktop: {
-                            desktop: true,
-                            text: 'Release added to your download queue.'
-                        }}).get().click(function(e) {
-                        if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                        alert('Release added to your download queue');
-                    }));
+                            desktop: true
+                        }})
+                    );
                 });
             }
             $(this).attr('checked', false);
@@ -393,20 +372,17 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download basket!',
-                text: 'It is now in your Download Basket',
                 type: 'success',
                 icon: 'fa fa-info fa-3x',
-                nonblock: {
-                    nonblock: true,
-                    nonblock_opacity: .2
+                animate: {
+                    animate: true,
+                    in_class: 'bounceInLeft',
+                    out_class: 'bounceOutRight'
                 },
                 desktop: {
-                    desktop: true,
-                    text: 'Release added to your download basket.'
-                }}).get().click(function(e) {
-                if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                alert('Release added to your download basket');
-            }));
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
@@ -430,20 +406,17 @@ jQuery(function($){
                 PNotify.desktop.permission();
                 (new PNotify({
                     title: 'ADDED TO NZBVORTEX!',
-                    text: 'It is now in your nzbvortex queue',
                     type: 'success',
                     icon: 'fa fa-info fa-3x',
-                    nonblock: {
-                        nonblock: true,
-                        nonblock_opacity: .2
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
                     },
                     desktop: {
-                        desktop: true,
-                        text: 'Release added nzbvortex.'
-                    }}).get().click(function(e) {
-                    if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                    alert('Release added to NZBVortex');
-                }));
+                        desktop: true
+                    }})
+                );
             }).fail(function(response)
             {
                 alert(response.responseText);
@@ -560,20 +533,17 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
-                text: 'It is now in your download queue',
                 type: 'success',
                 icon: 'fa fa-info fa-3x',
-                nonblock: {
-                    nonblock: true,
-                    nonblock_opacity: .2
-                },
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
                 desktop: {
-                    desktop: true,
-                    text: 'Release added to your download queue.'
-                }}).get().click(function(e) {
-                if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                alert('Release added to your download queue');
-            }));
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
@@ -590,20 +560,17 @@ jQuery(function($){
             PNotify.desktop.permission();
             (new PNotify({
                 title: 'Release added to your download queue!',
-                text: 'It is now in your download queue',
                 type: 'success',
                 icon: 'fa fa-info fa-3x',
-                nonblock: {
-                    nonblock: true,
-                    nonblock_opacity: .2
-                },
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
                 desktop: {
-                    desktop: true,
-                    text: 'Release added to your download queue.'
-                }}).get().click(function(e) {
-                if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                alert('Release added to your download queue');
-            }));
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
@@ -685,20 +652,17 @@ jQuery(function($){
                 PNotify.desktop.permission();
                 (new PNotify({
                     title: 'Release added to your Download Basket!',
-                    text: 'It is now in your Download Basket',
                     type: 'success',
                     icon: 'fa fa-info fa-3x',
-                    nonblock: {
-                        nonblock: true,
-                        nonblock_opacity: .2
-                    },
+                        animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight'
+                        },
                     desktop: {
-                        desktop: true,
-                        text: 'Release added to your download basket.'
-                    }}).get().click(function(e) {
-                    if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                    alert('Release added to your Download Basket');
-                }));
+                        desktop: true
+                    }})
+                );
             }
             $(this).attr('checked', false);
         });
@@ -720,20 +684,17 @@ jQuery(function($){
                     PNotify.desktop.permission();
                     (new PNotify({
                         title: 'Release added to your download queue!',
-                        text: 'It is now in your download queue',
                         type: 'success',
                         icon: 'fa fa-info fa-3x',
-                        nonblock: {
-                            nonblock: true,
-                            nonblock_opacity: .2
-                        },
+                            animate: {
+                                animate: true,
+                                in_class: 'bounceInLeft',
+                                out_class: 'bounceOutRight'
+                            },
                         desktop: {
-                            desktop: true,
-                            text: 'Release added to your download queue.'
-                        }}).get().click(function(e) {
-                        if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                        alert('Release added to your download queue');
-                    }));
+                            desktop: true
+                        }})
+                    );
                 });
             }
             $(this).attr('checked', false);
@@ -751,20 +712,17 @@ jQuery(function($){
                     PNotify.desktop.permission();
                     (new PNotify({
                         title: 'Release added to your download queue!',
-                        text: 'It is now in your download queue',
                         type: 'success',
                         icon: 'fa fa-info fa-3x',
-                        nonblock: {
-                            nonblock: true,
-                            nonblock_opacity: .2
-                        },
+                            animate: {
+                                animate: true,
+                                in_class: 'bounceInLeft',
+                                out_class: 'bounceOutRight'
+                            },
                         desktop: {
-                            desktop: true,
-                            text: 'Release added to your download queue.'
-                        }}).get().click(function(e) {
-                        if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                        alert('Release added to your download queue');
-                    }));
+                            desktop: true
+                        }})
+                    );
                 });
             }
             $(this).attr('checked', false);
@@ -837,20 +795,17 @@ jQuery(function($){
                 PNotify.desktop.permission();
                 (new PNotify({
                     title: 'Releases sent to queue!',
-                    text: 'It is now in your download queue',
                     type: 'success',
                     icon: 'fa fa-info fa-3x',
-                    nonblock: {
-                        nonblock: true,
-                        nonblock_opacity: .2
-                    },
+                        animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight'
+                        },
                     desktop: {
-                        desktop: true,
-                        text: 'Release added to your download queue.'
-                    }}).get().click(function(e) {
-                    if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) return;
-                    alert('Release added to your download queue');
-                }));
+                        desktop: true
+                    }})
+                );
             });
         });
     });
