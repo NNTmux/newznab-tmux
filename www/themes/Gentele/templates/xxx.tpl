@@ -21,24 +21,25 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<button type="button"
 											class="nzb_multi_operations_download btn btn-sm btn-success"
-											data-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
+											data-toggle="tooltip" data-placement="top" title
+											data-original-title="Download NZBs">
 										<i class="fa fa-cloud-download"></i></button>
 									<button type="button"
 											class="nzb_multi_operations_cart btn btn-sm btn-info"
-											data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket">
+											data-toggle="tooltip" data-placement="top" title
+											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
 												class="nzb_multi_operations_sab btn btn-sm btn-primary"
-												data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
+												data-toggle="tooltip" data-placement="top" title
+												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
-
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"
@@ -100,7 +101,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
 													{else}
 														<a
@@ -108,7 +109,7 @@
 																href="{$site->dereferrer_link}http://www.adultdvdempire.com/dvd/search?q={$result.title}"
 																name="viewade{$result.title}"
 																title="Search AdultdvdEmpire page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
 													{/if}
 													{if $result.classused == "hm"}
@@ -117,7 +118,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewhm{$result.title}"
 																title="View Hot Movies page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
 													{else}
 														<a
@@ -125,7 +126,7 @@
 																href="{$site->dereferrer_link}http://www.hotmovies.com/search.php?words={$result.title}&complete=on&search_in=video_title"
 																name="viewhm{$result.title}"
 																title="Search Hot Movies page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
 													{/if}
 													{if $result.classused == "pop"}
@@ -134,7 +135,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewpop{$result.id}"
 																title="View Popporn page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"></a>
 													{else}
 														<a
@@ -142,7 +143,7 @@
 																href="{$site->dereferrer_link}http://www.popporn.com/results/index.cfm?v=4&g=0&searchtext={$result.title}"
 																name="viewpop{$result.id}"
 																title="Search Popporn page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"></a>
 													{/if}
 													<a
@@ -150,18 +151,23 @@
 															href="{$site->dereferrer_link}http://www.iafd.com/results.asp?searchtype=title&searchstring={$result.title}"
 															name="viewiafd{$result.title}"
 															title="Search Internet Adult Film Database"
-															><img
+													><img
 																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-primary"
-														rel="nfo">NFO</a>{/if}
+														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"
+														htmlall"}"
+															   title="View NFO" class="label label-primary"
+															   rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
-														<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-															<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
+														<span class="btn btn-default btn-xs"
+															  title="This release has failed to download for some users">
+															<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
+															Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
+																	class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}
+															Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
 													{/if}
 												</div>
 												<div class="col-md-9 small-gutter-left">
@@ -169,47 +175,62 @@
 																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|escape:"htmlall"}</a></span>
 
 													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
-													<div id="guid{$mguid[$m@index]}">
-														<label>
-															<input type="checkbox"
-																   class="nzb_check"
-																   value="{$mguid[$m@index]}"
-																   id="chksingle"/>
-														</label>
-														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
-														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-														<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
+													<table class="data table table-striped responsive-utilities jambo-table">
+														<tr>
+															<td id="guid{$mguid[$m@index]}">
+																<label>
+																	<input type="checkbox"
+																		   class="flat"
+																		   value="{$mguid[$m@index]}"
+																		   id="chksingle"/>
+																</label>
+																<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
+																<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
 																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
-														<br/><br/><br/>
+																<br/><br/><br/>
 
-														<div class="release-name text-muted"><a
-																	href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
-														</div>
-														<div>
-															<a role="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title data-original-title="Download NZB"
-															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
-																		class="fa fa-cloud-download"></i><span
-																		class="badge"> {$mgrabs[$m@index]}
-																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
-																		class="fa fa-comment-o"></i><span
-																		class="badge"> {$mcomments[$m@index]}
-																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Send to my download basket"><i
+																<div class="release-name text-muted"><a
+																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
+																</div>
+																<div>
+																	<a role="button" class="btn btn-default btn-xs"
+																	   data-toggle="tooltip" data-placement="top" title
+																	   data-original-title="Download NZB"
+																	   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
+																				class="fa fa-cloud-download"></i><span
+																				class="badge"> {$mgrabs[$m@index]}
+																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
+																	<a role="button" class="btn btn-default btn-xs"
+																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
+																				class="fa fa-comment-o"></i><span
+																				class="badge"> {$mcomments[$m@index]}
+																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
+																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+																			  data-toggle="tooltip" data-placement="top"
+																			  title
+																			  data-original-title="Send to my download basket"><i
 																					class="fa fa-shopping-basket"></i></span>
-															{if isset($sabintegrated) && $sabintegrated !=""}
-																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																	  data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Queue"><i
-																			class="fa fa-share"></i></span>
-															{/if}
-															{if !empty($mfailed[$m@index])}
-																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-																		<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
-															{/if}
-														</div>
-													</div>
+																	{if isset($sabintegrated) && $sabintegrated !=""}
+																		<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																			  data-toggle="tooltip" data-placement="top"
+																			  title
+																			  data-original-title="Send to my Queue"><i
+																					class="fa fa-share"></i></span>
+																	{/if}
+																	{if !empty($mfailed[$m@index])}
+																		<span class="btn btn-default btn-xs"
+																			  title="This release has failed to download for some users">
+																		<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
+																			Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
+																					class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}
+																			Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
+																	{/if}
+																</div>
+															</td>
+														</tr>
+													</table>
 													{/if}
 													{/foreach}
 												</div>
@@ -255,7 +276,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
 													{else}
 														<a
@@ -263,7 +284,7 @@
 																href="{$site->dereferrer_link}http://www.adultdvdempire.com/dvd/search?q={$result.title}"
 																name="viewade{$result.title}"
 																title="Search AdultdvdEmpire page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
 													{/if}
 													{if $result.classused == "hm"}
@@ -272,7 +293,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewhm{$result.title}"
 																title="View Hot Movies page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
 													{else}
 														<a
@@ -280,7 +301,7 @@
 																href="{$site->dereferrer_link}http://www.hotmovies.com/search.php?words={$result.title}&complete=on&search_in=video_title"
 																name="viewhm{$result.title}"
 																title="Search Hot Movies page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
 													{/if}
 													{if $result.classused == "pop"}
@@ -289,7 +310,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewpop{$result.id}"
 																title="View Popporn page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"></a>
 													{else}
 														<a
@@ -297,7 +318,7 @@
 																href="{$site->dereferrer_link}http://www.popporn.com/results/index.cfm?v=4&g=0&searchtext={$result.title}"
 																name="viewpop{$result.id}"
 																title="Search Popporn page"
-																><img
+														><img
 																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"></a>
 													{/if}
 													<a
@@ -305,18 +326,23 @@
 															href="{$site->dereferrer_link}http://www.iafd.com/results.asp?searchtype=title&searchstring={$result.title}"
 															name="viewiafd{$result.title}"
 															title="Search Internet Adult Film Database"
-															><img
+													><img
 																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-primary"
-														rel="nfo">NFO</a>{/if}
+														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"
+														htmlall"}"
+															   title="View NFO" class="label label-primary"
+															   rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
-														<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-															<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
+														<span class="btn btn-default btn-xs"
+															  title="This release has failed to download for some users">
+															<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
+															Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
+																	class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}
+															Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
 													{/if}
 												</div>
 												<div class="col-md-9 small-gutter-left">
@@ -324,47 +350,62 @@
 																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|escape:"htmlall"}</a></span>
 
 													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
-													<div id="guid{$mguid[$m@index]}">
-														<label>
-															<input type="checkbox"
-																   class="nzb_check"
-																   value="{$mguid[$m@index]}"
-																   id="chksingle"/>
-														</label>
-														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
-														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-														<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
+													<table class="data table table-striped responsive-utilities jambo-table">
+														<tr>
+															<td id="guid{$mguid[$m@index]}">
+																<label>
+																	<input type="checkbox"
+																		   class="flat"
+																		   value="{$mguid[$m@index]}"
+																		   id="chksingle"/>
+																</label>
+																<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+																<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
+																<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
 																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
-														<br/><br/><br/>
+																<br/><br/><br/>
 
-														<div class="release-name text-muted"><a
-																	href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
-														</div>
-														<div>
-															<a role="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title data-original-title="Download NZB"
-															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
-																		class="fa fa-cloud-download"></i><span
-																		class="badge"> {$mgrabs[$m@index]}
-																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-															<a role="button" class="btn btn-default btn-xs"
-															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
-																		class="fa fa-comment-o"></i><span
-																		class="badge"> {$mcomments[$m@index]}
-																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Send to my download basket"><i
+																<div class="release-name text-muted"><a
+																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
+																</div>
+																<div>
+																	<a role="button" class="btn btn-default btn-xs"
+																	   data-toggle="tooltip" data-placement="top" title
+																	   data-original-title="Download NZB"
+																	   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
+																				class="fa fa-cloud-download"></i><span
+																				class="badge"> {$mgrabs[$m@index]}
+																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
+																	<a role="button" class="btn btn-default btn-xs"
+																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
+																				class="fa fa-comment-o"></i><span
+																				class="badge"> {$mcomments[$m@index]}
+																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
+																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+																			  data-toggle="tooltip" data-placement="top"
+																			  title
+																			  data-original-title="Send to my download basket"><i
 																					class="fa fa-shopping-basket"></i></span>
-															{if isset($sabintegrated) && $sabintegrated !=""}
-																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																	  data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Queue"><i
-																			class="fa fa-share"></i></span>
-															{/if}
-															{if !empty($mfailed[$m@index])}
-																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-																		<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
-															{/if}
-														</div>
-													</div>
+																	{if isset($sabintegrated) && $sabintegrated !=""}
+																		<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																			  data-toggle="tooltip" data-placement="top"
+																			  title
+																			  data-original-title="Send to my Queue"><i
+																					class="fa fa-share"></i></span>
+																	{/if}
+																	{if !empty($mfailed[$m@index])}
+																		<span class="btn btn-default btn-xs"
+																			  title="This release has failed to download for some users">
+																		<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
+																			Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
+																					class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}
+																			Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
+																	{/if}
+																</div>
+															</td>
+														</tr>
+													</table>
 													{/if}
 													{/foreach}
 												</div>
@@ -383,24 +424,25 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<button type="button"
 											class="nzb_multi_operations_download btn btn-sm btn-success"
-											data-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
+											data-toggle="tooltip" data-placement="top" title
+											data-original-title="Download NZBs">
 										<i class="fa fa-cloud-download"></i></button>
 									<button type="button"
 											class="nzb_multi_operations_cart btn btn-sm btn-info"
-											data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket">
+											data-toggle="tooltip" data-placement="top" title
+											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
 												class="nzb_multi_operations_sab btn btn-sm btn-primary"
-												data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
+												data-toggle="tooltip" data-placement="top" title
+												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
-
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"

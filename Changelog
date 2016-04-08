@@ -1,3 +1,5 @@
+2016-04-09 DariusIII
+	* Chg: Replace js checkboxes with iCheck.
 2016-04-08 DariusIII
 	* Fix: Fix NFO display on themes, fix stylings on Gentele theme
 	* Upd: Change label colour, fix search page styling.

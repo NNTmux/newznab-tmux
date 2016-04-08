@@ -30,19 +30,22 @@
 			<div class="col-lg-12 portlets">
 				<div class="panel panel-default">
 					<div class="panel-body pagination2">
-						<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table" id="browsetable">
-							<tr>
-								<th width="50"><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/><label
-											for="chkSelectAll" style="display:none;">Select All</label></th>
-								<th>Name</th>
-								<th>Added</th>
-								<th>Action</th>
+						<table class="data table table-striped responsive-utilities jambo-table bulk-action">
+							<thead>
+							<tr class="headings">
+								<th width="50">
+									<input id="chkSelectAll" type="checkbox" class="flat" title="Select All">
+								</th>
+								<th class="column-title" style="display: table-cell;">Name</th>
+								<th class="column-title" style="display: table-cell;">Added</th>
+								<th class="column-title" style="display: table-cell;">Action</th>
 							</tr>
+							</thead>
+							<tbody>
 							{foreach $results as $result}
 								<tr class="{cycle values=",alt"}">
-									<td class="check">
-										<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="nzb_check"
-											   value="{$result.id}"/>
+									<td class="a-center ">
+										<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="flat" value="{$result.id}"/>
 									</td>
 									<td>
 										<a title="View details"
@@ -54,6 +57,7 @@
 										   class="btn btn-danger btn-sm" style="padding-bottom:2px;">Delete</a></td>
 								</tr>
 							{/foreach}
+							</tbody>
 						</table>
 	</form>
 {else}

@@ -70,30 +70,30 @@
 							</div>
 						</div>
 						<hr>
-						<table class="data table table-striped responsive-utilities jambo-table" cellspacing="0"
-							   cellpadding="0" style="table-layout: auto;">
+						<table class="data table table-striped responsive-utilities jambo-table bulk-action">
 							<thead>
 							<tr class="headings">
-								<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
+								<th>
+									<input type="checkbox" id="check-all" class="flat">
+								</th>
 								<th>Name
-									<a title="Sort Descending" href="{$orderbyname_desc}">
-										<i class="fa-icon-caret-down text-muted"> </i>
-									</a>
-									<a title="Sort Ascending" href="{$orderbyname_asc}">
-										<i class="fa-icon-caret-up text-muted"> </i>
-									</a>
+									<a title="Sort Descending" href="{$orderbyname_desc}"><i class="fa-icon-caret-down text-muted"> </i></a>
+									<a title="Sort Ascending" href="{$orderbyname_asc}"><i class="fa-icon-caret-up text-muted"> </i></a>
 								</th>
 								<th class="column-title" style="display: table-cell;">Category</th>
 								<th class="column-title" style="display: table-cell;">Posted</th>
 								<th class="column-title" style="display: table-cell;">Size</th>
 								<th class="column-title no-link last" style="display: table-cell;">Action</th>
+								<th class="bulk-actions" colspan="7">
+									<a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
+								</th>
 							</tr>
 							</thead>
 							<tbody>
 							{foreach $results as $result}
 								<tr id="guid{$result.guid}">
-									<td class="check"><input id="chk{$result.guid|substr:0:7}"
-															 type="checkbox" class="nzb_check"
+									<td><input id="chk{$result.guid|substr:0:7}"
+															 type="checkbox" name="table_records" class="flat"
 															 value="{$result.guid}"/></td>
 									<td>
 										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"

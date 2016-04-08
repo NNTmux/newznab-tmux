@@ -22,7 +22,6 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<button type="button"
@@ -130,7 +129,7 @@
 														<td id="guid{$mguid[$m@index]}">
 															<label>
 															<input type="checkbox"
-																   class="nzb_check"
+																   class="flat"
 																   value="{$mguid[$m@index]}" id="chksingle"/>
 															</label>
 															<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
@@ -205,7 +204,6 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<button type="button"

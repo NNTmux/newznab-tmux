@@ -22,7 +22,6 @@
 										<div class="nzb_multi_operations">
 											View: <strong>Covers</strong> | <a
 													href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-											Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
 											With Selected:
 											<div class="btn-group">
 												<button type="button"
@@ -105,12 +104,12 @@
 														<h4><a title="View details"
 															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$result.author|escape:"htmlall"}
 																- {$result.title|escape:"htmlall"}</a></h4>
-														<table>
+														<table class="data table table-striped responsive-utilities jambo-table">
 															<tr>
 																<td id="guid{$mguid[$m@index]}">
 																	<label>
 																		<input type="checkbox"
-																			   class="nzb_check"
+																			   class="flat"
 																			   value="{$mguid[$m@index]}"
 																			   id="chksingle"/>
 																	</label>
@@ -177,7 +176,6 @@
 											<div class="nzb_multi_operations">
 												View: <strong>Covers</strong> | <a
 														href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-												Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
 												With Selected:
 												<div class="btn-group">
 													<button type="button"
