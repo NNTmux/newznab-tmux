@@ -114,7 +114,7 @@
 													href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}" class="label label-primary" rel="series">View TV</a></span>{/if}
 										{if isset($result.firstaired) && $result.firstaired != ""}<span class="label label-primary" title="{$result.guid}">
 											Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
-										{if $result.anidbid > 0}<span class="label label-primary"><a
+										{if $result.anidbid > 0}<span><a class="label label-primary"
 													href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}">View Anime</a></span>{/if}
 										{if !empty($result.failed)}<span class="label label-primary">
 											<i class ="fa fa-thumbs-o-up"></i> {$result.grabs} Grab{if $result.grabs != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$result.failed} Failed Download{if $result.failed != 1}s{/if}</span>{/if}									</td>
