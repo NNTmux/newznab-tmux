@@ -109,8 +109,8 @@
 																					 title="View Desura page">
 														Desura</a>{/if}
 												{if $result.nfoid > 0}<a
-													href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-													title="View NFO" class="label label-primary" rel="nfo">
+													href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+													title="View NFO" class="modal_nfo label label-primary" rel="nfo">
 														NFO</a>{/if}
 												<a class="label label-primary"
 												   href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name}"
@@ -125,7 +125,7 @@
 													(<a class="title" title="{$result.year}"
 														href="{$smarty.const.WWW_TOP}/games?year={$result.year}">{$result.year}</a>)
 												</h4>
-												<table class="data table table-responsive">
+												<table class="data table table-striped responsive-utilities jambo-table">
 													<tr>
 														<td id="guid{$mguid[$m@index]}">
 															<label>

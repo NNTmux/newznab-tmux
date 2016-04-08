@@ -95,7 +95,7 @@
 						<div class="panel panel-default">
 							<div class="panel-body pagination2">
 								<table style="width:100%;"
-									   class="data table table-condensed table-striped table-responsive table-hover">
+									   class="data table table-striped responsive-utilities jambo-table">
 									<tr>
 										<th>
 											<input id="chkSelectAll" type="checkbox" class="nntmux_check_all"/>
@@ -161,9 +161,9 @@
 												<br/>
 						<span class="label label-primary">{$mgrabs[$m@index]}
 							grab{if $mgrabs[$m@index] != 1}s{/if}</span>
-												{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span class="label label-primary"><a
+												{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span ><a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-															class="text-muted">NFO</a>
+															class="modal_nfo label label-primary text-muted">NFO</a>
 													</span>{/if}
 												{if $mpass[$m@index] == 2}
 													<i class="fa fa-icon-lock"></i>

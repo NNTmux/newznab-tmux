@@ -15,7 +15,7 @@
 					<div class="col-lg-12 portlets">
 						<div class="panel panel-default">
 							<div class="panel-body pagination2">
-								<table class="data table table-condensed table-striped Sortable table-responsive table-hover"
+								<table class="data table table-striped responsive-utilities jambo-table Sortable"
 									   style="table-layout: auto;" data-sort-order="desc">
 									<thead>
 									<tr>

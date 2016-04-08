@@ -30,7 +30,7 @@
 			<div class="col-lg-12 portlets">
 				<div class="panel panel-default">
 					<div class="panel-body pagination2">
-						<table style="width:100%;" class="data table table-condensed table-striped table-responsive table-hover" id="browsetable">
+						<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table" id="browsetable">
 							<tr>
 								<th width="50"><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/><label
 											for="chkSelectAll" style="display:none;">Select All</label></th>

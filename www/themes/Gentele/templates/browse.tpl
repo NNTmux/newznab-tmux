@@ -70,10 +70,10 @@
 							</div>
 						</div>
 						<hr>
-						<table class="data table table-condensed table-striped table-responsive table-hover" cellspacing="0"
+						<table class="data table table-striped responsive-utilities jambo-table" cellspacing="0"
 							   cellpadding="0" style="table-layout: auto;">
 							<thead>
-							<tr>
+							<tr class="headings">
 								<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
 								<th>Name
 									<a title="Sort Descending" href="{$orderbyname_desc}">
@@ -83,10 +83,10 @@
 										<i class="fa-icon-caret-up text-muted"> </i>
 									</a>
 								</th>
-								<th>Category</th>
-								<th>Posted</th>
-								<th>Size</th>
-								<th>Action</th>
+								<th class="column-title" style="display: table-cell;">Category</th>
+								<th class="column-title" style="display: table-cell;">Posted</th>
+								<th class="column-title" style="display: table-cell;">Size</th>
+								<th class="column-title no-link last" style="display: table-cell;">Action</th>
 							</tr>
 							</thead>
 							<tbody>

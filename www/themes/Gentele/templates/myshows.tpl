@@ -23,7 +23,7 @@
 			<div class="col-lg-12 portlets">
 				<div class="panel panel-default">
 					<div class="panel-body pagination2">
-						<table class="data table table-striped table-condensed table-responsive table-hover">
+						<table class="data table table-striped responsive-utilities jambo-table">
 							<tr>
 								<th>Name</th>
 								<th width="80">Category</th>

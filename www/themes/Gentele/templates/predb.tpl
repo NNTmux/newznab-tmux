@@ -23,7 +23,7 @@
 					<div class="panel-body pagination2">
 						<div class="row">
 							<div class="col-md-8">
-								<table class="data table table-condensed table-striped table-responsive table-hover">
+								<table class="data table table-striped responsive-utilities jambo-table">
 									<tr>
 										<th> Date</th>
 										<th> Title</th>

@@ -26,7 +26,7 @@
 												<tbody>
 												<tr valign="top">
 													<td>
-														<table class="table table-condensed table-striped table-responsive table-hover">
+														<table class="data table table-striped responsive-utilities jambo-table">
 															<tbody>
 															<tr class="bg-aqua-active">
 																<td colspan="2" style="padding-left: 8px;"><strong>General</strong>
@@ -60,7 +60,7 @@
 															</tr>
 															</tbody>
 														</table>
-														<table class="data table table-condensed table-striped table-responsive table-hover">
+														<table class="data data table table-striped responsive-utilities jambo-table">
 															<tbody>
 															<tr class="bg-aqua-active">
 																<td colspan="2" style="padding-left: 8px;"><strong>UI Preferences</strong></td>
@@ -82,7 +82,7 @@
 															</tr>
 															</tbody>
 														</table>
-														<table class="data table table-condensed table-striped table-responsive table-hover">
+														<table class="data data table table-striped responsive-utilities jambo-table">
 															<tbody>
 															<tr class="bg-aqua-active">
 																<td colspan="2" style="padding-left: 8px;"><strong>API &
@@ -129,7 +129,7 @@
 															</tbody>
 														</table>
 														{if ($user.id == $userdata.id || $isadmin) && $site->registerstatus == 1}
-															<table class="data table table-condensed table-striped table-responsive table-hover">
+															<table class="data data table table-striped responsive-utilities jambo-table">
 																<tbody>
 																<tr class="bg-aqua-active">
 																	<td colspan="2" style="padding-left: 8px;"><strong>Invites</strong>
@@ -179,7 +179,7 @@
 															</table>
 														{/if}
 														{if isset($isadmin) && $downloadlist|@count > 0}
-														<table class="data table table-condensed table-striped table-responsive table-hover">
+														<table class="data data table table-striped responsive-utilities jambo-table">
 															<tbody>
 															<tr class="bg-aqua-active">
 																<td colspan="2" style="padding-left: 8px;"><strong>Downloads for user</strong>

@@ -19,7 +19,7 @@
 <br/>
 {$site->adbrowse}
 {if isset($data) && $data|@count > 0}
-	<table class="data highlight icons table table-condensed table-striped table-responsive table-hover" id="coverstable">
+	<table class="data table table-striped responsive-utilities jambo-table highlight icons " id="coverstable">
 		{foreach $data as $result}
 			<tr class="{cycle values=",alt"}">
 				<td class="mid">

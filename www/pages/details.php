@@ -33,7 +33,7 @@ if (isset($_GET["id"]))
 	if ($page->isPostBack())
 		$rc->addComment($data["id"], $data["gid"], $_POST["txtAddComment"], $page->users->currentUserId(), $_SERVER['REMOTE_ADDR']);
 
-	$nfo = $releases->getReleaseNfo($data["id"], false);
+	$nfo = $releases->getReleaseNfo($data["id"], true);
 	$reVideo = $re->getVideo($data["id"]);
 	$reAudio = $re->getAudio($data["id"]);
 	$reSubs = $re->getSubs($data["id"]);

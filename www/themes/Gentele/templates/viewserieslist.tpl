@@ -20,7 +20,7 @@
 </div>
 {$site->adbrowse}
 {if $serieslist|@count > 0}
-	<table class="data table table-condensed table-striped table-responsive table-hover icons" id="browsetable">
+	<table class="data table table-striped responsive-utilities jambo-table icons" id="browsetable">
 		{foreach $serieslist as $sletter => $series}
 			<tr>
 				<td colspan="10">

@@ -124,38 +124,40 @@
 					</p>
 					<div class="col-md-12">
 							<div class="tabbable">
-								<ul class="nav nav-tabs nav-primary">
-									<li class="active"><a href="#pane1"
+								<div class role="tabpanel">
+								<ul class="nav nav-tabs bar-tabs" role="tablist">
+									<li role="presentation" class="active"><a href="#pane1"
 														  data-toggle="tab">Info</a></li>
 									{if $movie && $release.videos_id <= 0}{if $movie.trailer != ""}
 										<li><a href="#pane2" data-toggle="tab">Trailer</a></li>
 									{/if}{/if}
 									{if isset($xxx.trailers) && $xxx.trailers != ''}
-										<li><a href="#pane2" data-toggle="tab">Trailer</a></li>
+										<li role="presentation"><a href="#pane2" data-toggle="tab">Trailer</a></li>
 									{/if}
-									{if isset($nfo.nfo) && $nfo.nfo != ''}
-										<li><a href="#pane3" data-toggle="tab">NFO</a></li>
+									{if !empty($nfo.nfo)}
+										<li role="presentation"><a href="#pane3" data-toggle="tab">NFO</a></li>
 									{/if}
 									{if isset($similars) && $similars|@count > 1}
-										<li><a href="#pane4" data-toggle="tab">Similar</a></li>
+										<li role="presentation"><a href="#pane4" data-toggle="tab">Similar</a></li>
 									{/if}
 									{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
-										<li><a href="#pane6" data-toggle="tab">Sample</a></li>
+										<li role="presentation"><a href="#pane6" data-toggle="tab">Sample</a></li>
 									{/if}
-									<li><a href="#comments" data-toggle="tab">Comments</a></li>
+									<li role="presentation"><a href="#comments" data-toggle="tab">Comments</a></li>
 									{if ($release.haspreview == 1 && $userdata.canpreview == 1) || ($release.haspreview == 2 && $userdata.canpreview == 1)}
-										<li><a href="#pane7" data-toggle="tab">Preview</a></li>
+										<li role="presentation"><a href="#pane7" data-toggle="tab">Preview</a></li>
 									{/if}
 									{if $reVideo.releaseid|@count > 0 || $reAudio|@count > 0}
-										<li><a href="#pane8" data-toggle="tab">MediaInfo</a></li>
+										<li role="presentation"><a href="#pane8" data-toggle="tab">MediaInfo</a></li>
 									{/if}
 									{if isset($xxx.backdrop) && $xxx.backdrop == 1}
-										<li><a href="#pane9" data-toggle="tab">Back Cover</a></li>
+										<li role="presentation"><a href="#pane9" data-toggle="tab">Back Cover</a></li>
 									{/if}
 									{if isset($game.backdrop) && $game.backdrop == 1}
-									<li><a href="#pane10" data-toggle="tab">Screenshot</a></li>
+									<li role="presentation"><a href="#pane10" data-toggle="tab">Screenshot</a></li>
 									{/if}
 								</ul>
+								</div>
 								<div class="tab-content">
 									<div id="pane1" class="tab-pane active">
 										<div class="row small-gutter-left">
@@ -254,7 +256,7 @@
 													<tbody>
 													<tr valign="top">
 														<td>
-															<table class="data table table-condensed table-striped table-responsive table-hover">
+															<table class="data table table-striped responsive-utilities jambo-table">
 																<tbody>
 																{if $movie && $release.videos_id <= 0}
 																	<tr>
@@ -588,7 +590,7 @@
 									</div>
 									<div id="comments" class="tab-pane">
 										{if $comments|@count > 0}
-											<table class="tdata table table-condensed table-striped table-responsive table-hover">
+											<table class="data table table-striped responsive-utilities jambo-table">
 												<tr class="{cycle values=",alt"}">
 													<th width="80">User</th>
 													<th>Comment</th>
@@ -641,7 +643,7 @@
 									{if $reVideo.releaseid|@count > 0 || $reAudio|@count > 0}
 										<div id="pane8" class="tab-pane">
 											<table style="width:100%;"
-												   class="data table table-condensed table-striped table-responsive table-hover">
+												   class="data table table-striped responsive-utilities jambo-table">
 												<tr>
 													<th width="15%"></th>
 													<th>Property</th>

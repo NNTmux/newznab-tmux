@@ -103,8 +103,8 @@
 													   name="trakt{$result.imdbid}" title="View Trakt page"
 													   class="label label-primary" rel="trakt">TRAKT</a>
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-primary"
+														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+														title="View NFO" class="modal_nfo label label-primary"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
@@ -217,10 +217,9 @@
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbid}/"
 													   name="trakt{$result.imdbid}" title="View Trakt page"
 													   class="label label-primary" rel="trakt">TRAKT</a>
-													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-primary"
-														rel="nfo">NFO</a>{/if}
+													{if $mnfo[$m@index] > 0}<span><a
+														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+														title="View NFO" class="modal_nfo label label-primary">NFO</a></span>{/if}
 													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>

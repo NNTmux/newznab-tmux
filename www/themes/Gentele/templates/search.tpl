@@ -40,7 +40,7 @@
 <form method="get" action="{$smarty.const.WWW_TOP}/search">
 	<div id="sadvanced" {if not $sadvanced}style="display:none"{/if}>
 		<div style="text-align: center;">
-			<table class="data table table-striped table-condensed table-responsive">
+			<table class="data table table-striped responsive-utilities jambo-table">
 				<tr>
 					<th><label for="searchadvr">Release Name:</label></th>
 					<td><input class="searchadv" id="searchadvr" name="searchadvr" value="{$searchadvr|escape:'html'}"
@@ -187,7 +187,7 @@
 			</div>
 		</div>
 		<hr>
-		<table class="data table table-condensed table-striped table-responsive table-hover" id="browsetable">
+		<table class="data table table-striped responsive-utilities jambo-table" id="browsetable">
 			<thead>
 			<tr>
 				<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>

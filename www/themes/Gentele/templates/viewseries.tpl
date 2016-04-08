@@ -144,7 +144,7 @@
 									{if empty($seasonnum)}{$seasonnum = 'Packs'}{/if}
 									<div class="tab-pane{if $smarty.foreach.tv.first} active{/if} fade in"
 										 id="{$seasonnum}">
-										<table class="tb_{$seasonnum} data table table-condensed table-bordered table-responsive table-hover"
+										<table class="tb_{$seasonnum} data table table-striped responsive-utilities jambo-table"
 											   id="browsetable">
 											<thead>
 											<tr>
@@ -177,10 +177,9 @@
 															   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
 
 															<div>
-																{if $result.nfoid > 0}<span
-																		class="label label-primary">
+																{if $result.nfoid > 0}<span>
 																	<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
-																	   class="text-muted">NFO</a>
+																	   class="modal_nfo label label-primary text-muted">NFO</a>
 																	</span>{/if}
 																{if $result.image == 1 && $userdata.canpreview == 1}
 																<a

@@ -29,7 +29,7 @@
 											<tbody>
 											<tr valign="top">
 												<td>
-													<table class="data table table-condensed table-striped table-responsive">
+													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
 															<td colspan="2" style="padding-left: 8px;">
@@ -67,7 +67,7 @@
 														</tr>
 														</tbody>
 													</table>
-													<table class="data table table-condensed table-striped table-responsive">
+													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
 															<td colspan="2" style="padding-left: 8px;"><strong>Excluded
@@ -81,7 +81,7 @@
 														</tr>
 														</tbody>
 													</table>
-													<table class="data table table-condensed table-striped table-responsive">
+													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
 															<td colspan="2" style="padding-left: 8px;"><strong>UI
@@ -153,7 +153,7 @@
 													function.
 													<br/>
 													{if $page->settings->getSetting('sabintegrationtype') != 1}
-														<table class="data table table-condensed table-striped table-responsive">
+														<table class="data table table-striped responsive-utilities jambo-table">
 															<tbody>
 															<tr class="bg-aqua-active">
 																<td colspan="2" style="padding-left: 8px;"><strong>Queue
@@ -172,7 +172,7 @@
 														</table>
 													{/if}
 													{if $user.queuetype == 1 && $page->settings->getSetting('sabintegrationtype') == 2}
-														<table class="data table table-condensed table-striped table-responsive">
+														<table class="data table table-striped responsive-utilities jambo-table">
 															<tbody>
 															<tr class="bg-aqua-active">
 																<td colspan="2" style="padding-left: 8px;"><strong>SABnzbd</strong>
@@ -208,7 +208,7 @@
 														</table>
 													{/if}
 													{if $user.queuetype == 2 && ($page->settings->getSetting('sabintegrationtype') == 0 || $page->settings->getSetting('sabintegrationtype') == 2)}
-														<table class="data table table-condensed table-striped table-responsive">
+														<table class="data table table-striped responsive-utilities jambo-table">
 															<tbody>
 															<tr class="bg-aqua-active">
 																<td colspan="2" style="padding-left: 8px;"><strong>NZBget</strong>
@@ -248,7 +248,7 @@
 										</table>
 									</div>
 								</div>
-								<table class="data table table-condensed table-striped table-responsive">
+								<table class="data table table-striped responsive-utilities jambo-table">
 									<tbody>
 									<tr class="bg-aqua-active">
 										<td colspan="2" style="padding-left: 8px;"><strong>Couchpotato</strong>
@@ -274,7 +274,7 @@
 									</tr>
 									</tbody>
 								</table>
-								<table class="data table table-condensed table-striped table-responsive">
+								<table class="data table table-striped responsive-utilities jambo-table">
 									<tbody>
 									<tr class="bg-aqua-active">
 										<td colspan="2" style="padding-left: 8px;"><strong>Site theme</strong></td>

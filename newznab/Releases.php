@@ -1359,7 +1359,7 @@ class Releases
 	{
 		return $this->pdo->queryOneRow(
 			sprintf(
-				'SELECT id, releaseid %s FROM releasenfo WHERE releaseid = %d AND nfo IS NOT NULL',
+				'SELECT releaseid %s FROM releasenfo WHERE releaseid = %d AND nfo IS NOT NULL',
 				($getNfoString ? ", UNCOMPRESS(nfo) AS nfo" : ''),
 				$id
 			)

@@ -2,7 +2,7 @@
 <h2>For
 	<a href="{$smarty.const.WWW_TOP}/details/{$rel.guid}">{$rel.searchname|escape:'htmlall'}</a>
 </h2>
-<table class="data table table-striped table-responsive sortable table-condensed table-hover">
+<table class="data table table-striped responsive-utilities jambo-table Sortable">
 	<tr>
 		<th>#</th>
 		<th>filename</th>
