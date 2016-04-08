@@ -57,4 +57,4 @@ define('NN_THEMES_SHARED', NN_THEMES . 'shared' . DS);
 // Path where log files are stored.
 define('NN_LOGS', NN_RES . 'logs' . DS);
 
-define('NN_VERSIONS', NN_LIB . 'build' . DS . 'nntmux.xml');
+define('NN_VERSIONS', NN_ROOT . 'build' . DS . 'nntmux.xml');
