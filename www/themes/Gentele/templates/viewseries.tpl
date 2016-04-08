@@ -178,7 +178,7 @@
 
 															<div>
 																{if $result.nfoid > 0}<span
-																		class="label label-default">
+																		class="label label-primary">
 																	<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 																	   class="text-muted">NFO</a>
 																	</span>{/if}
@@ -187,16 +187,16 @@
 																		href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 																		name="name{$result.guid}"
 																		title="View Screenshot"
-																		class="modal_prev label label-default"
+																		class="modal_prev label label-primary"
 																		rel="preview">Preview</a>{/if}
-																<span class="label label-default">{$result.grabs}
+																<span class="label label-primary">{$result.grabs}
 																	Grab{if $result.grabs != 1}s{/if}</span>
 																{if $result.firstaired != ""}<span
 																	class="label label-success"
 																	title="{$result.title} Aired on {$result.firstaired|date_format}">
 																	Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
 																{if $result.reid > 0}<span
-																	class="mediainfo label label-default"
+																	class="mediainfo label label-primary"
 																	title="{$result.guid}">Media</span>{/if}
 															</div>
 														</td>
@@ -206,7 +206,7 @@
 																	class="nzb_check" name="{$seasonnum}"
 																	value="{$result.guid}"/></td>
 														<td>
-															<span class="label label-default">{$result.category_name}</span>
+															<span class="label label-primary">{$result.category_name}</span>
 														</td>
 														<td width="40"
 															title="{$result.postdate}">{$result.postdate|timeago}</td>

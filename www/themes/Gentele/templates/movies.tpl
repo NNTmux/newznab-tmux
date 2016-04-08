@@ -97,16 +97,16 @@
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
 													   name="imdb{$result.imdbid}" title="View IMDB page"
-													   class="label label-default" rel="imdb">IMDB</a>
+													   class="label label-primary" rel="imdb">IMDB</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbid}/"
 													   name="trakt{$result.imdbid}" title="View Trakt page"
-													   class="label label-default" rel="trakt">TRAKT</a>
+													   class="label label-primary" rel="trakt">TRAKT</a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-default"
+														title="View NFO" class="label label-primary"
 														rel="nfo">NFO</a>{/if}
-													<a class="label label-default"
+													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 												</div>
@@ -125,10 +125,10 @@
 													<div id="guid{$mguid[$m@index]}">
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-														<span class="label label-default">{$result.year}</span>
-														<span class="label label-default">{if $result.rating != ''}{$result.rating}/10{/if}</span>
-														<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
-																	<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
+														<span class="label label-primary">{$result.year}</span>
+														<span class="label label-primary">{if $result.rating != ''}{$result.rating}/10{/if}</span>
+														<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
+																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
 														<br/><br/><br/>
 														<div class="icon">
@@ -212,16 +212,16 @@
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
 													   name="imdb{$result.imdbid}" title="View IMDB page"
-													   class="label label-default" rel="imdb">IMDB</a>
+													   class="label label-primary" rel="imdb">IMDB</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbid}/"
 													   name="trakt{$result.imdbid}" title="View Trakt page"
-													   class="label label-default" rel="trakt">TRAKT</a>
+													   class="label label-primary" rel="trakt">TRAKT</a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-default"
+														title="View NFO" class="label label-primary"
 														rel="nfo">NFO</a>{/if}
-													<a class="label label-default"
+													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 												</div>
@@ -240,10 +240,10 @@
 													<div id="guid{$mguid[$m@index]}">
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-														<span class="label label-default">{$result.year}</span>
-														<span class="label label-default">{if $result.rating != ''}{$result.rating}/10{/if}</span>
-														<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
-																	<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
+														<span class="label label-primary">{$result.year}</span>
+														<span class="label label-primary">{if $result.rating != ''}{$result.rating}/10{/if}</span>
+														<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
+																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
 														<br/><br/><br/>
 														<div class="icon"><input type="checkbox" class="nzb_check" value="{$mguid[$m@index]}"/></div>

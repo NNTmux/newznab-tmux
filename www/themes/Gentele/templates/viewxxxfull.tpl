@@ -153,9 +153,9 @@
 												<a title="View details"
 												   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
 												<br/>
-						<span class="label label-default">{$mgrabs[$m@index]}
+						<span class="label label-primary">{$mgrabs[$m@index]}
 							grab{if $mgrabs[$m@index] != 1}s{/if}</span>
-												{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span class="label label-default"><a
+												{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<span class="label label-primary"><a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															class="text-muted">NFO</a>
 													</span>{/if}
@@ -166,7 +166,7 @@
 												{/if}
 											</td>
 											<td class="less"><span
-														class="label label-default">{$mcatname[$m@index]}</span>
+														class="label label-primary">{$mcatname[$m@index]}</span>
 											</td>
 											<td class="less mid"
 												title="{$mpostdate[$m@index]}">{$mpostdate[$m@index]|timeago}</td>

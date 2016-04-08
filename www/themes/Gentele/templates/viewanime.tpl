@@ -105,22 +105,22 @@
 										   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
 										<div>
 											<div>
-												{if $result.nfoid > 0}<span class="label label-default"><a
+												{if $result.nfoid > 0}<span class="label label-primary"><a
 															href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 															class="text-muted">NFO</a></span>{/if}
 												{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
 													href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 													name="name{$result.guid}"
 													title="Screenshot of {$result.animeTitle|escape:"htmlall"}"
-													class="label label-default" rel="preview">Preview</a>{/if}
-												<span class="label label-default">{$result.grabs}
+													class="label label-primary" rel="preview">Preview</a>{/if}
+												<span class="label label-primary">{$result.grabs}
 													Grab{if $result.grabs != 1}s{/if}</span>
-												{if $result.reid > 0}<span class="mediainfo label label-default"
+												{if $result.reid > 0}<span class="mediainfo label label-primary"
 																		   title="{$result.guid}">Media</span>{/if}
 											</div>
 										</div>
 									</td>
-									<td><span class="label label-default">{$result.category_name}</span></td>
+									<td><span class="label label-primary">{$result.category_name}</span></td>
 									<td width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>
 									<td>{$result.size|fsize_format:"MB"}</td>
 									<td class="icon_nzb"><a

@@ -37,7 +37,7 @@
 										   href="{$smarty.const.WWW_TOP}/series/{$show.videos_id}">{$show.title|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 									</td>
 									<td>
-										<span class="label label-default">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</span>
+										<span class="label label-primary">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</span>
 									</td>
 									<td title="Added on {$show.createddate}">{$show.createddate|date_format}</td>
 									<td>

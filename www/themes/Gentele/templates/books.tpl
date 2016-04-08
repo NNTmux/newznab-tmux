@@ -84,15 +84,15 @@
 																 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 														</a>
 														{if isset($result.url) && $result.url != ""}<a
-															class="label label-default" target="_blank"
+															class="label label-primary" target="_blank"
 															href="{$site->dereferrer_link}{$result.url}"
 															name="amazon{$result.bookinfoid}" title="View amazon page">
 																Amazon</a>{/if}
 														{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-															title="View Nfo" class="label label-default" rel="nfo">
+															title="View Nfo" class="label label-primary" rel="nfo">
 																NFO</a>{/if}
-														<a class="label label-default"
+														<a class="label label-primary"
 														   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
 														   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
 														{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0}
@@ -114,8 +114,8 @@
 																			   value="{$mguid[$m@index]}"
 																			   id="chksingle"/>
 																	</label>
-																	<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
-																<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
+																	<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
+																<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																	ago</span>
 																	<br/>
 																	{if isset($result.review) && $result.review != ""}<span class="descinitial">{$result.review|escape:"htmlall"|nl2br|magicurl|truncate:350}</span>{if $result.review|strlen > 350}<a class="descmore" href="#">more...</a><span class="descfull">{$result.review|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}<br /><br />{/if}

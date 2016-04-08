@@ -84,25 +84,25 @@
 														 width="140" border="0"
 														 alt="{$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 												</a>
-												{if $result.classused == "gb"}<a class="label label-default"
+												{if $result.classused == "gb"}<a class="label label-primary"
 																				 target="_blank"
 																				 href="{$site->dereferrer_link}{$result.url}"
 																				 name="giantbomb{$result.gamesinfo_id}"
 																				 title="View GiantBomb page">
 														GiantBomb</a>{/if}
-												{if $result.classused == "steam"}<a class="label label-default"
+												{if $result.classused == "steam"}<a class="label label-primary"
 																					target="_blank"
 																					href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
 																					name="steam{$result.gamesinfo_id}"
 																					title="View Steam page">
 														Steam</a>{/if}
-												{if $result.classused == "gl"}<a class="label label-default"
+												{if $result.classused == "gl"}<a class="label label-primary"
 																				 target="_blank"
 																				 href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
 																				 name="greenlight{$result.gamesinfo_id}"
 																				 title="View greenlight page">
 														GreenLight</a>{/if}
-												{if $result.classused == "desura"}<a class="label label-default"
+												{if $result.classused == "desura"}<a class="label label-primary"
 																					 target="_blank"
 																					 href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
 																					 name="desura{$result.gamesinfo_id}"
@@ -110,9 +110,9 @@
 														Desura</a>{/if}
 												{if $result.nfoid > 0}<a
 													href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-													title="View NFO" class="label label-default" rel="nfo">
+													title="View NFO" class="label label-primary" rel="nfo">
 														NFO</a>{/if}
-												<a class="label label-default"
+												<a class="label label-primary"
 												   href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name}"
 												   title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Group</a>
 												{if !empty($mfailed[$m@index])}
@@ -133,8 +133,8 @@
 																   class="nzb_check"
 																   value="{$mguid[$m@index]}" id="chksingle"/>
 															</label>
-															<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
-																	<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
+															<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
+																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
 															{if isset($isadmin)}<a class="label label-warning"
 																				   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.grp_release_id}&amp;from={$smarty.server.REQUEST_URI}"

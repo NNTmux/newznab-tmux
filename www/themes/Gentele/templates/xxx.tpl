@@ -154,9 +154,9 @@
 																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-default"
+														title="View NFO" class="label label-primary"
 														rel="nfo">NFO</a>{/if}
-													<a class="label label-default"
+													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
@@ -178,8 +178,8 @@
 														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-														<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
-																	<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
+														<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
+																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
 														<br/><br/><br/>
 
@@ -309,9 +309,9 @@
 																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-default"
+														title="View NFO" class="label label-primary"
 														rel="nfo">NFO</a>{/if}
-													<a class="label label-default"
+													<a class="label label-primary"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
@@ -333,8 +333,8 @@
 														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
-														<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
-																	<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
+														<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
+																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
 														<br/><br/><br/>
 

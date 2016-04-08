@@ -13,7 +13,7 @@
 								 src="{if $result['cover'] ==""}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{else}{$result['cover']}{/if}"
 								 width="120" border="0" alt="{$result['title']|escape:"htmlall"}"/>
 							<div>
-								<a class="label label-default" target="_blank"
+								<a class="label label-primary" target="_blank"
 								   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result['imdb_id']}"
 								   title="View on IMDB">IMDB</a>
 							</div>

@@ -22,80 +22,80 @@
 						   title="Delete release">Delete</a>
 					{/if}
 					{if $movie && $release.videos_id <= 0}
-						<a class="label label-default" target="_blank"
+						<a class="label label-primary" target="_blank"
 						   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbid}/"
 						   title="View at IMDB">IMDB</a>
 						<a target="_blank"
 						   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$release.imdbid}/"
 						   name="trakt{$release.imdbid}" title="View Trakt page"
-						   class="label label-default" rel="trakt">TRAKT</a>
+						   class="label label-primary" rel="trakt">TRAKT</a>
 						{if $movie.tmdbid != ''}
-							<a class="label label-default" target="_blank"
+							<a class="label label-primary" target="_blank"
 							   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}"
 							   title="View at TMDb">TMDb</a>
 						{/if}
-						<a class="label label-default" href="{$smarty.const.WWW_TOP}/movies?imdb={$release.imdbid}" title="View all versions">Movie View</a>
+						<a class="label label-primary" href="{$smarty.const.WWW_TOP}/movies?imdb={$release.imdbid}" title="View all versions">Movie View</a>
 					{/if}
 					{if $anidb && $release.anidbid > 0}
-						<a class="label label-default" href="{$serverroot}anime/{$release.anidbid}"
+						<a class="label label-primary" href="{$serverroot}anime/{$release.anidbid}"
 						   title="View all releases from this anime">View all episodes</a>
-						<a class="label label-default"
+						<a class="label label-primary"
 						   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}"
 						   title="View at AniDB" target="_blank">AniDB</a>
-						<a class="label label-default"
+						<a class="label label-primary"
 						   href="{$smarty.const.WWW_TOP}/rss?anidb={$release.anidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Anime
 							RSS Feed</a>
 					{/if}
 					{if $show && $release.videos_id > 0}
 						<a href="{$smarty.const.WWW_TOP}/myshows/add/{$release.videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
 						   class="label label-success">Add to My Shows</a>
-						<a class="label label-default" href="{$serverroot}series/{$release.videos_id}"
+						<a class="label label-primary" href="{$serverroot}series/{$release.videos_id}"
 						   title="View all releases for this series">View all episodes</a>
 							{if $show.tvdb > 0}
-							<a class="label label-default" target="_blank"
+							<a class="label label-primary" target="_blank"
 							   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
 							   title="View at TheTVDB">TheTVDB</a>
 							{/if}
 							{if $show.tvmaze > 0}
-							<a class="label label-default" target="_blank"
+							<a class="label label-primary" target="_blank"
 							   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$show.tvmaze}"
 							   title="View at TVMaze">TVMaze</a>
 								{/if}
 							{if $show.trakt > 0}
-							<a class="label label-default" target="_blank"
+							<a class="label label-primary" target="_blank"
 							   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}"
 							   title="View at TraktTv">Trakt</a>
 								{/if}
 							{if $show.tvrage > 0}
-							<a class="label label-default" target="_blank"
+							<a class="label label-primary" target="_blank"
 							   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
 							   title="View at TV Rage">TV Rage</a>
 								{/if}
 							{if $show.tmdb > 0}
-							<a class="label label-default" target="_blank"
+							<a class="label label-primary" target="_blank"
 							   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$show.tmdb}"
 							   title="View at TheMovieDB">TMDb</a>
 						{/if}
 					{/if}
 					{if $con && $con.url != ""}<a href="{$site->dereferrer_link}{$con.url}/"
-												  class="label label-default" target="_blank">Amazon</a>{/if}
+												  class="label label-primary" target="_blank">Amazon</a>{/if}
 					{if $book && $book.url != ""}<a href="{$site->dereferrer_link}{$book.url}/"
-													class="label label-default" target="_blank">Amazon</a>{/if}
+													class="label label-primary" target="_blank">Amazon</a>{/if}
 					{if $music && $music.url != ""}<a href="{$site->dereferrer_link}{$music.url}/"
-													  class="label label-default" target="_blank">
+													  class="label label-primary" target="_blank">
 							Amazon</a>{/if}
 					{if $xxx}
-						{if $xxx.classused === "ade"}<a class="label label-default" target="_blank"
+						{if $xxx.classused === "ade"}<a class="label label-primary" target="_blank"
 														href="{$site->dereferrer_link}{$xxx.directurl}"
 														title="View at Adult DVD Empire">ADE</a>
-						{elseif $xxx.classused === "pop"}<a class="label label-default" target="_blank"
+						{elseif $xxx.classused === "pop"}<a class="label label-primary" target="_blank"
 															href="{$site->dereferrer_link}{$xxx.directurl}"
 															title="View at Popporn">PopPorn</a>
-						{elseif $xxx.classused === "aebn"}<a class="label label-default" target="_blank"
+						{elseif $xxx.classused === "aebn"}<a class="label label-primary" target="_blank"
 															 href="{$site->dereferrer_link}{$xxx.directurl}"
 															 title="View at Adult Entertainment Broadcast Network">
 								AEBN</a>
-						{elseif $xxx.classused === "hm"}<a class="label label-default" target="_blank"
+						{elseif $xxx.classused === "hm"}<a class="label label-primary" target="_blank"
 														   href="{$site->dereferrer_link}{$xxx.directurl}"
 														   title="View at Hot Movies">HotMovies</a>
 						{/if}
@@ -505,8 +505,8 @@
 																				<i class="fa fa-lock"></i>
 																				<span class="label label-danger">Passworded</span>
 																			{/if}
-																			<span class="label label-default">{$rf.size|fsize_format:"MB"}</span>
-																			<span class="label label-default">{$rf.createddate|date_format}</span>
+																			<span class="label label-primary">{$rf.size|fsize_format:"MB"}</span>
+																			<span class="label label-primary">{$rf.createddate|date_format}</span>
 																			<br/>
 																		{/foreach}
 																	</td>

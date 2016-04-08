@@ -131,6 +131,7 @@
 	</div>
 {elseif ($search || $subject || $searchadvr || $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) == ""}
 {else}
+	<div class="well well-small">
 	<form style="padding-top:10px;" id="nzb_multi_operations_form" method="get" action="{$smarty.const.WWW_TOP}/search">
 		<div class="row">
 			<div class="col-md-8">
@@ -236,7 +237,7 @@
 								{/if}
 								{if $result.videostatus > 0}
 									<a
-											class="model_prev label label-default"
+											class="model_prev label label-primary"
 											href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"
 											title="This release has a video preview."
 											rel="preview"
@@ -245,48 +246,48 @@
 								{/if}
 								{if $result.nfoid > 0}
 									<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}" title="View Nfo"
-									   class="modal_nfo label label-default" rel="nfo">Nfo</a>
+									   class="modal_nfo label label-primary" rel="nfo">Nfo</a>
 								{/if}
 								{if $result.imdbid > 0}
 									<a href="#" name="name{$result.imdbid}" title="View movie info"
-									   class="modal_imdb label label-default" rel="movie">Cover</a>
+									   class="modal_imdb label label-primary" rel="movie">Cover</a>
 								{/if}
 								{if $result.haspreview == 1 && $userdata.canpreview == 1}
 								<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 								   name="name{$result.guid}" title="Screenshot of {$result.searchname|escape:"htmlall"}"
-								   class="modal_prev label label-default" rel="preview">Preview</a>{/if}
+								   class="modal_prev label label-primary" rel="preview">Preview</a>{/if}
 								{if $result.jpgstatus == 1 && $userdata.canpreview == 1}
 								<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
 								   name="name{$result.guid}" title="Sample of {$result.searchname|escape:"htmlall"}"
-								   class="modal_prev label label-default" rel="preview">Sample</a>{/if}
+								   class="modal_prev label label-primary" rel="preview">Sample</a>{/if}
 								{if $result.musicinfoid > 0}
 									<a href="#" name="name{$result.musicinfoid}" title="View music info"
-									   class="modal_music label label-default" rel="music">Cover</a>
+									   class="modal_music label label-primary" rel="music">Cover</a>
 								{/if}
 								{if $result.consoleinfoid > 0}
 									<a href="#" name="name{$result.consoleinfoid}" title="View console info"
-									   class="modal_console label label-default" rel="console">Cover</a>
+									   class="modal_console label label-primary" rel="console">Cover</a>
 								{/if}
 								{if $result.videos_id > 0}
-									<a class="label label-default"
+									<a class="label label-primary"
 									   href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}" title="View all episodes">View
 										Series</a>
 								{/if}
 								{if $result.anidbid > 0}
-									<a class="label label-default"
+									<a class="label label-primary"
 									   href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}" title="View all episodes">View
 										Anime</a>
 								{/if}
 								{if isset($result.firstaired) && $result.firstaired != ''}
-									<span class="seriesinfo label label-default"
+									<span class="seriesinfo label label-primary"
 										  title="{$result.guid}">Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>
 								{/if}
 								{if $result.group_name != ""}
-									<a class="label label-default"
+									<a class="label label-primary"
 									   href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name|escape:"htmlall"}"
 									   title="Browse {$result.group_name}">{$result.group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>
 								{/if}
-								{if !empty($result.failed)}<span class="label label-default">
+								{if !empty($result.failed)}<span class="label label-primary">
 									<i class ="fa fa-thumbs-o-up"></i> {$result.grabs} Grab{if $result.grabs != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$result.failed} Failed Download{if $result.failed != 1}s{/if}</span>
 								{/if}
 							</div>
@@ -386,4 +387,5 @@
 		</div>
 		<br><br><br>
 	</form>
+	</div>
 {/if}
