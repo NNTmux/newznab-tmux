@@ -33,7 +33,7 @@
 	<!-- Newposterwall -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen"/>
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/custom.css" rel="stylesheet">
-	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/icheck/flat/green.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/flat/green.css" rel="stylesheet">
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
 	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -216,10 +216,10 @@
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js"
 		type="text/javascript"></script>
 <!-- bootstrap progress js -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/progressbar/bootstrap-progressbar.min.js"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
 <script src="{$smarty.const.WWW_THEMES}/{$theme}/js/nicescroll/jquery.nicescroll.min.js"></script>
 <!-- icheck -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/icheck/icheck.min.js"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
 <script src="{$smarty.const.WWW_THEMES}/{$theme}/js/custom.js"></script>
 <!-- jQuery migrate script -->
 <script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>

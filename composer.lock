@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "787f3b210a98fdb349473d4c9a55ed64",
-    "content-hash": "82088ce08d626d6f6bacb2436b1b978e",
+    "hash": "a9a28ae34e622216a30da478db634f6a",
+    "content-hash": "217685cb220dc9bb1aef98d691b1f976",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -120,6 +120,40 @@
             ]
         },
         {
+            "name": "bower-asset/bootstrap-progressbar",
+            "version": "v0.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/minddust/bootstrap-progressbar.git",
+                "reference": "e7ac2690384024feb89bd5122fea14dc4d819567"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/minddust/bootstrap-progressbar/zipball/e7ac2690384024feb89bd5122fea14dc4d819567",
+                "reference": "e7ac2690384024feb89bd5122fea14dc4d819567",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.9.1"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "./bootstrap-progressbar.js",
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "Gulpfile.js",
+                    "Rakefile",
+                    "bower_components",
+                    "node_modules",
+                    "resources",
+                    "tasks"
+                ]
+            },
+            "license": [
+                "MIT"
+            ]
+        },
+        {
             "name": "bower-asset/font-awesome",
             "version": "v4.5.0",
             "source": {
@@ -155,6 +189,56 @@
                 "CC-BY-3.0"
             ],
             "description": "Font Awesome"
+        },
+        {
+            "name": "bower-asset/icheck",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fronteed/icheck.git",
+                "reference": "8a6eb37bd7dab1e843c1b630c91c6398ff409d05"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fronteed/icheck/zipball/8a6eb37bd7dab1e843c1b630c91c6398ff409d05",
+                "reference": "8a6eb37bd7dab1e843c1b630c91c6398ff409d05",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.7"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "./icheck.min.js"
+                ],
+                "bower-asset-ignore": [
+                    ".gitignore",
+                    "CHANGELOG.md",
+                    "README.md",
+                    "demo/"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Highly customizable checkboxes and radio buttons (jQuery & Zepto)",
+            "keywords": [
+                "accessibility",
+                "checkbox",
+                "checked",
+                "custom",
+                "disabled",
+                "field",
+                "form",
+                "icheck",
+                "indeterminate",
+                "input",
+                "radio",
+                "replacement",
+                "skins",
+                "ui"
+            ]
         },
         {
             "name": "bower-asset/jquery",

@@ -1,4 +1,5 @@
 2016-04-09 DariusIII
+	* Upd: Update composer with 2 more shared libraries(bootstrap-progressbar, icheck) and adjust Gentele theme to use them.
 	* Chg: Replace js checkboxes with iCheck.
 2016-04-08 DariusIII
 	* Fix: Fix NFO display on themes, fix stylings on Gentele theme
