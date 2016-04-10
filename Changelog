@@ -1,3 +1,5 @@
+2016-04-10 DariusIII
+	* Upd: Increase the size of covers on movies and xxx pages in Gentele theme.
 2016-04-09 DariusIII
 	* Upd: Update composer with 2 more shared libraries(bootstrap-progressbar, icheck) and adjust Gentele theme to use them.
 	* Chg: Replace js checkboxes with iCheck.

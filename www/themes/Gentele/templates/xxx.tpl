@@ -90,7 +90,7 @@
 													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
-																width="100" border="0"
+																width="140" border="0"
 																alt="{$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
 														<i class="fa fa-exclamation-circle" style="color: red"
 														   title="This release has failed to download for some users"></i>{/if}
@@ -265,7 +265,7 @@
 													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
-																width="100" border="0"
+																width="140" border="0"
 																alt="{$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
 														<i class="fa fa-exclamation-circle" style="color: red"
 														   title="This release has failed to download for some users"></i>{/if}
