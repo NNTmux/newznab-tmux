@@ -149,7 +149,7 @@
 																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-														title="View NFO" class="label label-default"
+														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-default"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
@@ -301,7 +301,7 @@
 																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-														title="View NFO" class="label label-default"
+														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-default"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"

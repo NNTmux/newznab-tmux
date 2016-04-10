@@ -84,7 +84,7 @@
 																Amazon</a>{/if}
 														{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-															title="View Nfo" class="label label-default" rel="nfo">
+															title="View Nfo" class="modal_nfo label label-default" rel="nfo">
 																NFO</a>{/if}
 														<a class="label label-default"
 														   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
