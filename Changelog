@@ -1,4 +1,5 @@
 2016-04-10 DariusIII
+	* Fix: Prevent undefined index isadmin on forumpost page in Gamma template
 	* Fix: Fix NFO links in cover pages in all of the templates.
 	* Upd: Increase size of games covers in Gentele theme.
 	* Upd: Increase the size of covers on movies and xxx pages in Gentele theme.
