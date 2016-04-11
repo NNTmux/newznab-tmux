@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a9a28ae34e622216a30da478db634f6a",
-    "content-hash": "217685cb220dc9bb1aef98d691b1f976",
+    "hash": "1f80bb3c9167f823fd98bd6898b4e305",
+    "content-hash": "bdac0624578eee3905c10f1f63cbbc68",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -155,16 +155,16 @@
         },
         {
             "name": "bower-asset/font-awesome",
-            "version": "v4.5.0",
+            "version": "v4.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "fddd2c240452e6c8990c4ef75e0265b455aa7968"
+                "reference": "5697be912bc4aa455bfe343f50afdd41caae1a2f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/fddd2c240452e6c8990c4ef75e0265b455aa7968",
-                "reference": "fddd2c240452e6c8990c4ef75e0265b455aa7968",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/5697be912bc4aa455bfe343f50afdd41caae1a2f",
+                "reference": "5697be912bc4aa455bfe343f50afdd41caae1a2f",
                 "shasum": ""
             },
             "type": "bower-asset-library",
