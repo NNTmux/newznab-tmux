@@ -34,7 +34,7 @@
 							<thead>
 							<tr class="headings">
 								<th width="50">
-									<input id="chkSelectAll" type="checkbox" class="flat" title="Select All">
+									Select
 								</th>
 								<th class="column-title" style="display: table-cell;">Name</th>
 								<th class="column-title" style="display: table-cell;">Added</th>

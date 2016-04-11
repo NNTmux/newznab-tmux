@@ -1,4 +1,5 @@
 2016-04-11 DariusIII
+	* Chg: Remove most of the select all selectors from Gentele theme.
 	* Upd: Update Omicron to use icheck from shared/assets folder.
 2016-04-10 DariusIII
 	* Fix: Prevent undefined index isadmin on forumpost page in Gamma template

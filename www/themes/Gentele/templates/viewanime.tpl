@@ -88,7 +88,7 @@
 					<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table"
 						   id="browsetable">
 						<tr>
-							<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all flat"/></th>
+							<th>Select</th>
 							<th>Name</th>
 							<th>Category</th>
 							<th>Posted</th>

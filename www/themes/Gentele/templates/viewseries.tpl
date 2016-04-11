@@ -150,12 +150,7 @@
 											<tr>
 												<th>Ep</th>
 												<th>Name</th>
-												<th><input id="chkSelectAll{$seasonnum}" type="checkbox"
-														   name="{$seasonnum}"
-														   class="nzb_check_all_season"/><label
-															for="chkSelectAll{$seasonnum}"
-															style="display:none;">Select
-														All</label></th>
+												<th>Select</th>
 												<th>Category</th>
 												<th>Posted</th>
 												<th>Size</th>
@@ -202,7 +197,7 @@
 														<td class="check" width="10"><input
 																	id="chk{$result.guid|substr:0:7}"
 																	type="checkbox"
-																	class="flat" name="{$seasonnum}"
+																	class="flat" name="table_data{$seasonnum}"
 																	value="{$result.guid}"/></td>
 														<td>
 															<span class="label label-primary">{$result.category_name}</span>

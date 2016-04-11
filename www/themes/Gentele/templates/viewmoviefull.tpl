@@ -97,10 +97,7 @@
 								<table style="width:100%;"
 									   class="data table table-striped responsive-utilities jambo-table">
 									<tr>
-										<th>
-											<input id="chkSelectAll" type="checkbox" class="nntmux_check_all"/>
-											<label for="chkSelectAll" style="display:none;">Select All</label>
-										</th>
+										<th>Select</th>
 										<th>Name<br/>
 											<a title="Sort Descending" href="{$orderbyname_desc}">
 												<i class="fa fa-icon-caret-down"></i>
