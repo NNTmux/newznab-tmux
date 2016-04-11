@@ -229,7 +229,7 @@
 														Download</a>
 													<button type="button"
 															class="btn btn-primary btn-sm btn-info btn-transparent cartadd">
-														<i class="icon icon_cart fa fa-shopping-basket guid"
+														<i class="icon_cart fa fa-shopping-basket guid"
 														   id="guid{$release.guid}"></i> Add to
 														Cart
 													</button>

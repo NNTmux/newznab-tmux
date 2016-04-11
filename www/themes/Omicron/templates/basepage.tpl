@@ -270,8 +270,8 @@
 	<!-- Bootstrap 3.3.6 JS -->
 	<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js"
 			type="text/javascript"></script>
-	<!-- iCheck -->
-	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
+	<!-- icheck -->
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js" type="text/javascript"></script>
 	<!-- Bootstrap hover on mouseover script -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/shared/scripts/bootstrap-hover-dropdown.min.js"></script>

@@ -79,8 +79,8 @@
     <script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"></script>
     <!-- Bootstrap 3.3.6 JS -->
     <script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
-    <!-- iCheck -->
-    <script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
+    <!-- icheck -->
+    <script src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js" type="text/javascript"></script>
     <script>
       $(function () {
         $('input').iCheck({
