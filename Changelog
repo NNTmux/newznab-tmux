@@ -1,4 +1,5 @@
 2016-04-12 DariusIII
+	* Upd: Update composer, themes use shared/assets/bootstrap-hover-dropdown now
 	* Upd: Add initial updating scripts, still not used.
 2016-04-11 DariusIII
 	* Upd: Update composer.json and add initial update script.

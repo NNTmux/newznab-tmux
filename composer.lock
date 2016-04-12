@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1f80bb3c9167f823fd98bd6898b4e305",
-    "content-hash": "bdac0624578eee3905c10f1f63cbbc68",
+    "hash": "04425f175f500cfb1cd08e48640914c5",
+    "content-hash": "91c9827f979826092e1a392515d47f96",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -117,6 +117,36 @@
                 "mobile-first",
                 "responsive",
                 "web"
+            ]
+        },
+        {
+            "name": "bower-asset/bootstrap-hover-dropdown",
+            "version": "v2.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CWSpear/bootstrap-hover-dropdown.git",
+                "reference": "56c494fbb1f4ad54180c716cc07f4919e49b423a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CWSpear/bootstrap-hover-dropdown/zipball/56c494fbb1f4ad54180c716cc07f4919e49b423a",
+                "reference": "56c494fbb1f4ad54180c716cc07f4919e49b423a",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/bootstrap": ">=3.0.0,<4.0.0",
+                "bower-asset/jquery": ">=1.9.0"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "./bootstrap-hover-dropdown.js"
+            },
+            "description": "An unofficial Bootstrap plugin to enable Bootstrap dropdowns to activate on hover and provide a nice user experience.",
+            "keywords": [
+                "bootstrap",
+                "dropdowns",
+                "hover",
+                "twitter"
             ]
         },
         {
