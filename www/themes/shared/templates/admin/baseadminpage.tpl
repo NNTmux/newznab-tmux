@@ -108,22 +108,12 @@
 <!-- jQuery migrate script -->
 <script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.colorbox-min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.autosize-min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.qtip2.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/sorttable.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/jquery.colorbox-min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/jquery.autosize-min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/jquery.qtip2.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/sorttable.js"></script>
 <!-- Custom functions -->
 <script src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/functions.js" type="text/javascript"></script>
-
-<!-- PNotify -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.animate.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.desktop.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.callbacks.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.buttons.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.confirm.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.nonblock.js"></script>
-
 <!-- pace -->
 <script src="{$smarty.const.WWW_THEMES}/{$theme}/js/pace/pace.min.js"></script>
 
