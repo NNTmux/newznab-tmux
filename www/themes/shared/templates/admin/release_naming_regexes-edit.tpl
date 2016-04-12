@@ -1,9 +1,10 @@
+<div class="well well-sm">
 <h1 xmlns="http://www.w3.org/1999/html">{$page->title}</h1>
 {if isset($error) && $error != ''}
 	<div class="error">{$error}</div>
 {/if}
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td><label for="group_regex">Group:</label></td>
 			<td>
@@ -64,8 +65,9 @@
 		<tr>
 			<td></td>
 			<td>
-				<input type="submit" value="Save" />
+				<input class="btn btn-default" type="submit" value="Save" />
 			</td>
 		</tr>
 	</table>
 </form>
+	</div>

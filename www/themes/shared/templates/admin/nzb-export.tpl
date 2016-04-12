@@ -1,4 +1,4 @@
-
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 <p>
@@ -14,7 +14,7 @@ If you are exporting a large number of nzb files, run this script from the comma
 
 <form action="{$SCRIPT_NAME}" method="POST">
 
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
 	<td><label for="folder">Folder</label>:</td>
@@ -53,7 +53,7 @@ If you are exporting a large number of nzb files, run this script from the comma
 <tr>
 	<td></td>
 	<td>
-		<input type="submit" value="Export" />
+		<input class="btn btn-default" type="submit" value="Export" />
 	</td>
 </tr>
 
@@ -64,3 +64,4 @@ If you are exporting a large number of nzb files, run this script from the comma
 <div>
 {$output}
 </div>
+	</div>

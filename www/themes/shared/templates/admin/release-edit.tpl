@@ -1,7 +1,8 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
 	<input type="hidden" name="from" value="{$smarty.get.from}" />
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td><label for="name">Original Name:</label></td>
 			<td>
@@ -90,8 +91,9 @@
 		<tr>
 			<td></td>
 			<td>
-				<input type="submit" value="Save" />
+				<input class="btn btn-default" type="submit" value="Save" />
 			</td>
 		</tr>
 	</table>
 </form>
+	</div>

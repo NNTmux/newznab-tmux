@@ -1,3 +1,4 @@
+<div class="well well.sm">
 <h1>{$page->title}</h1>
 
 <div style="float:right;">
@@ -18,7 +19,7 @@
 			{html_options values=$role_ids output=$role_names selected=$role}
 		</select>
 		&nbsp;&nbsp;
-		<input type="submit" value="Go" />
+		<input class="btn btn-default" type="submit" value="Go" />
 	</form>
 </div>
 
@@ -26,7 +27,7 @@
 
 <br/><br/>
 
-<table style="width:100%;margin-top:10px;" class="data highlight">
+<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 
 	<tr>
 		<th>name<br/><a title="Sort Descending" href="{$orderbyusername_desc}"><img src="{$smarty.const.WWW_TOP}/../themes/shared/images/sorting/arrow_down.gif" alt="" /></a><a title="Sort Ascending" href="{$orderbyusername_asc}"><img src="{$smarty.const.WWW_TOP}/../themes/shared/images/sorting/arrow_up.gif" alt="" /></a></th>
@@ -58,6 +59,5 @@
 		<td>{if $user.role!="2"}<a class="confirm_action" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">delete</a>{/if}</td>
 	</tr>
 	{/foreach}
-
-
 </table>
+	</div>

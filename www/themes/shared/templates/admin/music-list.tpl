@@ -1,9 +1,10 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 {if $musiclist}
 {$pager}
 
-<table style="margin-top:10px;" class="data Sortable highlight">
+<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 
 	<tr>
 		<th>id</th>
@@ -28,3 +29,4 @@
 {else}
 <p>No Music available.</p>
 {/if}
+	</div>

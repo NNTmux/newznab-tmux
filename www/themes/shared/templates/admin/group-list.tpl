@@ -9,7 +9,7 @@
 				<label for="groupname">Group</label>
 				<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15" />
 				&nbsp;&nbsp;
-				<input type="submit" value="Go" />
+				<input class="btn btn-default" type="submit" value="Go" />
 			</form>
 			<div style="position:absolute;">
 				{$pager}
@@ -69,7 +69,7 @@
 					<label for="groupname">Group</label>
 					<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15" />
 					&nbsp;&nbsp;
-					<input type="submit" value="Go" />
+					<input class="btn btn-default" type="submit" value="Go" />
 				</form>
 				<a title="Reset all groups" href="javascript:ajax_all_reset()" class="all_reset" onclick="return confirm('Are you sure? This will reset all groups, deleting all collections/binaries/parts (does not delete releases).');" >Reset all</a> |
 				<a title="Delete all releases, binaries/parts from all groups" href="javascript:ajax_all_purge()" class="all_purge" onclick="return confirm('Are you sure? This will delete all releases, collections/binaries/parts.');">Purge all</a><br />

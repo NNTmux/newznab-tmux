@@ -7,7 +7,7 @@
 	<label for="group">Search a group:</label>
 	<input id="group" type="text" name="group" value="{$group}" size="15" />
 	&nbsp;&nbsp;
-	<input type="submit" value="Go" />
+	<input class="btn btn-default" type="submit" value="Go" />
 </form>
 {if $regex}
 

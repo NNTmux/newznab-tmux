@@ -60,7 +60,7 @@
 <tr>
 	<td></td>
 	<td>
-		<input type="submit" value="Save" />
+		<input class="btn btn-default" type="submit" value="Save" />
 	</td>
 </tr>
 

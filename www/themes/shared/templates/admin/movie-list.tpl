@@ -1,8 +1,9 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 {if $movielist}
 	{$pager}
-	<table style="margin-top:10px;" class="data Sortable highlight">
+	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>
 			<th>IMDB ID</th>
 			<th>TMDb ID</th>
@@ -27,3 +28,4 @@
 {else}
 	<p>No Movies available.</p>
 {/if}
+	</div>

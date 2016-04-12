@@ -1,3 +1,4 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 <p>
 	Import NZB's from a folder or via the browser into the system. Specify the full file path to a folder containing NZB's.
@@ -14,7 +15,7 @@
 <fieldset>
 	<legend>Import From Directory</legend>
 	<form action="{$SCRIPT_NAME}#results" method="POST">
-		<table class="input">
+		<table class="input data table table-striped responsive-utilities jambo-table">
 			<tr>
 				<td style="width:100px;"><label for="folder">Folder:</label></td>
 				<td>
@@ -39,7 +40,7 @@
 			<tr>
 				<td></td>
 				<td>
-					<input type="submit" value="Import" />
+					<input class="btn btn-default" type="submit" value="Import" />
 				</td>
 			</tr>
 		</table>
@@ -48,7 +49,7 @@
 <fieldset>
 	<legend>Import From Browser</legend>
 	<form action="{$SCRIPT_NAME}#results" method="POST" enctype="multipart/form-data">
-		<table class="input">
+		<table class="input data table table-striped responsive-utilities jambo-table">
 			<tr>
 				<td style="width:100px;"><label for="uploadedfiles[]">File:</label></td>
 				<td>
@@ -60,7 +61,7 @@
 				<td></td>
 				<td>
 					<b>These NZBs will not be deleted once imported.</b><br />
-					<input type="submit" value="Import" />
+					<input class="btn btn-default" type="submit" value="Import" />
 				</td>
 			</tr>
 		</table>
@@ -72,3 +73,4 @@
 		{$output}
 	</div>
 {/if}
+	</div>

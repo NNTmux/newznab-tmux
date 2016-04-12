@@ -1,10 +1,10 @@
-
+ <div class="well well-sm">
 <h1>{$page->title}</h1>
 
 {if $topgrabs|count > 0}
 	<h2>Top Grabbers</h2>
 
-	<table style="width:100%;margin-top:10px;" class="data highlight">
+	<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<th>User</th>
 			<th>Grabs</th>
@@ -24,7 +24,7 @@
 
 <h2>Signups</h2>
 
-<table style="width:100%;margin-top:10px;" class="data highlight Sortable">
+<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-tableSortable">
 	<tr>
 		<th>Month</th>
 		<th>Signups</th>
@@ -44,7 +44,7 @@
 
 <h2>Users by Role</h2>
 
-<table style="width:100%;margin-top:10px;" class="data highlight Sortable">
+<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 	<tr>
 		<th>Role</th>
 		<th>Users</th>
@@ -64,7 +64,7 @@
 
 <h2>Users by Hosthash</h2>
 
-<table style="width:100%;margin-top:10px;" class="data highlight Sortable">
+<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 	<tr>
 		<th>Hosthash</th>
 		<th>User IDs (Edit)</th>
@@ -95,7 +95,7 @@
 
 <h2>Access by Date</h2>
 
-<table style="width:100%;margin-top:10px;" class="data highlight Sortable">
+<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 	<tr>
 		<th>Type</th>
 		<th>Last Day</th>
@@ -124,7 +124,7 @@
 {if $topdownloads|count > 0}
 	<h2>Top Downloads</h2>
 
-	<table style="width:100%;margin-top:10px;" class="data highlight">
+	<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<th>Release</th>
 			<th>Grabs</th>
@@ -147,7 +147,7 @@
 
 <h2>Releases Added In Last 7 Days</h2>
 
-<table style="width:100%;margin-top:10px;" class="data highlight">
+<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 	<tr>
 		<th>Category</th>
 		<th>Releases</th>
@@ -167,7 +167,7 @@
 {if $topcomments|count > 0}
 	<h2>Top Comments</h2>
 
-	<table style="width:100%;margin-top:10px;" class="data highlight">
+	<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<th>Release</th>
 			<th>Comments</th>
@@ -184,3 +184,4 @@
 
 	</table>
 {/if}
+	 </div>

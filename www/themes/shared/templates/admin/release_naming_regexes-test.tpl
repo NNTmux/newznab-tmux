@@ -1,3 +1,4 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 <p>This page is used for testing regex for getting release names from usenet subject.
 	<br />Maximum releases to display will limit the amount of results displayed on the page. 0 for no limit.
@@ -13,10 +14,10 @@
 	<input id="showlimit" type="text" name="showlimit" value="{$showlimit}" size="8" /><br/>
 	<label for="querylimit" style="padding-right:7px">Query limit:</label>
 	<input id="querylimit" type="text" name="querylimit" value="{$querylimit}" size="8" /><br/>
-	<input type="submit" value="Test" />
+	<input class="btn btn-default" type="submit" value="Test" />
 </form>
 {if $data}
-	<table style="margin-top:10px;" class="data Sortable highlight">
+	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>
 			<th>Release id</th>
 			<th>Usenet Subject</th>
@@ -33,3 +34,4 @@
 		{/foreach}
 	</table>
 {/if}
+	</div>
