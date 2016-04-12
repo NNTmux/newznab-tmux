@@ -1,4 +1,5 @@
 <h1>{$page->title}</h1>
+<div class="well well-sm">
 <p>This page is used for testing regex for grouping usenet collections.<br />Enter the group name to test and a regex. Limit is how many collections to show max on the page, 0 for no limit(slow).</p>
 
 {if $tpg}
@@ -14,12 +15,12 @@
 	{if $data}
 
 		{foreach from=$data key=hash item=collection}
-			<table style="margin-top:10px;" class="data">
+			<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 				<tr>
 					<th>{$hash}<br />Current Files: {count($collection)}</th>
 				</tr>
 			</table>
-			<table style="margin-top:10px;" class="data Sortable highlight">
+			<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 				<tr>
 					<th>name</th>
 					<th>current parts</th>
@@ -42,3 +43,4 @@
 {else}
 	<p>The Table Per Group setting is required to be on to use this page, for performance reasons.</p>
 {/if}
+	</div>

@@ -1,4 +1,5 @@
 2016-04-12 DariusIII
+	* Upd: Updated admin template to be in line with age. Part 1.
 	* Upd: Cleanup couple of Omicron/Gentele  tpl files (terms/contact)
 	* Upd: Update composer, themes use shared/assets/bootstrap-hover-dropdown now
 	* Upd: Add initial updating scripts, still not used.

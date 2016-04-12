@@ -1,7 +1,8 @@
 <h1>{$page->title}</h1>
+<div class="well well-sm">
 {if $commentslist}
 	{$pager}
-	<table style="margin-top:10px;" class="data Sortable highlight">
+	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>
 			<th>user</th>
 			<th>date</th>
@@ -35,3 +36,4 @@
 {else}
 	<p>No comments available</p>
 {/if}
+</div>

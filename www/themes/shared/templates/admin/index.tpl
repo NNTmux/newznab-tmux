@@ -1,3 +1,4 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 <div style="{if $site->showadminwelcome != "1"}display:none;{/if}" id="adminwelcome">
@@ -49,4 +50,5 @@
 
 	<br/>
 	<a onclick="ajax_welcome_msg(true); return false;" href="#">show welcome message</a>
+</div>
 </div>

@@ -1,4 +1,5 @@
 <h1>{$page->title}</h1>
+<div class="well well-sm">
 <p>This page lists regex used for grouping usenet collections.</p>
 <div id="message"></div>
 
@@ -11,7 +12,7 @@
 {if $regex}
 
 	<div>{$pager}</div>
-	<table style="margin-top:10px;" class="data Sortable highlight">
+	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>
 			<th style="width:20px;">id</th>
 			<th>group</th>
@@ -41,3 +42,4 @@
 	</table>
 	<div style="margin-top: 15px">{$pager}</div>
 {/if}
+</div>

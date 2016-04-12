@@ -1,3 +1,4 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 <p>This page lists regex used for categorizing releases.<br />
 	You can recategorize all releases by running misc/update/update_releases.php 6 true
@@ -13,7 +14,7 @@
 {if $regex}
 
 	<div>{$pager}</div>
-	<table style="margin-top:10px;" class="data Sortable highlight">
+	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>
 			<th style="width:20px;">id</th>
 			<th>group</th>
@@ -45,3 +46,4 @@
 	</table>
 	<div style="margin-top: 15px">{$pager}</div>
 {/if}
+	</div>

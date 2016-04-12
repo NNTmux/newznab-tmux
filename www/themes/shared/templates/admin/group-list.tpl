@@ -1,4 +1,4 @@
-<div id="group_list">
+<div class="well well-sm" id="group_list">
 	<h1>{$page->title}</h1>
 	<p>
 		Below is a list of all usenet groups available to be indexed. Click 'Activate' to start indexing a group. Backfill works independently of active.
@@ -23,7 +23,7 @@
 			</div>
 		</div>
 		<div id="message">msg</div>
-		<table style="width:100%;" class="data highlight Sortable">
+		<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table Sortable">
 			<tr>
 				<th>group</th>
 				<th>First Post</th>

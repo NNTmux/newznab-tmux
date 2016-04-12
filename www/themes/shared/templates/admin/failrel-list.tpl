@@ -1,9 +1,10 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 {if $releaselist}
 	{$pager}
 
-	<table style="margin-top:10px;" class="data Sortable highlight">
+	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 
 		<tr>
 			<th>name</th>
@@ -37,3 +38,4 @@
 {else}
 	<p>No releases available.</p>
 {/if}
+	</div>

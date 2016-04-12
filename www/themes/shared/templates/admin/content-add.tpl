@@ -1,6 +1,7 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td><label for="title">Title:</label></td>
 			<td>
@@ -72,3 +73,4 @@
 		</tr>
 	</table>
 </form>
+	</div>

@@ -1,10 +1,10 @@
-
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 <form enctype="multipart/form-data" action="{$SCRIPT_NAME}" method="post">
 
 
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
 	<td></td>
@@ -21,10 +21,11 @@
 <tr>
 	<td></td>
 	<td>
-		<input type="submit" value="Add" />
+		<input class="btn btn-default" type="submit" value="Add" />
 	</td>
 </tr>
 
 </table>
 
 </form>
+	</div>
