@@ -89,7 +89,7 @@ class Update extends \app\extensions\console\Command
 
 	protected function composer()
 	{
-		passthru('composer install');
+		passthru('composer install --no-dev');
 	}
 
 	/**

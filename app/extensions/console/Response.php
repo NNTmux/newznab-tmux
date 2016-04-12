@@ -3,8 +3,8 @@
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation,
-		either version 3 of the License,
-		or
+either version 3 of the License,
+or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
  * not,
-		see:
+see:
  *
  * @link <http://www.gnu.org/licenses/>.
  * @author niel
@@ -310,6 +310,7 @@ class Response extends \lithium\console\Response
 		'grey'			=> "\033[37m",
 		'hidden'		=> "\033[8m",
 		'normal'		=> "\033[0m",
+		'primary'		=> "\033[38;5;010m",
 		'reset'			=> "\033[0m",
 		'reverse'		=> "\033[7m",
 		'strikethrough' => "\033[9m",
