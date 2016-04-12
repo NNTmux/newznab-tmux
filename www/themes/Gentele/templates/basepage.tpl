@@ -137,8 +137,7 @@
 					{$header_menu}
 					<ul class="nav navbar-nav">
 						<li class="">
-							<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
-							   aria-expanded="false">
+							<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" data-delay="30" aria-expanded="false">
 								{if $loggedin == "true"}
 								<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png"
 									 alt="User Image"> {$userdata.username}
