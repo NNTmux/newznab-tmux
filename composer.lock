@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "04425f175f500cfb1cd08e48640914c5",
-    "content-hash": "91c9827f979826092e1a392515d47f96",
+    "hash": "ea4f56527576df49296db3694cdfc884",
+    "content-hash": "76a3242f92fc738dcf21f5b10863c19c",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -185,16 +185,16 @@
         },
         {
             "name": "bower-asset/font-awesome",
-            "version": "v4.6.0",
+            "version": "v4.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "5697be912bc4aa455bfe343f50afdd41caae1a2f"
+                "reference": "6535013c330e801ecf0b23c437865a7fb344486d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/5697be912bc4aa455bfe343f50afdd41caae1a2f",
-                "reference": "5697be912bc4aa455bfe343f50afdd41caae1a2f",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/6535013c330e801ecf0b23c437865a7fb344486d",
+                "reference": "6535013c330e801ecf0b23c437865a7fb344486d",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1120,21 +1120,22 @@
             "version": "1.1.x-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/niel/li3_quality.git",
-                "reference": "9bc45546786a780d9ddac74d1a54e3a78970a427"
+                "url": "https://github.com/UnionOfRAD/li3_quality.git",
+                "reference": "3a986b0b11ccd4be09a22206d6645aed8c8af1d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/niel/li3_quality/zipball/9bc45546786a780d9ddac74d1a54e3a78970a427",
-                "reference": "9bc45546786a780d9ddac74d1a54e3a78970a427",
+                "url": "https://api.github.com/repos/UnionOfRAD/li3_quality/zipball/3a986b0b11ccd4be09a22206d6645aed8c8af1d2",
+                "reference": "3a986b0b11ccd4be09a22206d6645aed8c8af1d2",
                 "shasum": ""
             },
             "require": {
                 "composer/installers": "1.*",
-                "php": ">=5.3",
-                "unionofrad/lithium": "1.1.x-dev"
+                "php": ">=5.5.0",
+                "unionofrad/lithium": "1.1.*"
             },
             "type": "lithium-library",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-clause"
             ],
@@ -1156,10 +1157,7 @@
                 "quality",
                 "syntax"
             ],
-            "support": {
-                "source": "https://github.com/niel/li3_quality/tree/1.1"
-            },
-            "time": "2016-03-22 12:07:46"
+            "time": "2016-04-10 15:04:15"
         },
         {
             "name": "unionofrad/manual",
