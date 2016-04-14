@@ -230,8 +230,7 @@
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/chosen/chosen.jquery.min.js"></script>
 	<!-- plugin for gallery image view -->
-	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/colorbox/jquery.colorbox-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
 	<!-- notification plugin -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/shared/assets/noty/js/noty/packaged/jquery.noty.packaged.js"></script>
@@ -255,8 +254,7 @@
 	<!-- Functions with noty -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/functions.js"></script>
 	<!-- newznab default scripts, needed for stuff to work -->
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.colorbox-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.autosize-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.qtip2.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/sorttable.js"></script>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->

@@ -1,4 +1,5 @@
 2016-04-13 DariusIII
+	* Upd: Update composer and themes with new autosize and colorbox libs.
 	* Fix: Fix PHP Fatal error on getid3
 2016-04-13 DariusIII
 	* Upd: Composer with fixed font awesome icons and proper litium/li3_quality
