@@ -112,6 +112,7 @@
 <!-- newznab default scripts, needed for stuff to work -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/jquery.qtip2.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/sorttable.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/utils-admin.js"></script>
 <!-- Custom functions -->
 <script src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/functions.js" type="text/javascript"></script>
 <!-- pace -->

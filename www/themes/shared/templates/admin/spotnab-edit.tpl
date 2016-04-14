@@ -38,7 +38,7 @@
 <tr>
 	<td>Public Key:</td>
 	<td>
-		<textarea class="autosize" name="publickey">{$source.publickey|escape:html}</textarea>
+		<textarea name="publickey">{$source.publickey|escape:html}</textarea>
 		<div class="hint">Public Key needed to decode the posts specific for this source.</div>
 	</td>
 </tr>

@@ -718,9 +718,8 @@ jQuery(function($){
     $('.confirm_action').click(function(){ return confirm('Are you sure?'); });
 
 
-    //fix for autosizing plugin
-    $('.autosize').autosize({append: "\n"});
-
+    //Autosize text area
+    autosize($('textarea'));
 });
 
 //enable Custom checkboxes for fix crap releases

@@ -39,7 +39,7 @@
 <tr>
 	<td><label for="metadescription">Meta Description</label>:</td>
 	<td>
-		<textarea class="autosize" id="metadescription" name="metadescription">{$site->metadescription}</textarea>
+		<textarea id="metadescription" name="metadescription">{$site->metadescription}</textarea>
 		<div class="hint">Stem meta-description appended to all page meta description tags.</div>
 	</td>
 </tr>
@@ -47,7 +47,7 @@
 <tr>
 	<td><label for="metakeywords">Meta Keywords</label>:</td>
 	<td>
-		<textarea class="autosize"  id="metakeywords" name="metakeywords">{$site->metakeywords}</textarea>
+		<textarea id="metakeywords" name="metakeywords">{$site->metakeywords}</textarea>
 		<div class="hint">Stem meta-keywords appended to all page meta keyword tags.</div>
 	</td>
 </tr>
@@ -55,7 +55,7 @@
 <tr>
 	<td><label for="footer">Footer</label>:</td>
 	<td>
-		<textarea class="autosize"  id="footer" name="footer">{$site->footer}</textarea>
+		<textarea id="footer" name="footer">{$site->footer}</textarea>
 		<div class="hint">Displayed in the footer section of every public page.</div>
 	</td>
 </tr>
@@ -136,7 +136,7 @@
 <tr>
 	<td><label for="tandc">Terms and Conditions</label>:</td>
 	<td>
-		<textarea class="autosize"  id="tandc" name="tandc">{$site->tandc}</textarea>
+		<textarea id="tandc" name="tandc">{$site->tandc}</textarea>
 		<div class="hint">Text displayed in the terms and conditions page.</div>
 	</td>
 </tr>
@@ -173,7 +173,7 @@
 <tr>
 	<td><label for="adheader">Advert Space in Banner</label>:</td>
 	<td>
-		<textarea class="autosize"  id="adheader" name="adheader">{$site->adheader}</textarea>
+		<textarea id="adheader" name="adheader">{$site->adheader}</textarea>
 		<div class="hint">The banner slot in the header.</div>
 	</td>
 </tr>
@@ -181,7 +181,7 @@
 <tr>
 	<td><label for="adbrowse">Advert Space in Browse List</label>:</td>
 	<td>
-		<textarea class="autosize"  id="adbrowse" name="adbrowse">{$site->adbrowse}</textarea>
+		<textarea id="adbrowse" name="adbrowse">{$site->adbrowse}</textarea>
 		<div class="hint">The banner slot in the header.</div>
 	</td>
 </tr>
@@ -189,7 +189,7 @@
 <tr>
 	<td><label for="addetail">Advert Space in Detail View</label>:</td>
 	<td>
-		<textarea class="autosize"  id="addetail" name="addetail">{$site->addetail}</textarea>
+		<textarea id="addetail" name="addetail">{$site->addetail}</textarea>
 		<div class="hint">The banner slot in the release details view.</div>
 	</td>
 </tr>
@@ -940,7 +940,7 @@
 <tr>
   <td style="width:130px;"><label for="spotnabsitepubkey">Public Key</label>:</td>
   <td>
-	<textarea class="autosize"  name="spotnabsitepubkey">{$site->spotnabsitepubkey|escape:html}</textarea>
+	<textarea name="spotnabsitepubkey">{$site->spotnabsitepubkey|escape:html}</textarea>
 	<div class="hint">Public key other sites will use to decrypt comments.</div>
   </td>
 </tr>
@@ -948,7 +948,7 @@
 <tr>
   <td style="width:130px;"><label for="spotnabsiteprvkey">Private Key:<br><u>Do Not Share This</u></label></td>
   <td>
-	<textarea class="autosize"  name="spotnabsiteprvkey">{$site->spotnabsiteprvkey|escape:html}</textarea>
+	<textarea name="spotnabsiteprvkey">{$site->spotnabsiteprvkey|escape:html}</textarea>
 	<div class="hint">Private key used to encrypt comments before uploading.</div>
   </td>
 </tr>

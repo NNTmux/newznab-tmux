@@ -61,7 +61,7 @@
 <tr>
 	<td><label for="description">Description</label>:</td>
 	<td>
-		<textarea class="autosize" id="description" name="description">{$anime.description|escape:'htmlall'}</textarea>
+		<textarea id="description" name="description">{$anime.description|escape:'htmlall'}</textarea>
 	</td>
 </tr>
 

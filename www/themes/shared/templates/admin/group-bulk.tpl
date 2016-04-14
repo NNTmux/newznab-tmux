@@ -29,7 +29,7 @@
 <tr>
 	<td width="90">Group List:</td>
 	<td>
-		<textarea  class="autosize" id="groupfilter" name="groupfilter"></textarea>
+		<textarea id="groupfilter" name="groupfilter"></textarea>
 		<div class="hint">A regular expression to match against group names e.g. alt.binaries.cd.image.linux|alt.binaries.warez.linux</div>
 	</td>
 </tr>

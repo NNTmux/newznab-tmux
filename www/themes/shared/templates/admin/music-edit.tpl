@@ -77,7 +77,7 @@
 <tr>
 	<td><label for="tracks">Tracks</label>:</td>
 	<td>
-		<textarea class="autosize" id="tracks" name="tracks">{$music.tracks|escape:'htmlall'}</textarea>
+		<textarea id="tracks" name="tracks">{$music.tracks|escape:'htmlall'}</textarea>
 		<div class="hint">Tracks separated by | (pipe) delimeter</div>
 	</td>
 </tr>

@@ -34,7 +34,7 @@
 <tr>
 	<td><label for="plot">Plot</label>:</td>
 	<td>
-		<textarea class="autosize" id="plot" name="plot">{$movie.plot|escape:'htmlall'}</textarea>
+		<textarea id="plot" name="plot">{$movie.plot|escape:'htmlall'}</textarea>
 	</td>
 </tr>
 
@@ -69,7 +69,7 @@
 <tr>
 	<td><label for="actors">Actors</label>:</td>
 	<td>
-		<textarea class="autosize" id="actors" name="actors">{$movie.actors|escape:'htmlall'}</textarea>
+		<textarea id="actors" name="actors">{$movie.actors|escape:'htmlall'}</textarea>
 	</td>
 </tr>
 
