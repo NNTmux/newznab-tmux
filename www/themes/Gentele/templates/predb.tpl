@@ -173,7 +173,7 @@
 													   href="{$smarty.const.WWW_TOP}/browse?t={$catClass::XXX_XVID}">XXX
 														SD</a>
 												{/if}
-													{* x264 *}
+												{* x264 *}
 												{if in_array($result.category, array('XXX: HD-CLIPS', 'XXX: MOVIES-HD'))}
 													<a class="title" title="View category XXX x264"
 													   href="{$smarty.const.WWW_TOP}/browse?t={$catClass::XXX_X264}">XXX
@@ -191,7 +191,7 @@
 													   href="{$smarty.const.WWW_TOP}/browse?t={$catClass::XXX_IMAGESET}">XXX
 														Imagesets</a>
 												{/if}
-													{* Books *}
+												{* Books *}
 												{if in_array($result.category, array('EBOOK'))}
 													<a class="title" title="View category Books"
 													   href="{$smarty.const.WWW_TOP}/browse?t={$catClass::BOOKS_ROOT}">Ebooks</a>

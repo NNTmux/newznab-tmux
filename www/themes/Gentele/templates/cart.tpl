@@ -45,7 +45,8 @@
 							{foreach $results as $result}
 								<tr class="{cycle values=",alt"}">
 									<td class="a-center ">
-										<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="flat" value="{$result.id}"/>
+										<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="flat"
+											   value="{$result.id}"/>
 									</td>
 									<td>
 										<a title="View details"

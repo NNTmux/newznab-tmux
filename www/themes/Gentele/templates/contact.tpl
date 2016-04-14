@@ -18,14 +18,14 @@
 	</div>
 	<div class="box-body">
 		<div class="box-content"
-			<div class="row">
-				<div class="col-md-12">
-					<div class="box-content">
-						<div class="row">
-							<div class="col-xlg-12 portlets">
-								<div class="panel panel-default">
-									<div class="panel-body pagination2">
-										<div class="box-body">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="box-content">
+					<div class="row">
+						<div class="col-xlg-12 portlets">
+							<div class="panel panel-default">
+								<div class="panel-body pagination2">
+									<div class="box-body">
 										<div class="row">
 											<div class="col-sm-8">
 												{$msg}
@@ -66,11 +66,11 @@
 							</div>
 						</div>
 						{/if}
-							</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
 </body>
 </html>

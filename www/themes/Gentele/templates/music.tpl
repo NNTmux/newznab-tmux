@@ -24,19 +24,21 @@
 								<div class="btn-group">
 									<button type="button"
 											class="nzb_multi_operations_download btn btn-sm btn-success"
-											data-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
+											data-toggle="tooltip" data-placement="top" title
+											data-original-title="Download NZBs">
 										<i class="fa fa-cloud-download"></i></button>
 									<button type="button"
 											class="nzb_multi_operations_cart btn btn-sm btn-info"
-											data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket">
+											data-toggle="tooltip" data-placement="top" title
+											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
 												class="nzb_multi_operations_sab btn btn-sm btn-primary"
-												data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
+												data-toggle="tooltip" data-placement="top" title
+												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
-
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"
@@ -79,7 +81,9 @@
 												   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
 													<img src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover == 1}{$result.musicinfoid}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 														 width="140" border="0"
-														 alt="{$result.artist|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
+														 alt="{$result.artist|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
+													<i class="fa fa-exclamation-circle" style="color: red"
+													   title="This release has failed to download for some users"></i>{/if}
 												</a>
 												{if $result.url != ""}<a class="label label-primary"
 																		 target="_blank"
@@ -95,8 +99,13 @@
 												   href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name}"
 												   title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Group</a>
 												{if !empty($mfailed[$m@index])}
-													<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-														<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>												{/if}
+													<span class="btn btn-default btn-xs"
+														  title="This release has failed to download for some users">
+														<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
+														Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
+																class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}
+														Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
+												{/if}
 											</div>
 											<div class="col-md-10 small-gutter-left">
 												<h4><a title="View details"
@@ -137,7 +146,9 @@
 																<br/>
 															{/if}
 															<div>
-																<a role="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title data-original-title="Download NZB"
+																<a role="button" class="btn btn-default btn-xs"
+																   data-toggle="tooltip" data-placement="top" title
+																   data-original-title="Download NZB"
 																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
 																			class="fa fa-cloud-download"></i><span
 																			class="badge"> {$mgrabs[$m@index]}
@@ -147,16 +158,25 @@
 																			class="fa fa-comment-o"></i><span
 																			class="badge"> {$mcomments[$m@index]}
 																		Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Send to my download basket"><i
+																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+																			  data-toggle="tooltip" data-placement="top"
+																			  title
+																			  data-original-title="Send to my download basket"><i
 																					class="fa fa-shopping-basket"></i></span>
 																{if isset($sabintegrated) && $sabintegrated !=""}
 																	<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																		  data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Queue"><i
+																		  data-toggle="tooltip" data-placement="top"
+																		  title
+																		  data-original-title="Send to my Queue"><i
 																				class="fa fa-share"></i></span>
 																{/if}
 																{if !empty($mfailed[$m@index])}
-																	<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-																		<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
+																	<span class="btn btn-default btn-xs"
+																		  title="This release has failed to download for some users">
+																		<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
+																		Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
+																				class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}
+																		Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
 																{/if}
 															</div>
 														</td>
@@ -179,19 +199,21 @@
 								<div class="btn-group">
 									<button type="button"
 											class="nzb_multi_operations_download btn btn-sm btn-success"
-											data-toggle="tooltip" data-placement="top" title data-original-title="Download NZBs">
+											data-toggle="tooltip" data-placement="top" title
+											data-original-title="Download NZBs">
 										<i class="fa fa-cloud-download"></i></button>
 									<button type="button"
 											class="nzb_multi_operations_cart btn btn-sm btn-info"
-											data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket">
+											data-toggle="tooltip" data-placement="top" title
+											data-original-title="Send to my Download Basket">
 										<i class="fa fa-shopping-basket"></i></button>
 
 									{if isset($sabintegrated) && $sabintegrated !=""}
 										<button type="button"
 												class="nzb_multi_operations_sab btn btn-sm btn-primary"
-												data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
+												data-toggle="tooltip" data-placement="top" title
+												data-original-title="Send to Queue">
 											<i class="fa fa-share"></i></button>
-
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"

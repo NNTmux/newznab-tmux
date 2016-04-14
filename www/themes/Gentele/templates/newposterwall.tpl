@@ -37,7 +37,7 @@
 								{elseif $type == 'TV'}
 									class="library-games"
 								{/if}
-								>
+						>
 							<div class="poster">
 								<a class="titleinfo" title="{$result.guid}"
 								   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">
@@ -70,13 +70,17 @@
 							</div>
 							<div class="rating-pod" id="guid{$result.guid}">
 								<div class="icons divlink col-lg-4">
-									<span class="btn btn-hover btn-default btn-sm icon_nzb text-muted"><a title="Download Nzb"
-																										  href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}">
+									<span class="btn btn-hover btn-default btn-sm icon_nzb text-muted"><a
+												title="Download Nzb"
+												href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}">
 											<i class="fa fa-cloud-download"></i></a>
 									</span>
-									<span class="btn btn-hover btn-default btn-sm icon_cart text-muted" title="Send to my Download Basket"><i class="fa fa-shopping-basket"></i></span>
+									<span class="btn btn-hover btn-default btn-sm icon_cart text-muted"
+										  title="Send to my Download Basket"><i
+												class="fa fa-shopping-basket"></i></span>
 									{if isset($sabintegrated) && $sabintegrated !=""}
-										<span class="btn btn-hover btn-default btn-sm icon_sab text-muted" title="Send to my Queue"><i class="fa fa-share"></i></span>
+										<span class="btn btn-hover btn-default btn-sm icon_sab text-muted"
+											  title="Send to my Queue"><i class="fa fa-share"></i></span>
 									{/if}
 								</div>
 							</div>

@@ -108,16 +108,22 @@
 													class="fa fa-envelope-o"></i><span> Contact</span> <span
 													class="fa arrow"></span></a></li>
 									{if $loggedin == "true"}
-									<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="fa fa-forumbee"></i> Forum</a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a></li>
+										<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="fa fa-forumbee"></i> Forum</a>
+										</li>
+										<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a>
+										</li>
+										<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS
+												Feeds</a></li>
+										<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i>
+												API</a></li>
 									{/if}
 								</ul>
-							{if $loggedin == "true"}
-							<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock"></i><span> Sign Out</span></a></li>
+								{if $loggedin == "true"}
+							<li><a href="{$smarty.const.WWW_TOP}/logout"><i
+											class="fa fa-unlock"></i><span> Sign Out</span></a></li>
 							{else}
-							<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Sign In</span></a></li>
+							<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Sign In</span></a>
+							</li>
 							{/if}
 						</ul>
 					</div>
@@ -135,7 +141,8 @@
 					{$header_menu}
 					<ul class="nav navbar-nav">
 						<li class="">
-							<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" data-delay="30" aria-expanded="false">
+							<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
+							   data-hover="dropdown" data-close-others="true" data-delay="30" aria-expanded="false">
 								{if $loggedin == "true"}
 								<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png"
 									 alt="User Image"> {$userdata.username}
@@ -171,7 +178,8 @@
 												class="fa fa-unlock-alt"></i> Sign out</a>
 								</li>
 								{else}
-								<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/login"><i
+												class="fa fa-lock"></i><span> Login</span></a></li>
 								<li><a href="{$smarty.const.WWW_TOP}/register"><i class="fa fa-bookmark-o"></i><span> Register</span></a>
 								</li>
 								{/if}
@@ -210,11 +218,15 @@
 
 </div>
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
-<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js"
+		type="text/javascript"></script>
 <!-- bootstrap progress js -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/nicescroll/jquery.nicescroll.min.js"></script>
+<script type="text/javascript"
+		src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+<script type="text/javascript"
+		src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
+<script type="text/javascript"
+		src="{$smarty.const.WWW_THEMES}/{$theme}/js/nicescroll/jquery.nicescroll.min.js"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/custom.js"></script>
@@ -232,7 +244,8 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.animate.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.desktop.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.callbacks.js"></script>
+<script type="text/javascript"
+		src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.callbacks.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.buttons.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.confirm.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.nonblock.js"></script>

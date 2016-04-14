@@ -24,24 +24,25 @@
 	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 	<div class="well well-small">
 		<div class="tvseriesheading">
-		<h1>
-			<div style="text-align: center;">{$seriestitles} ({$show.publisher})</div>
-		</h1>
-		{if $show.image != 0}
-			<div style="text-align: center;">
-				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$seriestitles} Logo"
-					 src="{$smarty.const.WWW_TOP}/covers/tvshows/{$show.id}.jpg"/>
-			</div>
-			<br/>
-		{/if}
-		<p>
-			<span class="descinitial">{$seriessummary|escape:"htmlall"|nl2br|magicurl}</span>
-		</p>
+			<h1>
+				<div style="text-align: center;">{$seriestitles} ({$show.publisher})</div>
+			</h1>
+			{if $show.image != 0}
+				<div style="text-align: center;">
+					<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$seriestitles} Logo"
+						 src="{$smarty.const.WWW_TOP}/covers/tvshows/{$show.id}.jpg"/>
+				</div>
+				<br/>
+			{/if}
+			<p>
+				<span class="descinitial">{$seriessummary|escape:"htmlall"|nl2br|magicurl}</span>
+			</p>
 		</div>
 	</div>
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default"
-		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS for TV Show <i class="fa fa-rss"></i></a>
+		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
+			for TV Show <i class="fa fa-rss"></i></a>
 		{if $show.tvdb > 0}
 			<a class="btn btn-sm btn-info" target="_blank"
 			   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
@@ -81,7 +82,8 @@
 						<i class="fa fa-cloud-download"></i></button>
 					<button type="button"
 							class="nzb_multi_operations_cart btn btn-sm btn-info"
-							data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket">
+							data-toggle="tooltip" data-placement="top" title
+							data-original-title="Send to my Download Basket">
 						<i class="fa fa-shopping-basket"></i></button>
 
 					{if isset($sabintegrated) && $sabintegrated !=""}
@@ -89,7 +91,6 @@
 								class="nzb_multi_operations_sab btn btn-sm btn-primary"
 								data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue">
 							<i class="fa fa-share"></i></button>
-
 					{/if}
 					{if isset($isadmin)}
 						<input type="button"
@@ -100,137 +101,150 @@
 							   value="Delete"/>
 					{/if}
 				</div>
-			<div>
-				<a title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">My Shows</a> :
-				<div class="btn-group">
-					{if $myshows.id != ''}
-						<a class="myshows btn btn-sm btn-warning" data-toggle="tooltip" data-placement="top" title data-original-title="Edit Categories for this show"
-						   href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-						   rel="edit" name="series{$show.id}">
-							<i class="fa fa-pencil"></i>
-						</a>
-						<a class="myshows btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title data-original-title="Remove from My Shows"
-						   href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-						   rel="remove" name="series{$show.id}">
-							<i class="fa fa-minus"></i>
-						</a>
-					{else}
-						<a class="myshows btn btn-sm btn-success" data-toggle="tooltip" data-placement="top" title data-original-title="Add to My Shows"
-						   href="{$smarty.const.WWW_TOP}/myshows/add/{$show.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-						   rel="add" name="series{$show.id}">
-							<i class="fa fa-plus"></i>
-						</a>
-					{/if}
+				<div>
+					<a title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">My Shows</a> :
+					<div class="btn-group">
+						{if $myshows.id != ''}
+							<a class="myshows btn btn-sm btn-warning" data-toggle="tooltip" data-placement="top" title
+							   data-original-title="Edit Categories for this show"
+							   href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+							   rel="edit" name="series{$show.id}">
+								<i class="fa fa-pencil"></i>
+							</a>
+							<a class="myshows btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title
+							   data-original-title="Remove from My Shows"
+							   href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+							   rel="remove" name="series{$show.id}">
+								<i class="fa fa-minus"></i>
+							</a>
+						{else}
+							<a class="myshows btn btn-sm btn-success" data-toggle="tooltip" data-placement="top" title
+							   data-original-title="Add to My Shows"
+							   href="{$smarty.const.WWW_TOP}/myshows/add/{$show.id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+							   rel="add" name="series{$show.id}">
+								<i class="fa fa-plus"></i>
+							</a>
+						{/if}
+					</div>
 				</div>
 			</div>
-		</div>
-		<br clear="all"/>
-		<a id="latest"></a>
+			<br clear="all"/>
+			<a id="latest"></a>
 
-		<div class="row">
-			<div class="col-xlg-12 portlets">
-				<div class="panel panel-default">
-					<div class="panel-body pagination2">
-						<div class="tabbable">
-							<ul class="nav nav-tabs">
-								{foreach $seasons as $seasonnum => $season name = "seas"}
-									<li {if $smarty.foreach.seas.first}class="active"{/if}><a
-												title="View Season {$seasonnum}" href="#{$seasonnum}"
-												data-toggle="tab">{$seasonnum}</a></li>
-								{/foreach}
-							</ul>
-							<div class="tab-content">
-								{foreach $seasons as $seasonnum => $season name = "tv"}
-									{if empty($seasonnum)}{$seasonnum = 'Packs'}{/if}
-									<div class="tab-pane{if $smarty.foreach.tv.first} active{/if} fade in"
-										 id="{$seasonnum}">
-										<table class="tb_{$seasonnum} data table table-striped responsive-utilities jambo-table"
-											   id="browsetable">
-											<thead>
-											<tr>
-												<th>Ep</th>
-												<th>Name</th>
-												<th>Select</th>
-												<th>Category</th>
-												<th>Posted</th>
-												<th>Size</th>
-												<th>Action</th>
-											</tr>
-											</thead>
-											{foreach $season as $episodes}
-												{foreach $episodes as $result}
-													<tr class="{cycle values=",alt"}"
-														id="guid{$result.guid}">
-														{if $result@total>1 && $result@index == 0}
-															<td rowspan="{$result@total}" width="30">
-																<h4>{$episodes@key}</h4></td>
-														{elseif $result@total == 1}
-															<td><h4>{$episodes@key}</h4></td>
-														{/if}
-														<td>
-															<a title="View details"
-															   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+			<div class="row">
+				<div class="col-xlg-12 portlets">
+					<div class="panel panel-default">
+						<div class="panel-body pagination2">
+							<div class="tabbable">
+								<ul class="nav nav-tabs">
+									{foreach $seasons as $seasonnum => $season name = "seas"}
+										<li {if $smarty.foreach.seas.first}class="active"{/if}><a
+													title="View Season {$seasonnum}" href="#{$seasonnum}"
+													data-toggle="tab">{$seasonnum}</a></li>
+									{/foreach}
+								</ul>
+								<div class="tab-content">
+									{foreach $seasons as $seasonnum => $season name = "tv"}
+										{if empty($seasonnum)}{$seasonnum = 'Packs'}{/if}
+										<div class="tab-pane{if $smarty.foreach.tv.first} active{/if} fade in"
+											 id="{$seasonnum}">
+											<table class="tb_{$seasonnum} data table table-striped responsive-utilities jambo-table"
+												   id="browsetable">
+												<thead>
+												<tr>
+													<th>Ep</th>
+													<th>Name</th>
+													<th>Select</th>
+													<th>Category</th>
+													<th>Posted</th>
+													<th>Size</th>
+													<th>Action</th>
+												</tr>
+												</thead>
+												{foreach $season as $episodes}
+													{foreach $episodes as $result}
+														<tr class="{cycle values=",alt"}"
+															id="guid{$result.guid}">
+															{if $result@total>1 && $result@index == 0}
+																<td rowspan="{$result@total}" width="30">
+																	<h4>{$episodes@key}</h4></td>
+															{elseif $result@total == 1}
+																<td><h4>{$episodes@key}</h4></td>
+															{/if}
+															<td>
+																<a title="View details"
+																   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
 
-															<div>
-																{if $result.nfoid > 0}<span>
-																	<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
-																	   class="modal_nfo label label-primary text-muted">NFO</a>
-																	</span>{/if}
-																{if $result.image == 1 && $userdata.canpreview == 1}
-																<a
-																		href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
-																		name="name{$result.guid}"
-																		title="View Screenshot"
-																		class="modal_prev label label-primary"
-																		rel="preview">Preview</a>{/if}
-																<span class="label label-primary">{$result.grabs}
-																	Grab{if $result.grabs != 1}s{/if}</span>
-																{if $result.firstaired != ""}<span
-																	class="label label-success"
-																	title="{$result.title} Aired on {$result.firstaired|date_format}">
-																	Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
-																{if $result.reid > 0}<span
-																	class="mediainfo label label-primary"
-																	title="{$result.guid}">Media</span>{/if}
-															</div>
-														</td>
-														<td class="check" width="10"><input
-																	id="chk{$result.guid|substr:0:7}"
-																	type="checkbox"
-																	class="flat" name="table_data{$seasonnum}"
-																	value="{$result.guid}"/></td>
-														<td>
-															<span class="label label-primary">{$result.category_name}</span>
-														</td>
-														<td width="40"
-															title="{$result.postdate}">{$result.postdate|timeago}</td>
-														<td>
-															{$result.size|fsize_format:"MB"}
-														</td>
-														<td class="icons" style='width:100px;'>
-															<a title="Download NZB" href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
-																		class="icon icon_nzb fa fa-cloud-download text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Download NZB"></i></a>
-															<a href="#" class="icon_cart text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Send to my Download Basket"><i class="fa fa-shopping-basket"></i></a>
-															{if isset($sabintegrated) && $sabintegrated !=""}
-																<a href="#" class="icon icon_sab text-muted" data-toggle="tooltip" data-placement="top" title data-original-title="Send to Queue"><i class="fa fa-share"></i></a
-															{/if}
-															{if isset($isadmin)}
-																<br/>
-																<a class="label label-warning"
-																   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
-																   title="Edit Release">Edit</a>
-																<a class="label label-danger"
-																   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
-																   title="Delete Release">Delete</a>
-															{/if}
-														</td>
-													</tr>
+																<div>
+																	{if $result.nfoid > 0}<span>
+																		<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+																		   class="modal_nfo label label-primary text-muted">NFO</a>
+																		</span>{/if}
+																	{if $result.image == 1 && $userdata.canpreview == 1}
+																	<a
+																			href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
+																			name="name{$result.guid}"
+																			title="View Screenshot"
+																			class="modal_prev label label-primary"
+																			rel="preview">Preview</a>{/if}
+																	<span class="label label-primary">{$result.grabs}
+																		Grab{if $result.grabs != 1}s{/if}</span>
+																	{if $result.firstaired != ""}<span
+																		class="label label-success"
+																		title="{$result.title} Aired on {$result.firstaired|date_format}">
+																		Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
+																	{if $result.reid > 0}<span
+																		class="mediainfo label label-primary"
+																		title="{$result.guid}">Media</span>{/if}
+																</div>
+															</td>
+															<td class="check" width="10"><input
+																		id="chk{$result.guid|substr:0:7}"
+																		type="checkbox"
+																		class="flat" name="table_data{$seasonnum}"
+																		value="{$result.guid}"/></td>
+															<td>
+																<span class="label label-primary">{$result.category_name}</span>
+															</td>
+															<td width="40"
+																title="{$result.postdate}">{$result.postdate|timeago}</td>
+															<td>
+																{$result.size|fsize_format:"MB"}
+															</td>
+															<td class="icons" style='width:100px;'>
+																<a title="Download NZB"
+																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
+																			class="icon icon_nzb fa fa-cloud-download text-muted"
+																			data-toggle="tooltip" data-placement="top"
+																			title
+																			data-original-title="Download NZB"></i></a>
+																<a href="#" class="icon_cart text-muted"
+																   data-toggle="tooltip" data-placement="top" title
+																   data-original-title="Send to my Download Basket"><i
+																			class="fa fa-shopping-basket"></i></a>
+																{if isset($sabintegrated) && $sabintegrated !=""}
+																	<a href="#" class="icon icon_sab text-muted"
+																	   data-toggle="tooltip" data-placement="top" title
+																	   data-original-title="Send to Queue"><i
+																				class="fa fa-share"></i></a
+																{/if}
+																{if isset($isadmin)}
+																	<br/>
+																	<a class="label label-warning"
+																	   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+																	   title="Edit Release">Edit</a>
+																	<a class="label label-danger"
+																	   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+																	   title="Delete Release">Delete</a>
+																{/if}
+															</td>
+														</tr>
+													{/foreach}
 												{/foreach}
-											{/foreach}
-										</table>
-									</div>
-								{/foreach}
+											</table>
+										</div>
+									{/foreach}
+								</div>
 							</div>
-						</div>
 	</form>
 {/if}
