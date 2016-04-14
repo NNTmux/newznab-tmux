@@ -4,36 +4,36 @@
 		<ul class="nav side-menu">
 			<li><a title="Home" href="{$smarty.const.WWW_TOP}/..{$site->home_link}">Home</a></li>
 			<li><a title="Admin Home" href="{$smarty.const.WWW_TOP}/">Admin Home</a></li>
-			<li><a><i class="fa fa-list"></i><span> Edit Site</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-sitemap"></i><span> Edit Site</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/site-edit.php">Edit Site</a></li>
 				</ul>
 			</li>
-			<li><a><i class="fa fa-list"></i><span> Content</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-plus-square-o"></i><span> Content</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/content-add.php?action=add">Add Content</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/content-list.php">Edit Content</a></li>
 				</ul>
 			</li>
-			<li><a><i class="fa fa-list"></i><span> Menu</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-chevron-circle-down"></i><span> Menu</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/menu-list.php">View Menu Items</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/menu-edit.php?action=add">Add Menu Items</a></li>
 				</ul>
 			</li>
-			<li><a><i class="fa fa-list"></i><span> Categories</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-tint"></i><span> Categories</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/category-list.php?action=add">Edit categories</a></li>
 				</ul>
 			</li>
-			<li><a><i class="fa fa-list"></i><span> Groups</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-object-group"></i><span> Groups</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/group-list.php">View Groups</a>
 					<li><a href="{$smarty.const.WWW_TOP}/group-edit.php">Add Groups</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/group-bulk.php">BulkAdd Groups</a></li>
 				</ul>
 			</li>
-			<li><a><i class="fa fa-list"></i><span> Regexes</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-registered"></i><span> Regexes</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/category_regexes-edit.php?action=add">Add Category Regex</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/category_regexes-list.php">View category Regexes</a></li>
@@ -45,13 +45,13 @@
 					<li><a href="{$smarty.const.WWW_TOP}/release_naming_regexes-list.php">View Release Naming Regexes</a></li>
 				</ul>
 			</li>
-			<li><a><i class="fa fa-list"></i><span> Blacklist</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-stop"></i><span> Blacklist</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/binaryblacklist-list.php">View Blacklist</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/binaryblacklist-edit.php?action=add">Add Blacklist</a></li>
 					</ul>
 			</li>
-			<li><a><i class="fa fa-list"></i><span> Releases</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-recycle"></i><span> Releases</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/release-list.php">View Releases</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/failrel-list.php">View Failed Releases</a></li>
@@ -66,21 +66,21 @@
 					<li><a href="{$smarty.const.WWW_TOP}/book-list.php">View Book List</a></li>
 					</ul>
 			</li>
-			<li><a><i class="fa fa-list"></i><span> NZB</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-download"></i><span> NZB</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/nzb-import.php">Import NZBs</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/nzb-export.php">Export NZBs</a></li>
 					</ul>
 			</li>
 
-			<li><a><i class="fa fa-list"></i><span> Stats & Logs</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-hourglass-start"></i><span> Stats & Logs</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/opcachestats.php">Opcache Statistics</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/site-stats.php">Site Stats</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/view-logs.php">View Logs</a></li>
 				</ul>
 			</li>
-			<li><a><i class="fa fa-list"></i><span> Comments & Sharing</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-comments"></i><span> Comments & Sharing</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/comments-list.php">View Comments</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/spotnab-list.php">View Spotnab Sources</a></li>
@@ -88,7 +88,7 @@
 					<li><a href="{$smarty.const.WWW_TOP}/sharing.php">Comment Sharing Settings</a></li>
 				</ul>
 			</li>
-			<li><a><i class="fa fa-list"></i><span> Users & Roles</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-users"></i><span> Users & Roles</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/user-list.php">View Users</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/user-edit.php?action=add">Add Users</a></li>
@@ -96,7 +96,7 @@
 					<li><a href="{$smarty.const.WWW_TOP}/role-edit.php?action=add">Add User Roles</a></li>
 				</ul>
 			</li>
-			<li><a><i class="fa fa-list"></i><span> Tmux</span><span class="fa fa-chevron-down"></span></a>
+			<li><a><i class="fa fa-linux"></i><span> Tmux</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/tmux-edit.php">Tmux Settings</a></li>
 				</ul>

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ea4f56527576df49296db3694cdfc884",
-    "content-hash": "76a3242f92fc738dcf21f5b10863c19c",
+    "hash": "ea0b1c8350883f4e67a02b336e677a54",
+    "content-hash": "ad2ea002c356bbd84718a8c51b15b53e",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -69,6 +69,35 @@
                     "*.md"
                 ]
             }
+        },
+        {
+            "name": "bower-asset/autosize",
+            "version": "3.0.15",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jackmoore/autosize.git",
+                "reference": "1e94f8aa0e6dfa7b52217bd4527e1dfdf38ed364"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/1e94f8aa0e6dfa7b52217bd4527e1dfdf38ed364",
+                "reference": "1e94f8aa0e6dfa7b52217bd4527e1dfdf38ed364",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "dist/autosize.js",
+                "bower-asset-ignore": []
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Autosize is a small, stand-alone script to automatically adjust textarea height to fit text.",
+            "keywords": [
+                "form",
+                "textarea",
+                "ui"
+            ]
         },
         {
             "name": "bower-asset/bootstrap",
@@ -402,16 +431,16 @@
         },
         {
             "name": "composer/installers",
-            "version": "v1.0.24",
+            "version": "v1.0.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "1cf7cc4b89d5e8549bbb7d6ab1de75da13d27988"
+                "reference": "36e5b5843203d7f1cf6ffb0305a97e014387bd8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/1cf7cc4b89d5e8549bbb7d6ab1de75da13d27988",
-                "reference": "1cf7cc4b89d5e8549bbb7d6ab1de75da13d27988",
+                "url": "https://api.github.com/repos/composer/installers/zipball/36e5b5843203d7f1cf6ffb0305a97e014387bd8e",
+                "reference": "36e5b5843203d7f1cf6ffb0305a97e014387bd8e",
                 "shasum": ""
             },
             "require": {
@@ -498,7 +527,7 @@
                 "zend",
                 "zikula"
             ],
-            "time": "2016-04-05 11:42:46"
+            "time": "2016-04-13 19:46:30"
         },
         {
             "name": "exeu/apai-io",
