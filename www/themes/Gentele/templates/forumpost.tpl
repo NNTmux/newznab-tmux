@@ -1,4 +1,4 @@
-<div class="wee well-sm">
+<div class="well well-sm">
 <h1><a href="{$smarty.const.WWW_TOP}/forum">Forum</a></h1>
 {if $results|@count > 0}
 	<h2>{$results[0].subject|escape:"htmlall"}</h2>
