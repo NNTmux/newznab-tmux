@@ -1,4 +1,6 @@
 2016-04-13 DariusIII
+	* Fix: Fix PHP Fatal error on getid3
+2016-04-13 DariusIII
 	* Upd: Composer with fixed font awesome icons and proper litium/li3_quality
 2016-04-12 DariusIII
 	* Upd: Update admin template part 2.
