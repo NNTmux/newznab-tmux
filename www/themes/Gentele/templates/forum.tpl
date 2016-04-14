@@ -4,7 +4,7 @@
 	{$pager}
 	<div style="float:right;margin-bottom:5px;"><a href="#new">New Post</a></div>
 	<a id="top"></a>
-	<table style="width:100%;" class="data highlight" id="forumtable">
+	<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table" id="forumtable">
 		<tr>
 			<th width="60%">Topic</th>
 			<th>Posted By</th>

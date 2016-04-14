@@ -4,7 +4,7 @@
 	<h2>{$results[0].subject|escape:"htmlall"}</h2>
 	<div style="float:right;margin-bottom:5px;"><a href="#reply">Reply</a></div>
 	<a id="top"></a>
-	<table style="width:100%;" class="data highlight" id="forumtable">
+	<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table" id="forumtable">
 		<tr>
 			<th>By</th>
 			<th>Message</th>
