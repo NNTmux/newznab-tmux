@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "655dbdc1f2c65ca63b4c746261f77eea",
-    "content-hash": "234ba226c6454fe39df410f9c5a9cb0a",
+    "hash": "62ca571d3b56f1573bf48cc353ac760c",
+    "content-hash": "0042227aec86c63c47ff09db1d3ee4b8",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
