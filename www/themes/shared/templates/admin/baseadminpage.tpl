@@ -110,7 +110,7 @@
 <!-- jQuery migrate script -->
 <script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/jquery.qtip2.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/qtip2/jquery.qtip.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/sorttable.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/utils-admin.js"></script>
 <!-- Custom functions -->
