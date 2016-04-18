@@ -106,7 +106,7 @@ class DB extends \PDO
 			'dbpass' 		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
 			'dbport'		=> defined('DB_PORT') ? DB_PORT : '',
 			'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
-			'dbtype'		=> defined('DB_TYPE') ? DB_TYPE : '',
+			'dbtype'		=> defined('DB_SYSTEM') ? DB_SYSTEM : '',
 			'dbuser' 		=> defined('DB_USER') ? DB_USER : '',
 			'log'			=> new ColorCLI(),
 			'persist'		=> false,

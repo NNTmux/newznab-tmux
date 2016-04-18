@@ -1,4 +1,8 @@
 2016-04-18 DariusIII
+	* Upd: Update git, versions, updater for complete update of newznab-tmux
+		NOTE: You need to run ./nntmux update nntmux to completely update nntmux.
+		      Please remove the post-merge git hook, as it will interfere with
+		      new updater.
 	* Upd: Update themes to use new files
 	* Upd: Update composer
 2016-04-15 DariusIII

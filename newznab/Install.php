@@ -6,7 +6,7 @@ namespace newznab;
  */
 class Install
 {
-	public $DB_TYPE;
+	public $DB_SYSTEM;
 	public $DB_HOST = "localhost";
 	public $DB_USER;
 	public $DB_PORT = 3306;
