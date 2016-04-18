@@ -1,4 +1,4 @@
-[![Code Climate](https://codeclimate.com/github/DariusIII/newznab-tmux/badges/gpa.svg)](https://codeclimate.com/github/DariusIII/newznab-tmux)  [![Build Status](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/badges/build.png?b=dev-regexless)](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/build-status/dev-regexless) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/badges/quality-score.png?b=dev-regexless)](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/?branch=dev-regexless)
+[![Code Climate](https://codeclimate.com/github/DariusIII/newznab-tmux/badges/gpa.svg)](https://codeclimate.com/github/DariusIII/newznab-tmux)  [![Build Status](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/badges/build.png?b=dev)](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/build-status/dev) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/badges/quality-score.png?b=dev)](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/?branch=dev)
 
 
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
@@ -14,19 +14,18 @@ I started adapting some of more interesting scripts from nZEDb, but they require
  		git init
  		git remote add origin https://github.com/DariusIII/newznab-tmux.git
  		git fetch
- 		git reset --hard origin/your_wanted_branch, ie. git reset --hard origin/master
- 		git checkout -t origin/your_wanted_branch, ie. git checkout -t origin/master
+ 		git reset --hard origin/your_wanted_branch, ie. git reset --hard origin/0.x
+ 		git checkout -t origin/your_wanted_branch, ie. git checkout -t origin/0.x
 
 	Schema for first database update is located in resources/db/schema/ folder. Import it to your database.
 	There is another file in that folder nntmux_fi_schema.sql, use that if you don't have any releases and users on your site, AKA, completely fresh install of newznab+.
 	BE WARNED: If you import this schema it WILL NUKE YOUR DATABASE.
 	If you are updating from latest newznab svn (aka tvmaze version), you need to rename back tvinfoID columns into rageid
 	(located in releases and userseries tables, maybe some more), before you import the schema.sql.
-	After that you update your database by running update_db.php from cli folder (ie. php cli/update_db.php true)
 
 	You need to chmod to 777 following folders now:
 	resources/*
-	libs/smarty/templates_c
+	resources/smarty/templates_c
 	nzbfiles/
 
 	You need to add an alias to your apache/nginx conf of your indexer:
@@ -36,15 +35,10 @@ I started adapting some of more interesting scripts from nZEDb, but they require
 
   Note: Newznab-tmux uses composer to install required libraries. To install composer
   		follow instructons located at: https://getcomposer.org/download/
+  		Use the global method.
   		When you have downloaded and installed composer,
-  		run "php composer.phar install" to install dependencies and create required
-  		folders and autoloader for them.
-  Next: sudo cp composer.phar /usr/local/bin/composer
-        sudo chmod a+x /usr/local/bin/composer
-
-# Git hooks
-
-  Note: run addHooks.sh from build/git-hooks folder to add required git hooks.
+  		run "./nntmux update nntmux" to install dependencies and create required
+  		folders and autoloader for themm, and to update your database.
 
 # yEnc:
 
