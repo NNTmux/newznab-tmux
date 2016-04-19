@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "443f934787bf846bbd72754cc450d10d",
-    "content-hash": "92d731c615f114020ff816d8da4a95fa",
+    "hash": "c2c9ec766db4e1fe4401d7955cb4281e",
+    "content-hash": "47c570fd3ae76742162d0e11d9cf8fae",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -714,6 +714,29 @@
                 ]
             },
             "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)"
+        },
+        {
+            "name": "bower-asset/select2",
+            "version": "4.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/select2/select2.git",
+                "reference": "622a619d25358b86a93c2335f88e1884acc9ccb8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/select2/select2/zipball/622a619d25358b86a93c2335f88e1884acc9ccb8",
+                "reference": "622a619d25358b86a93c2335f88e1884acc9ccb8",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "dist/js/select2.js",
+                    "src/scss/core.scss"
+                ]
+            },
+            "description": "Select2 is a jQuery based replacement for select boxes. It supports searching, remote data sets, and infinite scrolling of results."
         },
         {
             "name": "composer/installers",

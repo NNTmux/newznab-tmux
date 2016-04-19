@@ -82,6 +82,7 @@
     "bower-asset/pnotify": "~3.0",
     "bower-asset/qtip2": "~2.2.1",
     "bower-asset/respond": "~1.4.2",
+    "bower-asset/select2": "~4.0.2",
     "unionofrad/lithium": "^1.1-dev"
   },
 
