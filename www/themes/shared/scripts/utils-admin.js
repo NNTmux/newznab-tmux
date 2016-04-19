@@ -10,7 +10,7 @@ function ajax_group_status(id, what)
     if (what != undefined)
     {
         $.ajax({
-          url       : WWW_TOP + '/admin/ajax_group-edit.php?rand=' + $.now(),
+          url       : WWW_TOP + '/ajax_group-edit.php?rand=' + $.now(),
           data      : { group_id: id, group_status: what },
           dataType  : "html",
           success   : function(data)
@@ -51,7 +51,7 @@ function ajax_sharing_site_status(id, status)
     if (status != undefined)
     {
         $.ajax({
-            url       : WWW_TOP + '/admin/ajax_sharing_settings.php?rand=' + rand_no,
+            url       : WWW_TOP + '/ajax_sharing_settings.php?rand=' + rand_no,
             data      : { site_id: id, site_status: status },
             dataType  : "html",
             success   : function(data)
@@ -92,7 +92,7 @@ function ajax_sharing_enabled(id, status)
     if (status != undefined)
     {
         $.ajax({
-            url       : WWW_TOP + '/admin/ajax_sharing_settings.php?rand=' + rand_no,
+            url       : WWW_TOP + '/ajax_sharing_settings.php?rand=' + rand_no,
             data      : { enabled_status: status },
             dataType  : "html",
             success   : function(data)
@@ -133,7 +133,7 @@ function ajax_sharing_startposition(id, status)
     if (status != undefined)
     {
         $.ajax({
-            url       : WWW_TOP + '/admin/ajax_sharing_settings.php?rand=' + rand_no,
+            url       : WWW_TOP + '/ajax_sharing_settings.php?rand=' + rand_no,
             data      : { start_position: status },
             dataType  : "html",
             success   : function(data)
@@ -170,7 +170,7 @@ function ajax_sharing_reset(id)
 {
     var rand_no = Math.random();
     $.ajax({
-        url       : WWW_TOP + '/admin/ajax_sharing_settings.php?rand=' + rand_no,
+        url       : WWW_TOP + '/ajax_sharing_settings.php?rand=' + rand_no,
         data      : { reset_settings: id },
         dataType  : "html",
         success   : function(data)
@@ -195,7 +195,7 @@ function ajax_sharing_site_purge(id)
 {
     var rand_no = Math.random();
     $.ajax({
-        url       : WWW_TOP + '/admin/ajax_sharing_settings.php?rand=' + rand_no,
+        url       : WWW_TOP + '/ajax_sharing_settings.php?rand=' + rand_no,
         data      : { purge_site: id },
         dataType  : "html",
         success   : function(data)
@@ -224,7 +224,7 @@ function ajax_sharing_posting(id, status)
     if (status != undefined)
     {
         $.ajax({
-            url       : WWW_TOP + '/admin/ajax_sharing_settings.php?rand=' + rand_no,
+            url       : WWW_TOP + '/ajax_sharing_settings.php?rand=' + rand_no,
             data      : { posting_status: status },
             dataType  : "html",
             success   : function(data)
@@ -265,7 +265,7 @@ function ajax_sharing_fetching(id, status)
     if (status != undefined)
     {
         $.ajax({
-            url       : WWW_TOP + '/admin/ajax_sharing_settings.php?rand=' + rand_no,
+            url       : WWW_TOP + '/ajax_sharing_settings.php?rand=' + rand_no,
             data      : { fetching_status: status },
             dataType  : "html",
             success   : function(data)
@@ -306,7 +306,7 @@ function ajax_sharing_auto(id, status)
     if (status != undefined)
     {
         $.ajax({
-            url       : WWW_TOP + '/admin/ajax_sharing_settings.php?rand=' + rand_no,
+            url       : WWW_TOP + '/ajax_sharing_settings.php?rand=' + rand_no,
             data      : { auto_status: status },
             dataType  : "html",
             success   : function(data)
@@ -347,7 +347,7 @@ function ajax_sharing_hide(id, status)
     if (status != undefined)
     {
         $.ajax({
-            url       : WWW_TOP + '/admin/ajax_sharing_settings.php?rand=' + rand_no,
+            url       : WWW_TOP + '/ajax_sharing_settings.php?rand=' + rand_no,
             data      : { hide_status: status },
             dataType  : "html",
             success   : function(data)
@@ -387,7 +387,7 @@ function ajax_sharing_toggle_all(status)
     if (status != undefined)
     {
         $.ajax({
-            url       : WWW_TOP + '/admin/ajax_sharing_settings.php?rand=' + rand_no,
+            url       : WWW_TOP + '/ajax_sharing_settings.php?rand=' + rand_no,
             data      : { toggle_all: status },
             dataType  : "html"
         });
@@ -410,7 +410,7 @@ function ajax_backfill_status(id, what)
     if (what != undefined)
     {
         $.ajax({
-            url       : WWW_TOP + '/admin/ajax_group-edit.php?rand=' + rand_no,
+            url       : WWW_TOP + '/ajax_group-edit.php?rand=' + rand_no,
             data      : { group_id: id, backfill_status: what },
             dataType  : "html",
             success   : function(data)
@@ -447,7 +447,7 @@ function ajax_group_delete(id)
 {
     // no caching of results
 	$.ajax({
-	  url       : WWW_TOP + '/admin/ajax_group-edit.php?action=2&rand=' + $.now(),
+	  url       : WWW_TOP + '/ajax_group-edit.php?action=2&rand=' + $.now(),
 	  data      : { group_id: id},
 	  dataType  : "html",
 	  success   : function(data)
@@ -470,7 +470,7 @@ function ajax_group_reset(id)
 {
     // no caching of results
 	$.ajax({
-	  url       : WWW_TOP + '/admin/ajax_group-edit.php?action=3&rand=' + $.now(),
+	  url       : WWW_TOP + '/ajax_group-edit.php?action=3&rand=' + $.now(),
 	  data      : { group_id: id},
 	  dataType  : "html",
 	  success   : function(data)
@@ -493,7 +493,7 @@ function ajax_group_purge(id)
 {
     // no caching of results
 	$.ajax({
-	  url       : WWW_TOP + '/admin/ajax_group-edit.php?action=4&rand=' + $.now(),
+	  url       : WWW_TOP + '/ajax_group-edit.php?action=4&rand=' + $.now(),
 	  data      : { group_id: id},
 	  dataType  : "html",
 	  success   : function(data)
@@ -517,7 +517,7 @@ function ajax_all_reset()
     // no caching of results
     var rand_no = Math.random();
     $.ajax({
-        url       : WWW_TOP + '/admin/ajax_group-edit.php?action=5&rand=' + rand_no,
+        url       : WWW_TOP + '/ajax_group-edit.php?action=5&rand=' + rand_no,
         data      :  "All groups reset.",
         dataType  : "html",
         success   : function(data)
@@ -539,7 +539,7 @@ function ajax_all_purge()
     // no caching of results
     var rand_no = Math.random();
     $.ajax({
-        url       : WWW_TOP + '/admin/ajax_group-edit.php?action=6&rand=' + rand_no,
+        url       : WWW_TOP + '/ajax_group-edit.php?action=6&rand=' + rand_no,
         data      : "All groups purged",
         dataType  : "html",
         success   : function(data)
@@ -562,7 +562,7 @@ function ajax_releaseregex_delete(id)
 {
     // no caching of results
 	$.ajax({
-	  url       : WWW_TOP + '/admin/ajax_regex-list.php?action=2&rand=' + $.now(),
+	  url       : WWW_TOP + '/ajax_regex-list.php?action=2&rand=' + $.now(),
 	  data      : { regex_id: id},
 	  dataType  : "html",
 	  success   : function(data)
@@ -586,7 +586,7 @@ function ajax_binaryblacklist_delete(id)
 {
     // no caching of results
 	$.ajax({
-	  url       : WWW_TOP + '/admin/ajax_binaryblacklist-list.php?action=2&rand=' + $.now(),
+	  url       : WWW_TOP + '/ajax_binaryblacklist-list.php?action=2&rand=' + $.now(),
 	  data      : { bin_id: id},
 	  dataType  : "html",
 	  success   : function(data)
@@ -611,7 +611,7 @@ function ajax_welcome_msg(bln)
     // no caching of results
 	var _action = (bln ? 1 : 0);
 	$.ajax({
-	  url       : WWW_TOP + '/admin/ajax_welcome_msg.php?rand=' + $.now(),
+	  url       : WWW_TOP + '/ajax_welcome_msg.php?rand=' + $.now(),
 	  data      : { action: _action},
 	  dataType  : "html",
 	  success   : function(data)
@@ -641,7 +641,7 @@ function ajax_category_regex_delete(id)
     // no caching of results
     var rand_no = Math.random();
     $.ajax({
-        url       : WWW_TOP + '/admin/ajax.php?action=category_regex_delete&rand=' + rand_no,
+        url       : WWW_TOP + '/ajax.php?action=category_regex_delete&rand=' + rand_no,
         data      : { row_id: id},
         dataType  : "html",
         success   : function(data)
@@ -665,7 +665,7 @@ function ajax_collection_regex_delete(id)
     // no caching of results
     var rand_no = Math.random();
     $.ajax({
-        url       : WWW_TOP + '/admin/ajax_regex.php?action=1&rand=' + rand_no,
+        url       : WWW_TOP + '/ajax_regex.php?action=1&rand=' + rand_no,
         data      : { col_id: id},
         dataType  : "html",
         success   : function(data)
@@ -689,7 +689,7 @@ function ajax_release_naming_regex_delete(id)
     // no caching of results
     var rand_no = Math.random();
     $.ajax({
-        url       : WWW_TOP + '/admin/ajax.php?action=release_naming_regex_delete&rand=' + rand_no,
+        url       : WWW_TOP + '/ajax.php?action=release_naming_regex_delete&rand=' + rand_no,
         data      : { row_id: id},
         dataType  : "html",
         success   : function(data)

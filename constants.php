@@ -1,13 +1,17 @@
 <?php
 // YOU SHOULD NOT EDIT ANYTHING IN THIS FILE, COPY .../nzedb/config/settings.example.php TO .../nzedb/config/settings.php AND EDIT THAT FILE!
 
-define('NN_MINIMUM_PHP_VERSION', '5.5.0');
+define('NN_MINIMUM_PHP_VERSION', '5.6.0');
 define('NN_MINIMUM_MYSQL_VERSION', '5.5');
 
-define('DS', DIRECTORY_SEPARATOR);
+if (!defined('DS')) {
+	define('DS', DIRECTORY_SEPARATOR);
+}
 
 // These are file path constants
-define('NN_ROOT', realpath(__DIR__) . DS);
+if (!defined('NN_ROOT')) {
+	define('NN_ROOT', realpath(__DIR__) . DS);
+}
 
 // Used to refer to the main lib class files.
 define('NN_LIB', NN_ROOT . 'newznab' . DS);

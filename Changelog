@@ -1,3 +1,5 @@
+2016-04-19 DariusIII
+	* Fix: Fix ajax operations in admin area, replace old gif images with font awesome.
 2016-04-18 DariusIII
 	* Upd: Update README.md
 	* Upd: Update git, versions, updater for complete update of newznab-tmux
