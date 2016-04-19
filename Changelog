@@ -1,4 +1,5 @@
 2016-04-19 DariusIII
+	* Upd: Use local jquery-migrate, html5shiv and respond javascript in themes
 	* Upd: Add search back to headermenu in Gentele theme.
 	* Fix: Fix ajax operations in admin area, replace old gif images with font awesome.
 2016-04-18 DariusIII
