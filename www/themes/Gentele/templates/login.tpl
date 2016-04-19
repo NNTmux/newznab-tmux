@@ -11,7 +11,7 @@
 	<title>{$site->title} | Log in</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<!-- Bootstrap 3.3.6 -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- Font Awesome Icons -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
@@ -67,7 +67,7 @@
 		<!-- jQuery 2.2.x -->
 		<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"></script>
 		<!-- Bootstrap 3.3.6 JS -->
-		<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js"
+		<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"
 				type="text/javascript"></script>
 </body>
 </html>

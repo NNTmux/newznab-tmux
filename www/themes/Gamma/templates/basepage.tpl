@@ -41,7 +41,7 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 	<!-- Added the Bootstrap JS -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"></script>
 	<!-- Pines Notify -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.pnotify.js"></script>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->

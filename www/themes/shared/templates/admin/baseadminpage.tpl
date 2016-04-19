@@ -21,7 +21,7 @@
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 
 	<!-- Bootstrap core CSS -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
@@ -97,7 +97,7 @@
 
 </div>
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
-<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js" type="text/javascript"></script>
 <!-- bootstrap progress js -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>

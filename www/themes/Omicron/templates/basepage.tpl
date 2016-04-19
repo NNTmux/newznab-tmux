@@ -17,7 +17,7 @@
 	<!-- Newposterwall -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- Bootstrap 3.3.6 -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- iCheck -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/flat/blue.css" rel="stylesheet">
@@ -268,7 +268,7 @@
 	<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"
 			type="text/javascript" ></script>
 	<!-- Bootstrap 3.3.6 JS -->
-	<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js"
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"
 			type="text/javascript"></script>
 	<!-- icheck -->
 	<script src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js" type="text/javascript"></script>
