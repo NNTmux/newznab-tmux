@@ -34,8 +34,6 @@
 		  rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/responsive-tables/responsive-tables.css'
 		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/bootstrap-tour/build/css/bootstrap-tour.min.css'
-		  rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.min.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.theme.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/jquery.iphone.toggle.css' rel='stylesheet'>
@@ -236,9 +234,6 @@
 	<!-- library for making tables responsive -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/responsive-tables/responsive-tables.js"></script>
-	<!-- tour plugin -->
-	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/bootstrap-tour/build/js/bootstrap-tour.min.js"></script>
 	<!-- star rating plugin -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.raty.min.js"></script>
 	<!-- for iOS style toggle switch -->
