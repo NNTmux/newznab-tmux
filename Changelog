@@ -1,4 +1,5 @@
 2016-04-20 DariusIII
+	* Upd: Assign group to smarty in admin/category_regexes-list.php
 	* Upd: Update composer, adjust paths to bootstrap.
 2016-04-19 DariusIII
 	* Upd: Use local jquery-migrate, html5shiv and respond javascript in themes

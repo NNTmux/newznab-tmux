@@ -15,6 +15,7 @@ $regex = $regexes->getRegex($group, ITEMS_PER_PAGE, $offset);
 $count = $regexes->getCount($group);
 
 $page->smarty->assign([
+		'group'				=> $group,
 		'pagertotalitems'   => $count,
 		'pageroffset'       => $offset,
 		'pageritemsperpage' => ITEMS_PER_PAGE,
