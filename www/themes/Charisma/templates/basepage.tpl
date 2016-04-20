@@ -234,8 +234,6 @@
 	<!-- library for making tables responsive -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/responsive-tables/responsive-tables.js"></script>
-	<!-- star rating plugin -->
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.raty.min.js"></script>
 	<!-- for iOS style toggle switch -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.iphone.toggle.js"></script>
 	<!-- autogrowing textarea plugin -->
