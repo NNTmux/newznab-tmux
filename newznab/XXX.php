@@ -85,6 +85,8 @@ class XXX
 			Category::XXX_XVID . ', ' .
 			Category::XXX_X264 . ', ' .
 			Category::XXX_SD . ', ' .
+			Category::XXX_CLIPHD . ', ' .
+			Category::XXX_CLIPSD . ', ' .
 			Category::XXX_WEBDL . ') ';
 
 		if (NN_DEBUG || NN_LOGGING) {
