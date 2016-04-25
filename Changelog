@@ -1,4 +1,5 @@
 2016-04-25 DariusIII
+	* Fix: Add missing files to shared folder for admin theme
 	* Fix: Update sphinxsearch data when release_files for release are updated.
 	* Upd: Update composer, composer will handle git pull, no need for manual git pull
 	* Fix: Fix populate_rt_indexes script

@@ -32,7 +32,7 @@
 	<!-- Custom styling plus plugins -->
 	<!-- Newposterwall -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen"/>
-	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/custom.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/custom.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/flat/green.css" rel="stylesheet">
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
@@ -103,10 +103,10 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/nicescroll/jquery.nicescroll.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/nicescroll/jquery.nicescroll.min.js"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/custom.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
 <!-- jQuery migrate script -->
 <script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
@@ -114,9 +114,9 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/sorttable.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/utils-admin.js"></script>
 <!-- Custom functions -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/functions.js" type="text/javascript"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/scripts/functions.js" type="text/javascript"></script>
 <!-- pace -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/pace/pace.min.js"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/js/pace/pace.min.js"></script>
 
 </body>
 
