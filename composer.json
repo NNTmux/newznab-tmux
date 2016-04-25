@@ -91,5 +91,10 @@
     "unionofrad/manual": "1.1.x-dev",
     "unionofrad/li3_quality": "1.1.x-dev"
   },
+
+  "scripts": {
+    "pre-install-cmd": "./nntmux update git",
+    "post-install-cmd": "./nntmux update db"
+  },
   "type": "project"
 }

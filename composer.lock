@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c2c9ec766db4e1fe4401d7955cb4281e",
+    "hash": "645fd3508984ec45c9cbbb5a6c47896d",
     "content-hash": "47c570fd3ae76742162d0e11d9cf8fae",
     "packages": [
         {
@@ -901,16 +901,16 @@
         },
         {
             "name": "fxp/composer-asset-plugin",
-            "version": "v1.1.3",
+            "version": "v1.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/francoispluchino/composer-asset-plugin.git",
-                "reference": "62d2cdc302de2534f3985a1a2f5d4a783de4a5eb"
+                "reference": "c3d803cc890fad5a7fb61a4036c5d973faae34af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/francoispluchino/composer-asset-plugin/zipball/62d2cdc302de2534f3985a1a2f5d4a783de4a5eb",
-                "reference": "62d2cdc302de2534f3985a1a2f5d4a783de4a5eb",
+                "url": "https://api.github.com/repos/francoispluchino/composer-asset-plugin/zipball/c3d803cc890fad5a7fb61a4036c5d973faae34af",
+                "reference": "c3d803cc890fad5a7fb61a4036c5d973faae34af",
                 "shasum": ""
             },
             "require": {
@@ -918,7 +918,7 @@
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "composer/composer": "~1.0@dev"
+                "composer/composer": "^1.0.0"
             },
             "type": "composer-plugin",
             "extra": {
@@ -953,7 +953,7 @@
                 "npm",
                 "package"
             ],
-            "time": "2016-04-01 15:27:16"
+            "time": "2016-04-22 08:48:58"
         },
         {
             "name": "giantbomb/giantbomb",

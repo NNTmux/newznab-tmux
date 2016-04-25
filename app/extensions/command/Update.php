@@ -102,9 +102,9 @@ class Update extends \app\extensions\console\Command
 	public function nntmux()
 	{
 		try {
-			$this->git();
+			//$this->git();
 			$this->composer();
-			$this->db();
+			//$this->db();
 
 			$smarty = new Smarty();
 			$cleared = $smarty->clearCompiledTemplate();
@@ -145,6 +145,7 @@ class Update extends \app\extensions\console\Command
 		if (in_array($this->gitBranch, $this->git->getBranchesStable())) {
 			$command .= ' --no-dev';
 		}
+		$this->primary('Running composer install process...');
 		passthru($command);
 	}
 
