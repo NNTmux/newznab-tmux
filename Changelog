@@ -1,3 +1,5 @@
+2016-04-25 DariusIII
+	* Add: Add empty file and create resources/smarty/templates_c
 2016-04-20 DariusIII
 	* Upd: Assign group to smarty in admin/category_regexes-list.php
 	* Upd: Update composer, adjust paths to bootstrap.
