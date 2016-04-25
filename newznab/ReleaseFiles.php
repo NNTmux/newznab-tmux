@@ -105,6 +105,7 @@ class ReleaseFiles
 							$hasPassword
 					)
 			);
+			$this->sphinxSearch->updateRelease($id, $this->pdo);
 		}
 		return $insert;
 	}
