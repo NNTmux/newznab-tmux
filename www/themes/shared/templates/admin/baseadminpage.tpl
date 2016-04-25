@@ -103,7 +103,7 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/nicescroll/jquery.nicescroll.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/nicescroll/jquery.nicescroll.min.js"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
@@ -116,7 +116,7 @@
 <!-- Custom functions -->
 <script src="{$smarty.const.WWW_THEMES}/shared/scripts/functions.js" type="text/javascript"></script>
 <!-- pace -->
-<script src="{$smarty.const.WWW_THEMES}/shared/js/pace/pace.min.js"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/pace/pace.min.js"></script>
 
 </body>
 

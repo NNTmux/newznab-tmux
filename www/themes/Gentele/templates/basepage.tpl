@@ -226,7 +226,7 @@
 <script type="text/javascript"
 		src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 <script type="text/javascript"
-		src="{$smarty.const.WWW_THEMES}/{$theme}/js/nicescroll/jquery.nicescroll.min.js"></script>
+		src="{$smarty.const.WWW_THEMES}/shared/assets/nicescroll/jquery.nicescroll.min.js"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/custom.js"></script>
@@ -251,7 +251,7 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.nonblock.js"></script>
 
 <!-- pace -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/pace/pace.min.js"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/pace/pace.min.js"></script>
 
 </body>
 

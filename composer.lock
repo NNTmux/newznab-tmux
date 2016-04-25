@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "645fd3508984ec45c9cbbb5a6c47896d",
-    "content-hash": "47c570fd3ae76742162d0e11d9cf8fae",
+    "hash": "e37fd855dcf74183bf2af066217a6555",
+    "content-hash": "0000d201d93a7fc8242e6c6d410d2a46",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -575,6 +575,36 @@
             }
         },
         {
+            "name": "bower-asset/jquery.nicescroll",
+            "version": "3.6.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/inuyaksa/jquery.nicescroll.git",
+                "reference": "050267822f045f59d0b0d0ac5d84c36ff8c98e1e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/inuyaksa/jquery.nicescroll/zipball/050267822f045f59d0b0d0ac5d84c36ff8c98e1e",
+                "reference": "050267822f045f59d0b0d0ac5d84c36ff8c98e1e",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.8.3"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "./jquery.nicescroll.js",
+                    "./zoomico.png"
+                ],
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "demo",
+                    "package.json"
+                ]
+            }
+        },
+        {
             "name": "bower-asset/noty",
             "version": "v2.3.8",
             "source": {
@@ -594,6 +624,52 @@
                 "bower-asset-ignore": []
             },
             "description": "noty is a jQuery plugin that makes it easy to create alert - success - error - warning - information - confirmation messages as an alternative the standard alert dialog. Each notification is added to a queue. (Optional)"
+        },
+        {
+            "name": "bower-asset/pace",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/HubSpot/pace.git",
+                "reference": "c6846cbf6b928e9903b569269fa9fbf32f2554f4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/HubSpot/pace/zipball/c6846cbf6b928e9903b569269fa9fbf32f2554f4",
+                "reference": "c6846cbf6b928e9903b569269fa9fbf32f2554f4",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "pace.js",
+                "bower-asset-ignore": [
+                    ".*",
+                    "Gruntfile.coffee",
+                    "bower_components",
+                    "docs",
+                    "node_modules",
+                    "package.json",
+                    "templates",
+                    "tests"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Automatic page load progress bar",
+            "keywords": [
+                "activity",
+                "ajax",
+                "automatic",
+                "bar",
+                "client-side",
+                "load",
+                "loading",
+                "pageload",
+                "progress",
+                "progress",
+                "spinner"
+            ]
         },
         {
             "name": "bower-asset/pnotify",
