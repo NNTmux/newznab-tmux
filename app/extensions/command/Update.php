@@ -29,14 +29,14 @@ use \newznab\db\DbUpdate;
 
 /**
  * Update various aspects of your indexer.
-
+ *
  * Actions:
- *  * all|nntmux Fetches current git repo, composer dependencies, and update latest Db patches.
+ *  * all|nzedb Fetches current git repo, composer dependencies, and update latest Db patches.
  *  * db		Update the Db with any patches not yet applied.
  *  * git		Performs git pull.
-
-*
-*@package app\extensions\command
+ *  * predb		Fetch and import TSV files into the predb table.
+ *
+ *@package app\extensions\command
  */
 class Update extends \app\extensions\console\Command
 {
@@ -119,6 +119,14 @@ class Update extends \app\extensions\console\Command
 		}
 	}
 
+	/**
+	 * Import/Update the predb table using tab separated value files.
+	 */
+	public function predb()
+	{
+		$this->error('predb not available yet!');
+	}
+
 	public function run($command = null)
 	{
 		if (!$command || !$this->request->args()) {
@@ -138,6 +146,12 @@ class Update extends \app\extensions\console\Command
 		return false;
 	}
 
+	/**
+	 * Issues the command to 'install' the composer package.
+	 *
+	 * It first checks the current branch for stable versions. If found then the '--no-dev'
+	 * option is added to the command to prevent development packages being also downloded.
+	 */
 	protected function composer()
 	{
 		$this->initialiseGit();
