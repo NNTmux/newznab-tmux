@@ -1,4 +1,5 @@
 2016-04-25 DariusIII
+	* Fix: Fix path to nicescroll script
 	* Upd: Fix "porting" typo
 	* Fix: Update sphinx releases_rt index when release files are added.
     	*** NOTE *** - you will need to do the following to update the sphinx index:
