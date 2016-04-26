@@ -31,7 +31,7 @@ use \newznab\db\DbUpdate;
  * Update various aspects of your indexer.
  *
  * Actions:
- *  * all|nzedb Fetches current git repo, composer dependencies, and update latest Db patches.
+ *  * all|nntmux Fetches current git repo, composer dependencies, and update latest Db patches.
  *  * db		Update the Db with any patches not yet applied.
  *  * git		Performs git pull.
  *  * predb		Fetch and import TSV files into the predb table.
