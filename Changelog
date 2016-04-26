@@ -1,5 +1,10 @@
 2016-04-25 DariusIII
-	* Upd: Update scripts
+	Fix: Update sphinx releases_rt index when release files are added.
+    	*** NOTE *** - you will need to do the following to update the sphinx index:
+        		1) stop sphinxsearch - `sudo service sphinxsearch stop`
+        		2) clear old index - `sudo rm /var/lib/sphinxsearch/data/*`
+        		3) start sphinxsearch - `sudo service sphinxsearch start`
+        		4) populate the index - `php /var/www/newznab/misc/sphinxsearch/populate_rt_indexes.php releases_rt`
 2016-04-25 DariusIII
 	* Upd: Update composer files, remove extra not needed scripts, update Gentele and baseadminpage
 	* Fix: Add missing files to shared folder for admin theme
