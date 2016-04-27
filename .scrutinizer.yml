@@ -1,3 +1,9 @@
+before_commands:
+    - 'composer install --dev --prefer-source --no-scripts'
+build:
+    environment:
+        php:
+            version: 5.5.14
 checks:
     php:
         avoid_closing_tag: false
@@ -72,6 +78,4 @@ coding_style:
                 true_false_null: undefined
 
 filter:
-    excluded_paths:
-        - libs/PEAR/Net_NNTP/*
-        - libs/zeebinz/rarinfo/*
+    excluded_paths: [app/libraries/*, libraries/*, libs/*, resources/*]
