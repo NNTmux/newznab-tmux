@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e37fd855dcf74183bf2af066217a6555",
-    "content-hash": "0000d201d93a7fc8242e6c6d410d2a46",
+    "hash": "efcba1348fc23123a48defb677c07095",
+    "content-hash": "d3861f98671a69f7f1e54686955b1934",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -262,6 +262,47 @@
             ]
         },
         {
+            "name": "bower-asset/chosen",
+            "version": "v1.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/harvesthq/bower-chosen.git",
+                "reference": "e0d29eab0d1ea12535cf1933eba4c47df099f846"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/harvesthq/bower-chosen/zipball/e0d29eab0d1ea12535cf1933eba4c47df099f846",
+                "reference": "e0d29eab0d1ea12535cf1933eba4c47df099f846",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.4.4"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "chosen.jquery.js",
+                    "chosen.css"
+                ],
+                "bower-asset-ignore": []
+            },
+            "license": [
+                {
+                    "type": "MIT",
+                    "url": "https://github.com/harvesthq/chosen/blob/master/LICENSE.md"
+                }
+            ],
+            "description": "Chosen is a JavaScript plugin that makes select boxes user-friendly. It is currently available in both jQuery and Prototype flavors.",
+            "keywords": [
+                "dropdown",
+                "form",
+                "input",
+                "multiselect",
+                "select",
+                "ui"
+            ]
+        },
+        {
             "name": "bower-asset/colorbox",
             "version": "1.6.3",
             "source": {
@@ -303,6 +344,54 @@
             ]
         },
         {
+            "name": "bower-asset/datatables",
+            "version": "1.10.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DataTables/DataTables.git",
+                "reference": "d0163e24a0735ef3c0f04886be301baba67482e1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DataTables/DataTables/zipball/d0163e24a0735ef3c0f04886be301baba67482e1",
+                "reference": "d0163e24a0735ef3c0f04886be301baba67482e1",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.7.0"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "media/js/jquery.dataTables.js",
+                    "media/css/jquery.dataTables.css",
+                    "media/images/sort_asc.png",
+                    "media/images/sort_asc_disabled.png",
+                    "media/images/sort_both.png",
+                    "media/images/sort_desc.png",
+                    "media/images/sort_desc_disabled.png"
+                ],
+                "bower-asset-ignore": [
+                    "/.*",
+                    "examples",
+                    "media/unit_testing",
+                    "composer.json",
+                    "dataTables.jquery.json",
+                    "package.json"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "keywords": [
+                "datatables",
+                "javascript",
+                "jquery",
+                "library",
+                "table"
+            ]
+        },
+        {
             "name": "bower-asset/ev-emitter",
             "version": "v1.0.2",
             "source": {
@@ -337,6 +426,33 @@
                 "event",
                 "pubsub"
             ]
+        },
+        {
+            "name": "bower-asset/fastclick",
+            "version": "v1.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ftlabs/fastclick.git",
+                "reference": "9977a916739360ad4ffd7aa19b0016bf375e934b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ftlabs/fastclick/zipball/9977a916739360ad4ffd7aa19b0016bf375e934b",
+                "reference": "9977a916739360ad4ffd7aa19b0016bf375e934b",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "lib/fastclick.js",
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "component.json",
+                    "package.json",
+                    "Makefile",
+                    "tests",
+                    "examples"
+                ]
+            }
         },
         {
             "name": "bower-asset/font-awesome",
@@ -792,6 +908,36 @@
             "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)"
         },
         {
+            "name": "bower-asset/responsive-tables-js",
+            "version": "v1.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smasala/responsive-tables-js.git",
+                "reference": "10c8ea1f59acb8a00dc4af898d0cd54a527eef5d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smasala/responsive-tables-js/zipball/10c8ea1f59acb8a00dc4af898d0cd54a527eef5d",
+                "reference": "10c8ea1f59acb8a00dc4af898d0cd54a527eef5d",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": "dev-default|*"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "responsivetables.js",
+                "bower-asset-ignore": ""
+            },
+            "description": "JavaScript solution for supporting responsive tables",
+            "keywords": [
+                "javascript",
+                "jquery",
+                "responsive",
+                "table"
+            ]
+        },
+        {
             "name": "bower-asset/select2",
             "version": "4.0.2",
             "source": {
@@ -813,6 +959,22 @@
                 ]
             },
             "description": "Select2 is a jQuery based replacement for select boxes. It supports searching, remote data sets, and infinite scrolling of results."
+        },
+        {
+            "name": "bower-asset/slimscroll",
+            "version": "v1.3.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rochal/jQuery-slimScroll.git",
+                "reference": "00d27e3541d9cb4ada6f41b06cd67bef62d9d2b3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rochal/jQuery-slimScroll/zipball/00d27e3541d9cb4ada6f41b06cd67bef62d9d2b3",
+                "reference": "00d27e3541d9cb4ada6f41b06cd67bef62d9d2b3",
+                "shasum": ""
+            },
+            "type": "bower-asset-library"
         },
         {
             "name": "composer/installers",

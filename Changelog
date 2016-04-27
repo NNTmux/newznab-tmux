@@ -1,3 +1,5 @@
+2016-04-27 DariusIII
+	* Upd: Update composer, add more scripts to be managed by composer and remove scripts not used.
 2016-04-25 DariusIII
 	* Fix: Fix path to nicescroll script
 	* Upd: Fix "porting" typo
