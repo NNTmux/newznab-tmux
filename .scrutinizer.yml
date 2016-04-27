@@ -1,5 +1,5 @@
 before_commands:
-    - 'composer install --dev --prefer-source --no-scripts'
+    - 'composer install --no-dev --prefer-source --no-scripts'
 build:
     environment:
         php:
