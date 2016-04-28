@@ -1,3 +1,5 @@
+2016-04-28 DariusIII
+	* Upd: Update scrutinizer.yml, .gitignore and add .gitmodules
 2016-04-27 DariusIII
 	* Upd: Scrutinizer.yml
 	* Upd: Update composer, add more scripts to be managed by composer and remove scripts not used.
