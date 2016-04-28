@@ -1,4 +1,5 @@
 2016-04-28 DariusIII
+	* Upd: Add 'gn' case to nfo retrieval in api, to be in line with newznab api spec
 	* Upd: Check if the movies is SD before the HD check
 	* Upd: Update scrutinizer.yml, .gitignore and add .gitmodules
 2016-04-27 DariusIII
