@@ -154,7 +154,7 @@ class ReleaseRemover
 		$this->delete = true;
 		$this->ignoreUserCheck = false;
 		// Time we started.
-		$this->timeStart = TIME();
+		$this->timeStart = time();
 
 		// Start forming the query.
 		$this->query = 'SELECT id, guid, searchname FROM releases WHERE 1=1';
@@ -188,7 +188,7 @@ class ReleaseRemover
 
 		if ($this->echoCLI) {
 			echo $this->pdo->log->headerOver(($this->delete ? "Deleted " : "Would have deleted ") . $this->deletedCount . " release(s). This script ran for ");
-			echo $this->pdo->log->header($this->consoleTools->convertTime(TIME() - $this->timeStart));
+			echo $this->pdo->log->header($this->consoleTools->convertTime(time() - $this->timeStart));
 		}
 
 		return ($this->browser
@@ -197,7 +197,7 @@ class ReleaseRemover
 			($this->delete ? "Deleted " : "Would have deleted ") .
 			$this->deletedCount .
 			' release(s) in ' .
-			$this->consoleTools->convertTime(TIME() - $this->timeStart)
+			$this->consoleTools->convertTime(time() - $this->timeStart)
 			:
 			true
 		);
@@ -318,7 +318,7 @@ class ReleaseRemover
 
 		if ($this->echoCLI) {
 			echo $this->pdo->log->headerOver(($this->delete ? "Deleted " : "Would have deleted ") . $this->deletedCount . " release(s). This script ran for ");
-			echo $this->pdo->log->header($this->consoleTools->convertTime(TIME() - $this->timeStart));
+			echo $this->pdo->log->header($this->consoleTools->convertTime(time() - $this->timeStart));
 		}
 
 		return ($this->browser
@@ -327,7 +327,7 @@ class ReleaseRemover
 			($this->delete ? "Deleted " : "Would have deleted ") .
 			$this->deletedCount .
 			' release(s) in ' .
-			$this->consoleTools->convertTime(TIME() - $this->timeStart)
+			$this->consoleTools->convertTime(time() - $this->timeStart)
 			:
 			true
 		);
