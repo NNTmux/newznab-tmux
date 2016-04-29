@@ -1,4 +1,5 @@
 2016-04-29 DariusIII
+	* Upd: Change how git is pulled when there are no installed dependencies yet.
 	* Fix: Use proper case for time operator function in ReleaseRemover.
 2016-04-28 DariusIII
 	* Upd: Add 'gn' case to nfo retrieval in api, to be in line with newznab api spec

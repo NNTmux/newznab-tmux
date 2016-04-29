@@ -100,7 +100,7 @@
   },
 
   "scripts": {
-    "pre-install-cmd": "./nntmux update git",
+    "pre-install-cmd": "git pull",
     "post-install-cmd": "./nntmux update db"
   },
   "type": "project"
