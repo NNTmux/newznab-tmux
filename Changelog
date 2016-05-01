@@ -1,4 +1,5 @@
 2016-05-01 DariusIII
+	* Upd: Revert updating process to original version
 	* Upd: Update composer.lock and nntmux.xml files
 2016-04-29 DariusIII
 	* Upd: Change how git is pulled when there are no installed dependencies yet.
