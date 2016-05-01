@@ -29,8 +29,8 @@
 	<!-- The styles -->
 	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/{$theme}/css/bootstrap-spacelab.min.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/charisma-app.css" rel="stylesheet">
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/chosen/chosen.min.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/colorbox/example3/colorbox.css'
+	<link href='{$smarty.const.WWW_THEMES}/{$theme}/shared/assets/chosen/chosen.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_THEMES}/{$theme}/shared/assets/colorbox/example3/colorbox.css'
 		  rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/shared/assets/responsive-tables-js/dist/responsivetables.css'
 		  rel='stylesheet'>
