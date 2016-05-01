@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <newznab>
 	<versions>
-		<sql>
-			<db>243</db>
-			<file>243</file>
-		</sql>
 		<git>
 			<tag>0.0.0</tag>
 			<!-- commit count removed -->
@@ -12,6 +8,16 @@
 				<precommit>9</precommit>
 				<!-- this is the version of the pre-commit file in githooks NOT the files it calls -->
 			</hooks>
-		<commit>4540</commit></git>
+		</git>
+		<scripts>
+			<last>
+				<date>0000-00-00</date>
+				<ordinal>0</ordinal>
+			</last>
+		</scripts>
+		<sql>
+			<db>243</db>
+			<file>243</file>
+		</sql>
 	</versions>
 </newznab>

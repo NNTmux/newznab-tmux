@@ -1,3 +1,5 @@
+2016-05-01 DariusIII
+	* Upd: Update composer.lock and nntmux.xml files
 2016-04-29 DariusIII
 	* Upd: Change how git is pulled when there are no installed dependencies yet.
 	* Fix: Use proper case for time operator function in ReleaseRemover.
