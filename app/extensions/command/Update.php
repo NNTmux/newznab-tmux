@@ -20,7 +20,6 @@ namespace app\extensions\command;
 
 use \Exception;
 use \Smarty;
-use \app\extensions\command\Version;
 use \app\extensions\util\Git;
 use \app\extensions\util\Versions;
 use \lithium\console\command\Help;
@@ -81,8 +80,8 @@ class Update extends \app\extensions\console\Command
 		$currentDb = $versions->getSQLPatchFromDB();
 		$currentXML = $versions->getSQLPatchFromFile();
 		if ($currentDb < $currentXML) {
-			$db = new DbUpdate();
-			$db->processPatches();
+			$db = new DbUpdate(['backup' => false]);
+			$db->processPatches(['safe' => false]);
 		} else {
 			$this->out("Up to date.");
 		}
