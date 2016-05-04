@@ -1,3 +1,5 @@
+2016-05-04 DariusIII
+	* Upd: Add patch for triggers to match the new releases reqid format (@rainje)
 2016-05-01 DariusIII
 	* Upd: Revert updating process to original version
 	* Upd: Update composer.lock and nntmux.xml files
