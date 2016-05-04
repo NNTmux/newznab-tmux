@@ -69,7 +69,7 @@ class MiscSorter
 			sprintf("
 							SELECT UNCOMPRESS(rn.nfo) AS nfo,
 								r.id, r.name, r.searchname
-							FROM releasenfo rn
+							FROM release_nfos rn
 							INNER JOIN releases r ON rn.releaseid = r.id
 							INNER JOIN groups g ON r.groupid = g.id
 							WHERE rn.nfo IS NOT NULL

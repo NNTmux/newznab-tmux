@@ -21,7 +21,7 @@ I started adapting some of more interesting scripts from nZEDb, but they require
 	There is another file in that folder nntmux_fi_schema.sql, use that if you don't have any releases and users on your site, AKA, completely fresh install of newznab+.
 	BE WARNED: If you import this schema it WILL NUKE YOUR DATABASE.
 	If you are updating from latest newznab svn (aka tvmaze version), you need to rename back tvinfoID columns into rageid
-	(located in releases and userseries tables, maybe some more), before you import the schema.sql.
+	(located in releases and user_series tables, maybe some more), before you import the schema.sql.
 
 	You need to chmod to 777 following folders now:
 	resources/*

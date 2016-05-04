@@ -222,8 +222,8 @@ class Releases
 				INNER JOIN category cp ON cp.id = c.parentid
 				LEFT OUTER JOIN videos v ON r.videos_id = v.id
 				LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+				LEFT OUTER JOIN video_data re ON re.releaseid = r.id
+				LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				GROUP BY r.id
 				ORDER BY %7\$s %8\$s",
@@ -483,9 +483,9 @@ class Releases
 					tve.firstaired,
 					(SELECT df.failed) AS failed
 				FROM releases r
-				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
+				LEFT OUTER JOIN video_data re ON re.releaseid = r.id
 				INNER JOIN groups ON groups.id = r.groupid
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+				LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
 				LEFT OUTER JOIN tv_episodes tve ON tve.videos_id = r.videos_id
 				INNER JOIN category c ON c.id = r.categoryid
 				INNER JOIN category cp ON cp.id = c.parentid
@@ -604,13 +604,13 @@ class Releases
 			sprintf('
 				DELETE r, rn, rc, uc, rf, ra, rs, rv, re, df
 				FROM releases r
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+				LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
 				LEFT OUTER JOIN release_comments rc ON rc.releaseid = r.id
-				LEFT OUTER JOIN userdownloads uc ON uc.releaseid = r.id
+				LEFT OUTER JOIN user_downloads uc ON uc.releaseid = r.id
 				LEFT OUTER JOIN release_files rf ON rf.releaseid = r.id
-				LEFT OUTER JOIN releaseaudio ra ON ra.releaseid = r.id
-				LEFT OUTER JOIN releasesubs rs ON rs.releaseid = r.id
-				LEFT OUTER JOIN releasevideo rv ON rv.releaseid = r.id
+				LEFT OUTER JOIN release_audio ra ON ra.releaseid = r.id
+				LEFT OUTER JOIN release_subtitles rs ON rs.releaseid = r.id
+				LEFT OUTER JOIN video_data rv ON rv.releaseid = r.id
 				LEFT OUTER JOIN releaseextrafull re ON re.releaseid = r.id
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				WHERE r.guid = %s',
@@ -893,10 +893,10 @@ class Releases
 				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
 				tve.firstaired
 			FROM releases r
-			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
+			LEFT OUTER JOIN video_data re ON re.releaseid = r.id
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+			LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
 			INNER JOIN groups ON groups.id = r.groupid
 			INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN category cp ON cp.id = c.parentid
@@ -990,8 +990,8 @@ class Releases
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN groups ON groups.id = r.groupid
-			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+			LEFT OUTER JOIN video_data re ON re.releaseid = r.id
+			LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
 			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$this->getConcatenatedCategoryIDs(),
@@ -1048,7 +1048,7 @@ class Releases
 			FROM releases r
 			INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN groups ON groups.id = r.groupid
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+			LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
 			LEFT OUTER JOIN releaseextrafull re ON re.releaseid = r.id
 			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
@@ -1105,7 +1105,7 @@ class Releases
 			FROM releases r
 			INNER JOIN groups g ON g.id = r.groupid
 			INNER JOIN category c ON c.id = r.categoryid
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+			LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
 			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$this->getConcatenatedCategoryIDs(),
@@ -1359,7 +1359,7 @@ class Releases
 	{
 		return $this->pdo->queryOneRow(
 			sprintf(
-				'SELECT releaseid %s FROM releasenfo WHERE releaseid = %d AND nfo IS NOT NULL',
+				'SELECT releaseid %s FROM release_nfos WHERE releaseid = %d AND nfo IS NOT NULL',
 				($getNfoString ? ", UNCOMPRESS(nfo) AS nfo" : ''),
 				$id
 			)

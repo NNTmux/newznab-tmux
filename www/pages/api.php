@@ -469,7 +469,7 @@ function addLanguage(&$releases, Settings $settings)
 			if (isset($release['id'])) {
 				$language = $settings->queryOneRow('
 					SELECT audiolanguage
-					FROM releaseaudio
+					FROM release_audio
 					WHERE releaseid = ' .
 						$release['id']
 				);

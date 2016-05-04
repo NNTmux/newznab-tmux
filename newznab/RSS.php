@@ -57,7 +57,7 @@ Class RSS
 
 		if (count($cat)) {
 			if ($cat[0] == -2) {
-				$cartSearch = sprintf(' INNER JOIN usercart ON usercart.userid = %d AND usercart.releaseid = r.id ', $userID);
+				$cartSearch = sprintf(' INNER JOIN users_releases ON users_releases.userid = %d AND users_releases.releaseid = r.id ', $userID);
 			} else if ($cat[0] != -1) {
 				$catSearch = $this->releases->categorySQL($cat);
 			}
@@ -135,7 +135,7 @@ Class RSS
 				ORDER BY postdate DESC %s",
 
 				$this->releases->getConcatenatedCategoryIDs(),
-				$this->releases->uSQL($this->pdo->query(sprintf('SELECT videos_id, categoryid FROM userseries WHERE userid = %d', $userID), true), 'videos_id'),
+				$this->releases->uSQL($this->pdo->query(sprintf('SELECT videos_id, categoryid FROM user_series WHERE userid = %d', $userID), true), 'videos_id'),
 				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
 				NZB::NZB_ADDED,
@@ -176,7 +176,7 @@ Class RSS
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
 						$this->releases->getConcatenatedCategoryIDs(),
-						$this->releases->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM usermovies WHERE userid = %d', $userID), true), 'imdbid'),
+						$this->releases->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM user_movies WHERE userid = %d', $userID), true), 'imdbid'),
 						(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 						NZB::NZB_ADDED,
 						$this->releases->showPasswords,

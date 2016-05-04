@@ -351,7 +351,7 @@ class Forking extends \fork_daemon
 				MAX(a.first_record) AS their_first,
 				MAX(a.last_record) AS their_last
 				FROM groups g
-				INNER JOIN shortgroups a ON g.name = a.name
+				INNER JOIN short_groups a ON g.name = a.name
 				WHERE g.first_record IS NOT NULL
 				AND g.first_record_postdate IS NOT NULL
 				AND g.backfill = 1
@@ -432,7 +432,7 @@ class Forking extends \fork_daemon
 		$maxmssgs = $this->pdo->getSetting('maxmssgs');
 		$threads = $this->pdo->getSetting('binarythreads');
 
-		$groups = $this->pdo->query("SELECT g.name AS groupname, g.last_record AS our_last, a.last_record AS their_last FROM groups g INNER JOIN shortgroups a ON g.active = 1 AND g.name = a.name ORDER BY a.last_record DESC");
+		$groups = $this->pdo->query("SELECT g.name AS groupname, g.last_record AS our_last, a.last_record AS their_last FROM groups g INNER JOIN short_groups a ON g.active = 1 AND g.name = a.name ORDER BY a.last_record DESC");
 
 		if ($groups) {
 			$i = 1;

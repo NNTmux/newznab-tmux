@@ -27,7 +27,7 @@ if (!isset($argv[1])) {
 								SELECT r.id AS releaseid, r.guid, r.groupid, r.categoryid, r.name, r.searchname,
 									uncompress(nfo) AS textstring
 								FROM releases r
-								INNER JOIN releasenfo rn ON r.id = rn.releaseid
+								INNER JOIN release_nfos rn ON r.id = rn.releaseid
 								WHERE r.guid %s
 								AND r.nzbstatus = 1
 								AND r.proc_nfo = 0

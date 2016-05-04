@@ -1053,7 +1053,7 @@
 			<td style="width:180px;"><label for="safepartrepair">Part Repair for Backfill Scripts:</label></td>
 			<td>
 				{html_radios id="safepartrepair" name='safepartrepair' values=$yesno_ids output=$yesno_names selected=$site->safepartrepair separator='<br />'}
-				<div class="hint">Whether to put unreceived parts into partrepair table when running binaries(safe) or backfill scripts.</div>
+				<div class="hint">Whether to put unreceived parts into missed_parts table when running binaries(safe) or backfill scripts.</div>
 			</td>
 		</tr>
 		<tr>
@@ -1061,7 +1061,7 @@
 			<td>
 				<input class="short" id="maxpartrepair" name="maxpartrepair" type="text" value="{$site->maxpartrepair}"/>
 				<div class="hint">The maximum amount of articles to attempt to repair at a time. If you notice that you
-					are getting a lot of parts into the partrepair table, it is possible that you USP is not keeping up
+					are getting a lot of parts into the missed_parts table, it is possible that you USP is not keeping up
 					with the requests. Try to reduce the threads to safe scripts, stop using safe scripts or stop using
 					nntpproxy until improves. Ar least until the cause can be determined.
 				</div>
@@ -1501,7 +1501,7 @@
 					   value="{$site->binarythreads}"/>
 
 				<div class="hint">The number of threads for update_binaries. If you notice that you are getting a lot of
-					parts into the partrepair table, it is possible that you USP is not keeping up with the requests.
+					parts into the missed_parts table, it is possible that you USP is not keeping up with the requests.
 					Try to reduce the threads. At least until the cause can be determined.
 				</div>
 			</td>

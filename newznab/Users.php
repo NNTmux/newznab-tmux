@@ -130,22 +130,22 @@ class Users
 
 	public function delCartForUser($uid)
 	{
-		$this->pdo->queryExec(sprintf("DELETE FROM usercart WHERE userid = %d", $uid));
+		$this->pdo->queryExec(sprintf("DELETE FROM users_releases WHERE userid = %d", $uid));
 	}
 
 	public function delUserCategoryExclusions($uid)
 	{
-		$this->pdo->queryExec(sprintf("DELETE FROM userexcat WHERE userid = %d", $uid));
+		$this->pdo->queryExec(sprintf("DELETE FROM user_excluded_categories WHERE userid = %d", $uid));
 	}
 
 	public function delDownloadRequests($userid)
 	{
-		return $this->pdo->queryExec(sprintf("delete FROM userdownloads WHERE userid = %d", $userid));
+		return $this->pdo->queryExec(sprintf("delete FROM user_downloads WHERE userid = %d", $userid));
 	}
 
 	public function delApiRequests($userid)
 	{
-		return $this->pdo->queryExec(sprintf("delete FROM userrequests WHERE userid = %d", $userid));
+		return $this->pdo->queryExec(sprintf("delete FROM user_requests WHERE userid = %d", $userid));
 	}
 
 	public function getRange($start, $num, $orderby, $username = '', $email = '', $host = '', $role = '')
@@ -173,7 +173,7 @@ class Users
 
 		$order = $this->getBrowseOrder($orderby);
 
-		return $this->pdo->query(sprintf(" SELECT users.*, userroles.name as rolename FROM users INNER JOIN userroles on userroles.id = users.role WHERE 1=1 %s %s %s %s AND email != 'sharing@nZEDb.com' ORDER BY %s %s" . $limit, $usql, $esql, $hsql, $rsql, $order[0], $order[1]));
+		return $this->pdo->query(sprintf(" SELECT users.*, user_roles.name as rolename FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE 1=1 %s %s %s %s AND email != 'sharing@nZEDb.com' ORDER BY %s %s" . $limit, $usql, $esql, $hsql, $rsql, $order[0], $order[1]));
 	}
 
 	public function getBrowseOrder($orderby)
@@ -318,7 +318,7 @@ class Users
 
 	public function getByUsername($userName)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT users.*, userroles.name as rolename, userroles.apirequests, userroles.downloadrequests FROM users INNER JOIN userroles on userroles.id = users.role WHERE username = %s ", $this->pdo->escapeString($userName)));
+		return $this->pdo->queryOneRow(sprintf("SELECT users.*, user_roles.name as rolename, user_roles.apirequests, user_roles.downloadrequests FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE username = %s ", $this->pdo->escapeString($userName)));
 	}
 
 	public function getByEmail($email)
@@ -426,7 +426,7 @@ class Users
 	public function getById($id)
 	{
 
-		$sql = sprintf("SELECT users.*, userroles.name as rolename, userroles.hideads, userroles.canpreview, userroles.canpre, userroles.apirequests, userroles.downloadrequests, NOW() as now FROM users INNER JOIN userroles on userroles.id = users.role WHERE users.id = %d ", $id);
+		$sql = sprintf("SELECT users.*, user_roles.name as rolename, user_roles.hideads, user_roles.canpreview, user_roles.canpre, user_roles.apirequests, user_roles.downloadrequests, NOW() as now FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE users.id = %d ", $id);
 
 		return $this->pdo->queryOneRow($sql);
 	}
@@ -435,7 +435,7 @@ class Users
 	{
 
 
-		return $this->pdo->queryOneRow(sprintf("SELECT users.*, userroles.apirequests, userroles.downloadrequests, NOW() as now FROM users INNER JOIN userroles on userroles.id = users.role WHERE users.rsstoken = %s ", $this->pdo->escapeString($rsstoken)));
+		return $this->pdo->queryOneRow(sprintf("SELECT users.*, user_roles.apirequests, user_roles.downloadrequests, NOW() as now FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE users.rsstoken = %s ", $this->pdo->escapeString($rsstoken)));
 	}
 
 	public function getBrowseOrdering()
@@ -563,11 +563,11 @@ class Users
 		//
 		// Tidy any old invites sent greater than DEFAULT_INVITE_EXPIRY_DAYS days ago.
 		//
-		$this->pdo->queryExec(sprintf("DELETE FROM userinvite WHERE createddate < now() - INTERVAL %d DAY", self::DEFAULT_INVITE_EXPIRY_DAYS));
+		$this->pdo->queryExec(sprintf("DELETE FROM invitations WHERE createddate < now() - INTERVAL %d DAY", self::DEFAULT_INVITE_EXPIRY_DAYS));
 
 		return $this->pdo->queryOneRow(
 			sprintf(
-				"SELECT * FROM userinvite WHERE guid = %s",
+				"SELECT * FROM invitations WHERE guid = %s",
 				$this->pdo->escapeString($inviteToken)
 			)
 		);
@@ -576,7 +576,7 @@ class Users
 	public function deleteInvite($inviteToken)
 	{
 
-		$this->pdo->queryExec(sprintf("DELETE FROM userinvite WHERE guid = %s ", $this->pdo->escapeString($inviteToken)));
+		$this->pdo->queryExec(sprintf("DELETE FROM invitations WHERE guid = %s ", $this->pdo->escapeString($inviteToken)));
 	}
 
 
@@ -721,7 +721,7 @@ class Users
 	public function addCart($uid, $releaseid)
 	{
 
-		$sql = sprintf("INSERT INTO usercart (userid, releaseid, createddate) VALUES (%d, %d, now())", $uid, $releaseid);
+		$sql = sprintf("INSERT INTO users_releases (userid, releaseid, createddate) VALUES (%d, %d, now())", $uid, $releaseid);
 
 		return $this->pdo->queryInsert($sql);
 	}
@@ -732,7 +732,7 @@ class Users
 		if ($releaseid != "")
 			$releaseid = " AND releases.id = " . $this->pdo->escapeString($releaseid);
 
-		return $this->pdo->query(sprintf("SELECT usercart.*, releases.searchname,releases.guid FROM usercart INNER JOIN releases on releases.id = usercart.releaseid WHERE userid = %d %s", $uid, $releaseid));
+		return $this->pdo->query(sprintf("SELECT users_releases.*, releases.searchname,releases.guid FROM users_releases INNER JOIN releases on releases.id = users_releases.releaseid WHERE userid = %d %s", $uid, $releaseid));
 	}
 
 	public function delCartByGuid($ids, $userID)
@@ -750,7 +750,7 @@ class Users
 
 		return (bool)$this->pdo->queryExec(
 			sprintf(
-				"DELETE FROM usercart WHERE id IN (%s) AND userid = %d", implode(',', $del), $userID
+				"DELETE FROM users_releases WHERE id IN (%s) AND userid = %d", implode(',', $del), $userID
 			)
 		);
 	}
@@ -759,12 +759,12 @@ class Users
 	{
 		$rel = $this->pdo->queryOneRow(sprintf("SELECT id FROM releases WHERE guid = %s", $this->pdo->escapeString($guid)));
 		if ($rel)
-			$this->pdo->queryExec(sprintf("DELETE FROM usercart WHERE userid = %d AND releaseid = %d", $uid, $rel["id"]));
+			$this->pdo->queryExec(sprintf("DELETE FROM users_releases WHERE userid = %d AND releaseid = %d", $uid, $rel["id"]));
 	}
 
 	public function delCartForRelease($rid)
 	{
-		$this->pdo->queryExec(sprintf("DELETE FROM usercart WHERE releaseid = %d", $rid));
+		$this->pdo->queryExec(sprintf("DELETE FROM users_releases WHERE releaseid = %d", $rid));
 	}
 
 	public function addCategoryExclusions($uid, $catids)
@@ -772,7 +772,7 @@ class Users
 		$this->delUserCategoryExclusions($uid);
 		if (COUNT($catids) > 0) {
 			foreach ($catids as $catid) {
-				$this->pdo->queryInsert(sprintf("INSERT INTO userexcat (userid, categoryid, createddate) VALUES (%d, %d, now())", $uid, $catid));
+				$this->pdo->queryInsert(sprintf("INSERT INTO user_excluded_categories (userid, categoryid, createddate) VALUES (%d, %d, now())", $uid, $catid));
 			}
 		}
 	}
@@ -812,7 +812,7 @@ class Users
 	public function getCategoryExclusion($userID)
 	{
 		$ret = [];
-		$categories = $this->pdo->query(sprintf("SELECT categoryid FROM userexcat WHERE userid = %d", $userID));
+		$categories = $this->pdo->query(sprintf("SELECT categoryid FROM user_excluded_categories WHERE userid = %d", $userID));
 		foreach ($categories as $category) {
 			$ret[] = $category["categoryid"];
 		}
@@ -843,7 +843,7 @@ class Users
 
 	public function delCategoryExclusion($uid, $catid)
 	{
-		$this->pdo->queryExec(sprintf("DELETE FROM userexcat WHERE userid = %d AND categoryid = %d", $uid, $catid));
+		$this->pdo->queryExec(sprintf("DELETE FROM user_excluded_categories WHERE userid = %d AND categoryid = %d", $uid, $catid));
 	}
 
 	public function sendInvite($sitetitle, $siteemail, $serverurl, $uid, $emailto)
@@ -862,7 +862,7 @@ class Users
 
 	public function addInvite($uid, $inviteToken)
 	{
-		$this->pdo->queryInsert(sprintf("INSERT INTO userinvite (guid, userid, createddate) VALUES (%s, %d, now())", $this->pdo->escapeString($inviteToken), $uid));
+		$this->pdo->queryInsert(sprintf("INSERT INTO invitations (guid, userid, createddate) VALUES (%s, %d, now())", $this->pdo->escapeString($inviteToken), $uid));
 	}
 
 	public function getTopGrabbers()
@@ -907,9 +907,9 @@ class Users
 		$sql = sprintf("SELECT hosthash, group_concat(userid) AS user_string, group_concat(username) AS user_names
 							FROM
 							(
-							SELECT hosthash, userid, username FROM userdownloads LEFT OUTER JOIN users ON users.id = userdownloads.userid WHERE hosthash IS NOT NULL AND hosthash NOT IN %s GROUP BY hosthash, userid
+							SELECT hosthash, userid, username FROM user_downloads LEFT OUTER JOIN users ON users.id = user_downloads.userid WHERE hosthash IS NOT NULL AND hosthash NOT IN %s GROUP BY hosthash, userid
 							union distinct
-							SELECT hosthash, userid, username FROM userrequests LEFT OUTER JOIN users on users.id = userrequests.userid WHERE hosthash IS NOT NULL AND hosthash NOT IN %s GROUP BY hosthash, userid
+							SELECT hosthash, userid, username FROM user_requests LEFT OUTER JOIN users on users.id = user_requests.userid WHERE hosthash IS NOT NULL AND hosthash NOT IN %s GROUP BY hosthash, userid
 							) x
 							GROUP BY hosthash
 							HAVING CAST((LENGTH(group_concat(userid)) - LENGTH(REPLACE(group_concat(userid), ',', ''))) / LENGTH(',') AS UNSIGNED) < 9
@@ -932,7 +932,7 @@ class Users
 	public function getUsersByRole()
 	{
 		return $this->pdo->query("SELECT ur.name, COUNT(u.id) as num FROM users u
-							INNER JOIN userroles ur ON ur.id = u.role
+							INNER JOIN user_roles ur ON ur.id = u.role
 							GROUP BY ur.name
 							ORDER BY COUNT(u.id) DESC;"
 		);
@@ -962,19 +962,19 @@ class Users
 
 	public function getRoles()
 	{
-		return $this->pdo->query("SELECT * FROM userroles");
+		return $this->pdo->query("SELECT * FROM user_roles");
 	}
 
 	public function getRoleById($id)
 	{
-		$sql = sprintf("SELECT * FROM userroles WHERE id = %d", $id);
+		$sql = sprintf("SELECT * FROM user_roles WHERE id = %d", $id);
 
 		return $this->pdo->queryOneRow($sql);
 	}
 
 	public function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $canpre, $hideads)
 	{
-		$sql = sprintf("INSERT INTO userroles (name, apirequests, downloadrequests, defaultinvites, canpreview, canpre, hideads) VALUES (%s, %d, %d, %d, %d, %d)", $this->pdo->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $canpreview, $canpre, $hideads);
+		$sql = sprintf("INSERT INTO user_roles (name, apirequests, downloadrequests, defaultinvites, canpreview, canpre, hideads) VALUES (%s, %d, %d, %d, %d, %d)", $this->pdo->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $canpreview, $canpre, $hideads);
 
 		return $this->pdo->queryInsert($sql);
 	}
@@ -982,9 +982,9 @@ class Users
 	public function updateRole($id, $name, $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads)
 	{
 		if ($isdefault == 1) {
-			$this->pdo->queryExec("UPDATE userroles SET isdefault=0");
+			$this->pdo->queryExec("UPDATE user_roles SET isdefault=0");
 		}
-		return $this->pdo->queryExec(sprintf("UPDATE userroles SET name=%s, apirequests=%d, downloadrequests=%d, defaultinvites=%d, isdefault=%d, canpreview=%d, canpre=%d, hideads=%d WHERE id=%d", $this->pdo->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads, $id));
+		return $this->pdo->queryExec(sprintf("UPDATE user_roles SET name=%s, apirequests=%d, downloadrequests=%d, defaultinvites=%d, isdefault=%d, canpreview=%d, canpre=%d, hideads=%d WHERE id=%d", $this->pdo->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads, $id));
 	}
 
 	public function deleteRole($id)
@@ -998,12 +998,12 @@ class Users
 			$this->pdo->queryExec(sprintf("UPDATE users SET role=%d WHERE id IN (%s)", $defaultrole['id'], implode(',', $userids)));
 		}
 
-		return $this->pdo->queryExec(sprintf("DELETE FROM userroles WHERE id=%d", $id));
+		return $this->pdo->queryExec(sprintf("DELETE FROM user_roles WHERE id=%d", $id));
 	}
 
 	public function getDefaultRole()
 	{
-		return $this->pdo->queryOneRow("SELECT * FROM userroles WHERE isdefault = 1");
+		return $this->pdo->queryOneRow("SELECT * FROM user_roles WHERE isdefault = 1");
 	}
 
 	/**
@@ -1018,7 +1018,7 @@ class Users
 		// Clear old requests.
 		$this->clearApiRequests($userID);
 		$requests = $this->pdo->queryOneRow(
-			sprintf('SELECT COUNT(id) AS num FROM userrequests WHERE userid = %d', $userID)
+			sprintf('SELECT COUNT(id) AS num FROM user_requests WHERE userid = %d', $userID)
 		);
 		return (!$requests ? 0 : (int)$requests['num']);
 	}
@@ -1035,7 +1035,7 @@ class Users
 	{
 		return $this->pdo->queryInsert(
 			sprintf(
-				"INSERT INTO userrequests (userid, request, timestamp) VALUES (%d, %s, NOW())",
+				"INSERT INTO user_requests (userid, request, timestamp) VALUES (%d, %s, NOW())",
 				$userID,
 				$this->pdo->escapeString($request)
 			)
@@ -1054,11 +1054,11 @@ class Users
 	protected function clearApiRequests($userID)
 	{
 		if ($userID === false) {
-			$this->pdo->queryExec('DELETE FROM userrequests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)');
+			$this->pdo->queryExec('DELETE FROM user_requests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)');
 		} else {
 			$this->pdo->queryExec(
 				sprintf(
-					'DELETE FROM userrequests WHERE userid = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)',
+					'DELETE FROM user_requests WHERE userid = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)',
 					$userID
 				)
 			);
@@ -1066,7 +1066,7 @@ class Users
 	}
 
 	/**
-	 * deletes old rows FROM the userrequest and userdownloads tables.
+	 * deletes old rows FROM the userrequest and user_downloads tables.
 	 * if site->userdownloadpurgedays SET to 0 then all release history is removed but
 	 * the download/request rows must remain for at least one day to allow the role based
 	 * limits to apply.
@@ -1077,11 +1077,11 @@ class Users
 	{
 		if ($days == 0) {
 			$days = 1;
-			$this->pdo->queryExec("UPDATE userdownloads SET releaseid = null");
+			$this->pdo->queryExec("UPDATE user_downloads SET releaseid = null");
 		}
 
-		$this->pdo->queryExec(sprintf("DELETE FROM userrequests WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)", $days));
-		$this->pdo->queryExec(sprintf("DELETE FROM userdownloads WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)", $days));
+		$this->pdo->queryExec(sprintf("DELETE FROM user_requests WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)", $days));
+		$this->pdo->queryExec(sprintf("DELETE FROM user_downloads WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)", $days));
 	}
 
 	/**
@@ -1096,13 +1096,13 @@ class Users
 		// Clear old requests.
 		$this->pdo->queryExec(
 			sprintf(
-				'DELETE FROM userdownloads WHERE userid = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)',
+				'DELETE FROM user_downloads WHERE userid = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)',
 				$userID
 			)
 		);
 		$value = $this->pdo->queryOneRow(
 			sprintf(
-				'SELECT COUNT(id) AS num FROM userdownloads WHERE userid = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)',
+				'SELECT COUNT(id) AS num FROM user_downloads WHERE userid = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)',
 				$userID
 			)
 		);
@@ -1111,7 +1111,7 @@ class Users
 
 	public function getDownloadRequestsForUser($userID)
 	{
-		return $this->pdo->query(sprintf('SELECT u.*, r.guid, r.searchname FROM userdownloads u
+		return $this->pdo->query(sprintf('SELECT u.*, r.guid, r.searchname FROM user_downloads u
 										  LEFT OUTER JOIN releases r ON r.id = u.releaseid
 										  WHERE u.userid = %d
 										  ORDER BY u.timestamp
@@ -1134,7 +1134,7 @@ class Users
 	{
 		return $this->pdo->queryInsert(
 			sprintf(
-				"INSERT INTO userdownloads (userid, releaseid, timestamp) VALUES (%d, %d, NOW())",
+				"INSERT INTO user_downloads (userid, releaseid, timestamp) VALUES (%d, %d, NOW())",
 				$userID,
 				$releaseID
 			)
@@ -1143,7 +1143,7 @@ class Users
 
 	public function delDownloadRequestsForRelease($releaseID)
 	{
-		return $this->pdo->queryInsert(sprintf("delete FROM userdownloads WHERE releaseid = %d", $releaseID));
+		return $this->pdo->queryInsert(sprintf("delete FROM user_downloads WHERE releaseid = %d", $releaseID));
 	}
 
 	/**

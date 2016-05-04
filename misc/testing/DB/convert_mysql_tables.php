@@ -75,12 +75,12 @@ if (isset($argv[1]) && isset($argv[2]) && $argv[2] == "fmyisam") {
 	$tables = $pdo->query($sql);
 	foreach ($tables as $row) {
 		$tbl = $row['name'];
-		if ($tbl !== 'releasenfo' && $tbl !== 'releasesearch' && $tbl !== 'bookinfo' && $tbl !== 'consoleinfo' && $tbl !== 'musicinfo') {
+		if ($tbl !== 'release_nfos' && $tbl !== 'releasesearch' && $tbl !== 'bookinfo' && $tbl !== 'consoleinfo' && $tbl !== 'musicinfo') {
 			printf($cli->header("Converting $tbl"));
 			$pdo->queryExec("ALTER TABLE $tbl ENGINE=INNODB ROW_FORMAT=COMPRESSED");
 		}
 	}
-	$sql = 'SHOW TABLE STATUS WHERE Name = "releasenfo" AND (Engine != "InnoDB" || Row_format != "Dynamic")';
+	$sql = 'SHOW TABLE STATUS WHERE Name = "release_nfos" AND (Engine != "InnoDB" || Row_format != "Dynamic")';
 	$tables = $pdo->query($sql);
 	foreach ($tables as $row) {
 		$tbl = $row['name'];
@@ -103,12 +103,12 @@ if (isset($argv[1]) && isset($argv[2]) && $argv[2] == "fmyisam") {
 	$tables = $pdo->query($sql);
 	foreach ($tables as $row) {
 		$tbl = $row['name'];
-		if ($tbl !== 'releasenfo' && $tbl !== 'releasesearch' && $tbl !== 'bookinfo' && $tbl !== 'consoleinfo' && $tbl !== 'musicinfo' && !preg_match('/parts/', $tbl)) {
+		if ($tbl !== 'release_nfos' && $tbl !== 'releasesearch' && $tbl !== 'bookinfo' && $tbl !== 'consoleinfo' && $tbl !== 'musicinfo' && !preg_match('/parts/', $tbl)) {
 			printf($cli->header("Converting $tbl"));
 			$pdo->queryExec("ALTER TABLE $tbl ENGINE=INNODB ROW_FORMAT=COMPRESSED");
 		}
 	}
-	$sql = 'SHOW TABLE STATUS WHERE Name = "releasenfo" AND (Engine != "InnoDB" || Row_format != "Dynamic")';
+	$sql = 'SHOW TABLE STATUS WHERE Name = "release_nfos" AND (Engine != "InnoDB" || Row_format != "Dynamic")';
 	$tables = $pdo->query($sql);
 	foreach ($tables as $row) {
 		$tbl = $row['name'];

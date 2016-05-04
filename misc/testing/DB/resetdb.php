@@ -34,10 +34,10 @@ $pdo->queryExec("UPDATE groups SET first_record = 0, first_record_postdate = NUL
 echo $pdo->log->primary("Reseting all groups completed.");
 
 $arr = [
-		"videos", "tv_episodes", "tv_info", "releasenfo", "release_comments", 'sharing', 'sharing_sites',
-		"usercart", "usermovies", "userseries", "movieinfo", "musicinfo", "release_files",
-		"releaseaudio", "releasesubs", "releasevideo", "releaseextrafull", "parts",
-		"partrepair", "binaries", "collections", "releases", "spotnabsources"
+		"videos", "tv_episodes", "tv_info", "release_nfos", "release_comments", 'sharing', 'sharing_sites',
+		"users_releases", "user_movies", "user_series", "movieinfo", "musicinfo", "release_files",
+		"release_audio", "release_subtitles", "video_data", "releaseextrafull", "parts",
+		"missed_parts", "binaries", "collections", "releases", "spotnabsources"
 ];
 foreach ($arr as &$value) {
 	$rel = $pdo->queryExec("TRUNCATE TABLE $value");

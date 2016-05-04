@@ -19,10 +19,10 @@ if (isset($argv[1]) && $argv[1] === "all") {
 			$pdo->queryExec("TRUNCATE TABLE consoleinfo");
 			$pdo->queryExec("TRUNCATE TABLE gamesinfo");
 			$pdo->queryExec("TRUNCATE TABLE movieinfo");
-			$pdo->queryExec("TRUNCATE TABLE releasevideo");
+			$pdo->queryExec("TRUNCATE TABLE video_data");
 			$pdo->queryExec("TRUNCATE TABLE musicinfo");
 			$pdo->queryExec("TRUNCATE TABLE bookinfo");
-			$pdo->queryExec("TRUNCATE TABLE releasenfo");
+			$pdo->queryExec("TRUNCATE TABLE release_nfos");
 			$pdo->queryExec("TRUNCATE TABLE releaseextrafull");
 			$pdo->queryExec("TRUNCATE TABLE xxxinfo");
 			$pdo->queryExec("TRUNCATE TABLE videos");
@@ -298,7 +298,7 @@ if (isset($argv[1]) && ($argv[1] === "xxx" || $argv[1] === "all")) {
 if (isset($argv[1]) && ($argv[1] === "nfos" || $argv[1] === "all")) {
 	$ran = true;
 	if (isset($argv[3]) && $argv[3] === "truncate") {
-		$pdo->queryExec("TRUNCATE TABLE releasenfo");
+		$pdo->queryExec("TRUNCATE TABLE release_nfos");
 	}
 	if (isset($argv[2]) && $argv[2] === "true") {
 		echo $pdo->log->header("Resetting all NFO postprocessing");

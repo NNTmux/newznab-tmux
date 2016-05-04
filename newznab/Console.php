@@ -237,7 +237,7 @@ class Console
 				rn.id AS nfoid
 				FROM releases r
 				LEFT OUTER JOIN groups g ON g.id = r.groupid
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+				LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				INNER JOIN consoleinfo con ON con.id = r.consoleinfoid
 				INNER JOIN genres ON con.genreid = genres.id

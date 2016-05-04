@@ -18,7 +18,7 @@ if (!isset($argv[1])) {
 	$pieces = explode(' ', $argv[1]);
 	if (isset($pieces[1]) && $pieces[0] == 'nfo') {
 		$release = $pieces[1];
-		if ($res = $db->queryOneRow(sprintf('SELECT rel.guid AS guid, nfo.releaseid AS nfoid, rel.groupid, rel.categoryid, rel.name, rel.searchname, uncompress(nfo) AS textstring, rel.id AS releaseid FROM releases rel INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.id) WHERE rel.id = %d', $release))) {
+		if ($res = $db->queryOneRow(sprintf('SELECT rel.guid AS guid, nfo.releaseid AS nfoid, rel.groupid, rel.categoryid, rel.name, rel.searchname, uncompress(nfo) AS textstring, rel.id AS releaseid FROM releases rel INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id) WHERE rel.id = %d', $release))) {
 			//ignore encrypted nfos
 			if (preg_match('/^=newz\[NZB\]=\w+/', $res['textstring'])) {
 				$namefixer->done = $namefixer->matched = false;
