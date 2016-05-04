@@ -1,4 +1,5 @@
 2016-05-04 DariusIII
+	* Upd: NNTmux versions handling
 	* Upd: Update db function in Update script.
 	* Fix: Force li3 connections to ignore Host/Port settings if a socket is provided.
 	* Upd: Add patch for triggers to match the new releases reqid format (@rainje)

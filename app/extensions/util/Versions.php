@@ -68,7 +68,13 @@ class Versions extends \lithium\core\Object
 
 	public function getSQLPatchFromDB()
 	{
-		return Settings::find('setting', ['conditions' => '..sqlpatch']);
+		$dbVersion = Settings::value('..sqlpatch', true);
+
+		if (!is_numeric($dbVersion)) {
+			throw new \Exception('Bad sqlpatch value');
+		}
+
+		return $dbVersion;
 	}
 
 	public function getSQLPatchFromFile()
@@ -99,7 +105,7 @@ class Versions extends \lithium\core\Object
 			}
 
 			if ($this->xml->count() > 0) {
-				$vers = $this->xml->xpath('/newznab/versions');
+				$vers = $this->xml->xpath('/nntmux/versions');
 
 				if ($vers[0]->count() == 0) {
 					$this->error("Your versions XML file ($versions) does not contain version info, try updating from git.");

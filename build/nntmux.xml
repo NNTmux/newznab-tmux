@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<newznab>
+<nntmux>
 	<versions>
 		<git>
 			<tag>0.0.0</tag>
@@ -20,4 +20,4 @@
 			<file>244</file>
 		</sql>
 	</versions>
-</newznab>
+</nntmux>

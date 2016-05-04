@@ -264,7 +264,7 @@ class Versions
 		}
 
 		if ($this->_xml->count() > 0) {
-			$vers = $this->_xml->xpath('/newznab/versions');
+			$vers = $this->_xml->xpath('/nntmux/versions');
 
 			if ($vers[0]->count() == 0) {
 				$this->out->error("Your versions XML file ({NN_VERSIONS}) does not contain version info, try updating from git.");
