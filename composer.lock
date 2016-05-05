@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "42092b03e35a78faa7c12f4c9f589987",
+    "hash": "5a03bbb0aaebdf3ee21bad92191a5012",
     "content-hash": "d3861f98671a69f7f1e54686955b1934",
     "packages": [
         {
@@ -456,16 +456,16 @@
         },
         {
             "name": "bower-asset/font-awesome",
-            "version": "v4.6.1",
+            "version": "v4.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "6535013c330e801ecf0b23c437865a7fb344486d"
+                "reference": "e7cc59d666ed0826656f695afad7c56e95eb6513"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/6535013c330e801ecf0b23c437865a7fb344486d",
-                "reference": "6535013c330e801ecf0b23c437865a7fb344486d",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/e7cc59d666ed0826656f695afad7c56e95eb6513",
+                "reference": "e7cc59d666ed0826656f695afad7c56e95eb6513",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1327,12 +1327,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/JPinkney/TVMaze-PHP-API-Wrapper.git",
-                "reference": "bf6b5bcf44d607bd2406b0638e86e6b9f1b909fe"
+                "reference": "03e60ddbb4a5516aee531be5f4fafc92922f8ae4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JPinkney/TVMaze-PHP-API-Wrapper/zipball/bf6b5bcf44d607bd2406b0638e86e6b9f1b909fe",
-                "reference": "bf6b5bcf44d607bd2406b0638e86e6b9f1b909fe",
+                "url": "https://api.github.com/repos/JPinkney/TVMaze-PHP-API-Wrapper/zipball/03e60ddbb4a5516aee531be5f4fafc92922f8ae4",
+                "reference": "03e60ddbb4a5516aee531be5f4fafc92922f8ae4",
                 "shasum": ""
             },
             "type": "library",
@@ -1352,7 +1352,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2016-03-16 14:59:03"
+            "time": "2016-05-04 01:31:56"
         },
         {
             "name": "kbjr/Git.php",
