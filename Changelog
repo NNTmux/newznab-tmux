@@ -1,4 +1,5 @@
 2016-05-05 DariusIII
+	* Upd: Reinstate the LINES TERMINATED BY clause to loading data files to override default behaviour of only using '\n' instead of '\r\n' that we need.
 	* Upd: Update sphinx.conf (remove deprecated setting and change searchd.pid location)
 	* Upd: Update composer.lock with new versions of font awesome and TVMaze
 2016-05-04 DariusIII
