@@ -1,4 +1,5 @@
 2016-05-05 DariusIII
+	* Upd: Update sphinx.conf (remove deprecated setting and change searchd.pid location)
 	* Upd: Update composer.lock with new versions of font awesome and TVMaze
 2016-05-04 DariusIII
 	* Upd: Rename tables to more logical names (same as in nZEDb)
