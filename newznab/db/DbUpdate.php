@@ -80,7 +80,7 @@ class DbUpdate
 		// This is for unconverted scripts that still use $db->settings instead of the $db->pdo property.
 		$this->settings =& $this->pdo;
 
-		$this->_DbSystem = strtolower($this->pdo->dbSystem());
+		$this->_DbSystem = strtolower($this->pdo->DbSystem());
 	}
 
 	public function loadTables(array $options = [])
