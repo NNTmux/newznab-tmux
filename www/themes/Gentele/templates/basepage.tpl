@@ -34,6 +34,7 @@
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen"/>
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/custom.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/flat/green.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" type="text/css" media="screen"/>
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
 	<script src="{$smarty.const.WWW_THEMES}/shared/assets/html5shiv/dist/html5shiv.min.js"></script>
@@ -235,7 +236,7 @@
 <!-- newznab default scripts, needed for stuff to work -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/qtip2/jquery.qtip.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/sorttable.js"></script>
 <!-- Custom functions -->
 <script src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/functions.js" type="text/javascript"></script>

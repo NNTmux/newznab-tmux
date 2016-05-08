@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5a03bbb0aaebdf3ee21bad92191a5012",
-    "content-hash": "d3861f98671a69f7f1e54686955b1934",
+    "hash": "8673f797e28f190a443adc747b040a40",
+    "content-hash": "a6495a5790fde01decef45855de9affb",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -839,17 +839,17 @@
             "description": "JavaScript notification plugin."
         },
         {
-            "name": "bower-asset/qtip2",
-            "version": "v2.2.1",
+            "name": "bower-asset/qtip2-main",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/qTip2/bower.git",
-                "reference": "2f67997b5449bb4dea568e82966fb35dc11fb84e"
+                "url": "https://github.com/qTip2/qTip2.git",
+                "reference": "c25a530a431e78b3f7e7d955c953ffdca8d10b1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/qTip2/bower/zipball/2f67997b5449bb4dea568e82966fb35dc11fb84e",
-                "reference": "2f67997b5449bb4dea568e82966fb35dc11fb84e",
+                "url": "https://api.github.com/repos/qTip2/qTip2/zipball/c25a530a431e78b3f7e7d955c953ffdca8d10b1a",
+                "reference": "c25a530a431e78b3f7e7d955c953ffdca8d10b1a",
                 "shasum": ""
             },
             "require": {
@@ -859,11 +859,8 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": [
-                    "./jquery.qtip.js",
-                    "./basic/jquery.qtip.js"
-                ],
-                "bower-asset-ignore": [
-                    "bin"
+                    "./dist/jquery.qtip.js",
+                    "./dist/jquery.qtip.css"
                 ]
             },
             "license": [
@@ -876,6 +873,7 @@
                 "craig thompson",
                 "craigsworks",
                 "jquery",
+                "jquery-plugin",
                 "qtip",
                 "qtip2",
                 "simpletip",

@@ -1,4 +1,5 @@
 2016-05-08 DariusIII
+	* Upd: Composer replace qtip2 with qtip2-main
 	* Fix: Fix missed table renames in scripts.
 	* Upd: Update nntmux_fi_schema.sql.
 2016-05-06 DariusIII
