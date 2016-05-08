@@ -864,7 +864,7 @@ class ReleaseRemover
 				);
 
 				if ($opTypeName == 'Subject') {
-					$join = (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX ? 'INNER JOIN releases_se rse ON rse.id = r.id' : 'INNER JOIN releasesearch rs ON rs.releaseid = r.id');
+					$join = (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX ? 'INNER JOIN releases_se rse ON rse.id = r.id' : 'INNER JOIN release_search_data rs ON rs.releaseid = r.id');
 				} else {
 					$join = '';
 				}

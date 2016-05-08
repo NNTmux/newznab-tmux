@@ -826,7 +826,7 @@ class NameFixer
 				preg_match_all('#[a-zA-Z0-9]{3,}#', $preTitle, $matches, PREG_PATTERN_ORDER);
 				$titlematch = '+' . implode(' +', $matches[0]);
 				$join = sprintf(
-					"INNER JOIN releasesearch rs ON rs.releaseid = r.id
+					"INNER JOIN release_search_data rs ON rs.releaseid = r.id
 						WHERE
 							(MATCH (rs.name) AGAINST ('%1\$s' IN BOOLEAN MODE)
 							OR MATCH (rs.searchname) AGAINST ('%1\$s' IN BOOLEAN MODE))",
@@ -1005,7 +1005,7 @@ class NameFixer
 		$row = $pdo->queryOneRow(
 			sprintf("
 						SELECT p.id AS preid, p.title, p.source
-						FROM predb p INNER JOIN predbhash h ON h.pre_id = p.id
+						FROM predb p INNER JOIN predb_hashes h ON h.pre_id = p.id
 						WHERE h.hash = UNHEX(%s)
 						LIMIT 1",
 				$pdo->escapeString($hash)
