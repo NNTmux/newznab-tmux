@@ -9,7 +9,7 @@ use newznab\NNTP;
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
-	exit($c->error("This script is not intended to be run manually, it is called from postprocess_threaded.py."));
+	exit($c->error("This script is not intended to be run manually, it is called from postprocess.php."));
 }
 
 

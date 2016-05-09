@@ -1,4 +1,5 @@
 2016-05-09 DariusIII
+	* Chg: Replace/remove refferences to python scripts where possible.
 	* Fix: Change TIME() to lowercase time()
 	* Upd: Fix Yahoo search in Movie class
 	* Chg: Replace python requestid_threaded with php equivalent in ProcessReleases class.

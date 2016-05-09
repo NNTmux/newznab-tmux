@@ -209,8 +209,8 @@ function window_proxy($tmux_session, $window)
 	}
 
 	if ($nntpproxy === '1' && ($pdo->getSetting('alternate_nntp') == '1')) {
-		$DIR = NN_TMUX;
-		$nntpproxypy = $DIR . "python/nntpproxy.py";
+		$DIR = NN_MISC;
+		$nntpproxypy = $DIR . "update/python/nntpproxy.py";
 		if (file_exists($DIR . "python/lib/nntpproxy_a.conf")) {
 			$nntpproxyconf = $DIR . "python/lib/nntpproxy_a.conf";
 			exec("tmux selectp -t $tmux_session:$window.0; tmux splitw -t $tmux_session:$window -h -p 50 'printf \"\033]2;NNTPProxy\033\" && python $nntpproxypy $nntpproxyconf'");

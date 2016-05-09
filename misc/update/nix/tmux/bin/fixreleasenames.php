@@ -11,7 +11,7 @@ use newznab\Nfo;
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
-	exit($c->error("This script is not intended to be run manually, it is called from fixreleasenames_threaded.py."));
+	exit($c->error("This script is not intended to be run manually, it is called from fixreleasenames.php."));
 } else if (isset($argv[1])) {
 	$db = new Settings();
 	$namefixer = new NameFixer(['Settings' => $pdo]);
