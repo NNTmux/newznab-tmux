@@ -189,7 +189,7 @@ class Music
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0) {
-			$exccatlist = " AND r.categoryid NOT IN (" . implode(",", $excludedcats) . ")";
+			$exccatlist = " AND r.categories_id NOT IN (" . implode(",", $excludedcats) . ")";
 		}
 
 		$order = $this->getMusicOrder($orderby);
@@ -681,7 +681,7 @@ class Music
 					FROM releases
 					WHERE musicinfoid IS NULL
 					AND nzbstatus = 1 %s
-					AND categoryid IN (%s, %s, %s)
+					AND categories_id IN (%s, %s, %s)
 					ORDER BY postdate DESC
 					LIMIT %d',
 				$this->renamed,

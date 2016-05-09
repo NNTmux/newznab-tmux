@@ -65,7 +65,7 @@ class Categorize extends Category
 	 * @param string     $releaseName The name to parse.
 	 * @param int|string $groupID     The groupid.
 	 *
-	 * @return int The categoryid.
+	 * @return int The categories_id.
 	 */
 	public function determineCategory($groupID, $releaseName = '')
 	{

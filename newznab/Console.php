@@ -97,7 +97,7 @@ class Console
 			$this->renamed = 'AND isrenamed = 1';
 		}
 		//$this->cleanconsole = ($this->pdo->getSetting('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
-		$this->catWhere = "AND categoryid BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
+		$this->catWhere = "AND categories_id BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
 
 		$this->failCache =[];
 	}
@@ -175,7 +175,7 @@ class Console
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0) {
-			$exccatlist = " AND r.categoryid NOT IN (" . implode(",", $excludedcats) . ")";
+			$exccatlist = " AND r.categories_id NOT IN (" . implode(",", $excludedcats) . ")";
 		}
 
 		$order = $this->getConsoleOrder($orderby);
@@ -909,7 +909,7 @@ class Console
 		array_map("trim", $result);
 
 		/* Make sure we got a title and platform otherwise the resulting lookup will probably be shit.
-		   Other option is to pass the $release->categoryid here if we don't find a platform but that
+		   Other option is to pass the $release->categories_id here if we don't find a platform but that
 		   would require an extra lookup to determine the name. In either case we should have a title at the minimum. */
 
 		return (isset($result['title']) && !empty($result['title']) && isset($result['platform'])) ? $result : false;

@@ -296,7 +296,7 @@
 				<dd><a title="Browse {$release.group_name}" href="{$smarty.const.WWW_TOP}/browse?g={$release.group_name}">{$release.group_name|replace:"alt.binaries":"a.b"}</a></dd>
 
 				<dt>Category</dt>
-				<dd><a title="Browse by {$release.category_name}" href="{$smarty.const.WWW_TOP}/browse?t={$release.categoryid}">{$release.category_name}</a></dd>
+				<dd><a title="Browse by {$release.category_name}" href="{$smarty.const.WWW_TOP}/browse?t={$release.categories_id}">{$release.category_name}</a></dd>
 				{if $nfo.releaseid|@count > 0}
 					<dt>Nfo</dt>
 					<dd><a href="{$smarty.const.WWW_TOP}/nfo/{$release.guid}" title="View Nfo">View Nfo</a></dd>

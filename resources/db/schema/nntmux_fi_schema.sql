@@ -2435,7 +2435,7 @@ CREATE TABLE IF NOT EXISTS releases (
   guid VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
   fromname VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   completion FLOAT NOT NULL DEFAULT '0',
-  categoryid INT(11) NOT NULL DEFAULT '0',
+  categories_id INT(11) NOT NULL DEFAULT '0',
   videos_id MEDIUMINT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to videos.id of the parent series.',
   tv_episodes_id MEDIUMINT(11) NOT NULL DEFAULT '0' COMMENT 'FK to tv_episodes.id of the episode',
   regexid INT(11) DEFAULT NULL,
@@ -2474,7 +2474,7 @@ CREATE TABLE IF NOT EXISTS releases (
   xxxinfo_id INT(10) NOT NULL DEFAULT '0',
   nzbstatus TINYINT(1) NOT NULL DEFAULT '0',
   nzb_guid BINARY(16) DEFAULT NULL,
-  PRIMARY KEY (id,categoryid),
+  PRIMARY KEY (id,categories_id),
   KEY ix_releases_name (name),
   KEY ix_releases_group_id (groupid,passwordstatus),
   KEY ix_releases_postdate_searchname (postdate,searchname),
@@ -2501,7 +2501,7 @@ CREATE TABLE IF NOT EXISTS releases (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1
-  PARTITION BY RANGE (categoryid)(
+  PARTITION BY RANGE (categories_id)(
   PARTITION misc VALUES LESS THAN (1000),
   PARTITION console VALUES LESS THAN (2000),
   PARTITION movies VALUES LESS THAN (3000),
@@ -3821,10 +3821,10 @@ DROP TABLE IF EXISTS roleexcat;
 CREATE TABLE IF NOT EXISTS roleexcat (
   id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   role INT(11) NOT NULL,
-  categoryid INT(11) DEFAULT NULL,
+  categories_id INT(11) DEFAULT NULL,
   createddate DATETIME NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY ix_roleexcat_rolecat (role,categoryid)
+  UNIQUE KEY ix_roleexcat_rolecat (role,categories_id)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
@@ -4366,10 +4366,10 @@ DROP TABLE IF EXISTS user_excluded_categories;
 CREATE TABLE IF NOT EXISTS user_excluded_categories (
   id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   userid INT(11) DEFAULT NULL,
-  categoryid INT(11) DEFAULT NULL,
+  categories_id INT(11) DEFAULT NULL,
   createddate DATETIME NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY ix_userexcat_usercat (userid,categoryid)
+  UNIQUE KEY ix_userexcat_usercat (userid,categories_id)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
@@ -4394,7 +4394,7 @@ CREATE TABLE IF NOT EXISTS user_movies (
   id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   userid INT(16) DEFAULT NULL,
   imdbid MEDIUMINT(7) UNSIGNED zerofill DEFAULT NULL,
-  categoryid VARCHAR(64) COLLATE utf8_unicode_ci DEFAULT NULL,
+  categories_id VARCHAR(64) COLLATE utf8_unicode_ci DEFAULT NULL,
   createddate DATETIME NOT NULL,
   PRIMARY KEY (id),
   KEY ix_usermovies_userid (userid,imdbid)
@@ -4501,7 +4501,7 @@ CREATE TABLE IF NOT EXISTS user_series (
   id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   userid INT(16) DEFAULT NULL,
   videos_id INT(16) NOT NULL COMMENT 'FK to videos.id',
-  categoryid VARCHAR(64) COLLATE utf8_unicode_ci DEFAULT NULL,
+  categories_id VARCHAR(64) COLLATE utf8_unicode_ci DEFAULT NULL,
   createddate DATETIME NOT NULL,
   PRIMARY KEY (id),
   KEY ix_userseries_videos_id (userid,videos_id)

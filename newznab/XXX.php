@@ -79,7 +79,7 @@ class XXX
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->imgSavePath = NN_COVERS . 'xxx' . DS;
 		$this->cookie = NN_TMP . 'xxx.cookie';
-		$this->catWhere = 'AND categoryid IN (' .
+		$this->catWhere = 'AND categories_id IN (' .
 			Category::XXX_DVD . ', ' .
 			Category::XXX_WMV . ', ' .
 			Category::XXX_XVID . ', ' .
@@ -184,7 +184,7 @@ class XXX
 								? 'AND r.postdate > NOW() - INTERVAL ' . $maxAge . 'DAY '
 								: ''
 						),
-						(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+						(count($excludedCats) > 0 ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 						$order[0],
 						$order[1],
 						($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
@@ -224,8 +224,8 @@ class XXX
 			LEFT OUTER JOIN groups g ON g.id = r.groupid
 			LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			LEFT OUTER JOIN category c ON c.id = r.categoryid
-			LEFT OUTER JOIN category cp ON cp.id = c.parentid
+			LEFT OUTER JOIN categories c ON c.id = r.categories_id
+			LEFT OUTER JOIN categories cp ON cp.id = c.parentid
 			INNER JOIN xxxinfo xxx ON xxx.id = r.xxxinfo_id
 			WHERE r.nzbstatus = 1
 			AND xxx.id IN (%s)
@@ -242,7 +242,7 @@ class XXX
 						? 'AND r.postdate > NOW() - INTERVAL ' . $maxAge . 'DAY '
 						: ''
 				),
-				(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				(count($excludedCats) > 0 ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				$order[0],
 				$order[1]
 		);

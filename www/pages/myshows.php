@@ -101,7 +101,7 @@ switch ($action) {
 			$page->smarty->assign('type', 'edit');
 			$page->smarty->assign('cat_ids', array_keys($categories));
 			$page->smarty->assign('cat_names', $categories);
-			$page->smarty->assign('cat_selected', explode('|', $show['categoryid']));
+			$page->smarty->assign('cat_selected', explode('|', $show['categories_id']));
 			$page->smarty->assign('video', $videoId);
 			$page->smarty->assign('show', $show);
 			if (isset($_REQUEST['from'])) {
@@ -169,7 +169,7 @@ switch ($action) {
 		$shows = $us->getShows($page->users->currentUserId());
 		$results = [];
 		foreach ($shows as $showk => $show) {
-			$showcats = explode('|', $show['categoryid']);
+			$showcats = explode('|', $show['categories_id']);
 			if (is_array($showcats) && sizeof($showcats) > 0) {
 				$catarr = [];
 				foreach ($showcats as $scat) {

@@ -772,7 +772,7 @@ class Users
 		$this->delUserCategoryExclusions($uid);
 		if (COUNT($catids) > 0) {
 			foreach ($catids as $catid) {
-				$this->pdo->queryInsert(sprintf("INSERT INTO user_excluded_categories (userid, categoryid, createddate) VALUES (%d, %d, now())", $uid, $catid));
+				$this->pdo->queryInsert(sprintf("INSERT INTO user_excluded_categories (userid, categories_id, createddate) VALUES (%d, %d, now())", $uid, $catid));
 			}
 		}
 	}
@@ -780,9 +780,9 @@ class Users
 	public function getRoleCategoryExclusion($role)
 	{
 		$ret = [];
-		$data = $this->pdo->query(sprintf("SELECT categoryid FROM roleexcat WHERE role = %d", $role));
+		$data = $this->pdo->query(sprintf("SELECT categories_id FROM roleexcat WHERE role = %d", $role));
 		foreach ($data as $d)
-			$ret[] = $d["categoryid"];
+			$ret[] = $d["categories_id"];
 
 		return $ret;
 	}
@@ -792,7 +792,7 @@ class Users
 		$this->delRoleCategoryExclusions($role);
 		if (COUNT($catids) > 0) {
 			foreach ($catids as $catid) {
-				$this->pdo->queryInsert(sprintf("INSERT INTO roleexcat (role, categoryid, createddate) VALUES (%d, %d, now())", $role, $catid));
+				$this->pdo->queryInsert(sprintf("INSERT INTO roleexcat (role, categories_id, createddate) VALUES (%d, %d, now())", $role, $catid));
 			}
 		}
 	}
@@ -812,9 +812,9 @@ class Users
 	public function getCategoryExclusion($userID)
 	{
 		$ret = [];
-		$categories = $this->pdo->query(sprintf("SELECT categoryid FROM user_excluded_categories WHERE userid = %d", $userID));
+		$categories = $this->pdo->query(sprintf("SELECT categories_id FROM user_excluded_categories WHERE userid = %d", $userID));
 		foreach ($categories as $category) {
-			$ret[] = $category["categoryid"];
+			$ret[] = $category["categories_id"];
 		}
 
 		return $ret;
@@ -843,7 +843,7 @@ class Users
 
 	public function delCategoryExclusion($uid, $catid)
 	{
-		$this->pdo->queryExec(sprintf("DELETE FROM user_excluded_categories WHERE userid = %d AND categoryid = %d", $uid, $catid));
+		$this->pdo->queryExec(sprintf("DELETE FROM user_excluded_categories WHERE userid = %d AND categories_id = %d", $uid, $catid));
 	}
 
 	public function sendInvite($sitetitle, $siteemail, $serverurl, $uid, $emailto)

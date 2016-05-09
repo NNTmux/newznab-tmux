@@ -35,7 +35,7 @@ function reCategorize($argv)
 	} else if (isset($argv[1]) && preg_match('/\([\d, ]+\)/', $argv[1])) {
 		$where = ' AND groupid IN ' . $argv[1];
 	} else if (isset($argv[1]) && $argv[1] === 'misc') {
-		$where = sprintf(' AND categoryid IN (%s)', $othercats);
+		$where = sprintf(' AND categories_id IN (%s)', $othercats);
 	}
 	if (isset($argv[2]) && $argv[2] === 'test') {
 		$update = false;
@@ -73,13 +73,13 @@ function categorizeRelease($where, $update = true, $echooutput = false)
 	$pdo->log = new ColorCLI();
 	$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 	$relcount = $chgcount = 0;
-	echo $pdo->log->primary("SELECT id, searchname, groupid, categoryid FROM releases " . $where);
-	$resrel = $pdo->queryDirect("SELECT id, searchname, groupid, categoryid FROM releases " . $where);
+	echo $pdo->log->primary("SELECT id, searchname, groupid, categories_id FROM releases " . $where);
+	$resrel = $pdo->queryDirect("SELECT id, searchname, groupid, categories_id FROM releases " . $where);
 	$total = $resrel->rowCount();
 	if ($total > 0) {
 		foreach ($resrel as $rowrel) {
 			$catId = $cat->determineCategory($rowrel['groupid'], $rowrel['searchname']);
-			if ($rowrel['categoryid'] != $catId) {
+			if ($rowrel['categories_id'] != $catId) {
 				if ($update === true) {
 					$pdo->queryExec(
 						sprintf("
@@ -94,7 +94,7 @@ function categorizeRelease($where, $update = true, $echooutput = false)
 								bookinfoid = NULL,
 								anidbid = NULL,
 								xxxinfo_id = 0,
-								categoryid = %d
+								categories_id = %d
 							WHERE id = %d",
 							$catId,
 							$rowrel['id']

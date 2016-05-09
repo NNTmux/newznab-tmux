@@ -63,7 +63,7 @@ if (isset($argv[1]) && ($argv[1] === "consoles" || $argv[1] === "all")) {
 		$where = ' WHERE consoleinfoid IS NOT NULL';
 	} else {
 		echo $pdo->log->header("Resetting all failed Console postprocessing");
-		$where = " WHERE consoleinfoid IN (-2, 0) AND categoryid BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
+		$where = " WHERE consoleinfoid IN (-2, 0) AND categories_id BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -91,7 +91,7 @@ if (isset($argv[1]) && ($argv[1] === "games" || $argv[1] === "all")) {
 		$where = ' WHERE gamesinfo_id != 0';
 	} else {
 		echo $pdo->log->header("Resetting all failed Games postprocessing");
-		$where = " WHERE gamesinfo_id IN (-2, 0) AND categoryid = 4050";
+		$where = " WHERE gamesinfo_id IN (-2, 0) AND categories_id = 4050";
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -119,7 +119,7 @@ if (isset($argv[1]) && ($argv[1] === "movies" || $argv[1] === "all")) {
 		$where = ' WHERE imdbid IS NOT NULL';
 	} else {
 		echo $pdo->log->header("Resetting all failed Movie postprocessing");
-		$where = " WHERE imdbid IN (-2, 0) AND categoryid BETWEEN " . Category::MOVIE_ROOT . " AND " . Category::MOVIE_OTHER;
+		$where = " WHERE imdbid IN (-2, 0) AND categories_id BETWEEN " . Category::MOVIE_ROOT . " AND " . Category::MOVIE_OTHER;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -147,7 +147,7 @@ if (isset($argv[1]) && ($argv[1] === "music" || $argv[1] === "all")) {
 		$where = ' WHERE musicinfoid IS NOT NULL';
 	} else {
 		echo $pdo->log->header("Resetting all failed Music postprocessing");
-		$where = " WHERE musicinfoid IN (-2, 0) AND categoryid BETWEEN " . Category::MUSIC_ROOT . " AND " . Category::MUSIC_OTHER;
+		$where = " WHERE musicinfoid IN (-2, 0) AND categories_id BETWEEN " . Category::MUSIC_ROOT . " AND " . Category::MUSIC_OTHER;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -196,10 +196,10 @@ if (isset($argv[1]) && ($argv[1] === "tv" || $argv[1] === "all")) {
 	}
 	if (isset($argv[2]) && $argv[2] === "true") {
 		echo $pdo->log->header("Resetting all TV postprocessing");
-		$where = " WHERE videos_id != 0 AND tv_episodes_id != 0 AND categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER;
+		$where = " WHERE videos_id != 0 AND tv_episodes_id != 0 AND categories_id BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER;
 	} else {
 		echo $pdo->log->header("Resetting all failed TV postprocessing");
-		$where = " WHERE tv_episodes_id < 0 AND categoryid BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
+		$where = " WHERE tv_episodes_id < 0 AND categories_id BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -225,10 +225,10 @@ if (isset($argv[1]) && ($argv[1] === "anime" || $argv[1] === "all")) {
 	}
 	if (isset($argv[2]) && $argv[2] === "true") {
 		echo $pdo->log->header("Resetting all Anime postprocessing");
-		$where = ' WHERE categoryid = 5070';
+		$where = ' WHERE categories_id = 5070';
 	} else {
 		echo $pdo->log->header("Resetting all failed Anime postprocessing");
-		$where = " WHERE anidbid BETWEEN -2 AND -1 AND categoryid = " . Category::TV_ANIME;
+		$where = " WHERE anidbid BETWEEN -2 AND -1 AND categories_id = " . Category::TV_ANIME;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -256,7 +256,7 @@ if (isset($argv[1]) && ($argv[1] === "books" || $argv[1] === "all")) {
 		$where = ' WHERE bookinfoid IS NOT NULL';
 	} else {
 		echo $pdo->log->header("Resetting all failed Book postprocessing");
-		$where = " WHERE bookinfoid IN (-2, 0) AND categoryid BETWEEN " . Category::BOOKS_ROOT . " AND " . Category::BOOKS_UNKNOWN;
+		$where = " WHERE bookinfoid IN (-2, 0) AND categories_id BETWEEN " . Category::BOOKS_ROOT . " AND " . Category::BOOKS_UNKNOWN;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);
@@ -280,7 +280,7 @@ if (isset($argv[1]) && ($argv[1] === "xxx" || $argv[1] === "all")) {
 		$where = ' WHERE xxxinfo_id != 0';
 	} else {
 		echo $pdo->log->header("Resetting all failed XXX postprocessing");
-		$where = " WHERE xxxinfo_id IN (-2, 0) AND categoryid BETWEEN " . Category::XXX_ROOT . " AND " . Category::XXX_X264;
+		$where = " WHERE xxxinfo_id IN (-2, 0) AND categories_id BETWEEN " . Category::XXX_ROOT . " AND " . Category::XXX_X264;
 	}
 
 	$qry = $pdo->queryDirect("SELECT id FROM releases" . $where);

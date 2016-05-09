@@ -22,7 +22,7 @@ Class Videos
 		];
 		$options += $defaults;
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->catWhere = "r.categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER;
+		$this->catWhere = "r.categories_id BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER;
 	}
 
 	/**

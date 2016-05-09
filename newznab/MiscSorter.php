@@ -63,7 +63,7 @@ class MiscSorter
 	public function nfosorter($category = 0, $id = 0)
 	{
 		$idarr = ($id != 0 ? sprintf('AND r.id = %d', $id) : '');
-		$cat = ($category = 0 ? sprintf('AND r.categoryid = %d', Category::OTHER_MISC) : sprintf('AND r.categoryid = %d', $category));
+		$cat = ($category = 0 ? sprintf('AND r.categories_id = %d', Category::OTHER_MISC) : sprintf('AND r.categories_id = %d', $category));
 
 		$res = $this->pdo->queryDirect(
 			sprintf("
@@ -238,7 +238,7 @@ class MiscSorter
 		$release = $this->pdo->queryOneRow(
 			sprintf("
 							SELECT r.id AS releaseid, r.searchname AS searchname,
-								r.name AS name, r.categoryid, r.groupid
+								r.name AS name, r.categories_id, r.groupid
 							FROM releases r
 							WHERE r.id = %d",
 				$id

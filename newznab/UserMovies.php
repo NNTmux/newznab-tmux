@@ -31,7 +31,7 @@ class UserMovies
 
 		$catid = (!empty($catid)) ? $this->pdo->escapeString(implode('|', $catid)) : "null";
 
-		return $this->pdo->queryInsert(sprintf("INSERT INTO user_movies (userid, imdbid, categoryid, createddate) VALUES (%d, %d, %s, now())", $uid, $imdbid, $catid));
+		return $this->pdo->queryInsert(sprintf("INSERT INTO user_movies (userid, imdbid, categories_id, createddate) VALUES (%d, %d, %s, now())", $uid, $imdbid, $catid));
 	}
 
 	public function getMovies($uid)
@@ -58,6 +58,6 @@ class UserMovies
 	{
 
 		$catid = (!empty($catid)) ? $this->pdo->escapeString(implode('|', $catid)) : "null";
-		$this->pdo->queryExec(sprintf("UPDATE user_movies SET categoryid = %s WHERE userid = %d AND imdbid = %d", $catid, $uid, $imdbid));
+		$this->pdo->queryExec(sprintf("UPDATE user_movies SET categories_id = %s WHERE userid = %d AND imdbid = %d", $catid, $uid, $imdbid));
 	}
 }

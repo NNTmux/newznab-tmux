@@ -24,7 +24,7 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'nfo' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT r.id AS releaseid, r.guid, r.groupid, r.categoryid, r.name, r.searchname,
+								SELECT r.id AS releaseid, r.guid, r.groupid, r.categories_id, r.name, r.searchname,
 									uncompress(nfo) AS textstring
 								FROM releases r
 								INNER JOIN release_nfos rn ON r.id = rn.releaseid
@@ -64,7 +64,7 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'md5' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT DISTINCT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, r.dehashstatus,
+								SELECT DISTINCT r.id AS releaseid, r.name, r.searchname, r.categories_id, r.groupid, r.dehashstatus,
 									rf.name AS filename
 								FROM releases r
 								LEFT OUTER JOIN release_files rf ON r.id = rf.releaseid AND rf.ishashed = 1

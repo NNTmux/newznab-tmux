@@ -147,9 +147,9 @@ class Category
 			}
 
 			if ($chlist != '-99') {
-				$catsrch .= ' r.categoryid IN (' . $chlist . ') OR ';
+				$catsrch .= ' r.categories_id IN (' . $chlist . ') OR ';
 			} else {
-				$catsrch .= sprintf(' r.categoryid = %d OR ', $category);
+				$catsrch .= sprintf(' r.categories_id = %d OR ', $category);
 			}
 			$catsrch .= '1=2 )';
 		}
@@ -188,7 +188,7 @@ class Category
 	public function isParent($cid)
 	{
 		$ret = $this->pdo->query(
-			sprintf("SELECT id FROM category WHERE id = %d AND parentid IS NULL", $cid),
+			sprintf("SELECT id FROM categories WHERE id = %d AND parentid IS NULL", $cid),
 			true, NN_CACHE_EXPIRY_LONG
 		);
 		return (isset($ret[0]['id']));
@@ -205,7 +205,7 @@ class Category
 		if ($activeonly) {
 			$act = sprintf(" WHERE c.status = %d ", Category::STATUS_ACTIVE);
 		}
-		return $this->pdo->query("SELECT c.*, (SELECT title FROM category WHERE id=c.parentid) AS parentName FROM category c " . $act . " ORDER BY c.id");
+		return $this->pdo->query("SELECT c.*, (SELECT title FROM categories WHERE id=c.parentid) AS parentName FROM categories c " . $act . " ORDER BY c.id");
 	}
 
 	/**
@@ -218,7 +218,7 @@ class Category
 	public function getChildren($cid)
 	{
 		return $this->pdo->query(
-			sprintf("SELECT c.* FROM category c WHERE parentid = %d", $cid),
+			sprintf("SELECT c.* FROM categories c WHERE parentid = %d", $cid),
 			true, NN_CACHE_EXPIRY_LONG
 		);
 	}
@@ -230,7 +230,7 @@ class Category
 	public function getEnabledParentNames()
 	{
 		return $this->pdo->query(
-			"SELECT title FROM category WHERE parentid IS NULL AND status = 1",
+			"SELECT title FROM categories WHERE parentid IS NULL AND status = 1",
 			true, NN_CACHE_EXPIRY_LONG
 		);
 	}
@@ -243,7 +243,7 @@ class Category
 	public function getDisabledIDs()
 	{
 		return $this->pdo->query(
-			"SELECT id FROM category WHERE status = 2 OR parentid IN (SELECT id FROM category WHERE status = 2 AND parentid IS NULL)",
+			"SELECT id FROM categories WHERE status = 2 OR parentid IN (SELECT id FROM categories WHERE status = 2 AND parentid IS NULL)",
 			true, NN_CACHE_EXPIRY_LONG
 		);
 	}
@@ -258,13 +258,13 @@ class Category
 	public function getById($id)
 	{
 
-		return $this->pdo->queryOneRow(sprintf("SELECT c.disablepreview, c.id, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentid from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id));
+		return $this->pdo->queryOneRow(sprintf("SELECT c.disablepreview, c.id, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentid from categories c left outer join categories cp on cp.id = c.parentid where c.id = %d", $id));
 	}
 
 	public function getSizeRangeById($id)
 	{
 		$res = $this->pdo->queryOneRow(sprintf("SELECT c.minsizetoformrelease, c.maxsizetoformrelease, cp.minsizetoformrelease as p_minsizetoformrelease, cp.maxsizetoformrelease as p_maxsizetoformrelease" .
-				" from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id
+				" from categories c left outer join categories cp on cp.id = c.parentid where c.id = %d", $id
 			)
 		);
 		if (!$res)
@@ -316,8 +316,8 @@ class Category
 			return $this->pdo->query(
 				sprintf(
 					"SELECT CONCAT(cp.title, ' > ',c.title) AS title
-					FROM category c
-					INNER JOIN category cp ON cp.id = c.parentid
+					FROM categories c
+					INNER JOIN categories cp ON cp.id = c.parentid
 					WHERE c.id IN (%s)", implode(',', $ids)
 				), true, NN_CACHE_EXPIRY_LONG
 			);
@@ -328,8 +328,8 @@ class Category
 
 	public function getNameByID($ID)
 	{
-		$parent = $this->pdo->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", substr($ID, 0, 1) . "000"));
-		$cat = $this->pdo->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", $ID));
+		$parent = $this->pdo->queryOneRow(sprintf("SELECT title FROM categories WHERE id = %d", substr($ID, 0, 1) . "000"));
+		$cat = $this->pdo->queryOneRow(sprintf("SELECT title FROM categories WHERE id = %d", $ID));
 
 		return $parent["title"] . " " . $cat["title"];
 	}
@@ -348,7 +348,7 @@ class Category
 	 */
 	public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
 	{
-		return $this->pdo->queryExec(sprintf("update category set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where id = %d", $disablepreview, $status, $minsize, $maxsize, $this->pdo->escapeString($desc), $id));
+		return $this->pdo->queryExec(sprintf("update categories set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where id = %d", $disablepreview, $status, $minsize, $maxsize, $this->pdo->escapeString($desc), $id));
 	}
 
 	/**
@@ -366,7 +366,7 @@ class Category
 		}
 
 		$arr = $this->pdo->query(
-			sprintf('SELECT * FROM category WHERE status = %d %s', Category::STATUS_ACTIVE, $exccatlist),
+			sprintf('SELECT * FROM categories WHERE status = %d %s', Category::STATUS_ACTIVE, $exccatlist),
 			true, NN_CACHE_EXPIRY_LONG
 		);
 		foreach ($arr as $a) {
@@ -429,8 +429,8 @@ class Category
 	{
 		return $this->pdo->query(
 			"SELECT c.id, CONCAT(cp.title, ' > ',c.title) AS title, cp.id AS parentid, c.status
-			FROM category c
-			INNER JOIN category cp ON cp.id = c.parentid " .
+			FROM categories c
+			INNER JOIN categories cp ON cp.id = c.parentid " .
 			($activeonly ?
 				sprintf(
 					" WHERE c.status = %d %s ",
