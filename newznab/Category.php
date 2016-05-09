@@ -326,12 +326,24 @@ class Category
 		}
 	}
 
+	/**
+	 * Return the parent and category name from the supplied categoryID.
+	 * @param $ID
+	 *
+	 * @return string
+	 */
 	public function getNameByID($ID)
 	{
-		$parent = $this->pdo->queryOneRow(sprintf("SELECT title FROM categories WHERE id = %d", substr($ID, 0, 1) . "000"));
-		$cat = $this->pdo->queryOneRow(sprintf("SELECT title FROM categories WHERE id = %d", $ID));
-
-		return $parent["title"] . " " . $cat["title"];
+		$cat = $this->pdo->queryOneRow(
+			sprintf("
+				SELECT c.title AS ctitle, cp.title AS ptitle
+				FROM categories c
+				INNER JOIN categories cp ON c.parentid = cp.id
+				WHERE c.id = %d",
+				$ID
+			)
+		);
+		return $cat["ptitle"] . " -> " . $cat["ctitle"];
 	}
 
 	/**
@@ -441,5 +453,4 @@ class Category
 			" ORDER BY c.id"
 		);
 	}
-
 }

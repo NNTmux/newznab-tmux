@@ -74,10 +74,12 @@ Class PreDb
 
 		$res = $this->pdo->queryDirect(
 			sprintf('
-							SELECT p.id AS preid, r.id AS releaseid
-							FROM predb p
-							INNER JOIN releases r ON p.title = r.searchname
-							WHERE r.preid < 1 %s',
+				SELECT p.id AS preid, r.id AS releaseid
+				FROM predb p
+				INNER JOIN releases r
+					FORCE INDEX (ix_releases_preid_searchname)
+					ON p.title = r.searchname
+				WHERE r.preid < 1 %s',
 				$datesql
 			)
 		);
