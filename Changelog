@@ -1,4 +1,5 @@
 2016-05-09 DariusIII
+	* Chg: Replace python requestid_threaded with php equivalent in ProcessReleases class.
 	* Upd: Change categoryid to categories_id, category table to categories table
 2016-05-08 DariusIII
 	* Upd: Composer replace qtip2 with qtip2-main

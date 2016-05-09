@@ -184,8 +184,6 @@ class ProcessReleases
 		$this->deleteUnwantedCollections($groupID);
 
 		$DIR = NN_MISC;
-		$PYTHON = shell_exec('which python3 2>/dev/null');
-		$PYTHON = (empty($PYTHON) ? 'python -OOu' : 'python3 -OOu');
 
 		$totalReleasesAdded = 0;
 		do {
@@ -203,7 +201,7 @@ class ProcessReleases
 				if ($this->echoCLI) {
 					$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Request id Threaded lookup."));
 				}
-				passthru("$PYTHON ${DIR}update/nix/requestid_threaded.py");
+				passthru("{$DIR}update/nix/multiprocessing/requestid.php");
 				if ($this->echoCLI) {
 					$this->pdo->log->doEcho(
 						$this->pdo->log->primary(
