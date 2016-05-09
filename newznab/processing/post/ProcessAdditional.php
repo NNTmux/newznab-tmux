@@ -210,11 +210,6 @@ class ProcessAdditional
 	protected $_nfo;
 
 	/**
-	 * @var \newznab\processing\post\CRC
-	 */
-	protected $_crc;
-
-	/**
 	 * @var bool
 	 */
 	protected $_extractUsingRarInfo;
@@ -387,17 +382,6 @@ class ProcessAdditional
 	protected $_compressedFilesChecked;
 
 	/**
-	 * Should we download the last rar?
-	 * @var bool
-	 */
-	protected $_fetchLastFiles;
-	/**
-	 * Are we downloading the last rar?
-	 * @var bool
-	 */
-	protected $_reverse;
-
-	/**
 	 * @param array $options Class instances / echo to cli.
 	 */
 	public function __construct(array $options = [])
@@ -436,14 +420,10 @@ class ProcessAdditional
 		$this->_srrInfo = new \SrrInfo();
 		$this->_nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 		$this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
-		if (class_exists('newznab\processing\post\CRC')) {
-			$this->_crc = new CRC(['Settings' => $this->pdo, 'Echo' => $this->_echoCLI, 'NameFixer' => $this->_nameFixer]);
-		}
 
 		$this->_innerFileBlacklist = ($this->pdo->getSetting('innerfileblacklist') == '' ? false : $this->pdo->getSetting('innerfileblacklist'));
 		$this->_maxNestedLevels = ($this->pdo->getSetting('maxnestedlevels') == 0 ? 3 : $this->pdo->getSetting('maxnestedlevels'));
 		$this->_extractUsingRarInfo = ($this->pdo->getSetting('extractusingrarinfo') == 0 ? false : true);
-		$this->_fetchLastFiles = ($this->pdo->getSetting('fetchlastcompressedfiles') == 0 ? false : true);
 
 		$this->_7zipPath = false;
 		$this->_unrarPath = false;
@@ -646,9 +626,7 @@ class ProcessAdditional
 		$this->_releases = $this->pdo->query(
 			sprintf(
 				'
-				SELECT r.id, r.id AS releaseid, r.guid, r.name, r.size, r.groupid,
-				r.nfostatus, r.completion, r.categories_id, r.searchname, r.preid,
-				c.disablepreview
+				SELECT r.id, r.guid, r.name, c.disablepreview, r.size, r.groupid, r.nfostatus, r.completion, r.categories_id, r.searchname, r.preid
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
 				WHERE r.nzbstatus = 1
@@ -751,7 +729,7 @@ class ProcessAdditional
 					$this->_processNZBCompressedFiles();
 
 					// Download rar/zip in reverse order, to get the last rar or zip file.
-					if ($this->_fetchLastFiles == 1) {
+					if ($this->pdo->getSetting('fetchlastcompressedfiles') == 1) {
 						$this->_processNZBCompressedFiles(true);
 					}
 
@@ -1003,8 +981,7 @@ class ProcessAdditional
 	 */
 	protected function _processNZBCompressedFiles($reverse = false)
 	{
-		$this->_reverse = $reverse;
-		if ($this->_reverse) {
+		if ($reverse) {
 			if (!krsort($this->_nzbContents)) {
 				return;
 			}
@@ -1119,20 +1096,6 @@ class ProcessAdditional
 			$this->_releaseHasPassword = true;
 			$this->_passwordStatus[] = Releases::PASSWD_RAR;
 			return false;
-		}
-
-		if (isset($this->_crc) && $this->_reverse === true) {
-			$fileData = (isset($dataSummary['file_list'][0]) ? $dataSummary['file_list'][0] : '');
-			if(isset($fileData['crc32']) && isset($fileData['size']) && $fileData['size'] > 104857600) {
-				$matchedCRC = $this->_crc->checkCRCInfo(
-					$this->_release,
-					$fileData['crc32'],
-					$fileData['size'],
-					'',
-					$fileData['date']
-				);
-				$this->_release['preid'] = ($matchedCRC !== false ? $matchedCRC : 0);
-			}
 		}
 
 		switch ($dataSummary['main_type']) {

@@ -1,5 +1,4 @@
 2016-05-09 DariusIII
-	* Upd: Small improvements in additional processing
 	* Fix: Wrong class in Movie.php
 	* Chg: Replace/remove refferences to python scripts where possible.
 	* Fix: Change TIME() to lowercase time()
