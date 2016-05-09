@@ -88,4 +88,4 @@ try {
 	echo $pdo->log->error($e->getMessage());
 }
 
-echo $pdo->log->header("Deleted all releases, images, previews and samples. This script ran for " . $consoletools->convertTime(TIME() - $timestart));
+echo $pdo->log->header("Deleted all releases, images, previews and samples. This script ran for " . $consoletools->convertTime(time() - $timestart));

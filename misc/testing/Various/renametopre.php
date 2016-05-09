@@ -220,7 +220,7 @@ function preName($argv, $argc)
 	} else {
 		echo $pdo->log->header("Categorizing all releases using searchname. This can take a while, be patient.");
 	}
-	$timestart = TIME();
+	$timestart = time();
 	if (isset($argv[1]) && is_numeric($argv[1])) {
 		$relcount = catRelease("searchname", "WHERE (iscategorized = 0 OR categories_id = 0010) AND adddate > NOW() - INTERVAL " . $argv[1] . " HOUR", true);
 	} else if (isset($argv[2]) && preg_match('/\([\d, ]+\)/', $argv[2]) && $full === true) {
@@ -241,7 +241,7 @@ function preName($argv, $argc)
 		$relcount = catRelease("searchname", "WHERE (iscategorized = 0 OR categories_id = 0010) AND adddate > NOW() - INTERVAL " . $argv[1] . " HOUR", true);
 	}
 	$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
-	$time = $consoletools->convertTime(TIME() - $timestart);
+	$time = $consoletools->convertTime(time() - $timestart);
 	echo $pdo->log->header("Finished categorizing " . number_format($relcount) . " releases in " . $time . " seconds, using the usenet subject.\n");
 	resetSearchnames();
 }

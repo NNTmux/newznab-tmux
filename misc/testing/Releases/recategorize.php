@@ -48,14 +48,14 @@ function reCategorize($argv)
 	} else {
 		echo $pdo->log->header("Categorizing all releases using searchname. This can take a while, be patient.");
 	}
-	$timestart = TIME();
+	$timestart = time();
 	if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1])) || $argv[1] === 'misc') {
 		$chgcount = categorizeRelease(str_replace(" AND", "WHERE", $where), $update, true);
 	} else {
 		$chgcount = categorizeRelease('', $update, true);
 	}
 	$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
-	$time = $consoletools->convertTime(TIME() - $timestart);
+	$time = $consoletools->convertTime(time() - $timestart);
 	if ($update === true) {
 		echo $pdo->log->header("Finished re-categorizing " . number_format($chgcount) . " releases in " . $time . " , using the searchname.\n");
 	} else {

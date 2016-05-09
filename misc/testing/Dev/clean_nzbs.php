@@ -64,7 +64,7 @@ if (isset($argv[1]) && ($argv[1] === "true" || $argv[1] === "delete")) {
 				$pdo->queryExec(sprintf("UPDATE releases SET nzbstatus = 1 WHERE id = %s", $row['id']));
 			}
 
-			$time = $consoletools->convertTime(TIME() - $timestart);
+			$time = $consoletools->convertTime(time() - $timestart);
 			$consoletools->overWritePrimary('Checking Releases: ' . $deleted . " releases have no nzb of " . ++$checked . " and " . $couldbe . "deleted from db,  Running time: " . $time);
 		}
 	}

@@ -6,7 +6,7 @@ use newznab\ConsoleTools;
 use newznab\NNTP;
 
 
-$start = TIME();
+$start = time();
 $pdo = new Settings();
 $consoleTools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 
@@ -35,7 +35,7 @@ foreach ($data as $newgroup) {
 		echo $pdo->log->primary('Updated ' . $newgroup['group']);
 	}
 }
-echo $pdo->log->header('Running time: ' . $consoleTools->convertTimer(TIME() - $start));
+echo $pdo->log->header('Running time: ' . $consoleTools->convertTimer(time() - $start));
 
 function myInArray($array, $value, $key)
 {

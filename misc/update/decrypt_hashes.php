@@ -66,7 +66,7 @@ function getPreName($argv)
 		}
 	}
 	if ($total > 0) {
-		echo $pdo->log->header("\nRenamed " . $counted . " releases in " . $consoletools->convertTime(TIME() - $timestart) . ".");
+		echo $pdo->log->header("\nRenamed " . $counted . " releases in " . $consoletools->convertTime(time() - $timestart) . ".");
 	} else {
 		echo $pdo->log->info("\nNothing to do.");
 	}

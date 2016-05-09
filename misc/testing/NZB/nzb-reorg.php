@@ -19,7 +19,7 @@ $objects = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($sourc
 
 $filestoprocess = [];
 $iFilesProcessed = $iFilesCounted = 0;
-$time = TIME();
+$time = time();
 
 echo "\nReorganizing files to Level $newLevel from: $sourcePath This could take a while...\n";
 //$consoleTools = new \ConsoleTools();
@@ -57,7 +57,7 @@ function relativeTime($_time)
 	$w = array();
 
 	$return      = "";
-	$now         = TIME();
+	$now         = time();
 	$diff        = ($now - $_time);
 	$secondsLeft = $diff;
 

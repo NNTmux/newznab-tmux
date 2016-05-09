@@ -80,4 +80,4 @@ if (isset($argv[2]) && $argv[2] == 'truncate') {
 //set tpg active
 $pdo->queryExec("UPDATE settings SET value = 1 WHERE setting = 'tablepergroup'");
 
-echo $pdo->log->header("Processed: ${i} groups and " . number_format($parts_count['cnt']) . " parts in " . $consoleTools->convertTimer(TIME() - $start));
+echo $pdo->log->header("Processed: ${i} groups and " . number_format($parts_count['cnt']) . " parts in " . $consoleTools->convertTimer(time() - $start));

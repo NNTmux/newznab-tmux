@@ -883,7 +883,7 @@ class NameFixer
 						$this->consoletools->overWritePrimary("Renamed Releases: [" . number_format($counted) . "] " . $this->consoletools->percentString(++$counter, $total));
 					}
 				}
-				echo $this->pdo->log->header("\nRenamed " . number_format($counted) . " releases in " . $this->consoletools->convertTime(TIME() - $timestart) . ".");
+				echo $this->pdo->log->header("\nRenamed " . number_format($counted) . " releases in " . $this->consoletools->convertTime(time() - $timestart) . ".");
 			} else {
 				echo $this->pdo->log->info("\nNothing to do.");
 			}

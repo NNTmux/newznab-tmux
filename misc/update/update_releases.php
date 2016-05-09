@@ -38,20 +38,20 @@ if (isset($argv[1]) && isset($argv[2])) {
 		$releases->resetCategorize();
 	} else if ($argv[1] == 5 && ($argv[2] == 'true' || $argv[2] == 'false')) {
 		echo $pdo->log->header("Categorizing all non-categorized releases in other->misc using usenet subject. This can take a while, be patient.");
-		$timestart = TIME();
+		$timestart = time();
 		$relcount = $releases->categorizeRelease('name', "WHERE iscategorized = 0 AND categories_id = " . Category::OTHER_MISC);
-		$time = $consoletools->convertTime(TIME() - $timestart);
+		$time = $consoletools->convertTime(time() - $timestart);
 		echo $pdo->log->primary("\n" . 'Finished categorizing ' . $relcount . ' releases in ' . $time . " seconds, using the usenet subject.");
 	} else if ($argv[1] == 6 && $argv[2] == 'true') {
 		echo $pdo->log->header("Categorizing releases in all sections using the searchname. This can take a while, be patient.");
-		$timestart = TIME();
+		$timestart = time();
 		$relcount = $releases->categorizeRelease('searchname', '');
 		$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
-		$time = $consoletools->convertTime(TIME() - $timestart);
+		$time = $consoletools->convertTime(time() - $timestart);
 		echo $pdo->log->primary("\n" . 'Finished categorizing ' . $relcount . ' releases in ' . $time . " seconds, using the search name.");
 	} else if ($argv[1] == 6 && $argv[2] == 'false') {
 		echo $pdo->log->header("Categorizing releases in misc sections using the searchname. This can take a while, be patient.");
-		$timestart = TIME();
+		$timestart = time();
 		$relcount = $releases->categorizeRelease('searchname',
 			sprintf("WHERE categories_id IN (%s, %s, %s, %s, %s, %s)",
 				Category::GAME_OTHER,
@@ -62,7 +62,7 @@ if (isset($argv[1]) && isset($argv[2])) {
 				Category::OTHER_MISC
 			));
 		$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
-		$time = $consoletools->convertTime(TIME() - $timestart);
+		$time = $consoletools->convertTime(time() - $timestart);
 		echo $pdo->log->primary("\n" . 'Finished categorizing ' . $relcount . ' releases in ' . $time . " seconds, using the search name.");
 	} else {
 		exit($pdo->log->error("Wrong argument, type php update_releases.php to see a list of valid arguments."));
