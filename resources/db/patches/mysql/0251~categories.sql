@@ -3,7 +3,7 @@
 
 # Change references of categoryid to categories_id to comply with lithium conventions
 ALTER TABLE category_regexes
-  CHANGE COLUMN categoryid categories_id SMALLINT UNSIGNED NOT NULL DEFAULT '0010'
+  CHANGE COLUMN category_id categories_id SMALLINT UNSIGNED NOT NULL DEFAULT '0010'
   COMMENT 'Which category id to put the release in';
 #ALTER TABLE category_regexes RENAME INDEX ix_category_regexes_category_id TO ix_category_regexes_categories_id;
 
