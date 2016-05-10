@@ -1,3 +1,5 @@
+2016-05-10 DariusIII
+	* Chg: Move collection deletion right after NZB is created.
 2016-05-09 DariusIII
 	* Fix: Wrong class in Movie.php
 	* Chg: Replace/remove refferences to python scripts where possible.
