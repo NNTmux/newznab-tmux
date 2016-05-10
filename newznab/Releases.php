@@ -608,7 +608,7 @@ class Releases
 				LEFT OUTER JOIN release_comments rc ON rc.releases_id = r.id
 				LEFT OUTER JOIN user_downloads uc ON uc.releases_id = r.id
 				LEFT OUTER JOIN release_files rf ON rf.releases_id = r.id
-				LEFT OUTER JOIN release_audio ra ON ra.releases_id = r.id
+				LEFT OUTER JOIN audio_data ra ON ra.releases_id = r.id
 				LEFT OUTER JOIN release_subtitles rs ON rs.releases_id = r.id
 				LEFT OUTER JOIN video_data rv ON rv.releases_id = r.id
 				LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
