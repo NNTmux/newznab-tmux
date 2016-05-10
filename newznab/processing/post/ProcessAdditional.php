@@ -1,20 +1,20 @@
 <?php
 namespace newznab\processing\post;
 
+use newznab\Categorize;
+use newznab\Category;
+use newznab\Groups;
+use newznab\NameFixer;
+use newznab\Nfo;
+use newznab\NNTP;
+use newznab\NZB;
+use newznab\ReleaseExtra;
+use newznab\ReleaseFiles;
+use newznab\ReleaseImage;
+use newznab\Releases;
+use newznab\SphinxSearch;
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\NZB;
-use newznab\Groups;
-use newznab\NNTP;
-use newznab\Categorize;
-use newznab\Nfo;
-use newznab\ReleaseFiles;
-use newznab\ReleaseExtra;
-use newznab\ReleaseImage;
-use newznab\NameFixer;
-use newznab\SphinxSearch;
-use newznab\Releases;
-use newznab\Category;
 
 class ProcessAdditional
 {
@@ -54,7 +54,7 @@ class ProcessAdditional
 	protected $_release;
 
 	/**
-	 * @var NZB
+	 * @var \newznab\NZB
 	 */
 	protected $_nzb;
 
@@ -65,7 +65,7 @@ class ProcessAdditional
 	protected $_nzbContents;
 
 	/**
-	 * @var Groups
+	 * @var \newznab\Groups
 	 */
 	protected $_groups;
 
@@ -73,11 +73,6 @@ class ProcessAdditional
 	 * @var \Par2Info
 	 */
 	protected $_par2Info;
-
-	/**
-	 * @var \SrrInfo
-	 */
-	protected $_SRRInfo;
 
 	/**
 	 * @var \ArchiveInfo
@@ -103,11 +98,6 @@ class ProcessAdditional
 	 * @var array|bool|string
 	 */
 	protected $_unrarPath;
-
-	/**
-	 * @var bool
-	 */
-	protected $_hasGNUFile;
 
 	/**
 	 * @var string
@@ -155,11 +145,6 @@ class ProcessAdditional
 	protected $_processThumbnails;
 
 	/**
-	 * @var bool
-	 */
-	protected $_processSample;
-
-	/**
 	 * @var string
 	 */
 	protected $_audioSavePath;
@@ -175,37 +160,37 @@ class ProcessAdditional
 	protected $_echoCLI;
 
 	/**
-	 * @var NNTP
+	 * @var \newznab\NNTP
 	 */
 	protected $_nntp;
 
 	/**
-	 * @var ReleaseFiles
+	 * @var \newznab\ReleaseFiles
 	 */
 	protected $_releaseFiles;
 
 	/**
-	 * @var Categorize
+	 * @var \newznab\Categorize
 	 */
 	protected $_categorize;
 
 	/**
-	 * @var NameFixer
+	 * @var \newznab\NameFixer
 	 */
 	protected $_nameFixer;
 
 	/**
-	 * @var ReleaseExtra
+	 * @var \newznab\ReleaseExtra
 	 */
 	protected $_releaseExtra;
 
 	/**
-	 * @var ReleaseImage
+	 * @var \newznab\ReleaseImage
 	 */
 	protected $_releaseImage;
 
 	/**
-	 * @var Nfo
+	 * @var \newznab\Nfo
 	 */
 	protected $_nfo;
 
@@ -274,6 +259,7 @@ class ProcessAdditional
 	 */
 	protected $_videoFileRegex;
 
+
 	/**
 	 * Have we created a video file for the current release?
 	 * @var bool
@@ -323,13 +309,7 @@ class ProcessAdditional
 	protected $_foundPAR2Info;
 
 	/**
-	 * Have we found SRR info on this release?
-	 * @var bool
-	 */
-	protected $_foundSRRInfo;
-
-	/**
-	 * Message id's for found content to download.
+	 * Message ID's for found content to download.
 	 * @var array
 	 */
 	protected $_sampleMessageIDs;
@@ -417,7 +397,6 @@ class ProcessAdditional
 		$this->_releaseExtra = ($options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra($this->pdo));
 		$this->_releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 		$this->_par2Info = new \Par2Info();
-		$this->_srrInfo = new \SrrInfo();
 		$this->_nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 		$this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
 
@@ -440,8 +419,6 @@ class ProcessAdditional
 		}
 		$this->_archiveInfo->setExternalClients($clients);
 
-		$this->_hasGNUFile = (Utility::hasCommand('file') === true ? true : false);
-
 		$this->_killString = '"';
 		if ($this->pdo->getSetting('timeoutpath') != '' && $this->pdo->getSetting('timeoutseconds') > 0) {
 			$this->_killString = (
@@ -451,17 +428,17 @@ class ProcessAdditional
 			);
 		}
 
-		$this->_showCLIReleaseID = (PHP_BINARY . ' ' . __DIR__ . DS .  'ProcessAdditional.php ReleaseID: ');
+		$this->_showCLIReleaseID = (PHP_BINARY . ' ' . __DIR__ . DS . 'ProcessAdditional.php ReleaseID: ');
 
 		// Maximum amount of releases to fetch per run.
 		$this->_queryLimit =
 			($this->pdo->getSetting('maxaddprocessed') != '') ? (int)$this->pdo->getSetting('maxaddprocessed') : 25;
 
-		// Maximum message id's to download per file type in the NZB (video, jpg, etc).
+		// Maximum message ID's to download per file type in the NZB (video, jpg, etc).
 		$this->_segmentsToDownload =
 			($this->pdo->getSetting('segmentstodownload') != '') ? (int)$this->pdo->getSetting('segmentstodownload') : 2;
 
-		// Maximum message id's to download for a RAR file.
+		// Maximum message ID's to download for a RAR file.
 		$this->_maximumRarSegments =
 			($this->pdo->getSetting('maxpartsprocessed') != '') ? (int)$this->pdo->getSetting('maxpartsprocessed') : 3;
 
@@ -508,7 +485,7 @@ class ProcessAdditional
 		$this->_audioFileRegex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
 		$this->_ignoreBookRegex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';
 		$this->_supportFileRegex = '/\.(vol\d{1,3}\+\d{1,3}|par2|srs|sfv|nzb';
-		$this->_videoFileRegex = '\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|OGG|QT|RM|RMVB|TS|VOB|WMV)';
+		$this->_videoFileRegex = '\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|QT|RM|RMVB|TS|VOB|WMV)';
 	}
 
 	/**
@@ -522,14 +499,14 @@ class ProcessAdditional
 	/**
 	 * Main method.
 	 *
-	 * @param int|string $groupID  (Optional) id of a group to work on.
+	 * @param int|string $groupID  (Optional) ID of a group to work on.
 	 * @param string     $guidChar (Optional) First char of release GUID, can be used to select work.
 	 *
 	 * @void
 	 */
 	public function start($groupID = '', $guidChar = '')
 	{
-		$this->_setMainTempPath($groupID, $guidChar);
+		$this->_setMainTempPath($guidChar, $groupID);
 
 		// Fetch all the releases to work on.
 		$this->_fetchReleases($groupID, $guidChar);
@@ -561,7 +538,7 @@ class ProcessAdditional
 	 *
 	 * @throws ProcessAdditionalException
 	 */
-	protected function _setMainTempPath(&$groupID = '', &$guidChar)
+	protected function _setMainTempPath(&$guidChar, &$groupID = '')
 	{
 		// Set up the temporary files folder location.
 		$this->_mainTmpPath = (string)$this->pdo->getSetting('tmpunrarpath');
@@ -571,7 +548,7 @@ class ProcessAdditional
 			$this->_mainTmpPath .= DS;
 		}
 
-		// If we are doing per group, use the groupid has a inner path, so other scripts don't delete the files we are working on.
+		// If we are doing per group, use the groupID has a inner path, so other scripts don't delete the files we are working on.
 		if ($groupID !== '') {
 			$this->_mainTmpPath .= ($groupID . DS);
 		} else if ($guidChar !== '') {
@@ -586,7 +563,7 @@ class ProcessAdditional
 		}
 
 		if (!is_dir($this->_mainTmpPath)) {
-			throw new ProcessAdditionalException('Could create the tmpunrar folder (' . $this->_mainTmpPath . ')');
+			throw new ProcessAdditionalException('Could not create the tmpunrar folder (' . $this->_mainTmpPath . ')');
 		}
 
 		$this->_clearMainTmpPath();
@@ -605,9 +582,7 @@ class ProcessAdditional
 				// These are folders we don't want to delete.
 				[
 					// This is the actual temp folder.
-					$this->_mainTmpPath,
-					// This folder is used by misc/testing/Dev/rename_u4e.php
-					$this->_mainTmpPath . 'u4e'
+					$this->_mainTmpPath
 				]
 			);
 		}
@@ -625,8 +600,7 @@ class ProcessAdditional
 	{
 		$this->_releases = $this->pdo->query(
 			sprintf(
-				'
-				SELECT r.id, r.guid, r.name, c.disablepreview, r.size, r.groupid, r.nfostatus, r.completion, r.categories_id, r.searchname, r.predb_id
+				'SELECT r.id, r.guid, r.name, c.disablepreview, r.size, r.groupid, r.nfostatus, r.completion, r.categories_id, r.searchname, r.predb_id
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
 				WHERE r.nzbstatus = 1
@@ -687,9 +661,7 @@ class ProcessAdditional
 				false
 			);
 
-			if ($this->_showCLIReleaseID) {
-				cli_set_process_title($this->_showCLIReleaseID . $this->_release['id']);
-			}
+			cli_set_process_title($this->_showCLIReleaseID . $this->_release['id']);
 
 			// Create folder to store temporary files.
 			if ($this->_createTempFolder() === false) {
@@ -754,8 +726,8 @@ class ProcessAdditional
 	/**
 	 * Deletes files and folders recursively.
 	 *
-	 * @param string $path           Path to a folder or file.
-	 * @param array  $ignoredFolders Array with paths to folders to ignore.
+	 * @param string $path          Path to a folder or file.
+	 * @param string[] $ignoredFolders array with paths to folders to ignore.
 	 *
 	 * @void
 	 * @access protected
@@ -797,7 +769,6 @@ class ProcessAdditional
 			@umask($old);
 
 			if (!is_dir($this->tmpPath)) {
-
 				$this->_echo('Unable to create directory: ' . $this->tmpPath, 'warning');
 				return $this->_decrementPasswordStatus();
 			}
@@ -814,7 +785,6 @@ class ProcessAdditional
 	{
 		$nzbPath = $this->_nzb->NZBPath($this->_release['guid']);
 		if ($nzbPath === false) {
-
 			$this->_echo('NZB not found for GUID: ' . $this->_release['guid'], 'warning');
 			return $this->_decrementPasswordStatus();
 		}
@@ -826,13 +796,11 @@ class ProcessAdditional
 		}
 
 		// Get a list of files in the nzb.
-		$this->_nzbContents = $this->_nzb->nzbFileList($nzbContents);
+		$this->_nzbContents = $this->_nzb->nzbFileList($nzbContents, ['no-file-key' => false, 'strip-count' => true]);
 		if (count($this->_nzbContents) === 0) {
-
 			$this->_echo('NZB is potentially broken for GUID: ' . $this->_release['guid'], 'warning');
 			return $this->_decrementPasswordStatus();
 		}
-
 		// Sort keys.
 		ksort($this->_nzbContents, SORT_NATURAL);
 
@@ -1196,7 +1164,6 @@ class ProcessAdditional
 					}
 				}
 			}
-
 			$this->_addFileInfo($file);
 		}
 		if ($this->_addedFileInfo > 0) {
@@ -1230,8 +1197,8 @@ class ProcessAdditional
 				$this->pdo->queryOneRow(
 					sprintf(
 						'
-						SELECT releases_id FROM release_files
-						WHERE releases_id = %d
+						SELECT releaseid FROM release_files
+						WHERE releaseid = %d
 						AND name = %s
 						AND size = %d',
 						$this->_release['id'], $this->pdo->escapeString($file['name']), $file['size']
@@ -1324,11 +1291,8 @@ class ProcessAdditional
 				if (is_file($file)) {
 
 					// Process PAR2 files.
-					if ($this->_foundPAR2Info === false && preg_match('/\.par2$/i', $file)) {
+					if ($this->_foundPAR2Info === false && preg_match('/\.par2$/', $file)) {
 						$this->_siftPAR2Info($file);
-					} // Process SRR files
-					else if ($this->_foundSRRInfo === false && preg_match('/\.srr$/i', $file)) {
-						$this->_siftSRRInfo($file);
 					} // Process NFO files.
 					else if ($this->_releaseHasNoNFO === true && preg_match('/(\.(nfo|inf|ofn)|info\.txt)$/i', $file)) {
 						$this->_processNfoFile($file);
@@ -1358,6 +1322,7 @@ class ProcessAdditional
 					) {
 						$this->_processU4ETitle($file);
 					}
+
 					// Check file's magic info.
 					else {
 						$output = Utility::fileInfo($file);
@@ -1365,21 +1330,21 @@ class ProcessAdditional
 
 							switch (true) {
 
-								case ($this->_foundJPGSample === false && preg_match('/^JPE?G/i', $output[0])):
+								case ($this->_foundJPGSample === false && preg_match('/^JPE?G/i', $output)):
 									$this->_getJPGSample($file);
 									@unlink($file);
 									break;
 
 								case (
 									($this->_foundMediaInfo === false || $this->_foundSample === false || $this->_foundVideo === false)
-									&& preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output[0])
+									&& preg_match('/Matroska data|MPEG v4|MPEG sequence, v2|\WAVI\W/i', $output)
 								):
 									$this->_processVideoFile($file);
 									break;
 
 								case (
 									($this->_foundAudioSample === false || $this->_foundAudioInfo === false) &&
-									preg_match('/^FLAC|layer III|Vorbis audio/i', $file, $fileType)
+									preg_match('/^FLAC|layer III|Vorbis audio/i', $output, $fileType)
 								):
 									switch ($fileType[0]) {
 										case 'FLAC':
@@ -1397,7 +1362,7 @@ class ProcessAdditional
 									@unlink($this->tmpPath . 'audiofile.' . $fileType);
 									break;
 
-								case ($this->_foundPAR2Info === false && preg_match('/^Parity/i', $file)):
+								case ($this->_foundPAR2Info === false && preg_match('/^Parity/i', $output)):
 									$this->_siftPAR2Info($file);
 									break;
 							}
@@ -1654,10 +1619,10 @@ class ProcessAdditional
 		$releaseFiles = $this->pdo->queryOneRow(
 			sprintf(
 				'
-				SELECT COUNT(release_files.releases_id) AS count,
+				SELECT COUNT(release_files.releaseid) AS count,
 				SUM(release_files.size) AS size
 				FROM release_files
-				WHERE releases_id = %d',
+				WHERE releaseid = %d',
 				$this->_release['id']
 			)
 		);
@@ -1676,10 +1641,9 @@ class ProcessAdditional
 		// If we failed to get anything from the RAR/ZIPs, decrement the passwordstatus, if the rar/zip has no password.
 		if ($this->_releaseHasPassword === false && $this->_NZBHasCompressedFile && $releaseFiles['count'] == 0) {
 			$query = sprintf(
-				'
-								UPDATE releases
-								SET passwordstatus = passwordstatus - 1, rarinnerfilecount = %d %s %s %s
-								WHERE id = %d',
+				'UPDATE releases
+				SET passwordstatus = passwordstatus - 1, rarinnerfilecount = %d %s %s %s
+				WHERE id = %d',
 				$releaseFiles['count'],
 				$iSQL,
 				$vSQL,
@@ -1689,8 +1653,7 @@ class ProcessAdditional
 		} // Else update the release with the password status (if the admin enabled the setting).
 		else {
 			$query = sprintf(
-				'
-				UPDATE releases
+				'UPDATE releases
 				SET passwordstatus = %d, rarinnerfilecount = %d %s %s %s
 				WHERE id = %d',
 				($this->_processPasswords === true ? $this->_passwordStatus : Releases::PASSWD_NONE),
@@ -1712,7 +1675,7 @@ class ProcessAdditional
 	 * @param string $pattern Regex, optional
 	 * @param string $path    Path to the folder (if empty, uses $this->tmpPath)
 	 *
-	 * @return Iterator Object|bool
+	 * @return \Iterator Object|bool
 	 */
 	protected function _getTempDirectoryContents($pattern = '', $path = '')
 	{
@@ -1733,7 +1696,7 @@ class ProcessAdditional
 					new \RecursiveDirectoryIterator($path)
 				);
 			}
-		} catch (\exception $e) {
+		} catch (\Exception $e) {
 			$this->_debug('ERROR: Could not open temp dir: ' . $e->getMessage() . PHP_EOL);
 			return false;
 		}
@@ -1822,7 +1785,7 @@ class ProcessAdditional
 									} else if ($ext === 'FLAC') {
 										$newCat = Category::MUSIC_LOSSLESS;
 									} else {
-										$newCat = $this->_categorize->determineCategory($rQuery['groupid'],$newName);
+										$newCat = $this->_categorize->determineCategory($rQuery['groupid'], $newName);
 									}
 
 									$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
@@ -2032,7 +1995,7 @@ class ProcessAdditional
 				$this->pdo->getSetting('ffmpegpath') .
 				'" -i "' .
 				$fileLocation .
-				'" -ss ' . ($time === '' ? '00:00:03.00' : $time)  .
+				'" -ss ' . ($time === '' ? '00:00:03.00' : $time) .
 				' -vframes 1 -loglevel quiet -y "' .
 				$fileName .
 				'"'
@@ -2093,12 +2056,14 @@ class ProcessAdditional
 					$newMethod = true;
 
 					// Get the lowest time we can start making the video at based on how many seconds the admin wants the video to be.
-					if ($numbers[1] <= $this->_ffMPEGDuration) { // If the clip is shorter than the length we want.
+					if ($numbers[1] <= $this->_ffMPEGDuration) {
+						// If the clip is shorter than the length we want.
 
 						// The lowest we want is 0.
 						$lowestLength = '00:00:00.00';
 
-					} else { // If the clip is longer than the length we want.
+					} else {
+						// If the clip is longer than the length we want.
 
 						// The lowest we want is the the difference between the max video length and our wanted total time.
 						$lowestLength = ($numbers[1] - $this->_ffMPEGDuration);
@@ -2270,7 +2235,17 @@ class ProcessAdditional
 			$releaseInfo['proc_pp'] == 0 &&
 			in_array(
 				((int)$this->_release['categories_id']),
-				Category::OTHERS_GROUP
+				[
+					Category::BOOKS_UNKNOWN,
+					Category::GAME_OTHER,
+					Category::MOVIE_OTHER,
+					Category::MUSIC_OTHER,
+					Category::PC_PHONE_OTHER,
+					Category::TV_OTHER,
+					Category::OTHER_HASHED,
+					Category::XXX_OTHER,
+					Category::OTHER_MISC
+				]
 			)
 		) {
 			$foundName = false;
@@ -2295,7 +2270,7 @@ class ProcessAdditional
 				if ($filesAdded < 11 &&
 					$this->pdo->queryOneRow(
 						sprintf(
-							'SELECT releases_id FROM release_files WHERE releases_id = %d AND name = %s',
+							'SELECT releaseid FROM release_files WHERE releaseid = %d AND name = %s',
 							$this->_release['id'], $this->pdo->escapeString($file['name'])
 						)
 					) === false
@@ -2314,7 +2289,7 @@ class ProcessAdditional
 			if ($foundName === false) {
 				$this->_release['textstring'] = $file['name'];
 				$this->_release['releaseid'] = $this->_release['id'];
-				if ($this->_nameFixer->checkName($this->_release, ($this->_echoCLI ? 1 : 0), 'PAR2, ', 1, 1) === true) {
+				if ($this->_nameFixer->checkName($this->_release, ($this->_echoCLI ? true : false), 'PAR2, ', 1, 1) === true) {
 					$foundName = true;
 				}
 			}
@@ -2328,70 +2303,6 @@ class ProcessAdditional
 			)
 		);
 		$this->_foundPAR2Info = true;
-	}
-
-	/**
-	 * Get file info from inside SRR and attempt to get a release name.
-	 *
-	 * @param string $srr
-	 */
-	protected function _siftSRRInfo($srr)
-	{
-		$foundMatch = false;
-
-		$query = $this->pdo->queryOneRow(
-			sprintf('
-				SELECT
-					r.id, r.groupid, r.categories_id, r.name, r.searchname,
-					UNIX_TIMESTAMP(r.postdate) AS post_date,
-					r.id AS releaseid
-				FROM releases r
-				WHERE r.isrenamed = 0
-				AND r.predb_id = 0
-				AND r.id = %d',
-				$this->_release['id']
-			)
-		);
-
-		if ($query === false) {
-			return;
-		}
-
-		// Put the SRR into SrrInfo, check if there's an error.
-		$this->_srrInfo->open($srr);
-		if ($this->_srrInfo->error) {
-			$this->pdo->log->doEcho($this->pdo->log->primaryOver("-"));
-			return;
-		}
-
-		// Get the file list from SrrInfo.
-		$summary = $this->_srrInfo->getSummary();
-		if ($summary !== false && empty($summary['error'])) {
-			$this->pdo->log->doEcho($this->pdo->log->primaryOver("+"));
-
-			// Try to get a Pre Match by the OSO release name.
-			if (isset($summary['oso_info']['name']) && !empty($summary['oso_info']['name'])) {
-				$query['textstring'] = $summary['oso_info']['name'];
-				$foundMatch = $this->_nameFixer->checkName($query, $this->_echoCLI, 'SRR, ', 1, 1, true);
-			}
-			// Loop through the stored files in the SRR and try to get a Pre Match
-			if ($foundMatch === false && is_array($summary['stored_files']) && !empty($summary['stored_files'])) {
-				foreach ($summary['stored_files'] AS $storedFile) {
-					if ($foundMatch === true) {
-						break;
-					} else if (isset($storedFile['name']) && !empty($storedFile['name'])) {
-						$query['textstring'] = Utility::cutStringUsingLast('.', $storedFile['name'], 'left', false);
-						$foundMatch = $this->_nameFixer->checkName($query, $this->_echoCLI, 'SRR, ', 1, 1, true);
-					}
-				}
-			}
-			// This field is rarely populated but worth a shot for a rename
-			if ($foundMatch === false && isset($summary['file_name']) && !empty($summary['file_name'])) {
-				$query['textstring'] = Utility::cutStringUsingLast('.', $summary['file_name'], 'left', false);
-				$foundMatch = $this->_nameFixer->checkName($query, $this->_echoCLI, 'SRR, ', 1, 1, true);
-			}
-		}
-		$this->_foundSRRInfo = $foundMatch;
 	}
 
 	/**
@@ -2440,7 +2351,7 @@ class ProcessAdditional
 	/**
 	 * Try to get a title from a Linux_2rename.sh file for alt.binaries.u4e group.
 	 *
-	 * @param $fileLocation
+	 * @param string $fileLocation
 	 */
 	protected function _processU4ETitle($fileLocation)
 	{
@@ -2461,18 +2372,17 @@ class ProcessAdditional
 						continue;
 					}
 
-					// Get a new category id.
+					// Get a new category ID.
 					$newCategory = $this->_categorize->determineCategory($this->_release['groupid'], $newName);
 
 					$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
 					// Update the release with the data.
 					$this->pdo->queryExec(
 						sprintf(
-							'
-							UPDATE releases
-								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL,
-								consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, predb_id = 0,
-								searchname = %s, isrenamed = 1, iscategorized = 1, proc_files = 1, categories_id = %d
+							'UPDATE releases
+							SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL, consoleinfo_id = NULL,
+							bookinfo_id = NULL, anidbid = NULL, predb_id = 0, searchname = %s, isrenamed = 1, iscategorized = 1,
+							proc_files = 1, categories_id = %d
 							WHERE id = %d',
 							$newTitle,
 							$newCategory,
@@ -2599,7 +2509,6 @@ class ProcessAdditional
 		$this->_foundSample = ($this->_processThumbnails ? false : true);
 		$this->_foundSample = (($this->_release['disablepreview'] == 1) ? true : false);
 		$this->_foundPAR2Info = false;
-		$this->_foundSRRInfo = false;
 
 		$this->_passwordStatus = [Releases::PASSWD_NONE];
 		$this->_releaseHasPassword = false;
@@ -2654,3 +2563,5 @@ class ProcessAdditional
 		}
 	}
 }
+
+?>

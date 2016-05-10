@@ -1,4 +1,5 @@
 2016-05-10 DariusIII
+	* Upd: Bring ProcessAdditional class up-to-date
 	* Fix: Prevent binaries and releases update deadlocks.
 	* Upd: Add couchpotato icon to Gamma theme.
 	* Fix: Reorder patch files
