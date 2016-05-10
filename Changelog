@@ -1,5 +1,5 @@
 2016-05-10 DariusIII
-	* Fix: Reorder patche files
+	* Fix: Reorder patch files
 	* Chg: Rename release_audio to audio_data
 	* Chg: Rename releaseid to releases_id
 	* Upd: Remove unused scripts, update mysqltuner.pl
