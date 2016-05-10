@@ -1619,7 +1619,7 @@ class ProcessAdditional
 		$releaseFiles = $this->pdo->queryOneRow(
 			sprintf(
 				'
-				SELECT COUNT(release_files.releaseid) AS count,
+				SELECT COUNT(release_files.releases_id) AS count,
 				SUM(release_files.size) AS size
 				FROM release_files
 				WHERE releaseid = %d',
