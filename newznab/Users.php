@@ -732,7 +732,7 @@ class Users
 		if ($releaseid != "")
 			$releaseid = " AND releases.id = " . $this->pdo->escapeString($releaseid);
 
-		return $this->pdo->query(sprintf("SELECT users_releases.*, releases.searchname,releases.guid FROM users_releases INNER JOIN releases on releases.id = users_releases.releaseid WHERE userid = %d %s", $uid, $releaseid));
+		return $this->pdo->query(sprintf("SELECT users_releases.*, releases.searchname,releases.guid FROM users_releases INNER JOIN releases on releases.id = users_releases.releases_id WHERE userid = %d %s", $uid, $releaseid));
 	}
 
 	public function delCartByGuid($ids, $userID)
@@ -1112,7 +1112,7 @@ class Users
 	public function getDownloadRequestsForUser($userID)
 	{
 		return $this->pdo->query(sprintf('SELECT u.*, r.guid, r.searchname FROM user_downloads u
-										  LEFT OUTER JOIN releases r ON r.id = u.releaseid
+										  LEFT OUTER JOIN releases r ON r.id = u.releases_id
 										  WHERE u.userid = %d
 										  ORDER BY u.timestamp
 										  DESC',

@@ -897,7 +897,7 @@ class SpotNab {
 
 		$affected = $this->_pdo->queryExec(sprintf('UPDATE release_comments, releases SET release_comments.gid = UNHEX(releases.nzb_guid),
 											release_comments.nzb_guid = UNHEX(releases.nzb_guid)
-											WHERE releases.id = release_comments.releaseid
+											WHERE releases.id = release_comments.releases_id
 											AND release_comments.gid IS NULL
 											AND UNHEX(release_comments.nzb_guid) = "0"
 											AND UNHEX(releases.nzb_guid) IS NOT NULL
@@ -2046,7 +2046,7 @@ class SpotNab {
 		$sql = sprintf("SELECT r.gid, rc.id, rc.text, u.username, "
 			."rc.isvisible, rc.createddate, rc.host "
 			."FROM release_comments rc "
-			."JOIN releases r ON r.id = rc.releaseid AND rc.releaseid != 0 "
+			."JOIN releases r ON r.id = rc.releases_id AND rc.releases_id != 0 "
 			."JOIN users u ON rc.userid = u.id AND rc.userid != 0 "
 			."WHERE r.gid IS NOT NULL "
 			."AND sourceid = 0 AND issynced = 0 "

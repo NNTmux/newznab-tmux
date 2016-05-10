@@ -205,7 +205,7 @@ class Releases
 					CONCAT(cp.id, ',', c.id) AS category_ids,
 					(SELECT df.failed) AS failed,
 					rn.id AS nfoid,
-					re.releaseid AS reid,
+					re.releases_id AS reid,
 					v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
 					tve.title, tve.firstaired
 				FROM
@@ -222,8 +222,8 @@ class Releases
 				INNER JOIN categories cp ON cp.id = c.parentid
 				LEFT OUTER JOIN videos v ON r.videos_id = v.id
 				LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-				LEFT OUTER JOIN video_data re ON re.releaseid = r.id
-				LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
+				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
+				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				GROUP BY r.id
 				ORDER BY %7\$s %8\$s",
@@ -479,13 +479,13 @@ class Releases
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
 					groups.name AS group_name,
-					rn.id AS nfoid, re.releaseid AS reid,
+					rn.id AS nfoid, re.releases_id AS reid,
 					tve.firstaired,
 					(SELECT df.failed) AS failed
 				FROM releases r
-				LEFT OUTER JOIN video_data re ON re.releaseid = r.id
+				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 				INNER JOIN groups ON groups.id = r.groupid
-				LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
+				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN tv_episodes tve ON tve.videos_id = r.videos_id
 				INNER JOIN categories c ON c.id = r.categories_id
 				INNER JOIN categories cp ON cp.id = c.parentid
@@ -604,14 +604,14 @@ class Releases
 			sprintf('
 				DELETE r, rn, rc, uc, rf, ra, rs, rv, re, df
 				FROM releases r
-				LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
-				LEFT OUTER JOIN release_comments rc ON rc.releaseid = r.id
-				LEFT OUTER JOIN user_downloads uc ON uc.releaseid = r.id
-				LEFT OUTER JOIN release_files rf ON rf.releaseid = r.id
-				LEFT OUTER JOIN release_audio ra ON ra.releaseid = r.id
-				LEFT OUTER JOIN release_subtitles rs ON rs.releaseid = r.id
-				LEFT OUTER JOIN video_data rv ON rv.releaseid = r.id
-				LEFT OUTER JOIN releaseextrafull re ON re.releaseid = r.id
+				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+				LEFT OUTER JOIN release_comments rc ON rc.releases_id = r.id
+				LEFT OUTER JOIN user_downloads uc ON uc.releases_id = r.id
+				LEFT OUTER JOIN release_files rf ON rf.releases_id = r.id
+				LEFT OUTER JOIN release_audio ra ON ra.releases_id = r.id
+				LEFT OUTER JOIN release_subtitles rs ON rs.releases_id = r.id
+				LEFT OUTER JOIN video_data rv ON rv.releases_id = r.id
+				LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				WHERE r.guid = %s',
 				$this->pdo->escapeString($identifiers['g'])
@@ -888,15 +888,15 @@ class Releases
 				(SELECT df.failed) AS failed,
 				groups.name AS group_name,
 				rn.id AS nfoid,
-				re.releaseid AS reid,
+				re.releases_id AS reid,
 				cp.id AS categoryparentid,
 				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
 				tve.firstaired
 			FROM releases r
-			LEFT OUTER JOIN video_data re ON re.releaseid = r.id
+			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			INNER JOIN groups ON groups.id = r.groupid
 			INNER JOIN categories c ON c.id = r.categories_id
 			INNER JOIN categories cp ON cp.id = c.parentid
@@ -983,15 +983,15 @@ class Releases
 				%s AS category_ids,
 				groups.name AS group_name,
 				rn.id AS nfoid,
-				re.releaseid AS reid
+				re.releases_id AS reid
 			FROM releases r
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			INNER JOIN categories c ON c.id = r.categories_id
 			INNER JOIN groups ON groups.id = r.groupid
-			LEFT OUTER JOIN video_data re ON re.releaseid = r.id
-			LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
+			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			INNER JOIN categories cp ON cp.id = c.parentid
 			%s",
 			$this->getConcatenatedCategoryIDs(),
@@ -1044,12 +1044,12 @@ class Releases
 				%s AS category_ids,
 				groups.name AS group_name,
 				rn.id AS nfoid,
-				re.releaseid AS reid
+				re.releases_id AS reid
 			FROM releases r
 			INNER JOIN categories c ON c.id = r.categories_id
 			INNER JOIN groups ON groups.id = r.groupid
-			LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
-			LEFT OUTER JOIN releaseextrafull re ON re.releaseid = r.id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+			LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
 			INNER JOIN categories cp ON cp.id = c.parentid
 			%s",
 			$this->getConcatenatedCategoryIDs(),
@@ -1105,7 +1105,7 @@ class Releases
 			FROM releases r
 			INNER JOIN groups g ON g.id = r.groupid
 			INNER JOIN categories c ON c.id = r.categories_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releaseid = r.id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			INNER JOIN categories cp ON cp.id = c.parentid
 			%s",
 			$this->getConcatenatedCategoryIDs(),

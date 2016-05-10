@@ -190,7 +190,7 @@ class NameFixer
 			$query = sprintf('
 					SELECT rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
+					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE rel.nzbstatus = %d
 					AND rel.predb_id = 0',
 				NZB::NZB_ADDED
@@ -201,7 +201,7 @@ class NameFixer
 			$query = sprintf('
 					SELECT rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
+					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id = %d)
 					AND rel.proc_nfo = %d',
 				self::IS_RENAMED_NONE,
@@ -222,10 +222,10 @@ class NameFixer
 				foreach ($releases as $rel) {
 					$releaseRow = $this->pdo->queryOneRow(
 						sprintf('
-							SELECT nfo.releaseid AS nfoid, rel.groupid, rel.categories_id, rel.name, rel.searchname,
+							SELECT nfo.releases_id AS nfoid, rel.groupid, rel.categories_id, rel.name, rel.searchname,
 								UNCOMPRESS(nfo) AS textstring, rel.id AS releaseid
 							FROM releases rel
-							INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
+							INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 							WHERE rel.id = %d',
 							$rel['releaseid']
 						)
@@ -280,9 +280,9 @@ class NameFixer
 		if ($cats === 3) {
 			$query = sprintf('
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
-						rf.releaseid AS fileid, rel.id AS releaseid
+						rf.releases_id AS fileid, rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
+					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE rel.nzbstatus = %d
 					AND rel.predb_id = 0',
 				NZB::NZB_ADDED
@@ -292,9 +292,9 @@ class NameFixer
 		} else {
 			$query = sprintf('
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
-						rf.releaseid AS fileid, rel.id AS releaseid
+						rf.releases_id AS fileid, rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
+					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%s))
 					AND rel.predb_id = 0
 					AND rel.proc_files = %d
@@ -826,7 +826,7 @@ class NameFixer
 				preg_match_all('#[a-zA-Z0-9]{3,}#', $preTitle, $matches, PREG_PATTERN_ORDER);
 				$titlematch = '+' . implode(' +', $matches[0]);
 				$join = sprintf(
-					"INNER JOIN release_search_data rs ON rs.releaseid = r.id
+					"INNER JOIN release_search_data rs ON rs.releases_id = r.id
 						WHERE
 							(MATCH (rs.name) AGAINST ('%1\$s' IN BOOLEAN MODE)
 							OR MATCH (rs.searchname) AGAINST ('%1\$s' IN BOOLEAN MODE))",
@@ -859,7 +859,7 @@ class NameFixer
 								r.groupid, r.categories_id,
 								rf.name AS filename
 							FROM releases r
-							INNER JOIN release_files rf ON r.id = rf.releaseid
+							INNER JOIN release_files rf ON r.id = rf.releases_id
 							AND rf.name IS NOT NULL
 							WHERE r.predb_id = 0
 							%s %s',

@@ -75,12 +75,12 @@ class ReleaseExtra
 
 	public function getBriefByGuid($guid)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT containerformat, videocodec, videoduration, videoaspect, CONCAT(video_data.videowidth,'x',video_data.videoheight,' @',format(videoframerate,0),'fps') AS size, GROUP_CONCAT(DISTINCT release_audio.audiolanguage SEPARATOR ', ') AS audio, GROUP_CONCAT(DISTINCT release_audio.audioformat,' (',SUBSTRING(release_audio.audiochannels,1,1),' ch)' SEPARATOR ', ') AS audioformat, GROUP_CONCAT(DISTINCT release_audio.audioformat,' (',SUBSTRING(release_audio.audiochannels,1,1),' ch)' SEPARATOR ', ') AS audioformat, GROUP_CONCAT(DISTINCT release_subtitles.subslanguage SEPARATOR ', ') AS subs FROM video_data LEFT OUTER JOIN release_subtitles ON video_data.releaseid = release_subtitles.releaseid LEFT OUTER JOIN release_audio ON video_data.releaseid = release_audio.releaseid INNER JOIN releases r ON r.id = video_data.releaseid WHERE r.guid = %s GROUP BY r.id", $this->pdo->escapeString($guid)));
+		return $this->pdo->queryOneRow(sprintf("SELECT containerformat, videocodec, videoduration, videoaspect, CONCAT(video_data.videowidth,'x',video_data.videoheight,' @',format(videoframerate,0),'fps') AS size, GROUP_CONCAT(DISTINCT release_audio.audiolanguage SEPARATOR ', ') AS audio, GROUP_CONCAT(DISTINCT release_audio.audioformat,' (',SUBSTRING(release_audio.audiochannels,1,1),' ch)' SEPARATOR ', ') AS audioformat, GROUP_CONCAT(DISTINCT release_audio.audioformat,' (',SUBSTRING(release_audio.audiochannels,1,1),' ch)' SEPARATOR ', ') AS audioformat, GROUP_CONCAT(DISTINCT release_subtitles.subslanguage SEPARATOR ', ') AS subs FROM video_data LEFT OUTER JOIN release_subtitles ON video_data.releases_id = release_subtitles.releases_id LEFT OUTER JOIN release_audio ON video_data.releases_id = release_audio.releases_id INNER JOIN releases r ON r.id = video_data.releases_id WHERE r.guid = %s GROUP BY r.id", $this->pdo->escapeString($guid)));
 	}
 
 	public function getByGuid($guid)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT video_data.* FROM video_data INNER JOIN releases r ON r.id = video_data.releaseid WHERE r.guid = %s', $this->pdo->escapeString($guid)));
+		return $this->pdo->queryOneRow(sprintf('SELECT video_data.* FROM video_data INNER JOIN releases r ON r.id = video_data.releases_id WHERE r.guid = %s', $this->pdo->escapeString($guid)));
 	}
 
 	public function delete($id)

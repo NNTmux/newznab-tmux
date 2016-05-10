@@ -49,7 +49,7 @@ class ReleaseFiles
 	 */
 	public function getByGuid($guid)
 	{
-		return $this->pdo->query(sprintf("SELECT release_files.* FROM release_files INNER JOIN releases r ON r.id = release_files.releaseid WHERE r.guid = %s ORDER BY release_files.name ", $this->pdo->escapeString($guid)));
+		return $this->pdo->query(sprintf("SELECT release_files.* FROM release_files INNER JOIN releases r ON r.id = release_files.releases_id WHERE r.guid = %s ORDER BY release_files.name ", $this->pdo->escapeString($guid)));
 	}
 
 	/**

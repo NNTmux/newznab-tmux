@@ -172,7 +172,7 @@ Class PreDb
 
 		$tq = '';
 		if ($time == 1) {
-			$tq = 'AND r.adddate > (NOW() - INTERVAL 3 HOUR) ORDER BY rf.releaseid, rf.size DESC';
+			$tq = 'AND r.adddate > (NOW() - INTERVAL 3 HOUR) ORDER BY rf.releases_id, rf.size DESC';
 		}
 		$ct = '';
 		if ($cats == 1) {
@@ -191,12 +191,12 @@ Class PreDb
 		if ($cats === 3) {
 			$query = sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categories_id, r.groupid, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
-				. 'LEFT OUTER JOIN release_files rf ON r.id = rf.releaseid '
+				. 'LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id '
 				. 'WHERE nzbstatus = 1 AND dehashstatus BETWEEN -6 AND 0 AND predb_id = 0 %s', $regex);
 		} else {
 			$query = sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categories_id, r.groupid, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
-				. 'LEFT OUTER JOIN release_files rf ON r.id = rf.releaseid '
+				. 'LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id '
 				. 'WHERE nzbstatus = 1 AND isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
 		}
 
