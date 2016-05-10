@@ -1230,8 +1230,8 @@ class ProcessAdditional
 				$this->pdo->queryOneRow(
 					sprintf(
 						'
-						SELECT releaseid FROM release_files
-						WHERE releaseid = %d
+						SELECT releases_id FROM release_files
+						WHERE releases_id = %d
 						AND name = %s
 						AND size = %d',
 						$this->_release['id'], $this->pdo->escapeString($file['name']), $file['size']
@@ -1657,7 +1657,7 @@ class ProcessAdditional
 				SELECT COUNT(release_files.releases_id) AS count,
 				SUM(release_files.size) AS size
 				FROM release_files
-				WHERE releaseid = %d',
+				WHERE releases_id = %d',
 				$this->_release['id']
 			)
 		);
@@ -2295,7 +2295,7 @@ class ProcessAdditional
 				if ($filesAdded < 11 &&
 					$this->pdo->queryOneRow(
 						sprintf(
-							'SELECT releaseid FROM release_files WHERE releaseid = %d AND name = %s',
+							'SELECT releases_id FROM release_files WHERE releases_id = %d AND name = %s',
 							$this->_release['id'], $this->pdo->escapeString($file['name'])
 						)
 					) === false

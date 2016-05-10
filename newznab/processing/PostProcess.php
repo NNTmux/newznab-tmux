@@ -396,9 +396,9 @@ class PostProcess
 					if ($filesAdded < 11 &&
 						$this->pdo->queryOneRow(
 							sprintf('
-								SELECT releaseid
+								SELECT releases_id
 								FROM release_files
-								WHERE releaseid = %d
+								WHERE releases_id = %d
 								AND name = %s',
 								$relID,
 								$this->pdo->escapeString($file['name'])

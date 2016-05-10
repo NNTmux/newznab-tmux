@@ -261,7 +261,7 @@ class SpotNab {
 		// comments they do not have a release for... Makes sense :)
 		$offset = 0;
 		$sql = "SELECT DISTINCT(gid) as gid FROM release_comments "
-			."WHERE releaseid = 0 "
+			."WHERE releases_id = 0 "
 			."AND createddate < NOW() - INTERVAL $max_days DAY "
 			."ORDER BY createddate "
 			."LIMIT %d,%d";
@@ -1221,7 +1221,7 @@ class SpotNab {
 		// Comments
 		$sql_new_cmt = "INSERT INTO release_comments (".
 			"id, sourceid, username, userid, gid, cid, isvisible, ".
-			"releaseid, text, createddate, issynced, nzb_guid) VALUES (".
+			"releases_id, text, createddate, issynced, nzb_guid) VALUES (".
 			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, UNHEX(%s))";
 		$sql_upd_cmt = "UPDATE release_comments SET ".
 			"isvisible = %d, text = %s".

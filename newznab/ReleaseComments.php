@@ -173,7 +173,7 @@ class ReleaseComments
 
 		$comid = $this->pdo->queryInsert(
 			sprintf("
-				INSERT INTO release_comments (releaseid, gid, text, userid, createddate, host, username)
+				INSERT INTO release_comments (releases_id, gid, text, userid, createddate, host, username)
 				VALUES (%d, %s, %s, %d, NOW(), %s, %s)",
 				$id,
 				$this->pdo->escapeString($gid),

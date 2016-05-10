@@ -55,22 +55,22 @@ class ReleaseExtra
 	public function get($id)
 	{
 		// hopefully nothing will use this soon and it can be deleted
-		return $this->pdo->queryOneRow(sprintf('SELECT * FROM video_data WHERE releaseid = %d', $id));
+		return $this->pdo->queryOneRow(sprintf('SELECT * FROM video_data WHERE releases_id = %d', $id));
 	}
 
 	public function getVideo($id)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT * from video_data WHERE releaseid = %d', $id));
+		return $this->pdo->queryOneRow(sprintf('SELECT * from video_data WHERE releases_id = %d', $id));
 	}
 
 	public function getAudio($id)
 	{
-		return $this->pdo->query(sprintf('SELECT * from release_audio WHERE releaseid = %d ORDER BY audioid ASC', $id));
+		return $this->pdo->query(sprintf('SELECT * from release_audio WHERE releases_id = %d ORDER BY audioid ASC', $id));
 	}
 
 	public function getSubs($id)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT GROUP_CONCAT(subslanguage SEPARATOR ', ') AS subs FROM release_subtitles WHERE releaseid = %d ORDER BY subsid ASC", $id));
+		return $this->pdo->queryOneRow(sprintf("SELECT GROUP_CONCAT(subslanguage SEPARATOR ', ') AS subs FROM release_subtitles WHERE releases_id = %d ORDER BY subsid ASC", $id));
 	}
 
 	public function getBriefByGuid($guid)
@@ -85,9 +85,9 @@ class ReleaseExtra
 
 	public function delete($id)
 	{
-		$this->pdo->queryExec(sprintf('DELETE FROM release_audio WHERE releaseid = %d', $id));
-		$this->pdo->queryExec(sprintf('DELETE FROM release_subtitles WHERE releaseid = %d', $id));
-		return $this->pdo->queryExec(sprintf('DELETE FROM video_data WHERE releaseid = %d', $id));
+		$this->pdo->queryExec(sprintf('DELETE FROM release_audio WHERE releases_id = %d', $id));
+		$this->pdo->queryExec(sprintf('DELETE FROM release_subtitles WHERE releases_id = %d', $id));
+		return $this->pdo->queryExec(sprintf('DELETE FROM video_data WHERE releases_id = %d', $id));
 	}
 
 	public function addFromXml($releaseID, $xml)
@@ -188,43 +188,43 @@ class ReleaseExtra
 
 	public function addVideo($releaseID, $containerformat, $overallbitrate, $videoduration, $videoformat, $videocodec, $videowidth, $videoheight, $videoaspect, $videoframerate, $videolibrary)
 	{
-		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releaseid FROM video_data WHERE releaseid = %s', $releaseID));
-		if (!isset($ckid['releaseid'])) {
-			return $this->pdo->queryExec(sprintf('INSERT INTO video_data (releaseid, containerformat, overallbitrate, videoduration, videoformat, videocodec, videowidth, videoheight, videoaspect, videoframerate, videolibrary) VALUES (%d, %s, %s, %s, %s, %s, %d, %d, %s, %d, %s)', $releaseID, $this->pdo->escapeString($containerformat), $this->pdo->escapeString($overallbitrate), $this->pdo->escapeString($videoduration), $this->pdo->escapeString($videoformat), $this->pdo->escapeString($videocodec), $videowidth, $videoheight, $this->pdo->escapeString($videoaspect), $videoframerate, $this->pdo->escapeString(substr($videolibrary, 0, 50))));
+		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM video_data WHERE releases_id = %s', $releaseID));
+		if (!isset($ckid['releases_id'])) {
+			return $this->pdo->queryExec(sprintf('INSERT INTO video_data (releases_id, containerformat, overallbitrate, videoduration, videoformat, videocodec, videowidth, videoheight, videoaspect, videoframerate, videolibrary) VALUES (%d, %s, %s, %s, %s, %s, %d, %d, %s, %d, %s)', $releaseID, $this->pdo->escapeString($containerformat), $this->pdo->escapeString($overallbitrate), $this->pdo->escapeString($videoduration), $this->pdo->escapeString($videoformat), $this->pdo->escapeString($videocodec), $videowidth, $videoheight, $this->pdo->escapeString($videoaspect), $videoframerate, $this->pdo->escapeString(substr($videolibrary, 0, 50))));
 		}
 	}
 
 	public function addAudio($releaseID, $audioID, $audioformat, $audiomode, $audiobitratemode, $audiobitrate, $audiochannels, $audiosamplerate, $audiolibrary, $audiolanguage, $audiotitle)
 	{
-		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releaseid FROM release_audio WHERE releaseid = %s', $releaseID));
-		if (!isset($ckid['releaseid'])) {
-			return $this->pdo->queryExec(sprintf('INSERT INTO release_audio (releaseid, audioid, audioformat, audiomode, audiobitratemode, audiobitrate, audiochannels, audiosamplerate, audiolibrary ,audiolanguage, audiotitle) VALUES (%d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s)', $releaseID, $audioID, $this->pdo->escapeString($audioformat), $this->pdo->escapeString($audiomode), $this->pdo->escapeString($audiobitratemode), $this->pdo->escapeString(substr($audiobitrate, 0, 10)), $this->pdo->escapeString($audiochannels), $this->pdo->escapeString(substr($audiosamplerate, 0, 25)), $this->pdo->escapeString(substr($audiolibrary, 0, 50)), $this->pdo->escapeString($audiolanguage), $this->pdo->escapeString(substr($audiotitle, 0, 50))));
+		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM release_audio WHERE releases_id = %s', $releaseID));
+		if (!isset($ckid['releases_id'])) {
+			return $this->pdo->queryExec(sprintf('INSERT INTO release_audio (releases_id, audioid, audioformat, audiomode, audiobitratemode, audiobitrate, audiochannels, audiosamplerate, audiolibrary ,audiolanguage, audiotitle) VALUES (%d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s)', $releaseID, $audioID, $this->pdo->escapeString($audioformat), $this->pdo->escapeString($audiomode), $this->pdo->escapeString($audiobitratemode), $this->pdo->escapeString(substr($audiobitrate, 0, 10)), $this->pdo->escapeString($audiochannels), $this->pdo->escapeString(substr($audiosamplerate, 0, 25)), $this->pdo->escapeString(substr($audiolibrary, 0, 50)), $this->pdo->escapeString($audiolanguage), $this->pdo->escapeString(substr($audiotitle, 0, 50))));
 		}
 	}
 
 	public function addSubs($releaseID, $subsID, $subslanguage)
 	{
-		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releaseid FROM release_subtitles WHERE releaseid = %s', $releaseID));
-		if (!isset($ckid['releaseid'])) {
-			return $this->pdo->queryExec(sprintf('INSERT INTO release_subtitles (releaseid, subsid, subslanguage) VALUES (%d, %d, %s)', $releaseID, $subsID, $this->pdo->escapeString($subslanguage)));
+		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM release_subtitles WHERE releases_id = %s', $releaseID));
+		if (!isset($ckid['releases_id'])) {
+			return $this->pdo->queryExec(sprintf('INSERT INTO release_subtitles (releases_id, subsid, subslanguage) VALUES (%d, %d, %s)', $releaseID, $subsID, $this->pdo->escapeString($subslanguage)));
 		}
 	}
 
 	public function getFull($id)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT * FROM releaseextrafull WHERE releaseid = %d', $id));
+		return $this->pdo->queryOneRow(sprintf('SELECT * FROM releaseextrafull WHERE releases_id = %d', $id));
 	}
 
 	public function deleteFull($id)
 	{
-		return $this->pdo->queryExec(sprintf('DELETE FROM releaseextrafull WHERE releaseid = %d', $id));
+		return $this->pdo->queryExec(sprintf('DELETE FROM releaseextrafull WHERE releases_id = %d', $id));
 	}
 
 	public function addFull($id, $xml)
 	{
-		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releaseid FROM releaseextrafull WHERE releaseid = %s', $id));
-		if (!isset($ckid['releaseid'])) {
-			return $this->pdo->queryExec(sprintf('INSERT INTO releaseextrafull (releaseid, mediainfo) VALUES (%d, %s)', $id, $this->pdo->escapeString($xml)));
+		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM releaseextrafull WHERE releases_id = %s', $id));
+		if (!isset($ckid['releases_id'])) {
+			return $this->pdo->queryExec(sprintf('INSERT INTO releaseextrafull (releases_id, mediainfo) VALUES (%d, %s)', $id, $this->pdo->escapeString($xml)));
 		}
 	}
 }

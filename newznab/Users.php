@@ -721,7 +721,7 @@ class Users
 	public function addCart($uid, $releaseid)
 	{
 
-		$sql = sprintf("INSERT INTO users_releases (userid, releaseid, createddate) VALUES (%d, %d, now())", $uid, $releaseid);
+		$sql = sprintf("INSERT INTO users_releases (userid, releases_id, createddate) VALUES (%d, %d, now())", $uid, $releaseid);
 
 		return $this->pdo->queryInsert($sql);
 	}
@@ -759,12 +759,12 @@ class Users
 	{
 		$rel = $this->pdo->queryOneRow(sprintf("SELECT id FROM releases WHERE guid = %s", $this->pdo->escapeString($guid)));
 		if ($rel)
-			$this->pdo->queryExec(sprintf("DELETE FROM users_releases WHERE userid = %d AND releaseid = %d", $uid, $rel["id"]));
+			$this->pdo->queryExec(sprintf("DELETE FROM users_releases WHERE userid = %d AND releases_id = %d", $uid, $rel["id"]));
 	}
 
 	public function delCartForRelease($rid)
 	{
-		$this->pdo->queryExec(sprintf("DELETE FROM users_releases WHERE releaseid = %d", $rid));
+		$this->pdo->queryExec(sprintf("DELETE FROM users_releases WHERE releases_id = %d", $rid));
 	}
 
 	public function addCategoryExclusions($uid, $catids)
@@ -1077,7 +1077,7 @@ class Users
 	{
 		if ($days == 0) {
 			$days = 1;
-			$this->pdo->queryExec("UPDATE user_downloads SET releaseid = null");
+			$this->pdo->queryExec("UPDATE user_downloads SET releases_id = null");
 		}
 
 		$this->pdo->queryExec(sprintf("DELETE FROM user_requests WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)", $days));
@@ -1134,7 +1134,7 @@ class Users
 	{
 		return $this->pdo->queryInsert(
 			sprintf(
-				"INSERT INTO user_downloads (userid, releaseid, timestamp) VALUES (%d, %d, NOW())",
+				"INSERT INTO user_downloads (userid, releases_id, timestamp) VALUES (%d, %d, NOW())",
 				$userID,
 				$releaseID
 			)
@@ -1143,7 +1143,7 @@ class Users
 
 	public function delDownloadRequestsForRelease($releaseID)
 	{
-		return $this->pdo->queryInsert(sprintf("delete FROM user_downloads WHERE releaseid = %d", $releaseID));
+		return $this->pdo->queryInsert(sprintf("delete FROM user_downloads WHERE releases_id = %d", $releaseID));
 	}
 
 	/**
