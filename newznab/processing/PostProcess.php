@@ -396,9 +396,9 @@ class PostProcess
 					if ($filesAdded < 11 &&
 						$this->pdo->queryOneRow(
 							sprintf('
-								SELECT releaseid
+								SELECT releases_id
 								FROM release_files
-								WHERE releaseid = %d
+								WHERE releases_id = %d
 								AND name = %s',
 								$relID,
 								$this->pdo->escapeString($file['name'])
@@ -477,7 +477,7 @@ class PostProcess
 				FROM releases r
 				LEFT JOIN groups g ON r.groupid = g.id
 				WHERE r.isrenamed = 0
-				AND r.preid = 0
+				AND r.predb_id = 0
 				AND r.id = %d',
 				$relID
 			)

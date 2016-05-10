@@ -36,7 +36,7 @@ echo $pdo->log->primary("Reseting all groups completed.");
 $arr = [
 		"videos", "tv_episodes", "tv_info", "release_nfos", "release_comments", 'sharing', 'sharing_sites',
 		"users_releases", "user_movies", "user_series", "movieinfo", "musicinfo", "release_files",
-		"release_audio", "release_subtitles", "video_data", "releaseextrafull", "parts",
+		"audio_data", "release_subtitles", "video_data", "releaseextrafull", "parts",
 		"missed_parts", "binaries", "collections", "releases", "spotnabsources"
 ];
 foreach ($arr as &$value) {

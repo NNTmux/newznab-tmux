@@ -173,7 +173,7 @@ class ReleaseComments
 
 		$comid = $this->pdo->queryInsert(
 			sprintf("
-				INSERT INTO release_comments (releaseid, gid, text, userid, createddate, host, username)
+				INSERT INTO release_comments (releases_id, gid, text, userid, createddate, host, username)
 				VALUES (%d, %s, %s, %d, NOW(), %s, %s)",
 				$id,
 				$this->pdo->escapeString($gid),
@@ -249,6 +249,6 @@ class ReleaseComments
 		else
 			$limit = " LIMIT ".$start.",".$num;
 
-		return $this->pdo->query(sprintf("SELECT release_comments.*, r.guid, r.searchname, users.username FROM release_comments INNER JOIN releases r ON r.id = release_comments.releaseid LEFT OUTER JOIN users ON users.id = release_comments.userid WHERE userid = %d ORDER BY release_comments.createddate DESC ".$limit, $uid));
+		return $this->pdo->query(sprintf("SELECT release_comments.*, r.guid, r.searchname, users.username FROM release_comments INNER JOIN releases r ON r.id = release_comments.releases_id LEFT OUTER JOIN users ON users.id = release_comments.userid WHERE userid = %d ORDER BY release_comments.createddate DESC ".$limit, $uid));
 	}
 }

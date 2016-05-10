@@ -190,9 +190,9 @@ class NameFixer
 			$query = sprintf('
 					SELECT rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
+					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE rel.nzbstatus = %d
-					AND rel.preid = 0',
+					AND rel.predb_id = 0',
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -201,7 +201,7 @@ class NameFixer
 			$query = sprintf('
 					SELECT rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
+					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id = %d)
 					AND rel.proc_nfo = %d',
 				self::IS_RENAMED_NONE,
@@ -222,10 +222,10 @@ class NameFixer
 				foreach ($releases as $rel) {
 					$releaseRow = $this->pdo->queryOneRow(
 						sprintf('
-							SELECT nfo.releaseid AS nfoid, rel.groupid, rel.categories_id, rel.name, rel.searchname,
+							SELECT nfo.releases_id AS nfoid, rel.groupid, rel.categories_id, rel.name, rel.searchname,
 								UNCOMPRESS(nfo) AS textstring, rel.id AS releaseid
 							FROM releases rel
-							INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
+							INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 							WHERE rel.id = %d',
 							$rel['releaseid']
 						)
@@ -280,11 +280,11 @@ class NameFixer
 		if ($cats === 3) {
 			$query = sprintf('
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
-						rf.releaseid AS fileid, rel.id AS releaseid
+						rf.releases_id AS fileid, rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
+					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE rel.nzbstatus = %d
-					AND rel.preid = 0',
+					AND rel.predb_id = 0',
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -292,11 +292,11 @@ class NameFixer
 		} else {
 			$query = sprintf('
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
-						rf.releaseid AS fileid, rel.id AS releaseid
+						rf.releases_id AS fileid, rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
+					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%s))
-					AND rel.preid = 0
+					AND rel.predb_id = 0
 					AND rel.proc_files = %d
 					%s %s',
 				self::IS_RENAMED_NONE,
@@ -352,7 +352,7 @@ class NameFixer
 					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
 					WHERE nzbstatus = %d
-					AND preid = 0',
+					AND rel.predb_id = 0',
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -361,8 +361,8 @@ class NameFixer
 					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%s))
-					AND preid = 0
-					AND proc_srr = %d',
+					AND rel.predb_id = 0
+					AND rel.proc_srr = %d',
 				self::IS_RENAMED_NONE,
 				implode(',', Category::OTHERS_GROUP),
 				self::PROC_SRR_NONE
@@ -423,7 +423,7 @@ class NameFixer
 					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
 					WHERE rel.nzbstatus = %d
-					AND rel.preid = 0',
+					AND rel.predb_id = 0',
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -690,8 +690,8 @@ class NameFixer
 						$this->pdo->queryExec(
 							sprintf('
 								UPDATE releases
-								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
-									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, preid = %d,
+								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL,
+									consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, predb_id = %d,
 									searchname = %s, %s categories_id = %d
 								WHERE id = %d',
 								$preId,
@@ -707,8 +707,8 @@ class NameFixer
 						$this->pdo->queryExec(
 							sprintf('
 								UPDATE releases
-								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
-									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, preid = %d,
+								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL,
+									consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, predb_id = %d,
 									searchname = %s, iscategorized = 1, categories_id = %d
 								WHERE id = %d',
 								$preId,
@@ -781,7 +781,7 @@ class NameFixer
 							FROM releases r
 							%1\$s
 							AND (r.name %2\$s OR r.searchname %2\$s)
-							AND r.preid = 0
+							AND r.predb_id = 0
 							LIMIT 21",
 				$join,
 				$this->pdo->likeString($pre['title'], true, true)
@@ -796,10 +796,10 @@ class NameFixer
 		if ($total > 0 && $total <= 15 && $res instanceof \Traversable) {
 			foreach ($res as $row) {
 				if ($pre['title'] !== $row['searchname']) {
-					$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['preid']);
+					$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['predb_id']);
 					$matching++;
 				} else {
-					$this->_updateSingleColumn('preid', $pre['preid'], $row['releaseid']);
+					$this->_updateSingleColumn('predb_id', $pre['predb_id'], $row['releaseid']);
 				}
 			}
 		} elseif ($total >= 16) {
@@ -826,7 +826,7 @@ class NameFixer
 				preg_match_all('#[a-zA-Z0-9]{3,}#', $preTitle, $matches, PREG_PATTERN_ORDER);
 				$titlematch = '+' . implode(' +', $matches[0]);
 				$join = sprintf(
-					"INNER JOIN release_search_data rs ON rs.releaseid = r.id
+					"INNER JOIN release_search_data rs ON rs.releases_id = r.id
 						WHERE
 							(MATCH (rs.name) AGAINST ('%1\$s' IN BOOLEAN MODE)
 							OR MATCH (rs.searchname) AGAINST ('%1\$s' IN BOOLEAN MODE))",
@@ -859,9 +859,9 @@ class NameFixer
 								r.groupid, r.categories_id,
 								rf.name AS filename
 							FROM releases r
-							INNER JOIN release_files rf ON r.id = rf.releaseid
+							INNER JOIN release_files rf ON r.id = rf.releases_id
 							AND rf.name IS NOT NULL
-							WHERE r.preid = 0
+							WHERE r.predb_id = 0
 							%s %s',
 				$orderby,
 				$limit
@@ -910,7 +910,7 @@ class NameFixer
 		if ($this->_fileName !== '') {
 			$pre = $this->pdo->queryOneRow(
 				sprintf('
-							SELECT id AS preid, title, source
+							SELECT id AS predb_id, title, source
 							FROM predb
 							WHERE filename = %s
 							OR title = %1$s',
@@ -921,9 +921,9 @@ class NameFixer
 
 		if (isset($pre) && $pre !== false) {
 			if ($pre['title'] !== $release['searchname']) {
-				$this->updateRelease($release, $pre['title'], $method = "file matched source: " . $pre['source'], $echo, "PreDB file match, ", $namestatus, $show, $pre['preid']);
+				$this->updateRelease($release, $pre['title'], $method = "file matched source: " . $pre['source'], $echo, "PreDB file match, ", $namestatus, $show, $pre['predb_id']);
 			} else {
-				$this->_updateSingleColumn('preid', $pre['preid'], $release['releaseid']);
+				$this->_updateSingleColumn('predb_id', $pre['predb_id'], $release['releaseid']);
 			}
 			$matching++;
 		}
@@ -1004,8 +1004,8 @@ class NameFixer
 
 		$row = $pdo->queryOneRow(
 			sprintf("
-						SELECT p.id AS preid, p.title, p.source
-						FROM predb p INNER JOIN predb_hashes h ON h.pre_id = p.id
+						SELECT p.id AS predb_id, p.title, p.source
+						FROM predb p INNER JOIN predb_hashes h ON h.predb_id = p.id
 						WHERE h.hash = UNHEX(%s)
 						LIMIT 1",
 				$pdo->escapeString($hash)
@@ -1014,7 +1014,7 @@ class NameFixer
 
 		if ($row !== false) {
 			if ($row["title"] !== $release["searchname"]) {
-				$this->updateRelease($release, $row["title"], $method = "predb hash release name: " . $row["source"], $echo, $hashtype, $namestatus, $show, $row['preid']);
+				$this->updateRelease($release, $row["title"], $method = "predb hash release name: " . $row["source"], $echo, $hashtype, $namestatus, $show, $row['predb_id']);
 				$matching++;
 			}
 		} else {

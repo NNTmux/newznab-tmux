@@ -423,7 +423,7 @@ class NZBImport
 					'categories_id' => $this->category->determineCategory($nzbDetails['group_id'], $cleanName),
 					'isrenamed' => $renamed,
 					'reqidstatus' => 0,
-					'preid' => 0,
+					'predb_id' => 0,
 					'nzbstatus' => NZB::NZB_ADDED
 				]
 			);

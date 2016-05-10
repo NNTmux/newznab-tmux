@@ -104,21 +104,21 @@ if (isset($_GET["id"]))
 	}
 
 	$mus = '';
-	if ($data['musicinfoid'] != '') {
+	if ($data['musicinfo_id'] != '') {
 		$music = new Music(['Settings' => $page->settings]);
-		$mus = $music->getMusicInfo($data['musicinfoid']);
+		$mus = $music->getMusicInfo($data['musicinfo_id']);
 	}
 
 	$book = '';
-	if ($data['bookinfoid'] != '') {
+	if ($data['bookinfo_id'] != '') {
 		$b = new Books();
-		$book = $b->getBookInfo($data['bookinfoid']);
+		$book = $b->getBookInfo($data['bookinfo_id']);
 	}
 
 	$con = '';
-	if ($data['consoleinfoid'] != '') {
+	if ($data['consoleinfo_id'] != '') {
 		$c = new Console();
-		$con = $c->getConsoleInfo($data['consoleinfoid']);
+		$con = $c->getConsoleInfo($data['consoleinfo_id']);
 	}
 
 	$AniDBAPIArray = '';
@@ -129,7 +129,7 @@ if (isset($_GET["id"]))
 	}
 
 	$prehash = new PreDb();
-	$pre = $prehash->getForRelease($data["preid"]);
+	$pre = $prehash->getForRelease($data["predb_id"]);
 
 	$rf = new ReleaseFiles;
 	$releasefiles = $rf->get($data["id"]);

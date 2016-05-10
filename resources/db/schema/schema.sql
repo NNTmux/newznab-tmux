@@ -618,7 +618,7 @@ CREATE TABLE sharing (
 
 DROP TABLE IF EXISTS predbhash;
 CREATE TABLE predbhash (
-  pre_id INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  predb_id INT(11) UNSIGNED NOT NULL DEFAULT '0',
   hash VARBINARY(20)      NOT NULL DEFAULT '',
   PRIMARY KEY (hash)
 )
@@ -661,26 +661,26 @@ CREATE TABLE predb_imports (
   DEFAULT CHARSET =utf8
   COLLATE =utf8_unicode_ci;
 
-INSERT INTO predbhash (pre_id, hash) (SELECT id, CONCAT_WS(',', MD5(title), MD5(MD5(title)), SHA1(title)) FROM prehash);
+INSERT INTO predbhash (predb_id, hash) (SELECT id, CONCAT_WS(',', MD5(title), MD5(MD5(title)), SHA1(title)) FROM prehash);
 
 DELIMITER $$
 CREATE TRIGGER insert_hashes AFTER INSERT ON prehash FOR EACH ROW
   BEGIN
-    INSERT INTO predbhash (hash, pre_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id);
+    INSERT INTO predbhash (hash, predb_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id);
   END; $$
 
 CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW
   BEGIN
     IF NEW.title != OLD.title
       THEN
-         DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id = OLD.id;
-         INSERT INTO predbhash (hash, pre_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id );
+         DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND predb_id = OLD.id;
+         INSERT INTO predbhash (hash, predb_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id );
     END IF;
   END; $$
 
 CREATE TRIGGER delete_hashes AFTER DELETE ON prehash FOR EACH ROW
   BEGIN
-    DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id = OLD.id;
+    DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND predb_id = OLD.id;
   END; $$
 
 DELIMITER ;

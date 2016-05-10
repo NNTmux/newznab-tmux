@@ -2299,7 +2299,7 @@ CREATE TABLE IF NOT EXISTS parts (
 DROP TABLE IF EXISTS predb_hashes;
 CREATE TABLE IF NOT EXISTS predb_hashes (
   hash varbinary(20) NOT NULL DEFAULT '',
-  pre_id INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  predb_id INT(11) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (hash)
 )
   ENGINE = MyISAM
@@ -2344,11 +2344,11 @@ DROP TRIGGER IF EXISTS update_hashes;
 
 DELIMITER $$
 
-CREATE TRIGGER delete_hashes AFTER DELETE ON predb FOR EACH ROW BEGIN DELETE FROM predb_hashes WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id = OLD.id; END $$
+CREATE TRIGGER delete_hashes AFTER DELETE ON predb FOR EACH ROW BEGIN DELETE FROM predb_hashes WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND predb_id = OLD.id; END $$
 
-CREATE TRIGGER insert_hashes AFTER INSERT ON predb FOR EACH ROW BEGIN INSERT INTO predb_hashes (hash, pre_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id); END $$
+CREATE TRIGGER insert_hashes AFTER INSERT ON predb FOR EACH ROW BEGIN INSERT INTO predb_hashes (hash, predb_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id); END $$
 
-CREATE TRIGGER update_hashes AFTER UPDATE ON predb FOR EACH ROW BEGIN IF NEW.title != OLD.title THEN DELETE FROM predb_hashes WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id = OLD.id; INSERT INTO predb_hashes (hash, pre_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id ); END IF; END $$
+CREATE TRIGGER update_hashes AFTER UPDATE ON predb FOR EACH ROW BEGIN IF NEW.title != OLD.title THEN DELETE FROM predb_hashes WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND predb_id = OLD.id; INSERT INTO predb_hashes (hash, predb_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id ); END IF; END $$
 
 DELIMITER ;
 
@@ -2373,8 +2373,8 @@ CREATE TABLE IF NOT EXISTS predb_imports (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS release_audio;
-CREATE TABLE IF NOT EXISTS release_audio (
+DROP TABLE IF EXISTS audio_data;
+CREATE TABLE IF NOT EXISTS audio_data (
   id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   releaseid INT(11) UNSIGNED DEFAULT NULL,
   audioid INT(2) UNSIGNED DEFAULT NULL,
@@ -2442,9 +2442,9 @@ CREATE TABLE IF NOT EXISTS releases (
   tvdbid INT(11) UNSIGNED DEFAULT NULL,
   imdbid MEDIUMINT(7) UNSIGNED zerofill DEFAULT NULL,
   episodeinfoid INT(11) DEFAULT NULL,
-  musicinfoid INT(11) DEFAULT NULL,
-  consoleinfoid INT(11) DEFAULT NULL,
-  bookinfoid INT(11) DEFAULT NULL,
+  musicinfo_id INT(11) DEFAULT NULL,
+  consoleinfo_id INT(11) DEFAULT NULL,
+  bookinfo_id INT(11) DEFAULT NULL,
   anidbid INT(11) DEFAULT NULL,
   reqid VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   releasenfoid INT(11) DEFAULT NULL,
@@ -2459,7 +2459,7 @@ CREATE TABLE IF NOT EXISTS releases (
   audiostatus TINYINT(1) NOT NULL DEFAULT '0',
   videostatus TINYINT(1) NOT NULL DEFAULT '0',
   reqidstatus TINYINT(1) NOT NULL DEFAULT '0',
-  preid INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  predb_id INT(10) UNSIGNED NOT NULL DEFAULT '0',
   iscategorized TINYINT(1) NOT NULL DEFAULT '0',
   isrenamed TINYINT(1) NOT NULL DEFAULT '0',
   ishashed TINYINT(1) NOT NULL DEFAULT '0',
@@ -2482,12 +2482,12 @@ CREATE TABLE IF NOT EXISTS releases (
   KEY ix_releases_nzb_guid (nzb_guid),
   KEY ix_releases_imdbid (imdbid),
   KEY ix_releases_xxxinfo_id (xxxinfo_id),
-  KEY ix_releases_musicinfoid (musicinfoid,passwordstatus),
-  KEY ix_releases_consoleinfoid (consoleinfoid),
+  KEY ix_releases_musicinfoid (musicinfo_id,passwordstatus),
+  KEY ix_releases_consoleinfoid (consoleinfo_id),
   KEY ix_releases_gamesinfo_id (gamesinfo_id),
-  KEY ix_releases_bookinfoid (bookinfoid),
+  KEY ix_releases_bookinfoid (bookinfo_id),
   KEY ix_releases_anidbid (anidbid),
-  KEY ix_releases_preid_searchname (preid,searchname),
+  KEY ix_releases_preid_searchname (predb_id,searchname),
   KEY ix_releases_haspreview_passwordstatus (haspreview,passwordstatus),
   KEY ix_releases_passwordstatus (passwordstatus),
   KEY ix_releases_nfostatus (nfostatus,size),
