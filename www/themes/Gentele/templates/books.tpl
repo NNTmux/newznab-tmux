@@ -80,7 +80,7 @@
 												<div class="col-md-2 small-gutter-left">
 													<a title="View details"
 													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
-														<img src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfoid}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+														<img src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfo_id}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 															 width="140" border="0"
 															 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0}
 														<i class="fa fa-exclamation-circle" style="color: red"
@@ -89,7 +89,7 @@
 													{if isset($result.url) && $result.url != ""}<a
 														class="label label-primary" target="_blank"
 														href="{$site->dereferrer_link}{$result.url}"
-														name="amazon{$result.bookinfoid}" title="View amazon page">
+														name="amazon{$result.bookinfo_id}" title="View amazon page">
 															Amazon</a>{/if}
 													{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"

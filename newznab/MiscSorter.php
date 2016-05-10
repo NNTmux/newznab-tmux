@@ -252,7 +252,7 @@ class MiscSorter
 			$this->_setProcSorter(self::PROC_SORTER_DONE, $id);
 		}
 
-		if ($type !== '' && in_array($type, ['bookinfoid', 'consoleinfoid', 'imdbid', 'musicinfo_id'])) {
+		if ($type !== '' && in_array($type, ['bookinfo_id', 'consoleinfo_id', 'imdbid', 'musicinfo_id'])) {
 			$this->pdo->queryExec(
 				sprintf('
 								UPDATE releases
@@ -478,9 +478,9 @@ class MiscSorter
 		}
 
 		if ($audiobook) {
-			$ok = $this->dodbupdate($id, $name, $bookId, 'bookinfoid');
+			$ok = $this->dodbupdate($id, $name, $bookId, 'bookinfo_id');
 		} else {
-			$ok = $this->dodbupdate($id, $name, $bookId, 'bookinfoid');
+			$ok = $this->dodbupdate($id, $name, $bookId, 'bookinfo_id');
 		}
 
 		return $ok;
@@ -570,7 +570,7 @@ class MiscSorter
 		$rel = $this->_doAmazonLocal('consoleinfo', (string)$response->Items->Item->ASIN);
 
 		if ($rel !== false) {
-			$ok = $this->dodbupdate($id, $name, $rel['id'], 'consoleinfoid');
+			$ok = $this->dodbupdate($id, $name, $rel['id'], 'consoleinfo_id');
 		} else {
 			$consoleId = $this->console->
 			updateConsoleInfo([
@@ -579,7 +579,7 @@ class MiscSorter
 					'platform' => (string)$response->Items->Item->ItemAttributes->Platform
 				]
 			);
-			$ok = $this->dodbupdate($id, $name, $consoleId, 'consoleinfoid');
+			$ok = $this->dodbupdate($id, $name, $consoleId, 'consoleinfo_id');
 		}
 
 		return $ok;

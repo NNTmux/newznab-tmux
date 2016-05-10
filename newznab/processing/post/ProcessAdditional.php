@@ -2471,7 +2471,7 @@ class ProcessAdditional
 							'
 							UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL,
-								consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, predb_id = 0,
+								consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, predb_id = 0,
 								searchname = %s, isrenamed = 1, iscategorized = 1, proc_files = 1, categories_id = %d
 							WHERE id = %d',
 							$newTitle,

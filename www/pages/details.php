@@ -110,15 +110,15 @@ if (isset($_GET["id"]))
 	}
 
 	$book = '';
-	if ($data['bookinfoid'] != '') {
+	if ($data['bookinfo_id'] != '') {
 		$b = new Books();
-		$book = $b->getBookInfo($data['bookinfoid']);
+		$book = $b->getBookInfo($data['bookinfo_id']);
 	}
 
 	$con = '';
-	if ($data['consoleinfoid'] != '') {
+	if ($data['consoleinfo_id'] != '') {
 		$c = new Console();
-		$con = $c->getConsoleInfo($data['consoleinfoid']);
+		$con = $c->getConsoleInfo($data['consoleinfo_id']);
 	}
 
 	$AniDBAPIArray = '';

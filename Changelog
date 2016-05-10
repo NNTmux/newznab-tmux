@@ -1,4 +1,5 @@
 2016-05-10 DariusIII
+	* Chg: Rename bookinfoid to bookinfo_id, consoleinfoid to consoleinfo_id and pre_id to predb_id
 	* Chg: Rename musicinfoid to musicinfo_id
 	* Chg: Rename preid to predb_id in releases table and in classes and scripts.
 	* Chg: Move collection deletion right after NZB is created.

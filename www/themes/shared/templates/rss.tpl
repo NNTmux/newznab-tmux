@@ -38,12 +38,12 @@
 						{/if}
 						{if isset($release.co_cover) && $release.co_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;"
-								 src="{$serverroot}covers/console/{$release.consoleinfoid}.jpg" width="120" border="0"
+								 src="{$serverroot}covers/console/{$release.consoleinfo_id}.jpg" width="120" border="0"
 								 alt="{$release.searchname|escape:"htmlall"}"/>
 						{/if}
 						{if isset($release.bo_cover) && $release.bo_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;"
-								 src="{$serverroot}covers/book/{$release.bookinfoid}.jpg" width="120" border="0"
+								 src="{$serverroot}covers/book/{$release.bookinfo_id}.jpg" width="120" border="0"
 								 alt="{$release.searchname|escape:"htmlall"}"/>
 						{/if}
 						<ul>
@@ -119,7 +119,7 @@
 								{/if}
 							{/if}
 							{if isset($release.parentCategoryid) && $release.parentCategoryid == {$catClass::GAME_ROOT}}
-								{if $release.consoleinfoid > 0}
+								{if $release.consoleinfo_id > 0}
 									<li>Console Info:
 										<ul>
 											{if $release.co_url != ""}

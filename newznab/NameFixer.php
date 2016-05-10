@@ -691,7 +691,7 @@ class NameFixer
 							sprintf('
 								UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL,
-									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, predb_id = %d,
+									consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, predb_id = %d,
 									searchname = %s, %s categories_id = %d
 								WHERE id = %d',
 								$preId,
@@ -708,7 +708,7 @@ class NameFixer
 							sprintf('
 								UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL,
-									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, predb_id = %d,
+									consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, predb_id = %d,
 									searchname = %s, iscategorized = 1, categories_id = %d
 								WHERE id = %d',
 								$preId,
@@ -1005,7 +1005,7 @@ class NameFixer
 		$row = $pdo->queryOneRow(
 			sprintf("
 						SELECT p.id AS predb_id, p.title, p.source
-						FROM predb p INNER JOIN predb_hashes h ON h.pre_id = p.id
+						FROM predb p INNER JOIN predb_hashes h ON h.predb_id = p.id
 						WHERE h.hash = UNHEX(%s)
 						LIMIT 1",
 				$pdo->escapeString($hash)
