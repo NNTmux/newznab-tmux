@@ -22,5 +22,8 @@ ALTER TABLE releaseextrafull CHANGE COLUMN releaseid releases_id INT(11) NOT NUL
 # Change users_releases.releaseid to users_releases.releases_id to follow lithium convention.
 ALTER TABLE users_releases CHANGE COLUMN releaseid releases_id INT(11) NOT NULL COMMENT 'FK to releases.id';
 
+# Change user_downloads.releaseid to user_downloads.releases_id to follow lithium convention.
+ALTER TABLE user_downloads CHANGE COLUMN releaseid releases_id INT(11) NOT NULL COMMENT 'FK to releases.id';
+
 # Change video_data.releaseid to video_data.releases_id to follow lithium convention.
 ALTER TABLE video_data CHANGE COLUMN releaseid releases_id INT(11) NOT NULL COMMENT 'FK to releases.id';
