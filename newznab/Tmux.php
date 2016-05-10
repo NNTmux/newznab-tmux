@@ -383,7 +383,6 @@ class Tmux
 	{
 		switch ((int) $qry) {
 			case 1:
-			case 1:
 				return sprintf("SELECT
 					SUM(IF(nzbstatus = 1 AND categories_id BETWEEN %d AND %d AND categories_id != %d AND videos_id = 0
 						AND tv_episodes_id BETWEEN -3 AND 0 AND size > 1048576,1,0)) AS processtv,

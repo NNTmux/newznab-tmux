@@ -159,7 +159,7 @@ if (isset($argv[1]) && ($argv[1] === "music" || $argv[1] === "all")) {
 			$consoletools->overWritePrimary("Resetting Music Releases:  " . $consoletools->percentString(++$concount, $total));
 		}
 	}
-	echo $pdo->log->header("\n" . number_format($concount) . " musicinfoID's reset.");
+	echo $pdo->log->header("\n" . number_format($concount) . " musicinfo_id's reset.");
 }
 if (isset($argv[1]) && ($argv[1] === "misc" || $argv[1] === "all")) {
 	$ran = true;
