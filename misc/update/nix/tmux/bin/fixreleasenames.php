@@ -87,7 +87,7 @@ if (!isset($argv[1])) {
 
 	} else if (isset($pieces[1]) && $pieces[0] == 'predbft') {
 		$pre = $pieces[1];
-		if ($res = $db->queryOneRow(sprintf('SELECT id AS preid, title, source, searched FROM predb '
+		if ($res = $db->queryOneRow(sprintf('SELECT id AS predb_id, title, source, searched FROM predb '
 				. 'WHERE id = %d', $pre
 			)
 		)
@@ -104,7 +104,7 @@ if (!isset($argv[1])) {
 				$searched = $res['searched'] - 1;
 				echo ".";
 			}
-			$db->queryExec(sprintf("UPDATE predb SET searched = %d WHERE id = %d", $searched, $res['preid']));
+			$db->queryExec(sprintf("UPDATE predb SET searched = %d WHERE id = %d", $searched, $res['predb_id']));
 			$namefixer->checked++;
 		}
 

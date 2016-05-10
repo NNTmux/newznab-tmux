@@ -129,7 +129,7 @@ if (isset($_GET["id"]))
 	}
 
 	$prehash = new PreDb();
-	$pre = $prehash->getForRelease($data["preid"]);
+	$pre = $prehash->getForRelease($data["predb_id"]);
 
 	$rf = new ReleaseFiles;
 	$releasefiles = $rf->get($data["id"]);

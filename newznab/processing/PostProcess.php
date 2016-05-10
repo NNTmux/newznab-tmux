@@ -477,7 +477,7 @@ class PostProcess
 				FROM releases r
 				LEFT JOIN groups g ON r.groupid = g.id
 				WHERE r.isrenamed = 0
-				AND r.preid = 0
+				AND r.predb_id = 0
 				AND r.id = %d',
 				$relID
 			)

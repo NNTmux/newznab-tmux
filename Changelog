@@ -1,4 +1,5 @@
 2016-05-10 DariusIII
+	* Chg: Rename preid to predb_id in releases table and in classes and scripts.
 	* Chg: Move collection deletion right after NZB is created.
 2016-05-09 DariusIII
 	* Fix: Wrong class in Movie.php

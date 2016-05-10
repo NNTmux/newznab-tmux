@@ -1057,11 +1057,11 @@ class ReleaseRemover
 			LEFT JOIN release_files rf ON r.id = rf.releaseid
 			WHERE {$categories}
 			AND (r.imdbid NOT IN ('0000000', 0) OR xxxinfo_id > 0)
-			AND nfostatus = 1
-			AND haspreview = 0
-			AND jpgstatus = 0
-			AND preid = 0
-			AND videostatus = 0
+			AND r.nfostatus = 1
+			AND r.haspreview = 0
+			AND r.jpgstatus = 0
+			AND r.predb_id = 0
+			AND r.videostatus = 0
 			AND
 			(
 				rf.name REGEXP 'XviD-[a-z]{3}\\.(avi|mkv|wmv)$'

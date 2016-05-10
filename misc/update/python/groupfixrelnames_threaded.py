@@ -40,7 +40,7 @@ datelimit = "AND DATEDIFF(NOW(), r.adddate) <= 7"
 groupby = "GROUP BY guidchar"
 orderby = "ORDER BY guidchar ASC"
 rowlimit = "LIMIT 16"
-extrawhere = "AND r.preid = 0 AND r.nzbstatus = 1"
+extrawhere = "AND r.predb_id = 0 AND r.nzbstatus = 1"
 select = "DISTINCT LEFT(r.guid, 1) AS guidchar, COUNT(*) AS count"
 
 cur[0].execute("SELECT value FROM settings WHERE setting = 'fixnamethreads'")
