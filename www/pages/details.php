@@ -104,9 +104,9 @@ if (isset($_GET["id"]))
 	}
 
 	$mus = '';
-	if ($data['musicinfoid'] != '') {
+	if ($data['musicinfo_id'] != '') {
 		$music = new Music(['Settings' => $page->settings]);
-		$mus = $music->getMusicInfo($data['musicinfoid']);
+		$mus = $music->getMusicInfo($data['musicinfo_id']);
 	}
 
 	$book = '';

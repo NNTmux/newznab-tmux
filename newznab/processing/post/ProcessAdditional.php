@@ -2470,7 +2470,7 @@ class ProcessAdditional
 						sprintf(
 							'
 							UPDATE releases
-								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
+								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL,
 								consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, predb_id = 0,
 								searchname = %s, isrenamed = 1, iscategorized = 1, proc_files = 1, categories_id = %d
 							WHERE id = %d',

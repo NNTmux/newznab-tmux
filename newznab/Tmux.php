@@ -389,7 +389,7 @@ class Tmux
 						AND tv_episodes_id BETWEEN -3 AND 0 AND size > 1048576,1,0)) AS processtv,
 					SUM(IF(nzbstatus = 1 AND categories_id = %d AND anidbid IS NULL,1,0)) AS processanime,
 					SUM(IF(nzbstatus = 1 AND categories_id BETWEEN %d AND %d AND imdbid IS NULL,1,0)) AS processmovies,
-					SUM(IF(nzbstatus = 1 AND categories_id IN (%d, %d, %d) AND musicinfoid IS NULL,1,0)) AS processmusic,
+					SUM(IF(nzbstatus = 1 AND categories_id IN (%d, %d, %d) AND musicinfo_id IS NULL,1,0)) AS processmusic,
 					SUM(IF(nzbstatus = 1 AND categories_id BETWEEN %d AND %d AND consoleinfoid IS
 					NULL,1,0)) AS processconsole,
 					SUM(IF(nzbstatus = 1 AND categories_id IN (%s) AND bookinfoid IS NULL,1,0)) AS processbooks,

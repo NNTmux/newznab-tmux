@@ -33,7 +33,7 @@
 						{/if}
 						{if isset($release.mu_cover) && $release.mu_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;"
-								 src="{$serverroot}covers/music/{$release.musicinfoid}.jpg" width="120" border="0"
+								 src="{$serverroot}covers/music/{$release.musicinfo_id}.jpg" width="120" border="0"
 								 alt="{$release.searchname|escape:"htmlall"}"/>
 						{/if}
 						{if isset($release.co_cover) && $release.co_cover == 1}
@@ -88,7 +88,7 @@
 								{/if}
 							{/if}
 							{if isset($release.parentCategoryid) && $release.parentCategoryid == {$catClass::MUSIC_ROOT}}
-								{if $release.musicinfoid > 0}
+								{if $release.musicinfo_id > 0}
 									<li>Music Info:
 										<ul>
 											{if $release.mu_url != ""}

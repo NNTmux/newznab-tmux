@@ -1315,7 +1315,7 @@ class ProcessReleases
 						SELECT id, guid
 						FROM releases
 						INNER JOIN (SELECT id AS mid FROM musicinfo WHERE musicinfo.genreID = %d) mi
-						ON musicinfoid = mid',
+						ON musicinfo_id = mid',
 						$genre['id']
 					)
 				);
