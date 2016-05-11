@@ -16,8 +16,8 @@
 			</last>
 		</scripts>
 		<sql>
-			<db>255</db>
-			<file>255</file>
+			<db>256</db>
+			<file>256</file>
 		</sql>
 	</versions>
 </nntmux>
