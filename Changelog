@@ -1,4 +1,5 @@
 2016-05-11 DariusIII
+	* Upd: Split UPDATE and DELETE query after NZB is created for release
 	* Fix: Add patch to modify binaries table partcheck column.
 	* Fix: Fix createGUID function call in release creation process.
 2016-05-10 DariusIII
