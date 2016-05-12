@@ -320,14 +320,14 @@
 									{/if}
 									{if $cpurl != '' && $cpapi != ''}
 										<a
-												class="sendtocouch"
+												class="sendtocouch fa fa-bed"
 												target="blackhole"
 												href="javascript:"
 												rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
 												name="CP{$result.imdbid}"
-												title="Add to CouchPotato"
-												><img
-													src="{$smarty.const.WWW_THEMES}/shared/images/icons/couch.png"></a>
+												title="Add to CouchPotato">
+
+										</a>
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"
