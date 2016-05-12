@@ -1,4 +1,5 @@
 2016-05-12 DariusIII
+	* Fix: Remove derefferer links from CouchPotato url in Gamma theme.
 	* Fix: Fix nntmux_schema_fi for misc cats
 	* Fix: Wrong path to postprocess.php when using sequential in tmux
 	* Upd: Revert utf-8 fix apllied long time ago
