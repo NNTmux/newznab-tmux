@@ -145,9 +145,9 @@ CREATE TABLE IF NOT EXISTS category (
   AUTO_INCREMENT = 1000001;
 
 INSERT INTO category (id, title, parentid, status, minsizetoformrelease, maxsizetoformrelease, description, disablepreview) VALUES
-(0000, 'Other', NULL, 1, 0, 0, NULL, 0),
-(0010, 'Misc', 0000, 1, 0, 0, NULL, 0),
-(0020, 'Hashed', 0000, 1, 0, 0, NULL, 0),
+(0, 'Other', NULL, 1, 0, 0, NULL, 0),
+(10, 'Misc', 0, 1, 0, 0, NULL, 0),
+(20, 'Hashed', 0, 1, 0, 0, NULL, 0),
 (1000, 'Console', NULL, 1, 0, 0, NULL, 0),
 (1010, 'NDS', 1000, 1, 0, 0, NULL, 0),
 (1020, 'PSP', 1000, 1, 0, 0, NULL, 0),
