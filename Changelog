@@ -1,4 +1,6 @@
 2016-05-12 DariusIII
+	* Upd: Add output to git update
+	* Fix: Fix minsize queries fail
 	* Fix: Add/fix CouchPotato icons to themes.
 	* Fix: Remove derefferer links from CouchPotato url in Gamma theme.
 	* Fix: Fix nntmux_schema_fi for misc cats

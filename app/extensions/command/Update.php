@@ -73,45 +73,63 @@ class Update extends \app\extensions\console\Command
 	{
 		// TODO Add check to determine if the indexer or other scripts are running. Hopefully
 		// also prevent web access.
-		$this->primary("Checking database version...");
+		$this->out("Checking database version...", 'primary');
 
 		$versions = new Versions(['git' => ($this->git instanceof Git) ? $this->git : null]);
 
 		$currentDb = $versions->getSQLPatchFromDB();
 		$currentXML = $versions->getSQLPatchFromFile();
+		$this->out("Db: $currentDb,\tFile: $currentXML");
 		if ($currentDb < $currentXML) {
 			$db = new DbUpdate(['backup' => false]);
 			$db->processPatches(['safe' => false]);
 		} else {
-			$this->out("Up to date.");
+			$this->out("Up to date.", 'info');
 		}
 
 	}
 
 	public function git()
 	{
+		// TODO Add check to determine if the indexer or other scripts are running. Hopefully
+		// also prevent web access.
 		$this->initialiseGit();
 		if (!in_array($this->git->getBranch(), $this->git->getBranchesMain())) {
-			$this->error("Not on the stable or dev branch! Refusing to update repository ;-)");
+			$this->out("Not on the stable or dev branch! Refusing to update repository ;-)", 'error');
 			return;
 		}
-		$this->git->run('pull');
+		//return
+		$this->out($this->git->pull());
 	}
 
 	public function nntmux()
 	{
 		try {
-			$this->git();
-			$this->composer();
-			$this->db();
+			$output = $this->git();
+			if ($output === 'Already up-to-date.') {
+				$this->out($output, 'info');
+			} else {
+				$fail = $this->composer();
+				if (!$fail) {
+					$fail = $this->db();
+					if ($fail) {
+						$this->out('Db updating failed!!', 'error');
+						return false;
+					}
+				} else {
+					$this->out('Composer failed to update!!', 'error');
+					return false;
+				};
+			}
 
 			$smarty = new Smarty();
 			$cleared = $smarty->clearCompiledTemplate();
 			if ($cleared) {
-				$this->primary('The Smarty compiled template cache has been cleaned for you');
+				$this->out('The Smarty compiled template cache has been cleaned for you', 'primary');
 			} else {
-				$this->primary('You should clear your Smarty compiled template cache at: ' .
-					NN_RES . "smarty" . DS . 'templates_c');
+				$this->out('You should clear your Smarty compiled template cache at: ' .
+					NN_RES . "smarty" . DS . 'templates_c',
+					'primary');
 			}
 		} catch (\Exception $e) {
 			$this->error($e->getMessage());
@@ -123,7 +141,7 @@ class Update extends \app\extensions\console\Command
 	 */
 	public function predb()
 	{
-		$this->error('predb not available yet!');
+		$this->out('predb not available yet!', 'error');
 	}
 
 	public function run($command = null)
@@ -158,7 +176,7 @@ class Update extends \app\extensions\console\Command
 		if (in_array($this->gitBranch, $this->git->getBranchesStable())) {
 			$command .= ' --no-dev';
 		}
-		$this->primary('Running composer install process...');
+		$this->out('Running composer install process...', 'primary');
 		passthru($command);
 	}
 
