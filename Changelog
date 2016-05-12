@@ -1,4 +1,5 @@
 2016-05-12 DariusIII
+	* Fix: Wrong path to postprocess.php when using sequential in tmux
 	* Upd: Revert utf-8 fix apllied long time ago
 	* Rvr: Revert previous change
 	* Upd: Port many fixes from nZEDb

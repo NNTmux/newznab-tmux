@@ -235,7 +235,7 @@ class TmuxRun extends Tmux
 
 				$log = $this->writelog($runVar['panes']['one'][1]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.1 ' \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/nix/scripts/tmux/bin/postprocess.php amazon true $log; \
+						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/nix/tmux/bin/postprocess.php amazon true $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_amazon']}' 2>&1 1> /dev/null"
 				);
 				break;
