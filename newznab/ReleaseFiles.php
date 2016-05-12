@@ -87,7 +87,7 @@ class ReleaseFiles
 				FROM release_files
 				WHERE releases_id = %d AND name = %s',
 						$id,
-						$this->pdo->escapeString($name)
+						$this->pdo->escapeString(utf8_encode($name))
 				)
 		);
 
@@ -99,7 +99,7 @@ class ReleaseFiles
 						VALUES
 						(%d, %s, %s, %s, %d)",
 							$id,
-							$this->pdo->escapeString($name),
+							$this->pdo->escapeString(utf8_encode($name)),
 							$this->pdo->escapeString($size),
 							$this->pdo->from_unixtime($createdTime),
 							$hasPassword

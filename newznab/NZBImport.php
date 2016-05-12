@@ -335,7 +335,7 @@ class NZBImport
 
 			} else {
 				if ($isBlackListed) {
-					$errorMessage = "Subject is blacklisted: " . trim($firstName);
+					$errorMessage = "Subject is blacklisted: " . utf8_encode(trim($firstName));
 				} else {
 					$errorMessage = "No group found for " . $firstName . " (one of " . implode(', ', $groupArr) . " are missing";
 				}
@@ -377,7 +377,7 @@ class NZBImport
 		// Remove part count from subject.
 		$partLess = preg_replace('/(\(\d+\/\d+\))*$/', 'yEnc', $nzbDetails['subject']);
 		// Remove added yEnc from above and anything after.
-		$subject = trim(preg_replace('/yEnc.*$/i', 'yEnc', $partLess));
+		$subject = utf8_encode(trim(preg_replace('/yEnc.*$/i', 'yEnc', $partLess)));
 
 		$renamed = 0;
 		if ($nzbDetails['useFName']) {
