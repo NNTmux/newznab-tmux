@@ -1,5 +1,5 @@
 2016-05-12 DariusIII
-	* Chg: Rename all instances of releaseid to releases_id in NameFixer class
+	* Rvr: Revert previous change
 	* Upd: Port many fixes from nZEDb
 2016-05-11 DariusIII
 	* Upd: Composer update colorbox and phpmailer to newest versions
