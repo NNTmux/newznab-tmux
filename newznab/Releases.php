@@ -81,6 +81,7 @@ class Releases
 					size, passwordstatus, haspreview, categories_id, nfostatus, nzbstatus,
 					isrenamed, iscategorized, reqidstatus, predb_id)
 				VALUES (%s, %s, %d, %d, NOW(), %s, LEFT(%s, 1), %s, %s, %s, %d, -1, %d, -1, %d, %d, 1, %d, %d)",
+				$parameters['name'],
 				$parameters['searchname'],
 				$parameters['totalpart'],
 				$parameters['groupid'],
