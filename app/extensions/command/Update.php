@@ -127,7 +127,7 @@ class Update extends \app\extensions\console\Command
 			$smarty = new SmartyBC();
 			$smarty->setCompileDir(NN_RES . DS . 'smarty' . DS . 'templates_c/');
 			$cleared = $smarty->clear_compiled_tpl();
-			if ($cleared) {
+			if ($cleared > 0) {
 				$this->out('The Smarty compiled template cache has been cleaned for you', 'primary');
 			} else {
 				$this->out('You should clear your Smarty compiled template cache at: ' .
