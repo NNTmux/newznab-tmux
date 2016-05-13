@@ -109,16 +109,18 @@ class Update extends \app\extensions\console\Command
 			if ($output === 'Already up-to-date.') {
 				$this->out($output, 'info');
 			} else {
-				$fail = $this->composer();
-				if (!$fail) {
+				$status = $this->composer();
+				if ($status) {
+					$this->out('Composer failed to update!!', 'error');
+
+					return false;
+				} else {
 					$fail = $this->db();
 					if ($fail) {
 						$this->out('Db updating failed!!', 'error');
+
 						return false;
 					}
-				} else {
-					$this->out('Composer failed to update!!', 'error');
-					return false;
 				};
 			}
 
