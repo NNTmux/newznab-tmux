@@ -1269,7 +1269,7 @@ class NameFixer
 	{
 		$result = [];
 
-		if ($this->done === false && $this->relid !== $release["releaseid"]) {
+		if ($this->done === false && $this->relid !== $release["releases_id"]) {
 
 			if (preg_match('/:\s*.*[\\\\\/]([A-Z0-9].+?S\d+[.-_ ]?[ED]\d+.+?)\.\w{2,}\s+/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["1"], $method = "nfoCheck: Generic TV 1", $echo, $type, $namestatus, $show);
@@ -1292,7 +1292,7 @@ class NameFixer
 	{
 		$result = [];
 
-		if ($this->done === false && $this->relid !== $release["releaseid"]) {
+		if ($this->done === false && $this->relid !== $release["releases_id"]) {
 
 			if (preg_match('/(?:((?!Source\s)\:\s{1,}))(.+?(19|20)\d\d.+?(BDRip|bluray|DVD(R|Rip)?|XVID).+?)(\s{2,}|\r|\n)/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["2"], $method = "nfoCheck: Generic Movies 1", $echo, $type, $namestatus, $show);
@@ -1315,7 +1315,7 @@ class NameFixer
 	{
 		$result = [];
 
-		if ($this->done === false && $this->relid !== $release["releaseid"]) {
+		if ($this->done === false && $this->relid !== $release["releases_id"]) {
 
 			if (preg_match('/(?:\s{2,})(.+?-FM-\d{2}-\d{2})/i', $release["textstring"], $result)) {
 				$newname = str_replace('-FM-', '-FM-Radio-MP3-', $result["1"]);
@@ -1337,7 +1337,7 @@ class NameFixer
 	{
 		$result = [];
 
-		if ($this->done === false && $this->relid !== $release["releaseid"]) {
+		if ($this->done === false && $this->relid !== $release["releases_id"]) {
 			if (preg_match('/(\w[-\w`~!@#$%^&*()_+={}|"<>?\[\]\\;\',.\/ ]+\s?\((19|20)\d\d\))/i', $release["textstring"], $result) && !preg_match('/\.pdf|Audio ?Book/i', $release["textstring"])) {
 				$releasename = $result[0];
 				if (preg_match('/(idiomas|lang|language|langue|sprache).*?\b(?P<lang>Brazilian|Chinese|Croatian|Danish|DE|Deutsch|Dutch|Estonian|ES|English|Englisch|Finnish|Flemish|Francais|French|FR|German|Greek|Hebrew|Icelandic|Italian|Japenese|Japan|Japanese|Korean|Latin|Nordic|Norwegian|Polish|Portuguese|Russian|Serbian|Slovenian|Swedish|Spanisch|Spanish|Thai|Turkish)\b/i', $release["textstring"], $result)) {
@@ -1510,7 +1510,7 @@ class NameFixer
 	{
 		$result = [];
 
-		if ($this->done === false && $this->relid !== $release["releaseid"]) {
+		if ($this->done === false && $this->relid !== $release["releases_id"]) {
 			if (preg_match('/ALiAS|BAT-TEAM|FAiRLiGHT|Game Type|Glamoury|HI2U|iTWINS|JAGUAR|(LARGE|MEDIUM)ISO|MAZE|nERv|PROPHET|PROFiT|PROCYON|RELOADED|REVOLVER|ROGUE|ViTALiTY/i', $release["textstring"])) {
 				if (preg_match('/\w[\w.+&*\/\()\',;: -]+\(c\)[-\w.\',;& ]+\w/i', $release["textstring"], $result)) {
 					$releasename = str_replace(["(c)", "(C)"], "(GAMES) (c)", $result['0']);
@@ -1535,7 +1535,7 @@ class NameFixer
 	 */
 	public function nfoCheckMisc($release, $echo, $type, $namestatus, $show)
 	{
-		if ($this->done === false && $this->relid !== $release["releaseid"]) {
+		if ($this->done === false && $this->relid !== $release["releases_id"]) {
 
 			if (preg_match('/Supplier.+?IGUANA/i', $release["textstring"])) {
 				$releasename = '';
@@ -1577,7 +1577,7 @@ class NameFixer
 	{
 		$result = [];
 
-		if ($this->done === false && $this->relid !== $release["releaseid"]) {
+		if ($this->done === false && $this->relid !== $release["releases_id"]) {
 
 			if (preg_match('/^(.+?(x264|XviD)\-TVP)\\\\/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["1"], $method = "fileCheck: TVP", $echo, $type, $namestatus, $show);
@@ -1641,7 +1641,7 @@ class NameFixer
 	{
 		$result = [];
 
-		if ($this->done === false && $this->relid !== $release["releaseid"]) {
+		if ($this->done === false && $this->relid !== $release["releases_id"]) {
 			if (preg_match('/(.+?)\.(srr)$/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["1"], $method = "srrCheck: Srr filename", $echo, $type, $namestatus, $show);
 			}
