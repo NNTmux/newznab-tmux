@@ -70,7 +70,7 @@ if (!isset($argv[1])) {
 									rf.name AS filename
 								FROM releases r
 								LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id AND rf.ishashed = 1
-								WHERE r.leftguid %s
+								WHERE r.leftguid = %s
 								AND nzbstatus = 1 AND r.ishashed = 1
 								AND r.dehashstatus BETWEEN -6 AND 0
 								AND r.predb_id = 0
