@@ -1,4 +1,5 @@
 2016-05-12 DariusIII
+	* Chg: Add back old type Srr file match renaming.
 	* Upd: Add output to git update
 	* Fix: Fix minsize queries fail
 	* Fix: Add/fix CouchPotato icons to themes.

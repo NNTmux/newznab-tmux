@@ -147,11 +147,11 @@ class Forking extends \fork_daemon
 
 			case 'fixRelNames_nfo':
 			case 'fixRelNames_filename':
+			case 'fixRelNames_srr':
 			case 'fixRelNames_md5':
 			case 'fixRelNames_par2':
 			case 'fixRelNames_miscsorter':
 			case 'fixRelNames_predbft':
-			case 'fixRelNames_srr':
 				$maxProcesses = $this->fixRelNamesMainMethod();
 				break;
 
@@ -514,8 +514,13 @@ class Forking extends \fork_daemon
 				break;
 
 			case "filename":
-				$join = "STRAIGHT_JOIN release_files rf ON rf.releases_id = r.id";
-				$where = "r.proc_files = 0";
+				$join = "INNER JOIN release_files rf ON rf.releases_id = r.id";
+				$where = "r.proc_files = 0 AND (r.isrenamed = 0 OR r.categories_id = Category::OTHER_MISC)";
+				break;
+
+			case "srr":
+				$join = "INNER JOIN release_files rf ON rf.releases_id = r.id";
+				$where = "r.proc_srr = 0 AND (r.isrenamed = 0 OR r.categories_id IN (Category::OTHER_MISC, Category::OTHER_HASHED))";
 				break;
 
 			case "par2":
@@ -530,10 +535,6 @@ class Forking extends \fork_daemon
 				$extrawhere = "";
 				$where = "1=1";
 				$rowLimit = sprintf("LIMIT %s", $threads);
-				break;
-
-			case "srr":
-				$where = "r.proc_srr = 0";
 				break;
 		}
 
