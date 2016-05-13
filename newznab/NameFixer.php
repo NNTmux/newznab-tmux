@@ -1017,7 +1017,7 @@ class NameFixer
 				$matching++;
 			}
 		} else {
-			$this->_updateSingleColumn('dehashstatus', $release['dehashstatus'] - 1, $release['releases_id']);
+			$this->_updateSingleColumn('dehashstatus', $release['dehashstatus'] - 1, $release['releaseid']);
 		}
 
 		return $matching;
@@ -1081,13 +1081,13 @@ class NameFixer
 			if ($namestatus == 1 && $this->matched === false) {
 				switch ($type) {
 					case  "NFO, ":
-						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release['releases_id']);
+						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release['releaseid']);
 						break;
 					case "Filenames, ":
-						$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releases_id']);
+						$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releaseid']);
 						break;
 					case "PAR2, ":
-						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releases_id']);
+						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releaseid']);
 						break;
 				}
 			}
@@ -1577,7 +1577,7 @@ class NameFixer
 	{
 		$result = [];
 
-		if ($this->done === false && $this->relid !== $release["releases_id"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
 			if (preg_match('/^(.+?(x264|XviD)\-TVP)\\\\/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["1"], $method = "fileCheck: TVP", $echo, $type, $namestatus, $show);
@@ -1641,7 +1641,7 @@ class NameFixer
 	{
 		$result = [];
 
-		if ($this->done === false && $this->relid !== $release["releases_id"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 			if (preg_match('/(.+?)\.(srr)$/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["1"], $method = "srrCheck: Srr filename", $echo, $type, $namestatus, $show);
 			}

@@ -521,12 +521,12 @@ class Forking extends \fork_daemon
 
 			case "filename":
 				$join = "INNER JOIN release_files rf ON rf.releases_id = r.id";
-				$where = "r.proc_files = 0 AND (r.isrenamed = 0 OR r.categories_id = ' . Category::OTHER_MISC . ')";
+				$where = "r.proc_files = 0";
 				break;
 
 			case "srr":
 				$join = "INNER JOIN release_files rf ON rf.releases_id = r.id";
-				$where = "r.proc_srr = 0 AND (r.isrenamed = 0 OR r.categories_id IN (' . Category::OTHER_MISC . ', ' . Category::OTHER_HASHED . '))";
+				$where = "r.proc_srr = 0";
 				break;
 
 			case "par2":
