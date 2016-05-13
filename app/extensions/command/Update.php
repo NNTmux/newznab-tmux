@@ -19,7 +19,7 @@
 namespace app\extensions\command;
 
 use \Exception;
-use \Smarty;
+use \SmartyBC;
 use \app\extensions\util\Git;
 use \app\extensions\util\Versions;
 use \lithium\console\command\Help;
@@ -124,8 +124,9 @@ class Update extends \app\extensions\console\Command
 				};
 			}
 
-			$smarty = new Smarty();
-			$cleared = $smarty->clearCompiledTemplate();
+			$smarty = new SmartyBC();
+			$smarty->setCompileDir(NN_RES . DS . 'smarty' . DS . 'templates_c/');
+			$cleared = $smarty->clear_compiled_tpl();
 			if ($cleared) {
 				$this->out('The Smarty compiled template cache has been cleaned for you', 'primary');
 			} else {
