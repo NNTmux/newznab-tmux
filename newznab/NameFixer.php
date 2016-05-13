@@ -270,30 +270,32 @@ class NameFixer
 
 		$preId = false;
 		if ($cats === 3) {
-			$query = sprintf('
+			$query =
+				sprintf('
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE rel.nzbstatus = %d
-					AND rel.predb_id = 0',
-				NZB::NZB_ADDED
+					AND rel.predb_id < 1',
+					NZB::NZB_ADDED
 			);
 			$cats = 2;
 			$preId = true;
 		} else {
-			$query = sprintf('
+			$query =
+				sprintf('
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE (rel.isrenamed = %d OR rel.categories_id = %d)
 					AND rel.proc_files = %d
 					%s',
-				self::IS_RENAMED_NONE,
-				Category::OTHER_MISC,
-				self::PROC_FILES_NONE,
-				$guid
+					self::IS_RENAMED_NONE,
+					Category::OTHER_MISC,
+					self::PROC_FILES_NONE,
+					$guid
 			);
 		}
 
@@ -345,33 +347,35 @@ class NameFixer
 
 		$preId = false;
 		if ($cats === 3) {
-			$query = sprintf('
+			$query =
+				sprintf('
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
 					WHERE rel.nzbstatus = %d
-					AND rel.predb_id = 0',
-				NZB::NZB_ADDED
+					AND rel.predb_id < 1',
+					NZB::NZB_ADDED
 			);
 			$cats = 2;
 			$preId = true;
 		} else {
-			$query = sprintf('
-					  SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
-					  rf.releases_id AS fileid, rel.id AS releases_id
-					  FROM releases rel
-					  INNER JOIN release_files rf ON (rf.releases_id = rel.id)
-					  WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-					  AND rf.name %s
-					  AND rel.proc_srr = %d
-					  %s',
-				self::IS_RENAMED_NONE,
-				Category::OTHER_MISC,
-				Category::OTHER_HASHED,
-				$this->pdo->likeString('.srr', true, false),
-				self::PROC_SRR_NONE,
-				$guid
+			$query =
+				sprintf('
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
+						rf.releases_id AS fileid, rel.id AS releases_id
+					FROM releases rel
+					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
+					AND rf.name %s
+					AND rel.proc_srr = %d
+					%s',
+					self::IS_RENAMED_NONE,
+					Category::OTHER_MISC,
+					Category::OTHER_HASHED,
+					$this->pdo->likeString('.srr', true, false),
+					self::PROC_SRR_NONE,
+					$guid
 			);
 		}
 

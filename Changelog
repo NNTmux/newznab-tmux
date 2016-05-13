@@ -1,4 +1,5 @@
 2016-05-13 DariusIII
+	* Upd: Improve the speed of fixrelnames work queries
 	* Fix: Properly fix renaming issues introduced by renaming releaseid to releases_id
 2016-05-12 DariusIII
 	* Fix: Wrong path to fixrelnames script in TmuxRun
