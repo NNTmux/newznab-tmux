@@ -456,7 +456,7 @@ class NameFixer
 				);
 
 				foreach ($releases as $release) {
-					if (($nzbContents->checkPAR2($release['guid'], $release['releaseid'], $release['groupid'], $nameStatus, $show)) === true) {
+					if (($nzbContents->checkPAR2($release['guid'], $release['releases_id'], $release['groupid'], $nameStatus, $show)) === true) {
 						$this->fixed++;
 					}
 
@@ -697,10 +697,10 @@ class NameFixer
 								$newTitle,
 								$status,
 								$determinedCategory,
-								$release['releaseid']
+								$release['releases_id']
 							)
 						);
-						$this->sphinx->updateRelease($release['releaseid'], $this->pdo);
+						$this->sphinx->updateRelease($release['releases_id'], $this->pdo);
 					} else {
 						$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
 						$this->pdo->queryExec(
@@ -713,10 +713,10 @@ class NameFixer
 								$preId,
 								$newTitle,
 								$determinedCategory,
-								$release['releaseid']
+								$release['releases_id']
 							)
 						);
-						$this->sphinx->updateRelease($release['releaseid'], $this->pdo);
+						$this->sphinx->updateRelease($release['releases_id'], $this->pdo);
 					}
 				}
 			}
@@ -922,7 +922,7 @@ class NameFixer
 			if ($pre['title'] !== $release['searchname']) {
 				$this->updateRelease($release, $pre['title'], $method = "file matched source: " . $pre['source'], $echo, "PreDB file match, ", $namestatus, $show, $pre['predb_id']);
 			} else {
-				$this->_updateSingleColumn('predb_id', $pre['predb_id'], $release['releaseid']);
+				$this->_updateSingleColumn('predb_id', $pre['predb_id'], $release['releases_id']);
 			}
 			$matching++;
 		}
@@ -1017,7 +1017,7 @@ class NameFixer
 				$matching++;
 			}
 		} else {
-			$this->_updateSingleColumn('dehashstatus', $release['dehashstatus'] - 1, $release['releaseid']);
+			$this->_updateSingleColumn('dehashstatus', $release['dehashstatus'] - 1, $release['releases_id']);
 		}
 
 		return $matching;
@@ -1081,13 +1081,13 @@ class NameFixer
 			if ($namestatus == 1 && $this->matched === false) {
 				switch ($type) {
 					case  "NFO, ":
-						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release['releaseid']);
+						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release['releases_id']);
 						break;
 					case "Filenames, ":
-						$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releaseid']);
+						$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releases_id']);
 						break;
 					case "PAR2, ":
-						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releaseid']);
+						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releases_id']);
 						break;
 				}
 			}
