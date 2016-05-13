@@ -1,4 +1,5 @@
 2016-05-12 DariusIII
+	* Upd: Add leftguid column to releases table for better threading.
 	* Upd: Update command output
 	* Chg: Add back old type Srr file match renaming.
 	* Upd: Add output to git update

@@ -262,7 +262,7 @@ class NameFixer
 	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
 		$type = 'Filenames, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.guid '. $this->pdo->likeString($guidChar, false, true));
+		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid '. $this->pdo->escapeString($guidChar));
 		$queryLimit = ($limit === '') ? '' : $limit;
 		if ($guid === '') {
 			$this->_echoStartMessage($time, 'file names');

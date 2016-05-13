@@ -432,7 +432,13 @@ class Forking extends \fork_daemon
 		$maxmssgs = $this->pdo->getSetting('maxmssgs');
 		$threads = $this->pdo->getSetting('binarythreads');
 
-		$groups = $this->pdo->query("SELECT g.name AS groupname, g.last_record AS our_last, a.last_record AS their_last FROM groups g INNER JOIN short_groups a ON g.active = 1 AND g.name = a.name ORDER BY a.last_record DESC");
+		$groups = $this->pdo->query("
+			SELECT g.name AS groupname, g.last_record AS our_last,
+				a.last_record AS their_last
+			FROM groups g
+			INNER JOIN short_groups a ON g.active = 1 AND g.name = a.name
+			ORDER BY a.last_record DESC"
+		);
 
 		if ($groups) {
 			$i = 1;
@@ -494,7 +500,7 @@ class Forking extends \fork_daemon
 		$orderby = "ORDER BY guidchar ASC";
 		$rowLimit = "LIMIT 16";
 		$extrawhere = "AND r.predb_id = 0 AND r.nzbstatus = 1";
-		$select = "DISTINCT LEFT(r.guid, 1) AS guidchar, COUNT(r.id) AS count";
+		$select = "r.leftguid AS guidchar, COUNT(r.id) AS count";
 
 
 		$threads = $this->pdo->getSetting('fixnamethreads');
@@ -515,12 +521,12 @@ class Forking extends \fork_daemon
 
 			case "filename":
 				$join = "INNER JOIN release_files rf ON rf.releases_id = r.id";
-				$where = "r.proc_files = 0 AND (r.isrenamed = 0 OR r.categories_id = Category::OTHER_MISC)";
+				$where = "r.proc_files = 0 AND (r.isrenamed = 0 OR r.categories_id = ' . Category::OTHER_MISC . ')";
 				break;
 
 			case "srr":
 				$join = "INNER JOIN release_files rf ON rf.releases_id = r.id";
-				$where = "r.proc_srr = 0 AND (r.isrenamed = 0 OR r.categories_id IN (Category::OTHER_MISC, Category::OTHER_HASHED))";
+				$where = "r.proc_srr = 0 AND (r.isrenamed = 0 OR r.categories_id IN (' . Category::OTHER_MISC . ', ' . Category::OTHER_HASHED . '))";
 				break;
 
 			case "par2":
@@ -538,7 +544,20 @@ class Forking extends \fork_daemon
 				break;
 		}
 
-		$datas = $this->pdo->query(sprintf("SELECT %s FROM releases r %s WHERE %s %s %s %s %s", $select, $join, $where, $extrawhere, $groupby, $orderby, $rowLimit));
+		$datas = $this->pdo->query(
+			sprintf("
+				SELECT %s
+				FROM releases r %s
+				WHERE %s %s %s %s %s",
+				$select,
+				$join,
+				$where,
+				$extrawhere,
+				$groupby,
+				$orderby,
+				$rowLimit
+			)
+		);
 
 		if ($datas) {
 			$count = 0;
@@ -689,7 +708,7 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(r.guid, 1) AS id
+					SELECT r.leftguid AS id
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
 					WHERE r.nzbstatus = %d
@@ -697,7 +716,7 @@ class Forking extends \fork_daemon
 					AND r.haspreview = -1
 					AND c.disablepreview = 0
 					%s %s
-					GROUP BY LEFT(r.guid, 1)
+					GROUP BY r.leftguid
 					LIMIT 16',
 					NZB::NZB_ADDED,
 					$this->ppAddMaxSize,
@@ -739,10 +758,10 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(r.guid, 1) AS id
+					SELECT r.leftguid AS id
 					FROM releases r
 					WHERE 1=1 %s
-					GROUP BY LEFT(r.guid, 1)
+					GROUP BY r.leftguid
 					LIMIT 16',
 					$this->nfoQueryString
 				)
@@ -787,13 +806,13 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(guid, 1) AS id, %d AS renamed
+					SELECT leftguid AS id, %d AS renamed
 					FROM releases
 					WHERE nzbstatus = %d
 					AND imdbid IS NULL
 					AND categories_id BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
 					%s %s
-					GROUP BY LEFT(guid, 1)
+					GROUP BY leftguid
 					LIMIT 16',
 					($this->ppRenamedOnly ? 2 : 1),
 					NZB::NZB_ADDED,
@@ -842,14 +861,14 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(guid, 1) AS id, %d AS renamed
+					SELECT leftguid AS id, %d AS renamed
 					FROM releases
 					WHERE nzbstatus = %d
 					AND tv_episodes_id BETWEEN -2 AND 0
 					AND size > 1048576
 					AND categories_id BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
 					%s %s
-					GROUP BY LEFT(guid, 1)
+					GROUP BY leftguid
 					LIMIT 16',
 					($this->ppRenamedOnly ? 2 : 1),
 					NZB::NZB_ADDED,

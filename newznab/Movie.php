@@ -1092,7 +1092,7 @@ class Movie
 				LIMIT %d",
 				$this->catWhere,
 				($groupID === '' ? '' : ('AND r.groupid = ' . $groupID)),
-				($guidChar === '' ? '' : ('AND r.guid ' . $this->pdo->likeString($guidChar, false, true))),
+				($guidChar === '' ? '' : 'AND r.leftguid = ' . $this->pdo->escapeString($guidChar)),
 				($lookupIMDB == 2 ? 'AND r.isrenamed = 1' : ''),
 				$this->movieqty
 			)

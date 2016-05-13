@@ -170,6 +170,8 @@ class Update extends \app\extensions\console\Command
 	 *
 	 * It first checks the current branch for stable versions. If found then the '--no-dev'
 	 * option is added to the command to prevent development packages being also downloded.
+	 *
+	 * @return integer Return status from Composer.
 	 */
 	protected function composer()
 	{
@@ -179,7 +181,8 @@ class Update extends \app\extensions\console\Command
 			$command .= ' --no-dev';
 		}
 		$this->out('Running composer install process...', 'primary');
-		passthru($command);
+		system($command, $status);
+		return $status;
 	}
 
 	protected function initialiseGit()

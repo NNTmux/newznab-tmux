@@ -50,7 +50,7 @@ abstract class TV extends Videos
 	public $siteColumns;
 
 	/**
-	 * @var array|bool|int|string
+	 * @var string The TV categories_id lookup SQL language
 	 */
 	public $catWhere;
 
@@ -159,7 +159,7 @@ abstract class TV extends Videos
 				$status,
 				$this->catWhere,
 				($groupID === '' ? '' : 'AND r.groupid = ' . $groupID),
-				($guidChar === '' ? '' : 'AND r.guid ' . $this->pdo->likeString($guidChar, false, true)),
+				($guidChar === '' ? '' : 'AND r.leftguid = ' . $this->pdo->escapeString($guidChar)),
 				($lookupSetting == 2 ? 'AND r.isrenamed = 1' : ''),
 				$this->tvqty
 			)

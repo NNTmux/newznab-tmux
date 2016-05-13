@@ -24,18 +24,18 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'nfo' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT r.id AS releaseid, r.guid, r.groupid, r.categories_id, r.name, r.searchname,
-									uncompress(nfo) AS textstring
-								FROM releases r
-								INNER JOIN release_nfos rn ON r.id = rn.releases_id
-								WHERE r.guid %s
-								AND r.nzbstatus = 1
-								AND r.proc_nfo = 0
-								AND r.nfostatus = 1
-								AND r.predb_id = 0
-								ORDER BY r.postdate DESC
-								LIMIT %s',
-					$pdo->likeString($guidChar, false, true),
+					SELECT r.id AS releases_id, r.guid, r.groupid, r.categories_id, r.name, r.searchname,
+						uncompress(nfo) AS textstring
+					FROM releases r
+					INNER JOIN release_nfos rn ON r.id = rn.releases_id
+					WHERE r.leftguid = %s
+					AND r.nzbstatus = 1
+					AND r.proc_nfo = 0
+					AND r.nfostatus = 1
+					AND r.predb_id = 0
+					ORDER BY r.postdate DESC
+					LIMIT %s',
+					$pdo->escapeString($guidChar),
 					$maxperrun
 				)
 			);
@@ -70,13 +70,13 @@ if (!isset($argv[1])) {
 									rf.name AS filename
 								FROM releases r
 								LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id AND rf.ishashed = 1
-								WHERE r.guid %s
+								WHERE r.leftguid %s
 								AND nzbstatus = 1 AND r.ishashed = 1
 								AND r.dehashstatus BETWEEN -6 AND 0
 								AND r.predb_id = 0
 								ORDER BY r.dehashstatus DESC, r.postdate ASC
 								LIMIT %s',
-					$pdo->likeString($guidChar, false, true),
+					$pdo->escapeString($guidChar),
 					$maxperrun
 				)
 			);
@@ -99,13 +99,13 @@ if (!isset($argv[1])) {
 				sprintf('
 								SELECT r.id AS releaseid, r.guid, r.groupid
 								FROM releases r
-								WHERE r.guid %s
+								WHERE r.leftguid = %s
 								AND r.nzbstatus = 1
 								AND r.proc_par2 = 0
 								AND r.predb_id = 0
 								ORDER BY r.postdate ASC
 								LIMIT %s',
-					$pdo->likeString($guidChar, false, true),
+					$pdo->escapeString($guidChar),
 					$maxperrun
 				)
 			);
@@ -136,13 +136,13 @@ if (!isset($argv[1])) {
 				sprintf('
 								SELECT r.id AS releaseid
 								FROM releases r
-								WHERE r.guid %s
+								WHERE r.leftguid = %s
 								AND r.nzbstatus = 1 AND r.nfostatus = 1
 								AND r.proc_sorter = 0 AND r.isrenamed = 0
 								AND r.predb_id = 0
 								ORDER BY r.postdate DESC
 								LIMIT %s',
-					$pdo->likeString($guidChar, false, true),
+					$pdo->escapeString($guidChar),
 					$maxperrun
 				)
 			);
