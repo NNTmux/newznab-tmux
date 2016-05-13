@@ -262,7 +262,7 @@ class NameFixer
 	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
 		$type = 'Filenames, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid '. $this->pdo->escapeString($guidChar));
+		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = '. $this->pdo->escapeString($guidChar));
 		$queryLimit = ($limit === '') ? '' : $limit;
 		if ($guid === '') {
 			$this->_echoStartMessage($time, 'file names');
@@ -337,7 +337,7 @@ class NameFixer
 	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
 		$type = 'Srr, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid '. $this->pdo->escapeString($guidChar));
+		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = '. $this->pdo->escapeString($guidChar));
 		$queryLimit = ($limit === '') ? '' : $limit;
 		if ($guid === '') {
 			$this->_echoStartMessage($time, 'srr files');
