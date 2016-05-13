@@ -337,7 +337,7 @@ class NameFixer
 	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
 		$type = 'Srr, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.guid '. $this->pdo->likeString($guidChar, false, true));
+		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid '. $this->pdo->escapeString($guidChar));
 		$queryLimit = ($limit === '') ? '' : $limit;
 		if ($guid === '') {
 			$this->_echoStartMessage($time, 'srr files');
