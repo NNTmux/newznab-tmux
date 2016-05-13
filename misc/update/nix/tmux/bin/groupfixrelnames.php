@@ -44,7 +44,7 @@ if (!isset($argv[1])) {
 				foreach ($releases as $release) {
 					if (preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])) {
 						$namefixer->done = $namefixer->matched = false;
-						$pdo->queryDirect(sprintf('UPDATE releases SET proc_nfo = 1 WHERE id = %d', $release['releaseid']));
+						$pdo->queryDirect(sprintf('UPDATE releases SET proc_nfo = 1 WHERE id = %d', $release['releases_id']));
 						$namefixer->checked++;
 						echo '.';
 					} else {
@@ -66,7 +66,7 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'md5' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT DISTINCT r.id AS releaseid, r.name, r.searchname, r.categories_id, r.groupid, r.dehashstatus,
+								SELECT DISTINCT r.id AS releases_id, r.name, r.searchname, r.categories_id, r.groupid, r.dehashstatus,
 									rf.name AS filename
 								FROM releases r
 								LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id AND rf.ishashed = 1
@@ -88,7 +88,7 @@ if (!isset($argv[1])) {
 					} else if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['filename'], $matches)) {
 						$namefixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
 					} else {
-						$pdo->queryExec(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE id = %d", $release['dehashstatus'], $release['releaseid']));
+						$pdo->queryExec(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE id = %d", $release['dehashstatus'], $release['releases_id']));
 						echo '.';
 					}
 				}
@@ -97,7 +97,7 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'par2' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT r.id AS releaseid, r.guid, r.groupid
+								SELECT r.id AS releases_id, r.guid, r.groupid
 								FROM releases r
 								WHERE r.leftguid = %s
 								AND r.nzbstatus = 1
@@ -124,7 +124,7 @@ if (!isset($argv[1])) {
 					)
 				);
 				foreach ($releases as $release) {
-					$res = $nzbcontents->checkPAR2($release['guid'], $release['releaseid'], $release['groupid'], 1, 1);
+					$res = $nzbcontents->checkPAR2($release['guid'], $release['releases_id'], $release['groupid'], 1, 1);
 					if ($res === false) {
 						echo '.';
 					}
@@ -134,7 +134,7 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'miscsorter' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT r.id AS releaseid
+								SELECT r.id AS releases_id
 								FROM releases r
 								WHERE r.leftguid = %s
 								AND r.nzbstatus = 1 AND r.nfostatus = 1
@@ -150,7 +150,7 @@ if (!isset($argv[1])) {
 			if ($releases instanceof Traversable) {
 				$sorter = new MiscSorter(true, $pdo);
 				foreach ($releases as $release) {
-					$res = $sorter->nfosorter(null, $release['releaseid']);
+					$res = $sorter->nfosorter(null, $release['releases_id']);
 				}
 			}
 			break;

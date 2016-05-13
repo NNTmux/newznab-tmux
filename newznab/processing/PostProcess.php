@@ -339,7 +339,7 @@ class PostProcess
 
 		$query = $this->pdo->queryOneRow(
 			sprintf('
-				SELECT id, groupid, categories_id, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, id AS releaseid
+				SELECT id, groupid, categories_id, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, id AS releases_id
 				FROM releases
 				WHERE isrenamed = 0
 				AND id = %d',
@@ -472,7 +472,7 @@ class PostProcess
 				SELECT
 					r.id, r.groupid, r.categories_id, r.name, r.searchname,
 					UNIX_TIMESTAMP(r.postdate) AS post_date,
-					r.id AS releaseid,
+					r.id AS releases_id,
 					g.name AS groupname
 				FROM releases r
 				LEFT JOIN groups g ON r.groupid = g.id

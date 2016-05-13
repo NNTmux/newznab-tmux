@@ -74,7 +74,7 @@ Class PreDb
 
 		$res = $this->pdo->queryDirect(
 			sprintf('
-				SELECT p.id AS predb_id, r.id AS releaseid
+				SELECT p.id AS predb_id, r.id AS releases_id
 				FROM predb p
 				INNER JOIN releases r
 					FORCE INDEX (ix_releases_preid_searchname)
@@ -91,7 +91,7 @@ Class PreDb
 			if ($res instanceof \Traversable) {
 				foreach ($res as $row) {
 					$this->pdo->queryExec(
-						sprintf('UPDATE releases SET predb_id = %d WHERE id = %d', $row['predb_id'], $row['releaseid'])
+						sprintf('UPDATE releases SET predb_id = %d WHERE id = %d', $row['predb_id'], $row['releases_id'])
 					);
 
 					if ($this->echooutput) {
@@ -189,12 +189,12 @@ Class PreDb
 		$regex = "AND (r.ishashed = 1 OR rf.ishashed = 1)";
 
 		if ($cats === 3) {
-			$query = sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categories_id, r.groupid, '
+			$query = sprintf('SELECT r.id AS releases_id, r.name, r.searchname, r.categories_id, r.groupid, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
 				. 'LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id '
 				. 'WHERE nzbstatus = 1 AND dehashstatus BETWEEN -6 AND 0 AND predb_id = 0 %s', $regex);
 		} else {
-			$query = sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categories_id, r.groupid, '
+			$query = sprintf('SELECT r.id AS releases_id, r.name, r.searchname, r.categories_id, r.groupid, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
 				. 'LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id '
 				. 'WHERE nzbstatus = 1 AND isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
