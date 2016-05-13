@@ -49,6 +49,15 @@ define('NN_RES', NN_ROOT . 'resources' . DS);
 // Used to refer to the covers folder
 define('NN_COVERS', NN_RES . 'covers' . DS);
 
+// Smarty's cache.
+define('NN_SMARTY_CACHE', NN_RES . 'smarty' . DS . 'cache/');
+
+// Smarty's configuration files.
+define('NN_SMARTY_CONFIGS', NN_RES .'smarty' . DS . 'configs/');
+
+// Smarty's compiled template cache.
+define('NN_SMARTY_TEMPLATES', NN_RES . 'smarty' . DS . 'templates_c/');
+
 // Used to refer to the tmp folder
 define('NN_TMP', NN_RES . 'tmp' . DS);
 

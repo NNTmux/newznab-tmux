@@ -1,3 +1,5 @@
+2016-05-14 DariusIII
+	* Fix: Update constants.php with new Smarty variables and used them where needed.
 2016-05-13 DariusIII
 	* Fix: Smarty cleaning of templates_c folder on nntmux update
 	* Upd: Improve the speed of fixrelnames work queries
