@@ -456,16 +456,16 @@
         },
         {
             "name": "bower-asset/font-awesome",
-            "version": "v4.6.2",
+            "version": "v4.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "e7cc59d666ed0826656f695afad7c56e95eb6513"
+                "reference": "8e241f209faa1dd2182c9fdc9c352d8806504a4e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/e7cc59d666ed0826656f695afad7c56e95eb6513",
-                "reference": "e7cc59d666ed0826656f695afad7c56e95eb6513",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/8e241f209faa1dd2182c9fdc9c352d8806504a4e",
+                "reference": "8e241f209faa1dd2182c9fdc9c352d8806504a4e",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -840,16 +840,16 @@
         },
         {
             "name": "bower-asset/qtip2-main",
-            "version": "v3.0.2",
+            "version": "v3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/qTip2/qTip2.git",
-                "reference": "c25a530a431e78b3f7e7d955c953ffdca8d10b1a"
+                "reference": "ae4173b5ff6e97e2b1600363cf9561a618a76b8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/qTip2/qTip2/zipball/c25a530a431e78b3f7e7d955c953ffdca8d10b1a",
-                "reference": "c25a530a431e78b3f7e7d955c953ffdca8d10b1a",
+                "url": "https://api.github.com/repos/qTip2/qTip2/zipball/ae4173b5ff6e97e2b1600363cf9561a618a76b8e",
+                "reference": "ae4173b5ff6e97e2b1600363cf9561a618a76b8e",
                 "shasum": ""
             },
             "require": {
