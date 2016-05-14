@@ -257,7 +257,9 @@ class Tmux
 					(%2\$s 'tmpunrarpath') AS tmpunrar,
 					(%2\$s 'compressedheaders') AS compressed,
 					(%2\$s 'book_reqids') AS book_reqids,
-					(%2\$s 'request_hours') AS request_hours",
+					(%2\$s 'request_hours') AS request_hours,
+					(%2\$s 'maxsizetopostprocess') AS maxsize_pp,
+					(%2\$s 'minsizetopostprocess') AS minsize_pp",
 					$tmuxstr,
 					$settstr
 		);
@@ -379,7 +381,17 @@ class Tmux
 		return (empty($returnVal) ? false : true);
 	}
 
-	public function proc_query($qry, $bookreqids, $request_hours, $db_name)
+	/**
+	 * @param        $qry
+	 * @param        $bookreqids
+	 * @param int    $request_hours
+	 * @param string $db_name
+	 * @param string $ppmax
+	 * @param string $ppmin
+	 *
+	 * @return bool|string
+	 */
+	public function proc_query($qry, $bookreqids, $request_hours, $db_name, $ppmax = '', $ppmin = '')
 	{
 		switch ((int) $qry) {
 			case 1:
@@ -419,11 +431,24 @@ class Tmux
 					Nfo::NfoQueryString($this->pdo),
 					$request_hours);
 			case 2:
+				$ppminString = $ppmaxString = '';
+				if (is_numeric($ppmax) && !empty($ppmax)) {
+					$ppmax *= 1073741824;
+					$ppmaxString = "AND r.size < {$ppmax}";
+				}
+				if (is_numeric($ppmin) && !empty($ppmin)) {
+					$ppmin *= 1048576;
+					$ppminString = "AND r.size > {$ppmin}";
+				}
 				return "SELECT
 					(SELECT COUNT(r.id) FROM releases r
-						INNER JOIN categories c ON c.id = r.categories_id
+						LEFT JOIN categories c ON c.id = r.categories_id
 						WHERE r.nzbstatus = 1
-						AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0
+						AND r.passwordstatus BETWEEN -6 AND -1
+						AND r.haspreview = -1
+						{$ppminString}
+						{$ppmaxString}
+						AND c.disablepreview = 0
 					) AS work,
 					(SELECT COUNT(id) FROM groups WHERE active = 1) AS active_groups,
 					(SELECT COUNT(id) FROM groups WHERE name IS NOT NULL) AS all_groups";

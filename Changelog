@@ -1,4 +1,5 @@
 2016-05-14 DariusIII
+	* Fix: Fix pp add work queries (ported from nZEDb)
 	* Upd: Update composer libraries
 	* Fix: Update constants.php with new Smarty variables and used them where needed.
 2016-05-13 DariusIII
