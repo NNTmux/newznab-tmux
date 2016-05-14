@@ -38,11 +38,6 @@ if (count($nntpkill) !== 0) {
 	exec("tmux list-session", $session);
 }
 
-// Check database patch version
-/*if ($patch < 149) {
-	exit($c->error("\nYour database is not up to date. Please update.\nphp /var/www/newznab/misc/update/nix/tmux/lib/DB/patchDB.php\n"));
-}*/
-
 //check if session exists
 $session = shell_exec("tmux list-session | grep $tmux_session");
 // Kill the placeholder
@@ -95,7 +90,7 @@ sleep(2);
 function writelog($pane)
 {
 	$path = dirname(__FILE__) . "/bin/logs";
-	$getdate = gmDate("Ymd");
+	$getdate = gmdate("Ymd");
 	$tmux = new Tmux();
 	$logs = $tmux->get()->write_logs;
 	if ($logs == 1) {
@@ -104,15 +99,6 @@ function writelog($pane)
 		return "";
 	}
 }
-
-//remove folders from tmpunrar
-/*if (isset($pdo->getSetting('tmpunrarpath'))) {
-	$tmpunrar = $pdo->getSetting('tmpunrarpath');
-	if ((count(glob("$tmpunrar/*", GLOB_ONLYDIR))) > 0) {
-		echo $c->info("Removing dead folders from " . $tmpunrar);
-		exec("rm -r " . $tmpunrar . "/*");
-	}
-}*/
 
 function command_exist($cmd)
 {
