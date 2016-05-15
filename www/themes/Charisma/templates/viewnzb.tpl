@@ -241,7 +241,7 @@
 														Queue
 														</button>{/if}
 													{if !empty($cpurl) && !empty($cpapi)}
-														<a class="sendtocouch fa fa-bed" target="blackhole" href="javascript:;" rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$release.imdbid}&title={$movie.title}" name="CP{$release.imdbid}" title="Add to CouchPotato"></a>
+														<a id="guid{$release.guid}" class="sendtocouch fa fa-bed" href="#"  title="Add to CouchPotato"></a>
 													{/if}
 													{if $weHasVortex}
 														<button type="button"

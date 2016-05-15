@@ -55,7 +55,17 @@ jQuery(function($){
         return false;
     });
 
+    $('.sendtocouch').click(function (e) {
+        if ($(this).hasClass('icon_cp_clicked')) return false;
+        var guid = $(this).parent().parent().parent().parent().attr('id').substring(4);
+        var cpurl = SERVERROOT + "sendtocouch/" + guid;
 
+        $.post(cpurl, function(resp){
+            $(e.target).addClass('icon_cp_clicked').attr('title','Added to CouchPotato');
+            notify('Movie added to CouchPotato', 'topCenter', 'success');
+        });
+    });
+    
     $('.vortexsend').click(function(event)
     {
         if ($(this).hasClass('icon_nzbvortex_clicked')) return false;

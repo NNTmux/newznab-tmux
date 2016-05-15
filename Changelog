@@ -1,3 +1,5 @@
+2016-05-15 DariusIII
+	* Chg: Change CP support in themes, add new class and page to handle CP integration
 2016-05-14 DariusIII
 	* Fix: Fix pp add work queries (ported from nZEDb)
 	* Upd: Update composer libraries

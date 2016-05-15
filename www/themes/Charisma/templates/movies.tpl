@@ -156,12 +156,9 @@
 															{/if}
 															{if $cpurl != '' && $cpapi != ''}
 																<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																	  target="blackhole"
-																	  href="javascript:"
-																	  rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
-																	  name="CP{$result.imdbid}"
+																	  href="#"
 																	  title="Add to CouchPotato"
-																		><i class="fa fa-share"></i></span>
+																		><i class="fa fa-bed"></i></span>
 															{/if}
 															{if !empty($mfailed[$m@index])}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">

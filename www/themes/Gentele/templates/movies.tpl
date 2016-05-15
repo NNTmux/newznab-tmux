@@ -305,14 +305,12 @@
 																			  data-original-title="Send to my Queue"><i
 																					class="fa fa-share"></i></span>
 																	{/if}
-																	{if $cpurl != '' && $cpapi != ''}
-																		<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																			  target="blackhole"
-																			  href="javascript:"
-																			  rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
-																			  name="CP{$result.imdbid}"
-																			  title="Add to CouchPotato"
-																		><i class="fa fa-share"></i></span>
+																	{if !empty($cpurl) && !empty($cpapi)}
+																		<span class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
+																			  data-toggle="tooltip" data-placement="top"
+																			  title
+																			  data-original-title="Send to CouchPotato"><i
+																					class="fa fa-bed"></i></span>
 																	{/if}
 																	{if !empty($mfailed[$m@index])}
 																		<span class="btn btn-default btn-xs"

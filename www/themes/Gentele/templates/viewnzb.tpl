@@ -230,24 +230,24 @@
 										<div class="btn-group btn-group-vertical">
 											<a class="btn btn-primary btn-sm btn-success btn-transparent"
 											   href="{$smarty.const.WWW_TOP}/getnzb/{$release.guid}"><i
-														class="fa fa-cloud-download"></i>
-												Download</a>
+														class="fa fa-cloud-download"></i> Download</a>
 											<button type="button"
 													class="btn btn-primary btn-sm btn-info btn-transparent cartadd">
 												<i class="icon_cart fa fa-shopping-basket guid"
-												   id="guid{$release.guid}"></i> Add to
-												Cart
+												   id="guid{$release.guid}"></i> Add to Cart
 											</button>
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<button type="button"
 														class="btn btn-primary btn-sm btn-transparent sabsend">
 												<i class="icon_sab fa fa-arrow-right"
-												   id="guid{$release.guid}"></i> Send to
-												Queue
+												   id="guid{$release.guid}"></i> Send to Queue
 												</button>{/if}
 											{if !empty($cpurl) && !empty($cpapi)}
-												<a class="sendtocouch fa fa-bed" target="blackhole" href="javascript:;" rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$release.imdbid}&title={$movie.title}" name="CP{$release.imdbid}" title="Add to CouchPotato"></a>
-											{/if}
+												<button type="button"
+														class="btn btn-primary btn-sm btn-transparent sendtocouch">
+												<i class="fa fa-bed"
+												   id="guid{$release.guid}"></i> Send to CouchPotato
+												</button>{/if}
 											{if $weHasVortex}
 												<button type="button"
 														class="btn btn-primary btn-sm btn-transparent vortexsend">

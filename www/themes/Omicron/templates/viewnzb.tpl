@@ -240,6 +240,12 @@
 														   id="guid{$release.guid}"></i> Send to
 														Queue
 														</button>{/if}
+													{if !empty($cpurl) && !empty($cpapi)}
+														<button type="button"
+																class="btn btn-primary btn-sm btn-transparent sendtocouch">
+														<i class="fa fa-bed"
+														   id="guid{$release.guid}"></i> Send to CouchPotato
+														</button>{/if}
 													{if $weHasVortex}
 														<button type="button"
 																class="btn btn-primary btn-sm btn-transparent vortexsend">

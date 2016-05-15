@@ -98,19 +98,30 @@ jQuery(function($){
     });
 
     $('.sendtocouch').click(function (e) {
-        e.preventDefault();
-        $.get($(this).attr('rel'));
+        if ($(this).hasClass('icon_cp_clicked')) return false;
+        var guid = $(this).parent().parent().parent().parent().attr('id').substring(4);
+        var cpurl = SERVERROOT + "sendtocouch/" + guid;
 
-        $.pnotify({
-            title: 'ADDED TO COUCHPOTATO!',
-            text: 'Its now on your wanted list! ^_^',
-            type: 'info',
-            animate_speed: 'fast',
-            icon: 'fa fa-info-sign'
+        $.post(cpurl, function(resp){
+            $(e.target).addClass('icon_cp_clicked').attr('title','Added to CouchPotato');
+            PNotify.prototype.options.styling = "fontawesome";
+            PNotify.desktop.permission();
+            (new PNotify({
+                    title: 'Movie added to CoucPotato!',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
+                    desktop: {
+                        desktop: true
+                    }})
+            );
         });
     });
-
-
+    
     $('.vortexsend').click(function(event)
     {
         if ($(this).hasClass('icon_nzbvortex_clicked')) return false;
