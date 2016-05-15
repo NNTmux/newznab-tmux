@@ -155,7 +155,7 @@
 																			class="fa fa-share"></i></span>
 															{/if}
 															{if $cpurl != '' && $cpapi != ''}
-																<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																<span id="guid{$release.guid}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
 																	  href="#"
 																	  title="Add to CouchPotato"
 																		><i class="fa fa-bed"></i></span>
@@ -269,8 +269,8 @@
 																	  title="Send to my Queue"><i
 																			class="fa fa-share"></i></span>
 															{/if}
-															if $cpurl != '' && $cpapi != ''}
-																<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+															{if $cpurl != '' && $cpapi != ''}
+																<span id="guid{$release.guid}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
 																	  href="#"
 																	  title="Add to CouchPotato"
 																><i class="fa fa-bed"></i></span>
@@ -311,17 +311,6 @@
 										<input type="button"
 											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 											   value="Send to Queue"/>
-									{/if}
-									{if $cpurl != '' && $cpapi != ''}
-										<a
-												class="sendtocouch fa fa-bed"
-												target="blackhole"
-												href="javascript:"
-												rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
-												name="CP{$result.imdbid}"
-												title="Add to CouchPotato">
-
-										</a>
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"
