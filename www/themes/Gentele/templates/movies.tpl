@@ -171,7 +171,7 @@
 																					class="fa fa-share"></i></span>
 																	{/if}
 																	{if !empty($cpurl) && !empty($cpapi)}
-																		<span id="guid{$release.guid}" class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
+																		<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to CouchPotato"><i
@@ -304,7 +304,7 @@
 																					class="fa fa-share"></i></span>
 																	{/if}
 																	{if !empty($cpurl) && !empty($cpapi)}
-																		<span id="guid{$release.guid}" class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
+																		<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to CouchPotato"><i

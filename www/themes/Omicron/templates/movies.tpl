@@ -155,7 +155,7 @@
 																			class="fa fa-share"></i></span>
 															{/if}
 															{if $cpurl != '' && $cpapi != ''}
-																<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted" href="#" title="Add to CouchPotato"><i class="fa fa-bed"></i></span>
+																<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted" href="#" title="Add to CouchPotato"><i class="fa fa-bed"></i></span>
 															{/if}
 															{if !empty($mfailed[$m@index])}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
@@ -267,7 +267,7 @@
 																			class="fa fa-share"></i></span>
 															{/if}
 															{if $cpurl != '' && $cpapi != ''}
-																<span id="guid{$release.guid}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted" href="#" title="Add to CouchPotato"><i class="fa fa-bed"></i></span>
+																<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted" href="#" title="Add to CouchPotato"><i class="fa fa-bed"></i></span>
 															{/if}
 															{if !empty($mfailed[$m@index])}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
@@ -307,7 +307,7 @@
 											   value="Send to Queue"/>
 									{/if}
 									{if $cpurl != '' && $cpapi != ''}
-										<span id="guid{$release.guid}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted" href="#" title="Add to CouchPotato"><i class="fa fa-bed"></i></span>
+										<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted" href="#" title="Add to CouchPotato"><i class="fa fa-bed"></i></span>
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"

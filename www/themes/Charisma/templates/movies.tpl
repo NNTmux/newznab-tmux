@@ -155,7 +155,7 @@
 																			class="fa fa-share"></i></span>
 															{/if}
 															{if $cpurl != '' && $cpapi != ''}
-																<span id="guid{$release.guid}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
 																	  href="#"
 																	  title="Add to CouchPotato"
 																		><i class="fa fa-bed"></i></span>
@@ -270,7 +270,7 @@
 																			class="fa fa-share"></i></span>
 															{/if}
 															{if $cpurl != '' && $cpapi != ''}
-																<span id="guid{$release.guid}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
 																	  href="#"
 																	  title="Add to CouchPotato"
 																><i class="fa fa-bed"></i></span>
