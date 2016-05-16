@@ -1,43 +1,64 @@
 <?php
 
-use newznab\AniDB;
-use newznab\Books;
 use newznab\Console;
-use newznab\Games;
-use newznab\Movie;
-use newznab\Music;
-use newznab\PreDb;
 use newznab\ReleaseComments;
 use newznab\ReleaseExtra;
 use newznab\ReleaseFiles;
+use newznab\DnzbFailures;
 use newznab\Releases;
 use newznab\Videos;
+use newznab\Episode;
+use newznab\Movie;
 use newznab\XXX;
-use newznab\DnzbFailures;
+use newznab\Games;
+use newznab\Music;
+use newznab\AniDB;
+use newznab\Books;
+use newznab\PreDb;
 
-if (!$page->users->isLoggedIn()) {
+if (!$page->users->isLoggedIn())
 	$page->show403();
-}
 
-if (isset($_GET['id'])) {
+if (isset($_GET["id"]))
+{
 	$releases = new Releases(['Settings' => $page->settings]);
-	$data     = $releases->getByGuid($_GET['id']);
+	$rc = new ReleaseComments;
+	$re = new ReleaseExtra;
+	$df = new DnzbFailures(['Settings' => $page->settings]);
+	$data = $releases->getByGuid($_GET["id"]);
+	$user = $page->users->getById($page->users->currentUserId());
+	$cpapi = $user['cp_api'];
+	$cpurl = $user['cp_url'];
 
-	if (!$data) {
+	if (!$data)
 		$page->show404();
-	}
 
-	$rc = new ReleaseComments($page->settings);
-	$fail = new DnzbFailures(['Settings' => $page->settings]);
-	if ($page->isPostBack()) {
-		$rc->addComment($data['id'], $data['gid'], $_POST['txtAddComment'], $page->users->currentUserId(), $_SERVER['REMOTE_ADDR']);
-	}
+	if ($page->isPostBack())
+		$rc->addComment($data["id"], $data["gid"], $_POST["txtAddComment"], $page->users->currentUserId(), $_SERVER['REMOTE_ADDR']);
 
-	$mov = $xxx = $showInfo = '';
+	$nfo = $releases->getReleaseNfo($data["id"], true);
+	$reVideo = $re->getVideo($data["id"]);
+	$reAudio = $re->getAudio($data["id"]);
+	$reSubs = $re->getSubs($data["id"]);
+	$comments = $rc->getCommentsByGid($data["gid"]);
+	$similars = $releases->searchSimilar($data['id'],
+		$data['searchname'],
+		6,
+		$page->userdata['categoryexclusions']);
+	$failed = $df->getFailedCount($data['id']);
+
+	$showInfo = '';
 	if ($data['videos_id'] > 0) {
 		$showInfo = (new Videos(['Settings' => $page->settings]))->getByVideoID($data['videos_id']);
 	}
 
+	$episodeArray = '';
+	if ($data['episodeinfoid'] > 0)
+	{
+		$episode = new Episode();
+		$episodeArray = $episode->getEpisodeInfoByID($data['episodeinfoid']);
+	}
+	$mov = '';
 	if ($data['imdbid'] != '' && $data['imdbid'] != 0000000) {
 		$movie = new Movie(['Settings' => $page->settings]);
 		$mov   = $movie->getMovieInfo($data['imdbid']);
@@ -60,53 +81,89 @@ if (isset($_GET['id'])) {
 		}
 	}
 
+	$xxx = '';
 	if ($data['xxxinfo_id'] != '' && $data['xxxinfo_id'] != 0) {
-		$XXX = new XXX(['Settings' => $page->settings]);
-		$xxx = $XXX->getXXXInfo($data['xxxinfo_id']);
+		$x = new XXX();
+		$xxx = $x->getXXXInfo($data['xxxinfo_id']);
+
+		if (isset($xxx['trailers'])) {
+			$xxx['trailers'] = $x->insertSwf($xxx['classused'], $xxx['trailers']);
+		}
+
 		if ($xxx && isset($xxx['title'])) {
-			$xxx['title']    = str_replace(['/', '\\'], '', $xxx['title']);
-			$xxx['actors']   = $XXX->makeFieldLinks($xxx, 'actors');
-			$xxx['genre']    = $XXX->makeFieldLinks($xxx, 'genre');
-			$xxx['director'] = $XXX->makeFieldLinks($xxx, 'director');
-			if (isset($xxx['trailers'])) {
-				$xxx['trailers'] = $XXX->insertSwf($xxx['classused'], $xxx['trailers']);
-			}
+			$xxx['title'] = str_replace(array('/', '\\'), '', $xxx['title']);
+			$xxx['actors'] = $x->makeFieldLinks($xxx, 'actors');
+			$xxx['genre'] = $x->makeFieldLinks($xxx, 'genre');
+			$xxx['director'] = $x->makeFieldLinks($xxx, 'director');
 		} else {
 			$xxx = false;
 		}
 	}
 
-	$user = $page->users->getById($page->users->currentUserId());
-	$re = new ReleaseExtra($page->settings);
+	$game = '';
+	if ($data['gamesinfo_id'] != '') {
+		$g = new Games();
+		$game = $g->getGamesInfo($data['gamesinfo_id']);
+	}
 
-	$page->smarty->assign([
-		'anidb'   => ($data['anidbid'] > 0 ? (new AniDB(['Settings' => $page->settings]))->getAnimeInfo($data['anidbid']) : ''),
-		'boo'   => ($data['bookinfo_id'] != '' ? (new Books(['Settings' => $page->settings]))->getBookInfo($data['bookinfo_id']) : ''),
-		'con'   => ($data['consoleinfo_id'] != '' ? (new Console(['Settings' => $page->settings]))->getConsoleInfo($data['consoleinfo_id']) : ''),
-		'game'  => ($data['gamesinfo_id'] != '' ? (new Games(['Settings' => $page->settings]))->getGamesInfo($data['gamesinfo_id']) : ''),
-		'movie'   => $mov,
-		'music' => ($data['musicinfo_id'] != '' ? (new Music(['Settings' => $page->settings]))->getMusicInfo($data['musicinfo_id']) : ''),
-		'pre'   => (new PreDb(['Settings' => $page->settings]))->getForRelease($data['predb_id']),
-		'show'  => $showInfo,
-		'xxx'   => $xxx,
-		'comments' => $rc->getCommentById($data['id']),
-		'cpapi'    => $user['cp_api'],
-		'cpurl'    => $user['cp_url'],
-		'nfo'      => $releases->getReleaseNfo($data['id'], false),
-		'release'  => $data,
-		'reAudio'  => $re->getAudio($data['id']),
-		'reSubs'   => $re->getSubs($data['id']),
-		'reVideo'  => $re->getVideo($data['id']),
-		'similars' => $releases->searchSimilar($data['id'], $data['searchname'], 6, $page->userdata['categoryexclusions']),
-		'privateprofiles' => ($page->settings->getSetting('privateprofiles') == 1 ? true : false),
-		'releasefiles'    => (new ReleaseFiles($page->settings))->get($data['id']),
-		'searchname'      => $releases->getSimilarName($data['searchname']),
-		'failed'          => $fail->getFailedCount($data['id']),
-	]);
+	$mus = '';
+	if ($data['musicinfo_id'] != '') {
+		$music = new Music(['Settings' => $page->settings]);
+		$mus = $music->getMusicInfo($data['musicinfo_id']);
+	}
 
-	$page->meta_title       = 'View NZB';
-	$page->meta_keywords    = 'view,nzb,description,details';
-	$page->meta_description = 'View NZB for' . $data['searchname'];
+	$book = '';
+	if ($data['bookinfo_id'] != '') {
+		$b = new Books();
+		$book = $b->getBookInfo($data['bookinfo_id']);
+	}
+
+	$con = '';
+	if ($data['consoleinfo_id'] != '') {
+		$c = new Console();
+		$con = $c->getConsoleInfo($data['consoleinfo_id']);
+	}
+
+	$AniDBAPIArray = '';
+	if ($data["anidbid"] > 0)
+	{
+		$AniDB = new AniDB(['Settings' => $releases->pdo]);
+		$AniDBAPIArray = $AniDB->getAnimeInfo($data["anidbid"]);
+	}
+
+	$prehash = new PreDb();
+	$pre = $prehash->getForRelease($data["predb_id"]);
+
+	$rf = new ReleaseFiles;
+	$releasefiles = $rf->get($data["id"]);
+
+	$page->smarty->assign('releasefiles',$releasefiles);
+	$page->smarty->assign('release',$data);
+	$page->smarty->assign('reVideo',$reVideo);
+	$page->smarty->assign('reAudio',$reAudio);
+	$page->smarty->assign('reSubs',$reSubs);
+	$page->smarty->assign('nfo',$nfo);
+	$page->smarty->assign('show',$showInfo);
+	$page->smarty->assign('movie',$mov);
+	$page->smarty->assign('xxx', $xxx);
+	$page->smarty->assign('episode',$episodeArray);
+	$page->smarty->assign('anidb',$AniDBAPIArray);
+	$page->smarty->assign('music',$mus);
+	$page->smarty->assign('con',$con);
+	$page->smarty->assign('game', $game);
+	$page->smarty->assign('book',$book);
+	$page->smarty->assign('predb', $pre);
+	$page->smarty->assign('comments',$comments);
+	$page->smarty->assign('searchname',$releases->getSimilarName($data['searchname']));
+	$page->smarty->assign('similars', $similars);
+	$page->smarty->assign('privateprofiles', ($page->settings->getSetting('privateprofiles') == 1) ? true : false );
+	$page->smarty->assign('failed', $failed);
+	$page->smarty->assign('cpapi', $cpapi);
+	$page->smarty->assign('cpurl', $cpurl);
+
+	$page->meta_title = "View NZB";
+	$page->meta_keywords = "view,nzb,description,details";
+	$page->meta_description = "View NZB for".$data["searchname"] ;
 
 	$page->content = $page->smarty->fetch('viewnzb.tpl');
 	$page->render();
