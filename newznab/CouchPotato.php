@@ -68,16 +68,13 @@ class CouchPotato
 	{
 		$relData = $this->Releases->getByGuid($guid);
 		$imdbid = $relData['imdbid'];
-		$title = $relData['title'];
 
 		return Utility::getUrl([
 				'url' => $this->cpurl .
 					'/api/' .
 					$this->cpapi .
-					'movie.add/?identifier=tt' .
-					$imdbid .
-					'&title=' .
-					$title,
+					'/movie.add/?identifier=tt' .
+					$imdbid,
 				'verifypeer' => false,
 			]
 		);

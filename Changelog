@@ -1,4 +1,5 @@
 2016-05-15 DariusIII
+	* Fix: Fix the URL called by CouchPotato class
 	* Upd: Update details page and fix tootltips in Gamma theme.
 	* Fix: Properly manage guid for CouchPotato in functions.js.
 	* Fix: Fix functions.js in all tne themes
