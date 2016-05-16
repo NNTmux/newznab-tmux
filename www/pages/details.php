@@ -26,6 +26,11 @@ if (isset($_GET["id"]))
 	$re = new ReleaseExtra;
 	$df = new DnzbFailures(['Settings' => $page->settings]);
 	$data = $releases->getByGuid($_GET["id"]);
+	$user = $page->users->getById($page->users->currentUserId());
+	$cpapi = $user['cp_api'];
+	$cpurl = $user['cp_url'];
+	$page->smarty->assign('cpapi', $cpapi);
+	$page->smarty->assign('cpurl', $cpurl);
 
 	if (!$data)
 		$page->show404();

@@ -241,21 +241,23 @@
 														class="btn btn-primary btn-sm btn-transparent sabsend">
 												<i class="icon_sab fa fa-arrow-right"
 												   id="guid{$release.guid}"></i> Send to Queue
-												</button>{/if}
+												</button>
+											{/if}
 											{if !empty($cpurl) && !empty($cpapi)}
 												<button type="button"
-														class="btn btn-primary btn-sm btn-transparent sendtocouch">
+														class="btn btn-primary btn-sm btn-info btn-transparent couchsend">
 												<i class="fa fa-bed"
 												   id="guid{$release.guid}"></i> Send to CouchPotato
-												</button>{/if}
+												</button>
+											{/if}
 											{if $weHasVortex}
 												<button type="button"
 														class="btn btn-primary btn-sm btn-transparent vortexsend">
 												<i class="icon_sab fa fa-arrow-right"
 												   id="guid{$release.guid}"></i> Send to
 												NZBVortex
-												</button>{/if}
-											<p id="demo"></p>
+												</button>
+											{/if}
 										</div>
 									</div>
 									<div class="col-md-9 small-gutter-left">

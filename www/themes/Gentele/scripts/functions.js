@@ -97,6 +97,33 @@ jQuery(function($){
         return false;
     });
 
+    $('.couchsend').click(function(e){
+        if ($(this).hasClass('icon_cp_clicked')) return false;
+
+        var guid = $(".guid").attr('id').substring(4);
+        var cpurl = SERVERROOT + "sendtocouch/" + guid;
+
+        $.post(cpurl, function(resp){
+            $(e.target).addClass('icon_cp_clicked').attr('title','Added to CouchPotato');
+            PNotify.prototype.options.styling = "fontawesome";
+            PNotify.desktop.permission();
+            (new PNotify({
+                    title: 'Movie added to CouchPotato!',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
+                    desktop: {
+                        desktop: true
+                    }})
+            );
+        });
+        return false;
+    });
+
     $('.sendtocouch').click(function (e) {
         if ($(this).hasClass('icon_cp_clicked')) return false;
         var guid = $(this).parent().parent().attr('id').substring(4);
