@@ -4,10 +4,10 @@ require_once './config.php';
 
 
 use newznab\Category;
-use newznab\Sites;
 use newznab\SABnzbd;
-
 use newznab\db\Settings;
+use newznab\Sites;
+use newznab\utility\Utility;
 
 $category = new Category();
 $page = new AdminPage();
@@ -169,16 +169,7 @@ $books_selected = explode(",", $page->settings->getSetting('book_reqids'));
 $books_selected = array_map(create_function('$value', 'return (int)$value;'), $books_selected);
 $page->smarty->assign('book_reqids_selected', $books_selected);
 
-$themelist = [];
-$themes    = scandir(NN_THEMES);
-foreach ($themes as $theme) {
-	if (strpos($theme, ".") === false && is_dir(NN_THEMES . $theme) && ucfirst($theme) === $theme) {
-		$themelist[] = $theme;
-	}
-}
-sort($themelist);
-
-$page->smarty->assign('themelist', $themelist);
+$page->smarty->assign('themelist', Utility::getThemesList());
 
 if (strpos(NNTP_SERVER, "astra")===false)
 	$page->smarty->assign('compress_headers_warning', "compress_headers_warning");

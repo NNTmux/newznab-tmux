@@ -1,4 +1,5 @@
 2016-05-15 DariusIII
+	* Chg: Move themelist management to Utility class
 	* Upd: Clean up NZB class file indents and query strings
 	* Fix: Fix the URL called by CouchPotato class
 	* Upd: Update details page and fix tootltips in Gamma theme.
