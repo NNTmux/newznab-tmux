@@ -19,5 +19,4 @@ if (empty($cp->cpapi))
 $guid = $_GET["id"];
 
 $cp->sendToCouchPotato($guid);
-var_dump($cp->sendToCouchPotato($guid));
 

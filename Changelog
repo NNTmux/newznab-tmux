@@ -1,4 +1,5 @@
 2016-05-15 DariusIII
+	* Fix: Properly manage guid for CouchPotato in functions.js.
 	* Fix: Fix functions.js in all tne themes
 	* Chg: Change CP support in themes, add new class and page to handle CP integration
 2016-05-14 DariusIII

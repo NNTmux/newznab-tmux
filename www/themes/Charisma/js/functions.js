@@ -57,7 +57,7 @@ jQuery(function($){
 
     $('.sendtocouch').click(function (e) {
         if ($(this).hasClass('icon_cp_clicked')) return false;
-        var guid = $(".guid").attr('id').substring(4);
+        var guid = $(this).parent().parent().attr('id').substring(4);
         var cpurl = SERVERROOT + "sendtocouch/" + guid;
 
         $.post(cpurl, function(resp){
