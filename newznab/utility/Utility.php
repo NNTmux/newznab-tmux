@@ -155,6 +155,7 @@ class Utility
 	public static function getThemesList()
 	{
 		$themes = scandir(NN_THEMES);
+		$themelist[] = 'None';
 		foreach ($themes as $theme) {
 			if (strpos($theme, ".") === false &&
 				is_dir(NN_THEMES . $theme) &&
