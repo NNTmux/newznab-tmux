@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8673f797e28f190a443adc747b040a40",
-    "content-hash": "a6495a5790fde01decef45855de9affb",
+    "hash": "b14975ff36e30626e2fcc4c742a250c2",
+    "content-hash": "aed8570b83c7791e40d83a1ded40cd13",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -719,27 +719,6 @@
                     "package.json"
                 ]
             }
-        },
-        {
-            "name": "bower-asset/noty",
-            "version": "v2.3.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/needim/noty.git",
-                "reference": "6fe2cf81c7b8ecdbdafaa875b82b78cf65e2f100"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/needim/noty/zipball/6fe2cf81c7b8ecdbdafaa875b82b78cf65e2f100",
-                "reference": "6fe2cf81c7b8ecdbdafaa875b82b78cf65e2f100",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "js/noty/packaged/jquery.noty.packaged.js",
-                "bower-asset-ignore": []
-            },
-            "description": "noty is a jQuery plugin that makes it easy to create alert - success - error - warning - information - confirmation messages as an alternative the standard alert dialog. Each notification is added to a queue. (Optional)"
         },
         {
             "name": "bower-asset/pace",
