@@ -23,7 +23,21 @@ jQuery(function($){
         var guid = $(".guid").attr('id').substring(4);
         $.post( SERVERROOT + "cart?add=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title','Added to Cart');
-            notify('Release added to cart!', 'topCenter', 'information');
+            PNotify.prototype.options.styling = "fontawesome";
+            PNotify.desktop.permission();
+            (new PNotify({
+                title: 'Release added to your Download Basket!',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
+                desktop: {
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
@@ -37,7 +51,21 @@ jQuery(function($){
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_sab_clicked').attr('title','Added to Queue');
-            notify('Release added to queue', 'topCenter', 'success');
+            PNotify.prototype.options.styling = "fontawesome";
+            PNotify.desktop.permission();
+            (new PNotify({
+                title: 'Release added to your download queue!',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
+                desktop: {
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
@@ -50,33 +78,49 @@ jQuery(function($){
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_nzbget_clicked').attr('title','Added to Queue');
-            notify('NZB sent to NZBGet', 'topCenter', 'success');
-        });
-        return false;
-    });
-
-    $('.couchend').click(function(e){
-        if ($(this).hasClass('icon_cp_clicked')) return false;
-
-        var guid = $(".guid").attr('id').substring(4);
-        var cpurl = SERVERROOT + "sendtocouch/" + guid;
-
-        $.post(cpurl, function(resp){
-            $(e.target).addClass('icon_cp_clicked').attr('title','Added to CouchPotato');
-            notify('Movie added to Couchpotato', 'topCenter', 'success');
+            PNotify.prototype.options.styling = "fontawesome";
+            PNotify.desktop.permission();
+            (new PNotify({
+                title: 'Release added to your download queue!',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
+                desktop: {
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
 
     $('.sendtocouch').click(function (e) {
         if ($(this).hasClass('icon_cp_clicked')) return false;
-        var guid = $(this).parent().parent().attr('id').substring(4);
-        var cpurl = SERVERROOT + "sendtocouch/" + guid;
+        var id = $(this).attr('id').substring(4);
+        var cpurl = SERVERROOT + "sendtocouch/" + id;
 
         $.post(cpurl, function(resp){
             $(e.target).addClass('icon_cp_clicked').attr('title','Added to CouchPotato');
-            notify('Movie added to CouchPotato', 'topCenter', 'success');
+            PNotify.prototype.options.styling = "fontawesome";
+            PNotify.desktop.permission();
+            (new PNotify({
+                    title: 'Movie added to CoucPotato wanted list!',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
+                    desktop: {
+                        desktop: true
+                    }})
+            );
         });
+        return false;
     });
     
     $('.vortexsend').click(function(event)
@@ -94,7 +138,21 @@ jQuery(function($){
             {
                 var message = 'Added ' + guid + ' to queue.';
                 $(event.target).addClass('icon_nzbvortex_clicked').attr('title', message);
-                notify(message, 'topCenter', 'information');
+                PNotify.prototype.options.styling = "fontawesome";
+                PNotify.desktop.permission();
+                (new PNotify({
+                    title: 'Release added to your download queue!',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
+                        animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight'
+                        },
+                    desktop: {
+                        desktop: true
+                    }})
+                );
             }).fail(function(response)
             {
                 alert(response.responseText);
@@ -135,14 +193,28 @@ jQuery(function($){
     });
 
     $('input.nntmux_multi_operations_cart').click(function(){
-        var guids = [];
+        var guids = new Array();
         $("INPUT[type='checkbox']:checked").each( function(i, row) {
             var guid = $(row).val();
             var $cartIcon = $(row).parent().parent().children('td.icons').children('.icon_cart');
             if (guid && !$cartIcon.hasClass('icon_cart_clicked')){
                 $cartIcon.addClass('icon_cart_clicked').attr('title','Added to Cart');	// consider doing this only upon success
                 guids.push(guid);
-                notify('Release added to cart!', 'topCenter', 'information');
+                PNotify.prototype.options.styling = "fontawesome";
+                PNotify.desktop.permission();
+                (new PNotify({
+                    title: 'Release added to your Download Basket!',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
+                        animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight'
+                        },
+                    desktop: {
+                        desktop: true
+                    }})
+                );
             }
             $(this).attr('checked', false);
         });
@@ -157,7 +229,21 @@ jQuery(function($){
                 var nzburl = SERVERROOT + "sendtoqueue/" + guid;
                 $.post( nzburl, function(resp){
                     $sabIcon.addClass('icon_sab_clicked').attr('title','Added to Queue');
-                    notify('Releases sent to queue', 'topCenter', 'success');
+                    PNotify.prototype.options.styling = "fontawesome";
+                    PNotify.desktop.permission();
+                    (new PNotify({
+                        title: 'Release added to your download queue!',
+                        type: 'success',
+                        icon: 'fa fa-info fa-3x',
+                            animate: {
+                                animate: true,
+                                in_class: 'bounceInLeft',
+                                out_class: 'bounceOutRight'
+                            },
+                        desktop: {
+                            desktop: true
+                        }})
+                    );
                 });
             }
             $(this).attr('checked', false);
@@ -172,7 +258,21 @@ jQuery(function($){
                 var nzburl = SERVERROOT + "sendtoqueue/" + guid;
                 $.post( nzburl, function(resp){
                     $nzbgetIcon.addClass('icon_nzbget_clicked').attr('title','Added to Queue');
-                    notify('Releases sent to queue', 'topCenter', 'success');
+                    PNotify.prototype.options.styling = "fontawesome";
+                    PNotify.desktop.permission();
+                    (new PNotify({
+                        title: 'Release added to your download queue!',
+                        type: 'success',
+                        icon: 'fa fa-info fa-3x',
+                        animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight'
+                        },
+                        desktop: {
+                            desktop: true
+                        }})
+                    );
                 });
             }
             $(this).attr('checked', false);
@@ -186,11 +286,31 @@ jQuery(function($){
                 ids += '&id[]='+$(row).val();
         });
         if (ids)
-            if (confirm('Are you sure you want to delete the selected releases?')) {
-                $.post(SERVERROOT + "ajax_release-admin?action=dodelete"+ids, function(resp){
+        {
+            PNotify.prototype.options.styling = "fontawesome";
+            (new PNotify({
+                title: 'Confirmation Needed',
+                text: 'Are you sure you want to delete the selected releases?',
+                icon: 'glyphicon glyphicon-question-sign',
+                hide: false,
+                confirm: {
+                    confirm: true
+                },
+                buttons: {
+                    closer: false,
+                    sticker: false
+                },
+                history: {
+                    history: false
+                }
+            })).get().on('pnotify.confirm', function() {
+                $.post( SERVERROOT + "ajax_release-admin?action=dodelete"+ids, function(resp){
                     location.reload(true);
                 });
-            }
+            }).on('pnotify.cancel', function() {
+                alert('Cancelled');
+            });
+        }
     });
 
     $('input.nntmux_multi_operations_deletereport').click(function(){
@@ -226,7 +346,7 @@ jQuery(function($){
             }
     });
 
-    var vortexStates = [];
+    var vortexStates = new Array();
     vortexStates[0] = 'Waiting';
     vortexStates[1] = 'Downloading';
     vortexStates[2] = 'Downloaded';
@@ -293,7 +413,21 @@ jQuery(function($){
         var guid = $(this).parent().parent().attr('id').substring(4);
         $.post( SERVERROOT + "cart?add=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
-            notify('Release added to cart!', 'topCenter', 'information');
+            PNotify.prototype.options.styling = "fontawesome";
+            PNotify.desktop.permission();
+            (new PNotify({
+                title: 'Release added to your download basket!',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
+                animate: {
+                    animate: true,
+                    in_class: 'bounceInLeft',
+                    out_class: 'bounceOutRight'
+                },
+                desktop: {
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
@@ -313,7 +447,21 @@ jQuery(function($){
             {
                 var message = 'Added ' + guid + ' to queue.';
                 $(event.target).addClass('icon_nzbvortex_clicked').attr('title', message);
-                notify(message, 'top', 'information');
+                PNotify.prototype.options.styling = "fontawesome";
+                PNotify.desktop.permission();
+                (new PNotify({
+                    title: 'ADDED TO NZBVORTEX!',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
+                    desktop: {
+                        desktop: true
+                    }})
+                );
             }).fail(function(response)
             {
                 alert(response.responseText);
@@ -426,7 +574,21 @@ jQuery(function($){
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_sab_clicked').attr('title','Release added to Queue');
-            notify('Release added to queue', 'topCenter', 'success');
+            PNotify.prototype.options.styling = "fontawesome";
+            PNotify.desktop.permission();
+            (new PNotify({
+                title: 'Release added to your download queue!',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
+                desktop: {
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
@@ -439,7 +601,21 @@ jQuery(function($){
 
         $.post(nzburl, function(resp){
             $(e.target).addClass('icon_nzbget_clicked').attr('title','Added to Queue');
-            notify('Release added to queue', 'topCenter', 'success');
+            PNotify.prototype.options.styling = "fontawesome";
+            PNotify.desktop.permission();
+            (new PNotify({
+                title: 'Release added to your download queue!',
+                type: 'success',
+                icon: 'fa fa-info fa-3x',
+                    animate: {
+                        animate: true,
+                        in_class: 'bounceInLeft',
+                        out_class: 'bounceOutRight'
+                    },
+                desktop: {
+                    desktop: true
+                }})
+            );
         });
         return false;
     });
@@ -497,7 +673,7 @@ jQuery(function($){
 
 
 
-    $('input.nzb_multi_operations_download').click(function () {
+    $('button.nzb_multi_operations_download').on('click', (function(){
         var ids = "";
         $("table.data INPUT[type='checkbox']:checked").each( function (i, row) {
             if ($(row).val()!="on")
@@ -506,26 +682,40 @@ jQuery(function($){
         ids = ids.substring(0,ids.length-1);
         if (ids)
             window.location = SERVERROOT + "getnzb?zip=1&id="+ids;
-    });
+    }));
 
 
-    $('input.nzb_multi_operations_cart').click(function(){
-        var guids = [];
+    $('button.nzb_multi_operations_cart').on('click', (function(){
+        var guids = new Array();
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             var guid = $(row).val();
-            var $cartIcon = $(row).parent().parent().children('td.icons').children('.icon_cart');
+            var $cartIcon = $(row).parent().children('div.icons').children('.icon_cart');
             if (guid && !$cartIcon.hasClass('icon_cart_clicked')){
                 $cartIcon.addClass('icon_cart_clicked').attr('title','Added to Cart');
                 guids.push(guid);
-                notify('Releases added to cart!', 'topCenter', 'information'); // consider doing this only upon success and maybe placing it outside of the loop
+                PNotify.prototype.options.styling = "fontawesome";
+                PNotify.desktop.permission();
+                (new PNotify({
+                    title: 'Release added to your Download Basket!',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
+                        animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight'
+                        },
+                    desktop: {
+                        desktop: true
+                    }})
+                );
             }
             $(this).attr('checked', false);
         });
         var guidstring = guids.toString();
         // alert (guidstring); // This is just for testing shit
         $.post( SERVERROOT + "cart?add=" + guidstring);
-    });
-    $('input.nzb_multi_operations_sab').click(function(){
+    }));
+    $('button.nzb_multi_operations_sab').on('click', (function(){
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             var $sabIcon = $(row).parent().parent().children('td.icons').children('.icon_sab');
             var guid = $(row).val();
@@ -535,13 +725,27 @@ jQuery(function($){
                 // alert(nzburl);
                 $.post( nzburl, function(resp){
                     $sabIcon.addClass('icon_sab_clicked').attr('title','Added to Queue');
-                    notify('Release added to queue', 'topCenter', 'success');
+                    PNotify.prototype.options.styling = "fontawesome";
+                    PNotify.desktop.permission();
+                    (new PNotify({
+                        title: 'Release added to your download queue!',
+                        type: 'success',
+                        icon: 'fa fa-info fa-3x',
+                            animate: {
+                                animate: true,
+                                in_class: 'bounceInLeft',
+                                out_class: 'bounceOutRight'
+                            },
+                        desktop: {
+                            desktop: true
+                        }})
+                    );
                 });
             }
             $(this).attr('checked', false);
         });
-    });
-    $('input.nzb_multi_operations_nzbget').click(function(){
+    }));
+    $('input.nzb_multi_operations_nzbget').on('click', (function(){
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             var $nzbgetIcon = $(row).parent().parent().children('td.icons').children('.icon_nzbget');
             var guid = $(row).val();
@@ -549,12 +753,26 @@ jQuery(function($){
                 var nzburl = SERVERROOT + "sendtoqueue/" + guid;
                 $.post( nzburl, function(resp){
                     $nzbgetIcon.addClass('icon_nzbget_clicked').attr('title','Added to Queue');
-                    notify('Releases sent to queue', 'topCenter', 'success');
+                    PNotify.prototype.options.styling = "fontawesome";
+                    PNotify.desktop.permission();
+                    (new PNotify({
+                        title: 'Release added to your download queue!',
+                        type: 'success',
+                        icon: 'fa fa-info fa-3x',
+                            animate: {
+                                animate: true,
+                                in_class: 'bounceInLeft',
+                                out_class: 'bounceOutRight'
+                            },
+                        desktop: {
+                            desktop: true
+                        }})
+                    );
                 });
             }
             $(this).attr('checked', false);
         });
-    });
+    }));
 
     //front end admin functions
     $('input.nzb_multi_operations_edit').click(function(){
@@ -576,12 +794,31 @@ jQuery(function($){
             if ($(row).val()!="on")
                 ids += '&id[]='+$(row).val();
         });
-        if (ids)
-            if (confirm('Are you sure you want to delete the selected releases?')) {
-                $.post(SERVERROOT + "ajax_release-admin?action=dodelete"+ids, function(resp){
+        if (ids) {
+            PNotify.prototype.options.styling = "fontawesome";
+            (new PNotify({
+                title: 'Confirmation Needed',
+                text: 'Are you sure you want to delete the selected releases?',
+                icon: 'glyphicon glyphicon-question-sign',
+                hide: false,
+                confirm: {
+                    confirm: true
+                },
+                buttons: {
+                    closer: false,
+                    sticker: false
+                },
+                history: {
+                    history: false
+                }
+            })).get().on('pnotify.confirm', function() {
+                $.post( SERVERROOT + "ajax_release-admin?action=dodelete"+ids, function(resp){
                     location.reload(true);
                 });
-            }
+            }).on('pnotify.cancel', function() {
+                alert('Cancelled');
+            });
+        }
     });
     $('input.nzb_multi_operations_rebuild').click(function(){
         var ids = "";
@@ -598,27 +835,59 @@ jQuery(function($){
     });
     //cart functions
     $('input.nzb_multi_operations_cartdelete').click(function(){
-        var ids = [];
+        var ids = new Array();
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             if ($(row).val()!="on")
                 ids.push($(row).val());
         });
         if (ids)
         {
-            if (confirm('Are you sure you want to delete the selected releases from your cart?')) {
+            PNotify.prototype.options.styling = "fontawesome";
+            (new PNotify({
+                title: 'Confirmation Needed',
+                text: 'Are you sure you want to delete the selected releases from your cart?',
+                icon: 'glyphicon glyphicon-question-sign',
+                hide: false,
+                confirm: {
+                    confirm: true
+                },
+                buttons: {
+                    closer: false,
+                    sticker: false
+                },
+                history: {
+                    history: false
+                }
+            })).get().on('pnotify.confirm', function() {
                 $.post( SERVERROOT + "cart?delete", { 'delete': ids }, function(resp){
                     location.reload(true);
                 });
-            }
+            }).on('pnotify.cancel', function() {
+                alert('Cancelled');
+            });
         }
     });
     $('input.nzb_multi_operations_cartsab').click(function(){
-        var ids = [];
+        var ids = new Array();
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             var guid = $(row).val();
             var nzburl = SERVERROOT + "sendtoqueue/" + guid;
             $.post( nzburl, function(resp){
-                notify('Releases sent to queue', 'topCenter', 'success');
+                PNotify.prototype.options.styling = "fontawesome";
+                PNotify.desktop.permission();
+                (new PNotify({
+                    title: 'Releases sent to queue!',
+                    type: 'success',
+                    icon: 'fa fa-info fa-3x',
+                        animate: {
+                            animate: true,
+                            in_class: 'bounceInLeft',
+                            out_class: 'bounceOutRight'
+                        },
+                    desktop: {
+                        desktop: true
+                    }})
+                );
             });
         });
     });
@@ -1008,45 +1277,45 @@ $(document).ready(function()
         var persistent = false;
 
         $(document.body).qtip({
-                content: {
-                    text: tipText,
-                    title: {
-                        text: tipTitle,
-                        button: true
-                    }
-                },
-                position: {
-                    my: 'top right',
-                    at: (target.length ? 'bottom' : 'top') + ' right',
-                    target: target.length ? target : $(document.body),
-                    adjust: { y: 5 }
-                },
-                show: {
-                    event: false,
-                    ready: true,
-                    effect: function() { $(this).stop(0,1).fadeIn(400); },
-
-                    persistent: persistent
-                },
-                hide: {
-                    event: false,
-                    effect: function(api) {
-                        $(this).stop(0,1).fadeOut(400).queue(function() {
-                            api.destroy();
-                            updateGrowls();
-                        })
-                    }
-                },
-                style: {
-                    classes: 'jgrowl ui-tooltip-newznab ui-tooltip-rounded',
-                    tip: false
-                },
-                events: {
-                    render: function(event, api) {
-                        timer.call(api.elements.tooltip, event);
-                    }
+            content: {
+                text: tipText,
+                title: {
+                    text: tipTitle,
+                    button: true
                 }
-            })
+            },
+            position: {
+                my: 'top right',
+                at: (target.length ? 'bottom' : 'top') + ' right',
+                target: target.length ? target : $(document.body),
+                adjust: { y: 5 }
+            },
+            show: {
+                event: false,
+                ready: true,
+                effect: function() { $(this).stop(0,1).fadeIn(400); },
+
+                persistent: persistent
+            },
+            hide: {
+                event: false,
+                effect: function(api) {
+                    $(this).stop(0,1).fadeOut(400).queue(function() {
+                        api.destroy();
+                        updateGrowls();
+                    })
+                }
+            },
+            style: {
+                classes: 'jgrowl ui-tooltip-newznab ui-tooltip-rounded',
+                tip: false
+            },
+            events: {
+                render: function(event, api) {
+                    timer.call(api.elements.tooltip, event);
+                }
+            }
+        })
             .removeData('qtip');
     };
 

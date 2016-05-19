@@ -154,8 +154,14 @@
 																	  title="Send to my Queue"><i
 																			class="fa fa-share"></i></span>
 															{/if}
-															{if $cpurl != '' && $cpapi != ''}
-																<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted" href="#" title="Add to CouchPotato"><i class="fa fa-bed"></i></span>
+															{if !empty($cpurl) && !empty($cpapi)}
+																<span
+																	id="imdb{$result.imdbid}"
+																	class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																	href="javascript:;"
+																	title="Add to CouchPotato">
+																	<i class="fa fa-bed"></i>
+																</span>
 															{/if}
 															{if !empty($mfailed[$m@index])}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
@@ -266,8 +272,14 @@
 																	  title="Send to my Queue"><i
 																			class="fa fa-share"></i></span>
 															{/if}
-															{if $cpurl != '' && $cpapi != ''}
-																<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted" href="#" title="Add to CouchPotato"><i class="fa fa-bed"></i></span>
+															{if !empty($cpurl) && !empty($cpapi)}
+																<span
+																	id="imdb{$result.imdbid}"
+																	class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																	href="javascript:;"
+																	title="Add to CouchPotato">
+																	<i class="fa fa-bed"></i>
+																</span>
 															{/if}
 															{if !empty($mfailed[$m@index])}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
@@ -305,9 +317,6 @@
 										<input type="button"
 											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 											   value="Send to Queue"/>
-									{/if}
-									{if $cpurl != '' && $cpapi != ''}
-										<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs sendtocouch text-muted" href="#" title="Add to CouchPotato"><i class="fa fa-bed"></i></span>
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"

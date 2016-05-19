@@ -75,15 +75,17 @@ jQuery(function ($) {
         return false;
     });
     $('.sendtocouch').click(function (e) {
-        e.preventDefault();
-        $.get($(this).attr('rel'));
+        var id = $(this).attr('id').substring(4);
+        var cpurl = SERVERROOT + "sendtocouch/" + id;
 
-        $.pnotify({
-            title: 'ADDED TO COUCHPOTATO!',
-            text: 'Its now on your wanted list! ^_^',
-            type: 'info',
-            animate_speed: 'fast',
-            icon: 'icon-info-sign'
+        $.post(cpurl, function(resp) {
+            $.pnotify({
+                title: 'ADDED TO COUCHPOTATO!',
+                text: 'Its now on your wanted list! ^_^',
+                type: 'info',
+                animate_speed: 'fast',
+                icon: 'icon-info-sign'
+            });
         });
     });
     $("table.data a.modal_nfo").colorbox({	 // NFO modal

@@ -1,11 +1,30 @@
 <?php
+/**
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program (see LICENSE.txt in the base directory.  If
+ * not, see:
+ *
+ * @link      <http://www.gnu.org/licenses/>.
+ * @author    DariusIII
+ * @copyright 2016 newznab-tmux
+ */
+
 namespace newznab;
 
-use newznab\Releases;
 use newznab\utility\Utility;
 
 /**
- * Class SABnzbd
+ * Class CouchPotato
  */
 class CouchPotato
 {
@@ -16,28 +35,16 @@ class CouchPotato
 	public $cpurl = '';
 
 	/**
-	 * The SAB CP key.
+	 * The CP key.
 	 * @var string|array|bool
 	 */
 	public $cpapi = '';
 
 	/**
-	 * ID of the current user
+	 * Imdb ID
 	 * @var string
 	 */
-	protected $uid = '';
-
-	/**
-	 * User's newznab API key
-	 * @var string
-	 */
-	protected $rsstoken = '';
-
-	/**
-	 * nZEDb Site URL to send to SAB to download the NZB.
-	 * @var string
-	 */
-	protected $serverurl = '';
+	public $imdbid = '';
 
 	/**
 	 * Construct.
@@ -46,39 +53,28 @@ class CouchPotato
 	 */
 	public function __construct(&$page)
 	{
-		$this->uid = $page->userdata['id'];
-		$this->rsstoken = $page->userdata['rsstoken'];
-		$this->serverurl = $page->serverurl;
-		$this->Releases = new Releases();
-
 		$this->cpurl = !empty($page->userdata['cp_url']) ? $page->userdata['cp_url'] : '';
 		$this->cpapi = !empty($page->userdata['cp_api']) ? $page->userdata['cp_api'] : '';
-
 	}
 
 	/**
-	 * Send a release to CP.
+	 * Send a movie to CouchPotato.
 	 *
-	 * @param $guid
-	 *
+	 * @param string $id
 	 * @return bool|mixed
-	 *
 	 */
-	public function sendToCouchPotato($guid)
+	public function sendToCouchPotato($id)
 	{
-		$relData = $this->Releases->getByGuid($guid);
-		$imdbid = $relData['imdbid'];
+		$this->imdbid = $id;
 
 		return Utility::getUrl([
 				'url' => $this->cpurl .
 					'/api/' .
 					$this->cpapi .
 					'/movie.add/?identifier=tt' .
-					$imdbid,
+					$this->imdbid,
 				'verifypeer' => false,
 			]
 		);
 	}
-
-
 }

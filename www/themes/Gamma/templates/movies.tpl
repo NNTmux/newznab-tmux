@@ -174,7 +174,13 @@
 												{/if}
 												{if !empty($cpurl) && !empty($cpapi)}
 													<li>
-														<a href="#" class="sendtocouch fa fa-bed" style="text-decoration: none; color: #008ab8;" title="Send to CouchPotato"></a>
+														<a
+															id="imdb{$result.imdbid}"
+															href="javascript:;"
+															class="sendtocouch fa fa-bed"
+															style="text-decoration: none; color: #008ab8;"
+															title="Send to CouchPotato">
+														</a>
 													</li>
 												{/if}
 												{if $weHasVortex}

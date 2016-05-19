@@ -171,11 +171,14 @@
 																					class="fa fa-share"></i></span>
 																	{/if}
 																	{if !empty($cpurl) && !empty($cpapi)}
-																		<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
-																			  data-toggle="tooltip" data-placement="top"
-																			  title
-																			  data-original-title="Send to CouchPotato"><i
-																					class="fa fa-bed"></i></span>
+																		<span
+																			id="imdb{$result.imdbid}"
+																			href="javascript:;"
+																			class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
+																			data-toggle="tooltip" data-placement="top"
+																			title data-original-title="Send to CouchPotato">
+																			<i class="fa fa-bed"></i>
+																		</span>
 																	{/if}
 																	{if !empty($mfailed[$m@index])}
 																		<span class="btn btn-default btn-xs"
@@ -304,11 +307,14 @@
 																					class="fa fa-share"></i></span>
 																	{/if}
 																	{if !empty($cpurl) && !empty($cpapi)}
-																		<span id="guid{$mguid[$m@index]}" class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
-																			  data-toggle="tooltip" data-placement="top"
-																			  title
-																			  data-original-title="Send to CouchPotato"><i
-																					class="fa fa-bed"></i></span>
+																		<span
+																			id="imdb{$result.imdbid}"
+																			href="javascript:;"
+																			class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
+																			data-toggle="tooltip" data-placement="top"
+																			title data-original-title="Send to CouchPotato">
+																			<i class="fa fa-bed"></i>
+																		</span>
 																	{/if}
 																	{if !empty($mfailed[$m@index])}
 																		<span class="btn btn-default btn-xs"

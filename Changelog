@@ -1,3 +1,5 @@
+2016-05-19 DariusIII
+	* Upd: Refactor CouchPotato integration
 2016-05-16 DariusIII
 	* Fix: Use Artist - Track layout in Gamma theme music page
 	* Fix: Add back 'None' as theme in profileedit so admin selected theme is used
