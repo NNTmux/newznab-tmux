@@ -32,7 +32,7 @@
 	<!-- Custom styling plus plugins -->
 	<!-- Newposterwall -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen"/>
-	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/custom.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/custom.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/flat/green.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" type="text/css" media="screen"/>
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -230,7 +230,7 @@
 		src="{$smarty.const.WWW_THEMES}/shared/assets/jquery.nicescroll/jquery.nicescroll.min.js"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/custom.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
 <!-- jQuery migrate script -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate/jquery-migrate.min.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
