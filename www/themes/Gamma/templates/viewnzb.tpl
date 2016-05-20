@@ -369,13 +369,15 @@
 					{if isset($sabintegrated) && $sabintegrated !=""}
 						<a id="guid{$release.guid}" class="icon icon_sabNZBinfo fa fa-share"  style="text-decoration: none; color: #008ab8;" href="#" title="Send to queue"></a>
 					{/if}
-					{if !empty($cpurl) && !empty($cpapi)}
-						<a
-							id="imdb{$release.imdbid}"
-							class="sendtocouch fa fa-bed"
-							style="text-decoration: none; color: #008ab8;"
-							href="javascript:;"
-							title="Add to CouchPotato"></a>
+					{if !empty($release.imdbid)}
+						{if !empty($cpurl) && !empty($cpapi)}
+							<a
+								id="imdb{$release.imdbid}"
+								class="sendtocouch fa fa-bed"
+								style="text-decoration: none; color: #008ab8;"
+								href="javascript:;"
+								title="Add to CouchPotato"></a>
+						{/if}
 					{/if}
 					{if $weHasVortex}
 						<a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#" title="Send to my NZBVortex"><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/vortex/bigsmile.png"/></a>
