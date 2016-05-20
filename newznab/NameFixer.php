@@ -485,35 +485,41 @@ class NameFixer
 	 * @param         $nameStatus
 	 * @param         $show
 	 */
-	public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show)
+	public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
-		$this->_echoStartMessage($time, 'mediainfo Unique_IDs');
 		$type = 'UID, ';
+		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = '. $this->pdo->escapeString($guidChar));
+		$queryLimit = ($limit === '') ? '' : $limit;
+		if ($guid === '') {
+			$this->_echoStartMessage($time, 'mediainfo Unique_IDs');
+		}
 
 		// Only select releases we haven't checked here before
 		$preId = false;
 		if ($cats === 3) {
 			$query = sprintf('
-					SELECT rel.id AS releases_id
+					SELECT rel.id AS releases_id, rel.name AS textstring
 					FROM releases rel
 					INNER JOIN release_unique ru ON (ru.releases_id = rel.id)
 					WHERE rel.nzbstatus = %d
-					AND rel.predb_id = 0',
+					AND rel.predb_id < 1',
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
 			$preId = true;
 		} else {
 			$query = sprintf('
-					SELECT rel.id AS releases_id, rel.searchname, rel.groupid
+					SELECT rel.id AS releases_id, rel.searchname, rel.groupid, rel.name AS textstring
 					FROM releases rel
 					INNER JOIN release_unique ru ON (ru.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-					AND rel.proc_uid = %d',
+					AND rel.proc_uid = %d
+					%s',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
 				Category::OTHER_HASHED,
-				self::PROC_UID_NONE
+				self::PROC_UID_NONE,
+				$guid
 			);
 		}
 
@@ -524,16 +530,20 @@ class NameFixer
 
 			if ($total > 0) {
 				$this->_totalReleases = $total;
-				echo $this->pdo->log->primary(number_format($total) . ' releases to process.');
+				if ($guid === '') {
+					echo $this->pdo->log->primary(number_format($total) . ' unique ids to process.');
+				}
 
 				foreach ($releases as $rel) {
 					$releaseRow = $this->pdo->queryOneRow(
 						sprintf("
-							SELECT ru.releases_id, HEX(ru.uniqueid) AS uid, rel.groupid, rel.categories_id, rel.name, rel.searchname,rel.id AS releases_id
+							SELECT ru.releases_id, HEX(ru.uniqueid) AS uid, rel.groupid, rel.categories_id, rel.name, rel.predb_id, rel.searchname, rel.id AS releases_id
 							FROM releases rel
 							INNER JOIN release_unique ru ON (ru.releases_id = rel.id)
-							WHERE rel.id = %d",
-							$rel['releases_id']
+							WHERE rel.id = %d
+							%s",
+							$rel['releases_id'],
+						    $guid
 						)
 					);
 
@@ -544,8 +554,10 @@ class NameFixer
 					$this->_echoRenamed($show);
 				}
 				$this->_echoFoundCount($echo, ' UID\'s');
-			} else {
+			} elseif ($guid === '') {
 				echo $this->pdo->log->info('Nothing to fix.');
+			} else {
+				echo '.';
 			}
 		}
 	}
@@ -1747,7 +1759,7 @@ class NameFixer
 		if ($this->done === false && $this->relid !== $release["releases_id"]) {
 
 			$result = $this->pdo->queryExec(sprintf('
-											  SELECT r.id AS releases_id, r.searchname AS searchname, HEX(ru.uniqueid) AS uid
+											  SELECT r.id AS releases_id, r.searchname AS searchname, r.predb_id, HEX(ru.uniqueid) AS uid
 											  FROM releases r
 											  INNER JOIN release_unique ru ON (ru.releases_id = r.id)
 											  WHERE (r.isrenamed = %s OR r.categories_id NOT IN(%d))',
@@ -1757,8 +1769,7 @@ class NameFixer
 											);
 			foreach ($result as $rel) {
 				if ($rel['uid'] === $release['uid']) {
-					$newname = $rel['searchname'];
-					$this->updateRelease($release, $newname, $method = "uidCheck: Unique_ID", $echo, $type, $namestatus, $show);
+					$this->updateRelease($release, $rel['searchname'], $method = "uidCheck: Unique_ID", $echo, $type, $namestatus, $show, ($rel['predb_id'] > 0 ? $rel['predb_id'] : 0));
 				}
 			}
 		}
