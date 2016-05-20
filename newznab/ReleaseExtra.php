@@ -156,7 +156,9 @@ class ReleaseExtra
 						if (isset($track['Unique_ID'])) {
 							if(preg_match('/\d+/', $track['Unique_ID'], $match)){
 								$uniqueid = $match[0];
-								$this->addUID($releaseID, $uniqueid);
+								if($uniqueid > 0) {
+									$this->addUID($releaseID, $uniqueid);
+								}
 							}
 						}
 					} else if ($track['@attributes']['type'] == 'Video') {

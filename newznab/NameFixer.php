@@ -21,6 +21,8 @@ class NameFixer
 	const PROC_PAR2_DONE = 1;
 	const PROC_SRR_NONE = 0;
 	const PROC_SRR_DONE = 1;
+	const PROC_UID_NONE = 0;
+	const PROC_UID_DONE = 1;
 
 	// Constants for overall rename status
 	const IS_RENAMED_NONE = 0;
@@ -475,6 +477,81 @@ class NameFixer
 	}
 
 	/**
+	 * Attempts to fix release names using the NFO.
+	 *
+	 * @param int     $time 1: 24 hours, 2: no time limit
+	 * @param boolean $echo 1: change the name, anything else: preview of what could have been changed.
+	 * @param int     $cats 1: other categories, 2: all categories
+	 * @param         $nameStatus
+	 * @param         $show
+	 */
+	public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show)
+	{
+		$this->_echoStartMessage($time, 'mediainfo Unique_IDs');
+		$type = 'UID, ';
+
+		// Only select releases we haven't checked here before
+		$preId = false;
+		if ($cats === 3) {
+			$query = sprintf('
+					SELECT rel.id AS releases_id
+					FROM releases rel
+					INNER JOIN release_unique ru ON (ru.releases_id = rel.id)
+					WHERE rel.nzbstatus = %d
+					AND rel.predb_id = 0',
+				NZB::NZB_ADDED
+			);
+			$cats = 2;
+			$preId = true;
+		} else {
+			$query = sprintf('
+					SELECT rel.id AS releases_id
+					FROM releases rel
+					INNER JOIN release_unique ru ON (ru.releases_id = rel.id)
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
+					AND rel.proc_uid = %d',
+				self::IS_RENAMED_NONE,
+				Category::OTHER_MISC,
+				Category::OTHER_HASHED,
+				self::PROC_UID_NONE
+			);
+		}
+
+		$releases = $this->_getReleases($time, $cats, $query);
+
+		if ($releases instanceof \Traversable && $releases !== false) {
+			$total = $releases->rowCount();
+
+			if ($total > 0) {
+				$this->_totalReleases = $total;
+				echo $this->pdo->log->primary(number_format($total) . ' releases to process.');
+
+				foreach ($releases as $rel) {
+					$releaseRow = $this->pdo->queryOneRow(
+						sprintf('
+							SELECT ru.releases_id, ru.uniqueid AS uid, rel.groupid, rel.categories_id, rel.name, rel.searchname as textstring,
+								 rel.id AS releases_id
+							FROM releases rel
+							INNER JOIN release_unique ru ON (ru.releases_id = rel.id)
+							WHERE rel.id = %d',
+							$rel['releases_id']
+						)
+					);
+
+					$this->checked++;
+
+					$this->done = $this->matched = false;
+					$this->checkName($releaseRow, $echo, $type, $nameStatus, $show, $preId);
+					$this->_echoRenamed($show);
+				}
+				$this->_echoFoundCount($echo, ' UID\'s');
+			} else {
+				echo $this->pdo->log->info('Nothing to fix.');
+			}
+		}
+	}
+
+	/**
 	 * @param int    $time  1: 24 hours, 2: no time limit
 	 * @param int    $cats  1: other categories, 2: all categories
 	 * @param string $query Query to execute.
@@ -610,7 +687,6 @@ class NameFixer
 					}
 				}
 
-
 				if ($type === "Srr, ") {
 					$newName = ucwords($newName);
 					if (preg_match('/(.+?)\.(srr)?$/i', $name, $match)) {
@@ -688,6 +764,9 @@ class NameFixer
 								break;
 							case "Srr, ":
 								$status = "isrenamed = 1, iscategorized = 1, proc_srr = 1,";
+								break;
+							case "UID, ":
+								$status = "isrenamed = 1, iscategorized = 1, proc_uid = 1,";
 								break;
 						}
 						$this->pdo->queryExec(
@@ -1063,6 +1142,9 @@ class NameFixer
 					break;
 				case "Srr, ":
 					$this->srrCheck($release, $echo, $type, $namestatus, $show);
+					break;
+				case "UID, ":
+					$this->uidCheck($release, $echo, $type, $namestatus, $show);
 					break;
 				case "NFO, ":
 					$this->nfoCheckTV($release, $echo, $type, $namestatus, $show);
@@ -1649,6 +1731,35 @@ class NameFixer
 			if (preg_match('/(.+?)\.(srr)$/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["1"], $method = "srrCheck: Srr filename", $echo, $type, $namestatus, $show);
 			}
+		}
+	}
+	/**
+	 * Look for a name based on uid.
+	 *
+	 * @param         $release
+	 * @param         $release
+	 * @param boolean $echo
+	 * @param string  $type
+	 * @param         $namestatus
+	 * @param         $show
+	 */
+	public function uidCheck($release, $echo, $type, $namestatus, $show)
+	{
+		if ($this->done === false && $this->relid !== $release["releases_id"]) {
+
+			$proper = $this->pdo->queryExec(sprintf('
+													  SELECT r.id AS releases_id, r.searchname AS searchname, ru.uniqueid AS uid 													  FROM releases r
+													  INNER JOIN release_unique ru ON (ru.releases_id = r.id)
+													  WHERE (r.isrenamed = %s OR r.categories_id NOT IN(%d))',
+														self::IS_RENAMED_DONE,
+														$this->othercats
+													)
+												);
+			var_dump($proper['searchname']);
+			if ($proper['uid'] == $release['uid']) {
+				$this->updateRelease($release, $proper['searchname'], $method = "uidCheck: Unique_ID", $echo, $type, $namestatus, $show);
+			}
+
 		}
 	}
 }

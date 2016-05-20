@@ -15,7 +15,6 @@ $count = 0;
 echo $pdo->log->header("Updating Unique IDs for " . number_format($total) . " releases.");
 
 foreach ($releases as $release) {
-	$count++;
 	$xmlObj = @simplexml_load_string($release['mediainfo']);
 	$arrXml = Utility::objectsIntoArray($xmlObj);
 	if (isset($arrXml['File']) && isset($arrXml['File']['track'])) {
@@ -25,12 +24,17 @@ foreach ($releases as $release) {
 					if (isset($track['Unique_ID'])) {
 						if (preg_match('/\d+/', $track['Unique_ID'], $match)){
 							$uniqueid = $match[0];
-							$re->addUID($release['releases_id'], $uniqueid);
+							if($uniqueid > 0) {
+								$re->addUID($release['releases_id'], $uniqueid);
+								$count++;
+							}
 						}
 					}
 				}
 			}
 		}
 	}
+	echo "$count / $total\r";
 }
-echo $pdo->log->primary('Added' . $count . 'Unique IDs');
+echo $pdo->log->primary('Added ' . $count . ' Unique IDs that were not 0');
+
