@@ -154,8 +154,8 @@ class ReleaseExtra
 							$overallbitrate = $track['Overall_bit_rate'];
 						}
 						if (isset($track['Unique_ID'])) {
-							if(preg_match('/\d+/', $track['Unique_ID'], $match)){
-								$uniqueid = $match[0];
+							if(preg_match('/\(0x(?P<hash>[0-9a-f]{32})\)/i', $track['Unique_ID'], $matches)){
+								$uniqueid = $matches['hash'];
 								if($uniqueid > 0) {
 									$this->addUID($releaseID, $uniqueid);
 								}
@@ -305,7 +305,7 @@ class ReleaseExtra
 	 */
 	public function addUID($releaseID, $uniqueid)
 	{
-		$this->pdo->queryExec(sprintf('INSERT INTO release_unique(releases_id, uniqueid) VALUES (%s, %s)', $releaseID, $uniqueid ));
+		$this->pdo->queryExec(sprintf("INSERT IGNORE INTO release_unique (releases_id, uniqueid) VALUES (%s, UNHEX('%s'))", $releaseID, $uniqueid ));
 	}
 
 	/**

@@ -1,4 +1,5 @@
 2016-05-20 DariusIII
+	* Upd: Rename releases based on their uid
 	* Chg: Extract id from media, add separate table to handle it.
 	* Upd: Hide couchpotato button if no imdbid is set for release.
 2016-05-19 DariusIII

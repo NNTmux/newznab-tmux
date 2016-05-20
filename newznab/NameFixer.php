@@ -505,7 +505,7 @@ class NameFixer
 			$preId = true;
 		} else {
 			$query = sprintf('
-					SELECT rel.id AS releases_id
+					SELECT rel.id AS releases_id, rel.searchname, rel.groupid
 					FROM releases rel
 					INNER JOIN release_unique ru ON (ru.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
@@ -528,12 +528,11 @@ class NameFixer
 
 				foreach ($releases as $rel) {
 					$releaseRow = $this->pdo->queryOneRow(
-						sprintf('
-							SELECT ru.releases_id, ru.uniqueid AS uid, rel.groupid, rel.categories_id, rel.name, rel.searchname as textstring,
-								 rel.id AS releases_id
+						sprintf("
+							SELECT ru.releases_id, HEX(ru.uniqueid) AS uid, rel.groupid, rel.categories_id, rel.name, rel.searchname,rel.id AS releases_id
 							FROM releases rel
 							INNER JOIN release_unique ru ON (ru.releases_id = rel.id)
-							WHERE rel.id = %d',
+							WHERE rel.id = %d",
 							$rel['releases_id']
 						)
 					);
@@ -1747,19 +1746,21 @@ class NameFixer
 	{
 		if ($this->done === false && $this->relid !== $release["releases_id"]) {
 
-			$proper = $this->pdo->queryExec(sprintf('
-													  SELECT r.id AS releases_id, r.searchname AS searchname, ru.uniqueid AS uid 													  FROM releases r
-													  INNER JOIN release_unique ru ON (ru.releases_id = r.id)
-													  WHERE (r.isrenamed = %s OR r.categories_id NOT IN(%d))',
-														self::IS_RENAMED_DONE,
-														$this->othercats
-													)
-												);
-			var_dump($proper['searchname']);
-			if ($proper['uid'] == $release['uid']) {
-				$this->updateRelease($release, $proper['searchname'], $method = "uidCheck: Unique_ID", $echo, $type, $namestatus, $show);
+			$result = $this->pdo->queryExec(sprintf('
+											  SELECT r.id AS releases_id, r.searchname AS searchname, HEX(ru.uniqueid) AS uid
+											  FROM releases r
+											  INNER JOIN release_unique ru ON (ru.releases_id = r.id)
+											  WHERE (r.isrenamed = %s OR r.categories_id NOT IN(%d))',
+												self::IS_RENAMED_DONE,
+												$this->othercats
+												)
+											);
+			foreach ($result as $rel) {
+				if ($rel['uid'] === $release['uid']) {
+					$newname = $rel['searchname'];
+					$this->updateRelease($release, $newname, $method = "uidCheck: Unique_ID", $echo, $type, $namestatus, $show);
+				}
 			}
-
 		}
 	}
 }
