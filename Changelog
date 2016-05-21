@@ -1,3 +1,5 @@
+2016-05-21 DariusIII
+	* Upd: Move queries, match to properly named releases only
 2016-05-20 DariusIII
 	* Upd: Update uid matching and add it to tmux
 	* Upd: Rename releases based on their uid
