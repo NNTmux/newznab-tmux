@@ -477,13 +477,15 @@ class NameFixer
 	}
 
 	/**
-	 * Attempts to fix release names using the NFO.
+	 * Attempts to fix release names using the mediainfo xml Unique_ID.
 	 *
 	 * @param int     $time 1: 24 hours, 2: no time limit
 	 * @param boolean $echo 1: change the name, anything else: preview of what could have been changed.
 	 * @param int     $cats 1: other categories, 2: all categories
 	 * @param         $nameStatus
 	 * @param         $show
+	 * @param string  $guidChar
+	 * @param string  $limit
 	 */
 	public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
@@ -555,7 +557,7 @@ class NameFixer
 	 * @param int    $cats  1: other categories, 2: all categories
 	 * @param string $query Query to execute.
 	 *
-	 * @param string $limit
+	 * @param string $limit limit defined by maxperrun
 	 *
 	 * @return bool|\PDOStatement False on failure, PDOStatement with query results on success.
 	 */
@@ -565,31 +567,22 @@ class NameFixer
 		$queryLimit = ($limit === '') ? '' : ' LIMIT ' . $limit;
 		// 24 hours, other cats
 		if ($time == 1 && $cats == 1) {
-			$queryTime = $this->timeother;
+			echo $this->pdo->log->header($query . $this->timeother . $queryLimit . ";\n");
+			$releases = $this->pdo->queryDirect($query . $this->timeother . $queryLimit);
 		} // 24 hours, all cats
 		else if ($time == 1 && $cats == 2) {
-			$queryTime = $this->timeall;
+			echo $this->pdo->log->header($query . $this->timeall . $queryLimit . ";\n");
+			$releases = $this->pdo->queryDirect($query . $this->timeall . $queryLimit);
 		} //other cats
 		else if ($time == 2 && $cats == 1) {
-			$queryTime = $this->fullother;
+			echo $this->pdo->log->header($query . $this->fullother . $queryLimit . ";\n");
+			$releases = $this->pdo->queryDirect($query . $this->fullother . $queryLimit);
 		}
 		// all cats
 		else if ($time == 2 && $cats == 2) {
-			$queryTime = $this->fullall;
+			echo $this->pdo->log->header($query . $this->fullall . $queryLimit . ";\n");
+			$releases = $this->pdo->queryDirect($query . $this->fullall . $queryLimit);
 		}
-
-		if (isset($queryTime)) {
-			$query .= $queryTime;
-			// Remove GROUP BY if it exists for filename based renames
-			if (strpos($query, 'proc_files') !== false) {
-				$query = str_replace('GROUP BY r.id', '', $query);
-			}
-			//Uncomment if debugging queries
-			//echo $this->pdo->log->header("{$query};\n");
-
-			$releases = $this->pdo->queryDirect($query . $queryLimit);
-		}
-
 		return $releases;
 	}
 
@@ -1174,6 +1167,9 @@ class NameFixer
 					case "PAR2, ":
 						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releases_id']);
 						break;
+					case "UID, ":
+						$this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
+						break;
 				}
 			}
 		}
@@ -1732,8 +1728,9 @@ class NameFixer
 			}
 		}
 	}
+
 	/**
-	 * Look for a name based on uid.
+	 * Look for a name based on mediainfo xml Unique_ID.
 	 *
 	 * @param         $release
 	 * @param         $release
