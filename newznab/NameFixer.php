@@ -523,7 +523,7 @@ class NameFixer
 			);
 		}
 
-		$releases = $this->_getReleases($time, $cats, $query);
+		$releases = $this->_getReleases($time, $cats, $query, $queryLimit);
 
 		if ($releases instanceof \Traversable && $releases !== false) {
 			$total = $releases->rowCount();
