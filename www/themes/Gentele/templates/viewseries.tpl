@@ -154,7 +154,7 @@
 												<tr>
 													<th>Ep</th>
 													<th>Name</th>
-													<th>Select</th>
+													<th> Select All <input id="check-all" type="checkbox" class="flat-all"/></th>
 													<th>Category</th>
 													<th>Posted</th>
 													<th>Size</th>
