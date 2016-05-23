@@ -93,7 +93,7 @@
 									<table style="width:100%;"
 										   class="data table table-striped responsive-utilities jambo-table">
 										<tr>
-											<th></th>
+											<th><input id="check-all" type="checkbox" class="flat-all"/> Select All</th>
 											<th>Name<br/>
 												<a title="Sort Descending" href="{$orderbyname_desc}">
 													<i class="fa fa-icon-caret-down"></i>

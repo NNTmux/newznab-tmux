@@ -33,9 +33,7 @@
 						<table class="data table table-striped responsive-utilities jambo-table bulk-action">
 							<thead>
 							<tr class="headings">
-								<th width="50">
-									Select
-								</th>
+								<th><input id="check-all" type="checkbox" class="flat-all"/> Select All</th>
 								<th class="column-title" style="display: table-cell;">Name</th>
 								<th class="column-title" style="display: table-cell;">Added</th>
 								<th class="column-title" style="display: table-cell;">Action</th>
