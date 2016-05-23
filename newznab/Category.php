@@ -89,7 +89,7 @@ class Category
 
 	const OTHERS_GROUP =
 		[
-			self::BOOKS_ROOT,
+			self::BOOKS_UNKNOWN,
 			self::GAME_OTHER,
 			self::MOVIE_OTHER,
 			self::MUSIC_OTHER,
