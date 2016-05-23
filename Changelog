@@ -1,4 +1,5 @@
 2016-05-22 DariusIII
+	* Upd: Update the +1 patch file
 	* Upd: Update NameFixer and ReleaseExtra classes.
 	* Upd: Add index to release_unique table to speed up processing, use querylimit in fixNamesWithMedia function.
 2016-05-21 DariusIII
