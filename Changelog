@@ -1,3 +1,5 @@
+2016-05-24 DariusIII
+	* Upd: Improve speed of update_releases on larger databases
 2016-05-20 DariusIII
 	* Upd: Hide couchpotato button if no imdbid is set for release.
 2016-05-19 DariusIII
