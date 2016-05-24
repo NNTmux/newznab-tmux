@@ -502,7 +502,7 @@ class NameFixer
 			$query = sprintf('
 					SELECT rel.id AS releases_id, rel.name AS textstring
 					FROM releases rel
-					INNER JOIN release_unique ru ON (ru.releases_id = rel.id)
+					INNER JOIN release_unique ru ON ru.releases_id = rel.id
 					WHERE rel.nzbstatus = %d
 					AND rel.predb_id < 1',
 				NZB::NZB_ADDED
@@ -511,9 +511,12 @@ class NameFixer
 			$preId = true;
 		} else {
 			$query = sprintf('
-					SELECT rel.id AS releases_id, rel.groupid, rel.size AS relsize, rel.categories_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, ru.releases_id, HEX(ru.uniqueid) AS uid
+					SSELECT
+						rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.categories_id,
+						rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, ru.releases_id,
+						HEX(ru.uniqueid) AS uid
 					FROM releases rel
-					INNER JOIN release_unique ru ON (ru.releases_id = rel.id)
+					INNER JOIN release_unique ru ON ru.releases_id = rel.id
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rel.proc_uid = %d
 					%s',
@@ -540,7 +543,7 @@ class NameFixer
 					$this->checked++;
 
 					$this->done = $this->matched = false;
-					$this->checkName($rel, $echo, $type, $nameStatus, $show, $preId);
+					$this->uidCheck($rel, $echo, $type, $nameStatus, $show);
 					$this->_echoRenamed($show);
 				}
 				$this->_echoFoundCount($echo, ' UID\'s');
@@ -1742,26 +1745,27 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function uidCheck($release, $echo, $type, $namestatus, $show)
+	protected function uidCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releases_id"]) {
-
-			$result = $this->pdo->queryExec(sprintf('
-											  SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname AS searchname, r.predb_id, HEX(ru.uniqueid) AS uid
-											  FROM releases r
-											  INNER JOIN release_unique ru ON (ru.releases_id = r.id)
-											  WHERE (r.isrenamed = %s OR r.categories_id NOT IN(%s)) AND r.predb_id > 0',
-												self::IS_RENAMED_DONE,
-												$this->othercats
-												)
-											);
-			foreach ($result as $rel) {
-				$percentage = $rel['relsize'] * (5/100);
-				$minSize = $rel['relsize'] - $percentage;
-				$maxSize = $rel['relsize'] + $percentage;
-				if ($rel['uid'] === $release['uid'] && ($minSize <= $release['relsize'] && $maxSize >= $release['relsize'])) {
-					$this->updateRelease($release, $rel['searchname'], $method = "uidCheck: Unique_ID", $echo, $type, $namestatus, $show, ($rel['predb_id'] > 0 ? $rel['predb_id'] : 0));
-				}
+			$result = $this->pdo->queryExec("
+				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.predb_id
+				FROM release_unique ru
+				LEFT JOIN releases r ON ru.releases_id = r.id
+				WHERE ru.uniqueid = UNHEX('{$release['uid']}')
+				AND ru.releases_id != {$release['releases_id']}"
+			);
+			if ($result !== false && floor((1 - $result['relsize'] / $release['relsize']) * 100) <= (5 || -5)) {
+				$this->updateRelease(
+					$release,
+					$result['searchname'],
+					$method = "uidCheck: Unique_ID",
+					$echo,
+					$type,
+					$namestatus,
+					$show,
+					$result['predb_id']
+				);
 			}
 		}
 	}
