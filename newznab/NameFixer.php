@@ -511,7 +511,7 @@ class NameFixer
 			$preId = true;
 		} else {
 			$query = sprintf('
-					SSELECT
+					SELECT
 						rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.categories_id,
 						rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, ru.releases_id,
 						HEX(ru.uniqueid) AS uid
