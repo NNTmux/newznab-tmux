@@ -1748,7 +1748,7 @@ class NameFixer
 	protected function uidCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releases_id"]) {
-			$result = $this->pdo->queryExec("
+			$result = $this->pdo->queryOneRow("
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.predb_id
 				FROM release_unique ru
 				LEFT JOIN releases r ON ru.releases_id = r.id
