@@ -224,7 +224,7 @@ class NameFixer
 				foreach ($releases as $rel) {
 					$releaseRow = $this->pdo->queryOneRow(
 						sprintf('
-							SELECT nfo.releases_id AS nfoid, rel.groupid, rel.categories_id, rel.name, rel.searchname,
+							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.categories_id, rel.name, rel.searchname,
 								UNCOMPRESS(nfo) AS textstring, rel.id AS releases_id
 							FROM releases rel
 							INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
@@ -274,7 +274,7 @@ class NameFixer
 		if ($cats === 3) {
 			$query =
 				sprintf('
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
@@ -287,7 +287,7 @@ class NameFixer
 		} else {
 			$query =
 				sprintf('
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
@@ -351,7 +351,7 @@ class NameFixer
 		if ($cats === 3) {
 			$query =
 				sprintf('
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
@@ -364,7 +364,7 @@ class NameFixer
 		} else {
 			$query =
 				sprintf('
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groupid,
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
@@ -423,7 +423,7 @@ class NameFixer
 
 		if ($cats === 3) {
 			$query = sprintf('
-					SELECT rel.id AS releases_id, rel.guid, rel.groupid
+					SELECT rel.id AS releases_id, rel.guid, rel.groups_id
 					FROM releases rel
 					WHERE rel.nzbstatus = %d
 					AND rel.predb_id = 0',
@@ -432,7 +432,7 @@ class NameFixer
 			$cats = 2;
 		} else {
 			$query = sprintf('
-					SELECT rel.id AS releases_id, rel.guid, rel.groupid
+					SELECT rel.id AS releases_id, rel.guid, rel.groups_id
 					FROM releases rel
 					WHERE rel.isrenamed = %d
 					AND rel.proc_par2 = %d',
@@ -462,7 +462,7 @@ class NameFixer
 				);
 
 				foreach ($releases as $release) {
-					if (($nzbContents->checkPAR2($release['guid'], $release['releases_id'], $release['groupid'], $nameStatus, $show)) === true) {
+					if (($nzbContents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], $nameStatus, $show)) === true) {
 						$this->fixed++;
 					}
 
@@ -670,7 +670,7 @@ class NameFixer
 				$this->matched = true;
 				$this->relid = $release['releases_id'];
 
-				$determinedCategory = $this->category->determineCategory($release['groupid'], $newName);
+				$determinedCategory = $this->category->determineCategory($release['groups_id'], $newName);
 
 				if ($type === "PAR2, ") {
 					$newName = ucwords($newName);
@@ -692,7 +692,7 @@ class NameFixer
 				$newName = preg_replace(['/^[-=_\.:\s]+/', '/[-=_\.:\s]+$/'], '', $newName[0]);
 
 				if ($this->echooutput === true && $show === 1) {
-					$groupName = $this->_groups->getByNameByID($release['groupid']);
+					$groupName = $this->_groups->getByNameByID($release['groups_id']);
 					$oldCatName = $this->category->getNameByID($release['categories_id']);
 					$newCatName = $this->category->getNameByID($determinedCategory);
 
@@ -851,7 +851,7 @@ class NameFixer
 		$res = $this->pdo->queryDirect(
 			sprintf("
 							SELECT r.id AS releases_id, r.name, r.searchname,
-								r.groupid, r.categories_id
+								r.groups_id, r.categories_id
 							FROM releases r
 							%1\$s
 							AND (r.name %2\$s OR r.searchname %2\$s)
@@ -930,7 +930,7 @@ class NameFixer
 		$query = $this->pdo->queryDirect(
 			sprintf('
 							SELECT r.id AS releases_id, r.name, r.searchname,
-								r.groupid, r.categories_id,
+								r.groups_id, r.categories_id,
 								rf.name AS filename
 							FROM releases r
 							INNER JOIN release_files rf ON r.id = rf.releases_id

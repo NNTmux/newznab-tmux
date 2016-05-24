@@ -154,7 +154,7 @@ if (isset($_GET['type'])) {
 					sprintf('
 					SELECT p.*
 					FROM predb p
-					INNER JOIN groups g ON g.id = p.groupid
+					INNER JOIN groups g ON g.id = p.groups_id
 					WHERE requestid = %d
 					AND g.name = %s
 					%s %s %s

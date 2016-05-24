@@ -445,7 +445,7 @@ class NZBImport
 					'name'			=> $escapedSubject,
 					'searchname'	=> $this->pdo->escapeString($cleanName),
 					'totalpart'		=> $nzbDetails['totalFiles'],
-					'groupid'		=> $nzbDetails['group_id'],
+					'groups_id'		=> $nzbDetails['group_id'],
 					'guid'			=> $this->pdo->escapeString($this->relGuid),
 					'postdate'		=> $this->pdo->escapeString($nzbDetails['postDate']),
 					'fromname'		=> $escapedFromName,
