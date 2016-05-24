@@ -497,7 +497,6 @@ class NameFixer
 		}
 
 		// Only select releases we haven't checked here before
-		$preId = false;
 		if ($cats === 3) {
 			$query = sprintf('
 					SELECT rel.id AS releases_id, rel.name AS textstring
@@ -507,41 +506,38 @@ class NameFixer
 					AND rel.predb_id < 1',
 				NZB::NZB_ADDED
 			);
-			$cats = 2;
-			$preId = true;
 		} else {
 			$query = sprintf('
-					SELECT
-						rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.categories_id,
-						rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, ru.releases_id,
-						HEX(ru.uniqueid) AS uid
-					FROM releases rel
-					INNER JOIN release_unique ru ON ru.releases_id = rel.id
-					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-					AND rel.proc_uid = %d
-					%s',
+				SELECT
+					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.categories_id,
+					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, ru.releases_id,
+					HEX(ru.uniqueid) AS uid
+				FROM releases rel
+				INNER JOIN release_unique ru ON ru.releases_id = rel.id
+				WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
+				AND rel.proc_uid = %d
+				%s
+				ORDER BY rel.id DESC
+				LIMIT %d',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
 				Category::OTHER_HASHED,
 				self::PROC_UID_NONE,
-				$guid
+				$guid,
+				$queryLimit
 			);
 		}
 
-		$releases = $this->_getReleases($time, $cats, $query, $queryLimit);
-
+		$releases = $this->pdo->queryDirect($query);
 		if ($releases instanceof \Traversable && $releases !== false) {
 			$total = $releases->rowCount();
-
 			if ($total > 0) {
 				$this->_totalReleases = $total;
 				if ($guid === '') {
 					echo $this->pdo->log->primary(number_format($total) . ' unique ids to process.');
 				}
-
 				foreach ($releases as $rel) {
 					$this->checked++;
-
 					$this->done = $this->matched = false;
 					$this->uidCheck($rel, $echo, $type, $nameStatus, $show);
 					$this->_echoRenamed($show);
