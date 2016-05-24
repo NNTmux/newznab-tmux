@@ -485,7 +485,7 @@ class NameFixer
 	 * @param         $nameStatus
 	 * @param         $show
 	 * @param string  $guidChar
-	 * @param string  $limit
+	 * @param int  $limit
 	 */
 	public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
@@ -1754,7 +1754,7 @@ class NameFixer
 				LEFT JOIN releases r ON ru.releases_id = r.id
 				WHERE ru.uniqueid = UNHEX('{$release['uid']}')
 				AND ru.releases_id != {$release['releases_id']}
-				AND r.predb_id > 0"
+				AND (r.predb_id > 0 OR r.anidbid > 0)"
 			);
 			$floor = floor((1 - $result['relsize'] / $release['relsize']) * 100);
 			if ($result !== false &&  $floor <= 5 && $floor >= -5) {

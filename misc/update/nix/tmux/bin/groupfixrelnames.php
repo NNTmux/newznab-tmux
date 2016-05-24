@@ -64,7 +64,7 @@ if (!isset($argv[1])) {
 			$namefixer->fixNamesWithSrr(1, 1, 1, 1, 1, $guidChar, $maxperrun);
 			break;
 		case $pieces[0] === 'uid' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
-			$namefixer->fixNamesWithMedia(2, 1, 2, 1, 1, $guidChar);
+			$namefixer->fixNamesWithMedia(2, 1, 2, 1, 1, $guidChar, $maxperrun);
 			break;
 		case $pieces[0] === 'md5' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
