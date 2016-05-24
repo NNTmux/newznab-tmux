@@ -1768,6 +1768,8 @@ class NameFixer
 					$show,
 					$result['predb_id']
 				);
+			} else {
+				$this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
 			}
 		}
 	}
