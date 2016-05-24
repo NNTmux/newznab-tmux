@@ -567,9 +567,6 @@ class Forking extends \fork_daemon
 			$count = 0;
 			$queue = array();
 			foreach ($datas as $firstguid) {
-				if ($count >= $threads) {
-					$count = 0;
-				}
 				$count++;
 				if ($firstguid['count'] < $maxperrun) {
 					$limit = $firstguid['count'];

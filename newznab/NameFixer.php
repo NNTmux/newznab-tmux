@@ -1753,9 +1753,11 @@ class NameFixer
 				FROM release_unique ru
 				LEFT JOIN releases r ON ru.releases_id = r.id
 				WHERE ru.uniqueid = UNHEX('{$release['uid']}')
-				AND ru.releases_id != {$release['releases_id']}"
+				AND ru.releases_id != {$release['releases_id']}
+				AND r.predb_id > 0"
 			);
-			if ($result !== false && floor((1 - $result['relsize'] / $release['relsize']) * 100) <= (5 || -5)) {
+			$floor = floor((1 - $result['relsize'] / $release['relsize']) * 100);
+			if ($result !== false &&  $floor <= 5 && $floor >= -5) {
 				$this->updateRelease(
 					$release,
 					$result['searchname'],
