@@ -1,3 +1,5 @@
+2016-05-24 DariusIII
+	* Upd: Improve speed of update_releases on larger databases
 2016-05-22 DariusIII
 	* Upd: Update the +1 patch file
 	* Upd: Update NameFixer and ReleaseExtra classes.
