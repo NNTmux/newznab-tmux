@@ -226,7 +226,7 @@ class Nfo
 						'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this])
 					]
 				);
-				$nzbContents->parseNZB($release['guid'], $release['id'], $release['groupid']);
+				$nzbContents->parseNZB($release['guid'], $release['id'], $release['groups_id']);
 			}
 			return true;
 		}
@@ -278,12 +278,12 @@ class Nfo
 	{
 		$ret = 0;
 		$guidCharQuery = ($guidChar === '' ? '' : 'AND r.leftguid = ' . $this->pdo->escapeString($guidChar));
-		$groupIDQuery = ($groupID === '' ? '' : 'AND r.groupid = ' . $groupID);
+		$groupIDQuery = ($groupID === '' ? '' : 'AND r.groups_id = ' . $groupID);
 		$optionsQuery = self::NfoQueryString($this->pdo);
 
 		$res = $this->pdo->query(
 			sprintf('
-				SELECT r.id, r.guid, r.groupid, r.name
+				SELECT r.id, r.guid, r.groups_id, r.name
 				FROM releases r
 				WHERE 1=1 %s %s %s
 				ORDER BY r.nfostatus ASC, r.postdate DESC
@@ -344,7 +344,7 @@ class Nfo
 			$movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
 			foreach ($res as $arr) {
-				$fetchedBinary = $nzbContents->getNfoFromNZB($arr['guid'], $arr['id'], $arr['groupid'], $groups->getByNameByID($arr['groupid']));
+				$fetchedBinary = $nzbContents->getNfoFromNZB($arr['guid'], $arr['id'], $arr['groups_id'], $groups->getByNameByID($arr['groups_id']));
 				if ($fetchedBinary !== false) {
 					// Insert nfo into database.
 					$cp = 'COMPRESS(%s)';

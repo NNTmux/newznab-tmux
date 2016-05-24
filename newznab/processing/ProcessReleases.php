@@ -271,11 +271,11 @@ class ProcessReleases
 	{
 		$cat = new Categorize(['Settings' => $this->pdo]);
 		$categorized = $total = 0;
-		$releases = $this->pdo->queryDirect(sprintf('SELECT id, %s, groupid FROM releases %s', $type, $where));
+		$releases = $this->pdo->queryDirect(sprintf('SELECT id, %s, groups_id FROM releases %s', $type, $where));
 		if ($releases && $releases->rowCount()) {
 			$total = $releases->rowCount();
 			foreach ($releases as $release) {
-				$catId = $cat->determineCategory($release['groupid'], $release[$type]);
+				$catId = $cat->determineCategory($release['groups_id'], $release[$type]);
 				$this->pdo->queryExec(
 					sprintf('UPDATE releases SET categories_id = %d, iscategorized = 1 WHERE id = %d', $catId, $release['id'])
 				);
@@ -611,7 +611,7 @@ class ProcessReleases
 							'name' => $cleanRelName,
 							'searchname' => $this->pdo->escapeString(utf8_encode($cleanedName)),
 							'totalpart' => $collection['totalfiles'],
-							'groupid' => $collection['group_id'],
+							'groups_id' => $collection['group_id'],
 							'guid' => $this->pdo->escapeString($this->releases->createGUID()),
 							'postdate' => $this->pdo->escapeString($collection['date']),
 							'fromname' => $fromName,
@@ -701,7 +701,7 @@ class ProcessReleases
 				INNER JOIN categories c ON r.categories_id = c.id
 				INNER JOIN categories cp ON cp.id = c.parentid
 				WHERE %s nzbstatus = 0",
-				(!empty($groupID) ? ' r.groupid = ' . $groupID . ' AND ' : ' ')
+				(!empty($groupID) ? ' r.groups_id = ' . $groupID . ' AND ' : ' ')
 			)
 		);
 
@@ -820,7 +820,7 @@ class ProcessReleases
 		$this->categorizeRelease(
 			$type,
 			(!empty($groupID)
-					? 'WHERE categories_id = ' . Category::OTHER_MISC . ' AND iscategorized = 0 AND groupid = ' . $groupID
+					? 'WHERE categories_id = ' . Category::OTHER_MISC . ' AND iscategorized = 0 AND groups_id = ' . $groupID
 					: 'WHERE categories_id = ' . Category::OTHER_MISC . ' AND iscategorized = 0')
 	);
 
@@ -1091,8 +1091,8 @@ class ProcessReleases
 				sprintf("
 					SELECT r.guid, r.id
 					FROM releases r
-					INNER JOIN groups g ON g.id = r.groupid
-					WHERE r.groupid = %d
+					INNER JOIN groups g ON g.id = r.groups_id
+					WHERE r.groups_id = %d
 					AND greatest(IFNULL(g.minsizetoformrelease, 0), %d) > 0
 					AND r.size < greatest(IFNULL(g.minsizetoformrelease, 0), %d)",
 					$groupID['id'],
@@ -1112,7 +1112,7 @@ class ProcessReleases
 					sprintf('
 						SELECT id, guid
 						FROM releases
-						WHERE groupid = %d
+						WHERE groups_id = %d
 						AND size > %d',
 						$groupID['id'],
 						$maxSizeSetting
@@ -1130,8 +1130,8 @@ class ProcessReleases
 				sprintf("
 					SELECT r.id, r.guid
 					FROM releases r
-					INNER JOIN groups g ON g.id = r.groupid
-					WHERE r.groupid = %d
+					INNER JOIN groups g ON g.id = r.groups_id
+					WHERE r.groups_id = %d
 					AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
 					AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)",
 					$groupID['id'],

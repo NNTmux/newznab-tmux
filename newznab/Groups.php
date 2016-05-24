@@ -46,8 +46,8 @@ class Groups
 			COALESCE(rel.num, 0) AS num_releases
 			FROM groups
 			LEFT OUTER JOIN
-				(SELECT groupid, COUNT(id) AS num FROM releases GROUP BY groupid) rel
-			ON rel.groupid = groups.id
+				(SELECT groups_id, COUNT(id) AS num FROM releases GROUP BY groups_id) rel
+			ON rel.groups_id = groups.id
 			ORDER BY groups.name",
 			true, NN_CACHE_EXPIRY_LONG
 		);
@@ -131,7 +131,7 @@ class Groups
 	 *
 	 * @param string $name The group name.
 	 *
-	 * @return string Empty string on failure, groupid on success.
+	 * @return string Empty string on failure, groups_id on success.
 	 */
 	public function getIDByName($name)
 	{
@@ -180,10 +180,10 @@ class Groups
 				COALESCE(rel.num, 0) AS num_releases
 				FROM groups
 				LEFT OUTER JOIN
-					(SELECT groupid, COUNT(id) AS num
-						FROM releases GROUP BY groupid
+					(SELECT groups_id, COUNT(id) AS num
+						FROM releases GROUP BY groups_id
 					) rel
-				ON rel.groupid = groups.id
+				ON rel.groups_id = groups.id
 				WHERE 1 = 1 %s
 				ORDER BY groups.name " .
 				($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start),
@@ -567,7 +567,7 @@ class Groups
 		}
 
 		$releaseArray = $this->pdo->queryDirect(
-			sprintf("SELECT id, guid FROM releases %s", ($id === false ? '' : 'WHERE groupid = ' . $id))
+			sprintf("SELECT id, guid FROM releases %s", ($id === false ? '' : 'WHERE groups_id = ' . $id))
 		);
 
 		if ($releaseArray instanceof \Traversable) {
@@ -648,11 +648,11 @@ class Groups
 				SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
 				FROM groups
 				LEFT OUTER JOIN
-					(SELECT groupid, COUNT(id) AS num
+					(SELECT groups_id, COUNT(id) AS num
 						FROM releases
-						GROUP BY groupid
+						GROUP BY groups_id
 					) rel
-				ON rel.groupid = groups.id
+				ON rel.groups_id = groups.id
 				WHERE 1 = 1 %s
 				AND active = 1
 				ORDER BY groups.name " .
@@ -683,11 +683,11 @@ class Groups
 				SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
 				FROM groups
 				LEFT OUTER JOIN
-					(SELECT groupid, COUNT(id) AS num
+					(SELECT groups_id, COUNT(id) AS num
 						FROM releases
-						GROUP BY groupid
+						GROUP BY groups_id
 					) rel
-				ON rel.groupid = groups.id
+				ON rel.groups_id = groups.id
 				WHERE 1 = 1 %s
 				AND active = 0
 				ORDER BY groups.name " .
