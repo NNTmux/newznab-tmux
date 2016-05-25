@@ -194,7 +194,7 @@
 			<table class="data table table-striped responsive-utilities jambo-table" id="browsetable">
 				<thead>
 				<tr>
-					<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all flat"/></th>
+					<th><input id="check-all" type="checkbox" class="flat-all"/></th>
 					<th>Name
 						<a title="Sort Descending" href="{$orderbyname_desc}">
 							<i class="fa-icon-caret-down text-muted"> </i>
@@ -215,7 +215,7 @@
 				{foreach $results as $result}
 					<tr class="{cycle values=",alt"}{if $lastvisit|strtotime<$result.adddate|strtotime} new{/if}"
 						id="guid{$result.guid}">
-						<td class="check">
+						<td>
 							<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="flat"
 								   value="{$result.guid}">
 						</td>

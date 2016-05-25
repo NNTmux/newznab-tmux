@@ -184,7 +184,7 @@
 		<table class="data table table-condensed table-striped table-responsive table-hover" id="browsetable">
 			<thead>
 			<tr>
-				<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
+				<th><input id="chkSelectAll" type="checkbox" class="square-all"/></th>
 				<th>Name
 					<a title="Sort Descending" href="{$orderbyname_desc}">
 						<i class="fa-icon-caret-down text-muted"> </i>

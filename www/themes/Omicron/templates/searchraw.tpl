@@ -49,7 +49,6 @@
 							</tr>
 							{foreach $results as $result}
 								<tr class="{cycle values=",alt"}">
-									<!--<td class="selection"><input name="file{$result.id}" id="file{$result.id}" value="{$result.id}" type="checkbox"/></td>-->
 									<td title="{$result.xref|escape:"htmlall"}">{$result.name|escape:"htmlall"}</td>
 									<td class="less">{$result.group_name|replace:"alt.binaries":"a.b"}</td>
 									<td class="less" title="{$result.date}">{$result.date|date_format}</td>

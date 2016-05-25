@@ -32,9 +32,9 @@
           </div>
           <div class="row">
             <div class="col-xs-8">
-              <div class="checkbox icheck">
+              <div>
                 <label>
-                  <input id="rememberme" {if isset($rememberme) && $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox"> Remember Me
+                  <input id="rememberme" {if isset($rememberme) && $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox" class="square"> Remember Me
                 </label>
 				  <hr>
                 <div style="text-align: center;">
@@ -49,16 +49,5 @@
         </form>
 		  <a href="{$smarty.const.WWW_TOP}forgottenpassword" class="text-center">I forgot my password</a><br>
         <a href="{$smarty.const.WWW_TOP}register" class="text-center">Register a new membership</a>
-        <!-- icheck -->
-        <script src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js" type="text/javascript"></script>
-    <script>
-      $(function () {
-        $('input').iCheck({
-          checkboxClass: 'icheckbox_square-blue',
-          radioClass: 'iradio_square-blue',
-          increaseArea: '20%' // optional
-        });
-      });
-    </script>
   </body>
 </html>
