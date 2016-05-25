@@ -133,7 +133,7 @@
 
 		{foreach from=$topdownloads item=result}
 			<tr class="{cycle values=",alt"}">
-				<td width="75%"><a href="{$smarty.const.WWW_TOP}/../details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+				<td width="75%"><a href="{$smarty.const.WWW_TOP}/../details/{$result.guid}"}</a>
 				{if isset($isadmin)}<a href="{$smarty.const.WWW_TOP}/release-edit.php?id={$result.id}">[Edit]</a>{/if}</td>
 				<td>{$result.grabs}</td>
 				<td>{$result.adddate|timeago}</td>

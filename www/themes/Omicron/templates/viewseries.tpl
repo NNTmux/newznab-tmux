@@ -164,7 +164,7 @@
 														{/if}
 														<td>
 															<a title="View details"
-															   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+															   href="{$smarty.const.WWW_TOP}/details/{$result.guid}"}</a>
 
 															<div>
 																{if $result.nfoid > 0}<span
@@ -193,7 +193,7 @@
 														<td class="check" width="10"><input
 																	id="chk{$result.guid|substr:0:7}"
 																	type="checkbox"
-																	class="nzb_check" name="{$seasonnum}"
+																	class="square" name="{$seasonnum}"
 																	value="{$result.guid}"/></td>
 														<td>
 															<span class="label label-default">{$result.category_name}</span>

@@ -154,7 +154,7 @@
 												<tr>
 													<th>Ep</th>
 													<th>Name</th>
-													<th>Select</th>
+													<th> Select All <input id="check-all" type="checkbox" class="flat-all"/></th>
 													<th>Category</th>
 													<th>Posted</th>
 													<th>Size</th>
@@ -173,7 +173,7 @@
 															{/if}
 															<td>
 																<a title="View details"
-																   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+																   href="{$smarty.const.WWW_TOP}/details/{$result.guid}"}</a>
 
 																<div>
 																	{if $result.nfoid > 0}<span>

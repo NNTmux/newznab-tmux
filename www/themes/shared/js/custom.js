@@ -1,4 +1,4 @@
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -12,7 +12,7 @@ $(function () {
     $('#sidebar-menu li').on('click touchstart', function() {
         var link = $('a', this).attr('href');
 
-        if(link) { 
+        if(link) {
             window.location.href = link;
         } else {
             if ($(this).is('.active')) {
@@ -21,7 +21,7 @@ $(function () {
             } else {
                 $('#sidebar-menu li').removeClass('active');
                 $('#sidebar-menu li ul').slideUp();
-                
+
                 $(this).addClass('active');
                 $('ul', this).slideDown();
             }
@@ -109,14 +109,33 @@ $('.collapse-link').click(function () {
 });
 /** ******  /collapse panel  *********************** **/
 /** ******  iswitch  *********************** **/
-if ($("input.flat")[0]) {
-    $(document).ready(function () {
-        $('input.flat').iCheck({
-            checkboxClass: 'icheckbox_flat-green',
-            radioClass: 'iradio_flat-green'
-        });
+
+$(function () {
+    var checkAll = $('input.flat-all');
+    var checkboxes = $('input.flat');
+
+    $('input').iCheck({
+        checkboxClass: 'icheckbox_flat-green',
+        radioClass: 'iradio_flat-green'
     });
-}
+
+    checkAll.on('ifChecked ifUnchecked', function(event) {
+        if (event.type == 'ifChecked') {
+            checkboxes.iCheck('check');
+        } else {
+            checkboxes.iCheck('uncheck');
+        }
+    });
+
+    checkboxes.on('ifChanged', function(event){
+        if(checkboxes.filter(':checked').length == checkboxes.length) {
+            checkAll.prop('checked', 'checked');
+        } else {
+            checkAll.prop('checked', false);
+        }
+        checkAll.iCheck('update');
+    });
+});
 /** ******  /iswitch  *********************** **/
 /** ******  star rating  *********************** **/
 // Starrr plugin (https://github.com/dobtco/starrr)

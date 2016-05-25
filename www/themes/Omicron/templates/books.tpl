@@ -24,23 +24,23 @@
 										<div class="nzb_multi_operations">
 											View: <strong>Covers</strong> | <a
 													href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-											Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
+											Check all: <input type="checkbox" class="square-all"/> <br/>
 											With Selected:
 											<div class="btn-group">
 												<input type="button"
-													   class="nntmux_multi_operations_download btn btn-sm btn-success"
+													   class="nzb_multi_operations_download btn btn-sm btn-success"
 													   value="Download NZBs"/>
 												<input type="button"
-													   class="nntmux_multi_operations_cart btn btn-sm btn-info"
+													   class="nzb_multi_operations_cart btn btn-sm btn-info"
 													   value="Send to my Download Basket"/>
 												{if isset($sabintegrated) && $sabintegrated !=""}
 													<input type="button"
-														   class="nntmux_multi_operations_sab btn btn-sm btn-primary"
+														   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 														   value="Send to Queue"/>
 												{/if}
 												{if isset($isadmin)}
 													<input type="button"
-														   class="nntmux_multi_operations_delete btn btn-sm btn-danger"
+														   class="nzb_multi_operations_delete btn btn-sm btn-danger"
 														   value="Delete"/>
 												{/if}
 											</div>
@@ -168,23 +168,23 @@
 											<div class="nzb_multi_operations">
 												View: <strong>Covers</strong> | <a
 														href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-												Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
+												Check all: <input type="checkbox" class="square-all"/> <br/>
 												With Selected:
 												<div class="btn-group">
 													<input type="button"
-														   class="nntmux_multi_operations_download btn btn-sm btn-success"
+														   class="nzb_multi_operations_download btn btn-sm btn-success"
 														   value="Download NZBs"/>
 													<input type="button"
-														   class="nntmux_multi_operations_cart btn btn-sm btn-info"
+														   class="nzb_multi_operations_cart btn btn-sm btn-info"
 														   value="Send to my Download Basket"/>
 													{if isset($sabintegrated) && $sabintegrated !=""}
 														<input type="button"
-															   class="nntmux_multi_operations_sab btn btn-sm btn-primary"
+															   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 															   value="Send to Queue"/>
 													{/if}
 													{if isset($isadmin)}
 														<input type="button"
-															   class="nntmux_multi_operations_delete btn btn-sm btn-danger"
+															   class="nzb_multi_operations_delete btn btn-sm btn-danger"
 															   value="Delete"/>
 													{/if}
 												</div>

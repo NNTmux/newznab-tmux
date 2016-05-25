@@ -194,7 +194,7 @@
 			<table class="data table table-striped responsive-utilities jambo-table" id="browsetable">
 				<thead>
 				<tr>
-					<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all flat"/></th>
+					<th><input id="check-all" type="checkbox" class="flat-all"/></th>
 					<th>Name
 						<a title="Sort Descending" href="{$orderbyname_desc}">
 							<i class="fa-icon-caret-down text-muted"> </i>
@@ -215,14 +215,14 @@
 				{foreach $results as $result}
 					<tr class="{cycle values=",alt"}{if $lastvisit|strtotime<$result.adddate|strtotime} new{/if}"
 						id="guid{$result.guid}">
-						<td class="check">
+						<td>
 							<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="flat"
 								   value="{$result.guid}">
 						</td>
 						<td class="item">
 							<label for="chk{$result.guid|substr:0:7}">
 								<a class="title" title="View details"
-								   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">{$result.searchname|escape:"htmlall"|truncate:150:"...":true}</a>{if !empty($result.failed)}
+								   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|truncate:150:"...":true}</a>{if !empty($result.failed)}
 								<i class="fa fa-exclamation-circle" style="color: red"
 								   title="This release has failed to download for some users"></i>{/if}
 							</label value="Searchname">
@@ -245,7 +245,7 @@
 									{if $result.videostatus > 0}
 										<a
 												class="model_prev label label-primary"
-												href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"
+												href="{$smarty.const.WWW_TOP}/details/{$result.guid}"
 												title="This release has a video preview."
 												rel="preview"
 										><i class="icon-youtube-play"></i>

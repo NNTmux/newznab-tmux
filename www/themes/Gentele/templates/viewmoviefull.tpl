@@ -99,7 +99,7 @@
 									<table style="width:100%;"
 										   class="data table table-striped responsive-utilities jambo-table">
 										<tr>
-											<th>Select</th>
+											<th><input id="check-all" type="checkbox" class="flat-all"/> Select All</th>
 											<th>Name<br/>
 												<a title="Sort Descending" href="{$orderbyname_desc}">
 													<i class="fa fa-icon-caret-down"></i>
@@ -156,7 +156,7 @@
 																		 value="{$mguid[$m@index]}"/></td>
 												<td class="item">
 													<a title="View details"
-													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
+													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}"></a>
 													<br/>
 						<span class="label label-primary">{$mgrabs[$m@index]}
 							grab{if $mgrabs[$m@index] != 1}s{/if}</span>

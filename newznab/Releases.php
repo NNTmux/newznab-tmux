@@ -77,14 +77,14 @@ class Releases
 		$parameters['id'] = $this->pdo->queryInsert(
 			sprintf(
 				"INSERT INTO releases
-					(name, searchname, totalpart, groupid, adddate, guid, leftguid, postdate, fromname,
+					(name, searchname, totalpart, groups_id, adddate, guid, leftguid, postdate, fromname,
 					size, passwordstatus, haspreview, categories_id, nfostatus, nzbstatus,
 					isrenamed, iscategorized, reqidstatus, predb_id)
 				VALUES (%s, %s, %d, %d, NOW(), %s, LEFT(%s, 1), %s, %s, %s, %d, -1, %d, -1, %d, %d, 1, %d, %d)",
 				$parameters['name'],
 				$parameters['searchname'],
 				$parameters['totalpart'],
-				$parameters['groupid'],
+				$parameters['groups_id'],
 				$parameters['guid'],
 				$parameters['guid'],
 				$parameters['postdate'],
@@ -120,8 +120,8 @@ class Releases
 			sprintf(
 				'SELECT r.*, g.name AS group_name, c.title AS category_name
 				FROM releases r
-				INNER JOIN categories c ON c.id = r.categories_id
-				INNER JOIN groups g ON g.id = r.groupid
+				LEFT JOIN categories c ON c.id = r.categories_id
+				LEFT JOIN groups g ON g.id = r.groups_id
 				WHERE r.nzbstatus = %d',
 				NZB::NZB_ADDED
 			), true, NN_CACHE_EXPIRY_LONG
@@ -142,8 +142,8 @@ class Releases
 			sprintf(
 				"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name
 				FROM releases r
-				INNER JOIN categories c ON c.id = r.categories_id
-				INNER JOIN categories cp ON cp.id = c.parentid
+				LEFT JOIN categories c ON c.id = r.categories_id
+				LEFT JOIN categories cp ON cp.id = c.parentid
 				WHERE r.nzbstatus = %d
 				ORDER BY r.postdate DESC %s",
 				NZB::NZB_ADDED,
@@ -172,7 +172,7 @@ class Releases
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s %s %s %s',
-				($groupName != '' ? 'LEFT JOIN groups g ON g.id = r.groupid' : ''),
+				($groupName != '' ? 'LEFT JOIN groups g ON g.id = r.groups_id' : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords,
 				($groupName != '' ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
@@ -201,68 +201,46 @@ class Releases
 	{
 		$orderBy = $this->getBrowseOrder($orderBy);
 
-		$releases = $this->pdo->queryCalc(
-			sprintf("
-				SELECT SQL_CALC_FOUND_ROWS
-					r.id
-				FROM releases r
-				LEFT JOIN groups g ON g.id = r.groups_id
-				WHERE r.nzbstatus = %d
-				AND r.passwordstatus %s
-				%s %s %s %s %s
-				ORDER BY %s %s %s",
-				NZB::NZB_ADDED,
-				$this->showPasswords,
-				$this->categorySQL($cat),
-				($maxAge > 0 ? (" AND postdate > NOW() - INTERVAL " . $maxAge . ' DAY ') : ''),
-				(count($excludedCats) ? (' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')') : ''),
-				($groupName != '' ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
-				($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
-				$orderBy[0],
-				$orderBy[1],
-				($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
-			),
-			true,
-			NN_CACHE_EXPIRY_MEDIUM
-		);
-
-		if (is_array($releases['result'])) {
-			foreach ($releases['result'] as $release => $id) {
-				$releaseIDs[] = $id['id'];
-			}
-		}
-
 		$qry = sprintf(
 			"SELECT r.*,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
-				df.failed AS failed,
-				rn.releases_id AS nfoid,
-				re.releases_id AS reid,
-				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
-				tve.title, tve.firstaired
-			FROM releases r
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			WHERE r.id IN (%s)
-			ORDER BY %s %s",
-			(isset($releaseIDs) ? implode(',', $releaseIDs) : -1),
+					CONCAT(cp.title, ' > ', c.title) AS category_name,
+					CONCAT(cp.id, ',', c.id) AS category_ids,
+					(SELECT df.failed) AS failed,
+					rn.id AS nfoid,
+					re.releases_id AS reid,
+					v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+					tve.title, tve.firstaired
+				FROM
+				(
+					SELECT r.*, g.name AS group_name
+					FROM releases r
+					LEFT JOIN groups g ON g.id = r.groups_id
+					WHERE r.nzbstatus = %d
+					AND r.passwordstatus %s
+					%s %s %s %s %s
+					ORDER BY %s %s %s
+				) r
+				LEFT JOIN categories c ON c.id = r.categories_id
+				LEFT JOIN categories cp ON cp.id = c.parentid
+				LEFT OUTER JOIN videos v ON r.videos_id = v.id
+				LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
+				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+				GROUP BY r.id
+				ORDER BY %8\$s %9\$s",
+			NZB::NZB_ADDED,
+			$this->showPasswords,
+			$this->categorySQL($cat),
+			($maxAge > 0 ? (" AND postdate > NOW() - INTERVAL " . $maxAge . ' DAY ') : ''),
+			(count($excludedCats) ? (' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')') : ''),
+			($groupName != '' ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
+			($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
 			$orderBy[0],
-			$orderBy[1]
+			$orderBy[1],
+			($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
 		);
-
 		$sql = $this->pdo->query($qry, true, NN_CACHE_EXPIRY_MEDIUM);
-
-		if (!empty($sql)) {
-			$sql[0]['_totalcount'] = (isset($releases['total']) ? $releases['total'] : 0);
-			var_dump($releases['total']);
-		}
-
 		return $sql;
 	}
 
@@ -362,17 +340,17 @@ class Releases
 	{
 		return $this->pdo->query(
 			sprintf(
-				"SELECT searchname, guid, g.name AS gname, CONCAT(cp.title, '_', c.title) AS catName
+				"SELECT searchname, guid, groups.name AS gname, CONCAT(cp.title,'_',categories.title) AS catName
 				FROM releases r
-				LEFT JOIN categories c ON r.categories_id = c.id
-				LEFT JOIN groups g ON r.groups_id = g.id
-				LEFT JOIN categories cp ON cp.id = c.parentid
+				LEFT JOIN categories ON r.categories_id = categories.id
+				LEFT JOIN groups ON r.groups_id = groups.id
+				LEFT JOIN categories cp ON cp.id = categories.parentid
 				WHERE r.nzbstatus = %d
 				%s %s %s",
 				NZB::NZB_ADDED,
 				$this->exportDateString($postFrom),
 				$this->exportDateString($postTo, false),
-				(($groupID != '' && $groupID != '-1') ? sprintf(' AND r.groups_id = %d ', $groupID) : '')
+				(($groupID != '' && $groupID != '-1') ? sprintf(' AND groups_id = %d ', $groupID) : '')
 			)
 		);
 	}
@@ -444,7 +422,7 @@ class Releases
 		$groups = $this->pdo->query(
 			'SELECT DISTINCT g.id, g.name
 			FROM releases r
-			INNER JOIN groups g ON g.id = r.groupid'
+			LEFT JOIN groups g ON g.id = r.groups_id'
 		);
 		$temp_array = [];
 
@@ -473,7 +451,10 @@ class Releases
 	{
 		if (is_null($this->concatenatedCategoryIDsCache)) {
 			$result = $this->pdo->query(
-				"SELECT CONCAT(cp.id, ',', c.id) AS category_ids FROM categories c INNER JOIN categories cp ON cp.id = c.parentid",
+				"SELECT CONCAT(cp.id, ',', c.id) AS category_ids
+				FROM categories c
+				LEFT JOIN categories cp ON cp.id = c.parentid
+				WHERE c.parentid IS NOT NULL",
 				true, NN_CACHE_EXPIRY_LONG
 			);
 			if (isset($result[0]['category_ids'])) {
@@ -509,11 +490,11 @@ class Releases
 					(SELECT df.failed) AS failed
 				FROM releases r
 				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-				INNER JOIN groups ON groups.id = r.groupid
+				LEFT JOIN groups ON groups.id = r.groups_id
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN tv_episodes tve ON tve.videos_id = r.videos_id
-				INNER JOIN categories c ON c.id = r.categories_id
-				INNER JOIN categories cp ON cp.id = c.parentid
+				LEFT JOIN categories c ON c.id = r.categories_id
+				LEFT JOIN categories cp ON cp.id = c.parentid
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				WHERE %s %s
 				AND r.nzbstatus = %d
@@ -897,7 +878,7 @@ class Releases
 			$this->showPasswords,
 			NZB::NZB_ADDED,
 			($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-			($groupName != -1 ? sprintf(' AND r.groupid = %d ', $this->groups->getIDByName($groupName)) : ''),
+			($groupName != -1 ? sprintf(' AND r.groups_id = %d ', $this->groups->getIDByName($groupName)) : ''),
 			(array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > ' . (string)(104857600 * (int)$sizeRange[$sizeFrom]) . ' ' : ''),
 			(array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < ' . (string)(104857600 * (int)$sizeRange[$sizeTo]) . ' ' : ''),
 			($hasNfo != 0 ? ' AND r.nfostatus = 1 ' : ''),
@@ -926,9 +907,9 @@ class Releases
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			INNER JOIN groups ON groups.id = r.groupid
-			INNER JOIN categories c ON c.id = r.categories_id
-			INNER JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN groups ON groups.id = r.groups_id
+			LEFT JOIN categories c ON c.id = r.categories_id
+			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			%s",
 			$this->getConcatenatedCategoryIDs(),
@@ -1025,11 +1006,12 @@ class Releases
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id AND v.type = 0
 			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			INNER JOIN categories c ON c.id = r.categories_id
-			INNER JOIN groups ON groups.id = r.groupid
+			LEFT JOIN categories c ON c.id = r.categories_id
+			INNER JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN groups ON groups.id = r.groups_id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			INNER JOIN categories cp ON cp.id = c.parentid
+
 			%s",
 			$this->getConcatenatedCategoryIDs(),
 			$whereSql
@@ -1083,11 +1065,11 @@ class Releases
 				rn.id AS nfoid,
 				re.releases_id AS reid
 			FROM releases r
-			INNER JOIN categories c ON c.id = r.categories_id
-			INNER JOIN groups ON groups.id = r.groupid
+			LEFT JOIN categories c ON c.id = r.categories_id
+			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN groups ON groups.id = r.groups_id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
-			INNER JOIN categories cp ON cp.id = c.parentid
 			%s",
 			$this->getConcatenatedCategoryIDs(),
 			$whereSql
@@ -1141,10 +1123,10 @@ class Releases
 				g.name AS group_name,
 				rn.releases_id AS nfoid
 			FROM releases r
-			INNER JOIN groups g ON g.id = r.groupid
-			INNER JOIN categories c ON c.id = r.categories_id
+			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN categories c ON c.id = r.categories_id
+			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			INNER JOIN categories cp ON cp.id = c.parentid
 			%s",
 			$this->getConcatenatedCategoryIDs(),
 			$whereSql
@@ -1248,9 +1230,9 @@ class Releases
 				tvi.summary, tvi.image,
 				tve.title, tve.firstaired, tve.se_complete
 				FROM releases r
-			INNER JOIN groups g ON g.id = r.groupid
-			INNER JOIN categories c ON c.id = r.categories_id
-			INNER JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN groups g ON g.id = r.groups_id
+			LEFT JOIN categories c ON c.id = r.categories_id
+			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_info tvi ON r.videos_id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
@@ -1322,9 +1304,9 @@ class Releases
 				"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name,
 				groups.name AS group_name
 				FROM releases r
-				INNER JOIN groups ON groups.id = r.groupid
-				INNER JOIN categories c ON c.id = r.categories_id
-				INNER JOIN categories cp ON cp.id = c.parentid
+				LEFT JOIN groups ON groups.id = r.groups_id
+				LEFT JOIN categories c ON c.id = r.categories_id
+				LEFT JOIN categories cp ON cp.id = c.parentid
 				WHERE r.categories_id BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . "
 				AND r.passwordstatus %s
 				AND videos_id = %d %s %s",
@@ -1380,7 +1362,7 @@ class Releases
 		$qry = sprintf('
 				SELECT r.*, g.name AS group_name
 				FROM releases r
-				INNER JOIN groups g ON g.id = r.groupid
+				LEFT JOIN groups g ON g.id = r.groups_id
 				WHERE r.id = %d',
 			$id
 		);

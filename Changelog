@@ -1,3 +1,6 @@
+2016-05-24 DariusIII
+	* Chg: Rename groupid column to groups_id.
+	* Upd: Improve speed of update_releases on larger databases
 2016-05-20 DariusIII
 	* Upd: Hide couchpotato button if no imdbid is set for release.
 2016-05-19 DariusIII

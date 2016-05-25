@@ -69,7 +69,7 @@
 							   cellpadding="0" style="table-layout: auto;">
 							<thead>
 							<tr>
-								<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
+								<th><input id="check-all" type="checkbox" class="square-all"/></th>
 								<th>Name
 									<a title="Sort Descending" href="{$orderbyname_desc}">
 										<i class="fa-icon-caret-down text-muted"> </i>
@@ -88,10 +88,10 @@
 							{foreach $results as $result}
 								<tr id="guid{$result.guid}">
 									<td class="check"><input id="chk{$result.guid|substr:0:7}"
-															 type="checkbox" class="nzb_check"
+															 type="checkbox" class="square"
 															 value="{$result.guid}"/></td>
 									<td>
-										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"
+										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}"
 										   class="title">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>{if !empty($result.failed)} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 										<br/>
 													<span class="label label-default">{$result.grabs}

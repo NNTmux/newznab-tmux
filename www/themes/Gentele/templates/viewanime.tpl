@@ -89,7 +89,7 @@
 							<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table"
 								   id="browsetable">
 								<tr>
-									<th>Select</th>
+									<th><input id="check-all" type="checkbox" class="flat-all"/> Select All</th>
 									<th>Name</th>
 									<th>Category</th>
 									<th>Posted</th>
@@ -103,7 +103,7 @@
 																 value="{$result.guid}"/></td>
 										<td>
 											<a title="View details"
-											   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+											   href="{$smarty.const.WWW_TOP}/details/{$result.guid}"}</a>
 											<div>
 												<div>
 													{if $result.nfoid > 0}<span><a

@@ -75,7 +75,7 @@
 						<table class="data table table-striped responsive-utilities jambo-table bulk-action">
 							<thead>
 							<tr class="headings">
-								<th>Select</th>
+								<th><input id="check-all" type="checkbox" class="flat-all"/></th>
 								<th>Name
 									<a title="Sort Descending" href="{$orderbyname_desc}"><i
 												class="fa-icon-caret-down text-muted"> </i></a>
@@ -99,7 +99,7 @@
 											   type="checkbox" name="table_records" class="flat"
 											   value="{$result.guid}"/></td>
 									<td>
-										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"
+										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}"
 										   class="title">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>{if !empty($result.failed)}
 										<i class="fa fa-exclamation-circle" style="color: red"
 										   title="This release has failed to download for some users"></i>{/if}
