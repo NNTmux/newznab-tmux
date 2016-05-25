@@ -264,7 +264,7 @@ class NameFixer
 	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
 		$type = 'Filenames, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = '. $this->pdo->escapeString($guidChar));
+		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = ' . $this->pdo->escapeString($guidChar));
 		$queryLimit = ($limit === '') ? '' : $limit;
 		if ($guid === '') {
 			$this->_echoStartMessage($time, 'file names');
@@ -281,7 +281,7 @@ class NameFixer
 					WHERE rel.nzbstatus = %d
 					AND rel.predb_id < 1',
 					NZB::NZB_ADDED
-			);
+				);
 			$cats = 2;
 			$preId = true;
 		} else {
@@ -298,7 +298,7 @@ class NameFixer
 					Category::OTHER_MISC,
 					self::PROC_FILES_NONE,
 					$guid
-			);
+				);
 		}
 
 		$releases = $this->_getReleases($time, $cats, $query, $queryLimit);
@@ -341,7 +341,7 @@ class NameFixer
 	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
 		$type = 'Srr, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = '. $this->pdo->escapeString($guidChar));
+		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = ' . $this->pdo->escapeString($guidChar));
 		$queryLimit = ($limit === '') ? '' : $limit;
 		if ($guid === '') {
 			$this->_echoStartMessage($time, 'srr files');
@@ -358,7 +358,7 @@ class NameFixer
 					WHERE rel.nzbstatus = %d
 					AND rel.predb_id < 1',
 					NZB::NZB_ADDED
-			);
+				);
 			$cats = 2;
 			$preId = true;
 		} else {
@@ -378,7 +378,7 @@ class NameFixer
 					$this->pdo->likeString('.srr', true, false),
 					self::PROC_SRR_NONE,
 					$guid
-			);
+				);
 		}
 
 		$releases = $this->_getReleases($time, $cats, $query, $queryLimit);
@@ -485,12 +485,12 @@ class NameFixer
 	 * @param         $nameStatus
 	 * @param         $show
 	 * @param string  $guidChar
-	 * @param int  $limit
+	 * @param int     $limit
 	 */
 	public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
 	{
 		$type = 'UID, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = '. $this->pdo->escapeString($guidChar));
+		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = ' . $this->pdo->escapeString($guidChar));
 		$queryLimit = ($limit === '') ? '' : $limit;
 		if ($guid === '') {
 			$this->_echoStartMessage($time, 'mediainfo Unique_IDs');
@@ -576,12 +576,12 @@ class NameFixer
 		else if ($time == 2 && $cats == 1) {
 			echo $this->pdo->log->header($query . $this->fullother . $queryLimit . ";\n");
 			$releases = $this->pdo->queryDirect($query . $this->fullother . $queryLimit);
-		}
-		// all cats
+		} // all cats
 		else if ($time == 2 && $cats == 2) {
 			echo $this->pdo->log->header($query . $this->fullall . $queryLimit . ";\n");
 			$releases = $this->pdo->queryDirect($query . $this->fullall . $queryLimit);
 		}
+
 		return $releases;
 	}
 
@@ -1752,20 +1752,22 @@ class NameFixer
 				AND ru.releases_id != {$release['releases_id']}
 				AND (r.predb_id > 0 OR r.anidbid > 0)"
 			);
-			$floor = floor((1 - $result['relsize'] / $release['relsize']) * 100);
-			if ($result !== false &&  $floor <= 5 && $floor >= -5) {
-				$this->updateRelease(
-					$release,
-					$result['searchname'],
-					$method = "uidCheck: Unique_ID",
-					$echo,
-					$type,
-					$namestatus,
-					$show,
-					$result['predb_id']
-				);
-			} else {
-				$this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
+			if ($result !== false) {
+				$floor = floor((1 - $result['relsize'] / $release['relsize']) * 100);
+				if ($floor <= 5 && $floor >= -5) {
+					$this->updateRelease(
+						$release,
+						$result['searchname'],
+						$method = "uidCheck: Unique_ID",
+						$echo,
+						$type,
+						$namestatus,
+						$show,
+						$result['predb_id']
+					);
+				} else {
+					$this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
+				}
 			}
 		}
 	}
