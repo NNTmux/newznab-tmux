@@ -109,7 +109,7 @@
 											</div>
 											<div class="col-md-10 small-gutter-left">
 												<h4><a title="View details"
-													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}"></a>
+													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$result.title|escape:"htmlall"}</a>
 												</h4>
 												<table class="data table table-striped responsive-utilities jambo-table">
 													<tr>
