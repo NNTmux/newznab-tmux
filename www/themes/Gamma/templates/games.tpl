@@ -165,7 +165,7 @@
 							<ul class="inline">
 								<li>
 									<h4>
-										<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}" </a>
+										<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$result.title|escape:"htmlall"} </a>
 									</h4>
 								</li>
 								<li style="vertical-align:text-bottom;">
