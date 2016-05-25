@@ -1,10 +1,9 @@
 <?php
-if (!isset($argv[1]) || !in_array($argv[1], ['nfo', 'filename', 'srr', 'uid', 'md5', 'par2', 'miscsorter', 'predbft'])) {
+if (!isset($argv[1]) || !in_array($argv[1], ['nfo', 'filename', 'uid', 'md5', 'par2', 'miscsorter', 'predbft'])) {
 	exit(
 		'First argument (mandatory):' . PHP_EOL .
 		'nfo => Attempt to fix release name using the nfo.' . PHP_EOL .
 		'filename => Attempt to fix release name using the filenames.' . PHP_EOL .
-		'srr => Attempt to fix release name using the srr file.' . PHP_EOL .
 		'uid => Attempt to fix release name using the mediainfo uid.' . PHP_EOL .
 		'md5 => Attempt to fix release name using the MD5.' . PHP_EOL .
 		'par2 => Attempt to fix release name using the par2.' . PHP_EOL .

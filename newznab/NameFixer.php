@@ -19,8 +19,6 @@ class NameFixer
 	const PROC_FILES_DONE = 1;
 	const PROC_PAR2_NONE = 0;
 	const PROC_PAR2_DONE = 1;
-	const PROC_SRR_NONE = 0;
-	const PROC_SRR_DONE = 1;
 	const PROC_UID_NONE = 0;
 	const PROC_UID_DONE = 1;
 
@@ -328,86 +326,6 @@ class NameFixer
 	}
 
 	/**
-	 * Attempts to fix release names using the SRR file extension.
-	 *
-	 * @param int     $time 1: 24 hours, 2: no time limit
-	 * @param boolean $echo 1: change the name, anything else: preview of what could have been changed.
-	 * @param int     $cats 1: other categories, 2: all categories
-	 * @param         $nameStatus
-	 * @param         $show
-	 * @param string  $guidChar
-	 * @param string  $limit
-	 */
-	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
-	{
-		$type = 'Srr, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = ' . $this->pdo->escapeString($guidChar));
-		$queryLimit = ($limit === '') ? '' : $limit;
-		if ($guid === '') {
-			$this->_echoStartMessage($time, 'srr files');
-		}
-
-		$preId = false;
-		if ($cats === 3) {
-			$query =
-				sprintf('
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groups_id,
-						rf.releases_id AS fileid, rel.id AS releases_id
-					FROM releases rel
-					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
-					WHERE rel.nzbstatus = %d
-					AND rel.predb_id < 1',
-					NZB::NZB_ADDED
-				);
-			$cats = 2;
-			$preId = true;
-		} else {
-			$query =
-				sprintf('
-					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groups_id,
-						rf.releases_id AS fileid, rel.id AS releases_id
-					FROM releases rel
-					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
-					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-					AND rf.name %s
-					AND rel.proc_srr = %d
-					%s',
-					self::IS_RENAMED_NONE,
-					Category::OTHER_MISC,
-					Category::OTHER_HASHED,
-					$this->pdo->likeString('.srr', true, false),
-					self::PROC_SRR_NONE,
-					$guid
-				);
-		}
-
-		$releases = $this->_getReleases($time, $cats, $query, $queryLimit);
-		if ($releases instanceof \Traversable && $releases !== false) {
-
-			$total = $releases->rowCount();
-			if ($total > 0) {
-				$this->_totalReleases = $total;
-				if ($guid === '') {
-					echo $this->pdo->log->primary(number_format($total) . ' srr files to process.');
-				}
-
-				foreach ($releases as $release) {
-					$this->done = $this->matched = false;
-					$this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
-					$this->checked++;
-					$this->_echoRenamed($show);
-				}
-
-				$this->_echoFoundCount($echo, ' files');
-			} elseif ($guid === '') {
-				echo $this->pdo->log->info('Nothing to fix.');
-			} else {
-				echo '.';
-			}
-		}
-	}
-
-	/**
 	 * Attempts to fix release names using the Par2 File.
 	 *
 	 * @param int  $time 1: 24 hours, 2: no time limit
@@ -484,58 +402,57 @@ class NameFixer
 	 * @param int     $cats 1: other categories, 2: all categories
 	 * @param         $nameStatus
 	 * @param         $show
-	 * @param string  $guidChar
-	 * @param int     $limit
 	 */
-	public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
+	public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show)
 	{
 		$type = 'UID, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = ' . $this->pdo->escapeString($guidChar));
-		$queryLimit = ($limit === '') ? '' : $limit;
-		if ($guid === '') {
-			$this->_echoStartMessage($time, 'mediainfo Unique_IDs');
-		}
 
-		// Only select releases we haven't checked here before
+		$this->_echoStartMessage($time, 'mediainfo Unique_IDs');
+
+		// Re-check all releases we haven't matched to a PreDB
 		if ($cats === 3) {
 			$query = sprintf('
-					SELECT rel.id AS releases_id, rel.name AS textstring
-					FROM releases rel
-					INNER JOIN release_unique ru ON ru.releases_id = rel.id
-					WHERE rel.nzbstatus = %d
-					AND rel.predb_id < 1',
+				SELECT
+					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.categories_id,
+					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
+					HEX(ru.uniqueid) AS uid
+				FROM releases rel
+				LEFT JOIN release_unique ru ON ru.releases_id = rel.id
+				WHERE ru.releases_id IS NOT NULL
+				AND rel.nzbstatus = %d
+				AND rel.predb_id = 0',
 				NZB::NZB_ADDED
 			);
+			$cats = 2;
+			// Otherwise check only releases we haven't renamed and checked uid before in Misc categories
 		} else {
 			$query = sprintf('
 				SELECT
 					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.categories_id,
-					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, ru.releases_id,
+					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
 					HEX(ru.uniqueid) AS uid
 				FROM releases rel
-				INNER JOIN release_unique ru ON ru.releases_id = rel.id
-				WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
+				LEFT JOIN release_unique ru ON ru.releases_id = rel.id
+				WHERE ru.releases_id IS NOT NULL
+				AND rel.nzbstatus = %d
+				AND rel.isrenamed = 0
+				AND rel.categories_id IN (%d, %d)
 				AND rel.proc_uid = %d
-				%s
-				ORDER BY rel.id DESC
-				LIMIT %d',
+				%s',
+				NZB::NZB_ADDED,
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
 				Category::OTHER_HASHED,
-				self::PROC_UID_NONE,
-				$guid,
-				$queryLimit
+				self::PROC_UID_NONE
 			);
 		}
 
-		$releases = $this->pdo->queryDirect($query);
+		$releases = $this->_getReleases($time, $cats, $query);
 		if ($releases instanceof \Traversable && $releases !== false) {
 			$total = $releases->rowCount();
 			if ($total > 0) {
 				$this->_totalReleases = $total;
-				if ($guid === '') {
-					echo $this->pdo->log->primary(number_format($total) . ' unique ids to process.');
-				}
+				echo $this->pdo->log->primary(number_format($total) . ' unique ids to process.');
 				foreach ($releases as $rel) {
 					$this->checked++;
 					$this->done = $this->matched = false;
@@ -543,10 +460,8 @@ class NameFixer
 					$this->_echoRenamed($show);
 				}
 				$this->_echoFoundCount($echo, ' UID\'s');
-			} elseif ($guid === '') {
-				echo $this->pdo->log->info('Nothing to fix.');
 			} else {
-				echo '.';
+				echo $this->pdo->log->info('Nothing to fix.');
 			}
 		}
 	}
@@ -678,13 +593,6 @@ class NameFixer
 					}
 				}
 
-				if ($type === "Srr, ") {
-					$newName = ucwords($newName);
-					if (preg_match('/(.+?)\.(srr)?$/i', $name, $match)) {
-						$newName = $match[1];
-					}
-				}
-
 				$this->fixed++;
 
 				$newName = explode("\\", $newName);
@@ -752,9 +660,6 @@ class NameFixer
 								break;
 							case "sorter, ":
 								$status = "isrenamed = 1, iscategorized = 1, proc_sorter = 1,";
-								break;
-							case "Srr, ":
-								$status = "isrenamed = 1, iscategorized = 1, proc_srr = 1,";
 								break;
 							case "UID, ":
 								$status = "isrenamed = 1, iscategorized = 1, proc_uid = 1,";
@@ -1131,9 +1036,6 @@ class NameFixer
 				case "PAR2, ":
 					$this->fileCheck($release, $echo, $type, $namestatus, $show);
 					break;
-				case "Srr, ":
-					$this->srrCheck($release, $echo, $type, $namestatus, $show);
-					break;
 				case "UID, ":
 					$this->uidCheck($release, $echo, $type, $namestatus, $show);
 					break;
@@ -1165,9 +1067,6 @@ class NameFixer
 						break;
 					case "PAR2, ":
 						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releases_id']);
-						break;
-					case "Srr, ":
-						$this->_updateSingleColumn('proc_srr', self::PROC_SRR_DONE, $release['releases_id']);
 						break;
 					case "UID, ":
 						$this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
@@ -1712,63 +1611,48 @@ class NameFixer
 	}
 
 	/**
-	 * Look for a name based on srr filename.
-	 *
-	 * @param         $release
-	 * @param boolean $echo
-	 * @param string  $type
-	 * @param         $namestatus
-	 * @param         $show
-	 */
-	public function srrCheck($release, $echo, $type, $namestatus, $show)
-	{
-		$result = [];
-
-		if ($this->done === false && $this->relid !== $release["releases_id"]) {
-			if (preg_match('/(.+?)\.(srr)$/i', $release["textstring"], $result)) {
-				$this->updateRelease($release, $result["1"], $method = "srrCheck: Srr filename", $echo, $type, $namestatus, $show);
-			}
-		}
-	}
-
-	/**
 	 * Look for a name based on mediainfo xml Unique_ID.
 	 *
-	 * @param         $release
-	 * @param         $release
-	 * @param boolean $echo
-	 * @param string  $type
-	 * @param         $namestatus
-	 * @param         $show
+	 * @param array   $release The release to be matched
+	 * @param boolean $echo Should we show CLI output
+	 * @param string  $type The rename type
+	 * @param int     $namestatus Should we rename the release if match is found
+	 * @param int     $show Should we show the rename results
+	 *
+	 * @return bool Whether or not we matched the release
 	 */
-	protected function uidCheck($release, $echo, $type, $namestatus, $show)
+	public function uidCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releases_id"]) {
-			$result = $this->pdo->queryOneRow("
+			$result = $this->pdo->queryDirect("
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.predb_id
 				FROM release_unique ru
-				LEFT JOIN releases r ON ru.releases_id = r.id
-				WHERE ru.uniqueid = UNHEX('{$release['uid']}')
+				STRAIGHT_JOIN releases r ON ru.releases_id = r.id
+				WHERE ru.uniqueid = UNHEX({$this->pdo->escapeString($release['uid'])})
 				AND ru.releases_id != {$release['releases_id']}
 				AND (r.predb_id > 0 OR r.anidbid > 0)"
 			);
-			if ($result !== false) {
-				$floor = floor((1 - $result['relsize'] / $release['relsize']) * 100);
-				if ($floor <= 5 && $floor >= -5) {
-					$this->updateRelease(
-						$release,
-						$result['searchname'],
-						$method = "uidCheck: Unique_ID",
-						$echo,
-						$type,
-						$namestatus,
-						$show,
-						$result['predb_id']
-					);
-				} else {
-					$this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
+
+			if ($result instanceof \Traversable) {
+				foreach ($result AS $res) {
+					$floor = round(($res['relsize'] - $release['relsize']) / $res['relsize'] * 100, 1);
+					if ($floor >= -5 && $floor <= 5) {
+						$this->updateRelease(
+							$release,
+							$res['searchname'],
+							$method = "uidCheck: Unique_ID",
+							$echo,
+							$type,
+							$namestatus,
+							$show,
+							$res['predb_id']
+						);
+						return true;
+					}
 				}
 			}
 		}
+		$this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
+		return false;
 	}
 }

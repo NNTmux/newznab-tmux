@@ -147,7 +147,6 @@ class Forking extends \fork_daemon
 
 			case 'fixRelNames_nfo':
 			case 'fixRelNames_filename':
-			case 'fixRelNames_srr':
 			case 'fixRelNames_uid':
 			case 'fixRelNames_md5':
 			case 'fixRelNames_par2':
@@ -524,14 +523,9 @@ class Forking extends \fork_daemon
 				$where = "r.proc_files = 0";
 				break;
 
-			case "srr":
-				$join = "STRAIGHT_JOIN release_files rf ON rf.releases_id = r.id";
-				$where = "r.proc_srr = 0";
-				break;
-
 			case "uid":
-				$join = "STRAIGHT_JOIN release_unique ru ON ru.releases_id = r.id";
-				$where = "r.proc_uid = 0";
+				$join = "LEFT JOIN release_unique ru ON ru.releases_id = r.id";
+				$where = "ru.releases_id IS NOT NULL AND r.nzbstatus = 1 AND r.predb_id = 0 AND r.proc_uid = 0";
 				break;
 
 			case "par2":
