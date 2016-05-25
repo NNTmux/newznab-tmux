@@ -75,7 +75,7 @@
 						<table class="data table table-striped responsive-utilities jambo-table bulk-action">
 							<thead>
 							<tr class="headings">
-								<th><input id="check-all" type="checkbox" class="flat-all"/> Select All</th>
+								<th><input id="check-all" type="checkbox" class="flat-all"/></th>
 								<th>Name
 									<a title="Sort Descending" href="{$orderbyname_desc}"><i
 												class="fa-icon-caret-down text-muted"> </i></a>

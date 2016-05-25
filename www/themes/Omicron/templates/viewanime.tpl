@@ -81,7 +81,7 @@
 					<table style="width:100%;" class="data table table-condensed table-striped table-responsive table-hover"
 						   id="browsetable">
 						<tr>
-							<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
+							<th><input id="chkSelectAll" type="checkbox" class="square-all"/></th>
 							<th>Name</th>
 							<th>Category</th>
 							<th>Posted</th>
