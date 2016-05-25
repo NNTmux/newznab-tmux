@@ -225,12 +225,14 @@ class Releases
 			$orderBy[1],
 			($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
 		);
+
 		$sql = $this->pdo->query($qry, true, NN_CACHE_EXPIRY_MEDIUM);
 
 		if (!empty($sql)) {
 			$sql[0]['_totalcount'] = (isset($releases['total']) ? $releases['total'] : 0);
 		}
 
+		return $sql;
 	}
 
 	/**
