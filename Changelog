@@ -1,5 +1,3 @@
-2016-05-25 DariusIII
-	* Chg: Move icheck from custom.js to functions.js
 2016-05-24 DariusIII
 	* Chg: Rename groupid column to groups_id.
 	* Upd: Improve speed of update_releases on larger databases

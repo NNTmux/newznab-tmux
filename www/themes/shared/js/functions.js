@@ -1210,33 +1210,3 @@ function getHistory()
         timeout:5000
     });
 }
-
-/** ******  iswitch  *********************** **/
-
-$(function () {
-    var checkAll = $('input.flat-all');
-    var checkboxes = $('input.flat');
-
-    $('input').iCheck({
-        checkboxClass: 'icheckbox_flat-green',
-        radioClass: 'iradio_flat-green'
-    });
-
-    checkAll.on('ifChecked ifUnchecked', function(event) {
-        if (event.type == 'ifChecked') {
-            checkboxes.iCheck('check');
-        } else {
-            checkboxes.iCheck('uncheck');
-        }
-    });
-
-    checkboxes.on('ifChanged', function(event){
-        if(checkboxes.filter(':checked').length == checkboxes.length) {
-            checkAll.prop('checked', 'checked');
-        } else {
-            checkAll.prop('checked', false);
-        }
-        checkAll.iCheck('update');
-    });
-});
-/** ******  /iswitch  *********************** **/
