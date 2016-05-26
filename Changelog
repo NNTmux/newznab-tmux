@@ -1,3 +1,6 @@
+2016-05-26 DariusIII
+	* Fix: Remove lines not needed in register, login and forgottenpassword pages in themes
+	* Upd: Update composer.lock file with new versions of datatables and jquery.
 2016-05-24 DariusIII
 	* Chg: Rename groupid column to groups_id.
 	* Upd: Improve speed of update_releases on larger databases
