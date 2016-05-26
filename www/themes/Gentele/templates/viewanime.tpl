@@ -103,7 +103,7 @@
 																 value="{$result.guid}"/></td>
 										<td>
 											<a title="View details"
-											   href="{$smarty.const.WWW_TOP}/details/{$result.guid}"}</a>
+											   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
 											<div>
 												<div>
 													{if $result.nfoid > 0}<span><a
