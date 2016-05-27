@@ -132,7 +132,7 @@
 	</div>
 {elseif ($search || $subject || $searchadvr || $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) == ""}
 {else}
-	<div class="well well-small">
+	<div class="well well-sm">
 		<form style="padding-top:10px;" id="nzb_multi_operations_form" method="get"
 			  action="{$smarty.const.WWW_TOP}/search">
 			<div class="row">

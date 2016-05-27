@@ -1,4 +1,5 @@
 2016-05-27 DariusIII
+	* Upd: Use well-sm in all themes
 	* Chg: Use bootstrap3 css in Gamma theme
 2016-05-26 DariusIII
 	* Fix: Remove lines not needed in register, login and forgottenpassword pages in themes

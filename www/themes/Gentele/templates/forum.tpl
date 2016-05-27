@@ -1,4 +1,4 @@
-<div class="well well-small">
+<div class="well well-sm">
 	<h1>Forum</h1>
 	{if $results|@count > 0}
 		{$pager}

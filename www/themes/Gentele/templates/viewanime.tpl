@@ -14,7 +14,7 @@
 		</div>
 	</div>
 	<h1>
-		<div class="well well-small">
+		<div class="well well-sm">
 			{$animeTitle}
 			{if isset($isadmin)}
 				<a class="btn btn-xs btn-warning" title="Edit AniDB data"
@@ -22,7 +22,7 @@
 			{/if}
 		</div>
 	</h1>
-	<div class="well well-small">
+	<div class="well well-sm">
 		{if animePicture != ''}
 			<div style="text-align: center;">
 				<img class="shadow img img-polaroid" alt="{$animeTitle} Picture"
@@ -52,7 +52,7 @@
 		</div>
 	</div>
 	<form id="nzb_multi_operations_form" action="get">
-		<div class="well well-small">
+		<div class="well well-sm">
 			<div class="nzb_multi_operations">
 				With Selected:
 				<div class="btn-group">
