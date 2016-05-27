@@ -1,13 +1,13 @@
 <?php
 require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\processing\PostProcess;
+use newznab\MiscSorter;
 use newznab\NameFixer;
+use newznab\Nfo;
 use newznab\NNTP;
 use newznab\NZBContents;
-use newznab\Nfo;
-use newznab\MiscSorter;
+use newznab\db\Settings;
+use newznab\processing\PostProcess;
 
 $pdo = new Settings();
 
@@ -30,17 +30,18 @@ if (!isset($argv[1])) {
 					INNER JOIN release_nfos rn ON r.id = rn.releases_id
 					WHERE r.leftguid = %s
 					AND r.nzbstatus = 1
-					AND r.proc_nfo = 0
+					AND r.proc_nfo = %d
 					AND r.nfostatus = 1
-					AND r.predb_id < 1
+					AND r.predb_id = 0
 					ORDER BY r.id DESC
 					LIMIT %s',
 					$pdo->escapeString($guidChar),
+					$namefixer::PROC_NFO_NONE,
 					$maxperrun
 				)
 			);
 
-			if ($releases instanceof Traversable) {
+			if ($releases instanceof \Traversable) {
 				foreach ($releases as $release) {
 					if (preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])) {
 						$namefixer->done = $namefixer->matched = false;
@@ -58,10 +59,64 @@ if (!isset($argv[1])) {
 			}
 			break;
 		case $pieces[0] === 'filename' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
-			$namefixer->fixNamesWithFiles(1, 1, 1, 1, 1, $guidChar, $maxperrun);
+			$releases = $pdo->queryDirect(
+				sprintf('
+					SELECT rf.name AS textstring, rf.releases_id AS fileid,
+						r.id AS releases_id, r.name, r.searchname, r.categories_id, r.groups_id
+					FROM releases r
+					INNER JOIN release_files rf ON r.id = rf.releases_id
+					WHERE r.leftguid = %s
+					AND r.nzbstatus = 1
+					AND r.proc_files = %d
+					AND r.predb_id = 0
+					ORDER BY r.id ASC
+					LIMIT %s',
+					$pdo->escapeString($guidChar),
+					$namefixer::PROC_FILES_NONE,
+					$maxperrun
+				)
+			);
+
+			if ($releases instanceof \Traversable) {
+				foreach ($releases as $release) {
+					$namefixer->done = $namefixer->matched = false;
+					if ($namefixer->checkName($release, true, 'Filenames, ', 1, 1) !== true) {
+						echo '.';
+					}
+					$namefixer->checked++;
+				}
+			}
 			break;
-		case $pieces[0] === 'srr' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
-			$namefixer->fixNamesWithSrr(1, 1, 1, 1, 1, $guidChar, $maxperrun);
+		case $pieces[0] === 'uid' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
+			$releases = $pdo->queryDirect(
+				sprintf('
+					SELECT
+						r.id AS releases_id, r.size AS relsize, r.groups_id, r.categories_id,
+						r.name, r.name AS textstring, r.predb_id, r.searchname,
+						HEX(ru.uniqueid) AS uid
+					FROM releases r
+					LEFT JOIN release_unique ru ON ru.releases_id = r.id
+					WHERE ru.releases_id IS NOT NULL
+					AND r.leftguid = %s
+					AND r.nzbstatus = 1
+					AND r.predb_id = 0
+					AND r.proc_uid = %d
+					ORDER BY r.id DESC
+					LIMIT %d',
+					$pdo->escapeString($guidChar),
+					$namefixer::PROC_UID_NONE,
+					$maxperrun
+				)
+			);
+			if ($releases instanceof \Traversable) {
+				foreach ($releases as $release) {
+					$namefixer->done = $namefixer->matched = false;
+					if ($namefixer->uidCheck($release, true, 'UID, ', 1, 1) === false) {
+						echo '.';
+					}
+					$namefixer->checked++;
+				}
+			}
 			break;
 		case $pieces[0] === 'md5' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
@@ -74,15 +129,15 @@ if (!isset($argv[1])) {
 					AND nzbstatus = 1
 					AND r.ishashed = 1
 					AND r.dehashstatus BETWEEN -6 AND 0
-					AND r.predb_id < 1
+					AND r.predb_id = 1
 					ORDER BY r.dehashstatus DESC, r.id ASC
-								LIMIT %s',
+					LIMIT %s',
 					$pdo->escapeString($guidChar),
 					$maxperrun
 				)
 			);
 
-			if ($releases instanceof Traversable) {
+			if ($releases instanceof \Traversable) {
 				foreach ($releases as $release) {
 					if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['name'], $matches)) {
 						$namefixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
@@ -102,16 +157,17 @@ if (!isset($argv[1])) {
 					FROM releases r
 					WHERE r.leftguid = %s
 					AND r.nzbstatus = 1
-					AND r.proc_par2 = 0
-					AND r.predb_id < 1
+					AND r.proc_par2 = %d
+					AND r.predb_id = 0
 					ORDER BY r.id ASC
-								LIMIT %s',
+					LIMIT %s',
 					$pdo->escapeString($guidChar),
+					$namefixer::PROC_PAR2_NONE,
 					$maxperrun
 				)
 			);
 
-			if ($releases instanceof Traversable) {
+			if ($releases instanceof \Traversable) {
 				$nntp = new NNTP(['Settings' => $pdo]);
 				if (($pdo->getSetting('alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 					exit($pdo->log->error("Unable to connect to usenet."));
@@ -119,10 +175,10 @@ if (!isset($argv[1])) {
 
 				$Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);
 				$nzbcontents = new NZBContents(
-					array(
+					[
 						'Echo' => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,
 						'PostProcess' => new PostProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer])
-					)
+					]
 				);
 				foreach ($releases as $release) {
 					$res = $nzbcontents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], 1, 1);
@@ -140,17 +196,19 @@ if (!isset($argv[1])) {
 					WHERE r.leftguid = %s
 					AND r.nzbstatus = 1
 					AND r.nfostatus = 1
-					AND r.proc_sorter = 0
-					AND r.isrenamed = 0
-					AND r.predb_id < 1
+					AND r.proc_sorter = %d
+					AND r.isrenamed = %d
+					AND r.predb_id = 0
 					ORDER BY r.id DESC
 					LIMIT %s',
 					$pdo->escapeString($guidChar),
+					MiscSorter::PROC_SORTER_NONE,
+					$namefixer::IS_RENAMED_NONE,
 					$maxperrun
 				)
 			);
 
-			if ($releases instanceof Traversable) {
+			if ($releases instanceof \Traversable) {
 				$sorter = new MiscSorter(true, $pdo);
 				foreach ($releases as $release) {
 					$res = $sorter->nfosorter(null, $release['releases_id']);
@@ -173,7 +231,7 @@ if (!isset($argv[1])) {
 				)
 			);
 
-			if ($pres instanceof Traversable) {
+			if ($pres instanceof \Traversable) {
 				foreach ($pres as $pre) {
 					$namefixer->done = $namefixer->matched = false;
 					$ftmatched = $searched = 0;
@@ -187,7 +245,15 @@ if (!isset($argv[1])) {
 						$searched = $pre['searched'] - 1;
 						echo ".";
 					}
-					$pdo->queryExec(sprintf("UPDATE predb SET searched = %d WHERE id = %d", $searched, $pre['predb_id']));
+					$pdo->queryExec(
+						sprintf("
+							UPDATE predb
+							SET searched = %d
+							WHERE id = %d",
+							$searched,
+							$pre['predb_id']
+						)
+					);
 					$namefixer->checked++;
 				}
 			}

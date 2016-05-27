@@ -75,7 +75,6 @@ class Category
 	const BOOKS_TECHNICAL = '7040';
 	const BOOKS_FOREIGN = '7060';
 	const BOOKS_UNKNOWN = '7999';
-	const BOOKS_ROOT = '7000';
 	const OTHER_ROOT = '0000';
 	const GAME_ROOT = '1000';
 	const MOVIE_ROOT = '2000';
@@ -83,13 +82,14 @@ class Category
 	const PC_ROOT = '4000';
 	const TV_ROOT = '5000';
 	const XXX_ROOT = '6000';
+	const BOOKS_ROOT = '7000';
 	const STATUS_INACTIVE = 0;
 	const STATUS_ACTIVE = 1;
 	const STATUS_DISABLED = 2;
 
 	const OTHERS_GROUP =
 		[
-			self::BOOKS_ROOT,
+			self::BOOKS_UNKNOWN,
 			self::GAME_OTHER,
 			self::MOVIE_OTHER,
 			self::MUSIC_OTHER,
