@@ -193,13 +193,44 @@ class Releases
 	 * @param int    $maxAge
 	 * @param array  $excludedCats
 	 * @param string $groupName
-	 * @param string $minSize
+	 * @param int $minSize
 	 *
 	 * @return array
 	 */
 	public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [], $groupName = '', $minSize = 0)
 	{
 		$orderBy = $this->getBrowseOrder($orderBy);
+
+		$releases = $this->pdo->queryCalc(
+			sprintf("
+				SELECT SQL_CALC_FOUND_ROWS
+					r.id
+				FROM releases r
+				LEFT JOIN groups g ON g.id = r.groups_id
+				WHERE r.nzbstatus = %d
+				AND r.passwordstatus %s
+				%s %s %s %s %s
+				ORDER BY %s %s %s",
+				NZB::NZB_ADDED,
+				$this->showPasswords,
+				$this->categorySQL($cat),
+				($maxAge > 0 ? (" AND postdate > NOW() - INTERVAL " . $maxAge . ' DAY ') : ''),
+				(count($excludedCats) ? (' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')') : ''),
+				($groupName != '' ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
+				($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
+				$orderBy[0],
+				$orderBy[1],
+				($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+			),
+			true,
+			NN_CACHE_EXPIRY_MEDIUM
+		);
+
+		if (is_array($releases['result'])) {
+			foreach ($releases['result'] as $release => $id) {
+				$releaseIDs[] = $id['id'];
+			}
+		}
 
 		$qry = sprintf(
 			"SELECT r.*,
@@ -222,8 +253,7 @@ class Releases
 			ORDER BY %s %s",
 			(isset($releaseIDs) ? implode(',', $releaseIDs) : -1),
 			$orderBy[0],
-			$orderBy[1],
-			($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+			$orderBy[1]
 		);
 
 		$sql = $this->pdo->query($qry, true, NN_CACHE_EXPIRY_MEDIUM);
