@@ -159,12 +159,12 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																  data-toggle="tooltip" data-placement="top" title
 																  data-original-title="Send to my download basket"><i
 																		class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i
@@ -174,7 +174,7 @@
 																		<span
 																			id="imdb{$result.imdbid}"
 																			href="javascript:;"
-																			class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
+																			class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
 																			data-toggle="tooltip" data-placement="top"
 																			title data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
@@ -295,12 +295,12 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																  data-toggle="tooltip" data-placement="top" title
 																  data-original-title="Send to my download basket"><i
 																		class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i
@@ -310,7 +310,7 @@
 																		<span
 																			id="imdb{$result.imdbid}"
 																			href="javascript:;"
-																			class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
+																			class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
 																			data-toggle="tooltip" data-placement="top"
 																			title data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
