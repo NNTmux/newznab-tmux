@@ -108,7 +108,6 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
 <!-- jQuery migrate script -->
 <script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
@@ -117,6 +116,7 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/utils-admin.js"></script>
 <!-- Custom functions -->
 <script src="{$smarty.const.WWW_THEMES}/shared/js/functions.js" type="text/javascript"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
 <!-- pace -->
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/pace/pace.min.js"></script>
 
