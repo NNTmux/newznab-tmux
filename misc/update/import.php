@@ -146,7 +146,7 @@ foreach ($filestoprocess as $nzbFile) {
 						$regexMatches['regcatid'] = ($categoryoverride != -1 ? $categoryoverride : $regexMatches['regcatid']);
 
 						$sql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalParts, groupid, binaryhash, dateadded,
-                        categoryid, regexid, reqid, procstat, relpart, reltotalpart, relname)
+                        categories_id, regexid, reqid, procstat, relpart, reltotalpart, relname)
                         values (%s, %s, %s, %s, %d, %d, %s, NOW(), %s, %d, %s, %d, %d, %d, %s )",
 							$db->escapeString($postFile["subject"]), $db->escapeString($postFile["poster"]),
 							$db->escapeString(date("Y-m-d H:i:s", $postFile["posted"])),

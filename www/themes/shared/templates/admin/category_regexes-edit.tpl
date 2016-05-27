@@ -2,8 +2,9 @@
 {if isset($error) && $error != ''}
 	<div class="error">{$error}</div>
 {/if}
+<div class="well well-sm">
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td><label for="group_regex">Group:</label></td>
 			<td>
@@ -57,17 +58,18 @@
 			</td>
 		</tr>
 		<tr>
-			<td><label for="category_id">Category:</label></td>
+			<td><label for="categories_id">Category:</label></td>
 			<td>
-				{html_options id="category_id" name='category_id' values=$category_ids output=$category_names selected=$regex.category_id}
+				{html_options id="categories_id" name='categories_id' values=$category_ids output=$category_names selected=$regex.categories_id}
 				<div class="hint">Select a category which releases matched to this regex will go into.</div>
 			</td>
 		</tr>
 		<tr>
 			<td></td>
 			<td>
-				<input type="submit" value="Save" />
+				<input class="btn btn-default" type="submit" value="Save" />
 			</td>
 		</tr>
 	</table>
 </form>
+	</div>

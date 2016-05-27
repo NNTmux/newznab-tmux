@@ -18,7 +18,7 @@ pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
 def connect():
     conf = readConfig()
     con = None
-    if conf['DB_TYPE'] == "mysql":
+    if conf['DB_SYSTEM'] == "mysql":
         try:
             import cymysql as mdb
             if conf['DB_PORT'] != '':
@@ -28,7 +28,7 @@ def connect():
         except ImportError:
             print(bcolors.ERROR + "\nPlease install cymysql for python 3, \ninformation can be found in threaded_scripts_readme.txt\n" + bcolors.ENDC)
             sys.exit()
-    elif conf['DB_TYPE'] == "pgsql":
+    elif conf['DB_SYSTEM'] == "pgsql":
         try:
             import psycopg2 as mdb
             con = mdb.connect(host=conf['DB_HOST'], user=conf['DB_USER'], password=conf['DB_PASSWORD'], dbname=conf['DB_NAME'], port=int(conf['DB_PORT']))

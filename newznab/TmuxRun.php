@@ -175,6 +175,7 @@ class TmuxRun extends Tmux
 				$log = $this->writelog($runVar['panes']['one'][0]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.0 ' \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/fixrelnames.php md5 $log; \
+					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/fixrelnames.php srr $log; \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/fixrelnames.php filename $log; \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/fixrelnames.php nfo $log; \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/fixrelnames.php par2 $log; \
@@ -235,7 +236,7 @@ class TmuxRun extends Tmux
 
 				$log = $this->writelog($runVar['panes']['one'][1]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.1 ' \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/nix/scripts/tmux/bin/postprocess.php amazon true $log; \
+						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/nix/tmux/bin/postprocess.php amazon true $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_amazon']}' 2>&1 1> /dev/null"
 				);
 				break;
@@ -274,6 +275,7 @@ class TmuxRun extends Tmux
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/postprocess.php tv $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/postprocess.php mov $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/tmux/bin/postprocess.php anime true $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/PostProc/check_covers.php true $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_non']}' 2>&1 1> /dev/null"
 				);
 				break;

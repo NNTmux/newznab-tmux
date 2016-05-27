@@ -1,3 +1,4 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 <form action="{$SCRIPT_NAME}?action=submit" method="post">
@@ -8,7 +9,7 @@
 
 <fieldset>
 	<legend>Tmux - How It Works</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="explain">Information:</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
@@ -34,7 +35,7 @@
 
 <fieldset>
 	<legend>Monitor</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="running">Tmux Scripts Running:</label></td>
 			<td>
@@ -136,7 +137,7 @@
 
 <fieldset>
 	<legend>Sequential</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="sequential">Run Sequential:</label></td>
 			<td>
@@ -167,14 +168,14 @@
 
 <fieldset>
 	<legend>Update Binaries</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="binaries">Update Binaries:</label></td>
 			<td>
 				{html_options style="width:180px;" class="siteeditstyle" id="binaries" name='binaries' values=$binaries_ids output=$binaries_names selected=$ftmux->binaries}
 				<div class="hint">Choose to run update_binaries. Update binaries gets from your last_record to now.<br/>Simple
 					Threaded Update runs 1 group per thread.<br/>Complete Threaded Update splits all work across
-					multiple threads(binaries_safe_threaded.py).
+					multiple threads.
 				</div>
 			</td>
 		</tr>
@@ -202,7 +203,7 @@
 
 <fieldset>
 	<legend>Backfill</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="backfill">Backfill:</label></td>
 			<td>
@@ -213,7 +214,7 @@
 					Disabled - Disables backfill from running.<br/>
 					Safe - Backfills 1 group by backfill days (set in admin-view groups), using the number of threads
 					set in admin. This downloads Backfill Quantity times the Backfill Threads, each
-					loop(backfill_safe_threaded.py). <br \>
+					loop. <br \>
 					example: you have Backfill Threads = 10, Backfill Quantity = 20k, Max Messages = 5k: you will run 10
 					threads, queue of 40 and download 200k headers.<br/>
 					Interval - Backfills the number of groups (set in tmux), by backfill days (set in admin-view
@@ -280,7 +281,7 @@
 
 <fieldset>
 	<legend>Import nzbs</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="import">Import nzbs:</label></td>
 			<td>
@@ -334,7 +335,7 @@
 
 <fieldset>
 	<legend>Update Releases</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="releases">Update Releases:</label></td>
 			<td>
@@ -360,7 +361,7 @@
 
 <fieldset>
 	<legend>Postprocessing</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="post">Postprocess Additional:</label></td>
 			<td>
@@ -433,7 +434,7 @@
 
 <fieldset>
 	<legend>Comment Sharing</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="run_sharing">Comment Sharing :</label></td>
 			<td>
@@ -459,7 +460,7 @@
 
 <fieldset>
 	<legend>Fix Release Names</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="fix_names">Fix Release Names:</label></td>
 			<td>
@@ -483,7 +484,7 @@
 
 <fieldset>
 	<legend>Remove Crap Releases</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="fix_crap">Remove Crap Releases:</label></td>
 			<td>
@@ -510,7 +511,7 @@
 </fieldset>
 <fieldset>
 	<legend>Decrypt Hashes</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="dehash">Decrypt Hash Based Release Names:</label></td>
 			<td>
@@ -541,7 +542,7 @@
 </fieldset>
 <fieldset>
 	<legend>Update TV/Theater</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="update_tv">Update TV and Theater Schedules:</label></td>
 			<td>
@@ -565,7 +566,7 @@
 
 <fieldset>
 	<legend>PreDb IRC Scraper</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="scrape_cz">Scrape Irc Channels:</label></td>
 			<td>
@@ -591,7 +592,7 @@
 
 <fieldset>
 	<legend>Miscellaneous</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="niceness">Niceness:</label></td>
 			<td>
@@ -663,7 +664,7 @@
 
 <fieldset>
 	<legend>Server Monitors</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="showquery">Display Query Times:</label></td>
 			<td>
@@ -779,6 +780,7 @@
 	</table>
 </fieldset>
 
-<input type="submit" value="Save Tmux Settings"/>
+<input class="btn btn-default" type="submit" value="Save Tmux Settings"/>
 
 </form>
+	</div>

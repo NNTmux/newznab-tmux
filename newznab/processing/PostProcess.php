@@ -339,7 +339,7 @@ class PostProcess
 
 		$query = $this->pdo->queryOneRow(
 			sprintf('
-				SELECT id, groupid, categoryid, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, id AS releaseid
+				SELECT id, groups_id, categories_id, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, id AS releases_id
 				FROM releases
 				WHERE isrenamed = 0
 				AND id = %d',
@@ -354,7 +354,7 @@ class PostProcess
 		// Only get a new name if the category is OTHER.
 		$foundName = true;
 		if (!in_array(
-			(int)$query['categoryid'],
+			(int)$query['categories_id'],
 			Category::OTHERS_GROUP
 		)
 		) {
@@ -396,9 +396,9 @@ class PostProcess
 					if ($filesAdded < 11 &&
 						$this->pdo->queryOneRow(
 							sprintf('
-								SELECT releaseid
+								SELECT releases_id
 								FROM release_files
-								WHERE releaseid = %d
+								WHERE releases_id = %d
 								AND name = %s',
 								$relID,
 								$this->pdo->escapeString($file['name'])
@@ -470,14 +470,14 @@ class PostProcess
 		$query = $this->pdo->queryOneRow(
 			sprintf('
 				SELECT
-					r.id, r.groupid, r.categoryid, r.name, r.searchname,
+					r.id, r.groups_id, r.categories_id, r.name, r.searchname,
 					UNIX_TIMESTAMP(r.postdate) AS post_date,
-					r.id AS releaseid,
+					r.id AS releases_id,
 					g.name AS groupname
 				FROM releases r
-				LEFT JOIN groups g ON r.groupid = g.id
+				LEFT JOIN groups g ON r.groups_id = g.id
 				WHERE r.isrenamed = 0
-				AND r.preid = 0
+				AND r.predb_id = 0
 				AND r.id = %d',
 				$relID
 			)

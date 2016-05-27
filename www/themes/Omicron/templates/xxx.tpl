@@ -21,7 +21,7 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
+								Check all: <input type="checkbox" class="square-all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<input type="button"
@@ -148,8 +148,8 @@
 															><img
 																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-default"
+														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-default"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
@@ -300,8 +300,8 @@
 															><img
 																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-default"
+														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-default"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
@@ -372,7 +372,7 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
+								Check all: <input type="checkbox" class="square-all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<input type="button"

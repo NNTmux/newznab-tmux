@@ -40,7 +40,7 @@ datelimit = "AND DATEDIFF(NOW(), r.adddate) <= 7"
 groupby = "GROUP BY guidchar"
 orderby = "ORDER BY guidchar ASC"
 rowlimit = "LIMIT 16"
-extrawhere = "AND r.preid = 0 AND r.nzbstatus = 1"
+extrawhere = "AND r.predb_id = 0 AND r.nzbstatus = 1"
 select = "DISTINCT LEFT(r.guid, 1) AS guidchar, COUNT(*) AS count"
 
 cur[0].execute("SELECT value FROM settings WHERE setting = 'fixnamethreads'")
@@ -54,12 +54,12 @@ if threads > 16:
 maxperrun = int(run_perrun[0])
 
 if sys.argv[1] == "md5":
-	join = "LEFT OUTER JOIN release_files rf ON r.id = rf.releaseid AND rf.ishashed = 1"
+	join = "LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id AND rf.ishashed = 1"
 	where = "r.ishashed = 1 AND r.dehashstatus BETWEEN -6 AND 0"
 elif sys.argv[1] == "nfo":
 	where = "r.proc_nfo = 0 AND r.nfostatus = 1"
 elif sys.argv[1] == "filename":
-	join = "INNER JOIN release_files rf ON r.id = rf.releaseid"
+	join = "INNER JOIN release_files rf ON r.id = rf.releases_id"
 	where = "r.proc_files = 0"
 elif sys.argv[1] == "par2":
 	where = "r.proc_par2 = 0"

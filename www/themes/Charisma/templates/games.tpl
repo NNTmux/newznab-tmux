@@ -21,7 +21,7 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
+								Check all: <input type="checkbox" class="nzb_check_all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<input type="button"
@@ -103,8 +103,8 @@
 																					 title="View Desura page">
 														Desura</a>{/if}
 												{if $result.nfoid > 0}<a
-													href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-													title="View NFO" class="label label-default" rel="nfo">
+													href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+													title="View NFO" class="modal_nfo label label-default" rel="nfo">
 														NFO</a>{/if}
 												<a class="label label-default"
 												   href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name}"
@@ -196,7 +196,7 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
+								Check all: <input type="checkbox" class="nzb_check_all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<input type="button"

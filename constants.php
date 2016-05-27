@@ -1,13 +1,17 @@
 <?php
 // YOU SHOULD NOT EDIT ANYTHING IN THIS FILE, COPY .../nzedb/config/settings.example.php TO .../nzedb/config/settings.php AND EDIT THAT FILE!
 
-define('NN_MINIMUM_PHP_VERSION', '5.5.0');
+define('NN_MINIMUM_PHP_VERSION', '5.6.0');
 define('NN_MINIMUM_MYSQL_VERSION', '5.5');
 
-define('DS', DIRECTORY_SEPARATOR);
+if (!defined('DS')) {
+	define('DS', DIRECTORY_SEPARATOR);
+}
 
 // These are file path constants
-define('NN_ROOT', realpath(__DIR__) . DS);
+if (!defined('NN_ROOT')) {
+	define('NN_ROOT', realpath(__DIR__) . DS);
+}
 
 // Used to refer to the main lib class files.
 define('NN_LIB', NN_ROOT . 'newznab' . DS);
@@ -45,6 +49,15 @@ define('NN_RES', NN_ROOT . 'resources' . DS);
 // Used to refer to the covers folder
 define('NN_COVERS', NN_RES . 'covers' . DS);
 
+// Smarty's cache.
+define('NN_SMARTY_CACHE', NN_RES . 'smarty' . DS . 'cache/');
+
+// Smarty's configuration files.
+define('NN_SMARTY_CONFIGS', NN_RES .'smarty' . DS . 'configs/');
+
+// Smarty's compiled template cache.
+define('NN_SMARTY_TEMPLATES', NN_RES . 'smarty' . DS . 'templates_c/');
+
 // Used to refer to the tmp folder
 define('NN_TMP', NN_RES . 'tmp' . DS);
 
@@ -57,4 +70,4 @@ define('NN_THEMES_SHARED', NN_THEMES . 'shared' . DS);
 // Path where log files are stored.
 define('NN_LOGS', NN_RES . 'logs' . DS);
 
-define('NN_VERSIONS', NN_LIB . 'build' . DS . 'nntmux.xml');
+define('NN_VERSIONS', NN_ROOT . 'build' . DS . 'nntmux.xml');

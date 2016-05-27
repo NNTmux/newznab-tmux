@@ -1,11 +1,11 @@
-
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 <form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">
 
 <input type="hidden" name="id" value="{$movie.imdbid}" />
 
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
 	<td><label for="title">IMDB id</label>:</td>
@@ -34,7 +34,7 @@
 <tr>
 	<td><label for="plot">Plot</label>:</td>
 	<td>
-		<textarea class="autosize" id="plot" name="plot">{$movie.plot|escape:'htmlall'}</textarea>
+		<textarea id="plot" name="plot">{$movie.plot|escape:'htmlall'}</textarea>
 	</td>
 </tr>
 
@@ -69,7 +69,7 @@
 <tr>
 	<td><label for="actors">Actors</label>:</td>
 	<td>
-		<textarea class="autosize" id="actors" name="actors">{$movie.actors|escape:'htmlall'}</textarea>
+		<textarea id="actors" name="actors">{$movie.actors|escape:'htmlall'}</textarea>
 	</td>
 </tr>
 
@@ -103,10 +103,11 @@
 <tr>
 	<td></td>
 	<td>
-		<input type="submit" value="Save" />
+		<input class="btn btn-default" type="submit" value="Save" />
 	</td>
 </tr>
 
 </table>
 
 </form>
+	</div>

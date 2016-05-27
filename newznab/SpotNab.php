@@ -261,7 +261,7 @@ class SpotNab {
 		// comments they do not have a release for... Makes sense :)
 		$offset = 0;
 		$sql = "SELECT DISTINCT(gid) as gid FROM release_comments "
-			."WHERE releaseid = 0 "
+			."WHERE releases_id = 0 "
 			."AND createddate < NOW() - INTERVAL $max_days DAY "
 			."ORDER BY createddate "
 			."LIMIT %d,%d";
@@ -897,7 +897,7 @@ class SpotNab {
 
 		$affected = $this->_pdo->queryExec(sprintf('UPDATE release_comments, releases SET release_comments.gid = UNHEX(releases.nzb_guid),
 											release_comments.nzb_guid = UNHEX(releases.nzb_guid)
-											WHERE releases.id = release_comments.releaseid
+											WHERE releases.id = release_comments.releases_id
 											AND release_comments.gid IS NULL
 											AND UNHEX(release_comments.nzb_guid) = "0"
 											AND UNHEX(releases.nzb_guid) IS NOT NULL
@@ -1221,7 +1221,7 @@ class SpotNab {
 		// Comments
 		$sql_new_cmt = "INSERT INTO release_comments (".
 			"id, sourceid, username, userid, gid, cid, isvisible, ".
-			"releaseid, text, createddate, issynced, nzb_guid) VALUES (".
+			"releases_id, text, createddate, issynced, nzb_guid) VALUES (".
 			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, UNHEX(%s))";
 		$sql_upd_cmt = "UPDATE release_comments SET ".
 			"isvisible = %d, text = %s".
@@ -2046,7 +2046,7 @@ class SpotNab {
 		$sql = sprintf("SELECT r.gid, rc.id, rc.text, u.username, "
 			."rc.isvisible, rc.createddate, rc.host "
 			."FROM release_comments rc "
-			."JOIN releases r ON r.id = rc.releaseid AND rc.releaseid != 0 "
+			."JOIN releases r ON r.id = rc.releases_id AND rc.releases_id != 0 "
 			."JOIN users u ON rc.userid = u.id AND rc.userid != 0 "
 			."WHERE r.gid IS NOT NULL "
 			."AND sourceid = 0 AND issynced = 0 "

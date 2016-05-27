@@ -80,7 +80,7 @@ class DbUpdate
 		// This is for unconverted scripts that still use $db->settings instead of the $db->pdo property.
 		$this->settings =& $this->pdo;
 
-		$this->_DbSystem = strtolower($this->pdo->dbSystem());
+		$this->_DbSystem = strtolower($this->pdo->DbSystem());
 	}
 
 	public function loadTables(array $options = [])
@@ -98,7 +98,8 @@ class DbUpdate
 		$files = empty($options['files']) ? Utility::getDirFiles($options) : $options['files'];
 		natsort($files);
 		$local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
-		$sql = 'LOAD DATA ' . $local . 'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" OPTIONALLY ENCLOSED BY "\"" IGNORE 1 LINES (%s)';
+		$sql = 'LOAD DATA ' .
+			$local . 'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" OPTIONALLY ENCLOSED BY "\"" LINES TERMINATED BY "\r\n" IGNORE 1 LINES (%s)';
 		foreach ($files as $file) {
 			if ($show === true) {
 				echo "File: $file\n";

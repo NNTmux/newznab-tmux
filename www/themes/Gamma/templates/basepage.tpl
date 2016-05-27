@@ -25,6 +25,7 @@
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/bootstrap.cyborg.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/bootstrap-fixes.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.min.css" type="text/css" media="screen"/>
 
 	<!-- FAVICON -->
 	<link rel="search" type="application/opensearchdescription+xml" href="/opensearch" title="{$site->title|escape}" />
@@ -32,24 +33,23 @@
 
 	<!-- Javascripts -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"></script>
-	<script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.colorbox-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.qtip2.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate/jquery-migrate.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip.min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/utils.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.autosize-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/sorttable.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.qtip2.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/bootstrap-hover-dropdown.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 	<!-- Added the Bootstrap JS -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"></script>
 	<!-- Pines Notify -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.pnotify.js"></script>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
-	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/html5shiv/dist/html5shiv.min.js"></script>
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/respond/dest/respond.min.js"></script>
 	<![endif]-->
 	{literal}
 	<script>

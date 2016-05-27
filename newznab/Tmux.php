@@ -257,7 +257,9 @@ class Tmux
 					(%2\$s 'tmpunrarpath') AS tmpunrar,
 					(%2\$s 'compressedheaders') AS compressed,
 					(%2\$s 'book_reqids') AS book_reqids,
-					(%2\$s 'request_hours') AS request_hours",
+					(%2\$s 'request_hours') AS request_hours,
+					(%2\$s 'maxsizetopostprocess') AS maxsize_pp,
+					(%2\$s 'minsizetopostprocess') AS minsize_pp",
 					$tmuxstr,
 					$settstr
 		);
@@ -379,28 +381,37 @@ class Tmux
 		return (empty($returnVal) ? false : true);
 	}
 
-	public function proc_query($qry, $bookreqids, $request_hours, $db_name)
+	/**
+	 * @param        $qry
+	 * @param        $bookreqids
+	 * @param int    $request_hours
+	 * @param string $db_name
+	 * @param string $ppmax
+	 * @param string $ppmin
+	 *
+	 * @return bool|string
+	 */
+	public function proc_query($qry, $bookreqids, $request_hours, $db_name, $ppmax = '', $ppmin = '')
 	{
 		switch ((int) $qry) {
 			case 1:
-			case 1:
 				return sprintf("SELECT
-					SUM(IF(nzbstatus = 1 AND categoryid BETWEEN %d AND %d AND categoryid != %d AND videos_id = 0
+					SUM(IF(nzbstatus = 1 AND categories_id BETWEEN %d AND %d AND categories_id != %d AND videos_id = 0
 						AND tv_episodes_id BETWEEN -3 AND 0 AND size > 1048576,1,0)) AS processtv,
-					SUM(IF(nzbstatus = 1 AND categoryid = %d AND anidbid IS NULL,1,0)) AS processanime,
-					SUM(IF(nzbstatus = 1 AND categoryid BETWEEN %d AND %d AND imdbid IS NULL,1,0)) AS processmovies,
-					SUM(IF(nzbstatus = 1 AND categoryid IN (%d, %d, %d) AND musicinfoid IS NULL,1,0)) AS processmusic,
-					SUM(IF(nzbstatus = 1 AND categoryid BETWEEN %d AND %d AND consoleinfoid IS
+					SUM(IF(nzbstatus = 1 AND categories_id = %d AND anidbid IS NULL,1,0)) AS processanime,
+					SUM(IF(nzbstatus = 1 AND categories_id BETWEEN %d AND %d AND imdbid IS NULL,1,0)) AS processmovies,
+					SUM(IF(nzbstatus = 1 AND categories_id IN (%d, %d, %d) AND musicinfo_id IS NULL,1,0)) AS processmusic,
+					SUM(IF(nzbstatus = 1 AND categories_id BETWEEN %d AND %d AND consoleinfo_id IS
 					NULL,1,0)) AS processconsole,
-					SUM(IF(nzbstatus = 1 AND categoryid IN (%s) AND bookinfoid IS NULL,1,0)) AS processbooks,
-					SUM(IF(nzbstatus = 1 AND categoryid = %d AND gamesinfo_id = 0,1,0)) AS processgames,
-					SUM(IF(nzbstatus = 1 AND categoryid BETWEEN %d AND %d AND xxxinfo_id = 0,1,0)) AS processxxx,
+					SUM(IF(nzbstatus = 1 AND categories_id IN (%s) AND bookinfo_id IS NULL,1,0)) AS processbooks,
+					SUM(IF(nzbstatus = 1 AND categories_id = %d AND gamesinfo_id = 0,1,0)) AS processgames,
+					SUM(IF(nzbstatus = 1 AND categories_id BETWEEN %d AND %d AND xxxinfo_id = 0,1,0)) AS processxxx,
 					SUM(IF(1=1 %s,1,0)) AS processnfo,
 					SUM(IF(nzbstatus = 1 AND nfostatus = 1,1,0)) AS nfo,
-					SUM(IF(nzbstatus = 1 AND isrequestid = 1 AND preid = 0 AND ((reqidstatus = 0) OR (reqidstatus = -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL %s HOUR)),1,0)) AS requestid_inprogress,
-					SUM(IF(preid > 0 AND nzbstatus = 1 AND isrequestid = 1 AND reqidstatus = 1,1,0)) AS requestid_matched,
-					SUM(IF(preid > 0 AND searchname IS NOT NULL,1,0)) AS predb_matched,
-					COUNT(DISTINCT(preid)) AS distinct_predb_matched
+					SUM(IF(nzbstatus = 1 AND isrequestid = 1 AND predb_id = 0 AND ((reqidstatus = 0) OR (reqidstatus = -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL %s HOUR)),1,0)) AS requestid_inprogress,
+					SUM(IF(predb_id > 0 AND nzbstatus = 1 AND isrequestid = 1 AND reqidstatus = 1,1,0)) AS requestid_matched,
+					SUM(IF(predb_id > 0 AND searchname IS NOT NULL,1,0)) AS predb_matched,
+					COUNT(DISTINCT(predb_id)) AS distinct_predb_matched
 					FROM releases r",
 					Category::TV_ROOT,
 					Category::TV_OTHER,
@@ -420,11 +431,24 @@ class Tmux
 					Nfo::NfoQueryString($this->pdo),
 					$request_hours);
 			case 2:
+				$ppminString = $ppmaxString = '';
+				if (is_numeric($ppmax) && !empty($ppmax)) {
+					$ppmax *= 1073741824;
+					$ppmaxString = "AND r.size < {$ppmax}";
+				}
+				if (is_numeric($ppmin) && !empty($ppmin)) {
+					$ppmin *= 1048576;
+					$ppminString = "AND r.size > {$ppmin}";
+				}
 				return "SELECT
 					(SELECT COUNT(r.id) FROM releases r
-						INNER JOIN category c ON c.id = r.categoryid
+						LEFT JOIN categories c ON c.id = r.categories_id
 						WHERE r.nzbstatus = 1
-						AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0
+						AND r.passwordstatus BETWEEN -6 AND -1
+						AND r.haspreview = -1
+						{$ppminString}
+						{$ppmaxString}
+						AND c.disablepreview = 0
 					) AS work,
 					(SELECT COUNT(id) FROM groups WHERE active = 1) AS active_groups,
 					(SELECT COUNT(id) FROM groups WHERE name IS NOT NULL) AS all_groups";
@@ -432,7 +456,7 @@ class Tmux
 				return sprintf("
 					SELECT
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'predb' AND TABLE_SCHEMA = %1\$s) AS predb,
-					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'partrepair' AND TABLE_SCHEMA = %1\$s) AS partrepair_table,
+					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'missed_parts' AND TABLE_SCHEMA = %1\$s) AS partrepair_table,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = %1\$s) AS parts_table,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = %1\$s) AS binaries_table,
 					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'collections' AND TABLE_SCHEMA = %1\$s) AS collections_table,

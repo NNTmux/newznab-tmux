@@ -1,11 +1,13 @@
 
 <h1>{$page->title}</h1>
 
+<div class="well well-sm">
+
 <p>
 	Make a category inactive to remove it from the menu. This does not prevent binaries being matched into an appropriate category. Disable preview prevents ffmpeg being used for releases in the category.
 </p>
 
-<table style="margin-top:10px;" class="data Sortable highlight">
+<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 
 	<tr>
 		<th>id</th>
@@ -38,6 +40,5 @@
 		<td class="mid">{if $category.disablepreview == "1"}Yes{else}No{/if}</td>
 	</tr>
 	{/foreach}
-
-
 </table>
+	</div>

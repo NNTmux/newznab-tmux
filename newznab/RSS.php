@@ -53,11 +53,11 @@ Class RSS
 	{
 		$catSearch = $cartSearch = '';
 
-		$catLimit = "AND r.categoryid BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '";
+		$catLimit = "AND r.categories_id BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '";
 
 		if (count($cat)) {
 			if ($cat[0] == -2) {
-				$cartSearch = sprintf(' INNER JOIN usercart ON usercart.userid = %d AND usercart.releaseid = r.id ', $userID);
+				$cartSearch = sprintf(' INNER JOIN users_releases ON users_releases.userid = %d AND users_releases.releases_id = r.id ', $userID);
 			} else if ($cat[0] != -1) {
 				$catSearch = $this->releases->categorySQL($cat);
 			}
@@ -77,13 +77,13 @@ Class RSS
 					co.publisher AS co_publisher, co.releasedate AS co_releasedate,
 					co.review AS co_review, co.cover AS co_cover, cog.title AS co_genre
 				FROM releases r
-				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
-				INNER JOIN groups g ON g.id = r.groupid
+				INNER JOIN categories c ON c.id = r.categories_id
+				INNER JOIN categories cp ON cp.id = c.parentid
+				INNER JOIN groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN movieinfo m ON m.imdbid = r.imdbid AND m.title != ''
-				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfoid
+				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfo_id
 				LEFT OUTER JOIN genres mug ON mug.id = mu.genreid
-				LEFT OUTER JOIN consoleinfo co ON co.id = r.consoleinfoid
+				LEFT OUTER JOIN consoleinfo co ON co.id = r.consoleinfo_id
 				LEFT OUTER JOIN genres cog ON cog.id = co.genreid %s
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
 				WHERE r.passwordstatus %s
@@ -117,32 +117,36 @@ Class RSS
 	public function getShowsRss($limit, $userID = 0, $excludedCats = [], $airDate = -1)
 	{
 		return $this->pdo->query(
-				sprintf("
+			sprintf("
 				SELECT r.*, v.id, v.title, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
 					COALESCE(cp.id,0) AS parentCategoryid
 				FROM releases r
-				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
-				INNER JOIN groups g ON g.id = r.groupid
+				INNER JOIN categories c ON c.id = r.categories_id
+				INNER JOIN categories cp ON cp.id = c.parentid
+				INNER JOIN groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN videos v ON v.id = r.videos_id
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
 				WHERE %s %s %s
 				AND r.nzbstatus = %d
-				AND r.categoryid BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
+				AND r.categories_id BETWEEN %d AND %d
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-						$this->releases->getConcatenatedCategoryIDs(),
-						$this->releases->uSQL($this->pdo->query(sprintf('SELECT videos_id, categoryid FROM userseries WHERE userid = %d', $userID), true), 'videos_id'),
-						(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
-						($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
-						NZB::NZB_ADDED,
-						$this->releases->showPasswords,
-						(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
-				), true, NN_CACHE_EXPIRY_MEDIUM
+
+				$this->releases->getConcatenatedCategoryIDs(),
+				$this->releases->uSQL($this->pdo->query(sprintf('SELECT videos_id, categories_id FROM user_series WHERE userid = %d', $userID), true), 'videos_id'),
+				(count($excludedCats) ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
+				NZB::NZB_ADDED,
+				Category::TV_ROOT,
+				Category::TV_OTHER,
+				$this->releases->showPasswords,
+				(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
+			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 	}
+
 
 	/**
 	 * Get movies for RSS.
@@ -162,18 +166,18 @@ Class RSS
 					%s AS category_ids,
 					COALESCE(cp.id,0) AS parentCategoryid
 				FROM releases r
-				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
-				INNER JOIN groups g ON g.id = r.groupid
+				INNER JOIN categories c ON c.id = r.categories_id
+				INNER JOIN categories cp ON cp.id = c.parentid
+				INNER JOIN groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN movieinfo mi ON mi.imdbid = r.imdbid
 				WHERE %s %s
 				AND r.nzbstatus = %d
-				AND r.categoryid BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
+				AND r.categories_id BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
 						$this->releases->getConcatenatedCategoryIDs(),
-						$this->releases->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM usermovies WHERE userid = %d', $userID), true), 'imdbid'),
-						(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+						$this->releases->uSQL($this->pdo->query(sprintf('SELECT imdbid, categories_id FROM user_movies WHERE userid = %d', $userID), true), 'imdbid'),
+						(count($excludedCats) ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 						NZB::NZB_ADDED,
 						$this->releases->showPasswords,
 						(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')

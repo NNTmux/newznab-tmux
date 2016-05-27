@@ -1,4 +1,5 @@
-<h1>{$page->title}</h1>
+<div class="well well-sm">
+	<h1>{$page->title}</h1>
 <p>This page lists regex used for getting names for releases from usenet subjects.</p>
 <div id="message"></div>
 
@@ -6,12 +7,12 @@
 	<label for="group">Search a group:</label>
 	<input id="group" type="text" name="group" value="{$group}" size="15" />
 	&nbsp;&nbsp;
-	<input type="submit" value="Go" />
+	<input class="btn btn-default" type="submit" value="Go" />
 </form>
 {if $regex}
 
 	<div>{$pager}</div>
-	<table style="margin-top:10px;" class="data Sortable highlight">
+	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>
 			<th style="width:20px;">id</th>
 			<th>group</th>
@@ -41,3 +42,4 @@
 	</table>
 	<div style="margin-top: 15px">{$pager}</div>
 {/if}
+	</div>

@@ -1,10 +1,10 @@
-
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 <p>
 Export nzbs from the system into a folder. Specify the full file path to a folder.
 <br/>
-If you are exporting a large number of nzb files, run this script from the command line and pass in the folder path as the first argument. e.g. php scriptname outputpath from(optional) to(optional) groupid(optional use -1) categoryid(optional)<br/>
+If you are exporting a large number of nzb files, run this script from the command line and pass in the folder path as the first argument. e.g. php scriptname outputpath from(optional) to(optional) groups_id(optional use -1) categories_id(optional)<br/>
 <span style="font-family:courier;display:block;padding:5px 0 15px 0;">
 	php admin/nzb-export.php /path/to/export/into 01/01/2008 01/01/2010 -1 1050
 </span>
@@ -14,7 +14,7 @@ If you are exporting a large number of nzb files, run this script from the comma
 
 <form action="{$SCRIPT_NAME}" method="POST">
 
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
 	<td><label for="folder">Folder</label>:</td>
@@ -43,9 +43,9 @@ If you are exporting a large number of nzb files, run this script from the comma
 </tr>
 
 <tr>
-	<td><label for="categoryid">Category</label>:</td>
+	<td><label for="categories_id">Category</label>:</td>
 	<td>
-		{html_options id="categoryid" name='categoryid' options=$catlist selected=$cat}
+		{html_options id="categories_id" name='categories_id' options=$catlist selected=$cat}
 		<div class="hint">Posted to this category</div>
 	</td>
 </tr>
@@ -53,7 +53,7 @@ If you are exporting a large number of nzb files, run this script from the comma
 <tr>
 	<td></td>
 	<td>
-		<input type="submit" value="Export" />
+		<input class="btn btn-default" type="submit" value="Export" />
 	</td>
 </tr>
 
@@ -64,3 +64,4 @@ If you are exporting a large number of nzb files, run this script from the comma
 <div>
 {$output}
 </div>
+	</div>

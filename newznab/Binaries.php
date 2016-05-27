@@ -539,7 +539,7 @@ class Binaries
 			if ($partRepair === true) {
 				$this->_pdo->queryExec(
 					sprintf(
-						'UPDATE partrepair SET attempts = attempts + 1 WHERE group_id = %d AND numberid %s',
+						'UPDATE missed_parts SET attempts = attempts + 1 WHERE group_id = %d AND numberid %s',
 						$groupMySQL['id'],
 						($first == $last ? '= ' . $first : 'IN (' . implode(',', range($first, $last)) . ')')
 					)
@@ -725,8 +725,8 @@ class Binaries
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', NOW())
 							ON DUPLICATE KEY UPDATE dateadded = NOW(), noise = '%s'",
 							$tableNames['cname'],
-							$this->_pdo->escapeString(substr($matches[1], 0, 255)),
-							$this->_pdo->escapeString($header['From']),
+							$this->_pdo->escapeString(substr(utf8_encode($matches[1]), 0, 255)),
+							$this->_pdo->escapeString(utf8_encode($header['From'])),
 							(is_numeric($header['Date']) ? ($header['Date'] > $now ? $now : $header['Date']) : $now),
 							$this->_pdo->escapeString(substr($header['Xref'], 0, 255)),
 							$groupMySQL['id'],
@@ -756,7 +756,7 @@ class Binaries
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
 						$tableNames['bname'],
 						md5($matches[1] . $header['From'] . $groupMySQL['id']),
-						$this->_pdo->escapeString($matches[1]),
+						$this->_pdo->escapeString(utf8_encode($matches[1])),
 						$collectionID,
 						$matches[3],
 						$fileCount[1],
@@ -947,7 +947,7 @@ class Binaries
 	public function partRepair($groupArr)
 	{
 		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupArr['id']);
-		// Get all parts in partrepair table.
+		// Get all parts in missed_parts table.
 		$missingParts = $this->_pdo->query(
 			sprintf('
 				SELECT * FROM %s
@@ -1287,7 +1287,7 @@ class Binaries
 	 * Add article numbers from missing headers to DB.
 	 *
 	 * @param array  $numbers   The article numbers of the missing headers.
-	 * @param string $tableName Name of the partrepair table to insert into.
+	 * @param string $tableName Name of the missed_parts table to insert into.
 	 * @param int    $groupID   The ID of this groups.
 	 *
 	 * @return bool

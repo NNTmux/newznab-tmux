@@ -1,10 +1,11 @@
 <h1>{$page->title}</h1>
+<div class="well well-sm">
 <p>
 	Binaries can be prevented from being added to the index at all if they match a regex provided in the blacklist. They can also be included only if they match a regex (whitelist).
 	<br>CLICK EDIT OR ON THE BLACKLIST TO ENABLE/DISABLE.
 </p>
 <div id="message"></div>
-<table style="margin-top:10px;" class="data Sortable highlight">
+<table style="margin-top:10px;" class="Sortable data table table-striped responsive-utilities jambo-table">
 	<tr>
 		<th style="width:20px;">id</th>
 		<th>group</th>
@@ -36,3 +37,4 @@
 		</tr>
 	{/foreach}
 </table>
+	</div>

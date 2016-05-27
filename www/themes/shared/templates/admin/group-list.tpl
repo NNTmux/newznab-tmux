@@ -1,4 +1,4 @@
-<div id="group_list">
+<div class="well well-sm" id="group_list">
 	<h1>{$page->title}</h1>
 	<p>
 		Below is a list of all usenet groups available to be indexed. Click 'Activate' to start indexing a group. Backfill works independently of active.
@@ -9,7 +9,7 @@
 				<label for="groupname">Group</label>
 				<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15" />
 				&nbsp;&nbsp;
-				<input type="submit" value="Go" />
+				<input class="btn btn-default" type="submit" value="Go" />
 			</form>
 			<div style="position:absolute;">
 				{$pager}
@@ -23,7 +23,7 @@
 			</div>
 		</div>
 		<div id="message">msg</div>
-		<table style="width:100%;" class="data highlight Sortable">
+		<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table Sortable">
 			<tr>
 				<th>group</th>
 				<th>First Post</th>
@@ -69,7 +69,7 @@
 					<label for="groupname">Group</label>
 					<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15" />
 					&nbsp;&nbsp;
-					<input type="submit" value="Go" />
+					<input class="btn btn-default" type="submit" value="Go" />
 				</form>
 				<a title="Reset all groups" href="javascript:ajax_all_reset()" class="all_reset" onclick="return confirm('Are you sure? This will reset all groups, deleting all collections/binaries/parts (does not delete releases).');" >Reset all</a> |
 				<a title="Delete all releases, binaries/parts from all groups" href="javascript:ajax_all_purge()" class="all_purge" onclick="return confirm('Are you sure? This will delete all releases, collections/binaries/parts.');">Purge all</a><br />

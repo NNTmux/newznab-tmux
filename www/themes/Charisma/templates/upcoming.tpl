@@ -33,6 +33,15 @@
 							<a class="rndbtn badge badge-imdb" target="_blank"
 							   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result->alternate_ids->imdb}"
 							   title="View Imdb Details">IMDB</a>
+							{if !empty($cpurl) && !empty($cpapi)}
+								<a
+									id="imdb{$result->alternate_ids->imdb}"
+									href="javascript:;"
+									class="sendtocouch"
+									title="Add to CouchPotato">
+									<img src="{$smarty.const.WWW_TOP}/themes/shared/img/icons/couch.png">
+								</a>
+							{/if}
 						</div>
 					</div>
 				</td>

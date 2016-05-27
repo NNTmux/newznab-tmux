@@ -31,11 +31,11 @@ function reCategorize($argv)
 	$othercats = implode(",", Category::OTHERS_GROUP);
 	$update = true;
 	if (isset($argv[1]) && is_numeric($argv[1])) {
-		$where = ' AND groupid = ' . $argv[1];
+		$where = ' AND groups_id = ' . $argv[1];
 	} else if (isset($argv[1]) && preg_match('/\([\d, ]+\)/', $argv[1])) {
-		$where = ' AND groupid IN ' . $argv[1];
+		$where = ' AND groups_id IN ' . $argv[1];
 	} else if (isset($argv[1]) && $argv[1] === 'misc') {
-		$where = sprintf(' AND categoryid IN (%s)', $othercats);
+		$where = sprintf(' AND categories_id IN (%s)', $othercats);
 	}
 	if (isset($argv[2]) && $argv[2] === 'test') {
 		$update = false;
@@ -48,14 +48,14 @@ function reCategorize($argv)
 	} else {
 		echo $pdo->log->header("Categorizing all releases using searchname. This can take a while, be patient.");
 	}
-	$timestart = TIME();
+	$timestart = time();
 	if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1])) || $argv[1] === 'misc') {
 		$chgcount = categorizeRelease(str_replace(" AND", "WHERE", $where), $update, true);
 	} else {
 		$chgcount = categorizeRelease('', $update, true);
 	}
 	$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
-	$time = $consoletools->convertTime(TIME() - $timestart);
+	$time = $consoletools->convertTime(time() - $timestart);
 	if ($update === true) {
 		echo $pdo->log->header("Finished re-categorizing " . number_format($chgcount) . " releases in " . $time . " , using the searchname.\n");
 	} else {
@@ -73,13 +73,13 @@ function categorizeRelease($where, $update = true, $echooutput = false)
 	$pdo->log = new ColorCLI();
 	$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 	$relcount = $chgcount = 0;
-	echo $pdo->log->primary("SELECT id, searchname, groupid, categoryid FROM releases " . $where);
-	$resrel = $pdo->queryDirect("SELECT id, searchname, groupid, categoryid FROM releases " . $where);
+	echo $pdo->log->primary("SELECT id, searchname, groups_id, categories_id FROM releases " . $where);
+	$resrel = $pdo->queryDirect("SELECT id, searchname, groups_id, categories_id FROM releases " . $where);
 	$total = $resrel->rowCount();
 	if ($total > 0) {
 		foreach ($resrel as $rowrel) {
-			$catId = $cat->determineCategory($rowrel['groupid'], $rowrel['searchname']);
-			if ($rowrel['categoryid'] != $catId) {
+			$catId = $cat->determineCategory($rowrel['groups_id'], $rowrel['searchname']);
+			if ($rowrel['categories_id'] != $catId) {
 				if ($update === true) {
 					$pdo->queryExec(
 						sprintf("
@@ -88,13 +88,13 @@ function categorizeRelease($where, $update = true, $echooutput = false)
 								videos_id = 0,
 								tv_episodes_id = 0,
 								imdbid = NULL,
-								musicinfoid = NULL,
-								consoleinfoid = NULL,
+								musicinfo_id = NULL,
+								consoleinfo_id = NULL,
 								gamesinfo_id = 0,
-								bookinfoid = NULL,
+								bookinfo_id = NULL,
 								anidbid = NULL,
 								xxxinfo_id = 0,
-								categoryid = %d
+								categories_id = %d
 							WHERE id = %d",
 							$catId,
 							$rowrel['id']

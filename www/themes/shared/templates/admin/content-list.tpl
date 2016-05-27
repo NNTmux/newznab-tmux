@@ -1,5 +1,6 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
-<table class="data Sortable highlight">
+<table class="data table table-striped responsive-utilities jambo-table Sortable">
 	<tr>
 		<th style="width:60px;">ordinal</th>
 		<th style="width:30px;">id</th>
@@ -55,3 +56,4 @@
 		</tr>
 	{/foreach}
 </table>
+	</div>

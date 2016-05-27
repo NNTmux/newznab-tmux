@@ -1,3 +1,4 @@
+<div class="well wellsm">
 <h1>{$page->title}</h1>
 
 <label for="previewcat"> Select Category :
@@ -17,7 +18,7 @@
 {if $releaselist}
 {$pager}
 
-<table style="margin-top:10px;" class="data highlight">
+<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 
 	<tr>
 		<th>preview</th>
@@ -41,3 +42,4 @@
 {else}
 <p>No results.</p>
 {/if}
+	</div>

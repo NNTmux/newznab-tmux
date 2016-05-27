@@ -130,7 +130,7 @@ class ReleaseCleaning
 		) {
 			$title = $this->pdo->queryOneRow(
 				sprintf(
-					'SELECT p.title , p.id from predb p INNER JOIN groups g on g.id = p.groupid WHERE p.requestid = %d and g.name = %s',
+					'SELECT p.title , p.id from predb p INNER JOIN groups g on g.id = p.groups_id WHERE p.requestid = %d and g.name = %s',
 					$match[1],
 					$this->pdo->escapeString($this->groupName)
 				)
@@ -160,7 +160,7 @@ class ReleaseCleaning
 			if ($title === false && !empty($reqGname)) {
 				$title = $this->pdo->queryOneRow(
 					sprintf(
-						"SELECT p.title as title, p.id as id from predb p INNER JOIN groups g on g.id = p.groupid
+						"SELECT p.title as title, p.id as id from predb p INNER JOIN groups g on g.id = p.groups_id
 								WHERE p.requestid = %d and g.name = %s",
 						$match[1],
 						$this->pdo->escapeString($reqGname)
@@ -385,7 +385,7 @@ class ReleaseCleaning
 		//Replace multiple spaces with 1 space
 		$cleanerName = preg_replace('/\s\s+/i', ' ', $cleanerName);
 		//Remove invalid characters.
-		$cleanerName = trim(preg_replace('/[^(\x20-\x7F)]*/', '', $cleanerName));
+		$cleanerName = trim(utf8_encode(preg_replace('/[^(\x20-\x7F)]*/', '', $cleanerName)));
 		return $cleanerName;
 	}
 }

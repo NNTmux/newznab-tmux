@@ -2,6 +2,7 @@
 {if isset($error) && $error != ''}
 	<div class="error">{$error}</div>
 {/if}
+<div class="well well-sm">
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
 	<table class="input">
 		<tr>
@@ -50,8 +51,9 @@
 		<tr>
 			<td></td>
 			<td>
-				<input type="submit" value="Save" />
+				<input class="btn btn-default" type="submit" value="Save" />
 			</td>
 		</tr>
 	</table>
 </form>
+</div>

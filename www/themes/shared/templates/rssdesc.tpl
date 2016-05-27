@@ -1,3 +1,4 @@
+<div class="well sell-sm">
 <h1>{$page->title}</h1>
 <p>
 	Here you can choose rss feeds from settings categories. The feeds will present either decriptions or
@@ -96,3 +97,4 @@
 		<a href="{$smarty.const.WWW_TOP}/rss?anidb={$anidb}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}/rss/?anidb={$anidb}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 	</li>
 </ul>
+</div>

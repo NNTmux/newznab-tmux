@@ -1,8 +1,8 @@
-
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 {if $groupmsglist}
-<table class="data Sortable">
+<table class="data table table-striped responsive-utilities jambo-table Sortable">
 
 	<tr>
 		<th>group</th>
@@ -29,7 +29,7 @@
 <tr>
 	<td width="90">Group List:</td>
 	<td>
-		<textarea  class="autosize" id="groupfilter" name="groupfilter"></textarea>
+		<textarea id="groupfilter" name="groupfilter"></textarea>
 		<div class="hint">A regular expression to match against group names e.g. alt.binaries.cd.image.linux|alt.binaries.warez.linux</div>
 	</td>
 </tr>
@@ -50,7 +50,7 @@
 <tr>
 	<td></td>
 	<td>
-		<input type="submit" value="Add Groups" />
+		<input class="btn btn-default" type="submit" value="Add Groups" />
 	</td>
 </tr>
 
@@ -58,3 +58,4 @@
 
 </form>
 {/if}
+	</div>

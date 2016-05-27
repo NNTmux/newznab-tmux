@@ -1,3 +1,4 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 <div style="width:700px">
 	<strong>
@@ -12,7 +13,7 @@
 		<form action="{$SCRIPT_NAME}" method="post">
 			<fieldset style="width:717px;">
 				<legend>Local sharing settings.</legend>
-				<table class="input">
+				<table class="input data table table-striped responsive-utilities jambo-table">
 					<tr>
 						<td style="width: 100px;"><label for="sharing_name">Site Name:</label></td>
 						<td>
@@ -146,7 +147,7 @@
 					</tr>
 				</table>
 			</fieldset>
-			<input type="submit" value="Save Settings" />
+			<input class="btn btn-default" type="submit" value="Save Settings" />
 		</form>
 		<br />
 	{else}
@@ -160,7 +161,7 @@
 			<a href="javascript:ajax_sharing_toggle_all(1);" onclick="setTimeout('history.go(0);',700);" class="sharing_toggle_all">[Enable All]</a>
 			<a href="javascript:ajax_sharing_toggle_all(0);" onclick="setTimeout('history.go(0);',700);" class="sharing_toggle_all">[Disable All]</a>
 		</div>
-		<table style="margin-top:5px;margin-bottom:5px;width:733px" class="data Sortable highlight">
+		<table style="margin-top:5px;margin-bottom:5px;width:733px" class="data table table-striped responsive-utilities jambo-table Sortable">
 			<tr>
 				<th style="width:22px;text-align:center;">id</th>
 				<th style="width:300px;text-align:center;">Name</th>
@@ -195,3 +196,4 @@
 		<p>No remote sites found in your database.</p>
 	{/if}
 </div>
+	</div>

@@ -1,95 +1,123 @@
-<!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
+
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=9" />
-	<meta name="keywords" content="" />
-	<meta name="description" content="" />
-	<title>{$site->title|default:'newznab'} - {$page->meta_title|default:$page->title}</title>
-	<link href="{$smarty.const.WWW_THEMES}/shared/css/style.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_THEMES}/shared/css/admin.css" rel="stylesheet" type="text/css" media="screen" />
-	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico"/>
-	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/sorttable.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/utils-admin.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/jquery.multifile.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/scripts/jquery.autosize-min.js"></script>
-	<script type="text/javascript">var WWW_TOP = "{$smarty.const.WWW_TOP}/..";</script>
-
-	{$page->head}
-</head>
-<body>
-	<div id="logo" style="cursor: pointer;">
-		<h1><a href="/"></a></h1>
-		<p><em></em></p>
-	</div>
-	<hr />
-
-	<div id="header">
-		<div id="menu">
-		</div>
-		<!-- end #menu -->
-	</div>
-
-	<div id="page">
-
-		<div id="adpanel">
-
-		</div>
-
-		<div id="content">
-			{$page->content}
-		</div>
-		<!-- end #content -->
-
-		<div id="sidebar">
-		<ul>
-		<li>
-		{$admin_menu}
-		</li>
-
-		</ul>
-		</div>
-		<!-- end #sidebar -->
-
-		<div style="clear: both;">&nbsp;</div>
-
-	</div>
-	<!-- end #page -->
-
-	<div id="searchfooter">
-		<div style="text-align: center;">
-		</div>
-	</div>
-
-	<div class="footer">
-	<p>
-		{$site->footer}
-		<br /><br /><br />Copyright &copy; {$smarty.now|date_format:"%Y"} {$site->title}. All rights reserved.
-	</p>
-	</div>
-	<!-- end #footer -->
-
-	{if $site->google_analytics_acc != ''}
 	{literal}
-
-	<script type="text/javascript">
-	/* <![CDATA[ */
-	  var _gaq = _gaq || [];
-	  _gaq.push(['_setAccount', '{/literal}{$site->google_analytics_acc}{literal}']);
-	  _gaq.push(['_trackPageview']);
-	  _gaq.push(['_trackPageLoadTime']);
-
-	  (function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	  })();
-	/* ]]> */
+	<script>
+		/* <![CDATA[ */
+		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
+		var SERVERROOT = "{/literal}{$serverroot}{literal}";
+		var UID = "{/literal}{if $loggedin == "true"}{$userdata.id}{else}{/if}{literal}";
+		var RSSTOKEN = "{/literal}{if $loggedin == "true"}{$userdata.rsstoken}{else}{/if}{literal}";
+		/* ]]> */
 	</script>
-
 	{/literal}
-	{/if}
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<!-- Meta, title, CSS, favicons, etc. -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
+
+	<!-- Bootstrap core CSS -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet"
+		  type="text/css"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
+		  type="text/css"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/animate.css/animate.min.css" rel="stylesheet">
+	<!-- Normalize.css -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
+	<!-- Custom styling plus plugins -->
+	<!-- Newposterwall -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/custom.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/flat/green.css" rel="stylesheet">
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+
+</head>
+<body class="nav-md">
+<div class="container body">
+	<div class="main_container">
+		<div class="col-md-3 left_col">
+			<div class="left_col scroll-view">
+				<div class="navbar nav_title" style="border: 0;">
+					<a href="{$site->home_link}" class="site_title"><i class="fa fa-mixcloud"></i>
+						<span>{$site->title}</span></a>
+				</div>
+				<div class="clearfix"></div>
+				<br/>
+				<!-- sidebar menu -->
+				{$admin_menu}
+				<!-- /sidebar menu -->
+			</div>
+		</div>
+		<!-- top navigation -->
+		<div class="top_nav">
+			<div class="nav_menu">
+				<nav class="" role="navigation">
+					<div class="nav toggle">
+						<a id="menu_toggle"><i class="fa fa-bars"></i></a>
+					</div>
+					{$page->head}
+				</nav>
+			</div>
+		</div>
+		<!-- /top navigation -->
+
+		<!-- page content -->
+		<div class="right_col" role="main">
+			<div class="clearfix"></div>
+			<div class="row">
+				<div class="col-md-12 col-sm-12 col-xs-12">
+					{$page->content}
+					<div class="clearfix"></div>
+				</div>
+			</div>
+			<!-- footer content -->
+			<footer>
+				<div class="copyright-info">
+					<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
+								href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is open
+					source,
+					released under the GPL license
+				</div>
+				<div class="clearfix"></div>
+			</footer>
+			<!-- /footer content -->
+
+		</div>
+		<!-- /page content -->
+	</div>
+
+</div>
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js" type="text/javascript"></script>
+<!-- bootstrap progress js -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/nicescroll/jquery.nicescroll.min.js"></script>
+<!-- icheck -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
+<!-- jQuery migrate script -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
+<!-- newznab default scripts, needed for stuff to work -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/qtip2/jquery.qtip.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/utils-admin.js"></script>
+<!-- Custom functions -->
+<script src="{$smarty.const.WWW_THEMES}/shared/js/functions.js" type="text/javascript"></script>
+<!-- pace -->
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/pace/pace.min.js"></script>
 
 </body>
+
 </html>

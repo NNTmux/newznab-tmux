@@ -1,3 +1,4 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 {if $tvshowlist}
 	<div style="float:right;">
@@ -5,12 +6,12 @@
 			<label for="showname">Title</label>
 			<input id="showname" type="text" name="showname" value="{$showname}" size="15" />
 			&nbsp;&nbsp;
-			<input type="submit" value="Go" />
+			<input class="btn btn-default" type="submit" value="Go" />
 		</form>
 	</div>
 	{$pager}
 	<br/><br/>
-	<table style="width:100%;margin-top:10px;" class="data Sortable highlight">
+	<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>
 			<th style="width:50px;">videos_id</th>
 			<th>title</th>
@@ -36,3 +37,4 @@
 {else}
 	<p>No TV Shows available.</p>
 {/if}
+	</div>

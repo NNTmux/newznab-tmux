@@ -24,7 +24,7 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 	$other = 1;
 	if ($argv[3] === 'all') {
 		$other = 2;
-	} else if ($argv[3] === 'preid') {
+	} else if ($argv[3] === 'predb_id') {
 		$other = 3;
 	}
 	$setStatus = ($argv[4] == "yes") ? 1 : 2;
@@ -81,7 +81,7 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 } else {
 	exit($pdo->log->error("\nYou must supply 4 arguments.\n"
 			. "The 2nd argument, false, will display the results, but not change the name, type true to have the names changed.\n"
-			. "The 3rd argument, other, will only do against other categories, to do against all categories use all, or preid to process all not matched to predb.\n"
+			. "The 3rd argument, other, will only do against other categories, to do against all categories use all, or predb_id to process all not matched to predb.\n"
 			. "The 4th argument, yes, will set the release as checked, so the next time you run it will not be processed, to not set as checked type no.\n"
 			. "The 5th argument (optional), show, will display the release changes or only show a counter.\n\n"
 			. "php $argv[0] 1 false other no ...: Fix release names using the usenet subject in the past 3 hours with predb information.\n"
@@ -91,5 +91,7 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 			. "php $argv[0] 5 false other no ...: Fix release names in misc categories using File Name in the past 6 hours.\n"
 			. "php $argv[0] 6 false other no ...: Fix release names in misc categories using File Name.\n"
 			. "php $argv[0] 7 false other no ...: Fix release names in misc categories using Par2 Files in the past 6 hours.\n"
-			. "php $argv[0] 8 false other no ...: Fix release names in misc categories using Par2 Files.\n"));
+			. "php $argv[0] 8 false other no ...: Fix release names in misc categories using Par2 Files.\n"
+			. "php $argv[0] 9 false other no ...: Fix release names in misc categories using SRR Files in the past 6 hours.\n"
+			. "php $argv[0] 10 false other no ...: Fix release names in misc categories using SRR Files.\n"));
 }

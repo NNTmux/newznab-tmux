@@ -42,11 +42,11 @@ class RequestIDWeb extends RequestID
 	{
 		$this->_releases = $this->pdo->queryDirect(
 			sprintf ('
-				SELECT r.id, r.name, r.searchname, g.name AS groupname, r.groupid, r.categoryid
+				SELECT r.id, r.name, r.searchname, g.name AS groupname, r.groups_id, r.categories_id
 				FROM releases r
-				INNER JOIN groups g ON r.groupid = g.id
+				LEFT JOIN groups g ON r.groups_id = g.id
 				WHERE r.nzbstatus = 1
-				AND r.preid = 0
+				AND r.predb_id = 0
 				AND r.isrequestid = 1
 				AND (
 					r.reqidstatus = %d
@@ -58,7 +58,7 @@ class RequestIDWeb extends RequestID
 				self::REQID_NOLL,
 				self::REQID_NONE,
 				$this->_request_hours,
-				(empty($this->_groupID) ? '' : ('AND r.groupid = ' . $this->_groupID)),
+				(empty($this->_groupID) ? '' : ('AND r.groups_id = ' . $this->_groupID)),
 				$this->_getReqIdGroups(),
 				($this->_maxTime === 0 ? '' : sprintf(' AND r.adddate > NOW() - INTERVAL %d HOUR', $this->_maxTime)),
 				(empty($this->_limit) || $this->_limit > 1000 ? 1000 : $this->_limit)
@@ -177,12 +177,12 @@ class RequestIDWeb extends RequestID
 						// Buffer groupid queries.
 						$this->_release['groupname'] = $requestArray[(int)$result['ident']]['group'];
 						if (isset($groupIDarray[$this->_release['groupname']])) {
-							$this->_release['groupid'] = $groupIDArray[$this->_release['groupname']];
+							$this->_release['groups_id'] = $groupIDArray[$this->_release['groupname']];
 						} else {
-							$this->_release['groupid'] = $this->groups->getIDByName($this->_release['groupname']);
-							$groupIDArray[$this->_release['groupname']] = $this->_release['groupid'];
+							$this->_release['groups_id'] = $this->groups->getIDByName($this->_release['groupname']);
+							$groupIDArray[$this->_release['groupname']] = $this->_release['groups_id'];
 						}
-						$this->_release['gid'] = $this->_release['groupid'];
+						$this->_release['gid'] = $this->_release['groups_id'];
 
 						$this->_release['searchname'] = $requestArray[(int)$result['ident']]['sname'];
 						$this->_insertIntoPreDB();
@@ -246,7 +246,7 @@ class RequestIDWeb extends RequestID
 	{
 		$dupeCheck = $this->pdo->queryOneRow(
 			sprintf('
-				SELECT id AS preid, requestid, groupid
+				SELECT id AS predb_id, requestid, groups_id
 				FROM predb
 				WHERE title = %s',
 				$this->pdo->escapeString($this->_newTitle['title'])
@@ -256,23 +256,23 @@ class RequestIDWeb extends RequestID
 		if ($dupeCheck === false) {
 			$this->_preDbID = (int)$this->pdo->queryInsert(
 				sprintf("
-					INSERT INTO predb (title, source, requestid, groupid, predate)
+					INSERT INTO predb (title, source, requestid, groups_id, predate)
 					VALUES (%s, %s, %d, %d, NOW())",
 					$this->pdo->escapeString($this->_newTitle['title']),
 					$this->pdo->escapeString('requestWEB'),
 					$this->_requestID,
-					$this->_release['groupid']
+					$this->_release['groups_id']
 				)
 			);
 		} else {
-			$this->_preDbID = $dupeCheck['preid'];
+			$this->_preDbID = $dupeCheck['predb_id'];
 			$this->pdo->queryExec(
 				sprintf('
 					UPDATE predb
-					SET requestid = %d, groupid = %d
+					SET requestid = %d, groups_id = %d
 					WHERE id = %d',
 					$this->_requestID,
-					$this->_release['groupid'],
+					$this->_release['groups_id'],
 					$this->_preDbID
 				)
 			);
@@ -284,14 +284,14 @@ class RequestIDWeb extends RequestID
 	 */
 	protected function _updateRelease()
 	{
-		$determinedCategory = $this->category->determineCategory($this->_release['groupid'], $this->_newTitle['title']);
+		$determinedCategory = $this->category->determineCategory($this->_release['groups_id'], $this->_newTitle['title']);
 		$newTitle = $this->pdo->escapeString($this->_newTitle['title']);
 		$this->pdo->queryExec(
 			sprintf('
 				UPDATE releases
-				SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL,
-				reqidstatus = %d, isrenamed = 1, proc_files = 1, searchname = %s, categoryid = %d,
-				preid = %d
+				SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL, consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL,
+				reqidstatus = %d, isrenamed = 1, proc_files = 1, searchname = %s, categories_id = %d,
+				predb_id = %d
 				WHERE id = %d',
 				self::REQID_FOUND,
 				$newTitle,

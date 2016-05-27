@@ -18,6 +18,15 @@
 						<div style="text-align: center;">
 						<a class="rndbtn badge badge-success" target="_blank" href="{$site->dereferrer_link}{$result->links->alternate}" title="View Rotten Tomatoes Details">Rotten</a>
 						<a class="rndbtn badge badge-imdb" target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result->alternate_ids->imdb}" title="View Imdb Details">Imdb</a>
+							{if !empty($cpurl) && !empty($cpapi)}
+								<a
+									id="imdb{$result->alternate_ids->imdb}"
+									href="javascript:;"
+									class="sendtocouch"
+									title="Add to CouchPotato">
+									<img src="{$smarty.const.WWW_TOP}/themes/shared/img/icons/couch.png">
+								</a>
+							{/if}
 						</div>
 					</div>
 				</div>

@@ -154,7 +154,7 @@ if (isset($_GET['type'])) {
 					sprintf('
 					SELECT p.*
 					FROM predb p
-					INNER JOIN groups g ON g.id = p.groupid
+					INNER JOIN groups g ON g.id = p.groups_id
 					WHERE requestid = %d
 					AND g.name = %s
 					%s %s %s
@@ -195,7 +195,7 @@ if (isset($_GET['type'])) {
 			if (isset($_GET['md5']) && strlen($_GET['title']) === 32) {
 				$db = new newznab\db\Settings();
 				$preData = $db->query(
-					sprintf('SELECT * FROM predb p INNER JOIN predbhash ph ON ph.pre_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
+					sprintf('SELECT * FROM predb p INNER JOIN predb_hashes ph ON ph.predb_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
 						$db->escapeString($_GET['md5']),
 						$newer,
 						$older,
@@ -212,7 +212,7 @@ if (isset($_GET['type'])) {
 			if (isset($_GET['sha1']) && strlen($_GET['sha1']) === 40) {
 				$db = new newznab\db\Settings();
 				$preData = $db->query(
-					sprintf('SELECT * FROM predb p INNER JOIN predbhash ph ON ph.pre_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
+					sprintf('SELECT * FROM predb p INNER JOIN predb_hashes ph ON ph.predb_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
 						$db->escapeString($_GET['sha1']),
 						$newer,
 						$older,

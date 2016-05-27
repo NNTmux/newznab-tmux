@@ -12,7 +12,7 @@ use newznab\MiscSorter;
 $pdo = new Settings();
 
 if (!isset($argv[1])) {
-	exit($pdo->log->error("This script is not intended to be run manually, it is called from Forking.php."));
+	exit($pdo->log->error("This script is not intended to be run manually, it is called from Multiprocessing."));
 } else if (isset($argv[1])) {
 	$namefixer = new NameFixer(['Settings' => $pdo]);
 	$pieces = explode(' ', $argv[1]);
@@ -24,18 +24,18 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'nfo' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT r.id AS releaseid, r.guid, r.groupid, r.categoryid, r.name, r.searchname,
-									uncompress(nfo) AS textstring
-								FROM releases r
-								INNER JOIN releasenfo rn ON r.id = rn.releaseid
-								WHERE r.guid %s
-								AND r.nzbstatus = 1
-								AND r.proc_nfo = 0
-								AND r.nfostatus = 1
-								AND r.preid = 0
-								ORDER BY r.postdate DESC
-								LIMIT %s',
-					$pdo->likeString($guidChar, false, true),
+					SELECT r.id AS releases_id, r.guid, r.groups_id, r.categories_id, r.name, r.searchname,
+						uncompress(nfo) AS textstring
+					FROM releases r
+					INNER JOIN release_nfos rn ON r.id = rn.releases_id
+					WHERE r.leftguid = %s
+					AND r.nzbstatus = 1
+					AND r.proc_nfo = 0
+					AND r.nfostatus = 1
+					AND r.predb_id < 1
+					ORDER BY r.id DESC
+					LIMIT %s',
+					$pdo->escapeString($guidChar),
 					$maxperrun
 				)
 			);
@@ -44,7 +44,7 @@ if (!isset($argv[1])) {
 				foreach ($releases as $release) {
 					if (preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])) {
 						$namefixer->done = $namefixer->matched = false;
-						$pdo->queryDirect(sprintf('UPDATE releases SET proc_nfo = 1 WHERE id = %d', $release['releaseid']));
+						$pdo->queryDirect(sprintf('UPDATE releases SET proc_nfo = 1 WHERE id = %d', $release['releases_id']));
 						$namefixer->checked++;
 						echo '.';
 					} else {
@@ -58,23 +58,26 @@ if (!isset($argv[1])) {
 			}
 			break;
 		case $pieces[0] === 'filename' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
-			$namefixer->fixNamesWithFiles(1, true, 1, 1, 1, true, $guidChar, $maxperrun);
-			$namefixer->fixNamesWithFiles(1, true, 1, 1, 1, $guidChar, $maxperrun);
+			$namefixer->fixNamesWithFiles(1, 1, 1, 1, 1, $guidChar, $maxperrun);
+			break;
+		case $pieces[0] === 'srr' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
+			$namefixer->fixNamesWithSrr(1, 1, 1, 1, 1, $guidChar, $maxperrun);
 			break;
 		case $pieces[0] === 'md5' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT DISTINCT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, r.dehashstatus,
-									rf.name AS filename
-								FROM releases r
-								LEFT OUTER JOIN release_files rf ON r.id = rf.releaseid AND rf.ishashed = 1
-								WHERE r.guid %s
-								AND nzbstatus = 1 AND r.ishashed = 1
-								AND r.dehashstatus BETWEEN -6 AND 0
-								AND r.preid = 0
-								ORDER BY r.dehashstatus DESC, r.postdate ASC
+					SELECT DISTINCT r.id AS releases_id, r.name, r.searchname, r.categories_id, r.groups_id, r.dehashstatus,
+						rf.name AS filename
+					FROM releases r
+					LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id AND rf.ishashed = 1
+					WHERE r.leftguid = %s
+					AND nzbstatus = 1
+					AND r.ishashed = 1
+					AND r.dehashstatus BETWEEN -6 AND 0
+					AND r.predb_id < 1
+					ORDER BY r.dehashstatus DESC, r.id ASC
 								LIMIT %s',
-					$pdo->likeString($guidChar, false, true),
+					$pdo->escapeString($guidChar),
 					$maxperrun
 				)
 			);
@@ -86,7 +89,7 @@ if (!isset($argv[1])) {
 					} else if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['filename'], $matches)) {
 						$namefixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
 					} else {
-						$pdo->queryExec(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE id = %d", $release['dehashstatus'], $release['releaseid']));
+						$pdo->queryExec(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE id = %d", $release['dehashstatus'], $release['releases_id']));
 						echo '.';
 					}
 				}
@@ -95,15 +98,15 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'par2' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT r.id AS releaseid, r.guid, r.groupid
-								FROM releases r
-								WHERE r.guid %s
-								AND r.nzbstatus = 1
-								AND r.proc_par2 = 0
-								AND r.preid = 0
-								ORDER BY r.postdate ASC
+					SELECT r.id AS releases_id, r.guid, r.groups_id
+					FROM releases r
+					WHERE r.leftguid = %s
+					AND r.nzbstatus = 1
+					AND r.proc_par2 = 0
+					AND r.predb_id < 1
+					ORDER BY r.id ASC
 								LIMIT %s',
-					$pdo->likeString($guidChar, false, true),
+					$pdo->escapeString($guidChar),
 					$maxperrun
 				)
 			);
@@ -122,7 +125,7 @@ if (!isset($argv[1])) {
 					)
 				);
 				foreach ($releases as $release) {
-					$res = $nzbcontents->checkPAR2($release['guid'], $release['releaseid'], $release['groupid'], 1, 1);
+					$res = $nzbcontents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], 1, 1);
 					if ($res === false) {
 						echo '.';
 					}
@@ -132,15 +135,17 @@ if (!isset($argv[1])) {
 		case $pieces[0] === 'miscsorter' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 			$releases = $pdo->queryDirect(
 				sprintf('
-								SELECT r.id AS releaseid
-								FROM releases r
-								WHERE r.guid %s
-								AND r.nzbstatus = 1 AND r.nfostatus = 1
-								AND r.proc_sorter = 0 AND r.isrenamed = 0
-								AND r.preid = 0
-								ORDER BY r.postdate DESC
-								LIMIT %s',
-					$pdo->likeString($guidChar, false, true),
+					SELECT r.id AS releases_id
+					FROM releases r
+					WHERE r.leftguid = %s
+					AND r.nzbstatus = 1
+					AND r.nfostatus = 1
+					AND r.proc_sorter = 0
+					AND r.isrenamed = 0
+					AND r.predb_id < 1
+					ORDER BY r.id DESC
+					LIMIT %s',
+					$pdo->escapeString($guidChar),
 					$maxperrun
 				)
 			);
@@ -148,14 +153,14 @@ if (!isset($argv[1])) {
 			if ($releases instanceof Traversable) {
 				$sorter = new MiscSorter(true, $pdo);
 				foreach ($releases as $release) {
-					$res = $sorter->nfosorter(null, $release['releaseid']);
+					$res = $sorter->nfosorter(null, $release['releases_id']);
 				}
 			}
 			break;
 		case $pieces[0] === 'predbft' && isset($maxperrun) && is_numeric($maxperrun) && isset($thread) && is_numeric($thread):
 			$pres = $pdo->queryDirect(
 				sprintf('
-							SELECT p.id AS preid, p.title, p.source, p.searched
+							SELECT p.id AS predb_id, p.title, p.source, p.searched
 							FROM predb p
 							WHERE LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"
 							AND searched = 0
@@ -182,7 +187,7 @@ if (!isset($argv[1])) {
 						$searched = $pre['searched'] - 1;
 						echo ".";
 					}
-					$pdo->queryExec(sprintf("UPDATE predb SET searched = %d WHERE id = %d", $searched, $pre['preid']));
+					$pdo->queryExec(sprintf("UPDATE predb SET searched = %d WHERE id = %d", $searched, $pre['predb_id']));
 					$namefixer->checked++;
 				}
 			}

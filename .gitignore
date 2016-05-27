@@ -12,16 +12,18 @@ test.php
 *.orig
 
 /.idea/
+/app/libraries/*
+/app/resources/tmp/*
 /newznab/config/settings.php
 /newznab/config/ircscraper_settings.php
 /newznab/config/ircscraper.php
 /newznab/config/opensssl.php
 
+/libraries/*
 /nbproject/
 /nbproject/private/
 /resources/covers/*
 /resources/nzb/*
 /resources/tmp/*
 /templates_c/*
-/vendor
 /www/themes/shared/assets

@@ -23,35 +23,6 @@
 	-->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!-- The styles -->
-	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/{$theme}/css/bootstrap-spacelab.min.css" rel="stylesheet">
-	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/Charisma-app.css" rel="stylesheet">
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/fullcalendar/dist/fullcalendar.css'
-		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/fullcalendar/dist/fullcalendar.print.css'
-		  rel='stylesheet' media='print'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/chosen/chosen.min.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/colorbox/example3/colorbox.css'
-		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/responsive-tables/responsive-tables.css'
-		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/bootstrap-tour/build/css/bootstrap-tour.min.css'
-		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/jquery.noty.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/noty_theme_default.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.min.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.theme.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/jquery.iphone.toggle.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/uploadify.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/animate.min.css' rel='stylesheet'>
-	<!-- jQuery -->
-	<script src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/jquery/jquery.min.js"></script>
-	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
-	<!--[if lt IE 9]>
-	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<!-- The fav icon -->
-	<link rel="shortcut icon" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico">
 </head>
 <body>
 {if $showregister != "0"}
@@ -111,35 +82,4 @@
 	</div>
 	<!--/.fluid-container-->
 {/if}
-<!-- external javascript -->
-<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js"></script>
-<!-- library for cookie management -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.cookie.js"></script>
-<!-- calender plugin -->
-<script src='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/moment/min/moment.min.js'></script>
-<script src='{$smarty.const.WWW_THEMES}/{$theme}/bower_components/fullcalendar/dist/fullcalendar.min.js'></script>
-<!-- data table plugin -->
-<script src='{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.dataTables.min.js'></script>
-<!-- select or dropdown enhancer -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/chosen/chosen.jquery.min.js"></script>
-<!-- plugin for gallery image view -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/colorbox/jquery.colorbox-min.js"></script>
-<!-- notification plugin -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.noty.js"></script>
-<!-- library for making tables responsive -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/responsive-tables/responsive-tables.js"></script>
-<!-- tour plugin -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/bower_components/bootstrap-tour/build/js/bootstrap-tour.min.js"></script>
-<!-- star rating plugin -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.raty.min.js"></script>
-<!-- for iOS style toggle switch -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.iphone.toggle.js"></script>
-<!-- autogrowing textarea plugin -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.autogrow-textarea.js"></script>
-<!-- multiple file upload plugin -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.uploadify-3.1.min.js"></script>
-<!-- history.js for cross-browser state change on ajax -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.history.js"></script>
-<!-- application script for Charisma demo -->
-<script src="{$smarty.const.WWW_THEMES}/{$theme}/js/Charisma.js"></script>
 </body>

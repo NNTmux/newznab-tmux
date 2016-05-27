@@ -112,7 +112,7 @@ if((isset($argv[1]) && $argv[1] == "db") && (isset($argv[2]) && $argv[2] == "dum
 	}
 	$pdo->queryExec("SET FOREIGN_KEY_CHECKS=1");
 } else if((isset($argv[1]) && $argv[1] == "test") && (isset($argv[2]) && $argv[2] == "dump") && (isset($argv[3]) && file_exists($argv[3]))) {
-	$arr = array("parts", "binaries", "partrepair", "groups");
+	$arr = array("parts", "binaries", "missed_parts", "groups");
 	foreach ($arr as &$tbl) {
 		$filename = $argv[3]."/".$tbl.".gz";
 		echo $pdo->log->header("Dumping $tbl..");
@@ -123,7 +123,7 @@ if((isset($argv[1]) && $argv[1] == "db") && (isset($argv[2]) && $argv[2] == "dum
 		system($command);
 	}
 } else if((isset($argv[1]) && $argv[1] == "test") && (isset($argv[2]) && $argv[2] == "restore") && (isset($argv[3]) && file_exists($argv[3]))) {
-	$arr = array("parts", "binaries", "partrepair", "groups");
+	$arr = array("parts", "binaries", "missed_parts", "groups");
 	$pdo->queryExec("SET FOREIGN_KEY_CHECKS=0");
 	foreach ($arr as &$tbl) {
 		$filename = $argv[3]."/".$tbl.".gz";

@@ -106,7 +106,7 @@ class DB extends \PDO
 			'dbpass' 		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
 			'dbport'		=> defined('DB_PORT') ? DB_PORT : '',
 			'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
-			'dbtype'		=> defined('DB_TYPE') ? DB_TYPE : '',
+			'dbtype'		=> defined('DB_SYSTEM') ? DB_SYSTEM : '',
 			'dbuser' 		=> defined('DB_USER') ? DB_USER : '',
 			'log'			=> new ColorCLI(),
 			'persist'		=> false,
@@ -659,6 +659,9 @@ class DB extends \PDO
 		if (strpos($query, 'SQL_CALC_FOUND_ROWS') === false) {
 			return $data;
 		}
+
+		// Remove LIMIT and OFFSET from query to allow queryCalc usage with browse
+		$query = preg_replace('#(\s+LIMIT\s+\d+)?\s+OFFSET\s+\d+\s*$#i', '', $query);
 
 		if ($cache === true && $this->cacheEnabled === true ) {
 			try {

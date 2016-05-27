@@ -158,7 +158,7 @@
 												<li width="80px">{if $mhaspreview[$m@index]}<a href="#" onclick="return false;" class="mediainfo label" title="{$mguid[$m@index]}">Media</a>{/if}</li>
 											</ul>
 										</td>
-										<td class="icons" style='width:100px;'>
+										<td class="icons" style='width:150px;'>
 											<ul class="inline">
 												<li>
 													<a class="icon icon_nzb fa fa-cloud-download" style="text-decoration: none; color: #7ab800;" title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"></a>
@@ -170,6 +170,17 @@
 												{if isset($sabintegrated) && $sabintegrated !=""}
 													<li>
 														<a class="icon icon_sab fa fa-share" style="text-decoration: none; color: #008ab8;"  href="#" title="Send to queue"></a>
+													</li>
+												{/if}
+												{if !empty($cpurl) && !empty($cpapi)}
+													<li>
+														<a
+															id="imdb{$result.imdbid}"
+															href="javascript:;"
+															class="sendtocouch fa fa-bed"
+															style="text-decoration: none; color: #008ab8;"
+															title="Send to CouchPotato">
+														</a>
 													</li>
 												{/if}
 												{if $weHasVortex}

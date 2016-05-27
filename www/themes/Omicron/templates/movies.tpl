@@ -21,7 +21,7 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
+								Check all: <input type="checkbox" class="square-all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<input type="button"
@@ -98,8 +98,8 @@
 													   name="trakt{$result.imdbid}" title="View Trakt page"
 													   class="label label-default" rel="trakt">TRAKT</a>
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-default"
+														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-default"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
@@ -154,14 +154,14 @@
 																	  title="Send to my Queue"><i
 																			class="fa fa-share"></i></span>
 															{/if}
-															{if $cpurl != '' && $cpapi != ''}
-																<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																	  target="blackhole"
-																	  href="javascript:"
-																	  rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
-																	  name="CP{$result.imdbid}"
-																	  title="Add to CouchPotato"
-																		><i class="fa fa-share"></i></span>
+															{if !empty($cpurl) && !empty($cpapi)}
+																<span
+																	id="imdb{$result.imdbid}"
+																	class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																	href="javascript:;"
+																	title="Add to CouchPotato">
+																	<i class="fa fa-bed"></i>
+																</span>
 															{/if}
 															{if !empty($mfailed[$m@index])}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
@@ -216,8 +216,8 @@
 													   name="trakt{$result.imdbid}" title="View Trakt page"
 													   class="label label-default" rel="trakt">TRAKT</a>
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"htmlall"}"
-														title="View NFO" class="label label-default"
+														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-default"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
@@ -272,14 +272,14 @@
 																	  title="Send to my Queue"><i
 																			class="fa fa-share"></i></span>
 															{/if}
-															{if $cpurl != '' && $cpapi != ''}
-																<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																		target="blackhole"
-																		href="javascript:"
-																		rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
-																		name="CP{$result.imdbid}"
-																		title="Add to CouchPotato"
-																		><i class="fa fa-share"></i></span>
+															{if !empty($cpurl) && !empty($cpapi)}
+																<span
+																	id="imdb{$result.imdbid}"
+																	class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																	href="javascript:;"
+																	title="Add to CouchPotato">
+																	<i class="fa fa-bed"></i>
+																</span>
 															{/if}
 															{if !empty($mfailed[$m@index])}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
@@ -304,7 +304,7 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
+								Check all: <input type="checkbox" class="square-all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<input type="button"
@@ -317,17 +317,6 @@
 										<input type="button"
 											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 											   value="Send to Queue"/>
-									{/if}
-									{if $cpurl != '' && $cpapi != ''}
-										<a
-												class="sendtocouch"
-												target="blackhole"
-												href="javascript:"
-												rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
-												name="CP{$result.imdbid}"
-												title="Add to CouchPotato"
-												><img
-													src="{$smarty.const.WWW_THEMES}/shared/images/icons/couch.png"></a>
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"

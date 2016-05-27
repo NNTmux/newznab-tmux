@@ -1,3 +1,4 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 <p>This page lists regex used for categorizing releases.<br />
 	You can recategorize all releases by running misc/update/update_releases.php 6 true
@@ -8,12 +9,12 @@
 	<label for="group">Search a group:</label>
 	<input id="group" type="text" name="group" value="{$group}" size="15" />
 	&nbsp;&nbsp;
-	<input type="submit" value="Go" />
+	<input class="btn btn-default" type="submit" value="Go" />
 </form>
 {if $regex}
 
 	<div>{$pager}</div>
-	<table style="margin-top:10px;" class="data Sortable highlight">
+	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>
 			<th style="width:20px;">id</th>
 			<th>group</th>
@@ -39,9 +40,10 @@
 					<td style="color:#FF0000">Disabled</td>
 				{/if}
 				<td title="Edit this regex"><a href="{$smarty.const.WWW_TOP}/category_regexes-edit.php?id={$row.id}">{$row.regex|escape:html|truncate:50:"...":true}</a></td>
-				<td>{$row.category_id}</td>
+				<td>{$row.categories_id}</td>
 			</tr>
 		{/foreach}
 	</table>
 	<div style="margin-top: 15px">{$pager}</div>
 {/if}
+	</div>

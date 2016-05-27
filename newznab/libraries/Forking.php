@@ -147,11 +147,11 @@ class Forking extends \fork_daemon
 
 			case 'fixRelNames_nfo':
 			case 'fixRelNames_filename':
+			case 'fixRelNames_srr':
 			case 'fixRelNames_md5':
 			case 'fixRelNames_par2':
 			case 'fixRelNames_miscsorter':
 			case 'fixRelNames_predbft':
-			case 'fixRelNames_srr':
 				$maxProcesses = $this->fixRelNamesMainMethod();
 				break;
 
@@ -351,7 +351,7 @@ class Forking extends \fork_daemon
 				MAX(a.first_record) AS their_first,
 				MAX(a.last_record) AS their_last
 				FROM groups g
-				INNER JOIN shortgroups a ON g.name = a.name
+				INNER JOIN short_groups a ON g.name = a.name
 				WHERE g.first_record IS NOT NULL
 				AND g.first_record_postdate IS NOT NULL
 				AND g.backfill = 1
@@ -432,7 +432,13 @@ class Forking extends \fork_daemon
 		$maxmssgs = $this->pdo->getSetting('maxmssgs');
 		$threads = $this->pdo->getSetting('binarythreads');
 
-		$groups = $this->pdo->query("SELECT g.name AS groupname, g.last_record AS our_last, a.last_record AS their_last FROM groups g INNER JOIN shortgroups a ON g.active = 1 AND g.name = a.name ORDER BY a.last_record DESC");
+		$groups = $this->pdo->query("
+			SELECT g.name AS groupname, g.last_record AS our_last,
+				a.last_record AS their_last
+			FROM groups g
+			INNER JOIN short_groups a ON g.active = 1 AND g.name = a.name
+			ORDER BY a.last_record DESC"
+		);
 
 		if ($groups) {
 			$i = 1;
@@ -490,11 +496,10 @@ class Forking extends \fork_daemon
 
 		$join = "";
 		$where = "";
-		$groupby = "GROUP BY guidchar";
-		$orderby = "ORDER BY guidchar ASC";
+		$groupby = "GROUP BY leftguid";
 		$rowLimit = "LIMIT 16";
-		$extrawhere = "AND r.preid = 0 AND r.nzbstatus = 1";
-		$select = "DISTINCT LEFT(r.guid, 1) AS guidchar, COUNT(r.id) AS count";
+		$extrawhere = "AND r.predb_id < 1 AND r.nzbstatus = 1";
+		$select = "r.leftguid AS guidchar, COUNT(r.id) AS count";
 
 
 		$threads = $this->pdo->getSetting('fixnamethreads');
@@ -505,7 +510,7 @@ class Forking extends \fork_daemon
 		}
 		switch($this->workTypeOptions[0]) {
 			case "md5":
-				$join = "LEFT OUTER JOIN release_files rf ON (r.id = rf.releaseid) AND rf.ishashed = 1";
+				$join = "LEFT OUTER JOIN release_files rf ON (r.id = rf.releases_id) AND rf.ishashed = 1";
 				$where = "r.ishashed = 1 AND r.dehashstatus BETWEEN -6 AND 0";
 				break;
 
@@ -514,8 +519,13 @@ class Forking extends \fork_daemon
 				break;
 
 			case "filename":
-				$join = "INNER JOIN release_files rf ON rf.releaseid = r.id";
+				$join = "STRAIGHT_JOIN release_files rf ON rf.releases_id = r.id";
 				$where = "r.proc_files = 0";
+				break;
+
+			case "srr":
+				$join = "STRAIGHT_JOIN release_files rf ON rf.releases_id = r.id";
+				$where = "r.proc_srr = 0";
 				break;
 
 			case "par2":
@@ -531,13 +541,21 @@ class Forking extends \fork_daemon
 				$where = "1=1";
 				$rowLimit = sprintf("LIMIT %s", $threads);
 				break;
-
-			case "srr":
-				$where = "r.proc_srr = 0";
-				break;
 		}
 
-		$datas = $this->pdo->query(sprintf("SELECT %s FROM releases r %s WHERE %s %s %s %s %s", $select, $join, $where, $extrawhere, $groupby, $orderby, $rowLimit));
+		$datas = $this->pdo->query(
+			sprintf("
+				SELECT %s
+				FROM releases r %s
+				WHERE %s %s %s %s",
+				$select,
+				$join,
+				$where,
+				$extrawhere,
+				$groupby,
+				$rowLimit
+			)
+		);
 
 		if ($datas) {
 			$count = 0;
@@ -665,7 +683,7 @@ class Forking extends \fork_daemon
 				sprintf('
 					SELECT r.id
 					FROM releases r
-					LEFT JOIN category c ON c.id = r.categoryid
+					LEFT JOIN categories c ON c.id = r.categories_id
 					WHERE r.nzbstatus = %d
 					AND r.passwordstatus BETWEEN -6 AND -1
 					AND r.haspreview = -1
@@ -688,15 +706,15 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(r.guid, 1) AS id
+					SELECT r.leftguid AS id
 					FROM releases r
-					LEFT JOIN category c ON c.id = r.categoryid
+					LEFT JOIN categories c ON c.id = r.categories_id
 					WHERE r.nzbstatus = %d
 					AND r.passwordstatus BETWEEN -6 AND -1
 					AND r.haspreview = -1
 					AND c.disablepreview = 0
 					%s %s
-					GROUP BY LEFT(r.guid, 1)
+					GROUP BY r.leftguid
 					LIMIT 16',
 					NZB::NZB_ADDED,
 					$this->ppAddMaxSize,
@@ -738,10 +756,10 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(r.guid, 1) AS id
+					SELECT r.leftguid AS id
 					FROM releases r
 					WHERE 1=1 %s
-					GROUP BY LEFT(r.guid, 1)
+					GROUP BY r.leftguid
 					LIMIT 16',
 					$this->nfoQueryString
 				)
@@ -765,7 +783,7 @@ class Forking extends \fork_daemon
 						FROM releases
 						WHERE nzbstatus = %d
 						AND imdbid IS NULL
-						AND categoryid BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
+						AND categories_id BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
 						%s %s
 						LIMIT 1',
 						NZB::NZB_ADDED,
@@ -786,13 +804,13 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(guid, 1) AS id, %d AS renamed
+					SELECT leftguid AS id, %d AS renamed
 					FROM releases
 					WHERE nzbstatus = %d
 					AND imdbid IS NULL
-					AND categoryid BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
+					AND categories_id BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
 					%s %s
-					GROUP BY LEFT(guid, 1)
+					GROUP BY leftguid
 					LIMIT 16',
 					($this->ppRenamedOnly ? 2 : 1),
 					NZB::NZB_ADDED,
@@ -820,7 +838,7 @@ class Forking extends \fork_daemon
 						WHERE nzbstatus = %d
 						AND size > 1048576
 						AND tv_episodes_id BETWEEN -2 AND 0
-						AND categoryid BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
+						AND categories_id BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
 						%s %s
 						LIMIT 1',
 					NZB::NZB_ADDED,
@@ -841,14 +859,14 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(guid, 1) AS id, %d AS renamed
+					SELECT leftguid AS id, %d AS renamed
 					FROM releases
 					WHERE nzbstatus = %d
 					AND tv_episodes_id BETWEEN -2 AND 0
 					AND size > 1048576
-					AND categoryid BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
+					AND categories_id BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
 					%s %s
-					GROUP BY LEFT(guid, 1)
+					GROUP BY leftguid
 					LIMIT 16',
 					($this->ppRenamedOnly ? 2 : 1),
 					NZB::NZB_ADDED,
@@ -904,10 +922,10 @@ class Forking extends \fork_daemon
 			sprintf('
 				SELECT DISTINCT(g.id)
 				FROM groups g
-				INNER JOIN releases r ON r.groupid = g.id
+				INNER JOIN releases r ON r.groups_id = g.id
 				WHERE g.active = 1
 				AND r.nzbstatus = %d
-				AND r.preid = 0
+				AND r.predb_id = 0
 				AND r.isrequestid = 1
 				AND r.reqidstatus = %d',
 				NZB::NZB_ADDED,
@@ -1040,6 +1058,16 @@ class Forking extends \fork_daemon
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////// All class vars here /////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * @var ColorCLI
+	 */
+	public $_colorCLI;
+
+	/**
+	 * @var int The type of output
+	 */
+	protected $outputType;
 
 	/**
 	 * Path to do not run folder.

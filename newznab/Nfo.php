@@ -163,8 +163,7 @@ class Nfo
 			}
 
 			// If above checks couldn't  make a categorical identification, Use GetId3 to check if it's an image/video/rar/zip etc..
-			$getid3 = new \getID3();
-			$check = $getid3->analyze($tmpPath);
+			$check = (new \getID3())->analyze($tmpPath);
 			@unlink($tmpPath);
 			if (isset($check['error'])) {
 
@@ -200,11 +199,11 @@ class Nfo
 	{
 		if ($release['id'] > 0 && $this->isNFO($nfo, $release['guid'])) {
 
-			$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM releasenfo WHERE releaseid = %d', $release['id']));
+			$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM release_nfos WHERE releases_id = %d', $release['id']));
 
 			if ($check === false) {
 				$this->pdo->queryInsert(
-					sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (compress(%s), %d)',
+					sprintf('INSERT INTO release_nfos (nfo, releases_id) VALUES (compress(%s), %d)',
 						$this->pdo->escapeString($nfo),
 						$release['id']
 					)
@@ -227,7 +226,7 @@ class Nfo
 						'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this])
 					]
 				);
-				$nzbContents->parseNZB($release['guid'], $release['id'], $release['groupid']);
+				$nzbContents->parseNZB($release['guid'], $release['id'], $release['groups_id']);
 			}
 			return true;
 		}
@@ -278,13 +277,13 @@ class Nfo
 	public function processNfoFiles($nntp, $groupID = '', $guidChar = '', $processImdb = 1, $processTv = 1)
 	{
 		$ret = 0;
-		$guidCharQuery = ($guidChar === '' ? '' : 'AND r.guid ' . $this->pdo->likeString($guidChar, false, true));
-		$groupIDQuery = ($groupID === '' ? '' : 'AND r.groupid = ' . $groupID);
+		$guidCharQuery = ($guidChar === '' ? '' : 'AND r.leftguid = ' . $this->pdo->escapeString($guidChar));
+		$groupIDQuery = ($groupID === '' ? '' : 'AND r.groups_id = ' . $groupID);
 		$optionsQuery = self::NfoQueryString($this->pdo);
 
 		$res = $this->pdo->query(
 			sprintf('
-				SELECT r.id, r.guid, r.groupid, r.name
+				SELECT r.id, r.guid, r.groups_id, r.name
 				FROM releases r
 				WHERE 1=1 %s %s %s
 				ORDER BY r.nfostatus ASC, r.postdate DESC
@@ -345,15 +344,15 @@ class Nfo
 			$movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
 			foreach ($res as $arr) {
-				$fetchedBinary = $nzbContents->getNfoFromNZB($arr['guid'], $arr['id'], $arr['groupid'], $groups->getByNameByID($arr['groupid']));
+				$fetchedBinary = $nzbContents->getNfoFromNZB($arr['guid'], $arr['id'], $arr['groups_id'], $groups->getByNameByID($arr['groups_id']));
 				if ($fetchedBinary !== false) {
 					// Insert nfo into database.
 					$cp = 'COMPRESS(%s)';
 					$nc = $this->pdo->escapeString($fetchedBinary);
 
-					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT id FROM releasenfo WHERE releaseid = %d', $arr['id']));
+					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT id FROM release_nfos WHERE releases_id = %d', $arr['id']));
 					if (!isset($ckreleaseid['id'])) {
-						$this->pdo->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (' . $cp . ', %d)', $nc, $arr['id']));
+						$this->pdo->queryInsert(sprintf('INSERT INTO release_nfos (nfo, releases_id) VALUES (' . $cp . ', %d)', $nc, $arr['id']));
 					}
 					$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', self::NFO_FOUND, $arr['id']));
 					$ret++;
@@ -400,7 +399,7 @@ class Nfo
 			foreach ($releases as $release) {
 				// remove any releasenfo for failed
 				$this->pdo->queryExec(sprintf('
-					DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d',
+					DELETE FROM release_nfos WHERE nfo IS NULL AND releases_id = %d',
 						$release['id']
 					)
 				);

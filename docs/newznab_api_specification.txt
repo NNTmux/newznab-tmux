@@ -685,6 +685,7 @@ newznab-tmux https://github.com/DariusIII/newznab-tmux
    usenetdate      ALL                     Date posted to usenet                   "Tue, 22 Jun 2010 06:54:22 +0100"
    info            ALL                     Info (.nfo) file URL                    "http://somesite/stuff/info.php?id=1234"
    year            ALL                     Release year                            "2009"
+   prematch        ALL                     Has valid PreDB match                   "0" no "1" yes
    season          TV                      Numeric season                          "1"
    episode         TV                      Numeric episode within the season       "1"
    videos_id       TV, Movies, Anime       Local Video ID                          "1"

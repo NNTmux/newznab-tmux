@@ -1,4 +1,4 @@
-<div id="updatePanel">
+<div class="well well-sm" id="updatePanel">
 	{if $success}
 		<h4>Successfully updated!</h4>
 	{if $from != ''}
@@ -27,7 +27,7 @@
 				<tr>
 					<td><label for="category">Category:</label></td>
 					<td>
-						{html_options id="category" name=category options=$catlist selected=$release.categoryid}
+						{html_options id="category" name=category options=$catlist selected=$release.categories_id}
 					</td>
 				</tr>
 				<tr>
@@ -63,7 +63,7 @@
 				<tr>
 					<td></td>
 					<td>
-						<input type="submit" value="Save" id="save" />
+						<input class="btn btn-default" type="submit" value="Save" id="save" />
 					</td>
 				</tr>
 			</table>

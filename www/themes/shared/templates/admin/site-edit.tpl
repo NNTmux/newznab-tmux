@@ -1,5 +1,6 @@
 <h1>{$page->title}</h1>
 
+<div class="well well-small">
 <form action="{$SCRIPT_NAME}?action=submit" method="post">
 
 {if isset ($error) && $error != ''}
@@ -8,7 +9,7 @@
 
 <fieldset>
 <legend>Main Site Settings, HTML Layout, Tags</legend>
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
 	<td><label for="title">Title</label>:</td>
@@ -38,7 +39,7 @@
 <tr>
 	<td><label for="metadescription">Meta Description</label>:</td>
 	<td>
-		<textarea class="autosize" id="metadescription" name="metadescription">{$site->metadescription}</textarea>
+		<textarea id="metadescription" name="metadescription">{$site->metadescription}</textarea>
 		<div class="hint">Stem meta-description appended to all page meta description tags.</div>
 	</td>
 </tr>
@@ -46,7 +47,7 @@
 <tr>
 	<td><label for="metakeywords">Meta Keywords</label>:</td>
 	<td>
-		<textarea class="autosize"  id="metakeywords" name="metakeywords">{$site->metakeywords}</textarea>
+		<textarea id="metakeywords" name="metakeywords">{$site->metakeywords}</textarea>
 		<div class="hint">Stem meta-keywords appended to all page meta keyword tags.</div>
 	</td>
 </tr>
@@ -54,7 +55,7 @@
 <tr>
 	<td><label for="footer">Footer</label>:</td>
 	<td>
-		<textarea class="autosize"  id="footer" name="footer">{$site->footer}</textarea>
+		<textarea id="footer" name="footer">{$site->footer}</textarea>
 		<div class="hint">Displayed in the footer section of every public page.</div>
 	</td>
 </tr>
@@ -135,7 +136,7 @@
 <tr>
 	<td><label for="tandc">Terms and Conditions</label>:</td>
 	<td>
-		<textarea class="autosize"  id="tandc" name="tandc">{$site->tandc}</textarea>
+		<textarea id="tandc" name="tandc">{$site->tandc}</textarea>
 		<div class="hint">Text displayed in the terms and conditions page.</div>
 	</td>
 </tr>
@@ -144,7 +145,7 @@
 
 <fieldset>
 <legend>Google Adsense, Analytics and 3rd Party Banners</legend>
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 <tr>
 	<td style="width:160px;"><label for="google_analytics_acc">Google Analytics</label>:</td>
 	<td>
@@ -172,7 +173,7 @@
 <tr>
 	<td><label for="adheader">Advert Space in Banner</label>:</td>
 	<td>
-		<textarea class="autosize"  id="adheader" name="adheader">{$site->adheader}</textarea>
+		<textarea id="adheader" name="adheader">{$site->adheader}</textarea>
 		<div class="hint">The banner slot in the header.</div>
 	</td>
 </tr>
@@ -180,7 +181,7 @@
 <tr>
 	<td><label for="adbrowse">Advert Space in Browse List</label>:</td>
 	<td>
-		<textarea class="autosize"  id="adbrowse" name="adbrowse">{$site->adbrowse}</textarea>
+		<textarea id="adbrowse" name="adbrowse">{$site->adbrowse}</textarea>
 		<div class="hint">The banner slot in the header.</div>
 	</td>
 </tr>
@@ -188,7 +189,7 @@
 <tr>
 	<td><label for="addetail">Advert Space in Detail View</label>:</td>
 	<td>
-		<textarea class="autosize"  id="addetail" name="addetail">{$site->addetail}</textarea>
+		<textarea id="addetail" name="addetail">{$site->addetail}</textarea>
 		<div class="hint">The banner slot in the release details view.</div>
 	</td>
 </tr>
@@ -199,7 +200,7 @@
 
 <fieldset>
 <legend>3<sup>rd</sup> Party API Keys</legend>
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 <tr>
 	<td style="width:160px;"><label for="tmdbkey">TMDB Key</label>:</td>
 	<td>
@@ -279,7 +280,7 @@
 
 <fieldset>
 <legend>3<sup>rd</sup> Party Application Paths</legend>
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 <tr>
 	<td style="width:160px;"><label for="unrarpath">Unrar Path</label>:</td>
 	<td>
@@ -370,7 +371,7 @@
 	<fieldset>
 		<legend>Download Queue Integration Settings</legend>
 
-		<table class="input">
+		<table class="input data table table-striped responsive-utilities jambo-table">
 			<tr>
 				<td style="width:160px;"><label for="sabintegrationtype">Integration Type</label>:</td>
 				<td>
@@ -398,7 +399,7 @@
 
 		<fieldset>
 			<legend>SABnzbd</legend>
-			<table>
+			<table class="data table table-striped responsive-utilities jambo-table">
 
 				<tr>
 					<td><label for="saburl">SABnzbd Url</label>:</td>
@@ -438,7 +439,7 @@
 
 		<fieldset>
 			<legend>NZBGet</legend>
-			<table class="input">
+			<table class="input data table table-striped responsive-utilities jambo-table">
 
 				<tr>
 					<td><label for="nzbgeturl">NZBGet Url</label>:</td>
@@ -472,7 +473,7 @@
 
 <fieldset>
 <legend>Usenet Settings</legend>
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
 	<td><label for="nzbpath">Nzb File Path</label>:</td>
@@ -689,7 +690,7 @@
 
 <fieldset>
 <legend>Lookup Settings</legend>
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 <tr>
 	<td><label for="reqidurl">Allfilled Request Id Lookup URL</label>:</td>
 	<td>
@@ -800,7 +801,7 @@
 </fieldset>
 <fieldset>
 	<legend>Language/Categorization options</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="categorizeforeign">Categorize Foreign:</label></td>
 			<td>
@@ -825,7 +826,7 @@
 
 <fieldset>
 <legend>Password Settings</legend>
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 <tr>
 	<td><label for="checkpasswordedrar">Check For Passworded Releases</label>:</td>
 	<td>
@@ -872,7 +873,7 @@
 
 <fieldset>
 <legend>Spotnab Settings</legend>
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
 	<td><label for="spotnabpost">Enable Posting</label>:</td>
@@ -939,7 +940,7 @@
 <tr>
   <td style="width:130px;"><label for="spotnabsitepubkey">Public Key</label>:</td>
   <td>
-	<textarea class="autosize"  name="spotnabsitepubkey">{$site->spotnabsitepubkey|escape:html}</textarea>
+	<textarea name="spotnabsitepubkey">{$site->spotnabsitepubkey|escape:html}</textarea>
 	<div class="hint">Public key other sites will use to decrypt comments.</div>
   </td>
 </tr>
@@ -947,7 +948,7 @@
 <tr>
   <td style="width:130px;"><label for="spotnabsiteprvkey">Private Key:<br><u>Do Not Share This</u></label></td>
   <td>
-	<textarea class="autosize"  name="spotnabsiteprvkey">{$site->spotnabsiteprvkey|escape:html}</textarea>
+	<textarea name="spotnabsiteprvkey">{$site->spotnabsiteprvkey|escape:html}</textarea>
 	<div class="hint">Private key used to encrypt comments before uploading.</div>
   </td>
 </tr>
@@ -957,7 +958,7 @@
 
 <fieldset>
 	<legend>IMDB.com URL</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="imdburl">IMDB.com:</label></td>
 			<td>
@@ -972,7 +973,7 @@
 
 <fieldset>
 	<legend>Usenet Settings</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 
 		<tr>
 			<td style="width:180px;"><label for="maxsizetopostprocess">Maximum Release Size to Post Process:</label></td>
@@ -1015,7 +1016,7 @@
 
 <fieldset>
 	<legend>Advanced Settings - For advanced users</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="tablepergroup">Table Per Group:</label></td>
 			<td>
@@ -1052,7 +1053,7 @@
 			<td style="width:180px;"><label for="safepartrepair">Part Repair for Backfill Scripts:</label></td>
 			<td>
 				{html_radios id="safepartrepair" name='safepartrepair' values=$yesno_ids output=$yesno_names selected=$site->safepartrepair separator='<br />'}
-				<div class="hint">Whether to put unreceived parts into partrepair table when running binaries(safe) or backfill scripts.</div>
+				<div class="hint">Whether to put unreceived parts into missed_parts table when running binaries(safe) or backfill scripts.</div>
 			</td>
 		</tr>
 		<tr>
@@ -1060,7 +1061,7 @@
 			<td>
 				<input class="short" id="maxpartrepair" name="maxpartrepair" type="text" value="{$site->maxpartrepair}"/>
 				<div class="hint">The maximum amount of articles to attempt to repair at a time. If you notice that you
-					are getting a lot of parts into the partrepair table, it is possible that you USP is not keeping up
+					are getting a lot of parts into the missed_parts table, it is possible that you USP is not keeping up
 					with the requests. Try to reduce the threads to safe scripts, stop using safe scripts or stop using
 					nntpproxy until improves. Ar least until the cause can be determined.
 				</div>
@@ -1172,7 +1173,7 @@
 </fieldset>
 	<fieldset id="site_movietrailerset">
 		<legend>Movie Trailer settings</legend>
-		<table class="input">
+		<table class="input data table table-striped responsive-utilities jambo-table">
 			<tr>
 				<td style="width:180px;"><label for="trailers_display">Fetch/Display Movie Trailers:</label></td>
 				<td>
@@ -1198,7 +1199,7 @@
 	</fieldset>
 <fieldset id="site_requidset">
 	<legend>RequestID Settings</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="lookup_reqids">Lookup Request IDs:</label></td>
 			<td>
@@ -1227,7 +1228,7 @@
 
 <fieldset>
 	<legend>Advanced - Postprocessing Settings</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="timeoutseconds">Time in seconds to kill unrar/7zip/mediainfo/ffmpeg/avconv:</label></td>
 			<td>
@@ -1372,7 +1373,7 @@
 
 	<fieldset id="site_nfoprocessing">
 		<legend>NFO Processing Settings</legend>
-		<table class="input">
+		<table class="input data table table-striped responsive-utilities jambo-table">
 			<tr>
 				<td style="width:180px;"><label for="lookupnfo">Lookup NFO:</label></td>
 				<td>
@@ -1417,7 +1418,7 @@
 
 <fieldset>
 	<legend>Connection Settings</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 
 		<tr>
 			<td style="width:180px;"><label for="nntpretries">NNTP Retry Attempts:</label></td>
@@ -1479,7 +1480,7 @@
 </fieldset>
 	<fieldset id="site_developerset">
 		<legend>Developer Settings</legend>
-		<table class="input">
+		<table class="input data table table-striped responsive-utilities jambo-table">
 			<tr>
 				<td style="width:180px;"><label for="showdroppedyencparts">Log Dropped Headers:</label></td>
 				<td>
@@ -1492,7 +1493,7 @@
 
 <fieldset>
 	<legend>Advanced - Threaded Settings</legend>
-	<table class="input">
+	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<td style="width:180px;"><label for="binarythreads">Update Binaries Threads:</label></td>
 			<td>
@@ -1500,7 +1501,7 @@
 					   value="{$site->binarythreads}"/>
 
 				<div class="hint">The number of threads for update_binaries. If you notice that you are getting a lot of
-					parts into the partrepair table, it is possible that you USP is not keeping up with the requests.
+					parts into the missed_parts table, it is possible that you USP is not keeping up with the requests.
 					Try to reduce the threads. At least until the cause can be determined.
 				</div>
 			</td>
@@ -1593,7 +1594,7 @@
 
 <fieldset>
 <legend>User Settings</legend>
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
 	<td style="width:160px;"><label for="registerstatus">Registration Status</label>:</td>
@@ -1640,7 +1641,7 @@
 
 <fieldset>
 <legend>Recaptcha</legend>
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
   <td style="width:130px;"><label for="recaptchapublickey">ReCaptcha Public Key</label>:</td>
@@ -1671,6 +1672,7 @@
 </table>
 </fieldset>
 
-<input type="submit" value="Save Site Settings" />
+<input class="btn btn-default" type="submit" value="Save Site Settings" />
 
 </form>
+</div>

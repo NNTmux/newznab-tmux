@@ -2,13 +2,14 @@
 
 {if $anidblist}
 
+<div class="well well-sm">
 <div style="float:right;">
 
 	<form name="anidbsearch" action="">
 		<label for="animetitle">Title</label>
 		<input id="animetitle" type="text" name="animetitle" value="{$animetitle}" size="15" />
 		&nbsp;&nbsp;
-		<input type="submit" value="Go" />
+		<input class="btn btn-default" type="submit" value="Go" />
 	</form>
 </div>
 
@@ -16,7 +17,7 @@
 
 <br/><br/>
 
-<table style="width:100%;margin-top:10px;" class="data Sortable highlight">
+<table style="width:100%;margin-top:10px;" class="Sortable data table table-striped responsive-utilities jambo-table">
 
 	<tr>
 		<th style="width:60px;">AniDB Id</th>
@@ -39,3 +40,4 @@
 {else}
 <p>No AniDB episodes available.</p>
 {/if}
+</div>

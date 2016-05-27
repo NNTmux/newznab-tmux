@@ -1,11 +1,11 @@
-
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 <form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">
 
 <input type="hidden" name="id" value="{$music.id}" />
 
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
 	<td><label for="title">Title</label>:</td>
@@ -77,7 +77,7 @@
 <tr>
 	<td><label for="tracks">Tracks</label>:</td>
 	<td>
-		<textarea class="autosize" id="tracks" name="tracks">{$music.tracks|escape:'htmlall'}</textarea>
+		<textarea id="tracks" name="tracks">{$music.tracks|escape:'htmlall'}</textarea>
 		<div class="hint">Tracks separated by | (pipe) delimeter</div>
 	</td>
 </tr>
@@ -95,10 +95,11 @@
 <tr>
 	<td></td>
 	<td>
-		<input type="submit" value="Save" />
+		<input class="btn btn-default" type="submit" value="Save" />
 	</td>
 </tr>
 
 </table>
 
 </form>
+	</div>

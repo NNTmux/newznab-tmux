@@ -46,8 +46,8 @@ class Groups
 			COALESCE(rel.num, 0) AS num_releases
 			FROM groups
 			LEFT OUTER JOIN
-				(SELECT groupid, COUNT(id) AS num FROM releases GROUP BY groupid) rel
-			ON rel.groupid = groups.id
+				(SELECT groups_id, COUNT(id) AS num FROM releases GROUP BY groups_id) rel
+			ON rel.groups_id = groups.id
 			ORDER BY groups.name",
 			true, NN_CACHE_EXPIRY_LONG
 		);
@@ -131,7 +131,7 @@ class Groups
 	 *
 	 * @param string $name The group name.
 	 *
-	 * @return string Empty string on failure, groupid on success.
+	 * @return string Empty string on failure, groups_id on success.
 	 */
 	public function getIDByName($name)
 	{
@@ -180,10 +180,10 @@ class Groups
 				COALESCE(rel.num, 0) AS num_releases
 				FROM groups
 				LEFT OUTER JOIN
-					(SELECT groupid, COUNT(id) AS num
-						FROM releases GROUP BY groupid
+					(SELECT groups_id, COUNT(id) AS num
+						FROM releases GROUP BY groups_id
 					) rel
-				ON rel.groupid = groups.id
+				ON rel.groups_id = groups.id
 				WHERE 1 = 1 %s
 				ORDER BY groups.name " .
 				($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start),
@@ -321,7 +321,7 @@ class Groups
 		(new Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
 
 		// Remove rows from part repair.
-		$this->pdo->queryExec(sprintf("DELETE FROM partrepair WHERE group_id = %d", $id));
+		$this->pdo->queryExec(sprintf("DELETE FROM missed_parts WHERE group_id = %d", $id));
 
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS collections_%d', $id));
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS binaries_%d', $id));
@@ -349,7 +349,7 @@ class Groups
 		$this->pdo->queryExec("TRUNCATE TABLE collections");
 		$this->pdo->queryExec("TRUNCATE TABLE binaries");
 		$this->pdo->queryExec("TRUNCATE TABLE parts");
-		$this->pdo->queryExec("TRUNCATE TABLE partrepair");
+		$this->pdo->queryExec("TRUNCATE TABLE missed_parts");
 		$groups = $this->pdo->query("SELECT id FROM groups");
 		foreach ($groups as $group) {
 			$this->pdo->queryExec('DROP TABLE IF EXISTS collections_' . $group['id']);
@@ -487,7 +487,7 @@ class Groups
 		$tables['cname'] = 'collections';
 		$tables['bname'] = 'binaries';
 		$tables['pname'] = 'parts';
-		$tables['prname'] = 'partrepair';
+		$tables['prname'] = 'missed_parts';
 
 		if ($tpgSetting === true) {
 			if ($groupID == '') {
@@ -540,7 +540,7 @@ class Groups
 	 */
 	public function createNewTPGTables($groupID)
 	{
-		$cbpm = ['collections', 'binaries', 'parts', 'partrepair'];
+		$cbpm = ['collections', 'binaries', 'parts', 'missed_parts'];
 
 		foreach ( $cbpm as $tableName) {
 			if ($this->pdo->queryExec(sprintf('SELECT * FROM %s_%s LIMIT 1', $tableName, $groupID), true) === false) {
@@ -567,7 +567,7 @@ class Groups
 		}
 
 		$releaseArray = $this->pdo->queryDirect(
-			sprintf("SELECT id, guid FROM releases %s", ($id === false ? '' : 'WHERE groupid = ' . $id))
+			sprintf("SELECT id, guid FROM releases %s", ($id === false ? '' : 'WHERE groups_id = ' . $id))
 		);
 
 		if ($releaseArray instanceof \Traversable) {
@@ -648,11 +648,11 @@ class Groups
 				SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
 				FROM groups
 				LEFT OUTER JOIN
-					(SELECT groupid, COUNT(id) AS num
+					(SELECT groups_id, COUNT(id) AS num
 						FROM releases
-						GROUP BY groupid
+						GROUP BY groups_id
 					) rel
-				ON rel.groupid = groups.id
+				ON rel.groups_id = groups.id
 				WHERE 1 = 1 %s
 				AND active = 1
 				ORDER BY groups.name " .
@@ -683,11 +683,11 @@ class Groups
 				SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
 				FROM groups
 				LEFT OUTER JOIN
-					(SELECT groupid, COUNT(id) AS num
+					(SELECT groups_id, COUNT(id) AS num
 						FROM releases
-						GROUP BY groupid
+						GROUP BY groups_id
 					) rel
-				ON rel.groupid = groups.id
+				ON rel.groups_id = groups.id
 				WHERE 1 = 1 %s
 				AND active = 0
 				ORDER BY groups.name " .

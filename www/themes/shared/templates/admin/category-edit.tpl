@@ -5,9 +5,10 @@
 	<div class="error">{$error}</div>
 {/if}
 
+<div class="well well-sm">
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
 
-<table class="input">
+<table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
 	<td>Title:</td>
@@ -59,10 +60,11 @@
 <tr>
 	<td></td>
 	<td>
-		<input type="submit" value="Save" />
+		<input class="btn btn-default" type="submit" value="Save" />
 	</td>
 </tr>
 
 </table>
 
 </form>
+</div>

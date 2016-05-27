@@ -184,7 +184,7 @@
 		<table class="data table table-condensed table-striped table-responsive table-hover" id="browsetable">
 			<thead>
 			<tr>
-				<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
+				<th><input id="chkSelectAll" type="checkbox" class="square-all"/></th>
 				<th>Name
 					<a title="Sort Descending" href="{$orderbyname_desc}">
 						<i class="fa-icon-caret-down text-muted"> </i>
@@ -254,12 +254,12 @@
 								<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
 								   name="name{$result.guid}" title="Sample of {$result.searchname|escape:"htmlall"}"
 								   class="modal_prev label label-default" rel="preview">Sample</a>{/if}
-								{if $result.musicinfoid > 0}
-									<a href="#" name="name{$result.musicinfoid}" title="View music info"
+								{if $result.musicinfo_id > 0}
+									<a href="#" name="name{$result.musicinfo_id}" title="View music info"
 									   class="modal_music label label-default" rel="music">Cover</a>
 								{/if}
-								{if $result.consoleinfoid > 0}
-									<a href="#" name="name{$result.consoleinfoid}" title="View console info"
+								{if $result.consoleinfo_id > 0}
+									<a href="#" name="name{$result.consoleinfo_id}" title="View console info"
 									   class="modal_console label label-default" rel="console">Cover</a>
 								{/if}
 								{if $result.videos_id > 0}
@@ -289,7 +289,7 @@
 					</td>
 					<td class="category">
 						<a title="Browse {$result.category_name}"
-						   href="{$smarty.const.WWW_TOP}/browse?t={$result.categoryid}">{$result.category_name}</a>
+						   href="{$smarty.const.WWW_TOP}/browse?t={$result.categories_id}">{$result.category_name}</a>
 					</td>
 					<td class="posted" title="{$result.postdate}">
 						{$result.postdate|timeago}

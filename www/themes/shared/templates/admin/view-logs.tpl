@@ -1,8 +1,9 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 <br /><br />
 {if $data}
 	{$pager}
-	<table style="width:100%;margin-top:10px;" class="data highlight">
+	<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 		<tr>
 			<th>
 				<select name="logtype" id="logtype" onchange="window.location='{$smarty.const.WWW_TOP}/view-logs.php?t=' + this.value;">
@@ -32,3 +33,4 @@
 		{/foreach}
 	</select>
 {/if}
+	</div>

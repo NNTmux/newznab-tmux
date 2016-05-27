@@ -21,6 +21,14 @@ class TmuxOutput extends Tmux
 	 */
 	protected $_vers;
 
+	/**
+	 * @var array Different colour masks settings used by Tmux display functions
+	 */
+	protected $_colourMasks;
+
+	/**
+	 * @var array The various Tmux runtime configuration variables
+	 */
 	private $runVar;
 	/**
 	 * @var array of current format masks to use.
@@ -104,7 +112,7 @@ class TmuxOutput extends Tmux
 
 	protected function _getFormatMasks($compressed)
 	{
-		$index = $compressed == 1 ? 2.1 : 2.0;
+		$index = ($compressed == 1 ? '2.1' : '2.0');
 		return array(
 			1 => &$this->_colourMasks[1],
 			2 => &$this->_colourMasks[$index],
@@ -497,17 +505,17 @@ class TmuxOutput extends Tmux
 		return $buffer;
 	}
 
-	protected function _SetColourMasks()
+	protected function _setColourMasks()
 	{
 		$this->_colourMasks[1]   =
 			$this->pdo->log->headerOver("%-18s") . " " . $this->pdo->log->tmuxOrange("%-48.48s");
-		$this->_colourMasks[2.0] =
+		$this->_colourMasks['2.0'] =
 			$this->pdo->log->alternateOver("%-20s") . " " . $this->pdo->log->tmuxOrange("%-33.33s");
-		$this->_colourMasks[2.1] =
+		$this->_colourMasks['2.1'] =
 			$this->pdo->log->headerOver("%-20s") . " " . $this->pdo->log->tmuxOrange("%-33.33s");
-		$this->_colourMasks[3]   = $this->pdo->log->header("%-16.16s %25.25s %25.25s");;
+		$this->_colourMasks[3]   = $this->pdo->log->header("%-16.16s %25.25s %25.25s");
 		$this->_colourMasks[4] = $this->pdo->log->primaryOver("%-16.16s") .
-								 " " . $this->pdo->log->tmuxOrange("%25.25s %25.25s");;
+			" " . $this->pdo->log->tmuxOrange("%25.25s %25.25s");
 		$this->_colourMasks[5] = $this->pdo->log->tmuxOrange("%-16.16s %25.25s %25.25s");
 	}
 }

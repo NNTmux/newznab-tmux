@@ -22,7 +22,7 @@ Class Videos
 		];
 		$options += $defaults;
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->catWhere = "r.categoryid BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER;
+		$this->catWhere = "r.categories_id BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER;
 	}
 
 	/**
@@ -139,7 +139,7 @@ Class Videos
 				FROM videos v
 				INNER JOIN tv_info tvi ON v.id = tvi.videos_id
 				INNER JOIN tv_episodes tve ON v.id = tve.videos_id
-				LEFT OUTER JOIN userseries us ON v.id = us.videos_id AND us.userid = %d
+				LEFT OUTER JOIN user_series us ON v.id = us.videos_id AND us.userid = %d
 				WHERE 1=1
 				AND tve.firstaired <= NOW()
 				%s %s

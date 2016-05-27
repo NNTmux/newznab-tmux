@@ -184,8 +184,6 @@ class ProcessReleases
 		$this->deleteUnwantedCollections($groupID);
 
 		$DIR = NN_MISC;
-		$PYTHON = shell_exec('which python3 2>/dev/null');
-		$PYTHON = (empty($PYTHON) ? 'python -OOu' : 'python3 -OOu');
 
 		$totalReleasesAdded = 0;
 		do {
@@ -193,6 +191,7 @@ class ProcessReleases
 			$totalReleasesAdded += $releasesCount['added'];
 
 			$nzbFilesAdded = $this->createNZBs($groupID);
+			$this->deleteCollections($groupID);
 			if ($this->processRequestIDs === 0) {
 				$this->processRequestIDs($groupID, 5000, true);
 			} else if ($this->processRequestIDs === 1) {
@@ -203,7 +202,7 @@ class ProcessReleases
 				if ($this->echoCLI) {
 					$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Request id Threaded lookup."));
 				}
-				passthru("$PYTHON ${DIR}update/nix/requestid_threaded.py");
+				passthru("{$DIR}update/nix/multiprocessing/requestid.php");
 				if ($this->echoCLI) {
 					$this->pdo->log->doEcho(
 						$this->pdo->log->primary(
@@ -216,7 +215,6 @@ class ProcessReleases
 
 			$this->categorizeReleases($categorize, $groupID);
 			$this->postProcessReleases($postProcess, $nntp);
-			$this->deleteCollections($groupID);
 
 			// This loops as long as there were releases created or 3 loops, otherwise, you could loop indefinately
 		} while (($releasesCount['added'] + $releasesCount['dupes']) >= $this->releaseCreationLimit || $nzbFilesAdded >= $this->releaseCreationLimit);
@@ -256,7 +254,7 @@ class ProcessReleases
 	public function resetCategorize($where = '')
 	{
 		$this->pdo->queryExec(
-			sprintf('UPDATE releases SET categoryid = %d, iscategorized = 0 %s', \Category::OTHER_MISC, $where)
+			sprintf('UPDATE releases SET categories_id = %d, iscategorized = 0 %s', \Category::OTHER_MISC, $where)
 		);
 	}
 
@@ -273,13 +271,13 @@ class ProcessReleases
 	{
 		$cat = new Categorize(['Settings' => $this->pdo]);
 		$categorized = $total = 0;
-		$releases = $this->pdo->queryDirect(sprintf('SELECT id, %s, groupid FROM releases %s', $type, $where));
+		$releases = $this->pdo->queryDirect(sprintf('SELECT id, %s, groups_id FROM releases %s', $type, $where));
 		if ($releases && $releases->rowCount()) {
 			$total = $releases->rowCount();
 			foreach ($releases as $release) {
-				$catId = $cat->determineCategory($release['groupid'], $release[$type]);
+				$catId = $cat->determineCategory($release['groups_id'], $release[$type]);
 				$this->pdo->queryExec(
-					sprintf('UPDATE releases SET categoryid = %d, iscategorized = 1 WHERE id = %d', $catId, $release['id'])
+					sprintf('UPDATE releases SET categories_id = %d, iscategorized = 1 WHERE id = %d', $catId, $release['id'])
 				);
 				$categorized++;
 				if ($this->echoCLI) {
@@ -557,10 +555,12 @@ class ProcessReleases
 			foreach ($collections as $collection) {
 
 				$cleanRelName = $this->pdo->escapeString(
+					utf8_encode(
 						str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection['subject'])
+					)
 				);
 				$fromName = $this->pdo->escapeString(
-					trim($collection['fromname'], "'")
+					utf8_encode(trim($collection['fromname'], "'"))
 				);
 
 				// Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
@@ -601,7 +601,7 @@ class ProcessReleases
 						$preMatch = $preDB->matchPre($cleanedName);
 						if ($preMatch !== false) {
 							$cleanedName = $preMatch['title'];
-							$preID = $preMatch['preid'];
+							$preID = $preMatch['predb_id'];
 							$properName = true;
 						}
 					}
@@ -609,17 +609,17 @@ class ProcessReleases
 					$releaseID = $this->releases->insertRelease(
 						[
 							'name' => $cleanRelName,
-							'searchname' => $this->pdo->escapeString($cleanedName),
+							'searchname' => $this->pdo->escapeString(utf8_encode($cleanedName)),
 							'totalpart' => $collection['totalfiles'],
-							'groupid' => $collection['group_id'],
-							'guid' => $this->pdo->escapeString($this->releases->createGUID($cleanRelName)),
+							'groups_id' => $collection['group_id'],
+							'guid' => $this->pdo->escapeString($this->releases->createGUID()),
 							'postdate' => $this->pdo->escapeString($collection['date']),
 							'fromname' => $fromName,
 							'size' => $collection['filesize'],
-							'categoryid' => $categorize->determineCategory($collection['group_id'], $cleanedName),
+							'categories_id' => $categorize->determineCategory($collection['group_id'], $cleanedName),
 							'isrenamed' => ($properName === true ? 1 : 0),
 							'reqidstatus' => ($isReqID === true ? 1 : 0),
-							'preid' => ($preID === false ? 0 : $preID),
+							'predb_id' => ($preID === false ? 0 : $preID),
 							'nzbstatus' => NZB::NZB_NONE
 						]
 					);
@@ -698,10 +698,10 @@ class ProcessReleases
 				SELECT SQL_NO_CACHE CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
 					r.name, r.id, r.guid
 				FROM releases r
-				INNER JOIN category c ON r.categoryid = c.id
-				INNER JOIN category cp ON cp.id = c.parentid
+				INNER JOIN categories c ON r.categories_id = c.id
+				INNER JOIN categories cp ON cp.id = c.parentid
 				WHERE %s nzbstatus = 0",
-				(!empty($groupID) ? ' r.groupid = ' . $groupID . ' AND ' : ' ')
+				(!empty($groupID) ? ' r.groups_id = ' . $groupID . ' AND ' : ' ')
 			)
 		);
 
@@ -820,8 +820,8 @@ class ProcessReleases
 		$this->categorizeRelease(
 			$type,
 			(!empty($groupID)
-					? 'WHERE categoryid = ' . Category::OTHER_MISC . ' AND iscategorized = 0 AND groupid = ' . $groupID
-					: 'WHERE categoryid = ' . Category::OTHER_MISC . ' AND iscategorized = 0')
+					? 'WHERE categories_id = ' . Category::OTHER_MISC . ' AND iscategorized = 0 AND groups_id = ' . $groupID
+					: 'WHERE categories_id = ' . Category::OTHER_MISC . ' AND iscategorized = 0')
 	);
 
 		if ($this->echoCLI) {
@@ -1091,8 +1091,8 @@ class ProcessReleases
 				sprintf("
 					SELECT r.guid, r.id
 					FROM releases r
-					INNER JOIN groups g ON g.id = r.groupid
-					WHERE r.groupid = %d
+					INNER JOIN groups g ON g.id = r.groups_id
+					WHERE r.groups_id = %d
 					AND greatest(IFNULL(g.minsizetoformrelease, 0), %d) > 0
 					AND r.size < greatest(IFNULL(g.minsizetoformrelease, 0), %d)",
 					$groupID['id'],
@@ -1112,7 +1112,7 @@ class ProcessReleases
 					sprintf('
 						SELECT id, guid
 						FROM releases
-						WHERE groupid = %d
+						WHERE groups_id = %d
 						AND size > %d',
 						$groupID['id'],
 						$maxSizeSetting
@@ -1130,8 +1130,8 @@ class ProcessReleases
 				sprintf("
 					SELECT r.id, r.guid
 					FROM releases r
-					INNER JOIN groups g ON g.id = r.groupid
-					WHERE r.groupid = %d
+					INNER JOIN groups g ON g.id = r.groups_id
+					WHERE r.groups_id = %d
 					AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
 					AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)",
 					$groupID['id'],
@@ -1265,7 +1265,7 @@ class ProcessReleases
 		if (count($disabledCategories) > 0) {
 			foreach ($disabledCategories as $disabledCategory) {
 				$releases = $this->pdo->queryDirect(
-					sprintf('SELECT id, guid FROM releases WHERE categoryid = %d', $disabledCategory['id'])
+					sprintf('SELECT id, guid FROM releases WHERE categories_id = %d', $disabledCategory['id'])
 				);
 				if ($releases instanceof \Traversable) {
 					foreach ($releases as $release) {
@@ -1280,8 +1280,8 @@ class ProcessReleases
 		$categories = $this->pdo->queryDirect('
 			SELECT c.id AS id,
 			CASE WHEN c.minsizetoformrelease = 0 THEN cp.minsizetoformrelease ELSE c.minsizetoformrelease END AS minsize
-			FROM category c
-			INNER JOIN category cp ON cp.id = c.parentid
+			FROM categories c
+			INNER JOIN categories cp ON cp.id = c.parentid
 			WHERE c.parentid IS NOT NULL'
 		);
 
@@ -1292,7 +1292,7 @@ class ProcessReleases
 						sprintf('
 							SELECT r.id, r.guid
 							FROM releases r
-							WHERE r.categoryid = %d
+							WHERE r.categories_id = %d
 							AND r.size < %d LIMIT 1000',
 							$category['id'],
 							$category['minsize']
@@ -1317,7 +1317,7 @@ class ProcessReleases
 						SELECT id, guid
 						FROM releases
 						INNER JOIN (SELECT id AS mid FROM musicinfo WHERE musicinfo.genreID = %d) mi
-						ON musicinfoid = mid',
+						ON musicinfo_id = mid',
 						$genre['id']
 					)
 				);
@@ -1336,7 +1336,7 @@ class ProcessReleases
 				sprintf('
 					SELECT id, guid
 					FROM releases
-					WHERE categoryid = %d
+					WHERE categories_id = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					Category::OTHER_MISC,
 					$this->pdo->getSetting('miscotherretentionhours')
@@ -1356,7 +1356,7 @@ class ProcessReleases
 				sprintf('
 					SELECT id, guid
 					FROM releases
-					WHERE categoryid = %d
+					WHERE categories_id = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					Category::OTHER_HASHED,
 					$this->pdo->getSetting('mischashedretentionhours')
@@ -1657,19 +1657,24 @@ class ProcessReleases
 	 */
 	private function processStuckCollections(array $group, $where)
 	{
+		$lastRun = $this->pdo->getSetting('last_run_time');
 		$obj = $this->pdo->queryExec(
 			sprintf("
-				DELETE c FROM %s c
-				WHERE
-					c.added <
-					DATE_SUB((SELECT value FROM settings WHERE setting = 'last_run_time'), INTERVAL %d HOUR)
-				%s",
+                DELETE c, b, p FROM %s c
+                LEFT JOIN %s b ON (c.id=b.collection_id)
+                LEFT JOIN %s p ON (b.id=p.binaryid)
+                WHERE
+                    c.added <
+                    DATE_SUB({$this->pdo->escapeString($lastRun)}, INTERVAL %d HOUR)
+                %s",
 				$group['cname'],
+				$group['bname'],
+				$group['pname'],
 				$this->collectionTimeout,
 				$where
 			)
 		);
-		if ($this->echoCLI && $obj->rowCount() > 0) {
+		if ($this->echoCLI && is_object($obj) && $obj->rowCount()) {
 			$this->pdo->log->doEcho(
 				$this->pdo->log->primary('Deleted ' . $obj->rowCount() . ' broken/stuck collections.')
 			);

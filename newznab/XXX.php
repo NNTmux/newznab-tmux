@@ -79,12 +79,14 @@ class XXX
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->imgSavePath = NN_COVERS . 'xxx' . DS;
 		$this->cookie = NN_TMP . 'xxx.cookie';
-		$this->catWhere = 'AND categoryid IN (' .
+		$this->catWhere = 'AND categories_id IN (' .
 			Category::XXX_DVD . ', ' .
 			Category::XXX_WMV . ', ' .
 			Category::XXX_XVID . ', ' .
 			Category::XXX_X264 . ', ' .
 			Category::XXX_SD . ', ' .
+			Category::XXX_CLIPHD . ', ' .
+			Category::XXX_CLIPSD . ', ' .
 			Category::XXX_WEBDL . ') ';
 
 		if (NN_DEBUG || NN_LOGGING) {
@@ -182,7 +184,7 @@ class XXX
 								? 'AND r.postdate > NOW() - INTERVAL ' . $maxAge . 'DAY '
 								: ''
 						),
-						(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+						(count($excludedCats) > 0 ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 						$order[0],
 						$order[1],
 						($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
@@ -205,7 +207,7 @@ class XXX
 				GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
 				GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
 				GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-				GROUP_CONCAT(rn.releaseid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
+				GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
 				GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
 				GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
 				GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
@@ -217,13 +219,13 @@ class XXX
 				GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_catname,
 			xxx.*, UNCOMPRESS(xxx.plot) AS plot,
 			g.name AS group_name,
-			rn.releaseid AS nfoid
+			rn.releases_id AS nfoid
 			FROM releases r
-			LEFT OUTER JOIN groups g ON g.id = r.groupid
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+			LEFT OUTER JOIN groups g ON g.id = r.groups_id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			LEFT OUTER JOIN category c ON c.id = r.categoryid
-			LEFT OUTER JOIN category cp ON cp.id = c.parentid
+			LEFT OUTER JOIN categories c ON c.id = r.categories_id
+			LEFT OUTER JOIN categories cp ON cp.id = c.parentid
 			INNER JOIN xxxinfo xxx ON xxx.id = r.xxxinfo_id
 			WHERE r.nzbstatus = 1
 			AND xxx.id IN (%s)
@@ -240,7 +242,7 @@ class XXX
 						? 'AND r.postdate > NOW() - INTERVAL ' . $maxAge . 'DAY '
 						: ''
 				),
-				(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				(count($excludedCats) > 0 ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				$order[0],
 				$order[1]
 		);

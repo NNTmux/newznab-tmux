@@ -98,9 +98,9 @@ class BasePage
 		$this->settings = new Settings();
 		$this->smarty = new Smarty();
 
-		$this->smarty->setCompileDir(NN_RES . DS . 'smarty' . DS . 'templates_c/');
-		$this->smarty->setConfigDir(NN_RES . DS . 'smarty' . DS . 'configs/');
-		$this->smarty->setCacheDir(NN_RES . DS . 'smarty' . DS . 'cache/');
+		$this->smarty->setCompileDir(NN_SMARTY_TEMPLATES);
+		$this->smarty->setConfigDir(NN_SMARTY_CONFIGS);
+		$this->smarty->setCacheDir(NN_SMARTY_CACHE);
 		$this->smarty->setPluginsDir([
 			NN_WWW . 'plugins/',
 			SMARTY_DIR . 'plugins/',

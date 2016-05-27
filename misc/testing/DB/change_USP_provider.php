@@ -49,7 +49,7 @@ $totalend = microtime(true);
 echo $pdo->log->header('Total time to update all groups ' . gmdate("H:i:s", $totalend - $totalstart));
 
 // Truncate tables to complete the change to the new USP.
-$arr = array("parts", "partrepair", "binaries");
+$arr = array("parts", "missed_parts", "binaries");
 foreach ($arr as &$value) {
 	$rel = $pdo->queryExec("TRUNCATE TABLE $value");
 	if ($rel !== false) {

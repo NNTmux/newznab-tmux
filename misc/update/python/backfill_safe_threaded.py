@@ -78,9 +78,9 @@ while count < 10000:
 
 	#query to grab backfill groups
 	if len(sys.argv) == 1:
-		if conf['DB_TYPE'] == "mysql":
+		if conf['DB_SYSTEM'] == "mysql":
 			cur[0].execute("SELECT g.name, g.first_record AS our_first, MAX(a.first_record) AS thier_first, MAX(a.last_record) AS their_last FROM groups g INNER JOIN short_groups a ON g.name = a.name WHERE g.first_record IS NOT NULL AND g.first_record_postdate IS NOT NULL AND g.backfill = 1 AND (NOW() - INTERVAL %s DAY) < g.first_record_postdate AND g.name NOT IN (%s) GROUP BY a.name, a.last_record, g.name, g.first_record %s LIMIT 1" % (backfilldays, previous, group))
-		elif conf['DB_TYPE'] == "pgsql":
+		elif conf['DB_SYSTEM'] == "pgsql":
 			cur[0].execute("SELECT g.name, g.first_record AS our_first, MAX(a.first_record) AS thier_first, MAX(a.last_record) AS their_last FROM groups g INNER JOIN short_groups a ON g.name = a.name WHERE g.first_record IS NOT NULL AND g.first_record_postdate IS NOT NULL AND g.backfill = 1 AND (NOW() - INTERVAL '%s DAYS') < g.first_record_postdate GROUP BY a.name, a.last_record, g.name, g.first_record %s LIMIT 1" % (backfilldays, group, groups))
 		datas = cur[0].fetchone()
 	else:

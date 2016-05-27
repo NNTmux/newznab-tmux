@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nntmux>
+	<versions>
+		<git>
+			<tag>0.0.0</tag>
+			<!-- commit count removed -->
+			<hooks>
+				<precommit>9</precommit>
+				<!-- this is the version of the pre-commit file in githooks NOT the files it calls -->
+			</hooks>
+		</git>
+		<scripts>
+			<last>
+				<date>0000-00-00</date>
+				<ordinal>0</ordinal>
+			</last>
+		</scripts>
+		<sql>
+			<db>258</db>
+			<file>258</file>
+		</sql>
+	</versions>
+</nntmux>

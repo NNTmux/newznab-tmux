@@ -72,7 +72,7 @@ jQuery(function($){
                 title: 'ADDED TO YOUR DOWNLOAD BASKET!',
                 text: 'Its now in your Download Basket',
                 type: 'warning',
-                icon: 'fa-icon-info-sign'
+                icon: 'fa fa-info-sign'
             });        });
         return false;
     });
@@ -87,9 +87,26 @@ jQuery(function($){
                 title: 'ADDED TO YOUR DOWNLOAD BASKET!',
                 text: 'Its now in your Download Basket',
                 type: 'warning',
-                icon: 'fa-icon-info-sign'
+                icon: 'fa fa-info-sign'
             });        });
         return false;
+    });
+
+    $('.sendtocouch').click(function (e) {
+        if ($(this).hasClass('icon_cp_clicked')) return false;
+        var guid = $(this).parent().parent().parent().parent().attr('id').substring(4);
+        var cpurl = SERVERROOT + "sendtocouch/" + guid;
+
+        $.post(cpurl, function(resp){
+            $(e.target).addClass('icon_cp_clicked').attr('title','Added to CouchPotato');
+        $.pnotify({
+            title: 'ADDED TO COUCHPOTATO!',
+            text: 'Its now on your wanted list! ^_^',
+            type: 'info',
+            animate_speed: 'fast',
+            icon: 'fa fa-info-sign'
+            });
+        });
     });
 
     $('.icon_nzbvortex').click(function(event)
@@ -225,7 +242,7 @@ jQuery(function($){
                 title: 'ADDED TO QUEUE!',
                 text: 'Its now in the Queue',
                 type: 'info',
-                icon: 'fa-icon-info-sign'
+                icon: 'fa fa-info-sign'
             });
         });
         return false;
@@ -244,7 +261,7 @@ jQuery(function($){
                 title: 'ADDED TO NZBGET!',
                 text: 'Its now in the Queue',
                 type: 'info',
-                icon: 'fa-icon-info-sign'
+                icon: 'fa fa-info-sign'
             });
         });
         return false;
@@ -263,7 +280,7 @@ jQuery(function($){
                 title: 'ADDED TO NZBGET!',
                 text: 'Its now in the Queue',
                 type: 'info',
-                icon: 'fa-icon-info-sign'
+                icon: 'fa fa-info-sign'
             });
         });
         return false;
@@ -391,7 +408,7 @@ jQuery(function($){
                     title: 'ADDED TO YOUR DOWNLOAD BASKET!',
                     text: 'Its now in your Download Basket',
                     type: 'warning',
-                    icon: 'fa-icon-info-sign'
+                    icon: 'fa fa-info-sign'
                 });
             }
             $(this).attr('checked', false);
@@ -413,7 +430,7 @@ jQuery(function($){
                         title: 'ADDED TO QUEUE!',
                         text: 'Its now in the queue!! ^_^',
                         type: 'info',
-                        icon: 'fa-icon-info-sign'
+                        icon: 'fa fa-info-sign'
                     });
                 });
             }
@@ -433,7 +450,7 @@ jQuery(function($){
                         title: 'ADDED TO QUEUE!',
                         text: 'Its now in the queue!! ^_^',
                         type: 'info',
-                        icon: 'fa-icon-info-sign'
+                        icon: 'fa fa-info-sign'
                     });
                 });
             }

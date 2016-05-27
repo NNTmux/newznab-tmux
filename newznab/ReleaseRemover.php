@@ -154,7 +154,7 @@ class ReleaseRemover
 		$this->delete = true;
 		$this->ignoreUserCheck = false;
 		// Time we started.
-		$this->timeStart = TIME();
+		$this->timeStart = time();
 
 		// Start forming the query.
 		$this->query = 'SELECT id, guid, searchname FROM releases WHERE 1=1';
@@ -188,7 +188,7 @@ class ReleaseRemover
 
 		if ($this->echoCLI) {
 			echo $this->pdo->log->headerOver(($this->delete ? "Deleted " : "Would have deleted ") . $this->deletedCount . " release(s). This script ran for ");
-			echo $this->pdo->log->header($this->consoleTools->convertTime(TIME() - $this->timeStart));
+			echo $this->pdo->log->header($this->consoleTools->convertTime(time() - $this->timeStart));
 		}
 
 		return ($this->browser
@@ -197,7 +197,7 @@ class ReleaseRemover
 			($this->delete ? "Deleted " : "Would have deleted ") .
 			$this->deletedCount .
 			' release(s) in ' .
-			$this->consoleTools->convertTime(TIME() - $this->timeStart)
+			$this->consoleTools->convertTime(time() - $this->timeStart)
 			:
 			true
 		);
@@ -318,7 +318,7 @@ class ReleaseRemover
 
 		if ($this->echoCLI) {
 			echo $this->pdo->log->headerOver(($this->delete ? "Deleted " : "Would have deleted ") . $this->deletedCount . " release(s). This script ran for ");
-			echo $this->pdo->log->header($this->consoleTools->convertTime(TIME() - $this->timeStart));
+			echo $this->pdo->log->header($this->consoleTools->convertTime(time() - $this->timeStart));
 		}
 
 		return ($this->browser
@@ -327,7 +327,7 @@ class ReleaseRemover
 			($this->delete ? "Deleted " : "Would have deleted ") .
 			$this->deletedCount .
 			' release(s) in ' .
-			$this->consoleTools->convertTime(TIME() - $this->timeStart)
+			$this->consoleTools->convertTime(time() - $this->timeStart)
 			:
 			true
 		);
@@ -347,7 +347,7 @@ class ReleaseRemover
 			WHERE r.nfostatus = 0
 			AND r.iscategorized = 1
 			AND r.rarinnerfilecount = 0
-			AND r.categoryid NOT IN (%d)
+			AND r.categories_id NOT IN (%d)
 			AND r.searchname REGEXP '^[a-zA-Z0-9]{15,}$'
 			%s",
 			Category::OTHER_HASHED,
@@ -375,7 +375,7 @@ class ReleaseRemover
 			WHERE r.nfostatus = 0
 			AND r.iscategorized = 1
 			AND r.rarinnerfilecount = 0
-			AND r.categoryid NOT IN (%d, %d)
+			AND r.categories_id NOT IN (%d, %d)
 			AND r.searchname REGEXP '[a-zA-Z0-9]{25,}'
 			%s",
 			Category::OTHER_MISC, Category::OTHER_HASHED, $this->crapTime
@@ -402,7 +402,7 @@ class ReleaseRemover
 			WHERE r.nfostatus = 0
 			AND r.iscategorized = 1
 			AND r.rarinnerfilecount = 0
-			AND r.categoryid NOT IN (%d)
+			AND r.categories_id NOT IN (%d)
 			AND r.searchname REGEXP '^[a-zA-Z0-9]{0,5}$'
 			%s",
 			Category::OTHER_MISC, $this->crapTime
@@ -446,10 +446,10 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
+			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE r.searchname NOT REGEXP %s
 			AND rf.name %s
-			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d) %s %s",
+			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d) %s %s",
 			$ftJoin,
 			$this->pdo->escapeString('\.exe[sc]'),
 			$this->pdo->likeString('.exe', true, false),
@@ -493,7 +493,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
+			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name %s %s",
 			$ftJoin,
 			$this->pdo->likeString('install.bin', true, true),
@@ -531,7 +531,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
+			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name %s %s %s",
 			$ftJoin,
 			$this->pdo->likeString('password.url', true, true),
@@ -577,7 +577,7 @@ class ReleaseRemover
 			AND r.searchname NOT %s
 			AND r.searchname NOT %s
 			AND r.nzbstatus = 1
-			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s %s",
+			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s %s",
 			// Matches passwort / passworded / etc also.
 			$ftJoin,
 			$this->pdo->likeString('passwor', true, true),
@@ -620,7 +620,7 @@ class ReleaseRemover
 			FROM releases r
 			WHERE r.totalpart = 1
 			AND r.size < 2097152
-			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
+			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
 			Category::MUSIC_MP3,
 			Category::BOOKS_COMICS,
 			Category::BOOKS_EBOOK,
@@ -691,7 +691,7 @@ class ReleaseRemover
 			WHERE r.totalpart > 1
 			AND r.size < 40000000
 			AND r.name %s
-			AND r.categoryid IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s %s",
+			AND r.categories_id IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s %s",
 			$ftJoin,
 			$this->pdo->likeString('sample', true, true),
 			Category::TV_ANIME,
@@ -743,7 +743,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
+			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE (rf.name REGEXP '[.]scr[$ \"]' OR r.name REGEXP '[.]scr[$ \"]')
 			%s %s",
 			$ftJoin,
@@ -844,7 +844,7 @@ class ReleaseRemover
 						$groupIDs = (substr($string, 0, -1));
 					}
 
-					$groupID = ' AND r.groupid in (' . $groupIDs . ') ';
+					$groupID = ' AND r.groups_id in (' . $groupIDs . ') ';
 				}
 				$this->method = 'Blacklist [' . $regex['id'] . ']';
 
@@ -864,7 +864,7 @@ class ReleaseRemover
 				);
 
 				if ($opTypeName == 'Subject') {
-					$join = (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX ? 'INNER JOIN releases_se rse ON rse.id = r.id' : 'INNER JOIN releasesearch rs ON rs.releaseid = r.id');
+					$join = (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX ? 'INNER JOIN releases_se rse ON rse.id = r.id' : 'INNER JOIN release_search_data rs ON rs.releases_id = r.id');
 				} else {
 					$join = '';
 				}
@@ -931,7 +931,7 @@ class ReleaseRemover
 					}
 				}
 
-				$regexSQL = sprintf("STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
+				$regexSQL = sprintf("STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 				WHERE rf.name REGEXP %s ", $this->pdo->escapeString($regex['regex'])
 				);
 
@@ -959,7 +959,7 @@ class ReleaseRemover
 						$groupIDs = (substr($string, 0, -1));
 					}
 
-					$groupID = ' AND r.groupid in (' . $groupIDs . ') ';
+					$groupID = ' AND r.groups_id in (' . $groupIDs . ') ';
 				}
 
 				$this->method = 'Blacklist Files ' . $regex['id'];
@@ -1012,8 +1012,8 @@ class ReleaseRemover
 		$this->query = "
 			SELECT r.guid, r.searchname
 			FROM releases r
-			LEFT JOIN release_files rf ON (r.id = rf.releaseid)
-			WHERE r.categoryid BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
+			LEFT JOIN release_files rf ON (r.id = rf.releases_id)
+			WHERE r.categories_id BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
 			AND rf.name REGEXP 'x264.*\.wmv$'
 			GROUP BY r.id"
 		;
@@ -1033,7 +1033,7 @@ class ReleaseRemover
 	 */
 	protected function removeCodecPoster()
 	{
-		$categories = sprintf("r.categoryid IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
+		$categories = sprintf("r.categories_id IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
 			Category::MOVIE_3D,
 			Category::MOVIE_BLURAY,
 			Category::MOVIE_DVD,
@@ -1054,14 +1054,14 @@ class ReleaseRemover
 		$this->query = "
 			SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			LEFT JOIN release_files rf ON r.id = rf.releaseid
+			LEFT JOIN release_files rf ON r.id = rf.releases_id
 			WHERE {$categories}
 			AND (r.imdbid NOT IN ('0000000', 0) OR xxxinfo_id > 0)
-			AND nfostatus = 1
-			AND haspreview = 0
-			AND jpgstatus = 0
-			AND preid = 0
-			AND videostatus = 0
+			AND r.nfostatus = 1
+			AND r.haspreview = 0
+			AND r.jpgstatus = 0
+			AND r.predb_id = 0
+			AND r.videostatus = 0
 			AND
 			(
 				rf.name REGEXP 'XviD-[a-z]{3}\\.(avi|mkv|wmv)$'
@@ -1157,7 +1157,7 @@ class ReleaseRemover
 			$args[1] = $this->cleanSpaces($args[1]);
 			$args[2] = $this->cleanSpaces($args[2]);
 			switch ($args[0]) {
-				case 'categoryid':
+				case 'categories_id':
 					switch ($args[1]) {
 						case 'equals':
 							return ' AND categoryID = ' . $args[2];
@@ -1222,14 +1222,14 @@ class ReleaseRemover
 								break;
 							}
 
-							return ' AND groupid = ' . $group['id'];
+							return ' AND groups_id = ' . $group['id'];
 						case 'like':
 							$groups = $this->pdo->query('SELECT id FROM groups WHERE name ' . $this->formatLike($args[2], 'name'));
 							if (count($groups) === 0) {
 								$this->error = 'No groups were found with this pattern in your database: ' . $args[2] . PHP_EOL;
 								break;
 							}
-							$gQuery = ' AND groupid IN (';
+							$gQuery = ' AND groups_id IN (';
 							foreach ($groups as $group) {
 								$gQuery .= $group['id'] . ',';
 							}

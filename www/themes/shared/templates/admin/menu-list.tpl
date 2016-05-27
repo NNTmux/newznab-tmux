@@ -1,8 +1,9 @@
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 {if $menulist}
 
-<table style="margin-top:10px;" class="data Sortable highlight">
+<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 
 	<tr>
 		<th>name</th>
@@ -30,3 +31,4 @@
 {else}
 <p>No menus available.</p>
 {/if}
+</div>

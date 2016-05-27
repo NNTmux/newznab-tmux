@@ -24,23 +24,23 @@
 										<div class="nzb_multi_operations">
 											View: <strong>Covers</strong> | <a
 													href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-											Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
+											Check all: <input type="checkbox" class="square-all"/> <br/>
 											With Selected:
 											<div class="btn-group">
 												<input type="button"
-													   class="nntmux_multi_operations_download btn btn-sm btn-success"
+													   class="nzb_multi_operations_download btn btn-sm btn-success"
 													   value="Download NZBs"/>
 												<input type="button"
-													   class="nntmux_multi_operations_cart btn btn-sm btn-info"
+													   class="nzb_multi_operations_cart btn btn-sm btn-info"
 													   value="Send to my Download Basket"/>
 												{if isset($sabintegrated) && $sabintegrated !=""}
 													<input type="button"
-														   class="nntmux_multi_operations_sab btn btn-sm btn-primary"
+														   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 														   value="Send to Queue"/>
 												{/if}
 												{if isset($isadmin)}
 													<input type="button"
-														   class="nntmux_multi_operations_delete btn btn-sm btn-danger"
+														   class="nzb_multi_operations_delete btn btn-sm btn-danger"
 														   value="Delete"/>
 												{/if}
 											</div>
@@ -73,18 +73,18 @@
 													<div class="col-md-2 small-gutter-left">
 														<a title="View details"
 														   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
-															<img src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfoid}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+															<img src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfo_id}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																 width="140" border="0"
 																 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 														</a>
 														{if isset($result.url) && $result.url != ""}<a
 															class="label label-default" target="_blank"
 															href="{$site->dereferrer_link}{$result.url}"
-															name="amazon{$result.bookinfoid}" title="View amazon page">
+															name="amazon{$result.bookinfo_id}" title="View amazon page">
 																Amazon</a>{/if}
 														{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
-															title="View Nfo" class="label label-default" rel="nfo">
+															title="View Nfo" class="modal_nfo label label-default" rel="nfo">
 																NFO</a>{/if}
 														<a class="label label-default"
 														   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
@@ -168,23 +168,23 @@
 											<div class="nzb_multi_operations">
 												View: <strong>Covers</strong> | <a
 														href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-												Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
+												Check all: <input type="checkbox" class="square-all"/> <br/>
 												With Selected:
 												<div class="btn-group">
 													<input type="button"
-														   class="nntmux_multi_operations_download btn btn-sm btn-success"
+														   class="nzb_multi_operations_download btn btn-sm btn-success"
 														   value="Download NZBs"/>
 													<input type="button"
-														   class="nntmux_multi_operations_cart btn btn-sm btn-info"
+														   class="nzb_multi_operations_cart btn btn-sm btn-info"
 														   value="Send to my Download Basket"/>
 													{if isset($sabintegrated) && $sabintegrated !=""}
 														<input type="button"
-															   class="nntmux_multi_operations_sab btn btn-sm btn-primary"
+															   class="nzb_multi_operations_sab btn btn-sm btn-primary"
 															   value="Send to Queue"/>
 													{/if}
 													{if isset($isadmin)}
 														<input type="button"
-															   class="nntmux_multi_operations_delete btn btn-sm btn-danger"
+															   class="nzb_multi_operations_delete btn btn-sm btn-danger"
 															   value="Delete"/>
 													{/if}
 												</div>

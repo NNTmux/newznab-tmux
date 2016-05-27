@@ -17,12 +17,15 @@
 	<!-- Newposterwall -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- Bootstrap 3.3.6 -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- iCheck -->
-	<link href="{$smarty.const.WWW_THEMES}/{$theme}/plugins/iCheck/square/blue.css" rel="stylesheet" type="text/css"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/square/blue.css" rel="stylesheet">
 	<!-- Font Awesome Icons -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
+		  type="text/css"/>
+	<!-- Qtip2 CSS -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
@@ -34,15 +37,13 @@
 		  page. However, you can choose any other skin. Make sure you
 		  apply the skin class to the body tag so the changes take effect.
 	-->
-	<link href="{$smarty.const.WWW_THEMES}/{$theme}/dist/css/skins/skin-blue.min.css" rel="stylesheet"
-		  type="text/css"/>
-	<!-- Noty animation style -->
-	<link href="{$smarty.const.WWW_THEMES}/{$theme}/dist/css/animate.css" rel="stylesheet" type="text/css"/>
+	<link href="{$smarty.const.WWW_THEMES}/{$theme}/dist/css/skins/skin-blue.min.css" rel="stylesheet" type="text/css"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" type="text/css" media="screen"/>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
-	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/html5shiv/dist/html5shiv.min.js"></script>
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/respond/dest/respond.min.js"></script>
 	<![endif]-->
 </head>
 	<!--
@@ -261,74 +262,6 @@
 						href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is open source,
 			released under the GPL license
 		</footer>
-		<!-- Control Sidebar -->
-		<aside class="control-sidebar control-sidebar-dark">
-			<!-- Create the tabs -->
-			<ul class="nav nav-tabs nav-justified control-sidebar-tabs">
-				<li class="active"><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a>
-				</li>
-				<li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
-			</ul>
-			<!-- Tab panes -->
-			<div class="tab-content">
-				<!-- Home tab content -->
-				<div class="tab-pane active" id="control-sidebar-home-tab">
-					<h3 class="control-sidebar-heading">Recent Activity</h3>
-					<ul class='control-sidebar-menu'>
-						<li>
-							<a href='javascript::;'>
-								<i class="menu-icon fa fa-birthday-cake bg-red"></i>
-								<div class="menu-info">
-									<h4 class="control-sidebar-subheading">Langdon's Birthday</h4>
-									<p>Will be 23 on April 24th</p>
-								</div>
-							</a>
-						</li>
-					</ul>
-					<!-- /.control-sidebar-menu -->
-					<h3 class="control-sidebar-heading">Tasks Progress</h3>
-					<ul class='control-sidebar-menu'>
-						<li>
-							<a href='javascript::;'>
-								<h4 class="control-sidebar-subheading">
-									Custom Template Design
-									<span class="label label-danger pull-right">70%</span>
-								</h4>
-								<div class="progress progress-xxs">
-									<div class="progress-bar progress-bar-danger" style="width: 70%"></div>
-								</div>
-							</a>
-						</li>
-					</ul>
-					<!-- /.control-sidebar-menu -->
-				</div>
-				<!-- /.tab-pane -->
-				<!-- Stats tab content -->
-				<div class="tab-pane" id="control-sidebar-stats-tab">Stats Tab Content</div>
-				<!-- /.tab-pane -->
-				<!-- Settings tab content -->
-				<div class="tab-pane" id="control-sidebar-settings-tab">
-					<form method="post">
-						<h3 class="control-sidebar-heading">General Settings</h3>
-						<div class="form-group">
-							<label class="control-sidebar-subheading">
-								Report panel usage
-								<input type="checkbox" class="pull-right" checked/>
-							</label>
-							<p>
-								Some information about this general settings option
-							</p>
-						</div>
-						<!-- /.form-group -->
-					</form>
-				</div>
-				<!-- /.tab-pane -->
-			</div>
-		</aside>
-		<!-- /.control-sidebar -->
-		<!-- Add the sidebar's background. This div must be placed
-			   immediately after the control sidebar -->
-		<div class='control-sidebar-bg'></div>
 	</div>
 	<!-- ./wrapper -->
 	<!-- REQUIRED JS SCRIPTS -->
@@ -336,35 +269,39 @@
 	<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"
 			type="text/javascript" ></script>
 	<!-- Bootstrap 3.3.6 JS -->
-	<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap/dist/js/bootstrap.min.js"
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"
 			type="text/javascript"></script>
-	<!-- iCheck -->
-	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/iCheck/icheck.min.js" type="text/javascript"></script>
+	<!-- icheck -->
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js" type="text/javascript"></script>
 	<!-- Bootstrap hover on mouseover script -->
 	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/shared/scripts/bootstrap-hover-dropdown.min.js"></script>
+			src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 	<!-- AdminLTE App -->
 	<script src="{$smarty.const.WWW_THEMES}/{$theme}/dist/js/app.min.js" type="text/javascript"></script>
 	<!-- jQuery migrate script -->
-	<script type="text/javascript"
-			src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate/jquery-migrate.min.js"></script>
 	<!-- SlimScroll script -->
-	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/slimscroll/jquery.slimscroll.min.js"></script>
 	<!-- Fastclick script -->
-	<script src="{$smarty.const.WWW_THEMES}/{$theme}/plugins/fastclick/fastclick.min.js"></script>
-	<!-- notification plugin -->
-	<script type="text/javascript"
-			src="{$smarty.const.WWW_THEMES}/shared/assets/noty/js/noty/packaged/jquery.noty.packaged.js"></script>
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/fastclick/lib/fastclick.js"></script>
+	<!-- PNotify -->
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.animate.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.desktop.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.callbacks.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.buttons.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.confirm.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.nonblock.js"></script>
 	<!-- data table plugin -->
 	<script type="text/javascript"
-			src='{$smarty.const.WWW_THEMES}/{$theme}/dist/js/jquery.dataTables.min.js'></script>
+			src='{$smarty.const.WWW_THEMES}/shared/assets/datatables/media/js/jquery.dataTables.min.js'></script>
 	<!-- newznab default scripts, needed for stuff to work -->
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.colorbox-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.autosize-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.qtip2.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/sorttable.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
 	<!-- Custom functions -->
-	<script src="{$smarty.const.WWW_THEMES}/{$theme}/dist/js/functions.js" type="text/javascript"></script>
+	<script src="{$smarty.const.WWW_THEMES}/shared/js/functions.js" type="text/javascript"></script>
 	<!-- Optionally, you can add Slimscroll and FastClick plugins.
 		  Both of these plugins are recommended to enhance the
 		  user experience. Slimscroll is required when using the

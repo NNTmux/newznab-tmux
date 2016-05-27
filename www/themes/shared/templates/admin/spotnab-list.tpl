@@ -1,11 +1,11 @@
-
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 {if $spotnab|@count == 0}
 No available sources. <a href="spotnab-edit.php?action=add">Add one?</a>
 {else}
 
-<table style="margin-top:10px;" class="data highlight">
+<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">
 
 	<tr>
 		<th>source description</th>
@@ -42,3 +42,4 @@ No available sources. <a href="spotnab-edit.php?action=add">Add one?</a>
 
 </table>
 {/if}
+	</div>

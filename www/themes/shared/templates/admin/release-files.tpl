@@ -1,9 +1,9 @@
- 
+<div class="well well-sm">
 <h1>{$page->title}</h1>
 
 <h2>For {$rel.searchname|escape:'htmlall'}</h2>
 
-<table style="width:100%;" class="data Sortable">
+<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table Sortable">
 
 	<tr>
 		<th>#</th>
@@ -21,4 +21,5 @@
 	</tr>
 	{/foreach}
 
-</table>	
+</table>
+	</div>

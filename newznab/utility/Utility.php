@@ -115,30 +115,58 @@ class Utility
 		$defaults = [
 			'dir'   => false,
 			'ext'   => '', // no full stop (period) separator should be used.
+			'file'	=> true,
 			'path'  => '',
 			'regex' => '',
 		];
 		$options += $defaults;
+		if (!$options['dir'] && !$options['file']) {
+			return null;
+		}
+
+		// Replace windows style path separators with unix style.
+		$iterator = new \FilesystemIterator(
+			str_replace('\\', '/', $options['path']),
+			\FilesystemIterator::KEY_AS_PATHNAME |
+			\FilesystemIterator::SKIP_DOTS |
+			\FilesystemIterator::UNIX_PATHS
+		);
 
 		$files = [];
-		$dir = new \DirectoryIterator($options['path']);
-		foreach ($dir as $fileinfo) {
-			$file = $fileinfo->getFilename();
+		foreach ($iterator as $fileInfo) {
+			$file = $iterator->key();
 			switch (true) {
-				case $fileinfo->isDot():
+				case !$options['dir'] && $fileInfo->isDir():
 					break;
-				case !$options['dir'] && $fileinfo->isDir():
+				case !empty($options['ext']) && $fileInfo->getExtension() != $options['ext'];
 					break;
-				case !empty($options['ext']) && $fileinfo->getExtension() != $options['ext'];
+				case (empty($options['regex']) || !preg_match($options['regex'], $file)):
 					break;
-				case !preg_match($options['regex'], str_replace('\\', '/', $file)):
+				case (!$options['file'] && $fileInfo->isFile()):
 					break;
 				default:
-					$files[] = $fileinfo->getPathname();
+					$files[] = $file;
 			}
 		}
 
 		return $files;
+	}
+
+	public static function getThemesList()
+	{
+		$themes = scandir(NN_THEMES);
+		$themelist[] = 'None';
+		foreach ($themes as $theme) {
+			if (strpos($theme, ".") === false &&
+				is_dir(NN_THEMES . $theme) &&
+				ucfirst($theme) === $theme
+			) {
+				$themelist[] = $theme;
+			}
+		}
+
+		sort($themelist);
+		return $themelist;
 	}
 
 	public static function getValidVersionsFile()

@@ -26,7 +26,7 @@ function create_guids($live, $delete = false)
 {
 	$pdo = new Settings();
 	$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
-	$timestart = TIME();
+	$timestart = time();
 	$relcount = $deleted = $total = 0;
 
 	$relrecs = false;
@@ -82,7 +82,7 @@ function create_guids($live, $delete = false)
 
 							$pdo->queryExec("UPDATE releases set nzb_guid = UNHEX(" . $pdo->escapestring($nzb_guid) . ") WHERE id = " . $relrec["id"]);
 							$relcount++;
-							$consoletools->overWritePrimary("Created: [" . $deleted . "] " . $consoletools->percentString($reccnt, $total) . " Time:" . $consoletools->convertTimer(TIME() - $timestart));
+							$consoletools->overWritePrimary("Created: [" . $deleted . "] " . $consoletools->percentString($reccnt, $total) . " Time:" . $consoletools->convertTimer(time() - $timestart));
 							break;
 						}
 					}
@@ -98,9 +98,9 @@ function create_guids($live, $delete = false)
 		if ($relcount > 0) {
 			echo "\n";
 		}
-		echo $pdo->log->header("Updated " . $relcount . " release(s). This script ran for " . $consoletools->convertTime(TIME() - $timestart));
+		echo $pdo->log->header("Updated " . $relcount . " release(s). This script ran for " . $consoletools->convertTime(time() - $timestart));
 	} else {
-		echo $pdo->log->info('Query time: ' . $consoletools->convertTime(TIME() - $timestart));
+		echo $pdo->log->info('Query time: ' . $consoletools->convertTime(time() - $timestart));
 		exit($pdo->log->info("No releases are missing the guid."));
 	}
 }

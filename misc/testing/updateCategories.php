@@ -13,7 +13,7 @@ $rescount = 0;
 //
 // [1] change for all where the regex isnt aimed at a specific category (affects most releases)
 //
-//$res = $db->queryDirect("select r.id as id, r.searchname as searchname, g.name as groupname, r.categoryID as rcat from releases r, releaseregex rr, groups g where r.regexid=rr.id and g.ID = r.groupID and rr.categoryid is null");
+//$res = $db->queryDirect("select r.id as id, r.searchname as searchname, g.name as groupname, r.categoryID as rcat from releases r, releaseregex rr, groups g where r.regexid=rr.id and g.ID = r.groupID and rr.categories_id is null");
 
 //
 // [2] update for all in a category

@@ -74,10 +74,12 @@ Class PreDb
 
 		$res = $this->pdo->queryDirect(
 			sprintf('
-							SELECT p.id AS preid, r.id AS releaseid
-							FROM predb p
-							INNER JOIN releases r ON p.title = r.searchname
-							WHERE r.preid < 1 %s',
+				SELECT p.id AS predb_id, r.id AS releases_id
+				FROM predb p
+				INNER JOIN releases r
+					FORCE INDEX (ix_releases_preid_searchname)
+					ON p.title = r.searchname
+				WHERE r.predb_id < 1 %s',
 				$datesql
 			)
 		);
@@ -89,7 +91,7 @@ Class PreDb
 			if ($res instanceof \Traversable) {
 				foreach ($res as $row) {
 					$this->pdo->queryExec(
-						sprintf('UPDATE releases SET preid = %d WHERE id = %d', $row['preid'], $row['releaseid'])
+						sprintf('UPDATE releases SET predb_id = %d WHERE id = %d', $row['predb_id'], $row['releases_id'])
 					);
 
 					if ($this->echooutput) {
@@ -131,7 +133,7 @@ Class PreDb
 		if ($titleCheck !== false) {
 			return array(
 				'title' => $cleanerName,
-				'preid' => $titleCheck['id']
+				'predb_id' => $titleCheck['id']
 			);
 		}
 
@@ -143,7 +145,7 @@ Class PreDb
 		if ($fileCheck !== false) {
 			return array(
 				'title' => $fileCheck['title'],
-				'preid' => $fileCheck['id']
+				'predb_id' => $fileCheck['id']
 			);
 		}
 
@@ -170,11 +172,11 @@ Class PreDb
 
 		$tq = '';
 		if ($time == 1) {
-			$tq = 'AND r.adddate > (NOW() - INTERVAL 3 HOUR) ORDER BY rf.releaseid, rf.size DESC';
+			$tq = 'AND r.adddate > (NOW() - INTERVAL 3 HOUR) ORDER BY rf.releases_id, rf.size DESC';
 		}
 		$ct = '';
 		if ($cats == 1) {
-			$ct = sprintf('AND r.categoryid IN (%s)', $othercats);
+			$ct = sprintf('AND r.categories_id IN (%s)', $othercats);
 		}
 
 		if ($this->echooutput) {
@@ -187,14 +189,14 @@ Class PreDb
 		$regex = "AND (r.ishashed = 1 OR rf.ishashed = 1)";
 
 		if ($cats === 3) {
-			$query = sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, '
+			$query = sprintf('SELECT r.id AS releases_id, r.name, r.searchname, r.categories_id, r.groups_id, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
-				. 'LEFT OUTER JOIN release_files rf ON r.id = rf.releaseid '
-				. 'WHERE nzbstatus = 1 AND dehashstatus BETWEEN -6 AND 0 AND preid = 0 %s', $regex);
+				. 'LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id '
+				. 'WHERE nzbstatus = 1 AND dehashstatus BETWEEN -6 AND 0 AND predb_id = 0 %s', $regex);
 		} else {
-			$query = sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, '
+			$query = sprintf('SELECT r.id AS releases_id, r.name, r.searchname, r.categories_id, r.groups_id, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
-				. 'LEFT OUTER JOIN release_files rf ON r.id = rf.releaseid '
+				. 'LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id '
 				. 'WHERE nzbstatus = 1 AND isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
 		}
 
@@ -248,7 +250,7 @@ Class PreDb
 		$sql = sprintf('
 			SELECT p.*, r.guid
 			FROM predb p
-			LEFT OUTER JOIN releases r ON p.id = r.preid %s
+			LEFT OUTER JOIN releases r ON p.id = r.predb_id %s
 			ORDER BY p.predate DESC
 			LIMIT %d
 			OFFSET %d',
