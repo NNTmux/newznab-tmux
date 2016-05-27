@@ -115,6 +115,7 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/utils-admin.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.multiselect.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.multifile.js"></script>
 <!-- Custom functions -->
 <script src="{$smarty.const.WWW_THEMES}/shared/js/functions.js" type="text/javascript"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
