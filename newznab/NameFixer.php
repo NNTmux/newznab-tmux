@@ -283,10 +283,11 @@ class NameFixer
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
-					WHERE (rel.isrenamed = %d OR rel.categories_id = %d)
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN(%d, %d))
 					AND proc_files = %d',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
+				Category::OTHER_HASHED,
 				self::PROC_FILES_NONE
 			);
 		}
