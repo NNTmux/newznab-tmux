@@ -253,61 +253,51 @@ class NameFixer
 	/**
 	 * Attempts to fix release names using the File name.
 	 *
-	 * @param int     $time 1: 24 hours, 2: no time limit
-	 * @param boolean $echo 1: change the name, anything else: preview of what could have been changed.
-	 * @param int     $cats 1: other categories, 2: all categories
-	 * @param         $nameStatus
-	 * @param         $show
+	 * @param int $time   1: 24 hours, 2: no time limit
+	 * @param boolean $echo   1: change the name, anything else: preview of what could have been changed.
+	 * @param int $cats   1: other categories, 2: all categories
+	 * @param $nameStatus
+	 * @param $show
 	 */
-	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show, $guidChar = '', $limit = '')
+	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show)
 	{
+		$this->_echoStartMessage($time, 'file names');
 		$type = 'Filenames, ';
-		$guid = ($guidChar === '') ? '' : ('AND rel.leftguid = ' . $this->pdo->escapeString($guidChar));
-		$queryLimit = ($limit === '') ? '' : $limit;
-		if ($guid === '') {
-			$this->_echoStartMessage($time, 'file names');
-		}
 
 		$preId = false;
 		if ($cats === 3) {
-			$query =
-				sprintf('
+			$query = sprintf('
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
-					WHERE rel.nzbstatus = %d
-					AND rel.predb_id < 1',
-					NZB::NZB_ADDED
-				);
+					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					WHERE nzbstatus = %d
+					AND predb_id = 0',
+				NZB::NZB_ADDED
+			);
 			$cats = 2;
 			$preId = true;
 		} else {
-			$query =
-				sprintf('
+			$query = sprintf('
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					STRAIGHT_JOIN release_files rf ON rf.releases_id = rel.id
+					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id = %d)
-					AND rel.proc_files = %d
-					%s',
-					self::IS_RENAMED_NONE,
-					Category::OTHER_MISC,
-					self::PROC_FILES_NONE,
-					$guid
-				);
+					AND proc_files = %d',
+				self::IS_RENAMED_NONE,
+				Category::OTHER_MISC,
+				self::PROC_FILES_NONE
+			);
 		}
 
-		$releases = $this->_getReleases($time, $cats, $query, $queryLimit);
+		$releases = $this->_getReleases($time, $cats, $query);
 		if ($releases instanceof \Traversable && $releases !== false) {
 
 			$total = $releases->rowCount();
 			if ($total > 0) {
 				$this->_totalReleases = $total;
-				if ($guid === '') {
-					echo $this->pdo->log->primary(number_format($total) . ' file names to process.');
-				}
+				echo $this->pdo->log->primary(number_format($total) . ' file names to process.');
 
 				foreach ($releases as $release) {
 					$this->done = $this->matched = false;
@@ -317,10 +307,8 @@ class NameFixer
 				}
 
 				$this->_echoFoundCount($echo, ' files');
-			} elseif ($guid === '') {
-				echo $this->pdo->log->info('Nothing to fix.');
 			} else {
-				echo '.';
+				echo $this->pdo->log->info('Nothing to fix.');
 			}
 		}
 	}
