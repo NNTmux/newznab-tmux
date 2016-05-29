@@ -32,9 +32,9 @@
           </div>
           <div class="row">
             <div class="col-xs-8">
-              <div>
+              <div class="chackbox square">
                 <label>
-                  <input id="rememberme" {if isset($rememberme) && $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox" class="square"> Remember Me
+                  <input id="rememberme" {if isset($rememberme) && $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox"> Remember Me
                 </label>
 				  <hr>
                 <div style="text-align: center;">
