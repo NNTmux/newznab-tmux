@@ -475,7 +475,8 @@ class Releases
 				"SELECT CONCAT(cp.id, ',', c.id) AS category_ids
 				FROM categories c
 				LEFT JOIN categories cp ON cp.id = c.parentid
-				WHERE c.parentid IS NOT NULL",
+				WHERE c.parentid IS NOT NULL
+				AND cp.id IS NOT NULL",
 				true, NN_CACHE_EXPIRY_LONG
 			);
 			if (isset($result[0]['category_ids'])) {
@@ -978,6 +979,7 @@ class Releases
 	)
 	{
 		$siteSQL = array();
+		$showSql = '';
 
 		if (is_array($siteIdArr)) {
 			foreach ($siteIdArr as $column => $Id) {
@@ -989,23 +991,40 @@ class Releases
 
 		$siteCount = count($siteSQL);
 
+		if ($siteCount > 0 ) {
+			// If we have show info, find the Episode ID/Video ID first to avoid table scans
+			$showQry = sprintf('
+				SELECT v.id AS video, tve.id AS episode
+				FROM videos v
+				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
+				WHERE (%s) %s %s %s',
+				implode(' OR ', $siteSQL),
+				($series != '' ? sprintf('AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)) : ''),
+				($episode != '' ? sprintf('AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)) : ''),
+				($airdate != '' ? sprintf('AND DATE(tve.firstaired) = %s', $this->pdo->escapeString($airdate)) : '')
+			);
+			$show = $this->pdo->queryOneRow($showQry);
+			if ($show !== false) {
+				if (($series !== '' && $episode !== '') || $airdate !== '') {
+					$showSql = 'AND r.tv_episodes_id = ' . $show['episode'];
+				} else {
+					$showSql = 'AND r.videos_id = ' . $show['video'];
+				}
+			}
+		}
+
 		$whereSql = sprintf(
 			"%s
 			WHERE r.categories_id BETWEEN %d AND %d
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
-			AND (%s)
-			%s %s %s %s %s %s %s",
-
+			%s %s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			Category::TV_ROOT,
 			Category::TV_OTHER,
 			NZB::NZB_ADDED,
 			$this->showPasswords,
-			($siteCount > 0 ? implode(' OR ', $siteSQL) : '1=1'),
-			($series != '' ? sprintf('AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)) : ''),
-			($episode != '' ? sprintf('AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)) : ''),
-			($airdate != '' ? sprintf('AND DATE(tve.firstaired) = %s', $this->pdo->escapeString($airdate)) : ''),
+			$showSql,
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
 			$this->categorySQL($cat),
 			($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
@@ -1028,11 +1047,10 @@ class Releases
 			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT JOIN categories c ON c.id = r.categories_id
-			INNER JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT JOIN groups ON groups.id = r.groups_id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-
 			%s",
 			$this->getConcatenatedCategoryIDs(),
 			$whereSql
