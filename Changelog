@@ -1,4 +1,5 @@
 2016-05-29 DariusIII
+	* Upd: update composer.lock with new versions of libs.
 	* Upd: Greatly improve speed of tv shows search.
 2016-05-28 DariusIII
 	* Fix: Fix for login rememberme
