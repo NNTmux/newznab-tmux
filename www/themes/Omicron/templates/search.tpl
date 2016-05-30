@@ -206,7 +206,7 @@
 				<tr class="{cycle values=",alt"}{if $lastvisit|strtotime<$result.adddate|strtotime} new{/if}"
 					id="guid{$result.guid}">
 					<td class="check">
-						<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="nzb_check"
+						<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="square"
 							   value="{$result.guid}">
 					</td>
 					<td class="item">

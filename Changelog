@@ -1,3 +1,5 @@
+2016-05-30 DariusIII
+	* Upd: Replace rest of the nzb_check and nzb_check_all with square and square-all, respectively
 2016-05-29 DariusIII
 	* Upd: update composer.lock with new versions of libs.
 	* Upd: Greatly improve speed of tv shows search.

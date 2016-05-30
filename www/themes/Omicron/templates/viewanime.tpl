@@ -91,7 +91,7 @@
 						{foreach $animeEpisodeTitles as $result}
 								<tr class="{cycle values=",alt"}" id="guid{$result.guid}">
 									<td class="check"><input id="chk{$result.guid|substr:0:7}"
-															 type="checkbox" class="nzb_check"
+															 type="checkbox" class="square"
 															 value="{$result.guid}"/></td>
 									<td>
 										<a title="View details"
