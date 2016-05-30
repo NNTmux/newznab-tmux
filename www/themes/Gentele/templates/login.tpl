@@ -32,22 +32,33 @@
 			</div>
 			<div class="row">
 				<div class="col-xs-8">
-					<div class="checkbox flat">
+					<div class="checkbox icheck">
 						<label>
 							<input id="rememberme" {if isset($rememberme) && $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox"> Remember Me
 						</label>
 						<hr>
-						<div style="text-align: center;">
-							{$page->smarty->fetch('captcha.tpl')}
-						</div>
+						{$page->smarty->fetch('captcha.tpl')}
 					</div>
 				</div><!-- /.col -->
 				<div class="col-xs-4">
 					<button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+
 				</div><!-- /.col -->
 			</div>
 		</form>
-		<a href="{$smarty.const.WWW_TOP}forgottenpassword" class="text-center">I forgot my password</a><br>
-		<a href="{$smarty.const.WWW_TOP}register" class="text-center">Register a new membership</a>
+
+		<a href="{$smarty.const.WWW_TOP}/forgottenpassword" class="text-center">I forgot my password</a><br>
+		<a href="{$smarty.const.WWW_TOP}/register" class="text-center">Register a new membership</a>
+		<!-- iCheck -->
+		<script src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js" type="text/javascript"></script>
+		<script>
+			$(function () {
+				$('input').iCheck({
+					checkboxClass: 'icheckbox_flat-green',
+					radioClass: 'iradio_flat-green',
+					increaseArea: '20%' // optional
+				});
+			});
+		</script>
 </body>
 </html>
