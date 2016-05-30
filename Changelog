@@ -1,4 +1,5 @@
 2016-05-30 DariusIII
+	* Fix: Fix Nfo display on Gentele XXX page.
 	* Upd: Replace rest of the nzb_check and nzb_check_all with square and square-all, respectively
 2016-05-29 DariusIII
 	* Upd: update composer.lock with new versions of libs.

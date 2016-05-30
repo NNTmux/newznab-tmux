@@ -154,8 +154,7 @@
 													><img
 																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"
-														htmlall"}"
+														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															   title="View NFO" class="label label-primary"
 															   rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
@@ -329,8 +328,7 @@
 													><img
 																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
-														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}|escape:"
-														htmlall"}"
+														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															   title="View NFO" class="label label-primary"
 															   rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
