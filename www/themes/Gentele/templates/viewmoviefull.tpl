@@ -176,21 +176,34 @@
 												<td class="less mid"
 													title="{$mpostdate[$m@index]}">{$mpostdate[$m@index]|timeago}</td>
 												<td class="less right">{$msize[$m@index]|fsize_format:"MB"}</td>
-												<td class="icons">
-													<a title="Download NZB"
-													   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
-																class="icon icon_nzb fa fa-cloud-download text-muted"
+												<td>
+													<a href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}" class="icon_nzb text-muted"><i
+																class="fa fa-cloud-download text-muted"
 																data-toggle="tooltip" data-placement="top" title
 																data-original-title="Download NZB"></i></a>
-													<a href="#" class="icon_cart text-muted" data-toggle="tooltip"
-													   data-placement="top" title
-													   data-original-title="Send to my Download Basket"><i
-																class="fa fa-shopping-basket"></i></a>
+													<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
+																class="fa fa-comments-o text-muted"
+																data-toggle="tooltip" data-placement="top" title
+																data-original-title="Comments"></i></a>
+													<a href="#"><i
+																id="cart{$result.guid}"
+																class="icon_cart text-muted fa fa-shopping-basket" data-toggle="tooltip"
+																data-placement="top" title
+																data-original-title="Send to my download basket"></i></a>
 													{if isset($sabintegrated) && $sabintegrated !=""}
-														<a href="#" class="icon icon_sab text-muted"
-														   data-toggle="tooltip" data-placement="top" title
-														   data-original-title="Send to Queue"><i
-																	class="fa fa-share"></i></a>
+														<a href="#">
+															<i	id="send{$result.guid}"
+																  class="icon_sab text-muted fa fa-share"
+																  data-toggle="tooltip"
+																  data-placement="top" title
+																  data-original-title="Send to my Queue">
+															</i>
+														</a>
+													{/if}
+													{if $weHasVortex}
+														<a href="#" class="icon_vortex text-muted"><i
+																	class="fa fa-share" data-toggle="tooltip" data-placement="top"
+																	title data-original-title="Send to NZBVortex"></i></a>
 													{/if}
 												</td>
 											</tr>
