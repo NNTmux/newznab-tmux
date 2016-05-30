@@ -206,13 +206,14 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																			  data-toggle="tooltip" data-placement="top"
-																			  title
-																			  data-original-title="Send to my download basket"><i
-																					class="fa fa-shopping-basket"></i></span>
+															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																  id="cart{$mguid[$m@index]}"
+																  data-toggle="tooltip" data-placement="top" title
+																  data-original-title="Send to my download basket"><i
+																		class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																			  id="send{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i
@@ -221,7 +222,7 @@
 																	{if !empty($mfailed[$m@index])}
 																		<span class="btn btn-default btn-xs"
 																			  title="This release has failed to download for some users">
-																		<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
+																	<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
 																			Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
 																					class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}
 																			Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
@@ -380,13 +381,14 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																			  data-toggle="tooltip" data-placement="top"
-																			  title
-																			  data-original-title="Send to my download basket"><i
-																					class="fa fa-shopping-basket"></i></span>
+															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																  id="cart{$mguid[$m@index]}"
+																  data-toggle="tooltip" data-placement="top" title
+																  data-original-title="Send to my download basket"><i
+																		class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																			  id="send{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i
@@ -395,7 +397,7 @@
 																	{if !empty($mfailed[$m@index])}
 																		<span class="btn btn-default btn-xs"
 																			  title="This release has failed to download for some users">
-																		<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
+																	<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]}
 																			Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i
 																					class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}
 																			Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>

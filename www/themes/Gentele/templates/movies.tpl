@@ -160,11 +160,13 @@
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																  id="cart{$mguid[$m@index]}"
 																  data-toggle="tooltip" data-placement="top" title
 																  data-original-title="Send to my download basket"><i
 																		class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																			  id="send{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i
@@ -172,11 +174,11 @@
 																	{/if}
 																	{if !empty($cpurl) && !empty($cpapi)}
 																		<span
-																			id="imdb{$result.imdbid}"
-																			href="javascript:;"
-																			class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																			data-toggle="tooltip" data-placement="top"
-																			title data-original-title="Send to CouchPotato">
+																				id="imdb{$result.imdbid}"
+																				href="javascript:;"
+																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																				data-toggle="tooltip" data-placement="top"
+																				title data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
 																		</span>
 																	{/if}
@@ -296,11 +298,13 @@
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																  id="cart{$mguid[$m@index]}"
 																  data-toggle="tooltip" data-placement="top" title
 																  data-original-title="Send to my download basket"><i
 																		class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																			  id="send{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i

@@ -124,11 +124,20 @@
 										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
 													class="fa fa-comments-o text-muted"
 													title="Comments"></i></a>
-										<a href="#" class="icon_cart text-muted"><i
-													class="fa fa-shopping-basket" title="Send to my Download Basket"></i></a>
+										<a href="#"><i
+													id="cart{$result.guid}"
+													class="icon_cart text-muted fa fa-shopping-basket" title="Send to my Download Basket">
+
+											</i>
+										</a>
 										{if isset($sabintegrated) && $sabintegrated !=""}
-											<a href="#" class="icon_sab text-muted"><i class="fa fa-share"
-																					   title="Send to my Queue"></i></a>
+											<a href="#"><i
+														id="send{$result.guid}"
+														class="icon_sab text-muted fa fa-share"
+														title="Send to my Queue">
+
+												</i>
+											</a>
 										{/if}
 										{if $weHasVortex}
 											<a href="#" class="icon_vortex text-muted"><i

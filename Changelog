@@ -1,4 +1,5 @@
 2016-05-30 DariusIII
+	* Fix: Fix issues with adding releases to cart/queue in Omicron/Gentele theme
 	* Fix: Fix styling on browse page on all themes
 	* Fix: Fix Nfo display on Gentele XXX page.
 	* Upd: Replace rest of the nzb_check and nzb_check_all with square and square-all, respectively

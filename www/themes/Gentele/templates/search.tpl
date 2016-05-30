@@ -340,8 +340,8 @@
 								cmt{if $result.comments != 1}s{/if}</a>
 							<br>{$result.grabs} grab{if $result.grabs != 1}s{/if}
 						</td>
-						<td class="icon_nzb"><a
-									href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"><i
+						<td>
+							<a href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}" class="icon_nzb text-muted"><i
 										class="fa fa-cloud-download text-muted"
 										data-toggle="tooltip" data-placement="top" title
 										data-original-title="Download NZB"></i></a>
@@ -349,18 +349,25 @@
 										class="fa fa-comments-o text-muted"
 										data-toggle="tooltip" data-placement="top" title
 										data-original-title="Comments"></i></a>
-							<a href="#" class="icon_cart text-muted"><i
-										class="fa fa-shopping-basket" data-toggle="tooltip" data-placement="top" title
+							<a href="#"><i
+										id="cart{$result.guid}"
+										class="icon_cart text-muted fa fa-shopping-basket" data-toggle="tooltip"
+										data-placement="top" title
 										data-original-title="Send to my download basket"></i></a>
 							{if isset($sabintegrated) && $sabintegrated !=""}
-								<a href="#" class="icon_sab text-muted"><i class="fa fa-share" data-toggle="tooltip"
-																		   data-placement="top" title
-																		   data-original-title="Send to my Queue"></i></a>
+								<a href="#">
+									<i	id="send{$result.guid}"
+										  class="icon_sab text-muted fa fa-share"
+										  data-toggle="tooltip"
+										  data-placement="top" title
+										  data-original-title="Send to my Queue">
+									</i>
+								</a>
 							{/if}
 							{if $weHasVortex}
 								<a href="#" class="icon_vortex text-muted"><i
-											class="fa fa-share" data-toggle="tooltip" data-placement="top" title
-											data-original-title="Send to NZBVortex"></i></a>
+											class="fa fa-share" data-toggle="tooltip" data-placement="top"
+											title data-original-title="Send to NZBVortex"></i></a>
 							{/if}
 						</td>
 					</tr>
