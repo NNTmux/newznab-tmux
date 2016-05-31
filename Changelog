@@ -1,4 +1,5 @@
 2016-05-31 DariusIII
+	* Fix: Remove doubled and wrong preinfo function ih Gamma theme utils.js
 	* Fix: Fix PreDB page layout in Gamma theme.
 	* Fix: Fix links to colorbox images in Gamma bootstrap-fixes.css
 	* Fix: Fix Gamma links to scripts
