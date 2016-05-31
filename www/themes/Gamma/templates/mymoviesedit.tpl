@@ -6,7 +6,7 @@
 	</p>
 </div>
 {if $movies|@count > 0}
-<table class="data highlight Sortable table table-striped" id="browsetable">
+<table class="data highlight Sortable table" id="browsetable">
 	<tr>
 		<th style="padding-top:0px; padding-bottom:0px;"></th>
 		<th style="padding-top:0px; padding-bottom:0px;">name</th>

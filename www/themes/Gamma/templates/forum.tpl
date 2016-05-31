@@ -5,7 +5,7 @@
 </div>
 <div style="float:right;margin-bottom:5px;"><a href="#new" role="button" class="btn btn-small btn-primary" data-toggle="modal">New post</a></div>
 <a id="top"></a>
-<table style="width:100%;" class="data highlight table table-striped" id="forumtable">
+<table style="width:100%;" class="data highlight table" id="forumtable">
 	<tr>
 		<th style="padding-top:0px; padding-bottom:0px;" width="60%">Topic</th>
 		<th style="padding-top:0px; padding-bottom:0px;">Posted By</th>

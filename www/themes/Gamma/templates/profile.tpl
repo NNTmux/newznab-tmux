@@ -131,7 +131,7 @@
 {if isset($isadmin) && $downloadlist|@count > 0}
 <div style="padding-top:20px;">
 	<h3>Downloads for User and Host</h3>
-	<table class="data Sortable highlight table table-striped" id="downloadtable" style="margin-top:10px;">
+	<table class="data Sortable highlight table" id="downloadtable" style="margin-top:10px;">
 	<tr>
 		<th>date</th>
 		<th>hosthash</th>

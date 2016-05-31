@@ -34,7 +34,7 @@
 {$site->adbrowse}
 
 <form method="post" id="dl" name="dl" action="{$smarty.const.WWW_TOP}/searchraw">
-<table style="width:100%;" class="data table table-striped" id="browsetable">
+<table style="width:100%;" class="data table" id="browsetable">
 	<tr>
 		<!--<th width="10"></th>-->
 		<th>filename</th>
