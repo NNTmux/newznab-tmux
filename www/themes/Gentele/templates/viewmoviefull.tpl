@@ -186,13 +186,13 @@
 																data-toggle="tooltip" data-placement="top" title
 																data-original-title="Comments"></i></a>
 													<a href="#"><i
-																id="cart{$mguid[$m@index]}"
+																id="guid{$mguid[$m@index]}"
 																class="icon_cart text-muted fa fa-shopping-basket" data-toggle="tooltip"
 																data-placement="top" title
 																data-original-title="Send to my download basket"></i></a>
 													{if isset($sabintegrated) && $sabintegrated !=""}
 														<a href="#">
-															<i	id="send{$mguid[$m@index]}"
+															<i	id="guid{$mguid[$m@index]}"
 																  class="icon_sab text-muted fa fa-share"
 																  data-toggle="tooltip"
 																  data-placement="top" title

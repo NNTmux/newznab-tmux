@@ -160,13 +160,13 @@
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
-																  id="cart{$mguid[$m@index]}"
+																  id="guid{$mguid[$m@index]}"
 																  data-toggle="tooltip" data-placement="top" title
 																  data-original-title="Send to my download basket"><i
 																		class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
-																			  id="send{$mguid[$m@index]}"
+																			  id="guid{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i
@@ -298,13 +298,13 @@
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
-																  id="cart{$mguid[$m@index]}"
+																  id="guid{$mguid[$m@index]}"
 																  data-toggle="tooltip" data-placement="top" title
 																  data-original-title="Send to my download basket"><i
 																		class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
 																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
-																			  id="send{$mguid[$m@index]}"
+																			  id="guid{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i

@@ -173,14 +173,14 @@
 																			class="badge"> {$mcomments[$m@index]}
 																		Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 															<span
-																	id="cart{$mguid[$m@index]}"
+																	id="guid{$mguid[$m@index]}"
 																	class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																	title="Send to my Download Basket">
 																	<i class="fa fa-shopping-basket"></i>
 															</span>
 																{if isset($sabintegrated) && $sabintegrated !=""}
 																	<span
-																			id="send{$mguid[$m@index]}"
+																			id="guid{$mguid[$m@index]}"
 																			class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																			title="Send to my Queue">
 																		<i class="fa fa-share"></i>

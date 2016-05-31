@@ -146,13 +146,13 @@
 													data-toggle="tooltip" data-placement="top" title
 													data-original-title="Comments"></i></a>
 										<a href="#"><i
-													id="cart{$result.guid}"
+													id="guid{$result.guid}"
 													class="icon_cart text-muted fa fa-shopping-basket" data-toggle="tooltip"
 													data-placement="top" title
 													data-original-title="Send to my download basket"></i></a>
 										{if isset($sabintegrated) && $sabintegrated !=""}
 											<a href="#">
-												<i	id="send{$result.guid}"
+												<i	id="guid{$result.guid}"
 													class="icon_sab text-muted fa fa-share"
 													data-toggle="tooltip"
 													data-placement="top" title
