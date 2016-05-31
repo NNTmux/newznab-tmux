@@ -1,6 +1,7 @@
 <?php
 
 use newznab\PreDb;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
@@ -9,7 +10,7 @@ if (!isset($_REQUEST["id"])) {
 	$page->show404();
 }
 
-$pre = new PreDb();
+$pre = new PreDb(['Settings' => $page->settings]);
 $predata = $pre->getOne($_REQUEST["id"]);
 
 if (!$predata) {
@@ -18,7 +19,7 @@ if (!$predata) {
 	print "<table>\n";
 	if (isset($predata['nuked'])) {
 		$nuked = '';
-		switch($predata['nuked']) {
+		switch ($predata['nuked']) {
 			case PreDb::PRE_NUKED:
 				$nuked = 'NUKED';
 				break;
