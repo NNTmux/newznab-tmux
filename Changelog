@@ -1,4 +1,5 @@
 2016-06-01 DariusIII
+	* Chg: Make API and RSS separate and smarty independent.
 	* Upd: Update composer files.
 	* Chg: Use old jquery.qtip2.js, remove new version from assets
 	* Fix: Fix TV search sending wrong data.
