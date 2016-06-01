@@ -92,9 +92,9 @@ Class RSS extends Capabilities
 				LEFT JOIN groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN movieinfo m ON m.imdbid = r.imdbid AND m.title != ''
 				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfo_id
-				LEFT OUTER JOIN genres mug ON mug.id = mu.genre_id
+				LEFT OUTER JOIN genres mug ON mug.id = mu.genreid
 				LEFT OUTER JOIN consoleinfo co ON co.id = r.consoleinfo_id
-				LEFT OUTER JOIN genres cog ON cog.id = co.genre_id %s
+				LEFT OUTER JOIN genres cog ON cog.id = co.genreid %s
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
 				LEFT OUTER JOIN bookinfo bo ON bo.id = r.bookinfo_id
 				WHERE r.passwordstatus %s
