@@ -63,7 +63,7 @@ Class RSS extends Capabilities
 		if (count($cat)) {
 			if ($cat[0] == -2) {
 				$cartSearch = sprintf(
-					'INNER JOIN users_releases ON users_releases.user_id = %d AND users_releases.releases_id = r.id',
+					'INNER JOIN users_releases ON users_releases.userid = %d AND users_releases.releases_id = r.id',
 					$userID
 				);
 			} else if ($cat[0] != -1) {
@@ -150,7 +150,7 @@ Class RSS extends Capabilities
 						sprintf('
 							SELECT videos_id, categoryid
 							FROM user_series
-							WHERE user_id = %d',
+							WHERE userid = %d',
 							$userID
 						),
 						true
@@ -201,7 +201,7 @@ Class RSS extends Capabilities
 						sprintf('
 							SELECT imdbid, categories_id
 							FROM user_movies
-							WHERE user_id = %d',
+							WHERE userid = %d',
 							$userID
 						),
 						true

@@ -22,7 +22,7 @@ if (!isset($_GET["t"]) && !isset($_GET["show"]) && !isset($_GET["anidb"])) {
 	$page->title = "Rss Info";
 	$page->meta_title = "Rss Nzb Info";
 	$page->meta_keywords = "view,nzb,description,details,rss,atom";
-	$page->meta_description = "View information about nZEDb RSS Feeds.";
+	$page->meta_description = "View information about Newznab Tmux RSS Feeds.";
 
 	$firstShow = $rss->getFirstInstance('videos_id', 'releases', 'id');
 	$firstAni = $rss->getFirstInstance('anidbid', 'releases', 'id');
