@@ -124,7 +124,7 @@ class XML_Response
 					return $this->returnApiRss();
 					break;
 				case 'rss':
-					$this->namespace = 'nZEDb';
+					$this->namespace = 'nntmux';
 					return $this->returnApiRss();
 					break;
 				case 'reg':
@@ -260,7 +260,7 @@ class XML_Response
 			case 'newznab':
 				$url = 'http://www.newznab.com/DTD/2010/feeds/attributes/';
 				break;
-			case 'nZEDb':
+			case 'nntmux':
 			default:
 				$url = $this->server['server']['url'] . 'rss-info/';
 		}
@@ -302,7 +302,7 @@ class XML_Response
 				$path = 'apihelp/';
 				$tag = 'API';
 				break;
-			case 'nZEDb':
+			case 'nntmux':
 			default:
 				$path = 'rss-info/';
 				$tag = 'RSS';
@@ -314,7 +314,7 @@ class XML_Response
 		$this->xml->writeElement('language', 'en-gb');
 		$this->xml->writeElement('webMaster', $server['email'] . ' ' . $server['title']);
 		$this->xml->writeElement('category', $server['meta']);
-		$this->xml->writeElement('generator', 'nZEDb');
+		$this->xml->writeElement('generator', 'nntmux');
 		$this->xml->writeElement('ttl', '10');
 		$this->xml->writeElement('docs', $this->server['server']['url'] . $path);
 	}
