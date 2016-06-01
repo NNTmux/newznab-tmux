@@ -1,4 +1,6 @@
 2016-06-01 DariusIII
+	* Upd: Update composer files.
+	* Chg: Use old jquery.qtip2.js, remove new version from assets
 	* Fix: Fix TV search sending wrong data.
 2016-05-31 DariusIII
 	* Fix: Remove doubled and wrong preinfo function ih Gamma theme utils.js
