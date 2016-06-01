@@ -1,4 +1,5 @@
 2016-06-01 DariusIII
+	* Upd: Show API search
 	* Upd: Fix connections
 	* Upd: Update Versions class
 	* Chg: Make API and RSS separate and smarty independent.
