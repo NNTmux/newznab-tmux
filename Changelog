@@ -1,3 +1,5 @@
+2016-06-01 DariusIII
+	* Fix: Fix TV search sending wrong data.
 2016-05-31 DariusIII
 	* Fix: Remove doubled and wrong preinfo function ih Gamma theme utils.js
 	* Fix: Fix PreDB page layout in Gamma theme.

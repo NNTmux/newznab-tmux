@@ -974,11 +974,11 @@ class Releases
 	 * @return array
 	 */
 	public function searchShows(
-		$siteIdArr = array(), $series = '', $episode = '', $airdate = '', $offset = 0,
+		$siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0,
 		$limit = 100, $name = '', $cat = [-1], $maxAge = -1, $minSize = 0
 	)
 	{
-		$siteSQL = array();
+		$siteSQL = [];
 		$showSql = '';
 
 		if (is_array($siteIdArr)) {
@@ -1005,11 +1005,16 @@ class Releases
 			);
 			$show = $this->pdo->queryOneRow($showQry);
 			if ($show !== false) {
-				if (($series !== '' && $episode !== '') || $airdate !== '') {
+				if ($show['episode'] > 0) {
 					$showSql = 'AND r.tv_episodes_id = ' . $show['episode'];
-				} else {
+				} else if($show['video'] > 0) {
 					$showSql = 'AND r.videos_id = ' . $show['video'];
+				} else {
+					return [];
 				}
+			} else {
+				// If we were passed ID Info and no match was found, do not run the query
+				return [];
 			}
 		}
 
