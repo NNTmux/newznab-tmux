@@ -23,7 +23,7 @@ class Versions
 	public $git;
 
 	/**
-	 * @var object newznab\ColorCLI
+	 * @var object ColorCLI
 	 */
 	public $out;
 
@@ -33,9 +33,19 @@ class Versions
 	protected $_changes = 0;
 
 	/**
-	 * @var string	Path and filename for the XML file.
+	 * @var string Path and filename for the XML file.
 	 */
 	protected $_filespec;
+
+	/**
+	 * @var string highest tag value
+	 */
+	protected $_gitHighestTag;
+
+	/**
+	 * @var array of stable branches.
+	 */
+	protected $_stable = ['0.x'];
 
 	/**
 	 * Shortcut to the newznab->versions node to make method work shorter.
@@ -87,7 +97,6 @@ class Versions
 	public function checkAll($update = true)
 	{
 		$this->checkGitTag($update);
-		//$this->checkSQLFileLatest($update);
 		$this->checkSQLDb($update);
 		$this->checkGitCommit($update);
 		return $this->hasChanged();
@@ -102,7 +111,7 @@ class Versions
 	{
 		// Since Dec 2014 we no longer maintain the git commit count in the XML file, as it is no
 		// longer used in the code base.
-		if ((int)$this->_vers->sql->db >= 200) {
+		if ((int)$this->_vers->sql->db >= 307) {
 			return 0;
 		}
 
@@ -127,23 +136,23 @@ class Versions
 
 	/**
 	 * Checks the git's latest version tag against the XML's stored value. Version should be
-	 * Major.Minor.Revision (Note commit number is NOT revision)
+	 * Major.Minor.Revision (**commit number is NOT revision**)
 	 * @param boolean $update Whether the XML should be updated by the check.
 	 * @return boolean The new git's latest version tag, or false.
 	 */
 	public function checkGitTag($update = true)
 	{
-		$latest = $this->git->tagLatest();
+		$branch = $this->git->getBranch();
+		$this->_gitHighestTag = $latest = trim($this->git->tagLatest());
 		$ver = preg_match('#v(\d+\.\d+\.\d+).*#', $latest, $matches) ? $matches[1] : $latest;
 
-		if ($this->git->getBranch() !== 'master') {
+		if (!in_array($branch, $this->_stable)) {
 			if (version_compare($this->_vers->git->tag, '0.0.0', '!=')) {
 				$this->_vers->git->tag = '0.0.0';
 				$this->_changes |= self::UPDATED_GIT_TAG;
 			}
 			return $this->_vers->git->tag;
 		}
-
 		// Check if version file's entry is the same as current branch's tag
 		if (version_compare($this->_vers->git->tag, $latest, '!=')) {
 			if ($update) {
@@ -152,7 +161,7 @@ class Versions
 				$this->_changes |= self::UPDATED_GIT_TAG;
 			} else {
 				echo $this->out->primaryOver("Leaving tag version at ") .
-						$this->out->headerOver($this->_vers->git->tag);
+					$this->out->headerOver($this->_vers->git->tag);
 			}
 			return $this->_vers->git->tag;
 		} else {
@@ -196,12 +205,12 @@ class Versions
 	public function checkSQLFileLatest($update = true)
 	{
 		$options = [
-				'data'  => NN_RES . 'db' . DS . 'schema' . DS . 'data' . DS,
-				'ext'   => 'sql',
-				'path'  => NN_RES . 'db' . DS . 'patches' . DS . 'mysql',
-				'regex' =>
-						'#^' . Utility::PATH_REGEX . '(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
-				'safe'  => true,
+			'data'  => NN_RES . 'db' . DS . 'schema' . DS . 'data' . DS,
+			'ext'   => 'sql',
+			'path'  => NN_RES . 'db' . DS . 'patches' . DS . 'mysql',
+			'regex' =>
+				'#^' . Utility::PATH_REGEX . '(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
+			'safe'  => true,
 		];
 		$files = Utility::getDirFiles($options);
 		natsort($files);
@@ -245,7 +254,10 @@ class Versions
 
 	public function getTagVersion()
 	{
-		return $this->_vers->git->tag->__toString();
+		if (empty($this->_gitHighestTag)) {
+			$this->checkGitTag();
+		}
+		return $this->_gitHighestTag;
 	}
 
 	public function getValidVersionsFile($filepath = null)
@@ -297,3 +309,4 @@ class Versions
 		}
 	}
 }
+?>
