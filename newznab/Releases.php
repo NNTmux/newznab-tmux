@@ -974,11 +974,11 @@ class Releases
 	 * @return array
 	 */
 	public function searchShows(
-		$siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0,
+		$siteIdArr = array(), $series = '', $episode = '', $airdate = '', $offset = 0,
 		$limit = 100, $name = '', $cat = [-1], $maxAge = -1, $minSize = 0
 	)
 	{
-		$siteSQL = [];
+		$siteSQL = array();
 		$showSql = '';
 
 		if (is_array($siteIdArr)) {
@@ -991,11 +991,14 @@ class Releases
 
 		if (count($siteSQL) > 0) {
 			// If we have show info, find the Episode ID/Video ID first to avoid table scans
-			$showQry = sprintf('
-				SELECT v.id AS video, tve.id AS episode
+			$showQry = sprintf("
+				SELECT
+					v.id AS video,
+					GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes
 				FROM videos v
 				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
-				WHERE (%s) %s %s %s',
+				WHERE (%s) %s %s %s
+				GROUP BY v.id",
 				implode(' OR ', $siteSQL),
 				($series != '' ? sprintf('AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)) : ''),
 				($episode != '' ? sprintf('AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)) : ''),
@@ -1003,16 +1006,17 @@ class Releases
 			);
 			$show = $this->pdo->queryOneRow($showQry);
 			if ($show !== false) {
-				if ((!empty($series) && !empty($epsiode) || !empty($airdate)) &&  $show['episode'] > 0) {
-					$showSql = 'AND r.tv_episodes_id = ' . $show['episode'];
-				} else if ($show['video'] > 0) {
+				if ((!empty($series) || !empty($episode) || !empty($airdate)) && strlen((string)$show['episodes']) > 0) {
+					$showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show['episodes']);
+				} else if ((int)$show['video'] > 0) {
 					$showSql = 'AND r.videos_id = ' . $show['video'];
 				} else {
-					return [];
+					// If we were passed Episode Info and no match was found, do not run the query
+					return array();
 				}
 			} else {
-				// If we were passed ID Info and no match was found, do not run the query
-				return [];
+				// If we were passed Site ID Info and no match was found, do not run the query
+				return array();
 			}
 		}
 

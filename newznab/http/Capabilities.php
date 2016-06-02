@@ -75,23 +75,34 @@ abstract class Capabilities
 				new XML_Response(
 					[
 						'Parameters' => $params,
-						'Releases' => $data,
-						'Server' => $this->getForMenu(),
-						'Type' => $type
+						'Data'       => $data,
+						'Server'     => $this->getForMenu(),
+						'Type'       => $type
 					]
 				)
 				)->returnXML();
 			header('Content-type: text/xml');
 		} else {
-			$response = json_encode(Utility::encodeAsUTF8($data));
-			if ($response === false) {
-				Utility::showApiError(201);
-			}
+			$response =
+				(
+				new JSON_Response(
+					[
+						'Parameters' => $params,
+						'Data'       => $data,
+						'Type'       => $type
+					]
+				)
+				)->returnJSON();
 			header('Content-type: application/json');
 		}
-		header('Content-Length: ' . strlen($response));
-		echo $response;
+		if ($response === false) {
+			Utility::showApiError(201);
+		} else {
+			header('Content-Length: ' . strlen($response));
+			echo $response;
+		}
 	}
+
 
 	/**
 	 * Collect and return various capability information for usage in API
