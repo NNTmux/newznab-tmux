@@ -20,7 +20,7 @@
  */
 
 namespace newznab\http;
-use newznab\utility\Utility;
+use newznab\Utility\Utility;
 use newznab\Category;
 
 /**
@@ -124,7 +124,7 @@ class XML_Response
 					return $this->returnApiRss();
 					break;
 				case 'rss':
-					$this->namespace = 'nntmux';
+					$this->namespace = 'nZEDb';
 					return $this->returnApiRss();
 					break;
 				case 'reg':
@@ -260,7 +260,7 @@ class XML_Response
 			case 'newznab':
 				$url = 'http://www.newznab.com/DTD/2010/feeds/attributes/';
 				break;
-			case 'nntmux':
+			case 'nZEDb':
 			default:
 				$url = $this->server['server']['url'] . 'rss-info/';
 		}
@@ -302,7 +302,7 @@ class XML_Response
 				$path = 'apihelp/';
 				$tag = 'API';
 				break;
-			case 'nntmux':
+			case 'nZEDb':
 			default:
 				$path = 'rss-info/';
 				$tag = 'RSS';
@@ -314,7 +314,7 @@ class XML_Response
 		$this->xml->writeElement('language', 'en-gb');
 		$this->xml->writeElement('webMaster', $server['email'] . ' ' . $server['title']);
 		$this->xml->writeElement('category', $server['meta']);
-		$this->xml->writeElement('generator', 'nntmux');
+		$this->xml->writeElement('generator', 'nZEDb');
 		$this->xml->writeElement('ttl', '10');
 		$this->xml->writeElement('docs', $this->server['server']['url'] . $path);
 	}
@@ -426,7 +426,7 @@ class XML_Response
 			$this->writeZedAttr('grabs', $this->release['grabs']);
 			$this->writeZedAttr('comments', $this->release['comments']);
 			$this->writeZedAttr('password', $this->release['passwordstatus']);
-			$this->writeZedAttr('usenetdate', date(DATE_RSS, strtotime($this->release['postdate'])));
+			$this->writeZedAttr('usenetdate', $this->release['postdate']);
 			$this->writeZedAttr('group', $this->release['group_name']);
 		}
 	}
@@ -444,7 +444,7 @@ class XML_Response
 			case $this->release['episode'] > 0:
 				$this->writeZedAttr('episode', $this->release['episode']);
 			case !empty($this->release['firstaired']):
-				$this->writeZedAttr('firstaired', date(DATE_RSS, strtotime($this->release['firstaired'])));
+				$this->writeZedAttr('tvairdate', $this->release['firstaired']);
 			case $this->release['tvdb'] > 0:
 				$this->writeZedAttr('tvdbid', $this->release['tvdb']);
 			case $this->release['trakt'] > 0:
@@ -515,7 +515,6 @@ class XML_Response
 				"width=\"120\" alt=\"{$r['searchname']}\" />\n";
 		}
 		$size = Utility::bytesToSizeString($r['size']);
-		$pdate = date(DATE_RSS, strtotime($r['postdate']));
 		$this->cdata .=
 			"\t<li>ID: <a href=\"{$s['server']['url']}details/{$r['guid']}\">{$r['guid']}</a></li>\n" .
 			"\t<li>Name: {$r['searchname']}</li>\n" .
@@ -523,7 +522,7 @@ class XML_Response
 			"\t<li>Category: <a href=\"{$s['server']['url']}browse?t={$r['categories_id']}\">{$r['category_name']}</a></li>\n" .
 			"\t<li>Group: <a href=\"{$s['server']['url']}browse?g={$r['group_name']}\">{$r['group_name']}</a></li>\n" .
 			"\t<li>Poster: {$r['fromname']}</li>\n" .
-			"\t<li>Posted: {$pdate}</li>\n";
+			"\t<li>Posted: {$r['postdate']}</li>\n";
 
 		switch ($r['passwordstatus']) {
 			case 0:
