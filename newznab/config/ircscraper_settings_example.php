@@ -3,6 +3,7 @@
  * You can use this to set the NICKNAME, REALNAME and USERNAME below.
  * You can change them manually below if you have to.
  * @note THIS MUST NOT BE EMPTY, THIS MUST ALSO BE UNIQUE OR YOU WILL NOT BE ABLE TO CONNECT TO IRC.
+ * @note pick a normal name otherwise you will be banned from the pre channel !!!!
  **********************************************************************************************************************/
 $username = '';
 
@@ -71,12 +72,12 @@ define('SCRAPE_IRC_TITLE_IGNORE', '');
  **********************************************************************************************************************/
 define('SCRAPE_IRC_CHANNELS',
 	serialize(
-		[
+		array(
 			//'#Channel'                => 'Password',
 			//'#nZEDbPRE2'                => null,
 			'#PreNNTmux'                => null,
 			'#nZEDbPRE'                 => null
-		]
+		)
 	)
 );
 
