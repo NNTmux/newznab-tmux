@@ -1,4 +1,5 @@
 2016-06-03 DariusIII
+	* Fix: Fix styling of login page.
 	* Fix: Fix TV alias and local matching
 	* Upd: Fix look of search page in Gentele theme.
 	* Upd: Add support for multiple channels in IRCScraper.
