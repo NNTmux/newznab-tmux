@@ -1,4 +1,5 @@
 2016-06-03 DariusIII
+	* Upd: Add support for multiple channels in IRCScraper.
 	* Upd: Fix Json and XML response
 2016-06-02 DariuIII
 	* Upd: Port fixes and new features from nZEDb.

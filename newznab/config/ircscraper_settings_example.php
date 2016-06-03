@@ -66,12 +66,27 @@ define('SCRAPE_IRC_CATEGORY_IGNORE', '');
 define('SCRAPE_IRC_TITLE_IGNORE', '');
 
 /***********************************************************************************************************************
+ * This is a list of all the channels we fetch PRE's from.
+ * If you want to ignore a source, change it from false to true.
+ **********************************************************************************************************************/
+define('SCRAPE_IRC_CHANNELS',
+	serialize(
+		[
+			//'#Channel'                => 'Password',
+			//'#nZEDbPRE2'                => null,
+			'#PreNNTmux'                => null,
+			'#nZEDbPRE'                 => null
+		]
+	)
+);
+
+/***********************************************************************************************************************
  * This is a list of all the sources we fetch PRE's from.
  * If you want to ignore a source, change it from false to true.
  **********************************************************************************************************************/
 define('SCRAPE_IRC_SOURCE_IGNORE',
 	serialize(
-		array(
+		[
 			'#a.b.cd.image'               => false,
 			'#a.b.console.ps3'            => false,
 			'#a.b.dvd'                    => false,
@@ -97,6 +112,6 @@ define('SCRAPE_IRC_SOURCE_IGNORE',
 			'srrdb'                       => false,
 			'u4all.eu'                    => false,
 			'zenet'                       => false
-		)
+		]
 	)
 );

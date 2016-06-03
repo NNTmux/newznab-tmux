@@ -79,7 +79,7 @@ class IRCScraper extends IRCClient
 		if (defined('SCRAPE_IRC_SOURCE_IGNORE')) {
 			$this->_ignoredChannels = unserialize(SCRAPE_IRC_SOURCE_IGNORE);
 		} else {
-			$this->_ignoredChannels = array(
+			$this->_ignoredChannels = [
 				'#a.b.cd.image'               => false,
 				'#a.b.console.ps3'            => false,
 				'#a.b.dvd'                    => false,
@@ -105,7 +105,7 @@ class IRCScraper extends IRCClient
 				'srrdb'                       => false,
 				'u4all.eu'                    => false,
 				'zenet'                       => false
-			);
+			];
 		}
 
 		$this->_categoryIgnoreRegex = false;
@@ -161,7 +161,8 @@ class IRCScraper extends IRCClient
 		}
 
 		// Join channels.
-		$this->joinChannels(array('#PreNNTmux' => null));
+		$channels = defined('SCRAPE_IRC_CHANNELS') ? unserialize(SCRAPE_IRC_CHANNELS) : ['#PreNNTmux' => null];
+		$this->joinChannels($channels);
 
 		if (!$this->_silent) {
 			echo
@@ -443,7 +444,7 @@ class IRCScraper extends IRCClient
 		$this->_nuked = false;
 		$this->_oldPre = [];
 		$this->_curPre =
-			array(
+			[
 				'title'    => '',
 				'size'     => '',
 				'predate'  => '',
@@ -455,6 +456,6 @@ class IRCScraper extends IRCClient
 				'reason'   => '',
 				'files'    => '',
 				'filename' => ''
-			);
+			];
 	}
 }
