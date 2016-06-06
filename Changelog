@@ -1,4 +1,5 @@
 2016-06-06 DariusIII
+	* Fix: use old qtip in Gentele theme
 	* Fix: Missed occurences of old checkboxes in Gentele
 	* Fix: TV fallback searches not episode specific / fix Season Pack lookups
 2016-06-03 DariusIII
