@@ -99,8 +99,7 @@ class IRCScraper extends IRCClient
 				'#pre@corrupt'                => false,
 				'#scnzb'                      => false,
 				'#tvnzb'                      => false,
-				'srrdb'                       => false,
-				'zenet'                       => false
+				'srrdb'                       => false
 			];
 		}
 
