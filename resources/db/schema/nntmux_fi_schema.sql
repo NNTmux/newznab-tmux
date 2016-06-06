@@ -2299,7 +2299,7 @@ CREATE TABLE IF NOT EXISTS parts (
 DROP TABLE IF EXISTS predb_hashes;
 CREATE TABLE IF NOT EXISTS predb_hashes (
   hash varbinary(20) NOT NULL DEFAULT '',
-  predb_id INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  pre_id INT(11) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (hash)
 )
   ENGINE = MyISAM
@@ -2338,20 +2338,6 @@ CREATE TABLE IF NOT EXISTS predb (
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
 
-DROP TRIGGER IF EXISTS delete_hashes;
-DROP TRIGGER IF EXISTS insert_hashes;
-DROP TRIGGER IF EXISTS update_hashes;
-
-DELIMITER $$
-
-CREATE TRIGGER delete_hashes AFTER DELETE ON predb FOR EACH ROW BEGIN DELETE FROM predb_hashes WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND predb_id = OLD.id; END $$
-
-CREATE TRIGGER insert_hashes AFTER INSERT ON predb FOR EACH ROW BEGIN INSERT INTO predb_hashes (hash, predb_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id); END $$
-
-CREATE TRIGGER update_hashes AFTER UPDATE ON predb FOR EACH ROW BEGIN IF NEW.title != OLD.title THEN DELETE FROM predb_hashes WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND predb_id = OLD.id; INSERT INTO predb_hashes (hash, predb_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id ); END IF; END $$
-
-DELIMITER ;
-
 DROP TABLE IF EXISTS predb_imports;
 CREATE TABLE IF NOT EXISTS predb_imports (
   title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
@@ -2373,8 +2359,8 @@ CREATE TABLE IF NOT EXISTS predb_imports (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS audio_data;
-CREATE TABLE IF NOT EXISTS audio_data (
+DROP TABLE IF EXISTS release_audio;
+CREATE TABLE IF NOT EXISTS release_audio (
   id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   releaseid INT(11) UNSIGNED DEFAULT NULL,
   audioid INT(2) UNSIGNED DEFAULT NULL,
@@ -2405,8 +2391,8 @@ CREATE TABLE IF NOT EXISTS releaseextrafull (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS release_nfos;
-CREATE TABLE IF NOT EXISTS release_nfos (
+DROP TABLE IF EXISTS releasenfos;
+CREATE TABLE IF NOT EXISTS releasenfos (
   id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   releaseid INT(11) UNSIGNED DEFAULT NULL,
   binaryid INT(11) UNSIGNED DEFAULT NULL,
@@ -2433,19 +2419,18 @@ CREATE TABLE IF NOT EXISTS releases (
   adddate DATETIME DEFAULT NULL,
   updatedate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   guid VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
-  leftguid CHAR(1) NOT NULL COMMENT 'The first letter of the release guid',
   fromname VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   completion FLOAT NOT NULL DEFAULT '0',
-  categories_id INT(11) NOT NULL DEFAULT '0',
+  categoryid INT(11) NOT NULL DEFAULT '0',
   videos_id MEDIUMINT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to videos.id of the parent series.',
   tv_episodes_id MEDIUMINT(11) NOT NULL DEFAULT '0' COMMENT 'FK to tv_episodes.id of the episode',
   regexid INT(11) DEFAULT NULL,
   tvdbid INT(11) UNSIGNED DEFAULT NULL,
   imdbid MEDIUMINT(7) UNSIGNED zerofill DEFAULT NULL,
   episodeinfoid INT(11) DEFAULT NULL,
-  musicinfo_id INT(11) DEFAULT NULL,
-  consoleinfo_id INT(11) DEFAULT NULL,
-  bookinfo_id INT(11) DEFAULT NULL,
+  musicinfoid INT(11) DEFAULT NULL,
+  consoleinfoid INT(11) DEFAULT NULL,
+  bookinfoid INT(11) DEFAULT NULL,
   anidbid INT(11) DEFAULT NULL,
   reqid VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   releasenfoid INT(11) DEFAULT NULL,
@@ -2460,7 +2445,7 @@ CREATE TABLE IF NOT EXISTS releases (
   audiostatus TINYINT(1) NOT NULL DEFAULT '0',
   videostatus TINYINT(1) NOT NULL DEFAULT '0',
   reqidstatus TINYINT(1) NOT NULL DEFAULT '0',
-  predb_id INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  preid INT(10) UNSIGNED NOT NULL DEFAULT '0',
   iscategorized TINYINT(1) NOT NULL DEFAULT '0',
   isrenamed TINYINT(1) NOT NULL DEFAULT '0',
   ishashed TINYINT(1) NOT NULL DEFAULT '0',
@@ -2475,21 +2460,20 @@ CREATE TABLE IF NOT EXISTS releases (
   xxxinfo_id INT(10) NOT NULL DEFAULT '0',
   nzbstatus TINYINT(1) NOT NULL DEFAULT '0',
   nzb_guid BINARY(16) DEFAULT NULL,
-  PRIMARY KEY (id,categories_id),
+  PRIMARY KEY (id,categoryid),
   KEY ix_releases_name (name),
   KEY ix_releases_group_id (groupid,passwordstatus),
   KEY ix_releases_postdate_searchname (postdate,searchname),
   KEY ix_releases_guid (guid),
-  KEY ix_releases_leftguid (leftguid ASC, predb_id),
   KEY ix_releases_nzb_guid (nzb_guid),
   KEY ix_releases_imdbid (imdbid),
   KEY ix_releases_xxxinfo_id (xxxinfo_id),
-  KEY ix_releases_musicinfoid (musicinfo_id,passwordstatus),
-  KEY ix_releases_consoleinfoid (consoleinfo_id),
+  KEY ix_releases_musicinfoid (musicinfoid,passwordstatus),
+  KEY ix_releases_consoleinfoid (consoleinfoid),
   KEY ix_releases_gamesinfo_id (gamesinfo_id),
-  KEY ix_releases_bookinfoid (bookinfo_id),
+  KEY ix_releases_bookinfoid (bookinfoid),
   KEY ix_releases_anidbid (anidbid),
-  KEY ix_releases_preid_searchname (predb_id,searchname),
+  KEY ix_releases_preid_searchname (preid,searchname),
   KEY ix_releases_haspreview_passwordstatus (haspreview,passwordstatus),
   KEY ix_releases_passwordstatus (passwordstatus),
   KEY ix_releases_nfostatus (nfostatus,size),
@@ -2503,7 +2487,7 @@ CREATE TABLE IF NOT EXISTS releases (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1
-  PARTITION BY RANGE (categories_id)(
+  PARTITION BY RANGE (categoryid)(
   PARTITION misc VALUES LESS THAN (1000),
   PARTITION console VALUES LESS THAN (2000),
   PARTITION movies VALUES LESS THAN (3000),
@@ -2513,26 +2497,8 @@ CREATE TABLE IF NOT EXISTS releases (
   PARTITION xxx VALUES LESS THAN (7000),
   PARTITION books VALUES LESS THAN (8000));
 
-DROP TRIGGER IF EXISTS check_insert;
-DROP TRIGGER IF EXISTS check_update;
-DROP TRIGGER IF EXISTS delete_search;
-DROP TRIGGER IF EXISTS insert_search;
-DROP TRIGGER IF EXISTS update_search;
-
-DELIMITER $$
-
-CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\s?\\[' THEN SET NEW.isrequestid = 1; END IF; END;$$
-
-CREATE TRIGGER check_update BEFORE UPDATE ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\s?\\[' THEN SET NEW.isrequestid = 1;END IF;END;$$
-
-CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW BEGIN INSERT INTO release_search_data (releaseid, guid, name, searchname, fromname) VALUES (NEW.id, NEW.guid, NEW.name, NEW.searchname, NEW.fromname); END;
-CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW BEGIN IF NEW.guid != OLD.guid THEN UPDATE release_search_data SET guid = NEW.guid WHERE releaseid = OLD.id; END IF; IF NEW.name != OLD.name THEN UPDATE release_search_data SET name = NEW.name WHERE releaseid = OLD.id; END IF; IF NEW.searchname != OLD.searchname THEN UPDATE release_search_data SET searchname = NEW.searchname WHERE releaseid = OLD.id; END IF; IF NEW.fromname != OLD.fromname THEN UPDATE release_search_data SET fromname = NEW.fromname WHERE releaseid = OLD.id; END IF; END;
-CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW BEGIN DELETE FROM release_search_data WHERE releaseid = OLD.id; END;
-
-DELIMITER ;
-
-DROP TABLE IF EXISTS release_search_data;
-CREATE TABLE IF NOT EXISTS release_search_data (
+DROP TABLE IF EXISTS releasesearch;
+CREATE TABLE IF NOT EXISTS releasesearch (
   id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   releaseid INT(11) UNSIGNED NOT NULL,
   guid VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
@@ -2551,14 +2517,14 @@ CREATE TABLE IF NOT EXISTS release_search_data (
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS release_subtitles;
-CREATE TABLE IF NOT EXISTS  (
-  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  releaseid INT(11) UNSIGNED DEFAULT NULL,
-  subsid INT(2) UNSIGNED DEFAULT NULL,
+DROP TABLE IF EXISTS releasesubs;
+CREATE TABLE IF NOT EXISTS releasesubs (
+  id INT(11) UNSIGNED AUTO_INCREMENT,
+  releaseid INT(11) UNSIGNED NOT NULL,
+  subsid INT(2) UNSIGNED NOT NULL,
   subslanguage VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY releaseid (releaseid,subsid)
+  UNIQUE KEY releaseid (releaseid, subsid)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
@@ -2616,14 +2582,6 @@ CREATE TABLE IF NOT EXISTS release_comments (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
-
-DROP TRIGGER IF EXISTS insert_MD5;
-
-DELIMITER $$
-
-CREATE TRIGGER insert_MD5 BEFORE INSERT ON release_comments FOR EACH ROW SET NEW.text_hash  =  MD5(NEW.TEXT); $$
-
-DELIMITER ;
 
 DROP TABLE IF EXISTS release_files;
 CREATE TABLE IF NOT EXISTS release_files (
@@ -3823,10 +3781,10 @@ DROP TABLE IF EXISTS roleexcat;
 CREATE TABLE IF NOT EXISTS roleexcat (
   id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   role INT(11) NOT NULL,
-  categories_id INT(11) DEFAULT NULL,
+  categoryid INT(11) DEFAULT NULL,
   createddate DATETIME NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY ix_roleexcat_rolecat (role,categories_id)
+  UNIQUE KEY ix_roleexcat_rolecat (role,categoryid)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
@@ -4368,10 +4326,10 @@ DROP TABLE IF EXISTS user_excluded_categories;
 CREATE TABLE IF NOT EXISTS user_excluded_categories (
   id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   userid INT(11) DEFAULT NULL,
-  categories_id INT(11) DEFAULT NULL,
+  categoryid INT(11) DEFAULT NULL,
   createddate DATETIME NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE KEY ix_userexcat_usercat (userid,categories_id)
+  UNIQUE KEY ix_userexcat_usercat (userid,categoryid)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
@@ -4396,7 +4354,7 @@ CREATE TABLE IF NOT EXISTS user_movies (
   id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   userid INT(16) DEFAULT NULL,
   imdbid MEDIUMINT(7) UNSIGNED zerofill DEFAULT NULL,
-  categories_id VARCHAR(64) COLLATE utf8_unicode_ci DEFAULT NULL,
+  categoryid VARCHAR(64) COLLATE utf8_unicode_ci DEFAULT NULL,
   createddate DATETIME NOT NULL,
   PRIMARY KEY (id),
   KEY ix_usermovies_userid (userid,imdbid)
@@ -4503,7 +4461,7 @@ CREATE TABLE IF NOT EXISTS user_series (
   id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   userid INT(16) DEFAULT NULL,
   videos_id INT(16) NOT NULL COMMENT 'FK to videos.id',
-  categories_id VARCHAR(64) COLLATE utf8_unicode_ci DEFAULT NULL,
+  categoryid VARCHAR(64) COLLATE utf8_unicode_ci DEFAULT NULL,
   createddate DATETIME NOT NULL,
   PRIMARY KEY (id),
   KEY ix_userseries_videos_id (userid,videos_id)
@@ -4578,3 +4536,43 @@ CREATE TABLE IF NOT EXISTS xxxinfo (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
+
+DROP TRIGGER IF EXISTS delete_hashes;
+DROP TRIGGER IF EXISTS insert_hashes;
+DROP TRIGGER IF EXISTS update_hashes;
+
+DELIMITER $$
+
+CREATE TRIGGER delete_hashes AFTER DELETE ON predb FOR EACH ROW BEGIN DELETE FROM predb_hashes WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id = OLD.id; END $$
+
+CREATE TRIGGER insert_hashes AFTER INSERT ON predb FOR EACH ROW BEGIN INSERT INTO predb_hashes (hash, preid) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id); END $$
+
+CREATE TRIGGER update_hashes AFTER UPDATE ON predb FOR EACH ROW BEGIN IF NEW.title != OLD.title THEN DELETE FROM predb_hashes WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id = OLD.id; INSERT INTO predb_hashes (hash, pre_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id ); END IF; END $$
+
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS check_insert;
+DROP TRIGGER IF EXISTS check_update;
+DROP TRIGGER IF EXISTS delete_search;
+DROP TRIGGER IF EXISTS insert_search;
+DROP TRIGGER IF EXISTS update_search;
+
+DELIMITER $$
+
+CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\s?\\[' THEN SET NEW.isrequestid = 1; END IF; END;$$
+
+CREATE TRIGGER check_update BEFORE UPDATE ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\s?\\[' THEN SET NEW.isrequestid = 1;END IF;END;$$
+
+CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW BEGIN INSERT INTO releasesearch (releaseid, guid, name, searchname, fromname) VALUES (NEW.id, NEW.guid, NEW.name, NEW.searchname, NEW.fromname); END; $$
+CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW BEGIN IF NEW.guid != OLD.guid THEN UPDATE releasesearch SET guid = NEW.guid WHERE releaseid = OLD.id; END IF; IF NEW.name != OLD.name THEN UPDATE releasesearch SET name = NEW.name WHERE releaseid = OLD.id; END IF; IF NEW.searchname != OLD.searchname THEN UPDATE releasesearch SET searchname = NEW.searchname WHERE releaseid = OLD.id; END IF; IF NEW.fromname != OLD.fromname THEN UPDATE releasesearch SET fromname = NEW.fromname WHERE releaseid = OLD.id; END IF; END; $$
+CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW BEGIN DELETE FROM release_searfcategoriesch_data WHERE releaseid = OLD.id; END; $$
+
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS insert_MD5;
+
+DELIMITER $$
+
+CREATE TRIGGER insert_MD5 BEFORE INSERT ON release_comments FOR EACH ROW SET NEW.text_hash  =  MD5(NEW.TEXT); $$
+
+DELIMITER ;
