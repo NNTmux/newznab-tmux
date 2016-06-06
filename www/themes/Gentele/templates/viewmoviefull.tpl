@@ -150,7 +150,7 @@
 										{assign var="mcatname" value=","|explode:$result.grp_release_catname}
 										{foreach $msplits as $m}
 											<tr class="{cycle values=",alt"}" id="guid{$mguid[$m@index]}">
-												<td class="check"><input id="chk{$mguid[$m@index]|substr:0:7}"
+												<td><input id="guid{$mguid[$m@index]}"
 																		 type="checkbox"
 																		 class="flat"
 																		 value="{$mguid[$m@index]}"/></td>

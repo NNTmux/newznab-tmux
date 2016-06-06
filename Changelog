@@ -1,4 +1,5 @@
 2016-06-06 DariusIII
+	* Fix: Missed occurences of old checkboxes in Gentele
 	* Fix: TV fallback searches not episode specific / fix Season Pack lookups
 2016-06-03 DariusIII
 	* Fix: Fix styling of login page.

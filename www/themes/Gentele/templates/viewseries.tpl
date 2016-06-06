@@ -198,8 +198,8 @@
 																		title="{$result.guid}">Media</span>{/if}
 																</div>
 															</td>
-															<td class="check" width="10"><input
-																		id="chk{$result.guid|substr:0:7}"
+															<td width="10"><input
+																		id="guid{$result.guid}"
 																		type="checkbox"
 																		class="flat" name="table_data{$seasonnum}"
 																		value="{$result.guid}"/></td>
