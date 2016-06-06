@@ -135,15 +135,23 @@
 														class="fa fa-comments-o text-muted" data-toggle="tooltip"
 														data-placement="top" title
 														data-original-title="Comments"></i></a>
-											<a href="#" class="icon_cart text-muted"><i
-														class="fa fa-shopping-basket" data-toggle="tooltip"
-														data-placement="top" title
-														data-original-title="Send to my Download Basket"></i></a>
+											<a href="#">
+												<i
+													id="guid{$result.guid}" class="icon_cart fa fa-shopping-basket" data-toggle="tooltip"
+													data-placement="top" title
+													data-original-title="Send to my Download Basket">
+												</i>
+											</a>
 											{if isset($sabintegrated) && $sabintegrated !=""}
-												<a href="#" class="icon_sab text-muted"><i class="fa fa-share"
-																						   data-toggle="tooltip"
-																						   data-placement="top" title
-																						   data-original-title="Send to My Queue"></i></a>
+												<a href="#">
+													<i
+														id="guid{$result.guid}"
+														class="fa fa-share"
+														data-toggle="tooltip"
+														data-placement="top" title
+														data-original-title="Send to My Queue">
+													</i>
+												</a>
 											{/if}
 											{if $weHasVortex}
 												<a href="#" class="icon_vortex text-muted"><i
