@@ -1,4 +1,5 @@
 2016-06-06 DariusIII
+	* Upd: Remove bad sources from ircscraper_settings_example and IRCScraper class
 	* Fix: use old qtip in Gentele theme
 	* Fix: Missed occurences of old checkboxes in Gentele
 	* Fix: TV fallback searches not episode specific / fix Season Pack lookups
