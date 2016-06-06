@@ -1,3 +1,5 @@
+2016-06-06 DariusIII
+	* Fix: TV fallback searches not episode specific / fix Season Pack lookups
 2016-06-03 DariusIII
 	* Fix: Fix styling of login page.
 	* Fix: Fix TV alias and local matching
