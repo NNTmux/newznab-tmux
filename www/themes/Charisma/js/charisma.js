@@ -1,7 +1,7 @@
 $(document).ready(function () {
     //themes, change CSS with JS
     //default theme(CSS) is cerulean, change it if needed
-    var defaultTheme = 'slate';
+    var defaultTheme = 'cyborg';
 
     var currentTheme = $.cookie('currentTheme') == null ? defaultTheme : $.cookie('currentTheme');
     var msie = navigator.userAgent.match(/msie/i);
@@ -143,12 +143,6 @@ function docReady() {
 
     //iOS / iPhone style toggle switch
     $('.iphone-toggle').iphoneStyle();
-
-    //star rating
-    $('.raty').raty({
-        score: 4 //default stars
-    });
-
 
     //gallery controls container animation
     $('ul.gallery li').hover(function () {

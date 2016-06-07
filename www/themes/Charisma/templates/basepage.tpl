@@ -27,10 +27,10 @@
 	<!-- Newposterwall -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- The styles -->
-	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/{$theme}/css/bootstrap-spacelab.min.css" rel="stylesheet">
+	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/{$theme}/css/bootstrap-cyborg.min.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/charisma-app.css" rel="stylesheet">
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/shared/assets/chosen/chosen.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/shared/assets/colorbox/example3/colorbox.css'
+	<link href='{$smarty.const.WWW_THEMES}/shared/assets/chosen/chosen.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_THEMES}/shared/assets/colorbox/example3/colorbox.css'
 		  rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/shared/assets/responsive-tables-js/dist/responsivetables.css'
 		  rel='stylesheet'>
@@ -41,29 +41,33 @@
 	<!-- Font Awesome Icons -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" type="text/css" media="screen"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.css" type="text/css" media="screen"/>
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/square/blue.css" rel="stylesheet">
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico">
 </head>
 	<body>
 	<!-- topbar starts -->
 	<div class="navbar navbar-default" role="navigation">
-		<div class="navbar-inner">
-			<button type="button" class="navbar-toggle pull-left animated flip">
+		<div class="container-fluid">
+			<button type="button" class="navbar-toggle navbar-left animated flip">
 				<span class="sr-only">Toggle navigation</span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="{$site->home_link}"> <img alt="newznab-tmux logo"
-																	src="{$smarty.const.WWW_THEMES}/{$theme}/img/logo-tmux.png"
-						/></a>
+			<div class="navbar-header">
+				<a href="{$site->home_link}" class="navbar-brand">
+				<span>{$site->title}</span></a>
+			</div>
+			<div class="navbar-header">
 			{$header_menu}
+			</div>
 			<!-- user dropdown starts -->
 			{if $loggedin == "true"}
-			<div class="btn-group pull-right">
+			<div class="btn-group navbar-right">
 				<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 					<i class="fa fa-user"></i><span class="hidden-sm hidden-xs"><span
 								class="username"> Hi, {$userdata.username}</span></span>
@@ -100,28 +104,7 @@
 						<div class="nav-sm nav nav-stacked">
 						</div>
 						<ul class="nav nav-pills nav-stacked main-menu">
-							<!-- search form -->
 							{if $loggedin == "true"}
-							<form id="headsearch_form" action="{$smarty.const.WWW_TOP}/search/" method="get">
-								<input id="headsearch" name="search" value="{if $header_menu_search == ""}Search...{else}{$header_menu_search|escape:"htmlall"}{/if}" class="form-control" type="text" tabindex="1$" />
-								<div class="row" style="padding-top:3px;">
-									<div class="col-md-8">
-										<select id="headcat" name="t" class="form-control" data-search="true">
-											<option class="grouping" value="-1">All</option>
-											{foreach $parentcatlist as $parentcat}
-												<option {if $header_menu_cat == $parentcat.id}selected="selected"{/if} value="{$parentcat.id}"> [{$parentcat.title}]</option>
-												{foreach $parentcat.subcatlist as $subcat}
-													<option {if $header_menu_cat == $subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;&nbsp; > {$subcat.title}</option>
-												{/foreach}
-											{/foreach}
-										</select>
-									</div>
-									<div class="col-md-3">
-										<input id="headsearch_go" type="submit" class="btn btn-dark" style="margin-top:0px; margin-left:4px;" value="Go"/>
-									</div>
-								</div>
-							</form>
-							<!-- /.search form -->
 							<li class="nav-header">Main</li>
 							<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
 											class="fa arrow"></span></a></li>
@@ -234,6 +217,8 @@
 			src="{$smarty.const.WWW_THEMES}/shared/assets/responsive-tables-js/dist/responsivetables.js"></script>
 	<!-- for iOS style toggle switch -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.iphone.toggle.js"></script>
+	<!-- icheck -->
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
 	<!-- autogrowing textarea plugin -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.autogrow-textarea.js"></script>
@@ -252,7 +237,7 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/functions.js"></script>
 	<!-- newznab default scripts, needed for stuff to work -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip2.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
