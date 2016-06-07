@@ -8,7 +8,7 @@
 </div>
 
 <div class="navbar">
-	<div class="navbar-inner">
+	<div class="container">
 		<form method="get" class="navbar-form pull-left" action="{$smarty.const.WWW_TOP}/search">
 			<div id="sbasic" style="text-align:center;{if $sadvanced} display:none;{/if}">
 				<div class="input-append">

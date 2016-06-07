@@ -192,6 +192,23 @@
 					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::OTHER_HASHED}">Hashed</a></li>
 				</ul>
 			</li>
+			<ul class="nav pull-left">
+				<li class="">
+					<form class="navbar-form" id="headsearch_form" action="{$smarty.const.WWW_TOP}/search/" method="get">
+						<select class="form-control" id="headcat" name="t">
+							<option class="grouping" value="-1">All</option>
+							{foreach $parentcatlist as $parentcat}
+								<option {if $header_menu_cat == $parentcat.id}selected="selected"{/if} class="grouping" value="{$parentcat.id}">{$parentcat.title}</option>
+								{foreach $parentcat.subcatlist as $subcat}
+									<option {if $header_menu_cat == $subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;{$subcat.title}</option>
+								{/foreach}
+							{/foreach}
+						</select>
+						<input class="form-control" id="headsearch" name="search" value="{if $header_menu_search == ""}{else}{$header_menu_search|escape:"htmlall"}{/if}" placeholder="Search" type="text" />
+						<button id="headsearch_go" type="submit" class="btn btn-success"><i class="fa fa-search"></i></button>
+					</form>
+				</li>
+			</ul>
 			<!-- End If logged in -->
 		{/if}
 		{/if}

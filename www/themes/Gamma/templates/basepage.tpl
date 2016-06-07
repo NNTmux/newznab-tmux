@@ -67,7 +67,7 @@
 	================================================== -->
 	<!-- If you want the navbar "white" remove Navbar-inverse -->
 	<div class="navbar navbar-inverse navbar-fixed-top">
-		<div class="navbar-inner" style="padding-left:30px; padding-right:30px;">
+		<div class="container" style="padding-left:30px; padding-right:30px;">
 			<div class="container">
 						{if $loggedin == "true"}
 							{$header_menu}

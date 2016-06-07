@@ -7,7 +7,7 @@
 	</p>
 </div>
 <div class="navbar">
-	<div class="navbar-inner">
+	<div class="container">
 		<form id="frmMyMovieLookup" class="navbar-form pull-left">
 			<div class="input-append">
 				<input class="input-xlarge" type="text" id="txtsearch" placeholder="Movie Title or IMDB Id" />
