@@ -45,16 +45,16 @@
         },
         {
             "name": "bower-asset/animate.css",
-            "version": "3.5.1",
+            "version": "3.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/daneden/animate.css.git",
-                "reference": "010e06e11175840ae84ad9363f7269f03775d963"
+                "reference": "dac3dab7b59cb6072b5d0fe23eae3805e370a58c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/daneden/animate.css/zipball/010e06e11175840ae84ad9363f7269f03775d963",
-                "reference": "010e06e11175840ae84ad9363f7269f03775d963",
+                "url": "https://api.github.com/repos/daneden/animate.css/zipball/dac3dab7b59cb6072b5d0fe23eae3805e370a58c",
+                "reference": "dac3dab7b59cb6072b5d0fe23eae3805e370a58c",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -62,7 +62,6 @@
                 "bower-asset-main": "./animate.css",
                 "bower-asset-ignore": [
                     ".*",
-                    "source",
                     "*.yml",
                     "Gemfile",
                     "Gemfile.lock",
@@ -1277,16 +1276,16 @@
         },
         {
             "name": "phpmailer/phpmailer",
-            "version": "v5.2.15",
+            "version": "v5.2.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "d0186171b28af4f06ac2ad8a84a8f3d6cbc3ba6c"
+                "reference": "1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/d0186171b28af4f06ac2ad8a84a8f3d6cbc3ba6c",
-                "reference": "d0186171b28af4f06ac2ad8a84a8f3d6cbc3ba6c",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a",
+                "reference": "1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a",
                 "shasum": ""
             },
             "require": {
@@ -1333,7 +1332,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2016-05-10 18:39:36"
+            "time": "2016-06-06 09:09:37"
         },
         {
             "name": "smarty/smarty",
@@ -1396,12 +1395,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "57e12b4e136f6de8a75321b82579de305a34acff"
+                "reference": "ce1d4d44d1e5b6c4a8cf6dc273025a8638e78b8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/57e12b4e136f6de8a75321b82579de305a34acff",
-                "reference": "57e12b4e136f6de8a75321b82579de305a34acff",
+                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/ce1d4d44d1e5b6c4a8cf6dc273025a8638e78b8e",
+                "reference": "ce1d4d44d1e5b6c4a8cf6dc273025a8638e78b8e",
                 "shasum": ""
             },
             "require": {
@@ -1434,7 +1433,7 @@
                 "li3",
                 "lithium"
             ],
-            "time": "2016-05-31 19:43:44"
+            "time": "2016-06-03 16:16:20"
         }
     ],
     "packages-dev": [

@@ -1,3 +1,5 @@
+2016-06-07 DariusIII
+	* Upd: Update composer.lock file
 2016-06-06 DariusIII
 	* Fix: Fix the nntmux_fi_schema.sql
 	* Upd: Remove bad sources from ircscraper_settings_example and IRCScraper class
