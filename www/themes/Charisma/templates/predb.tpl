@@ -20,10 +20,9 @@
 		<div class="row">
 			<div class="col-xlg-12 portlets">
 				<div class="panel panel-default">
-					<div class="panel-body pagination2">
-						<div class="row">
-							<div class="col-md-8">
-								<table class="data table table-condensed table-striped table-responsive table-hover">
+					<div class="panel-body col-md-12">
+						<div class="row col-md-12">
+							<table class="table table-responsive">
 									<tr>
 										<th style="width: auto"> Date</th>
 										<th style="width: auto"> Title</th>
@@ -379,7 +378,6 @@
 			</div>
 		</div>
 	</div>
-</div>
 <hr>
 <div style="padding-bottom:10px;">
 	{$pager}
