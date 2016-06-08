@@ -353,9 +353,19 @@ class PostProcess
 
 		// Only get a new name if the category is OTHER.
 		$foundName = true;
-		if (!in_array(
+		if (in_array(
 			(int)$query['categories_id'],
-			Category::OTHERS_GROUP
+			[
+				Category::BOOKS_UNKNOWN,
+				Category::GAME_OTHER,
+				Category::MOVIE_OTHER,
+				Category::MUSIC_OTHER,
+				Category::PC_PHONE_OTHER,
+				Category::TV_OTHER,
+				Category::OTHER_HASHED,
+				Category::XXX_OTHER,
+				Category::OTHER_MISC
+			]
 		)
 		) {
 			$foundName = false;
@@ -426,7 +436,7 @@ class PostProcess
 
 			// If we found some files.
 			if ($filesAdded > 0) {
-				$this->debugging->log(get_class(), __FUNCTION__, 'Added ' . $filesAdded . ' releasefiles from PAR2 for ' . $query['searchname'], Logger::LOG_INFO);
+				$this->debugging->log(get_class(), __FUNCTION__, 'Added ' . $filesAdded . ' release_files from PAR2 for ' . $query['searchname'], Logger::LOG_INFO);
 
 				// Update the file count with the new file count + old file count.
 				$this->pdo->queryExec(
@@ -444,94 +454,5 @@ class PostProcess
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Attempt to get a better name from a SRR file and categorize the release.
-	 *
-	 * @note Called from NZBContents.php
-	 *
-	 * @param string $messageID MessageID from NZB file.
-	 * @param int    $relID     ID of the release.
-	 * @param \newznab\NNTP   $nntp      Class NNTP
-	 * @param int    $show      Only show result or apply it.
-	 *
-	 * @return bool
-	 */
-	public function parseSRR($messageID, $relID, &$nntp, $show)
-	{
-		$this->_srrInfo = new \SrrInfo();
-		$foundMatch = false;
-
-		if ($messageID === '') {
-			return false;
-		}
-
-		$query = $this->pdo->queryOneRow(
-			sprintf('
-				SELECT
-					r.id, r.groups_id, r.categories_id, r.name, r.searchname,
-					UNIX_TIMESTAMP(r.postdate) AS post_date,
-					r.id AS releases_id,
-					g.name AS groupname
-				FROM releases r
-				LEFT JOIN groups g ON r.groups_id = g.id
-				WHERE r.isrenamed = 0
-				AND r.predb_id = 0
-				AND r.id = %d',
-				$relID
-			)
-		);
-
-		if ($query === false) {
-			return false;
-		}
-
-		// Get the SRR file.
-		$srr = $nntp->getMessages($query['groupname'], $messageID, $this->alternateNNTP);
-
-		if ($nntp->isError($srr)) {
-			if ($srr->getMessage() === 'No such article found') {
-				$this->pdo->log->doEcho($this->pdo->log->primaryOver('f'));
-			}
-			return false;
-		}
-
-		// Put the SRR into SrrInfo, check if there's an error.
-		$this->_srrInfo->setData($srr);
-		if ($this->_srrInfo->error) {
-			$this->pdo->log->doEcho($this->pdo->log->primaryOver("-"));
-			return false;
-		}
-
-		// Get the file list from SrrInfo.
-		$summary = $this->_srrInfo->getSummary();
-		if ($summary !== false && empty($summary['error'])) {
-			$this->pdo->log->doEcho($this->pdo->log->primaryOver("+"));
-
-			// Try to get a Pre Match by the OSO release name.
-			if (isset($summary['oso_info']['name']) && !empty($summary['oso_info']['name'])) {
-				$query['textstring'] = $summary['oso_info']['name'];
-				$foundMatch = $this->nameFixer->checkName($query, 1, 'SRR, ', 1, $show, true);
-			}
-			// Loop through the stored files in the SRR and try to get a Pre Match
-			if ($foundMatch === false && is_array($summary['stored_files']) && !empty($summary['stored_files'])) {
-				foreach ($summary['stored_files'] AS $storedFile) {
-					if ($foundMatch === true) {
-						break;
-					} else if (isset($storedFile['name']) && !empty($storedFile['name'])) {
-						$query['textstring'] = Utility::cutStringUsingLast('.', $storedFile['name'], 'left', false);
-						$foundMatch = $this->nameFixer->checkName($query, 1, 'SRR, ', 1, $show, true);
-					}
-				}
-			}
-			// This field is rarely populated but worth a shot for a rename
-			if ($foundMatch === false && isset($summary['file_name']) && !empty($summary['file_name'])) {
-				$query['textstring'] = Utility::cutStringUsingLast('.', $summary['file_name'], 'left', false);
-				$foundMatch = $this->nameFixer->checkName($query, 1, 'SRR, ', 1, $show, true);
-			}
-		}
-		unset($this->_srrInfo);
-		return $foundMatch;
 	}
 }

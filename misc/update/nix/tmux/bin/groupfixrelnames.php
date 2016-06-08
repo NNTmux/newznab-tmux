@@ -27,17 +27,8 @@ if (!isset($argv[1])) {
 
 		case $pieces[0] === 'standard' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
 
-			$categories = [
-				Category::OTHER_MISC,
-				Category::OTHER_HASHED,
-				Category::GAME_OTHER,
-				Category::MOVIE_OTHER,
-				Category::MUSIC_OTHER,
-				Category::PC_PHONE_OTHER,
-				Category::TV_OTHER,
-				Category::XXX_OTHER,
-				Category::BOOKS_UNKNOWN
-			];
+			// Allow for larger filename return sets
+			$pdo->queryExec('SET SESSION group_concat_max_len = 32768');
 
 			// Find releases to process.  We only want releases that have no PreDB match, have not been renamed, exist
 			// in Other Categories, have already been PP Add/NFO processed, and haven't been fully fixRelName processed
@@ -45,12 +36,12 @@ if (!isset($argv[1])) {
 				sprintf("
 					SELECT
 						r.id AS releases_id, r.guid, r.groups_id, r.categories_id, r.name, r.searchname, r.proc_nfo,
-						r.proc_files, r.proc_par2, r.proc_sorter, r.ishashed, r.dehashstatus, r.nfostatus,
+						r.proc_uid, r.proc_files, r.proc_par2, r.proc_sorter, r.ishashed, r.dehashstatus, r.nfostatus,
 						r.size AS relsize, r.predb_id,
-						rf.releases_id AS fileid, IF(rf.ishashed = 1, rf.name, NULL) AS filehash,
-						GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|') AS filestring,
-						UNCOMPRESS(rn.nfo) AS textstring,
-						HEX(ru.uniqueid) AS uid
+						IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash,
+						IFNULL(GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|'), '') AS filestring,
+						IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring,
+						IFNULL(HEX(ru.uniqueid), '') AS uid
 					FROM releases r
 					LEFT JOIN release_nfos rn ON r.id = rn.releases_id
 					LEFT JOIN release_files rf ON r.id = rf.releases_id
@@ -59,30 +50,43 @@ if (!isset($argv[1])) {
 					AND r.nzbstatus = %d
 					AND r.isrenamed = %d
 					AND r.predb_id = 0
-					AND proc_pp = 1
-					AND r.nfostatus = %d
+					AND r.passwordstatus >= 0
+					AND r.nfostatus > %d
 					AND
 					(
-						r.proc_nfo = %d
+						(
+							r.nfostatus = %d
+							AND r.proc_nfo = %d
+						)
 						OR r.proc_files = %d
 						OR r.proc_uid = %d
 						OR r.proc_par2 = %d
-						OR r.proc_sorter = %d
-						OR r.dehashstatus BETWEEN -6 AND 0
+						OR
+						(
+							r.nfostatus = %5\$d
+							AND r.proc_sorter = %d
+						)
+						OR
+						(
+							r.ishashed = 1
+							AND r.dehashstatus BETWEEN -6 AND 0
+						)
 					)
 					AND r.categories_id IN (%s)
 					GROUP BY r.id
+					ORDER BY r.id DESC
 					LIMIT %s",
 					$pdo->escapeString($guidChar),
 					NZB::NZB_ADDED,
 					NameFixer::IS_RENAMED_NONE,
+					Nfo::NFO_UNPROC,
 					Nfo::NFO_FOUND,
 					NameFixer::PROC_NFO_NONE,
 					NameFixer::PROC_FILES_NONE,
 					NameFixer::PROC_UID_NONE,
 					NameFixer::PROC_PAR2_NONE,
 					MiscSorter::PROC_SORTER_NONE,
-					implode(',', $categories),
+					Category::getCategoryOthersGroup(),
 					$maxperrun
 				)
 			);
@@ -92,76 +96,84 @@ if (!isset($argv[1])) {
 				foreach ($releases as $release) {
 
 					$namefixer->checked++;
-					$namefixer->done = $namefixer->matched = false;
+					$namefixer->reset();
 
-					if ($release['ishashed'] === 1 && $release['dehashstatus'] > -6 && $release['dehashstatus'] < 0) {
+					echo PHP_EOL . $pdo->log->primaryOver("[{$release['releases_id']}]");
+
+					if ($release['ishashed'] == 1 && $release['dehashstatus'] >= -6 && $release['dehashstatus'] <= 0) {
+						echo $pdo->log->primaryOver('m');
 						if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['name'], $matches)) {
 							$namefixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
 						}
-						if ($namefixer->matched === false
-							&& !is_null($release['filehash'])
+						if ($namefixer->matched === false && !empty($release['filehash'])
 							&& preg_match('/[a-fA-F0-9]{32,40}/i', $release['filehash'], $matches)) {
+							echo $pdo->log->primaryOver('h');
 							$namefixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
 						}
+						// All gate requirements in query, only set column status if it ran the routine
+						$namefixer->_updateSingleColumn('dehashstatus', 'dehashstatus - 1', $release['releases_id']);
 					}
-					$namefixer->_updateSingleColumn('dehashstatus', $release['dehashstatus'] - 1, $release['releases_id']);
 
 					if($namefixer->matched) {
 						continue;
-					} else {
-						$namefixer->done = $namefixer->matched = false;
-						echo $pdo->log->primaryOver('!');
 					}
+					$namefixer->reset();
 
-					if ($release['proc_uid'] === NameFixer::PROC_UID_NONE
-						&& !is_null($release['uid']) && strlen($release['uid']) === 32) {
+					if ($release['proc_uid'] == NameFixer::PROC_UID_NONE
+						&& !empty($release['uid'])) {
+						echo $pdo->log->primaryOver('U');
 						$namefixer->uidCheck($release, true, 'UID, ', 1, 1);
 					}
+					// Not all gate requirements in query always set column status as PP Add check is in query
 					$namefixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release['releases_id']);
 
 					if($namefixer->matched) {
 						continue;
-					} else {
-						$namefixer->done = $namefixer->matched = false;
-						echo $pdo->log->primaryOver('@');
 					}
+					$namefixer->reset();
 
-					if (!preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])
-						|| (int)$release['nfostatus'] === Nfo::NFO_FOUND
-						|| (int)$release['nfostatus'] === NameFixer::PROC_NFO_NONE) {
-						$namefixer->done = $namefixer->matched = false;
-						$namefixer->checkName($release, true, 'NFO, ', 1, 1);
+					if ($release['nfostatus'] == Nfo::NFO_FOUND
+						&& $release['proc_nfo'] == NameFixer::PROC_NFO_NONE) {
+						if (!empty($release['texstring'])
+							&& !preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])) {
+							echo $pdo->log->primaryOver('n');
+							$namefixer->done = $namefixer->matched = false;
+							$namefixer->checkName($release, true, 'NFO, ', 1, 1);
+						}
+						// All gate requirements in query, only set column status if it ran the routine
+						$namefixer->_updateSingleColumn('proc_nfo', NameFixer::PROC_NFO_DONE, $release['releases_id']);
 					}
-					$namefixer->_updateSingleColumn('proc_nfo', NameFixer::PROC_NFO_DONE, $release['releases_id']);
 
 					if($namefixer->matched) {
 						continue;
-					} else {
-						$namefixer->done = $namefixer->matched = false;
-						echo $pdo->log->primaryOver('#');
 					}
+					$namefixer->reset();
 
-					if (!is_null($release['fileid']) && (int)$release['proc_files'] === NameFixer::PROC_FILES_NONE) {
+					if ($release['fileid'] > 0 && $release['proc_files'] == NameFixer::PROC_FILES_NONE) {
+						echo $pdo->log->primaryOver('F');
 						$namefixer->done = $namefixer->matched = false;
 						$fileNames = explode('|', $release['filestring']);
 						if (is_array($fileNames)) {
 							$releaseFile = $release;
 							foreach ($fileNames AS $fileName) {
-								$releaseFile['texstring'] = $fileName;
-								$namefixer->checkName($releaseFile, true, 'Filenames, ', 1, 1);
+								if ($namefixer->matched === false) {
+									echo $pdo->log->primaryOver('f');
+									$releaseFile['texstring'] = $fileName;
+									$namefixer->checkName($releaseFile, true, 'Filenames, ', 1, 1);
+								}
 							}
 						}
 					}
+					// Not all gate requirements in query always set column status as PP Add check is in query
 					$namefixer->_updateSingleColumn('proc_files', NameFixer::PROC_FILES_DONE, $release['releases_id']);
 
 					if($namefixer->matched) {
 						continue;
-					} else {
-						$namefixer->done = $namefixer->matched = false;
-						echo $pdo->log->primaryOver('$');
 					}
+					$namefixer->reset();
 
-					if ($release['proc_par2'] === NameFixer::PROC_PAR2_NONE) {
+					if ($release['proc_par2'] == NameFixer::PROC_PAR2_NONE) {
+						echo $pdo->log->primaryOver('p');
 						if (!isset($nzbcontents)) {
 							$nntp = new NNTP(['Settings' => $pdo]);
 							if (($pdo->getSetting('alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
@@ -176,19 +188,21 @@ if (!isset($argv[1])) {
 							);
 						}
 						$nzbcontents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], 1, 1);
+						// All gate requirements in query, only set column status if it ran the routine
+						$namefixer->_updateSingleColumn('proc_par2', NameFixer::PROC_PAR2_DONE, $release['releases_id']);
 					}
-					$namefixer->_updateSingleColumn('proc_par2', NameFixer::PROC_PAR2_DONE, $release['releases_id']);
 
 					if($namefixer->matched) {
 						continue;
-					} else {
-						$namefixer->done = $namefixer->matched = false;
-						echo $pdo->log->primaryOver('%');
 					}
+					$namefixer->reset();
 
-					if ($release['nfostatus'] === Nfo::NFO_FOUND
-						&& $release['proc_sorter'] === MiscSorter::PROC_SORTER_NONE) {
+					if ($release['nfostatus'] == Nfo::NFO_FOUND
+						&& $release['proc_sorter'] == MiscSorter::PROC_SORTER_NONE) {
+						echo $pdo->log->primaryOver('S');
 						$res = $sorter->nfosorter(null, $release['releases_id']);
+						// All gate requirements in query, only set column status if it ran the routine
+						$namefixer->_updateSingleColumn('proc_sorter', MiscSorter::PROC_SORTER_DONE, $release['releases_id']);
 					}
 				}
 			}
@@ -201,7 +215,7 @@ if (!isset($argv[1])) {
 					FROM predb p
 					WHERE LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"
 					AND searched = 0
-					AND DATEDIFF(NOW(), predate) > 1
+					AND predate < (NOW() - INTERVAL 1 DAY)
 					ORDER BY predate ASC
 					LIMIT %s
 					OFFSET %s',
