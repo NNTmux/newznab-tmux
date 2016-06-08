@@ -1,4 +1,5 @@
 2016-06-08 DariusIII
+	* Fix: Fix send to queue and download basket in Charisma theme.
 	* Upd: Make PreDb class to default to remote Db.
 	* Upd: Change DATEDIFF to constant comparison to allow index scan
 	* Upd: AniDB code cleanup, ported from nZEDb
