@@ -12,15 +12,13 @@ use newznab\RequestID;
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
 
-
-
 /**
  * Class Forking
  *
  * This forks various newznab scripts.
  *
- * For example, you get all the id's of the active groups in the groups table, you then iterate over them and spawn
- * processes of misc/update_binaries.php passing the group id's.
+ * For example, you get all the ID's of the active groups in the groups table, you then iterate over them and spawn
+ * processes of misc/update_binaries.php passing the group ID's.
  *
  * @package newznab\libraries
  */
@@ -38,7 +36,6 @@ class Forking extends \fork_daemon
 		parent::__construct();
 
 		$this->_colorCLI = new ColorCLI();
-		$this->pdo = new Settings();
 
 		$this->register_logging(
 			[0 => $this, 1 => 'logger'],
@@ -75,7 +72,7 @@ class Forking extends \fork_daemon
 			}
 		}
 
-		$this->dnr_path = PHP_BINARY . ' ' . NN_MULTI . '.do_not_run' . DS . 'switch.php "php  ';
+		$this->dnr_path = PHP_BINARY . ' ' . NN_MULTIPROCESSING . '.do_not_run' . DS . 'switch.php "php  ';
 	}
 
 	/**
@@ -296,7 +293,7 @@ class Forking extends \fork_daemon
 		foreach ($groups as $group) {
 			$this->_executeCommand(
 				PHP_BINARY . ' ' . NN_UPDATE . 'backfill.php ' .
-			$group['name'] . (isset($group['max']) ? (' ' . $group['max']) : '')
+				$group['name'] . (isset($group['max']) ? (' ' . $group['max']) : '')
 			);
 		}
 	}
@@ -338,7 +335,7 @@ class Forking extends \fork_daemon
 		if ($run[0]['days'] == 1) {
 			$backfilldays = "backfill_target";
 		} elseif ($run[0]['days'] == 2) {
-			$backfilldays = round(abs(strtotime(date("Y-m-d")) - strtotime($this->pdo->getSetting('safebackfilldate'))) / 86400);;
+			$backfilldays = round(abs(strtotime(date("Y-m-d")) - strtotime($this->pdo->getSetting('safebackfilldate'))) / 86400);
 		}
 
 		$data = $this->pdo->queryOneRow(
@@ -374,7 +371,7 @@ class Forking extends \fork_daemon
 				$geteach = $count / $run[0]['maxmsgs'];
 			}
 
-			$queue = array();
+			$queue = [];
 			for ($i = 0; $i <= $geteach - 1; $i++) {
 				$queue[$i] = sprintf("get_range  backfill  %s  %s  %s  %s", $data['name'], $data['our_first'] - $i * $run[0]['maxmsgs'] - $run[0]['maxmsgs'], $data['our_first'] - $i * $run[0]['maxmsgs'] - 1, $i + 1);
 			}
@@ -414,7 +411,7 @@ class Forking extends \fork_daemon
 	{
 		foreach ($groups as $group) {
 			$this->_executeCommand(
-				PHP_BINARY . ' ' . NN_UPDATE  . 'update_binaries.php ' . $group['name'] . ' ' . $group['max']
+				PHP_BINARY . ' ' . NN_UPDATE . 'update_binaries.php ' . $group['name'] . ' ' . $group['max']
 			);
 		}
 	}
@@ -467,6 +464,7 @@ class Forking extends \fork_daemon
 					}
 				}
 			}
+			//var_dump($queue);
 			$this->work = $queue;
 		}
 
@@ -491,96 +489,27 @@ class Forking extends \fork_daemon
 	{
 		$this->register_child_run([0 => $this, 1 => 'fixRelNamesChildWorker']);
 
-		$categories = [
-			Category::OTHER_MISC,
-			Category::OTHER_HASHED,
-			Category::GAME_OTHER,
-			Category::MOVIE_OTHER,
-			Category::MUSIC_OTHER,
-			Category::PC_PHONE_OTHER,
-			Category::TV_OTHER,
-			Category::XXX_OTHER,
-			Category::BOOKS_UNKNOWN
-		];
-
-		$groupby = "GROUP BY leftguid";
-		$rowLimit = "LIMIT 16";
-		$select = "r.leftguid AS guidchar, COUNT(r.id) AS count";
-
 		$threads = $this->pdo->getSetting('fixnamethreads');
 		$maxperrun = $this->pdo->getSetting('fixnamesperrun');
 
 		if ($threads > 16) {
 			$threads = 16;
-		}
-		switch ($this->workTypeOptions[0]) {
-
-			case "standard":
-				$where = sprintf("
-					r.nzbstatus = %d
-					AND r.isrenamed = %d
-					AND r.predb_id = 0
-					AND proc_pp = 1
-					AND r.nfostatus = %d
-					AND
-					(
-						r.proc_nfo = %d
-						OR r.proc_files = %d
-						OR r.proc_uid = %d
-						OR r.proc_par2 = %d
-						OR r.proc_sorter = %d
-						OR r.dehashstatus BETWEEN -6 AND 0
-					)
-					AND r.categories_id IN (%s)",
-					NZB::NZB_ADDED,
-					NameFixer::IS_RENAMED_NONE,
-					Nfo::NFO_FOUND,
-					NameFixer::PROC_NFO_NONE,
-					NameFixer::PROC_FILES_NONE,
-					NameFixer::PROC_UID_NONE,
-					NameFixer::PROC_PAR2_NONE,
-					MiscSorter::PROC_SORTER_NONE,
-					implode(',', $categories)
-				);
-				break;
-
-			case "predbft":
-				$where = "1=1";
-				$rowLimit = sprintf("LIMIT %s", $threads);
-				break;
-
-			default:
-				return 0;
+		} else if ($threads == 0) {
+			$threads = 1;
 		}
 
-		$datas = $this->pdo->query(
-			sprintf("
-				SELECT %s
-				FROM releases r
-				WHERE %s %s %s",
-				$select,
-				$where,
-				$groupby,
-				$rowLimit
-			)
-		);
+		$leftguids = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];
 
-		if ($datas) {
-			$count = 0;
-			$queue = [];
-			foreach ($datas as $firstguid) {
-				$count++;
-				if ($firstguid['count'] < $maxperrun) {
-					$limit = $firstguid['count'];
-				} else {
-					$limit = $maxperrun;
-				}
-				if ($limit > 0) {
-					$queue[$count] = sprintf("%s %s %s %s", $this->workTypeOptions[0], $firstguid['guidchar'], $limit, $count);
-				}
+		$count = 0;
+		$queue = [];
+		foreach ($leftguids as $leftguid) {
+			$count++;
+			if ($maxperrun > 0) {
+				$queue[$count] = sprintf("%s %s %s %s", $this->workTypeOptions[0], $leftguid, $maxperrun, $count);
 			}
-			$this->work = $queue;
 		}
+		$this->work = $queue;
+
 		return $threads;
 	}
 
@@ -608,8 +537,8 @@ class Forking extends \fork_daemon
 			$groups = $this->pdo->queryDirect('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
 
 			if ($groups instanceof \Traversable) {
-				foreach($groups as $group) {
-					if ($this->pdo->queryOneRow(sprintf('SELECT id FROM collections_%d  LIMIT 1',$group['id'])) !== false) {
+				foreach ($groups as $group) {
+					if ($this->pdo->queryOneRow(sprintf('SELECT id FROM collections_%d  LIMIT 1', $group['id'])) !== false) {
 						$this->work[] = ['id' => $group['id']];
 					}
 				}
@@ -618,16 +547,14 @@ class Forking extends \fork_daemon
 			$this->work = $this->pdo->query('SELECT name FROM groups WHERE (active = 1 OR backfill = 1)');
 		}
 
-		return $this->pdo->getSetting('releasethreads');
+		return $this->pdo->getSetting('releasesthreads');
 	}
 
 	public function releasesChildWorker($groups, $identifier = '')
 	{
 		foreach ($groups as $group) {
 			if ($this->tablePerGroup === true) {
-				$this->_executeCommand(
-					$this->dnr_path . 'releases  ' .  $group['id'] . '"'
-				);
+				$this->_executeCommand($this->dnr_path . 'releases  ' . $group['id'] . '"');
 			} else {
 				$this->_executeCommand(
 					PHP_BINARY . ' ' . NN_UPDATE . 'update_releases.php 1 false ' . $group['name']
@@ -662,7 +589,7 @@ class Forking extends \fork_daemon
 
 			if ($type !== '') {
 				$this->_executeCommand(
-					$this->dnr_path . $type .  $group['id'] . (isset($group['renamed']) ? ('  ' . $group['renamed']) : '') . '"'
+					$this->dnr_path . $type . $group['id'] . (isset($group['renamed']) ? ('  ' . $group['renamed']) : '') . '"'
 				);
 			}
 		}
@@ -684,8 +611,8 @@ class Forking extends \fork_daemon
 			($this->pdo->getSetting('maxsizetopostprocess') != '') ? (int)$this->pdo->getSetting('maxsizetopostprocess') : 100;
 		$this->ppAddMaxSize = ($this->ppAddMaxSize > 0 ? ('AND r.size < ' . ($this->ppAddMaxSize * 1073741824)) : '');
 		return (
-			$this->pdo->queryOneRow(
-				sprintf('
+		$this->pdo->queryOneRow(
+			sprintf('
 					SELECT r.id
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
@@ -695,11 +622,11 @@ class Forking extends \fork_daemon
 					AND c.disablepreview = 0
 					%s %s
 					LIMIT 1',
-					NZB::NZB_ADDED,
-					$this->ppAddMaxSize,
-					$this->ppAddMinSize
-				)
-			) === false ? false : true
+				NZB::NZB_ADDED,
+				$this->ppAddMaxSize,
+				$this->ppAddMinSize
+			)
+		) === false ? false : true
 		);
 	}
 
@@ -711,7 +638,7 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT r.leftguid AS id
+					SELECT leftguid AS id
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
 					WHERE r.nzbstatus = %d
@@ -719,7 +646,7 @@ class Forking extends \fork_daemon
 					AND r.haspreview = -1
 					AND c.disablepreview = 0
 					%s %s
-					GROUP BY r.leftguid
+					GROUP BY leftguid
 					LIMIT 16',
 					NZB::NZB_ADDED,
 					$this->ppAddMaxSize,
@@ -742,12 +669,12 @@ class Forking extends \fork_daemon
 		if ($this->pdo->getSetting('lookupnfo') == 1) {
 			$this->nfoQueryString = Nfo::NfoQueryString($this->pdo);
 			return (
-				$this->pdo->queryOneRow(
-					sprintf(
-						'SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1',
-						$this->nfoQueryString
-					)
-				) === false ? false : true
+			$this->pdo->queryOneRow(
+				sprintf(
+					'SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1',
+					$this->nfoQueryString
+				)
+			) === false ? false : true
 			);
 		}
 		return false;
@@ -761,10 +688,10 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT r.leftguid AS id
+					SELECT leftguid AS id
 					FROM releases r
 					WHERE 1=1 %s
-					GROUP BY r.leftguid
+					GROUP BY leftguid
 					LIMIT 16',
 					$this->nfoQueryString
 				)
@@ -782,20 +709,22 @@ class Forking extends \fork_daemon
 	{
 		if ($this->pdo->getSetting('lookupimdb') > 0) {
 			return (
-				$this->pdo->queryOneRow(
-					sprintf('
+			$this->pdo->queryOneRow(
+				sprintf('
 						SELECT id
 						FROM releases
 						WHERE nzbstatus = %d
 						AND imdbid IS NULL
-						AND categories_id BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
+						AND categories_id BETWEEN %d AND %d
 						%s %s
 						LIMIT 1',
-						NZB::NZB_ADDED,
-						($this->pdo->getSetting('lookupimdb') == 2 ? 'AND isrenamed = 1' : ''),
-						($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
-					)
-				) === false ? false : true
+					NZB::NZB_ADDED,
+					Category::MOVIE_ROOT,
+					Category::MOVIE_OTHER,
+					($this->pdo->getSetting('lookupimdb') == 2 ? 'AND isrenamed = 1' : ''),
+					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
+				)
+			) === false ? false : true
 			);
 		}
 		return false;
@@ -843,10 +772,12 @@ class Forking extends \fork_daemon
 						WHERE nzbstatus = %d
 						AND size > 1048576
 						AND tv_episodes_id BETWEEN -2 AND 0
-						AND categories_id BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
+						AND categories_id BETWEEN %d AND %d
 						%s %s
 						LIMIT 1',
 					NZB::NZB_ADDED,
+					Category::TV_ROOT,
+					Category::TV_OTHER,
 					($this->pdo->getSetting('lookuptvrage') == 2 ? 'AND isrenamed = 1' : ''),
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
@@ -869,12 +800,14 @@ class Forking extends \fork_daemon
 					WHERE nzbstatus = %d
 					AND tv_episodes_id BETWEEN -2 AND 0
 					AND size > 1048576
-					AND categories_id BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER . '
+					AND categories_id BETWEEN %d AND %d
 					%s %s
 					GROUP BY leftguid
 					LIMIT 16',
 					($this->ppRenamedOnly ? 2 : 1),
 					NZB::NZB_ADDED,
+					Category::TV_ROOT,
+					Category::TV_OTHER,
 					($this->pdo->getSetting('lookuptvrage') == 2 ? 'AND isrenamed = 1' : ''),
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
@@ -917,7 +850,7 @@ class Forking extends \fork_daemon
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////// All requestid code goes here ////////////////////////////////////////////////
+	////////////////////////////////////// All requestID code goes here ////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private function requestIDMainMethod()
@@ -928,7 +861,7 @@ class Forking extends \fork_daemon
 				SELECT DISTINCT(g.id)
 				FROM groups g
 				INNER JOIN releases r ON r.groups_id = g.id
-				WHERE g.active = 1
+				WHERE (g.active = 1 OR g.backfill = 1)
 				AND r.nzbstatus = %d
 				AND r.predb_id = 0
 				AND r.isrequestid = 1
@@ -943,9 +876,7 @@ class Forking extends \fork_daemon
 	public function requestIDChildWorker($groups, $identifier = '')
 	{
 		foreach ($groups as $group) {
-			$this->_executeCommand(
-				$this->dnr_path . 'requestid  ' .  $group['id'] . '"'
-			);
+			$this->_executeCommand($this->dnr_path . 'requestid  ' . $group['id'] . '"');
 		}
 	}
 
@@ -957,14 +888,14 @@ class Forking extends \fork_daemon
 	{
 		$this->register_child_run([0 => $this, 1 => 'updatePerGroupChildWorker']);
 		$this->work = $this->pdo->query('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
-		return $this->pdo->getSetting('releasethreads');
+		return $this->pdo->getSetting('releasesthreads');
 	}
 
 	public function updatePerGroupChildWorker($groups, $identifier = '')
 	{
 		foreach ($groups as $group) {
 			$this->_executeCommand(
-				$this->dnr_path . 'update_per_group  ' .  $group['id'] . '"'
+				$this->dnr_path . 'update_per_group  ' . $group['id'] . '"'
 			);
 		}
 	}
@@ -980,7 +911,7 @@ class Forking extends \fork_daemon
 	 */
 	protected function _executeCommand($command)
 	{
-		switch($this->outputType) {
+		switch ($this->outputType) {
 			case self::OUTPUT_NONE:
 				exec($command);
 				break;
@@ -1044,7 +975,7 @@ class Forking extends \fork_daemon
 		if (NN_ECHOCLI) {
 			$this->_colorCLI->doEcho(
 				$this->_colorCLI->header(
-					'Process id #' . $pid . ' has completed.' . PHP_EOL .
+					'Process ID #' . $pid . ' has completed.' . PHP_EOL .
 					'There are ' . ($this->forked_children_count - 1) . ' process(es) still active with ' .
 					(--$this->_workCount) . ' job(s) left in the queue.' . PHP_EOL
 				)
@@ -1131,7 +1062,7 @@ class Forking extends \fork_daemon
 	 * @var bool
 	 */
 	private $processAdditional = false; // Should we process additional?
-	private $processNFO = false;        // Should we process NFOs?
-	private $processMovies = false;     // Should we process Movies?
-	private $processTV = false;         // Should we process TV?
+	private $processNFO = false; // Should we process NFOs?
+	private $processMovies = false; // Should we process Movies?
+	private $processTV = false; // Should we process TV?
 }

@@ -161,7 +161,7 @@ class Category
 	{
 		return implode(",",
 			[
-				self::BOOKS_ROOT,
+				self::BOOKS_UNKNOWN,
 				self::GAME_OTHER,
 				self::MOVIE_OTHER,
 				self::MUSIC_OTHER,
@@ -169,7 +169,8 @@ class Category
 				self::TV_OTHER,
 				self::OTHER_HASHED,
 				self::XXX_OTHER,
-				self::OTHER_MISC
+				self::OTHER_MISC,
+				self::OTHER_HASHED
 			]);
 	}
 
