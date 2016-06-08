@@ -1,3 +1,5 @@
+2016-06-08 DariusIII
+	* Upd: AniDB code cleanup, ported from nZEDb
 2016-06-07 DariusIII
 	* Upd: Make Charisma theme dark, fix some bootstrap issues.
 	* Upd: Update composer.lock file
