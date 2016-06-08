@@ -171,13 +171,19 @@
 																			class="fa fa-comment-o"></i><span
 																			class="badge">{$mcomments[$m@index]}
 																		Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																	  title="Send to my Download Basket"><i
-																			class="fa fa-shopping-basket"></i></span>
+																<span
+																		id="guid{$mguid[$m@index]}"
+																		class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																		title="Send to my Download Basket"><i
+																			class="fa fa-shopping-basket"></i>
+																		</span>
 																{if isset($sabintegrated) && $sabintegrated !=""}
-																	<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																		  title="Send to my Queue"><i
-																				class="fa fa-share"></i></span>
+																	<span
+																			id="guid{$mguid[$m@index]}"
+																			class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																			title="Send to my Queue"><i
+																				class="fa fa-share"></i>
+																			</span>
 																{/if}
 															</div>
 														</td>

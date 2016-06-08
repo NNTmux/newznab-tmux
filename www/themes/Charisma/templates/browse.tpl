@@ -107,7 +107,7 @@
 													name="name{$result.guid}" class="modal_prev label label-default" rel="preview">Preview</a></span>{/if}
 										{if $result.videos_id > 0}<span class="label label-default"><a
 													href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}">View TV</a></span>{/if}
-										{if isset($result.firstaired) && $result.firstaired != ""}<span class="label label-default" title="{$result.guid}">
+										{if isset($result.firstaired) && $result.firstaired != ""}<span class="seriesinfo label label-default" title="{$result.guid}">
 											Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
 										{if $result.anidbid > 0}<span class="label label-default"><a
 													href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}">View Anime</a></span>{/if}
@@ -124,11 +124,20 @@
 										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
 													class="fa fa-comments-o text-muted"
 													title="Comments"></i></a>
-										<a href="#" class="icon_cart text-muted"><i
-													class="fa fa-shopping-basket" title="Send to my Download Basket"></i></a>
+										<a href="#"><i
+													id="guid{$result.guid}"
+													class="icon_cart text-muted fa fa-shopping-basket" title="Send to my Download Basket">
+
+											</i>
+										</a>
 										{if isset($sabintegrated) && $sabintegrated !=""}
-											<a href="#" class="icon_sab text-muted"><i class="fa fa-share"
-																					   title="Send to my Queue"></i></a>
+											<a href="#"><i
+														id="guid{$result.guid}"
+														class="icon_sab text-muted fa fa-share"
+														title="Send to my Queue">
+
+												</i>
+											</a>
 										{/if}
 										{if $weHasVortex}
 											<a href="#" class="icon_vortex text-muted"><i
