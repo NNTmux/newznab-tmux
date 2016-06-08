@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8eb6df8db06581cf25941d22dd6c4c72",
-    "content-hash": "1a7c2f8f7ffac98ab554f24aed4be076",
+    "hash": "65867ff98b70d729e240bfeab1cd52c3",
+    "content-hash": "722189a7778ff9d599d98f0a64502efe",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -1550,17 +1550,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/li3_quality.git",
-                "reference": "3a986b0b11ccd4be09a22206d6645aed8c8af1d2"
+                "reference": "6a357b9a8c0bd43b5924dabb5b6338e43cc6c75e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/li3_quality/zipball/3a986b0b11ccd4be09a22206d6645aed8c8af1d2",
-                "reference": "3a986b0b11ccd4be09a22206d6645aed8c8af1d2",
+                "url": "https://api.github.com/repos/UnionOfRAD/li3_quality/zipball/6a357b9a8c0bd43b5924dabb5b6338e43cc6c75e",
+                "reference": "6a357b9a8c0bd43b5924dabb5b6338e43cc6c75e",
                 "shasum": ""
             },
             "require": {
                 "composer/installers": "1.*",
-                "php": ">=5.5.0",
+                "php": ">=5.5.14",
                 "unionofrad/lithium": "1.1.*"
             },
             "type": "lithium-library",
@@ -1586,7 +1586,7 @@
                 "quality",
                 "syntax"
             ],
-            "time": "2016-04-10 15:04:15"
+            "time": "2016-06-08 07:43:17"
         },
         {
             "name": "unionofrad/manual",
@@ -1640,7 +1640,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.6.0",
+        "php": ">=5.6.20",
         "ext-ctype": "*",
         "ext-curl": "*",
         "ext-exif": "*",
