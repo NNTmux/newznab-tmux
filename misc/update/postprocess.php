@@ -1,5 +1,5 @@
 <?php
-require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
@@ -125,7 +125,7 @@ switch ($argv[1]) {
 		$postProcess->processSpotnab();
 		break;
 	case 'tv':
-		$postProcess->processTV('', (isset($argv[3]) && in_array($argv[3], $charArray) ? $argv[3] : ''));
+		$postProcess->processTv('', (isset($argv[3]) && in_array($argv[3], $charArray) ? $argv[3] : ''));
 		break;
 	case 'xxx':
 		$postProcess->processXXX();
