@@ -247,7 +247,7 @@ class TmuxRun extends Tmux
 
 				$log = $this->writelog($runVar['panes']['one'][1]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.1 ' \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/nix/tmux/bin/postprocess.php amazon true $log; \
+						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/postprocess.php amazon true $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_amazon']}' 2>&1 1> /dev/null"
 				);
 				break;
@@ -285,7 +285,7 @@ class TmuxRun extends Tmux
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:2.1 ' \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/postprocess.php tv $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/postprocess.php mov $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/tmux/bin/postprocess.php anime true $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/postprocess.php anime true $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/PostProc/check_covers.php true $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_non']}' 2>&1 1> /dev/null"
 				);
@@ -711,8 +711,8 @@ class TmuxRun extends Tmux
 			if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
 				shell_exec(
 					"tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/nix/tmux/bin/postprocess.php spotnab true; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/nix/tmux/bin/postprocess.php sharing true; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/postprocess.php spotnab true; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/postprocess.php sharing true; \
 						{$runVar['commands']['_sleep']} {$runVar['settings']['sharing_timer']}' 2>&1 1> /dev/null"
 				);
 			}
