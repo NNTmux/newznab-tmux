@@ -79,11 +79,12 @@ class PreDb extends DB
 	public function executeExport(array $options = null)
 	{
 		$defaults = [
-			'enclosedby' => '',
-			'fields'     => '\t',
-			'limit'      => 0,
-			'lines'      => '\r\n',    // use Windows style endings so that text can contain \n
-			'path'		=> null,
+			'enclosedby'	=> '',
+			'fields'		=> '\t',
+			'limit'			=> 0,
+			'lines'			=> '\r\n',    // use Windows style endings so that text can contain \n
+			'local'			=> false,
+			'path'			=> null,
 		];
 		$options += $defaults;
 

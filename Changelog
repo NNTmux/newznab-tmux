@@ -1,4 +1,6 @@
 2016-06-08 DariusIII
+	* Upd: Make PreDb class to default to remote Db.
+	* Upd: Change DATEDIFF to constant comparison to allow index scan
 	* Upd: AniDB code cleanup, ported from nZEDb
 2016-06-07 DariusIII
 	* Upd: Make Charisma theme dark, fix some bootstrap issues.
