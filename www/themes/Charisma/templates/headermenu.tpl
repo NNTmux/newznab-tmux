@@ -192,7 +192,7 @@
 					<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::OTHER_HASHED}">Hashed</a></li>
 				</ul>
 			</li>
-			<ul class="nav pull-left">
+			<ul class="nav navbar-left">
 				<li class="">
 					<form class="navbar-form" id="headsearch_form" action="{$smarty.const.WWW_TOP}/search/" method="get">
 						<select class="form-control" id="headcat" name="t">
@@ -211,6 +211,34 @@
 			</ul>
 			<!-- End If logged in -->
 		{/if}
+		<!-- user dropdown starts -->
+		{if $loggedin == "true"}
+			<div class="btn-group navbar-right">
+				<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+					<i class="fa fa-user"></i><span class="hidden-sm hidden-xs"><span
+								class="username"> Hi, {$userdata.username}</span></span>
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="{$smarty.const.WWW_TOP}/profile"><i class="fa fa-user"></i><span> My Profile</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/cart"><i class="fa fa-shopping-basket"></i><span> My Download Basket</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/queue"><i class="fa fa-cloud-download"></i><span> My Queue</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/mymovies"><i class="fa fa-film"></i><span> My movies</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/myshows"><i class="fa fa-television"></i> My Shows</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/profileedit"><i class="fa fa-cog fa-spin"></i><span> Account Settings</span></a>
+					</li>
+					{if isset($isadmin)}
+						<li><a href="{$smarty.const.WWW_TOP}/admin"><i class="fa fa-cogs fa-spin"></i><span> Admin</span></a></li>
+					{/if}
+					<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock-alt"></i><span> Logout</span></a></li>
+				</ul>
+				{else}
+				<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/register"><i class="fa fa-bookmark-o"></i><span> Register</span></a></li>
+			</div>
+		{/if}
+		<!-- user dropdown ends -->
+	</div>
 		{/if}
 	</div>
 </div>
