@@ -1,10 +1,13 @@
 <?php
 namespace newznab;
 
-use newznab\Category;
 use newznab\db\Settings;
 
-
+/**
+ * Class Tmux
+ *
+ * @package newznab
+ */
 class Tmux
 {
 	/**
@@ -12,18 +15,34 @@ class Tmux
 	 */
 	public $pdo;
 
+	/**
+	 * @var
+	 */
 	public $tmux_session;
 
+	/**
+	 * Tmux constructor.
+	 *
+	 * @param Settings|null $pdo
+	 */
 	function __construct(Settings $pdo = null)
 	{
 		$this->pdo = (empty($pdo) ? new Settings() : $pdo);
 	}
 
+	/**
+	 * @return string
+	 */
 	public function version()
 	{
-		return $this->pdo->getSetting('dbversion');
+		return $this->pdo->version();
 	}
 
+	/**
+	 * @param $form
+	 *
+	 * @return \stdClass
+	 */
 	public function update($form)
 	{
 		$pdo = $this->pdo;
@@ -43,6 +62,11 @@ class Tmux
 		return $tmux;
 	}
 
+	/**
+	 * @param string $setting
+	 *
+	 * @return bool|\stdClass
+	 */
 	public function get($setting = '')
 	{
 		$pdo = $this->pdo;
@@ -57,9 +81,13 @@ class Tmux
 		return $this->rows2Object($rows);
 	}
 
+	/**
+	 * @param $constants
+	 *
+	 * @return mixed
+	 */
 	public function getConnectionsInfo($constants)
 	{
-		$runVar = [];
 		$runVar['connections']['port_a'] = $runVar['connections']['host_a'] = $runVar['connections']['ip_a'] = false;
 
 		if ($constants['nntpproxy'] == 0) {
@@ -73,7 +101,7 @@ class Tmux
 			}
 		} else {
 			$filename = NN_MISC . "update/python/lib/nntpproxy.conf";
-			$fp = fopen($filename, "r") || die("Couldn't open $filename");
+			$fp = fopen($filename, "r") or die("Couldn't open $filename");
 			while (!feof($fp)) {
 				$line = fgets($fp);
 				if (preg_match('/"host": "(.+)",$/', $line, $match)) {
@@ -86,7 +114,7 @@ class Tmux
 			}
 			if ($constants['alternate_nntp']) {
 				$filename = NN_MISC . "update/python/lib/nntpproxy_a.conf";
-				$fp = fopen($filename, "r") || die("Couldn't open $filename");
+				$fp = fopen($filename, "r") or die("Couldn't open $filename");
 				while (!feof($fp)) {
 					$line = fgets($fp);
 					if (preg_match('/"host": "(.+)",$/', $line, $match)) {
@@ -106,21 +134,26 @@ class Tmux
 		return $runVar['connections'];
 	}
 
+	/**
+	 * @param $which
+	 * @param $connections
+	 *
+	 * @return mixed
+	 */
 	public function getUSPConnections($which, $connections)
 	{
 
 		switch ($which) {
 			case 'alternate':
-					$ip = 'ip_a';
-					$port = 'port_a';
-					break;
+				$ip = 'ip_a';
+				$port = 'port_a';
+				break;
 			case 'primary':
 			default:
 				$ip = 'ip';
 				$port = 'port';
 				break;
 		}
-		$runVar = [];
 
 		$runVar['conncounts'][$which]['active'] = $runVar['conncounts'][$which]['total'] = 0;
 
@@ -128,8 +161,8 @@ class Tmux
 		$runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec("ss -n | grep -c " . $connections[$ip] . ":" . $connections[$port]));
 
 		if ($runVar['conncounts'][$which]['active'] == 0 && $runVar['conncounts'][$which]['total'] == 0) {
-				$runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec("ss -n | grep " . $connections[$ip] . ":https | grep -c ESTAB"));
-				$runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec("ss -n | grep -c " . $connections[$ip] . ":https"));
+			$runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec("ss -n | grep " . $connections[$ip] . ":https | grep -c ESTAB"));
+			$runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec("ss -n | grep -c " . $connections[$ip] . ":https"));
 		}
 		if ($runVar['conncounts'][$which]['active'] == 0 && $runVar['conncounts'][$which]['total'] == 0) {
 			$runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec("ss -n | grep " . $connections[$port] . " | grep -c ESTAB"));
@@ -142,6 +175,11 @@ class Tmux
 		return ($runVar['conncounts']);
 	}
 
+	/**
+	 * @param $constants
+	 *
+	 * @return array
+	 */
 	public function getListOfPanes($constants)
 	{
 		$panes = ['zero' => '', 'one' => '', 'two' => ''];
@@ -172,13 +210,16 @@ class Tmux
 		return $panes;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getConstantSettings()
 	{
 		$tmuxstr = 'SELECT value FROM tmux WHERE setting =';
 		$settstr = 'SELECT value FROM settings WHERE setting =';
 
 		$sql = sprintf(
-				"SELECT
+			"SELECT
 					(%1\$s 'sequential') AS sequential,
 					(%1\$s 'tmux_session') AS tmux_session,
 					(%1\$s 'run_ircscraper') AS run_ircscraper,
@@ -187,19 +228,22 @@ class Tmux
 					(%2\$s 'tablepergroup') AS tablepergroup,
 					(%2\$s 'delaytime') AS delaytime,
 					(%2\$s 'nntpproxy') AS nntpproxy",
-					$tmuxstr,
-					$settstr
+			$tmuxstr,
+			$settstr
 		);
 		return $sql;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getMonitorSettings()
 	{
 		$tmuxstr = 'SELECT value FROM tmux WHERE setting =';
 		$settstr = 'SELECT value FROM settings WHERE setting =';
 
 		$sql = sprintf(
-				"SELECT
+			"SELECT
 					(%1\$s 'monitor_delay') AS monitor,
 					(%1\$s 'binaries') AS binaries_run,
 					(%1\$s 'backfill') AS backfill,
@@ -249,7 +293,7 @@ class Tmux
 					(%2\$s 'lookupgames') AS processgames,
 					(%2\$s 'lookupxxx') AS processxxx,
 					(%2\$s 'lookupimdb') AS processmovies,
-					(%2\$s 'lookuptvrage') AS processtv,
+					(%2\$s 'lookuptvrage') AS processtvrage,
 					(%2\$s 'lookupanidb') AS processanime,
 					(%2\$s 'lookupnfo') AS processnfo,
 					(%2\$s 'lookuppar2') AS processpar2,
@@ -260,12 +304,17 @@ class Tmux
 					(%2\$s 'request_hours') AS request_hours,
 					(%2\$s 'maxsizetopostprocess') AS maxsize_pp,
 					(%2\$s 'minsizetopostprocess') AS minsize_pp",
-					$tmuxstr,
-					$settstr
+			$tmuxstr,
+			$settstr
 		);
 		return $sql;
 	}
 
+	/**
+	 * @param $rows
+	 *
+	 * @return \stdClass
+	 */
 	public function rows2Object($rows)
 	{
 		$obj = new \stdClass;
@@ -277,6 +326,11 @@ class Tmux
 		return $obj;
 	}
 
+	/**
+	 * @param $row
+	 *
+	 * @return \stdClass
+	 */
 	public function row2Object($row)
 	{
 		$obj = new \stdClass;
@@ -287,6 +341,12 @@ class Tmux
 		return $obj;
 	}
 
+	/**
+	 * @param $setting
+	 * @param $value
+	 *
+	 * @return bool|\PDOStatement
+	 */
 	public function updateItem($setting, $value)
 	{
 		$pdo = $this->pdo;
@@ -295,23 +355,49 @@ class Tmux
 	}
 
 	//get microtime
+	/**
+	 * @return float
+	 */
 	public function microtime_float()
 	{
 		list($usec, $sec) = explode(" ", microtime());
 		return ((float)$usec + (float)$sec);
 	}
 
+	/**
+	 * @param double $bytes
+	 *
+	 * @return string
+	 */
 	public function decodeSize($bytes)
 	{
 		$types = ['B', 'KB', 'MB', 'GB', 'TB'];
+		/*
 		for ($i = 0; $bytes >= 1024 && $i < (count($types) - 1); $bytes /= 1024, $i++);
+
 		return (round($bytes, 2) . " " . $types[$i]);
+		*/
+
+		$suffix = 'B';
+		foreach ($types as $type) {
+			if ($bytes < 1024.0) {
+				$suffix = $type;
+				break;
+			}
+			$bytes /= 1024;
+		}
+		return (round($bytes, 2) . " " . $suffix);
 	}
 
+	/**
+	 * @param $pane
+	 *
+	 * @return string
+	 */
 	public function writelog($pane)
 	{
 		$path = NN_LOGS;
-		$getdate = gmDate("Ymd");
+		$getdate = gmdate("Ymd");
 		$tmux = $this->get();
 		$logs = (isset($tmux->write_logs)) ? $tmux->write_logs : 0;
 		if ($logs == 1) {
@@ -321,6 +407,13 @@ class Tmux
 		}
 	}
 
+	/**
+	 * @param $colors_start
+	 * @param $colors_end
+	 * @param $colors_exc
+	 *
+	 * @return int
+	 */
 	public function get_color($colors_start, $colors_end, $colors_exc)
 	{
 		$exception = str_replace(".", ".", $colors_exc);
@@ -338,6 +431,12 @@ class Tmux
 	}
 
 	// Returns random bool, weighted by $chance
+	/**
+	 * @param     $loop
+	 * @param int $chance
+	 *
+	 * @return bool
+	 */
 	public function rand_bool($loop, $chance = 60)
 	{
 		$tmux = $this->get();
@@ -349,6 +448,11 @@ class Tmux
 		}
 	}
 
+	/**
+	 * @param $_time
+	 *
+	 * @return string
+	 */
 	public function relativeTime($_time)
 	{
 		$d = [];
@@ -375,6 +479,11 @@ class Tmux
 		return $return;
 	}
 
+	/**
+	 * @param $cmd
+	 *
+	 * @return bool
+	 */
 	public function command_exist($cmd)
 	{
 		$returnVal = shell_exec("which $cmd 2>/dev/null");
@@ -393,26 +502,30 @@ class Tmux
 	 */
 	public function proc_query($qry, $bookreqids, $request_hours, $db_name, $ppmax = '', $ppmin = '')
 	{
-		switch ((int) $qry) {
+		switch ((int)$qry) {
 			case 1:
-				return sprintf("SELECT
-					SUM(IF(nzbstatus = 1 AND categories_id BETWEEN %d AND %d AND categories_id != %d AND videos_id = 0
-						AND tv_episodes_id BETWEEN -3 AND 0 AND size > 1048576,1,0)) AS processtv,
-					SUM(IF(nzbstatus = 1 AND categories_id = %d AND anidbid IS NULL,1,0)) AS processanime,
-					SUM(IF(nzbstatus = 1 AND categories_id BETWEEN %d AND %d AND imdbid IS NULL,1,0)) AS processmovies,
-					SUM(IF(nzbstatus = 1 AND categories_id IN (%d, %d, %d) AND musicinfo_id IS NULL,1,0)) AS processmusic,
-					SUM(IF(nzbstatus = 1 AND categories_id BETWEEN %d AND %d AND consoleinfo_id IS
-					NULL,1,0)) AS processconsole,
-					SUM(IF(nzbstatus = 1 AND categories_id IN (%s) AND bookinfo_id IS NULL,1,0)) AS processbooks,
-					SUM(IF(nzbstatus = 1 AND categories_id = %d AND gamesinfo_id = 0,1,0)) AS processgames,
-					SUM(IF(nzbstatus = 1 AND categories_id BETWEEN %d AND %d AND xxxinfo_id = 0,1,0)) AS processxxx,
+				return sprintf("
+					SELECT
+					SUM(IF(nzbstatus = %d AND categories_id BETWEEN %d AND %d AND categories_id != %d AND videos_id = 0 AND tv_episodes_id BETWEEN -3 AND 0 AND size > 1048576,1,0)) AS processtv,
+					SUM(IF(nzbstatus = %1\$d AND categories_id = %d AND anidbid IS NULL,1,0)) AS processanime,
+					SUM(IF(nzbstatus = %1\$d AND categories_id BETWEEN %d AND %d AND imdbid IS NULL,1,0)) AS processmovies,
+					SUM(IF(nzbstatus = %1\$d AND categories_id IN (%d, %d, %d) AND musicinfo_id IS NULL,1,0)) AS processmusic,
+					SUM(IF(nzbstatus = %1\$d AND categories_id BETWEEN %d AND %d AND consoleinfo_id IS NULL,1,0)) AS processconsole,
+					SUM(IF(nzbstatus = %1\$d AND categories_id IN (%s) AND bookinfo_id IS NULL,1,0)) AS processbooks,
+					SUM(IF(nzbstatus = %1\$d AND categories_id = %d AND gamesinfo_id = 0,1,0)) AS processgames,
+					SUM(IF(nzbstatus = %1\$d AND categories_id BETWEEN %d AND %d AND xxxinfo_id = 0,1,0)) AS processxxx,
 					SUM(IF(1=1 %s,1,0)) AS processnfo,
-					SUM(IF(nzbstatus = 1 AND nfostatus = 1,1,0)) AS nfo,
-					SUM(IF(nzbstatus = 1 AND isrequestid = 1 AND predb_id = 0 AND ((reqidstatus = 0) OR (reqidstatus = -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL %s HOUR)),1,0)) AS requestid_inprogress,
-					SUM(IF(predb_id > 0 AND nzbstatus = 1 AND isrequestid = 1 AND reqidstatus = 1,1,0)) AS requestid_matched,
-					SUM(IF(predb_id > 0 AND searchname IS NOT NULL,1,0)) AS predb_matched,
+					SUM(IF(nzbstatus = %1\$d AND isrenamed = %d AND predb_id = 0 AND passwordstatus >= 0 AND nfostatus > %d
+						AND ((nfostatus = %d AND proc_nfo = %d) OR proc_files = %d OR proc_uid = %d OR proc_par2 = %d OR (nfostatus = %20\$d AND proc_sorter = %d)
+							OR (ishashed = 1 AND dehashstatus BETWEEN -6 AND 0)) AND categories_id IN (%s),1,0)) AS processrenames,
+					SUM(IF(isrenamed = %d,1,0)) AS renamed,
+					SUM(IF(nzbstatus = %1\$d AND nfostatus = %20\$d,1,0)) AS nfo,
+					SUM(IF(nzbstatus = %1\$d AND isrequestid = %d AND predb_id = 0 AND ((reqidstatus = %d) OR (reqidstatus = %d) OR (reqidstatus = %d AND adddate > NOW() - INTERVAL %s HOUR)),1,0)) AS requestid_inprogress,
+					SUM(IF(predb_id > 0 AND nzbstatus = %1\$d AND isrequestid = %28\$d AND reqidstatus = %d,1,0)) AS requestid_matched,
+					SUM(IF(predb_id > 0,1,0)) AS predb_matched,
 					COUNT(DISTINCT(predb_id)) AS distinct_predb_matched
 					FROM releases r",
+					NZB::NZB_ADDED,
 					Category::TV_ROOT,
 					Category::TV_OTHER,
 					Category::TV_ANIME,
@@ -429,7 +542,24 @@ class Tmux
 					Category::XXX_ROOT,
 					Category::XXX_X264,
 					Nfo::NfoQueryString($this->pdo),
-					$request_hours);
+					NameFixer::IS_RENAMED_NONE,
+					Nfo::NFO_UNPROC,
+					Nfo::NFO_FOUND,
+					NameFixer::PROC_NFO_NONE,
+					NameFixer::PROC_FILES_NONE,
+					NameFixer::PROC_UID_NONE,
+					NameFixer::PROC_PAR2_NONE,
+					MiscSorter::PROC_SORTER_NONE,
+					Category::getCategoryOthersGroup(),
+					NameFixer::IS_RENAMED_DONE,
+					RequestID::IS_REQID_TRUE,
+					RequestID::REQID_UPROC,
+					RequestID::REQID_NOLL,
+					RequestID::REQID_NONE,
+					RequestID::REQID_FOUND,
+					$request_hours
+				);
+
 			case 2:
 				$ppminString = $ppmaxString = '';
 				if (is_numeric($ppmax) && !empty($ppmax)) {
@@ -452,15 +582,16 @@ class Tmux
 					) AS work,
 					(SELECT COUNT(id) FROM groups WHERE active = 1) AS active_groups,
 					(SELECT COUNT(id) FROM groups WHERE name IS NOT NULL) AS all_groups";
+
 			case 4:
 				return sprintf("
 					SELECT
-					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'predb' AND TABLE_SCHEMA = %1\$s) AS predb,
-					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'missed_parts' AND TABLE_SCHEMA = %1\$s) AS partrepair_table,
-					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = %1\$s) AS parts_table,
-					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = %1\$s) AS binaries_table,
+					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'predb' AND TABLE_SCHEMA = %1\$s) AS predb,
+					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'missed_parts' AND TABLE_SCHEMA = %1\$s) AS missed_parts_table,
+					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = %1\$s) AS parts_table,
+					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = %1\$s) AS binaries_table,
 					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'collections' AND TABLE_SCHEMA = %1\$s) AS collections_table,
-					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'releases' AND TABLE_SCHEMA = %1\$s) AS releases,
+					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'releases' AND TABLE_SCHEMA = %1\$s) AS releases,
 					(SELECT COUNT(id) FROM groups WHERE first_record IS NOT NULL AND backfill = 1
 						AND (now() - INTERVAL backfill_target DAY) < first_record_postdate
 					) AS backfill_groups_days,
@@ -484,13 +615,17 @@ class Tmux
 	 */
 	public function isRunning()
 	{
-		return ($this->get()->running == 1);
+		$running = $this->get()->running;
+		if ($running === false) {
+			throw new \RuntimeException("Tmux's running flag was not found in the database.\nPlease check the tables are correctly setup.\n");
+		}
+		return ($running == 1);
 	}
 
 	/**
 	 * Check if Tmux is running, if it is, stop it.
 	 *
-	 * @return bool		true if scripts were running, false otherwise.
+	 * @return bool true if scripts were running, false otherwise.
 	 * @access public
 	 */
 	public function stopIfRunning()
@@ -505,6 +640,9 @@ class Tmux
 		return false;
 	}
 
+	/**
+	 * @return bool|\PDOStatement
+	 */
 	public function startRunning()
 	{
 		if (!$this->isRunning()) {
@@ -512,5 +650,4 @@ class Tmux
 		}
 		return true;
 	}
-
 }
