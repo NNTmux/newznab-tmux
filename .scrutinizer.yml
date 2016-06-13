@@ -5,7 +5,7 @@ build:
             - 'composer install --no-interaction --no-dev --prefer-source --no-scripts'
     environment:
         php:
-            version: 5.5.14
+            version: 5.6.20
     checks:
         php:
             avoid_closing_tag: false
