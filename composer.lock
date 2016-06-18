@@ -816,19 +816,44 @@
         },
         {
             "name": "bower-asset/slimscroll",
-            "version": "v1.3.7",
+            "version": "v1.3.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rochal/jQuery-slimScroll.git",
-                "reference": "00d27e3541d9cb4ada6f41b06cd67bef62d9d2b3"
+                "reference": "cf39d364e777ef95574c30c42d3b85cb2bf325d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rochal/jQuery-slimScroll/zipball/00d27e3541d9cb4ada6f41b06cd67bef62d9d2b3",
-                "reference": "00d27e3541d9cb4ada6f41b06cd67bef62d9d2b3",
+                "url": "https://api.github.com/repos/rochal/jQuery-slimScroll/zipball/cf39d364e777ef95574c30c42d3b85cb2bf325d3",
+                "reference": "cf39d364e777ef95574c30c42d3b85cb2bf325d3",
                 "shasum": ""
             },
-            "type": "bower-asset-library"
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "jquery.slimscroll.js",
+                    "jquery.slimscroll.min.js"
+                ],
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "node_modules",
+                    "bower_components",
+                    "test",
+                    "tests"
+                ]
+            },
+            "description": "slimScroll is a small jQuery plugin that transforms any div into a scrollable area. slimScroll doesn't occupy any visual space as it only appears on a user initiated mouse-over.",
+            "keywords": [
+                "ecosystem:jquery",
+                "jquery-plugin",
+                "scroll",
+                "scrollable",
+                "scrollbar",
+                "scroller",
+                "scrolling",
+                "slimscroll",
+                "ui"
+            ]
         },
         {
             "name": "composer/installers",
@@ -1053,12 +1078,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/amalfra/GiantBomb.git",
-                "reference": "6e5c37fdaff69bc2af089acd39fbc00b1d4f5985"
+                "reference": "2f80210e54e8310380221759b26117c1351b8031"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amalfra/GiantBomb/zipball/6e5c37fdaff69bc2af089acd39fbc00b1d4f5985",
-                "reference": "6e5c37fdaff69bc2af089acd39fbc00b1d4f5985",
+                "url": "https://api.github.com/repos/amalfra/GiantBomb/zipball/2f80210e54e8310380221759b26117c1351b8031",
+                "reference": "2f80210e54e8310380221759b26117c1351b8031",
                 "shasum": ""
             },
             "require": {
@@ -1092,7 +1117,7 @@
                 "php",
                 "wrapper"
             ],
-            "time": "2014-05-10 11:57:09"
+            "time": "2016-06-15 06:37:08"
         },
         {
             "name": "google/recaptcha",
@@ -1395,12 +1420,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "ce1d4d44d1e5b6c4a8cf6dc273025a8638e78b8e"
+                "reference": "aa9b5e8bdb39ddacc2b9cd5b05c8564e80eca21f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/ce1d4d44d1e5b6c4a8cf6dc273025a8638e78b8e",
-                "reference": "ce1d4d44d1e5b6c4a8cf6dc273025a8638e78b8e",
+                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/aa9b5e8bdb39ddacc2b9cd5b05c8564e80eca21f",
+                "reference": "aa9b5e8bdb39ddacc2b9cd5b05c8564e80eca21f",
                 "shasum": ""
             },
             "require": {
@@ -1408,7 +1433,7 @@
                 "php": ">=5.5.14"
             },
             "require-dev": {
-                "unionofrad/li3_fixtures": "1.0.*@RC"
+                "unionofrad/li3_fixtures": "1.0.*"
             },
             "bin": [
                 "console/li3"
@@ -1433,7 +1458,7 @@
                 "li3",
                 "lithium"
             ],
-            "time": "2016-06-03 16:16:20"
+            "time": "2016-06-17 19:00:57"
         }
     ],
     "packages-dev": [
