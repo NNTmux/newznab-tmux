@@ -1,4 +1,5 @@
 2016-06-20 DariusIII
+	* Upd: composer.lock with update for forkdaemon-php release 1.0.8
 	* Fix: SQL injection fix in Movie.php @pkostiuk
 2016-06-18 DariusIII
 	* Upd: Update composer.lock
