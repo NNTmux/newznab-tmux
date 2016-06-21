@@ -1160,7 +1160,7 @@ class ReleaseRemover
 				case 'categories_id':
 					switch ($args[1]) {
 						case 'equals':
-							return ' AND categoryID = ' . $args[2];
+							return ' AND categories_id = ' . $args[2];
 						default:
 							break;
 					}
@@ -1169,9 +1169,9 @@ class ReleaseRemover
 					switch ($args[1]) {
 						case 'equals':
 							if ($args[2] === 'NULL') {
-								return ' AND imdbID IS NULL ';
+								return ' AND imdbid IS NULL ';
 							} else {
-								return ' AND imdbID = ' . $args[2];
+								return ' AND imdbid = ' . $args[2];
 							}
 						default:
 							break;
