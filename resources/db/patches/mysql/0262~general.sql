@@ -11,7 +11,7 @@ ALTER TABLE user_movies CHANGE COLUMN userid users_id INT(11) UNSIGNED NOT NULL 
 ALTER TABLE users_releases CHANGE COLUMN userid users_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to users.id';
 
 # Change user_excluded_cat.userid to user_excluded_cat.users_id to follow lithium convention.
-ALTER TABLE user_excluded_cat CHANGE COLUMN userid users_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to users.id';
+ALTER TABLE user_excluded_categories CHANGE COLUMN userid users_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to users.id';
 
 # Change user_downloads.userid to user_downloads.users_id to follow lithium convention.
 ALTER TABLE user_downloads CHANGE COLUMN userid users_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to users.id';
