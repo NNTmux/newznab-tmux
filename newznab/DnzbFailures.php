@@ -119,7 +119,7 @@ class DnzbFailures
 
 		$insert = $this->pdo->queryInsert(
 			sprintf('
-				INSERT IGNORE INTO dnzb_failures (release_id, userid, failed)
+				INSERT IGNORE INTO dnzb_failures (release_id, users_id, failed)
 				VALUES (%d, %d, 1)',
 				$rel['id'],
 				$userid

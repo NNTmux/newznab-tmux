@@ -41,7 +41,7 @@ class UserSeries
 	{
 		return $this->pdo->queryInsert(
 			sprintf(
-				"INSERT INTO user_series (userid, videos_id, categories_id, createddate) VALUES (%d, %d, %s, NOW())",
+				"INSERT INTO user_series (users_id, videos_id, categories_id, createddate) VALUES (%d, %d, %s, NOW())",
 				$uID,
 				$videoId,
 				(!empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : "NULL")
@@ -63,7 +63,7 @@ class UserSeries
 				SELECT us.*, v.title
 				FROM user_series us
 				INNER JOIN videos v ON v.id = us.videos_id
-				WHERE userid = %d
+				WHERE users_id = %d
 				ORDER BY v.title ASC",
 				$uID
 			)
@@ -80,7 +80,7 @@ class UserSeries
 	{
 		$this->pdo->queryExec(
 			sprintf(
-				"DELETE FROM user_series WHERE userid = %d AND videos_id = %d",
+				"DELETE FROM user_series WHERE users_id = %d AND videos_id = %d",
 				$uID,
 				$videoId
 			)
@@ -102,7 +102,7 @@ class UserSeries
 				SELECT us.*, v.title
 				FROM user_series us
 				LEFT OUTER JOIN videos v ON v.id = us.videos_id
-				WHERE us.userid = %d
+				WHERE us.users_id = %d
 				AND us.videos_id = %d",
 				$uID,
 				$videoId
@@ -119,7 +119,7 @@ class UserSeries
 	{
 		$this->pdo->queryExec(
 			sprintf(
-				"DELETE FROM user_series WHERE userid = %d",
+				"DELETE FROM user_series WHERE users_id = %d",
 				$uID
 			)
 		);
@@ -151,7 +151,7 @@ class UserSeries
 	{
 		$this->pdo->queryExec(
 			sprintf(
-				"UPDATE user_series SET categories_id = %s WHERE userid = %d AND videos_id = %d",
+				"UPDATE user_series SET categories_id = %s WHERE users_id = %d AND videos_id = %d",
 				(!empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : "NULL"),
 				$uID,
 				$videoId
