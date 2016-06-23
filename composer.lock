@@ -9,16 +9,16 @@
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
-            "version": "v1.0.8",
+            "version": "v1.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barracudanetworks/forkdaemon-php.git",
-                "reference": "4d97d1c207040a573290026c3b85de3052f056e5"
+                "reference": "06462cffb0181514ce2559615f0e892731919187"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barracudanetworks/forkdaemon-php/zipball/4d97d1c207040a573290026c3b85de3052f056e5",
-                "reference": "4d97d1c207040a573290026c3b85de3052f056e5",
+                "url": "https://api.github.com/repos/barracudanetworks/forkdaemon-php/zipball/06462cffb0181514ce2559615f0e892731919187",
+                "reference": "06462cffb0181514ce2559615f0e892731919187",
                 "shasum": ""
             },
             "require": {
@@ -41,7 +41,7 @@
                 "forking",
                 "php"
             ],
-            "time": "2016-06-15 17:10:16"
+            "time": "2016-06-21 18:44:21"
         },
         {
             "name": "bower-asset/animate.css",
@@ -1021,12 +1021,12 @@
             "version": "v1.1.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/francoispluchino/composer-asset-plugin.git",
+                "url": "https://github.com/fxpio/composer-asset-plugin.git",
                 "reference": "c3d803cc890fad5a7fb61a4036c5d973faae34af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/francoispluchino/composer-asset-plugin/zipball/c3d803cc890fad5a7fb61a4036c5d973faae34af",
+                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/c3d803cc890fad5a7fb61a4036c5d973faae34af",
                 "reference": "c3d803cc890fad5a7fb61a4036c5d973faae34af",
                 "shasum": ""
             },
