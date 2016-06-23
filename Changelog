@@ -1,3 +1,5 @@
+2016-06-23 DariusIII
+	* Fix: Fix gFRN nfo processing typo and update.
 2016-06-21 DariusIII
 	* Upd: Remove old and unused scripts
 	* Fix: Fix stray categoryID in ReleaseRemover
