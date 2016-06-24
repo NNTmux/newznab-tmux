@@ -201,7 +201,7 @@ class ReleaseComments
 			sprintf("
 				SELECT rc.*, r.guid
 				FROM release_comments rc
-				LEFT JOIN releases r on r.gid = rc.gid
+				LEFT JOIN releases r on r.id = rc.releases_id
 				ORDER BY rc.createddate DESC %s",
 				($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start)
 			)
