@@ -42,20 +42,21 @@ class Forking extends \fork_daemon
 			(defined('NN_MULTIPROCESSING_LOG_TYPE') ? NN_MULTIPROCESSING_LOG_TYPE : \fork_daemon::LOG_LEVEL_INFO)
 		);
 
-		$this->max_work_per_child_set(1);
 		if (defined('NN_MULTIPROCESSING_MAX_CHILD_WORK')) {
 			$this->max_work_per_child_set(NN_MULTIPROCESSING_MAX_CHILD_WORK);
+		} else {
+			$this->max_work_per_child_set(1);
 		}
 
-		$this->child_max_run_time_set(1800);
 		if (defined('NN_MULTIPROCESSING_MAX_CHILD_TIME')) {
 			$this->child_max_run_time_set(NN_MULTIPROCESSING_MAX_CHILD_TIME);
+		} else {
+			$this->child_max_run_time_set(1800);
 		}
 
 		// Use a single exit method for all children, makes things easier.
 		$this->register_parent_child_exit([0 => $this, 1 => 'childExit']);
 
-		$this->outputType = self::OUTPUT_REALTIME;
 		if (defined('NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE')) {
 			switch (NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE) {
 				case 0:
@@ -70,6 +71,8 @@ class Forking extends \fork_daemon
 				default:
 					$this->outputType = self::OUTPUT_REALTIME;
 			}
+		} else {
+			$this->outputType = self::OUTPUT_REALTIME;
 		}
 
 		$this->dnr_path = PHP_BINARY . ' ' . NN_MULTIPROCESSING . '.do_not_run' . DS . 'switch.php "php  ';

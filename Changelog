@@ -1,3 +1,5 @@
+2016-06-24 DariusIII
+	* Upd: Move settings for forking child processes inside if else loop
 2016-06-23 DariusIII
 	* Chg: Rename userid to users_id to follow lithium naming convention.
 	* Upd: Update composer.lock with new version of barracudanetworks/forkdaemon-php
