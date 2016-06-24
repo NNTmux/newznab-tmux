@@ -202,15 +202,13 @@
 				</div>
 			</div>
 			<!-- footer content -->
-			<div class="well well-sm">
-				<footer>
-					<div class="copyright-info">
-						<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
-								href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is open source, released under the GPL license
-					</div>
-					<div class="clearfix"></div>
-				</footer>
-			</div>
+			<footer>
+				<div class="copyright-info">
+					<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
+							href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is open source, released under the GPL license
+				</div>
+				<div class="clearfix"></div>
+			</footer>
 			<!-- /footer content -->
 
 		</div>
