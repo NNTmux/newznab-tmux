@@ -12,7 +12,7 @@ if (isset($_REQUEST['groupname']) && !empty($_REQUEST['groupname'])) {
 	$gname = $_REQUEST['groupname'];
 }
 
-$groupcount = $groups->getCountActive($gname);
+$groupcount = $groups->getCount($gname, 1);
 
 $offset = isset($_REQUEST["offset"]) ? $_REQUEST["offset"] : 0;
 $groupname = (isset($_REQUEST['groupname']) && !empty($_REQUEST['groupname'])) ? $_REQUEST['groupname'] : '';
@@ -27,7 +27,7 @@ $page->smarty->assign('pagerquerybase', WWW_TOP."/group-list-active.php?".$group
 $pager = $page->smarty->fetch("pager.tpl");
 $page->smarty->assign('pager', $pager);
 
-$grouplist = $groups->getRangeActive($offset, ITEMS_PER_PAGE, $gname);
+$grouplist = $groups->getRange($offset, ITEMS_PER_PAGE, $gname, 1);
 
 $page->smarty->assign('grouplist',$grouplist);
 

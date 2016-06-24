@@ -7,7 +7,7 @@ use newznab\Groups;
 
 $groups = new Groups(['Settings' => $page->settings]);
 
-$grouplist = $groups->getAll();
+$grouplist = $groups->getRange();
 $page->smarty->assign('results', $grouplist);
 
 $page->meta_title = "Browse Groups";
