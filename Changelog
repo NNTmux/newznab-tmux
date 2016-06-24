@@ -1,4 +1,5 @@
 2016-06-24 DariusIII
+	* Fix: Fix styling of some pages in Gentele theme
 	* Chg: Consolidate groups handling by @ruhllatio
 	* Upd: Join release_comments on releases_id not gid
 	* Upd: Add forum link to all the themes, fix forum and forumpost pages
