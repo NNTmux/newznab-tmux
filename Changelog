@@ -1,4 +1,5 @@
 2016-06-24 DariusIII
+	* Upd: Add forum link to all the themes, fix forum and forumpost pages
 	* Upd: Move settings for forking child processes inside if else loop
 2016-06-23 DariusIII
 	* Chg: Make gfRN predbft deterministic to prevent useless threads
