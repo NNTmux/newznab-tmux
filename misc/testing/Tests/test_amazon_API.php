@@ -4,7 +4,7 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\Operations\Search;
 use ApaiIO\ApaiIO;
-use newznab\db\Settings;
+use nntmux\db\Settings;
 
 $s = new Settings();
 

@@ -1,10 +1,10 @@
 <?php
 
-use newznab\Users;
-use newznab\Contents;
-use newznab\Forum;
-use newznab\Menu;
-use newznab\Category;
+use nntmux\Users;
+use nntmux\Contents;
+use nntmux\Forum;
+use nntmux\Menu;
+use nntmux\Category;
 
 /**
  * This class represents every normal user page in the site.

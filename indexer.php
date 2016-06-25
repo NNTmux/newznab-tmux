@@ -23,8 +23,8 @@ require_once 'autoloader.php';
 //require_once 'libs/autoloader.php';
 //require_once 'vendor/autoload.php';
 
-use newznab\config\Configure;
-use newznab\utility\Utility;
+use nntmux\config\Configure;
+use nntmux\utility\Utility;
 
 $config = new Configure('indexer');
 

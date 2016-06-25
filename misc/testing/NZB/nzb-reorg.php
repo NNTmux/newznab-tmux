@@ -1,9 +1,9 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\ConsoleTools;
-use newznab\NZB;
-use newznab\db\Settings;
+use nntmux\ConsoleTools;
+use nntmux\NZB;
+use nntmux\db\Settings;
 
 if (!isset($argv[1]) || !isset($argv[2])) {
 	exit("ERROR: You must supply the level you want to reorganize it to, and the source directory  (You would use: 3 .../newznab/resources/nzb/ to move it to 3 levels deep)\n");

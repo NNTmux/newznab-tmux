@@ -14,10 +14,10 @@ test.php
 /.idea/
 /app/libraries/*
 /app/resources/tmp/*
-/newznab/config/settings.php
-/newznab/config/ircscraper_settings.php
-/newznab/config/ircscraper.php
-/newznab/config/opensssl.php
+/nntmux/config/settings.php
+/nntmux/config/ircscraper_settings.php
+/nntmux/config/ircscraper.php
+/nntmux/config/opensssl.php
 
 /libraries/*
 /nbproject/

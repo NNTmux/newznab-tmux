@@ -3,8 +3,8 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 
 // Test if your giantbomb key is working.
 
-use newznab\ColorCLI;
-use newznab\db\Settings;
+use nntmux\ColorCLI;
+use nntmux\db\Settings;
 
 $giantbombkey = (new Settings())->getSetting('giantbombkey');
 $cli = new ColorCLI();

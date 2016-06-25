@@ -2,8 +2,8 @@
 //This script will update all records in the movieinfo table
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\processing\tv\TraktTv;
+use nntmux\db\Settings;
+use nntmux\processing\tv\TraktTv;
 
 $pdo = new Settings();
 $trakt = new TraktTv(['Settings' => $pdo]);

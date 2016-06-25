@@ -2,7 +2,7 @@
 
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\processing\tv\TVMaze;
+use nntmux\processing\tv\TVMaze;
 
 $c = new newznab\ColorCLI();
 $tvmaze = new TVMaze();

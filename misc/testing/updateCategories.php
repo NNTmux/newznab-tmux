@@ -2,8 +2,8 @@
 //This script will rerun all releases against Category.php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\Categorize;
+use nntmux\db\Settings;
+use nntmux\Categorize;
 
 $db = new Settings();
 $category = new Categorize();

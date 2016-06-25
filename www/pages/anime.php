@@ -1,8 +1,8 @@
 <?php
 
-use newznab\AniDB;
-use newznab\Releases;
-use newznab\Category;
+use nntmux\AniDB;
+use nntmux\Releases;
+use nntmux\Category;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

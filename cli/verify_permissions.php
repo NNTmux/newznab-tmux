@@ -1,6 +1,6 @@
 <?php
-use newznab\ReleaseImage;
-use newznab\utility\Utility;
+use nntmux\ReleaseImage;
+use nntmux\utility\Utility;
 
 if (!isset($argv[1]) || $argv[1] !== 'yes') {
 	exit(

@@ -1,9 +1,9 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\ConsoleTools;
-use newznab\NameFixer;
-use newznab\db\Settings;
+use nntmux\ConsoleTools;
+use nntmux\NameFixer;
+use nntmux\db\Settings;
 
 $pdo = new Settings();
 

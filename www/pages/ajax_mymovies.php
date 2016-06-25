@@ -1,9 +1,9 @@
 <?php
 
-use newznab\Category;
+use nntmux\Category;
 use libs\Tmdb\TmdbAPI;
-use newznab\UserMovies;
-use newznab\Movie;
+use nntmux\UserMovies;
+use nntmux\Movie;
 
 
 if (!$page->users->isLoggedIn()) {

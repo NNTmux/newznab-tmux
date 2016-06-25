@@ -27,7 +27,7 @@ if (!isset($argv[1]) || !in_array($argv[1], ['1'])) {
 }
 require_once dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php';
 
-use newznab\db\Settings;
+use nntmux\db\Settings;
 
 $pdo = new Settings();
 

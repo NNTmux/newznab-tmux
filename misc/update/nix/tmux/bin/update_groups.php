@@ -1,9 +1,9 @@
 <?php
 require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\ConsoleTools;
-use newznab\NNTP;
+use nntmux\db\Settings;
+use nntmux\ConsoleTools;
+use nntmux\NNTP;
 
 
 $start = time();

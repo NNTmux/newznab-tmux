@@ -1,9 +1,9 @@
 <?php
 
-use newznab\Category;
-use newznab\http\RSS;
-use newznab\db\Settings;
-use newznab\utility\Utility;
+use nntmux\Category;
+use nntmux\http\RSS;
+use nntmux\db\Settings;
+use nntmux\utility\Utility;
 
 $category = new Category(['Settings' => $page->settings]);
 $rss = new RSS(['Settings' => $page->settings]);

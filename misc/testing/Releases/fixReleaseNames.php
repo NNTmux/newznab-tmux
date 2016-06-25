@@ -9,10 +9,10 @@
 
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\NameFixer;
-use newznab\NNTP;
-use newznab\PreDb;
-use newznab\db\Settings;
+use nntmux\NameFixer;
+use nntmux\NNTP;
+use nntmux\PreDb;
+use nntmux\db\Settings;
 
 $n = "\n";
 $pdo = new Settings();

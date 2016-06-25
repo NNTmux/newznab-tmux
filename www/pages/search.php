@@ -1,9 +1,9 @@
 <?php
 
-use newznab\Groups;
-use newznab\Releases;
-use newznab\ReleaseSearch;
-use newznab\Category;
+use nntmux\Groups;
+use nntmux\Releases;
+use nntmux\ReleaseSearch;
+use nntmux\Category;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

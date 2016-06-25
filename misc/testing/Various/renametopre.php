@@ -2,14 +2,14 @@
 // TODO: bunch of if/elses need converting to switches
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\Categorize;
-use newznab\ColorCLI;
-use newznab\ConsoleTools;
-use newznab\Groups;
-use newznab\NameFixer;
-use newznab\ReleaseCleaning;
-use newznab\ReleaseFiles;
-use newznab\db\Settings;
+use nntmux\Categorize;
+use nntmux\ColorCLI;
+use nntmux\ConsoleTools;
+use nntmux\Groups;
+use nntmux\NameFixer;
+use nntmux\ReleaseCleaning;
+use nntmux\ReleaseFiles;
+use nntmux\db\Settings;
 
 /*
  *

@@ -1,6 +1,6 @@
 <?php
 
-use newznab\NZBGet;
+use nntmux\NZBGet;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

@@ -2,11 +2,11 @@
 require_once './config.php';
 
 
-use newznab\Releases;
-use newznab\NZBExport;
+use nntmux\Releases;
+use nntmux\NZBExport;
 
 
-if (\newznab\utility\Utility::isCLI()) {
+if (\nntmux\utility\Utility::isCLI()) {
 	exit ('This script is only for exporting from the web, use the script in misc/testing' .
 		PHP_EOL);
 }

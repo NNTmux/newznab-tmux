@@ -24,8 +24,8 @@
 */
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\PreDb;
-use newznab\utility\Utility;
+use nntmux\db\PreDb;
+use nntmux\utility\Utility;
 
 if (!Utility::isWin()) {
 	if (NN_DEBUG) {

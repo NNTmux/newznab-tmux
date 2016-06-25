@@ -1,8 +1,8 @@
 <?php
 
-use newznab\XXX;
-use newznab\Category;
-use newznab\DnzbFailures;
+use nntmux\XXX;
+use nntmux\Category;
+use nntmux\DnzbFailures;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

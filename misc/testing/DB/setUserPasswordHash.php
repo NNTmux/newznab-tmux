@@ -8,8 +8,8 @@
  */
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\Users;
+use nntmux\db\Settings;
+use nntmux\Users;
 
 $pdo = new Settings();
 

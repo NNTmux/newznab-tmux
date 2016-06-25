@@ -74,7 +74,7 @@ use lithium\data\Connections;
 // ));
 
 $config1 = LITHIUM_APP_PATH . DS . 'config' . DS . 'db-config.php';
-$config2 = NN_ROOT . 'newznab' . DS . 'config' . DS . 'config.php';
+$config2 = NN_ROOT . 'nntmux' . DS . 'config' . DS . 'config.php';
 $config = file_exists($config1) ? $config1 : $config2;
 
 if (file_exists($config)) {

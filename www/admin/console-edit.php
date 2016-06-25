@@ -3,8 +3,8 @@
 require_once './config.php';
 
 
-use newznab\Console;
-use newznab\Genres;
+use nntmux\Console;
+use nntmux\Genres;
 
 $page = new AdminPage();
 $console = new Console(['Settings' => $page->settings]);

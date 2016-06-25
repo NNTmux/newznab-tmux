@@ -1,10 +1,10 @@
 <?php
 
-use newznab\utility\Utility;
-use newznab\Category;
-use newznab\SABnzbd;
-use newznab\NZBGet;
-use newznab\Users;
+use nntmux\utility\Utility;
+use nntmux\Category;
+use nntmux\SABnzbd;
+use nntmux\NZBGet;
+use nntmux\Users;
 
 $category = new Category;
 $sab = new SABnzbd($page);

@@ -2,14 +2,14 @@
 
 require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
 
-use newznab\db\Settings;
-use newznab\Users;
-use newznab\SABnzbd;
+use nntmux\db\Settings;
+use nntmux\Users;
+use nntmux\SABnzbd;
 
 class BasePage
 {
 	/**
-	 * @var \newznab\db\Settings
+	 * @var \nntmux\db\Settings
 	 */
 	public $settings = null;
 
@@ -69,7 +69,7 @@ class BasePage
 	/**
 	 * Public access to Captcha object for error checking.
 	 *
-	 * @var \newznab\Captcha
+	 * @var \nntmux\Captcha
 	 */
 	public $captcha;
 

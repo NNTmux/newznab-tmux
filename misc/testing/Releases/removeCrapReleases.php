@@ -2,8 +2,8 @@
 /* This script deletes releases that match certain criteria, type php removeCrapReleases.php false for details. */
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\ColorCLI;
-use newznab\ReleaseRemover;
+use nntmux\ColorCLI;
+use nntmux\ReleaseRemover;
 
 $cli = new ColorCLI();
 

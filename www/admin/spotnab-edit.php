@@ -3,7 +3,7 @@
 require_once './config.php';
 
 
-use newznab\SpotNab;
+use nntmux\SpotNab;
 
 $page = new AdminPage();
 $spotnab = new SpotNab();

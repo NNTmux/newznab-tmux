@@ -4,13 +4,13 @@
 // --------------------------------------------------------------
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\utility\Utility;
-use newznab\Releases;
-use newznab\NZB;
-use newznab\ReleaseImage;
-use newznab\ConsoleTools;
-use newznab\Movie;
+use nntmux\db\Settings;
+use nntmux\utility\Utility;
+use nntmux\Releases;
+use nntmux\NZB;
+use nntmux\ReleaseImage;
+use nntmux\ConsoleTools;
+use nntmux\Movie;
 
 $pdo = new Settings();
 $movie = new Movie(['Echo' => true, 'Settings' => $pdo]);

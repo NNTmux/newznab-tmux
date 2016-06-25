@@ -1,10 +1,10 @@
 <?php
 
-use newznab\Category;
-use newznab\Releases;
-use newznab\http\API;
-use newznab\db\Settings;
-use newznab\utility\Utility;
+use nntmux\Category;
+use nntmux\Releases;
+use nntmux\http\API;
+use nntmux\db\Settings;
+use nntmux\utility\Utility;
 
 // API functions.
 $function = 's';

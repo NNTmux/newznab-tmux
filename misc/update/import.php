@@ -2,14 +2,14 @@
 
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\utility\Utility;
-use newznab\Releases;
-use newznab\ReleaseImage;
-use newznab\Categorize;
-use newznab\NZB;
-use newznab\ReleaseRegex;
-use newznab\NZBInfo;
+use nntmux\db\Settings;
+use nntmux\utility\Utility;
+use nntmux\Releases;
+use nntmux\ReleaseImage;
+use nntmux\Categorize;
+use nntmux\NZB;
+use nntmux\ReleaseRegex;
+use nntmux\NZBInfo;
 
 $releases = new Releases();
 $releaseImage = new ReleaseImage();

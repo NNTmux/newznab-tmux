@@ -6,16 +6,16 @@ if (!isset($argv[1])) {
 
 require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use \newznab\db\Settings;
-use \newznab\processing\PostProcess;
-use \newznab\processing\ProcessReleases;
-use \newznab\processing\post\ProcessAdditional;
-use newznab\Backfill;
-use newznab\Binaries;
-use newznab\Groups;
-use newznab\Nfo;
-use newznab\NNTP;
-use newznab\RequestIDLocal;
+use \nntmux\db\Settings;
+use \nntmux\processing\PostProcess;
+use \nntmux\processing\ProcessReleases;
+use \nntmux\processing\post\ProcessAdditional;
+use nntmux\Backfill;
+use nntmux\Binaries;
+use nntmux\Groups;
+use nntmux\Nfo;
+use nntmux\NNTP;
+use nntmux\RequestIDLocal;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
 // The type of process we want to do: $options[1] => (string): releases
@@ -313,7 +313,7 @@ function charCheck($char)
 /**
  * Check if the group should be processed.
  *
- * @param \newznab\db\Settings $pdo
+ * @param \nntmux\db\Settings $pdo
  * @param int                $groupID
  */
 function collectionCheck(&$pdo, $groupID)
@@ -326,7 +326,7 @@ function collectionCheck(&$pdo, $groupID)
 /**
  * Connect to usenet, return NNTP object.
  *
- * @param \newznab\db\Settings $pdo
+ * @param \nntmux\db\Settings $pdo
  * @param bool               $alternate Use alternate NNTP provider.
  *
  * @return NNTP

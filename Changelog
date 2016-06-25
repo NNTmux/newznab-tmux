@@ -1,4 +1,6 @@
 2016-06-25 DariusIII
+	* Upd: Update composer.lock
+	* Chg: Switch namespace from newznab to nntmux, rename nntmux script to tmux
 	* Upd: Update lithium connections
 	* Upd: Composer will prefer source now on install
 2016-06-24 DariusIII

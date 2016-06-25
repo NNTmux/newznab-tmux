@@ -6,5 +6,5 @@ if (!isset($argv[1]) || !is_numeric($argv[1])) {
 }
 declare(ticks=1);
 require('.do_not_run/require.php');
-use newznab\libraries\Forking;
+use nntmux\libraries\Forking;
 (new Forking())->processWorkType('binaries', array(0 => $argv[1]));

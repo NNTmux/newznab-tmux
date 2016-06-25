@@ -1,11 +1,11 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\Category;
-use newznab\ConsoleTools;
-use newznab\NNTP;
-use newznab\db\Settings;
-use newznab\processing\ProcessReleases;
+use nntmux\Category;
+use nntmux\ConsoleTools;
+use nntmux\NNTP;
+use nntmux\db\Settings;
+use nntmux\processing\ProcessReleases;
 
 $category = new Category();
 $pdo = new Settings();

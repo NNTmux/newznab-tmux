@@ -3,8 +3,8 @@
 
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\Games;
+use nntmux\db\Settings;
+use nntmux\Games;
 
 
 $pdo = new Settings();

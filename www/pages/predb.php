@@ -1,6 +1,6 @@
 <?php
 
-use newznab\PreDb;
+use nntmux\PreDb;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

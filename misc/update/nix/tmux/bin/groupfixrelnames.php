@@ -1,15 +1,15 @@
 <?php
 require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\Category;
-use newznab\MiscSorter;
-use newznab\NameFixer;
-use newznab\Nfo;
-use newznab\NNTP;
-use newznab\NZB;
-use newznab\NZBContents;
-use newznab\db\Settings;
-use newznab\processing\PostProcess;
+use nntmux\Category;
+use nntmux\MiscSorter;
+use nntmux\NameFixer;
+use nntmux\Nfo;
+use nntmux\NNTP;
+use nntmux\NZB;
+use nntmux\NZBContents;
+use nntmux\db\Settings;
+use nntmux\processing\PostProcess;
 
 $pdo = new Settings();
 

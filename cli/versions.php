@@ -20,8 +20,8 @@
  */
 require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\utility\Utility;
-use newznab\utility\Versions;
+use nntmux\utility\Utility;
+use nntmux\utility\Versions;
 
 if (!Utility::isCLI()) {
 	exit;

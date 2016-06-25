@@ -1,11 +1,11 @@
 <?php
 require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\Category;
-use newznab\TmuxOutput;
-use newznab\TmuxRun;
-use newznab\db\Settings;
-use newznab\utility\Utility;
+use nntmux\Category;
+use nntmux\TmuxOutput;
+use nntmux\TmuxRun;
+use nntmux\db\Settings;
+use nntmux\utility\Utility;
 
 $pdo = new Settings();
 $tRun = new TmuxRun($pdo);

@@ -1,9 +1,9 @@
 <?php
 
-use newznab\Music;
-use newznab\Category;
-use newznab\Genres;
-use newznab\DnzbFailures;
+use nntmux\Music;
+use nntmux\Category;
+use nntmux\Genres;
+use nntmux\DnzbFailures;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

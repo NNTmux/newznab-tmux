@@ -1,7 +1,7 @@
 <?php
 require_once 'smarty.php';
 
-use newznab\db\Settings;
+use nntmux\db\Settings;
 
 $page = new Page;
 

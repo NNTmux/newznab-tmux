@@ -3,8 +3,8 @@
 require_once './config.php';
 
 
-use newznab\Books;
-use newznab\Genres;
+use nntmux\Books;
+use nntmux\Genres;
 
 $page = new AdminPage();
 $book = new Books();

@@ -16,6 +16,6 @@ if (!isset($argv[1]) || !in_array($argv[1], ['ama', 'add', 'mov', 'nfo', 'sha', 
 declare(ticks=1);
 require('.do_not_run/require.php');
 
-use newznab\libraries\Forking;
+use nntmux\libraries\Forking;
 
 (new Forking())->processWorkType('postProcess_' . $argv[1], (isset($argv[2]) && $argv[2] === 'true' ? [0 => true] : []));

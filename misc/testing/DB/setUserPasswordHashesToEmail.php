@@ -17,9 +17,9 @@
  */
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\ColorCLI;
-use newznab\Users;
+use nntmux\db\Settings;
+use nntmux\ColorCLI;
+use nntmux\Users;
 
 $colorCLI = new ColorCLI();
 

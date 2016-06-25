@@ -1,11 +1,11 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\ReleaseSearch;
-use newznab\db\DB;
+use nntmux\ReleaseSearch;
+use nntmux\db\DB;
 
 if (NN_RELEASE_SEARCH_TYPE != ReleaseSearch::SPHINX) {
-	exit('Error, NN_RELEASE_SEARCH_TYPE in newznab/config/settings.php must be set to SPHINX!' . PHP_EOL);
+	exit('Error, NN_RELEASE_SEARCH_TYPE in nntmux/config/settings.php must be set to SPHINX!' . PHP_EOL);
 }
 
 $sphinxConnection = '';

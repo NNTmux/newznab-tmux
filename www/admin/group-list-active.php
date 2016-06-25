@@ -2,7 +2,7 @@
 require_once './config.php';
 
 
-use newznab\Groups;
+use nntmux\Groups;
 
 $page = new AdminPage();
 $groups = new Groups(['Settings' => $page->settings]);

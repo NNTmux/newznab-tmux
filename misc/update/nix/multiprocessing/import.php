@@ -2,7 +2,7 @@
 declare(ticks=1);
 require('.do_not_run/require.php');
 
-use newznab\libraries\ForkingImportNZB;
+use nntmux\libraries\ForkingImportNZB;
 
 if (!isset($argv[1]) || !is_dir($argv[1])) {
 	exit(

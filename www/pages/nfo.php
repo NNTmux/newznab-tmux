@@ -1,7 +1,7 @@
 <?php
 
-use newznab\utility\Utility;
-use newznab\Releases;
+use nntmux\utility\Utility;
+use nntmux\Releases;
 
 $releases = new Releases;
 

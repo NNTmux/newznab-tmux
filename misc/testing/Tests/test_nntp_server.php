@@ -2,9 +2,9 @@
 // To troubleshoot what's actually on usenet.
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\Binaries;
-use newznab\ColorCLI;
-use newznab\NNTP;
+use nntmux\Binaries;
+use nntmux\ColorCLI;
+use nntmux\NNTP;
 
 $cli = new ColorCLI();
 

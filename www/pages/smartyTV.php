@@ -18,9 +18,9 @@
  * @author    niel
  * @copyright 2015 nZEDb
  */
-require_once '../../newznab/processing/tv/TV.php';
+require_once '../../nntmux/processing/tv/TV.php';
 
-use newznab\processing\tv\TV;
+use nntmux\processing\tv\TV;
 
 class smartyTV extends TV
 {

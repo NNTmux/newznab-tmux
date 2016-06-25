@@ -1,6 +1,6 @@
 <?php
-use newznab\AdminPage;
-use newznab\Users;
+use nntmux\AdminPage;
+use nntmux\Users;
 
 $page = new AdminPage();
 $u = new Users();

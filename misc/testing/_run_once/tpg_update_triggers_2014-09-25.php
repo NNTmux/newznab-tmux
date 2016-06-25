@@ -20,7 +20,7 @@
  */
 require_once dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php';
 
-use newznab\db\Settings;
+use nntmux\db\Settings;
 
 $pdo = new Settings();
 

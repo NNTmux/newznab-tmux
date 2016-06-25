@@ -2,7 +2,7 @@
 require_once './config.php';
 require_once NN_WWW . 'pages/smartyTV.php';
 
-use newznab\Videos;
+use nntmux\Videos;
 
 $page   = new AdminPage();
 $tv = new smartyTV(['Settings' => $page->settings]);

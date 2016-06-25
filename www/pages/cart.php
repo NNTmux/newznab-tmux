@@ -4,7 +4,7 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-use newznab\Releases;
+use nntmux\Releases;
 
 if (isset($_GET["add"])) {
 	$releases = new Releases(['Settings' => $page->settings]);

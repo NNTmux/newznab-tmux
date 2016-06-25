@@ -2,7 +2,7 @@
 require_once './config.php';
 
 
-use newznab\Forum;
+use nntmux\Forum;
 
 $page = new AdminPage();
 

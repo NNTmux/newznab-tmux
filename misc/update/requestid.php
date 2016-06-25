@@ -1,9 +1,9 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\ColorCLI;
-use newznab\RequestIDLocal;
-use newznab\RequestIDWeb;
+use nntmux\ColorCLI;
+use nntmux\RequestIDLocal;
+use nntmux\RequestIDWeb;
 
 $cli = new ColorCLI();
 

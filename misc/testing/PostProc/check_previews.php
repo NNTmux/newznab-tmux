@@ -4,12 +4,12 @@
 // --------------------------------------------------------------
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\utility\Utility;
-use newznab\Releases;
-use newznab\NZB;
-use newznab\ReleaseImage;
-use newznab\ConsoleTools;
+use nntmux\db\Settings;
+use nntmux\utility\Utility;
+use nntmux\Releases;
+use nntmux\NZB;
+use nntmux\ReleaseImage;
+use nntmux\ConsoleTools;
 
 $pdo = new Settings();
 

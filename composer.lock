@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "65867ff98b70d729e240bfeab1cd52c3",
+    "hash": "76832dcbf70cc9f08ca16c7ccef0d624",
     "content-hash": "722189a7778ff9d599d98f0a64502efe",
     "packages": [
         {
@@ -1420,12 +1420,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "aa9b5e8bdb39ddacc2b9cd5b05c8564e80eca21f"
+                "reference": "ab51c2ba498d22d2d4ca261018c046d716902419"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/aa9b5e8bdb39ddacc2b9cd5b05c8564e80eca21f",
-                "reference": "aa9b5e8bdb39ddacc2b9cd5b05c8564e80eca21f",
+                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/ab51c2ba498d22d2d4ca261018c046d716902419",
+                "reference": "ab51c2ba498d22d2d4ca261018c046d716902419",
                 "shasum": ""
             },
             "require": {
@@ -1458,7 +1458,7 @@
                 "li3",
                 "lithium"
             ],
-            "time": "2016-06-17 19:00:57"
+            "time": "2016-06-25 10:09:25"
         }
     ],
     "packages-dev": [

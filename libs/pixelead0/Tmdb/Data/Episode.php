@@ -147,7 +147,7 @@ class Episode{
      *  Reload the content of this class.<br>
      *  Could be used to update or complete the information.
      *
-     *  @param \newznab\libraries\TmdbAPI $tmdb An instance of the API handler, necesary to make the API call.
+     *  @param \nntmux\libraries\TmdbAPI $tmdb An instance of the API handler, necesary to make the API call.
      */
     public function reload($tmdb) {
         $tmdb->getEpisode($this->getTVShowID(), $this->getSeasonNumber(), $this->getEpisodeNumber());

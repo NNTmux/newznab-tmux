@@ -3,7 +3,7 @@
 require_once './config.php';
 
 
-use newznab\Movie;
+use nntmux\Movie;
 
 $page  = new AdminPage();
 $movie = new Movie(['Settings' => $page->settings]);

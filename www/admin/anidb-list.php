@@ -3,7 +3,7 @@
 require_once './config.php';
 
 
-use newznab\AniDB;
+use nntmux\AniDB;
 
 
 $page = new AdminPage();

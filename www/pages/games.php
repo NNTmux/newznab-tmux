@@ -1,9 +1,9 @@
 <?php
 
-use newznab\Games;
-use newznab\Category;
-use newznab\Genres;
-use newznab\DnzbFailures;
+use nntmux\Games;
+use nntmux\Category;
+use nntmux\Genres;
+use nntmux\DnzbFailures;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

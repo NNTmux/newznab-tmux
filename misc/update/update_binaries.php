@@ -1,10 +1,10 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\NNTP;
-use newznab\Binaries;
-use newznab\Groups;
+use nntmux\db\Settings;
+use nntmux\NNTP;
+use nntmux\Binaries;
+use nntmux\Groups;
 
 $pdo = new Settings();
 

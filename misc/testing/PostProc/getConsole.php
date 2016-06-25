@@ -3,9 +3,9 @@
 
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\Category;
-use newznab\db\Settings;
-use newznab\Console;
+use nntmux\Category;
+use nntmux\db\Settings;
+use nntmux\Console;
 
 
 

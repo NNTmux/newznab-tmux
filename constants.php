@@ -14,7 +14,7 @@ if (!defined('NN_ROOT')) {
 }
 
 // Used to refer to the main lib class files.
-define('NN_LIB', NN_ROOT . 'newznab' . DS);
+define('NN_LIB', NN_ROOT . 'nntmux' . DS);
 define('NN_CORE', NN_LIB);
 
 define('NN_CONFIGS', NN_CORE . 'config' . DS);

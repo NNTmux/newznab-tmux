@@ -1,7 +1,7 @@
 <?php
 
-use newznab\Releases;
-use newznab\Videos;
+use nntmux\Releases;
+use nntmux\Videos;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

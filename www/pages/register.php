@@ -1,8 +1,8 @@
 <?php
 
-use newznab\db\Settings;
-use newznab\Captcha;
-use newznab\Users;
+use nntmux\db\Settings;
+use nntmux\Captcha;
+use nntmux\Users;
 
 
 if ($page->users->isLoggedIn()) {

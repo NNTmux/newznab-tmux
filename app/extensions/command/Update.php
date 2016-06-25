@@ -23,7 +23,7 @@ use \Smarty;
 use \app\extensions\util\Git;
 use \app\extensions\util\Versions;
 use \lithium\console\command\Help;
-use \newznab\db\DbUpdate;
+use \nntmux\db\DbUpdate;
 
 
 /**

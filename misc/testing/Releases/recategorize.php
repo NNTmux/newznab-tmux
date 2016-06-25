@@ -1,11 +1,11 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\Categorize;
-use newznab\Category;
-use newznab\ColorCLI;
-use newznab\ConsoleTools;
-use newznab\db\Settings;
+use nntmux\Categorize;
+use nntmux\Category;
+use nntmux\ColorCLI;
+use nntmux\ConsoleTools;
+use nntmux\db\Settings;
 
 $pdo = new Settings();
 

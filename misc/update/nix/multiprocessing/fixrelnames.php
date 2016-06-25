@@ -9,7 +9,7 @@ if (!isset($argv[1]) || !in_array($argv[1], ['standard', 'predbft'])) {
 
 require('.do_not_run/require.php');
 
-use newznab\libraries\Forking;
+use nntmux\libraries\Forking;
 
 declare(ticks = 1);
 

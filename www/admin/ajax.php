@@ -1,10 +1,10 @@
 <?php
 
-use newznab\Binaries;
-use newznab\Regexes;
-use newznab\Groups;
-use newznab\Sharing;
-use newznab\ReleaseComments;
+use nntmux\Binaries;
+use nntmux\Regexes;
+use nntmux\Groups;
+use nntmux\Sharing;
+use nntmux\ReleaseComments;
 
 // This script waits for ajax queries from the web.
 

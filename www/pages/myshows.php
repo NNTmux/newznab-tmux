@@ -1,9 +1,9 @@
 <?php
 
-use newznab\Category;
-use newznab\Releases;
-use newznab\UserSeries;
-use newznab\Videos;
+use nntmux\Category;
+use nntmux\Releases;
+use nntmux\UserSeries;
+use nntmux\Videos;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

@@ -8,8 +8,8 @@ Author: lordgnu <lordgnu@me.com>
 
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\NZB;
+use nntmux\db\Settings;
+use nntmux\NZB;
 
 $pdo = new Settings;
 $nzb = new NZB;

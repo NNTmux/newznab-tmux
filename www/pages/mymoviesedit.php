@@ -1,7 +1,7 @@
 <?php
 
-use newznab\UserMovies;
-use newznab\Category;
+use nntmux\UserMovies;
+use nntmux\Category;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

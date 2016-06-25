@@ -1,6 +1,6 @@
 <?php
 
-use newznab\XXX;
+use nntmux\XXX;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

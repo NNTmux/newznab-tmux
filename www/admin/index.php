@@ -2,7 +2,7 @@
 
 require_once './config.php';
 
-use newznab\db\Settings;
+use nntmux\db\Settings;
 
 $page = new AdminPage();
 

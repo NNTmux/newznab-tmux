@@ -3,7 +3,7 @@
 if (!$page->users->isLoggedIn())
 	$page->show403();
 
-use newznab\Console;
+use nntmux\Console;
 
 if (isset($_GET["id"]) && ctype_digit($_GET["id"]))
 {

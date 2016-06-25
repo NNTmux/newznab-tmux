@@ -1,7 +1,7 @@
 <?php
 
-use newznab\Releases;
-use newznab\Category;
+use nntmux\Releases;
+use nntmux\Category;
 
 $releases = new Releases(['Settings' => $page->settings]);
 

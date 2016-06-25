@@ -1,8 +1,8 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\utility\Utility;
+use nntmux\db\Settings;
+use nntmux\utility\Utility;
 
 Utility::clearScreen();
 

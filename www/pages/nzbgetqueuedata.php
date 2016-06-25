@@ -1,7 +1,7 @@
 <?php
 
-use newznab\utility\Utility;
-use newznab\NZBGet;
+use nntmux\utility\Utility;
+use nntmux\NZBGet;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

@@ -1,10 +1,10 @@
 <?php
 require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
-use newznab\utility\Utility;
-use newznab\Tmux;
-use newznab\ColorCLI;
+use nntmux\db\Settings;
+use nntmux\utility\Utility;
+use nntmux\Tmux;
+use nntmux\ColorCLI;
 
 $pdo = new Settings();
 $DIR = NN_TMUX;

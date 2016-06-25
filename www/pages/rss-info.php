@@ -1,6 +1,6 @@
 <?php
 
-use newznab\http\RSS;
+use nntmux\http\RSS;
 
 $rss = new RSS(['Settings' => $page->settings]);
 

@@ -22,7 +22,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "newznab\\": "newznab/"
+      "nntmux\\": "nntmux/"
     },
     "classmap": [
       "www/pages/",

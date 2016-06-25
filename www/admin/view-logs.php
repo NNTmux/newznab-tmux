@@ -3,7 +3,7 @@
 require_once './config.php';
 
 
-use newznab\Logger;
+use nntmux\Logger;
 
 $page = new AdminPage();
 $page->title = 'View Logs';

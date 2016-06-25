@@ -2,7 +2,7 @@
 
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\processing\tv\TVDB;
+use nntmux\processing\tv\TVDB;
 
 $c = new newznab\ColorCLI();
 $tvdb = new TVDB();
