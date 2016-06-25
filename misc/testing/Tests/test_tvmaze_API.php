@@ -4,7 +4,7 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 
 use nntmux\processing\tv\TVMaze;
 
-$c = new newznab\ColorCLI();
+$c = new nntmux\ColorCLI();
 $tvmaze = new TVMaze();
 
 if (!empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {

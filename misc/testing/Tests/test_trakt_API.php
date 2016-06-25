@@ -4,7 +4,7 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 
 use nntmux\processing\tv\TraktTv;
 
-$c = new newznab\ColorCLI();
+$c = new nntmux\ColorCLI();
 $trakt = new TraktTv();
 
 if (!empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {

@@ -16,7 +16,7 @@ use nntmux\utility\Utility;
  * is out of date, you will need to update it and change the version number.
  *
  * @note    Developers: When updating settings.example.php, up this version
- *                   and $current_settings_file_version in newznab\config\Configure.php
+ *                   and $current_settings_file_version in nntmux\config\Configure.php
  * @version 4
  */
 define('NN_SETTINGS_FILE_VERSION', 4);

@@ -14,7 +14,7 @@ class BasePage
 	public $settings = null;
 
 	/**
-	 * @var newznab\Users
+	 * @var nntmux\Users
 	 */
 	public $users = null;
 

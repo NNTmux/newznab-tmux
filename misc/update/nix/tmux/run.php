@@ -238,7 +238,7 @@ function window_optimize($tmux_session)
 
 function window_sharing($tmux_session)
 {
-	$pdo = new newznab\db\Settings();
+	$pdo = new nntmux\db\Settings();
 	$sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 	$t = new Tmux();
 	$tmux = $t->get();
