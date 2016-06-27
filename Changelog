@@ -1,4 +1,5 @@
 2016-06-27 DariusIII
+	* Chg: Update Readme.md with updating script name change
 	* Chg: Add DocBlock comments to UserMovies and fix missing return in delMovie function.
 2016-06-25 DariusIII
 	* Upd: Update composer.lock

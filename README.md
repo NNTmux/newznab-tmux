@@ -36,7 +36,7 @@ I started adapting some of more interesting scripts from nZEDb, but they require
   Note: Newznab-tmux uses composer to install required libraries. Now is time to <a href="https://getcomposer.org/doc/00-intro.md#downloading-the-composer-executable" title="Composer web site">install Composer</a>.
   		Use the global method.
   		When you have downloaded and installed composer,
-  		run "./nntmux update nntmux" to install dependencies and create required
+  		run "./tmux update nntmux" to install dependencies and create required
   		folders and autoloader for them, and to update your database.
 
 # yEnc:
