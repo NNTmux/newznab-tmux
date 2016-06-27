@@ -38,7 +38,7 @@ if (isset($_REQUEST['del'])) {
 	if (is_numeric($_REQUEST['id'])) {
 		$movie = $m->fetchTMDBProperties($_REQUEST['id']);
 		if ($movie !== false) {
-			$obj = array($movie);
+			$obj = [$movie];
 		}
 	} else {
 		$searchm = $tmdb->searchMovie($_REQUEST['id']);
