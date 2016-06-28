@@ -148,7 +148,7 @@ Class RSS extends Capabilities
 				$this->releases->uSQL(
 					$this->pdo->query(
 						sprintf('
-							SELECT videos_id, categoryid
+							SELECT videos_id, categories_id
 							FROM user_series
 							WHERE users_id = %d',
 							$userID
