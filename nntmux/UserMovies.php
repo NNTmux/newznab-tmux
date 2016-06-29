@@ -31,16 +31,23 @@ class UserMovies
 	 *
 	 * @param       $uid
 	 * @param       $imdbid
-	 * @param array $catid
+	 * @param array $catID
 	 *
 	 * @return bool|int
 	 */
-	public function addMovie($uid, $imdbid, $catid = [])
+	public function addMovie($uid, $imdbid, $catID = [])
 	{
 
-		$catid = (!empty($catid)) ? $this->pdo->escapeString(implode('|', $catid)) : "null";
 
-		return $this->pdo->queryInsert(sprintf("INSERT INTO user_movies (users_id, imdbid, categories_id, createddate) VALUES (%d, %d, %s, now())", $uid, $imdbid, $catid));
+		return $this->pdo->queryInsert(
+			sprintf(
+				"INSERT INTO user_movies (users_id, imdbid, categories, createddate)
+				VALUES (%d, %d, %s, now())",
+				$uid,
+				$imdbid,
+				(!empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : "NULL")
+			)
+		);
 	}
 
 	/**
@@ -52,7 +59,16 @@ class UserMovies
 	 */
 	public function getMovies($uid)
 	{
-		return $this->pdo->query(sprintf("SELECT user_movies.*, movieinfo.year, movieinfo.plot, movieinfo.cover, movieinfo.title FROM user_movies LEFT OUTER JOIN movieinfo ON movieinfo.imdbid = user_movies.imdbid WHERE users_id = %d ORDER BY movieinfo.title ASC", $uid));
+		return $this->pdo->query(
+			sprintf(
+				"SELECT um.*, mi.year, mi.plot, mi.cover, mi.title
+				FROM user_movies us
+				LEFT OUTER JOIN movieinfo mi ON mi.imdbid = uim.imdbid
+				WHERE users_id = %d
+				ORDER BY mi.title ASC",
+				$uid
+			)
+		);
 	}
 
 	/**
@@ -94,12 +110,20 @@ class UserMovies
 	 *
 	 * @param       $uid
 	 * @param       $imdbid
-	 * @param array $catid
+	 * @param array $catID
 	 */
-	public function updateMovie($uid, $imdbid, $catid = [])
+	public function updateMovie($uid, $imdbid, $catID = [])
 	{
-
-		$catid = (!empty($catid)) ? $this->pdo->escapeString(implode('|', $catid)) : "null";
-		$this->pdo->queryExec(sprintf("UPDATE user_movies SET categories_id = %s WHERE users_id = %d AND imdbid = %d", $catid, $uid, $imdbid));
+		$this->pdo->queryExec(
+			sprintf(
+				"UPDATE user_movies
+				SET categories = %s
+				WHERE users_id = %d
+				AND imdbid = %d",
+				(!empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : "NULL"),
+				$uid,
+				$imdbid
+			)
+		);
 	}
 }

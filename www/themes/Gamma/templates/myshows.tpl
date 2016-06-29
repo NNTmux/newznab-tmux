@@ -18,14 +18,14 @@
 	{foreach $shows as $show}
 		<tr class="{cycle values=",alt"}">
 			<td>
-				<a title="View details" href="{$smarty.const.WWW_TOP}/series/{$show.videos_id}{if $show.categories_id != ''}?t={$show.categories_id|replace:"|":","}{/if}"><h5>{$show.title|escape:"htmlall"|wordwrap:75:"\n":true}</h5></a>
+				<a title="View details" href="{$smarty.const.WWW_TOP}/series/{$show.videos_id}{if $show.categories != ''}?t={$show.categories|replace:"|":","}{/if}"><h5>{$show.title|escape:"htmlall"|wordwrap:75:"\n":true}</h5></a>
 			</td>
 			<td class="less">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</td>
 			<td class="less" style="width:100px;" title="Added on {$show.createddate}">{$show.createddate|date_format}</td>
 			<td class="mid" style="width:100px;">
 				<div class="btn-group">
-					<a class="btn btn-mini btn-warning" href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.videos_id}" class="myshows" rel="edit" name="series{$show.videos_id}" title="Edit Categories">Edit</a>&nbsp;&nbsp;
-					<a class="btn btn-mini btn-danger" href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.videos_id}" class="myshows" rel="remove" name="series{$show.videos_id}" title="Remove from My Shows">Remove</a>
+					<a class="btn btn-mini btn-warning myshows" href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.videos_id}" rel="edit" name="series{$show.videos_id}" title="Edit Categories">Edit</a>&nbsp;&nbsp;
+					<a class="btn btn-mini btn-danger myshows" href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.videos_id}" rel="remove" name="series{$show.videos_id}" title="Remove from My Shows">Remove</a>
 				</div>
 				</td>
 		</tr>

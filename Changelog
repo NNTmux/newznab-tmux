@@ -1,3 +1,5 @@
+2016-06-29 DariusIII
+	* Chg: Change categories_id columns in user_movies and user_series to categories (they host multiple category numbers)
 2016-06-28 DariusIII
 	* Chg: Change remaining categoryid to categories_id and add patch for user_series table
 2016-06-27 DariusIII

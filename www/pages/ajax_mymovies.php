@@ -16,9 +16,7 @@ if (isset($_REQUEST['del'])) {
 	$usermovies = $um->delMovie($page->users->currentUserId(), $_REQUEST['del']);
 } else if (isset($_REQUEST['add'])) {
 	// Derive cats from user preferences.
-	$cats = [];
-	$cats[] = Category::MOVIE_SD;
-	$cats[] = Category::MOVIE_HD;
+	$cats = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
 
 	$m = new Movie(['Settings' => $page->settings]);
 	$mi = $m->getMovieInfo($_REQUEST['add']);
