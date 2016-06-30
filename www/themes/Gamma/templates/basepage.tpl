@@ -79,9 +79,11 @@
 								<ul class="dropdown-menu">
 										<li><a href="{$smarty.const.WWW_TOP}/profile"><i class="icon-user icon-white"></i> Profile</a></li>
 										<li class="divider"></li>
+										<li><a href="{$smarty.const.WWW_TOP}/mymovies"><i class="icon-hdd icon-white"></i> My Movies</a></li>
+										<li><a href="{$smarty.const.WWW_TOP}/myshows"><i class="icon-hdd icon-white"></i> My Shows</a></li>
+										<li class="divider"></li>
 										<li><a href="{$smarty.const.WWW_TOP}/queue"><i class="icon-tasks icon-white"></i> Queue</a></li>
 										<li><a href="{$smarty.const.WWW_TOP}/cart"><i class="icon-shopping-cart icon-white"></i> Download Basket</a></li>
-										<li><a href="{$smarty.const.WWW_TOP}/mymoviesedit"><i class="icon-hdd icon-white"></i> Movies</a></li>
 									{if $isadmin}
 											<li class="divider"></li>
 											<li>
