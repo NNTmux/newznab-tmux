@@ -1,7 +1,7 @@
 <?php
 
-use nntmux\UserMovies;
 use nntmux\Category;
+use nntmux\UserMovies;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
