@@ -97,7 +97,9 @@
 						</div>
 					</td>
 					<td colspan="3" class="left">
-						<h4><a title="View Movie" href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a> (<a class="title" title="{$result.year}" href="{$smarty.const.WWW_TOP}/movies?year={$result.year}">{$result.year}</a>) {if $result.rating != ''}{$result.rating}/10{/if}{if {$result.imdbid} != ""}&nbsp;&nbsp;<a onclick="mymovie_add('{$result.imdbid}', this);return false;" class="rndbtn btn btn-mini btn-info" href="#">Add To My Movies</a>{/if}</h4>
+						<h4><a title="View Movie" href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a> (<a class="title" title="{$result.year}" href="{$smarty.const.WWW_TOP}/movies?year={$result.year}">{$result.year}</a>)
+							{if $result.rating != ''}{$result.rating}/10{/if}
+							<a class="btn btn-mini btn-success mymovies" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a></h4>
 
 						{if isset($result.tagline)&& $result.tagline != ''}
 							<b>{$result.tagline}</b>

@@ -1,8 +1,8 @@
 <?php
 
-use nntmux\Movie;
 use nntmux\Category;
 use nntmux\DnzbFailures;
+use nntmux\Movie;
 
 $movie = new Movie(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);

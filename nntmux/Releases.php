@@ -568,6 +568,35 @@ class Releases
 	}
 
 	/**
+	 * Get count for my shows page pagination.
+	 *
+	 * @param       $userMovies
+	 * @param int   $maxAge
+	 * @param array $excludedCats
+	 *
+	 * @return int
+	 */
+	public function getMovieCount($userMovies, $maxAge = -1, $excludedCats = [])
+	{
+		return $this->getPagerCount(
+			sprintf(
+				'SELECT r.id
+				FROM releases r
+				WHERE %s %s
+				AND r.nzbstatus = %d
+				AND r.categories_id BETWEEN " . Category::MOVIE_ROOT . " AND " . Category::MOVIE_OTHER . "
+				AND r.passwordstatus %s
+				%s',
+				$this->uSQL($userMovies, 'imdbid'),
+				(count($excludedCats) ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				NZB::NZB_ADDED,
+				$this->showPasswords,
+				($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
+			)
+		);
+	}
+
+	/**
 	 * Get count for admin release list page.
 	 *
 	 * @return int
