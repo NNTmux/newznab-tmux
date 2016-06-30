@@ -79,7 +79,14 @@ class UserMovies
 	 */
 	public function delMovie($uid, $imdbid)
 	{
-		return $this->pdo->queryExec(sprintf("DELETE FROM user_movies WHERE users_id = %d AND imdbid = %d ", $uid, $imdbid));
+		return $this->pdo->queryExec(sprintf(
+			"DELETE FROM user_movies
+			WHERE users_id = %d
+			AND imdbid = %d ",
+			$uid,
+			$imdbid
+			)
+		);
 	}
 
 	/**
@@ -92,7 +99,16 @@ class UserMovies
 	 */
 	public function getMovie($uid, $imdbid)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT user_movies.*, movieinfo.title FROM user_movies LEFT OUTER JOIN movieinfo ON movieinfo.imdbid = user_movies.imdbid WHERE user_movies.users_id = %d AND user_movies.imdbid = %d ", $uid, $imdbid));
+		return $this->pdo->queryOneRow(sprintf(
+			"SELECT um.*, mi.title
+			FROM user_movies um
+			LEFT OUTER JOIN movieinfo mi ON mi.imdbid = um.imdbid
+			WHERE um.users_id = %d
+			AND um.imdbid = %d ",
+			$uid,
+			$imdbid
+			)
+		);
 	}
 
 	/**
@@ -100,7 +116,12 @@ class UserMovies
 	 */
 	public function delMovieForUser($uid)
 	{
-		$this->pdo->queryExec(sprintf("DELETE FROM user_movies WHERE users_id = %d", $uid));
+		$this->pdo->queryExec(sprintf(
+			"DELETE FROM user_movies
+			WHERE users_id = %d",
+			$uid
+			)
+		);
 	}
 
 	/**
