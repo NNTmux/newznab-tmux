@@ -105,7 +105,7 @@ switch ($action) {
 			$page->smarty->assign('type', 'edit');
 			$page->smarty->assign('cat_ids', array_keys($categories));
 			$page->smarty->assign('cat_names', $categories);
-			$page->smarty->assign('cat_selected', explode('|', $show['categories_id']));
+			$page->smarty->assign('cat_selected', explode('|', $show['categories']));
 			$page->smarty->assign('video', $videoId);
 			$page->smarty->assign('show', $show);
 			$page->content = $page->smarty->fetch('myshows-add.tpl');
