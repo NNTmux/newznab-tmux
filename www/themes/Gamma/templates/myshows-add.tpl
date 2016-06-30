@@ -3,7 +3,7 @@
 </div>
 <h3>{$type|ucwords} {$show.title|escape:"htmlall"} in</h3>
 <form class="form-horizontal" id="myshows" action="{$smarty.const.WWW_TOP}/myshows/do{$type}" method="post">
-	<input type="hidden" name="subpage" value="{$rid}" />
+	<input type="hidden" name="subpage" value="{$video}" />
 	<div class="control-group">
 		<label class="control-label" for="category">Choose</label>
 		<div class="controls">
