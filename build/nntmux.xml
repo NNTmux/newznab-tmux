@@ -8,7 +8,7 @@
 				<precommit>9</precommit>
 				<!-- this is the version of the pre-commit file in githooks NOT the files it calls -->
 			</hooks>
-		<commit>5335</commit></git>
+		<commit>5336</commit></git>
 		<scripts>
 			<last>
 				<date>0000-00-00</date>
@@ -16,8 +16,8 @@
 			</last>
 		</scripts>
 		<sql>
-			<db>265</db>
-			<file>265</file>
+			<db>267</db>
+			<file>267</file>
 		</sql>
 	</versions>
 </nntmux>
