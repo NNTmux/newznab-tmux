@@ -37,8 +37,6 @@ class UserMovies
 	 */
 	public function addMovie($uid, $imdbid, $catID = [])
 	{
-
-
 		return $this->pdo->queryInsert(
 			sprintf(
 				"INSERT INTO user_movies (users_id, imdbid, categories, createddate)
@@ -62,8 +60,8 @@ class UserMovies
 		return $this->pdo->query(
 			sprintf(
 				"SELECT um.*, mi.year, mi.plot, mi.cover, mi.title
-				FROM user_movies us
-				LEFT OUTER JOIN movieinfo mi ON mi.imdbid = uim.imdbid
+				FROM user_movies um
+				LEFT OUTER JOIN movieinfo mi ON mi.imdbid = um.imdbid
 				WHERE users_id = %d
 				ORDER BY mi.title ASC",
 				$uid
