@@ -1,8 +1,8 @@
 <h2>{$page->title}</h2>
 <div style="text-align: center;">
 	<div class="btn-group">
-		<a class="btn btn-small" title="View available Movies" href="{$smarty.const.WWW_TOP}/movies" >Movies List</a>
-		<a class="btn btn-small" title="All releases in your movies as an RSS feed" href="{$smarty.const.WWW_TOP}/rss?t=-4&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Rss <i class="fa fa-rss"></i></a>
+		<a class="btn btn-sm" title="View available Movies" href="{$smarty.const.WWW_TOP}/movies" >Movies List</a>
+		<a class="btn btn-sm" title="All releases in your movies as an RSS feed" href="{$smarty.const.WWW_TOP}/rss?t=-4&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Rss <i class="fa fa-rss"></i></a>
 	</div>
 </div>
 <br>
