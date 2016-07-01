@@ -107,7 +107,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a> <a class="btn btn-mini btn-success mymovies" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}
 															<b>Genre: </b>
 															{$result.genre}, {/if}</div>
@@ -231,7 +231,7 @@
 												</div>
 												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a> <a class="btn btn-mini btn-success mymovies" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}
 															<b>Genre: </b>
 															{$result.genre}, {/if}</div>
