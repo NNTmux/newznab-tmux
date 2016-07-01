@@ -21,8 +21,8 @@
 namespace nntmux\http;
 
 use nntmux\Category;
-use nntmux\utility\Utility;
 use nntmux\db\Settings;
+use nntmux\utility\Utility;
 use nntmux\utility\Versions;
 
 /**
@@ -69,30 +69,35 @@ abstract class Capabilities
 	{
 		$this->type = $type;
 
+		$options = [
+			'Parameters' => $params,
+			'Data'       => $data,
+			'Server'     => $this->getForMenu(),
+			'Type'       => $type
+		];
+
+		// Generate the XML Response
+		$response = (new XML_Response($options))->returnXML();
+
 		if ($xml) {
-			$response =
-				(
-				new XML_Response(
-					[
-						'Parameters' => $params,
-						'Data'       => $data,
-						'Server'     => $this->getForMenu(),
-						'Type'       => $type
-					]
-				)
-				)->returnXML();
 			header('Content-type: text/xml');
 		} else {
-			$response =
-				(
-				new JSON_Response(
+			// JSON encode the XMLWriter response
+			$response = json_encode(
+			// Convert SimpleXMLElement response from XMLWriter
+			//into array with namespace preservation
+				Utility::xmlToArray(
+				// Load the XMLWriter response
+					@simplexml_load_string($response),
 					[
-						'Parameters' => $params,
-						'Data'       => $data,
-						'Type'       => $type
+						'attributePrefix' => '_',
+						'textContent'     => 'text',
 					]
 				)
-				)->returnJSON();
+				// Strip the RSS+XML info from the JSON response by selecting enclosed data only
+				['rss']['channel'],
+				JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES
+			);
 			header('Content-type: application/json');
 		}
 		if ($response === false) {
@@ -102,7 +107,6 @@ abstract class Capabilities
 			echo $response;
 		}
 	}
-
 
 	/**
 	 * Collect and return various capability information for usage in API

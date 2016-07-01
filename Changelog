@@ -1,3 +1,5 @@
+2016-07-01 DariusIII
+	* Chg: Base JSON response of XMLWriter response
 2016-06-30 DariusIII
 	* Chg: Refactor adding movies to mymovies list.
 	* Chg: Update myshows.php
