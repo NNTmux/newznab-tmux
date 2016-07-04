@@ -325,7 +325,7 @@ class XML_Response
 	protected function includeImage()
 	{
 		$this->xml->startElement('image');
-		$this->xml->writeAttribute('url', $this->server['server']['url'] . 'themes/shared/img/logo.png');
+		$this->xml->writeAttribute('url', $this->server['server']['url'] . 'themes/shared/images/logo.png');
 		$this->xml->writeAttribute('title', $this->server['server']['title']);
 		$this->xml->writeAttribute('link', $this->server['server']['url']);
 		$this->xml->writeAttribute(
@@ -412,10 +412,13 @@ class XML_Response
 			switch (true) {
 					case isset($this->release['imdbid']) && $this->release['imdbid'] > 0:
 						$this->writeZedAttr('imdb', $this->release['imdbid']);
+						break;
 					case isset($this->release['anidbid']) && $this->release['anidbid'] > 0:
 						$this->writeZedAttr('anidbid', $this->release['anidbid']);
+						break;
 					case isset($this->release['predb_id']) && $this->release['predb_id'] > 0:
 						$this->writeZedAttr('prematch', 1);
+						break;
 					case isset($this->release['nfostatus']) && $this->release['nfostatus'] == 1:
 						$this->writeZedAttr(
 							'info',
@@ -439,23 +442,32 @@ class XML_Response
 		switch(true) {
 			case !empty($this->release['title']):
 				$this->writeZedAttr('title', $this->release['title']);
+				break;
 			case $this->release['series'] > 0:
 				$this->writeZedAttr('season', $this->release['series']);
+				break;
 			case $this->release['episode'] > 0:
 				$this->writeZedAttr('episode', $this->release['episode']);
+				break;
 			case !empty($this->release['firstaired']):
 				$this->writeZedAttr('tvairdate', $this->release['firstaired']);
+				break;
 			case $this->release['tvdb'] > 0:
 				$this->writeZedAttr('tvdbid', $this->release['tvdb']);
+				break;
 			case $this->release['trakt'] > 0:
 				$this->writeZedAttr('traktid', $this->release['trakt']);
+				break;
 			case $this->release['tvrage'] > 0:
 				$this->writeZedAttr('tvrageid', $this->release['tvrage']);
 				$this->writeZedAttr('rageid', $this->release['tvrage']);
+				break;
 			case $this->release['tvmaze'] > 0:
 				$this->writeZedAttr('tvmazeid', $this->release['tvmaze']);
+				break;
 			case $this->release['imdb'] > 0:
 				$this->writeZedAttr('imdbid', str_pad($this->release['imdb'], 7, '0', STR_PAD_LEFT));
+				break;
 			case $this->release['tmdb'] > 0:
 				$this->writeZedAttr('tmdbid', $this->release['tmdb']);
 		}
@@ -490,19 +502,19 @@ class XML_Response
 
 		$this->cdata = "\n\t<div>\n";
 		switch(1) {
-			case $r['cover']:
+			case !empty($r['cover']):
 				$dir = 'movies';
 				$column = 'imdbid';
 				break;
-			case $r['mu_cover']:
+			case !empty($r['mu_cover']):
 				$dir = 'music';
 				$column = 'musicinfo_id';
 				break;
-			case $r['co_cover']:
+			case !empty($r['co_cover']):
 				$dir = 'console';
 				$column = 'consoleinfo_id';
 				break;
-			case $r['bo_cover']:
+			case !empty($r['bo_cover']):
 				$dir = 'books';
 				$column = 'bookinfo_id';
 				break;
@@ -654,7 +666,7 @@ class XML_Response
 		$cData = '';
 
 		foreach ($columns AS $info) {
-			if ($r[$info] != '') {
+			if (!empty($r[$info]))  {
 				if ($info == 'mu_releasedate') {
 					$ucInfo = 'Released';
 					$rDate = date('Y-m-d', strtotime($r[$info]));
