@@ -23,7 +23,7 @@ class Versions
 	public $git;
 
 	/**
-	 * @var object ColorCLI
+	 * @var object nntmux\ColorCLI
 	 */
 	public $out;
 
@@ -136,7 +136,7 @@ class Versions
 
 	/**
 	 * Checks the git's latest version tag against the XML's stored value. Version should be
-	 * Major.Minor.Revision (**commit number is NOT revision**)
+	 * Major.Minor.Revision[.fix] (**commit number is NOT revision**)
 	 * @param boolean $update Whether the XML should be updated by the check.
 	 * @return boolean The new git's latest version tag, or false.
 	 */

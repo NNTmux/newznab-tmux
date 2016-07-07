@@ -1,9 +1,9 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\extensions\util\Versions;
 use nntmux\libraries\Cache;
-use nntmux\utility\Versions;
+use nntmux\db\Settings;
 
 
 class Sites
@@ -28,7 +28,7 @@ class Sites
 	protected $_db;
 
 	/**
-	 * @var \nntmux\utility\Versions|bool
+	 * @var \app\extensions\util\Versions|bool
 	 */
 	protected $_versions = false;
 
@@ -46,7 +46,7 @@ class Sites
 
 		if (defined('NN_VERSIONS')) {
 			try {
-				$this->_versions = new Versions(NN_VERSIONS);
+				$this->_versions = new Versions();
 			} catch (\Exception $e) {
 				$this->_versions = false;
 			}
@@ -56,7 +56,7 @@ class Sites
 
 	public function version()
 	{
-		return "0.4.1 nn-tmux-regexless";
+		return ($this->_versions === false ? '0.0.0' : $this->_versions->getGitTagFromRepo());
 	}
 
 	public function update($form)

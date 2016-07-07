@@ -35,5 +35,6 @@ spl_autoload_register(
 	}
 );
 */
+require_once 'app/config/bootstrap/libraries.php';
 require_once 'app/libraries/autoload.php'
 ?>

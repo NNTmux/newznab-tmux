@@ -20,8 +20,8 @@
  */
 namespace nntmux\db;
 
+use app\extensions\util\Versions;
 use nntmux\utility\Utility;
-use nntmux\utility\Versions;
 
 class Settings extends DB
 {
@@ -228,7 +228,7 @@ class Settings extends DB
 	public function version()
 	{
 		try {
-			$ver = (new Versions())->getTagVersion();
+			$ver = (new Versions())->getGitTagFromRepo();
 		} catch (\Exception $e) {
 			$ver = '0.0.0';
 		}

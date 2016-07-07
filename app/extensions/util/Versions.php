@@ -42,6 +42,12 @@ class Versions extends \lithium\core\Object
 		parent::__construct($config += $defaults);
 	}
 
+	public function getGitTagFromRepo()
+	{
+		$this->initialiseGit();
+		return $this->git->tagLatest();
+	}
+
 	public function getGitHeadHash()
 	{
 		$this->initialiseGit();
@@ -58,12 +64,6 @@ class Versions extends \lithium\core\Object
 	{
 		$this->initialiseGit();
 		return $this->git->getBranch();
-	}
-
-	public function getGitTagFromRepo()
-	{
-		$this->initialiseGit();
-		return $this->git->tagLatest();
 	}
 
 	public function getSQLPatchFromDB()
