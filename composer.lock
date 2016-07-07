@@ -857,16 +857,16 @@
         },
         {
             "name": "composer/installers",
-            "version": "v1.0.25",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "36e5b5843203d7f1cf6ffb0305a97e014387bd8e"
+                "reference": "a3595c5272a6f247228abb20076ed27321e4aae9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/36e5b5843203d7f1cf6ffb0305a97e014387bd8e",
-                "reference": "36e5b5843203d7f1cf6ffb0305a97e014387bd8e",
+                "url": "https://api.github.com/repos/composer/installers/zipball/a3595c5272a6f247228abb20076ed27321e4aae9",
+                "reference": "a3595c5272a6f247228abb20076ed27321e4aae9",
                 "shasum": ""
             },
             "require": {
@@ -913,6 +913,7 @@
                 "MODX Evo",
                 "Mautic",
                 "OXID",
+                "RadPHP",
                 "SMF",
                 "Thelia",
                 "WolfCMS",
@@ -928,6 +929,7 @@
                 "dokuwiki",
                 "drupal",
                 "elgg",
+                "expressionengine",
                 "fuelphp",
                 "grav",
                 "installer",
@@ -953,7 +955,7 @@
                 "zend",
                 "zikula"
             ],
-            "time": "2016-04-13 19:46:30"
+            "time": "2016-07-05 06:18:20"
         },
         {
             "name": "exeu/apai-io",
@@ -1018,16 +1020,16 @@
         },
         {
             "name": "fxp/composer-asset-plugin",
-            "version": "v1.1.4",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/composer-asset-plugin.git",
-                "reference": "c3d803cc890fad5a7fb61a4036c5d973faae34af"
+                "reference": "8d74bc7c714aadbda54622c216b2e7bf786595cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/c3d803cc890fad5a7fb61a4036c5d973faae34af",
-                "reference": "c3d803cc890fad5a7fb61a4036c5d973faae34af",
+                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/8d74bc7c714aadbda54622c216b2e7bf786595cb",
+                "reference": "8d74bc7c714aadbda54622c216b2e7bf786595cb",
                 "shasum": ""
             },
             "require": {
@@ -1041,7 +1043,7 @@
             "extra": {
                 "class": "Fxp\\Composer\\AssetPlugin\\FxpAssetPlugin",
                 "branch-alias": {
-                    "dev-master": "1.1-dev"
+                    "dev-master": "1.2-dev"
                 }
             },
             "autoload": {
@@ -1060,7 +1062,7 @@
                 }
             ],
             "description": "NPM/Bower Dependency Manager for Composer",
-            "homepage": "https://github.com/francoispluchino/composer-asset-plugin",
+            "homepage": "https://github.com/fxpio/composer-asset-plugin",
             "keywords": [
                 "asset",
                 "bower",
@@ -1070,7 +1072,7 @@
                 "npm",
                 "package"
             ],
-            "time": "2016-04-22 08:48:58"
+            "time": "2016-07-01 12:04:16"
         },
         {
             "name": "giantbomb/giantbomb",
@@ -1420,12 +1422,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "ab51c2ba498d22d2d4ca261018c046d716902419"
+                "reference": "72adef6d0ba44031e93d8aefc708e1cda999c7b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/ab51c2ba498d22d2d4ca261018c046d716902419",
-                "reference": "ab51c2ba498d22d2d4ca261018c046d716902419",
+                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/72adef6d0ba44031e93d8aefc708e1cda999c7b3",
+                "reference": "72adef6d0ba44031e93d8aefc708e1cda999c7b3",
                 "shasum": ""
             },
             "require": {
@@ -1458,7 +1460,7 @@
                 "li3",
                 "lithium"
             ],
-            "time": "2016-06-25 10:09:25"
+            "time": "2016-07-04 16:23:57"
         }
     ],
     "packages-dev": [
@@ -1575,12 +1577,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/li3_quality.git",
-                "reference": "6a357b9a8c0bd43b5924dabb5b6338e43cc6c75e"
+                "reference": "f304a360e8199a9e8c4abb403c3b209e520db104"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/li3_quality/zipball/6a357b9a8c0bd43b5924dabb5b6338e43cc6c75e",
-                "reference": "6a357b9a8c0bd43b5924dabb5b6338e43cc6c75e",
+                "url": "https://api.github.com/repos/UnionOfRAD/li3_quality/zipball/f304a360e8199a9e8c4abb403c3b209e520db104",
+                "reference": "f304a360e8199a9e8c4abb403c3b209e520db104",
                 "shasum": ""
             },
             "require": {
@@ -1611,7 +1613,7 @@
                 "quality",
                 "syntax"
             ],
-            "time": "2016-06-08 07:43:17"
+            "time": "2016-07-01 08:58:56"
         },
         {
             "name": "unionofrad/manual",
