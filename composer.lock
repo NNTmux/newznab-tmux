@@ -612,16 +612,16 @@
         },
         {
             "name": "bower-asset/jquery.nicescroll",
-            "version": "3.6.8",
+            "version": "v3.6.8-patch1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/inuyaksa/jquery.nicescroll.git",
-                "reference": "050267822f045f59d0b0d0ac5d84c36ff8c98e1e"
+                "reference": "25737c1a8ecfaccf219a13142d300b64e52e6b58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/inuyaksa/jquery.nicescroll/zipball/050267822f045f59d0b0d0ac5d84c36ff8c98e1e",
-                "reference": "050267822f045f59d0b0d0ac5d84c36ff8c98e1e",
+                "url": "https://api.github.com/repos/inuyaksa/jquery.nicescroll/zipball/25737c1a8ecfaccf219a13142d300b64e52e6b58",
+                "reference": "25737c1a8ecfaccf219a13142d300b64e52e6b58",
                 "shasum": ""
             },
             "require": {
@@ -1422,12 +1422,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "72adef6d0ba44031e93d8aefc708e1cda999c7b3"
+                "reference": "3b225b72b341d4e0ed585b9e6c372d777485f9ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/72adef6d0ba44031e93d8aefc708e1cda999c7b3",
-                "reference": "72adef6d0ba44031e93d8aefc708e1cda999c7b3",
+                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/3b225b72b341d4e0ed585b9e6c372d777485f9ad",
+                "reference": "3b225b72b341d4e0ed585b9e6c372d777485f9ad",
                 "shasum": ""
             },
             "require": {
@@ -1460,7 +1460,7 @@
                 "li3",
                 "lithium"
             ],
-            "time": "2016-07-04 16:23:57"
+            "time": "2016-07-08 11:01:29"
         }
     ],
     "packages-dev": [
