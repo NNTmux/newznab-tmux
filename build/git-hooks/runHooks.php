@@ -22,9 +22,8 @@ define('GIT_PRE_COMMIT', true);
 
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use nntmux\db\DbUpdate;
 use nntmux\utility\Git;
-use nntmux\utility\Versions;
+use app\extensions\util\Versions;
 
 echo "Running pre-commit hooks\n";
 
@@ -48,7 +47,8 @@ if ($error === false) {
 		if ($error === false) {
 			try {
 				$vers = new Versions();
-				$vers->checkAll();
+				$vers->checkGitTag();
+				$vers->checkSQLFileLatest();
 				$vers->save();
 				$git->add(NN_VERSIONS);
 			} catch (\Exception $e) {

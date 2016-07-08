@@ -12,7 +12,7 @@ use nntmux\utility\Utility;
 class TmuxOutput extends Tmux
 {
 	/**
-	 * @var \nntmux\utility\Versions
+	 * @var \simpleXMLElement object
 	 */
 	protected $_vers;
 

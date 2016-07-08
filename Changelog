@@ -1,4 +1,5 @@
 2016-07-07 DariusIII
+	* Chg: Use modified Versions command from app folder.
 	* Chg: Port changes for versions handling from nZEDb
 	* Chg: Update composer.lock with new versions of used libs
 2016-07-04 DariusIII

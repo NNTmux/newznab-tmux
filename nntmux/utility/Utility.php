@@ -1,6 +1,7 @@
 <?php
 namespace nntmux\utility;
 
+use app\extensions\util\Versions;
 use nntmux\db\Settings;
 use nntmux\ColorCLI;
 
@@ -171,9 +172,7 @@ class Utility
 
 	public static function getValidVersionsFile()
 	{
-		$versions = new Versions();
-
-		return $versions->getValidVersionsFile();
+		return (new Versions())->getValidVersionsFile();
 	}
 
 	/**
