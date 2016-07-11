@@ -1,5 +1,5 @@
 <?php
-use nntmux\AdminPage;
+
 use nntmux\Users;
 
 $page = new AdminPage();
