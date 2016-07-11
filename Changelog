@@ -1,4 +1,5 @@
 2016-07-10 DariusIII
+	* Fix: Add missing ajax_resetusergrabs-admin page to index.php
 	* Chg: Port changes from nZEDb
 	* Chg: Update AdminLTE css, js and skins to version 2.3.5
 2016-07-08 DariusIII
