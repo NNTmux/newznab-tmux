@@ -145,7 +145,7 @@ class Users
 
 	public function delApiRequests($userID)
 	{
-		return $this->pdo->queryExec(sprintf("DELETE FROM user_requests WHERE users_id = %d", $useriID);
+		return $this->pdo->queryExec(sprintf("DELETE FROM user_requests WHERE users_id = %d", $userID));
 	}
 
 	public function getRange($start, $num, $orderby, $username = '', $email = '', $host = '', $role = '')
