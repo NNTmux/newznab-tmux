@@ -138,14 +138,14 @@ class Users
 		$this->pdo->queryExec(sprintf("DELETE FROM user_excluded_categories WHERE users_id = %d", $uid));
 	}
 
-	public function delDownloadRequests($userid)
+	public function delDownloadRequests($userID)
 	{
-		return $this->pdo->queryExec(sprintf("delete FROM user_downloads WHERE users_id = %d", $userid));
+		return $this->pdo->queryExec(sprintf("DELETE FROM user_downloads WHERE users_id = %d", $userID));
 	}
 
-	public function delApiRequests($userid)
+	public function delApiRequests($userID)
 	{
-		return $this->pdo->queryExec(sprintf("delete FROM user_requests WHERE users_id = %d", $userid));
+		return $this->pdo->queryExec(sprintf("DELETE FROM user_requests WHERE users_id = %d", $useriID);
 	}
 
 	public function getRange($start, $num, $orderby, $username = '', $email = '', $host = '', $role = '')
@@ -173,7 +173,7 @@ class Users
 
 		$order = $this->getBrowseOrder($orderby);
 
-		return $this->pdo->query(sprintf(" SELECT users.*, user_roles.name as rolename FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE 1=1 %s %s %s %s AND email != 'sharing@nZEDb.com' ORDER BY %s %s" . $limit, $usql, $esql, $hsql, $rsql, $order[0], $order[1]));
+		return $this->pdo->query(sprintf(" SELECT users.*, user_roles.name AS rolename FROM users INNER JOIN user_roles ON user_roles.id = users.role WHERE 1=1 %s %s %s %s AND email != 'sharing@nZEDb.com' ORDER BY %s %s" . $limit, $usql, $esql, $hsql, $rsql, $order[0], $order[1]));
 	}
 
 	public function getBrowseOrder($orderby)
