@@ -149,7 +149,7 @@
 									 alt="User Image"> {$userdata.username}
 								<span class=" fa fa-angle-down"></span>
 							</a>
-							<ul class="dropdown-menu dropdown-usermenu animated jello pull-right">
+							<ul class="dropdown-menu dropdown-usermenu pull-right">
 								<li><a href="{$smarty.const.WWW_TOP}/cart"><i class="fa fa-shopping-basket"></i> My
 										Download Basket</a>
 								</li>
