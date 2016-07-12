@@ -9,7 +9,7 @@
 							   data-delay="30">
 								<i class="fa fa-television"></i> {$parentcat.title}<i class="fa fa-angle-down"></i>
 							</a>
-							<ul class="dropdown-menu animated jello">
+							<ul class="dropdown-menu">
 								<li><a href="{$smarty.const.WWW_TOP}/browse?t={$parentcat.id}">TV</a></li>
 								<hr>
 								<li><a href="{$smarty.const.WWW_TOP}/series">TV Series</a></li>
@@ -27,7 +27,7 @@
 							   data-delay="30">
 								<i class="fa fa-film"></i> {$parentcat.title}<i class="fa fa-angle-down"></i>
 							</a>
-							<ul class="dropdown-menu animated jello">
+							<ul class="dropdown-menu">
 								{if $userdata.movieview == "1"}
 									<li><a href="{$smarty.const.WWW_TOP}/movies">{$parentcat.title}</a></li>
 								{elseif $userdata.movieview != "1"}
@@ -59,7 +59,7 @@
 							   data-delay="30">
 								<i class="fa fa-gamepad"></i> {$parentcat.title}<i class="fa fa-angle-down"></i>
 							</a>
-							<ul class="dropdown-menu animated jello">
+							<ul class="dropdown-menu">
 								{if $userdata.consoleview == "1"}
 									<li><a href="{$smarty.const.WWW_TOP}/console">{$parentcat.title}</a></li>
 								{elseif $userdata.consoleview != "1"}
@@ -88,7 +88,7 @@
 							   data-delay="30">
 								<i class="fa fa-gamepad"></i> {$parentcat.title}<i class="fa fa-angle-down"></i>
 							</a>
-							<ul class="dropdown-menu animated jello">
+							<ul class="dropdown-menu">
 								{if $userdata.gameview == "1"}
 									<li><a href="{$smarty.const.WWW_TOP}/games">{$parentcat.title}</a></li>
 								{elseif $userdata.gameview != "1"}
@@ -124,7 +124,7 @@
 							   data-delay="30">
 								<i class="fa fa-music"></i> {$parentcat.title}<i class="fa fa-angle-down"></i>
 							</a>
-							<ul class="dropdown-menu animated jello">
+							<ul class="dropdown-menu">
 								{if $userdata.musicview == "1"}
 									<li><a href="{$smarty.const.WWW_TOP}/music">{$parentcat.title}</a></li>
 								{elseif $userdata.musicview != "1"}
@@ -153,7 +153,7 @@
 							   data-delay="30">
 								<i class="fa fa-book"></i> Books<i class="fa fa-angle-down"></i>
 							</a>
-							<ul class="dropdown-menu animated jello">
+							<ul class="dropdown-menu">
 								{if $userdata.bookview == "1"}
 									<li><a href="{$smarty.const.WWW_TOP}/books">{$parentcat.title}</a></li>
 								{elseif $userdata.bookview != "1"}
@@ -174,7 +174,7 @@
 							   data-delay="30">
 								<i class="fa fa-venus-mars"></i> Adult<i class="fa fa-angle-down"></i>
 							</a>
-							<ul class="dropdown-menu animated jello">
+							<ul class="dropdown-menu">
 								{if $userdata.xxxview == "1"}
 									<li><a href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}</a></li>
 								{elseif $userdata.xxxview != "1"}
@@ -207,7 +207,7 @@
 				<li class="nav-parent">
 					<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" data-delay="30">
 						<i class="fa fa-bolt"></i> Other<i class="fa fa-angle-down"></i></a>
-					<ul class="dropdown-menu animated jello">
+					<ul class="dropdown-menu">
 						<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::OTHER_ROOT}">Other</a></li>
 						<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::OTHER_MISC}">Misc</a></li>
 						<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::OTHER_HASHED}">Hashed</a></li>
