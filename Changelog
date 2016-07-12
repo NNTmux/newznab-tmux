@@ -1,4 +1,5 @@
 2016-07-12 DariusIII
+	* Fix: Prevent undefined index notices in XML_Response
 	* Chg: Remove animation from menus in Gentele theme
 	* Fix: Fix color style of theme selection in Charisma theme.
 	* Fix: Add missing check for user selected styles setting on profile edit page

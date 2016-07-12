@@ -443,32 +443,32 @@ class XML_Response
 			case !empty($this->release['title']):
 				$this->writeZedAttr('title', $this->release['title']);
 				break;
-			case $this->release['series'] > 0:
+			case isset($this->release['series']) && $this->release['series'] > 0:
 				$this->writeZedAttr('season', $this->release['series']);
 				break;
-			case $this->release['episode'] > 0:
+			case isset($this->release['episode']) && $this->release['episode'] > 0:
 				$this->writeZedAttr('episode', $this->release['episode']);
 				break;
 			case !empty($this->release['firstaired']):
 				$this->writeZedAttr('tvairdate', $this->release['firstaired']);
 				break;
-			case $this->release['tvdb'] > 0:
+			case isset($this->release['tvdb']) && $this->release['tvdb'] > 0:
 				$this->writeZedAttr('tvdbid', $this->release['tvdb']);
 				break;
-			case $this->release['trakt'] > 0:
+			case isset($this->release['trakt']) && $this->release['trakt'] > 0:
 				$this->writeZedAttr('traktid', $this->release['trakt']);
 				break;
-			case $this->release['tvrage'] > 0:
+			case isset($this->release['tvrage']) && $this->release['tvrage'] > 0:
 				$this->writeZedAttr('tvrageid', $this->release['tvrage']);
 				$this->writeZedAttr('rageid', $this->release['tvrage']);
 				break;
-			case $this->release['tvmaze'] > 0:
+			case isset($this->release['tvmaze']) && $this->release['tvmaze'] > 0:
 				$this->writeZedAttr('tvmazeid', $this->release['tvmaze']);
 				break;
-			case $this->release['imdb'] > 0:
+			case isset($this->release['imdb']) && $this->release['imdb'] > 0:
 				$this->writeZedAttr('imdbid', str_pad($this->release['imdb'], 7, '0', STR_PAD_LEFT));
 				break;
-			case $this->release['tmdb'] > 0:
+			case isset($this->release['tmdb']) && $this->release['tmdb'] > 0:
 				$this->writeZedAttr('tmdbid', $this->release['tmdb']);
 		}
 	}
