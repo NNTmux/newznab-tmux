@@ -1,3 +1,5 @@
+2016-07-12 DariusIII
+	* Fix: Re-arrange items in profile edit page in all the themes.
 2016-07-10 DariusIII
 	* Fix: Add missing ajax_resetusergrabs-admin page to index.php
 	* Chg: Port changes from nZEDb
