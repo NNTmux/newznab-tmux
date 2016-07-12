@@ -75,7 +75,7 @@
 																	Categories</strong></td>
 														</tr>
 														<tr>
-															<th width="200">Excluded Categories</th>
+															<th width="200"></th>
 															<td>
 																{html_options style="height:105px;" class="form-control" data-placeholder="Choose categories to exclude" multiple=multiple name="exccat[]" options=$catlist selected=$userexccat}
 															</td>
@@ -146,7 +146,7 @@
 														<tr>
 															<td>
 																{if $page->settings->getSetting('userselstyle') == 1}
-																	{html_options id="style" name='style' values=$themelist output=$themelist selected=$user.style}
+																	{html_options style="color: black;" id="style" name='style' values=$themelist output=$themelist selected=$user.style}
 																{/if}
 															</td>
 														</tr>
