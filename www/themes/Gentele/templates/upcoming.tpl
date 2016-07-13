@@ -73,11 +73,11 @@
 							<a class="rndbtn btn btn-sm btn-success"
 							   href="{$smarty.const.WWW_TOP}/movies?imdb={$result->alternate_ids->imdb}">Download</a>
 						{else}
-							<a {if isset($userimdbs) && $userimdbs[$result->alternate_ids->imdb] != ""}style="display:none;"{/if}
+							<a {if !empty($userimdbs[$result->alternate_ids->imdb])}style="display:none;"{/if}
 							   onclick="mymovie_add('{$result->alternate_ids->imdb}', this);return false;"
 							   class="rndbtn btn btn-sm btn-info" href="#">Add To My Movies</a>
 						{/if}
-						<a style="display:{if $userimdbs[$result->alternate_ids->imdb] != ""}inline{else}none;{/if}"
+						<a style="display:{if !empty($userimdbs[$result->alternate_ids->imdb])}inline{else}none;{/if}"
 						   onclick="mymovie_del('{$result->alternate_ids->imdb}', this);return false;" href="#"
 						   class="rndbtn btn btn-sm btn-danger">Remove From My Movies</a>
 						<br/>
