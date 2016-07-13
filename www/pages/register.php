@@ -37,7 +37,9 @@ if ($showRegister == 1) {
 				$password = htmlspecialchars($_POST['password']);
 				$confirmPassword = htmlspecialchars($_POST['confirmpassword']);
 				$email = htmlspecialchars($_POST['email']);
-				$inviteCode = htmlspecialchars($_REQUEST['invitecode']);
+				if (!empty($_REQUEST['invitecode'])) {
+					$inviteCode = htmlspecialchars($_REQUEST['invitecode']);
+				}
 
 				// Check uname/email isn't in use, password valid. If all good create new user account and redirect back to home page.
 				if ($password != $confirmPassword) {
