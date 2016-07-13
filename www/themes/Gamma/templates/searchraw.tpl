@@ -40,7 +40,7 @@
 		<th>filename</th>
 		<th>group</th>
 		<th>posted</th>
-		{if $isadmin}
+		{if isset($isadmin)}
 		<th>Misc</th>
 		<th>%</th>
 		{/if}
@@ -53,7 +53,7 @@
 			<td title="{$result.xref|escape:"htmlall"}">{$result.name|escape:"htmlall"}</td>
 			<td class="less">{$result.group_name|replace:"alt.binaries":"a.b"}</td>
 			<td class="less" title="{$result.date}">{$result.date|date_format}</td>
-			{if $isadmin}
+			{if isset($isadmin)}
 			<td><span title="procstat">{$result.procstat}</span>/<span title="totalparts">{$result.totalParts}</span>/<span title="regex">{if $result.regexid == ""}_{else}{$result.regexid}{/if}</span>/<span title="relpart">{$result.relpart}</span>/<span title="reltotalpart">{$result.reltotalpart}</span></td>
 			<td class="less">{if $result.binnum < $result.totalParts}<span class="label label-danger">{$result.binnum}/{$result.totalParts}</span>{else}<span class="label label-success">100%</span>{/if}</td>
 			{/if}

@@ -39,7 +39,7 @@
 			{if $xxx && $xxx.cover == 1}
 				<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;"  src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg" width="160" alt="{$xxx.title|escape:"htmlall"}"/>
 			{/if}
-			{if $isadmin}
+			{if isset($isadmin)}
 				<div class="well well-sm pull-right">
 					Admin :
 					<div class="btn-group">
@@ -389,7 +389,7 @@
 					<a class="label" title="Search for similar Nzbs" href="{$smarty.const.WWW_TOP}/search/{$searchname|escape:"url"}">Search for similar</a>
 				</dd>
 
-				{if $isadmin}
+				{if isset($isadmin)}
 					<dt>Release Info</dt>
 					<dd>
 						Regex Id (<a href="{$smarty.const.WWW_TOP}/admin/regex-list.php?group={$release.group_name|escape:"url"}#{$release.regexid}">{$release.regexid}</a>)
