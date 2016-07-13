@@ -1,4 +1,5 @@
 2016-07-13 DariusIII
+	* Fix: Fix adding movies to my movies from upcoming page (in theatres)
 	* Fix: Fix wrong name of used result in ajax_tvinfo
 	* Fix: Mark new releases in Gamma browse page.
 	* Fix: Check if isadmin is set in Gamma theme.
