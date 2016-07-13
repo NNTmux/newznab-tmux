@@ -82,8 +82,8 @@ switch ($action) {
 					(isset($_POST['sabapikeytype']) ? $_POST['sabapikeytype'] : ''),
 					(isset($_POST['nzbvortex_server_url']) ? $_POST['nzbvortex_server_url'] : false),
 					(isset($_POST['nzbvortex_api_key']) ? $_POST['nzbvortex_api_key'] : false),
-					$_POST['cp_url'],
-					$_POST['cp_api'],
+					(isset($_POST['cp_url']) ? $_POST['cp_url'] : ''),
+					(isset($_POST['cp_api']) ? $_POST['cp_api'] : ''),
 					$_POST['style']
 				);
 
