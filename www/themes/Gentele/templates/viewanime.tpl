@@ -114,7 +114,7 @@
 													{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
 														href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 														name="name{$result.guid}"
-														title="Screenshot of {$result.animeTitle|escape:"htmlall"}"
+														title="Screenshot of {$result.searchname|escape:"htmlall"}"
 														class="label label-primary" rel="preview">Preview</a>{/if}
 													<span class="label label-primary">{$result.grabs}
 														Grab{if $result.grabs != 1}s{/if}</span>
