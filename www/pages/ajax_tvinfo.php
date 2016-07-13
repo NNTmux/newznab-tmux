@@ -19,7 +19,7 @@ else
 
 	print "<ul class=\"ui-tooltip-nntmux\">\n";
 	print "<li>".htmlentities($rel["title"], ENT_QUOTES)."</li>\n";
-	print "<li>Aired on ".date("F j, Y", strtotime($rel["firstairdate"]))."</li>\n";
+	print "<li>Aired on ".date("F j, Y", strtotime($rel["firstaired"]))."</li>\n";
 	print "</ul>";
 
 	if (isset($rel["videos_id"]) && $rel["videos_id"] > 0)
