@@ -1,3 +1,5 @@
+2016-07-13 DariusIII
+	* Chg: Add check for empty values for season and episode in api page
 2016-07-12 DariusIII
 	* Fix: Wrong usage of result.guid in Gentele theme viewmoviefull page
 	* Fix: Prevent undefined index notices in XML_Response
