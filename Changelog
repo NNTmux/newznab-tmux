@@ -1,3 +1,5 @@
+2016-07-14 DariusIII
+	* Chg: Create gitignore for new configuration folder
 2016-07-13 DariusIII
 	* Chg: Use searchname and not animeTitle in viewanime.tpl's
 	* Chg: Check if cp_url and cp_api are set on profile edit page
