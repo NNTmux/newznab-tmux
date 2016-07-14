@@ -18,7 +18,7 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
-require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
 use nntmux\utility\Utility;
 use nntmux\utility\Versions;

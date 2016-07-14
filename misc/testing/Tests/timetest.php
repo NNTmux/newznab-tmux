@@ -1,6 +1,6 @@
 <?php
 //This Script Verifies your System Time vs Myself Time vs PHP Time
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
 use nntmux\db\Settings;
 $res="";

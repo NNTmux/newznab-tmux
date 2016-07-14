@@ -4,7 +4,7 @@ if (!isset($argv[1])) {
 	exit("This script is not intended to be run manually." . PHP_EOL);
 }
 
-require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
 use \nntmux\db\Settings;
 use \nntmux\processing\PostProcess;

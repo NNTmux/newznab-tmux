@@ -13,7 +13,7 @@ if (!isset($argv[1]) || $argv[1] !== 'yes') {
 	);
 }
 
-require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
 define('R', 1);
 define('W', 2);

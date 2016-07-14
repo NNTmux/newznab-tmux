@@ -1,4 +1,5 @@
 2016-07-14 DariusIII
+	* Chg: Replace usage of indexer.php with bootstrap.php
 	* Chg: Add workaround for duplicate constants warning
 	* Chg: Create gitignore for new configuration folder
 2016-07-13 DariusIII
