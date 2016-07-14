@@ -253,7 +253,7 @@ class Model extends StaticObject
 	 *  'database' => 'app_name',
 	 *  'schema' => function($db, $collection, $meta) {
 	 *      $result = $db->connection->schemas->findOne(compact('collection'));
-	 *      return $result ? $result['data'] : array();
+	 *      return $result ? $result['data'] : [];
 	 *  }
 	 * ));
 	 * }}}

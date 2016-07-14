@@ -576,11 +576,11 @@ class Utility
 	 *
 	 * @return array            The associate array of the XML namespaced file
 	 */
-	public static function xmlToArray(\SimpleXMLElement $xml, $options = array()) {
+	public static function xmlToArray(\SimpleXMLElement $xml, $options = []) {
 		$defaults = array(
 			'namespaceSeparator' => ':',//you may want this to be something other than a colon
 			'attributePrefix' => '@',   //to distinguish between attributes and nodes with the same name
-			'alwaysArray' => array(),   //array of xml tag names which should always become arrays
+			'alwaysArray' => [],   //array of xml tag names which should always become arrays
 			'autoArray' => true,        //only create arrays for tags which appear more than once
 			'textContent' => '$',       //key used for the text content of elements
 			'autoText' => true,         //skip textContent key if node has no attributes or child nodes
@@ -591,7 +591,7 @@ class Utility
 		$namespaces = $xml->getDocNamespaces();
 		$namespaces[''] = null; //add base (empty) namespace
 
-		$attributesArray = $tagsArray = array();
+		$attributesArray = $tagsArray = [];
 		foreach ($namespaces as $prefix => $namespace) {
 			//get attributes from all namespaces
 			foreach ($xml->attributes($namespace) as $attributeName => $attribute) {
@@ -635,7 +635,7 @@ class Utility
 		}
 
 		//get text content of node
-		$textContentArray = array();
+		$textContentArray = [];
 		$plainText = trim((string)$xml);
 		if ($plainText !== '') $textContentArray[$options['textContent']] = $plainText;
 

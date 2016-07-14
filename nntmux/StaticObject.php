@@ -34,14 +34,14 @@ class StaticObject
 	 *
 	 * @var array Method filters, indexed by `get_called_class()`.
 	 */
-	protected static $_methodFilters = array();
+	protected static $_methodFilters = [];
 
 	/**
 	 * Keeps a cached list of each class' inheritance tree.
 	 *
 	 * @var array
 	 */
-	protected static $_parents = array();
+	protected static $_parents = [];
 
 	/**
 	 * Apply a closure to a method of the current static object.
@@ -61,12 +61,12 @@ class StaticObject
 	{
 		$class = get_called_class();
 		if ($method === false) {
-			static::$_methodFilters[$class] = array();
+			static::$_methodFilters[$class] = [];
 			return;
 		}
 		foreach ((array)$method as $m) {
 			if (!isset(static::$_methodFilters[$class][$m]) || $filter === false) {
-				static::$_methodFilters[$class][$m] = array();
+				static::$_methodFilters[$class][$m] = [];
 			}
 			if ($filter !== false) {
 				static::$_methodFilters[$class][$m][] = $filter;
@@ -76,7 +76,7 @@ class StaticObject
 
 	/**
 	 * Calls a method on this object with the given parameters. Provides an OO wrapper for
-	 * `forward_static_call_array()`, and improves performance by using straight method calls
+	 * `forward_static_call_[]`, and improves performance by using straight method calls
 	 * in most cases.
 	 *
 	 * @param string $method Name of the method to call.
@@ -84,7 +84,7 @@ class StaticObject
 	 *
 	 * @return mixed Returns the result of the method call.
 	 */
-	public static function invokeMethod($method, $params = array())
+	public static function invokeMethod($method, $params = [])
 	{
 		switch (count($params)) {
 			case 0:

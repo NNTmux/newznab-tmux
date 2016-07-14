@@ -55,7 +55,7 @@ class Object
 	 * @see lithium\core\Object::_init()
 	 * @var array
 	 */
-	protected $_autoConfig = array();
+	protected $_autoConfig = [];
 
 	/**
 	 * Stores configuration information for object instances at time of construction.
@@ -63,7 +63,7 @@ class Object
 	 *
 	 * @var array
 	 */
-	protected $_config = array();
+	protected $_config = [];
 
 	/**
 	 * Contains a 2-dimensional array of filters applied to this object's methods, indexed by method
@@ -73,7 +73,7 @@ class Object
 	 * @see lithium\core\Object::applyFilter()
 	 * @var array
 	 */
-	protected $_methodFilters = array();
+	protected $_methodFilters = [];
 
 	/**
 	 * Parents of the current class.
@@ -81,7 +81,7 @@ class Object
 	 * @see lithium\core\Object::_parents()
 	 * @var array
 	 */
-	protected static $_parents = array();
+	protected static $_parents = [];
 
 	/**
 	 * Initializes class configuration (`$_config`), and assigns object properties using the
@@ -96,7 +96,7 @@ class Object
 	 *                      method. If `false`, the method is not called, otherwise it is. Defaults to
 	 *                      `true`.
 	 */
-	public function __construct(array $config = array())
+	public function __construct(array $config = [])
 	{
 		$defaults      = array('init' => true);
 		$this->_config = $config + $defaults;
@@ -144,12 +144,12 @@ class Object
 	public function applyFilter($method, $filter = null)
 	{
 		if ($method === false) {
-			$this->_methodFilters = array();
+			$this->_methodFilters = [];
 			return;
 		}
 		foreach ((array)$method as $m) {
 			if (!isset($this->_methodFilters[$m]) || $filter === false) {
-				$this->_methodFilters[$m] = array();
+				$this->_methodFilters[$m] = [];
 			}
 			if ($filter !== false) {
 				$this->_methodFilters[$m][] = $filter;
@@ -167,7 +167,7 @@ class Object
 	 *
 	 * @return mixed  Returns the result of the method call
 	 */
-	public function invokeMethod($method, $params = array())
+	public function invokeMethod($method, $params = [])
 	{
 		switch (count($params)) {
 			case 0:
@@ -220,7 +220,7 @@ class Object
 	 * @return mixed Returns the return value of `$callback`, modified by any filters passed in
 	 *         `$filters` or applied with `applyFilter()`.
 	 */
-	protected function _filter($method, $params, $callback, $filters = array())
+	protected function _filter($method, $params, $callback, $filters = [])
 	{
 		list($class, $method) = explode('::', $method);
 
@@ -228,7 +228,7 @@ class Object
 			return $callback($this, $params, null);
 		}
 
-		$f    = isset($this->_methodFilters[$method]) ? $this->_methodFilters[$method] : array();
+		$f    = isset($this->_methodFilters[$method]) ? $this->_methodFilters[$method] : [];
 		$data = array_merge($f, $filters, array($callback));
 		return Filters::run($this, $params, compact('data', 'class', 'method'));
 	}
@@ -281,7 +281,7 @@ class Object
 	 *
 	 * @return object
 	 */
-	protected function _instance($name, array $options = array())
+	protected function _instance($name, array $options = [])
 	{
 		if (is_string($name) && isset($this->_classes[$name])) {
 			$name = $this->_classes[$name];

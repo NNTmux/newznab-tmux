@@ -114,7 +114,7 @@ class Groups
 				$orderBy = "g.first_record_postdate DESC";
 				break;
 			default:
-				return array();
+				return [];
 		}
 
 		return $this->pdo->query(

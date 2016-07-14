@@ -160,7 +160,7 @@ class Cache
 					return apc_cache_info();
 			}
 		}
-		return array();
+		return [];
 	}
 
 	/**

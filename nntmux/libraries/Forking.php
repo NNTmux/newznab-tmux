@@ -518,7 +518,7 @@ class Forking extends \fork_daemon
 			if ($preCount['num'] > 0) {
 				$leftguids = array_slice($leftguids, 0, (int)ceil($preCount['num'] / $maxperrun));
 			} else {
-				$leftguids = array();
+				$leftguids = [];
 			}
 		}
 
