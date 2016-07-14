@@ -1003,11 +1003,11 @@ class Releases
 	 * @return array
 	 */
 	public function searchShows(
-		$siteIdArr = array(), $series = '', $episode = '', $airdate = '', $offset = 0,
+		$siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0,
 		$limit = 100, $name = '', $cat = [-1], $maxAge = -1, $minSize = 0
 	)
 	{
-		$siteSQL = array();
+		$siteSQL = [];
 		$showSql = '';
 
 		if (is_array($siteIdArr)) {
@@ -1045,11 +1045,11 @@ class Releases
 					}
 				} else {
 					// If we were passed Episode Info and no match was found, do not run the query
-					return array();
+					return [];
 				}
 			} else {
 				// If we were passed Site ID Info and no match was found, do not run the query
-				return array();
+				return [];
 			}
 		}
 
