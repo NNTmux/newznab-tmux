@@ -1,4 +1,5 @@
 2016-07-14 DariusIII
+	* Fix: Add back the missing nzb download option to api
 	* Chg: Add checks for ep when api is queries for season/episode.
 	* Fix: Wrong guid usage in Gentele viexxxfull page
 	* Chg: Add api requests count to admin/user-list page
