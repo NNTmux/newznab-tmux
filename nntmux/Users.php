@@ -148,32 +148,58 @@ class Users
 		return $this->pdo->queryExec(sprintf("DELETE FROM user_requests WHERE users_id = %d", $userID));
 	}
 
-	public function getRange($start, $num, $orderby, $username = '', $email = '', $host = '', $role = '')
+	/**
+	 * Get all users / extra data from other tables.
+	 *
+	 * @param        $start
+	 * @param        $offset
+	 * @param        $orderBy
+	 * @param string $userName
+	 * @param string $email
+	 * @param string $host
+	 * @param string $role
+	 * @param bool   $apiRequests
+	 *
+	 * @return array
+	 */
+	public function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false)
 	{
-		if ($start === false)
-			$limit = "";
-		else
-			$limit = " LIMIT " . $start . "," . $num;
+		if ($apiRequests) {
+			$this->clearApiRequests(false);
+			$query = ("
+				SELECT users.*, user_roles.name AS rolename, COUNT(user_requests.id) AS apirequests
+				FROM users
+				INNER JOIN user_roles ON user_roles.id = users.role
+				LEFT JOIN user_requests ON user_requests.users_id = users.id
+				WHERE users.id != 0 %s %s %s %s
+				AND email != 'sharing@nZEDb.com'
+				GROUP BY users.id
+				ORDER BY %s %s %s"
+			);
+		} else {
+			$query = ("
+				SELECT users.*, user_roles.name AS rolename
+				FROM users
+				INNER JOIN user_roles ON user_roles.id = users.role
+				WHERE 1=1 %s %s %s %s
+				ORDER BY %s %s %s"
+			);
+		}
 
-		$usql = '';
-		if ($username != '')
-			$usql = sprintf(" AND users.username like %s ", $this->pdo->escapeString("%" . $username . "%"));
+		$order = $this->getBrowseOrder($orderBy);
 
-		$esql = '';
-		if ($email != '')
-			$esql = sprintf(" AND users.email like %s ", $this->pdo->escapeString("%" . $email . "%"));
-
-		$hsql = '';
-		if ($host != '')
-			$hsql = sprintf(" AND users.host like %s ", $this->pdo->escapeString("%" . $host . "%"));
-
-		$rsql = '';
-		if ($role != '')
-			$rsql = sprintf(" AND users.role = %d ", $role);
-
-		$order = $this->getBrowseOrder($orderby);
-
-		return $this->pdo->query(sprintf(" SELECT users.*, user_roles.name AS rolename FROM users INNER JOIN user_roles ON user_roles.id = users.role WHERE 1=1 %s %s %s %s AND email != 'sharing@nZEDb.com' ORDER BY %s %s" . $limit, $usql, $esql, $hsql, $rsql, $order[0], $order[1]));
+		return $this->pdo->query(
+			sprintf(
+				$query,
+				($userName != '' ? ('AND users.username ' . $this->pdo->likeString($userName)) : ''),
+				($email != '' ? ('AND users.email ' . $this->pdo->likeString($email)) : ''),
+				($host != '' ? ('AND users.host ' . $this->pdo->likeString($host)) : ''),
+				($role != '' ? ('AND users.role = ' . $role) : ''),
+				$order[0],
+				$order[1],
+				($start === false ? '' : ('LIMIT ' . $offset . ' OFFSET ' . $start))
+			)
+		);
 	}
 
 	public function getBrowseOrder($orderby)

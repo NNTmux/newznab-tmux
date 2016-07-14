@@ -1,4 +1,5 @@
 2016-07-14 DariusIII
+	* Chg: Add api requests count to admin/user-list page
 	* Chg: Remove now unused files
 	* Chg: Replace usage of indexer.php with bootstrap.php
 	* Chg: Add workaround for duplicate constants warning
