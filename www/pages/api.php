@@ -214,6 +214,7 @@ switch ($function) {
 	// Get NZB.
 	case 'g':
 		$api->verifyEmptyParameter('g');
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 		$relData = $releases->getByGuid($_GET['id']);
 		if ($relData) {
 			header(
