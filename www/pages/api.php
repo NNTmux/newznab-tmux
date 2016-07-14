@@ -161,14 +161,14 @@ switch ($function) {
 				$airdate = str_replace('/', '-', $year[0] . '-' . $_GET['ep']);
 			} else {
 				$series = $_GET['season'];
-				$episode = $_GET['ep'];
+				$episode = (!empty($_GET['ep']) ? $_GET['ep'] : '');
 			}
 		}
 
 		$relData = $releases->searchShows(
 			$siteIdArr,
 			(isset($series) ? $series : ''),
-			(isset($episode) ? $episode : ''),
+			(!empty($episode) ? $episode : ''),
 			(isset($airdate) ? $airdate : ''),
 			$offset,
 			$api->limit(),
@@ -289,7 +289,7 @@ switch ($function) {
 
 		$params['username'] = $username;
 		$params['password'] = $password;
-		$params['token'] = $userdata['rsstoken'];
+		$params['token'] = $userData['rsstoken'];
 
 		$api->output('', $params, true, 'reg');
 		break;
