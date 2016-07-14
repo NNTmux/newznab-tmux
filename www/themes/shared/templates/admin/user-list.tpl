@@ -36,7 +36,7 @@
 		<th>join date<br/><a title="Sort Descending" href="{$orderbycreateddate_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbycreateddate_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
 		<th>last login<br/><a title="Sort Descending" href="{$orderbylastlogin_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbylastlogin_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
 		<th>api access<br/><a title="Sort Descending" href="{$orderbyapiaccess_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbyapiaccess_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
-		<th>api requests<br/><a title="Sort Descending" href="{$orderbyapirequests_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbyapiarequests_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
+		<th>api requests<br/></th>
 		<th class="mid">grabs<br/><a title="Sort Descending" href="{$orderbygrabs_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbygrabs_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
 		<th class="mid">invites</th>
 		<th class="mid">notes</th>
