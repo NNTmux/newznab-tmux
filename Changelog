@@ -1,4 +1,5 @@
 2016-07-15 DariusIII
+	* Fix: Prevent undefined index notices in api.php
 	* Chg: Update composer files
 2016-07-14 DariusIII
 	* Fix: Add back the missing nzb download option to api
