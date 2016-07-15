@@ -66,46 +66,11 @@
 					<input id="chkSelectAll" type="checkbox" class="nzb_check_all" />
 					<label for="chkSelectAll" style="display:none;">Select All</label>
 				</th>
-				<th>name<br/>
-					<a title="Sort Descending" href="{$orderbyname_desc}">
-						<i class="fa fa-caret-down"></i>
-					</a>
-					<a title="Sort Ascending" href="{$orderbyname_asc}">
-						<i class="fa fa-caret-up"></i>
-					</a>
-				</th>
-				<th>category<br/>
-					<a title="Sort Descending" href="{$orderbycat_desc}">
-						<i class="fa fa-caret-down"></i>
-					</a>
-					<a title="Sort Ascending" href="{$orderbycat_asc}">
-						<i class="fa fa-caret-up"></i>
-					</a>
-				</th>
-				<th>posted<br/>
-					<a title="Sort Descending" href="{$orderbyposted_desc}">
-						<i class="fa fa-caret-down"></i>
-					</a>
-					<a title="Sort Ascending" href="{$orderbyposted_asc}">
-						<i class="fa fa-caret-up"></i>
-					</a>
-				</th>
-				<th>size<br/>
-					<a title="Sort Descending" href="{$orderbysize_desc}">
-						<i class="fa fa-caret-down"></i>
-					</a>
-					<a title="Sort Ascending" href="{$orderbysize_asc}">
-						<i class="fa fa-caret-up"></i>
-					</a>
-				</th>
-				<th>files<br/>
-					<a title="Sort Descending" href="{$orderbyfiles_desc}">
-						<i class="fa fa-caret-down"></i>
-					</a>
-					<a title="Sort Ascending" href="{$orderbyfiles_asc}">
-						<i class="fa fa-caret-up"></i>
-					</a>
-				</th>
+				<th>name</th>
+				<th>category</th>
+				<th>posted</th>
+				<th>size</th>
+				<th>files<</th>
 				<th>action</th>
 			</tr>
 		{assign var="msplits" value=","|explode:$result.grp_release_id}
