@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "76832dcbf70cc9f08ca16c7ccef0d624",
-    "content-hash": "722189a7778ff9d599d98f0a64502efe",
+    "hash": "2fc1f264c1c09c771deee13e994a9478",
+    "content-hash": "74c48b2e8cf9951c5e6a4bfd20446634",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -71,16 +71,16 @@
         },
         {
             "name": "bower-asset/autosize",
-            "version": "3.0.15",
+            "version": "3.0.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jackmoore/autosize.git",
-                "reference": "1e94f8aa0e6dfa7b52217bd4527e1dfdf38ed364"
+                "reference": "b7f730623e8af653a3e6d8bad5bf797e5cfe6ed5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/1e94f8aa0e6dfa7b52217bd4527e1dfdf38ed364",
-                "reference": "1e94f8aa0e6dfa7b52217bd4527e1dfdf38ed364",
+                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/b7f730623e8af653a3e6d8bad5bf797e5cfe6ed5",
+                "reference": "b7f730623e8af653a3e6d8bad5bf797e5cfe6ed5",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1667,7 +1667,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.6.20",
+        "php": ">=5.6.9",
         "ext-ctype": "*",
         "ext-curl": "*",
         "ext-exif": "*",

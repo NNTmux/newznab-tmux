@@ -1,3 +1,5 @@
+2016-07-15 DariusIII
+	* Chg: Update composer files
 2016-07-14 DariusIII
 	* Fix: Add back the missing nzb download option to api
 	* Chg: Add checks for ep when api is queries for season/episode.
