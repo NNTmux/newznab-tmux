@@ -18,9 +18,8 @@
  * @author niel
  * @copyright 2015 NN
  */
-require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'constants.php');
-require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'autoloader.php');
-//require_once 'autoloader.php';
+require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php');
+require_once NN_ROOT . 'app/libraries/autoload.php';
 
 use nntmux\config\Configure;
 

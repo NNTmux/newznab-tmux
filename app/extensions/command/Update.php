@@ -18,19 +18,18 @@
  */
 namespace app\extensions\command;
 
-use \Exception;
-use \Smarty;
 use \app\extensions\util\Git;
 use \app\extensions\util\Versions;
 use \lithium\console\command\Help;
 use \nntmux\db\DbUpdate;
+use \Smarty;
 
 
 /**
  * Update various aspects of your indexer.
  *
  * Actions:
- *  * all|nntmux Fetches current git repo, composer dependencies, and update latest Db patches.
+ *  * all|nzedb Fetches current git repo, composer dependencies, and update latest Db patches.
  *  * db		Update the Db with any patches not yet applied.
  *  * git		Performs git pull.
  *  * predb		Fetch and import TSV files into the predb table.
@@ -39,10 +38,17 @@ use \nntmux\db\DbUpdate;
  */
 class Update extends \app\extensions\console\Command
 {
+	const UPDATES_FILE = NN_CONFIGS . 'updates.json';
+
 	/**
 	 * @var \app\extensions\util\Git object.
 	 */
 	protected $git;
+
+	/**
+	 * @var array Decoded JSON updates file.
+	 */
+	protected $updates = null;
 
 	private $gitBranch;
 
@@ -66,7 +72,7 @@ class Update extends \app\extensions\console\Command
 
 	public function all()
 	{
-		$this->nntmux();
+		$this->nzedb();
 	}
 
 	public function db()
@@ -91,7 +97,6 @@ class Update extends \app\extensions\console\Command
 		} else {
 			$this->out("Up to date.", 'info');
 		}
-
 	}
 
 	public function git()
@@ -100,10 +105,10 @@ class Update extends \app\extensions\console\Command
 		// also prevent web access.
 		$this->initialiseGit();
 		if (!in_array($this->git->getBranch(), $this->git->getBranchesMain())) {
-			$this->out("Not on the stable or dev branch! Refusing to update repository ;-)", 'error');
+			$this->out("Not on the stable or dev branch! Refusing to update repository", 'error');
 			return;
 		}
-		//return
+
 		$this->out($this->git->pull());
 	}
 
@@ -128,6 +133,8 @@ class Update extends \app\extensions\console\Command
 					}
 				};
 			}
+
+			$this->scripts();
 
 			$smarty = new Smarty();
 			$smarty->setCompileDir(NN_SMARTY_TEMPLATES);
@@ -228,6 +235,20 @@ class Update extends \app\extensions\console\Command
 
 		if ($this->_config['git'] instanceof Git) {
 			$this->git =& $this->_config['git'];
+		}
+
+		if (file_exists(UPDATES_FILE)) {
+			$this->updates = json_decode(file_get_contents(UPDATES_FILE), true);
+		}
+	}
+
+	/**
+	 * Fetches and executes scripts for customised updating tasks.
+	 */
+	protected function scripts()
+	{
+		if (![$this->updates]) {
+			$this->updates = ['script' => '0000-00-00 00:00:00'];
 		}
 	}
 }

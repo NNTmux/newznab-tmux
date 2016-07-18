@@ -1,3 +1,5 @@
+2016-07-18 DariusIII
+	* Chg: Change bootstraping process in nntmux
 2016-07-15 DariusIII
 	* Chg: Remove releases ordering in viewmoviefull page of all the themes
 	* Fix: Prevent undefined index notices in api.php

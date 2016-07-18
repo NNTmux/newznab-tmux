@@ -134,8 +134,6 @@ Libraries::add('nntmux',
 		'path'	=> NN_ROOT . 'nntmux',
 	]);
 
-require_once NN_ROOT . 'constants.php';
-
 require_once LITHIUM_APP_PATH . DS . 'libraries' . DS . 'autoload.php';
 /**
  * Add some plugins:

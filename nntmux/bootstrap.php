@@ -18,7 +18,6 @@
  * @author    niel
  * @copyright 2016 nZEDb
  */
-require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'constants.php');
 require_once NN_ROOT . 'app/libraries/autoload.php';
 //require_once 'config' . DS . 'Configure.php';
 
