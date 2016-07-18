@@ -21,6 +21,8 @@
 namespace app\extensions\console;
 
 
+use lithium\data\DocumentSchema;
+
 class Command extends \lithium\console\Command
 {
 	protected $_classes = [
@@ -31,7 +33,7 @@ class Command extends \lithium\console\Command
 	{
 		$defaults = ['request' => null, 'response' => [], 'classes' => $this->_classes];
 		parent::__construct($config + $defaults);
-		require_once NN_ROOT . 'constants.php';
+		require_once NN_LIB . 'constants.php';
 	}
 
 	public function info($text)
