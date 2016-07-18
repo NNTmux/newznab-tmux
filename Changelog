@@ -1,4 +1,5 @@
 2016-07-18 DariusIII
+	* Fix: RSS/API usenetdate format to conform with newznab api specification
 	* Fix: API search now respects group parameter for searches
 	* Chg: Add check for isadmin in forumpost.tpl in all the themes
 	* Fix: RSS/API issues introduced in latest commit
