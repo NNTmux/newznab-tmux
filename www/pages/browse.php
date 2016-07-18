@@ -12,7 +12,7 @@ $category = -1;
 if (isset($_REQUEST["t"]) && ctype_digit($_REQUEST["t"]))
 	$category = $_REQUEST["t"];
 
-$grp = "";
+$grp = -1;
 if (isset($_REQUEST["g"])) {
 	$grp = $_REQUEST["g"];
 }
