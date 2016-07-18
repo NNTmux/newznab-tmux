@@ -237,8 +237,8 @@ class Update extends \app\extensions\console\Command
 			$this->git =& $this->_config['git'];
 		}
 
-		if (file_exists(UPDATES_FILE)) {
-			$this->updates = json_decode(file_get_contents(UPDATES_FILE), true);
+		if (file_exists(self::UPDATES_FILE)) {
+			$this->updates = json_decode(file_get_contents(self::UPDATES_FILE), true);
 		}
 	}
 
