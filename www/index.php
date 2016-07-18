@@ -1,5 +1,6 @@
 <?php
 require_once 'smarty.php';
+require_once NN_ROOT . 'app' . DS . 'config' . DS . 'bootstrap' . DS . 'libraries.php';
 
 use nntmux\db\Settings;
 
