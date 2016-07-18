@@ -17,7 +17,7 @@
  * @copyright 2016 nZEDb
  */
 
-require_once '..' . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
+require_once '..' . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 $updates = NN_CONFIGS . 'updates.json';
 if (!file_exists($updates)) {
