@@ -128,7 +128,7 @@ class API extends Capabilities {
 		$groupName = -1;
 		if (isset($this->getRequest['group'])) {
 			$group = (new Groups())->isValidGroup($this->getRequest['group']);
-			if ($group !== false){
+			if ($group !== false) {
 				$groupName = $group;
 			}
 		}
