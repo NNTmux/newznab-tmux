@@ -192,12 +192,12 @@ class Releases
 	 * @param string $orderBy
 	 * @param int    $maxAge
 	 * @param array  $excludedCats
-	 * @param string $groupName
-	 * @param int $minSize
+	 * @param mixed $groupName
+	 * @param int    $minSize
 	 *
 	 * @return array
 	 */
-	public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [], $groupName, $minSize = 0)
+	public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [], $groupName = -1, $minSize = 0)
 	{
 		$orderBy = $this->getBrowseOrder($orderBy);
 
