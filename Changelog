@@ -1,4 +1,5 @@
 2016-07-18 DariusIII
+	* Chg: Add check for isadmin in forumpost.tpl in all the themes
 	* Fix: RSS/API issues introduced in latest commit
 	* Chg: Change bootstraping process in nntmux
 2016-07-15 DariusIII
