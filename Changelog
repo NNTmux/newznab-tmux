@@ -1,4 +1,5 @@
 2016-07-19 DariusIII
+	* Fix: Add lithium libraries bootstrap for Admin pages
 	* Fix: Display of browsing categories on browse pages of every theme.
 2016-07-18 DariusIII
 	* Fix: RSS/API usenetdate format to conform with newznab api specification

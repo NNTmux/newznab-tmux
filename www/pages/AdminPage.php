@@ -1,4 +1,5 @@
 <?php
+require_once NN_ROOT . 'app' . DS . 'config' . DS . 'bootstrap' . DS . 'libraries.php';
 
 use nntmux\Users;
 
