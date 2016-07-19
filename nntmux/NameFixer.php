@@ -188,7 +188,7 @@ class NameFixer
 		$preId = false;
 		if ($cats === 3) {
 			$query = sprintf('
-					SELECT rel.id AS releases_id
+					SELECT rel.id AS releases_id, rel.fromname
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE rel.nzbstatus = %d
@@ -199,7 +199,7 @@ class NameFixer
 			$preId = true;
 		} else {
 			$query = sprintf('
-					SELECT rel.id AS releases_id
+					SELECT rel.id AS releases_id, rel.fromname
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id = %d)
@@ -222,7 +222,7 @@ class NameFixer
 				foreach ($releases as $rel) {
 					$releaseRow = $this->pdo->queryOneRow(
 						sprintf('
-							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.categories_id, rel.name, rel.searchname,
+							SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname,
 								UNCOMPRESS(nfo) AS textstring, rel.id AS releases_id
 							FROM releases rel
 							INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
