@@ -160,9 +160,9 @@ class Categorize extends Category
 					break;
 				case $group === 'alt.binaries.british.drama':
 					switch (true) {
+						case $this->isUHDTV():
 						case $this->isHDTV():
 						case $this->isSDTV():
-						case $this->isUHDTV():
 						case $this->isPC():
 							break;
 						default:
@@ -183,9 +183,9 @@ class Categorize extends Category
 					break;
 				case $group === 'alt.binaries.b4e':
 					switch (true) {
+						case $this->isUHDTV():
 						case $this->isHDTV():
 						case $this->isSDTV():
-						case $this->isUHDTV():
 						case $this->isPC():
 						case $this->isMovie():
 						case $this->isXxx():
@@ -420,9 +420,9 @@ class Categorize extends Category
 							break;
 						case $this->isMovieSD(): // Need to check this BEFORE the HD check
 							break;
-						case $this->isMovieHD():  // Check the movie isn't an HD release before blindly assigning SD
-							break;
 						case $this->isMovieUHD():  // Check the movie isn't an UHD release before blindly assigning SD
+							break;
+						case $this->isMovieHD():  // Check the movie isn't an HD release before blindly assigning SD
 							break;
 						default:
 							$this->tmpCat = Category::MOVIE_SD;
@@ -723,8 +723,8 @@ class Categorize extends Category
 				case $this->isMovieSD():
 				case $this->isMovie3D():
 				case $this->isMovieBluRay():
-				case $this->isMovieHD():
 				case $this->isMovieUHD():
+				case $this->isMovieHD():
 				case $this->isMovieOther():
 					return true;
 				default:
@@ -915,8 +915,8 @@ class Categorize extends Category
 			case $this->isXxxPack():
 			case $this->isXxxClipSD():
 			case $this->isXxxSD():
-			case $this->isXxxClipHD():
 			case $this->isXxxUHD():
+			case $this->isXxxClipHD():
 			case $this->catWebDL && $this->isXxxWEBDL():
 			case $this->isXxx264():
 			case $this->isXxxXvid():
