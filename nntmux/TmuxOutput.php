@@ -120,7 +120,7 @@ class TmuxOutput extends Tmux
 		$version = $this->_vers->versions->git->tag;
 
 		$buffer .= sprintf($this->tmpMasks[2],
-			"Monitor $state v$version [" . $this->runVar['constants']['sqlpatch'] . "]: ",
+			"Monitor $state $version [" . $this->runVar['constants']['sqlpatch'] . "]: ",
 			$this->relativeTime($this->runVar['timers']['timer1'])
 		);
 
