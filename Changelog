@@ -1,3 +1,5 @@
+2016-07-19 DariusIII
+	* Fix: Display of browsing categories on browse pages of every theme.
 2016-07-18 DariusIII
 	* Fix: RSS/API usenetdate format to conform with newznab api specification
 	* Fix: API search now respects group parameter for searches
