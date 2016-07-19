@@ -20,8 +20,6 @@
  */
 namespace nntmux\db;
 
-require_once NN_ROOT . 'app' . DS . 'config' . DS . 'bootstrap' . DS . 'libraries.php';
-
 use app\extensions\util\Versions;
 use nntmux\utility\Utility;
 
