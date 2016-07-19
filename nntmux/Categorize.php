@@ -36,7 +36,7 @@ class Categorize extends Category
 	 * Group id of the releasename we are sorting through.
 	 * @var int|string
 	 */
-	public $groupID;
+	public $groupid;
 
 	/**
 	 * @var Regexes
@@ -881,7 +881,7 @@ class Categorize extends Category
 			case !preg_match('/\bXXX\b|(a\.b\.erotica|ClubSeventeen|Cum(ming|shot)|Err?oticax?|Porn(o|lation)?|Imageset|PICTURESET|JAV Uncensored|lesb(ians?|os?)|mastur(bation|e?bate)|My_Stepfather_Made_Me|nympho?|OLDER ANGELS|pictures\.erotica\.anime|sexontv|slut|Squirt|SWE6RUS|Transsexual|whore)/i', $this->releaseName):
 				return false;
 			case $this->isXxxPack():
-			case $this->IsXxxClipHD():
+			case $this->isXxxClipHD():
 			case $this->isXxxClipSD():
 			case $this->catWebDL && $this->isXxxWEBDL():
 			case $this->isXxx264():
@@ -993,7 +993,7 @@ class Categorize extends Category
 
 	public function isXxxSD()
 	{
-		if (preg_match('/^[\w.]+(\d{2}\.\d{2}\.\d{2})[\w.]+(MP4-\w+)/i', $this->releaseName)) {
+		if (preg_match('/SDX264XXX|XXX\.HR\./i', $this->releaseName)) {
 			$this->tmpCat = Category::XXX_SD;
 			return true;
 		}
