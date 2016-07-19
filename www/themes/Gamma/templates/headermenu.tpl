@@ -117,7 +117,7 @@
 				<hr>
 				{if $userdata.xxxview == "1"}
 					{foreach $parentcat.subcatlist as $subcat}
-						{if $subcat.id == {$catClass::XXX_DVD} OR $subcat.id == {$catClass::XXX_WMV} OR $subcat.id == {$catClass::XXX_XVID} OR $subcat.id == {$catClass::XXX_X264} OR $subcat.id == {$catClass::XXX_UHD}}
+						{if $subcat.id == {$catClass::XXX_DVD} OR $subcat.id == {$catClass::XXX_WMV} OR $subcat.id == {$catClass::XXX_XVID} OR $subcat.id == {$catClass::XXX_X264}}
 							<li><a href="{$smarty.const.WWW_TOP}/xxx?t={$subcat.id}">{$subcat.title}</a>
 							</li>
 						{else}
