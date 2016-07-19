@@ -23,7 +23,7 @@ class RequestIDLocal extends RequestID
 	protected function _getReleases()
 	{
 		$query = (
-			'SELECT r.id, r.name, r.categories_id, r.reqidstatus, g.name AS groupname, g.id as gid
+			'SELECT r.id, r.name, r.fromname, r.categories_id, r.reqidstatus, g.name AS groupname, g.id as gid
 			FROM releases r
 			LEFT JOIN groups g ON r.groups_id = g.id
 			WHERE r.nzbstatus = 1

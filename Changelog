@@ -1,4 +1,5 @@
 2016-07-19 DariusIII
+	* Chg: Update queries in NameFixer for by poster categorization
 	* Chg: Move UHD releases checks before HD ondes
 	* Chg: Add UHD subcategories to Movies, TV and XXX categories
 	* Chg: Add categorization by poster to Categorize.php (used in XXX SD clips for now)

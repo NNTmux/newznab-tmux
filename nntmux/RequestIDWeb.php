@@ -42,7 +42,7 @@ class RequestIDWeb extends RequestID
 	{
 		$this->_releases = $this->pdo->queryDirect(
 			sprintf ('
-				SELECT r.id, r.name, r.searchname, g.name AS groupname, r.groups_id, r.categories_id
+				SELECT r.id, r.name, r.searchname, r.fromname, g.name AS groupname, r.groups_id, r.categories_id
 				FROM releases r
 				LEFT JOIN groups g ON r.groups_id = g.id
 				WHERE r.nzbstatus = 1
