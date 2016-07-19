@@ -572,7 +572,7 @@ class NameFixer
 				$this->matched = true;
 				$this->relid = $release['releases_id'];
 
-				$determinedCategory = $this->category->determineCategory($release['groups_id'], $newName);
+				$determinedCategory = $this->category->determineCategory($release['groups_id'], $newName, !empty($release['fromname']) ? $release['fromname'] : '');
 
 				if ($type === "PAR2, ") {
 					$newName = ucwords($newName);
@@ -748,7 +748,7 @@ class NameFixer
 		$res = $this->pdo->queryDirect(
 			sprintf("
 				SELECT r.id AS releases_id, r.name, r.searchname,
-				r.groups_id, r.categories_id
+				r.fromname, r.groups_id, r.categories_id
 				FROM releases r
 				%1\$s
 				AND (r.name %2\$s OR r.searchname %2\$s)
@@ -1624,7 +1624,7 @@ class NameFixer
 	{
 		if ($this->done === false && $this->relid !== $release["releases_id"]) {
 			$result = $this->pdo->queryDirect("
-				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.predb_id
+				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM release_unique ru
 				STRAIGHT_JOIN releases r ON ru.releases_id = r.id
 				WHERE ru.uniqueid = UNHEX({$this->pdo->escapeString($release['uid'])})

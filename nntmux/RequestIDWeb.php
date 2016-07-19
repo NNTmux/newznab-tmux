@@ -284,7 +284,7 @@ class RequestIDWeb extends RequestID
 	 */
 	protected function _updateRelease()
 	{
-		$determinedCategory = $this->category->determineCategory($this->_release['groups_id'], $this->_newTitle['title']);
+		$determinedCategory = $this->category->determineCategory($this->_release['groups_id'], $this->_newTitle['title'], $this->_release['fromname']);
 		$newTitle = $this->pdo->escapeString($this->_newTitle['title']);
 		$this->pdo->queryExec(
 			sprintf('

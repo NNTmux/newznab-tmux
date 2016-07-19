@@ -253,7 +253,7 @@ class RequestIDLocal extends RequestID
 	 */
 	protected function _updateRelease()
 	{
-		$determinedCat = $this->category->determineCategory($this->_release['gid'], $this->_newTitle['title']);
+		$determinedCat = $this->category->determineCategory($this->_release['gid'], $this->_newTitle['title'], $this->_release['fromname']);
 		if ($determinedCat == $this->_release['categories_id']) {
 			$newTitle = $this->pdo->escapeString($this->_newTitle['title']);
 			$this->pdo->queryExec(

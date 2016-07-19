@@ -33,6 +33,12 @@ class Categorize extends Category
 	public $releaseName;
 
 	/**
+	 * Release poster to sort through.
+	 * @var string
+	 */
+	public $poster;
+
+	/**
 	 * Group id of the releasename we are sorting through.
 	 * @var int|string
 	 */
@@ -63,15 +69,17 @@ class Categorize extends Category
 	 * Returns Category::OTHER_MISC if no category is appropriate.
 	 *
 	 * @param string     $releaseName The name to parse.
+	 * @param string     $poster Name of the release poster to parse
 	 * @param int|string $groupID     The groups_id.
 	 *
 	 * @return int The categories_id.
 	 */
-	public function determineCategory($groupID, $releaseName = '')
+	public function determineCategory($groupID, $releaseName = '', $poster = '')
 	{
 		$this->releaseName = $releaseName;
 		$this->groupid     = $groupID;
 		$this->tmpCat      = Category::OTHER_MISC;
+		$this->poster      = $poster;
 
 		switch (true) {
 			case $this->isMisc():
@@ -80,7 +88,7 @@ class Categorize extends Category
 			case $this->byGroup(): // Note that in byGroup() some overrides occur...
 			//Try against all functions, if still nothing, return Cat Misc.
 			case $this->isPC():
-			case $this->isXXX():
+			case $this->isXxx():
 			case $this->isTV():
 			case $this->isMusic():
 			case $this->isMovie():
@@ -881,8 +889,9 @@ class Categorize extends Category
 			case !preg_match('/\bXXX\b|(a\.b\.erotica|ClubSeventeen|Cum(ming|shot)|Err?oticax?|Porn(o|lation)?|Imageset|PICTURESET|JAV Uncensored|lesb(ians?|os?)|mastur(bation|e?bate)|My_Stepfather_Made_Me|nympho?|OLDER ANGELS|pictures\.erotica\.anime|sexontv|slut|Squirt|SWE6RUS|Transsexual|whore)/i', $this->releaseName):
 				return false;
 			case $this->isXxxPack():
-			case $this->isXxxClipHD():
 			case $this->isXxxClipSD():
+			case $this->isXxxSD():
+			case $this->isXxxClipHD():
 			case $this->catWebDL && $this->isXxxWEBDL():
 			case $this->isXxx264():
 			case $this->isXxxXvid():
@@ -890,7 +899,6 @@ class Categorize extends Category
 			case $this->isXxxWMV():
 			case $this->isXxxDVD():
 			case $this->isXxxOther():
-			case $this->isXxxSD():
 
 				return true;
 			default:
@@ -980,11 +988,7 @@ class Categorize extends Category
 
 	public function isXxxClipSD()
 	{
-		if (preg_match('/^[\w.]+(\d{2}\.\d{2}\.\d{2})[\w.]+(MP4-(SDX264XXX|XXX\.HR\.))/i', $this->releaseName)) {
-			$this->tmpCat = Category::XXX_CLIPSD;
-			return true;
-		}
-		if (preg_match('/SDX264XXX/i', $this->releaseName)) {
+		if (preg_match('/oz@lot[.]com/i', $this->poster)) {
 			$this->tmpCat = Category::XXX_CLIPSD;
 			return true;
 		}

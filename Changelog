@@ -1,4 +1,5 @@
 2016-07-19 DariusIII
+	* Chg: Add categorization by poster to Categorize.php (used in XXX SD clips for now)
 	* Fix: Add lithium libraries bootstrap for Admin pages
 	* Fix: Display of browsing categories on browse pages of every theme.
 2016-07-18 DariusIII
