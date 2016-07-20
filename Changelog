@@ -1,3 +1,5 @@
+2016-07-20 DariusIII
+	* Chg: Update XXX UHD and XXX HD regexes for categorization
 2016-07-19 DariusIII
 	* Chg: Update queries in NameFixer for by poster categorization
 	* Chg: Move UHD releases checks before HD ondes
