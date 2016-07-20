@@ -1,4 +1,5 @@
 2016-07-20 DariusIII
+	* Chg: Update upcoming pages to prevent notices when alternate_ids is not set in rottentomatoes response
 	* Chg: Update XXX UHD and XXX HD regexes for categorization
 2016-07-19 DariusIII
 	* Chg: Update queries in NameFixer for by poster categorization

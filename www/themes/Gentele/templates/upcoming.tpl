@@ -31,10 +31,12 @@
 								<a class="rndbtn badge badge-success" target="_blank"
 								   href="{$site->dereferrer_link}{$result->links->alternate}"
 								   title="View Rotten Tomatoes Details">Rotten</a>
+								{if !empty($result->alternate_ids->imdb)}
 								<a class="rndbtn badge badge-imdb" target="_blank"
 								   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result->alternate_ids->imdb}"
 								   title="View Imdb Details">IMDB</a>
-								{if !empty($cpurl) && !empty($cpapi)}
+								{/if}
+								{if !empty($cpurl) && !empty($cpapi) && !empty($result->alternate_ids->imdb)}
 									<a
 											id="imdb{$result->alternate_ids->imdb}"
 											href="javascript:;"
@@ -48,7 +50,9 @@
 					</td>
 					<td colspan="3" class="left">
 						<h4>
+							{if !empty($result->alternate_ids->imdb)}
 							<a href="{$smarty.const.WWW_TOP}/movies?imdb={$result->alternate_ids->imdb}">{$result->title|escape:"htmlall"}</a>
+							{/if}
 							(<a class="title" title="{$result->year}"
 								href="{$smarty.const.WWW_TOP}/movies?year={$result->year}">{$result->year}</a>) {if $result->ratings->critics_score > 0}{$result->ratings->critics_score}/100{/if}
 						</h4>
@@ -69,7 +73,7 @@
 							<br/>
 							<br/>
 						{/if}
-						{if isset($ourmovies) && $ourmovies[$result->alternate_ids->imdb] != ""}
+						{if !empty($ourmovies[$result->alternate_ids->imdb])}
 							<a class="rndbtn btn btn-sm btn-success"
 							   href="{$smarty.const.WWW_TOP}/movies?imdb={$result->alternate_ids->imdb}">Download</a>
 						{else}
