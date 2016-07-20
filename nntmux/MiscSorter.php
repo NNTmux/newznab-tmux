@@ -237,7 +237,7 @@ class MiscSorter
 		$release = $this->pdo->queryOneRow(
 			sprintf("
 							SELECT r.id AS releases_id, r.searchname AS searchname,
-								r.name AS name, r.categories_id, r.groups_id
+								r.name AS name, r.fromname, r.categories_id, r.groups_id
 							FROM releases r
 							WHERE r.id = %d",
 				$id
