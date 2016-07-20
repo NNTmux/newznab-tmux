@@ -1022,8 +1022,7 @@ class Categorize extends Category
 
 	public function isXxxClipSD()
 	{
-		if (preg_match('/oz@lot[.]com/i', $this->poster)) {
-			$this->tmpCat = Category::XXX_CLIPSD;
+		if ($this->checkPoster( '/oz@lot[.]com/i', $this->poster, Category::XXX_CLIPSD) === true) {
 			return true;
 		}
 		return false;
@@ -1488,5 +1487,21 @@ class Categorize extends Category
 				return false;
 		}
 		return true;
+	}
+
+	/**
+	 * @param string $regex     Regex to use for match
+	 * @param string $fromName  Poster that needs to be matched by regex
+	 * @param string $category  Category to set if there is a match
+	 *
+	 * @return bool
+	 */
+	public function checkPoster($regex, $fromName, $category)
+	{
+		if (preg_match($regex, $fromName)) {
+			$this->tmpCat = $category;
+			return true;
+		}
+		return false;
 	}
 }
