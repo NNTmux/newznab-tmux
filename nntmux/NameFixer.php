@@ -572,7 +572,7 @@ class NameFixer
 				$this->matched = true;
 				$this->relid = $release['releases_id'];
 
-				$determinedCategory = $this->category->determineCategory($release['groups_id'], $newName, $release['fromname']);
+				$determinedCategory = $this->category->determineCategory($release['groups_id'], $newName, !empty($release['fromname']) ? $release['fromname'] : '');
 
 				if ($type === "PAR2, ") {
 					$newName = ucwords($newName);
