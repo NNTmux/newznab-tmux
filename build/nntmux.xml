@@ -2,7 +2,7 @@
 <nntmux>
 	<versions>
 		<git>
-			<tag>0.0.0</tag>
+			<tag>v0.4.2</tag>
 			<!-- commit count removed -->
 			<hooks>
 				<precommit>9</precommit>

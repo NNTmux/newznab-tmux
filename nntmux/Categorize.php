@@ -1022,10 +1022,12 @@ class Categorize extends Category
 
 	public function isXxxClipSD()
 	{
-		if ($this->checkPoster( '/oz@lot[.]com/i', $this->poster, Category::XXX_CLIPSD) === true) {
-			return true;
+		switch(true) {
+			case $this->checkPoster( '/oz@lot[.]com/i', $this->poster, Category::XXX_CLIPSD):
+				return true;
+			default:
+				return false;
 		}
-		return false;
 	}
 
 	public function isXxxSD()

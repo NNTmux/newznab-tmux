@@ -1,3 +1,5 @@
+2016-07-21 DariusIII
+	* Chg: Improve isXxxClipSD matching code
 2016-07-20 DariusIII
 	* Chg: Add function to match poster for categorization
 	* Chg: Update upcoming pages to prevent notices when alternate_ids is not set in rottentomatoes response
