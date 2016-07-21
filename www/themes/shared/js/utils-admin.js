@@ -7,29 +7,30 @@
 function ajax_group_status(id, what)
 {
     // no caching of results
+    var rand_no = Math.random();
     if (what != undefined)
     {
         $.ajax({
-          url       : WWW_TOP + '/ajax_group-edit.php?rand=' + $.now(),
-          data      : { group_id: id, group_status: what },
-          dataType  : "html",
-          success   : function(data)
-          {
-              $('div#message').html(data);
-              $('div#message').show('fast', function() {});
+            url       : WWW_TOP + '/admin/ajax.php?action=toggle_group_active_status&rand=' + rand_no,
+            data      : { group_id: id, group_status: what },
+            dataType  : "html",
+            success   : function(data)
+            {
+                $('div#message').html(data);
+                $('div#message').show('fast', function() {});
 
-              // switch some links around
-              if (what == 0) {
-                  $('td#group-' + id).html('<a href="javascript:ajax_group_status('+ id +', 1)" class="group_deactive">Activate</a>');
-              }
-              else {
-                  $('td#group-' + id).html('<a href="javascript:ajax_group_status('+ id +', 0)" class="group_active">Deactivate</a>');
-              }
+                // switch some links around
+                if (what == 0) {
+                    $('td#group-' + id).html('<a href="javascript:ajax_group_status('+ id +', 1)" class="group_deactive">Activate</a>');
+                }
+                else {
+                    $('td#group-' + id).html('<a href="javascript:ajax_group_status('+ id +', 0)" class="group_active">Deactivate</a>');
+                }
 
-              // fade.. mm
-              $('#message').fadeOut(5000);
-          },
-          error: function(xhr,err,e) { alert( "Error in ajax_group_status: " + err ); }
+                // fade.. mm
+                $('#message').fadeOut(5000);
+            },
+            error: function(xhr,err,e) { alert( "Error in ajax_group_status: " + err ); }
         });
     }
     else
