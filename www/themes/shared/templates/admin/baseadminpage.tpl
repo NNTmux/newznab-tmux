@@ -25,7 +25,7 @@
 		  type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.css" rel="stylesheet"
 		  type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/animate.css/animate.min.css" rel="stylesheet">
@@ -111,7 +111,7 @@
 <!-- jQuery migrate script -->
 <script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.4.0.min.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/utils-admin.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.multiselect.js"></script>

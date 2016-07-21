@@ -2,7 +2,7 @@
  * ajax_group_status()
  *
  * @param id        group id
- * @param status    0 = deactive, 1 = activate
+ * @param what    0 = deactive, 1 = activate
  */
 function ajax_group_status(id, what)
 {
