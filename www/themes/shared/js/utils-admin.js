@@ -11,7 +11,7 @@ function ajax_group_status(id, what)
     if (what != undefined)
     {
         $.ajax({
-            url       : WWW_TOP + '/admin/ajax.php?action=toggle_group_active_status&rand=' + rand_no,
+            url       : WWW_TOP + '/ajax.php?action=toggle_group_active_status&rand=' + rand_no,
             data      : { group_id: id, group_status: what },
             dataType  : "html",
             success   : function(data)
