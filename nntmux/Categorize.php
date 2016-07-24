@@ -225,12 +225,17 @@ class Categorize extends Category
 					if ($this->isXxx()) {
 						break;
 					}
+
 					return false;
 				case preg_match('/alt\.binaries(\.(19\d0s|country|sounds?(\.country|\.19\d0s)?))?\.mp3(\.[a-z]+)?/i', $group):
-					if ($this->isMusic()) {
-						break;
+					switch (true) {
+						case $this->isMusic():
+						case $this->isXxx():
+							break;
+						default:
+							$this->tmpCat = Category::MUSIC_MP3;
+							break;
 					}
-					$this->tmpCat = Category::MUSIC_MP3;
 					break;
 				case $group === 'alt.binaries.triballs':
 					switch (true) {

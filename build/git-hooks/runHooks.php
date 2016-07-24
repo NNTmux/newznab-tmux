@@ -47,9 +47,11 @@ if ($error === false) {
 		if ($error === false) {
 			try {
 				$vers = new Versions();
-				$vers->checkGitTag(true, true);
-				$vers->checkSQLFileLatest(true);
+				$vers->checkGitTag(true);
+				$vers->checkSQLFileLatest(false);
+				$vers->checkSQLDb(false);
 				$vers->save();
+
 				$git->add(NN_VERSIONS);
 			} catch (\Exception $e) {
 				$error = 1;
