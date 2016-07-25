@@ -1,7 +1,10 @@
 <?php
 namespace nntmux;
+
+use darius\rarinfo\Par2Info;
+use darius\rarinfo\SfvInfo;
 use nntmux\db\Settings;
-use \nntmux\processing\PostProcess;
+use nntmux\processing\PostProcess;
 use nntmux\utility\Utility;
 
 /**
@@ -168,12 +171,12 @@ class Nfo
 			if (isset($check['error'])) {
 
 				// Check if it's a par2.
-				$par2info = new \Par2Info();
+				$par2info = new Par2Info();
 				$par2info->setData($possibleNFO);
 				if ($par2info->error) {
 
 					// Check if it's an SFV.
-					$sfv = new \SfvInfo();
+					$sfv = new SfvInfo();
 					$sfv->setData($possibleNFO);
 					if ($sfv->error) {
 						return true;

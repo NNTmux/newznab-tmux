@@ -1,6 +1,7 @@
 <?php
 namespace nntmux\processing;
 
+use darius\rarinfo\Par2Info;
 use nntmux\Books;
 use nntmux\Category;
 use nntmux\Console;
@@ -45,12 +46,12 @@ class PostProcess
 	protected $nameFixer;
 
 	/**
-	 * @var \Par2Info
+	 * @var \darius\rarinfo\Par2Info
 	 */
 	protected $_par2Info;
 
 	/**
-	 * @var \srrInfo
+	 * @var \darius\rarinfo\SrrInfo
 	 */
 	protected $_srrInfo;
 
@@ -111,7 +112,7 @@ class PostProcess
 		// Class instances.
 		$this->pdo = (($options['Settings'] instanceof Settings) ? $options['Settings'] : new Settings());
 		$this->groups = (($options['Groups'] instanceof Groups) ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
-		$this->_par2Info = new \Par2Info();
+		$this->_par2Info = new Par2Info();
 		$this->debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
 		$this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
 		$this->Nfo = (($options['Nfo'] instanceof Nfo) ? $options['Nfo'] : new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
@@ -267,7 +268,6 @@ class PostProcess
 			(new TVMaze(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
 			(new TMDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
 			(new TraktTv(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
-			//(new TvRage(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvRage($groupID, $guidChar, $processTV);
 		}
 	}
 
