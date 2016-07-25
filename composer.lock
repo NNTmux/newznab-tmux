@@ -967,12 +967,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "53e89b3bf07f6b12783b3e8da3eb5ccb48ec5402"
+                "reference": "aa4f465fd3826b5cec997b3e8bfd8584dcc20342"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/53e89b3bf07f6b12783b3e8da3eb5ccb48ec5402",
-                "reference": "53e89b3bf07f6b12783b3e8da3eb5ccb48ec5402",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/aa4f465fd3826b5cec997b3e8bfd8584dcc20342",
+                "reference": "aa4f465fd3826b5cec997b3e8bfd8584dcc20342",
                 "shasum": ""
             },
             "require": {
@@ -980,9 +980,17 @@
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "dariusiii\rarinfo\\": ""
-                }
+                "classmap": [
+                    "ArchiveInfo.php",
+                    "ArchiveReader.php",
+                    "Par2Info.php",
+                    "PipeReader.php",
+                    "RarInfo.php",
+                    "SfvInfo.php",
+                    "SrrInfo.php",
+                    "SzipInfo.php",
+                    "ZipInfo.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -998,7 +1006,7 @@
                 }
             ],
             "description": "PHP archive reader helper class",
-            "time": "2016-07-25 18:36:36"
+            "time": "2016-07-25 18:45:34"
         },
         {
             "name": "exeu/apai-io",
