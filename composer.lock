@@ -967,12 +967,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "0c11ad042655d951b921c7e0c8f374ee27a61574"
+                "reference": "53e89b3bf07f6b12783b3e8da3eb5ccb48ec5402"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/0c11ad042655d951b921c7e0c8f374ee27a61574",
-                "reference": "0c11ad042655d951b921c7e0c8f374ee27a61574",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/53e89b3bf07f6b12783b3e8da3eb5ccb48ec5402",
+                "reference": "53e89b3bf07f6b12783b3e8da3eb5ccb48ec5402",
                 "shasum": ""
             },
             "require": {
@@ -998,7 +998,7 @@
                 }
             ],
             "description": "PHP archive reader helper class",
-            "time": "2016-07-25 17:46:32"
+            "time": "2016-07-25 18:36:36"
         },
         {
             "name": "exeu/apai-io",
