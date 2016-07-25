@@ -1,8 +1,8 @@
 <?php
 namespace nntmux;
 
-use darius\rarinfo\Par2Info;
-use darius\rarinfo\SfvInfo;
+use dariusiii\rarinfo\Par2Info;
+use dariusiii\rarinfo\SfvInfo;
 use nntmux\db\Settings;
 use nntmux\processing\PostProcess;
 use nntmux\utility\Utility;

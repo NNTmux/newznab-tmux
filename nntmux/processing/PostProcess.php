@@ -1,7 +1,7 @@
 <?php
 namespace nntmux\processing;
 
-use darius\rarinfo\Par2Info;
+use dariusiii\rarinfo\Par2Info;
 use nntmux\Books;
 use nntmux\Category;
 use nntmux\Console;

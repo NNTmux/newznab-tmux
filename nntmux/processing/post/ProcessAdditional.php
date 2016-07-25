@@ -1,8 +1,8 @@
 <?php
 namespace nntmux\processing\post;
 
-use darius\rarinfo\ArchiveInfo;
-use darius\rarinfo\Par2Info;
+use dariusiii\rarinfo\ArchiveInfo;
+use dariusiii\rarinfo\Par2Info;
 use nntmux\Categorize;
 use nntmux\Category;
 use nntmux\Groups;
