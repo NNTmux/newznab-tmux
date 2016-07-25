@@ -46,12 +46,12 @@ class PostProcess
 	protected $nameFixer;
 
 	/**
-	 * @var \darius\rarinfo\Par2Info
+	 * @var \dariusiii\rarinfo\Par2Info
 	 */
 	protected $_par2Info;
 
 	/**
-	 * @var \darius\rarinfo\SrrInfo
+	 * @var \dariusiii\rarinfo\SrrInfo
 	 */
 	protected $_srrInfo;
 

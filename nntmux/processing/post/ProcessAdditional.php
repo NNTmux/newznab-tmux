@@ -72,12 +72,12 @@ class ProcessAdditional
 	protected $_groups;
 
 	/**
-	 * @var \darius\rarinfo\Par2Info
+	 * @var \dariusiii\rarinfo\Par2Info
 	 */
 	protected $_par2Info;
 
 	/**
-	 * @var \darius\rarinfo\ArchiveInfo
+	 * @var \dariusiii\rarinfo\ArchiveInfo
 	 */
 	protected $_archiveInfo;
 
