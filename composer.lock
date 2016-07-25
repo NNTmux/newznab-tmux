@@ -100,20 +100,20 @@
         },
         {
             "name": "bower-asset/bootstrap",
-            "version": "v3.3.6",
+            "version": "v3.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twbs/bootstrap.git",
-                "reference": "81df608a40bf0629a1dc08e584849bb1e43e0b7a"
+                "reference": "0b9c4a4007c44201dce9a6cc1a38407005c26c86"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/81df608a40bf0629a1dc08e584849bb1e43e0b7a",
-                "reference": "81df608a40bf0629a1dc08e584849bb1e43e0b7a",
+                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/0b9c4a4007c44201dce9a6cc1a38407005c26c86",
+                "reference": "0b9c4a4007c44201dce9a6cc1a38407005c26c86",
                 "shasum": ""
             },
             "require": {
-                "bower-asset/jquery": ">=1.9.1,<=2"
+                "bower-asset/jquery": ">=1.9.1,<4.0"
             },
             "type": "bower-asset-library",
             "extra": {
@@ -149,20 +149,20 @@
         },
         {
             "name": "bower-asset/bootstrap-3.x",
-            "version": "v3.3.6",
+            "version": "v3.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twbs/bootstrap.git",
-                "reference": "81df608a40bf0629a1dc08e584849bb1e43e0b7a"
+                "reference": "0b9c4a4007c44201dce9a6cc1a38407005c26c86"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/81df608a40bf0629a1dc08e584849bb1e43e0b7a",
-                "reference": "81df608a40bf0629a1dc08e584849bb1e43e0b7a",
+                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/0b9c4a4007c44201dce9a6cc1a38407005c26c86",
+                "reference": "0b9c4a4007c44201dce9a6cc1a38407005c26c86",
                 "shasum": ""
             },
             "require": {
-                "bower-asset/jquery": ">=1.9.1,<=2"
+                "bower-asset/jquery": ">=1.9.1,<4.0"
             },
             "type": "bower-asset-library",
             "extra": {
@@ -535,29 +535,33 @@
         },
         {
             "name": "bower-asset/jquery",
-            "version": "2.0.0",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jquery/jquery-dist.git",
-                "reference": "a55c5eeb709b584f58a1f3d8d0bc9f1432cd998a"
+                "reference": "6f02bc382c0529d3b4f68f6b2ad21876642dbbfe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/a55c5eeb709b584f58a1f3d8d0bc9f1432cd998a",
-                "reference": "a55c5eeb709b584f58a1f3d8d0bc9f1432cd998a",
+                "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/6f02bc382c0529d3b4f68f6b2ad21876642dbbfe",
+                "reference": "6f02bc382c0529d3b4f68f6b2ad21876642dbbfe",
                 "shasum": ""
             },
             "type": "bower-asset-library",
             "extra": {
-                "bower-asset-main": "jquery.js"
+                "bower-asset-main": "dist/jquery.js",
+                "bower-asset-ignore": [
+                    "package.json"
+                ]
             },
             "license": [
                 "MIT"
             ],
-            "description": "jQuery component",
             "keywords": [
-                "component",
-                "jquery"
+                "browser",
+                "javascript",
+                "jquery",
+                "library"
             ]
         },
         {
@@ -963,12 +967,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "3831bf1f5046f476f83f814726eb0fe0f99bf51e"
+                "reference": "0c11ad042655d951b921c7e0c8f374ee27a61574"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/3831bf1f5046f476f83f814726eb0fe0f99bf51e",
-                "reference": "3831bf1f5046f476f83f814726eb0fe0f99bf51e",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/0c11ad042655d951b921c7e0c8f374ee27a61574",
+                "reference": "0c11ad042655d951b921c7e0c8f374ee27a61574",
                 "shasum": ""
             },
             "require": {
@@ -976,17 +980,9 @@
             },
             "type": "library",
             "autoload": {
-                "classmap": [
-                    "ArchiveInfo.php",
-                    "ArchiveReader.php",
-                    "Par2Info.php",
-                    "PipeReader.php",
-                    "RarInfo.php",
-                    "SfvInfo.php",
-                    "SrrInfo.php",
-                    "SzipInfo.php",
-                    "ZipInfo.php"
-                ]
+                "psr-4": {
+                    "dariusiii\rarinfo\\": ""
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -1002,7 +998,7 @@
                 }
             ],
             "description": "PHP archive reader helper class",
-            "time": "2016-07-25 13:58:33"
+            "time": "2016-07-25 17:46:32"
         },
         {
             "name": "exeu/apai-io",
