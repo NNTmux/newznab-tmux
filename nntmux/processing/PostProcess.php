@@ -23,7 +23,6 @@ use nntmux\db\Settings;
 use nntmux\processing\post\AniDB;
 use nntmux\processing\post\ProcessAdditional;
 use nntmux\SpotNab;
-use nntmux\utility\Utility;
 
 class PostProcess
 {
