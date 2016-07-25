@@ -28,7 +28,6 @@
       "www/pages/",
       "libs/pixelead0/Tmdb/",
       "libs/PEAR/Net_NNTP/NNTP/",
-      "libs/zeebinz/rarinfo/",
       "libs/"
     ]
   },
@@ -46,13 +45,14 @@
     }
   },
   "license": "GPL-3.0",
-  "name": "dariusiii/newznab-tmux",
+  "name": "DariusIII/newznab-tmux",
   "non-feature-branches": [
     "latest-.*"
   ],
   "require": {
     "php": ">=5.6.9",
     "barracudanetworks/forkdaemon-php": "~1.0",
+    "dariusiii/rarinfo": "dev-master",
     "ext-ctype": "*",
     "ext-curl": "*",
     "ext-exif": "*",

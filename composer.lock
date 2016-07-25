@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2fc1f264c1c09c771deee13e994a9478",
-    "content-hash": "74c48b2e8cf9951c5e6a4bfd20446634",
+    "hash": "07710fea57007aa92de2590d3ef0d571",
+    "content-hash": "f7225754e6122c48ab9996490a19337c",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -958,6 +958,46 @@
             "time": "2016-07-05 06:18:20"
         },
         {
+            "name": "dariusiii/rarinfo",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DariusIII/rarinfo.git",
+                "reference": "83118cd42b405d45be78a65b227e72161c6fbcb5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/83118cd42b405d45be78a65b227e72161c6fbcb5",
+                "reference": "83118cd42b405d45be78a65b227e72161c6fbcb5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "ArchiveReader.php",
+                    "PipeReader.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Modified BSD"
+            ],
+            "authors": [
+                {
+                    "name": "DariusIII",
+                    "email": "dkrisan@egmail.com"
+                },
+                {
+                    "name": "Hecks"
+                }
+            ],
+            "description": "PHP archive reader helper class",
+            "time": "2016-07-25 11:38:11"
+        },
+        {
             "name": "exeu/apai-io",
             "version": "1.10.0",
             "source": {
@@ -1422,12 +1462,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "3b225b72b341d4e0ed585b9e6c372d777485f9ad"
+                "reference": "cf32a8053257a2f19b2964178a5db6dad8825d3c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/3b225b72b341d4e0ed585b9e6c372d777485f9ad",
-                "reference": "3b225b72b341d4e0ed585b9e6c372d777485f9ad",
+                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/cf32a8053257a2f19b2964178a5db6dad8825d3c",
+                "reference": "cf32a8053257a2f19b2964178a5db6dad8825d3c",
                 "shasum": ""
             },
             "require": {
@@ -1460,7 +1500,7 @@
                 "li3",
                 "lithium"
             ],
-            "time": "2016-07-08 11:01:29"
+            "time": "2016-07-22 08:23:07"
         }
     ],
     "packages-dev": [
@@ -1656,6 +1696,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "dariusiii/rarinfo": 20,
         "giantbomb/giantbomb": 20,
         "joshpinkney/tv-maze-php-api": 20,
         "kbjr/git.php": 20,
