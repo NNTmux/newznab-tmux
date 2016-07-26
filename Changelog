@@ -1,4 +1,5 @@
 2016-07-25 DariusIII
+	* Chg: Update getTVReleases query by not allowing it to use any index on ORDER BY postdate DESC clause (speeds up the query as it uses the right index now)
 	* Fix: Prevent notices on nzb details page for isadmin and ismod in Charisma, Gentele and Omicron themes
 	* Fix: Prevent undefined index group_name in XML_Response class
 	* Chg: Update dariusiii/rarinfo package

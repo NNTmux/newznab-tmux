@@ -154,7 +154,7 @@ abstract class TV extends Videos
 				AND r.size > 1048576
 				AND %s
 				%s %s %s
-				ORDER BY r.postdate DESC
+				ORDER BY r.postdate+0 DESC
 				LIMIT %d",
 				$status,
 				$this->catWhere,
