@@ -610,7 +610,7 @@
 												{foreach $comments|@array_reverse:true as $comment}
 													<tr>
 														<td class="less" title="{$comment.createddate}">
-															{if !$privateprofiles || $isadmin || $ismod}
+															{if !$privateprofiles || isset($isadmin) || isset($ismod)}
 																<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
 															{else}
 																{$comment.username}
