@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "07710fea57007aa92de2590d3ef0d571",
-    "content-hash": "f7225754e6122c48ab9996490a19337c",
+    "hash": "5bf0c16c9ef6da12c57eac8940b78666",
+    "content-hash": "c2d3ed6ec277b288298d2d9e1a58ab51",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -597,16 +597,16 @@
         },
         {
             "name": "bower-asset/jquery-migrate",
-            "version": "1.4.0",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/appleboy/jquery-migrate.git",
-                "reference": "29077d39689bddad05036a537d49c4cf96488569"
+                "reference": "ba224c3e6bd8a90f72fddacf34e02bc2472d5a0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/appleboy/jquery-migrate/zipball/29077d39689bddad05036a537d49c4cf96488569",
-                "reference": "29077d39689bddad05036a537d49c4cf96488569",
+                "url": "https://api.github.com/repos/appleboy/jquery-migrate/zipball/ba224c3e6bd8a90f72fddacf34e02bc2472d5a0f",
+                "reference": "ba224c3e6bd8a90f72fddacf34e02bc2472d5a0f",
                 "shasum": ""
             },
             "type": "bower-asset-library",
