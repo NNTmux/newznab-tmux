@@ -265,9 +265,8 @@
 	</div>
 	<!-- ./wrapper -->
 	<!-- REQUIRED JS SCRIPTS -->
-	<!-- jQuery 2.2.1 -->
-	<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"
-			type="text/javascript" ></script>
+	<!-- jQuery 3.1.0 -->
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-3.1.x/dist/jquery.min.js" type="text/javascript"></script>
 	<!-- Bootstrap 3.3.6 JS -->
 	<script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"
 			type="text/javascript"></script>

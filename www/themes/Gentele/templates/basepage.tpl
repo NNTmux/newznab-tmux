@@ -216,7 +216,8 @@
 	</div>
 
 </div>
-<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
+<!-- jQuery 3.1.0 -->
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-3.1.x/dist/jquery.min.js" type="text/javascript"></script>
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"
 		type="text/javascript"></script>
 <!-- bootstrap progress js -->

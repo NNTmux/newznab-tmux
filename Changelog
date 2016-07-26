@@ -1,7 +1,9 @@
-2016-07-25 DariusIII
+2016-07-26 DariusIII
+	* Chg: Update composer with new version of jquery(3.1.0)  and use it in themes
 	* Chg: Update getTVReleases query by not allowing it to use any index on ORDER BY postdate DESC clause (speeds up the query as it uses the right index now)
-	* Fix: Prevent notices on nzb details page for isadmin and ismod in Charisma, Gentele and Omicron themes
-	* Fix: Prevent undefined index group_name in XML_Response class
+        * Fix: Prevent notices on nzb details page for isadmin and ismod in Charisma, Gentele and Omicron themes
+        * Fix: Prevent undefined index group_name in XML_Response class
+2016-07-25 DariusIII
 	* Chg: Update dariusiii/rarinfo package
 	* Fix: Par2Info and SfvInfo class calls in postprocessing
 	* Chg: Use own rarinfo library

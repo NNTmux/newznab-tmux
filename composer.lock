@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5bf0c16c9ef6da12c57eac8940b78666",
-    "content-hash": "c2d3ed6ec277b288298d2d9e1a58ab51",
+    "hash": "865eb711179c047a0305dc629838dd24",
+    "content-hash": "7478a635988c5d8ca41efd35d2e6b798",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -576,6 +576,37 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/c0185ab7c75aab88762c5aae780b9d83b80eda72",
                 "reference": "c0185ab7c75aab88762c5aae780b9d83b80eda72",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "dist/jquery.js",
+                "bower-asset-ignore": [
+                    "package.json"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "keywords": [
+                "browser",
+                "javascript",
+                "jquery",
+                "library"
+            ]
+        },
+        {
+            "name": "bower-asset/jquery-3.1.x",
+            "version": "3.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jquery/jquery-dist.git",
+                "reference": "6f02bc382c0529d3b4f68f6b2ad21876642dbbfe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/6f02bc382c0529d3b4f68f6b2ad21876642dbbfe",
+                "reference": "6f02bc382c0529d3b4f68f6b2ad21876642dbbfe",
                 "shasum": ""
             },
             "type": "bower-asset-library",

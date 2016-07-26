@@ -31,7 +31,8 @@
 	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico"/>
 
 	<!-- Javascripts -->
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"></script>
+	<!-- jQuery 3.1.0 -->
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-3.1.x/dist/jquery.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate/jquery-migrate.min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip2.js"></script>
