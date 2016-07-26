@@ -71,16 +71,16 @@
         },
         {
             "name": "bower-asset/autosize",
-            "version": "3.0.16",
+            "version": "3.0.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jackmoore/autosize.git",
-                "reference": "b7f730623e8af653a3e6d8bad5bf797e5cfe6ed5"
+                "reference": "3838f1939045804b3166fd217ed59184758e8de3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/b7f730623e8af653a3e6d8bad5bf797e5cfe6ed5",
-                "reference": "b7f730623e8af653a3e6d8bad5bf797e5cfe6ed5",
+                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/3838f1939045804b3166fd217ed59184758e8de3",
+                "reference": "3838f1939045804b3166fd217ed59184758e8de3",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -967,12 +967,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "28c15e230af01a6f9e48fd16dfd9e197d6034b29"
+                "reference": "33cadf482f3d119e3e29bedab58e0816b245adb7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/28c15e230af01a6f9e48fd16dfd9e197d6034b29",
-                "reference": "28c15e230af01a6f9e48fd16dfd9e197d6034b29",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/33cadf482f3d119e3e29bedab58e0816b245adb7",
+                "reference": "33cadf482f3d119e3e29bedab58e0816b245adb7",
                 "shasum": ""
             },
             "require": {
@@ -1006,7 +1006,7 @@
                 }
             ],
             "description": "PHP archive reader helper class",
-            "time": "2016-07-25 21:32:57"
+            "time": "2016-07-26 09:27:10"
         },
         {
             "name": "exeu/apai-io",
