@@ -1,3 +1,5 @@
+2016-07-27 DariusIII
+	* Chg: Update groupfixrelnames query by not allowing it to use any index on ORDER BY r.id DESC clause (speeds up the query)
 2016-07-26 DariusIII
 	* Chg: Update composer with new version of jquery(3.1.0)  and use it in themes
 	* Chg: Update getTVReleases query by not allowing it to use any index on ORDER BY postdate DESC clause (speeds up the query as it uses the right index now)
