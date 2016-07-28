@@ -1,5 +1,11 @@
 2016-07-28 DariusIII
 	* Chg: Update sphinx.conf for new sphinx 2.2.11 release
+		Note: if using sphinx search the following is required to update the index
+		sudo service sphinxsearch stop
+		sudo mv /etc/sphinxsearch/sphinx.conf /etc/sphinxsearch/sphinx.conf.1
+		sudo cp /var/www/newznab/misc/sphinxsearch/sphinx.conf /etc/sphinxsearch/sphinx.conf
+		sudo service sphinxsearch start
+		php misc/sphinxsearch/populate_rt_indexes.php releases_rt
 2016-07-27 DariusIII
 	* Chg: Update groupfixrelnames query by not allowing it to use any index on ORDER BY r.id DESC clause (speeds up the query)
 2016-07-26 DariusIII
