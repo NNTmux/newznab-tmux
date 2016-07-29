@@ -99,6 +99,7 @@
     "bower-asset/jquery-2.2.x": "~2.2.1",
     "bower-asset/jquery-3.1.x": "~3.1.0",
     "bower-asset/jquery.nicescroll": "~3.6.8",
+    "bower-asset/jquery-migrate-1.4.x": "~1.4.0",
     "bower-asset/jquery-migrate": "~3.0.0",
     "bower-asset/pace": "~1.0.2",
     "bower-asset/pnotify": "~3.0",
