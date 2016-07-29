@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d0d46650aa3422b0fad81dbcb103bd7a",
-    "content-hash": "f9694a4759a58766618ad287add71021",
+    "hash": "ca7ad8fd0c966be1da9fdf592384d63b",
+    "content-hash": "80a7526b6289810ef301eb90c55703cb",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -627,25 +627,6 @@
             ]
         },
         {
-            "name": "bower-asset/jquery-migrate",
-            "version": "3.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/appleboy/jquery-migrate.git",
-                "reference": "ba224c3e6bd8a90f72fddacf34e02bc2472d5a0f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/appleboy/jquery-migrate/zipball/ba224c3e6bd8a90f72fddacf34e02bc2472d5a0f",
-                "reference": "ba224c3e6bd8a90f72fddacf34e02bc2472d5a0f",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "jquery-migrate.js"
-            }
-        },
-        {
             "name": "bower-asset/jquery-migrate-1.4.x",
             "version": "1.4.0",
             "source": {
@@ -657,6 +638,25 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/appleboy/jquery-migrate/zipball/29077d39689bddad05036a537d49c4cf96488569",
                 "reference": "29077d39689bddad05036a537d49c4cf96488569",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "jquery-migrate.js"
+            }
+        },
+        {
+            "name": "bower-asset/jquery-migrate-3.0.x",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/appleboy/jquery-migrate.git",
+                "reference": "ba224c3e6bd8a90f72fddacf34e02bc2472d5a0f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/appleboy/jquery-migrate/zipball/ba224c3e6bd8a90f72fddacf34e02bc2472d5a0f",
+                "reference": "ba224c3e6bd8a90f72fddacf34e02bc2472d5a0f",
                 "shasum": ""
             },
             "type": "bower-asset-library",
