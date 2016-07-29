@@ -53,7 +53,7 @@ class RequestIDWeb extends RequestID
 					OR (r.reqidstatus = %d AND r.adddate < NOW() - INTERVAL %d HOUR)
 				)
 				%s %s %s
-				ORDER BY r.postdate DESC
+				ORDER BY r.postdate+0 DESC
 				LIMIT %d',
 				self::REQID_NOLL,
 				self::REQID_NONE,

@@ -1,4 +1,5 @@
 2016-07-29 DariusIII
+	* Chg: Speed up queries in RequestIDWeb and groupfixrelnames by preventing usage of indexes on ORDER BY clause.
 	* Chg: Allow underscore in usernames.
 2016-07-28 DariusIII
 	* Chg: Update sphinx.conf for new sphinx 2.2.11 release

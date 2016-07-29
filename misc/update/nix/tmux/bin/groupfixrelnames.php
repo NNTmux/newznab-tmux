@@ -211,7 +211,7 @@ if (!isset($argv[1])) {
 					WHERE LENGTH(title) >= 15 AND title NOT REGEXP "[\"\<\> ]"
 					AND searched = 0
 					AND predate < (NOW() - INTERVAL 1 DAY)
-					ORDER BY predate ASC
+					ORDER BY predate+0 ASC
 					LIMIT %s
 					OFFSET %s',
 					$maxperrun,
