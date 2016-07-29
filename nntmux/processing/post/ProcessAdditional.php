@@ -1151,7 +1151,7 @@ class ProcessAdditional
 					continue;
 				}
 
-				if ($file['pass'] == true) {
+				if (isset($file['pass']) && $file['pass'] == true) {
 					$this->_releaseHasPassword = true;
 					$this->_passwordStatus[] = Releases::PASSWD_RAR;
 					break;
