@@ -167,9 +167,9 @@
 	<!-- Scripts-->
 	<!-- jQuery -->
 	<!-- jQuery 3.1.0 -->
-	<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-3.1.x/dist/jquery.min.js" type="text/javascript"></script>
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
 	<!-- jQuery migrate script -->
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate/jquery-migrate.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"></script>
 	<!-- Bootstrap hover on mouseover script -->

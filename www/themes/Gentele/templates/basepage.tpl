@@ -217,7 +217,7 @@
 
 </div>
 <!-- jQuery 3.1.0 -->
-<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-3.1.x/dist/jquery.min.js" type="text/javascript"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"
 		type="text/javascript"></script>
 <!-- bootstrap progress js -->
@@ -233,7 +233,7 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
 <!-- jQuery migrate script -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate/jquery-migrate.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
