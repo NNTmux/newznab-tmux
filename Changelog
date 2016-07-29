@@ -1,3 +1,5 @@
+2016-07-29 DariusIII
+	* Chg: Allow underscore in usernames.
 2016-07-28 DariusIII
 	* Chg: Update sphinx.conf for new sphinx 2.2.11 release
 		Note: if using sphinx search the following is required to update the index

@@ -327,7 +327,7 @@ class Users
 
 	public function isValidUsername($userName)
 	{
-		return preg_match("/^[a-z][a-z0-9]{2,}$/i", $userName);
+		return preg_match("/^[a-z][a-z0-9_]{2,}$/i", $userName);
 	}
 
 	/**
