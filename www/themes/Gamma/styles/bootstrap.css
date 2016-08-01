@@ -2299,7 +2299,7 @@ table th[class*="span"],
 .dropdown-menu > .active > a > [class*=" icon-"],
 .dropdown-submenu:hover > a > [class^="icon-"],
 .dropdown-submenu:hover > a > [class*=" icon-"] {
-	background-image: url("../images/glyphicons-halflings-white.png");
+	background-image: url("../../shared/images/glyphicons-halflings-white.png");
 }
 
 .icon-glass {
