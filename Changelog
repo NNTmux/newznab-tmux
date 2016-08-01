@@ -2,7 +2,7 @@
 2016-08-01 DariusIII
 	* Fix: Path to glyphicons in Gamma them
 2016-07-30 DariusIII
-	* Chg: Update rarinfo librar
+	* Chg: Update rarinfo library
 2016-07-29 DariusIII
 	* Fix: Add check if the password is set in ProcessAdditional
 	* Chg: Speed up queries in RequestIDWeb and groupfixrelnames by preventing usage of indexes on ORDER BY clause.
