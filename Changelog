@@ -1,3 +1,5 @@
+2016-08-02 DariusIII
+	* Chg: Move user menu to headermenu.tpl
 2016-08-01 DariusIII
 	* Chg: Make themes more mobile devices friendly
 	* Fix: Path to glyphicons in Gamma them

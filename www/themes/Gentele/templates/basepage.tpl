@@ -140,53 +140,6 @@
 						<a id="menu_toggle"><i class="fa fa-bars"></i></a>
 					</div>
 					{$header_menu}
-					<ul class="nav navbar-nav">
-						<li class="">
-							<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
-							   data-hover="dropdown" data-close-others="true" data-delay="30" aria-expanded="false">
-								{if $loggedin == "true"}
-								<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png"
-									 alt="User Image"> {$userdata.username}
-								<span class=" fa fa-angle-down"></span>
-							</a>
-							<ul class="dropdown-menu dropdown-usermenu pull-right">
-								<li><a href="{$smarty.const.WWW_TOP}/cart"><i class="fa fa-shopping-basket"></i> My
-										Download Basket</a>
-								</li>
-								<li>
-									<a href="{$smarty.const.WWW_TOP}/queue"><i class="fa fa-list-alt"></i> My Queue</a>
-								</li>
-								<li>
-									<a href="{$smarty.const.WWW_TOP}/mymovies"><i class="fa fa-film"></i> My Movies</a>
-								</li>
-								<li><a href="{$smarty.const.WWW_TOP}/myshows"><i class="fa fa-television"></i> My Shows</a>
-								</li>
-								<li>
-									<a href="{$smarty.const.WWW_TOP}/profileedit"><i class="fa fa-cog fa-spin"></i>
-										Account Settings</a>
-								</li>
-								{if isset($isadmin)}
-									<li>
-										<a href="{$smarty.const.WWW_TOP}/admin"><i class="fa fa-cogs fa-spin"></i> Admin</a>
-									</li>
-								{/if}
-								<li>
-									<a href="{$smarty.const.WWW_TOP}/profile" class="btn btn-default btn-flat"><i
-												class="fa fa-user"></i> Profile</a>
-								</li>
-								<li>
-									<a href="{$smarty.const.WWW_TOP}/logout" class="btn btn-default btn-flat"><i
-												class="fa fa-unlock-alt"></i> Sign out</a>
-								</li>
-								{else}
-								<li><a href="{$smarty.const.WWW_TOP}/login"><i
-												class="fa fa-lock"></i><span> Login</span></a></li>
-								<li><a href="{$smarty.const.WWW_TOP}/register"><i class="fa fa-bookmark-o"></i><span> Register</span></a>
-								</li>
-								{/if}
-							</ul>
-						</li>
-					</ul>
 				</nav>
 			</div>
 		</div>
