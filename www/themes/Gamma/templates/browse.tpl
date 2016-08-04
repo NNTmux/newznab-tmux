@@ -1,6 +1,7 @@
 <ul class="breadcrumb">
-	<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a> <span class="divider">/</span></li>
-	<li class="active">{$catname|escape:"htmlall"}</li>
+	{assign var="catsplit" value=">"|explode:$catname}
+	<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+	/ {if isset($catsplit[0])} {$catsplit[0]}{/if} / {if isset($catsplit[1])} {$catsplit[1]}{/if}
 </ul>
 
 {$site->adbrowse}

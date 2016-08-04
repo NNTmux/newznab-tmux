@@ -1,4 +1,5 @@
 2016-08-04 DariusIII
+	* Fix: Category display in Gamma theme browse page
 	* Chg: Update git tag checking code
 2016-08-02 DariusIII
 	* Chg: Move user menu to headermenu.tpl
