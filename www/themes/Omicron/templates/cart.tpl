@@ -50,7 +50,7 @@
 									</td>
 									<td class="less"
 										title="Added on {$result.createddate}">{$result.createddate|date_format}</td>
-									<td><a title="Delete from your cart" href="?delete={$result.id}"
+									<td><a title="Delete from your cart" href="?delete={$result.guid}"
 										   class="btn btn-danger btn-sm" style="padding-bottom:2px;">Delete</a></td>
 								</tr>
 							{/foreach}
