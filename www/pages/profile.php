@@ -1,8 +1,8 @@
 <?php
 
-use newznab\ReleaseComments;
-use newznab\SABnzbd;
-use newznab\NZBGet;
+use nntmux\ReleaseComments;
+use nntmux\SABnzbd;
+use nntmux\NZBGet;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

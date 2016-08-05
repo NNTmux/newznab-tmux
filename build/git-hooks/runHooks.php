@@ -20,18 +20,17 @@
  */
 define('GIT_PRE_COMMIT', true);
 
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\DbUpdate;
-use newznab\utility\Git;
-use newznab\utility\Versions;
+use nntmux\utility\Git;
+use app\extensions\util\Versions;
 
 echo "Running pre-commit hooks\n";
 
 $error = false;
 
 // TODO Add code here to check permissions on staged files.
-//$files = file(NN_ROOT . 'newznab/build/git-hooks'), FILE_IGNORE_NEW_LINES);
+//$files = file(NN_ROOT . 'nntmux/build/git-hooks'), FILE_IGNORE_NEW_LINES);
 //foreach ($files as $file) {
 //	echo "Filename: $file\n";
 //}
@@ -48,8 +47,11 @@ if ($error === false) {
 		if ($error === false) {
 			try {
 				$vers = new Versions();
-				$vers->checkAll();
+				$vers->checkGitTag(true);
+				$vers->checkSQLFileLatest(false);
+				$vers->checkSQLDb(false);
 				$vers->save();
+
 				$git->add(NN_VERSIONS);
 			} catch (\Exception $e) {
 				$error = 1;

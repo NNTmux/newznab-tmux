@@ -6,10 +6,10 @@
  * reason, it will allow the password hash on the account to be changed.
  * Hopefully that will allow admin access to fix any further problems.
  */
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\Users;
+use nntmux\db\Settings;
+use nntmux\Users;
 
 $pdo = new Settings();
 

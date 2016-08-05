@@ -19,9 +19,9 @@
     => Script will backfill ONLY a.b.games.xbox from May 15, 2011
 */
 
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\Backfill;
+use nntmux\Backfill;
 
 $time = 0;
 

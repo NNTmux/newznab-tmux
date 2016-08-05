@@ -1,11 +1,11 @@
 <?php
 //This script will update all records in the consoleinfo table
 
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\Category;
-use newznab\db\Settings;
-use newznab\Console;
+use nntmux\Category;
+use nntmux\db\Settings;
+use nntmux\Console;
 
 
 

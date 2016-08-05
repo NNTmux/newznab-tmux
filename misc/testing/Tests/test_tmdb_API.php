@@ -1,10 +1,10 @@
 <?php
 
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\processing\tv\TMDB;
+use nntmux\processing\tv\TMDB;
 
-$c = new newznab\ColorCLI();
+$c = new nntmux\ColorCLI();
 $tmdb = new TMDB();
 
 if (!empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {

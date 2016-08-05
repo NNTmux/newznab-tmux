@@ -3,8 +3,8 @@
 require_once './config.php';
 
 
-use newznab\Category;
-use newznab\ReleaseRegex;
+use nntmux\Category;
+use nntmux\ReleaseRegex;
 
 $page = new AdminPage();
 $category = new Category();

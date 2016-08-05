@@ -39,8 +39,8 @@
 			{if $xxx && $xxx.cover == 1}
 				<img class="shadow img-polaroid pull-right" style="margin-right:50px; margin-top:80px;"  src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg" width="160" alt="{$xxx.title|escape:"htmlall"}"/>
 			{/if}
-			{if $isadmin}
-				<div class="well well-small pull-right">
+			{if isset($isadmin)}
+				<div class="well well-sm pull-right">
 					Admin :
 					<div class="btn-group">
 						<a href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$release.id}&amp;from={$smarty.server.REQUEST_URI}" class="btn btn-small btn-warning" >Edit</a>
@@ -389,7 +389,7 @@
 					<a class="label" title="Search for similar Nzbs" href="{$smarty.const.WWW_TOP}/search/{$searchname|escape:"url"}">Search for similar</a>
 				</dd>
 
-				{if $isadmin}
+				{if isset($isadmin)}
 					<dt>Release Info</dt>
 					<dd>
 						Regex Id (<a href="{$smarty.const.WWW_TOP}/admin/regex-list.php?group={$release.group_name|escape:"url"}#{$release.regexid}">{$release.regexid}</a>)
@@ -403,7 +403,7 @@
 		<div class="tab-pane" id="mediainfo">
 			{if $reVideo.releases_id|@count > 0 || $reAudio|@count > 0}
 				<td style="padding:0;">
-					<table style="width:100%;" class="innerdata highlight table table-striped">
+					<table style="width:100%;" class="innerdata highlight table">
 						<tr>
 							<th width="15%"></th>
 							<th>Property</th>
@@ -579,7 +579,7 @@
 			<div class="comments">
 				{if $comments|@count > 0}
 
-					<table style="margin-bottom:20px;" class="data Sortable table table-striped">
+					<table style="margin-bottom:20px;" class="data Sortable table">
 						<tr class="{cycle values=",alt"}">
 							<th width="150" style="text-align:right;">User </th>
 							<th>Comment</th>

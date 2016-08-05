@@ -25,30 +25,6 @@
 </div>
 
 <div style="{if $site->showadminwelcome != "0"}display:none;{/if}" id="adminhome">
-
-	<h2>Status Alerts</h2>
-
-	{if $statusmsgs|@count > 0}
-
-		<table class="data" style="width:75%;">
-			<tr>
-				<th style="width:20px" class="left">#</th>
-				<th class="left">Item</th>
-				<th style="width:20px"></th>
-			</tr>
-			{foreach from=$statusmsgs item=result name=result}
-				<tr class="{cycle values=",alt"}">
-					<td>{$smarty.foreach.result.iteration}</td>
-					<td>{$result.msg}</td>
-					<td>{if $result.url != ""}<a href="{$result.url}"><img src="{$smarty.const.WWW_TOP}/../themes/shared/images/icons/{$result.icon}.png"/></a>{/if}</td>
-				</tr>
-			{/foreach}
-		</table>
-	{else}
-		<p>There are currently no status alerts.</p>
-	{/if}
-
-	<br/>
 	<a onclick="ajax_welcome_msg(true); return false;" href="#">show welcome message</a>
 </div>
 </div>

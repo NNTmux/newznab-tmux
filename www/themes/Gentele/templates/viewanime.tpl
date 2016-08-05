@@ -14,7 +14,7 @@
 		</div>
 	</div>
 	<h1>
-		<div class="well well-small">
+		<div class="well well-sm">
 			{$animeTitle}
 			{if isset($isadmin)}
 				<a class="btn btn-xs btn-warning" title="Edit AniDB data"
@@ -22,7 +22,7 @@
 			{/if}
 		</div>
 	</h1>
-	<div class="well well-small">
+	<div class="well well-sm">
 		{if animePicture != ''}
 			<div style="text-align: center;">
 				<img class="shadow img img-polaroid" alt="{$animeTitle} Picture"
@@ -52,7 +52,7 @@
 		</div>
 	</div>
 	<form id="nzb_multi_operations_form" action="get">
-		<div class="well well-small">
+		<div class="well well-sm">
 			<div class="nzb_multi_operations">
 				With Selected:
 				<div class="btn-group">
@@ -97,8 +97,9 @@
 									<th>Action</th>
 								</tr>
 								{foreach $animeEpisodeTitles as $result}
-									<tr class="{cycle values=",alt"}" id="guid{$result.guid}">
-										<td class="check"><input id="chk{$result.guid|substr:0:7}"
+									<tr class="{cycle values=",alt"}">
+										<td>
+											<input id="guid{$result.guid}"
 																 type="checkbox" class="flat"
 																 value="{$result.guid}"/></td>
 										<td>
@@ -113,7 +114,7 @@
 													{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
 														href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 														name="name{$result.guid}"
-														title="Screenshot of {$result.animeTitle|escape:"htmlall"}"
+														title="Screenshot of {$result.searchname|escape:"htmlall"}"
 														class="label label-primary" rel="preview">Preview</a>{/if}
 													<span class="label label-primary">{$result.grabs}
 														Grab{if $result.grabs != 1}s{/if}</span>
@@ -134,15 +135,23 @@
 														class="fa fa-comments-o text-muted" data-toggle="tooltip"
 														data-placement="top" title
 														data-original-title="Comments"></i></a>
-											<a href="#" class="icon_cart text-muted"><i
-														class="fa fa-shopping-basket" data-toggle="tooltip"
-														data-placement="top" title
-														data-original-title="Send to my Download Basket"></i></a>
+											<a href="#">
+												<i
+													id="guid{$result.guid}" class="icon_cart fa fa-shopping-basket" data-toggle="tooltip"
+													data-placement="top" title
+													data-original-title="Send to my Download Basket">
+												</i>
+											</a>
 											{if isset($sabintegrated) && $sabintegrated !=""}
-												<a href="#" class="icon_sab text-muted"><i class="fa fa-share"
-																						   data-toggle="tooltip"
-																						   data-placement="top" title
-																						   data-original-title="Send to My Queue"></i></a>
+												<a href="#">
+													<i
+														id="guid{$result.guid}"
+														class="fa fa-share"
+														data-toggle="tooltip"
+														data-placement="top" title
+														data-original-title="Send to My Queue">
+													</i>
+												</a>
 											{/if}
 											{if $weHasVortex}
 												<a href="#" class="icon_vortex text-muted"><i

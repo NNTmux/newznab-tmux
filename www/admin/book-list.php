@@ -3,7 +3,7 @@
 require_once './config.php';
 
 
-use newznab\Books;
+use nntmux\Books;
 
 $page = new AdminPage();
 

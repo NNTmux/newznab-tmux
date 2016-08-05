@@ -1,6 +1,6 @@
 <?php
 
-use newznab\Forum;
+use nntmux\Forum;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

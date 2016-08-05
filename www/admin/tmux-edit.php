@@ -2,7 +2,7 @@
 require_once './config.php';
 
 
-use newznab\Tmux;
+use nntmux\Tmux;
 
 $page = new AdminPage();
 $tmux = new Tmux();

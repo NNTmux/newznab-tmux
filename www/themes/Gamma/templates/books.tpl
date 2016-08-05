@@ -1,6 +1,6 @@
 <h2>Browse Books</h2>
 
-<div class="well well-small">
+<div class="well well-sm">
 <div style="text-align: center;">
 	{include file='search-filter.tpl'}
 </div>
@@ -12,7 +12,7 @@
 
 <form id="nzb_multi_operations_form" action="get">
 
-	<div class="well well-small">
+	<div class="well well-sm">
 		<div class="nzb_multi_operations">
 			<table width="100%">
 				<tr>
@@ -34,7 +34,7 @@
 					<td width="20%">
 						{if isset($section) && $section != ''}
 							<div class="pull-right">
-							{if $isadmin}
+							{if isset($isadmin)}
 								Admin:
 								<div class="btn-group">
 									<input type="button" class="nzb_multi_operations_edit btn btn-small btn-warning" value="Edit" />
@@ -52,7 +52,7 @@
 
 
 
-<table style="width:100%;" class="data highlight icons table table-striped" id="coverstable">
+<table style="width:100%;" class="data highlight icons table" id="coverstable">
 	<tr>
 		<th width="130"><input type="checkbox" class="nzb_check_all" /></th>
 		<th>author<br/>
@@ -138,7 +138,7 @@
 								<div class="icon"><input type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" /></div>
 							</td>
 							<td>
-								<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">{$mname[$m@index]|escape:"htmlall"}</a><br/>
+								<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a><br/>
 								<ul class="inline">
 									<li width="50px"><b>Info:</b></li>
 									<li width="100px">Posted {$mpostdate[$m@index]|timeago}</li>
@@ -200,7 +200,7 @@
 </table>
 
 {if $results|@count > 10}
-<div class="well well-small">
+<div class="well well-sm">
 	<div class="nzb_multi_operations">
 		<table width="100%">
 			<tr>
@@ -222,7 +222,7 @@
 				<td width="20%">
 					{if isset($section) && $section != ''}
 						<div class="pull-right">
-						{if $isadmin}
+						{if isset($isadmin)}
 							Admin:
 							<div class="btn-group">
 								<input type="button" class="nzb_multi_operations_edit btn btn-small btn-warning" value="Edit" />

@@ -2,7 +2,7 @@
 
 if (!$page->users->isLoggedIn())
     $page->show403();
-use newznab\NZBVortex;
+use nntmux\NZBVortex;
 
 try
 {

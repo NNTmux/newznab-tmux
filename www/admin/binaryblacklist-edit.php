@@ -1,8 +1,8 @@
 <?php
 require_once './config.php';
 
-use newznab\Binaries;
-use newznab\Category;
+use nntmux\Binaries;
+use nntmux\Category;
 
 $page = new AdminPage();
 $bin  = new Binaries(['Settings' => $page->settings]);

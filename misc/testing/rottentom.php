@@ -1,8 +1,8 @@
 <?php
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\RottenTomato;
+use nntmux\db\Settings;
+use nntmux\RottenTomato;
 
 $s = new Settings();
 $rtkey = $s->getSetting('rottentomatokey');

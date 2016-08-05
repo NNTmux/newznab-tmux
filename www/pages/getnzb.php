@@ -1,9 +1,9 @@
 <?php
 
-use newznab\Releases;
-use newznab\NZB;
-use newznab\utility\Utility;
-use newznab\db\Settings;
+use nntmux\Releases;
+use nntmux\NZB;
+use nntmux\utility\Utility;
+use nntmux\db\Settings;
 
 $uid = 0;
 

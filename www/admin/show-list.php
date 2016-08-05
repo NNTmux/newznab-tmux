@@ -1,7 +1,7 @@
 <?php
 require_once './config.php';
 
-use newznab\Videos;
+use nntmux\Videos;
 
 $page   = new AdminPage();
 $tv = new Videos(['Settings' => $page->settings]);

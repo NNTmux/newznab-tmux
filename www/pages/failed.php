@@ -1,7 +1,7 @@
 <?php
 
-use newznab\DnzbFailures;
-use newznab\db\Settings;
+use nntmux\DnzbFailures;
+use nntmux\db\Settings;
 
 // Page is accessible only by the rss token, or logged in users.
 if ($page->users->isLoggedIn()) {

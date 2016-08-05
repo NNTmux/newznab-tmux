@@ -1,7 +1,7 @@
 <?php
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\NZBImport;
+use nntmux\NZBImport;
 
 $n = PHP_EOL;
 

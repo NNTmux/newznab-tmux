@@ -82,7 +82,7 @@
 													{foreach $msplits as $loop=>$m name="loop"}
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
-																class="cover"
+																class="cover img-responsive img-rounded"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
@@ -159,7 +159,7 @@
 															<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
 													{/if}
 												</div>
-												<div class="col-md-9 small-gutter-left">
+												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|escape:"htmlall"}</a></span>
 
@@ -167,7 +167,7 @@
 													<div id="guid{$mguid[$m@index]}">
 														<label>
 															<input type="checkbox"
-																   class="nzb_check"
+																   class="square"
 																   value="{$mguid[$m@index]}"
 																   id="chksingle"/>
 														</label>
@@ -192,14 +192,23 @@
 																		class="fa fa-comment-o"></i><span
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																  title="Send to my Download Basket"><i
-																		class="fa fa-shopping-basket"></i></span>
+															<span
+																	id="guid{$mguid[$m@index]}"
+																	class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																	title="Send to my Download Basket">
+																	<i class="fa fa-shopping-basket"></i>
+															</span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
-																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																	  title="Send to my Queue"><i
-																			class="fa fa-share"></i></span>
+																<span
+																		id="guid{$mguid[$m@index]}"
+																		class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																		title="Send to my Queue">
+																		<i class="fa fa-share"></i>
+																</span>
 															{/if}
+															{if !empty($mfailed[$m@index])}
+																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+																	<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>															{/if}
 														</div>
 													</div>
 													{/if}
@@ -234,7 +243,7 @@
 													{foreach $msplits as $loop=>$m name="loop"}
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
-																class="cover"
+																class="cover img-responsive img-rounded"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
@@ -311,7 +320,7 @@
 															<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
 													{/if}
 												</div>
-												<div class="col-md-9 small-gutter-left">
+												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|escape:"htmlall"}</a></span>
 
@@ -319,7 +328,7 @@
 													<div id="guid{$mguid[$m@index]}">
 														<label>
 															<input type="checkbox"
-																   class="nzb_check"
+																   class="square"
 																   value="{$mguid[$m@index]}"
 																   id="chksingle"/>
 														</label>
@@ -344,14 +353,23 @@
 																		class="fa fa-comment-o"></i><span
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																  title="Send to my Download Basket"><i
-																		class="fa fa-shopping-basket"></i></span>
+															<span
+																	id="guid{$mguid[$m@index]}"
+																	class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																	title="Send to my Download Basket">
+																	<i class="fa fa-shopping-basket"></i>
+															</span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
-																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																	  title="Send to my Queue"><i
-																			class="fa fa-share"></i></span>
+																<span
+																		id="guid{$mguid[$m@index]}"
+																		class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																		title="Send to my Queue">
+																		<i class="fa fa-share"></i>
+																</span>
 															{/if}
+															{if !empty($mfailed[$m@index])}
+																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+																	<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>															{/if}
 														</div>
 													</div>
 													{/if}

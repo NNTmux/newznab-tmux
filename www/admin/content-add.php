@@ -2,9 +2,9 @@
 require_once './config.php';
 
 
-use newznab\Contents;
-use newznab\Content;
-use newznab\Users;
+use nntmux\Contents;
+use nntmux\Content;
+use nntmux\Users;
 
 
 $page     = new AdminPage();

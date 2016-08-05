@@ -1,9 +1,9 @@
 <?php
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\ColorCLI;
-use newznab\RottenTomato;
-use newznab\db\Settings;
+use nntmux\ColorCLI;
+use nntmux\RottenTomato;
+use nntmux\db\Settings;
 
 $cli = new ColorCLI();
 

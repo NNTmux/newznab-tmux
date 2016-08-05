@@ -29,7 +29,7 @@
 		</dl>
 		</div>
 		<form id="nzb_multi_operations_form" action="get">
-		<div class="well well-small">
+		<div class="well well-sm">
 			<div class="nzb_multi_operations">
 				With Selected:
 				<div class="btn-group">
@@ -49,7 +49,7 @@
 					<button data-quality="1080p" class="btn">1080p</button>
 					<button data-quality="2160p" class="btn">2160p</button>
 				</div>
-				{if $isadmin}
+				{if isset($isadmin)}
 				<div class="pull-right">
 					Admin:
 					<div class="btn-group">
@@ -60,52 +60,17 @@
 				{/if}
 			</div>
 		</div>
-		<table style="width:100%;" class="data highlight icons table table-striped" id="browsetable">
+		<table style="width:100%;" class="data highlight icons table" id="browsetable">
 			<tr class="dont-filter">
 				<th>
 					<input id="chkSelectAll" type="checkbox" class="nzb_check_all" />
 					<label for="chkSelectAll" style="display:none;">Select All</label>
 				</th>
-				<th>name<br/>
-					<a title="Sort Descending" href="{$orderbyname_desc}">
-						<i class="fa fa-caret-down"></i>
-					</a>
-					<a title="Sort Ascending" href="{$orderbyname_asc}">
-						<i class="fa fa-caret-up"></i>
-					</a>
-				</th>
-				<th>category<br/>
-					<a title="Sort Descending" href="{$orderbycat_desc}">
-						<i class="fa fa-caret-down"></i>
-					</a>
-					<a title="Sort Ascending" href="{$orderbycat_asc}">
-						<i class="fa fa-caret-up"></i>
-					</a>
-				</th>
-				<th>posted<br/>
-					<a title="Sort Descending" href="{$orderbyposted_desc}">
-						<i class="fa fa-caret-down"></i>
-					</a>
-					<a title="Sort Ascending" href="{$orderbyposted_asc}">
-						<i class="fa fa-caret-up"></i>
-					</a>
-				</th>
-				<th>size<br/>
-					<a title="Sort Descending" href="{$orderbysize_desc}">
-						<i class="fa fa-caret-down"></i>
-					</a>
-					<a title="Sort Ascending" href="{$orderbysize_asc}">
-						<i class="fa fa-caret-up"></i>
-					</a>
-				</th>
-				<th>files<br/>
-					<a title="Sort Descending" href="{$orderbyfiles_desc}">
-						<i class="fa fa-caret-down"></i>
-					</a>
-					<a title="Sort Ascending" href="{$orderbyfiles_asc}">
-						<i class="fa fa-caret-up"></i>
-					</a>
-				</th>
+				<th>name</th>
+				<th>category</th>
+				<th>posted</th>
+				<th>size</th>
+				<th>files<</th>
 				<th>action</th>
 			</tr>
 		{assign var="msplits" value=","|explode:$result.grp_release_id}
@@ -127,7 +92,7 @@
 				<td class="check"><input id="chk{$mguid[$m@index]|substr:0:7}" type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" /></td>
 				<td class="item">
 					<label for="chk{$mguid[$m@index]|substr:0:7}">
-						<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
+						<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
 					</label>
 					{if $mpass[$m@index] == 2}
 						<i class="fa fa-lock"></i>
@@ -178,7 +143,7 @@
 	<br/>
 	{$pager}
 	{if $results|@count > 10}
-		<div class="well well-small">
+		<div class="well well-sm">
 			<div class="nzb_multi_operations">
 				{if isset($section) && $section != ''}View: <a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a> | <b>List</b><br />{/if}
 				With Selected:
@@ -199,7 +164,7 @@
 					<button data-quality="1080p" class="btn">1080p</button>
 					<button data-quality="complete Rbluray" class="BDISK">HDTV</button>
 				</div>
-				{if $isadmin}
+				{if isset($isadmin)}
 				<div class="pull-right">
 					Admin:
 					<div class="btn-group">

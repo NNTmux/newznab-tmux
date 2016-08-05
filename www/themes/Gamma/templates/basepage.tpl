@@ -8,6 +8,7 @@
 	<meta name="robots" content="noindex,nofollow"/>
 	<meta name="application-name" content="newznab-{$site->version}" />
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
+	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 
 {if $loggedin == "true"}
 	<link rel="alternate" type="application/rss+xml" title="{$site->title} Full Rss Feed" href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}" />
@@ -18,24 +19,24 @@
 {/if}
 	<!-- Newposterwall -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/bootstrap.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/extra.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/jquery.pnotify.default.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/bootstrap.cyborg.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/styles/bootstrap-fixes.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.min.css" type="text/css" media="screen"/>
 
 	<!-- FAVICON -->
 	<link rel="search" type="application/opensearchdescription+xml" href="/opensearch" title="{$site->title|escape}" />
 	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico"/>
 
 	<!-- Javascripts -->
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate/jquery-migrate.min.js"></script>
+	<!-- jQuery 3.1.0 -->
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip2.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/utils.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
@@ -44,7 +45,7 @@
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"></script>
 	<!-- Pines Notify -->
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/jquery.pnotify.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.pnotify.js"></script>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
@@ -68,7 +69,7 @@
 	================================================== -->
 	<!-- If you want the navbar "white" remove Navbar-inverse -->
 	<div class="navbar navbar-inverse navbar-fixed-top">
-		<div class="navbar-inner" style="padding-left:30px; padding-right:30px;">
+		<div class="container" style="padding-left:30px; padding-right:30px;">
 			<div class="container">
 						{if $loggedin == "true"}
 							{$header_menu}
@@ -80,10 +81,12 @@
 								<ul class="dropdown-menu">
 										<li><a href="{$smarty.const.WWW_TOP}/profile"><i class="icon-user icon-white"></i> Profile</a></li>
 										<li class="divider"></li>
+										<li><a href="{$smarty.const.WWW_TOP}/mymovies"><i class="icon-hdd icon-white"></i> My Movies</a></li>
+										<li><a href="{$smarty.const.WWW_TOP}/myshows"><i class="icon-hdd icon-white"></i> My Shows</a></li>
+										<li class="divider"></li>
 										<li><a href="{$smarty.const.WWW_TOP}/queue"><i class="icon-tasks icon-white"></i> Queue</a></li>
 										<li><a href="{$smarty.const.WWW_TOP}/cart"><i class="icon-shopping-cart icon-white"></i> Download Basket</a></li>
-										<li><a href="{$smarty.const.WWW_TOP}/mymoviesedit"><i class="icon-hdd icon-white"></i> Movies</a></li>
-									{if $isadmin}
+									{if isset($isadmin)}
 											<li class="divider"></li>
 											<li>
 													<li><a href="{$smarty.const.WWW_TOP}/admin"><i class="icon-cog icon-white"></i> Admin</a></li>

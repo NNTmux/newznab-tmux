@@ -1,5 +1,5 @@
 <?php
-use newznab\Forum;
+use nntmux\Forum;
 
 $forum = new Forum;
 

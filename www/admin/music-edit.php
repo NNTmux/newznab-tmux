@@ -3,8 +3,8 @@
 require_once './config.php';
 
 
-use newznab\Music;
-use newznab\Genres;
+use nntmux\Music;
+use nntmux\Genres;
 
 $page = new AdminPage();
 $music = new Music();

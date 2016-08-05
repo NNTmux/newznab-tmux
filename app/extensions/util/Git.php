@@ -27,13 +27,15 @@ class Git extends \lithium\core\Object
 	 */
 	protected $repo;
 
+	protected $gitTagLatest = null;
+
 	private $branch;
 
 	public function __construct(array $config = [])
 	{
 		$defaults = [
 			'branches'		=> [
-				'stable' => ['0.x', 'latest-testing'],
+				'stable' => ['0.x', 'Latest-testing', '\d+\.\d+\.\d+(\.\d+)?'],
 				'development' => ['dev', 'dev-test']
 			],
 			'create'		=> false,
@@ -119,6 +121,19 @@ class Git extends \lithium\core\Object
 		return ($result === '');
 	}
 
+	public function isStable($branch)
+	{
+		foreach ($this->getBranchesStable() as $pattern) {
+			if (!preg_match("#$pattern#", $branch)) {
+				continue;
+			} else {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Run the log command.
 	 *
@@ -176,9 +191,12 @@ class Git extends \lithium\core\Object
 	 *
 	 * @return string
 	 */
-	public function tagLatest()
+	public function tagLatest($cached = true)
 	{
-		return $this->describe("--tags --abbrev=0 HEAD");
+		if (empty($this->gitTagLatest) || $cached === false) {
+			$this->gitTagLatest = trim($this->describe("--tags --abbrev=0 HEAD"));
+		}
+		return $this->gitTagLatest;
 	}
 
 	protected function _init()

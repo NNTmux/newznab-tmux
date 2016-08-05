@@ -2,8 +2,8 @@
 require_once './config.php';
 
 
-use newznab\Games;
-use newznab\Genres;
+use nntmux\Games;
+use nntmux\Genres;
 
 $page = new AdminPage();
 $games = new Games(['Settings' => $page->settings]);

@@ -1,6 +1,7 @@
 <?php
+require_once NN_ROOT . 'app' . DS . 'config' . DS . 'bootstrap' . DS . 'libraries.php';
 
-use newznab\Users;
+use nntmux\Users;
 
 /**
  * All admin pages implement this class. Enforces admin role for requesting user.

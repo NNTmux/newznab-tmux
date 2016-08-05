@@ -1,7 +1,7 @@
 <?php
 require_once './config.php';
 
-use newznab\Menu;
+use nntmux\Menu;
 
 $page = new AdminPage();
 $menu = new Menu($page->settings);

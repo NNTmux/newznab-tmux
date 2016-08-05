@@ -1,8 +1,8 @@
 <?php
 
-use newznab\Movie;
-use newznab\Category;
-use newznab\DnzbFailures;
+use nntmux\Category;
+use nntmux\DnzbFailures;
+use nntmux\Movie;
 
 $movie = new Movie(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);

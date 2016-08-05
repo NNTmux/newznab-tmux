@@ -66,10 +66,10 @@
 //
 //	server
 //   -/ code:        This is taken from the users local database `site` table.  It is
-//                    the `code` the user configured their newznab server as.
+//                    the `code` the user configured their nntmux server as.
 //
 //   -/ title:       This is also taken from the users local database `site` table. It
-//                      is the the `title` the user configured their newznab server as.
+//                      is the the `title` the user configured their nntmux server as.
 //
 //	postdate_utc:    This is the current time measured in the number of seconds since
 //                    the Unix Epoch (January 1 1970 00:00:00 GMT). This represents
@@ -172,9 +172,9 @@ SHARING
 		recognize or want to test out the source.
 */
 
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\SpotNab;
+use nntmux\SpotNab;
 
 // Subject Lines will always be a hash key that helps scanning identify whether
 // or not the contents are valid or not.  the hash key contains is built

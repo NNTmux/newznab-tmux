@@ -6,10 +6,10 @@ If after import you have a bunch of zero sized releases run this
 Author: lordgnu <lordgnu@me.com>
 */
 
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\NZB;
+use nntmux\db\Settings;
+use nntmux\NZB;
 
 $pdo = new Settings;
 $nzb = new NZB;

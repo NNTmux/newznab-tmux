@@ -24,13 +24,14 @@
 	-->
 	<meta charset="utf-8">
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
+	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<!-- Newposterwall -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- The styles -->
-	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/{$theme}/css/bootstrap-spacelab.min.css" rel="stylesheet">
+	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/{$theme}/css/bootstrap-cyborg.min.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/charisma-app.css" rel="stylesheet">
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/shared/assets/chosen/chosen.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/shared/assets/colorbox/example3/colorbox.css'
+	<link href='{$smarty.const.WWW_THEMES}/shared/assets/chosen/chosen.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_THEMES}/shared/assets/colorbox/example3/colorbox.css'
 		  rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/shared/assets/responsive-tables-js/dist/responsivetables.css'
 		  rel='stylesheet'>
@@ -41,54 +42,30 @@
 	<!-- Font Awesome Icons -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" type="text/css" media="screen"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.css" type="text/css" media="screen"/>
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/square/blue.css" rel="stylesheet">
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico">
 </head>
 	<body>
 	<!-- topbar starts -->
 	<div class="navbar navbar-default" role="navigation">
-		<div class="navbar-inner">
-			<button type="button" class="navbar-toggle pull-left animated flip">
+		<div class="container-fluid">
+			<button type="button" class="navbar-toggle navbar-left animated flip">
 				<span class="sr-only">Toggle navigation</span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="{$site->home_link}"> <img alt="newznab-tmux logo"
-																	src="{$smarty.const.WWW_THEMES}/{$theme}/img/logo-tmux.png"
-						/></a>
-			{$header_menu}
-			<!-- user dropdown starts -->
-			{if $loggedin == "true"}
-			<div class="btn-group pull-right">
-				<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-					<i class="fa fa-user"></i><span class="hidden-sm hidden-xs"><span
-								class="username"> Hi, {$userdata.username}</span></span>
-					<span class="caret"></span>
-				</button>
-				<ul class="dropdown-menu">
-					<li><a href="{$smarty.const.WWW_TOP}/profile"><i class="fa fa-user"></i><span> My Profile</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/cart"><i class="fa fa-shopping-basket"></i><span> My Download Basket</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/queue"><i class="fa fa-cloud-download"></i><span> My Queue</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/mymovies"><i class="fa fa-film"></i><span> My movies</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/myshows"><i class="fa fa-television"></i> My Shows</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/profileedit"><i class="fa fa-cog fa-spin"></i><span> Account Settings</span></a>
-					</li>
-					{if isset($isadmin)}
-						<li><a href="{$smarty.const.WWW_TOP}/admin"><i class="fa fa-cogs fa-spin"></i><span> Admin</span></a></li>
-					{/if}
-					<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock-alt"></i><span> Logout</span></a></li>
-				</ul>
-				{else}
-				<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a></li>
-				<li><a href="{$smarty.const.WWW_TOP}/register"><i class="fa fa-bookmark-o"></i><span> Register</span></a></li>
+			<div class="navbar-header">
+				<a href="{$site->home_link}" class="navbar-brand">
+				<span>{$site->title}</span></a>
 			</div>
-			{/if}
-			<!-- user dropdown ends -->
-		</div>
+			<div class="navbar-header" style="margin: 0 auto; float: right;">
+			{$header_menu}
+			</div>
 	</div>
 	<!-- topbar ends -->
 	<div class="ch-container">
@@ -100,28 +77,7 @@
 						<div class="nav-sm nav nav-stacked">
 						</div>
 						<ul class="nav nav-pills nav-stacked main-menu">
-							<!-- search form -->
 							{if $loggedin == "true"}
-							<form id="headsearch_form" action="{$smarty.const.WWW_TOP}/search/" method="get">
-								<input id="headsearch" name="search" value="{if $header_menu_search == ""}Search...{else}{$header_menu_search|escape:"htmlall"}{/if}" class="form-control" type="text" tabindex="1$" />
-								<div class="row" style="padding-top:3px;">
-									<div class="col-md-8">
-										<select id="headcat" name="t" class="form-control" data-search="true">
-											<option class="grouping" value="-1">All</option>
-											{foreach $parentcatlist as $parentcat}
-												<option {if $header_menu_cat == $parentcat.id}selected="selected"{/if} value="{$parentcat.id}"> [{$parentcat.title}]</option>
-												{foreach $parentcat.subcatlist as $subcat}
-													<option {if $header_menu_cat == $subcat.id}selected="selected"{/if} value="{$subcat.id}">&nbsp;&nbsp;&nbsp; > {$subcat.title}</option>
-												{/foreach}
-											{/foreach}
-										</select>
-									</div>
-									<div class="col-md-3">
-										<input id="headsearch_go" type="submit" class="btn btn-dark" style="margin-top:0px; margin-left:4px;" value="Go"/>
-									</div>
-								</div>
-							</form>
-							<!-- /.search form -->
 							<li class="nav-header">Main</li>
 							<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
 											class="fa arrow"></span></a></li>
@@ -158,6 +114,7 @@
 													class="fa fa-envelope-o"></i><span> Contact</span> <span
 													class="fa arrow"></span></a></li>
 									{if $loggedin == "true"}
+									<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="fa fa-forumbee"></i> Forum</a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a></li>
@@ -210,10 +167,10 @@
 	<!--/.fluid-container-->
 	<!-- Scripts-->
 	<!-- jQuery -->
-	<!-- jQuery 2.2.1 -->
-	<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js"></script>
+	<!-- jQuery 3.1.0 -->
+	<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
 	<!-- jQuery migrate script -->
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate/jquery-migrate.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"></script>
 	<!-- Bootstrap hover on mouseover script -->
@@ -234,6 +191,8 @@
 			src="{$smarty.const.WWW_THEMES}/shared/assets/responsive-tables-js/dist/responsivetables.js"></script>
 	<!-- for iOS style toggle switch -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.iphone.toggle.js"></script>
+	<!-- icheck -->
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
 	<!-- autogrowing textarea plugin -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.autogrow-textarea.js"></script>
@@ -252,7 +211,7 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/functions.js"></script>
 	<!-- newznab default scripts, needed for stuff to work -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip2.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

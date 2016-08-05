@@ -2,8 +2,8 @@
 require_once './config.php';
 
 
-use newznab\Regexes;
-use newznab\Category;
+use nntmux\Regexes;
+use nntmux\Category;
 
 $page    = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'collection_regexes']);

@@ -131,7 +131,7 @@
 {if isset($isadmin) && $downloadlist|@count > 0}
 <div style="padding-top:20px;">
 	<h3>Downloads for User and Host</h3>
-	<table class="data Sortable highlight table table-striped" id="downloadtable" style="margin-top:10px;">
+	<table class="data Sortable highlight table" id="downloadtable" style="margin-top:10px;">
 	<tr>
 		<th>date</th>
 		<th>hosthash</th>
@@ -146,7 +146,7 @@
 		<tr {if $download@iteration >= 10}class="extra" style="display:none;"{/if}>
 			<td class="less" title="{$download.timestamp}">{$download.timestamp|date_format}</td>
 			<td title="{$download.hosthash}">{if $download.hosthash == ""}n/a{else}{$download.hosthash|truncate:10}{/if}</td>
-			<td>{if $download.guid == ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download.guid}/{$download.searchname|escape:"seourl"}">{$download.searchname}</a>{/if}</td>
+			<td>{if $download.guid == ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download.guid}">{$download.searchname}</a>{/if}</td>
 		</tr>
 		{/foreach}
 	</table>
@@ -167,7 +167,7 @@
 		{foreach from=$commentslist item=comment}
 		<tr>
 			<td width="80" title="{$comment.createddate}">{$comment.createddate|date_format}</td>
-			<td><a href="{$smarty.const.WWW_TOP}/details/{$comment.guid}/{$comment.searchname|escape:"seourl"}">{$comment.searchname}</a></td>
+			<td><a href="{$smarty.const.WWW_TOP}/details/{$comment.guid}">{$comment.searchname}</a></td>
 			<td>{$comment.text|escape:"htmlall"|nl2br}</td>
 		</tr>
 		{/foreach}

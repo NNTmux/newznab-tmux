@@ -19,7 +19,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
-
+	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<!-- Bootstrap core CSS -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
@@ -140,53 +140,6 @@
 						<a id="menu_toggle"><i class="fa fa-bars"></i></a>
 					</div>
 					{$header_menu}
-					<ul class="nav navbar-nav">
-						<li class="">
-							<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
-							   data-hover="dropdown" data-close-others="true" data-delay="30" aria-expanded="false">
-								{if $loggedin == "true"}
-								<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png"
-									 alt="User Image"> {$userdata.username}
-								<span class=" fa fa-angle-down"></span>
-							</a>
-							<ul class="dropdown-menu dropdown-usermenu animated jello pull-right">
-								<li><a href="{$smarty.const.WWW_TOP}/cart"><i class="fa fa-shopping-basket"></i> My
-										Download Basket</a>
-								</li>
-								<li>
-									<a href="{$smarty.const.WWW_TOP}/queue"><i class="fa fa-list-alt"></i> My Queue</a>
-								</li>
-								<li>
-									<a href="{$smarty.const.WWW_TOP}/mymovies"><i class="fa fa-film"></i> My Movies</a>
-								</li>
-								<li><a href="{$smarty.const.WWW_TOP}/myshows"><i class="fa fa-television"></i> My Shows</a>
-								</li>
-								<li>
-									<a href="{$smarty.const.WWW_TOP}/profileedit"><i class="fa fa-cog fa-spin"></i>
-										Account Settings</a>
-								</li>
-								{if isset($isadmin)}
-									<li>
-										<a href="{$smarty.const.WWW_TOP}/admin"><i class="fa fa-cogs fa-spin"></i> Admin</a>
-									</li>
-								{/if}
-								<li>
-									<a href="{$smarty.const.WWW_TOP}/profile" class="btn btn-default btn-flat"><i
-												class="fa fa-user"></i> Profile</a>
-								</li>
-								<li>
-									<a href="{$smarty.const.WWW_TOP}/logout" class="btn btn-default btn-flat"><i
-												class="fa fa-unlock-alt"></i> Sign out</a>
-								</li>
-								{else}
-								<li><a href="{$smarty.const.WWW_TOP}/login"><i
-												class="fa fa-lock"></i><span> Login</span></a></li>
-								<li><a href="{$smarty.const.WWW_TOP}/register"><i class="fa fa-bookmark-o"></i><span> Register</span></a>
-								</li>
-								{/if}
-							</ul>
-						</li>
-					</ul>
 				</nav>
 			</div>
 		</div>
@@ -205,9 +158,7 @@
 			<footer>
 				<div class="copyright-info">
 					<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
-								href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is open
-					source,
-					released under the GPL license
+							href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is open source, released under the GPL license
 				</div>
 				<div class="clearfix"></div>
 			</footer>
@@ -218,6 +169,7 @@
 	</div>
 
 </div>
+<!-- jQuery 3.1.0 -->
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"
 		type="text/javascript"></script>
@@ -234,11 +186,11 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
 <!-- jQuery migrate script -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate/jquery-migrate.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip2.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
 
 <!-- PNotify -->

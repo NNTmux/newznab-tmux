@@ -22,13 +22,12 @@
   ],
   "autoload": {
     "psr-4": {
-      "newznab\\": "newznab/"
+      "nntmux\\": "nntmux/"
     },
     "classmap": [
       "www/pages/",
       "libs/pixelead0/Tmdb/",
       "libs/PEAR/Net_NNTP/NNTP/",
-      "libs/zeebinz/rarinfo/",
       "libs/"
     ]
   },
@@ -46,17 +45,35 @@
     }
   },
   "license": "GPL-3.0",
-  "name": "dariusiii/newznab-tmux",
+  "name": "DariusIII/newznab-tmux",
   "non-feature-branches": [
     "latest-.*"
   ],
   "require": {
-    "php": ">=5.6.0",
+    "php": ">=5.6.9",
     "barracudanetworks/forkdaemon-php": "~1.0",
+    "dariusiii/rarinfo": "dev-master",
+    "ext-ctype": "*",
     "ext-curl": "*",
+    "ext-exif": "*",
+    "ext-filter": "*",
     "ext-gd": "*",
+    "ext-hash": "*",
+    "ext-iconv": "*",
     "ext-json": "*",
+    "ext-mbstring": "*",
+    "ext-mcrypt": "*",
     "ext-mysqlnd": "*",
+    "ext-openssl": "*",
+    "ext-pcre": "*",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "ext-session": "*",
+    "ext-simplexml": "*",
+    "ext-sockets": "*",
+    "ext-spl": "*",
+    "ext-xmlwriter": "*",
+    "ext-zlib": "*",
     "fxp/composer-asset-plugin": "~1.1",
     "giantbomb/giantbomb": "@dev",
     "google/recaptcha": "~1.1",
@@ -80,11 +97,12 @@
     "bower-asset/html5shiv": "~3.7.3",
     "bower-asset/icheck": "~1.0.2",
     "bower-asset/jquery-2.2.x": "~2.2.1",
+    "bower-asset/jquery-3.1.x": "~3.1.0",
     "bower-asset/jquery.nicescroll": "~3.6.8",
-    "bower-asset/jquery-migrate": "~1.4.0",
+    "bower-asset/jquery-migrate-1.4.x": "~1.4.0",
+    "bower-asset/jquery-migrate-3.0.x": "~3.0.0",
     "bower-asset/pace": "~1.0.2",
     "bower-asset/pnotify": "~3.0",
-    "bower-asset/qtip2-main": "~3.0.2",
     "bower-asset/respond": "~1.4.2",
     "bower-asset/responsive-tables-js": "~1.0.6",
     "bower-asset/select2": "~4.0.2",
@@ -99,6 +117,10 @@
   },
 
   "scripts": {
+  },
+  "suggest": {
+    "ext-simple_php_yenc_decode": "Greatly improves yEnc decoding speed in PHP 5.x",
+    "ext-xdebug": "For developement work"
   },
   "type": "project"
 }

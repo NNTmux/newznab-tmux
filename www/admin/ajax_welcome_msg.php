@@ -2,7 +2,7 @@
 require_once './config.php';
 
 
-use newznab\Sites;
+use nntmux\Sites;
 
 // login check
 $admin = new AdminPage;

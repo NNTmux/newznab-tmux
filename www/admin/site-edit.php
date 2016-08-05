@@ -3,11 +3,11 @@
 require_once './config.php';
 
 
-use newznab\Category;
-use newznab\SABnzbd;
-use newznab\db\Settings;
-use newznab\Sites;
-use newznab\utility\Utility;
+use nntmux\Category;
+use nntmux\SABnzbd;
+use nntmux\db\Settings;
+use nntmux\Sites;
+use nntmux\utility\Utility;
 
 $category = new Category();
 $page = new AdminPage();

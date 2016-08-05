@@ -3,9 +3,9 @@
 require_once './config.php';
 
 
-use newznab\ReleaseRegex;
-use newznab\Groups;
-use newznab\Category;
+use nntmux\ReleaseRegex;
+use nntmux\Groups;
+use nntmux\Category;
 
 
 $page = new AdminPage();

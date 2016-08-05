@@ -3,7 +3,7 @@
 </div>
 
 <div class="navbar">
-	<div class="navbar-inner">
+	<div class="container">
 		<form method="get" class="navbar-form pull-left" action="{$smarty.const.WWW_TOP}/searchraw">
 			<div class="input-append">
 
@@ -34,13 +34,13 @@
 {$site->adbrowse}
 
 <form method="post" id="dl" name="dl" action="{$smarty.const.WWW_TOP}/searchraw">
-<table style="width:100%;" class="data table table-striped" id="browsetable">
+<table style="width:100%;" class="data table" id="browsetable">
 	<tr>
 		<!--<th width="10"></th>-->
 		<th>filename</th>
 		<th>group</th>
 		<th>posted</th>
-		{if $isadmin}
+		{if isset($isadmin)}
 		<th>Misc</th>
 		<th>%</th>
 		{/if}
@@ -53,11 +53,11 @@
 			<td title="{$result.xref|escape:"htmlall"}">{$result.name|escape:"htmlall"}</td>
 			<td class="less">{$result.group_name|replace:"alt.binaries":"a.b"}</td>
 			<td class="less" title="{$result.date}">{$result.date|date_format}</td>
-			{if $isadmin}
+			{if isset($isadmin)}
 			<td><span title="procstat">{$result.procstat}</span>/<span title="totalparts">{$result.totalParts}</span>/<span title="regex">{if $result.regexid == ""}_{else}{$result.regexid}{/if}</span>/<span title="relpart">{$result.relpart}</span>/<span title="reltotalpart">{$result.reltotalpart}</span></td>
 			<td class="less">{if $result.binnum < $result.totalParts}<span class="label label-danger">{$result.binnum}/{$result.totalParts}</span>{else}<span class="label label-success">100%</span>{/if}</td>
 			{/if}
-			<td class="less">{if $result.releases_id > 0}<a class="btn btn-mini" title="View Nzb details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.filename|escape:"seourl"}">Yes</a>{/if}</td>
+			<td class="less">{if $result.releases_id > 0}<a class="btn btn-mini" title="View Nzb details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}">Yes</a>{/if}</td>
 		</tr>
 	{/foreach}
 

@@ -1,11 +1,11 @@
 <?php
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\Categorize;
-use newznab\Category;
-use newznab\ColorCLI;
-use newznab\ConsoleTools;
-use newznab\db\Settings;
+use nntmux\Categorize;
+use nntmux\Category;
+use nntmux\ColorCLI;
+use nntmux\ConsoleTools;
+use nntmux\db\Settings;
 
 $pdo = new Settings();
 
@@ -73,12 +73,12 @@ function categorizeRelease($where, $update = true, $echooutput = false)
 	$pdo->log = new ColorCLI();
 	$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 	$relcount = $chgcount = 0;
-	echo $pdo->log->primary("SELECT id, searchname, groups_id, categories_id FROM releases " . $where);
-	$resrel = $pdo->queryDirect("SELECT id, searchname, groups_id, categories_id FROM releases " . $where);
+	echo $pdo->log->primary("SELECT id, searchname, fromname, groups_id, categories_id FROM releases " . $where);
+	$resrel = $pdo->queryDirect("SELECT id, searchname, fromname, groups_id, categories_id FROM releases " . $where);
 	$total = $resrel->rowCount();
 	if ($total > 0) {
 		foreach ($resrel as $rowrel) {
-			$catId = $cat->determineCategory($rowrel['groups_id'], $rowrel['searchname']);
+			$catId = $cat->determineCategory($rowrel['groups_id'], $rowrel['searchname'], $rowrel['fromname']);
 			if ($rowrel['categories_id'] != $catId) {
 				if ($update === true) {
 					$pdo->queryExec(

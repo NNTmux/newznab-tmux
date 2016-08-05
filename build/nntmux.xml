@@ -2,13 +2,13 @@
 <nntmux>
 	<versions>
 		<git>
-			<tag>0.0.0</tag>
+			<tag>0.0.0-dev</tag>
 			<!-- commit count removed -->
 			<hooks>
 				<precommit>9</precommit>
 				<!-- this is the version of the pre-commit file in githooks NOT the files it calls -->
 			</hooks>
-		</git>
+		<commit>5351</commit></git>
 		<scripts>
 			<last>
 				<date>0000-00-00</date>
@@ -16,8 +16,8 @@
 			</last>
 		</scripts>
 		<sql>
-			<db>258</db>
-			<file>258</file>
+			<db>268</db>
+			<file>268</file>
 		</sql>
 	</versions>
 </nntmux>

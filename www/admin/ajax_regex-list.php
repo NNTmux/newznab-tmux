@@ -2,7 +2,7 @@
 require_once './config.php';
 
 
-use newznab\ReleaseRegex;
+use nntmux\ReleaseRegex;
 
 // login check
 $admin = new AdminPage;

@@ -3,7 +3,7 @@
 require_once './config.php';
 
 
-use newznab\ReleaseRegex;
+use nntmux\ReleaseRegex;
 
 $page = new AdminPage();
 

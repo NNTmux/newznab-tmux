@@ -1,12 +1,12 @@
 <?php
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\ReleaseSearch;
-use newznab\SphinxSearch;
-use newznab\db\DB;
+use nntmux\ReleaseSearch;
+use nntmux\SphinxSearch;
+use nntmux\db\DB;
 
 if (NN_RELEASE_SEARCH_TYPE != ReleaseSearch::SPHINX) {
-	exit('Error, NN_RELEASE_SEARCH_TYPE in newznab/config/settings.php must be set to SPHINX!' . PHP_EOL);
+	exit('Error, NN_RELEASE_SEARCH_TYPE in nntmux/config/settings.php must be set to SPHINX!' . PHP_EOL);
 } else if (!isset($argv[1]) || !in_array($argv[1], ['releases_rt'])) {
 	exit(
 			"Argument 1 is the index name, releases_rt are the only supported ones currently.\n" .

@@ -3,7 +3,7 @@
 require_once './config.php';
 
 
-use newznab\Category;
+use nntmux\Category;
 
 $page = new AdminPage();
 

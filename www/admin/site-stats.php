@@ -3,8 +3,8 @@
 require_once './config.php';
 
 
-use newznab\Users;
-use newznab\Releases;
+use nntmux\Users;
+use nntmux\Releases;
 
 $page = new AdminPage();
 $users = new Users();

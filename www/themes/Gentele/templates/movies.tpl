@@ -91,7 +91,7 @@
 													{foreach $msplits as $loop=>$m name="loop"}
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
-																class="cover"
+																class="cover img-responsive img-rounded"
 																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result.title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
@@ -111,10 +111,11 @@
 														title="View NFO" class="modal_nfo label label-primary"
 														rel="nfo">NFO</a>{/if}
 													<a class="label label-primary"
-													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
-													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
+													   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
+													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>
-												<div class="col-md-9 small-gutter-left">
+												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}
@@ -159,12 +160,14 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																  id="guid{$mguid[$m@index]}"
 																  data-toggle="tooltip" data-placement="top" title
 																  data-original-title="Send to my download basket"><i
 																		class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																			  id="guid{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i
@@ -172,11 +175,11 @@
 																	{/if}
 																	{if !empty($cpurl) && !empty($cpapi)}
 																		<span
-																			id="imdb{$result.imdbid}"
-																			href="javascript:;"
-																			class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
-																			data-toggle="tooltip" data-placement="top"
-																			title data-original-title="Send to CouchPotato">
+																				id="imdb{$result.imdbid}"
+																				href="javascript:;"
+																				class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																				data-toggle="tooltip" data-placement="top"
+																				title data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>
 																		</span>
 																	{/if}
@@ -227,7 +230,7 @@
 													{foreach $msplits as $loop=>$m name="loop"}
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
-																class="cover"
+																class="cover img-responsive img-rounded"
 																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result.title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])}
@@ -247,10 +250,11 @@
 																title="View NFO" class="modal_nfo label label-primary">NFO</a>
 														</span>{/if}
 													<a class="label label-primary"
-													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
-													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
+													   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
+													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>
-												<div class="col-md-9 small-gutter-left">
+												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}
@@ -295,12 +299,14 @@
 																				class="fa fa-comment-o"></i><span
 																				class="badge"> {$mcomments[$m@index]}
 																			Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																  id="guid{$mguid[$m@index]}"
 																  data-toggle="tooltip" data-placement="top" title
 																  data-original-title="Send to my download basket"><i
 																		class="fa fa-shopping-basket"></i></span>
 																	{if isset($sabintegrated) && $sabintegrated !=""}
-																		<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																		<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																			  id="guid{$mguid[$m@index]}"
 																			  data-toggle="tooltip" data-placement="top"
 																			  title
 																			  data-original-title="Send to my Queue"><i
@@ -310,7 +316,7 @@
 																		<span
 																			id="imdb{$result.imdbid}"
 																			href="javascript:;"
-																			class="btn btn-hover btn-default btn-xs icon sendtocouch text-muted"
+																			class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
 																			data-toggle="tooltip" data-placement="top"
 																			title data-original-title="Send to CouchPotato">
 																			<i class="fa fa-bed"></i>

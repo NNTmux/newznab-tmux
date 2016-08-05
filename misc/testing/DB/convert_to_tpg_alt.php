@@ -1,9 +1,9 @@
 <?php
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\Groups;
-use newznab\ConsoleTools;
+use nntmux\db\Settings;
+use nntmux\Groups;
+use nntmux\ConsoleTools;
 
 
 $pdo = new Settings();
@@ -39,7 +39,7 @@ $parts_count = $pdo->queryOneRow("SELECT COUNT(*) AS cnt FROM parts");
 $i = 0;
 if ($collections_rows instanceof \Traversable) {
 	foreach ($collections_rows as $row) {
-		$groupName = $groups->getByNameByID($row['group_id']);
+		$groupName = $groups->getNameByID($row['group_id']);
 		echo $pdo->log->header("Processing ${groupName}");
 		//collection
 		$pdo->queryExec("INSERT IGNORE INTO collections_" . $row['group_id'] . " (subject, fromname, date, xref, totalfiles, group_id, collectionhash, dateadded, filecheck, filesize, releaseid) "

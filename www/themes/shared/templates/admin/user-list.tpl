@@ -36,6 +36,7 @@
 		<th>join date<br/><a title="Sort Descending" href="{$orderbycreateddate_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbycreateddate_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
 		<th>last login<br/><a title="Sort Descending" href="{$orderbylastlogin_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbylastlogin_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
 		<th>api access<br/><a title="Sort Descending" href="{$orderbyapiaccess_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbyapiaccess_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
+		<th>api requests<br/></th>
 		<th class="mid">grabs<br/><a title="Sort Descending" href="{$orderbygrabs_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbygrabs_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
 		<th class="mid">invites</th>
 		<th class="mid">notes</th>
@@ -52,6 +53,7 @@
 		<td title="{$user.createddate}">{$user.createddate|date_format}</td>
 		<td title="{$user.lastlogin}">{$user.lastlogin|date_format}</td>
 		<td title="{$user.apiaccess}">{$user.apiaccess|date_format}</td>
+		<td>{$user.apirequests}</td>
 		<td class="mid">{$user.grabs}</td>
 		<td class="mid">{$user.invites}</td>
 		<td class="mid"><a title="{if $user.notes|count_characters > 0}View{else}Add{/if} Notes" href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.id}#notes"><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/{if $user.notes|count_characters > 0}note_edit.png{else}note_add.png{/if}" alt="" /></a></td>

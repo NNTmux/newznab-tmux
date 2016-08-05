@@ -1,9 +1,9 @@
 <?php
 
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\Movie;
+use nntmux\db\Settings;
+use nntmux\Movie;
 
 $db = new Settings();
 $movie = new Movie(['Echo' => true, 'Settings' => $pdo]);

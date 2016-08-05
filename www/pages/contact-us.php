@@ -1,7 +1,7 @@
 <?php
 
-use newznab\utility\Utility;
-use newznab\Captcha;
+use nntmux\utility\Utility;
+use nntmux\Captcha;
 
 $captcha = new Captcha($page);
 

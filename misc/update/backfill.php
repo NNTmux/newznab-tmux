@@ -1,9 +1,9 @@
 <?php
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\NNTP;
-use newznab\Backfill;
+use nntmux\db\Settings;
+use nntmux\NNTP;
+use nntmux\Backfill;
 
 $pdo = new Settings();
 

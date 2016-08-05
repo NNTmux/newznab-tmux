@@ -22,7 +22,7 @@
 		</div>
 	</div>
 	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
-	<div class="well well-small">
+	<div class="well well-sm">
 		<div class="tvseriesheading">
 			<h1>
 				<div style="text-align: center;">{$seriestitles} ({$show.publisher})</div>
@@ -72,7 +72,7 @@
 	<br/>
 	<div class="box-body"
 	<form id="nzb_multi_operations_form" action="get">
-		<div class="well well-small">
+		<div class="well well-sm">
 			<div class="nzb_multi_operations">
 				With Selected:
 				<div class="btn-group">
@@ -198,8 +198,8 @@
 																		title="{$result.guid}">Media</span>{/if}
 																</div>
 															</td>
-															<td class="check" width="10"><input
-																		id="chk{$result.guid|substr:0:7}"
+															<td width="10"><input
+																		id="guid{$result.guid}"
 																		type="checkbox"
 																		class="flat" name="table_data{$seasonnum}"
 																		value="{$result.guid}"/></td>
@@ -211,31 +211,34 @@
 															<td>
 																{$result.size|fsize_format:"MB"}
 															</td>
-															<td class="icons" style='width:100px;'>
-																<a title="Download NZB"
-																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
-																			class="icon icon_nzb fa fa-cloud-download text-muted"
-																			data-toggle="tooltip" data-placement="top"
-																			title
+															<td>
+																<a href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}" class="icon_nzb text-muted"><i
+																			class="fa fa-cloud-download text-muted"
+																			data-toggle="tooltip" data-placement="top" title
 																			data-original-title="Download NZB"></i></a>
-																<a href="#" class="icon_cart text-muted"
-																   data-toggle="tooltip" data-placement="top" title
-																   data-original-title="Send to my Download Basket"><i
-																			class="fa fa-shopping-basket"></i></a>
+																<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
+																			class="fa fa-comments-o text-muted"
+																			data-toggle="tooltip" data-placement="top" title
+																			data-original-title="Comments"></i></a>
+																<a href="#"><i
+																			id="guid{$result.guid}"
+																			class="icon_cart text-muted fa fa-shopping-basket" data-toggle="tooltip"
+																			data-placement="top" title
+																			data-original-title="Send to my download basket"></i></a>
 																{if isset($sabintegrated) && $sabintegrated !=""}
-																	<a href="#" class="icon icon_sab text-muted"
-																	   data-toggle="tooltip" data-placement="top" title
-																	   data-original-title="Send to Queue"><i
-																				class="fa fa-share"></i></a
+																	<a href="#">
+																		<i	id="guid{$result.guid}"
+																			  class="icon_sab text-muted fa fa-share"
+																			  data-toggle="tooltip"
+																			  data-placement="top" title
+																			  data-original-title="Send to my Queue">
+																		</i>
+																	</a>
 																{/if}
-																{if isset($isadmin)}
-																	<br/>
-																	<a class="label label-warning"
-																	   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
-																	   title="Edit Release">Edit</a>
-																	<a class="label label-danger"
-																	   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
-																	   title="Delete Release">Delete</a>
+																{if $weHasVortex}
+																	<a href="#" class="icon_vortex text-muted"><i
+																				class="fa fa-share" data-toggle="tooltip" data-placement="top"
+																				title data-original-title="Send to NZBVortex"></i></a>
 																{/if}
 															</td>
 														</tr>

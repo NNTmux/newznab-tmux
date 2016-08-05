@@ -1,6 +1,6 @@
 <h2>Browse {$catname}</h2>
 
-<div class="well well-small">
+<div class="well well-sm">
 	<div style="text-align: center;">
 		{include file='search-filter.tpl'}
 	</div>
@@ -11,7 +11,7 @@
 {if $results|@count > 0}
 
 	<form id="nzb_multi_operations_form" action="get">
-		<div class="well well-small">
+		<div class="well well-sm">
 			<div class="nzb_multi_operations">
 				<table width="100%">
 					<tr>
@@ -32,7 +32,7 @@
 						</td>
 						<td width="20%">
 							<div class="pull-right">
-								{if $isadmin}
+								{if isset($isadmin)}
 									Admin:
 									<div class="btn-group">
 										<input type="button" class="nzb_multi_operations_edit btn btn-small btn-warning" value="Edit" />
@@ -46,7 +46,7 @@
 				</table>
 			</div>
 		</div>
-		<table style="width:100%;" class="data highlight icons table table-striped" id="coverstable">
+		<table style="width:100%;" class="data highlight icons table" id="coverstable">
 			<tr>
 				<th width="130" style="padding-top:0px; padding-bottom:0px;">
 					<input type="checkbox" class="nzb_check_all" />
@@ -97,7 +97,9 @@
 						</div>
 					</td>
 					<td colspan="3" class="left">
-						<h4><a title="View Movie" href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a> (<a class="title" title="{$result.year}" href="{$smarty.const.WWW_TOP}/movies?year={$result.year}">{$result.year}</a>) {if $result.rating != ''}{$result.rating}/10{/if}{if {$result.imdbid} != ""}&nbsp;&nbsp;<a onclick="mymovie_add('{$result.imdbid}', this);return false;" class="rndbtn btn btn-mini btn-info" href="#">Add To My Movies</a>{/if}</h4>
+						<h4><a title="View Movie" href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a> (<a class="title" title="{$result.year}" href="{$smarty.const.WWW_TOP}/movies?year={$result.year}">{$result.year}</a>)
+							{if $result.rating != ''}{$result.rating}/10{/if}
+							<a class="btn btn-mini btn-success mymovies" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a></h4>
 
 						{if isset($result.tagline)&& $result.tagline != ''}
 							<b>{$result.tagline}</b>
@@ -145,7 +147,7 @@
 											<div class="icon"><input type="checkbox" class="nzb_check" value="{$mguid[$m@index]}" /></div>
 										</td>
 										<td>
-											<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">&nbsp;{$mname[$m@index]|escape:"htmlall"}</a>
+											<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">&nbsp;{$mname[$m@index]|escape:"htmlall"}</a>
 											<ul class="inline">
 												<li width="100px">Posted {$mpostdate[$m@index]|timeago}</li>
 												<li width="80px">{$msize[$m@index]|fsize_format:"MB"}</li>
@@ -208,7 +210,7 @@
 			{/foreach}
 		</table>
 		{if $results|@count > 10}
-			<div class="well well-small">
+			<div class="well well-sm">
 				<div class="nzb_multi_operations">
 					<table width="100%">
 						<tr>
@@ -229,7 +231,7 @@
 							</td>
 							<td width="20%">
 								<div class="pull-right">
-									{if $isadmin}
+									{if isset($isadmin)}
 										Admin:
 										<div class="btn-group">
 											<input type="button" class="nzb_multi_operations_edit btn btn-small btn-warning" value="Edit" />

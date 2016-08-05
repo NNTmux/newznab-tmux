@@ -1,9 +1,9 @@
 <?php
 //This script will update all records in the movieinfo table where there is no cover
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\Movie;
+use nntmux\db\Settings;
+use nntmux\Movie;
 
 $pdo = new Settings();
 

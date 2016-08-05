@@ -1,7 +1,7 @@
 <?php
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\IRCScraper;
+use nntmux\IRCScraper;
 
 if (!defined('IRC_SCRAPER_CONFIG')) {
 	define('IRC_SCRAPER_CONFIG', NN_CONFIGS . 'ircscraper_settings.php');

@@ -3,8 +3,8 @@
 require_once './config.php';
 
 
-use newznab\Releases;
-use newznab\Category;
+use nntmux\Releases;
+use nntmux\Category;
 
 $page = new AdminPage();
 $releases = new Releases();

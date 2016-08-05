@@ -3,7 +3,7 @@
 require_once './config.php';
 
 
-use newznab\Console;
+use nntmux\Console;
 
 $page = new AdminPage();
 $con  = new Console(['Settings' => $page->settings]);

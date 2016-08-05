@@ -6,10 +6,11 @@
  *
  * It will start the tmux server and monitoring scripts if needed.
  */
-require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'indexer.php');
+//require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\Tmux;
+use nntmux\db\Settings;
+use nntmux\Tmux;
 
 $pdo = new Settings();
 

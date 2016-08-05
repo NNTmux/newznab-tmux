@@ -1,5 +1,5 @@
 <?php
-use newznab\ReleaseFiles;
+use nntmux\ReleaseFiles;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

@@ -1,6 +1,6 @@
 <?php
 
-use newznab\CouchPotato;
+use nntmux\CouchPotato;
 
 if (!$page->users->isLoggedIn()){
 	$page->show403();

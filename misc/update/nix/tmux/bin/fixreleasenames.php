@@ -1,13 +1,13 @@
 <?php
-require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\processing\PostProcess;
-use newznab\ColorCLI;
-use newznab\NameFixer;
-use newznab\NNTP;
-use newznab\NZBContents;
-use newznab\Nfo;
+use nntmux\db\Settings;
+use nntmux\processing\PostProcess;
+use nntmux\ColorCLI;
+use nntmux\NameFixer;
+use nntmux\NNTP;
+use nntmux\NZBContents;
+use nntmux\Nfo;
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {

@@ -122,7 +122,7 @@ jQuery(function($){
         });
         return false;
     });
-    
+
     $('.vortexsend').click(function(event)
     {
         if ($(this).hasClass('icon_nzbvortex_clicked')) return false;
@@ -159,16 +159,6 @@ jQuery(function($){
             });
         }
         return false;
-    });
-
-    $('.report_check_all').change(function(){
-        if($(this).attr('checked'))
-        {
-            $(".nzb_check").attr('checked',$(this).attr('checked'));
-            $(".rid").attr('checked',$(this).attr('checked'));
-        } else {
-            $(".nzb_check").removeAttr('checked');
-        }
     });
 
     var vortexStates = new Array();
@@ -235,7 +225,7 @@ jQuery(function($){
     // browse.tpl, search.tpl
     $('.icon_cart').click(function(e){
         if ($(this).hasClass('icon_cart_clicked')) return false;
-        var guid = $(this).parent().parent().attr('id').substring(4);
+        var guid = $(this).attr('id').substring(4);
         $.post( SERVERROOT + "cart?add=" + guid, function(resp){
             $(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
             PNotify.prototype.options.styling = "fontawesome";
@@ -394,7 +384,7 @@ jQuery(function($){
     $('.icon_sab').click(function(e){
         if ($(this).hasClass('icon_sab_clicked')) return false;
 
-        var guid = $(this).parent().parent().attr('id').substring(4);
+        var guid = $(this).attr('id').substring(4);
         var nzburl = SERVERROOT + "sendtoqueue/" + guid;
 
         $.post(nzburl, function(resp){
@@ -421,7 +411,7 @@ jQuery(function($){
     $('.icon_nzbget').click(function(e){
         if ($(this).hasClass('icon_nzbget_clicked')) return false;
 
-        var guid = $(this).parent().parent().attr('id').substring(4);
+        var guid = $(this).attr('id').substring(4);
         var nzburl = SERVERROOT + "sendtoqueue/" + guid;
 
         $.post(nzburl, function(resp){
@@ -499,6 +489,17 @@ jQuery(function($){
 
 
     $('button.nzb_multi_operations_download').on('click', (function(){
+        var ids = "";
+        $("table.data INPUT[type='checkbox']:checked").each( function (i, row) {
+            if ($(row).val()!="on")
+                ids += $(row).val()+',';
+        });
+        ids = ids.substring(0,ids.length-1);
+        if (ids)
+            window.location = SERVERROOT + "getnzb?zip=1&id="+ids;
+    }));
+
+    $('input.nzb_multi_operations_download_cart').on('click', (function(){
         var ids = "";
         $("table.data INPUT[type='checkbox']:checked").each( function (i, row) {
             if ($(row).val()!="on")

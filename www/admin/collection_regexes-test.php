@@ -2,7 +2,7 @@
 require_once './config.php';
 
 
-use newznab\Regexes;
+use nntmux\Regexes;
 
 $page = new AdminPage();
 

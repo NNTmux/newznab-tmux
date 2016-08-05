@@ -2,8 +2,8 @@
 require_once './config.php';
 
 
-use newznab\Regexes;
-use newznab\Binaries;
+use nntmux\Regexes;
+use nntmux\Binaries;
 
 // Login Check
 $admin = new AdminPage;

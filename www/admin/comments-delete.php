@@ -2,7 +2,7 @@
 require_once './config.php';
 
 
-use newznab\ReleaseComments;
+use nntmux\ReleaseComments;
 
 $page = new AdminPage();
 

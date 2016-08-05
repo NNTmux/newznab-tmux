@@ -1,5 +1,5 @@
 <?php
-use newznab\db\Settings;
+use nntmux\db\Settings;
 
 try {
     // Create the first database class instance (which will initialize the PDO connection)

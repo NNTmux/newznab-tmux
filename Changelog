@@ -1,10 +1,222 @@
+2016-08-05 DariusIII
+	* Chg: Update composer asset plugin
+	* Fix: Fix cart operations in all themes
+2016-08-04 DariusIII
+	* Fix: Category display in Gamma theme browse page
+	* Chg: Update git tag checking code
+2016-08-02 DariusIII
+	* Chg: Move user menu to headermenu.tpl
+2016-08-01 DariusIII
+	* Chg: Make themes more mobile devices friendly
+	* Fix: Path to glyphicons in Gamma them
+2016-07-30 DariusIII
+	* Chg: Update rarinfo library
+2016-07-29 DariusIII
+	* Fix: Add check if the password is set in ProcessAdditional
+	* Chg: Speed up queries in RequestIDWeb and groupfixrelnames by preventing usage of indexes on ORDER BY clause.
+	* Chg: Allow underscore in usernames.
+2016-07-28 DariusIII
+	* Chg: Update sphinx.conf for new sphinx 2.2.11 release
+		Note: if using sphinx search the following is required to update the index
+		sudo service sphinxsearch stop
+		sudo mv /etc/sphinxsearch/sphinx.conf /etc/sphinxsearch/sphinx.conf.1
+		sudo cp /var/www/newznab/misc/sphinxsearch/sphinx.conf /etc/sphinxsearch/sphinx.conf
+		sudo service sphinxsearch start
+		php misc/sphinxsearch/populate_rt_indexes.php releases_rt
+2016-07-27 DariusIII
+	* Chg: Update groupfixrelnames query by not allowing it to use any index on ORDER BY r.id DESC clause (speeds up the query)
+2016-07-26 DariusIII
+	* Chg: Update composer with new version of jquery(3.1.0)  and use it in themes
+	* Chg: Update getTVReleases query by not allowing it to use any index on ORDER BY postdate DESC clause (speeds up the query as it uses the right index now)
+        * Fix: Prevent notices on nzb details page for isadmin and ismod in Charisma, Gentele and Omicron themes
+        * Fix: Prevent undefined index group_name in XML_Response class
+2016-07-25 DariusIII
+	* Chg: Update dariusiii/rarinfo package
+	* Fix: Par2Info and SfvInfo class calls in postprocessing
+	* Chg: Use own rarinfo library
+2016-07-24 DariusIII
+	* Fix: Improvements to versions updating for XML file.
+2016-07-24 DariusIII
+	* Chg: Use max headers iteration site setting if set (or max of 1000000 if not set) during multiprocessing safe binaries
+		This will ensure we don't queue too many jobs in one loop if you are behind on updating and is consistant
+		with other update binaries methods
+	Fix: Categorization of XXX releases posted in mp3 groups
+2016-07-21 DariusIII
+	* Fix: Wrong order of inserted values when editing an group
+	* Chg: Improve isXxxClipSD matching code
+2016-07-20 DariusIII
+	* Chg: Add function to match poster for categorization
+	* Chg: Update upcoming pages to prevent notices when alternate_ids is not set in rottentomatoes response
+	* Chg: Update XXX UHD and XXX HD regexes for categorization
+2016-07-19 DariusIII
+	* Chg: Update queries in NameFixer for by poster categorization
+	* Chg: Move UHD releases checks before HD ondes
+	* Chg: Add UHD subcategories to Movies, TV and XXX categories
+	* Chg: Add categorization by poster to Categorize.php (used in XXX SD clips for now)
+	* Fix: Add lithium libraries bootstrap for Admin pages
+	* Fix: Display of browsing categories on browse pages of every theme.
+2016-07-18 DariusIII
+	* Fix: RSS/API usenetdate format to conform with newznab api specification
+	* Fix: API search now respects group parameter for searches
+	* Chg: Add check for isadmin in forumpost.tpl in all the themes
+	* Fix: RSS/API issues introduced in latest commit
+	* Chg: Change bootstraping process in nntmux
+2016-07-15 DariusIII
+	* Chg: Remove releases ordering in viewmoviefull page of all the themes
+	* Fix: Prevent undefined index notices in api.php
+	* Chg: Update composer files
+2016-07-14 DariusIII
+	* Fix: Add back the missing nzb download option to api
+	* Chg: Add checks for ep when api is queries for season/episode.
+	* Fix: Wrong guid usage in Gentele viexxxfull page
+	* Chg: Add api requests count to admin/user-list page
+	* Chg: Remove now unused files
+	* Chg: Replace usage of indexer.php with bootstrap.php
+	* Chg: Add workaround for duplicate constants warning
+	* Chg: Create gitignore for new configuration folder
+2016-07-13 DariusIII
+	* Chg: Use searchname and not animeTitle in viewanime.tpl's
+	* Chg: Check if cp_url and cp_api are set on profile edit page
+	* Chg: Add check for empty invitecode when user registers on site
+	* Fix: Remove extra release searchname after the release guid when linking to release details page
+	* Fix: Fix adding movies to my movies from upcoming page (in theatres)
+	* Fix: Fix wrong name of used result in ajax_tvinfo
+	* Fix: Mark new releases in Gamma browse page.
+	* Fix: Check if isadmin is set in Gamma theme.
+	* Chg: Add check for empty values for userimdbs in upcoming pages.
+	* Chg: Add check for empty values for season and episode in api page
+2016-07-12 DariusIII
+	* Fix: Wrong usage of result.guid in Gentele theme viewmoviefull page
+	* Fix: Prevent undefined index notices in XML_Response
+	* Chg: Remove animation from menus in Gentele theme
+	* Fix: Fix color style of theme selection in Charisma theme.
+	* Fix: Add missing check for user selected styles setting on profile edit page
+	* Fix: Re-arrange items in profile edit page in all the themes.
+2016-07-10 DariusIII
+	* Fix: Add missing ajax_resetusergrabs-admin page to index.php
+	* Chg: Port changes from nZEDb
+	* Chg: Update AdminLTE css, js and skins to version 2.3.5
+2016-07-08 DariusIII
+	* Chg: Update composer.lock with new versions of nicescroll and lithium-dev
+2016-07-07 DariusIII
+	* Chg: Use modified Versions command from app folder.
+	* Chg: Port changes for versions handling from nZEDb
+	* Chg: Update composer.lock with new versions of used libs
+2016-07-04 DariusIII
+	* Fix: Fix wrong constant name in myshow-add.tpl in all the themes
+	* Fix: Fix my movies and my shows RSS feeds
+	* Chg: Move adding of movies below cover
+2016-07-01 DariusIII
+	* Chg: Base JSON response of XMLWriter response
+2016-06-30 DariusIII
+	* Chg: Refactor adding movies to mymovies list.
+	* Chg: Update myshows.php
+	* Chg: Add link for My Shows to Gamma theme user menu
+2016-06-29 DariusIII
+	* Chg: Change categories_id columns in user_movies and user_series to categories (they host multiple category numbers)
+2016-06-28 DariusIII
+	* Chg: Change remaining categoryid to categories_id and add patch for user_series table
+2016-06-27 DariusIII
+	* Chg: Update Readme.md with updating script name change
+	* Chg: Add DocBlock comments to UserMovies and fix missing return in delMovie function.
+2016-06-25 DariusIII
+	* Upd: Update composer.lock
+	* Chg: Switch namespace from newznab to nntmux, rename nntmux script to tmux
+	* Upd: Update lithium connections
+	* Upd: Composer will prefer source now on install
+2016-06-24 DariusIII
+	* Fix: Fix styling of some pages in Gentele theme
+	* Chg: Consolidate groups handling by @ruhllatio
+	* Upd: Join release_comments on releases_id not gid
+	* Upd: Add forum link to all the themes, fix forum and forumpost pages
+	* Upd: Move settings for forking child processes inside if else loop
+2016-06-23 DariusIII
+	* Chg: Make gfRN predbft deterministic to prevent useless threads
+	* Chg: Rename userid to users_id to follow lithium naming convention.
+	* Upd: Update composer.lock with new version of barracudanetworks/forkdaemon-php
+	* Fix: Fix gFRN nfo processing typo and update.
+2016-06-21 DariusIII
+	* Upd: Remove old and unused scripts
+	* Fix: Fix stray categoryID in ReleaseRemover
+2016-06-20 DariusIII
+	* Upd: composer.lock with update for forkdaemon-php release 1.0.8
+	* Fix: SQL injection fix in Movie.php @pkostiuk
+2016-06-18 DariusIII
+	* Upd: Update composer.lock
+2016-06-13 DariusIII
+	* Upd: Update scrutinizer config
+2016-06-10 DariusIII
+	* Fix: Anidb not respecting update interval
+2016-06-09 DariusIII
+	* Upd: Increase cover size on movies and XXX pages
+2016-06-08 DariusIII
+	* Fix: Fix send to cart and queue behaviour in Charisma theme browse page
+	* Chg: Move user login menu in Charisma theme to headermenu
+	* Fix: Fix send to queue and download basket in Charisma theme.
+	* Upd: Make PreDb class to default to remote Db.
+	* Upd: Change DATEDIFF to constant comparison to allow index scan
+	* Upd: AniDB code cleanup, ported from nZEDb
+2016-06-07 DariusIII
+	* Upd: Make Charisma theme dark, fix some bootstrap issues.
+	* Upd: Update composer.lock file
+2016-06-06 DariusIII
+	* Fix: Fix the nntmux_fi_schema.sql
+	* Upd: Remove bad sources from ircscraper_settings_example and IRCScraper class
+	* Fix: use old qtip in Gentele theme
+	* Fix: Missed occurences of old checkboxes in Gentele
+	* Fix: TV fallback searches not episode specific / fix Season Pack lookups
+2016-06-03 DariusIII
+	* Fix: Fix styling of login page.
+	* Fix: Fix TV alias and local matching
+	* Upd: Fix look of search page in Gentele theme.
+	* Upd: Add support for multiple channels in IRCScraper.
+	* Upd: Fix Json and XML response
+2016-06-02 DariuIII
+	* Upd: Port fixes and new features from nZEDb.
+2016-06-01 DariusIII
+	* Upd: Show API search
+	* Upd: Fix connections
+	* Upd: Update Versions class
+	* Chg: Make API and RSS separate and smarty independent.
+	* Upd: Update composer files.
+	* Chg: Use old jquery.qtip2.js, remove new version from assets
+	* Fix: Fix TV search sending wrong data.
+2016-05-31 DariusIII
+	* Fix: Remove doubled and wrong preinfo function ih Gamma theme utils.js
+	* Fix: Fix PreDB page layout in Gamma theme.
+	* Fix: Fix links to colorbox images in Gamma bootstrap-fixes.css
+	* Fix: Fix Gamma links to scripts
+	* Chg: Adjust name of id attribute to guid.
+2016-05-30 DariusIII
+	* Fix: Fix issues with adding releases to cart/queue in Omicron/Gentele theme
+	* Fix: Fix styling on browse page on all themes
+	* Fix: Fix Nfo display on Gentele XXX page.
+	* Upd: Replace rest of the nzb_check and nzb_check_all with square and square-all, respectively
+2016-05-29 DariusIII
+	* Upd: update composer.lock with new versions of libs.
+	* Upd: Greatly improve speed of tv shows search.
+2016-05-28 DariusIII
+	* Fix: Fix for login rememberme
+2016-05-27 DariusIII
+	* Upd: Remove table-striped attribute from tables in search page of Gentele theme.
+	* Upd: Use well-sm in all themes
+	* Chg: Use bootstrap3 css in Gamma theme
 2016-05-26 DariusIII
 	* Fix: Remove lines not needed in register, login and forgottenpassword pages in themes
 	* Upd: Update composer.lock file with new versions of datatables and jquery.
 2016-05-24 DariusIII
 	* Chg: Rename groupid column to groups_id.
 	* Upd: Improve speed of update_releases on larger databases
+2016-05-22 DariusIII
+	* Upd: Update the +1 patch file
+	* Upd: Update NameFixer and ReleaseExtra classes.
+	* Upd: Add index to release_unique table to speed up processing, use querylimit in fixNamesWithMedia function.
+2016-05-21 DariusIII
+	* Upd: Move queries, match to properly named releases only
 2016-05-20 DariusIII
+	* Upd: Update uid matching and add it to tmux
+	* Upd: Rename releases based on their uid
+	* Chg: Extract id from media, add separate table to handle it.
 	* Upd: Hide couchpotato button if no imdbid is set for release.
 2016-05-19 DariusIII
 	* Upd: Composer.lock and remove noty. Fix wrong paths after changes to scripts location

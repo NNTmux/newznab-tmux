@@ -3,9 +3,8 @@
 <div class=".pagination pagination-centered">
 	{$pager}
 </div>
-<div style="float:right;margin-bottom:5px;"><a href="#new" role="button" class="btn btn-small btn-primary" data-toggle="modal">New post</a></div>
 <a id="top"></a>
-<table style="width:100%;" class="data highlight table table-striped" id="forumtable">
+<table style="width:100%;" class="data highlight table" id="forumtable">
 	<tr>
 		<th style="padding-top:0px; padding-bottom:0px;" width="60%">Topic</th>
 		<th style="padding-top:0px; padding-bottom:0px;">Posted By</th>
@@ -38,12 +37,11 @@
 	{$pager}
 </div>
 {/if}
-<div id="new" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-		<h3 id="myModalLabel">Add New Post</h3>
+<div id="new" tabindex="-1" role="dialog" aria-labelledby="myLabel" aria-hidden="true">
+	<div class="header">
+		<h3 id="myLabel">Add New Post</h3>
 	</div>
-	<div class="modal-body">
+	<div class="body">
 		<form id="new-forum-thread" class="form-horizontal" action="" method="post">
 		<div class="control-group">
 			<label class="control-label" for="addSubject">Subject</label>
@@ -54,23 +52,11 @@
 		<div class="control-group">
 			<label class="control-label" for="addMessage">Message</label>
 			<div class="controls">
-				<textarea cols="100" rows="3" class="input input-xlarge" maxlength="5000" id="addMessage" name="addMessage" rows="6"
-						  cols="60"></textarea>
+				<textarea cols="100" class="input input-xlarge" maxlength="5000" id="addMessage" name="addMessage" rows="6"></textarea>
 			</div>
+			<input class="forumpostsubmit btn btn-success" type="submit" value="submit"/>
 		</div>
 		</form>
 	</div>
-	<div class="modal-footer">
-		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-		<input id="new-forum-thread-submit" class="forumpostsubmit btn btn-success" type="submit" value="submit"/>
-	</div>
 </div>
-<script>
-	$('#new-forum-thread-submit').on('click', function(e){
-	  // We don't want this to act as a link so cancel the link action
-	   e.preventDefault();
-	  // Find form and submit it
-	  $('#new-forum-thread').submit();
-	});
-</script>
 <br/><br/><br/>

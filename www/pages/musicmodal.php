@@ -1,6 +1,6 @@
 <?php
 
-use newznab\Music;
+use nntmux\Music;
 
 $music = new Music;
 

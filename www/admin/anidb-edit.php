@@ -1,7 +1,7 @@
 <?php
 require_once './config.php';
 
-use newznab\AniDB;
+use nntmux\AniDB;
 
 $page  = new AdminPage();
 $AniDB = new AniDB(['Settings' => $page->settings]);

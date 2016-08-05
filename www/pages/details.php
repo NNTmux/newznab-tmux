@@ -1,20 +1,20 @@
 <?php
 
-use newznab\Console;
-use newznab\ReleaseComments;
-use newznab\ReleaseExtra;
-use newznab\ReleaseFiles;
-use newznab\DnzbFailures;
-use newznab\Releases;
-use newznab\Videos;
-use newznab\Episode;
-use newznab\Movie;
-use newznab\XXX;
-use newznab\Games;
-use newznab\Music;
-use newznab\AniDB;
-use newznab\Books;
-use newznab\PreDb;
+use nntmux\Console;
+use nntmux\ReleaseComments;
+use nntmux\ReleaseExtra;
+use nntmux\ReleaseFiles;
+use nntmux\DnzbFailures;
+use nntmux\Releases;
+use nntmux\Videos;
+use nntmux\Episode;
+use nntmux\Movie;
+use nntmux\XXX;
+use nntmux\Games;
+use nntmux\Music;
+use nntmux\AniDB;
+use nntmux\Books;
+use nntmux\PreDb;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

@@ -19,11 +19,11 @@
  * @copyright 2015 nZEDb
  */
 
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'indexer.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-use newznab\db\DbUpdate;
-use newznab\utility\Git;
-use newznab\utility\Utility;
+use nntmux\db\DbUpdate;
+use nntmux\utility\Git;
+use nntmux\utility\Utility;
 
 if (!Utility::isCLI()) {
 	exit;

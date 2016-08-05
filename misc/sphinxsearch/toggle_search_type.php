@@ -1,8 +1,8 @@
 <?php
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\ReleaseSearch;
-use newznab\db\Settings;
+use nntmux\ReleaseSearch;
+use nntmux\db\Settings;
 
 
 if (!isset($argv[1]) || !in_array($argv[1], ['sphinx', 'standard'])) {

@@ -1,6 +1,6 @@
 <?php
 
-use newznab\Movie;
+use nntmux\Movie;
 
 $movie = new Movie;
 

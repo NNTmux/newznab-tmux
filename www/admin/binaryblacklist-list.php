@@ -3,7 +3,7 @@
 require_once './config.php';
 
 
-use newznab\Binaries;
+use nntmux\Binaries;
 
 
 $page = new AdminPage();

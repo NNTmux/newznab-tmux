@@ -20,10 +20,9 @@
 		<div class="row">
 			<div class="col-xlg-12 portlets">
 				<div class="panel panel-default">
-					<div class="panel-body pagination2">
-						<div class="row">
-							<div class="col-md-8">
-								<table class="data table table-condensed table-striped table-responsive table-hover">
+					<div class="panel-body col-md-12">
+						<div class="row col-md-12">
+							<table class="table table-responsive">
 									<tr>
 										<th style="width: auto"> Date</th>
 										<th style="width: auto"> Title</th>
@@ -44,7 +43,7 @@
 												{if isset($result.guid)}
 													<a style="font-style:italic;text-decoration:underline;color:#{if $result.nuked == 1}009933{elseif $result.nuked > 1}990000{/if};"
 													   class="title" title="View details"
-													   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.title|escape:"htmlall"}">
+													   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">
 														<span title="{if $result.nuked == 1}UNNUKED: {$result.nukereason|escape:"htmlall"}{elseif $result.nuked > 1}NUKED: {$result.nukereason|escape:"htmlall"}{else}{$result.title|escape:"htmlall"}{/if}">{$result.title|escape:"htmlall"}</span>
 													</a>
 												{else}
@@ -379,7 +378,6 @@
 			</div>
 		</div>
 	</div>
-</div>
 <hr>
 <div style="padding-bottom:10px;">
 	{$pager}

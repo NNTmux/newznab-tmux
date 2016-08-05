@@ -1,10 +1,10 @@
 <?php
 
-use newznab\utility\Utility;
-use newznab\Category;
-use newznab\SABnzbd;
-use newznab\NZBGet;
-use newznab\Users;
+use nntmux\utility\Utility;
+use nntmux\Category;
+use nntmux\SABnzbd;
+use nntmux\NZBGet;
+use nntmux\Users;
 
 $category = new Category;
 $sab = new SABnzbd($page);
@@ -82,8 +82,8 @@ switch ($action) {
 					(isset($_POST['sabapikeytype']) ? $_POST['sabapikeytype'] : ''),
 					(isset($_POST['nzbvortex_server_url']) ? $_POST['nzbvortex_server_url'] : false),
 					(isset($_POST['nzbvortex_api_key']) ? $_POST['nzbvortex_api_key'] : false),
-					$_POST['cp_url'],
-					$_POST['cp_api'],
+					(isset($_POST['cp_url']) ? $_POST['cp_url'] : ''),
+					(isset($_POST['cp_api']) ? $_POST['cp_api'] : ''),
 					$_POST['style']
 				);
 

@@ -2,7 +2,7 @@
 require_once './config.php';
 
 
-use newznab\Regexes;
+use nntmux\Regexes;
 
 $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'category_regexes']);

@@ -3,7 +3,7 @@
 require_once './config.php';
 
 
-use newznab\Music;
+use nntmux\Music;
 
 $page = new AdminPage();
 

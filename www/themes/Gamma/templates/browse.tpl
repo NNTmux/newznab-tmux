@@ -1,6 +1,7 @@
 <ul class="breadcrumb">
-	<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a> <span class="divider">/</span></li>
-	<li class="active">{$catname|escape:"htmlall"}</li>
+	{assign var="catsplit" value=">"|explode:$catname}
+	<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+	/ {if isset($catsplit[0])} {$catsplit[0]}{/if} / {if isset($catsplit[1])} {$catsplit[1]}{/if}
 </ul>
 
 {$site->adbrowse}
@@ -20,7 +21,7 @@
 
 <form id="nzb_multi_operations_form" action="get">
 
-	<div class="well well-small">
+	<div class="well well-sm">
 		<div class="nzb_multi_operations">
 			<table width="100%">
 				<tr>
@@ -47,7 +48,7 @@
 					<td width="20%">
 						<div class="pull-right">
 						<a class="btn btn-small" title="All releases in your shows as an RSS feed" href="{$smarty.const.WWW_TOP}/rss?t={$category}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Rss <i class="fa fa-rss"></i></a>
-						{if $isadmin}
+						{if isset($isadmin)}
 							Admin:
 							<div class="btn-group">
 								<input type="button" class="nzb_multi_operations_edit btn btn-small btn-warning" value="Edit" />
@@ -64,7 +65,7 @@
 			</table>
 		</div>
 	</div>
-	<table style="100%" class="data highlight icons table table-striped" id="browsetable">
+	<table style="100%" class="data highlight icons table" id="browsetable">
 		<tr>
 			<th style="padding-top:0; padding-bottom:0;">
 				<input id="chkSelectAll" type="checkbox" class="nzb_check_all" />
@@ -79,7 +80,7 @@
 			<th>Action</th>
 		</tr>
 		{foreach $results as $result}
-		<tr class="{cycle values=",alt"}{if $lastvisit|strtotime<$result.adddate|strtotime} new{/if}" id="guid{$result.guid}">
+		<tr class="{cycle values=",alt"}" id="guid{$result.guid}">
 			{if (strpos($category, '60') !== false)}
 					<td class="check" width="25%"><input id="chk{$result.guid|substr:0:7}"
 					 type="checkbox" class="nzb_check"
@@ -99,7 +100,7 @@
 			{/if}
 			<td class="item">
 				<label for="chk{$result.guid|substr:0:7}">
-					<a class="title" title="View details"  href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}"><h5>{$result.searchname|escape:"htmlall"|replace:".":" "}</h5></a>
+					<a class="title" title="View details"  href="{$smarty.const.WWW_TOP}/details/{$result.guid}"><h5>{$result.searchname|escape:"htmlall"|replace:".":" "} {if $lastvisit|strtotime < $result.adddate|strtotime} <a href="#" class="badge badge-success">New</a>{/if}</h5></a>
 				</label>
 				{if $result.passwordstatus == 2}
 				<i class="fa fa-lock"></i>
@@ -145,7 +146,7 @@
 						{if $result.anidbid > 0}
 						<a class="badge badge-inverse halffade" href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}" title="View all episodes">View Anime</a>
 						{/if}
-						{if isset($result.firstaired) && $result.firstaired != ""}
+						{if !empty($result.firstaired)}
 							<span class="seriesinfo badge badge-success halffade" title="{$result.guid}"> Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>
 						{/if}
 						{if $result.videostatus > 0}
@@ -221,7 +222,7 @@
 	</table>
 
 	{if $results|@count > 10}
-	<div class="well well-small">
+	<div class="well well-sm">
 		<div class="nzb_multi_operations">
 			<table width="100%">
 				<tr>
@@ -246,7 +247,7 @@
 					</td>
 					<td width="20%">
 						<div class="pull-right">
-						{if $isadmin}
+						{if isset($isadmin)}
 							Admin:
 							<div class="btn-group">
 								<input type="button" class="nzb_multi_operations_edit btn btn-small btn-warning" value="Edit" />

@@ -21,7 +21,7 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nzb_check_all"/> <br/>
+								Check all: <input type="checkbox" class="square-all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<input type="button"
@@ -85,9 +85,9 @@
 													{foreach $msplits as $loop=>$m name="loop"}
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
-																class="cover"
+																class="cover img-responsive img-rounded"
 																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
-																width="100" border="0"
+																width="140" border="0"
 																alt="{$result.title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed for some users"></i>{/if}</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
@@ -101,11 +101,12 @@
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
-													<a class="label label-default"
-													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
-													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
+													<a class="label label-primary"
+													   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
+													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>
-												<div class="col-md-9 small-gutter-left">
+												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}
@@ -120,7 +121,7 @@
 													<div id="guid{$mguid[$m@index]}">
 														<label>
 															<input type="checkbox"
-																   class="nzb_check"
+																   class="square"
 																   value="{$mguid[$m@index]}"
 																   id="chksingle"/>
 														</label>
@@ -146,13 +147,19 @@
 																		class="fa fa-comment-o"></i><span
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted"
-																  title="Send to my Download Basket"><i
-																		class="fa fa-shopping-basket"></i></span>
+															<span
+																	id="guid{$mguid[$m@index]}"
+																	class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																	title="Send to my Download Basket"><i
+																		class="fa fa-shopping-basket"></i>
+																		</span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
-																<span class="btn btn-hover btn-default btn-xs icon_sab text-muted"
-																	  title="Send to my Queue"><i
-																			class="fa fa-share"></i></span>
+																<span
+																		id="guid{$mguid[$m@index]}"
+																		class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																		title="Send to my Queue"><i
+																			class="fa fa-share"></i>
+																			</span>
 															{/if}
 															{if !empty($cpurl) && !empty($cpapi)}
 																<span
@@ -203,9 +210,9 @@
 													{foreach $msplits as $loop=>$m name="loop"}
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
-																class="cover"
+																class="cover img-responsive img-rounded"
 																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
-																width="100" border="0"
+																width="140" border="0"
 																alt="{$result.title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
@@ -219,11 +226,12 @@
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 														title="View NFO" class="modal_nfo label label-default"
 														rel="nfo">NFO</a>{/if}
-													<a class="label label-default"
-													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
-													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
+													<a class="label label-primary"
+													   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+													   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
+													<a class="label label-primary" href="{$smarty.const.WWW_TOP}/mymovies/add/{$result.imdbid}?from={$smarty.server.REQUEST_URI|escape:"url"}" rel="add" name="movies{$result.imdbid}" title="Add to My Movies">Add</a>
 												</div>
-												<div class="col-md-9 small-gutter-left">
+												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}
@@ -238,7 +246,7 @@
 													<div id="guid{$mguid[$m@index]}">
 														<label>
 															<input type="checkbox"
-																   class="nzb_check"
+																   class="square"
 																   value="{$mguid[$m@index]}"
 																   id="chksingle"/>
 														</label>
@@ -264,13 +272,19 @@
 																		class="fa fa-comment-o"></i><span
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-															<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																  title="Send to my Download Basket"><i
-																		class="fa fa-shopping-basket"></i></span>
+															<span
+																	id="guid{$mguid[$m@index]}"
+																	class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																	title="Send to my Download Basket"><i
+																		class="fa fa-shopping-basket"></i>
+																		</span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
-																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																	  title="Send to my Queue"><i
-																			class="fa fa-share"></i></span>
+																<span
+																		id="guid{$mguid[$m@index]}"
+																		class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																		title="Send to my Queue"><i
+																			class="fa fa-share"></i>
+																			</span>
 															{/if}
 															{if !empty($cpurl) && !empty($cpapi)}
 																<span
@@ -304,7 +318,7 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-								Check all: <input type="checkbox" class="nzb_check_all"/> <br/>
+								Check all: <input type="checkbox" class="square-all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<input type="button"

@@ -4,9 +4,9 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-use newznab\Releases;
-use newznab\Contents;
-use newznab\Category;
+use nntmux\Releases;
+use nntmux\Contents;
+use nntmux\Category;
 
 $releases = new Releases(['Settings' => $page->settings]);
 $contents = new Contents(['Settings' => $page->settings]);

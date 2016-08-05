@@ -8,7 +8,7 @@
 </div>
 
 <div class="navbar">
-	<div class="navbar-inner">
+	<div class="container">
 		<form method="get" class="navbar-form pull-left" action="{$smarty.const.WWW_TOP}/search">
 			<div id="sbasic" style="text-align:center;{if $sadvanced} display:none;{/if}">
 				<div class="input-append">
@@ -25,7 +25,7 @@
 <form method="get" action="{$smarty.const.WWW_TOP}/search">
 	<div id="sadvanced" {if not $sadvanced}style="display:none"{/if}>
 		<div style="text-align: center;">
-			<table class="data table table-striped table-condensed table-responsive">
+			<table class="data table table-condensed table-responsive">
 				<tr>
 					<th><label for="searchadvr">Release Name:</label></th>
 					<td><input class="searchadv" id="searchadvr" name="searchadvr" value="{$searchadvr|escape:'html'}"
@@ -116,7 +116,7 @@
 <form style="padding-top:10px;" id="nzb_multi_operations_form" method="get" action="{$smarty.const.WWW_TOP}/search">
 
 	<form id="nzb_multi_operations_form" action="get">
-		<div class="well well-small">
+		<div class="well well-sm">
 			<div class="nzb_multi_operations">
 				<table width="100%">
 					<tr>
@@ -136,7 +136,7 @@
 						<td width="33%">
 							<div class="pull-right">
 							<a class="btn btn-small" title="All releases in your shows as an RSS feed" href="{$smarty.const.WWW_TOP}/rss?t={$category[0]}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}&amp;uFilter={$search|escape:'html'}">Rss <i class="fa fa-rss"></i></a>
-							{if $isadmin}
+							{if isset($isadmin)}
 									Admin:
 									<div class="btn-group">
 										<input type="button" class="nzb_multi_operations_edit btn btn-small btn-warning" value="Edit" />
@@ -151,7 +151,7 @@
 			</div>
 		</div>
 
-<table style="100%" class="data highlight icons table table-striped" id="browsetable">
+<table style="100%" class="data highlight icons table" id="browsetable">
 
 	<tr>
 		<th style="padding-top:0px; padding-bottom:0px;">
@@ -187,7 +187,7 @@
 			{/if}
 			<td class="item">
 				<label for="chk{$result.guid|substr:0:7}">
-					<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}">
+					<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}">
 						<h5>{$result.searchname|escape:"htmlall"|replace:".":" "}</h5>
 					</a>
 				</label>
@@ -291,7 +291,7 @@
 </table>
 <br/>
 {if $results|@count > 10}
-<div class="well well-small">
+<div class="well well-sm">
 	<div class="nzb_multi_operations">
 		<table width="100%">
 			<tr>
@@ -309,7 +309,7 @@
 					</div>
 				</td>
 				<td width="33%">
-					{if $isadmin}
+					{if isset($isadmin)}
 						<div class="pull-right">
 							Admin:
 							<div class="btn-group">

@@ -3,7 +3,7 @@
 require_once("config.php");
 
 
-use newznab\DnzbFailures;
+use nntmux\DnzbFailures;
 
 $page = new AdminPage();
 

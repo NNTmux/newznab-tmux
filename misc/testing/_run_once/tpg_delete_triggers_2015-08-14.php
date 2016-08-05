@@ -18,9 +18,9 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
-require_once dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php';
+require_once dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-use newznab\db\Settings;
+use nntmux\db\Settings;
 
 $pdo = new Settings();
 

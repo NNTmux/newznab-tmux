@@ -1,6 +1,6 @@
 <?php
 
-use newznab\Books;
+use nntmux\Books;
 
 $b = new Books;
 

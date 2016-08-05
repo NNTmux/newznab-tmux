@@ -1,10 +1,10 @@
 <?php
 //This script will update all records in the movieinfo table
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\ColorCLI;
-use newznab\Movie;
+use nntmux\db\Settings;
+use nntmux\ColorCLI;
+use nntmux\Movie;
 
 $pdo = new Settings();
 $c = new ColorCLI();

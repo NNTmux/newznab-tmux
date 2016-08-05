@@ -13,8 +13,8 @@
 		{foreach from=$commentslist item=comment}
 			<tr class="{cycle values=",alt"}">
 				<td>
-					{if $comment.userid > 0}
-						<a href="{$smarty.const.WWW_TOP}/user-edit.php?id={$comment.userid}">{$comment.username}</a>
+					{if $comment.users_id > 0}
+						<a href="{$smarty.const.WWW_TOP}/user-edit.php?id={$comment.users_id}">{$comment.username}</a>
 					{else}
 						{$comment.username}
 					{/if}

@@ -25,9 +25,9 @@ if (!isset($argv[1]) || !in_array($argv[1], ['1'])) {
 		'1: 2014-07-28: Add unique key to binaryhash to be able to do multiple updates in 1 statement.' . PHP_EOL
 	);
 }
-require_once dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php';
+require_once dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-use newznab\db\Settings;
+use nntmux\db\Settings;
 
 $pdo = new Settings();
 

@@ -3,9 +3,9 @@
 require_once './config.php';
 
 
-use newznab\db\Settings;
-use newznab\Sharing;
-use newznab\ReleaseComments;
+use nntmux\db\Settings;
+use nntmux\Sharing;
+use nntmux\ReleaseComments;
 
 // Login check.
 $admin = new AdminPage;

@@ -1,10 +1,10 @@
 <?php
-require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\processing\PostProcess;
-use newznab\ColorCLI;
-use newznab\Tmux;
-use newznab\NNTP;
+use nntmux\processing\PostProcess;
+use nntmux\ColorCLI;
+use nntmux\Tmux;
+use nntmux\NNTP;
 
 
 $c = new ColorCLI();

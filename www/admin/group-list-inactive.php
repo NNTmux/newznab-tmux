@@ -2,7 +2,7 @@
 require_once './config.php';
 
 
-use newznab\Groups;
+use nntmux\Groups;
 
 $page = new AdminPage();
 $groups = new Groups(['Settings' => $page->settings]);
@@ -12,7 +12,7 @@ if (isset($_REQUEST['groupname']) && !empty($_REQUEST['groupname'])) {
 	$gname = $_REQUEST['groupname'];
 }
 
-$groupcount = $groups->getCountInactive($gname);
+$groupcount = $groups->getCount($gname, 0);
 
 $offset = isset($_REQUEST["offset"]) ? $_REQUEST["offset"] : 0;
 $groupname = (isset($_REQUEST['groupname']) && !empty($_REQUEST['groupname'])) ? $_REQUEST['groupname'] : '';
@@ -27,7 +27,7 @@ $page->smarty->assign('pagerquerybase', WWW_TOP."/group-list-inactive.php?".$gro
 $pager = $page->smarty->fetch("pager.tpl");
 $page->smarty->assign('pager', $pager);
 
-$grouplist = $groups->getRangeInactive($offset, ITEMS_PER_PAGE, $gname);
+$grouplist = $groups->getRange($offset, ITEMS_PER_PAGE, $gname, 0);
 
 $page->smarty->assign('grouplist',$grouplist);
 

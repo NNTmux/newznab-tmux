@@ -128,7 +128,11 @@ Libraries::add('app', array('default' => true));
 // 	Libraries::add(basename($path), array('path' => $path));
 // }
 
-require_once NN_ROOT . 'constants.php';
+Libraries::add('nntmux',
+	[
+		'bootstrap'	=> 'bootstrap.php',
+		'path'	=> NN_ROOT . 'nntmux',
+	]);
 
 require_once LITHIUM_APP_PATH . DS . 'libraries' . DS . 'autoload.php';
 /**

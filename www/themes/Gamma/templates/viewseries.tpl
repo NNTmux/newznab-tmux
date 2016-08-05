@@ -74,7 +74,7 @@
 <br/>
 
 <form id="nzb_multi_operations_form" action="get">
-	<div class="well well-small">
+	<div class="well well-sm">
 		<div class="nzb_multi_operations">
 			With Selected:
 			<div class="btn-group">
@@ -97,7 +97,7 @@
 				<button data-quality="2160p" class="btn">2160p</button>
 		    </div>
 
-			{if $isadmin}
+			{if isset($isadmin)}
 			<div class="pull-right">
 				Admin:
 				<div class="btn-group">
@@ -159,7 +159,7 @@
 		<div class="tab-content">
 			{foreach $seasons as $seasonnum => $season name=tv}
 			<div class="tab-pane{if $smarty.foreach.tv.first} active{/if}" id="{$seasonnum}">
-				<table class="tb_{$seasonnum} data highlight icons table table-striped" id="browsetable">
+				<table class="tb_{$seasonnum} data highlight icons table" id="browsetable">
 					<tr class="dont-filter">
 						<th>Ep</th>
 						<th>Name</th>
@@ -182,7 +182,7 @@
 					<tr class="{cycle values=",alt"} filter" id="guid{$result.guid}" data-name="{$result.searchname|escape:"htmlall"|lower|replace:".":" "}">
 						<td width="20" class="static"></td>
 						<td>
-							<a title="View details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}"><h5>{$result.searchname|escape:"htmlall"|replace:".":" "}</h5></a>
+							<a title="View details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}"><h5>{$result.searchname|escape:"htmlall"|replace:".":" "}</h5></a>
 
 							<div class="resextra">
 								<div class="btns">

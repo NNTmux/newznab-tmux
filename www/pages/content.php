@@ -1,6 +1,6 @@
 <?php
 
-use newznab\Contents;
+use nntmux\Contents;
 
 $contents = new Contents(['Settings' => $page->settings]);
 

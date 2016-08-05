@@ -1,7 +1,7 @@
 <?php
 
-use newznab\Contents;
-use newznab\Sitemap;
+use nntmux\Contents;
+use nntmux\Sitemap;
 
 $te = $page->smarty;
 

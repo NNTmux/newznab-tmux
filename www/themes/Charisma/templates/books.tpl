@@ -24,7 +24,7 @@
 										<div class="nzb_multi_operations">
 											View: <strong>Covers</strong> | <a
 													href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-											Check all: <input type="checkbox" class="nzb_check_all"/> <br/>
+											Check all: <input type="checkbox" class="square-all"/> <br/>
 											With Selected:
 											<div class="btn-group">
 												<input type="button"
@@ -74,6 +74,7 @@
 														<a title="View details"
 														   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">
 															<img src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfo_id}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
+																 class="img-responsive img-rounded"
 																 width="140" border="0"
 																 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 														</a>
@@ -104,7 +105,7 @@
 																<td id="guid{$mguid[$m@index]}">
 																	<label>
 																		<input type="checkbox"
-																			   class="nzb_check"
+																			   class="square"
 																			   value="{$mguid[$m@index]}"
 																			   id="chksingle"/>
 																	</label>
@@ -144,13 +145,19 @@
 																					class="fa fa-comment-o"></i><span
 																					class="badge">{$mcomments[$m@index]}
 																				Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
-																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																			  title="Send to my Download Basket"><i
-																					class="fa fa-shopping-basket"></i></span>
+																		<span
+																			id="guid{$mguid[$m@index]}"
+																			class="btn btn-hover btn-default btn-xs icon_cart text-muted"
+																			title="Send to my Download Basket"><i
+																			class="fa fa-shopping-basket"></i>
+																		</span>
 																		{if isset($sabintegrated) && $sabintegrated !=""}
-																			<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
-																				  title="Send to my Queue"><i
-																						class="fa fa-share"></i></span>
+																			<span
+																				id="guid{$mguid[$m@index]}"
+																				class="btn btn-hover btn-default btn-xs icon_sab text-muted"
+																				title="Send to my Queue"><i
+																				class="fa fa-share"></i>
+																			</span>
 																		{/if}
 																	</div>
 																</td>
@@ -168,7 +175,7 @@
 											<div class="nzb_multi_operations">
 												View: <strong>Covers</strong> | <a
 														href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-												Check all: <input type="checkbox" class="nzb_check_all"/> <br/>
+												Check all: <input type="checkbox" class="square-all"/> <br/>
 												With Selected:
 												<div class="btn-group">
 													<input type="button"

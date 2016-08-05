@@ -589,7 +589,7 @@
 							{foreach $similars as $similar}
 											<li>
 												<a title="View similar NZB details"
-												   href="{$smarty.const.WWW_TOP}/details/{$similar.guid}/{$similar.searchname|escape:"htmlall"}">{$similar.searchname|escape:"htmlall"}</a>
+												   href="{$smarty.const.WWW_TOP}/details/{$similar.guid}">{$similar.searchname|escape:"htmlall"}</a>
 												<br/>
 											</li>
 										{/foreach}
@@ -610,7 +610,7 @@
 												{foreach $comments|@array_reverse:true as $comment}
 													<tr>
 														<td class="less" title="{$comment.createddate}">
-															{if !$privateprofiles || $isadmin || $ismod}
+															{if !$privateprofiles || isset($isadmin) || isset($ismod)}
 																<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
 															{else}
 																{$comment.username}

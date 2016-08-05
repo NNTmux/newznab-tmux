@@ -1,10 +1,10 @@
 <?php
-require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\utility\Utility;
-use newznab\Tmux;
-use newznab\ColorCLI;
+use nntmux\db\Settings;
+use nntmux\utility\Utility;
+use nntmux\Tmux;
+use nntmux\ColorCLI;
 
 $pdo = new Settings();
 $DIR = NN_TMUX;
@@ -238,7 +238,7 @@ function window_optimize($tmux_session)
 
 function window_sharing($tmux_session)
 {
-	$pdo = new newznab\db\Settings();
+	$pdo = new nntmux\db\Settings();
 	$sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 	$t = new Tmux();
 	$tmux = $t->get();

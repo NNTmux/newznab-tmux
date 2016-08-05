@@ -10,6 +10,6 @@ if (!isset($argv[1]) || !in_array($argv[1], ['backfill', 'binaries'])) {
 declare(ticks=1);
 require('.do_not_run/require.php');
 
-use \newznab\libraries\Forking;
+use \nntmux\libraries\Forking;
 
 (new Forking())->processWorkType('safe_' . $argv[1]);

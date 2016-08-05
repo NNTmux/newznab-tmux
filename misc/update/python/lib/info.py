@@ -45,7 +45,7 @@ def disconnect(cur, con):
     cur = None
 
 def readConfig():
-	Configfile = pathname+"/../../../newznab/config/config.php"
+	Configfile = pathname+"/../../../nntmux/config/config.php"
 	file = open( Configfile, "r")
 
 	# Match a config line

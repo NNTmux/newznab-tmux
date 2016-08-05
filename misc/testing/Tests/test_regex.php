@@ -1,13 +1,13 @@
 <?php
 //
 // This script is used to test the regular expressions identified
-// within a newznab database are valid.
+// within a nntmux database are valid.
 //
 // by l2g
 //
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
+use nntmux\db\Settings;
 
 function handleError($errno, $errstr, $errfile, $errline, array $errcontext)
 {

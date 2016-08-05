@@ -1,7 +1,7 @@
 <?php
 
-use newznab\Releases;
-use newznab\NZB;
+use nntmux\Releases;
+use nntmux\NZB;
 
 $releases = new Releases;
 $nzb = new NZB;

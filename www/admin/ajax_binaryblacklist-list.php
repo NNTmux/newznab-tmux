@@ -2,7 +2,7 @@
 require_once './config.php';
 
 
-use newznab\Binaries;
+use nntmux\Binaries;
 
 // login check
 $admin = new AdminPage;

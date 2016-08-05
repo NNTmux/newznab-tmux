@@ -1,9 +1,9 @@
 <?php
 
-use newznab\Category;
-use newznab\Releases;
-use newznab\UserSeries;
-use newznab\Videos;
+use nntmux\Category;
+use nntmux\Releases;
+use nntmux\UserSeries;
+use nntmux\Videos;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
@@ -15,32 +15,36 @@ $tv = new Videos(['Settings' => $page->settings]);
 $action = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
 $videoId = isset($_REQUEST['subpage']) ? $_REQUEST['subpage'] : '';
 
+if (isset($_REQUEST['from'])) {
+	$page->smarty->assign('from', WWW_TOP . $_REQUEST['from']);
+} else {
+	$page->smarty->assign('from', WWW_TOP . '/myshows');
+}
+
 switch ($action) {
 	case 'delete':
 		$show = $us->getShow($page->users->currentUserId(), $videoId);
-
+		if (isset($_REQUEST['from'])) {
+			header("Location:" . WWW_TOP . $_REQUEST['from']);
+		} else {
+			header("Location:" . WWW_TOP . "/myshows");
+		}
 		if (!$show) {
 			$page->show404('Not subscribed');
 		} else {
 			$us->delShow($page->users->currentUserId(), $videoId);
 		}
 
-		if (isset($_REQUEST['from'])) {
-			header("Location:" . WWW_TOP . $_REQUEST['from']);
-		} else {
-			header("Location:" . WWW_TOP . "/myshows");
-		}
 		break;
 	case 'add':
 	case 'doadd':
 		$show = $us->getShow($page->users->currentUserId(), $videoId);
-
 		if ($show) {
 			$page->show404('Already subscribed');
 		} else {
 			$show = $tv->getByVideoID($videoId);
 			if (!$show) {
-				$page->show404('Seriously?');
+				$page->show404('No matching show.');
 			}
 		}
 
@@ -48,7 +52,7 @@ switch ($action) {
 			$category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
 			$us->addShow($page->users->currentUserId(), $videoId, $category);
 			if (isset($_REQUEST['from'])) {
-				header("Location:" . $_REQUEST['from']);
+				header("Location:" . WWW_TOP . $_REQUEST['from']);
 			} else {
 				header("Location:" . WWW_TOP . "/myshows");
 			}
@@ -57,18 +61,18 @@ switch ($action) {
 			$tmpcats = $cat->getChildren(Category::TV_ROOT);
 			$categories = [];
 			foreach ($tmpcats as $c) {
+				// If TV WEB-DL categorization is disabled, don't include it as an option
+				if ($page->settings->getSetting('catwebdl') == 0 && $c['id'] == Category::TV_WEBDL) {
+					continue;
+				}
 				$categories[$c['id']] = $c['title'];
 			}
-
 			$page->smarty->assign('type', 'add');
 			$page->smarty->assign('cat_ids', array_keys($categories));
 			$page->smarty->assign('cat_names', $categories);
-			$page->smarty->assign('cat_selected', []);
-			$page->smarty->assign('rid', $videoId);
+			$page->smarty->assign('cat_selected', array());
+			$page->smarty->assign('video', $videoId);
 			$page->smarty->assign('show', $show);
-			if (isset($_REQUEST['from'])) {
-				$page->smarty->assign('from', $_REQUEST['from']);
-			}
 			$page->content = $page->smarty->fetch('myshows-add.tpl');
 			$page->render();
 		}
@@ -101,12 +105,9 @@ switch ($action) {
 			$page->smarty->assign('type', 'edit');
 			$page->smarty->assign('cat_ids', array_keys($categories));
 			$page->smarty->assign('cat_names', $categories);
-			$page->smarty->assign('cat_selected', explode('|', $show['categories_id']));
+			$page->smarty->assign('cat_selected', explode('|', $show['categories']));
 			$page->smarty->assign('video', $videoId);
 			$page->smarty->assign('show', $show);
-			if (isset($_REQUEST['from'])) {
-				$page->smarty->assign('from', $_REQUEST['from']);
-			}
 			$page->content = $page->smarty->fetch('myshows-add.tpl');
 			$page->render();
 		}
@@ -135,6 +136,7 @@ switch ($action) {
 		$page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
 		$page->smarty->assign('pagerquerybase', WWW_TOP . "/myshows/browse?ob=" . $orderby . "&amp;offset=");
 		$page->smarty->assign('pagerquerysuffix', "#results");
+		$page->smarty->assign('covgroup', '');
 
 		$pager = $page->smarty->fetch("pager.tpl");
 		$page->smarty->assign('pager', $pager);
@@ -169,7 +171,7 @@ switch ($action) {
 		$shows = $us->getShows($page->users->currentUserId());
 		$results = [];
 		foreach ($shows as $showk => $show) {
-			$showcats = explode('|', $show['categories_id']);
+			$showcats = explode('|', $show['categories']);
 			if (is_array($showcats) && sizeof($showcats) > 0) {
 				$catarr = [];
 				foreach ($showcats as $scat) {

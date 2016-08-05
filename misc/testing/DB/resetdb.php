@@ -1,12 +1,12 @@
 <?php
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use newznab\db\Settings;
-use newznab\utility\Utility;
-use newznab\ReleaseImage;
-use newznab\NZB;
-use newznab\ConsoleTools;
-use newznab\SphinxSearch;
+use nntmux\db\Settings;
+use nntmux\utility\Utility;
+use nntmux\ReleaseImage;
+use nntmux\NZB;
+use nntmux\ConsoleTools;
+use nntmux\SphinxSearch;
 
 Utility::clearScreen();
 $pdo = new Settings();
