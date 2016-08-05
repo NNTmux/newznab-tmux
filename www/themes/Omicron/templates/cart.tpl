@@ -23,7 +23,7 @@
 					<input type="button" class="nzb_multi_operations_cartsab btn btn-sm btn-info"
 						   value="Send to queue"/>
 				{/if}
-				<input type="button" class="nzb_multi_operations_download btn btn-sm btn-success" value="Download"/>
+				<input type="button" class="nzb_multi_operations_download_cart btn btn-sm btn-success" value="Download"/>
 			</div>
 		</div>
 		<div class="row">

@@ -24,13 +24,13 @@
 						<input type="button" class="nzb_multi_operations_cartsab btn btn-sm btn-info"
 							   value="Send to queue"/>
 					{/if}
-					<input type="button" class="nzb_multi_operations_download btn btn-sm btn-success" value="Download"/>
+					<input type="button" class="nzb_multi_operations_download_cart btn btn-sm btn-success" value="Download"/>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-lg-12 portlets">
 					<div class="panel panel-default">
-						<div class="panel-body pagination2">
+						<div class="panel-body pagination2 table-responsive">
 							<table class="data table table-striped responsive-utilities jambo-table bulk-action">
 								<thead>
 								<tr class="headings">
@@ -59,6 +59,10 @@
 								{/foreach}
 								</tbody>
 							</table>
+							</div>
+						</div>
+					</div>
+				</div>
 		</form>
 	{else}
 		<div class="alert alert-danger" role="alert">There are no NZBs in your download basket.</div>
