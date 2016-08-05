@@ -1121,16 +1121,16 @@
         },
         {
             "name": "fxp/composer-asset-plugin",
-            "version": "v1.2.0",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/composer-asset-plugin.git",
-                "reference": "8d74bc7c714aadbda54622c216b2e7bf786595cb"
+                "reference": "d7d189e8ffac26a2e39e26a9c75e1fc5c2e2b98d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/8d74bc7c714aadbda54622c216b2e7bf786595cb",
-                "reference": "8d74bc7c714aadbda54622c216b2e7bf786595cb",
+                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/d7d189e8ffac26a2e39e26a9c75e1fc5c2e2b98d",
+                "reference": "d7d189e8ffac26a2e39e26a9c75e1fc5c2e2b98d",
                 "shasum": ""
             },
             "require": {
@@ -1173,7 +1173,7 @@
                 "npm",
                 "package"
             ],
-            "time": "2016-07-01 12:04:16"
+            "time": "2016-08-03 07:44:07"
         },
         {
             "name": "giantbomb/giantbomb",
