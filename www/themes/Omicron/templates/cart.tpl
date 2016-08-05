@@ -42,7 +42,7 @@
 								<tr class="{cycle values=",alt"}">
 									<td class="check">
 										<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="square"
-											   value="{$result.id}"/>
+											   value="{$result.guid}"/>
 									</td>
 									<td>
 										<a title="View details"
