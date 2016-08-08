@@ -253,13 +253,14 @@ class NameFixer
 	/**
 	 * Attempts to fix release names using the File name.
 	 *
-	 * @param int $time   1: 24 hours, 2: no time limit
-	 * @param boolean $echo   1: change the name, anything else: preview of what could have been changed.
-	 * @param int $cats   1: other categories, 2: all categories
-	 * @param $nameStatus
-	 * @param $show
+	 * @param int     $time 1: 24 hours, 2: no time limit
+	 * @param boolean $echo 1: change the name, anything else: preview of what could have been changed.
+	 * @param int     $cats 1: other categories, 2: all categories
+	 * @param         $nameStatus
+	 * @param         $show
+	 * @param bool    $rfstring false: use standard filenames query, true: use specific rf.name to rename releases
 	 */
-	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show)
+	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show, $rfstring = true)
 	{
 		$this->_echoStartMessage($time, 'file names');
 		$type = 'Filenames, ';
@@ -284,11 +285,11 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN(%d, %d))
-					AND proc_files = %d',
+					%s',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
 				Category::OTHER_HASHED,
-				self::PROC_FILES_NONE
+				($rfstring ?  sprintf ('AND rf.name %s', $this->pdo->likeString('SDPORN', true, true)) : sprintf('AND proc_files = %d', self::PROC_FILES_NONE))
 			);
 		}
 
@@ -1582,6 +1583,8 @@ class NameFixer
 				$this->updateRelease($release, $result["1"], $method = "fileCheck: XXX Imagesets", $echo, $type, $namestatus, $show);
 			} else if (preg_match('/^VIDEOOT-[A-Z0-9]+\\\\([\w!.,& ()\[\]\'\`-]{8,}?\b.?)([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev|\.vol.+?|\.mp4)/', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["1"] . " XXX DVDRIP XviD-VIDEOOT", $method = "fileCheck: XXX XviD VIDEOOT", $echo, $type, $namestatus, $show);
+			} else if (preg_match('/^(.+?SDPORN.+?)\\\\.+/i', $release["textstring"], $result)) {
+				$this->updateRelease($release, $result["1"], $method = "fileCheck: XXX SDPORN", $echo, $type, $namestatus, $show);
 			} else if (preg_match('/\w[-\w.\',;& ]+1080i[._ -]DD5[._ -]1[._ -]MPEG2-R&C(?=\.ts)/i', $release["textstring"], $result)) {
 				$result = str_replace("MPEG2", "MPEG2.HDTV", $result["0"]);
 				$this->updateRelease($release, $result, $method = "fileCheck: R&C", $echo, $type, $namestatus, $show);
