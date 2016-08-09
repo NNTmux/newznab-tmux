@@ -1030,6 +1030,9 @@ class Categorize extends Category
 		switch(true) {
 			case $this->checkPoster( '/oz@lot[.]com/i', $this->poster, Category::XXX_CLIPSD):
 				return true;
+			case preg_match('/SDPORN/i', $this->releaseName):
+				$this->tmpCat = Category::XXX_CLIPSD;
+				return true;
 			default:
 				return false;
 		}

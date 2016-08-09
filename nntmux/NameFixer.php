@@ -258,9 +258,8 @@ class NameFixer
 	 * @param int     $cats 1: other categories, 2: all categories
 	 * @param         $nameStatus
 	 * @param         $show
-	 * @param bool    $rfstring false: use standard filenames query, true: use specific rf.name to rename releases
 	 */
-	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show, $rfstring = true)
+	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show)
 	{
 		$this->_echoStartMessage($time, 'file names');
 		$type = 'Filenames, ';
@@ -285,11 +284,75 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN(%d, %d))
-					%s',
+					AND proc_files = %d',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
 				Category::OTHER_HASHED,
-				($rfstring ?  sprintf ('AND rf.name %s', $this->pdo->likeString('SDPORN', true, true)) : sprintf('AND proc_files = %d', self::PROC_FILES_NONE))
+				self::PROC_FILES_NONE
+			);
+		}
+
+		$releases = $this->_getReleases($time, $cats, $query);
+		if ($releases instanceof \Traversable && $releases !== false) {
+
+			$total = $releases->rowCount();
+			if ($total > 0) {
+				$this->_totalReleases = $total;
+				echo $this->pdo->log->primary(number_format($total) . ' file names to process.');
+
+				foreach ($releases as $release) {
+					$this->done = $this->matched = false;
+					$this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
+					$this->checked++;
+					$this->_echoRenamed($show);
+				}
+
+				$this->_echoFoundCount($echo, ' files');
+			} else {
+				echo $this->pdo->log->info('Nothing to fix.');
+			}
+		}
+	}
+
+	/**
+	 * Attempts to fix release names using the File name.
+	 *
+	 * @param int     $time 1: 24 hours, 2: no time limit
+	 * @param boolean $echo 1: change the name, anything else: preview of what could have been changed.
+	 * @param int     $cats 1: other categories, 2: all categories
+	 * @param         $nameStatus
+	 * @param         $show
+	 */
+	public function fixXXXNamesWithFiles($time, $echo, $cats, $nameStatus, $show)
+	{
+		$this->_echoStartMessage($time, 'file names');
+		$type = 'Filenames, ';
+
+		$preId = false;
+		if ($cats === 3) {
+			$query = sprintf('
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+						rf.releases_id AS fileid, rel.id AS releases_id
+					FROM releases rel
+					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					WHERE nzbstatus = %d
+					AND predb_id = 0',
+				NZB::NZB_ADDED
+			);
+			$cats = 2;
+			$preId = true;
+		} else {
+			$query = sprintf('
+					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+						rf.releases_id AS fileid, rel.id AS releases_id
+					FROM releases rel
+					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN(%d, %d))
+					AND rf.name %s',
+				self::IS_RENAMED_NONE,
+				Category::OTHER_MISC,
+				Category::OTHER_HASHED,
+				$this->pdo->likeString('SDPORN', true, true)
 			);
 		}
 
@@ -1594,8 +1657,8 @@ class NameFixer
 				case preg_match('/^VIDEOOT-[A-Z0-9]+\\\\([\w!.,& ()\[\]\'\`-]{8,}?\b.?)([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev|\.vol.+?|\.mp4)/', $release["textstring"], $result):
 					$this->updateRelease($release, $result["1"] . " XXX DVDRIP XviD-VIDEOOT", $method = "fileCheck: XXX XviD VIDEOOT", $echo, $type, $namestatus, $show);
 					break;
-				case preg_match('/^(.+?SDPORN+?)\\\\.+/i', $release["textstring"], $result):
-					$this->updateRelease($release, $result["1"], $method = "fileCheck: XXX SDPORN", $echo, $type, $namestatus, $show);
+				case preg_match('/^.+?SDPORN/i', $release["textstring"], $result):
+					$this->updateRelease($release, $result["0"], $method = "fileCheck: XXX SDPORN", $echo, $type, $namestatus, $show);
 					break;
 				case preg_match('/\w[-\w.\',;& ]+1080i[._ -]DD5[._ -]1[._ -]MPEG2-R&C(?=\.ts)/i', $release["textstring"], $result):
 					$result = str_replace("MPEG2", "MPEG2.HDTV", $result["0"]);
