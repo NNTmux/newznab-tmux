@@ -176,7 +176,6 @@ class TmuxRun extends Tmux
 					case $runVar['counts']['now']['processrenames'] > 0:
 						$log = $this->writelog($runVar['panes']['one'][0]);
 						shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.0 ' \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/fixReleaseNames.php 11 true other yes show $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/fixrelnames.php standard $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/fixrelnames.php predbft $log; date +\"{$this->_dateFormat}\"; \
 						{$runVar['commands']['_sleep']} {$runVar['settings']['fix_timer']}' 2>&1 1> /dev/null"

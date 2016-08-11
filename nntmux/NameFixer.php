@@ -328,7 +328,6 @@ class NameFixer
 		$this->_echoStartMessage($time, 'file names');
 		$type = 'Filenames, ';
 
-		$preId = false;
 		if ($cats === 3) {
 			$query = sprintf('
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
@@ -340,7 +339,6 @@ class NameFixer
 				NZB::NZB_ADDED
 			);
 			$cats = 2;
-			$preId = true;
 		} else {
 			$query = sprintf('
 					SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
@@ -362,15 +360,13 @@ class NameFixer
 			$total = $releases->rowCount();
 			if ($total > 0) {
 				$this->_totalReleases = $total;
-				echo $this->pdo->log->primary(number_format($total) . ' file names to process.');
+				echo $this->pdo->log->primary(number_format($total) . ' xxx file names to process.');
 
 				foreach ($releases as $release) {
 					$this->done = $this->matched = false;
-					$this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
-					$this->checked++;
+					$this->xxxNameCheck($release, $echo, $type, $nameStatus, $show);
 					$this->_echoRenamed($show);
 				}
-
 				$this->_echoFoundCount($echo, ' files');
 			} else {
 				echo $this->pdo->log->info('Nothing to fix.');
@@ -1743,6 +1739,54 @@ class NameFixer
 			}
 		}
 		$this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
+		return false;
+	}
+
+	/**
+	 * Look for a name based on xxx release filename.
+	 *
+	 * @param array   $release The release to be matched
+	 * @param boolean $echo Should we show CLI output
+	 * @param string  $type The rename type
+	 * @param int     $namestatus Should we rename the release if match is found
+	 * @param int     $show Should we show the rename results
+	 *
+	 * @return bool Whether or not we matched the release
+	 */
+	public function xxxNameCheck($release, $echo, $type, $namestatus, $show)
+	{
+		if ($this->done === false && $this->relid !== $release["releases_id"]) {
+			$result = $this->pdo->queryDirect("
+				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
+						rf.releases_id AS fileid, rel.id AS releases_id
+					FROM releases rel
+					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					WHERE (rel.isrenamed = %d OR rel.categories_id IN(%d, %d))
+					AND rf.name %s",
+				self::IS_RENAMED_NONE,
+				Category::OTHER_MISC,
+				Category::OTHER_HASHED,
+				$this->pdo->likeString('SDPORN', true, true)
+			);
+
+			if ($result instanceof \Traversable) {
+				foreach ($result AS $res) {
+					if (preg_match('/^.+?SDPORN/i', $res["textstring"], $match)) {
+						$this->updateRelease(
+							$release,
+							$match["0"],
+							$method = "fileCheck: XXX SDPORN",
+							$echo,
+							$type,
+							$namestatus,
+							$show
+						);
+						return true;
+					}
+				}
+			}
+		}
+		$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releases_id']);
 		return false;
 	}
 
