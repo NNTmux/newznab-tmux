@@ -574,9 +574,9 @@ class Categorize extends Category
 				case $this->categorizeForeign && $this->isForeignTV():
 				case $this->isSportTV():
 				case $this->isDocumentaryTV():
+				case $this->isUHDTV():
 				case $this->catWebDL && $this->isWEBDL():
 				case $this->isAnimeTV():
-				case $this->isUHDTV():
 				case $this->isHDTV():
 				case $this->isSDTV():
 				case $this->isOtherTV2():
