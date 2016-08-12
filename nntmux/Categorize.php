@@ -724,11 +724,11 @@ class Categorize extends Category
 			switch (true) {
 				case $this->categorizeForeign && $this->isMovieForeign():
 				case $this->isMovieDVD():
+				case $this->isMovieUHD():
 				case $this->catWebDL && $this->isMovieWEBDL():
 				case $this->isMovieSD():
 				case $this->isMovie3D():
 				case $this->isMovieBluRay():
-				case $this->isMovieUHD():
 				case $this->isMovieHD():
 				case $this->isMovieOther():
 					return true;

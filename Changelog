@@ -1,4 +1,5 @@
 2016-08-12 DariusIII
+	* Chg: Move movie UHD category check above webdl one
 	* Chg: Update Smarty to version 3.1.30
 2016-08-11 DariusIII
 	* Chg: Update handling of SDPORN releases in NameFixer and groupfixrelnames
