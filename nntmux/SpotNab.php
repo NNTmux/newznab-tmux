@@ -1878,7 +1878,7 @@ class SpotNab {
 	public function decodePost($message, $key = NULL, $decrypt = true) {
 
 		// Decode Yenc
-		$message = $this->_nntp->decodeYenc2($message);
+		$message = Yenc::decode($message);
 
 		// Decompress Messsage
 		$message = @gzuncompress($message);
