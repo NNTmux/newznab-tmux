@@ -19,10 +19,11 @@
 
 namespace app\extensions\util\yenc\adapter;
 
+use app\extensions\util\Yenc;
 use app\models\Settings;
 use nntmux\utility\Utility;
 
-class Yydecode extends \lithium\core\Object
+class Ydecode extends \lithium\core\Object
 {
 	/**
 	 * Path to yyDecoder binary.
@@ -82,8 +83,7 @@ class Yydecode extends \lithium\core\Object
 
 	public static function encode($data, $filename, $lineLength, $crc32)
 	{
-		throw new \Exception('Method not implemented!');
-		return null;
+		return Yenc::encode($data, $filename, $lineLength, $crc32, ['name' => 'Php']);
 	}
 
 	protected function _init()
