@@ -1,12 +1,9 @@
 <?php
 namespace nntmux;
-/**
- * Attempt to include PEAR's nntp class if it has not already been included.
- */
 
+use app\extensions\util\Yenc;
 use nntmux\db\Settings;
 use nntmux\utility\Utility;
-
 
 /**
  * Class for connecting to the usenet, retrieving articles and article headers,
@@ -383,7 +380,7 @@ class NNTP extends \Net_NNTP_Client
 	/**
 	 * Fetch an overview of article(s) in the currently selected group.
 	 *
-	 * @param null $range
+	 * @param string $range
 	 * @param bool $names
 	 * @param bool $forceNames
 	 *
@@ -444,7 +441,7 @@ class NNTP extends \Net_NNTP_Client
 
 		// Send XOVER command to NNTP with wanted articles.
 		$response = $this->_sendCommand('XOVER ' . $range);
-		if ($this->isError($response)){
+		if ($this->isError($response)) {
 			return $response;
 		}
 
@@ -496,9 +493,9 @@ class NNTP extends \Net_NNTP_Client
 			foreach ($overview as $name => $element) {
 				// Strip Xref:
 				if ($element === true) {
-					@$header[$iterator] = substr($header[$iterator], 6);
+					$header[$iterator] = substr($header[$iterator], 6);
 				}
-				@$headerArray[$name] = $header[$iterator++];
+				$headerArray[$name] = $header[$iterator++];
 			}
 			// Add the individual header array back to the return array.
 			$data[$key] = $headerArray;
@@ -557,7 +554,7 @@ class NNTP extends \Net_NNTP_Client
 
 			$loops = $messageSize = 0;
 
-			// Loop over the message-id's or article numbers.
+			// Loop over the message-ID's or article numbers.
 			foreach ($identifiers as $wanted) {
 
 				/* This is to attempt to prevent string size overflow.
@@ -627,7 +624,7 @@ class NNTP extends \Net_NNTP_Client
 				}
 			}
 
-			// If it's a string check if it's a valid message-id.
+			// If it's a string check if it's a valid message-ID.
 		} else if (is_string($identifiers) || is_numeric($identifiers)) {
 			$body = $this->_getMessage($groupName, $identifiers);
 			if ($alternate === true && $this->isError($body)) {
@@ -657,7 +654,7 @@ class NNTP extends \Net_NNTP_Client
 	 * associated values, optionally decode the body using yEnc.
 	 *
 	 * @param string $groupName  The name of the group the article is in.
-	 * @param mixed  $identifier (string)The message-id of the article to download.
+	 * @param mixed  $identifier (string)The message-ID of the article to download.
 	 *                           (int) The article number.
 	 * @param bool   $yEnc       Attempt to yEnc decode the body.
 	 *
@@ -686,9 +683,9 @@ class NNTP extends \Net_NNTP_Client
 			}
 		}
 
-		// Check if it's an article number or message-id.
+		// Check if it's an article number or message-ID.
 		if (!is_numeric($identifier)) {
-			// If it's a message-id, check if it has the required triangular brackets.
+			// If it's a message-ID, check if it has the required triangular brackets.
 			$identifier = $this->_formatMessageID($identifier);
 		}
 
@@ -732,7 +729,7 @@ class NNTP extends \Net_NNTP_Client
 				}
 			}
 			// Finally we decode the message using yEnc.
-			$ret['Message'] = ($yEnc ? $this->_decodeIgnoreYEnc($body) : $body);
+			$ret['Message'] = ($yEnc ? Yenc::decodeIgnore($body) : $body);
 		}
 		return $ret;
 	}
@@ -741,7 +738,7 @@ class NNTP extends \Net_NNTP_Client
 	 * Download a full article header.
 	 *
 	 * @param string $groupName  The name of the group the article is in.
-	 * @param mixed $identifier (string) The message-id of the article to download.
+	 * @param mixed $identifier (string) The message-ID of the article to download.
 	 *                          (int)    The article number.
 	 *
 	 * @return mixed On success : (array)  The header.
@@ -806,13 +803,13 @@ class NNTP extends \Net_NNTP_Client
 	/**
 	 * Post an article to usenet.
 	 *
-	 * @param $groups   mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
+	 * @param string $groups   mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
 	 *                          (string) Group.  ie.: $groups = 'alt.test';
-	 * @param $subject  string  The subject.     ie.: $subject = 'Test article';
-	 * @param $body     string  The message.     ie.: $message = 'This is only a test, please disregard.';
-	 * @param $from     string  The poster.      ie.: $from = '<anon@anon.com>';
+	 * @param string $subject  string  The subject.     ie.: $subject = 'Test article';
+	 * @param string $body     string  The message.     ie.: $message = 'This is only a test, please disregard.';
+	 * @param string $from     string  The poster.      ie.: $from = '<anon@anon.com>';
 	 * @param $extra    string  Extra, separated by \r\n
-	 *                                           ie.: $extra  = 'Organization: <nntmux>\r\nNNTP-Posting-Host: <127.0.0.1>';
+	 *                                           ie.: $extra  = 'Organization: <NNTmux>\r\nNNTP-Posting-Host: <127.0.0.1>';
 	 * @param $yEnc     bool    Encode the message with yEnc?
 	 * @param $compress bool    Compress the message with GZip?
 	 *
@@ -860,7 +857,8 @@ class NNTP extends \Net_NNTP_Client
 
 		// Check if we should encode to yEnc.
 		if ($yEnc) {
-			$body = $this->encodeYEnc(($compress ? gzdeflate($body, 4) : $body), $subject);
+			$bin = $compress ? gzdeflate($body, 4) : $body;
+			$body = Yenc::encode($bin, $subject);
 			// If not yEnc, then check if the body is 510+ chars, split it at 510 chars and separate with \r\n
 		} else {
 			$body = $this->_splitLines($body, $compress);
@@ -920,6 +918,7 @@ class NNTP extends \Net_NNTP_Client
 	/**
 	 * yEncodes a string and returns it.
 	 *
+	 * @deprecated use app\extensions\util\Yenc::encode instead.
 	 * @param string $string     String to encode.
 	 * @param string $filename   Name to use as the filename in the yEnc header (this does not have to be an actual file).
 	 * @param int    $lineLength Line length to use (can be up to 254 characters).
@@ -932,6 +931,7 @@ class NNTP extends \Net_NNTP_Client
 	 */
 	public function encodeYEnc($string, $filename, $lineLength = 128, $crc32 = true)
 	{
+		trigger_error('Deprecated. Use app\extensions\util\Yenc::encode instead.' . PHP_EOL);
 		// yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.
 		if ($lineLength > 254) {
 			$lineLength = 254;
@@ -982,15 +982,17 @@ class NNTP extends \Net_NNTP_Client
 	/**
 	 * yDecodes an encoded string and either writes the result to a file or returns it as a string.
 	 *
+	 * @deprecated use app\extensions\util\Yenc::decode instead.
+	 *
 	 * @param string $string yEncoded string to decode.
 	 *
 	 * @return mixed On success: (string) The decoded string.
 	 *               On failure: (object) PEAR_Error.
-	 *
 	 * @access public
 	 */
 	public function decodeYEnc($string)
 	{
+		trigger_error('Deprecated. Use app\extensions\util\Yenc::decode instead.' . PHP_EOL);
 		$crc = '';
 		// Extract the yEnc string itself.
 		if (preg_match("/=ybegin.*size=([^ $]+).*\\r\\n(.*)\\r\\n=yend.*size=([^ $\\r\\n]+)(.*)/ims", $string, $encoded)) {
@@ -1046,94 +1048,18 @@ class NNTP extends \Net_NNTP_Client
 	}
 
 	/**
-	 * Encode a yenc encoded string.
-	 *
-	 * @param      $message
-	 * @param      $filename
-	 * @param int  $linelen
-	 * @param bool $crc32
-	 *
-	 * @return bool|string
-	 */
-	function encodeYenc2($message, $filename, $linelen = 128, $crc32 = true)
-	{
-		/*
-		* This code was found http://everything2.com/title/yEnc+PHP+Class
-		*/
-
-		// yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.
-		if ($linelen > 254)
-			$linelen = 254;
-
-		if ($linelen < 1)
-			return false;
-
-		$encoded = "";
-
-		// Encode each character of the message one at a time.
-		for( $i = 0; $i < strlen($message); $i++)
-		{
-			$value = (ord($message{$i}) + 42) % 256;
-
-			// Escape NULL, TAB, LF, CR, space, . and = characters.
-			if ($value == 0 || $value == 9 || $value == 10 ||
-				$value == 13 || $value == 32 || $value == 46 ||
-				$value == 61)
-				$encoded .= "=".chr(($value + 64) % 256);
-			else
-				$encoded .= chr($value);
-		}
-
-		// Wrap the lines to $linelen characters
-		$encoded = trim(chunk_split($encoded, $linelen));
-
-		// Tack a yEnc header onto the encoded message.
-		$encoded = "=ybegin line=$linelen size=".strlen($message)
-			." name=".trim($filename)."\r\n".$encoded;
-		$encoded .= "\r\n=yend size=".strlen($message);
-
-		// Add a CRC32 checksum if desired.
-		if ($crc32 === true)
-			$encoded .= " crc32=".strtolower(sprintf("%04X", crc32($message)));
-
-		return $encoded."\r\n";
-	}
-
-	/**
-	 * Decode a yenc encoded string.
-	 *
-	 * @param $yencodedvar
-	 *
-	 * @return bool|string
-	 */
-	function decodeYenc2($yencodedvar)
-	{
-		$input = [];
-		preg_match("/^(=ybegin.*=yend[^$]*)$/ims", $yencodedvar, $input);
-		if (isset($input[1])) {
-			$ret = "";
-			$input = trim(preg_replace("/\r\n/im", "", preg_replace("/(^=yend.*)/im", "", preg_replace("/(^=ypart.*\\r\\n)/im", "", preg_replace("/(^=ybegin.*\\r\\n)/im", "", $input[1], 1), 1), 1)));
-
-			for ($chr = 0; $chr < strlen($input); $chr++)
-				$ret .= ($input[$chr] != "=" ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
-
-			return $ret;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Decode a string of text encoded with yEnc. Ignores all errors.
+	 *
+	 * @deprecated use app\extensions\util\Yenc::decodeIgnore instead.
 	 *
 	 * @param  string $data The encoded text to decode.
 	 *
 	 * @return string The decoded yEnc string, or the input string, if it's not yEnc.
-	 *
 	 * @access protected
 	 */
 	protected function _decodeIgnoreYEnc(&$data)
 	{
+		trigger_error('Deprecated. Use app\extensions\util\Yenc::decodeIgnore instead.' . PHP_EOL);
 		if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $data, $input)) {
 			// If there user has no yyDecode path set, use PHP to decode yEnc.
 			if ($this->_yyDecoderPath === false) {
@@ -1146,10 +1072,7 @@ class NNTP extends \Net_NNTP_Client
 								'/(^=yEnd.*)/im', '',
 								preg_replace(
 									'/(^=yPart.*\\r\\n)/im', '',
-									preg_replace(
-										'/(^=yBegin.*\\r\\n)/im', '',
-										$input[1],
-										1),
+									preg_replace('/(^=yBegin.*\\r\\n)/im', '', $input[1], 1),
 									1),
 								1)
 						)
@@ -1161,7 +1084,7 @@ class NNTP extends \Net_NNTP_Client
 				}
 
 			} else if ($this->_yEncExtension) {
-				$data = simple_yenc_decode($input[1]);
+				$data = \simple_yenc_decode($input[1]);
 			} else {
 				$inFile = $this->_yEncTempInput . mt_rand(0, 999999);
 				$ouFile = $this->_yEncTempOutput . mt_rand(0, 999999);
@@ -1232,7 +1155,7 @@ class NNTP extends \Net_NNTP_Client
 	protected function _initiateYEncSettings()
 	{
 		// Check if the user wants to use yyDecode or the simple_php_yenc_decode extension.
-		$this->_yyDecoderPath  = ($this->pdo->getSetting('yydecoderpath') != '') ? (string)$this->pdo->getSetting('yydecoderpath') : false;
+		$this->_yyDecoderPath = ($this->pdo->getSetting('yydecoderpath') != '') ? (string)$this->pdo->getSetting('yydecoderpath') : false;
 		if (strpos((string)$this->_yyDecoderPath, 'simple_php_yenc_decode') !== false) {
 			if (extension_loaded('simple_php_yenc_decode')) {
 				$this->_yEncExtension = true;
@@ -1241,7 +1164,7 @@ class NNTP extends \Net_NNTP_Client
 			}
 		} else if ($this->_yyDecoderPath !== false) {
 
-			$this->_yEncSilence    = (Utility::isWindows() ? '' : ' > /dev/null 2>&1');
+			$this->_yEncSilence    = (Utility::isWin() ? '' : ' > /dev/null 2>&1');
 			$this->_yEncTempInput  = NN_TMP . 'yEnc' . DS;
 			$this->_yEncTempOutput = $this->_yEncTempInput . 'output';
 			$this->_yEncTempInput .= 'input';
@@ -1365,7 +1288,6 @@ class NNTP extends \Net_NNTP_Client
 	 *
 	 * @return string/print Have we failed to decompress the data, was there a
 	 *                 problem downloading the data, etc..
-
 	 * @return mixed  On success : (array)  The headers.
 	 *                On failure : (object) PEAR_Error.
 	 *
@@ -1468,7 +1390,7 @@ class NNTP extends \Net_NNTP_Client
 		if ($this->_debugBool) {
 			$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_NOTICE);
 		}
-		$message = $this->throwError($this->pdo->log->error($message), 1000);;
+		$message = $this->throwError($this->pdo->log->error($message), 1000);
 		return $message;
 	}
 
@@ -1504,10 +1426,10 @@ class NNTP extends \Net_NNTP_Client
 	 * Download an article body (an article without the header).
 	 *
 	 * @param string $groupName The name of the group the article is in.
-	 * @param mixed $identifier (string) The message-id of the article to download.
+	 * @param mixed $identifier (string) The message-ID of the article to download.
 	 *                          (int)    The article number.
 	 *
-	 * @return mixed On success : (string) The article's body.
+	 * @return string On success : (string) The article's body.
 	 *               On failure : (object) PEAR_Error.
 	 *
 	 * @access protected
@@ -1559,11 +1481,12 @@ class NNTP extends \Net_NNTP_Client
 					// Check if the line terminates the text response.
 					if ($line === ".\r\n") {
 						if ($this->_debugBool) {
-							$this->_debugging->log(get_class(), __FUNCTION__, 'Fetched body for article ' . $identifier, Logger::LOG_INFO
+							$this->_debugging->log(get_class(),
+								__FUNCTION__, 'Fetched body for article ' . $identifier, Logger::LOG_INFO
 							);
 						}
 						// Attempt to yEnc decode and return the body.
-						return $this->_decodeIgnoreYEnc($body);
+						return Yenc::decodeIgnore($body);
 					}
 
 					// Check for line that starts with double period, remove one.
@@ -1599,7 +1522,7 @@ class NNTP extends \Net_NNTP_Client
 		if (parent::_isConnected()) {
 			$retVal = true;
 		} else {
-			switch($this->_currentServer) {
+			switch ($this->_currentServer) {
 				case NNTP_SERVER:
 					if (is_resource($this->_socket)) {
 						$this->doQuit(true);
@@ -1615,7 +1538,8 @@ class NNTP extends \Net_NNTP_Client
 				default:
 					$retVal = $this->throwError('Wrong server constant used in NNTP checkConnection()!');
 			}
-			if ($retVal === true && $reSelectGroup){
+
+			if ($retVal === true && $reSelectGroup) {
 				$group = $this->selectGroup($currentGroup);
 				if ($this->isError($group)) {
 					$retVal = $group;
@@ -1624,5 +1548,4 @@ class NNTP extends \Net_NNTP_Client
 		}
 		return $retVal;
 	}
-
 }
