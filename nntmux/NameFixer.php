@@ -953,9 +953,10 @@ class NameFixer
 				sprintf('
 							SELECT id AS predb_id, title, source
 							FROM predb
-							WHERE filename = %s
+							WHERE filename = %s %s
 							OR title = %1$s',
-					$this->pdo->escapeString($this->_fileName)
+					$this->pdo->escapeString($this->_fileName),
+					preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w-.]+[\w]$/i', $this->_fileName, $match) ? 'OR filename ' . $this->pdo->likeString($match[0], true, false) : ''
 				)
 			);
 		}
