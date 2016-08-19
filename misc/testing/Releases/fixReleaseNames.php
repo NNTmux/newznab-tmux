@@ -57,10 +57,10 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 			$namefixer->fixNamesWithNfo(2, $update, $other, $setStatus, $show);
 			break;
 		case 5:
-			$namefixer->fixNamesWithFiles(1, $update, $other, $setStatus, $show, false);
+			$namefixer->fixNamesWithFiles(1, $update, $other, $setStatus, $show);
 			break;
 		case 6:
-			$namefixer->fixNamesWithFiles(2, $update, $other, $setStatus, $show, false);
+			$namefixer->fixNamesWithFiles(2, $update, $other, $setStatus, $show);
 			break;
 		case 7:
 			$namefixer->fixNamesWithPar2(1, $update, $other, $setStatus, $show, $nntp);
