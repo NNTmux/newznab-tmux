@@ -50,9 +50,7 @@
 					</td>
 					<td colspan="3" class="left">
 						<h4>
-							{if !empty($result->alternate_ids->imdb)}
-							<a href="{$smarty.const.WWW_TOP}/movies?imdb={$result->alternate_ids->imdb}">{$result->title|escape:"htmlall"}</a>
-							{/if}
+							<a href="{$smarty.const.WWW_TOP}/movies?title={$result->title}&year={$result->year}">{$result->title|escape:"htmlall"}</a>
 							(<a class="title" title="{$result->year}"
 								href="{$smarty.const.WWW_TOP}/movies?year={$result->year}">{$result->year}</a>) {if $result->ratings->critics_score > 0}{$result->ratings->critics_score}/100{/if}
 						</h4>

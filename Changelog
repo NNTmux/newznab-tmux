@@ -1,3 +1,5 @@
+2016-08-19 DariusIII
+	* Fix: Missing names of movies in upcoming movies pages.
 2016-08-12 DariusIII
 	* Chg: Move movie and tv UHD category check above webdl one
 	* Chg: Update Smarty to version 3.1.30
