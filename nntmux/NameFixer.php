@@ -644,7 +644,7 @@ class NameFixer
 
 				$this->fixed++;
 
-				if(preg_match('/oz@lot[.]com/i', $release['fromname'])) {
+				if(!empty($release['fromname']) && preg_match('/oz@lot[.]com/i', $release['fromname'])) {
 					$newName = preg_replace('/KTR$/', 'SDCLiP', $newName);
 				}
 				$newName = explode("\\", $newName);
