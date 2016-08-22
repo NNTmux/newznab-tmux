@@ -947,16 +947,25 @@ class NameFixer
 		$matching = 0;
 		$this->_fileName = $this->_cleanMatchFiles($release['filename']);
 		$pre = false;
+		$preMatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w-.]+[\w]$/i', $this->_fileName, $match);
+		if($preMatch) {
+			$result = $this->pdo->queryOneRow(sprintf("SELECT filename AS filename FROM predb WHERE MATCH(filename) AGAINST ('$match[0]' IN BOOLEAN MODE)"));
+			$preFTmatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w-.]+[\w]$/i', $result['filename'], $match1);
+			if($preFTmatch) {
+				if ($match[0] == $match1[0]) {
+					$this->_fileName = $result['filename'];
+				}
+			}
+		}
 
 		if ($this->_fileName !== '') {
 			$pre = $this->pdo->queryOneRow(
 				sprintf('
 							SELECT id AS predb_id, title, source
 							FROM predb
-							WHERE filename = %s %s
+							WHERE filename = %s
 							OR title = %1$s',
-					$this->pdo->escapeString($this->_fileName),
-					preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w-.]+[\w]$/i', $this->_fileName, $match) ? 'OR filename ' . $this->pdo->likeString($match[0], true, false) : ''
+					$this->pdo->escapeString($this->_fileName)
 				)
 			);
 		}
