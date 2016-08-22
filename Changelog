@@ -1,4 +1,5 @@
 2016-08-22 DariusIII
+	* Fix: Wrong table name used in site-edit
 	* Chg: Add back prefiles match to tmux run
 	* Chg: Update NameFixer to use FULLTEXT search in matchPreDbFiles function
 	* Chg: Add FULLTEXT index to predb.filename
