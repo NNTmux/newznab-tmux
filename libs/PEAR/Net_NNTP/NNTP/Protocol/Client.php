@@ -1896,7 +1896,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 * @return object PEAR error
 	 * @access protected
 	 */
-	protected function _handleErrorResponse(&$response)
+	protected function _handleErrorResponse($response)
 	{
 		switch ($response) {
 
