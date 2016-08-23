@@ -136,7 +136,8 @@ class RequestIDWeb extends RequestID
 					'reqid' => $requestId,
 					'ident' => $release['id'],
 					'group' => $release['groupname'],
-					'sname' => $release['searchname']
+					'sname' => $release['searchname'],
+					'fromname' => $release['fromname']
 				);
 			}
 		}
@@ -184,7 +185,10 @@ class RequestIDWeb extends RequestID
 						}
 						$this->_release['gid'] = $this->_release['groups_id'];
 
+						$this->_release['fromname'] = $requestArray[(string)$result['ident']]['fromname'];
+						
 						$this->_release['searchname'] = $requestArray[(int)$result['ident']]['sname'];
+						
 						$this->_insertIntoPreDB();
 						if ($this->_preDbID === false) {
 							$this->_preDbID = 0;
