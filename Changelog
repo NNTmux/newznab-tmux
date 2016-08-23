@@ -1,3 +1,5 @@
+2016-08-23 DariusIII
+	* Fix: Update sphinx.conf and change rt_attr_string = name to rt_attr_uint = dummy
 2016-08-22 DariusIII
 	* Fix: Wrong table name used in site-edit
 	* Chg: Add back prefiles match to tmux run
