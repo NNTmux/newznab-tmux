@@ -3,6 +3,7 @@ namespace nntmux;
 
 
 use nntmux\db\Settings;
+use app\extensions\util\Yenc;
 
 // Help out those who don't have SSL enabled
 if(!defined('OPENSSL_KEYTYPE_RSA')) {
@@ -1877,7 +1878,7 @@ class SpotNab {
 	public function decodePost($message, $key = NULL, $decrypt = true) {
 
 		// Decode Yenc
-		$message = $this->_nntp->decodeYenc2($message);
+		$message = Yenc::decode($message);
 
 		// Decompress Messsage
 		$message = @gzuncompress($message);
@@ -1975,7 +1976,7 @@ class SpotNab {
 		$message = @gzcompress($message, 9);
 
 		// Yenc Binary Content
-		$message = $this->_nntp->encodeYenc2($message, md5($message));
+		$message = Yenc::encode($message, md5($message));
 
 		//
 		// Prepare Header
