@@ -1,3 +1,5 @@
+2016-08-25 DariusIII
+	* Chg: Update sql schema files to be up-to-date
 2016-08-23 DariusIII
 	* Fix: Update sphinx.conf and change rt_attr_string = name to rt_attr_uint = dummy
 2016-08-22 DariusIII
