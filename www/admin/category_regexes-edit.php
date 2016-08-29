@@ -61,8 +61,8 @@ $page->smarty->assign('status_names', ['Yes', 'No']);
 
 $categories_db = $page->settings->queryDirect(
 	'SELECT c.id, c.title, cp.title AS parent_title
-	FROM category c
-	INNER JOIN category cp ON c.parentid = cp.id
+	FROM categories c
+	INNER JOIN categories cp ON c.parentid = cp.id
 	WHERE c.parentid IS NOT NULL
 	ORDER BY c.id ASC'
 );
