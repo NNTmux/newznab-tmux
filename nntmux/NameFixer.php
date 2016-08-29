@@ -811,7 +811,7 @@ class NameFixer
 		//Find release matches with fulltext and then identify exact matches with cleaned LIKE string
 		$res = $this->pdo->queryDirect(
 			sprintf("
-				SELECT r.id AS releases_id, r.name, r.fromname, r.searchname,
+				SELECT r.id AS releases_id, r.name, r.searchname,
 				r.fromname, r.groups_id, r.categories_id
 				FROM releases r
 				%1\$s
