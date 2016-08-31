@@ -68,9 +68,6 @@ do
 	if [ "$DIFF" -gt 43200 ] || [ "$DIFF" -lt 1 ]
 	then
 		LASTOPTIMIZE2=`date +%s`
-		echo "Updating schedules..."
-		#$PHP ${NNTMUX_PATH}/update_tvschedule.php
-		$PHP ${NNTMUX_PATH}/update_theaters.php
 	fi
 
 	echo "waiting ${NNTMUX_SLEEP_TIME} seconds..."

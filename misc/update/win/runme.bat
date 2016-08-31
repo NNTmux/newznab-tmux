@@ -43,7 +43,6 @@ GOTO tvdone
 
 :Movies
 CD..
-php.exe update_theaters.php
 set Movies=0
 CD win
 GOTO Moviesdone
