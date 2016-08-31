@@ -155,9 +155,7 @@
 																		   onclick="return false;" href="#">Send
 																			Invite</a>
 																		]
-																		<span title="Your invites will be reduced when the invitation is claimed."
-																			  class="invitesuccess"
-																			  id="divInviteSuccess">Invite Sent</span>
+																		<span title="Your invites will be reduced when the invitation is claimed." class="invitesuccess" id="divInviteSuccess"></span>
 																		<span class="invitefailed"
 																			  id="divInviteError"></span>
 																		<div style="display:none;" id="divInvite">

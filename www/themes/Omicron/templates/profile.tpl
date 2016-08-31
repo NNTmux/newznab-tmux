@@ -148,7 +148,7 @@
 																			]
 																			<span title="Your invites will be reduced when the invitation is claimed."
 																				  class="invitesuccess"
-																				  id="divInviteSuccess">Invite Sent</span>
+																				  id="divInviteSuccess"></span>
 																			<span class="invitefailed"
 																				  id="divInviteError"></span>
 																			<div style="display:none;" id="divInvite">

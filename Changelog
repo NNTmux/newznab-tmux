@@ -1,4 +1,5 @@
 2016-08-31 DariusIII
+	* Fix: Remove "Invite sent" text from user profile
 	* Chg: Remove upcoming pages and RottenTomato references as RT are removing all free keys in 30 days.
 	* Fix: View user profile by name as admin
 2016-08-29 DariusIII
