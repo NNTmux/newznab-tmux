@@ -486,12 +486,9 @@ class TmuxRun extends Tmux
 
 	protected function _runUpdateTv(&$runVar)
 	{
-		switch (true) {
-			default:
-				$color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-				shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.2 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][2]} has been disabled/terminated by Update TV/Theater\"'");
-		}
+		$color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
+		shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.2 \
+		'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][2]} has been disabled/terminated by Update TV/Theater\"'");
 	}
 
 	protected function _runUpdateTvFull(&$runVar)
