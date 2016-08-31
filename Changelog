@@ -1,3 +1,5 @@
+2016-08-31 DariusIII
+	* Fix: View user profile by name as admin
 2016-08-29 DariusIII
 	* Fix: Remove duplicate r.fromname from matchPredbFT function
 	* Chg: Rename roleexcat categoryid column to categories_id
