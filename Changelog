@@ -1,3 +1,5 @@
+2016-09-02 DariusIII
+	* Chg: Update custom yenc class handling (ported from nZEDb)
 2016-08-31 DariusIII
 	* Fix: Remove "Invite sent" text from user profile
 	* Chg: Remove upcoming pages and RottenTomato references as RT are removing all free keys in 30 days.

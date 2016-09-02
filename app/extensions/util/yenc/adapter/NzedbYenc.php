@@ -19,30 +19,34 @@
 
 namespace app\extensions\util\yenc\adapter;
 
-use nntmux\yenc;
+use yenc\yenc;
+
 
 class NzedbYenc extends \lithium\core\Object
 {
 	public static function decode($string, $ignore = false, array $options = [])
 	{
-		throw new \Exception('Method not implemented!');
+		return (new yenc())->decode($string);
+	}
 
-		return null;
+	public static function decodeIgnore($string, array $options = [])
+	{
+		return self::decode($string, $options);
 	}
 
 	/**
-	 * Determines if this adapter is enabled by checking if the `nzedb_yenc` extension is loaded.
+	 * Determines if this adapter is enabled by checking if the `yenc` extension is loaded.
 	 *
 	 * @return boolean Returns `true` if enabled, otherwise `false`.
 	 */
 	public static function enabled()
 	{
-		return extension_loaded('nzedb_yenc');
+		return extension_loaded('yenc');
 	}
 
-	public static function encode($data, $filename, $lineLength = 128, $crc32 = true)
+	public static function encode($data, $filename, $lineLength = 128)
 	{
-		return (new nzedb_yenc)->encode($data, $filename, $lineLength, $crc32);
+		return (new yenc())->encode($data, $filename, $lineLength);
 	}
 
 	protected function _init()

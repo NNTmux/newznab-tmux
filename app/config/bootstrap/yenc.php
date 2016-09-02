@@ -20,7 +20,7 @@
 use app\models\Settings;
 
 switch (true) {
-	case extension_loaded('nzedb_yenc'):
+	case extension_loaded('yenc'):
 		$adapter = 'NzedbYenc';
 		break;
 	case extension_loaded('simple_php_yenc_decode'):
@@ -28,7 +28,7 @@ switch (true) {
 		break;
 	case !empty(Settings::value('..yydecoderpath', true)) &&
 		(strpos(Settings::value('..yydecoderpath', true), 'simple_php_yenc_decode') === false):
-		$adapter = 'Yydecode';
+		$adapter = 'Ydecode';
 		break;
 	default:
 		$adapter = 'Php';
@@ -59,4 +59,3 @@ app\extensions\util\Yenc::config(
 );
 
 ?>
-
