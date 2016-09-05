@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 
+<pre>Content-Security-Policy: default-src self unsafe-inline unsafe-eval style-src self unsafe-inline unsafe-eval sandbox allow-forms allow-same-origin</pre>
 <head>
 	{literal}
 	<script>
@@ -13,7 +14,6 @@
 	</script>
 	{/literal}
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' 'unsafe-eval'">
 	<!-- Meta, title, CSS, favicons, etc. -->
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">

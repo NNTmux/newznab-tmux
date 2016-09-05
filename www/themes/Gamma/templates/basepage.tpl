@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<pre>Content-Security-Policy: default-src self unsafe-inline unsafe-eval style-src self unsafe-inline unsafe-eval sandbox allow-forms allow-same-origin</pre>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="Content-Security-Policy" content="default-src 'self' http://www.google.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' 'unsafe-eval'">

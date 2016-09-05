@@ -25,7 +25,7 @@ if ($showRegister == 1) {
 
 	//Be sure to persist the invite code in the event of multiple form submissions. (errors)
 	if (isset($_REQUEST['invitecode'])) {
-		$inviteCodeQuery = '&invitecode=' . htmlspecialchars($_REQUEST["invitecode"]);
+		$inviteCodeQuery = '&invitecode=' . $_REQUEST["invitecode"];
 	}
 
 	$captcha = new Captcha($page);
@@ -33,12 +33,12 @@ if ($showRegister == 1) {
 	switch ($action) {
 		case 'submit':
 			if ($captcha->getError() === false) {
-				$userName = htmlspecialchars($_POST['username']);
-				$password = htmlspecialchars($_POST['password']);
-				$confirmPassword = htmlspecialchars($_POST['confirmpassword']);
-				$email = htmlspecialchars($_POST['email']);
+				$userName = $_POST['username'];
+				$password = $_POST['password'];
+				$confirmPassword = $_POST['confirmpassword'];
+				$email = $_POST['email'];
 				if (!empty($_REQUEST['invitecode'])) {
-					$inviteCode = htmlspecialchars($_REQUEST['invitecode']);
+					$inviteCode = $_REQUEST['invitecode'];
 				}
 
 				// Check uname/email isn't in use, password valid. If all good create new user account and redirect back to home page.
@@ -84,7 +84,7 @@ if ($showRegister == 1) {
 			}
 			break;
 		case "view": {
-			$inviteCode = isset($_GET["invitecode"]) ? htmlspecialchars($_GET["invitecode"]) : null;
+			$inviteCode = isset($_GET["invitecode"]) ? $_GET["invitecode"] : null;
 			if (isset($inviteCode)) {
 				// See if it is a valid invite.
 				$invite = $page->users->getInvite($inviteCode);
@@ -100,12 +100,12 @@ if ($showRegister == 1) {
 	}
 }
 $page->smarty->assign([
-		'username'          => $userName,
-		'password'          => $password,
-		'confirmpassword'   => $confirmPassword,
-		'email'             => $email,
-		'invitecode'        => $inviteCode,
-		'invite_code_query' => $inviteCodeQuery,
+		'username'          => htmlspecialchars($userName, ENT_QUOTES, 'UTF-8'),
+		'password'          => htmlspecialchars($password, ENT_QUOTES, 'UTF-8'),
+		'confirmpassword'   => htmlspecialchars($confirmPassword, ENT_QUOTES, 'UTF-8'),
+		'email'             => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
+		'invitecode'        => htmlspecialchars($inviteCode, ENT_QUOTES, 'UTF-8'),
+		'invite_code_query' => htmlspecialchars($inviteCodeQuery, ENT_QUOTES, 'UTF-8'),
 		'showregister'      => $showRegister,
 		'error'             => $error
 	]
