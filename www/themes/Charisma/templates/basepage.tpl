@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
-<pre>Content-Security-Policy: default-src self unsafe-inline unsafe-eval style-src self unsafe-inline unsafe-eval sandbox allow-forms allow-same-origin</pre>
+
 <head>
 	{literal}
 	<script>
