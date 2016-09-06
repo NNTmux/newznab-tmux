@@ -23,9 +23,6 @@ if(!defined('JSON_HEX_APOS')) define('JSON_HEX_APOS', 4);
 if(!defined('JSON_HEX_QUOT')) define('JSON_HEX_QUOT', 8);
 if(!defined('JSON_UNESCAPED_UNICODE')) define('JSON_UNESCAPED_UNICODE', 256);
 
-// Create a NNTP \Exception type so we can identify it from others
-class SpotNabException extends \Exception { }
-
 class SpotNab {
 	// Segment Identifier domain is used to help build segments
 	// prior to them being posted.
@@ -142,6 +139,7 @@ class SpotNab {
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
 		$this->releaseImage =  new ReleaseImage($this->_pdo);
 		$this->nzb = new NZB($this->_pdo);
+		$this->releases = new Releases(['Settings' => $this->_pdo]);
 
 		$this->_post_user = $post_user;
 		$this->_post_email = $post_email;
@@ -256,7 +254,8 @@ class SpotNab {
 	}
 
 	// ***********************************************************************
-	public function orphan_comment_clean($max_days=1, $batch=500){
+	public function orphan_comment_clean($max_days=1, $batch=500)
+	{
 		// Clean out orphan comments that are older then at least 1 day
 		// this is to address people who do not wish to hold on to
 		// comments they do not have a release for... Makes sense :)
@@ -270,37 +269,42 @@ class SpotNab {
 		$sql_rel = "SELECT gid FROM releases WHERE gid IN ('%s') ";
 		$sql_del = "DELETE FROM release_comments WHERE gid IN ('%s')";
 		$total_delcnt = 0;
-		while(1)
-		{
+		while(1) {
 			$res = $this->_pdo->query(sprintf($sql, $offset, $batch));
-			if(!$res)break;
+			if(!$res) {
+				break;
+			}
 
 			# Assemble results into list
 			$gids_found = [];
 			$gids_matched = [];
-			foreach($res as $item)
+			foreach($res as $item) {
 				$gids_found[] = $item['gid'];
+			}
 
 			#echo 'B:'.sprintf($sql_rel, implode("','", $gids_found))."\n";
 			$res2 = $this->_pdo->query(sprintf($sql_rel, implode("','", $gids_found)));
-			foreach($res2 as $item)
+			foreach($res2 as $item) {
 				$gids_matched[] = $item['gid'];
+			}
 			# Now we want to create an inverted list by eliminating the
 			# matches we just fetched
 			$gids_missing = array_diff($gids_found, $gids_matched);
 			//print_r($gids_missing);
-			if(count($gids_missing)){
+			if(count($gids_missing)) {
 				$s_gids_missing = implode("','", $gids_missing);
 				$dresc = $this->_pdo->queryExec(sprintf($sql_del, $s_gids_missing));
 				$total_delcnt += count($gids_missing);
 				$offset += $batch - count($gids_missing);
-			}else{
+			} else {
 				$offset += $batch;
 			}
 			# make noise
 			echo '.';
 
-			if(!count($res))break;
+			if(!count($res)) {
+				break;
+			}
 		}
 		return $total_delcnt;
 	}
@@ -855,10 +859,8 @@ class SpotNab {
 				if (!$nzbInfo->loadFromFile($nzbfile))
 				{
 					if($delete_broken_releases){
-						$release = new Releases();
-						$release->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->nzb, $this->releaseImage);
+						$this->releases->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->nzb, $this->releaseImage);
 						// Free the variable in an attempt to recover memory
-						unset($release);
 						echo '-';
 					}else{
 						// Skip over this one for future fetches
@@ -874,9 +876,7 @@ class SpotNab {
 
 				if(!$gid){
 					if($delete_broken_releases){
-						$release = new Releases();
-						$release->$release->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->nzb, $this->releaseImage);
-						unset($release);
+						$this->releases->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->nzb, $this->releaseImage);
 						echo '-';
 					}else{
 						// Skip over this one for future fetches
@@ -1287,10 +1287,12 @@ class SpotNab {
 					continue;
 
 				// Match against our sources posts
-				if(trim($matches['user']) != $hash['user'])
+				if(trim($matches['user']) != $hash['user']) {
 					continue;
-				if(trim($matches['email']) != $hash['email'])
+				}
+				if(trim($matches['email']) != $hash['email']) {
 					continue;
+				}
 
 				// If we reach here, we've found a header we can process
 				// The next step is to download the header's body
@@ -1300,62 +1302,67 @@ class SpotNab {
 				// within the body matches that of the header... then we
 				// can start processing the guts of the body.
 
-				if($save){
+				if($save) {
 					// Download Body
-					$body = $this->_get_body($header['Group'],
-						$header['Message-ID']);
-					if($body === false){
+					$body = $this->_get_body($header['Group'], $header['Message-ID']);
+					if($body === false) {
 						continue;
 					}
 
 					// Decode Body
 					$body = $this->decodePost($body, $hash['key']);
-					if($body === false)
+					if($body === false) {
 						continue; // Decode failed
+					}
 
 					// Verify Body
-					if(!is_array($body))
+					if(!is_array($body)) {
 						continue; // not any array
+					}
 
-					if(!(bool)count(array_filter(array_keys($body), 'is_string')))
+					if(!(bool)count(array_filter(array_keys($body), 'is_string'))) {
 						continue; // not an associative array
+					}
 
-					if((!array_key_exists('server', $body)) ||
-						(!array_key_exists('postdate_utc', $body)))
+					if((!array_key_exists('server', $body)) || (!array_key_exists('postdate_utc', $body))) {
 						continue; // base structure missing
+					}
 
 					// Compare postdate_utc and ensure it matches header
 					// timestamp
-					if(preg_replace('/[^0-9]/', '',
-							$body['postdate_utc']) != $refdate)
+					if(preg_replace('/[^0-9]/', '', $body['postdate_utc']) != $refdate) {
 						continue;
+					}
 
 					// Comment Handling
-					if(array_key_exists('comments',$body) &&
-						is_array($body['comments'])){
+					if(array_key_exists('comments',$body) && is_array($body['comments'])) {
 						$rc = new ReleaseComments();
 
 						foreach($body['comments'] as $comment){
 
 							// Verify Comment is parseable
-							if(!is_array($comment))
+							if(!is_array($comment)) {
 								continue; // not an array
-							if(!count(array_filter(array_keys($comment))))
+							}
+							if(!count(array_filter(array_keys($comment)))) {
 								continue; // not an associative array
+							}
 
 							// Store isvisible flag
 							$is_visible = 1;
-							if(array_key_exists('is_visible', $comment))
-								$is_visible = (intval($comment['is_visible'])>0)?1:0;
+							if(array_key_exists('is_visible', $comment)) {
+								$is_visible = (intval($comment['is_visible']) > 0) ? 1 : 0;
+							}
 
 							// Check that comment doesn't already exist
-							$res = $this->_pdo->queryOneRow(sprintf($sql_fnd_cmt,
+							$res = $this->_pdo->queryOneRow(sprintf(
+								$sql_fnd_cmt,
 								$hash['id'],
 								$this->_pdo->escapeString($comment['gid']),
 								$this->_pdo->escapeString($comment['cid'])));
 
 							// Store Results in DB
-							if($res && intval($res['cnt'])>0){
+							if($res && intval($res['cnt'])>0) {
 								// Make some noise
 								echo '.';
 								$updates += ($this->_pdo->queryExec(sprintf($sql_upd_cmt,
@@ -1366,7 +1373,7 @@ class SpotNab {
 										$this->_pdo->escapeString($comment['cid']),
 										$this->_pdo->escapeString($comment['gid'])
 									))>0)?1:0;
-							}else{
+							} else {
 								// Make some noise
 								echo '+';
 								// Perform Insert
@@ -1391,8 +1398,7 @@ class SpotNab {
 					// Update spotnabsources table, set lastupdate to the
 					// timestamp parsed from the header.
 					$this->_pdo->queryExec(sprintf($sql_sync,
-							$this->_pdo->escapeString(
-								$this->utc2local($body['postdate_utc'])),
+							$this->_pdo->escapeString($this->utc2local($body['postdate_utc'])),
 							$hash['id']
 						)
 					);
@@ -2113,9 +2119,9 @@ class SpotNab {
 		* If no argument is specified then current local
 		* time is returned.
 		*/
-		if(is_string($utc)){
+		if(is_string($utc)) {
 			return date($format, strtotime($utc. " UTC"));
-		}else if(is_int($utc)){
+		} else if(is_int($utc)) {
 			return date($format,  strtotime(date($format, $utc)." UTC"));
 		}
 		return date($format);
@@ -2128,9 +2134,9 @@ class SpotNab {
 		* If no argument is specified then current UTC
 		* time is returned.
 		*/
-		if(is_string($local)){
+		if(is_string($local)) {
 			return gmdate($format, strtotime($local));
-		}else if(is_int($local)){
+		} else if(is_int($local)) {
 			return gmdate($format, $local);
 		}
 		return gmdate($format);
@@ -2140,8 +2146,9 @@ class SpotNab {
 	private function _keygen($passphrase = NULL, $bits=1024,
 							 $type=OPENSSL_KEYTYPE_RSA)
 	{
-		if(!function_exists('openssl_pkey_new'))
+		if(!function_exists('openssl_pkey_new')) {
 			return false;
+		}
 
 		//Generate Key
 		$res = openssl_pkey_new(
@@ -2152,8 +2159,7 @@ class SpotNab {
 			]
 		);
 
-		if ($res === false)
-		{
+		if ($res === false) {
 			//print_r(openssl_error_string() );
 			return false;
 		}
@@ -2165,7 +2171,7 @@ class SpotNab {
 
 		// Get Public Key
 		$details = openssl_pkey_get_details($res);
-		if($details === false){
+		if($details === false) {
 			return false;
 		}
 		$pubkey = $details['key'];
@@ -2203,10 +2209,10 @@ class SpotNab {
 
 		while($len > 0){
 			// Prepare batch size
-			$batch = (($len - SpotNab::SSL_MAX_BUF_LEN) > 0)?SpotNab::SSL_MAX_BUF_LEN:$len;
+			$batch = (($len - SpotNab::SSL_MAX_BUF_LEN) > 0) ? SpotNab::SSL_MAX_BUF_LEN : $len;
 
 			$res = openssl_private_encrypt(substr($source, $ptr, $batch), $crypttext, $pkey);
-			if($res === false){
+			if($res === false) {
 				// Encryption failed
 				openssl_free_key($pkey);
 				return false;
@@ -2333,4 +2339,9 @@ class SpotNab {
 	{
 		return $this->_pdo->query(sprintf("SHOW COLUMNS FROM %s WHERE field = %s", $table, $this->_pdo->escapeString($field)));
 	}
+}
+
+// Create a NNTP \Exception type so we can identify it from others
+class SpotNabException extends \Exception {
+
 }
