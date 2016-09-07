@@ -1,3 +1,5 @@
+2016-09-07 DariusIII
+	* Chg: Make Settings::value more robust
 2016-09-05 DariusIII
 	* Chg: Update XSS vulnerability protection in themes.
 	* Chg: Update composer installer to version 1.2.0
