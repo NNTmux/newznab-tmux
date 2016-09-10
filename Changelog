@@ -1,3 +1,5 @@
+2016-09-11 DariusIII
+	* Chg: Add user notes to themes and fix notes in admin area
 2016-09-07 DariusIII
 	* Chg: Use PHP own decodeIgnore in yenc
 	* Chg: Make Settings::value more robust

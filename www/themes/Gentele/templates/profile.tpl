@@ -135,6 +135,10 @@
 																		KEY</a>
 																</td>
 															</tr>
+															<tr>
+																<th title="Admin Notes">Notes:</th>
+																<td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}<br/>{/if}<a href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes" class="label label-info">Add/Edit</a></td>
+															</tr>
 														{/if}
 														</tbody>
 													</table>

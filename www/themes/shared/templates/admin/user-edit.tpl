@@ -87,6 +87,12 @@
 			</td>
 		</tr>
 		<tr>
+			<td><label for="notes">Notes:</label></td>
+			<td>
+				<input id="notes" name='notes' type="text" value="{$user.notes|escape:htmlall}" />
+			</td>
+		</tr>
+		<tr>
 			<td></td>
 			<td>
 				<input class="btn btn-default" type="submit" value="Save" />
