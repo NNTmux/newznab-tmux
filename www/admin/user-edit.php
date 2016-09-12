@@ -8,7 +8,12 @@ use nntmux\Users;
 $page = new AdminPage();
 $users = new Users();
 
-$user = ['id' => '', 'username' => '', 'email' => '', 'password' => ''];
+$user = [
+	'id' => '',
+	'username' => '',
+	'email' => '',
+	'password' => ''
+];
 
 // set the current action
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
@@ -56,9 +61,9 @@ switch ($action) {
 				$users->updatePassword($_POST["id"], $_POST['password']);
 		}
 
-		if ($ret >= 0)
+		if ($ret >= 0) {
 			header("Location:" . WWW_TOP . "/user-list.php");
-		else {
+		} else {
 			switch ($ret) {
 				case Users::ERR_SIGNUP_BADUNAME:
 					$page->smarty->assign('error', "Bad username. Try a better one.");
@@ -99,7 +104,7 @@ switch ($action) {
 	if (isset($_GET["id"])) {
 			$page->title = "User Edit";
 			$id = $_GET["id"];
-			$user = $users->getByID($id);
+			$user = $users->getById($id);
 
 			$page->smarty->assign('user', $user);
 		}
