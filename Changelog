@@ -1,4 +1,5 @@
 2016-09-12 DariusIII
+	* Chg: Update composer with new version of rarinfo
 	* Chg: Increase the size of textarea in custom.css
 	* Chg: Update mysqltuner.pl script
 	* Chg: Update admin user_edit and role_edit pages
