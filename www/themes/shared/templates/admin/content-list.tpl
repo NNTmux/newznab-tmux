@@ -52,7 +52,7 @@
 				{/if}
 			</td>
 			<td title="{$content->body|escape:'htmlall'}">{$content->body|truncate:100|escape:'htmlall'}</td>
-			<td>{if $content->contenttype != "3"}<a class="confirm_action" href="{$smarty.const.WWW_TOP}/content-delete.php?id={$content->id}">delete</a>{/if}</td>
+			<td><a class="confirm_action" href="{$smarty.const.WWW_TOP}/content-delete.php?id={$content->id}">delete</a></td>
 		</tr>
 	{/foreach}
 </table>
