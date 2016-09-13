@@ -126,7 +126,7 @@
 
 <script type="text/javascript">
 	tinyMCE.init({
-		selector: 'textarea',
+		selector: 'textarea#body',
 		theme : "modern",
 		plugins: [
 			'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
