@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ca7ad8fd0c966be1da9fdf592384d63b",
-    "content-hash": "80a7526b6289810ef301eb90c55703cb",
+    "hash": "aa4c8a510844412555810dc3822c3b6a",
+    "content-hash": "3547a5da6720676124c5aa3507e36d6c",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -907,6 +907,33 @@
                 "scrolling",
                 "slimscroll",
                 "ui"
+            ]
+        },
+        {
+            "name": "bower-asset/tinymce-builded",
+            "version": "4.4.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/artursmirnov/tinymce_builded.git",
+                "reference": "b6c9e915a1f0e415725c7cad901165f016eb58f0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/artursmirnov/tinymce_builded/zipball/b6c9e915a1f0e415725c7cad901165f016eb58f0",
+                "reference": "b6c9e915a1f0e415725c7cad901165f016eb58f0",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "license": [
+                "GNU / Lesser GPL"
+            ],
+            "description": "Builded version of TinyMCE rich editor",
+            "keywords": [
+                "builded",
+                "editor",
+                "rich",
+                "tinymce",
+                "wysiwyg"
             ]
         },
         {

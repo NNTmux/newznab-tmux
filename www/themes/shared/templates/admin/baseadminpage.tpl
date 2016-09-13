@@ -106,6 +106,8 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
+<!-- tinymce editor -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/tinymce-builded/js/tinymce/jquery.tinymce.min.js"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
 <!-- jQuery migrate script -->
