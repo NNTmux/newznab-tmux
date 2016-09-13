@@ -1,10 +1,6 @@
 {if $loggedin == "true"}
 	{if $smarty.server.REQUEST_URI == "/"}
 		{foreach from=$content item=c}
-			<div class="header">
-				<h2><strong>{$c->title}</strong></h2>
-				</br>
-			</div>
 			{$c->body}
 		{/foreach}
 	{else}
@@ -13,6 +9,7 @@
 				<h2>Help > <strong>{$c->title}</strong></h2>
 				<div class="breadcrumb-wrapper">
 					<ol class="breadcrumb">
+						<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
 						/ {$c->title}
 					</ol>
 				</div>
@@ -23,15 +20,16 @@
 {else}
 	{foreach from=$content item=c}
 		{if $c->role == 0}
-		<div class="header">
-			<h2>Help > <strong>{$c->title}</strong></h2>
-			<div class="breadcrumb-wrapper">
-				<ol class="breadcrumb">
-					/ {$c->title}
-				</ol>
+			<div class="header">
+				<h2>Help > <strong>{$c->title}</strong></h2>
+				<div class="breadcrumb-wrapper">
+					<ol class="breadcrumb">
+						<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
+						/ {$c->title}
+					</ol>
+				</div>
 			</div>
-		</div>
-		{$c->body}
+			{$c->body}
 		{/if}
 	{/foreach}
 {/if}

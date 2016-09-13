@@ -19,7 +19,7 @@
 						<a title="View post" class="title"
 						   href="{$smarty.const.WWW_TOP}/forumpost/{$result.id}">{$result.subject|escape:"htmlall"|truncate:100:'...':true:true}</a>
 						<div class="hint">
-							{$result.message|escape:"htmlall"|truncate:200:'...':false:false}
+							{$result.message|truncate:200:'...':false:false}
 						</div>
 					</td>
 					<td>
@@ -60,10 +60,10 @@
 				<div class="control-group">
 					<label class="control-label" for="addMessage">Message</label>
 					<div class="controls">
-						<textarea cols="100" class="input input-xlarge" maxlength="5000" id="addMessage"
-								  name="addMessage" rows="6"></textarea>
+						<textarea maxlength="5000" id="addMessage" name="addMessage"></textarea>
 					</div>
-					<input class="forumpostsubmit btn btn-success" type="submit" value="submit"/>
+					<input class="btn btn-success" type="submit" value="submit"/>
+					<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />
 				</div>
 			</form>
 		</div>

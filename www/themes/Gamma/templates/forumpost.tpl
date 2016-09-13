@@ -22,7 +22,7 @@
 				</div>
 				{/if}
 			</td>
-			<td>{$result.message|escape:"htmlall"|nl2br|magicurl}</td>
+			<td>{$result.message}</td>
 		</tr>
 	{/foreach}
 </table>
@@ -33,9 +33,9 @@
 	<div class="body">
 		<form id="forum-post-reply" class="form-horizontal" action="" method="post">
 			<div class="control-group">
-				<label class="control-label" for="addReply">Message</label>
+				<label class="control-label" for="addMessage">Message</label>
 				<div class="controls">
-					<textarea class="input input-xlarge" maxlength="5000" id="addReply" name="addReply" rows="6" cols="100"></textarea>
+					<textarea class="input input-xlarge" maxlength="5000" id="addMessage" name="addMessage" rows="6" cols="100"></textarea>
 				</div>
 				<input class="forumreplysubmit btn btn-success" type="submit" value="submit"/>
 			</div>

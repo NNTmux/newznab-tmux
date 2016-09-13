@@ -1,4 +1,8 @@
 2016-09-13 DariusIII
+	* Fix: Fix display of tinyMCE generated code on forum pages
+	* Chg: Adjust how content is displayed on homepage
+	* Chg: Add tinyMCE support to forums
+	* Chg: Add tinymce support to admin content page
 	* Fix: Prevent undefined index errors on admin site-stats page
 2016-09-12 DariusIII
 	* Chg: Update composer with new version of rarinfo
