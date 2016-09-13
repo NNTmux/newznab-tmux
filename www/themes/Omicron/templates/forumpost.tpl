@@ -34,7 +34,7 @@
 		</table>
 		<div id="new" tabindex="-1" role="dialog" aria-labelledby="myLabel" aria-hidden="true">
 			<div class="header">
-				<h3 id="myLabel">Add New Post</h3>
+				<h3 id="myLabel">Reply</h3>
 			</div>
 			<div class="body">
 				<form id="forum-post-reply" class="form-horizontal" action="" method="post">
@@ -44,7 +44,7 @@
 							<textarea class="input input-xlarge" maxlength="5000" id="addMessage" name="addMessage" rows="6"
 									  cols="100"></textarea>
 						</div>
-						<input class="forumreplysubmit btn btn-success" type="submit" value="submit"/>
+						<input class="btn btn-success" type="submit" value="Submit"/>
 					</div>
 				</form>
 			</div>

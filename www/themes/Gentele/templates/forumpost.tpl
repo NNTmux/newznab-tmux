@@ -34,17 +34,17 @@
 		</table>
 		<div id="new" tabindex="-1" role="dialog" aria-labelledby="myLabel" aria-hidden="true">
 			<div class="header">
-				<h3 id="myLabel">Add New Post</h3>
+				<h3 id="myLabel">Reply</h3>
 			</div>
 			<div class="body">
 				<form id="forum-post-reply" class="form-horizontal" action="" method="post">
 					<div class="control-group">
 						<label class="control-label" for="addMessage">Message</label>
 						<div class="controls">
-							<textarea class="input input-xlarge" maxlength="5000" id="addMessage" name="addMessage" rows="6"
-									  cols="100"></textarea>
+							<textarea id="addMessage" name="addMessage"></textarea>
 						</div>
-						<input class="forumreplysubmit btn btn-success" type="submit" value="submit"/>
+						<input class="btn btn-success" type="submit" value="Submit"/>
+						<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />
 					</div>
 				</form>
 			</div>
