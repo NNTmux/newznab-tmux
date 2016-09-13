@@ -185,7 +185,7 @@ jQuery(function($){
     });
 
     $(".forumreplysubmit").click(function(e) {
-        if ($.trim($("#addReply").val()) == "")
+        if ($.trim($("#addMessage").val()) == "")
         {
             alert ("Please enter a message.");
             return false;
