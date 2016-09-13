@@ -22,7 +22,7 @@
 				</div>
 				{/if}
 			</td>
-			<td>{$result.message|escape:"htmlall"|nl2br|magicurl}</td>
+			<td>{$result.message}</td>
 		</tr>
 	{/foreach}
 </table>
