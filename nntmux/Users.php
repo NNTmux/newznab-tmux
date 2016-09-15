@@ -225,11 +225,17 @@ class Users
 			case 'apiaccess':
 				$orderfield = 'apiaccess';
 				break;
+			case 'apirequests':
+				$orderfield = 'apirequests';
+				break;
 			case 'grabs':
 				$orderfield = 'grabs';
 				break;
 			case 'role':
 				$orderfield = 'role';
+				break;
+			case 'rolechangedate':
+				$orderfield = 'rolechangedate';
 				break;
 			default:
 				$orderfield = 'username';
@@ -237,7 +243,7 @@ class Users
 		}
 		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'DESC';
 
-		return array($orderfield, $ordersort);
+		return [$orderfield, $ordersort];
 	}
 
 	public function getCount()
@@ -466,7 +472,7 @@ class Users
 
 	public function getBrowseOrdering()
 	{
-		return array('username_asc', 'username_desc', 'email_asc', 'email_desc', 'host_asc', 'host_desc', 'createddate_asc', 'createddate_desc', 'lastlogin_asc', 'lastlogin_desc', 'apiaccess_asc', 'apiaccess_desc', 'grabs_asc', 'grabs_desc', 'role_asc', 'role_desc');
+		return array('username_asc', 'username_desc', 'email_asc', 'email_desc', 'host_asc', 'host_desc', 'createddate_asc', 'createddate_desc', 'lastlogin_asc', 'lastlogin_desc', 'apiaccess_asc', 'apiaccess_desc', 'apirequets_asc', 'apirequests_desc', 'grabs_asc', 'grabs_desc', 'role_asc', 'role_desc', 'rolechangedate_asc', 'rolechangedate_desc');
 	}
 
 	public function isDisabled($username)

@@ -36,12 +36,12 @@
 		<th>Join date<br/><a title="Sort Descending" href="{$orderbycreateddate_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbycreateddate_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
 		<th>last login<br/><a title="Sort Descending" href="{$orderbylastlogin_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbylastlogin_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
 		<th>API access<br/><a title="Sort Descending" href="{$orderbyapiaccess_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbyapiaccess_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
-		<th>API requests<br/></th>
+		<th>API Requests<br/><a title="Sort Descending" href="{$orderbyapirequests_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbyapirequests_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
 		<th class="mid">grabs<br/><a title="Sort Descending" href="{$orderbygrabs_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbygrabs_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
 		<th class="mid">Invites</th>
 		<th class="mid">Notes</th>
 		<th>Role<br/><a title="Sort Descending" href="{$orderbyrole_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbyrole_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
-		<th>Role expiration date<br/><a title="Sort Descending" href="{$orderbyrole_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbyrole_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
+		<th>Role expiration date<br/><a title="Sort Descending" href="{$orderbyrolechangedate_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending" href="{$orderbyrolechangedate_asc}"><span><i class="fa fa-chevron-up"></i></span></a></th>
 		<th>options</th>
 	</tr>
 
