@@ -87,6 +87,12 @@
 			</td>
 		</tr>
 		<tr>
+			<td><label for="role">Role change date:</label></td>
+			<td>
+				<input name="rolechangedate" class="form-control" type="text" data-provide="datepicker" data-date-format="yyyy-mm-dd"value="{$user.rolechangedate}"/>
+			</td>
+		</tr>
+		<tr>
 			<td><label for="notes">Notes:</label></td>
 			<td>
 				<input id="notes" name='notes' type="text" value="{$user.notes|escape:htmlall}" />

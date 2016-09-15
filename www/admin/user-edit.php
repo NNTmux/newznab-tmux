@@ -57,8 +57,12 @@ switch ($action) {
 			$ret = $users->signup($_POST["username"], $_POST["password"], $_POST["email"], '', $_POST["role"], $_POST["notes"], $invites, "", true);
 		} else {
 			$ret = $users->update($_POST["id"], $_POST["username"], $_POST["email"], $_POST["grabs"], $_POST["role"], $_POST["notes"], $_POST["invites"], (isset($_POST['movieview']) ? "1" : "0"), (isset($_POST['musicview']) ? "1" : "0"), (isset($_POST['gameview']) ? "1" : "0"), (isset($_POST['xxxview']) ? "1" : "0"), (isset($_POST['consoleview']) ? "1" : "0"), (isset($_POST['bookview']) ? "1" : "0"));
-			if ($_POST['password'] != "")
+			if ($_POST['password'] != "") {
 				$users->updatePassword($_POST["id"], $_POST['password']);
+			}
+			if ($_POST['rolechangedate'] != "") {
+				$users->updateUserRoleChangeDate($_POST["id"], $_POST["rolechangedate"]);
+			}
 		}
 
 		if ($ret >= 0) {
