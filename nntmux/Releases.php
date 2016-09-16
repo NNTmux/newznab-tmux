@@ -1118,6 +1118,9 @@ class Releases
 		);
 
 		$releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+		if (!empty($releases) && count($releases)) {
+			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
+		}
 		return $releases;
 	}
 
@@ -1175,6 +1178,9 @@ class Releases
 		);
 		$releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 
+		if (!empty($releases) && count($releases)) {
+			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
+		}
 		return $releases;
 	}
 
@@ -1232,6 +1238,9 @@ class Releases
 		);
 		$releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 
+		if (!empty($releases) && count($releases)) {
+			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
+		}
 		return $releases;
 	}
 

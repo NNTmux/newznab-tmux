@@ -1,4 +1,5 @@
 2016-09-16 DariusIII
+	* Chg: Add back reporting of total releases to api response
 	* Chg: Group music releases in Gamma theme.
 2016-09-15 DariusIII
 	* Chg: Update yenc decode handling for new php-yenc module
