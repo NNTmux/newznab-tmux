@@ -1,3 +1,5 @@
+2016-09-16 DariusIII
+	* Chg: Group music releases in Gamma theme.
 2016-09-15 DariusIII
 	* Chg: Add datepicker and role change date column to users list and user edit in admin.
 		Admins can now set and track role expiration date, for those who use it.
