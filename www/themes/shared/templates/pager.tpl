@@ -2,11 +2,11 @@
 {assign var="currentpage" value=($pageroffset+$pageritemsperpage)/$pageritemsperpage}
 {assign var="upperhalfwaypoint" value=((($pages-$currentpage)/2)|round)+$currentpage}
 {if $pages > 1}
-	<div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+	<div class="container">
 		<ul class="pagination">
 			<li>
 				<a href="{$pagerquerybase}{$pageroffset-$pageritemsperpage}{$pagerquerysuffix}" aria-label="Previous">
-					<span aria-hidden="true">&laquo;</span>
+					<i class="fa fa-long-arrow-left"><span aria-hidden="true"></i></span>
 				</a>
 			</li>
 			{if $currentpage > 1}
@@ -42,7 +42,7 @@
 			{/if}
 			<li>
 				<a href="{$pagerquerybase}{$pageroffset+$pageritemsperpage}{$pagerquerysuffix}" aria-label="Next">
-					<span aria-hidden="true">&raquo;</span>
+					<i class="fa fa-long-arrow-right"></i><span aria-hidden="true"></span>
 				</a>
 			</li>
 		</ul>
