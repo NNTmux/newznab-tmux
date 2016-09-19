@@ -197,6 +197,8 @@
 	<!-- autogrowing textarea plugin -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.autogrow-textarea.js"></script>
+	<!-- tinymce editor -->
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/tinymce-builded/js/tinymce/tinymce.min.js"></script>
 	<!-- history.js for cross-browser state change on ajax -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.history.js"></script>
 	<!-- Charisma functions -->

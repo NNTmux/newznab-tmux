@@ -45,6 +45,7 @@
 									  cols="100"></textarea>
 						</div>
 						<input class="btn btn-success" type="submit" value="Submit"/>
+						<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />
 					</div>
 				</form>
 			</div>

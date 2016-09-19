@@ -54,7 +54,8 @@
 			<div class="controls">
 				<textarea cols="100" class="input input-xlarge" maxlength="5000" id="addMessage" name="addMessage" rows="6"></textarea>
 			</div>
-			<input class="forumpostsubmit btn btn-success" type="submit" value="submit"/>
+			<input class="btn btn-success" type="submit" value="submit"/>
+			<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />
 		</div>
 		</form>
 	</div>
