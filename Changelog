@@ -1,3 +1,5 @@
+2016-09-19 DariusIII
+	* Chg: Remove unused settings from site edit page and nntmux_fi_schema.sql, reorganize site edit to be more logical
 2016-09-17 DariusIII
 	* Fix: Badly formed class setting
 	* Chg: Reformat pager and move it to shared folder

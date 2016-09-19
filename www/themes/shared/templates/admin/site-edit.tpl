@@ -583,47 +583,7 @@
 			<input class="short" id="crossposttime" name="crossposttime" type="text" value="{$site->crossposttime}"/>
 			<div class="hint">The time in hours to check for crossposted releases - this will delete 1 of the releases if the 2 are posted by the same person in the same time period.</div>
 		</td>
-	</tr>
-
-<tr>
-	<td><label for="removespam">Remove Spam</label>:</td>
-	<td>
-		{html_radios id="removespam" name='removespam' values=$yesno_ids output=$yesno_names selected=$site->removespam separator='<br />'}
-		<div class="hint">Find and remove spam after each update. An inexact science which uses a few methods to identify virus/spam posts.</div>
-	</td>
-</tr>
-
-<tr>
-	<td><label for="exepermittedcategories">Spam - Accepted Exe Categories</label>:</td>
-	<td>
-		<input id="exepermittedcategories" class="long" name="exepermittedcategories" type="text" value="{$site->exepermittedcategories}" />
-		<div class="hint">Which categories to permit .exe files. Requires unrar inner file checking to be enabled.</div>
-	</td>
-</tr>
-
-<tr>
-    <td><label for="updateparsing">Perform Integrated Update Parsing</label>:</td>
-    <td>
-        {html_radios id="updateparsing" name='updateparsing' values=$yesno_ids output=$yesno_names selected=$site->updateparsing separator='<br />'}
-        <div class="hint">Update Parsing is a mechanism to decode names using various techniques.</div>
-    </td>
-</tr>
-
-<tr>
-    <td><label for="updatecleanup">Perform Integrated Update Cleanup</label>:</td>
-    <td>
-        {html_radios id="updatecleanup" name='updatecleanup' values=$yesno_ids output=$yesno_names selected=$site->updatecleanup separator='<br />'}
-        <div class="hint">Update Cleanup is a general mechanism for deleting and moving unwanted items into misc>other.</div>
-    </td>
-</tr>
-
-<tr>
-    <td><label for="removespecial">Perform Integrated Remove Special Chars</label>:</td>
-    <td>
-        {html_radios id="removespecial" name='removespecial' values=$yesno_ids output=$yesno_names selected=$site->removespecial separator='<br />'}
-        <div class="hint">Remove Special is a general mechanism for removing erroneous characters from release names.</div>
-    </td>
-</tr>
+	</tr
 
 <tr>
 	<td><label for="compressedheaders">Use Compressed Headers</label>:</td>
@@ -691,13 +651,6 @@
 <fieldset>
 <legend>Lookup Settings</legend>
 <table class="input data table table-striped responsive-utilities jambo-table">
-<tr>
-	<td><label for="reqidurl">Allfilled Request Id Lookup URL</label>:</td>
-	<td>
-		<input class="long" id="reqidurl" name="reqidurl" type="text" value="{$site->reqidurl}" />
-		<div class="hint">The url to use to translate allfilled style reqid usenet posts into real release titles. Leave blank to not perform lookup.</div>
-	</td>
-</tr>
 	<tr>
 		<td style="width:180px;"><label for="lookuptvrage">Lookup TV:</label></td>
 		<td>
@@ -705,15 +658,13 @@
 			<div class="hint">Whether to attempt to lookup TvRage ids on the web.</div>
 		</td>
 	</tr>
-
-<tr>
-	<td><label for="lookupthetvdb">Lookup TheTVDB</label>:</td>
-	<td>
-		{html_radios id="lookupthetvdb" name='lookupthetvdb' values=$yesno_ids output=$yesno_names selected=$site->lookupthetvdb separator='<br />'}
-		<div class="hint">Whether to attempt to lookup addidional series information from TheTVDB when processing binaries.</div>
-	</td>
-</tr>
-
+	<tr>
+		<td style="width:180px;"><label for="lookupbooks">Lookup Books:</label></td>
+		<td>
+			{html_options style="width:180px;" id="lookupbooks" name='lookupbooks' values=$lookupbooks_ids output=$lookupbooks_names selected=$site->lookupbooks}
+			<div class="hint">Whether to attempt to lookup book information from Amazon.</div>
+		</td>
+	</tr>
 	<tr>
 		<td style="width:180px;"><label for="book_reqids">Type of books to look up:</label></td>
 		<td>
@@ -730,6 +681,14 @@
 		</td>
 	</tr>
 
+	<tr>
+		<td><label for="lookuplanguage">Movie Lookup Language</label>:</td>
+		<td>
+			{html_options id="lookuplanguage" name='lookuplanguage' values=$lookuplanguage_iso output=$lookuplanguage_names selected=$site->lookuplanguage}
+			<div class="hint">Preferred language for scraping external sources.</div>
+		</td>
+	</tr>
+
 <tr>
 	<td><label for="lookupanidb">Lookup AniDB</label>:</td>
 	<td>
@@ -737,7 +696,6 @@
 		<div class="hint">Whether to attempt to lookup anime information from AniDB when processing binaries.</div>
 	</td>
 </tr>
-
 	<tr>
 		<td style="width:180px;"><label for="lookupmusic">Lookup Music:</label></td>
 		<td>
@@ -745,7 +703,13 @@
 			<div class="hint">Whether to attempt to lookup music information from Amazon.</div>
 		</td>
 	</tr>
-
+	<tr>
+		<td><label for="saveaudiopreview">Save Audio Preview</label>:</td>
+		<td>
+			{html_radios id="saveaudiopreview" name='saveaudiopreview' values=$yesno_ids output=$yesno_names selected=$site->saveaudiopreview separator='<br />'}
+			<div class="hint">Whether to save a preview of an audio release (requires deep rar inspection enabled).<br/>It is advisable to specify a path to the lame binary to reduce the size of audio previews.</div>
+		</td>
+	</tr>
 	<tr>
 		<td style="width:180px;"><label for="lookupgames">Lookup Games:</label></td>
 		<td>
@@ -761,42 +725,6 @@
 			<div class="hint">Whether to attempt to lookup XXX information when processing binaries.</div>
 		</td>
 	</tr>
-
-	<tr>
-		<td style="width:180px;"><label for="maxxxxprocessed">Maximum xxx per run:</label></td>
-		<td>
-			<input class="short" id="maxxxxprocessed" name="maxxxxprocessed" type="text"
-				   value="{$site->maxxxxprocessed}"/>
-
-			<div class="hint">The maximum amount of XXX to process per run. This does not use an NNTP
-				connection or query Amazon.
-			</div>
-	</td>
-</tr>
-
-	<tr>
-		<td style="width:180px;"><label for="lookupbooks">Lookup Books:</label></td>
-		<td>
-			{html_options style="width:180px;" id="lookupbooks" name='lookupbooks' values=$lookupbooks_ids output=$lookupbooks_names selected=$site->lookupbooks}
-			<div class="hint">Whether to attempt to lookup book information from Amazon.</div>
-		</td>
-	</tr>
-
-<tr>
-	<td><label for="lookuplanguage">Movie Lookup Language</label>:</td>
-	<td>
-		{html_options id="lookuplanguage" name='lookuplanguage' values=$lookuplanguage_iso output=$lookuplanguage_names selected=$site->lookuplanguage}
-		<div class="hint">Preferred language for scraping external sources.</div>
-	</td>
-</tr>
-
-<tr>
-	<td><label for="saveaudiopreview">Save Audio Preview</label>:</td>
-	<td>
-		{html_radios id="saveaudiopreview" name='saveaudiopreview' values=$yesno_ids output=$yesno_names selected=$site->saveaudiopreview separator='<br />'}
-		<div class="hint">Whether to save a preview of an audio release (requires deep rar inspection enabled).<br/>It is advisable to specify a path to the lame binary to reduce the size of audio previews.</div>
-	</td>
-</tr>
 </table>
 </fieldset>
 <fieldset>
@@ -1087,10 +1015,6 @@
 							style="color:#0082E1"
 							href="http://sourceforge.net/projects/yydecode/files/yydecode/0.2.10/">Download yydecode
 						on sourceforce.</a>
-					<br/>Putting in <strong style="color:#ac2925">simple_php_yenc_decode</strong> will use that
-					extension which is even faster <strong>(you must have the extension)</strong>. <a
-							style="color:#0082E1" href="https://github.com/kevinlekiller/simple_php_yenc_decode">View
-						simple_php_yenc_decode on github.</a>
 				</div>
 			</td>
 		</tr>
@@ -1342,6 +1266,18 @@
 
 				<div class="hint">The maximum amount of books to process with amazon per run. This does not use an NNTP
 					connection
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="maxxxxprocessed">Maximum xxx per run:</label></td>
+			<td>
+				<input class="short" id="maxxxxprocessed" name="maxxxxprocessed" type="text"
+					   value="{$site->maxxxxprocessed}"/>
+
+				<div class="hint">The maximum amount of XXX to process per run. This does not use an NNTP
+					connection or query Amazon.
 				</div>
 			</td>
 		</tr>
