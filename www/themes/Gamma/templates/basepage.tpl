@@ -38,7 +38,6 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip2.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/utils.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
@@ -47,6 +46,7 @@
 			src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"></script>
 	<!-- tinymce editor -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/tinymce-builded/js/tinymce/tinymce.min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/utils.js"></script>
 	<!-- Pines Notify -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.pnotify.js"></script>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
