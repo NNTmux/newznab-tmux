@@ -28,7 +28,7 @@ if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
 			if (method_exists('yenc\yEnc', 'version') &&
 				version_compare(
 					yenc\yEnc::version(),
-					'1.1.0',
+					'1.2.2',
 					'>='
 				)
 			) {
