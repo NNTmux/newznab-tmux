@@ -247,7 +247,7 @@ class Nfo
 	 * @access public
 	 * @static
 	 */
-	static public function NfoQueryString(Settings &$pdo)
+	static public function NfoQueryString(&$pdo)
 	{
 		if ($pdo instanceof Settings) {
 			$maxSize = $pdo->getSetting('maxsizetoprocessnfo');
