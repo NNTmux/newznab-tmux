@@ -3,9 +3,9 @@ has decided to code the Fulltext searching within the site for MyISAM due to its
 full text search implementation is the stop word table.  MyISAM's (seen below) consists of 543 entries while InnoDB's consists of only 36.  This leads to greatly disparate results when
 searching the same data between the two engines.  If you prefer your results using InnoDB's default stop word table, then ignore this file.  If you wish to keep your search in-line with the
 way it was coded simply import this file into MySQL.  Using this import constitutes (in general) a major change to the entire MySQL instance as the change is Global to use the new stop word
-table.  Because of this, it is recommended you import this table into the mysql database, NOT nntmux.  Do this with the following command (using an account that has access to the mysql database):
+table.  Because of this, it is recommended you import this table into the mysql database, NOT nzedb.  Do this with the following command (using an account that has access to the mysql database):
 
-mysql -uroot mysql < /var/www/nntmux/resources/db/schema/innodb_5.6_stopword_tbl.sql
+mysql -uroot mysql < /var/www/nZEDb/resources/db/schema/innodb_5.6_stopword_tbl.sql
 
 Once imported, it is recommended to set:
 
