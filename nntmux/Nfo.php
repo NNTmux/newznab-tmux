@@ -14,7 +14,7 @@ use nntmux\utility\Utility;
 class Nfo
 {
 	/**
-	 * Instance of class DB
+	 * Instance of class Settings
 	 * @var \nntmux\db\Settings
 	 * @access private
 	 */
