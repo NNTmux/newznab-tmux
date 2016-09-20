@@ -57,7 +57,6 @@ class Categorize extends Category
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->pdo = new Settings();
 		$this->categorizeForeign = (Settings::value('categorizeforeign') == "0") ? false : true;
 		$this->catWebDL = (Settings::value('catwebdl') == "0") ? false : true;
 		$this->regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'category_regexes']);
