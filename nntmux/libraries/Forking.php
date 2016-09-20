@@ -572,7 +572,7 @@ class Forking extends \fork_daemon
 			$this->work = $this->pdo->query('SELECT name FROM groups WHERE (active = 1 OR backfill = 1)');
 		}
 
-		return Settings::value('releasesthreads');
+		return Settings::value('releasethreads');
 	}
 
 	public function releasesChildWorker($groups, $identifier = '')
@@ -913,7 +913,7 @@ class Forking extends \fork_daemon
 	{
 		$this->register_child_run([0 => $this, 1 => 'updatePerGroupChildWorker']);
 		$this->work = $this->pdo->query('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
-		return Settings::value('releasesthreads');
+		return Settings::value('releasethreads');
 	}
 
 	public function updatePerGroupChildWorker($groups, $identifier = '')

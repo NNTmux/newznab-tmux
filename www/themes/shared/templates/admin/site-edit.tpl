@@ -1454,7 +1454,7 @@
 		</tr>
 
 		<tr>
-			<td style="width:180px;"><label for="releasesthreads">Update Releases Threads:</label></td>
+			<td style="width:180px;"><label for="releasethreads">Update Releases Threads:</label></td>
 			<td>
 				<input class="short" id="releasethreads" name="releasethreads" type="text"
 					   value="{$site->releasethreads}"/>
