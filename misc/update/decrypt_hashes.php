@@ -3,9 +3,9 @@ require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstr
 
 use nntmux\ConsoleTools;
 use nntmux\NameFixer;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
-$pdo = new Settings();
+$pdo = new DB();
 
 if (!isset($argv[1]) || ($argv[1] != "all" && $argv[1] != "full" && !is_numeric($argv[1]))) {
 	exit($pdo->log->error(

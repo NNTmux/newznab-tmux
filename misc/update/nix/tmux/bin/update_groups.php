@@ -1,13 +1,13 @@
 <?php
 require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\ConsoleTools;
 use nntmux\NNTP;
 
 
 $start = time();
-$pdo = new Settings();
+$pdo = new DB();
 $consoleTools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 
 // Create the connection here and pass

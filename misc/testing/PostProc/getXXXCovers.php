@@ -2,12 +2,12 @@
 //This script will update all records in the xxxinfo table where there is no cover
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\XXX;
 use nntmux\ColorCLI;
 
 
-$pdo = new Settings();
+$pdo = new DB();
 $movie = new XXX();
 $c = new ColorCLI();
 

@@ -1,6 +1,7 @@
 <?php
 namespace nntmux\libraries;
 
+use app\models\Settings;
 use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\MiscSorter;
@@ -9,7 +10,7 @@ use nntmux\Nfo;
 use nntmux\NNTP;
 use nntmux\NZB;
 use nntmux\RequestID;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\processing\PostProcess;
 
 /**
@@ -27,6 +28,7 @@ class Forking extends \fork_daemon
 	const OUTPUT_NONE     = 0; // Don't display child output.
 	const OUTPUT_REALTIME = 1; // Display child output in real time.
 	const OUTPUT_SERIALLY = 2; // Display child output when child is done.
+
 
 	/**
 	 * Setup required parent / self vars.
@@ -97,7 +99,7 @@ class Forking extends \fork_daemon
 		$this->work = [];
 
 		// Init Settings here, as forking causes errors when it's destroyed.
-		$this->pdo = new Settings();
+		$this->pdo = new DB();
 
 		// Process extra work that should not be forked and done before forking.
 		$this->processStartWork();
@@ -1077,7 +1079,7 @@ class Forking extends \fork_daemon
 	private $safeBackfillGroup = '';
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var \nntmux\db\DB
 	 */
 	public $pdo;
 

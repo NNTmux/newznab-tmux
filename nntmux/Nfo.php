@@ -249,9 +249,17 @@ class Nfo
 	 */
 	static public function NfoQueryString(Settings &$pdo)
 	{
-		$maxSize = $pdo->getSetting('maxsizetoprocessnfo');
-		$minSize = $pdo->getSetting('minsizetoprocessnfo');
-		$maxRetries = (int)($pdo->getSetting('maxnforetries') >= 0 ? -((int)$pdo->getSetting('maxnforetries') + 1) : self::NFO_UNPROC);
+		if ($pdo instanceof Settings) {
+			$maxSize = $pdo->getSetting('maxsizetoprocessnfo');
+			$minSize = $pdo->getSetting('minsizetoprocessnfo');
+			$maxRetries = (int)($pdo->getSetting('maxnforetries') >= 0 ?
+				-((int)$pdo->getSetting('maxnforetries') + 1) : self::NFO_UNPROC);
+		} else {
+			$maxSize = \app\models\Settings::value('maxsizetoprocessnfo');
+			$minSize = \app\models\Settings::value('minsizetoprocessnfo');
+			$value = \app\models\Settings::value('maxnforetries');
+			$maxRetries = (int)$value >= 0 ? -((int)$value + 1) : self::NFO_UNPROC;
+		}
 		return (
 		sprintf(
 			'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',

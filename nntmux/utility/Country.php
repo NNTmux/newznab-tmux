@@ -20,7 +20,7 @@
  */
 namespace nntmux\utility;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 /**
  * Class Country
@@ -34,13 +34,13 @@ Class Country
 	 *
 	 * @param string $country
 	 *
-	 * @param Settings $pdo
+	 * @param DB $pdo
 	 *
 	 * @return mixed
 	 */
 	public static function countryCode($country, $pdo)
 	{
-		$pdo = ($pdo instanceof Settings ? $pdo : new Settings());
+		$pdo = ($pdo instanceof DB ? $pdo : new DB());
 		if (!is_array($country) && strlen($country) > 2) {
 			$code = $pdo->queryOneRow(
 				sprintf('

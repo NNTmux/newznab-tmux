@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 class Genres
 {
@@ -13,7 +13,7 @@ class Genres
 	const STATUS_DISABLED = 1;
 
 	/**
-	 * @var \nntmux\db\Settings;
+	 * @var \nntmux\db\DB;
 	 */
 	public $pdo;
 
@@ -27,7 +27,7 @@ class Genres
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 	}
 
 	public function getGenres($type = '', $activeonly = false)

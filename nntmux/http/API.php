@@ -20,7 +20,7 @@
  */
 namespace nntmux\http;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 use nntmux\Category;
 use nntmux\Groups;
@@ -32,8 +32,8 @@ use nntmux\Groups;
  */
 class API extends Capabilities {
 
-	/** Settings class
-	 * @var \nntmux\db\Settings
+	/** DB class
+	 * @var \nntmux\db\DB
 	 */
 	public $pdo;
 
@@ -54,7 +54,7 @@ class API extends Capabilities {
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->getRequest = $options['Request'];
 	}
 

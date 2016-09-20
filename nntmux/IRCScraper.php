@@ -1,6 +1,6 @@
 <?php
 namespace nntmux;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 /**
  * Class IRCScraper
@@ -48,7 +48,7 @@ class IRCScraper extends IRCClient
 	protected $_oldPre;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var \nntmux\db\DB
 	 * @access protected
 	 */
 	protected $_pdo;
@@ -113,7 +113,7 @@ class IRCScraper extends IRCClient
 			$this->_titleIgnoreRegex = SCRAPE_IRC_TITLE_IGNORE;
 		}
 
-		$this->_pdo = new Settings();
+		$this->_pdo = new DB();
 		$this->_groupList = [];
 		$this->_silent = $silent;
 		$this->_debug = $debug;

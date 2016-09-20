@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 /**
  * Class UserMovies
@@ -9,7 +9,7 @@ use nntmux\db\Settings;
 class UserMovies
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var \nntmux\db\DB
 	 */
 	public $pdo;
 
@@ -23,7 +23,7 @@ class UserMovies
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 	}
 
 	/**

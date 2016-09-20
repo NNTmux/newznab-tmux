@@ -2,7 +2,7 @@
 
 namespace nntmux\http;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\Releases;
 use nntmux\Category;
 use nntmux\NZB;
@@ -19,8 +19,8 @@ Class RSS extends Capabilities
 	 */
 	public $releases;
 
-	/** Settings class
-	 * @var \nntmux\db\Settings
+	/** DB class
+	 * @var \nntmux\db\DB
 	 */
 	public $pdo;
 
@@ -36,7 +36,7 @@ Class RSS extends Capabilities
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->releases = (
 			$options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo])
 		);

@@ -1,12 +1,12 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 class Forum
 {
 	/**
-	 * @var Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -20,7 +20,7 @@ class Forum
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 	}
 
 	public function add($parentid, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0)

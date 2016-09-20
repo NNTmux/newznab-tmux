@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\processing\PostProcess;
 use nntmux\utility\Utility;
 
@@ -108,7 +108,7 @@ class NameFixer
 	protected $fullall;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var \nntmux\db\DB
 	 */
 	public $pdo;
 
@@ -155,7 +155,7 @@ class NameFixer
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->relid = $this->fixed = $this->checked = 0;
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->othercats = implode(",", Category::OTHERS_GROUP);
 		$this->timeother = sprintf(' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categories_id IN (%s) GROUP BY rel.id ORDER BY postdate DESC', $this->othercats);
 		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.id ORDER BY postdate DESC';

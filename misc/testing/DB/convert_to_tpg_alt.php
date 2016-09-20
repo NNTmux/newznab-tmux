@@ -1,12 +1,12 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\Groups;
 use nntmux\ConsoleTools;
 
 
-$pdo = new Settings();
+$pdo = new DB();
 
 if (!isset($argv[1]) || $argv[1] != 'true') {
 	exit($pdo->log->error("\nThis script will move all collections, binaries, parts into tables per group.\n\n"

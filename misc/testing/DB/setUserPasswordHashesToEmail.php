@@ -17,7 +17,7 @@
  */
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\ColorCLI;
 use nntmux\Users;
 
@@ -40,7 +40,7 @@ if ($argc != 2) {
 	exit($colorCLI->error("\nInvalid parameter(s)$usage"));
 }
 
-$pdo = new Settings();
+$pdo = new DB();
 
 $users = $pdo->query("SELECT id, username, email, password FROM users");
 $update = $pdo->Prepare('UPDATE users SET password = :password WHERE id = :id');

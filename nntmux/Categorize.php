@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\models\Settings;
 
 /**
  * Categorizing of releases by name/group.
@@ -58,8 +58,8 @@ class Categorize extends Category
 	{
 		parent::__construct($options);
 		$this->pdo = new Settings();
-		$this->categorizeForeign = ($this->pdo->getSetting('categorizeforeign') == "0") ? false : true;
-		$this->catWebDL = ($this->pdo->getSetting('catwebdl') == "0") ? false : true;
+		$this->categorizeForeign = (Settings::value('categorizeforeign') == "0") ? false : true;
+		$this->catWebDL = (Settings::value('catwebdl') == "0") ? false : true;
 		$this->regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'category_regexes']);
 	}
 

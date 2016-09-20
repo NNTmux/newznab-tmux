@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 /**
  * This class manages the site wide categories.
@@ -107,7 +107,7 @@ class Category
 	private $tmpCat = 0;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var \nntmux\db\DB
 	 */
 	public $pdo;
 
@@ -123,7 +123,7 @@ class Category
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 	}
 
 	/**

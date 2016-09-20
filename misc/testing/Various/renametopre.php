@@ -9,7 +9,7 @@ use nntmux\Groups;
 use nntmux\NameFixer;
 use nntmux\ReleaseCleaning;
 use nntmux\ReleaseFiles;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 /*
  *
@@ -22,7 +22,7 @@ use nntmux\db\Settings;
  * release has been created
  *
  */
-$pdo = new Settings();
+$pdo = new DB();
 
 if (!(isset($argv[1]) && ($argv[1] == "all" || $argv[1] == "full" || $argv[1] == "predb_id" || is_numeric($argv[1])))) {
 	exit($pdo->log->error(

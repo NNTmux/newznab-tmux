@@ -5,9 +5,9 @@ use nntmux\Categorize;
 use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\ConsoleTools;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
-$pdo = new Settings();
+$pdo = new DB();
 
 if (!(isset($argv[1]) && ($argv[1] == "all" || $argv[1] == "misc" || preg_match('/\([\d, ]+\)/', $argv[1]) || is_numeric($argv[1])))) {
 	exit($pdo->log->error(

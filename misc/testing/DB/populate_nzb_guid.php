@@ -1,7 +1,7 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 use nntmux\ColorCLI;
 use nntmux\ConsoleTools;
@@ -24,7 +24,7 @@ if (isset($argv[1])) {
 
 function create_guids($live, $delete = false)
 {
-	$pdo = new Settings();
+	$pdo = new DB();
 	$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 	$timestart = time();
 	$relcount = $deleted = $total = 0;

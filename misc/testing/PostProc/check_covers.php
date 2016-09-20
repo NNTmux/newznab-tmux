@@ -4,7 +4,7 @@
 // --------------------------------------------------------------
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 use nntmux\Releases;
 use nntmux\NZB;
@@ -12,7 +12,7 @@ use nntmux\ReleaseImage;
 use nntmux\ConsoleTools;
 use nntmux\Movie;
 
-$pdo = new Settings();
+$pdo = new DB();
 $movie = new Movie(['Echo' => true, 'Settings' => $pdo]);
 
 $row = $pdo->queryOneRow("SELECT value FROM settings WHERE setting = 'coverspath'");
