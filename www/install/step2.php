@@ -125,7 +125,7 @@ if ($page->isPostBack()) {
 		$goodVersion = false;
 		if (!$cfg->error) {
 			try {
-				$goodVersion = $pdo->isDbVersionAtLeast(nZEDb_MINIMUM_MYSQL_VERSION);
+				$goodVersion = $pdo->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION);
 			} catch (\PDOException $e) {
 				$goodVersion   = false;
 				$cfg->error    = true;
@@ -138,7 +138,7 @@ if ($page->isPostBack()) {
 					'You are using an unsupported version of ' .
 					$cfg->DB_SYSTEM .
 					' the minimum allowed version is ' .
-					nZEDb_MINIMUM_MYSQL_VERSION;
+					NN_MINIMUM_MYSQL_VERSION;
 			}
 		}
 	}
@@ -158,7 +158,7 @@ if ($page->isPostBack()) {
 			$DbSetup->processSQLFile(); // Setup default schema
 			$DbSetup->processSQLFile( // Process any custom stuff.
 				[
-					'filepath' => nZEDb_RES . 'db' . DS . 'schema' . DS . 'mysql-data.sql'
+					'filepath' => NN_RES . 'db' . DS . 'schema' . DS . 'mysql-data.sql'
 				]
 			);
 			$DbSetup->loadTables(); // Load default data files

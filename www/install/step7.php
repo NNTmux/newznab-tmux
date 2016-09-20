@@ -29,9 +29,9 @@ if ($page->isPostBack()) {
 
 	if (extension_loaded('posix') && strtolower(substr(PHP_OS, 0, 3)) !== 'win') {
 		$group = posix_getgrgid(posix_getgid());
-		$fixString = '<br /><br />Another solution is to run:<br />chown -R YourUnixUserName:' . $group['name'] . ' ' . nZEDb_ROOT .
+		$fixString = '<br /><br />Another solution is to run:<br />chown -R YourUnixUserName:' . $group['name'] . ' ' . NN_ROOT .
 		'<br />Then give your user access to the group:<br />usermod -a -G ' . $group['name'] . ' YourUnixUserName' .
-		'<br />Finally give read/write access to your user/group:<br />chmod -R 774 ' . nZEDb_ROOT;
+		'<br />Finally give read/write access to your user/group:<br />chmod -R 774 ' . NN_ROOT;
 		$page->smarty->assign('fixString', $fixString);
 	}
 
@@ -89,11 +89,11 @@ if ($page->isPostBack()) {
 		}
 
 		if ($cfg->error !== true) {
-			if ($cfg->COVERS_PATH != nZEDb_WWW . 'covers' . DS) {
+			if ($cfg->COVERS_PATH != NN_WWW . 'covers' . DS) {
 				// TODO clean up old covers location if 'empty' (i.e. only contains the versioned files).
 			}
 
-			if ($cfg->NZB_PATH != nZEDb_ROOT . 'nzbfiles' . DS) {
+			if ($cfg->NZB_PATH != NN_ROOT . 'nzbfiles' . DS) {
 				// TODO clean up old nzbfiles location if 'empty' (i.e. only contains the versioned files).
 			}
 		}

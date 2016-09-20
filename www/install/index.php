@@ -11,7 +11,7 @@ if ($cfg->isLocked()) {
 	$cfg->error = true;
 }
 
-$cfg->cacheCheck = is_writable(nZEDb_RES . 'smarty' . DS . 'templates_c');
+$cfg->cacheCheck = is_writable(NN_RES . 'smarty' . DS . 'templates_c');
 if ($cfg->cacheCheck === false) {
 	$cfg->error = true;
 }
@@ -70,13 +70,13 @@ if (!$cfg->error) {
 				<div class="error">
 					The template compile dir must be writable.<br />A quick solution is to run:	<br />
 					<?php
-					echo 'chmod 777 ' . nZEDb_RES . 'smarty' . DS . 'templates_c';
+					echo 'chmod 777 ' . NN_RES . 'smarty' . DS . 'templates_c';
 					if (extension_loaded('posix') && strtolower(substr(PHP_OS, 0, 3)) !== 'win') {
 						$group = posix_getgrgid(posix_getgid());
 						echo
-						'<br /><br />Another solution is to run:<br />chown -R YourUnixUserName:' . $group['name'] . ' ' . nZEDb_ROOT .
+						'<br /><br />Another solution is to run:<br />chown -R YourUnixUserName:' . $group['name'] . ' ' . NN_ROOT .
 						'<br />Then give your user access to the group:<br />usermod -a -G ' . $group['name'] . ' YourUnixUserName' .
-						'<br />Finally give read/write access to your user/group:<br />chmod -R 774 ' . nZEDb_ROOT;
+						'<br />Finally give read/write access to your user/group:<br />chmod -R 774 ' . NN_ROOT;
 					}
 					?>
 				</div>

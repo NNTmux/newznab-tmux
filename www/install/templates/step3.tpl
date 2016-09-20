@@ -20,7 +20,7 @@
 			<tr class="">
 				<td><label for="cafile">CA Bundle Path(Optional):</label></td>
 				<td>
-					<input type="text" name="cafile" id="cafile" value="{$cfg->nZEDb_SSL_CAFILE}" />
+					<input type="text" name="cafile" id="cafile" value="{$cfg->NN_SSL_CAFILE}" />
 					<div>
 						Location of Certificate Authority file on local filesystem which will be used if the Verify Peer option is enabled to authenticate the identity of the remote peer.
 						<br />Example: /etc/ssl/certs/cacert.pem
@@ -30,7 +30,7 @@
 			<tr class="alt">
 				<td><label for="capath">Certificate Folder(Optional):</label></td>
 				<td>
-					<input type="text" name="capath" id="capath" value="{$cfg->nZEDb_SSL_CAPATH}" />
+					<input type="text" name="capath" id="capath" value="{$cfg->NN_SSL_CAPATH}" />
 					<div>
 						If the ca bundle cert file is not specified or if the certificate is not found there, you can specify a directory here which will be searched for a suitable certificate.
 						<br />Example: /etc/ssl/certs/</div>
@@ -39,7 +39,7 @@
 			<tr class="">
 				<td><label for="verifypeer">Verify peer:</label></td>
 				<td>
-					<input type="checkbox" name="verifypeer" id="verifypeer" value="1" {if $cfg->nZEDb_SSL_VERIFY_PEER=="true"}checked="checked"{/if} />
+					<input type="checkbox" name="verifypeer" id="verifypeer" value="1" {if $cfg->NN_SSL_VERIFY_PEER=="true"}checked="checked"{/if} />
 					<div>
 						Enabling this requires the ca bundle cert file path to be set.<br />
 						Disabling this will disable TLS/SSL remote certificate verification which is not recommended.
@@ -49,7 +49,7 @@
 			<tr class="alt">
 				<td><label for="verifyhost">Verify host:</label></td>
 				<td>
-					<input type="checkbox" name="verifyhost" id="verifyhost" value="1" {if $cfg->nZEDb_SSL_VERIFY_HOST=="true"}checked="checked"{/if} />
+					<input type="checkbox" name="verifyhost" id="verifyhost" value="1" {if $cfg->NN_SSL_VERIFY_HOST=="true"}checked="checked"{/if} />
 					<div>
 						This makes sure the host is who they say they are.<br />
 						See <a href="http://curl.haxx.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html">this</a> link for detailed info.<br />
@@ -61,7 +61,7 @@
 			<tr class="">
 				<td><label for="allowselfsigned">Allow self signed certificates:</label></td>
 				<td>
-					<input type="checkbox" name="allowselfsigned" id="allowselfsigned" value="1" {if $cfg->nZEDb_SSL_ALLOW_SELF_SIGNED=="true"}checked="checked"{/if} />
+					<input type="checkbox" name="allowselfsigned" id="allowselfsigned" value="1" {if $cfg->NN_SSL_ALLOW_SELF_SIGNED=="true"}checked="checked"{/if} />
 					<div>
 						Enabling this will not verify self-signed openssl certificates.<br />
 						Note that you will require non self-signed certificates for sabnzbd/nzbget/etc if you disable this.

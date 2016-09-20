@@ -62,17 +62,17 @@ $cfg->curlCheck = function_exists('curl_init');
 
 if (extension_loaded('posix') && strtolower(substr(PHP_OS, 0, 3)) !== 'win') {
 	$group = posix_getgrgid(posix_getgid());
-	$fixString = '<br /><br />Another solution is to run:<br />chown -R YourUnixUserName:' . $group['name'] . ' ' . nZEDb_ROOT .
+	$fixString = '<br /><br />Another solution is to run:<br />chown -R YourUnixUserName:' . $group['name'] . ' ' . NN_ROOT .
 		'<br />Then give your user access to the group:<br />usermod -a -G ' . $group['name'] . ' YourUnixUserName' .
-		'<br />Finally give read/write access to your user/group:<br />chmod -R 774 ' . nZEDb_ROOT;
+		'<br />Finally give read/write access to your user/group:<br />chmod -R 774 ' . NN_ROOT;
 	$page->smarty->assign('fixString', $fixString);
 	$page->smarty->assign('unixGroup', $group['name']);
-	$page->smarty->assign('rootPath', nZEDb_ROOT);
+	$page->smarty->assign('rootPath', NN_ROOT);
 } else {
 	$page->smarty->assign('fixString', false);
 }
 
-$cfg->cacheCheck = is_writable(nZEDb_RES . 'smarty' . DS . 'templates_c');
+$cfg->cacheCheck = is_writable(NN_RES . 'smarty' . DS . 'templates_c');
 if ($cfg->cacheCheck === false) {
 	$cfg->error = true;
 }
@@ -127,14 +127,14 @@ if ($cfg->videoCoversCheck === false) {
 	$cfg->error = true;
 }
 
-$cfg->configCheck = is_writable(nZEDb_CONFIGS);
+$cfg->configCheck = is_writable(NN_CONFIGS);
 if ($cfg->configCheck === false) {
-	$cfg->configCheck = is_file(nZEDb_CONFIGS);
+	$cfg->configCheck = is_file(NN_CONFIGS);
 	if ($cfg->configCheck === true) {
 		$cfg->configCheck = false;
 		$cfg->error = true;
 	} else {
-		$cfg->configCheck = is_writable(nZEDb_CONFIGS);
+		$cfg->configCheck = is_writable(NN_CONFIGS);
 		if ($cfg->configCheck === false) {
 			$cfg->error = true;
 		}
@@ -170,7 +170,7 @@ if ($cfg->schemaCheck === false) {
 }
 
 // Don't set error = true for these as we only want to display a warning.
-$cfg->phpCheck = (version_compare(PHP_VERSION, nZEDb_MINIMUM_PHP_VERSION, '>=')) ? true : false;
+$cfg->phpCheck = (version_compare(PHP_VERSION, NN_MINIMUM_PHP_VERSION, '>=')) ? true : false;
 $cfg->timelimitCheck = (ini_get('max_execution_time') >= 120) ? true : false;
 $cfg->memlimitCheck = (ini_get('memory_limit') >= 1024 || ini_get('memory_limit') == -1) ? true : false;
 $cfg->opensslCheck = extension_loaded("openssl");
@@ -184,8 +184,8 @@ if (preg_match('/apache/i', $_SERVER['SERVER_SOFTWARE'])) {
 }
 
 // Load previous config.php.
-if (file_exists(nZEDb_CONFIGS . 'config.php') && is_readable(nZEDb_CONFIGS . 'config.php')) {
-	$tmpCfg = file_get_contents(nZEDb_CONFIGS . 'config.php');
+if (file_exists(NN_CONFIGS . 'config.php') && is_readable(NN_CONFIGS . 'config.php')) {
+	$tmpCfg = file_get_contents(NN_CONFIGS . 'config.php');
 	$cfg->setConfig($tmpCfg);
 }
 
