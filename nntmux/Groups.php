@@ -6,7 +6,7 @@ use nntmux\db\DB;
 class Groups
 {
 	/**
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

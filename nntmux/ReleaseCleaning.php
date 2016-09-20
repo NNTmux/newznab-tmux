@@ -58,7 +58,7 @@ class ReleaseCleaning
 	public $groupName = '';
 
 	/**
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

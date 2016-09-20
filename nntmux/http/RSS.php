@@ -20,7 +20,7 @@ Class RSS extends Capabilities
 	public $releases;
 
 	/** DB class
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

@@ -13,7 +13,7 @@ class Genres
 	const STATUS_DISABLED = 1;
 
 	/**
-	 * @var \nntmux\db\DB;
+	 * @var \nntmux\db\Settings;
 	 */
 	public $pdo;
 

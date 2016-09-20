@@ -7,7 +7,7 @@ use nntmux\utility\Utility;
 class ReleaseExtra
 {
 	/**
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

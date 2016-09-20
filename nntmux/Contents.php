@@ -10,7 +10,7 @@ class Contents
 	const TYPEINDEX = 3;
 
 	/**
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

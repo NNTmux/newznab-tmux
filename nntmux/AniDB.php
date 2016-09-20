@@ -6,7 +6,7 @@ use nntmux\db\DB;
 class AniDB
 {
 	/**
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

@@ -108,7 +108,7 @@ class NameFixer
 	protected $fullall;
 
 	/**
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

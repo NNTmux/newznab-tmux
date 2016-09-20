@@ -107,7 +107,7 @@ class Category
 	private $tmpCat = 0;
 
 	/**
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

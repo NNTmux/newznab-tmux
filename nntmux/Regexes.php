@@ -6,7 +6,7 @@ use nntmux\db\DB;
 class Regexes
 {
 	/**
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

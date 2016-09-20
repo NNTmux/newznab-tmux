@@ -35,7 +35,7 @@ abstract class Videos
 	const TYPE_ANIME	= 2; // Type of video is a Anime
 
 	/**
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

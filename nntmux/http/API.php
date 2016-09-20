@@ -33,7 +33,7 @@ use nntmux\Groups;
 class API extends Capabilities {
 
 	/** DB class
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

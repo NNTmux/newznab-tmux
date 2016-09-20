@@ -58,7 +58,7 @@ class CollectionsCleaning
 	public $subject = '';
 
 	/**
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
 

@@ -72,7 +72,7 @@ class ReleaseRemover
 	protected $method = '';
 
 	/**
-	 * @var \nntmux\db\DB
+	 * @var \nntmux\db\Settings
 	 */
 	protected $pdo;
 
