@@ -34,7 +34,6 @@ class NzedbYenc extends \lithium\core\Object
 		return (new yenc())->decode($text, true);
 	}
 
-
 	/**
 	 * Determines if this adapter is enabled by checking if the `yenc` extension is loaded.
 	 *

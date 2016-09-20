@@ -1,3 +1,5 @@
+2016-09-20 DariusIII
+	* Chg: Port yenc and yydecoder changes from nZEDb
 2016-09-19 DariusIII
 	* Chg: Forgot to add tinyMCE to all of the themes, move tinymce call to functions.js/utils.js
 	* Chg: Remove unused settings from site edit page and nntmux_fi_schema.sql, reorganize site edit to be more logical

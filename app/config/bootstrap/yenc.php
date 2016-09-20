@@ -19,19 +19,35 @@
 
 use app\models\Settings;
 
-switch (true) {
-	case extension_loaded('yenc'):
-		$adapter = 'NzedbYenc';
-		break;
-	case extension_loaded('simple_php_yenc_decode'):
-		$adapter = 'SimplePhpYencDecode';
-		break;
-	case !empty(Settings::value('..yydecoderpath', true)) &&
-		(strpos(Settings::value('..yydecoderpath', true), 'simple_php_yenc_decode') === false):
-		$adapter = 'Ydecode';
-		break;
-	default:
-		$adapter = 'Php';
+
+if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
+	$adapter = 'Php';
+} else {
+	switch (true) {
+		case extension_loaded('yenc'):
+			if (method_exists('yenc\yEnc', 'version') &&
+				version_compare(
+					yenc\yEnc::version(),
+					'1.1.0',
+					'>='
+				)
+			) {
+				$adapter = 'NzedbYenc';
+				break;
+			} else {
+				trigger_error('Your version of the php-yenc extension is out of date and will be
+				ignored. Please update it to use the extension.', E_USER_WARNING);
+			}
+		case extension_loaded('simple_php_yenc_decode'):
+			$adapter = 'SimplePhpYencDecode';
+			break;
+		case !empty(Settings::value('..yydecoderpath', true)) &&
+			(strpos(Settings::value('..yydecoderpath', true), 'simple_php_yenc_decode') === false):
+			$adapter = 'Ydecode';
+			break;
+		default:
+			$adapter = 'Php';
+	}
 }
 
 app\extensions\util\Yenc::config(
