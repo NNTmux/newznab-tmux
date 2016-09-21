@@ -100,7 +100,7 @@ class DbUpdate
 		natsort($files);
 		$local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
 		$sql = 'LOAD DATA ' .
-			$local . 'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" OPTIONALLY ENCLOSED BY "\"" LINES TERMINATED BY "\r\n" IGNORE 1 LINES (%s)';
+			$local . 'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" OPTIONALLY ENCLOSED BY "\"" LINES TERMINATED BY "\n" IGNORE 1 LINES (%s)';
 		foreach ($files as $file) {
 			if ($show === true) {
 				echo "File: $file\n";
