@@ -1,3 +1,5 @@
+2016-09-21 DariusIII
+	* Chg: Add installer for NNTmux
 2016-09-20 DariusIII
 	* Chg: Update yenc to support version 1.2.2 of php-yenc module
 	* Fix: Wrong column name used in settings table call
