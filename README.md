@@ -32,8 +32,8 @@ The overall speed of NNTmux is largely governed by performance of the database. 
 
 ### Software
 
-	PHP 5.5+ (and various modules)
-	MySQL 5.5+ (Postgres is not supported)
+	PHP 5.6+ (and various modules)
+	MySQL 5.6+ (Postgres is not supported)
 	Python 2.7 or 3.0 (and various modules)(Optional. Most useful on Windows.)
 The installation guides have more detailed software requirements.
 
