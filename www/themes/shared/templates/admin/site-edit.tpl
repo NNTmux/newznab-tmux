@@ -110,14 +110,6 @@
 </tr>
 
 <tr>
-	<td><label for="apienabled">Api Enabled</label>:</td>
-	<td>
-		{html_radios id="apienabled" name='apienabled' values=$yesno_ids output=$yesno_names selected=$site->apienabled separator='<br />'}
-		<div class="hint">Whether access to the site via the API is enabled.</div>
-	</td>
-</tr>
-
-<tr>
 	<td style="width:160px;"><label for="showrecentforumposts">Recent Forum Posts</label>:</td>
 	<td>
 		<input id="showrecentforumposts" name="showrecentforumposts" type="text" value="{$site->showrecentforumposts}" />
