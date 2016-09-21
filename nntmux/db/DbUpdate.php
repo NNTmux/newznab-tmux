@@ -21,6 +21,7 @@
 namespace nntmux\db;
 
 use nntmux\ColorCLI;
+use nntmux\db\Settings;
 use nntmux\utility\Git;
 use nntmux\utility\Utility;
 
@@ -76,11 +77,11 @@ class DbUpdate
 		$this->log    = $options['logger'];
 		// Must be DB not Settings because the Settings table may not exist yet.
 		$this->pdo = (($options['db'] instanceof DB) ? $options['db'] : new DB());
-		if ($this->pdo instanceof Settings) {
+		if ($this->pdo instanceof  Settings) {
 			$this->settings &= $this->pdo;
 		}
 
-		$this->_DbSystem = strtolower($this->pdo->DbSystem());
+		$this->_DbSystem = strtolower($this->pdo->dbSystem());
 	}
 
 	public function loadTables(array $options = [])
@@ -131,7 +132,7 @@ class DbUpdate
 					}
 				} else {
 					echo "Incorrectly formatted filename '$file' (should match " .
-						 str_replace('#', '', $options['regex']) . "\n";
+						str_replace('#', '', $options['regex']) . "\n";
 				}
 			} else {
 				echo $this->log->error("  Unable to read file: '$file'");
@@ -184,8 +185,8 @@ class DbUpdate
 					$current++;
 					$this->pdo->queryExec("UPDATE settings SET value = '$current' WHERE setting = 'sqlpatch';");
 					$newName = $matches['drive'] . $matches['path'] .
-							   str_pad($current, 4, '0', STR_PAD_LEFT) . '~' .
-							   $matches['table'] . '.sql';
+						str_pad($current, 4, '0', STR_PAD_LEFT) . '~' .
+						$matches['table'] . '.sql';
 					rename($matches[0], $newName);
 					$this->git->add($newName);
 					if ($this->git->isCommited($this->git->getBranch() . ':' . str_replace(NN_ROOT, '', $matches[0]))) {
@@ -407,8 +408,8 @@ class DbUpdate
 			'path'	=> 'resources' . DS . 'db' . DS . 'schema' . DS . 'data' . DS,
 			'regex'	=> '#^(?P<section>.*)\t(?P<subsection>.*)\t(?P<name>.*)\t(?P<value>.*)\t(?P<hint>.*)\t(?P<setting>.*)$#',
 			'value'	=> function(array $matches) {
-					return "{$matches['section']}\t{$matches['subsection']}\t{$matches['name']}\t{$matches['value']}\t{$matches['hint']}\t{$matches['setting']}";
-				} // WARNING: leaving this empty will blank not remove lines.
+				return "{$matches['section']}\t{$matches['subsection']}\t{$matches['name']}\t{$matches['value']}\t{$matches['hint']}\t{$matches['setting']}";
+			} // WARNING: leaving this empty will blank not remove lines.
 		];
 		$options += $default;
 
@@ -450,7 +451,7 @@ class DbUpdate
 		}
 
 		system("$PHP " . NN_MISC . 'testing' . DS . 'DB' . DS . $this->_DbSystem .
-			   'dump_tables.php db dump');
+			'dump_tables.php db dump');
 		$this->backedup = true;
 	}
 

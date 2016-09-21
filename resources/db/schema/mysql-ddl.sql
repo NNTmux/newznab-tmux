@@ -928,6 +928,27 @@ CREATE TABLE short_groups (
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
 
+DROP TABLE IF EXISTS spotnabsources;
+CREATE TABLE spotnabsources
+(
+  id BIGINT(20) unsigned PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  username VARCHAR(64) DEFAULT 'nntp' NOT NULL,
+  useremail VARCHAR(128) DEFAULT 'spot@nntp.com' NOT NULL,
+  usenetgroup VARCHAR(64) DEFAULT 'alt.binaries.backup' NOT NULL,
+  publickey VARCHAR(512) NOT NULL,
+  active TINYINT(1) DEFAULT '0' NOT NULL,
+  description VARCHAR(255) DEFAULT '',
+  lastupdate DATETIME,
+  lastbroadcast DATETIME,
+  lastarticle BIGINT(20) unsigned DEFAULT '0' NOT NULL,
+  dateadded DATETIME
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
+CREATE UNIQUE INDEX spotnabsources_ix1 ON spotnabsources (username, useremail, usenetgroup);
+
 
 DROP TABLE IF EXISTS tmux;
 CREATE TABLE tmux (
