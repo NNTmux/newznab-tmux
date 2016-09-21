@@ -1079,6 +1079,7 @@ DROP TABLE IF EXISTS user_downloads;
 CREATE TABLE user_downloads (
   id        INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   users_id INT(16)          NOT NULL,
+  hosthash VARCHAR(50)      NOT NULL,
   timestamp DATETIME         NOT NULL,
   PRIMARY KEY (id),
   KEY userid    (users_id),
@@ -1125,6 +1126,7 @@ DROP TABLE IF EXISTS user_requests;
 CREATE TABLE user_requests (
   id        INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   users_id INT(16)          NOT NULL,
+  hosthash VARCHAR(50)      NOT NULL,
   request   VARCHAR(255)     NOT NULL,
   timestamp DATETIME         NOT NULL,
   PRIMARY KEY (id),
