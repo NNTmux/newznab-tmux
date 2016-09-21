@@ -334,7 +334,7 @@ CREATE TABLE gamesinfo
     url VARCHAR(1000),
     platform VARCHAR(255),
     publisher VARCHAR(255),
-    genre_id INT(10),
+    genres_id INT(10),
     esrb VARCHAR(255),
     releasedate DATETIME,
     review VARCHAR(3000),
@@ -1052,7 +1052,6 @@ CREATE TABLE user_roles
     defaultinvites INT(10) unsigned NOT NULL,
     isdefault TINYINT(1) unsigned DEFAULT '0' NOT NULL,
     canpreview TINYINT(1) unsigned DEFAULT '0' NOT NULL,
-    canpre TINYINT(1) unsigned DEFAULT '0' NOT NULL,
     hideads TINYINT(1) unsigned DEFAULT '0' NOT NULL
 )
     ENGINE = MyISAM

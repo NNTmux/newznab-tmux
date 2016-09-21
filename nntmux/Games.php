@@ -128,7 +128,7 @@ class Games
 			sprintf("
 				SELECT gamesinfo.*, genres.title AS genres
 				FROM gamesinfo
-				LEFT OUTER JOIN genres ON genres.id = gamesinfo.genre_id
+				LEFT OUTER JOIN genres ON genres.id = gamesinfo.genres_id
 				WHERE gamesinfo.id = %d",
 				$id
 			)
@@ -151,7 +151,7 @@ class Games
 	{
 		return $this->pdo->query(
 			sprintf(
-				"SELECT gi.*, g.title AS genretitle FROM gamesinfo gi INNER JOIN genres g ON gi.genre_id = g.id ORDER BY createddate DESC %s",
+				"SELECT gi.*, g.title AS genretitle FROM gamesinfo gi INNER JOIN genres g ON gi.genres_id = g.id ORDER BY createddate DESC %s",
 				($start === false ? '' : 'LIMIT ' . $num . ' OFFSET ' . $start)
 			)
 		);
@@ -282,7 +282,7 @@ class Games
 				$orderfield = 'con.releasedate';
 				break;
 			case 'genre':
-				$orderfield = 'con.genre_id';
+				$orderfield = 'con.genres_id';
 				break;
 			case 'size':
 				$orderfield = 'r.size';
@@ -314,7 +314,7 @@ class Games
 
 	public function getBrowseByOptions()
 	{
-		return ['title' => 'title', 'genre' => 'genre_id', 'year' => 'year'];
+		return ['title' => 'title', 'genre' => 'genres_id', 'year' => 'year'];
 	}
 
 	public function getBrowseBy()
@@ -380,7 +380,7 @@ class Games
 			sprintf("
 				UPDATE gamesinfo
 				SET title = %s, asin = %s, url = %s, publisher = %s,
-					releasedate = %s, esrb = %s, cover = %d, trailer = %s, genre_id = %d, updateddate = NOW()
+					releasedate = %s, esrb = %s, cover = %d, trailer = %s, genres_id = %d, updateddate = NOW()
 				WHERE id = %d",
 				$this->pdo->escapeString($title),
 				$this->pdo->escapeString($asin),
@@ -680,7 +680,7 @@ class Games
 			$gamesId = $this->pdo->queryInsert(
 				sprintf("
 					INSERT INTO gamesinfo
-						(title, asin, url, publisher, genre_id, esrb, releasedate, review, cover, backdrop, trailer, classused, createddate, updateddate)
+						(title, asin, url, publisher, genres_id, esrb, releasedate, review, cover, backdrop, trailer, classused, createddate, updateddate)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %d, %d, %s, %s, NOW(), NOW())",
 					$this->pdo->escapeString($con['title']),
 					$this->pdo->escapeString($con['asin']),
@@ -702,7 +702,7 @@ class Games
 				sprintf('
 					UPDATE gamesinfo
 					SET
-						title = %s, asin = %s, url = %s, publisher = %s, genre_id = %s,
+						title = %s, asin = %s, url = %s, publisher = %s, genres_id = %s,
 						esrb = %s, releasedate = %s, review = %s, cover = %d, backdrop = %d, trailer = %s, classused = %s, updateddate = NOW()
 					WHERE id = %d',
 					$this->pdo->escapeString($con['title']),

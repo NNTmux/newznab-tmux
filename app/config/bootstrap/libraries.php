@@ -53,10 +53,6 @@
  */
 define('LITHIUM_APP_PATH', realpath(dirname(dirname(__DIR__))));
 
-if (!defined('NN_ROOT')) {
-	define('NN_ROOT', realpath(dirname(LITHIUM_APP_PATH)) . DS);
-}
-
 /**
  * This is the path to the class libraries used by your application, and must contain a copy of the
  * Lithium core.  By default, this directory is named `libraries`, and resides in the same
@@ -128,11 +124,13 @@ Libraries::add('app', array('default' => true));
 // 	Libraries::add(basename($path), array('path' => $path));
 // }
 
-Libraries::add('nntmux',
-	[
-		'bootstrap'	=> 'bootstrap.php',
-		'path'	=> NN_ROOT . 'nntmux',
-	]);
+if (!defined('NN_INSTALLER') || NN_INSTALLER !== true) {
+	Libraries::add('nntmux',
+		[
+			'bootstrap'	=> 'bootstrap.php',
+			'path'	=> NN_ROOT . 'nntmux',
+		]);
+}
 
 require_once LITHIUM_APP_PATH . DS . 'libraries' . DS . 'autoload.php';
 /**

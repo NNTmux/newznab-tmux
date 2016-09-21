@@ -1,4 +1,4 @@
-[![Code Climate](https://codeclimate.com/github/DariusIII/newznab-tmux/badges/gpa.svg)](https://codeclimate.com/github/DariusIII/newznab-tmux)  [![Build Status](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/badges/build.png?b=dev)](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/build-status/dev) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/badges/quality-score.png?b=dev)](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/?branch=dev)
+[![Code Climate](https://codeclimate.com/github/NNTmux/newznab-tmux/badges/gpa.svg)](https://codeclimate.com/github/NNTmux/newznab-tmux)  [![Build Status](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/build.png?b=dev)](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/build-status/dev) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/quality-score.png?b=dev)](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/?branch=dev)
 
 
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
@@ -8,11 +8,11 @@ I started adapting some of more interesting scripts from nZEDb, but they require
 
 # Steps to have a working tmux install:
 
- CD to the root of your newznab install, ie.  cd /var/www/newznab
+ CD to the root of your newznab install, ie.  cd /var/www/nntmux
  Next steps are very important:
 
  		git init
- 		git remote add origin https://github.com/DariusIII/newznab-tmux.git
+ 		git remote add origin https://github.com/NNTmux/newznab-tmux.git
  		git fetch
  		git reset --hard origin/your_wanted_branch, ie. git reset --hard origin/0.x
  		git checkout -t origin/your_wanted_branch, ie. git checkout -t origin/0.x

@@ -297,7 +297,7 @@ class Music
 				$orderfield = 'm.year';
 				break;
 			case 'genre':
-				$orderfield = 'm.genreid';
+				$orderfield = 'm.genres_id';
 				break;
 			case 'posted':
 			default:
@@ -803,7 +803,7 @@ class Music
 				(
 					SELECT DISTINCT musicgenreid
 					FROM musicinfo
-				) x ON x.genreid = ge.id
+				) x ON x.genres_id = ge.id
 				WHERE ge.type = " . Category::MUSIC_ROOT . "
 				ORDER BY title"
 			);

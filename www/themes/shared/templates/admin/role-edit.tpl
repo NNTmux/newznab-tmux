@@ -46,14 +46,6 @@
 </tr>
 
 <tr>
-	<td>Can Pre:</td>
-	<td>
-		{html_radios id="canpre" name='canpre' values=$yesno_ids output=$yesno_names selected=$role.canpre separator='<br />'}
-		<div class="hint">Whether the role can view pre data</div>
-	</td>
-</tr>
-
-<tr>
 	<td>Hide Ads:</td>
 	<td>
 		{html_radios id="hidetads" name='hidetads' values=$yesno_ids output=$yesno_names selected=$role.hideads separator='<br />'}

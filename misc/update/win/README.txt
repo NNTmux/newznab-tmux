@@ -2,7 +2,7 @@ Inlcuded in this folder are batch files for windows users.
 You MUST set your system path to include the PHP path.
 
 Otherwise at the top of each batch file add the line
-set Path=“C:\yourpathtoPHP\”
+set Path=ï¿½C:\yourpathtoPHP\ï¿½
 
 updatebinaries.bat will execute the updatebinaries.php script.
 updatereleases.bat will execute the updatereleases.php script.
