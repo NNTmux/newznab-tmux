@@ -334,7 +334,7 @@ CREATE TABLE gamesinfo
     url VARCHAR(1000),
     platform VARCHAR(255),
     publisher VARCHAR(255),
-    genre_id INT(10),
+    genres_id INT(10),
     esrb VARCHAR(255),
     releasedate DATETIME,
     review VARCHAR(3000),

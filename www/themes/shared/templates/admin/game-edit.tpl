@@ -52,7 +52,7 @@
 			<td>
 				<select id="genre_list" name="genre" />
 				{foreach $genres as $gen}
-					<option {if $gen.id == $game.genre_id}selected="selected"{/if} value="{$gen.id}">{$gen.title|escape:'htmlall'}</option>
+					<option {if $gen.id == $game.genres_id}selected="selected"{/if} value="{$gen.id}">{$gen.title|escape:'htmlall'}</option>
 				{/foreach}
 				</select>
 			</td>

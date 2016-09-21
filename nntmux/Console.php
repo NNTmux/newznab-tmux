@@ -106,7 +106,7 @@ class Console
 	{
 		return $this->pdo->queryOneRow(
 			sprintf(
-				"SELECT consoleinfo.*, genres.title AS genres FROM consoleinfo LEFT OUTER JOIN genres ON genres.id = consoleinfo.genreid WHERE consoleinfo.id = %d ",
+				"SELECT consoleinfo.*, genres.title AS genres FROM consoleinfo LEFT OUTER JOIN genres ON genres.id = consoleinfo.genres_id WHERE consoleinfo.id = %d ",
 				$id
 			)
 		);
@@ -240,7 +240,7 @@ class Console
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				INNER JOIN consoleinfo con ON con.id = r.consoleinfo_id
-				INNER JOIN genres ON con.genreid = genres.id
+				INNER JOIN genres ON con.genres_id = genres.id
 				WHERE con.id IN (%s)
 				AND r.id IN (%s)
 				AND %s
@@ -274,7 +274,7 @@ class Console
 				$orderfield = 'con.releasedate';
 				break;
 			case 'genre':
-				$orderfield = 'con.genreid';
+				$orderfield = 'con.genres_id';
 				break;
 			case 'size':
 				$orderfield = 'r.size';
@@ -301,7 +301,7 @@ class Console
 
 	public function getBrowseByOptions()
 	{
-		return array('platform' => 'platform', 'title' => 'title', 'genre' => 'genreid');
+		return array('platform' => 'platform', 'title' => 'title', 'genre' => 'genres_id');
 	}
 
 	public function getBrowseBy()
@@ -344,7 +344,7 @@ class Console
 				UPDATE consoleinfo
 				SET
 					title = %s, asin = %s, url = %s, salesrank = %s, platform = %s, publisher = %s,
-					releasedate= %s, esrb = %s, cover = %d, genreid = %d, review = %s, updateddate = NOW()
+					releasedate= %s, esrb = %s, cover = %d, genres_id = %d, review = %s, updateddate = NOW()
 				WHERE id = %d",
 				$this->pdo->escapeString($title),
 				$this->pdo->escapeString($asin),
@@ -679,7 +679,7 @@ class Console
 		if ($check === false) {
 			$consoleId = $this->pdo->queryInsert(
 				sprintf(
-					"INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genreid, esrb, releasedate, review, cover, createddate, updateddate)
+					"INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genres_id, esrb, releasedate, review, cover, createddate, updateddate)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, NOW(), NOW())",
 					$this->pdo->escapeString($con['title']),
 					$this->pdo->escapeString($con['asin']),
