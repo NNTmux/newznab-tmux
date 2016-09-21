@@ -437,8 +437,8 @@ CREATE TABLE logging (
   AUTO_INCREMENT = 1;
 
 
-DROP TABLE IF EXISTS menu_items;
-CREATE TABLE menu_items (
+DROP TABLE IF EXISTS menu;
+CREATE TABLE menu (
   id        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   href      VARCHAR(2000)    NOT NULL DEFAULT '',
   title     VARCHAR(2000)    NOT NULL DEFAULT '',
@@ -531,8 +531,8 @@ CREATE TABLE musicinfo (
   AUTO_INCREMENT = 1;
 
 
-DROP TABLE IF EXISTS page_contents;
-CREATE TABLE page_contents (
+DROP TABLE IF EXISTS content;
+CREATE TABLE content (
   id              INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   title           VARCHAR(255)    NOT NULL,
   url             VARCHAR(2000)   NULL,
