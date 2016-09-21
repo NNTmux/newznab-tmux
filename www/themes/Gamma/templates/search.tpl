@@ -195,7 +195,7 @@
 				{elseif $result.passwordstatus == 1}
 				<i class="fa fa-lock"></i>
 				{/if}
-				{if $userdata.canpre == 1 && isset($result.nuketype) && $result.nuketype != ''}
+				{if isset($result.nuketype) && $result.nuketype != ''}
 				&nbsp;<img title="{$result.nuketype}" src="{$smarty.const.WWW_THEMES}/shared/images/icons/nuke.png" width="10" height="10" alt="{$result.nuketype}" />
 				{/if}
 				<div class="resextra">

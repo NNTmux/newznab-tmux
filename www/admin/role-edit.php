@@ -20,7 +20,6 @@ switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
 			'downloadrequests' => '',
 			'defaultinvites'   => '',
 			'canpreview'       => 0,
-			'canpre'           => 0,
 			'hideads'          => 0
 		];
 		$page->smarty->assign('role', $role);
@@ -29,12 +28,12 @@ switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
 	case 'submit':
 		if ($_POST["id"] == "") {
 			$ret = $page->users->addRole($_POST['name'], $_POST['apirequests'], $_POST['downloadrequests'],
-				$_POST['defaultinvites'], $_POST['canpreview'], $_POST['canpre'], $_POST['hideads']
+				$_POST['defaultinvites'], $_POST['canpreview'], $_POST['hideads']
 			);
 			header("Location:" . WWW_TOP . "/role-list.php");
 		} else {
 			$ret = $page->users->updateRole($_POST['id'], $_POST['name'], $_POST['apirequests'],
-				$_POST['downloadrequests'], $_POST['defaultinvites'], $_POST['isdefault'], $_POST['canpreview'], $_POST['canpre'], $_POST['hideads']
+				$_POST['downloadrequests'], $_POST['defaultinvites'], $_POST['isdefault'], $_POST['canpreview'], $_POST['hideads']
 			);
 			header("Location:" . WWW_TOP . "/role-list.php");
 		}

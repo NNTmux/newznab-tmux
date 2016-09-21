@@ -1052,7 +1052,6 @@ CREATE TABLE user_roles
     defaultinvites INT(10) unsigned NOT NULL,
     isdefault TINYINT(1) unsigned DEFAULT '0' NOT NULL,
     canpreview TINYINT(1) unsigned DEFAULT '0' NOT NULL,
-    canpre TINYINT(1) unsigned DEFAULT '0' NOT NULL,
     hideads TINYINT(1) unsigned DEFAULT '0' NOT NULL
 )
     ENGINE = MyISAM
