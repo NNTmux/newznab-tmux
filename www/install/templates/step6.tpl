@@ -20,14 +20,6 @@
 				<td><input autocomplete="off" type="text" name="user" id="user" value="{$cfg->ADMIN_USER}" /></td>
 			</tr>
 			<tr class="">
-				<td><label for="user">Real First Name(Optional):</label></td>
-				<td><input autocomplete="off" type="text" name="fname" id="fname" value="{$cfg->ADMIN_FNAME}" /></td>
-			</tr>
-			<tr class="alt">
-				<td><label for="user">Real Last Name(Optional):</label></td>
-				<td><input autocomplete="off" type="text" name="lname" id="lname" value="{$cfg->ADMIN_LNAME}" /></td>
-			</tr>
-			<tr class="">
 				<td><label for="pass">Password:</label></td>
 				<td><input autocomplete="off" type="text" name="pass" id="pass" value="{$cfg->ADMIN_PASS}" /></td>
 			</tr>
