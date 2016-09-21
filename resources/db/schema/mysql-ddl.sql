@@ -736,6 +736,7 @@ CREATE TABLE release_comments (
   id          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   releases_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to releases.id',
   text        VARCHAR(2000)    NOT NULL DEFAULT '',
+  isvisible   TINYINT(1)       NOT NULL DEFAULT '1',
   text_hash   VARCHAR(32)      NOT NULL DEFAULT '',
   username    VARCHAR(255)     NOT NULL DEFAULT '',
   users_id     INT(11) UNSIGNED NOT NULL,
