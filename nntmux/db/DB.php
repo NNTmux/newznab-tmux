@@ -263,7 +263,7 @@ class DB extends \PDO
 	}
 
 	/**
-	 * Init \PDO instance.
+	 * Init PDO instance.
 	 */
 	private function initialiseDatabase()
 	{
@@ -316,7 +316,7 @@ class DB extends \PDO
 			$this->pdo->query("USE {$this->opts['dbname']}");
 		}
 
-		// In case \PDO is not set to produce exceptions (PHP's default behaviour).
+		// In case PDO is not set to produce exceptions (PHP's default behaviour).
 		if ($this->pdo === false) {
 			$this->echoError(
 				"Unable to create connection to the Database!",
@@ -329,7 +329,6 @@ class DB extends \PDO
 		// For backwards compatibility, no need for a patch.
 		$this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
 		$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-		$this->pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 	}
 
 	/**
