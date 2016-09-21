@@ -1046,6 +1046,7 @@ CREATE TABLE users (
   nzbgetusername VARCHAR(255)     NULL     DEFAULT NULL,
   nzbgetpassword VARCHAR(255)     NULL     DEFAULT NULL,
   userseed       VARCHAR(50)      NOT NULL,
+  notes          VARCHAR(255)     NOT NULL,
   cp_url         VARCHAR(255)     NULL     DEFAULT NULL,
   cp_api         VARCHAR(255)     NULL     DEFAULT NULL,
   style          VARCHAR(255)     NULL     DEFAULT NULL,
