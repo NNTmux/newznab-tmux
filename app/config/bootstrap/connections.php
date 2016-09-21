@@ -111,7 +111,7 @@ if (file_exists($config) && !defined('NN_INSTALLER')) {
 		);
 	}
 } else {
-	/** throw new ErrorException("Couldn't open newznab-tmux configuration file!"); */
+	/** throw new ErrorException("Couldn't open NNTmux's configuration file!"); */
 	Connections::add('default',
 		[
 			'type'     => 'database',
@@ -120,7 +120,7 @@ if (file_exists($config) && !defined('NN_INSTALLER')) {
 			'port'     => '3306',
 			'login'    => 'root',
 			'password' => 'root_pass',
-			'database' => 'newznab',
+			'database' => 'nntmux',
 			'encoding' => 'UTF-8'
 		]
 	);
