@@ -1028,6 +1028,7 @@ CREATE TABLE users (
   cp_url         VARCHAR(255)     NULL     DEFAULT NULL,
   cp_api         VARCHAR(255)     NULL     DEFAULT NULL,
   style          VARCHAR(255)     NULL     DEFAULT NULL,
+  rolechangedate DATETIME         NULL     DEFAULT NULL COMMENT 'When does the role expire',
   PRIMARY KEY (id),
   INDEX ix_role (role)
 )
