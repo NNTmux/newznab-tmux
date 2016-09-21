@@ -1,23 +1,7 @@
 {
   "authors": [
     {
-      "name": "DariusIII",
-      "email": "dkrisan@gmail.com",
-      "role": "developer"
-    }
-  ],
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/kbjr/Git.php"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/niel/li3_docs"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/unionofrad/manual"
+      "name": "NNTmux Team"
     }
   ],
   "autoload": {
@@ -41,17 +25,42 @@
   "description": "A Usenet Indexer",
   "extra": {
     "branch-alias": {
-      "dev-master": "0.x-dev"
+      "dev-dev": "0.x-dev"
     },
     "asset-installer-paths": {
       "npm-asset-library": "www/themes/shared/assets",
       "bower-asset-library": "www/themes/shared/assets"
     }
   },
+  "keywords": [
+    "NNTmux",
+    "usenet",
+    "indexer",
+    "lithium",
+    "li3"
+  ],
   "license": "GPL-3.0",
-  "name": "DariusIII/newznab-tmux",
+  "name": "nntmux/newznab-tmux",
   "non-feature-branches": [
     "latest-.*"
+  ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/kbjr/Git.php"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/niel/li3_docs"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/niel/li3_quality"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/unionofrad/manual"
+    }
   ],
   "require": {
     "php": ">=5.6.9",
@@ -117,16 +126,15 @@
   },
 
   "require-dev": {
-    "unionofrad/li3_docs": "1.1.x-dev",
-    "unionofrad/manual": "1.1.x-dev",
-    "unionofrad/li3_quality": "1.1.x-dev"
+    "unionofrad/manual": "1.1.x-dev"
   },
 
   "scripts": {
   },
   "suggest": {
     "ext-simple_php_yenc_decode": "Greatly improves yEnc decoding speed in PHP 5.x",
-    "ext-xdebug": "For developement work"
+    "ext-xdebug": "For developement work",
+    "ext-yenc": "PHP7 and PHP5 yEnc decoding extension"
   },
   "type": "project"
 }
