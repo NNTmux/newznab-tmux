@@ -791,14 +791,14 @@ sub make_short
 #
 # The format_u_time sub simply beautifies long_query_time.
 
-sub format_u_time  # format microsecond (µ) time value
+sub format_u_time  # format microsecond (ï¿½) time value
 {
-   # 0.000000 - 0.000999 = 0 - 999 µ
+   # 0.000000 - 0.000999 = 0 - 999 ï¿½
    # 0.001000 - 0.999999 = 1 ms - 999.999 ms
    # 1.000000 - n.nnnnnn = 1 s - n.nnnnn s
 
    my $t = shift;
-   my $f;  # formatted µ time
+   my $f;  # formatted ï¿½ time
    my $u = chr(($WIN ? 230 : 181));
 
    $t = 0 if $t < 0;
