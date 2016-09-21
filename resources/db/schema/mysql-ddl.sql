@@ -185,7 +185,8 @@ CREATE TABLE categories (
   status         INT              NOT NULL DEFAULT '1',
   description    VARCHAR(255)     NULL,
   disablepreview TINYINT(1)       NOT NULL DEFAULT '0',
-  minsize        BIGINT UNSIGNED  NOT NULL DEFAULT '0',
+  minsizetoformrelease BIGINT UNSIGNED NOT NULL DEFAULT '0',
+  maxsizetoformrelease BIGINT UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
   INDEX ix_categories_status   (status),
   INDEX ix_categories_parentid (parentid)
