@@ -744,6 +744,7 @@ CREATE TABLE release_comments (
   shared      TINYINT(1)       NOT NULL DEFAULT '0',
   shareid     VARCHAR(40)      NOT NULL DEFAULT '',
   siteid      VARCHAR(40)      NOT NULL DEFAULT '',
+  sourceid    BIGINT(20)       UNSIGNED,
   nzb_guid    BINARY(16)       NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
   PRIMARY KEY (id),
   UNIQUE INDEX ix_release_comments_hash_releases_id(text_hash, releases_id),
