@@ -20,7 +20,7 @@
  */
 namespace nntmux\db\populate;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 class PopulateTitles
@@ -67,7 +67,7 @@ class PopulateTitles
 		$this->mainTable = $options['main-table'];
 		$this->tempTable = $options['main-table'] . '_tmp';
 
-		if (isset($options['pdo']) && $options['pdo'] instanceof Settings) {
+		if (isset($options['pdo']) && $options['pdo'] instanceof DB) {
 			$this->pdo = $options['pdo'];
 		}
 	}
@@ -123,7 +123,7 @@ class PopulateTitles
 	protected function pdo()
 	{
 		if ($this->pdo === null) {
-			$this->pdo = new Settings();
+			$this->pdo = new DB();
 		}
 		return $this->pdo;
 	}

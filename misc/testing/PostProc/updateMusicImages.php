@@ -1,10 +1,10 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 
-$pdo = new Settings();
+$pdo = new DB();
 $covers = $updated = $deleted = 0;
 
 if ($argc == 1 || $argv[1] != 'true') {

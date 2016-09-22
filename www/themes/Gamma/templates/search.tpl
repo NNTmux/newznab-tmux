@@ -135,7 +135,6 @@
 						</td>
 						<td width="33%">
 							<div class="pull-right">
-							<a class="btn btn-small" title="All releases in your shows as an RSS feed" href="{$smarty.const.WWW_TOP}/rss?t={$category[0]}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}&amp;uFilter={$search|escape:'html'}">Rss <i class="fa fa-rss"></i></a>
 							{if isset($isadmin)}
 									Admin:
 									<div class="btn-group">
@@ -196,7 +195,7 @@
 				{elseif $result.passwordstatus == 1}
 				<i class="fa fa-lock"></i>
 				{/if}
-				{if $userdata.canpre == 1 && isset($result.nuketype) && $result.nuketype != ''}
+				{if isset($result.nuketype) && $result.nuketype != ''}
 				&nbsp;<img title="{$result.nuketype}" src="{$smarty.const.WWW_THEMES}/shared/images/icons/nuke.png" width="10" height="10" alt="{$result.nuketype}" />
 				{/if}
 				<div class="resextra">

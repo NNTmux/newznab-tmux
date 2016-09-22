@@ -1,7 +1,7 @@
 <?php
 namespace nntmux\libraries;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 
 /**
@@ -17,7 +17,7 @@ class ForkingImportNZB extends Forking
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-			'settings' => new Settings(),
+			'settings' => new DB(),
 		];
 		$options += $defaults;
 

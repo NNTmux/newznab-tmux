@@ -5,10 +5,10 @@ use nntmux\ConsoleTools;
 use nntmux\NZB;
 use nntmux\ReleaseImage;
 use nntmux\Releases;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
-$pdo = new Settings();
+$pdo = new DB();
 
 $dir = NN_RES . "movednzbs/";
 

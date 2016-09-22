@@ -486,50 +486,16 @@ class TmuxRun extends Tmux
 
 	protected function _runUpdateTv(&$runVar)
 	{
-		switch (true) {
-			case ($runVar['settings']['update_tv'] == 1 && (time() - $runVar['timers']['timer4'] >= $runVar['settings']['tv_timer'])) || ($runVar['counts']['iterations'] == 1):
-				$log = $this->writelog($runVar['panes']['one'][3]);
-				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.2 ' \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/update_theaters.php $log; date +\"{$this->_dateFormat}\"' 2>&1 1> /dev/null"
-				);
-				$runVar['timers']['timer4'] = time();
-				break;
-			case $runVar['settings']['update_tv'] == 1:
-				$run_time = $this->relativeTime($runVar['settings']['tv_timer'] + $runVar['timers']['timer4']);
-				$color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.2 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][2]} will run in T[ $run_time]\"' 2>&1 1> /dev/null");
-				break;
-			default:
-				$color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-				shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.2 \
-					'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][2]} has been disabled/terminated by Update TV/Theater\"'");
-		}
+		$color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
+		shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.2 \
+		'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][2]} has been disabled/terminated by Update TV/Theater\"'");
 	}
 
 	protected function _runUpdateTvFull(&$runVar)
 	{
-		if (($runVar['settings']['update_tv'] == 1) && ((time() - $runVar['timers']['timer4'] >= $runVar['settings']['tv_timer']) || ($runVar['counts']['iterations'] == 1))) {
-			$log = $this->writelog($runVar['panes']['one'][0]);
-			shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.0 ' \
-				{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/update_theaters.php $log; \
-				{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/PostProc/populate_tvrage.php true $log; \
-				{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/update_tvschedule.php $log; \
-				{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/PostProc/updateTvRage.php update $log; date +\"{$this->_dateFormat}\"' 2>&1 1> /dev/null"
-			);
-			$runVar['timers']['timer4'] = time();
-
-		} else if ($runVar['settings']['update_tv'] == 1) {
-			$run_time = $this->relativeTime($runVar['settings']['tv_timer'] + $runVar['timers']['timer4']);
-			$color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-			shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.0 \
-				'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][0]} will run in T[ $run_time]\"' 2>&1 1> /dev/null");
-
-		} else {
-			$color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
-			shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.0 \
-				'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][0]} has been disabled/terminated by Update TV/Theater\"'");
-		}
+		$color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
+		shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.0 \
+			'echo \"\033[38;5;${color}m\n{$runVar['panes']['one'][0]} has been disabled/terminated by Update TV/Theater\"'");
 	}
 
 	protected function _runMainNon(&$runVar)

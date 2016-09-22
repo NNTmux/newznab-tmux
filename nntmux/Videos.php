@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\Category;
 
 /**
@@ -21,7 +21,7 @@ Class Videos
 			'Settings'     => null,
 		];
 		$options += $defaults;
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->catWhere = "r.categories_id BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER;
 	}
 

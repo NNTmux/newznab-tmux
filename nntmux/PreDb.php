@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 /**
  * Class for inserting names/categories etc from PreDB sources into the DB,
@@ -30,7 +30,7 @@ Class PreDb
 	protected $echooutput;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var \nntmux\db\DB
 	 */
 	protected $pdo;
 
@@ -48,7 +48,7 @@ Class PreDb
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 	}
 
 	/**

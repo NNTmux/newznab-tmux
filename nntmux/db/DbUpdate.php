@@ -21,12 +21,15 @@
 namespace nntmux\db;
 
 use nntmux\ColorCLI;
+use nntmux\db\Settings;
 use nntmux\utility\Git;
 use nntmux\utility\Utility;
 
 
 class DbUpdate
 {
+	public $backedup;
+
 	/**
 	 * @var \nntmux\db\Settings    Instance variable for DB object.
 	 */
@@ -62,25 +65,23 @@ class DbUpdate
 
 	public function __construct(array $options = [])
 	{
-		$defaults = [
+		$options += [
 			'backup' => true,
 			'db'     => null,
 			'git'    => new Git(),
 			'logger' => new ColorCLI(),
 		];
-		$options += $defaults;
-		unset($defaults);
 
 		$this->backup = $options['backup'];
-		$this->pdo    = (($options['db'] instanceof Settings) ? $options['db'] : new Settings());
 		$this->git    = $options['git'];
 		$this->log    = $options['logger'];
+		// Must be DB not Settings because the Settings table may not exist yet.
+		$this->pdo = (($options['db'] instanceof DB) ? $options['db'] : new DB());
+		if ($this->pdo instanceof  Settings) {
+			$this->settings &= $this->pdo;
+		}
 
-		// If $pdo is an instance of Settings, reuse it to save resources.
-		// This is for unconverted scripts that still use $db->settings instead of the $db->pdo property.
-		$this->settings =& $this->pdo;
-
-		$this->_DbSystem = strtolower($this->pdo->DbSystem());
+		$this->_DbSystem = strtolower($this->pdo->dbSystem());
 	}
 
 	public function loadTables(array $options = [])
@@ -99,7 +100,7 @@ class DbUpdate
 		natsort($files);
 		$local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
 		$sql = 'LOAD DATA ' .
-			$local . 'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" OPTIONALLY ENCLOSED BY "\"" LINES TERMINATED BY "\r\n" IGNORE 1 LINES (%s)';
+			$local . 'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" OPTIONALLY ENCLOSED BY "\"" LINES TERMINATED BY "\n" IGNORE 1 LINES (%s)';
 		foreach ($files as $file) {
 			if ($show === true) {
 				echo "File: $file\n";
@@ -160,6 +161,8 @@ class DbUpdate
 		];
 		$options += $defaults;
 
+		$this->initSettings();
+
 		$this->processPatches(['safe' => $options['safe']]); // Make sure we are completely up to date!
 
 		echo $this->log->primaryOver('Looking for new patches...');
@@ -179,7 +182,6 @@ class DbUpdate
 					echo $this->log->header('Processing patch file: ' . $file);
 					$this->splitSQL($file, ['local' => $local, 'data' => $options['data']]);
 					$current = (integer)$this->settings->getSetting('sqlpatch');
-					var_dump($current);
 					$current++;
 					$this->pdo->queryExec("UPDATE settings SET value = '$current' WHERE setting = 'sqlpatch';");
 					$newName = $matches['drive'] . $matches['path'] .
@@ -187,7 +189,7 @@ class DbUpdate
 						$matches['table'] . '.sql';
 					rename($matches[0], $newName);
 					$this->git->add($newName);
-					if ($this->git->isCommited($this->git->getBranch() . ':' . str_replace(NN_ROOT, '',$matches[0]))) {
+					if ($this->git->isCommited($this->git->getBranch() . ':' . str_replace(NN_ROOT, '', $matches[0]))) {
 						$this->git->add(" -u {$matches[0]}"); // remove old filename from the index.
 					}
 				}
@@ -206,6 +208,8 @@ class DbUpdate
 			'safe'	=> true,
 		];
 		$options += $defaults;
+
+		$this->initSettings();
 
 		$currentVersion = $this->settings->getSetting(['setting' => 'sqlpatch']);
 		if (!is_numeric($currentVersion)) {
@@ -227,7 +231,8 @@ class DbUpdate
 				if (preg_match($options['regex'], str_replace('\\', '/', $file), $matches)) {
 					$patch = (integer)$matches['patch'];
 					$setPatch = true;
-				} else if (preg_match('/UPDATE `?site`? SET `?value`? = \'?(?P<patch>\d+)\'? WHERE `?setting`? = \'sqlpatch\'/i',
+				} else if (preg_match(
+					'/UPDATE `?site`? SET `?value`? = \'?(?P<patch>\d+)\'? WHERE `?setting`? = \'sqlpatch\'/i',
 					$patch,
 					$matches)
 				) {
@@ -235,7 +240,6 @@ class DbUpdate
 				} else {
 					throw new \RuntimeException("No patch information available, stopping!!");
 				}
-
 				if ($patch > $currentVersion) {
 					echo $this->log->header('Processing patch file: ' . $file);
 					if ($options['safe'] && !$this->backedUp) {
@@ -438,8 +442,6 @@ class DbUpdate
 		}
 	}
 
-	public $backedup;
-
 	protected function _backupDb()
 	{
 		if (Utility::hasCommand("php5")) {
@@ -452,4 +454,13 @@ class DbUpdate
 			'dump_tables.php db dump');
 		$this->backedup = true;
 	}
+
+	protected function initSettings()
+	{
+		if (!($this->settings instanceof Settings)) {
+			$this->settings = new Settings();
+		}
+	}
 }
+
+?>

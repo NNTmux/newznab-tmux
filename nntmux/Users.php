@@ -225,11 +225,17 @@ class Users
 			case 'apiaccess':
 				$orderfield = 'apiaccess';
 				break;
+			case 'apirequests':
+				$orderfield = 'apirequests';
+				break;
 			case 'grabs':
 				$orderfield = 'grabs';
 				break;
 			case 'role':
 				$orderfield = 'role';
+				break;
+			case 'rolechangedate':
+				$orderfield = 'rolechangedate';
 				break;
 			default:
 				$orderfield = 'username';
@@ -237,7 +243,7 @@ class Users
 		}
 		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'DESC';
 
-		return array($orderfield, $ordersort);
+		return [$orderfield, $ordersort];
 	}
 
 	public function getCount()
@@ -452,7 +458,7 @@ class Users
 	public function getById($id)
 	{
 
-		$sql = sprintf("SELECT users.*, user_roles.name as rolename, user_roles.hideads, user_roles.canpreview, user_roles.canpre, user_roles.apirequests, user_roles.downloadrequests, NOW() as now FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE users.id = %d ", $id);
+		$sql = sprintf("SELECT users.*, user_roles.name as rolename, user_roles.hideads, user_roles.canpreview, user_roles.apirequests, user_roles.downloadrequests, NOW() as now FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE users.id = %d ", $id);
 
 		return $this->pdo->queryOneRow($sql);
 	}
@@ -466,7 +472,7 @@ class Users
 
 	public function getBrowseOrdering()
 	{
-		return array('username_asc', 'username_desc', 'email_asc', 'email_desc', 'host_asc', 'host_desc', 'createddate_asc', 'createddate_desc', 'lastlogin_asc', 'lastlogin_desc', 'apiaccess_asc', 'apiaccess_desc', 'grabs_asc', 'grabs_desc', 'role_asc', 'role_desc');
+		return array('username_asc', 'username_desc', 'email_asc', 'email_desc', 'host_asc', 'host_desc', 'createddate_asc', 'createddate_desc', 'lastlogin_asc', 'lastlogin_desc', 'apiaccess_asc', 'apiaccess_desc', 'apirequets_asc', 'apirequests_desc', 'grabs_asc', 'grabs_desc', 'role_asc', 'role_desc', 'rolechangedate_asc', 'rolechangedate_desc');
 	}
 
 	public function isDisabled($username)
@@ -999,19 +1005,19 @@ class Users
 		return $this->pdo->queryOneRow($sql);
 	}
 
-	public function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $canpre, $hideads)
+	public function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $hideads)
 	{
-		$sql = sprintf("INSERT INTO user_roles (name, apirequests, downloadrequests, defaultinvites, canpreview, canpre, hideads) VALUES (%s, %d, %d, %d, %d, %d)", $this->pdo->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $canpreview, $canpre, $hideads);
+		$sql = sprintf("INSERT INTO user_roles (name, apirequests, downloadrequests, defaultinvites, canpreview, hideads) VALUES (%s, %d, %d, %d, %d, %d)", $this->pdo->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $canpreview, $hideads);
 
 		return $this->pdo->queryInsert($sql);
 	}
 
-	public function updateRole($id, $name, $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads)
+	public function updateRole($id, $name, $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $hideads)
 	{
 		if ($isdefault == 1) {
 			$this->pdo->queryExec("UPDATE user_roles SET isdefault=0");
 		}
-		return $this->pdo->queryExec(sprintf("UPDATE user_roles SET name=%s, apirequests=%d, downloadrequests=%d, defaultinvites=%d, isdefault=%d, canpreview=%d, canpre=%d, hideads=%d WHERE id=%d", $this->pdo->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads, $id));
+		return $this->pdo->queryExec(sprintf("UPDATE user_roles SET name=%s, apirequests=%d, downloadrequests=%d, defaultinvites=%d, isdefault=%d, canpreview=%d, hideads=%d WHERE id=%d", $this->pdo->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $hideads, $id));
 	}
 
 	public function deleteRole($id)

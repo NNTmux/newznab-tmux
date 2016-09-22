@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 class Genres
 {
@@ -27,7 +27,7 @@ class Genres
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 	}
 
 	public function getGenres($type = '', $activeonly = false)
@@ -47,20 +47,20 @@ class Genres
 						SELECT g.*
 						FROM genres g
 						INNER JOIN
-							(SELECT DISTINCT genreID FROM musicinfo) x
-							ON x.genreID = g.id %1\$s
+							(SELECT DISTINCT genres_id FROM musicinfo) x
+							ON x.genres_id = g.id %1\$s
 						UNION
 						SELECT g.*
 						FROM genres g
 						INNER JOIN
-							(SELECT DISTINCT genreID FROM consoleinfo) x
-							ON x.genreID = g.id %1\$s
+							(SELECT DISTINCT genres_id FROM consoleinfo) x
+							ON x.genres_id = g.id %1\$s
 						UNION
 						SELECT g.*
 						FROM genres g
 						INNER JOIN
-							(SELECT DISTINCT genre_id FROM gamesinfo) x
-							ON x.genre_id = g.id %1\$s
+							(SELECT DISTINCT genres_id FROM gamesinfo) x
+							ON x.genres_id = g.id %1\$s
 							ORDER BY title",
 				$typesql
 			);
@@ -91,20 +91,20 @@ class Genres
 						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
-							(SELECT DISTINCT genreid FROM musicinfo) x
-							ON x.genreid = g.id %1\$s
+							(SELECT DISTINCT genres_id FROM musicinfo) x
+							ON x.genres_id = g.id %1\$s
 						+
 						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
-							(SELECT DISTINCT genreid FROM consoleinfo) y
-							ON y.genreid = g.id %1\$s
+							(SELECT DISTINCT genres_id FROM consoleinfo) y
+							ON y.genres_id = g.id %1\$s
 						+
 						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
-							(SELECT DISTINCT genre_id FROM gamesinfo) x
-							ON x.genre_id = g.id %1\$s",
+							(SELECT DISTINCT genres_id FROM gamesinfo) x
+							ON x.genres_id = g.id %1\$s",
 				$typesql
 			);
 		else

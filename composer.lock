@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ca7ad8fd0c966be1da9fdf592384d63b",
-    "content-hash": "80a7526b6289810ef301eb90c55703cb",
+    "hash": "e49235704ac34230df713c01ce5ec054",
+    "content-hash": "f5ced3c2d4e75d8ebeef1d593c58a653",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -194,6 +194,35 @@
                 "mobile-first",
                 "responsive",
                 "web"
+            ]
+        },
+        {
+            "name": "bower-asset/bootstrap-datepicker",
+            "version": "v1.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eternicode/bootstrap-datepicker.git",
+                "reference": "42940960ffaf6c727c9f2d64a6175be87516986e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eternicode/bootstrap-datepicker/zipball/42940960ffaf6c727c9f2d64a6175be87516986e",
+                "reference": "42940960ffaf6c727c9f2d64a6175be87516986e",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.7.1"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "dist/css/bootstrap-datepicker3.css",
+                    "dist/js/bootstrap-datepicker.min.js"
+                ],
+                "bower-asset-ignore": []
+            },
+            "license": [
+                "Apache-2.0"
             ]
         },
         {
@@ -910,17 +939,44 @@
             ]
         },
         {
-            "name": "composer/installers",
-            "version": "v1.1.0",
+            "name": "bower-asset/tinymce-builded",
+            "version": "4.4.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/composer/installers.git",
-                "reference": "a3595c5272a6f247228abb20076ed27321e4aae9"
+                "url": "https://github.com/artursmirnov/tinymce_builded.git",
+                "reference": "b6c9e915a1f0e415725c7cad901165f016eb58f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/a3595c5272a6f247228abb20076ed27321e4aae9",
-                "reference": "a3595c5272a6f247228abb20076ed27321e4aae9",
+                "url": "https://api.github.com/repos/artursmirnov/tinymce_builded/zipball/b6c9e915a1f0e415725c7cad901165f016eb58f0",
+                "reference": "b6c9e915a1f0e415725c7cad901165f016eb58f0",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "license": [
+                "GNU / Lesser GPL"
+            ],
+            "description": "Builded version of TinyMCE rich editor",
+            "keywords": [
+                "builded",
+                "editor",
+                "rich",
+                "tinymce",
+                "wysiwyg"
+            ]
+        },
+        {
+            "name": "composer/installers",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/installers.git",
+                "reference": "d78064c68299743e0161004f2de3a0204e33b804"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/installers/zipball/d78064c68299743e0161004f2de3a0204e33b804",
+                "reference": "d78064c68299743e0161004f2de3a0204e33b804",
                 "shasum": ""
             },
             "require": {
@@ -967,6 +1023,7 @@
                 "MODX Evo",
                 "Mautic",
                 "OXID",
+                "Plentymarkets",
                 "RadPHP",
                 "SMF",
                 "Thelia",
@@ -974,9 +1031,11 @@
                 "agl",
                 "aimeos",
                 "annotatecms",
+                "attogram",
                 "bitrix",
                 "cakephp",
                 "chef",
+                "cockpit",
                 "codeigniter",
                 "concrete5",
                 "croogo",
@@ -1000,16 +1059,18 @@
                 "piwik",
                 "ppi",
                 "puppet",
+                "reindex",
                 "roundcube",
                 "shopware",
                 "silverstripe",
                 "symfony",
                 "typo3",
                 "wordpress",
+                "yawik",
                 "zend",
                 "zikula"
             ],
-            "time": "2016-07-05 06:18:20"
+            "time": "2016-08-13 20:53:52"
         },
         {
             "name": "dariusiii/rarinfo",
@@ -1017,12 +1078,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "86cf91a95da48b5b104d375f1e5c5c7fae42d46e"
+                "reference": "69ffe82e9cee2d37821741b554c90755b0b37ad1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/86cf91a95da48b5b104d375f1e5c5c7fae42d46e",
-                "reference": "86cf91a95da48b5b104d375f1e5c5c7fae42d46e",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/69ffe82e9cee2d37821741b554c90755b0b37ad1",
+                "reference": "69ffe82e9cee2d37821741b554c90755b0b37ad1",
                 "shasum": ""
             },
             "require": {
@@ -1056,7 +1117,7 @@
                 }
             ],
             "description": "PHP archive reader helper class",
-            "time": "2016-07-30 16:27:56"
+            "time": "2016-09-12 12:49:10"
         },
         {
             "name": "exeu/apai-io",
@@ -1464,16 +1525,16 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.29",
+            "version": "v3.1.30",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarty-php/smarty.git",
-                "reference": "35480f10e7ce9b0fdaf23d3799d7b79463919b1e"
+                "reference": "ed2b7f1146cfda13df1eea8a5f707a1b771b6e7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/35480f10e7ce9b0fdaf23d3799d7b79463919b1e",
-                "reference": "35480f10e7ce9b0fdaf23d3799d7b79463919b1e",
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/ed2b7f1146cfda13df1eea8a5f707a1b771b6e7e",
+                "reference": "ed2b7f1146cfda13df1eea8a5f707a1b771b6e7e",
                 "shasum": ""
             },
             "require": {
@@ -1515,20 +1576,20 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2015-12-21 01:57:06"
+            "time": "2016-08-07 18:46:49"
         },
         {
             "name": "unionofrad/lithium",
-            "version": "1.1.x-dev",
+            "version": "1.2.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "cf32a8053257a2f19b2964178a5db6dad8825d3c"
+                "reference": "49d2d46a63d6f2a94c28e392ee67b150aed4d524"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/cf32a8053257a2f19b2964178a5db6dad8825d3c",
-                "reference": "cf32a8053257a2f19b2964178a5db6dad8825d3c",
+                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/49d2d46a63d6f2a94c28e392ee67b150aed4d524",
+                "reference": "49d2d46a63d6f2a94c28e392ee67b150aed4d524",
                 "shasum": ""
             },
             "require": {
@@ -1561,161 +1622,10 @@
                 "li3",
                 "lithium"
             ],
-            "time": "2016-07-22 08:23:07"
+            "time": "2016-09-19 11:17:21"
         }
     ],
     "packages-dev": [
-        {
-            "name": "cebe/markdown",
-            "version": "1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cebe/markdown.git",
-                "reference": "54a2c49de31cc44e864ebf0500a35ef21d0010b2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cebe/markdown/zipball/54a2c49de31cc44e864ebf0500a35ef21d0010b2",
-                "reference": "54a2c49de31cc44e864ebf0500a35ef21d0010b2",
-                "shasum": ""
-            },
-            "require": {
-                "lib-pcre": "*",
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "cebe/indent": "*",
-                "facebook/xhprof": "*@dev",
-                "phpunit/phpunit": "4.1.*"
-            },
-            "bin": [
-                "bin/markdown"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "cebe\\markdown\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Carsten Brandt",
-                    "email": "mail@cebe.cc",
-                    "homepage": "http://cebe.cc/",
-                    "role": "Creator"
-                }
-            ],
-            "description": "A super fast, highly extensible markdown parser for PHP",
-            "homepage": "https://github.com/cebe/markdown#readme",
-            "keywords": [
-                "extensible",
-                "fast",
-                "gfm",
-                "markdown",
-                "markdown-extra"
-            ],
-            "time": "2015-03-06 05:28:07"
-        },
-        {
-            "name": "unionofrad/li3_docs",
-            "version": "1.1.x-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/niel/li3_docs.git",
-                "reference": "502a84a3eba182c6f3e163ec4031131ea4133fd4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/niel/li3_docs/zipball/502a84a3eba182c6f3e163ec4031131ea4133fd4",
-                "reference": "502a84a3eba182c6f3e163ec4031131ea4133fd4",
-                "shasum": ""
-            },
-            "require": {
-                "cebe/markdown": "1.*",
-                "composer/installers": "1.*",
-                "php": ">=5.3",
-                "unionofrad/lithium": "1.1.x-dev"
-            },
-            "type": "lithium-library",
-            "license": [
-                "BSD-3-clause"
-            ],
-            "authors": [
-                {
-                    "name": "Union of RAD"
-                },
-                {
-                    "name": "The Community"
-                }
-            ],
-            "description": "A documentation generator for Lithium projects.",
-            "homepage": "http://li3.me",
-            "keywords": [
-                "docblock",
-                "docs",
-                "documentation",
-                "documented",
-                "li3",
-                "lithium"
-            ],
-            "support": {
-                "source": "https://github.com/niel/li3_docs/tree/1.1"
-            },
-            "time": "2016-03-22 13:06:11"
-        },
-        {
-            "name": "unionofrad/li3_quality",
-            "version": "1.1.x-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/UnionOfRAD/li3_quality.git",
-                "reference": "f304a360e8199a9e8c4abb403c3b209e520db104"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/li3_quality/zipball/f304a360e8199a9e8c4abb403c3b209e520db104",
-                "reference": "f304a360e8199a9e8c4abb403c3b209e520db104",
-                "shasum": ""
-            },
-            "require": {
-                "composer/installers": "1.*",
-                "php": ">=5.5.14",
-                "unionofrad/lithium": "1.1.*"
-            },
-            "type": "lithium-library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-clause"
-            ],
-            "authors": [
-                {
-                    "name": "Union of RAD"
-                },
-                {
-                    "name": "The Community"
-                }
-            ],
-            "description": "This li₃ plugin adds code quality assurance to your toolbelt.",
-            "homepage": "http://li3.me",
-            "keywords": [
-                "coverage",
-                "li3",
-                "lithium",
-                "plugin",
-                "quality",
-                "syntax"
-            ],
-            "time": "2016-07-01 08:58:56"
-        },
         {
             "name": "unionofrad/manual",
             "version": "1.1.x-dev",
@@ -1762,9 +1672,7 @@
         "joshpinkney/tv-maze-php-api": 20,
         "kbjr/git.php": 20,
         "unionofrad/lithium": 20,
-        "unionofrad/li3_docs": 20,
-        "unionofrad/manual": 20,
-        "unionofrad/li3_quality": 20
+        "unionofrad/manual": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

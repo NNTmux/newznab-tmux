@@ -26,6 +26,7 @@ if (!$privateProfiles || $privileged) {
 		$user = $page->users->getByUsername($altUsername);
 		if ($user) {
 			$altID = $user['id'];
+			$userID = $altID;
 		}
 	} else if ($altID !== false) {
 		$userID = $altID;

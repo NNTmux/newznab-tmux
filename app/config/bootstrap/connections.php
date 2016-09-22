@@ -77,7 +77,7 @@ $config1 = LITHIUM_APP_PATH . DS . 'config' . DS . 'db-config.php';
 $config2 = NN_ROOT . 'nntmux' . DS . 'config' . DS . 'config.php';
 $config = file_exists($config1) ? $config1 : $config2;
 
-if (file_exists($config)) {
+if (file_exists($config) && !defined('NN_INSTALLER')) {
 	require_once $config;
 	switch (DB_SYSTEM) {
 		case 'mysql':
@@ -111,7 +111,7 @@ if (file_exists($config)) {
 		);
 	}
 } else {
-	/** throw new ErrorException("Couldn't open newznab-tmux configuration file!"); */
+	/** throw new ErrorException("Couldn't open NNTmux's configuration file!"); */
 	Connections::add('default',
 		[
 			'type'     => 'database',
@@ -120,7 +120,7 @@ if (file_exists($config)) {
 			'port'     => '3306',
 			'login'    => 'root',
 			'password' => 'root_pass',
-			'database' => 'newznab',
+			'database' => 'nntmux',
 			'encoding' => 'UTF-8'
 		]
 	);

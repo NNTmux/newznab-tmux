@@ -3,7 +3,7 @@ namespace nntmux;
 
 use app\extensions\util\Versions;
 use nntmux\libraries\Cache;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 
 class Sites
@@ -42,7 +42,7 @@ class Sites
 		];
 		$options += $defaults;
 
-		$this->_db = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->_db = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		if (defined('NN_VERSIONS')) {
 			try {

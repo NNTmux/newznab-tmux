@@ -18,7 +18,7 @@ conf = info.readConfig()
 cur = info.connect()
 start_time = time.time()
 pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
-cur[0].execute("SELECT value FROM settings WHERE setting = 'releasesthreads'")
+cur[0].execute("SELECT value FROM settings WHERE setting = 'releasethreads'")
 threads = cur[0].fetchone()
 threads = int(threads[0])
 

@@ -36,7 +36,6 @@
 									</li>
 								{/if}
 								<hr>
-								<li><a href="{$smarty.const.WWW_TOP}/upcoming">In Theatre</a></li>
 								<li><a href="{$smarty.const.WWW_TOP}/mymovies">My Movies</a></li>
 								<hr>
 								{if $userdata.movieview == "1"}

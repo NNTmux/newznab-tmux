@@ -87,6 +87,18 @@
 			</td>
 		</tr>
 		<tr>
+			<td><label for="role">Role change date:</label></td>
+			<td>
+				<input name="rolechangedate" class="form-control" type="text" style="width: 20%" data-provide="datepicker" data-date-format="yyyy-mm-dd" data-date-autoclose="true" data-date-today-highlight="true" data-date-clear-btn="true" value="{$user.rolechangedate}"/>
+			</td>
+		</tr>
+		<tr>
+			<td><label for="notes">Notes:</label></td>
+			<td>
+				<input id="notes" name='notes' type="text" value="{$user.notes|escape:htmlall}" />
+			</td>
+		</tr>
+		<tr>
 			<td></td>
 			<td>
 				<input class="btn btn-default" type="submit" value="Save" />

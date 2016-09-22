@@ -2,10 +2,10 @@
 //This script will update all records in the movieinfo table
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\processing\tv\TraktTv;
 
-$pdo = new Settings();
+$pdo = new DB();
 $trakt = new TraktTv(['Settings' => $pdo]);
 
 $mreleases = $pdo->queryDirect(sprintf('SELECT id, imdbid FROM releases WHERE traktid = 0 AND imdbid IS NOT NULL AND imdbid != 0000000 ORDER BY id ASC'));

@@ -29,6 +29,8 @@ $page->smarty->assign('usersbymonth', $usersbymonth);
 
 $usersbyrole = $users->getUsersByRole();
 $page->smarty->assign('usersbyrole', $usersbyrole);
+$page->smarty->assign('totusers', 0);
+$page->smarty->assign('totrusers', 0);
 
 $usersbyhosthash = $users->getUsersByHostHash();
 $page->smarty->assign('usersbyhosthash', $usersbyhosthash);

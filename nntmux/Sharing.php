@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 
 /**
@@ -84,7 +84,7 @@ Class Sharing
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		// Get all sharing info from DB.
 		$check = $this->pdo->queryOneRow('SELECT * FROM sharing');

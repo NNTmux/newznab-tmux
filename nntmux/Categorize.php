@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\models\Settings;
 
 /**
  * Categorizing of releases by name/group.
@@ -57,9 +57,8 @@ class Categorize extends Category
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->pdo = new Settings();
-		$this->categorizeForeign = ($this->pdo->getSetting('categorizeforeign') == "0") ? false : true;
-		$this->catWebDL = ($this->pdo->getSetting('catwebdl') == "0") ? false : true;
+		$this->categorizeForeign = (Settings::value('indexer.categorise.categorizeforeign') == "0") ? false : true;
+		$this->catWebDL = (Settings::value('indexer.categorise.catwebdl') == "0") ? false : true;
 		$this->regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'category_regexes']);
 	}
 
@@ -574,9 +573,9 @@ class Categorize extends Category
 				case $this->categorizeForeign && $this->isForeignTV():
 				case $this->isSportTV():
 				case $this->isDocumentaryTV():
+				case $this->isUHDTV():
 				case $this->catWebDL && $this->isWEBDL():
 				case $this->isAnimeTV():
-				case $this->isUHDTV():
 				case $this->isHDTV():
 				case $this->isSDTV():
 				case $this->isOtherTV2():
@@ -724,11 +723,11 @@ class Categorize extends Category
 			switch (true) {
 				case $this->categorizeForeign && $this->isMovieForeign():
 				case $this->isMovieDVD():
+				case $this->isMovieUHD():
 				case $this->catWebDL && $this->isMovieWEBDL():
 				case $this->isMovieSD():
 				case $this->isMovie3D():
 				case $this->isMovieBluRay():
-				case $this->isMovieUHD():
 				case $this->isMovieHD():
 				case $this->isMovieOther():
 					return true;
@@ -1029,6 +1028,9 @@ class Categorize extends Category
 	{
 		switch(true) {
 			case $this->checkPoster( '/oz@lot[.]com/i', $this->poster, Category::XXX_CLIPSD):
+				return true;
+			case preg_match('/SDPORN/i', $this->releaseName):
+				$this->tmpCat = Category::XXX_CLIPSD;
 				return true;
 			default:
 				return false;

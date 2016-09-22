@@ -50,7 +50,7 @@ foreach ($genres as $gn) {
 }
 
 foreach ($results as $result) {
-	$result['genre'] = $tmpgnr[$result["genreid"]];
+	$result['genre'] = $tmpgnr[$result["genres_id"]];
 	$musics[] = $result;
 }
 

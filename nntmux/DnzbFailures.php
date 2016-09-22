@@ -2,7 +2,7 @@
 namespace nntmux;
 
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 
 /**
@@ -30,7 +30,7 @@ class DnzbFailures
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->rc = new ReleaseComments(['Settings' => $this->pdo]);
 	}
 

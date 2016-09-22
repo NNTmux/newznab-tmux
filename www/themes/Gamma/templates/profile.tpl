@@ -28,6 +28,12 @@
 		<th>Role:</th>
 		<td>{$user.rolename}</td>
 	</tr>
+	{if !empty($user.rolechangedate)}
+		<tr>
+			<th width="200">Role expiration date</th>
+			<td>{$user.rolechangedate|date_format:"%A, %B %e, %Y"}</td>
+		</tr>
+	{/if}
 	{if isset($isadmin)}
 		<tr>
 			<th title="Admin Notes">Notes:</th>

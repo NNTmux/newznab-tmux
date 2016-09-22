@@ -2,7 +2,6 @@
 namespace nntmux;
 
 use nntmux\db\DB;
-use nntmux\db\Settings;
 
 class SphinxSearch
 {
@@ -61,9 +60,9 @@ class SphinxSearch
 	/**
 	 * Delete release from Sphinx RT tables.
 	 * @param array $identifiers ['g' => Release GUID(mandatory), 'id' => ReleaseID(optional, pass false)]
-	 * @param \nntmux\db\Settings $pdo
+	 * @param \nntmux\db\DB $pdo
 	 */
-	public function deleteRelease($identifiers, Settings $pdo)
+	public function deleteRelease($identifiers, DB $pdo)
 	{
 		if (!is_null($this->sphinxQL)) {
 			if ($identifiers['i'] === false) {
@@ -100,9 +99,9 @@ class SphinxSearch
 	 * Update Sphinx Relases index for given releaseid.
 	 *
 	 * @param int $releaseID
-	 * @param \nntmux\db\Settings $pdo
+	 * @param \nntmux\db\DB $pdo
 	 */
-	public function updateRelease($releaseID, Settings $pdo)
+	public function updateRelease($releaseID, DB $pdo)
 	{
 		if (!is_null($this->sphinxQL)) {
 			$new = $pdo->queryOneRow(

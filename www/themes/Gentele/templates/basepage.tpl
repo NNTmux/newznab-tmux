@@ -180,10 +180,12 @@
 		src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 <script type="text/javascript"
 		src="{$smarty.const.WWW_THEMES}/shared/assets/jquery.nicescroll/jquery.nicescroll.min.js"></script>
-<!-- Custom functions -->
-<script src="{$smarty.const.WWW_THEMES}/shared/js/functions.js" type="text/javascript"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
+<!-- tinymce editor -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/tinymce-builded/js/tinymce/tinymce.min.js"></script>
+<!-- Custom functions -->
+<script src="{$smarty.const.WWW_THEMES}/shared/js/functions.js" type="text/javascript"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
 <!-- jQuery migrate script -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>

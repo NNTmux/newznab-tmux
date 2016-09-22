@@ -8,7 +8,12 @@ use nntmux\Users;
 $page = new AdminPage();
 $users = new Users();
 
-$user = ['id' => '', 'username' => '', 'email' => '', 'password' => ''];
+$user = [
+	'id' => '',
+	'username' => '',
+	'email' => '',
+	'password' => ''
+];
 
 // set the current action
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
@@ -52,13 +57,17 @@ switch ($action) {
 			$ret = $users->signup($_POST["username"], $_POST["password"], $_POST["email"], '', $_POST["role"], $_POST["notes"], $invites, "", true);
 		} else {
 			$ret = $users->update($_POST["id"], $_POST["username"], $_POST["email"], $_POST["grabs"], $_POST["role"], $_POST["notes"], $_POST["invites"], (isset($_POST['movieview']) ? "1" : "0"), (isset($_POST['musicview']) ? "1" : "0"), (isset($_POST['gameview']) ? "1" : "0"), (isset($_POST['xxxview']) ? "1" : "0"), (isset($_POST['consoleview']) ? "1" : "0"), (isset($_POST['bookview']) ? "1" : "0"));
-			if ($_POST['password'] != "")
+			if ($_POST['password'] != "") {
 				$users->updatePassword($_POST["id"], $_POST['password']);
+			}
+			if ($_POST['rolechangedate'] != "") {
+				$users->updateUserRoleChangeDate($_POST["id"], $_POST["rolechangedate"]);
+			}
 		}
 
-		if ($ret >= 0)
+		if ($ret >= 0) {
 			header("Location:" . WWW_TOP . "/user-list.php");
-		else {
+		} else {
 			switch ($ret) {
 				case Users::ERR_SIGNUP_BADUNAME:
 					$page->smarty->assign('error', "Bad username. Try a better one.");
@@ -99,7 +108,7 @@ switch ($action) {
 	if (isset($_GET["id"])) {
 			$page->title = "User Edit";
 			$id = $_GET["id"];
-			$user = $users->getByID($id);
+			$user = $users->getById($id);
 
 			$page->smarty->assign('user', $user);
 		}

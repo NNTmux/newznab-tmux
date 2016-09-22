@@ -4,13 +4,13 @@
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
 use nntmux\Category;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\Console;
 
 
 
 $category = new Category();
-$pdo = new Settings();
+$pdo = new DB();
 $console = new Console(['Echo' => true, 'Settings' => $pdo]);
 
 $res = $pdo->queryDirect(

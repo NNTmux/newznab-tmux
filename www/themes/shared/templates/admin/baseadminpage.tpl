@@ -23,6 +23,8 @@
 	<!-- Bootstrap core CSS -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
+	<!-- bootstrap datepicker CSS
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" /> -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.css" rel="stylesheet"
@@ -102,10 +104,14 @@
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js" type="text/javascript"></script>
 <!-- bootstrap progress js -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+<!-- bootstrap datepicker -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
+<!-- tinymce editor -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/tinymce-builded/js/tinymce/tinymce.min.js"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
 <!-- jQuery migrate script -->

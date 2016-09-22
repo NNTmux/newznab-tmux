@@ -1,11 +1,11 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\NNTP;
 use nntmux\Backfill;
 
-$pdo = new Settings();
+$pdo = new DB();
 
 // Create the connection here and pass
 $nntp = new NNTP(['Settings' => $pdo]);

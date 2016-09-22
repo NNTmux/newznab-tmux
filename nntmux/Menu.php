@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 /**
  * This class looks up site menu data.
@@ -9,16 +9,16 @@ use nntmux\db\Settings;
 class Menu
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var \nntmux\db\DB
 	 */
 	public $pdo;
 
 	/**
-	 * @param \nntmux\db\Settings $settings
+	 * @param \nntmux\db\DB $settings
 	 */
 	public function __construct($settings = null)
 	{
-		$this->pdo = ($settings instanceof Settings ? $settings : new Settings());
+		$this->pdo = ($settings instanceof DB ? $settings : new DB());
 	}
 
 	public function get($role, $serverurl)

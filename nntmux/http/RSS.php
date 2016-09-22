@@ -2,7 +2,7 @@
 
 namespace nntmux\http;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\Releases;
 use nntmux\Category;
 use nntmux\NZB;
@@ -19,7 +19,7 @@ Class RSS extends Capabilities
 	 */
 	public $releases;
 
-	/** Settings class
+	/** DB class
 	 * @var \nntmux\db\Settings
 	 */
 	public $pdo;
@@ -36,7 +36,7 @@ Class RSS extends Capabilities
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->releases = (
 			$options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo])
 		);
@@ -92,9 +92,9 @@ Class RSS extends Capabilities
 				LEFT JOIN groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN movieinfo m ON m.imdbid = r.imdbid AND m.title != ''
 				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfo_id
-				LEFT OUTER JOIN genres mug ON mug.id = mu.genreid
+				LEFT OUTER JOIN genres mug ON mug.id = mu.genres_id
 				LEFT OUTER JOIN consoleinfo co ON co.id = r.consoleinfo_id
-				LEFT OUTER JOIN genres cog ON cog.id = co.genreid %s
+				LEFT OUTER JOIN genres cog ON cog.id = co.genres_id %s
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
 				LEFT OUTER JOIN bookinfo bo ON bo.id = r.bookinfo_id
 				WHERE r.passwordstatus %s

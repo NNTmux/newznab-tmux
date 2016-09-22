@@ -2,10 +2,10 @@
 //This Script Verifies your System Time vs Myself Time vs PHP Time
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 $res="";
 
-$db = new Settings();
+$db = new DB();
 $res = $db->queryOneRow( sprintf("Select now()"));
 foreach($res as $time){
 echo "Mysql Time Is Now ".$time."\n";}

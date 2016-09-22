@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 class ReleaseExtra
@@ -12,11 +12,11 @@ class ReleaseExtra
 	public $pdo;
 
 	/**
-	 * @param \nntmux\db\Settings $settings
+	 * @param \nntmux\db\DB $settings
 	 */
 	public function __construct($settings = null)
 	{
-		$this->pdo = ($settings instanceof Settings ? $settings : new Settings());
+		$this->pdo = ($settings instanceof DB ? $settings : new DB());
 	}
 
 	/**

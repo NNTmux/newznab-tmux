@@ -90,7 +90,9 @@ class Update extends \app\extensions\console\Command
 			$this->out('Error fetching patch versions!', 'error');
 			return 1;
 		}
+
 		$this->out("Db: $currentDb,\tFile: $currentXML");
+
 		if ($currentDb < $currentXML) {
 			$db = new DbUpdate(['backup' => false]);
 			$db->processPatches(['safe' => false]);

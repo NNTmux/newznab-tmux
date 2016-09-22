@@ -1,3 +1,83 @@
+2016-09-22 DariusIII
+	* Chg: Update Readme.md
+	* Chg: Move tinyMCE init to utils-admin.js
+2016-09-21 DariusIII
+	* Chg: Add installer for NNTmux
+2016-09-20 DariusIII
+	* Chg: Update yenc to support version 1.2.2 of php-yenc module
+	* Fix: Wrong column name used in settings table call
+	* Chg: Use DB class instead of Settings class where advanced settings functions are not used
+	* Chg: Port yenc and yydecoder changes from nZEDb
+2016-09-19 DariusIII
+	* Chg: Forgot to add tinyMCE to all of the themes, move tinymce call to functions.js/utils.js
+	* Chg: Remove unused settings from site edit page and nntmux_fi_schema.sql, reorganize site edit to be more logical
+2016-09-17 DariusIII
+	* Fix: Badly formed class setting
+	* Chg: Reformat pager and move it to shared folder
+2016-09-16 DariusIII
+	* Chg: Add back reporting of total releases to api response
+	* Chg: Group music releases in Gamma theme.
+2016-09-15 DariusIII
+	* Chg: Update yenc decode handling for new php-yenc module
+	* Chg: Add datepicker and role change date column to users list and user edit in admin.
+		Admins can now set and track role expiration date, for those who use it.
+2016-09-13 DariusIII
+	* Fix: Fix display of tinyMCE generated code on forum pages
+	* Chg: Adjust how content is displayed on homepage
+	* Chg: Add tinyMCE support to forums
+	* Chg: Add tinymce support to admin content page
+	* Fix: Prevent undefined index errors on admin site-stats page
+2016-09-12 DariusIII
+	* Chg: Update composer with new version of rarinfo
+	* Chg: Increase the size of textarea in custom.css
+	* Chg: Update mysqltuner.pl script
+	* Chg: Update admin user_edit and role_edit pages
+2016-09-11 DariusIII
+	* Chg: Update composer with new version on rarinfo library
+	* Chg: Add user notes to themes and fix notes in admin area
+2016-09-07 DariusIII
+	* Chg: Use PHP own decodeIgnore in yenc
+	* Chg: Make Settings::value more robust
+2016-09-05 DariusIII
+	* Chg: Update XSS vulnerability protection in themes.
+	* Chg: Update composer installer to version 1.2.0
+	* Fix: Content display for not logged in users in Charisma/Gentele/Omicron themes.
+2016-09-02 DariusIII
+	* Chg: Update custom yenc class handling (ported from nZEDb)
+2016-08-31 DariusIII
+	* Fix: Remove "Invite sent" text from user profile
+	* Chg: Remove upcoming pages and RottenTomato references as RT are removing all free keys in 30 days.
+	* Fix: View user profile by name as admin
+2016-08-29 DariusIII
+	* Fix: Remove duplicate r.fromname from matchPredbFT function
+	* Chg: Rename roleexcat categoryid column to categories_id
+	* Chg: Update composer.lock with new version of Lithium dev package
+2016-08-25 DariusIII
+	* Chg: Update sql schema files to be up-to-date
+2016-08-23 DariusIII
+	* Fix: Update sphinx.conf and change rt_attr_string = name to rt_attr_uint = dummy
+2016-08-22 DariusIII
+	* Fix: Wrong table name used in site-edit
+	* Chg: Add back prefiles match to tmux run
+	* Chg: Update NameFixer to use FULLTEXT search in matchPreDbFiles function
+	* Chg: Add FULLTEXT index to predb.filename
+2016-08-21 DariusIII
+	* Chg: Remove match_prefiles from tmux, should be ran manualy
+2016-08-20 DariusIIi
+	* Chg: Update SDCLiP release names predb matching
+2016-08-19 DariusIII
+	* Chg: Rename releases posted by ozelot from KTR to SDCLiP
+	* Fix: Missing names of movies in upcoming movies pages.
+2016-08-12 DariusIII
+	* Chg: Move movie and tv UHD category check above webdl one
+	* Chg: Update Smarty to version 3.1.30
+2016-08-11 DariusIII
+	* Chg: Update handling of SDPORN releases in NameFixer and groupfixrelnames
+2016-08-09 DariusIII
+	* Chg: Properly process SDPORN releases
+2016-08-08 DariusIII
+	* Chg: Change updating (ported from nZEDb)
+	* Chg: Remove rss button from search page in Gamma theme.
 2016-08-05 DariusIII
 	* Chg: Update composer asset plugin
 	* Fix: Fix cart operations in all themes

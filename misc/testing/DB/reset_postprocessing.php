@@ -3,10 +3,10 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 
 use nntmux\Category;
 use nntmux\ConsoleTools;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 $category = new Category();
-$pdo = new Settings();
+$pdo = new DB();
 $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 $ran = false;
 

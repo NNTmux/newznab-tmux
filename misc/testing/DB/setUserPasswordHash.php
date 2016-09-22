@@ -8,10 +8,10 @@
  */
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\Users;
 
-$pdo = new Settings();
+$pdo = new DB();
 
 if ($argc < 3) {
 	exit(

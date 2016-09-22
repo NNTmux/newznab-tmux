@@ -30,12 +30,12 @@ class DB extends \PDO
 	public $cli;
 
 	/**
-	 * @var object Instance of ConsoleTools class.
+	 * @var object Instance of \nntmux\ConsoleTools class.
 	 */
 	public $ct;
 
 	/**
-	 * @var ColorCLI	Instance variable for logging object. Currently only ColorCLI supported,
+	 * @var \nntmux\ColorCLI	Instance variable for logging object. Currently only ColorCLI supported,
 	 * but expanding for full logging with agnostic API planned.
 	 */
 	public $log;
@@ -43,7 +43,7 @@ class DB extends \PDO
 	/**
 	 * @note Setting this static causes issues when creating multiple instances of this class with different
 	 *       MySQL servers, the next instances re-uses the server of the first instance.
-	 * @var \PDO Instance of \PDO class.
+	 * @var \PDO Instance of PDO class.
 	 */
 	public $pdo = null;
 
@@ -78,7 +78,7 @@ class DB extends \PDO
 	private $opts;
 
 	/**
-	 * @var null Cache
+	 * @var null|\nntmux\libraries\Cache
 	 */
 	private $cacheServer = null;
 
@@ -88,7 +88,17 @@ class DB extends \PDO
 	private $cacheEnabled = false;
 
 	/**
-	 * Constructor. Sets up all necessary properties. Instantiates a \PDO object
+	 * @var string MySQL LOW_PRIORITY DELETE option.
+	 */
+	private $DELETE_LOW_PRIORITY = '';
+
+	/**
+	 * @var string MYSQL QUICK DELETE option.
+	 */
+	private $DELETE_QUICK = '';
+
+	/**
+	 * Constructor. Sets up all necessary properties. Instantiates a PDO object
 	 * if needed, otherwise returns the current one.
 	 *
 	 * @param array $options
@@ -102,12 +112,12 @@ class DB extends \PDO
 			'createDb'		=> false, // create dbname if it does not exist?
 			'ct'			=> new ConsoleTools(),
 			'dbhost'		=> defined('DB_HOST') ? DB_HOST : '',
-			'dbname' 		=> defined('DB_NAME') ? DB_NAME : '',
-			'dbpass' 		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
+			'dbname' => defined('DB_NAME') ? DB_NAME : '',
+			'dbpass' => defined('DB_PASSWORD') ? DB_PASSWORD : '',
 			'dbport'		=> defined('DB_PORT') ? DB_PORT : '',
 			'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
 			'dbtype'		=> defined('DB_SYSTEM') ? DB_SYSTEM : '',
-			'dbuser' 		=> defined('DB_USER') ? DB_USER : '',
+			'dbuser' => defined('DB_USER') ? DB_USER : '',
 			'log'			=> new ColorCLI(),
 			'persist'		=> false,
 		];
@@ -149,8 +159,17 @@ class DB extends \PDO
 			}
 		}
 
+
 		if ($this->opts['checkVersion']) {
 			$this->fetchDbVersion();
+		}
+
+		if (defined('NN_SQL_DELETE_LOW_PRIORITY') && NN_SQL_DELETE_LOW_PRIORITY) {
+			$this->DELETE_LOW_PRIORITY = ' LOW_PRIORITY ';
+		}
+
+		if (defined('NN_SQL_DELETE_QUICK') && NN_SQL_DELETE_QUICK) {
+			$this->DELETE_QUICK = ' QUICK ';
 		}
 
 		return $this->pdo;
@@ -242,28 +261,34 @@ class DB extends \PDO
 	}
 
 	/**
+	 * Attempts to determine if the Db is on the local machine.
+	 *
+	 * If the method returns true, then the Db is definitely on the local machine. However,
+	 * returning false only indicates that it could not positively be determined to be local - so
+	 * assume remote.
+	 *
 	 * @return bool Whether the Db is definitely on the local machine.
 	 */
-	public function isLocalDb ()
+	public function isLocalDb()
 	{
+		$local = false;
 		if (!empty($this->opts['dbsock']) || $this->opts['dbhost'] == 'localhost') {
-			return true;
-		}
+			$local = true;
+		} else {
+			preg_match_all('/inet' . '6?' . ' addr: ?([^ ]+)/', `ifconfig`, $ips);
 
-		preg_match_all('/inet' . '6?' . ' addr: ?([^ ]+)/', `ifconfig`, $ips);
-
-		// Check for dotted quad - if exists compare against local IP number(s)
-		if (preg_match('#^\d+\.\d+\.\d+\.\d+$#', $this->opts['dbhost'])) {
-			if (in_array($this->opts['dbhost'], $ips[1])) {
-				return true;
+			// Check for dotted quad - if exists compare against local IP number(s)
+			if (preg_match('#^\d+\.\d+\.\d+\.\d+$#', $this->opts['dbhost'])) {
+				if (in_array($this->opts['dbhost'], $ips[1])) {
+					$local = true;
+				}
 			}
 		}
-
-		return false;
+		return $local;
 	}
 
 	/**
-	 * Init \PDO instance.
+	 * Init PDO instance.
 	 */
 	private function initialiseDatabase()
 	{
@@ -316,7 +341,7 @@ class DB extends \PDO
 			$this->pdo->query("USE {$this->opts['dbname']}");
 		}
 
-		// In case \PDO is not set to produce exceptions (PHP's default behaviour).
+		// In case PDO is not set to produce exceptions (PHP's default behaviour).
 		if ($this->pdo === false) {
 			$this->echoError(
 				"Unable to create connection to the Database!",
@@ -329,7 +354,6 @@ class DB extends \PDO
 		// For backwards compatibility, no need for a patch.
 		$this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
 		$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-		$this->pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 	}
 
 	/**

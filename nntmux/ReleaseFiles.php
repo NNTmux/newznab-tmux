@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 /**
  * This class handles storage and retrieval of releasefiles.
@@ -19,11 +19,11 @@ class ReleaseFiles
 	public $sphinxSearch;
 
 	/**
-	 * @param \nntmux\db\Settings $settings
+	 * @param \nntmux\db\DB $settings
 	 */
 	public function __construct($settings = null)
 	{
-		$this->pdo = ($settings instanceof Settings ? $settings : new Settings());
+		$this->pdo = ($settings instanceof DB ? $settings : new DB());
 		$this->sphinxSearch = new SphinxSearch();
 	}
 

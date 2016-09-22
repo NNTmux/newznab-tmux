@@ -47,8 +47,6 @@ then
 	LASTOPTIMIZE1=`date +%s`
 	echo "Optimizing DB..."
 	$PHP ${NNTMUX_PATH}/optimise_db.php space
-	#$PHP ${NNTMUX_PATH}/update_tvschedule.php
-	$PHP ${NNTMUX_PATH}/update_theaters.php
 fi
 
 echo "waiting ${NNTMUX_SLEEP_TIME} seconds..."

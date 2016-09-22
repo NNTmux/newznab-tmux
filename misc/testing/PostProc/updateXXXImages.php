@@ -1,11 +1,11 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\ColorCLI;
 
 
-$pdo = new Settings();
+$pdo = new DB();
 $c = new ColorCLI();
 $covers = $updated = $deleted = 0;
 
