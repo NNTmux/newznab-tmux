@@ -70,6 +70,10 @@ Before converting to InnoDB be sure to set:
 
  https://github.com/nZEDb/nZEDb_Misc/blob/master/Guides/Installation/Ubuntu/Guide.md
 
+ For composer install and getting NNTmux follow this guide:
+
+ https://github.com/NNTmux/newznab-tmux/wiki/Installing-Composer
+
 ### Support
 
  Support is given on irc.synirc.net #tmux channel.

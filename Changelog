@@ -1,4 +1,5 @@
 2016-09-22 DariusIII
+	* Chg: Update Readme.md
 	* Chg: Move tinyMCE init to utils-admin.js
 2016-09-21 DariusIII
 	* Chg: Add installer for NNTmux
