@@ -83,7 +83,7 @@ indexer	ppa	innerfileblacklist	/setup\.exe|password\.url/i	You can add a regex h
 		privateprofiles	1	Hide profiles from other users (admin/mod can still access).	privateprofiles
 		registerstatus	0	The status of registrations to the site.	registerstatus
 		registerrecaptcha	0	Use google recaptcha on registration page?	registerrecaptcha
-		releasecompletion	95	The minimum completion % to keep a release. Set to 0 to disable.	releasecompletion
+		completionpercent	95	The minimum completion % to keep a release. Set to 0 to disable.	completionpercent
 		releaseretentiondays	0	!!THIS IS NOT HEADER RETENTION!! The number of days releases will be retained for use throughout site. Set to 0 to disable.	releaseretentiondays
 		releasesthreads	1	The number of threads for update_releases. This is only for tablepergroup.	releasesthreads
 		replacenzbs	0	NZBs that are crossposted, instead of deleting, replace with the nzb grabbed.(This is not necessary, was added before I understood how crossposted nzbs work).	replacenzbs
