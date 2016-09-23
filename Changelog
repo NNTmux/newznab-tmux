@@ -1,3 +1,5 @@
+2016-09-23 DariusIII
+	* Fix: Replace leftover genreID references with proper genres_id
 2016-09-22 DariusIII
 	* Chg: Update Readme.md
 	* Chg: Move tinyMCE init to utils-admin.js

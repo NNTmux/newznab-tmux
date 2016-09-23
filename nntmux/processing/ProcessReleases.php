@@ -1316,7 +1316,7 @@ class ProcessReleases
 					sprintf('
 						SELECT id, guid
 						FROM releases
-						INNER JOIN (SELECT id AS mid FROM musicinfo WHERE musicinfo.genreID = %d) mi
+						INNER JOIN (SELECT id AS mid FROM musicinfo WHERE musicinfo.genres_id = %d) mi
 						ON musicinfo_id = mid',
 						$genre['id']
 					)
