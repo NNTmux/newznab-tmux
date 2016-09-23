@@ -36,6 +36,9 @@ switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
 				$_POST['downloadrequests'], $_POST['defaultinvites'], $_POST['isdefault'], $_POST['canpreview'], $_POST['hideads']
 			);
 			header("Location:" . WWW_TOP . "/role-list.php");
+
+			$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? [] : $_POST['exccat'];
+			$page->users->addRoleCategoryExclusions($_POST['id'], $_POST['exccat']);
 		}
 		break;
 
@@ -45,6 +48,7 @@ switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
 			$page->title = "User Roles Edit";
 			$role = $page->users->getRoleById($_GET["id"]);
 			$page->smarty->assign('role', $role);
+			$page->smarty->assign('roleexccat', $users->getRoleCategoryExclusion($_GET["id"]));
 		}
 		break;
 }
