@@ -1,6 +1,9 @@
 <?php
 require_once './config.php';
 
+use nntmux\Category;
+
+$category = new Category();
 $page = new AdminPage();
 
 // Get the user roles.
@@ -55,6 +58,7 @@ switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
 
 $page->smarty->assign('yesno_ids', [1, 0]);
 $page->smarty->assign('yesno_names', ['Yes', 'No']);
+$page->smarty->assign('catlist',$category->getForSelect(false));
 
 $page->content = $page->smarty->fetch('role-edit.tpl');
 $page->render();
