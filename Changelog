@@ -1,3 +1,5 @@
+2016-09-30 DariusIII
+	* Chg: Update jquery and themes basepage to fix tinymce loading error
 2016-09-23 DariusIII
 	* Chg: Rename roleexcat table to role_excluded_categories and add it back to mysql-ddl.sql
 	* Fix: Add back missing role category exclusion in admin->role edit
