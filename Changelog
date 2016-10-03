@@ -1,3 +1,5 @@
+2016-10-03 DariusIII
+	* Fix: Add missing lamepath to 10-settings.tsv (fixes issue #120)
 2016-09-30 DariusIII
 	* Chg: Update jquery and themes basepage to fix tinymce loading error
 2016-09-23 DariusIII

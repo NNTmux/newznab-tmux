@@ -120,6 +120,7 @@ apps	indexer	magic_file_path		Path to magic number database. Windows&apos; users
 apps		7zippath		The path to the 7za (7zip command line in windows) binary, used for grabbing nfos from compressed zip files. Use forward slashes in windows c:/path/to/7z.exe	zippath
 apps		ffmpegpath		The path to the ffmpeg or avconv binary. Used for making thumbnails and video/audio previews. Use forward slashes in windows c:/path/to/ffmpeg.exe	ffmpegpath
 apps		mediainfopath		The path to the mediainfo binary. Used for deep file media analysis. Use empty path to disable mediainfo checks Use forward slashes in windows c:/path/to/mediainfo.exe	mediainfopath
+apps		lamepath		The path to the lame binary. Used for audio manipulation. Use forward slashes in windows c:/path/to/lame.exe	lamepath
 apps		unrarpath		The path to an unrar binary, used in deep password detection and media info grabbing. Use forward slashes in windows c:/path/to/unrar.exe	unrarpath
 apps		timeoutpath		The path to the timeout binary. This is used to limit the amount of time unrar/7zip/mediainfo/ffmpeg/avconv can run. You can the time limit in the process additional section. You can leave this empty to disable this. Use forward slashes in windows c:/path/to/timeout.exe	timeoutpath
 apps		yydecoderpath		Path to yydecode, this will decode yEnc articles. On ubuntu/debian you can get yydecode in the getdeb repository. Compiling yydecode from source is easy/fast also. Use forward slashes in windows c:/path/to/yydecode.exe	yydecoderpath
