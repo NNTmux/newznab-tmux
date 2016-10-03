@@ -483,14 +483,6 @@
 			</div>
 		</td>
 	</tr>
-
-<tr>
-	<td><label for="rawretentiondays">Header Retention</label>:</td>
-	<td>
-		<input class="tiny" id="rawretentiondays" name="rawretentiondays" type="text" value="{$site->rawretentiondays}" />
-		<div class="hint">The number of days binary and part data will be retained for use in raw search and release formation.</div>
-	</td>
-</tr>
 	<tr>
 		<td style="width:180px;"><label for="partretentionhours">Part Retention Hours:</label></td>
 		<td>
