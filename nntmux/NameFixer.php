@@ -1844,7 +1844,7 @@ class NameFixer
 				$this->pdo->likeString('SDPORN', true, true)
 			);
 
-			$result = $this->pdo->queryDirect($query);
+			$result = $this->pdo->query($query);
 
 			if ($result instanceof \Traversable) {
 				foreach ($result AS $res) {
@@ -1894,7 +1894,8 @@ class NameFixer
 				$this->pdo->likeString('.srr', true, false)
 			);
 
-			$result = $this->pdo->queryDirect($query);
+			$result = $this->pdo->query($query);
+			var_dump($result);
 
 			if ($result instanceof \Traversable) {
 				foreach ($result AS $res) {
