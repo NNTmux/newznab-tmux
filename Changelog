@@ -1,3 +1,5 @@
+2016-10-04 DariusIII
+	* Chg: Add renaming based on included srr file in release
 2016-10-03 DariusIII
 	* Fix: Add missing lamepath to 10-settings.tsv (fixes issue #120)
 2016-09-30 DariusIII
