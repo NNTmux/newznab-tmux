@@ -1894,7 +1894,7 @@ class NameFixer
 
 			if ($result instanceof \Traversable) {
 				foreach ($result AS $res) {
-					if (preg_match('/^(.+?)\.srr/i', $res["textstring"], $match)) {
+					if (preg_match('/^(.*)/i', $res["textstring"], $match)) {
 						$this->updateRelease(
 							$release,
 							$match["1"],
