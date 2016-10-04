@@ -1895,7 +1895,6 @@ class NameFixer
 			);
 
 			$result = $this->pdo->query($query);
-			var_dump($result);
 
 			if ($result instanceof \Traversable) {
 				foreach ($result AS $res) {
