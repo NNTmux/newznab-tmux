@@ -1831,7 +1831,7 @@ class NameFixer
 	public function xxxNameCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releases_id"]) {
-			$result = $this->pdo->queryDirect("
+			$query = sprintf("
 				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
@@ -1843,6 +1843,8 @@ class NameFixer
 				Category::OTHER_HASHED,
 				$this->pdo->likeString('SDPORN', true, true)
 			);
+
+			$result = $this->pdo->queryDirect($query);
 
 			if ($result instanceof \Traversable) {
 				foreach ($result AS $res) {
@@ -1879,7 +1881,7 @@ class NameFixer
 	public function srrNameCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releases_id"]) {
-			$result = $this->pdo->queryDirect("
+			$query = sprintf("
 				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
@@ -1892,12 +1894,14 @@ class NameFixer
 				$this->pdo->likeString('.srr', true, false)
 			);
 
+			$result = $this->pdo->queryDirect($query);
+
 			if ($result instanceof \Traversable) {
 				foreach ($result AS $res) {
-					if (preg_match('/^(.*)/i', $res["textstring"], $match)) {
+					if (preg_match('/^(.*)\.srr/i', $res["textstring"], $match)) {
 						$this->updateRelease(
 							$release,
-							$match["0"],
+							$match["1"],
 							$method = "fileCheck: SRR extension",
 							$echo,
 							$type,

@@ -1,4 +1,5 @@
 2016-10-04 DariusIII
+	* Fix: Fix xxx and srr renaming queries
 	* Chg: Remove unused Max Messages Per Run setting from admin->edit site
 	* Chg: Add renaming based on included srr file in release
 2016-10-03 DariusIII
