@@ -576,22 +576,12 @@
 		<div class="hint">Some servers allow headers to be sent over in a compressed format.  If enabled this will use much less bandwidth, but processing times may increase.</div>
 	</td>
 </tr>
-
-
 <tr>
 	<td><label for="maxmssgs">Max Messages</label>:</td>
 	<td>
 		<input class="small" id="maxmssgs" name="maxmssgs" type="text" value="{$site->maxmssgs}" />
 		<div class="hint">The maximum number of messages to fetch at a time from the server.</div>
 	</td>
-</tr>
-
-<tr>
-    <td><label for="maxmsgsperrun">Max Messages Per Run</label>:</td>
-    <td>
-        <input class="small" id="maxmsgsperrun" name="maxmsgsperrun" type="text" value="{$site->maxmsgsperrun}" />
-        <div class="hint">The maximum number of messages to process for a group in one run of update_binaries.</div>
-    </td>
 </tr>
 	<tr>
 		<td><label for="max_headers_iteration">Max headers iteration</label>:</td>

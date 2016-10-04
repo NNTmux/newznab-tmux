@@ -4341,7 +4341,6 @@ INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('maxbooksprocessed', '300','', '', 'maxbooksprocessed', ''),
 ('maxgamesprocessed', '150','', '', 'maxgamesprocessed', ''),
 ('maximdbprocessed', '100','', '', 'maximdbprocessed', ''),
-('maxmsgsperrun', '200000','', '', 'maxmsgsperrun', ''),
 ('maxmssgs', '20000','', '', 'maxmssgs', ''),
 ('maxmusicprocessed', '150','', '', 'maxmusicprocessed', ''),
 ('maxnestedlevels', '3','', '', 'maxnestedlevels', ''),
