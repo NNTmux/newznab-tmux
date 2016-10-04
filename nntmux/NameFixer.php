@@ -1897,7 +1897,7 @@ class NameFixer
 					if (preg_match('/^(.*)/i', $res["textstring"], $match)) {
 						$this->updateRelease(
 							$release,
-							$match["1"],
+							$match["0"],
 							$method = "fileCheck: SRR extension",
 							$echo,
 							$type,
