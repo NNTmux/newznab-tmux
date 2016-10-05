@@ -1,4 +1,5 @@
 2016-10-05 DariusIII
+	* Chg: Add caching to getPagerCount function to reduce load on indexers with many API calls
 	* Fix: Logic in queries for xxx and srr renaming in NameFixer.
 2016-10-04 DariusIII
 	* Fix: Fix xxx and srr renaming queries
