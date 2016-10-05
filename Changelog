@@ -1,3 +1,5 @@
+2016-10-05 DariusIII
+	* Fix: Logic in queries for xxx and srr renaming in NameFixer.
 2016-10-04 DariusIII
 	* Fix: Fix xxx and srr renaming queries
 	* Chg: Remove unused Max Messages Per Run setting from admin->edit site

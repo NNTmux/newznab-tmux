@@ -1831,20 +1831,19 @@ class NameFixer
 	public function xxxNameCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releases_id"]) {
-			$query = sprintf("
+			$result = $this->pdo->queryDirect(sprintf("
 				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON (rf.releases_id = {$release["releases_id"]})
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN(%d, %d))
 					AND rf.name %s",
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
 				Category::OTHER_HASHED,
 				$this->pdo->likeString('SDPORN', true, true)
+				)
 			);
-
-			$result = $this->pdo->query($query);
 
 			if ($result instanceof \Traversable) {
 				foreach ($result AS $res) {
@@ -1881,20 +1880,19 @@ class NameFixer
 	public function srrNameCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releases_id"]) {
-			$query = sprintf("
+			$result = $this->pdo->queryDirect(sprintf("
 				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
+					INNER JOIN release_files rf ON (rf.releases_id = {$release["releases_id"]})
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rf.name %s",
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
 				Category::OTHER_HASHED,
 				$this->pdo->likeString('.srr', true, false)
+				)
 			);
-
-			$result = $this->pdo->query($query);
 
 			if ($result instanceof \Traversable) {
 				foreach ($result AS $res) {
