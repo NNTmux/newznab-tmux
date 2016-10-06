@@ -277,12 +277,6 @@
 							<a href="{$smarty.const.WWW_TOP}/logout" class="btn btn-default btn-flat"><i
 										class="fa fa-unlock-alt"></i> Sign out</a>
 						</li>
-						{else}
-						<li><a href="{$smarty.const.WWW_TOP}/login"><i
-										class="fa fa-lock"></i><span> Login</span></a></li>
-						<li><a href="{$smarty.const.WWW_TOP}/register"><i
-										class="fa fa-bookmark-o"></i><span> Register</span></a>
-						</li>
 						{/if}
 					</ul>
 				</li>

@@ -54,11 +54,11 @@
 				<div class="clearfix"></div>
 				<!-- menu profile quick info -->
 				<div class="profile">
+					{if $loggedin == "true"}
 					<div class="profile_pic">
 						<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png" alt="User Image"
 							 class="img-circle profile_img">
 					</div>
-					{if $loggedin == "true"}
 						<div class="profile_info">
 							<span>Welcome,</span>
 							<h2>{$userdata.username}</h2>
@@ -67,6 +67,7 @@
 				</div>
 				<!-- /menu profile quick info -->
 				<br/>
+				<div class="clearfix"></div>
 				<!-- sidebar menu -->
 				<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
 					<div class="menu_section">
@@ -103,6 +104,7 @@
 									</ul>
 								</li>
 							{/if}
+							<div class="clearfix"></div>
 							<li><a><i class="fa fa-edit"></i> Articles & Links <span class="fa fa-chevron-down"></span></a>
 								<ul class="nav child_menu" style="display: none">
 									<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
@@ -119,6 +121,7 @@
 												API</a></li>
 									{/if}
 								</ul>
+								<div class="clearfix"></div>
 								{if $loggedin == "true"}
 							<li><a href="{$smarty.const.WWW_TOP}/logout"><i
 											class="fa fa-unlock"></i><span> Sign Out</span></a></li>

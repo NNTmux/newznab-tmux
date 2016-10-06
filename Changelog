@@ -1,3 +1,5 @@
+2016-10-16 DariusIII
+	* Chg: Adjust the look of login page on Gentele theme
 2016-10-05 DariusIII
 	* Fix: Gentele theme Series and Anime list visibility
 	* Chg: Add caching to getPagerCount function to reduce load on indexers with many API calls
