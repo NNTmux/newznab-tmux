@@ -8,7 +8,7 @@
 	</div>
 </div>
 <div class="row">
-	<div class="col-xlg-12 portlets">
+	<div class="col-lg-12 col-sm-12 col-xs-12">
 		<div class="panel panel-default">
 			<div class="panel-body pagination2">
 				<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed)}<span class="btn btn-default btn-xs"
@@ -815,7 +815,8 @@
 							{/if}
 							{if isset($game.backdrop) && $game.backdrop == 1}
 								<div id="pane10" class="tab-pane">
-									<img src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}-backdrop.jpg"
+									<img class="img-responsive" src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}-backdrop.jpg"
+										 width="500" border="0"
 										 alt="{$game.title|escape:"htmlall"}"
 										 data-toggle="modal"
 										 data-target="#modal-image"/>

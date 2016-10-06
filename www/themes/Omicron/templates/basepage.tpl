@@ -22,6 +22,9 @@
 		  type="text/css"/>
 	<!-- iCheck -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/square/blue.css" rel="stylesheet">
+	<!-- flexboxgrid -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/flexboxgrid/dist/flexboxgrid.min.css" rel="stylesheet"
+		  type="text/css"/>
 	<!-- Font Awesome Icons -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>

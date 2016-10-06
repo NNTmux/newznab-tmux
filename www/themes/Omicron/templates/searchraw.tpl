@@ -8,7 +8,7 @@
 	</div>
 </div>
 <div class="row">
-	<div class="col-xlg-12 portlets">
+	<div class="col-lg-12 col-sm-12 col-xs-12">
 		<div class="panel panel-default">
 			<div class="panel-body pagination2">
 				<form method="get" action="{$serverroot}searchraw">
