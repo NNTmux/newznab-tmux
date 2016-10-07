@@ -1,3 +1,5 @@
+2016-10-07 DariusIII
+	* Fix: Search button design in Charisma/Gentele/Omicron themes for advanced search
 2016-10-16 DariusIII
 	* Chg: Add flexboxgrid support to Charisma/Gentele/Omicron themes, adjust the themes accordingly
 	* Chg: Adjust the look of login page on Gentele theme
