@@ -1,3 +1,5 @@
+2016-10-10 DariusIII
+	* Chg: Add release_naming_regex for a.b.movies group DJ releases
 2016-10-07 DariusIII
 	* Chg: Add user deletion to admin user edit
 	* Chg: Update composer with new version of RarInfo
