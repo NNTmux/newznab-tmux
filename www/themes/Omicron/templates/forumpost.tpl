@@ -21,7 +21,7 @@
 						<div class="hint">({$result.createddate|timeago})</div>
 						{if $userdata.id == $result.users_id || $isadmin}
 							<div>
-								<a class="btn btn-mini btn-warning"
+								<a class="btn btn-sm btn-warning"
 								   href="{$smarty.const.WWW_TOP}/post_edit?id={$result.id}"
 								   title="Edit Post">Edit</a>
 							</div>
@@ -29,7 +29,7 @@
 						{if $userdata.role == 2}
 							<br/>
 							<div>
-								<a class="rndbtn confirm_action btn btn-mini btn-danger"
+								<a class="confirm_action btn btn-sm btn-danger"
 								   href="{$smarty.const.WWW_TOP}/admin/forum-delete.php?id={$result.id} from={$smarty.server.REQUEST_URI|escape:"url"}"
 								   title="Delete Post">Delete</a>
 							</div>
