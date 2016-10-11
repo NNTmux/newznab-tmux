@@ -1,4 +1,5 @@
 2016-10-11 DariusIII
+	* Fix: TinyMCE URL handling
 	* Chg: Add ability to edit posts on forum.
 2016-10-10 DariusIII
 	* Chg: Add release naming regex for a.b.multimedia.anime.highspeed for better release naming
