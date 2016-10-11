@@ -37,7 +37,7 @@
 					{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 				</div>
 				<div class="btn-group pull-right">
-					<div class="input-append">
+					<div class="input-group">
 						<input class="span2"  id="filter-text" type="text" placeholder="Filter">
 					</div>
 				</div>
@@ -186,7 +186,7 @@
 						{if isset($sabintegrated) && $sabintegrated !=""}<input type="button" class="nzb_multi_operations_sab btn btn-small btn-primary" value="Send to queue" />{/if}
 					</div>
 					<div class="btn-group pull-right">
-						<div class="input-append">
+						<div class="input-group">
 							<input class="span2" id="filter-text" type="text">
 							<span class="add-on"><i class="icon-search"></i></span>
 						</div>

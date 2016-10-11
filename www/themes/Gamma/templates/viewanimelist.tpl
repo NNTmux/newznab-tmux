@@ -9,7 +9,7 @@
 </p>
 <form class="form pull-right" style="margin-top:-35px;">
 	<form name="anidbsearch" class="navbar-form" action="" method="get">
-		<div class="input-append">
+		<div class="input-group">
 			<input class="input-medium span2" id="title appendedInputButton" type="text" name="title" value="{$animetitle}" placeholder="Search anime title"/>
 			<button type="submit" class="btn">GO</button>
 		</div>

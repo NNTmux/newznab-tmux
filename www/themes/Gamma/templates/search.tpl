@@ -11,7 +11,7 @@
 	<div class="container">
 		<form method="get" class="navbar-form pull-left" action="{$smarty.const.WWW_TOP}/search">
 			<div id="sbasic" style="text-align:center;{if $sadvanced} display:none;{/if}">
-				<div class="input-append">
+				<div class="input-group">
 				<input id="search" class="input-large" name="search" value="{$search|escape:'html'}" type="text" placeholder="Search" />
 				<input id="search_search_button" class="btn btn-success" type="submit" value="Search" />
 				</div>
