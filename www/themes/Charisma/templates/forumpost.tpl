@@ -15,7 +15,7 @@
 				{if isset($isadmin) && $isadmin == 1}</strong>{/if}
 				<br/>
 				on <span title="{$result.createddate}">{$result.createddate|date_format}</span> <div class="hint">({$result.createddate|timeago})</div>
-				{if $userdata.id == $result.users_id}
+				{if $userdata.id == $result.users_id || $isadmin}
 					<div>
 						<a class="btn btn-mini btn-warning"
 						   href="{$smarty.const.WWW_TOP}/post_edit?id={$result.id}"
