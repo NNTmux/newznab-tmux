@@ -19,10 +19,18 @@
 						<br/>
 						on <span title="{$result.createddate}">{$result.createddate|date_format}</span>
 						<div class="hint">({$result.createddate|timeago})</div>
+						<br/>
+						{if $userdata.id == $result.users_id}
+							<div>
+								<a class="btn btn-mini btn-warning"
+								   href="{$smarty.const.WWW_TOP}/post_edit?id={$result.id}"
+								   title="Edit Post">Edit</a>
+							</div>
+						{/if}
 						{if $userdata.role == 2}
 							<br/>
 							<div>
-								<a class="rndbtn confirm_action btn btn-mini btn-danger"
+								<a class="confirm_action btn btn-mini btn-danger"
 								   href="{$smarty.const.WWW_TOP}/admin/forum-delete.php?id={$result.id} from={$smarty.server.REQUEST_URI|escape:"url"}"
 								   title="Delete Post">Delete</a>
 							</div>
@@ -44,7 +52,8 @@
 							<textarea id="addMessage" name="addMessage"></textarea>
 						</div>
 						<input class="btn btn-success" type="submit" value="Submit"/>
-						<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />
+						<input class="btn btn-warning" value="Cancel"
+							   onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();"/>
 					</div>
 				</form>
 			</div>
