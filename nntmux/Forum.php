@@ -224,12 +224,22 @@ class Forum
 	 *
 	 * @param $id
 	 * @param $message
+	 * @param $uid
 	 */
 	public function editPost($id, $message, $uid)
 	{
 		$post = $this->getPost($id);
 		if ($post) {
-			$this->pdo->queryExec(sprintf('UPDATE forumpost SET message = %s WHERE id = %d AND users_id = %d', $this->pdo->escapeString($message), $post['id'], $uid));
+			$this->pdo->queryExec(sprintf('
+							UPDATE forumpost
+							SET message = %s
+							WHERE id = %d
+							AND users_id = %d',
+				$this->pdo->escapeString($message),
+				$post['id'],
+				$uid
+			)
+			);
 		}
 	}
 }
