@@ -1052,6 +1052,8 @@ CREATE TABLE users (
   nzbgeturl      VARCHAR(255)     NULL     DEFAULT NULL,
   nzbgetusername VARCHAR(255)     NULL     DEFAULT NULL,
   nzbgetpassword VARCHAR(255)     NULL     DEFAULT NULL,
+  nzbvortex_api_key VARCHAR(10)   NULL     DEFAULT NULL ,
+  nzbvortex_server_url VARCHAR(255) NULL   DEFAULT NULL,
   userseed       VARCHAR(50)      NOT NULL,
   notes          VARCHAR(255)     NOT NULL,
   cp_url         VARCHAR(255)     NULL     DEFAULT NULL,

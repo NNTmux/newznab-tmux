@@ -1,3 +1,5 @@
+2016-10-12 DariusIII
+	* Chg: Add missing user settings to mysql-ddl.sql, remove Episode.php and episodeinfo table related settings
 2016-10-11 DariusIII
 	* Chg: Update README.md
 	* Fix: Advanced/Basic search toggle in Gamma theme
