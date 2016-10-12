@@ -1,4 +1,5 @@
 2016-10-12 DariusIII
+	* Chg: Update composer.json with new version of composer asset plugin
 	* Chg: Add missing user settings to mysql-ddl.sql, remove Episode.php and episodeinfo table related settings
 2016-10-11 DariusIII
 	* Chg: Update README.md
