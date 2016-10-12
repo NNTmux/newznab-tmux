@@ -655,6 +655,7 @@ CREATE TABLE         releases (
   postdate          DATETIME                       DEFAULT NULL,
   adddate           DATETIME                       DEFAULT NULL,
   updatetime        TIMESTAMP                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  gid               VARCHAR(32)                    NULL,
   guid              VARCHAR(40)                    NOT NULL,
   leftguid          CHAR(1)                        NOT NULL COMMENT 'The first letter of the release guid',
   fromname          VARCHAR(255)                   NULL,
