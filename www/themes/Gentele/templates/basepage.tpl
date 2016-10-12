@@ -23,6 +23,9 @@
 	<!-- Bootstrap core CSS -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
+	<!-- flexboxgrid -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/flexboxgrid/dist/flexboxgrid.min.css" rel="stylesheet"
+		  type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
@@ -34,7 +37,8 @@
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/custom.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/flat/green.css" rel="stylesheet">
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" type="text/css" media="screen"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" type="text/css"
+		  media="screen"/>
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
 	<script src="{$smarty.const.WWW_THEMES}/shared/assets/html5shiv/dist/html5shiv.min.js"></script>
@@ -54,11 +58,11 @@
 				<div class="clearfix"></div>
 				<!-- menu profile quick info -->
 				<div class="profile">
-					<div class="profile_pic">
-						<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png" alt="User Image"
-							 class="img-circle profile_img">
-					</div>
 					{if $loggedin == "true"}
+						<div class="profile_pic">
+							<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png" alt="User Image"
+								 class="img-circle profile_img">
+						</div>
 						<div class="profile_info">
 							<span>Welcome,</span>
 							<h2>{$userdata.username}</h2>
@@ -67,6 +71,7 @@
 				</div>
 				<!-- /menu profile quick info -->
 				<br/>
+				<div class="clearfix"></div>
 				<!-- sidebar menu -->
 				<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
 					<div class="menu_section">
@@ -103,6 +108,7 @@
 									</ul>
 								</li>
 							{/if}
+							<div class="clearfix"></div>
 							<li><a><i class="fa fa-edit"></i> Articles & Links <span class="fa fa-chevron-down"></span></a>
 								<ul class="nav child_menu" style="display: none">
 									<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
@@ -119,6 +125,7 @@
 												API</a></li>
 									{/if}
 								</ul>
+								<div class="clearfix"></div>
 								{if $loggedin == "true"}
 							<li><a href="{$smarty.const.WWW_TOP}/logout"><i
 											class="fa fa-unlock"></i><span> Sign Out</span></a></li>
@@ -154,15 +161,18 @@
 					<div class="clearfix"></div>
 				</div>
 			</div>
-			<!-- footer content -->
-			<footer>
-				<div class="copyright-info">
-					<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
-							href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is open source, released under the GPL license
-				</div>
-				<div class="clearfix"></div>
-			</footer>
-			<!-- /footer content -->
+			<div class="container">
+				<!-- footer content -->
+				<footer>
+					<div class="copyright-info">
+						<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
+									href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is
+						open source, released under the GPL license
+					</div>
+					<div class="clearfix"></div>
+				</footer>
+				<!-- /footer content -->
+			</div>
 
 		</div>
 		<!-- /page content -->
@@ -183,23 +193,26 @@
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
 <!-- tinymce editor -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/tinymce-builded/js/tinymce/tinymce.min.js"></script>
-<!-- Custom functions -->
-<script src="{$smarty.const.WWW_THEMES}/shared/js/functions.js" type="text/javascript"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
+<script type="text/javascript"
+		src="{$smarty.const.WWW_THEMES}/shared/assets/tinymce-builded/js/tinymce/tinymce.min.js"></script>
 <!-- jQuery migrate script -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
+<script type="text/javascript"
+		src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip2.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
+<!-- Custom functions -->
+<script src="{$smarty.const.WWW_THEMES}/shared/js/functions.js" type="text/javascript"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
 
 <!-- PNotify -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.animate.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.desktop.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.callbacks.js"></script>
+<script type="text/javascript"
+		src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.callbacks.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.buttons.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.confirm.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.nonblock.js"></script>

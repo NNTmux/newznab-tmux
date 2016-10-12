@@ -18,7 +18,7 @@
 <div class="box-body">
 	<div class="box-inner">
 		<div class="row">
-			<div class="col-xlg-12 portlets">
+			<div class="col-lg-12 col-sm-12 col-xs-12">
 				<div class="panel panel-default">
 					<div class="panel-body col-md-12">
 						<div class="row col-md-12">

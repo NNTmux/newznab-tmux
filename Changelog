@@ -1,3 +1,35 @@
+2016-10-11 DariusIII
+	* Chg: Update README.md
+	* Fix: Advanced/Basic search toggle in Gamma theme
+	* Fix: Search button on TV series list
+	* Fix: TinyMCE URL handling
+	* Chg: Add ability to edit posts on forum.
+2016-10-10 DariusIII
+	* Chg: Add release naming regex for a.b.multimedia.anime.highspeed for better release naming
+	* Chg: Add release_naming_regex for a.b.movies group DJ releases
+2016-10-07 DariusIII
+	* Chg: Add user deletion to admin user edit
+	* Chg: Update composer with new version of RarInfo
+	* Fix: Search button design in Charisma/Gentele/Omicron themes for advanced search
+2016-10-16 DariusIII
+	* Chg: Add flexboxgrid support to Charisma/Gentele/Omicron themes, adjust the themes accordingly
+	* Chg: Adjust the look of login page on Gentele theme
+2016-10-05 DariusIII
+	* Fix: Gentele theme Series and Anime list visibility
+	* Chg: Add caching to getPagerCount function to reduce load on indexers with many API calls
+	* Fix: Logic in queries for xxx and srr renaming in NameFixer.
+2016-10-04 DariusIII
+	* Fix: Fix xxx and srr renaming queries
+	* Chg: Remove unused Max Messages Per Run setting from admin->edit site
+	* Chg: Add renaming based on included srr file in release
+2016-10-03 DariusIII
+	* Fix: Add missing lamepath to 10-settings.tsv (fixes issue #120)
+2016-09-30 DariusIII
+	* Chg: Update jquery and themes basepage to fix tinymce loading error
+2016-09-23 DariusIII
+	* Chg: Rename roleexcat table to role_excluded_categories and add it back to mysql-ddl.sql
+	* Fix: Add back missing role category exclusion in admin->role edit
+	* Fix: Replace leftover genreID references with proper genres_id
 2016-09-22 DariusIII
 	* Chg: Update Readme.md
 	* Chg: Move tinyMCE init to utils-admin.js

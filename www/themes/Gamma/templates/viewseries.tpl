@@ -84,7 +84,7 @@
 			</div>
 
 		    <div class="btn-group pull-right">
-		        <div class="input-append">
+		        <div class="input-group">
                     <input class="span2"  id="filter-text" type="text" placeholder="Filter">
                 </div>
 		    </div>

@@ -11,8 +11,8 @@
 </p>
 <form class="form pull-right" style="margin-top:-35px;">
 	<form name="showsearch" class="navbar-form" action="" method="get">
-		<div class="input-append">
-			<input class="input-medium" id="title appendedInputButton" type="text" name="title" value="{$showname}" class="span2" placeholder="Search here"/>
+		<div class="input-group">
+			<input class="input-medium span2" id="title appendedInputButton" type="text" name="title" value="{$series.title}" placeholder="Search here"/>
 			<button type="submit" class="btn">GO</button>
 		</div>
 	</form>

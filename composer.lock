@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e49235704ac34230df713c01ce5ec054",
-    "content-hash": "f5ced3c2d4e75d8ebeef1d593c58a653",
+    "hash": "aa1386a313394fd492da1e39ccde2feb",
+    "content-hash": "43a003a33739d002c050b77fcba4846c",
     "packages": [
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -447,6 +447,42 @@
             }
         },
         {
+            "name": "bower-asset/flexboxgrid",
+            "version": "v6.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kristoferjoseph/flexboxgrid.git",
+                "reference": "854e214331101c04df893560d7cd1608f2105f6e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kristoferjoseph/flexboxgrid/zipball/854e214331101c04df893560d7cd1608f2105f6e",
+                "reference": "854e214331101c04df893560d7cd1608f2105f6e",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "dist/flexboxgrid.css",
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "node_modules",
+                    "bower_components",
+                    "test",
+                    "tests"
+                ]
+            },
+            "license": [
+                "Apache 2"
+            ],
+            "description": "Grid based on the flex display property.",
+            "keywords": [
+                "browser",
+                "css",
+                "flexbox",
+                "grid"
+            ]
+        },
+        {
             "name": "bower-asset/font-awesome",
             "version": "v4.6.3",
             "source": {
@@ -564,16 +600,16 @@
         },
         {
             "name": "bower-asset/jquery",
-            "version": "3.1.0",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jquery/jquery-dist.git",
-                "reference": "6f02bc382c0529d3b4f68f6b2ad21876642dbbfe"
+                "reference": "1b30f3ad466ebf2714d47eda34dbd7fdf6849fe3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/6f02bc382c0529d3b4f68f6b2ad21876642dbbfe",
-                "reference": "6f02bc382c0529d3b4f68f6b2ad21876642dbbfe",
+                "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/1b30f3ad466ebf2714d47eda34dbd7fdf6849fe3",
+                "reference": "1b30f3ad466ebf2714d47eda34dbd7fdf6849fe3",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -626,16 +662,16 @@
         },
         {
             "name": "bower-asset/jquery-3.1.x",
-            "version": "3.1.0",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jquery/jquery-dist.git",
-                "reference": "6f02bc382c0529d3b4f68f6b2ad21876642dbbfe"
+                "reference": "1b30f3ad466ebf2714d47eda34dbd7fdf6849fe3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/6f02bc382c0529d3b4f68f6b2ad21876642dbbfe",
-                "reference": "6f02bc382c0529d3b4f68f6b2ad21876642dbbfe",
+                "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/1b30f3ad466ebf2714d47eda34dbd7fdf6849fe3",
+                "reference": "1b30f3ad466ebf2714d47eda34dbd7fdf6849fe3",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1078,12 +1114,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "69ffe82e9cee2d37821741b554c90755b0b37ad1"
+                "reference": "e6bd26f56eb8dd4bc452d92bec98a285cc38a00d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/69ffe82e9cee2d37821741b554c90755b0b37ad1",
-                "reference": "69ffe82e9cee2d37821741b554c90755b0b37ad1",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/e6bd26f56eb8dd4bc452d92bec98a285cc38a00d",
+                "reference": "e6bd26f56eb8dd4bc452d92bec98a285cc38a00d",
                 "shasum": ""
             },
             "require": {
@@ -1117,7 +1153,7 @@
                 }
             ],
             "description": "PHP archive reader helper class",
-            "time": "2016-09-12 12:49:10"
+            "time": "2016-10-07 08:38:10"
         },
         {
             "name": "exeu/apai-io",

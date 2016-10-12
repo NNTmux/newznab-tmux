@@ -66,9 +66,9 @@ Before converting to InnoDB be sure to set:
 
 ## Installation
 
- Follow nZEDb Ubuntu install guide, just replace nZEDb with nntmux:
+ Follow NNTmux Ubuntu install guide:
 
- https://github.com/nZEDb/nZEDb_Misc/blob/master/Guides/Installation/Ubuntu/Guide.md
+ https://github.com/NNTmux/newznab-tmux/wiki/Ubuntu-Install-guide
 
  For composer install and getting NNTmux follow this guide:
 

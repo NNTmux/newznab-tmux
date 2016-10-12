@@ -1,17 +1,21 @@
 <h2>Search</h2>
-<div class="btn btn-info pull-right"  style="text-decoration: none; font-family: Droid Sans,sans-serif;" onclick="if (jQuery(this).text() == 'Basic Search')
-				jQuery(this).text('Advanced Search');
-			else
-				jQuery(this).text('Basic Search');
-			jQuery('#sbasic,#sadvanced').toggle();
-		return false;">{if $sadvanced}Basic{else}Click For Advanced{/if} Search
+<div>
+	<div style="text-align: right;">
+		<a href="#" onclick="if (jQuery(this).text() == 'Advanced Search')
+					jQuery(this).text('Basic Search');
+				else
+					jQuery(this).text('Advanced Search');
+				jQuery('#sbasic,#sadvanced').toggle();
+				return false;">{if $sadvanced}Basic{else}Click For Advanced{/if} Search
+		</a>
+	</div>
 </div>
 
 <div class="navbar">
 	<div class="container">
 		<form method="get" class="navbar-form pull-left" action="{$smarty.const.WWW_TOP}/search">
 			<div id="sbasic" style="text-align:center;{if $sadvanced} display:none;{/if}">
-				<div class="input-append">
+				<div class="input-group">
 				<input id="search" class="input-large" name="search" value="{$search|escape:'html'}" type="text" placeholder="Search" />
 				<input id="search_search_button" class="btn btn-success" type="submit" value="Search" />
 				</div>

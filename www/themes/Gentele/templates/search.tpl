@@ -103,7 +103,7 @@
 							<input type="checkbox" name="searchadvhascomments" value="1">
 							<div style="float:right;"><input type="hidden" name="search_type" value="adv"
 															 id="search_type">
-								<input id="search_adv_button" type="submit" value="search">
+								<input id="search_adv_button" class="btn btn-primary" type="submit" value="Search">
 							</div>
 						</td>
 					</tr>

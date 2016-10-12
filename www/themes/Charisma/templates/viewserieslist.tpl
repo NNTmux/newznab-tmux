@@ -24,15 +24,24 @@
 		{foreach $serieslist as $sletter => $series}
 			<tr>
 				<td colspan="10">
-					<h2>{$sletter}...</h2>
-					<form class="form pull-right" style="margin-top:-35px;">
-						<form name="showsearch" class="navbar-form" action="" method="get">
-							<div class="input-append">
-								<input class="form-control" style="width: 150px;" id="title appendedInputButton" type="text" name="title" value="{$showname}" placeholder="Search here"/>
-								<button type="submit" class="btn btn-default">GO</button>
-							</div>
-						</form>
-					</form>
+					<div class="row">
+						<div class="col-md-3">
+							<h2>{$sletter}</h2>
+						</div>
+						<div class="col-md-9">
+							<form class="form pull-right" style="margin-top:-35px;">
+								<form name="showsearch" class="navbar-form" action="" method="get">
+									<div class="input-group">
+										<input class="form-control" style="width: 150px;"
+											   id="title appendedInputButton"
+											   type="text" name="title" value="{$series.title}"
+											   placeholder="Search here"/>
+										<button type="submit" class="btn btn-success">GO</button>
+									</div>
+								</form>
+							</form>
+						</div>
+					</div>
 				</td>
 			</tr>
 			<tr>
