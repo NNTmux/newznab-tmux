@@ -1,4 +1,5 @@
 2016-10-13 DariusIII
+	* Chg: getBrowseCount function now returns proper value for total count of releases for API totalrows
 	* Fix: getBrowseRange query missing group_name used in API extended parameter
 2016-10-12 DariusIII
 	* Chg: Update composer.json with new version of composer asset plugin

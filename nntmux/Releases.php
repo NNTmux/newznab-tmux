@@ -164,9 +164,9 @@ class Releases
 	 */
 	public function getBrowseCount($cat, $maxAge = -1, $excludedCats = [], $groupName = '')
 	{
-		return $this->getPagerCount(
+		$count = $this->pdo->query(
 			sprintf(
-				'SELECT r.id
+				'SELECT COUNT(r.id) AS count
 				FROM releases r
 				%s
 				WHERE r.nzbstatus = %d
@@ -179,8 +179,10 @@ class Releases
 				$this->categorySQL($cat),
 				($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY ') : ''),
 				(count($excludedCats) ? (' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')') : '')
-			)
+			), true, NN_CACHE_EXPIRY_SHORT
 		);
+
+		return (isset($count[0]['count']) ? $count[0]['count'] : 0);
 	}
 
 	/**
