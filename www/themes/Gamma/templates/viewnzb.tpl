@@ -369,7 +369,6 @@
 				{if isset($isadmin)}
 					<dt>Release Info</dt>
 					<dd>
-						Regex Id (<a href="{$smarty.const.WWW_TOP}/admin/regex-list.php?group={$release.group_name|escape:"url"}#{$release.regexid}">{$release.regexid}</a>)
 						{if $release.reqid != ""}
 							Request Id ({$release.reqid})
 						{/if}

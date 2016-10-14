@@ -1,4 +1,5 @@
 2016-10-14 DariusIII
+	* Fix: Remove references to regexid
 	* Fix: Wrong column name in addAlternateNfo function
 	* Fix: lookuppar2 setting in NZBContents class.
 	* Chg: Add new favicon
