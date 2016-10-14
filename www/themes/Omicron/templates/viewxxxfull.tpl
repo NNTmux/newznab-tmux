@@ -89,38 +89,10 @@
 											<input id="chkSelectAll" type="checkbox" class="square-all"/>
 											<label for="chkSelectAll" style="display:none;">Select All</label>
 										</th>
-										<th>Name<br/>
-											<a title="Sort Descending" href="{$orderbyname_desc}">
-												<i class="fa fa-caret-down"></i>
-											</a>
-											<a title="Sort Ascending" href="{$orderbyname_asc}">
-												<i class="fa fa-caret-up"></i>
-											</a>
-										</th>
-										<th>Category<br/>
-											<a title="Sort Descending" href="{$orderbycat_desc}">
-												<i class="fa fa-caret-down"></i>
-											</a>
-											<a title="Sort Ascending" href="{$orderbycat_asc}">
-												<i class="fa fa-caret-up"></i>
-											</a>
-										</th>
-										<th>Posted<br/>
-											<a title="Sort Descending" href="{$orderbyposted_desc}">
-												<i class="fa fa-caret-down"></i>
-											</a>
-											<a title="Sort Ascending" href="{$orderbyposted_asc}">
-												<i class="fa fa-caret-up"></i>
-											</a>
-										</th>
-										<th>Size<br/>
-											<a title="Sort Descending" href="{$orderbysize_desc}">
-												<i class="fa fa-caret-down"></i>
-											</a>
-											<a title="Sort Ascending" href="{$orderbysize_asc}">
-												<i class="fa fa-caret-up"></i>
-											</a>
-										</th>
+										<th>Name</th>
+										<th>Category</th>
+										<th>Posted</th>
+										<th>Size</th>
 										<th>Action</th>
 									</tr>
 									{assign var="msplits" value=","|explode:$result.grp_release_id}
