@@ -1,4 +1,5 @@
 2016-10-14 DariusIII
+	* Fix: Caret icons display in viewxxxfull
 	* Chg: Add more ordering options to XXX to prevent undefined index errors
 	* Fix: Remove episodeArray from detals.php
 	* Fix: Remove missplaced semicolon from mysql-ddl.sql
