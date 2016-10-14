@@ -1,4 +1,5 @@
 2016-10-14 DariusIII
+	* Fix: Remove episodeArray from detals.php
 	* Fix: Remove missplaced semicolon from mysql-ddl.sql
 	* Chg: Update composer with new version of rarinfo
 2016-10-13 DariusIII

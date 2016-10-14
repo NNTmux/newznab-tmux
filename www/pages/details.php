@@ -139,7 +139,6 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('show',$showInfo);
 	$page->smarty->assign('movie',$mov);
 	$page->smarty->assign('xxx', $xxx);
-	$page->smarty->assign('episode',$episodeArray);
 	$page->smarty->assign('anidb',$AniDBAPIArray);
 	$page->smarty->assign('music',$mus);
 	$page->smarty->assign('con',$con);
