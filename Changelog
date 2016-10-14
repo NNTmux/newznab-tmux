@@ -1,4 +1,5 @@
 2016-10-14 DariusIII
+	* Fix: Prevent some more undefined index notices
 	* Fix: Prevent undefined index isadmin in forumpost.tpl
 	* Fix: Remove references to regexid
 	* Fix: Wrong column name in addAlternateNfo function
