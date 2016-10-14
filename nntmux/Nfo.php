@@ -202,7 +202,7 @@ class Nfo
 	{
 		if ($release['id'] > 0 && $this->isNFO($nfo, $release['guid'])) {
 
-			$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM release_nfos WHERE releases_id = %d', $release['id']));
+			$check = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM release_nfos WHERE releases_id = %d', $release['id']));
 
 			if ($check === false) {
 				$this->pdo->queryInsert(
