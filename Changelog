@@ -1,4 +1,5 @@
 2016-10-14 DariusIII
+	* Chg: Add more ordering options to XXX to prevent undefined index errors
 	* Fix: Remove episodeArray from detals.php
 	* Fix: Remove missplaced semicolon from mysql-ddl.sql
 	* Chg: Update composer with new version of rarinfo
