@@ -20,8 +20,6 @@ if ($page->isPostBack()) {
 	$cfg->doCheck = true;
 
 	$cfg->ADMIN_USER = trim($_POST['user']);
-	$cfg->ADMIN_FNAME = trim($_POST['fname']);
-	$cfg->ADMIN_LNAME = trim($_POST['lname']);
 	$cfg->ADMIN_PASS = trim($_POST['pass']);
 	$cfg->ADMIN_EMAIL = trim($_POST['email']);
 
