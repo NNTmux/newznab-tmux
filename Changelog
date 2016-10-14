@@ -1,3 +1,5 @@
+2016-10-14 DariusIII
+	* Chg: Update composer with new version of rarinfo
 2016-10-13 DariusIII
 	* Chg: Remove TraktTv cover support for movies and TV (Trakt will not serve any images after october 31)
 	* Chg: getBrowseCount function now returns proper value for total count of releases for API totalrows
