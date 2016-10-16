@@ -1,3 +1,5 @@
+2016-10-16 DariusIII
+	* Fix: Wrong table used in deleteSingle function
 2016-10-14 DariusIII
 	* Fix: Prevent some more undefined index notices
 	* Fix: Prevent undefined index isadmin in forumpost.tpl
