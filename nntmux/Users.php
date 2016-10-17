@@ -813,9 +813,10 @@ class Users
 	public function getRoleCategoryExclusion($role)
 	{
 		$ret = [];
-		$data = $this->pdo->query(sprintf("SELECT categories_id FROM role_excluded_categories WHERE role = %d", $role));
-		foreach ($data as $d)
-			$ret[] = $d["categories_id"];
+		$categories = $this->pdo->query(sprintf("SELECT categories_id FROM role_excluded_categories WHERE role = %d", $role));
+		foreach ($categories as $category) {
+			$ret[] = $category["categories_id"];
+		}
 
 		return $ret;
 	}
