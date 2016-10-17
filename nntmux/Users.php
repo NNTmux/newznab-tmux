@@ -823,7 +823,7 @@ class Users
 	public function addRoleCategoryExclusions($role, $catids)
 	{
 		$this->delRoleCategoryExclusions($role);
-		if (COUNT($catids) > 0) {
+		if (count($catids) > 0) {
 			foreach ($catids as $catid) {
 				$this->pdo->queryInsert(sprintf("INSERT INTO role_excluded_categories (role, categories_id, createddate) VALUES (%d, %d, now())", $role, $catid));
 			}
