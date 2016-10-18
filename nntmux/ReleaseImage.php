@@ -91,14 +91,11 @@ class ReleaseImage
 			$img = @file_get_contents($imgLoc);
 		}
 
-		if ($img !== false) {
-			if (@getimagesizefromstring($img) !== false) {
-				$im = @imagecreatefromstring($img);
-				if ($im !== false) {
-					imagedestroy($im);
-
-					return $img;
-				}
+		if ($img !== false && @getimagesizefromstring($img) !== false) {
+			$im = @imagecreatefromstring($img);
+			if ($im !== false) {
+				imagedestroy($im);
+				return $img;
 			}
 		}
 		return false;
