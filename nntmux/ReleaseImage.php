@@ -92,10 +92,13 @@ class ReleaseImage
 		}
 
 		if ($img !== false) {
-			$im = @imagecreatefromstring($img);
-			if ($im !== false) {
-				imagedestroy($im);
-				return $img;
+			if (@getimagesizefromstring($img) !== false) {
+				$im = @imagecreatefromstring($img);
+				if ($im !== false) {
+					imagedestroy($im);
+
+					return $img;
+				}
 			}
 		}
 		return false;

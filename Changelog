@@ -1,3 +1,5 @@
+2016-10-18 DariusIII
+	* Fix: Segfaults on PPA (possible fix)
 2016-10-16 DariusIII
 	* Fix: Wrong table used in deleteSingle function
 2016-10-14 DariusIII
