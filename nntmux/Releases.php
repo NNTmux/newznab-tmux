@@ -164,9 +164,9 @@ class Releases
 	 */
 	public function getBrowseCount($cat, $maxAge = -1, $excludedCats = [], $groupName = '')
 	{
-		return $this->getPagerCount(
+		$count = $this->pdo->query(
 			sprintf(
-				'SELECT r.id
+				'SELECT COUNT(r.id) AS count
 				FROM releases r
 				%s
 				WHERE r.nzbstatus = %d
@@ -179,8 +179,10 @@ class Releases
 				$this->categorySQL($cat),
 				($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY ') : ''),
 				(count($excludedCats) ? (' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')') : '')
-			)
+			), true, NN_CACHE_EXPIRY_SHORT
 		);
+
+		return (isset($count[0]['count']) ? $count[0]['count'] : 0);
 	}
 
 	/**
@@ -236,6 +238,7 @@ class Releases
 			"SELECT r.*,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				CONCAT(cp.id, ',', c.id) AS category_ids,
+				g.name AS group_name,
 				df.failed AS failed,
 				rn.releases_id AS nfoid,
 				re.releases_id AS reid,
@@ -244,6 +247,7 @@ class Releases
 			FROM releases r
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
+			LEFT JOIN groups g ON g.id = r.groups_id
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
@@ -663,7 +667,7 @@ class Releases
 				FROM releases r
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 				LEFT OUTER JOIN release_comments rc ON rc.releases_id = r.id
-				LEFT OUTER JOIN user_downloads uc ON uc.releases_id = r.id
+				LEFT OUTER JOIN users_releases uc ON uc.releases_id = r.id
 				LEFT OUTER JOIN release_files rf ON rf.releases_id = r.id
 				LEFT OUTER JOIN audio_data ra ON ra.releases_id = r.id
 				LEFT OUTER JOIN release_subtitles rs ON rs.releases_id = r.id

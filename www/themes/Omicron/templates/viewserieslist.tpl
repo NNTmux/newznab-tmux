@@ -53,7 +53,7 @@
 			</tr>
 			{foreach $series as $s}
 				<tr>
-					<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.id}">{$s.title|escape:"htmlall"}</a>{if $s.prevdate != ''}<br /><span class="label label-info">Last: {$s.previnfo|escape:"htmlall"} aired {$s.prevdate|date_format}</span>{/if}</td>
+					<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.id}">{if !empty($s.title)}{$s.title|escape:"htmlall"}{/if}</a>{if $s.prevdate != ''}<br /><span class="label label-info">Last: {$s.previnfo|escape:"htmlall"} aired {$s.prevdate|date_format}</span>{/if}</td>
 					<td>{$s.publisher|escape:"htmlall"}</td>
 					<td>{$s.countries_id|escape:"htmlall"}</td>
 					<td class="mid">

@@ -56,7 +56,6 @@
 									{if isset($isadmin)}
 										<td><span title="procstat">{$result.procstat}</span>/<span
 													title="totalparts">{$result.totalParts}</span>/<span
-													title="regex">{if $result.regexid == ""}_{else}{$result.regexid}{/if}</span>/<span
 													title="relpart">{$result.relpart}</span>/<span
 													title="reltotalpart">{$result.reltotalpart}</span></td>
 										<td class="less">{if $result.binnum < $result.totalParts}<span

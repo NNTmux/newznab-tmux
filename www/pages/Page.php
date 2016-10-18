@@ -23,7 +23,7 @@ class Page extends BasePage
 			[
 				'user' 		=> NN_THEMES . $this->theme . '/templates',
 				'shared' 	=> NN_THEMES . 'shared/templates',
-				'default' 	=> NN_THEMES . 'Omicron/templates'
+				'default' 	=> NN_THEMES . 'Gentele/templates'
 			]
 		);
 

@@ -1,5 +1,7 @@
 <div class="header">
-	{assign var="catsplit" value=">"|explode:$catname}
+	{if isset($catname)}
+		{assign var="catsplit" value=">"|explode:$catname}
+	{/if}
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>

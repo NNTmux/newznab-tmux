@@ -1114,12 +1114,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "e6bd26f56eb8dd4bc452d92bec98a285cc38a00d"
+                "reference": "835e6e3a4fb81c7abd67ff6d548eca720c4a28a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/e6bd26f56eb8dd4bc452d92bec98a285cc38a00d",
-                "reference": "e6bd26f56eb8dd4bc452d92bec98a285cc38a00d",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/835e6e3a4fb81c7abd67ff6d548eca720c4a28a6",
+                "reference": "835e6e3a4fb81c7abd67ff6d548eca720c4a28a6",
                 "shasum": ""
             },
             "require": {
@@ -1153,7 +1153,7 @@
                 }
             ],
             "description": "PHP archive reader helper class",
-            "time": "2016-10-07 08:38:10"
+            "time": "2016-10-14 06:50:51"
         },
         {
             "name": "exeu/apai-io",
@@ -1218,16 +1218,16 @@
         },
         {
             "name": "fxp/composer-asset-plugin",
-            "version": "v1.2.1",
+            "version": "v1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/composer-asset-plugin.git",
-                "reference": "d7d189e8ffac26a2e39e26a9c75e1fc5c2e2b98d"
+                "reference": "60bc94db574103dfc73acb907fa79c6dfc86c96e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/d7d189e8ffac26a2e39e26a9c75e1fc5c2e2b98d",
-                "reference": "d7d189e8ffac26a2e39e26a9c75e1fc5c2e2b98d",
+                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/60bc94db574103dfc73acb907fa79c6dfc86c96e",
+                "reference": "60bc94db574103dfc73acb907fa79c6dfc86c96e",
                 "shasum": ""
             },
             "require": {
@@ -1270,7 +1270,7 @@
                 "npm",
                 "package"
             ],
-            "time": "2016-08-03 07:44:07"
+            "time": "2016-10-12 08:03:45"
         },
         {
             "name": "giantbomb/giantbomb",

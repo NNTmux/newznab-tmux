@@ -53,12 +53,11 @@
 									<td class="less">{$result.group_name|replace:"alt.binaries":"a.b"}</td>
 									<td class="less" title="{$result.date}">{$result.date|date_format}</td>
 									{if isset($isadmin)}
-										<td><span title="procstat">{$result.procstat}</span>/<span
-													title="totalparts">{$result.totalParts}</span>/<span
-													title="regex">{if $result.regexid == ""}_{else}{$result.regexid}{/if}</span>/<span
-													title="relpart">{$result.relpart}</span>/<span
+										<td><span title="procstat">{$result.procstat}</span>/<span>
+													title="totalparts">{$result.totalParts}</span>/<span>
+													title="relpart">{$result.relpart}</span>/<span>
 													title="reltotalpart">{$result.reltotalpart}</span></td>
-										<td class="less">{if $result.binnum < $result.totalParts}<span
+										<td class="less">{if $result.binnum < $result.totalParts}<span>
 													style="color:red;">{$result.binnum}
 												/{$result.totalParts}</span>{else}100%{/if}</td>
 									{/if}

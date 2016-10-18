@@ -283,7 +283,7 @@ class XXX
 	 */
 	public function getXXXOrdering()
 	{
-		return ['title_asc', 'title_desc'];
+		return ['title_asc', 'title_desc', 'name_asc', 'name_desc', 'size_asc', 'size_desc', 'posted_asc', 'posted_desc', 'cat_asc', 'cat_desc'];
 	}
 
 	/**

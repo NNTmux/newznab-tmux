@@ -655,6 +655,7 @@ CREATE TABLE         releases (
   postdate          DATETIME                       DEFAULT NULL,
   adddate           DATETIME                       DEFAULT NULL,
   updatetime        TIMESTAMP                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  gid               VARCHAR(32)                    NULL,
   guid              VARCHAR(40)                    NOT NULL,
   leftguid          CHAR(1)                        NOT NULL COMMENT 'The first letter of the release guid',
   fromname          VARCHAR(255)                   NULL,
@@ -1052,6 +1053,8 @@ CREATE TABLE users (
   nzbgeturl      VARCHAR(255)     NULL     DEFAULT NULL,
   nzbgetusername VARCHAR(255)     NULL     DEFAULT NULL,
   nzbgetpassword VARCHAR(255)     NULL     DEFAULT NULL,
+  nzbvortex_api_key VARCHAR(10)   NULL     DEFAULT NULL ,
+  nzbvortex_server_url VARCHAR(255) NULL   DEFAULT NULL,
   userseed       VARCHAR(50)      NOT NULL,
   notes          VARCHAR(255)     NOT NULL,
   cp_url         VARCHAR(255)     NULL     DEFAULT NULL,
@@ -1120,7 +1123,7 @@ CREATE TABLE role_excluded_categories
     categories_id   INT(11),
     createddate     DATETIME NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE INDEX ix_roleexcat_rolecat (role, categories_id);
+    UNIQUE INDEX ix_roleexcat_rolecat (role, categories_id)
 )
     ENGINE = MyISAM
     DEFAULT CHARSET = utf8

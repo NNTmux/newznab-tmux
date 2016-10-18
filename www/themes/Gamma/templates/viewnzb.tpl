@@ -123,29 +123,6 @@
 						<dt>Aired</dt>
 						<dd>{$release.tvairdate|date_format}</dd>
 					{/if}
-					{if $episode && $release.episodeinfoid > 0}
-						{if $episode.overview != ""}
-							<dt>Overview</dt>
-							<dd>{$episode.overview}</dd>
-						{/if}
-						{if $episode.rating > 0}
-							<dt>Rating</dt>
-							<dd>{$episode.rating}</dd>
-						{/if}
-						{if $episode.director != ""}
-							<dt>Director</dt>
-							<dd>{$episode.director|escape:"htmlall"|replace:"|":", "}</dd>
-						{/if}
-						{if $episode.gueststars != ""}
-							<dt>Guest Stars</dt>
-							<dd>{$episode.gueststars|escape:"htmlall"|replace:"|":", "}</dd>
-						{/if}
-						{if $episode.writer != ""}
-							<dt>Writer</dt>
-							<dd>{$episode.writer|escape:"htmlall"|replace:"|":", "}</dd>
-						{/if}
-					{/if}
-
 					<div style="margin-left: 180px;">
 						<a class="rndbtn badge" title="View all episodes from this anime" href="{$smarty.const.WWW_TOP}/anime/{$release.anidbid}">All Episodes</a>
 						<a class="rndbtn badge badge-inverse" target="_blank" href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}" title="View at AniDB">AniDB</a>
@@ -392,7 +369,6 @@
 				{if isset($isadmin)}
 					<dt>Release Info</dt>
 					<dd>
-						Regex Id (<a href="{$smarty.const.WWW_TOP}/admin/regex-list.php?group={$release.group_name|escape:"url"}#{$release.regexid}">{$release.regexid}</a>)
 						{if $release.reqid != ""}
 							Request Id ({$release.reqid})
 						{/if}

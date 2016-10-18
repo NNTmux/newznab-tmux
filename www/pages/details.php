@@ -7,7 +7,6 @@ use nntmux\ReleaseFiles;
 use nntmux\DnzbFailures;
 use nntmux\Releases;
 use nntmux\Videos;
-use nntmux\Episode;
 use nntmux\Movie;
 use nntmux\XXX;
 use nntmux\Games;
@@ -52,12 +51,6 @@ if (isset($_GET["id"]))
 		$showInfo = (new Videos(['Settings' => $page->settings]))->getByVideoID($data['videos_id']);
 	}
 
-	$episodeArray = '';
-	if ($data['episodeinfoid'] > 0)
-	{
-		$episode = new Episode();
-		$episodeArray = $episode->getEpisodeInfoByID($data['episodeinfoid']);
-	}
 	$mov = '';
 	if ($data['imdbid'] != '' && $data['imdbid'] != 0000000) {
 		$movie = new Movie(['Settings' => $page->settings]);
@@ -146,7 +139,6 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('show',$showInfo);
 	$page->smarty->assign('movie',$mov);
 	$page->smarty->assign('xxx', $xxx);
-	$page->smarty->assign('episode',$episodeArray);
 	$page->smarty->assign('anidb',$AniDBAPIArray);
 	$page->smarty->assign('music',$mus);
 	$page->smarty->assign('con',$con);
