@@ -1,4 +1,5 @@
 2016-10-18 DariusIII
+	* Chg: Increase the height of category exclusion selection table in all the themes
 	* Fix: Segfaults on PPA (possible fix)
 2016-10-16 DariusIII
 	* Fix: Wrong table used in deleteSingle function
