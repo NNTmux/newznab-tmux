@@ -90,7 +90,7 @@ class Versions extends \lithium\core\Object
 
 				$result = $this->versions->git->tag;
 			} else {
-				$result = $this->checkGitTagsAreEqual($update);
+				$result = $this->checkGitTagsAreEqual(['update' => $update]);
 			}
 		}
 
