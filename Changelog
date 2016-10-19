@@ -1,4 +1,5 @@
 2016-10-18 DariusIII
+	* Chg: Add distinction between cli and web php errors for easier tracking
 	* Chg: Increase the height of category exclusion selection table in all the themes
 	* Fix: Segfaults on PPA (possible fix)
 2016-10-16 DariusIII
