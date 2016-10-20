@@ -364,7 +364,7 @@ class Category
 	 */
 	public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
 	{
-		return $this->pdo->queryExec(sprintf("update categories set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where id = %d", $disablepreview, $status, $minsize, $maxsize, $this->pdo->escapeString($desc), $id));
+		return $this->pdo->queryExec(sprintf("UPDATE categories SET disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s WHERE id = %d", $disablepreview, $status, $minsize, $maxsize, $this->pdo->escapeString($desc), $id));
 	}
 
 	/**
@@ -385,8 +385,18 @@ class Category
 			sprintf('SELECT * FROM categories WHERE status = %d %s', Category::STATUS_ACTIVE, $exccatlist),
 			true, NN_CACHE_EXPIRY_LONG
 		);
+
+		foreach($arr as $key => $val) {
+			if($val['id'] == '0') {
+				$item = $arr[$key];
+				unset($arr[$key]);
+				array_push($arr, $item);
+				break;
+			}
+		}
+
 		foreach ($arr as $a) {
-			if ($a['parentid'] == '') {
+			if (empty($a['parentid'])) {
 				$ret[] = $a;
 			}
 		}

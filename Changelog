@@ -1,3 +1,5 @@
+2016-10-19 DariusIII
+	* Chg: Change in how OTHER categories are "rendered" in themes, now they can be also excluded from frontend by user
 2016-10-18 DariusIII
 	* Chg: Add distinction between cli and web php errors for easier tracking
 	* Chg: Increase the height of category exclusion selection table in all the themes
