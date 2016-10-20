@@ -10,6 +10,6 @@ $id = $_GET['id'] + 0;
 
 if (isset($id))
 {
-	$forum->deleteTopic($id);
+	$forum->deleteParent($id);
 	header("Location:" . WWW_TOP . "/forum");
 }
