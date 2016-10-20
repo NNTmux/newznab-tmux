@@ -1,4 +1,5 @@
 2016-10-20 DariusIII
+	* Chg: Properly add topic deletion to forum
 	* Fix: Role excluded categories work properly now
 	* Chg: Change in how OTHER categories are "rendered" in themes, now they can be also excluded from frontend by user
 2016-10-18 DariusIII
