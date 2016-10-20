@@ -11,6 +11,7 @@
 				<th style="padding-top:0px; padding-bottom:0px;">Posted By</th>
 				<th style="padding-top:0px; padding-bottom:0px;">Last Update</th>
 				<th style="padding-top:0px; padding-bottom:0px;" width="5%" class="mid">Replies</th>
+				<th style="padding-top:0px; padding-bottom:0px;">Action</th>
 			</tr>
 			{foreach $results as $result}
 				<tr class="{cycle values=",alt"}" id="guid{$result.id}">
@@ -21,6 +22,7 @@
 						<div class="hint">
 							{$result.message|truncate:200:'...':false:false}
 						</div>
+							<br/>
 					</td>
 					<td>
 						<a title="View profile"
@@ -35,6 +37,15 @@
 						<div class="hint">({$result.updateddate|timeago})</div>
 					</td>
 					<td class="mid">{$result.replies}</td>
+					<td>
+						{if isset($isadmin)}
+							<div>
+								<a class="confirm_action btn btn-sm btn-danger"
+								   href="{$smarty.const.WWW_TOP}/topic_delete.php?id={$result.id}"
+								   title="Delete Topic">Delete Topic</a>
+							</div>
+						{/if}
+					</td>
 				</tr>
 			{/foreach}
 		</table>
