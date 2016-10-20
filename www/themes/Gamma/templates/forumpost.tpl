@@ -22,7 +22,7 @@
 						   title="Edit Post">Edit</a>
 					</div>
 				{/if}
-				{if $userdata.role == 2}
+				{if isset($isadmin)}
 				<br/>
 				<div>
 					<a class="rndbtn confirm_action btn btn-mini btn-danger" href="{$smarty.const.WWW_TOP}/admin/forum-delete.php?id={$result.id} from={$smarty.server.REQUEST_URI|escape:"url"}" title="Delete Post">Delete</a>

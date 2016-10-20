@@ -27,7 +27,7 @@
 								   title="Edit Post">Edit</a>
 							</div>
 						{/if}
-						{if $userdata.role == 2}
+						{if isset($isadmin)}
 							<br/>
 							<div>
 								<a class="confirm_action btn btn-sm btn-danger"
