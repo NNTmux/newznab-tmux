@@ -803,7 +803,7 @@ class Users
 	public function addCategoryExclusions($uid, $catids)
 	{
 		$this->delUserCategoryExclusions($uid);
-		if (COUNT($catids) > 0) {
+		if (count($catids) > 0) {
 			foreach ($catids as $catid) {
 				$this->pdo->queryInsert(sprintf("INSERT INTO user_excluded_categories (users_id, categories_id, createddate) VALUES (%d, %d, now())", $uid, $catid));
 			}

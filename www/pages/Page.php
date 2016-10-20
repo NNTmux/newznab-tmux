@@ -46,7 +46,7 @@ class Page extends BasePage
 
 		$category = new Category(['Settings' => $content->pdo]);
 		if (!empty($this->userdata)) {
-			$parentcatlist = $category->getForMenu($this->userdata["categoryexclusions"]);
+			$parentcatlist = $category->getForMenu($this->userdata['categoryexclusions'], $this->userdata['rolecategoryexclusions']);
 		}
 		else {
 			$parentcatlist = $category->getForMenu();

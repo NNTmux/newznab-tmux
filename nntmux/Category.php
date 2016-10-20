@@ -372,14 +372,19 @@ class Category
 	 *
 	 * @return array
 	 */
-	public function getForMenu($excludedcats = [])
+	public function getForMenu($excludedcats = [], $roleexcludedcats = [])
 	{
 		$ret = [];
 
 		$exccatlist = '';
-		if (count($excludedcats) > 0) {
+		if (count($excludedcats) > 0 && count($roleexcludedcats) == 0) {
 			$exccatlist = ' AND id NOT IN (' . implode(',', $excludedcats) . ')';
+		} elseif (count($excludedcats) > 0 && count($roleexcludedcats) > 0) {
+			$exccatlist = ' AND id NOT IN (' . implode(',', $excludedcats) . ',' . implode(',', $roleexcludedcats) . ')';
+		} elseif (count($excludedcats) == 0 && count($roleexcludedcats) > 0) {
+			$exccatlist = ' AND id NOT IN (' . implode(',', $roleexcludedcats) . ')';
 		}
+		var_dump($exccatlist);
 
 		$arr = $this->pdo->query(
 			sprintf('SELECT * FROM categories WHERE status = %d %s', Category::STATUS_ACTIVE, $exccatlist),
