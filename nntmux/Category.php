@@ -384,7 +384,6 @@ class Category
 		} elseif (count($excludedcats) == 0 && count($roleexcludedcats) > 0) {
 			$exccatlist = ' AND id NOT IN (' . implode(',', $roleexcludedcats) . ')';
 		}
-		var_dump($exccatlist);
 
 		$arr = $this->pdo->query(
 			sprintf('SELECT * FROM categories WHERE status = %d %s', Category::STATUS_ACTIVE, $exccatlist),
