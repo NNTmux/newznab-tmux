@@ -71,7 +71,7 @@ class Forum
 	{
 		return $this->pdo->queryOneRow(
 			sprintf(
-				"SELECT forumpost.*, users.username FROM forumpost LEFT OUTER JOIN users ON users.id = forumpost.users_id WHERE forumpost.id = %d",
+				"SELECT f.*, u.username FROM forumpost f LEFT OUTER JOIN users u ON u.id = f.users_id WHERE f.id = %d",
 				$parent
 			)
 		);
@@ -135,9 +135,9 @@ class Forum
 	{
 		return $this->pdo->query(
 			sprintf("
-				SELECT forumpost.*, users.username
-				FROM forumpost
-				LEFT OUTER JOIN users ON users.id = forumpost.users_id
+				SELECT f.*, u.username
+				FROM forumpost f
+				LEFT OUTER JOIN users u ON u.id = f.users_id
 				WHERE parentid = 0
 				ORDER BY updateddate DESC %s",
 				($start === false ? '' : (" LIMIT " . $num . " OFFSET " . $start))
@@ -241,5 +241,25 @@ class Forum
 			)
 			);
 		}
+	}
+
+	/**
+	 * Lock forum topic
+	 *
+	 * @param $id
+	 * @param $lock
+	 */
+	public function lockUnlockTopic($id, $lock)
+	{
+		$this->pdo->queryExec(sprintf('
+						UPDATE forumpost
+						SET locked = %d
+						WHERE id = %d
+						OR parentid = %d',
+				$lock,
+				$id,
+				$id
+			)
+		);
 	}
 }

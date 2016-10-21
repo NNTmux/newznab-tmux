@@ -1,3 +1,5 @@
+2016-10-21 DariusIII
+	* Chg: Add support for topic locking/unlocking in forum
 2016-10-20 DariusIII
 	* Chg: Properly add topic deletion to forum
 	* Fix: Role excluded categories work properly now

@@ -25,6 +25,13 @@
 							{$result.message|truncate:200:'...':false:false}
 						</div>
 							<br/>
+						{if $result.locked == 1}
+							<button type="button"
+									class="btn btn-sm btn-warning"
+									data-toggle="tooltip" data-placement="top" title
+									data-original-title="Topic Locked">
+								<i class="fa fa-lock"></i></button>
+						{/if}
 					</td>
 					<td>
 						<a title="View profile"
@@ -45,6 +52,17 @@
 								<a class="confirm_action btn btn-sm btn-danger"
 								   href="{$smarty.const.WWW_TOP}/topic_delete?id={$result.id}"
 								   title="Delete Topic">Delete Topic</a>
+							</div>
+							<div>
+								{if $result.locked == 0}
+									<a class="confirm_action btn btn-sm btn-danger"
+									   href="{$smarty.const.WWW_TOP}/forum?lock={$result.id}"
+									   title="Lock Topic">Lock Topic</a>
+								{else}
+									<a class="confirm_action btn btn-sm btn-danger"
+									   href="{$smarty.const.WWW_TOP}/forum?unlock={$result.id}"
+									   title="Unlock Topic">Unlock Topic</a>
+								{/if}
 							</div>
 						{/if}
 					</td>

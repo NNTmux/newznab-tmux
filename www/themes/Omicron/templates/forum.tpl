@@ -24,6 +24,9 @@
 						<div class="hint">
 							{$result.message|truncate:200:'...':false:false}
 						</div>
+						{if $result.locked == 1}
+							<label class="label label-warning" title="Topic Locked">Topic Locked</label>
+						{/if}
 					</td>
 					<td>
 						<a title="View profile"
@@ -44,6 +47,17 @@
 								<a class="confirm_action btn btn-sm btn-danger"
 								   href="{$smarty.const.WWW_TOP}/topic_delete?id={$result.id}"
 								   title="Delete Topic">Delete Topic</a>
+							</div>
+							<div>
+								{if $result.locked == 0}
+									<a class="confirm_action btn btn-sm btn-danger"
+									   href="{$smarty.const.WWW_TOP}/forum?lock={$result.id}"
+									   title="Lock Topic">Lock Topic</a>
+								{else}
+									<a class="confirm_action btn btn-sm btn-danger"
+									   href="{$smarty.const.WWW_TOP}/forum?unlock={$result.id}"
+									   title="Unlock Topic">Unlock Topic</a>
+								{/if}
 							</div>
 						{/if}
 					</td>

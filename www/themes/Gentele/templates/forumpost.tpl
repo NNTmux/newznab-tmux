@@ -20,7 +20,7 @@
 						on <span title="{$result.createddate}">{$result.createddate|date_format}</span>
 						<div class="hint">({$result.createddate|timeago})</div>
 						<br/>
-						{if $userdata.id == $result.users_id || isset($isadmin)}
+						{if $userdata.id == $result.users_id && $result.locked != 1 || isset($isadmin)}
 							<div>
 								<a class="btn btn-sm btn-warning"
 								   href="{$smarty.const.WWW_TOP}/post_edit?id={$result.id}"
@@ -41,22 +41,26 @@
 			{/foreach}
 		</table>
 		<div id="new" tabindex="-1" role="dialog" aria-labelledby="myLabel" aria-hidden="true">
-			<div class="header">
-				<h3 id="myLabel">Reply</h3>
-			</div>
-			<div class="body">
-				<form id="forum-post-reply" class="form-horizontal" action="" method="post">
-					<div class="control-group">
-						<label class="control-label" for="addMessage">Message</label>
-						<div class="controls">
-							<textarea id="addMessage" name="addMessage"></textarea>
+			{if $result.locked == 0}
+				<div class="header">
+					<h3 id="myLabel">Reply</h3>
+				</div>
+				<div class="body">
+					<form id="forum-post-reply" class="form-horizontal" action="" method="post">
+						<div class="control-group">
+							<label class="control-label" for="addMessage">Message</label>
+							<div class="controls">
+								<textarea id="addMessage" name="addMessage"></textarea>
+							</div>
+							<input class="btn btn-success" type="submit" value="Submit"/>
+							<input class="btn btn-warning" value="Cancel"
+								   onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();"/>
 						</div>
-						<input class="btn btn-success" type="submit" value="Submit"/>
-						<input class="btn btn-warning" value="Cancel"
-							   onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();"/>
-					</div>
-				</form>
-			</div>
+					</form>
+				</div>
+			{else}
+				<label class="label label-warning" title="Topic Locked">Topic Locked</label>
+			{/if}
 		</div>
 	{/if}
 </div>
