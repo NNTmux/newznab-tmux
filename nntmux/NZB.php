@@ -102,7 +102,7 @@ class NZB
 	/**
 	 * Default constructor.
 	 *
-	 * @param \nntmux\db\Settings $pdo
+	 * @param \nntmux\db\DB $pdo
 	 *
 	 * @access public
 	 */

@@ -16,4 +16,8 @@ UPDATE settings SET subsection = 'release' where setting = 'minfilestoformreleas
 
 #Update coverspath setting.
 
- UPDATE settings SET sections = 'site', subsection = 'main' where setting = 'coverspath';
+ UPDATE settings SET section = 'site', subsection = 'main' where setting = 'coverspath';
+
+ #Update coverspath setting.
+
+ UPDATE settings SET section = 'site', subsection = 'main' where setting = 'style';

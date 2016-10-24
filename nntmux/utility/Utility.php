@@ -232,7 +232,7 @@ class Utility
 		return ($gzipped);
 	}
 
-	public static function isPatched(Settings $pdo = null)
+	public static function isPatched(DB $pdo = null)
 	{
 		$versions = self::getValidVersionsFile();
 
