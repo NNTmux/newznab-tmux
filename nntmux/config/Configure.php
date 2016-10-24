@@ -37,13 +37,9 @@ class Configure
 		],
 	];
 
-	public function __construct($environment = '')
+	public function __construct($environment = 'indexer')
 	{
-		if (empty($environment)) {
-			$this->loadEnvironment('indexer');
-		} else {
-			$this->loadEnvironment($environment);
-		}
+		$this->loadEnvironment($environment);
 	}
 
 	private function loadEnvironment($environment)
