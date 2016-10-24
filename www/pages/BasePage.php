@@ -123,14 +123,14 @@ class BasePage
 		if ($this->users->isLoggedIn()) {
 			$this->setUserPreferences();
 		} else {
-			$this->theme = $this->getSettingValue('main.site.style');
+			$this->theme = $this->getSettingValue('site.main.style');
 
 			$this->smarty->assign('isadmin', 'false');
 			$this->smarty->assign('ismod', 'false');
 			$this->smarty->assign('loggedin', 'false');
 		}
-		if ($this->theme === '') {
-			$this->theme = 'Omicron';
+		if ($this->theme === 'None') {
+			$this->theme = Settings::value('site.main.style');
 		}
 
 		$this->smarty->assign('theme', $this->theme);
