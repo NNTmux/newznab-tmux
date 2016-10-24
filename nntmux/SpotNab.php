@@ -2,7 +2,7 @@
 namespace nntmux;
 
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use app\extensions\util\Yenc;
 
 // Help out those who don't have SSL enabled
@@ -135,7 +135,7 @@ class SpotNab {
 	private $_discovery_lastarticle;
 
 	public function __construct($post_user = NULL, $post_email = NULL, $post_group = NULL) {
-		$this->_pdo = new Settings();
+		$this->_pdo = new DB();
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
 		$this->releaseImage =  new ReleaseImage($this->_pdo);
 		$this->nzb = new NZB($this->_pdo);

@@ -1,8 +1,9 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
-use \nntmux\processing\PostProcess;
+use app\models\Settings;
+use nntmux\db\DB;
+use nntmux\processing\PostProcess;
 use nntmux\utility\Utility;
 
 /**
@@ -88,7 +89,7 @@ Class NZBContents
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->pp = (
@@ -99,8 +100,8 @@ Class NZBContents
 		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
 		$t = new Tmux();
 		$this->tmux = $t->get();
-		$this->lookuppar2 = ($this->pdo->getSetting('lookuppar2') == 1 ? true : false);
-		$this->alternateNNTP = ($this->pdo->getSetting('alternate_nntp') == 1 ? true : false);
+		$this->lookuppar2 = (Settings::value('..lookuppar2') == 1 ? true : false);
+		$this->alternateNNTP = (Settings::value('..alternate_nntp') == 1 ? true : false);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 /**

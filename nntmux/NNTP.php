@@ -2,7 +2,8 @@
 namespace nntmux;
 
 use app\extensions\util\Yenc;
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 /**
@@ -107,7 +108,7 @@ class NNTP extends \Net_NNTP_Client
 
 		$this->_echo = ($options['Echo'] && NN_ECHOCLI);
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		$this->_debugBool = (NN_LOGGING || NN_DEBUG);
 		if ($this->_debugBool) {
@@ -118,7 +119,7 @@ class NNTP extends \Net_NNTP_Client
 			}
 		}
 
-		$this->_nntpRetries = ($this->pdo->getSetting('nntpretries') != '') ? (int)$this->pdo->getSetting('nntpretries') : 0 + 1;
+		$this->_nntpRetries = (Settings::value('..nntpretries') != '') ? (int)Settings::value('..nntpretries') : 0 + 1;
 	}
 
 	/**
@@ -270,7 +271,7 @@ class NNTP extends \Net_NNTP_Client
 			// If we are connected and authenticated, try enabling compression if we have it enabled.
 			if ($connected === true && $authenticated === true) {
 				// Check if we should use compression on the connection.
-				if ($compression === false || $this->pdo->getSetting('compressedheaders') == 0) {
+				if ($compression === false || Settings::value('..compressedheaders') == 0) {
 					$this->_compressionSupported = false;
 				}
 				if ($this->_debugBool) {
@@ -343,7 +344,7 @@ class NNTP extends \Net_NNTP_Client
 	 */
 	public function enableCompression()
 	{
-		if (!$this->pdo->getSetting('compressedheaders') == 1) {
+		if (!Settings::value('..compressedheaders') == 1) {
 			return;
 		}
 		$this->_enableCompression();

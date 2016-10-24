@@ -53,6 +53,10 @@
  */
 define('LITHIUM_APP_PATH', realpath(dirname(dirname(__DIR__))));
 
+if (!defined('NN_ROOT')) {
+	define('NN_ROOT', realpath(dirname(LITHIUM_APP_PATH)) . DS);
+}
+
 /**
  * This is the path to the class libraries used by your application, and must contain a copy of the
  * Lithium core.  By default, this directory is named `libraries`, and resides in the same
@@ -133,6 +137,7 @@ if (!defined('NN_INSTALLER') || NN_INSTALLER !== true) {
 }
 
 require_once LITHIUM_APP_PATH . DS . 'libraries' . DS . 'autoload.php';
+
 /**
  * Add some plugins:
  */

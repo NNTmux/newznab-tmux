@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 /**
  * Class Binaries
@@ -168,7 +168,7 @@ class Binaries
 
 		$this->_echoCLI = ($options['Echo'] && NN_ECHOCLI);
 
-		$this->_pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->_pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->_pdo]));
 		$this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
 		$this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
@@ -193,7 +193,7 @@ class Binaries
 		$this->_partRepairLimit = ($this->_pdo->getSetting('maxpartrepair') != '') ? (int)$this->_pdo->getSetting('maxpartrepair') : 15000;
 		$this->_partRepairMaxTries = ($this->_pdo->getSetting('partrepairmaxtries') != '' ? (int)$this->_pdo->getSetting('partrepairmaxtries') : 3);
 		$this->_showDroppedYEncParts = ($this->_pdo->getSetting('showdroppedyencparts') == 1 ? true : false);
-		$this->_tablePerGroup = ($this->_pdo->getSetting('tablepergroup') == 1 ? true : false);
+		$this->_tablePerGroup = ($this->_pdo->getSetting('..tablepergroup') == 1 ? true : false);
 
 		$this->blackList = $this->whiteList = [];
 	}

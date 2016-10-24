@@ -1,8 +1,9 @@
 <?php
 namespace nntmux\utility;
 
+use app\models\Settings;
 use app\extensions\util\Versions;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\ColorCLI;
 
 
@@ -235,10 +236,10 @@ class Utility
 	{
 		$versions = self::getValidVersionsFile();
 
-		if (!($pdo instanceof Settings)) {
-			$pdo = new Settings();
+		if (!($pdo instanceof DB)) {
+			$pdo = new DB();
 		}
-		$patch = $pdo->getSetting(['section' => '', 'subsection' => '', 'name' => 'sqlpatch']);
+		$patch = Settings::value(['section' => '', 'subsection' => '', 'name' => 'sqlpatch']);
 		$ver = $versions->versions->sql->file;
 
 		// Check database patch version
@@ -717,7 +718,7 @@ class Utility
 				$mail->Password = PHPMAILER_SMTP_PASSWORD;
 			}
 		}
-		$settings = new Settings();
+		$settings = new DB();
 
 		$fromEmail = (PHPMAILER_FROM_EMAIL == '') ? $settings->getSetting('email') : PHPMAILER_FROM_EMAIL;
 		$fromName  = (PHPMAILER_FROM_NAME == '') ? $settings->getSetting('title') : PHPMAILER_FROM_NAME;
@@ -752,7 +753,7 @@ class Utility
 	 */
 	public static function fileInfo($path)
 	{
-		$magicPath = (new Settings())->getSetting('magic_file_path');
+		$magicPath = (new DB())->getSetting('magic_file_path');
 		if (self::hasCommand('file') && (!self::isWin() || !empty($magicPath))) {
 			$magicSwitch = empty($magicPath) ? '' : " -m $magicPath";
 			$output = self::runCmd('file' . $magicSwitch . ' -b "' . $path . '"');

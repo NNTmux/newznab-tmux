@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 /**
@@ -54,7 +54,7 @@ class ReleaseImage
 	{
 		// Creates the NN_COVERS constant
 		if ($pdo === null) {
-			$pdo = new Settings();
+			$pdo = new DB();
 		}
 		//                                                            Table    |  Column
 		$this->audSavePath    = NN_COVERS . 'audiosample' . DS; // releases    guid

@@ -1,7 +1,8 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 
 /**
  * Class for reading and writing NZB files on the hard disk,
@@ -107,12 +108,12 @@ class NZB
 	 */
 	public function __construct(&$pdo = null)
 	{
-		$this->pdo = ($pdo instanceof Settings ? $pdo : new Settings());
+		$this->pdo = ($pdo instanceof DB ? $pdo : new DB());
 
-		$this->tablePerGroup = ($this->pdo->getSetting('tablepergroup') == 0 ? false : true);
-		$nzbSplitLevel = $this->pdo->getSetting('nzbsplitlevel');
+		$this->tablePerGroup = (Settings::value('..tablepergroup') == 0 ? false : true);
+		$nzbSplitLevel = Settings::value('..nzbsplitlevel');
 		$this->nzbSplitLevel = (empty($nzbSplitLevel) ? 1 : $nzbSplitLevel);
-		$this->siteNzbPath = (string)$this->pdo->getSetting('nzbpath');
+		$this->siteNzbPath = (string)Settings::value('..nzbpath');
 		if (substr($this->siteNzbPath, -1) !== DS) {
 			$this->siteNzbPath .= DS;
 		}

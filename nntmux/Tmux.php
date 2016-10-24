@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 /**
  * Class Tmux
@@ -27,7 +27,7 @@ class Tmux
 	 */
 	function __construct(Settings $pdo = null)
 	{
-		$this->pdo = (empty($pdo) ? new Settings() : $pdo);
+		$this->pdo = (empty($pdo) ? new DB() : $pdo);
 	}
 
 	/**

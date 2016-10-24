@@ -1,7 +1,7 @@
 <?php
 require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\processing\PostProcess;
 use nntmux\ColorCLI;
 use nntmux\NameFixer;
@@ -13,7 +13,7 @@ $c = new ColorCLI();
 if (!isset($argv[1])) {
 	exit($c->error("This script is not intended to be run manually, it is called from fixreleasenames.php."));
 } else if (isset($argv[1])) {
-	$db = new Settings();
+	$db = new DB();
 	$namefixer = new NameFixer(['Settings' => $pdo]);
 	$pieces = explode(' ', $argv[1]);
 	if (isset($pieces[1]) && $pieces[0] == 'nfo') {

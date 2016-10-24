@@ -3,7 +3,7 @@ require_once realpath(__DIR__ . DIRECTORY_SEPARATOR . 'install.php');
 
 use nntmux\Install;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 $page = new InstallPage();
 
@@ -80,7 +80,7 @@ if ($page->isPostBack()) {
 			mkdir($cfg->UNRAR_PATH);
 		}
 
-		$pdo = new Settings();
+		$pdo = new DB();
 		$sql1 = sprintf("UPDATE settings SET value = %s WHERE setting = 'nzbpath'", $pdo->escapeString($cfg->NZB_PATH));
 		$sql2 = sprintf("UPDATE settings SET value = %s WHERE setting = 'tmpunrarpath'", $pdo->escapeString($cfg->UNRAR_PATH));
 		$sql3 = sprintf("UPDATE settings SET value = %s WHERE setting = 'coverspath'", $pdo->escapeString($cfg->COVERS_PATH));

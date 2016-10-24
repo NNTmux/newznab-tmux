@@ -20,7 +20,7 @@
  */
 namespace nntmux\processing;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 /**
  * Parent class for TV/Film and any similar classes to inherit from.
@@ -66,7 +66,7 @@ abstract class Videos
 		//date_default_timezone_set('UTC'); TODO: Make this a DTO instead and use as needed
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->titleCache = [];
 	}
 

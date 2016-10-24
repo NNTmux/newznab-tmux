@@ -1,6 +1,7 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
+use app\models\Settings;
 use nntmux\db\DB;
 
 $pdo = new DB();
@@ -18,7 +19,7 @@ if (isset($argv[1]) && ($argv[1] == "true" || $argv[1] == "drop")) {
 	}
 	unset($value);
 
-	$tpg = $pdo->getSetting('tablepergroup');
+	$tpg = Settings::value('..tablepergroup');
 	$tablepergroup = (!empty($tpg)) ? $tpg : 0;
 
 	if ($tablepergroup == 1) {

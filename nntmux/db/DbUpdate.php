@@ -20,8 +20,9 @@
  */
 namespace nntmux\db;
 
+use app\models\Settings;
 use nntmux\ColorCLI;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Git;
 use nntmux\utility\Utility;
 
@@ -81,7 +82,7 @@ class DbUpdate
 			$this->settings &= $this->pdo;
 		}
 
-		$this->_DbSystem = strtolower($this->pdo->dbSystem());
+		$this->_DbSystem = strtolower($this->pdo->DbSystem());
 	}
 
 	public function loadTables(array $options = [])
@@ -161,8 +162,6 @@ class DbUpdate
 		];
 		$options += $defaults;
 
-		$this->initSettings();
-
 		$this->processPatches(['safe' => $options['safe']]); // Make sure we are completely up to date!
 
 		echo $this->log->primaryOver('Looking for new patches...');
@@ -208,8 +207,6 @@ class DbUpdate
 			'safe'	=> true,
 		];
 		$options += $defaults;
-
-		$this->initSettings();
 
 		$currentVersion = $this->settings->getSetting(['setting' => 'sqlpatch']);
 		if (!is_numeric($currentVersion)) {
@@ -453,13 +450,6 @@ class DbUpdate
 		system("$PHP " . NN_MISC . 'testing' . DS . 'DB' . DS . $this->_DbSystem .
 			'dump_tables.php db dump');
 		$this->backedup = true;
-	}
-
-	protected function initSettings()
-	{
-		if (!($this->settings instanceof Settings)) {
-			$this->settings = new Settings();
-		}
 	}
 }
 

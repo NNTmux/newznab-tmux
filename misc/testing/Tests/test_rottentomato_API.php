@@ -3,11 +3,11 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 
 use nntmux\ColorCLI;
 use nntmux\RottenTomato;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 $cli = new ColorCLI();
 
-$rtkey = (new Settings())->getSetting('rottentomatokey');
+$rtkey = (new DB())->getSetting('rottentomatokey');
 if (isset($rtkey)) {
 	$rt = new RottenTomato($rtkey);
 	print_r(json_decode($rt->searchMovie("inception")));

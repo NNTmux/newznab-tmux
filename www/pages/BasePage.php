@@ -2,7 +2,8 @@
 
 require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 use nntmux\Users;
 use nntmux\SABnzbd;
 
@@ -95,7 +96,7 @@ class BasePage
 		}
 
 		// Buffer settings/DB connection.
-		$this->settings = new Settings();
+		$this->settings = new DB();
 		$this->smarty = new Smarty();
 
 		$this->smarty->setCompileDir(NN_SMARTY_TEMPLATES);
@@ -122,7 +123,7 @@ class BasePage
 		if ($this->users->isLoggedIn()) {
 			$this->setUserPreferences();
 		} else {
-			$this->theme = $this->settings->getSetting('style');
+			$this->theme = $this->getSettingValue('main.site.style');
 
 			$this->smarty->assign('isadmin', 'false');
 			$this->smarty->assign('ismod', 'false');
@@ -370,5 +371,34 @@ class BasePage
 			$this->settings->setSetting(['adbrowse', '']);
 			$this->settings->setSetting(['addetail', '']);
 		}
+	}
+
+	/**
+	 * Allows to fetch a value from the settings table.
+	 *
+	 * This method is deprecated, as the column it uses to select the data is due to be removed
+	 * from the table *soon*.
+	 *
+	 * @param $setting
+	 *
+	 * @return array|bool|mixed|null|string
+	 */
+	public function getSetting($setting)
+	{
+		if (strpos($setting, '.') === false) {
+			trigger_error(
+				'You should update your template to use the newer method "$page->getSettingValue()"" of fetching values from the "settings" table! This method *will* be removed in a future version.',
+				E_USER_WARNING);
+		} else {
+			return $this->getSettingValue($setting);
+		}
+
+		return $this->settings->$setting;
+
+	}
+
+	public function getSettingValue($setting)
+	{
+		return Settings::value($setting);
 	}
 }

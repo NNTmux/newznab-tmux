@@ -1,12 +1,13 @@
 <?php
 require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 use nntmux\Tmux;
 use nntmux\ColorCLI;
 
-$pdo = new Settings();
+$pdo = new DB();
 $DIR = NN_TMUX;
 $c = new ColorCLI();
 $t = new Tmux();
@@ -17,10 +18,10 @@ $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
 $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $colors = (isset($tmux->colors)) ? $tmux->colors : 0;
-$nntpproxy = $pdo->getSetting('nntpproxy');
-$tablepergroup = $pdo->getSetting('tablepergroup');
+$nntpproxy = Settings::value('..nntpproxy');
+$tablepergroup = Settings::value('..tablepergroup');
 $tablepergroup = ($tablepergroup != '') ? $tablepergroup : 0;
-$delaytimet = $pdo->getSetting('delaytime');
+$delaytimet = Settings::value('..delaytime');
 $delaytimet = ($delaytimet) ? (int)$delaytimet : 2;
 
 Utility::isPatched();
@@ -46,7 +47,7 @@ if (count($session) !== 0) {
 	exit($pdo->log->error("tmux session: '" . $tmux_session . "' is already running, aborting.\n"));
 }
 
-$nntpproxy = $pdo->getSetting('nntpproxy');
+$nntpproxy = Settings::value('..nntpproxy');
 if ($nntpproxy == '1') {
 	$modules = ["nntp", "socketpool"];
 	foreach ($modules as &$value) {
@@ -121,7 +122,7 @@ function python_module_exist($module)
 	return ($returnCode == 0 ? true : false);
 }
 
-$nntpproxy = $pdo->getSetting('nntpproxy');
+$nntpproxy = Settings::value('..nntpproxy');
 if ($nntpproxy == '1') {
 	$modules = array("nntp", "socketpool");
 	foreach ($modules as &$value) {
@@ -184,7 +185,7 @@ function start_apps($tmux_session)
 function window_proxy($tmux_session, $window)
 {
 	global $pdo;
-	$nntpproxy = $pdo->getSetting('nntpproxy');
+	$nntpproxy = Settings::value('..nntpproxy');
 	if ($nntpproxy === '1') {
 		$DIR = NN_MISC;
 		$nntpproxypy = $DIR . "update/python/nntpproxy.py";
@@ -194,7 +195,7 @@ function window_proxy($tmux_session, $window)
 		}
 	}
 
-	if ($nntpproxy === '1' && ($pdo->getSetting('alternate_nntp') == '1')) {
+	if ($nntpproxy === '1' && (Settings::value('..alternate_nntp') == '1')) {
 		$DIR = NN_MISC;
 		$nntpproxypy = $DIR . "update/python/nntpproxy.py";
 		if (file_exists($DIR . "python/lib/nntpproxy_a.conf")) {

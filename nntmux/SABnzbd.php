@@ -92,7 +92,7 @@ class SABnzbd
 		$this->serverurl = $page->serverurl;
 
 		// Set up properties.
-		switch ($page->settings->getSetting('sabintegrationtype')) {
+		switch ($page->getSettingValue('..sabintegrationtype')) {
 			case self::INTEGRATION_TYPE_USER:
 				if (!empty($_COOKIE['sabnzbd_' . $this->uid . '__apikey']) && !empty($_COOKIE['sabnzbd_' . $this->uid . '__host'])) {
 					$this->url = $_COOKIE['sabnzbd_' . $this->uid . '__host'];
@@ -118,11 +118,11 @@ class SABnzbd
 				break;
 
 			case self::INTEGRATION_TYPE_SITEWIDE:
-				if (($page->settings->getSetting('sabapikey') != '') && ($page->settings->getSetting('saburl') != '')) {
-					$this->url = $page->settings->getSetting('saburl');
-					$this->apikey = $page->settings->getSetting('sabapikey');
-					$this->priority = $page->settings->getSetting('sabpriority');
-					$this->apikeytype = $page->settings->getSetting('sabapikeytype');
+				if (($page->getSettingValue('..sabapikey') != '') && ($page->getSettingValue('..saburl') != '')) {
+					$this->url = $page->getSettingValue('..saburl');
+					$this->apikey = $page->getSettingValue('..sabapikey');
+					$this->priority = $page->getSettingValue('..sabpriority');
+					$this->apikeytype = $page->getSettingValue('..sabapikeytype');
 				}
 				$this->integrated = self::INTEGRATION_TYPE_SITEWIDE;
 				$this->integratedBool = true;

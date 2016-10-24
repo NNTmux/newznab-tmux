@@ -1,10 +1,10 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\Releases;
 
-$db = new Settings();
+$db = new DB();
 $r = new Releases();
 
 //

@@ -4,9 +4,9 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 // Test if your giantbomb key is working.
 
 use nntmux\ColorCLI;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
-$giantbombkey = (new Settings())->getSetting('giantbombkey');
+$giantbombkey = (new DB())->getSetting('giantbombkey');
 $cli = new ColorCLI();
 $obj = new GiantBomb($giantbombkey, $resp = "json");
 
