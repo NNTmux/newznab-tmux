@@ -1,3 +1,5 @@
+2016-10-24 DariusIII
+	* Chg: Search posts by poster by clicking on poster name on details page
 2016-10-21 DariusIII
 	* Chg: Remove now not needed yenc initiation code from NNTP class.
 	* Chg: Add support for topic locking/unlocking in forum
