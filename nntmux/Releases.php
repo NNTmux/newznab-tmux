@@ -63,7 +63,7 @@ class Releases
 		$this->passwordStatus = (Settings::value('..checkpasswordedrar') == 1 ? -1 : 0);
 		$this->sphinxSearch = new SphinxSearch();
 		$this->releaseSearch = new ReleaseSearch($this->pdo, $this->sphinxSearch);
-		$this->showPasswords = self::showPasswords($this->pdo);
+		$this->showPasswords = self::showPasswords();
 	}
 
 	/**
@@ -273,17 +273,14 @@ class Releases
 	/**
 	 * Return site setting for hiding/showing passworded releases.
 	 *
-	 * @param Settings $pdo
-	 *
 	 * @return string
 	 */
-	public static function showPasswords(Settings $pdo)
+	public static function showPasswords()
 	{
-		$setting = $pdo->query(
-			"SELECT value FROM settings WHERE setting = 'showpasswordedrelease'",
-			true, NN_CACHE_EXPIRY_LONG
-		);
-		switch ((isset($setting[0]['value']) && is_numeric($setting[0]['value']) ? $setting[0]['value'] : 10)) {
+		$setting = Settings::value('..showpasswordedrelease', true);
+		$setting = (isset($setting) && is_numeric($setting)) ? $setting : 10;
+
+		switch ($setting) {
 			case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
 				return ('= ' . Releases::PASSWD_NONE);
 			case 1: // Show releases with no password or a potential password (Show unprocessed releases).
