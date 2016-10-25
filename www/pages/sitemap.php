@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Settings;
 use nntmux\Contents;
 use nntmux\Sitemap;
 

@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Settings;
 use nntmux\ReleaseComments;
 use nntmux\SABnzbd;
 use nntmux\NZBGet;

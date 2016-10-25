@@ -12,7 +12,7 @@ if ($page->users->isLoggedIn()) {
 $error = $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';
 $showRegister = 1;
 
-if (Settings::value('..registerstatus') == Settings::REGISTER_STATUS_CLOSED || Settings::value('registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
+if (Settings::value('..registerstatus') == Settings::REGISTER_STATUS_CLOSED || Settings::value('..registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
 	$error = "Registrations are currently disabled.";
 	$showRegister = 0;
 } elseif (Settings::value('..registerstatus') == Settings::REGISTER_STATUS_INVITE && (!isset($_REQUEST["invitecode"]) || empty($_REQUEST['invitecode']))) {

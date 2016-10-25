@@ -1,4 +1,6 @@
 <?php
+
+use app\models\Settings;
 use nntmux\Forum;
 
 $forum = new Forum;

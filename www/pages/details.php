@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Settings;
 use nntmux\Console;
 use nntmux\ReleaseComments;
 use nntmux\ReleaseExtra;

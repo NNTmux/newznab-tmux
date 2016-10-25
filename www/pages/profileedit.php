@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Settings;
 use nntmux\utility\Utility;
 use nntmux\Category;
 use nntmux\SABnzbd;

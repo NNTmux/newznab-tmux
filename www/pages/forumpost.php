@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Settings;
 use nntmux\Forum;
 
 if (!$page->users->isLoggedIn())
