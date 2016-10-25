@@ -1,8 +1,8 @@
 <?php
 @session_start();
 
-if (!defined('nZEDb_INSTALLER')) {
-	define('nZEDb_INSTALLER', true);
+if (!defined('NN_INSTALLER')) {
+	define('NN_INSTALLER', true);
 }
 
 require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php');
