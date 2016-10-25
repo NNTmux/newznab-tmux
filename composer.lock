@@ -484,16 +484,16 @@
         },
         {
             "name": "bower-asset/font-awesome",
-            "version": "v4.6.3",
+            "version": "v4.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "8e241f209faa1dd2182c9fdc9c352d8806504a4e"
+                "reference": "a8386aae19e200ddb0f6845b5feeee5eb7013687"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/8e241f209faa1dd2182c9fdc9c352d8806504a4e",
-                "reference": "8e241f209faa1dd2182c9fdc9c352d8806504a4e",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/a8386aae19e200ddb0f6845b5feeee5eb7013687",
+                "reference": "a8386aae19e200ddb0f6845b5feeee5eb7013687",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1461,16 +1461,16 @@
         },
         {
             "name": "moinax/tvdb",
-            "version": "v1.0.5",
+            "version": "v1.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Moinax/TvDb.git",
-                "reference": "772b24179b199bc1f17935c52613f95d318ad3cc"
+                "reference": "26f33df9e0ddf9b0b6ba9deeb43f1fa83b483085"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Moinax/TvDb/zipball/772b24179b199bc1f17935c52613f95d318ad3cc",
-                "reference": "772b24179b199bc1f17935c52613f95d318ad3cc",
+                "url": "https://api.github.com/repos/Moinax/TvDb/zipball/26f33df9e0ddf9b0b6ba9deeb43f1fa83b483085",
+                "reference": "26f33df9e0ddf9b0b6ba9deeb43f1fa83b483085",
                 "shasum": ""
             },
             "require": {
@@ -1497,7 +1497,7 @@
             "keywords": [
                 "api"
             ],
-            "time": "2016-04-01 14:51:00"
+            "time": "2016-10-25 08:14:27"
         },
         {
             "name": "phpmailer/phpmailer",
