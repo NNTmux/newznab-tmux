@@ -377,7 +377,7 @@ class Users
 	{
 		$data = $this->pdo->query(sprintf("SELECT id,email FROM users WHERE role = %d AND rolechangedate < now()", $uprole));
 		foreach ($data as $u) {
-			Utility::sendEmail($u["email"], $msgsubject, $msgbody, Settings::value('..email'));
+			Utility::sendEmail($u["email"], $msgsubject, $msgbody, Settings::value('site.main.email'));
 			$this->pdo->queryExec(sprintf("UPDATE users SET role = %d, rolechangedate=null WHERE id = %d", $downrole, $u["id"]));
 		}
 
@@ -930,7 +930,7 @@ class Users
 	{
 		$ipsql = "('-1')";
 
-		if (Settings::value('userhostexclusion') != '') {
+		if (Settings::value('..userhostexclusion') != '') {
 			$ipsql = "";
 			$ips = explode(",", Settings::value('..userhostexclusion'));
 			foreach ($ips as $ip) {

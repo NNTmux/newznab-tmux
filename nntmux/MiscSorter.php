@@ -55,9 +55,9 @@ class MiscSorter
 		$this->category = new Categorize(['Settings' => $this->pdo]);
 		$this->movie = new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 		$this->music = new Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
-		$this->pubkey = Settings::value('..amazonpubkey');
-		$this->privkey = Settings::value('..amazonprivkey');
-		$this->asstag = Settings::value('..amazonassociatetag');
+		$this->pubkey = Settings::value('APIs..amazonpubkey');
+		$this->privkey = Settings::value('APIs..amazonaprivkey');
+		$this->asstag = Settings::value('APIs..amazonassociatetag');
 	}
 
 	// Main function that determines which operation(s) should be run based on the releases NFO file

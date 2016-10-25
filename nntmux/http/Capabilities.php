@@ -133,12 +133,12 @@ abstract class Capabilities
 			'server' => [
 				'appversion' => (new Versions())->getGitTagInRepo(),
 				'version'    => '0.1',
-				'title'      => Settings::value('..title'),
-				'strapline'  => Settings::value('..strapline'),
-				'email'      => Settings::value('..email'),
-				'meta'       => Settings::value('..metakeywords'),
+				'title'      => Settings::value('site.main.title'),
+				'strapline'  => Settings::value('site.main.strapline'),
+				'email'      => Settings::value('site.main.email'),
+				'meta'       => Settings::value('site.main.metakeywords'),
 				'url'        => $serverroot,
-				'image'      => $serverroot . 'themes/shared/images/logo.png'
+				'image'      => $serverroot . 'themes/shared/images/tmux_logo.png'
 			],
 			'limits' => [
 				'max'     => 100,

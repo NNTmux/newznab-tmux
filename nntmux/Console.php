@@ -86,9 +86,9 @@ class Console
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
-		$this->pubkey = Settings::value('..amazonpubkey');
-		$this->privkey = Settings::value('..amazonprivkey');
-		$this->asstag = Settings::value('..amazonassociatetag');
+		$this->pubkey = Settings::value('APIs..amazonpubkey');
+		$this->privkey = Settings::value('APIs..amazonaprivkey');
+		$this->asstag = Settings::value('APIs..amazonassociatetag');
 		$this->gameqty = (Settings::value('..maxgamesprocessed') != '') ? Settings::value('..maxgamesprocessed') : 150;
 		$this->sleeptime = (Settings::value('..amazonsleep') != '') ? Settings::value('..amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'console' . DS;

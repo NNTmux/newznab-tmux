@@ -155,13 +155,13 @@ class Movie
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 
-		$this->lookuplanguage = (Settings::value('..lookuplanguage') != '') ? (string)Settings::value('..lookuplanguage') : 'en';
+		$this->lookuplanguage = (Settings::value('indexer.categorise.imdblanguage') != '') ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
 
-		$this->fanartapikey = Settings::value('f..anarttvkey');
-		$this->imdburl = (Settings::value('..imdburl') == 0 ? false : true);
+		$this->fanartapikey = Settings::value('APIs..fanarttvkey');
+		$this->imdburl = (Settings::value('indexer.categorise.imdburl') == 0 ? false : true);
 		$this->movieqty = (Settings::value('..maximdbprocessed') != '') ? Settings::value('..maximdbprocessed') : 100;
 		$this->searchEngines = true;
-		$this->showPasswords = Releases::showPasswords($this->pdo);
+		$this->showPasswords = Releases::showPasswords();
 
 		$this->debug = NN_DEBUG;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI && $this->pdo->cli);
@@ -923,7 +923,7 @@ class Movie
 		$buffer =
 			Utility::getUrl([
 					'url' => 'http://' . ($this->imdburl === false ? 'www' : 'akas') . '.imdb.com/title/tt' . $imdbId . '/',
-					'Accept-Language' => ((Settings::value('..lookuplanguage') != '') ? Settings::value('..lookuplanguage') : 'en'),
+					'Accept-Language' => ((Settings::value('indexer.categorise.imdblanguage') != '') ? Settings::value('indexer.categorise.imdblanguage') : 'en'),
 					'useragent' => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ' .
 						'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar'
 				]

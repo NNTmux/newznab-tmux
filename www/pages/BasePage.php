@@ -322,10 +322,10 @@ class BasePage
 		$this->userdata['rolecategoryexclusions'] = $this->users->getRoleCategoryExclusion($this->userdata['role']);
 
 		// Change the theme to user's selected theme if they selected one, else use the admin one.
-		if ($this->settings->getSetting('userselstyle') == 1) {
+		if (Settings::value('userselstyle') == 1) {
 			$this->theme = isset($this->userdata['style']) ? $this->userdata['style'] : 'None';
 			if ($this->theme == 'None') {
-				$this->theme = $this->settings->getSetting('style');
+				$this->theme = Settings::value('site.main.style');
 			}
 
 			if (lcfirst($this->theme) === $this->theme) {
@@ -333,7 +333,7 @@ class BasePage
 				$this->theme = ucfirst($this->theme);
 			}
 		} else {
-			$this->theme = $this->settings->getSetting('style');
+			$this->theme = Settings::value('site.main.style');
 		}
 
 		// Update last login every 15 mins.

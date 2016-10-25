@@ -1,6 +1,7 @@
 <?php
 namespace nntmux;
 
+use app\models\Settings;
 use nntmux\db\DB;
 
 /**
@@ -184,16 +185,16 @@ class Binaries
 			}
 		}
 
-		$this->messageBuffer = ($this->_pdo->getSetting('maxmssgs') != '') ? $this->_pdo->getSetting('maxmssgs') : 20000;
-		$this->_compressedHeaders = ($this->_pdo->getSetting('compressedheaders') == 1 ? true : false);
-		$this->_partRepair = ($this->_pdo->getSetting('partrepair') == 0 ? false : true);
-		$this->_newGroupScanByDays = ($this->_pdo->getSetting('newgroupscanmethod') == 1 ? true : false);
-		$this->_newGroupMessagesToScan = ($this->_pdo->getSetting('newgroupmsgstoscan') != '') ? $this->_pdo->getSetting('newgroupmsgstoscan') : 50000;
-		$this->_newGroupDaysToScan = ($this->_pdo->getSetting('newgroupdaystoscan') != '') ? (int)$this->_pdo->getSetting('newgroupdaystoscan') : 3;
-		$this->_partRepairLimit = ($this->_pdo->getSetting('maxpartrepair') != '') ? (int)$this->_pdo->getSetting('maxpartrepair') : 15000;
-		$this->_partRepairMaxTries = ($this->_pdo->getSetting('partrepairmaxtries') != '' ? (int)$this->_pdo->getSetting('partrepairmaxtries') : 3);
-		$this->_showDroppedYEncParts = ($this->_pdo->getSetting('showdroppedyencparts') == 1 ? true : false);
-		$this->_tablePerGroup = ($this->_pdo->getSetting('..tablepergroup') == 1 ? true : false);
+		$this->messageBuffer = (Settings::value('..maxmssgs') != '') ? Settings::value('..maxmssgs') : 20000;
+		$this->_compressedHeaders = (Settings::value('..compressedheaders') == 1 ? true : false);
+		$this->_partRepair = (Settings::value('..partrepair') == 0 ? false : true);
+		$this->_newGroupScanByDays = (Settings::value('..newgroupscanmethod') == 1 ? true : false);
+		$this->_newGroupMessagesToScan = (Settings::value('..newgroupmsgstoscan') != '') ? Settings::value('..newgroupmsgstoscan') : 50000;
+		$this->_newGroupDaysToScan = (Settings::value('..newgroupdaystoscan') != '') ? (int)Settings::value('..newgroupdaystoscan') : 3;
+		$this->_partRepairLimit = (Settings::value('..maxpartrepair') != '') ? (int)Settings::value('..maxpartrepair') : 15000;
+		$this->_partRepairMaxTries = (Settings::value('..partrepairmaxtries') != '' ? (int)Settings::value('..partrepairmaxtries') : 3);
+		$this->_showDroppedYEncParts = (Settings::value('..showdroppedyencparts') == 1 ? true : false);
+		$this->_tablePerGroup = (Settings::value('..tablepergroup') == 1 ? true : false);
 
 		$this->blackList = $this->whiteList = [];
 	}

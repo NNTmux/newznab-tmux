@@ -1,6 +1,7 @@
 <?php
 namespace nntmux;
 
+use app\models\Settings;
 use nntmux\utility\Utility;
 
 /**
@@ -118,11 +119,11 @@ class SABnzbd
 				break;
 
 			case self::INTEGRATION_TYPE_SITEWIDE:
-				if (($page->getSettingValue('..sabapikey') != '') && ($page->getSettingValue('..saburl') != '')) {
-					$this->url = $page->getSettingValue('..saburl');
-					$this->apikey = $page->getSettingValue('..sabapikey');
-					$this->priority = $page->getSettingValue('..sabpriority');
-					$this->apikeytype = $page->getSettingValue('..sabapikeytype');
+				if ((Settings::value('apps.sabnzbplus.apikey') != '') && (Settings::value('saburl') != '')) {
+					$this->url = Settings::value('saburl');
+					$this->apikey = Settings::value('apps.sabnzbplus.apikey');
+					$this->priority = Settings::value('apps.sabnzbplus.priority');
+					$this->apikeytype = Settings::value('apps.sabnzbplus.apikeytype');
 				}
 				$this->integrated = self::INTEGRATION_TYPE_SITEWIDE;
 				$this->integratedBool = true;

@@ -66,7 +66,7 @@ switch ($page->page) {
 	case 'xxxmodal':
 		// Don't show these pages if it's an API-only site.
 		if (!$page->users->isLoggedIn() && Settings::value('..registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
-			header("Location: " . Settings::value('..code'));
+			header("Location: " . Settings::value('site.main.code'));
 			break;
 		}
 	case 'api':

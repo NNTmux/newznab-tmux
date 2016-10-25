@@ -16,7 +16,7 @@ if ($page->users->isLoggedIn()) {
 		Utility::showApiError(101);
 	}
 } else {
-	if ($page->getSettingValue('..registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
+	if (Settings::value('..registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
 		$res = $page->users->getById(0);
 	} else {
 		if ((!isset($_GET["i"]) || !isset($_GET["r"]))) {
@@ -44,8 +44,8 @@ if (isset($_GET['id'])) {
 // A hash of the users ip to record against the download
 //
 $hosthash = "";
-if ($page->getSettingValue('..storeuserips') == 1) {
-	$hosthash = $page->users->getHostHash($_SERVER["REMOTE_ADDR"], $page->getSettingValue('..siteseed'));
+if (Settings::value('..storeuserips') == 1) {
+	$hosthash = $page->users->getHostHash($_SERVER["REMOTE_ADDR"], Settings::value('..siteseed'));
 }
 
 // Check download limit on user role.

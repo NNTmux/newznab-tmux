@@ -415,30 +415,30 @@ class ProcessAdditional
 		$this->_nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 		$this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
 
-		$this->_innerFileBlacklist = (Settings::value('..innerfileblacklist') == '' ? false : Settings::value('..innerfileblacklist'));
+		$this->_innerFileBlacklist = (Settings::value('indexer.ppa.innerfileblacklist') == '' ? false : Settings::value('indexer.ppa.innerfileblacklist'));
 		$this->_maxNestedLevels = (Settings::value('..maxnestedlevels') == 0 ? 3 : Settings::value('..maxnestedlevels'));
 		$this->_extractUsingRarInfo = (Settings::value('..extractusingrarinfo') == 0 ? false : true);
-		$this->_fetchLastFiles = (Settings::value('..fetchlastcompressedfiles') == 0 ? false : true);
+		$this->_fetchLastFiles = (Settings::value('archive.fetch.end') == 0 ? false : true);
 
 		$this->_7zipPath = false;
 		$this->_unrarPath = false;
 
 		// Pass the binary extractors to ArchiveInfo.
 		$clients = [];
-		if (Settings::value('..unrarpath') != '') {
-			$clients += [ArchiveInfo::TYPE_RAR => Settings::value('..unrarpath')];
-			$this->_unrarPath = Settings::value('..unrarpath');
+		if (Settings::value('apps..unrarpath') != '') {
+			$clients += [ArchiveInfo::TYPE_RAR => Settings::value('apps..unrarpath')];
+			$this->_unrarPath = Settings::value('apps..unrarpath');
 		}
-		if (Settings::value('..zippath') != '') {
-			$clients += [ArchiveInfo::TYPE_ZIP => Settings::value('..zippath')];
-			$this->_7zipPath = Settings::value('..zippath');
+		if (Settings::value('apps..7zippath') != '') {
+			$clients += [ArchiveInfo::TYPE_ZIP => Settings::value('apps..7zippath')];
+			$this->_7zipPath = Settings::value('apps..7zippath');
 		}
 		$this->_archiveInfo->setExternalClients($clients);
 
 		$this->_killString = '"';
-		if (Settings::value('..timeoutpath') != '' && Settings::value('..timeoutseconds') > 0) {
+		if (Settings::value('apps..timeoutpath') != '' && Settings::value('..timeoutseconds') > 0) {
 			$this->_killString = (
-				'"' . Settings::value('..timeoutpath') .
+				'"' . Settings::value('apps..timeoutpath') .
 				'" --foreground --signal=KILL ' .
 				Settings::value('..timeoutseconds') . ' "'
 			);
@@ -480,7 +480,7 @@ class ProcessAdditional
 
 		$this->_addPAR2Files = (Settings::value('..addpar2') === '0') ? false : true;
 
-		if (!Settings::value('..ffmpegpath')) {
+		if (!Settings::value('apps..ffmpegpath')) {
 			$this->_processAudioSample = $this->_processThumbnails = $this->_processVideo = false;
 		} else {
 			$this->_processAudioSample = (Settings::value('..saveaudiopreview') == 0) ? false : true;
@@ -489,11 +489,11 @@ class ProcessAdditional
 		}
 
 		$this->_processJPGSample = (Settings::value('..processjpg') == 0) ? false : true;
-		$this->_processMediaInfo = (Settings::value('..mediainfopath') == '') ? false : true;
+		$this->_processMediaInfo = (Settings::value('apps..mediainfopath') == '') ? false : true;
 		$this->_processAudioInfo = $this->_processMediaInfo;
 		$this->_processPasswords = (
 			(((Settings::value('..checkpasswordedrar') == 0) ? false : true)) &&
-			((Settings::value('..unrarpath') == '') ? false : true)
+			((Settings::value('apps..unrarpath') == '') ? false : true)
 		);
 
 		$this->_audioSavePath = NN_COVERS . 'audiosample' . DS;
@@ -1775,7 +1775,7 @@ class ProcessAdditional
 
 				// Get the media info for the file.
 				$xmlArray = Utility::runCmd(
-					$this->_killString . Settings::value('..mediainfopath') . '" --Output=XML "' . $fileLocation . '"'
+					$this->_killString . Settings::value('apps..mediainfopath') . '" --Output=XML "' . $fileLocation . '"'
 				);
 				if (is_array($xmlArray)) {
 
@@ -1863,7 +1863,7 @@ class ProcessAdditional
 				// Create an audio sample.
 				Utility::runCmd(
 					$this->_killString .
-					Settings::value('..ffmpegpath') .
+					Settings::value('apps..ffmpegpath') .
 					'" -t 30 -i "' .
 					$fileLocation .
 					'" -acodec libvorbis -loglevel quiet -y "' .
@@ -1966,7 +1966,7 @@ class ProcessAdditional
 		// Get the real duration of the file.
 		$time = Utility::runCmd(
 			$this->_killString .
-			Settings::value('..ffmpegpath') .
+			Settings::value('apps..ffmpegpath') .
 			'" -i "' . $videoLocation .
 			'" -vcodec copy -y 2>&1 "' .
 			$tmpVideo . '"',
@@ -2012,7 +2012,7 @@ class ProcessAdditional
 			// Create the image.
 			Utility::runCmd(
 				$this->_killString .
-				Settings::value('..ffmpegpath') .
+				Settings::value('apps..ffmpegpath') .
 				'" -i "' .
 				$fileLocation .
 				'" -ss ' . ($time === '' ? '00:00:03.00' : $time) .
@@ -2105,7 +2105,7 @@ class ProcessAdditional
 					// Try to get the sample (from the end instead of the start).
 					Utility::runCmd(
 						$this->_killString .
-						Settings::value('..ffmpegpath') .
+						Settings::value('apps..ffmpegpath') .
 						'" -i "' .
 						$fileLocation .
 						'" -ss ' . $lowestLength .
@@ -2122,7 +2122,7 @@ class ProcessAdditional
 				// If longer than 60 or we could not get the video length, run the old way.
 				Utility::runCmd(
 					$this->_killString .
-					Settings::value('..ffmpegpath') .
+					Settings::value('apps..ffmpegpath') .
 					'" -i "' .
 					$fileLocation .
 					'" -vcodec libtheora -filter:v scale=320:-1 -t ' .
@@ -2196,7 +2196,7 @@ class ProcessAdditional
 
 			// Run media info on it.
 			$xmlArray = Utility::runCmd(
-				$this->_killString . Settings::value('..mediainfopath') . '" --Output=XML "' . $fileLocation . '"'
+				$this->_killString . Settings::value('apps..mediainfopath') . '" --Output=XML "' . $fileLocation . '"'
 			);
 
 			// Check if we got it.

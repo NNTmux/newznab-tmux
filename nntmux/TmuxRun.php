@@ -1,6 +1,7 @@
 <?php
 namespace nntmux;
 
+use app\models\Settings;
 use nntmux\db\DB;
 
 /**
@@ -18,7 +19,13 @@ class TmuxRun extends Tmux
 	public function __construct(DB $pdo = null)
 	{
 		parent::__construct($pdo);
-		$this->_dateFormat = '%Y-%m-%d %T';
+		$dateFormat = Settings::value(
+			[
+				'section'    => 'shell',
+				'subsection' => 'date',
+				'name'       => 'format'
+			]);
+		$this->_dateFormat = empty($dateFormat) ? '%Y-%m-%d %T' : $dateFormat;
 
 	}
 

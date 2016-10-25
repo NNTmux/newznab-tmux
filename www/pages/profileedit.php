@@ -103,7 +103,7 @@ switch ($action) {
 	default:
 		break;
 }
-if ($page->getSettingValue('..userselstyle') == 1) {
+if (Settings::value('..userselstyle') == 1) {
 // Get the list of themes.
 	$page->smarty->assign('themelist', Utility::getThemesList());
 }

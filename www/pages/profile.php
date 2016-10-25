@@ -13,7 +13,7 @@ $nzbget = new NZBGet($page);
 
 $userID = $page->users->currentUserId();
 $privileged = ($page->users->isAdmin($userID) || $page->users->isModerator($userID)) ? true : false;
-$privateProfiles = ($page->getSettingValue('..privateprofiles') == 1) ? true : false;
+$privateProfiles = (Settings::value('..privateprofiles') == 1) ? true : false;
 $publicView = false;
 
 if (!$privateProfiles || $privileged) {

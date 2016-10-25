@@ -143,7 +143,7 @@ class ProcessReleases
 			$this->completion = 100;
 			echo $this->pdo->log->error(PHP_EOL . 'You have an invalid setting for completion. It must be lower than 100.');
 		}
-		$this->collectionTimeout = intval(Settings::value('..collection_timeout'));
+		$this->collectionTimeout = intval(Settings::value('indexer.processing.collection_timeout'));
 	}
 
 	/**
@@ -1658,7 +1658,7 @@ class ProcessReleases
 	 */
 	private function processStuckCollections(array $group, $where)
 	{
-		$lastRun = Settings::value('..last_run_time');
+		$lastRun = Settings::value('indexer.processing.last_run_time');
 		$obj = $this->pdo->queryExec(
 			sprintf("
                 DELETE c, b, p FROM %s c
