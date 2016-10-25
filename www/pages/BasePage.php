@@ -322,7 +322,7 @@ class BasePage
 		$this->userdata['rolecategoryexclusions'] = $this->users->getRoleCategoryExclusion($this->userdata['role']);
 
 		// Change the theme to user's selected theme if they selected one, else use the admin one.
-		if (Settings::value('userselstyle') == 1) {
+		if (Settings::value('site.main.userselstyle') == 1) {
 			$this->theme = isset($this->userdata['style']) ? $this->userdata['style'] : 'None';
 			if ($this->theme == 'None') {
 				$this->theme = Settings::value('site.main.style');
