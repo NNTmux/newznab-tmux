@@ -83,7 +83,7 @@ class Books
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		$this->pubkey = Settings::value('APIs..amazonpubkey');
-		$this->privkey = Settings::value('APIs..amazonaprivkey');
+		$this->privkey = Settings::value('APIs..amazonprivkey');
 		$this->asstag = Settings::value('APIs..amazonassociatetag');
 		$this->bookqty = (Settings::value('..maxbooksprocessed') != '') ? Settings::value('..maxbooksprocessed') : 300;
 		$this->sleeptime = (Settings::value('..amazonsleep') != '') ? Settings::value('..amazonsleep') : 1000;

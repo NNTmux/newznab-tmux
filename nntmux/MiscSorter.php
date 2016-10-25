@@ -56,7 +56,7 @@ class MiscSorter
 		$this->movie = new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 		$this->music = new Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 		$this->pubkey = Settings::value('APIs..amazonpubkey');
-		$this->privkey = Settings::value('APIs..amazonaprivkey');
+		$this->privkey = Settings::value('APIs..amazonprivkey');
 		$this->asstag = Settings::value('APIs..amazonassociatetag');
 	}
 

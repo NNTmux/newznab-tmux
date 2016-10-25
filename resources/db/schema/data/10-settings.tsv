@@ -177,3 +177,4 @@ tmux	running	exit	0	Determines if the running tmux monitor script should exit. I
 max	headers	iteration	1000000	The maximum number of headers that update binaries is given as the total range. This ensures that a total of no more than this amount is attempted to be downloaded per group.	max_headers_iteration
 			userhostexclusion			userhostexclusion
 			siteseed			siteseed
+			showrecentforumposts			showrecentforumposts

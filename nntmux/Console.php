@@ -87,7 +87,7 @@ class Console
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		$this->pubkey = Settings::value('APIs..amazonpubkey');
-		$this->privkey = Settings::value('APIs..amazonaprivkey');
+		$this->privkey = Settings::value('APIs..amazonprivkey');
 		$this->asstag = Settings::value('APIs..amazonassociatetag');
 		$this->gameqty = (Settings::value('..maxgamesprocessed') != '') ? Settings::value('..maxgamesprocessed') : 150;
 		$this->sleeptime = (Settings::value('..amazonsleep') != '') ? Settings::value('..amazonsleep') : 1000;
