@@ -84,18 +84,27 @@ class ReleaseImage
 	protected function fetchImage($imgLoc)
 	{
 		$img = false;
-
 		if (strpos(strtolower($imgLoc), 'http:') === 0 || strpos(strtolower($imgLoc), 'https:') === 0) {
 			$img = Utility::getUrl(['url' => $imgLoc]);
 		} else if (is_file($imgLoc)) {
 			$img = @file_get_contents($imgLoc);
 		}
-
-		if ($img !== false && getimagesizefromstring($img) !== false) {
-			$im = @imagecreatefromstring($img);
-			if ($im !== false) {
-				imagedestroy($im);
-				return $img;
+		if ($img !== false) {
+			$imgFail = false;
+			try {
+				(new \Imagick())->readImageBlob($img);
+			} catch (\ImagickException $imgError) {
+				if (strpos($imgError, 'Unsupported marker type') !== false) {
+					echo 'Corrupt image marker data found.  Skipping.' . PHP_EOL;
+					$imgFail = true;
+				}
+			}
+			if ($imgFail === false) {
+				$im = @imagecreatefromstring($img);
+				if ($im !== false) {
+					imagedestroy($im);
+					return $img;
+				}
 			}
 		}
 		return false;

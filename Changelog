@@ -1,4 +1,5 @@
 2016-10-25 DariusIII
+	* Chg: Use Imagick to detect broken sample images
 	* Chg: Update composer.lock with new versions of font-awesome (4.7.0) and moinax/tvdb (1.0.6)
 2016-10-24 DariusIII
 	* Chg: Search posts by poster by clicking on poster name on details page
