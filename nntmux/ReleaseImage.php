@@ -47,6 +47,11 @@ class ReleaseImage
 	public $vidSavePath;
 
 	/**
+	 * @var \Imagick
+	 */
+	public $imagick;
+
+	/**
 	 * Construct.
 	 * @param \DB()
 	 */
@@ -87,7 +92,7 @@ class ReleaseImage
 	{
 		$img = false;
 		if (strpos(strtolower($imgLoc), 'http:') === 0 || strpos(strtolower($imgLoc), 'https:') === 0) {
-			$img = @file_get_contents(Utility::getUrl(['url' => $imgLoc]));
+			$img = Utility::getUrl(['url' => $imgLoc]);
 		} else if (is_file($imgLoc)) {
 			$img = @file_get_contents($imgLoc);
 		}
@@ -96,7 +101,7 @@ class ReleaseImage
 			try {
 				$this->imagick->readImageBlob($img);
 			} catch (\ImagickException $imgError) {
-				echo 'Error processing image, skipping.' . PHP_EOL;
+				echo 'Bad image data, skipping processing' . PHP_EOL;
 				$imgFail = true;
 			}
 			if ($imgFail === false) {
@@ -121,7 +126,7 @@ class ReleaseImage
 	 *
 	 * @return int 1 on success, 0 on failure Used on site to check if there is an image.
 	 */
-	public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth='', $imgMaxHeight='', $saveThumb=false)
+	public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth='', $imgMaxHeight='', $saveThumb = false)
 	{
 		// Try to get the image as a string.
 		$cover = $this->fetchImage($imgLoc);
@@ -140,11 +145,11 @@ class ReleaseImage
 			$new_height = intval($ratio*$height);
 			if ($new_width < $width && $new_width > 10 && $new_height > 10) {
 				$this->imagick->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
-				$this->imagick->setImageFormat('jpeg');
 				$this->imagick->resizeImage($new_width, $new_height, \Imagick::FILTER_LANCZOS, 0);
 				ob_start();
+				$this->imagick->setImageFormat('jpeg');
+				$this->imagick->writeImage($imgName. '.jpg');
 				$thumb = ob_get_clean();
-				$this->imagick->clear();
 
 				if ($saveThumb) {
 					@file_put_contents($imgSavePath.$imgName.'_thumb.jpg', $thumb);
