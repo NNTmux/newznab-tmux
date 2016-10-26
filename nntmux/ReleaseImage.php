@@ -72,6 +72,8 @@ class ReleaseImage
 
 		$this->audioImgPath   = NN_COVERS . 'audio'       . DS; // unused folder, music folder already exists.
 		**/
+
+		$this->imagick = new \Imagick();
 	}
 
 	/**
@@ -85,24 +87,22 @@ class ReleaseImage
 	{
 		$img = false;
 		if (strpos(strtolower($imgLoc), 'http:') === 0 || strpos(strtolower($imgLoc), 'https:') === 0) {
-			$img = Utility::getUrl(['url' => $imgLoc]);
+			$img = @file_get_contents(Utility::getUrl(['url' => $imgLoc]));
 		} else if (is_file($imgLoc)) {
 			$img = @file_get_contents($imgLoc);
 		}
 		if ($img !== false) {
 			$imgFail = false;
 			try {
-				(new \Imagick())->readImageBlob($img);
+				$this->imagick->readImageBlob($img);
 			} catch (\ImagickException $imgError) {
-				if (strpos($imgError, 'Unsupported marker type') !== false) {
-					echo 'Corrupt image marker data found.  Skipping.' . PHP_EOL;
-					$imgFail = true;
-				}
+				echo 'Error processing image, skipping.' . PHP_EOL;
+				$imgFail = true;
 			}
 			if ($imgFail === false) {
-				$im = @imagecreatefromstring($img);
+				$im = $this->imagick->readImageBlob($img);
 				if ($im !== false) {
-					imagedestroy($im);
+					$this->imagick->clear();
 					return $img;
 				}
 			}
@@ -131,20 +131,20 @@ class ReleaseImage
 
 		// Check if we need to resize it.
 		if ($imgMaxWidth != '' && $imgMaxHeight != '') {
-			$im = @imagecreatefromstring($cover);
-			$width = @imagesx($im);
-			$height = @imagesy($im);
+			$this->imagick->readImageBlob($cover);
+			$width = $this->imagick->getImageWidth();
+			$height = $this->imagick->getImageHeight();
 			$ratio = min($imgMaxHeight/$height, $imgMaxWidth/$width);
 			// New dimensions
 			$new_width = intval($ratio*$width);
 			$new_height = intval($ratio*$height);
 			if ($new_width < $width && $new_width > 10 && $new_height > 10) {
-				$new_image = @imagecreatetruecolor($new_width, $new_height);
-				@imagecopyresampled($new_image, $im, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+				$this->imagick->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
+				$this->imagick->setImageFormat('jpeg');
+				$this->imagick->resizeImage($new_width, $new_height, \Imagick::FILTER_LANCZOS, 0);
 				ob_start();
-				@imagejpeg($new_image, null, 85);
 				$thumb = ob_get_clean();
-				@imagedestroy($new_image);
+				$this->imagick->clear();
 
 				if ($saveThumb) {
 					@file_put_contents($imgSavePath.$imgName.'_thumb.jpg', $thumb);
@@ -154,7 +154,7 @@ class ReleaseImage
 
 				unset($thumb);
 			}
-			@imagedestroy($im);
+			$this->imagick->clear();
 		}
 		// Store it on the hard drive.
 		$coverPath = $imgSavePath.$imgName.'.jpg';

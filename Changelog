@@ -1,3 +1,5 @@
+2016-10-26 DariusIIi
+	* Chg: Switch to php-imagick for previews/cover processing in ReleaseImage class
 2016-10-25 DariusIII
 	* Chg: Use Imagick to detect broken sample images
 	* Chg: Update composer.lock with new versions of font-awesome (4.7.0) and moinax/tvdb (1.0.6)
