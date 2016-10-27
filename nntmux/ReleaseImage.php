@@ -96,17 +96,22 @@ class ReleaseImage
 		} else if (is_file($imgLoc)) {
 			$img = @file_get_contents($imgLoc);
 		}
-		if ($img !== false) {
+		if ($img !== false && !empty($img)) {
 			$imgFail = false;
 			try {
 				$this->imagick->readImageBlob($img);
 			} catch (\ImagickException $imgError) {
 				echo 'Bad image data, skipping processing' . PHP_EOL;
+				if(NN_DEBUG) {
+					echo $imgError;
+				}
 				$imgFail = true;
 			}
 			if ($imgFail === false) {
 				$im = $this->imagick->readImageBlob($img);
-				if ($im !== false) {
+				$this->imagick->getImageBlob();
+				$size = $this->imagick->getImageLength();
+				if ($im === true && $size > 0) {
 					$this->imagick->clear();
 					return $img;
 				}
@@ -126,7 +131,7 @@ class ReleaseImage
 	 *
 	 * @return int 1 on success, 0 on failure Used on site to check if there is an image.
 	 */
-	public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth='', $imgMaxHeight='', $saveThumb = false)
+	public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false)
 	{
 		// Try to get the image as a string.
 		$cover = $this->fetchImage($imgLoc);
@@ -137,22 +142,30 @@ class ReleaseImage
 		// Check if we need to resize it.
 		if ($imgMaxWidth != '' && $imgMaxHeight != '') {
 			$this->imagick->readImageBlob($cover);
+			$this->imagick->getImageBlob();
+			$size = $this->imagick->getImageLength();
 			$width = $this->imagick->getImageWidth();
 			$height = $this->imagick->getImageHeight();
 			$ratio = min($imgMaxHeight/$height, $imgMaxWidth/$width);
 			// New dimensions
 			$new_width = intval($ratio*$width);
 			$new_height = intval($ratio*$height);
-			if ($new_width < $width && $new_width > 10 && $new_height > 10) {
+			if ($new_width < $width && $new_width > 10 && $new_height > 10  && $size > 0) {
 				$this->imagick->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
 				$this->imagick->resizeImage($new_width, $new_height, \Imagick::FILTER_LANCZOS, 0);
 				ob_start();
+				$this->imagick->getImageBlob();
 				$this->imagick->setImageFormat('jpeg');
-				$this->imagick->writeImage($imgName. '.jpg');
+				$this->imagick->writeImage($imgName . '.jpeg');
 				$thumb = ob_get_clean();
 
 				if ($saveThumb) {
-					@file_put_contents($imgSavePath.$imgName.'_thumb.jpg', $thumb);
+					$image = file_get_contents($thumb);
+					if(strlen($image) >= 1) {
+						@file_put_contents($imgSavePath . $imgName . '_thumb.jpg', $image);
+					} else {
+						echo 'Error fetching' . $image;
+					}
 				} else {
 					$cover = $thumb;
 				}
@@ -162,12 +175,13 @@ class ReleaseImage
 			$this->imagick->clear();
 		}
 		// Store it on the hard drive.
-		$coverPath = $imgSavePath.$imgName.'.jpg';
-		$coverSave = @file_put_contents($coverPath, $cover);
-
-		// Check if it's on the drive.
-		if ($coverSave === false || !is_file($coverPath)) {
-			return 0;
+		if (!empty($cover)) {
+			$coverPath = $imgSavePath . $imgName . '.jpg';
+			$coverSave = @file_put_contents($coverPath, $cover);
+			// Check if it's on the drive.
+			if ($coverSave === false || !is_file($coverPath)) {
+				return 0;
+			}
 		}
 		return 1;
 	}
