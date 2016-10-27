@@ -1,4 +1,6 @@
-2016-10-26 DariusIIi
+2016-10-27 DariusIII
+	* Chg: Speed up browsing and api response
+2016-10-26 DariusIII
 	* Chg: Switch to php-imagick for previews/cover processing in ReleaseImage class
 2016-10-25 DariusIII
 	* Chg: Use Imagick to detect broken sample images
