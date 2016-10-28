@@ -87,8 +87,10 @@ class ReleaseImage
 		$img = false;
 		if (strpos(strtolower($imgLoc), 'http:') === 0 || strpos(strtolower($imgLoc), 'https:') === 0) {
 			$img = Utility::getUrl(['url' => $imgLoc]);
+			echo 'Remote URL';
 		} else if (is_file($imgLoc)) {
 			$img = @file_get_contents($imgLoc);
+			echo 'Local File\n';
 		}
 		if ($img !== false) {
 			$imagick = new \Imagick();
@@ -104,11 +106,8 @@ class ReleaseImage
 			}
 			if ($imgFail === false) {
 				$im = $imagick->readImageBlob($img);
-				$imagick->getImageBlob();
-				$size = $imagick->getImageLength();
-				if ($im === true && $size > 0) {
+				if ($im === true) {
 					$imagick->clear();
-
 					return $img;
 				}
 			}
@@ -148,21 +147,13 @@ class ReleaseImage
 			$new_width = intval($ratio * $width);
 			$new_height = intval($ratio * $height);
 			if ($new_width < $width && $new_width > 10 && $new_height > 10) {
-				$imagick->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
 				$imagick->thumbnailImage($new_width, $new_height, true);
-				ob_start();
-				$imagick->getImageBlob();
 				$imagick->setImageFormat('jpeg');
-				$thumb = ob_get_clean();
+				$thumb = $imagick->getImageBlob();
 				$imagick->clear();
 
 				if ($saveThumb) {
-					$image = @file_get_contents($thumb);
-					if(strlen($image) >= 1) {
 						@file_put_contents($imgSavePath . $imgName . '_thumb.jpg', $thumb);
-					} else {
-						echo 'Error fetching ' . $image;
-					}
 				} else {
 					$cover = $thumb;
 				}
@@ -172,14 +163,12 @@ class ReleaseImage
 			$imagick->clear();
 		}
 		// Store it on the hard drive.
-		if (!empty($cover)) {
 			$coverPath = $imgSavePath . $imgName . '.jpg';
 			$coverSave = @file_put_contents($coverPath, $cover);
 			// Check if it's on the drive.
 			if ($coverSave === false || !is_file($coverPath)) {
 				return 0;
 			}
-		}
 		return 1;
 	}
 
