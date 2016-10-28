@@ -1,6 +1,7 @@
 <?php
 namespace nntmux;
 
+use ApaiIO\Request\Util;
 use nntmux\db\Settings;
 use nntmux\utility\Utility;
 
@@ -91,35 +92,27 @@ class ReleaseImage
 			$img = @file_get_contents($imgLoc);
 		}
 		if ($img !== false) {
-			$imagick = new \Imagick();
 			$imgFail = false;
 			try {
-				$imagick->readImageBlob($img);
+				(new \Imagick())->readImageBlob($img);
 			} catch (\ImagickException $imgError) {
-				echo 'Bad image data, skipping processing' . PHP_EOL;
-				if (NN_DEBUG) {
-					echo $imgError;
+				if (strpos($imgError, 'Unsupported marker type') !== false) {
+					echo 'Corrupt image marker data found.  Skipping.' . PHP_EOL;
+					$imgFail = true;
 				}
-				$imgFail = true;
 			}
 			if ($imgFail === false) {
-				$im = $imagick->readImageBlob($img);
-				$imagick->getImageBlob();
-				$size = $imagick->getImageLength();
-				if ($im === true && $size > 0) {
-					$imagick->clear();
-
+				$im = @imagecreatefromstring($img);
+				if ($im !== false) {
+					imagedestroy($im);
 					return $img;
 				}
 			}
 		}
-
 		return false;
 	}
-
 	/**
 	 * Save an image to disk, optionally resizing it.
-	 *
 	 * @param string $imgName      What to name the new image.
 	 * @param string $imgLoc       URL or location on the disk the original image is in.
 	 * @param string $imgSavePath  Folder to save the new image in.
@@ -129,59 +122,49 @@ class ReleaseImage
 	 *
 	 * @return int 1 on success, 0 on failure Used on site to check if there is an image.
 	 */
-	public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false)
+	public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '',
+							  $imgMaxHeight = '', $saveThumb = false)
 	{
 		// Try to get the image as a string.
 		$cover = $this->fetchImage($imgLoc);
 		if ($cover === false) {
 			return 0;
 		}
-
 		// Check if we need to resize it.
 		if ($imgMaxWidth != '' && $imgMaxHeight != '') {
-			$imagick = new \Imagick();
-			$imagick->readImageBlob($cover);
-			$width = $imagick->getImageWidth();
-			$height = $imagick->getImageHeight();
+			$im = @imagecreatefromstring($cover);
+			$width = @imagesx($im);
+			$height = @imagesy($im);
 			$ratio = min($imgMaxHeight / $height, $imgMaxWidth / $width);
 			// New dimensions
-			$new_width = intval($ratio * $width);
+			$new_width  = intval($ratio * $width);
 			$new_height = intval($ratio * $height);
 			if ($new_width < $width && $new_width > 10 && $new_height > 10) {
-				$imagick->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
-				$imagick->thumbnailImage($new_width, $new_height, true);
+				$new_image = @imagecreatetruecolor($new_width, $new_height);
+				@imagecopyresampled($new_image, $im, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
 				ob_start();
-				$imagick->getImageBlob();
-				$imagick->setImageFormat('jpeg');
+				@imagejpeg($new_image, null, 85);
 				$thumb = ob_get_clean();
-				$imagick->clear();
-
+				@imagedestroy($new_image);
 				if ($saveThumb) {
-					$image = @file_get_contents($thumb);
-					if(strlen($image) >= 1) {
-						@file_put_contents($imgSavePath . $imgName . '_thumb.jpg', $thumb);
-					} else {
-						echo 'Error fetching ' . $image;
-					}
+					@file_put_contents($imgSavePath . $imgName . '_thumb.jpg', $thumb);
 				} else {
 					$cover = $thumb;
 				}
-
 				unset($thumb);
 			}
-			$imagick->clear();
+			@imagedestroy($im);
 		}
 		// Store it on the hard drive.
-		if (!empty($cover)) {
-			$coverPath = $imgSavePath . $imgName . '.jpg';
-			$coverSave = @file_put_contents($coverPath, $cover);
-			// Check if it's on the drive.
-			if ($coverSave === false || !is_file($coverPath)) {
-				return 0;
-			}
+		$coverPath = $imgSavePath . $imgName . '.jpg';
+		$coverSave = @file_put_contents($coverPath, $cover);
+		// Check if it's on the drive.
+		if ($coverSave === false || !is_file($coverPath)) {
+			return 0;
 		}
 		return 1;
 	}
+
 
 	/**
 	 * Delete images for the release.
