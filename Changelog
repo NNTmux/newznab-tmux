@@ -1,4 +1,5 @@
 2016-10-28 DariusIII
+	* Chg: check_covers now searches for covers less than 2 days old.
 	* Fix: decrypt_hashes uses wrong index to send to NameFixer (fixes issue #122)
 2016-10-27 DariusIII
 	* Chg: Speed up browsing and api response
