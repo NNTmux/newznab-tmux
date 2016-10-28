@@ -1,9 +1,9 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\DB;
+use nntmux\db\Settings;
 
-$pdo = new DB();
+$pdo = new Settings();
 
 if (isset($argv[1]) && ($argv[1] == "true" || $argv[1] == "drop")) {
 	$pdo->queryExec("UPDATE groups SET first_record = 0, first_record_postdate = NULL, last_record = 0, last_record_postdate = NULL, last_updated = NULL");
