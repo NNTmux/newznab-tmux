@@ -47,12 +47,8 @@ class ReleaseImage
 	public $vidSavePath;
 
 	/**
-	 * @var \Imagick
-	 */
-	public $imagick;
-
-	/**
 	 * Construct.
+	 *
 	 * @param \DB()
 	 */
 	public function __construct(&$pdo = null)
@@ -62,11 +58,11 @@ class ReleaseImage
 			$pdo = new Settings();
 		}
 		//                                                            Table    |  Column
-		$this->audSavePath    = NN_COVERS . 'audiosample' . DS; // releases    guid
-		$this->imgSavePath    = NN_COVERS . 'preview'     . DS; // releases    guid
-		$this->jpgSavePath    = NN_COVERS . 'sample'      . DS; // releases    guid
-		$this->movieImgSavePath = NN_COVERS . 'movies'      . DS; // releases    imdbid
-		$this->vidSavePath    = NN_COVERS . 'video'       . DS; // releases    guid
+		$this->audSavePath = NN_COVERS . 'audiosample' . DS; // releases    guid
+		$this->imgSavePath = NN_COVERS . 'preview' . DS; // releases    guid
+		$this->jpgSavePath = NN_COVERS . 'sample' . DS; // releases    guid
+		$this->movieImgSavePath = NN_COVERS . 'movies' . DS; // releases    imdbid
+		$this->vidSavePath = NN_COVERS . 'video' . DS; // releases    guid
 
 		/* For reference. *
 		$this->anidbImgPath   = NN_COVERS . 'anime'       . DS; // anidb       anidbid | used in populate_anidb.php, not anidb.php
@@ -77,8 +73,6 @@ class ReleaseImage
 
 		$this->audioImgPath   = NN_COVERS . 'audio'       . DS; // unused folder, music folder already exists.
 		**/
-
-		$this->imagick = new \Imagick();
 	}
 
 	/**
@@ -96,32 +90,36 @@ class ReleaseImage
 		} else if (is_file($imgLoc)) {
 			$img = @file_get_contents($imgLoc);
 		}
-		if ($img !== false && !empty($img)) {
+		if ($img !== false) {
+			$imagick = new \Imagick();
 			$imgFail = false;
 			try {
-				$this->imagick->readImageBlob($img);
+				$imagick->readImageBlob($img);
 			} catch (\ImagickException $imgError) {
 				echo 'Bad image data, skipping processing' . PHP_EOL;
-				if(NN_DEBUG) {
+				if (NN_DEBUG) {
 					echo $imgError;
 				}
 				$imgFail = true;
 			}
 			if ($imgFail === false) {
-				$im = $this->imagick->readImageBlob($img);
-				$this->imagick->getImageBlob();
-				$size = $this->imagick->getImageLength();
+				$im = $imagick->readImageBlob($img);
+				$imagick->getImageBlob();
+				$size = $imagick->getImageLength();
 				if ($im === true && $size > 0) {
-					$this->imagick->clear();
+					$imagick->clear();
+
 					return $img;
 				}
 			}
 		}
+
 		return false;
 	}
 
 	/**
 	 * Save an image to disk, optionally resizing it.
+	 *
 	 * @param string $imgName      What to name the new image.
 	 * @param string $imgLoc       URL or location on the disk the original image is in.
 	 * @param string $imgSavePath  Folder to save the new image in.
@@ -141,30 +139,29 @@ class ReleaseImage
 
 		// Check if we need to resize it.
 		if ($imgMaxWidth != '' && $imgMaxHeight != '') {
-			$this->imagick->readImageBlob($cover);
-			$this->imagick->getImageBlob();
-			$size = $this->imagick->getImageLength();
-			$width = $this->imagick->getImageWidth();
-			$height = $this->imagick->getImageHeight();
-			$ratio = min($imgMaxHeight/$height, $imgMaxWidth/$width);
+			$imagick = new \Imagick();
+			$imagick->readImageBlob($cover);
+			$width = $imagick->getImageWidth();
+			$height = $imagick->getImageHeight();
+			$ratio = min($imgMaxHeight / $height, $imgMaxWidth / $width);
 			// New dimensions
-			$new_width = intval($ratio*$width);
-			$new_height = intval($ratio*$height);
-			if ($new_width < $width && $new_width > 10 && $new_height > 10  && $size > 0) {
-				$this->imagick->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
-				$this->imagick->resizeImage($new_width, $new_height, \Imagick::FILTER_LANCZOS, 0);
+			$new_width = intval($ratio * $width);
+			$new_height = intval($ratio * $height);
+			if ($new_width < $width && $new_width > 10 && $new_height > 10) {
+				$imagick->setImageType(\Imagick::IMGTYPE_TRUECOLOR);
+				$imagick->thumbnailImage($new_width, $new_height, true);
 				ob_start();
-				$this->imagick->getImageBlob();
-				$this->imagick->setImageFormat('jpeg');
-				$this->imagick->writeImage($imgName . '.jpeg');
+				$imagick->getImageBlob();
+				$imagick->setImageFormat('jpeg');
 				$thumb = ob_get_clean();
+				$imagick->clear();
 
 				if ($saveThumb) {
-					$image = file_get_contents($thumb);
+					$image = @file_get_contents($thumb);
 					if(strlen($image) >= 1) {
-						@file_put_contents($imgSavePath . $imgName . '_thumb.jpg', $image);
+						@file_put_contents($imgSavePath . $imgName . '_thumb.jpg', $thumb);
 					} else {
-						echo 'Error fetching' . $image;
+						echo 'Error fetching ' . $image;
 					}
 				} else {
 					$cover = $thumb;
@@ -172,7 +169,7 @@ class ReleaseImage
 
 				unset($thumb);
 			}
-			$this->imagick->clear();
+			$imagick->clear();
 		}
 		// Store it on the hard drive.
 		if (!empty($cover)) {
@@ -189,7 +186,7 @@ class ReleaseImage
 	/**
 	 * Delete images for the release.
 	 *
-	 * @param string      $guid   The GUID of the release.
+	 * @param string $guid The GUID of the release.
 	 *
 	 * @return void
 	 */
