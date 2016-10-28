@@ -1,4 +1,6 @@
 2016-10-28 DariusIII
+	* Chg: Categorize VERUM releases as TV Sport
+		Note: run php misc/testing/Releases/recategorize.php all to recategorize releases properly
 	* Chg: check_covers now searches for covers less than 2 days old.
 	* Fix: decrypt_hashes uses wrong index to send to NameFixer (fixes issue #122)
 2016-10-27 DariusIII
