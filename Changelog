@@ -1,3 +1,5 @@
+2016-10-29 DariusIII
+	* Chg: Switch from php-gd to php-imagick in ReleaseImage class
 2016-10-28 DariusIII
 	* Chg: Categorize VERUM releases as TV Sport
 		Note: run php misc/testing/Releases/recategorize.php all to recategorize releases properly
