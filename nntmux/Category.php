@@ -133,33 +133,38 @@ class Category
 	 *
 	 * @return string $catsrch
 	 */
-	public function getCategorySearch($cat = [])
+	public function getCategorySearch(array $cat = [])
 	{
 		$catsrch = ' (';
 
 		foreach ($cat as $category) {
 
-			$chlist = '-99';
+			$chlist = '';
 
 			if ($category != -1 && $this->isParent($category)) {
 				$children = $this->getChildren($category);
 
 				foreach ($children as $child) {
-					$chlist .= ', ' . $child['id'];
+					$chlist .= "{$child['id']}, ";
 				}
+				$chlist = rtrim($chlist, ", ");
 			}
 
-			if ($chlist != '-99') {
-				$catsrch .= ' r.categories_id IN (' . $chlist . ') OR ';
+			if ($chlist != '') {
+				$catsrch .= " r.categories_id IN ({$chlist}) OR ";
 			} else {
 				$catsrch .= sprintf(' r.categories_id = %d OR ', $category);
 			}
 			$catsrch .= '1=2 )';
 		}
-
 		return $catsrch;
 	}
 
+	/**
+	 * Returns a concatenated list of other categories
+	 *
+	 * @return string
+	 */
 	public static function getCategoryOthersGroup()
 	{
 		return implode(",",
@@ -174,7 +179,8 @@ class Category
 				self::XXX_OTHER,
 				self::OTHER_MISC,
 				self::OTHER_HASHED
-			]);
+			]
+		);
 	}
 
 	public static function getCategoryValue($category)

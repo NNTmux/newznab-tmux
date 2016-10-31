@@ -1,4 +1,5 @@
 2016-10-31 DariusIII
+	* Chg: Replace duplicate categorySearch function in releases and exclude leading -99 improving query speed
 	* Chg: Add back button to most of the edit pages in admin area
 2016-10-29 DariusIII
 	* Chg: Switch from php-gd to php-imagick in ReleaseImage class
