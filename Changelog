@@ -1,3 +1,16 @@
+2016-10-31 DariusIII
+	* Chg: Add back button to most of the edit pages in admin area
+2016-10-29 DariusIII
+	* Chg: Switch from php-gd to php-imagick in ReleaseImage class
+2016-10-28 DariusIII
+	* Chg: Categorize VERUM releases as TV Sport
+		Note: run php misc/testing/Releases/recategorize.php all to recategorize releases properly
+	* Chg: check_covers now searches for covers less than 2 days old.
+	* Fix: decrypt_hashes uses wrong index to send to NameFixer (fixes issue #122)
+2016-10-27 DariusIII
+	* Chg: Speed up browsing and api response
+2016-10-26 DariusIII
+	* Chg: Switch to php-imagick for previews/cover processing in ReleaseImage class
 2016-10-25 DariusIII
 	* Chg: Use Imagick to detect broken sample images
 	* Chg: Update composer.lock with new versions of font-awesome (4.7.0) and moinax/tvdb (1.0.6)

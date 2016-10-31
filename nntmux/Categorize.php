@@ -636,6 +636,7 @@ class Categorize extends Category
 			case preg_match('/[-._ ]?(DTM|FIFA|formula[-._ ]1|indycar|Rugby|NASCAR|NBA|NHL|NRL|netball[-._ ]anz|ROH|SBK|Superleague|The[-._ ]Ultimate[-._ ]Fighter|TNA|V8[-._ ]Supercars|WBA|WrestleMania)[-._ ]/i', $this->releaseName):
 			case preg_match('/[-._ ]?(AFL|Grand Prix|Indy[-._ ]Car|(iMPACT|Smoky[-._ ]Mountain|Texas)[-._ ]Wrestling|Moto[-._ ]?GP|NSCS[-._ ]ROUND|NECW|Poker|PWX|Rugby|WCW)[-._ ]/i', $this->releaseName):
 			case preg_match('/[-._ ]?(Horse)[-._ ]Racing[-._ ]/i', $this->releaseName):
+			case preg_match('/[-._ ](VERUM)/i', $this->releaseName):
 				$this->tmpCat = Category::TV_SPORT;
 				return true;
 			default:
