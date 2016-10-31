@@ -1,5 +1,6 @@
 <div class="well well-sm">
 <h1>{$page->title}</h1>
+<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/game-list.php"><i class="fa fa-arrow-left"></i> Go back</a>
 <form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">
 	<input type="hidden" name="id" value="{$game.id}" />
 	<table class="input data table table-striped responsive-utilities jambo-table">

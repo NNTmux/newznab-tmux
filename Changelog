@@ -1,3 +1,5 @@
+2016-10-31 DariusIII
+	* Chg: Add back button to most of the edit pages in admin area
 2016-10-29 DariusIII
 	* Chg: Switch from php-gd to php-imagick in ReleaseImage class
 2016-10-28 DariusIII
