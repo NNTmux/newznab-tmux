@@ -1,3 +1,5 @@
+2016-11-01 DariusIII
+	* Chg: Let scrutinizer ignore platform requirements
 2016-10-31 DariusIII
 	* Chg: Replace duplicate categorySearch function in releases and exclude leading -99 improving query speed
 	* Chg: Add back button to most of the edit pages in admin area
