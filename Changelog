@@ -1,4 +1,5 @@
 2016-11-02 DariusIII
+	* Fix: Typo in Users class
 	* Chg: Switch to if loop in setTvAttributes function for better output
 2016-11-01 DariusIII
 	* Chg: Revamp categorySearch for cleanliness and make category determination more reliable and extensible
