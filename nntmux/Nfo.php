@@ -362,7 +362,7 @@ class Nfo
 					$cp = 'COMPRESS(%s)';
 					$nc = $this->pdo->escapeString($fetchedBinary);
 
-					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT id FROM release_nfos WHERE releases_id = %d', $arr['id']));
+					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM release_nfos WHERE releases_id = %d', $arr['id']));
 					if (!isset($ckreleaseid['id'])) {
 						$this->pdo->queryInsert(sprintf('INSERT INTO release_nfos (nfo, releases_id) VALUES (' . $cp . ', %d)', $nc, $arr['id']));
 					}
