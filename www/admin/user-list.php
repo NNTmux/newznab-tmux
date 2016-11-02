@@ -27,6 +27,7 @@ $page->smarty->assign([
 		'role'              => $variables['role'],
 		'role_ids'          => array_keys($roles),
 		'role_names'        => $roles,
+		'pagerquerysuffix'  => "#results",
 		'pagertotalitems'   => $page->users->getCount(),
 		'pageroffset'       => $offset,
 		'pageritemsperpage' => ITEMS_PER_PAGE,

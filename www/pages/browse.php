@@ -9,8 +9,9 @@ if (!$page->users->isLoggedIn())
 	$page->show403();
 
 $category = -1;
-if (isset($_REQUEST["t"]) && ctype_digit($_REQUEST["t"]))
+if (isset($_REQUEST["t"])) {
 	$category = $_REQUEST["t"];
+}
 
 $grp = -1;
 if (isset($_REQUEST["g"])) {

@@ -9,14 +9,14 @@
 		<tr>
 			<td>Name:</td>
 			<td>
-				<input type="hidden" name="id" value="{$user.id}" />
-				<input autocomplete="off" class="long" name="username" type="text" value="{$user.username}" />
+				<input type="hidden" name="id" {if isset($user)}value="{$user.id}"{else}{/if}/>
+				<input autocomplete="off" class="long" name="username" type="text" {if isset($user)}value="{$user.username}"{else}{/if}/>
 			</td>
 		</tr>
 		<tr>
 			<td>Email:</td>
 			<td>
-				<input autocomplete="off" class="long" name="email" type="text" value="{$user.email}" />
+				<input autocomplete="off" class="long" name="email" type="text" {if isset($user)}value="{$user.email}"{else}{/if} />
 			</td>
 		</tr>
 		<tr>

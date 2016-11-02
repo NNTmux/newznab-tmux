@@ -20,6 +20,7 @@
  */
 
 namespace nntmux\http;
+
 use nntmux\Utility\Utility;
 use nntmux\Category;
 
@@ -90,7 +91,8 @@ class XML_Response
 	 *
 	 * @param array $options
 	 */
-	public function __construct($options = []) {
+	public function __construct($options = [])
+	{
 		$defaults = [
 			'Parameters' => null,
 			'Data'       => null,
@@ -123,10 +125,12 @@ class XML_Response
 					break;
 				case 'api':
 					$this->namespace = 'newznab';
+
 					return $this->returnApiRss();
 					break;
 				case 'rss':
 					$this->namespace = 'nntmux';
+
 					return $this->returnApiRss();
 					break;
 				case 'reg':
@@ -134,6 +138,7 @@ class XML_Response
 					break;
 			}
 		}
+
 		return false;
 	}
 
@@ -201,12 +206,13 @@ class XML_Response
 
 	/**
 	 * Starts a new element, loops through the attribute data and ends the element
+	 *
 	 * @param array $element An array with the name of the element and the attribute data
 	 */
 	protected function addNode($element)
 	{
 		$this->xml->startElement($element['name']);
-		foreach($element['data'] AS $attr => $val) {
+		foreach ($element['data'] AS $attr => $val) {
 			$this->xml->writeAttribute($attr, $val);
 		}
 		$this->xml->endElement();
@@ -214,12 +220,13 @@ class XML_Response
 
 	/**
 	 * Starts a new element, loops through the attribute data and ends the element
+	 *
 	 * @param array $element An array with the name of the element and the attribute data
 	 */
 	protected function addNodes($element)
 	{
 		$this->xml->startElement($element['name']);
-		foreach($element['data'] AS $elem => $value) {
+		foreach ($element['data'] AS $elem => $value) {
 			$subelement['name'] = $elem;
 			$subelement['data'] = $value;
 			$this->addNode($subelement);
@@ -240,7 +247,7 @@ class XML_Response
 			if ($p['description'] != '') {
 				$this->xml->writeAttribute('description', html_entity_decode($p['description']));
 			}
-			foreach($p['subcatlist'] AS $c) {
+			foreach ($p['subcatlist'] AS $c) {
 				$this->xml->startElement('subcat');
 				$this->xml->writeAttribute('id', $c['id']);
 				$this->xml->writeAttribute('name', html_entity_decode($c['title']));
@@ -259,7 +266,7 @@ class XML_Response
 	 */
 	protected function includeRssAtom()
 	{
-		switch($this->namespace) {
+		switch ($this->namespace) {
 			case 'newznab':
 				$url = 'http://www.newznab.com/DTD/2010/feeds/attributes/';
 				break;
@@ -300,7 +307,7 @@ class XML_Response
 	{
 		$server = $this->server['server'];
 
-		switch($this->namespace) {
+		switch ($this->namespace) {
 			case 'newznab':
 				$path = 'apihelp/';
 				$tag = 'API';
@@ -340,7 +347,7 @@ class XML_Response
 
 	public function includeTotalRows()
 	{
-		$this->xml->startElement($this->namespace.":response");
+		$this->xml->startElement($this->namespace . ":response");
 		$this->xml->writeAttribute('offset', $this->offset);
 		$this->xml->writeAttribute('total', isset($this->releases[0]['_totalrows']) ? $this->releases[0]['_totalrows'] : 0);
 		$this->xml->endElement();
@@ -351,7 +358,7 @@ class XML_Response
 	 */
 	public function includeReleases()
 	{
-		if(is_array($this->releases) && !empty($this->releases)) {
+		if (is_array($this->releases) && !empty($this->releases)) {
 			foreach ($this->releases AS $this->release) {
 				$this->xml->startElement('item');
 				$this->includeReleaseMain();
@@ -385,7 +392,7 @@ class XML_Response
 		} else {
 			$this->writeRssCdata();
 		}
-		if((isset($this->parameters['dl']) && $this->parameters['dl'] == 1) || !isset($this->parameters['dl'])) {
+		if ((isset($this->parameters['dl']) && $this->parameters['dl'] == 1) || !isset($this->parameters['dl'])) {
 			$this->xml->startElement('enclosure');
 			$this->xml->writeAttribute(
 				'url',
@@ -416,24 +423,27 @@ class XML_Response
 		if ($this->parameters['extended'] == 1) {
 			$this->writeZedAttr('files', $this->release['totalpart']);
 			$this->writeZedAttr('poster', $this->release['fromname']);
-			if(($this->release['videos_id'] > 0 || $this->release['tv_episodes_id'] > 0) && $this->namespace === 'newznab') {
+			if (($this->release['videos_id'] > 0 || $this->release['tv_episodes_id'] > 0) && $this->namespace === 'newznab') {
 				$this->setTvAttr();
 			}
 
-			switch (true) {
-					case isset($this->release['imdbid']) && $this->release['imdbid'] > 0:
-						$this->writeZedAttr('imdb', $this->release['imdbid']);
-					case isset($this->release['anidbid']) && $this->release['anidbid'] > 0:
-						$this->writeZedAttr('anidbid', $this->release['anidbid']);
-					case isset($this->release['predb_id']) && $this->release['predb_id'] > 0:
-						$this->writeZedAttr('prematch', 1);
-					case isset($this->release['nfostatus']) && $this->release['nfostatus'] == 1:
-						$this->writeZedAttr(
-							'info',
-							$this->server['server']['url'] .
-							"api?t=info&id={$this->release['guid']}&r={$this->parameters['token']}"
-						);
+			if (isset($this->release['imdbid']) && $this->release['imdbid'] > 0) {
+				$this->writeZedAttr('imdb', $this->release['imdbid']);
 			}
+			if (isset($this->release['anidbid']) && $this->release['anidbid'] > 0) {
+				$this->writeZedAttr('anidbid', $this->release['anidbid']);
+			}
+			if (isset($this->release['predb_id']) && $this->release['predb_id'] > 0) {
+				$this->writeZedAttr('prematch', 1);
+			}
+			if (isset($this->release['nfostatus']) && $this->release['nfostatus'] == 1) {
+				$this->writeZedAttr(
+					'info',
+					$this->server['server']['url'] .
+					"api?t=info&id={$this->release['guid']}&r={$this->parameters['token']}"
+				);
+			}
+
 			$this->writeZedAttr('grabs', $this->release['grabs']);
 			$this->writeZedAttr('comments', $this->release['comments']);
 			$this->writeZedAttr('password', $this->release['passwordstatus']);
@@ -449,35 +459,43 @@ class XML_Response
 	 */
 	protected function setTvAttr()
 	{
-		switch(true) {
-			case !empty($this->release['title']):
-				$this->writeZedAttr('title', $this->release['title']);
-			case isset($this->release['series']) && $this->release['series'] > 0:
-				$this->writeZedAttr('season', $this->release['series']);
-			case isset($this->release['episode']) && $this->release['episode'] > 0:
-				$this->writeZedAttr('episode', $this->release['episode']);
-			case !empty($this->release['firstaired']):
-				$this->writeZedAttr('tvairdate', $this->release['firstaired']);
-			case isset($this->release['tvdb']) && $this->release['tvdb'] > 0:
-				$this->writeZedAttr('tvdbid', $this->release['tvdb']);
-			case isset($this->release['trakt']) && $this->release['trakt'] > 0:
-				$this->writeZedAttr('traktid', $this->release['trakt']);
-			case isset($this->release['tvrage']) && $this->release['tvrage'] > 0:
-				$this->writeZedAttr('tvrageid', $this->release['tvrage']);
-				$this->writeZedAttr('rageid', $this->release['tvrage']);
-			case isset($this->release['tvmaze']) && $this->release['tvmaze'] > 0:
-				$this->writeZedAttr('tvmazeid', $this->release['tvmaze']);
-			case isset($this->release['imdb']) && $this->release['imdb'] > 0:
-				$this->writeZedAttr('imdbid', str_pad($this->release['imdb'], 7, '0', STR_PAD_LEFT));
-			case isset($this->release['tmdb']) && $this->release['tmdb'] > 0:
-				$this->writeZedAttr('tmdbid', $this->release['tmdb']);
+		if (!empty($this->release['title'])) {
+			$this->writeZedAttr('title', $this->release['title']);
+		}
+		if (isset($this->release['series']) && $this->release['series'] > 0) {
+			$this->writeZedAttr('season', $this->release['series']);
+		}
+		if (isset($this->release['episode']) && $this->release['episode'] > 0) {
+			$this->writeZedAttr('episode', $this->release['episode']);
+		}
+		if (!empty($this->release['firstaired'])) {
+			$this->writeZedAttr('tvairdate', $this->release['firstaired']);
+		}
+		if (isset($this->release['tvdb']) && $this->release['tvdb'] > 0) {
+			$this->writeZedAttr('tvdbid', $this->release['tvdb']);
+		}
+		if (isset($this->release['trakt']) && $this->release['trakt'] > 0) {
+			$this->writeZedAttr('traktid', $this->release['trakt']);
+		}
+		if (isset($this->release['tvrage']) && $this->release['tvrage'] > 0) {
+			$this->writeZedAttr('tvrageid', $this->release['tvrage']);
+			$this->writeZedAttr('rageid', $this->release['tvrage']);
+		}
+		if (isset($this->release['tvmaze']) && $this->release['tvmaze'] > 0) {
+			$this->writeZedAttr('tvmazeid', $this->release['tvmaze']);
+		}
+		if (isset($this->release['imdb']) && $this->release['imdb'] > 0) {
+			$this->writeZedAttr('imdbid', str_pad($this->release['imdb'], 7, '0', STR_PAD_LEFT));
+		}
+		if (isset($this->release['tmdb']) && $this->release['tmdb'] > 0) {
+			$this->writeZedAttr('tmdbid', $this->release['tmdb']);
 		}
 	}
 
 	/**
 	 * Writes individual zed (newznab) type attributes
 	 *
-	 * @param string $name The namespaced attribute name tag
+	 * @param string $name  The namespaced attribute name tag
 	 * @param string $value The namespaced attribute value
 	 */
 	protected function writeZedAttr($name, $value)
@@ -502,7 +520,7 @@ class XML_Response
 		$p = $this->parameters;
 
 		$this->cdata = "\n\t<div>\n";
-		switch(1) {
+		switch (1) {
 			case !empty($r['cover']):
 				$dir = 'movies';
 				$column = 'imdbid';
@@ -606,7 +624,7 @@ class XML_Response
 
 		$cData = $this->buildCdata($musicCol);
 
-		if ($r['mu_url'] !== '' ) {
+		if ($r['mu_url'] !== '') {
 			$cDataUrl = "<li>Amazon: <a href=\"{$r['mu_url']}\">{$r['mu_title']}</a></li>";
 		}
 
@@ -667,7 +685,7 @@ class XML_Response
 		$cData = '';
 
 		foreach ($columns AS $info) {
-			if (!empty($r[$info]))  {
+			if (!empty($r[$info])) {
 				if ($info == 'mu_releasedate') {
 					$ucInfo = 'Released';
 					$rDate = date('Y-m-d', strtotime($r[$info]));
