@@ -21,25 +21,25 @@
 {$site->adbrowse}
 {if $serieslist|@count > 0}
 	<table class="data table table-condensed table-striped table-responsive table-hover icons" id="browsetable">
+	<div class="col-md-12 pull-right">
+				<form class="form pull-right" style="margin-top:-35px;">
+					<form name="showsearch" class="navbar-form" action="" method="get">
+						<div class="input-group">
+							<input class="form-control" style="width: 150px;"
+								   id="title appendedInputButton"
+								   type="text" name="title" {if isset($serieslist.title)} value="{$serieslist.title}" {else}{/if}"
+								   placeholder="Search here"/>
+							<button type="submit" class="btn btn-success">GO</button>
+						</div>
+					</form>
+				</form>
+			</div>
 		{foreach $serieslist as $sletter => $series}
 			<tr>
 				<td colspan="10">
 					<div class="row">
 						<div class="col-md-3">
 							<h2>{$sletter}</h2>
-						</div>
-						<div class="col-md-9">
-							<form class="form pull-right" style="margin-top:-35px;">
-								<form name="showsearch" class="navbar-form" action="" method="get">
-									<div class="input-group">
-										<input class="form-control" style="width: 150px;"
-											   id="title appendedInputButton"
-											   type="text" name="title" value="{$series.title}"
-											   placeholder="Search here"/>
-										<button type="submit" class="btn btn-success">GO</button>
-									</div>
-								</form>
-							</form>
 						</div>
 					</div>
 				</td>

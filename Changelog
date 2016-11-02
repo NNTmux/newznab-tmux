@@ -1,4 +1,5 @@
 2016-11-02 DariusIII
+	* Fix: Undefined index title notice in viewserieslist pages
 	* Fix: Define pagerquerysuffix for users-list
 	* Fix: Typo in Users class
 	* Chg: Switch to if loop in setTvAttributes function for better output
