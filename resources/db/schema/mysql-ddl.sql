@@ -1090,7 +1090,7 @@ CREATE TABLE user_downloads (
   users_id    INT(16) UNSIGNED  NOT NULL,
   hosthash    VARCHAR(50)       NOT NULL,
   timestamp   DATETIME          NOT NULL,
-  releases_id INT(11)           NOT NULL COMMENT 'FK to releases.id'
+  releases_id INT(11)           NOT NULL COMMENT 'FK to releases.id',
   PRIMARY KEY (id),
   KEY userid    (users_id),
   KEY timestamp (timestamp)
