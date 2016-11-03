@@ -8,7 +8,7 @@ UPDATE settings SET subsection = 'release' WHERE setting = 'maxsizetoformrelease
 
 UPDATE settings SET subsection = 'release' WHERE setting = 'minfilestoformrelease';
 
-UPDATE settings SET section = 'archive', subsection = 'fetch' name = 'end' WHERE setting = 'fetchlastcompressedfiles';
+UPDATE settings SET section = 'archive', subsection = 'fetch', name = 'end' WHERE setting = 'fetchlastcompressedfiles';
 
 UPDATE settings SET section = 'APIs' WHERE setting = 'amazonassociatetag';
 
@@ -136,7 +136,7 @@ UPDATE settings SET section = 'site', subsection = 'google', name = 'google_adse
 
 UPDATE settings SET section = 'site', subsection = 'google', name = 'google_analytics_acc' WHERE setting = 'google_analytics_acc';
 
-INSERT IGNORE INTO settings (section, subsection, name, value, hint, setting) VALUES (shell, date, format, '%Y-%m-%d %T', 'Format string to use in shell''s date command output. See `man date` for acceptable format.\nDefault: %Y-%m-%d %T', 'shell.date.format');
+INSERT IGNORE INTO settings (section, subsection, name, value, hint, setting) VALUES ('shell', 'date', 'format', '%Y-%m-%d %T', 'Format string to use in shell date command output. See `man date` for acceptable format.\nDefault: %Y-%m-%d %T', 'shell.date.format');
 
 
 
