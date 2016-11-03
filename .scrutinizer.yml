@@ -1,7 +1,7 @@
 build:
     dependencies:
         # Overwrites inferred commands
-    override:
+        override:
           - 'composer install --no-interaction --no-dev --prefer-source --no-scripts --ignore-platform-reqs'
 
     environment:
