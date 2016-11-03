@@ -1,4 +1,5 @@
 2016-11-03 DariusIII
+	* Fix: Wrong variable used in viewmusic.tpl in all themes
 	* Fix: Version lookup in NZB class
 2016-11-02 DariusIII
 	* Fix: Undefined index title notice in viewserieslist pages
