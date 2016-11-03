@@ -1,8 +1,8 @@
 <?php
 
+use app\models\Settings;
 use nntmux\Category;
 use nntmux\http\RSS;
-use nntmux\db\Settings;
 use nntmux\utility\Utility;
 
 $category = new Category(['Settings' => $page->settings]);
@@ -13,10 +13,10 @@ $offset = 0;
 if (!isset($_GET["t"]) && !isset($_GET["show"]) && !isset($_GET["anidb"])) {
 	// User has to either be logged in, or using rsskey.
 	if (!$page->users->isLoggedIn()) {
-		if ($page->settings->getSetting('registerstatus') != Settings::REGISTER_STATUS_API_ONLY) {
+		if (Settings::value('..registerstatus') != Settings::REGISTER_STATUS_API_ONLY) {
 			Utility::showApiError(100);
 		} else {
-			header("Location: " . $page->settings->getSetting('code'));
+			header("Location: " . Settings::value('site.main.code'));
 		}
 	}
 
@@ -56,7 +56,7 @@ if (!isset($_GET["t"]) && !isset($_GET["show"]) && !isset($_GET["anidb"])) {
 		$rssToken = $page->userdata["rsstoken"];
 		$maxRequests = $page->userdata['apirequests'];
 	} else {
-		if ($page->settings->getSetting('registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
+		if (Settings::value('..registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
 			$res = $page->users->getById(0);
 		} else {
 			if (!isset($_GET["i"]) || !isset($_GET["r"])) {

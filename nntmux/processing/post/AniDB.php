@@ -2,9 +2,10 @@
 
 namespace nntmux\processing\post;
 
+use app\models\Settings;
 use nntmux\Category;
 use nntmux\NZB;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 class AniDB
 {
@@ -50,9 +51,9 @@ class AniDB
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
-		$qty = $this->pdo->getSetting('maxanidbprocessed');
+		$qty = Settings::value('..maxanidbprocessed');
 		$this->aniqty = !empty($qty) ? $qty : 100;
 
 		$this->status = 'NULL';

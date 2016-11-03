@@ -1,13 +1,14 @@
 <?php
 require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
+use app\models\Settings;
 use nntmux\Category;
 use nntmux\TmuxOutput;
 use nntmux\TmuxRun;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
-$pdo = new Settings();
+$pdo = new DB();
 $tRun = new TmuxRun($pdo);
 $tOut = new TmuxOutput($pdo);
 
@@ -72,7 +73,7 @@ while ($runVar['counts']['iterations'] > 0) {
 	//check the db connection
 	if ($pdo->ping(true) == false) {
 		unset($pdo);
-		$pdo = new Settings();
+		$pdo = new DB();
 	}
 
 	$timer01 = time();
@@ -372,7 +373,7 @@ while ($runVar['counts']['iterations'] > 0) {
 		$tRun->runPane('notrunning', $runVar);
 	}
 
-	$exit = $pdo->getSetting('tmux.run.exit');
+	$exit = Settings::value('tmux.running.exit');
 	if ($exit == 0) {
 		$runVar['counts']['iterations']++;
 		sleep(10);

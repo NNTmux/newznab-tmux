@@ -1,7 +1,8 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 class Users
@@ -49,7 +50,7 @@ class Users
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		$this->password_hash_cost = (defined('NN_PASSWORD_HASH_COST') ? NN_PASSWORD_HASH_COST : 11);
 	}
@@ -376,7 +377,7 @@ class Users
 	{
 		$data = $this->pdo->query(sprintf("SELECT id,email FROM users WHERE role = %d AND rolechangedate < now()", $uprole));
 		foreach ($data as $u) {
-			Utility::sendEmail($u["email"], $msgsubject, $msgbody, $this->pdo->getSetting('email'));
+			Utility::sendEmail($u["email"], $msgsubject, $msgbody, Settings::value('site.main.email'));
 			$this->pdo->queryExec(sprintf("UPDATE users SET role = %d, rolechangedate=null WHERE id = %d", $downrole, $u["id"]));
 		}
 
@@ -550,7 +551,7 @@ class Users
 
 		// Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.
 		$invitedBy = 0;
-		if (($this->pdo->getSetting('registerstatus') == Settings::REGISTER_STATUS_INVITE) && !$forceInviteMode) {
+		if ((Settings::value('..registerstatus') == Settings::REGISTER_STATUS_INVITE) && !$forceInviteMode) {
 			if ($inviteCode == '') {
 				return self::ERR_SIGNUP_BADINVITECODE;
 			}
@@ -642,7 +643,7 @@ class Users
 				$this->pdo->escapeString((string)$password),
 				$this->pdo->escapeString($email),
 				$role,
-				$this->pdo->escapeString(($this->pdo->getSetting('storeuserips') == 1 ? $host : '')),
+				$this->pdo->escapeString((Settings::value('..storeuserips') == 1 ? $host : '')),
 				$this->pdo->escapeString(uniqid()),
 				$invites,
 				($invitedBy == 0 ? 'NULL' : $invitedBy),
@@ -682,7 +683,7 @@ class Users
 	{
 		$_SESSION['uid'] = $userID;
 
-		if ($this->pdo->getSetting('storeuserips') != 1) {
+		if (Settings::value('..storeuserips') != 1) {
 			$host = '';
 		}
 
@@ -929,11 +930,11 @@ class Users
 	{
 		$ipsql = "('-1')";
 
-		if ($this->pdo->getSetting('userhostexclusion') != '') {
+		if (Settings::value('..userhostexclusion') != '') {
 			$ipsql = "";
-			$ips = explode(",", $this->pdo->getSetting('userhostexclusion'));
+			$ips = explode(",", Settings::value('..userhostexclusion'));
 			foreach ($ips as $ip) {
-				$ipsql .= $this->pdo->escapeString($this->getHostHash($ip, $this->pdo->getSetting('siteseed'))) . ",";
+				$ipsql .= $this->pdo->escapeString($this->getHostHash($ip, Settings::value('..siteseed'))) . ",";
 			}
 			$ipsql = "(" . $ipsql . " '-1')";
 		}
@@ -957,7 +958,7 @@ class Users
 	public function getHostHash($host, $siteseed = "")
 	{
 		if ($siteseed == "") {
-			$siteseed = $this->pdo->getSetting('siteseed');
+			$siteseed = Settings::value('..siteseed');
 		}
 
 		return self::hashSHA1($siteseed . $host . $siteseed);

@@ -1,7 +1,8 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\extensions\util\Versions;
+use nntmux\db\DB;
 
 /**
  * Class Tmux
@@ -23,11 +24,11 @@ class Tmux
 	/**
 	 * Tmux constructor.
 	 *
-	 * @param Settings|null $pdo
+	 * @param DB|null $pdo
 	 */
-	function __construct(Settings $pdo = null)
+	function __construct(DB $pdo = null)
 	{
-		$this->pdo = (empty($pdo) ? new Settings() : $pdo);
+		$this->pdo = (empty($pdo) ? new DB() : $pdo);
 	}
 
 	/**
@@ -35,7 +36,7 @@ class Tmux
 	 */
 	public function version()
 	{
-		return $this->pdo->version();
+		return (new Versions())->getGitTagInRepo();
 	}
 
 	/**

@@ -8,10 +8,11 @@ Author: lordgnu <lordgnu@me.com>
 
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 use nntmux\NZB;
 
-$pdo = new Settings;
+$pdo = new DB;
 $nzb = new NZB;
 
 $items = $pdo->query("SELECT id,guid FROM releases WHERE size = 0");
@@ -21,7 +22,7 @@ echo "Updating file size for " . count($items) . " release(s)\n";
 
 while ($item = array_pop($items))
 {
-	$nzbpath = $nzb->getNZBPath($item['guid'], $pdo->getSetting('nzbpath'));
+	$nzbpath = $nzb->getNZBPath($item['guid'], Settings::value('..nzbpath'));
 
 	ob_start();
 	@readgzfile($nzbpath);

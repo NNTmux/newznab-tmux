@@ -3,9 +3,9 @@
 require_once './config.php';
 
 
+use app\models\Settings;
 use nntmux\Category;
 use nntmux\SABnzbd;
-use nntmux\db\Settings;
 use nntmux\Sites;
 use nntmux\utility\Utility;
 
@@ -27,7 +27,7 @@ switch($action)
 				implode(', ', $_POST['book_reqids']) : $_POST['book_reqids'];
 		}
 		$error = "";
-		$ret = $page->settings->update($_POST);
+		$ret = $page->settings->settingsUpdate($_POST);
 		if (is_int($ret))
 		{
 			if ($ret == Settings::ERR_BADUNRARPATH)
@@ -163,7 +163,7 @@ $page->smarty->assign('book_reqids_ids', $book_reqids_ids);
 $page->smarty->assign('book_reqids_names', $book_reqids_names);
 
 // convert from a list to an array as we need to use an array, but teh Settings table only saves strings
-$books_selected = explode(",", $page->settings->getSetting('book_reqids'));
+$books_selected = explode(",", Settings::value('..book_reqids'));
 
 // convert from a string array to an int array
 $books_selected = array_map(create_function('$value', 'return (int)$value;'), $books_selected);

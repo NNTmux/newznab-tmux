@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Settings;
 use nntmux\Users;
 use nntmux\Contents;
 use nntmux\Forum;
@@ -38,7 +39,7 @@ class Page extends BasePage
 		$this->smarty->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
 		$this->smarty->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
 		if ($this->userdata != null)
-			$this->smarty->assign('recentforumpostslist',$f->getPosts($this->settings->getSetting('showrecentforumposts')));
+			$this->smarty->assign('recentforumpostslist',$f->getPosts(Settings::value('..showrecentforumposts')));
 
 		$this->smarty->assign('main_menu',$this->smarty->fetch('mainmenu.tpl'));
 		$this->smarty->assign('useful_menu',$this->smarty->fetch('usefullinksmenu.tpl'));

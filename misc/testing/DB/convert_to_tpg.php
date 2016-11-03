@@ -1,16 +1,17 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 use nntmux\Groups;
 use nntmux\ConsoleTools;
 
 
 $debug = false;
-$pdo = new Settings();
+$pdo = new DB();
 $groups = new Groups(['Settings' => $pdo]);
 $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
-$DoPartRepair = ($pdo->getSetting('partrepair') == '0') ? false : true;
+$DoPartRepair = (Settings::value('..partrepair') == '0') ? false : true;
 
 if ((!isset($argv[1])) || $argv[1] != 'true') {
 	exit($pdo->log->error("\nMandatory argument missing\n\n"

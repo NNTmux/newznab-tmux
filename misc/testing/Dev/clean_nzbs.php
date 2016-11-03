@@ -1,7 +1,7 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\ConsoleTools;
+use app\models\Settings;
 use nntmux\NZB;
 use nntmux\ReleaseImage;
 use nntmux\Releases;
@@ -33,7 +33,7 @@ $couldbe = ($argv[1] === "true") ? "could be " : "";
 echo $pdo->log->header('Getting List of nzbs to check against db.');
 echo $pdo->log->header("Checked / {$couldbe}moved\n");
 
-$dirItr = new \RecursiveDirectoryIterator($pdo->getSetting('nzbpath'));
+$dirItr = new \RecursiveDirectoryIterator(Settings::value('..nzbpath'));
 $itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
 
 foreach ($itr as $filePath) {

@@ -1,7 +1,8 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 
 
 /**
@@ -20,7 +21,7 @@ class ReleaseComments
 	 */
 	public function __construct($settings = null)
 	{
-		$this->pdo = ($settings instanceof Settings ? $settings : new Settings());
+		$this->pdo = ($settings instanceof DB ? $settings : new DB());
 	}
 
 	/**
@@ -164,7 +165,7 @@ class ReleaseComments
 	 */
 	public function addComment($id, $gid, $text, $userid, $host)
 	{
-		if ($this->pdo->getSetting('storeuserips') != "1") {
+		if (Settings::value('..storeuserips') != "1") {
 			$host = "";
 		}
 

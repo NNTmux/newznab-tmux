@@ -1,9 +1,9 @@
 <?php
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 try {
     // Create the first database class instance (which will initialize the PDO connection)
-    $db = new Settings();
+    $db = new DB();
 
     // For debug set the error mode
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -18,7 +18,7 @@ try {
             echo "--[ Insert run: {$i} ]----------------------------------------". PHP_EOL;
 
             // Create a new db class instance (multiple can exist)
-            $newDb = new Settings();
+            $newDb = new DB();
 
             // Check that there is a new db class instance, but no new PDO instance
             var_dump( $newDb, $newDb->getPDO() );

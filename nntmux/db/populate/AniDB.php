@@ -2,9 +2,9 @@
 
 namespace nntmux\db\populate;
 
+use app\models\Settings;
 use nntmux\ReleaseImage;
-use nntmux\db\Settings;
-use nntmux\utility\Utility;
+use nntmux\db\DB;
 
 class AniDB
 {
@@ -69,13 +69,13 @@ class AniDB
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
-		$anidbupdint = $this->pdo->getSetting('intanidbupdate');
-		$lastupdated = $this->pdo->getSetting('lastanidbupdate');
+		$anidbupdint = Settings::value('..intanidbupdate');
+		$lastupdated = Settings::value('..lastanidbupdate');
 
 		$this->imgSavePath = NN_COVERS . 'anime' . DS;
-		$this->apiKey      = $this->pdo->getSetting('anidbkey');
+		$this->apiKey      = Settings::value('APIs..anidbkey');
 
 		$this->updateInterval = (isset($anidbupdint) ? $anidbupdint : '7');
 		$this->lastUpdate     = (isset($lastupdated) ? $lastupdated : '0');
@@ -136,7 +136,7 @@ class AniDB
 	 */
 	private function getAniDbAPI()
 	{
-		$timestamp = $this->pdo->getSetting('APIs.AniDB.banned') + 90000;
+		$timestamp = Settings::value('APIs.AniDB.banned') + 90000;
 		if ($timestamp > time()) {
 			echo "Banned from AniDB lookups until " . date('Y-m-d H:i:s', $timestamp) . "\n";
 			return false;

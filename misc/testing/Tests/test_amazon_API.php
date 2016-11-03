@@ -4,9 +4,9 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\Operations\Search;
 use ApaiIO\ApaiIO;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
-$s = new Settings();
+$s = new DB();
 
 $pubkey = $s->getSetting('amazonpubkey');
 $privkey = $s->getSetting('amazonprivkey');

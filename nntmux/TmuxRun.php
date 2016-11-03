@@ -1,7 +1,8 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 
 /**
  * Tmux pane shell exec functions for pane respawning
@@ -13,12 +14,18 @@ class TmuxRun extends Tmux
 	protected $_dateFormat;
 
 	/**
-	 * @param \nntmux\db\Settings $pdo
+	 * @param \nntmux\db\DB $pdo
 	 */
-	public function __construct(Settings $pdo = null)
+	public function __construct(DB $pdo = null)
 	{
 		parent::__construct($pdo);
-		$this->_dateFormat = '%Y-%m-%d %T';
+		$dateFormat = Settings::value(
+			[
+				'section'    => 'shell',
+				'subsection' => 'date',
+				'name'       => 'format'
+			]);
+		$this->_dateFormat = empty($dateFormat) ? '%Y-%m-%d %T' : $dateFormat;
 
 	}
 

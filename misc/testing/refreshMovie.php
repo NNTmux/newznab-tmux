@@ -2,10 +2,10 @@
 
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\Movie;
 
-$db = new Settings();
+$db = new DB();
 $movie = new Movie(['Echo' => true, 'Settings' => $pdo]);
 $movies = [];
 $counter = 1;

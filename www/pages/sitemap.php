@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Settings;
 use nntmux\Contents;
 use nntmux\Sitemap;
 
@@ -76,10 +77,10 @@ if (isset($_GET["type"]) && $_GET["type"] == "xml")
 }
 else
 {
-	$page->title = $page->settings->getSetting('title'). " site map";
-	$page->meta_title = $page->settings->getSetting('title'). " site map";
+	$page->title = Settings::value('site.main.title'). " site map";
+	$page->meta_title = Settings::value('site.main.title'). " site map";
 	$page->meta_keywords = "sitemap,site,map";
-	$page->meta_description = $page->settings->getSetting('title')." site map shows all our pages.";
+	$page->meta_description = Settings::value('site.main.title')." site map shows all our pages.";
 	$page->content = $page->smarty->fetch('sitemap.tpl');
 	$page->render();
 }

@@ -1,14 +1,14 @@
 <?php
 
+use app\models\Settings;
 use nntmux\DnzbFailures;
-use nntmux\db\Settings;
 
 // Page is accessible only by the rss token, or logged in users.
 if ($page->users->isLoggedIn()) {
 	$uid = $page->users->currentUserId();
 	$rssToken = $page->userdata['rsstoken'];
 } else {
-	if ($page->settings->getSetting('registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
+	if (Settings::value('..registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
 		if (!isset($_GET["rsstoken"])) {
 			header("X-DNZB-RCode: 400");
 			header("X-DNZB-RText: Bad request, please supply all parameters!");

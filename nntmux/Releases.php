@@ -1,7 +1,8 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 /**
@@ -56,14 +57,14 @@ class Releases
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
-		$this->updategrabs = ($this->pdo->getSetting('grabstatus') == '0' ? false : true);
-		$this->passwordStatus = ($this->pdo->getSetting('checkpasswordedrar') == 1 ? -1 : 0);
+		$this->updategrabs = (Settings::value('..grabstatus') == '0' ? false : true);
+		$this->passwordStatus = (Settings::value('..checkpasswordedrar') == 1 ? -1 : 0);
 		$this->sphinxSearch = new SphinxSearch();
 		$this->releaseSearch = new ReleaseSearch($this->pdo, $this->sphinxSearch);
 		$this->category = new Category(['Settings' => $this->pdo]);
-		$this->showPasswords = self::showPasswords($this->pdo);
+		$this->showPasswords = self::showPasswords();
 	}
 
 	/**
@@ -254,17 +255,14 @@ class Releases
 	/**
 	 * Return site setting for hiding/showing passworded releases.
 	 *
-	 * @param Settings $pdo
-	 *
 	 * @return string
 	 */
-	public static function showPasswords(Settings $pdo)
+	public static function showPasswords()
 	{
-		$setting = $pdo->query(
-			"SELECT value FROM settings WHERE setting = 'showpasswordedrelease'",
-			true, NN_CACHE_EXPIRY_LONG
-		);
-		switch ((isset($setting[0]['value']) && is_numeric($setting[0]['value']) ? $setting[0]['value'] : 10)) {
+		$setting = Settings::value('..showpasswordedrelease', true);
+		$setting = (isset($setting) && is_numeric($setting)) ? $setting : 10;
+
+		switch ($setting) {
 			case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
 				return ('= ' . Releases::PASSWD_NONE);
 			case 1: // Show releases with no password or a potential password (Show unprocessed releases).

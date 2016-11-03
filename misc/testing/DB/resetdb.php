@@ -1,6 +1,7 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
+use app\models\Settings;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 use nntmux\ReleaseImage;
@@ -64,7 +65,7 @@ $pdo->optimise(false, 'full');
 
 echo $pdo->log->header("Deleting nzbfiles subfolders.");
 try {
-	$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($pdo->getSetting('nzbpath'), \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
+	$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(Settings::value('..nzbpath'), \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
 	foreach ($files as $file) {
 		if (basename($file) != '.gitignore' && basename($file) != 'tmpunrar') {
 			$todo = ($file->isDir() ? 'rmdir' : 'unlink');

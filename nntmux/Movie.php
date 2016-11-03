@@ -1,8 +1,8 @@
 <?php
 namespace nntmux;
 
-use nntmux\Category;
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 use nntmux\processing\tv\TMDB;
 use nntmux\processing\tv\TraktTv;
@@ -152,16 +152,16 @@ class Movie
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 
-		$this->lookuplanguage = ($this->pdo->getSetting('lookuplanguage') != '') ? (string)$this->pdo->getSetting('lookuplanguage') : 'en';
+		$this->lookuplanguage = (Settings::value('indexer.categorise.imdblanguage') != '') ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
 
-		$this->fanartapikey = $this->pdo->getSetting('fanarttvkey');
-		$this->imdburl = ($this->pdo->getSetting('imdburl') == 0 ? false : true);
-		$this->movieqty = ($this->pdo->getSetting('maximdbprocessed') != '') ? $this->pdo->getSetting('maximdbprocessed') : 100;
+		$this->fanartapikey = Settings::value('APIs..fanarttvkey');
+		$this->imdburl = (Settings::value('indexer.categorise.imdburl') == 0 ? false : true);
+		$this->movieqty = (Settings::value('..maximdbprocessed') != '') ? Settings::value('..maximdbprocessed') : 100;
 		$this->searchEngines = true;
-		$this->showPasswords = Releases::showPasswords($this->pdo);
+		$this->showPasswords = Releases::showPasswords();
 
 		$this->debug = NN_DEBUG;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI && $this->pdo->cli);
@@ -923,7 +923,7 @@ class Movie
 		$buffer =
 			Utility::getUrl([
 					'url' => 'http://' . ($this->imdburl === false ? 'www' : 'akas') . '.imdb.com/title/tt' . $imdbId . '/',
-					'Accept-Language' => (($this->pdo->getSetting('lookuplanguage') != '') ? $this->pdo->getSetting('lookuplanguage') : 'en'),
+					'Accept-Language' => ((Settings::value('indexer.categorise.imdblanguage') != '') ? Settings::value('indexer.categorise.imdblanguage') : 'en'),
 					'useragent' => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ' .
 						'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar'
 				]

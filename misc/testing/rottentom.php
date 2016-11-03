@@ -1,10 +1,10 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\RottenTomato;
 
-$s = new Settings();
+$s = new DB();
 $rtkey = $s->getSetting('rottentomatokey');
 $rt = new RottenTomato($rtkey);
 

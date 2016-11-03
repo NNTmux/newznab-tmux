@@ -3,13 +3,13 @@
 require_once './config.php';
 
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\Sharing;
 use nntmux\ReleaseComments;
 
 // Login check.
 $admin = new AdminPage;
-$db = new Settings();
+$db = new DB();
 
 if (isset($_GET['site_ID']) && isset($_GET['site_status'])) {
 	$db->queryExec(sprintf('UPDATE sharing_sites SET enabled = %d WHERE id = %d', $_GET['site_status'], $_GET['site_ID']));

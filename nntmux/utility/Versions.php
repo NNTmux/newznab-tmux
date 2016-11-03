@@ -184,7 +184,7 @@ class Versions
 	{
 		$this->checkSQLFileLatest($update);
 
-		//$settings = new Settings();
+		//$settings = new DB();
 		//$setting  = $settings->getSetting('sqlpatch');
 
 		if ($this->_vers->sql->db->__toString() != $this->_vers->sql->file->__toString()) {

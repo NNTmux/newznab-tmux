@@ -1,6 +1,7 @@
 <?php
 require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
+use app\models\Settings;
 use nntmux\Category;
 use nntmux\MiscSorter;
 use nntmux\NameFixer;
@@ -8,10 +9,10 @@ use nntmux\Nfo;
 use nntmux\NNTP;
 use nntmux\NZB;
 use nntmux\NZBContents;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\processing\PostProcess;
 
-$pdo = new Settings();
+$pdo = new DB();
 
 if (!isset($argv[1])) {
 	exit($pdo->log->error("This script is not intended to be run manually, it is called from Multiprocessing."));
@@ -181,7 +182,7 @@ if (!isset($argv[1])) {
 						echo $pdo->log->primaryOver('p');
 						if (!isset($nzbcontents)) {
 							$nntp = new NNTP(['Settings' => $pdo]);
-							if (($pdo->getSetting('alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+							if ((Settings::value('..alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 								$pdo->log->error("Unable to connect to usenet.");
 							}
 							$Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);

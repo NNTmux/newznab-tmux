@@ -1072,7 +1072,7 @@ CREATE TABLE users (
 DROP TABLE IF EXISTS users_releases;
 CREATE TABLE users_releases (
   id          INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
-  users_id INT              NOT NULL,
+  users_id INT(16) UNSIGNED    NOT NULL,
   releases_id   INT              NOT NULL COMMENT 'FK to releases.id',
   createddate DATETIME         NOT NULL,
   PRIMARY KEY (id),
@@ -1086,11 +1086,11 @@ CREATE TABLE users_releases (
 
 DROP TABLE IF EXISTS user_downloads;
 CREATE TABLE user_downloads (
-  id        INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  users_id INT(16)           NOT NULL,
-  hosthash VARCHAR(50)       NOT NULL,
-  timestamp DATETIME         NOT NULL,
-  releases_id INT(11)        NOT NULL COMMENT 'FK to releases.id'
+  id          INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  users_id    INT(16) UNSIGNED  NOT NULL,
+  hosthash    VARCHAR(50)       NOT NULL,
+  timestamp   DATETIME          NOT NULL,
+  releases_id INT(11)           NOT NULL COMMENT 'FK to releases.id',
   PRIMARY KEY (id),
   KEY userid    (users_id),
   KEY timestamp (timestamp)
@@ -1104,7 +1104,7 @@ CREATE TABLE user_downloads (
 DROP TABLE IF EXISTS user_excluded_categories;
 CREATE TABLE user_excluded_categories (
   id          INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
-  users_id INT              NOT NULL,
+  users_id    INT(16) UNSIGNED  NOT NULL,
   categories_id  INT              NOT NULL,
   createddate DATETIME         NOT NULL,
   PRIMARY KEY (id),
@@ -1133,7 +1133,7 @@ CREATE TABLE role_excluded_categories
 DROP TABLE IF EXISTS user_movies;
 CREATE TABLE user_movies (
   id          INT(16) UNSIGNED               NOT NULL AUTO_INCREMENT,
-  users_id     INT(16)                        NOT NULL,
+  users_id    INT(16) UNSIGNED  NOT NULL,
   imdbid      MEDIUMINT(7) UNSIGNED ZEROFILL NULL,
   categories  VARCHAR(64)                    NULL DEFAULT NULL COMMENT 'List of categories for user movies',
   createddate DATETIME                       NOT NULL,
@@ -1149,7 +1149,7 @@ CREATE TABLE user_movies (
 DROP TABLE IF EXISTS user_requests;
 CREATE TABLE user_requests (
   id        INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  users_id INT(16)          NOT NULL,
+  users_id    INT(16) UNSIGNED  NOT NULL,
   hosthash VARCHAR(50)      NOT NULL,
   request   VARCHAR(255)     NOT NULL,
   timestamp DATETIME         NOT NULL,
@@ -1184,7 +1184,7 @@ CREATE TABLE user_roles (
 DROP TABLE IF EXISTS user_series;
 CREATE TABLE user_series (
   id          INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
-  users_id     INT(16)          NOT NULL,
+  users_id    INT(16) UNSIGNED  NOT NULL,
   videos_id   INT(16)          NOT NULL COMMENT 'FK to videos.id',
   categories  VARCHAR(64)      NULL DEFAULT NULL COMMENT 'List of categories for user tv shows',
   createddate DATETIME         NOT NULL,

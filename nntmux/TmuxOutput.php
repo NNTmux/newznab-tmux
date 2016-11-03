@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 /**
@@ -33,9 +33,9 @@ class TmuxOutput extends Tmux
 
 
 	/**
-	 * @param Settings $pdo
+	 * @param DB $pdo
 	 */
-	public function __construct(Settings $pdo = null)
+	public function __construct(DB $pdo = null)
 	{
 		parent::__construct($pdo);
 		$this->_vers = Utility::getValidVersionsFile();

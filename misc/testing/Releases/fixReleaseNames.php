@@ -9,13 +9,14 @@
 
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
+use app\models\Settings;
 use nntmux\NameFixer;
 use nntmux\NNTP;
 use nntmux\PreDb;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 $n = "\n";
-$pdo = new Settings();
+$pdo = new DB();
 $namefixer = new NameFixer(['Settings' => $pdo]);
 $predb = new PreDb(['Echo' => true, 'Settings' => $pdo]);
 
@@ -37,7 +38,7 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 	$nntp = null;
 	if ($argv[1] == 7 || $argv[1] == 8) {
 		$nntp = new NNTP(['Settings' => $pdo]);
-		if (($pdo->getSetting('alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+		if ((Settings::value('..alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 			echo $pdo->log->error("Unable to connect to usenet.\n");
 			return;
 		}

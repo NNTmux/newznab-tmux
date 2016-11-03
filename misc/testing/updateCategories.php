@@ -2,10 +2,10 @@
 //This script will rerun all releases against Category.php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\Categorize;
 
-$db = new Settings();
+$db = new DB();
 $category = new Categorize();
 $changedcount = 0;
 $rescount = 0;

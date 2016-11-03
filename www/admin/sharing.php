@@ -1,13 +1,13 @@
 <?php
 require_once 'config.php';
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 
 $page = new AdminPage();
 $page->title = 'Sharing Settings';
 
-$db = new Settings();
+$db = new DB();
 
 $offset = (isset($_GET['offset']) ? $_GET['offset'] : 0);
 

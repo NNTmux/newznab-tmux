@@ -1,9 +1,8 @@
 <?php
 
-use nntmux\Category;
+use app\models\Settings;
 use nntmux\Releases;
 use nntmux\http\API;
-use nntmux\db\Settings;
 use nntmux\utility\Utility;
 
 // API functions.
@@ -288,7 +287,7 @@ switch ($function) {
 	case 'r':
 		$api->verifyEmptyParameter('email');
 
-		if (!in_array((int)$page->settings->getSetting('registerstatus'), [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_API_ONLY])) {
+		if (!in_array((int)Settings::value('..registerstatus'), [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_API_ONLY])) {
 			Utility::showApiError(104);
 		}
 		// Check email is valid format.
