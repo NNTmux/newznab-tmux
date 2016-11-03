@@ -50,7 +50,7 @@ indexer	ppa	innerfileblacklist	/setup\.exe|password\.url/i	You can add a regex h
 		maxpartrepair	15000	The maximum amount of articles to attempt to repair at a time. If you notice that you are getting a lot of parts into the partrepair table, it is possible that you USP is not keeping up with the requests. Try to reduce the threads to safe scripts, stop using safe scripts or stop using nntpproxy until improves. At least until the cause can be determined.	maxpartrepair
 		maxpartsprocessed	3	If a part fails to download while post processing, this will retry up to the amount you set, then give up.	maxpartsprocessed
 		maxrageprocessed	75	The maximum amount of TV shows to process with TVRage per run. This does not use an NNTP connection or query Amazon.	maxrageprocessed
-		maxsizetoformrelease	0	The maximum total size in bytes to make a release. If set to 0, then ignored. Only deletes during release creation.	maxsizetoformrelease
+	release	maxsizetoformrelease	0	The maximum total size in bytes to make a release. If set to 0, then ignored. Only deletes during release creation.	maxsizetoformrelease
 		maxsizetopostprocess	100	The maximum size in gigabytes to post process (additional) a release. If set to 0, then ignored.	maxsizetopostprocess
 		maxsizetoprocessnfo	100	The maximum size in gigabytes of a release to process it for NFOs. If set to 0, then ignored.	maxsizetoprocessnfo
 		minsizetopostprocess	1	The minimum size in megabytes to post process (additional) a release. If set to 0, then ignored.	minsizetopostprocess
