@@ -10,11 +10,16 @@
 {/foreach}]
 </p>
 <form class="form pull-right" style="margin-top:-35px;">
-	<form name="showsearch" class="navbar-form" action="" method="get">
-		<div class="input-group">
-			<input class="input-medium span2" id="title appendedInputButton" type="text" name="title" value="{$series.title}" placeholder="Search here"/>
-			<button type="submit" class="btn">GO</button>
-		</div>
+	<form class="form pull-right" style="margin-top:-35px;">
+		<form name="showsearch" class="navbar-form" action="" method="get">
+			<div class="input-group">
+				<input class="form-control" style="width: 150px;"
+					   id="title appendedInputButton"
+					   type="text" name="title" {if isset($serieslist.title)} value="{$serieslist.title}" {else}{/if}"
+				placeholder="Search here"/>
+				<button type="submit" class="btn btn-success">GO</button>
+			</div>
+		</form>
 	</form>
 </form>
 <div style="text-align: center;">

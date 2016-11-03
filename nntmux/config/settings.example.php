@@ -593,7 +593,7 @@ if (Utility::isCLI()) {
 	 * @note    To log to syslog, put in 'syslog'
 	 * @version 4
 	 */
-	ini_set('error_log', NN_LOGS . 'php_errors.log');
+	ini_set('error_log', NN_LOGS . 'php_errors_cli.log');
 
 	/**
 	 * Log errors to error_log?
@@ -683,7 +683,7 @@ if (Utility::isCLI()) {
 	 * @note    To log to syslog, put in 'syslog'
 	 * @version 4
 	 */
-	ini_set('error_log', NN_LOGS . 'php_errors.log');
+	ini_set('error_log', NN_LOGS . 'php_errors_web.log');
 
 	/**
 	 * Log errors to error_log?

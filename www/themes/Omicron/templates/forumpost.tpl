@@ -19,14 +19,14 @@
 						<br/>
 						on <span title="{$result.createddate}">{$result.createddate|date_format}</span>
 						<div class="hint">({$result.createddate|timeago})</div>
-						{if $userdata.id == $result.users_id || isset($isadmin)}
+						{if $userdata.id == $result.users_id && $result.locked != 1 || isset($isadmin)}
 							<div>
 								<a class="btn btn-sm btn-warning"
 								   href="{$smarty.const.WWW_TOP}/post_edit?id={$result.id}"
 								   title="Edit Post">Edit</a>
 							</div>
 						{/if}
-						{if $userdata.role == 2}
+						{if isset($isadmin)}
 							<br/>
 							<div>
 								<a class="confirm_action btn btn-sm btn-danger"
@@ -40,6 +40,7 @@
 			{/foreach}
 		</table>
 		<div id="new" tabindex="-1" role="dialog" aria-labelledby="myLabel" aria-hidden="true">
+			{if $result.locked == 0}
 			<div class="header">
 				<h3 id="myLabel">Reply</h3>
 			</div>
@@ -56,6 +57,9 @@
 					</div>
 				</form>
 			</div>
+			{else}
+				<label class="label label-warning" title="Topic Locked">Topic Locked</label>
+			{/if}
 		</div>
 	{/if}
 </div>

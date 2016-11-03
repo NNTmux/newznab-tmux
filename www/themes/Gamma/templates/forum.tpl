@@ -10,6 +10,9 @@
 		<th style="padding-top:0px; padding-bottom:0px;">Posted By</th>
 		<th style="padding-top:0px; padding-bottom:0px;">Last Update</th>
 		<th style="padding-top:0px; padding-bottom:0px;" width="5%" class="mid">Replies</th>
+		{if isset($isadmin)}
+			<th style="padding-top:0px; padding-bottom:0px;">Action</th>
+		{/if}
 	</tr>
 	{foreach $results as $result}
 	<tr class="{cycle values=",alt"}" id="guid{$result.id}">
@@ -18,6 +21,9 @@
 			<div class="hint">
 				{$result.message|truncate:200:'...':false:false}
 			</div>
+			{if $result.locked == 1}
+				<label class="label label-warning" title="Topic Locked">Topic Locked</label>
+			{/if}
 		</td>
 		<td>
 			<a title="View profile" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}">{$result.username}</a>
@@ -28,6 +34,26 @@
 			<a href="{$smarty.const.WWW_TOP}/forumpost/{$result.id}#last" title="{$result.updateddate}">{$result.updateddate|date_format}</a> <div class="hint">({$result.updateddate|timeago})</div>
 		</td>
 		<td class="mid">{$result.replies}</td>
+		<td>
+			{if isset($isadmin)}
+				<div>
+					<a class="confirm_action btn btn-sm btn-danger"
+					   href="{$smarty.const.WWW_TOP}/topic_delete?id={$result.id}"
+					   title="Delete Topic">Delete Topic</a>
+				</div>
+				<div>
+					{if $result.locked == 0}
+						<a class="confirm_action btn btn-sm btn-danger"
+						   href="{$smarty.const.WWW_TOP}/forum?lock={$result.id}"
+						   title="Lock Topic">Lock Topic</a>
+					{else}
+						<a class="confirm_action btn btn-sm btn-danger"
+						   href="{$smarty.const.WWW_TOP}/forum?unlock={$result.id}"
+						   title="Unlock Topic">Unlock Topic</a>
+					{/if}
+				</div>
+			{/if}
+		</td>
 	</tr>
 	{/foreach}
 </table>

@@ -1048,8 +1048,7 @@ CREATE TABLE users (
   sabapikey      VARCHAR(255)     NULL     DEFAULT NULL,
   sabapikeytype  TINYINT(1)       NULL     DEFAULT NULL,
   sabpriority    TINYINT(1)       NULL     DEFAULT NULL,
-  queuetype      TINYINT(1)       NOT NULL DEFAULT '1'
-  COMMENT 'Type of queue, Sab or NZBGet',
+  queuetype      TINYINT(1)       NOT NULL DEFAULT '1' COMMENT 'Type of queue, Sab or NZBGet',
   nzbgeturl      VARCHAR(255)     NULL     DEFAULT NULL,
   nzbgetusername VARCHAR(255)     NULL     DEFAULT NULL,
   nzbgetpassword VARCHAR(255)     NULL     DEFAULT NULL,
@@ -1088,9 +1087,10 @@ CREATE TABLE users_releases (
 DROP TABLE IF EXISTS user_downloads;
 CREATE TABLE user_downloads (
   id        INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  users_id INT(16)          NOT NULL,
-  hosthash VARCHAR(50)      NOT NULL,
+  users_id INT(16)           NOT NULL,
+  hosthash VARCHAR(50)       NOT NULL,
   timestamp DATETIME         NOT NULL,
+  releases_id INT(11)        NOT NULL COMMENT 'FK to releases.id'
   PRIMARY KEY (id),
   KEY userid    (users_id),
   KEY timestamp (timestamp)
@@ -1219,7 +1219,7 @@ CREATE TABLE video_data (
 
 DROP TABLE IF EXISTS videos;
 CREATE TABLE videos (
-  id           MEDIUMINT(11) UNSIGNED  NOT NULL AUTO_INCREMENT COMMENT 'Show\'s ID to be used in other tables as reference.',
+  id           MEDIUMINT(11) UNSIGNED  NOT NULL AUTO_INCREMENT COMMENT 'Show ID to be used in other tables as reference ',
   type         TINYINT(1) UNSIGNED     NOT NULL DEFAULT '0' COMMENT '0 = TV, 1 = Film, 2 = Anime',
   title        VARCHAR(180) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name of the video.',
   countries_id CHAR(2) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT 'Two character country code (FK to countries table).',

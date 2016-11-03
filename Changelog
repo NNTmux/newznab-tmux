@@ -1,3 +1,41 @@
+2016-11-02 DariusIII
+	* Fix: Undefined index title notice in viewserieslist pages
+	* Fix: Define pagerquerysuffix for users-list
+	* Fix: Typo in Users class
+	* Chg: Switch to if loop in setTvAttributes function for better output
+2016-11-01 DariusIII
+	* Chg: Revamp categorySearch for cleanliness and make category determination more reliable and extensible
+	* Chg: Let scrutinizer ignore platform requirements
+2016-10-31 DariusIII
+	* Chg: Replace duplicate categorySearch function in releases and exclude leading -99 improving query speed
+	* Chg: Add back button to most of the edit pages in admin area
+2016-10-29 DariusIII
+	* Chg: Switch from php-gd to php-imagick in ReleaseImage class
+2016-10-28 DariusIII
+	* Chg: Categorize VERUM releases as TV Sport
+		Note: run php misc/testing/Releases/recategorize.php all to recategorize releases properly
+	* Chg: check_covers now searches for covers less than 2 days old.
+	* Fix: decrypt_hashes uses wrong index to send to NameFixer (fixes issue #122)
+2016-10-27 DariusIII
+	* Chg: Speed up browsing and api response
+2016-10-26 DariusIII
+	* Chg: Switch to php-imagick for previews/cover processing in ReleaseImage class
+2016-10-25 DariusIII
+	* Chg: Use Imagick to detect broken sample images
+	* Chg: Update composer.lock with new versions of font-awesome (4.7.0) and moinax/tvdb (1.0.6)
+2016-10-24 DariusIII
+	* Chg: Search posts by poster by clicking on poster name on details page
+2016-10-21 DariusIII
+	* Chg: Remove now not needed yenc initiation code from NNTP class.
+	* Chg: Add support for topic locking/unlocking in forum
+2016-10-20 DariusIII
+	* Chg: Properly add topic deletion to forum
+	* Fix: Role excluded categories work properly now
+	* Chg: Change in how OTHER categories are "rendered" in themes, now they can be also excluded from frontend by user
+2016-10-18 DariusIII
+	* Chg: Add distinction between cli and web php errors for easier tracking
+	* Chg: Increase the height of category exclusion selection table in all the themes
+	* Fix: Segfaults on PPA (possible fix)
 2016-10-16 DariusIII
 	* Fix: Wrong table used in deleteSingle function
 2016-10-14 DariusIII

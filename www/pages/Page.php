@@ -45,10 +45,12 @@ class Page extends BasePage
 		$this->smarty->assign('article_menu',$this->smarty->fetch('articlesmenu.tpl'));
 
 		$category = new Category(['Settings' => $content->pdo]);
-		if ($this->userdata != null)
-			$parentcatlist = $category->getForMenu($this->userdata["categoryexclusions"]);
-		else
+		if (!empty($this->userdata)) {
+			$parentcatlist = $category->getForMenu($this->userdata['categoryexclusions'], $this->userdata['rolecategoryexclusions']);
+		}
+		else {
 			$parentcatlist = $category->getForMenu();
+		}
 
 		$this->smarty->assign('parentcatlist',$parentcatlist);
 		$this->smarty->assign('catClass', $category);

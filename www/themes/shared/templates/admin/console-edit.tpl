@@ -1,7 +1,7 @@
 
 <h1>{$page->title}</h1>
 <div class="well well-sm">
-
+<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/console-list.php"><i class="fa fa-arrow-left"></i> Go back</a>
 <form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">
 
 <input type="hidden" name="id" value="{$console.id}" />

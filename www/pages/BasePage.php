@@ -317,7 +317,8 @@ class BasePage
 	protected function setUserPreferences()
 	{
 		$this->userdata = $this->users->getById($this->users->currentUserId());
-		$this->userdata["categoryexclusions"] = $this->users->getCategoryExclusion($this->users->currentUserId());
+		$this->userdata['categoryexclusions'] = $this->users->getCategoryExclusion($this->users->currentUserId());
+		$this->userdata['rolecategoryexclusions'] = $this->users->getRoleCategoryExclusion($this->userdata['role']);
 
 		// Change the theme to user's selected theme if they selected one, else use the admin one.
 		if ($this->settings->getSetting('userselstyle') == 1) {

@@ -9,8 +9,9 @@ if (!$page->users->isLoggedIn())
 	$page->show403();
 
 $category = -1;
-if (isset($_REQUEST["t"]) && ctype_digit($_REQUEST["t"]))
+if (isset($_REQUEST["t"])) {
 	$category = $_REQUEST["t"];
+}
 
 $grp = -1;
 if (isset($_REQUEST["g"])) {
@@ -29,9 +30,13 @@ $orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_RE
 $results = [];
 $results = $releases->getBrowseRange($catarray, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata["categoryexclusions"], $grp);
 
-$browsecount = $results[0]['_totalcount'];
+if(isset($results[0]['_totalcount'])) {
+	$browsecount = $results[0]['_totalcount'];
+}
 
-$page->smarty->assign('pagertotalitems',$browsecount);
+if (isset($browsecount)) {
+	$page->smarty->assign('pagertotalitems', $browsecount);
+}
 $page->smarty->assign('pageroffset',$offset);
 $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
 $page->smarty->assign('pagerquerybase', WWW_TOP . "/browse?t=" . $category . "&amp;g=" . $grp . "&amp;ob=" . $orderby . "&amp;offset=");

@@ -133,33 +133,57 @@ class Category
 	 *
 	 * @return string $catsrch
 	 */
-	public function getCategorySearch($cat = [])
+	public function getCategorySearch(array $cat = [])
 	{
-		$catsrch = ' (';
+		$categories = [];
+
+		// If multiple categories were sent in a single array position, slice and add them
+		if (strpos($cat[0], ',') !== false) {
+			$tmpcats = explode(',', $cat[0]);
+			// Reset the category to the first comma separated value in the string
+			$cat[0] = $tmpcats[0];
+			// Add the remaining categories in the string to the original array
+			foreach (array_slice($tmpcats, 1) AS $tmpcat) {
+				$cat[] = $tmpcat;
+			}
+		}
 
 		foreach ($cat as $category) {
-
-			$chlist = '-99';
-
 			if ($category != -1 && $this->isParent($category)) {
-				$children = $this->getChildren($category);
-
-				foreach ($children as $child) {
-					$chlist .= ', ' . $child['id'];
+				foreach ($this->getChildren($category) as $child) {
+					$categories[] = $child['id'];
 				}
+			} else if ($category > 0) {
+				$categories[] = $category;
 			}
+		}
 
-			if ($chlist != '-99') {
-				$catsrch .= ' r.categories_id IN (' . $chlist . ') OR ';
-			} else {
-				$catsrch .= sprintf(' r.categories_id = %d OR ', $category);
-			}
-			$catsrch .= '1=2 )';
+		$catCount = count($categories);
+
+		switch ($catCount) {
+			//No category constraint
+			case 0:
+				$catsrch = ' 1=1 ';
+				break;
+			// One category constraint
+			case 1:
+				$catsrch = " r.categories_id = {$categories[0]}";
+				break;
+			// Multiple category constraints
+			default:
+				$catsrch = " r.categories_id IN (" . implode(", ", $categories) . ") ";
+				break;
 		}
 
 		return $catsrch;
 	}
 
+
+	/**
+	 * Returns a concatenated list of other categories
+	 *
+	 * @return string
+	 */
 	public static function getCategoryOthersGroup()
 	{
 		return implode(",",
@@ -174,7 +198,8 @@ class Category
 				self::XXX_OTHER,
 				self::OTHER_MISC,
 				self::OTHER_HASHED
-			]);
+			]
+		);
 	}
 
 	public static function getCategoryValue($category)
@@ -364,7 +389,7 @@ class Category
 	 */
 	public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
 	{
-		return $this->pdo->queryExec(sprintf("update categories set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where id = %d", $disablepreview, $status, $minsize, $maxsize, $this->pdo->escapeString($desc), $id));
+		return $this->pdo->queryExec(sprintf("UPDATE categories SET disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s WHERE id = %d", $disablepreview, $status, $minsize, $maxsize, $this->pdo->escapeString($desc), $id));
 	}
 
 	/**
@@ -372,21 +397,35 @@ class Category
 	 *
 	 * @return array
 	 */
-	public function getForMenu($excludedcats = [])
+	public function getForMenu($excludedcats = [], $roleexcludedcats = [])
 	{
 		$ret = [];
 
 		$exccatlist = '';
-		if (count($excludedcats) > 0) {
+		if (count($excludedcats) > 0 && count($roleexcludedcats) == 0) {
 			$exccatlist = ' AND id NOT IN (' . implode(',', $excludedcats) . ')';
+		} elseif (count($excludedcats) > 0 && count($roleexcludedcats) > 0) {
+			$exccatlist = ' AND id NOT IN (' . implode(',', $excludedcats) . ',' . implode(',', $roleexcludedcats) . ')';
+		} elseif (count($excludedcats) == 0 && count($roleexcludedcats) > 0) {
+			$exccatlist = ' AND id NOT IN (' . implode(',', $roleexcludedcats) . ')';
 		}
 
 		$arr = $this->pdo->query(
 			sprintf('SELECT * FROM categories WHERE status = %d %s', Category::STATUS_ACTIVE, $exccatlist),
 			true, NN_CACHE_EXPIRY_LONG
 		);
+
+		foreach($arr as $key => $val) {
+			if($val['id'] == '0') {
+				$item = $arr[$key];
+				unset($arr[$key]);
+				array_push($arr, $item);
+				break;
+			}
+		}
+
 		foreach ($arr as $a) {
-			if ($a['parentid'] == '') {
+			if (empty($a['parentid'])) {
 				$ret[] = $a;
 			}
 		}

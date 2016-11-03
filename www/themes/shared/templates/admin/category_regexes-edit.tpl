@@ -3,6 +3,7 @@
 	<div class="error">{$error}</div>
 {/if}
 <div class="well well-sm">
+<a class="btn btn-success" href="{$smarty.const.WWW_TOP}/category_regexes-list.php"><i class="fa fa-arrow-left"></i> Go back</a>
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
 	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>

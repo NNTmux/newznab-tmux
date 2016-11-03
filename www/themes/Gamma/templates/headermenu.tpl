@@ -154,16 +154,19 @@
 			</ul>
 		</li>
 	{/if}
+		{if $parentcat.id === "0"}
+			<li class="dropdown">
+				<a id="dropOther" class="dropdown-hover" data-hover="dropdown" href="#">Other <b class="caret"></b></a>
+				<ul class="dropdown-menu" role="menu" aria-labelledby="dropOther">
+					<li><a href="/browse?t={$catClass::OTHER_ROOT}">Other</a></li>
+					<hr>
+					<li><a href="/browse?t={$catClass::OTHER_MISC}">Misc</a></li>
+					<li><a href="/browse?t={$catClass::OTHER_HASHED}">Hashed</a></li>
+				</ul>
+			</li>
+		{/if}
 	{/foreach}
-	<li class="dropdown">
-		<a id="dropOther" class="dropdown-hover" data-hover="dropdown" href="#">Other <b class="caret"></b></a>
-		<ul class="dropdown-menu" role="menu" aria-labelledby="dropOther">
-			<li><a href="/browse?t={$catClass::OTHER_ROOT}">Other</a></li>
-			<hr>
-			<li><a href="/browse?t={$catClass::OTHER_MISC}">Misc</a></li>
-			<li><a href="/browse?t={$catClass::OTHER_HASHED}">Hashed</a></li>
-		</ul>
-	</li>
+
 </ul>
 <ul class="nav pull-left">
 	<li class="">

@@ -472,7 +472,7 @@ class Users
 
 	public function getBrowseOrdering()
 	{
-		return array('username_asc', 'username_desc', 'email_asc', 'email_desc', 'host_asc', 'host_desc', 'createddate_asc', 'createddate_desc', 'lastlogin_asc', 'lastlogin_desc', 'apiaccess_asc', 'apiaccess_desc', 'apirequets_asc', 'apirequests_desc', 'grabs_asc', 'grabs_desc', 'role_asc', 'role_desc', 'rolechangedate_asc', 'rolechangedate_desc');
+		return array('username_asc', 'username_desc', 'email_asc', 'email_desc', 'host_asc', 'host_desc', 'createddate_asc', 'createddate_desc', 'lastlogin_asc', 'lastlogin_desc', 'apiaccess_asc', 'apiaccess_desc', 'apirequests_asc', 'apirequests_desc', 'grabs_asc', 'grabs_desc', 'role_asc', 'role_desc', 'rolechangedate_asc', 'rolechangedate_desc');
 	}
 
 	public function isDisabled($username)
@@ -803,7 +803,7 @@ class Users
 	public function addCategoryExclusions($uid, $catids)
 	{
 		$this->delUserCategoryExclusions($uid);
-		if (COUNT($catids) > 0) {
+		if (count($catids) > 0) {
 			foreach ($catids as $catid) {
 				$this->pdo->queryInsert(sprintf("INSERT INTO user_excluded_categories (users_id, categories_id, createddate) VALUES (%d, %d, now())", $uid, $catid));
 			}
