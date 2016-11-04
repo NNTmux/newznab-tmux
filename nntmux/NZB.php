@@ -67,15 +67,6 @@ class NZB
 	 */
 	protected $_debug = false;
 
-
-	/**
-	 * Current nntmux version.
-	 *
-	 * @var string
-	 * @access protected
-	 */
-	protected $_NNTmuxVersion;
-
 	/**
 	 * Base query for selecting collection data for writing NZB files.
 	 *
