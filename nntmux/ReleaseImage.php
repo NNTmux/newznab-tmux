@@ -97,9 +97,6 @@ class ReleaseImage
 				$imagick->readImageBlob($img);
 			} catch (\ImagickException $imgError) {
 				echo 'Bad image data, skipping processing' . PHP_EOL;
-				if (NN_DEBUG) {
-					echo $imgError;
-				}
 				$imgFail = true;
 			}
 			if ($imgFail === false) {
