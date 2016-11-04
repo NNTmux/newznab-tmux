@@ -103,6 +103,7 @@ indexer	ppa	innerfileblacklist	/setup\.exe|password\.url/i	You can add a regex h
 		tmpunrarpath		The path to where unrar puts files. WARNING: This directory will have its contents deleted.<br/>Use forward slashes in windows c:/temp/path/stuff/will/be/unpacked/to	tmpunrarpath
 	release	minfilestoformrelease	1	The minimum number of files to make a release. i.e. if set to two, then releases which only contain one file will not be created.	minfilestoformrelease
 	release	minsizetoformrelease	0	The minimum total size in bytes to make a release. If set to 0, then ignored. Only deletes during release creation.	minsizetoformrelease
+APIs	AniDB	banned	0	Timestamp of WHEN we were banned.	AniDB_banned
 APIs		amazonassociatetag	n01369-20	The amazon associate tag. Used for music/book lookups.	amazonassociatetag
 APIs		amazonprivkey	B58mVwyj+T/MEucxWugJ3GQ0CcW2kQq16qq/1WpS	The amazon private api key. Used for music/book lookups.	amazonprivkey
 APIs		amazonpubkey	AKIAIPDNG5EU7LB4AD3Q	The amazon public api key. Used for music/book lookups.	amazonpubkey
