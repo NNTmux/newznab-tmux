@@ -364,13 +364,6 @@ class BasePage
 			case Users::ROLE_MODERATOR:
 				$this->smarty->assign('ismod', 'true');
 		}
-
-		if ($this->userdata["hideads"] == "1")
-		{
-			$this->settings->setSetting(['adheader', '']);
-			$this->settings->setSetting(['adbrowse', '']);
-			$this->settings->setSetting(['addetail', '']);
-		}
 	}
 
 	/**
