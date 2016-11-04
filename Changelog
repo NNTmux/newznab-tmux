@@ -1,4 +1,5 @@
 2016-11-04 DariusIII
+	* Chg: Use XMLWriter for creating nzbs
 	* Chg: Remove debug output from ReleaseImage class
 2016-11-03 DariusIII
 	* Fix: Wrong variable used in viewmusic.tpl in all themes
