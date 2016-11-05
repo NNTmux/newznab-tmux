@@ -145,7 +145,7 @@
 														</tr>
 														<tr>
 															<td>
-																{if $page->getSettingValue('..userselstyle') == 1}
+																{if $page->getSettingValue('site.main.userselstyle') == 1}
 																	{html_options id="style" name='style' values=$themelist output=$themelist selected=$user.style}
 																{/if}
 															</td>

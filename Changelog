@@ -1,3 +1,5 @@
+2016-11-05 DariusIII
+	* Fix: Use full path to userselstyle setting
 2016-11-04 DariusIII
 	* Chg: Use XMLWriter for creating nzbs
 	* Chg: Remove debug output from ReleaseImage class
