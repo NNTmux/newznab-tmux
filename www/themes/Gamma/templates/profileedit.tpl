@@ -112,8 +112,8 @@
 			</div>
 		</div>
 	</fieldset>
-	{if $page->getSettingValue('..sabintegrationtype') > 0}
-	{if $page->getSettingValue('..sabintegrationtype') != 1}
+	{if $page->getSettingValue('apps.sabnzbplus.integrationtype') > 0}
+	{if $page->getSettingValue('apps.sabnzbplus.integrationtype') != 1}
 		<legend>Queue type (NZBget / Sabnzbd)</legend>
 		<div class="control-group">
 			<label class="control-label">Queue type</label>

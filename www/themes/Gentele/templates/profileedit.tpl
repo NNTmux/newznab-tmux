@@ -169,7 +169,7 @@
 													function.
 												</div>
 												<br>
-												{if $page->getSettingValue('..sabintegrationtype') != 1}
+												{if $page->getSettingValue('apps.sabnzbplus.integrationtype') != 1}
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
@@ -188,7 +188,7 @@
 														</tbody>
 													</table>
 												{/if}
-												{if $user.queuetype == 1 && $page->getSettingValue('..sabintegrationtype') == 2}
+												{if $user.queuetype == 1 && $page->getSettingValue('apps.sabnzbplus.integrationtype') == 2}
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
@@ -225,7 +225,7 @@
 														</tbody>
 													</table>
 												{/if}
-												{if $user.queuetype == 2 && ($page->getSettingValue('..sabintegrationtype') == 0 || $page->getSettingValue('..sabintegrationtype') == 2)}
+												{if $user.queuetype == 2 && ($page->getSettingValue('apps.sabnzbplus.integrationtype') == 0 || $page->getSettingValue('apps.sabnzbplus.integrationtype') == 2)}
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
