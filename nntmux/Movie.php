@@ -287,7 +287,7 @@ class Movie
 					ORDER BY %s %s %s",
 						$this->showPasswords,
 						$this->getBrowseBy(),
-						(!empty($catsrch) ? 'AND ' . $catsrch : ''),
+						(!empty($catsrch) ? $catsrch : ''),
 						($maxAge > 0
 								? 'AND r.postdate > NOW() - INTERVAL ' . $maxAge . 'DAY '
 								: ''
@@ -341,7 +341,7 @@ class Movie
 			ORDER BY %s %s",
 				(is_array($movieIDs) ? implode(',', $movieIDs) : -1),
 				(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-				(!empty($catsrch) ? 'AND ' . $catsrch : ''),
+				(!empty($catsrch) ? $catsrch : ''),
 				$order[0],
 				$order[1]
 		);

@@ -206,7 +206,7 @@ class Music
 				AND m.title != ''
 				AND m.cover = 1
 				AND r.passwordstatus %s
-				AND %s %s %s
+				%s %s %s
 				GROUP BY m.id
 				ORDER BY %s %s %s",
 						Releases::showPasswords($this->pdo),
@@ -255,7 +255,7 @@ class Music
 			INNER JOIN musicinfo m ON m.id = r.musicinfo_id
 			WHERE m.id IN (%s)
 			AND r.id IN (%s)
-			AND %s
+			%s
 			GROUP BY m.id
 			ORDER BY %s %s",
 				(is_array($musicIDs) ? implode(',', $musicIDs) : -1),
@@ -336,9 +336,9 @@ class Music
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
 				$bbs = stripslashes($_REQUEST[$bbk]);
 				if (preg_match('/id/i', $bbv)) {
-					$browseby .= 'm.' . $bbv . ' = ' . $bbs . ' AND ';
+					$browseby .= 'AND m.' . $bbv . ' = ' . $bbs . ' AND ';
 				} else {
-					$browseby .= 'm.' . $bbv . ' ' . $this->pdo->likeString($bbs, true, true) . ' AND ';
+					$browseby .= 'AND m.' . $bbv . ' ' . $this->pdo->likeString($bbs, true, true) . ' AND ';
 				}
 			}
 		}
