@@ -255,8 +255,8 @@ class NZB
 				$xmlwrtr->writeAttribute('date', $collection['udate']);
 				$xmlwrtr->writeAttribute('subject', $subject);
 				$xmlwrtr->startElement('groups');
-				if (preg_match_all('#(\S+):\d+#', $collection['xref'], $matches)) {
-				    foreach ($matches[1] as $group) {
+				if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
+					foreach ($matches[1] as $group) {
 						$xmlwrtr->writeElement('group', $group);
 					}
 				}
