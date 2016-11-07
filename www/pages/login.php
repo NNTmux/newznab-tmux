@@ -2,6 +2,7 @@
 
 use nntmux\Captcha;
 use nntmux\Logging;
+use nntmux\utility\Utility;
 
 $page->smarty->assign(['error' => '', 'username' => '', 'rememberme' => '']);
 

@@ -1,5 +1,6 @@
 <?php
 namespace nntmux;
+use nntmux\utility\Utility;
 
 class NZBInfo
 {
@@ -347,7 +348,7 @@ class NZBInfo
             $nzb .= " <segments>\n";
             foreach($postFile['segments'] as $fileSegmentNum=>$fileSegment)
             {
-                $nzb .= "  <segment bytes=\"".$postFile['segmentbytes'][$fileSegmentNum]."\" number=\"".$fileSegmentNum."\">".htmlspecialchars($fileSegment, ENT_QUOTES, 'utf-8')."</segment>\n";
+                $nzb .= "  <segment bytes=\"".$postFile['segmentbytes'][$fileSegmentNum]."\" number=\"".$fileSegmentNum."\">".Utility::htmlfmt($fileSegment)."</segment>\n";
             }
             $nzb .= " </segments>\n</file>\n";
         }

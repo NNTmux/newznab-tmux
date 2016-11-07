@@ -3,6 +3,7 @@
 use app\models\Settings;
 use nntmux\Captcha;
 use nntmux\Users;
+use nntmux\utility\Utility;
 
 
 if ($page->users->isLoggedIn()) {
@@ -100,12 +101,12 @@ if ($showRegister == 1) {
 	}
 }
 $page->smarty->assign([
-		'username'          => htmlspecialchars($userName, ENT_QUOTES, 'UTF-8'),
-		'password'          => htmlspecialchars($password, ENT_QUOTES, 'UTF-8'),
-		'confirmpassword'   => htmlspecialchars($confirmPassword, ENT_QUOTES, 'UTF-8'),
-		'email'             => htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
-		'invitecode'        => htmlspecialchars($inviteCode, ENT_QUOTES, 'UTF-8'),
-		'invite_code_query' => htmlspecialchars($inviteCodeQuery, ENT_QUOTES, 'UTF-8'),
+		'username'          => Utility::htmlfmt($userName),
+		'password'          => Utility::htmlfmt($password),
+		'confirmpassword'   => Utility::htmlfmt($confirmPassword),
+		'email'             => Utility::htmlfmt($email),
+		'invitecode'        => Utility::htmlfmt($inviteCode),
+		'invite_code_query' => Utility::htmlfmt($inviteCodeQuery),
 		'showregister'      => $showRegister,
 		'error'             => $error
 	]
