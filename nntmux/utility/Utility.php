@@ -1093,4 +1093,16 @@ class Utility
 
 		exit($response);
 	}
+
+	/**
+	 * Simple function to reduce duplication in html string formatting
+	 *
+	 * @param $string
+	 *
+	 * @return string
+	 */
+	public static function htmlfmt($string)
+	{
+		return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
+	}
 }

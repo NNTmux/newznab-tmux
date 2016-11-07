@@ -227,11 +227,11 @@ class NZB
 		$xmlwrtr->startElement('head');
 		$xmlwrtr->startElement('meta');
 		$xmlwrtr->writeAttribute('type', 'category');
-		$xmlwrtr->text($this->htmlfmt($cTitle));
+		$xmlwrtr->text($cTitle);
 		$xmlwrtr->endElement();
 		$xmlwrtr->startElement('meta');
 		$xmlwrtr->writeAttribute('type', 'name');
-		$xmlwrtr->text($this->htmlfmt($name));
+		$xmlwrtr->text($name);
 		$xmlwrtr->endElement();
 		$xmlwrtr->endElement(); //head
 
@@ -241,7 +241,7 @@ class NZB
 				return false;
 			}
 
-			$poster = $this->htmlfmt($collection['fromname']);
+			$poster = $collection['fromname'];
 
 			foreach ($binaries as $binary) {
 				$parts = $this->pdo->queryDirect(sprintf($this->_partsQuery, $binary['id']));
@@ -249,7 +249,7 @@ class NZB
 					return false;
 				}
 
-				$subject = $this->htmlfmt($binary['name']) . '(1/' . $binary['totalparts'] . ')';
+				$subject = $binary['name'] . '(1/' . $binary['totalparts'] . ')';
 				$xmlwrtr->startElement('file');
 				$xmlwrtr->writeAttribute('poster', $poster);
 				$xmlwrtr->writeAttribute('date', $collection['udate']);
@@ -269,7 +269,7 @@ class NZB
 					$xmlwrtr->startElement('segment');
 					$xmlwrtr->writeAttribute('bytes', $part['size']);
 					$xmlwrtr->writeAttribute('number', $part['partnumber']);
-					$xmlwrtr->text($this->htmlfmt($part['messageid']));
+					$xmlwrtr->text($part['messageid']);
 					$xmlwrtr->endElement();
 				}
 				$xmlwrtr->endElement(); //segments
@@ -493,17 +493,5 @@ class NZB
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Simple function to reduce duplication in html string formatting
-	 *
-	 * @param $string
-	 *
-	 * @return string
-	 */
-	public static function htmlfmt($string)
-	{
-		return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
 	}
 }
