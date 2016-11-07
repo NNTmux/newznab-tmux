@@ -164,6 +164,7 @@ class ReleaseSearch
 			$words = explode(' ', $searchString);
 			foreach ($words as $word) {
 				$word = str_replace("'", "\\'", trim($word, "\n\t\r\0\x0B "));
+				$word = str_replace('-', '', $word);
 				if ($word !== '') {
 					$searchWords .= ($word . ' ');
 				}
