@@ -428,7 +428,7 @@ class ReleaseRemover
 			case ReleaseSearch::SPHINX:
 				$rs = new ReleaseSearch($this->pdo);
 				$execFT =
-						str_replace('=10000;', '=1000000;',
+						str_replace('=10000;', '=100000;',
 								$rs->getSearchSQL(
 										[
 												'searchname' => '-exes* -exec*',
@@ -482,7 +482,7 @@ class ReleaseRemover
 		switch (NN_RELEASE_SEARCH_TYPE) {
 			case ReleaseSearch::SPHINX:
 				$rs = new ReleaseSearch($this->pdo);
-				$instbinFT = str_replace('=10000;', '=10000000;', $rs->getSearchSQL(['filename' => 'install<<bin']));
+				$instbinFT = str_replace('=10000;', '=100000;', $rs->getSearchSQL(['filename' => 'install<<bin']));
 				$ftJoin = $rs->getFullTextJoinString();
 				break;
 			default:
@@ -520,7 +520,7 @@ class ReleaseRemover
 		switch (NN_RELEASE_SEARCH_TYPE) {
 			case ReleaseSearch::SPHINX:
 				$rs = new ReleaseSearch($this->pdo);
-				$passurlFT = str_replace('=10000;', '=10000000;', $rs->getSearchSQL(['filename' => 'password<<url']));
+				$passurlFT = str_replace('=10000;', '=100000;', $rs->getSearchSQL(['filename' => 'password<<url']));
 				$ftJoin = $rs->getFullTextJoinString();
 				break;
 			default:
@@ -558,7 +558,7 @@ class ReleaseRemover
 		switch (NN_RELEASE_SEARCH_TYPE) {
 			case ReleaseSearch::SPHINX:
 				$rs = new ReleaseSearch($this->pdo);
-				$passFT = str_replace('=10000;', '=10000000;', $rs->getSearchSQL(['searchname' => 'passwor*']));
+				$passFT = str_replace('=10000;', '=100000;', $rs->getSearchSQL(['searchname' => 'passwor*']));
 				$ftJoin = $rs->getFullTextJoinString();
 				break;
 			default:
@@ -677,7 +677,7 @@ class ReleaseRemover
 		switch (NN_RELEASE_SEARCH_TYPE) {
 			case ReleaseSearch::SPHINX:
 				$rs = new ReleaseSearch($this->pdo);
-				$sampleFT = str_replace('=10000;', '=10000000;', $rs->getSearchSQL(['name' => 'sample']));
+				$sampleFT = str_replace('=10000;', '=100000;', $rs->getSearchSQL(['name' => 'sample']));
 				$ftJoin = $rs->getFullTextJoinString();
 				break;
 			default:
@@ -732,7 +732,7 @@ class ReleaseRemover
 		switch (NN_RELEASE_SEARCH_TYPE) {
 			case ReleaseSearch::SPHINX:
 				$rs = new ReleaseSearch($this->pdo);
-				$scrFT = str_replace('=10000;', '=10000000;', $rs->getSearchSQL(['(name,filename)' => 'scr']));
+				$scrFT = str_replace('=10000;', '=100000;', $rs->getSearchSQL(['(name,filename)' => 'scr']));
 				$ftJoin = $rs->getFullTextJoinString();
 				break;
 			default:

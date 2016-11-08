@@ -1,3 +1,7 @@
+2016-11-08 DariusIII
+	* Chg: Couple of fixes and missing settings (Sphinx, sabnzbd)
+	* Chg: Improve performance of site/edit by updating some queries in Groups/Releases
+	* Chg: Add serch description to search page in all themes
 2016-11-07 DariusIII
 	* Fix: Error on searchd process when '-' is in releasename
 	* Chg: Remove htmlspecialchars from NZB class, it is already handled by XMLWriter. Move the function to Utility class.

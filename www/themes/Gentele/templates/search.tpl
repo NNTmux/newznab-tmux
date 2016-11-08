@@ -24,6 +24,8 @@
 	</div>
 	<br>
 	<div class="well well-sm">
+		<div style="text-align: center">{$search_description}<div>
+				<br>
 		<form method="get" action="{$smarty.const.WWW_TOP}/search">
 			<div id="sbasic" class="row" style="text-align:center;{if $sadvanced} display:none;{/if}">
 				<div class="col-md-6">
