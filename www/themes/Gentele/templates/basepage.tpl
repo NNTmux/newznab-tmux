@@ -52,7 +52,7 @@
 		<div class="col-md-3 left_col">
 			<div class="left_col scroll-view">
 				<div class="navbar nav_title" style="border: 0;">
-					<a href="{$site->home_link}" class="site_title"><i class="fa fa-superpower"></i>
+					<a href="{$site->home_link}" class="site_title"><i class="fa fa-superpowers"></i>
 						<span>{$site->title}</span></a>
 				</div>
 				<div class="clearfix"></div>
