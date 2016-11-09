@@ -9,26 +9,26 @@
 		<tr>
 			<td>Name:</td>
 			<td>
-				<input type="hidden" name="id" {if isset($user)}value="{$user.id}"{else}{/if}/>
-				<input autocomplete="off" class="long" name="username" type="text" {if isset($user)}value="{$user.username}"{else}{/if}/>
+				<input type="hidden" name="id" {if !empty($user)}value="{$user.id}"{else}{/if}/>
+				<input autocomplete="off" class="long" name="username" type="text" {if !empty($user)}value="{$user.username}"{else}{/if}/>
 			</td>
 		</tr>
 		<tr>
 			<td>Email:</td>
 			<td>
-				<input autocomplete="off" class="long" name="email" type="text" {if isset($user)}value="{$user.email}"{else}{/if} />
+				<input autocomplete="off" class="long" name="email" type="text" {if !empty($user)}value="{$user.email}"{else}{/if} />
 			</td>
 		</tr>
 		<tr>
 			<td>Password:</td>
 			<td>
 				<input autocomplete="off" class="long" name="password" type="password" value="" />
-				{if $user.id}
+				{if !empty($user.id)}
 					<div class="hint">Only enter a password if you want to change it.</div>
 				{/if}
 			</td>
 		</tr>
-		{if $user.id}
+		{if !empty($user.id)}
 			<tr>
 				<td>Grabs:</td>
 				<td>
@@ -41,7 +41,6 @@
 					<input class="short" name="invites" type="text" value="{$user.invites}" />
 				</td>
 			</tr>
-		{/if}
 		<tr>
 			<td>Movie View:</td>
 			<td>
@@ -106,6 +105,7 @@
 				{if $user.role!="2"}<a class="confirm_action btn btn-danger" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">Delete user</a>{/if}
 			</td>
 		</tr>
+		{/if}
 	</table>
 </form>
 </div>

@@ -1,3 +1,5 @@
+2016-11-09 DariusIII
+	* Fix: Fix undefined notices in user-edit page
 2016-11-08 DariusIII
 	* Chg: Couple of fixes and missing settings (Sphinx, sabnzbd)
 	* Chg: Improve performance of site/edit by updating some queries in Groups/Releases
