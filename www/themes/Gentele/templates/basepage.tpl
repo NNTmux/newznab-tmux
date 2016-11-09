@@ -52,7 +52,7 @@
 		<div class="col-md-3 left_col">
 			<div class="left_col scroll-view">
 				<div class="navbar nav_title" style="border: 0;">
-					<a href="{$site->home_link}" class="site_title"><i class="fa fa-mixcloud"></i>
+					<a href="{$site->home_link}" class="site_title"><i class="fa fa-superpower"></i>
 						<span>{$site->title}</span></a>
 				</div>
 				<div class="clearfix"></div>
@@ -166,7 +166,7 @@
 				<footer>
 					<div class="copyright-info">
 						<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
-									href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is
+									href="https://github.com/NNTmux/">newznab-tmux</a>.</strong> This software is
 						open source, released under the GPL license
 					</div>
 					<div class="clearfix"></div>

@@ -165,7 +165,7 @@
 		<footer class="row">
 			<div class="box col-md-12">
 				<p class="col-md-9 col-sm-9 col-xs-12 copyright">&copy; <i class="fa fa-github-alt"></i><a
-							href="https://github.com/DariusIII/" target="_blank"> DariusIII</a> newznab-tmux {$smarty.now|date_format:"%Y"}</p>
+							href="https://github.com/NNTmux/" target="_blank"> NNTmux</a> newznab-tmux {$smarty.now|date_format:"%Y"}</p>
 		</footer>
 	</div>
 	<!--/.fluid-container-->

@@ -87,7 +87,7 @@
 			<footer>
 				<div class="copyright-info">
 					<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
-								href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is open
+								href="https://github.com/NNTmux/">newznab-tmux</a>.</strong> This software is open
 					source,
 					released under the GPL license
 				</div>
