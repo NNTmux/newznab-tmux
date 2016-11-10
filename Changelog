@@ -1,3 +1,5 @@
+2016-11-10 DariusIII
+	* Fix: Wrong parameters used in SAB integration checks.
 2016-11-09 DariusIII
 	* Chg: Change link to github page from DariusIII to NNTmux
 	* Fix: Fix undefined notices in user-edit page
