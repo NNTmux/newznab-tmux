@@ -261,7 +261,6 @@
 													</table>
 												{/if}
 												<br/>
-												site
 											</td>
 										</tr>
 										</tbody>
