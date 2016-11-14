@@ -47,7 +47,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/kbjr/Git.php"
+      "url": "https://github.com/nZEDb/Git.php"
     },
     {
       "type": "vcs",

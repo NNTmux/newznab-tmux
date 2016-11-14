@@ -130,7 +130,7 @@ UPDATE settings SET section = 'site', subsection = 'google', name = 'addetail' W
 
 UPDATE settings SET section = 'site', subsection = 'google', name = 'adheader' WHERE setting = 'adheader';
 
-UPDATE settings SET section = 'site', subsection = 'google', name = 'gogle_adsense_acc' WHERE setting = 'google_adsense_acc';
+UPDATE settings SET section = 'site', subsection = 'google', name = 'google_adsense_acc' WHERE setting = 'google_adsense_acc';
 
 UPDATE settings SET section = 'site', subsection = 'google', name = 'google_adsense_search' WHERE setting = 'google_adsense_search';
 

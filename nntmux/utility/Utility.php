@@ -260,6 +260,11 @@ class Utility
 		return (strtolower(substr(PHP_OS, 0, 3)) === 'win');
 	}
 
+	public static  function pathCombine(array $elements, $prefix = '')
+	{
+		return $prefix . implode(DS, $elements);
+	}
+
 	static public function stripBOM(&$text)
 	{
 		$bom = pack("CCC", 0xef, 0xbb, 0xbf);
