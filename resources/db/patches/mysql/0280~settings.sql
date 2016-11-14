@@ -28,4 +28,4 @@ REPLACE INTO settings (section, subsection, name, value, hint, setting) VALUES (
 
 REPLACE INTO settings (section, subsection, name, value, hint, setting) VALUES ('site', 'google', 'google_adsense_acc', '', 'AdSense account: e.g. pub-123123123123123', 'google_adsense_acc');
 
-REPLACE INTO settings (section, subsection, name, value, hint, setting) VALUES ('site', 'menu', 'menuposition', '2', 'Where the menu should appear. Moving the menu to the top will require using a theme which widens the content panel. (not currently functional)', 'menuposition');
+REPLACE INTO settings (section, subsection, name, value, hint, setting) VALUES ('site', 'main', 'menuposition', '2', 'Where the menu should appear. Moving the menu to the top will require using a theme which widens the content panel. (not currently functional)', 'menuposition');
