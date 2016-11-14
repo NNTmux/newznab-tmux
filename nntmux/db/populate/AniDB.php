@@ -71,8 +71,8 @@ class AniDB
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
-		$anidbupdint = Settings::value('..intanidbupdate');
-		$lastupdated = Settings::value('..lastanidbupdate');
+		$anidbupdint = Settings::value('APIs.AniDB.max_update_frequency');
+		$lastupdated = Settings::value('APIs.AniDB.last_full_update');
 
 		$this->imgSavePath = NN_COVERS . 'anime' . DS;
 		$this->apiKey      = Settings::value('APIs..anidbkey');
