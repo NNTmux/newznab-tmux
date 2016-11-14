@@ -1554,17 +1554,17 @@
 <table class="input data table table-striped responsive-utilities jambo-table">
 
 <tr>
-  <td style="width:130px;"><label for="recaptchapublickey">ReCaptcha Public Key</label>:</td>
+  <td style="width:130px;"><label for="recaptchasitekey">ReCaptcha Public Key</label>:</td>
   <td>
-    <input id="recaptchapublickey" class="medium" name="recaptchapublickey" type="text" value="{$site->recaptchapublickey}" />
+    <input id="recaptchasitekey" class="medium" name="recaptchasitekey" type="text" value="{$site->recaptchasitekey}" />
     <div class="hint">The public key supplied by recaptcha.net. Sign up for recaptcha at <a href="https://www.google.com/recaptcha/admin/create">https://www.google.com/recaptcha/admin/create</a></div>
   </td>
 </tr>
 
 <tr>
-  <td style="width:130px;"><label for="recaptchaprivatekey">ReCaptcha Private Key</label>:</td>
+  <td style="width:130px;"><label for="recaptchasecretkey">ReCaptcha Private Key</label>:</td>
   <td>
-    <input id="recaptchaprivatekey" class="medium" name="recaptchaprivatekey" type="text" value="{$site->recaptchaprivatekey}" />
+    <input id="recaptchasecretkey" class="medium" name="recaptchasecretkey" type="text" value="{$site->recaptchasecretkey}" />
     <div class="hint">The private key supplied by recaptcha.net</div>
   </td>
 </tr>
