@@ -1,3 +1,5 @@
+2016-11-23 DariusIII
+	* Chg: Avoid joining groups table on CBP deletes by selecting group info beforehand
 2016-11-14 DariusIII
 	* Chg: Add check for missing settings table entries, add the patches for settings and tmux tables
 2016-11-10 DariusIII
