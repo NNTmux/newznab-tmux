@@ -1,3 +1,5 @@
+2016-11-27 DariusIII
+	* Chg: Update composer.lock
 2016-11-23 DariusIII
 	* Chg: Avoid joining groups table on CBP deletes by selecting group info beforehand
 2016-11-14 DariusIII

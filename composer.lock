@@ -71,16 +71,16 @@
         },
         {
             "name": "bower-asset/autosize",
-            "version": "3.0.18",
+            "version": "3.0.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jackmoore/autosize.git",
-                "reference": "fa2fa308e91ff9f8ba1a9fb17a1b9cc620671ca8"
+                "reference": "5c747b00a93f85e53c083de036004682a5f04af6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/fa2fa308e91ff9f8ba1a9fb17a1b9cc620671ca8",
-                "reference": "fa2fa308e91ff9f8ba1a9fb17a1b9cc620671ca8",
+                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/5c747b00a93f85e53c083de036004682a5f04af6",
+                "reference": "5c747b00a93f85e53c083de036004682a5f04af6",
                 "shasum": ""
             },
             "type": "bower-asset-library",
