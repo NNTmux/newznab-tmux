@@ -27,8 +27,4 @@ class ReleasesGroups extends \lithium\data\Model
 	protected $_meta = [
 		'key'			=> ['releases_id', 'groups_id'],
 	];
-
-	public static function insertReleaseGroups ($releaseID) {
-
-	}
 }

@@ -662,7 +662,7 @@ class ProcessReleases
 									//check if the group already exists in database
 									$dupeCheck = $this->pdo->queryOneRow(sprintf('SELECT SQL_NO_CACHE id FROM groups WHERE name = %s', $this->pdo->escapeString($grp)));
 									if ($dupeCheck === false) {
-										$this->groups->add([
+										$groupID = $this->groups->add([
 												'name'                  => $grp,
 												'description'           => 'Added by Release processing',
 												'backfill_target'       => 1,
@@ -676,7 +676,9 @@ class ProcessReleases
 										);
 									}
 								}
-								$groupIDs = $this->groups->getIDByName($grp);
+								if (!$groupID) {
+									$groupIDs = $this->groups->getIDByName($grp);
+								}
 								$this->pdo->queryInsert(
 									sprintf('
 										INSERT INTO releases_groups (releases_id, groups_id, groups_name) VALUES (%d, %d, %s)', $releaseID, $groupIDs, $this->pdo->escapeString($grp)
