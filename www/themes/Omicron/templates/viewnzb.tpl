@@ -463,6 +463,7 @@
 																			{foreach $groupname as $grp}
 																				<a title="Browse {$grp}"
 																				   href="{$smarty.const.WWW_TOP}/browse?g={$grp}">{$grp|replace:"alt.binaries":"a.b"}</a>
+																				<br/>
 																			{/foreach}
 																		</td>
 																	{else}

@@ -272,7 +272,6 @@
 											<tr valign="top">
 												<td>
 													<table class="data table table-striped responsive-utilities jambo-table">
-														<					>
 														{if $movie && $release.videos_id <= 0}
 															<tr>
 																<th width="140">Name
@@ -463,17 +462,18 @@
 															{if !empty($release.release_group_names)}
 																{assign var="groupname" value=","|explode:$release.release_group_names}
 																<td>
-																{foreach $groupname as $grp}
+																	{foreach $groupname as $grp}
 																			<a title="Browse {$grp}"
 																		   	href="{$smarty.const.WWW_TOP}/browse?g={$grp}">{$grp|replace:"alt.binaries":"a.b"}</a>
-																{/foreach}
+																		<br/>
+																	{/foreach}
 																</td>
-														{else}
-															<td>
-																<a title="Browse {$release.group_name}"
+															{else}
+																<td>
+																	<a title="Browse {$release.group_name}"
 																   href="{$smarty.const.WWW_TOP}/browse?g={$release.group_name}">{$release.group_name|replace:"alt.binaries":"a.b"}</a>
-															</td>
-														{/if}
+																</td>
+															{/if}
 														</tr>
 														<tr>
 															<th width="140">Size /
@@ -670,8 +670,7 @@
 							{/if}
 							{if $reVideo.releases_id|@count > 0 || $reAudio|@count > 0}
 								<div id="pane8" class="tab-pane">
-									<table style="width:100%;"
-										   class="data table table-striped responsive-utilities jambo-table">
+									<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table">
 										<tr>
 											<th width="15%"></th>
 											<th>Property</th>
