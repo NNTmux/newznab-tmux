@@ -1279,6 +1279,7 @@ class Releases
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				CONCAT(cp.id, ',', c.id) AS category_ids,
 				GROUP_CONCAT(rg.groups_id) AS release_groups,
+				GROUP_CONCAT(rg.groups_name) AS release_group_names,
 				g.name AS group_name,
 				v.title AS showtitle, v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.source,
 				tvi.summary, tvi.image,

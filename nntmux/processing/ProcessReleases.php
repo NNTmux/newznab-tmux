@@ -659,6 +659,8 @@ class ProcessReleases
 							foreach ($matches[1] as $grp) {
 								$grps = $this->groups->isValidGroup($grp);
 								if ($grps !== false) {
+									//check if the group already exists in database
+									$dupe = $this->pdo->queryOneRow(sprintf('SELECT id FROM groups WHERE name = %s', $this->pdo->escapeString($grp)));
 									$this->groups->add([
 										'name'            => $grp,
 										'description'     => 'Added by Release processing',
@@ -675,7 +677,7 @@ class ProcessReleases
 								$groupIDs = $this->groups->getIDByName($grp);
 								$this->pdo->queryInsert(
 									sprintf('
-										INSERT INTO releases_groups (releases_id, groups_id) VALUES (%d, %d)', $releaseID, $groupIDs
+										INSERT INTO releases_groups (releases_id, groups_id, groups_name) VALUES (%d, %d, %s)', $releaseID, $groupIDs, $this->pdo->escapeString($grp)
 									)
 								);
 							}
