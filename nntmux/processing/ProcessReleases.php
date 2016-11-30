@@ -1,6 +1,7 @@
 <?php
 namespace nntmux\processing;
 
+use app\models\ReleasesGroups;
 use app\models\Settings;
 use nntmux\db\DB;
 use nntmux\Groups;
@@ -654,6 +655,31 @@ class ProcessReleases
 								$collection['id']
 							)
 						);
+						if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
+							foreach ($matches[1] as $grp) {
+								$grps = $this->groups->isValidGroup($grp);
+								if ($grps !== false) {
+									$this->groups->add([
+										'name'            => $grp,
+										'description'     => 'Added by Release processing',
+										'backfill_target' => 1,
+										'first_record'    => 0,
+										'last_record'     => 0,
+										'active'          => 0,
+										'backfill'        => 0,
+										'minfilestoformrelease' => '',
+										'minsizetoformrelease' => ''
+									]
+									);
+								}
+								$groupIDs = $this->groups->getIDByName($grp);
+								$this->pdo->queryInsert(
+									sprintf('
+										INSERT INTO releases_groups (releases_id, groups_id) VALUES (%d, %d)', $releaseID, $groupIDs
+									)
+								);
+							}
+						}
 
 						$returnCount++;
 

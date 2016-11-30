@@ -459,7 +459,7 @@
 															{/if}
 														{/if}
 														<tr>
-															<th width="140">Group</th>
+															<th width="140">Group(s)</th>
 															<td>
 																<a title="Browse {$release.group_name}"
 																   href="{$smarty.const.WWW_TOP}/browse?g={$release.group_name}">{$release.group_name|replace:"alt.binaries":"a.b"}</a>
