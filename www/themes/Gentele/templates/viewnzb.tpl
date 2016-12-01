@@ -459,8 +459,8 @@
 														{/if}
 														<tr>
 															<th width="140">Group(s)</th>
-															{if !empty($release.release_group_names)}
-																{assign var="groupname" value=","|explode:$release.release_group_names}
+															{if !empty($release.group_names)}
+																{assign var="groupname" value=","|explode:$release.group_names}
 																<td>
 																	{foreach $groupname as $grp}
 																			<a title="Browse {$grp}"

@@ -655,15 +655,18 @@ class ProcessReleases
 								$collection['id']
 							)
 						);
+
 						if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
 							foreach ($matches[1] as $grp) {
-								$grps = $this->groups->isValidGroup($grp);
-								if ($grps !== false) {
+								//check if the group name is in a valid format
+								$grpTmp = $this->groups->isValidGroup($grp);
+								if ($grpTmp !== false) {
 									//check if the group already exists in database
-									$dupeCheck = $this->pdo->queryOneRow(sprintf('SELECT SQL_NO_CACHE id FROM groups WHERE name = %s', $this->pdo->escapeString($grp)));
-									if ($dupeCheck === false) {
-											$this->groups->add([
-												'name'                  => $grp,
+									$xrefGrpID = $this->groups->getIDByName($grpTmp);
+									if ($xrefGrpID === false) {
+										$xrefGrpID = $this->groups->add(
+											[
+												'name'                  => $grpTmp,
 												'description'           => 'Added by Release processing',
 												'backfill_target'       => 1,
 												'first_record'          => 0,
@@ -675,14 +678,15 @@ class ProcessReleases
 											]
 										);
 									}
-								}
-								$groupIDs = $this->groups->getIDByName($grp);
 
-								$relGroups = ReleasesGroups::create();
-								$relGroups->releases_id = $releaseID;
-								$relGroups->groups_id = $groupIDs;
-								$relGroups->groups_name = $grp;
-								$relGroups->save();
+									$relGroups = ReleasesGroups::create(
+										[
+											'releases_id' => $releaseID,
+											'groups_id'   => $xrefGrpID,
+										]
+									);
+									$relGroups->save();
+								}
 							}
 						}
 

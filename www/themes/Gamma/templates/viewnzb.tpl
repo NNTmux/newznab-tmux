@@ -270,8 +270,8 @@
 			{/if}
 			<dl class="dl-horizontal" style="margin-right:300px;">
 					<dt width="140">Group(s)</dt>
-					{if !empty($release.release_group_names)}
-						{assign var="groupname" value=","|explode:$release.release_group_names}
+					{if !empty($release.group_names)}
+						{assign var="groupname" value=","|explode:$release.group_names}
 						<dd>
 							{foreach $groupname as $grp}
 								<a title="Browse {$grp}"

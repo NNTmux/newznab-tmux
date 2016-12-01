@@ -1278,8 +1278,7 @@ class Releases
 			"SELECT r.*,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				CONCAT(cp.id, ',', c.id) AS category_ids,
-				GROUP_CONCAT(rg.groups_id SEPARATOR ',') AS release_groups,
-				GROUP_CONCAT(rg.groups_name SEPARATOR ',') AS release_group_names,
+				GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names,
 				g.name AS group_name,
 				v.title AS showtitle, v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.source,
 				tvi.summary, tvi.image,
@@ -1288,11 +1287,13 @@ class Releases
 			LEFT JOIN groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT JOIN releases_groups rg ON rg.releases_id = r.id
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_info tvi ON r.videos_id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			WHERE %s",
+			LEFT OUTER JOIN releases_groups rg ON r.id = rg.releases_id
+			LEFT OUTER JOIN groups g2 ON rg.groups_id = g2.id
+			WHERE %s
+			GROUP BY r.id",
 			$gSql
 		);
 
