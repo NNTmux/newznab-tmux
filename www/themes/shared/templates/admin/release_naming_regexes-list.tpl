@@ -5,11 +5,11 @@
 
 <form name="groupsearch" action="" style="margin-bottom:5px;">
 	<label for="group">Search a group:</label>
-	<input id="group" type="text" name="group" value="{$group}" size="15" />
+	<input id="group" type="text" name="group" value="{if isset($group)}{$group}{else}{/if}" size="15" />
 	&nbsp;&nbsp;
 	<input class="btn btn-default" type="submit" value="Go" />
 </form>
-{if $regex}
+{if isset($regex)}
 
 	<div>{$pager}</div>
 	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
