@@ -16,7 +16,7 @@
 	<input id="querylimit" type="text" name="querylimit" value="{$querylimit}" size="8" /><br/>
 	<input class="btn btn-default" type="submit" value="Test" />
 </form>
-{if $data}
+{if isset($data)}
 	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
 		<tr>
 			<th>Release id</th>
