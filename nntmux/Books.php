@@ -88,7 +88,8 @@ class Books
 		$this->bookqty = (Settings::value('..maxbooksprocessed') != '') ? Settings::value('..maxbooksprocessed') : 300;
 		$this->sleeptime = (Settings::value('..amazonsleep') != '') ? Settings::value('..amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'book' . DS;
-		$this->bookreqids = (Settings::value('..book_reqids') == null || Settings::value('..book_reqids') == "") ? Category::BOOKS_MAGAZINES : Settings::value('book_reqids');
+		$result = Settings::value('..book_reqids');
+		$this->bookreqids = empty($result) ? Category::BOOKS_EBOOK : $result;
 		$this->renamed = '';
 		if (Settings::value('..lookupbooks') == 2) {
 			$this->renamed = 'AND isrenamed = 1';
