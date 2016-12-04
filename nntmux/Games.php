@@ -109,18 +109,14 @@ class Games
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		$this->publicKey = Settings::value('APIs..giantbombkey');
-		$this->gameQty = (Settings::value('..maxgamesprocessed') != '') ? Settings::value('..maxgamesprocessed') : 150;
-		$this->sleepTime = (Settings::value('..amazonsleep') != '') ? Settings::value('..amazonsleep') : 1000;
+		$this->gameQty = Settings::value('..maxgamesprocessed' != '') ? Settings::value('..maxgamesprocessed') : 150;
+		$this->sleepTime = Settings::value('..amazonsleep') != '' ? Settings::value('..amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'games' . DS;
-		$this->renamed = '';
+		$this->renamed = Settings::value('..lookupgames') == 2 ? 'AND isrenamed = 1' : '';
 		$this->matchPercentage = 60;
 		$this->maxHitRequest = false;
 		$this->cookie = NN_TMP . 'xxx.cookie';
-		if (Settings::value('..lookupgames') == 2) {
-			$this->renamed = 'AND isrenamed = 1';
-		}
 		$this->catWhere = 'AND categories_id = ' . Category::PC_GAMES . ' ';
-		//$this->cleangames = (Settings::value('('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
 	}
 
 	public function getGamesInfo($id)
