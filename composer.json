@@ -96,7 +96,7 @@
     "kbjr/Git.php": "dev-master",
     "moinax/tvdb": "~1.0",
     "phpmailer/phpmailer": "~5.2",
-    "exeu/apai-io": "~1.0",
+    "exeu/apai-io": "~2.0",
     "smarty/smarty": "~3.1",
     "bower-asset/animate.css": "~3.5.1",
     "bower-asset/autosize": "~3.0.15",
