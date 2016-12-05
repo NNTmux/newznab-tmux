@@ -239,17 +239,17 @@
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<button type="button"
 														class="btn btn-primary btn-sm btn-transparent sabsend">
-												<i class="icon_sab fa fa-arrow-right"
-												   id="guid{$release.guid}"></i> Send to Queue
+													<i class="icon_sab fa fa-arrow-right"
+													   id="guid{$release.guid}"></i> Send to Queue
 												</button>
 											{/if}
 											{if !empty($release.imdbid)}
 												{if !empty($cpurl) && !empty($cpapi)}
 													<button
-														type="button"
-														id="imdb{$release.imdbid}"
-														href="javascript:;"
-														class="btn btn-primary btn-sm btn-info btn-transparent sendtocouch">
+															type="button"
+															id="imdb{$release.imdbid}"
+															href="javascript:;"
+															class="btn btn-primary btn-sm btn-info btn-transparent sendtocouch">
 														<i class="fa fa-bed"></i>
 														Send to CouchPotato
 													</button>
@@ -258,9 +258,9 @@
 											{if $weHasVortex}
 												<button type="button"
 														class="btn btn-primary btn-sm btn-transparent vortexsend">
-												<i class="icon_sab fa fa-arrow-right"
-												   id="guid{$release.guid}"></i> Send to
-												NZBVortex
+													<i class="icon_sab fa fa-arrow-right"
+													   id="guid{$release.guid}"></i> Send to
+													NZBVortex
 												</button>
 											{/if}
 										</div>
@@ -272,7 +272,6 @@
 											<tr valign="top">
 												<td>
 													<table class="data table table-striped responsive-utilities jambo-table">
-														<tbody>
 														{if $movie && $release.videos_id <= 0}
 															<tr>
 																<th width="140">Name
@@ -459,11 +458,22 @@
 															{/if}
 														{/if}
 														<tr>
-															<th width="140">Group</th>
-															<td>
-																<a title="Browse {$release.group_name}"
+															<th width="140">Group(s)</th>
+															{if !empty($release.group_names)}
+																{assign var="groupname" value=","|explode:$release.group_names}
+																<td>
+																	{foreach $groupname as $grp}
+																			<a title="Browse {$grp}"
+																		   	href="{$smarty.const.WWW_TOP}/browse?g={$grp}">{$grp|replace:"alt.binaries":"a.b"}</a>
+																		<br/>
+																	{/foreach}
+																</td>
+															{else}
+																<td>
+																	<a title="Browse {$release.group_name}"
 																   href="{$smarty.const.WWW_TOP}/browse?g={$release.group_name}">{$release.group_name|replace:"alt.binaries":"a.b"}</a>
-															</td>
+																</td>
+															{/if}
 														</tr>
 														<tr>
 															<th width="140">Size /
@@ -530,7 +540,9 @@
 														</tr>
 														<tr>
 															<th width="140">Poster</th>
-															<td><a title="Find releases by this poster" href="{$smarty.const.WWW_TOP}/search?searchadvr=&searchadvsubject=&searchadvposter={$release.fromname|escape:"htmlall"}&searchadvfilename=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv">{$release.fromname|escape:"htmlall"}</a></td>
+															<td><a title="Find releases by this poster"
+																   href="{$smarty.const.WWW_TOP}/search?searchadvr=&searchadvsubject=&searchadvposter={$release.fromname|escape:"htmlall"}&searchadvfilename=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv">{$release.fromname|escape:"htmlall"}</a>
+															</td>
 														</tr>
 														<tr>
 															<th width="140">Posted</th>
@@ -658,8 +670,7 @@
 							{/if}
 							{if $reVideo.releases_id|@count > 0 || $reAudio|@count > 0}
 								<div id="pane8" class="tab-pane">
-									<table style="width:100%;"
-										   class="data table table-striped responsive-utilities jambo-table">
+									<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table">
 										<tr>
 											<th width="15%"></th>
 											<th>Property</th>
@@ -812,7 +823,8 @@
 							{/if}
 							{if isset($game.backdrop) && $game.backdrop == 1}
 								<div id="pane10" class="tab-pane">
-									<img class="img-responsive" src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}-backdrop.jpg"
+									<img class="img-responsive"
+										 src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}-backdrop.jpg"
 										 width="500" border="0"
 										 alt="{$game.title|escape:"htmlall"}"
 										 data-toggle="modal"
