@@ -1,8 +1,10 @@
 <?php
 namespace nntmux;
 
+use ApaiIO\Request\GuzzleRequest;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use app\models\Settings;
+use GuzzleHttp\Client;
 use nntmux\db\DB;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\Operations\Search;
@@ -338,13 +340,17 @@ class Books
 	public function fetchAmazonProperties($title)
 	{
 		$conf = new GenericConfiguration();
+		$client = new Client();
+		$request = new GuzzleRequest($client);
+
 		try {
 			$conf
 				->setCountry('com')
 				->setAccessKey($this->pubkey)
 				->setSecretKey($this->privkey)
 				->setAssociateTag($this->asstag)
-				->setResponseTransformer(XmlToSimpleXmlObject::class);
+				->setRequest($request)
+				->setResponseTransformer(new XmlToSimpleXmlObject());
 		} catch (\Exception $e) {
 				echo $e->getMessage();
 			}
