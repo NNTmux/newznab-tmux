@@ -205,7 +205,7 @@ class Games
 				%s %s %s %s
 				GROUP BY con.id
 				ORDER BY %s %s %s",
-						Releases::showPasswords($this->pdo),
+						Releases::showPasswords(),
 						$browseby,
 						$catsrch,
 						$maxage,
@@ -394,7 +394,7 @@ class Games
 	}
 
 	/**
-	 * Process each game, updating game information from Giantbomb
+	 * Process each game, updating game information from Steam, Giantbomb, Desura and GreenLight
 	 *
 	 * @param $gameInfo
 	 *

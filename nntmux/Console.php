@@ -1,6 +1,7 @@
 <?php
 namespace nntmux;
 
+use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use app\models\Settings;
 use nntmux\db\DB;
 use ApaiIO\Configuration\GenericConfiguration;
@@ -92,11 +93,7 @@ class Console
 		$this->gameqty = (Settings::value('..maxgamesprocessed') != '') ? Settings::value('..maxgamesprocessed') : 150;
 		$this->sleeptime = (Settings::value('..amazonsleep') != '') ? Settings::value('..amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'console' . DS;
-		$this->renamed = '';
-		if (Settings::value('..lookupgames') == 2) {
-			$this->renamed = 'AND isrenamed = 1';
-		}
-		//$this->cleanconsole = (Settings::value('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
+		$this->renamed = Settings::value('..lookupgames') == 2 ? 'AND isrenamed = 1' : '';
 		$this->catWhere = "AND categories_id BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER;
 
 		$this->failCache =[];
@@ -722,7 +719,7 @@ class Console
 				->setAccessKey($this->pubkey)
 				->setSecretKey($this->privkey)
 				->setAssociateTag($this->asstag)
-				->setResponseTransformer('\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
+				->setResponseTransformer(XmlToSimpleXmlObject::class);
 		} catch (\Exception $e) {
 			echo $e->getMessage();
 		}
