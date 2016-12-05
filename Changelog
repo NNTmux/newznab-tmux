@@ -1,4 +1,5 @@
 2016-12-05 DariusIII
+	* Chg: Update amazon usage for new apai-io version
 	* Chg: Change semantics for $this->renamed
 	* Chg: Update exeu/apai-io to version 2
 2016-12-04 DariusIII

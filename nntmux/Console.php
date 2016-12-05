@@ -1,6 +1,7 @@
 <?php
 namespace nntmux;
 
+use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use app\models\Settings;
 use nntmux\db\DB;
 use ApaiIO\Configuration\GenericConfiguration;
@@ -718,7 +719,7 @@ class Console
 				->setAccessKey($this->pubkey)
 				->setSecretKey($this->privkey)
 				->setAssociateTag($this->asstag)
-				->setResponseTransformer('\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
+				->setResponseTransformer(XmlToSimpleXmlObject::class);
 		} catch (\Exception $e) {
 			echo $e->getMessage();
 		}

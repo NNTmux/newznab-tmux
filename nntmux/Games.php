@@ -394,7 +394,7 @@ class Games
 	}
 
 	/**
-	 * Process each game, updating game information from Giantbomb
+	 * Process each game, updating game information from Steam, Giantbomb, Desura and GreenLight
 	 *
 	 * @param $gameInfo
 	 *
