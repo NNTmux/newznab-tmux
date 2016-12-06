@@ -1,3 +1,5 @@
+2016-12-06 DariusIII
+	* Chg: Fix call to showpasswords function
 2016-12-05 DariusIII
 	* Mrg: Merge dev-release_groups branch
 	* Chg: Update amazon usage for new apai-io version

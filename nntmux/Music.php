@@ -212,7 +212,7 @@ class Music
 				%s %s %s
 				GROUP BY m.id
 				ORDER BY %s %s %s",
-						Releases::showPasswords($this->pdo),
+						Releases::showPasswords(),
 						$browseby,
 						$catsrch,
 						$exccatlist,

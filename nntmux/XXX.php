@@ -75,7 +75,7 @@ class XXX
 		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 
 		$this->movieqty = (Settings::value('..maxxxxprocessed') != '') ? Settings::value('..maxxxxprocessed') : 100;
-		$this->showPasswords = Releases::showPasswords($this->pdo);
+		$this->showPasswords = Releases::showPasswords();
 		$this->debug = NN_DEBUG;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->imgSavePath = NN_COVERS . 'xxx' . DS;
