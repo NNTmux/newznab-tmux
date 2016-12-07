@@ -7,11 +7,6 @@ use nntmux\db\DB;
 
 class Games
 {
-	const REQID_FOUND 		= 1; // Request id found and release was updated.
-	const REQID_NO_LOCAL	= -1; // Request id was not found via local lookup.
-	const REQID_NONE		= -3; // The Request id was not found locally or via web lookup.
-	const REQID_UNPROCESSED	= 0; // Release has not been processed.
-	const REQID_ZERO		= -2; // The Request id was 0.
 
 	/**
 	 * @var string
