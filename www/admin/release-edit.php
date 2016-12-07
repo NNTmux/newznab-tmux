@@ -34,12 +34,10 @@ switch ($action) {
 
 	case 'view':
 	default:
-		if (isset($_GET["id"])) {
-			$page->title = "Release Edit";
-			$id          = $_GET["id"];
-			$release     = $releases->getByID($id);
-			$page->smarty->assign('release', $release);
-		}
+		$page->title = "Release Edit";
+		$id          = $_GET["id"];
+		$release     = $releases->getByID($id);
+		$page->smarty->assign('release', $release);
 		break;
 }
 
