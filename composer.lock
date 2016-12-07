@@ -373,16 +373,16 @@
         },
         {
             "name": "bower-asset/datatables",
-            "version": "1.10.12",
+            "version": "1.10.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DataTables/DataTables.git",
-                "reference": "3a432c5db3546b2ef0c192f2ae367811cb5edb9b"
+                "reference": "403128c42f7b263a0563e862decbe69734b834e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DataTables/DataTables/zipball/3a432c5db3546b2ef0c192f2ae367811cb5edb9b",
-                "reference": "3a432c5db3546b2ef0c192f2ae367811cb5edb9b",
+                "url": "https://api.github.com/repos/DataTables/DataTables/zipball/403128c42f7b263a0563e862decbe69734b834e8",
+                "reference": "403128c42f7b263a0563e862decbe69734b834e8",
                 "shasum": ""
             },
             "require": {
@@ -1834,12 +1834,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "49d2d46a63d6f2a94c28e392ee67b150aed4d524"
+                "reference": "5e894ca64a07d03ad1f09230875b621d04405a21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/49d2d46a63d6f2a94c28e392ee67b150aed4d524",
-                "reference": "49d2d46a63d6f2a94c28e392ee67b150aed4d524",
+                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/5e894ca64a07d03ad1f09230875b621d04405a21",
+                "reference": "5e894ca64a07d03ad1f09230875b621d04405a21",
                 "shasum": ""
             },
             "require": {
@@ -1872,7 +1872,7 @@
                 "li3",
                 "lithium"
             ],
-            "time": "2016-09-19 11:17:21"
+            "time": "2016-12-01 16:55:39"
         }
     ],
     "packages-dev": [
