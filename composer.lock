@@ -4,9 +4,47 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f00db34ac487c4a6925971b771ecbf39",
-    "content-hash": "1beab9d3715684ed6d62e1d70f4765f9",
+    "hash": "077de9e63a777c378a9b98b0b0aa0e6c",
+    "content-hash": "a8aba981dc67c01aaa3e2a1fa3f6113d",
     "packages": [
+        {
+            "name": "b3rs3rk/steamfront",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/b3rs3rk/steamfront.git",
+                "reference": "feadd9577747d90ca8a6ff5490fb14524327c1f1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/b3rs3rk/steamfront/zipball/feadd9577747d90ca8a6ff5490fb14524327c1f1",
+                "reference": "feadd9577747d90ca8a6ff5490fb14524327c1f1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "b3rs3rk\\": "source"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "b3rs3rk",
+                    "email": "b3rs3rk@protonmail.com"
+                }
+            ],
+            "description": "PHP Wrapper for Accessing the Steam Storefront API",
+            "time": "2016-12-08 13:54:05"
+        },
         {
             "name": "barracudanetworks/forkdaemon-php",
             "version": "v1.0.9",
@@ -1917,6 +1955,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "b3rs3rk/steamfront": 20,
         "dariusiii/rarinfo": 20,
         "giantbomb/giantbomb": 20,
         "joshpinkney/tv-maze-php-api": 20,
