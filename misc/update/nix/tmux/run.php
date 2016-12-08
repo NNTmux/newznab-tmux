@@ -90,7 +90,7 @@ sleep(2);
 
 function writelog($pane)
 {
-	$path = dirname(__FILE__) . "/bin/logs";
+	$path = NN_RES . "logs";
 	$getdate = gmdate("Ymd");
 	$tmux = new Tmux();
 	$logs = $tmux->get()->write_logs;
