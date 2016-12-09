@@ -24,6 +24,7 @@
 */
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
+use GuzzleHttp\Client;
 use nntmux\db\PreDb;
 use nntmux\utility\Utility;
 
@@ -50,14 +51,14 @@ if (!isset($argv[1]) || !is_numeric($argv[1]) && $argv[1] != 'progress' || !isse
 	!in_array($argv[3], ['true', 'false'])
 ) {
 	exit('This script quickly imports the daily PreDB dumps.' . PHP_EOL .
-		 'Argument 1: Enter the unix time of the patch to start at.' . PHP_EOL .
-		 'You can find the unix time in the file name of the patch, it\'s the long number.' .
-		 PHP_EOL .
-		 'You can put in 0 to import all the daily PreDB dumps.' . PHP_EOL .
-		 'You can put in progress to track progress of the imports and only import newer ones.' .
-		 PHP_EOL .
-		 'Argument 2: If your MySQL server is local, type local else type remote.' . PHP_EOL .
-		 'Argument 3: Show output of queries or not, true | false' . PHP_EOL
+		'Argument 1: Enter the unix time of the patch to start at.' . PHP_EOL .
+		'You can find the unix time in the file name of the patch, it\'s the long number.' .
+		PHP_EOL .
+		'You can put in 0 to import all the daily PreDB dumps.' . PHP_EOL .
+		'You can put in progress to track progress of the imports and only import newer ones.' .
+		PHP_EOL .
+		'Argument 2: If your MySQL server is local, type local else type remote.' . PHP_EOL .
+		'Argument 3: Show output of queries or not, true | false' . PHP_EOL
 	);
 }
 if (NN_DEBUG) {
@@ -66,19 +67,19 @@ if (NN_DEBUG) {
 
 $url         = 'https://api.github.com/repos/nZEDb/nZEDbPre_Dumps/contents/dumps/';
 $filePattern = '(?P<filename>(?P<stamp>\d+)_predb_dump\.csv\.gz)';
+$client = new Client();
 
 if (NN_DEBUG) {
 	echo "Fetching predb_dump list from GitHub\n";
 }
 
-$result = Utility::getUrl(
-		[
-		   'url'            => $url,
-		   'requestheaders' => [
-				   'Content-Type: application/json',
-				   'User-Agent: nZEDb'
-		   ]
-	   ]);
+$result = $client->request('GET', $url,
+	[
+		'requestheaders' => [
+			'Content-Type: application/json',
+			'User-Agent: NNTmux'
+		]
+	]);
 
 if ($result === false) {
 	exit('Error connecting to GitHub, try again later?' . PHP_EOL);
@@ -88,7 +89,7 @@ if (NN_DEBUG) {
 	echo "Extracting filenames from list.\n";
 }
 
-$data = json_decode($result, true);
+$data = json_decode($result->getBody()->getContents(), true);
 if (is_null($data)) {
 	exit("Error: $result");
 }
@@ -100,39 +101,32 @@ $progress = $predb->progress(settings_array());
 
 foreach ($data as $file) {
 	if (preg_match("#^https://raw\.githubusercontent\.com/nZEDb/nZEDbPre_Dumps/master/dumps/$filePattern$#",
-				   $file['download_url'])) {
+		$file['download_url'])) {
 		if (preg_match("#^$filePattern$#", $file['name'], $match)) {
 			$timematch = $progress['last'];
 
 			// Skip patches the user does not want.
 			if ($match[1] < $timematch) {
 				echo 'Skipping dump ' . $match[2] .
-					 ', as your minimum unix time argument is ' .
-					 $timematch . PHP_EOL;
+					', as your minimum unix time argument is ' .
+					$timematch . PHP_EOL;
 				--$total;
 				continue;
 			}
 
 			// Download the dump.
-			$dump = Utility::getUrl(['url' => $file['download_url']]);
+			$dump = $client->get($file['download_url'])->getBody();
 			echo "Downloading: {$file['download_url']}\n";
 
 			if (!$dump) {
 				echo "Error downloading dump {$match[2]} you can try manually importing it." .
-					 PHP_EOL;
+					PHP_EOL;
 				continue;
 			} else {
 				if (NN_DEBUG) {
 					echo "Dump {$match[2]} downloaded\n";
 				}
 			}
-
-			// Make sure we didn't get an HTML page.
-			if (strpos($dump, '<!DOCTYPE html>') !== false) {
-				echo "The dump file {$match[2]} might be missing from GitHub." . PHP_EOL;
-				continue;
-			}
-
 			// Decompress.
 			$dump = gzdecode($dump);
 
@@ -146,7 +140,7 @@ foreach ($data as $file) {
 			$fetched  = file_put_contents($dumpFile, $dump);
 			if (!$fetched) {
 				echo "Error storing dump file {$match[2]} in (" . NN_RES . ').' .
-					 PHP_EOL;
+					PHP_EOL;
 				continue;
 			}
 
@@ -164,12 +158,12 @@ foreach ($data as $file) {
 
 			// Import file into predb_imports
 			$predb->executeLoadData(
-					[
-						'fields' => '\\t\\t',
-						'lines'  => '\\r\\n',
-						'local'  => $local,
-						'path'   => $dumpFile,
-					]);
+				[
+					'fields' => '\\t\\t',
+					'lines'  => '\\r\\n',
+					'local'  => $local,
+					'path'   => $dumpFile,
+				]);
 
 			// Remove any titles where length <=8
 			if ($verbose === true) {
@@ -190,14 +184,14 @@ foreach ($data as $file) {
 			unlink($dumpFile);
 
 			$progress = $predb->progress(settings_array($match[2] + 1, $progress),
-										 ['read' => false]);
+				['read' => false]);
 			echo "Successfully imported PreDB dump {$match[2]}, " . (--$total) .
-				 ' dumps remaining.' . PHP_EOL;
+				' dumps remaining.' . PHP_EOL;
 		} else {
 			echo "Ignoring: {$file['download_url']}\n";
 		}
 	} else if (NN_DEBUG) {
-			echo "^https://raw.githubusercontent.com/nZEDb/nZEDbPre_Dumps/master/dumps/$filePattern$\n {$file['download_url']}\n";
+		echo "^https://raw.githubusercontent.com/nZEDb/nZEDbPre_Dumps/master/dumps/$filePattern$\n {$file['download_url']}\n";
 	}
 }
 
@@ -213,5 +207,3 @@ function settings_array($last = null, $settings = null)
 
 	return $settings;
 }
-
-?>
