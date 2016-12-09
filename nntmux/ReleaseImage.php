@@ -1,6 +1,9 @@
 <?php
 namespace nntmux;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 
@@ -57,6 +60,7 @@ class ReleaseImage
 		if ($pdo === null) {
 			$pdo = new DB();
 		}
+		$this->client = new Client();
 		//                                                            Table    |  Column
 		$this->audSavePath = NN_COVERS . 'audiosample' . DS; // releases    guid
 		$this->imgSavePath = NN_COVERS . 'preview' . DS; // releases    guid
@@ -86,7 +90,12 @@ class ReleaseImage
 	{
 		$img = false;
 		if (strpos(strtolower($imgLoc), 'http:') === 0 || strpos(strtolower($imgLoc), 'https:') === 0) {
-			$img = Utility::getUrl(['url' => $imgLoc]);
+			try {
+				$img = $this->client->get($imgLoc)->getBody()->getContents();
+			} catch (ClientException $e) {
+				$e->getResponse();
+			}
+
 		} else if (is_file($imgLoc)) {
 			$img = @file_get_contents($imgLoc);
 		}
