@@ -48,6 +48,11 @@ class ReleaseImage
 	public $vidSavePath;
 
 	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
 	 * Construct.
 	 *
 	 * @param \DB()
@@ -91,7 +96,6 @@ class ReleaseImage
 			try {
 				$img = $this->client->get($imgLoc)->getBody()->getContents();
 			} catch (ClientException $e) {
-				$e->getResponse();
 			}
 
 		} else if (is_file($imgLoc)) {
