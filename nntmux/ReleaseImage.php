@@ -3,9 +3,7 @@ namespace nntmux;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\RequestException;
 use nntmux\db\DB;
-use nntmux\utility\Utility;
 
 /**
  * Resize/save/delete images to disk.
