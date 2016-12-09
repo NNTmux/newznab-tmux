@@ -79,10 +79,10 @@ class TraktTv extends TV
 		parent::__construct($options);
 		$this->clientId = Settings::value('APIs..trakttvclientkey');
 		$this->requestHeaders = [
-				'Content-Type: application/json',
-				'trakt-api-version: 2',
-				'trakt-api-key: ' . $this->clientId,
-				'Content-Length: 0'
+				'Content-Type' => 'application/json',
+				'trakt-api-version' => 2,
+				'trakt-api-key' => $this->clientId,
+				'Content-Length' => 0
 		];
 		$this->client = new TraktAPI($this->requestHeaders);
 		$this->time = new Time();

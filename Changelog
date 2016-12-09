@@ -1,3 +1,5 @@
+2016-12-09 DariusIII
+	* Chg: Use guzzlehttp/guzzle in TraktTV processing
 2016-12-08 DariusIII
 	* Chg: Fix location of logs for tmux
 2016-12-07 DariusIII

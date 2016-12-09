@@ -1,6 +1,8 @@
 <?php
 namespace nntmux\libraries;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use nntmux\utility\Utility;
 
 /**
@@ -39,6 +41,8 @@ Class TraktAPI {
 		} else {
 			$this->requestHeaders = $headers;
 		}
+
+		$this->client = new Client();
 	}
 
 	/**
@@ -143,13 +147,17 @@ Class TraktAPI {
 
 		if (!empty($this->requestHeaders)) {
 
-			$json = Utility::getUrl([
-							'url'            => $URI . $extendedString,
-							'requestheaders' => $this->requestHeaders
+			try {
+				$json = $this->client->get(
+					$URI . $extendedString,
+					[
+						'headers' => $this->requestHeaders
 					]
-			);
+				)->getBody()->getContents();
+			} catch (ClientException $e) {
+			}
 
-			if ($json !== false) {
+			if (isset($json) && $json !== false) {
 				$json = json_decode($json, true);
 				if (!is_array($json) || (isset($json['status']) && $json['status'] === 'failure')) {
 					return false;
