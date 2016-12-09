@@ -27,6 +27,11 @@ Class TraktAPI {
 	private $requestHeaders;
 
 	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
 	 * Construct. Assign passed request headers.  Headers should be complete with API key.
 	 *
 	 * @access public
@@ -155,6 +160,7 @@ Class TraktAPI {
 					]
 				)->getBody()->getContents();
 			} catch (ClientException $e) {
+				echo "Error retrieving data from TraktTV";
 			}
 
 			if (isset($json) && $json !== false) {
