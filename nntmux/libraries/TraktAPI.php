@@ -4,6 +4,7 @@ namespace nntmux\libraries;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Psr7;
 
 /**
  * Class TraktAPI
@@ -160,11 +161,11 @@ Class TraktAPI {
 					]
 				)->getBody()->getContents();
 			} catch (ClientException $e) {
-				echo $e->getRequest();
-				echo $e->getResponse();
+				echo Psr7\str($e->getRequest());
+				echo Psr7\str($e->getResponse());
 			} catch (ServerException $se) {
-				echo $se->getRequest();
-				echo $se->getResponse();
+				echo Psr7\str($se->getRequest());
+				echo Psr7\str($se->getResponse());
 			}
 
 			if (isset($json) && $json !== false) {

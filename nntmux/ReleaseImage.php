@@ -4,6 +4,7 @@ namespace nntmux;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Psr7;
 use nntmux\db\DB;
 
 /**
@@ -97,11 +98,11 @@ class ReleaseImage
 			try {
 				$img = $this->client->get($imgLoc)->getBody()->getContents();
 			} catch (ClientException $e) {
-				echo $e->getRequest();
-				echo $e->getResponse();
+				echo Psr7\str($e->getRequest());
+				echo Psr7\str($e->getResponse());
 			} catch (ServerException $se) {
-				echo $se->getRequest();
-				echo $se->getResponse();
+				echo Psr7\str($se->getRequest());
+				echo Psr7\str($se->getResponse());
 			}
 
 		} else if (is_file($imgLoc)) {
