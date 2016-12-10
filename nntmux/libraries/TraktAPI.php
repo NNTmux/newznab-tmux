@@ -161,11 +161,15 @@ Class TraktAPI {
 					]
 				)->getBody()->getContents();
 			} catch (ClientException $e) {
-				echo Psr7\str($e->getRequest());
-				echo Psr7\str($e->getResponse());
+				if(NN_DEBUG) {
+					echo Psr7\str($e->getRequest());
+					echo Psr7\str($e->getResponse());
+				}
 			} catch (ServerException $se) {
-				echo Psr7\str($se->getRequest());
-				echo Psr7\str($se->getResponse());
+				if (NN_DEBUG) {
+					echo Psr7\str($se->getRequest());
+					echo Psr7\str($se->getResponse());
+				}
 			}
 
 			if (isset($json) && $json !== false) {

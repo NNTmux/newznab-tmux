@@ -788,11 +788,15 @@ class Movie
 			try {
 				$buffer = $this->client->get('https://webservice.fanart.tv/v3/movies/' . 'tt' . $imdbId . '?api_key=' . $this->fanartapikey)->getBody()->getContents();
 			} catch (ClientException $e) {
-				echo Psr7\str($e->getRequest());
-				echo Psr7\str($e->getResponse());
+				if(NN_DEBUG) {
+					echo Psr7\str($e->getRequest());
+					echo Psr7\str($e->getResponse());
+				}
 			} catch (ServerException $se) {
-				echo Psr7\str($se->getRequest());
-				echo Psr7\str($se->getResponse());
+				if (NN_DEBUG) {
+					echo Psr7\str($se->getRequest());
+					echo Psr7\str($se->getResponse());
+				}
 			}
 
 			if (isset($buffer) && $buffer !== false) {
@@ -950,11 +954,15 @@ class Movie
 					]
 				)->getBody()->getContents();
 		} catch (ClientException $e) {
-			echo Psr7\str($e->getRequest());
-			echo Psr7\str($e->getResponse());
+			if(NN_DEBUG) {
+				echo Psr7\str($e->getRequest());
+				echo Psr7\str($e->getResponse());
+			}
 		} catch (ServerException $se) {
-			echo Psr7\str($se->getRequest());
-			echo Psr7\str($se->getResponse());
+			if (NN_DEBUG) {
+				echo Psr7\str($se->getRequest());
+				echo Psr7\str($se->getResponse());
+			}
 		}
 
 		if (isset($buffer) && $buffer !== false) {
@@ -1167,11 +1175,15 @@ class Movie
 								'&r=json'
 							)->getBody()->getContents();
 					} catch (ClientException $e) {
-						echo Psr7\str($e->getRequest());
-						echo Psr7\str($e->getResponse());
+						if(NN_DEBUG) {
+							echo Psr7\str($e->getRequest());
+							echo Psr7\str($e->getResponse());
+						}
 					} catch (ServerException $se) {
-						echo Psr7\str($se->getRequest());
-						echo Psr7\str($se->getResponse());
+						if (NN_DEBUG) {
+							echo Psr7\str($se->getRequest());
+							echo Psr7\str($se->getResponse());
+						}
 					}
 
 					if (isset($buffer) && $buffer !== false) {
@@ -1335,11 +1347,15 @@ class Movie
 				'&as_occt=title&safe=images&tbs=&as_filetype=&as_rights='
 			)->getBody()->getContents();
 		} catch (ClientException $e) {
-			echo Psr7\str($e->getRequest());
-			echo Psr7\str($e->getResponse());
+			if(NN_DEBUG) {
+				echo Psr7\str($e->getRequest());
+				echo Psr7\str($e->getResponse());
+			}
 		} catch (ServerException $se) {
-			echo Psr7\str($se->getRequest());
-			echo Psr7\str($se->getResponse());
+			if (NN_DEBUG) {
+				echo Psr7\str($se->getRequest());
+				echo Psr7\str($se->getResponse());
+			}
 		}
 
 		// Make sure we got some data.
@@ -1377,11 +1393,15 @@ class Movie
 				'&qs=n&form=QBLH&filt=all'
 			)->getBody()->getContents();
 		} catch (ClientException $e) {
-			echo Psr7\str($e->getRequest());
-			echo Psr7\str($e->getResponse());
+			if(NN_DEBUG) {
+				echo Psr7\str($e->getRequest());
+				echo Psr7\str($e->getResponse());
+			}
 		} catch (ServerException $se) {
-			echo Psr7\str($se->getRequest());
-			echo Psr7\str($se->getResponse());
+			if (NN_DEBUG) {
+				echo Psr7\str($se->getRequest());
+				echo Psr7\str($se->getResponse());
+			}
 		}
 
 		if (isset($buffer) && $buffer !== false) {
@@ -1427,11 +1447,15 @@ class Movie
 				urlencode('www.imdb.com/title/')
 			)->getBody()->getContents();
 		} catch (ClientException $e) {
-			echo Psr7\str($e->getRequest());
-			echo Psr7\str($e->getResponse());
+			if(NN_DEBUG) {
+				echo Psr7\str($e->getRequest());
+				echo Psr7\str($e->getResponse());
+			}
 		} catch (ServerException $se) {
-			echo Psr7\str($se->getRequest());
-			echo Psr7\str($se->getResponse());
+			if (NN_DEBUG) {
+				echo Psr7\str($se->getRequest());
+				echo Psr7\str($se->getResponse());
+			}
 		}
 
 		if (isset($buffer) && $buffer !== false) {
