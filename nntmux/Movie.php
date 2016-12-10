@@ -788,6 +788,11 @@ class Movie
 			try {
 				$buffer = $this->client->get('https://webservice.fanart.tv/v3/movies/' . 'tt' . $imdbId . '?api_key=' . $this->fanartapikey)->getBody()->getContents();
 			} catch (ClientException $e) {
+				echo $e->getRequest();
+				echo $e->getResponse();
+			} catch (ServerException $se) {
+				echo $se->getRequest();
+				echo $se->getResponse();
 			}
 			if (isset($buffer) && $buffer !== false) {
 				$art = json_decode($buffer, true);
@@ -944,6 +949,11 @@ class Movie
 					]
 				)->getBody()->getContents();
 		} catch (ClientException $e) {
+			echo $e->getRequest();
+			echo $e->getResponse();
+		} catch (ServerException $se) {
+			echo $se->getRequest();
+			echo $se->getResponse();
 		}
 
 		if (isset($buffer) && $buffer !== false) {
@@ -1155,7 +1165,12 @@ class Movie
 								($this->currentYear !== false ? ('&y=' . $this->currentYear) : '') .
 								'&r=json'
 							)->getBody()->getContents();
-					} catch (ServerException $s) {
+					} catch (ClientException $e) {
+						echo $e->getRequest();
+						echo $e->getResponse();
+					} catch (ServerException $se) {
+						echo $se->getRequest();
+						echo $se->getResponse();
 					}
 
 					if (isset($buffer) && $buffer !== false) {
@@ -1318,7 +1333,12 @@ class Movie
 				urlencode('www.imdb.com/title/') .
 				'&as_occt=title&safe=images&tbs=&as_filetype=&as_rights='
 			)->getBody()->getContents();
-		} catch (ServerException $s) {
+		} catch (ClientException $e) {
+			echo $e->getRequest();
+			echo $e->getResponse();
+		} catch (ServerException $se) {
+			echo $se->getRequest();
+			echo $se->getResponse();
 		}
 
 		// Make sure we got some data.
@@ -1355,7 +1375,12 @@ class Movie
 				) .
 				'&qs=n&form=QBLH&filt=all'
 			)->getBody()->getContents();
-		} catch (ServerException $s) {
+		} catch (ClientException $e) {
+			echo $e->getRequest();
+			echo $e->getResponse();
+		} catch (ServerException $se) {
+			echo $se->getRequest();
+			echo $se->getResponse();
 		}
 
 		if (isset($buffer) && $buffer !== false) {
@@ -1401,6 +1426,11 @@ class Movie
 				urlencode('www.imdb.com/title/')
 			)->getBody()->getContents();
 		} catch (ClientException $e) {
+			echo $e->getRequest();
+			echo $e->getResponse();
+		} catch (ServerException $se) {
+			echo $se->getRequest();
+			echo $se->getResponse();
 		}
 
 		if (isset($buffer) && $buffer !== false) {

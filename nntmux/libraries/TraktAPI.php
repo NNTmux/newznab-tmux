@@ -3,7 +3,7 @@ namespace nntmux\libraries;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use nntmux\utility\Utility;
+use GuzzleHttp\Exception\ServerException;
 
 /**
  * Class TraktAPI
@@ -160,7 +160,11 @@ Class TraktAPI {
 					]
 				)->getBody()->getContents();
 			} catch (ClientException $e) {
-				echo "Error retrieving data from TraktTV";
+				echo $e->getRequest();
+				echo $e->getResponse();
+			} catch (ServerException $se) {
+				echo $se->getRequest();
+				echo $se->getResponse();
 			}
 
 			if (isset($json) && $json !== false) {
