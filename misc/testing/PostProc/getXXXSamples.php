@@ -38,6 +38,7 @@ if (isset($argv[1]) && ($argv[1] === "true" || $argv[1] === "check")) {
 						$pdo->queryExec(sprintf('UPDATE releases SET jpgstatus = 1 WHERE id = %d', $row['id']));
 					} else {
 						echo $pdo->log->notice("Sample download failed!");
+						$pdo->queryExec(sprintf('UPDATE releases SET jpgstatus = -2 WHERE id = %d', $row['id']));
 					}
 				}
 			}
