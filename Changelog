@@ -1,3 +1,5 @@
+2016-12-12 DariusIII
+	* Chg: Use guzzlehttp for RequestIDWeb lookups
 2016-12-09 DariusIII
 	* Chg: Use guzzlehhtp in Movies and NZBGet
 	* Chg: Use guzzlehttp/guzzle in TraktTV processing
