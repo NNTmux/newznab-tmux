@@ -98,12 +98,12 @@ class ReleaseImage
 			try {
 				$img = $this->client->get($imgLoc)->getBody()->getContents();
 			} catch (ClientException $e) {
-				if(NN_DEBUG) {
+				if(NN_DEBUG && !empty($e)) {
 					echo Psr7\str($e->getRequest());
 					echo Psr7\str($e->getResponse());
 				}
 			} catch (ServerException $se) {
-				if (NN_DEBUG) {
+				if (NN_DEBUG && !empty($se)) {
 					echo Psr7\str($se->getRequest());
 					echo Psr7\str($se->getResponse());
 				}
