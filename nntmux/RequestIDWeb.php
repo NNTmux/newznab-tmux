@@ -2,7 +2,9 @@
 namespace nntmux;
 
 use app\models\Settings;
-use nntmux\utility\Utility;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Psr7;
 
 /**
  * Attempts to find a PRE name for a release using a request id from our local pre database,
@@ -152,17 +154,30 @@ class RequestIDWeb extends RequestID
 		$requestArray[0] = ['ident' => 0, 'group' => 'none', 'reqid' => 0];
 
 		// Do a web lookup.
-		$returnXml = Utility::getUrl([
-				'url' => Settings::value('..request_url'),
-				'method' => 'post',
-				'postdata' => 'data=' . serialize($requestArray),
-				'verifycert' => false,
-			]
-		);
+		try {
+			$request = $this->client->request('POST', Settings::value('..request_url'),
+				[
+					'headers' => [
+						'data' => '=' . serialize($requestArray)
+					]
+				]
+			);
+			$returnXml = $request->xml();
+		} catch (ClientException $e) {
+			if(NN_DEBUG && !empty($e)) {
+				echo Psr7\str($e->getRequest());
+				echo Psr7\str($e->getResponse());
+			}
+		} catch (ServerException $se) {
+			if (NN_DEBUG && !empty($se)) {
+				echo Psr7\str($se->getRequest());
+				echo Psr7\str($se->getResponse());
+			}
+		}
 
 		$renamed = 0;
 		// Change the release titles and insert the PRE's if they don't exist.
-		if ($returnXml !== false) {
+		if (isset($returnXml) && $returnXml !== false) {
 			$returnXml = @simplexml_load_string($returnXml);
 			if ($returnXml !== false) {
 

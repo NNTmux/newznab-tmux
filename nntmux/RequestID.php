@@ -1,6 +1,7 @@
 <?php
 namespace nntmux;
 
+use GuzzleHttp\Client;
 use nntmux\db\DB;
 
 /**
@@ -25,6 +26,11 @@ abstract class RequestID
 	public $groups;
 
 	/**
+	 * @var Client
+	 */
+	public $client;
+
+	/**
 	 * @param array $options Class instances / Echo to cli?
 	 */
 	public function __construct(array $options = [])
@@ -45,6 +51,7 @@ abstract class RequestID
 		$this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
 		$this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools(['ColorCLI' => $this->pdo->log]));
 		$this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
+		$this->client = new Client();
 	}
 
 	/**

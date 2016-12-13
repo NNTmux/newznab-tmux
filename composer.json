@@ -92,6 +92,7 @@
     "fxp/composer-asset-plugin": "~1.1",
     "giantbomb/giantbomb": "@dev",
     "google/recaptcha": "~1.1",
+    "guzzlehttp/guzzle":"dev-master",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
     "kbjr/Git.php": "dev-master",

@@ -1,7 +1,10 @@
 <?php
 namespace nntmux\libraries;
 
-use nntmux\utility\Utility;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Psr7;
 
 /**
  * Class TraktAPI
@@ -25,6 +28,11 @@ Class TraktAPI {
 	private $requestHeaders;
 
 	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
 	 * Construct. Assign passed request headers.  Headers should be complete with API key.
 	 *
 	 * @access public
@@ -39,6 +47,8 @@ Class TraktAPI {
 		} else {
 			$this->requestHeaders = $headers;
 		}
+
+		$this->client = new Client();
 	}
 
 	/**
@@ -143,13 +153,26 @@ Class TraktAPI {
 
 		if (!empty($this->requestHeaders)) {
 
-			$json = Utility::getUrl([
-							'url'            => $URI . $extendedString,
-							'requestheaders' => $this->requestHeaders
+			try {
+				$json = $this->client->get(
+					$URI . $extendedString,
+					[
+						'headers' => $this->requestHeaders
 					]
-			);
+				)->getBody()->getContents();
+			} catch (ClientException $e) {
+				if(NN_DEBUG) {
+					echo Psr7\str($e->getRequest());
+					echo Psr7\str($e->getResponse());
+				}
+			} catch (ServerException $se) {
+				if (NN_DEBUG) {
+					echo Psr7\str($se->getRequest());
+					echo Psr7\str($se->getResponse());
+				}
+			}
 
-			if ($json !== false) {
+			if (isset($json) && $json !== false) {
 				$json = json_decode($json, true);
 				if (!is_array($json) || (isset($json['status']) && $json['status'] === 'failure')) {
 					return false;

@@ -1,8 +1,11 @@
 <?php
 namespace nntmux;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Psr7;
 use nntmux\db\DB;
-use nntmux\utility\Utility;
 
 /**
  * Resize/save/delete images to disk.
@@ -47,6 +50,11 @@ class ReleaseImage
 	public $vidSavePath;
 
 	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
 	 * Construct.
 	 *
 	 * @param \DB()
@@ -57,6 +65,7 @@ class ReleaseImage
 		if ($pdo === null) {
 			$pdo = new DB();
 		}
+		$this->client = new Client();
 		//                                                            Table    |  Column
 		$this->audSavePath = NN_COVERS . 'audiosample' . DS; // releases    guid
 		$this->imgSavePath = NN_COVERS . 'preview' . DS; // releases    guid
@@ -86,7 +95,20 @@ class ReleaseImage
 	{
 		$img = false;
 		if (strpos(strtolower($imgLoc), 'http:') === 0 || strpos(strtolower($imgLoc), 'https:') === 0) {
-			$img = Utility::getUrl(['url' => $imgLoc]);
+			try {
+				$img = $this->client->get($imgLoc)->getBody()->getContents();
+			} catch (ClientException $e) {
+				if(NN_DEBUG && !empty($e)) {
+					echo Psr7\str($e->getRequest());
+					echo Psr7\str($e->getResponse());
+				}
+			} catch (ServerException $se) {
+				if (NN_DEBUG && !empty($se)) {
+					echo Psr7\str($se->getRequest());
+					echo Psr7\str($se->getResponse());
+				}
+			}
+
 		} else if (is_file($imgLoc)) {
 			$img = @file_get_contents($imgLoc);
 		}

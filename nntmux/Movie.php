@@ -2,11 +2,14 @@
 namespace nntmux;
 
 use app\models\Settings;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 use nntmux\processing\tv\TMDB;
 use nntmux\processing\tv\TraktTv;
-
+use GuzzleHttp\Psr7;
 /**
  * Class Movie
  */
@@ -98,6 +101,11 @@ class Movie
 	protected $tmdb;
 
 	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
 	 * Language to fetch from IMDB.
 	 * @var string
 	 */
@@ -154,6 +162,7 @@ class Movie
 
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
+		$this->client = new Client();
 
 		$this->lookuplanguage = (Settings::value('indexer.categorise.imdblanguage') != '') ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
 
@@ -776,8 +785,21 @@ class Movie
 	{
 		if ($this->fanartapikey != '')
 		{
-			$buffer = Utility::getUrl(['url' => 'https://webservice.fanart.tv/v3/movies/' . 'tt' . $imdbId . '?api_key=' . $this->fanartapikey , 'verifycert' => false]);
-			if ($buffer !== false) {
+			try {
+				$buffer = $this->client->get('https://webservice.fanart.tv/v3/movies/' . 'tt' . $imdbId . '?api_key=' . $this->fanartapikey)->getBody()->getContents();
+			} catch (ClientException $e) {
+				if(NN_DEBUG && !empty($e)) {
+					echo Psr7\str($e->getRequest());
+					echo Psr7\str($e->getResponse());
+				}
+			} catch (ServerException $se) {
+				if (NN_DEBUG && !empty($se)) {
+					echo Psr7\str($se->getRequest());
+					echo Psr7\str($se->getResponse());
+				}
+			}
+
+			if (isset($buffer) && $buffer !== false) {
 				$art = json_decode($buffer, true);
 				if (isset($art['status']) && $art['status'] === 'error') {
 					return false;
@@ -920,16 +942,30 @@ class Movie
 			'type' => '/<meta property=\'og\:type\' content=\"(.+)\" \/>/i'
 		];
 
-		$buffer =
-			Utility::getUrl([
-					'url' => 'http://' . ($this->imdburl === false ? 'www' : 'akas') . '.imdb.com/title/tt' . $imdbId . '/',
-					'Accept-Language' => ((Settings::value('indexer.categorise.imdblanguage') != '') ? Settings::value('indexer.categorise.imdblanguage') : 'en'),
-					'useragent' => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ' .
-						'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar'
-				]
-			);
+		try {
+			$buffer =
+				$this->client->get(
+					'http://' . ($this->imdburl === false ? 'www' : 'akas') . '.imdb.com/title/tt' . $imdbId . '/',
+					['headers' => [
+						'Accept-Language' => ((Settings::value('indexer.categorise.imdblanguage') != '') ? Settings::value('indexer.categorise.imdblanguage') : 'en'),
+						'useragent'       => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ' .
+							'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar'
+					]
+					]
+				)->getBody()->getContents();
+		} catch (ClientException $e) {
+			if(NN_DEBUG && !empty($e)) {
+				echo Psr7\str($e->getRequest());
+				echo Psr7\str($e->getResponse());
+			}
+		} catch (ServerException $se) {
+			if (NN_DEBUG && !empty($se)) {
+				echo Psr7\str($se->getRequest());
+				echo Psr7\str($se->getResponse());
+			}
+		}
 
-		if ($buffer !== false) {
+		if (isset($buffer) && $buffer !== false) {
 			$ret = [];
 			foreach ($imdb_regex as $field => $regex) {
 				if (preg_match($regex, $buffer, $matches)) {
@@ -1130,16 +1166,27 @@ class Movie
 					}
 
 					// Check OMDB api.
-					$buffer =
-						Utility::getUrl([
-								'url' => 'http://www.omdbapi.com/?t=' .
-									urlencode($this->currentTitle) .
-									($this->currentYear !== false ? ('&y=' . $this->currentYear) : '') .
-									'&r=json'
-							]
-						);
+					try {
+						$buffer =
+							$this->client->get(
+								'http://www.omdbapi.com/?t=' .
+								urlencode($this->currentTitle) .
+								($this->currentYear !== false ? ('&y=' . $this->currentYear) : '') .
+								'&r=json'
+							)->getBody()->getContents();
+					} catch (ClientException $e) {
+						if(NN_DEBUG && !empty($e)) {
+							echo Psr7\str($e->getRequest());
+							echo Psr7\str($e->getResponse());
+						}
+					} catch (ServerException $se) {
+						if (NN_DEBUG && !empty($se)) {
+							echo Psr7\str($se->getRequest());
+							echo Psr7\str($se->getResponse());
+						}
+					}
 
-					if ($buffer !== false) {
+					if (isset($buffer) && $buffer !== false) {
 						$getIMDBid = json_decode($buffer);
 
 						if (isset($getIMDBid->imdbid)) {
@@ -1287,22 +1334,32 @@ class Movie
 	 */
 	protected function googleSearch()
 	{
-		$buffer =Utility::getUrl([
-				'url' =>
-					'https://www.google.com/search?hl=en&as_q=&as_epq=' .
-					urlencode(
-						$this->currentTitle .
-						' ' .
-						$this->currentYear
-					) .
-					'&as_oq=&as_eq=&as_nlo=&as_nhi=&lr=&cr=&as_qdr=all&as_sitesearch=' .
-					urlencode('www.imdb.com/title/') .
-					'&as_occt=title&safe=images&tbs=&as_filetype=&as_rights='
-			]
-		);
+		try {
+			$buffer = $this->client->get(
+				'https://www.google.com/search?hl=en&as_q=&as_epq=' .
+				urlencode(
+					$this->currentTitle .
+					' ' .
+					$this->currentYear
+				) .
+				'&as_oq=&as_eq=&as_nlo=&as_nhi=&lr=&cr=&as_qdr=all&as_sitesearch=' .
+				urlencode('www.imdb.com/title/') .
+				'&as_occt=title&safe=images&tbs=&as_filetype=&as_rights='
+			)->getBody()->getContents();
+		} catch (ClientException $e) {
+			if(NN_DEBUG && !empty($e)) {
+				echo Psr7\str($e->getRequest());
+				echo Psr7\str($e->getResponse());
+			}
+		} catch (ServerException $se) {
+			if (NN_DEBUG && !empty($se)) {
+				echo Psr7\str($se->getRequest());
+				echo Psr7\str($se->getResponse());
+			}
+		}
 
 		// Make sure we got some data.
-		if ($buffer !== false) {
+		if (isset($buffer) && $buffer !== false) {
 			$this->googleLimit++;
 
 			if (preg_match('/(To continue, please type the characters below)|(- did not match any documents\.)/i', $buffer, $matches)) {
@@ -1323,21 +1380,31 @@ class Movie
 	 */
 	protected function bingSearch()
 	{
-		$buffer = Utility::getUrl([
-				'url' =>
-					"http://www.bing.com/search?q=" .
-					urlencode(
-						'("' .
-						$this->currentTitle .
-						'" and "' .
-						$this->currentYear .
-						'") site:www.imdb.com/title/'
-					) .
-					'&qs=n&form=QBLH&filt=all'
-			]
-		);
+		try {
+			$buffer = $this->client->get(
+				"http://www.bing.com/search?q=" .
+				urlencode(
+					'("' .
+					$this->currentTitle .
+					'" and "' .
+					$this->currentYear .
+					'") site:www.imdb.com/title/'
+				) .
+				'&qs=n&form=QBLH&filt=all'
+			)->getBody()->getContents();
+		} catch (ClientException $e) {
+			if(NN_DEBUG && !empty($e)) {
+				echo Psr7\str($e->getRequest());
+				echo Psr7\str($e->getResponse());
+			}
+		} catch (ServerException $se) {
+			if (NN_DEBUG && !empty($se)) {
+				echo Psr7\str($se->getRequest());
+				echo Psr7\str($se->getResponse());
+			}
+		}
 
-		if ($buffer !== false) {
+		if (isset($buffer) && $buffer !== false) {
 			$this->bingLimit++;
 
 			if ($this->doMovieUpdate($buffer, 'Bing.com', $this->currentRelID) !== false) {
@@ -1354,35 +1421,44 @@ class Movie
 	 */
 	protected function yahooSearch()
 	{
-		$buffer = Utility::getUrl(
-			[
-				'url' =>
-					"http://search.yahoo.com/search?n=10&ei=UTF-8&va_vt=title&vo_vt=any&ve_vt=any&vp_vt=any&vf=all&vm=p&fl=0&fr=fp-top&p=" .
-					urlencode(
-						'' .
-						implode('+',
-							explode(
+		try {
+			$buffer = $this->client->get(
+				"http://search.yahoo.com/search?n=10&ei=UTF-8&va_vt=title&vo_vt=any&ve_vt=any&vp_vt=any&vf=all&vm=p&fl=0&fr=fp-top&p=" .
+				urlencode(
+					'' .
+					implode('+',
+						explode(
+							' ',
+							preg_replace(
+								'/\s+/',
 								' ',
 								preg_replace(
-									'/\s+/',
+									'/\W/',
 									' ',
-									preg_replace(
-										'/\W/',
-										' ',
-										$this->currentTitle
-									)
+									$this->currentTitle
 								)
 							)
-						) .
-						'+' .
-						$this->currentYear
+						)
 					) .
-					'&vs=' .
-					urlencode('www.imdb.com/title/')
-			]
-		);
+					'+' .
+					$this->currentYear
+				) .
+				'&vs=' .
+				urlencode('www.imdb.com/title/')
+			)->getBody()->getContents();
+		} catch (ClientException $e) {
+			if(NN_DEBUG && !empty($e)) {
+				echo Psr7\str($e->getRequest());
+				echo Psr7\str($e->getResponse());
+			}
+		} catch (ServerException $se) {
+			if (NN_DEBUG && !empty($se)) {
+				echo Psr7\str($se->getRequest());
+				echo Psr7\str($se->getResponse());
+			}
+		}
 
-		if ($buffer !== false) {
+		if (isset($buffer) && $buffer !== false) {
 			$this->yahooLimit++;
 
 			if ($this->doMovieUpdate($buffer, 'Yahoo.com', $this->currentRelID) !== false) {
