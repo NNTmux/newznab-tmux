@@ -3,13 +3,11 @@ namespace nntmux;
 
 use app\models\Settings;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\RequestException;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 use nntmux\processing\tv\TMDB;
 use nntmux\processing\tv\TraktTv;
-use GuzzleHttp\Psr7;
 /**
  * Class Movie
  */
@@ -787,15 +785,9 @@ class Movie
 		{
 			try {
 				$buffer = $this->client->get('https://webservice.fanart.tv/v3/movies/' . 'tt' . $imdbId . '?api_key=' . $this->fanartapikey)->getBody()->getContents();
-			} catch (ClientException $e) {
-				if(NN_DEBUG && !empty($e)) {
-					echo Psr7\str($e->getRequest());
-					echo Psr7\str($e->getResponse());
-				}
-			} catch (ServerException $se) {
-				if (NN_DEBUG && !empty($se)) {
-					echo Psr7\str($se->getRequest());
-					echo Psr7\str($se->getResponse());
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
 				}
 			}
 
@@ -953,15 +945,9 @@ class Movie
 					]
 					]
 				)->getBody()->getContents();
-		} catch (ClientException $e) {
-			if(NN_DEBUG && !empty($e)) {
-				echo Psr7\str($e->getRequest());
-				echo Psr7\str($e->getResponse());
-			}
-		} catch (ServerException $se) {
-			if (NN_DEBUG && !empty($se)) {
-				echo Psr7\str($se->getRequest());
-				echo Psr7\str($se->getResponse());
+		} catch (RequestException $e) {
+			if ($e->hasResponse()) {
+				$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
 			}
 		}
 
@@ -1174,15 +1160,9 @@ class Movie
 								($this->currentYear !== false ? ('&y=' . $this->currentYear) : '') .
 								'&r=json'
 							)->getBody()->getContents();
-					} catch (ClientException $e) {
-						if(NN_DEBUG && !empty($e)) {
-							echo Psr7\str($e->getRequest());
-							echo Psr7\str($e->getResponse());
-						}
-					} catch (ServerException $se) {
-						if (NN_DEBUG && !empty($se)) {
-							echo Psr7\str($se->getRequest());
-							echo Psr7\str($se->getResponse());
+					} catch (RequestException $e) {
+						if ($e->hasResponse()) {
+							$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
 						}
 					}
 
@@ -1346,15 +1326,9 @@ class Movie
 				urlencode('www.imdb.com/title/') .
 				'&as_occt=title&safe=images&tbs=&as_filetype=&as_rights='
 			)->getBody()->getContents();
-		} catch (ClientException $e) {
-			if(NN_DEBUG && !empty($e)) {
-				echo Psr7\str($e->getRequest());
-				echo Psr7\str($e->getResponse());
-			}
-		} catch (ServerException $se) {
-			if (NN_DEBUG && !empty($se)) {
-				echo Psr7\str($se->getRequest());
-				echo Psr7\str($se->getResponse());
+		} catch (RequestException $e) {
+			if ($e->hasResponse()) {
+				$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
 			}
 		}
 
@@ -1392,15 +1366,9 @@ class Movie
 				) .
 				'&qs=n&form=QBLH&filt=all'
 			)->getBody()->getContents();
-		} catch (ClientException $e) {
-			if(NN_DEBUG && !empty($e)) {
-				echo Psr7\str($e->getRequest());
-				echo Psr7\str($e->getResponse());
-			}
-		} catch (ServerException $se) {
-			if (NN_DEBUG && !empty($se)) {
-				echo Psr7\str($se->getRequest());
-				echo Psr7\str($se->getResponse());
+		} catch (RequestException $e) {
+			if ($e->hasResponse()) {
+				$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
 			}
 		}
 
@@ -1446,15 +1414,9 @@ class Movie
 				'&vs=' .
 				urlencode('www.imdb.com/title/')
 			)->getBody()->getContents();
-		} catch (ClientException $e) {
-			if(NN_DEBUG && !empty($e)) {
-				echo Psr7\str($e->getRequest());
-				echo Psr7\str($e->getResponse());
-			}
-		} catch (ServerException $se) {
-			if (NN_DEBUG && !empty($se)) {
-				echo Psr7\str($se->getRequest());
-				echo Psr7\str($se->getResponse());
+		} catch (RequestException $e) {
+			if ($e->hasResponse()) {
+				$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
 			}
 		}
 
