@@ -2,9 +2,7 @@
 namespace nntmux;
 
 use app\models\Settings;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\Psr7;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Attempts to find a PRE name for a release using a request id from our local pre database,
@@ -155,23 +153,13 @@ class RequestIDWeb extends RequestID
 
 		// Do a web lookup.
 		try {
-			$request = $this->client->request('POST', Settings::value('..request_url'),
-				[
-					'headers' => [
-						'data' => '=' . serialize($requestArray)
-					]
-				]
-			);
-			$returnXml = $request->xml();
-		} catch (ClientException $e) {
-			if(NN_DEBUG && !empty($e)) {
-				echo Psr7\str($e->getRequest());
-				echo Psr7\str($e->getResponse());
-			}
-		} catch (ServerException $se) {
-			if (NN_DEBUG && !empty($se)) {
-				echo Psr7\str($se->getRequest());
-				echo Psr7\str($se->getResponse());
+			$returnXml = $this->client->request('POST', Settings::value('..request_url'),
+				['Link' => 'data=' . serialize($requestArray)]
+			)->getBody();
+
+		} catch (RequestException $e) {
+			if ($e->hasResponse()) {
+				$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
 			}
 		}
 
