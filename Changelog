@@ -1,3 +1,5 @@
+2016-12-13 DariusIII
+	* Chg: Update CouchPotato and SABNzbd to use guzzlehttp
 2016-12-12 DariusIII
 	* Chg: Use guzzlehttp for RequestIDWeb lookups
 2016-12-09 DariusIII
