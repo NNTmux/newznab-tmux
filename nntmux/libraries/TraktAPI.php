@@ -2,10 +2,7 @@
 namespace nntmux\libraries;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\Psr7;
 use nntmux\db\DB;
 
 /**
