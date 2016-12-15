@@ -1363,12 +1363,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "471026d23a14f6eadd0147eb5697f48ebe6adec8"
+                "reference": "dfadff37efcfd42230eef1350009898b7b9af40a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/471026d23a14f6eadd0147eb5697f48ebe6adec8",
-                "reference": "471026d23a14f6eadd0147eb5697f48ebe6adec8",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/dfadff37efcfd42230eef1350009898b7b9af40a",
+                "reference": "dfadff37efcfd42230eef1350009898b7b9af40a",
                 "shasum": ""
             },
             "require": {
@@ -1417,7 +1417,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2016-11-15 18:22:40"
+            "time": "2016-12-15 09:53:31"
         },
         {
             "name": "guzzlehttp/promises",
@@ -1530,16 +1530,16 @@
         },
         {
             "name": "james-heinrich/getid3",
-            "version": "v1.9.12",
+            "version": "v1.9.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JamesHeinrich/getID3.git",
-                "reference": "41c05612d532d30f07680cad3a4a6efbec7fc7f5"
+                "reference": "b9a8564e56bdcc294dc7ade32a7f67885bed3778"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JamesHeinrich/getID3/zipball/41c05612d532d30f07680cad3a4a6efbec7fc7f5",
-                "reference": "41c05612d532d30f07680cad3a4a6efbec7fc7f5",
+                "url": "https://api.github.com/repos/JamesHeinrich/getID3/zipball/b9a8564e56bdcc294dc7ade32a7f67885bed3778",
+                "reference": "b9a8564e56bdcc294dc7ade32a7f67885bed3778",
                 "shasum": ""
             },
             "require": {
@@ -1548,7 +1548,7 @@
             "type": "library",
             "autoload": {
                 "classmap": [
-                    "getid3/getid3.php"
+                    "getid3/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1562,7 +1562,7 @@
                 "php",
                 "tags"
             ],
-            "time": "2016-03-02 13:13:30"
+            "time": "2016-12-14 14:29:29"
         },
         {
             "name": "joshpinkney/tv-maze-php-api",
@@ -1775,16 +1775,16 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.30",
+            "version": "v3.1.31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarty-php/smarty.git",
-                "reference": "ed2b7f1146cfda13df1eea8a5f707a1b771b6e7e"
+                "reference": "c7d42e4a327c402897dd587871434888fde1e7a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/ed2b7f1146cfda13df1eea8a5f707a1b771b6e7e",
-                "reference": "ed2b7f1146cfda13df1eea8a5f707a1b771b6e7e",
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/c7d42e4a327c402897dd587871434888fde1e7a9",
+                "reference": "c7d42e4a327c402897dd587871434888fde1e7a9",
                 "shasum": ""
             },
             "require": {
@@ -1797,10 +1797,8 @@
                 }
             },
             "autoload": {
-                "classmap": [
-                    "libs/Smarty.class.php",
-                    "libs/SmartyBC.class.php",
-                    "libs/sysplugins/"
+                "files": [
+                    "libs/bootstrap.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1826,7 +1824,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2016-08-07 18:46:49"
+            "time": "2016-12-14 21:57:25"
         },
         {
             "name": "unionofrad/lithium",
