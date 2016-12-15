@@ -1,3 +1,5 @@
+2016-12-15 DariusIII
+	* Chg: Disable Desura game lookups as desura site is not serving any information for now
 2016-12-13 DariusIII
 	* Chg: Update CouchPotato and SABNzbd to use guzzlehttp
 2016-12-12 DariusIII
