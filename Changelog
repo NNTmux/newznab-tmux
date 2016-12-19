@@ -1,4 +1,5 @@
 2016-12-19 DariusIII
+	* Chg: Change checks for minfiles and minsize values in ProcessReleases class
 	* Chg: Improve the folder matching regex
 2016-12-16 DariusIII
 	* Chg: Improve renaming of releases

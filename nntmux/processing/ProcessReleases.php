@@ -421,10 +421,10 @@ class ProcessReleases
 
 			$groupMinimums = $this->groups->getByID($groupID['id']);
 			if ($groupMinimums !== false) {
-				if (is_numeric($groupMinimums['minsizetoformrelease']) && $groupMinimums['minsizetoformrelease'] > 0) {
+				if (!empty($groupMinimums['minsizetoformrelease']) && $groupMinimums['minsizetoformrelease'] > 0) {
 					$groupMinSizeSetting = (int)$groupMinimums['minsizetoformrelease'];
 				}
-				if (is_numeric($groupMinimums['minfilestoformrelease']) && $groupMinimums['minfilestoformrelease'] > 0) {
+				if (!empty($groupMinimums['minfilestoformrelease']) && $groupMinimums['minfilestoformrelease'] > 0) {
 					$groupMinFilesSetting = (int)$groupMinimums['minfilestoformrelease'];
 				}
 			}
