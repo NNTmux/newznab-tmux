@@ -1,6 +1,7 @@
 <?php
 namespace nntmux\processing\tv;
 
+use GuzzleHttp\Client;
 use nntmux\utility\Utility;
 use nntmux\utility\Country;
 use nntmux\ReleaseImage;
@@ -65,6 +66,11 @@ class TvRage extends TV
 	private $rageId;
 
 	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
 	 * @param array $options Class instances / Echo to cli?
 	 */
 	public function __construct(array $options = [])
@@ -72,6 +78,7 @@ class TvRage extends TV
 		parent::__construct($options);
 		$this->xmlEpisodeInfoUrl    =  "http://services.tvrage.com/myfeeds/episodeinfo.php?key=" . TvRage::APIKEY;
 		$this->imgSavePath = NN_COVERS . 'tvrage' . DS;
+		$this->client = new Client();
 	}
 
 	/**
@@ -257,7 +264,7 @@ class TvRage extends TV
 
 		$series = str_ireplace("s", "", $series);
 		$episode = str_ireplace("e", "", $episode);
-		$xml = Utility::getUrl(['url' => $this->xmlEpisodeInfoUrl . "&sid=" . $rageid . "&ep=" . $series . "x" . $episode]);
+		$xml = $this->client->get($this->xmlEpisodeInfoUrl . "&sid=" . $rageid . "&ep=" . $series . "x" . $episode)->getBody()->getContents();
 		if ($xml !== false) {
 			if (stripos($xml, 'no show found') === false) {
 				$xmlObj = @simplexml_load_string($xml);
@@ -288,7 +295,7 @@ class TvRage extends TV
 	{
 		$result = false;
 		// Standard show info search as AKAs not needed.
-		$xml = Utility::getUrl(['url' => $this->xmlShowInfoUrl . $rageid]);
+		$xml = $this->client->get($this->xmlShowInfoUrl . $rageid)->getBody()->getContents();
 		if ($xml !== false) {
 			$arrXml = Utility::objectsIntoArray(simplexml_load_string($xml));
 			if (is_array($arrXml)) {
@@ -312,7 +319,7 @@ class TvRage extends TV
 	public function getRageInfoFromPage($rageid)
 	{
 		$result = ['desc' => '', 'imgurl' => ''];
-		$page = Utility::getUrl(['url' => $this->showInfoUrl . $rageid]);
+		$page = $this->client->get($this->showInfoUrl . $rageid)->getBody()->getContents();
 		$matches = '';
 		if ($page !== false) {
 			// Description.
@@ -352,7 +359,7 @@ class TvRage extends TV
 		$matchedTitle = -1;
 		$title = $showInfo['cleanname'];
 		// Full search gives us the akas.
-		$xml = Utility::getUrl(['url' => $this->xmlFullSearchUrl . urlencode(strtolower($title))]);
+		$xml = $this->client->get($this->xmlFullSearchUrl . urlencode(strtolower($title)))->getBody()->getContents();
 		if ($xml !== false) {
 			$arrXml = @Utility::objectsIntoArray(simplexml_load_string($xml));
 
