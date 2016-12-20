@@ -159,7 +159,13 @@ class RequestIDWeb extends RequestID
 
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
-				$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
+				if($e->getCode() === 404) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+				} else if ($e->getCode() === 503) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+				} else {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+				}
 			}
 		}
 

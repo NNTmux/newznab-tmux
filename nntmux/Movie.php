@@ -787,7 +787,13 @@ class Movie
 				$buffer = $this->client->get('https://webservice.fanart.tv/v3/movies/' . 'tt' . $imdbId . '?api_key=' . $this->fanartapikey)->getBody()->getContents();
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
-					$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					}
 				}
 			}
 
@@ -947,7 +953,13 @@ class Movie
 				)->getBody()->getContents();
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
-				$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
+				if($e->getCode() === 404) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+				} else if ($e->getCode() === 503) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+				} else {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+				}
 			}
 		}
 
@@ -1162,7 +1174,13 @@ class Movie
 							)->getBody()->getContents();
 					} catch (RequestException $e) {
 						if ($e->hasResponse()) {
-							$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
+							if($e->getCode() === 404) {
+								$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+							} else if ($e->getCode() === 503) {
+								$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+							} else {
+								$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+							}
 						}
 					}
 
@@ -1328,7 +1346,13 @@ class Movie
 			)->getBody()->getContents();
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
-				$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
+				if($e->getCode() === 404) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+				} else if ($e->getCode() === 503) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+				} else {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+				}
 			}
 		}
 
@@ -1368,7 +1392,13 @@ class Movie
 			)->getBody()->getContents();
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
-				$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
+				if($e->getCode() === 404) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+				} else if ($e->getCode() === 503) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+				} else {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+				}
 			}
 		}
 
@@ -1416,7 +1446,13 @@ class Movie
 			)->getBody()->getContents();
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
-				$this->pdo->log->doEcho($this->pdo->log->error('Unable to fetch data, http error code: ' . $e->getCode()));
+				if($e->getCode() === 404) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+				} else if ($e->getCode() === 503) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+				} else {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+				}
 			}
 		}
 
