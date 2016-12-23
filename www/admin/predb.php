@@ -2,7 +2,7 @@
 
 use nntmux\PreDb;
 
-
+$page = new AdminPage();
 $predb = new PreDb();
 
 $offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST["offset"] : 0;
