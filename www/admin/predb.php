@@ -1,5 +1,5 @@
 <?php
-
+require_once './config.php';
 use nntmux\PreDb;
 
 $page = new AdminPage();
