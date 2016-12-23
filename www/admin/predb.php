@@ -1,5 +1,6 @@
 <?php
 require_once './config.php';
+
 use nntmux\PreDb;
 
 $page = new AdminPage();
@@ -18,14 +19,13 @@ if (isset($_REQUEST['presearch'])) {
 $page->smarty->assign('pagertotalitems', $parr['count']);
 $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
-$page->smarty->assign('pagerquerybase', WWW_TOP . "/predb/&amp;offset=");
+$page->smarty->assign('pagerquerybase', WWW_TOP . "/predb.php?offset=");
 $page->smarty->assign('pagerquerysuffix', "#results");
 $page->smarty->assign('lastSearch', $lastSearch);
 
-$pager = $page->smarty->fetch("pager.tpl");
-$page->smarty->assign('pager', $pager);
-
+$page->smarty->assign('pager', $page->smarty->fetch("pager.tpl"));
 $page->smarty->assign('results', $parr['arr']);
+
 
 $page->title = "Browse PreDb";
 $page->meta_title = "View PreDb info";

@@ -1,6 +1,7 @@
 <?php
 require_once NN_ROOT . 'app' . DS . 'config' . DS . 'bootstrap' . DS . 'libraries.php';
 
+use nntmux\Category;
 use nntmux\Users;
 
 /**
@@ -26,6 +27,9 @@ class AdminPage extends BasePage
 
 		if (!$this->users->isLoggedIn() || !isset($this->userdata["role"]) || $this->userdata["role"] != Users::ROLE_ADMIN)
 			$this->show403(true);
+
+		$category = new Category();
+		$this->smarty->assign('catClass', $category);
 
 	}
 

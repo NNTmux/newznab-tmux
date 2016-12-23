@@ -102,7 +102,7 @@
 			</li>
 			<li><a><i class="fa fa-object-group"></i><span> Pre Database</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
-					<li><a href="{$smarty.const.WWW_TOP}/predb.php">View Predb</a>
+					<li><a href="{$smarty.const.WWW_TOP}/predb.php">View Predb</a></li>
 				</ul>
 			</li>
 		</ul>
