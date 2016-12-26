@@ -1,0 +1,100 @@
+language: php
+sudo: required
+dist: trusty
+group: edge
+
+branches:
+  only:
+    - 0.x
+    - Latest-testing
+    - dev
+
+notifications:
+  irc:
+    channels:
+      - "irc.synirc.net#TmuxAnnounce"
+    on_success: always
+    on_failure: always
+    use_notice: true
+    skip_join: true
+    template:
+      - "\x030[\x0310Travis-ci\x030]\x03 Commit \x0314{%{commit}}\x03 by \x0315(%{author})\x03@\x0313%{repository_name}/%{branch}\x03 has \x037%{result}\x03: \x032%{build_url}\x03"
+
+php:
+  - '5.6'
+  - '7.0'
+
+addons:
+  mariadb: '10.0'
+  apt:
+    packages:
+    - apache2
+    - libapache2-mod-fastcgi
+    - curl
+
+  before_install:
+    - composer validate
+
+  install:
+    - yes '' | pecl install imagick
+    # Install composer packages.
+    - composer install --prefer-dist
+
+  before_script:
+    - curl -O https://raw.githubusercontent.com/NNTmux/travis-ci/master/cat_logs.sh
+    # Create mysql user.
+    - mysql -u root -e "GRANT ALL ON nntmux.* TO 'nntmux'@'localhost' IDENTIFIED BY 'nntmux';"
+    - mysql -u root -e "GRANT FILE ON *.* TO 'nntmux'@'localhost';"
+    # Disable apparmor.
+    - if service apparmor status; then service apparmor stop; update-rc.d -f apparmor remove; service apparmor teardown; fi
+    # Change MySQL settings.
+    - if [[ -f /etc/mysql/my.cnf ]]; then sudo sed -i "s/\[mysqld\]/\[mysqld\]\ngroup_concat_max_len = 8192/" /etc/mysql/my.cnf; fi
+    # Change PHP settings.
+    - echo 'max_execution_time = 120' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+    - echo 'memory_limit = 1024M' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+    # Enable php-fpm
+    - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
+    # Required for PHP 7
+    - if [[ -f ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf.default ]]; then sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf; fi
+    - sudo a2enmod rewrite actions fastcgi alias
+    - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
+    # Configure apache virtual hosts
+    - sudo a2dissite 000-default
+    - curl -O https://raw.githubusercontent.com/NNTmux/travis-ci/master/apache.conf
+    - sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place apache.conf
+    - sudo mv apache.conf /etc/apache2/sites-available/default.conf
+    - sudo a2ensite default.conf
+    - sudo sed -i "s/AllowOverride None/AllowOverride All/g" /etc/apache2/apache2.conf
+    - sudo sed -i "s/Require all denied/Require all granted/g" /etc/apache2/apache2.conf
+    - sudo service apache2 restart
+    # Set permissions, can't use newgrp with travis so we need to do it this way.
+    - sudo chmod -R 777 /home/travis/
+    # Download/configure NNTmux installer test script.
+    - curl -O https://raw.githubusercontent.com/NNTmux/travis-ci/master/test_nntmux_installer.sh
+    - sed -i 's/DBUSER=".*"/DBUSER="nntmux"/' test_nntmux_installer.sh
+    - sed -i 's/DBPASS=".*"/DBPASS="nntmux"/' test_nntmux_installer.sh
+    - sed -i 's/DBSOCKET=".*"/DBSOCKET=""/' test_nntmux_installer.sh
+    - sed -i "s?NNTMUXPATH=\".*\"?NNTMUXPATH=\"$(pwd)\"?" test_nntmux_installer.sh
+    - sed -i 's/HOST=".*"/HOST="127.0.0.1"/' test_nntmux_installer.sh
+    # Configure NNTmux settings.
+    - cp nntmux/config/settings.example.php nntmux/config/settings.php
+    - sed -i "s/'NN_DEBUG', false/'NN_DEBUG', true/" nntmux/config/settings.php
+    - sed -i "s/'NN_LOGGING', false/'NN_LOGGING', true/" nntmux/config/settings.php
+    - sed -i "s/'NN_LOGINFO', false/'NN_LOGINFO', true/" nntmux/config/settings.php
+    - sed -i "s/'NN_LOGNOTICE', false/'NN_LOGNOTICE', true/" nntmux/config/settings.php
+    - sed -i "s/'NN_LOGWARNING', false/'NN_LOGWARNING', true/" nntmux/config/settings.php
+    - sed -i "s/'NN_LOGERROR', false/'NN_LOGERROR', true/" nntmux/config/settings.php
+    - sed -i "s/'NN_LOGFATAL', false/'NN_LOGFATAL', true/" nntmux/config/settings.php
+    - sed -i "s/'NN_LOGQUERIES', false/'NN_LOGQUERIES', true/" nntmux/config/settings.php
+
+  script:
+    # Run NNTmux installer test script.
+    - bash test_nntmux_installer.sh
+
+  # Get contents of logs regardless of success / failure, this will help us fix potential minor issues.
+  after_success:
+    - bash cat_logs.sh
+  after_failure:
+    - bash cat_logs.sh
+
