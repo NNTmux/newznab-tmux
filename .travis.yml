@@ -1,0 +1,41 @@
+language: php
+sudo: required
+dist: trusty
+group: edge
+
+branches:
+  only:
+    - 0.x
+    - Latest-testing
+    - dev
+
+notifications:
+  irc:
+    channels:
+      - "irc.synirc.net#TmuxAnnounce"
+    on_success: always
+    on_failure: always
+    use_notice: true
+    skip_join: true
+    template:
+      - "\x030[\x0310Travis-ci\x030]\x03 Commit \x0314{%{commit}}\x03 by \x0315(%{author})\x03@\x0313%{repository_name}/%{branch}\x03 has \x037%{result}\x03: \x032%{build_url}\x03"
+
+php:
+  - '5.6'
+  - '7.0'
+
+addons:
+  mariadb: '10.0'
+  apt:
+    packages:
+    - apache2
+    - libapache2-mod-fastcgi
+    - curl
+
+before_install:
+  - composer validate
+
+install:
+  - yes '' | pecl install imagick
+  # Install composer packages.
+  - composer install --prefer-dist
