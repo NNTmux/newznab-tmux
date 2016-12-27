@@ -1,3 +1,8 @@
+2016-12-27 DariusIII
+	* Chg: Update composer.lock
+	* Chg: Add Travis-CI build status to README.md
+2016-12-23 DariusIII
+	* Chg: Move predb to admin from frontend
 2016-12-20 DariusIII
 	* Chg: Make guzzlehttp http error messages more informative
 	* Fix: Fix the broken delete_release stored procedure

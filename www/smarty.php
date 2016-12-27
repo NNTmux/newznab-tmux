@@ -52,7 +52,7 @@ if (strlen($www_top) == 1) {
 	$www_top = "";
 }
 
-// Used everywhere an href is output, includes the full path to the NN install.
+// Used everywhere an href is output, includes the full path to the NNTmux install.
 define('WWW_TOP', $www_top);
 define('WWW_THEMES', '/themes');
 
