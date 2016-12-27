@@ -1,3 +1,5 @@
+2016-12-27 DariusIII
+	* Chg: Add Travis-CI build status to README.md
 2016-12-23 DariusIII
 	* Chg: Move predb to admin from frontend
 2016-12-20 DariusIII

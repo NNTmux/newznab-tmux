@@ -1,4 +1,5 @@
 [![Code Climate](https://codeclimate.com/github/NNTmux/newznab-tmux/badges/gpa.svg)](https://codeclimate.com/github/NNTmux/newznab-tmux)  [![Build Status](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/build.png?b=dev)](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/build-status/dev) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/quality-score.png?b=dev)](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/?branch=dev)
+[![Build Status](https://travis-ci.org/NNTmux/newznab-tmux.svg?branch=dev)](https://travis-ci.org/NNTmux/newznab-tmux)
 
 
 
