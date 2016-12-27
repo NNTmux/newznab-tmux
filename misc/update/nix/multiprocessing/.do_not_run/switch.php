@@ -158,7 +158,7 @@ switch ($options[1]) {
 				collectionCheck($pdo, $options[2]);
 			}
 
-			processReleases($pdo, $releases, $options[2]);
+			processReleases($releases, $options[2]);
 
 		} else {
 
@@ -276,11 +276,10 @@ switch ($options[1]) {
 /**
  * Create / process releases for a groupID.
  *
- * @param Settings        $pdo
  * @param ProcessReleases $releases
  * @param int             $groupID
  */
-function processReleases($pdo, $releases, $groupID)
+function processReleases($releases, $groupID)
 {
 	$releaseCreationLimit = (Settings::value('..maxnzbsprocessed') != '' ? (int)Settings::value('..maxnzbsprocessed') : 1000);
 	$releases->processIncompleteCollections($groupID);

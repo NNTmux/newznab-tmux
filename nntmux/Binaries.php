@@ -520,6 +520,8 @@ class Binaries
 		// Check if MySQL tables exist, create if they do not, get their names at the same time.
 		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupMySQL['id']);
 
+		$multiGroup = false;
+
 		$returnArray = [];
 
 		$partRepair = ($type === 'partrepair');
@@ -619,6 +621,8 @@ class Binaries
 		// Loop articles, figure out files/parts.
 		foreach ($headers as $header) {
 
+			ReleasesMultiGroup::isMultiGroup($header['From']) ? $multiGroup = true : $multiGroup = false;
+
 			// Check if we got the article or not.
 			if (isset($header['Number'])) {
 				$headersReceived[] = $header['Number'];
@@ -700,12 +704,20 @@ class Binaries
 				}
 
 				// Used to group articles together when forming the release/nzb.
-				$header['CollectionKey'] = (
-					$this->_collectionsCleaning->collectionsCleaner($matches[1], $groupMySQL['name']) .
-					$header['From'] .
-					$groupMySQL['id'] .
-					$fileCount[3]
-				);
+				if ($multiGroup === true) {
+					$header['CollectionKey'] = (
+						$this->_collectionsCleaning->collectionsCleaner($matches[1], '') .
+						$header['From'] .
+						$fileCount[3]
+					);
+				} else {
+					$header['CollectionKey'] = (
+						$this->_collectionsCleaning->collectionsCleaner($matches[1], $groupMySQL['name']) .
+						$header['From'] .
+						$groupMySQL['id'] .
+						$fileCount[3]
+					);
+				}
 
 
 				if (!isset($collectionIDs[$header['CollectionKey']])) {
@@ -725,12 +737,12 @@ class Binaries
 								totalfiles, collectionhash, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', NOW())
 							ON DUPLICATE KEY UPDATE dateadded = NOW(), noise = '%s'",
-							$tableNames['cname'],
+							($multiGroup === true ? $tableNames['mgrcname'] : $tableNames['cname']),
 							$this->_pdo->escapeString(substr(utf8_encode($matches[1]), 0, 255)),
 							$this->_pdo->escapeString(utf8_encode($header['From'])),
 							(is_numeric($header['Date']) ? ($header['Date'] > $now ? $now : $header['Date']) : $now),
 							$this->_pdo->escapeString(substr($header['Xref'], 0, 255)),
-							$groupMySQL['id'],
+							($multiGroup === true ? 0 : $groupMySQL['id']),
 							$fileCount[3],
 							sha1($header['CollectionKey']),
 							bin2hex(openssl_random_pseudo_bytes(16))
@@ -755,8 +767,8 @@ class Binaries
 						INSERT INTO %s (binaryhash, name, collection_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
-						$tableNames['bname'],
-						md5($matches[1] . $header['From'] . $groupMySQL['id']),
+						($multiGroup === true ? $tableNames['mgrbname'] : $tableNames['bname']),
+						($multiGroup === true ? md5($matches[1] . $header['From'] . -1) : md5($matches[1] . $header['From'] . $groupMySQL['id'])),
 						$this->_pdo->escapeString(utf8_encode($matches[1])),
 						$collectionID,
 						$matches[3],
@@ -796,6 +808,7 @@ class Binaries
 				$matches[2] . ',' . $header['Bytes'] . '),';
 
 		}
+
 		unset($headers); // Reclaim memory.
 
 		// Start of inserting into SQL.
@@ -804,7 +817,7 @@ class Binaries
 		// End of processing headers.
 		$timeCleaning = number_format($startUpdate - $startCleaning, 2);
 
-		$binariesQuery = $binariesCheck = sprintf('INSERT INTO %s (id, partsize, currentparts) VALUES ', $tableNames['bname']);
+		$binariesQuery = $binariesCheck = sprintf('INSERT INTO %s (id, partsize, currentparts) VALUES ', ($multiGroup === true ? $tableNames['mgrbname'] : $tableNames['bname']));
 		foreach ($binariesUpdate as $binaryID => $binary) {
 			$binariesQuery .= '(' . $binaryID . ',' . $binary['Size'] . ',' . $binary['Parts'] . '),';
 		}
@@ -1410,10 +1423,10 @@ class Binaries
 	{
 		switch ($opType) {
 			case self::OPTYPE_BLACKLIST:
-				$opType = 'AND binaryblacklist.optype = ' . self::OPTYPE_BLACKLIST;
+				$opType = 'AND bb.optype = ' . self::OPTYPE_BLACKLIST;
 				break;
 			case self::OPTYPE_WHITELIST:
-				$opType = 'AND binaryblacklist.optype = ' . self::OPTYPE_WHITELIST;
+				$opType = 'AND bb.optype = ' . self::OPTYPE_WHITELIST;
 				break;
 			default:
 				$opType = '';
@@ -1422,17 +1435,17 @@ class Binaries
 		return $this->_pdo->query(
 			sprintf('
 				SELECT
-					binaryblacklist.id, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description,
-					binaryblacklist.groupname AS groupname, binaryblacklist.regex, groups.id AS group_id, binaryblacklist.msgcol,
-					binaryblacklist.last_activity as last_activity
-				FROM binaryblacklist
-				LEFT OUTER JOIN groups ON groups.name %s binaryblacklist.groupname
+					bb.id, bb.optype, bb.status, bb.description,
+					bb.groupname AS groupname, bb.regex, g.id AS group_id, bb.msgcol,
+					bb.last_activity as last_activity
+				FROM binaryblacklist bb
+				LEFT OUTER JOIN groups g ON g.name %s bb.groupname
 				WHERE 1=1 %s %s %s
 				ORDER BY coalesce(groupname,\'zzz\')',
 				($groupRegex ? 'REGEXP' : '='),
-				($activeOnly ? 'AND binaryblacklist.status = 1' : ''),
+				($activeOnly ? 'AND bb.status = 1' : ''),
 				$opType,
-				($groupName ? ('AND groups.name REGEXP ' . $this->_pdo->escapeString($groupName)) : '')
+				($groupName ? ('AND g.name REGEXP ' . $this->_pdo->escapeString($groupName)) : '')
 			)
 		);
 	}

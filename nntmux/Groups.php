@@ -602,6 +602,10 @@ class Groups
 		$tables['bname']  = 'binaries';
 		$tables['pname']  = 'parts';
 		$tables['prname'] = 'missed_parts';
+		$tables['mgrcname']  = 'mgr_collections';
+		$tables['mgrbname']  = 'mgr_binaries';
+		$tables['mgrpname']  = 'mgr_parts';
+		$tables['mgrprname'] = 'mgr_missed_parts';
 
 		if ($tpgSetting === true) {
 			if ($groupID == '') {
@@ -617,6 +621,10 @@ class Groups
 			$tables['bname'] .= $groupEnding;
 			$tables['pname'] .= $groupEnding;
 			$tables['prname'] .= $groupEnding;
+			$tables['mgrcname'];
+			$tables['mgrbname'];
+			$tables['mgrpname'];
+			$tables['mgrprname'];
 		}
 
 		// Buffer.

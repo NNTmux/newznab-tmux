@@ -12,13 +12,14 @@ class ReleasesMultiGroup
 	/**
 	 * @var array of MGR groups
 	 */
-	private static $mgrGroups = [
+	public static $mgrGroups = [
 		 'alt.binaries.amazing',
 		 'alt.binaries.ath',
 		 'alt.binaries.bloaf',
 		 'alt.binaries.british.drama',
 		 'alt.binaries.chello',
 		 'alt.binaries.etc',
+		 'alt.binaries.font',
 		 'alt.binaries.misc',
 		 'alt.binaries.tatu'
 	];
@@ -26,9 +27,11 @@ class ReleasesMultiGroup
 	/**
 	 * @var array of MGR posters
 	 */
-	private static $mgrPosterNames = [
+	public static $mgrPosterNames = [
 		'mmmq@meh.com',
-		'buymore@suprnova.com'
+		'buymore@suprnova.com',
+		'pfc@p0rnFuscated.com',
+		'mq@meh.com'
 	];
 
 
