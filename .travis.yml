@@ -43,8 +43,8 @@ install:
 before_script:
    - curl -O https://raw.githubusercontent.com/NNTmux/travis-ci/master/cat_logs.sh
    # Create mysql user.
-   - mysql -u root -e "GRANT ALL ON nntmux.* TO 'nntmux'@'localhost' IDENTIFIED BY 'nntmux';"
-   - mysql -u root -e "GRANT FILE ON *.* TO 'nntmux'@'localhost';"
+   - mysql -u root -e "GRANT ALL ON NNTMUX.* TO 'NNTMUX'@'localhost' IDENTIFIED BY 'NNTMUX';"
+   - mysql -u root -e "GRANT FILE ON *.* TO 'NNTMUX'@'localhost';"
    # Disable apparmor.
    - if service apparmor status; then service apparmor stop; update-rc.d -f apparmor remove; service apparmor teardown; fi
    # Change MySQL settings.
@@ -72,8 +72,8 @@ before_script:
    - sudo chmod -R 777 /home/travis/
    # Download/configure NNTmux installer test script.
    - curl -O https://raw.githubusercontent.com/NNTmux/travis-ci/master/test_nntmux_installer.sh
-   - sed -i 's/DBUSER=".*"/DBUSER="nntmux"/' test_nntmux_installer.sh
-   - sed -i 's/DBPASS=".*"/DBPASS="nntmux"/' test_nntmux_installer.sh
+   - sed -i 's/DBUSER=".*"/DBUSER="NNTMUX"/' test_nntmux_installer.sh
+   - sed -i 's/DBPASS=".*"/DBPASS="NNTMUX"/' test_nntmux_installer.sh
    - sed -i 's/DBSOCKET=".*"/DBSOCKET=""/' test_nntmux_installer.sh
    - sed -i "s?NNTMUXPATH=\".*\"?NNTMUXPATH=\"$(pwd)\"?" test_nntmux_installer.sh
    - sed -i 's/HOST=".*"/HOST="127.0.0.1"/' test_nntmux_installer.sh
