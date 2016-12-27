@@ -1,16 +1,12 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 
 
 class Games
 {
-	const REQID_FOUND 		= 1; // Request id found and release was updated.
-	const REQID_NO_LOCAL	= -1; // Request id was not found via local lookup.
-	const REQID_NONE		= -3; // The Request id was not found locally or via web lookup.
-	const REQID_UNPROCESSED	= 0; // Release has not been processed.
-	const REQID_ZERO		= -2; // The Request id was 0.
 
 	/**
 	 * @var string
@@ -105,21 +101,17 @@ class Games
 		$options += $defaults;
 		$this->echoOutput = ($options['Echo'] && NN_ECHOCLI);
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
-		$this->publicKey = $this->pdo->getSetting('giantbombkey');
-		$this->gameQty = ($this->pdo->getSetting('maxgamesprocessed') != '') ? $this->pdo->getSetting('maxgamesprocessed') : 150;
-		$this->sleepTime = ($this->pdo->getSetting('amazonsleep') != '') ? $this->pdo->getSetting('amazonsleep') : 1000;
+		$this->publicKey = Settings::value('APIs..giantbombkey');
+		$this->gameQty = Settings::value('..maxgamesprocessed' != '') ? Settings::value('..maxgamesprocessed') : 150;
+		$this->sleepTime = Settings::value('..amazonsleep') != '' ? Settings::value('..amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'games' . DS;
-		$this->renamed = '';
+		$this->renamed = Settings::value('..lookupgames') == 2 ? 'AND isrenamed = 1' : '';
 		$this->matchPercentage = 60;
 		$this->maxHitRequest = false;
 		$this->cookie = NN_TMP . 'xxx.cookie';
-		if ($this->pdo->getSetting('lookupgames') == 2) {
-			$this->renamed = 'AND isrenamed = 1';
-		}
 		$this->catWhere = 'AND categories_id = ' . Category::PC_GAMES . ' ';
-		//$this->cleangames = ($this->pdo->getSetting('('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
 	}
 
 	public function getGamesInfo($id)
@@ -205,10 +197,10 @@ class Games
 				AND con.title != ''
 				AND con.cover = 1
 				AND r.passwordstatus %s
-				AND %s %s %s %s
+				%s %s %s %s
 				GROUP BY con.id
 				ORDER BY %s %s %s",
-						Releases::showPasswords($this->pdo),
+						Releases::showPasswords(),
 						$browseby,
 						$catsrch,
 						$maxage,
@@ -254,7 +246,7 @@ class Games
 				INNER JOIN gamesinfo con ON con.id = r.gamesinfo_id
 				WHERE con.id IN (%s)
 				AND r.id IN (%s)
-				AND %s
+				%s
 				GROUP BY con.id
 				ORDER BY %s %s",
 						(is_array($gameIDs) ? implode(',', $gameIDs) : -1),
@@ -327,9 +319,9 @@ class Games
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
 				$bbs = stripslashes($_REQUEST[$bbk]);
 				if ($bbk === 'year') {
-					$browseby .= 'YEAR (con.releasedate) ' . $like . ' (' . $this->pdo->escapeString('%' . $bbs . '%') . ') AND ';
+					$browseby .= 'AND YEAR (con.releasedate) ' . $like . ' (' . $this->pdo->escapeString('%' . $bbs . '%') . ') AND ';
 				} else {
-					$browseby .= 'con.' . $bbv . ' ' . $like . ' (' . $this->pdo->escapeString('%' . $bbs . '%') . ') AND ';
+					$browseby .= 'AND con.' . $bbv . ' ' . $like . ' (' . $this->pdo->escapeString('%' . $bbs . '%') . ') AND ';
 				}
 			}
 		}
@@ -397,7 +389,7 @@ class Games
 	}
 
 	/**
-	 * Process each game, updating game information from Giantbomb
+	 * Process each game, updating game information from Steam, Giantbomb, Desura and GreenLight
 	 *
 	 * @param $gameInfo
 	 *
@@ -420,7 +412,8 @@ class Games
 		if($this->_getGame->search() !== false){
 			$this->_gameResults = $this->_getGame->getAll();
 		}
-		if (count($this->_gameResults) < 1) {
+		/*
+		 	if (count($this->_gameResults) < 1) {
 			$this->_getGame = new Desura();
 			$this->_classUsed = "desura";
 			$this->_getGame->cookie = $this->cookie;
@@ -429,6 +422,7 @@ class Games
 				$this->_gameResults = $this->_getGame->getAll();
 			}
 		}
+		*/
 		if (count($this->_gameResults) < 1) {
 			$this->_getGame = new Greenlight();
 			$this->_classUsed = "gl";
@@ -454,6 +448,7 @@ class Games
 			$genreName = '';
 			switch ($this->_classUsed) {
 
+				/*
 				case "desura":
 					if (isset($this->_gameResults['cover']) && $this->_gameResults['cover'] != '') {
 						$con['coverurl'] = (string)$this->_gameResults['cover'];
@@ -492,6 +487,7 @@ class Games
 						$genreName = $this->_matchGenre($genres);
 					}
 					break;
+				*/
 
 				case "gb":
 					$con['coverurl'] = (string)$this->_gameResults['image']['super_url'];

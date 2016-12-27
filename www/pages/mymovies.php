@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Settings;
 use nntmux\Category;
 use nntmux\Releases;
 use nntmux\UserMovies;
@@ -62,7 +63,7 @@ switch ($action) {
 			$categories = [];
 			foreach ($tmpcats as $c) {
 				// If MOVIE WEB-DL categorization is disabled, don't include it as an option
-				if ($page->settings->getSetting('catwebdl') == 0 && $c['id'] == Category::MOVIE_WEBDL) {
+				if (Settings::value('indexer.categorise.catwebdl') == 0 && $c['id'] == Category::MOVIE_WEBDL) {
 					continue;
 				}
 				$categories[$c['id']] = $c['title'];

@@ -2,7 +2,8 @@
 
 require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 use nntmux\Users;
 use nntmux\SABnzbd;
 
@@ -95,7 +96,7 @@ class BasePage
 		}
 
 		// Buffer settings/DB connection.
-		$this->settings = new Settings();
+		$this->settings = new DB();
 		$this->smarty = new Smarty();
 
 		$this->smarty->setCompileDir(NN_SMARTY_TEMPLATES);
@@ -122,14 +123,14 @@ class BasePage
 		if ($this->users->isLoggedIn()) {
 			$this->setUserPreferences();
 		} else {
-			$this->theme = $this->settings->getSetting('style');
+			$this->theme = $this->getSettingValue('site.main.style');
 
 			$this->smarty->assign('isadmin', 'false');
 			$this->smarty->assign('ismod', 'false');
 			$this->smarty->assign('loggedin', 'false');
 		}
-		if ($this->theme === '') {
-			$this->theme = 'Omicron';
+		if ($this->theme === 'None') {
+			$this->theme = Settings::value('site.main.style');
 		}
 
 		$this->smarty->assign('theme', $this->theme);
@@ -321,10 +322,10 @@ class BasePage
 		$this->userdata['rolecategoryexclusions'] = $this->users->getRoleCategoryExclusion($this->userdata['role']);
 
 		// Change the theme to user's selected theme if they selected one, else use the admin one.
-		if ($this->settings->getSetting('userselstyle') == 1) {
+		if (Settings::value('site.main.userselstyle') == 1) {
 			$this->theme = isset($this->userdata['style']) ? $this->userdata['style'] : 'None';
 			if ($this->theme == 'None') {
-				$this->theme = $this->settings->getSetting('style');
+				$this->theme = Settings::value('site.main.style');
 			}
 
 			if (lcfirst($this->theme) === $this->theme) {
@@ -332,7 +333,7 @@ class BasePage
 				$this->theme = ucfirst($this->theme);
 			}
 		} else {
-			$this->theme = $this->settings->getSetting('style');
+			$this->theme = Settings::value('site.main.style');
 		}
 
 		// Update last login every 15 mins.
@@ -363,12 +364,34 @@ class BasePage
 			case Users::ROLE_MODERATOR:
 				$this->smarty->assign('ismod', 'true');
 		}
+	}
 
-		if ($this->userdata["hideads"] == "1")
-		{
-			$this->settings->setSetting(['adheader', '']);
-			$this->settings->setSetting(['adbrowse', '']);
-			$this->settings->setSetting(['addetail', '']);
+	/**
+	 * Allows to fetch a value from the settings table.
+	 *
+	 * This method is deprecated, as the column it uses to select the data is due to be removed
+	 * from the table *soon*.
+	 *
+	 * @param $setting
+	 *
+	 * @return array|bool|mixed|null|string
+	 */
+	public function getSetting($setting)
+	{
+		if (strpos($setting, '.') === false) {
+			trigger_error(
+				'You should update your template to use the newer method "$page->getSettingValue()"" of fetching values from the "settings" table! This method *will* be removed in a future version.',
+				E_USER_WARNING);
+		} else {
+			return $this->getSettingValue($setting);
 		}
+
+		return $this->settings->$setting;
+
+	}
+
+	public function getSettingValue($setting)
+	{
+		return Settings::value($setting);
 	}
 }

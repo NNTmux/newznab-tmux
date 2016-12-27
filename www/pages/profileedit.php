@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Settings;
 use nntmux\utility\Utility;
 use nntmux\Category;
 use nntmux\SABnzbd;
@@ -103,7 +104,7 @@ switch ($action) {
 	default:
 		break;
 }
-if ($page->settings->getSetting('userselstyle') == 1) {
+if (Settings::value('site.main.userselstyle') == 1) {
 // Get the list of themes.
 	$page->smarty->assign('themelist', Utility::getThemesList());
 }

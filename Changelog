@@ -1,3 +1,75 @@
+2016-12-23 DariusIII
+	* Chg: Move predb to admin from frontend
+2016-12-20 DariusIII
+	* Chg: Make guzzlehttp http error messages more informative
+	* Fix: Fix the broken delete_release stored procedure
+2016-12-19 DariusIII
+	* Chg: Revert to old style deleteSingle function (non-SP)
+	* Chg: Change checks for minfiles and minsize values in ProcessReleases class
+	* Chg: Improve the folder matching regex
+2016-12-16 DariusIII
+	* Chg: Improve renaming of releases
+2016-12-15 DariusIII
+	* Chg: Disable Desura game lookups as desura site is not serving any information for now
+2016-12-13 DariusIII
+	* Chg: Update CouchPotato and SABNzbd to use guzzlehttp
+2016-12-12 DariusIII
+	* Chg: Use guzzlehttp for RequestIDWeb lookups
+2016-12-09 DariusIII
+	* Chg: Use guzzlehhtp in Movies and NZBGet
+	* Chg: Use guzzlehttp/guzzle in TraktTV processing
+2016-12-08 DariusIII
+	* Chg: Fix location of logs for tmux
+2016-12-07 DariusIII
+	* Chg: Remove stray reqid constants from Games class
+	* Chg: Remove check for ID in release-edit, as we are working with existing releases
+	* Chg: Update composer.lock
+2016-12-06 DariusIII
+	* Chg: Fix call to showpasswords function
+2016-12-05 DariusIII
+	* Mrg: Merge dev-release_groups branch
+	* Chg: Update amazon usage for new apai-io version
+	* Chg: Change semantics for $this->renamed
+	* Chg: Update exeu/apai-io to version 2
+2016-12-04 DariusIII
+	* Chg: Simplify $this->renamed in Games class
+	* Fix: Books processing
+	* Chg: Remove do while loop from crossposted releases check
+	* Fix: TV processing
+2016-12-02 DariusIII
+	* Fix: Undefined notices in admin regexes pages
+2016-11-30 DariusIII
+	* Fix: Grouping of console releasescover view in Gamma theme
+	* Fix: Settings table verification for PHP 5.6 users
+2016-11-27 DariusIII
+	* Chg: Update composer.lock
+2016-11-23 DariusIII
+	* Chg: Avoid joining groups table on CBP deletes by selecting group info beforehand
+2016-11-14 DariusIII
+	* Chg: Add check for missing settings table entries, add the patches for settings and tmux tables
+2016-11-10 DariusIII
+	* Fix: Remove stray word from profileedit in Gentele.
+	* Fix: Wrong parameters used in SAB integration checks.
+2016-11-09 DariusIII
+	* Chg: Change link to github page from DariusIII to NNTmux
+	* Fix: Fix undefined notices in user-edit page
+2016-11-08 DariusIII
+	* Chg: Couple of fixes and missing settings (Sphinx, sabnzbd)
+	* Chg: Improve performance of site/edit by updating some queries in Groups/Releases
+	* Chg: Add serch description to search page in all themes
+2016-11-07 DariusIII
+	* Fix: Error on searchd process when '-' is in releasename
+	* Chg: Remove htmlspecialchars from NZB class, it is already handled by XMLWriter. Move the function to Utility class.
+2016-11-06 DariusIII
+	* Fix: Remove extra AND from search function query.
+2016-11-05 DariusIII
+	* Fix: Use full path to userselstyle setting
+2016-11-04 DariusIII
+	* Chg: Use XMLWriter for creating nzbs
+	* Chg: Remove debug output from ReleaseImage class
+2016-11-03 DariusIII
+	* Fix: Wrong variable used in viewmusic.tpl in all themes
+	* Fix: Version lookup in NZB class
 2016-11-02 DariusIII
 	* Fix: Undefined index title notice in viewserieslist pages
 	* Fix: Define pagerquerysuffix for users-list

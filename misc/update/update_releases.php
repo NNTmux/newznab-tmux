@@ -1,14 +1,15 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
+use app\models\Settings;
 use nntmux\Category;
 use nntmux\ConsoleTools;
 use nntmux\NNTP;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\processing\ProcessReleases;
 
 $category = new Category();
-$pdo = new Settings();
+$pdo = new DB();
 
 if (isset($argv[2]) && $argv[2] === 'true') {
 	// Create the connection here and pass
@@ -17,7 +18,7 @@ if (isset($argv[2]) && $argv[2] === 'true') {
 		exit($pdo->log->error("Unable to connect to usenet."));
 	}
 }
-if ($pdo->getSetting('tablepergroup') === 1) {
+if (Settings::value('..tablepergroup') === 1) {
 	exit($pdo->log->error("You are using 'tablepergroup', you must use .../misc/update/nix/multiprocessing/releases.php"));
 }
 

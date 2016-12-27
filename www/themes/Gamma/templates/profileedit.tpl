@@ -52,11 +52,11 @@
 	<fieldset>
 		<legend>Site Preferences</legend>
 
-		{if $page->settings->getSetting('userselstyle') == 1}
+		{if $page->getSettingValue('site.main.userselstyle') == 1}
 		<div class="control-group">
 			<label class="control-label">Change site theme</label>
 			<div class="controls">
-				{if $page->settings->getSetting('userselstyle') == 1}
+				{if $page->getSettingValue('site.main.userselstyle') == 1}
 					{html_options id="style" name='style' values=$themelist output=$themelist selected=$user.style}
 				{/if}
 			</div>
@@ -112,8 +112,8 @@
 			</div>
 		</div>
 	</fieldset>
-	{if $page->settings->getSetting('sabintegrationtype') > 0}
-	{if $page->settings->getSetting('sabintegrationtype') != 1}
+	{if $page->getSettingValue('apps.sabnzbplus.integrationtype') > 0}
+	{if $page->getSettingValue('apps.sabnzbplus.integrationtype') != 1}
 		<legend>Queue type (NZBget / Sabnzbd)</legend>
 		<div class="control-group">
 			<label class="control-label">Queue type</label>

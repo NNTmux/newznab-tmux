@@ -7,11 +7,11 @@
 
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 
-$db = new Settings();
+$db = new DB();
 
 $res = $db->queryDirect("select releases.searchname, releases.postdate, uncompress(release_nfos.nfo) as nfo from releases inner join release_nfos on releases.ID = release_nfos.releaseID and release_nfos.nfo is not null order by postdate");
 while ($row = $db->getAssocArray($res))

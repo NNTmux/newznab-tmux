@@ -4,10 +4,10 @@
 */
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\db\populate\AniDB;
 
-$pdo = new Settings();
+$pdo = new DB();
 
 if ($argc > 1 && $argv[1] == true) {
 	(new AniDB(['Settings' => $pdo, 'Echo' => true]))->populateTable('full');

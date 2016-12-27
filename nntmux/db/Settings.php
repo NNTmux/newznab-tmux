@@ -341,5 +341,5 @@ class Settings extends DB
  * This is a temporary measure until a proper frontend for cli stuff can be implemented with li3.
  */
 if (Utility::isCLI() && isset($argv[1])) {
-	echo (new Settings())->getSetting($argv[1]);
+	echo (new DB())->getSetting($argv[1]);
 }

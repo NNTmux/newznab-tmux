@@ -1763,6 +1763,9 @@ class NameFixer
 					$result = str_replace("." . $result["1"], " (" . $result["1"] . ")", $result['0']);
 					$this->updateRelease($release, $result, $method = "fileCheck: EBook", $echo, $type, $namestatus, $show);
 					break;
+				case preg_match('/\w[-\w.\',;& ]+/i', $release['textstring'], $result) && preg_match(self::PREDB_REGEX, $release['textstring']):
+					$this->updateRelease($release, $result['0'], $method = 'fileCheck: Folder name', $echo, $type, $namestatus, $show);
+					break;
 				default:
 					return false;
 			}

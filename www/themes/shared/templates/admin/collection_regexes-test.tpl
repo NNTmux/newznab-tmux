@@ -12,7 +12,7 @@
 		<input id="limit" type="text" name="limit" value="{$limit}" size="8" /><br/>
 		<input class="btn btn-default" type="submit" value="Test" />
 	</form>
-	{if $data}
+	{if isset($data)}
 
 		{foreach from=$data key=hash item=collection}
 			<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table">

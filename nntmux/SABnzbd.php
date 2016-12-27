@@ -1,6 +1,8 @@
 <?php
 namespace nntmux;
 
+use app\models\Settings;
+use GuzzleHttp\Client;
 use nntmux\utility\Utility;
 
 /**
@@ -90,9 +92,10 @@ class SABnzbd
 		$this->uid = $page->userdata['id'];
 		$this->rsstoken = $page->userdata['rsstoken'];
 		$this->serverurl = $page->serverurl;
+		$this->client = new Client(['verify' => false]);
 
 		// Set up properties.
-		switch ($page->settings->getSetting('sabintegrationtype')) {
+		switch (Settings::value('apps.sabnzbplus.integrationtype')) {
 			case self::INTEGRATION_TYPE_USER:
 				if (!empty($_COOKIE['sabnzbd_' . $this->uid . '__apikey']) && !empty($_COOKIE['sabnzbd_' . $this->uid . '__host'])) {
 					$this->url = $_COOKIE['sabnzbd_' . $this->uid . '__host'];
@@ -118,11 +121,11 @@ class SABnzbd
 				break;
 
 			case self::INTEGRATION_TYPE_SITEWIDE:
-				if (($page->settings->getSetting('sabapikey') != '') && ($page->settings->getSetting('saburl') != '')) {
-					$this->url = $page->settings->getSetting('saburl');
-					$this->apikey = $page->settings->getSetting('sabapikey');
-					$this->priority = $page->settings->getSetting('sabpriority');
-					$this->apikeytype = $page->settings->getSetting('sabapikeytype');
+				if ((Settings::value('apps.sabnzbplus.apikey') != '') && (Settings::value('apps.sabnzbplus.url') != '')) {
+					$this->url = Settings::value('apps.sabnzbplus.url');
+					$this->apikey = Settings::value('apps.sabnzbplus.apikey');
+					$this->priority = Settings::value('apps.sabnzbplus.priority');
+					$this->apikeytype = Settings::value('apps.sabnzbplus.apikeytype');
 				}
 				$this->integrated = self::INTEGRATION_TYPE_SITEWIDE;
 				$this->integratedBool = true;
@@ -161,8 +164,8 @@ class SABnzbd
 	 */
 	public function sendToSab($guid)
 	{
-		return Utility::getUrl([
-				'url' => $this->url .
+		return $this->client->get(
+				$this->url .
 					'api?mode=addurl&priority=' .
 					$this->priority .
 					'&apikey=' .
@@ -176,9 +179,7 @@ class SABnzbd
 						$this->uid .
 						'&r=' .
 						$this->rsstoken
-					),
-				'verifypeer' => false,
-			]
+					)
 		);
 	}
 
@@ -189,13 +190,10 @@ class SABnzbd
 	 */
 	public function getQueue()
 	{
-		return Utility::getUrl([
-				'url' =>
+		return $this->client->get(
 					$this->url .
 					"api?mode=qstatus&output=json&apikey=" .
-					$this->apikey,
-				'verifypeer' => false,
-			]
+					$this->apikey
 		);
 	}
 
@@ -206,13 +204,11 @@ class SABnzbd
 	 */
 	public function getAdvQueue()
 	{
-		return Utility::getUrl([
-				'url' =>
+		return $this->client->get(
 					$this->url .
 					"api?mode=queue&start=START&limit=LIMIT&output=json&apikey=" .
-					$this->apikey,
-				'verifypeer' => false,
-			]
+					$this->apikey
+
 		);
 	}
 
@@ -225,14 +221,12 @@ class SABnzbd
 	 */
 	public function delFromQueue($id)
 	{
-		return Utility::getUrl([
+		return $this->client->get(
 		$this->url .
 			"api?mode=queue&name=delete&value=" .
 			$id .
 			"&apikey=" .
-			$this->apikey,
-			'verifypeer' => false,
-		]);
+			$this->apikey);
 	}
 
 	/**
@@ -244,14 +238,12 @@ class SABnzbd
 	 */
 	public function pauseFromQueue($id)
 	{
-		return Utility::getUrl([
+		return $this->client->get(
 		$this->url .
 			"api?mode=queue&name=pause&value=" .
 			$id .
 			"&apikey=" .
-			$this->apikey,
-			'verifypeer' => false,
-		]);
+			$this->apikey);
 	}
 
 	/**
@@ -263,14 +255,13 @@ class SABnzbd
 	 */
 	public function resumeFromQueue($id)
 	{
-		return Utility::getUrl([
+		return $this->client->get(
 		$this->url .
 			"api?mode=queue&name=resume&value=" .
 			$id .
 			"&apikey=" .
-			$this->apikey,
-			'verifypeer' => false,
-		]);
+			$this->apikey
+		);
 	}
 
 	/**
@@ -280,13 +271,12 @@ class SABnzbd
 	 */
 	public function pauseAll()
 	{
-		return Utility::getUrl([
+		return $this->client->get(
 		$this->url .
 			"api?mode=pause" .
 			"&apikey=" .
-			$this->apikey,
-			'verifypeer' => false,
-		]);
+			$this->apikey
+		);
 	}
 
 	/**
@@ -296,13 +286,12 @@ class SABnzbd
 	 */
 	public function resumeAll()
 	{
-		return Utility::getUrl([
+		return $this->client->get(
 		$this->url .
 			"api?mode=resume" .
 			"&apikey=" .
-			$this->apikey,
-			'verifypeer' => false,
-		]);
+			$this->apikey
+		);
 	}
 
 	/**

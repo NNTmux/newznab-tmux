@@ -1,7 +1,8 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 
 
 /**
@@ -70,11 +71,11 @@ class XXX
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 
-		$this->movieqty = ($this->pdo->getSetting('maxxxxprocessed') != '') ? $this->pdo->getSetting('maxxxxprocessed') : 100;
-		$this->showPasswords = Releases::showPasswords($this->pdo);
+		$this->movieqty = (Settings::value('..maxxxxprocessed') != '') ? Settings::value('..maxxxxprocessed') : 100;
+		$this->showPasswords = Releases::showPasswords();
 		$this->debug = NN_DEBUG;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->imgSavePath = NN_COVERS . 'xxx' . DS;
@@ -174,7 +175,7 @@ class XXX
 				WHERE r.nzbstatus = 1
 				AND xxx.title != ''
 				AND r.passwordstatus %s
-				AND %s %s %s %s
+				%s %s %s %s
 				GROUP BY xxx.id
 				ORDER BY %s %s %s",
 						$this->showPasswords,
@@ -231,7 +232,7 @@ class XXX
 			AND xxx.id IN (%s)
 			AND xxx.title != ''
 			AND r.passwordstatus %s
-			AND %s %s %s %s
+			%s %s %s %s
 			GROUP BY xxx.id
 			ORDER BY %s %s",
 				(is_array($xxxIDs) ? implode(',', $xxxIDs) : -1),
@@ -297,12 +298,12 @@ class XXX
 			if (isset($_REQUEST[$bb]) && !empty($_REQUEST[$bb])) {
 				$bbv = stripslashes($_REQUEST[$bb]);
 				if ($bb == "genre") {
-					$bbv = $this->getgenreid($bbv);
+					$bbv = $this->getGenreID($bbv);
 				}
 				if ($bb == 'id') {
-					$browseBy .= 'xxx.' . $bb . '=' . $bbv . ' AND ';
+					$browseBy .= 'AND xxx.' . $bb . '=' . $bbv;
 				} else {
-					$browseBy .= 'xxx.' . $bb . ' ' . $this->pdo->likeString($bbv, true, true) . ' AND ';
+					$browseBy .= 'AND xxx.' . $bb . ' ' . $this->pdo->likeString($bbv, true, true);
 				}
 			}
 		}

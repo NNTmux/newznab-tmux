@@ -7,7 +7,7 @@
 //
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
-use nntmux\db\Settings;
+use nntmux\db\DB;
 
 function handleError($errno, $errstr, $errfile, $errline, array $errcontext)
 {
@@ -26,7 +26,7 @@ $regs = array(
     "simple" => '"data.mp3',
  );
 
-$db = new Settings();
+$db = new DB();
 # fetch enabled regular expression
 $catsql = "select ID,groupname,regex from releaseregex where status = 1";
 $res = $db->query($catsql);

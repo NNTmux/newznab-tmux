@@ -20,11 +20,12 @@
  */
 require_once dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 
-$pdo = new Settings();
+$pdo = new DB();
 
-if (!$pdo->getSetting('tablepergroup')) {
+if (!Settings::value('..tablepergroup')) {
 	exit("Tables per groups is not enabled, quitting!");
 }
 

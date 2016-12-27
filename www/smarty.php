@@ -19,7 +19,7 @@
  * @copyright 2015 NN
  */
 require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php');
-require_once NN_ROOT . 'app/libraries/autoload.php';
+require_once NN_ROOT . 'app' . DS . 'config' . DS . 'bootstrap.php';
 
 use nntmux\config\Configure;
 
@@ -52,7 +52,7 @@ if (strlen($www_top) == 1) {
 	$www_top = "";
 }
 
-// Used everywhere an href is output, includes the full path to the NN install.
+// Used everywhere an href is output, includes the full path to the NNTmux install.
 define('WWW_TOP', $www_top);
 define('WWW_THEMES', '/themes');
 

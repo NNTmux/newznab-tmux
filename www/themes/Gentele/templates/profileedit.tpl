@@ -144,7 +144,7 @@
 													</tr>
 													<tr>
 														<td>
-															{if $page->settings->getSetting('userselstyle') == 1}
+															{if $page->getSettingValue('site.main.userselstyle') == 1}
 																{html_options id="style" name='style' values=$themelist output=$themelist selected=$user.style}
 															{/if}
 														</td>
@@ -169,7 +169,7 @@
 													function.
 												</div>
 												<br>
-												{if $page->settings->getSetting('sabintegrationtype') != 1}
+												{if $page->getSettingValue('apps.sabnzbplus.integrationtype') != 1}
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
@@ -188,7 +188,7 @@
 														</tbody>
 													</table>
 												{/if}
-												{if $user.queuetype == 1 && $page->settings->getSetting('sabintegrationtype') == 2}
+												{if $user.queuetype == 1 && $page->getSettingValue('apps.sabnzbplus.integrationtype') == 2}
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
@@ -225,7 +225,7 @@
 														</tbody>
 													</table>
 												{/if}
-												{if $user.queuetype == 2 && ($page->settings->getSetting('sabintegrationtype') == 0 || $page->settings->getSetting('sabintegrationtype') == 2)}
+												{if $user.queuetype == 2 && ($page->getSettingValue('apps.sabnzbplus.integrationtype') == 0 || $page->getSettingValue('apps.sabnzbplus.integrationtype') == 2)}
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tbody>
 														<tr class="bg-aqua-active">
@@ -261,7 +261,6 @@
 													</table>
 												{/if}
 												<br/>
-												site
 											</td>
 										</tr>
 										</tbody>

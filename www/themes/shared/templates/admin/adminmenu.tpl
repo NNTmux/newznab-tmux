@@ -55,7 +55,6 @@
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/release-list.php">View Releases</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/failrel-list.php">View Failed Releases</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/preview-list.php">View Previews</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/show-list.php">View Shows</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/movie-list.php">View Movie List</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/movie-add.php">Add Movie</a></li>
@@ -99,6 +98,11 @@
 			<li><a><i class="fa fa-linux"></i><span> Tmux</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/tmux-edit.php">Tmux Settings</a></li>
+				</ul>
+			</li>
+			<li><a><i class="fa fa-object-group"></i><span> Pre Database</span><span class="fa fa-chevron-down"></span></a>
+				<ul class="nav child_menu" style="display: none">
+					<li><a href="{$smarty.const.WWW_TOP}/predb.php">View Predb</a></li>
 				</ul>
 			</li>
 		</ul>

@@ -1,8 +1,9 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
-use nntmux\utility\Utility;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use nntmux\db\DB;
 
 /**
  * Resize/save/delete images to disk.
@@ -47,6 +48,11 @@ class ReleaseImage
 	public $vidSavePath;
 
 	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
 	 * Construct.
 	 *
 	 * @param \DB()
@@ -55,8 +61,9 @@ class ReleaseImage
 	{
 		// Creates the NN_COVERS constant
 		if ($pdo === null) {
-			$pdo = new Settings();
+			$pdo = new DB();
 		}
+		$this->client = new Client();
 		//                                                            Table    |  Column
 		$this->audSavePath = NN_COVERS . 'audiosample' . DS; // releases    guid
 		$this->imgSavePath = NN_COVERS . 'preview' . DS; // releases    guid
@@ -84,9 +91,23 @@ class ReleaseImage
 	 */
 	protected function fetchImage($imgLoc)
 	{
+		$pdo = new DB();
 		$img = false;
 		if (strpos(strtolower($imgLoc), 'http:') === 0 || strpos(strtolower($imgLoc), 'https:') === 0) {
-			$img = Utility::getUrl(['url' => $imgLoc]);
+			try {
+				$img = $this->client->get($imgLoc)->getBody()->getContents();
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$pdo->log->doEcho($pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$pdo->log->doEcho($pdo->log->notice('Service unavailable'));
+					} else {
+						$pdo->log->doEcho($pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+					}
+				}
+			}
+
 		} else if (is_file($imgLoc)) {
 			$img = @file_get_contents($imgLoc);
 		}
@@ -96,10 +117,7 @@ class ReleaseImage
 			try {
 				$imagick->readImageBlob($img);
 			} catch (\ImagickException $imgError) {
-				echo 'Bad image data, skipping processing' . PHP_EOL;
-				if (NN_DEBUG) {
-					echo $imgError;
-				}
+				$pdo->log->doEcho($pdo->log->notice('Invalid image data, skipping processing') . PHP_EOL);
 				$imgFail = true;
 			}
 			if ($imgFail === false) {

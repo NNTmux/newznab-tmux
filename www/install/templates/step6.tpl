@@ -8,8 +8,6 @@
 	<p>This will set up an administrator account you can use to change site settings.</p>
 	<ul>
 		<li>The username must start with a letter followed by a letter or number, it must be 3 characters or longer.</li>
-		<li>The real first name is optional.</li>
-		<li>The real last name is optional.</li>
 		<li>The password must be at least 6 characters long.</li>
 		<li>The email address is used in case you forget your password.</li>
 	</ul>

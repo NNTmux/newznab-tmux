@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Settings;
 use nntmux\utility\Utility;
 use nntmux\Captcha;
 
@@ -32,10 +33,10 @@ switch($action) {
 			$page->users->updatePassword($ret["id"], $newpass);
 
 			$to = $ret["email"];
-			$subject = $page->settings->getSetting('title') . " Password Reset";
+			$subject = Settings::value('site.main.title') . " Password Reset";
 			$contents = "Your password has been reset to " . $newpass;
 			$onscreen = "Your password has been reset to <strong>" . $newpass ."</strong> and sent to your e-mail address.";
-			Utility::sendEmail($to, $subject, $contents, $page->settings->getSetting('email'));
+			Utility::sendEmail($to, $subject, $contents, Settings::value('site.main.email'));
 			$page->smarty->assign('notice',  $onscreen);
 			$confirmed = "true";
 			break;
@@ -68,9 +69,9 @@ switch($action) {
 					// Send the email
 					//
 					$to = $ret["email"];
-					$subject = $page->settings->getSetting('title') . " Forgotten Password Request";
+					$subject = Settings::value('site.main.title') . " Forgotten Password Request";
 					$contents = "Someone has requested a password reset for this email address. To reset the password use the following link.\n\n " . $page->serverurl . "forgottenpassword?action=reset&guid=" . $guid;
-					Utility::sendEmail($to, $subject, $contents, $page->settings->getSetting('email'));
+					Utility::sendEmail($to, $subject, $contents, Settings::value('site.main.email'));
 					$sent = "true";
 					break;
 				}

@@ -21,6 +21,7 @@
 
 namespace nntmux;
 
+use GuzzleHttp\Client;
 use nntmux\utility\Utility;
 
 /**
@@ -67,14 +68,13 @@ class CouchPotato
 	{
 		$this->imdbid = $id;
 
-		return Utility::getUrl([
-				'url' => $this->cpurl .
+		return (new Client(['verify' => false]))->get(
+				$this->cpurl .
 					'/api/' .
 					$this->cpapi .
 					'/movie.add/?identifier=tt' .
-					$this->imdbid,
-				'verifypeer' => false,
-			]
-		);
+					$this->imdbid
+
+		)->getBody()->getContents();
 	}
 }

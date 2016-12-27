@@ -47,7 +47,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/kbjr/Git.php"
+      "url": "https://github.com/nZEDb/Git.php"
     },
     {
       "type": "vcs",
@@ -91,12 +91,13 @@
     "fxp/composer-asset-plugin": "~1.1",
     "giantbomb/giantbomb": "@dev",
     "google/recaptcha": "~1.1",
+    "guzzlehttp/guzzle":"dev-master",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
     "kbjr/Git.php": "dev-master",
     "moinax/tvdb": "~1.0",
     "phpmailer/phpmailer": "~5.2",
-    "exeu/apai-io": "~1.0",
+    "exeu/apai-io": "~2.0",
     "smarty/smarty": "~3.1",
     "bower-asset/animate.css": "~3.5.1",
     "bower-asset/autosize": "~3.0.15",

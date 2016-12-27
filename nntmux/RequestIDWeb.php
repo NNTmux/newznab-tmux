@@ -1,7 +1,8 @@
 <?php
 namespace nntmux;
 
-use nntmux\utility\Utility;
+use app\models\Settings;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Attempts to find a PRE name for a release using a request id from our local pre database,
@@ -32,7 +33,7 @@ class RequestIDWeb extends RequestID
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->_request_hours = ($this->pdo->getSetting('request_hours') != '') ? (int)$this->pdo->getSetting('request_hours') : 1;
+		$this->_request_hours = (Settings::value('..request_hours') != '') ? (int)Settings::value('..request_hours') : 1;
 	}
 
 	/**
@@ -151,17 +152,26 @@ class RequestIDWeb extends RequestID
 		$requestArray[0] = ['ident' => 0, 'group' => 'none', 'reqid' => 0];
 
 		// Do a web lookup.
-		$returnXml = Utility::getUrl([
-				'url' => $this->pdo->getSetting('request_url'),
-				'method' => 'post',
-				'postdata' => 'data=' . serialize($requestArray),
-				'verifycert' => false,
-			]
-		);
+		try {
+			$returnXml = $this->client->request('POST', Settings::value('..request_url'),
+				['Link' => 'data=' . serialize($requestArray)]
+			)->getBody();
+
+		} catch (RequestException $e) {
+			if ($e->hasResponse()) {
+				if($e->getCode() === 404) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+				} else if ($e->getCode() === 503) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+				} else {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+				}
+			}
+		}
 
 		$renamed = 0;
 		// Change the release titles and insert the PRE's if they don't exist.
-		if ($returnXml !== false) {
+		if (isset($returnXml) && $returnXml !== false) {
 			$returnXml = @simplexml_load_string($returnXml);
 			if ($returnXml !== false) {
 
@@ -186,9 +196,9 @@ class RequestIDWeb extends RequestID
 						$this->_release['gid'] = $this->_release['groups_id'];
 
 						$this->_release['fromname'] = $requestArray[(string)$result['ident']]['fromname'];
-						
+
 						$this->_release['searchname'] = $requestArray[(int)$result['ident']]['sname'];
-						
+
 						$this->_insertIntoPreDB();
 						if ($this->_preDbID === false) {
 							$this->_preDbID = 0;

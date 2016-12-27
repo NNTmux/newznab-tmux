@@ -1,6 +1,7 @@
 <?php
 namespace nntmux;
 
+use GuzzleHttp\Client;
 use nntmux\utility\Utility;
 
 /**
@@ -74,6 +75,11 @@ class NZBGet
 	protected $NZB;
 
 	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
 	 * Construct.
 	 * Set up full URL.
 	 *
@@ -96,6 +102,7 @@ class NZBGet
 		$this->fullURL = $this->verifyURL($this->url);
 		$this->Releases = new Releases();
 		$this->NZB = new NZB();
+		$this->client = new Client();
 	}
 
 	/**
@@ -140,7 +147,13 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl(['url' => $this->fullURL . 'append', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
+		$this->client->post($this->fullURL . 'append',
+			['headers' =>
+				 [
+					 'postdata' => $header
+				 ]
+			]
+		);
 	}
 
 	/**
@@ -189,7 +202,13 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl(['url' => $this->fullURL . 'appendurl', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
+		$this->client->post($this->fullURL . 'appendurl',
+			['headers' =>
+				 [
+					 'postdata' => $header
+				 ]
+			]
+		);
 	}
 
 	/**
@@ -211,7 +230,13 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl(['url' => $this->fullURL . 'pausedownload2', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
+		$this->client->post($this->fullURL . 'pausedownload2',
+			['headers' =>
+				 [
+				 	'postdata' => $header
+				 ]
+			]
+		);
 	}
 
 	/**
@@ -233,7 +258,13 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl(['url' => $this->fullURL . 'resumedownload2', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
+		$this->client->post($this->fullURL . 'resumedownload2',
+			['headers' =>
+				 [
+					 'postdata' => $header
+				 ]
+			]
+		);
 	}
 
 	/**
@@ -268,7 +299,13 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl(['url' => $this->fullURL . 'editqueue', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
+		$this->client->post($this->fullURL . 'editqueue',
+			['headers' =>
+				 [
+					 'postdata' => $header
+				 ]
+			]
+		);
 	}
 
 	/**
@@ -303,7 +340,13 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl(['url' => $this->fullURL . 'editqueue', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
+		$this->client->post($this->fullURL . 'editqueue',
+			['headers' =>
+				 [
+					 'postdata' => $header
+				 ]
+			]
+		);
 	}
 
 	/**
@@ -338,7 +381,13 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl(['url' => $this->fullURL . 'editqueue', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
+		$this->client->post($this->fullURL . 'editqueue',
+			['headers' =>
+				 [
+					 'postdata' => $header
+				 ]
+			]
+		);
 	}
 
 	/**
@@ -362,7 +411,13 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl(['url' => $this->fullURL . 'rate', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
+		$this->client->post($this->fullURL . 'rate',
+			['headers' =>
+				 [
+					 'postdata' => $header
+				 ]
+			]
+		);
 	}
 
 	/**
@@ -374,7 +429,7 @@ class NZBGet
 	 */
 	public function getQueue()
 	{
-		$data = Utility::getUrl(['url' => $this->fullURL . 'listgroups', 'verifycert' => false]);
+		$data = $this->client->get($this->fullURL . 'listgroups')->getBody()->getContents();
 		$retVal = false;
 		if ($data) {
 			$xml = simplexml_load_string($data);
@@ -399,13 +454,13 @@ class NZBGet
 	/**
 	 * Request for current status (summary) information. Parts of informations returned by this method can be printed by command "nzbget -L".
 	 *
-	 * @return array The status.
+	 * @return array|bool The status.
 	 *
 	 * @access public
 	 */
 	public function status()
 	{
-		$data = Utility::getUrl(['url' => $this->fullURL . 'status', 'verifycert' => false]);
+		$data = $this->client->get($this->fullURL . 'status')->getBody()->getContents();
 		$retVal = false;
 		if ($data) {
 			$xml = simplexml_load_string($data);

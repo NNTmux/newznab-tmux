@@ -1,7 +1,8 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 
 /**
  * Tmux pane shell exec functions for pane respawning
@@ -13,12 +14,18 @@ class TmuxRun extends Tmux
 	protected $_dateFormat;
 
 	/**
-	 * @param \nntmux\db\Settings $pdo
+	 * @param \nntmux\db\DB $pdo
 	 */
-	public function __construct(Settings $pdo = null)
+	public function __construct(DB $pdo = null)
 	{
 		parent::__construct($pdo);
-		$this->_dateFormat = '%Y-%m-%d %T';
+		$dateFormat = Settings::value(
+			[
+				'section'    => 'shell',
+				'subsection' => 'date',
+				'name'       => 'format'
+			]);
+		$this->_dateFormat = empty($dateFormat) ? '%Y-%m-%d %T' : $dateFormat;
 
 	}
 
@@ -212,7 +219,8 @@ class TmuxRun extends Tmux
 
 				$log = $this->writelog($runVar['panes']['two'][2]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:2.2 ' \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/postprocess.php amazon true $log; date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_amazon']}' 2>&1 1> /dev/null"
+						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/postprocess.php amazon true $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/PostProc/getXXXSamples.php true 100 $log; date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_amazon']}' 2>&1 1> /dev/null"
 				);
 				break;
 			case $runVar['settings']['post_amazon'] == 1 && $runVar['settings']['processbooks'] == 0

@@ -1,6 +1,7 @@
 <?php
 namespace nntmux\processing\tv;
 
+use app\models\Settings;
 use nntmux\libraries\TraktAPI;
 use nntmux\ReleaseImage;
 use nntmux\utility\Time;
@@ -76,12 +77,12 @@ class TraktTv extends TV
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->clientId = $this->pdo->getSetting('trakttvclientkey');
+		$this->clientId = Settings::value('APIs..trakttvclientkey');
 		$this->requestHeaders = [
-				'Content-Type: application/json',
-				'trakt-api-version: 2',
-				'trakt-api-key: ' . $this->clientId,
-				'Content-Length: 0'
+				'Content-Type' => 'application/json',
+				'trakt-api-version' => 2,
+				'trakt-api-key' => $this->clientId,
+				'Content-Length' => 0
 		];
 		$this->client = new TraktAPI($this->requestHeaders);
 		$this->time = new Time();

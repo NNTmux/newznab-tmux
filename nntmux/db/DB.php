@@ -1,19 +1,20 @@
 <?php
 namespace nntmux\db;
 
-use \nntmux\utility\Utility;
-use \nntmux\libraries\Cache;
-use \nntmux\libraries\CacheException;
-use nntmux\ConsoleTools;
+use app\models\Settings;
 use nntmux\ColorCLI;
+use nntmux\ConsoleTools;
 use nntmux\Logger;
 use nntmux\LoggerException;
+use nntmux\utility\Utility;
+use nntmux\libraries\Cache;
+use nntmux\libraries\CacheException;
 
 
 /**
- * Class for handling connection to MySQL database using \PDO.
+ * Class for handling connection to MySQL database using PDO.
  *
- * The class extends \PDO, thereby exposing all of \PDO's functionality directly
+ * The class extends PDO, thereby exposing all of PDO's functionality directly
  * without the need to wrap each and every method here.
  *
  * Exceptions are caught and displayed to the user.
@@ -112,12 +113,12 @@ class DB extends \PDO
 			'createDb'		=> false, // create dbname if it does not exist?
 			'ct'			=> new ConsoleTools(),
 			'dbhost'		=> defined('DB_HOST') ? DB_HOST : '',
-			'dbname' => defined('DB_NAME') ? DB_NAME : '',
-			'dbpass' => defined('DB_PASSWORD') ? DB_PASSWORD : '',
+			'dbname'		=> defined('DB_NAME') ? DB_NAME : '',
+			'dbpass'		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
 			'dbport'		=> defined('DB_PORT') ? DB_PORT : '',
 			'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
 			'dbtype'		=> defined('DB_SYSTEM') ? DB_SYSTEM : '',
-			'dbuser' => defined('DB_USER') ? DB_USER : '',
+			'dbuser'		=> defined('DB_USER') ? DB_USER : '',
 			'log'			=> new ColorCLI(),
 			'persist'		=> false,
 		];
@@ -180,7 +181,14 @@ class DB extends \PDO
 		$this->pdo = null;
 	}
 
-	public function checkDbExists ($name = null)
+	public function __get($name)
+	{
+		$result = $this->queryOneRow("SELECT value FROM settings WHERE setting = '$name' LIMIT 1");
+
+		return is_array($result) ? $result['value'] : $result;
+	}
+
+	public function checkDbExists($name = null)
 	{
 		if (empty($name)) {
 			$name = $this->opts['dbname'];
@@ -253,7 +261,46 @@ class DB extends \PDO
 		}
 	}
 
-	public function getTableList ()
+	public function getSetting($name)
+	{
+		$result = $this->queryOneRow("SELECT value FROM settings WHERE setting = '$name' LIMIT 1");
+		return is_array($result) ? $result['value'] : $result;
+	}
+
+	/**
+	 * Return a tree-like array of all or selected settings.
+	 *
+	 * @param array $options            Options array for Settings::find() i.e. ['conditions' => ...].
+	 * @param bool  $excludeUnsectioned If rows with empty 'section' field should be excluded.
+	 *                                  Note this doesn't prevent empty 'subsection' fields.
+	 *
+	 * @return array
+	 * @throws \RuntimeException
+	 */
+	public function getSettingsAsTree($excludeUnsectioned = true)
+	{
+		$where = $excludeUnsectioned ? "WHERE section != ''" : '';
+
+		$sql = sprintf("SELECT section, subsection, name, value, hint FROM settings %s ORDER BY section, subsection, name",
+			$where);
+		$results = $this->queryArray($sql);
+
+		$tree = [];
+		if (is_array($results)) {
+			foreach ($results as $result) {
+				if (!empty($result['section']) || !$excludeUnsectioned) {
+					$tree[$result['section']][$result['subsection']][$result['name']] =
+						['value' => $result['value'], 'hint' => $result['hint']];
+				}
+			}
+		} else {
+			echo "NO results!!\n";
+		}
+
+		return $tree;
+	}
+
+	public function getTableList()
 	{
 		$query  = ($this->opts['dbtype'] === 'mysql' ? 'SHOW DATABASES' : 'SELECT datname AS Database FROM pg_database');
 		$result = $this->pdo->query($query);
@@ -412,20 +459,13 @@ class DB extends \PDO
 	 *
 	 * @return string
 	 */
-	public function likeString($str, $left=true, $right=true)
+	public function likeString($str, $left = true, $right = true)
 	{
-		return (
-			'LIKE ' .
-			$this->escapeString(
-				($left  ? '%' : '') .
-				$str .
-				($right ? '%' : '')
-			)
-		);
+		return ('LIKE ' . $this->escapeString(($left ? '%' : '') . $str . ($right ? '%' : '')));
 	}
 
 	/**
-	 * Verify if pdo var is instance of \PDO class.
+	 * Verify if pdo var is instance of PDO class.
 	 *
 	 * @return bool
 	 */
@@ -435,31 +475,30 @@ class DB extends \PDO
 	}
 
 	/**
-	 * For inserting a row. Returns last insert id. queryExec is better if you do not need the id.
+	 * For inserting a row. Returns last insert ID. queryExec is better if you do not need the id.
 	 *
 	 * @param string $query
 	 *
-	 * @return bool|int
+	 * @return integer|false|string
 	 */
 	public function queryInsert($query)
 	{
-		if (empty($query)) {
+		if (!$this->parseQuery($query)) {
 			return false;
-		}
-
-		if (NN_QUERY_STRIP_WHITESPACE) {
-			$query = Utility::collapseWhiteSpace($query);
 		}
 
 		$i = 2;
 		$error = '';
-		while($i < 11) {
+		while ($i < 11) {
 			$result = $this->queryExecHelper($query, true);
 			if (is_array($result) && isset($result['deadlock'])) {
 				$error = $result['message'];
 				if ($result['deadlock'] === true) {
-					$this->echoError("A Deadlock or lock wait timeout has occurred, sleeping.(" . ($i-1) . ")", 'queryInsert', 4);
-					$this->ct->showsleep($i * ($i/2));
+					$this->echoError("A Deadlock or lock wait timeout has occurred, sleeping. (" .
+						($i - 1) . ")",
+						'queryInsert',
+						4);
+					$this->ct->showsleep($i * ($i / 2));
 					$i++;
 				} else {
 					break;
@@ -479,6 +518,23 @@ class DB extends \PDO
 	}
 
 	/**
+	 * Delete rows from MySQL.
+	 *
+	 * @param string $query
+	 * @param bool   $silent Echo or log errors?
+	 *
+	 * @return bool|\PDOStatement
+	 */
+	public function queryDelete($query, $silent = false)
+	{
+		// Accommodate for chained queries (SELECT 1;DELETE x FROM y)
+		if (preg_match('#(.*?[^a-z0-9]|^)DELETE\s+(.+?)$#is', $query, $matches)) {
+			$query = $matches[1] . 'DELETE ' . $this->DELETE_LOW_PRIORITY . $this->DELETE_QUICK . $matches[2];
+		}
+		return $this->queryExec($query, $silent);
+	}
+
+	/**
 	 * Used for deleting, updating (and inserting without needing the last insert id).
 	 *
 	 * @param string $query
@@ -488,23 +544,19 @@ class DB extends \PDO
 	 */
 	public function queryExec($query, $silent = false)
 	{
-		if (empty($query)) {
+		if (!$this->parseQuery($query)) {
 			return false;
-		}
-
-		if (NN_QUERY_STRIP_WHITESPACE) {
-			$query = Utility::collapseWhiteSpace($query);
 		}
 
 		$i = 2;
 		$error = '';
-		while($i < 11) {
+		while ($i < 11) {
 			$result = $this->queryExecHelper($query);
 			if (is_array($result) && isset($result['deadlock'])) {
 				$error = $result['message'];
 				if ($result['deadlock'] === true) {
-					$this->echoError("A Deadlock or lock wait timeout has occurred, sleeping.(" . ($i-1) . ")", 'queryExec', 4);
-					$this->ct->showsleep($i * ($i/2));
+					$this->echoError("A Deadlock or lock wait timeout has occurred, sleeping. (" . ($i - 1) . ")", 'queryExec', 4);
+					$this->ct->showsleep($i * ($i / 2));
 					$i++;
 				} else {
 					break;
@@ -534,7 +586,7 @@ class DB extends \PDO
 	protected function queryExecHelper($query, $insert = false)
 	{
 		try {
-			if ($insert === false ) {
+			if ($insert === false) {
 				$run = $this->pdo->prepare($query);
 				$run->execute();
 				return $run;
@@ -577,7 +629,7 @@ class DB extends \PDO
 	 * @note If not "consumed", causes this error:
 	 *       'SQLSTATE[HY000]: General error: 2014 Cannot execute queries while other unbuffered queries are active.
 	 *        Consider using PDOStatement::fetchAll(). Alternatively, if your code is only ever going to run against mysql,
-	 *        you may enable query buffering by setting the \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.'
+	 *        you may enable query buffering by setting the PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.'
 	 *
 	 * @param string $query
 	 * @param bool   $silent Whether to skip echoing errors to the console.
@@ -586,12 +638,8 @@ class DB extends \PDO
 	 */
 	public function exec($query, $silent = false)
 	{
-		if (empty($query)) {
+		if (!$this->parseQuery($query)) {
 			return false;
-		}
-
-		if (NN_QUERY_STRIP_WHITESPACE) {
-			$query = Utility::collapseWhiteSpace($query);
 		}
 
 		try {
@@ -637,12 +685,8 @@ class DB extends \PDO
 	 */
 	public function query($query, $cache = false, $cacheExpiry = 600)
 	{
-		if (empty($query)) {
+		if (!$this->parseQuery($query)) {
 			return false;
-		}
-
-		if (NN_QUERY_STRIP_WHITESPACE) {
-			$query = Utility::collapseWhiteSpace($query);
 		}
 
 		if ($cache === true && $this->cacheEnabled === true) {
@@ -687,7 +731,7 @@ class DB extends \PDO
 		// Remove LIMIT and OFFSET from query to allow queryCalc usage with browse
 		$query = preg_replace('#(\s+LIMIT\s+\d+)?\s+OFFSET\s+\d+\s*$#i', '', $query);
 
-		if ($cache === true && $this->cacheEnabled === true ) {
+		if ($cache === true && $this->cacheEnabled === true) {
 			try {
 				$count = $this->cacheServer->get($this->cacheServer->createKey($query . 'count'));
 				if ($count !== false) {
@@ -705,10 +749,10 @@ class DB extends \PDO
 		}
 
 		return
-				[
-						'total' => ($result === false ? 0 : $result['total']),
-						'result' => $data
-				];
+			[
+				'total' => ($result === false ? 0 : $result['total']),
+				'result' => $data
+			];
 	}
 
 	/**
@@ -755,31 +799,9 @@ class DB extends \PDO
 		$result = $this->queryArray($query);
 
 		if ($mode != \PDO::FETCH_ASSOC) {
-			$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+			$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, $mode); // Restore old mode
 		}
 		return $result;
-	}
-
-	/**
-	 * Fetch a assoc row from a result set
-	 *
-	 * @param $result
-	 * @return array|\PDOStatement
-	 */
-	public function getAssocArray($result)
-	{
-		return $result->fetch(\PDO::FETCH_ASSOC);
-	}
-
-	/**
-	 * Get the total number of rows in the result set
-	 *
-	 * @param $result
-	 * @return int|\PDOStatement
-	 */
-	public function getNumRows($result)
-	{
-		return $result->rowCount();
 	}
 
 	/**
@@ -792,12 +814,8 @@ class DB extends \PDO
 	 */
 	public function queryDirect($query, $ignore = false)
 	{
-		if (empty($query)) {
+		if (!$this->parseQuery($query)) {
 			return false;
-		}
-
-		if (NN_QUERY_STRIP_WHITESPACE) {
-			$query = Utility::collapseWhiteSpace($query);
 		}
 
 		try {
@@ -878,9 +896,10 @@ class DB extends \PDO
 		// Force the query to only return 1 row, so queryArray doesn't potentially run out of memory on a large data set.
 		// First check if query already contains a LIMIT clause.
 		if (preg_match('#\s+LIMIT\s+(?P<lower>\d+)(,\s+(?P<upper>\d+))?(;)?$#i', $query, $matches)) {
-			If (!isset($matches['upper']) && isset($matches['lower']) && $matches['lower'] == 1) {
+			if (!isset($matches['upper']) && isset($matches['lower']) && $matches['lower'] == 1) {
 				// good it's already correctly set.
-			} else { // We have a limit, but it's not for a single row
+			} else {
+				// We have a limit, but it's not for a single row
 				return false;
 			}
 
@@ -915,7 +934,7 @@ class DB extends \PDO
 			foreach ($tableList as $tableName) {
 				$tableAnd .= ($this->escapeString($tableName) . ',');
 			}
-			$tableAnd = (' AND name IN (' . rtrim($tableAnd, ',') . ')');
+			$tableAnd = (' AND Name IN (' . rtrim($tableAnd, ',') . ')');
 		}
 
 		switch ($type) {
@@ -965,18 +984,6 @@ class DB extends \PDO
 		}
 
 		return $optimised;
-	}
-
-	/**
-	 * Get the amount of found rows after running a SELECT SQL_CALC_FOUND_ROWS query.
-	 *
-	 * @return int
-	 * @access public
-	 */
-	public function get_Found_Rows()
-	{
-		$totalCount = $this->queryOneRow('SELECT FOUND_ROWS() AS total');
-		return ($totalCount === false ? 0 : $totalCount['total']);
 	}
 
 	/**
@@ -1040,6 +1047,109 @@ class DB extends \PDO
 		return true;
 	}
 
+	public function setCovers()
+	{
+		$path = Settings::value([
+			'section'    => 'site',
+			'subsection' => 'main',
+			'name'       => 'coverspath',
+			'setting'    => 'coverspath',
+		]);
+		Utility::setCoversConstant($path);
+	}
+
+	public function rowToArray(array $row)
+	{
+		$this->settings[$row['setting']] = $row['value'];
+	}
+
+	public function rowsToArray(array $rows)
+	{
+		foreach ($rows as $row) {
+			if (is_array($row)) {
+				$this->rowToArray($row);
+			}
+		}
+
+		return $this->settings;
+	}
+
+	public function settingsUpdate($form)
+	{
+		$error = $this->settingsValidate($form);
+
+		if ($error === null) {
+			$sql = $sqlKeys = [];
+			foreach ($form as $settingK => $settingV) {
+				$sql[] = sprintf("WHEN %s THEN %s",
+					$this->escapeString($settingK),
+					$this->escapeString($settingV));
+				$sqlKeys[] = $this->escapeString($settingK);
+			}
+
+			$this->queryExec(
+				sprintf("UPDATE settings SET value = CASE setting %s END WHERE setting IN (%s)",
+					implode(' ', $sql),
+					implode(', ', $sqlKeys)
+				)
+			);
+		} else {
+			$form = $error;
+		}
+
+		return $form;
+	}
+
+	protected function settingsValidate(array $fields)
+	{
+		$defaults = [
+			'checkpasswordedrar' => false,
+			'ffmpegpath'         => '',
+			'mediainfopath'      => '',
+			'nzbpath'            => '',
+			'tmpunrarpath'       => '',
+			'unrarpath'          => '',
+			'yydecoderpath'      => '',
+		];
+		$fields += $defaults;    // Make sure keys exist to avoid error notices.
+		ksort($fields);
+		// Validate settings
+		$fields['nzbpath'] = Utility::trailingSlash($fields['nzbpath']);
+		$error = null;
+		switch (true) {
+			case ($fields['mediainfopath'] != '' && !is_file($fields['mediainfopath'])):
+				$error = Settings::ERR_BADMEDIAINFOPATH;
+				break;
+			case ($fields['ffmpegpath'] != '' && !is_file($fields['ffmpegpath'])):
+				$error = Settings::ERR_BADFFMPEGPATH;
+				break;
+			case ($fields['unrarpath'] != '' && !is_file($fields['unrarpath'])):
+				$error = Settings::ERR_BADUNRARPATH;
+				break;
+			case (empty($fields['nzbpath'])):
+				$error = Settings::ERR_BADNZBPATH_UNSET;
+				break;
+			case (!file_exists($fields['nzbpath']) || !is_dir($fields['nzbpath'])):
+				$error = Settings::ERR_BADNZBPATH;
+				break;
+			case (!is_readable($fields['nzbpath'])):
+				$error = Settings::ERR_BADNZBPATH_UNREADABLE;
+				break;
+			case ($fields['checkpasswordedrar'] == 1 && !is_file($fields['unrarpath'])):
+				$error = Settings::ERR_DEEPNOUNRAR;
+				break;
+			case ($fields['tmpunrarpath'] != '' && !file_exists($fields['tmpunrarpath'])):
+				$error = Settings::ERR_BADTMPUNRARPATH;
+				break;
+			case ($fields['yydecoderpath'] != '' &&
+				$fields['yydecoderpath'] !== 'simple_php_yenc_decode' &&
+				!file_exists($fields['yydecoderpath'])):
+				$error = Settings::ERR_BAD_YYDECODER_PATH;
+		}
+
+		return $error;
+	}
+
 	/**
 	 * PHP interpretation of MySQL's from_unixtime method.
 	 * @param int  $utime UnixTime
@@ -1099,7 +1209,7 @@ class DB extends \PDO
 
 	/**
 	 * Checks whether the connection to the server is working. Optionally restart a new connection.
-	 * NOTE: Restart does not happen if \PDO is not using exceptions (PHP's default configuration).
+	 * NOTE: Restart does not happen if PDO is not using exceptions (PHP's default configuration).
 	 * In this case check the return value === false.
 	 *
 	 * @param boolean $restart Whether an attempt should be made to reinitialise the Db object on failure.
@@ -1109,7 +1219,7 @@ class DB extends \PDO
 	public function ping($restart = false)
 	{
 		try {
-			return (bool) $this->pdo->query('SELECT 1+1');
+			return (bool)$this->pdo->query('SELECT 1+1');
 		} catch (\PDOException $e) {
 			if ($restart == true) {
 				$this->initialiseDatabase();
@@ -1150,7 +1260,7 @@ class DB extends \PDO
 	 *
 	 * @param int $attribute
 	 *
-	 * @return bool|mixed
+	 * @return false|mixed
 	 */
 	public function getAttribute($attribute)
 	{
@@ -1175,7 +1285,7 @@ class DB extends \PDO
 	 *
 	 * @return string
 	 */
-	public function getDbVersion ()
+	public function getDbVersion()
 	{
 		return $this->dbVersion;
 	}
@@ -1186,7 +1296,7 @@ class DB extends \PDO
 	 * @return bool|null       TRUE if Db version is greater than or eaqual to $requiredVersion,
 	 * false if not, and null if the version isn't available to check against.
 	 */
-	public function isDbVersionAtLeast ($requiredVersion)
+	public function isDbVersionAtLeast($requiredVersion)
 	{
 		if (empty($this->dbVersion)) {
 			return null;
@@ -1197,7 +1307,7 @@ class DB extends \PDO
 	/**
 	 * Performs the fetch from the Db server and stores the resulting Major.Minor.Version number.
 	 */
-	private function fetchDbVersion ()
+	private function fetchDbVersion()
 	{
 		$result = $this->queryOneRow("SELECT VERSION() AS version");
 		if (!empty($result)) {
@@ -1205,4 +1315,24 @@ class DB extends \PDO
 			$this->dbVersion = $dummy[0];
 		}
 	}
+
+	/**
+	 * Checks if the query is empty. Cleans the query of whitespace if needed.
+	 *
+	 * @param string $query
+	 *
+	 * @return boolean
+	 */
+	private function parseQuery(&$query)
+	{
+		if (empty($query)) {
+			return false;
+		}
+
+		if (NN_QUERY_STRIP_WHITESPACE) {
+			$query = Utility::collapseWhiteSpace($query);
+		}
+		return true;
+	}
+
 }

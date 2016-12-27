@@ -9,8 +9,8 @@
 		<tr>
 			<td><label for="group_regex">Group:</label></td>
 			<td>
-				<input type="hidden" name="id" value="{$regex.id}" />
-				<input type="text" id="group_regex" name="group_regex" value="{$regex.group_regex|escape:html}" />
+				<input type="hidden" name="id" value="{if isset($regex.id)}{$regex.id}{else}{/if}" />
+				<input type="text" id="group_regex" name="group_regex" value="{if isset($regex.group_regex)}{$regex.group_regex|escape:html}{else}{/if}" />
 				<div class="hint">
 					Regex to match against a group or multiple groups.<br />
 					Delimiters are already added, and PCRE_CASELESS is added after for case insensitivity.<br /> >
@@ -22,7 +22,7 @@
 		<tr>
 			<td><label for="regex">Regex:</label></td>
 			<td>
-				<textarea id="regex" name="regex" >{$regex.regex|escape:html}</textarea>
+				<textarea id="regex" name="regex" >{if isset($regex.regex)}{$regex.regex|escape:html}{else}{/if}</textarea>
 				<div class="hint">
 					The regex to use when trying to name a release using the usenet subject.<br />
 					The regex delimiters are not added, you MUST add them. See <a href="http://php.net/manual/en/regexp.reference.delimiters.php">this</a> page.<br />
@@ -38,7 +38,7 @@
 		<tr>
 			<td><label for="description">Description:</label></td>
 			<td>
-				<textarea id="description" name="description" >{$regex.description|escape:html}</textarea>
+				<textarea id="description" name="description" >{if isset($regex.description)}{$regex.description|escape:html}{else}{/if}</textarea>
 				<div class="hint">
 					Description for this regex.<br />
 					You can include an example usenet subject this regex would match on.
@@ -48,7 +48,7 @@
 		<tr>
 			<td><label for="ordinal">Ordinal:</label></td>
 			<td>
-				<input class="ordinal" id="ordinal" name="ordinal" type="text" value="{$regex.ordinal}" />
+				<input class="ordinal" id="ordinal" name="ordinal" type="text" value="{if isset($regex.ordinal)}{$regex.ordinal}{else}{/if}" />
 				<div class="hint">
 					The order to run this regex in.<br />
 					Must be a number, 0 or higher.<br />

@@ -1,7 +1,9 @@
 <?php
 namespace nntmux\libraries;
 
-use nntmux\utility\Utility;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use nntmux\db\DB;
 
 /**
  * Class TraktAPI
@@ -25,6 +27,16 @@ Class TraktAPI {
 	private $requestHeaders;
 
 	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
+	 * @var DB
+	 */
+	protected $pdo;
+
+	/**
 	 * Construct. Assign passed request headers.  Headers should be complete with API key.
 	 *
 	 * @access public
@@ -39,6 +51,9 @@ Class TraktAPI {
 		} else {
 			$this->requestHeaders = $headers;
 		}
+
+		$this->client = new Client();
+		$this->pdo = new DB();
 	}
 
 	/**
@@ -143,13 +158,26 @@ Class TraktAPI {
 
 		if (!empty($this->requestHeaders)) {
 
-			$json = Utility::getUrl([
-							'url'            => $URI . $extendedString,
-							'requestheaders' => $this->requestHeaders
+			try {
+				$json = $this->client->get(
+					$URI . $extendedString,
+					[
+						'headers' => $this->requestHeaders
 					]
-			);
+				)->getBody()->getContents();
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+					}
+				}
+			}
 
-			if ($json !== false) {
+			if (isset($json) && $json !== false) {
 				$json = json_decode($json, true);
 				if (!is_array($json) || (isset($json['status']) && $json['status'] === 'failure')) {
 					return false;

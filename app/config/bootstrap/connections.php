@@ -109,9 +109,13 @@ if (file_exists($config) && !defined('NN_INSTALLER')) {
 				'persistent' => false,
 			]
 		);
+
+		\nntmux\utility\Utility::setCoversConstant(
+			\app\models\Settings::value('site.main.coverspath')
+		);
 	}
 } else {
-	/** throw new ErrorException("Couldn't open NNTmux's configuration file!"); */
+	/** throw new ErrorException("Couldn't open NN's configuration file!"); */
 	Connections::add('default',
 		[
 			'type'     => 'database',

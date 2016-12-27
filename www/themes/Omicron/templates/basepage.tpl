@@ -219,7 +219,6 @@
 							<li><a href="{$smarty.const.WWW_TOP}/browse"><i
 											class="fa fa-list-ul"></i><span> Browse All Releases</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i class="fa fa-object-group"></i><span> Browse Groups</span></a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/predb"><i class="fa fa-list-ol"></i><span> PreDb</span></a>
 							</li>
 						</ul>
 					</li>
@@ -263,7 +262,7 @@
 			</div>
 			<!-- Default to the left -->
 			<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
-						href="https://github.com/DariusIII/">newznab-tmux</a>.</strong> This software is open source,
+						href="https://github.com/NNTmux/">newznab-tmux</a>.</strong> This software is open source,
 			released under the GPL license
 		</footer>
 	</div>

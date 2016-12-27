@@ -1,7 +1,8 @@
 <?php
 namespace nntmux;
 
-use nntmux\db\Settings;
+use app\models\Settings;
+use nntmux\db\DB;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ApaiIO;
 use ApaiIO\Operations\Lookup;
@@ -49,14 +50,14 @@ class MiscSorter
 		$this->qty = 100;
 		$this->DEBUGGING = NN_DEBUG;
 
-		$this->pdo = ($pdo instanceof Settings ? $pdo : new Settings());
+		$this->pdo = ($pdo instanceof DB ? $pdo : new DB());
 
 		$this->category = new Categorize(['Settings' => $this->pdo]);
 		$this->movie = new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 		$this->music = new Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
-		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
-		$this->privkey = $this->pdo->getSetting('amazonprivkey');
-		$this->asstag = $this->pdo->getSetting('amazonassociatetag');
+		$this->pubkey = Settings::value('APIs..amazonpubkey');
+		$this->privkey = Settings::value('APIs..amazonprivkey');
+		$this->asstag = Settings::value('APIs..amazonassociatetag');
 	}
 
 	// Main function that determines which operation(s) should be run based on the releases NFO file

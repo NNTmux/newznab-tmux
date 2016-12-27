@@ -10,7 +10,8 @@
 		</a>
 	</div>
 </div>
-
+<div style="text-align: center">{$search_description}<div>
+		<br>
 <div class="navbar">
 	<div class="container">
 		<form method="get" class="navbar-form pull-left" action="{$smarty.const.WWW_TOP}/search">

@@ -1,9 +1,10 @@
 <?php
 namespace nntmux;
 
+use app\models\Settings;
 use dariusiii\rarinfo\Par2Info;
 use dariusiii\rarinfo\SfvInfo;
-use nntmux\db\Settings;
+use nntmux\db\DB;
 use nntmux\processing\PostProcess;
 use nntmux\utility\Utility;
 
@@ -82,15 +83,15 @@ class Nfo
 		];
 		$options += $defaults;
 		$this->echo = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->nzbs = ($this->pdo->getSetting('maxnfoprocessed') != '') ? (int)$this->pdo->getSetting('maxnfoprocessed') : 100;
-		$this->maxsize = ($this->pdo->getSetting('maxsizetoprocessnfo') != '') ? (int)$this->pdo->getSetting('maxsizetoprocessnfo') : 100;
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->nzbs = (Settings::value('..maxnfoprocessed') != '') ? (int)Settings::value('..maxnfoprocessed') : 100;
+		$this->maxsize = (Settings::value('..maxsizetoprocessnfo') != '') ? (int)Settings::value('..maxsizetoprocessnfo') : 100;
 		$this->maxsize = ($this->maxsize > 0 ? ('AND size < ' . ($this->maxsize * 1073741824)) : '');
-		$this->minsize = ($this->pdo->getSetting('minsizetoprocessnfo') != '') ? (int)$this->pdo->getSetting('minsizetoprocessnfo') : 100;
+		$this->minsize = (Settings::value('..minsizetoprocessnfo') != '') ? (int)Settings::value('..minsizetoprocessnfo') : 100;
 		$this->minsize = ($this->minsize > 0 ? ('AND size > ' . ($this->minsize * 1048576)) : '');
-		$this->maxRetries = (int)($this->pdo->getSetting('maxnforetries') >= 0 ? -((int)$this->pdo->getSetting('maxnforetries') + 1) : self::NFO_UNPROC);
+		$this->maxRetries = (int)(Settings::value('..maxnforetries') >= 0 ? -((int)Settings::value('..maxnforetries') + 1) : self::NFO_UNPROC);
 		$this->maxRetries = ($this->maxRetries < -8 ? -8 : $this->maxRetries);
-		$this->tmpPath = (string)$this->pdo->getSetting('tmpunrarpath');
+		$this->tmpPath = (string)Settings::value('..tmpunrarpath');
 		if (!preg_match('/[\/\\\\]$/', $this->tmpPath)) {
 			$this->tmpPath .= DS;
 		}
@@ -241,7 +242,7 @@ class Nfo
 	 * "AND r.nzbstatus = 1 AND r.nfostatus BETWEEN -8 AND -1 AND r.size < 1073741824 AND r.size > 1048576"
 	 * To use in a query.
 	 *
-	 * @param Settings $pdo
+	 * @param DB $pdo
 	 *
 	 * @return string
 	 * @access public
@@ -249,15 +250,15 @@ class Nfo
 	 */
 	static public function NfoQueryString(&$pdo)
 	{
-		if ($pdo instanceof Settings) {
-			$maxSize = $pdo->getSetting('maxsizetoprocessnfo');
-			$minSize = $pdo->getSetting('minsizetoprocessnfo');
-			$maxRetries = (int)($pdo->getSetting('maxnforetries') >= 0 ?
-				-((int)$pdo->getSetting('maxnforetries') + 1) : self::NFO_UNPROC);
+		if ($pdo instanceof DB) {
+			$maxSize = Settings::value('..maxsizetoprocessnfo');
+			$minSize = Settings::value('..minsizetoprocessnfo');
+			$maxRetries = (int)(Settings::value('..maxnforetries') >= 0 ?
+				-((int)Settings::value('..maxnforetries') + 1) : self::NFO_UNPROC);
 		} else {
-			$maxSize = \app\models\Settings::value('maxsizetoprocessnfo');
-			$minSize = \app\models\Settings::value('minsizetoprocessnfo');
-			$value = \app\models\Settings::value('maxnforetries');
+			$maxSize = Settings::value('..maxsizetoprocessnfo');
+			$minSize = Settings::value('..minsizetoprocessnfo');
+			$value = Settings::value('..maxnforetries');
 			$maxRetries = (int)$value >= 0 ? -((int)$value + 1) : self::NFO_UNPROC;
 		}
 		return (
@@ -361,7 +362,7 @@ class Nfo
 					$cp = 'COMPRESS(%s)';
 					$nc = $this->pdo->escapeString($fetchedBinary);
 
-					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT id FROM release_nfos WHERE releases_id = %d', $arr['id']));
+					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM release_nfos WHERE releases_id = %d', $arr['id']));
 					if (!isset($ckreleaseid['id'])) {
 						$this->pdo->queryInsert(sprintf('INSERT INTO release_nfos (nfo, releases_id) VALUES (' . $cp . ', %d)', $nc, $arr['id']));
 					}
