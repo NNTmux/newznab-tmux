@@ -731,6 +731,8 @@ class Binaries
 					// Get the current unixtime from PHP.
 					$now = time();
 
+					$mgroups = implode('', ReleasesMultiGroup::$mgrGroups);
+
 					$collectionID = $this->_pdo->queryInsert(
 						sprintf("
 							INSERT INTO %s (subject, fromname, date, xref, group_id,
@@ -741,7 +743,7 @@ class Binaries
 							$this->_pdo->escapeString(substr(utf8_encode($matches[1]), 0, 255)),
 							$this->_pdo->escapeString(utf8_encode($header['From'])),
 							(is_numeric($header['Date']) ? ($header['Date'] > $now ? $now : $header['Date']) : $now),
-							$this->_pdo->escapeString(substr($header['Xref'], 0, 255)),
+							($multiGroup === true ? $this->_pdo->escapeString(substr($mgroups, 0, 255)) : $this->_pdo->escapeString(substr($header['Xref'], 0, 255))),
 							$groupMySQL['id'],
 							$fileCount[3],
 							sha1($header['CollectionKey']),
@@ -849,8 +851,15 @@ class Binaries
 				$this->_pdo->Rollback();
 			}
 
-			if ((($multiGroup === true && strlen($mgrPartsQuery) === strlen($mgrPartsCheck)) ? true : $this->_pdo->queryExec(rtrim($mgrPartsQuery, ',')))) {
-				$this->_pdo->Commit();
+			if ($multiGroup === true) {
+				if (((strlen($mgrPartsQuery) === strlen($mgrPartsCheck)) ? true : $this->_pdo->queryExec(rtrim($mgrPartsQuery, ',')))) {
+					$this->_pdo->Commit();
+				} else {
+					if ($addToPartRepair) {
+						$headersNotInserted += $headersReceived;
+					}
+					$this->_pdo->Rollback();
+				}
 			}
 		} else {
 			if ($addToPartRepair) {
