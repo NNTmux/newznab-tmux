@@ -31,7 +31,7 @@ chmod -R 777 app/resources
 chmod -R 755 libraries
 chmod -R 755 resources
 chmod -R 777 www
-chmod +x ./zed
+chmod +x ./tmux
 alias tmux='./tmux'
 echo ""
 
