@@ -852,6 +852,7 @@ class Binaries
 			}
 
 			if ($multiGroup === true) {
+				$this->_pdo->beginTransaction();
 				if (((strlen($mgrPartsQuery) === strlen($mgrPartsCheck)) ? true : $this->_pdo->queryExec(rtrim($mgrPartsQuery, ',')))) {
 					$this->_pdo->Commit();
 				} else {
