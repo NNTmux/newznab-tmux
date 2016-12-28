@@ -1531,6 +1531,24 @@ class ProcessReleases
 				self::COLLFC_COMPCOLL
 			)
 		);
+
+		$this->pdo->queryExec(
+			sprintf('
+				UPDATE %s c INNER JOIN
+					(SELECT c.id FROM %s c
+					INNER JOIN %s b ON b.collection_id = c.id
+					WHERE c.totalfiles > 0 AND c.filecheck = %d
+					GROUP BY b.collection_id, c.totalfiles, c.id
+					HAVING COUNT(b.id) IN (c.totalfiles, c.totalfiles + 1)
+					)
+				r ON c.id = r.id SET filecheck = %d',
+				$group['mgrcname'],
+				$group['mgrcname'],
+				$group['mgrbname'],
+				self::COLLFC_DEFAULT,
+				self::COLLFC_COMPCOLL
+			)
+		);
 	}
 
 	/**
@@ -1577,6 +1595,35 @@ class ProcessReleases
 				self::COLLFC_TEMPCOMP,
 				self::COLLFC_COMPCOLL,
 				$where
+			)
+		);
+
+		$this->pdo->queryExec(
+			sprintf('
+				UPDATE %s c INNER JOIN
+					(SELECT c.id FROM %s c
+					INNER JOIN %s b ON b.collection_id = c.id
+					WHERE b.filenumber = 0
+					AND c.totalfiles > 0
+					AND c.filecheck = %d
+					GROUP BY c.id
+					)
+				r ON c.id = r.id SET c.filecheck = %d',
+				$group['mgrcname'],
+				$group['mgrcname'],
+				$group['mgrbname'],
+				self::COLLFC_COMPCOLL,
+				self::COLLFC_ZEROPART
+			)
+		);
+		$this->pdo->queryExec(
+			sprintf('
+				UPDATE %s c
+				SET filecheck = %d
+				WHERE filecheck = %d',
+				$group['mgrcname'],
+				self::COLLFC_TEMPCOMP,
+				self::COLLFC_COMPCOLL
 			)
 		);
 	}
@@ -1629,6 +1676,41 @@ class ProcessReleases
 				self::FILE_COMPLETE
 			)
 		);
+
+		$this->pdo->queryExec(
+			sprintf('
+				UPDATE %s b INNER JOIN
+					(SELECT b.id FROM %s b
+					INNER JOIN %s c ON c.id = b.collection_id
+					WHERE c.filecheck = %d AND b.partcheck = %d
+					AND b.currentparts = b.totalparts
+					GROUP BY b.id, b.totalparts)
+				r ON b.id = r.id SET b.partcheck = %d',
+				$group['mgrbname'],
+				$group['mgrbname'],
+				$group['mgrcname'],
+				self::COLLFC_TEMPCOMP,
+				self::FILE_INCOMPLETE,
+				self::FILE_COMPLETE
+			)
+		);
+		$this->pdo->queryExec(
+			sprintf('
+				UPDATE %s b INNER JOIN
+					(SELECT b.id FROM %s b
+					INNER JOIN %s c ON c.id = b.collection_id
+					WHERE c.filecheck = %d AND b.partcheck = %d
+					AND b.currentparts >= (b.totalparts + 1)
+					GROUP BY b.id, b.totalparts)
+				r ON b.id = r.id SET b.partcheck = %d',
+				$group['mgrbname'],
+				$group['mgrbname'],
+				$group['mgrcname'],
+				self::COLLFC_ZEROPART,
+				self::FILE_INCOMPLETE,
+				self::FILE_COMPLETE
+			)
+		);
 	}
 
 	/**
@@ -1661,6 +1743,23 @@ class ProcessReleases
 				self::COLLFC_COMPPART
 			)
 		);
+
+		$this->pdo->queryExec(
+			sprintf('
+				UPDATE %s c INNER JOIN
+					(SELECT c.id FROM %s c
+					INNER JOIN %s b ON c.id = b.collection_id
+					WHERE b.partcheck = 1 AND c.filecheck IN (%d, %d)
+					GROUP BY b.collection_id, c.totalfiles, c.id HAVING COUNT(b.id) >= c.totalfiles)
+				r ON c.id = r.id SET filecheck = %d',
+				$group['mgrcname'],
+				$group['mgrcname'],
+				$group['mgrbname'],
+				self::COLLFC_TEMPCOMP,
+				self::COLLFC_ZEROPART,
+				self::COLLFC_COMPPART
+			)
+		);
 	}
 
 	/**
@@ -1685,6 +1784,18 @@ class ProcessReleases
 				self::COLLFC_TEMPCOMP,
 				self::COLLFC_ZEROPART,
 				$where
+			)
+		);
+
+		$this->pdo->queryExec(
+			sprintf('
+				UPDATE %s c
+				SET filecheck = %d
+				WHERE filecheck IN (%d, %d)',
+				$group['mgrcname'],
+				self::COLLFC_COMPCOLL,
+				self::COLLFC_TEMPCOMP,
+				self::COLLFC_ZEROPART
 			)
 		);
 	}
@@ -1713,6 +1824,20 @@ class ProcessReleases
 				self::COLLFC_DEFAULT,
 				self::COLLFC_COMPCOLL,
 				$where
+			)
+		);
+
+		$this->pdo->queryExec(
+			sprintf("
+				UPDATE %s c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM %s b WHERE b.collection_id = c.id)
+				WHERE c.dateadded < NOW() - INTERVAL '%d' HOUR
+				AND c.filecheck IN (%d, %d, 10)",
+				$group['mgrcname'],
+				self::COLLFC_COMPPART,
+				$group['mgrbname'],
+				$this->collectionDelayTime,
+				self::COLLFC_DEFAULT,
+				self::COLLFC_COMPCOLL
 			)
 		);
 	}
