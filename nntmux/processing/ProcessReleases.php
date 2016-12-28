@@ -369,13 +369,36 @@ class ProcessReleases
 				$group['bname'],
 				self::COLLFC_SIZED,
 				self::COLLFC_COMPPART,
-				(!empty($groupID) ? ' AND c.group_id = ' . $groupID : ' ')
+				(!empty($groupID) ? ' AND c.group_id = ' . $groupID : '')
 			)
 		);
 		if ($checked !== false && $this->echoCLI) {
 			$this->pdo->log->doEcho(
 				$this->pdo->log->primary(
 					$checked->rowCount() . " collections set to filecheck = 3(size calculated)"
+				)
+			);
+			$this->pdo->log->doEcho($this->pdo->log->primary($this->consoleTools->convertTime(time() - $startTime)), true);
+		}
+
+		// Get the total size in bytes of the mgr collection for mgr collections where filecheck = 2.
+		$mgrChecked = $this->pdo->queryExec(
+			sprintf(
+				'UPDATE %s c
+				SET filesize = (SELECT COALESCE(SUM(b.partsize), 0) FROM %s b WHERE b.collection_id = c.id),
+				filecheck = %d
+				WHERE c.filecheck = %d
+				AND c.filesize = 0',
+				$group['mgrcname'],
+				$group['mgrbname'],
+				self::COLLFC_SIZED,
+				self::COLLFC_COMPPART
+			)
+		);
+		if ($mgrChecked !== false && $this->echoCLI) {
+			$this->pdo->log->doEcho(
+				$this->pdo->log->primary(
+					$mgrChecked->rowCount() . " mgr collections set to filecheck = 3(size calculated)"
 				)
 			);
 			$this->pdo->log->doEcho($this->pdo->log->primary($this->consoleTools->convertTime(time() - $startTime)), true);
