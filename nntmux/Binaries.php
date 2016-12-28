@@ -742,7 +742,7 @@ class Binaries
 							$this->_pdo->escapeString(utf8_encode($header['From'])),
 							(is_numeric($header['Date']) ? ($header['Date'] > $now ? $now : $header['Date']) : $now),
 							$this->_pdo->escapeString(substr($header['Xref'], 0, 255)),
-							($multiGroup === true ? 0 : $groupMySQL['id']),
+							$groupMySQL['id'],
 							$fileCount[3],
 							sha1($header['CollectionKey']),
 							bin2hex(openssl_random_pseudo_bytes(16))
@@ -768,7 +768,7 @@ class Binaries
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
 						($multiGroup === true ? $tableNames['mgrbname'] : $tableNames['bname']),
-						($multiGroup === true ? md5($matches[1] . $header['From'] . -1) : md5($matches[1] . $header['From'] . $groupMySQL['id'])),
+						($multiGroup === true ? md5($matches[1] . $header['From']) : md5($matches[1] . $header['From'] . $groupMySQL['id'])),
 						$this->_pdo->escapeString(utf8_encode($matches[1])),
 						$collectionID,
 						$matches[3],
