@@ -516,11 +516,10 @@ class Binaries
 	{
 		// Start time of scan method and of fetching headers.
 		$startLoop = microtime(true);
+		$multiGroup = false;
 
 		// Check if MySQL tables exist, create if they do not, get their names at the same time.
 		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupMySQL['id']);
-
-		$multiGroup = false;
 
 		$returnArray = [];
 
@@ -616,6 +615,7 @@ class Binaries
 		$notYEnc = $headersBlackListed = 0;
 
 		$partsQuery = $partsCheck = sprintf('INSERT IGNORE INTO %s (binaryid, number, messageid, partnumber, size) VALUES ', $tableNames['pname']);
+		$mgrPartsQuery = $mgrPartsCheck = sprintf('INSERT IGNORE INTO %s (binaryid, number, messageid, partnumber, size) VALUES ', $tableNames['mgrpname']);
 
 		$this->_pdo->beginTransaction();
 		// Loop articles, figure out files/parts.
@@ -807,6 +807,12 @@ class Binaries
 				'(' . $binaryID . ',' . $header['Number'] . ',' . rtrim($header['Message-ID'], '>') . "'," .
 				$matches[2] . ',' . $header['Bytes'] . '),';
 
+			if ($multiGroup === true) {
+				$mgrPartsQuery .=
+					'(' . $binaryID . ',' . $header['Number'] . ',' . rtrim($header['Message-ID'], '>') . "'," .
+					$matches[2] . ',' . $header['Bytes'] . '),';
+			}
+
 		}
 
 		unset($headers); // Reclaim memory.
@@ -841,6 +847,10 @@ class Binaries
 					$headersNotInserted += $headersReceived;
 				}
 				$this->_pdo->Rollback();
+			}
+
+			if ((($multiGroup === true && strlen($mgrPartsQuery) === strlen($mgrPartsCheck)) ? true : $this->_pdo->queryExec(rtrim($mgrPartsQuery, ',')))) {
+				$this->_pdo->Commit();
 			}
 		} else {
 			if ($addToPartRepair) {

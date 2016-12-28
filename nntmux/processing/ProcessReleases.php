@@ -12,6 +12,7 @@ use nntmux\ReleaseImage;
 use nntmux\NZB;
 use nntmux\Categorize;
 use nntmux\Category;
+use nntmux\ReleasesMultiGroup;
 use nntmux\RequestIDLocal;
 use nntmux\RequestIDWeb;
 use nntmux\PreDb;
@@ -569,6 +570,8 @@ class ProcessReleases
 
 		$this->pdo->ping(true);
 
+		(new ReleasesMultiGroup())->createMGRReleases();
+
 		$collections = $this->pdo->queryDirect(
 			sprintf('
 				SELECT SQL_NO_CACHE %s.*, groups.name AS gname
@@ -767,6 +770,8 @@ class ProcessReleases
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
 		}
+
+		(new ReleasesMultiGroup())->createNZBs();
 
 		$releases = $this->pdo->queryDirect(
 			sprintf("

@@ -612,11 +612,15 @@ class Groups
 				exit('Error: You must use .../misc/update/nix/multiprocessing/releases.php since you have enabled TPG!');
 			}
 
-			if ($this->createNewTPGTables($groupID) === false && NN_ECHOCLI) {
+			if ($groupID !== -1 && $this->createNewTPGTables($groupID) === false && NN_ECHOCLI) {
 				exit('There is a problem creating new TPG tables for this group ID: ' . $groupID . PHP_EOL);
 			}
 
-			$groupEnding = '_' . $groupID;
+			if ($groupID !== -1) {
+				$groupEnding = '_' . $groupID;
+			} else {
+				$groupEnding = '';
+			}
 			$tables['cname'] .= $groupEnding;
 			$tables['bname'] .= $groupEnding;
 			$tables['pname'] .= $groupEnding;
