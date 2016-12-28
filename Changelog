@@ -1,4 +1,6 @@
 2016-12-27 DariusIII
+	* Chg: Add remote installer script (reused from nZEDb)
+2016-12-27 DariusIII
 	* Chg: Update composer.lock
 	* Chg: Add Travis-CI build status to README.md
 2016-12-23 DariusIII
