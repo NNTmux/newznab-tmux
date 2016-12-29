@@ -1363,12 +1363,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "dfadff37efcfd42230eef1350009898b7b9af40a"
+                "reference": "8bc9d2de8834a9b74921807ba29d081703868078"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/dfadff37efcfd42230eef1350009898b7b9af40a",
-                "reference": "dfadff37efcfd42230eef1350009898b7b9af40a",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/8bc9d2de8834a9b74921807ba29d081703868078",
+                "reference": "8bc9d2de8834a9b74921807ba29d081703868078",
                 "shasum": ""
             },
             "require": {
@@ -1417,7 +1417,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2016-12-15 09:53:31"
+            "time": "2016-12-29 13:24:34"
         },
         {
             "name": "guzzlehttp/promises",
@@ -1665,16 +1665,16 @@
         },
         {
             "name": "phpmailer/phpmailer",
-            "version": "v5.2.19",
+            "version": "v5.2.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "9e4b8fb3deb7d9cfa515c04cec41f71bc37ce9a9"
+                "reference": "1d51856b76c06fc687fcd9180efa7a0bed0d761e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/9e4b8fb3deb7d9cfa515c04cec41f71bc37ce9a9",
-                "reference": "9e4b8fb3deb7d9cfa515c04cec41f71bc37ce9a9",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/1d51856b76c06fc687fcd9180efa7a0bed0d761e",
+                "reference": "1d51856b76c06fc687fcd9180efa7a0bed0d761e",
                 "shasum": ""
             },
             "require": {
@@ -1721,7 +1721,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2016-12-26 10:09:10"
+            "time": "2016-12-28 15:35:48"
         },
         {
             "name": "psr/http-message",
