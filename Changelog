@@ -1,3 +1,5 @@
+2016-12-29 DariusIII
+	* Chg: Update phpmailer and guzzlehttp libraries
 2016-12-28 DariusIII
 	* Chg: Make match_prefiles more in depth and work in chunks of releases in full mode (ported from nZEDb)
 	* Chg: Update tmux.conf and add separate tmux configurations for older and newer tmux versions (ported from nZEDb)
