@@ -101,10 +101,10 @@ class ReleasesMultiGroup
 				INNER JOIN groups ON %s.group_id = groups.id
 				WHERE %s.filecheck = %d
 				AND filesize > 0 LIMIT %d',
-				$group['cname'],
-				$group['cname'],
-				$group['cname'],
-				$group['cname'],
+				$group['mgrcname'],
+				$group['mgrcname'],
+				$group['mgrcname'],
+				$group['mgrcname'],
 				ProcessReleases::COLLFC_SIZED,
 				$this->releaseCreationLimit
 			)
