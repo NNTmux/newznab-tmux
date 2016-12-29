@@ -338,11 +338,9 @@ class ReleasesMultiGroup
 			);
 		}
 
-		if ($groupID == '') {
-			$groupIDs = $this->_groups->getActiveIDs();
-		} else {
-			$groupIDs = [['id' => $groupID]];
-		}
+
+		$groupIDs = $this->_groups->getActiveIDs();
+
 
 		$minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
