@@ -167,18 +167,18 @@ class NZB
 				'cName' => 'collections_' . $this->groupID,
 				'bName' => 'binaries_' . $this->groupID,
 				'pName' => 'parts_' . $this->groupID,
-				'mgrcName' => 'collections_mgr',
-				'mgrbName' => 'binaries_mgr',
-				'mgrpName' => 'parts_mgr'
+				'mgrcName' => 'mgr_collections',
+				'mgrbName' => 'mgr_binaries',
+				'mgrpName' => 'mgr_parts'
 			];
 		} else {
 			$this->_tableNames = [
 				'cName' => 'collections',
 				'bName' => 'binaries',
 				'pName' => 'parts',
-				'mgrcName' => 'collections_mgr',
-				'mgrbName' => 'binaries_mgr',
-				'mgrpName' => 'parts_mgr'
+				'mgrcName' => 'mgr_collections',
+				'mgrbName' => 'mgr_binaries',
+				'mgrpName' => 'mgr_parts'
 			];
 		}
 
