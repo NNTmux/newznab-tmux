@@ -618,11 +618,7 @@ class Groups
 				exit('There is a problem creating new TPG tables for this group ID: ' . $groupID . PHP_EOL);
 			}
 
-			if ($multiGroup === false) {
-				$groupEnding = '_' . $groupID;
-			} else {
-				$groupEnding = '';
-			}
+			$groupEnding = '_' . $groupID;
 			$tables['cname'] .= $groupEnding;
 			$tables['bname'] .= $groupEnding;
 			$tables['pname'] .= $groupEnding;
