@@ -222,7 +222,7 @@ class NZB
 	 *
 	 * @access public
 	 */
-	public function writeNZBforReleaseId($relID, $relGuid, $name, $cTitle)
+	public function writeNZBforReleaseId($relID, $relGuid, $name, $cTitle, $multigroup = false)
 	{
 		$collections = $this->pdo->queryDirect($this->_collectionsQuery . $relID);
 
@@ -320,12 +320,21 @@ class NZB
 			)
 		);
 		// Delete CBP for release that has its NZB created.
-		$this->pdo->queryExec(
-			sprintf('
+		if ($multigroup === true) {
+			$this->pdo->queryExec(
+				sprintf('
 				DELETE c, b, p FROM %s c JOIN %s b ON(c.id=b.collection_id) STRAIGHT_JOIN %s p ON(b.id=p.binaryid) WHERE c.releaseid = %d',
-				$this->_tableNames['cName'], $this->_tableNames['bName'], $this->_tableNames['pName'], $relID
-			)
-		);
+					$this->_tableNames['mgrcName'], $this->_tableNames['mgrbName'], $this->_tableNames['mgrpName'], $relID
+				)
+			);
+		} else {
+			$this->pdo->queryExec(
+				sprintf('
+				DELETE c, b, p FROM %s c JOIN %s b ON(c.id=b.collection_id) STRAIGHT_JOIN %s p ON(b.id=p.binaryid) WHERE c.releaseid = %d',
+					$this->_tableNames['cName'], $this->_tableNames['bName'], $this->_tableNames['pName'], $relID
+				)
+			);
+		}
 		// Chmod to fix issues some users have with file permissions.
 		chmod($path, 0777);
 

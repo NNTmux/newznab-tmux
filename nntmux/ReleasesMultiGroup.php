@@ -305,7 +305,7 @@ class ReleasesMultiGroup
 			$this->nzb->initiateForWrite('', true);
 			foreach ($releases as $release) {
 
-				if ($this->nzb->writeNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
+				if ($this->nzb->writeNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title'], true) === true) {
 					$nzbCount++;
 					if ($this->echoCLI) {
 						echo $this->_pdo->log->primaryOver("Creating NZBs and deleting Collections:\t" . $nzbCount . '/' . $total . "\r");
