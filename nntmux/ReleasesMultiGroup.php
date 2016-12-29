@@ -8,7 +8,7 @@ use nntmux\db\DB;
 use nntmux\processing\ProcessReleases;
 
 
-class ReleasesMultiGroup
+class ReleasesMultiGroup extends ProcessReleases
 {
 
 	/**
@@ -36,6 +36,11 @@ class ReleasesMultiGroup
 		'mq@meh.com'
 	];
 
+	/**
+	 * @var
+	 */
+	protected $mgrFromNames;
+
 
 	/**
 	 * ReleasesMultiGroup constructor.
@@ -44,23 +49,7 @@ class ReleasesMultiGroup
 	 */
 	public function __construct(array $options = [])
 	{
-		$defaults = [
-			'ColorCLI'            => null,
-			'Groups'              => null,
-			'Settings'            => null,
-		];
-		$options += $defaults;
-
-		$this->_pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->_pdo]));
-		$this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
-		$this->echoCLI = NN_ECHOCLI;
-		$this->releases = new Releases(['Settings' => $this->_pdo, 'Groups' => $this->_groups]);
-		$this->consoleTools = new ConsoleTools(['ColorCLI' => $this->_pdo->log]);
-		$this->nzb = new NZBMultiGroup();
-		$this->releaseCleaning = new ReleaseCleaning($this->_pdo);
-		$this->tablePerGroup = (Settings::value('..tablepergroup') == 0 ? false : true);
-		$this->releaseCreationLimit = (Settings::value('..maxnzbsprocessed') != '' ? (int)Settings::value('..maxnzbsprocessed') : 1000);
+		parent::__construct();
 		$this->mgrFromNames = implode(",", self::$mgrPosterNames);
 	}
 
@@ -84,18 +73,18 @@ class ReleasesMultiGroup
 	public function createMGRReleases()
 	{
 		$startTime = time();
-		$group = $this->_groups->getCBPTableNames($this->tablePerGroup, '', true);
+		$group = $this->groups->getCBPTableNames($this->tablePerGroup, '', true);
 
-		$categorize = new Categorize(['Settings' => $this->_pdo]);
+		$categorize = new Categorize(['Settings' => $this->pdo]);
 		$returnCount = $duplicate = 0;
 
 		if ($this->echoCLI) {
-			$this->_pdo->log->doEcho($this->_pdo->log->header("Process Releases -> Create releases from complete collections."));
+			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create releases from complete collections."));
 		}
 
-		$this->_pdo->ping(true);
+		$this->pdo->ping(true);
 
-		$collections = $this->_pdo->queryDirect(
+		$collections = $this->pdo->queryDirect(
 			sprintf('
 				SELECT SQL_NO_CACHE %s.*, groups.name AS gname
 				FROM %s
@@ -112,26 +101,26 @@ class ReleasesMultiGroup
 		);
 
 		if ($this->echoCLI && $collections !== false) {
-			echo $this->_pdo->log->primary($collections->rowCount() . " Collections ready to be converted to releases.");
+			echo $this->pdo->log->primary($collections->rowCount() . " Collections ready to be converted to releases.");
 		}
 
 		if ($collections instanceof \Traversable) {
-			$preDB = new PreDb(['Echo' => $this->echoCLI, 'Settings' => $this->_pdo]);
+			$preDB = new PreDb(['Echo' => $this->echoCLI, 'Settings' => $this->pdo]);
 
 			foreach ($collections as $collection) {
 
-				$cleanRelName = $this->_pdo->escapeString(
+				$cleanRelName = $this->pdo->escapeString(
 					utf8_encode(
 						str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection['subject'])
 					)
 				);
-				$fromName = $this->_pdo->escapeString(
+				$fromName = $this->pdo->escapeString(
 					utf8_encode(trim($collection['fromname'], "'"))
 				);
 
 				// Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
 				// A 1% variance in size is considered the same size when the subject and poster are the same
-				$dupeCheck = $this->_pdo->queryOneRow(
+				$dupeCheck = $this->pdo->queryOneRow(
 					sprintf("
 						SELECT SQL_NO_CACHE id
 						FROM releases
@@ -175,11 +164,11 @@ class ReleasesMultiGroup
 					$releaseID = $this->releases->insertRelease(
 						[
 							'name' => $cleanRelName,
-							'searchname' => $this->_pdo->escapeString(utf8_encode($cleanedName)),
+							'searchname' => $this->pdo->escapeString(utf8_encode($cleanedName)),
 							'totalpart' => $collection['totalfiles'],
 							'groups_id' => $collection['group_id'],
-							'guid' => $this->_pdo->escapeString($this->releases->createGUID()),
-							'postdate' => $this->_pdo->escapeString($collection['date']),
+							'guid' => $this->pdo->escapeString($this->releases->createGUID()),
+							'postdate' => $this->pdo->escapeString($collection['date']),
 							'fromname' => $fromName,
 							'size' => $collection['filesize'],
 							'categories_id' => $categorize->determineCategory($collection['group_id'], $cleanedName, $fromName),
@@ -192,7 +181,7 @@ class ReleasesMultiGroup
 
 					if ($releaseID !== false) {
 						// Update collections table to say we inserted the release.
-						$this->_pdo->queryExec(
+						$this->pdo->queryExec(
 							sprintf('
 								UPDATE %s
 								SET filecheck = %d, releaseid = %d
@@ -207,12 +196,12 @@ class ReleasesMultiGroup
 						if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
 							foreach ($matches[1] as $grp) {
 								//check if the group name is in a valid format
-								$grpTmp = $this->_groups->isValidGroup($grp);
+								$grpTmp = $this->groups->isValidGroup($grp);
 								if ($grpTmp !== false) {
 									//check if the group already exists in database
-									$xrefGrpID = $this->_groups->getIDByName($grpTmp);
+									$xrefGrpID = $this->groups->getIDByName($grpTmp);
 									if ($xrefGrpID === '') {
-										$xrefGrpID = $this->_groups->add(
+										$xrefGrpID = $this->groups->add(
 											[
 												'name'                  => $grpTmp,
 												'description'           => 'Added by Release processing',
@@ -246,14 +235,14 @@ class ReleasesMultiGroup
 					}
 				} else {
 					// The release was already in the DB, so delete the collection.
-					$this->_pdo->queryExec(
+					$this->pdo->queryExec(
 						sprintf('
 							DELETE c, b, p FROM %s c
 							INNER JOIN %s b ON(c.id=b.collection_id)
 							STRAIGHT_JOIN %s p ON(b.id=p.binaryid)
 							WHERE c.collectionhash = %s',
 							$group['mgrcname'], $group['mgrbname'], $group['mgrpname'],
-							$this->_pdo->escapeString($collection['collectionhash'])
+							$this->pdo->escapeString($collection['collectionhash'])
 						)
 					);
 					$duplicate++;
@@ -262,8 +251,8 @@ class ReleasesMultiGroup
 		}
 
 		if ($this->echoCLI) {
-			$this->_pdo->log->doEcho(
-				$this->_pdo->log->primary(
+			$this->pdo->log->doEcho(
+				$this->pdo->log->primary(
 					PHP_EOL .
 					number_format($returnCount) .
 					' Releases added and ' .
@@ -287,14 +276,14 @@ class ReleasesMultiGroup
 	public function createMGRNZBs()
 	{
 
-		$releases = $this->_pdo->queryDirect(
+		$releases = $this->pdo->queryDirect(
 			sprintf("
 				SELECT SQL_NO_CACHE CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
 					r.name, r.id, r.guid
 				FROM releases r
 				INNER JOIN categories c ON r.categories_id = c.id
 				INNER JOIN categories cp ON cp.id = c.parentid
-				WHERE r.nzbstatus = 0 AND r.fromname IN (%s)", $this->_pdo->escapeString($this->mgrFromNames)
+				WHERE r.nzbstatus = 0 AND r.fromname IN (%s)", $this->pdo->escapeString($this->mgrFromNames)
 			)
 		);
 
@@ -309,7 +298,7 @@ class ReleasesMultiGroup
 				if ($this->nzb->writeMgrNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
 					$nzbCount++;
 					if ($this->echoCLI) {
-						echo $this->_pdo->log->primaryOver("Creating NZBs and deleting Collections:\t" . $nzbCount . '/' . $total . "\r");
+						echo $this->pdo->log->primaryOver("Creating NZBs and deleting Collections:\t" . $nzbCount . '/' . $total . "\r");
 					}
 				}
 			}
@@ -328,18 +317,18 @@ class ReleasesMultiGroup
 	public function deleteUnwantedMGRCollections()
 	{
 		$startTime = time();
-		$group = $this->_groups->getCBPTableNames($this->tablePerGroup, '', true);
+		$group = $this->groups->getCBPTableNames($this->tablePerGroup, '', true);
 
 		if ($this->echoCLI) {
-			$this->_pdo->log->doEcho(
-				$this->_pdo->log->header(
+			$this->pdo->log->doEcho(
+				$this->pdo->log->header(
 					"Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting."
 				)
 			);
 		}
 
 
-		$groupIDs = $this->_groups->getActiveIDs();
+		$groupIDs = $this->groups->getActiveIDs();
 
 
 		$minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
@@ -352,7 +341,7 @@ class ReleasesMultiGroup
 
 			$groupMinSizeSetting = $groupMinFilesSetting = 0;
 
-			$groupMinimums = $this->_groups->getByID($groupID['id']);
+			$groupMinimums = $this->groups->getByID($groupID['id']);
 			if ($groupMinimums !== false) {
 				if (!empty($groupMinimums['minsizetoformrelease']) && $groupMinimums['minsizetoformrelease'] > 0) {
 					$groupMinSizeSetting = (int)$groupMinimums['minsizetoformrelease'];
@@ -362,7 +351,7 @@ class ReleasesMultiGroup
 				}
 			}
 
-			if ($this->_pdo->queryOneRow(
+			if ($this->pdo->queryOneRow(
 					sprintf(
 						'SELECT SQL_NO_CACHE id FROM %s c WHERE c.filecheck = %d AND c.filesize > 0 LIMIT 1',
 						$group['mgrcname'],
@@ -371,7 +360,7 @@ class ReleasesMultiGroup
 				) !== false
 			) {
 
-				$deleteQuery = $this->_pdo->queryExec(
+				$deleteQuery = $this->pdo->queryExec(
 					sprintf('
 						DELETE c, b, p
 						FROM %s c
@@ -397,7 +386,7 @@ class ReleasesMultiGroup
 
 
 				if ($maxSizeSetting > 0) {
-					$deleteQuery = $this->_pdo->queryExec(
+					$deleteQuery = $this->pdo->queryExec(
 						sprintf('
 							DELETE c, b, p FROM %s c
 							LEFT JOIN %s b ON c.id = b.collection_id
@@ -416,7 +405,7 @@ class ReleasesMultiGroup
 					}
 				}
 
-				$deleteQuery = $this->_pdo->queryExec(
+				$deleteQuery = $this->pdo->queryExec(
 					sprintf('
 						DELETE c, b, p FROM %s c
 						LEFT JOIN %s b ON (c.id=b.collection_id)
@@ -441,14 +430,214 @@ class ReleasesMultiGroup
 		}
 
 		if ($this->echoCLI) {
-			$this->_pdo->log->doEcho(
-				$this->_pdo->log->primary(
+			$this->pdo->log->doEcho(
+				$this->pdo->log->primary(
 					'Deleted ' . ($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted) . '  MGR collections: ' . PHP_EOL .
 					$minSizeDeleted . ' smaller than, ' .
 					$maxSizeDeleted . ' bigger than, ' .
 					$minFilesDeleted . ' with less files than site/group settings in: ' .
 					$this->consoleTools->convertTime(time() - $startTime)
 				), true
+			);
+		}
+	}
+
+	/**
+	 * Delete MGR collections (complete/incomplete/old/etc).
+	 *
+	 * @void
+	 * @access public
+	 */
+	public function deleteMGRCollections()
+	{
+		$startTime = time();
+		$group = $this->groups->getCBPTableNames($this->tablePerGroup, '', true);
+
+		$deletedCount = 0;
+
+		// CBP older than retention.
+		if ($this->echoCLI) {
+			echo (
+				$this->pdo->log->header("Process Releases -> Delete finished MGR collections." . PHP_EOL) .
+				$this->pdo->log->primary(sprintf(
+					'Deleting collections/binaries/parts older than %d hours.',
+					Settings::value('..partretentionhours')
+				))
+			);
+		}
+
+		$deleted = 0;
+		$deleteQuery = $this->pdo->queryExec(
+			sprintf(
+				'DELETE c, b, p FROM %s c
+				LEFT JOIN %s b ON (c.id=b.collection_id)
+				LEFT JOIN %s p ON (b.id=p.binaryid)
+				WHERE (c.dateadded < NOW() - INTERVAL %d HOUR)',
+				$group['mgrcname'],
+				$group['mgrbname'],
+				$group['mgrpname'],
+				Settings::value('..partretentionhours')
+			)
+		);
+
+		if ($deleteQuery !== false) {
+			$deleted = $deleteQuery->rowCount();
+			$deletedCount += $deleted;
+		}
+
+		$firstQuery = $fourthQuery = time();
+
+		if ($this->echoCLI) {
+			echo $this->pdo->log->primary(
+				'Finished deleting ' . $deleted . ' old collections/binaries/parts in ' .
+				($firstQuery - $startTime) . ' seconds.' . PHP_EOL
+			);
+		}
+
+		// Cleanup orphaned collections, binaries and parts
+		// this really shouldn't happen, but just incase - so we only run 1/200 of the time
+		if (mt_rand(0, 200) <= 1 ) {
+			// CBP collection orphaned with no binaries or parts.
+			if ($this->echoCLI) {
+				echo (
+					$this->pdo->log->header("Process Releases -> Remove CBP orphans." . PHP_EOL) .
+					$this->pdo->log->primary('Deleting orphaned MGR collections.')
+				);
+			}
+
+			$deleted = 0;
+			$deleteQuery = $this->pdo->queryExec(
+				sprintf(
+					'DELETE c, b, p FROM %s c
+					LEFT JOIN %s b ON (c.id=b.collection_id)
+					LEFT JOIN %s p ON (b.id=p.binaryid)
+					WHERE (b.id IS NULL OR p.binaryid IS NULL)',
+					$group['mgrcname'],
+					$group['mgrbname'],
+					$group['mgrpname']
+				)
+			);
+
+			if ($deleteQuery !== false) {
+				$deleted = $deleteQuery->rowCount();
+				$deletedCount += $deleted;
+			}
+
+			$secondQuery = time();
+
+			if ($this->echoCLI) {
+				echo $this->pdo->log->primary(
+					'Finished deleting ' . $deleted . ' orphaned MGR collections in ' .
+					($secondQuery - $firstQuery) . ' seconds.' . PHP_EOL
+				);
+			}
+
+			// orphaned binaries - binaries with no parts or binaries with no collection
+			// Don't delete currently inserting binaries by checking the max id.
+			if ($this->echoCLI) {
+				echo $this->pdo->log->primary('Deleting orphaned binaries/parts with no collection.');
+			}
+
+			$deleted = 0;
+			$deleteQuery = $this->pdo->queryExec(
+				sprintf(
+					'DELETE b, p FROM %s b
+									LEFT JOIN %s p ON(b.id=p.binaryid)
+									LEFT JOIN %s c ON(b.collection_id=c.id)
+									WHERE (p.binaryid IS NULL OR c.id IS NULL) AND b.id < %d ',
+					$group['mgrbname'], $group['mgrpname'], $group['mgrcname'], $this->maxQueryFormulator($group['mgrbname'], 20000)
+				)
+			);
+
+			if ($deleteQuery !== false) {
+				$deleted = $deleteQuery->rowCount();
+				$deletedCount += $deleted;
+			}
+
+			$thirdQuery = time();
+
+			if ($this->echoCLI) {
+				echo $this->pdo->log->primary(
+					'Finished deleting ' . $deleted . ' binaries with no collections or parts in ' .
+					($thirdQuery - $secondQuery) . ' seconds.'
+				);
+			}
+
+			// orphaned parts - parts with no binary
+			// Don't delete currently inserting parts by checking the max id.
+			if ($this->echoCLI) {
+				echo $this->pdo->log->primary('Deleting orphaned parts with no binaries.');
+			}
+			$deleted = 0;
+			$deleteQuery = $this->pdo->queryExec(
+				sprintf(
+					'DELETE p FROM %s p LEFT JOIN %s b ON (p.binaryid=b.id) WHERE b.id IS NULL AND p.binaryid < %d',
+					$group['mgrpname'], $group['mgrbname'], $this->maxQueryFormulator($group['mgrbname'], 20000)
+				)
+			);
+			if ($deleteQuery !== false) {
+				$deleted = $deleteQuery->rowCount();
+				$deletedCount += $deleted;
+			}
+
+			$fourthQuery = time();
+
+			if ($this->echoCLI) {
+				echo $this->pdo->log->primary(
+					'Finished deleting ' . $deleted . ' parts with no binaries in ' .
+					($fourthQuery - $thirdQuery) . ' seconds.' . PHP_EOL
+				);
+			}
+		} // done cleaning up Binaries/Parts orphans
+
+		if ($this->echoCLI) {
+			echo $this->pdo->log->primary(
+				'Deleting collections that were missed after NZB creation.'
+			);
+		}
+
+		$deleted = 0;
+		// Collections that were missing on NZB creation.
+		$collections = $this->pdo->queryDirect(
+			sprintf('
+				SELECT SQL_NO_CACHE c.id
+				FROM %s c
+				INNER JOIN releases r ON r.id = c.releaseid
+				WHERE r.nzbstatus = 1',
+				$group['mgrcname']
+			)
+		);
+
+		if ($collections instanceof \Traversable) {
+			foreach ($collections as $collection) {
+				$deleted++;
+				$this->pdo->queryExec(
+					sprintf('
+						DELETE c, b, p
+						FROM %s c
+						LEFT JOIN %s b ON(c.id=b.collection_id)
+						LEFT JOIN %s p ON(b.id=p.binaryid)
+						WHERE c.id = %d',
+						$group['mgrcname'],
+						$group['mgrbname'],
+						$group['mgrpname'],
+						$collection['id']
+					)
+				);
+			}
+			$deletedCount += $deleted;
+		}
+
+		if ($this->echoCLI) {
+			$this->pdo->log->doEcho(
+				$this->pdo->log->primary(
+					'Finished deleting ' . $deleted . ' MGR collections missed after NZB creation in ' .
+					(time() - $fourthQuery) . ' seconds.' . PHP_EOL .
+					'Removed ' .
+					number_format($deletedCount) .
+					' parts/binaries/collection rows in ' .
+					$this->consoleTools->convertTime(($fourthQuery - $startTime)) . PHP_EOL
+				)
 			);
 		}
 	}

@@ -951,6 +951,8 @@ class ProcessReleases
 
 		$deletedCount = 0;
 
+		(new ReleasesMultiGroup())->deleteMGRCollections();
+
 		// CBP older than retention.
 		if ($this->echoCLI) {
 			echo (
@@ -1500,7 +1502,7 @@ class ProcessReleases
 	 * @return string
 	 * @access private
 	 */
-	private function maxQueryFormulator($groupName, $difference)
+	protected function maxQueryFormulator($groupName, $difference)
 	{
 		$maxID = $this->pdo->queryOneRow(sprintf('SELECT IFNULL(MAX(id),0) AS max FROM %s', $groupName ));
 		return empty($maxID['max']) || $maxID['max'] < $difference ? 0 : $maxID['max'] - $difference;
