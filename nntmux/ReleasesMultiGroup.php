@@ -317,4 +317,141 @@ class ReleasesMultiGroup
 
 		return $nzbCount;
 	}
+
+	/**
+	 * Delete unwanted collections based on size/file count using admin settings.
+	 *
+	 *
+	 * @void
+	 * @access public
+	 */
+	public function deleteUnwantedMGRCollections()
+	{
+		$startTime = time();
+		$group = $this->_groups->getCBPTableNames($this->tablePerGroup, '', true);
+
+		if ($this->echoCLI) {
+			$this->_pdo->log->doEcho(
+				$this->_pdo->log->header(
+					"Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting."
+				)
+			);
+		}
+
+		if ($groupID == '') {
+			$groupIDs = $this->_groups->getActiveIDs();
+		} else {
+			$groupIDs = [['id' => $groupID]];
+		}
+
+		$minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
+
+		$maxSizeSetting = Settings::value('.release.maxsizetoformrelease');
+		$minSizeSetting = Settings::value('.release.minsizetoformrelease');
+		$minFilesSetting = Settings::value('.release.minfilestoformrelease');
+
+		foreach ($groupIDs as $groupID) {
+
+			$groupMinSizeSetting = $groupMinFilesSetting = 0;
+
+			$groupMinimums = $this->_groups->getByID($groupID['id']);
+			if ($groupMinimums !== false) {
+				if (!empty($groupMinimums['minsizetoformrelease']) && $groupMinimums['minsizetoformrelease'] > 0) {
+					$groupMinSizeSetting = (int)$groupMinimums['minsizetoformrelease'];
+				}
+				if (!empty($groupMinimums['minfilestoformrelease']) && $groupMinimums['minfilestoformrelease'] > 0) {
+					$groupMinFilesSetting = (int)$groupMinimums['minfilestoformrelease'];
+				}
+			}
+
+			if ($this->_pdo->queryOneRow(
+					sprintf(
+						'SELECT SQL_NO_CACHE id FROM %s c WHERE c.filecheck = %d AND c.filesize > 0 LIMIT 1',
+						$group['mgrcname'],
+						ProcessReleases::COLLFC_SIZED
+					)
+				) !== false
+			) {
+
+				$deleteQuery = $this->_pdo->queryExec(
+					sprintf('
+						DELETE c, b, p
+						FROM %s c
+						LEFT JOIN %s b ON c.id = b.collection_id
+						LEFT JOIN %s p ON b.id = p.binaryid
+						WHERE c.filecheck = %d
+						AND c.filesize > 0
+						AND GREATEST(%d, %d) > 0
+						AND c.filesize < GREATEST(%d, %d)',
+						$group['mgrcname'],
+						$group['mgrbname'],
+						$group['mgrpname'],
+						ProcessReleases::COLLFC_SIZED,
+						$groupMinSizeSetting,
+						$minSizeSetting,
+						$groupMinSizeSetting,
+						$minSizeSetting
+					)
+				);
+				if ($deleteQuery !== false) {
+					$minSizeDeleted += $deleteQuery->rowCount();
+				}
+
+
+				if ($maxSizeSetting > 0) {
+					$deleteQuery = $this->_pdo->queryExec(
+						sprintf('
+							DELETE c, b, p FROM %s c
+							LEFT JOIN %s b ON c.id = b.collection_id
+							LEFT JOIN %s p ON b.id = p.binaryid
+							WHERE c.filecheck = %d
+							AND c.filesize > %d',
+							$group['mgrcname'],
+							$group['mgrbname'],
+							$group['mgrpname'],
+							ProcessReleases::COLLFC_SIZED,
+							$maxSizeSetting
+						)
+					);
+					if ($deleteQuery !== false) {
+						$maxSizeDeleted += $deleteQuery->rowCount();
+					}
+				}
+
+				$deleteQuery = $this->_pdo->queryExec(
+					sprintf('
+						DELETE c, b, p FROM %s c
+						LEFT JOIN %s b ON (c.id=b.collection_id)
+						LEFT JOIN %s p ON (b.id=p.binaryid)
+						WHERE c.filecheck = %d
+						AND GREATEST(%d, %d) > 0
+						AND c.totalfiles < GREATEST(%d, %d)',
+						$group['mgrcname'],
+						$group['mgrbname'],
+						$group['mgrpname'],
+						ProcessReleases::COLLFC_SIZED,
+						$groupMinFilesSetting,
+						$minFilesSetting,
+						$groupMinFilesSetting,
+						$minFilesSetting
+					)
+				);
+				if ($deleteQuery !== false) {
+					$minFilesDeleted += $deleteQuery->rowCount();
+				}
+			}
+		}
+
+		if ($this->echoCLI) {
+			$this->_pdo->log->doEcho(
+				$this->_pdo->log->primary(
+					'Deleted ' . ($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted) . '  MGR collections: ' . PHP_EOL .
+					$minSizeDeleted . ' smaller than, ' .
+					$maxSizeDeleted . ' bigger than, ' .
+					$minFilesDeleted . ' with less files than site/group settings in: ' .
+					$this->consoleTools->convertTime(time() - $startTime)
+				), true
+			);
+		}
+	}
 }
