@@ -586,9 +586,11 @@ class Groups
 	 * @param bool $tpgSetting false, tpg is off in site setting, true tpg is on in site setting.
 	 * @param int  $groupID    ID of the group.
 	 *
+	 * @param bool $multiGroup
+	 *
 	 * @return array The table names.
 	 */
-	public function getCBPTableNames($tpgSetting, $groupID)
+	public function getCBPTableNames($tpgSetting, $groupID, $multiGroup = false)
 	{
 		$groupKey = ($groupID . '_' . (int)$tpgSetting);
 
@@ -612,11 +614,11 @@ class Groups
 				exit('Error: You must use .../misc/update/nix/multiprocessing/releases.php since you have enabled TPG!');
 			}
 
-			if ($groupID !== -1 && $this->createNewTPGTables($groupID) === false && NN_ECHOCLI) {
+			if ($multiGroup === false && $this->createNewTPGTables($groupID) === false && NN_ECHOCLI) {
 				exit('There is a problem creating new TPG tables for this group ID: ' . $groupID . PHP_EOL);
 			}
 
-			if ($groupID !== -1) {
+			if ($multiGroup === false) {
 				$groupEnding = '_' . $groupID;
 			} else {
 				$groupEnding = '';
