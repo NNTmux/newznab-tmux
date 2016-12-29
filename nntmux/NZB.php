@@ -33,14 +33,14 @@ class NZB
 	 *
 	 * @var int
 	 */
-	private $nzbSplitLevel;
+	protected $nzbSplitLevel;
 
 	/**
 	 * Path to store NZB files.
 	 *
 	 * @var string
 	 */
-	private $siteNzbPath;
+	protected $siteNzbPath;
 
 	/**
 	 * Group id when writing NZBs.
@@ -142,18 +142,15 @@ class NZB
 	/**
 	 * Initiate class vars when writing NZB's.
 	 *
-	 * @param int  $groupID
-	 *
-	 * @param bool $multiGroup
+	 * @param int $groupID
 	 *
 	 * @access public
 	 */
-	public function initiateForWrite($groupID, $multiGroup = false)
+	public function initiateForWrite($groupID)
 	{
 		$this->groupID = $groupID;
-
 		// Set table names
-		if ($this->tablePerGroup === true && $multiGroup === false) {
+		if ($this->tablePerGroup === true) {
 			if ($this->groupID == '') {
 				exit("{$this->groupID} is missing\n");
 			}
@@ -162,44 +159,28 @@ class NZB
 				'bName' => 'binaries_' . $this->groupID,
 				'pName' => 'parts_' . $this->groupID
 			];
-		} else if ($this->tablePerGroup === true && $multiGroup === true) {
-			$this->_tableNames = [
-				'cName' => 'collections_' . $this->groupID,
-				'bName' => 'binaries_' . $this->groupID,
-				'pName' => 'parts_' . $this->groupID,
-				'mgrcName' => 'mgr_collections',
-				'mgrbName' => 'mgr_binaries',
-				'mgrpName' => 'mgr_parts'
-			];
 		} else {
 			$this->_tableNames = [
 				'cName' => 'collections',
 				'bName' => 'binaries',
-				'pName' => 'parts',
-				'mgrcName' => 'mgr_collections',
-				'mgrbName' => 'mgr_binaries',
-				'mgrpName' => 'mgr_parts'
+				'pName' => 'parts'
 			];
 		}
 
-		$tablesc = $multiGroup === true ? $this->_tableNames['mgrcName'] : $this->_tableNames['cName'];
-		$tablesb = $multiGroup === true ? $this->_tableNames['mgrbName'] : $this->_tableNames['bName'];
-		$tablesp = $multiGroup === true ? $this->_tableNames['mgrpName'] : $this->_tableNames['pName'];
-
-			$this->_collectionsQuery = "
+		$this->_collectionsQuery = "
 			SELECT c.*, UNIX_TIMESTAMP(c.date) AS udate,
 				g.name AS groupname
-			FROM {$tablesc} c
+			FROM {$this->_tableNames['cName']} c
 			INNER JOIN groups g ON c.group_id = g.id
 			WHERE c.releaseid = ";
-			$this->_binariesQuery = "
+		$this->_binariesQuery = "
 			SELECT b.id, b.name, b.totalparts
-			FROM {$tablesb} b
+			FROM {$this->_tableNames['bName']} b
 			WHERE b.collection_id = %d
 			ORDER BY b.name ASC";
-			$this->_partsQuery = "
+		$this->_partsQuery = "
 			SELECT DISTINCT(p.messageid), p.size, p.partnumber
-			FROM {$tablesp} p
+			FROM {$this->_tableNames['pName']} p
 			WHERE p.binaryid = %d
 			ORDER BY p.partnumber ASC";
 
@@ -222,7 +203,7 @@ class NZB
 	 *
 	 * @access public
 	 */
-	public function writeNZBforReleaseId($relID, $relGuid, $name, $cTitle, $multigroup = false)
+	public function writeNZBforReleaseId($relID, $relGuid, $name, $cTitle)
 	{
 		$collections = $this->pdo->queryDirect($this->_collectionsQuery . $relID);
 
@@ -320,21 +301,12 @@ class NZB
 			)
 		);
 		// Delete CBP for release that has its NZB created.
-		if ($multigroup === true) {
-			$this->pdo->queryExec(
-				sprintf('
+		$this->pdo->queryExec(
+			sprintf('
 				DELETE c, b, p FROM %s c JOIN %s b ON(c.id=b.collection_id) STRAIGHT_JOIN %s p ON(b.id=p.binaryid) WHERE c.releaseid = %d',
-					$this->_tableNames['mgrcName'], $this->_tableNames['mgrbName'], $this->_tableNames['mgrpName'], $relID
-				)
-			);
-		} else {
-			$this->pdo->queryExec(
-				sprintf('
-				DELETE c, b, p FROM %s c JOIN %s b ON(c.id=b.collection_id) STRAIGHT_JOIN %s p ON(b.id=p.binaryid) WHERE c.releaseid = %d',
-					$this->_tableNames['cName'], $this->_tableNames['bName'], $this->_tableNames['pName'], $relID
-				)
-			);
-		}
+				$this->_tableNames['cName'], $this->_tableNames['bName'], $this->_tableNames['pName'], $relID
+			)
+		);
 		// Chmod to fix issues some users have with file permissions.
 		chmod($path, 0777);
 
@@ -352,7 +324,7 @@ class NZB
 	 *
 	 * @access public
 	 */
-	private function buildNZBPath($releaseGuid, $levelsToSplit, $createIfNotExist)
+	protected function buildNZBPath($releaseGuid, $levelsToSplit, $createIfNotExist)
 	{
 		$nzbPath = '';
 

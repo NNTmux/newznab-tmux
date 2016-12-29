@@ -57,10 +57,11 @@ class ReleasesMultiGroup
 		$this->echoCLI = NN_ECHOCLI;
 		$this->releases = new Releases(['Settings' => $this->_pdo, 'Groups' => $this->_groups]);
 		$this->consoleTools = new ConsoleTools(['ColorCLI' => $this->_pdo->log]);
-		$this->nzb = new NZB($this->_pdo);
+		$this->nzb = new NZBMultiGroup();
 		$this->releaseCleaning = new ReleaseCleaning($this->_pdo);
 		$this->tablePerGroup = (Settings::value('..tablepergroup') == 0 ? false : true);
 		$this->releaseCreationLimit = (Settings::value('..maxnzbsprocessed') != '' ? (int)Settings::value('..maxnzbsprocessed') : 1000);
+		$this->mgrFromNames = implode(",", self::$mgrPosterNames);
 	}
 
 	/**
@@ -283,7 +284,7 @@ class ReleasesMultiGroup
 	 * @return int
 	 * @access public
 	 */
-	public function createNZBs()
+	public function createMGRNZBs()
 	{
 
 		$releases = $this->_pdo->queryDirect(
@@ -293,7 +294,7 @@ class ReleasesMultiGroup
 				FROM releases r
 				INNER JOIN categories c ON r.categories_id = c.id
 				INNER JOIN categories cp ON cp.id = c.parentid
-				WHERE nzbstatus = 0"
+				WHERE r.nzbstatus = 0 AND r.fromname IN (%s)", $this->_pdo->escapeString($this->mgrFromNames)
 			)
 		);
 
@@ -302,10 +303,10 @@ class ReleasesMultiGroup
 		if ($releases && $releases->rowCount()) {
 			$total = $releases->rowCount();
 			// Init vars for writing the NZB's.
-			$this->nzb->initiateForWrite('', true);
+			$this->nzb->initiateForMgrWrite();
 			foreach ($releases as $release) {
 
-				if ($this->nzb->writeNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title'], true) === true) {
+				if ($this->nzb->writeMgrNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
 					$nzbCount++;
 					if ($this->echoCLI) {
 						echo $this->_pdo->log->primaryOver("Creating NZBs and deleting Collections:\t" . $nzbCount . '/' . $total . "\r");

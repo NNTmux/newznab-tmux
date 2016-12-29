@@ -771,7 +771,7 @@ class ProcessReleases
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
 		}
 
-		(new ReleasesMultiGroup())->createNZBs();
+		(new ReleasesMultiGroup())->createMgrNZBs();
 
 		$releases = $this->pdo->queryDirect(
 			sprintf("
