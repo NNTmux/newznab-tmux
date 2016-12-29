@@ -83,7 +83,7 @@ class ReleasesMultiGroup
 	public function createMGRReleases()
 	{
 		$startTime = time();
-		$group = $this->_groups->getCBPTableNames($this->tablePerGroup, -1);
+		$group = $this->_groups->getCBPTableNames($this->tablePerGroup, '', true);
 
 		$categorize = new Categorize(['Settings' => $this->_pdo]);
 		$returnCount = $duplicate = 0;
@@ -101,10 +101,10 @@ class ReleasesMultiGroup
 				INNER JOIN groups ON %s.group_id = groups.id
 				WHERE %s.filecheck = %d
 				AND filesize > 0 LIMIT %d',
-				$group['mgrcname'],
-				$group['mgrcname'],
-				$group['mgrcname'],
-				$group['mgrcname'],
+				$group['cname'],
+				$group['cname'],
+				$group['cname'],
+				$group['cname'],
 				ProcessReleases::COLLFC_SIZED,
 				$this->releaseCreationLimit
 			)
@@ -196,7 +196,7 @@ class ReleasesMultiGroup
 								UPDATE %s
 								SET filecheck = %d, releaseid = %d
 								WHERE id = %d',
-								$group['mgrcname'],
+								$group['cname'],
 								ProcessReleases::COLLFC_INSERTED,
 								$releaseID,
 								$collection['id']
@@ -251,7 +251,7 @@ class ReleasesMultiGroup
 							INNER JOIN %s b ON(c.id=b.collection_id)
 							STRAIGHT_JOIN %s p ON(b.id=p.binaryid)
 							WHERE c.collectionhash = %s',
-							$group['mgrcname'], $group['mgrbname'], $group['mgrpname'],
+							$group['cname'], $group['bname'], $group['pname'],
 							$this->_pdo->escapeString($collection['collectionhash'])
 						)
 					);
@@ -302,7 +302,7 @@ class ReleasesMultiGroup
 		if ($releases && $releases->rowCount()) {
 			$total = $releases->rowCount();
 			// Init vars for writing the NZB's.
-			$this->nzb->initiateForWrite(-1);
+			$this->nzb->initiateForWrite('', true);
 			foreach ($releases as $release) {
 
 				if ($this->nzb->writeNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
