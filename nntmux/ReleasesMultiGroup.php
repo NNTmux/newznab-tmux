@@ -196,7 +196,7 @@ class ReleasesMultiGroup
 								UPDATE %s
 								SET filecheck = %d, releaseid = %d
 								WHERE id = %d',
-								$group['cname'],
+								$group['mgrcname'],
 								ProcessReleases::COLLFC_INSERTED,
 								$releaseID,
 								$collection['id']
@@ -251,7 +251,7 @@ class ReleasesMultiGroup
 							INNER JOIN %s b ON(c.id=b.collection_id)
 							STRAIGHT_JOIN %s p ON(b.id=p.binaryid)
 							WHERE c.collectionhash = %s',
-							$group['cname'], $group['bname'], $group['pname'],
+							$group['mgrcname'], $group['mgrbname'], $group['mgrpname'],
 							$this->_pdo->escapeString($collection['collectionhash'])
 						)
 					);
