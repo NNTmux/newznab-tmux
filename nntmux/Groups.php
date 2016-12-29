@@ -610,7 +610,7 @@ class Groups
 		$tables['mgrprname'] = 'mgr_missed_parts';
 
 		if ($tpgSetting === true) {
-			if ($groupID == '') {
+			if ($multiGroup === false && $groupID == '') {
 				exit('Error: You must use .../misc/update/nix/multiprocessing/releases.php since you have enabled TPG!');
 			}
 
