@@ -971,7 +971,7 @@ class NameFixer
 			$query = $this->pdo->queryDirect(
 				sprintf("
 					SELECT r.id AS releases_id, r.name, r.searchname,
-						r.groups_id, r.categories_id,
+						r.fromname, r.groups_id, r.categories_id,
 						GROUP_CONCAT(rf.name ORDER BY LENGTH(rf.name) DESC SEPARATOR '||') AS filename
 					FROM releases r
 					INNER JOIN release_files rf ON r.id = rf.releases_id
