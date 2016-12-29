@@ -427,8 +427,6 @@ class ProcessReleases
 			);
 		}
 
-		(new ReleasesMultiGroup())->deleteUnwantedMGRCollections();
-
 		if ($groupID == '') {
 			$groupIDs = $this->groups->getActiveIDs();
 		} else {

@@ -4,7 +4,6 @@ namespace nntmux;
 
 use app\models\ReleasesGroups;
 use app\models\Settings;
-use nntmux\db\DB;
 use nntmux\processing\ProcessReleases;
 
 
@@ -41,6 +40,11 @@ class ReleasesMultiGroup extends ProcessReleases
 	 */
 	protected $mgrFromNames;
 
+	/**
+	 * @var NZBMultiGroup
+	 */
+	protected $mgrnzb;
+
 
 	/**
 	 * ReleasesMultiGroup constructor.
@@ -50,7 +54,9 @@ class ReleasesMultiGroup extends ProcessReleases
 	public function __construct(array $options = [])
 	{
 		parent::__construct();
+
 		$this->mgrFromNames = implode(",", self::$mgrPosterNames);
+		$this->mgrnzb = new NZBMultiGroup();
 	}
 
 	/**
@@ -292,10 +298,10 @@ class ReleasesMultiGroup extends ProcessReleases
 		if ($releases && $releases->rowCount()) {
 			$total = $releases->rowCount();
 			// Init vars for writing the NZB's.
-			$this->nzb->initiateForMgrWrite();
+			$this->mgrnzb->initiateForMgrWrite();
 			foreach ($releases as $release) {
 
-				if ($this->nzb->writeMgrNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
+				if ($this->mgrnzb->writeMgrNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
 					$nzbCount++;
 					if ($this->echoCLI) {
 						echo $this->pdo->log->primaryOver("Creating NZBs and deleting Collections:\t" . $nzbCount . '/' . $total . "\r");
@@ -305,141 +311,6 @@ class ReleasesMultiGroup extends ProcessReleases
 		}
 
 		return $nzbCount;
-	}
-
-	/**
-	 * Delete unwanted collections based on size/file count using admin settings.
-	 *
-	 *
-	 * @void
-	 * @access public
-	 */
-	public function deleteUnwantedMGRCollections()
-	{
-		$startTime = time();
-		$group = $this->groups->getCBPTableNames($this->tablePerGroup, '', true);
-
-		if ($this->echoCLI) {
-			$this->pdo->log->doEcho(
-				$this->pdo->log->header(
-					"Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting."
-				)
-			);
-		}
-
-
-		$groupIDs = $this->groups->getActiveIDs();
-
-
-		$minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
-
-		$maxSizeSetting = Settings::value('.release.maxsizetoformrelease');
-		$minSizeSetting = Settings::value('.release.minsizetoformrelease');
-		$minFilesSetting = Settings::value('.release.minfilestoformrelease');
-
-		foreach ($groupIDs as $groupID) {
-
-			$groupMinSizeSetting = $groupMinFilesSetting = 0;
-
-			$groupMinimums = $this->groups->getByID($groupID['id']);
-			if ($groupMinimums !== false) {
-				if (!empty($groupMinimums['minsizetoformrelease']) && $groupMinimums['minsizetoformrelease'] > 0) {
-					$groupMinSizeSetting = (int)$groupMinimums['minsizetoformrelease'];
-				}
-				if (!empty($groupMinimums['minfilestoformrelease']) && $groupMinimums['minfilestoformrelease'] > 0) {
-					$groupMinFilesSetting = (int)$groupMinimums['minfilestoformrelease'];
-				}
-			}
-
-			if ($this->pdo->queryOneRow(
-					sprintf(
-						'SELECT SQL_NO_CACHE id FROM %s c WHERE c.filecheck = %d AND c.filesize > 0 LIMIT 1',
-						$group['mgrcname'],
-						ProcessReleases::COLLFC_SIZED
-					)
-				) !== false
-			) {
-
-				$deleteQuery = $this->pdo->queryExec(
-					sprintf('
-						DELETE c, b, p
-						FROM %s c
-						LEFT JOIN %s b ON c.id = b.collection_id
-						LEFT JOIN %s p ON b.id = p.binaryid
-						WHERE c.filecheck = %d
-						AND c.filesize > 0
-						AND GREATEST(%d, %d) > 0
-						AND c.filesize < GREATEST(%d, %d)',
-						$group['mgrcname'],
-						$group['mgrbname'],
-						$group['mgrpname'],
-						ProcessReleases::COLLFC_SIZED,
-						$groupMinSizeSetting,
-						$minSizeSetting,
-						$groupMinSizeSetting,
-						$minSizeSetting
-					)
-				);
-				if ($deleteQuery !== false) {
-					$minSizeDeleted += $deleteQuery->rowCount();
-				}
-
-
-				if ($maxSizeSetting > 0) {
-					$deleteQuery = $this->pdo->queryExec(
-						sprintf('
-							DELETE c, b, p FROM %s c
-							LEFT JOIN %s b ON c.id = b.collection_id
-							LEFT JOIN %s p ON b.id = p.binaryid
-							WHERE c.filecheck = %d
-							AND c.filesize > %d',
-							$group['mgrcname'],
-							$group['mgrbname'],
-							$group['mgrpname'],
-							ProcessReleases::COLLFC_SIZED,
-							$maxSizeSetting
-						)
-					);
-					if ($deleteQuery !== false) {
-						$maxSizeDeleted += $deleteQuery->rowCount();
-					}
-				}
-
-				$deleteQuery = $this->pdo->queryExec(
-					sprintf('
-						DELETE c, b, p FROM %s c
-						LEFT JOIN %s b ON (c.id=b.collection_id)
-						LEFT JOIN %s p ON (b.id=p.binaryid)
-						WHERE c.filecheck = %d
-						AND GREATEST(%d, %d) > 0
-						AND c.totalfiles < GREATEST(%d, %d)',
-						$group['mgrcname'],
-						$group['mgrbname'],
-						$group['mgrpname'],
-						ProcessReleases::COLLFC_SIZED,
-						$groupMinFilesSetting,
-						$minFilesSetting,
-						$groupMinFilesSetting,
-						$minFilesSetting
-					)
-				);
-				if ($deleteQuery !== false) {
-					$minFilesDeleted += $deleteQuery->rowCount();
-				}
-			}
-		}
-
-		if ($this->echoCLI) {
-			$this->pdo->log->doEcho(
-				$this->pdo->log->primary(
-					'Deleted ' . ($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted) . '  MGR collections: ' . PHP_EOL .
-					$minSizeDeleted . ' smaller than, ' .
-					$maxSizeDeleted . ' bigger than, ' .
-					$minFilesDeleted . ' with less files than site/group settings in: ' .
-					$this->consoleTools->convertTime(time() - $startTime)
-				), true
-			);
-		}
 	}
 
 	/**

@@ -516,7 +516,6 @@ class Binaries
 	{
 		// Start time of scan method and of fetching headers.
 		$startLoop = microtime(true);
-		$multiGroup = false;
 
 		// Check if MySQL tables exist, create if they do not, get their names at the same time.
 		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupMySQL['id']);
@@ -704,7 +703,7 @@ class Binaries
 				}
 
 				// Used to group articles together when forming the release/nzb.
-				if ($multiGroup) {
+				if ($multiGroup === true) {
 					$header['CollectionKey'] = (
 						$this->_collectionsCleaning->collectionsCleaner($matches[1], '') .
 						$header['From'] .
@@ -736,8 +735,8 @@ class Binaries
 							INSERT INTO %s (subject, fromname, date, xref, group_id,
 								totalfiles, collectionhash, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', NOW())
-							ON DUPLICATE KEY UPDATE dateadded = NOW(), noise = '%s'",
-							($multiGroup ? $tableNames['mgrcname'] : $tableNames['cname']),
+							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'",
+							($multiGroup === true ? $tableNames['mgrcname'] : $tableNames['cname']),
 							$this->_pdo->escapeString(substr(utf8_encode($matches[1]), 0, 255)),
 							$this->_pdo->escapeString(utf8_encode($header['From'])),
 							(is_numeric($header['Date']) ? ($header['Date'] > $now ? $now : $header['Date']) : $now),
@@ -745,6 +744,7 @@ class Binaries
 							$groupMySQL['id'],
 							$fileCount[3],
 							sha1($header['CollectionKey']),
+							($multiGroup === true ? sprintf("xref = CONCAT(xref, \\n%s ),", $this->_pdo->escapeString(substr($header['Xref'], 2, 255))) : ''),
 							bin2hex(openssl_random_pseudo_bytes(16))
 						)
 					);
@@ -767,8 +767,8 @@ class Binaries
 						INSERT INTO %s (binaryhash, name, collection_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
-						($multiGroup ? $tableNames['mgrbname'] : $tableNames['bname']),
-						($multiGroup ? md5($matches[1] . $header['From']) : md5($matches[1] . $header['From'] . $groupMySQL['id'])),
+						($multiGroup === true ? $tableNames['mgrbname'] : $tableNames['bname']),
+						($multiGroup === true ? md5($matches[1] . $header['From']) : md5($matches[1] . $header['From'] . $groupMySQL['id'])),
 						$this->_pdo->escapeString(utf8_encode($matches[1])),
 						$collectionID,
 						$matches[3],
@@ -807,7 +807,7 @@ class Binaries
 				'(' . $binaryID . ',' . $header['Number'] . ',' . rtrim($header['Message-ID'], '>') . "'," .
 				$matches[2] . ',' . $header['Bytes'] . '),';
 
-			if ($multiGroup) {
+			if ($multiGroup === true) {
 				$mgrPartsQuery .=
 					'(' . $binaryID . ',' . $header['Number'] . ',' . rtrim($header['Message-ID'], '>') . "'," .
 					$matches[2] . ',' . $header['Bytes'] . '),';
@@ -823,7 +823,7 @@ class Binaries
 		// End of processing headers.
 		$timeCleaning = number_format($startUpdate - $startCleaning, 2);
 
-		$binariesQuery = $binariesCheck = sprintf('INSERT INTO %s (id, partsize, currentparts) VALUES ', ($multiGroup ? $tableNames['mgrbname'] : $tableNames['bname']));
+		$binariesQuery = $binariesCheck = sprintf('INSERT INTO %s (id, partsize, currentparts) VALUES ', ($multiGroup === true ? $tableNames['mgrbname'] : $tableNames['bname']));
 		foreach ($binariesUpdate as $binaryID => $binary) {
 			$binariesQuery .= '(' . $binaryID . ',' . $binary['Size'] . ',' . $binary['Parts'] . '),';
 		}
@@ -849,7 +849,7 @@ class Binaries
 				$this->_pdo->Rollback();
 			}
 
-			if ($multiGroup) {
+			if ($multiGroup === true) {
 				$this->_pdo->beginTransaction();
 				if (((strlen($mgrPartsQuery) === strlen($mgrPartsCheck)) ? true : $this->_pdo->queryExec(rtrim($mgrPartsQuery, ',')))) {
 					$this->_pdo->Commit();
