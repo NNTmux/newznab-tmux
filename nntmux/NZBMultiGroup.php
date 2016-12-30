@@ -107,7 +107,6 @@ class NZBMultiGroup
 	public function writeMgrNZBforReleaseId($relID, $relGuid, $name, $cTitle)
 	{
 		$collections = $this->pdo->queryDirect($this->_collectionsQuery . $relID);
-		var_dump($collections);
 
 		if (!$collections instanceof \Traversable) {
 			return false;
@@ -140,7 +139,6 @@ class NZBMultiGroup
 
 		foreach ($collections as $collection) {
 			$binaries = $this->pdo->queryDirect(sprintf($this->_binariesQuery, $collection['id']));
-			var_dump($binaries);
 			if (!$binaries instanceof \Traversable) {
 				return false;
 			}
@@ -149,7 +147,6 @@ class NZBMultiGroup
 
 			foreach ($binaries as $binary) {
 				$parts = $this->pdo->queryDirect(sprintf($this->_partsQuery, $binary['id']));
-				var_dump($parts);
 				if (!$parts instanceof \Traversable) {
 					return false;
 				}
