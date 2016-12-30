@@ -4,10 +4,11 @@ namespace nntmux;
 
 use app\models\ReleasesGroups;
 use app\models\Settings;
+use nntmux\db\DB;
 use nntmux\processing\ProcessReleases;
 
 
-class ReleasesMultiGroup extends ProcessReleases
+class ReleasesMultiGroup
 {
 
 	/**
@@ -53,10 +54,17 @@ class ReleasesMultiGroup extends ProcessReleases
 	 */
 	public function __construct(array $options = [])
 	{
-		parent::__construct();
 
 		$this->mgrFromNames = implode(",", self::$mgrPosterNames);
 		$this->mgrnzb = new NZBMultiGroup();
+		$this->pdo = new DB();
+		$this->consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
+		$this->groups = new Groups(['Settings' => $this->pdo]);
+		$this->releaseCleaning = new ReleaseCleaning($this->pdo);
+		$this->releases = new Releases(['Settings' => $this->pdo, 'Groups' => $this->groups]);
+		$this->tablePerGroup = (Settings::value('..tablepergroup') == 0 ? false : true);
+		$this->echoCLI = NN_ECHOCLI;
+		$this->releaseCreationLimit = (Settings::value('..maxnzbsprocessed') != '' ? (int)Settings::value('..maxnzbsprocessed') : 1000);
 	}
 
 	/**
@@ -67,6 +75,26 @@ class ReleasesMultiGroup extends ProcessReleases
 	public static function isMultiGroup($fromName)
 	{
 		return in_array($fromName, self::$mgrPosterNames);
+	}
+
+	/**
+	 * @param $collectionID
+	 * @param $xref
+	 *
+	 * @return bool
+	 */
+	public function checkXref($collectionID, $xref)
+	{
+		$collection = $this->pdo->queryDirect(sprintf('SELECT xref FROM mgr_collections WHERE id = %d', $collectionID));
+
+		if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
+			foreach ($matches[1] as $mgrgroup){
+				if ($mgrgroup == $xref) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -313,203 +341,4 @@ class ReleasesMultiGroup extends ProcessReleases
 		return $nzbCount;
 	}
 
-	/**
-	 * Delete MGR collections (complete/incomplete/old/etc).
-	 *
-	 * @void
-	 * @access public
-	 */
-	public function deleteMGRCollections()
-	{
-		$startTime = time();
-		$group = $this->groups->getCBPTableNames($this->tablePerGroup, '', true);
-
-		$deletedCount = 0;
-
-		// CBP older than retention.
-		if ($this->echoCLI) {
-			echo (
-				$this->pdo->log->header("Process Releases -> Delete finished MGR collections." . PHP_EOL) .
-				$this->pdo->log->primary(sprintf(
-					'Deleting collections/binaries/parts older than %d hours.',
-					Settings::value('..partretentionhours')
-				))
-			);
-		}
-
-		$deleted = 0;
-		$deleteQuery = $this->pdo->queryExec(
-			sprintf(
-				'DELETE c, b, p FROM %s c
-				LEFT JOIN %s b ON (c.id=b.collection_id)
-				LEFT JOIN %s p ON (b.id=p.binaryid)
-				WHERE (c.dateadded < NOW() - INTERVAL %d HOUR)',
-				$group['mgrcname'],
-				$group['mgrbname'],
-				$group['mgrpname'],
-				Settings::value('..partretentionhours')
-			)
-		);
-
-		if ($deleteQuery !== false) {
-			$deleted = $deleteQuery->rowCount();
-			$deletedCount += $deleted;
-		}
-
-		$firstQuery = $fourthQuery = time();
-
-		if ($this->echoCLI) {
-			echo $this->pdo->log->primary(
-				'Finished deleting ' . $deleted . ' old collections/binaries/parts in ' .
-				($firstQuery - $startTime) . ' seconds.' . PHP_EOL
-			);
-		}
-
-		// Cleanup orphaned collections, binaries and parts
-		// this really shouldn't happen, but just incase - so we only run 1/200 of the time
-		if (mt_rand(0, 200) <= 1 ) {
-			// CBP collection orphaned with no binaries or parts.
-			if ($this->echoCLI) {
-				echo (
-					$this->pdo->log->header("Process Releases -> Remove CBP orphans." . PHP_EOL) .
-					$this->pdo->log->primary('Deleting orphaned MGR collections.')
-				);
-			}
-
-			$deleted = 0;
-			$deleteQuery = $this->pdo->queryExec(
-				sprintf(
-					'DELETE c, b, p FROM %s c
-					LEFT JOIN %s b ON (c.id=b.collection_id)
-					LEFT JOIN %s p ON (b.id=p.binaryid)
-					WHERE (b.id IS NULL OR p.binaryid IS NULL)',
-					$group['mgrcname'],
-					$group['mgrbname'],
-					$group['mgrpname']
-				)
-			);
-
-			if ($deleteQuery !== false) {
-				$deleted = $deleteQuery->rowCount();
-				$deletedCount += $deleted;
-			}
-
-			$secondQuery = time();
-
-			if ($this->echoCLI) {
-				echo $this->pdo->log->primary(
-					'Finished deleting ' . $deleted . ' orphaned MGR collections in ' .
-					($secondQuery - $firstQuery) . ' seconds.' . PHP_EOL
-				);
-			}
-
-			// orphaned binaries - binaries with no parts or binaries with no collection
-			// Don't delete currently inserting binaries by checking the max id.
-			if ($this->echoCLI) {
-				echo $this->pdo->log->primary('Deleting orphaned binaries/parts with no collection.');
-			}
-
-			$deleted = 0;
-			$deleteQuery = $this->pdo->queryExec(
-				sprintf(
-					'DELETE b, p FROM %s b
-									LEFT JOIN %s p ON(b.id=p.binaryid)
-									LEFT JOIN %s c ON(b.collection_id=c.id)
-									WHERE (p.binaryid IS NULL OR c.id IS NULL) AND b.id < %d ',
-					$group['mgrbname'], $group['mgrpname'], $group['mgrcname'], $this->maxQueryFormulator($group['mgrbname'], 20000)
-				)
-			);
-
-			if ($deleteQuery !== false) {
-				$deleted = $deleteQuery->rowCount();
-				$deletedCount += $deleted;
-			}
-
-			$thirdQuery = time();
-
-			if ($this->echoCLI) {
-				echo $this->pdo->log->primary(
-					'Finished deleting ' . $deleted . ' binaries with no collections or parts in ' .
-					($thirdQuery - $secondQuery) . ' seconds.'
-				);
-			}
-
-			// orphaned parts - parts with no binary
-			// Don't delete currently inserting parts by checking the max id.
-			if ($this->echoCLI) {
-				echo $this->pdo->log->primary('Deleting orphaned parts with no binaries.');
-			}
-			$deleted = 0;
-			$deleteQuery = $this->pdo->queryExec(
-				sprintf(
-					'DELETE p FROM %s p LEFT JOIN %s b ON (p.binaryid=b.id) WHERE b.id IS NULL AND p.binaryid < %d',
-					$group['mgrpname'], $group['mgrbname'], $this->maxQueryFormulator($group['mgrbname'], 20000)
-				)
-			);
-			if ($deleteQuery !== false) {
-				$deleted = $deleteQuery->rowCount();
-				$deletedCount += $deleted;
-			}
-
-			$fourthQuery = time();
-
-			if ($this->echoCLI) {
-				echo $this->pdo->log->primary(
-					'Finished deleting ' . $deleted . ' parts with no binaries in ' .
-					($fourthQuery - $thirdQuery) . ' seconds.' . PHP_EOL
-				);
-			}
-		} // done cleaning up Binaries/Parts orphans
-
-		if ($this->echoCLI) {
-			echo $this->pdo->log->primary(
-				'Deleting collections that were missed after NZB creation.'
-			);
-		}
-
-		$deleted = 0;
-		// Collections that were missing on NZB creation.
-		$collections = $this->pdo->queryDirect(
-			sprintf('
-				SELECT SQL_NO_CACHE c.id
-				FROM %s c
-				INNER JOIN releases r ON r.id = c.releaseid
-				WHERE r.nzbstatus = 1',
-				$group['mgrcname']
-			)
-		);
-
-		if ($collections instanceof \Traversable) {
-			foreach ($collections as $collection) {
-				$deleted++;
-				$this->pdo->queryExec(
-					sprintf('
-						DELETE c, b, p
-						FROM %s c
-						LEFT JOIN %s b ON(c.id=b.collection_id)
-						LEFT JOIN %s p ON(b.id=p.binaryid)
-						WHERE c.id = %d',
-						$group['mgrcname'],
-						$group['mgrbname'],
-						$group['mgrpname'],
-						$collection['id']
-					)
-				);
-			}
-			$deletedCount += $deleted;
-		}
-
-		if ($this->echoCLI) {
-			$this->pdo->log->doEcho(
-				$this->pdo->log->primary(
-					'Finished deleting ' . $deleted . ' MGR collections missed after NZB creation in ' .
-					(time() - $fourthQuery) . ' seconds.' . PHP_EOL .
-					'Removed ' .
-					number_format($deletedCount) .
-					' parts/binaries/collection rows in ' .
-					$this->consoleTools->convertTime(($fourthQuery - $startTime)) . PHP_EOL
-				)
-			);
-		}
-	}
 }

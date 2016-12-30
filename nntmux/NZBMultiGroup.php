@@ -10,8 +10,33 @@ use nntmux\utility\Utility;
  * Class for reading and writing NZB files on the hard disk,
  * building folder paths to store the NZB files.
  */
-class NZBMultiGroup extends NZB
+class NZBMultiGroup
 {
+
+	/**
+	 * @var
+	 */
+	private $_tableNames;
+
+	/**
+	 * @var
+	 */
+	private $_collectionsQuery;
+
+	/**
+	 * @var
+	 */
+	private $_binariesQuery;
+
+	/**
+	 * @var
+	 */
+	private $_partsQuery;
+
+	/**
+	 * @var
+	 */
+	private $_nzbCommentString;
 
 	/**
 	 * Default constructor.
@@ -21,7 +46,10 @@ class NZBMultiGroup extends NZB
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+		$this->pdo = new DB();
+		$this->nzb = new NZB();
+		$nzbSplitLevel = Settings::value('..nzbsplitlevel');
+		$this->nzbSplitLevel = (empty($nzbSplitLevel) ? 1 : $nzbSplitLevel);
 	}
 
 	/**
@@ -79,6 +107,7 @@ class NZBMultiGroup extends NZB
 	public function writeMgrNZBforReleaseId($relID, $relGuid, $name, $cTitle)
 	{
 		$collections = $this->pdo->queryDirect($this->_collectionsQuery . $relID);
+		var_dump($collections);
 
 		if (!$collections instanceof \Traversable) {
 			return false;
@@ -92,12 +121,12 @@ class NZBMultiGroup extends NZB
 		$nzb_guid = '';
 
 		$xmlwrtr->startDocument('1.0', 'UTF-8');
-		$xmlwrtr->startDtd(self::NZB_DTD_NAME, self::NZB_DTD_PUBLIC, self::NZB_DTD_EXTERNAL);
+		$xmlwrtr->startDtd(NZB::NZB_DTD_NAME, NZB::NZB_DTD_PUBLIC, NZB::NZB_DTD_EXTERNAL);
 		$xmlwrtr->endDtd();
 		$xmlwrtr->writeComment($this->_nzbCommentString);
 
 		$xmlwrtr->startElement('nzb');
-		$xmlwrtr->writeAttribute('xmlns', self::NZB_XML_NS);
+		$xmlwrtr->writeAttribute('xmlns', NZB::NZB_XML_NS);
 		$xmlwrtr->startElement('head');
 		$xmlwrtr->startElement('meta');
 		$xmlwrtr->writeAttribute('type', 'category');
@@ -111,6 +140,7 @@ class NZBMultiGroup extends NZB
 
 		foreach ($collections as $collection) {
 			$binaries = $this->pdo->queryDirect(sprintf($this->_binariesQuery, $collection['id']));
+			var_dump($binaries);
 			if (!$binaries instanceof \Traversable) {
 				return false;
 			}
@@ -119,6 +149,7 @@ class NZBMultiGroup extends NZB
 
 			foreach ($binaries as $binary) {
 				$parts = $this->pdo->queryDirect(sprintf($this->_partsQuery, $binary['id']));
+				var_dump($parts);
 				if (!$parts instanceof \Traversable) {
 					return false;
 				}
@@ -152,7 +183,7 @@ class NZBMultiGroup extends NZB
 		}
 		$xmlwrtr->endElement(); //nzb
 		$xmlwrtr->endDocument();
-		$path = ($this->buildNZBPath($relGuid, $this->nzbSplitLevel, true) . $relGuid . '.nzb.gz');
+		$path = ($this->nzb->buildNZBPath($relGuid, $this->nzbSplitLevel, true) . $relGuid . '.nzb.gz');
 		$fp = gzopen($path, 'wb7');
 		if (!$fp) {
 			return false;

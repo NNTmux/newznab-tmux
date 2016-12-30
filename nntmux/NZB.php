@@ -324,7 +324,7 @@ class NZB
 	 *
 	 * @access public
 	 */
-	protected function buildNZBPath($releaseGuid, $levelsToSplit, $createIfNotExist)
+	public function buildNZBPath($releaseGuid, $levelsToSplit, $createIfNotExist)
 	{
 		$nzbPath = '';
 

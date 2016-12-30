@@ -771,7 +771,7 @@ class ProcessReleases
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
 		}
 
-		(new ReleasesMultiGroup())->createMgrNZBs();
+		(new ReleasesMultiGroup())->createMGRNZBs();
 
 		$releases = $this->pdo->queryDirect(
 			sprintf("
@@ -949,7 +949,7 @@ class ProcessReleases
 
 		$deletedCount = 0;
 
-		(new ReleasesMultiGroup())->deleteMGRCollections();
+		//(new ReleasesMultiGroup())->deleteMGRCollections();
 
 		// CBP older than retention.
 		if ($this->echoCLI) {

@@ -730,6 +730,7 @@ class Binaries
 					// Get the current unixtime from PHP.
 					$now = time();
 
+					$xref = ($multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->escapeString(substr($header['Xref'], 2, 255))) : '');
 					$collectionID = $this->_pdo->queryInsert(
 						sprintf("
 							INSERT INTO %s (subject, fromname, date, xref, group_id,
@@ -744,7 +745,7 @@ class Binaries
 							$groupMySQL['id'],
 							$fileCount[3],
 							sha1($header['CollectionKey']),
-							($multiGroup === true ? sprintf("xref = CONCAT(xref, \\n%s ),", $this->_pdo->escapeString(substr($header['Xref'], 2, 255))) : ''),
+							$xref,
 							bin2hex(openssl_random_pseudo_bytes(16))
 						)
 					);
