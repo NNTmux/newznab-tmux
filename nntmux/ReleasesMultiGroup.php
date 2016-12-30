@@ -107,7 +107,6 @@ class ReleasesMultiGroup
 	public function createMGRReleases()
 	{
 		$startTime = time();
-		$group = $this->groups->getCBPTableNames($this->tablePerGroup, '', true);
 
 		$categorize = new Categorize(['Settings' => $this->pdo]);
 		$returnCount = $duplicate = 0;
@@ -120,15 +119,11 @@ class ReleasesMultiGroup
 
 		$collections = $this->pdo->queryDirect(
 			sprintf('
-				SELECT SQL_NO_CACHE %s.*, groups.name AS gname
-				FROM %s
-				INNER JOIN groups ON %s.group_id = groups.id
-				WHERE %s.filecheck = %d
+				SELECT SQL_NO_CACHE mgr_collections.*, groups.name AS gname
+				FROM mgr_collections
+				INNER JOIN groups ON mgr_collections.group_id = groups.id
+				WHERE mgr_collections.filecheck = %d
 				AND filesize > 0 LIMIT %d',
-				$group['mgrcname'],
-				$group['mgrcname'],
-				$group['mgrcname'],
-				$group['mgrcname'],
 				ProcessReleases::COLLFC_SIZED,
 				$this->releaseCreationLimit
 			)
@@ -217,10 +212,9 @@ class ReleasesMultiGroup
 						// Update collections table to say we inserted the release.
 						$this->pdo->queryExec(
 							sprintf('
-								UPDATE %s
+								UPDATE mgr_collections
 								SET filecheck = %d, releaseid = %d
 								WHERE id = %d',
-								$group['mgrcname'],
 								ProcessReleases::COLLFC_INSERTED,
 								$releaseID,
 								$collection['id']
@@ -271,11 +265,10 @@ class ReleasesMultiGroup
 					// The release was already in the DB, so delete the collection.
 					$this->pdo->queryExec(
 						sprintf('
-							DELETE c, b, p FROM %s c
-							INNER JOIN %s b ON(c.id=b.collection_id)
-							STRAIGHT_JOIN %s p ON(b.id=p.binaryid)
+							DELETE c, b, p FROM mgr_collections c
+							INNER JOIN mgr_binaries b ON(c.id=b.collection_id)
+							STRAIGHT_JOIN mgr_missed_parts p ON(b.id=p.binaryid)
 							WHERE c.collectionhash = %s',
-							$group['mgrcname'], $group['mgrbname'], $group['mgrpname'],
 							$this->pdo->escapeString($collection['collectionhash'])
 						)
 					);
@@ -332,7 +325,7 @@ class ReleasesMultiGroup
 				if ($this->mgrnzb->writeMgrNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
 					$nzbCount++;
 					if ($this->echoCLI) {
-						echo $this->pdo->log->primaryOver("Creating NZBs and deleting Collections:\t" . $nzbCount . '/' . $total . "\r");
+						echo $this->pdo->log->primaryOver("Creating NZBs and deleting MGR Collections:\t" . $nzbCount . '/' . $total . "\r");
 					}
 				}
 			}

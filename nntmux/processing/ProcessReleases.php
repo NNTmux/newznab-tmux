@@ -191,9 +191,11 @@ class ProcessReleases
 		$totalReleasesAdded = 0;
 		do {
 			$releasesCount = $this->createReleases($groupID);
-			$totalReleasesAdded += $releasesCount['added'];
+			$mgrReleasesCount = (new ReleasesMultiGroup())->createMGRReleases();
+			$totalReleasesAdded += $releasesCount['added'] += $mgrReleasesCount['added'];
 
 			$nzbFilesAdded = $this->createNZBs($groupID);
+			$mgrFilesAdded = (new ReleasesMultiGroup())->createMGRNZBs();
 			$this->deleteCollections($groupID);
 			if ($this->processRequestIDs === 0) {
 				$this->processRequestIDs($groupID, 5000, true);
@@ -220,7 +222,7 @@ class ProcessReleases
 			$this->postProcessReleases($postProcess, $nntp);
 
 			// This loops as long as there were releases created or 3 loops, otherwise, you could loop indefinately
-		} while (($releasesCount['added'] + $releasesCount['dupes']) >= $this->releaseCreationLimit || $nzbFilesAdded >= $this->releaseCreationLimit);
+		} while (($releasesCount['added'] + $releasesCount['dupes']) + $mgrReleasesCount['added'] + $mgrReleasesCount['dupes'] >= $this->releaseCreationLimit || $nzbFilesAdded + $mgrFilesAdded >= $this->releaseCreationLimit);
 
 
 
@@ -385,13 +387,11 @@ class ProcessReleases
 		// Get the total size in bytes of the mgr collection for mgr collections where filecheck = 2.
 		$mgrChecked = $this->pdo->queryExec(
 			sprintf(
-				'UPDATE %s c
-				SET filesize = (SELECT COALESCE(SUM(b.partsize), 0) FROM %s b WHERE b.collection_id = c.id),
+				'UPDATE mgr_collections c
+				SET filesize = (SELECT COALESCE(SUM(b.partsize), 0) FROM mgr_binaries b WHERE b.collection_id = c.id),
 				filecheck = %d
 				WHERE c.filecheck = %d
 				AND c.filesize = 0',
-				$group['mgrcname'],
-				$group['mgrbname'],
 				self::COLLFC_SIZED,
 				self::COLLFC_COMPPART
 			)
@@ -569,8 +569,6 @@ class ProcessReleases
 		}
 
 		$this->pdo->ping(true);
-
-		(new ReleasesMultiGroup())->createMGRReleases();
 
 		$collections = $this->pdo->queryDirect(
 			sprintf('
@@ -770,8 +768,6 @@ class ProcessReleases
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
 		}
-
-		(new ReleasesMultiGroup())->createMGRNZBs();
 
 		$releases = $this->pdo->queryDirect(
 			sprintf("
@@ -1541,17 +1537,14 @@ class ProcessReleases
 
 		$this->pdo->queryExec(
 			sprintf('
-				UPDATE %s c INNER JOIN
-					(SELECT c.id FROM %s c
-					INNER JOIN %s b ON b.collection_id = c.id
+				UPDATE mgr_collections c INNER JOIN
+					(SELECT c.id FROM mgr_collections c
+					INNER JOIN mgr_binaries b ON b.collection_id = c.id
 					WHERE c.totalfiles > 0 AND c.filecheck = %d
 					GROUP BY b.collection_id, c.totalfiles, c.id
 					HAVING COUNT(b.id) IN (c.totalfiles, c.totalfiles + 1)
 					)
 				r ON c.id = r.id SET filecheck = %d',
-				$group['mgrcname'],
-				$group['mgrcname'],
-				$group['mgrbname'],
 				self::COLLFC_DEFAULT,
 				self::COLLFC_COMPCOLL
 			)
@@ -1607,28 +1600,24 @@ class ProcessReleases
 
 		$this->pdo->queryExec(
 			sprintf('
-				UPDATE %s c INNER JOIN
-					(SELECT c.id FROM %s c
-					INNER JOIN %s b ON b.collection_id = c.id
+				UPDATE mgr_collections c INNER JOIN
+					(SELECT c.id FROM mgr_collections c
+					INNER JOIN mgr_binaries b ON b.collection_id = c.id
 					WHERE b.filenumber = 0
 					AND c.totalfiles > 0
 					AND c.filecheck = %d
 					GROUP BY c.id
 					)
 				r ON c.id = r.id SET c.filecheck = %d',
-				$group['mgrcname'],
-				$group['mgrcname'],
-				$group['mgrbname'],
 				self::COLLFC_COMPCOLL,
 				self::COLLFC_ZEROPART
 			)
 		);
 		$this->pdo->queryExec(
 			sprintf('
-				UPDATE %s c
+				UPDATE mgr_collections c
 				SET filecheck = %d
 				WHERE filecheck = %d',
-				$group['mgrcname'],
 				self::COLLFC_TEMPCOMP,
 				self::COLLFC_COMPCOLL
 			)
@@ -1686,16 +1675,13 @@ class ProcessReleases
 
 		$this->pdo->queryExec(
 			sprintf('
-				UPDATE %s b INNER JOIN
-					(SELECT b.id FROM %s b
-					INNER JOIN %s c ON c.id = b.collection_id
+				UPDATE mgr_binaries b INNER JOIN
+					(SELECT b.id FROM mgr_binaries b
+					INNER JOIN mgr_collections c ON c.id = b.collection_id
 					WHERE c.filecheck = %d AND b.partcheck = %d
 					AND b.currentparts = b.totalparts
 					GROUP BY b.id, b.totalparts)
 				r ON b.id = r.id SET b.partcheck = %d',
-				$group['mgrbname'],
-				$group['mgrbname'],
-				$group['mgrcname'],
 				self::COLLFC_TEMPCOMP,
 				self::FILE_INCOMPLETE,
 				self::FILE_COMPLETE
@@ -1703,16 +1689,13 @@ class ProcessReleases
 		);
 		$this->pdo->queryExec(
 			sprintf('
-				UPDATE %s b INNER JOIN
-					(SELECT b.id FROM %s b
-					INNER JOIN %s c ON c.id = b.collection_id
+				UPDATE mgr_binaries b INNER JOIN
+					(SELECT b.id FROM mgr_binaries b
+					INNER JOIN mgr_collections c ON c.id = b.collection_id
 					WHERE c.filecheck = %d AND b.partcheck = %d
 					AND b.currentparts >= (b.totalparts + 1)
 					GROUP BY b.id, b.totalparts)
 				r ON b.id = r.id SET b.partcheck = %d',
-				$group['mgrbname'],
-				$group['mgrbname'],
-				$group['mgrcname'],
 				self::COLLFC_ZEROPART,
 				self::FILE_INCOMPLETE,
 				self::FILE_COMPLETE
@@ -1753,15 +1736,12 @@ class ProcessReleases
 
 		$this->pdo->queryExec(
 			sprintf('
-				UPDATE %s c INNER JOIN
-					(SELECT c.id FROM %s c
-					INNER JOIN %s b ON c.id = b.collection_id
+				UPDATE mgr_collections c INNER JOIN
+					(SELECT c.id FROM mgr_collections c
+					INNER JOIN mgr_binaries b ON c.id = b.collection_id
 					WHERE b.partcheck = 1 AND c.filecheck IN (%d, %d)
 					GROUP BY b.collection_id, c.totalfiles, c.id HAVING COUNT(b.id) >= c.totalfiles)
 				r ON c.id = r.id SET filecheck = %d',
-				$group['mgrcname'],
-				$group['mgrcname'],
-				$group['mgrbname'],
 				self::COLLFC_TEMPCOMP,
 				self::COLLFC_ZEROPART,
 				self::COLLFC_COMPPART
@@ -1796,10 +1776,9 @@ class ProcessReleases
 
 		$this->pdo->queryExec(
 			sprintf('
-				UPDATE %s c
+				UPDATE mgr_collections c
 				SET filecheck = %d
 				WHERE filecheck IN (%d, %d)',
-				$group['mgrcname'],
 				self::COLLFC_COMPCOLL,
 				self::COLLFC_TEMPCOMP,
 				self::COLLFC_ZEROPART
@@ -1836,12 +1815,10 @@ class ProcessReleases
 
 		$this->pdo->queryExec(
 			sprintf("
-				UPDATE %s c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM %s b WHERE b.collection_id = c.id)
+				UPDATE mgr_collections c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM mgr_binaries b WHERE b.collection_id = c.id)
 				WHERE c.dateadded < NOW() - INTERVAL '%d' HOUR
 				AND c.filecheck IN (%d, %d, 10)",
-				$group['mgrcname'],
 				self::COLLFC_COMPPART,
-				$group['mgrbname'],
 				$this->collectionDelayTime,
 				self::COLLFC_DEFAULT,
 				self::COLLFC_COMPCOLL

@@ -586,11 +586,9 @@ class Groups
 	 * @param bool $tpgSetting false, tpg is off in site setting, true tpg is on in site setting.
 	 * @param int  $groupID    ID of the group.
 	 *
-	 * @param bool $multiGroup
-	 *
 	 * @return array The table names.
 	 */
-	public function getCBPTableNames($tpgSetting, $groupID, $multiGroup = false)
+	public function getCBPTableNames($tpgSetting, $groupID)
 	{
 		$groupKey = ($groupID . '_' . (int)$tpgSetting);
 
@@ -604,17 +602,13 @@ class Groups
 		$tables['bname']  = 'binaries';
 		$tables['pname']  = 'parts';
 		$tables['prname'] = 'missed_parts';
-		$tables['mgrcname']  = 'mgr_collections';
-		$tables['mgrbname']  = 'mgr_binaries';
-		$tables['mgrpname']  = 'mgr_parts';
-		$tables['mgrprname'] = 'mgr_missed_parts';
 
 		if ($tpgSetting === true) {
-			if ($multiGroup === false && $groupID == '') {
+			if ($groupID == '') {
 				exit('Error: You must use .../misc/update/nix/multiprocessing/releases.php since you have enabled TPG!');
 			}
 
-			if ($multiGroup === false && $this->createNewTPGTables($groupID) === false && NN_ECHOCLI) {
+			if ($this->createNewTPGTables($groupID) === false && NN_ECHOCLI) {
 				exit('There is a problem creating new TPG tables for this group ID: ' . $groupID . PHP_EOL);
 			}
 
@@ -623,10 +617,6 @@ class Groups
 			$tables['bname'] .= $groupEnding;
 			$tables['pname'] .= $groupEnding;
 			$tables['prname'] .= $groupEnding;
-			$tables['mgrcname'];
-			$tables['mgrbname'];
-			$tables['mgrpname'];
-			$tables['mgrprname'];
 		}
 
 		// Buffer.

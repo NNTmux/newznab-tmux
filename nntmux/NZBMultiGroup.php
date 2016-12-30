@@ -61,27 +61,20 @@ class NZBMultiGroup
 	public function initiateForMgrWrite()
 	{
 
-		// Set table names
-		$this->_tableNames = [
-			'mgrcName' => 'mgr_collections',
-			'mgrbName' => 'mgr_binaries',
-			'mgrpName' => 'mgr_parts'
-			];
-
 		$this->_collectionsQuery = "
 			SELECT c.*, UNIX_TIMESTAMP(c.date) AS udate,
 				g.name AS groupname
-			FROM {$this->_tableNames['mgrcName']} c
+			FROM mgr_collections c
 			INNER JOIN groups g ON c.group_id = g.id
 			WHERE c.releaseid = ";
 		$this->_binariesQuery = "
 			SELECT b.id, b.name, b.totalparts
-			FROM {$this->_tableNames['mgrbName']} b
+			FROM mgr_binaries b
 			WHERE b.collection_id = %d
 			ORDER BY b.name ASC";
 		$this->_partsQuery = "
 			SELECT DISTINCT(p.messageid), p.size, p.partnumber
-			FROM {$this->_tableNames['mgrpName']} p
+			FROM mgr_parts p
 			WHERE p.binaryid = %d
 			ORDER BY p.partnumber ASC";
 
@@ -204,8 +197,8 @@ class NZBMultiGroup
 		// Delete CBP for release that has its NZB created.
 		$this->pdo->queryExec(
 			sprintf('
-			DELETE c, b, p FROM %s c JOIN %s b ON(c.id=b.collection_id) STRAIGHT_JOIN %s p ON(b.id=p.binaryid) WHERE c.releaseid = %d',
-				$this->_tableNames['mgrcName'], $this->_tableNames['mgrbName'], $this->_tableNames['mgrpName'], $relID
+			DELETE c, b, p FROM mgr_collections c JOIN mgr_binaries b ON(c.id=b.collection_id) STRAIGHT_JOIN mgr_parts p ON(b.id=p.binaryid) WHERE c.releaseid = %d',
+				$relID
 			)
 		);
 		// Chmod to fix issues some users have with file permissions.
