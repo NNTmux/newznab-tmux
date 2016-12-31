@@ -55,7 +55,6 @@ class NZBMultiGroup
 	/**
 	 * Initiate class vars when writing NZB's.
 	 *
-	 *
 	 * @access public
 	 */
 	public function initiateForMgrWrite()
@@ -151,7 +150,8 @@ class NZBMultiGroup
 				$xmlwrtr->writeAttribute('subject', $subject);
 				$xmlwrtr->startElement('groups');
 				if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
-					foreach ($matches[1] as $group) {
+					$matches = array_unique($matches[1]);
+					foreach ($matches as $group) {
 						$xmlwrtr->writeElement('group', $group);
 					}
 				}

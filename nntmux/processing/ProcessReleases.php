@@ -190,13 +190,13 @@ class ProcessReleases
 
 		$totalReleasesAdded = 0;
 		do {
-			$releasesCount = $this->createReleases($groupID);
+			//$releasesCount = $this->createReleases($groupID);
 			$mgrReleasesCount = (new ReleasesMultiGroup())->createMGRReleases();
-			$totalReleasesAdded += $releasesCount['added'] += $mgrReleasesCount['added'];
+			$totalReleasesAdded += /*$releasesCount['added'] +=*/ $mgrReleasesCount['added'];
 
-			$nzbFilesAdded = $this->createNZBs($groupID);
+			//$nzbFilesAdded = $this->createNZBs($groupID);
 			$mgrFilesAdded = (new ReleasesMultiGroup())->createMGRNZBs();
-			$this->deleteCollections($groupID);
+			//$this->deleteCollections($groupID);
 			if ($this->processRequestIDs === 0) {
 				$this->processRequestIDs($groupID, 5000, true);
 			} else if ($this->processRequestIDs === 1) {
@@ -222,7 +222,7 @@ class ProcessReleases
 			$this->postProcessReleases($postProcess, $nntp);
 
 			// This loops as long as there were releases created or 3 loops, otherwise, you could loop indefinately
-		} while (($releasesCount['added'] + $releasesCount['dupes']) + $mgrReleasesCount['added'] + $mgrReleasesCount['dupes'] >= $this->releaseCreationLimit || $nzbFilesAdded + $mgrFilesAdded >= $this->releaseCreationLimit);
+		} while ((/*$releasesCount['added'] + /*$releasesCount['dupes']+*/ $mgrReleasesCount['added'] + $mgrReleasesCount['dupes']) >= $this->releaseCreationLimit || /*$nzbFilesAdded +*/ $mgrFilesAdded >= $this->releaseCreationLimit);
 
 
 
@@ -776,8 +776,10 @@ class ProcessReleases
 				FROM releases r
 				INNER JOIN categories c ON r.categories_id = c.id
 				INNER JOIN categories cp ON cp.id = c.parentid
-				WHERE %s nzbstatus = 0",
-				(!empty($groupID) ? ' r.groups_id = ' . $groupID . ' AND ' : ' ')
+				WHERE %s nzbstatus = 0
+				AND r.fromname NOT IN('%s')",
+				(!empty($groupID) ? ' r.groups_id = ' . $groupID . ' AND ' : ' '),
+				implode("', '", ReleasesMultiGroup::$mgrPosterNames)
 			)
 		);
 

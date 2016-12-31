@@ -55,7 +55,7 @@ class ReleasesMultiGroup
 	public function __construct(array $options = [])
 	{
 
-		$this->mgrFromNames = implode(",", self::$mgrPosterNames);
+		$this->mgrFromNames = implode("', '", self::$mgrPosterNames);
 		$this->mgrnzb = new NZBMultiGroup();
 		$this->pdo = new DB();
 		$this->consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
@@ -112,7 +112,7 @@ class ReleasesMultiGroup
 		$returnCount = $duplicate = 0;
 
 		if ($this->echoCLI) {
-			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create releases from complete collections."));
+			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create releases from complete MGR collections."));
 		}
 
 		$this->pdo->ping(true);
@@ -130,7 +130,7 @@ class ReleasesMultiGroup
 		);
 
 		if ($this->echoCLI && $collections !== false) {
-			echo $this->pdo->log->primary($collections->rowCount() . " Collections ready to be converted to releases.");
+			echo $this->pdo->log->primary($collections->rowCount() . " MGR Collections ready to be converted to releases.");
 		}
 
 		if ($collections instanceof \Traversable) {
@@ -242,15 +242,14 @@ class ReleasesMultiGroup
 												'minsizetoformrelease'  => ''
 											]
 										);
+										$relGroups = ReleasesGroups::create(
+											[
+												'releases_id' => $releaseID,
+												'groups_id'   => $xrefGrpID,
+											]
+										);
+										$relGroups->save();
 									}
-
-									$relGroups = ReleasesGroups::create(
-										[
-											'releases_id' => $releaseID,
-											'groups_id'   => $xrefGrpID,
-										]
-									);
-									$relGroups->save();
 								}
 							}
 						}
@@ -267,7 +266,7 @@ class ReleasesMultiGroup
 						sprintf('
 							DELETE c, b, p FROM mgr_collections c
 							INNER JOIN mgr_binaries b ON(c.id=b.collection_id)
-							STRAIGHT_JOIN mgr_missed_parts p ON(b.id=p.binaryid)
+							STRAIGHT_JOIN mgr_parts p ON(b.id=p.binaryid)
 							WHERE c.collectionhash = %s',
 							$this->pdo->escapeString($collection['collectionhash'])
 						)
@@ -310,7 +309,7 @@ class ReleasesMultiGroup
 				FROM releases r
 				INNER JOIN categories c ON r.categories_id = c.id
 				INNER JOIN categories cp ON cp.id = c.parentid
-				WHERE r.nzbstatus = 0 AND r.fromname IN (%s)", $this->pdo->escapeString($this->mgrFromNames)
+				WHERE r.nzbstatus = 0 AND r.fromname IN ('%s')", $this->mgrFromNames
 			)
 		);
 

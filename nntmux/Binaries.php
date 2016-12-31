@@ -855,11 +855,19 @@ class Binaries
 				);
 			}
 
-			if (((strlen($partsQuery) === strlen($partsCheck)) ? true : $this->_pdo->queryExec(rtrim($partsQuery, ','))) || ((strlen($mgrPartsQuery) === strlen($mgrPartsCheck)) ? true : $this->_pdo->queryExec(rtrim($mgrPartsQuery, ',')))) {
+			if (((strlen($partsQuery) === strlen($partsCheck)) ? true : $this->_pdo->queryExec(rtrim($partsQuery, ',')))) {
 				$this->_pdo->Commit();
 			} else {
 				if ($addToPartRepair) {
 					$headersNotInserted += $headersReceived;
+				}
+				$this->_pdo->Rollback();
+			}
+			$this->_pdo->beginTransaction();
+			if (((strlen($mgrPartsQuery) === strlen($mgrPartsCheck)) ? true : $this->_pdo->queryExec(rtrim($mgrPartsQuery, ',')))) {
+				$this->_pdo->Commit();
+			} else {
+				if ($addToPartRepair) {
 					$mgrHeadersNotInserted += $mgrHeadersReceived;
 				}
 				$this->_pdo->Rollback();
@@ -867,6 +875,7 @@ class Binaries
 		} else {
 			if ($addToPartRepair) {
 				$headersNotInserted += $headersReceived;
+				$mgrHeadersNotInserted += $mgrHeadersReceived;
 			}
 			$this->_pdo->Rollback();
 		}
