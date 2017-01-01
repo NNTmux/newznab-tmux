@@ -16,11 +16,6 @@ class NZBMultiGroup
 	/**
 	 * @var
 	 */
-	private $_tableNames;
-
-	/**
-	 * @var
-	 */
 	private $_collectionsQuery;
 
 	/**

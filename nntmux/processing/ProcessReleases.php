@@ -191,11 +191,11 @@ class ProcessReleases
 		$totalReleasesAdded = 0;
 		do {
 			//$releasesCount = $this->createReleases($groupID);
-			$mgrReleasesCount = (new ReleasesMultiGroup())->createMGRReleases();
+			$mgrReleasesCount = (new ReleasesMultiGroup())->createMGRReleases($groupID);
 			$totalReleasesAdded += /*$releasesCount['added'] +=*/ $mgrReleasesCount['added'];
 
 			//$nzbFilesAdded = $this->createNZBs($groupID);
-			$mgrFilesAdded = (new ReleasesMultiGroup())->createMGRNZBs();
+			$mgrFilesAdded = (new ReleasesMultiGroup())->createMGRNZBs($groupID);
 			//$this->deleteCollections($groupID);
 			if ($this->processRequestIDs === 0) {
 				$this->processRequestIDs($groupID, 5000, true);
@@ -391,9 +391,10 @@ class ProcessReleases
 				SET filesize = (SELECT COALESCE(SUM(b.partsize), 0) FROM mgr_binaries b WHERE b.collection_id = c.id),
 				filecheck = %d
 				WHERE c.filecheck = %d
-				AND c.filesize = 0',
+				AND c.filesize = 0 %s',
 				self::COLLFC_SIZED,
-				self::COLLFC_COMPPART
+				self::COLLFC_COMPPART,
+				(!empty($groupID) ? ' AND c.group_id = ' . $groupID : '')
 			)
 		);
 		if ($mgrChecked !== false && $this->echoCLI) {

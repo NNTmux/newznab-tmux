@@ -290,8 +290,8 @@ function processReleases($releases, $mgrreleases, $groupID)
 	$releases->deleteUnwantedCollections($groupID);
 
 	do {
-		$mgrReleasesCount = $mgrreleases->CreateMGRReleases();
-		$mgrFilesAdded = $mgrreleases->createMGRNzbs();
+		$mgrReleasesCount = $mgrreleases->createMGRReleases($groupID);
+		$mgrFilesAdded = $mgrreleases->createMGRNzbs($groupID);
 		$releasesCount = $releases->createReleases($groupID);
 		$nzbFilesAdded = $releases->createNZBs($groupID);
 

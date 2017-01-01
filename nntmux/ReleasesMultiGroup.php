@@ -101,10 +101,12 @@ class ReleasesMultiGroup
 	 * Create releases from complete collections.
 	 *
 	 *
+	 * @param $groupID
+	 *
 	 * @return array
 	 * @access public
 	 */
-	public function createMGRReleases()
+	public function createMGRReleases($groupID)
 	{
 		$startTime = time();
 
@@ -122,8 +124,9 @@ class ReleasesMultiGroup
 				SELECT SQL_NO_CACHE mgr_collections.*, groups.name AS gname
 				FROM mgr_collections
 				INNER JOIN groups ON mgr_collections.group_id = groups.id
-				WHERE mgr_collections.filecheck = %d
+				WHERE %s mgr_collections.filecheck = %d
 				AND filesize > 0 LIMIT %d',
+				(!empty($groupID) ? ' group_id = ' . $groupID . ' AND ' : ' '),
 				ProcessReleases::COLLFC_SIZED,
 				$this->releaseCreationLimit
 			)
@@ -296,10 +299,12 @@ class ReleasesMultiGroup
 	 * Create NZB files from complete releases.
 	 *
 	 *
+	 * @param $groupID
+	 *
 	 * @return int
 	 * @access public
 	 */
-	public function createMGRNZBs()
+	public function createMGRNZBs($groupID)
 	{
 
 		$releases = $this->pdo->queryDirect(
@@ -309,7 +314,9 @@ class ReleasesMultiGroup
 				FROM releases r
 				INNER JOIN categories c ON r.categories_id = c.id
 				INNER JOIN categories cp ON cp.id = c.parentid
-				WHERE r.nzbstatus = 0 AND r.fromname IN ('%s')", $this->mgrFromNames
+				WHERE %s r.nzbstatus = 0 AND r.fromname IN ('%s')",
+				(!empty($groupID) ? ' r.groups_id = ' . $groupID . ' AND ' : ' '),
+				$this->mgrFromNames
 			)
 		);
 
