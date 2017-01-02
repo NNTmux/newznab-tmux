@@ -12,21 +12,6 @@ class ReleasesMultiGroup
 {
 
 	/**
-	 * @var array of MGR groups
-	 */
-	public static $mgrGroups = [
-		 'alt.binaries.amazing',
-		 'alt.binaries.ath',
-		 'alt.binaries.bloaf',
-		 'alt.binaries.british.drama',
-		 'alt.binaries.chello',
-		 'alt.binaries.etc',
-		 'alt.binaries.font',
-		 'alt.binaries.misc',
-		 'alt.binaries.tatu'
-	];
-
-	/**
 	 * @var array of MGR posters
 	 */
 	public static $mgrPosterNames = [
@@ -225,7 +210,8 @@ class ReleasesMultiGroup
 						);
 
 						if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
-							foreach ($matches[1] as $grp) {
+							$matches = array_unique($matches[1]);
+							foreach ($matches as $grp) {
 								//check if the group name is in a valid format
 								$grpTmp = $this->groups->isValidGroup($grp);
 								if ($grpTmp !== false) {
@@ -245,14 +231,15 @@ class ReleasesMultiGroup
 												'minsizetoformrelease'  => ''
 											]
 										);
-										$relGroups = ReleasesGroups::create(
-											[
-												'releases_id' => $releaseID,
-												'groups_id'   => $xrefGrpID,
-											]
-										);
-										$relGroups->save();
 									}
+
+									$relGroups = ReleasesGroups::create(
+										[
+											'releases_id' => $releaseID,
+											'groups_id'   => $xrefGrpID,
+										]
+									);
+									$relGroups->save();
 								}
 							}
 						}
@@ -339,5 +326,4 @@ class ReleasesMultiGroup
 
 		return $nzbCount;
 	}
-
 }
