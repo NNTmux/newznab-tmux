@@ -10,7 +10,7 @@ use nntmux\utility\Utility;
  * Class for reading and writing NZB files on the hard disk,
  * building folder paths to store the NZB files.
  */
-class NZBMultiGroup
+class NZBMultiGroup extends NZB
 {
 
 	/**
@@ -41,10 +41,7 @@ class NZBMultiGroup
 	 */
 	public function __construct()
 	{
-		$this->pdo = new DB();
-		$this->nzb = new NZB();
-		$nzbSplitLevel = Settings::value('..nzbsplitlevel');
-		$this->nzbSplitLevel = (empty($nzbSplitLevel) ? 1 : $nzbSplitLevel);
+		parent::__construct($options);
 	}
 
 	/**
@@ -168,7 +165,7 @@ class NZBMultiGroup
 		}
 		$xmlwrtr->endElement(); //nzb
 		$xmlwrtr->endDocument();
-		$path = ($this->nzb->buildNZBPath($relGuid, $this->nzbSplitLevel, true) . $relGuid . '.nzb.gz');
+		$path = ($this->buildNZBPath($relGuid, $this->nzbSplitLevel, true) . $relGuid . '.nzb.gz');
 		$fp = gzopen($path, 'wb7');
 		if (!$fp) {
 			return false;
