@@ -2,8 +2,6 @@
 namespace nntmux;
 
 use app\extensions\util\Versions as li3Versions;
-use app\models\Settings;
-use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 /**
