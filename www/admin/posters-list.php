@@ -7,11 +7,12 @@ $page   = new AdminPage();
 $pdo = new DB();
 $posterslist = $pdo->query(sprintf('SELECT * FROM mgr_posters'));
 
-$posters = (isset($_REQUEST['id']) && !empty($_REQUEST['id']) ? $_REQUEST['id'] : '');
+
+$poster = (isset($_REQUEST['poster']) && !empty($_REQUEST['poster']) ? $_REQUEST['poster'] : '');
 
 $page->smarty->assign(
 	[
-		'poster' => $posters,
+		'poster' => $poster,
 		'posterslist' => $posterslist
 	]
 );

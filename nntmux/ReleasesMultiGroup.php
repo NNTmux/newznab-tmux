@@ -326,4 +326,21 @@ class ReleasesMultiGroup
 
 		return $nzbCount;
 	}
+
+	/**
+	 * @param $poster
+	 */
+	public function addPoster($poster)
+	{
+		$this->pdo->queryInsert(sprintf('INSERT INTO mgr_posters (poster) VALUE (%s)', $this->pdo->escapeString($poster)));
+	}
+
+	/**
+	 * @param $id
+	 * @param $poster
+	 */
+	public function updatePoster($id, $poster)
+	{
+		$this->pdo->queryExec(sprintf('UPDATE mgr_posters SET poster = %s WHERE id = %d', $this->pdo->escapeString($poster), $id));
+	}
 }

@@ -6,7 +6,8 @@
 			<tr>
 				<td>Poster name:</td>
 				<td>
-					<input id="poster" class="long" name="poster" type="text" value="{$poster}" />
+					<input type="hidden" name="id" value="{$poster.id}" />
+					<input id="poster" class="long" name="poster" type="text" value={if isset($poster)}"{$poster.poster}"{else}""{/if} />
 					<div class="hint">Name of the MGR poster</div>
 				</td>
 			</tr>

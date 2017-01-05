@@ -21,23 +21,7 @@ namespace app\models;
 
 class MgrPosters extends \lithium\data\Model
 {
-	public $belongsTo = ['MGR'];
-	public $hasMany = ['Posters'];
-
-	public $validates = [
-		'id' => [
-			 [
-			'required' => false
-			]
-		],
-		'poster' => [
-			[
-			'required' => true
-			]
-		]
-	];
-
 	protected $_meta = [
-		'key'			=> ['id', 'poster'],
+		'key'			=> ['poster']
 	];
 }

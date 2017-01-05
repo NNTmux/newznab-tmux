@@ -9,9 +9,9 @@
 				<th>Poster name</th>
 			</tr>
 			{foreach from=$posterslist item=poster}
-				<tr class="{cycle values=",alt"}">
+				<tr id="poster" class="{cycle values=",alt"}">
 					<td>
-						<a href="{$smarty.const.WWW_TOP}/posters-edit.php?poster={$poster.poster}">{$poster.poster}</a>
+						<a href="{$smarty.const.WWW_TOP}/posters-edit.php?id={$poster.id}&poster={$poster.poster}">{$poster.poster}</a>
 					</td>
 				</tr>
 			{/foreach}
