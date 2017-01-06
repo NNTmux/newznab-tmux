@@ -744,16 +744,19 @@ class Binaries
 					$now = time();
 
 					$xref = ($multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->escapeString(substr($header['Xref'], 2, 255))) : '');
+					$table = $multiGroup === true ? 'mgr_collections' : $tableNames['cname'];
+					$date = $header['Date'] > $now ? $now : $header['Date'];
+					$unixtime = is_numeric($header['Date']) ? $date : $now;
 					$collectionID = $this->_pdo->queryInsert(
 						sprintf("
 							INSERT INTO %s (subject, fromname, date, xref, group_id,
 								totalfiles, collectionhash, dateadded)
 							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', NOW())
 							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'",
-							($multiGroup === true ? 'mgr_collections' : $tableNames['cname']),
+							$table,
 							$this->_pdo->escapeString(substr(utf8_encode($matches[1]), 0, 255)),
 							$this->_pdo->escapeString(utf8_encode($header['From'])),
-							(is_numeric($header['Date']) ? ($header['Date'] > $now ? $now : $header['Date']) : $now),
+							$unixtime,
 							$this->_pdo->escapeString(substr($header['Xref'], 0, 255)),
 							$groupMySQL['id'],
 							$fileCount[3],
@@ -780,13 +783,16 @@ class Binaries
 					$collectionID = $collectionIDs[$header['CollectionKey']];
 				}
 
+				$table = $multiGroup === true ? 'mgr_binaries' : $tableNames['bname'];
+				$hash = $multiGroup === true ? md5($matches[1] . $header['From']) :
+					md5($matches[1] . $header['From'] . $groupMySQL['id']);
 				$binaryID = $this->_pdo->queryInsert(
 					sprintf("
 						INSERT INTO %s (binaryhash, name, collection_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
-						($multiGroup === true ? 'mgr_binaries' : $tableNames['bname']),
-						($multiGroup === true ? md5($matches[1] . $header['From']) : md5($matches[1] . $header['From'] . $groupMySQL['id'])),
+						$table,
+						$hash,
 						$this->_pdo->escapeString(utf8_encode($matches[1])),
 						$collectionID,
 						$matches[3],
@@ -1383,7 +1389,7 @@ class Binaries
 	 *
 	 * @return bool
 	 */
-	private function addMissingParts($numbers, $tableName, $groupID)
+	private function addMissingParts(array $numbers, $tableName, $groupID)
 	{
 		$insertStr = 'INSERT INTO ' . $tableName . ' (numberid, group_id) VALUES ';
 		foreach ($numbers as $number) {
@@ -1399,7 +1405,7 @@ class Binaries
 	 *
 	 * @return bool
 	 */
-	private function addMissingMGRParts($numbers)
+	private function addMissingMGRParts(array $numbers)
 	{
 		$insertStr = 'INSERT INTO mgr_missed_parts (numberid) VALUES ';
 		foreach ($numbers as $number) {
@@ -1417,7 +1423,7 @@ class Binaries
 	 *
 	 * @return void
 	 */
-	private function removeRepairedParts($numbers, $tableName, $groupID)
+	private function removeRepairedParts(array $numbers, $tableName, $groupID)
 	{
 		$sql = 'DELETE FROM ' . $tableName . ' WHERE numberid in (';
 		foreach ($numbers as $number) {
@@ -1433,7 +1439,7 @@ class Binaries
 	 *
 	 * @return void
 	 */
-	private function removeRepairedMGRParts($numbers)
+	private function removeRepairedMGRParts(array $numbers)
 	{
 		$sql = 'DELETE FROM mgr_missed_parts WHERE numberid in (';
 		foreach ($numbers as $number) {
