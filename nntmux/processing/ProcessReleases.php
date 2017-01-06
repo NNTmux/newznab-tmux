@@ -18,6 +18,7 @@ use nntmux\RequestIDWeb;
 use nntmux\PreDb;
 use nntmux\Genres;
 use nntmux\NNTP;
+use nntmux\utility\Utility;
 
 class ProcessReleases
 {
@@ -770,6 +771,8 @@ class ProcessReleases
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
 		}
 
+		$relmgr = (new ReleasesMultiGroup())->getAllPosters();
+		$posters = Utility::convertMultiArray($relmgr);
 		$releases = $this->pdo->queryDirect(
 			sprintf("
 				SELECT SQL_NO_CACHE CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
@@ -780,7 +783,7 @@ class ProcessReleases
 				WHERE %s nzbstatus = 0
 				AND r.fromname NOT IN('%s')",
 				(!empty($groupID) ? ' r.groups_id = ' . $groupID . ' AND ' : ' '),
-				implode("', '", ReleasesMultiGroup::$mgrPosterNames)
+				$posters
 			)
 		);
 

@@ -10,17 +10,6 @@ use nntmux\processing\ProcessReleases;
 
 class ReleasesMultiGroup
 {
-
-	/**
-	 * @var array of MGR posters
-	 */
-	public static $mgrPosterNames = [
-		'mmmq@meh.com',
-		'buymore@suprnova.com',
-		'pfc@p0rnFuscated.com',
-		'mq@meh.com'
-	];
-
 	/**
 	 * @var
 	 */
@@ -39,8 +28,6 @@ class ReleasesMultiGroup
 	 */
 	public function __construct(array $options = [])
 	{
-
-		$this->mgrFromNames = implode("', '", self::$mgrPosterNames);
 		$this->mgrnzb = new NZBMultiGroup();
 		$this->pdo = new DB();
 		$this->consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
@@ -57,9 +44,9 @@ class ReleasesMultiGroup
 	 *
 	 * @return bool
 	 */
-	public static function isMultiGroup($fromName)
+	public function isMultiGroup($fromName)
 	{
-		return in_array($fromName, self::$mgrPosterNames);
+		return in_array($fromName, $this->getAllPosters());
 	}
 
 	/**
@@ -342,5 +329,17 @@ class ReleasesMultiGroup
 	public function updatePoster($id, $poster)
 	{
 		$this->pdo->queryExec(sprintf('UPDATE mgr_posters SET poster = %s WHERE id = %d', $this->pdo->escapeString($poster), $id));
+	}
+
+	/**
+	 * @return array|bool
+	 */
+	public function getAllPosters()
+	{
+		$pstrs = $this->pdo->query(sprintf('SELECT poster AS poster FROM mgr_posters'));
+		if (is_array($pstrs) && !empty($pstrs)) {
+			return $pstrs;
+		}
+		return false;
 	}
 }

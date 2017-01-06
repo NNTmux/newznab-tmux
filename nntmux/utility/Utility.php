@@ -1110,4 +1110,16 @@ class Utility
 	{
 		return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
 	}
+
+	/**
+	 * Code taken from http://stackoverflow.com/a/12309103
+	 *
+	 * @param $array
+	 *
+	 * @return string
+	 */
+	public static function convertMultiArray($array)
+	{
+		return implode(",",array_map(function($a) {return implode(",",$a);},$array));
+	}
 }

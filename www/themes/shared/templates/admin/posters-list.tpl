@@ -4,7 +4,7 @@
 		Below is a list of MGR posters
 	</p>
 	{if $posterslist}
-		<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table Sortable">
+		<table style="width:100%;" class="data table table-striped responsive-utilities sortable">
 			<tr>
 				<th>Poster name</th>
 			</tr>
