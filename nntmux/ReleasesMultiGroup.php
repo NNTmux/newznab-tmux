@@ -6,6 +6,7 @@ use app\models\ReleasesGroups;
 use app\models\Settings;
 use nntmux\db\DB;
 use nntmux\processing\ProcessReleases;
+use nntmux\utility\Utility;
 
 
 class ReleasesMultiGroup
@@ -336,9 +337,9 @@ class ReleasesMultiGroup
 	 */
 	public function getAllPosters()
 	{
-		$pstrs = $this->pdo->query(sprintf('SELECT poster AS poster FROM mgr_posters'));
-		if (is_array($pstrs) && !empty($pstrs)) {
-			return $pstrs;
+		$result = $this->pdo->query(sprintf('SELECT poster AS poster FROM mgr_posters'));
+		if (is_array($result) && !empty($result)) {
+			return $result;
 		}
 		return false;
 	}
