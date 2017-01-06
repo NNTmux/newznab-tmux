@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use ApaiIO\Request\Util;
 use app\models\ReleasesGroups;
 use app\models\Settings;
 use nntmux\db\DB;
@@ -47,7 +48,8 @@ class ReleasesMultiGroup
 	 */
 	public function isMultiGroup($fromName)
 	{
-		return in_array($fromName, $this->getAllPosters());
+		$array = array_column($this->getAllPosters(), 'poster');
+		return in_array($fromName, $array);
 	}
 
 	/**
