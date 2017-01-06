@@ -2,12 +2,10 @@
 
 namespace nntmux;
 
-use ApaiIO\Request\Util;
 use app\models\ReleasesGroups;
 use app\models\Settings;
 use nntmux\db\DB;
 use nntmux\processing\ProcessReleases;
-use nntmux\utility\Utility;
 
 
 class ReleasesMultiGroup

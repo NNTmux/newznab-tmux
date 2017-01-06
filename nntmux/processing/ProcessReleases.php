@@ -771,7 +771,7 @@ class ProcessReleases
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
 		}
 		$relMgrp = new ReleasesMultiGroup();
-		$posters = Utility::convertMultiArray($relMgrp->getAllPosters());
+		$posters = Utility::convertMultiArray($relMgrp->getAllPosters(), "','");
 		$releases = $this->pdo->queryDirect(
 			sprintf("
 				SELECT SQL_NO_CACHE CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
