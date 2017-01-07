@@ -5,6 +5,7 @@ namespace nntmux;
 use app\models\ReleasesGroups;
 use app\models\Settings;
 use nntmux\db\DB;
+use nntmux\utility\Utility;
 use nntmux\processing\ProcessReleases;
 
 
@@ -29,6 +30,7 @@ class ReleasesMultiGroup
 	public function __construct(array $options = [])
 	{
 		$this->mgrnzb = new NZBMultiGroup();
+		$this->mgrFromNames = Utility::convertMultiArray($this->getAllPosters(), "','");
 		$this->pdo = new DB();
 		$this->consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
 		$this->groups = new Groups(['Settings' => $this->pdo]);
