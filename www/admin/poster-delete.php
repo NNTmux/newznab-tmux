@@ -8,8 +8,8 @@ $page = new AdminPage();
 
 if (isset($_GET['id']))
 {
-	$forum = new ReleasesMultiGroup();
-	$forum->deletePoster($_GET['id']);
+	$mgr = new ReleasesMultiGroup();
+	$mgr->deletePoster($_GET['id']);
 }
 
 if (isset($_GET['from']))

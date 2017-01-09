@@ -345,7 +345,7 @@ class ReleasesMultiGroup
 	 */
 	public function deletePoster($id)
 	{
-		$this->pdo->queryExec(sprintf('DELETE * FROM mgr_posters WHERE id = %d', $id));
+		$this->pdo->queryExec(sprintf('DELETE FROM mgr_posters WHERE id = %d', $id));
 	}
 
 	/**
