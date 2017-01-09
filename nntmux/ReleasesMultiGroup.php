@@ -318,6 +318,8 @@ class ReleasesMultiGroup
 	}
 
 	/**
+	 * Add multi group posters to database
+	 *
 	 * @param $poster
 	 */
 	public function addPoster($poster)
@@ -326,6 +328,8 @@ class ReleasesMultiGroup
 	}
 
 	/**
+	 * Update multi group poster
+	 *
 	 * @param $id
 	 * @param $poster
 	 */
@@ -335,6 +339,18 @@ class ReleasesMultiGroup
 	}
 
 	/**
+	 * Delete multi group posters from database
+	 *
+	 * @param $id
+	 */
+	public function deletePoster($id)
+	{
+		$this->pdo->queryExec(sprintf('DELETE * FROM mgr_posters WHERE id = %d', $id));
+	}
+
+	/**
+	 * Fetch all multi group posters from database
+	 *
 	 * @return array|bool
 	 */
 	public function getAllPosters()
