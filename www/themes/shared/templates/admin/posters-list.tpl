@@ -15,7 +15,7 @@
 					</td>
 					<td>
 						<a class="confirm_action btn btn-sm btn-danger"
-						   href="{$smarty.const.WWW_TOP}/admin/poster_delete.php?id={$poster.id} from={$smarty.server.REQUEST_URI|escape:"url"}"
+						   href="{$smarty.const.WWW_TOP}/poster_delete.php?id={$poster.id} from={$smarty.server.REQUEST_URI|escape:"url"}"
 						   title="Delete Topic">Delete poster</a>
 					</td>
 				</tr>
