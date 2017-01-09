@@ -186,6 +186,7 @@ class ProcessReleases
 		$this->processIncompleteCollections($groupID);
 		$this->processCollectionSizes($groupID);
 		$this->deleteUnwantedCollections($groupID);
+		$this->deleteUnwantedCollections($groupID, true);
 
 		$DIR = NN_MISC;
 
