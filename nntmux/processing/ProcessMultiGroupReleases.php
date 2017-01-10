@@ -2,11 +2,7 @@
 
 namespace nntmux\processing;
 
-use app\models\ReleasesGroups;
-use nntmux\Categorize;
-use nntmux\NZB;
 use nntmux\NZBMultiGroup;
-use nntmux\PreDb;
 use nntmux\utility\Utility;
 
 

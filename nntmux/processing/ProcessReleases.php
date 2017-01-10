@@ -715,7 +715,15 @@ class ProcessReleases
 										);
 									}
 
-									$relGroupsDupe = $this->pdo->queryOneRow(sprintf('SELECT releases_groups.releases_id FROM releases_groups WHERE releases_id = %s AND groups_id = %d', $releaseID, $groupID));
+									$relGroupsDupe = $this->pdo->queryOneRow(sprintf('
+																				SELECT releases_groups.releases_id
+																				FROM releases_groups
+																				WHERE releases_id = %s
+																				AND groups_id = %d',
+																				$releaseID,
+																				$groupID
+																			)
+																		);
 									if ($relGroupsDupe === false) {
 										$relGroups = ReleasesGroups::create(
 											[
