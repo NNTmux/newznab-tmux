@@ -12,7 +12,7 @@ use nntmux\ReleaseImage;
 use nntmux\NZB;
 use nntmux\Categorize;
 use nntmux\Category;
-use nntmux\ReleasesMultiGroup;
+use nntmux\processing\ProcessMultiGroupReleases;
 use nntmux\RequestIDLocal;
 use nntmux\RequestIDWeb;
 use nntmux\PreDb;
@@ -193,11 +193,11 @@ class ProcessReleases
 		$totalReleasesAdded = 0;
 		do {
 			$releasesCount = $this->createReleases($groupID);
-			$mgrReleasesCount = (new ReleasesMultiGroup())->createMGRReleases($groupID);
+			$mgrReleasesCount = (new ProcessMultiGroupReleases())->createMGRReleases($groupID);
 			$totalReleasesAdded += $releasesCount['added'] += $mgrReleasesCount['added'];
 
 			$nzbFilesAdded = $this->createNZBs($groupID);
-			$mgrFilesAdded = (new ReleasesMultiGroup())->createMGRNZBs($groupID);
+			$mgrFilesAdded = (new ProcessMultiGroupReleases())->createMGRNZBs($groupID);
 			$this->deleteCollections($groupID);
 			if ($this->processRequestIDs === 0) {
 				$this->processRequestIDs($groupID, 5000, true);
@@ -310,7 +310,7 @@ class ProcessReleases
 	public function processIncompleteCollections($groupID)
 	{
 		$startTime = time();
-		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
+		$group = $this->initiateTableNames($groupID);
 
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Attempting to find complete collections."));
@@ -366,7 +366,7 @@ class ProcessReleases
 	public function processCollectionSizes($groupID, $multiGroup = false)
 	{
 		$startTime = time();
-		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
+		$group = $this->initiateTableNames($groupID);
 		$tablec = $multiGroup === true ? 'mgr_collections' : $group['cname'];
 		$tableb = $multiGroup === true ? 'mgr_binaries' : $group['bname'];
 
@@ -404,13 +404,15 @@ class ProcessReleases
 	 *
 	 * @param int|string $groupID (optional)
 	 *
+	 * @param bool       $multiGroup
+	 *
 	 * @void
 	 * @access public
 	 */
 	public function deleteUnwantedCollections($groupID, $multiGroup = false)
 	{
 		$startTime = time();
-		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
+		$group = $this->initiateTableNames($groupID);
 		$tablec = $multiGroup === true ? 'mgr_collections' : $group['cname'];
 		$tableb = $multiGroup === true ? 'mgr_binaries' : $group['bname'];
 		$tablep = $multiGroup === true ? 'mgr_parts' : $group['pname'];
@@ -544,18 +546,32 @@ class ProcessReleases
 		}
 	}
 
+	protected function initiateTableNames($groupID)
+	{
+		return $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
+	}
+
+	public function createReleases($groupID)
+	{
+		$tableNames = $this->initiateTableNames($groupID);
+		return $this->createReleasesMain($groupID, $tableNames);
+	}
+
+
 	/**
 	 * Create releases from complete collections.
 	 *
 	 * @param int|string $groupID (optional)
 	 *
+	 * @param  array          $tableNames
+	 *
 	 * @return array
 	 * @access public
 	 */
-	public function createReleases($groupID)
+	public function createReleasesMain($groupID, $tableNames)
 	{
 		$startTime = time();
-		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
+		$group = $tableNames;
 
 		$categorize = new Categorize(['Settings' => $this->pdo]);
 		$returnCount = $duplicate = 0;
@@ -764,7 +780,7 @@ class ProcessReleases
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
 		}
-		$relMgrp = new ReleasesMultiGroup();
+		$relMgrp = new ProcessMultiGroupReleases();
 		$posters = Utility::convertMultiArray($relMgrp->getAllPosters(), "','");
 		$releases = $this->pdo->queryDirect(
 			sprintf("
@@ -942,14 +958,14 @@ class ProcessReleases
 	public function deleteCollections($groupID, $multiGroup = false)
 	{
 		$startTime = time();
-		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
+		$group = $this->initiateTableNames($groupID);
 		$tablec = $multiGroup === true ? 'mgr_collections' : $group['cname'];
 		$tableb = $multiGroup === true ? 'mgr_binaries' : $group['bname'];
 		$tablep = $multiGroup === true ? 'mgr_parts' : $group['pname'];
 
 		$deletedCount = 0;
 
-		//(new ReleasesMultiGroup())->deleteMGRCollections();
+		//(new ProcessMultiGroupReleases())->deleteMGRCollections();
 
 		// CBP older than retention.
 		if ($this->echoCLI) {

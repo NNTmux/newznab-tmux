@@ -3,10 +3,10 @@
 require_once './config.php';
 
 
-use nntmux\ReleasesMultiGroup;
+use nntmux\processing\ProcessMultiGroupReleases;
 
 $page = new AdminPage();
-$relPosters = new ReleasesMultiGroup(['Settings' => $page->settings]);
+$relPosters = new ProcessMultiGroupReleases(['Settings' => $page->settings]);
 
 // Set the current action.
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';

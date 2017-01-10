@@ -2,13 +2,13 @@
 require_once './config.php';
 
 
-use nntmux\ReleasesMultiGroup;
+use nntmux\processing\ProcessMultiGroupReleases;
 
 $page = new AdminPage();
 
 if (isset($_GET['id']))
 {
-	$mgr = new ReleasesMultiGroup();
+	$mgr = new ProcessMultiGroupReleases();
 	$mgr->deletePoster($_GET['id']);
 }
 

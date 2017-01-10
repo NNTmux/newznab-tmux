@@ -16,7 +16,7 @@ use nntmux\Binaries;
 use nntmux\Groups;
 use nntmux\Nfo;
 use nntmux\NNTP;
-use nntmux\ReleasesMultiGroup;
+use nntmux\processing\ProcessMultiGroupReleases;
 use nntmux\RequestIDLocal;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
@@ -151,7 +151,7 @@ switch ($options[1]) {
 	case 'releases':
 		$pdo = new DB();
 		$releases = new ProcessReleases(['Settings' => $pdo]);
-		$mgrreleases = new ReleasesMultiGroup(['Settings' => $pdo]);
+		$mgrreleases = new ProcessMultiGroupReleases(['Settings' => $pdo]);
 
 		//Runs function that are per group
 		if (is_numeric($options[2])) {
@@ -223,7 +223,7 @@ switch ($options[1]) {
 			$backFill->backfillAllGroups($groupMySQL['name'], 20000, 'normal');
 
 			// Create releases.
-			processReleases(new ProcessReleases(['Settings' => $pdo]), new ReleasesMultiGroup(['Settings' => $pdo]), $options[2]);
+			processReleases(new ProcessReleases(['Settings' => $pdo]), new ProcessMultiGroupReleases(['Settings' => $pdo]), $options[2]);
 
 			// Post process the releases.
 			(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start($options[2]);
@@ -279,7 +279,7 @@ switch ($options[1]) {
  * Create / process releases for a groupID.
  *
  * @param ProcessReleases $releases
- * @param ReleasesMultiGroup $mgrreleases
+ * @param ProcessMultiGroupReleases $mgrreleases
  * @param int             $groupID
  */
 function processReleases($releases, $mgrreleases, $groupID)
