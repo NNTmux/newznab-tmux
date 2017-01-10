@@ -151,7 +151,7 @@ switch ($options[1]) {
 	case 'releases':
 		$pdo = new DB();
 		$releases = new ProcessReleases(['Settings' => $pdo]);
-		$mgrreleases = new ReleasesMultiGroup();
+		$mgrreleases = new ReleasesMultiGroup(['Settings' => $pdo]);
 
 		//Runs function that are per group
 		if (is_numeric($options[2])) {
@@ -223,7 +223,7 @@ switch ($options[1]) {
 			$backFill->backfillAllGroups($groupMySQL['name'], 20000, 'normal');
 
 			// Create releases.
-			processReleases(new ProcessReleases(['Settings' => $pdo]), new ReleasesMultiGroup(), $options[2]);
+			processReleases(new ProcessReleases(['Settings' => $pdo]), new ReleasesMultiGroup(['Settings' => $pdo]), $options[2]);
 
 			// Post process the releases.
 			(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start($options[2]);

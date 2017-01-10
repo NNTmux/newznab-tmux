@@ -29,8 +29,12 @@ class ReleasesMultiGroup
 	 */
 	public function __construct(array $options = [])
 	{
-		$this->mgrnzb = new NZBMultiGroup();
-		$this->pdo = new DB();
+		$defaults = [
+			'Settings' => null,
+		];
+		$options += $defaults;
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->mgrnzb = new NZBMultiGroup($this->pdo);
 		$this->consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
 		$this->groups = new Groups(['Settings' => $this->pdo]);
 		$this->releaseCleaning = new ReleaseCleaning($this->pdo);
@@ -49,26 +53,6 @@ class ReleasesMultiGroup
 	{
 		$array = array_column($this->getAllPosters(), 'poster');
 		return in_array($fromName, $array);
-	}
-
-	/**
-	 * @param $collectionID
-	 * @param $xref
-	 *
-	 * @return bool
-	 */
-	public function checkXref($collectionID, $xref)
-	{
-		$collection = $this->pdo->queryDirect(sprintf('SELECT xref FROM mgr_collections WHERE id = %d', $collectionID));
-
-		if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
-			foreach ($matches[1] as $mgrgroup){
-				if ($mgrgroup == $xref) {
-					return false;
-				}
-			}
-		}
-		return true;
 	}
 
 	/**
@@ -305,7 +289,7 @@ class ReleasesMultiGroup
 			$this->mgrnzb->initiateForMgrWrite();
 			foreach ($releases as $release) {
 
-				if ($this->mgrnzb->writeMgrNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
+				if ($this->mgrnzb->writeNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
 					$nzbCount++;
 					if ($this->echoCLI) {
 						echo $this->pdo->log->primaryOver("Creating NZBs and deleting MGR Collections:\t" . $nzbCount . '/' . $total . "\r");
