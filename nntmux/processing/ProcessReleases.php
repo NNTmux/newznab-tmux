@@ -17,7 +17,6 @@ use nntmux\RequestIDWeb;
 use nntmux\PreDb;
 use nntmux\Genres;
 use nntmux\NNTP;
-use nntmux\processing\ProcessReleasesMultiGroup;
 use nntmux\utility\Utility;
 
 class ProcessReleases
@@ -135,7 +134,6 @@ class ProcessReleases
 		$this->releaseCleaning = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning($this->pdo));
 		$this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo, 'Groups' => $this->groups]));
 		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
-		$this->mgr = new ProcessReleasesMultiGroup(['Settings' => $this->pdo]);
 
 		$this->tablePerGroup = (Settings::value('..tablepergroup') == 0 ? false : true);
 		$this->collectionDelayTime = (Settings::value('..delaytime') != '' ? (int)Settings::value('..delaytime') : 2);
@@ -188,20 +186,20 @@ class ProcessReleases
 		$this->processCollectionSizes($groupID);
 		$this->deleteUnwantedCollections($groupID);
 
-		$this->mgr->processIncompleteMgrCollections($groupID);
-		$this->mgr->processMgrCollectionSizes($groupID);
-		$this->mgr->deleteUnwantedMgrCollections($groupID);
+		(new ProcessReleasesMultiGroup(['Settings' => $this->pdo]))->processIncompleteMgrCollections($groupID);
+		(new ProcessReleasesMultiGroup(['Settings' => $this->pdo]))->processMgrCollectionSizes($groupID);
+		(new ProcessReleasesMultiGroup(['Settings' => $this->pdo]))->deleteUnwantedMgrCollections($groupID);
 
 		$DIR = NN_MISC;
 
 		$totalReleasesAdded = 0;
 		do {
 			$releasesCount = $this->createReleases($groupID);
-			$mgrReleasesCount = $this->mgr->createMGRReleases($groupID);
+			$mgrReleasesCount = (new ProcessReleasesMultiGroup(['Settings' => $this->pdo]))->createMGRReleases($groupID);
 			$totalReleasesAdded += $releasesCount['added'] += $mgrReleasesCount['added'];
 
 			$nzbFilesAdded = $this->createNZBs($groupID);
-			$mgrFilesAdded = $this->mgr->createMGRNZBs($groupID);
+			$mgrFilesAdded = (new ProcessReleasesMultiGroup(['Settings' => $this->pdo]))->createMGRNZBs($groupID);
 			$this->deleteCollections($groupID);
 			if ($this->processRequestIDs === 0) {
 				$this->processRequestIDs($groupID, 5000, true);
@@ -799,7 +797,7 @@ class ProcessReleases
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
 		}
-		$posters = Utility::convertMultiArray($this->mgr->getAllPosters(), "','");
+		$posters = Utility::convertMultiArray((new ProcessReleasesMultiGroup(['Settings' => $this->pdo]))->getAllPosters(), "','");
 		$releases = $this->pdo->queryDirect(
 			sprintf("
 				SELECT SQL_NO_CACHE CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
