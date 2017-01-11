@@ -1,3 +1,5 @@
+2017-01-11 DariusIII
+	* Chg: Add check for tmux version (ported from nZEDb)
 2017-01-05 DariusIII
 	* Chg: Update guzzlehttp
 2016-12-29 DariusIII
