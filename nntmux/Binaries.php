@@ -3,7 +3,7 @@ namespace nntmux;
 
 use app\models\Settings;
 use nntmux\db\DB;
-use nntmux\processing\ProcessMultiGroupReleases;
+use nntmux\processing\ProcessReleasesMultiGroup;
 
 /**
  * Class Binaries
@@ -85,7 +85,7 @@ class Binaries
 	protected $_pdo;
 
 	/**
-	 * @var ProcessMultiGroupReleases
+	 * @var ProcessReleasesMultiGroup
 	 */
 	protected $_multiGrp;
 
@@ -180,7 +180,7 @@ class Binaries
 		$this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
 		$this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
 		$this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof CollectionsCleaning ? $options['CollectionsCleaning'] : new CollectionsCleaning(['Settings' => $this->_pdo]));
-		$this->_multiGrp = new ProcessMultiGroupReleases(['Settings' => $this->_pdo]);
+		$this->_multiGrp = new ProcessReleasesMultiGroup(['Settings' => $this->_pdo]);
 
 		$this->_debug = (NN_DEBUG || NN_LOGGING);
 

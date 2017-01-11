@@ -6,7 +6,7 @@ use nntmux\NZBMultiGroup;
 use nntmux\utility\Utility;
 
 
-class ProcessMultiGroupReleases extends ProcessReleases
+class ProcessReleasesMultiGroup extends ProcessReleases
 {
 	/**
 	 * @var
@@ -20,7 +20,7 @@ class ProcessMultiGroupReleases extends ProcessReleases
 
 
 	/**
-	 * ProcessMultiGroupReleases constructor.
+	 * ProcessReleasesMultiGroup constructor.
 	 *
 	 * @param array $options
 	 */
@@ -54,7 +54,46 @@ class ProcessMultiGroupReleases extends ProcessReleases
 	}
 
 	/**
-	 * Create releases from complete collections.
+	 * Process incomplete MultiGroup Releases
+	 *
+	 * @param $groupID
+	 */
+	public function processIncompleteMgrCollections($groupID)
+	{
+		$tableNames = $this->initiateMgrTableNames();
+		$this->processIncompleteCollectionsMain($groupID, $tableNames);
+	}
+
+	/**
+	 * Process MultiGroup collection sizes
+	 *
+	 * @param $groupID
+	 */
+	public function processMgrCollectionSizes($groupID)
+	{
+		$tableNames = $this->initiateMgrTableNames();
+		$this->processCollectionSizesMain($groupID, $tableNames);
+	}
+
+	/**
+	 * Delete unwanted MultiGroup collections
+	 *
+	 * @param $groupID
+	 */
+	public function deleteUnwantedMgrCollections($groupID)
+	{
+		$tableNames = $this->initiateMgrTableNames();
+		$this->deleteUnwantedCollectionsMain($groupID, $tableNames);
+	}
+
+	public function deleteMgrCollections($groupID)
+	{
+		$tableNames = $this->initiateMgrTableNames();
+		$this->deleteCollectionsMain($groupID, $tableNames);
+	}
+
+	/**
+	 * Create releases from complete MultiGroup collections.
 	 *
 	 * @param $groupID
 	 *
@@ -68,7 +107,7 @@ class ProcessMultiGroupReleases extends ProcessReleases
 	}
 
 	/**
-	 * Create NZB files from complete releases.
+	 * Create NZB files from complete MultiGroup releases.
 	 *
 	 *
 	 * @param $groupID
@@ -114,7 +153,7 @@ class ProcessMultiGroupReleases extends ProcessReleases
 	}
 
 	/**
-	 * Add multi group posters to database
+	 * Add MultiGroup posters to database
 	 *
 	 * @param $poster
 	 */
@@ -124,7 +163,7 @@ class ProcessMultiGroupReleases extends ProcessReleases
 	}
 
 	/**
-	 * Update multi group poster
+	 * Update MultiGroup poster
 	 *
 	 * @param $id
 	 * @param $poster
@@ -135,7 +174,7 @@ class ProcessMultiGroupReleases extends ProcessReleases
 	}
 
 	/**
-	 * Delete multi group posters from database
+	 * Delete MultiGroup posters from database
 	 *
 	 * @param $id
 	 */
@@ -145,7 +184,7 @@ class ProcessMultiGroupReleases extends ProcessReleases
 	}
 
 	/**
-	 * Fetch all multi group posters from database
+	 * Fetch all MultiGroup posters from database
 	 *
 	 * @return array|bool
 	 */
