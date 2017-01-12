@@ -1,7 +1,11 @@
 <?php
 namespace nntmux;
 
-use nntmux\utility\Utility;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Client;
+use nntmux\db\DB;
 
 class AEBN
 {
@@ -45,6 +49,16 @@ class AEBN
 	 * @var \simple_html_dom
 	 */
 	protected $_html;
+
+	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
+	 * @var DB
+	 */
+	protected $pdo;
 
 	/**
 	 * Post Parameters to use with curl
@@ -109,8 +123,12 @@ class AEBN
 	{
 		$this->_whichSite = ["straight" => self::AEBNSURL, "gay" => self::AEBNGURL];
 		$this->_html = new \simple_html_dom();
+		$this->client = new Client();
+		$this->cookiejar = new CookieJar();
+		$this->pdo = new DB();
 		if (isset($this->cookie)) {
-			$this->getUrl();
+			$cookieJar = $this->cookiejar->setCookie(SetCookie::fromString($this->cookie));
+			$this->client = new Client(['cookies' => $cookieJar]);
 		}
 	}
 
@@ -342,39 +360,43 @@ class AEBN
 	 *
 	 * @return bool
 	 */
-	private function getUrl($usepost = false, $site = "straight")
+	private function getUrl($site = "straight")
 	{
 		if (isset($this->_trailUrl)) {
-			$ch = curl_init($this->_whichSite[$site] . $this->_trailUrl);
+			try {
+				$this->_response = $this->client->get($this->_whichSite[$site] . $this->_trailUrl)->getBody()->getContents();
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					}
+				}
+			}
 		} else {
-			$ch = curl_init(self::IF18);
+			try {
+				$this->_response = $this->client->get(self::IF18)->getBody()->getContents();
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					}
+				}
+			}
 		}
 
-		if ($usepost === true) {
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-			curl_setopt($ch, CURLOPT_POST, 1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_postParams);
-		}
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_VERBOSE, 0);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
-		curl_setopt($ch, CURLOPT_FAILONERROR, 1);
-		if (isset($this->cookie)) {
-			curl_setopt($ch, CURLOPT_COOKIEJAR, $this->cookie);
-			curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie);
-		}
-		curl_setopt_array($ch, Utility::curlSslContextOptions());
-		$this->_response = curl_exec($ch);
 		if (!$this->_response) {
-			curl_close($ch);
-
 			return false;
 		}
-		curl_close($ch);
-		$this->_html->load($this->_response);
 
+		$this->_html->load($this->_response);
 		return true;
 	}
 }
