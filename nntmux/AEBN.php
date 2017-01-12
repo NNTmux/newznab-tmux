@@ -276,7 +276,7 @@ class AEBN
 			return false;
 		}
 		$this->_trailUrl = self::TRAILINGSEARCH . urlencode($this->searchTerm);
-		if ($this->getUrl(false, $this->_currentSite) === false) {
+		if ($this->getUrl($this->_currentSite) === false) {
 			return false;
 		} else {
 			if ($count = count($this->_html->find("div.movie"))) {
@@ -292,7 +292,7 @@ class AEBN
 							$this->_title = trim($ret->title);
 							$this->_trailUrl = html_entity_decode($ret->href);
 							$this->_directUrl = $this->_whichSite[$this->_currentSite] . $this->_trailUrl;
-							$this->getUrl(false, $this->_currentSite);
+							$this->getUrl($this->_currentSite);
 							return true;
 						} else {
 							continue;
@@ -355,7 +355,6 @@ class AEBN
 	/**
 	 * Get Raw html of webpage
 	 *
-	 * @param bool $usepost
 	 * @param string $site
 	 *
 	 * @return bool
