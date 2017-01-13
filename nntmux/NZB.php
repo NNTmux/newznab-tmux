@@ -264,6 +264,8 @@ class NZB
 					foreach ($matches as $group) {
 						$XMLWriter->writeElement('group', $group);
 					}
+				} else {
+					return false;
 				}
 				$XMLWriter->endElement(); //groups
 				$XMLWriter->startElement('segments');
