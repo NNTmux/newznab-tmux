@@ -787,7 +787,19 @@ class ProcessReleases
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
 		}
-		$posters = MultigroupPosters::commaSeparatedList();
+
+		$list = [];
+		$posters = MultigroupPosters::find('all',
+			[
+				'fields' => ['poster'],
+				'order'  => ['poster' => 'ASC'],
+			]
+		);
+
+		foreach ($posters as $poster) {
+			$list[] = $poster->poster;
+		}
+		$posters = implode("','", $list);
 		$releases = $this->pdo->queryDirect(
 			sprintf("
 				SELECT SQL_NO_CACHE CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
