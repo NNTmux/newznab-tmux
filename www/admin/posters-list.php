@@ -1,22 +1,22 @@
 <?php
 require_once './config.php';
 
+use app\models\MultigroupPosters;
 use nntmux\db\DB;
 
 $page   = new AdminPage();
 $pdo = new DB();
-$posterslist = $pdo->query(sprintf('SELECT * FROM multigroup_posters'));
-
+$posters = MultigroupPosters::find('all', ['order' => ['poster' => 'ASC']]);
 
 $poster = (isset($_REQUEST['poster']) && !empty($_REQUEST['poster']) ? $_REQUEST['poster'] : '');
 
 $page->smarty->assign(
 	[
 		'poster' => $poster,
-		'posterslist' => $posterslist
+		'posters' => $posters
 	]
 );
 
-$page->title = 'MGR Posters List';
+$page->title = 'MultiGroup Posters List';
 $page->content = $page->smarty->fetch('posters-list.tpl');
 $page->render();

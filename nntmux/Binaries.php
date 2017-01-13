@@ -628,7 +628,7 @@ class Binaries
 		// Loop articles, figure out files/parts.
 		foreach ($headers as $header) {
 
-			$multiGroup = $this->_multiGrp->isMultiGroup($header['From']);
+			$multiGroup = ProcessReleasesMultiGroup::isMultiGroup($header['From']);
 
 			// Check if we got the article or not.
 			if (isset($header['Number'])) {

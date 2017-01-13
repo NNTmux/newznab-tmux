@@ -2,7 +2,7 @@
 
 require_once './config.php';
 
-
+use app\models\MultigroupPosters;
 use nntmux\processing\ProcessReleasesMultiGroup;
 
 $page = new AdminPage();
@@ -14,25 +14,35 @@ $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 switch ($action) {
 	case 'submit':
 		if ($_POST['id'] == '') {
-			// Add a new mgr poster.
-			$relPosters->addPoster($_POST['poster']);
+			// Add a new mg poster.
+			$poster = MultigroupPosters::create();
 		} else {
-			// Update an existing mgr poster.
-			$relPosters->updatePoster($_POST['id'], $_POST['poster']);
+			// Update an existing mg poster.
+			$poster = MultigroupPosters::find($_POST['id']);
 		}
+		$poster->poster = $_POST['poster'];
+		$poster->save();
+
 		header("Location:" . WWW_TOP . "/posters-list.php");
 		break;
 
 	case 'view':
 	default:
 		if (!empty($_GET['id'])) {
-			$page->title = "MGR Poster Edit";
+			$page->title = "MultiGroup Poster Edit";
+			// Note: explicitly setting default stuff below, which could be shortened to:
+			// $entry = MultigroupPosters::find($_GET['id']);
+			$entry = MultigroupPosters::find('first',
+				[
+					'conditions' => ['id' => $_GET['id']],
+					'fields' => ['id', 'poster']
+				]);
 			$poster = [
-				'id'     => $_GET['id'],
-				'poster' => $_GET['poster']
+				'id'     => $entry->id,
+				'poster' => $entry->poster,
 			];
 		} else {
-			$page->title = "MGR Poster Add";
+			$page->title = "MultiGroup Poster Add";
 			$poster = [
 				'id'     => '',
 				'poster' => ''

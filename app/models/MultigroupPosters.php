@@ -13,15 +13,40 @@
  * not, see:
  *
  * @link      <http://www.gnu.org/licenses/>.
- * @author    DariusIII
- * @copyright 2017 NNTmux/nZEDb
+ * @author    niel
+ * @copyright 2016 nZEDb
  */
 namespace app\models;
 
-
-class MgrPosters extends \lithium\data\Model
+class MultigroupPosters extends \lithium\data\Model
 {
 	protected $_meta = [
-		'key'			=> ['poster']
+		'key' => ['poster']
 	];
+
+	public $validates = [
+		'poster' => [
+			'notEmpty',
+			'message' => 'Empty poster value is not permitted.'
+		]
+	];
+
+	public static function commaSeparatedList()
+	{
+		$list = [];
+		$posters = MultigroupPosters::find('all',
+			[
+				'fields' => ['poster'],
+				'order'  => ['poster' => 'ASC'],
+			]
+		);
+
+		foreach ($posters as $poster) {
+			$list[] = $poster->poster;
+		}
+
+		return implode(',', $list);
+	}
 }
+
+?>

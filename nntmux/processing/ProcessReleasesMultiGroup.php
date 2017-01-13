@@ -2,6 +2,7 @@
 
 namespace nntmux\processing;
 
+use app\models\MultigroupPosters;
 use nntmux\NZBMultiGroup;
 use nntmux\utility\Utility;
 
@@ -35,10 +36,10 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 	 *
 	 * @return bool
 	 */
-	public function isMultiGroup($fromName)
+	public static function isMultiGroup($fromName)
 	{
-		$array = array_column($this->getAllPosters(), 'poster');
-		return in_array($fromName, $array);
+		$poster = MultigroupPosters::find('first', ['conditions' => ['poster' => $fromName]]);
+		return (empty($poster) ? false : true);
 	}
 
 
@@ -150,50 +151,5 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 		}
 
 		return $nzbCount;
-	}
-
-	/**
-	 * Add MultiGroup posters to database
-	 *
-	 * @param $poster
-	 */
-	public function addPoster($poster)
-	{
-		$this->pdo->queryInsert(sprintf('INSERT INTO multigroup_posters (poster) VALUE (%s)', $this->pdo->escapeString($poster)));
-	}
-
-	/**
-	 * Update MultiGroup poster
-	 *
-	 * @param $id
-	 * @param $poster
-	 */
-	public function updatePoster($id, $poster)
-	{
-		$this->pdo->queryExec(sprintf('UPDATE multigroup_posters SET poster = %s WHERE id = %d', $this->pdo->escapeString($poster), $id));
-	}
-
-	/**
-	 * Delete MultiGroup posters from database
-	 *
-	 * @param $id
-	 */
-	public function deletePoster($id)
-	{
-		$this->pdo->queryExec(sprintf('DELETE FROM multigroup_posters WHERE id = %d', $id));
-	}
-
-	/**
-	 * Fetch all MultiGroup posters from database
-	 *
-	 * @return array|bool
-	 */
-	public function getAllPosters()
-	{
-		$result = $this->pdo->query(sprintf('SELECT poster AS poster FROM multigroup_posters'));
-		if (is_array($result) && !empty($result)) {
-			return $result;
-		}
-		return false;
 	}
 }
