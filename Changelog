@@ -1,3 +1,5 @@
+2017-01-13 DariusIIi
+	* Chg: Use guzzlehttp to retrieve data from ADE and ADM
 2017-01-12 DariusIIi
 	* Chg: Use guzzlehttp to retrieve data from AEBN
 2017-01-11 DariusIII

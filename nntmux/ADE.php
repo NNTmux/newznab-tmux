@@ -1,6 +1,9 @@
 <?php
 namespace nntmux;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 
@@ -69,10 +72,22 @@ class ADE
 	protected $_edithtml;
 	protected $_ch;
 
+	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
+	 * @var DB
+	 */
+	protected $pdo;
+
 	public function __construct()
 	{
 		$this->_html = new \simple_html_dom();
 		$this->_edithtml = new \simple_html_dom();
+		$this->client = new Client();
+		$this->pdo = new DB();
 	}
 
 	/**
@@ -327,25 +342,41 @@ class ADE
 	private function getUrl($trailing = "")
 	{
 		if (!empty($trailing)) {
-			$this->_ch = curl_init(self::ADE . $trailing);
+			try {
+				$this->_response = $this->client->get(self::ADE . $trailing)->getBody()->getContents();
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					}
+				}
+			}
 		}
 		if (!empty($this->directLink)) {
-			$this->_ch = curl_init($this->directLink);
-			$this->directLink = "";
+			try {
+				$this->_response = $this->client->get($this->directLink)->getBody()->getContents();
+				$this->directLink = "";
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					}
+				}
+			}
 		}
-		curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($this->_ch, CURLOPT_HEADER, 0);
-		curl_setopt($this->_ch, CURLOPT_VERBOSE, 0);
-		curl_setopt($this->_ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
-		curl_setopt($this->_ch, CURLOPT_FAILONERROR, 1);
-		curl_setopt_array($this->_ch, Utility::curlSslContextOptions());
-		$this->_response = curl_exec($this->_ch);
-		if (!$this->_response) {
-			curl_close($this->_ch);
 
+		if (!$this->_response) {
 			return false;
 		}
-		curl_close($this->_ch);
+
 		return true;
 	}
 
