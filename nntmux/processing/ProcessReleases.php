@@ -1,6 +1,7 @@
 <?php
 namespace nntmux\processing;
 
+use app\models\MultigroupPosters;
 use app\models\ReleasesGroups;
 use app\models\Settings;
 use nntmux\db\DB;
@@ -786,7 +787,7 @@ class ProcessReleases
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
 		}
-		$posters = Utility::convertMultiArray((new ProcessReleasesMultiGroup(['Settings' => $this->pdo]))->getAllPosters(), "','");
+		$posters = MultigroupPosters::commaSeparatedList();
 		$releases = $this->pdo->queryDirect(
 			sprintf("
 				SELECT SQL_NO_CACHE CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,

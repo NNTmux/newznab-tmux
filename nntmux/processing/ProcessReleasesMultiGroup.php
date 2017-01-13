@@ -118,7 +118,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 	 */
 	public function createMGRNZBs($groupID)
 	{
-		$this->mgrFromNames = Utility::convertMultiArray($this->getAllPosters(), "','");
+		$this->mgrFromNames = MultigroupPosters::commaSeparatedList();
 
 		$releases = $this->pdo->queryDirect(
 			sprintf("
