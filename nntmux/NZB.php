@@ -214,30 +214,30 @@ class NZB
 			return false;
 		}
 
-		$xmlwrtr = new \XMLWriter();
-		$xmlwrtr->openMemory();
-		$xmlwrtr->setIndent(true);
-		$xmlwrtr->setIndentString('  ');
+		$XMLWriter = new \XMLWriter();
+		$XMLWriter->openMemory();
+		$XMLWriter->setIndent(true);
+		$XMLWriter->setIndentString('  ');
 
 		$nzb_guid = '';
 
-		$xmlwrtr->startDocument('1.0', 'UTF-8');
-		$xmlwrtr->startDtd(self::NZB_DTD_NAME, self::NZB_DTD_PUBLIC, self::NZB_DTD_EXTERNAL);
-		$xmlwrtr->endDtd();
-		$xmlwrtr->writeComment($this->_nzbCommentString);
+		$XMLWriter->startDocument('1.0', 'UTF-8');
+		$XMLWriter->startDtd(self::NZB_DTD_NAME, self::NZB_DTD_PUBLIC, self::NZB_DTD_EXTERNAL);
+		$XMLWriter->endDtd();
+		$XMLWriter->writeComment($this->_nzbCommentString);
 
-		$xmlwrtr->startElement('nzb');
-		$xmlwrtr->writeAttribute('xmlns', self::NZB_XML_NS);
-		$xmlwrtr->startElement('head');
-		$xmlwrtr->startElement('meta');
-		$xmlwrtr->writeAttribute('type', 'category');
-		$xmlwrtr->text($cTitle);
-		$xmlwrtr->endElement();
-		$xmlwrtr->startElement('meta');
-		$xmlwrtr->writeAttribute('type', 'name');
-		$xmlwrtr->text($name);
-		$xmlwrtr->endElement();
-		$xmlwrtr->endElement(); //head
+		$XMLWriter->startElement('nzb');
+		$XMLWriter->writeAttribute('xmlns', self::NZB_XML_NS);
+		$XMLWriter->startElement('head');
+		$XMLWriter->startElement('meta');
+		$XMLWriter->writeAttribute('type', 'category');
+		$XMLWriter->text($cTitle);
+		$XMLWriter->endElement();
+		$XMLWriter->startElement('meta');
+		$XMLWriter->writeAttribute('type', 'name');
+		$XMLWriter->text($name);
+		$XMLWriter->endElement();
+		$XMLWriter->endElement(); //head
 
 		foreach ($collections as $collection) {
 			$binaries = $this->pdo->queryDirect(sprintf($this->_binariesQuery, $collection['id']));
@@ -254,43 +254,43 @@ class NZB
 				}
 
 				$subject = $binary['name'] . '(1/' . $binary['totalparts'] . ')';
-				$xmlwrtr->startElement('file');
-				$xmlwrtr->writeAttribute('poster', $poster);
-				$xmlwrtr->writeAttribute('date', $collection['udate']);
-				$xmlwrtr->writeAttribute('subject', $subject);
-				$xmlwrtr->startElement('groups');
+				$XMLWriter->startElement('file');
+				$XMLWriter->writeAttribute('poster', $poster);
+				$XMLWriter->writeAttribute('date', $collection['udate']);
+				$XMLWriter->writeAttribute('subject', $subject);
+				$XMLWriter->startElement('groups');
 				if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
 					$matches = array_unique($matches[1]);
 					foreach ($matches as $group) {
-						$xmlwrtr->writeElement('group', $group);
+						$XMLWriter->writeElement('group', $group);
 					}
 				}
-				$xmlwrtr->endElement(); //groups
-				$xmlwrtr->startElement('segments');
+				$XMLWriter->endElement(); //groups
+				$XMLWriter->startElement('segments');
 				foreach ($parts as $part) {
 					if ($nzb_guid === '') {
 						$nzb_guid = $part['messageid'];
 					}
-					$xmlwrtr->startElement('segment');
-					$xmlwrtr->writeAttribute('bytes', $part['size']);
-					$xmlwrtr->writeAttribute('number', $part['partnumber']);
-					$xmlwrtr->text($part['messageid']);
-					$xmlwrtr->endElement();
+					$XMLWriter->startElement('segment');
+					$XMLWriter->writeAttribute('bytes', $part['size']);
+					$XMLWriter->writeAttribute('number', $part['partnumber']);
+					$XMLWriter->text($part['messageid']);
+					$XMLWriter->endElement();
 				}
-				$xmlwrtr->endElement(); //segments
-				$xmlwrtr->endElement(); //file
+				$XMLWriter->endElement(); //segments
+				$XMLWriter->endElement(); //file
 			}
 		}
-		$xmlwrtr->endElement(); //nzb
-		$xmlwrtr->endDocument();
+		$XMLWriter->endElement(); //nzb
+		$XMLWriter->endDocument();
 		$path = ($this->buildNZBPath($relGuid, $this->nzbSplitLevel, true) . $relGuid . '.nzb.gz');
 		$fp = gzopen($path, 'wb7');
 		if (!$fp) {
 			return false;
 		}
-		gzwrite($fp, $xmlwrtr->outputMemory());
+		gzwrite($fp, $XMLWriter->outputMemory());
 		gzclose($fp);
-		unset($xmlwrtr);
+		unset($XMLWriter);
 		if (!is_file($path)) {
 			echo "ERROR: $path does not exist.\n";
 
