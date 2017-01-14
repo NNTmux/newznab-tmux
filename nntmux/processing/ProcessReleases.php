@@ -151,7 +151,7 @@ class ProcessReleases
 		$this->crossPostTime = ($dummy != '' ? (int)$dummy : 2);
 		$dummy = Settings::value('..maxnzbsprocessed');
 		$this->releaseCreationLimit = ($dummy != '' ? (int)$dummy : 1000);
-		$dummy = Settings::value('..releasecompletion');
+		$dummy = Settings::value('..completionpercent');
 		$this->completion = ($dummy != '' ? (int)$dummy : 0);
 		$this->processRequestIDs = (int)Settings::value('lookup_reqids');
 		if ($this->completion > 100) {
