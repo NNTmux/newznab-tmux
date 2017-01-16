@@ -7,7 +7,7 @@ CREATE TABLE         multigroup_collections (
   date           DATETIME            DEFAULT NULL,
   xref           VARCHAR(510)        NOT NULL DEFAULT '',
   totalfiles     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  group_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  groups_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
   collectionhash VARCHAR(255)        NOT NULL DEFAULT '0',
   dateadded      DATETIME            DEFAULT NULL,
   added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
