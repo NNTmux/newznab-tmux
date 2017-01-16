@@ -226,7 +226,7 @@ CREATE TABLE         collections (
   date           DATETIME            DEFAULT NULL,
   xref           VARCHAR(255)        NOT NULL DEFAULT '',
   totalfiles     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  group_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  groups_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
   collectionhash VARCHAR(255)        NOT NULL DEFAULT '0',
   dateadded      DATETIME            DEFAULT NULL,
   added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -237,7 +237,7 @@ CREATE TABLE         collections (
   PRIMARY KEY                               (id),
   INDEX        fromname                     (fromname),
   INDEX        date                         (date),
-  INDEX        group_id                     (group_id),
+  INDEX        groups_id                     (groups_id),
   INDEX        ix_collection_filecheck      (filecheck),
   INDEX        ix_collection_dateadded      (dateadded),
   INDEX        ix_collection_releaseid      (releaseid),
@@ -461,13 +461,13 @@ DROP TABLE IF EXISTS missed_parts;
 CREATE TABLE missed_parts (
   id       INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   numberid BIGINT UNSIGNED  NOT NULL,
-  group_id INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to groups.id',
+  groups_id INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to groups.id',
   attempts TINYINT(1)       NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
   INDEX ix_missed_parts_attempts                  (attempts),
-  INDEX ix_missed_parts_groupid_attempts          (group_id, attempts),
-  INDEX ix_missed_parts_numberid_groupsid_attempts (numberid, group_id, attempts),
-  UNIQUE INDEX ix_missed_parts_numberid_groupsid          (numberid, group_id)
+  INDEX ix_missed_parts_groupid_attempts          (groups_id, attempts),
+  INDEX ix_missed_parts_numberid_groupsid_attempts (numberid, groups_id, attempts),
+  UNIQUE INDEX ix_missed_parts_numberid_groupsid          (numberid, groups_id)
 )
   ENGINE = MYISAM
   DEFAULT CHARSET = utf8
@@ -539,7 +539,7 @@ CREATE TABLE         multigroup_collections (
   date           DATETIME            DEFAULT NULL,
   xref           VARCHAR(510)        NOT NULL DEFAULT '',
   totalfiles     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  group_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  groups_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
   collectionhash VARCHAR(255)        NOT NULL DEFAULT '0',
   dateadded      DATETIME            DEFAULT NULL,
   added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -550,7 +550,7 @@ CREATE TABLE         multigroup_collections (
   PRIMARY KEY                               (id),
   INDEX        fromname                     (fromname),
   INDEX        date                         (date),
-  INDEX        group_id                     (group_id),
+  INDEX        groups_id                     (groups_id),
   INDEX        ix_collection_filecheck      (filecheck),
   INDEX        ix_collection_dateadded      (dateadded),
   INDEX        ix_collection_releaseid      (releaseid),
