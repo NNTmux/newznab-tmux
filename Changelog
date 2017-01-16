@@ -1,4 +1,6 @@
-2017-01-13 DariusIIi
+2017-01-16 DariusIII
+	* Chg: Fix ADE getUtl function
+2017-01-13 DariusIII
 	* Chg: Use guzzlehttp to retrieve data from ADE and ADM
 2017-01-12 DariusIIi
 	* Chg: Use guzzlehttp to retrieve data from AEBN

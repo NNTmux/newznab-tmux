@@ -377,7 +377,7 @@ class ADE
 			return false;
 		}
 
-		return true;
+		return $this->_response;
 	}
 
 	/**
