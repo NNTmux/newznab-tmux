@@ -1,6 +1,12 @@
 <?php
 namespace nntmux;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
+use GuzzleHttp\Exception\RequestException;
+use lithium\storage\session\adapter\Cookie;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 class Steam
@@ -53,6 +59,21 @@ class Steam
 	protected $_html;
 
 	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
+	 * @var CookieJar
+	 */
+	protected $cookiejar;
+
+	/**
+	 * @var DB
+	 */
+	protected $pdo;
+
+	/**
 	 * @var string
 	 */
 	protected $_indirectURL = '';
@@ -101,8 +122,12 @@ class Steam
 	{
 		$this->_html = new \simple_html_dom();
 		$this->_editHtml = new \simple_html_dom();
+		$this->client = new Client();
+		$this->cookiejar = new CookieJar();
+		$this->pdo = new DB();
 		if (isset($this->cookie)) {
-			$this->getUrl(self::STEAMURL);
+			$cookieJar = $this->cookiejar->setCookie(SetCookie::fromString($this->cookie));
+			$this->client = new Client(['cookies' => $cookieJar]);
 		}
 	}
 
@@ -331,14 +356,17 @@ class Steam
 		if (isset($this->cookie)) {
 			$this->extractCookies(file_get_contents($this->cookie));
 			if($this->_ageCheckSet === false) {
-				$this->_postParams = array(
+				$this->_postParams = [
 					"snr" => "1_agecheck_agecheck__age-gate",
 					"ageDay" => "1",
 					"ageMonth" => "May",
 					"ageYear" => "1966"
-				);
+				];
 
-				$this->getUrl(self::AGECHECKURL . $this->_steamGameID . '/', true);
+				$this->client->post(self::AGECHECKURL . $this->_steamGameID . '/', ['headers' => ['snr' => '1_agecheck_agecheck__age-gate',
+																								  'ageDay' => '1',
+																								  'ageMonth' => 'May',
+																								  'ageYear' => '1966']]);
 			}
 		}
 		$this->getUrl(self::GAMEURL . $this->_steamGameID . '/');
@@ -348,36 +376,30 @@ class Steam
 	 * Gets Raw Html
 	 *
 	 * @param string $fetchURL
-	 * @param bool $usePost
 	 *
 	 * @return bool
 	 */
-	private function getUrl($fetchURL, $usePost = false)
+	private function getUrl($fetchURL)
 	{
 		if (isset($fetchURL)) {
-			$this->_ch = curl_init($fetchURL);
+			try {
+				$this->_response = $this->client->get($fetchURL)->getBody()->getContents();
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					}
+				}
+			}
 		}
-		if ($usePost === true) {
-			curl_setopt($this->_ch, CURLOPT_POST, 1);
-			curl_setopt($this->_ch, CURLOPT_POSTFIELDS, $this->_postParams);
-		}
-		curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($this->_ch, CURLOPT_HEADER, 0);
-		curl_setopt($this->_ch, CURLOPT_VERBOSE, 0);
-		curl_setopt($this->_ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
-		curl_setopt($this->_ch, CURLOPT_FAILONERROR, 1);
-		if (isset($this->cookie)) {
-			curl_setopt($this->_ch, CURLOPT_COOKIEJAR, $this->cookie);
-			curl_setopt($this->_ch, CURLOPT_COOKIEFILE, $this->cookie);
-		}
-		curl_setopt_array($this->_ch, Utility::curlSslContextOptions());
-		$this->_response = curl_exec($this->_ch);
-		if (!$this->_response) {
-			curl_close($this->_ch);
 
+		if (!$this->_response) {
 			return false;
 		}
-		curl_close($this->_ch);
 		$this->_html->load($this->_response);
 
 		return true;
