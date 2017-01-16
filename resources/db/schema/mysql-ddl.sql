@@ -111,7 +111,7 @@ DROP TABLE IF EXISTS binaries;
 CREATE TABLE binaries (
   id            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   name          VARCHAR(1000)       NOT NULL DEFAULT '',
-  collection_id INT(11) UNSIGNED    NOT NULL DEFAULT 0,
+  collections_id INT(11) UNSIGNED    NOT NULL DEFAULT 0,
   filenumber    INT UNSIGNED        NOT NULL DEFAULT '0',
   totalparts    INT(11) UNSIGNED    NOT NULL DEFAULT 0,
   currentparts  INT UNSIGNED        NOT NULL DEFAULT 0,
@@ -121,7 +121,7 @@ CREATE TABLE binaries (
   PRIMARY KEY (id),
   UNIQUE INDEX ix_binary_binaryhash (binaryhash),
   INDEX ix_binary_partcheck  (partcheck),
-  INDEX ix_binary_collection (collection_id)
+  INDEX ix_binary_collection (collections_id)
 )
   ENGINE = MYISAM
   DEFAULT CHARSET = utf8

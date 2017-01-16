@@ -384,7 +384,7 @@ class ProcessReleases
 				(
 					SELECT COALESCE(SUM(b.partsize), 0)
 					FROM %s b
-					WHERE b.collection_id = c.id
+					WHERE b.collections_id = c.id
 				),
 				c.filecheck = %d
 				WHERE c.filecheck = %d
@@ -462,7 +462,7 @@ class ProcessReleases
 					sprintf('
 						DELETE c, b, p
 						FROM %s c
-						LEFT JOIN %s b ON c.id = b.collection_id
+						LEFT JOIN %s b ON c.id = b.collections_id
 						LEFT JOIN %s p ON b.id = p.binaryid
 						WHERE c.filecheck = %d %s
 						AND c.filesize > 0
@@ -488,7 +488,7 @@ class ProcessReleases
 					$deleteQuery = $this->pdo->queryExec(
 						sprintf('
 							DELETE c, b, p FROM %s c
-							LEFT JOIN %s b ON c.id = b.collection_id
+							LEFT JOIN %s b ON c.id = b.collections_id
 							LEFT JOIN %s p ON b.id = p.binaryid
 							WHERE c.filecheck = %d %s
 							AND c.filesize > %d',
@@ -508,7 +508,7 @@ class ProcessReleases
 				$deleteQuery = $this->pdo->queryExec(
 					sprintf('
 						DELETE c, b, p FROM %s c
-						LEFT JOIN %s b ON c.id = b.collection_id
+						LEFT JOIN %s b ON c.id = b.collections_id
 						LEFT JOIN %s p ON b.id = p.binaryid
 						WHERE c.filecheck = %d %s
 						AND GREATEST(%d, %d) > 0
@@ -750,7 +750,7 @@ class ProcessReleases
 						sprintf('
 							DELETE c, b, p
 							FROM %s c
-							INNER JOIN %s b ON c.id = b.collection_id
+							INNER JOIN %s b ON c.id = b.collections_id
 							STRAIGHT_JOIN %s p ON b.id = p.binaryid
 							WHERE c.collectionhash = %s',
 							$this->tables['cname'],
@@ -991,7 +991,7 @@ class ProcessReleases
 			sprintf('
 				DELETE c, b, p
 				FROM %s c
-				LEFT JOIN %s b ON c.id = b.collection_id
+				LEFT JOIN %s b ON c.id = b.collections_id
 				LEFT JOIN %s p ON b.id = p.binaryid
 				WHERE (c.dateadded < NOW() - INTERVAL %d HOUR) %s',
 				$this->tables['cname'],
@@ -1032,7 +1032,7 @@ class ProcessReleases
 				sprintf('
 					DELETE c, b, p
 					FROM %s c
-					LEFT JOIN %s b ON c.id = b.collection_id
+					LEFT JOIN %s b ON c.id = b.collections_id
 					LEFT JOIN %s p ON b.id = p.binaryid
 					WHERE (b.id IS NULL OR p.binaryid IS NULL) %s',
 					$this->tables['cname'],
@@ -1067,7 +1067,7 @@ class ProcessReleases
 				sprintf(
 					'DELETE b, p FROM %s b
 					LEFT JOIN %s p ON b.id = p.binaryid
-					LEFT JOIN %s c ON b.collection_id = c.id
+					LEFT JOIN %s c ON b.collections_id = c.id
 					WHERE (p.binaryid IS NULL OR c.id IS NULL)
 					AND b.id < %d',
 					$this->tables['bname'],
@@ -1149,7 +1149,7 @@ class ProcessReleases
 					sprintf('
 						DELETE c, b, p
 						FROM %s c
-						LEFT JOIN %s b ON(c.id=b.collection_id)
+						LEFT JOIN %s b ON(c.id=b.collections_id)
 						LEFT JOIN %s p ON(b.id=p.binaryid)
 						WHERE c.id = %d',
 						$this->tables['cname'],
@@ -1574,10 +1574,10 @@ class ProcessReleases
 				(
 					SELECT c.id
 					FROM %s c
-					INNER JOIN %s b ON b.collection_id = c.id
+					INNER JOIN %s b ON b.collections_id = c.id
 					WHERE c.totalfiles > 0
 					AND c.filecheck = %d %s
-					GROUP BY b.collection_id, c.totalfiles, c.id
+					GROUP BY b.collections_id, c.totalfiles, c.id
 					HAVING COUNT(b.id) IN (c.totalfiles, c.totalfiles + 1)
 				) r ON c.id = r.id
 				SET filecheck = %d',
@@ -1613,7 +1613,7 @@ class ProcessReleases
 				(
 					SELECT c.id
 					FROM %s c
-					INNER JOIN %s b ON b.collection_id = c.id
+					INNER JOIN %s b ON b.collections_id = c.id
 					WHERE b.filenumber = 0
 					AND c.totalfiles > 0
 					AND c.filecheck = %d %s
@@ -1660,7 +1660,7 @@ class ProcessReleases
 				(
 					SELECT b.id
 					FROM %s b
-					INNER JOIN %s c ON c.id = b.collection_id
+					INNER JOIN %s c ON c.id = b.collections_id
 					WHERE c.filecheck = %d
 					AND b.partcheck = %d %s
 					AND b.currentparts = b.totalparts
@@ -1683,7 +1683,7 @@ class ProcessReleases
 				(
 					SELECT b.id
 					FROM %s b
-					INNER JOIN %s c ON c.id = b.collection_id
+					INNER JOIN %s c ON c.id = b.collections_id
 					WHERE c.filecheck = %d
 					AND b.partcheck = %d %s
 					AND b.currentparts >= (b.totalparts + 1)
@@ -1718,9 +1718,9 @@ class ProcessReleases
 			sprintf('
 				UPDATE %s c INNER JOIN
 					(SELECT c.id FROM %s c
-					INNER JOIN %s b ON c.id = b.collection_id
+					INNER JOIN %s b ON c.id = b.collections_id
 					WHERE b.partcheck = 1 AND c.filecheck IN (%d, %d) %s
-					GROUP BY b.collection_id, c.totalfiles, c.id HAVING COUNT(b.id) >= c.totalfiles)
+					GROUP BY b.collections_id, c.totalfiles, c.id HAVING COUNT(b.id) >= c.totalfiles)
 				r ON c.id = r.id SET filecheck = %d',
 				$this->tables['cname'],
 				$this->tables['cname'],
@@ -1773,7 +1773,7 @@ class ProcessReleases
 
 		$this->pdo->queryExec(
 			sprintf("
-				UPDATE %s c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM %s b WHERE b.collection_id = c.id)
+				UPDATE %s c SET filecheck = %d, totalfiles = (SELECT COUNT(b.id) FROM %s b WHERE b.collections_id = c.id)
 				WHERE c.dateadded < NOW() - INTERVAL '%d' HOUR
 				AND c.filecheck IN (%d, %d, 10) %s",
 				$this->tables['cname'],
@@ -1802,7 +1802,7 @@ class ProcessReleases
 		$obj = $this->pdo->queryExec(
 			sprintf("
                 DELETE c, b, p FROM %s c
-                LEFT JOIN %s b ON (c.id=b.collection_id)
+                LEFT JOIN %s b ON (c.id=b.collections_id)
                 LEFT JOIN %s p ON (b.id=p.binaryid)
                 WHERE
                     c.added <

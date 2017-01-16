@@ -795,7 +795,7 @@ class Binaries
 					md5($matches[1] . $header['From'] . $groupMySQL['id']);
 				$binaryID = $this->_pdo->queryInsert(
 					sprintf("
-						INSERT INTO %s (binaryhash, name, collection_id, totalparts, currentparts, filenumber, partsize)
+						INSERT INTO %s (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
 						VALUES (UNHEX('%s'), %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
 						$table,
@@ -1200,7 +1200,7 @@ class Binaries
 					sprintf('
 						SELECT c.date AS date
 						FROM %s c
-						INNER JOIN %s b ON(c.id=b.collection_id)
+						INNER JOIN %s b ON(c.id=b.collections_id)
 						INNER JOIN %s p ON(b.id=p.binaryid)
 						WHERE p.number = %s
 						%s LIMIT 1',
