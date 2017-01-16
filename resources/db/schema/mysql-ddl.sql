@@ -119,9 +119,9 @@ CREATE TABLE binaries (
   partcheck     TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
   partsize      BIGINT UNSIGNED     NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
-  UNIQUE INDEX ix_binary_binaryhash (binaryhash),
-  INDEX ix_binary_partcheck  (partcheck),
-  INDEX ix_binary_collection (collections_id)
+  UNIQUE INDEX ix_binaries_binaryhash (binaryhash),
+  INDEX ix_binaries_partcheck  (partcheck),
+  INDEX ix_binaries_collection (collections_id)
 )
   ENGINE = MYISAM
   DEFAULT CHARSET = utf8
@@ -597,12 +597,12 @@ CREATE TABLE content (
 
 DROP TABLE IF EXISTS parts;
 CREATE TABLE parts (
-  binaryid      BIGINT(20) UNSIGNED                      NOT NULL DEFAULT '0',
+  binaries_id      BIGINT(20) UNSIGNED                      NOT NULL DEFAULT '0',
   messageid     VARCHAR(255)        CHARACTER SET latin1 NOT NULL DEFAULT '',
   number        BIGINT UNSIGNED                          NOT NULL DEFAULT '0',
   partnumber    MEDIUMINT UNSIGNED                       NOT NULL DEFAULT '0',
   size          MEDIUMINT UNSIGNED                       NOT NULL DEFAULT '0',
-  PRIMARY KEY (binaryid,number)
+  PRIMARY KEY (binaries_id,number)
 )
   ENGINE = MYISAM
   DEFAULT CHARSET = utf8

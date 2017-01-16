@@ -463,7 +463,7 @@ class ProcessReleases
 						DELETE c, b, p
 						FROM %s c
 						LEFT JOIN %s b ON c.id = b.collections_id
-						LEFT JOIN %s p ON b.id = p.binaryid
+						LEFT JOIN %s p ON b.id = p.binaries_id
 						WHERE c.filecheck = %d %s
 						AND c.filesize > 0
 						AND GREATEST(%d, %d) > 0
@@ -489,7 +489,7 @@ class ProcessReleases
 						sprintf('
 							DELETE c, b, p FROM %s c
 							LEFT JOIN %s b ON c.id = b.collections_id
-							LEFT JOIN %s p ON b.id = p.binaryid
+							LEFT JOIN %s p ON b.id = p.binaries_id
 							WHERE c.filecheck = %d %s
 							AND c.filesize > %d',
 							$this->tables['cname'],
@@ -509,7 +509,7 @@ class ProcessReleases
 					sprintf('
 						DELETE c, b, p FROM %s c
 						LEFT JOIN %s b ON c.id = b.collections_id
-						LEFT JOIN %s p ON b.id = p.binaryid
+						LEFT JOIN %s p ON b.id = p.binaries_id
 						WHERE c.filecheck = %d %s
 						AND GREATEST(%d, %d) > 0
 						AND c.totalfiles < GREATEST(%d, %d)',
@@ -751,7 +751,7 @@ class ProcessReleases
 							DELETE c, b, p
 							FROM %s c
 							INNER JOIN %s b ON c.id = b.collections_id
-							STRAIGHT_JOIN %s p ON b.id = p.binaryid
+							STRAIGHT_JOIN %s p ON b.id = p.binaries_id
 							WHERE c.collectionhash = %s',
 							$this->tables['cname'],
 							$this->tables['bname'],
@@ -992,7 +992,7 @@ class ProcessReleases
 				DELETE c, b, p
 				FROM %s c
 				LEFT JOIN %s b ON c.id = b.collections_id
-				LEFT JOIN %s p ON b.id = p.binaryid
+				LEFT JOIN %s p ON b.id = p.binaries_id
 				WHERE (c.dateadded < NOW() - INTERVAL %d HOUR) %s',
 				$this->tables['cname'],
 				$this->tables['bname'],
@@ -1033,8 +1033,8 @@ class ProcessReleases
 					DELETE c, b, p
 					FROM %s c
 					LEFT JOIN %s b ON c.id = b.collections_id
-					LEFT JOIN %s p ON b.id = p.binaryid
-					WHERE (b.id IS NULL OR p.binaryid IS NULL) %s',
+					LEFT JOIN %s p ON b.id = p.binaries_id
+					WHERE (b.id IS NULL OR p.binaries_id IS NULL) %s',
 					$this->tables['cname'],
 					$this->tables['bname'],
 					$this->tables['pname'],
@@ -1066,9 +1066,9 @@ class ProcessReleases
 			$deleteQuery = $this->pdo->queryExec(
 				sprintf(
 					'DELETE b, p FROM %s b
-					LEFT JOIN %s p ON b.id = p.binaryid
+					LEFT JOIN %s p ON b.id = p.binaries_id
 					LEFT JOIN %s c ON b.collections_id = c.id
-					WHERE (p.binaryid IS NULL OR c.id IS NULL)
+					WHERE (p.binaries_id IS NULL OR c.id IS NULL)
 					AND b.id < %d',
 					$this->tables['bname'],
 					$this->tables['pname'],
@@ -1101,9 +1101,9 @@ class ProcessReleases
 				sprintf('
 					DELETE p
 					FROM %s p
-					LEFT JOIN %s b ON p.binaryid = b.id
+					LEFT JOIN %s b ON p.binaries_id = b.id
 					WHERE b.id IS NULL
-					AND p.binaryid < %d',
+					AND p.binaries_id < %d',
 					$this->tables['pname'],
 					$this->tables['bname'],
 					$this->maxQueryFormulator($this->tables['bname'], 20000)
@@ -1150,7 +1150,7 @@ class ProcessReleases
 						DELETE c, b, p
 						FROM %s c
 						LEFT JOIN %s b ON(c.id=b.collections_id)
-						LEFT JOIN %s p ON(b.id=p.binaryid)
+						LEFT JOIN %s p ON(b.id=p.binaries_id)
 						WHERE c.id = %d',
 						$this->tables['cname'],
 						$this->tables['bname'],
@@ -1803,7 +1803,7 @@ class ProcessReleases
 			sprintf("
                 DELETE c, b, p FROM %s c
                 LEFT JOIN %s b ON (c.id=b.collections_id)
-                LEFT JOIN %s p ON (b.id=p.binaryid)
+                LEFT JOIN %s p ON (b.id=p.binaries_id)
                 WHERE
                     c.added <
                     DATE_SUB({$this->pdo->escapeString($lastRun)}, INTERVAL %d HOUR)
