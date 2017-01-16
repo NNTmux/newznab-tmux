@@ -232,7 +232,7 @@ CREATE TABLE         collections (
   added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
   filecheck      TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
   filesize       BIGINT UNSIGNED     NOT NULL DEFAULT '0',
-  releaseid      INT                 NULL,
+  releases_id      INT                 NULL,
   noise          CHAR(32)            NOT NULL DEFAULT '',
   PRIMARY KEY                               (id),
   INDEX        fromname                     (fromname),
@@ -240,7 +240,7 @@ CREATE TABLE         collections (
   INDEX        groups_id                     (groups_id),
   INDEX        ix_collection_filecheck      (filecheck),
   INDEX        ix_collection_dateadded      (dateadded),
-  INDEX        ix_collection_releaseid      (releaseid),
+  INDEX        ix_collection_releaseid      (releases_id),
   UNIQUE INDEX ix_collection_collectionhash (collectionhash)
 )
   ENGINE          = MYISAM
@@ -545,7 +545,7 @@ CREATE TABLE         multigroup_collections (
   added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
   filecheck      TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
   filesize       BIGINT UNSIGNED     NOT NULL DEFAULT '0',
-  releaseid      INT                 NULL,
+  releases_id      INT                 NULL,
   noise          CHAR(32)            NOT NULL DEFAULT '',
   PRIMARY KEY                               (id),
   INDEX        fromname                     (fromname),
@@ -553,7 +553,7 @@ CREATE TABLE         multigroup_collections (
   INDEX        groups_id                     (groups_id),
   INDEX        ix_collection_filecheck      (filecheck),
   INDEX        ix_collection_dateadded      (dateadded),
-  INDEX        ix_collection_releaseid      (releaseid),
+  INDEX        ix_collection_releaseid      (releases_id),
   UNIQUE INDEX ix_collection_collectionhash (collectionhash)
 )
   ENGINE          = MYISAM
