@@ -67,8 +67,8 @@
 			</li>
 			<li><a><i class="fa fa-object-group"></i><span> Multi Group</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
-					<li><a href="{$smarty.const.WWW_TOP}/posters-edit.php">Edit Multi Group Posters</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/posters-list.php">Multi Group Posters List</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/posters-edit.php">Add MultiGroup Poster</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/posters-list.php">MultiGroup Posters List</a></li>
 				</ul>
 			</li>
 			<li><a><i class="fa fa-download"></i><span> NZB</span><span class="fa fa-chevron-down"></span></a>
