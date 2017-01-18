@@ -35,38 +35,38 @@ elif sys.argv[1] == "nfo":
 
 # You can limit postprocessing for additional and nfo by group_id or categories_id
 if len(sys.argv) == 3 and sys.argv[2].isdigit() and len(sys.argv[2]) < 4:
-	group_id = 'AND group_id = '+sys.argv[2]
+	group_id = 'AND groups_id = '+sys.argv[2]
 	print(bcolors.HEADER + "Using group_id "+sys.argv[2] + bcolors.ENDC)
 elif len(sys.argv) == 3 and sys.argv[2].isdigit() and len(sys.argv[2]) == 4:
 	if sys.argv[2] == '1000':
-		group_id = 'AND categories_id BETWEEN 1000 AND 1999'
+		groups_id = 'AND categories_id BETWEEN 1000 AND 1999'
 		print(bcolors.HEADER + "Using categoryids 1000-1999" + bcolors.ENDC)
 	elif sys.argv[2] == '2000':
-		group_id = 'AND categories_id BETWEEN 2000 AND 2999'
+		groups_id = 'AND categories_id BETWEEN 2000 AND 2999'
 		print(bcolors.HEADER + "Using categoryids 2000-2999" + bcolors.ENDC)
 	elif sys.argv[2] == '3000':
-		group_id = 'AND categories_id BETWEEN 3000 AND 3999'
+		groups_id = 'AND categories_id BETWEEN 3000 AND 3999'
 		print(bcolors.HEADER + "Using categoryids 3000-3999" + bcolors.ENDC)
 	elif sys.argv[2] == '4000':
-		group_id = 'AND categories_id BETWEEN 4000 AND 4999'
+		groups_id = 'AND categories_id BETWEEN 4000 AND 4999'
 		print(bcolors.HEADER + "Using categoryids 4000-4999" + bcolors.ENDC)
 	elif sys.argv[2] == '5000':
-		group_id = 'AND categories_id BETWEEN 5000 AND 5999'
+		groups_id = 'AND categories_id BETWEEN 5000 AND 5999'
 		print(bcolors.HEADER + "Using categoryids 5000-5999" + bcolors.ENDC)
 	elif sys.argv[2] == '6000':
-		group_id = 'AND categories_id BETWEEN 6000 AND 6999'
+		groups_id = 'AND categories_id BETWEEN 6000 AND 6999'
 		print(bcolors.HEADER + "Using categoryids 6000-6999" + bcolors.ENDC)
 	elif sys.argv[2] == '7000':
-		group_id = 'AND categories_id BETWEEN 7000 AND 7999'
+		groups_id = 'AND categories_id BETWEEN 7000 AND 7999'
 		print(bcolors.HEADER + "Using categoryids 7000-7999" + bcolors.ENDC)
 	elif sys.argv[2] == '0000':
-		group_id = 'AND categories_id BETWEEN 0000 AND 0999'
+		groups_id = 'AND categories_id BETWEEN 0000 AND 0999'
 		print(bcolors.HEADER + "Using categoryids 0000-0999" + bcolors.ENDC)
 	else:
-		group_id = 'AND categories_id = '+sys.argv[2]
+		groups_id = 'AND categories_id = '+sys.argv[2]
 		print(bcolors.HEADER + "Using categories_id "+sys.argv[2] + bcolors.ENDC)
 else:
-	group_id = ''
+	groups_id = ''
 
 #you can sort tv releases by searchname
 if len(sys.argv) == 3 and (sys.argv[2] == "asc" or sys.argv[2] == "desc"):
@@ -82,7 +82,7 @@ start_time = time.time()
 pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 if len(sys.argv) > 1 and sys.argv[1] == "additional":
-	cur[0].execute("SELECT (SELECT value FROM settings WHERE setting = 'postthreads') AS a, (SELECT value FROM settings WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM settings WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM settings WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM settings WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM settings WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM settings WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -1 "+group_id+") as j, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -2 "+group_id+") as k, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -3 "+group_id+") as l, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -4 "+group_id+") as m, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -5 "+group_id+") as n, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -6 "+group_id+") as o")
+	cur[0].execute("SELECT (SELECT value FROM settings WHERE setting = 'postthreads') AS a, (SELECT value FROM settings WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM settings WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM settings WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM settings WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM settings WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM settings WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -1 "+groups_id+") as j, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -2 "+groups_id+") as k, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -3 "+groups_id+") as l, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -4 "+groups_id+") as m, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -5 "+groups_id+") as n, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -6 "+groups_id+") as o")
 	dbgrab = cur[0].fetchall()
 	ps1 = format(int(dbgrab[0][9]))
 	ps2 = format(int(dbgrab[0][10]))
@@ -91,7 +91,7 @@ if len(sys.argv) > 1 and sys.argv[1] == "additional":
 	ps5 = format(int(dbgrab[0][13]))
 	ps6 = format(int(dbgrab[0][14]))
 elif len(sys.argv) > 1 and sys.argv[1] == "nfo":
-	cur[0].execute("SELECT (SELECT value FROM settings WHERE setting = 'nfothreads') AS a, (SELECT value FROM settings WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM settings WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM settings WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM settings WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM settings WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM settings WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i, (SELECT count(*) FROM releases WHERE nfostatus = -1 "+group_id+") as j, (SELECT count(*) FROM releases WHERE nfostatus = -2 "+group_id+") as k, (SELECT count(*) FROM releases WHERE nfostatus = -3 "+group_id+") as l, (SELECT count(*) FROM releases WHERE nfostatus = -4 "+group_id+") as m, (SELECT count(*) FROM releases WHERE nfostatus = -5 "+group_id+") as n, (SELECT count(*) FROM releases WHERE nfostatus = -6 "+group_id+") as o")
+	cur[0].execute("SELECT (SELECT value FROM settings WHERE setting = 'nfothreads') AS a, (SELECT value FROM settings WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM settings WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM settings WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM settings WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM settings WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM settings WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i, (SELECT count(*) FROM releases WHERE nfostatus = -1 "+groups_id+") as j, (SELECT count(*) FROM releases WHERE nfostatus = -2 "+groups_id+") as k, (SELECT count(*) FROM releases WHERE nfostatus = -3 "+groups_id+") as l, (SELECT count(*) FROM releases WHERE nfostatus = -4 "+groups_id+") as m, (SELECT count(*) FROM releases WHERE nfostatus = -5 "+groups_id+") as n, (SELECT count(*) FROM releases WHERE nfostatus = -6 "+groups_id+") as o")
 	dbgrab = cur[0].fetchall()
 	ps1 = format(int(dbgrab[0][9]))
 	ps2 = format(int(dbgrab[0][10]))
