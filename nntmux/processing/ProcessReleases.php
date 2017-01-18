@@ -374,7 +374,7 @@ class ProcessReleases
 		$this->initiateTableNames($groupID);
 
 		if ($this->echoCLI) {
-			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Calculating collection sizes (in bytes)."));
+			$this->pdo->log->doEcho($this->pdo->log->header('Process Releases -> Calculating collection sizes (in bytes).'));
 		}
 		// Get the total size in bytes of the collection for collections where filecheck = 2.
 		$checked = $this->pdo->queryExec(
@@ -399,7 +399,7 @@ class ProcessReleases
 		if ($checked !== false && $this->echoCLI) {
 			$this->pdo->log->doEcho(
 				$this->pdo->log->primary(
-					$checked->rowCount() . " collections set to filecheck = 3(size calculated)"
+					$checked->rowCount() . ' collections set to filecheck = 3(size calculated)'
 				)
 			);
 			$this->pdo->log->doEcho($this->pdo->log->primary($this->consoleTools->convertTime(time() - $startTime)), true);
@@ -414,16 +414,12 @@ class ProcessReleases
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho(
 				$this->pdo->log->header(
-					"Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting."
+					'Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting.'
 				)
 			);
 		}
 
-		if ($groupID == '') {
-			$groupIDs = $this->groups->getActiveIDs();
-		} else {
-			$groupIDs = [['id' => $groupID]];
-		}
+		$groupID === '' ? $groupIDs = $this->groups->getActiveIDs() : $groupIDs = [['id' => $groupID]];
 
 		$minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
@@ -431,11 +427,11 @@ class ProcessReleases
 		$minSizeSetting = Settings::value('.release.minsizetoformrelease');
 		$minFilesSetting = Settings::value('.release.minfilestoformrelease');
 
-		foreach ($groupIDs as $groupID) {
+		foreach ($groupIDs as $grpID) {
 
 			$groupMinSizeSetting = $groupMinFilesSetting = 0;
 
-			$groupMinimums = $this->groups->getByID($groupID['id']);
+			$groupMinimums = $this->groups->getByID($grpID['id']);
 			if ($groupMinimums !== false) {
 				if (!empty($groupMinimums['minsizetoformrelease']) && $groupMinimums['minsizetoformrelease'] > 0) {
 					$groupMinSizeSetting = (int)$groupMinimums['minsizetoformrelease'];
@@ -453,7 +449,7 @@ class ProcessReleases
 						AND c.filesize > 0 %s',
 						$this->tables['cname'],
 						self::COLLFC_SIZED,
-						$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $groupID['id']) : ''
+						$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $grpID['id']) : ''
 					)
 				) !== false
 			) {
@@ -472,7 +468,7 @@ class ProcessReleases
 						$this->tables['bname'],
 						$this->tables['pname'],
 						self::COLLFC_SIZED,
-						$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $groupID['id']) : '',
+						$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $grpID['id']) : '',
 						$groupMinSizeSetting,
 						$minSizeSetting,
 						$groupMinSizeSetting,
@@ -496,7 +492,7 @@ class ProcessReleases
 							$this->tables['bname'],
 							$this->tables['pname'],
 							self::COLLFC_SIZED,
-							$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $groupID['id']) : '',
+							$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $grpID['id']) : '',
 							$maxSizeSetting
 						)
 					);
@@ -517,7 +513,7 @@ class ProcessReleases
 						$this->tables['bname'],
 						$this->tables['pname'],
 						self::COLLFC_SIZED,
-						$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $groupID['id']) : '',
+						$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $grpID['id']) : '',
 						$groupMinFilesSetting,
 						$minFilesSetting,
 						$groupMinFilesSetting,
@@ -578,7 +574,7 @@ class ProcessReleases
 		$returnCount = $duplicate = 0;
 
 		if ($this->echoCLI) {
-			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create releases from complete collections."));
+			$this->pdo->log->doEcho($this->pdo->log->header('Process Releases -> Create releases from complete collections.'));
 		}
 
 		$this->pdo->ping(true);
@@ -599,7 +595,7 @@ class ProcessReleases
 		);
 
 		if ($this->echoCLI && $collections !== false) {
-			echo $this->pdo->log->primary($collections->rowCount() . " Collections ready to be converted to releases.");
+			echo $this->pdo->log->primary($collections->rowCount() . ' Collections ready to be converted to releases.');
 		}
 
 		if ($collections instanceof \Traversable) {
@@ -627,8 +623,8 @@ class ProcessReleases
 						AND size BETWEEN '%s' AND '%s'",
 						$cleanRelName,
 						$fromName,
-						($collection['filesize'] * .99),
-						($collection['filesize'] * 1.01)
+						$collection['filesize'] * .99,
+						$collection['filesize'] * 1.01
 					)
 				);
 
@@ -669,9 +665,9 @@ class ProcessReleases
 							'fromname' => $fromName,
 							'size' => $collection['filesize'],
 							'categories_id' => $categorize->determineCategory($collection['groups_id'], $cleanedName),
-							'isrenamed' => ($properName === true ? 1 : 0),
-							'reqidstatus' => ($isReqID === true ? 1 : 0),
-							'predb_id' => ($preID === false ? 0 : $preID),
+							'isrenamed' => $properName === true ? 1 : 0,
+							'reqidstatus' => $isReqID === true ? 1 : 0,
+							'predb_id' => $preID === false ? 0 : $preID,
 							'nzbstatus' => NZB::NZB_NONE
 						]
 					);
@@ -791,10 +787,10 @@ class ProcessReleases
 	public function createNZBs($groupID)
 	{
 		$startTime = time();
-		$this->formFromnamesQuery();
+		$this->formFromNamesQuery();
 
 		if ($this->echoCLI) {
-			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
+			$this->pdo->log->doEcho($this->pdo->log->header('Process Releases -> Create the NZB, delete collections/binaries/parts.'));
 		}
 
 		$releases = $this->pdo->queryDirect(
@@ -864,7 +860,7 @@ class ProcessReleases
 			$this->pdo->log->doEcho(
 				$this->pdo->log->header(
 					sprintf(
-						"Process Releases -> Request ID %s lookup -- limit %s",
+						'Process Releases -> Request ID %s lookup -- limit %s',
 						($local === true ? 'local' : 'web'),
 						$limit
 					)
@@ -919,7 +915,7 @@ class ProcessReleases
 	{
 		$startTime = time();
 		if ($this->echoCLI) {
-			echo $this->pdo->log->header("Process Releases -> Categorize releases.");
+			echo $this->pdo->log->header('Process Releases -> Categorize releases.');
 		}
 		switch ((int)$categorize) {
 			case 2:
@@ -961,7 +957,7 @@ class ProcessReleases
 				$this->pdo->log->doEcho(
 					$this->pdo->log->info(
 						"\nPost-processing is not running inside the Process Releases class.\n" .
-						"If you are using tmux or screen they might have their own scripts running Post-processing."
+						'If you are using tmux or screen they might have their own scripts running Post-processing.'
 					)
 				);
 			}
@@ -978,7 +974,7 @@ class ProcessReleases
 		// CBP older than retention.
 		if ($this->echoCLI) {
 			echo (
-				$this->pdo->log->header("Process Releases -> Delete finished collections." . PHP_EOL) .
+				$this->pdo->log->header('Process Releases -> Delete finished collections.' . PHP_EOL) .
 				$this->pdo->log->primary(sprintf(
 					'Deleting collections/binaries/parts older than %d hours.',
 					Settings::value('..partretentionhours')
@@ -1022,7 +1018,7 @@ class ProcessReleases
 			// CBP collection orphaned with no binaries or parts.
 			if ($this->echoCLI) {
 				echo (
-					$this->pdo->log->header("Process Releases -> Remove CBP orphans." . PHP_EOL) .
+					$this->pdo->log->header('Process Releases -> Remove CBP orphans.' . PHP_EOL) .
 					$this->pdo->log->primary('Deleting orphaned collections.')
 				);
 			}
@@ -1170,7 +1166,7 @@ class ProcessReleases
 					'Removed ' .
 					number_format($deletedCount) .
 					' parts/binaries/collection rows in ' .
-					$this->consoleTools->convertTime(($fourthQuery - $startTime)) . PHP_EOL
+					$this->consoleTools->convertTime($fourthQuery - $startTime) . PHP_EOL
 				)
 			);
 		}
@@ -1191,29 +1187,25 @@ class ProcessReleases
 		$minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
 		if ($this->echoCLI) {
-			echo $this->pdo->log->header("Process Releases -> Delete releases smaller/larger than minimum size/file count from group/site setting.");
+			echo $this->pdo->log->header('Process Releases -> Delete releases smaller/larger than minimum size/file count from group/site setting.');
 		}
 
-		if ($groupID == '') {
-			$groupIDs = $this->groups->getActiveIDs();
-		} else {
-			$groupIDs = [['id' => $groupID]];
-		}
+		$groupID === '' ? $groupIDs = $this->groups->getActiveIDs() : $groupIDs = [['id' => $groupID]];
 
 		$maxSizeSetting = Settings::value('.release.maxsizetoformrelease');
 		$minSizeSetting = Settings::value('.release.minsizetoformrelease');
 		$minFilesSetting = Settings::value('.release.minfilestoformrelease');
 
-		foreach ($groupIDs as $groupID) {
+		foreach ($groupIDs as $grpID) {
 			$releases = $this->pdo->queryDirect(
-				sprintf("
+				sprintf('
 					SELECT SQL_NO_CACHE r.guid, r.id
 					FROM releases r
 					INNER JOIN groups g ON g.id = r.groups_id
 					WHERE r.groups_id = %d
 					AND greatest(IFNULL(g.minsizetoformrelease, 0), %d) > 0
-					AND r.size < greatest(IFNULL(g.minsizetoformrelease, 0), %d)",
-					$groupID['id'],
+					AND r.size < greatest(IFNULL(g.minsizetoformrelease, 0), %d)',
+					$grpID['id'],
 					$minSizeSetting,
 					$minSizeSetting
 				)
@@ -1232,7 +1224,7 @@ class ProcessReleases
 						FROM releases
 						WHERE groups_id = %d
 						AND size > %d',
-						$groupID['id'],
+						$grpID['id'],
 						$maxSizeSetting
 					)
 				);
@@ -1245,14 +1237,14 @@ class ProcessReleases
 			}
 
 			$releases = $this->pdo->queryDirect(
-				sprintf("
+				sprintf('
 					SELECT SQL_NO_CACHE r.id, r.guid
 					FROM releases r
 					INNER JOIN groups g ON g.id = r.groups_id
 					WHERE r.groups_id = %d
 					AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
-					AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)",
-					$groupID['id'],
+					AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)',
+					$grpID['id'],
 					$minFilesSetting,
 					$minFilesSetting
 				)
@@ -1295,7 +1287,7 @@ class ProcessReleases
 
 		// Delete old releases and finished collections.
 		if ($this->echoCLI) {
-			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Delete old releases and passworded releases."));
+			$this->pdo->log->doEcho($this->pdo->log->header('Process Releases -> Delete old releases and passworded releases.'));
 		}
 
 		// Releases past retention.
@@ -1524,7 +1516,7 @@ class ProcessReleases
 			if ($totalDeleted > 0) {
 				$this->pdo->log->doEcho(
 					$this->pdo->log->primary(
-						"Removed " . number_format($totalDeleted) . ' releases in ' .
+						'Removed ' . number_format($totalDeleted) . ' releases in ' .
 						$this->consoleTools->convertTime(time() - $startTime)
 					)
 				);
