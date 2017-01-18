@@ -11,6 +11,14 @@ class RequestIDLocal extends RequestID
 {
 
 	/**
+	 * @param array $options Class instances / Echo to cli?
+	 */
+	public function __construct(array $options = [])
+	{
+		parent::__construct($options);
+	}
+
+	/**
 	 * Fetch releases with requestid's from MySQL.
 	 */
 	protected function _getReleases()

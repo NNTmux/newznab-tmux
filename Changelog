@@ -1,4 +1,5 @@
 2017-01-18 DariusIII
+	* Chg: Add back construct to RequestIDLocal
 	* Chg: Small optimization of RequestID code
 2017-01-16 DariusIII
 	* Chg: Fix ADE getUtl function
