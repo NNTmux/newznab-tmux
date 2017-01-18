@@ -9,27 +9,20 @@ namespace nntmux;
  */
 class RequestIDLocal extends RequestID
 {
-	/**
-	 * @param array $options Class instances / Echo to cli?
-	 */
-	public function __construct(array $options = [])
-	{
-		parent::__construct($options);
-	}
 
 	/**
 	 * Fetch releases with requestid's from MySQL.
 	 */
 	protected function _getReleases()
 	{
-		$query = (
+		$query =
 			'SELECT r.id, r.name, r.fromname, r.categories_id, r.reqidstatus, g.name AS groupname, g.id as gid
 			FROM releases r
 			LEFT JOIN groups g ON r.groups_id = g.id
 			WHERE r.nzbstatus = 1
 			AND r.predb_id = 0
 			AND r.isrequestID = 1'
-		);
+		;
 
 		$query .= ($this->_charGUID === '' ? '' : ' AND r.leftguid = ' . $this->pdo->escapeString($this->_charGUID));
 		$query .= ($this->_groupID === '' ? '' : ' AND r.groups_id = ' . $this->_groupID);
@@ -38,7 +31,7 @@ class RequestIDLocal extends RequestID
 		switch ($this->_limit) {
 			case 'full':
 				$query .= sprintf(
-					" AND r.reqidstatus in (%d, %d, %d)",
+					' AND r.reqidstatus in (%d, %d, %d)',
 					self::REQID_UPROC,
 					self::REQID_NOLL,
 					self::REQID_NONE
@@ -46,7 +39,7 @@ class RequestIDLocal extends RequestID
 				break;
 			case is_numeric($this->_limit):
 				$query .= sprintf(
-					" AND r.reqidstatus in (%d, %d, %d) ORDER BY r.postdate DESC LIMIT %d",
+					' AND r.reqidstatus in (%d, %d, %d) ORDER BY r.postdate DESC LIMIT %d',
 					self::REQID_UPROC,
 					self::REQID_NOLL,
 					self::REQID_NONE,
@@ -79,12 +72,12 @@ class RequestIDLocal extends RequestID
 					$this->_updateRelease();
 					$renamed++;
 				} else {
-					$this->_requestIdNotFound($this->_release['id'], ($this->_release['reqidstatus'] == self::REQID_UPROC ? self::REQID_NOLL : self::REQID_NONE));
+					$this->_requestIdNotFound($this->_release['id'], ($this->_release['reqidstatus'] === self::REQID_UPROC ? self::REQID_NOLL : self::REQID_NONE));
 				}
 
 				if ($this->echoOutput && $this->_show === 0) {
 					$this->consoleTools->overWritePrimary(
-						"Checked Releases: [" . number_format($checked) . "] " .
+						'Checked Releases: [' . number_format($checked) . '] ' .
 						$this->consoleTools->percentString(++$checked, $this->_totalReleases)
 					);
 				}
@@ -115,7 +108,7 @@ class RequestIDLocal extends RequestID
 		);
 
 		if ($check instanceof \Traversable) {
-			if ($check->rowCount() == 1) {
+			if ($check->rowCount() === 1) {
 				foreach ($check as $row) {
 					if (preg_match('/s\d+/i', $row['title']) && !preg_match('/s\d+e\d+/i', $row['title'])) {
 						return false;
@@ -165,7 +158,7 @@ class RequestIDLocal extends RequestID
 			case preg_match($regex2, $this->_release['name'], $matches):
 				$check = $this->pdo->queryOneRow(
 					sprintf(
-						"SELECT id, title FROM predb WHERE title = %s OR filename = %s %s",
+						'SELECT id, title FROM predb WHERE title = %s OR filename = %s %s',
 						$this->pdo->escapeString($matches['title']),
 						$this->pdo->escapeString($matches['title']),
 						(
@@ -200,7 +193,7 @@ class RequestIDLocal extends RequestID
 	protected function _singleAltLookup()
 	{
 		switch (true) {
-			case $this->_release['name'] == 'alt.binaries.etc':
+			case $this->_release['name'] === 'alt.binaries.etc':
 				$groupName = 'alt.binaries.teevee';
 				break;
 			case strpos($this->_release['name'], 'teevee') !== false:
@@ -236,8 +229,8 @@ class RequestIDLocal extends RequestID
 			$groupID = $this->groups->getIDByName($groupName);
 		}
 		$check = $this->pdo->queryOneRow(
-			sprintf("
-				SELECT id, title FROM predb WHERE requestid = %d AND groups_id = %d",
+			sprintf('
+				SELECT id, title FROM predb WHERE requestid = %d AND groups_id = %d',
 				$this->_requestID,
 				($groupID === '' ? 0 : $groupID)
 			)
@@ -254,7 +247,7 @@ class RequestIDLocal extends RequestID
 	protected function _updateRelease()
 	{
 		$determinedCat = $this->category->determineCategory($this->_release['gid'], $this->_newTitle['title'], $this->_release['fromname']);
-		if ($determinedCat == $this->_release['categories_id']) {
+		if ($determinedCat === $this->_release['categories_id']) {
 			$newTitle = $this->pdo->escapeString($this->_newTitle['title']);
 			$this->pdo->queryExec(
 				sprintf('
@@ -287,7 +280,7 @@ class RequestIDLocal extends RequestID
 			$this->sphinx->updateRelease($this->_release['id'], $this->pdo);
 		}
 
-		if ($this->_release['name'] !== $this->_newTitle['title'] && $this->_show == 1) {
+		if ($this->_show === 1 && $this->_release['name'] !== $this->_newTitle['title']) {
 			NameFixer::echoChangedReleaseName(
 				array(
 					'new_name'     => $this->_newTitle['title'],
