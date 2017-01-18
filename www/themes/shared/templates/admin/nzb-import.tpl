@@ -66,7 +66,7 @@
 			</tr>
 		</table>
 </fieldset>
-{if $output != ""}
+{if !empty($output)}
 	<div>
 		<a id="results"></a>
 		<h1>Import Results</h1>
