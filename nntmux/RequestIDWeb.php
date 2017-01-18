@@ -180,7 +180,7 @@ class RequestIDWeb extends RequestID
 
 				$groupIDArray = [];
 				foreach($returnXml->request as $result) {
-					if (isset($result['name']) && isset($result['ident']) && (int)$result['ident'] > 0) {
+					if (isset($result['name'], $result['ident']) && (int)$result['ident'] > 0) {
 						$this->_newTitle['title'] = (string)$result['name'];
 						$this->_requestID = (int)$result['reqid'];
 						$this->_release['id'] = (int)$result['ident'];
@@ -269,9 +269,9 @@ class RequestIDWeb extends RequestID
 
 		if ($dupeCheck === false) {
 			$this->_preDbID = (int)$this->pdo->queryInsert(
-				sprintf("
+				sprintf('
 					INSERT INTO predb (title, source, requestid, groups_id, predate)
-					VALUES (%s, %s, %d, %d, NOW())",
+					VALUES (%s, %s, %d, %d, NOW())',
 					$this->pdo->escapeString($this->_newTitle['title']),
 					$this->pdo->escapeString('requestWEB'),
 					$this->_requestID,
