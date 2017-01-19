@@ -222,8 +222,8 @@ class NZB
 		$nzb_guid = '';
 
 		$XMLWriter->startDocument('1.0', 'UTF-8');
-		$XMLWriter->startDtd(self::NZB_DTD_NAME, self::NZB_DTD_PUBLIC, self::NZB_DTD_EXTERNAL);
-		$XMLWriter->endDtd();
+		$XMLWriter->startDTD(self::NZB_DTD_NAME, self::NZB_DTD_PUBLIC, self::NZB_DTD_EXTERNAL);
+		$XMLWriter->endDTD();
 		$XMLWriter->writeComment($this->_nzbCommentString);
 
 		$XMLWriter->startElement('nzb');
