@@ -793,7 +793,7 @@ class Binaries
 				$table = $multiGroup === true ? 'multigroup_binaries' : $tableNames['bname'];
 				$hash = $multiGroup === true ? md5($matches[1] . $header['From']) :
 					md5($matches[1] . $header['From'] . $groupMySQL['id']);
-				$onDuplicate = $multiGroup === true ? sprintf('ON DUPLICATE KEY UPDATE currentparts = CASE WHEN currentparts <= totalparts * 1.1 THEN currentparts + 1 ELSE currentparts END, partsize = CASE WHEN currentparts <= totalparts * 1.1 THEN partsize + %d ELSE partsize END', $header['Bytes']) : sprintf('ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d', $header['Bytes']);
+				$onDuplicate = $multiGroup === true ? sprintf('ON DUPLICATE KEY UPDATE currentparts = CASE WHEN currentparts < totalparts THEN currentparts + 1 ELSE currentparts END, partsize = CASE WHEN currentparts < totalparts THEN partsize + %d ELSE partsize END', $header['Bytes']) : sprintf('ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d', $header['Bytes']);
 				$binaryID = $this->_pdo->queryInsert(
 					sprintf("
 						INSERT INTO %s (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize)
