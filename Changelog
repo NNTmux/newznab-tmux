@@ -1,4 +1,5 @@
 2017-01-24 DariusIII
+	* Chg: Update resetdb with cbpm_loop
 	* Fix: Fix wrong check for yydecoderpath
 2017-01-18 DariusIII
 	* Chg: Prevent undefined index output on nzb-import page
