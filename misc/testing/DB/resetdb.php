@@ -37,10 +37,7 @@ echo ColorCLI::primary('Reseting all groups completed.');
 
 $arr = [
 		'videos', 'tv_episodes', 'tv_info', 'release_nfos', 'release_comments', 'sharing', 'sharing_sites',
-		'users_releases', 'user_movies', 'user_series', 'movieinfo', 'musicinfo', 'release_files',
-		'audio_data', 'release_subtitles', 'video_data', 'releaseextrafull', 'parts',
-		'missed_parts', 'binaries', 'collections', 'releases', 'spotnabsources', 'anidb_titles',
-		'anidb_info', 'anidb_episodes', 'releases_groups'
+		'users_releases', 'user_movies', 'user_series', 'movieinfo', 'musicinfo', 'multigroup_binaries', 'multigroup_collections', 'multigroup_missed_parts', 		'multigroup_parts', 'release_files', 'audio_data', 'release_subtitles', 'video_data', 'releaseextrafull', 'parts', 'missed_parts', 'binaries', 		'collections', 'releases', 'spotnabsources', 'anidb_titles', 'anidb_info', 'anidb_episodes', 'releases_groups'
 ];
 foreach ($arr as &$value) {
 	$rel = $pdo->queryExec("TRUNCATE TABLE $value");
