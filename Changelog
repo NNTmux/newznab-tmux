@@ -1,3 +1,5 @@
+2017-01-24 DariusIII
+	* Fix: Fix wrong check for yydecoderpath
 2017-01-18 DariusIII
 	* Chg: Prevent undefined index output on nzb-import page
 	* Chg: Add back construct to RequestIDLocal
