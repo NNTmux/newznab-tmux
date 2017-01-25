@@ -424,23 +424,6 @@ class ReleaseRemover
 	{
 		$this->method = 'Executable';
 
-		if (NN_RELEASE_SEARCH_TYPE === ReleaseSearch::SPHINX) {
-			$rs = new ReleaseSearch($this->pdo);
-			$execFT =
-				str_replace('=10000;', '=100000;',
-					$rs->getSearchSQL(
-						[
-							'searchname' => '-exes* -exec*',
-							'filename'   => 'exe'
-						]
-					)
-				);
-			$ftJoin = $rs->getFullTextJoinString();
-
-		} else {
-			$execFT = $ftJoin = '';
-		}
-
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
 			FROM releases r
@@ -474,14 +457,6 @@ class ReleaseRemover
 	{
 		$this->method = 'Install.bin';
 
-		if (NN_RELEASE_SEARCH_TYPE === ReleaseSearch::SPHINX) {
-			$rs = new ReleaseSearch($this->pdo);
-			$instbinFT = str_replace('=10000;', '=100000;', $rs->getSearchSQL(['filename' => 'install<<bin']));
-			$ftJoin = $rs->getFullTextJoinString();
-		} else {
-			$instbinFT = $ftJoin = '';
-		}
-
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
 			FROM releases r
@@ -507,14 +482,6 @@ class ReleaseRemover
 	{
 		$this->method = 'Password.url';
 
-		if (NN_RELEASE_SEARCH_TYPE === ReleaseSearch::SPHINX) {
-			$rs = new ReleaseSearch($this->pdo);
-			$passurlFT = str_replace('=10000;', '=100000;', $rs->getSearchSQL(['filename' => 'password<<url']));
-			$ftJoin = $rs->getFullTextJoinString();
-		} else {
-			$passurlFT = $ftJoin = '';
-		}
-
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
 			FROM releases r
@@ -539,14 +506,6 @@ class ReleaseRemover
 	protected function removePassworded()
 	{
 		$this->method = 'Passworded';
-
-		if (NN_RELEASE_SEARCH_TYPE === ReleaseSearch::SPHINX) {
-			$rs = new ReleaseSearch($this->pdo);
-			$passFT = str_replace('=10000;', '=100000;', $rs->getSearchSQL(['searchname' => 'passwor*']));
-			$ftJoin = $rs->getFullTextJoinString();
-		} else {
-			$passFT = $ftJoin = '';
-		}
 
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
@@ -654,14 +613,6 @@ class ReleaseRemover
 	{
 		$this->method = 'Sample';
 
-		if (NN_RELEASE_SEARCH_TYPE === ReleaseSearch::SPHINX) {
-			$rs = new ReleaseSearch($this->pdo);
-			$sampleFT = str_replace('=10000;', '=100000;', $rs->getSearchSQL(['name' => 'sample']));
-			$ftJoin = $rs->getFullTextJoinString();
-		} else {
-			$sampleFT = $ftJoin = '';
-		}
-
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
 			FROM releases r
@@ -703,14 +654,6 @@ class ReleaseRemover
 	protected function removeSCR()
 	{
 		$this->method = '.scr';
-
-		if (NN_RELEASE_SEARCH_TYPE === ReleaseSearch::SPHINX) {
-			$rs = new ReleaseSearch($this->pdo);
-			$scrFT = str_replace('=10000;', '=100000;', $rs->getSearchSQL(['(name,filename)' => 'scr']));
-			$ftJoin = $rs->getFullTextJoinString();
-		} else {
-			$scrFT = $ftJoin = '';
-		}
 
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
@@ -886,14 +829,6 @@ class ReleaseRemover
 
 			foreach ($allRegex as $regex) {
 				$dbRegex = $this->pdo->escapeString($regex['regex']);
-				$ftMatch = $ftJoin = $regexMatch = '';
-				if ($this->crapTime === '') {
-					$regexMatch = $this->extractSrchFromRegx($dbRegex);
-					if ($regexMatch !== '' && NN_RELEASE_SEARCH_TYPE === ReleaseSearch::SPHINX) {
-						$ftMatch = sprintf('AND (rse.query = "@(filename) %s;limit=1000000;maxmatches=1000000;mode=any")', str_replace('|', ' ', str_replace('"', '', $regexMatch)));
-						$ftJoin = 'INNER JOIN releases_se rse ON rse.id = r.id';
-					}
-				}
 
 				$regexSQL = sprintf('STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 				WHERE rf.name REGEXP %s ', $this->pdo->escapeString($regex['regex'])
@@ -928,14 +863,9 @@ class ReleaseRemover
 
 				$this->method = 'Blacklist Files ' . $regex['id'];
 
-				// Check if using FT Match and declare for echo
-				if ($ftMatch !== '') {
-					$blType = 'FULLTEXT match with REGEXP';
-					$ftUsing = 'Using (' . $regexMatch . ') as interesting words.' . PHP_EOL;
-				} else {
-					$blType = 'only REGEXP';
-					$ftUsing = PHP_EOL;
-				}
+				$blType = 'only REGEXP';
+				$ftUsing = PHP_EOL;
+
 
 				// Provide useful output of operations
 				echo $this->pdo->log->header(sprintf('Finding crap releases for %s: Using %s method against release filenames.' . PHP_EOL .
@@ -945,11 +875,9 @@ class ReleaseRemover
 
 				$this->query = sprintf(
 					'SELECT DISTINCT r.id, r.guid, r.searchname
-					FROM releases r %s %s %s %s %s',
-					$ftJoin,
+					FROM releases r %s %s %s',
 					$regexSQL,
 					$groupID,
-					$ftMatch,
 					$this->crapTime
 				);
 
