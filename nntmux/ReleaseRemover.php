@@ -443,13 +443,11 @@ class ReleaseRemover
 
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
-			FROM releases r %s
+			FROM releases r
+			INNER JOIN release_search_data rs on rs.releases_id = r.id
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
-			WHERE r.searchname NOT REGEXP %s
-			AND rf.name %s
-			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d) %s %s',
-			$ftJoin,
-			$this->pdo->escapeString('\.exe[sc]'),
+			WHERE rf.name %s
+			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d) %s',
 			$this->pdo->likeString('.exe', true, false),
 			Category::PC_0DAY,
 			Category::PC_GAMES,
@@ -457,7 +455,6 @@ class ReleaseRemover
 			Category::PC_MAC,
 			Category::OTHER_MISC,
 			Category::OTHER_HASHED,
-			$execFT,
 			$this->crapTime
 		);
 
@@ -487,12 +484,10 @@ class ReleaseRemover
 
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
-			FROM releases r %s
+			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
-			WHERE rf.name %s %s %s',
-			$ftJoin,
+			WHERE rf.name %s %s',
 			$this->pdo->likeString('install.bin', true, true),
-			$instbinFT,
 			$this->crapTime
 		);
 
@@ -522,12 +517,10 @@ class ReleaseRemover
 
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
-			FROM releases r %s
+			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
-			WHERE rf.name %s %s %s',
-			$ftJoin,
+			WHERE rf.name %s %s ',
 			$this->pdo->likeString('password.url', true, true),
-			$passurlFT,
 			$this->crapTime
 		);
 
@@ -557,7 +550,7 @@ class ReleaseRemover
 
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
-			FROM releases r %s
+			FROM releases r
 			WHERE r.searchname %s
 			AND r.searchname NOT %s
 			AND r.searchname NOT %s
@@ -566,9 +559,8 @@ class ReleaseRemover
 			AND r.searchname NOT %s
 			AND r.searchname NOT %s
 			AND r.nzbstatus = 1
-			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s %s',
+			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
 			// Matches passwort / passworded / etc also.
-			$ftJoin,
 			$this->pdo->likeString('passwor', true, true),
 			$this->pdo->likeString('advanced', true, true),
 			$this->pdo->likeString('no password', true, true),
@@ -585,7 +577,6 @@ class ReleaseRemover
 			Category::PC_PHONE_OTHER,
 			Category::OTHER_MISC,
 			Category::OTHER_HASHED,
-			$passFT,
 			$this->crapTime
 		);
 
@@ -673,12 +664,11 @@ class ReleaseRemover
 
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
-			FROM releases r %s
+			FROM releases r
 			WHERE r.totalpart > 1
 			AND r.size < 40000000
 			AND r.name %s
-			AND r.categories_id IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s %s',
-			$ftJoin,
+			AND r.categories_id IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s',
 			$this->pdo->likeString('sample', true, true),
 			Category::TV_ANIME,
 			Category::TV_DOCU,
@@ -695,7 +685,6 @@ class ReleaseRemover
 			Category::MOVIE_HD,
 			Category::MOVIE_OTHER,
 			Category::MOVIE_SD,
-			$sampleFT,
 			$this->crapTime
 		);
 
@@ -725,12 +714,10 @@ class ReleaseRemover
 
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
-			FROM releases r %s
+			FROM releases r
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE (rf.name REGEXP '[.]scr[$ \"]' OR r.name REGEXP '[.]scr[$ \"]')
-			%s %s",
-			$ftJoin,
-			$scrFT,
+			%s",
 			$this->crapTime
 		);
 
@@ -933,7 +920,7 @@ class ReleaseRemover
 						foreach ($groupIDs as $fID) {
 							$string .= $fID['id'] . ',';
 						}
-						$groupIDs = (substr($string, 0, -1));
+						$groupIDs = substr($string, 0, -1);
 					}
 
 					$groupID = ' AND r.groups_id in (' . $groupIDs . ') ';

@@ -56,7 +56,7 @@ class ReleaseSearch
 	 *
 	 * @return string
 	 */
-	public function getSearchSQL($options = [], $forceLike = false)
+	public function getSearchSQL(array $options = [], $forceLike = false)
 	{
 		$this->searchOptions = $options;
 
@@ -116,7 +116,7 @@ class ReleaseSearch
 		}
 		// If we didn't get anything, try the LIKE method.
 		if ($return === '') {
-			return ($this->likeSQL());
+			return $this->likeSQL();
 		} else {
 			return $return;
 		}
@@ -134,11 +134,11 @@ class ReleaseSearch
 			$wordCount = 0;
 			$words = explode(' ', $searchString);
 			foreach ($words as $word) {
-				if ($word != '') {
+				if ($word !== '') {
 					$word = trim($word, "-\n\t\r\0\x0B ");
-					if ($wordCount == 0 && (strpos($word, '^') === 0)) {
+					if ($wordCount === 0 && (strpos($word, '^') === 0)) {
 						$return .= sprintf(' AND r.%s %s', $columnName, $this->pdo->likeString(substr($word, 1), false));
-					} else if (substr($word, 0, 2) == '--') {
+					} else if (strpos($word, '--') === 0) {
 						$return .= sprintf(' AND r.%s NOT %s', $columnName, $this->pdo->likeString(substr($word, 2)));
 					} else {
 						$return .= sprintf(' AND r.%s %s', $columnName, $this->pdo->likeString($word));
@@ -170,7 +170,7 @@ class ReleaseSearch
 			}
 			$searchWords = rtrim($searchWords, "\n\t\r\0\x0B ");
 			if ($searchWords !== '') {
-				$searchQuery .= sprintf("@%s %s ",
+				$searchQuery .= sprintf('@%s %s ',
 					$columnName,
 					$searchWords
 				);

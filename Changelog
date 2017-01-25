@@ -1,3 +1,5 @@
+2017-01-25 DariusIII
+	* Chg: Not using sphinx in ReleaseRemover anymore, as it does not remove releases properly
 2017-01-24 DariusIII
 	* Chg: Refactor RemoveCrapReleases
 	* Chg: Update resetdb with cbpm_loop
