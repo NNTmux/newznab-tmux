@@ -548,9 +548,10 @@ class Binaries
 			if ($partRepair === true) {
 				$this->_pdo->queryExec(
 					sprintf(
-						'UPDATE missed_parts SET attempts = attempts + 1 WHERE groups_id = %d AND numberid %s',
+						'UPDATE %s SET attempts = attempts + 1 WHERE group_id = %d AND numberid %s',
+						$tableNames['prname'],
 						$groupMySQL['id'],
-						($first == $last ? '= ' . $first : 'IN (' . implode(',', range($first, $last)) . ')')
+						($first === $last ? '= ' . $first : 'IN (' . implode(',', range($first, $last)) . ')')
 					)
 				);
 				return $returnArray;
