@@ -15,33 +15,33 @@ class ADM
 	 * Define Adult DVD Marketplace url
 	 * Needed Search Queries Constant
 	 */
-	const ADMURL = "http://www.adultdvdmarketplace.com";
-	const IF18 = "http://www.adultdvdmarketplace.com/xcart/adult_dvd/disclaimer.php?action=enter&site=intl&return_url=";
-	const TRAILINGSEARCH = "/xcart/adult_dvd/advanced_search.php?sort_by=relev&title=";
+	const ADMURL = 'http://www.adultdvdmarketplace.com';
+	const IF18 = 'http://www.adultdvdmarketplace.com/xcart/adult_dvd/disclaimer.php?action=enter&site=intl&return_url=';
+	const TRAILINGSEARCH = '/xcart/adult_dvd/advanced_search.php?sort_by=relev&title=';
 
 	/**
 	 * Define a cookie file location for curl
 	 * @var string string
 	 */
-	public $cookie = "";
+	public $cookie = '';
 
 	/**
 	 * Direct Link given from outside url doesn't do a search
 	 * @var string
 	 */
-	public $directLink = "";
+	public $directLink = '';
 
 	/**
 	 * Set this for what you are searching for.
 	 * @var string
 	 */
-	public $searchTerm = "";
+	public $searchTerm = '';
 
 	/**
 	 * Sets the directurl for the return results array
 	 * @var string
 	 */
-	protected $_directUrl = "";
+	protected $_directUrl = '';
 
 	/**
 	 * Simple Html Dom Object
@@ -81,14 +81,14 @@ class ADM
 	 * Add this to popurl to get results
 	 * @var string
 	 */
-	protected $_trailUrl = "";
+	protected $_trailUrl = '';
 
 	/**
 	 * This is set in the getAll method
 	 *
 	 * @var string
 	 */
-	protected $_title = "";
+	protected $_title = '';
 
 	public function __construct()
 	{
@@ -96,7 +96,7 @@ class ADM
 		$this->client = new Client();
 		$this->cookiejar = new CookieJar();
 		$this->pdo = new DB();
-		if (isset($this->cookie)) {
+		if (!empty($this->cookie)) {
 			$cookieJar = $this->cookiejar->setCookie(SetCookie::fromString($this->cookie));
 			$this->client = new Client(['cookies' => $cookieJar]);
 		}
@@ -108,8 +108,7 @@ class ADM
 	public function __destruct()
 	{
 		$this->_html->clear();
-		unset($this->_response);
-		unset($this->_res);
+		unset($this->_response, $this->_res);
 	}
 
 	/**
@@ -120,15 +119,12 @@ class ADM
 	{
 		$baseUrl = 'http://www.adultdvdmarketplace.com/';
 		if ($ret = $this->_html->find('a[rel=fancybox-button]', 0)) {
-			if (isset($ret->href)) {
-				if (preg_match('/images\/.*[0-9]+\.jpg/i', $ret->href, $matches)
-				) {
-					$this->_res['boxcover'] = $baseUrl . $matches[0];
-					$this->_res['backcover'] = $baseUrl . preg_replace('/front/i', 'back', $matches[0]);
-				}
+			if (isset($ret->href) && preg_match('/images\/.*[\d]+\.jpg/i', $ret->href, $matches)) {
+				$this->_res['boxcover'] = $baseUrl . $matches[0];
+				$this->_res['backcover'] = $baseUrl . str_ireplace('/front/i', 'back', $matches[0]);
 			}
 		} elseif ($ret = $this->_html->find('img[rel=license]', 0)) {
-			if (preg_match('/images\/.*[0-9]+\.jpg/i', $ret->src, $matches)) {
+			if (preg_match('/images\/.*[\d]+\.jpg/i', $ret->src, $matches)) {
 				$this->_res['boxcover'] = $baseUrl . $matches[0];
 			}
 		}
@@ -143,7 +139,7 @@ class ADM
 	{
 		$this->_res['sypnosis'] = "N/A";
 		foreach ($this->_html->find('h3') as $heading) {
-			if (trim($heading->plaintext) == "Description") {
+			if (trim($heading->plaintext) === 'Description') {
 				$this->_res['sypnosis'] = trim($heading->next_sibling()->plaintext);
 			}
 		}
@@ -163,13 +159,13 @@ class ADM
 		foreach ($this->_html->find('ul.list-unstyled li') as $li) {
 			$category = explode(":", $li->plaintext);
 			switch (trim($category[0])) {
-				case "Director":
+				case 'Director':
 					$this->_res['director'] = trim($category[1]);
 					break;
-				case "Format":
-				case "Studio":
-				case "Released":
-				case "SKU":
+				case 'Format':
+				case 'Studio':
+				case 'Released':
+				case 'SKU':
 					$this->_res['productinfo'][trim($category[0])] = trim($category[1]);
 			}
 		}
@@ -185,8 +181,8 @@ class ADM
 	{
 		$cast = [];
 		foreach ($this->_html->find('h3') as $heading) {
-			if (trim($heading->plaintext) == "Cast") {
-				for ($next = $heading->next_sibling(); $next && $next->nodeName != 'h3'; $next = $next->next_sibling()) {
+			if (trim($heading->plaintext) === 'Cast') {
+				for ($next = $heading->next_sibling(); $next && $next->nodeName !== 'h3'; $next = $next->next_sibling()) {
 					if (preg_match_all('/search_performerid/', $next->href, $matches)) {
 						$cast[] = trim($next->plaintext);
 					}
@@ -206,13 +202,13 @@ class ADM
 	{
 		$genres = [];
 		foreach ($this->_html->find('ul.list-unstyled li') as $li) {
-			$category = explode(":", $li->plaintext);
-			if (trim($category[0]) == "Category") {
-				$g = explode(",", $category[1]);
-				foreach($g as $genre) {
-					$genres[] = trim($genre);
+			$category = explode(':', $li->plaintext);
+			if (trim($category[0]) === 'Category') {
+				$genre = explode(',', $category[1]);
+				foreach($genre as $g) {
+					$genres[] = trim($g);
 				}
-				$this->_res['genres'] = & $genres;
+				$this->_res['genres'] = $genres;
 			}
 		}
 
@@ -226,7 +222,7 @@ class ADM
 	public function search()
 	{
 		$result = false;
-		if (isset($this->searchTerm)) {
+		if (!empty($this->searchTerm)) {
 			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($this->searchTerm);
 			if ($this->getUrl() !== false) {
 				if ($ret = $this->_html->find('img[rel=license]')) {
@@ -234,26 +230,25 @@ class ADM
 						foreach ($this->_html->find('img[rel=license]') as $ret) {
 							if (isset($ret->alt)) {
 								$title = trim($ret->alt, '"');
-								$title = preg_replace('/XXX/', '', $title);
-								$comparetitle = preg_replace('/[^\w]/', '', $title);
-								$comparesearch = preg_replace('/[^\w]/', '', $this->searchTerm);
+								$title = str_replace('/XXX/', '', $title);
+								$comparetitle = preg_replace('/[\W]/', '', $title);
+								$comparesearch = preg_replace('/[\W]/', '', $this->searchTerm);
 								similar_text($comparetitle, $comparesearch, $p);
-								if ($p == 100) {
+								if ($p === 100) {
 									if (preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)) {
-										$this->_title     = trim($title);
-										$this->_trailUrl  = "/dvd_view_" . (string)$matches['sku'] . ".html";
+										$this->_title = trim($title);
+										$this->_trailUrl = '/dvd_view_' . (string)$matches['sku'] . '.html';
 										$this->_directUrl = self::ADMURL . $this->_trailUrl;
-										if ($this->getUrl() !== false) {
-											$result = true;
-										}
 									}
 								}
 							}
 						}
 					}
 				}
+				$result = true;
 			}
 		}
+
 		return $result;
 	}
 
@@ -264,7 +259,7 @@ class ADM
 	public function getAll()
 	{
 		$results = [];
-		if (isset($this->_directUrl)) {
+		if (!empty($this->_directUrl)) {
 			$results['title'] = $this->_title;
 			$results['directurl'] = $this->_directUrl;
 		}
@@ -300,7 +295,7 @@ class ADM
 	 */
 	private function getUrl()
 	{
-		if (isset($this->_trailUrl)) {
+		if (!empty($this->_trailUrl)) {
 			try {
 				$this->_response = $this->client->get(self::ADMURL . $this->_trailUrl)->getBody()->getContents();
 			} catch (RequestException $e) {

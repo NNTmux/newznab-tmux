@@ -5,16 +5,16 @@ use nntmux\utility\Utility;
 
 class IAFD
 {
-	public $classUsed = "";
-	public $cookie = "";
+	public $classUsed = '';
+	public $cookie = '';
 	public $directUrl;
-	public $searchTerm = "";
-	public $title = "";
+	public $searchTerm = '';
+	public $title = '';
 
-	const ADE = "Adult DVD Empire";
-	const ADM = "AdultDVDMarketplace";
-	const IAFDSEARCHURL = "http://www.iafd.com/results.asp?searchtype=title&searchstring=";
-	const IAFDURL = "http://www.iafd.com";
+	const ADE = 'Adult DVD Empire';
+	const ADM = 'AdultDVDMarketplace';
+	const IAFDSEARCHURL = 'http://www.iafd.com/results.asp?searchtype=title&searchstring=';
+	const IAFDURL = 'http://www.iafd.com';
 
 	protected $_dvdFound = false;
 	protected $_doSearch = false;
@@ -27,7 +27,7 @@ class IAFD
 	public function __construct()
 	{
 		$this->_html = new \simple_html_dom();
-		if (isset($this->cookie)) {
+		if (!empty($this->cookie)) {
 			@$this->getUrl();
 		}
 	}
@@ -35,26 +35,25 @@ class IAFD
 	public function __destruct()
 	{
 		$this->_html->clear();
-		unset($this->response);
-		unset($this->res);
+		unset($this->response, $this->res);
 	}
 
 	public function findme()
 	{
 		if ($this->search() === true) {
-			if ($this->_html->find("div#commerce", 0)) {
-				foreach ($this->_html->find("div#commerce") as $e) {
-					foreach ($e->find("h4, p.item") as $h4) {
+			if ($this->_html->find('div#commerce', 0)) {
+				foreach ($this->_html->find('div#commerce') as $e) {
+					foreach ($e->find('h4, p.item') as $h4) {
 						//echo ($h4->innertext) ."\n";
-						if (trim($h4->plaintext) == "DVD") {
+						if (trim($h4->plaintext) === 'DVD') {
 							$this->_dvdFound = true;
 							$h4 = null;
 						}
 						if ($this->_dvdFound === true && isset($h4)) {
-							foreach ($h4->find("a") as $alink) {
+							foreach ($h4->find('a') as $alink) {
 								$compare = trim($alink->innertext);
 								if ($compare === self::ADE && !empty($compare)) {
-									$this->classUsed = "ade";
+									$this->classUsed = 'ade';
 									$this->_getRedirect = self::IAFDURL . trim($alink->href);
 									$this->directUrl = $this->getUrl();
 									$this->directUrl = preg_replace('/\?(.*)/', '', $this->directUrl);
@@ -62,7 +61,7 @@ class IAFD
 									break;
 								}
 								if ($compare === self::ADM && !empty($compare)) {
-									$this->classUsed = "adm";
+									$this->classUsed = 'adm';
 									$this->_getRedirect = self::IAFDURL . trim($alink->href);
 									$this->directUrl = $this->getUrl();
 									$this->directUrl = preg_replace('/\?(.*)/',
@@ -76,7 +75,7 @@ class IAFD
 					}
 				}
 			}
-			if (!isset($this->classUsed)) {
+			if (empty($this->classUsed)) {
 				return false;
 			} else {
 				return true;
@@ -89,7 +88,7 @@ class IAFD
 	private function search()
 	{
 
-		if (!isset($this->searchTerm)) {
+		if (empty($this->searchTerm)) {
 			return false;
 		}
 
@@ -100,24 +99,24 @@ class IAFD
 		} else {
 			$firsttitle = null;
 			$secondtitle = null;
-			if ($ret = $this->_html->find("div#moviedata, h2, dt", 0)) {
-				if ($ret->find("h2", 0)) {
-					$firsttitle = $ret->find("h2", 0)->innertext;
-					if (preg_match("/Movie Titles/", $firsttitle)) {
+			if ($ret = $this->_html->find('div#moviedata, h2, dt', 0)) {
+				if ($ret->find('h2', 0)) {
+					$firsttitle = $ret->find('h2', 0)->innertext;
+					if (preg_match('/Movie Titles/', $firsttitle)) {
 						return false;
 					}
 				}
-				if ($ret->find("dt", 0)) {
-					$secondtitle = $ret->find("dd", 0)->innertext;
+				if ($ret->find('dt', 0)) {
+					$secondtitle = $ret->find('dd', 0)->innertext;
 				}
 				unset($ret);
 				if (isset($secondtitle) || isset($firsttitle)) {
-					$firsttitle = preg_replace('/\(([0-9]+)\)/', "", $firsttitle);
-					$firsttitle = preg_replace('/XXX/', '', $firsttitle);
-					$firsttitle = preg_replace('/\(.*?\)|[-._]/i', ' ', $firsttitle);
-					$secondtitle = preg_replace('/\(([0-9]+)\)/', "", $secondtitle);
-					$secondtitle = preg_replace('/XXX/', '', $secondtitle);
-					$secondtitle = preg_replace('/\(.*?\)|[-._]/i', ' ', $secondtitle);
+					$firsttitle = preg_replace('/\(([\d]+)\)/', '', $firsttitle);
+					$firsttitle = str_replace('/XXX/', '', $firsttitle);
+					$firsttitle = preg_replace('/\(.*?\)|[-._]/', '', $firsttitle);
+					$secondtitle = preg_replace('/\(([\d]+)\)/', '', $secondtitle);
+					$secondtitle = str_replace('/XXX/', '', $secondtitle);
+					$secondtitle = preg_replace('/\(.*?\)|[-._]/', '', $secondtitle);
 					similar_text(strtolower($this->searchTerm), strtolower(trim($firsttitle)), $p);
 					if ($p >= 90) {
 						$this->title = trim($firsttitle);
@@ -125,8 +124,7 @@ class IAFD
 						return true;
 					} else {
 						similar_text(strtolower($this->searchTerm),
-							strtolower(trim($secondtitle)),
-							$p);
+						strtolower(trim($secondtitle)), $p);
 						if ($p >= 90) {
 							$this->title = trim($secondtitle);
 
@@ -142,7 +140,6 @@ class IAFD
 				return false;
 			}
 		}
-
 	}
 
 	private function getUrl()
@@ -161,10 +158,10 @@ class IAFD
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_VERBOSE, 0);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
+		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36');
 		curl_setopt($ch, CURLOPT_FAILONERROR, 1);
 
-		if (isset($this->cookie)) {
+		if (!empty($this->cookie)) {
 			curl_setopt($ch, CURLOPT_COOKIEJAR, $this->cookie);
 			curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie);
 		}
@@ -192,7 +189,4 @@ class IAFD
 
 		return true;
 	}
-
-
-
 }
