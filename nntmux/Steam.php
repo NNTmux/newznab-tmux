@@ -161,22 +161,23 @@ class Steam
 			$totaldetails = count($textarr) - 1;
 			for ($i = 0; $i <= $totaldetails;) {
 				if ($textarr[$i] === 'Release Date') {
-					$pregmatchdate = $textarr[$i+1];
+					$pregmatchdate = $textarr[$i + 1];
 					if (preg_match_all('#(?P<day>[0-3]?\d)[\D]|(?P<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)|(?P<year>(19|20)\d{2})#i',
 						$pregmatchdate,
-						$matches)) {
+						$matches
+					)) {
 
-						$matches    = array_map('array_filter', $matches);
-						$matches    = array_map('array_values', $matches);
-						$matchday   = isset($matches['day'][0]) ? $matches['day'][0] : '1';
+						$matches = array_map('array_filter', $matches);
+						$matches = array_map('array_values', $matches);
+						$matchday = isset($matches['day'][0]) ? $matches['day'][0] : '1';
 						$matchmonth = isset($matches['month'][0]) ? $matches['month'][0] : '';
-						$matchyear  = isset($matches['year'][0]) ? $matches['year'][0] : '';
+						$matchyear = isset($matches['year'][0]) ? $matches['year'][0] : '';
 						if (!empty($matchday) && !empty($matchmonth) && !empty($matchyear)) {
 							$textarr[$i + 1] = $matchmonth . '/' . $matchday . '/' . $matchyear;
 						}
 					}
 				}
-				$this->_res['gamedetails'][$textarr[$i]] = $textarr[$i+1];
+				$this->_res['gamedetails'][$textarr[$i]] = $textarr[$i + 1];
 				$i += 2;
 			}
 		}
@@ -242,9 +243,9 @@ class Steam
 		}
 		if ($this->_ret = $this->_html->find('div.screenshot_holder', 0)) {
 			if ($this->_ret = $this->_ret->find('a', 0)) {
-				if(preg_match('/\?url\=(?<imgurl>.*)/', $this->_ret->href, $matches)){
+				if (preg_match('/\?url\=(?<imgurl>.*)/', $this->_ret->href, $matches)) {
 					$this->_res['backdrop'] = trim($matches['imgurl']);
-				}else{
+				} else {
 					$this->_res['backdrop'] = trim($this->_ret->href);
 				}
 
@@ -264,6 +265,7 @@ class Steam
 		if ($this->_ret = $this->_html->find('div#game_area_metascore', 0)) {
 			$this->_res['rating'] = (int)$this->_ret->plaintext;
 		}
+
 		return $this->_res;
 	}
 
@@ -299,6 +301,7 @@ class Steam
 									$this->_directURL = self::GAMEURL . $this->_steamGameID . '/';
 									$this->getUrl($result->href);
 									$this->ageCheck();
+
 									return true;
 								} else {
 									return false;
@@ -315,6 +318,7 @@ class Steam
 			} else {
 				return false;
 			}
+
 			return true;
 		}
 
@@ -352,18 +356,21 @@ class Steam
 	{
 		if (!empty($this->cookie)) {
 			$this->extractCookies(file_get_contents($this->cookie));
-			if($this->_ageCheckSet === false) {
+			if ($this->_ageCheckSet === false) {
 				$this->_postParams = [
-					'snr' => '1_agecheck_agecheck__age-gate',
-					'ageDay' => '1',
+					'snr'      => '1_agecheck_agecheck__age-gate',
+					'ageDay'   => '1',
 					'ageMonth' => 'May',
-					'ageYear' => '1966'
+					'ageYear'  => '1966'
 				];
 
-				$this->client->post(self::AGECHECKURL . $this->_steamGameID . '/', ['headers' => ['snr' => '1_agecheck_agecheck__age-gate',
-																								  'ageDay' => '1',
+				$this->client->post(self::AGECHECKURL . $this->_steamGameID . '/', ['headers' => ['snr'      => '1_agecheck_agecheck__age-gate',
+																								  'ageDay'   => '1',
 																								  'ageMonth' => 'May',
-																								  'ageYear' => '1966']]);
+																								  'ageYear'  => '1966'
+				]
+				]
+				);
 			}
 		}
 		$this->getUrl(self::GAMEURL . $this->_steamGameID . '/');
@@ -383,7 +390,7 @@ class Steam
 				$this->_response = $this->client->get($fetchURL)->getBody()->getContents();
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
-					if($e->getCode() === 404) {
+					if ($e->getCode() === 404) {
 						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
 					} else if ($e->getCode() === 503) {
 						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
@@ -441,5 +448,7 @@ class Steam
 		if ($this->_birthTime === true && $this->_lastAgeCheck === true) {
 			$this->_ageCheckSet = true;
 		}
-	return $this->_ageCheckSet;
+
+		return $this->_ageCheckSet;
+	}
 }
