@@ -58,7 +58,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 	 *
 	 * @return array
 	 */
-	public function returnTableNames()
+	public static function returnTableNames()
 	{
 		return [
 			'cname' => 'multigroup_collections',
