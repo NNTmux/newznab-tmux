@@ -1,4 +1,5 @@
 2017-01-26 DariusIII
+	* Chg: Slightly refactor Steam class
 	* Chg: Refactor XXX info related classes
 2017-01-25 DariusIII
 	* Chg: Not using sphinx in ReleaseRemover anymore, as it does not remove releases properly
