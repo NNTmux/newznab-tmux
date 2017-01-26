@@ -1,4 +1,5 @@
 2017-01-26 DariusIII
+	* Fix: Fix bug in handling partrepair and used tables in binaries class
 	* Chg: Slightly refactor Steam class
 	* Chg: Refactor XXX info related classes
 2017-01-25 DariusIII
