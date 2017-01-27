@@ -18,10 +18,10 @@ CREATE TABLE         multigroup_collections (
   PRIMARY KEY                               (id),
   INDEX        fromname                     (fromname),
   INDEX        date                         (date),
-  INDEX        group_id                     (group_id),
+  INDEX        groups_id                     (groups_id),
   INDEX        ix_collection_filecheck      (filecheck),
   INDEX        ix_collection_dateadded      (dateadded),
-  INDEX        ix_collection_releaseid      (releaseid),
+  INDEX        ix_collection_releaseid      (releases_id),
   UNIQUE INDEX ix_collection_collectionhash (collectionhash)
 )
   ENGINE          = MYISAM
@@ -34,6 +34,3 @@ CREATE TABLE multigroup_binaries LIKE binaries;
 
 DROP TABLE IF EXISTS multigroup_parts;
 CREATE TABLE multigroup_parts LIKE parts;
-
-DROP TABLE IF EXISTS multigroup_missed_parts;
-CREATE TABLE multigroup_missed_parts LIKE missed_parts;
