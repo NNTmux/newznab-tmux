@@ -50,7 +50,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 	 */
 	protected function initiateTableNames($groupID)
 	{
-		$this->tables = $this->tableNames();
+		$this->tables = $this->returnTableNames();
 	}
 
 	/**
@@ -58,7 +58,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 	 *
 	 * @return array
 	 */
-	public static function tableNames()
+	public static function returnTableNames()
 	{
 		return [
 			'cname' => 'multigroup_collections',
