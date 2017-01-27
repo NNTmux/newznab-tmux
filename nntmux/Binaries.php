@@ -371,7 +371,7 @@ class Binaries
 		$groupNNTP = $this->_nntp->selectGroup($groupMySQL['name']);
 		if ($this->_nntp->isError($groupNNTP)) {
 			$groupNNTP = $this->_nntp->dataError($this->_nntp, $groupMySQL['name']);
-			if ($groupNNTP->code == 411) {
+			if ($groupNNTP->code === 411) {
 				$this->_groups->disableIfNotExist($groupMySQL['id']);
 			}
 			if ($this->_nntp->isError($groupNNTP)) {
@@ -384,7 +384,7 @@ class Binaries
 		}
 
 		// Attempt to repair any missing parts before grabbing new ones.
-		if ($groupMySQL['last_record'] != 0) {
+		if ($groupMySQL['last_record'] !== 0) {
 			if ($this->_partRepair) {
 				if ($this->_echoCLI) {
 					$this->_colorCLI->doEcho($this->_colorCLI->primary('Part repair enabled. Checking for missing parts.'), true);
@@ -396,7 +396,7 @@ class Binaries
 		}
 
 		// Generate postdate for first record, for those that upgraded.
-		if (is_null($groupMySQL['first_record_postdate']) && $groupMySQL['first_record'] != 0) {
+		if ($groupMySQL['first_record_postdate'] === null && $groupMySQL['first_record'] !== 0) {
 
 			$groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
 
@@ -412,7 +412,7 @@ class Binaries
 		}
 
 		// Get first article we want aka the oldest.
-		if ($groupMySQL['last_record'] == 0) {
+		if ($groupMySQL['last_record'] === 0) {
 			if ($this->_newGroupScanByDays) {
 				// For new newsgroups - determine here how far we want to go back using date.
 				$first = $this->daytopost($this->_newGroupDaysToScan, $groupNNTP);
@@ -438,10 +438,10 @@ class Binaries
 			// Check if the server has more articles than our loop limit x 2.
 			if ($totalCount > ($this->messageBuffer * 2)) {
 				// Get the remainder of $totalCount / $this->message buffer
-				$leaveOver = round(($totalCount % $this->messageBuffer), 0, PHP_ROUND_HALF_DOWN) + $this->messageBuffer;
+				$leaveOver = round($totalCount % $this->messageBuffer, 0, PHP_ROUND_HALF_DOWN) + $this->messageBuffer;
 			} else {
 				// Else get half of the available.
-				$leaveOver = round(($totalCount / 2), 0, PHP_ROUND_HALF_DOWN);
+				$leaveOver = round($totalCount / 2, 0, PHP_ROUND_HALF_DOWN);
 			}
 		}
 
@@ -472,7 +472,7 @@ class Binaries
 			if ($this->_echoCLI) {
 				$this->_colorCLI->doEcho(
 					$this->_colorCLI->primary(
-						($groupMySQL['last_record'] == 0
+						($groupMySQL['last_record'] === 0
 							? 'New group ' . $groupNNTP['group'] . ' starting with ' .
 							($this->_newGroupScanByDays
 								? $this->_newGroupDaysToScan . ' days'
@@ -507,8 +507,8 @@ class Binaries
 					$this->_colorCLI->doEcho(
 						$this->_colorCLI->header(
 							"\nGetting " . number_format($last - $first + 1) . ' articles (' . number_format($first) .
-							' to ' . number_format($last) . ') from ' . $groupMySQL['name'] . " - (" .
-							number_format($groupLast - $last) . " articles in queue)."
+							' to ' . number_format($last) . ') from ' . $groupMySQL['name'] . ' - (' .
+							number_format($groupLast - $last) . ' articles in queue).'
 						)
 					);
 				}
@@ -520,7 +520,7 @@ class Binaries
 				if (!empty($scanSummary)) {
 
 					// If new group, update first record & postdate
-					if (is_null($groupMySQL['first_record_postdate']) && $groupMySQL['first_record'] == 0) {
+					if ($groupMySQL['first_record_postdate'] === null && $groupMySQL['first_record'] === 0) {
 						$groupMySQL['first_record'] = $scanSummary['firstArticleNumber'];
 
 						if (isset($scanSummary['firstArticleDate'])) {
@@ -569,7 +569,7 @@ class Binaries
 					);
 				}
 
-				if ($last == $groupLast) {
+				if ($last === $groupLast) {
 					$done = true;
 				} else {
 					$first = $last;
@@ -638,12 +638,13 @@ class Binaries
 
 			// Increment if part repair and return false.
 			if ($partRepair === true) {
+				$fLast = $this->first === $this->last ? '= ' . $this->first : 'IN (' . implode(',', range($this->first, $this->last)) . ')';
 				$this->_pdo->queryExec(
 					sprintf(
 						'UPDATE %s SET attempts = attempts + 1 WHERE groups_id = %d AND numberid %s',
 						$this->tableNames['prname'],
 						$this->groupMySQL['id'],
-						($this->first == $this->last ? '= ' . $this->first : 'IN (' . implode(',', range($this->first, $this->last)) . ')')
+						$fLast
 					)
 				);
 				return $returnArray;
@@ -662,7 +663,7 @@ class Binaries
 
 			// Check if the non-compression headers have an error.
 			if ($this->_nntp->isError($headers)) {
-				$message = ($headers->code == 0 ? 'Unknown error' : $headers->message);
+				$message = ($headers->code === 0 ? 'Unknown error' : $headers->message);
 				$this->log(
 					"Code {$headers->code}: $message\nSkipping group: {$this->groupMySQL['name']}",
 					__FUNCTION__,
@@ -703,8 +704,8 @@ class Binaries
 			}
 
 			// If set we are running in partRepair mode.
-			if ($partRepair === true && !is_null($missingParts)) {
-				if (!in_array($header['Number'], $missingParts)) {
+			if ($partRepair === true && $missingParts !== null) {
+				if (!in_array($header['Number'], $missingParts, false)) {
 					// If article isn't one that is missing skip it.
 					continue;
 				} else {
@@ -725,7 +726,7 @@ class Binaries
 			 */
 			if (preg_match('/^\s*(?!"Usenet Index Post)(.+)\s+\((\d+)\/(\d+)\)/', $header['Subject'], $header['matches'])) {
 				// Add yEnc to subjects that do not have them, but have the part number at the end of the header.
-				if (!stristr($header['Subject'], 'yEnc')) {
+				if (stripos($header['Subject'], 'yEnc') === false) {
 					$header['matches'][1] .= ' yEnc';
 				}
 			} else {
@@ -750,7 +751,7 @@ class Binaries
 			}
 			$header['Bytes'] = (int)$header['Bytes'];
 
-			if(ProcessReleasesMultiGroup::isMultiGroup($header['From'])) {
+			if (ProcessReleasesMultiGroup::isMultiGroup($header['From'])) {
 				$mgrHeaders[] = $header;
 			} else {
 				$stdHeaders[] = $header;
@@ -765,11 +766,11 @@ class Binaries
 			$this->outputHeaderInitial();
 		}
 
-		if (isset($stdHeaders) && count($stdHeaders) > 0) {
+		if (!empty($stdHeaders) && count($stdHeaders) > 0) {
 			$this->storeHeaders($stdHeaders, false);
 		}
-		if (isset($mgrHeaders) && count($mgrHeaders) > 0) {
-			$this->tableNames = ProcessReleasesMultiGroup::returnTableNames();
+		if (!empty($mgrHeaders) && count($mgrHeaders) > 0) {
+			$this->tableNames = ProcessReleasesMultiGroup::tableNames();
 			$this->storeHeaders($mgrHeaders, true);
 		}
 
@@ -965,8 +966,6 @@ class Binaries
 				$this->header['matches'][2] . ',' . $this->header['Bytes'] . '),';
 		}
 
-		unset($headers); // Reclaim memory.
-
 		// Start of inserting into SQL.
 		$this->startUpdate = microtime(true);
 
@@ -980,7 +979,7 @@ class Binaries
 		$binariesQuery = rtrim($binariesQuery, ',') . $binariesEnd;
 
 		// Check if we got any binaries. If we did, try to insert them.
-		if (((strlen($binariesCheck . $binariesEnd) === strlen($binariesQuery)) ? true : $this->_pdo->queryExec($binariesQuery))) {
+		if ((strlen($binariesCheck . $binariesEnd) === strlen($binariesQuery)) ? true : $this->_pdo->queryExec($binariesQuery)) {
 			if ($this->_debug) {
 				$this->_colorCLI->doEcho(
 					$this->_colorCLI->debug(
@@ -989,7 +988,7 @@ class Binaries
 					)
 				);
 			}
-			if (((strlen($partsQuery) === strlen($partsCheck)) ? true : $this->_pdo->queryExec(rtrim($partsQuery, ',')))) {
+			if ((strlen($partsQuery) === strlen($partsCheck)) ? true : $this->_pdo->queryExec(rtrim($partsQuery, ','))) {
 				$this->_pdo->Commit();
 			} else {
 				if ($this->addToPartRepair) {
@@ -1012,7 +1011,7 @@ class Binaries
 	 * @param array $headers
 	 * @param int   $msgCount
 	 */
-	protected function getHighLowArticleInfo(array &$returnArray, array $headers, int $msgCount)
+	protected function getHighLowArticleInfo(array $returnArray, array $headers, int $msgCount)
 	{
 		// Get highest and lowest article numbers/dates.
 		$iterator1 = 0;
@@ -1029,7 +1028,7 @@ class Binaries
 			}
 
 			// Break if we found non empty articles.
-			if (isset($returnArray['firstArticleNumber']) && isset($returnArray['lastArticleNumber'])) {
+			if (isset($returnArray['firstArticleNumber'], $returnArray['lastArticleNumber'])) {
 				break;
 			}
 
@@ -1061,7 +1060,7 @@ class Binaries
 		$this->_colorCLI->doEcho(
 			$this->_colorCLI->primary(
 				'Received ' . count($this->headersReceived) .
-				' articles of ' . (number_format($this->last - $this->first + 1)) . ' requested, ' .
+				' articles of ' . number_format($this->last - $this->first + 1) . ' requested, ' .
 				$this->headersBlackListed . ' blacklisted, ' . $this->notYEnc . ' not yEnc.'
 			)
 		);
@@ -1288,12 +1287,10 @@ class Binaries
 
 			// If we could not find it locally, try usenet.
 			$header = $this->_nntp->getXOVER($currentPost);
-			if (!$this->_nntp->isError($header)) {
+			if (!$this->_nntp->isError($header) && isset($header[0]['Date']) && strlen($header[0]['Date']) > 0) {
 				// Check if the date is set.
-				if (isset($header[0]['Date']) && strlen($header[0]['Date']) > 0) {
-					$date = $header[0]['Date'];
-					break;
-				}
+				$date = $header[0]['Date'];
+				break;
 			}
 
 			// Try to get a different article number.
@@ -1315,7 +1312,7 @@ class Binaries
 			$currentPost = $tempPost;
 
 			if ($this->_debug) {
-				$this->_colorCLI->doEcho($this->_colorCLI->debug('Postdate retried ' . $attempts . " time(s)."));
+				$this->_colorCLI->doEcho($this->_colorCLI->debug('Postdate retried ' . $attempts . ' time(s).'));
 			}
 		} while ($attempts++ <= 20);
 
@@ -1336,7 +1333,7 @@ class Binaries
 				$date .
 				') (' .
 				$this->daysOld($date) .
-				" days old)",
+				' days old)',
 				Logger::LOG_INFO
 			);
 		}
@@ -1419,14 +1416,14 @@ class Binaries
 				if ($this->_echoCLI) {
 					echo '+';
 				}
-			} else if ($articleTime == $goalTime) {
+			} else if ($articleTime === $goalTime) {
 				// Exact match. We did it! (this will likely never happen though)
 				break;
 			}
 
 			// We seem to be flip-flopping between 2 articles, assume we're out of articles to check.
 			// End on an article more recent than our oldest so that we don't miss any releases.
-			if ($reallyOldArticle == $wantedArticle && ($goalTime - $articleTime) <= 0) {
+			if ($reallyOldArticle === $wantedArticle && ($goalTime - $articleTime) <= 0) {
 				break;
 			}
 		}
@@ -1471,7 +1468,7 @@ class Binaries
 		foreach ($numbers as $number) {
 			$insertStr .= '(' . $number . ',' . $groupID . '),';
 		}
-		return $this->_pdo->queryInsert((rtrim($insertStr, ',') . ' ON DUPLICATE KEY UPDATE attempts=attempts+1'));
+		return $this->_pdo->queryInsert(rtrim($insertStr, ',') . ' ON DUPLICATE KEY UPDATE attempts=attempts+1');
 	}
 
 	/**
@@ -1489,7 +1486,7 @@ class Binaries
 		foreach ($numbers as $number) {
 			$sql .= $number . ',';
 		}
-		$this->_pdo->queryExec((rtrim($sql, ',') . ') AND groups_id = ' . $groupID));
+		$this->_pdo->queryExec(rtrim($sql, ',') . ') AND groups_id = ' . $groupID);
 	}
 
 	/**
@@ -1572,7 +1569,7 @@ class Binaries
 	 * Return all blacklists.
 	 *
 	 * @param bool   $activeOnly Only display active blacklists ?
-	 * @param int    $opType     Optional, get white or black lists (use Binaries constants).
+	 * @param int|string    $opType     Optional, get white or black lists (use Binaries constants).
 	 * @param string $groupName  Optional, group.
 	 * @param bool   $groupRegex Optional Join groups / binaryblacklist using regexp for equals.
 	 *
@@ -1636,21 +1633,19 @@ class Binaries
 	/**
 	 * Updates a blacklist from binary blacklist edit admin web page.
 	 *
-	 * @param Array $blacklistArray
+	 * @param array $blacklistArray
 	 *
 	 * @return boolean
 	 */
 	public function updateBlacklist($blacklistArray)
 	{
+		$blArray = $blacklistArray['groupname'] === '' ? 'null' : $this->_pdo->escapeString(preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']));
 		return $this->_pdo->queryExec(
 			sprintf('
 				UPDATE binaryblacklist
 				SET groupname = %s, regex = %s, status = %d, description = %s, optype = %d, msgcol = %d
 				WHERE id = %d ',
-				($blacklistArray['groupname'] == ''
-					? 'null'
-					: $this->_pdo->escapeString(preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']))
-				),
+				$blArray,
 				$this->_pdo->escapeString($blacklistArray['regex']), $blacklistArray['status'],
 				$this->_pdo->escapeString($blacklistArray['description']),
 				$blacklistArray['optype'],
@@ -1663,20 +1658,18 @@ class Binaries
 	/**
 	 * Adds a new blacklist from binary blacklist edit admin web page.
 	 *
-	 * @param Array $blacklistArray
+	 * @param array $blacklistArray
 	 *
 	 * @return bool
 	 */
 	public function addBlacklist($blacklistArray)
 	{
+		$blArray = $blacklistArray['groupname'] === '' ? 'null' : $this->_pdo->escapeString(preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']));
 		return $this->_pdo->queryInsert(
 			sprintf('
 				INSERT INTO binaryblacklist (groupname, regex, status, description, optype, msgcol)
 				VALUES (%s, %s, %d, %s, %d, %d)',
-				($blacklistArray['groupname'] == ''
-					? 'null'
-					: $this->_pdo->escapeString(preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']))
-				),
+				$blArray,
 				$this->_pdo->escapeString($blacklistArray['regex']),
 				$blacklistArray['status'],
 				$this->_pdo->escapeString($blacklistArray['description']),
