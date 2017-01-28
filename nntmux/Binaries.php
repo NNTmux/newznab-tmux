@@ -863,7 +863,7 @@ class Binaries
 
 				// Used to group articles together when forming the release.  MGR requires this to be group irrespective
 				$this->header['CollectionKey'] = (
-					$this->_collectionsCleaning->collectionsCleaner($this->header['matches'][1], $this->groupMySQL['name']) .
+					$this->_collectionsCleaning->collectionsCleaner($this->header['matches'][1], ($this->multiGroup ? '' : $this->groupMySQL['name'])) .
 					$this->header['From'] .
 					($this->multiGroup ? $fileCount[3] : $this->groupMySQL['id'] . $fileCount[3])
 				);
