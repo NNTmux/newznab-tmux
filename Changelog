@@ -1,3 +1,5 @@
+2017-01-28 DariusIII
+	* Fix: Fix errors in XXX releases processing
 2017-01-26 DariusIII
 	* Fix: Fix bug in handling partrepair and used tables in binaries class
 	* Chg: Slightly refactor Steam class
