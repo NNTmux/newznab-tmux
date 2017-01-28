@@ -11,7 +11,7 @@ use nntmux\db\DB;
 class XXX
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -37,6 +37,16 @@ class XXX
 	 * @var bool
 	 */
 	protected $debug;
+
+	/**
+	 * @var bool
+	 */
+	protected $echooutput;
+
+	/**
+	 * @var string
+	 */
+	protected $imgSavePath;
 
 	/**
 	 * @var ReleaseImage
@@ -95,7 +105,7 @@ class XXX
 			try {
 				$this->debugging = new Logger();
 			} catch (LoggerException $error) {
-				$this->_debug = false;
+				$this->debug = false;
 			}
 		}
 	}
