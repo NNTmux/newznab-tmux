@@ -495,7 +495,7 @@ class XXX
 		$mov['cover'] = !empty($res['boxcover']) ? $res['boxcover'] : 0;
 		$res['cast'] = !empty($res['cast']) ? implode(',', $res['cast']) : '';
 		$res['genres'] = !empty($res['genres']) ? $this->getGenreID($res['genres']) : '';
-		$mov['title'] = !empty($res['title'] ? html_entity_decode($res['title'], ENT_QUOTES, 'UTF-8') : '';
+		$mov['title'] = !empty($res['title']) ? html_entity_decode($res['title'], ENT_QUOTES, 'UTF-8') : '';
 		$mov['plot'] = !empty($res['sypnosis']) ? html_entity_decode($res['sypnosis'], ENT_QUOTES, 'UTF-8') : '';
 		$mov['tagline'] = !empty($res['tagline']) ? html_entity_decode($res['tagline'], ENT_QUOTES, 'UTF-8') : '';
 		$mov['genre'] = !empty($res['genres']) ? html_entity_decode($res['genres'], ENT_QUOTES, 'UTF-8') : '';
@@ -805,7 +805,7 @@ class XXX
 				$ret .= "flashvars='" .	$trailers['flashvars'] . "' allowfullscreen='true' allowscriptaccess='always' quality='high' name='trailer' style='undefined'";
 				$ret .= "src='" . $trailers['baseurl'] . "' type='application/x-shockwave-flash'>";
 
-				return ($ret);
+				return $ret;
 			}
 		}
 
