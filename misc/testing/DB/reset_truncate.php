@@ -11,7 +11,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'drop')) {
 	$pdo->queryExec('UPDATE groups SET first_record = 0, first_record_postdate = NULL, last_record = 0, last_record_postdate = NULL, last_updated = NULL');
 	echo ColorCLI::primary('Reseting all groups completed.');
 
-	$sql = "SELECT CALL loop_cbpm('truncate)";
+	$sql = "CALL loop_cbpm('truncate')";
 	echo ColorCLI::primary('Truncating binaries, collections, missed_parts and parts tables...');
 	$result = $pdo->query($sql);
 	echo ColorCLI::primary('Truncating completed.');
