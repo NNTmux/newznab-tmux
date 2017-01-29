@@ -234,6 +234,7 @@ CREATE TABLE         collections (
   filesize       BIGINT UNSIGNED     NOT NULL DEFAULT '0',
   releases_id      INT                 NULL,
   noise          CHAR(32)            NOT NULL DEFAULT '',
+  collection_regexes_id INT SIGNED NOT NULL DEFAULT '0' COMMENT 'FK to collection_regexes.id',
   PRIMARY KEY                               (id),
   INDEX        fromname                     (fromname),
   INDEX        date                         (date),
