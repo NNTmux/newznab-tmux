@@ -1,3 +1,5 @@
+2017-01-30 DariusIIi
+	* Chg: Change handling of post data by guzzlehttp in NZBGet class
 2017-01-28 DariusIII
 	* Fix: Fix errors in XXX releases processing
 2017-01-26 DariusIII

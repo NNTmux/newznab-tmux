@@ -2,6 +2,7 @@
 namespace nntmux;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
 use nntmux\utility\Utility;
 
 /**
@@ -147,13 +148,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->client->post($this->fullURL . 'append',
-			['headers' =>
-				 [
-					 'postdata' => $header
-				 ]
-			]
-		);
+		new Request('POST', $this->fullURL . 'append', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
 	}
 
 	/**
@@ -202,13 +197,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->client->post($this->fullURL . 'appendurl',
-			['headers' =>
-				 [
-					 'postdata' => $header
-				 ]
-			]
-		);
+		new Request('POST', $this->fullURL . 'append', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
 	}
 
 	/**
@@ -230,13 +219,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->client->post($this->fullURL . 'pausedownload2',
-			['headers' =>
-				 [
-				 	'postdata' => $header
-				 ]
-			]
-		);
+		new Request('POST', $this->fullURL . 'pausedownload2', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
 	}
 
 	/**
@@ -258,13 +241,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->client->post($this->fullURL . 'resumedownload2',
-			['headers' =>
-				 [
-					 'postdata' => $header
-				 ]
-			]
-		);
+		new Request('POST', $this->fullURL . 'resumedownload2', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
 	}
 
 	/**
@@ -299,13 +276,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->client->post($this->fullURL . 'editqueue',
-			['headers' =>
-				 [
-					 'postdata' => $header
-				 ]
-			]
-		);
+		new Request('POST', $this->fullURL . 'editqueue', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
 	}
 
 	/**
@@ -340,13 +311,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->client->post($this->fullURL . 'editqueue',
-			['headers' =>
-				 [
-					 'postdata' => $header
-				 ]
-			]
-		);
+		new Request('POST', $this->fullURL . 'editqueue', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
 	}
 
 	/**
@@ -381,13 +346,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->client->post($this->fullURL . 'editqueue',
-			['headers' =>
-				 [
-					 'postdata' => $header
-				 ]
-			]
-		);
+		new Request('POST', $this->fullURL . 'editqueue', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
 	}
 
 	/**
@@ -411,13 +370,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->client->post($this->fullURL . 'rate',
-			['headers' =>
-				 [
-					 'postdata' => $header
-				 ]
-			]
-		);
+		new Request('POST', $this->fullURL . 'rate', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
 	}
 
 	/**
