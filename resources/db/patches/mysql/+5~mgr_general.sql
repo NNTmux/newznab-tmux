@@ -9,6 +9,7 @@ CREATE TABLE         multigroup_collections (
   totalfiles     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
   groups_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
   collectionhash VARCHAR(255)        NOT NULL DEFAULT '0',
+  collection_regexes_id INT SIGNED NOT NULL DEFAULT '0' COMMENT 'FK to collection_regexes.id',
   dateadded      DATETIME            DEFAULT NULL,
   added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
   filecheck      TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
@@ -34,3 +35,6 @@ CREATE TABLE multigroup_binaries LIKE binaries;
 
 DROP TABLE IF EXISTS multigroup_parts;
 CREATE TABLE multigroup_parts LIKE parts;
+
+DROP TABLE IF EXISTS multigroup_missed_parts;
+CREATE TABLE multigroup_missed_parts LIKE missed_parts;
