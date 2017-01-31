@@ -1114,12 +1114,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "835e6e3a4fb81c7abd67ff6d548eca720c4a28a6"
+                "reference": "19f5ca57849e366cf93ec44ebf9caab132fb0885"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/835e6e3a4fb81c7abd67ff6d548eca720c4a28a6",
-                "reference": "835e6e3a4fb81c7abd67ff6d548eca720c4a28a6",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/19f5ca57849e366cf93ec44ebf9caab132fb0885",
+                "reference": "19f5ca57849e366cf93ec44ebf9caab132fb0885",
                 "shasum": ""
             },
             "require": {
@@ -1153,7 +1153,7 @@
                 }
             ],
             "description": "PHP archive reader helper class",
-            "time": "2016-10-14 06:50:51"
+            "time": "2017-01-31 10:11:45"
         },
         {
             "name": "exeu/apai-io",
@@ -1363,12 +1363,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "dfadff37efcfd42230eef1350009898b7b9af40a"
+                "reference": "443ca656dec18f3e5ea7751d2429fc2aeacf3ca2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/dfadff37efcfd42230eef1350009898b7b9af40a",
-                "reference": "dfadff37efcfd42230eef1350009898b7b9af40a",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/443ca656dec18f3e5ea7751d2429fc2aeacf3ca2",
+                "reference": "443ca656dec18f3e5ea7751d2429fc2aeacf3ca2",
                 "shasum": ""
             },
             "require": {
@@ -1417,7 +1417,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2016-12-15 09:53:31"
+            "time": "2017-01-16 17:41:59"
         },
         {
             "name": "guzzlehttp/promises",
@@ -1665,16 +1665,16 @@
         },
         {
             "name": "phpmailer/phpmailer",
-            "version": "v5.2.18",
+            "version": "v5.2.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "ed4e7ce8ad877a8f578139c491c256ab1933c7c9"
+                "reference": "b18cb98131bd83103ccb26a888fdfe3177b8a663"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/ed4e7ce8ad877a8f578139c491c256ab1933c7c9",
-                "reference": "ed4e7ce8ad877a8f578139c491c256ab1933c7c9",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/b18cb98131bd83103ccb26a888fdfe3177b8a663",
+                "reference": "b18cb98131bd83103ccb26a888fdfe3177b8a663",
                 "shasum": ""
             },
             "require": {
@@ -1721,7 +1721,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2016-12-24 15:43:41"
+            "time": "2017-01-09 09:33:47"
         },
         {
             "name": "psr/http-message",

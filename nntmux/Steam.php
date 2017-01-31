@@ -1,6 +1,12 @@
 <?php
 namespace nntmux;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
+use GuzzleHttp\Exception\RequestException;
+use lithium\storage\session\adapter\Cookie;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 class Steam
@@ -16,11 +22,11 @@ class Steam
 	 */
 	public $searchTerm;
 
-	const AGECHECKURL = "http://store.steampowered.com/agecheck/app/";
-	const CDNURL = "http://cdn.akamai.steamstatic.com/steam/apps/";
-	const GAMEURL = "http://store.steampowered.com/app/";
-	const STEAMURL = "http://store.steampowered.com";
-	const STEAMVARS = "/search/?category1=998&os=win&sort_order=ASC&page=1&term=";
+	const AGECHECKURL = 'http://store.steampowered.com/agecheck/app/';
+	const CDNURL = 'http://cdn.akamai.steamstatic.com/steam/apps/';
+	const GAMEURL = 'http://store.steampowered.com/app/';
+	const STEAMURL = 'http://store.steampowered.com';
+	const STEAMVARS = '/search/?category1=998&os=win&sort_order=ASC&page=1&term=';
 
 	/**
 	 * @var bool
@@ -51,6 +57,21 @@ class Steam
 	 * @var \simple_html_dom
 	 */
 	protected $_html;
+
+	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
+	 * @var CookieJar
+	 */
+	protected $cookiejar;
+
+	/**
+	 * @var DB
+	 */
+	protected $pdo;
 
 	/**
 	 * @var string
@@ -101,8 +122,12 @@ class Steam
 	{
 		$this->_html = new \simple_html_dom();
 		$this->_editHtml = new \simple_html_dom();
-		if (isset($this->cookie)) {
-			$this->getUrl(self::STEAMURL);
+		$this->client = new Client();
+		$this->cookiejar = new CookieJar();
+		$this->pdo = new DB();
+		if (!empty($this->cookie)) {
+			$cookieJar = $this->cookiejar->setCookie(SetCookie::fromString($this->cookie));
+			$this->client = new Client(['cookies' => $cookieJar]);
 		}
 	}
 
@@ -125,34 +150,35 @@ class Steam
 	 */
 	public function details()
 	{
-		if ($this->_ret = $this->_html->find("div.details_block", 0)) {
+		if ($this->_ret = $this->_html->find('div.details_block', 0)) {
 			$textarr = [];
 			foreach ($this->_ret->find('text') as $text) {
 				$text = trim($text->plaintext);
 				if (!empty($text)) {
-					$textarr[] = rtrim($text, ":");
+					$textarr[] = rtrim($text, ':');
 				}
 			}
 			$totaldetails = count($textarr) - 1;
 			for ($i = 0; $i <= $totaldetails;) {
-				if ($textarr[$i] == "Release Date") {
-					$pregmatchdate = $textarr[$i+1];
-					if (preg_match_all('#(?P<day>[0-3]?\d)[^\d]|(?P<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)|(?P<year>(19|20)\d{2})#i',
+				if ($textarr[$i] === 'Release Date') {
+					$pregmatchdate = $textarr[$i + 1];
+					if (preg_match_all('#(?P<day>[0-3]?\d)[\D]|(?P<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)|(?P<year>(19|20)\d{2})#i',
 						$pregmatchdate,
-						$matches)) {
+						$matches
+					)) {
 
-						$matches    = array_map('array_filter', $matches);
-						$matches    = array_map('array_values', $matches);
-						$matchday   = isset($matches['day'][0]) ? $matches['day'][0] : '1';
+						$matches = array_map('array_filter', $matches);
+						$matches = array_map('array_values', $matches);
+						$matchday = isset($matches['day'][0]) ? $matches['day'][0] : '1';
 						$matchmonth = isset($matches['month'][0]) ? $matches['month'][0] : '';
-						$matchyear  = isset($matches['year'][0]) ? $matches['year'][0] : '';
+						$matchyear = isset($matches['year'][0]) ? $matches['year'][0] : '';
 						if (!empty($matchday) && !empty($matchmonth) && !empty($matchyear)) {
 							$textarr[$i + 1] = $matchmonth . '/' . $matchday . '/' . $matchyear;
 						}
 					}
 				}
-				$this->_res['gamedetails'][$textarr[$i]] = $textarr[$i+1];
-				$i = $i+2;
+				$this->_res['gamedetails'][$textarr[$i]] = $textarr[$i + 1];
+				$i += 2;
 			}
 		}
 
@@ -166,7 +192,7 @@ class Steam
 	 */
 	public function gameDescription()
 	{
-		if ($this->_ret = $this->_html->find("div.game_description_snippet", 0)) {
+		if ($this->_ret = $this->_html->find('div.game_description_snippet', 0)) {
 			$this->_res['description'] = trim($this->_ret->plaintext);
 		}
 
@@ -181,7 +207,7 @@ class Steam
 	public function getAll()
 	{
 		$results = [];
-		if (isset($this->_directURL)) {
+		if (!empty($this->_directURL)) {
 			$results['steamgameid'] = $this->_steamGameID;
 			$results['directurl'] = $this->_directURL;
 			$results['title'] = $this->_title;
@@ -212,14 +238,14 @@ class Steam
 	 */
 	public function images()
 	{
-		if ($this->_ret = $this->_html->find("img.game_header_image_full", 0)) {
+		if ($this->_ret = $this->_html->find('img.game_header_image_full', 0)) {
 			$this->_res['cover'] = $this->_ret->src;
 		}
-		if ($this->_ret = $this->_html->find("div.screenshot_holder", 0)) {
-			if ($this->_ret = $this->_ret->find("a", 0)) {
-				if(preg_match('/\?url\=(?<imgurl>.*)/', $this->_ret->href, $matches)){
+		if ($this->_ret = $this->_html->find('div.screenshot_holder', 0)) {
+			if ($this->_ret = $this->_ret->find('a', 0)) {
+				if (preg_match('/\?url\=(?<imgurl>.*)/', $this->_ret->href, $matches)) {
 					$this->_res['backdrop'] = trim($matches['imgurl']);
-				}else{
+				} else {
 					$this->_res['backdrop'] = trim($this->_ret->href);
 				}
 
@@ -236,9 +262,10 @@ class Steam
 	 */
 	public function rating()
 	{
-		if ($this->_ret = $this->_html->find("div#game_area_metascore", 0)) {
+		if ($this->_ret = $this->_html->find('div#game_area_metascore', 0)) {
 			$this->_res['rating'] = (int)$this->_ret->plaintext;
 		}
+
 		return $this->_res;
 	}
 
@@ -249,22 +276,22 @@ class Steam
 	 */
 	public function search()
 	{
-		if (!isset($this->searchTerm)) {
+		if (empty($this->searchTerm)) {
 			return false;
 		}
 
 		if ($this->getUrl(self::STEAMURL . self::STEAMVARS . rawurlencode($this->searchTerm)) !== false) {
 			$title = null;
-			if ($this->_ret = $this->_html->find("div.search_pagination_left", 0)) {
+			if ($this->_ret = $this->_html->find('div.search_pagination_left', 0)) {
 				if (preg_match('/\d+ of (?<total>\d+)/', trim($this->_ret->plaintext), $matches)) {
 					$this->_totalResults = (int)$matches['total'];
 				}
 				if ($this->_totalResults > 0) {
-					foreach ($this->_html->find("a.search_result_row") as $result) {
-						foreach ($result->find("span.title") as $searchtitle) {
+					foreach ($this->_html->find('a.search_result_row') as $result) {
+						foreach ($result->find('span.title') as $searchtitle) {
 							$title = (string)trim($searchtitle->innertext);
 						}
-						if (isset($title)) {
+						if (!empty($title)) {
 							similar_text(strtolower($title), strtolower($this->searchTerm), $p);
 							if ($p > 90) {
 								$this->_title = $title;
@@ -274,6 +301,7 @@ class Steam
 									$this->_directURL = self::GAMEURL . $this->_steamGameID . '/';
 									$this->getUrl($result->href);
 									$this->ageCheck();
+
 									return true;
 								} else {
 									return false;
@@ -290,6 +318,7 @@ class Steam
 			} else {
 				return false;
 			}
+
 			return true;
 		}
 
@@ -306,11 +335,8 @@ class Steam
 		if (preg_match('/store.steampowered.com\/video\//', $this->_response)) {
 			$this->_res['trailer'] = self::STEAMURL . '/video/' . $this->_steamGameID;
 			$this->getUrl($this->_res['trailer']);
-			if (preg_match('@FILENAME\:\s+(?<videourl>\"\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))")@', $this->_response, $matches)
-			) {
-				if (isset($matches['videourl'])) {
-					$this->_res['trailer'] = trim($matches['videourl'], '"');
-				}
+			if (preg_match('@FILENAME\:\s+(?<videourl>\"\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w]+\)|([^[:punct:]\s]|/)))")@', $this->_response, $matches) && !empty($matches['videourl'])) {
+				$this->_res['trailer'] = trim($matches['videourl'], '"');
 			}
 		} else {
 			if (preg_match('/movie480.webm\?t\=(?<videoidentifier>\d+)/', $this->_response, $matches)
@@ -328,17 +354,23 @@ class Steam
 	 */
 	private function ageCheck()
 	{
-		if (isset($this->cookie)) {
+		if (!empty($this->cookie)) {
 			$this->extractCookies(file_get_contents($this->cookie));
-			if($this->_ageCheckSet === false) {
-				$this->_postParams = array(
-					"snr" => "1_agecheck_agecheck__age-gate",
-					"ageDay" => "1",
-					"ageMonth" => "May",
-					"ageYear" => "1966"
-				);
+			if ($this->_ageCheckSet === false) {
+				$this->_postParams = [
+					'snr'      => '1_agecheck_agecheck__age-gate',
+					'ageDay'   => '1',
+					'ageMonth' => 'May',
+					'ageYear'  => '1966'
+				];
 
-				$this->getUrl(self::AGECHECKURL . $this->_steamGameID . '/', true);
+				$this->client->post(self::AGECHECKURL . $this->_steamGameID . '/', ['headers' => ['snr'      => '1_agecheck_agecheck__age-gate',
+																								  'ageDay'   => '1',
+																								  'ageMonth' => 'May',
+																								  'ageYear'  => '1966'
+				]
+				]
+				);
 			}
 		}
 		$this->getUrl(self::GAMEURL . $this->_steamGameID . '/');
@@ -348,36 +380,30 @@ class Steam
 	 * Gets Raw Html
 	 *
 	 * @param string $fetchURL
-	 * @param bool $usePost
 	 *
 	 * @return bool
 	 */
-	private function getUrl($fetchURL, $usePost = false)
+	private function getUrl($fetchURL)
 	{
-		if (isset($fetchURL)) {
-			$this->_ch = curl_init($fetchURL);
+		if (!empty($fetchURL)) {
+			try {
+				$this->_response = $this->client->get($fetchURL)->getBody()->getContents();
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if ($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					}
+				}
+			}
 		}
-		if ($usePost === true) {
-			curl_setopt($this->_ch, CURLOPT_POST, 1);
-			curl_setopt($this->_ch, CURLOPT_POSTFIELDS, $this->_postParams);
-		}
-		curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($this->_ch, CURLOPT_HEADER, 0);
-		curl_setopt($this->_ch, CURLOPT_VERBOSE, 0);
-		curl_setopt($this->_ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
-		curl_setopt($this->_ch, CURLOPT_FAILONERROR, 1);
-		if (isset($this->cookie)) {
-			curl_setopt($this->_ch, CURLOPT_COOKIEJAR, $this->cookie);
-			curl_setopt($this->_ch, CURLOPT_COOKIEFILE, $this->cookie);
-		}
-		curl_setopt_array($this->_ch, Utility::curlSslContextOptions());
-		$this->_response = curl_exec($this->_ch);
-		if (!$this->_response) {
-			curl_close($this->_ch);
 
+		if (!$this->_response) {
 			return false;
 		}
-		curl_close($this->_ch);
 		$this->_html->load($this->_response);
 
 		return true;
@@ -393,12 +419,13 @@ class Steam
 	private function extractCookies($string)
 	{
 		$lines = explode("\n", $string);
+		$this->_ageCheckSet = false;
 
 		// iterate over lines
 		foreach ($lines as $line) {
 
 			// we only care for valid cookie def lines
-			if (isset($line[0]) && substr_count($line, "\t") == 6) {
+			if (isset($line[0]) && substr_count($line, "\t") === 6) {
 
 				// get tokens in an array
 				$tokens = explode("\t", $line);
@@ -407,20 +434,21 @@ class Steam
 				$tokens = array_map('trim', $tokens);
 
 				// Extract the data
-				if ($tokens[0] == "store.steampowered.com") {
-					if ($tokens[5] == 'birthtime') {
+				if ($tokens[0] === 'store.steampowered.com') {
+					if ($tokens[5] === 'birthtime') {
 						$this->_birthTime = true;
 					}
-					if ($tokens[5] == 'lastagecheckage') {
+					if ($tokens[5] === 'lastagecheckage') {
 						$this->_lastAgeCheck = true;
 					}
 				}
 			}
 		}
+
 		if ($this->_birthTime === true && $this->_lastAgeCheck === true) {
 			$this->_ageCheckSet = true;
-		} else {
-			$this->_ageCheckSet = false;
 		}
+
+		return $this->_ageCheckSet;
 	}
 }
