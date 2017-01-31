@@ -1,4 +1,6 @@
-2017-01-30 DariusIIi
+2017-01-31 DariusIII
+	* Chg: Update rarinfo
+2017-01-30 DariusIII
 	* Chg: Change handling of post data by guzzlehttp in NZBGet class
 2017-01-28 DariusIII
 	* Fix: Fix errors in XXX releases processing
