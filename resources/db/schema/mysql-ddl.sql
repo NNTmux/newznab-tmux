@@ -111,7 +111,7 @@ DROP TABLE IF EXISTS binaries;
 CREATE TABLE binaries (
   id            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   name          VARCHAR(1000)       NOT NULL DEFAULT '',
-  collection_id INT(11) UNSIGNED    NOT NULL DEFAULT 0,
+  collections_id INT(11) UNSIGNED    NOT NULL DEFAULT 0,
   filenumber    INT UNSIGNED        NOT NULL DEFAULT '0',
   totalparts    INT(11) UNSIGNED    NOT NULL DEFAULT 0,
   currentparts  INT UNSIGNED        NOT NULL DEFAULT 0,
@@ -119,9 +119,9 @@ CREATE TABLE binaries (
   partcheck     TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
   partsize      BIGINT UNSIGNED     NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
-  UNIQUE INDEX ix_binary_binaryhash (binaryhash),
-  INDEX ix_binary_partcheck  (partcheck),
-  INDEX ix_binary_collection (collection_id)
+  UNIQUE INDEX ix_binaries_binaryhash (binaryhash),
+  INDEX ix_binaries_partcheck  (partcheck),
+  INDEX ix_binaries_collection (collections_id)
 )
   ENGINE = MYISAM
   DEFAULT CHARSET = utf8
@@ -226,21 +226,22 @@ CREATE TABLE         collections (
   date           DATETIME            DEFAULT NULL,
   xref           VARCHAR(255)        NOT NULL DEFAULT '',
   totalfiles     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  group_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  groups_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
   collectionhash VARCHAR(255)        NOT NULL DEFAULT '0',
+  collection_regexes_id INT SIGNED NOT NULL DEFAULT '0' COMMENT 'FK to collection_regexes.id',
   dateadded      DATETIME            DEFAULT NULL,
   added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
   filecheck      TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
   filesize       BIGINT UNSIGNED     NOT NULL DEFAULT '0',
-  releaseid      INT                 NULL,
+  releases_id      INT                 NULL,
   noise          CHAR(32)            NOT NULL DEFAULT '',
   PRIMARY KEY                               (id),
   INDEX        fromname                     (fromname),
   INDEX        date                         (date),
-  INDEX        group_id                     (group_id),
+  INDEX        groups_id                     (groups_id),
   INDEX        ix_collection_filecheck      (filecheck),
   INDEX        ix_collection_dateadded      (dateadded),
-  INDEX        ix_collection_releaseid      (releaseid),
+  INDEX        ix_collection_releaseid      (releases_id),
   UNIQUE INDEX ix_collection_collectionhash (collectionhash)
 )
   ENGINE          = MYISAM
@@ -461,13 +462,13 @@ DROP TABLE IF EXISTS missed_parts;
 CREATE TABLE missed_parts (
   id       INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   numberid BIGINT UNSIGNED  NOT NULL,
-  group_id INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to groups.id',
+  groups_id INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to groups.id',
   attempts TINYINT(1)       NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
   INDEX ix_missed_parts_attempts                  (attempts),
-  INDEX ix_missed_parts_groupid_attempts          (group_id, attempts),
-  INDEX ix_missed_parts_numberid_groupsid_attempts (numberid, group_id, attempts),
-  UNIQUE INDEX ix_missed_parts_numberid_groupsid          (numberid, group_id)
+  INDEX ix_missed_parts_groupid_attempts          (groups_id, attempts),
+  INDEX ix_missed_parts_numberid_groupsid_attempts (numberid, groups_id, attempts),
+  UNIQUE INDEX ix_missed_parts_numberid_groupsid          (numberid, groups_id)
 )
   ENGINE = MYISAM
   DEFAULT CHARSET = utf8
@@ -531,6 +532,49 @@ CREATE TABLE musicinfo (
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
 
+DROP TABLE IF EXISTS multigroup_collections;
+CREATE TABLE         multigroup_collections (
+  id             INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
+  subject        VARCHAR(255)        NOT NULL DEFAULT '',
+  fromname       VARCHAR(255)        NOT NULL DEFAULT '',
+  date           DATETIME            DEFAULT NULL,
+  xref           VARCHAR(510)        NOT NULL DEFAULT '',
+  totalfiles     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  groups_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  collectionhash VARCHAR(255)        NOT NULL DEFAULT '0',
+  collection_regexes_id INT SIGNED NOT NULL DEFAULT '0' COMMENT 'FK to collection_regexes.id',
+  dateadded      DATETIME            DEFAULT NULL,
+  added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  filecheck      TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  filesize       BIGINT UNSIGNED     NOT NULL DEFAULT '0',
+  releases_id      INT                 NULL,
+  noise          CHAR(32)            NOT NULL DEFAULT '',
+  PRIMARY KEY                               (id),
+  INDEX        fromname                     (fromname),
+  INDEX        date                         (date),
+  INDEX        groups_id                     (groups_id),
+  INDEX        ix_collection_filecheck      (filecheck),
+  INDEX        ix_collection_dateadded      (dateadded),
+  INDEX        ix_collection_releaseid      (releases_id),
+  UNIQUE INDEX ix_collection_collectionhash (collectionhash)
+)
+  ENGINE          = MYISAM
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  AUTO_INCREMENT  = 1;
+
+DROP TABLE IF EXISTS multigroup_posters;
+CREATE TABLE multigroup_posters (
+  id             INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
+  poster       VARCHAR(255)        NOT NULL DEFAULT '',
+  PRIMARY KEY (id) ,
+  UNIQUE KEY (poster)
+)
+  ENGINE          = MYISAM
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
+
 
 DROP TABLE IF EXISTS content;
 CREATE TABLE content (
@@ -555,12 +599,12 @@ CREATE TABLE content (
 
 DROP TABLE IF EXISTS parts;
 CREATE TABLE parts (
-  binaryid      BIGINT(20) UNSIGNED                      NOT NULL DEFAULT '0',
+  binaries_id      BIGINT(20) UNSIGNED                      NOT NULL DEFAULT '0',
   messageid     VARCHAR(255)        CHARACTER SET latin1 NOT NULL DEFAULT '',
   number        BIGINT UNSIGNED                          NOT NULL DEFAULT '0',
   partnumber    MEDIUMINT UNSIGNED                       NOT NULL DEFAULT '0',
   size          MEDIUMINT UNSIGNED                       NOT NULL DEFAULT '0',
-  PRIMARY KEY (binaryid,number)
+  PRIMARY KEY (binaries_id,number)
 )
   ENGINE = MYISAM
   DEFAULT CHARSET = utf8
@@ -1297,6 +1341,14 @@ CREATE TABLE         xxxinfo (
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 1;
 
+DROP TABLE IF EXISTS multigroup_binaries;
+CREATE TABLE multigroup_binaries LIKE binaries;
+
+DROP TABLE IF EXISTS multigroup_parts;
+CREATE TABLE multigroup_parts LIKE parts;
+
+DROP TABLE IF EXISTS multigroup_missed_parts;
+CREATE TABLE multigroup_missed_parts LIKE missed_parts;
 
 
 DELIMITER $$
@@ -1377,30 +1429,30 @@ CREATE PROCEDURE loop_cbpm(IN method CHAR(10))
     main: BEGIN
     DECLARE done INT DEFAULT 0;
     DECLARE tname VARCHAR(255) DEFAULT '';
+    DECLARE regstr VARCHAR(255) CHARSET utf8 COLLATE utf8_general_ci DEFAULT '';
+
     DECLARE cur1 CURSOR FOR
       SELECT TABLE_NAME
       FROM information_schema.TABLES
       WHERE
         TABLE_SCHEMA = (SELECT DATABASE())
-        AND
-        (
-          TABLE_NAME LIKE 'collections%'
-          OR TABLE_NAME LIKE 'parts%'
-          OR TABLE_NAME LIKE 'binaries%'
-          OR TABLE_NAME LIKE 'missed%'
-        )
+        AND TABLE_NAME REGEXP regstr
       ORDER BY TABLE_NAME ASC;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
     IF method NOT IN ('repair', 'analyze', 'optimize', 'drop', 'truncate')
     THEN LEAVE main; END IF;
 
+    IF method = 'drop' THEN SET regstr = '^(collections|binaries|parts|missed_parts)_[0-9]+$';
+    ELSE SET regstr = '^(multigroup_)?(collections|binaries|parts|missed_parts)(_[0-9]+)?$';
+    END IF;
+
     OPEN cur1;
-    alter_loop: LOOP FETCH cur1
+    cbpm_loop: LOOP FETCH cur1
     INTO tname;
       IF done
-      THEN LEAVE alter_loop; END IF;
-      SET @SQL := CONCAT(method, " TABLE ", tname);
+      THEN LEAVE cbpm_loop; END IF;
+      SET @SQL := CONCAT(method, ' TABLE ', tname);
       PREPARE _stmt FROM @SQL;
       EXECUTE _stmt;
       DEALLOCATE PREPARE _stmt;
