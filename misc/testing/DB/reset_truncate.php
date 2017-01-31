@@ -7,7 +7,7 @@ use nntmux\db\DB;
 
 $pdo = new DB();
 
-f (isset($argv[1]) && ($argv[1] == "true" || $argv[1] == "drop")) {
+if (isset($argv[1]) && ($argv[1] == "true" || $argv[1] == "drop")) {
 $pdo->queryExec("UPDATE groups SET first_record = 0, first_record_postdate = NULL, last_record = 0, last_record_postdate = NULL, last_updated = NULL");
 echo $pdo->log->primary("Reseting all groups completed.");
 
