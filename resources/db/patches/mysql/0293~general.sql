@@ -41,7 +41,6 @@ CREATE PROCEDURE loop_cbpm(IN method CHAR(10))
       DEALLOCATE PREPARE _stmt;
     END LOOP;
     CLOSE cur1;
-  END;
-$$
+  END; $$
 
 DELIMITER ;
