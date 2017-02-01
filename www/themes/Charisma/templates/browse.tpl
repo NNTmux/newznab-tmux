@@ -127,7 +127,10 @@
 												{$result.grabs} Grab{if $result.grabs != 1}s{/if} /
 												<i class="fa fa-thumbs-o-down"></i>
 												{$result.failed} Failed Download{if $result.failed != 1}s{/if}
-												</span>{/if}                                    </td>
+												</span>{/if}
+											<span class="label label-primary">{$result.group_name}</span>
+											<span class="label label-primary">{$result.fromname}</span>
+										</td>
 										<td><span class="label label-default">{$result.category_name}</span>
 										</td>
 										<td>{$result.postdate|timeago}</td>

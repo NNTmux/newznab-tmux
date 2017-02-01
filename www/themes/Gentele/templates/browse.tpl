@@ -139,6 +139,8 @@
 													<i class="fa fa-thumbs-o-down"></i>
 													{$result.failed} Failed Download{if $result.failed != 1}s{/if}
 													</span>{/if}
+												<span class="label label-primary">{$result.group_name}</span>
+												<span class="label label-primary">{$result.fromname}</span>
 											</td>
 											<td><span class="label label-primary">{$result.category_name}</span>
 											</td>
