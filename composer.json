@@ -60,10 +60,15 @@
     {
       "type": "vcs",
       "url": "https://github.com/unionofrad/manual"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/b3rs3rk/steamfront"
     }
   ],
   "require": {
     "php": ">=5.6.9",
+    "roave/security-advisories": "dev-master",
     "barracudanetworks/forkdaemon-php": "~1.0",
     "b3rs3rk/steamfront": "dev-master",
     "dariusiii/rarinfo": "dev-master",
