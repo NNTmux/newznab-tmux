@@ -397,6 +397,8 @@ class Games
 	 */
 	public function updateGamesInfo($gameInfo)
 	{
+		//wait 10 seconds before proceeding (steam api limit)
+		sleep(10);
 		$gen = new Genres(['Settings' => $this->pdo]);
 		$ri = new ReleaseImage($this->pdo);
 
@@ -548,47 +550,46 @@ class Games
 					}
 					break;
 				case "steam":
-					if (!empty($this->_gameResults['header'])) {
-						$con['coverurl'] = (string)$this->_gameResults['header'];
+					if (!empty($this->_gameResults['cover'])) {
+						$con['coverurl'] = (string)$this->_gameResults['cover'];
 					}
 
-					if (!empty($this->_gameResults['background'])) {
-						$con['backdropurl'] = (string)$this->_gameResults['background'];
+					if (!empty($this->_gameResults['backdrop'])) {
+						$con['backdropurl'] = (string)$this->_gameResults['backdrop'];
 					}
 
 					$con['title'] = (string)$this->_gameResults['name'];
-					$con['asin'] = $this->_gameResults['appid'];
+					$con['asin'] = $this->_gameResults['steamid'];
 					$con['url'] = (string)$this->_gameResults['directurl'];
 
-					if (!empty($this->_gameResults['publishers'])) {
-						$con['publisher'] = (string)$this->_gameResults['publishers'];
+					if (!empty($this->_gameResults['publisher'])) {
+						$con['publisher'] = (string)$this->_gameResults['publisher'];
 					} else {
 						$con['publisher'] = 'Unknown';
 					}
 
-					if (isset($this->_gameResults->metacritic['score'])) {
+					if (!empty($this->_gameResults['rating'])) {
 						$con['esrb'] = (string)$this->_gameResults['rating'];
 					} else {
 						$con['esrb'] = 'Not Rated';
 					}
 
-					if (!empty($this->_gameResults->releasedate['date'])) {
-						$dateReleased = $this->_gameResults->releasedate['date'];
+					if (!empty($this->_gameResults['releasedate'])) {
+						$dateReleased = $this->_gameResults['releasedate'];
 						$date = \DateTime::createFromFormat('M/j/Y', $dateReleased);
 						if ($date instanceof \DateTime) {
 							$con['releasedate'] = (string)$date->format('Y-m-d');
 						}
 					}
 
-					if (!empty($this->_gameResults->description['short'])) {
-						$con['review'] = trim(strip_tags((string)$this->_gameResults['description']));
+					if (!empty($this->_gameResults['description'])) {
+						$con['review'] = (string)$this->_gameResults['description'];
 					}
 
 
-					if (isset($this->_gameResults->genres)) {
-						foreach ($this->_gameResults->genres as $genres) {
+					if (!empty($this->_gameResults['genres'])) {
+						$genres = implode('-' , $this->_gameResults['genres']);
 							$genreName = $this->_matchGenre($genres);
-						}
 					}
 					break;
 				default:

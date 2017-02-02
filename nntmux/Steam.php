@@ -2,7 +2,6 @@
 namespace nntmux;
 
 use b3rs3rk\steamfront\Main;
-use nntmux\db\DB;
 
 class Steam
 {
@@ -34,12 +33,24 @@ class Steam
 	 *
 	 * @param integer $appID
 	 *
-	 * @return \b3rs3rk\steamfront\data\App
+	 * @return array
 	 */
 	public function getAll($appID)
 	{
-		return $this->steamClient->getAppDetails($appID);
-
+		$res = $this->steamClient->getAppDetails($appID);
+		$result = [
+			'title' => $res->name,
+			'description' => $res->description['short'],
+			'cover' => $res->images['header'],
+			'backdrop' => $res->images['background'],
+			'steamid' =>$res->appid,
+			'directurl' => Main::STEAM_STORE_ROOT . 'app/' . $res->appid,
+			'publisher' => $res->publishers,
+			'rating' => $res->metacritic['score'],
+			'releasedate' => $res->releasedate['date'],
+			'genres' => $res->genres
+		];
+	   return $result;
 	}
 
 
