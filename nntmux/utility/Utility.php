@@ -245,7 +245,7 @@ class Utility
 		// Check database patch version
 		if ($patch < $ver) {
 			$message = "\nYour database is not up to date. Reported patch levels\n   Db: $patch\nfile: $ver\nPlease update.\n php " .
-				NN_ROOT . "cli/update_db.php true\n";
+				NN_ROOT . "./tmux update db\n";
 			if (self::isCLI()) {
 				echo (new ColorCLI())->error($message);
 			}
@@ -1109,5 +1109,20 @@ class Utility
 	public static function htmlfmt($string)
 	{
 		return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
+	}
+
+	/**
+	 * Convert multi to single dimensional array
+	 * Code taken from http://stackoverflow.com/a/12309103
+	 *
+	 * @param $array
+	 *
+	 * @param $separator
+	 *
+	 * @return string
+	 */
+	public static function convertMultiArray($array, $separator)
+	{
+		return implode("$separator",array_map(function($a) {return implode(",",$a);},$array));
 	}
 }

@@ -20,6 +20,7 @@
  */
 namespace nntmux\db\populate;
 
+use GuzzleHttp\Client;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 
@@ -55,6 +56,15 @@ class PopulateTitles
 	protected $sourceURL;
 
 	protected $tempTable;
+
+	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
+	 * @param $options
+	 */
 
 	public function  __constructor($options)
 	{
@@ -135,8 +145,9 @@ class PopulateTitles
 	 */
 	protected function saveSourceFile($pathname)
 	{
+		$client = new Client();
 		$result = false;
-		$file = Utility::getUrl(['url' => $this->sourceURL]);
+		$file = $client->get($this->sourceURL)->getBody();
 		if ($file !== false) {
 			$result = file_put_contents($pathname, $file);
 		}

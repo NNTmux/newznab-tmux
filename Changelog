@@ -1,3 +1,59 @@
+2017-02-01 DariusIII
+	* Chg: Add groupname and poster to browse pages in themes
+2017-01-31 DariusIII
+	* Chg: Update rarinfo
+2017-01-30 DariusIII
+	* Chg: Change handling of post data by guzzlehttp in NZBGet class
+2017-01-28 DariusIII
+	* Fix: Fix errors in XXX releases processing
+2017-01-26 DariusIII
+	* Fix: Fix bug in handling partrepair and used tables in binaries class
+	* Chg: Slightly refactor Steam class
+	* Chg: Refactor XXX info related classes
+2017-01-25 DariusIII
+	* Chg: Not using sphinx in ReleaseRemover anymore, as it does not remove releases properly
+2017-01-24 DariusIII
+	* Chg: Refactor RemoveCrapReleases
+	* Chg: Update resetdb with cbpm_loop
+	* Fix: Fix wrong check for yydecoderpath
+2017-01-18 DariusIII
+	* Chg: Prevent undefined index output on nzb-import page
+	* Chg: Add back construct to RequestIDLocal
+	* Chg: Small optimization of RequestID code
+2017-01-16 DariusIII
+	* Chg: Fix ADE getUtl function
+2017-01-13 DariusIII
+	* Chg: Use guzzlehttp to retrieve data from ADE and ADM
+2017-01-12 DariusIIi
+	* Chg: Use guzzlehttp to retrieve data from AEBN
+2017-01-11 DariusIII
+	* Chg: Add check for tmux version (ported from nZEDb)
+2017-01-05 DariusIII
+	* Chg: Update guzzlehttp
+2016-12-29 DariusIII
+	* Chg: Update phpmailer and guzzlehttp libraries
+2016-12-28 DariusIII
+	* Chg: Make match_prefiles more in depth and work in chunks of releases in full mode (ported from nZEDb)
+	* Chg: Update tmux.conf and add separate tmux configurations for older and newer tmux versions (ported from nZEDb)
+	* Chg: Add remote installer script (reused from nZEDb)
+2016-12-27 DariusIII
+	* Chg: Update composer.lock
+	* Chg: Add Travis-CI build status to README.md
+2016-12-23 DariusIII
+	* Chg: Move predb to admin from frontend
+2016-12-20 DariusIII
+	* Chg: Make guzzlehttp http error messages more informative
+	* Fix: Fix the broken delete_release stored procedure
+2016-12-19 DariusIII
+	* Chg: Revert to old style deleteSingle function (non-SP)
+	* Chg: Change checks for minfiles and minsize values in ProcessReleases class
+	* Chg: Improve the folder matching regex
+2016-12-16 DariusIII
+	* Chg: Improve renaming of releases
+2016-12-15 DariusIII
+	* Chg: Disable Desura game lookups as desura site is not serving any information for now
+2016-12-13 DariusIII
+	* Chg: Update CouchPotato and SABNzbd to use guzzlehttp
 2016-12-12 DariusIII
 	* Chg: Use guzzlehttp for RequestIDWeb lookups
 2016-12-09 DariusIII

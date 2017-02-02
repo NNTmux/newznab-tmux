@@ -2,9 +2,7 @@
 namespace nntmux;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\Psr7;
+use GuzzleHttp\Exception\RequestException;
 use nntmux\db\DB;
 
 /**
@@ -93,19 +91,20 @@ class ReleaseImage
 	 */
 	protected function fetchImage($imgLoc)
 	{
+		$pdo = new DB();
 		$img = false;
 		if (strpos(strtolower($imgLoc), 'http:') === 0 || strpos(strtolower($imgLoc), 'https:') === 0) {
 			try {
 				$img = $this->client->get($imgLoc)->getBody()->getContents();
-			} catch (ClientException $e) {
-				if(NN_DEBUG && !empty($e)) {
-					echo Psr7\str($e->getRequest());
-					echo Psr7\str($e->getResponse());
-				}
-			} catch (ServerException $se) {
-				if (NN_DEBUG && !empty($se)) {
-					echo Psr7\str($se->getRequest());
-					echo Psr7\str($se->getResponse());
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$pdo->log->doEcho($pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$pdo->log->doEcho($pdo->log->notice('Service unavailable'));
+					} else {
+						$pdo->log->doEcho($pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+					}
 				}
 			}
 
@@ -118,7 +117,7 @@ class ReleaseImage
 			try {
 				$imagick->readImageBlob($img);
 			} catch (\ImagickException $imgError) {
-				echo 'Bad image data, skipping processing' . PHP_EOL;
+				$pdo->log->doEcho($pdo->log->notice('Invalid image data, skipping processing') . PHP_EOL);
 				$imgFail = true;
 			}
 			if ($imgFail === false) {

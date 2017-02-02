@@ -1,7 +1,11 @@
 <?php
 namespace nntmux;
 
-use nntmux\utility\Utility;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Client;
+use nntmux\db\DB;
 
 class AEBN
 {
@@ -22,29 +26,39 @@ class AEBN
 	/**
 	 * Url Constants used within this class
 	 */
-	const AEBNGURL = "http://gay.theater.aebn.net";
-	const AEBNSURL = "http://straight.theater.aebn.net";
-	const IF18 = "http://straight.theater.aebn.net/dispatcher/frontDoor?genreId=101&theaterId=13992&locale=en&refid=AEBN-000001";
-	const TRAILINGSEARCH = "/dispatcher/fts?theaterId=13992&genreId=101&locale=en&count=30&imageType=Large&targetSearchMode=basic&isAdvancedSearch=false&isFlushAdvancedSearchCriteria=false&sortType=Relevance&userQuery=title%3A+%2B";
-	const TRAILERURL = "/dispatcher/previewPlayer?locale=en&theaterId=13992&genreId=101&movieId=";
+	const AEBNGURL = 'http://gay.theater.aebn.net';
+	const AEBNSURL = 'http://straight.theater.aebn.net';
+	const IF18 = 'http://straight.theater.aebn.net/dispatcher/frontDoor?genreId=101&theaterId=13992&locale=en&refid=AEBN-000001';
+	const TRAILINGSEARCH = '/dispatcher/fts?theaterId=13992&genreId=101&locale=en&count=30&imageType=Large&targetSearchMode=basic&isAdvancedSearch=false&isFlushAdvancedSearchCriteria=false&sortType=Relevance&userQuery=title%3A+%2B';
+	const TRAILERURL = '/dispatcher/previewPlayer?locale=en&theaterId=13992&genreId=101&movieId=';
 
 	/**
 	 * Sets the current site to search
 	 * @var string
 	 */
-	protected $_currentSite = "straight";
+	protected $_currentSite = 'straight';
 
 	/**
 	 * Direct Url in getAll method
 	 * @var string
 	 */
-	protected $_directUrl = "";
+	protected $_directUrl = '';
 
 	/**
 	 * Simple Html Dom Object
 	 * @var \simple_html_dom
 	 */
 	protected $_html;
+
+	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
+	 * @var DB
+	 */
+	protected $pdo;
 
 	/**
 	 * Post Parameters to use with curl
@@ -85,13 +99,13 @@ class AEBN
 	 * Sets title in getAll method
 	 * @var string
 	 */
-	protected $_title = "";
+	protected $_title = '';
 
 	/**
 	 * Trailing Url
 	 * @var string
 	 */
-	protected $_trailUrl = "";
+	protected $_trailUrl = '';
 
 	/**
 	 * Used in __construct
@@ -107,10 +121,14 @@ class AEBN
 	 */
 	public function __construct()
 	{
-		$this->_whichSite = ["straight" => self::AEBNSURL, "gay" => self::AEBNGURL];
+		$this->_whichSite = ['straight' => self::AEBNSURL, 'gay' => self::AEBNGURL];
 		$this->_html = new \simple_html_dom();
-		if (isset($this->cookie)) {
-			$this->getUrl();
+		$this->client = new Client();
+		$this->cookiejar = new CookieJar();
+		$this->pdo = new DB();
+		if (!empty($this->cookie)) {
+			$cookieJar = $this->cookiejar->setCookie(SetCookie::fromString($this->cookie));
+			$this->client = new Client(['cookies' => $cookieJar]);
 		}
 	}
 
@@ -120,8 +138,7 @@ class AEBN
 	public function __destruct()
 	{
 		$this->_html->clear();
-		unset($this->_response);
-		unset($this->_res);
+		unset($this->_response, $this->_res);
 	}
 
 	/**
@@ -131,11 +148,10 @@ class AEBN
 	 */
 	public function trailers()
 	{
-		if ($ret = $this->_html->find("a[itemprop=trailer]", 0)) {
-			if (preg_match('/movieId=(?<movieid>\d+)&/', trim($ret->href), $matches)) {
-				$movieid = $matches['movieid'];
-				$this->_res['trailers']['url'] = $this->_whichSite[$this->_currentSite] . self::TRAILERURL . $movieid;
-			}
+		$ret = $this->_html->find('a[itemprop=trailer]', 0);
+		if (preg_match('/movieId=(?<movieid>\d+)&/', trim($ret->href), $matches)) {
+			$movieid = $matches['movieid'];
+			$this->_res['trailers']['url'] = $this->_whichSite[$this->_currentSite] . self::TRAILERURL . $movieid;
 		}
 
 		return $this->_res;
@@ -148,10 +164,10 @@ class AEBN
 	 */
 	public function covers()
 	{
-		if ($ret = $this->_html->find("div#md-boxCover, img[itemprop=thumbnailUrl]", 1)) {
+		if ($ret = $this->_html->find('div#md-boxCover, img[itemprop=thumbnailUrl]', 1)) {
 			$ret = trim($ret->src);
-			$this->_res['boxcover'] = str_ireplace("160w.jpg", "xlf.jpg", $ret);
-			$this->_res['backcover'] = str_ireplace("160w.jpg", "xlb.jpg", $ret);
+			$this->_res['boxcover'] = str_ireplace('160w.jpg', 'xlf.jpg', $ret);
+			$this->_res['backcover'] = str_ireplace('160w.jpg', 'xlb.jpg', $ret);
 		}
 		return $this->_res;
 	}
@@ -163,8 +179,8 @@ class AEBN
 	 */
 	public function genres()
 	{
-		if ($ret = $this->_html->find("div.md-detailsCategories", 0)) {
-			foreach ($ret->find("a[itemprop=genre]") as $genre) {
+		if ($ret = $this->_html->find('div.md-detailsCategories', 0)) {
+			foreach ($ret->find('a[itemprop=genre]') as $genre) {
 				$this->_res['genres'][] = trim($genre->plaintext);
 			}
 		}
@@ -179,14 +195,14 @@ class AEBN
 	 */
 	public function cast()
 	{
-		if ($ret = $this->_html->find("div.starsFull", 0)) {
-			foreach ($ret->find("span[itemprop=name]") as $star) {
+		if ($ret = $this->_html->find('div.starsFull', 0)) {
+			foreach ($ret->find('span[itemprop=name]') as $star) {
 				$this->_res['cast'][] = trim($star->plaintext);
 			}
 		} else {
-			if ($ret = $this->_html->find("div.detailsLink", 0)) {
-				foreach ($ret->find("span") as $star) {
-					if (!preg_match("/More/", $star->plaintext) && !preg_match("/Stars/", $star->plaintext)) {
+			if ($ret = $this->_html->find('div.detailsLink', 0)) {
+				foreach ($ret->find('span') as $star) {
+					if (strpos($star->plaintext, '/More/') !== false && strpos($star->plaintext, '/Stars/') !== false) {
 						$this->_res['cast'][] = trim($star->plaintext);
 					}
 				}
@@ -203,21 +219,20 @@ class AEBN
 	 */
 	public function productInfo()
 	{
-		if ($ret = $this->_html->find("div#md-detailsLeft", 0)) {
-			foreach ($ret->find("div") as $div) {
-				foreach ($div->find("span") as $span) {
+		if ($ret = $this->_html->find('div#md-detailsLeft', 0)) {
+			foreach ($ret->find('div') as $div) {
+				foreach ($div->find('span') as $span) {
 					$span->plaintext = rawurldecode($span->plaintext);
-					$span->plaintext = preg_replace("/&nbsp;/", "", $span->plaintext);
+					$span->plaintext = preg_replace('/&nbsp;/', '', $span->plaintext);
 					$this->_res['productinfo'][] = trim($span->plaintext);
 				}
 			}
-			if (false !== $key = array_search("Running Time:", $this->_res['productinfo'])) {
+			if (false !== $key = array_search('Running Time:', $this->_res['productinfo'])) {
 				unset($this->_res['productinfo'][$key + 2]);
 			}
 			if (false !== $key = array_search("Director:", $this->_res['productinfo'])) {
 				$this->_res['director'] = $this->_res['productinfo'][$key + 1];
-				unset($this->_res['productinfo'][$key]);
-				unset($this->_res['productinfo'][$key + 1]);
+				unset($this->_res['productinfo'][$key], $this->_res['productinfo'][$key + 1]);
 			}
 			$this->_res['productinfo'] = array_chunk($this->_res['productinfo'], 2, false);
 		}
@@ -233,9 +248,9 @@ class AEBN
 	 */
 	public function sypnosis()
 	{
-		if ($ret = $this->_html->find("span[itemprop=about]", 0)) {
-			if (is_null($ret)) {
-				if ($ret = $this->_html->find("div.movieDetailDescription", 0)) {
+		if ($ret = $this->_html->find('span[itemprop=about]', 0)) {
+			if ($ret === null) {
+				if ($ret = $this->_html->find('div.movieDetailDescription', 0)) {
 					$this->_res['sypnosis'] = trim($ret->plaintext);
 					$this->_res['sypnosis'] = preg_replace('/Description:\s/', "", $this->_res['plot']);
 				}
@@ -254,27 +269,27 @@ class AEBN
 	 */
 	public function search()
 	{
-		if (!isset($this->searchTerm)) {
+		if (empty($this->searchTerm)) {
 			return false;
 		}
 		$this->_trailUrl = self::TRAILINGSEARCH . urlencode($this->searchTerm);
-		if ($this->getUrl(false, $this->_currentSite) === false) {
+		if ($this->getUrl($this->_currentSite) === false) {
 			return false;
 		} else {
-			if ($count = count($this->_html->find("div.movie"))) {
+			if ($count = count($this->_html->find('div.movie'))) {
 				$i = 1;
-				foreach ($this->_html->find("div.movie") as $movie) {
-					$string = "a#FTSMovieSearch_link_title_detail_" . $i;
+				foreach ($this->_html->find('div.movie') as $movie) {
+					$string = 'a#FTSMovieSearch_link_title_detail_' . $i;
 					if ($ret = $movie->find($string, 0)) {
-						$title = preg_replace('/XXX/', '', $ret->title);
-						$title = preg_replace('/\(.*?\)|[-._]/i', ' ', $title);
+						$title = str_replace('/XXX/', '', $ret->title);
+						$title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
 						$title = trim($title);
 						similar_text(strtolower($this->searchTerm), strtolower($title), $p);
 						if ($p >= 90) {
 							$this->_title = trim($ret->title);
 							$this->_trailUrl = html_entity_decode($ret->href);
 							$this->_directUrl = $this->_whichSite[$this->_currentSite] . $this->_trailUrl;
-							$this->getUrl(false, $this->_currentSite);
+							$this->getUrl($this->_currentSite);
 							return true;
 						} else {
 							continue;
@@ -283,10 +298,10 @@ class AEBN
 					$i++;
 				}
 				if ($i === $count || $count === 0) {
-					if ($this->_currentSite === "gay") {
+					if ($this->_currentSite === 'gay') {
 						return false;
 					}
-					$this->_currentSite = "gay";
+					$this->_currentSite = 'gay';
 					$this->search();
 				}
 			} else {
@@ -305,14 +320,14 @@ class AEBN
 	public function getAll()
 	{
 		$results = [];
-		if (isset($this->_directUrl)) {
+		if (!empty($this->_directUrl)) {
 			$results['title'] = $this->_title;
 			$results['directurl'] = $this->_directUrl;
 		}
 		if (is_array($this->sypnosis())) {
 			$results = array_merge($results, $this->sypnosis());
 		}
-		if (is_array($this->productinfo())) {
+		if (is_array($this->productInfo())) {
 			$results = array_merge($results, $this->productInfo());
 		}
 		if (is_array($this->cast())) {
@@ -337,44 +352,47 @@ class AEBN
 	/**
 	 * Get Raw html of webpage
 	 *
-	 * @param bool $usepost
 	 * @param string $site
 	 *
 	 * @return bool
 	 */
-	private function getUrl($usepost = false, $site = "straight")
+	private function getUrl($site = 'straight')
 	{
-		if (isset($this->_trailUrl)) {
-			$ch = curl_init($this->_whichSite[$site] . $this->_trailUrl);
+		if (!empty($this->_trailUrl)) {
+			try {
+				$this->_response = $this->client->get($this->_whichSite[$site] . $this->_trailUrl)->getBody()->getContents();
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					}
+				}
+			}
 		} else {
-			$ch = curl_init(self::IF18);
+			try {
+				$this->_response = $this->client->get(self::IF18)->getBody()->getContents();
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					}
+				}
+			}
 		}
 
-		if ($usepost === true) {
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-			curl_setopt($ch, CURLOPT_POST, 1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_postParams);
-		}
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_VERBOSE, 0);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
-		curl_setopt($ch, CURLOPT_FAILONERROR, 1);
-		if (isset($this->cookie)) {
-			curl_setopt($ch, CURLOPT_COOKIEJAR, $this->cookie);
-			curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie);
-		}
-		curl_setopt_array($ch, Utility::curlSslContextOptions());
-		$this->_response = curl_exec($ch);
 		if (!$this->_response) {
-			curl_close($ch);
-
 			return false;
 		}
-		curl_close($ch);
-		$this->_html->load($this->_response);
 
+		$this->_html->load($this->_response);
 		return true;
 	}
 }

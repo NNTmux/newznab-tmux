@@ -16,6 +16,7 @@ use nntmux\Binaries;
 use nntmux\Groups;
 use nntmux\Nfo;
 use nntmux\NNTP;
+use nntmux\processing\ProcessReleasesMultiGroup;
 use nntmux\RequestIDLocal;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
@@ -150,6 +151,7 @@ switch ($options[1]) {
 	case 'releases':
 		$pdo = new DB();
 		$releases = new ProcessReleases(['Settings' => $pdo]);
+		$mgrreleases = new ProcessReleasesMultiGroup(['Settings' => $pdo]);
 
 		//Runs function that are per group
 		if (is_numeric($options[2])) {
@@ -158,9 +160,11 @@ switch ($options[1]) {
 				collectionCheck($pdo, $options[2]);
 			}
 
-			processReleases($pdo, $releases, $options[2]);
-
+			processReleases($releases, $options[2]);
 		} else {
+
+			// Run MGR once after all other release updates for standard groups
+			processReleases(new ProcessReleasesMultiGroup(['Settings' => $pdo]), '');
 
 			// Run functions that run on releases table after all others completed.
 			$groupCount = rtrim($options[2], '_');
@@ -221,7 +225,8 @@ switch ($options[1]) {
 			$backFill->backfillAllGroups($groupMySQL['name'], 20000, 'normal');
 
 			// Create releases.
-			processReleases($pdo, new ProcessReleases(['Settings' => $pdo]), $options[2]);
+			processReleases(new ProcessReleases(['Settings' => $pdo]), $options[2]);
+			processReleases(new ProcessReleasesMultiGroup(['Settings' => $pdo]), $options[2]);
 
 			// Post process the releases.
 			(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start($options[2]);
@@ -276,11 +281,10 @@ switch ($options[1]) {
 /**
  * Create / process releases for a groupID.
  *
- * @param Settings        $pdo
- * @param ProcessReleases $releases
+ * @param ProcessReleases|ProcessReleasesMultiGroup $releases
  * @param int             $groupID
  */
-function processReleases($pdo, $releases, $groupID)
+function processReleases($releases, $groupID)
 {
 	$releaseCreationLimit = (Settings::value('..maxnzbsprocessed') != '' ? (int)Settings::value('..maxnzbsprocessed') : 1000);
 	$releases->processIncompleteCollections($groupID);
@@ -292,7 +296,7 @@ function processReleases($pdo, $releases, $groupID)
 		$nzbFilesAdded = $releases->createNZBs($groupID);
 
 		// This loops as long as the number of releases or nzbs added was >= the limit (meaning there are more waiting to be created)
-	} while (($releasesCount['added'] + $releasesCount['dupes']) >= $releaseCreationLimit || $nzbFilesAdded >= $releaseCreationLimit);
+	} while (($releasesCount['added'] + $releasesCount['dupes'] >= $releaseCreationLimit || $nzbFilesAdded >= $releaseCreationLimit));
 	$releases->deleteCollections($groupID);
 }
 

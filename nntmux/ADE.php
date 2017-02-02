@@ -1,6 +1,9 @@
 <?php
 namespace nntmux;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 
@@ -13,7 +16,7 @@ class ADE
 	 * If a direct link is given parse it rather then search
 	 * @var string
 	 */
-	public $directLink = "";
+	public $directLink = '';
 
 	/**
 	 * If a string is found do call back.
@@ -25,12 +28,12 @@ class ADE
 	 * Search keyword
 	 * @var string
 	 */
-	public $searchTerm = "";
+	public $searchTerm = '';
 
 	/**
 	 * Define ADE Url here
 	 */
-	const ADE = "http://www.adultdvdempire.com";
+	const ADE = 'http://www.adultdvdempire.com';
 
 	/**
 	 * Direct Url returned in getAll method
@@ -53,12 +56,12 @@ class ADE
 	protected $_title = "";
 
 	/** Trailing urls */
-	protected $_dvdQuery = "/dvd/search?q=";
-	protected $_scenes = "/scenes";
-	protected $_boxCover = "/boxcover";
-	protected $_backCover = "/backcover";
-	protected $_reviews = "/reviews";
-	protected $_trailers = "/trailers";
+	protected $_dvdQuery = '/dvd/search?q=';
+	protected $_scenes = '/scenes';
+	protected $_boxCover = '/boxcover';
+	protected $_backCover = '/backcover';
+	protected $_reviews = '/reviews';
+	protected $_trailers = '/trailers';
 
 
 	protected $_url;
@@ -69,10 +72,22 @@ class ADE
 	protected $_edithtml;
 	protected $_ch;
 
+	/**
+	 * @var Client
+	 */
+	protected $client;
+
+	/**
+	 * @var DB
+	 */
+	protected $pdo;
+
 	public function __construct()
 	{
 		$this->_html = new \simple_html_dom();
 		$this->_edithtml = new \simple_html_dom();
+		$this->client = new Client();
+		$this->pdo = new DB();
 	}
 
 	/**
@@ -84,8 +99,7 @@ class ADE
 	{
 		$this->_html->clear();
 		$this->_edithtml->clear();
-		unset($this->_response);
-		unset($this->_tmpResponse);
+		unset($this->_response, $this->_tmpResponse);
 	}
 
 	/**
@@ -104,7 +118,7 @@ class ADE
 			) {
 				$this->_res['trailers']['streamid'] = trim($matches['streamid']);
 			}
-			if (preg_match('#(?:BaseStreamingUrl:\s\")(?P<baseurl>[0-9]+.[0-9]+.[0-9]+.[0-9]+)(?:\")#',
+			if (preg_match('#(?:BaseStreamingUrl:\s\")(?P<baseurl>[\d]+.[\d]+.[\d]+.[\d]+)(?:\")#',
 				$this->_response,
 				$matches)
 			) {
@@ -123,7 +137,7 @@ class ADE
 	 */
 	public function covers()
 	{
-		if ($ret = $this->_html->find("div#Boxcover, img[itemprop=image]", 1)) {
+		if ($ret = $this->_html->find('div#Boxcover, img[itemprop=image]', 1)) {
 			$this->_res['boxcover'] = preg_replace('/m\.jpg/', 'h.jpg', $ret->src);
 			$this->_res['backcover'] = preg_replace('/m\.jpg/', 'bh.jpg', $ret->src);
 		}
@@ -141,13 +155,12 @@ class ADE
 	public function sypnosis($tagline = false)
 	{
 		if ($tagline === true) {
-			if ($ret = $this->_html->find("p.Tagline", 0)) {
-				if (!empty($ret->plaintext)) {
-					$this->_res['tagline'] = trim($ret->plaintext);
-				}
+			$ret = $this->_html->find('p.Tagline', 0);
+			if (!empty($ret->plaintext)) {
+				$this->_res['tagline'] = trim($ret->plaintext);
 			}
 		}
-		if ($ret = @$this->_html->find("p.Tagline", 0)->next_sibling()->next_sibling()) {
+		if ($ret = @$this->_html->find('p.Tagline', 0)->next_sibling()->next_sibling()) {
 			$this->_res['sypnosis'] = trim($ret->innertext);
 		}
 
@@ -163,31 +176,29 @@ class ADE
 	 */
 	public function cast($awards = false)
 	{
-		$this->_tmpResponse = str_ireplace("Section Cast", "scast", $this->_response);
+		$this->_tmpResponse = str_ireplace('Section Cast', 'scast', $this->_response);
 		$this->_edithtml->load($this->_tmpResponse);
 
 
-		if ($ret = $this->_edithtml->find("div[class=scast]", 0)) {
+		if ($ret = $this->_edithtml->find('div[class=scast]', 0)) {
 			$this->_tmpResponse = trim($ret->outertext);
 			$ret = $this->_edithtml->load($this->_tmpResponse);
-			foreach ($ret->find("a.PerformerName") as $a) {
-				if ($a->plaintext != "(bio)") {
-					if ($a->plaintext != "(interview)") {
-						$this->_res['cast'][] = trim($a->plaintext);
+			foreach ($ret->find('a.PerformerName') as $a) {
+				if ($a->plaintext !== '(bio)' && $a->plaintext !== '(interview)') {
+					$this->_res['cast'][] = trim($a->plaintext);
 					}
 				}
 			}
-			if ($awards == true) {
-				if ($ret->find("ul", 1)) {
-					foreach ($ret->find("ul", 1)->find("li, strong") as $li) {
+			if ($awards === true) {
+				if ($ret->find('ul', 1)) {
+					foreach ($ret->find('ul', 1)->find('li, strong') as $li) {
 						$this->_res['awards'][] = trim($li->plaintext);
 					}
 				}
 			}
 			$this->_edithtml->clear();
-			unset($ret);
-			unset($this->_tmpResponse);
-		}
+			unset($ret, $this->_tmpResponse);
+
 		return $this->_res;
 	}
 
@@ -198,17 +209,17 @@ class ADE
 	public function genres()
 	{
 		$genres = [];
-		$this->_tmpResponse = str_ireplace("Section Categories", "scat", $this->_response);
+		$this->_tmpResponse = str_ireplace('Section Categories', 'scat', $this->_response);
 		$this->_edithtml->load($this->_tmpResponse);
-		if ($ret = $this->_edithtml->find("div[class=scat]", 0)) {
-			$ret = $ret->find("p", 0);
+		if ($ret = $this->_edithtml->find('div[class=scat]', 0)) {
+			$ret = $ret->find('p', 0);
 			$this->_tmpResponse = trim($ret->outertext);
 			$ret = $this->_edithtml->load($this->_tmpResponse);
 
-			foreach ($ret->find("a") as $categories) {
+			foreach ($ret->find('a') as $categories) {
 				$categories = trim($categories->plaintext);
-				if (stristr($categories, ",")) {
-					$genres = explode(",", $categories);
+				if (strpos($categories, ',') !== false) {
+					$genres = explode(',', $categories);
 					$genres = array_map('trim', $genres);
 				} else {
 					$genres[] = $categories;
@@ -219,8 +230,7 @@ class ADE
 			}
 		}
 		$this->_edithtml->clear();
-		unset($this->_tmpResponse);
-		unset($ret);
+		unset($this->_tmpResponse, $ret);
 		return $this->_res;
 	}
 
@@ -234,21 +244,21 @@ class ADE
 	public function productInfo($features = false)
 	{
 		$dofeature = null;
-		$this->_tmpResponse = str_ireplace("Section ProductInfo", "spdinfo", $this->_response);
+		$this->_tmpResponse = str_ireplace('Section ProductInfo', 'spdinfo', $this->_response);
 		$this->_edithtml->load($this->_tmpResponse);
-		if ($ret = $this->_edithtml->find("div[class=spdinfo]", 0)) {
+		if ($ret = $this->_edithtml->find('div[class=spdinfo]', 0)) {
 			$this->_tmpResponse = trim($ret->outertext);
 			$ret                = $this->_edithtml->load($this->_tmpResponse);
 			foreach ($ret->find("text") as $strong) {
-				if (trim($strong->innertext) == "Features") {
+				if (trim($strong->innertext) === 'Features') {
 					$dofeature = true;
 				}
 				if ($dofeature != true) {
-					if (trim($strong->innertext) != "&nbsp;") {
+					if (trim($strong->innertext) !== '&nbsp;') {
 						$this->_res['productinfo'][] = trim($strong->innertext);
 					}
 				} else {
-					if ($features == true) {
+					if ($features === true) {
 						$this->_res['extras'][] = trim($strong->innertext);
 					}
 				}
@@ -259,8 +269,7 @@ class ADE
 			$this->_res['productinfo'] = array_chunk($this->_res['productinfo'], 2, false);
 		}
 		$this->_edithtml->clear();
-		unset($this->_tmpResponse);
-		unset($ret);
+		unset($this->_tmpResponse, $ret);
 
 		return $this->_res;
 	}
@@ -283,17 +292,17 @@ class ADE
 	 */
 	public function search()
 	{
-		if (!isset($this->searchTerm)) {
+		if (empty($this->searchTerm)) {
 			return false;
 		}
 		if ($this->getUrl($this->_dvdQuery . rawurlencode($this->searchTerm)) === false) {
 			return false;
 		} else {
 			$this->_html->load($this->_response);
-			if ($ret = $this->_html->find("a.boxcover", 0)) {
+			if ($ret = $this->_html->find('a.boxcover', 0)) {
 				$title = $ret->title;
-				$title = preg_replace('/XXX/', '', $title);
-				$title = preg_replace('/\(.*?\)|[-._]/i', ' ', $title);
+				$title = str_replace('/XXX/', '', $title);
+				$title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
 				$ret   = (string)trim($ret->href);
 				similar_text(strtolower($this->searchTerm), strtolower($title), $p);
 				if ($p >= 90) {
@@ -327,26 +336,42 @@ class ADE
 	private function getUrl($trailing = "")
 	{
 		if (!empty($trailing)) {
-			$this->_ch = curl_init(self::ADE . $trailing);
+			try {
+				$this->_response = $this->client->get(self::ADE . $trailing)->getBody()->getContents();
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					}
+				}
+			}
 		}
 		if (!empty($this->directLink)) {
-			$this->_ch = curl_init($this->directLink);
-			$this->directLink = "";
+			try {
+				$this->_response = $this->client->get($this->directLink)->getBody()->getContents();
+				$this->directLink = "";
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					}
+				}
+			}
 		}
-		curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($this->_ch, CURLOPT_HEADER, 0);
-		curl_setopt($this->_ch, CURLOPT_VERBOSE, 0);
-		curl_setopt($this->_ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
-		curl_setopt($this->_ch, CURLOPT_FAILONERROR, 1);
-		curl_setopt_array($this->_ch, Utility::curlSslContextOptions());
-		$this->_response = curl_exec($this->_ch);
-		if (!$this->_response) {
-			curl_close($this->_ch);
 
+		if (!$this->_response) {
 			return false;
 		}
-		curl_close($this->_ch);
-		return true;
+
+		return $this->_response;
 	}
 
 	/**
@@ -357,7 +382,7 @@ class ADE
 	public function getAll()
 	{
 		$results = [];
-		if (isset($this->_directUrl)) {
+		if (!empty($this->_directUrl)) {
 			$results['directurl'] = $this->_directUrl;
 			$results['title']     = $this->_title;
 		}

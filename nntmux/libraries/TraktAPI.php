@@ -2,9 +2,8 @@
 namespace nntmux\libraries;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\Psr7;
+use GuzzleHttp\Exception\RequestException;
+use nntmux\db\DB;
 
 /**
  * Class TraktAPI
@@ -33,6 +32,11 @@ Class TraktAPI {
 	protected $client;
 
 	/**
+	 * @var DB
+	 */
+	protected $pdo;
+
+	/**
 	 * Construct. Assign passed request headers.  Headers should be complete with API key.
 	 *
 	 * @access public
@@ -49,6 +53,7 @@ Class TraktAPI {
 		}
 
 		$this->client = new Client();
+		$this->pdo = new DB();
 	}
 
 	/**
@@ -160,15 +165,15 @@ Class TraktAPI {
 						'headers' => $this->requestHeaders
 					]
 				)->getBody()->getContents();
-			} catch (ClientException $e) {
-				if(NN_DEBUG) {
-					echo Psr7\str($e->getRequest());
-					echo Psr7\str($e->getResponse());
-				}
-			} catch (ServerException $se) {
-				if (NN_DEBUG) {
-					echo Psr7\str($se->getRequest());
-					echo Psr7\str($se->getResponse());
+			} catch (RequestException $e) {
+				if ($e->hasResponse()) {
+					if($e->getCode() === 404) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					} else if ($e->getCode() === 503) {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					} else {
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+					}
 				}
 			}
 

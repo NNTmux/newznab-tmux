@@ -31,7 +31,7 @@ $page->smarty->assign([
 		'pagertotalitems'   => $page->users->getCount(),
 		'pageroffset'       => $offset,
 		'pageritemsperpage' => ITEMS_PER_PAGE,
-		'pagerquerybase'    => WWW_TOP . "/user-list.php?ob=" . $orderBy . $uSearch . "&amp;offset=",
+		'pagerquerybase'    => WWW_TOP . "/user-list.php?ob=" . $orderBy . $uSearch . "&offset=",
 		'userlist' => $page->users->getRange(
 			$offset, ITEMS_PER_PAGE, $orderBy, $variables['username'],
 			$variables['email'], $variables['host'], $variables['role'], true
@@ -40,7 +40,7 @@ $page->smarty->assign([
 );
 
 foreach ($ordering as $orderType) {
-	$page->smarty->assign('orderby' . $orderType, WWW_TOP . "/user-list.php?ob=" . $orderType . "&amp;offset=0");
+	$page->smarty->assign('orderby' . $orderType, WWW_TOP . "/user-list.php?ob=" . $orderType . "&offset=0");
 }
 
 $page->smarty->assign('pager', $page->smarty->fetch("pager.tpl"));
@@ -51,6 +51,6 @@ function checkREQUEST($param) {
 	global $uSearch, $variables;
 	if (isset($_REQUEST[$param])) {
 		$variables[$param] = $_REQUEST[$param];
-		$uSearch .= "&amp;$param=" . $_REQUEST[$param];
+		$uSearch .= "&$param=" . $_REQUEST[$param];
 	}
 }

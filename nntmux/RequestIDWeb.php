@@ -2,9 +2,7 @@
 namespace nntmux;
 
 use app\models\Settings;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\Psr7;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Attempts to find a PRE name for a release using a request id from our local pre database,
@@ -155,23 +153,19 @@ class RequestIDWeb extends RequestID
 
 		// Do a web lookup.
 		try {
-			$request = $this->client->request('POST', Settings::value('..request_url'),
-				[
-					'headers' => [
-						'data' => '=' . serialize($requestArray)
-					]
-				]
-			);
-			$returnXml = $request->xml();
-		} catch (ClientException $e) {
-			if(NN_DEBUG && !empty($e)) {
-				echo Psr7\str($e->getRequest());
-				echo Psr7\str($e->getResponse());
-			}
-		} catch (ServerException $se) {
-			if (NN_DEBUG && !empty($se)) {
-				echo Psr7\str($se->getRequest());
-				echo Psr7\str($se->getResponse());
+			$returnXml = $this->client->request('POST', Settings::value('..request_url'),
+				['Link' => 'data=' . serialize($requestArray)]
+			)->getBody();
+
+		} catch (RequestException $e) {
+			if ($e->hasResponse()) {
+				if($e->getCode() === 404) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+				} else if ($e->getCode() === 503) {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+				} else {
+					$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+				}
 			}
 		}
 
@@ -186,7 +180,7 @@ class RequestIDWeb extends RequestID
 
 				$groupIDArray = [];
 				foreach($returnXml->request as $result) {
-					if (isset($result['name']) && isset($result['ident']) && (int)$result['ident'] > 0) {
+					if (isset($result['name'], $result['ident']) && (int)$result['ident'] > 0) {
 						$this->_newTitle['title'] = (string)$result['name'];
 						$this->_requestID = (int)$result['reqid'];
 						$this->_release['id'] = (int)$result['ident'];
@@ -275,9 +269,9 @@ class RequestIDWeb extends RequestID
 
 		if ($dupeCheck === false) {
 			$this->_preDbID = (int)$this->pdo->queryInsert(
-				sprintf("
+				sprintf('
 					INSERT INTO predb (title, source, requestid, groups_id, predate)
-					VALUES (%s, %s, %d, %d, NOW())",
+					VALUES (%s, %s, %d, %d, NOW())',
 					$this->pdo->escapeString($this->_newTitle['title']),
 					$this->pdo->escapeString('requestWEB'),
 					$this->_requestID,

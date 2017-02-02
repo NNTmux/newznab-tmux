@@ -47,7 +47,6 @@ switch ($page->page) {
 	case 'nfo':
 	case 'nzbgetqueuedata':
 	case 'post_edit':
-	case 'predb':
 	case 'profile':
 	case 'profileedit':
 	case 'queue':

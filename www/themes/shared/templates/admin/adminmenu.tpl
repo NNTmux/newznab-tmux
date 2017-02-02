@@ -65,6 +65,12 @@
 					<li><a href="{$smarty.const.WWW_TOP}/book-list.php">View Book List</a></li>
 					</ul>
 			</li>
+			<li><a><i class="fa fa-object-group"></i><span> Multi Group</span><span class="fa fa-chevron-down"></span></a>
+				<ul class="nav child_menu" style="display: none">
+					<li><a href="{$smarty.const.WWW_TOP}/posters-edit.php">Add MultiGroup Poster</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/posters-list.php">MultiGroup Posters List</a></li>
+				</ul>
+			</li>
 			<li><a><i class="fa fa-download"></i><span> NZB</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/nzb-import.php">Import NZBs</a></li>
@@ -98,6 +104,11 @@
 			<li><a><i class="fa fa-linux"></i><span> Tmux</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/tmux-edit.php">Tmux Settings</a></li>
+				</ul>
+			</li>
+			<li><a><i class="fa fa-object-group"></i><span> Pre Database</span><span class="fa fa-chevron-down"></span></a>
+				<ul class="nav child_menu" style="display: none">
+					<li><a href="{$smarty.const.WWW_TOP}/predb.php">View Predb</a></li>
 				</ul>
 			</li>
 		</ul>

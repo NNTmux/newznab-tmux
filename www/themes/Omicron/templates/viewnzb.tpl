@@ -89,6 +89,9 @@
 						{if $xxx.classused === "ade"}<a class="label label-default" target="_blank"
 														href="{$site->dereferrer_link}{$xxx.directurl}"
 														title="View at Adult DVD Empire">ADE</a>
+						{elseif $xxx.classused === "adm"}<a class="label label-primary" target="_blank"
+															href="{$site->dereferrer_link}{$xxx.directurl}"
+															title="View at Adult DVD Marketplace">ADM</a>
 						{elseif $xxx.classused === "pop"}<a class="label label-default" target="_blank"
 															href="{$site->dereferrer_link}{$xxx.directurl}"
 															title="View at Popporn">PopPorn</a>
