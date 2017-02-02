@@ -406,11 +406,11 @@ class Games
 		// Steam has more details
 		$this->_gameResults = [];
 		$this->_getGame = new Steam();
-		$this->_classUsed = "steam";
-		$this->_getGame->cookie = $this->cookie;
+		$this->_classUsed = 'steam';
 		$this->_getGame->searchTerm = $gameInfo['title'];
-		if($this->_getGame->search() !== false){
-			$this->_gameResults = $this->_getGame->getAll();
+		$steamGameID = $this->_getGame->search($gameInfo['title']);
+		if($steamGameID !== false){
+			$this->_gameResults = $this->_getGame->getAll($steamGameID);
 		}
 		/*
 		 	if (count($this->_gameResults) < 1) {
@@ -548,59 +548,48 @@ class Games
 					}
 					break;
 				case "steam":
-					if (isset($this->_gameResults['cover']) && $this->_gameResults['cover'] != '') {
-						$con['coverurl'] = (string)$this->_gameResults['cover'];
+					if (!empty($this->_gameResults['header'])) {
+						$con['coverurl'] = (string)$this->_gameResults['header'];
 					}
 
-					if (isset($this->_gameResults['backdrop']) && $this->_gameResults['backdrop'] != '') {
-						$con['backdropurl'] = (string)$this->_gameResults['backdrop'];
+					if (!empty($this->_gameResults['background'])) {
+						$con['backdropurl'] = (string)$this->_gameResults['background'];
 					}
 
-					$con['title'] = (string)$this->_gameResults['title'];
-					$con['asin'] = $this->_gameResults['steamgameid'];
+					$con['title'] = (string)$this->_gameResults['name'];
+					$con['asin'] = $this->_gameResults['appid'];
 					$con['url'] = (string)$this->_gameResults['directurl'];
 
-					if (isset($this->_gameResults['gamedetails']['Publisher'])) {
-						$con['publisher'] = (string)$this->_gameResults['gamedetails']['Publisher'];
+					if (!empty($this->_gameResults['publishers'])) {
+						$con['publisher'] = (string)$this->_gameResults['publishers'];
 					} else {
-						$con['publisher'] = "Unknown";
+						$con['publisher'] = 'Unknown';
 					}
 
-					if (isset($this->_gameResults['rating'])) {
+					if (isset($this->_gameResults->metacritic['score'])) {
 						$con['esrb'] = (string)$this->_gameResults['rating'];
 					} else {
-						$con['esrb'] = "Not Rated";
+						$con['esrb'] = 'Not Rated';
 					}
 
-					if (!empty($this->_gameResults['gamedetails']['Release Date'])) {
-						$dateReleased = $this->_gameResults['gamedetails']['Release Date'];
-						if (!preg_match('#^\s*(?P<month>\w+)\s+(?P<day>\d{1,2}),?\s+(?P<year>\d{4})\s*$#',
-							$dateReleased)) {
-							if (preg_match('#^\s*(?P<month>\w+)\s+(?P<year>\d{4})\s*$#',
-								$dateReleased, $matches)) {
-								$dateReleased = "{$matches['month']} 1, {$matches['year']}";
-							}
-						}
-
+					if (!empty($this->_gameResults->releasedate['date'])) {
+						$dateReleased = $this->_gameResults->releasedate['date'];
 						$date = \DateTime::createFromFormat('M/j/Y', $dateReleased);
 						if ($date instanceof \DateTime) {
 							$con['releasedate'] = (string)$date->format('Y-m-d');
 						}
 					}
 
-					if (isset($this->_gameResults['description'])) {
+					if (!empty($this->_gameResults->description['short'])) {
 						$con['review'] = trim(strip_tags((string)$this->_gameResults['description']));
 					}
 
-					if (isset($this->_gameResults['trailer'])) {
-						$con['trailer'] = (string)$this->_gameResults['trailer'];
-					}
 
-					if (isset($this->_gameResults['gamedetails']['Genre'])) {
-						$genres = (string)$this->_gameResults['gamedetails']['Genre'];
-						$genreName = $this->_matchGenre($genres);
+					if (isset($this->_gameResults->genres)) {
+						foreach ($this->_gameResults->genres as $genres) {
+							$genreName = $this->_matchGenre($genres);
+						}
 					}
-
 					break;
 				default:
 					return false;
