@@ -2,6 +2,7 @@
 namespace nntmux;
 
 use b3rs3rk\steamfront\Main;
+use nntmux\utility\Utility;
 
 class Steam
 {
@@ -38,6 +39,7 @@ class Steam
 	public function getAll($appID)
 	{
 		$res = $this->steamClient->getAppDetails($appID);
+
 		if ($res !== null) {
 			$result = [
 				'title'       => $res->name,
@@ -49,7 +51,7 @@ class Steam
 				'publisher'   => $res->publishers,
 				'rating'      => $res->metacritic['score'],
 				'releasedate' => $res->releasedate['date'],
-				'genres'      => $res->genres
+				'genres'      => Utility::convertMultiArray($res->genres, ',')
 			];
 
 			return $result;

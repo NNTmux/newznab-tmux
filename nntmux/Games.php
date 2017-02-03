@@ -563,7 +563,7 @@ class Games
 						$con['backdropurl'] = (string)$this->_gameResults['backdrop'];
 					}
 
-					$con['title'] = (string)$this->_gameResults['name'];
+					$con['title'] = (string)$this->_gameResults['title'];
 					$con['asin'] = $this->_gameResults['steamid'];
 					$con['url'] = (string)$this->_gameResults['directurl'];
 
@@ -593,8 +593,8 @@ class Games
 
 
 					if (!empty($this->_gameResults['genres'])) {
-						$genres = implode('-' , $this->_gameResults['genres']);
-							$genreName = $this->_matchGenre($genres);
+						$genres = (string)$this->_gameResults['genres'];
+						$genreName = $this->_matchGenre($genres);
 					}
 					break;
 				default:
