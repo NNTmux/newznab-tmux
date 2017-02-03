@@ -75,17 +75,15 @@ class Steam
 			return false;
 		}
 
-		$steamGames = SteamApps::find('all', ['order' => ['name' => 'ASC']]);
+		$steamGames = SteamApps::find('all',
+			['fields' => ['appid', 'name'] ,
+			 'order' => ['name' => 'ASC']
+			]);
+
 		foreach ($steamGames as $gamesArray) {
-			if (is_array($gamesArray)) {
-				foreach ($gamesArray as $gameArray) {
-					foreach ($gameArray as $game) {
-						similar_text(strtolower($game['name']), strtolower($searchTerm), $percent);
-						if ($percent > 90) {
-							return $game['appid'];
-						}
-					}
-				}
+			similar_text(strtolower($gamesArray->name), strtolower($searchTerm), $percent);
+			if ($percent > 90) {
+				return $gamesArray->appid;
 			}
 		}
 		return false;
