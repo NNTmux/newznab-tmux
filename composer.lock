@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/b3rs3rk/steamfront.git",
-                "reference": "028ff64b22bea627fc27c20bf4a39433a807de7a"
+                "reference": "ad52973f0b97ceffcb2195ceef17da33a209ed7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/b3rs3rk/steamfront/zipball/028ff64b22bea627fc27c20bf4a39433a807de7a",
-                "reference": "028ff64b22bea627fc27c20bf4a39433a807de7a",
+                "url": "https://api.github.com/repos/b3rs3rk/steamfront/zipball/ad52973f0b97ceffcb2195ceef17da33a209ed7e",
+                "reference": "ad52973f0b97ceffcb2195ceef17da33a209ed7e",
                 "shasum": ""
             },
             "require": {
@@ -46,7 +46,7 @@
                 "source": "https://github.com/b3rs3rk/steamfront/tree/master",
                 "issues": "https://github.com/b3rs3rk/steamfront/issues"
             },
-            "time": "2016-12-15 20:49:54"
+            "time": "2017-02-03 18:55:19"
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
