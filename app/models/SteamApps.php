@@ -24,7 +24,7 @@ class SteamApps extends \lithium\data\Model
 		'key' => [
 			'appid',
 			'name'
-		]
+		],
 	];
 }
 

@@ -1,6 +1,8 @@
 <?php
 namespace nntmux;
 
+use app\models\Settings;
+use app\models\SteamApps;
 use b3rs3rk\steamfront\Main;
 use nntmux\utility\Utility;
 
@@ -60,7 +62,6 @@ class Steam
 		return false;
 	}
 
-
 	/**
 	 * Searches for a game for a 90% match
 	 *
@@ -74,7 +75,7 @@ class Steam
 			return false;
 		}
 
-		$steamGames = $this->steamClient->getFullAppList();
+		$steamGames = SteamApps::find('all', ['order' => ['name' => 'ASC']]);
 		foreach ($steamGames as $gamesArray) {
 			if (is_array($gamesArray)) {
 				foreach ($gamesArray as $gameArray) {
@@ -88,5 +89,40 @@ class Steam
 			}
 		}
 		return false;
+	}
+
+	public function populateSteamAppsTable()
+	{
+		$fullAppArray = $this->steamClient->getFullAppList();
+		echo 'Populating steam apps table' . PHP_EOL;
+		foreach ($fullAppArray as $appsArray) {
+			foreach ($appsArray as $appArray) {
+				foreach ($appArray as $app) {
+					$dupeCheck = SteamApps::find('first',
+						[
+							'conditions' =>
+								[
+									'name'  => $app['name'],
+								],
+							'fields'     => ['name'],
+							'limit'      => 1,
+						]
+					);
+
+
+					if ($dupeCheck === null) {
+						$steamApps = SteamApps::create([
+								'appid' => $app['appid'],
+								'name'  => $app['name'],
+							]
+						);
+						$steamApps->save();
+						echo '.';
+					} else {
+						echo '-';
+					}
+				}
+			}
+		}
 	}
 }
