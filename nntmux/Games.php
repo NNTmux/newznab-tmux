@@ -412,7 +412,12 @@ class Games
 		$this->_getGame->searchTerm = $gameInfo['title'];
 		$steamGameID = $this->_getGame->search($gameInfo['title']);
 		if($steamGameID !== false){
-			$this->_gameResults = $this->_getGame->getAll($steamGameID);
+			$result = $this->_getGame->getAll($steamGameID);
+			if ($result !== false) {
+				$this->_gameResults = $result;
+			} else {
+				$this->_gameResults = null;
+			}
 		}
 		/*
 		 	if (count($this->_gameResults) < 1) {

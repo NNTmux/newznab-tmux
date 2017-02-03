@@ -33,24 +33,29 @@ class Steam
 	 *
 	 * @param integer $appID
 	 *
-	 * @return array
+	 * @return array|bool
 	 */
 	public function getAll($appID)
 	{
 		$res = $this->steamClient->getAppDetails($appID);
-		$result = [
-			'title' => $res->name,
-			'description' => $res->description['short'],
-			'cover' => $res->images['header'],
-			'backdrop' => $res->images['background'],
-			'steamid' =>$res->appid,
-			'directurl' => Main::STEAM_STORE_ROOT . 'app/' . $res->appid,
-			'publisher' => $res->publishers,
-			'rating' => $res->metacritic['score'],
-			'releasedate' => $res->releasedate['date'],
-			'genres' => $res->genres
-		];
-	   return $result;
+		if ($res !== null) {
+			$result = [
+				'title'       => $res->name,
+				'description' => $res->description['short'],
+				'cover'       => $res->images['header'],
+				'backdrop'    => $res->images['background'],
+				'steamid'     => $res->appid,
+				'directurl'   => Main::STEAM_STORE_ROOT . 'app/' . $res->appid,
+				'publisher'   => $res->publishers,
+				'rating'      => $res->metacritic['score'],
+				'releasedate' => $res->releasedate['date'],
+				'genres'      => $res->genres
+			];
+
+			return $result;
+		}
+
+		return false;
 	}
 
 
