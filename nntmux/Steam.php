@@ -76,18 +76,14 @@ class Steam
 		}
 
 		$steamGames = SteamApps::find('all',
-			['fields' => ['appid', 'name'] ,
+			['fields' => ['name', 'appid'] ,
 			 'order' => ['name' => 'ASC']
 			]);
 
 		foreach ($steamGames as $gamesArray) {
-			if (!empty($steamGames->name)) {
-				similar_text(strtolower($gamesArray->name), strtolower($searchTerm), $percent);
-				if ($percent > 90) {
-					return $gamesArray->appid;
-				}
-			} else {
-				return false;
+			similar_text(strtolower($gamesArray->name), strtolower($searchTerm), $percent);
+			if ($percent > 90) {
+				return $gamesArray->appid;
 			}
 		}
 		return false;
