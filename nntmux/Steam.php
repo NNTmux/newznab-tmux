@@ -92,6 +92,7 @@ class Steam
 	public function populateSteamAppsTable()
 	{
 		$fullAppArray = $this->steamClient->getFullAppList();
+		$i = 0;
 		echo 'Populating steam apps table' . PHP_EOL;
 		foreach ($fullAppArray as $appsArray) {
 			foreach ($appsArray as $appArray) {
@@ -115,12 +116,12 @@ class Steam
 							]
 						);
 						$steamApps->save();
+						$i++;
 						echo '.';
-					} else {
-						echo '-';
 					}
 				}
 			}
 		}
+		echo 'Added ' . $i . ' new steam apps'. PHP_EOL;
 	}
 }
