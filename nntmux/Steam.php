@@ -81,9 +81,13 @@ class Steam
 			]);
 
 		foreach ($steamGames as $gamesArray) {
-			similar_text(strtolower($gamesArray->name), strtolower($searchTerm), $percent);
-			if ($percent > 90) {
-				return $gamesArray->appid;
+			if (!empty($steamGames->name)) {
+				similar_text(strtolower($gamesArray->name), strtolower($searchTerm), $percent);
+				if ($percent > 90) {
+					return $gamesArray->appid;
+				}
+			} else {
+				return false;
 			}
 		}
 		return false;
