@@ -92,7 +92,7 @@ class Steam
 	public function populateSteamAppsTable()
 	{
 		$fullAppArray = $this->steamClient->getFullAppList();
-		$i = 0;
+		$inserted = $dupe = 0;
 		echo 'Populating steam apps table' . PHP_EOL;
 		foreach ($fullAppArray as $appsArray) {
 			foreach ($appsArray as $appArray) {
@@ -101,7 +101,7 @@ class Steam
 						[
 							'conditions' =>
 								[
-									'name'  => $app['name'],
+									'name' => $app['name']
 								],
 							'fields'     => ['name'],
 							'limit'      => 1,
@@ -116,12 +116,18 @@ class Steam
 							]
 						);
 						$steamApps->save();
-						$i++;
-						echo '.';
+						$inserted++;
+						if ($inserted % 500 == 0) {
+							echo PHP_EOL . number_format($inserted) . ' apps inserted.' . PHP_EOL;
+						} else {
+							echo '.';
+						}
+					} else {
+						$dupe++;
 					}
 				}
 			}
 		}
-		echo 'Added ' . $i . ' new steam apps'. PHP_EOL;
+		echo PHP_EOL . 'Added ' . $inserted . ' new steam apps, '. $dupe . ' duplicates skipped' . PHP_EOL;
 	}
 }
