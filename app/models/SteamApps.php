@@ -22,7 +22,8 @@ class SteamApps extends \lithium\data\Model
 {
 	protected $_meta = [
 		'key' => [
-			'name'
+			'name',
+			'appid'
 		],
 	];
 }
