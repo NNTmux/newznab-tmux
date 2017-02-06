@@ -591,7 +591,7 @@ class Games
 
 
 					if (!empty($this->_gameResults['genres'])) {
-						$genres = (string)$this->_gameResults['genres'];
+						$genres = $this->_gameResults['genres'];
 						$genreName = $this->_matchGenre($genres);
 					}
 					break;
