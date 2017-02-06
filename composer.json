@@ -60,10 +60,6 @@
     {
       "type": "vcs",
       "url": "https://github.com/unionofrad/manual"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/b3rs3rk/steamfront"
     }
   ],
   "require": {

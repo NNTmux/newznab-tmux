@@ -415,8 +415,6 @@ class Games
 			$result = $this->_getGame->getAll($steamGameID);
 			if ($result !== false) {
 				$this->_gameResults = $result;
-			} else {
-				$this->_gameResults = null;
 			}
 		}
 		/*
