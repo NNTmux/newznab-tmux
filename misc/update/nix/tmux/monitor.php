@@ -10,7 +10,7 @@ use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 $pdo = new DB();
-$tmux = new Tmux($pdo);
+$tMain = new Tmux($pdo);
 $tRun = new TmuxRun($pdo);
 $tOut = new TmuxOutput($pdo);
 
@@ -202,7 +202,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
 		$timer07 = time();
 		if ($runVar['constants']['tablepergroup'] == 1) {
-			$tables = $tmux->cbpmTableQuery();
+			$tables = $tMain->cbpmTableQuery();
 			$age = time();
 
 			$runVar['counts']['now']['collections_table'] = $runVar['counts']['now']['binaries_table'] = 0;
