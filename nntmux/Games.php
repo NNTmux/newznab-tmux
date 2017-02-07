@@ -174,7 +174,7 @@ class Games
 			$maxage = '';
 		}
 
-		$exccatlist = "";
+		$exccatlist = '';
 		if (count($excludedcats) > 0) {
 			$exccatlist = ' AND r.categories_id NOT IN (' . implode(',', $excludedcats) . ')';
 		}
@@ -305,7 +305,7 @@ class Games
 
 	public function getBrowseBy()
 	{
-		$browseby = ' ';
+		$browseby = '';
 		$browsebyArr = $this->getBrowseByOptions();
 		$like = 'LIKE';
 
@@ -313,9 +313,9 @@ class Games
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
 				$bbs = stripslashes($_REQUEST[$bbk]);
 				if ($bbk === 'year') {
-					$browseby .= 'AND YEAR (gi.releasedate) ' . $like . ' (' . $this->pdo->escapeString('%' . $bbs . '%') . ') AND ';
+					$browseby .= 'AND YEAR (gi.releasedate) ' . $this->pdo->likeString($bbs, true, true);
 				} else {
-					$browseby .= 'AND gi.' . $bbv . ' ' . $like . ' (' . $this->pdo->escapeString('%' . $bbs . '%') . ') AND ';
+					$browseby .= 'AND gi.' . $bbv . ' ' .  $this->pdo->likeString($bbs, true, true);
 				}
 			}
 		}

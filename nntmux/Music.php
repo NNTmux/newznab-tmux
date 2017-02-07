@@ -339,9 +339,9 @@ class Music
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
 				$bbs = stripslashes($_REQUEST[$bbk]);
 				if (preg_match('/id/i', $bbv)) {
-					$browseby .= 'AND m.' . $bbv . ' = ' . $bbs . ' AND ';
+					$browseby .= 'AND m.' . $bbv . ' = ' . $bbs;
 				} else {
-					$browseby .= 'AND m.' . $bbv . ' ' . $this->pdo->likeString($bbs, true, true) . ' AND ';
+					$browseby .= 'AND m.' . $bbv . ' ' . $this->pdo->likeString($bbs, true, true);
 				}
 			}
 		}

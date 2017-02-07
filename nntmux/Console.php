@@ -307,11 +307,10 @@ class Console
 	{
 		$browseby = ' ';
 		$browsebyArr = $this->getBrowseByOptions();
-		$like = 'LIKE';
 		foreach ($browsebyArr as $bbk => $bbv) {
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
 				$bbs = stripslashes($_REQUEST[$bbk]);
-				$browseby .= 'AND con.' . $bbv . ' ' . $like . ' (' . $this->pdo->escapeString('%' . $bbs . '%') . ') AND ';
+				$browseby .= 'AND con.' . $bbv . ' ' . $this->pdo->likeString($bbs, true, true);
 			}
 		}
 		return $browseby;

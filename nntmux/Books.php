@@ -324,14 +324,12 @@ class Books
 
 	public function getBrowseBy()
 	{
-		$like = 'LIKE';
-
 		$browseby = ' ';
 		$browsebyArr = $this->getBrowseByOptions();
 		foreach ($browsebyArr as $bbk => $bbv) {
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
 				$bbs = stripslashes($_REQUEST[$bbk]);
-				$browseby .= 'AND boo.' . $bbv . ' ' . $this->pdo->likeString($bbs, true, true) . ' AND ';
+				$browseby .= 'AND boo.' . $bbv . ' ' . $this->pdo->likeString($bbs, true, true);
 			}
 		}
 		return $browseby;
