@@ -7,7 +7,7 @@ use nntmux\db\DB;
 
 class Steam
 {
-	const STEAM_MATCH_PERCENTAGE = 90;
+	const STEAM_MATCH_PERCENTAGE = 75;
 
 	/**
 	 * @var string The parsed game name from searchname
@@ -55,7 +55,7 @@ class Steam
 	{
 		$res = $this->steamClient->getAppDetails($appID);
 
-		if ($res !== null) {
+		if ($res !== false) {
 			$result = [
 				'title'       => $res->name,
 				'description' => $res->description['short'],
@@ -108,14 +108,12 @@ class Steam
 				} else {
 					similar_text(strtolower($result['name']), strtolower($searchTerm), $percent);
 					// If similartext reports an exact match set best match and break out
-					if ($percent == 100) {
+					if ($percent === 100) {
 						$bestMatch = $result['appid'];
 						break;
-					} else if ($percent >= self::STEAM_MATCH_PERCENTAGE) {
-						if ($percent > $bestMatchPct) {
+					} else if ($percent >= self::STEAM_MATCH_PERCENTAGE && $percent > $bestMatchPct) {
 							$bestMatch = $result['appid'];
 							$bestMatchPct = $percent;
-						}
 					}
 				}
 			}
