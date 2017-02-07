@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "49e48479a9d21f76916c669e51f119cd",
-    "content-hash": "461d8a57047f2fa333e48370cdf87457",
+    "hash": "e2709b8a1564253c5635dbea021c39fd",
+    "content-hash": "6b7ed17b69499aac043743d54292d083",
     "packages": [
         {
             "name": "b3rs3rk/steamfront",
@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/b3rs3rk/steamfront.git",
-                "reference": "ad52973f0b97ceffcb2195ceef17da33a209ed7e"
+                "reference": "91926f883c7cff6dcdd844e5e34310d56da49113"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/b3rs3rk/steamfront/zipball/ad52973f0b97ceffcb2195ceef17da33a209ed7e",
-                "reference": "ad52973f0b97ceffcb2195ceef17da33a209ed7e",
+                "url": "https://api.github.com/repos/b3rs3rk/steamfront/zipball/91926f883c7cff6dcdd844e5e34310d56da49113",
+                "reference": "91926f883c7cff6dcdd844e5e34310d56da49113",
                 "shasum": ""
             },
             "require": {
@@ -32,6 +32,7 @@
                     "b3rs3rk\\": "source"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0"
             ],
@@ -42,11 +43,7 @@
                 }
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
-            "support": {
-                "source": "https://github.com/b3rs3rk/steamfront/tree/master",
-                "issues": "https://github.com/b3rs3rk/steamfront/issues"
-            },
-            "time": "2017-02-03 18:55:19"
+            "time": "2017-02-07 02:15:29"
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
