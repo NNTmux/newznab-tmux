@@ -7,7 +7,7 @@ use nntmux\db\DB;
 
 class Steam
 {
-	const STEAM_MATCH_PERCENTAGE = 75;
+	const STEAM_MATCH_PERCENTAGE = 90;
 
 	/**
 	 * @var string The parsed game name from searchname
@@ -72,6 +72,9 @@ class Steam
 			return $result;
 		}
 
+		if ($res === false) {
+			$this->pdo->log->doEcho($this->pdo->log->notice('Steam did not return game data'));
+		}
 		return false;
 	}
 
@@ -87,7 +90,7 @@ class Steam
 		$bestMatch = false;
 
 		if (empty($searchTerm)) {
-
+			$this->pdo->log->doEcho($this->pdo->log->notice('Search term cannot be empty'));
 			return $bestMatch;
 		}
 
@@ -117,6 +120,9 @@ class Steam
 					}
 				}
 			}
+		}
+		if ($bestMatch === false) {
+			$this->pdo->log->doEcho($this->pdo->log->notice('Steam search returned no valid results'));
 		}
 
 		return $bestMatch;

@@ -401,20 +401,14 @@ class Games
 		// Process Steam first before giantbomb
 		// Steam has more details
 		$this->_gameResults = [];
-		$this->_getGame = new Steam();
+		$this->_getGame = new Steam($this->pdo);
 		$this->_classUsed = 'steam';
 		$this->_getGame->searchTerm = $gameInfo['title'];
 		$steamGameID = $this->_getGame->search($gameInfo['title']);
 		if ($steamGameID !== false){
 			$result = $this->_getGame->getAll($steamGameID);
 			if ($result !== false) {
-				$this->_gameResults = $result;
-			}
-		}
-		if (count($this->_gameResults) < 1) {
-			$this->_gameResults = (array)$this->fetchGiantBombID($gameInfo['title']);
-			if ($this->maxHitRequest === true) {
-				return false;
+				$this->_gameResults[] = $result;
 			}
 		}
 		if(empty($this->_gameResults['title'])){
@@ -426,65 +420,7 @@ class Games
 		if (count($this->_gameResults) > 1) {
 			$genreName = '';
 			switch ($this->_classUsed) {
-				case "gb":
-					$game['coverurl'] = (string)$this->_gameResults['image']['super_url'];
-					$game['title'] = (string)$this->_gameResults['name'];
-					$game['asin'] = $this->_gameID;
-					$game['url'] = (string)$this->_gameResults['site_detail_url'];
-					if (is_array($this->_gameResults['publishers'])) {
-						while (list($key) = each($this->_gameResults['publishers'])) {
-							if ($key == 0) {
-								$game['publisher'] = (string)$this->_gameResults['publishers'][$key]['name'];
-							}
-						}
-					} else {
-						$game['publisher'] = 'Unknown';
-					}
-
-					if (is_array($this->_gameResults['original_game_rating'])) {
-						$game['esrb'] = (string)$this->_gameResults['original_game_rating'][0]['name'];
-					} else {
-						$game['esrb'] = (string)$this->_gameResults['original_game_rating']['name'];
-					}
-					$game['releasedate'] = (string)$this->_gameResults['original_release_date'];
-
-					if (isset($this->_gameResults['description'])) {
-						$game['review'] = trim(strip_tags((string)$this->_gameResults['description']));
-					}
-					if (isset($this->_gameResults['genres'][0]['name'])) {
-						$genres = (string)$this->_gameResults['genres'][0]['name'];
-						$genreName = $this->_matchGenre($genres);
-					}
-					break;
-				case "gl":
-					if (isset($this->_gameResults['cover']) && $this->_gameResults['cover'] != '') {
-						$game['coverurl'] = (string)$this->_gameResults['cover'];
-					}
-
-					if (isset($this->_gameResults['backdrop'])) {
-						$game['backdropurl'] = (string)$this->_gameResults['backdrop'];
-					}
-
-					$game['title'] = (string)$this->_gameResults['title'];
-					$game['asin'] = $this->_gameResults['greenlightgameid'];
-					$game['url'] = (string)$this->_gameResults['directurl'];
-					$game['publisher'] = 'Unknown';
-					$game['esrb'] = 'Not Rated';
-
-					if (isset($this->_gameResults['description'])) {
-						$game['review'] = trim(strip_tags((string)$this->_gameResults['description']));
-					}
-
-					if (isset($this->_gameResults['trailer'])) {
-						$game['trailer'] = (string)$this->_gameResults['trailer'];
-					}
-
-					if (isset($this->_gameResults['gamedetails']['Genre'])) {
-						$genres = (string)$this->_gameResults['gamedetails']['Genre'];
-						$genreName = $this->_matchGenre($genres);
-					}
-					break;
-				case "steam":
+				case 'steam':
 					if (!empty($this->_gameResults['cover'])) {
 						$game['coverurl'] = (string)$this->_gameResults['cover'];
 					}
@@ -660,89 +596,13 @@ class Games
 		} else {
 			if ($this->echoOutput) {
 				$this->pdo->log->doEcho(
-					$this->pdo->log->headerOver("Nothing to update: ") .
+					$this->pdo->log->headerOver('Nothing to update: ') .
 					$this->pdo->log->primary($game['title'] . ' (PC)' )
 				);
 			}
 		}
 
 		return $gamesId;
-	}
-
-	/**
-	 * Get Giantbomb id from title
-	 *
-	 * @param string $title
-	 *
-	 * @return bool|mixed Array if no result False
-	 */
-
-	public function fetchGiantBombID($title = '')
-	{
-		$obj = new \GiantBomb($this->publicKey);
-		try {
-			$fields = [
-				'api_detail_url',
-				'name'
-			];
-			$result = json_decode(json_encode($obj->search($title, $fields, 10, 1, ["game"])), true);
-			// We hit the maximum request.
-			if (empty($result)) {
-				$this->maxHitRequest = true;
-				return false;
-			}
-			if (!is_array($result['results']) || (int)$result['number_of_total_results'] === 0) {
-				$result = false;
-			} else {
-				$this->_resultsFound = count($result['results']) - 1;
-				if ($this->_resultsFound !== 0) {
-					for ($i = 0; $i <= $this->_resultsFound; $i++) {
-						similar_text(strtolower($result['results'][$i]['name']), strtolower($title), $p);
-						if ($p > 77) {
-							$result = $result['results'][$i];
-							preg_match('/\/\d+\-(?<asin>\d+)\//', $result['api_detail_url'], $matches);
-							$this->_gameID = (string)$matches['asin'];
-							$result = $this->fetchGiantBombArray();
-							$this->_classUsed = 'gb';
-							break;
-						}
-						if ($i === $this->_resultsFound) {
-							return false;
-						}
-					}
-
-				} else {
-					return false;
-				}
-			}
-		} catch (\Exception $e) {
-			$result = false;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Fetch Giantbomb results from GameID
-	 *
-	 * @return bool|mixed
-	 */
-	public function fetchGiantBombArray()
-	{
-		$obj = new \GiantBomb($this->publicKey);
-		try {
-			$fields = [
-				'deck', 'description', 'original_game_rating', 'api_detail_url', 'image', 'genres',
-				'name', 'publishers', 'original_release_date', 'reviews',
-				'site_detail_url'
-			];
-			$result = json_decode(json_encode($obj->game($this->_gameID, $fields)), true);
-			$result = $result['results'];
-		} catch (\Exception $e) {
-			$result = false;
-		}
-
-		return $result;
 	}
 
 	public function processGamesReleases()
@@ -880,16 +740,16 @@ class Games
 	/**
 	 * See if genre name exists
 	 *
-	 * @param $nodeName
+	 * @param $gameGenre
 	 *
 	 * @return bool|string
 	 */
-	public function matchBrowseNode($nodeName)
+	public function matchGenreName($gameGenre)
 	{
 		$str = '';
 
-		//music nodes above mp3 download nodes
-		switch ($nodeName) {
+		//Game genres
+		switch ($gameGenre) {
 			case 'Action':
 			case 'Adventure':
 			case 'Arcade':
@@ -905,7 +765,7 @@ class Games
 			case 'Sports':
 			case 'Strategy':
 			case 'Trivia':
-				$str = $nodeName;
+				$str = $gameGenre;
 				break;
 		}
 
@@ -926,7 +786,7 @@ class Games
 		$tmpGenre = explode(',', $a);
 		if (is_array($tmpGenre)) {
 			foreach ($tmpGenre as $tg) {
-				$genreMatch = $this->matchBrowseNode(ucwords($tg));
+				$genreMatch = $this->matchGenreName(ucwords($tg));
 				if ($genreMatch !== false) {
 					$genreName = (string)$genreMatch;
 					break;
