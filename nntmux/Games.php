@@ -108,6 +108,11 @@ class Games
 		$this->catWhere = 'AND categories_id = ' . Category::PC_GAMES . ' ';
 	}
 
+	/**
+	 * @param $id
+	 *
+	 * @return array|bool
+	 */
 	public function getGamesInfo($id)
 	{
 		return $this->pdo->queryOneRow(
@@ -121,6 +126,11 @@ class Games
 		);
 	}
 
+	/**
+	 * @param $title
+	 *
+	 * @return array|bool
+	 */
 	public function getGamesInfoByName($title)
 	{
 		return $this->pdo->queryOneRow(
@@ -133,6 +143,12 @@ class Games
 		);
 	}
 
+	/**
+	 * @param $start
+	 * @param $num
+	 *
+	 * @return array
+	 */
 	public function getRange($start, $num)
 	{
 		return $this->pdo->query(
@@ -256,6 +272,11 @@ class Games
 		return $return;
 	}
 
+	/**
+	 * @param $orderby
+	 *
+	 * @return array
+	 */
 	public function getGamesOrder($orderby)
 	{
 		$order = ($orderby == '') ? 'r.postdate' : $orderby;
@@ -323,6 +344,12 @@ class Games
 		return $browseby;
 	}
 
+	/**
+	 * @param $data
+	 * @param $field
+	 *
+	 * @return string
+	 */
 	public function makeFieldLinks($data, $field)
 	{
 		$tmpArr = explode(', ', $data[$field]);
