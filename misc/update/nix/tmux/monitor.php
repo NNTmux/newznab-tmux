@@ -3,12 +3,14 @@ require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SE
 
 use app\models\Settings;
 use nntmux\Category;
+use nntmux\Tmux;
 use nntmux\TmuxOutput;
 use nntmux\TmuxRun;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 $pdo = new DB();
+$tmux = new Tmux($pdo);
 $tRun = new TmuxRun($pdo);
 $tOut = new TmuxOutput($pdo);
 
@@ -200,7 +202,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
 		$timer07 = time();
 		if ($runVar['constants']['tablepergroup'] == 1) {
-			$tables = $t->cbpmTableQuery();
+			$tables = $tmux->cbpmTableQuery();
 			$age = time();
 
 			$runVar['counts']['now']['collections_table'] = $runVar['counts']['now']['binaries_table'] = 0;
