@@ -15,7 +15,7 @@ $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
 if (isset($_REQUEST["id"])) {
 	$id = $_REQUEST["id"];
-	$game = $games->getGamesInfo($id);
+	$game = $games->getGamesInfoById($id);
 
 	if (!$game) {
 		$page->show404();
