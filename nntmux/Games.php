@@ -145,11 +145,11 @@ class Games
 			return $bestMatch;
 		}
 
-		$results = $this->pdo->queryDirect('
+		$results = $this->pdo->queryDirect("
 			SELECT *
 			FROM gamesinfo
 			WHERE MATCH(title) AGAINST({$this->pdo->escapeString($title)})
-			LIMIT 20'
+			LIMIT 20"
 		);
 
 		if ($results instanceof \Traversable) {
