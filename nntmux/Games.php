@@ -8,7 +8,12 @@ use nntmux\db\DB;
 class Games
 {
 
-	/**
+	const GAMES_TITLE_PARSE_REGEX =
+		'#(?P<title>[\w\s\.]+)(-(?P<relgrp>FLT|RELOADED|SKIDROW|PROPHET|RAZOR1911|CORE|REFLEX))?\s?(\s*(\(?(' .
+		'(?P<reltype>PROPER|MULTI\d|RETAIL|CRACK(FIX)?|ISO|(RE)?(RIP|PACK))|(?P<year>(19|20)\d{2})|V\s?' .
+		'(?P<version>(\d+\.)+\d+)|(-\s)?(?P=relgrp))\)?)\s?)*\s?(\.\w{2,4})?#i';
+
+/**
 	 * @var bool
 	 */
 	public $echoOutput;
@@ -113,7 +118,7 @@ class Games
 	 *
 	 * @return array|bool
 	 */
-	public function getGamesInfo($id)
+	public function getGamesInfoById($id)
 	{
 		return $this->pdo->queryOneRow(
 			sprintf('
@@ -720,16 +725,9 @@ class Games
 	 */
 	public function parseTitle($releasename)
 	{
-		// Get name of the game from name of release.
-		if (preg_match(
-			'/^(.+((EFNet|EFNet\sFULL|FULL\sabgxEFNet|abgx\sFULL|abgxbox360EFNet)\s|illuminatenboard\sorg|' .
-			'Place2(hom|us)e.net|united-forums? co uk|\(\d+\)))?(?P<title>.*?)[\.\-_ \:](v\.?\d\.\d|RIP|ADDON|' .
-			'EUR|USA|JP|ASIA|JAP|JPN|AUS|MULTI(\.?\d{1,2})?|PATCHED|FULLDVD|DVD5|DVD9|DVDRIP|\(GAMES\)\s*\(C\)|PROPER|REPACK|RETAIL|' .
-			'DEMO|DISTRIBUTION|BETA|REGIONFREE|READ\.?NFO|NFOFIX|Update|BWClone|CRACKED|Remastered|Fix|LINUX|x86|x64|Windows|Steam|Patch|GoG|Dox|No\.Intro|' .
-			// Group names, like Reloaded, CPY, Razor1911, etc
-			'[a-z0-9]{2,}$)/i',
-			preg_replace('/\sMulti\d?\s/i', '', $releasename), $matches)) {
 
+		// Get name of the game from name of release.
+		if (preg_match(self::GAMES_TITLE_PARSE_REGEX, preg_replace('/\sMulti\d?\s/i', '', $releasename), $matches)) {
 			// Replace dots, underscores, colons, or brackets with spaces.
 			$result = [];
 			$result['title'] = str_replace(' RF ', ' ', preg_replace('/(\-|\:|\.|_|\%20|\[|\])/', ' ', $matches['title']));
@@ -739,26 +737,12 @@ class Games
 			$result['title'] = preg_replace('/^(PC\sISO\)\s\()/i', '', $result['title']);
 			// Finally remove multiple spaces and trim leading spaces.
 			$result['title'] = trim(preg_replace('/\s{2,}/', ' ', $result['title']));
-			// Needed to add code to handle DLC Properly.
-			if (stripos($result['title'], 'dlc') !== false) {
-				$result['dlc'] = '1';
-				if (stripos($result['title'], 'Rock Band Network') !== false) {
-					$result['title'] = 'Rock Band';
-				} else if (stripos($result['title'], '-') !== false) {
-					$dlc = explode("-", $result['title']);
-					$result['title'] = $dlc[0];
-				} else if (preg_match('/(.*? .*?) /i', $result['title'], $dlc)) {
-					$result['title'] = $dlc[0];
-				}
-			}
-			if(empty($result['title'])){
+			if (empty($result['title'])) {
 				return false;
 			}
-			$browseNode = '94';
-			$result['node'] = $browseNode;
 			$result['release'] = $releasename;
 
-			return array_map('trim', $result);
+			return array_map("trim", $result);
 		}
 
 		return false;
