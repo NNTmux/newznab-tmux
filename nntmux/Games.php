@@ -106,7 +106,6 @@ class Games
 
 		$this->publicKey = Settings::value('APIs..giantbombkey');
 		$this->gameQty = Settings::value('..maxgamesprocessed' != '') ? Settings::value('..maxgamesprocessed') : 150;
-		$this->sleepTime = Settings::value('..amazonsleep') != '' ? Settings::value('..amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'games' . DS;
 		$this->renamed = Settings::value('..lookupgames') == 2 ? 'AND isrenamed = 1' : '';
 		$this->matchPercentage = 60;
@@ -202,33 +201,33 @@ class Games
 	 * @param       $cat
 	 * @param       $start
 	 * @param       $num
-	 * @param       $orderby
-	 * @param int   $maxage
-	 * @param array $excludedcats
+	 * @param       $orderBy
+	 * @param int|string   $maxAge
+	 * @param array $excludedCats
 	 *
 	 * @return array
 	 */
-	public function getGamesRange($cat, $start, $num, $orderby, $maxage = -1, $excludedcats = [])
+	public function getGamesRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [])
 	{
-		$browseby = $this->getBrowseBy();
+		$browseBy = $this->getBrowseBy();
 
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
 			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
-		if ($maxage > 0) {
-			$maxage = sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage);
+		if ($maxAge > 0) {
+			$maxAge = sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge);
 		} else {
-			$maxage = '';
+			$maxAge = '';
 		}
 
 		$exccatlist = '';
-		if (count($excludedcats) > 0) {
-			$exccatlist = ' AND r.categories_id NOT IN (' . implode(',', $excludedcats) . ')';
+		if (count($excludedCats) > 0) {
+			$exccatlist = ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')';
 		}
 
-		$order = $this->getGamesOrder($orderby);
+		$order = $this->getGamesOrder($orderBy);
 
 		$games = $this->pdo->queryCalc(
 				sprintf("
@@ -244,9 +243,9 @@ class Games
 				GROUP BY gi.id
 				ORDER BY %s %s %s",
 						Releases::showPasswords(),
-						$browseby,
+						$browseBy,
 						$catsrch,
-						$maxage,
+						$maxAge,
 						$exccatlist,
 						$order[0],
 						$order[1],
@@ -306,41 +305,41 @@ class Games
 	}
 
 	/**
-	 * @param $orderby
+	 * @param $orderBy
 	 *
 	 * @return array
 	 */
-	public function getGamesOrder($orderby)
+	public function getGamesOrder($orderBy)
 	{
-		$order = ($orderby == '') ? 'r.postdate' : $orderby;
+		$order = ($orderBy == '') ? 'r.postdate' : $orderBy;
 		$orderArr = explode('_', $order);
 		switch ($orderArr[0]) {
 			case 'title':
-				$orderfield = 'gi.title';
+				$orderField = 'gi.title';
 				break;
 			case 'releasedate':
-				$orderfield = 'gi.releasedate';
+				$orderField = 'gi.releasedate';
 				break;
 			case 'genre':
-				$orderfield = 'gi.genres_id';
+				$orderField = 'gi.genres_id';
 				break;
 			case 'size':
-				$orderfield = 'r.size';
+				$orderField = 'r.size';
 				break;
 			case 'files':
-				$orderfield = 'r.totalpart';
+				$orderField = 'r.totalpart';
 				break;
 			case 'stats':
-				$orderfield = 'r.grabs';
+				$orderField = 'r.grabs';
 				break;
 			case 'posted':
 			default:
-				$orderfield = 'r.postdate';
+				$orderField = 'r.postdate';
 				break;
 		}
-		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
+		$orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
-		return [$orderfield, $ordersort];
+		return [$orderField, $orderSort];
 	}
 
 	public function getGamesOrdering()
@@ -359,22 +358,22 @@ class Games
 
 	public function getBrowseBy()
 	{
-		$browseby = '';
-		$browsebyArr = $this->getBrowseByOptions();
+		$browseBy = '';
+		$browseByArr = $this->getBrowseByOptions();
 		$like = 'LIKE';
 
-		foreach ($browsebyArr as $bbk => $bbv) {
+		foreach ($browseByArr as $bbk => $bbv) {
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
 				$bbs = stripslashes($_REQUEST[$bbk]);
 				if ($bbk === 'year') {
-					$browseby .= 'AND YEAR (gi.releasedate) ' . $this->pdo->likeString($bbs, true, true);
+					$browseBy .= 'AND YEAR (gi.releasedate) ' . $this->pdo->likeString($bbs, true, true);
 				} else {
-					$browseby .= 'AND gi.' . $bbv . ' ' .  $this->pdo->likeString($bbs, true, true);
+					$browseBy .= 'AND gi.' . $bbv . ' ' .  $this->pdo->likeString($bbs, true, true);
 				}
 			}
 		}
 
-		return $browseby;
+		return $browseBy;
 	}
 
 	/**
@@ -413,13 +412,13 @@ class Games
 	 * @param $asin
 	 * @param $url
 	 * @param $publisher
-	 * @param $releasedate
+	 * @param $releaseDate
 	 * @param $esrb
 	 * @param $cover
-	 * @param $trailerurl
+	 * @param $trailerUrl
 	 * @param $genreID
 	 */
-	public function update($id, $title, $asin, $url, $publisher, $releasedate, $esrb, $cover, $trailerurl, $genreID)
+	public function update($id, $title, $asin, $url, $publisher, $releaseDate, $esrb, $cover, $trailerUrl, $genreID)
 	{
 
 		$this->pdo->queryExec(
@@ -432,10 +431,10 @@ class Games
 				$this->pdo->escapeString($asin),
 				$this->pdo->escapeString($url),
 				$this->pdo->escapeString($publisher),
-				$this->pdo->escapeString($releasedate),
+				$this->pdo->escapeString($releaseDate),
 				$this->pdo->escapeString($esrb),
 				$cover,
-				$this->pdo->escapeString($trailerurl),
+				$this->pdo->escapeString($trailerUrl),
 				$genreID,
 				$id
 			)
@@ -531,9 +530,9 @@ class Games
 		}
 		// Load genres.
 		$defaultGenres = $gen->getGenres(Genres::GAME_TYPE);
-		$genreassoc = [];
+		$genreAssoc = [];
 		foreach ($defaultGenres as $dg) {
-			$genreassoc[$dg['id']] = strtolower($dg['title']);
+			$genreAssoc[$dg['id']] = strtolower($dg['title']);
 		}
 
 		// Prepare database values.
@@ -569,8 +568,8 @@ class Games
 			$genreName = 'Unknown';
 		}
 
-		if (in_array(strtolower($genreName), $genreassoc)) {
-			$genreKey = array_search(strtolower($genreName), $genreassoc);
+		if (in_array(strtolower($genreName), $genreAssoc)) {
+			$genreKey = array_search(strtolower($genreName), $genreAssoc);
 		} else {
 			$genreKey = $this->pdo->queryInsert(
 				sprintf('
@@ -605,7 +604,7 @@ class Games
 					$this->pdo->escapeString($game['publisher']),
 					($game['gamesgenreID'] == -1 ? "null" : $game['gamesgenreID']),
 					$this->pdo->escapeString($game['esrb']),
-					($game['releasedate'] != "" ? $this->pdo->escapeString($game['releasedate']) : "null"),
+					($game['releasedate'] != '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
 					$this->pdo->escapeString(substr($game['review'], 0, 3000)),
 					$game['cover'],
 					$game['backdrop'],
@@ -628,7 +627,7 @@ class Games
 					$this->pdo->escapeString($game['publisher']),
 					($game['gamesgenreID'] == -1 ? "null" : $game['gamesgenreID']),
 					$this->pdo->escapeString($game['esrb']),
-					($game['releasedate'] != "" ? $this->pdo->escapeString($game['releasedate']) : "null"),
+					($game['releasedate'] != '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
 					$this->pdo->escapeString(substr($game['review'], 0, 3000)),
 					$game['cover'],
 					$game['backdrop'],
@@ -690,8 +689,7 @@ class Games
 
 				// Reset maxhitrequest
 				$this->maxHitRequest = false;
-				$startTime = microtime(true);
-				$usedgb = false;
+
 				$gameInfo = $this->parseTitle($arr['searchname']);
 				if ($gameInfo !== false) {
 
@@ -707,7 +705,6 @@ class Games
 
 					if ($gameCheck === false) {
 						$gameId = $this->updateGamesInfo($gameInfo);
-						$usedgb = true;
 						if ($gameId === false) {
 							$gameId = -2;
 
@@ -730,12 +727,6 @@ class Games
 						echo '.';
 					}
 				}
-
-				// Sleep to not flood giantbomb.
-				$diff = floor((microtime(true) - $startTime) * 1000000);
-				if ($this->sleepTime * 1000 - $diff > 0 && $usedgb === true) {
-					usleep($this->sleepTime * 1000 - $diff);
-				}
 			}
 		} else {
 			if ($this->echoOutput) {
@@ -747,15 +738,15 @@ class Games
 	/**
 	 * Parse the game release title
 	 *
-	 * @param string $releasename
+	 * @param string $releaseName
 	 *
 	 * @return array|bool
 	 */
-	public function parseTitle($releasename)
+	public function parseTitle($releaseName)
 	{
 
 		// Get name of the game from name of release.
-		if (preg_match(self::GAMES_TITLE_PARSE_REGEX, preg_replace('/\sMulti\d?\s/i', '', $releasename), $matches)) {
+		if (preg_match(self::GAMES_TITLE_PARSE_REGEX, preg_replace('/\sMulti\d?\s/i', '', $releaseName), $matches)) {
 			// Replace dots, underscores, colons, or brackets with spaces.
 			$result = [];
 			$result['title'] = str_replace(' RF ', ' ', preg_replace('/(\-|\:|\.|_|\%20|\[|\])/', ' ', $matches['title']));
@@ -768,9 +759,9 @@ class Games
 			if (empty($result['title'])) {
 				return false;
 			}
-			$result['release'] = $releasename;
+			$result['release'] = $releaseName;
 
-			return array_map("trim", $result);
+			return array_map('trim', $result);
 		}
 
 		return false;
