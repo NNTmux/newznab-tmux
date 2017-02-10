@@ -40,7 +40,7 @@ class Games
 	public $maxHitRequest;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -207,7 +207,7 @@ class Games
 	 *
 	 * @return array
 	 */
-	public function getGamesRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [])
+	public function getGamesRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = array())
 	{
 		$browseBy = $this->getBrowseBy();
 
