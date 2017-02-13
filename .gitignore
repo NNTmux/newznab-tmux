@@ -22,6 +22,7 @@ test.php
 /libraries/*
 /nbproject/
 /nbproject/private/
+/resources/covers/*
 /resources/nzb/*
 /resources/tmp/*
 /templates_c/*
