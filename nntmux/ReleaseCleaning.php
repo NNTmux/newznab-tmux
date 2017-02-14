@@ -111,13 +111,13 @@ class ReleaseCleaning
 						$title = false;
 					}
 					if ($title !== false) {
-						return array(
+						return [
 							'cleansubject'  => $title['title'],
 							'properlynamed' => true,
 							'increment'     => false,
 							'predb'         => $title['id'],
 							'requestid'     => false
-						);
+						];
 					}
 				}
 			}
@@ -172,13 +172,13 @@ class ReleaseCleaning
 				$title = false;
 			}
 			if ($title !== false) {
-				return array(
+				return [
 					'cleansubject'  => $title['title'],
 					'properlynamed' => true,
 					'increment'     => false,
 					'predb'         => $title['id'],
 					'requestid'     => true
-				);
+				];
 			}
 		}
 		if ($usepre === true) {
@@ -190,7 +190,7 @@ class ReleaseCleaning
 		if ($potentialName) {
 			return [
 				'id'   => $this->_regexes->matchedRegex,
-				'name' => $potentialName
+				'cleansubject' => $potentialName
 			];
 		}
 
