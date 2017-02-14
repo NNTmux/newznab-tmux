@@ -1,3 +1,8 @@
+2017-02-14 DariusIII
+	* Chg: Update themes to show the regex info to admins
+	* Chg: Add collection regex to details page
+	* Chg: Update mysql-ddl with new releases_regexes table
+	* Chg: Add model for new releases_regexes table
 2017-02-13 DariusIII
 	* Chg: Add bad regex logging (bad regex, not regex with 0 matches)
 	* Chg: Improve performance by doing poster check in PHP instead of single row MySQL queries (by b3rs3rk@nZEDb) 
