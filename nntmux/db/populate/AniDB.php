@@ -451,7 +451,10 @@ class AniDB
 	 */
 	private function setLastUpdated()
 	{
-		$this->pdo->setSetting(['APIs.anidb.last_full_update' => time()]);
+		Settings::update(
+			['value' => time()],
+			['section' => 'APIs', 'subsection' => 'AniDB', 'name' => 'last_full_update']
+		);
 	}
 
 	/**

@@ -26,6 +26,11 @@ class Steam
 	protected $pdo;
 
 	/**
+	 * @var
+	 */
+	protected $lastUpdate;
+
+	/**
 	 * Steam constructor.
 	 *
 	 * @param array $options
@@ -97,6 +102,8 @@ class Steam
 			return $bestMatch;
 		}
 
+		$this->populateSteamAppsTable();
+
 		$results = $this->pdo->queryDirect("
 			SELECT name, appid
 			FROM steam_apps
@@ -137,7 +144,10 @@ class Steam
 	public function populateSteamAppsTable()
 	{
 		$lastUpdate = Settings::value('APIs.Steam.last_update');
-		if ((time() - (int)$lastUpdate) > 86400) {
+		$this->lastUpdate = $lastUpdate > 0 ? $lastUpdate : 0;
+		if ((time() - (int)$this->lastUpdate) > 86400) {
+			// Set time we updated steam_apps table
+			$this->setLastUpdated();
 			$fullAppArray = $this->steamClient->getFullAppList();
 			$inserted = $dupe = 0;
 			echo 'Populating steam apps table' . PHP_EOL;
@@ -182,5 +192,16 @@ class Steam
 					'Steam has been updated within the past day, will be updated when 1 day interval passes.'
 				) . PHP_EOL;
 		}
+	}
+
+	/**
+	 * Sets the database time for last full AniDB update
+	 */
+	private function setLastUpdated()
+	{
+		Settings::update(
+			['value' => time()],
+			['section' => 'APIs', 'subsection' => 'Steam', 'name' => 'last_update']
+		);
 	}
 }
