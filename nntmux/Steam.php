@@ -2,6 +2,7 @@
 namespace nntmux;
 
 use app\models\SteamApps;
+use app\models\Settings;
 use b3rs3rk\steamfront\Main;
 use nntmux\db\DB;
 
@@ -75,6 +76,7 @@ class Steam
 		if ($res === false) {
 			$this->pdo->log->doEcho($this->pdo->log->notice('Steam did not return game data'));
 		}
+
 		return false;
 	}
 
@@ -91,6 +93,7 @@ class Steam
 
 		if (empty($searchTerm)) {
 			$this->pdo->log->doEcho($this->pdo->log->notice('Search term cannot be empty'));
+
 			return $bestMatch;
 		}
 
@@ -115,8 +118,8 @@ class Steam
 						$bestMatch = $result['appid'];
 						break;
 					} else if ($percent >= self::STEAM_MATCH_PERCENTAGE && $percent > $bestMatchPct) {
-							$bestMatch = $result['appid'];
-							$bestMatchPct = $percent;
+						$bestMatch = $result['appid'];
+						$bestMatchPct = $percent;
 					}
 				}
 			}
@@ -133,44 +136,51 @@ class Steam
 	 */
 	public function populateSteamAppsTable()
 	{
-		$fullAppArray = $this->steamClient->getFullAppList();
-		$inserted = $dupe = 0;
-		echo 'Populating steam apps table' . PHP_EOL;
-		foreach ($fullAppArray as $appsArray) {
-			foreach ($appsArray as $appArray) {
-				foreach ($appArray as $app) {
-					$dupeCheck = SteamApps::find('first',
-						[
-							'conditions' =>
-								[
-									'name'  => $app['name'],
-									'appid' => $app['appid'],
-								],
-							'fields'     => ['appid'],
-							'limit'      => 1,
-						]
-					);
-
-					if ($dupeCheck === null) {
-						$steamApps = SteamApps::create(
+		$lastUpdate = Settings::value('APIs.Steam.last_update');
+		if ((time() - (int)$lastUpdate) > 86400) {
+			$fullAppArray = $this->steamClient->getFullAppList();
+			$inserted = $dupe = 0;
+			echo 'Populating steam apps table' . PHP_EOL;
+			foreach ($fullAppArray as $appsArray) {
+				foreach ($appsArray as $appArray) {
+					foreach ($appArray as $app) {
+						$dupeCheck = SteamApps::find('first',
 							[
-								'appid' => $app['appid'],
-								'name'  => $app['name'],
+								'conditions' =>
+									[
+										'name'  => $app['name'],
+										'appid' => $app['appid'],
+									],
+								'fields'     => ['appid'],
+								'limit'      => 1,
 							]
 						);
-						$steamApps->save();
-						$inserted++;
-						if ($inserted % 500 == 0) {
-							echo PHP_EOL . number_format($inserted) . ' apps inserted.' . PHP_EOL;
+
+						if ($dupeCheck === null) {
+							$steamApps = SteamApps::create(
+								[
+									'appid' => $app['appid'],
+									'name'  => $app['name'],
+								]
+							);
+							$steamApps->save();
+							$inserted++;
+							if ($inserted % 500 == 0) {
+								echo PHP_EOL . number_format($inserted) . ' apps inserted.' . PHP_EOL;
+							} else {
+								echo '.';
+							}
 						} else {
-							echo '.';
+							$dupe++;
 						}
-					} else {
-						$dupe++;
 					}
 				}
 			}
+			echo PHP_EOL . 'Added ' . $inserted . ' new steam apps, ' . $dupe . ' duplicates skipped' . PHP_EOL;
+		} else {
+			echo PHP_EOL . $this->pdo->log->info(
+					'Steam has been updated within the past day, will be updated when 1 day interval passes.'
+				) . PHP_EOL;
 		}
-		echo PHP_EOL . 'Added ' . $inserted . ' new steam apps, '. $dupe . ' duplicates skipped' . PHP_EOL;
 	}
 }
