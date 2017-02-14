@@ -1,4 +1,5 @@
 2017-02-14 DariusIII
+	* Chg: Add collection regex to details page
 	* Chg: Update mysql-ddl with new releases_regexes table
 	* Chg: Add model for new releases_regexes table
 2017-02-13 DariusIII
