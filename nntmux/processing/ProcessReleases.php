@@ -691,7 +691,7 @@ class ProcessReleases
 						$releasesRegexes = ReleasesRegexes::create(
 							[
 								'releases_id' => $releaseID,
-								'regex_id'    => $collection['collections_regexes_id'],
+								'regex_id'    => $collection['collection_regexes_id'],
 							]
 						);
 						$releasesRegexes->save();
