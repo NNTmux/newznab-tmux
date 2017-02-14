@@ -1,6 +1,6 @@
 <?php
 
-use app\models\ReleasesRegexes;
+use app\models\ReleaseRegexes;
 use app\models\Settings;
 use nntmux\Console;
 use nntmux\ReleaseComments;
@@ -30,7 +30,7 @@ if (isset($_GET['id']))
 	$user = $page->users->getById($page->users->currentUserId());
 	$cpapi = $user['cp_api'];
 	$cpurl = $user['cp_url'];
-	$releaseRegex = ReleasesRegexes::find('first', ['conditions' => ['releases_id' => $data['id']]]);
+	$releaseRegex = ReleaseRegexes::find('first', ['conditions' => ['releases_id' => $data['id']]]);
 
 	if (!$data)
 		$page->show404();
