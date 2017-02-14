@@ -31,7 +31,7 @@ CREATE PROCEDURE delete_release(IN is_numeric BOOLEAN, IN identifier VARCHAR(40)
       LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
       LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
       LEFT OUTER JOIN releases_groups rg ON rg.releases_id = r.id
-      LEFT OUTER JOIN releases_regexes rr ON rr.releases_id = r.id
+      LEFT OUTER JOIN release_regexes rr ON rr.releases_id = r.id
     WHERE where_constr;
 
   END; $$

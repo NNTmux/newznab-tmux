@@ -687,7 +687,7 @@ class ProcessReleases
 							)
 						);
 
-						// Add the id of regex that matched the collection and release name to releases_regexes table
+						// Add the id of regex that matched the collection and release name to release_regexes table
 						$releasesRegexes = ReleaseRegexes::create(
 							[
 								'releases_id'            => $releaseID,

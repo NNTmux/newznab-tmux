@@ -1,4 +1,4 @@
-# Create the new releases_regexes table
+# Create the new release_regexes table
 
 DROP TABLE IF EXISTS release_regexes;
 CREATE TABLE release_regexes (
