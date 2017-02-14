@@ -150,7 +150,7 @@ class Steam
 			$this->setLastUpdated();
 			$fullAppArray = $this->steamClient->getFullAppList();
 			$inserted = $dupe = 0;
-			echo 'Populating steam apps table' . PHP_EOL;
+			echo $this->pdo->log->info('Populating steam apps table') . PHP_EOL;
 			foreach ($fullAppArray as $appsArray) {
 				foreach ($appsArray as $appArray) {
 					foreach ($appArray as $app) {
@@ -167,13 +167,14 @@ class Steam
 						);
 
 						if ($dupeCheck === null) {
-							$steamApps = SteamApps::create(
+							/*$steamApps = SteamApps::create(
 								[
 									'appid' => $app['appid'],
 									'name'  => $app['name'],
 								]
 							);
-							$steamApps->save();
+							$steamApps->save();  */
+							$this->pdo->queryExec(sprintf("INSERT IGNORE INTO steam_apps (appid, name) VALUES (%d, %s)", $app['appid'], $app['name']));
 							$inserted++;
 							if ($inserted % 500 == 0) {
 								echo PHP_EOL . number_format($inserted) . ' apps inserted.' . PHP_EOL;
