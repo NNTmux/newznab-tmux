@@ -190,7 +190,8 @@ class ReleaseCleaning
 		if ($potentialName) {
 			return [
 				'id'   => $this->_regexes->matchedRegex,
-				'cleansubject' => $potentialName
+				'cleansubject' => $potentialName,
+				'properlynamed' => true
 			];
 		}
 
