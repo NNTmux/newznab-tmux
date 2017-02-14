@@ -104,6 +104,7 @@ indexer	ppa	innerfileblacklist	/setup\.exe|password\.url/i	You can add a regex h
 APIs	AniDB	banned	0	Timestamp of WHEN we were banned.	AniDB_banned
 APIs	AniDB	max_update_frequency	7	The number of days between AniDB full updates.  Default is 7.	intanidbupdate
 APIs	AniDB	last_full_update	0	The last time a full AniDB update occurred in unixtime.	lastanidbupdate
+APIs	Steam	last_update	0	Last time we updated steam_apps table.	laststeamupdate
 APIs		amazonassociatetag	n01369-20	The amazon associate tag. Used for music/book lookups.	amazonassociatetag
 APIs		amazonprivkey	B58mVwyj+T/MEucxWugJ3GQ0CcW2kQq16qq/1WpS	The amazon private api key. Used for music/book lookups.	amazonprivkey
 APIs		amazonpubkey	AKIAIPDNG5EU7LB4AD3Q	The amazon public api key. Used for music/book lookups.	amazonpubkey
