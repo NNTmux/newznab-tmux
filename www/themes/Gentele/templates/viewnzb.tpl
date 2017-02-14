@@ -570,9 +570,7 @@
 																	{if $release.gid != ""}
 																		Global Id ({$release.gid})
 																	{/if}
-																</td>
-																<td>
-																	{if !empty($regex)} Collection regex ID ({$regex->regex_id}){/if}
+																	{if !empty($regex->regex_id)} Collection regex ID ({$regex->regex_id}){/if}
 																</td>
 															</tr>
 														{/if}
