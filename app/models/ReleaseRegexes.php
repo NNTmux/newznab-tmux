@@ -19,12 +19,12 @@
 namespace app\models;
 
 
-class ReleasesRegexes extends \lithium\data\Model
+class ReleaseRegexes extends \lithium\data\Model
 {
 	public $belongsTo = ['Releases'];
 	public $hasMany = ['Collection_regexes'];
 
 	protected $_meta = [
-		'key'			=> ['releases_id', 'regex_id'],
+		'key'			=> ['releases_id', 'collection_regex_id', 'naming_regex_id'],
 	];
 }

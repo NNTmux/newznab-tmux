@@ -3,7 +3,7 @@ namespace nntmux\processing;
 
 use app\models\MultigroupPosters;
 use app\models\ReleasesGroups;
-use app\models\ReleasesRegexes;
+use app\models\ReleaseRegexes;
 use app\models\Settings;
 use nntmux\Categorize;
 use nntmux\Category;
@@ -687,11 +687,12 @@ class ProcessReleases
 							)
 						);
 
-						// Add the id of regex that matched the collection to releases_regexes table
-						$releasesRegexes = ReleasesRegexes::create(
+						// Add the id of regex that matched the collection and release name to releases_regexes table
+						$releasesRegexes = ReleaseRegexes::create(
 							[
-								'releases_id' => $releaseID,
-								'regex_id'    => $collection['collection_regexes_id'],
+								'releases_id'            => $releaseID,
+								'collection_regex_id'    => $collection['collection_regexes_id'],
+								'naming_regex_id'        => $cleanedName['id'],
 							]
 						);
 						$releasesRegexes->save();
