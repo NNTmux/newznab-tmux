@@ -3,6 +3,7 @@ namespace nntmux\processing;
 
 use app\models\MultigroupPosters;
 use app\models\ReleasesGroups;
+use app\models\ReleasesRegexes;
 use app\models\Settings;
 use nntmux\Categorize;
 use nntmux\Category;
@@ -685,6 +686,15 @@ class ProcessReleases
 								$collection['id']
 							)
 						);
+
+						// Add the id of regex that matched the collection to releases_regexes table
+						$releasesRegexes = ReleasesRegexes::create(
+							[
+								'releases_id' => $releaseID,
+								'regex_id'    => $collection['collections_regexes_id'],
+							]
+						);
+						$releasesRegexes->save();
 
 						if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
 							foreach ($matches[1] as $grp) {
