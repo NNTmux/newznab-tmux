@@ -174,7 +174,7 @@ class Steam
 								]
 							);
 							$steamApps->save();  */
-							$this->pdo->queryExec(sprintf("INSERT IGNORE INTO steam_apps (appid, name) VALUES (%d, %s)", $app['appid'], $app['name']));
+							$this->pdo->queryExec(sprintf("INSERT IGNORE INTO steam_apps (name, appid) VALUES (%s, %d)", $app['name'], $app['appid']));
 							$inserted++;
 							if ($inserted % 500 == 0) {
 								echo PHP_EOL . number_format($inserted) . ' apps inserted.' . PHP_EOL;
