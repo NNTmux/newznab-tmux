@@ -639,7 +639,7 @@ class ProcessReleases
 						$properName = $cleanedName['properlynamed'];
 						$preID = (isset($cleanerName['predb']) ? $cleanerName['predb'] : false);
 						$isReqID = (isset($cleanerName['requestid']) ? $cleanerName['requestid'] : false);
-						$cleanedName['name'] = $cleanedName['cleansubject'];
+						$cleanedName = $cleanedName['cleansubject'];
 					} else {
 						$properName = true;
 						$isReqID = $preID = false;
@@ -649,7 +649,7 @@ class ProcessReleases
 						// try to match the cleaned searchname to predb title or filename here
 						$preMatch = $preDB->matchPre($cleanedName);
 						if ($preMatch !== false) {
-							$cleanedName['name'] = $preMatch['title'];
+							$cleanedName = $preMatch['title'];
 							$preID = $preMatch['predb_id'];
 							$properName = true;
 						}
@@ -658,14 +658,14 @@ class ProcessReleases
 					$releaseID = $this->releases->insertRelease(
 						[
 							'name' => $cleanRelName,
-							'searchname' => $this->pdo->escapeString(utf8_encode($cleanedName['name'])),
+							'searchname' => $this->pdo->escapeString(utf8_encode($cleanedName)),
 							'totalpart' => $collection['totalfiles'],
 							'groups_id' => $collection['groups_id'],
 							'guid' => $this->pdo->escapeString($this->releases->createGUID()),
 							'postdate' => $this->pdo->escapeString($collection['date']),
 							'fromname' => $fromName,
 							'size' => $collection['filesize'],
-							'categories_id' => $categorize->determineCategory($collection['groups_id'], $cleanedName['name']),
+							'categories_id' => $categorize->determineCategory($collection['groups_id'], $cleanedName),
 							'isrenamed' => $properName === true ? 1 : 0,
 							'reqidstatus' => $isReqID === true ? 1 : 0,
 							'predb_id' => $preID === false ? 0 : $preID,
