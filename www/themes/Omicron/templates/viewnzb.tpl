@@ -567,6 +567,9 @@
 																				Global Id ({$release.gid})
 																			{/if}
 																		</td>
+																		<td>
+																			{if !empty($regex)} Collection regex ID ({$regex->regex_id}){/if}
+																		</td>
 																	</tr>
 																{/if}
 																</tbody>
