@@ -1,3 +1,5 @@
+2017-02-15 DariusIII
+	* Fix: Missing use statement in myshows.php
 2017-02-14 DariusIII
 	* Chg: Update themes to show the regex info to admins
 	* Chg: Add collection regex to details page
