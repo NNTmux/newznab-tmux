@@ -210,7 +210,7 @@
 <script type="text/javascript"
 		src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.autogrow-textarea.js"></script>
 <!-- bootswatch theme switcer -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/themes/shared/assets/jquery-bootswatch/jquery.bootswatch.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-bootswatch/jquery.bootswatch.js"></script>
 <!-- tinymce editor -->
 <script type="text/javascript"
 		src="{$smarty.const.WWW_THEMES}/shared/assets/tinymce-builded/js/tinymce/tinymce.min.js"></script>
@@ -238,8 +238,6 @@
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/html5shiv/dist/html5shiv.min.js"></script>
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/respond/dest/respond.min.js"></script>
 <![endif]-->
-<script>
     $('.themes').bootswatch();
-</script>
 </body>
 </html>
