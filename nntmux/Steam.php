@@ -167,13 +167,6 @@ class Steam
 						);
 
 						if ($dupeCheck === null) {
-							/*$steamApps = SteamApps::create(
-								[
-									'appid' => $app['appid'],
-									'name'  => $app['name'],
-								]
-							);
-							$steamApps->save();  */
 							$this->pdo->queryExec(sprintf('INSERT IGNORE INTO steam_apps (name, appid) VALUES (%s, %d)', $app['name'], $app['appid']));
 							$inserted++;
 							if ($inserted % 500 == 0) {
@@ -188,10 +181,6 @@ class Steam
 				}
 			}
 			echo PHP_EOL . 'Added ' . $inserted . ' new steam apps, ' . $dupe . ' duplicates skipped' . PHP_EOL;
-		} else {
-			echo PHP_EOL . $this->pdo->log->info(
-					'Steam has been updated within the past day, will be updated when 1 day interval passes.'
-				) . PHP_EOL;
 		}
 	}
 
