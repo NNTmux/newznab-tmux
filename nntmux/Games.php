@@ -487,8 +487,8 @@ class Games
 					}
 				}
 				if ($bestMatch !== false) {
-					$this->_gameResults[] = $this->giantbomb->findOne('Game', '3030-' . $bestMatch);
-					$this->_gameResults['title'] = $this->_gameResults->name;
+					$this->_gameResults = $this->giantbomb->findOne('Game', '3030-' . $bestMatch);
+					$this->_gameResults['title'] = $this->_gameResults->get('name');
 				}
 			}
 		}
