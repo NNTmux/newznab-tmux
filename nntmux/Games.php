@@ -488,10 +488,11 @@ class Games
 				}
 				if ($bestMatch !== false) {
 					$this->_gameResults[] = $this->giantbomb->findOne('Game', '3030-' . $bestMatch);
+					$this->_gameResults['title'] = $this->_gameResults->name;
 				}
 			}
 		}
-		if(empty($this->_gameResults['title'] || empty($this->_gameResults['name']))){
+		if(empty($this->_gameResults['title'])){
 			return false;
 		}
 		if(!is_array($this->_gameResults)){
