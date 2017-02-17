@@ -2,12 +2,14 @@
 namespace nntmux;
 
 use app\models\Settings;
+use DBorsatto\GiantBomb\Config;
+use DBorsatto\GiantBomb\Client;
 use nntmux\db\DB;
 
 
 class Games
 {
-	const GAME_MATCH_PERCENTAGE = 90;
+	const GAME_MATCH_PERCENTAGE = 85;
 
 	const GAMES_TITLE_PARSE_REGEX =
 		'#(?P<title>[\w\s\.]+)(-(?P<relgrp>FLT|RELOADED|SKIDROW|PROPHET|RAZOR1911|CORE|REFLEX))?\s?(\s*(\(?(' .
@@ -111,6 +113,8 @@ class Games
 		$this->matchPercentage = 60;
 		$this->maxHitRequest = false;
 		$this->catWhere = 'AND categories_id = ' . Category::PC_GAMES . ' ';
+		$this->config = new Config($this->publicKey);
+		$this->giantbomb = new Client($this->config);
 	}
 
 	/**
@@ -470,7 +474,24 @@ class Games
 				$this->_gameResults[] = $result;
 			}
 		}
-		if(empty($this->_gameResults['title'])){
+
+		if (count($this->_gameResults) < 1) {
+			$bestMatch = false;
+			$this->_classUsed = 'giantbomb';
+			$result = $this->giantbomb->search($gameInfo['title'], 'game');
+			if (!empty($result)) {
+				foreach ($result as $res) {
+					similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent);
+					if ($percent >= self::GAME_MATCH_PERCENTAGE) {
+						$bestMatch = $res->id;
+					}
+				}
+				if ($bestMatch !== false) {
+					$this->_gameResults[] = $this->giantbomb->findOne('Game', '3030-' . $bestMatch);
+				}
+			}
+		}
+		if(empty($this->_gameResults['title'] || empty($this->_gameResults['name']))){
 			return false;
 		}
 		if(!is_array($this->_gameResults)){
@@ -518,6 +539,49 @@ class Games
 
 					if (!empty($this->_gameResults['genres'])) {
 						$genres = $this->_gameResults['genres'];
+						$genreName = $this->_matchGenre($genres);
+					}
+					break;
+				case 'giantbomb':
+					if (!empty($this->_gameResults->image['medium_url'])) {
+						$game['coverurl'] = (string)$this->_gameResults->image['medium_url'];
+					}
+
+					if (!empty($this->_gameResults->image['screen_url'])) {
+						$game['backdropurl'] = (string)$this->_gameResults->image['screen_url'];
+					}
+
+					$game['title'] = (string)$this->_gameResults->name;
+					$game['asin'] = $this->_gameResults->id;
+					$game['url'] = (string)$this->_gameResults->site_detail_url;
+
+					if (!empty($this->_gameResults->publishers)) {
+						$game['publisher'] = (string)$this->_gameResults->publishers[0]['name'];
+					} else {
+						$game['publisher'] = 'Unknown';
+					}
+
+
+					if (!empty($this->_gameResults->original_game_rating[0]['name'])) {
+						$game['esrb'] = (string)$this->_gameResults->original_game_rating[0]['name'];
+					} else {
+						$game['esrb'] = 'Not Rated';
+					}
+
+					if (!empty($this->_gameResults->original_release_date)) {
+						$dateReleased = $this->_gameResults->original_release_date;
+						$date = \DateTime::createFromFormat('Y-m-d H:i:s', $dateReleased);
+						if ($date instanceof \DateTime) {
+							$game['releasedate'] = (string)$date->format('Y-m-d');
+						}
+					}
+
+					if (!empty($this->_gameResults->deck)) {
+						$game['review'] = (string)$this->_gameResults->deck;
+					}
+
+					if (!empty($this->_gameResults->genres)) {
+						$genres = implode(',', array_column($this->_gameResults->genres, 'name'));
 						$genreName = $this->_matchGenre($genres);
 					}
 					break;

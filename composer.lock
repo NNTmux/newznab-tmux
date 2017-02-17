@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e2709b8a1564253c5635dbea021c39fd",
-    "content-hash": "6b7ed17b69499aac043743d54292d083",
+    "hash": "c2082dcccca021f81cf7d67c5a9d87b9",
+    "content-hash": "8521f3e08d3f40482c82c1a02c1a88c3",
     "packages": [
         {
             "name": "b3rs3rk/steamfront",
@@ -1194,6 +1194,118 @@
             "time": "2017-01-31 10:11:45"
         },
         {
+            "name": "dborsatto/php-giantbomb",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dborsatto/php-giantbomb.git",
+                "reference": "05e5dbc31cdff29e4ee870f3f3eda73056e2a63a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dborsatto/php-giantbomb/zipball/05e5dbc31cdff29e4ee870f3f3eda73056e2a63a",
+                "reference": "05e5dbc31cdff29e4ee870f3f3eda73056e2a63a",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/cache": "^1.6",
+                "guzzlehttp/guzzle": "^6.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DBorsatto\\GiantBomb\\Test\\": "tests",
+                    "DBorsatto\\GiantBomb\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Davide Borsatto",
+                    "email": "davide.borsatto@gmail.com",
+                    "homepage": "https://github.com/dborsatto"
+                }
+            ],
+            "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
+            "time": "2017-02-04 18:39:42"
+        },
+        {
+            "name": "doctrine/cache",
+            "version": "v1.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/cache.git",
+                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/cache/zipball/b6f544a20f4807e81f7044d31e679ccbb1866dc3",
+                "reference": "b6f544a20f4807e81f7044d31e679ccbb1866dc3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~5.5|~7.0"
+            },
+            "conflict": {
+                "doctrine/common": ">2.2,<2.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.8|~5.0",
+                "predis/predis": "~1.0",
+                "satooshi/php-coveralls": "~0.6"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.6.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Doctrine\\Common\\Cache\\": "lib/Doctrine/Common/Cache"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                }
+            ],
+            "description": "Caching library offering an object-oriented API for many cache backends",
+            "homepage": "http://www.doctrine-project.org",
+            "keywords": [
+                "cache",
+                "caching"
+            ],
+            "time": "2016-10-29 11:16:17"
+        },
+        {
             "name": "exeu/apai-io",
             "version": "2.0.0",
             "source": {
@@ -1302,53 +1414,6 @@
                 "package"
             ],
             "time": "2016-10-12 08:03:45"
-        },
-        {
-            "name": "giantbomb/giantbomb",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/amalfra/GiantBomb.git",
-                "reference": "2f80210e54e8310380221759b26117c1351b8031"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/amalfra/GiantBomb/zipball/2f80210e54e8310380221759b26117c1351b8031",
-                "reference": "2f80210e54e8310380221759b26117c1351b8031",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "GiantBomb": "GiantBomb/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Amal Francis",
-                    "email": "amalfra@gmail.com"
-                },
-                {
-                    "name": "koroban",
-                    "email": "dev+koroban@novutec.com"
-                }
-            ],
-            "description": "A PHP wrapper for GiantBomb API",
-            "homepage": "http://www.giantbomb.com/api/",
-            "keywords": [
-                "api",
-                "giantbomb",
-                "php",
-                "wrapper"
-            ],
-            "time": "2016-06-15 06:37:08"
         },
         {
             "name": "google/recaptcha",
@@ -2093,7 +2158,7 @@
         "roave/security-advisories": 20,
         "b3rs3rk/steamfront": 20,
         "dariusiii/rarinfo": 20,
-        "giantbomb/giantbomb": 20,
+        "dborsatto/php-giantbomb": 20,
         "guzzlehttp/guzzle": 20,
         "joshpinkney/tv-maze-php-api": 20,
         "kbjr/git.php": 20,
