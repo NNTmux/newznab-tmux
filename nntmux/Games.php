@@ -487,15 +487,14 @@ class Games
 					}
 				}
 				if ($bestMatch !== false) {
-					$this->_gameResults = $this->giantbomb->findOne('Game', '3030-' . $bestMatch);
-					$this->_gameResults['title'] = $this->_gameResults->get('name');
+					$this->_gameResults[] = $this->giantbomb->findOne('Game', '3030-' . $bestMatch);
 				}
 			}
 		}
-		if(empty($this->_gameResults['title'])){
+		if (empty($this->_gameResults['title']) || empty($this->_gameResults->name)){
 			return false;
 		}
-		if(!is_array($this->_gameResults)){
+		if (!is_array($this->_gameResults)){
 			return false;
 		}
 		if (count($this->_gameResults) > 1) {
