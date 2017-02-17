@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 
 <head>
 	{literal}
@@ -209,6 +209,8 @@
 <!-- autogrowing textarea plugin -->
 <script type="text/javascript"
 		src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.autogrow-textarea.js"></script>
+<!-- bootswatch theme switcer -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/themes/shared/assets/jquery-bootswatchjs/jquery.bootswatch.js"></script>
 <!-- tinymce editor -->
 <script type="text/javascript"
 		src="{$smarty.const.WWW_THEMES}/shared/assets/tinymce-builded/js/tinymce/tinymce.min.js"></script>
