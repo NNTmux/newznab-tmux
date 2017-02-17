@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "76c751bde33ea95d430611b288fd65b3",
-    "content-hash": "b4a568766ade50923732fa7faa6d9565",
+    "hash": "24a9bda2231ba2459f6904f100f65600",
+    "content-hash": "8ee62949b163d3f3322405b1f2c87a6e",
     "packages": [
         {
             "name": "b3rs3rk/steamfront",
@@ -781,6 +781,33 @@
                 "jquery",
                 "library"
             ]
+        },
+        {
+            "name": "bower-asset/jquery-bootswatch",
+            "version": "v0.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sergeyt/jquery-bootswatch.git",
+                "reference": "bd119fed777dcb9f9306b295102314ac7a6a249e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sergeyt/jquery-bootswatch/zipball/bd119fed777dcb9f9306b295102314ac7a6a249e",
+                "reference": "bd119fed777dcb9f9306b295102314ac7a6a249e",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.11"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "jquery.bootswatch.js",
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "node_modules",
+                    "components"
+                ]
+            }
         },
         {
             "name": "bower-asset/jquery-migrate-1.4.x",

@@ -1,4 +1,5 @@
 2017-02-17 DariusIIi
+	* Chg: Further improve Charisma, add theme switcher
 	* Chg: Use css files from bootswatch directly
 	* Chg: Add support for GiantBomb queries back to Games class
 2017-02-15 DariusIII

@@ -213,6 +213,12 @@
 		{/if}
 		<!-- user dropdown starts -->
 		{if $loggedin == "true"}
+			<div class="btn-group">
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+					Themes <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu themes" role="menu"></ul>
+			</div>
 			<div class="btn-group navbar-right">
 				<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 					<i class="fa fa-user"></i><span class="hidden-sm hidden-xs"><span
