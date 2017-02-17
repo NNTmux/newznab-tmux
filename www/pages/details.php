@@ -99,7 +99,7 @@ if (isset($_GET['id']))
 	$game = '';
 	if ($data['gamesinfo_id'] != '') {
 		$g = new Games();
-		$game = $g->getGamesInfo($data['gamesinfo_id']);
+		$game = $g->getGamesInfoById($data['gamesinfo_id']);
 	}
 
 	$mus = '';

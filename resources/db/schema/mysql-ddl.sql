@@ -364,7 +364,8 @@ CREATE TABLE gamesinfo (
   updateddate DATETIME            NOT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX  ix_gamesinfo_asin (asin),
-  INDEX         ix_title (title)
+  INDEX         ix_title (title),
+  FULLTEXT INDEX ix_title_ft (title)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
@@ -1025,6 +1026,16 @@ CREATE TABLE spotnabsources
   AUTO_INCREMENT = 1;
 CREATE UNIQUE INDEX spotnabsources_ix1 ON spotnabsources (username, useremail, usenetgroup);
 
+DROP TABLE IF EXISTS steam_apps;
+CREATE TABLE steam_apps (
+  name         VARCHAR(255)        NOT NULL DEFAULT '' COMMENT 'Steam application name',
+  appid        INT(11) UNSIGNED    NULL COMMENT 'Steam application id',
+  PRIMARY KEY (appid, name),
+  FULLTEXT INDEX ix_name_ft (name)
+)
+  ENGINE          = MYISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
 DROP TABLE IF EXISTS tmux;
 CREATE TABLE tmux (
