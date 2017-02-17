@@ -552,7 +552,7 @@ class Games
 						$game['backdropurl'] = (string)$this->_gameResults->image['screen_url'];
 					}
 
-					$game['title'] = (string)$this->_gameResults->name;
+					$game['title'] = (string)$this->_gameResults->get('name');
 					$game['asin'] = $this->_gameResults->id;
 					$game['url'] = (string)$this->_gameResults->site_detail_url;
 
