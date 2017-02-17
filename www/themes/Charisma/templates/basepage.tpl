@@ -29,7 +29,7 @@
 	<!-- Newposterwall -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- The styles -->
-	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/{$theme}/css/bootstrap-cyborg.min.css" rel="stylesheet">
+	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/shared/assets/bootswatch/cyborg/bootstrap.min.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/charisma-app.css" rel="stylesheet">
 	<link href='{$smarty.const.WWW_THEMES}/shared/assets/chosen/chosen.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/shared/assets/colorbox/example3/colorbox.css'
