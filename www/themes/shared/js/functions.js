@@ -247,8 +247,6 @@ jQuery(function($){
         return false;
     });
 
-    $('.themes').bootswatch();
-
     $('.icon_nzbvortex').click(function(event)
     {
         if ($(this).hasClass('icon_nzbvortex_clicked')) return false;
