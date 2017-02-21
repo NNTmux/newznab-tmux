@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "24a9bda2231ba2459f6904f100f65600",
-    "content-hash": "8ee62949b163d3f3322405b1f2c87a6e",
+    "hash": "9dd34a1ba775531b32cda396a7db3d57",
+    "content-hash": "b498233d2cd9b3dad52262bdf785254d",
     "packages": [
         {
             "name": "b3rs3rk/steamfront",
@@ -382,16 +382,16 @@
         },
         {
             "name": "bower-asset/chosen",
-            "version": "v1.5.1",
+            "version": "v1.6.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/harvesthq/bower-chosen.git",
-                "reference": "e0d29eab0d1ea12535cf1933eba4c47df099f846"
+                "url": "https://github.com/harvesthq/chosen-package.git",
+                "reference": "4bbafbc6125eb1f0f148af11d6ce9e50bfd993dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/harvesthq/bower-chosen/zipball/e0d29eab0d1ea12535cf1933eba4c47df099f846",
-                "reference": "e0d29eab0d1ea12535cf1933eba4c47df099f846",
+                "url": "https://api.github.com/repos/harvesthq/chosen-package/zipball/4bbafbc6125eb1f0f148af11d6ce9e50bfd993dd",
+                "reference": "4bbafbc6125eb1f0f148af11d6ce9e50bfd993dd",
                 "shasum": ""
             },
             "require": {
@@ -401,15 +401,14 @@
             "extra": {
                 "bower-asset-main": [
                     "chosen.jquery.js",
-                    "chosen.css"
+                    "chosen.css",
+                    "chosen-sprite@2x.png",
+                    "chosen-sprite.png"
                 ],
                 "bower-asset-ignore": []
             },
             "license": [
-                {
-                    "type": "MIT",
-                    "url": "https://github.com/harvesthq/chosen/blob/master/LICENSE.md"
-                }
+                "https://github.com/harvesthq/chosen/blob/master/LICENSE.md"
             ],
             "description": "Chosen is a JavaScript plugin that makes select boxes user-friendly. It is currently available in both jQuery and Prototype flavors.",
             "keywords": [

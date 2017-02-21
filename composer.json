@@ -109,7 +109,7 @@
     "bower-asset/bootstrap-progressbar": "~0.9.0",
     "bower-asset/bootswatch": "~3.3.7",
     "bower-asset/colorbox": "~1.6.3",
-    "bower-asset/chosen": "~1.5.1",
+    "bower-asset/chosen": "^1.6",
     "bower-asset/DataTables": "~1.10.11",
     "bower-asset/fastclick": "~1.0.6",
     "bower-asset/flexboxgrid": "^6.3",
