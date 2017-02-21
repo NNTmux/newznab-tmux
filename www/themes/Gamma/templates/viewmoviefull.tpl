@@ -39,7 +39,7 @@
 				</div>
 				<div class="btn-group pull-right">
 					<div class="input-group">
-						<input class="span2"  id="filter-text" type="text" placeholder="Filter">
+						<input class="col-md-2"  id="filter-text" type="text" placeholder="Filter">
 					</div>
 				</div>
 				<div class="btn-group pull-right" data-toggle="buttons-radio" id="filter-quality">
@@ -154,7 +154,7 @@
 				</div>
 				<div class="btn-group pull-right">
 					<div class="input-group">
-						<input class="span2" id="filter-text" type="text">
+						<input class="col-md-2" id="filter-text" type="text">
 						<span class="add-on"><i class="icon-search"></i></span>
 					</div>
 				</div>

@@ -1,4 +1,5 @@
 2017-02-21 DariusIII
+	* Chg: Replace span with col-md- in Gamma theme
 	* Chg: Update AdminLTE to version 2.3.11 (Omicron theme) 
 	* Chg: Remove year from names of releases on games page
 	* Chg: Update guzzlehttp
