@@ -1,4 +1,5 @@
 2017-02-22 DariusIII
+	* Chg: Update NNBase.php to use defined constants
 	* Chg: Fix sending to sab and download basket from xxx and movie views in Charisma/Omicron themes
 2017-02-21 DariusIII
 	* Chg: Replace span with col-md- in Gamma theme
