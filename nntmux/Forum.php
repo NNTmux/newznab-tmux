@@ -38,7 +38,7 @@ class Forum
 	 */
 	public function add($parentid, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0)
 	{
-		if ($message == "") {
+		if ($message == '') {
 			return -1;
 		}
 
@@ -48,13 +48,13 @@ class Forum
 				return -1;
 			}
 
-			$this->pdo->queryExec(sprintf("UPDATE forumpost SET replies = replies + 1, updateddate = NOW() WHERE id = %d", $parentid));
+			$this->pdo->queryExec(sprintf('UPDATE forumpost SET replies = replies + 1, updateddate = NOW() WHERE id = %d', $parentid));
 		}
 
 		return $this->pdo->queryInsert(
-			sprintf("
+			sprintf('
 				INSERT INTO forumpost (forumid, parentid, users_id, subject, message, locked, sticky, replies, createddate, updateddate)
-				VALUES (1, %d, %d, %s, %s, %d, %d, %d, NOW(), NOW())",
+				VALUES (1, %d, %d, %s, %s, %d, %d, %d, NOW(), NOW())',
 				$parentid, $userid, $this->pdo->escapeString($subject), $this->pdo->escapeString($message), $locked, $sticky, $replies
 			)
 		);
@@ -71,7 +71,7 @@ class Forum
 	{
 		return $this->pdo->queryOneRow(
 			sprintf(
-				"SELECT f.*, u.username FROM forumpost f LEFT OUTER JOIN users u ON u.id = f.users_id WHERE f.id = %d",
+				'SELECT f.*, u.username FROM forumpost f LEFT OUTER JOIN users u ON u.id = f.users_id WHERE f.id = %d',
 				$parent
 			)
 		);
@@ -87,13 +87,13 @@ class Forum
 	public function getPosts($parent)
 	{
 		return $this->pdo->query(
-			sprintf("
+			sprintf('
 				SELECT forumpost.*, users.username
 				FROM forumpost
 				LEFT OUTER JOIN users ON users.id = forumpost.users_id
 				WHERE forumpost.id = %d OR parentid = %d
 				ORDER BY createddate ASC
-				LIMIT 250",
+				LIMIT 250',
 				$parent,
 				$parent
 			)
@@ -109,7 +109,7 @@ class Forum
 	 */
 	public function getPost($id)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT * FROM forumpost WHERE id = %d", $id));
+		return $this->pdo->queryOneRow(sprintf('SELECT * FROM forumpost WHERE id = %d', $id));
 	}
 
 	/**
@@ -119,8 +119,8 @@ class Forum
 	 */
 	public function getBrowseCount()
 	{
-		$res = $this->pdo->queryOneRow(sprintf("SELECT COUNT(id) AS num FROM forumpost WHERE parentid = 0"));
-		return ($res === false ? 0 : $res["num"]);
+		$res = $this->pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM forumpost WHERE parentid = 0'));
+		return ($res === false ? 0 : $res['num']);
 	}
 
 	/**
@@ -134,13 +134,13 @@ class Forum
 	public function getBrowseRange($start, $num)
 	{
 		return $this->pdo->query(
-			sprintf("
+			sprintf('
 				SELECT f.*, u.username
 				FROM forumpost f
 				LEFT OUTER JOIN users u ON u.id = f.users_id
 				WHERE parentid = 0
-				ORDER BY updateddate DESC %s",
-				($start === false ? '' : (" LIMIT " . $num . " OFFSET " . $start))
+				ORDER BY updateddate DESC %s',
+				($start === false ? '' : (' LIMIT ' . $num . ' OFFSET ' . $start))
 			)
 		);
 	}
@@ -152,7 +152,7 @@ class Forum
 	 */
 	public function deleteParent($parent)
 	{
-		$this->pdo->queryExec(sprintf("DELETE FROM forumpost WHERE id = %d OR parentid = %d", $parent, $parent));
+		$this->pdo->queryExec(sprintf('DELETE FROM forumpost WHERE id = %d OR parentid = %d', $parent, $parent));
 	}
 
 	/**
@@ -164,10 +164,10 @@ class Forum
 	{
 		$post = $this->getPost($id);
 		if ($post) {
-			if ($post["parentid"] == "0") {
+			if ($post['parentid'] == '0') {
 				$this->deleteParent($id);
 			} else {
-				$this->pdo->queryExec(sprintf("DELETE FROM forumpost WHERE id = %d", $id));
+				$this->pdo->queryExec(sprintf('DELETE FROM forumpost WHERE id = %d', $id));
 			}
 		}
 	}
@@ -179,7 +179,7 @@ class Forum
 	 */
 	public function deleteUser($id)
 	{
-		$this->pdo->queryExec(sprintf("DELETE FROM forumpost WHERE users_id = %d", $id));
+		$this->pdo->queryExec(sprintf('DELETE FROM forumpost WHERE users_id = %d', $id));
 	}
 
 	/**
@@ -191,8 +191,8 @@ class Forum
 	 */
 	public function getCountForUser($uid)
 	{
-		$res = $this->pdo->queryOneRow(sprintf("SELECT COUNT(id) AS num FROM forumpost WHERE users_id = %d", $uid));
-		return ($res === false ? 0 : $res["num"]);
+		$res = $this->pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM forumpost WHERE users_id = %d', $uid));
+		return ($res === false ? 0 : $res['num']);
 	}
 
 	/**
@@ -207,13 +207,13 @@ class Forum
 	public function getForUserRange($uid, $start, $num)
 	{
 		return $this->pdo->query(
-			sprintf("
+			sprintf('
 				SELECT forumpost.*, users.username
 				FROM forumpost
 				LEFT OUTER JOIN users ON users.id = forumpost.users_id
 				WHERE users_id = %d
-				ORDER BY forumpost.createddate DESC %s",
-				($start === false ? '' : (" LIMIT " . $num . " OFFSET " . $start)),
+				ORDER BY forumpost.createddate DESC %s',
+				($start === false ? '' : (' LIMIT ' . $num . ' OFFSET ' . $start)),
 				$uid
 			)
 		);

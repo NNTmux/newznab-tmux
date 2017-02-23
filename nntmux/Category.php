@@ -424,8 +424,9 @@ class Category
 			$temp_array[-1] = '--Please Select--';
 		}
 
-		foreach ($categories as $category)
+		foreach ($categories as $category) {
 			$temp_array[$category['id']] = $category['title'];
+		}
 
 		return $temp_array;
 	}

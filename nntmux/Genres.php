@@ -38,12 +38,12 @@ class Genres
 	private function getListQuery($type = '', $activeonly = false)
 	{
 		if (!empty($type))
-			$typesql = sprintf(" AND g.type = %d", $type);
+			$typesql = sprintf(' AND g.type = %d', $type);
 		else
 			$typesql = '';
 
 		if ($activeonly) {
-			$sql = sprintf("
+			$sql = sprintf('
 						SELECT g.*
 						FROM genres g
 						INNER JOIN
@@ -61,11 +61,11 @@ class Genres
 						INNER JOIN
 							(SELECT DISTINCT genres_id FROM gamesinfo) x
 							ON x.genres_id = g.id %1\$s
-							ORDER BY title",
+							ORDER BY title',
 				$typesql
 			);
 		} else {
-			$sql = sprintf("SELECT g.* FROM genres g WHERE 1 %s ORDER BY g.title", $typesql);
+			$sql = sprintf('SELECT g.* FROM genres g WHERE 1 %s ORDER BY g.title', $typesql);
 		}
 
 		return $sql;
@@ -74,7 +74,7 @@ class Genres
 	public function getRange($type = '', $activeonly = false, $start, $num)
 	{
 		$sql = $this->getListQuery($type, $activeonly);
-		$sql .= " LIMIT " . $num . " OFFSET " . $start;
+		$sql .= ' LIMIT ' . $num . ' OFFSET ' . $start;
 
 		return $this->pdo->query($sql);
 	}
@@ -82,12 +82,12 @@ class Genres
 	public function getCount($type = '', $activeonly = false)
 	{
 		if (!empty($type))
-			$typesql = sprintf(" AND g.type = %d", $type);
+			$typesql = sprintf(' AND g.type = %d', $type);
 		else
 			$typesql = '';
 
 		if ($activeonly)
-			$sql = sprintf("
+			$sql = sprintf('
 						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
@@ -104,29 +104,29 @@ class Genres
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genres_id FROM gamesinfo) x
-							ON x.genres_id = g.id %1\$s",
+							ON x.genres_id = g.id %1\$s',
 				$typesql
 			);
 		else
-			$sql = sprintf("SELECT COUNT(g.id) AS num FROM genres g WHERE 1 %s ORDER BY g.title", $typesql);
+			$sql = sprintf('SELECT COUNT(g.id) AS num FROM genres g WHERE 1 %s ORDER BY g.title', $typesql);
 
 		$res = $this->pdo->queryOneRow($sql);
 
-		return $res["num"];
+		return $res['num'];
 	}
 
 	public function getById($id)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT * FROM genres WHERE id = %d", $id));
+		return $this->pdo->queryOneRow(sprintf('SELECT * FROM genres WHERE id = %d', $id));
 	}
 
 	public function update($id, $disabled)
 	{
-		return $this->pdo->queryExec(sprintf("UPDATE genres SET disabled = %d WHERE id = %d", $disabled, $id));
+		return $this->pdo->queryExec(sprintf('UPDATE genres SET disabled = %d WHERE id = %d', $disabled, $id));
 	}
 
 	public function getDisabledIDs()
 	{
-		return $this->pdo->query("SELECT id FROM genres WHERE disabled = 1", true, NN_CACHE_EXPIRY_LONG);
+		return $this->pdo->query('SELECT id FROM genres WHERE disabled = 1', true, NN_CACHE_EXPIRY_LONG);
 	}
 }
