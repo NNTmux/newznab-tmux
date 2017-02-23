@@ -171,7 +171,7 @@ class Category
 				break;
 			// Multiple category constraints
 			default:
-				$catsrch = " AND r.categories_id IN (" . implode(", ", $categories) . ") ";
+				$catsrch = ' AND r.categories_id IN (' . implode(', ', $categories) . ') ';
 				break;
 		}
 
@@ -186,7 +186,7 @@ class Category
 	 */
 	public static function getCategoryOthersGroup()
 	{
-		return implode(",",
+		return implode(',',
 			[
 				self::BOOKS_UNKNOWN,
 				self::GAME_OTHER,
@@ -217,10 +217,10 @@ class Category
 	public function isParent($cid)
 	{
 		$ret = $this->pdo->query(
-			sprintf("SELECT id FROM categories WHERE id = %d AND parentid IS NULL", $cid),
+			sprintf('SELECT id FROM categories WHERE id = %d AND parentid IS NULL', $cid),
 			true, NN_CACHE_EXPIRY_LONG
 		);
-		return (isset($ret[0]['id']));
+		return isset($ret[0]['id']);
 	}
 
 	/**
@@ -232,9 +232,9 @@ class Category
 	{
 		$act = "";
 		if ($activeonly) {
-			$act = sprintf(" WHERE c.status = %d ", Category::STATUS_ACTIVE);
+			$act = sprintf(' WHERE c.status = %d ', Category::STATUS_ACTIVE);
 		}
-		return $this->pdo->query("SELECT c.*, (SELECT title FROM categories WHERE id=c.parentid) AS parentName FROM categories c " . $act . " ORDER BY c.id");
+		return $this->pdo->query('SELECT c.*, (SELECT title FROM categories WHERE id=c.parentid) AS parentName FROM categories c ' . $act . ' ORDER BY c.id');
 	}
 
 	/**
@@ -247,7 +247,7 @@ class Category
 	public function getChildren($cid)
 	{
 		return $this->pdo->query(
-			sprintf("SELECT c.* FROM categories c WHERE parentid = %d", $cid),
+			sprintf('SELECT c.* FROM categories c WHERE parentid = %d', $cid),
 			true, NN_CACHE_EXPIRY_LONG
 		);
 	}
@@ -259,7 +259,7 @@ class Category
 	public function getEnabledParentNames()
 	{
 		return $this->pdo->query(
-			"SELECT title FROM categories WHERE parentid IS NULL AND status = 1",
+			'SELECT title FROM categories WHERE parentid IS NULL AND status = 1',
 			true, NN_CACHE_EXPIRY_LONG
 		);
 	}
@@ -272,7 +272,7 @@ class Category
 	public function getDisabledIDs()
 	{
 		return $this->pdo->query(
-			"SELECT id FROM categories WHERE status = 2 OR parentid IN (SELECT id FROM categories WHERE status = 2 AND parentid IS NULL)",
+			'SELECT id FROM categories WHERE status = 2 OR parentid IN (SELECT id FROM categories WHERE status = 2 AND parentid IS NULL)',
 			true, NN_CACHE_EXPIRY_LONG
 		);
 	}
@@ -289,48 +289,6 @@ class Category
 
 		return $this->pdo->queryOneRow(sprintf("SELECT c.disablepreview, c.id, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentid from categories c left outer join categories cp on cp.id = c.parentid where c.id = %d", $id));
 	}
-
-	public function getSizeRangeById($id)
-	{
-		$res = $this->pdo->queryOneRow(sprintf("SELECT c.minsizetoformrelease, c.maxsizetoformrelease, cp.minsizetoformrelease as p_minsizetoformrelease, cp.maxsizetoformrelease as p_maxsizetoformrelease" .
-				" from categories c left outer join categories cp on cp.id = c.parentid where c.id = %d", $id
-			)
-		);
-		if (!$res)
-			return null;
-
-		$min = intval($res['minsizetoformrelease']);
-		$max = intval($res['maxsizetoformrelease']);
-		if ($min == 0 && $max == 0) {
-			# Size restriction disabled; now check parent
-			$min = intval($res['p_minsizetoformrelease']);
-			$max = intval($res['p_maxsizetoformrelease']);
-			if ($min == 0 && $max == 0) {
-				# no size restriction
-				return null;
-			} else if ($max > 0) {
-				$min = 0;
-				$max = intval($res['p_maxsizetoformrelease']);
-			} else {
-				$min = intval($res['p_minsizetoformrelease']);
-				$max = PHP_INT_MAX;
-			}
-		} else if ($max > 0) {
-			$min = 0;
-			$max = intval($res['maxsizetoformrelease']);
-		} else {
-			$min = intval($res['minsizetoformrelease']);
-			$max = PHP_INT_MAX;
-		}
-
-		# If code reaches here, then content is enabled
-		return array('min' => $min, 'max' => $max);
-	}
-
-	/*
-	* Return min/max size range (in array(min, max)) otherwise, none is returned
-	* if no size restrictions are set
-	*/
 
 	/**
 	 * Get multiple categories.
@@ -364,15 +322,15 @@ class Category
 	public function getNameByID($ID)
 	{
 		$cat = $this->pdo->queryOneRow(
-			sprintf("
+			sprintf('
 				SELECT c.title AS ctitle, cp.title AS ptitle
 				FROM categories c
 				INNER JOIN categories cp ON c.parentid = cp.id
-				WHERE c.id = %d",
+				WHERE c.id = %d',
 				$ID
 			)
 		);
-		return $cat["ptitle"] . " -> " . $cat["ctitle"];
+		return $cat['ptitle'] . ' -> ' . $cat['ctitle'];
 	}
 
 	/**
@@ -389,7 +347,7 @@ class Category
 	 */
 	public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
 	{
-		return $this->pdo->queryExec(sprintf("UPDATE categories SET disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s WHERE id = %d", $disablepreview, $status, $minsize, $maxsize, $this->pdo->escapeString($desc), $id));
+		return $this->pdo->queryExec(sprintf('UPDATE categories SET disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s WHERE id = %d', $disablepreview, $status, $minsize, $maxsize, $this->pdo->escapeString($desc), $id));
 	}
 
 	/**
@@ -463,11 +421,11 @@ class Category
 		$temp_array = [];
 
 		if ($blnIncludeNoneSelected) {
-			$temp_array[-1] = "--Please Select--";
+			$temp_array[-1] = '--Please Select--';
 		}
 
 		foreach ($categories as $category)
-			$temp_array[$category["id"]] = $category["title"];
+			$temp_array[$category['id']] = $category['title'];
 
 		return $temp_array;
 	}
