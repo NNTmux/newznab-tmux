@@ -16,7 +16,7 @@ use ApaiIO\ApaiIO;
 class Books
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -88,8 +88,8 @@ class Books
 		$this->pubkey = Settings::value('APIs..amazonpubkey');
 		$this->privkey = Settings::value('APIs..amazonprivkey');
 		$this->asstag = Settings::value('APIs..amazonassociatetag');
-		$this->bookqty = (Settings::value('..maxbooksprocessed') != '') ? Settings::value('..maxbooksprocessed') : 300;
-		$this->sleeptime = (Settings::value('..amazonsleep') != '') ? Settings::value('..amazonsleep') : 1000;
+		$this->bookqty = Settings::value('..maxbooksprocessed') != '' ? Settings::value('..maxbooksprocessed') : 300;
+		$this->sleeptime = Settings::value('..amazonsleep') != '' ? Settings::value('..amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'book' . DS;
 		$result = Settings::value('..book_reqids');
 		$this->bookreqids = empty($result) ? Category::BOOKS_EBOOK : $result;
@@ -110,7 +110,7 @@ class Books
 	{
 		$pdo = $this->pdo;
 		$like = 'ILIKE';
-		if ($pdo->dbSystem() === 'mysql') {
+		if ($pdo->DbSystem() === 'mysql') {
 			$like = 'LIKE';
 		}
 
@@ -134,9 +134,9 @@ class Books
 				}
 			}
 			$searchwords = trim($searchwords);
-			$searchsql .= sprintf(" MATCH(author, title) AGAINST(%s IN BOOLEAN MODE)", $pdo->escapeString($searchwords));
+			$searchsql .= sprintf(' MATCH(author, title) AGAINST(%s IN BOOLEAN MODE)', $pdo->escapeString($searchwords));
 		}
-		return $pdo->queryOneRow(sprintf("SELECT * FROM bookinfo WHERE %s", $searchsql));
+		return $pdo->queryOneRow(sprintf('SELECT * FROM bookinfo WHERE %s', $searchsql));
 	}
 
 
@@ -259,7 +259,7 @@ class Books
 		);
 		$return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 		if (!empty($return)) {
-			$return[0]['_totalcount'] = (isset($books['total']) ? $books['total'] : 0);
+			$return[0]['_totalcount'] = (isset($books['total']) ?? 0);
 		}
 		return $return;
 	}
@@ -363,7 +363,7 @@ class Books
 		$response = $apaiIo->runOperation($search);
 		if ($response === false)
 		{
-			throw new \Exception("Could not connect to Amazon");
+			throw new \Exception('Could not connect to Amazon');
 		}
 		else
 		{
@@ -384,7 +384,7 @@ class Books
 	public function processBookReleases()
 	{
 		$bookids =[];
-		if (preg_match('/^\d+$/', $this->bookreqids)) {
+		if (ctype_digit((string)$this->bookreqids)) {
 			$bookids[] = $this->bookreqids;
 		} else {
 			$bookids = explode(', ', $this->bookreqids);
@@ -427,7 +427,7 @@ class Books
 				$startTime = microtime(true);
 				$usedAmazon = false;
 				// audiobooks are also books and should be handled in an identical manor, even though it falls under a music category
-				if ($arr['categories_id'] == '3030') {
+				if ($arr['categories_id'] === '3030') {
 					// audiobook
 					$bookInfo = $this->parseTitle($arr['searchname'], $arr['id'], 'audiobook');
 				} else {
@@ -502,7 +502,7 @@ class Books
 				}
 				$this->pdo->queryExec(sprintf('UPDATE releases SET categories_id = %s WHERE id = %d', Category::BOOKS_UNKNOWN, $releaseID));
 				return false;
-			} else if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun( |e|$)|Jul( |y|$)|Aug( |ust|$)|Sep( |tember|$)|O(c|k)t( |ober|$)|Nov( |ember|$)|De(c|z)( |ember|$))/i', $releasename) && !preg_match('/Part \d+/i', $releasename)) {
+			} else if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun( |e|$)|Jul( |y|$)|Aug( |ust|$)|Sep( |tember|$)|O(c|k)t( |ober|$)|Nov( |ember|$)|De(c|z)( |ember|$))/ui', $releasename) && !preg_match('/Part \d+/i', $releasename)) {
 
 				if ($this->echooutput) {
 					$this->pdo->log->doEcho(
@@ -535,7 +535,7 @@ class Books
 		$amaz = false;
 		if ($bookInfo != '') {
 			$amaz = $this->fetchAmazonProperties($bookInfo);
-		} else if ($amazdata != null) {
+		} else if ($amazdata !== null) {
 			$amaz = $amazdata;
 		}
 
@@ -557,7 +557,7 @@ class Books
 		}
 
 		$book['url'] = (string)$amaz->Items->Item->DetailPageURL;
-		$book['url'] = str_replace("%26tag%3Dws", "%26tag%3Dopensourceins%2D21", $book['url']);
+		$book['url'] = str_replace('%26tag%3Dws', '%26tag%3Dopensourceins%2D21', $book['url']);
 
 		$book['salesrank'] = (string)$amaz->Items->Item->SalesRank;
 		if ($book['salesrank'] == '') {
@@ -607,11 +607,11 @@ class Books
 		$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM bookinfo WHERE asin = %s', $this->pdo->escapeString($book['asin'])));
 		if ($check === false) {
 			$bookId = $this->pdo->queryInsert(
-				sprintf("
+				sprintf('
 								INSERT INTO bookinfo
 									(title, author, asin, isbn, ean, url, salesrank, publisher, publishdate, pages,
 									overview, genre, cover, createddate, updateddate)
-								VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, now(), now())",
+								VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, now(), now())',
 					$this->pdo->escapeString($book['title']), $this->pdo->escapeString($book['author']),
 					$this->pdo->escapeString($book['asin']), $this->pdo->escapeString($book['isbn']),
 					$this->pdo->escapeString($book['ean']), $this->pdo->escapeString($book['url']),
@@ -642,13 +642,13 @@ class Books
 
 		if ($bookId) {
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho($this->pdo->log->header("Added/updated book: "));
+				$this->pdo->log->doEcho($this->pdo->log->header('Added/updated book: '));
 				if ($book['author'] !== '') {
-					$this->pdo->log->doEcho($this->pdo->log->alternateOver("   Author: ") . $this->pdo->log->primary($book['author']));
+					$this->pdo->log->doEcho($this->pdo->log->alternateOver('   Author: ') . $this->pdo->log->primary($book['author']));
 				}
-				echo $this->pdo->log->alternateOver("   Title: ") . $this->pdo->log->primary(" " . $book['title']);
+				echo $this->pdo->log->alternateOver('   Title: ') . $this->pdo->log->primary(' ' . $book['title']);
 				if ($book['genre'] !== 'null') {
-					$this->pdo->log->doEcho($this->pdo->log->alternateOver("   Genre: ") . $this->pdo->log->primary(" " . $book['genre']));
+					$this->pdo->log->doEcho($this->pdo->log->alternateOver('   Genre: ') . $this->pdo->log->primary(' ' . $book['genre']));
 				}
 			}
 

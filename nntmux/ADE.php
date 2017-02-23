@@ -253,7 +253,7 @@ class ADE
 				if (trim($strong->innertext) === 'Features') {
 					$dofeature = true;
 				}
-				if ($dofeature != true) {
+				if ($dofeature !== true) {
 					if (trim($strong->innertext) !== '&nbsp;') {
 						$this->_res['productinfo'][] = trim($strong->innertext);
 					}

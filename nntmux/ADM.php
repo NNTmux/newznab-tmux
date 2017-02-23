@@ -132,15 +132,15 @@ class ADM
 	}
 
 	/**
-	 * Gets the sypnosis
+	 * Gets the synopsis
 	 * @return array
 	 */
-	public function sypnosis()
+	public function synopsis()
 	{
-		$this->_res['sypnosis'] = "N/A";
+		$this->_res['synopsis'] = 'N/A';
 		foreach ($this->_html->find('h3') as $heading) {
 			if (trim($heading->plaintext) === 'Description') {
-				$this->_res['sypnosis'] = trim($heading->next_sibling()->plaintext);
+				$this->_res['synopsis'] = trim($heading->next_sibling()->plaintext);
 			}
 		}
 
@@ -157,7 +157,7 @@ class ADM
 	{
 
 		foreach ($this->_html->find('ul.list-unstyled li') as $li) {
-			$category = explode(":", $li->plaintext);
+			$category = explode(':', $li->plaintext);
 			switch (trim($category[0])) {
 				case 'Director':
 					$this->_res['director'] = trim($category[1]);
@@ -264,8 +264,8 @@ class ADM
 			$results['directurl'] = $this->_directUrl;
 		}
 
-		if (is_array($this->sypnosis())) {
-			$results = array_merge($results, $this->sypnosis());
+		if (is_array($this->synopsis())) {
+			$results = array_merge($results, $this->synopsis());
 		}
 
 		if (is_array($this->productInfo())) {

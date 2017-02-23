@@ -118,11 +118,11 @@ class Backfill
 			}
 		}
 
-		$this->_compressedHeaders = (Settings::value('..compressedheaders') == 1 ? true : false);
-		$this->_safeBackFillDate = (Settings::value('..safebackfilldate') != '') ? (string)Settings::value('safebackfilldate') : '2008-08-14';
-		$this->_safePartRepair = (Settings::value('..safepartrepair') == 1 ? 'update' : 'backfill');
-		$this->_tablePerGroup = (Settings::value('..tablepergroup') == 1 ? true : false);
-		$this->_disableBackfillGroup = (Settings::value('..disablebackfillgroup') == 1 ? true : false);
+		$this->_compressedHeaders = Settings::value('..compressedheaders');
+		$this->_safeBackFillDate = Settings::value('..safebackfilldate') !== '' ? (string)Settings::value('safebackfilldate') : '2008-08-14';
+		$this->_safePartRepair = Settings::value('..safepartrepair') === 1 ? 'update' : 'backfill';
+		$this->_tablePerGroup = Settings::value('..tablepergroup');
+		$this->_disableBackfillGroup = Settings::value('..disablebackfillgroup');
 	}
 
 	/**
@@ -175,7 +175,7 @@ class Backfill
 			// Loop through groups.
 			foreach ($res as $groupArr) {
 				if ($groupName === '') {
-					$dMessage = "Starting group " . $counter . ' of ' . $groupCount;
+					$dMessage = 'Starting group ' . $counter . ' of ' . $groupCount;
 					if ($this->_debug) {
 						$this->_debugging->log(get_class(), __FUNCTION__, $dMessage, Logger::LOG_INFO);
 					}
@@ -188,7 +188,7 @@ class Backfill
 				$counter++;
 			}
 
-			$dMessage = 'Backfilling completed in ' . number_format(microtime(true) - $allTime, 2) . " seconds.";
+			$dMessage = 'Backfilling completed in ' . number_format(microtime(true) - $allTime, 2) . ' seconds.';
 			if ($this->_debug) {
 				$this->_debugging->log(get_class(), __FUNCTION__, $dMessage, Logger::LOG_INFO);
 			}
@@ -229,9 +229,9 @@ class Backfill
 		// If our local oldest article 0, it means we never ran update_binaries on the group.
 		if ($groupArr['first_record'] <= 0) {
 			$dMessage =
-				"You need to run update_binaries on " .
+				'You need to run update_binaries on ' .
 				$groupName .
-				". Otherwise the group is dead, you must disable it.";
+				'. Otherwise the group is dead, you must disable it.';
 			if ($this->_debug) {
 				$this->_debugging->log(get_class(), __FUNCTION__, $dMessage, Logger::LOG_ERROR);
 			}
@@ -256,7 +256,7 @@ class Backfill
 		}
 
 		// Check if this is days or post backfill.
-		$postCheck = ($articles === '' ? false : true);
+		$postCheck = $articles === '' ? false : true;
 
 		// Get target post based on date or user specified number.
 		$targetpost = (string)($postCheck
@@ -274,10 +274,10 @@ class Backfill
 		// Check if our target post is newer than our oldest post or if our local oldest article is older than the servers oldest.
 		if ($targetpost >= $groupArr['first_record'] || $groupArr['first_record'] <= $data['first']) {
 			$dMessage =
-				"We have hit the maximum we can backfill for " .
+				'We have hit the maximum we can backfill for ' .
 				$groupName .
-				($this->_disableBackfillGroup ? ", disabling backfill on it." :
-				", skipping it, consider disabling backfill on it.");
+				($this->_disableBackfillGroup ? ', disabling backfill on it.' :
+				', skipping it, consider disabling backfill on it.');
 			if ($this->_debug) {
 				$this->_debugging->log(get_class(), __FUNCTION__, $dMessage, Logger::LOG_NOTICE);
 			}
@@ -326,15 +326,15 @@ class Backfill
 			if ($this->_echoCLI) {
 				$this->pdo->log->doEcho(
 					$this->pdo->log->set256('Yellow') .
-					"\nGetting " .
-					(number_format($last - $first + 1)) .
-					" articles from " .
+					PHP_EOL . 'Getting ' .
+					number_format($last - $first + 1) .
+					' articles from ' .
 					$groupName .
-					", " .
+					', ' .
 					$left .
-					" group(s) left. (" .
-					(number_format($first - $targetpost)) .
-					" articles in queue)." .
+					' group(s) left. (' .
+					number_format($first - $targetpost) .
+					' articles in queue).' .
 					$this->pdo->log->rsetColor(), true
 				);
 			}
@@ -380,7 +380,7 @@ class Backfill
 					$groupName .
 					' processed in ' .
 					number_format(microtime(true) - $startGroup, 2) .
-					" seconds."
+					' seconds.'
 				), true
 			);
 		}
@@ -410,7 +410,7 @@ class Backfill
 			$dMessage =
 				'No groups to backfill, they are all at the target date ' .
 				$this->_safeBackFillDate .
-				", or you have not enabled them to be backfilled in the groups page.\n";
+				', or you have not enabled them to be backfilled in the groups page.' . PHP_EOL;
 			if ($this->_debug) {
 				$this->_debugging->log(get_class(), __FUNCTION__, $dMessage, Logger::LOG_FATAL);
 			}
