@@ -43,7 +43,7 @@ class Genres
 			$typesql = '';
 
 		if ($activeonly) {
-			$sql = sprintf('
+			$sql = sprintf("
 						SELECT g.*
 						FROM genres g
 						INNER JOIN
@@ -61,7 +61,7 @@ class Genres
 						INNER JOIN
 							(SELECT DISTINCT genres_id FROM gamesinfo) x
 							ON x.genres_id = g.id %1\$s
-							ORDER BY title',
+							ORDER BY title",
 				$typesql
 			);
 		} else {
@@ -87,7 +87,7 @@ class Genres
 			$typesql = '';
 
 		if ($activeonly)
-			$sql = sprintf('
+			$sql = sprintf("
 						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
@@ -104,7 +104,7 @@ class Genres
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genres_id FROM gamesinfo) x
-							ON x.genres_id = g.id %1\$s',
+							ON x.genres_id = g.id %1\$s",
 				$typesql
 			);
 		else
