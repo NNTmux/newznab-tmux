@@ -39,11 +39,6 @@ class ProcessReleases
 	public $groups;
 
 	/**
-	 * @var bool
-	 */
-	public $tablePerGroup;
-
-	/**
 	 * @var int
 	 */
 	public $collectionDelayTime;
@@ -145,7 +140,6 @@ class ProcessReleases
 		$this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo, 'Groups' => $this->groups]));
 		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 
-		$this->tablePerGroup = (Settings::value('..tablepergroup') == 0 ? false : true);
 		$dummy = Settings::value('..delaytime');
 		$this->collectionDelayTime = ($dummy != '' ? (int)$dummy : 2);
 		$dummy = Settings::value('..crossposttime');
@@ -246,22 +240,6 @@ class ProcessReleases
 		if ($groupName !== 'mgr') {
 			$this->deletedReleasesByGroup($groupID);
 			$this->deleteReleases();
-		}
-
-		//Print amount of added releases and time it took.
-		if ($this->echoCLI && $this->tablePerGroup === false) {
-			$countID = $this->pdo->queryOneRow('SELECT COUNT(id) AS count FROM collections ' . (!empty($groupID) ? ' WHERE groups_id = ' . $groupID : ''));
-			$this->pdo->log->doEcho(
-				$this->pdo->log->primary(
-					'Completed adding ' .
-					number_format($totalReleasesAdded) .
-					' releases in ' .
-					$this->consoleTools->convertTime(number_format(microtime(true) - $processReleases, 2)) .
-					'. ' .
-					number_format(($countID === false ? 0 : $countID['count'])) .
-					' collections waiting to be created (still incomplete or in queue for creation)'
-				), true
-			);
 		}
 
 		return $totalReleasesAdded;
@@ -447,10 +425,9 @@ class ProcessReleases
 						SELECT SQL_NO_CACHE id
 						FROM %s c
 						WHERE c.filecheck = %d
-						AND c.filesize > 0 %s',
+						AND c.filesize > 0',
 						$this->tables['cname'],
-						self::COLLFC_SIZED,
-						$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $grpID['id']) : ''
+						self::COLLFC_SIZED
 					)
 				) !== false
 			) {
@@ -461,7 +438,7 @@ class ProcessReleases
 						FROM %s c
 						LEFT JOIN %s b ON c.id = b.collections_id
 						LEFT JOIN %s p ON b.id = p.binaries_id
-						WHERE c.filecheck = %d %s
+						WHERE c.filecheck = %d
 						AND c.filesize > 0
 						AND GREATEST(%d, %d) > 0
 						AND c.filesize < GREATEST(%d, %d)',
@@ -469,7 +446,6 @@ class ProcessReleases
 						$this->tables['bname'],
 						$this->tables['pname'],
 						self::COLLFC_SIZED,
-						$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $grpID['id']) : '',
 						$groupMinSizeSetting,
 						$minSizeSetting,
 						$groupMinSizeSetting,
@@ -487,13 +463,12 @@ class ProcessReleases
 							DELETE c, b, p FROM %s c
 							LEFT JOIN %s b ON c.id = b.collections_id
 							LEFT JOIN %s p ON b.id = p.binaries_id
-							WHERE c.filecheck = %d %s
+							WHERE c.filecheck = %d
 							AND c.filesize > %d',
 							$this->tables['cname'],
 							$this->tables['bname'],
 							$this->tables['pname'],
 							self::COLLFC_SIZED,
-							$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $grpID['id']) : '',
 							$maxSizeSetting
 						)
 					);
@@ -507,14 +482,13 @@ class ProcessReleases
 						DELETE c, b, p FROM %s c
 						LEFT JOIN %s b ON c.id = b.collections_id
 						LEFT JOIN %s p ON b.id = p.binaries_id
-						WHERE c.filecheck = %d %s
+						WHERE c.filecheck = %d
 						AND GREATEST(%d, %d) > 0
 						AND c.totalfiles < GREATEST(%d, %d)',
 						$this->tables['cname'],
 						$this->tables['bname'],
 						$this->tables['pname'],
 						self::COLLFC_SIZED,
-						$this->tablePerGroup === false ? sprintf('AND c.groups_id = %d', $grpID['id']) : '',
 						$groupMinFilesSetting,
 						$minFilesSetting,
 						$groupMinFilesSetting,
@@ -547,7 +521,7 @@ class ProcessReleases
 	 */
 	protected function initiateTableNames($groupID)
 	{
-		$this->tables = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
+		$this->tables = $this->groups->getCBPTableNames($groupID);
 	}
 
 	/**
@@ -1000,12 +974,11 @@ class ProcessReleases
 				FROM %s c
 				LEFT JOIN %s b ON c.id = b.collections_id
 				LEFT JOIN %s p ON b.id = p.binaries_id
-				WHERE (c.dateadded < NOW() - INTERVAL %d HOUR) %s',
+				WHERE (c.dateadded < NOW() - INTERVAL %d HOUR)',
 				$this->tables['cname'],
 				$this->tables['bname'],
 				$this->tables['pname'],
-				Settings::value('..partretentionhours'),
-				(!empty($groupID) && $this->tablePerGroup === false ? ' AND c.groups_id = ' . $groupID : '')
+				Settings::value('..partretentionhours')
 			)
 		);
 
@@ -1041,11 +1014,10 @@ class ProcessReleases
 					FROM %s c
 					LEFT JOIN %s b ON c.id = b.collections_id
 					LEFT JOIN %s p ON b.id = p.binaries_id
-					WHERE (b.id IS NULL OR p.binaries_id IS NULL) %s',
+					WHERE (b.id IS NULL OR p.binaries_id IS NULL)',
 					$this->tables['cname'],
 					$this->tables['bname'],
-					$this->tables['pname'],
-					(!empty($groupID) && $this->tablePerGroup === false ? ' AND c.groups_id = ' . $groupID : '')
+					$this->tables['pname']
 				)
 			);
 
