@@ -1,4 +1,5 @@
 2017-02-24 DariusIII
+	* Chg: Update createNewTPGTables function to honor mandatory tpg
 	* Chg: Make tpg mandatory in monitor, run and Tmux
 	* Chg: Start to make tablepergroup mandatory, remove tpg check from Binaries
 	* Fix: Fix code in Binaries class
