@@ -1,4 +1,5 @@
 2017-02-24 DariusIII
+	* Chg: Update reset_truncate, Backfill and NZB with mandatory tpg
 	* Chg: Update ProcessReleases with mandatory tpg
 	* Chg: Update Forking to new mandatory tpg.
 	* Chg: Update createNewTPGTables function to honor mandatory tpg
