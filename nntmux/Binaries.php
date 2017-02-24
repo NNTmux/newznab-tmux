@@ -278,15 +278,15 @@ class Binaries
 
 		$this->messageBuffer = Settings::value('..maxmssgs') != '' ?
 			Settings::value('..maxmssgs') : 20000;
-		$this->_compressedHeaders = Settings::value('..compressedheaders');
-		$this->_partRepair = Settings::value('..partrepair');
-		$this->_newGroupScanByDays = Settings::value('..newgroupscanmethod');
+		$this->_compressedHeaders = Settings::value('..compressedheaders') == 1 ? true : false;
+		$this->_partRepair = Settings::value('..partrepair') == 1 ? true : false;
+		$this->_newGroupScanByDays = Settings::value('..newgroupscanmethod') == 1 ? true : false;
 		$this->_newGroupMessagesToScan = Settings::value('..newgroupmsgstoscan') != '' ? Settings::value('..newgroupmsgstoscan') : 50000;
 		$this->_newGroupDaysToScan = Settings::value('..newgroupdaystoscan') != '' ? (int)Settings::value('..newgroupdaystoscan') : 3;
 		$this->_partRepairLimit = Settings::value('..maxpartrepair') != '' ? (int)Settings::value('..maxpartrepair') : 15000;
 		$this->_partRepairMaxTries = (Settings::value('..partrepairmaxtries') != '' ? (int)Settings::value('..partrepairmaxtries') : 3);
-		$this->_showDroppedYEncParts = Settings::value('..showdroppedyencparts');
-		$this->_tablePerGroup = Settings::value('..tablepergroup');
+		$this->_showDroppedYEncParts = Settings::value('..showdroppedyencparts') == 1 ? true : false;
+		$this->_tablePerGroup = Settings::value('..tablepergroup') == 1 ? true : false;
 
 		$this->blackList = $this->whiteList = [];
 	}
