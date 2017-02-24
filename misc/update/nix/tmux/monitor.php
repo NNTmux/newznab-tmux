@@ -55,7 +55,7 @@ $runVar['timers']['query']['proc11_time'] = $runVar['timers']['query']['proc21_t
 $runVar['timers']['query']['tpg1_time'] = 0;
 
 // Analyze release table if not using innoDB (innoDB uses online analysis)
-$engine = $pdo->queryOneRow("sprintf('SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'releases'", $pdo->escapeString($db_name));
+$engine = $pdo->queryOneRow(sprintf("SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'releases'", $pdo->escapeString($db_name)));
 if (!in_array($engine['engine'], ['InnoDB', 'TokuDB'])) {
 	printf($pdo->log->info(PHP_EOL . 'Analyzing your tables to refresh your indexes.'));
 	$pdo->optimise(false, 'analyze', false, ['releases']);
