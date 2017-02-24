@@ -1,4 +1,5 @@
 2017-02-24 DariusIII
+	* Chg: Start to make tablepergroup mandatory, remove tpg check from Binaries
 	* Fix: Fix code in Binaries class
 2017-02-23 DariusIII
 	* Chg: Start to slowly refactor code for PHP 7
