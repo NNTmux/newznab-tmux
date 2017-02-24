@@ -61,6 +61,13 @@ class Backfill
 	protected $_echoCLI;
 
 	/**
+	 * Should we use tpg?
+	 *
+	 * @var bool
+	 */
+	protected $_tablePerGroup;
+
+	/**
 	 * How far back should we go on safe back fill?
 	 *
 	 * @var string
@@ -111,10 +118,11 @@ class Backfill
 			}
 		}
 
-		$this->_compressedHeaders = Settings::value('..compressedheaders') === 1 ? true : false;
+		$this->_compressedHeaders = Settings::value('..compressedheaders');
 		$this->_safeBackFillDate = Settings::value('..safebackfilldate') !== '' ? (string)Settings::value('safebackfilldate') : '2008-08-14';
 		$this->_safePartRepair = Settings::value('..safepartrepair') === 1 ? 'update' : 'backfill';
-		$this->_disableBackfillGroup = Settings::value('..disablebackfillgroup') === 1 ? true : false;
+		$this->_tablePerGroup = Settings::value('..tablepergroup');
+		$this->_disableBackfillGroup = Settings::value('..disablebackfillgroup');
 	}
 
 	/**

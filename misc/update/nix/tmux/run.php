@@ -19,6 +19,8 @@ $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $colors = (isset($tmux->colors)) ? $tmux->colors : 0;
 $nntpproxy = Settings::value('..nntpproxy');
+$tablepergroup = Settings::value('..tablepergroup');
+$tablepergroup = ($tablepergroup != '') ? $tablepergroup : 0;
 $delaytimet = Settings::value('..delaytime');
 $delaytimet = ($delaytimet) ? (int)$delaytimet : 2;
 
@@ -51,9 +53,7 @@ if ($nntpproxy == '1') {
 	foreach ($modules as &$value) {
 		if (!python_module_exist($value)) {
 			exit($pdo->log->error("\nNNTP Proxy requires " . $value .
-				" python module but it's not installed. Aborting.\n"
-			)
-			);
+				" python module but it's not installed. Aborting.\n"));
 		}
 	}
 }
@@ -61,22 +61,31 @@ if ($nntpproxy == '1') {
 //reset collections dateadded to now if dateadded > delay time check
 echo $pdo->log->header("Resetting expired collections dateadded to now. This could take a minute or two. Really.");
 
-$sql = "SHOW table status";
-$tables = $pdo->queryDirect($sql);
-$ran = 0;
-foreach ($tables as $row) {
-	$tbl = $row['name'];
-	if (preg_match('/(multigroup\_)?collections(_\d+)?/', $tbl)) {
-		$run = $pdo->queryExec('UPDATE ' . $tbl .
-			' SET dateadded = now() WHERE dateadded < now() - INTERVAL ' .
-			$delaytimet . ' HOUR'
-		);
-		if ($run !== false) {
-			$ran += $run->rowCount();
+if ($tablepergroup == 1) {
+	$sql    = "SHOW table status";
+	$tables = $pdo->queryDirect($sql);
+	$ran    = 0;
+	foreach ($tables as $row) {
+		$tbl = $row['name'];
+		if (preg_match('/(multigroup\_)?collections(_\d+)?/', $tbl)) {
+			$run = $pdo->queryExec('UPDATE ' . $tbl .
+				' SET dateadded = now() WHERE dateadded < now() - INTERVAL ' .
+				$delaytimet . ' HOUR');
+			if ($run !== false) {
+				$ran += $run->rowCount();
+			}
 		}
 	}
+	echo $pdo->log->primary(number_format($ran) . " collections reset.");
+} else {
+	$ran = 0;
+	$run = $pdo->queryExec('update collections set dateadded = now() WHERE dateadded < now() - INTERVAL ' .
+		$delaytimet . ' HOUR');
+	if ($run !== false) {
+		$ran += $run->rowCount();
+	}
+	echo $pdo->log->primary(number_format($ran) . " collections reset.");
 }
-echo $pdo->log->primary(number_format($ran) . " collections reset.");
 sleep(2);
 
 function writelog($pane)
@@ -95,7 +104,6 @@ function writelog($pane)
 function command_exist($cmd)
 {
 	$returnVal = exec("which $cmd 2>/dev/null");
-
 	return (empty($returnVal) ? false : true);
 }
 
@@ -111,7 +119,6 @@ function python_module_exist($module)
 {
 	$output = $returnCode = '';
 	exec("python -c \"import $module\"", $output, $returnCode);
-
 	return ($returnCode == 0 ? true : false);
 }
 

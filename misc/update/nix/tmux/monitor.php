@@ -22,15 +22,15 @@ $db_name = DB_NAME;
 $dbtype = DB_SYSTEM;
 $tmux = $tRun->get('niceness');
 
-$tmux_niceness = (isset($tmux->niceness) ?? 2);
+$tmux_niceness = (isset($tmux->niceness) ? $tmux->niceness : 2);
 
 $runVar['constants'] = $pdo->queryOneRow($tRun->getConstantSettings());
 
-$PHP = 'php';
-$PYTHON = ($tRun->command_exist('python3') ? 'python3 -OOu' : 'python -OOu');
+$PHP = ($tRun->command_exist("php5") ? 'php5' : 'php');
+$PYTHON = ($tRun->command_exist("python3") ? 'python3 -OOu' : 'python -OOu');
 
 //assign shell commands
-$show_time = (NN_DEBUG ? '/usr/bin/time' : '');
+$show_time = (NN_DEBUG ? "/usr/bin/time" : "");
 $runVar['commands']['_php'] = $show_time . " nice -n{$tmux_niceness} $PHP";
 $runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} $PHP";
 $runVar['commands']['_python'] = $show_time . " nice -n{$tmux_niceness} $PYTHON";
@@ -43,7 +43,7 @@ $tRun->runPane('scraper', $runVar);
 $runVar['panes'] = $tRun->getListOfPanes($runVar['constants']);
 
 //totals per category in db, results by parentID
-$catcntqry = 'SELECT c.parentid AS parentid, COUNT(r.id) AS count FROM categories c, releases r WHERE r.categories_id = c.id GROUP BY c.parentid';
+$catcntqry = "SELECT c.parentid AS parentid, COUNT(r.id) AS count FROM categories c, releases r WHERE r.categories_id = c.id GROUP BY c.parentid";
 
 //create timers and set to now
 $runVar['timers']['timer1'] = $runVar['timers']['timer2'] = $runVar['timers']['timer3'] =
@@ -55,9 +55,9 @@ $runVar['timers']['query']['proc11_time'] = $runVar['timers']['query']['proc21_t
 $runVar['timers']['query']['tpg1_time'] = 0;
 
 // Analyze release table if not using innoDB (innoDB uses online analysis)
-$engine = $pdo->queryOneRow("sprintf('SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'releases'", $pdo->escapeString($db_name));
+$engine = $pdo->queryOneRow(sprintf("SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'releases'", $pdo->escapeString($db_name)));
 if (!in_array($engine['engine'], ['InnoDB', 'TokuDB'])) {
-	printf($pdo->log->info(PHP_EOL . 'Analyzing your tables to refresh your indexes.'));
+	printf($pdo->log->info("\nAnalyzing your tables to refresh your indexes."));
 	$pdo->optimise(false, 'analyze', false, ['releases']);
 	Utility::clearScreen();
 }
@@ -67,7 +67,7 @@ $runVar['counts']['iterations'] = 1;
 $runVar['modsettings']['fc']['firstrun'] = true;
 $runVar['modsettings']['fc']['num'] = 0;
 
-$tblCount = 'SELECT TABLE_ROWS AS count FROM information_schema.TABLES WHERE TABLE_NAME = :table AND TABLE_SCHEMA = ' . $pdo->escapeString($db_name);
+$tblCount = "SELECT TABLE_ROWS AS count FROM information_schema.TABLES WHERE TABLE_NAME = :table AND TABLE_SCHEMA = " . $pdo->escapeString($db_name);
 $psTableRowCount = $pdo->Prepare($tblCount);
 
 while ($runVar['counts']['iterations'] > 0) {
@@ -92,7 +92,10 @@ while ($runVar['counts']['iterations'] > 0) {
 	$runVar['constants']['pre_lim'] = ($runVar['counts']['iterations'] > 1 ? '7' : '');
 
 	//assign scripts
-	$runVar['scripts']['releases'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/releases.php";
+	$runVar['scripts']['releases'] = ($runVar['constants']['tablepergroup'] == 0
+		? "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/update_releases.php 1 false"
+		: "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/releases.php"
+	);
 
 	switch ((int)$runVar['settings']['binaries_run']) {
 		case 1:
@@ -198,55 +201,57 @@ while ($runVar['counts']['iterations'] > 0) {
 		$runVar['timers']['query']['proc31_time'] = (time() - $timer01);
 
 		$timer07 = time();
-		$tables = $tMain->cbpmTableQuery();
-		$age = time();
+		if ($runVar['constants']['tablepergroup'] == 1) {
+			$tables = $tMain->cbpmTableQuery();
+			$age = time();
 
-		$runVar['counts']['now']['collections_table'] = $runVar['counts']['now']['binaries_table'] = 0;
-		$runVar['counts']['now']['parts_table'] = $runVar['counts']['now']['parterpair_table'] = 0;
+			$runVar['counts']['now']['collections_table'] = $runVar['counts']['now']['binaries_table'] = 0;
+			$runVar['counts']['now']['parts_table'] = $runVar['counts']['now']['parterpair_table'] = 0;
 
-		if ($psTableRowCount === false) {
-			echo 'Unable to prepare statement, skipping monitor updates!';
-		} else {
-			if ($tables instanceof \Traversable) {
-				foreach ($tables as $row) {
-					$tbl = $row['name'];
-					$stamp = 'UNIX_TIMESTAMP(MIN(dateadded))';
+			if ($psTableRowCount === false) {
+				echo "Unable to prepare statement, skipping monitor updates!";
+			} else {
+				if ($tables instanceof \Traversable) {
+					foreach ($tables as $row) {
+						$tbl = $row['name'];
+						$stamp = 'UNIX_TIMESTAMP(MIN(dateadded))';
 
-					switch (true) {
-						case strpos($tbl, 'collections') !== false:
-							$runVar['counts']['now']['collections_table'] +=
-								getTableRowCount($psTableRowCount, $tbl);
-							$added = $pdo->queryOneRow(sprintf('SELECT %s AS dateadded FROM %s', $stamp, $tbl));
-							if (isset($added['dateadded']) && is_numeric($added['dateadded']) &&
-								$added['dateadded'] < $age
-							) {
-								$age = $added['dateadded'];
-							}
-							break;
-						case strpos($tbl, 'binaries') !== false:
-							$runVar['counts']['now']['binaries_table'] +=
-								getTableRowCount($psTableRowCount, $tbl);
-							break;
-						// This case must come before the 'parts_' one.
-						case strpos($tbl, 'missed_parts') !== false:
-							$runVar['counts']['now']['missed_parts_table'] +=
-								getTableRowCount($psTableRowCount, $tbl);
+						switch (true) {
+							case strpos($tbl, 'collections') !== false:
+								$runVar['counts']['now']['collections_table'] +=
+									getTableRowCount($psTableRowCount, $tbl);
+								$added = $pdo->queryOneRow(sprintf('SELECT %s AS dateadded FROM %s', $stamp, $tbl));
+								if (isset($added['dateadded']) && is_numeric($added['dateadded']) &&
+									$added['dateadded'] < $age
+								) {
+									$age = $added['dateadded'];
+								}
+								break;
+							case strpos($tbl, 'binaries') !== false:
+								$runVar['counts']['now']['binaries_table'] +=
+									getTableRowCount($psTableRowCount, $tbl);
+								break;
+							// This case must come before the 'parts_' one.
+							case strpos($tbl, 'missed_parts') !== false:
+								$runVar['counts']['now']['missed_parts_table'] +=
+									getTableRowCount($psTableRowCount, $tbl);
 
-							break;
-						case strpos($tbl, 'parts') !== false:
-							$runVar['counts']['now']['parts_table'] +=
-								getTableRowCount($psTableRowCount, $tbl);
-							break;
-						default:
+								break;
+							case strpos($tbl, 'parts') !== false:
+								$runVar['counts']['now']['parts_table'] +=
+									getTableRowCount($psTableRowCount, $tbl);
+								break;
+							default:
+						}
 					}
+					$runVar['timers']['newOld']['oldestcollection'] = $age;
+
+					//free up memory used by now stale data
+					unset($age, $added, $tables);
+
+					$runVar['timers']['query']['tpg_time']  = (time() - $timer07);
+					$runVar['timers']['query']['tpg1_time'] = (time() - $timer01);
 				}
-				$runVar['timers']['newOld']['oldestcollection'] = $age;
-
-				//free up memory used by now stale data
-				unset($age, $added, $tables);
-
-				$runVar['timers']['query']['tpg_time'] = (time() - $timer07);
-				$runVar['timers']['query']['tpg1_time'] = (time() - $timer01);
 			}
 		}
 		$runVar['timers']['timer2'] = time();
@@ -364,7 +369,7 @@ while ($runVar['counts']['iterations'] > 0) {
 			$tRun->runPane('nonamazon', $runVar);
 		}
 
-	} else if ($runVar['settings']['is_running'] === '0') {
+	} else  if ($runVar['settings']['is_running'] === '0') {
 		$tRun->runPane('notrunning', $runVar);
 	}
 
@@ -382,11 +387,11 @@ while ($runVar['counts']['iterations'] > 0) {
 
 function errorOnSQL($pdo)
 {
-	echo $pdo->log->error(PHP_EOL . 'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.' . PHP_EOL);
+	echo $pdo->log->error(PHP_EOL . "Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again." . PHP_EOL);
 	exit;
 }
 
-function getTableRowCount(\PDOStatement $ps, $table)
+function getTableRowCount(\PDOStatement &$ps, $table)
 {
 	$success = $ps->execute([':table' => $table]);
 	if ($success) {
