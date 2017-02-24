@@ -197,7 +197,7 @@ class Groups
 	 * Gets a count of all groups in the table limited by parameters
 	 *
 	 * @param string $groupname Constrain query to specific group name
-	 * @param int    $active Constrain query to active status
+	 * @param int    $active    Constrain query to active status
 	 *
 	 * @return mixed
 	 */
@@ -226,10 +226,10 @@ class Groups
 	/**
 	 * Gets all groups and associated release counts
 	 *
-	 * @param bool|int $start The offset of the query or false for no offset
-	 * @param int $num The limit of the query
-	 * @param string $groupname The groupname we want if any
-	 * @param int $active The status of the group we want if any
+	 * @param bool|int $start     The offset of the query or false for no offset
+	 * @param int      $num       The limit of the query
+	 * @param string   $groupname The groupname we want if any
+	 * @param int      $active    The status of the group we want if any
 	 *
 	 * @return mixed
 	 */
@@ -304,7 +304,7 @@ class Groups
 				$this->formatNumberString($group['backfill']),
 				$minFileString,
 				$minSizeString,
-				$group["id"]
+				$group['id']
 			)
 		);
 	}
@@ -489,8 +489,8 @@ class Groups
 		);
 
 		if ($res instanceof \Traversable) {
-			$releases     = new Releases(['Settings' => $this->pdo, 'Groups' => $this]);
-			$nzb          = new NZB($this->pdo);
+			$releases = new Releases(['Settings' => $this->pdo, 'Groups' => $this]);
+			$nzb = new NZB($this->pdo);
 			$releaseImage = new ReleaseImage($this->pdo);
 			foreach ($res AS $row) {
 				$releases->deleteSingle(
@@ -517,7 +517,7 @@ class Groups
 	public function addBulk($groupList, $active = 1, $backfill = 1)
 	{
 		if (preg_match('/^\s*$/m', $groupList)) {
-			$ret = "No group list provided.";
+			$ret = 'No group list provided.';
 		} else {
 			$nntp = new NNTP(['Echo' => false]);
 			if ($nntp->doConnect() !== true) {
@@ -562,9 +562,9 @@ class Groups
 	/**
 	 * Updates the group active/backfill status
 	 *
-	 * @param int $id Which group ID
+	 * @param int    $id     Which group ID
 	 * @param string $column Which column active/backfill
-	 * @param int $status Which status we are setting
+	 * @param int    $status Which status we are setting
 	 *
 	 * @return string
 	 */
@@ -583,14 +583,13 @@ class Groups
 	 * Get the names of the collections/binaries/parts/part repair tables.
 	 * If TPG is on, try to create new tables for the groups_id, if we fail, log the error and exit.
 	 *
-	 * @param bool $tpgSetting false, tpg is off in site setting, true tpg is on in site setting.
-	 * @param int  $groupID    ID of the group.
+	 * @param int $groupID ID of the group.
 	 *
 	 * @return array The table names.
 	 */
-	public function getCBPTableNames($tpgSetting, $groupID)
+	public function getCBPTableNames($groupID)
 	{
-		$groupKey = ($groupID . '_' . (int)$tpgSetting);
+		$groupKey = $groupID;
 
 		// Check if buffered and return. Prevents re-querying MySQL when TPG is on.
 		if (isset($this->cbppTableNames[$groupKey])) {
@@ -603,21 +602,15 @@ class Groups
 		$tables['pname']  = 'parts';
 		$tables['prname'] = 'missed_parts';
 
-		if ($tpgSetting === true) {
-			if ($groupID == '') {
-				exit('Error: You must use .../misc/update/nix/multiprocessing/releases.php since you have enabled TPG!');
-			}
-
-			if ($this->createNewTPGTables($groupID) === false && NN_ECHOCLI) {
-				exit('There is a problem creating new TPG tables for this group ID: ' . $groupID . PHP_EOL);
-			}
-
-			$groupEnding = '_' . $groupID;
-			$tables['cname'] .= $groupEnding;
-			$tables['bname'] .= $groupEnding;
-			$tables['pname'] .= $groupEnding;
-			$tables['prname'] .= $groupEnding;
+		if (NN_ECHOCLI && $this->createNewTPGTables($groupID) === false) {
+			exit('There is a problem creating new TPG tables for this group ID: ' . $groupID . PHP_EOL);
 		}
+
+		$groupEnding = '_' . $groupID;
+		$tables['cname'] .= $groupEnding;
+		$tables['bname'] .= $groupEnding;
+		$tables['pname'] .= $groupEnding;
+		$tables['prname'] .= $groupEnding;
 
 		// Buffer.
 		$this->cbppTableNames[$groupKey] = $tables;

@@ -21,14 +21,6 @@ class NZB
 	const NZB_XML_NS = 'http://www.newzbin.com/DTD/2003/nzb';
 
 	/**
-	 * Determines if the site setting table per group is enabled.
-	 *
-	 * @var bool
-	 * @access private
-	 */
-	private $tablePerGroup;
-
-	/**
 	 * Levels deep to store NZB files.
 	 *
 	 * @var int
@@ -119,7 +111,6 @@ class NZB
 	{
 		$this->pdo = ($pdo instanceof DB ? $pdo : new DB());
 
-		$this->tablePerGroup = (Settings::value('..tablepergroup') == 0 ? false : true);
 		$nzbSplitLevel = Settings::value('..nzbsplitlevel');
 		$this->nzbSplitLevel = (empty($nzbSplitLevel) ? 1 : $nzbSplitLevel);
 		$this->siteNzbPath = (string)Settings::value('..nzbpath');
@@ -155,39 +146,32 @@ class NZB
 	{
 		$this->groupID = $groupID;
 		// Set table names
-		if ($this->tablePerGroup === true) {
-			if ($this->groupID == '') {
-				exit("{$this->groupID} is missing\n");
-			}
-			$this->_tableNames = [
-				'cName' => 'collections_' . $this->groupID,
-				'bName' => 'binaries_' . $this->groupID,
-				'pName' => 'parts_' . $this->groupID
-			];
-		} else {
-			$this->_tableNames = [
-				'cName' => 'collections',
-				'bName' => 'binaries',
-				'pName' => 'parts'
-			];
+
+		if ($this->groupID == '') {
+			exit("{$this->groupID} is missing\n");
 		}
+		$this->_tableNames = [
+			'cName' => 'collections_' . $this->groupID,
+			'bName' => 'binaries_' . $this->groupID,
+			'pName' => 'parts_' . $this->groupID
+		];
 		$this->setQueries();
 	}
 
 	protected function setQueries()
 	{
-			$this->_collectionsQuery = "
+		$this->_collectionsQuery = "
 			SELECT c.*, UNIX_TIMESTAMP(c.date) AS udate,
 				g.name AS groupname
 			FROM {$this->_tableNames['cName']} c
 			INNER JOIN groups g ON c.groups_id = g.id
 			WHERE c.releases_id = ";
-			$this->_binariesQuery = "
+		$this->_binariesQuery = "
 			SELECT b.id, b.name, b.totalparts
 			FROM {$this->_tableNames['bName']} b
 			WHERE b.collections_id = %d
 			ORDER BY b.name ASC";
-			$this->_partsQuery = "
+		$this->_partsQuery = "
 			SELECT DISTINCT(p.messageid), p.size, p.partnumber
 			FROM {$this->_tableNames['pName']} p
 			WHERE p.binaries_id = %d
@@ -426,7 +410,7 @@ class NZB
 				$num_pars++;
 			}
 
-			if ($options['no-file-key'] == false) {
+			if ($options['no-file-key'] === false) {
 				$i = $title;
 				if ($options['strip-count']) {
 					// Strip file / part count to get proper sorting.
