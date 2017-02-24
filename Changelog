@@ -1,9 +1,8 @@
 2017-02-24 DariusIII
+	* Chg: Fix some problems related to bad understanding of CBP tables code in Groups class.
 	* Chg: Update reset_truncate, Backfill and NZB with mandatory tpg
 	* Chg: Update ProcessReleases with mandatory tpg
 	* Chg: Update Forking to new mandatory tpg.
-	* Chg: Update createNewTPGTables function to honor mandatory tpg
-	* Chg: Make tpg mandatory in monitor, run and Tmux
 	* Chg: Start to make tablepergroup mandatory, remove tpg check from Binaries
 	* Fix: Fix code in Binaries class
 2017-02-23 DariusIII
@@ -17,7 +16,7 @@
 	* Chg: Fix sending to sab and download basket from xxx and movie views in Charisma/Omicron themes
 2017-02-21 DariusIII
 	* Chg: Replace span with col-md- in Gamma theme
-	* Chg: Update AdminLTE to version 2.3.11 (Omicron theme) 
+	* Chg: Update AdminLTE to version 2.3.11 (Omicron theme)
 	* Chg: Remove year from names of releases on games page
 	* Chg: Update guzzlehttp
 2017-02-20 DariusIII
@@ -35,7 +34,7 @@
 	* Chg: Add model for new releases_regexes table
 2017-02-13 DariusIII
 	* Chg: Add bad regex logging (bad regex, not regex with 0 matches)
-	* Chg: Improve performance by doing poster check in PHP instead of single row MySQL queries (by b3rs3rk@nZEDb) 
+	* Chg: Improve performance by doing poster check in PHP instead of single row MySQL queries (by b3rs3rk@nZEDb)
 2017-02-10 DariusIII
 	* Fix: Predb links in admin area
 2017-02-08 DariusIII

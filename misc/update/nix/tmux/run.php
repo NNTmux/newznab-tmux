@@ -12,12 +12,12 @@ $DIR = NN_TMUX;
 $c = new ColorCLI();
 $t = new Tmux();
 $tmux = $t->get();
-$patch = isset($tmux->sqlpatch) ?? 0;
-$import = isset($tmux->import) ?? 0;
-$tmux_session = isset($tmux->tmux_session) ?? 0;
-$seq = isset($tmux->sequential) ?? 0;
-$powerline = isset($tmux->powerline) ?? 0;
-$colors = isset($tmux->colors) ?? 0;
+$patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
+$import = (isset($tmux->import)) ? $tmux->import : 0;
+$tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
+$seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
+$powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
+$colors = (isset($tmux->colors)) ? $tmux->colors : 0;
 $nntpproxy = Settings::value('..nntpproxy');
 $delaytimet = Settings::value('..delaytime');
 $delaytimet = ($delaytimet) ? (int)$delaytimet : 2;
@@ -27,12 +27,12 @@ Utility::clearScreen();
 
 echo "Starting Tmux...\n";
 // Create a placeholder session so tmux commands do not throw server not found errors.
-exec("tmux new-session -ds placeholder 2>/dev/null");
+exec('tmux new-session -ds placeholder 2>/dev/null');
 // Search for NNTPProxy session that might be running from a user threaded.php run. Setup a clean environment to run in.
 exec("tmux list-session | grep NNTPProxy", $nntpkill);
 if (count($nntpkill) !== 0) {
 	exec("tmux kill-session -t NNTPProxy");
-	echo $pdo->log->notice('Found NNTPProxy tmux session and killing it.');
+	echo $pdo->log->notice("Found NNTPProxy tmux session and killing it.");
 } else {
 	exec("tmux list-session", $session);
 }
@@ -40,48 +40,49 @@ if (count($nntpkill) !== 0) {
 //check if session exists
 $session = shell_exec("tmux list-session | grep $tmux_session");
 // Kill the placeholder
-exec("tmux kill-session -t placeholder");
+exec('tmux kill-session -t placeholder');
 if (count($session) !== 0) {
-	exit($pdo->log->error('tmux session: ' . $tmux_session . ' is already running, aborting.' . PHP_EOL));
+	exit($pdo->log->error("tmux session: '" . $tmux_session . "' is already running, aborting.\n"));
 }
 
 $nntpproxy = Settings::value('..nntpproxy');
-if ($nntpproxy === '1') {
-	$modules = ['nntp', 'socketpool'];
+if ($nntpproxy == '1') {
+	$modules = ["nntp", "socketpool"];
 	foreach ($modules as &$value) {
 		if (!python_module_exist($value)) {
-			exit($pdo->log->error('NNTP Proxy requires ' . $value .
-				' python module but it\\\'s not installed. Aborting.' . PHP_EOL));
+			exit($pdo->log->error("\nNNTP Proxy requires " . $value .
+				" python module but it's not installed. Aborting.\n"
+			)
+			);
 		}
 	}
-	unset ($value);
 }
 
 //reset collections dateadded to now if dateadded > delay time check
-echo $pdo->log->header('Resetting expired collections dateadded to now. This could take a minute or two. Really.');
+echo $pdo->log->header("Resetting expired collections dateadded to now. This could take a minute or two. Really.");
 
-
-	$sql    = 'SHOW table status';
-	$tables = $pdo->queryDirect($sql);
-	$ran    = 0;
-	foreach ($tables as $row) {
-		$tbl = $row['name'];
-		if (preg_match('/(multigroup\_)?collections(_\d+)?/', $tbl)) {
-			$run = $pdo->queryExec('UPDATE ' . $tbl .
-				' SET dateadded = now() WHERE dateadded < now() - INTERVAL ' .
-				$delaytimet . ' HOUR');
-			if ($run !== false) {
-				$ran += $run->rowCount();
-			}
+$sql = "SHOW table status";
+$tables = $pdo->queryDirect($sql);
+$ran = 0;
+foreach ($tables as $row) {
+	$tbl = $row['name'];
+	if (preg_match('/(multigroup\_)?collections(_\d+)?/', $tbl)) {
+		$run = $pdo->queryExec('UPDATE ' . $tbl .
+			' SET dateadded = now() WHERE dateadded < now() - INTERVAL ' .
+			$delaytimet . ' HOUR'
+		);
+		if ($run !== false) {
+			$ran += $run->rowCount();
 		}
 	}
-	echo $pdo->log->primary(number_format($ran) . ' collections reset.');
+}
+echo $pdo->log->primary(number_format($ran) . " collections reset.");
 sleep(2);
 
 function writelog($pane)
 {
-	$path = NN_RES . 'logs';
-	$getdate = gmdate('Ymd');
+	$path = NN_RES . "logs";
+	$getdate = gmdate("Ymd");
 	$tmux = new Tmux();
 	$logs = $tmux->get()->write_logs;
 	if ($logs == 1) {
@@ -94,34 +95,34 @@ function writelog($pane)
 function command_exist($cmd)
 {
 	$returnVal = exec("which $cmd 2>/dev/null");
+
 	return (empty($returnVal) ? false : true);
 }
 
 //check for apps
-$apps = ['time', 'tmux', 'nice', 'python', 'tee'];
+$apps = array("time", "tmux", "nice", "python", "tee");
 foreach ($apps as &$value) {
 	if (!command_exist($value)) {
-		exit($c->error('Tmux scripts require ' . $value . ' but it\\\'s not installed. Aborting' . PHP_EOL));
+		exit($c->error("Tmux scripts require " . $value . " but it's not installed. Aborting.\n"));
 	}
 }
-unset ($value);
 
 function python_module_exist($module)
 {
 	$output = $returnCode = '';
 	exec("python -c \"import $module\"", $output, $returnCode);
+
 	return ($returnCode == 0 ? true : false);
 }
 
 $nntpproxy = Settings::value('..nntpproxy');
-if ($nntpproxy === 1) {
-	$modules = ['nntp', 'socketpool'];
+if ($nntpproxy == '1') {
+	$modules = array("nntp", "socketpool");
 	foreach ($modules as &$value) {
 		if (!python_module_exist($value)) {
-			exit($pdo->log->error(PHP_EOL . 'NNTP Proxy requires ' . $value . ' python module but it\\\'s not installed. Aborting.' . PHP_EOL));
+			exit($pdo->log->error("\nNNTP Proxy requires " . $value . " python module but it's not installed. Aborting.\n"));
 		}
 	}
-	unset($value);
 }
 
 function start_apps($tmux_session)
@@ -140,7 +141,7 @@ function start_apps($tmux_session)
 	$processupdate = $tmux->processupdate;
 	$console_bash = $tmux->console;
 
-	if ($htop == 1 && command_exist('htop')) {
+	if ($htop == 1 && command_exist("htop")) {
 		exec("tmux new-window -t $tmux_session -n htop 'printf \"\033]2;htop\033\" && htop'");
 	}
 
@@ -167,8 +168,9 @@ function start_apps($tmux_session)
 	if ($showprocesslist == 1) {
 		exec("tmux new-window -t $tmux_session -n showprocesslist 'printf \"\033]2;showprocesslist\033\" && watch -n .5 \"mysql -e \\\"SELECT time, state, info FROM information_schema.processlist WHERE command != \\\\\\\"Sleep\\\\\\\" AND time >= $processupdate ORDER BY time DESC \\\G\\\"\"'");
 	}
+	//exec("tmux new-window -t $tmux_session -n showprocesslist 'printf \"\033]2;showprocesslist\033\" && watch -n .2 \"mysql -e \\\"SELECT time, state, rows_examined, info FROM information_schema.processlist WHERE command != \\\\\\\"Sleep\\\\\\\" AND time >= $processupdate ORDER BY time DESC \\\G\\\"\"'");
 
-	if ($console_bash === 1) {
+	if ($console_bash == 1) {
 		exec("tmux new-window -t $tmux_session -n bash 'printf \"\033]2;Bash\033\" && bash -i'");
 	}
 }
@@ -177,20 +179,20 @@ function window_proxy($tmux_session, $window)
 {
 	global $pdo;
 	$nntpproxy = Settings::value('..nntpproxy');
-	if ($nntpproxy === 1) {
+	if ($nntpproxy === '1') {
 		$DIR = NN_MISC;
-		$nntpproxypy = $DIR . 'update/python/nntpproxy.py';
-		if (file_exists($DIR . 'update/python/lib/nntpproxy.conf')) {
-			$nntpproxyconf = $DIR . 'update/python/lib/nntpproxy.conf';
+		$nntpproxypy = $DIR . "update/python/nntpproxy.py";
+		if (file_exists($DIR . "update/python/lib/nntpproxy.conf")) {
+			$nntpproxyconf = $DIR . "update/python/lib/nntpproxy.conf";
 			exec("tmux new-window -t $tmux_session -n nntpproxy 'printf \"\033]2;NNTPProxy\033\" && python $nntpproxypy $nntpproxyconf'");
 		}
 	}
 
-	if ($nntpproxy === 1 && (Settings::value('..alternate_nntp') === 1)) {
+	if ($nntpproxy === '1' && (Settings::value('..alternate_nntp') == '1')) {
 		$DIR = NN_MISC;
-		$nntpproxypy = $DIR . 'update/python/nntpproxy.py';
-		if (file_exists($DIR . 'python/lib/nntpproxy_a.conf')) {
-			$nntpproxyconf = $DIR . 'python/lib/nntpproxy_a.conf';
+		$nntpproxypy = $DIR . "update/python/nntpproxy.py";
+		if (file_exists($DIR . "python/lib/nntpproxy_a.conf")) {
+			$nntpproxyconf = $DIR . "python/lib/nntpproxy_a.conf";
 			exec("tmux selectp -t $tmux_session:$window.0; tmux splitw -t $tmux_session:$window -h -p 50 'printf \"\033]2;NNTPProxy\033\" && python $nntpproxypy $nntpproxyconf'");
 		}
 	}
@@ -234,17 +236,20 @@ function window_sharing($tmux_session)
 	$sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 	$t = new Tmux();
 	$tmux = $t->get();
-	$tmux_share = isset($tmux->run_sharing) ?? 0;
+	$tmux_share = (isset($tmux->run_sharing)) ? $tmux->run_sharing : 0;
 
-	if ($tmux_share && $sharing['enabled'] === 1 && ($sharing['posting'] === 1 || $sharing['fetching'] === 1)) {
+	if ($tmux_share && $sharing['enabled'] == 1 && ($sharing['posting'] == 1 || $sharing['fetching'] == 1)) {
 		exec("tmux new-window -t $tmux_session -n Sharing 'printf \"\033]2;comment_sharing\033\"'");
 	}
 }
 
 function attach($DIR, $tmux_session)
 {
-	$PHP = 'php';
-
+	if (command_exist("php5")) {
+		$PHP = "php5";
+	} else {
+		$PHP = "php";
+	}
 
 	//get list of panes by name
 	$panes_win_1 = exec("echo `tmux list-panes -t $tmux_session:0 -F '#{pane_title}'`");
@@ -256,12 +261,12 @@ function attach($DIR, $tmux_session)
 
 //create tmux session
 if ($powerline == 1) {
-	$tmuxconfig = $DIR . 'powerline/tmux.conf';
+	$tmuxconfig = $DIR . "powerline/tmux.conf";
 } else {
-	$tmuxconfig = $DIR . 'tmux.conf';
+	$tmuxconfig = $DIR . "tmux.conf";
 }
 
-if ($seq === 1) {
+if ($seq == 1) {
 	exec("cd ${DIR}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_releases\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
