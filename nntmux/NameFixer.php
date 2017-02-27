@@ -472,7 +472,7 @@ class NameFixer
 
 		$releases = $this->_getReleases($time, $cats, $query);
 
-		if ($releases instanceof \Traversable && $releases !== false) {
+		if ($releases instanceof \Traversable) {
 
 			$total = $releases->rowCount();
 			if ($total > 0) {
@@ -492,6 +492,8 @@ class NameFixer
 
 				foreach ($releases as $release) {
 					if (($nzbContents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], $nameStatus, $show)) === true) {
+						$this->fixed++;
+					} else if ($this->matchParHash($release['releases_id']) === true){
 						$this->fixed++;
 					}
 
@@ -1942,6 +1944,43 @@ class NameFixer
 			}
 		}
 		$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releases_id']);
+		return false;
+	}
+
+	public function matchParHash($release, $echo, $type, $namestatus, $show)
+	{
+		if ($this->done === false && $this->relid !== $release['releases_id']) {
+			$hash = $this->pdo->queryDirect(sprintf("SELECT hash AS hash from par_hashes WHERE releases_id = {$release['releases_id']}"));
+			$result = $this->pdo->queryDirect(sprintf("
+				SELECT ph.hash AS hash, r.categories_id, r.name, r.searchname, r.fromname, r.groups_id, r.id AS releases_id
+					FROM releases r
+					LEFT JOIN par_hashes ph ON ph.releases_id = {$release['releases_id']}
+					WHERE (r.isrenamed = %d OR r.categories_id IN (%d, %d))
+					",
+					self::IS_RENAMED_DONE,
+					Category::OTHER_MISC,
+					Category::OTHER_HASHED
+				)
+			);
+
+			if ($result instanceof \Traversable) {
+				foreach ($result AS $res) {
+					if (preg_match('/^(.*)\.srr/i', $res['hash'], $match)) {
+						$this->updateRelease(
+							$release,
+							$match["1"],
+							$method = "PAR2: hash_16K",
+							$echo,
+							$type,
+							$namestatus,
+							$show
+						);
+						return true;
+					}
+				}
+			}
+		}
+		$this->_updateSingleColumn('proc_par2', self::PROC_PAR2_DONE, $release['releases_id']);
 		return false;
 	}
 
