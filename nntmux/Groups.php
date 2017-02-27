@@ -596,21 +596,15 @@ class Groups
 			return $this->cbppTableNames[$groupKey];
 		}
 
-		$tables           = [];
-		$tables['cname']  = 'collections';
-		$tables['bname']  = 'binaries';
-		$tables['pname']  = 'parts';
-		$tables['prname'] = 'missed_parts';
-
 		if (NN_ECHOCLI && $this->createNewTPGTables($groupID) === false) {
 			exit('There is a problem creating new TPG tables for this group ID: ' . $groupID . PHP_EOL);
 		}
 
-		$groupEnding = '_' . $groupID;
-		$tables['cname'] .= $groupEnding;
-		$tables['bname'] .= $groupEnding;
-		$tables['pname'] .= $groupEnding;
-		$tables['prname'] .= $groupEnding;
+		$tables           = [];
+		$tables['cname']  = 'collections_' . $groupID;
+		$tables['bname']  = 'binaries_' . $groupID;
+		$tables['pname']  = 'parts_' . $groupID;
+		$tables['prname'] = 'missed_parts_' . $groupID;
 
 		// Buffer.
 		$this->cbppTableNames[$groupKey] = $tables;
