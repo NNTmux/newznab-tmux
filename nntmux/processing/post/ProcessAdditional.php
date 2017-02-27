@@ -1175,12 +1175,12 @@ class ProcessAdditional
 					// Extract files from the rar.
 					if (isset($file['compressed']) && $file['compressed'] == 0) {
 						@file_put_contents(
-							($this->tmpPath . mt_rand(10, 999999) . '_' . $fileName),
+							($this->tmpPath . random_int(10, 999999) . '_' . $fileName),
 							$this->_archiveInfo->getFileData($file['name'], $file['source'])
 						);
 					} // If the files are compressed, use a binary extractor.
 					else {
-						$this->_archiveInfo->extractFile($file['name'], $this->tmpPath . mt_rand(10, 999999) . '_' . $fileName);
+						$this->_archiveInfo->extractFile($file['name'], $this->tmpPath . random_int(10, 999999) . '_' . $fileName);
 					}
 				}
 			}
@@ -1226,7 +1226,7 @@ class ProcessAdditional
 				) === false
 			) {
 
-				if ($this->_releaseFiles->add($this->_release['id'], $file['name'], $file['size'], $file['date'], $file['pass'])) {
+				if ($this->_releaseFiles->add($this->_release['id'], $file['name'], '', $file['size'], $file['date'], $file['pass'])) {
 					$this->_addedFileInfo++;
 
 					if ($this->_echoCLI) {
@@ -1434,7 +1434,7 @@ class ProcessAdditional
 					// Check if it's more than 40 bytes.
 					if (strlen($sampleBinary) > 40) {
 
-						$fileLocation = $this->tmpPath . 'sample_' . mt_rand(0, 99999) . '.avi';
+						$fileLocation = $this->tmpPath . 'sample_' . random_int(0, 99999) . '.avi';
 						// Try to create the file.
 						@file_put_contents($fileLocation, $sampleBinary);
 
@@ -2005,7 +2005,7 @@ class ProcessAdditional
 		if (is_file($fileLocation)) {
 
 			// Create path to temp file.
-			$fileName = ($this->tmpPath . 'zzzz' . mt_rand(5, 12) . mt_rand(5, 12) . '.jpg');
+			$fileName = ($this->tmpPath . 'zzzz' . random_int(5, 12) . random_int(5, 12) . '.jpg');
 
 			$time = $this->getVideoTime($fileLocation);
 
@@ -2274,6 +2274,7 @@ class ProcessAdditional
 			if ($foundName === true && $filesAdded > 10) {
 				break;
 			}
+
 
 			// Add to release files.
 			if ($this->_addPAR2Files) {

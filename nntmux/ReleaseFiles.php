@@ -98,25 +98,26 @@ class ReleaseFiles
 						INSERT INTO release_files
 						(releases_id, name, size, createddate, passworded)
 						VALUES
-						(%d, %s, %s, %s, %s, %d)',
+						(%d, %s, %s, %s, %d)',
 							$id,
 							$this->pdo->escapeString(utf8_encode($name)),
-							!empty($this->pdo->escapeString($hash)) ?? '',
 							$this->pdo->escapeString($size),
 							$this->pdo->from_unixtime($createdTime),
 							$hasPassword
 					)
 			);
 
-			$this->pdo->queryExec(
+			if (strlen($hash) === 32) {
+				$this->pdo->queryExec(
 					sprintf('
 						INSERT INTO par_hashes
 						(releases_id, hash)
 						VALUES (%d, %s)',
 						$id,
-						!empty($this->pdo->escapeString($hash)) ?? ''
+						$this->pdo->escapeString($hash)
 					)
-			);
+				);
+			}
 			$this->sphinxSearch->updateRelease($id, $this->pdo);
 		}
 		return $insert;
