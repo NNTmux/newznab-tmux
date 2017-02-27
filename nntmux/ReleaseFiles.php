@@ -111,10 +111,9 @@ class ReleaseFiles
 			$this->pdo->queryExec(
 					sprintf('
 						INSERT INTO par_hashes
-						(releases_id, name, hash)
-						VALUES (%d, %s, %s)',
+						(releases_id, hash)
+						VALUES (%d, %s)',
 						$id,
-						$this->pdo->escapeString(utf8_encode($name)),
 						!empty($this->pdo->escapeString($hash)) ?? ''
 					)
 			);
