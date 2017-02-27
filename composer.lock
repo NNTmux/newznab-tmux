@@ -1386,16 +1386,16 @@
         },
         {
             "name": "exeu/apai-io",
-            "version": "2.0.0",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Exeu/apai-io.git",
-                "reference": "86c554a06883374fae7c0ad726231dc087f87e92"
+                "reference": "fb171b5654c8a24a075976fc927f488a2ea0c15b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Exeu/apai-io/zipball/86c554a06883374fae7c0ad726231dc087f87e92",
-                "reference": "86c554a06883374fae7c0ad726231dc087f87e92",
+                "url": "https://api.github.com/repos/Exeu/apai-io/zipball/fb171b5654c8a24a075976fc927f488a2ea0c15b",
+                "reference": "fb171b5654c8a24a075976fc927f488a2ea0c15b",
                 "shasum": ""
             },
             "require": {
@@ -1436,7 +1436,7 @@
                 "products",
                 "rest"
             ],
-            "time": "2016-05-28 20:30:49"
+            "time": "2017-02-24 10:12:27"
         },
         {
             "name": "fxp/composer-asset-plugin",
@@ -1545,12 +1545,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "6a99df94a22f01b4b9c32ed8789cf30d05bdba92"
+                "reference": "437c0c33217953b3b75e5080b73554da5f76b179"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/6a99df94a22f01b4b9c32ed8789cf30d05bdba92",
-                "reference": "6a99df94a22f01b4b9c32ed8789cf30d05bdba92",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/437c0c33217953b3b75e5080b73554da5f76b179",
+                "reference": "437c0c33217953b3b75e5080b73554da5f76b179",
                 "shasum": ""
             },
             "require": {
@@ -1602,7 +1602,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2017-02-19 15:59:27"
+            "time": "2017-02-23 20:32:34"
         },
         {
             "name": "guzzlehttp/promises",
