@@ -71,13 +71,14 @@ class ReleaseFiles
 	 *
 	 * @param int    $id          The ID of the release.
 	 * @param string $name        Name of the file.
-	 * @param int    $size        Size of the file.
+	 * @param string $hash        hash_16k of par2
+	 * @param int $size Size of the file.
 	 * @param int    $createdTime Unix time the file was created.
 	 * @param int    $hasPassword Does it have a password (see Releases class constants)?
 	 *
 	 * @return mixed
 	 */
-	public function add($id, $name, $size, $createdTime, $hasPassword)
+	public function add($id, $name, $hash = '', $size, $createdTime, $hasPassword)
 	{
 		$insert = 0;
 
@@ -93,16 +94,28 @@ class ReleaseFiles
 
 		if ($duplicateCheck === false) {
 			$insert = $this->pdo->queryInsert(
-					sprintf("
+					sprintf('
 						INSERT INTO release_files
 						(releases_id, name, size, createddate, passworded)
 						VALUES
-						(%d, %s, %s, %s, %d)",
+						(%d, %s, %s, %s, %s, %d)',
 							$id,
 							$this->pdo->escapeString(utf8_encode($name)),
+							!empty($this->pdo->escapeString($hash)) ?? '',
 							$this->pdo->escapeString($size),
 							$this->pdo->from_unixtime($createdTime),
 							$hasPassword
+					)
+			);
+
+			$this->pdo->queryExec(
+					sprintf('
+						INSERT INTO par_hashes
+						(releases_id, name, hash)
+						VALUES (%d, %s, %s)',
+						$id,
+						$this->pdo->escapeString(utf8_encode($name)),
+						!empty($this->pdo->escapeString($hash)) ?? ''
 					)
 			);
 			$this->sphinxSearch->updateRelease($id, $this->pdo);

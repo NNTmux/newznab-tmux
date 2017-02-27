@@ -2252,20 +2252,10 @@ class ProcessAdditional
 		// Only get a new name if the category is OTHER.
 		$foundName = true;
 		if (NN_RENAME_PAR2 &&
-			$releaseInfo['proc_pp'] == 0 &&
+			$releaseInfo['proc_pp'] === 0 &&
 			in_array(
-				((int)$this->_release['categories_id']),
-				[
-					Category::BOOKS_UNKNOWN,
-					Category::GAME_OTHER,
-					Category::MOVIE_OTHER,
-					Category::MUSIC_OTHER,
-					Category::PC_PHONE_OTHER,
-					Category::TV_OTHER,
-					Category::OTHER_HASHED,
-					Category::XXX_OTHER,
-					Category::OTHER_MISC
-				]
+				(int)$this->_release['categories_id'],
+				Category::OTHERS_GROUP
 			)
 		) {
 			$foundName = false;
@@ -2297,7 +2287,7 @@ class ProcessAdditional
 				) {
 
 					// Try to add the files to the DB.
-					if ($this->_releaseFiles->add($this->_release['id'], $file['name'], $file['size'], $releaseInfo['postdate'], 0)) {
+					if ($this->_releaseFiles->add($this->_release['id'], $file['name'], $file['hash_16K'], $file['size'], $releaseInfo['postdate'], 0)) {
 						$filesAdded++;
 					}
 				}
