@@ -493,8 +493,6 @@ class NameFixer
 				foreach ($releases as $release) {
 					if (($nzbContents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], $nameStatus, $show)) === true) {
 						$this->fixed++;
-					} else if ($this->matchParHash($release['releases_id']) === true){
-						$this->fixed++;
 					}
 
 					$this->checked++;
