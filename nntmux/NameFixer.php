@@ -620,13 +620,11 @@ class NameFixer
 				WHERE ph.releases_id IS NOT NULL
 				AND rel.nzbstatus = %d
 				AND rel.isrenamed = %d
-				AND rel.categories_id IN (%d, %d)
-				AND rel.proc_par2 = %d',
+				AND rel.categories_id IN (%d, %d)',
 				NZB::NZB_ADDED,
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
-				Category::OTHER_HASHED,
-				self::PROC_PAR2_NONE
+				Category::OTHER_HASHED
 			);
 		}
 
@@ -1267,20 +1265,23 @@ class NameFixer
 		if ($preid !== true) {
 
 			switch ($type) {
-				case "PAR2, ":
+				case 'PAR2, ':
 					$this->fileCheck($release, $echo, $type, $namestatus, $show);
 					break;
-				case "UID, ":
+				case 'PAR2 hash, ':
+					$this->hashCheck($release, $echo, $type, $namestatus, $show);
+					break;
+				case 'UID, ':
 					$this->uidCheck($release, $echo, $type, $namestatus, $show);
 					break;
-				case "NFO, ":
+				case 'NFO, ':
 					$this->nfoCheckTV($release, $echo, $type, $namestatus, $show);
 					$this->nfoCheckMov($release, $echo, $type, $namestatus, $show);
 					$this->nfoCheckMus($release, $echo, $type, $namestatus, $show);
 					$this->nfoCheckTY($release, $echo, $type, $namestatus, $show);
 					$this->nfoCheckG($release, $echo, $type, $namestatus, $show);
 					continue;
-				case "Filenames, ":
+				case 'Filenames, ':
 					$this->fileCheck($release, $echo, $type, $namestatus, $show);
 					continue;
 				default:
@@ -1293,16 +1294,17 @@ class NameFixer
 			// set NameFixer process flags after run
 			if ($namestatus == 1 && $this->matched === false) {
 				switch ($type) {
-					case "NFO, ":
+					case 'NFO, ':
 						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release['releases_id']);
 						break;
-					case "Filenames, ":
+					case 'Filenames, ':
 						$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releases_id']);
 						break;
-					case "PAR2, ":
+					case 'PAR2, ':
+					case 'PAR2 hash, ':
 						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releases_id']);
 						break;
-					case "UID, ":
+					case 'UID, ':
 						$this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
 						break;
 				}
@@ -1987,7 +1989,7 @@ class NameFixer
 				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = {$release["releases_id"]})
+					INNER JOIN release_files rf ON (rf.releases_id = {$release['releases_id']})
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rf.name %s",
 				self::IS_RENAMED_NONE,
@@ -1999,11 +2001,11 @@ class NameFixer
 
 			if ($result instanceof \Traversable) {
 				foreach ($result AS $res) {
-					if (preg_match('/^(.*)\.srr/i', $res["textstring"], $match)) {
+					if (preg_match('/^(.*)\.srr/i', $res['textstring'], $match)) {
 						$this->updateRelease(
 							$release,
-							$match["1"],
-							$method = "fileCheck: SRR extension",
+							$match['1'],
+							$method = 'fileCheck: SRR extension',
 							$echo,
 							$type,
 							$namestatus,
