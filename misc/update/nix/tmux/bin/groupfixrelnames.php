@@ -15,7 +15,7 @@ use nntmux\processing\PostProcess;
 $pdo = new DB();
 
 if (!isset($argv[1])) {
-	exit($pdo->log->error("This script is not intended to be run manually, it is called from Multiprocessing."));
+	exit($pdo->log->error('This script is not intended to be run manually, it is called from Multiprocessing.'));
 } else if (isset($argv[1])) {
 	$namefixer = new NameFixer(['Settings' => $pdo]);
 	$sorter = new MiscSorter(true, $pdo);
@@ -42,11 +42,13 @@ if (!isset($argv[1])) {
 						IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash,
 						IFNULL(GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|'), '') AS filestring,
 						IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring,
-						IFNULL(HEX(ru.uniqueid), '') AS uid
+						IFNULL(HEX(ru.uniqueid), '') AS uid,
+						IFNULL(ph.hash, 0) AS hash
 					FROM releases r
 					LEFT JOIN release_nfos rn ON r.id = rn.releases_id
 					LEFT JOIN release_files rf ON r.id = rf.releases_id
 					LEFT JOIN release_unique ru ON ru.releases_id = r.id
+					LEFT JOIN par_hashes ph ON ph.releases_id = r.id
 					WHERE r.leftguid = %s
 					AND r.nzbstatus = %d
 					AND r.isrenamed = %d
@@ -183,7 +185,7 @@ if (!isset($argv[1])) {
 						if (!isset($nzbcontents)) {
 							$nntp = new NNTP(['Settings' => $pdo]);
 							if ((Settings::value('..alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
-								$pdo->log->error("Unable to connect to usenet.");
+								$pdo->log->error('Unable to connect to usenet.');
 							}
 							$Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);
 							$nzbcontents = new NZBContents(
@@ -193,8 +195,13 @@ if (!isset($argv[1])) {
 								]
 							);
 						}
-						$nzbcontents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], 1, 1);
+						if ($namefixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1) === false) {
+							$nzbcontents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], 1, 1);
+						}
 					}
+
+					// Not all gate requirements in query always set column status as PP Add check is in query
+					$namefixer->_updateSingleColumn('proc_par2', NameFixer::PROC_PAR2_DONE, $release['releases_id']);
 
 					if($namefixer->matched) {
 						continue;

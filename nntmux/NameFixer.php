@@ -620,11 +620,13 @@ class NameFixer
 				WHERE ph.releases_id IS NOT NULL
 				AND rel.nzbstatus = %d
 				AND rel.isrenamed = %d
-				AND rel.categories_id IN (%d, %d)',
+				AND rel.categories_id IN (%d, %d)
+				AND rel.proc_par2 = %d',
 				NZB::NZB_ADDED,
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
-				Category::OTHER_HASHED
+				Category::OTHER_HASHED,
+				self::PROC_PAR2_NONE
 			);
 		}
 
