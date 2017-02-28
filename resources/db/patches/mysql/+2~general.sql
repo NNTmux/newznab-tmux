@@ -11,7 +11,7 @@ CREATE PROCEDURE delete_release(IN is_numeric BOOLEAN, IN identifier VARCHAR(40)
 
     IF is_numeric IS TRUE
     THEN
-      DELETE r, rn, rc, uc, rf, ra, rs, rv, re, df, rg, rr
+      DELETE r, rn, rc, uc, rf, ra, rs, rv, re, df, rg, rr, ph
       FROM releases r
         LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
         LEFT OUTER JOIN release_comments rc ON rc.releases_id = r.id
@@ -29,7 +29,7 @@ CREATE PROCEDURE delete_release(IN is_numeric BOOLEAN, IN identifier VARCHAR(40)
 
     ELSEIF is_numeric IS FALSE
       THEN
-        DELETE r, rn, rc, uc, rf, ra, rs, rv, re, df, rg, rr
+        DELETE r, rn, rc, uc, rf, ra, rs, rv, re, df, rg, rr, ph
         FROM releases r
           LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
           LEFT OUTER JOIN release_comments rc ON rc.releases_id = r.id
