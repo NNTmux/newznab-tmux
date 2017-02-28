@@ -640,7 +640,7 @@ class NameFixer
 					$this->hashCheck($rel, $echo, $type, $nameStatus, $show);
 					$this->_echoRenamed($show);
 				}
-				$this->_echoFoundCount($echo, ' Hash\'s');
+				$this->_echoFoundCount($echo, ' hashes');
 			} else {
 				echo $this->pdo->log->info('Nothing to fix.');
 			}
