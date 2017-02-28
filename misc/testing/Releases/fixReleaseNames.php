@@ -87,6 +87,12 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 		case 14:
 			$namefixer->fixNamesWithSrr(2, $update, $other, $setStatus, $show);
 			break;
+		case 15:
+			$namefixer->fixNamesWithParHash(1, $update, $other, $setStatus, $show);
+			break;
+		case 16:
+			$namefixer->fixNamesWithParHash(2, $update, $other, $setStatus, $show);
+			break;
 		default :
 			exit($pdo->log->error("\nERROR: Wrong argument, type php $argv[0] to see a list of valid arguments." . $n));
 			break;
