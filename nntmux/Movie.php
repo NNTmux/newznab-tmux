@@ -97,9 +97,9 @@ class Movie
 	protected $releaseImage;
 
 	/**
-	 * @var TMDb
+	 * @var \Tmdb\Client
 	 */
-	protected $tmdb;
+	protected $tmdbclient;
 
 	/**
 	 * @var Client
