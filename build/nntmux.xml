@@ -16,8 +16,8 @@
 			</last>
 		</scripts>
 		<sql>
-			<db>300</db>
-			<file>300</file>
+			<db>302</db>
+			<file>302</file>
 		</sql>
 	</versions>
 </nntmux>
