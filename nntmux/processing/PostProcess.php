@@ -355,17 +355,7 @@ class PostProcess
 		$foundName = true;
 		if (in_array(
 			(int)$query['categories_id'],
-			[
-				Category::BOOKS_UNKNOWN,
-				Category::GAME_OTHER,
-				Category::MOVIE_OTHER,
-				Category::MUSIC_OTHER,
-				Category::PC_PHONE_OTHER,
-				Category::TV_OTHER,
-				Category::OTHER_HASHED,
-				Category::XXX_OTHER,
-				Category::OTHER_MISC
-			]
+			Category::OTHERS_GROUP
 		)
 		) {
 			$foundName = false;
@@ -417,7 +407,7 @@ class PostProcess
 					) {
 
 						// Try to add the files to the DB.
-						if ($this->releaseFiles->add($relID, $file['name'], $file['size'], $query['post_date'], 0)) {
+						if ($this->releaseFiles->add($relID, $file['name'], $file['hash_16K'], $file['size'], $query['post_date'], 0)) {
 							$filesAdded++;
 						}
 					}

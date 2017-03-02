@@ -533,7 +533,7 @@ class Forking extends \fork_daemon
 		foreach ($leftguids as $leftguid) {
 			$count++;
 			if ($maxperrun > 0) {
-				$queue[$count] = sprintf("%s %s %s %s", $this->workTypeOptions[0], $leftguid, $maxperrun, $count);
+				$queue[$count] = sprintf('%s %s %s %s', $this->workTypeOptions[0], $leftguid, $maxperrun, $count);
 			}
 		}
 		$this->work = $queue;
@@ -548,8 +548,6 @@ class Forking extends \fork_daemon
 				PHP_BINARY . ' ' . NN_NIX . 'tmux/bin/groupfixrelnames.php "' . $guid . '"' . ' true'
 			);
 		}
-
-		return;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

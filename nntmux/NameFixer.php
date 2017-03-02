@@ -21,6 +21,8 @@ class NameFixer
 	const PROC_PAR2_DONE = 1;
 	const PROC_UID_NONE = 0;
 	const PROC_UID_DONE = 1;
+	const PROC_HASH_NONE = 0;
+	const PROC_HASH_DONE = 1;
 
 	// Constants for overall rename status
 	const IS_RENAMED_NONE = 0;
@@ -472,7 +474,7 @@ class NameFixer
 
 		$releases = $this->_getReleases($time, $cats, $query);
 
-		if ($releases instanceof \Traversable && $releases !== false) {
+		if ($releases instanceof \Traversable) {
 
 			$total = $releases->rowCount();
 			if ($total > 0) {
@@ -570,6 +572,77 @@ class NameFixer
 					$this->_echoRenamed($show);
 				}
 				$this->_echoFoundCount($echo, ' UID\'s');
+			} else {
+				echo $this->pdo->log->info('Nothing to fix.');
+			}
+		}
+	}
+
+	/**
+	 * Attempts to fix release names using the par2 hash_16K block.
+	 *
+	 * @param int     $time 1: 24 hours, 2: no time limit
+	 * @param boolean $echo 1: change the name, anything else: preview of what could have been changed.
+	 * @param int     $cats 1: other categories, 2: all categories
+	 * @param         $nameStatus
+	 * @param         $show
+	 */
+	public function fixNamesWithParHash($time, $echo, $cats, $nameStatus, $show)
+	{
+		$type = 'PAR2 hash, ';
+
+		$this->_echoStartMessage($time, 'PAR2 hash_16K');
+
+		// Re-check all releases we haven't matched to a PreDB
+		if ($cats === 3) {
+			$query = sprintf('
+				SELECT
+					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
+					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
+					ph.hash AS hash
+				FROM releases rel
+				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
+				WHERE ph.releases_id IS NOT NULL
+				AND rel.nzbstatus = %d
+				AND rel.predb_id = 0',
+				NZB::NZB_ADDED
+			);
+			$cats = 2;
+			// Otherwise check only releases we haven't renamed and checked their par2 hash_16K before in Misc categories
+		} else {
+			$query = sprintf('
+				SELECT
+					rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
+					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
+					ph.hash AS hash
+				FROM releases rel
+				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
+				WHERE ph.releases_id IS NOT NULL
+				AND rel.nzbstatus = %d
+				AND rel.isrenamed = %d
+				AND rel.categories_id IN (%d, %d)
+				AND rel.proc_par2 = %d',
+				NZB::NZB_ADDED,
+				self::IS_RENAMED_NONE,
+				Category::OTHER_MISC,
+				Category::OTHER_HASHED,
+				self::PROC_PAR2_NONE
+			);
+		}
+
+		$releases = $this->_getReleases($time, $cats, $query);
+		if ($releases instanceof \Traversable) {
+			$total = $releases->rowCount();
+			if ($total > 0) {
+				$this->_totalReleases = $total;
+				echo $this->pdo->log->primary(number_format($total) . ' hash_16K to process.');
+				foreach ($releases as $rel) {
+					$this->checked++;
+					$this->done = $this->matched = false;
+					$this->hashCheck($rel, $echo, $type, $nameStatus, $show);
+					$this->_echoRenamed($show);
+				}
+				$this->_echoFoundCount($echo, ' hashes');
 			} else {
 				echo $this->pdo->log->info('Nothing to fix.');
 			}
@@ -1194,20 +1267,23 @@ class NameFixer
 		if ($preid !== true) {
 
 			switch ($type) {
-				case "PAR2, ":
+				case 'PAR2, ':
 					$this->fileCheck($release, $echo, $type, $namestatus, $show);
 					break;
-				case "UID, ":
+				case 'PAR2 hash, ':
+					$this->hashCheck($release, $echo, $type, $namestatus, $show);
+					break;
+				case 'UID, ':
 					$this->uidCheck($release, $echo, $type, $namestatus, $show);
 					break;
-				case "NFO, ":
+				case 'NFO, ':
 					$this->nfoCheckTV($release, $echo, $type, $namestatus, $show);
 					$this->nfoCheckMov($release, $echo, $type, $namestatus, $show);
 					$this->nfoCheckMus($release, $echo, $type, $namestatus, $show);
 					$this->nfoCheckTY($release, $echo, $type, $namestatus, $show);
 					$this->nfoCheckG($release, $echo, $type, $namestatus, $show);
 					continue;
-				case "Filenames, ":
+				case 'Filenames, ':
 					$this->fileCheck($release, $echo, $type, $namestatus, $show);
 					continue;
 				default:
@@ -1220,16 +1296,17 @@ class NameFixer
 			// set NameFixer process flags after run
 			if ($namestatus == 1 && $this->matched === false) {
 				switch ($type) {
-					case "NFO, ":
+					case 'NFO, ':
 						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release['releases_id']);
 						break;
-					case "Filenames, ":
+					case 'Filenames, ':
 						$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releases_id']);
 						break;
-					case "PAR2, ":
+					case 'PAR2, ':
+					case 'PAR2 hash, ':
 						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releases_id']);
 						break;
-					case "UID, ":
+					case 'UID, ':
 						$this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
 						break;
 				}
@@ -1914,7 +1991,7 @@ class NameFixer
 				SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
 						rf.releases_id AS fileid, rel.id AS releases_id
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releases_id = {$release["releases_id"]})
+					INNER JOIN release_files rf ON (rf.releases_id = {$release['releases_id']})
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
 					AND rf.name %s",
 				self::IS_RENAMED_NONE,
@@ -1926,11 +2003,11 @@ class NameFixer
 
 			if ($result instanceof \Traversable) {
 				foreach ($result AS $res) {
-					if (preg_match('/^(.*)\.srr/i', $res["textstring"], $match)) {
+					if (preg_match('/^(.*)\.srr/i', $res['textstring'], $match)) {
 						$this->updateRelease(
 							$release,
-							$match["1"],
-							$method = "fileCheck: SRR extension",
+							$match['1'],
+							$method = 'fileCheck: SRR extension',
 							$echo,
 							$type,
 							$namestatus,
@@ -1942,6 +2019,52 @@ class NameFixer
 			}
 		}
 		$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releases_id']);
+		return false;
+	}
+
+	/**
+	 * Look for a name based on par2 hash_16K block.
+	 *
+	 * @param array   $release The release to be matched
+	 * @param boolean $echo Should we show CLI output
+	 * @param string  $type The rename type
+	 * @param int     $namestatus Should we rename the release if match is found
+	 * @param int     $show Should we show the rename results
+	 *
+	 * @return bool Whether or not we matched the release
+	 */
+	public function hashCheck($release, $echo, $type, $namestatus, $show)
+	{
+		if ($this->done === false && $this->relid !== $release['releases_id']) {
+			$result = $this->pdo->queryDirect("
+				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
+				FROM par_hashes ph
+				STRAIGHT_JOIN releases r ON ph.releases_id = r.id
+				WHERE ph.hash = {$this->pdo->escapeString($release['hash'])}
+				AND ph.releases_id != {$release['releases_id']}
+				AND (r.predb_id > 0 OR r.anidbid > 0)"
+			);
+
+			if ($result instanceof \Traversable) {
+				foreach ($result AS $res) {
+					$floor = round(($res['relsize'] - $release['relsize']) / $res['relsize'] * 100, 1);
+					if ($floor >= -5 && $floor <= 5) {
+						$this->updateRelease(
+							$release,
+							$res['searchname'],
+							$method = 'hashCheck: PAR2 hash_16K',
+							$echo,
+							$type,
+							$namestatus,
+							$show,
+							$res['predb_id']
+						);
+						return true;
+					}
+				}
+			}
+		}
+		$this->_updateSingleColumn('proc_par2', self::PROC_PAR2_DONE, $release['releases_id']);
 		return false;
 	}
 

@@ -87,6 +87,12 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 		case 14:
 			$namefixer->fixNamesWithSrr(2, $update, $other, $setStatus, $show);
 			break;
+		case 15:
+			$namefixer->fixNamesWithParHash(1, $update, $other, $setStatus, $show);
+			break;
+		case 16:
+			$namefixer->fixNamesWithParHash(2, $update, $other, $setStatus, $show);
+			break;
 		default :
 			exit($pdo->log->error("\nERROR: Wrong argument, type php $argv[0] to see a list of valid arguments." . $n));
 			break;
@@ -108,5 +114,9 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 			. "php $argv[0] 9 false other no ...: Fix release names in misc categories using UID in the past 6 hours.\n"
 			. "php $argv[0] 10 false other no ...: Fix release names in misc categories using UID.\n"
 			. "php $argv[0] 11 false other no ...: Fix SDPORN XXX release names in misc categories using specific File Name in the past 6 hours.\n"
-			. "php $argv[0] 12 false other no ...: Fix SDPORN XXX release names in misc categories using specific File Name.\n"));
+			. "php $argv[0] 12 false other no ...: Fix SDPORN XXX release names in misc categories using specific File Name.\n"
+			. "php $argv[0] 13 false other no ...: Fix release names in misc categories using SRR files in the past 6 hours.\n"
+			. "php $argv[0] 14 false other no ...: Fix release names in misc categories using SRR files.\n"
+			. "php $argv[0] 15 false other no ...: Fix release names in misc categories using PAR2 hash_16K block in the past 6 hours.\n"
+			. "php $argv[0] 16 false other no ...: Fix release names in misc categories using PAR2 hash_16K block.\n"));
 }
