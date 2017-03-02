@@ -6,6 +6,7 @@ use GuzzleHttp\Exception\ClientException;
 use nntmux\ReleaseImage;
 use Tmdb\ApiToken;
 use Tmdb\Client;
+use Tmdb\Exception\TmdbApiException;
 use Tmdb\Helper\ImageHelper;
 use Tmdb\Repository\ConfigurationRepository;
 
@@ -234,7 +235,7 @@ class TMDB extends TV
 
 		try {
 			$response = $this->client->getTvApi()->getTvshow($cleanName);
-		} catch (ClientException $e) {
+		} catch (TmdbApiException $e) {
 			return false;
 		}
 
@@ -278,13 +279,13 @@ class TMDB extends TV
 		if (!empty($highest)) {
 			try {
 				$showAlternativeTitles = $this->client->getTvApi()->getAlternativeTitles($highest['id']);
-			} catch (ClientException $e) {
+			} catch (TmdbApiException $e) {
 				return false;
 			}
 
 			try {
 				$showExternalIds = $this->client->getTvApi()->getExternalIds($highest['id']);
-			} catch (ClientException $e) {
+			} catch (TmdbApiException $e) {
 				return false;
 			}
 
@@ -340,7 +341,7 @@ class TMDB extends TV
 
 		try {
 			$response = $this->client->getTvEpisodeApi()->getEpisode($tmdbid, $season, $episode);
-		} catch (ClientException $e) {
+		} catch (TmdbApiException $e) {
 			return false;
 		}
 

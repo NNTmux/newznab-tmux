@@ -852,7 +852,7 @@ class Movie
 		} catch (TmdbApiException $e) {
 			return false;
 		}
-		/*$status = $tmdbLookup->get('status_code');
+		/*$status = $tmdbLookup['status_code'];
 		if (!$status || (isset($status) && $status !== 1)) {
 			return false;
 		}*/
