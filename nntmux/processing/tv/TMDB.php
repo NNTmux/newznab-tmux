@@ -2,8 +2,11 @@
 namespace nntmux\processing\tv;
 
 use app\models\Settings;
-use libs\Tmdb\TmdbAPI;
 use nntmux\ReleaseImage;
+use Tmdb\ApiToken;
+use Tmdb\Client;
+use Tmdb\Helper\ImageHelper;
+use Tmdb\Repository\ConfigurationRepository;
 
 class TMDB extends TV
 {
@@ -15,9 +18,29 @@ class TMDB extends TV
 	public $posterUrl;
 
 	/**
-	 * @var \libs\Tmdb\TmdbAPI
+	 * @var ApiToken
+	 */
+   public $token;
+
+	/**
+	 * @var Client
 	 */
 	public $client;
+
+	/**
+	 * @var ImageHelper
+	 */
+	public $helper;
+
+	/**
+	 * @var ConfigurationRepository
+	 */
+	public $configRepository;
+
+	/**
+	 * @var \Tmdb\Model\Configuration
+	 */
+	public $config;
 
 	/**
 	 * Construct. Instantiate TMDB Class
@@ -29,7 +52,11 @@ class TMDB extends TV
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->client = new TmdbAPI(Settings::value('APIs..tmdbkey'));
+		$this->token = new ApiToken(Settings::value('APIs..tmdbkey'));
+		$this->client = new Client($this->token);
+		$this->configRepository = new ConfigurationRepository($this->client);
+		$this->config = $this->configRepository->load();
+		$this->helper = new ImageHelper($this->config);
 	}
 
 	/**
@@ -204,7 +231,7 @@ class TMDB extends TV
 	{
 		$return = $response = false;
 
-		$response = $this->client->searchTVShow($cleanName);
+		$response = $this->client->getTvApi()->getTvshow($cleanName);
 
 		sleep(1);
 
@@ -215,8 +242,8 @@ class TMDB extends TV
 	}
 
 	/**
-	 * @param $shows
-	 * @param $cleanName
+	 * @param array $shows
+	 * @param string $cleanName
 	 *
 	 * @return array|false
 	 */
@@ -226,14 +253,14 @@ class TMDB extends TV
 		$highestMatch = 0;
 
 		foreach ($shows AS $show) {
-			if ($this->checkRequiredAttr($show->_data, 'tmdbS')) {
+			if ($this->checkRequiredAttr($show, 'tmdbS')) {
 				// Check for exact title match first and then terminate if found
-				if (strtolower($show->_data['name']) === strtolower($cleanName)) {
+				if (strtolower($show['name']) === strtolower($cleanName)) {
 					$highest = $show;
 					break;
 				} else {
 					// Check each show title for similarity and then find the highest similar value
-					$matchPercent = $this->checkMatch(strtolower($show->_data['name']), strtolower($cleanName), self::MATCH_PROBABILITY);
+					$matchPercent = $this->checkMatch(strtolower($show['name']), strtolower($cleanName), self::MATCH_PROBABILITY);
 
 					// If new match has a higher percentage, set as new matched title
 					if ($matchPercent > $highestMatch) {
@@ -243,14 +270,15 @@ class TMDB extends TV
 				}
 			}
 		}
-		if (isset($highest)) {
-			$showAppends = $this->client->getTVShow($highest->_data['id'], 'append_to_response=alternative_titles,external_ids');
-			if (isset($showAppends->_data['alternative_titles']['results']) && is_array($showAppends->_data['alternative_titles']['results'])) {
-				foreach ($showAppends->_data['alternative_titles']['results'] AS $aka) {
+		if (!empty($highest)) {
+			$showAlternativeTitles = $this->client->getTvApi()->getAlternativeTitles($highest['id']);
+			$showExternalIds = $this->client->getTvApi()->getExternalIds($highest['id']);
+			if (isset($showAlternativeTitles['alternative_titles']['results']) && is_array($showAlternativeTitles['alternative_titles']['results'])) {
+				foreach ($showAlternativeTitles['alternative_titles']['results'] AS $aka) {
 					$highest->_data['alternative_titles'][] = $aka['title'];
 				}
-				$highest->_data['network'] = (isset($showAppends->_data['networks'][0]['name']) ? $showAppends->_data['networks'][0]['name'] : '');
-				$highest->_data['external_ids'] = $showAppends->_data['external_ids'];
+				$highest['network'] = (isset($show['networks'][0]['name']) ?? '');
+				$highest['external_ids'] = $showExternalIds['external_ids'];
 			}
 			$return = $this->formatShowInfo($highest);
 		}
@@ -273,7 +301,7 @@ class TMDB extends TV
 		$hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '');
 
 		// Mark it retrieved if we saved an image
-		if ($hascover == 1) {
+		if ($hascover === 1) {
 			$this->setCoverFound($videoId);
 		}
 		return $hascover;
@@ -295,15 +323,13 @@ class TMDB extends TV
 	{
 		$return = false;
 
-		$response = $this->client->getEpisode($tmdbid, $season, $episode);
+		$response = $this->client->getTvEpisodeApi()->getEpisode($tmdbid, $season, $episode);
 
 		sleep(1);
 
 		//Handle Single Episode Lookups
-		if (is_object($response)) {
-			if ($this->checkRequiredAttr($response->_data, 'tmdbE')) {
-				$return = $this->formatEpisodeInfo($response);
-			}
+		if (is_array($response) && $this->checkRequiredAttr($response, 'tmdbE')) {
+			$return = $this->formatEpisodeInfo($response);
 		}
 		return $return;
 	}
@@ -318,27 +344,27 @@ class TMDB extends TV
 	 */
 	protected function formatShowInfo($show)
 	{
-		$this->posterUrl = $this->client->getImageURL() . (string)(isset($show->_data['poster_path']) ? $show->_data['poster_path'] : '');
+		$this->posterUrl = isset($show['poster_path']) ? 'https:' . $this->helper->getUrl($show['poster_path']) : '';
 
-		if (isset($show->_data['external_ids']['imdb_id'])) {
-			preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->_data['external_ids']['imdb_id'], $imdb);
+		if (isset($show['external_ids']['imdb_id'])) {
+			preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show['external_ids']['imdb_id'], $imdb);
 		}
 
 		return [
 				'type'      => (int)parent::TYPE_TV,
-				'title'     => (string)$show->_data['name'],
-				'summary'   => (string)$show->_data['overview'],
-				'started'   => (string)$show->_data['first_air_date'],
-				'publisher' => (isset($show->_data['network']) ? (string)$show->_data['network'] : ''),
-				'country'   => (string)(isset($show->_data['origin_country'][0]) ? $show->_data['origin_country'][0] : ''),
+				'title'     => (string)$show['name'],
+				'summary'   => (string)$show['overview'],
+				'started'   => (string)$show['first_air_date'],
+				'publisher' => isset($show['network']) ? (string)$show['network'] : '',
+				'country'   => (string)(isset($show['origin_country'][0]) ?? ''),
 				'source'    => (int)parent::SOURCE_TMDB,
-				'imdb'      => (isset($imdb['imdbid']) ? (int)$imdb['imdbid'] : 0),
-				'tvdb'      => (isset($show->_data['external_ids']['tvdb_id']) ? (int)$show->_data['external_ids']['tvdb_id'] : 0),
+				'imdb'      => isset($imdb['imdbid']) ? (int)$imdb['imdbid'] : 0,
+				'tvdb'      => isset($show['external_ids']['tvdb_id']) ? (int)$show['external_ids']['tvdb_id'] : 0,
 				'trakt'     => 0,
-				'tvrage'    => (isset($show->_data['external_ids']['tvrage_id']) ? (int)$show->_data['external_ids']['tvrage_id'] : 0),
+				'tvrage'    => isset($show['external_ids']['tvrage_id']) ? (int)$show['external_ids']['tvrage_id'] : 0,
 				'tvmaze'    => 0,
-				'tmdb'      => (int)$show->_data['id'],
-				'aliases'   => (!empty($show->_data['alternative_titles']) ? (array)$show->_data['alternative_titles'] : ''),
+				'tmdb'      => (int)$show['id'],
+				'aliases'   => !empty($show['alternative_titles']) ? (array)$show['alternative_titles'] : '',
 				'localzone' => "''"
 		];
 	}
