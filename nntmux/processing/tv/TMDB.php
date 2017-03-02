@@ -2,6 +2,7 @@
 namespace nntmux\processing\tv;
 
 use app\models\Settings;
+use GuzzleHttp\Exception\ClientException;
 use nntmux\ReleaseImage;
 use Tmdb\ApiToken;
 use Tmdb\Client;
@@ -231,7 +232,11 @@ class TMDB extends TV
 	{
 		$return = $response = false;
 
-		$response = $this->client->getTvApi()->getTvshow($cleanName);
+		try {
+			$response = $this->client->getTvApi()->getTvshow($cleanName);
+		} catch (ClientException $e) {
+			return false;
+		}
 
 		sleep(1);
 
@@ -271,11 +276,21 @@ class TMDB extends TV
 			}
 		}
 		if (!empty($highest)) {
-			$showAlternativeTitles = $this->client->getTvApi()->getAlternativeTitles($highest['id']);
-			$showExternalIds = $this->client->getTvApi()->getExternalIds($highest['id']);
+			try {
+				$showAlternativeTitles = $this->client->getTvApi()->getAlternativeTitles($highest['id']);
+			} catch (ClientException $e) {
+				return false;
+			}
+
+			try {
+				$showExternalIds = $this->client->getTvApi()->getExternalIds($highest['id']);
+			} catch (ClientException $e) {
+				return false;
+			}
+
 			if (isset($showAlternativeTitles['alternative_titles']['results']) && is_array($showAlternativeTitles['alternative_titles']['results'])) {
 				foreach ($showAlternativeTitles['alternative_titles']['results'] AS $aka) {
-					$highest->_data['alternative_titles'][] = $aka['title'];
+					$highest['alternative_titles'][] = $aka['title'];
 				}
 				$highest['network'] = (isset($show['networks'][0]['name']) ?? '');
 				$highest['external_ids'] = $showExternalIds['external_ids'];
@@ -323,7 +338,11 @@ class TMDB extends TV
 	{
 		$return = false;
 
-		$response = $this->client->getTvEpisodeApi()->getEpisode($tmdbid, $season, $episode);
+		try {
+			$response = $this->client->getTvEpisodeApi()->getEpisode($tmdbid, $season, $episode);
+		} catch (ClientException $e) {
+			return false;
+		}
 
 		sleep(1);
 
@@ -380,12 +399,12 @@ class TMDB extends TV
 	protected function formatEpisodeInfo($episode)
 	{
 		return [
-				'title'       => (string)$episode->_data['name'],
-				'series'      => (int)$episode->_data['season_number'],
-				'episode'     => (int)$episode->_data['episode_number'],
-				'se_complete' => (string)'S' . sprintf('%02d', $episode->_data['season_number']) . 'E' . sprintf('%02d', $episode->_data['episode_number']),
-				'firstaired'  => (string)$episode->_data['air_date'],
-				'summary'     => (string)$episode->_data['overview']
+				'title'       => (string)$episode['name'],
+				'series'      => (int)$episode['season_number'],
+				'episode'     => (int)$episode['episode_number'],
+				'se_complete' => (string)'S' . sprintf('%02d', $episode['season_number']) . 'E' . sprintf('%02d', $episode['episode_number']),
+				'firstaired'  => (string)$episode['air_date'],
+				'summary'     => (string)$episode['overview']
 		];
 	}
 }
