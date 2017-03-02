@@ -1,4 +1,5 @@
 2017-03-02 DariusIII
+	* Chg: Use new tmdb library in Movies class
 	* Chg: Add new php-tmdb library
 	* Chg: Add PHP 7.1 to travis tests
 	* Chg: Update mysql-ddl.sql
