@@ -1,4 +1,5 @@
 2017-03-03 DariusIII
+	* Fix: Fix for missing email error in forgottenpassword.php
 	* Fix: Fix errors in Version.php
 2017-03-02 DariusIII
 	* Fix: Catch error blocks in TMDB
