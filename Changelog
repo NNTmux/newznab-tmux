@@ -1,4 +1,5 @@
 2017-03-03 DariusIII
+	* Chg: Remove unnecessary parenthesys in monitor.php
 	* Chg: Lower PHP 7 version requirement and add new NN_MINIMUM_MARIA_VERSION constant to constants.php
 	* Fix: Fix for missing email error in forgottenpassword.php
 	* Fix: Fix errors in Version.php

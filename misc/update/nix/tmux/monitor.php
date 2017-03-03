@@ -22,7 +22,7 @@ $db_name = DB_NAME;
 $dbtype = DB_SYSTEM;
 $tmux = $tRun->get('niceness');
 
-$tmux_niceness = (isset($tmux->niceness) ?? 2);
+$tmux_niceness = isset($tmux->niceness) ?? 2;
 
 $runVar['constants'] = $pdo->queryOneRow($tRun->getConstantSettings());
 
@@ -56,7 +56,7 @@ $runVar['timers']['query']['tpg1_time'] = 0;
 
 // Analyze release table if not using innoDB (innoDB uses online analysis)
 $engine = $pdo->queryOneRow(sprintf("SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'releases'", $pdo->escapeString($db_name)));
-if (!in_array($engine['engine'], ['InnoDB', 'TokuDB'])) {
+if (!in_array($engine['engine'], ['InnoDB', 'TokuDB'], false)) {
 	printf($pdo->log->info(PHP_EOL . 'Analyzing your tables to refresh your indexes.'));
 	$pdo->optimise(false, 'analyze', false, ['releases']);
 	Utility::clearScreen();
@@ -73,7 +73,7 @@ $psTableRowCount = $pdo->Prepare($tblCount);
 while ($runVar['counts']['iterations'] > 0) {
 
 	//check the db connection
-	if ($pdo->ping(true) == false) {
+	if ($pdo->ping(true) === false) {
 		unset($pdo);
 		$pdo = new DB();
 	}
