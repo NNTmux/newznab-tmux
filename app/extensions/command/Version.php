@@ -77,8 +77,6 @@ class Version extends \app\extensions\console\Command
 
 	/**
 	 * Fetch git tag for latest version.
-	 *
-	 * @param null $path Optional path to the versions XML file.
 	 */
 	protected function git()
 	{
@@ -92,8 +90,6 @@ class Version extends \app\extensions\console\Command
 
 	/**
 	 * Fetch SQL latest patch version.
-	 *
-	 * @param null $path Optional path to the versions XML file.
 	 */
 	protected function sql()
 	{
@@ -101,23 +97,17 @@ class Version extends \app\extensions\console\Command
 			$this->primary('Looking up SQL patch version(s)');
 		}
 
-		if (in_array($this->request->params['args']['sqlcheck'], ['xml', 'both', 'all'])) {
+		if (in_array($this->request->params['args']['sqlcheck'], ['xml', 'both', 'all'], false)) {
 			$latest = $this->versions->getSQLPatchFromFile();
 			$this->out("XML version: $latest");
 		}
 
-		if (in_array($this->request->params['args']['sqlcheck'], ['db', 'both', 'all'])) {
-			$dbpatch = $this->versions->getSQLPatchFromDB();
-
-			if ($dbpatch->count()) {
-				$dbVersion = $dbpatch->data()[0]['value'];
-				if (!is_numeric($dbVersion)) {
-					$this->error("Bad sqlpatch value: '$dbVersion'\n");
-				} else {
-					$this->out(" DB version: " . $dbVersion);
-				}
-			} else {
-				$this->error("Unable to fetch Databse SQL level!");
+		if (in_array($this->request->params['args']['sqlcheck'], ['db', 'both', 'all'], false)) {
+			try {
+				$dbVersion = $this->versions->getSQLPatchFromDB();
+				$this->out(' DB version: ' . $dbVersion);
+			} catch (\Exception $e) {
+				$this->error($e->getMessage());
 			}
 		}
 	}

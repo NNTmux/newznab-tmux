@@ -1,3 +1,5 @@
+2017-03-03 DariusIII
+	* Fix: Fix errors in Version.php
 2017-03-02 DariusIII
 	* Fix: Catch error blocks in TMDB
 	* Chg: Use new tmdb library in TMDB class

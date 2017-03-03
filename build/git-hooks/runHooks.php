@@ -41,7 +41,7 @@ $error = false;
 if ($error === false) {
 	$git = new Git();
 	$branch = $git->active_branch();
-	if (in_array($branch, $git->mainBranches())) {
+	if (in_array($branch, $git->mainBranches(), false)) {
 		// Only update versions, etc. on specific branches to lessen conflicts
 
 		if ($error === false) {
