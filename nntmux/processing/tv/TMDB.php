@@ -2,7 +2,6 @@
 namespace nntmux\processing\tv;
 
 use app\models\Settings;
-use GuzzleHttp\Exception\ClientException;
 use nntmux\ReleaseImage;
 use Tmdb\ApiToken;
 use Tmdb\Client;
