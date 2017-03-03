@@ -56,7 +56,7 @@ if ($error === false) {
 			} catch (\Exception $e) {
 				$error = 1;
 				echo "Error while checking versions!\n";
-				echo $e->getMessage() . "\n";
+				echo $e->getMessage() . PHP_EOL;
 			}
 		}
 	} else {
