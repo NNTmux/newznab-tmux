@@ -28,6 +28,8 @@
 	<!-- Font Awesome Icons -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/animate.css/animate.min.css" rel="stylesheet">
 	<!-- Qtip2 CSS -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.css" rel="stylesheet"
 		  type="text/css"/>
@@ -286,14 +288,6 @@
 	<script src="{$smarty.const.WWW_THEMES}/shared/assets/slimscroll/jquery.slimscroll.min.js"></script>
 	<!-- Fastclick script -->
 	<script src="{$smarty.const.WWW_THEMES}/shared/assets/fastclick/lib/fastclick.js"></script>
-	<!-- PNotify -->
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.animate.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.desktop.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.callbacks.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.buttons.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.confirm.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.nonblock.js"></script>
 	<!-- data table plugin -->
 	<script type="text/javascript"
 			src='{$smarty.const.WWW_THEMES}/shared/assets/datatables/media/js/jquery.dataTables.min.js'></script>
@@ -306,6 +300,14 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
 	<!-- Custom functions -->
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/functions.js"></script>
+	<!-- PNotify -->
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.animate.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.desktop.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.callbacks.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.buttons.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.confirm.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.nonblock.js"></script>
 	<!-- Optionally, you can add Slimscroll and FastClick plugins.
 		  Both of these plugins are recommended to enhance the
 		  user experience. Slimscroll is required when using the

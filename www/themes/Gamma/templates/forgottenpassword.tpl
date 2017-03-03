@@ -1,4 +1,4 @@
-<div class="span6 offset2"
+<div class="col-md-6 offset2"
 style="
 padding:40px;
 border: 1px solid #e1e1e8;

@@ -1110,4 +1110,19 @@ class Utility
 	{
 		return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
 	}
+
+	/**
+	 * Convert multi to single dimensional array
+	 * Code taken from http://stackoverflow.com/a/12309103
+	 *
+	 * @param $array
+	 *
+	 * @param $separator
+	 *
+	 * @return string
+	 */
+	public static function convertMultiArray($array, $separator)
+	{
+		return implode("$separator",array_map(function($a) {return implode(",",$a);},$array));
+	}
 }

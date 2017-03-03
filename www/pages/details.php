@@ -1,5 +1,6 @@
 <?php
 
+use app\models\ReleaseRegexes;
 use app\models\Settings;
 use nntmux\Console;
 use nntmux\ReleaseComments;
@@ -19,28 +20,29 @@ use nntmux\PreDb;
 if (!$page->users->isLoggedIn())
 	$page->show403();
 
-if (isset($_GET["id"]))
+if (isset($_GET['id']))
 {
 	$releases = new Releases(['Settings' => $page->settings]);
 	$rc = new ReleaseComments;
 	$re = new ReleaseExtra;
 	$df = new DnzbFailures(['Settings' => $page->settings]);
-	$data = $releases->getByGuid($_GET["id"]);
+	$data = $releases->getByGuid($_GET['id']);
 	$user = $page->users->getById($page->users->currentUserId());
 	$cpapi = $user['cp_api'];
 	$cpurl = $user['cp_url'];
+	$releaseRegex = ReleaseRegexes::find('first', ['conditions' => ['releases_id' => $data['id']]]);
 
 	if (!$data)
 		$page->show404();
 
 	if ($page->isPostBack())
-		$rc->addComment($data["id"], $data["gid"], $_POST["txtAddComment"], $page->users->currentUserId(), $_SERVER['REMOTE_ADDR']);
+		$rc->addComment($data['id'], $data['gid'], $_POST['txtAddComment'], $page->users->currentUserId(), $_SERVER['REMOTE_ADDR']);
 
-	$nfo = $releases->getReleaseNfo($data["id"], true);
-	$reVideo = $re->getVideo($data["id"]);
-	$reAudio = $re->getAudio($data["id"]);
-	$reSubs = $re->getSubs($data["id"]);
-	$comments = $rc->getCommentsByGid($data["gid"]);
+	$nfo = $releases->getReleaseNfo($data['id'], true);
+	$reVideo = $re->getVideo($data['id']);
+	$reAudio = $re->getAudio($data['id']);
+	$reSubs = $re->getSubs($data['id']);
+	$comments = $rc->getCommentsByGid($data['gid']);
 	$similars = $releases->searchSimilar($data['id'],
 		$data['searchname'],
 		6,
@@ -97,7 +99,7 @@ if (isset($_GET["id"]))
 	$game = '';
 	if ($data['gamesinfo_id'] != '') {
 		$g = new Games();
-		$game = $g->getGamesInfo($data['gamesinfo_id']);
+		$game = $g->getGamesInfoById($data['gamesinfo_id']);
 	}
 
 	$mus = '';
@@ -129,7 +131,7 @@ if (isset($_GET["id"]))
 	$pre = $prehash->getForRelease($data["predb_id"]);
 
 	$rf = new ReleaseFiles;
-	$releasefiles = $rf->get($data["id"]);
+	$releasefiles = $rf->get($data['id']);
 
 	$page->smarty->assign('releasefiles',$releasefiles);
 	$page->smarty->assign('release',$data);
@@ -153,10 +155,11 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('failed', $failed);
 	$page->smarty->assign('cpapi', $cpapi);
 	$page->smarty->assign('cpurl', $cpurl);
+	$page->smarty->assign('regex', $releaseRegex);
 
-	$page->meta_title = "View NZB";
-	$page->meta_keywords = "view,nzb,description,details";
-	$page->meta_description = "View NZB for".$data["searchname"] ;
+	$page->meta_title = 'View NZB';
+	$page->meta_keywords = 'view,nzb,description,details';
+	$page->meta_description = 'View NZB for'.$data['searchname'] ;
 
 	$page->content = $page->smarty->fetch('viewnzb.tpl');
 	$page->render();

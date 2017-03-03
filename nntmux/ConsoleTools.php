@@ -62,7 +62,7 @@ class ConsoleTools
 		}
 
 		echo str_repeat(chr(8), $this->lastMessageLength);
-		echo str_repeat(" ", $this->lastMessageLength);
+		echo str_repeat(' ', $this->lastMessageLength);
 		echo str_repeat(chr(8), $this->lastMessageLength);
 
 		$this->lastMessageLength = strlen($message);
@@ -80,7 +80,7 @@ class ConsoleTools
 		}
 
 		echo str_repeat(chr(8), $this->lastMessageLength);
-		echo str_repeat(" ", $this->lastMessageLength);
+		echo str_repeat(' ', $this->lastMessageLength);
 		echo str_repeat(chr(8), $this->lastMessageLength);
 
 		$this->lastMessageLength = strlen($message);
@@ -93,7 +93,7 @@ class ConsoleTools
 	public function appendWrite($message)
 	{
 		echo $message;
-		$this->lastMessageLength = $this->lastMessageLength + strlen($message);
+		$this->lastMessageLength += strlen($message);
 	}
 
 	/**
@@ -135,11 +135,11 @@ class ConsoleTools
 	{
 
 		if ($seconds > 3600) {
-			return round($seconds / 3600) . " hour(s)";
+			return round($seconds / 3600) . ' hour(s)';
 		} else if ($seconds > 60) {
-			return round($seconds / 60) . " minute(s)";
+			return round($seconds / 60) . ' minute(s)';
 		} else {
-			return $seconds . " second(s)";
+			return $seconds . ' second(s)';
 		}
 	}
 
@@ -163,7 +163,7 @@ class ConsoleTools
 	public function showSleep($seconds)
 	{
 		for ($i = $seconds; $i >= 0; $i--) {
-			$this->overWriteHeader("Sleeping for " . $i . " seconds.");
+			$this->overWriteHeader('Sleeping for ' . $i . ' seconds.');
 			sleep(1);
 		}
 		echo PHP_EOL;

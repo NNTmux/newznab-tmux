@@ -96,7 +96,7 @@ class SphinxSearch
 	}
 
 	/**
-	 * Update Sphinx Relases index for given releaseid.
+	 * Update Sphinx Relases index for given releases_id.
 	 *
 	 * @param int $releaseID
 	 * @param \nntmux\db\DB $pdo

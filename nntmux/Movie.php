@@ -6,8 +6,11 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
-use nntmux\processing\tv\TMDB;
 use nntmux\processing\tv\TraktTv;
+use Tmdb\ApiToken;
+use Tmdb\Client as TmdbClient;
+use Tmdb\Exception\TmdbApiException;
+
 /**
  * Class Movie
  */
@@ -94,9 +97,9 @@ class Movie
 	protected $releaseImage;
 
 	/**
-	 * @var TMDb
+	 * @var \Tmdb\Client
 	 */
-	protected $tmdb;
+	protected $tmdbclient;
 
 	/**
 	 * @var Client
@@ -161,6 +164,8 @@ class Movie
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 		$this->client = new Client();
+		$this->tmdbtoken = new ApiToken(Settings::value('APIs..tmdbkey'));
+		$this->tmdbclient = new TmdbClient($this->tmdbtoken);
 
 		$this->lookuplanguage = (Settings::value('indexer.categorise.imdblanguage') != '') ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
 
@@ -660,7 +665,7 @@ class Movie
 	public function updateMovieInfo($imdbId)
 	{
 		if ($this->echooutput && $this->service !== '') {
-			$this->pdo->log->doEcho($this->pdo->log->primary("Fetching IMDB info from TMDB and/or Trakt using IMDB id: " . $imdbId));
+			$this->pdo->log->doEcho($this->pdo->log->primary('Fetching IMDB info from TMDB and/or Trakt using IMDB id: ' . $imdbId));
 		}
 
 		// Check TMDB for IMDB info.
@@ -841,20 +846,19 @@ class Movie
 	public function fetchTMDBProperties($imdbId, $text = false)
 	{
 		$lookupId = ($text === false ? 'tt' . $imdbId : $imdbId);
-		$tmdb = new TMDB();
 
 		try {
-			$tmdbLookup = $tmdb->client->getMovie($lookupId);
-		} catch (\Exception $e) {
+			$tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId);
+		} catch (TmdbApiException $e) {
 			return false;
 		}
-		/*$status = $tmdbLookup->get('status_code');
+		/*$status = $tmdbLookup['status_code'];
 		if (!$status || (isset($status) && $status !== 1)) {
 			return false;
 		}*/
 
 		$ret = [];
-		$ret['title'] = $tmdbLookup->get('title');
+		$ret['title'] = $tmdbLookup['original_title'];
 
 		if ($this->currentTitle !== '') {
 			// Check the similarity.
@@ -877,43 +881,43 @@ class Movie
 			}
 		}
 
-		$ret['tmdbid'] = $tmdbLookup->getID();
-		$ImdbID = str_replace('tt', '', $tmdbLookup->get('imdb_id'));
+		$ret['tmdbid'] = $tmdbLookup['id'];
+		$ImdbID = str_replace('tt', '', $tmdbLookup['imdb_id']);
 		$ret['imdb_id'] = $ImdbID;
-		$vote = $tmdbLookup->getVoteAverage();
+		$vote = $tmdbLookup['vote_average'];
 		if (isset($vote)) {
-			$ret['rating'] = ($vote == 0) ? '' : $vote;
+			$ret['rating'] = ($vote === 0) ? '' : $vote;
 		}
-		$overview = $tmdbLookup->get('overview');
-		if (isset($overview)) {
+		$overview = $tmdbLookup['overview'];
+		if (!empty($overview)) {
 			$ret['plot'] = $overview;
 		}
-		$tagline = $tmdbLookup->getTagline();
-		if (isset($tagline)) {
+		$tagline = $tmdbLookup['tagline'];
+		if (!empty($tagline)) {
 			$ret['tagline'] = $tagline;
 		}
-		$released = $tmdbLookup->get('release_date');
-		if (isset($released)) {
-			$ret['year'] = date("Y", strtotime($released));
+		$released = $tmdbLookup['release_date'];
+		if (!empty($released)) {
+			$ret['year'] = date('Y', strtotime($released));
 		}
-		$genresa = $tmdbLookup->get('genres');
-		if (isset($genresa) && sizeof($genresa) > 0) {
+		$genresa = $tmdbLookup['genres'];
+		if (!empty($genresa) && count($genresa) > 0) {
 			$genres = [];
 			foreach ($genresa as $genre) {
 				$genres[] = $genre['name'];
 			}
 			$ret['genre'] = $genres;
 		}
-		$posterp = $tmdbLookup->getPoster();
-		if (isset($posterp) && sizeof($posterp > 0)) {
-			$ret['cover'] = "http://image.tmdb.org/t/p/w185" . $posterp;
+		$posterp = $tmdbLookup['poster_path'];
+		if (!empty($posterp)) {
+			$ret['cover'] = 'http://image.tmdb.org/t/p/w185' . $posterp;
 		}
-		$backdrop = $tmdbLookup->get('backdrop_path');
-		if (isset($backdrop) && sizeof($backdrop) > 0) {
-			$ret['backdrop'] = "http://image.tmdb.org/t/p/original" . $backdrop;
+		$backdrop = $tmdbLookup['backdrop_path'];
+		if (!empty($backdrop)) {
+			$ret['backdrop'] = 'http://image.tmdb.org/t/p/original' . $backdrop;
 		}
 		if ($this->echooutput) {
-			$this->pdo->log->doEcho($this->pdo->log->primaryOver("TMDb Found ") . $this->pdo->log->headerOver($ret['title']), true);
+			$this->pdo->log->doEcho($this->pdo->log->primaryOver('TMDb Found ') . $this->pdo->log->headerOver($ret['title']), true);
 		}
 		return $ret;
 	}

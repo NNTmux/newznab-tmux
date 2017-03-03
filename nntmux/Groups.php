@@ -6,7 +6,7 @@ use nntmux\db\DB;
 class Groups
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -55,11 +55,11 @@ class Groups
 		$groups = $this->getActive();
 		$temp_array = [];
 
-		$temp_array[-1] = "--Please Select--";
+		$temp_array[-1] = '--Please Select--';
 
 		if (is_array($groups)) {
 			foreach ($groups as $group) {
-				$temp_array[$group["name"]] = $group["name"];
+				$temp_array[$group['name']] = $group['name'];
 			}
 		}
 
@@ -90,7 +90,7 @@ class Groups
 	public function getActive()
 	{
 		return $this->pdo->query(
-			"SELECT g.* FROM groups g WHERE g.active = 1 ORDER BY g.name ASC",
+			'SELECT g.* FROM groups g WHERE g.active = 1 ORDER BY g.name ASC',
 			true,
 			NN_CACHE_EXPIRY_SHORT
 		);
@@ -108,10 +108,10 @@ class Groups
 		switch ($order) {
 			case '':
 			case 'normal':
-				$orderBy = "g.name ASC";
+				$orderBy = 'g.name ASC';
 				break;
 			case 'date':
-				$orderBy = "g.first_record_postdate DESC";
+				$orderBy = 'g.first_record_postdate DESC';
 				break;
 			default:
 				return [];
@@ -131,11 +131,11 @@ class Groups
 	 */
 	public function getActiveIDs()
 	{
-		return $this->pdo->query("
+		return $this->pdo->query('
 			SELECT g.id
 			FROM groups g
 			WHERE g.active = 1
-			ORDER BY g.name ASC",
+			ORDER BY g.name ASC',
 			true,
 			NN_CACHE_EXPIRY_SHORT
 		);
@@ -172,7 +172,7 @@ class Groups
 			WHERE g.id = {$id}"
 		);
 
-		return ($res === false ? '' : $res["name"]);
+		return ($res === false ? '' : $res['name']);
 	}
 
 	/**
@@ -190,53 +190,53 @@ class Groups
 			WHERE g.name = {$this->pdo->escapeString($name)}"
 		);
 
-		return ($res === false ? '' : $res["id"]);
+		return ($res === false ? '' : $res['id']);
 	}
 
 	/**
 	 * Gets a count of all groups in the table limited by parameters
 	 *
 	 * @param string $groupname Constrain query to specific group name
-	 * @param int    $active Constrain query to active status
+	 * @param int    $active    Constrain query to active status
 	 *
 	 * @return mixed
 	 */
-	public function getCount($groupname = "", $active = -1)
+	public function getCount($groupname = '', $active = -1)
 	{
 		$res = $this->pdo->query(
-			sprintf("
+			sprintf('
 				SELECT COUNT(g.id) AS num
 				FROM groups g
-				WHERE 1=1 %s %s",
+				WHERE 1=1 %s %s',
 				($groupname !== ''
 					?
 					sprintf(
-						"AND g.name %s",
+						'AND g.name %s',
 						$this->pdo->likeString($groupname, true, true)
 					)
 					: ''
 				),
-				($active > -1 ? "AND g.active = {$active}" : '')
+				($active > -1 ? 'AND g.active = {$active}' : '')
 			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 
-		return (empty($res) ? 0 : $res[0]["num"]);
+		return (empty($res) ? 0 : $res[0]['num']);
 	}
 
 	/**
 	 * Gets all groups and associated release counts
 	 *
-	 * @param bool|int $start The offset of the query or false for no offset
-	 * @param int $num The limit of the query
-	 * @param string $groupname The groupname we want if any
-	 * @param int $active The status of the group we want if any
+	 * @param bool|int $start     The offset of the query or false for no offset
+	 * @param int      $num       The limit of the query
+	 * @param string   $groupname The groupname we want if any
+	 * @param int      $active    The status of the group we want if any
 	 *
 	 * @return mixed
 	 */
 	public function getRange($start = false, $num = -1, $groupname = '', $active = -1)
 	{
 		return $this->pdo->query(
-			sprintf("
+			sprintf('
 				SELECT g.*,
 				COALESCE(COUNT(r.id), 0) AS num_releases
 				FROM groups g
@@ -244,17 +244,17 @@ class Groups
 				WHERE 1=1 %s %s
 				GROUP BY g.id
 				ORDER BY g.name ASC
-				%s",
+				%s',
 				($groupname !== ''
 					?
 					sprintf(
-						"AND g.name %s",
+						'AND g.name %s',
 						$this->pdo->likeString($groupname, true, true)
 					)
 					: ''
 				),
-				($active > -1 ? "AND g.active = {$active}" : ''),
-				($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start)
+				($active > -1 ? 'AND g.active = {$active}' : ''),
+				($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
 			), true, NN_CACHE_EXPIRY_SHORT
 		);
 	}
@@ -271,40 +271,40 @@ class Groups
 
 		$minFileString =
 			(
-			$group["minfilestoformrelease"] == ''
-				? "minfilestoformrelease = NULL,"
+			$group['minfilestoformrelease'] == ''
+				? 'minfilestoformrelease = NULL,'
 				: sprintf(
-				" minfilestoformrelease = %d,",
-				$this->formatNumberString($group["minfilestoformrelease"], false)
+				' minfilestoformrelease = %d,',
+				$this->formatNumberString($group['minfilestoformrelease'], false)
 			)
 			);
 
 		$minSizeString =
 			(
-			$group["minsizetoformrelease"] == ''
-				? "minsizetoformrelease = NULL"
+			$group['minsizetoformrelease'] == ''
+				? 'minsizetoformrelease = NULL'
 				: sprintf(
-				" minsizetoformrelease = %d",
-				$this->formatNumberString($group["minsizetoformrelease"], false)
+				' minsizetoformrelease = %d',
+				$this->formatNumberString($group['minsizetoformrelease'], false)
 			)
 			);
 
 		return $this->pdo->queryExec(
 			sprintf(
-				"UPDATE groups
+				'UPDATE groups
 				SET name = %s, description = %s, backfill_target = %s, first_record = %s, last_record = %s,
 				last_updated = NOW(), active = %s, backfill = %s, %s %s
-				WHERE id = %d",
-				$this->pdo->escapeString(trim($group["name"])),
-				$this->pdo->escapeString(trim($group["description"])),
-				$this->formatNumberString($group["backfill_target"]),
-				$this->formatNumberString($group["first_record"]),
-				$this->formatNumberString($group["last_record"]),
-				$this->formatNumberString($group["active"]),
-				$this->formatNumberString($group["backfill"]),
+				WHERE id = %d',
+				$this->pdo->escapeString(trim($group['name'])),
+				$this->pdo->escapeString(trim($group['description'])),
+				$this->formatNumberString($group['backfill_target']),
+				$this->formatNumberString($group['first_record']),
+				$this->formatNumberString($group['last_record']),
+				$this->formatNumberString($group['active']),
+				$this->formatNumberString($group['backfill']),
 				$minFileString,
 				$minSizeString,
-				$group["id"]
+				$group['id']
 			)
 		);
 	}
@@ -337,31 +337,31 @@ class Groups
 	{
 		$minFileString =
 			(
-			$group["minfilestoformrelease"] == ''
-				? "NULL"
-				: sprintf("%d", $this->formatNumberString($group["minfilestoformrelease"], false))
+			$group['minfilestoformrelease'] == ''
+				? 'NULL'
+				: sprintf('%d', $this->formatNumberString($group['minfilestoformrelease'], false))
 			);
 
 		$minSizeString =
 			(
-			$group["minsizetoformrelease"] == ''
-				? "NULL"
-				: sprintf("%d", $this->formatNumberString($group["minsizetoformrelease"], false))
+			$group['minsizetoformrelease'] == ''
+				? 'NULL'
+				: sprintf('%d', $this->formatNumberString($group['minsizetoformrelease'], false))
 			);
 
 		return $this->pdo->queryInsert(
-			sprintf("
+			sprintf('
 				INSERT INTO groups
 					(name, description, backfill_target, first_record, last_record, last_updated,
 					active, backfill, minfilestoformrelease, minsizetoformrelease)
-				VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s)",
-				$this->pdo->escapeString(trim($group["name"])),
-				(isset($group["description"]) ? $this->pdo->escapeString(trim($group["description"])) : "''"),
-				(isset($group["backfill_target"]) ? $this->formatNumberString($group["backfill_target"]) : "1"),
-				(isset($group["first_record"]) ? $this->formatNumberString($group["first_record"]) : "0"),
-				(isset($group["last_record"]) ? $this->formatNumberString($group["last_record"]) : "0"),
-				(isset($group["active"]) ? $this->formatNumberString($group["active"]) : "0"),
-				(isset($group["backfill"]) ? $this->formatNumberString($group["backfill"]) : "0"),
+				VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s)',
+				$this->pdo->escapeString(trim($group['name'])),
+				(isset($group['description']) ? $this->pdo->escapeString(trim($group['description'])) : "''"),
+				(isset($group['backfill_target']) ? $this->formatNumberString($group['backfill_target']) : '1'),
+				(isset($group['first_record']) ? $this->formatNumberString($group['first_record']) : '0'),
+				(isset($group['last_record']) ? $this->formatNumberString($group['last_record']) : '0'),
+				(isset($group['active']) ? $this->formatNumberString($group['active']) : '0'),
+				(isset($group['backfill']) ? $this->formatNumberString($group['backfill']) : '0'),
 				$minFileString,
 				$minSizeString
 			)
@@ -379,7 +379,7 @@ class Groups
 	protected function formatNumberString($setting, $escape = true)
 	{
 		$setting = trim($setting);
-		if ($setting === "0" || !is_numeric($setting)) {
+		if ($setting === '0' || !is_numeric($setting)) {
 			$setting = '0';
 		}
 
@@ -420,7 +420,7 @@ class Groups
 		$this->pdo->queryExec("
 			DELETE mp
 			FROM missed_parts mp
-			WHERE mp.group_id = {$id}"
+			WHERE mp.groups_id = {$id}"
 		);
 
 		foreach ($this->cbpm AS $tablePrefix) {
@@ -449,7 +449,7 @@ class Groups
 			$this->pdo->queryExec("TRUNCATE TABLE {$tablePrefix}");
 		}
 
-		$groups = $this->pdo->queryDirect("SELECT id FROM groups");
+		$groups = $this->pdo->queryDirect('SELECT id FROM groups');
 
 		if ($groups instanceof \Traversable) {
 			foreach ($groups AS $group) {
@@ -460,10 +460,10 @@ class Groups
 		}
 
 		// Reset the group stats.
-		return $this->pdo->queryExec("
+		return $this->pdo->queryExec('
 			UPDATE groups
 			SET backfill_target = 1, first_record = 0, first_record_postdate = NULL,
-				last_record = 0, last_record_postdate = NULL, last_updated = NULL, active = 0"
+				last_record = 0, last_record_postdate = NULL, last_updated = NULL, active = 0'
 		);
 	}
 
@@ -481,16 +481,16 @@ class Groups
 		}
 
 		$res = $this->pdo->queryDirect(
-			sprintf("
+			sprintf('
 				SELECT r.id, r.guid
-				FROM releases r %s",
+				FROM releases r %s',
 				($id === false ? '' : 'WHERE r.groups_id = ' . $id)
 			)
 		);
 
 		if ($res instanceof \Traversable) {
-			$releases     = new Releases(['Settings' => $this->pdo, 'Groups' => $this]);
-			$nzb          = new NZB($this->pdo);
+			$releases = new Releases(['Settings' => $this->pdo, 'Groups' => $this]);
+			$nzb = new NZB($this->pdo);
 			$releaseImage = new ReleaseImage($this->pdo);
 			foreach ($res AS $row) {
 				$releases->deleteSingle(
@@ -512,12 +512,12 @@ class Groups
 	 * @param int    $active
 	 * @param int    $backfill
 	 *
-	 * @return array
+	 * @return array|string
 	 */
 	public function addBulk($groupList, $active = 1, $backfill = 1)
 	{
 		if (preg_match('/^\s*$/m', $groupList)) {
-			$ret = "No group list provided.";
+			$ret = 'No group list provided.';
 		} else {
 			$nntp = new NNTP(['Echo' => false]);
 			if ($nntp->doConnect() !== true) {
@@ -562,9 +562,9 @@ class Groups
 	/**
 	 * Updates the group active/backfill status
 	 *
-	 * @param int $id Which group ID
+	 * @param int    $id     Which group ID
 	 * @param string $column Which column active/backfill
-	 * @param int $status Which status we are setting
+	 * @param int    $status Which status we are setting
 	 *
 	 * @return string
 	 */
@@ -583,41 +583,28 @@ class Groups
 	 * Get the names of the collections/binaries/parts/part repair tables.
 	 * If TPG is on, try to create new tables for the groups_id, if we fail, log the error and exit.
 	 *
-	 * @param bool $tpgSetting false, tpg is off in site setting, true tpg is on in site setting.
-	 * @param int  $groupID    ID of the group.
+	 * @param int $groupID ID of the group.
 	 *
 	 * @return array The table names.
 	 */
-	public function getCBPTableNames($tpgSetting, $groupID)
+	public function getCBPTableNames($groupID)
 	{
-		$groupKey = ($groupID . '_' . (int)$tpgSetting);
+		$groupKey = $groupID;
 
 		// Check if buffered and return. Prevents re-querying MySQL when TPG is on.
 		if (isset($this->cbppTableNames[$groupKey])) {
 			return $this->cbppTableNames[$groupKey];
 		}
 
-		$tables           = [];
-		$tables['cname']  = 'collections';
-		$tables['bname']  = 'binaries';
-		$tables['pname']  = 'parts';
-		$tables['prname'] = 'missed_parts';
-
-		if ($tpgSetting === true) {
-			if ($groupID == '') {
-				exit('Error: You must use .../misc/update/nix/multiprocessing/releases.php since you have enabled TPG!');
-			}
-
-			if ($this->createNewTPGTables($groupID) === false && NN_ECHOCLI) {
-				exit('There is a problem creating new TPG tables for this group ID: ' . $groupID . PHP_EOL);
-			}
-
-			$groupEnding = '_' . $groupID;
-			$tables['cname'] .= $groupEnding;
-			$tables['bname'] .= $groupEnding;
-			$tables['pname'] .= $groupEnding;
-			$tables['prname'] .= $groupEnding;
+		if (NN_ECHOCLI && $this->createNewTPGTables($groupID) === false) {
+			exit('There is a problem creating new TPG tables for this group ID: ' . $groupID . PHP_EOL);
 		}
+
+		$tables           = [];
+		$tables['cname']  = 'collections_' . $groupID;
+		$tables['bname']  = 'binaries_' . $groupID;
+		$tables['pname']  = 'parts_' . $groupID;
+		$tables['prname'] = 'missed_parts_' . $groupID;
 
 		// Buffer.
 		$this->cbppTableNames[$groupKey] = $tables;

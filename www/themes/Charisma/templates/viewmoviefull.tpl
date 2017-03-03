@@ -147,10 +147,10 @@
 												<a title="Download NZB"
 												   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
 															class="icon icon_nzb fa fa-cloud-download text-muted"></i></a>
-												<a href="#" class="icon_cart text-muted"><i class="fa fa-shopping-basket"
+												<a href="#" id="guid{$mguid[$m@index]}" class="icon_cart text-muted"><i class="fa fa-shopping-basket"
 																							title="Send to my Download Basket"></i></a>
 												{if isset($sabintegrated) && $sabintegrated !=""}
-													<a href="#" class="icon icon_sab text-muted"
+													<a href="#" id="guid{$mguid[$m@index]}" class="icon icon_sab text-muted"
 														  title="Send to my Queue"><i
 																class="fa fa-share"></i></a>
 												{/if}

@@ -180,7 +180,7 @@
 					{/foreach}
 					{/foreach}
 				</select>
-				<input class="span3" id="headsearch" name="search" value="{if $header_menu_search == ""}{else}{$header_menu_search|escape:"htmlall"}{/if}" placeholder="Search" type="text" />
+				<input class="col-md-3" id="headsearch" name="search" value="{if $header_menu_search == ""}{else}{$header_menu_search|escape:"htmlall"}{/if}" placeholder="Search" type="text" />
 				<input class="btn" id="headsearch_go" type="submit" value="Search"/>
 		</form>
 	</li>

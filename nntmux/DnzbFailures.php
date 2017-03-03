@@ -62,11 +62,11 @@ class DnzbFailures
 	 */
 	public function getCount()
 	{
-		$res = $this->pdo->queryOneRow("
+		$res = $this->pdo->queryOneRow('
 			SELECT COUNT(release_id) AS num
-			FROM dnzb_failures"
+			FROM dnzb_failures'
 		);
-		return $res["num"];
+		return $res['num'];
 	}
 
 	/**
@@ -170,13 +170,13 @@ class DnzbFailures
 				SELECT text
 				FROM release_comments
 				WHERE releases_id = %d',
-						$relid
+				$relid
 				)
 		);
 
 		if ($check instanceof \Traversable) {
 			foreach ($check AS $dbl) {
-				if ($dbl['text'] == $text) {
+				if ($dbl['text'] === $text) {
 					$dupe = 1;
 					break;
 				}

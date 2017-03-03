@@ -2,20 +2,20 @@
 
 if [ -e "NNBase.php" ]
 then
-    export NN_ROOT="$(pwd)"
-elif [ -e "../../../NNBase.php" ]
+    export NN_CONFIGS="$(pwd)"
+elif [ -e "../../../NNBase.php NN_CONFIGS" ]
 then
-    export NN_ROOT="$(php ../../../NNBase.php)"
+    export NN_CONFIGS="$(php ../../../NNBase.php NN_CONFIGS)"
 elif [ -e "../../../../NNBase.php" ]
 then
-    export NN_ROOT="$(php ../../../../NNBase.php)"
+    export NN_CONFIGS="$(php ../../../../NNBase.php NN_CONFIGS)"
 else
-    export NN_ROOT="$(php ../../../../../NNBase.php)"
+    export NN_CONFIGS="$(php ../../../../../NNBase.php NN_CONFIGS)"
 fi
 
 run_segment() {
     # get USP settings from config.php
-    uspsetting=( $(cat ${NN_ROOT}/www/config.php | awk '/NNTP/ && /SERVER|PORT/ {print $2}' | sed 's/);//' | sed "s/'//g") )
+    uspsetting=( $(cat ${NN_CONFIGS}/config.php | awk '/NNTP/ && /SERVER|PORT/ {print $2}' | sed 's/);//' | sed "s/'//g") )
 
     # Get info about primary NNTP connections.
     mainusp=`( dig ${uspsetting} A +short | tail -n1; \

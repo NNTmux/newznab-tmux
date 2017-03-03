@@ -574,10 +574,9 @@ class TmuxRun extends Tmux
 
 			switch ($runVar['settings']['releases_run']) {
 				case 0:
-					$releases = 'echo "\nreleases have been disabled/terminated by Releases"';
+					$releases = 'echo PHP_EOL . "releases have been disabled/terminated by Releases"';
 					break;
 				case 1:
-				case 2:
 					$releases = sprintf(
 						'%s %s;',
 						$runVar['scripts']['releases'],

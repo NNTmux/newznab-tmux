@@ -253,7 +253,7 @@ class Model extends StaticObject
 	 *  'database' => 'app_name',
 	 *  'schema' => function($db, $collection, $meta) {
 	 *      $result = $db->connection->schemas->findOne(compact('collection'));
-	 *      return $result ? $result['data'] : [];
+	 *      return $result ? $result['data'] : array();
 	 *  }
 	 * ));
 	 * }}}
@@ -429,16 +429,16 @@ class Model extends StaticObject
 
 		$self->_initializers += [
 			'name'   => function($self) {
-					return basename(str_replace('\\', '/', $self));
-				},
+				return basename(str_replace('\\', '/', $self));
+			},
 			'source' => function($self) {
-					return Inflector::tableize($self::meta('name'));
-				},
+				return Inflector::tableize($self::meta('name'));
+			},
 			'title'  => function($self) {
-					$titleKeys = ['title', 'name'];
-					$titleKeys = array_merge($titleKeys, (array)$self::meta('key'));
-					return $self::hasField($titleKeys);
-				}
+				$titleKeys = ['title', 'name'];
+				$titleKeys = array_merge($titleKeys, (array)$self::meta('key'));
+				return $self::hasField($titleKeys);
+			}
 		];
 
 		if (is_object($self->_schema)) {
@@ -501,18 +501,18 @@ class Model extends StaticObject
 	protected function _inherited()
 	{
 		return array_merge($this->_inherits,
-						   [
-							   'validates',
-							   'belongsTo',
-							   'hasMany',
-							   'hasOne',
-							   '_meta',
-							   '_finders',
-							   '_query',
-							   '_schema',
-							   '_classes',
-							   '_initializers'
-						   ]);
+			[
+				'validates',
+				'belongsTo',
+				'hasMany',
+				'hasOne',
+				'_meta',
+				'_finders',
+				'_query',
+				'_schema',
+				'_classes',
+				'_initializers'
+			]);
 	}
 
 	/**
@@ -895,10 +895,10 @@ class Model extends StaticObject
 		}
 		$self->_relationFieldNames[$config['fieldName']] = $name;
 		$rel                                             = static::connection()
-																 ->relationship(get_called_class(),
-																				$type,
-																				$name,
-																				$config);
+			->relationship(get_called_class(),
+				$type,
+				$name,
+				$config);
 		return $self->_relations[$name] = $rel;
 	}
 
@@ -921,9 +921,9 @@ class Model extends StaticObject
 
 		if (!is_object($self->_schema)) {
 			$self->_schema = static::connection()->describe(
-								   $self::meta('source'),
-								   $self->_schema,
-								   $self->_meta
+				$self::meta('source'),
+				$self->_schema,
+				$self->_meta
 			);
 			if (!is_object($self->_schema)) {
 				$class = get_called_class();
@@ -1006,7 +1006,7 @@ class Model extends StaticObject
 		$defaults = ['defaults' => true, 'class' => 'entity'];
 		$options += $defaults;
 		return static::_filter(__FUNCTION__,
-							   compact('data', 'options'),
+			compact('data', 'options'),
 			function($self, $params) {
 				$class = $params['options']['class'];
 				unset($params['options']['class']);
@@ -1249,7 +1249,7 @@ class Model extends StaticObject
 		$params = compact('entity', 'options');
 
 		return static::_filter(__FUNCTION__,
-							   $params,
+			$params,
 			function($self, $params) {
 				$options =
 					$params + $params['options'] + ['model' => $self, 'type' => 'delete'];
@@ -1281,7 +1281,7 @@ class Model extends StaticObject
 		$params = compact('data', 'conditions', 'options');
 
 		return static::_filter(__FUNCTION__,
-							   $params,
+			$params,
 			function($self, $params) {
 				$options =
 					$params + $params['options'] + ['model' => $self, 'type' => 'update'];
@@ -1312,7 +1312,7 @@ class Model extends StaticObject
 		$params = compact('conditions', 'options');
 
 		return static::_filter(__FUNCTION__,
-							   $params,
+			$params,
 			function($self, $params) {
 				$options =
 					$params['options'] + $params + ['model' => $self, 'type' => 'delete'];
@@ -1448,7 +1448,7 @@ class Model extends StaticObject
 	{
 		if (!isset($this->{$type}[$name]['fieldName'])) {
 			$fieldName                         = static::connection()
-													   ->relationFieldName($type, $name);
+				->relationFieldName($type, $name);
 			$this->{$type}[$name]['fieldName'] = $fieldName;
 		}
 		return $this->{$type}[$name]['fieldName'];
@@ -1466,43 +1466,43 @@ class Model extends StaticObject
 
 		return [
 			'first' => function($self, $params, $chain) {
-					$options          =& $params['options'];
-					$options['limit'] = 1;
-					$data             = $chain->next($self, $params, $chain);
+				$options          =& $params['options'];
+				$options['limit'] = 1;
+				$data             = $chain->next($self, $params, $chain);
 
-					if (isset($options['return']) && $options['return'] === 'array') {
-						$data = is_array($data) ? reset($data) : $data;
-					} else {
-						$data = is_object($data) ? $data->rewind() : $data;
-					}
-
-					return $data ?: null;
-				},
-			'list'  => function($self, $params, $chain) {
-					$result = [];
-					$meta   = $self::meta();
-					$name   = $meta['key'];
-
-					foreach ($chain->next($self, $params, $chain) as $entity) {
-						$key                                           = $entity->{$name};
-						$result[is_scalar($key) ? $key : (string)$key] = $entity->title();
-					}
-					return $result;
-				},
-			'count' => function($self, $params) use ($_query) {
-					$model   = $self;
-					$type    = $params['type'];
-					$options = array_diff_key($params['options'], $_query);
-
-					if ($options && !isset($params['options']['conditions'])) {
-						$options = ['conditions' => $options];
-					} else {
-						$options = $params['options'];
-					}
-					$options += ['type' => 'read'] + compact('model');
-					$query = $self::invokeMethod('_instance', ['query', $options]);
-					return $self::connection()->calculation('count', $query, $options);
+				if (isset($options['return']) && $options['return'] === 'array') {
+					$data = is_array($data) ? reset($data) : $data;
+				} else {
+					$data = is_object($data) ? $data->rewind() : $data;
 				}
+
+				return $data ?: null;
+			},
+			'list'  => function($self, $params, $chain) {
+				$result = [];
+				$meta   = $self::meta();
+				$name   = $meta['key'];
+
+				foreach ($chain->next($self, $params, $chain) as $entity) {
+					$key                                           = $entity->{$name};
+					$result[is_scalar($key) ? $key : (string)$key] = $entity->title();
+				}
+				return $result;
+			},
+			'count' => function($self, $params) use ($_query) {
+				$model   = $self;
+				$type    = $params['type'];
+				$options = array_diff_key($params['options'], $_query);
+
+				if ($options && !isset($params['options']['conditions'])) {
+					$options = ['conditions' => $options];
+				} else {
+					$options = $params['options'];
+				}
+				$options += ['type' => 'read'] + compact('model');
+				$query = $self::invokeMethod('_instance', ['query', $options]);
+				return $self::connection()->calculation('count', $query, $options);
+			}
 		];
 	}
 

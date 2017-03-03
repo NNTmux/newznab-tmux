@@ -34,8 +34,8 @@ $tables = $pdo->queryDirect("SELECT SUBSTR(TABLE_NAME, 9) AS suffix FROM informa
 
 $query1 = "ALTER TABLE binaries%s DROP INDEX ix_binary_collection";
 $query2 = "DROP TRIGGER IF EXISTS delete_collections%s";
-$query3 = "CREATE TRIGGER delete_collections%s BEFORE DELETE ON collections%s FOR EACH ROW BEGIN DELETE FROM binaries%s WHERE collection_id = OLD.id; DELETE FROM parts%s WHERE collection_id = OLD.id; END";
-$query4 = "ALTER TABLE binaries%s ADD INDEX ix_parts_collection_id(collection_id)";
+$query3 = "CREATE TRIGGER delete_collections%s BEFORE DELETE ON collections%s FOR EACH ROW BEGIN DELETE FROM binaries%s WHERE collections_id = OLD.id; DELETE FROM parts%s WHERE collections_id = OLD.id; END";
+$query4 = "ALTER TABLE binaries%s ADD INDEX ix_parts_collection_id(collections_id)";
 
 if ($tables instanceof \Traversable) {
 	foreach ($tables as $table) {

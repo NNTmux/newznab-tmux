@@ -160,10 +160,11 @@
 						{if $result.predb_id > 0}
 						<span class="preinfo badge badge-inverse halffade" title="{$result.predb_id}">PreDb</span>
 						{/if}
-							{if !empty($result.failed)}
+						{if !empty($result.failed)}
 								<span class="badge badge-inverse"><i class ="fa fa-thumbs-o-up"></i> {$result.grabs} Grab{if $result.grabs != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$result.failed} Failed Download{if $result.failed != 1}s{/if}</span>
-							{/if}
-
+						{/if}
+							<span class="label label-primary">{$result.group_name}</span>
+							<span class="label label-primary">{$result.fromname}</span>
 						{/strip}
 					</div>
 				</div>

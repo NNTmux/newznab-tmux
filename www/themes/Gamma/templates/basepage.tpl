@@ -116,13 +116,13 @@
 		================================================== -->
 		<div class="container-fluid">
 			<div class="row-fluid">
-				<div class="span2">
+				<div class="col-md-2">
 					<ul class="nav nav-list">
 					{$main_menu}
 					{$useful_menu}
 					</ul>
 				</div>
-				<div class="span10">
+				<div class="col-md-10">
 					{$page->content}
 				</div>
 			</div>

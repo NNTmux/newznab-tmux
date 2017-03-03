@@ -1,3 +1,57 @@
+2017-03-02 DariusIII
+	* Fix: Catch error blocks in TMDB
+	* Chg: Use new tmdb library in TMDB class
+	* Chg: Use new tmdb library in Movies class
+	* Chg: Add new php-tmdb library
+	* Chg: Add PHP 7.1 to travis tests
+	* Chg: Update mysql-ddl.sql
+2017-02-27 DariusIII
+	* Chg: Update guzzlehttps and apaiIO libraries
+2017-02-24 DariusIII
+	* Chg: Fix some problems related to bad understanding of CBP tables code in Groups class.
+	* Chg: Update reset_truncate, Backfill and NZB with mandatory tpg
+	* Chg: Update ProcessReleases with mandatory tpg
+	* Chg: Update Forking to new mandatory tpg.
+	* Chg: Start to make tablepergroup mandatory, remove tpg check from Binaries
+	* Fix: Fix code in Binaries class
+2017-02-23 DariusIII
+	* Chg: Start to slowly refactor code for PHP 7
+	* Chg: Update travis.yml
+	* Chg: Update minimum supported PHP version to 7.0.16 and mysql to 5.6
+2017-02-22 DariusIII
+	* Chg: Update uspsetting.sh
+	* Chg: Change check from Traversable to false in NZB class
+	* Chg: Update NNBase.php to use defined constants
+	* Chg: Fix sending to sab and download basket from xxx and movie views in Charisma/Omicron themes
+2017-02-21 DariusIII
+	* Chg: Replace span with col-md- in Gamma theme
+	* Chg: Update AdminLTE to version 2.3.11 (Omicron theme)
+	* Chg: Remove year from names of releases on games page
+	* Chg: Update guzzlehttp
+2017-02-20 DariusIII
+	* Chg: Move Pnotify to end of basepage
+2017-02-17 DariusIII
+	* Chg: Further improve Charisma, add theme switcher
+	* Chg: Use css files from bootswatch directly
+	* Chg: Add support for GiantBomb queries back to Games class
+2017-02-15 DariusIII
+	* Fix: Missing use statement in myshows.php
+2017-02-14 DariusIII
+	* Chg: Update themes to show the regex info to admins
+	* Chg: Add collection regex to details page
+	* Chg: Update mysql-ddl with new releases_regexes table
+	* Chg: Add model for new releases_regexes table
+2017-02-13 DariusIII
+	* Chg: Add bad regex logging (bad regex, not regex with 0 matches)
+	* Chg: Improve performance by doing poster check in PHP instead of single row MySQL queries (by b3rs3rk@nZEDb)
+2017-02-10 DariusIII
+	* Fix: Predb links in admin area
+2017-02-08 DariusIII
+	* Fix: Fix cbpm count in tmux monitor
+2017-02-07 DariusIII
+	* Chg: Update multigroup handling
+2017-02-01 DariusIII
+	* Chg: Add groupname and poster to browse pages in themes
 2017-01-31 DariusIII
 	* Chg: Update rarinfo
 2017-01-30 DariusIII

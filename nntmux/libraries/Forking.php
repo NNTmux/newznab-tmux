@@ -25,7 +25,7 @@ use nntmux\processing\PostProcess;
  */
 class Forking extends \fork_daemon
 {
-	const OUTPUT_NONE     = 0; // Don't display child output.
+	const OUTPUT_NONE = 0; // Don't display child output.
 	const OUTPUT_REALTIME = 1; // Display child output in real time.
 	const OUTPUT_SERIALLY = 2; // Display child output when child is done.
 
@@ -95,7 +95,7 @@ class Forking extends \fork_daemon
 		$startTime = microtime(true);
 		$this->workType = $type;
 		$this->workTypeOptions = $options;
-		$this->processAdditional = $this->processNFO = $this->processTV = $this->processMovies = $this->tablePerGroup = $this->ppRenamedOnly = false;
+		$this->processAdditional = $this->processNFO = $this->processTV = $this->processMovies = $this->ppRenamedOnly = false;
 		$this->work = [];
 
 		// Init Settings here, as forking causes errors when it's destroyed.
@@ -128,6 +128,7 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Only post process renamed movie / tv releases?
+	 *
 	 * @var bool
 	 */
 	private $ppRenamedOnly;
@@ -254,11 +255,9 @@ class Forking extends \fork_daemon
 	{
 		switch ($this->workType) {
 			case 'releases':
-				if ($this->tablePerGroup === true) {
-					$this->_executeCommand(
-						$this->dnr_path . 'releases  ' . count($this->work) . '_"'
-					);
-				}
+				$this->_executeCommand(
+					$this->dnr_path . 'releases  ' . count($this->work) . '_"'
+				);
 				break;
 			case 'update_per_group':
 				$this->_executeCommand(
@@ -290,6 +289,7 @@ class Forking extends \fork_daemon
 				($this->workTypeOptions[0] === false ? '' : (', ' . $this->workTypeOptions[0] . ' AS max'))
 			)
 		);
+
 		return Settings::value('..backfillthreads');
 	}
 
@@ -393,6 +393,7 @@ class Forking extends \fork_daemon
 				$this->dnr_path . $range . '"'
 			);
 		}
+
 		return;
 	}
 
@@ -409,6 +410,7 @@ class Forking extends \fork_daemon
 				$this->workTypeOptions[0]
 			)
 		);
+
 		return Settings::value('..binarythreads');
 	}
 
@@ -484,6 +486,7 @@ class Forking extends \fork_daemon
 				$this->dnr_path . $range . '"'
 			);
 		}
+
 		return;
 	}
 
@@ -504,7 +507,7 @@ class Forking extends \fork_daemon
 			$threads = 1;
 		}
 
-		$leftguids = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];
+		$leftguids = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
 
 		// Prevent PreDB FT from always running
 		if ($this->workTypeOptions[0] === 'predbft') {
@@ -530,7 +533,7 @@ class Forking extends \fork_daemon
 		foreach ($leftguids as $leftguid) {
 			$count++;
 			if ($maxperrun > 0) {
-				$queue[$count] = sprintf("%s %s %s %s", $this->workTypeOptions[0], $leftguid, $maxperrun, $count);
+				$queue[$count] = sprintf('%s %s %s %s', $this->workTypeOptions[0], $leftguid, $maxperrun, $count);
 			}
 		}
 		$this->work = $queue;
@@ -545,7 +548,6 @@ class Forking extends \fork_daemon
 				PHP_BINARY . ' ' . NN_NIX . 'tmux/bin/groupfixrelnames.php "' . $guid . '"' . ' true'
 			);
 		}
-		return;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -556,20 +558,14 @@ class Forking extends \fork_daemon
 	{
 		$this->register_child_run([0 => $this, 1 => 'releasesChildWorker']);
 
-		$this->tablePerGroup = (Settings::value('..tablepergroup') == 1 ? true : false);
-		if ($this->tablePerGroup === true) {
+		$groups = $this->pdo->queryDirect('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
 
-			$groups = $this->pdo->queryDirect('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
-
-			if ($groups instanceof \Traversable) {
-				foreach ($groups as $group) {
-					if ($this->pdo->queryOneRow(sprintf('SELECT id FROM collections_%d  LIMIT 1', $group['id'])) !== false) {
-						$this->work[] = ['id' => $group['id']];
-					}
+		if ($groups instanceof \Traversable) {
+			foreach ($groups as $group) {
+				if ($this->pdo->queryOneRow(sprintf('SELECT id FROM collections_%d  LIMIT 1', $group['id'])) !== false) {
+					$this->work[] = ['id' => $group['id']];
 				}
 			}
-		} else {
-			$this->work = $this->pdo->query('SELECT name FROM groups WHERE (active = 1 OR backfill = 1)');
 		}
 
 		return Settings::value('..releasethreads');
@@ -578,13 +574,7 @@ class Forking extends \fork_daemon
 	public function releasesChildWorker($groups, $identifier = '')
 	{
 		foreach ($groups as $group) {
-			if ($this->tablePerGroup === true) {
-				$this->_executeCommand($this->dnr_path . 'releases  ' . $group['id'] . '"');
-			} else {
-				$this->_executeCommand(
-					PHP_BINARY . ' ' . NN_UPDATE . 'update_releases.php 1 false ' . $group['name']
-				);
-			}
+			$this->_executeCommand($this->dnr_path . 'releases  ' . $group['id'] . '"');
 		}
 	}
 
@@ -625,6 +615,7 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Check if we should process Additional's.
+	 *
 	 * @return bool
 	 */
 	private function checkProcessAdditional()
@@ -635,6 +626,7 @@ class Forking extends \fork_daemon
 		$this->ppAddMaxSize =
 			(Settings::value('..maxsizetopostprocess') != '') ? (int)Settings::value('..maxsizetopostprocess') : 100;
 		$this->ppAddMaxSize = ($this->ppAddMaxSize > 0 ? ('AND r.size < ' . ($this->ppAddMaxSize * 1073741824)) : '');
+
 		return (
 		$this->pdo->queryOneRow(
 			sprintf('
@@ -680,6 +672,7 @@ class Forking extends \fork_daemon
 			);
 			$maxProcesses = Settings::value('..postthreads');
 		}
+
 		return $maxProcesses;
 	}
 
@@ -687,12 +680,14 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Check if we should process NFO's.
+	 *
 	 * @return bool
 	 */
 	private function checkProcessNfo()
 	{
 		if (Settings::value('..lookupnfo') == 1) {
 			$this->nfoQueryString = Nfo::NfoQueryString($this->pdo);
+
 			return (
 			$this->pdo->queryOneRow(
 				sprintf(
@@ -702,6 +697,7 @@ class Forking extends \fork_daemon
 			) === false ? false : true
 			);
 		}
+
 		return false;
 	}
 
@@ -723,11 +719,13 @@ class Forking extends \fork_daemon
 			);
 			$maxProcesses = Settings::value('..nfothreads');
 		}
+
 		return $maxProcesses;
 	}
 
 	/**
 	 * Check if we should process Movies.
+	 *
 	 * @return bool
 	 */
 	private function checkProcessMovies()
@@ -752,6 +750,7 @@ class Forking extends \fork_daemon
 			) === false ? false : true
 			);
 		}
+
 		return false;
 	}
 
@@ -779,11 +778,13 @@ class Forking extends \fork_daemon
 			);
 			$maxProcesses = Settings::value('..postthreadsnon');
 		}
+
 		return $maxProcesses;
 	}
 
 	/**
 	 * Check if we should process TV's.
+	 *
 	 * @return bool
 	 */
 	private function checkProcessTV()
@@ -809,6 +810,7 @@ class Forking extends \fork_daemon
 			) === false ? false : true
 			);
 		}
+
 		return false;
 	}
 
@@ -839,6 +841,7 @@ class Forking extends \fork_daemon
 			);
 			$maxProcesses = Settings::value('..postthreadsnon');
 		}
+
 		return $maxProcesses;
 	}
 
@@ -855,8 +858,10 @@ class Forking extends \fork_daemon
 			if ((Settings::value('..alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
 				(new PostProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]))->processSharing($nntp);
 			}
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -895,6 +900,7 @@ class Forking extends \fork_daemon
 				RequestID::REQID_UPROC
 			)
 		);
+
 		return Settings::value('..reqidthreads');
 	}
 
@@ -913,6 +919,7 @@ class Forking extends \fork_daemon
 	{
 		$this->register_child_run([0 => $this, 1 => 'updatePerGroupChildWorker']);
 		$this->work = $this->pdo->query('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
+
 		return Settings::value('..releasethreads');
 	}
 
@@ -951,6 +958,7 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Set the amount of max child processes.
+	 *
 	 * @param int $maxProcesses
 	 */
 	private function setMaxProcesses($maxProcesses)
@@ -1032,48 +1040,49 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Path to do not run folder.
+	 *
 	 * @var string
 	 */
 	private $dnr_path = '';
 
 	/**
 	 * Work to work on.
+	 *
 	 * @var array
 	 */
 	private $work = [];
 
 	/**
 	 * How much work do we have to do?
+	 *
 	 * @var int
 	 */
 	public $_workCount = 0;
 
 	/**
 	 * The type of work we want to work on.
+	 *
 	 * @var string
 	 */
 	private $workType = '';
 
 	/**
 	 * List of passed in options for the current work type.
+	 *
 	 * @var array
 	 */
 	private $workTypeOptions = [];
 
 	/**
 	 * Max amount of child processes to do work at a time.
+	 *
 	 * @var int
 	 */
 	private $maxProcesses = 1;
 
 	/**
-	 * Are we using tablePerGroup?
-	 * @var bool
-	 */
-	private $tablePerGroup = false;
-
-	/**
 	 * Group used for safe backfill.
+	 *
 	 * @var string
 	 */
 	private $safeBackfillGroup = '';

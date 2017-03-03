@@ -1,5 +1,5 @@
 {if $showregister != "0"}
-	<div class="span6 offset2"
+	<div class="col-md-6 offset2"
 	  style="background-color:#d9edf7; padding:40px; background-color: #f7f7f9; border: 1px solid #e1e1e8;
 	    -webkit-border-radius: 4px;
 	    -moz-border-radius: 4px;
@@ -29,7 +29,7 @@
 		</table>
 	</form>
 {else}
-	<div class="span6 offset2"
+	<div class="col-md-6 offset2"
 	  style="background-color:#d9edf7; padding:40px; background-color: #f2dede; border: 1px solid #eed3d7;
 	    -webkit-border-radius: 4px;
 	    -moz-border-radius: 4px;

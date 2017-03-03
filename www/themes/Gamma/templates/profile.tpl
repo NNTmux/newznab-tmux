@@ -1,4 +1,4 @@
-<div class="span8">
+<div class="col-md-8">
 <ul class="inline">
 	<li><h2>Profile for {$user.username|escape:"htmlall"}</h2></li>
 	{if $user.id == $userdata.id}

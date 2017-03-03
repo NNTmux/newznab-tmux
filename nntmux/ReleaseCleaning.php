@@ -111,13 +111,13 @@ class ReleaseCleaning
 						$title = false;
 					}
 					if ($title !== false) {
-						return array(
-							"cleansubject"  => $title['title'],
-							"properlynamed" => true,
-							"increment"     => false,
-							"predb"         => $title['id'],
-							"requestid"     => false
-						);
+						return [
+							'cleansubject'  => $title['title'],
+							'properlynamed' => true,
+							'increment'     => false,
+							'predb'         => $title['id'],
+							'requestid'     => false
+						];
 					}
 				}
 			}
@@ -160,8 +160,8 @@ class ReleaseCleaning
 			if ($title === false && !empty($reqGname)) {
 				$title = $this->pdo->queryOneRow(
 					sprintf(
-						"SELECT p.title as title, p.id as id from predb p INNER JOIN groups g on g.id = p.groups_id
-								WHERE p.requestid = %d and g.name = %s",
+						'SELECT p.title as title, p.id as id from predb p INNER JOIN groups g on g.id = p.groups_id
+								WHERE p.requestid = %d and g.name = %s',
 						$match[1],
 						$this->pdo->escapeString($reqGname)
 					)
@@ -172,13 +172,13 @@ class ReleaseCleaning
 				$title = false;
 			}
 			if ($title !== false) {
-				return array(
-					"cleansubject"  => $title['title'],
-					"properlynamed" => true,
-					"increment"     => false,
-					"predb"         => $title['id'],
-					"requestid"     => true
-				);
+				return [
+					'cleansubject'  => $title['title'],
+					'properlynamed' => true,
+					'increment'     => false,
+					'predb'         => $title['id'],
+					'requestid'     => true
+				];
 			}
 		}
 		if ($usepre === true) {
@@ -188,7 +188,11 @@ class ReleaseCleaning
 		// Try DB regex.
 		$potentialName = $this->_regexes->tryRegex($subject, $groupName);
 		if ($potentialName) {
-			return $potentialName;
+			return [
+				'id'   => $this->_regexes->matchedRegex,
+				'cleansubject' => $potentialName,
+				'properlynamed' => false
+			];
 		}
 
 		//if www.town.ag releases check against generic_town regexes
@@ -206,13 +210,16 @@ class ReleaseCleaning
 	{
 		//[140022]-[04] - [01/40] - "140022-04.nfo" yEnc
 		if (preg_match('/\[\d+\]-\[.+\] - \[\d+\/\d+\] - "\d+-.+" yEnc/', $this->subject)) {
-			return array(
-				"cleansubject" => $this->subject, "properlynamed" => false, "ignore" => true
-			);
+			return [
+				'cleansubject' => $this->subject,
+				'properlynamed' => false,
+				'ignore' => true
+			];
 		}
-		return array(
-			"cleansubject" => $this->releaseCleanerHelper($this->subject), "properlynamed" => false
-		);
+		return [
+			'cleansubject' => $this->releaseCleanerHelper($this->subject),
+			'properlynamed' => false
+		];
 	}
 	public function generic_town()
 	{
@@ -348,9 +355,10 @@ class ReleaseCleaning
 		) {
 			return $match[1];
 		}
-		return array(
-			"cleansubject" => $this->releaseCleanerHelper($this->subject), "properlynamed" => false
-		);
+		return [
+			'cleansubject' => $this->releaseCleanerHelper($this->subject),
+			'properlynamed' => false
+		];
 	}
 	// Run at the end because this can be dangerous. In the future it's better to make these per group. There should not be numbers after yEnc because we remove them as well before inserting (even when importing).
 	public function generic()
@@ -362,9 +370,10 @@ class ReleaseCleaning
 		) {
 			return $match['title'];
 		}
-		return array(
-			"cleansubject" => $this->releaseCleanerHelper($this->subject), "properlynamed" => false
-		);
+		return [
+			'cleansubject' => $this->releaseCleanerHelper($this->subject),
+			'properlynamed' => false
+		];
 	}
 	public function releaseCleanerHelper($subject)
 	{

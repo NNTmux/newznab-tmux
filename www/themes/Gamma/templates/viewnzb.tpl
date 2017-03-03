@@ -383,9 +383,13 @@
 				{if isset($isadmin)}
 					<dt>Release Info</dt>
 					<dd>
-						{if $release.reqid != ""}
-							Request Id ({$release.reqid})
+						{if $release.gid != ""}
+							Global Id: {$release.gid}
 						{/if}
+						<br>
+						{if !empty($regex->collection_regex_id)} Collection regex ID: {$regex->collection_regex_id}{/if}
+						<br>
+						{if !empty($regex->naming_regex_id)} Naming regex ID: {$regex->naming_regex_id}{/if}
 					</dd>
 				{/if}
 			</dl>

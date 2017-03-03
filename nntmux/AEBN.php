@@ -85,7 +85,7 @@ class AEBN
 		'director'		=> [],
 		'genres'		=> [],
 		'productinfo'	=> [],
-		'sypnosis'		=> [],
+		'synopsis'		=> [],
 		'trailers'		=> ['url' =>[]],
 	];
 
@@ -241,21 +241,21 @@ class AEBN
 	}
 
 	/**
-	 * Gets the sypnosis "plot"
+	 * Gets the synopsis "plot"
 	 *
 	 * @return array
 	 *
 	 */
-	public function sypnosis()
+	public function synopsis()
 	{
 		if ($ret = $this->_html->find('span[itemprop=about]', 0)) {
 			if ($ret === null) {
 				if ($ret = $this->_html->find('div.movieDetailDescription', 0)) {
-					$this->_res['sypnosis'] = trim($ret->plaintext);
-					$this->_res['sypnosis'] = preg_replace('/Description:\s/', "", $this->_res['plot']);
+					$this->_res['synopsis'] = trim($ret->plaintext);
+					$this->_res['synopsis'] = preg_replace('/Description:\s/', "", $this->_res['plot']);
 				}
 			} else {
-				$this->_res['sypnosis'] = trim($ret->plaintext);
+				$this->_res['synopsis'] = trim($ret->plaintext);
 			}
 		}
 
@@ -324,8 +324,8 @@ class AEBN
 			$results['title'] = $this->_title;
 			$results['directurl'] = $this->_directUrl;
 		}
-		if (is_array($this->sypnosis())) {
-			$results = array_merge($results, $this->sypnosis());
+		if (is_array($this->synopsis())) {
+			$results = array_merge($results, $this->synopsis());
 		}
 		if (is_array($this->productInfo())) {
 			$results = array_merge($results, $this->productInfo());

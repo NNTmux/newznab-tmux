@@ -75,10 +75,10 @@
 									<th><input id="chkSelectAll" type="checkbox" class="square-all"/></th>
 									<th>Name
 										<a title="Sort Descending" href="{$orderbyname_desc}">
-											<i class="fa-icon-caret-down text-muted"> </i>
+											<i class="fa-icon-caret-down"> </i>
 										</a>
 										<a title="Sort Ascending" href="{$orderbyname_asc}">
-											<i class="fa-icon-caret-up text-muted"> </i>
+											<i class="fa-icon-caret-up"> </i>
 										</a>
 									</th>
 									<th>Category</th>
@@ -127,22 +127,25 @@
 												{$result.grabs} Grab{if $result.grabs != 1}s{/if} /
 												<i class="fa fa-thumbs-o-down"></i>
 												{$result.failed} Failed Download{if $result.failed != 1}s{/if}
-												</span>{/if}                                    </td>
+												</span>{/if}
+											<span class="label label-primary">{$result.group_name}</span>
+											<span class="label label-primary">{$result.fromname}</span>
+										</td>
 										<td><span class="label label-default">{$result.category_name}</span>
 										</td>
 										<td>{$result.postdate|timeago}</td>
 										<td>{$result.size|fsize_format:"MB"}</td>
 										<td>
 											<a href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"
-											   class="icon_nzb text-muted"><i
-														class="fa fa-cloud-download text-muted"
+											   class="icon_nzb"><i
+														class="fa fa-cloud-download"
 														title="Download NZB"></i></a>
 											<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
-														class="fa fa-comments-o text-muted"
+														class="fa fa-comments-o"
 														title="Comments"></i></a>
 											<a href="#"><i
 														id="guid{$result.guid}"
-														class="icon_cart text-muted fa fa-shopping-basket"
+														class="icon_cart fa fa-shopping-basket"
 														title="Send to my Download Basket">
 
 												</i>
@@ -150,14 +153,14 @@
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<a href="#"><i
 															id="guid{$result.guid}"
-															class="icon_sab text-muted fa fa-share"
+															class="icon_sab fa fa-share"
 															title="Send to my Queue">
 
 													</i>
 												</a>
 											{/if}
 											{if $weHasVortex}
-												<a href="#" class="icon_vortex text-muted"><i
+												<a href="#" class="icon_vortex"><i
 															class="fa fa-share" title="Send to NZBVortex"></i></a>
 											{/if}
 										</td>
