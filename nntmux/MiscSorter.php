@@ -1,6 +1,7 @@
 <?php
 namespace nntmux;
 
+use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use app\models\Settings;
 use nntmux\db\DB;
 use ApaiIO\Configuration\GenericConfiguration;
@@ -416,7 +417,7 @@ class MiscSorter
 				->setAccessKey($this->pubkey)
 				->setSecretKey($this->privkey)
 				->setAssociateTag($this->asstag)
-				->setResponseTransformer('\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
+				->setResponseTransformer(new XmlToSimpleXmlObject());
 		} catch (\Exception $e) {
 			echo $e->getMessage();
 		}
