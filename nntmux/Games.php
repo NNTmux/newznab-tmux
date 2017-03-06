@@ -211,7 +211,7 @@ class Games
 	 *
 	 * @return array
 	 */
-	public function getGamesRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = array())
+	public function getGamesRange($cat, $start, $num, $orderBy, $maxAge = '', array $excludedCats = array())
 	{
 		$browseBy = $this->getBrowseBy();
 
@@ -222,8 +222,6 @@ class Games
 
 		if ($maxAge > 0) {
 			$maxAge = sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge);
-		} else {
-			$maxAge = '';
 		}
 
 		$exccatlist = '';
@@ -346,6 +344,9 @@ class Games
 		return [$orderField, $orderSort];
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getGamesOrdering()
 	{
 		return [
@@ -355,21 +356,26 @@ class Games
 		];
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getBrowseByOptions()
 	{
 		return ['title' => 'title', 'genre' => 'genres_id', 'year' => 'year'];
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getBrowseBy()
 	{
 		$browseBy = '';
 		$browseByArr = $this->getBrowseByOptions();
-		$like = 'LIKE';
 
 		foreach ($browseByArr as $bbk => $bbv) {
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
 				$bbs = stripslashes($_REQUEST[$bbk]);
-				if ($bbk === 'year') {
+				if ($bbk == 'year') {
 					$browseBy .= 'AND YEAR (gi.releasedate) ' . $this->pdo->likeString($bbs, true, true);
 				} else {
 					$browseBy .= 'AND gi.' . $bbv . ' ' .  $this->pdo->likeString($bbs, true, true);
@@ -631,8 +637,8 @@ class Games
 			$genreName = 'Unknown';
 		}
 
-		if (in_array(strtolower($genreName), $genreAssoc)) {
-			$genreKey = array_search(strtolower($genreName), $genreAssoc);
+		if (in_array(strtolower($genreName), $genreAssoc, false)) {
+			$genreKey = array_search(strtolower($genreName), $genreAssoc, false);
 		} else {
 			$genreKey = $this->pdo->queryInsert(
 				sprintf('
@@ -665,7 +671,7 @@ class Games
 					$this->pdo->escapeString($game['asin']),
 					$this->pdo->escapeString($game['url']),
 					$this->pdo->escapeString($game['publisher']),
-					($game['gamesgenreID'] == -1 ? "null" : $game['gamesgenreID']),
+					($game['gamesgenreID'] == -1 ? 'null' : $game['gamesgenreID']),
 					$this->pdo->escapeString($game['esrb']),
 					($game['releasedate'] != '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
 					$this->pdo->escapeString(substr($game['review'], 0, 3000)),
@@ -688,7 +694,7 @@ class Games
 					$this->pdo->escapeString($game['asin']),
 					$this->pdo->escapeString($game['url']),
 					$this->pdo->escapeString($game['publisher']),
-					($game['gamesgenreID'] == -1 ? "null" : $game['gamesgenreID']),
+					($game['gamesgenreID'] == -1 ? 'null' : $game['gamesgenreID']),
 					$this->pdo->escapeString($game['esrb']),
 					($game['releasedate'] != '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
 					$this->pdo->escapeString(substr($game['review'], 0, 3000)),
