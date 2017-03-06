@@ -167,11 +167,11 @@ class Movie
 		$this->tmdbtoken = new ApiToken(Settings::value('APIs..tmdbkey'));
 		$this->tmdbclient = new TmdbClient($this->tmdbtoken);
 
-		$this->lookuplanguage = (Settings::value('indexer.categorise.imdblanguage') != '') ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
+		$this->lookuplanguage = Settings::value('indexer.categorise.imdblanguage') != '' ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
 
 		$this->fanartapikey = Settings::value('APIs..fanarttvkey');
-		$this->imdburl = (Settings::value('indexer.categorise.imdburl') == 0 ? false : true);
-		$this->movieqty = (Settings::value('..maximdbprocessed') != '') ? Settings::value('..maximdbprocessed') : 100;
+		$this->imdburl = Settings::value('indexer.categorise.imdburl') == 0 ? false : true;
+		$this->movieqty = Settings::value('..maximdbprocessed') != '' ? Settings::value('..maximdbprocessed') : 100;
 		$this->searchEngines = true;
 		$this->showPasswords = Releases::showPasswords();
 
@@ -200,7 +200,7 @@ class Movie
 	 */
 	public function getMovieInfo($imdbId)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT * FROM movieinfo WHERE imdbid = %d", $imdbId));
+		return $this->pdo->queryOneRow(sprintf('SELECT * FROM movieinfo WHERE imdbid = %d', $imdbId));
 	}
 
 	/**
@@ -213,11 +213,11 @@ class Movie
 	public function getMovieInfoMultiImdb($imdbIDs)
 	{
 		return $this->pdo->query(
-			sprintf("
+			sprintf('
 				SELECT DISTINCT movieinfo.*, releases.imdbid AS relimdb
 				FROM movieinfo
 				LEFT OUTER JOIN releases ON releases.imdbid = movieinfo.imdbid
-				WHERE movieinfo.imdbid IN (%s)",
+				WHERE movieinfo.imdbid IN (%s)',
 				str_replace(
 					',,',
 					',',
@@ -272,7 +272,7 @@ class Movie
 	 * @param       $maxAge
 	 * @param array $excludedCats
 	 *
-	 * @return bool|\PDOStatement
+	 * @return array|bool|\PDOStatement
 	 */
 	public function getMovieRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [])
 	{
@@ -359,7 +359,7 @@ class Movie
 		);
 		$return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 		if (!empty($return)) {
-			$return[0]['_totalcount'] = (isset($movies['total']) ? $movies['total'] : 0);
+			$return[0]['_totalcount'] = (isset($movies['total']) ?? 0);
 		}
 		return $return;
 	}
@@ -390,7 +390,7 @@ class Movie
 				break;
 		}
 
-		return [$orderField, ((isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc')];
+		return [$orderField, isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1]) ? $orderArr[1] : 'desc'];
 	}
 
 	/**
@@ -444,19 +444,19 @@ class Movie
 			return false;
 		}
 
-		$trailer = $this->pdo->queryOneRow("SELECT trailer FROM movieinfo WHERE imdbid = $imdbID and trailer != ''");
+		$trailer = $this->pdo->queryOneRow("SELECT trailer FROM movieinfo WHERE imdbid = $imdbID AND trailer != ''");
 		if ($trailer) {
 			return $trailer['trailer'];
 		}
 
-		if (is_null($this->traktTv)) {
+		if ($this->traktTv === null) {
 			$this->traktTv = new TraktTv(['Settings' => $this->pdo]);
 		}
 
 		$data = $this->traktTv->client->movieSummary('tt' . $imdbID, 'full');
 		if ($data) {
 			$this->parseTraktTv($data);
-			if (isset($data['trailer']) && !empty($data['trailer'])) {
+			if (!empty($data['trailer'])) {
 				return $data['trailer'];
 			}
 		}
@@ -476,7 +476,7 @@ class Movie
 	 *
 	 * @param array $data
 	 *
-	 * @return mixed|void
+	 * @return mixed
 	 */
 		public function parseTraktTv(&$data)
 	{
@@ -1203,7 +1203,7 @@ class Movie
 					$data = $this->traktTv->client->movieSummary($movieName, 'full');
 					if ($data !== false) {
 						$this->parseTraktTv($data);
-						if (isset($data['ids']['imdb'])) {
+						if (!empty($data['ids']['imdb'])) {
 							$imdbID = $this->doMovieUpdate($data['ids']['imdb'], 'Trakt', $arr['id']);
 							if ($imdbID !== false) {
 								continue;
@@ -1219,7 +1219,7 @@ class Movie
 					}
 
 					// We failed to get an IMDB id from all sources.
-					$this->pdo->queryExec(sprintf("UPDATE releases SET imdbid = 0000000 WHERE id = %d %s", $arr["id"], $this->catWhere));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d %s', $arr['id'], $this->catWhere));
 				}
 			}
 		}
@@ -1290,13 +1290,12 @@ class Movie
 		}
 
 		return (
-		($IMDBCheck === false
+		$IMDBCheck === false
 			? false
 			: (is_numeric($IMDBCheck['imdbid'])
 				? (int)$IMDBCheck['imdbid']
 				: false
 			)
-		)
 		);
 	}
 
@@ -1313,10 +1312,8 @@ class Movie
 			}
 		}
 
-		if ($this->yahooLimit < 41) {
-			if ($this->yahooSearch() === true) {
-				return true;
-			}
+		if ($this->yahooLimit < 41 && $this->yahooSearch() === true) {
+			return true;
 		}
 
 		// Not using this right now because bing's advanced search is not good enough.
@@ -1361,7 +1358,7 @@ class Movie
 		}
 
 		// Make sure we got some data.
-		if (isset($buffer) && $buffer !== false) {
+		if (!empty($buffer)) {
 			$this->googleLimit++;
 
 			if (preg_match('/(To continue, please type the characters below)|(- did not match any documents\.)/i', $buffer, $matches)) {
@@ -1406,7 +1403,7 @@ class Movie
 			}
 		}
 
-		if (isset($buffer) && $buffer !== false) {
+		if (!empty($buffer)) {
 			$this->bingLimit++;
 
 			if ($this->doMovieUpdate($buffer, 'Bing.com', $this->currentRelID) !== false) {
@@ -1460,7 +1457,7 @@ class Movie
 			}
 		}
 
-		if (isset($buffer) && $buffer !== false) {
+		if (!empty($buffer)) {
 			$this->yahooLimit++;
 
 			if ($this->doMovieUpdate($buffer, 'Yahoo.com', $this->currentRelID) !== false) {
