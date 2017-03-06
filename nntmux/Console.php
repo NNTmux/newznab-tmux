@@ -253,7 +253,7 @@ class Console
 				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 		if (!empty($return)) {
-			$return[0]['_totalcount'] = (isset($consoles['total']) ?? 0);
+			$return[0]['_totalcount'] = $consoles['total'] ?? 0;
 		}
 		return $return;
 	}

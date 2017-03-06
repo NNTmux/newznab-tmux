@@ -1,4 +1,5 @@
 2017-03-06 DariusIII
+	* Fix: Fix wrong usage of null coalescing operator
 	* Chg: Remove unused classes (Desura, Greenlight), update Logger, Logging, Menu, MiscSorter classes
 2017-03-03 DariusIII
 	* Chg: Update ternary to PHP 7 style in start.php

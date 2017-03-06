@@ -359,7 +359,7 @@ class Movie
 		);
 		$return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 		if (!empty($return)) {
-			$return[0]['_totalcount'] = (isset($movies['total']) ?? 0);
+			$return[0]['_totalcount'] = $movies['total'] ?? 0;
 		}
 		return $return;
 	}

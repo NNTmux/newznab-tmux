@@ -83,8 +83,8 @@ class Music
 		$this->pubkey = Settings::value('APIs..amazonpubkey');
 		$this->privkey = Settings::value('APIs..amazonprivkey');
 		$this->asstag = Settings::value('APIs..amazonassociatetag');
-		$this->musicqty = (Settings::value('..maxmusicprocessed') != '') ? Settings::value('..maxmusicprocessed') : 150;
-		$this->sleeptime = (Settings::value('..amazonsleep') != '') ? Settings::value('..amazonsleep') : 1000;
+		$this->musicqty = Settings::value('..maxmusicprocessed') != '' ? Settings::value('..maxmusicprocessed') : 150;
+		$this->sleeptime = Settings::value('..amazonsleep') != '' ? Settings::value('..amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'music' . DS;
 		$this->renamed = '';
 		if (Settings::value('..lookupmusic') == 2) {
@@ -101,7 +101,7 @@ class Music
 	 */
 	public function getMusicInfo($id)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT musicinfo.*, genres.title AS genres FROM musicinfo LEFT OUTER JOIN genres ON genres.id = musicinfo.genres_id WHERE musicinfo.id = %d ", $id));
+		return $this->pdo->queryOneRow(sprintf('SELECT musicinfo.*, genres.title AS genres FROM musicinfo LEFT OUTER JOIN genres ON genres.id = musicinfo.genres_id WHERE musicinfo.id = %d ', $id));
 	}
 
 	/**
@@ -114,7 +114,7 @@ class Music
 	{
 		$pdo = $this->pdo;
 		$like = 'ILIKE';
-		if ($pdo->dbSystem() === 'mysql') {
+		if ($pdo->DbSystem() === 'mysql') {
 			$like = 'LIKE';
 		}
 
@@ -139,9 +139,9 @@ class Music
 				}
 			}
 			$searchwords = trim($searchwords);
-			$searchsql .= sprintf(" MATCH(artist, title) AGAINST(%s IN BOOLEAN MODE)", $pdo->escapeString($searchwords));
+			$searchsql .= sprintf(' MATCH(artist, title) AGAINST(%s IN BOOLEAN MODE)', $pdo->escapeString($searchwords));
 		}
-		return $pdo->queryOneRow(sprintf("SELECT * FROM musicinfo WHERE %s", $searchsql));
+		return $pdo->queryOneRow(sprintf('SELECT * FROM musicinfo WHERE %s', $searchsql));
 	}
 
 	/**
@@ -155,12 +155,12 @@ class Music
 
 
 		if ($start === false) {
-			$limit = "";
+			$limit = '';
 		} else {
-			$limit = " LIMIT " . $num . " OFFSET " . $start;
+			$limit = ' LIMIT ' . $num . ' OFFSET ' . $start;
 		}
 
-		return $this->pdo->query(" SELECT * FROM musicinfo ORDER BY createddate DESC" . $limit);
+		return $this->pdo->query('SELECT * FROM musicinfo ORDER BY createddate DESC' . $limit);
 	}
 
 	/**
@@ -169,8 +169,8 @@ class Music
 	public function getCount()
 	{
 
-		$res = $this->pdo->queryOneRow("SELECT COUNT(id) AS num FROM musicinfo");
-		return $res["num"];
+		$res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM musicinfo');
+		return $res['num'];
 	}
 
 	/**
@@ -191,9 +191,9 @@ class Music
 			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
-		$exccatlist = "";
+		$exccatlist = '';
 		if (count($excludedcats) > 0) {
-			$exccatlist = " AND r.categories_id NOT IN (" . implode(",", $excludedcats) . ")";
+			$exccatlist = ' AND r.categories_id NOT IN (' . implode(',', $excludedcats) . ')';
 		}
 
 		$order = $this->getMusicOrder($orderby);
@@ -269,7 +269,7 @@ class Music
 		);
 		$return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 		if (!empty($return)) {
-			$return[0]['_totalcount'] = (isset($music['total']) ? $music['total'] : 0);
+			$return[0]['_totalcount'] = $music['total'] ?? 0;
 		}
 
 		return $return;

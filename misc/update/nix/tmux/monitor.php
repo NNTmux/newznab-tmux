@@ -22,7 +22,7 @@ $db_name = DB_NAME;
 $dbtype = DB_SYSTEM;
 $tmux = $tRun->get('niceness');
 
-$tmux_niceness = isset($tmux->niceness) ?? 2;
+$tmux_niceness = $tmux->niceness ?? 2;
 
 $runVar['constants'] = $pdo->queryOneRow($tRun->getConstantSettings());
 

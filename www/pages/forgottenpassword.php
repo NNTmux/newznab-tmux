@@ -8,7 +8,7 @@ if ($page->users->isLoggedIn()) {
 	header('Location: ' . WWW_TOP . '/');
 }
 
-$action = isset($_REQUEST['action']) ?? 'view';
+$action = $_REQUEST['action'] ?? 'view';
 
 $captcha = new Captcha($page);
 $email = $sent = $confirmed = '';
@@ -46,7 +46,7 @@ switch($action) {
 	case 'submit':
 
 		if ($captcha->getError() === false) {
-			$email = !empty($_POST['email']) ?? '';
+			$email = $_POST['email'] ?? '';
 			if (empty($email)) {
 				$page->smarty->assign('error', 'Missing Email');
 			} else {
