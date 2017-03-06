@@ -1,3 +1,5 @@
+2017-03-06 DariusIII
+	* Chg: Remove unused classes (Desura, Greenlight), update Logger, Logging, Menu, MiscSorter classes
 2017-03-03 DariusIII
 	* Chg: Update ternary to PHP 7 style in start.php
 	* Fix: Fix function name in ajax_group-edit.php (Fixes issue #126)

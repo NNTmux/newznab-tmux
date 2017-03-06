@@ -79,12 +79,12 @@ class Logging
 				$this->pdo->escapeString($username), $this->pdo->escapeString($host)));
 			$logData = date('M d H:i:s ') . "Login Failed for " . $username . " from " . $host . "." .
 				$this->newLine;
-			if (isset($logFile) && $logFile != "") {
+			if (!empty($logFile)) {
 				file_put_contents($logFile, $logData, FILE_APPEND);
 			}
 		} else if ($loggingOpt == '3') {
-			$logData = date('M d H:i:s ') . "Login Failed for " . $username . " from " . $host . "." . $this->newLine;
-			if (isset($logFile) && $logFile != '') {
+			$logData = date('M d H:i:s ') . 'Login Failed for ' . $username . ' from ' . $host . '.' . $this->newLine;
+			if (!empty($logFile)) {
 				file_put_contents($logFile, $logData, FILE_APPEND);
 			}
 		}
