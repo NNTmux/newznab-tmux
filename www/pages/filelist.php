@@ -1,10 +1,12 @@
 <?php
 
+use nntmux\db\DB;
 use nntmux\Releases;
 use nntmux\NZB;
 
 $releases = new Releases;
-$nzb = new NZB;
+$pdo = new DB();
+$nzb = new NZB($pdo);
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

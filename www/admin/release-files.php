@@ -6,11 +6,13 @@ require_once './config.php';
 use nntmux\Releases;
 use nntmux\Users;
 use nntmux\NZB;
+use nntmux\db\DB;
 
 $page = new AdminPage;
 $users = new Users;
 $releases = new Releases;
-$nzb = new NZB;
+$pdo = new DB();
+$nzb = new NZB($pdo);
 
 if (!$users->isLoggedIn())
 	$page->show403();

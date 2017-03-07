@@ -828,8 +828,6 @@ class SpotNab {
 	public function processGID($limit=500, $batch=5000, $delete_broken_releases = false){
 		// Process until someone presses cntrl-c
 
-		$nzb = new NZB();
-
 		$processed = 0;
 
 		// We need an offset for tracking unhandled issues
@@ -850,7 +848,7 @@ class SpotNab {
 			$offset += $batch;
 
 			foreach ($res as $r){
-				$nzbfile = $nzb->getNZBPath($r["guid"]);
+				$nzbfile = $this->nzb->getNZBPath($r["guid"]);
 				if($nzbfile === NULL){
 					continue;
 				}
