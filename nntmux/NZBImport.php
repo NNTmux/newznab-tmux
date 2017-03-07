@@ -127,7 +127,7 @@ class NZBImport
 		$this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['settings' => $this->pdo]));
 		$this->groups = new Groups(['Settings' => $this->pdo]);
 
-		$this->crossPostt = (Settings::value('..crossposttime') != '') ? Settings::value('..crossposttime') : 2;
+		$this->crossPostt = Settings::value('..crossposttime') !== '' ? Settings::value('..crossposttime') : 2;
 		$this->browser = $options['Browser'];
 		$this->retVal = '';
 	}
@@ -300,7 +300,7 @@ class NZBImport
 			}
 
 			// Make a fake message array to use to check the blacklist.
-			$msg = ["Subject" => (string)$file->attributes()->subject, "From" => (string)$file->attributes()->poster, "Message-ID" => ""];
+			$msg = ['Subject' => (string)$file->attributes()->subject, 'From' => (string)$file->attributes()->poster, 'Message-ID' => ''];
 
 			// Get the group names, group_id, check if it's blacklisted.
 			$groupArr = [];
@@ -354,9 +354,9 @@ class NZBImport
 
 			} else {
 				if ($isBlackListed) {
-					$errorMessage = "Subject is blacklisted: " . utf8_encode(trim($firstName));
+					$errorMessage = 'Subject is blacklisted: ' . utf8_encode(trim($firstName));
 				} else {
-					$errorMessage = "No group found for " . $firstName . " (one of " . implode(', ', $groupArr) . " are missing";
+					$errorMessage = 'No group found for ' . $firstName . ' (one of ' . implode(', ', $groupArr) . ' are missing';
 				}
 				$this->echoOut($errorMessage);
 
@@ -380,8 +380,8 @@ class NZBImport
 			[
 				'subject'    => $firstName,
 				'useFName'   => $useNzbName,
-				'postDate'   => (empty($postDate) ? date("Y-m-d H:i:s") : $postDate),
-				'from'       => (empty($posterName) ? '' : $posterName),
+				'postDate'   => empty($postDate) ? date("Y-m-d H:i:s") : $postDate,
+				'from'       => empty($posterName) ? '' : $posterName,
 				'groups_id'   => $groupID,
 				'groupName'  => $groupName,
 				'totalFiles' => $totalFiles,
@@ -447,7 +447,7 @@ class NZBImport
 			$relID = $this->releases->insertRelease(
 				[
 					'name'			=> $escapedSubject,
-					'searchname'	=> $this->pdo->escapeString($cleanName),
+					'searchname'	=> $escapedSearchName,
 					'totalpart'		=> $nzbDetails['totalFiles'],
 					'groups_id'		=> $nzbDetails['groups_id'],
 					'guid'			=> $this->pdo->escapeString($this->relGuid),
@@ -482,14 +482,14 @@ class NZBImport
 	protected function getAllGroups()
 	{
 		$this->allGroups = [];
-		$groups = $this->pdo->queryDirect("
+		$groups = $this->pdo->queryDirect('
 			SELECT id, name
-			FROM groups"
+			FROM groups'
 		);
 
 		if ($groups instanceof \Traversable) {
 			foreach ($groups as $group) {
-				$this->allGroups[$group["name"]] = $group["id"];
+				$this->allGroups[$group['name']] = $group['id'];
 			}
 		}
 
@@ -510,7 +510,7 @@ class NZBImport
 	protected function echoOut($message)
 	{
 		if ($this->browser) {
-			$this->retVal .= $message . "<br />";
+			$this->retVal .= $message . '<br />';
 		} elseif ($this->echoCLI) {
 			echo $message . PHP_EOL;
 		}

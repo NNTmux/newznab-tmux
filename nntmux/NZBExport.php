@@ -253,7 +253,7 @@ class NZBExport
 	protected function echoOut($message)
 	{
 		if ($this->browser) {
-			$this->retVal .= $message . "<br />";
+			$this->retVal .= $message . '<br />';
 		} elseif ($this->echoCLI) {
 			echo $message . PHP_EOL;
 		}

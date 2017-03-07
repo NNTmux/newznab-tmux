@@ -4,6 +4,7 @@ namespace nntmux;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use nntmux\utility\Utility;
+use nntmux\db\DB;
 
 /**
  * Class NZBGet
@@ -57,7 +58,7 @@ class NZBGet
 	protected $rsstoken = '';
 
 	/**
-	 * URL to your nZEDb site.
+	 * URL to your NNTmux site.
 	 * @var string
 	 * @access protected
 	 */
@@ -102,7 +103,8 @@ class NZBGet
 
 		$this->fullURL = $this->verifyURL($this->url);
 		$this->Releases = new Releases();
-		$this->NZB = new NZB();
+		$this->pdo = new DB();
+		$this->NZB = new NZB($this->pdo);
 		$this->client = new Client();
 	}
 
