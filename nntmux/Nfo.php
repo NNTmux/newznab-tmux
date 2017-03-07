@@ -84,13 +84,13 @@ class Nfo
 		$options += $defaults;
 		$this->echo = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->nzbs = (Settings::value('..maxnfoprocessed') != '') ? (int)Settings::value('..maxnfoprocessed') : 100;
-		$this->maxsize = (Settings::value('..maxsizetoprocessnfo') != '') ? (int)Settings::value('..maxsizetoprocessnfo') : 100;
-		$this->maxsize = ($this->maxsize > 0 ? ('AND size < ' . ($this->maxsize * 1073741824)) : '');
-		$this->minsize = (Settings::value('..minsizetoprocessnfo') != '') ? (int)Settings::value('..minsizetoprocessnfo') : 100;
-		$this->minsize = ($this->minsize > 0 ? ('AND size > ' . ($this->minsize * 1048576)) : '');
-		$this->maxRetries = (int)(Settings::value('..maxnforetries') >= 0 ? -((int)Settings::value('..maxnforetries') + 1) : self::NFO_UNPROC);
-		$this->maxRetries = ($this->maxRetries < -8 ? -8 : $this->maxRetries);
+		$this->nzbs = Settings::value('..maxnfoprocessed') != '' ? (int)Settings::value('..maxnfoprocessed') : 100;
+		$this->maxsize = Settings::value('..maxsizetoprocessnfo') != '' ? (int)Settings::value('..maxsizetoprocessnfo') : 100;
+		$this->maxsize = $this->maxsize > 0 ? ('AND size < ' . ($this->maxsize * 1073741824)) : '';
+		$this->minsize = Settings::value('..minsizetoprocessnfo') != '' ? (int)Settings::value('..minsizetoprocessnfo') : 100;
+		$this->minsize = $this->minsize > 0 ? ('AND size > ' . ($this->minsize * 1048576)) : '';
+		$this->maxRetries = (int)Settings::value('..maxnforetries') >= 0 ? -((int)Settings::value('..maxnforetries') + 1) : self::NFO_UNPROC;
+		$this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
 		$this->tmpPath = (string)Settings::value('..tmpunrarpath');
 		if (!preg_match('/[\/\\\\]$/', $this->tmpPath)) {
 			$this->tmpPath .= DS;
@@ -111,12 +111,11 @@ class Nfo
 		$return = false;
 
 		if (preg_match('/tvrage\.com\/shows\/id-(\d{1,6})/i', $str, $matches)) {
-			$return = (
+			$return =
 			[
 				'showid' => trim($matches[1]),
 				'site'   => 'tvrage'
-			]
-			);
+			];
 		}
 		return $return;
 	}
@@ -253,15 +252,15 @@ class Nfo
 		if ($pdo instanceof DB) {
 			$maxSize = Settings::value('..maxsizetoprocessnfo');
 			$minSize = Settings::value('..minsizetoprocessnfo');
-			$maxRetries = (int)(Settings::value('..maxnforetries') >= 0 ?
-				-((int)Settings::value('..maxnforetries') + 1) : self::NFO_UNPROC);
+			$maxRetries = (int)Settings::value('..maxnforetries') >= 0 ?
+				-((int)Settings::value('..maxnforetries') + 1) : self::NFO_UNPROC;
 		} else {
 			$maxSize = Settings::value('..maxsizetoprocessnfo');
 			$minSize = Settings::value('..minsizetoprocessnfo');
 			$value = Settings::value('..maxnforetries');
 			$maxRetries = (int)$value >= 0 ? -((int)$value + 1) : self::NFO_UNPROC;
 		}
-		return (
+		return
 		sprintf(
 			'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
 			NZB::NZB_ADDED,
@@ -269,20 +268,19 @@ class Nfo
 			self::NFO_UNPROC,
 			(($maxSize != '' && $maxSize > 0) ? ('AND r.size < ' . ($maxSize * 1073741824)) : ''),
 			(($minSize != '' && $minSize > 0) ? ('AND r.size > ' . ($minSize * 1048576)) : '')
-		)
 		);
 	}
 
 	/**
 	 * Attempt to find NFO files inside the NZB's of releases.
 	 *
-	 * @param object $nntp           Instance of class NNTP.
-	 * @param string $groupID        (optional) Group ID.
-	 * @param string $guidChar       (optional) First character of the release GUID (used for multi-processing).
-	 * @param int    $processImdb    (optional) Attempt to find IMDB id's in the NZB?
-	 * @param int    $processTv      (optional) Attempt to find Tv id's in the NZB?
+	 * @param        $nntp
+	 * @param string $groupID     (optional) Group ID.
+	 * @param string $guidChar    (optional) First character of the release GUID (used for multi-processing).
+	 * @param int    $processImdb (optional) Attempt to find IMDB id's in the NZB?
+	 * @param int    $processTv   (optional) Attempt to find Tv id's in the NZB?
 	 *
-	 * @return int                   How many NFO's were processed?
+	 * @return int How many NFO's were processed?
 	 *
 	 * @access public
 	 */
@@ -373,20 +371,6 @@ class Nfo
 					// If set scan for tv info.
 					if ($processTv == 1) {
 						(new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo]))->processTv($groupID, $guidChar, $processTv);
-						/*$tvRage = new TvRage(['Echo' => $this->echo, 'Settings' => $this->pdo]);
-						$showId = $this->parseShowId($fetchedBinary);
-						if ($showId !== false) {
-							$show = $tvRage->parseNameEpSeason($arr['name']);
-							if (is_array($show) && $show['name'] != '') {
-								// Update release with season, ep, and air date info (if available) from release title.
-								$tvRage->updateEpInfo($show, $arr['id']);
-								$rid = $tvRage->getByRageID($rageId);
-								if (!$rid) {
-									$tvrShow = $tvRage->getRageInfoFromService($rageId);
-									$tvRage->updateRageInfo($rageId, $show, $tvrShow, $arr['id']);
-								}
-							}
-						}*/
 					}
 				}
 			}
