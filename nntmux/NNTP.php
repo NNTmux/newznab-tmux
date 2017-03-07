@@ -99,6 +99,7 @@ class NNTP extends \Net_NNTP_Client
 	 */
 	public function __construct(array $options = [])
 	{
+		parent::__construct();
 		$defaults = [
 			'Echo'      => true,
 			'Logger' => null,
@@ -119,7 +120,7 @@ class NNTP extends \Net_NNTP_Client
 			}
 		}
 
-		$this->_nntpRetries = (Settings::value('..nntpretries') != '') ? (int)Settings::value('..nntpretries') : 0 + 1;
+		$this->_nntpRetries = Settings::value('..nntpretries') != '' ? (int)Settings::value('..nntpretries') : 0 + 1;
 	}
 
 	/**
@@ -146,11 +147,12 @@ class NNTP extends \Net_NNTP_Client
 	 */
 	public function doConnect($compression = true, $alternate = false)
 	{
-		if (// Don't reconnect to usenet if:
-			// We are already connected to usenet. AND
-			parent::_isConnected() &&
-			// (Alternate is wanted, AND current server is alt,     OR    Alternate is not wanted AND current is main.)
-			(($alternate && $this->_currentServer === NNTP_SERVER_A) || (!$alternate && $this->_currentServer === NNTP_SERVER))
+		if (// (Alternate is wanted, AND current server is alt,  OR  Alternate is not wanted AND current is main.)         AND
+		(($alternate && $this->_currentServer === NNTP_SERVER_A) || (!$alternate && $this->_currentServer === NNTP_SERVER)) &&
+			// Don't reconnect to usenet if:
+			// We are already connected to usenet.
+			parent::_isConnected()
+
 		) {
 			return true;
 		} else {
@@ -214,7 +216,7 @@ class NNTP extends \Net_NNTP_Client
 			// If we have no more retries and could not connect, return an error.
 			if ($retries === 0 && !$connected) {
 				$message =
-					"Cannot connect to server " .
+					'Cannot connect to server ' .
 					$this->_currentServer .
 					$enc .
 					': ' .
@@ -254,7 +256,7 @@ class NNTP extends \Net_NNTP_Client
 					// If we ran out of retries, return an error.
 					if ($retries === 0 && $authenticated === false) {
 						$message =
-							"Cannot authenticate to server " .
+							'Cannot authenticate to server ' .
 							$this->_currentServer .
 							$enc .
 							' - ' .
@@ -275,7 +277,7 @@ class NNTP extends \Net_NNTP_Client
 					$this->_compressionSupported = false;
 				}
 				if ($this->_debugBool) {
-					$this->_debugging->log(get_class(), __FUNCTION__, "Connected to " . $this->_currentServer . '.', Logger::LOG_INFO);
+					$this->_debugging->log(get_class(), __FUNCTION__, 'Connected to ' . $this->_currentServer . '.', Logger::LOG_INFO);
 				}
 				return true;
 			}
@@ -312,7 +314,7 @@ class NNTP extends \Net_NNTP_Client
 		// Check if we are connected to usenet.
 		if ($force === true || parent::_isConnected(false)) {
 			if ($this->_debugBool) {
-				$this->_debugging->log(get_class(), __FUNCTION__, "Disconnecting from " . $this->_currentServer, Logger::LOG_INFO);
+				$this->_debugging->log(get_class(), __FUNCTION__, 'Disconnecting from ' . $this->_currentServer, Logger::LOG_INFO);
 			}
 			// Disconnect from usenet.
 			return parent::disconnect();
@@ -368,7 +370,7 @@ class NNTP extends \Net_NNTP_Client
 		}
 
 		// Check if the current selected group is the same, or if we have not selected a group or if a fresh summary is wanted.
-		if ($force || $this->_currentGroup !== $group || is_null($this->_selectedGroupSummary)) {
+		if ($force || $this->_currentGroup !== $group || $this->_selectedGroupSummary === null) {
 			$this->_currentGroup = $group;
 			return parent::selectGroup($group, $articles);
 		} else {
@@ -459,7 +461,7 @@ class NNTP extends \Net_NNTP_Client
 		}
 
 		// Fetch the header overview format (for setting the array keys on the return array).
-		if (!is_null($this->_overviewFormatCache) && isset($this->_overviewFormatCache['Xref'])) {
+		if ($this->_overviewFormatCache !== null && isset($this->_overviewFormatCache['Xref'])) {
 			$overview = $this->_overviewFormatCache;
 		} else {
 			$overview = $this->getOverviewFormat(false, true);
@@ -802,7 +804,7 @@ class NNTP extends \Net_NNTP_Client
 	/**
 	 * Post an article to usenet.
 	 *
-	 * @param string $groups   mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
+	 * @param string|array $groups   mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
 	 *                          (string) Group.  ie.: $groups = 'alt.test';
 	 * @param string $subject  string  The subject.     ie.: $subject = 'Test article';
 	 * @param string $body     string  The message.     ie.: $message = 'This is only a test, please disregard.';
@@ -850,7 +852,7 @@ class NNTP extends \Net_NNTP_Client
 		}
 
 		// Check if the group is string or array.
-		if (is_array(($groups))) {
+		if (is_array($groups)) {
 			$groups = implode(', ', $groups);
 		}
 
@@ -1085,8 +1087,8 @@ class NNTP extends \Net_NNTP_Client
 			} else if ($this->_yEncExtension) {
 				$data = \simple_yenc_decode($input[1]);
 			} else {
-				$inFile = $this->_yEncTempInput . mt_rand(0, 999999);
-				$ouFile = $this->_yEncTempOutput . mt_rand(0, 999999);
+				$inFile = $this->_yEncTempInput . random_int(0, 999999);
+				$ouFile = $this->_yEncTempOutput . random_int(0, 999999);
 				file_put_contents($inFile, $input[1]);
 				file_put_contents($ouFile, '');
 				Utility::runCmd(
@@ -1368,7 +1370,7 @@ class NNTP extends \Net_NNTP_Client
 	protected function _formatMessageID($messageID)
 	{
 		$messageID = (string)$messageID;
-		if (strlen($messageID) < 1) {
+		if ($messageID === '') {
 			return false;
 		}
 

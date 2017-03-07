@@ -1,4 +1,5 @@
 2017-03-07 DariusIII
+	* Chg: Slightly change NNTP class
 	* Chg: Remove tvrage code, reformat some of the existing code in Nfo class
 2017-03-06 DariusIII
 	* Chg: Make maxage parameter in getGamesRange function an empty string
