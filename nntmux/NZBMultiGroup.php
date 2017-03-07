@@ -14,7 +14,7 @@ class NZBMultiGroup extends NZB
 	 *
 	 * @param $pdo
 	 */
-	public function __construct(&$pdo = null)
+	public function __construct(&$pdo)
 	{
 		parent::__construct($pdo);
 	}
