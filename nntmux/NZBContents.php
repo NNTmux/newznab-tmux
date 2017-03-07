@@ -100,8 +100,8 @@ Class NZBContents
 		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
 		$t = new Tmux();
 		$this->tmux = $t->get();
-		$this->lookuppar2 = (Settings::value('..lookuppar2') == 1 ? true : false);
-		$this->alternateNNTP = (Settings::value('..alternate_nntp') == 1 ? true : false);
+		$this->lookuppar2 = Settings::value('..lookuppar2') == 1 ? true : false;
+		$this->alternateNNTP = Settings::value('..alternate_nntp') == 1 ? true : false;
 	}
 
 	/**
@@ -172,8 +172,8 @@ Class NZBContents
 		if ($nzbFile !== false) {
 			$messageID = $hiddenID = '';
 			$actualParts = $artificialParts = 0;
-			$foundPAR2 = ($this->lookuppar2 === false ? true : false);
-			$foundNFO = $hiddenNFO = ($nfoCheck === false ? true : false);
+			$foundPAR2 = $this->lookuppar2 === false ? true : false;
+			$foundNFO = $hiddenNFO = $nfoCheck === false ? true : false;
 			$foundSRR = false;
 
 			foreach ($nzbFile->file as $nzbcontents) {
