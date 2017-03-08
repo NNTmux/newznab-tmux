@@ -323,7 +323,7 @@ class RequestIDWeb extends RequestID
 					'new_category' => $this->category->getNameByID($determinedCategory),
 					'old_category' => '',
 					'group' => $this->_release['groupname'],
-					'release_id' => $this->_release['id'],
+					'releases_id' => $this->_release['id'],
 					'method' => 'RequestID->updateRelease<web>'
 				)
 			);

@@ -190,7 +190,7 @@ function preName($argv, $argc)
 									'new_category' => $newcatname,
 									'old_category' => $oldcatname,
 									'group'        => $groupname,
-									'release_id'   => $row["id"],
+									'releases_id'   => $row["id"],
 									'method'       => 'misc/testing/Various/renametopre.php'
 								]
 							);
