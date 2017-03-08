@@ -1,3 +1,5 @@
+2017-03-08 DariusIII
+	* Chg: Update guzzlehttp
 2017-03-07 DariusIII
 	* Fix: Fix missing pdo when calling NZB class
 	* Chg: Small refactor of NZB class
