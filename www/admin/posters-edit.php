@@ -9,27 +9,28 @@ $page = new AdminPage();
 $relPosters = new ProcessReleasesMultiGroup(['Settings' => $page->settings]);
 
 // Set the current action.
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = $_REQUEST['action'] ?? 'view';
 
 switch ($action) {
 	case 'submit':
-		if ($_POST['id'] == '') {
+		if ($_POST['id'] === '') {
 			// Add a new mg poster.
-			$poster = MultigroupPosters::create();
+			$poster = MultigroupPosters::create([
+				'poster' => $_POST['poster'],
+			]);
 		} else {
 			// Update an existing mg poster.
 			$poster = MultigroupPosters::find($_POST['id']);
 		}
-		$poster->poster = $_POST['poster'];
 		$poster->save();
 
-		header("Location:" . WWW_TOP . "/posters-list.php");
+		header('Location:' . WWW_TOP . '/posters-list.php');
 		break;
 
 	case 'view':
 	default:
 		if (!empty($_GET['id'])) {
-			$page->title = "MultiGroup Poster Edit";
+			$page->title = 'MultiGroup Poster Edit';
 			// Note: explicitly setting default stuff below, which could be shortened to:
 			// $entry = MultigroupPosters::find($_GET['id']);
 			$poster = MultigroupPosters::find('first',
@@ -46,7 +47,7 @@ switch ($action) {
 				]
 			);
 		} else {
-			$page->title = "MultiGroup Poster Add";
+			$page->title = 'MultiGroup Poster Add';
 			$poster = '';
 		}
 		$page->smarty->assign('poster', $poster);
