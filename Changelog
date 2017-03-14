@@ -1,4 +1,5 @@
 2017-03-14 DariusIII
+	* Chg: Remove references to nntpproxy and options for its usage
 	* Chg: Remove python backfill script from tmux.
 2017-03-13 DariusIII
 	* Fix: Fix fetching of covers from AEBN (thanks to @niel, ported from nZEDb)
