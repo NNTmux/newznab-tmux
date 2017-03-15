@@ -57,14 +57,13 @@ class ReleaseImage
 	 *
 	 * @param \DB()
 	 */
-	public function __construct(&$pdo = null)
+	public function __construct(&$pdo)
 	{
-		// Creates the NN_COVERS constant
-		if ($pdo === null) {
-			$pdo = new DB();
-		}
+
+		$this->pdo = ($pdo instanceof DB ? $pdo : new DB());
 		$this->client = new Client();
-		//                                                            Table    |  Column
+		// Creates the NN_COVERS constant
+		//                                                       Table    |  Column
 		$this->audSavePath = NN_COVERS . 'audiosample' . DS; // releases    guid
 		$this->imgSavePath = NN_COVERS . 'preview' . DS; // releases    guid
 		$this->jpgSavePath = NN_COVERS . 'sample' . DS; // releases    guid
@@ -91,7 +90,6 @@ class ReleaseImage
 	 */
 	protected function fetchImage($imgLoc)
 	{
-		$pdo = new DB();
 		$img = false;
 		if (strpos(strtolower($imgLoc), 'http:') === 0 || strpos(strtolower($imgLoc), 'https:') === 0) {
 			try {
@@ -99,11 +97,11 @@ class ReleaseImage
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						$pdo->log->doEcho($pdo->log->notice('Data not available on server'));
+						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
 					} else if ($e->getCode() === 503) {
-						$pdo->log->doEcho($pdo->log->notice('Service unavailable'));
+						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
 					} else {
-						$pdo->log->doEcho($pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
 					}
 				}
 			}
@@ -117,7 +115,7 @@ class ReleaseImage
 			try {
 				$imagick->readImageBlob($img);
 			} catch (\ImagickException $imgError) {
-				$pdo->log->doEcho($pdo->log->notice('Invalid image data, skipping processing') . PHP_EOL);
+				$this->pdo->log->doEcho($this->pdo->log->notice('Invalid image data, skipping processing') . PHP_EOL);
 				$imgFail = true;
 			}
 			if ($imgFail === false) {
@@ -160,8 +158,8 @@ class ReleaseImage
 			$height = $imagick->getImageHeight();
 			$ratio = min($imgMaxHeight / $height, $imgMaxWidth / $width);
 			// New dimensions
-			$new_width = intval($ratio * $width);
-			$new_height = intval($ratio * $height);
+			$new_width = (int)($ratio * $width);
+			$new_height = (int)($ratio * $height);
 			if ($new_width < $width && $new_width > 10 && $new_height > 10) {
 				$imagick->thumbnailImage($new_width, $new_height, true);
 				$imagick->setImageFormat('jpeg');
