@@ -17,11 +17,11 @@ use nntmux\AniDB;
 use nntmux\Books;
 use nntmux\PreDb;
 
-if (!$page->users->isLoggedIn())
+if (!$page->users->isLoggedIn()) {
 	$page->show403();
+}
 
-if (isset($_GET['id']))
-{
+if (isset($_GET['id'])) {
 	$releases = new Releases(['Settings' => $page->settings]);
 	$rc = new ReleaseComments;
 	$re = new ReleaseExtra;
@@ -32,11 +32,13 @@ if (isset($_GET['id']))
 	$cpurl = $user['cp_url'];
 	$releaseRegex = ReleaseRegexes::find('first', ['conditions' => ['releases_id' => $data['id']]]);
 
-	if (!$data)
+	if (!$data) {
 		$page->show404();
+	}
 
-	if ($page->isPostBack())
+	if ($page->isPostBack()) {
 		$rc->addComment($data['id'], $data['gid'], $_POST['txtAddComment'], $page->users->currentUserId(), $_SERVER['REMOTE_ADDR']);
+	}
 
 	$nfo = $releases->getReleaseNfo($data['id'], true);
 	$reVideo = $re->getVideo($data['id']);
@@ -121,8 +123,7 @@ if (isset($_GET['id']))
 	}
 
 	$AniDBAPIArray = '';
-	if ($data['anidbid'] > 0)
-	{
+	if ($data['anidbid'] > 0) {
 		$AniDB = new AniDB(['Settings' => $releases->pdo]);
 		$AniDBAPIArray = $AniDB->getAnimeInfo($data['anidbid']);
 	}
