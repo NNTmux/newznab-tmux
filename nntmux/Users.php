@@ -936,20 +936,26 @@ class Users
 
 	/**
 	 * @param        $uid
-	 * @param int $releaseid
+	 * @param int|string $releaseId
 	 *
 	 * @return array
 	 */
-	public function getCart($uid, int $releaseid)
+	public function getCart($uid, $releaseId = '')
 	{
 
-		if ($releaseid != '') {
-			$releaseid = ' AND releases.id = ' . $releaseid;
+		if ($releaseId !== '') {
+			$releaseId = ' AND releases.id = ' . $releaseId;
 		}
 
-		return $this->pdo->query(sprintf('SELECT users_releases.*, releases.searchname,releases.guid FROM users_releases INNER JOIN releases on releases.id = users_releases.releases_id WHERE users_id = %d %s', $uid, $releaseid));
+		return $this->pdo->query(sprintf('SELECT users_releases.*, releases.searchname,releases.guid FROM users_releases INNER JOIN releases on releases.id = users_releases.releases_id WHERE users_id = %d %s', $uid, $releaseId));
 	}
 
+	/**
+	 * @param array $guids
+	 * @param $userID
+	 *
+	 * @return bool
+	 */
 	public function delCartByGuid($guids, $userID)
 	{
 		if (!is_array($guids)) {
