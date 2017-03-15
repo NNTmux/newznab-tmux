@@ -50,9 +50,9 @@ class Users
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = $options['Settings'] instanceof DB ? $options['Settings'] : new DB();
 
-		$this->password_hash_cost = (defined('NN_PASSWORD_HASH_COST') ? NN_PASSWORD_HASH_COST : 11);
+		$this->password_hash_cost = defined('NN_PASSWORD_HASH_COST') ? NN_PASSWORD_HASH_COST : 11;
 	}
 
 	/**
@@ -61,7 +61,7 @@ class Users
 	 * Automatically update the hash if it needs to be.
 	 *
 	 * @param string $password Password to check against hash.
-	 * @param string $hash     Hash to check against password.
+	 * @param string|bool $hash     Hash to check against password.
 	 * @param int    $userID   ID of the user.
 	 *
 	 * @return bool
@@ -74,7 +74,7 @@ class Users
 
 		// Update the hash if it needs to be.
 		if (is_numeric($userID) && $userID > 0 && password_needs_rehash($hash, PASSWORD_DEFAULT, ['cost' => $this->password_hash_cost])) {
-			$hash = $this->hashPassword($password);
+			$hash = Users::hashPassword($password);
 
 			if ($hash !== false) {
 				$this->pdo->queryExec(
@@ -89,9 +89,12 @@ class Users
 		return true;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function get()
 	{
-		return $this->pdo->query("SELECT * FROM users");
+		return $this->pdo->query('SELECT * FROM users');
 	}
 
 	/**
@@ -103,10 +106,13 @@ class Users
 	 */
 	public function getStyle($userID)
 	{
-		$row = $this->pdo->queryOneRow(sprintf("SELECT style FROM users WHERE id = %d", $userID));
+		$row = $this->pdo->queryOneRow(sprintf('SELECT style FROM users WHERE id = %d', $userID));
 		return ($row === false ? 'None' : $row['style']);
 	}
 
+	/**
+	 * @param $id
+	 */
 	public function delete($id)
 	{
 		$this->delCartForUser($id);
@@ -126,27 +132,43 @@ class Users
 		$forum = new Forum();
 		$forum->deleteUser($id);
 
-		$this->pdo->queryExec(sprintf("DELETE FROM users WHERE id = %d", $id));
+		$this->pdo->queryExec(sprintf('DELETE FROM users WHERE id = %d', $id));
 	}
 
+	/**
+	 * @param $uid
+	 */
 	public function delCartForUser($uid)
 	{
-		$this->pdo->queryExec(sprintf("DELETE FROM users_releases WHERE users_id = %d", $uid));
+		$this->pdo->queryExec(sprintf('DELETE FROM users_releases WHERE users_id = %d', $uid));
 	}
 
+	/**
+	 * @param $uid
+	 */
 	public function delUserCategoryExclusions($uid)
 	{
-		$this->pdo->queryExec(sprintf("DELETE FROM user_excluded_categories WHERE users_id = %d", $uid));
+		$this->pdo->queryExec(sprintf('DELETE FROM user_excluded_categories WHERE users_id = %d', $uid));
 	}
 
+	/**
+	 * @param $userID
+	 *
+	 * @return bool|\PDOStatement
+	 */
 	public function delDownloadRequests($userID)
 	{
-		return $this->pdo->queryExec(sprintf("DELETE FROM user_downloads WHERE users_id = %d", $userID));
+		return $this->pdo->queryExec(sprintf('DELETE FROM user_downloads WHERE users_id = %d', $userID));
 	}
 
+	/**
+	 * @param $userID
+	 *
+	 * @return bool|\PDOStatement
+	 */
 	public function delApiRequests($userID)
 	{
-		return $this->pdo->queryExec(sprintf("DELETE FROM user_requests WHERE users_id = %d", $userID));
+		return $this->pdo->queryExec(sprintf('DELETE FROM user_requests WHERE users_id = %d', $userID));
 	}
 
 	/**
@@ -192,10 +214,10 @@ class Users
 		return $this->pdo->query(
 			sprintf(
 				$query,
-				($userName != '' ? ('AND users.username ' . $this->pdo->likeString($userName)) : ''),
-				($email != '' ? ('AND users.email ' . $this->pdo->likeString($email)) : ''),
-				($host != '' ? ('AND users.host ' . $this->pdo->likeString($host)) : ''),
-				($role != '' ? ('AND users.role = ' . $role) : ''),
+				($userName !== '' ? ('AND users.username ' . $this->pdo->likeString($userName)) : ''),
+				($email !== '' ? ('AND users.email ' . $this->pdo->likeString($email)) : ''),
+				($host !== '' ? ('AND users.host ' . $this->pdo->likeString($host)) : ''),
+				($role !== '' ? ('AND users.role = ' . $role) : ''),
 				$order[0],
 				$order[1],
 				($start === false ? '' : ('LIMIT ' . $offset . ' OFFSET ' . $start))
@@ -203,77 +225,121 @@ class Users
 		);
 	}
 
-	public function getBrowseOrder($orderby)
+	/**
+	 * @param $orderBy
+	 *
+	 * @return array
+	 */
+	public function getBrowseOrder($orderBy)
 	{
-		$order = ($orderby == '') ? 'username_desc' : $orderby;
-		$orderArr = explode("_", $order);
+		$order = ($orderBy === '') ? 'username_asc' : $orderBy;
+		$orderArr = explode('', $order);
 		switch ($orderArr[0]) {
 			case 'username':
-				$orderfield = 'username';
+				$orderField = 'username';
 				break;
 			case 'email':
-				$orderfield = 'email';
+				$orderField = 'email';
 				break;
 			case 'host':
-				$orderfield = 'host';
+				$orderField = 'host';
 				break;
 			case 'createddate':
-				$orderfield = 'createddate';
+				$orderField = 'createddate';
 				break;
 			case 'lastlogin':
-				$orderfield = 'lastlogin';
+				$orderField = 'lastlogin';
 				break;
 			case 'apiaccess':
-				$orderfield = 'apiaccess';
+				$orderField = 'apiaccess';
 				break;
 			case 'apirequests':
-				$orderfield = 'apirequests';
+				$orderField = 'apirequests';
 				break;
 			case 'grabs':
-				$orderfield = 'grabs';
+				$orderField = 'grabs';
 				break;
 			case 'role':
-				$orderfield = 'role';
+				$orderField = 'role';
 				break;
 			case 'rolechangedate':
-				$orderfield = 'rolechangedate';
+				$orderField = 'rolechangedate';
 				break;
 			default:
-				$orderfield = 'username';
+				$orderField = 'username';
 				break;
 		}
-		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'DESC';
+		$orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'DESC';
 
-		return [$orderfield, $ordersort];
+		return [$orderField, $orderSort];
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function getCount()
 	{
 		$res = $this->pdo->queryOneRow("SELECT COUNT(id) as num FROM users WHERE email != 'sharing@nZEDb.com'");
 
-		return $res["num"];
+		return $res['num'];
 	}
 
+	/**
+	 * @param        $id
+	 * @param        $userName
+	 * @param        $email
+	 * @param        $grabs
+	 * @param        $role
+	 * @param        $notes
+	 * @param        $invites
+	 * @param        $movieview
+	 * @param        $musicview
+	 * @param        $gameview
+	 * @param        $xxxview
+	 * @param        $consoleview
+	 * @param        $bookview
+	 * @param string $queueType
+	 * @param string $nzbgetURL
+	 * @param string $nzbgetUsername
+	 * @param string $nzbgetPassword
+	 * @param string $saburl
+	 * @param string $sabapikey
+	 * @param string $sabpriority
+	 * @param string $sabapikeytype
+	 * @param bool   $nzbvortexServerUrl
+	 * @param bool   $nzbvortexApiKey
+	 * @param bool   $cp_url
+	 * @param bool   $cp_api
+	 * @param string $style
+	 *
+	 * @return int
+	 */
 	public function update($id, $userName, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false, $style = 'None')
 	{
 		$userName = trim($userName);
 		$email = trim($email);
 
-		if (!$this->isValidUsername($userName))
+		if (!$this->isValidUsername($userName)) {
 			return Users::ERR_SIGNUP_BADUNAME;
+		}
 
-		if (!$this->isValidEmail($email))
+		if (!$this->isValidEmail($email)) {
 			return Users::ERR_SIGNUP_BADEMAIL;
+		}
 
 		$res = $this->getByUsername($userName);
-		if ($res)
-			if ($res["id"] != $id)
+		if ($res) {
+			if ($res['id'] != $id) {
 				return Users::ERR_SIGNUP_UNAMEINUSE;
+			}
+		}
 
 		$res = $this->getByEmail($email);
-		if ($res)
-			if ($res["id"] != $id)
+		if ($res) {
+			if ($res['id'] != $id) {
 				return Users::ERR_SIGNUP_EMAILINUSE;
+			}
+		}
 
 		$sql = [];
 
@@ -327,14 +393,19 @@ class Users
 			$sql[] = sprintf('cp_api = %s', $this->pdo->escapeString($cp_api));
 		}
 
-		$this->pdo->queryExec(sprintf("UPDATE users SET %s WHERE id = %d", implode(', ', $sql), $id));
+		$this->pdo->queryExec(sprintf('UPDATE users SET %s WHERE id = %d', implode(', ', $sql), $id));
 
 		return self::SUCCESS;
 	}
 
-	public function isValidUsername($userName)
+	/**
+	 * @param string $userName
+	 *
+	 * @return int
+	 */
+	public function isValidUsername(string $userName)
 	{
-		return preg_match("/^[a-z][a-z0-9_]{2,}$/i", $userName);
+		return preg_match('/^[a-z][a-z0-9_]{2,}$/i', $userName);
 	}
 
 	/**
@@ -344,22 +415,38 @@ class Users
 	 *
 	 * @return bool
 	 */
-	public function isValidEmail($email)
+	public function isValidEmail(string $email)
 	{
 		return (bool)preg_match('/^([\w\+-]+)(\.[\w\+-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/i', $email);
 	}
 
-	public function getByUsername($userName)
+	/**
+	 * @param string $userName
+	 *
+	 * @return array|bool
+	 */
+	public function getByUsername(string $userName)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT users.*, user_roles.name as rolename, user_roles.apirequests, user_roles.downloadrequests FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE username = %s ", $this->pdo->escapeString($userName)));
+		return $this->pdo->queryOneRow(sprintf('SELECT users.*, user_roles.name as rolename, user_roles.apirequests, user_roles.downloadrequests FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE username = %s', $this->pdo->escapeString($userName)));
 	}
 
-	public function getByEmail($email)
+	/**
+	 * @param string $email
+	 *
+	 * @return array|bool
+	 */
+	public function getByEmail(string $email)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT * FROM users WHERE lower(email) = %s ", $this->pdo->escapeString(strtolower($email))));
+		return $this->pdo->queryOneRow(sprintf('SELECT * FROM users WHERE lower(email) = %s', $this->pdo->escapeString(strtolower($email))));
 	}
 
-	public function updateUserRole($uid, $role)
+	/**
+	 * @param int $uid
+	 * @param int $role
+	 *
+	 * @return int
+	 */
+	public function updateUserRole(int $uid, int $role)
 	{
 		$this->pdo->queryExec(sprintf("UPDATE users SET role = %d WHERE id = %d", $role, $uid));
 
@@ -377,8 +464,8 @@ class Users
 	{
 		$data = $this->pdo->query(sprintf("SELECT id,email FROM users WHERE role = %d AND rolechangedate < now()", $uprole));
 		foreach ($data as $u) {
-			Utility::sendEmail($u["email"], $msgsubject, $msgbody, Settings::value('site.main.email'));
-			$this->pdo->queryExec(sprintf("UPDATE users SET role = %d, rolechangedate=null WHERE id = %d", $downrole, $u["id"]));
+			Utility::sendEmail($u['email'], $msgsubject, $msgbody, Settings::value('site.main.email'));
+			$this->pdo->queryExec(sprintf("UPDATE users SET role = %d, rolechangedate=null WHERE id = %d", $downrole, $u['id']));
 		}
 
 		return Users::SUCCESS;
@@ -403,7 +490,7 @@ class Users
 	public function updatePassword($id, $password)
 	{
 
-		$this->pdo->queryExec(sprintf("UPDATE users SET password = %s, userseed=md5(%s) WHERE id = %d", $this->pdo->escapeString($this->hashPassword($password)), $this->pdo->escapeString(Utility::generateUuid()), $id));
+		$this->pdo->queryExec(sprintf("UPDATE users SET password = %s, userseed=md5(%s) WHERE id = %d", $this->pdo->escapeString(Users::hashPassword($password)), $this->pdo->escapeString(Utility::generateUuid()), $id));
 
 		return Users::SUCCESS;
 	}
@@ -531,28 +618,32 @@ class Users
 		$password = trim($password);
 		$email = trim($email);
 
-		if (!$this->isValidUsername($userName))
+		if (!$this->isValidUsername($userName)) {
 			return Users::ERR_SIGNUP_BADUNAME;
+		}
 
-		if (!$this->isValidPassword($password))
+		if (!$this->isValidPassword($password)) {
 			return Users::ERR_SIGNUP_BADPASS;
+		}
 
 		if (!$this->isValidEmail($email)) {
 			return self::ERR_SIGNUP_BADEMAIL;
 		}
 
 		$res = $this->getByUsername($userName);
-		if ($res)
+		if ($res) {
 			return Users::ERR_SIGNUP_UNAMEINUSE;
+		}
 
 		$res = $this->getByEmail($email);
-		if ($res)
+		if ($res) {
 			return Users::ERR_SIGNUP_EMAILINUSE;
+		}
 
 		// Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.
 		$invitedBy = 0;
 		if ((Settings::value('..registerstatus') == Settings::REGISTER_STATUS_INVITE) && !$forceInviteMode) {
-			if ($inviteCode == '') {
+			if ($inviteCode === '') {
 				return self::ERR_SIGNUP_BADINVITECODE;
 			}
 
@@ -584,9 +675,9 @@ class Users
 			return -1;
 		}
 
-		$this->pdo->queryExec(sprintf("UPDATE users SET invites = invites-1 WHERE id = %d ", $invite["users_id"]));
+		$this->pdo->queryExec(sprintf("UPDATE users SET invites = invites-1 WHERE id = %d ", $invite['users_id']));
 		$this->deleteInvite($inviteCode);
-		return $invite["users_id"];
+		return $invite['users_id'];
 	}
 
 	public function getInvite($inviteToken)
@@ -630,7 +721,7 @@ class Users
 	public function add($userName, $password, $email, $role, $notes, $host, $invites = self::DEFAULT_INVITES, $invitedBy = 0)
 	{
 
-		$password = $this->hashPassword($password);
+		$password = Users::hashPassword($password);
 		if (!$password) {
 			return false;
 		}
@@ -665,7 +756,7 @@ class Users
 		} else if (isset($_COOKIE['uid']) && isset($_COOKIE['idh'])) {
 			$u = $this->getById($_COOKIE['uid']);
 
-			if (($_COOKIE['idh'] == $this->hashSHA1($u["userseed"] . $_COOKIE['uid'])) && ($u["role"] != self::ROLE_DISABLED)) {
+			if (($_COOKIE['idh'] == $this->hashSHA1($u['userseed'] . $_COOKIE['uid'])) && ($u['role'] != self::ROLE_DISABLED)) {
 				$this->login($_COOKIE['uid'], $_SERVER['REMOTE_ADDR']);
 			}
 		}
@@ -793,7 +884,7 @@ class Users
 	{
 		$rel = $this->pdo->queryOneRow(sprintf("SELECT id FROM releases WHERE guid = %s", $this->pdo->escapeString($guid)));
 		if ($rel)
-			$this->pdo->queryExec(sprintf("DELETE FROM users_releases WHERE users_id = %d AND releases_id = %d", $uid, $rel["id"]));
+			$this->pdo->queryExec(sprintf("DELETE FROM users_releases WHERE users_id = %d AND releases_id = %d", $uid, $rel['id']));
 	}
 
 	public function delCartForRelease($rid)
@@ -816,7 +907,7 @@ class Users
 		$ret = [];
 		$categories = $this->pdo->query(sprintf("SELECT categories_id FROM role_excluded_categories WHERE role = %d", $role));
 		foreach ($categories as $category) {
-			$ret[] = $category["categories_id"];
+			$ret[] = $category['categories_id'];
 		}
 
 		return $ret;
@@ -849,7 +940,7 @@ class Users
 		$ret = [];
 		$categories = $this->pdo->query(sprintf("SELECT categories_id FROM user_excluded_categories WHERE users_id = %d", $userID));
 		foreach ($categories as $category) {
-			$ret[] = $category["categories_id"];
+			$ret[] = $category['categories_id'];
 		}
 
 		return $ret;
@@ -870,7 +961,7 @@ class Users
 		$ret = [];
 		if ($categories !== false) {
 			foreach ($categories as $cat) {
-				$ret[] = $cat["title"];
+				$ret[] = $cat['title'];
 			}
 		}
 		return $ret;
@@ -887,7 +978,7 @@ class Users
 		$token = $this->hashSHA1(uniqid());
 		$subject = $sitetitle . " Invitation";
 		$url = $serverurl . "register?invitecode=" . $token;
-		$contents = $sender["username"] . " has sent an invite to join " . $sitetitle . " to this email address. To accept the invitation click the following link.\n\n " . $url;
+		$contents = $sender['username'] . " has sent an invite to join " . $sitetitle . " to this email address. To accept the invitation click the following link.\n\n " . $url;
 
 		Utility::sendEmail($emailto, $subject, $contents, $siteemail);
 		$this->addInvite($uid, $token);
