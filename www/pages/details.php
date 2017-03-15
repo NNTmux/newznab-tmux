@@ -55,7 +55,7 @@ if (isset($_GET['id']))
 	}
 
 	$mov = '';
-	if ($data['imdbid'] != '' && $data['imdbid'] != 0000000) {
+	if ($data['imdbid'] !== '' && $data['imdbid'] !== 0000000) {
 		$movie = new Movie(['Settings' => $page->settings]);
 		$mov   = $movie->getMovieInfo($data['imdbid']);
 		if ($mov && isset($mov['title'])) {
@@ -67,7 +67,7 @@ if (isset($_GET['id']))
 				$trailer = (!isset($mov['trailer']) || empty($mov['trailer']) || $mov['trailer'] == '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer']);
 				if ($trailer) {
 					$mov['trailer'] = sprintf(
-						"<iframe width=\"%d\" height=\"%d\" src=\"%s\"></iframe>",
+						'<iframe width=\"%d\" height=\"%d\" src=\"%s\"></iframe>',
 						Settings::value('site.trailers.trailers_size_x'),
 						Settings::value('site.trailers.trailers_size_y'),
 						$trailer
@@ -78,7 +78,7 @@ if (isset($_GET['id']))
 	}
 
 	$xxx = '';
-	if ($data['xxxinfo_id'] != '' && $data['xxxinfo_id'] != 0) {
+	if ($data['xxxinfo_id'] !== '' && $data['xxxinfo_id'] !== 0) {
 		$x = new XXX();
 		$xxx = $x->getXXXInfo($data['xxxinfo_id']);
 
@@ -97,38 +97,38 @@ if (isset($_GET['id']))
 	}
 
 	$game = '';
-	if ($data['gamesinfo_id'] != '') {
+	if ($data['gamesinfo_id'] !== '') {
 		$g = new Games();
 		$game = $g->getGamesInfoById($data['gamesinfo_id']);
 	}
 
 	$mus = '';
-	if ($data['musicinfo_id'] != '') {
+	if ($data['musicinfo_id'] !== '') {
 		$music = new Music(['Settings' => $page->settings]);
 		$mus = $music->getMusicInfo($data['musicinfo_id']);
 	}
 
 	$book = '';
-	if ($data['bookinfo_id'] != '') {
+	if ($data['bookinfo_id'] !== '') {
 		$b = new Books();
 		$book = $b->getBookInfo($data['bookinfo_id']);
 	}
 
 	$con = '';
-	if ($data['consoleinfo_id'] != '') {
+	if ($data['consoleinfo_id'] !== '') {
 		$c = new Console();
 		$con = $c->getConsoleInfo($data['consoleinfo_id']);
 	}
 
 	$AniDBAPIArray = '';
-	if ($data["anidbid"] > 0)
+	if ($data['anidbid'] > 0)
 	{
 		$AniDB = new AniDB(['Settings' => $releases->pdo]);
-		$AniDBAPIArray = $AniDB->getAnimeInfo($data["anidbid"]);
+		$AniDBAPIArray = $AniDB->getAnimeInfo($data['anidbid']);
 	}
 
 	$prehash = new PreDb();
-	$pre = $prehash->getForRelease($data["predb_id"]);
+	$pre = $prehash->getForRelease($data['predb_id']);
 
 	$rf = new ReleaseFiles;
 	$releasefiles = $rf->get($data['id']);
