@@ -5,7 +5,7 @@ use nntmux\Contents;
 $contents = new Contents(['Settings' => $page->settings]);
 
 $role = 0;
-if ($page->userdata !== null) {
+if (isset($page->userdata)) {
 	$role = $page->userdata['role'];
 }
 
