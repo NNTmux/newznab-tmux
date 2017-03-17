@@ -1,3 +1,5 @@
+2017-03-17 DariusIII
+	* Chg: Remove now unused pixelead0 tmdb library, update jquery
 2017-03-16 DariusIII
 	* Fix: Possible fix for bad nzb details pages
 	* Chg: Update renaming of SDCLiP releases

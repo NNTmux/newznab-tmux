@@ -10,7 +10,6 @@
     },
     "classmap": [
       "www/pages/",
-      "libs/pixelead0/Tmdb/",
       "libs/PEAR/Net_NNTP/NNTP/",
       "libs/"
     ]
@@ -140,9 +139,8 @@
   "scripts": {
   },
   "suggest": {
-    "ext-simple_php_yenc_decode": "Greatly improves yEnc decoding speed in PHP 5.x",
     "ext-xdebug": "For developement work",
-    "ext-yenc": "PHP7 and PHP5 yEnc decoding extension"
+    "ext-yenc": "PHP7 yEnc decoding extension"
   },
   "type": "project"
 }
