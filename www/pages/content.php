@@ -5,7 +5,7 @@ use nntmux\Contents;
 $contents = new Contents(['Settings' => $page->settings]);
 
 $role = 0;
-if (isset($page->userdata)) {
+if (!empty($page->userdata) && $page->users->isLoggedIn()) {
 	$role = $page->userdata['role'];
 }
 
@@ -26,12 +26,12 @@ if (isset($page->userdata)) {
 $page->smarty->assign('admin', (($role === 2 || $role === 4) ? 'true' : 'false'));
 
 $contentId = 0;
-if (isset($_GET['id'])) {
+if (!empty($_GET['id'])) {
 	$contentId = $_GET['id'];
 }
 
 $request = false;
-if (isset($_REQUEST['page'])) {
+if (!empty($_REQUEST['page'])) {
 	$request = $_REQUEST['page'];
 }
 
@@ -42,7 +42,7 @@ if ($contentId === 0 && $request === 'content') {
 	$page->meta_keywords = 'contents';
 	$page->meta_description = 'This is the contents page.';
 } else if ($contentId !== 0 && $request !== false) {
-	$content = array($contents->getByID($contentId, $role));
+	$content = [$contents->getByID($contentId, $role)];
 	$page->smarty->assign('front', false);
 	$page->meta_title = 'Contents page';
 	$page->meta_keywords = 'contents';
@@ -56,7 +56,7 @@ if ($contentId === 0 && $request === 'content') {
 	$page->meta_description = $index->metadescription;
 }
 
-if ($content === null) {
+if (empty($content)) {
 	$page->show404();
 }
 
