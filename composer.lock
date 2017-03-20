@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b4f2cb0fa2ff568748824ed57672fc2",
+    "content-hash": "3f21cbbe5fd0004f9dd03c07d6156bea",
     "packages": [
         {
             "name": "b3rs3rk/steamfront",
@@ -238,12 +238,12 @@
             "version": "v1.6.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/eternicode/bootstrap-datepicker.git",
+                "url": "https://github.com/uxsolutions/bootstrap-datepicker.git",
                 "reference": "42940960ffaf6c727c9f2d64a6175be87516986e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eternicode/bootstrap-datepicker/zipball/42940960ffaf6c727c9f2d64a6175be87516986e",
+                "url": "https://api.github.com/repos/uxsolutions/bootstrap-datepicker/zipball/42940960ffaf6c727c9f2d64a6175be87516986e",
                 "reference": "42940960ffaf6c727c9f2d64a6175be87516986e",
                 "shasum": ""
             },

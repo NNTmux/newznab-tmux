@@ -19,17 +19,20 @@
     "preferred-install": {
       "*": "source"
     },
+    "fxp-asset" : {
+      "installer-paths": {
+        "npm-asset-library": "www/themes/shared/assets",
+        "bower-asset-library": "www/themes/shared/assets"
+      }
+    },
     "vendor-dir": "app/libraries"
   },
   "description": "A Usenet Indexer",
   "extra": {
     "branch-alias": {
       "dev-dev": "0.x-dev"
-    },
-    "asset-installer-paths": {
-      "npm-asset-library": "www/themes/shared/assets",
-      "bower-asset-library": "www/themes/shared/assets"
     }
+
   },
   "keywords": [
     "NNTmux",

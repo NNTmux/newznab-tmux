@@ -1,4 +1,5 @@
 2017-03-20 DariusIII
+	* Chg: Update composer.json with new fxp-asset setting
 	* Chg: Update user-list.php
 	* Chg: Remove dependecy on config.php in www/admin by calling smarty.php directly
 	* Fix: Possible fix for contact us page erros
