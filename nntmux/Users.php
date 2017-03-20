@@ -232,7 +232,7 @@ class Users
 	 */
 	public function getBrowseOrder($orderBy)
 	{
-		$order = ($orderBy === '') ? 'username_asc' : $orderBy;
+		$order = $orderBy == '' ? 'username_asc' : $orderBy;
 		$orderArr = explode(' ', $order);
 		switch ($orderArr[0]) {
 			case 'username':
@@ -269,7 +269,7 @@ class Users
 				$orderField = 'username';
 				break;
 		}
-		$orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'DESC';
+		$orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'ASC';
 
 		return [$orderField, $orderSort];
 	}
