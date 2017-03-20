@@ -3,16 +3,16 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 $page = new AdminPage();
 
-$page->title = "User List";
+$page->title = 'User List';
 
 $roles = [];
 foreach ($page->users->getRoles() as $userRole) {
 	$roles[$userRole['id']] = $userRole['name'];
 }
 
-$offset = isset($_REQUEST["offset"]) ? $_REQUEST["offset"] : 0;
+$offset = $_REQUEST['offset'] ?? 0;
 $ordering = $page->users->getBrowseOrdering();
-$orderBy = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
+$orderBy = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
 
 $variables = ['username' => '', 'email' => '', 'host' => '', 'role' => ''];
 $uSearch = '';
@@ -27,11 +27,11 @@ $page->smarty->assign([
 		'role'              => $variables['role'],
 		'role_ids'          => array_keys($roles),
 		'role_names'        => $roles,
-		'pagerquerysuffix'  => "#results",
+		'pagerquerysuffix'  => '#results',
 		'pagertotalitems'   => $page->users->getCount(),
 		'pageroffset'       => $offset,
 		'pageritemsperpage' => ITEMS_PER_PAGE,
-		'pagerquerybase'    => WWW_TOP . "/user-list.php?ob=" . $orderBy . $uSearch . "&offset=",
+		'pagerquerybase'    => WWW_TOP . '/user-list.php?ob=' . $orderBy . $uSearch . '&offset=',
 		'userlist' => $page->users->getRange(
 			$offset, ITEMS_PER_PAGE, $orderBy, $variables['username'],
 			$variables['email'], $variables['host'], $variables['role'], true
@@ -40,10 +40,10 @@ $page->smarty->assign([
 );
 
 foreach ($ordering as $orderType) {
-	$page->smarty->assign('orderby' . $orderType, WWW_TOP . "/user-list.php?ob=" . $orderType . "&offset=0");
+	$page->smarty->assign('orderby' . $orderType, WWW_TOP . '/user-list.php?ob=' . $orderType . '&offset=0');
 }
 
-$page->smarty->assign('pager', $page->smarty->fetch("pager.tpl"));
+$page->smarty->assign('pager', $page->smarty->fetch('pager.tpl'));
 $page->content = $page->smarty->fetch('user-list.tpl');
 $page->render();
 
