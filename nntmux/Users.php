@@ -233,7 +233,7 @@ class Users
 	public function getBrowseOrder($orderBy)
 	{
 		$order = ($orderBy === '') ? 'username_asc' : $orderBy;
-		$orderArr = explode('', $order);
+		$orderArr = explode(' ', $order);
 		switch ($orderArr[0]) {
 			case 'username':
 				$orderField = 'username';
