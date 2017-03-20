@@ -1,4 +1,5 @@
 2017-03-20 DariusIII
+	* Fix: Possible fix for contact us page erros
 	* Fix: Possible fix for role error on content page when not logged in
 2017-03-17 DariusIII
 	* Chg: Remove now unused pixelead0 tmdb library, update jquery
