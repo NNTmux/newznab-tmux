@@ -269,7 +269,7 @@ class Users
 				$orderField = 'username';
 				break;
 		}
-		$orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'ASC';
+		$orderSort = (isset($orderArr[1]) && preg_match('/(asc|desc)$/i', $orderArr[1])) ? $orderArr[1] : 'ASC';
 
 		return [$orderField, $orderSort];
 	}
