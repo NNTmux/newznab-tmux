@@ -9,7 +9,7 @@ $page->title = 'Sharing Settings';
 
 $db = new DB();
 
-$offset = (isset($_GET['offset']) ? $_GET['offset'] : 0);
+$offset = $_GET['offset'] ?? 0;
 
 $allSites = $db->query(sprintf('SELECT * FROM sharing_sites ORDER BY id LIMIT %d OFFSET %d', 25, $offset));
 if (count($allSites) === 0) {
@@ -54,9 +54,9 @@ $total = $db->queryOneRow('SELECT COUNT(id) AS total FROM sharing_sites');
 $page->smarty->assign('pagertotalitems', ($total === false ? 0 : $total['total']));
 $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', 25);
-$page->smarty->assign('pagerquerybase', WWW_TOP . "/sharing.php?offset=");
+$page->smarty->assign('pagerquerybase', WWW_TOP . '/sharing.php?offset=');
 
-$pager = $page->smarty->fetch("pager.tpl");
+$pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
 $page->smarty->assign(array('local' => $ourSite, 'sites' => $allSites));
