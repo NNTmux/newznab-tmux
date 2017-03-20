@@ -1,4 +1,5 @@
 2017-03-20 DariusIII
+	* Chg: Remove dependecy on config.php in www/admin by calling smarty.php directly
 	* Fix: Possible fix for contact us page erros
 	* Fix: Possible fix for role error on content page when not logged in
 2017-03-17 DariusIII

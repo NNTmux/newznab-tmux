@@ -11,7 +11,7 @@ use nntmux\ReleaseComments;
 if (!isset($_GET['action'])) {
 	exit();
 }
-require_once './config.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 // Make sure the user is an admin and logged in.
 $admin = new AdminPage;
