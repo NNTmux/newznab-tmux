@@ -135,9 +135,10 @@ class Forum
 	{
 		return $this->pdo->query(
 			sprintf('
-				SELECT f.*, u.username
+				SELECT f.*, u.username, ur.name AS rolename
 				FROM forumpost f
 				LEFT OUTER JOIN users u ON u.id = f.users_id
+				LEFT JOIN user_roles ur ON u.role = ur.id
 				WHERE parentid = 0
 				ORDER BY updateddate DESC %s',
 				($start === false ? '' : (' LIMIT ' . $num . ' OFFSET ' . $start))
