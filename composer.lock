@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3f21cbbe5fd0004f9dd03c07d6156bea",
+    "content-hash": "dacb51981cc6b76309fd8a388f197dfd",
     "packages": [
         {
             "name": "b3rs3rk/steamfront",
@@ -806,6 +806,41 @@
                     "components"
                 ]
             }
+        },
+        {
+            "name": "bower-asset/jquery-goup",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Ryuk87/jquery-goup.git",
+                "reference": "96863ce9a576d23d8633e63563ac9e9355c3d651"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Ryuk87/jquery-goup/zipball/96863ce9a576d23d8633e63563ac9e9355c3d651",
+                "reference": "96863ce9a576d23d8633e63563ac9e9355c3d651",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "./src/jquery.goup.js",
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "node_modules",
+                    "bower_components",
+                    "test",
+                    "tests"
+                ],
+                "bower-asset-private": true
+            },
+            "description": "A simple jQuery plugin that let users go back to the top of a web page.",
+            "keywords": [
+                "backtotop",
+                "jquery-plugin",
+                "scroll",
+                "scrolltop",
+                "scrolltotop"
+            ]
         },
         {
             "name": "bower-asset/jquery-migrate-1.4.x",
