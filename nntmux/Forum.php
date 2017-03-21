@@ -44,7 +44,7 @@ class Forum
 
 		if ($parentid != 0) {
 			$par = $this->getParent($parentid);
-			if ($par == false) {
+			if ($par === false) {
 				return -1;
 			}
 
@@ -88,11 +88,12 @@ class Forum
 	{
 		return $this->pdo->query(
 			sprintf('
-				SELECT forumpost.*, users.username
-				FROM forumpost
-				LEFT OUTER JOIN users ON users.id = forumpost.users_id
-				WHERE forumpost.id = %d OR parentid = %d
-				ORDER BY createddate ASC
+				SELECT f.*, u.username, ur.name AS rolename
+				FROM forumpost f
+				LEFT OUTER JOIN users u ON u.id = f.users_id
+				LEFT JOIN user_roles ur ON ur.id = u.role
+				WHERE f.id = %d OR f.parentid = %d
+				ORDER BY f.createddate ASC
 				LIMIT 250',
 				$parent,
 				$parent
@@ -138,9 +139,9 @@ class Forum
 				SELECT f.*, u.username, ur.name AS rolename
 				FROM forumpost f
 				LEFT OUTER JOIN users u ON u.id = f.users_id
-				LEFT JOIN user_roles ur ON u.role = ur.id
-				WHERE parentid = 0
-				ORDER BY updateddate DESC %s',
+				LEFT JOIN user_roles ur ON ur.id = u.role
+				WHERE f.parentid = 0
+				ORDER BY f.updateddate DESC %s',
 				($start === false ? '' : (' LIMIT ' . $num . ' OFFSET ' . $start))
 			)
 		);
