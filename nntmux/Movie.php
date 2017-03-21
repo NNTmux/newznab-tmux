@@ -165,7 +165,12 @@ class Movie
 		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 		$this->client = new Client();
 		$this->tmdbtoken = new ApiToken(Settings::value('APIs..tmdbkey'));
-		$this->tmdbclient = new TmdbClient($this->tmdbtoken);
+		$this->tmdbclient = new TmdbClient($this->tmdbtoken, [
+			'cache' => [
+				'path' => NN_TMP
+			]
+		]
+		);
 
 		$this->lookuplanguage = Settings::value('indexer.categorise.imdblanguage') != '' ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
 
