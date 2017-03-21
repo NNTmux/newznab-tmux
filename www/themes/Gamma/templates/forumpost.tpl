@@ -11,7 +11,7 @@
 		<tr class="{cycle values=",alt"}">
 			<td width="15%;">
 				{if isset($isadmin) && $isadmin == 1}<strong>{/if}
-				<a {if $smarty.foreach.result.last}id="last"{/if} title="{if isset($isadmin) && $isadmin == 1}Admin{else}View profile{/if}" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}">{$result.username}</a>
+				<a {if $smarty.foreach.result.last}id="last"{/if} title="{if isset($isadmin) && $isadmin == 1}Admin{else}View profile{/if}" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><strong>{$result.username}</strong></a>
 				{if isset($isadmin) && $isadmin == 1}</strong>{/if}
 				<br/>
 				{$result.rolename}

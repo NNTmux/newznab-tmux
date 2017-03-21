@@ -29,7 +29,7 @@
 				</td>
 				<td>
 					<a title="View profile"
-					   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}">{$result.username}</a>
+					   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><strong>{$result.username}</strong></a>
 					<br/>
 					{$result.rolename}
 					<br/>
