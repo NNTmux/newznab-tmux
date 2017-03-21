@@ -16,7 +16,6 @@
 							   title="{if isset($isadmin) && $isadmin == 1}Admin{else}View profile{/if}"
 							   href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5><strong>{$result.username}</strong></h5></a>
 							{if isset($isadmin) && $isadmin == 1}</strong>{/if}
-						<br/>
 						{$result.rolename}
 						<br/>
 						on <span title="{$result.createddate}">{$result.createddate|date_format}</span>
