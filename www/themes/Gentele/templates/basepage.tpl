@@ -217,6 +217,20 @@
 
 <!-- pace -->
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/pace/pace.min.js"></script>
+<!-- scrollup -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-goup/jquery.goup.min.js"></script>
+
+<script>
+    jQuery(document).ready(function(){
+        jQuery.goup({
+			containerColor: "#8bc5c5",
+			arrowColor: "#fdf8f8",
+			bottomOffset: 100,
+			goupSpeed: "normal",
+			title: "Scroll to top"
+		});
+    });
+</script>
 
 </body>
 
