@@ -26,7 +26,7 @@
 			{/if}
 		</td>
 		<td>
-			<a title="View profile" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><strong>{$result.username}</strong></a>
+			<a title="View profile" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5><strong>{$result.username}</strong></h5></a>
 			<br/>
 			{$result.rolename}
 			<br/>
