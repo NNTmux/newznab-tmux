@@ -1,4 +1,5 @@
 2017-03-21 DariusIII
+	* Chg: Update forums with coloured roles
 	* Chg: Use resources/tmp with TMDB client
 	* Chg: Display user role in forums
 	* Chg: Update guzzlehhtp/psr7 and jquery
