@@ -39,6 +39,8 @@
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/flat/green.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" type="text/css"
 		  media="screen"/>
+	<!-- fancybox css -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/fancybox/dist/jquery.fancybox.css" rel="stylesheet">
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
 	<script src="{$smarty.const.WWW_THEMES}/shared/assets/html5shiv/dist/html5shiv.min.js"></script>
@@ -219,6 +221,9 @@
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/pace/pace.min.js"></script>
 <!-- scrollup -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-goup/jquery.goup.min.js"></script>
+
+<!-- fancybox js -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/fancybox/dist/jquery.fancybox.js"></script>
 
 <script>
     jQuery(document).ready(function(){
