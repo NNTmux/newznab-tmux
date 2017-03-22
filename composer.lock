@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "99d8dcf863ce91d45db59323562604bd",
+    "content-hash": "2dfb9632acbbd60b2d7e98c01570e0b1",
     "packages": [
         {
             "name": "b3rs3rk/steamfront",
@@ -507,6 +507,22 @@
                 "library",
                 "table"
             ]
+        },
+        {
+            "name": "bower-asset/fancybox",
+            "version": "v3.0.47",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fancyapps/fancybox.git",
+                "reference": "04bd1bd751ac10048c06e7db79197770cff4a1d7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/04bd1bd751ac10048c06e7db79197770cff4a1d7",
+                "reference": "04bd1bd751ac10048c06e7db79197770cff4a1d7",
+                "shasum": ""
+            },
+            "type": "bower-asset-library"
         },
         {
             "name": "bower-asset/fastclick",

@@ -114,6 +114,7 @@
     "bower-asset/colorbox": "~1.6.3",
     "bower-asset/chosen": "^1.6",
     "bower-asset/DataTables": "~1.10.11",
+    "bower-asset/fancyBox": "~v3.0",
     "bower-asset/fastclick": "~1.0.6",
     "bower-asset/flexboxgrid": "^6.3",
     "bower-asset/font-awesome": "~4.5",
