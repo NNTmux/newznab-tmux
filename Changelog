@@ -1,3 +1,5 @@
+2017-03-22 DariusIII
+	* Fix: Fix empty groups list when selecting active/inactive groups
 2017-03-21 DariusIII
 	* Chg: Add jquery-goup script to composer
 	* Chg: Update forums with coloured roles

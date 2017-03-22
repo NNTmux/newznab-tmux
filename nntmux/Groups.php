@@ -216,7 +216,7 @@ class Groups
 					)
 					: ''
 				),
-				($active > -1 ? 'AND g.active = {$active}' : '')
+				($active > -1 ? sprintf('AND g.active = %d', $active) : '')
 			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 
@@ -253,8 +253,8 @@ class Groups
 					)
 					: ''
 				),
-				($active > -1 ? 'AND g.active = {$active}' : ''),
-				($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+				$active > -1 ? sprintf('AND g.active = %d', $active) : '',
+				$start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start
 			), true, NN_CACHE_EXPIRY_SHORT
 		);
 	}
