@@ -1,4 +1,5 @@
 2017-03-22 DariusIII
+	* Chg: Use jquery3 in Gentele theme
 	* Fix: Fix page count when selecting user roles in users list
 	* Fix: Fix empty groups list when selecting active/inactive groups
 2017-03-21 DariusIII

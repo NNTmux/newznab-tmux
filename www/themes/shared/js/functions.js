@@ -286,7 +286,7 @@ jQuery(function($){
         return false;
     });
 
-    $('a.vortex-resume').live('click', function(event)
+    $(document).on('click', 'a.vortex-resume', function(event)
     {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
@@ -295,7 +295,7 @@ jQuery(function($){
         return false;
     });
 
-    $('a.vortex-pause').live('click', function(event)
+    $(document).on('click', 'a.vortex-pause', function(event)
     {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
@@ -304,7 +304,7 @@ jQuery(function($){
         return false;
     });
 
-    $('a.vortex-moveup').live('click', function(event)
+    $(document).on('click', 'a.vortex-moveup', function(event)
     {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
@@ -313,7 +313,7 @@ jQuery(function($){
         return false;
     });
 
-    $('a.vortex-movedown').live('click', function(event)
+    $(document).on('click', 'a.vortex-movedown', function(event)
     {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
@@ -322,7 +322,7 @@ jQuery(function($){
         return false;
     });
 
-    $('a.vortex-movetop').live('click', function(event)
+    $(document).on('click', 'a.vortex-movetop', function(event)
     {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
@@ -331,7 +331,7 @@ jQuery(function($){
         return false;
     });
 
-    $('a.vortex-movebottom').live('click', function(event)
+    $(document).on('click', 'a.vortex-movebottom', function(event)
     {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
@@ -340,7 +340,7 @@ jQuery(function($){
         return false;
     });
 
-    $('a.vortex-trash').live('click', function(event)
+    $(document).on('click', 'a.vortex-trash', function(event)
     {
         event.preventDefault();
         $('#vortex-overlay-' + $(this).attr('href')).show();
@@ -349,7 +349,7 @@ jQuery(function($){
         return false;
     });
 
-    $('a.vortex-filelist').live('click', function(event)
+    $(document).on('click', 'a.vortex-filelist', function(event)
     {
         event.preventDefault();
         var id = $(this).attr('href');

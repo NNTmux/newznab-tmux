@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "dacb51981cc6b76309fd8a388f197dfd",
+    "content-hash": "09a12f325cff16466e8a700f8b46a4fe",
     "packages": [
         {
             "name": "b3rs3rk/steamfront",
