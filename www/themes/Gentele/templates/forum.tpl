@@ -91,7 +91,7 @@
 		<div class="body">
 			<form id="new-forum-thread" class="form-horizontal" action="" method="post">
 				<div class="control-group">
-					<label class="control-label" for="addSubject">Subject (required)</label>
+					<label class="control-label" for="addSubject">Subject</label>
 					<div class="controls">
 						<input class="input input-xlarge" type="text" maxlength="200" id="addSubject"
 							   name="addSubject" required aria-required="true"/>
