@@ -1,3 +1,5 @@
+2017-03-23 DariusIII
+	* Chg: Update composer.lock and .json with new sweetalert and update guzzlehttp
 2017-03-22 DariusIII
 	* Chg: Use fancybox for image modals
 	* Chg: Update jquery3 to version 3.2.x
