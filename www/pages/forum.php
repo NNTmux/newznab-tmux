@@ -10,28 +10,26 @@ if (!$page->users->isLoggedIn()) {
 }
 
 if ($page->isPostBack()) {
-	if (!isset($_POST['addSubject']) || empty($_POST['addSubject'])) {
-		$page->show403();
-	}
-	if (!isset($_POST['addMessage']) || empty($_POST['addMessage'])) {
-		$page->show403();
-	}
-
 	$forum->add(0, $page->users->currentUserId(), $_POST['addSubject'], $_POST['addMessage']);
 	header('Location:'.WWW_TOP.'/forum');
 	die();
 }
 
-if (!empty($_GET['lock']) || !empty($_GET['unlock'])) {
+$lock = $unlock = null;
+
+if (!empty($_GET['lock'])) {
 	$lock = $_GET['lock'];
+}
+
+if (!empty($_GET['unlock'])) {
 	$unlock = $_GET['unlock'];
 }
 
-if (isset($lock)) {
+if ($lock !== null) {
 	$forum->lockUnlockTopic($lock, 1);
 	header('Location:' . WWW_TOP . '/forum');
 	die();
-} elseif (isset($unlock)) {
+} elseif ($unlock !== null) {
 	$forum->lockUnlockTopic($unlock, 0);
 	header('Location:' . WWW_TOP . '/forum');
 	die();

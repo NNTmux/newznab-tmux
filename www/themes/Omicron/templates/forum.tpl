@@ -89,14 +89,14 @@
 					<label class="control-label" for="addSubject">Subject</label>
 					<div class="controls">
 						<input class="input input-xlarge" type="text" maxlength="200" id="addSubject"
-							   name="addSubject"/>
+							   name="addSubject" required aria-required="true"/>
 					</div>
 				</div>
 				<div class="control-group">
 					<label class="control-label" for="addMessage">Message</label>
 					<div class="controls">
 						<textarea cols="100" class="input input-xlarge" maxlength="5000" id="addMessage"
-								  name="addMessage" rows="6"></textarea>
+								  name="addMessage" rows="6" required aria-required="true"></textarea>
 					</div>
 					<input class="btn btn-success" type="submit" value="submit"/>
 					<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />

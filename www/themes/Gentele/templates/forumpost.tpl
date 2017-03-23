@@ -59,7 +59,7 @@
 						<div class="control-group">
 							<label class="control-label" for="addMessage">Message</label>
 							<div class="controls">
-								<textarea id="addMessage" name="addMessage"></textarea>
+								<textarea id="addMessage" name="addMessage" required aria-required="true"></textarea>
 							</div>
 							<input class="btn btn-success" type="submit" value="Submit"/>
 							<input class="btn btn-warning" value="Cancel"

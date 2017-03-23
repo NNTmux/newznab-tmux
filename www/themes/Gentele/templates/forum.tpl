@@ -91,16 +91,16 @@
 		<div class="body">
 			<form id="new-forum-thread" class="form-horizontal" action="" method="post">
 				<div class="control-group">
-					<label class="control-label" for="addSubject">Subject</label>
+					<label class="control-label" for="addSubject">Subject (required)</label>
 					<div class="controls">
 						<input class="input input-xlarge" type="text" maxlength="200" id="addSubject"
-							   name="addSubject"/>
+							   name="addSubject" required aria-required="true"/>
 					</div>
 				</div>
 				<div class="control-group">
 					<label class="control-label" for="addMessage">Message</label>
 					<div class="controls">
-						<textarea maxlength="5000" id="addMessage" name="addMessage"></textarea>
+						<textarea maxlength="5000" id="addMessage" name="addMessage" required aria-required="true"></textarea>
 					</div>
 					<input class="btn btn-success" type="submit" value="submit"/>
 					<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />
