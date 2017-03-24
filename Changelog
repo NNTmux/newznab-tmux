@@ -1,3 +1,5 @@
+2017-03-24 DariusIII
+	* Chg: Increase search term maxlenght on search page in Charisma/Gentele/omicron themes
 2017-03-23 DariusIII
 	* Chg: Remove sweetalert update forum theme templates for required fields
 	* Chg: Update composer.lock and .json with new sweetalert and update guzzlehttp

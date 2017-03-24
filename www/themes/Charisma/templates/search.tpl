@@ -28,7 +28,7 @@
 	<form method="get" action="{$smarty.const.WWW_TOP}/search">
 		<div id="sbasic" class="row" style="text-align:center;{if $sadvanced} display:none;{/if}">
 			<div class="col-md-6">
-				<input id="search" class="form-control" maxlength="50" name="search" value="{$search|escape:'html'}"
+				<input id="search" class="form-control" maxlength="500" name="search" value="{$search|escape:'htmlall'}"
 					   type="search" placeholder="What are you looking for?"/>
 			</div>
 			<div class="col-md-6">
