@@ -381,20 +381,17 @@
         },
         {
             "name": "bower-asset/chosen",
-            "version": "v1.6.2",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/harvesthq/chosen-package.git",
-                "reference": "4bbafbc6125eb1f0f148af11d6ce9e50bfd993dd"
+                "reference": "20457c69249226af89fda0b357591622b922b36a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/harvesthq/chosen-package/zipball/4bbafbc6125eb1f0f148af11d6ce9e50bfd993dd",
-                "reference": "4bbafbc6125eb1f0f148af11d6ce9e50bfd993dd",
+                "url": "https://api.github.com/repos/harvesthq/chosen-package/zipball/20457c69249226af89fda0b357591622b922b36a",
+                "reference": "20457c69249226af89fda0b357591622b922b36a",
                 "shasum": ""
-            },
-            "require": {
-                "bower-asset/jquery": ">=1.4.4"
             },
             "type": "bower-asset-library",
             "extra": {
@@ -2104,16 +2101,16 @@
         },
         {
             "name": "james-heinrich/getid3",
-            "version": "v1.9.13",
+            "version": "v1.9.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JamesHeinrich/getID3.git",
-                "reference": "b9a8564e56bdcc294dc7ade32a7f67885bed3778"
+                "reference": "30bd11473b0eef6f1b47866ef7ab0a557917fc21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JamesHeinrich/getID3/zipball/b9a8564e56bdcc294dc7ade32a7f67885bed3778",
-                "reference": "b9a8564e56bdcc294dc7ade32a7f67885bed3778",
+                "url": "https://api.github.com/repos/JamesHeinrich/getID3/zipball/30bd11473b0eef6f1b47866ef7ab0a557917fc21",
+                "reference": "30bd11473b0eef6f1b47866ef7ab0a557917fc21",
                 "shasum": ""
             },
             "require": {
@@ -2136,7 +2133,7 @@
                 "php",
                 "tags"
             ],
-            "time": "2016-12-14T14:29:29+00:00"
+            "time": "2017-03-27T21:12:55+00:00"
         },
         {
             "name": "joshpinkney/tv-maze-php-api",
