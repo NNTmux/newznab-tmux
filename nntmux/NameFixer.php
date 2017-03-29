@@ -1892,9 +1892,10 @@ class NameFixer
 		if ($this->done === false && $this->relid !== $release['releases_id']) {
 			$result = $this->pdo->queryDirect("
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
-				FROM release_unique ru
-				STRAIGHT_JOIN releases r ON ru.releases_id = r.id
-				WHERE ru.uniqueid = UNHEX({$this->pdo->escapeString($release['uid'])})
+				FROM releases r
+				LEFT JOIN release_unique ru ON ru.releases_id = r.id
+				WHERE ru.releases_id IS NOT NULL 
+				AND ru.uniqueid = UNHEX({$this->pdo->escapeString($release['uid'])})
 				AND ru.releases_id != {$release['releases_id']}
 				AND (r.predb_id > 0 OR r.anidbid > 0)"
 			);
@@ -1902,7 +1903,7 @@ class NameFixer
 			if ($result instanceof \Traversable) {
 				foreach ($result AS $res) {
 					$floor = round(($res['relsize'] - $release['relsize']) / $res['relsize'] * 100, 1);
-					if ($floor >= -5 && $floor <= 5) {
+					if ($floor >= -7 && $floor <= 7) {
 						$this->updateRelease(
 							$release,
 							$res['searchname'],
