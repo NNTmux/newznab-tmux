@@ -46,16 +46,16 @@
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
-            "version": "v1.0.9",
+            "version": "v1.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barracudanetworks/forkdaemon-php.git",
-                "reference": "06462cffb0181514ce2559615f0e892731919187"
+                "reference": "6675af59d017afc3bbb32af1c0844353f1b7666a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barracudanetworks/forkdaemon-php/zipball/06462cffb0181514ce2559615f0e892731919187",
-                "reference": "06462cffb0181514ce2559615f0e892731919187",
+                "url": "https://api.github.com/repos/barracudanetworks/forkdaemon-php/zipball/6675af59d017afc3bbb32af1c0844353f1b7666a",
+                "reference": "6675af59d017afc3bbb32af1c0844353f1b7666a",
                 "shasum": ""
             },
             "require": {
@@ -78,7 +78,7 @@
                 "forking",
                 "php"
             ],
-            "time": "2016-06-21T18:44:21+00:00"
+            "time": "2017-03-28T17:06:09+00:00"
         },
         {
             "name": "bower-asset/animate.css",
