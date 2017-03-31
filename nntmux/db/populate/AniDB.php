@@ -153,7 +153,6 @@ class AniDB
 		} elseif (preg_match('/\<error\>Anime not found\<\/error\>/', $apiresponse)) {
 			echo "AniDB   : Anime not yet on site. Remove until next update.\n";
 		} elseif ($AniDBAPIXML = new \SimpleXMLElement($apiresponse)) {
-			var_dump($AniDBAPIXML);
 
 			$AniDBAPIArray['similar'] = $this->processAPIResponceElement($AniDBAPIXML->similaranime, 'anime');
 			$AniDBAPIArray['related'] = $this->processAPIResponceElement($AniDBAPIXML->relatedanime, 'anime');
