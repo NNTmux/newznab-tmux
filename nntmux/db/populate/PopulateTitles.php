@@ -22,7 +22,6 @@ namespace nntmux\db\populate;
 
 use GuzzleHttp\Client;
 use nntmux\db\DB;
-use nntmux\utility\Utility;
 
 class PopulateTitles
 {
@@ -66,7 +65,7 @@ class PopulateTitles
 	 * @param $options
 	 */
 
-	public function  __constructor($options)
+	public function  __construct($options)
 	{
 		$defaults = [
 			'pdo'	=> null,
@@ -88,7 +87,7 @@ class PopulateTitles
 			$this->checkForDuplicate->execute($parameters);
 			return $this->checkForDuplicate->fetchAll();
 		} else {
-			throw new \RuntimeException("Duplicate check query not yet prepared!");
+			throw new \RuntimeException('Duplicate check query not yet prepared!');
 		}
 	}
 
@@ -111,7 +110,7 @@ class PopulateTitles
 			$this->insertEntry->execute($parameters);
 			return $this->insertEntry->fetchAll();
 		} else {
-			throw new \RuntimeException("Insertion query not yet prepared!");
+			throw new \RuntimeException('Insertion query not yet prepared!');
 		}
 	}
 

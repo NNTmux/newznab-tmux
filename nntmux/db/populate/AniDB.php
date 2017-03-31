@@ -77,8 +77,8 @@ class AniDB
 		$this->imgSavePath = NN_COVERS . 'anime' . DS;
 		$this->apiKey      = Settings::value('APIs..anidbkey');
 
-		$this->updateInterval = (isset($anidbupdint) ? $anidbupdint : '7');
-		$this->lastUpdate     = (isset($lastupdated) ? $lastupdated : '0');
+		$this->updateInterval = $anidbupdint ?? '7';
+		$this->lastUpdate     = $lastupdated ?? '0';
 		$this->banned         = false;
 	}
 
@@ -138,7 +138,7 @@ class AniDB
 	{
 		$timestamp = Settings::value('APIs.AniDB.banned') + 90000;
 		if ($timestamp > time()) {
-			echo "Banned from AniDB lookups until " . date('Y-m-d H:i:s', $timestamp) . "\n";
+			echo 'Banned from AniDB lookups until ' . date('Y-m-d H:i:s', $timestamp) . PHP_EOL;
 			return false;
 		}
 		$apiresponse = $this->getAniDbResponse();
@@ -146,13 +146,14 @@ class AniDB
 		$AniDBAPIArray = [];
 
 		if (!$apiresponse) {
-			echo "AniDB: Error getting response." . PHP_EOL;
-		} elseif (preg_match("/\<error\>Banned\<\/error\>/", $apiresponse)) {
+			echo 'AniDB: Error getting response.' . PHP_EOL;
+		} elseif (preg_match('/\<error\>Banned\<\/error\>/', $apiresponse)) {
 			$this->banned = true;
 			$this->pdo->setSetting(['APIs.AniDB.banned' => time()]);
-		} elseif (preg_match("/\<error\>Anime not found\<\/error\>/", $apiresponse)) {
+		} elseif (preg_match('/\<error\>Anime not found\<\/error\>/', $apiresponse)) {
 			echo "AniDB   : Anime not yet on site. Remove until next update.\n";
 		} elseif ($AniDBAPIXML = new \SimpleXMLElement($apiresponse)) {
+			var_dump($AniDBAPIXML);
 
 			$AniDBAPIArray['similar'] = $this->processAPIResponceElement($AniDBAPIXML->similaranime, 'anime');
 			$AniDBAPIArray['related'] = $this->processAPIResponceElement($AniDBAPIXML->relatedanime, 'anime');
@@ -186,16 +187,13 @@ class AniDB
 			}
 
 			//start and end date come from AniDB API as date strings -- no manipulation needed
-			$AniDBAPIArray['startdate'] = isset($AniDBAPIXML->startdate) ? $AniDBAPIXML->startdate : '0000-00-00';
-			$AniDBAPIArray['enddate'] = isset($AniDBAPIXML->enddate) ? $AniDBAPIXML->enddate : '0000-00-00';
+			$AniDBAPIArray['startdate'] = $AniDBAPIXML->startdate ?? '0000-00-00';
+			$AniDBAPIArray['enddate'] = $AniDBAPIXML->enddate ?? '0000-00-00';
 
 			if (isset($AniDBAPIXML->ratings->permanent)) {
 				$AniDBAPIArray['rating'] = $AniDBAPIXML->ratings->permanent;
 			} else {
-				$AniDBAPIArray['rating'] = (isset($AniDBAPIXML->ratings->temporary)
-					? $AniDBAPIXML->ratings->temporary
-					: $AniDBAPIArray['rating'] = ''
-				);
+				$AniDBAPIArray['rating'] = $AniDBAPIXML->ratings->temporary ?? $AniDBAPIArray['rating'] = '';
 			}
 
 			$AniDBAPIArray += [
@@ -356,13 +354,15 @@ class AniDB
 	 */
 	private function populateMainTable()
 	{
-		if ((time() - (int)$this->lastUpdate) > ((int)$this->updateInterval * 86400)) {
+		$lastUpdate = (new \DateTime)->setTimestamp($this->lastUpdate);
+		$current = new \DateTime();
 
+		if ($current->diff($lastUpdate)->format('%d') > $this->updateInterval) {
 			if ($this->echooutput) {
-				echo $this->pdo->log->header("Updating anime titles by grabbing full data AniDB dump.");
+				echo $this->pdo->log->header('Updating anime titles by grabbing full data AniDB dump.');
 			}
 
-			$animetitles = new \SimpleXMLElement("compress.zlib://http://anidb.net/api/anime-titles.xml.gz", null, true);
+			$animetitles = new \SimpleXMLElement('compress.zlib://http://anidb.net/api/anime-titles.xml.gz', null, true);
 
 			//Even if the update process fails,
 			//we must mark the last update time or risk ban
@@ -372,7 +372,7 @@ class AniDB
 				$count = $animetitles->count();
 				if ($this->echooutput) {
 					echo $this->pdo->log->header(
-						"Total of " . number_format($count) . " titles to add." . PHP_EOL
+						'Total of ' . number_format($count) . ' titles to add.' . PHP_EOL
 					);
 				}
 
@@ -388,7 +388,7 @@ class AniDB
 						);
 						$this->pdo->log->primary(
 							sprintf(
-								"Inserting: %d, %s, %s, %s",
+								'Inserting: %d, %s, %s, %s',
 								$anime['aid'],
 								$title['type'],
 								$xmlAttribs->lang,
@@ -400,14 +400,13 @@ class AniDB
 				}
 			} else {
 				echo PHP_EOL .
-					$this->pdo->log->error("Error retrieving XML data from AniDB. Please try again later.") .
+					$this->pdo->log->error('Error retrieving XML data from AniDB. Please try again later.') .
 					PHP_EOL;
 			}
 		} else {
 			echo PHP_EOL . $this->pdo->log->info(
-					"AniDB has been updated within the past {$this->updateInterval} days.  " .
-					"Either set this value lower in Site Edit (at your own risk of being banned) or try again later.") .
-				PHP_EOL;
+					'AniDB has been updated within the past ' . $this->updateInterval . ' days. ' .
+					'Either set this value lower in Site Edit (at your own risk of being banned) or try again later.');
 		}
 	}
 
@@ -421,7 +420,7 @@ class AniDB
 		if ($this->banned === true) {
 			$this->pdo->log->doEcho(
 				$this->pdo->log->error(
-					"AniDB Banned, import will fail, please wait 24 hours before retrying."
+					'AniDB Banned, import will fail, please wait 24 hours before retrying.'
 				),
 				true
 			);
@@ -429,7 +428,7 @@ class AniDB
 		} elseif ($AniDBAPIArray === false && $this->echooutput) {
 			$this->pdo->log->doEcho(
 				$this->pdo->log->info(
-					"Anime ID: {$this->anidbId} not available for update yet."
+					'Anime ID: ' . $this->anidbId . ' not available for update yet.'
 				),
 				true
 			);
@@ -438,7 +437,7 @@ class AniDB
 			if (NN_DEBUG) {
 				$this->pdo->log->doEcho(
 					$this->pdo->log->headerOver(
-						"Added/Updated AniDB ID: {$this->anidbId}"
+						'Added/Updated AniDB ID: '  . $this->anidbId
 					),
 					true
 				);
