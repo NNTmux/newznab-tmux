@@ -22,7 +22,6 @@ class MiscSorter
 	private $echooutput;
 	private $DEBUGGING;
 	private $pdo;
-	private $category;
 	private $movie;
 	private $music;
 
@@ -43,9 +42,9 @@ class MiscSorter
 
 	/**
 	 * @param bool $echooutput
-	 * @param object $pdo
+	 * @param      $pdo
 	 */
-	public function __construct($echooutput = false, &$pdo = null)
+	public function __construct($echooutput = false, &$pdo)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);
 		$this->qty = 100;
@@ -62,15 +61,15 @@ class MiscSorter
 
 	// Main function that determines which operation(s) should be run based on the releases NFO file
 	/**
-	 * @param int $category
+	 * @param int|string $category
 	 * @param int $id
 	 *
 	 * @return bool
 	 */
-	public function nfosorter($category = 0, $id = 0)
+	public function nfosorter($category, $id)
 	{
-		$idarr = ($id != 0 ? sprintf('AND r.id = %d', $id) : '');
-		$cat = ($category = 0 ? sprintf('AND r.categories_id = %d', Category::OTHER_MISC) : sprintf('AND r.categories_id = %d', $category));
+		$idarr = ($id != '' ? sprintf('AND r.id = %d', $id) : '');
+		$cat = ($category == '' ? sprintf('AND r.categories_id = %d', Category::OTHER_MISC) : sprintf('AND r.categories_id = %d', $category));
 
 		$res = $this->pdo->queryDirect(
 			sprintf('
@@ -142,9 +141,10 @@ class MiscSorter
 		$pos = stripos($nfo, $str);
 		if ($pos !== false) {
 			return $pos / strlen($nfo);
-		} else {
-			return false;
 		}
+
+		return false;
+
 	}
 
 	/**
@@ -176,7 +176,7 @@ class MiscSorter
 			$x = -1;
 
 			if (strlen($m) < 50) {
-				$str = preg_replace("/\s/iU", "", $m);
+				$str = preg_replace("/\s/iU", '', $m);
 
 				$m = strtolower($str);
 
@@ -240,10 +240,10 @@ class MiscSorter
 	{
 		do {
 			$original = $name;
-			$name = preg_replace("/[\{\[\(]\d+[ \.\-\/]+\d+[\]\}\)]/iU", " ", $name);
-			$name = preg_replace("/[\x01-\x1f\!\?\[\{\}\]\/\:\|]+/iU", " ", $name);
+			$name = preg_replace('/[\{\[\(]\d+[ \.\-\/]+\d+[\]\}\)]/iU', ' ', $name);
+			$name = preg_replace('/[\x01-\x1f\!\?\[\{\}\]\/\:\|]+/iU', ' ', $name);
 			$name = str_replace('  ', ' ', $name);
-			$name = preg_replace("/^[\s\.]+|[\s\.]{2,}$/iU", "", $name);
+			$name = preg_replace('/^[\s\.]+|[\s\.]{2,}$/iU', '', $name);
 			$name = str_replace(' - - ', ' - ', $name);
 			$name = preg_replace('/^[\s\-\_\.]/iU', '', $name);
 			$name = trim($name);
@@ -275,7 +275,7 @@ class MiscSorter
 		);
 
 		if ($release !== false && is_array($release) && $name !== '' && $name !== $release['searchname'] && strlen($name) >= 10) {
-			(new NameFixer(['Settings' => $this->pdo]))->updateRelease($release, $name, $type, true, "sorter ", 1, 1);
+			(new NameFixer(['Settings' => $this->pdo]))->updateRelease($release, $name, $type, true, 'sorter ', 1, 1);
 			$nameChanged = true;
 		} else {
 			$this->_setProcSorter(self::PROC_SORTER_DONE, $id);
@@ -307,8 +307,8 @@ class MiscSorter
 		$ok = false;
 		$tmp = [];
 
-		$nfo = preg_replace("/[^\x09-\x80]|\?/", "", $nfo);
-		$nfo = preg_replace("/[\x01-\x09\x0e-\x20]/", " ", $nfo);
+		$nfo = preg_replace('/[^\x09-\x80]|\?/', '', $nfo);
+		$nfo = preg_replace('/[\x01-\x09\x0e-\x20]/', ' ', $nfo);
 
 		$cleanNfo = $this->_cleanStrForPos($nfo);
 
@@ -431,7 +431,6 @@ class MiscSorter
 
 			switch ($case) {
 				case 'upc':
-					//$amaz = $amazon->getItemByUpc(trim($q), $region);
 					$amalookup->getName();
 					$amalookup->setItemId(trim($q));
 					$amalookup->setSearchIndex($region);
@@ -440,14 +439,12 @@ class MiscSorter
 					$response = $apaiIo->runOperation($amalookup);
 					break;
 				case 'asin':
-					//$amaz = $amazon->getItemByAsin(trim($q), $region);
 					$amalookup->getName();
 					$amalookup->setItemId(trim($q));
 					$amalookup->setResponseGroup(['Medium']);
 					$response = $apaiIo->runOperation($amalookup);
 					break;
 				case 'isbn':
-					//$amaz = $amazon->searchProducts(trim($q), '', "ISBN");
 					$amalookup->getName();
 					$amalookup->setItemId(trim($q));
 					$amalookup->setSearchIndex($region);
@@ -607,8 +604,8 @@ class MiscSorter
 	private function _doAmazonVG($response = [], $id = 0)
 	{
 		$name = (string)$response->Items->Item->ItemAttributes->Title;
-		$name .= "." . (string)$response->Items->Item->ItemAttributes->Region . ".";
-		$name .= "-" . (string)$response->Items->Item->ItemAttributes->Platform;
+		$name .= '.' . (string)$response->Items->Item->ItemAttributes->Region . '.';
+		$name .= '-' . (string)$response->Items->Item->ItemAttributes->Platform;
 
 		$rel = $this->_doAmazonLocal('consoleinfo', (string)$response->Items->Item->ASIN);
 
