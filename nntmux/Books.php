@@ -317,9 +317,12 @@ class Books
 		);
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getBrowseByOptions()
 	{
-		return array('author' => 'author', 'title' => 'title');
+		return ['author' => 'author', 'title' => 'title'];
 	}
 
 	public function getBrowseBy()
@@ -492,7 +495,7 @@ class Books
 		$releasename = trim(preg_replace('/\s\s+/i', ' ', $d));
 
 		// the default existing type was ebook, this handles that in the same manor as before
-		if ($releasetype == 'ebook') {
+		if ($releasetype === 'ebook') {
 			if (preg_match('/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O(c|k)tober|November|De(c|z)ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i', $releasename)) {
 
 				if ($this->echooutput) {
@@ -516,13 +519,12 @@ class Books
 			} else {
 				return false;
 			}
-		} else if ($releasetype == 'audiobook') {
+		} else if ($releasetype === 'audiobook') {
 			if (!empty($releasename) && !preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
 				// we can skip category for audiobooks, since we already know it, so as long as the release name is valid return it so that it is postprocessed by amazon.  In the future, determining the type of audiobook could be added (Lecture or book), since we can skip lookups on lectures, but for now handle them all the same way
 				return $releasename;
-			} else {
-				return false;
 			}
+			return false;
 		}
 	}
 
