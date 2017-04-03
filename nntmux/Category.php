@@ -439,7 +439,7 @@ class Category
 	 *
 	 * @return array
 	 */
-	public function getCategories($activeonly = false, array $excludedcats)
+	public function getCategories($activeonly = false, array $excludedcats = [])
 	{
 		return $this->pdo->query(
 			"SELECT c.id, CONCAT(cp.title, ' > ',c.title) AS title, cp.id AS parentid, c.status
