@@ -1,4 +1,5 @@
 2017-04-03 DariusIII
+	* Chg: Update Category class
 	* Chg: Small changes in Books and Categorize classes
 	* Chg: Update used unserialize function to match PHP7 usage in IRCScraper class
 2017-03-30 DariusIII
