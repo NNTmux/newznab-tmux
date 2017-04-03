@@ -74,10 +74,33 @@ class IRCScraper extends IRCClient
 	 *
 	 * @access public
 	 */
-	public function __construct(&$silent = false, &$debug = false)
+	public function __construct(&$silent, &$debug)
 	{
 		if (defined('SCRAPE_IRC_SOURCE_IGNORE')) {
-			$this->_ignoredChannels = unserialize(SCRAPE_IRC_SOURCE_IGNORE);
+			$this->_ignoredChannels = unserialize(SCRAPE_IRC_SOURCE_IGNORE, ['allowed_classes' =>
+																				 ['#a.b.cd.image',
+																				  '#a.b.console.ps3',
+																				  '#a.b.dvd',
+																				  '#a.b.erotica',
+																				  '#a.b.flac',
+																				  '#a.b.foreign',
+																				  '#a.b.games.nintendods',
+																				  '#a.b.inner-sanctum',
+																				  '#a.b.moovee',
+																				  '#a.b.movies.divx',
+																				  '#a.b.sony.psp',
+																				  '#a.b.sounds.mp3.complete_cd',
+																				  '#a.b.teevee',
+																				  '#a.b.games.wii',
+																				  '#a.b.warez',
+																				  '#a.b.games.xbox360',
+																				  '#pre@corrupt',
+																				  '#scnzb',
+																				  '#tvnzb',
+																				  'srrdb'
+																				 ]
+			]
+			);
 		} else {
 			$this->_ignoredChannels = [
 				'#a.b.cd.image'               => false,
@@ -156,7 +179,7 @@ class IRCScraper extends IRCClient
 		}
 
 		// Join channels.
-		$channels = defined('SCRAPE_IRC_CHANNELS') ? unserialize(SCRAPE_IRC_CHANNELS) : ['#PreNNTmux' => null];
+		$channels = defined('SCRAPE_IRC_CHANNELS') ? unserialize(SCRAPE_IRC_CHANNELS, ['allowed_classes' => ['#PreNNTmux', '#nZEDbPRE', '#nZEDbPRE2']]) : ['#PreNNTmux' => null];
 		$this->joinChannels($channels);
 
 		if (!$this->_silent) {
