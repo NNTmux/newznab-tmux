@@ -2555,7 +2555,7 @@ class ProcessAdditional
 	protected function _echo($string, $type, $newLine = true)
 	{
 		if ($this->_echoCLI) {
-			$this->pdo->log->doEcho($this->pdo->log->$type($string), $newLine);
+			ColorCLI::doEcho(ColorCLI::$type($string), $newLine);
 		}
 	}
 

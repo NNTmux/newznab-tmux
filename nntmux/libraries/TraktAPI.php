@@ -3,6 +3,7 @@ namespace nntmux\libraries;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use nntmux\ColorCLI;
 use nntmux\db\DB;
 
 /**
@@ -48,9 +49,8 @@ Class TraktAPI {
 		if (empty($headers)) {
 			// Can't work without headers.
 			exit;
-		} else {
-			$this->requestHeaders = $headers;
 		}
+		$this->requestHeaders = $headers;
 
 		$this->client = new Client();
 		$this->pdo = new DB();
@@ -153,7 +153,7 @@ Class TraktAPI {
 		if ($extended === '') {
 			$extendedString = '';
 		} else {
-			$extendedString = "?extended=" . $extended;
+			$extendedString = '?extended=' . $extended;
 		}
 
 		if (!empty($this->requestHeaders)) {
@@ -168,13 +168,15 @@ Class TraktAPI {
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+						ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
 					} else if ($e->getCode() === 503) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+						ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
 					} else {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
 					}
 				}
+			} catch (\RuntimeException $e) {
+				ColorCLI::doEcho(ColorCLI::notice('Unknown error occurred!'));
 			}
 
 			if (isset($json) && $json !== false) {

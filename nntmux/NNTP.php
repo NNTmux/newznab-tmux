@@ -224,7 +224,7 @@ class NNTP extends \Net_NNTP_Client
 				if ($this->_debugBool) {
 					$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_ERROR);
 				}
-				return $this->throwError($this->pdo->log->error($message));
+				return $this->throwError(ColorCLI::error($message));
 			}
 
 			// If we are connected, try to authenticate.
@@ -265,7 +265,7 @@ class NNTP extends \Net_NNTP_Client
 						if ($this->_debugBool) {
 							$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_ERROR);
 						}
-						return $this->throwError($this->pdo->log->error($message));
+						return $this->throwError(ColorCLI::error($message));
 					}
 				}
 			}
@@ -294,7 +294,7 @@ class NNTP extends \Net_NNTP_Client
 		if ($this->_debugBool) {
 			$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_ERROR);
 		}
-		return $this->throwError($this->pdo->log->error($message));
+		return $this->throwError(ColorCLI::error($message));
 	}
 
 	/**
@@ -640,7 +640,7 @@ class NNTP extends \Net_NNTP_Client
 			if ($this->_debugBool) {
 				$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_WARNING);
 			}
-			return $this->throwError($this->pdo->log->error($message));
+			return $this->throwError(ColorCLI::error($message));
 		}
 
 		if ($aConnected === true) {
@@ -826,7 +826,7 @@ class NNTP extends \Net_NNTP_Client
 			if ($this->_debugBool) {
 				$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_NOTICE);
 			}
-			return $this->throwError($this->pdo->log->error($message));
+			return $this->throwError(ColorCLI::error($message));
 		}
 
 		$connected = $this->_checkConnection();
@@ -840,7 +840,7 @@ class NNTP extends \Net_NNTP_Client
 			if ($this->_debugBool) {
 				$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_WARNING);
 			}
-			return $this->throwError($this->pdo->log->error($message));
+			return $this->throwError(ColorCLI::error($message));
 		}
 
 		if (strlen($from) > 510) {
@@ -848,7 +848,7 @@ class NNTP extends \Net_NNTP_Client
 			if ($this->_debugBool) {
 				$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_WARNING);
 			}
-			return $this->throwError($this->pdo->log->error($message));
+			return $this->throwError(ColorCLI::error($message));
 		}
 
 		// Check if the group is string or array.
@@ -909,7 +909,7 @@ class NNTP extends \Net_NNTP_Client
 			}
 
 			if ($this->_echo) {
-				$this->pdo->log->doEcho($this->pdo->log->error($message), true);
+				ColorCLI::doEcho(ColorCLI::error($message), true);
 			}
 			$nntp->doQuit();
 		}
@@ -1295,8 +1295,8 @@ class NNTP extends \Net_NNTP_Client
 
 						$bytesReceived = strlen($data);
 						if ($this->_echo && $bytesReceived > 10240) {
-							$this->pdo->log->doEcho(
-								$this->pdo->log->primaryOver(
+							ColorCLI::doEcho(
+								ColorCLI::primaryOver(
 									'Received ' . round($bytesReceived / 1024) .
 									'KB from group (' . $this->group() . ').'
 								), true
@@ -1311,7 +1311,7 @@ class NNTP extends \Net_NNTP_Client
 						if ($this->_debugBool) {
 							$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_NOTICE);
 						}
-						$message = $this->throwError($this->pdo->log->error($message), 1000);
+						$message = $this->throwError(ColorCLI::error($message), 1000);
 						return $message;
 					}
 
@@ -1335,7 +1335,7 @@ class NNTP extends \Net_NNTP_Client
 					if ($this->_debugBool) {
 						$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_NOTICE);
 					}
-					$message = $this->throwError($this->pdo->log->error($message), 1000);
+					$message = $this->throwError(ColorCLI::error($message), 1000);
 					return $message;
 				}
 			}
@@ -1354,7 +1354,7 @@ class NNTP extends \Net_NNTP_Client
 		if ($this->_debugBool) {
 			$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_NOTICE);
 		}
-		$message = $this->throwError($this->pdo->log->error($message), 1000);
+		$message = $this->throwError(ColorCLI::error($message), 1000);
 		return $message;
 	}
 

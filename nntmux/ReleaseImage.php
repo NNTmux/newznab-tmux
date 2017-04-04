@@ -97,11 +97,11 @@ class ReleaseImage
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+						ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
 					} else if ($e->getCode() === 503) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+						ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
 					} else {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
 					}
 				}
 			}
@@ -115,7 +115,7 @@ class ReleaseImage
 			try {
 				$imagick->readImageBlob($img);
 			} catch (\ImagickException $imgError) {
-				$this->pdo->log->doEcho($this->pdo->log->notice('Invalid image data, skipping processing') . PHP_EOL);
+				ColorCLI::doEcho(ColorCLI::notice('Invalid image data, skipping processing') . PHP_EOL);
 				$imgFail = true;
 			}
 			if ($imgFail === false) {

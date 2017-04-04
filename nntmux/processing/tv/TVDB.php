@@ -57,12 +57,12 @@ class TVDB extends TV
 			$this->serverTime = $this->client->getServerTime();
 		} catch (CurlException $error) {
 			if (strpos($error->getMessage(), 'Cannot fetch') === 0) {
-				echo $this->pdo->log->warning('Could not reach TVDB API. Running in local mode only!');
+				echo ColorCLI::warning('Could not reach TVDB API. Running in local mode only!');
 				$this->local = true;
 			}
 		} catch (XmlException $error) {
 			if (strpos($error->getMessage(), 'Error in file') === 0) {
-				echo $this->pdo->log->warning('Bad response from TVDB API. Running in local mode only!');
+				echo ColorCLI::warning('Bad response from TVDB API. Running in local mode only!');
 				$this->local = true;
 			}
 		}
@@ -84,7 +84,7 @@ class TVDB extends TV
 		$tvcount = $res->rowCount();
 
 		if ($this->echooutput && $tvcount > 0) {
-			echo $this->pdo->log->header("Processing TVDB lookup for " . number_format($tvcount) . " release(s).");
+			echo ColorCLI::header("Processing TVDB lookup for " . number_format($tvcount) . " release(s).");
 		}
 
 		if ($res instanceof \Traversable) {
@@ -101,9 +101,9 @@ class TVDB extends TV
 
 					if (in_array($release['cleanname'], $this->titleCache)) {
 						if ($this->echooutput) {
-							echo $this->pdo->log->headerOver("Title: ") .
-									$this->pdo->log->warningOver('"' . $release['cleanname'] . '"') .
-									$this->pdo->log->header(" already failed lookup for this site.  Skipping.");
+							echo ColorCLI::headerOver("Title: ") .
+									ColorCLI::warningOver('"' . $release['cleanname'] . '"') .
+									ColorCLI::header(" already failed lookup for this site.  Skipping.");
 						}
 						$this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
 						continue;
@@ -127,9 +127,9 @@ class TVDB extends TV
 
 						// If it doesnt exist locally and lookups are allowed lets try to get it.
 						if ($this->echooutput) {
-							echo $this->pdo->log->primaryOver("Video ID for ") .
-								$this->pdo->log->headerOver($release['cleanname']) .
-								$this->pdo->log->primary(" not found in local db, checking web.");
+							echo ColorCLI::primaryOver("Video ID for ") .
+								ColorCLI::headerOver($release['cleanname']) .
+								ColorCLI::primary(" not found in local db, checking web.");
 						}
 
 						// Check if we have a valid country and set it in the array
@@ -148,9 +148,9 @@ class TVDB extends TV
 						}
 
 					} else if ($this->echooutput && $tvdbid !== false) {
-						echo $this->pdo->log->primaryOver("Video ID for ") .
-							$this->pdo->log->headerOver($release['cleanname']) .
-							$this->pdo->log->primary(" found in local db, attempting episode match.");
+						echo ColorCLI::primaryOver("Video ID for ") .
+							ColorCLI::headerOver($release['cleanname']) .
+							ColorCLI::primary(" found in local db, attempting episode match.");
 					}
 
 					if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvdbid) && $tvdbid > 0) {
@@ -163,7 +163,7 @@ class TVDB extends TV
 						if ($episodeNo === 'all') {
 							// Set the video ID and leave episode 0
 							$this->setVideoIdFound($videoId, $row['id'], 0);
-							echo $this->pdo->log->primary("Found TVDB Match for Full Season!");
+							echo ColorCLI::primary("Found TVDB Match for Full Season!");
 							continue;
 						}
 
@@ -193,7 +193,7 @@ class TVDB extends TV
 							// Mark the releases video and episode IDs
 							$this->setVideoIdFound($videoId, $row['id'], $episode);
 							if ($this->echooutput) {
-								echo $this->pdo->log->primary("Found TVDB Match!");
+								echo ColorCLI::primary("Found TVDB Match!");
 							}
 						} else {
 							//Processing failed, set the episode ID to the next processing group

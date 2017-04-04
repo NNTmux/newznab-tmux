@@ -549,14 +549,14 @@ class Music
 
 		if ($musicId) {
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho(
-					$this->pdo->log->header(PHP_EOL . 'Added/updated album: ') .
-					$this->pdo->log->alternateOver('   Artist: ') .
-					$this->pdo->log->primary($mus['artist']) .
-					$this->pdo->log->alternateOver('   Title:  ') .
-					$this->pdo->log->primary($mus['title']) .
-					$this->pdo->log->alternateOver('   Year:   ') .
-					$this->pdo->log->primary($mus['year'])
+				ColorCLI::doEcho(
+					ColorCLI::header(PHP_EOL . 'Added/updated album: ') .
+					ColorCLI::alternateOver('   Artist: ') .
+					ColorCLI::primary($mus['artist']) .
+					ColorCLI::alternateOver('   Title:  ') .
+					ColorCLI::primary($mus['title']) .
+					ColorCLI::alternateOver('   Year:   ') .
+					ColorCLI::primary($mus['year'])
 				);
 			}
 			$mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
@@ -567,9 +567,9 @@ class Music
 				} else {
 					$artist = 'Artist: ' . $mus['artist'] . ', Album: ';
 				}
-				$this->pdo->log->doEcho(
-					$this->pdo->log->headerOver('Nothing to update: ') .
-					$this->pdo->log->primaryOver(
+				ColorCLI::doEcho(
+					ColorCLI::headerOver('Nothing to update: ') .
+					ColorCLI::primaryOver(
 						$artist .
 						$mus['title'] .
 						' (' .
@@ -701,8 +701,8 @@ class Music
 		);
 		if ($res instanceof \Traversable && $res->rowCount() > 0) {
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho(
-					$this->pdo->log->header('Processing ' . $res->rowCount() .' music release(s).'
+				ColorCLI::doEcho(
+					ColorCLI::header('Processing ' . $res->rowCount() .' music release(s).'
 					)
 				);
 			}
@@ -715,7 +715,7 @@ class Music
 					$newname = $album['name'] . ' (' . $album['year'] . ')';
 
 					if ($this->echooutput) {
-						$this->pdo->log->doEcho($this->pdo->log->headerOver('Looking up: ') . $this->pdo->log->primary($newname));
+						ColorCLI::doEcho(ColorCLI::headerOver('Looking up: ') . ColorCLI::primary($newname));
 					}
 
 					// Do a local lookup first
@@ -724,7 +724,7 @@ class Music
 					if ($musicCheck === false && in_array($album['name'] . $album['year'], $this->failCache, false)) {
 						// Lookup recently failed, no point trying again
 						if ($this->echooutput) {
-							$this->pdo->log->doEcho($this->pdo->log->headerOver('Cached previous failure. Skipping.') . PHP_EOL);
+							ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.') . PHP_EOL);
 						}
 						$albumId = -2;
 					} else if ($musicCheck === false && $local === false) {
@@ -759,7 +759,7 @@ class Music
 
 		} else {
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho($this->pdo->log->header('No music releases to process.'));
+				ColorCLI::doEcho(ColorCLI::header('No music releases to process.'));
 			}
 		}
 	}

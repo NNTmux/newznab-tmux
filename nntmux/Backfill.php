@@ -153,7 +153,7 @@ class Backfill
 			}
 
 			if ($this->_echoCLI) {
-				$this->pdo->log->doEcho($this->pdo->log->header($dMessage), true);
+				ColorCLI::doEcho(ColorCLI::header($dMessage), true);
 			}
 
 			$this->_binaries = new Binaries(
@@ -173,7 +173,7 @@ class Backfill
 					}
 
 					if ($this->_echoCLI) {
-						$this->pdo->log->doEcho($this->pdo->log->header($dMessage), true);
+						ColorCLI::doEcho(ColorCLI::header($dMessage), true);
 					}
 				}
 				$this->backfillGroup($groupArr, $groupCount - $counter, $articles);
@@ -186,7 +186,7 @@ class Backfill
 			}
 
 			if ($this->_echoCLI) {
-				$this->pdo->log->doEcho($this->pdo->log->primary($dMessage));
+				ColorCLI::doEcho(ColorCLI::primary($dMessage));
 			}
 		} else {
 			$dMessage = "No groups specified. Ensure groups are added to nntmux's database for updating.";
@@ -195,7 +195,7 @@ class Backfill
 			}
 
 			if ($this->_echoCLI) {
-				$this->pdo->log->doEcho($this->pdo->log->warning($dMessage), true);
+				ColorCLI::doEcho(ColorCLI::warning($dMessage), true);
 			}
 		}
 	}
@@ -229,7 +229,7 @@ class Backfill
 			}
 
 			if ($this->_echoCLI) {
-				$this->pdo->log->doEcho($this->pdo->log->error($dMessage));
+				ColorCLI::doEcho(ColorCLI::error($dMessage));
 			}
 			return;
 		}
@@ -244,7 +244,7 @@ class Backfill
 		}
 
 		if ($this->_echoCLI) {
-			$this->pdo->log->doEcho($this->pdo->log->primary('Processing ' . $groupName), true);
+			ColorCLI::doEcho(ColorCLI::primary('Processing ' . $groupName), true);
 		}
 
 		// Check if this is days or post backfill.
@@ -279,14 +279,14 @@ class Backfill
 			}
 
 			if ($this->_echoCLI) {
-				$this->pdo->log->doEcho($this->pdo->log->notice($dMessage), true);
+				ColorCLI::doEcho(ColorCLI::notice($dMessage), true);
 			}
 			return;
 		}
 
 		if ($this->_echoCLI) {
-			$this->pdo->log->doEcho(
-				$this->pdo->log->primary(
+			ColorCLI::doEcho(
+				ColorCLI::primary(
 					'Group ' .
 					$groupName .
 					"'s oldest article is " .
@@ -316,8 +316,8 @@ class Backfill
 		while ($done === false) {
 
 			if ($this->_echoCLI) {
-				$this->pdo->log->doEcho(
-					$this->pdo->log->set256('Yellow') .
+				ColorCLI::doEcho(
+					ColorCLI::set256('Yellow') .
 					PHP_EOL . 'Getting ' .
 					number_format($last - $first + 1) .
 					' articles from ' .
@@ -327,7 +327,7 @@ class Backfill
 					' group(s) left. (' .
 					number_format($first - $targetpost) .
 					' articles in queue).' .
-					$this->pdo->log->rsetColor(), true
+					ColorCLI::rsetColor(), true
 				);
 			}
 
@@ -365,8 +365,8 @@ class Backfill
 		}
 
 		if ($this->_echoCLI) {
-			$this->pdo->log->doEcho(
-				$this->pdo->log->primary(
+			ColorCLI::doEcho(
+				ColorCLI::primary(
 					PHP_EOL .
 					'Group ' .
 					$groupName .

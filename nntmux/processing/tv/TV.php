@@ -520,7 +520,7 @@ abstract class TV extends Videos
 			}
 		}
 		if (NN_DEBUG) {
-			$this->pdo->log->doEcho('Failed to parse release: ' . $relname, true);
+			ColorCLI::doEcho('Failed to parse release: ' . $relname, true);
 		}
 		return false;
 	}

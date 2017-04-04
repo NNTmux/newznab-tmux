@@ -281,7 +281,7 @@ class AniDB
 				)
 			);
 		} else {
-			echo $this->pdo->log->warning("Duplicate: $id");
+			echo ColorCLI::warning("Duplicate: $id");
 		}
 	}
 
@@ -358,7 +358,7 @@ class AniDB
 
 		if ($current->diff($lastUpdate)->format('%d') > $this->updateInterval) {
 			if ($this->echooutput) {
-				echo $this->pdo->log->header('Updating anime titles by grabbing full data AniDB dump.');
+				echo ColorCLI::header('Updating anime titles by grabbing full data AniDB dump.');
 			}
 
 			$animetitles = new \SimpleXMLElement('compress.zlib://http://anidb.net/api/anime-titles.xml.gz', null, true);
@@ -370,7 +370,7 @@ class AniDB
 			if ($animetitles instanceof \Traversable) {
 				$count = $animetitles->count();
 				if ($this->echooutput) {
-					echo $this->pdo->log->header(
+					echo ColorCLI::header(
 						'Total of ' . number_format($count) . ' titles to add.' . PHP_EOL
 					);
 				}
@@ -385,7 +385,7 @@ class AniDB
 							(string)$xmlAttribs->lang,
 							(string)$title[0]
 						);
-						$this->pdo->log->primary(
+						ColorCLI::primary(
 							sprintf(
 								'Inserting: %d, %s, %s, %s',
 								$anime['aid'],
@@ -399,11 +399,11 @@ class AniDB
 				}
 			} else {
 				echo PHP_EOL .
-					$this->pdo->log->error('Error retrieving XML data from AniDB. Please try again later.') .
+					ColorCLI::error('Error retrieving XML data from AniDB. Please try again later.') .
 					PHP_EOL;
 			}
 		} else {
-			echo PHP_EOL . $this->pdo->log->info(
+			echo PHP_EOL . ColorCLI::info(
 					'AniDB has been updated within the past ' . $this->updateInterval . ' days. ' .
 					'Either set this value lower in Site Edit (at your own risk of being banned) or try again later.');
 		}
@@ -417,16 +417,16 @@ class AniDB
 		$AniDBAPIArray = $this->getAniDbAPI();
 
 		if ($this->banned === true) {
-			$this->pdo->log->doEcho(
-				$this->pdo->log->error(
+			ColorCLI::doEcho(
+				ColorCLI::error(
 					'AniDB Banned, import will fail, please wait 24 hours before retrying.'
 				),
 				true
 			);
 			exit;
 		} elseif ($AniDBAPIArray === false && $this->echooutput) {
-			$this->pdo->log->doEcho(
-				$this->pdo->log->info(
+			ColorCLI::doEcho(
+				ColorCLI::info(
 					'Anime ID: ' . $this->anidbId . ' not available for update yet.'
 				),
 				true
@@ -434,8 +434,8 @@ class AniDB
 		} else {
 			$this->updateAniChildTables($AniDBAPIArray);
 			if (NN_DEBUG) {
-				$this->pdo->log->doEcho(
-					$this->pdo->log->headerOver(
+				ColorCLI::doEcho(
+					ColorCLI::headerOver(
 						'Added/Updated AniDB ID: '  . $this->anidbId
 					),
 					true

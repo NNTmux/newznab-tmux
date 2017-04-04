@@ -429,7 +429,7 @@ class XXX
 					$res['title'] = $iafd->title;
 					$res['directurl'] = (string)$iafd->directUrl;
 					$this->whichclass = $iafd->classUsed;
-					$this->pdo->log->doEcho($this->pdo->log->primary("Fetching XXX info from IAFD -> Adult DVD Empire"));
+					ColorCLI::doEcho(ColorCLI::primary("Fetching XXX info from IAFD -> Adult DVD Empire"));
 					break;
 			}
 		}
@@ -487,7 +487,7 @@ class XXX
 						default:
 							$fromstr = null;
 					}
-					$this->pdo->log->doEcho($this->pdo->log->primary("Fetching XXX info from: " . $fromstr));
+					ColorCLI::doEcho(ColorCLI::primary("Fetching XXX info from: " . $fromstr));
 				}
 				$res = $mov->getAll();
 			} else {
@@ -572,9 +572,9 @@ class XXX
 		}
 
 		if ($this->echooutput) {
-			$this->pdo->log->doEcho(
-				$this->pdo->log->headerOver(($xxxID !== false ? 'Added/updated XXX movie: ' : 'Nothing to update for XXX movie: ')) .
-				$this->pdo->log->primary($mov['title'])
+			ColorCLI::doEcho(
+				ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: ' : 'Nothing to update for XXX movie: ')) .
+				ColorCLI::primary($mov['title'])
 			);
 		}
 
@@ -603,7 +603,7 @@ class XXX
 		if ($movieCount > 0) {
 
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho($this->pdo->log->header("Processing " . $movieCount . " XXX releases."));
+				ColorCLI::doEcho(ColorCLI::header("Processing " . $movieCount . " XXX releases."));
 			}
 
 			// Loop over releases.
@@ -618,10 +618,10 @@ class XXX
 						$this->currentRelID = $arr['id'];
 						$movieName = $this->currentTitle;
 						if ($this->debug && $this->echooutput) {
-							$this->pdo->log->doEcho("DB name: " . $arr['searchname'], true);
+							ColorCLI::doEcho("DB name: " . $arr['searchname'], true);
 						}
 						if ($this->echooutput) {
-							$this->pdo->log->doEcho($this->pdo->log->primaryOver("Looking up: ") . $this->pdo->log->headerOver($movieName), true);
+							ColorCLI::doEcho(ColorCLI::primaryOver("Looking up: ") . ColorCLI::headerOver($movieName), true);
 						}
 
 						$idcheck = $this->updateXXXInfo($movieName);
@@ -629,12 +629,12 @@ class XXX
 						$idcheck = (int)$check['id'];
 					}
 				} else {
-					$this->pdo->log->doEcho(".", true);
+					ColorCLI::doEcho(".", true);
 				}
 				$this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE id = %d %s', $idcheck, $arr['id'], $this->catWhere));
 			}
 		} elseif ($this->echooutput) {
-			$this->pdo->log->doEcho($this->pdo->log->header('No xxx releases to process.'));
+			ColorCLI::doEcho(ColorCLI::header('No xxx releases to process.'));
 		}
 	}
 
@@ -685,7 +685,7 @@ class XXX
 				$this->currentTitle = $name;
 				return true;
 			} else {
-				$this->pdo->log->doEcho(".", false);
+				ColorCLI::doEcho(".", false);
 			}
 		}
 

@@ -670,7 +670,7 @@ class Movie
 	public function updateMovieInfo($imdbId)
 	{
 		if ($this->echooutput && $this->service !== '') {
-			$this->pdo->log->doEcho($this->pdo->log->primary('Fetching IMDB info from TMDB and/or Trakt using IMDB id: ' . $imdbId));
+			ColorCLI::doEcho(ColorCLI::primary('Fetching IMDB info from TMDB and/or Trakt using IMDB id: ' . $imdbId));
 		}
 
 		// Check TMDB for IMDB info.
@@ -768,9 +768,9 @@ class Movie
 		]);
 
 		if ($this->echooutput && $this->service !== '') {
-			$this->pdo->log->doEcho(
-				$this->pdo->log->headerOver(($movieID !== 0 ? 'Added/updated movie: ' : 'Nothing to update for movie: ')) .
-				$this->pdo->log->primary($mov['title'] .
+			ColorCLI::doEcho(
+				ColorCLI::headerOver(($movieID !== 0 ? 'Added/updated movie: ' : 'Nothing to update for movie: ')) .
+				ColorCLI::primary($mov['title'] .
 					' (' .
 					$mov['year'] .
 					') - ' .
@@ -798,11 +798,11 @@ class Movie
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+						ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
 					} else if ($e->getCode() === 503) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+						ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
 					} else {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
 					}
 				}
 			}
@@ -831,7 +831,7 @@ class Movie
 						$ret['title'] = $art['name'];
 					}
 					if ($this->echooutput) {
-						$this->pdo->log->doEcho($this->pdo->log->alternateOver("Fanart Found ") . $this->pdo->log->headerOver($ret['title']), true);
+						ColorCLI::doEcho(ColorCLI::alternateOver("Fanart Found ") . ColorCLI::headerOver($ret['title']), true);
 					}
 					return $ret;
 				}
@@ -922,7 +922,7 @@ class Movie
 			$ret['backdrop'] = 'http://image.tmdb.org/t/p/original' . $backdrop;
 		}
 		if ($this->echooutput) {
-			$this->pdo->log->doEcho($this->pdo->log->primaryOver('TMDb Found ') . $this->pdo->log->headerOver($ret['title']), true);
+			ColorCLI::doEcho(ColorCLI::primaryOver('TMDb Found ') . ColorCLI::headerOver($ret['title']), true);
 		}
 		return $ret;
 	}
@@ -963,11 +963,11 @@ class Movie
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
 				if($e->getCode() === 404) {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
 				} else if ($e->getCode() === 503) {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
 				} else {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
 				}
 			}
 		}
@@ -1026,7 +1026,7 @@ class Movie
 				}
 			}
 			if ($this->echooutput && isset($ret['title'])) {
-				$this->pdo->log->doEcho($this->pdo->log->headerOver("IMDb Found ") . $this->pdo->log->primaryOver($ret['title']), true);
+				ColorCLI::doEcho(ColorCLI::headerOver("IMDb Found ") . ColorCLI::primaryOver($ret['title']), true);
 			}
 			return $ret;
 		}
@@ -1058,7 +1058,7 @@ class Movie
 				return false;
 			}
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho($this->pdo->log->alternateOver("Trakt Found ") . $this->pdo->log->headerOver($ret['title']), true);
+				ColorCLI::doEcho(ColorCLI::alternateOver("Trakt Found ") . ColorCLI::headerOver($ret['title']), true);
 			}
 			return $ret;
 		}
@@ -1085,7 +1085,7 @@ class Movie
 		if ($imdbID !== false) {
 			$this->service = $service;
 			if ($this->echooutput && $this->service !== '') {
-				$this->pdo->log->doEcho($this->pdo->log->headerOver($service . ' found IMDBid: ') . $this->pdo->log->primary('tt' . $imdbID));
+				ColorCLI::doEcho(ColorCLI::headerOver($service . ' found IMDBid: ') . ColorCLI::primary('tt' . $imdbID));
 			}
 
 			$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE id = %d %s', $this->pdo->escapeString($imdbID), $id, $this->catWhere));
@@ -1139,7 +1139,7 @@ class Movie
 				$this->traktTv = new TraktTv(['Settings' => $this->pdo]);
 			}
 			if ($this->echooutput && $movieCount > 1) {
-				$this->pdo->log->doEcho($this->pdo->log->header("Processing " . $movieCount . " movie releases."));
+				ColorCLI::doEcho(ColorCLI::header("Processing " . $movieCount . " movie releases."));
 			}
 
 			// Loop over releases.
@@ -1159,7 +1159,7 @@ class Movie
 					}
 
 					if ($this->echooutput) {
-						$this->pdo->log->doEcho($this->pdo->log->primaryOver("Looking up: ") . $this->pdo->log->headerOver($movieName), true);
+						ColorCLI::doEcho(ColorCLI::primaryOver("Looking up: ") . ColorCLI::headerOver($movieName), true);
 					}
 
 					// Check local DB.
@@ -1184,11 +1184,11 @@ class Movie
 					} catch (RequestException $e) {
 						if ($e->hasResponse()) {
 							if($e->getCode() === 404) {
-								$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+								ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
 							} else if ($e->getCode() === 503) {
-								$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+								ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
 							} else {
-								$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+								ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
 							}
 						}
 					}
@@ -1353,11 +1353,11 @@ class Movie
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
 				if($e->getCode() === 404) {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
 				} else if ($e->getCode() === 503) {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
 				} else {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
 				}
 			}
 		}
@@ -1399,11 +1399,11 @@ class Movie
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
 				if($e->getCode() === 404) {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
 				} else if ($e->getCode() === 503) {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
 				} else {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
 				}
 			}
 		}
@@ -1453,11 +1453,11 @@ class Movie
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
 				if($e->getCode() === 404) {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+					ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
 				} else if ($e->getCode() === 503) {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
 				} else {
-					$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
 				}
 			}
 		}
@@ -1512,7 +1512,7 @@ class Movie
 			// Check if the name is long enough and not just numbers.
 			if (strlen($name) > 4 && !preg_match('/^\d+$/', $name)) {
 				if ($this->debug && $this->echooutput) {
-					$this->pdo->log->doEcho("DB name: {$releaseName}", true);
+					ColorCLI::doEcho("DB name: {$releaseName}", true);
 				}
 				$this->currentTitle = $name;
 				$this->currentYear  = ($year === '' ? false : $year);

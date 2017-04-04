@@ -709,10 +709,10 @@ class Games
 
 		if ($gamesId) {
 			if ($this->echoOutput) {
-				$this->pdo->log->doEcho(
-					$this->pdo->log->header('Added/updated game: ') .
-					$this->pdo->log->alternateOver('   Title:    ') .
-					$this->pdo->log->primary($game['title'])
+				ColorCLI::doEcho(
+					ColorCLI::header('Added/updated game: ') .
+					ColorCLI::alternateOver('   Title:    ') .
+					ColorCLI::primary($game['title'])
 				);
 			}
 			if($game['cover'] === 1){
@@ -723,9 +723,9 @@ class Games
 			}
 		} else {
 			if ($this->echoOutput) {
-				$this->pdo->log->doEcho(
-					$this->pdo->log->headerOver('Nothing to update: ') .
-					$this->pdo->log->primary($game['title'] . ' (PC)' )
+				ColorCLI::doEcho(
+					ColorCLI::headerOver('Nothing to update: ') .
+					ColorCLI::primary($game['title'] . ' (PC)' )
 				);
 			}
 		}
@@ -751,7 +751,7 @@ class Games
 
 		if ($res instanceof \Traversable && $res->rowCount() > 0) {
 			if ($this->echoOutput) {
-				$this->pdo->log->doEcho($this->pdo->log->header('Processing ' . $res->rowCount() . ' games release(s).'));
+				ColorCLI::doEcho(ColorCLI::header('Processing ' . $res->rowCount() . ' games release(s).'));
 			}
 
 			foreach ($res as $arr) {
@@ -763,9 +763,9 @@ class Games
 				if ($gameInfo !== false) {
 
 					if ($this->echoOutput) {
-						$this->pdo->log->doEcho(
-							$this->pdo->log->headerOver('Looking up: ') .
-							$this->pdo->log->primary($gameInfo['title'] . ' (PC)' )
+						ColorCLI::doEcho(
+							ColorCLI::headerOver('Looking up: ') .
+							ColorCLI::primary($gameInfo['title'] . ' (PC)' )
 						);
 					}
 
@@ -799,7 +799,7 @@ class Games
 			}
 		} else {
 			if ($this->echoOutput) {
-				$this->pdo->log->doEcho($this->pdo->log->header('No games releases to process.'));
+				ColorCLI::doEcho(ColorCLI::header('No games releases to process.'));
 			}
 		}
 	}

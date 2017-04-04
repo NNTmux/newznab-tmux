@@ -483,7 +483,7 @@ class MiscSorter
 					$ok = $this->_doAmazonVG($response, $id);
 					break;
 				default:
-					echo PHP_EOL . $this->pdo->log->error("Amazon category $type could not be parsed for " . $name) . PHP_EOL;
+					echo PHP_EOL . ColorCLI::error("Amazon category $type could not be parsed for " . $name) . PHP_EOL;
 			}
 		}
 
