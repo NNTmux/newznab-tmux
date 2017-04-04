@@ -6,7 +6,7 @@ If after import you have a bunch of zero sized releases run this
 Author: lordgnu <lordgnu@me.com>
 */
 
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use app\models\Settings;
 use nntmux\db\DB;

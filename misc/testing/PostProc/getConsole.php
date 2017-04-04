@@ -1,7 +1,7 @@
 <?php
 //This script will update all records in the consoleinfo table
 
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\Category;
 use nntmux\db\DB;

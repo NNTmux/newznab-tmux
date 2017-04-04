@@ -172,7 +172,7 @@ SHARING
 		recognize or want to test out the source.
 */
 
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\SpotNab;
 

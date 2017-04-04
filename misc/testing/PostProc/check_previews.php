@@ -2,7 +2,7 @@
 // --------------------------------------------------------------
 //          Scan for releases missing previews on disk
 // --------------------------------------------------------------
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\db\DB;
 use nntmux\utility\Utility;

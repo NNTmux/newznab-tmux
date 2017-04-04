@@ -1,6 +1,6 @@
 <?php
 // TODO: bunch of if/elses need converting to switches
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\Categorize;
 use nntmux\ColorCLI;

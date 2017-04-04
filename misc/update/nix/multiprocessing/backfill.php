@@ -1,6 +1,6 @@
 <?php
 declare(ticks=1);
-require('.do_not_run/require.php');
+require __DIR__ . '.do_not_run/require.php';
 use nntmux\libraries\Forking;
 // Check if argument 1 is numeric, which is to limit article count.
 (new Forking())->processWorkType(

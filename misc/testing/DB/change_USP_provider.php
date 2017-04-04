@@ -1,5 +1,5 @@
 <?php
-require_once realpath(dirname(__DIR__, 3)) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\db\DB;
 use nntmux\NNTP;

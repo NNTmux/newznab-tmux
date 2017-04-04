@@ -8,7 +8,7 @@ if (!isset($argv[1]) || !in_array($argv[1], ['backfill', 'binaries'])) {
 }
 
 declare(ticks=1);
-require('.do_not_run/require.php');
+require __DIR__ . '.do_not_run/require.php';
 
 use \nntmux\libraries\Forking;
 

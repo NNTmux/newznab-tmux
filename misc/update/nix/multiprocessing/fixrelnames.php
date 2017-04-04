@@ -7,7 +7,7 @@ if (!isset($argv[1]) || !in_array($argv[1], ['standard', 'predbft'])) {
 	);
 }
 
-require('.do_not_run/require.php');
+require __DIR__ . '.do_not_run/require.php';
 
 use nntmux\libraries\Forking;
 

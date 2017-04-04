@@ -1,6 +1,6 @@
 <?php
 // To troubleshoot what's actually on usenet.
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\Binaries;
 use nntmux\ColorCLI;
