@@ -6,6 +6,7 @@ use dariusiii\rarinfo\ArchiveInfo;
 use dariusiii\rarinfo\Par2Info;
 use nntmux\Categorize;
 use nntmux\Category;
+use nntmux\ColorCLI;
 use nntmux\Groups;
 use nntmux\NameFixer;
 use nntmux\Nfo;
