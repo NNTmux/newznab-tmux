@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "2dfb9632acbbd60b2d7e98c01570e0b1",
+    "content-hash": "b03d49667b8a7db49607bc138c927b96",
     "packages": [
         {
             "name": "b3rs3rk/steamfront",
@@ -922,6 +922,45 @@
                     "package.json"
                 ]
             }
+        },
+        {
+            "name": "bower-asset/material-design-iconic-font",
+            "version": "2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zavoloklom/material-design-iconic-font.git",
+                "reference": "a1cdb51dc417163d0f262806ffe290751b0e63d3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zavoloklom/material-design-iconic-font/zipball/a1cdb51dc417163d0f262806ffe290751b0e63d3",
+                "reference": "a1cdb51dc417163d0f262806ffe290751b0e63d3",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "./dist/css/material-design-iconic-font.min.css",
+                    "./dist/fonts/*"
+                ],
+                "bower-asset-ignore": [
+                    "*/.*",
+                    "node_modules/*",
+                    "*.json",
+                    "*.md"
+                ]
+            },
+            "license": [
+                "OFL-1.1",
+                "MIT"
+            ],
+            "description": "Material Design Iconic Font",
+            "keywords": [
+                "design",
+                "font",
+                "icons",
+                "material"
+            ]
         },
         {
             "name": "bower-asset/pace",
