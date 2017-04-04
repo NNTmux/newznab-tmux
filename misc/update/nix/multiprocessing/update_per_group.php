@@ -1,6 +1,6 @@
 <?php
 declare(ticks=1);
-require __DIR__ . '.do_not_run/require.php';
+require __DIR__ . DIRECTORY_SEPARATOR . '.do_not_run/require.php';
 
 use \nntmux\libraries\Forking;
 

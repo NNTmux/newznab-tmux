@@ -14,7 +14,7 @@ if (!isset($argv[1]) || !in_array($argv[1], ['ama', 'add', 'mov', 'nfo', 'sha', 
 }
 
 declare(ticks=1);
-require __DIR__ . '.do_not_run/require.php';
+require __DIR__ . DIRECTORY_SEPARATOR . '.do_not_run/require.php';
 
 use nntmux\libraries\Forking;
 
