@@ -497,7 +497,7 @@ class Games
 				}
 			}
 		}
-		if (empty($this->_gameResults['title']) || empty($this->_gameResults->name)){
+		if (empty($this->_gameResults->name) || empty($this->_gameResults['title'])){
 			return false;
 		}
 		if (!is_array($this->_gameResults)){
@@ -622,7 +622,7 @@ class Games
 			$game['title'] = $gameInfo['title'];
 		}
 		if(!isset($game['releasedate'])){
-			$game['releasedate'] = "";
+			$game['releasedate'] = '';
 		}
 
 		if ($game['releasedate'] == '') {
