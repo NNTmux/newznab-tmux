@@ -5,6 +5,7 @@ use app\models\Settings;
 use dariusiii\rarinfo\Par2Info;
 use nntmux\Books;
 use nntmux\Category;
+use nntmux\ColorCLI;
 use nntmux\Console;
 use nntmux\Games;
 use nntmux\Groups;

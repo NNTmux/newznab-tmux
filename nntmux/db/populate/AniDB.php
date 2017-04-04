@@ -3,6 +3,7 @@
 namespace nntmux\db\populate;
 
 use app\models\Settings;
+use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
 use nntmux\db\DB;
 

@@ -2,6 +2,7 @@
 namespace nntmux\libraries;
 
 use nntmux\db\DB;
+use nntmux\ColorCLI;
 
 
 /**

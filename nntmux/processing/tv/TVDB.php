@@ -4,6 +4,7 @@ namespace nntmux\processing\tv;
 use Moinax\TvDb\Client;
 use Moinax\TvDb\CurlException;
 use Moinax\TvDb\XmlException;
+use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
 
 /**

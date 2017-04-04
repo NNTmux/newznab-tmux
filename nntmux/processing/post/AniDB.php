@@ -4,6 +4,7 @@ namespace nntmux\processing\post;
 
 use app\models\Settings;
 use nntmux\Category;
+use nntmux\ColorCLI;
 use nntmux\NZB;
 use nntmux\db\DB;
 

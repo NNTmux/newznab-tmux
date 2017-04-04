@@ -4,6 +4,7 @@ namespace nntmux\processing\tv;
 use GuzzleHttp\Client;
 use nntmux\utility\Utility;
 use nntmux\utility\Country;
+use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
 
 /**

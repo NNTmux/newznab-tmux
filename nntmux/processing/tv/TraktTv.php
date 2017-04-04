@@ -3,6 +3,7 @@ namespace nntmux\processing\tv;
 
 use app\models\Settings;
 use nntmux\libraries\TraktAPI;
+use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
 use nntmux\utility\Time;
 

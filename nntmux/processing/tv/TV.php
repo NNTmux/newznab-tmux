@@ -6,6 +6,7 @@ use nntmux\processing\Videos;
 use nntmux\utility\Country;
 use nntmux\utility\Utility;
 use nntmux\Category;
+use nntmux\ColorCLI;
 
 /**
  * Class TV -- abstract extension of Videos

@@ -2,6 +2,7 @@
 namespace nntmux\processing\tv;
 
 use JPinkney\TVMaze\TVMaze as Client;
+use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
 
 /**
