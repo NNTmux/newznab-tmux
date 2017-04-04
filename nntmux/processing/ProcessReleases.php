@@ -7,6 +7,7 @@ use app\models\ReleaseRegexes;
 use app\models\Settings;
 use nntmux\Categorize;
 use nntmux\Category;
+use nntmux\ColorCLI;
 use nntmux\ConsoleTools;
 use nntmux\Genres;
 use nntmux\Groups;
