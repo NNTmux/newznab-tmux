@@ -6,7 +6,7 @@
 		<ul class="pagination">
 			<li>
 				<a href="{$pagerquerybase}{$pageroffset-$pageritemsperpage}{$pagerquerysuffix}" aria-label="Previous">
-					<i class="fa fa-long-arrow-left"><span aria-hidden="true"></i></span>
+					<i class="fa fa-chevron-left"><span aria-hidden="true"></i></span>
 				</a>
 			</li>
 			{if $currentpage > 1}
@@ -42,7 +42,7 @@
 			{/if}
 			<li>
 				<a href="{$pagerquerybase}{$pageroffset+$pageritemsperpage}{$pagerquerysuffix}" aria-label="Next">
-					<i class="fa fa-long-arrow-right"></i><span aria-hidden="true"></span>
+					<i class="fa fa-chevron-right"></i><span aria-hidden="true"></span>
 				</a>
 			</li>
 		</ul>

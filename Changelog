@@ -1,4 +1,5 @@
 2017-04-05 DariusIII
+	* Chg: Use chevron instead of arrow in pager.tpl
 	* Chg: Add materializecss to composer
 2017-04-04 DariusIII
 	* Chg: Change path handling in scripts
