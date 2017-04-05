@@ -132,9 +132,9 @@
 															class="text-muted">NFO</a>
 													</span>{/if}
 												{if $mpass[$m@index] == 2}
-													<i class="fa fa-icon-lock"></i>
+													<i class="zmdi zmdi-icon-lock"></i>
 												{elseif $mpass[$m@index] == 1}
-													<i class="fa fa-icon-lock"></i>
+													<i class="zmdi zmdi-icon-lock"></i>
 												{/if}
 											</td>
 											<td class="less"><span
@@ -146,13 +146,13 @@
 											<td class="icons">
 												<a title="Download NZB"
 												   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
-															class="icon icon_nzb fa fa-cloud-download text-muted"></i></a>
-												<a href="#" id="guid{$mguid[$m@index]}" class="icon_cart text-muted"><i class="fa fa-shopping-basket"
+															class="icon icon_nzb zmdi zmdi-cloud-download text-muted"></i></a>
+												<a href="#" id="guid{$mguid[$m@index]}" class="icon_cart text-muted"><i class="zmdi zmdi-shopping-basket"
 																							title="Send to my Download Basket"></i></a>
 												{if isset($sabintegrated) && $sabintegrated !=""}
 													<a href="#" id="guid{$mguid[$m@index]}" class="icon icon_sab text-muted"
 														  title="Send to my Queue"><i
-																class="fa fa-share"></i></a>
+																class="zmdi zmdi-share"></i></a>
 												{/if}
 											</td>
 										</tr>

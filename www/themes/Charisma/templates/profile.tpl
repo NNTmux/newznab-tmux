@@ -17,7 +17,7 @@
 						<div class="panel-body pagination2">
 							<div class="panel-body">
 								<ul class="nav nav-tabs nav-primary">
-									<li class="active"><a href="#tab2_1" data-toggle="tab"><i class="fa fa-user"></i>
+									<li class="active"><a href="#tab2_1" data-toggle="tab"><i class="zmdi zmdi-account"></i>
 											Main</a></li>
 								</ul>
 								<div class="tab-content">

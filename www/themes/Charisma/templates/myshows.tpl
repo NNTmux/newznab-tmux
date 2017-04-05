@@ -14,7 +14,7 @@
 		   href="{$smarty.const.WWW_TOP}/myshows/browse">View releases for My Shows</a>
 		<a class="btn btn-sm btn-default" title="All releases in your shows as an RSS feed"
 		   href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS Feed for
-			My Shows <i class="fa fa-rss"></i></a>
+			My Shows <i class="zmdi zmdi-rss"></i></a>
 	</div>
 <hr>
 {if $shows|@count > 0}

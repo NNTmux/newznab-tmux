@@ -7,7 +7,7 @@
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
-							<i class="fa fa-television"></i> {$parentcat.title}<i class="fa fa-angle-down"></i>
+							<i class="zmdi zmdi-tv-play"></i> {$parentcat.title}
 						</a>
 						<ul class="dropdown-menu">
 							<li><a href="{$smarty.const.WWW_TOP}/browse?t={$parentcat.id}">TV</a></li>
@@ -25,7 +25,7 @@
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
-							<i class="fa fa-film"></i> {$parentcat.title}<i class="fa fa-angle-down"></i>
+							<i class="zmdi zmdi-movie-alt"></i> {$parentcat.title}
 						</a>
 						<ul class="dropdown-menu">
 							{if $userdata.movieview == "1"}
@@ -52,7 +52,7 @@
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
-							<i class="fa fa-gamepad"></i> {$parentcat.title}<i class="fa fa-angle-down"></i>
+							<i class="zmdi zmdi-xbox"></i> {$parentcat.title}
 						</a>
 						<ul class="dropdown-menu">
 							{if $userdata.consoleview == "1"}
@@ -78,7 +78,7 @@
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
-							<i class="fa fa-gamepad"></i> {$parentcat.title}<i class="fa fa-angle-down"></i>
+							<i class="zmdi zmdi-keyboard"></i> {$parentcat.title}
 						</a>
 						<ul class="dropdown-menu">
 							{if $userdata.gameview == "1"}
@@ -109,7 +109,7 @@
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
-							<i class="fa fa-music"></i> {$parentcat.title}<i class="fa fa-angle-down"></i>
+							<i class="zmdi zmdi-audio"></i> {$parentcat.title}
 						</a>
 						<ul class="dropdown-menu">
 							{if $userdata.musicview == "1"}
@@ -134,7 +134,7 @@
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
-							<i class="fa fa-book"></i> Books<i class="fa fa-angle-down"></i>
+							<i class="zmdi zmdi-book"></i> Books
 						</a>
 						<ul class="dropdown-menu">
 							{if $userdata.bookview == "1"}
@@ -153,7 +153,7 @@
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
-							<i class="fa fa-venus-mars"></i> Adult<i class="fa fa-angle-down"></i>
+							<i class="zmdi zmdi-male-female"></i> Adult
 						</a>
 						<ul class="dropdown-menu">
 							{if $userdata.xxxview == "1"}
@@ -183,7 +183,7 @@
 				{if $parentcat.id === "0"}
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" data-delay="30">
-							<i class="fa fa-bolt"></i> Other<i class="fa fa-angle-down"></i></a>
+							<i class="zmdi zmdi-thumb-up-down"></i> Other</a>
 						<ul class="dropdown-menu">
 							<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::OTHER_ROOT}">Other</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::OTHER_MISC}">Misc</a></li>
@@ -205,7 +205,7 @@
 							{/foreach}
 						</select>
 						<input class="form-control" id="headsearch" name="search" value="{if $header_menu_search == ""}{else}{$header_menu_search|escape:"htmlall"}{/if}" placeholder="Search" type="text" />
-						<button id="headsearch_go" type="submit" class="btn btn-success"><i class="fa fa-search"></i></button>
+						<button id="headsearch_go" type="submit" class="btn btn-success"><i class="zmdi zmdi-search"></i></button>
 					</form>
 				</li>
 			</ul>
@@ -215,26 +215,26 @@
 		{if $loggedin == "true"}
 			<div class="btn-group navbar-right">
 				<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-					<i class="fa fa-user"></i><span class="hidden-sm hidden-xs"><span
+					<i class="zmdi zmdi-account"></i><span class="hidden-sm hidden-xs"><span
 								class="username"> Hi, {$userdata.username}</span></span>
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu">
-					<li><a href="{$smarty.const.WWW_TOP}/profile"><i class="fa fa-user"></i><span> My Profile</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/cart"><i class="fa fa-shopping-basket"></i><span> My Download Basket</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/queue"><i class="fa fa-cloud-download"></i><span> My Queue</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/mymovies"><i class="fa fa-film"></i><span> My movies</span></a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/myshows"><i class="fa fa-television"></i> My Shows</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/profileedit"><i class="fa fa-cog fa-spin"></i><span> Account Settings</span></a>
+					<li><a href="{$smarty.const.WWW_TOP}/profile"><i class="zmdi zmdi-account"></i><span> My Profile</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/cart"><i class="zmdi zmdi-shopping-basket"></i><span> My Download Basket</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/queue"><i class="zmdi zmdi-cloud-download"></i><span> My Queue</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/mymovies"><i class="zmdi zmdi-movie-alt"></i><span> My movies</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/myshows"><i class="zmdi zmdi-tv-play"></i> My Shows</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/profileedit"><i class="zmdi zmdi-coffee"></i><span> Account Settings</span></a>
 					</li>
 					{if isset($isadmin)}
-						<li><a href="{$smarty.const.WWW_TOP}/admin"><i class="fa fa-cogs fa-spin"></i><span> Admin</span></a></li>
+						<li><a href="{$smarty.const.WWW_TOP}/admin"><i class="zmdi zmdi-settings"></i><span> Admin</span></a></li>
 					{/if}
-					<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="fa fa-unlock-alt"></i><span> Logout</span></a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/logout"><i class="zmdi zmdi-lock-open"></i><span> Logout</span></a></li>
 				</ul>
 				{else}
-				<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Login</span></a></li>
-				<li><a href="{$smarty.const.WWW_TOP}/register"><i class="fa fa-bookmark-o"></i><span> Register</span></a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/login"><i class="zmdi zmdi-lock"></i><span> Login</span></a></li>
+				<li><a href="{$smarty.const.WWW_TOP}/register"><i class="zmdi zmdi-bookmark-outline"></i><span> Register</span></a></li>
 			</div>
 		{/if}
 		<!-- user dropdown ends -->

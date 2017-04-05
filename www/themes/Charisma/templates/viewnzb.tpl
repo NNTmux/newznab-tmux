@@ -13,7 +13,7 @@
 			<div class="panel panel-default">
 				<div class="panel-body pagination2">
 					<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed) }<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-							<i class ="fa fa-thumbs-o-up"></i> {$release.grabs} Grab{if $release.grabs != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
+							<i class ="zmdi zmdi-thumbs-o-up"></i> {$release.grabs} Grab{if $release.grabs != 1}s{/if} / <i class ="zmdi zmdi-thumbs-o-down"></i> {$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
 					{if isset($isadmin)}
 						<a class="label label-warning"
 						   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$release.id}&amp;from={$smarty.server.REQUEST_URI}"
@@ -228,18 +228,18 @@
 												<div class="btn-group btn-group-vertical">
 													<a class="btn btn-primary btn-sm btn-success btn-transparent"
 													   href="{$smarty.const.WWW_TOP}/getnzb/{$release.guid}"><i
-																class="fa fa-cloud-download"></i>
+																class="zmdi zmdi-cloud-download"></i>
 														Download</a>
 													<button type="button"
 															class="btn btn-primary btn-sm btn-info btn-transparent cartadd">
-														<i class="icon icon_cart fa fa-shopping-basket guid"
+														<i class="icon icon_cart zmdi zmdi-shopping-basket guid"
 														   id="guid{$release.guid}"></i> Add to
 														Cart
 													</button>
 													{if isset($sabintegrated) && $sabintegrated !=""}
 														<button type="button"
 																class="btn btn-primary btn-sm btn-transparent sabsend">
-														<i class="icon_sab fa fa-arrow-right"
+														<i class="icon_sab zmdi zmdi-arrow-right"
 														   id="guid{$release.guid}"></i> Send to
 														Queue
 														</button>{/if}
@@ -250,7 +250,7 @@
 																id="imdb{$release.imdbid}"
 																href="javascript:;"
 																class="btn btn-primary btn-sm btn-info btn-transparent sendtocouch">
-																<i class="fa fa-bed"></i>
+																<i class="zmdi zmdi-bed"></i>
 																Send to CouchPotato
 															</button>
 														{/if}
@@ -258,7 +258,7 @@
 													{if $weHasVortex}
 														<button type="button"
 																class="btn btn-primary btn-sm btn-transparent vortexsend">
-														<i class="icon_sab fa fa-arrow-right"
+														<i class="icon_sab zmdi zmdi-arrow-right"
 														   id="guid{$release.guid}"></i> Send to
 														NZBVortex
 														</button>{/if}
@@ -527,10 +527,10 @@
 																			<code>{$rf.name}</code>
 																			<br/>
 																			{if $rf.passworded != 1}
-																				<i class="fa fa-unlock"></i>
+																				<i class="zmdi zmdi-unlock"></i>
 																				<span class="label label-success">No Password</span>
 																			{else}
-																				<i class="fa fa-lock"></i>
+																				<i class="zmdi zmdi-lock"></i>
 																				<span class="label label-danger">Passworded</span>
 																			{/if}
 																			<span class="label label-default">{$rf.size|fsize_format:"MB"}</span>
