@@ -944,14 +944,14 @@ class NameFixer
 
 		//Find release matches with fulltext and then identify exact matches with cleaned LIKE string
 		$res = $this->pdo->queryDirect(
-			sprintf('
+			sprintf("
 				SELECT r.id AS releases_id, r.name, r.searchname,
 				r.fromname, r.groups_id, r.categories_id
 				FROM releases r
 				%1\$s
 				AND (r.name %2\$s OR r.searchname %2\$s)
 				AND r.predb_id = 0
-				LIMIT 21',
+				LIMIT 21",
 				$join,
 				$this->pdo->likeString($pre['title'], true, true)
 			)
