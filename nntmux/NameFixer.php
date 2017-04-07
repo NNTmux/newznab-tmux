@@ -930,7 +930,16 @@ class NameFixer
 			ColorCLI::headerOver('Method:       ') . ColorCLI::primaryOver($data['method']) . PHP_EOL;
 	}
 
-	// Match a PreDB title to a release name or searchname using an exact full-text match
+	/**
+	 * Match a PreDB title to a release name or searchname using an exact full-text match
+	 * @param $pre
+	 * @param $echo
+	 * @param $namestatus
+	 * @param $echooutput
+	 * @param $show
+	 *
+	 * @return int
+	 */
 	public function matchPredbFT($pre, $echo, $namestatus, $echooutput, $show)
 	{
 		$matching = $total = 0;
