@@ -110,32 +110,32 @@ class NameFixer
 	protected $fullall;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
 	/**
-	 * @var \nntmux\ConsoleTools
+	 * @var ConsoleTools
 	 */
 	public $consoletools;
 
 	/**
-	 * @var \nntmux\Category
+	 * @var Category
 	 */
 	public $category;
 
 	/**
-	 * @var \nntmux\utility\Utility
+	 * @var Utility
 	 */
 	public $text;
 
 	/**
-	 * @var \nntmux\Groups
+	 * @var Groups
 	 */
 	public $_groups;
 
 	/**
-	 * @var \nntmux\SphinxSearch
+	 * @var SphinxSearch
 	 */
 	public $sphinx;
 
@@ -158,7 +158,7 @@ class NameFixer
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->relid = $this->fixed = $this->checked = 0;
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->othercats = implode(",", Category::OTHERS_GROUP);
+		$this->othercats = implode(',', Category::OTHERS_GROUP);
 		$this->timeother = sprintf(' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categories_id IN (%s) GROUP BY rel.id ORDER BY postdate DESC', $this->othercats);
 		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.id ORDER BY postdate DESC';
 		$this->fullother = sprintf(' AND rel.categories_id IN (%s) GROUP BY rel.id', $this->othercats);
@@ -214,7 +214,7 @@ class NameFixer
 
 		$releases = $this->_getReleases($time, $cats, $query);
 
-		if ($releases instanceof \Traversable && $releases !== false) {
+		if ($releases instanceof \Traversable) {
 			$total = $releases->rowCount();
 
 			if ($total > 0) {
@@ -295,7 +295,7 @@ class NameFixer
 		}
 
 		$releases = $this->_getReleases($time, $cats, $query);
-		if ($releases instanceof \Traversable && $releases !== false) {
+		if ($releases instanceof \Traversable) {
 
 			$total = $releases->rowCount();
 			if ($total > 0) {
@@ -844,8 +844,8 @@ class NameFixer
 							case 'PreDB FT Exact, ':
 								$status = 'isrenamed = 1, iscategorized = 1,';
 								break;
-							case "sorter, ":
-								$status = "isrenamed = 1, iscategorized = 1, proc_sorter = 1,";
+							case 'sorter, ':
+								$status = 'isrenamed = 1, iscategorized = 1, proc_sorter = 1,';
 								break;
 							case 'UID, ':
 								$status = 'isrenamed = 1, iscategorized = 1, proc_uid = 1,';
@@ -944,14 +944,14 @@ class NameFixer
 
 		//Find release matches with fulltext and then identify exact matches with cleaned LIKE string
 		$res = $this->pdo->queryDirect(
-			sprintf("
+			sprintf('
 				SELECT r.id AS releases_id, r.name, r.searchname,
 				r.fromname, r.groups_id, r.categories_id
 				FROM releases r
 				%1\$s
 				AND (r.name %2\$s OR r.searchname %2\$s)
 				AND r.predb_id = 0
-				LIMIT 21",
+				LIMIT 21',
 				$join,
 				$this->pdo->likeString($pre['title'], true, true)
 			)
@@ -965,7 +965,7 @@ class NameFixer
 		if ($total > 0 && $total <= 15 && $res instanceof \Traversable) {
 			foreach ($res as $row) {
 				if ($pre['title'] !== $row['searchname']) {
-					$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['predb_id']);
+					$this->updateRelease($row, $pre['title'], $method = 'Title Match source: ' . $pre['source'], $echo, 'PreDB FT Exact, ', $namestatus, $show, $pre['predb_id']);
 					$matching++;
 				} else {
 					$this->_updateSingleColumn('predb_id', $pre['predb_id'], $row['releases_id']);
@@ -1130,7 +1130,7 @@ class NameFixer
 				);
 			}
 
-			if (isset($pre) && $pre !== false) {
+			if (!empty($pre)) {
 				$release['filename'] = $this->_fileName;
 				if ($pre['title'] !== $release['searchname']) {
 					$this->updateRelease($release, $pre['title'], $method = 'file matched source: ' . $pre['source'], $echo, 'PreDB file match, ', $namestatus, $show, $pre['predb_id']);
@@ -1154,29 +1154,29 @@ class NameFixer
 	{
 
 		// first strip all non-printing chars  from filename
-		$this->_fileName = $this->text->stripNonPrintingChars($this->_fileName);
+		$this->_fileName = Utility::stripNonPrintingChars($this->_fileName);
 
-		if (strlen($this->_fileName) !== false && strlen($this->_fileName) > 0 && strpos($this->_fileName, '.') !== 0) {
+		if (strlen($this->_fileName) > 0 && strpos($this->_fileName, '.') !== 0) {
 			switch (true) {
 
 				case strpos($this->_fileName, '.') !== false:
 					//some filenames start with a period that ends up creating bad matches so we don't process them
-					$this->_fileName = $this->text->cutStringUsingLast('.', $this->_fileName, "left", false);
+					$this->_fileName = Utility::cutStringUsingLast('.', $this->_fileName, 'left', false);
 					continue;
 
 				//if filename has a .part001, send it back to the function to cut the next period
 				case preg_match('/\.part\d+$/', $this->_fileName):
-					$this->_fileName = $this->text->cutStringUsingLast('.', $this->_fileName, "left", false);
+					$this->_fileName = Utility::cutStringUsingLast('.', $this->_fileName, 'left', false);
 					continue;
 
 				//if filename has a .vol001, send it back to the function to cut the next period
 				case preg_match('/\.vol\d+(\+\d+)?$/', $this->_fileName):
-					$this->_fileName = $this->text->cutStringUsingLast('.', $this->_fileName, "left", false);
+					$this->_fileName = Utility::cutStringUsingLast('.', $this->_fileName, "left", false);
 					continue;
 
 				//if filename contains a slash, cut the string and keep string to the right of the last slash to remove dir
 				case strpos($this->_fileName, '\\') !== false:
-					$this->_fileName = $this->text->cutStringUsingLast('\\', $this->_fileName, "right", false);
+					$this->_fileName = Utility::cutStringUsingLast('\\', $this->_fileName, "right", false);
 					continue;
 
 				// A lot of obscured releases have one NFO file properly named with a track number (Audio) at the front of it
@@ -1708,7 +1708,7 @@ class NameFixer
 					}
 					$releasename = $releasename . '.' . $result['audio'];
 				}
-				$releasename = $releasename . '-NoGroup';
+				$releasename .= '-NoGroup';
 				$this->updateRelease($release, $releasename, $method = 'nfoCheck: Title (Year)', $echo, $type, $namestatus, $show);
 			}
 		}
