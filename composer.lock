@@ -4,8 +4,63 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "063043d779c7e515bfa54b4be0809286",
+    "content-hash": "3af81b42bf4a018106309d7bff0b5911",
     "packages": [
+        {
+            "name": "adrenth/thetvdb2",
+            "version": "1.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/adrenth/thetvdb2.git",
+                "reference": "f746cff968f66b88d9f63cd15e036eb6eab2d2b4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/adrenth/thetvdb2/zipball/f746cff968f66b88d9f63cd15e036eb6eab2d2b4",
+                "reference": "f746cff968f66b88d9f63cd15e036eb6eab2d2b4",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.0",
+                "illuminate/support": "^5.2",
+                "php": ">=5.5",
+                "symfony/serializer": "^2.7|^3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8",
+                "symfony/var-dumper": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Adrenth\\Thetvdb\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alwin Drenth",
+                    "email": "adrenth@gmail.com"
+                }
+            ],
+            "description": "API v2 Client for thetvdb.com",
+            "homepage": "http://github.com/adrenth/thetvdb2",
+            "keywords": [
+                "api",
+                "library",
+                "thetvdb",
+                "thetvdb.com"
+            ],
+            "time": "2016-11-29T18:38:40+00:00"
+        },
         {
             "name": "b3rs3rk/steamfront",
             "version": "dev-master",
@@ -1914,16 +1969,16 @@
         },
         {
             "name": "fxp/composer-asset-plugin",
-            "version": "v1.3.0",
+            "version": "v1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/composer-asset-plugin.git",
-                "reference": "4aab26a846e61edca2ba91c9b980f6503f7dc84d"
+                "reference": "0bfdd307d2cddbc42c634b14247f3f3a8525b836"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/4aab26a846e61edca2ba91c9b980f6503f7dc84d",
-                "reference": "4aab26a846e61edca2ba91c9b980f6503f7dc84d",
+                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/0bfdd307d2cddbc42c634b14247f3f3a8525b836",
+                "reference": "0bfdd307d2cddbc42c634b14247f3f3a8525b836",
                 "shasum": ""
             },
             "require": {
@@ -1969,7 +2024,7 @@
                 "npm",
                 "package"
             ],
-            "time": "2017-03-17T11:16:25+00:00"
+            "time": "2017-04-09T11:49:10+00:00"
         },
         {
             "name": "google/recaptcha",
@@ -2022,12 +2077,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "a1c4a74bf31d4e41d783fafb635c806cc19c2e9b"
+                "reference": "b517bd912afa5aa1033ce434d7138641fd6c31ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/a1c4a74bf31d4e41d783fafb635c806cc19c2e9b",
-                "reference": "a1c4a74bf31d4e41d783fafb635c806cc19c2e9b",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/b517bd912afa5aa1033ce434d7138641fd6c31ab",
+                "reference": "b517bd912afa5aa1033ce434d7138641fd6c31ab",
                 "shasum": ""
             },
             "require": {
@@ -2079,7 +2134,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2017-03-22 11:33:29"
+            "time": "2017-04-07 20:03:48"
         },
         {
             "name": "guzzlehttp/promises",
@@ -2196,6 +2251,105 @@
                 "url"
             ],
             "time": "2017-03-20T17:10:46+00:00"
+        },
+        {
+            "name": "illuminate/contracts",
+            "version": "v5.4.17",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminate/contracts.git",
+                "reference": "ab2825726bee46a67c8cc66789852189dbef74a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/illuminate/contracts/zipball/ab2825726bee46a67c8cc66789852189dbef74a9",
+                "reference": "ab2825726bee46a67c8cc66789852189dbef74a9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Illuminate\\Contracts\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "The Illuminate Contracts package.",
+            "homepage": "https://laravel.com",
+            "time": "2017-03-29T13:17:47+00:00"
+        },
+        {
+            "name": "illuminate/support",
+            "version": "v5.4.17",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminate/support.git",
+                "reference": "c7e7c9daf5044e76b46085b8351f8235a3e979c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/illuminate/support/zipball/c7e7c9daf5044e76b46085b8351f8235a3e979c6",
+                "reference": "c7e7c9daf5044e76b46085b8351f8235a3e979c6",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/inflector": "~1.0",
+                "ext-mbstring": "*",
+                "illuminate/contracts": "5.4.*",
+                "paragonie/random_compat": "~1.4|~2.0",
+                "php": ">=5.6.4"
+            },
+            "replace": {
+                "tightenco/collect": "self.version"
+            },
+            "suggest": {
+                "illuminate/filesystem": "Required to use the composer class (5.2.*).",
+                "symfony/process": "Required to use the composer class (~3.2).",
+                "symfony/var-dumper": "Required to use the dd function (~3.2)."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Illuminate\\Support\\": ""
+                },
+                "files": [
+                    "helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "The Illuminate Support package.",
+            "homepage": "https://laravel.com",
+            "time": "2017-03-28T12:49:45+00:00"
         },
         {
             "name": "james-heinrich/getid3",
@@ -2369,46 +2523,6 @@
                 "validation"
             ],
             "time": "2017-01-16T07:02:13+00:00"
-        },
-        {
-            "name": "moinax/tvdb",
-            "version": "v1.0.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Moinax/TvDb.git",
-                "reference": "26f33df9e0ddf9b0b6ba9deeb43f1fa83b483085"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Moinax/TvDb/zipball/26f33df9e0ddf9b0b6ba9deeb43f1fa83b483085",
-                "reference": "26f33df9e0ddf9b0b6ba9deeb43f1fa83b483085",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Moinax\\TvDb": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Moinax",
-                    "email": "moinax@gmail.com"
-                }
-            ],
-            "description": "PHPTVDB is a PHP library for accessing TV show information such as episodes, actors, showtimes and descriptions.",
-            "homepage": "http://moinax.github.io/TvDb/",
-            "keywords": [
-                "api"
-            ],
-            "time": "2016-10-25T08:14:27+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -3483,20 +3597,20 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "5e894ca64a07d03ad1f09230875b621d04405a21"
+                "reference": "e1a4d284032958d51e10cee4c94e7b1e2491b747"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/5e894ca64a07d03ad1f09230875b621d04405a21",
-                "reference": "5e894ca64a07d03ad1f09230875b621d04405a21",
+                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/e1a4d284032958d51e10cee4c94e7b1e2491b747",
+                "reference": "e1a4d284032958d51e10cee4c94e7b1e2491b747",
                 "shasum": ""
             },
             "require": {
                 "composer/installers": "1.*",
-                "php": ">=5.5.14"
+                "php": "^5.6 || ^7.0"
             },
             "require-dev": {
-                "unionofrad/li3_fixtures": "1.0.*"
+                "unionofrad/li3_fixtures": "^1.1"
             },
             "bin": [
                 "console/li3"
@@ -3521,7 +3635,7 @@
                 "li3",
                 "lithium"
             ],
-            "time": "2016-12-01 16:55:39"
+            "time": "2017-04-09 11:20:59"
         }
     ],
     "packages-dev": [
