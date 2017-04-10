@@ -16,40 +16,38 @@ if (isset($argv[1]) && !empty($argv[1]) && isset($argv[2]) && is_numeric($argv[2
 	$episode = (int)$argv[3];
 	$day = (isset($argv[4]) && is_numeric($argv[4]) ? $argv[4] : '');
 
-	$serverTime = $tvdb->client->getServerTime();
-
 	// Search for a show
-	$series = $tvdb->client->getSeries((string)$argv[1]);
+	$series = $tvdb->client->search()->seriesByName((string)$argv[1]);
 
 	// Use the first show found (highest match) and get the requested season/episode from $argv
 	if ($series) {
+		$serie = $series->getData();
+		  print_r($serie);
 
-		echo PHP_EOL . $c->info("Server Time: " . $serverTime) .  PHP_EOL;
-		print_r($series[0]);
 
 		if ($season > 0 && $episode > 0 && $day === '') {
-			$episodeObj = $tvdb->client->getEpisode($series[0]->id, $season, $episode, 'en');
+			$episodeObj = $tvdb->client->series()->getEpisodesWithQuery($serie[0]->getid(), ['airedSeason' => $season, 'airedepisodeNumber' => $episode]);
 			if ($episodeObj) {
 				print_r($episodeObj);
 			}
-		} else if ($season == 0 && $episode == 0) {
-			$episodeObj = $tvdb->client->getSerieEpisodes($series[0]->id, 'en');
+		} else if ($season === 0 && $episode === 0) {
+			$episodeObj = $tvdb->client->series()->getEpisodes($serie[0]->getid());
 			if (is_array($episodeObj['episodes'])) {
 				foreach ($episodeObj['episodes'] AS $ep) {
 					print_r($ep);
 				}
 			}
 		} else if (preg_match('#^(19|20)\d{2}\/\d{2}\/\d{2}$#', $season . '/' . $episode . '/' . $day, $airdate)) {
-			$episodeObj = $tvdb->client->getEpisodeByAirDate($series[0]->id, (string)$airdate[0], 'en');
+			$episodeObj = $tvdb->client->series()->getEpisodesWithQuery($series[0]->id, ['firstAired' => (string)$airdate[0]]);
 			if ($episodeObj) {
 				print_r($episodeObj);
 			}
 		} else {
-			exit($c->error("Invalid episode data returned from TVDB API."));
+			exit($c->error('Invalid episode data returned from TVDB API.'));
 		}
 
 	} else {
-		exit($c->error("Invalid show data returned from TVDB API."));
+		exit($c->error('Invalid show data returned from TVDB API.'));
 	}
 
 } else {

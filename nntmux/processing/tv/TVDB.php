@@ -1,9 +1,9 @@
 <?php
 namespace nntmux\processing\tv;
 
-use Moinax\TvDb\Client;
-use Moinax\TvDb\CurlException;
-use Moinax\TvDb\XmlException;
+use Adrenth\Thetvdb\Client;
+use Adrenth\Thetvdb\Exception\CouldNotLoginException;
+use Adrenth\Thetvdb\Exception\UnauthorizedException;
 use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
 
@@ -12,14 +12,19 @@ use nntmux\ReleaseImage;
  */
 class TVDB extends TV
 {
-	const TVDB_URL = 'http://thetvdb.com';
+	const TVDB_URL = 'http://api.thetvdb.com';
 	const TVDB_API_KEY = '5296B37AEC35913D';
 	const MATCH_PROBABILITY = 75;
 
 	/**
-	 * @var \Moinax\TvDb\Client
+	 * @var Client
 	 */
 	public $client;
+
+	/**
+	 * @var string Authorization token for TVDB v2 API
+	 */
+	public $token;
 
 	/**
 	 * @string URL for show poster art
@@ -47,25 +52,25 @@ class TVDB extends TV
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->client = new Client(self::TVDB_URL, self::TVDB_API_KEY);
-		$this->posterUrl = self::TVDB_URL . DS . 'banners/_cache/posters/%s-1.jpg';
-		$this->fanartUrl = self::TVDB_URL . DS . 'banners/_cache/fanart/original/%s-1.jpg';
+		$this->client = new Client();
+		$this->client->setLanguage('en');
+		$this->posterUrl = self::TVDB_URL . DS . 'graphical/%s-g.jpg';
 		$this->local = false;
 
 		// Check if we can get the time for API status
 		// If we can't then we set local to true
 		try {
-			$this->serverTime = $this->client->getServerTime();
-		} catch (CurlException $error) {
-			if (strpos($error->getMessage(), 'Cannot fetch') === 0) {
-				echo ColorCLI::warning('Could not reach TVDB API. Running in local mode only!');
-				$this->local = true;
-			}
-		} catch (XmlException $error) {
-			if (strpos($error->getMessage(), 'Error in file') === 0) {
-				echo ColorCLI::warning('Bad response from TVDB API. Running in local mode only!');
-				$this->local = true;
-			}
+			$this->token = $this->client->authentication()->login(self::TVDB_API_KEY);
+		} catch (CouldNotLoginException $error) {
+			echo ColorCLI::warning('Could not reach TVDB API. Running in local mode only!');
+			$this->local = true;
+		} catch (UnauthorizedException $error) {
+			echo ColorCLI::warning('Bad response from TVDB API. Running in local mode only!');
+			$this->local = true;
+		}
+
+		if (strlen($this->token) > 0) {
+			$this->client->setToken($this->token);
 		}
 	}
 
@@ -85,7 +90,7 @@ class TVDB extends TV
 		$tvcount = $res->rowCount();
 
 		if ($this->echooutput && $tvcount > 0) {
-			echo ColorCLI::header("Processing TVDB lookup for " . number_format($tvcount) . " release(s).");
+			echo ColorCLI::header('Processing TVDB lookup for ' . number_format($tvcount) . ' release(s).');
 		}
 
 		if ($res instanceof \Traversable) {
@@ -100,11 +105,11 @@ class TVDB extends TV
 				$release = $this->parseInfo($row['searchname']);
 				if (is_array($release) && $release['name'] != '') {
 
-					if (in_array($release['cleanname'], $this->titleCache)) {
+					if (in_array($release['cleanname'], $this->titleCache, false)) {
 						if ($this->echooutput) {
-							echo ColorCLI::headerOver("Title: ") .
-									ColorCLI::warningOver('"' . $release['cleanname'] . '"') .
-									ColorCLI::header(" already failed lookup for this site.  Skipping.");
+							echo ColorCLI::headerOver('Title: ') .
+									ColorCLI::warningOver($release['cleanname']) .
+									ColorCLI::header(' already failed lookup for this site.  Skipping.');
 						}
 						$this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
 						continue;
@@ -128,9 +133,9 @@ class TVDB extends TV
 
 						// If it doesnt exist locally and lookups are allowed lets try to get it.
 						if ($this->echooutput) {
-							echo ColorCLI::primaryOver("Video ID for ") .
+							echo ColorCLI::primaryOver('Video ID for ') .
 								ColorCLI::headerOver($release['cleanname']) .
-								ColorCLI::primary(" not found in local db, checking web.");
+								ColorCLI::primary(' not found in local db, checking web.');
 						}
 
 						// Check if we have a valid country and set it in the array
@@ -149,9 +154,9 @@ class TVDB extends TV
 						}
 
 					} else if ($this->echooutput && $tvdbid !== false) {
-						echo ColorCLI::primaryOver("Video ID for ") .
+						echo ColorCLI::primaryOver('Video ID for ') .
 							ColorCLI::headerOver($release['cleanname']) .
-							ColorCLI::primary(" found in local db, attempting episode match.");
+							ColorCLI::primary(' found in local db, attempting episode match.');
 					}
 
 					if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvdbid) && $tvdbid > 0) {
@@ -164,7 +169,7 @@ class TVDB extends TV
 						if ($episodeNo === 'all') {
 							// Set the video ID and leave episode 0
 							$this->setVideoIdFound($videoId, $row['id'], 0);
-							echo ColorCLI::primary("Found TVDB Match for Full Season!");
+							echo ColorCLI::primary('Found TVDB Match for Full Season!');
 							continue;
 						}
 
@@ -194,7 +199,7 @@ class TVDB extends TV
 							// Mark the releases video and episode IDs
 							$this->setVideoIdFound($videoId, $row['id'], $episode);
 							if ($this->echooutput) {
-								echo ColorCLI::primary("Found TVDB Match!");
+								echo ColorCLI::primary('Found TVDB Match!');
 							}
 						} else {
 							//Processing failed, set the episode ID to the next processing group
@@ -242,38 +247,27 @@ class TVDB extends TV
 		$return = $response = false;
 		$highestMatch = 0;
 		try {
-			$response = (array)$this->client->getSeries($cleanName, 'en');
-		} catch (CurlException $error) {
-			if (strpos($error->getMessage(), 'Cannot fetch') === 0) {
-				//Do nothing as there is a second chance
-			}
-		} catch (XmlException $error) {
-			if (strpos($error->getMessage(), 'Error in file') === 0) {
-				//Do nothing as there is a second chance
-			}
+			$response = $this->client->search()->seriesByName($cleanName);
+		} catch (\Exception $error) {
+			echo $error->getMessage();
 		}
+
 
 		if ($response === false && $country !== '') {
 			try {
-				$response = (array)$this->client->getSeries(rtrim(str_replace($country, '', $cleanName)), 'en');
-			} catch (CurlException $error) {
-				if (strpos($error->getMessage(), 'Cannot fetch') === 0) {
-					return false;
-				}
-			} catch (XmlException $error) {
-				if (strpos($error->getMessage(), 'Error in file') === 0) {
-					return false;
-				}
+				$response = $this->client->search()->seriesByName(rtrim(str_replace($country, '', $cleanName)));
+			} catch (\Exception $error) {
+				echo $error->getMessage();
 			}
 		}
 
 		sleep(1);
 
 		if (is_array($response)) {
-			foreach ($response as $show) {
+			foreach ($response->getData() as $show) {
 				if ($this->checkRequiredAttr($show, 'tvdbS')) {
 					// Check for exact title match first and then terminate if found
-					if (strtolower($show->name) === strtolower($cleanName)) {
+					if (strtolower($show->getSeriesName()) === strtolower($cleanName)) {
 						$highest = $show;
 						break;
 					}
@@ -288,9 +282,9 @@ class TVDB extends TV
 					}
 
 					// Check for show aliases and try match those too
-					if (!empty($show->aliasNames)) {
-						foreach ($show->aliasNames as $key => $name) {
-							$matchPercent = $this->CheckMatch(strtolower($name), strtolower($cleanName), $matchPercent);
+					if (!empty($show->getAliases())) {
+						foreach ($show->getAliases() as $key => $name) {
+							$matchPercent = $this->checkMatch(strtolower($name), strtolower($cleanName), $matchPercent);
 							if ($matchPercent > $highestMatch) {
 								$highestMatch = $matchPercent;
 								$highest = $show;
@@ -351,49 +345,31 @@ class TVDB extends TV
 
 		if ($airdate !== '') {
 			try {
-				$response = $this->client->getEpisodeByAirDate($tvdbid, $airdate);
-			} catch (CurlException $error) {
-				if (strpos($error->getMessage(), 'Cannot fetch') === 0) {
-					return false;
-				}
-			} catch (XmlException $error) {
-				if (strpos($error->getMessage(), 'Error in file') === 0) {
-					return false;
-				}
+				$response = $this->client->series()->getEpisodesWithQuery($tvdbid, ['lastAired' => $airdate]);
+			} catch (\Exception $error) {
+				echo $error->getMessage();
 			}
 		} else if ($videoId > 0) {
 			try {
-				$response = $this->client->getSerieEpisodes($tvdbid, 'en');
-			} catch (CurlException $error) {
-				if (strpos($error->getMessage(), 'Cannot fetch') === 0) {
-					return false;
-				}
-			} catch (XmlException $error) {
-				if (strpos($error->getMessage(), 'Error in file') === 0) {
-					return false;
-				}
+				$response = $this->client->series()->getEpisodes($tvdbid);
+			} catch (\Exception $error) {
+				echo $error->getMessage();
 			}
 		} else {
 			try {
-				$response = $this->client->getEpisode($tvdbid, $season, $episode);
-			} catch (CurlException $error) {
-				if (strpos($error->getMessage(), 'Cannot fetch') === 0) {
-					return false;
-				}
-			} catch (XmlException $error) {
-				if (strpos($error->getMessage(), 'Error in file') === 0) {
-					return false;
-				}
+				$response = $this->client->series()->getEpisodesWithQuery($tvdbid, ['airedSeason' => $season, 'airedEpsiodeNumber' => $episode]);
+			} catch (\Exception $error) {
+				echo $error->getMessage();
 			}
 		}
 
 		sleep(1);
 
-		if (is_object($response)) {
+		if (is_object($response->getData())) {
 			if ($this->checkRequiredAttr($response, 'tvdbE')) {
 				$return = $this->formatEpisodeInfo($response);
 			}
-		} else if (is_array($response) && isset($response['episodes']) && $videoId > 0) {
+		} else if (is_array($response->getData()) && isset($response['episodes']) && $videoId > 0) {
 			foreach ($response['episodes'] as $singleEpisode) {
 				if ($this->checkRequiredAttr($singleEpisode, 'tvdbE')) {
 					$this->addEpisode($videoId, $this->formatEpisodeInfo($singleEpisode));
@@ -414,6 +390,7 @@ class TVDB extends TV
 	 */
 	protected function formatShowInfo($show)
 	{
+		$show = $show->getData();
 		preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
 
 		return [
@@ -423,13 +400,13 @@ class TVDB extends TV
 			'started'   => $show->firstAired->format('Y-m-d'),
 			'publisher' => (string)$show->network,
 			'source'    => (int)parent::SOURCE_TVDB,
-			'imdb'      => (int)(isset($imdb['imdbid']) ? $imdb['imdbid'] : 0),
-			'tvdb'      => (int)$show->id,
+			'imdb'      => (int)($imdb['imdbid'] ?? 0),
+			'tvdb'      => (int)$show->getid(),
 			'trakt'     => 0,
 			'tvrage'    => 0,
 			'tvmaze'    => 0,
 			'tmdb'      => 0,
-			'aliases'   => (!empty($show->aliasNames) ? (array)$show->aliasNames : ''),
+			'aliases'   => (!empty($show->getAliases()) ? $show->getAliases() : ''),
 			'localzone' => "''"
 		];
 	}
