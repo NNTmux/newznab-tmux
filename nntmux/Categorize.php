@@ -1042,6 +1042,8 @@ class Categorize extends Category
 		switch(true) {
 			case $this->checkPoster( '/oz@lot[.]com/i', $this->poster, Category::XXX_CLIPSD):
 				return true;
+			case $this->checkPoster( '/anon@y[.]com/i', $this->poster, Category::XXX_CLIPSD):
+				return true;
 			case stripos($this->releaseName, 'SDPORN') !== false:
 				$this->tmpCat = Category::XXX_CLIPSD;
 				return true;
