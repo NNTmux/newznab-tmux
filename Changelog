@@ -1,4 +1,5 @@
 2017-04-11 DariusIII
+	* Chg: Adjust TMDB class
 	* Chg: Add exceptions handling, fix incorrect library usage
 2017-04-10 DariusIII
 	* Chg: Update Tv, TVDB classes for new TVDB v2 library

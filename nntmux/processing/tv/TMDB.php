@@ -95,7 +95,7 @@ class TMDB extends TV
 		$tvcount = $res->rowCount();
 
 		if ($this->echooutput && $tvcount > 0) {
-			echo ColorCLI::header("Processing TMDB lookup for " . number_format($tvcount) . " release(s).");
+			echo ColorCLI::header('Processing TMDB lookup for ' . number_format($tvcount) . ' release(s).');
 		}
 
 		if ($res instanceof \Traversable) {
@@ -114,9 +114,9 @@ class TMDB extends TV
 
 					if (in_array($release['cleanname'], $this->titleCache)) {
 						if ($this->echooutput) {
-							echo ColorCLI::headerOver("Title: ") .
-									ColorCLI::warningOver('"' . $release['cleanname'] . '"') .
-									ColorCLI::header(" already failed lookup for this site.  Skipping.");
+							echo ColorCLI::headerOver('Title: ') .
+									ColorCLI::warningOver($release['cleanname']) .
+									ColorCLI::header(' already failed lookup for this site.  Skipping.');
 						}
 						$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
 						continue;
@@ -126,7 +126,7 @@ class TMDB extends TV
 					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV, parent::SOURCE_TMDB);
 
 					// Force local lookup only
-					if ($local == true) {
+					if ($local === true) {
 						$lookupSetting = false;
 					} else {
 						$lookupSetting = true;
@@ -135,9 +135,9 @@ class TMDB extends TV
 					// If lookups are allowed lets try to get it.
 					if ($videoId === false && $lookupSetting) {
 						if ($this->echooutput) {
-							echo ColorCLI::primaryOver("Checking TMDB for previously failed title: ") .
+							echo ColorCLI::primaryOver('Checking TMDB for previously failed title: ') .
 									ColorCLI::headerOver($release['cleanname']) .
-									ColorCLI::primary(".");
+									ColorCLI::primary('.');
 						}
 
 						// Get the show from TMDB
@@ -158,9 +158,9 @@ class TMDB extends TV
 						}
 					} else {
 						if ($this->echooutput) {
-							echo ColorCLI::primaryOver("Found local TMDB match for: ") .
+							echo ColorCLI::primaryOver('Found local TMDB match for: ') .
 									ColorCLI::headerOver($release['cleanname']) .
-									ColorCLI::primary(".  Attempting episode lookup!");
+									ColorCLI::primary('.  Attempting episode lookup!');
 						}
 						$tmdbid = $this->getSiteIDFromVideoID('tmdb', $videoId);
 					}
@@ -175,7 +175,7 @@ class TMDB extends TV
 						if ($episodeNo === 'all') {
 							// Set the video ID and leave episode 0
 							$this->setVideoIdFound($videoId, $row['id'], 0);
-							echo ColorCLI::primary("Found TMDB Match for Full Season!");
+							echo ColorCLI::primary('Found TMDB Match for Full Season!');
 							continue;
 						}
 
@@ -205,7 +205,7 @@ class TMDB extends TV
 							// Mark the releases video and episode IDs
 							$this->setVideoIdFound($videoId, $row['id'], $episode);
 							if ($this->echooutput) {
-								echo ColorCLI::primary("Found TMDB Match!");
+								echo ColorCLI::primary('Found TMDB Match!');
 							}
 							continue;
 						} else {
@@ -246,8 +246,8 @@ class TMDB extends TV
 
 		sleep(1);
 
-		if (is_array($response) && !empty($response)) {
-			$return = $this->matchShowInfo($response, $cleanName);
+		if (is_array($response) && !empty($response['results'])) {
+			$return = $this->matchShowInfo($response['results'], $cleanName);
 		}
 		return $return;
 	}
@@ -294,12 +294,12 @@ class TMDB extends TV
 				return false;
 			}
 
-			if (isset($showAlternativeTitles['alternative_titles']['results']) && is_array($showAlternativeTitles['alternative_titles']['results'])) {
-				foreach ($showAlternativeTitles['alternative_titles']['results'] AS $aka) {
+			if (isset($showAlternativeTitles) && is_array($showAlternativeTitles)) {
+				foreach ($showAlternativeTitles AS $aka) {
 					$highest['alternative_titles'][] = $aka['title'];
 				}
 				$highest['network'] = $show['networks'][0]['name'] ?? '';
-				$highest['external_ids'] = $showExternalIds['external_ids'];
+				$highest['external_ids'] = $showExternalIds;
 			}
 			$return = $this->formatShowInfo($highest);
 		}
