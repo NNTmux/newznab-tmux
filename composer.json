@@ -142,7 +142,8 @@
   },
 
   "require-dev": {
-    "unionofrad/manual": "1.1.x-dev"
+    "unionofrad/manual": "1.1.x-dev",
+    "php-console/php-console": "^3.1"
   },
 
   "scripts": {
