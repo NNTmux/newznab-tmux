@@ -3,6 +3,10 @@
 require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\processing\tv\TVDB;
+use Adrenth\Thetvdb\Exception\InvalidArgumentException;
+use Adrenth\Thetvdb\Exception\InvalidJsonInResponseException;
+use Adrenth\Thetvdb\Exception\RequestFailedException;
+use Adrenth\Thetvdb\Exception\UnauthorizedException;
 
 $c = new nntmux\ColorCLI();
 $tvdb = new TVDB();
@@ -26,14 +30,30 @@ if (isset($argv[1]) && !empty($argv[1]) && isset($argv[2]) && is_numeric($argv[2
 
 
 		if ($season > 0 && $episode > 0 && $day === '') {
-			$episodeObj = $tvdb->client->series()->getEpisodesWithQuery($serie[0]->getid(), ['airedSeason' => $season, 'airedepisodeNumber' => $episode]);
+			try {
+				$episodeObj = $tvdb->client->series()->getEpisodesWithQuery($serie[0]->getid(), ['airedSeason' => $season, 'airedEpisode' => $episode]);
+			} catch (InvalidArgumentException $error) {
+				echo 'Invalid argument(s) used' . PHP_EOL;
+				return false;
+			} catch (InvalidJsonInResponseException $error) {
+				if (strpos($error->getMessage(), 'Could not decode JSON data') === 0 || strpos($error->getMessage(), 'Incorrect data structure') === 0) {
+					return false;
+				}
+			} catch (RequestFailedException $error) {
+				return false;
+			} catch (UnauthorizedException $error) {
+				if (strpos($error->getMessage(), 'Unauthorized') === 0) {
+					return false;
+				}
+			}
+
 			if ($episodeObj) {
 				print_r($episodeObj);
 			}
 		} else if ($season === 0 && $episode === 0) {
 			$episodeObj = $tvdb->client->series()->getEpisodes($serie[0]->getid());
-			if (is_array($episodeObj['episodes'])) {
-				foreach ($episodeObj['episodes'] AS $ep) {
+			if (is_object($episodeObj)) {
+				foreach ($episodeObj->getData() AS $ep) {
 					print_r($ep);
 				}
 			}
@@ -51,7 +71,7 @@ if (isset($argv[1]) && !empty($argv[1]) && isset($argv[2]) && is_numeric($argv[2
 	}
 
 } else {
-	exit($c->error("Invalid arguments. This script requires a text string (show name) followed by a season and episode number." . PHP_EOL .
-		"You can also optionally supply 'YYYY' 'MM' 'DD' arguments instead of season/episode for an airdate lookup.")
+	exit($c->error('Invalid arguments. This script requires a text string (show name) followed by a season and episode number.' . PHP_EOL .
+		'You can also optionally supply "YYYY" "MM" "DD" arguments instead of season/episode for an airdate lookup.')
 	);
 }

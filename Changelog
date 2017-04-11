@@ -1,3 +1,5 @@
+2017-04-11 DariusIII
+	* Chg: Add exceptions handling, fix incorrect library usage
 2017-04-10 DariusIII
 	* Chg: Update Tv, TVDB classes for new TVDB v2 library
 	* Chg: Update fxp-assest-plugin, guzzlehttp, remove moinax/tvdb add adrenth/thetvdb2 for thetvdb api v2 support

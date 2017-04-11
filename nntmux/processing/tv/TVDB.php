@@ -3,6 +3,9 @@ namespace nntmux\processing\tv;
 
 use Adrenth\Thetvdb\Client;
 use Adrenth\Thetvdb\Exception\CouldNotLoginException;
+use Adrenth\Thetvdb\Exception\InvalidArgumentException;
+use Adrenth\Thetvdb\Exception\InvalidJsonInResponseException;
+use Adrenth\Thetvdb\Exception\RequestFailedException;
 use Adrenth\Thetvdb\Exception\UnauthorizedException;
 use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
@@ -55,6 +58,7 @@ class TVDB extends TV
 		$this->client = new Client();
 		$this->client->setLanguage('en');
 		$this->posterUrl = self::TVDB_URL . DS . 'graphical/%s-g.jpg';
+		$this->fanartUrl = self::TVDB_URL . DS . '_cache/fanart/original/%s-3.jpg';
 		$this->local = false;
 
 		// Check if we can get the time for API status
@@ -248,16 +252,36 @@ class TVDB extends TV
 		$highestMatch = 0;
 		try {
 			$response = $this->client->search()->seriesByName($cleanName);
-		} catch (\Exception $error) {
-			echo $error->getMessage();
+		} catch (InvalidArgumentException $error) {
+			return false;
+		} catch (InvalidJsonInResponseException $error) {
+			if (strpos($error->getMessage(), 'Could not decode JSON data') === 0 || strpos($error->getMessage(), 'Incorrect data structure') === 0) {
+				return false;
+			}
+		} catch (RequestFailedException $error) {
+			return false;
+		} catch (UnauthorizedException $error) {
+			if (strpos($error->getMessage(), 'Unauthorized') === 0) {
+				return false;
+			}
 		}
 
 
 		if ($response === false && $country !== '') {
 			try {
 				$response = $this->client->search()->seriesByName(rtrim(str_replace($country, '', $cleanName)));
-			} catch (\Exception $error) {
-				echo $error->getMessage();
+			} catch (InvalidArgumentException $error) {
+				return false;
+			} catch (InvalidJsonInResponseException $error) {
+				if (strpos($error->getMessage(), 'Could not decode JSON data') === 0 || strpos($error->getMessage(), 'Incorrect data structure') === 0) {
+					return false;
+				}
+			} catch (RequestFailedException $error) {
+				return false;
+			} catch (UnauthorizedException $error) {
+				if (strpos($error->getMessage(), 'Unauthorized') === 0) {
+					return false;
+				}
 			}
 		}
 
@@ -273,7 +297,7 @@ class TVDB extends TV
 					}
 
 					// Check each show title for similarity and then find the highest similar value
-					$matchPercent = $this->checkMatch(strtolower($show->name), strtolower($cleanName), self::MATCH_PROBABILITY);
+					$matchPercent = $this->checkMatch(strtolower($show->getSeriesName()), strtolower($cleanName), self::MATCH_PROBABILITY);
 
 					// If new match has a higher percentage, set as new matched title
 					if ($matchPercent > $highestMatch) {
@@ -293,7 +317,7 @@ class TVDB extends TV
 					}
 				}
 			}
-			if (isset($highest)) {
+			if (!empty($highest)) {
 				$return = $this->formatShowInfo($highest);
 			}
 		}
@@ -345,32 +369,62 @@ class TVDB extends TV
 
 		if ($airdate !== '') {
 			try {
-				$response = $this->client->series()->getEpisodesWithQuery($tvdbid, ['lastAired' => $airdate]);
-			} catch (\Exception $error) {
-				echo $error->getMessage();
+				$response = $this->client->series()->getEpisodesWithQuery($tvdbid, ['firstAired' => $airdate]);
+			} catch (InvalidArgumentException $error) {
+				return false;
+			} catch (InvalidJsonInResponseException $error) {
+				if (strpos($error->getMessage(), 'Could not decode JSON data') === 0 || strpos($error->getMessage(), 'Incorrect data structure') === 0) {
+					return false;
+				}
+			} catch (RequestFailedException $error) {
+				return false;
+			} catch (UnauthorizedException $error) {
+				if (strpos($error->getMessage(), 'Unauthorized') === 0) {
+					return false;
+				}
 			}
 		} else if ($videoId > 0) {
 			try {
 				$response = $this->client->series()->getEpisodes($tvdbid);
-			} catch (\Exception $error) {
-				echo $error->getMessage();
+			} catch (InvalidArgumentException $error) {
+				return false;
+			} catch (InvalidJsonInResponseException $error) {
+				if (strpos($error->getMessage(), 'Could not decode JSON data') === 0 || strpos($error->getMessage(), 'Incorrect data structure') === 0) {
+					return false;
+				}
+			} catch (RequestFailedException $error) {
+				return false;
+			} catch (UnauthorizedException $error) {
+				if (strpos($error->getMessage(), 'Unauthorized') === 0) {
+					return false;
+				}
 			}
 		} else {
 			try {
-				$response = $this->client->series()->getEpisodesWithQuery($tvdbid, ['airedSeason' => $season, 'airedEpsiodeNumber' => $episode]);
-			} catch (\Exception $error) {
-				echo $error->getMessage();
+				$response = $this->client->series()->getEpisodesWithQuery($tvdbid, ['airedSeason' => $season, 'airedEpisode' => $episode]);
+			} catch (InvalidArgumentException $error) {
+				return false;
+			} catch (InvalidJsonInResponseException $error) {
+				if (strpos($error->getMessage(), 'Could not decode JSON data') === 0 || strpos($error->getMessage(), 'Incorrect data structure') === 0) {
+					return false;
+				}
+			} catch (RequestFailedException $error) {
+				return false;
+			} catch (UnauthorizedException $error) {
+				if (strpos($error->getMessage(), 'Unauthorized') === 0) {
+					return false;
+				}
 			}
 		}
 
 		sleep(1);
 
 		if (is_object($response->getData())) {
-			if ($this->checkRequiredAttr($response, 'tvdbE')) {
+			if ($this->checkRequiredAttr($response->getData(), 'tvdbE')) {
 				$return = $this->formatEpisodeInfo($response);
 			}
-		} else if (is_array($response->getData()) && isset($response['episodes']) && $videoId > 0) {
-			foreach ($response['episodes'] as $singleEpisode) {
+		} else if ($videoId > 0 && is_array($response->getData())) {
+			foreach ($response->getData() as $singleEpisode) {
 				if ($this->checkRequiredAttr($singleEpisode, 'tvdbE')) {
 					$this->addEpisode($videoId, $this->formatEpisodeInfo($singleEpisode));
 				}
@@ -390,15 +444,14 @@ class TVDB extends TV
 	 */
 	protected function formatShowInfo($show)
 	{
-		$show = $show->getData();
 		preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
 
 		return [
 			'type'      => (int)parent::TYPE_TV,
-			'title'     => (string)$show->name,
-			'summary'   => (string)$show->overview,
+			'title'     => (string)$show->getSeriesName(),
+			'summary'   => (string)$show->getOverview(),
 			'started'   => $show->firstAired->format('Y-m-d'),
-			'publisher' => (string)$show->network,
+			'publisher' => (string)$show->getNetwork(),
 			'source'    => (int)parent::SOURCE_TVDB,
 			'imdb'      => (int)($imdb['imdbid'] ?? 0),
 			'tvdb'      => (int)$show->getid(),

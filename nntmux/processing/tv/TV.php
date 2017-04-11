@@ -782,7 +782,7 @@ abstract class TV extends Videos
 				$required = ['id', 'seriesName', 'overview', 'firstAired'];
 				break;
 			case 'tvdbE':
-				$required = ['episodeName', 'airedSeason', 'airedEpisodeNumber', 'firstAired', 'overview'];
+				$required = ['episodeName', 'airedSeason', 'airedEpisode', 'firstAired', 'overview'];
 				break;
 			case 'tvmazeS':
 				$required = ['id', 'name', 'summary', 'premiered', 'country'];
