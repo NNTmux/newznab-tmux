@@ -1,4 +1,5 @@
 2017-04-11 DariusIII
+	* Chg: Use proper project API key for TheTVDB
 	* Chg: Adjust TMDB class
 	* Chg: Add exceptions handling, fix incorrect library usage
 2017-04-10 DariusIII
