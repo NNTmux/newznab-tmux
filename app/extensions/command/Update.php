@@ -195,9 +195,11 @@ class Update extends Command
 	protected function composer()
 	{
 		$this->initialiseGit();
-		$command = 'composer install --prefer-source';
-		if (in_array($this->gitBranch, $this->git->getBranchesStable(), false)) {
-			$command .= ' --no-dev';
+		$command = 'composer install';
+		if (in_array($this->gitBranch, $this->git->getBranchesStable())) {
+			$command .= ' --prefer-dist --no-dev';
+		} else {
+			$command .= ' --prefer-source';
 		}
 		$this->out('Running composer install process...', 'primary');
 		system($command, $status);
