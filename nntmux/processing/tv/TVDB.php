@@ -40,11 +40,6 @@ class TVDB extends TV
 	public $fanartUrl;
 
 	/**
-	 * @string The Timestamp of the TVDB Server
-	 */
-	private $serverTime;
-
-	/**
 	 * @bool Do a local lookup only if server is down
 	 */
 	private $local;
