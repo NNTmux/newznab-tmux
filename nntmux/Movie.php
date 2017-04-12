@@ -1175,7 +1175,7 @@ class Movie
 					}
 
 					// Check OMDB api.
-					$buffer = $this->omdb->search($this->currentTitle, 'movies', $this->currentYear !== false ? $this->currentYear : '');
+					$buffer = $this->omdb->search($this->currentTitle, 'movies',  $this->currentYear !== false ? "'" . $this->currentYear . "'" : '');
 
 					if (!empty($buffer) && $buffer->data->Response !== 'False') {
 						$getIMDBid = $buffer->data->Search[0]->imdbID;
