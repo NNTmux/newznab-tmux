@@ -68,7 +68,7 @@ class TVMaze extends TV
 		$tvcount = $res->rowCount();
 
 		if ($this->echooutput && $tvcount > 0) {
-			echo ColorCLI::header("Processing TVMaze lookup for " . number_format($tvcount) . " release(s).");
+			echo ColorCLI::header('Processing TVMaze lookup for ' . number_format($tvcount) . ' release(s).');
 		}
 
 		if ($res instanceof \Traversable) {
@@ -86,9 +86,9 @@ class TVMaze extends TV
 
 					if (in_array($release['cleanname'], $this->titleCache)) {
 						if ($this->echooutput) {
-							echo ColorCLI::headerOver("Title: ") .
-									ColorCLI::warningOver('"' . $release['cleanname'] . '"') .
-									ColorCLI::header(" already failed lookup for this site.  Skipping.");
+							echo ColorCLI::headerOver('Title: ') .
+									ColorCLI::warningOver($release['cleanname']) .
+									ColorCLI::header(' already failed lookup for this site.  Skipping.');
 						}
 						$this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
 						continue;
@@ -98,7 +98,7 @@ class TVMaze extends TV
 					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV, parent::SOURCE_TVMAZE);
 
 					// Force local lookup only
-					if ($local == true) {
+					if ($local === true) {
 						$lookupSetting = false;
 					} else {
 						$lookupSetting = true;
@@ -107,9 +107,9 @@ class TVMaze extends TV
 					if ($videoId === false && $lookupSetting) {
 						// If lookups are allowed lets try to get it.
 						if ($this->echooutput) {
-							echo ColorCLI::primaryOver("Checking TVMaze for previously failed title: ") .
+							echo ColorCLI::primaryOver('Checking TVMaze for previously failed title: ') .
 									ColorCLI::headerOver($release['cleanname']) .
-									ColorCLI::primary(".");
+									ColorCLI::primary('.');
 						}
 
 						// Get the show from TVMaze
@@ -133,9 +133,9 @@ class TVMaze extends TV
 						}
 					} else {
 						if ($this->echooutput) {
-							echo ColorCLI::primaryOver("Found local TVMaze match for: ") .
+							echo ColorCLI::primaryOver('Found local TVMaze match for: ') .
 									ColorCLI::headerOver($release['cleanname']) .
-									ColorCLI::primary(".  Attempting episode lookup!");
+									ColorCLI::primary('.  Attempting episode lookup!');
 						}
 						$tvmazeid = $this->getSiteIDFromVideoID('tvmaze', $videoId);
 					}
@@ -150,7 +150,7 @@ class TVMaze extends TV
 						if ($episodeNo === 'all') {
 							// Set the video ID and leave episode 0
 							$this->setVideoIdFound($videoId, $row['id'], 0);
-							echo ColorCLI::primary("Found TVDB Match for Full Season!");
+							echo ColorCLI::primary('Found TVMaze Match for Full Season!');
 							continue;
 						}
 
@@ -180,7 +180,7 @@ class TVMaze extends TV
 							// Mark the releases video and episode IDs
 							$this->setVideoIdFound($videoId, $row['id'], $episode);
 							if ($this->echooutput) {
-								echo ColorCLI::primary("Found TVMaze Match!");
+								echo ColorCLI::primary('Found TVMaze Match!');
 							}
 							continue;
 						} else {
@@ -325,7 +325,7 @@ class TVMaze extends TV
 		$hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '');
 
 		// Mark it retrieved if we saved an image
-		if ($hascover == 1) {
+		if ($hascover === 1) {
 			$this->setCoverFound($videoId);
 		}
 		return $hascover;
@@ -401,12 +401,12 @@ class TVMaze extends TV
 			'country'   => (string)$show->country,
 			'source'    => (int)parent::SOURCE_TVMAZE,
 			'imdb'      => 0,
-			'tvdb'      => (int)(isset($show->externalIDs['thetvdb']) ? $show->externalIDs['thetvdb'] : 0),
+			'tvdb'      => (int)($show->externalIDs['thetvdb'] ?? 0),
 			'tvmaze'    => (int)$show->id,
 			'trakt'     => 0,
-			'tvrage'    => (int)(isset($show->externalIDs['tvrage']) ? $show->externalIDs['tvrage'] : 0),
+			'tvrage'    => (int)($show->externalIDs['tvrage'] ?? 0),
 			'tmdb'      => 0,
-			'aliases'   => (!empty($show->akas) ? (array)$show->akas : ''),
+			'aliases'   => !empty($show->akas) ? (array)$show->akas : '',
 			'localzone' => "''"
 		];
 	}
