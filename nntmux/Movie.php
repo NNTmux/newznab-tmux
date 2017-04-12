@@ -6,6 +6,7 @@ use aharen\OMDbAPI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use nntmux\db\DB;
+use nntmux\libraries\FanartTV;
 use nntmux\utility\Utility;
 use nntmux\processing\tv\TraktTv;
 use Tmdb\ApiToken;
@@ -173,10 +174,11 @@ class Movie
 		]
 		);
 		$this->omdb = new OMDbAPI();
+		$this->fanartapikey = Settings::value('APIs..fanarttvkey');
+		$this->fanart = new FanartTV($this->fanartapikey);
 
 		$this->lookuplanguage = Settings::value('indexer.categorise.imdblanguage') != '' ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
 
-		$this->fanartapikey = Settings::value('APIs..fanarttvkey');
 		$this->imdburl = Settings::value('indexer.categorise.imdburl') == 0 ? false : true;
 		$this->movieqty = Settings::value('..maximdbprocessed') != '' ? Settings::value('..maximdbprocessed') : 100;
 		$this->searchEngines = true;
@@ -793,24 +795,11 @@ class Movie
 	 */
 	protected function fetchFanartTVProperties($imdbId)
 	{
-		if ($this->fanartapikey != '')
+		if ($this->fanartapikey !== '')
 		{
-			try {
-				$buffer = $this->client->get('https://webservice.fanart.tv/v3/movies/' . 'tt' . $imdbId . '?api_key=' . $this->fanartapikey)->getBody()->getContents();
-			} catch (RequestException $e) {
-				if ($e->hasResponse()) {
-					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
-					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
-					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
-					}
-				}
-			}
+			$buffer = $this->fanart->getMovieFanart('tt' . $imdbId);
 
 			if (isset($buffer) && $buffer !== false) {
-				$art = json_decode($buffer, true);
 				if (isset($art['status']) && $art['status'] === 'error') {
 					return false;
 				}
@@ -827,13 +816,13 @@ class Movie
 					$ret['banner'] = $art['moviebanner'][0]['url'];
 				}
 
-				if (isset($ret['backdrop']) && isset($ret['cover'])) {
+				if (isset($ret['backdrop'], $ret['cover'])) {
 					$ret['title'] = $imdbId;
 					if (isset($art['name'])) {
 						$ret['title'] = $art['name'];
 					}
 					if ($this->echooutput) {
-						ColorCLI::doEcho(ColorCLI::alternateOver("Fanart Found ") . ColorCLI::headerOver($ret['title']), true);
+						ColorCLI::doEcho(ColorCLI::alternateOver('Fanart Found ') . ColorCLI::headerOver($ret['title']), true);
 					}
 					return $ret;
 				}

@@ -1,4 +1,5 @@
 2017-04-12 DariusIII
+	* Chg: Add new Fanart.TV class for handling API requests to Fanart.TV, adjust Movie class to use it
 	* Chg: Adjust viewnzb templates in Charisma/Gentele/omicron themes
 	* Chg: Add aharen/omdbapi library and use it in Movies class to retrieve data from OMDb
 2017-04-11 DariusIII
