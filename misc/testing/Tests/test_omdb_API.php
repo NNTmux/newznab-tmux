@@ -9,8 +9,8 @@ $omdb = new OMDbAPI();
 
 if (!empty($argv[1])) {
 
-	// Test if your Trakt API key and configuration are working
-	// If it works you should get a printed array of the show/season/episode entered
+	// Test if your OMDb API key and configuration are working
+	// If it works you should get a printed array of the show entered
 
 	// Search for a show
 	$series = $omdb->search((string)$argv[1], 'series');
@@ -30,5 +30,5 @@ if (!empty($argv[1])) {
 		exit(ColorCLI::error('Error retrieving OMDb API data.'));
 	}
 } else {
-	exit(ColorCLI::error('Invalid arguments.  This script requires a text string (show name).'));
+	exit(ColorCLI::error('Invalid arguments. This script requires a text string (show name).'));
 }
