@@ -16,10 +16,10 @@ if (!empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
 
 	// Search for a show
 	$series = $tmdb->client->getSearchApi()->searchTv((string)$argv[1]);
-	//print_r($series);
+	print_r($series);
 
 	// Use the first show found (highest match) and get the requested season/episode from $argv
-	if (!empty($series)) {
+	if (!empty($series) && $series['total_results'] > 0) {
 		$seriesAppends = [
 			'networks' => $tmdb->client->getTvApi()->getTvshow($series['results'][0]['id'])['networks'],
 			'alternative_titles' => $tmdb->client->getTvApi()->getAlternativeTitles($series['results'][0]['id']),
