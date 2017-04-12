@@ -12,7 +12,7 @@ use nntmux\db\DB;
  */
 Class TraktAPI {
 
-	const API_URL = 'https://api-v2launch.trakt.tv/';
+	const API_URL = 'https://api.trakt.tv/';
 
 	/**
 	 * @var array	List of site IDs that trakt,tv supports. Only trakt is guaranteed to exist.
