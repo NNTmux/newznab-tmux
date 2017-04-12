@@ -1251,7 +1251,7 @@ class Releases
 	}
 
 	/**
-	 * @param string $guid
+	 * @param string|array $guid
 	 *
 	 * @return array|bool
 	 */
@@ -1289,7 +1289,7 @@ class Releases
 			$gSql
 		);
 
-		return (is_array($guid)) ? $this->pdo->query($sql) : $this->pdo->queryOneRow($sql);
+		return is_array($guid) ? $this->pdo->query($sql) : $this->pdo->queryOneRow($sql);
 	}
 
 	// Writes a zip file of an array of release guids directly to the stream.

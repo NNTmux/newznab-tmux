@@ -2,6 +2,7 @@
 namespace nntmux;
 
 use app\models\Settings;
+use aharen\OMDbAPI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use nntmux\db\DB;
@@ -171,6 +172,7 @@ class Movie
 			]
 		]
 		);
+		$this->omdb = new OMDbAPI();
 
 		$this->lookuplanguage = Settings::value('indexer.categorise.imdblanguage') != '' ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
 
@@ -1112,34 +1114,34 @@ class Movie
 	 */
 	public function processMovieReleases($groupID = '', $guidChar = '', $lookupIMDB = 1)
 	{
-		if ($lookupIMDB == 0) {
+		if ($lookupIMDB === 0) {
 			return;
 		}
 
 		// Get all releases without an IMDB id.
 		$res = $this->pdo->query(
-			sprintf("
+			sprintf('
 				SELECT r.searchname, r.id
 				FROM releases r
 				WHERE r.imdbid IS NULL
 				AND r.nzbstatus = 1
 				%s %s %s %s
-				LIMIT %d",
+				LIMIT %d',
 				$this->catWhere,
 				($groupID === '' ? '' : ('AND r.groups_id = ' . $groupID)),
 				($guidChar === '' ? '' : 'AND r.leftguid = ' . $this->pdo->escapeString($guidChar)),
-				($lookupIMDB == 2 ? 'AND r.isrenamed = 1' : ''),
+				($lookupIMDB === 2 ? 'AND r.isrenamed = 1' : ''),
 				$this->movieqty
 			)
 		);
 		$movieCount = count($res);
 
 		if ($movieCount > 0) {
-			if (is_null($this->traktTv)) {
+			if ($this->traktTv === null) {
 				$this->traktTv = new TraktTv(['Settings' => $this->pdo]);
 			}
 			if ($this->echooutput && $movieCount > 1) {
-				ColorCLI::doEcho(ColorCLI::header("Processing " . $movieCount . " movie releases."));
+				ColorCLI::doEcho(ColorCLI::header('Processing ' . $movieCount . ' movie releases.'));
 			}
 
 			// Loop over releases.
@@ -1147,7 +1149,7 @@ class Movie
 				// Try to get a name/year.
 				if ($this->parseMovieSearchName($arr['searchname']) === false) {
 					//We didn't find a name, so set to all 0's so we don't parse again.
-					$this->pdo->queryExec(sprintf("UPDATE releases SET imdbid = 0000000 WHERE id = %d %s", $arr["id"], $this->catWhere));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d %s', $arr['id'], $this->catWhere));
 					continue;
 
 				} else {
@@ -1159,7 +1161,7 @@ class Movie
 					}
 
 					if ($this->echooutput) {
-						ColorCLI::doEcho(ColorCLI::primaryOver("Looking up: ") . ColorCLI::headerOver($movieName), true);
+						ColorCLI::doEcho(ColorCLI::primaryOver('Looking up: ') . ColorCLI::headerOver($movieName), true);
 					}
 
 					// Check local DB.
@@ -1173,31 +1175,13 @@ class Movie
 					}
 
 					// Check OMDB api.
-					try {
-						$buffer =
-							$this->client->get(
-								'http://www.omdbapi.com/?t=' .
-								urlencode($this->currentTitle) .
-								($this->currentYear !== false ? ('&y=' . $this->currentYear) : '') .
-								'&r=json'
-							)->getBody()->getContents();
-					} catch (RequestException $e) {
-						if ($e->hasResponse()) {
-							if($e->getCode() === 404) {
-								ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
-							} else if ($e->getCode() === 503) {
-								ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
-							} else {
-								ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
-							}
-						}
-					}
+					$buffer = $this->omdb->search($this->currentTitle, 'movies', $this->currentYear !== false ? $this->currentYear : '');
 
-					if (isset($buffer) && $buffer !== false) {
-						$getIMDBid = json_decode($buffer);
+					if (!empty($buffer) && $buffer->data->Response !== 'False') {
+						$getIMDBid = $buffer->data->Search[0]->imdbID;
 
-						if (isset($getIMDBid->imdbid)) {
-							$imdbID = $this->doMovieUpdate($getIMDBid->imdbid, 'OMDbAPI', $arr['id']);
+						if (!empty($getIMDBid)) {
+							$imdbID = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $arr['id']);
 							if ($imdbID !== false) {
 								continue;
 							}

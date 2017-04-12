@@ -1,3 +1,5 @@
+2017-04-12 DariusIII
+	* Chg: Add aharen/omdbapi library and use it in Movies class to retrieve data from OMDb
 2017-04-11 DariusIII
 	* Chg: Add php-console support for Chrome browser (dev tool)
 	* Chg: Add monolog/monolog and illuminate/filesystem to composer 

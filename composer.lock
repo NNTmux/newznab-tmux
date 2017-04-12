@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7835597b85cd4cce8acd1e01c5200de3",
+    "content-hash": "6889e6fd6afd1695052783a071f42998",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -60,6 +60,48 @@
                 "thetvdb.com"
             ],
             "time": "2016-11-29T18:38:40+00:00"
+        },
+        {
+            "name": "aharen/omdbapi",
+            "version": "v2.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aharen/OMDbAPI.git",
+                "reference": "80536f44db66a6f7e5491074c20a64651c6244f8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aharen/OMDbAPI/zipball/80536f44db66a6f7e5491074c20a64651c6244f8",
+                "reference": "80536f44db66a6f7e5491074c20a64651c6244f8",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.2",
+                "php": ">=5.5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "aharen\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ahmed Khusaam",
+                    "email": "hello@khusaam.com"
+                }
+            ],
+            "description": "PHP package for OMDbAPI.com by Brian Fritz",
+            "keywords": [
+                "movies",
+                "omdb api",
+                "tv shows"
+            ],
+            "time": "2017-02-20T05:40:43+00:00"
         },
         {
             "name": "b3rs3rk/steamfront",

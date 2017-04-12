@@ -138,7 +138,8 @@
     "bower-asset/tinymce-builded": "~4.4.3",
     "unionofrad/lithium": "^1.2-dev",
     "illuminate/filesystem": "^5.4",
-    "monolog/monolog": "^1.22"
+    "monolog/monolog": "^1.22",
+    "aharen/omdbapi": "^2.0"
   },
 
   "require-dev": {
