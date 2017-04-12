@@ -1,4 +1,5 @@
 2017-04-12 DariusIII
+	* Chg: Update dariusiii/rarinfo package
 	* Chg: Update TV processing classes, remove TVRage as site is dead long time
 	* Chg: Add new Fanart.TV class for handling API requests to Fanart.TV, adjust Movie class to use it
 	* Chg: Adjust viewnzb templates in Charisma/Gentele/omicron themes
