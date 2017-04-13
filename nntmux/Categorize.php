@@ -679,6 +679,10 @@ class Categorize extends Category
 			$this->tmpCat = Category::TV_ANIME;
 			return true;
 		}
+		if (preg_match('/(ANiHLS|HaiKU)/i', $this->releaseName)) {
+			$this->tmpCat = Category::TV_ANIME;
+			return true;
+		}
 		return false;
 	}
 
@@ -688,7 +692,7 @@ class Categorize extends Category
 			$this->tmpCat = Category::TV_HD;
 			return true;
 		}
-		if ($this->catWebDL == false) {
+		if ($this->catWebDL === false) {
 			if (preg_match('/web[-._ ]dl|web-?rip/i', $this->releaseName)) {
 				$this->tmpCat = Category::TV_HD;
 				return true;
