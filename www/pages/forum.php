@@ -9,7 +9,7 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-if ($page->isPostBack()) {
+if (!empty($_POST['addMessage']) && !empty($_POST['addSubject']) && $page->isPostBack()) {
 	$forum->add(0, $page->users->currentUserId(), $_POST['addSubject'], $_POST['addMessage']);
 	header('Location:'.WWW_TOP.'/forum');
 	die();
@@ -47,7 +47,7 @@ $page->smarty->assign('pageroffset',$offset);
 $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/forum?offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
-$page->smarty->assign('privateprofiles', Settings::value('..privateprofiles') == 1 ? true : false );
+$page->smarty->assign('privateprofiles', Settings::value('..privateprofiles') === 1 ? true : false );
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
