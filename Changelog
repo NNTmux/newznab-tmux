@@ -1,4 +1,5 @@
 2017-04-13 DariusIII
+	* Fix: Fix notice display and movies display when imdbid is 000000
 	* Fix: Properly categorize HAiKU and ANiHLS releases into TV->Anime category
 	* Fix: Fix settings statuses of groups in admin groups page
 	* Chg: Update forum and forumpost related tpl's and pages

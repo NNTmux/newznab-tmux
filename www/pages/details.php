@@ -57,16 +57,16 @@ if (isset($_GET['id'])) {
 	}
 
 	$mov = '';
-	if ($data['imdbid'] != '' && $data['imdbid'] !== 0000000) {
+	if ($data['imdbid'] !== '' && $data['imdbid'] !== 0000000) {
 		$movie = new Movie(['Settings' => $page->settings]);
 		$mov   = $movie->getMovieInfo($data['imdbid']);
-		if (isset($mov['title'])) {
+		if (!empty($mov['title'])) {
 			$mov['title']    = str_replace(['/', '\\'], '', $mov['title']);
 			$mov['actors']   = $movie->makeFieldLinks($mov, 'actors');
 			$mov['genre']    = $movie->makeFieldLinks($mov, 'genre');
 			$mov['director'] = $movie->makeFieldLinks($mov, 'director');
 			if (Settings::value('site.trailers.trailers_display')) {
-				$trailer = empty($mov['trailer']) || $mov['trailer'] == '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer'];
+				$trailer = empty($mov['trailer']) || $mov['trailer'] === '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer'];
 				if ($trailer) {
 					$mov['trailer'] = sprintf(
 						'<iframe width=\"%d\" height=\"%d\" src=\"%s\"></iframe>',
@@ -80,7 +80,7 @@ if (isset($_GET['id'])) {
 	}
 
 	$xxx = '';
-	if ($data['xxxinfo_id'] != '' && $data['xxxinfo_id'] !== 0) {
+	if ($data['xxxinfo_id'] !== '' && $data['xxxinfo_id'] !== 0) {
 		$x = new XXX();
 		$xxx = $x->getXXXInfo($data['xxxinfo_id']);
 
@@ -99,25 +99,25 @@ if (isset($_GET['id'])) {
 	}
 
 	$game = '';
-	if ($data['gamesinfo_id'] != '') {
+	if ($data['gamesinfo_id'] !== '') {
 		$g = new Games();
 		$game = $g->getGamesInfoById($data['gamesinfo_id']);
 	}
 
 	$mus = '';
-	if ($data['musicinfo_id'] != '') {
+	if ($data['musicinfo_id'] !== '') {
 		$music = new Music(['Settings' => $page->settings]);
 		$mus = $music->getMusicInfo($data['musicinfo_id']);
 	}
 
 	$book = '';
-	if ($data['bookinfo_id'] != '') {
+	if ($data['bookinfo_id'] !== '') {
 		$b = new Books();
 		$book = $b->getBookInfo($data['bookinfo_id']);
 	}
 
 	$con = '';
-	if ($data['consoleinfo_id'] != '') {
+	if ($data['consoleinfo_id'] !== '') {
 		$c = new Console();
 		$con = $c->getConsoleInfo($data['consoleinfo_id']);
 	}

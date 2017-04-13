@@ -1082,7 +1082,7 @@ class Movie
 			$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE id = %d %s', $this->pdo->escapeString($imdbID), $id, $this->catWhere));
 
 			// If set, scan for imdb info.
-			if ($processImdb == 1) {
+			if ($processImdb === 1) {
 				$movCheck = $this->getMovieInfo($imdbID);
 				if ($movCheck === false || (isset($movCheck['updateddate']) && (time() - strtotime($movCheck['updateddate'])) > 2592000)) {
 					if ($this->updateMovieInfo($imdbID) === false) {
