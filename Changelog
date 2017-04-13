@@ -1,4 +1,5 @@
 2017-04-13 DariusIII
+	* Fix: Fix settings statuses of groups in admin groups page
 	* Chg: Update forum and forumpost related tpl's and pages
 2017-04-12 DariusIII
 	* Chg: Update dariusiii/rarinfo package

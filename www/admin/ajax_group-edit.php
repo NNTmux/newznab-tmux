@@ -35,11 +35,11 @@ if (isset($_GET['action']) && $_GET['action'] === 2) {
 		$id = (int)$_GET['group_id'];
 		if(isset($_GET['group_status'])) {
 			$status = isset($_GET['group_status']) ? (int)$_GET['group_status'] : 0;
-			print $group->updateGroupStatus($id, $status);
+			print $group->updateGroupStatus($id, 'active', $status);
 		}
 		if(isset($_GET['backfill_status'])) {
 			$status = isset($_GET['backfill_status']) ? (int)$_GET['backfill_status'] : 0;
-			print $group->updateGroupStatus($id, $status);
+			print $group->updateGroupStatus($id, 'backfill', $status);
 		}
 	}
 }

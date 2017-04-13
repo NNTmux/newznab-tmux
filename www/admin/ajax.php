@@ -45,12 +45,12 @@ switch($_GET['action']) {
 	case 'group_edit_purge_all':
 		session_write_close();
 		(new Groups($settings))->purge();
-		print "All groups purged.";
+		print 'All groups purged.';
 		break;
 
 	case 'group_edit_reset_all':
 		(new Groups($settings))->resetall();
-		print "All groups reset.";
+		print 'All groups reset.';
 		break;
 
 	case 'group_edit_purge_single':
@@ -88,17 +88,17 @@ switch($_GET['action']) {
 
 	case 'sharing_toggle_status':
 		$admin->settings->queryExec(sprintf('UPDATE sharing_sites SET enabled = %d WHERE id = %d', $_GET['site_status'], $_GET['site_id']));
-		print ($_GET['site_status'] == 1 ? 'Activated' : 'Deactivated') . ' site ' . $_GET['site_id'];
+		print ($_GET['site_status'] === 1 ? 'Activated' : 'Deactivated') . ' site ' . $_GET['site_id'];
 		break;
 
 	case 'sharing_toggle_enabled':
 		$admin->settings->queryExec(sprintf('UPDATE sharing SET enabled = %d', $_GET['enabled_status']));
-		print ($_GET['enabled_status'] == 1 ? 'Enabled' : 'Disabled') . ' sharing!';
+		print ($_GET['enabled_status'] === 1 ? 'Enabled' : 'Disabled') . ' sharing!';
 		break;
 
 	case 'sharing_start_position':
 		$admin->settings->queryExec(sprintf('UPDATE sharing SET start_position = %d', $_GET['start_position']));
-		print ($_GET['start_position'] == 1 ? 'Enabled' : 'Disabled') . ' fetching from start of group!';
+		print ($_GET['start_position'] === 1 ? 'Enabled' : 'Disabled') . ' fetching from start of group!';
 		break;
 
 	case 'sharing_reset_settings':
@@ -128,22 +128,22 @@ switch($_GET['action']) {
 
 	case 'sharing_toggle_posting':
 		$admin->settings->queryExec(sprintf('UPDATE sharing SET posting = %d', $_GET['posting_status']));
-		print ($_GET['posting_status'] == 1 ? 'Enabled' : 'Disabled') . ' posting!';
+		print ($_GET['posting_status'] === 1 ? 'Enabled' : 'Disabled') . ' posting!';
 		break;
 
 	case 'sharing_toggle_fetching':
 		$admin->settings->queryExec(sprintf('UPDATE sharing SET fetching = %d', $_GET['fetching_status']));
-		print ($_GET['fetching_status'] == 1 ? 'Enabled' : 'Disabled') . ' fetching!';
+		print ($_GET['fetching_status'] === 1 ? 'Enabled' : 'Disabled') . ' fetching!';
 		break;
 
 	case 'sharing_toggle_site_auto_enabling';
 		$admin->settings->queryExec(sprintf('UPDATE sharing SET auto_enable = %d', $_GET['auto_status']));
-		print ($_GET['auto_status'] == 1 ? 'Enabled' : 'Disabled') . ' automatic site enabling!';
+		print ($_GET['auto_status'] === 1 ? 'Enabled' : 'Disabled') . ' automatic site enabling!';
 		break;
 
 	case 'sharing_toggle_hide_users':
 		$admin->settings->queryExec(sprintf('UPDATE sharing SET hide_users = %d', $_GET['hide_status']));
-		print ($_GET['hide_status'] == 1? 'Enabled' : 'Disabled') . ' hiding of user names!';
+		print ($_GET['hide_status'] === 1? 'Enabled' : 'Disabled') . ' hiding of user names!';
 		break;
 
 	case 'sharing_toggle_all_sites':

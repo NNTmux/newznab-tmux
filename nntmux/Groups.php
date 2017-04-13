@@ -576,7 +576,7 @@ class Groups
 			WHERE id = {$id}"
 		);
 
-		return "Group {$id}: {$column} has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
+		return "Group {$id}: {$column} has been " . (($status === 0) ? 'deactivated' : 'activated') . '.';
 	}
 
 	/**
