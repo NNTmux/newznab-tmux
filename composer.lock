@@ -1061,16 +1061,16 @@
         },
         {
             "name": "bower-asset/materialize",
-            "version": "v0.98.1",
+            "version": "v0.98.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Dogfalo/materialize.git",
-                "reference": "2a27dc5fc5745001986055fdf3985aef32fa2def"
+                "reference": "138be0b945cc8e1ee24d76ab6c1240c3f3628565"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Dogfalo/materialize/zipball/2a27dc5fc5745001986055fdf3985aef32fa2def",
-                "reference": "2a27dc5fc5745001986055fdf3985aef32fa2def",
+                "url": "https://api.github.com/repos/Dogfalo/materialize/zipball/138be0b945cc8e1ee24d76ab6c1240c3f3628565",
+                "reference": "138be0b945cc8e1ee24d76ab6c1240c3f3628565",
                 "shasum": ""
             },
             "require": {
@@ -3895,7 +3895,7 @@
                 "source": "https://github.com/UnionOfRAD/manual/tree/1.1",
                 "issues": "https://github.com/UnionOfRAD/manual/issues"
             },
-            "time": "2016-05-31 20:16:51"
+            "time": "2016-05-31T20:16:51+00:00"
         }
     ],
     "aliases": [],
