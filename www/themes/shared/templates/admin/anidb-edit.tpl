@@ -89,21 +89,21 @@
 <tr>
 	<td><label for="epnos">Episode numbers</label>:</td>
 	<td>
-		<input id="epnos" class="long" name="epnos" type="text" value="{$anime.epnos|escape:'htmlall'}" />
+		<input id="epnos" class="long" name="epnos" type="text" value="{$anime.episode_no|escape:'htmlall'}" />
 	</td>
 </tr>
 
 <tr>
 	<td><label for="airdates">Episode air dates</label>:</td>
 	<td>
-		<input id="airdates" class="long" name="airdates" type="text" value="{$anime.airdates|escape:'htmlall'}" />
+		<input id="airdates" class="long" name="airdates" type="text" value="{$anime.airdate|escape:'htmlall'}" />
 	</td>
 </tr>
 
 <tr>
 	<td><label for="episodetitles">Episode titles</label>:</td>
 	<td>
-		<input id="episodetitles" class="long" name="episodetitles" type="text" value="{$anime.episodetitles|escape:'htmlall'}" />
+		<input id="episodetitles" class="long" name="episodetitles" type="text" value="{$anime.episode_title|escape:'htmlall'}" />
 	</td>
 </tr>
 

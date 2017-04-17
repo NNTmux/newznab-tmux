@@ -425,7 +425,9 @@ class AniDB
 				true
 			);
 			exit;
-		} elseif ($AniDBAPIArray === false && $this->echooutput) {
+		}
+
+		if ($AniDBAPIArray === false && $this->echooutput) {
 			ColorCLI::doEcho(
 				ColorCLI::info(
 					'Anime ID: ' . $this->anidbId . ' not available for update yet.'
