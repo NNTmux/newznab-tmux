@@ -1,3 +1,5 @@
+2017-04-17 DariusIII
+	* Mrg: Merge PR #131 from Nightah (update a.b.anime regexes)
 2017-04-13 DariusIII
 	* Fix: Fix notice display and movies display when imdbid is 000000
 	* Fix: Properly categorize HAiKU and ANiHLS releases into TV->Anime category
