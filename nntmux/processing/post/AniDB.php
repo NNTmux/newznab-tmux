@@ -55,7 +55,7 @@ class AniDB
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		$qty = Settings::value('..maxanidbprocessed');
-		$this->aniqty = !empty($qty) ? $qty : 100;
+		$this->aniqty = $qty ?? 100;
 
 		$this->status = 'NULL';
 	}
@@ -106,7 +106,7 @@ class AniDB
 				}
 			}
 		} else {
-			ColorCLI::doEcho(ColorCLI::info("No work to process."), true);
+			ColorCLI::doEcho(ColorCLI::info('No anidb releases to  process.'), true);
 		}
 	}
 
@@ -138,7 +138,7 @@ class AniDB
 	 */
 	private function doRandomSleep()
 	{
-		sleep(rand(10, 15));
+		sleep(random_int(10, 15));
 	}
 
 	/**
@@ -157,7 +157,7 @@ class AniDB
 			$matches)
 		) {
 			$matches['epno'] = (int)$matches['epno'];
-			if (in_array($matches['epno'], ['Movie', 'OVA'])) {
+			if (in_array($matches['epno'], ['Movie', 'OVA'], false)) {
 				$matches['epno'] = 1;
 			}
 		} else if (preg_match('/^(\[[a-zA-Z\.\-!?]+\][\s_]*)?(\[BD\])?(\[\d{3,4}[ip]\])?(?P<title>[\w\s_.+!?\'-\(\)]+)(New Edit|(Blu-?ray)?( ?Box)?( ?Set)?)?\s*[\(\[](BD|\d{3,4}[ipx])/i',
@@ -219,9 +219,9 @@ class AniDB
 
 		if (is_array($cleanArr) && isset($cleanArr['title']) && is_numeric($cleanArr['epno'])) {
 
-			echo ColorCLI::header(PHP_EOL . "Looking Up: ") .
-				ColorCLI::primary("   Title: {$cleanArr['title']}" . PHP_EOL .
-					"   Episode: {$cleanArr['epno']}");
+			echo ColorCLI::header(PHP_EOL . 'Looking Up: ') .
+				ColorCLI::primary('   Title: ' . $cleanArr['title'] .  PHP_EOL .
+					'   Episode: ' . $cleanArr['epno']);
 
 			// get anidb number for the title of the name
 			$anidbId = $this->getAnidbByName($cleanArr['title']);
@@ -243,7 +243,7 @@ class AniDB
 						$type = 'Remote';
 					} else {
 						echo PHP_EOL .
-							ColorCLI::info("This AniDB ID was not found to be accurate locally, but has been updated too recently to check AniDB.") .
+							ColorCLI::info('This AniDB ID was not found to be accurate locally, but has been updated too recently to check AniDB.') .
 							PHP_EOL;
 					}
 				}
@@ -251,13 +251,13 @@ class AniDB
 				$this->updateRelease($anidbId['anidbid'], $release['id']);
 
 				ColorCLI::doEcho(
-					ColorCLI::headerOver("Matched {$type} AniDB ID: ") .
+					ColorCLI::headerOver('Matched ' . $type . ' AniDB ID: ') .
 					ColorCLI::primary($anidbId['anidbid']) .
-					ColorCLI::alternateOver("   Title: ") .
+					ColorCLI::alternateOver('   Title: ') .
 					ColorCLI::primary($anidbId['title']) .
-					ColorCLI::alternateOver("   Episode #: ") .
+					ColorCLI::alternateOver('   Episode #: ') .
 					ColorCLI::primary($cleanArr['epno']) .
-					ColorCLI::alternateOver("   Episode Title: ") .
+					ColorCLI::alternateOver('   Episode Title: ') .
 					ColorCLI::primary($updatedAni['episode_title'])
 				);
 
@@ -265,7 +265,7 @@ class AniDB
 			} else {
 				if (NN_DEBUG) {
 					ColorCLI::doEcho(
-						PHP_EOL . "Could not match searchname: {$release['searchname']}.",
+						PHP_EOL . 'Could not match searchname:' . $release['searchname'],
 						true
 					);
 				}
