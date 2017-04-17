@@ -1,4 +1,5 @@
 2017-04-17 DariusIII
+	* Chg: Update AniDB and related pages updateTitle function
 	* Mrg: Merge PR #131 from Nightah (update a.b.anime regexes)
 2017-04-13 DariusIII
 	* Fix: Fix notice display and movies display when imdbid is 000000

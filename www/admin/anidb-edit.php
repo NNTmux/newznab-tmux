@@ -13,6 +13,7 @@ $action = $_REQUEST['action'] ?? 'view';
 switch ($action) {
 	case 'submit':
 		$AniDB->updateTitle($_POST['anidbid'],
+				$_POST['title'],
 				$_POST['type'],
 				$_POST['startdate'],
 				$_POST['enddate'],
@@ -22,7 +23,10 @@ switch ($action) {
 				$_POST['description'],
 				$_POST['rating'],
 				$_POST['categories'],
-				$_POST['characters']);
+				$_POST['characters'],
+				$_POST['epnos'],
+				$_POST['airdates'],
+				$_POST['episodetitles']);
 
 		if (!empty($_POST['from'])) {
 			header('Location:' . $_POST['from']);
