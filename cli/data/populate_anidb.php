@@ -9,11 +9,16 @@ use nntmux\db\populate\AniDB;
 
 $pdo = new DB();
 
-if ($argc > 1 && $argv[1] == true) {
-	(new AniDB(['Settings' => $pdo, 'Echo' => true]))->populateTable('full');
+if ($argc > 1 && $argv[1] === 'true' && isset($argv[2])) {
+	if($argv[2] === 'full') {
+		(new AniDB(['Settings' => $pdo, 'Echo' => true]))->populateTable('full');
+	} elseif ($argv[2] === 'info'){
+		(new AniDB(['Settings' => $pdo, 'Echo' => true]))->populateTable('info');
+	}
 } else {
 	$pdo->log->doEcho(PHP_EOL . $pdo->log->error(
 			'To execute this script you must provide a boolean argument.' . PHP_EOL .
-			'Argument1: true|false to run this script or not'), true
+			'Argument1: true|false to run this script or not' . PHP_EOL .
+			'Argument2: full|info for what type of data to populate'), true
 	);
 }
