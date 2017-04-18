@@ -1,3 +1,5 @@
+2017-04-18 DariusIII
+	* Chg: Update nntmux/db/populate/AniDB.php to properly update anidb_episodes table (still need to find a way to prevent bans)
 2017-04-17 DariusIII
 	* Chg: Update AniDB and related pages updateTitle function
 	* Mrg: Merge PR #131 from Nightah (update a.b.anime regexes)

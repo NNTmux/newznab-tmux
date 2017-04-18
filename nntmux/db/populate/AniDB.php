@@ -87,16 +87,15 @@ class AniDB
 	 * Main switch that initiates AniDB table population
 	 *
 	 * @param string  $type
-	 * @param integer $anidbId
 	 */
-	public function populateTable($type = '', $anidbId = 0)
+	public function populateTable($type = '')
 	{
 		switch ($type) {
 			case 'full':
 				$this->populateMainTable();
+				$this->populateInfoTable();
 				break;
 			case 'info':
-				$this->anidbId = $anidbId;
 				$this->populateInfoTable();
 				break;
 		}
@@ -135,14 +134,14 @@ class AniDB
 	 *
 	 * @return array|bool
 	 */
-	private function getAniDbAPI()
+	private function getAniDbAPI($anidbId)
 	{
 		$timestamp = Settings::value('APIs.AniDB.banned') + 90000;
 		if ($timestamp > time()) {
 			echo 'Banned from AniDB lookups until ' . date('Y-m-d H:i:s', $timestamp) . PHP_EOL;
 			return false;
 		}
-		$apiresponse = $this->getAniDbResponse();
+		$apiresponse = $this->getAniDbResponse($anidbId);
 
 		$AniDBAPIArray = [];
 
@@ -150,16 +149,19 @@ class AniDB
 			echo 'AniDB: Error getting response.' . PHP_EOL;
 		} elseif (preg_match('/\<error\>Banned\<\/error\>/', $apiresponse)) {
 			$this->banned = true;
-			$this->pdo->setSetting(['APIs.AniDB.banned' => time()]);
+			Settings::update(
+				['value' => time()],
+				['section' => 'APIs', 'subsection' => 'AniDB', 'name' => 'banned']
+			);
 		} elseif (preg_match('/\<error\>Anime not found\<\/error\>/', $apiresponse)) {
 			echo "AniDB   : Anime not yet on site. Remove until next update.\n";
 		} elseif ($AniDBAPIXML = new \SimpleXMLElement($apiresponse)) {
 
-			$AniDBAPIArray['similar'] = $this->processAPIResponceElement($AniDBAPIXML->similaranime, 'anime');
-			$AniDBAPIArray['related'] = $this->processAPIResponceElement($AniDBAPIXML->relatedanime, 'anime');
-			$AniDBAPIArray['creators'] = $this->processAPIResponceElement($AniDBAPIXML->creators);
-			$AniDBAPIArray['characters'] = $this->processAPIResponceElement($AniDBAPIXML->characters);
-			$AniDBAPIArray['categories'] = $this->processAPIResponceElement($AniDBAPIXML->categories);
+			$AniDBAPIArray['similar'] = $this->processAPIResponseElement($AniDBAPIXML->similaranime, 'anime');
+			$AniDBAPIArray['related'] = $this->processAPIResponseElement($AniDBAPIXML->relatedanime, 'anime');
+			$AniDBAPIArray['creators'] = $this->processAPIResponseElement($AniDBAPIXML->creators);
+			$AniDBAPIArray['characters'] = $this->processAPIResponseElement($AniDBAPIXML->characters);
+			$AniDBAPIArray['categories'] = $this->processAPIResponseElement($AniDBAPIXML->categories);
 
 			$episodeArray = [];
 			if ($AniDBAPIXML->episodes && $AniDBAPIXML->episodes[0]->attributes()) {
@@ -175,7 +177,7 @@ class AniDB
 						foreach ($AniDBAPIXML->title->children() as $title) {
 							$xmlAttribs = $title->attributes('xml', true);
 							// only english, x-jat imploded episode titles for now
-							if (in_array($xmlAttribs->lang, ['en', 'x-jat'])) {
+							if (in_array($xmlAttribs->lang, ['en', 'x-jat'], false)) {
 								$titleArray[] = $title[0];
 							}
 						}
@@ -215,9 +217,9 @@ class AniDB
 	 *
 	 * @return string
 	 */
-	private function processAPIResponceElement(\SimpleXMLElement $element, $property = null)
+	private function processAPIResponseElement(\SimpleXMLElement $element, $property = null)
 	{
-		$property = empty($property) ? 'name' : $property;
+		$property = $property ?? 'name';
 		$temp = '';
 		if ($element && $element[0]->attributes()) {
 			foreach ($element->children() as $entry) {
@@ -233,13 +235,13 @@ class AniDB
 	 *
 	 * @return string
 	 */
-	private function getAniDbResponse()
+	private function getAniDbResponse($anidbId)
 	{
 		$curlString = sprintf(
 			'http://api.anidb.net:9001/httpapi?request=anime&client=%s&clientver=%d&protover=1&aid=%d',
 			$this->apiKey,
 			self::CLIENT_VERSION,
-			$this->anidbId
+			$anidbId
 		);
 
 		$ch = curl_init($curlString);
@@ -293,7 +295,7 @@ class AniDB
 	 *
 	 * @return string
 	 */
-	private function insertAniDBInfoEps(array $AniDBInfoArray = [])
+	private function insertAniDBInfoEps(array $AniDBInfoArray = [], $anidbId)
 	{
 		$this->pdo->queryInsert(
 			sprintf('
@@ -303,7 +305,7 @@ class AniDB
 					description, rating, picture, categories, characters, updated
 				)
 				VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())',
-				$this->anidbId,
+				$anidbId['anidbid'],
 				$this->pdo->escapeString($AniDBInfoArray['type']),
 				$this->pdo->escapeString($AniDBInfoArray['startdate']),
 				$this->pdo->escapeString($AniDBInfoArray['enddate']),
@@ -317,8 +319,8 @@ class AniDB
 				$this->pdo->escapeString($AniDBInfoArray['characters'])
 			)
 		);
-		if (isset($AniDBInfoArray['epsarr'])) {
-			$this->insertAniDBEpisodes($AniDBInfoArray['epsarr']);
+		if (!empty($AniDBInfoArray['epsarr'])) {
+			$this->insertAniDBEpisodes($AniDBInfoArray['epsarr'], $anidbId);
 		}
 
 		return $AniDBInfoArray['picture'];
@@ -329,7 +331,7 @@ class AniDB
 	 *
 	 * @param array $episodeArr
 	 */
-	private function insertAniDBEpisodes(array $episodeArr = [])
+	private function insertAniDBEpisodes($episodeArr = [], $anidbId)
 	{
 		if (!empty($episodeArr)) {
 			foreach ($episodeArr as $episode) {
@@ -338,7 +340,7 @@ class AniDB
 						INSERT IGNORE INTO anidb_episodes
 						(anidbid, episodeid, episode_no, episode_title, airdate)
 						VALUES (%d, %d, %d, %s, %s)',
-						$this->anidbId,
+						$anidbId['anidbid'],
 						$episode['episode_id'],
 						$episode['episode_no'],
 						$this->pdo->escapeString($episode['episode_title']),
@@ -415,34 +417,38 @@ class AniDB
 	 */
 	private function populateInfoTable()
 	{
-		$AniDBAPIArray = $this->getAniDbAPI();
+		$anidbIds = $this->pdo->query(sprintf('SELECT DISTINCT anidbid AS anidbid FROM anidb_titles'));
+		foreach ($anidbIds as $anidbId) {
+			$AniDBAPIArray = $this->getAniDbAPI($anidbId['anidbid']);
 
-		if ($this->banned === true) {
-			ColorCLI::doEcho(
-				ColorCLI::error(
-					'AniDB Banned, import will fail, please wait 24 hours before retrying.'
-				),
-				true
-			);
-			exit;
-		}
-
-		if ($AniDBAPIArray === false && $this->echooutput) {
-			ColorCLI::doEcho(
-				ColorCLI::info(
-					'Anime ID: ' . $this->anidbId . ' not available for update yet.'
-				),
-				true
-			);
-		} else {
-			$this->updateAniChildTables($AniDBAPIArray);
-			if (NN_DEBUG) {
+			if ($this->banned === true) {
 				ColorCLI::doEcho(
-					ColorCLI::headerOver(
-						'Added/Updated AniDB ID: '  . $this->anidbId
+					ColorCLI::error(
+						'AniDB Banned, import will fail, please wait 24 hours before retrying.'
 					),
 					true
 				);
+				exit;
+			}
+
+			if ($AniDBAPIArray === false && $this->echooutput) {
+				ColorCLI::doEcho(
+					ColorCLI::info(
+						'Anime ID: ' . $anidbId['anidbid'] . ' not available for update yet.'
+					),
+					true
+				);
+			} else {
+				$this->updateAniChildTables($AniDBAPIArray, $anidbId);
+				echo '*';
+				if (NN_DEBUG) {
+					ColorCLI::doEcho(
+						ColorCLI::headerOver(
+							'Added/Updated AniDB ID: ' . $anidbId['anidbid']
+						),
+						true
+					);
+				}
 			}
 		}
 	}
@@ -465,7 +471,7 @@ class AniDB
 	 *
 	 * @return string
 	 */
-	private function updateAniDBInfoEps($AniDBInfoArray = [])
+	private function updateAniDBInfoEps($AniDBInfoArray = [], $anidbId)
 	{
 		$this->pdo->queryExec(
 			sprintf('
@@ -486,10 +492,12 @@ class AniDB
 				$this->pdo->escapeString($AniDBInfoArray['picture']),
 				$this->pdo->escapeString($AniDBInfoArray['categories']),
 				$this->pdo->escapeString($AniDBInfoArray['characters']),
-				$this->anidbId
+				$anidbId['anidbid']
 			)
 		);
-		$this->insertAniDBEpisodes($AniDBInfoArray['epsarr']);
+		if (!empty($AniDBInfoArray['epsarr'])) {
+			$this->insertAniDBEpisodes($AniDBInfoArray['epsarr'], $anidbId);
+		}
 
 		return $AniDBInfoArray['picture'];
 	}
@@ -499,26 +507,26 @@ class AniDB
 	 *
 	 * @param array $AniDBInfoArray
 	 */
-	private function updateAniChildTables($AniDBInfoArray = [])
+	private function updateAniChildTables($AniDBInfoArray = [], $anidbId)
 	{
 		$check = $this->pdo->queryOneRow(
 			sprintf('
 				SELECT ai.anidbid AS info
 				FROM anidb_info ai
 				WHERE ai.anidbid = %d',
-				$this->anidbId
+				$anidbId['anidbid']
 			)
 		);
 
 		if ($check === false) {
-			$picture = $this->insertAniDBInfoEps($AniDBInfoArray);
+			$picture = $this->insertAniDBInfoEps($AniDBInfoArray, $anidbId);
 		} else {
-			$picture = $this->updateAniDBInfoEps($AniDBInfoArray);
+			$picture = $this->updateAniDBInfoEps($AniDBInfoArray, $anidbId);
 		}
 
-		if (!empty($picture) && !file_exists($this->imgSavePath . $this->anidbId . ".jpg")) {
+		if (!empty($picture) && !file_exists($this->imgSavePath . $anidbId['anidbid'] . '.jpg')) {
 			(new ReleaseImage($this->pdo))->saveImage(
-				$this->anidbId,
+				$anidbId['anidbid'],
 				'http://img7.anidb.net/pics/anime/' . $picture,
 				$this->imgSavePath
 			);
