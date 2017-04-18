@@ -4,6 +4,7 @@
 */
 require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
+use nntmux\ColorCLI;
 use nntmux\db\DB;
 use nntmux\db\populate\AniDB;
 
@@ -16,9 +17,10 @@ if ($argc > 1 && $argv[1] === 'true' && isset($argv[2])) {
 		(new AniDB(['Settings' => $pdo, 'Echo' => true]))->populateTable('info');
 	}
 } else {
-	$pdo->log->doEcho(PHP_EOL . $pdo->log->error(
+	ColorCLI::doEcho(PHP_EOL . ColorCLI::error(
 			'To execute this script you must provide a boolean argument.' . PHP_EOL .
 			'Argument1: true|false to run this script or not' . PHP_EOL .
-			'Argument2: full|info for what type of data to populate'), true
+			'Argument2: full|info for what type of data to populate.' . PHP_EOL .
+			'WARNING: Argument "info" will get you banned from AniDB almost instantly'), true
 	);
 }

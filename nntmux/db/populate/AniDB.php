@@ -2,6 +2,7 @@
 
 namespace nntmux\db\populate;
 
+use GuzzleHttp\Client;
 use app\models\Settings;
 use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
@@ -71,6 +72,7 @@ class AniDB
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->guzzleclient = new Client();
 
 		$anidbupdint = Settings::value('APIs.AniDB.max_update_frequency');
 		$lastupdated = Settings::value('APIs.AniDB.last_full_update');
@@ -86,17 +88,17 @@ class AniDB
 	/**
 	 * Main switch that initiates AniDB table population
 	 *
-	 * @param string  $type
+	 * @param string $type
+	 * @param int|string    $anidbId
 	 */
-	public function populateTable($type = '')
+	public function populateTable($type = '', $anidbId = '')
 	{
 		switch ($type) {
 			case 'full':
 				$this->populateMainTable();
-				$this->populateInfoTable();
 				break;
 			case 'info':
-				$this->populateInfoTable();
+				$this->populateInfoTable($anidbId);
 				break;
 		}
 	}
@@ -145,7 +147,7 @@ class AniDB
 
 		$AniDBAPIArray = [];
 
-		if (!$apiresponse) {
+		if ($apiresponse === false) {
 			echo 'AniDB: Error getting response.' . PHP_EOL;
 		} elseif (preg_match('/\<error\>Banned\<\/error\>/', $apiresponse)) {
 			$this->banned = true;
@@ -414,11 +416,52 @@ class AniDB
 
 	/**
 	 * Directs flow for populating the AniDB Info/Episodes table
+	 *
+	 * @param string $anidbId
 	 */
-	private function populateInfoTable()
+	private function populateInfoTable($anidbId = '')
 	{
-		$anidbIds = $this->pdo->query(sprintf('SELECT DISTINCT anidbid AS anidbid FROM anidb_titles'));
-		foreach ($anidbIds as $anidbId) {
+		if ($anidbId === '') {
+			$anidbIds = $this->pdo->query(sprintf(
+				'SELECT DISTINCT at.anidbid AS anidbid, ai.updated 
+					FROM anidb_titles at 
+					LEFT JOIN anidb_info ai ON ai.anidbid = at.anidbid
+                    WHERE ai.updated IS NULL'
+				)
+			);
+			foreach ($anidbIds as $anidbId) {
+				$AniDBAPIArray = $this->getAniDbAPI($anidbId['anidbid']);
+
+				if ($this->banned === true) {
+					ColorCLI::doEcho(
+						ColorCLI::error(
+							'AniDB Banned, import will fail, please wait 24 hours before retrying.'
+						),
+						true
+					);
+					exit;
+				}
+
+				if ($AniDBAPIArray === false && $this->echooutput) {
+					ColorCLI::doEcho(
+						ColorCLI::info(
+							'Anime ID: ' . $anidbId['anidbid'] . ' not available for update yet.'
+						),
+						true
+					);
+				} else {
+					$this->updateAniChildTables($AniDBAPIArray, $anidbId);
+					if (NN_DEBUG) {
+						ColorCLI::doEcho(
+							ColorCLI::headerOver(
+								'Added/Updated AniDB ID: ' . $anidbId['anidbid']
+							),
+							true
+						);
+					}
+				}
+			}
+		} else {
 			$AniDBAPIArray = $this->getAniDbAPI($anidbId['anidbid']);
 
 			if ($this->banned === true) {
@@ -506,6 +549,7 @@ class AniDB
 	 * Directs flow for updating child AniDB tables
 	 *
 	 * @param array $AniDBInfoArray
+	 * @param       $anidbId
 	 */
 	private function updateAniChildTables($AniDBInfoArray = [], $anidbId)
 	{

@@ -26,7 +26,7 @@ class AniDB
 	public $padb;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -192,10 +192,10 @@ class AniDB
 	private function getAnidbByName($searchName = '')
 	{
 		return $this->pdo->queryOneRow(
-			sprintf("
+			sprintf('
 				SELECT at.anidbid, at.title
 				FROM anidb_titles AS at
-				WHERE at.title %s",
+				WHERE at.title %s',
 				$this->pdo->likeString($searchName, true, true)
 			)
 		);
@@ -237,7 +237,7 @@ class AniDB
 
 				if ($updatedAni === false) {
 					if ($this->updateTimeCheck($anidbId['anidbid']) !== false) {
-						$this->padb->populateTable('info', $anidbId['anidbid']);
+						$this->padb->populateTable('info', $anidbId);
 						$this->doRandomSleep();
 						$updatedAni = $this->checkAniDBInfo($anidbId['anidbid']);
 						$type = 'Remote';
