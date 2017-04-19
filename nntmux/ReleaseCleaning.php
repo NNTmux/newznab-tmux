@@ -3,7 +3,7 @@ namespace nntmux;
 
 use nntmux\db\DB;
 
-/*
+/**
  * Cleans names for releases/imports/namefixer.
  * Names of group functions should match between CollectionsCleaning and this file
  */
@@ -58,7 +58,7 @@ class ReleaseCleaning
 	public $groupName = '';
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -91,6 +91,15 @@ class ReleaseCleaning
 		$this->_regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'release_naming_regexes']);
 	}
 
+	/**
+	 * @param      $subject
+	 * @param      $fromName
+	 * @param      $size
+	 * @param      $groupName
+	 * @param bool $usepre
+	 *
+	 * @return array|bool|null
+	 */
 	public function releaseCleaner($subject, $fromName, $size, $groupName, $usepre = false)
 	{
 		$match           = $matches = [];
@@ -104,10 +113,10 @@ class ReleaseCleaning
 			$matches)) {
 			foreach ($matches as $match) {
 				foreach ($match as $val) {
-					$title = $this->pdo->queryOneRow("SELECT title, id from predb WHERE title = " .
+					$title = $this->pdo->queryOneRow('SELECT title, id from predb WHERE title = ' .
 						$this->pdo->escapeString(trim($val)));
 					// don't match against ab.teevee if title is for just the season
-					if ($this->groupName == 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {
+					if ($this->groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {
 						$title = false;
 					}
 					if ($title !== false) {
@@ -168,7 +177,7 @@ class ReleaseCleaning
 				);
 			}
 			// don't match against ab.teevee if title is for just the season
-			if ($this->groupName == 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {
+			if ($this->groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $match)) {
 				$title = false;
 			}
 			if ($title !== false) {
@@ -206,7 +215,11 @@ class ReleaseCleaning
 				return $this->generic();
 		}
 	}
-	public function teevee()
+
+	/**
+	 * @return array
+	 */
+	public function teevee(): array
 	{
 		//[140022]-[04] - [01/40] - "140022-04.nfo" yEnc
 		if (preg_match('/\[\d+\]-\[.+\] - \[\d+\/\d+\] - "\d+-.+" yEnc/', $this->subject)) {
@@ -221,7 +234,11 @@ class ReleaseCleaning
 			'properlynamed' => false
 		];
 	}
-	public function generic_town()
+
+	/**
+	 * @return array
+	 */
+	public function generic_town(): array
 	{
 		//<TOWN><www.town.ag > <download all our files with>>> www.ssl-news.info <<< > [05/87] - "Deep.Black.Ass.5.XXX.1080p.WEBRip.x264-TBP.part03.rar" - 7,87 GB yEnc
 		//<TOWN><www.town.ag > <partner of www.ssl-news.info > [02/24] - "Dragons.Den.UK.S11E02.HDTV.x264-ANGELiC.nfo" - 288,96 MB yEnc
@@ -375,14 +392,25 @@ class ReleaseCleaning
 			'properlynamed' => false
 		];
 	}
-	public function releaseCleanerHelper($subject)
+
+	/**
+	 * @param $subject
+	 *
+	 * @return string
+	 */
+	public function releaseCleanerHelper($subject): string
 	{
 		$cleanerName = preg_replace('/(- )?yEnc$/', '', $subject);
 		return trim(preg_replace('/\s\s+/', ' ', $cleanerName));
 	}
-	//
-	//	Cleans release name for the namefixer class.
-	//
+
+	/**
+	 * Cleans release name for the namefixer class.
+	 *
+	 * @param $name
+	 *
+	 * @return mixed|string
+	 */
 	public function fixerCleaner($name)
 	{
 		//Extensions.
