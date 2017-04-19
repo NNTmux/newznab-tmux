@@ -118,3 +118,6 @@ Before converting to InnoDB be sure to set:
  All external libraries will have their full licenses in their respectful folders.
 
  Some licenses might have been missed in this document for various external software, they will be included in their respectful folders.
+ 
+ 
+ [Flattr](<a href="https://flattr.com/submit/auto?fid=jegg95&url=https%3A%2F%2Fgithub.com%2FNNTmux%2Fnewznab-tmux" target="_blank"><img src="//button.flattr.com/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>)
