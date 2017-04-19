@@ -757,9 +757,9 @@ class NameFixer
 	 * @param int     $show
 	 * @param int     $preId
 	 */
-	public function updateRelease($release, $name, $method, $echo, $type, $nameStatus, $show, $preId = 0): void
+	public function updateRelease($release, $name, $method, $echo, $type, int $nameStatus, int $show,  int $preId = 0): void
 	{
-		$release['releases_id'] = ($release['releases_id'] ?? $release['releaseid']);
+		$release['releases_id'] = $release['releases_id'] ?? $release['releaseid'];
 		if ($this->relid !== (int)$release['releases_id']) {
 			$releaseCleaning = new ReleaseCleaning($this->pdo);
 			$newName = $releaseCleaning->fixerCleaner($name);
@@ -817,13 +817,13 @@ class NameFixer
 					}
 
 					if ($type !== 'PAR2, ') {
-						echo "\n";
+						echo PHP_EOL;
 					}
 				}
 
 				$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
 
-				if ($echo === true) {
+				if ($echo === 1) {
 					if ($nameStatus === 1) {
 						$status = '';
 						switch ($type) {
@@ -851,7 +851,7 @@ class NameFixer
 								$status = 'isrenamed = 1, iscategorized = 1, proc_uid = 1,';
 								break;
 						}
-						$this->pdo->queryExec(
+						$end = $this->pdo->queryExec(
 							sprintf('
 								UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL,
@@ -1033,7 +1033,7 @@ class NameFixer
 	 *
 	 * @param array $args The CLI script arguments
 	 */
-	public function getPreFileNames(array $args = array()): void
+	public function getPreFileNames(array $args = []): void
 	{
 		$n = PHP_EOL;
 

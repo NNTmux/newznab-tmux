@@ -1,4 +1,5 @@
 2017-04-19 DariusIII
+	* Fix: Fix bad logic for namefixer release update function
 	* Fix: Cast $release['releases_id'] as integer when comparing to $this->relid in NameFixer class
 	* Chg: Declare PHP7 return types, remove duplicated TV naming regex in NameFixer class
 	* Chg: Declare PHP7 return types in Categorize class and add PHPDOC blocks to functions
