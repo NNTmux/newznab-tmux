@@ -10,7 +10,7 @@ class ReleaseSearch
 	const SPHINX   = 2;
 
 	/***
-	 * @var \nntmux\db\DB
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -44,7 +44,7 @@ class ReleaseSearch
 				break;
 		}
 
-		$this->sphinxQueryOpt = ";limit=10000;maxmatches=10000;sort=relevance;mode=extended";
+		$this->sphinxQueryOpt = ';limit=10000;maxmatches=10000;sort=relevance;mode=extended';
 		$this->pdo = ($settings instanceof DB ? $settings : new DB());
 	}
 
@@ -56,7 +56,7 @@ class ReleaseSearch
 	 *
 	 * @return string
 	 */
-	public function getSearchSQL(array $options = [], $forceLike = false)
+	public function getSearchSQL(array $options = [], $forceLike = false): string
 	{
 		$this->searchOptions = $options;
 
@@ -83,7 +83,7 @@ class ReleaseSearch
 	 * Returns the string for joining the release search table to the releases table.
 	 * @return string
 	 */
-	public function getFullTextJoinString()
+	public function getFullTextJoinString(): string
 	{
 		return $this->fullTextJoinString;
 	}
@@ -93,7 +93,7 @@ class ReleaseSearch
 	 *
 	 * @return string
 	 */
-	private function fullTextSQL()
+	private function fullTextSQL(): ?string
 	{
 		$return = '';
 		foreach ($this->searchOptions as $columnName => $searchString) {
@@ -117,9 +117,8 @@ class ReleaseSearch
 		// If we didn't get anything, try the LIKE method.
 		if ($return === '') {
 			return $this->likeSQL();
-		} else {
-			return $return;
 		}
+		return $return;
 	}
 
 	/**
@@ -127,7 +126,7 @@ class ReleaseSearch
 	 *
 	 * @return string
 	 */
-	private function likeSQL()
+	private function likeSQL(): string
 	{
 		$return = '';
 		foreach ($this->searchOptions as $columnName => $searchString) {
@@ -155,7 +154,7 @@ class ReleaseSearch
 	 *
 	 * @return string
 	 */
-	private function sphinxSQL()
+	private function sphinxSQL(): string
 	{
 		$searchQuery = $fullReturn = '';
 
