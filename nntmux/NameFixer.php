@@ -181,7 +181,7 @@ class NameFixer
 	 * @param         $nameStatus
 	 * @param         $show
 	 */
-	public function fixNamesWithNfo($time, $echo, $cats, $nameStatus, $show)
+	public function fixNamesWithNfo($time, $echo, $cats, $nameStatus, $show): void
 	{
 		$this->_echoStartMessage($time, '.nfo files');
 		$type = 'NFO, ';
@@ -261,7 +261,7 @@ class NameFixer
 	 * @param         $nameStatus
 	 * @param         $show
 	 */
-	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show)
+	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show): void
 	{
 		$this->_echoStartMessage($time, 'file names');
 		$type = 'Filenames, ';
@@ -325,7 +325,7 @@ class NameFixer
 	 * @param         $nameStatus
 	 * @param         $show
 	 */
-	public function fixXXXNamesWithFiles($time, $echo, $cats, $nameStatus, $show)
+	public function fixXXXNamesWithFiles($time, $echo, $cats, $nameStatus, $show): void
 	{
 		$this->_echoStartMessage($time, 'file names');
 		$type = 'Filenames, ';
@@ -386,7 +386,7 @@ class NameFixer
 	 * @param         $nameStatus
 	 * @param         $show
 	 */
-	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show)
+	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show): void
 	{
 		$this->_echoStartMessage($time, 'file names');
 		$type = 'Filenames, ';
@@ -448,7 +448,7 @@ class NameFixer
 	 * @param      $show
 	 * @param NNTP $nntp
 	 */
-	public function fixNamesWithPar2($time, $echo, $cats, $nameStatus, $show, $nntp)
+	public function fixNamesWithPar2($time, $echo, $cats, $nameStatus, $show, $nntp): void
 	{
 		$this->_echoStartMessage($time, 'par2 files');
 
@@ -516,7 +516,7 @@ class NameFixer
 	 * @param         $nameStatus
 	 * @param         $show
 	 */
-	public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show)
+	public function fixNamesWithMedia($time, $echo, $cats, $nameStatus, $show): void
 	{
 		$type = 'UID, ';
 
@@ -587,7 +587,7 @@ class NameFixer
 	 * @param         $nameStatus
 	 * @param         $show
 	 */
-	public function fixNamesWithParHash($time, $echo, $cats, $nameStatus, $show)
+	public function fixNamesWithParHash($time, $echo, $cats, $nameStatus, $show): void
 	{
 		$type = 'PAR2 hash, ';
 
@@ -663,19 +663,19 @@ class NameFixer
 		$releases = false;
 		$queryLimit = ($limit === '') ? '' : ' LIMIT ' . $limit;
 		// 24 hours, other cats
-		if ($time == 1 && $cats == 1) {
+		if ($time === 1 && $cats === 1) {
 			echo ColorCLI::header($query . $this->timeother . $queryLimit . ";\n");
 			$releases = $this->pdo->queryDirect($query . $this->timeother . $queryLimit);
 		} // 24 hours, all cats
-		else if ($time == 1 && $cats == 2) {
+		else if ($time === 1 && $cats === 2) {
 			echo ColorCLI::header($query . $this->timeall . $queryLimit . ";\n");
 			$releases = $this->pdo->queryDirect($query . $this->timeall . $queryLimit);
 		} //other cats
-		else if ($time == 2 && $cats == 1) {
+		else if ($time === 2 && $cats === 1) {
 			echo ColorCLI::header($query . $this->fullother . $queryLimit . ";\n");
 			$releases = $this->pdo->queryDirect($query . $this->fullother . $queryLimit);
 		} // all cats
-		else if ($time == 2 && $cats == 2) {
+		else if ($time === 2 && $cats === 2) {
 			echo ColorCLI::header($query . $this->fullall . $queryLimit . ";\n");
 			$releases = $this->pdo->queryDirect($query . $this->fullall . $queryLimit);
 		}
@@ -689,9 +689,9 @@ class NameFixer
 	 * @param int    $echo 1: change the name, anything else: preview of what could have been changed.
 	 * @param string $type The function type that found the name.
 	 */
-	protected function _echoFoundCount($echo, $type)
+	protected function _echoFoundCount($echo, $type): void
 	{
-		if ($echo == 1) {
+		if ($echo === 1) {
 			echo ColorCLI::header(
 				PHP_EOL .
 				number_format($this->fixed) .
@@ -714,12 +714,12 @@ class NameFixer
 	 * @param int    $time 1: 24 hours, 2: no time limit
 	 * @param string $type The function type.
 	 */
-	protected function _echoStartMessage($time, $type)
+	protected function _echoStartMessage($time, $type): void
 	{
 		echo ColorCLI::header(
 			sprintf(
 				'Fixing search names %s using %s.',
-				($time == 1 ? 'in the past 6 hours' : 'since the beginning'),
+				($time === 1 ? 'in the past 6 hours' : 'since the beginning'),
 				$type
 			)
 		);
@@ -729,9 +729,9 @@ class NameFixer
 	/**
 	 * @param int $show
 	 */
-	protected function _echoRenamed($show)
+	protected function _echoRenamed($show): void
 	{
-		if ($this->checked % 500 == 0 && $show === 1) {
+		if ($this->checked % 500 === 0 && $show === 1) {
 			echo ColorCLI::alternate(PHP_EOL . number_format($this->checked) . ' files processed.' . PHP_EOL);
 		}
 
@@ -757,13 +757,13 @@ class NameFixer
 	 * @param int     $show
 	 * @param int     $preId
 	 */
-	public function updateRelease($release, $name, $method, $echo, $type, $nameStatus, $show, $preId = 0)
+	public function updateRelease($release, $name, $method, $echo, $type, $nameStatus, $show, $preId = 0): void
 	{
 		$release['releases_id'] = ($release['releases_id'] ?? $release['releaseid']);
 		if ($this->relid !== $release['releases_id']) {
 			$releaseCleaning = new ReleaseCleaning($this->pdo);
 			$newName = $releaseCleaning->fixerCleaner($name);
-			if (strtolower($newName) != strtolower($release["searchname"])) {
+			if (strtolower($newName) !== strtolower($release['searchname'])) {
 				$this->matched = true;
 				$this->relid = $release['releases_id'];
 
@@ -789,7 +789,7 @@ class NameFixer
 					$oldCatName = $this->category->getNameByID($release['categories_id']);
 					$newCatName = $this->category->getNameByID($determinedCategory);
 
-					if ($type === "PAR2, ") {
+					if ($type === 'PAR2, ') {
 						echo PHP_EOL;
 					}
 
@@ -823,8 +823,8 @@ class NameFixer
 
 				$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
 
-				if ($echo == true) {
-					if ($nameStatus == 1) {
+				if ($echo === true) {
+					if ($nameStatus === 1) {
 						$status = '';
 						switch ($type) {
 							case 'NFO, ':
@@ -917,7 +917,7 @@ class NameFixer
 													  'releases_id'   => 0,
 													  'method'       => ''
 												  ]
-	)
+	): void
 	{
 		echo
 			PHP_EOL .
@@ -940,7 +940,7 @@ class NameFixer
 	 *
 	 * @return int
 	 */
-	public function matchPredbFT($pre, $echo, $namestatus, $echooutput, $show)
+	public function matchPredbFT($pre, $echo, $namestatus, $echooutput, $show): int
 	{
 		$matching = $total = 0;
 
@@ -987,7 +987,12 @@ class NameFixer
 		return $matching;
 	}
 
-	protected function _preFTsearchQuery($preTitle)
+	/**
+	 * @param $preTitle
+	 *
+	 * @return string
+	 */
+	protected function _preFTsearchQuery($preTitle): string
 	{
 		$join = '';
 
@@ -1028,7 +1033,7 @@ class NameFixer
 	 *
 	 * @param array $args The CLI script arguments
 	 */
-	public function getPreFileNames(array $args = array())
+	public function getPreFileNames(array $args = array()): void
 	{
 		$n = PHP_EOL;
 
@@ -1108,7 +1113,7 @@ class NameFixer
 	 *
 	 * @return int
 	 */
-	public function matchPredbFiles($release, $echo, $namestatus, $echooutput, $show)
+	public function matchPredbFiles($release, $echo, $namestatus, $echooutput, $show): int
 	{
 		$matching = 0;
 		$pre = false;
@@ -1121,7 +1126,7 @@ class NameFixer
 				$result = $this->pdo->queryOneRow(sprintf("SELECT filename AS filename FROM predb WHERE MATCH(filename) AGAINST ('$match[0]' IN BOOLEAN MODE)"));
 				$preFTmatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w-.]+[\w]$/i', $result['filename'], $match1);
 				if ($preFTmatch) {
-					if ($match[0] == $match1[0]) {
+					if ($match[0] === $match1[0]) {
 						$this->_fileName = $result['filename'];
 					}
 				}
@@ -1159,7 +1164,7 @@ class NameFixer
 	 *
 	 * @return string
 	 */
-	protected function _cleanMatchFiles()
+	protected function _cleanMatchFiles(): ?string
 	{
 
 		// first strip all non-printing chars  from filename
@@ -1180,12 +1185,12 @@ class NameFixer
 
 				//if filename has a .vol001, send it back to the function to cut the next period
 				case preg_match('/\.vol\d+(\+\d+)?$/', $this->_fileName):
-					$this->_fileName = Utility::cutStringUsingLast('.', $this->_fileName, "left", false);
+					$this->_fileName = Utility::cutStringUsingLast('.', $this->_fileName, 'left', false);
 					continue;
 
 				//if filename contains a slash, cut the string and keep string to the right of the last slash to remove dir
 				case strpos($this->_fileName, '\\') !== false:
-					$this->_fileName = Utility::cutStringUsingLast('\\', $this->_fileName, "right", false);
+					$this->_fileName = Utility::cutStringUsingLast('\\', $this->_fileName, 'right', false);
 					continue;
 
 				// A lot of obscured releases have one NFO file properly named with a track number (Audio) at the front of it
@@ -1210,7 +1215,7 @@ class NameFixer
 	 *
 	 * @return int
 	 */
-	public function matchPredbHash($hash, $release, $echo, $namestatus, $echooutput, $show)
+	public function matchPredbHash($hash, $release, $echo, $namestatus, $echooutput, $show): int
 	{
 		$pdo = $this->pdo;
 		$matching = 0;
@@ -1257,7 +1262,7 @@ class NameFixer
 	 *
 	 * @return boolean
 	 */
-	public function checkName($release, $echo, $type, $namestatus, $show, $preid = false)
+	public function checkName($release, $echo, $type, $namestatus, $show, $preid = false): bool
 	{
 		// Get pre style name from releases.name
 		if (preg_match_all(self::PREDB_REGEX, $release['textstring'], $matches) && !preg_match('/Source\s\:/i', $release['textstring'])) {
@@ -1303,7 +1308,7 @@ class NameFixer
 			}
 
 			// set NameFixer process flags after run
-			if ($namestatus == 1 && $this->matched === false) {
+			if ($namestatus === 1 && $this->matched === false) {
 				switch ($type) {
 					case 'NFO, ':
 						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release['releases_id']);
@@ -1333,7 +1338,7 @@ class NameFixer
 	 * @param integer $status
 	 * @param integer $id
 	 */
-	public function _updateSingleColumn($column = '', $status = 0, $id = 0)
+	public function _updateSingleColumn($column = '', $status = 0, $id = 0): void
 	{
 		if ($column !== '' && $id !== 0) {
 			$this->pdo->queryExec(
@@ -1358,7 +1363,7 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function tvCheck($release, $echo, $type, $namestatus, $show)
+	public function tvCheck($release, $echo, $type, $namestatus, $show): void
 	{
 		$result = [];
 
@@ -1374,8 +1379,6 @@ class NameFixer
 				$this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.SxxExx.source.vcodec.group', $echo, $type, $namestatus, $show);
 			} else if (preg_match('/\w[-\w.\',;& ]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[._ -](AAC( LC)?|AC-?3|DD5([._ -]1)?|(A_)?DTS-?(HD)?|Dolby( ?TrueHD)?|MP3|TrueHD)[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -](480|720|1080)[ip][._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release['textstring'], $result)) {
 				$this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.SxxExx.acodec.source.res.vcodec.group', $echo, $type, $namestatus, $show);
-			} else if (preg_match('/\w[-\w.\',;& ]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[-\w.\',;& ]+((19|20)\d\d)[-\w.\',;& ]+\w/i', $release['textstring'], $result)) {
-				$this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.SxxExx.resolution.source.vcodec.group', $echo, $type, $namestatus, $show);
 			} else if (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[._ -]((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[._ -](BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[-\w.\',;& ]+\w/i', $release['textstring'], $result)) {
 				$this->updateRelease($release, $result['0'], $method = 'tvCheck: Title.year.###(season/episode).source.group', $echo, $type, $namestatus, $show);
 			} else if (preg_match('/\w(19|20)\d\d[._ -]\d{2}[._ -]\d{2}[._ -](IndyCar|NBA|NCW(T|Y)S|NNS|NSCS?)([._ -](19|20)\d\d)?[-\w.\',;& ]+\w/i', $release['textstring'], $result)) {
@@ -1393,7 +1396,7 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function movieCheck($release, $echo, $type, $namestatus, $show)
+	public function movieCheck($release, $echo, $type, $namestatus, $show): void
 	{
 		$result = [];
 
@@ -1438,7 +1441,7 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function gameCheck($release, $echo, $type, $namestatus, $show)
+	public function gameCheck($release, $echo, $type, $namestatus, $show): void
 	{
 		$result = [];
 
@@ -1467,7 +1470,7 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function appCheck($release, $echo, $type, $namestatus, $show)
+	public function appCheck($release, $echo, $type, $namestatus, $show): void
 	{
 		$result = [];
 
@@ -1494,7 +1497,7 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function nfoCheckTV($release, $echo, $type, $namestatus, $show)
+	public function nfoCheckTV($release, $echo, $type, $namestatus, $show): void
 	{
 		$result = [];
 
@@ -1517,7 +1520,7 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function nfoCheckMov($release, $echo, $type, $namestatus, $show)
+	public function nfoCheckMov($release, $echo, $type, $namestatus, $show): void
 	{
 		$result = [];
 
@@ -1540,7 +1543,7 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function nfoCheckMus($release, $echo, $type, $namestatus, $show)
+	public function nfoCheckMus($release, $echo, $type, $namestatus, $show): void
 	{
 		$result = [];
 
@@ -1559,7 +1562,7 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function nfoCheckTY($release, $echo, $type, $namestatus, $show)
+	public function nfoCheckTY($release, $echo, $type, $namestatus, $show): void
 	{
 		$result = [];
 
@@ -1637,7 +1640,7 @@ class NameFixer
 							break;
 					}
 
-					$releasename = $releasename . "." . $result['res'];
+					$releasename = $releasename . '.' . $result['res'];
 				}
 
 				if (preg_match('/source.*?\b(?P<source>BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)\b/i', $release['textstring'], $result)) {
@@ -1732,7 +1735,7 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function nfoCheckG($release, $echo, $type, $namestatus, $show)
+	public function nfoCheckG($release, $echo, $type, $namestatus, $show): void
 	{
 		$result = [];
 
@@ -1759,7 +1762,7 @@ class NameFixer
 	 * @param         $namestatus
 	 * @param         $show
 	 */
-	public function nfoCheckMisc($release, $echo, $type, $namestatus, $show)
+	public function nfoCheckMisc($release, $echo, $type, $namestatus, $show): void
 	{
 		if ($this->done === false && $this->relid !== $release['releases_id']) {
 
@@ -1775,16 +1778,16 @@ class NameFixer
 				} else if (preg_match('/Format.+(DVD(5|9|R)?|[HX][._ -]?264)\b/i', $release['textstring'], $result)) {
 					$releasename = $releasename . "." . $result[1];
 				} else if (preg_match('/\[(640x.+|1280x.+|1920x.+)\] Resolution\b/i', $release['textstring'], $result)) {
-					if ($result[1] == '640x.+') {
+					if ($result[1] === '640x.+') {
 						$result[1] = '480p';
-					} else if ($result[1] == '1280x.+') {
+					} else if ($result[1] === '1280x.+') {
 						$result[1] = '720p';
-					} else if ($result[1] == '1920x.+') {
+					} else if ($result[1] === '1920x.+') {
 						$result[1] = '1080p';
 					}
-					$releasename = $releasename . "." . $result[1];
+					$releasename = $releasename . '.' . $result[1];
 				}
-				$result = $releasename . ".IGUANA";
+				$result = $releasename . '.IGUANA';
 				$this->updateRelease($release, $result, $method = 'nfoCheck: IGUANA', $echo, $type, $namestatus, $show);
 			}
 		}
@@ -1801,7 +1804,7 @@ class NameFixer
 	 *
 	 * @return bool
 	 */
-	public function fileCheck($release, $echo, $type, $namestatus, $show)
+	public function fileCheck($release, $echo, $type, $namestatus, $show): bool
 	{
 		$result = [];
 
@@ -1896,7 +1899,7 @@ class NameFixer
 	 *
 	 * @return bool Whether or not we matched the release
 	 */
-	public function uidCheck($release, $echo, $type, $namestatus, $show)
+	public function uidCheck($release, $echo, $type, $namestatus, $show): bool
 	{
 		if ($this->done === false && $this->relid !== $release['releases_id']) {
 			$result = $this->pdo->queryDirect("
@@ -1943,7 +1946,7 @@ class NameFixer
 	 *
 	 * @return bool Whether or not we matched the release
 	 */
-	public function xxxNameCheck($release, $echo, $type, $namestatus, $show)
+	public function xxxNameCheck($release, $echo, $type, $namestatus, $show): bool
 	{
 		if ($this->done === false && $this->relid !== $release['releases_id']) {
 			$result = $this->pdo->queryDirect(sprintf("
@@ -1992,7 +1995,7 @@ class NameFixer
 	 *
 	 * @return bool Whether or not we matched the release
 	 */
-	public function srrNameCheck($release, $echo, $type, $namestatus, $show)
+	public function srrNameCheck($release, $echo, $type, $namestatus, $show): bool
 	{
 		if ($this->done === false && $this->relid !== $release['releases_id']) {
 			$result = $this->pdo->queryDirect(sprintf("
@@ -2041,7 +2044,7 @@ class NameFixer
 	 *
 	 * @return bool Whether or not we matched the release
 	 */
-	public function hashCheck($release, $echo, $type, $namestatus, $show)
+	public function hashCheck($release, $echo, $type, $namestatus, $show): bool
 	{
 		if ($this->done === false && $this->relid !== $release['releases_id']) {
 			$result = $this->pdo->queryDirect("
@@ -2079,7 +2082,7 @@ class NameFixer
 	/**
 	 * Resets NameFixer status variables for new processing
 	 */
-	public function reset()
+	public function reset(): void
 	{
 		$this->done = $this->matched = false;
 	}
