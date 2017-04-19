@@ -25,7 +25,7 @@ class AniDB
 	public $imgSavePath;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var Settings
 	 */
 	public $pdo;
 
@@ -91,7 +91,7 @@ class AniDB
 	 * @param string $type
 	 * @param int|string    $anidbId
 	 */
-	public function populateTable($type = '', $anidbId = '')
+	public function populateTable($type = '', $anidbId = ''): void
 	{
 		switch ($type) {
 			case 'full':
@@ -219,7 +219,7 @@ class AniDB
 	 *
 	 * @return string
 	 */
-	private function processAPIResponseElement(\SimpleXMLElement $element, $property = null)
+	private function processAPIResponseElement(\SimpleXMLElement $element, $property = null): string
 	{
 		$property = $property ?? 'name';
 		$temp = '';
@@ -237,7 +237,7 @@ class AniDB
 	 *
 	 * @return string
 	 */
-	private function getAniDbResponse($anidbId)
+	private function getAniDbResponse($anidbId): string
 	{
 		$curlString = sprintf(
 			'http://api.anidb.net:9001/httpapi?request=anime&client=%s&clientver=%d&protover=1&aid=%d',
@@ -269,7 +269,7 @@ class AniDB
 	 * @param string $lang  The title language
 	 * @param string $title The title of the Anime
 	 */
-	private function insertAniDb($id, $type, $lang, $title)
+	private function insertAniDb($id, $type, $lang, $title): void
 	{
 		$check = $this->checkDuplicateDbEntry($id, $type, $lang, $title);
 
@@ -297,7 +297,7 @@ class AniDB
 	 *
 	 * @return string
 	 */
-	private function insertAniDBInfoEps(array $AniDBInfoArray = [], $anidbId)
+	private function insertAniDBInfoEps(array $AniDBInfoArray = [], $anidbId): string
 	{
 		$this->pdo->queryInsert(
 			sprintf('
@@ -307,7 +307,7 @@ class AniDB
 					description, rating, picture, categories, characters, updated
 				)
 				VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())',
-				$anidbId['anidbid'],
+				$anidbId,
 				$this->pdo->escapeString($AniDBInfoArray['type']),
 				$this->pdo->escapeString($AniDBInfoArray['startdate']),
 				$this->pdo->escapeString($AniDBInfoArray['enddate']),
@@ -333,7 +333,7 @@ class AniDB
 	 *
 	 * @param array $episodeArr
 	 */
-	private function insertAniDBEpisodes($episodeArr = [], $anidbId)
+	private function insertAniDBEpisodes(array $episodeArr = [], $anidbId): void
 	{
 		if (!empty($episodeArr)) {
 			foreach ($episodeArr as $episode) {
@@ -342,7 +342,7 @@ class AniDB
 						INSERT IGNORE INTO anidb_episodes
 						(anidbid, episodeid, episode_no, episode_title, airdate)
 						VALUES (%d, %d, %d, %s, %s)',
-						$anidbId['anidbid'],
+						$anidbId,
 						$episode['episode_id'],
 						$episode['episode_no'],
 						$this->pdo->escapeString($episode['episode_title']),
@@ -356,7 +356,7 @@ class AniDB
 	/**
 	 *  Grabs AniDB Full Dump XML and inserts it into anidb table
 	 */
-	private function populateMainTable()
+	private function populateMainTable(): void
 	{
 		$lastUpdate = (new \DateTime)->setTimestamp($this->lastUpdate);
 		$current = new \DateTime();
@@ -419,18 +419,18 @@ class AniDB
 	 *
 	 * @param string $anidbId
 	 */
-	private function populateInfoTable($anidbId = '')
+	private function populateInfoTable($anidbId = ''): void
 	{
 		if ($anidbId === '') {
 			$anidbIds = $this->pdo->query(sprintf(
-				'SELECT DISTINCT at.anidbid AS anidbid, ai.updated 
+				'SELECT DISTINCT at.anidbid 
 					FROM anidb_titles at 
 					LEFT JOIN anidb_info ai ON ai.anidbid = at.anidbid
                     WHERE ai.updated IS NULL'
 				)
 			);
-			foreach ($anidbIds as $anidbId) {
-				$AniDBAPIArray = $this->getAniDbAPI($anidbId['anidbid']);
+			foreach ($anidbIds as $anidb) {
+				$AniDBAPIArray = $this->getAniDbAPI($anidb['anidbid']);
 
 				if ($this->banned === true) {
 					ColorCLI::doEcho(
@@ -445,16 +445,16 @@ class AniDB
 				if ($AniDBAPIArray === false && $this->echooutput) {
 					ColorCLI::doEcho(
 						ColorCLI::info(
-							'Anime ID: ' . $anidbId['anidbid'] . ' not available for update yet.'
+							'Anime ID: ' . $anidb['anidbid'] . ' not available for update yet.'
 						),
 						true
 					);
 				} else {
-					$this->updateAniChildTables($AniDBAPIArray, $anidbId);
+					$this->updateAniChildTables($AniDBAPIArray, $anidb['anidbid']);
 					if (NN_DEBUG) {
 						ColorCLI::doEcho(
 							ColorCLI::headerOver(
-								'Added/Updated AniDB ID: ' . $anidbId['anidbid']
+								'Added/Updated AniDB ID: ' . $anidb['anidbid']
 							),
 							true
 						);
@@ -462,7 +462,7 @@ class AniDB
 				}
 			}
 		} else {
-			$AniDBAPIArray = $this->getAniDbAPI($anidbId['anidbid']);
+			$AniDBAPIArray = $this->getAniDbAPI($anidbId);
 
 			if ($this->banned === true) {
 				ColorCLI::doEcho(
@@ -477,7 +477,7 @@ class AniDB
 			if ($AniDBAPIArray === false && $this->echooutput) {
 				ColorCLI::doEcho(
 					ColorCLI::info(
-						'Anime ID: ' . $anidbId['anidbid'] . ' not available for update yet.'
+						'Anime ID: ' . $anidbId . ' not available for update yet.'
 					),
 					true
 				);
@@ -487,7 +487,7 @@ class AniDB
 				if (NN_DEBUG) {
 					ColorCLI::doEcho(
 						ColorCLI::headerOver(
-							'Added/Updated AniDB ID: ' . $anidbId['anidbid']
+							'Added/Updated AniDB ID: ' . $anidbId
 						),
 						true
 					);
@@ -499,7 +499,7 @@ class AniDB
 	/**
 	 * Sets the database time for last full AniDB update
 	 */
-	private function setLastUpdated()
+	private function setLastUpdated(): void
 	{
 		Settings::update(
 			['value' => time()],
@@ -514,7 +514,7 @@ class AniDB
 	 *
 	 * @return string
 	 */
-	private function updateAniDBInfoEps($AniDBInfoArray = [], $anidbId)
+	private function updateAniDBInfoEps(array $AniDBInfoArray = [], $anidbId): string
 	{
 		$this->pdo->queryExec(
 			sprintf('
@@ -535,7 +535,7 @@ class AniDB
 				$this->pdo->escapeString($AniDBInfoArray['picture']),
 				$this->pdo->escapeString($AniDBInfoArray['categories']),
 				$this->pdo->escapeString($AniDBInfoArray['characters']),
-				$anidbId['anidbid']
+				$anidbId
 			)
 		);
 		if (!empty($AniDBInfoArray['epsarr'])) {
@@ -551,14 +551,14 @@ class AniDB
 	 * @param array $AniDBInfoArray
 	 * @param       $anidbId
 	 */
-	private function updateAniChildTables($AniDBInfoArray = [], $anidbId)
+	private function updateAniChildTables(array $AniDBInfoArray = [], $anidbId): void
 	{
 		$check = $this->pdo->queryOneRow(
 			sprintf('
 				SELECT ai.anidbid AS info
 				FROM anidb_info ai
 				WHERE ai.anidbid = %d',
-				$anidbId['anidbid']
+				$anidbId
 			)
 		);
 
@@ -568,9 +568,9 @@ class AniDB
 			$picture = $this->updateAniDBInfoEps($AniDBInfoArray, $anidbId);
 		}
 
-		if (!empty($picture) && !file_exists($this->imgSavePath . $anidbId['anidbid'] . '.jpg')) {
+		if (!empty($picture) && !file_exists($this->imgSavePath . $anidbId . '.jpg')) {
 			(new ReleaseImage($this->pdo))->saveImage(
-				$anidbId['anidbid'],
+				$anidbId,
 				'http://img7.anidb.net/pics/anime/' . $picture,
 				$this->imgSavePath
 			);

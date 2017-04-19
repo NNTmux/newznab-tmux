@@ -7,6 +7,7 @@ use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\NZB;
 use nntmux\db\DB;
+use nntmux\db\populate\AniDB as PaDb;
 
 class AniDB
 {
@@ -21,7 +22,7 @@ class AniDB
 	public $echooutput;
 
 	/**
-	 * @var \nntmux\db\populate\AniDB
+	 * @var PaDb
 	 */
 	public $padb;
 
@@ -63,7 +64,7 @@ class AniDB
 	/**
 	 * Queues anime releases for processing
 	 */
-	public function processAnimeReleases()
+	public function processAnimeReleases(): void
 	{
 		$results = $this->pdo->queryDirect(
 			sprintf('
@@ -84,7 +85,7 @@ class AniDB
 
 			$this->doRandomSleep();
 
-			$this->padb = new \nntmux\db\populate\AniDB(
+			$this->padb = new PaDb(
 				[
 					'Echo'     => $this->echooutput,
 					'Settings' => $this->pdo
@@ -136,7 +137,7 @@ class AniDB
 	/**
 	 * Sleeps between 10 and 15 seconds for AniDB API cooldown
 	 */
-	private function doRandomSleep()
+	private function doRandomSleep(): void
 	{
 		sleep(random_int(10, 15));
 	}
@@ -146,9 +147,9 @@ class AniDB
 	 *
 	 * @param string $cleanName
 	 *
-	 * @return array
+	 * @return array $matches
 	 */
-	private function extractTitleEpisode($cleanName = '')
+	private function extractTitleEpisode($cleanName = ''): array
 	{
 		$cleanName = str_replace('_', ' ', $cleanName);
 
@@ -237,7 +238,7 @@ class AniDB
 
 				if ($updatedAni === false) {
 					if ($this->updateTimeCheck($anidbId['anidbid']) !== false) {
-						$this->padb->populateTable('info', $anidbId);
+						$this->padb->populateTable('info', $anidbId['anidbid']);
 						$this->doRandomSleep();
 						$updatedAni = $this->checkAniDBInfo($anidbId['anidbid']);
 						$type = 'Remote';
@@ -280,13 +281,13 @@ class AniDB
 	 * @param $anidbId
 	 * @param $relId
 	 */
-	private function updateRelease($anidbId, $relId)
+	private function updateRelease($anidbId, $relId): void
 	{
 		$this->pdo->queryExec(
-			sprintf("
+			sprintf('
 				UPDATE releases
 				SET anidbid = %d
-				WHERE id = %d",
+				WHERE id = %d',
 				$anidbId,
 				$relId
 			)
@@ -303,11 +304,11 @@ class AniDB
 	private function updateTimeCheck($anidbId)
 	{
 		return $this->pdo->queryOneRow(
-			sprintf("
+			sprintf('
 				SELECT anidbid
 				FROM anidb_info ai
 				WHERE ai.updated < (NOW() - INTERVAL 7 DAY)
-				AND ai.anidbid = %d",
+				AND ai.anidbid = %d',
 				$anidbId
 			)
 		);
