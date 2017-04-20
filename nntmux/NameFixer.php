@@ -691,7 +691,7 @@ class NameFixer
 	 */
 	protected function _echoFoundCount($echo, $type): void
 	{
-		if ($echo === 1) {
+		if ($echo === true) {
 			echo ColorCLI::header(
 				PHP_EOL .
 				number_format($this->fixed) .
@@ -823,7 +823,7 @@ class NameFixer
 
 				$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
 
-				if ($echo === 1) {
+				if ($echo === true) {
 					if ($nameStatus === 1) {
 						$status = '';
 						switch ($type) {
@@ -851,7 +851,7 @@ class NameFixer
 								$status = 'isrenamed = 1, iscategorized = 1, proc_uid = 1,';
 								break;
 						}
-						$end = $this->pdo->queryExec(
+						$this->pdo->queryExec(
 							sprintf('
 								UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL,
@@ -1080,7 +1080,7 @@ class NameFixer
 					echo ColorCLI::header($n . number_format($total) . ' releases to process.');
 
 					foreach ($query as $row) {
-						$success = $this->matchPredbFiles($row, 1, 1, true, $show);
+						$success = $this->matchPredbFiles($row, true, 1, true, $show);
 						if ($success === 1) {
 							$counted++;
 						}

@@ -21,7 +21,7 @@ $namefixer = new NameFixer(['Settings' => $pdo]);
 $predb = new PreDb(['Echo' => true, 'Settings' => $pdo]);
 
 if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
-	$update = ($argv[2] === 'true') ? 1 : 0;
+	$update = $argv[2] === 'true' ? true : false;
 	$other = 1;
 	if ($argv[3] === 'all') {
 		$other = 2;
