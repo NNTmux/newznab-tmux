@@ -464,6 +464,7 @@ class AniDB
 						);
 					}
 				}
+				sleep(random_int(120, 240));
 			}
 		} else {
 			$AniDBAPIArray = $this->getAniDbAPI($anidbId);
