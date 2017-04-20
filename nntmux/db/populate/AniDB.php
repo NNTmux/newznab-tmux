@@ -159,24 +159,24 @@ class AniDB
 			echo "AniDB   : Anime not yet on site. Remove until next update.\n";
 		} elseif ($AniDBAPIXML = new \SimpleXMLElement($apiresponse)) {
 
-			$AniDBAPIArray['similar'] = $this->processAPIResponseElement($AniDBAPIXML->similaranime, 'anime');
-			$AniDBAPIArray['related'] = $this->processAPIResponseElement($AniDBAPIXML->relatedanime, 'anime');
-			$AniDBAPIArray['creators'] = $this->processAPIResponseElement($AniDBAPIXML->creators);
-			$AniDBAPIArray['characters'] = $this->processAPIResponseElement($AniDBAPIXML->characters);
-			$AniDBAPIArray['categories'] = $this->processAPIResponseElement($AniDBAPIXML->categories);
+			$AniDBAPIArray['similar'] = $this->processAPIResponseElement($AniDBAPIXML->similaranime, 'anime', false);
+			$AniDBAPIArray['related'] = $this->processAPIResponseElement($AniDBAPIXML->relatedanime, 'anime', false);
+			$AniDBAPIArray['creators'] = $this->processAPIResponseElement($AniDBAPIXML->creators, null, false);
+			$AniDBAPIArray['characters'] = $this->processAPIResponseElement($AniDBAPIXML->characters, null, true);
+			$AniDBAPIArray['categories'] = $this->processAPIResponseElement($AniDBAPIXML->categories, null, true);
 
 			$episodeArray = [];
-			if ($AniDBAPIXML->episodes && $AniDBAPIXML->episodes[0]->attributes()) {
+			if ($AniDBAPIXML->episodes && $AniDBAPIXML->episodes->episode[0]->attributes()) {
 				$i = 1;
 				foreach ($AniDBAPIXML->episodes->episode as $episode) {
 					$titleArray = [];
 
-					$episodeArray[$i]['episode_id'] = (int)$episode->attributes()->id[0];
+					$episodeArray[$i]['episode_id'] = (int)$episode->attributes()->id;
 					$episodeArray[$i]['episode_no'] = (int)$episode->epno;
 					$episodeArray[$i]['airdate'] = (string)$episode->airdate;
 
-					if ($AniDBAPIXML->title && $AniDBAPIXML->title[0]->attributes()) {
-						foreach ($AniDBAPIXML->title->children() as $title) {
+					if (!empty($episode->title)) {
+						foreach ($episode->title as $title) {
 							$xmlAttribs = $title->attributes('xml', true);
 							// only english, x-jat imploded episode titles for now
 							if (in_array($xmlAttribs->lang, ['en', 'x-jat'], false)) {
@@ -217,14 +217,18 @@ class AniDB
 	 * @param \SimpleXMLElement $element
 	 * @param string            $property
 	 *
+	 * @param bool              $children
+	 *
 	 * @return string
 	 */
-	private function processAPIResponseElement(\SimpleXMLElement $element, $property = null): string
+	private function processAPIResponseElement(\SimpleXMLElement $element, $property = null, $children = false): string
 	{
 		$property = $property ?? 'name';
 		$temp = '';
-		if ($element && $element[0]->attributes()) {
-			foreach ($element->children() as $entry) {
+
+		if (is_object($element) && !empty($element)) {
+			$result = $children === true ? $element->children() : $element;
+			foreach ($result as $entry) {
 				$temp .= (string)$entry->$property . ', ';
 			}
 		}
@@ -421,7 +425,7 @@ class AniDB
 	 */
 	private function populateInfoTable($anidbId = ''): void
 	{
-		if ($anidbId === '') {
+		if (empty($anidbId)) {
 			$anidbIds = $this->pdo->query(sprintf(
 				'SELECT DISTINCT at.anidbid 
 					FROM anidb_titles at 
@@ -483,7 +487,6 @@ class AniDB
 				);
 			} else {
 				$this->updateAniChildTables($AniDBAPIArray, $anidbId);
-				echo '*';
 				if (NN_DEBUG) {
 					ColorCLI::doEcho(
 						ColorCLI::headerOver(
