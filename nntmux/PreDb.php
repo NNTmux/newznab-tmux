@@ -56,7 +56,7 @@ Class PreDb
 	 *
 	 * @param $dateLimit
 	 */
-	public function checkPre($dateLimit = false)
+	public function checkPre($dateLimit = false): void
 	{
 		$this->dateLimit = $dateLimit;
 
@@ -120,7 +120,7 @@ Class PreDb
 	 */
 	public function matchPre($cleanerName)
 	{
-		if ($cleanerName == '') {
+		if (empty($cleanerName)) {
 			return false;
 		}
 
@@ -161,30 +161,30 @@ Class PreDb
 	 *
 	 * @return int
 	 */
-	public function parseTitles($time, $echo, $cats, $namestatus, $show)
+	public function parseTitles($time, $echo, $cats, $namestatus, $show): int
 	{
 		$namefixer = new NameFixer(['Echo' => $this->echooutput, 'ConsoleTools' => $this->pdo->log, 'Settings' => $this->pdo]);
 		$consoletools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
-		$othercats = implode(",", Category::OTHERS_GROUP);
+		$othercats = implode(',', Category::OTHERS_GROUP);
 		$updated = $checked = 0;
 
 		$tq = '';
-		if ($time == 1) {
+		if ($time === 1) {
 			$tq = 'AND r.adddate > (NOW() - INTERVAL 3 HOUR) ORDER BY rf.releases_id, rf.size DESC';
 		}
 		$ct = '';
-		if ($cats == 1) {
+		if ($cats === 1) {
 			$ct = sprintf('AND r.categories_id IN (%s)', $othercats);
 		}
 
 		if ($this->echooutput) {
 			$te = '';
-			if ($time == 1) {
+			if ($time === 1) {
 				$te = ' in the past 3 hours';
 			}
-			echo ColorCLI::header('Fixing search names' . $te . " using the predb hash.");
+			echo ColorCLI::header('Fixing search names' . $te . ' using the predb hash.');
 		}
-		$regex = "AND (r.ishashed = 1 OR rf.ishashed = 1)";
+		$regex = 'AND (r.ishashed = 1 OR rf.ishashed = 1)';
 
 		if ($cats === 3) {
 			$query = sprintf('SELECT r.id AS releases_id, r.name, r.searchname, r.categories_id, r.groups_id, '
@@ -200,23 +200,23 @@ Class PreDb
 
 		$res = $this->pdo->queryDirect($query);
 		$total = $res->rowCount();
-		echo ColorCLI::primary(number_format($total) . " releases to process.");
+		echo ColorCLI::primary(number_format($total) . ' releases to process.');
 		if ($res instanceof \Traversable) {
 			foreach ($res as $row) {
 				if (preg_match('/[a-fA-F0-9]{32,40}/i', $row['name'], $matches)) {
-					$updated = $updated + $namefixer->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+					$updated += $namefixer->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
 				} else if (preg_match('/[a-fA-F0-9]{32,40}/i', $row['filename'], $matches)) {
-					$updated = $updated + $namefixer->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+					$updated += $namefixer->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
 				}
 				if ($show === 2) {
-					$consoletools->overWritePrimary("Renamed Releases: [" . number_format($updated) . "] " . $consoletools->percentString(++$checked, $total));
+					$consoletools->overWritePrimary('Renamed Releases: [' . number_format($updated) . '] ' . $consoletools->percentString($checked++, $total));
 				}
 			}
 		}
-		if ($echo == 1) {
-			echo ColorCLI::header("\n" . $updated . " releases have had their names changed out of: " . number_format($checked) . " files.");
+		if ($echo === 1) {
+			echo ColorCLI::header(PHP_EOL . $updated . ' releases have had their names changed out of: ' . number_format($checked) . ' files.');
 		} else {
-			echo ColorCLI::header("\n" . $updated . " releases could have their names changed. " . number_format($checked) . " files were checked.");
+			echo ColorCLI::header(PHP_EOL . $updated . ' releases could have their names changed. ' . number_format($checked) . ' files were checked.');
 		}
 
 		return $updated;
@@ -231,7 +231,7 @@ Class PreDb
 	 *
 	 * @return array The row count and the query results.
 	 */
-	public function getAll($offset, $offset2, $search = '')
+	public function getAll($offset, $offset2, $search = ''): array
 	{
 		if ($search !== '') {
 			$search = explode(' ', trim($search));
@@ -267,7 +267,7 @@ Class PreDb
 	 *
 	 * @return int
 	 */
-	public function getCount($search = '')
+	public function getCount($search = ''): int
 	{
 		$count = $this->pdo->query("
 			SELECT COUNT(id) AS cnt
@@ -285,7 +285,7 @@ Class PreDb
 	 *
 	 * @return array
 	 */
-	public function getForRelease($preID)
+	public function getForRelease($preID): array
 	{
 		return $this->pdo->query(sprintf('SELECT * FROM predb WHERE id = %d', $preID));
 	}
@@ -297,7 +297,7 @@ Class PreDb
 	 *
 	 * @return array
 	 */
-	public function getOne($preID)
+	public function getOne($preID): array
 	{
 		return $this->pdo->queryOneRow(sprintf('SELECT * FROM predb WHERE id = %d', $preID));
 	}
