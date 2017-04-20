@@ -496,6 +496,8 @@ class XXX
 			}
 		}
 
+		$mov = [];
+
 		$mov['trailers'] = !empty($res['trailers']) ? serialize($res['trailers']) : '';
 		$mov['extras'] = !empty($res['extras']) ? serialize($res['extras']) : '';
 		$mov['productinfo'] = !empty($res['productinfo']) ? serialize($res['productinfo']) : '';
