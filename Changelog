@@ -1,4 +1,5 @@
 2017-04-20 DariusIII
+	* Chg: Change definition of XXX movies array
 	* Chg: Update PreDB class for PHP7
 	* Fix: Fix usage of fixRelNames script
 	* Mrg: Merge PR #133 from Nightah - Rebase all anime regexes
