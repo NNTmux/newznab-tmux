@@ -1,4 +1,5 @@
 2017-04-21 DariusIII
+	* Chg: Update NNTP class, small refactor of if - else
 	* Chg: Update Binaries class for PHP7
 	* Chg: Make guzzlehttp return codes more service specific
 	* Chg: Remove duplicated checks in XXX class
