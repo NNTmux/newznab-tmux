@@ -350,7 +350,7 @@ class TraktTv extends TV
 	 *
 	 * @return array
 	 */
-	public function formatShowInfo($show)
+	public function formatShowInfo($show): array
 	{
 		preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show['ids']['imdb'], $imdb);
 		$this->posterUrl = $show['images']['poster']['thumb'] ?? '';
@@ -384,7 +384,7 @@ class TraktTv extends TV
 	 *
 	 * @return array
 	 */
-	public function formatEpisodeInfo($episode)
+	public function formatEpisodeInfo($episode): array
 	{
 		return [
 				'title'       => (string)$episode['title'],
