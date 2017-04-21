@@ -93,9 +93,9 @@ abstract class TV extends Videos
 	 * @param integer $videoId ID from videos table.
 	 * @param integer $siteId  ID that this site uses for the programme.
 	 *
-	 * @return null
+	 * @return int
 	 */
-	abstract protected function getPoster($videoId, $siteId);
+	abstract protected function getPoster($videoId, $siteId): int;
 
 	/**
 	 * Retrieve info of TV programme from site using it's API.
@@ -114,7 +114,7 @@ abstract class TV extends Videos
 	 *
 	 * @return array
 	 */
-	abstract protected function formatShowInfo($show);
+	abstract protected function formatShowInfo($show): array;
 
 	/**
 	 * Assigns API episode response values to a formatted array for insertion
@@ -124,7 +124,7 @@ abstract class TV extends Videos
 	 *
 	 * @return array
 	 */
-	abstract protected function formatEpisodeInfo($episode);
+	abstract protected function formatEpisodeInfo($episode): array;
 
 		/**
 	 * Retrieve releases for TV processing
@@ -174,7 +174,8 @@ abstract class TV extends Videos
 	 * @param     $releaseId
 	 * @param int $episodeId
 	 */
-	public function setVideoIdFound($videoId, $releaseId, $episodeId) {
+	public function setVideoIdFound($videoId, $releaseId, $episodeId): void
+	{
 		$this->pdo->queryExec(
 			sprintf('
 				UPDATE releases
@@ -195,7 +196,7 @@ abstract class TV extends Videos
 	 * @param $status
 	 * @param $Id
 	 */
-	public function setVideoNotFound($status, $Id)
+	public function setVideoNotFound($status, $Id): void
 	{
 		$this->pdo->queryExec(
 			sprintf('
@@ -218,7 +219,7 @@ abstract class TV extends Videos
 	 *
 	 * @return int
 	 */
-	public function add(array $show = [])
+	public function add(array $show = []): int
 	{
 		$videoId = false;
 
@@ -319,7 +320,7 @@ abstract class TV extends Videos
 	 * @param int   $videoId
 	 * @param array $show
 	 */
-	public function update($videoId, array $show = [])
+	public function update($videoId, array $show = []): void
 	{
 		if ($show['country'] !== '') {
 			$show['country'] = Country::countryCode($show['country'], $this->pdo);
@@ -381,7 +382,7 @@ abstract class TV extends Videos
 	 *
 	 * @param $videoId
 	 */
-	public function setCoverFound($videoId)
+	public function setCoverFound($videoId): void
 	{
 		$this->pdo->queryExec(
 			sprintf('
@@ -466,7 +467,7 @@ abstract class TV extends Videos
 	 *
 	 * @return bool
 	 */
-	public function countEpsByVideoID($videoId)
+	public function countEpsByVideoID($videoId): bool
 	{
 		$count = $this->pdo->queryOneRow(
 			sprintf('

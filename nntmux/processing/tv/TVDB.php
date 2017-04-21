@@ -82,7 +82,7 @@ class TVDB extends TV
 	 * @param      $process
 	 * @param bool $local
 	 */
-	public function processSite($groupID, $guidChar, $process, $local = false)
+	public function processSite($groupID, $guidChar, $process, $local = false): void
 	{
 		$res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVDB);
 
@@ -226,7 +226,7 @@ class TVDB extends TV
 	 *
 	 * @return bool
 	 */
-	protected function getBanner($videoID, $siteId)
+	protected function getBanner($videoID, $siteId): bool
 	{
 		return false;
 	}
@@ -328,7 +328,7 @@ class TVDB extends TV
 	 *
 	 * @return int
 	 */
-	public function getPoster($videoId, $showId)
+	public function getPoster($videoId, $showId): int
 	{
 		$ri = new ReleaseImage($this->pdo);
 
@@ -340,7 +340,7 @@ class TVDB extends TV
 			$hascover = $ri->saveImage($videoId, sprintf($this->fanartUrl, $showId), $this->imgSavePath, '', '');
 		}
 		// Mark it retrieved if we saved an image
-		if ($hascover == 1) {
+		if ($hascover === 1) {
 			$this->setCoverFound($videoId);
 		}
 		return $hascover;
@@ -437,7 +437,7 @@ class TVDB extends TV
 	 *
 	 * @return array
 	 */
-	protected function formatShowInfo($show)
+	protected function formatShowInfo($show): array
 	{
 		preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
 
@@ -467,7 +467,7 @@ class TVDB extends TV
 	 *
 	 * @return array
 	 */
-	protected function formatEpisodeInfo($episode)
+	protected function formatEpisodeInfo($episode): array
 	{
 		return [
 			'title'       => (string)$episode->name,

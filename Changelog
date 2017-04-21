@@ -1,4 +1,5 @@
 2017-04-21 DariusIII
+	* Chg: Update TV related classes, fix trakttv covers
 	* Chg: Update Videos class
 	* Chg: Update NNTP class, small refactor of if - else
 	* Chg: Update Binaries class for PHP7

@@ -97,7 +97,7 @@ class TraktTv extends TV
 	 * @param      $process
 	 * @param bool $local
 	 */
-	public function processSite($groupID, $guidChar, $process, $local = false)
+	public function processSite($groupID, $guidChar, $process, $local = false): void
 	{
 		$res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TRAKT);
 
@@ -201,10 +201,9 @@ class TraktTv extends TV
 								echo ColorCLI::primary('Found TRAKT Match!');
 							}
 							continue;
-						} else {
-							//Processing failed, set the episode ID to the next processing group
-							$this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
 						}
+						//Processing failed, set the episode ID to the next processing group
+						$this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
 					} else {
 						//Processing failed, set the episode ID to the next processing group
 						$this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
@@ -226,7 +225,7 @@ class TraktTv extends TV
 	 *
 	 * @return bool
 	 */
-	public function getBanner($videoId, $siteID)
+	public function getBanner($videoId, $siteID): bool
 	{
 		return false;
 	}
@@ -238,7 +237,7 @@ class TraktTv extends TV
 	 * @param integer $series
 	 * @param integer $episode
 	 *
-	 * @return array|false False on failure, an array of information fields otherwise.
+	 * @return array|bool False on failure, an array of information fields otherwise.
 	 */
 	public function getEpisodeInfo($siteId, $series, $episode)
 	{
@@ -260,9 +259,9 @@ class TraktTv extends TV
 	/**
 	 *
 	 */
-	public function getMovieInfo()
+	public function getMovieInfo(): void
 	{
-		;
+
 	}
 
 	/**
@@ -271,9 +270,9 @@ class TraktTv extends TV
 	 * @param integer $videoId ID from videos table.
 	 * @param integer $siteId  ID that this site uses for the programme.
 	 *
-	 * @return null
+	 * @return int
 	 */
-	public function getPoster($videoId, $siteId)
+	public function getPoster($videoId, $siteId): int
 	{
 		$hascover = 0;
 		$ri = new ReleaseImage($this->pdo);
@@ -289,9 +288,10 @@ class TraktTv extends TV
 		}
 
 		// Mark it retrieved if we saved an image
-		if ($hascover == 1) {
+		if ($hascover === 1) {
 			$this->setCoverFound($videoId);
 		}
+		return $hascover;
 	}
 
 	/**
