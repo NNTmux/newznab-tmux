@@ -1,4 +1,16 @@
+2017-04-21 DariusIII
+	* Chg: Update NNTP class, small refactor of if - else
+	* Chg: Update Binaries class for PHP7
+	* Chg: Make guzzlehttp return codes more service specific
+	* Chg: Remove duplicated checks in XXX class
+	* Chg: Update composer with new versions of libraries
+	* Fix: Anime page layout in Gentele theme
 2017-04-20 DariusIII
+	* Chg: Adjust the renaming logic in NameFixer
+	* Chg: Change definition of XXX movies array
+	* Chg: Update PreDB class for PHP7
+	* Fix: Fix usage of fixRelNames script
+	* Mrg: Merge PR #133 from Nightah - Rebase all anime regexes
 	* Chg: Update XXX class for better PHP7 support
 	* Fix: Properly update anidb_episodes table on anidb updates
 2017-04-19 DariusIII

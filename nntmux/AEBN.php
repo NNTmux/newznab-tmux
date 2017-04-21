@@ -368,13 +368,15 @@ class AEBN
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
+						ColorCLI::doEcho(ColorCLI::notice('Data not available on AEBN server'));
 					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
+						ColorCLI::doEcho(ColorCLI::notice('AEBN service unavailable'));
 					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from AEBN, http error reported: ' . $e->getCode()));
 					}
 				}
+			} catch (\RuntimeException $e) {
+				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
 			}
 		} else {
 			try {
@@ -382,13 +384,15 @@ class AEBN
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
+						ColorCLI::doEcho(ColorCLI::notice('Data not available on AEBN server'));
 					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
+						ColorCLI::doEcho(ColorCLI::notice('AEBN service unavailable'));
 					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from AEBN, http error reported: ' . $e->getCode()));
 					}
 				}
+			} catch (\RuntimeException $e) {
+				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
 			}
 		}
 

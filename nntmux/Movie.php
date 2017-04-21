@@ -954,13 +954,15 @@ class Movie
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
 				if($e->getCode() === 404) {
-					ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
+					ColorCLI::doEcho(ColorCLI::notice('Data not available on IMDB server'));
 				} else if ($e->getCode() === 503) {
-					ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('IMDB service unavailable'));
 				} else {
-					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from IMDB, http error reported: ' . $e->getCode()));
 				}
 			}
+		} catch (\RuntimeException $e) {
+			ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
 		}
 
 		if (isset($buffer) && $buffer !== false) {
@@ -1326,13 +1328,15 @@ class Movie
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
 				if($e->getCode() === 404) {
-					ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
+					ColorCLI::doEcho(ColorCLI::notice('Data not available on IMDB server'));
 				} else if ($e->getCode() === 503) {
-					ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('IMDB service unavailable'));
 				} else {
-					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from IMDB, http error reported: ' . $e->getCode()));
 				}
 			}
+		} catch (\RuntimeException $e) {
+			ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
 		}
 
 		// Make sure we got some data.
@@ -1372,13 +1376,15 @@ class Movie
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
 				if($e->getCode() === 404) {
-					ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
+					ColorCLI::doEcho(ColorCLI::notice('Data not available on IMDB server'));
 				} else if ($e->getCode() === 503) {
-					ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('IMDB service unavailable'));
 				} else {
-					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from IMDB , http error reported: ' . $e->getCode()));
 				}
 			}
+		} catch (\RuntimeException $e) {
+			ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
 		}
 
 		if (!empty($buffer)) {
@@ -1426,13 +1432,15 @@ class Movie
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
 				if($e->getCode() === 404) {
-					ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
+					ColorCLI::doEcho(ColorCLI::notice('Data not available on IMDB server'));
 				} else if ($e->getCode() === 503) {
-					ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('IMDB service unavailable'));
 				} else {
-					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from IMDB, http error reported: ' . $e->getCode()));
 				}
 			}
+		} catch (\RuntimeException $e) {
+			ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
 		}
 
 		if (!empty($buffer)) {

@@ -111,7 +111,7 @@ switch (true) {
 					}
 					if ($namefixer->matched === false && !empty($release['filehash']) && preg_match('/[a-fA-F0-9]{32,40}/i', $release['filehash'], $matches)) {
 						echo ColorCLI::primaryOver('h');
-						$namefixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
+						$namefixer->matchPredbHash($matches[0], $release, true, 1, true, 1);
 					}
 				}
 
@@ -235,7 +235,7 @@ switch (true) {
 			foreach ($pres as $pre) {
 				$namefixer->done = $namefixer->matched = false;
 				$ftmatched = $searched = 0;
-				$ftmatched = $namefixer->matchPredbFT($pre, 1, 1, true, 1);
+				$ftmatched = $namefixer->matchPredbFT($pre, true, 1, true, 1);
 				if ($ftmatched > 0) {
 					$searched = 1;
 				} elseif ($ftmatched < 0) {

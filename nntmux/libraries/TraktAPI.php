@@ -168,11 +168,13 @@ Class TraktAPI {
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
+						ColorCLI::doEcho(ColorCLI::notice('Data not available on TraktTV server'));
 					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
+						ColorCLI::doEcho(ColorCLI::notice('TraktTV service unavailable'));
+					} else if ($e->getCode() === 401) {
+						ColorCLI::doEcho(ColorCLI::notice('Unauthorized - OAuth must be provided for TraktTV'));
 					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from TraktTV, server responded with code: ' . $e->getCode()));
 					}
 				}
 			} catch (\RuntimeException $e) {
