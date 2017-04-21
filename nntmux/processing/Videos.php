@@ -91,7 +91,7 @@ abstract class Videos
 	 */
 	protected function getSiteIDFromVideoID($siteColumn, $videoID)
 	{
-		if (in_array($siteColumn, $this->sites, false)) {
+		if (in_array($siteColumn, Videos::$sites, false)) {
 			$result = $this->pdo->queryOneRow("SELECT $siteColumn FROM videos WHERE id = $videoID");
 
 			return $result[$siteColumn] ?? false;
