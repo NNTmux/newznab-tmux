@@ -2,6 +2,7 @@
 namespace nntmux;
 
 use app\models\Settings;
+use nntmux\ColorCLI;
 use nntmux\db\DB;
 use nntmux\processing\ProcessReleasesMultiGroup;
 
@@ -290,7 +291,7 @@ class Binaries
 	 *
 	 * @return void
 	 */
-	public function updateAllGroups($maxHeaders = 100000)
+	public function updateAllGroups($maxHeaders = 100000): void
 	{
 		$groups = $this->_groups->getActive();
 
@@ -337,7 +338,7 @@ class Binaries
 	/**
 	 * When the indexer is started, log the date/time.
 	 */
-	public function logIndexerStart()
+	public function logIndexerStart(): void
 	{
 		$this->_pdo->queryExec("UPDATE settings SET value = NOW() WHERE setting = 'last_run_time'");
 	}
@@ -350,7 +351,7 @@ class Binaries
 	 *
 	 * @return void
 	 */
-	public function updateGroup($groupMySQL, $maxHeaders = 0)
+	public function updateGroup($groupMySQL, $maxHeaders = 0): void
 	{
 		$startGroup = microtime(true);
 
@@ -360,7 +361,7 @@ class Binaries
 		$groupNNTP = $this->_nntp->selectGroup($groupMySQL['name']);
 		if ($this->_nntp->isError($groupNNTP)) {
 			$groupNNTP = $this->_nntp->dataError($this->_nntp, $groupMySQL['name']);
-			if ($groupNNTP->code == 411) {
+			if ($groupNNTP->code === 411) {
 				$this->_groups->disableIfNotExist($groupMySQL['id']);
 			}
 			if ($this->_nntp->isError($groupNNTP)) {
@@ -369,23 +370,23 @@ class Binaries
 		}
 
 		if ($this->_echoCLI) {
-			$this->_colorCLI->doEcho($this->_colorCLI->primary('Processing ' . $groupMySQL['name']), true);
+			ColorCLI::doEcho(ColorCLI::primary('Processing ' . $groupMySQL['name']), true);
 		}
 
 		// Attempt to repair any missing parts before grabbing new ones.
 		if ($groupMySQL['last_record'] != 0) {
 			if ($this->_partRepair) {
 				if ($this->_echoCLI) {
-					$this->_colorCLI->doEcho($this->_colorCLI->primary('Part repair enabled. Checking for missing parts.'), true);
+					ColorCLI::doEcho(ColorCLI::primary('Part repair enabled. Checking for missing parts.'), true);
 				}
 				$this->partRepair($groupMySQL);
 			} else if ($this->_echoCLI) {
-				$this->_colorCLI->doEcho($this->_colorCLI->primary('Part repair disabled by user.'), true);
+				ColorCLI::doEcho(ColorCLI::primary('Part repair disabled by user.'), true);
 			}
 		}
 
 		// Generate postdate for first record, for those that upgraded.
-		if (is_null($groupMySQL['first_record_postdate']) && $groupMySQL['first_record'] != 0) {
+		if ($groupMySQL['first_record_postdate'] === null && $groupMySQL['first_record'] != 0) {
 
 			$groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
 
@@ -427,10 +428,10 @@ class Binaries
 			// Check if the server has more articles than our loop limit x 2.
 			if ($totalCount > ($this->messageBuffer * 2)) {
 				// Get the remainder of $totalCount / $this->message buffer
-				$leaveOver = round(($totalCount % $this->messageBuffer), 0, PHP_ROUND_HALF_DOWN) + $this->messageBuffer;
+				$leaveOver = round($totalCount % $this->messageBuffer, 0, PHP_ROUND_HALF_DOWN) + $this->messageBuffer;
 			} else {
 				// Else get half of the available.
-				$leaveOver = round(($totalCount / 2), 0, PHP_ROUND_HALF_DOWN);
+				$leaveOver = round($totalCount / 2, 0, PHP_ROUND_HALF_DOWN);
 			}
 		}
 
@@ -459,8 +460,8 @@ class Binaries
 		if ($total > 0) {
 
 			if ($this->_echoCLI) {
-				$this->_colorCLI->doEcho(
-					$this->_colorCLI->primary(
+				ColorCLI::doEcho(
+					ColorCLI::primary(
 						($groupMySQL['last_record'] == 0
 							? 'New group ' . $groupNNTP['group'] . ' starting with ' .
 							($this->_newGroupScanByDays
@@ -493,8 +494,8 @@ class Binaries
 				$first++;
 
 				if ($this->_echoCLI) {
-					$this->_colorCLI->doEcho(
-						$this->_colorCLI->header(
+					ColorCLI::doEcho(
+						ColorCLI::header(
 							PHP_EOL . 'Getting ' . number_format($last - $first + 1) . ' articles (' . number_format($first) .
 							' to ' . number_format($last) . ') from ' . $groupMySQL['name'] . ' - (' .
 							number_format($groupLast - $last) . ' articles in queue).'
@@ -509,7 +510,7 @@ class Binaries
 				if (!empty($scanSummary)) {
 
 					// If new group, update first record & postdate
-					if (is_null($groupMySQL['first_record_postdate']) && $groupMySQL['first_record'] == 0) {
+					if ($groupMySQL['first_record_postdate'] === null && $groupMySQL['first_record'] == 0) {
 						$groupMySQL['first_record'] = $scanSummary['firstArticleNumber'];
 
 						if (isset($scanSummary['firstArticleDate'])) {
@@ -566,16 +567,16 @@ class Binaries
 			}
 
 			if ($this->_echoCLI) {
-				$this->_colorCLI->doEcho(
-					$this->_colorCLI->primary(
+				ColorCLI::doEcho(
+					ColorCLI::primary(
 						PHP_EOL . 'Group ' . $groupMySQL['name'] . ' processed in ' .
 						number_format(microtime(true) - $startGroup, 2) . ' seconds.'
 					), true
 				);
 			}
 		} else if ($this->_echoCLI) {
-			$this->_colorCLI->doEcho(
-				$this->_colorCLI->primary(
+			ColorCLI::doEcho(
+				ColorCLI::primary(
 					'No new articles for ' . $groupMySQL['name'] . ' (first ' . number_format($first) .
 					', last ' . number_format($last) . ', grouplast ' . number_format($groupMySQL['last_record']) .
 					', total ' . number_format($total) . ")\n" . 'Server oldest: ' . number_format($groupNNTP['first']) .
@@ -596,7 +597,7 @@ class Binaries
 	 *
 	 * @return array Empty on failure.
 	 */
-	public function scan($groupMySQL, $first, $last, $type = 'update', $missingParts = null)
+	public function scan($groupMySQL, $first, $last, $type = 'update', $missingParts = null): array
 	{
 		// Start time of scan method and of fetching headers.
 		$this->startLoop = microtime(true);
@@ -702,13 +703,12 @@ class Binaries
 
 			// If set we are running in partRepair mode.
 			if ($partRepair === true && !is_null($missingParts)) {
-				if (!in_array($header['Number'], $missingParts)) {
+				if (!in_array($header['Number'], $missingParts, false)) {
 					// If article isn't one that is missing skip it.
 					continue;
-				} else {
-					// We got the part this time. Remove article from part repair.
-					$headersRepaired[] = $header['Number'];
 				}
+				// We got the part this time. Remove article from part repair.
+				$headersRepaired[] = $header['Number'];
 			}
 
 			/*
@@ -814,8 +814,8 @@ class Binaries
 				$this->addMissingParts($rangeNotReceived, $this->tableNames['prname'], $this->groupMySQL['id']);
 
 				if ($this->_echoCLI) {
-					$this->_colorCLI->doEcho(
-						$this->_colorCLI->alternate(
+					ColorCLI::doEcho(
+						ColorCLI::alternate(
 							'Server did not return ' . $notReceivedCount .
 							' articles from ' . $this->groupMySQL['name'] . '.'
 						), true
@@ -835,7 +835,7 @@ class Binaries
 	 * @param array $headers The retrieved headers
 	 * @param bool  $multiGroup Is this task being run in MGR mode?
 	 */
-	protected function storeHeaders(array $headers, $multiGroup)
+	protected function storeHeaders(array $headers, $multiGroup): void
 	{
 		$this->multiGroup = $multiGroup;
 		$binariesUpdate = $collectionIDs = $articles = [];
@@ -999,8 +999,8 @@ class Binaries
 		// Check if we got any binaries. If we did, try to insert them.
 		if (strlen($binariesCheck . $binariesEnd) === strlen($binariesQuery) ? true : $this->_pdo->queryExec($binariesQuery)) {
 			if ($this->_debug) {
-				$this->_colorCLI->doEcho(
-					$this->_colorCLI->debug(
+				ColorCLI::doEcho(
+					ColorCLI::debug(
 						'Sending ' . round(strlen($partsQuery) / 1024, 2) .
 						' KB of' . ($this->multiGroup ? ' MGR' : '') . ' parts to MySQL'
 					)
@@ -1029,7 +1029,7 @@ class Binaries
 	 * @param array $headers
 	 * @param int   $msgCount
 	 */
-	protected function getHighLowArticleInfo(array &$returnArray, array $headers, int $msgCount)
+	protected function getHighLowArticleInfo(array &$returnArray, array $headers, int $msgCount): void
 	{
 		// Get highest and lowest article numbers/dates.
 		$iterator1 = 0;
@@ -1060,7 +1060,7 @@ class Binaries
 	/**
 	 * Updates Blacklist Regex Timers in DB to reflect last usage
 	 */
-	protected function updateBlacklistUsage()
+	protected function updateBlacklistUsage(): void
 	{
 		$this->_pdo->queryExec(
 			sprintf('UPDATE binaryblacklist SET last_activity = NOW() WHERE id IN (%s)',
@@ -1073,10 +1073,10 @@ class Binaries
 	/**
 	 * Outputs the initial header scan results after yEnc check and blacklist routines
 	 */
-	protected function outputHeaderInitial()
+	protected function outputHeaderInitial(): void
 	{
-		$this->_colorCLI->doEcho(
-			$this->_colorCLI->primary(
+		ColorCLI::doEcho(
+			ColorCLI::primary(
 				'Received ' . count($this->headersReceived) .
 				' articles of ' . number_format($this->last - $this->first + 1) . ' requested, ' .
 				$this->headersBlackListed . ' blacklisted, ' . $this->notYEnc . ' not yEnc.'
@@ -1087,21 +1087,21 @@ class Binaries
 	/**
 	 * Outputs speed metrics of the scan function to CLI
 	 */
-	protected function outputHeaderDuration()
+	protected function outputHeaderDuration(): void
 	{
 		$currentMicroTime = microtime(true);
 		if ($this->_echoCLI) {
-			$this->_colorCLI->doEcho(
-				$this->_colorCLI->alternateOver($this->timeHeaders . 's') .
-				$this->_colorCLI->primaryOver(' to download articles, ') .
-				$this->_colorCLI->alternateOver($this->timeCleaning . 's') .
-				$this->_colorCLI->primaryOver(' to process collections, ') .
-				$this->_colorCLI->alternateOver($this->timeInsert . 's') .
-				$this->_colorCLI->primaryOver(' to insert binaries/parts, ') .
-				$this->_colorCLI->alternateOver(number_format($currentMicroTime - $this->startPR, 2) . 's') .
-				$this->_colorCLI->primaryOver(' for part repair, ') .
-				$this->_colorCLI->alternateOver(number_format($currentMicroTime - $this->startLoop, 2) . 's') .
-				$this->_colorCLI->primary(' total.')
+			ColorCLI::doEcho(
+				ColorCLI::alternateOver($this->timeHeaders . 's') .
+				ColorCLI::primaryOver(' to download articles, ') .
+				ColorCLI::alternateOver($this->timeCleaning . 's') .
+				ColorCLI::primaryOver(' to process collections, ') .
+				ColorCLI::alternateOver($this->timeInsert . 's') .
+				ColorCLI::primaryOver(' to insert binaries/parts, ') .
+				ColorCLI::alternateOver(number_format($currentMicroTime - $this->startPR, 2) . 's') .
+				ColorCLI::primaryOver(' for part repair, ') .
+				ColorCLI::alternateOver(number_format($currentMicroTime - $this->startLoop, 2) . 's') .
+				ColorCLI::primary(' total.')
 			);
 		}
 	}
@@ -1115,7 +1115,7 @@ class Binaries
 	 *
 	 * @access protected
 	 */
-	protected function _rollbackAddToPartRepair(array $headers)
+	protected function _rollbackAddToPartRepair(array $headers): array
 	{
 		$headersNotInserted = [];
 		foreach ($headers as $header) {
@@ -1134,7 +1134,7 @@ class Binaries
 	 *
 	 * @return void
 	 */
-	public function partRepair($groupArr)
+	public function partRepair($groupArr): void
 	{
 		$tableNames = $this->_groups->getCBPTableNames($groupArr['id']);
 		// Get all parts in partrepair table.
@@ -1153,8 +1153,8 @@ class Binaries
 		$missingCount = count($missingParts);
 		if ($missingCount > 0) {
 			if ($this->_echoCLI) {
-				$this->_colorCLI->doEcho(
-					$this->_colorCLI->primary(
+				ColorCLI::doEcho(
+					ColorCLI::primary(
 						'Attempting to repair ' .
 						number_format($missingCount) .
 						' parts.'
@@ -1237,8 +1237,8 @@ class Binaries
 			}
 
 			if ($this->_echoCLI) {
-				$this->_colorCLI->doEcho(
-					$this->_colorCLI->primary(
+				ColorCLI::doEcho(
+					ColorCLI::primary(
 						PHP_EOL .
 						number_format($partsRepaired) .
 						' parts repaired.'
@@ -1266,7 +1266,7 @@ class Binaries
 	 *
 	 * @return int	Timestamp.
 	 */
-	public function postdate($post, array $groupData)
+	public function postdate($post, array $groupData): int
 	{
 		// Set table names
 		$groupID = $this->_groups->getIDByName($groupData['group']);
@@ -1331,7 +1331,7 @@ class Binaries
 			$currentPost = $tempPost;
 
 			if ($this->_debug) {
-				$this->_colorCLI->doEcho($this->_colorCLI->debug('Postdate retried ' . $attempts . " time(s)."));
+				ColorCLI::doEcho(ColorCLI::debug('Postdate retried ' . $attempts . ' time(s).'));
 			}
 		} while ($attempts++ <= 20);
 
@@ -1344,7 +1344,7 @@ class Binaries
 
 		if ($this->_debug) {
 			$this->_debugging->log(
-				get_class(),
+				__CLASS__,
 				__FUNCTION__,
 				'Article (' .
 				$post .
@@ -1389,8 +1389,8 @@ class Binaries
 		}
 
 		if ($this->_echoCLI) {
-			$this->_colorCLI->doEcho(
-				$this->_colorCLI->primary(
+			ColorCLI::doEcho(
+				ColorCLI::primary(
 					'Searching for an approximate article number for group ' . $data['group'] . ' ' . $days . ' days back.'
 				)
 			);
@@ -1449,8 +1449,8 @@ class Binaries
 
 		$wantedArticle = (int)$wantedArticle;
 		if ($this->_echoCLI) {
-			$this->_colorCLI->doEcho(
-				$this->_colorCLI->primary(
+			ColorCLI::doEcho(
+				ColorCLI::primary(
 					PHP_EOL . 'Found article #' . $wantedArticle . ' which has a date of ' . date('r', $articleTime) .
 					', vs wanted date of ' . date('r', $goalTime) . '. Difference from goal is ' . round(($goalTime - $articleTime) / 60 / 60 / 24, 1) . ' days.'
 				)
@@ -1481,7 +1481,7 @@ class Binaries
 	 *
 	 * @return bool
 	 */
-	private function addMissingParts($numbers, $tableName, $groupID)
+	private function addMissingParts($numbers, $tableName, $groupID): bool
 	{
 		$insertStr = 'INSERT INTO ' . $tableName . ' (numberid, groups_id) VALUES ';
 		foreach ($numbers as $number) {
@@ -1499,7 +1499,7 @@ class Binaries
 	 *
 	 * @return void
 	 */
-	private function removeRepairedParts(array $numbers, $tableName, $groupID)
+	private function removeRepairedParts(array $numbers, $tableName, $groupID): void
 	{
 		$sql = 'DELETE FROM ' . $tableName . ' WHERE numberid in (';
 		foreach ($numbers as $number) {
@@ -1521,7 +1521,7 @@ class Binaries
 	 *
 	 * @return void
 	 */
-	protected function _retrieveBlackList($groupName)
+	protected function _retrieveBlackList($groupName): void
 	{
 		if (!isset($this->blackList[$groupName])) {
 			$this->blackList[$groupName] = $this->getBlacklist(true, self::OPTYPE_BLACKLIST, $groupName, true);
@@ -1540,7 +1540,7 @@ class Binaries
 	 *
 	 * @return bool
 	 */
-	public function isBlackListed($msg, $groupName)
+	public function isBlackListed($msg, $groupName): bool
 	{
 		if (!isset($this->_listsFound[$groupName])) {
 			$this->_retrieveBlackList($groupName);
@@ -1594,7 +1594,7 @@ class Binaries
 	 *
 	 * @return array
 	 */
-	public function getBlacklist($activeOnly = true, $opType = -1, $groupName = '', $groupRegex = false)
+	public function getBlacklist($activeOnly = true, $opType = -1, $groupName = '', $groupRegex = false): array
 	{
 		switch ($opType) {
 			case self::OPTYPE_BLACKLIST:
@@ -1644,7 +1644,7 @@ class Binaries
 	 *
 	 * @return bool
 	 */
-	public function deleteBlacklist($id)
+	public function deleteBlacklist($id): bool
 	{
 		return $this->_pdo->queryExec(sprintf('DELETE FROM binaryblacklist WHERE id = %d', $id));
 	}
@@ -1656,7 +1656,7 @@ class Binaries
 	 *
 	 * @return boolean
 	 */
-	public function updateBlacklist($blacklistArray)
+	public function updateBlacklist($blacklistArray): bool
 	{
 		return $this->_pdo->queryExec(
 			sprintf('
@@ -1683,7 +1683,7 @@ class Binaries
 	 *
 	 * @return bool
 	 */
-	public function addBlacklist($blacklistArray)
+	public function addBlacklist($blacklistArray): bool
 	{
 		return $this->_pdo->queryInsert(
 			sprintf('
@@ -1711,7 +1711,7 @@ class Binaries
 	 *
 	 * @return void
 	 */
-	public function delete($collectionID)
+	public function delete($collectionID): void
 	{
 		$this->_pdo->queryExec(sprintf('DELETE FROM collections WHERE id = %d', $collectionID));
 	}
@@ -1725,7 +1725,7 @@ class Binaries
 	 *
 	 * @return void
 	 */
-	public function purgeGroup($groupID)
+	public function purgeGroup($groupID): void
 	{
 		$this->_pdo->queryExec(sprintf('DELETE c FROM collections c WHERE c.groups_id = %d', $groupID));
 	}
@@ -1738,16 +1738,16 @@ class Binaries
 	 * @param int    $level   Logger severity level constant.
 	 * @param string $color   ColorCLI method name.
 	 */
-	private function log($message, $method, $level, $color)
+	private function log($message, $method, $level, $color): void
 	{
 		if ($this->_echoCLI) {
-			$this->_colorCLI->doEcho(
-				$this->_colorCLI->$color($message . ' [' . get_class() . "::$method]"), true
+			ColorCLI::doEcho(
+				ColorCLI::$color($message . ' [' . __CLASS__ . "::$method]"), true
 			);
 		}
 
 		if ($this->_debug) {
-			$this->_debugging->log(get_class(), $method, $message, $level);
+			$this->_debugging->log(__CLASS__, $method, $message, $level);
 		}
 	}
 
@@ -1761,7 +1761,7 @@ class Binaries
 	 * @access protected
 	 *
 	 */
-	protected function _ignoreFileCount($groupName, $subject)
+	protected function _ignoreFileCount($groupName, $subject): bool
 	{
 		$ignore = false;
 		switch ($groupName) {
@@ -1779,7 +1779,7 @@ class Binaries
 	 *
 	 * @return array
 	 */
-	protected function getMultiGroupPosters()
+	protected function getMultiGroupPosters(): array
 	{
 		return $this->_pdo->query('
 			SELECT poster
