@@ -35,7 +35,7 @@ abstract class Videos
 	const TYPE_ANIME	= 2; // Type of video is a Anime
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -47,7 +47,7 @@ abstract class Videos
 	/**
 	 * @var array	sites	The sites that we have an ID columns for in our video table.
 	 */
-	private $sites = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvmaze', 'tvrage'];
+	private static $sites = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvmaze', 'tvrage'];
 
 	/**
 	 * @var array Temp Array of cached failed lookups
@@ -79,7 +79,7 @@ abstract class Videos
 	 * @param      $process
 	 * @param bool $local
 	 */
-	abstract protected function processSite($groupID, $guidChar, $process, $local = false);
+	abstract protected function processSite($groupID, $guidChar, $process, $local = false): void;
 
 	/**
 	 * Get video info from a Video ID and column.
@@ -91,10 +91,10 @@ abstract class Videos
 	 */
 	protected function getSiteIDFromVideoID($siteColumn, $videoID)
 	{
-		if (in_array($siteColumn, $this->sites)) {
+		if (in_array($siteColumn, $this->sites, false)) {
 			$result = $this->pdo->queryOneRow("SELECT $siteColumn FROM videos WHERE id = $videoID");
 
-			return isset($result[$siteColumn]) ? $result[$siteColumn] : false;
+			return $result[$siteColumn] ?? false;
 		}
 
 		return false;
@@ -107,11 +107,11 @@ abstract class Videos
 	 *
 	 * @return string Empty string if no query return or tz style timezone
 	 */
-	protected function getLocalZoneFromVideoID($videoID)
+	protected function getLocalZoneFromVideoID($videoID): string
 	{
-		$result = $this->pdo->queryOneRow("SELECT localzone FROM tv_info WHERE videos_id = $videoID");
+		$result = $this->pdo->queryOneRow('SELECT localzone FROM tv_info WHERE videos_id = %d', $videoID);
 
-		return (isset($result['localzone']) ? $result['localzone'] : '');
+		return $result['localzone'] ?? '';
 	}
 
 
@@ -125,8 +125,8 @@ abstract class Videos
 	 */
 	protected function getVideoIDFromSiteID($siteColumn, $siteID)
 	{
-		if (in_array($siteColumn, $this->sites)) {
-			$result = $this->pdo->queryOneRow("SELECT id FROM videos WHERE $siteColumn = $siteID");
+		if (in_array($siteColumn, $this->sites, false)) {
+			$result = $this->pdo->queryOneRow('SELECT id FROM videos WHERE $siteColumn = %d', $siteID);
 
 			return isset($result['id']) ? (int)$result['id'] : false;
 		}
@@ -152,7 +152,7 @@ abstract class Videos
 		}
 
 		$title2 = str_replace(' and ', ' & ', $title);
-		if ($title != $title2) {
+		if ((string)$title !== (string)$title2) {
 			$res = $this->getTitleExact($title2, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
@@ -160,7 +160,7 @@ abstract class Videos
 			$pieces = explode(' ', $title2);
 			$title2 = '%';
 			foreach ($pieces as $piece) {
-				$title2 .= str_replace(["'", "!"], "", $piece) . '%';
+				$title2 .= str_replace(["'", '!'], '', $piece) . '%';
 			}
 			$res = $this->getTitleLoose($title2, $type, $source);
 			if (isset($res['id'])) {
@@ -171,7 +171,7 @@ abstract class Videos
 		// Some words are spelled correctly 2 ways
 		// example theatre and theater
 		$title2 = str_replace('er', 're', $title);
-		if ($title != $title2) {
+		if ((string)$title !== (string)$title2) {
 			$res = $this->getTitleExact($title2, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
@@ -179,7 +179,7 @@ abstract class Videos
 			$pieces = explode(' ', $title2);
 			$title2 = '%';
 			foreach ($pieces as $piece) {
-				$title2 .= str_replace(["'", "!"], "", $piece) . '%';
+				$title2 .= str_replace(["'", '!'], '', $piece) . '%';
 			}
 			$res = $this->getTitleLoose($title2, $type, $source);
 			if (isset($res['id'])) {
@@ -194,7 +194,7 @@ abstract class Videos
 		if (count($pieces) > 1) {
 			$title2 = '%';
 			foreach ($pieces as $piece) {
-				$title2 .= str_replace(["'", "!"], "", $piece) . '%';
+				$title2 .= str_replace(["'", '!'], '', $piece) . '%';
 			}
 			$res = $this->getTitleLoose($title2, $type, $source);
 			if (isset($res['id'])) {
@@ -263,11 +263,11 @@ abstract class Videos
 
 		if (!empty($title)) {
 			$return = $this->pdo->queryOneRow(
-				sprintf("
+				sprintf('
 					SELECT v.id
 					FROM videos v
 					WHERE v.title %s
-					AND type = %d %s",
+					AND type = %d %s',
 					$this->pdo->likeString(rtrim($title, '%'), false, false),
 					$type,
 					($source > 0 ? 'AND v.source = ' . $source : '')
@@ -276,12 +276,12 @@ abstract class Videos
 			// Try for an alias
 			if ($return === false) {
 				$return = $this->pdo->queryOneRow(
-					sprintf("
+					sprintf('
 						SELECT v.id
 						FROM videos v
 						INNER JOIN videos_aliases va ON v.id = va.videos_id
 						WHERE va.title %s
-						AND type = %d %s",
+						AND type = %d %s',
 						$this->pdo->likeString(rtrim($title, '%'), false, false),
 						$type,
 						($source > 0 ? 'AND v.source = ' . $source : '')
@@ -299,7 +299,7 @@ abstract class Videos
 	 * @param       $videoId
 	 * @param array $aliases
 	 */
-	public function addAliases($videoId, array $aliases = [])
+	public function addAliases($videoId, array $aliases = []): void
 	{
 		if (!empty($aliases) && $videoId > 0) {
 			foreach ($aliases AS $key => $title) {
