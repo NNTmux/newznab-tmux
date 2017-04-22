@@ -1164,7 +1164,7 @@ class NameFixer
 	 *
 	 * @return string
 	 */
-	protected function _cleanMatchFiles(): ?string
+	protected function _cleanMatchFiles(): string
 	{
 
 		// first strip all non-printing chars  from filename
@@ -1201,6 +1201,7 @@ class NameFixer
 
 			return trim($this->_fileName);
 		}
+		return false;
 	}
 
 	/**

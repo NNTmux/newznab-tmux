@@ -1,3 +1,5 @@
+2017-04-22 DariusIII
+	* Fix: Return value of cleanMatchFiles function
 2017-04-21 DariusIII
 	* Chg: Update TV related classes, fix trakttv covers
 	* Chg: Update Videos class
