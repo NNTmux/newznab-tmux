@@ -1246,14 +1246,14 @@ class NNTP extends \Net_NNTP_Client
 	 * split the data (bunch of headers in a string) into an array, finally
 	 * return the array.
 	 *
-	 * @return string/print Have we failed to decompress the data, was there a
+	 * return string/print Have we failed to decompress the data, was there a
 	 *                 problem downloading the data, etc..
 	 * @return mixed  On success : (array)  The headers.
 	 *                On failure : (object) PEAR_Error.
 	 *
 	 * @access protected
 	 */
-	protected function &_getXFeatureTextResponse(): string
+	protected function &_getXFeatureTextResponse(): array
 	{
 		$possibleTerm = false;
 		$data = null;
@@ -1303,19 +1303,17 @@ class NNTP extends \Net_NNTP_Client
 						// Split the string of headers into an array of individual headers, then return it.
 						$deComp = explode("\r\n", trim($deComp));
 						return $deComp;
-					} else {
-						$message = 'Decompression of OVER headers failed.';
-						if ($this->_debugBool) {
-							$this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-						}
-						$message = $this->throwError(ColorCLI::error($message), 1000);
-						return $message;
 					}
+					$message = 'Decompression of OVER headers failed.';
+					if ($this->_debugBool) {
+						$this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
+					}
+					$message = $this->throwError(ColorCLI::error($message), 1000);
+					return $message;
 
-				} else {
-					// The buffer was not empty, so we know this was not the real ending, so reset $possibleTerm.
-					$possibleTerm = false;
 				}
+				// The buffer was not empty, so we know this was not the real ending, so reset $possibleTerm.
+				$possibleTerm = false;
 			} else {
 				// Get data from the stream.
 				$buffer = fgets($this->_socket);
