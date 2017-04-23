@@ -1246,10 +1246,11 @@ class NNTP extends \Net_NNTP_Client
 	 * split the data (bunch of headers in a string) into an array, finally
 	 * return the array.
 	 *
-	 * return string/print Have we failed to decompress the data, was there a
-	 *                 problem downloading the data, etc..
-	 * @return mixed  On success : (array)  The headers.
-	 *                On failure : (object) PEAR_Error.
+	 * Have we failed to decompress the data, was there a
+	 * problem downloading the data, etc..
+	 * @return array|string  On success : (array)  The headers.
+	 *                       On failure : (object) PEAR_Error.
+	 *                       On decompress failure: (string) error message
 	 *
 	 * @access protected
 	 */
