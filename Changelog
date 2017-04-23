@@ -1,3 +1,5 @@
+2017-04-23 DariusIII
+	* Fix: Remove return type declaration from _getXFeatureTextResponse function (should fix issue #135)
 2017-04-22 DariusIII
 	* Fix: Fix wrong declared return type in NNTP class, fixes issue 135
 	* Fix: Return value of cleanMatchFiles function

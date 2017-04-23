@@ -1253,7 +1253,7 @@ class NNTP extends \Net_NNTP_Client
 	 *
 	 * @access protected
 	 */
-	protected function &_getXFeatureTextResponse(): array
+	protected function &_getXFeatureTextResponse()
 	{
 		$possibleTerm = false;
 		$data = null;
