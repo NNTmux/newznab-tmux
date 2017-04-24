@@ -67,14 +67,14 @@ class NNTP extends \Net_NNTP_Client
 	 * @var int
 	 * @access protected
 	 */
-	protected $_currentPort = NNTP_PORT;
+	protected $_currentPort = 'NNTP_PORT';
 
 	/**
 	 * Address of the current NNTP server.
 	 * @var string
 	 * @access protected
 	 */
-	protected $_currentServer = NNTP_SERVER;
+	protected $_currentServer = 'NNTP_SERVER';
 
 	/**
 	 * Are we allowed to post to usenet?
