@@ -24,15 +24,15 @@ class Configure
 {
 	private $environments = [
 		'indexer' => [
-			'config'	=> true,
+			'.env'	=> true,
 			'settings'	=> false
 		],
 		'install' => [
-			'config'	=> false,
+			'.env'	=> false,
 			'settings'	=> false
 		],
 		'smarty'  => [
-			'config'	=> true,
+			'.env'	=> true,
 			'settings'	=> false
 		],
 	];
@@ -69,7 +69,7 @@ class Configure
 		}
 
 		switch ($filename) {
-			case 'config':
+			case '.env':
 				$this->defaultSSL();
 				break;
 			case 'settings':

@@ -90,7 +90,7 @@ if (!defined('NN_INSTALLER')) {
 	}
 	require_once $config;
 
-	switch (getenv('DB_SYSTEM')) {
+	switch (getenv('DB_SYSTEM', true)) {
 		case 'mysql':
 			$adapter = 'MySql';
 			break;
@@ -102,7 +102,7 @@ if (!defined('NN_INSTALLER')) {
 	}
 
 	if (isset($adapter)) {
-		if (empty(getenv('DB_SOCKET'))) {
+		if (empty(getenv('DB_SOCKET', true))) {
 			$host = empty(getenv('DB_PORT')) ? getenv('DB_HOST') : getenv('DB_HOST') . ':' . getenv('DB_PORT');
 		} else {
 			$host = getenv('DB_SOCKET');
