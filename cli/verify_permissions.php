@@ -13,7 +13,7 @@ if (!isset($argv[1]) || $argv[1] !== 'yes') {
 	);
 }
 
-require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 define('R', 1);
 define('W', 2);
@@ -58,7 +58,7 @@ foreach (['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies',
 }
 
 // Set up covers paths.
-if (defined('DB_PASSWORD') && DB_PASSWORD != '') {
+if (getenv(DB_PASSWORD) !== '') {
 	$ri = new ReleaseImage();
 
 	$folders[$ri->audSavePath]      = [R, W];

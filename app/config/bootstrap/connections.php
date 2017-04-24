@@ -36,6 +36,11 @@
  * @see lithium\core\Environment
  */
 use lithium\data\Connections;
+use Dotenv\Dotenv;
+
+$dotenv = new Dotenv(dirname(__DIR__, 3));
+$dotenv->load();
+
 
 /**
  * Uncomment this configuration to use MongoDB as your default database.
@@ -74,12 +79,12 @@ use lithium\data\Connections;
 // ));
 
 $config1 = LITHIUM_APP_PATH . DS . 'config' . DS . 'db-config.php';
-$config2 = NN_ROOT . 'nntmux' . DS . 'config' . DS . 'config.php';
+$config2 = NN_ROOT . '.env';
 $config = file_exists($config1) ? $config1 : $config2;
 
-if (file_exists($config) && !defined('NN_INSTALLER')) {
-	require_once $config;
-	switch (DB_SYSTEM) {
+if (!defined('NN_INSTALLER')) {
+
+	switch (getenv(DB_SYSTEM)) {
 		case 'mysql':
 			$adapter = 'MySql';
 			break;
@@ -91,10 +96,10 @@ if (file_exists($config) && !defined('NN_INSTALLER')) {
 	}
 
 	if (isset($adapter)) {
-		if (empty(DB_SOCKET)) {
-			$host = empty(DB_PORT) ? DB_HOST : DB_HOST.':'.DB_PORT;
+		if (empty(getenv(DB_SOCKET))) {
+			$host = empty(getenv(DB_PORT)) ? getenv(DB_HOST) : getenv(DB_HOST) . ':' . getenv(DB_PORT);
 		} else {
-			$host = DB_SOCKET;
+			$host = getenv(DB_SOCKET);
 		}
 
 		Connections::add('default',
@@ -102,9 +107,9 @@ if (file_exists($config) && !defined('NN_INSTALLER')) {
 				'type'       => 'database',
 				'adapter'    => $adapter,
 				'host'       => $host,
-				'login'      => DB_USER,
-				'password'   => DB_PASSWORD,
-				'database'   => DB_NAME,
+				'login'      => getenv(DB_USER),
+				'password'   => getenv(DB_PASSWORD),
+				'database'   => getenv(DB_NAME),
 				'encoding'   => 'UTF-8',
 				'persistent' => false,
 			]

@@ -139,7 +139,8 @@
     "unionofrad/lithium": "^1.2-dev",
     "illuminate/filesystem": "^5.4",
     "monolog/monolog": "^1.22",
-    "aharen/omdbapi": "^2.0"
+    "aharen/omdbapi": "^2.0",
+    "vlucas/phpdotenv": "^2.4"
   },
 
   "require-dev": {

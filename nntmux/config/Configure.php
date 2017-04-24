@@ -55,10 +55,10 @@ class Configure
 
 	public function loadSettings($filename, $throwException = true)
 	{
-		$file = NN_CONFIGS . $filename . '.php';
+		$file = NN_ROOT . '.env';
 		if (!file_exists($file)) {
 			if ($throwException) {
-				$errorCode = (int)($filename === 'config');
+				$errorCode = (int)($filename === '.env');
 				throw new \RuntimeException(
 					"Unable to load configuration file '$file'. Make sure it has been created and contains correct settings.",
 					$errorCode
