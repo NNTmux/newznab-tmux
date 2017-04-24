@@ -83,8 +83,14 @@ $config2 = NN_ROOT . '.env';
 $config = file_exists($config1) ? $config1 : $config2;
 
 if (!defined('NN_INSTALLER')) {
+	if (!file_exists($config)) {
+		throw new \ErrorException(
+			"No valid configuration file found at '$config'"
+		);
+	}
+	require_once $config;
 
-	switch (getenv(DB_SYSTEM)) {
+	switch (getenv('DB_SYSTEM')) {
 		case 'mysql':
 			$adapter = 'MySql';
 			break;
@@ -96,10 +102,10 @@ if (!defined('NN_INSTALLER')) {
 	}
 
 	if (isset($adapter)) {
-		if (empty(getenv(DB_SOCKET))) {
-			$host = empty(getenv(DB_PORT)) ? getenv(DB_HOST) : getenv(DB_HOST) . ':' . getenv(DB_PORT);
+		if (empty(getenv('DB_SOCKET'))) {
+			$host = empty(getenv('DB_PORT')) ? getenv('DB_HOST') : getenv('DB_HOST') . ':' . getenv('DB_PORT');
 		} else {
-			$host = getenv(DB_SOCKET);
+			$host = getenv('DB_SOCKET');
 		}
 
 		Connections::add('default',
@@ -107,9 +113,9 @@ if (!defined('NN_INSTALLER')) {
 				'type'       => 'database',
 				'adapter'    => $adapter,
 				'host'       => $host,
-				'login'      => getenv(DB_USER),
-				'password'   => getenv(DB_PASSWORD),
-				'database'   => getenv(DB_NAME),
+				'login'      => getenv('DB_USER'),
+				'password'   => getenv('DB_PASSWORD'),
+				'database'   => getenv('DB_NAME'),
 				'encoding'   => 'UTF-8',
 				'persistent' => false,
 			]

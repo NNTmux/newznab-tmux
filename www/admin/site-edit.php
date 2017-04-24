@@ -171,7 +171,7 @@ $page->smarty->assign('book_reqids_selected', $books_selected);
 
 $page->smarty->assign('themelist', Utility::getThemesList());
 
-if (strpos(getenv(NNTP_SERVER), "astra") === false) {
+if (strpos(getenv('NNTP_SERVER'), "astra") === false) {
 	$page->smarty->assign('compress_headers_warning', "compress_headers_warning");
 }
 
