@@ -1,4 +1,5 @@
 2017-04-24 DariusIII
+	* Chg: Chage some if-else loop logic in TMDB class
 	* Chg: Update lithium, pnotify and composer/installers
 2017-04-23 DariusIII
 	* Fix: Remove return type declaration from _getXFeatureTextResponse function (should fix issue #135)

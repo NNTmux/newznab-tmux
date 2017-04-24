@@ -74,7 +74,7 @@ class TMDB extends TV
 	 *
 	 * @return bool
 	 */
-	public function getBanner($videoId, $siteID)
+	public function getBanner($videoId, $siteID): bool
 	{
 		return false;
 	}
@@ -93,6 +93,7 @@ class TMDB extends TV
 		$res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TMDB);
 
 		$tvcount = $res->rowCount();
+		$lookupSetting = true;
 
 		if ($this->echooutput && $tvcount > 0) {
 			echo ColorCLI::header('Processing TMDB lookup for ' . number_format($tvcount) . ' release(s).');
@@ -110,7 +111,7 @@ class TMDB extends TV
 				// Clean the show name for better match probability
 				$release = $this->parseInfo($row['searchname']);
 
-				if (is_array($release) && $release['name'] != '') {
+				if (is_array($release) && $release['name'] !== '') {
 
 					if (in_array($release['cleanname'], $this->titleCache, false)) {
 						if ($this->echooutput) {
@@ -128,8 +129,6 @@ class TMDB extends TV
 					// Force local lookup only
 					if ($local === true) {
 						$lookupSetting = false;
-					} else {
-						$lookupSetting = true;
 					}
 
 					// If lookups are allowed lets try to get it.
@@ -262,6 +261,7 @@ class TMDB extends TV
 		$return = false;
 		$highestMatch = 0;
 
+		$show = [];
 		foreach ($shows AS $show) {
 			if ($this->checkRequiredAttr($show, 'tmdbS')) {
 				// Check for exact title match first and then terminate if found
@@ -292,7 +292,7 @@ class TMDB extends TV
 				return false;
 			}
 
-			if (isset($showAlternativeTitles) && is_array($showAlternativeTitles)) {
+			if ($showAlternativeTitles !== null && is_array($showAlternativeTitles)) {
 				foreach ($showAlternativeTitles AS $aka) {
 					$highest['alternative_titles'][] = $aka['title'];
 				}
