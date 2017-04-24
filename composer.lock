@@ -1166,16 +1166,16 @@
         },
         {
             "name": "bower-asset/pnotify",
-            "version": "3.0.0",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/pnotify.git",
-                "reference": "2c6a12b5d8a6b55d21beae5b35c2a643fcfe4a90"
+                "reference": "313f9823cbcad5d7dd93807a7e51b5dfcc43a8c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/pnotify/zipball/2c6a12b5d8a6b55d21beae5b35c2a643fcfe4a90",
-                "reference": "2c6a12b5d8a6b55d21beae5b35c2a643fcfe4a90",
+                "url": "https://api.github.com/repos/sciactive/pnotify/zipball/313f9823cbcad5d7dd93807a7e51b5dfcc43a8c8",
+                "reference": "313f9823cbcad5d7dd93807a7e51b5dfcc43a8c8",
                 "shasum": ""
             },
             "require": {
@@ -1362,16 +1362,16 @@
         },
         {
             "name": "composer/installers",
-            "version": "v1.2.0",
+            "version": "v1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "d78064c68299743e0161004f2de3a0204e33b804"
+                "reference": "79ad876c7498c0bbfe7eed065b8651c93bfd6045"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/d78064c68299743e0161004f2de3a0204e33b804",
-                "reference": "d78064c68299743e0161004f2de3a0204e33b804",
+                "url": "https://api.github.com/repos/composer/installers/zipball/79ad876c7498c0bbfe7eed065b8651c93bfd6045",
+                "reference": "79ad876c7498c0bbfe7eed065b8651c93bfd6045",
                 "shasum": ""
             },
             "require": {
@@ -1413,12 +1413,16 @@
             "keywords": [
                 "Craft",
                 "Dolibarr",
+                "Eliasis",
                 "Hurad",
                 "ImageCMS",
+                "Kanboard",
                 "MODX Evo",
                 "Mautic",
+                "Maya",
                 "OXID",
                 "Plentymarkets",
+                "Porto",
                 "RadPHP",
                 "SMF",
                 "Thelia",
@@ -1441,9 +1445,11 @@
                 "fuelphp",
                 "grav",
                 "installer",
+                "itop",
                 "joomla",
                 "kohana",
                 "laravel",
+                "lavalite",
                 "lithium",
                 "magento",
                 "mako",
@@ -1458,6 +1464,7 @@
                 "roundcube",
                 "shopware",
                 "silverstripe",
+                "sydes",
                 "symfony",
                 "typo3",
                 "wordpress",
@@ -1465,7 +1472,7 @@
                 "zend",
                 "zikula"
             ],
-            "time": "2016-08-13T20:53:52+00:00"
+            "time": "2017-04-24T06:37:16+00:00"
         },
         {
             "name": "dariusiii/rarinfo",
@@ -3767,17 +3774,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "e1a4d284032958d51e10cee4c94e7b1e2491b747"
+                "reference": "0224e1ed92ecc18f9a246c4b8a0e35d0cc956b0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/e1a4d284032958d51e10cee4c94e7b1e2491b747",
-                "reference": "e1a4d284032958d51e10cee4c94e7b1e2491b747",
+                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/0224e1ed92ecc18f9a246c4b8a0e35d0cc956b0c",
+                "reference": "0224e1ed92ecc18f9a246c4b8a0e35d0cc956b0c",
                 "shasum": ""
             },
             "require": {
                 "composer/installers": "1.*",
-                "php": "^5.6 || ^7.0"
+                "php": "^5.6 || ^7.0.3"
             },
             "require-dev": {
                 "unionofrad/li3_fixtures": "^1.1"
@@ -3805,7 +3812,7 @@
                 "li3",
                 "lithium"
             ],
-            "time": "2017-04-09 11:20:59"
+            "time": "2017-04-23 09:48:41"
         }
     ],
     "packages-dev": [
