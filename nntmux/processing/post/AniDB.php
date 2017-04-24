@@ -210,7 +210,7 @@ class AniDB
 	 *
 	 * @return bool
 	 */
-	private function matchAnimeRelease($release = [])
+	private function matchAnimeRelease(array $release = []): bool
 	{
 		$matched = false;
 		$type    = 'Local';
