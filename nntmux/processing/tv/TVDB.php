@@ -15,7 +15,7 @@ use nntmux\ReleaseImage;
  */
 class TVDB extends TV
 {
-	const TVDB_URL = 'http://api.thetvdb.com';
+	const TVDB_URL = 'https://api.thetvdb.com';
 	const TVDB_API_KEY = '31740C28BAC74DEF';
 	const MATCH_PROBABILITY = 75;
 
