@@ -1,4 +1,7 @@
 2017-04-25 DariusIII
+	* Mrg: Merge dev-env branch into dev
+		Note: You need to copy .env.example, which is found in your sites root folder,  into .env and edit database and USP connection fields with proper data
+			Install will still create config.php in nntmux/config folder but that file is not used anymore
 	* Fix: Fix wrong return type declared In ReleaseSearch fullTextSQL function
 	* Chg: Use secure tvdb api site
 	* Fix: Fix SSL connections to USP and IRC
