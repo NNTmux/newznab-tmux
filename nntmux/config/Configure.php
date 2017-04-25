@@ -28,7 +28,7 @@ class Configure
 			'settings'	=> false
 		],
 		'install' => [
-			'.env'	=> false,
+			'.env'	=> true,
 			'settings'	=> false
 		],
 		'smarty'  => [
@@ -49,21 +49,19 @@ class Configure
 				$this->loadSettings($config, $throwException);
 			}
 		} else {
-			throw new \RuntimeException("Unknown environment passed to Configure class!");
+			throw new \RuntimeException('Unknown environment passed to Configure class!');
 		}
 	}
 
 	public function loadSettings($filename, $throwException = true)
 	{
 		$file = NN_ROOT . '.env';
-		if (!file_exists($file)) {
-			if ($throwException) {
-				$errorCode = (int)($filename === '.env');
-				throw new \RuntimeException(
-					"Unable to load configuration file '$file'. Make sure it has been created and contains correct settings.",
-					$errorCode
-				);
-			}
+		if (!file_exists($file) && $throwException) {
+			$errorCode = (int)($filename === '.env');
+			throw new \RuntimeException(
+				"Unable to load configuration file '$file'. Make sure it has been created and contains correct settings.",
+				$errorCode
+			);
 		}
 
 		switch ($filename) {
