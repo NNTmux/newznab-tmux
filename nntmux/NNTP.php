@@ -67,14 +67,14 @@ class NNTP extends \Net_NNTP_Client
 	 * @var int
 	 * @access protected
 	 */
-	protected $_currentPort = NNTP_PORT;
+	protected $_currentPort = 'NNTP_PORT';
 
 	/**
 	 * Address of the current NNTP server.
 	 * @var string
 	 * @access protected
 	 */
-	protected $_currentServer = NNTP_SERVER;
+	protected $_currentServer = 'NNTP_SERVER';
 
 	/**
 	 * Are we allowed to post to usenet?
@@ -148,7 +148,7 @@ class NNTP extends \Net_NNTP_Client
 	public function doConnect($compression = true, $alternate = false)
 	{
 		if (// (Alternate is wanted, AND current server is alt,  OR  Alternate is not wanted AND current is main.)         AND
-		(($alternate && $this->_currentServer === NNTP_SERVER_A) || (!$alternate && $this->_currentServer === NNTP_SERVER)) &&
+		(($alternate && $this->_currentServer === getenv('NNTP_SERVER_A')) || (!$alternate && $this->_currentServer === getenv('NNTP_SERVER'))) &&
 			// Don't reconnect to usenet if:
 			// We are already connected to usenet.
 			parent::_isConnected()
@@ -163,19 +163,19 @@ class NNTP extends \Net_NNTP_Client
 
 		// Set variables to connect based on if we are using the alternate provider or not.
 		if (!$alternate) {
-			$sslEnabled = (NNTP_SSLENABLED ? true : false);
-			$this->_currentServer = NNTP_SERVER;
-			$this->_currentPort = NNTP_PORT;
-			$userName = NNTP_USERNAME;
-			$password = NNTP_PASSWORD;
-			$socketTimeout = (defined('NNTP_SOCKET_TIMEOUT') ? NNTP_SOCKET_TIMEOUT : $this->_socketTimeout);
+			$sslEnabled = getenv('NNTP_SSLENABLED') ? true : false;
+			$this->_currentServer = getenv('NNTP_SERVER');
+			$this->_currentPort = getenv('NNTP_PORT');
+			$userName = getenv('NNTP_USERNAME');
+			$password = getenv('NNTP_PASSWORD');
+			$socketTimeout = !empty(getenv('NNTP_SOCKET_TIMEOUT')) ? getenv('NNTP_SOCKET_TIMEOUT') : $this->_socketTimeout;
 		} else {
-			$sslEnabled = (NNTP_SSLENABLED_A ? true : false);
-			$this->_currentServer = NNTP_SERVER_A;
-			$this->_currentPort = NNTP_PORT_A;
-			$userName = NNTP_USERNAME_A;
-			$password = NNTP_PASSWORD_A;
-			$socketTimeout = (defined('NNTP_SOCKET_TIMEOUT_A') ? NNTP_SOCKET_TIMEOUT_A : $this->_socketTimeout);
+			$sslEnabled = getenv('NNTP_SSLENABLED_A') ? true : false;
+			$this->_currentServer = getenv('NNTP_SERVER_A');
+			$this->_currentPort = getenv('NNTP_PORT_A');
+			$userName = getenv('NNTP_USERNAME_A');
+			$password = getenv('NNTP_PASSWORD_A');
+			$socketTimeout = !empty(getenv('NNTP_SOCKET_TIMEOUT_A')) ? getenv('NNTP_SOCKET_TIMEOUT_A') : $this->_socketTimeout;
 		}
 
 		$enc = ($sslEnabled ? ' (ssl)' : ' (non-ssl)');
@@ -581,7 +581,7 @@ class NNTP extends \Net_NNTP_Client
 					if ($alternate === true) {
 						if ($aConnected === false) {
 							// Check if the current connected server is the alternate or not.
-							if ($this->_currentServer === NNTP_SERVER) {
+							if ($this->_currentServer === getenv('NNTP_SERVER')) {
 								// It's the main so connect to the alternate.
 								$aConnected = $nntp->doConnect(true, true);
 							} else {
@@ -1483,13 +1483,13 @@ class NNTP extends \Net_NNTP_Client
 			$retVal = true;
 		} else {
 			switch ($this->_currentServer) {
-				case NNTP_SERVER:
+				case getenv('NNTP_SERVER'):
 					if (is_resource($this->_socket)) {
 						$this->doQuit(true);
 					}
 					$retVal = $this->doConnect();
 					break;
-				case NNTP_SERVER_A:
+				case getenv('NNTP_SERVER_A'):
 					if (is_resource($this->_socket)) {
 						$this->doQuit(true);
 					}

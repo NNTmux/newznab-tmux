@@ -1,5 +1,6 @@
 .DS_Store
 config.php
+.env
 error_log
 failed-login.log
 php_errors.log

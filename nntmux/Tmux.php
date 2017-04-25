@@ -90,12 +90,12 @@ class Tmux
 	public function getConnectionsInfo($constants)
 	{
 		$runVar['connections']['port_a'] = $runVar['connections']['host_a'] = $runVar['connections']['ip_a'] = false;
-		$runVar['connections']['port'] = NNTP_PORT;
-		$runVar['connections']['host'] = NNTP_SERVER;
+		$runVar['connections']['port'] = getenv('NNTP_PORT');
+		$runVar['connections']['host'] = getenv('NNTP_SERVER');
 		$runVar['connections']['ip'] = gethostbyname($runVar['connections']['host']);
 		if ($constants['alternate_nntp'] === '1') {
-			$runVar['connections']['port_a'] = NNTP_PORT_A;
-			$runVar['connections']['host_a'] = NNTP_SERVER_A;
+			$runVar['connections']['port_a'] = getenv('NNTP_PORT_A');
+			$runVar['connections']['host_a'] = getenv('NNTP_SERVER_A');
 			$runVar['connections']['ip_a'] = gethostbyname($runVar['connections']['host_a']);
 		}
 		return $runVar['connections'];

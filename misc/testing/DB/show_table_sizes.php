@@ -20,7 +20,7 @@ $table_data = "SELECT TABLE_NAME AS 'Table', TABLE_ROWS AS 'Rows', "
 	. "((INDEX_LENGTH) / POWER(1024,2)) AS 'index', "
 	. "((DATA_FREE) / POWER(1024,2)) AS 'free', "
 	. "((DATA_LENGTH + INDEX_LENGTH) / POWER(1024,2)) AS 'total' "
-	. "FROM information_schema.TABLES WHERE information_schema.TABLES.table_schema = '" . DB_NAME . "' "
+	. "FROM information_schema.TABLES WHERE information_schema.TABLES.table_schema = '" .  getenv('DB_NAME') . "' "
 	. "ORDER BY (DATA_LENGTH + INDEX_LENGTH) DESC";
 
 $run = $pdo->queryDirect($table_data);

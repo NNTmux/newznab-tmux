@@ -27,7 +27,7 @@ if ($argc == 1 || $argv[1] != 'true') {
 	exit($pdo->log->error("\nThis script will rename every table column to lowercase that is not already lowercase.\nTo run:\nphp $argv[0] true\n"));
 }
 
-$database = DB_NAME;
+$database = getenv('DB_NAME');
 
 $count = 0;
 $list = $pdo->query("SELECT TABLE_NAME, COLUMN_NAME, UPPER(COLUMN_TYPE), EXTRA FROM information_schema.columns WHERE table_schema = '" . $database . "'");

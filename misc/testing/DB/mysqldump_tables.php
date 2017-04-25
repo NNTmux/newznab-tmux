@@ -32,14 +32,14 @@ function builddefaultsfile()
 	//generate file contents
 	$filetext = "[mysqldump]"
 				."\n"
-				."user = " . DB_USER
+				."user = " . getenv('DB_USER')
 				."\n"
-				."password = " . DB_PASSWORD
+				."password = " . getenv('DB_PASSWORD')
 				."\n[mysql]"
 				."\n"
-				."user = " . DB_USER
+				."user = " . getenv('DB_USER')
 				."\n"
-				."password = " . DB_PASSWORD;
+				."password = " . getenv('DB_PASSWORD');
 
 	$filehandle = fopen("mysql-defaults.txt", "w+");
 	if(!$filehandle) {
@@ -51,14 +51,14 @@ function builddefaultsfile()
 	}
 }
 
-$dbhost = DB_HOST;
-$dbport = DB_PORT;
-$dbsocket = DB_SOCKET;
-$dbuser = DB_USER;
-$dbpass = DB_PASSWORD;
-$dbname = DB_NAME;
+$dbhost = getenv('DB_HOST');
+$dbport = getenv('DB_PORT');
+$dbsocket = getenv('DB_SOCKET');
+$dbuser = getenv('DB_USER');
+$dbpass = getenv('DB_PASSWORD');
+$dbname = getenv(getenv('DB_NAME'));
 
-if (DB_SOCKET != '') {
+if (getenv('DB_SOCKET') !== '') {
 	$use = "-S $dbsocket";
 } else {
 	$use = "-P$dbport";
@@ -88,7 +88,7 @@ if((isset($argv[1]) && $argv[1] == "db") && (isset($argv[2]) && $argv[2] == "dum
 	$sql = "SHOW tables";
 	$tables = $pdo->query($sql);
 	foreach($tables as $row) {
-		$tbl = $row['Tables_in_'.DB_NAME];
+		$tbl = $row['Tables_in_'. getenv('DB_NAME')];
 		$filename = $argv[3]."/".$tbl.".gz";
 		echo $pdo->log->header("Dumping $tbl.");
 		if (file_exists($filename)) {
@@ -102,7 +102,7 @@ if((isset($argv[1]) && $argv[1] == "db") && (isset($argv[2]) && $argv[2] == "dum
 	$tables = $pdo->query($sql);
 	$pdo->queryExec("SET FOREIGN_KEY_CHECKS=0");
 	foreach($tables as $row) {
-		$tbl = $row['Tables_in_'.DB_NAME];
+		$tbl = $row['Tables_in_'.getenv('DB_NAME')];
 		$filename = $argv[3]."/".$tbl.".gz";
 		if (file_exists($filename)) {
 			echo $pdo->log->header("Restoring $tbl.");
@@ -138,7 +138,7 @@ if((isset($argv[1]) && $argv[1] == "db") && (isset($argv[2]) && $argv[2] == "dum
 	$sql = "SHOW tables";
 	$tables = $pdo->query($sql);
 	foreach($tables as $row) {
-		$tbl = $row['Tables_in_'.DB_NAME];
+		$tbl = $row['Tables_in_'.getenv('DB_NAME')];
 		$filename = $argv[3].$tbl.".csv";
 		echo $pdo->log->header("Dumping $tbl.");
 		if (file_exists($filename)) {
@@ -151,7 +151,7 @@ if((isset($argv[1]) && $argv[1] == "db") && (isset($argv[2]) && $argv[2] == "dum
 	$tables = $pdo->query($sql);
 	$pdo->queryExec("SET FOREIGN_KEY_CHECKS=0");
 	foreach($tables as $row) {
-		$tbl = $row['Tables_in_'.DB_NAME];
+		$tbl = $row['Tables_in_'.getenv('DB_NAME')];
 		$filename = $argv[3].$tbl.".csv";
 		if (file_exists($filename)) {
 			echo $pdo->log->header("Restoring $tbl.");
