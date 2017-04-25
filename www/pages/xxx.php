@@ -29,7 +29,7 @@ $page->smarty->assign('category', $category);
 
 $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST["offset"] : 0;
 $ordering = $movie->getXXXOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST['ob'] : '';
+$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
 
 $results = $movies = [];
 $results = $movie->getXXXRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, -1, $page->userdata['categoryexclusions']);
@@ -49,13 +49,13 @@ $director = (isset($_REQUEST['director']) && !empty($_REQUEST['director'])) ? st
 $page->smarty->assign('director', $director);
 
 $genres = (array)$movie->getAllGenres(true);
-$genre = (isset($_REQUEST['genre']) && in_array($_REQUEST['genre'], $genres)) ? $_REQUEST['genre'] : '';
+$genre = (isset($_REQUEST['genre']) && in_array($_REQUEST['genre'], $genres, false)) ? $_REQUEST['genre'] : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
 $browseby_link = '&amp;title=' . $title . '&amp;actors=' . $actors . '&amp;director=' . $director . '&amp;genre=' . $genre;
 
-$page->smarty->assign('pagertotalitems', isset($results[0]['_totalcount']) ? $results[0]['_totalcount'] : 0);
+$page->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
 $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_COVER_PAGE);
 $page->smarty->assign('pagerquerybase', WWW_TOP . "/xxx?t=" . $category . $browseby_link . "&amp;ob=" . $orderby . "&amp;offset=");
