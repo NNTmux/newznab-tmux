@@ -64,8 +64,6 @@ class Configure
 					$errorCode
 				);
 			}
-		} else {
-			require_once $file;
 		}
 
 		switch ($filename) {

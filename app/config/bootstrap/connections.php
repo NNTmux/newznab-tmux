@@ -88,9 +88,8 @@ if (!defined('NN_INSTALLER')) {
 			"No valid configuration file found at '$config'"
 		);
 	}
-	require_once $config;
 
-	switch (getenv('DB_SYSTEM', true)) {
+	switch (getenv('DB_SYSTEM')) {
 		case 'mysql':
 			$adapter = 'MySql';
 			break;
@@ -102,7 +101,7 @@ if (!defined('NN_INSTALLER')) {
 	}
 
 	if (isset($adapter)) {
-		if (empty(getenv('DB_SOCKET', true))) {
+		if (empty(getenv('DB_SOCKET'))) {
 			$host = empty(getenv('DB_PORT')) ? getenv('DB_HOST') : getenv('DB_HOST') . ':' . getenv('DB_PORT');
 		} else {
 			$host = getenv('DB_SOCKET');
