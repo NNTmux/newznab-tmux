@@ -696,9 +696,9 @@ class XXX
 	 *
 	 * @param bool $activeOnly
 	 *
-	 * @return array|null
+	 * @return array
 	 */
-	public function getAllGenres($activeOnly = false): ?array
+	public function getAllGenres($activeOnly = false): array
 	{
 		$ret = null;
 
