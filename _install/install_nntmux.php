@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__DIR__) . 'bootstrap.php';
+require_once dirname(__DIR__) . DS .  'bootstrap.php';
 
 use app\extensions\util\Versions;
 use nntmux\db\DB;
