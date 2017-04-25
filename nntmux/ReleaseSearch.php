@@ -93,7 +93,7 @@ class ReleaseSearch
 	 *
 	 * @return string
 	 */
-	private function fullTextSQL(): ?string
+	private function fullTextSQL(): string
 	{
 		$return = '';
 		foreach ($this->searchOptions as $columnName => $searchString) {
