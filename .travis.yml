@@ -26,6 +26,9 @@ php:
 
 addons:
   mariadb: '10.1'
+  apt:
+      packages:
+      - curl
 
 before_install:
     - composer validate
@@ -66,4 +69,10 @@ before_script:
 
 script:
    phpunit --configuration tests/phpunit.xml
+
+# Get contents of logs regardless of success / failure, this will help us fix potential minor issues.
+after_success:
+   - bash cat_logs.sh
+after_failure:
+   - bash cat_logs.sh
 
