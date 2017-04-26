@@ -26,7 +26,7 @@ class UsersTest extends \PHPUnit_Framework_TestCase
 	const EMAIL = 'example@example.com';
 
 	public function testUsersAdd() {
-		$dotenv = new Dotenv('', NN_ROOT . DS . 'tests' . DS .'.env.test');
+		$dotenv = new Dotenv(NN_ROOT  . DS . 'tests' . DS , '.env.test');
 		$dotenv->load();
 		$pdo = new DB();
 		$users = new Users(['Settings' => $pdo]);
