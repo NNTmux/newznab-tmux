@@ -29,7 +29,6 @@ addons:
 
 before_install:
     - composer validate
-    - cd php
 
 install:
     - yes '' | pecl install imagick
