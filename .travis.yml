@@ -35,6 +35,31 @@ install:
     # Install composer packages.
     - composer install --prefer-dist
 
+    before_script:
+       - curl -O https://raw.githubusercontent.com/NNTmux/travis-ci/master/cat_logs.sh
+       # Create mysql user.
+       - mysql -u root -e "GRANT ALL ON NNTMUX.* TO 'NNTMUX'@'localhost' IDENTIFIED BY 'NNTMUX';"
+       - mysql -u root -e "GRANT FILE ON *.* TO 'NNTMUX'@'localhost';"
+       # Disable apparmor.
+       - if service apparmor status; then service apparmor stop; update-rc.d -f apparmor remove; service apparmor teardown; fi
+       # Change MySQL settings.
+       - if [[ -f /etc/mysql/my.cnf ]]; then sudo sed -i "s/\[mysqld\]/\[mysqld\]\ngroup_concat_max_len = 8192/" /etc/mysql/my.cnf; fi
+       # Change PHP settings.
+       - echo 'max_execution_time = 120' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+       - echo 'memory_limit = 1024M' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+       # Set permissions, can't use newgrp with travis so we need to do it this way.
+       - sudo chmod -R 777 /home/travis/
+       # Configure NNTmux settings.
+       - cp nntmux/config/settings.example.php nntmux/config/settings.php
+       - sed -i "s/'NN_DEBUG', false/'NN_DEBUG', true/" nntmux/config/settings.php
+       - sed -i "s/'NN_LOGGING', false/'NN_LOGGING', true/" nntmux/config/settings.php
+       - sed -i "s/'NN_LOGINFO', false/'NN_LOGINFO', true/" nntmux/config/settings.php
+       - sed -i "s/'NN_LOGNOTICE', false/'NN_LOGNOTICE', true/" nntmux/config/settings.php
+       - sed -i "s/'NN_LOGWARNING', false/'NN_LOGWARNING', true/" nntmux/config/settings.php
+       - sed -i "s/'NN_LOGERROR', false/'NN_LOGERROR', true/" nntmux/config/settings.php
+       - sed -i "s/'NN_LOGFATAL', false/'NN_LOGFATAL', true/" nntmux/config/settings.php
+       - sed -i "s/'NN_LOGQUERIES', false/'NN_LOGQUERIES', true/" nntmux/config/settings.php
+
 script:
    phpunit --configuration tests/phpunit.xml
 

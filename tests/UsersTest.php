@@ -13,6 +13,9 @@
 
 namespace tests;
 
+include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
+
+use Dotenv\Dotenv;
 use nntmux\db\DB;
 use nntmux\Users;
 
@@ -23,8 +26,10 @@ class UsersTest extends \PHPUnit_Framework_TestCase
 	const EMAIL = 'example@example.com';
 
 	public function testUsersAdd() {
+		$dotenv = new Dotenv('', NN_ROOT . DS . 'tests' . DS .'.env.test');
+		$dotenv->load();
 		$pdo = new DB();
-		$users = new Users();
+		$users = new Users(['Settings' => $pdo]);
 		$users->add(self::USERNAME, self::PASSWORD, self::EMAIL, '2', '', '');
 		$userTest = $users->getByEmail(self::EMAIL);
 		$this->assertEquals(self::EMAIL, $userTest['email']);
