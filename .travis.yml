@@ -62,6 +62,11 @@ before_script:
      - sed -i "s/'NN_LOGERROR', false/'NN_LOGERROR', true/" nntmux/config/settings.php
      - sed -i "s/'NN_LOGFATAL', false/'NN_LOGFATAL', true/" nntmux/config/settings.php
      - sed -i "s/'NN_LOGQUERIES', false/'NN_LOGQUERIES', true/" nntmux/config/settings.php
+     # Configure mysql environment settings
+     - cp .env.example .env
+     - sed -i 's/DB_USER\ \=/DB_USER\ \=\ NNTMUX/g' .env
+     - sed -i 's/DB_PASSWORD\ \=/DB_PASSWORD\ \=\ NNTMUX/g' .env
+     - sed -i 's/DB_NAME\ \=/DB_NAME\ \=\ NNTMUX/g' .env
 
 script:
    phpunit --configuration tests/phpunit.xml
