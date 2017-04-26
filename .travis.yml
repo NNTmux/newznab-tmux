@@ -69,7 +69,7 @@ before_script:
      - sed -i 's/DB_NAME\ \=/DB_NAME\ \=\ NNTMUX/g' .env
 
 script:
-   phpunit --configuration tests/phpunit.xml
+   phpunit --debug --configuration tests/phpunit.xml
 
 # Get contents of logs regardless of success / failure, this will help us fix potential minor issues.
 after_success:
