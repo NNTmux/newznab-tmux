@@ -22,7 +22,7 @@ namespace nntmux\config;
 
 class Configure
 {
-	private $environments = [
+	private static $environments = [
 		'indexer' => [
 			'.env'	=> true,
 			'settings'	=> false
@@ -37,15 +37,28 @@ class Configure
 		],
 	];
 
+	/**
+	 * Configure constructor.
+	 *
+	 * @param string $environment
+	 */
 	public function __construct($environment = 'indexer')
 	{
-		$this->loadEnvironment($environment);
+		try {
+			$this->loadEnvironment($environment);
+		} catch (\RuntimeException $e) {
+			echo $e->getMessage();
+		}
 	}
 
+	/**
+	 * @param $environment
+	 * @throws \RuntimeException
+	 */
 	private function loadEnvironment($environment)
 	{
-		if (array_key_exists($environment, $this->environments)) {
-			foreach ($this->environments[$environment] as $config => $throwException) {
+		if (array_key_exists($environment, Configure::$environments)) {
+			foreach (Configure::$environments[$environment] as $config => $throwException) {
 				$this->loadSettings($config, $throwException);
 			}
 		} else {
@@ -53,13 +66,18 @@ class Configure
 		}
 	}
 
+	/**
+	 * @param      $filename
+	 * @param bool $throwException
+	 * @throws \RuntimeException
+	 */
 	public function loadSettings($filename, $throwException = true)
 	{
 
 		if ($filename === '.env') {
 			$file = NN_ROOT . '.env';
 		} else  {
-			$file = $file = NN_CONFIGS . $filename . '.php';
+			$file = NN_CONFIGS . $filename . '.php';
 		}
 		if (!file_exists($file) && $throwException) {
 			$errorCode = (int)($filename === '.env');
@@ -68,6 +86,10 @@ class Configure
 				$errorCode
 			);
 		}
+		if ($file !== NN_ROOT . '.env') {
+			require_once $file;
+		}
+
 
 		switch ($filename) {
 			case '.env':
@@ -76,7 +98,7 @@ class Configure
 			case 'settings':
 				$settings_file = NN_CONFIGS . 'settings.php';
 				if (is_file($settings_file)) {
-					require_once($settings_file);
+					require_once $settings_file;
 					if (PHP_SAPI === 'cli') {
 						$current_settings_file_version = 4; // Update this when updating settings.example.php
 						if (!defined('NN_SETTINGS_FILE_VERSION') ||

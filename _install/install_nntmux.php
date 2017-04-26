@@ -228,8 +228,11 @@ if (!$error) {
 	}
 
 	if (!file_exists($unrar_path)) {
-		ColorCLI::doEcho(ColorCLI::primary('Creating missing' . $unrar_path . ' folder'));
-		mkdir($unrar_path);
+		ColorCLI::doEcho(ColorCLI::primary('Creating missing ' . $unrar_path . ' folder'));
+		if (!@mkdir($unrar_path) && !is_dir($unrar_path)) {
+			throw new RuntimeException('Unable to create ' . $unrar_path . ' folder');
+		}
+		ColorCLI::doEcho(ColorCLI::primary('Folder ' . $unrar_path . ' successfully created'));
 	}
 	$unrarPathCheck = is_writable($unrar_path);
 	if ($unrarPathCheck === false) {
