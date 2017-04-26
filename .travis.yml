@@ -28,6 +28,8 @@ addons:
   mariadb: '10.1'
   apt:
       packages:
+      - apache2
+      - libapache2-mod-fastcgi
       - curl
 
 before_install:
