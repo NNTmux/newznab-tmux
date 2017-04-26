@@ -60,9 +60,9 @@ before_script:
      - sed -i "s/'NN_LOGFATAL', false/'NN_LOGFATAL', true/" nntmux/config/settings.php
      - sed -i "s/'NN_LOGQUERIES', false/'NN_LOGQUERIES', true/" nntmux/config/settings.php
      - cp .env.example .env
-     - sed -i "s/DB_USER = /DB_USER = NNTMUX/" .env
-     - sed -i "s/DB_PASSWORD = /DB_PASSWORD = NNTMUX/" .env
-     - sed -i "s/DB_NAME = nntmux/DB_NAME = NNTMUX/" .env
+     - sed -i 's/DB_USER\ \=/DB_USER\ \=\ NNTMUX/g'  .env
+     - sed -i 's/DB_PASSWORD\ \=/DB_PASSWORD\ \=\ NNTMUX/g'  .env
+     - sed -i 's/DB_NAME\ \=/DB_NAME\ \=\ NNTMUX/g'  .env
 
 script:
    phpunit --configuration tests/phpunit.xml
