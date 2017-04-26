@@ -77,7 +77,7 @@ class Configure
 				$settings_file = NN_CONFIGS . 'settings.php';
 				if (is_file($settings_file)) {
 					require_once($settings_file);
-					if (php_sapi_name() == 'cli') {
+					if (PHP_SAPI === 'cli') {
 						$current_settings_file_version = 4; // Update this when updating settings.example.php
 						if (!defined('NN_SETTINGS_FILE_VERSION') ||
 							NN_SETTINGS_FILE_VERSION != $current_settings_file_version
