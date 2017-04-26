@@ -3,8 +3,8 @@
 if (!defined('NN_INSTALLER')) {
 	define('NN_INSTALLER', true);
 }
-require_once dirname(__DIR__) . '/bootstrap.php';
-include_once dirname(__DIR__) . '/nntmux/constants.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
 
 use app\extensions\util\Versions;
 use nntmux\config\Configure;
@@ -16,12 +16,10 @@ use nntmux\Users;
 $config = new Configure('install');
 
 $pdo = new DB();
-$users = new Users();
 $error = false;
 
-
 if (file_exists(NN_ROOT . '_install/install.lock')) {
-	ColorCLI::doEcho(ColorCLI::notice('Installation is locked. If you want to reinstall the database, please remove install.lock file from _install folder'));
+	ColorCLI::doEcho(ColorCLI::notice('Installation is locked. If you want to reinstall NNTmux, please remove install.lock file from _install folder. ' . PHP_EOL . ColorCLI::warning('This will wipe your database!')));
 	exit();
 }
 
@@ -91,7 +89,6 @@ if (getenv('DB_SYSTEM') !== 'mysql') {
 
 // Start inserting data into the DB.
 if (!$error) {
-
 	$DbSetup = new DbUpdate(
 		[
 			'backup' => false,
@@ -128,20 +125,16 @@ if (!$error) {
 				}
 			}
 		}
-
 		$ver = new Versions();
 		$patch = $ver->getSQLPatchFromFile();
-
 		if ($dbInstallWorked) {
+			$updateSettings = false;
 			if ($patch > 0) {
 				$updateSettings = $pdo->exec(
 					"UPDATE settings SET value = '$patch' WHERE section = '' AND subsection = '' AND name = 'sqlpatch'"
 				);
-			} else {
-				$updateSettings = false;
 			}
-
-			// If it all worked, move to the next page.
+			// If it all worked, continue the install process.
 			if ($updateSettings) {
 				ColorCLI::doEcho(ColorCLI::info('Database updated successfully'));
 			} else {
@@ -155,106 +148,128 @@ if (!$error) {
 		}
 	}
 }
-
 //Insert admin user into database
 if (getenv('ADMIN_USER') === '' || getenv('ADMIN_PASS') === '' || getenv('ADMIN_EMAIL') === '') {
 	$error = true;
-} else {
-	switch (getenv('DB_SYSTEM')) {
-		case 'mysql':
-			$adapter = 'MySql';
-			break;
-		case 'pgsql':
-			$adapter = 'PostgreSql';
-			break;
-		default:
-			break;
-	}
+	ColorCLI::doEcho(ColorCLI::error('Admin user data cannot be empty! Please edit .env file and fill in admin user details and run this script again!'));
+	exit();
+}
 
-	if ($adapter !== null) {
-		if (empty(getenv('DB_SOCKET'))) {
-			$host = empty(getenv('DB_PORT')) ? getenv('DB_HOST') : getenv('DB_HOST') . ':' . getenv('DB_PORT');
-		} else {
-			$host = getenv('DB_SOCKET');
-		}
+switch (getenv('DB_SYSTEM')) {
+	case 'mysql':
+		$adapter = 'MySql';
+		break;
+	case 'pgsql':
+		$adapter = 'PostgreSql';
+		break;
+	default:
+		break;
+}
 
-		lithium\data\Connections::add('default',
-			[
-				'type'       => 'database',
-				'adapter'    => $adapter,
-				'host'       => $host,
-				'login'      => getenv('DB_USER'),
-				'password'   => getenv('DB_PASSWORD'),
-				'database'   => getenv('DB_NAME'),
-				'encoding'   => 'UTF-8',
-				'persistent' => false,
-			]
-		);
-	}
-
-	$user = new Users();
-	if (!$user->isValidUsername(getenv('ADMIN_USER'))) {
-		$error = true;
+if ($adapter !== null) {
+	if (empty(getenv('DB_SOCKET'))) {
+		$host = empty(getenv('DB_PORT')) ? getenv('DB_HOST') : getenv('DB_HOST') . ':' . getenv('DB_PORT');
 	} else {
-		$usrCheck = $user->getByUsername(getenv('ADMIN_USER'));
-		if ($usrCheck) {
-			$error = true;
-		}
+		$host = getenv('DB_SOCKET');
 	}
-	if (!$user->isValidEmail(getenv('ADMIN_EMAIL'))) {
+
+	lithium\data\Connections::add('default',
+		[
+			'type'       => 'database',
+			'adapter'    => $adapter,
+			'host'       => $host,
+			'login'      => getenv('DB_USER'),
+			'password'   => getenv('DB_PASSWORD'),
+			'database'   => getenv('DB_NAME'),
+			'encoding'   => 'UTF-8',
+			'persistent' => false,
+		]
+	);
+}
+
+$user = new Users();
+if (!$user->isValidUsername(getenv('ADMIN_USER'))) {
+	$error = true;
+} else {
+	$usrCheck = $user->getByUsername(getenv('ADMIN_USER'));
+	if ($usrCheck) {
 		$error = true;
+	}
+}
+if (!$user->isValidEmail(getenv('ADMIN_EMAIL'))) {
+	$error = true;
+}
+
+if (!$error) {
+	$adminCheck = $user->add(getenv('ADMIN_USER'), getenv('ADMIN_PASS'), getenv('ADMIN_EMAIL'), 2, '', '');
+	if (!is_numeric($adminCheck)) {
+		$error = true;
+	}
+}
+
+if (!$error) {
+	$doCheck = true;
+
+	$covers_path = NN_RES . 'covers' . DS;
+	$nzb_path = NN_RES . 'nzb' . DS;
+	$tmp_path = NN_RES . 'tmp' . DS;
+	$unrar_path = $tmp_path . 'unrar' . DS;
+
+
+	$nzbPathCheck = is_writable($nzb_path);
+	if ($nzbPathCheck === false) {
+		$error = true;
+		ColorCLI::doEcho(ColorCLI::warning($nzb_path . ' is not writable. Please fix folder permissions'));
+	}
+
+	$lastchar = substr($nzb_path, strlen($nzb_path) - 1);
+	if ($lastchar !== '/') {
+		$nzb_path .= '/';
+	}
+
+	if (!file_exists($unrar_path)) {
+		ColorCLI::doEcho(ColorCLI::primary('Creating missing' . $unrar_path . ' folder'));
+		mkdir($unrar_path);
+	}
+	$unrarPathCheck = is_writable($unrar_path);
+	if ($unrarPathCheck === false) {
+		$error = true;
+		ColorCLI::doEcho(ColorCLI::warning($unrar_path . ' is not writable. Please fix folder permissions'));
+	}
+
+	$lastchar = substr($unrar_path, strlen($unrar_path) - 1);
+	if ($lastchar !== '/') {
+		$unrar_path .= '/';
+	}
+
+	$coversPathCheck = is_writable($covers_path);
+	if ($coversPathCheck === false) {
+		$error = true;
+		ColorCLI::doEcho(ColorCLI::warning($covers_path . ' is not writable. Please fix folder permissions'));
+	}
+
+	$lastchar = substr($covers_path, strlen($covers_path) - 1);
+	if ($lastchar !== '/') {
+		$covers_path .= '/';
 	}
 
 	if (!$error) {
-		$adminCheck = $user->add(getenv('ADMIN_USER'), getenv('ADMIN_PASS'), getenv('ADMIN_EMAIL'), 2, '', '');
-		if (!is_numeric($adminCheck)) {
+
+		$sql1 = sprintf("UPDATE settings SET value = %s WHERE setting = 'nzbpath'", $pdo->escapeString($nzb_path));
+		$sql2 = sprintf("UPDATE settings SET value = %s WHERE setting = 'tmpunrarpath'", $pdo->escapeString($unrar_path));
+		$sql3 = sprintf("UPDATE settings SET value = %s WHERE setting = 'coverspath'", $pdo->escapeString($covers_path));
+		if ($pdo->queryExec($sql1) === false || $pdo->queryExec($sql2) === false || $pdo->queryExec($sql3) === false) {
 			$error = true;
+		} else {
+			ColorCLI::doEcho(ColorCLI::info('Settings table updated successfully'));
 		}
 	}
 }
-$doCheck = true;
 
-$covers_path = NN_RES . 'covers' . DS;
-$nzb_path = NN_RES . 'nzb' . DS;
-$tmp_path = NN_RES . 'tmp' . DS;
-$unrar_path = $tmp_path . 'unrar' . DS;
-
-
-$nzbPathCheck = is_writable($nzb_path);
-if ($nzbPathCheck === false) {
-	$error = true;
-}
-
-$lastchar = substr($nzb_path, strlen($nzb_path) - 1);
-if ($lastchar !== '/') {
-	$nzb_path .= '/';
-}
-
-$unrarPathCheck = is_writable($nzb_path);
-if ($unrarPathCheck === false) {
-	$error = true;
-}
-
-$lastchar = substr($unrar_path, strlen($unrar_path) - 1);
-if ($lastchar !== '/') {
-	$unrar_path .= '/';
-}
-
-if (!$error) {
-	if (!file_exists($unrar_path)) {
-		mkdir($unrar_path);
-	}
-
-	$sql1 = sprintf("UPDATE settings SET value = %s WHERE setting = 'nzbpath'", $pdo->escapeString($nzb_path));
-	$sql2 = sprintf("UPDATE settings SET value = %s WHERE setting = 'tmpunrarpath'", $pdo->escapeString($unrar_path));
-	$sql3 = sprintf("UPDATE settings SET value = %s WHERE setting = 'coverspath'", $pdo->escapeString($covers_path));
-	if ($pdo->queryExec($sql1) === false || $pdo->queryExec($sql2) === false || $pdo->queryExec($sql3) === false) {
-		$error = true;
-	} else {
-		ColorCLI::doEcho(ColorCLI::info('Settings table updated successfully'));
-	}
-}
 if (!$error) {
 	@file_put_contents(NN_ROOT . '_install/install.lock', '');
 	ColorCLI::doEcho(ColorCLI::alternate('NNTmux installation completed successfully'));
+	exit();
 }
+
+ColorCLI::doEcho(ColorCLI::error('NNTmux installation failed. Fix reported problems and try again'));

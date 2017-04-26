@@ -55,7 +55,12 @@ class Configure
 
 	public function loadSettings($filename, $throwException = true)
 	{
-		$file = NN_ROOT . '.env';
+
+		if ($filename === '.env') {
+			$file = NN_ROOT . '.env';
+		} else  {
+			$file = $file = NN_CONFIGS . $filename . '.php';
+		}
 		if (!file_exists($file) && $throwException) {
 			$errorCode = (int)($filename === '.env');
 			throw new \RuntimeException(
