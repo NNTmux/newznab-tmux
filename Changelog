@@ -1,3 +1,5 @@
+2017-04-26 DariusIII
+	* Chg: Add new installation to nntmux, remove web based one
 2017-04-25 DariusIII
 	* Mrg: Merge dev-env branch into dev
 		Note: You need to copy .env.example, which is found in your sites root folder,  into .env and edit database and USP connection fields with proper data
