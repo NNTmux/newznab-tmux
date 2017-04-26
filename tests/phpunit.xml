@@ -1,0 +1,5 @@
+<phpunit backupGlobals="true" bootstrap="./bootstrap.php">
+    <testsuite>
+        <directory>./</directory>
+    </testsuite>
+</phpunit>
