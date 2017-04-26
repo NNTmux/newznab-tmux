@@ -86,7 +86,7 @@ class Configure
 				$errorCode
 			);
 		}
-		if ($file !== NN_ROOT . '.env') {
+		if ($file !== NN_ROOT . '.env' && file_exists($file)) {
 			require_once $file;
 		}
 
