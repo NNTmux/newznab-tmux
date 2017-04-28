@@ -107,7 +107,7 @@ abstract class Videos
 	 *
 	 * @return string Empty string if no query return or tz style timezone
 	 */
-	protected function getLocalZoneFromVideoID($videoID): string
+	protected function getLocalZoneFromVideoID($videoID)
 	{
 		$result = $this->pdo->queryOneRow('SELECT localzone FROM tv_info WHERE videos_id = %d', $videoID);
 
