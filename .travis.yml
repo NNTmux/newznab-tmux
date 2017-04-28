@@ -41,7 +41,7 @@ install:
 before_script:
      - curl -O https://raw.githubusercontent.com/NNTmux/travis-ci/master/cat_logs.sh
      # Create mysql user.
-     - mysql -u root -e "GRANT ALL ON NNTMUX.* TO 'NNTMUX'@'localhost' IDENTIFIED BY 'NNTMUX';"
+     - mysql -u root -e "GRANT ALL ON TEST.* TO 'NNTMUX'@'localhost' IDENTIFIED BY 'NNTMUX';"
      - mysql -u root -e "GRANT FILE ON *.* TO 'NNTMUX'@'localhost';"
      # Disable apparmor.
      - if service apparmor status; then service apparmor stop; update-rc.d -f apparmor remove; service apparmor teardown; fi
