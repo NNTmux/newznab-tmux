@@ -1,3 +1,5 @@
+2017-04-27 DariusIII
+	* Chg: Update Steam and Game classes with some minor fixes
 2017-04-26 DariusIII
 	* Fix: Fix loading of settings.php if file does not exist
 	* Chg: Change test suite for travis, add phpunit tests

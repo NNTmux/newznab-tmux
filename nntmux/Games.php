@@ -77,7 +77,7 @@ class Games
 	protected $_gameResults;
 
 	/**
-	 * @var object
+	 * @var Steam
 	 */
 	protected $_getGame;
 
@@ -107,9 +107,9 @@ class Games
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		$this->publicKey = Settings::value('APIs..giantbombkey');
-		$this->gameQty = Settings::value('..maxgamesprocessed' != '') ? Settings::value('..maxgamesprocessed') : 150;
+		$this->gameQty = Settings::value('..maxgamesprocessed' !== '') ? Settings::value('..maxgamesprocessed') : 150;
 		$this->imgSavePath = NN_COVERS . 'games' . DS;
-		$this->renamed = Settings::value('..lookupgames') == 2 ? 'AND isrenamed = 1' : '';
+		$this->renamed = Settings::value('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
 		$this->matchPercentage = 60;
 		$this->maxHitRequest = false;
 		$this->catWhere = 'AND categories_id = ' . Category::PC_GAMES . ' ';
@@ -162,16 +162,16 @@ class Games
 				if ($result['title'] === $title) {
 					$bestMatch = $result;
 					break;
-				} else {
-					similar_text(strtolower($result['title']), strtolower($title), $percent);
-					// If similartext reports an exact match set best match and break out
-					if ($percent === 100) {
-						$bestMatch = $result;
-						break;
-					} else if ($percent >= self::GAME_MATCH_PERCENTAGE && $percent > $bestMatchPct) {
-						$bestMatch = $result;
-						$bestMatchPct = $percent;
-					}
+				}
+				similar_text(strtolower($result['title']), strtolower($title), $percent);
+				// If similar_text reports an exact match set best match and break out
+				if ($percent === 100) {
+					$bestMatch = $result;
+					break;
+				}
+				if ($percent >= self::GAME_MATCH_PERCENTAGE && $percent > $bestMatchPct) {
+					$bestMatch = $result;
+					$bestMatchPct = $percent;
 				}
 			}
 		}
@@ -185,7 +185,7 @@ class Games
 	 *
 	 * @return array
 	 */
-	public function getRange($start, $num)
+	public function getRange($start, $num): array
 	{
 		return $this->pdo->query(
 			sprintf(
@@ -195,7 +195,10 @@ class Games
 		);
 	}
 
-	public function getCount()
+	/**
+	 * @return int
+	 */
+	public function getCount(): int
 	{
 		$res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM gamesinfo');
 		return ($res === false ? 0 : $res['num']);
@@ -211,12 +214,12 @@ class Games
 	 *
 	 * @return array
 	 */
-	public function getGamesRange($cat, $start, $num, $orderBy, $maxAge = '', array $excludedCats = array())
+	public function getGamesRange($cat, $start, $num, $orderBy, $maxAge = '', array $excludedCats = []): array
 	{
 		$browseBy = $this->getBrowseBy();
 
 		$catsrch = '';
-		if (count($cat) > 0 && $cat[0] != -1) {
+		if (count($cat) > 0 && $cat[0] !== -1) {
 			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
@@ -301,7 +304,7 @@ class Games
 				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 		if (!empty($return)) {
-			$return[0]['_totalcount'] = (isset($games['total']) ? $games['total'] : 0);
+			$return[0]['_totalcount'] = $games['total'] ?? 0;
 		}
 		return $return;
 	}
@@ -311,9 +314,9 @@ class Games
 	 *
 	 * @return array
 	 */
-	public function getGamesOrder($orderBy)
+	public function getGamesOrder($orderBy): array
 	{
-		$order = ($orderBy == '') ? 'r.postdate' : $orderBy;
+		$order = ($orderBy === '') ? 'r.postdate' : $orderBy;
 		$orderArr = explode('_', $order);
 		switch ($orderArr[0]) {
 			case 'title':
@@ -347,7 +350,7 @@ class Games
 	/**
 	 * @return array
 	 */
-	public function getGamesOrdering()
+	public function getGamesOrdering(): array
 	{
 		return [
 			'title_asc', 'title_desc', 'posted_asc', 'posted_desc', 'size_asc', 'size_desc',
@@ -359,7 +362,7 @@ class Games
 	/**
 	 * @return array
 	 */
-	public function getBrowseByOptions()
+	public function getBrowseByOptions(): array
 	{
 		return ['title' => 'title', 'genre' => 'genres_id', 'year' => 'year'];
 	}
@@ -367,15 +370,15 @@ class Games
 	/**
 	 * @return string
 	 */
-	public function getBrowseBy()
+	public function getBrowseBy(): string
 	{
-		$browseBy = '';
+		$browseBy = ' ';
 		$browseByArr = $this->getBrowseByOptions();
 
 		foreach ($browseByArr as $bbk => $bbv) {
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
 				$bbs = stripslashes($_REQUEST[$bbk]);
-				if ($bbk == 'year') {
+				if ($bbk === 'year') {
 					$browseBy .= 'AND YEAR (gi.releasedate) ' . $this->pdo->likeString($bbs, true, true);
 				} else {
 					$browseBy .= 'AND gi.' . $bbv . ' ' .  $this->pdo->likeString($bbs, true, true);
@@ -392,13 +395,13 @@ class Games
 	 *
 	 * @return string
 	 */
-	public function makeFieldLinks($data, $field)
+	public function makeFieldLinks($data, $field): string
 	{
 		$tmpArr = explode(', ', $data[$field]);
 		$newArr = [];
 		$i = 0;
 		foreach ($tmpArr as $ta) {
-			if (trim($ta) == '') {
+			if (trim($ta) === '') {
 				continue;
 			}
 			// Only use first 6.
@@ -428,7 +431,7 @@ class Games
 	 * @param $trailerUrl
 	 * @param $genreID
 	 */
-	public function update($id, $title, $asin, $url, $publisher, $releaseDate, $esrb, $cover, $trailerUrl, $genreID)
+	public function update($id, $title, $asin, $url, $publisher, $releaseDate, $esrb, $cover, $trailerUrl, $genreID): void
 	{
 
 		$this->pdo->queryExec(
@@ -458,7 +461,7 @@ class Games
 	 *
 	 * @return bool
 	 */
-	public function updateGamesInfo($gameInfo)
+	public function updateGamesInfo($gameInfo): bool
 	{
 		//wait 10 seconds before proceeding (steam api limit)
 		sleep(10);
@@ -625,7 +628,7 @@ class Games
 			$game['releasedate'] = '';
 		}
 
-		if ($game['releasedate'] == '') {
+		if ($game['releasedate'] === '') {
 			$game['releasedate'] = '';
 		}
 		if(!isset($game['review'])){
@@ -671,9 +674,9 @@ class Games
 					$this->pdo->escapeString($game['asin']),
 					$this->pdo->escapeString($game['url']),
 					$this->pdo->escapeString($game['publisher']),
-					($game['gamesgenreID'] == -1 ? 'null' : $game['gamesgenreID']),
+					($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']),
 					$this->pdo->escapeString($game['esrb']),
-					($game['releasedate'] != '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
+					($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
 					$this->pdo->escapeString(substr($game['review'], 0, 3000)),
 					$game['cover'],
 					$game['backdrop'],
@@ -694,9 +697,9 @@ class Games
 					$this->pdo->escapeString($game['asin']),
 					$this->pdo->escapeString($game['url']),
 					$this->pdo->escapeString($game['publisher']),
-					($game['gamesgenreID'] == -1 ? 'null' : $game['gamesgenreID']),
+					($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']),
 					$this->pdo->escapeString($game['esrb']),
-					($game['releasedate'] != '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
+					($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
 					$this->pdo->escapeString(substr($game['review'], 0, 3000)),
 					$game['cover'],
 					$game['backdrop'],
@@ -733,7 +736,10 @@ class Games
 		return $gamesId;
 	}
 
-	public function processGamesReleases()
+	/**
+	 *
+	 */
+	public function processGamesReleases(): void
 	{
 		$res = $this->pdo->queryDirect(
 			sprintf('
@@ -878,7 +884,7 @@ class Games
 	 *
 	 * @return string
 	 */
-	protected function _matchGenre($genre = '')
+	protected function _matchGenre($genre = ''): string
 	{
 		$genreName = '';
 		$a = str_replace('-', ' ', $genre);
