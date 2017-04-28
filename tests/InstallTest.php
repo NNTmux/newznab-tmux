@@ -160,10 +160,12 @@ class InstallTest extends \PHPUnit_Framework_TestCase
 					}
 					// If it all worked, continue the install process.
 					if ($updateSettings) {
-						ColorCLI::doEcho(ColorCLI::info('Database updated successfully'));
+						$message = 'Database updated successfully';
+						echo $message . PHP_EOL;
 					} else {
 						$error = true;
-						ColorCLI::doEcho(ColorCLI::error('Could not update sqlpatch to ' . $patch . ' for your database.'));
+						$message = 'Could not update sqlpatch to ' . $patch . ' for your database.';
+						echo $message . PHP_EOL;
 					}
 				} else {
 					$dbCreateCheck = false;
@@ -243,8 +245,8 @@ class InstallTest extends \PHPUnit_Framework_TestCase
 			$nzbPathCheck = is_writable($nzb_path);
 			if ($nzbPathCheck === false) {
 				$error = true;
-				$message = ColorCLI::warning($nzb_path . ' is not writable. Please fix folder permissions');
-				ColorCLI::doEcho($message);
+				$message = $nzb_path . ' is not writable. Please fix folder permissions';
+				echo $message . PHP_EOL;
 			}
 
 			$lastchar = substr($nzb_path, strlen($nzb_path) - 1);
@@ -257,14 +259,14 @@ class InstallTest extends \PHPUnit_Framework_TestCase
 				if (!@mkdir($unrar_path) && !is_dir($unrar_path)) {
 					throw new \RuntimeException('Unable to create ' . $unrar_path . ' folder');
 				}
-				$message = ColorCLI::primary('Folder ' . $unrar_path . ' successfully created');
-				ColorCLI::doEcho($message);
+				$message = 'Folder ' . $unrar_path . ' successfully created';
+				echo $message;
 			}
 			$unrarPathCheck = is_writable($unrar_path);
 			if ($unrarPathCheck === false) {
 				$error = true;
-				$message = ColorCLI::warning($unrar_path . ' is not writable. Please fix folder permissions');
-				ColorCLI::doEcho($message);
+				$message = $unrar_path . ' is not writable. Please fix folder permissions';
+				echo $message . PHP_EOL;
 			}
 
 			$lastchar = substr($unrar_path, strlen($unrar_path) - 1);
@@ -275,8 +277,8 @@ class InstallTest extends \PHPUnit_Framework_TestCase
 			$coversPathCheck = is_writable($covers_path);
 			if ($coversPathCheck === false) {
 				$error = true;
-				$message = ColorCLI::warning($covers_path . ' is not writable. Please fix folder permissions');
-				ColorCLI::doEcho($message);
+				$message = $covers_path . ' is not writable. Please fix folder permissions';
+				echo $message . PHP_EOL;
 			}
 
 			$lastchar = substr($covers_path, strlen($covers_path) - 1);
@@ -292,19 +294,19 @@ class InstallTest extends \PHPUnit_Framework_TestCase
 				if ($pdo->queryExec($sql1) === false || $pdo->queryExec($sql2) === false || $pdo->queryExec($sql3) === false) {
 					$error = true;
 				} else {
-					$message = ColorCLI::info('Settings table updated successfully');
-					ColorCLI::doEcho($message);
+					$message = 'Settings table updated successfully';
+					echo $message . PHP_EOL;
 				}
 			}
 		}
 
 		if (!$error) {
 			@file_put_contents(NN_ROOT . '_install/install.lock', '');
-			$message = ColorCLI::alternate('NNTmux installation completed successfully');
-			ColorCLI::doEcho($message);
+			$message = 'NNTmux installation completed successfully';
+			echo $message . PHP_EOL;
 		} else {
-			$message = ColorCLI::warning('NNTmux installation failed. Please fix reported problems and run this script again');
-			ColorCLI::doEcho($message);
+			$message = 'NNTmux installation failed. Please fix reported problems and run this script again';
+			echo $message . PHP_EOL;
 		}
 		$this->assertEquals('NNTmux installation completed successfully', $message, 'Test Failed');
 	}
