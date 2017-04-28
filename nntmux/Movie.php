@@ -648,9 +648,9 @@ class Movie
 	 * @param string $variable2
 	 * @param string $variable3
 	 *
-	 * @return string
+	 * @return array|string
 	 */
-	protected function setTmdbImdbTraktVar(&$variable1, &$variable2, &$variable3): string
+	protected function setTmdbImdbTraktVar(&$variable1, &$variable2, &$variable3)
 	{
 		if ($this->checkVariable($variable1)) {
 			return $variable1;
