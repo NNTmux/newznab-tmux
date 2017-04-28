@@ -42,6 +42,7 @@ class FanartTV
 			if (!empty($fanart)) {
 				return $fanart;
 			}
+			return false;
 		}
 
 		return false;
@@ -59,6 +60,7 @@ class FanartTV
 			if (!empty($fanart)) {
 				return $fanart;
 			}
+			return false;
 		}
 
 		return false;

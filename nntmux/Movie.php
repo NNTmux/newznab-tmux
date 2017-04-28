@@ -797,9 +797,9 @@ class Movie
 	{
 		if ($this->fanartapikey !== '')
 		{
-			$buffer = $this->fanart->getMovieFanart('tt' . $imdbId);
+			$art = $this->fanart->getMovieFanart('tt' . $imdbId);
 
-			if (isset($buffer) && $buffer !== false) {
+			if (isset($art) && $art !== false) {
 				if (isset($art['status']) && $art['status'] === 'error') {
 					return false;
 				}
