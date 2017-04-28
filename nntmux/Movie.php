@@ -18,13 +18,9 @@ use Tmdb\Exception\TmdbApiException;
  */
 class Movie
 {
-
-	const SRC_BOXOFFICE = 1;
-	const SRC_INTHEATRE = 2;
-	const SRC_OPENING = 3;
-	const SRC_UPCOMING = 4;
-	const SRC_DVD = 5;
-
+	/**
+	 * @var DB
+	 */
 	public $pdo;
 
 	/**
@@ -115,7 +111,7 @@ class Movie
 	protected $lookuplanguage;
 
 	/**
-	 * @var array|bool|string
+	 * @var null|string
 	 */
 	public $fanartapikey;
 
@@ -177,10 +173,10 @@ class Movie
 		$this->fanartapikey = Settings::value('APIs..fanarttvkey');
 		$this->fanart = new FanartTV($this->fanartapikey);
 
-		$this->lookuplanguage = Settings::value('indexer.categorise.imdblanguage') != '' ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
+		$this->lookuplanguage = Settings::value('indexer.categorise.imdblanguage') !== '' ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
 
-		$this->imdburl = Settings::value('indexer.categorise.imdburl') == 0 ? false : true;
-		$this->movieqty = Settings::value('..maximdbprocessed') != '' ? Settings::value('..maximdbprocessed') : 100;
+		$this->imdburl = Settings::value('indexer.categorise.imdburl') === 0 ? false : true;
+		$this->movieqty = Settings::value('..maximdbprocessed') !== '' ? Settings::value('..maximdbprocessed') : 100;
 		$this->searchEngines = true;
 		$this->showPasswords = Releases::showPasswords();
 
@@ -219,7 +215,7 @@ class Movie
 	 *
 	 * @return array
 	 */
-	public function getMovieInfoMultiImdb($imdbIDs)
+	public function getMovieInfoMultiImdb($imdbIDs): array
 	{
 		return $this->pdo->query(
 			sprintf('
@@ -248,7 +244,7 @@ class Movie
 	 *
 	 * @return array
 	 */
-	public function getRange($start, $num)
+	public function getRange($start, $num): array
 	{
 		return $this->pdo->query(
 			sprintf('
@@ -265,7 +261,7 @@ class Movie
 	 *
 	 * @return int
 	 */
-	public function getCount()
+	public function getCount(): int
 	{
 		$res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM movieinfo');
 		return ($res === false ? 0 : $res['num']);
@@ -283,10 +279,10 @@ class Movie
 	 *
 	 * @return array|bool|\PDOStatement
 	 */
-	public function getMovieRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [])
+	public function getMovieRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
 	{
 		$catsrch = '';
-		if (count($cat) > 0 && $cat[0] != -1) {
+		if (count($cat) > 0 && $cat[0] !== -1) {
 			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
@@ -380,9 +376,9 @@ class Movie
 	 *
 	 * @return array
 	 */
-	protected function getMovieOrder($orderBy)
+	protected function getMovieOrder($orderBy): array
 	{
-		$orderArr = explode('_', (($orderBy == '') ? 'MAX(r.postdate)' : $orderBy));
+		$orderArr = explode('_', (($orderBy === '') ? 'MAX(r.postdate)' : $orderBy));
 		switch ($orderArr[0]) {
 			case 'title':
 				$orderField = 'm.title';
@@ -407,7 +403,7 @@ class Movie
 	 *
 	 * @return array
 	 */
-	public function getMovieOrdering()
+	public function getMovieOrdering(): array
 	{
 		return ['title_asc', 'title_desc', 'year_asc', 'year_desc', 'rating_asc', 'rating_desc'];
 	}
@@ -415,7 +411,7 @@ class Movie
 	/**
 	 * @return string
 	 */
-	protected function getBrowseBy()
+	protected function getBrowseBy(): string
 	{
 		$browseBy = ' ';
 		$browseByArr = ['title', 'director', 'actors', 'genre', 'rating', 'year', 'imdb'];
@@ -531,7 +527,7 @@ class Movie
 	 *
 	 * @return string
 	 */
-	private function checkTraktValue($value)
+	private function checkTraktValue($value): string
 	{
 		if (is_array($value) && !empty($value)) {
 			$temp = '';
@@ -553,9 +549,9 @@ class Movie
 	 *
 	 * @return string
 	 */
-	public function makeFieldLinks($data, $field)
+	public function makeFieldLinks($data, $field): string
 	{
-		if (!isset($data[$field]) || $data[$field] == '') {
+		if (!isset($data[$field]) || $data[$field] === '') {
 			return '';
 		}
 
@@ -563,7 +559,7 @@ class Movie
 		$newArr = [];
 		$i = 0;
 		foreach ($tmpArr as $ta) {
-			if (trim($ta) == '') {
+			if (trim($ta) === '') {
 				continue;
 			}
 			if ($i > 5) {
@@ -577,9 +573,10 @@ class Movie
 
 	/**
 	 * Get array of column keys, for inserting / updating.
+	 *
 	 * @return array
 	 */
-	public function getColumnKeys()
+	public function getColumnKeys(): array
 	{
 		return [
 			'actors','backdrop','cover','director','genre','imdbid','language',
@@ -591,6 +588,7 @@ class Movie
 	 * Update movie on movie-edit page.
 	 *
 	 * @param array $values Array of keys/values to update. See $validKeys
+	 *
 	 * @return int|bool
 	 */
 	public function update(array $values) {
@@ -607,10 +605,10 @@ class Movie
 		];
 		$found = 0;
 		foreach ($values as $key => $value) {
-			if (in_array($key, $validKeys) && !empty($value)) {
+			if (!empty($value) && in_array($key, $validKeys, false)) {
 				$found++;
 				$query[0] .= "$key, ";
-				if (in_array($key, ['genre', 'language'])) {
+				if (in_array($key, ['genre', 'language'], false)) {
 					$value = substr($value, 0, 64);
 				}
 				$value = $this->pdo->escapeString($value);
@@ -635,9 +633,9 @@ class Movie
 	 *
 	 * @return string
 	 */
-	protected function checkVariable(&$variable)
+	protected function checkVariable(&$variable): string
 	{
-		if (isset($variable) && $variable != '') {
+		if (isset($variable) && $variable !== '') {
 			return true;
 		}
 		return false;
@@ -652,13 +650,15 @@ class Movie
 	 *
 	 * @return string
 	 */
-	protected function setTmdbImdbTraktVar(&$variable1, &$variable2, &$variable3)
+	protected function setTmdbImdbTraktVar(&$variable1, &$variable2, &$variable3): string
 	{
 		if ($this->checkVariable($variable1)) {
 			return $variable1;
-		} elseif ($this->checkVariable($variable2)) {
+		}
+		if ($this->checkVariable($variable2)) {
 			return $variable2;
-		} elseif ($this->checkVariable($variable3)) {
+		}
+		if ($this->checkVariable($variable3)) {
 			return $variable3;
 		}
 		return '';
@@ -671,7 +671,7 @@ class Movie
 	 *
 	 * @return bool
 	 */
-	public function updateMovieInfo($imdbId)
+	public function updateMovieInfo($imdbId): bool
 	{
 		if ($this->echooutput && $this->service !== '') {
 			ColorCLI::doEcho(ColorCLI::primary('Fetching IMDB info from TMDB and/or Trakt using IMDB id: ' . $imdbId));
@@ -698,7 +698,7 @@ class Movie
 		$mov['type'] = $mov['director'] = $mov['actors'] = $mov['language'] = '';
 
 		$mov['imdbid'] = $imdbId;
-		$mov['tmdbid'] = (!isset($tmdb['tmdbid']) || $tmdb['tmdbid'] == '') ? 0 : $tmdb['tmdbid'];
+		$mov['tmdbid'] = (!isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
 
 		// Prefer Fanart.tv cover over TMDB and TMDB over IMDB.
 		if ($this->checkVariable($fanart['cover'])) {
@@ -732,15 +732,15 @@ class Movie
 		}
 
 		if ($this->checkVariable($imdb['director'])) {
-			$mov['director'] = (is_array($imdb['director'])) ? implode(', ', array_unique($imdb['director'])) : $imdb['director'];
+			$mov['director'] = is_array($imdb['director']) ? implode(', ', array_unique($imdb['director'])) : $imdb['director'];
 		}
 
 		if ($this->checkVariable($imdb['actors'])) {
-			$mov['actors'] = (is_array($imdb['actors'])) ? implode(', ', array_unique($imdb['actors'])) : $imdb['actors'];
+			$mov['actors'] = is_array($imdb['actors']) ? implode(', ', array_unique($imdb['actors'])) : $imdb['actors'];
 		}
 
 		if ($this->checkVariable($imdb['language'])) {
-			$mov['language'] = (is_array($imdb['language'])) ? implode(', ', array_unique($imdb['language'])) : $imdb['language'];
+			$mov['language'] = is_array($imdb['language']) ? implode(', ', array_unique($imdb['language'])) : $imdb['language'];
 		}
 
 		if (is_array($mov['genre'])) {
@@ -1035,7 +1035,7 @@ class Movie
 	 */
 	protected function fetchTraktTVProperties($imdbId)
 	{
-		if (is_null($this->traktTv)) {
+		if ($this->traktTv === null) {
 			$this->traktTv = new TraktTv(['Settings' => $this->pdo]);
 		}
 		$resp = $this->traktTv->client->movieSummary('tt' . $imdbId, 'full');
@@ -1051,7 +1051,7 @@ class Movie
 				return false;
 			}
 			if ($this->echooutput) {
-				ColorCLI::doEcho(ColorCLI::alternateOver("Trakt Found ") . ColorCLI::headerOver($ret['title']), true);
+				ColorCLI::doEcho(ColorCLI::alternateOver('Trakt Found ') . ColorCLI::headerOver($ret['title']), true);
 			}
 			return $ret;
 		}
@@ -1068,7 +1068,7 @@ class Movie
 	 *
 	 * @return string
 	 */
-	public function doMovieUpdate($buffer, $service, $id, $processImdb = 1)
+	public function doMovieUpdate($buffer, $service, $id, $processImdb = 1): string
 	{
 		$imdbID = false;
 		if (is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,7})/i', $buffer, $matches)) {
@@ -1103,7 +1103,7 @@ class Movie
 	 * @param string $guidChar   (Optional) First letter of a release GUID to use to get work.
 	 * @param int    $lookupIMDB (Optional) 0 Don't lookup IMDB, 1 lookup IMDB, 2 lookup IMDB on releases that were renamed.
 	 */
-	public function processMovieReleases($groupID = '', $guidChar = '', $lookupIMDB = 1)
+	public function processMovieReleases($groupID = '', $guidChar = '', $lookupIMDB = 1): void
 	{
 		if ($lookupIMDB === 0) {
 			return;
@@ -1142,65 +1142,63 @@ class Movie
 					//We didn't find a name, so set to all 0's so we don't parse again.
 					$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d %s', $arr['id'], $this->catWhere));
 					continue;
+				}
+				$this->currentRelID = $arr['id'];
 
-				} else {
-					$this->currentRelID = $arr['id'];
+				$movieName = $this->currentTitle;
+				if ($this->currentYear !== false) {
+					$movieName .= ' (' . $this->currentYear . ')';
+				}
 
-					$movieName = $this->currentTitle;
-					if ($this->currentYear !== false) {
-						$movieName .= ' (' . $this->currentYear . ')';
+				if ($this->echooutput) {
+					ColorCLI::doEcho(ColorCLI::primaryOver('Looking up: ') . ColorCLI::headerOver($movieName), true);
+				}
+
+				// Check local DB.
+				$getIMDBid = $this->localIMDBsearch();
+
+				if ($getIMDBid !== false) {
+					$imdbID = $this->doMovieUpdate('tt' . $getIMDBid, 'Local DB', $arr['id']);
+					if ($imdbID !== false) {
+						continue;
 					}
+				}
 
-					if ($this->echooutput) {
-						ColorCLI::doEcho(ColorCLI::primaryOver('Looking up: ') . ColorCLI::headerOver($movieName), true);
-					}
+				// Check OMDB api.
+				$buffer = $this->omdb->search($this->currentTitle, 'movies', $this->currentYear !== false ? "'" . $this->currentYear . "'" : '');
 
-					// Check local DB.
-					$getIMDBid = $this->localIMDBsearch();
+				if (!empty($buffer) && $buffer->data->Response !== 'False') {
+					$getIMDBid = $buffer->data->Search[0]->imdbID;
 
-					if ($getIMDBid !== false) {
-						$imdbID = $this->doMovieUpdate('tt' . $getIMDBid, 'Local DB', $arr['id']);
+					if (!empty($getIMDBid)) {
+						$imdbID = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $arr['id']);
 						if ($imdbID !== false) {
 							continue;
 						}
 					}
+				}
 
-					// Check OMDB api.
-					$buffer = $this->omdb->search($this->currentTitle, 'movies',  $this->currentYear !== false ? "'" . $this->currentYear . "'" : '');
-
-					if (!empty($buffer) && $buffer->data->Response !== 'False') {
-						$getIMDBid = $buffer->data->Search[0]->imdbID;
-
-						if (!empty($getIMDBid)) {
-							$imdbID = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $arr['id']);
-							if ($imdbID !== false) {
-								continue;
-							}
-						}
-					}
-
-					// Check on trakt.
-					$data = $this->traktTv->client->movieSummary($movieName, 'full');
-					if ($data !== false) {
-						$this->parseTraktTv($data);
-						if (!empty($data['ids']['imdb'])) {
-							$imdbID = $this->doMovieUpdate($data['ids']['imdb'], 'Trakt', $arr['id']);
-							if ($imdbID !== false) {
-								continue;
-							}
-						}
-					}
-
-					// Try on search engines.
-					if ($this->searchEngines && $this->currentYear !== false) {
-						if ($this->imdbIDFromEngines() === true) {
+				// Check on trakt.
+				$data = $this->traktTv->client->movieSummary($movieName, 'full');
+				if ($data !== false) {
+					$this->parseTraktTv($data);
+					if (!empty($data['ids']['imdb'])) {
+						$imdbID = $this->doMovieUpdate($data['ids']['imdb'], 'Trakt', $arr['id']);
+						if ($imdbID !== false) {
 							continue;
 						}
 					}
-
-					// We failed to get an IMDB id from all sources.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d %s', $arr['id'], $this->catWhere));
 				}
+
+				// Try on search engines.
+				if ($this->searchEngines && $this->currentYear !== false) {
+					if ($this->imdbIDFromEngines() === true) {
+						continue;
+					}
+				}
+
+				// We failed to get an IMDB id from all sources.
+				$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d %s', $arr['id'], $this->catWhere));
 			}
 		}
 	}
@@ -1284,7 +1282,7 @@ class Movie
 	 *
 	 * @return bool
 	 */
-	protected function imdbIDFromEngines()
+	protected function imdbIDFromEngines(): bool
 	{
 		if ($this->googleLimit < 41 && (time() - $this->googleBan) > 600) {
 			if ($this->googleSearch() === true) {
@@ -1311,7 +1309,7 @@ class Movie
 	 *
 	 * @return bool
 	 */
-	protected function googleSearch()
+	protected function googleSearch(): bool
 	{
 		try {
 			$buffer = $this->client->get(
@@ -1359,7 +1357,7 @@ class Movie
 	 *
 	 * @return bool
 	 */
-	protected function bingSearch()
+	protected function bingSearch(): bool
 	{
 		try {
 			$buffer = $this->client->get(
@@ -1402,7 +1400,7 @@ class Movie
 	 *
 	 * @return bool
 	 */
-	protected function yahooSearch()
+	protected function yahooSearch(): bool
 	{
 		try {
 			$buffer = $this->client->get(
@@ -1460,7 +1458,7 @@ class Movie
 	 *
 	 * @return bool
 	 */
-	protected function parseMovieSearchName($releaseName)
+	protected function parseMovieSearchName($releaseName): bool
 	{
 		$name = $year = '';
 		$followingList = '[^\w]((1080|480|720)p|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[-._ ]?264|xvid)[^\w]';
@@ -1508,7 +1506,7 @@ class Movie
 	 *
 	 * @return array
 	 */
-	public function getGenres()
+	public function getGenres(): array
 	{
 		return [
 			'Action',
