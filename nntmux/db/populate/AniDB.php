@@ -2,7 +2,6 @@
 
 namespace nntmux\db\populate;
 
-use GuzzleHttp\Client;
 use app\models\Settings;
 use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
@@ -72,7 +71,6 @@ class AniDB
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->guzzleclient = new Client();
 
 		$anidbupdint = Settings::value('APIs.AniDB.max_update_frequency');
 		$lastupdated = Settings::value('APIs.AniDB.last_full_update');
