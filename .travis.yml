@@ -28,10 +28,7 @@ addons:
   mariadb: '10.1'
   apt:
       packages:
-      - apache2
-      - libapache2-mod-fastcgi
       - curl
-      - phpunit
 
 before_install:
     - composer validate
@@ -53,22 +50,6 @@ before_script:
      # Change PHP settings.
      - echo 'max_execution_time = 120' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
      - echo 'memory_limit = 1024M' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-     # Enable php-fpm
-     - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
-     # Required for PHP 7
-     - if [[ -f ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf.default ]]; then sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf; fi
-     - sudo a2enmod rewrite actions fastcgi alias
-     - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-     - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
-     # Configure apache virtual hosts
-     - sudo a2dissite 000-default
-     - curl -O https://raw.githubusercontent.com/NNTmux/travis-ci/master/apache.conf
-     - sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place apache.conf
-     - sudo mv apache.conf /etc/apache2/sites-available/default.conf
-     - sudo a2ensite default.conf
-     - sudo sed -i "s/AllowOverride None/AllowOverride All/g" /etc/apache2/apache2.conf
-     - sudo sed -i "s/Require all denied/Require all granted/g" /etc/apache2/apache2.conf
-     - sudo service apache2 restart
      # Set permissions, can't use newgrp with travis so we need to do it this way.
      - sudo chmod -R 777 /home/travis/
      # Configure NNTmux settings.
@@ -85,7 +66,10 @@ before_script:
      - cp .env.example .env
      - sed -i 's/DB_USER\ \=/DB_USER\ \=\ NNTMUX/g' .env
      - sed -i 's/DB_PASSWORD\ \=/DB_PASSWORD\ \=\ NNTMUX/g' .env
-     - sed -i 's/DB_NAME\ \=/DB_NAME\ \=\ NNTMUX/g' .env
+     - sed -i 's/DB_NAME\ \=/DB_NAME\ \=\ TEST/g' .env
+     - sed -i 's/ADMIN_USER\ \=/ADMIN_USER\ \=\ NNTMUX/g' .env
+     - sed -i 's/ADMIN_PASS\ \=/ADMIN_PASS\ \=\ NNTMUX/g' .env
+     - sed -i 's/ADMIN_EMAIL\ \=/ADMIN_EMAIL\ \=\ example@example.com/g' .env
 
 script:
    phpunit --configuration tests/phpunit.xml
