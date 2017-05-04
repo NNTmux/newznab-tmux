@@ -65,7 +65,7 @@
     }
   ],
   "require": {
-    "php": ">=7.0.0",
+    "php": ">=7.1.0",
     "roave/security-advisories": "dev-master",
     "barracudanetworks/forkdaemon-php": "~1.0",
     "b3rs3rk/steamfront": "dev-master",
