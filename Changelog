@@ -1,4 +1,5 @@
 2017-05-04 DariusIII
+	* Chg: Switch lithium to 1.1-beta branch, update rest of the libraries
 	* Mrg: Merge PR #137 by Nightah - Updated new anime group regexes to match more explicitly
 	* Chg: Set PHP 7.1.0 as minimum version supported by NNTmux
 2017-04-27 DariusIII
