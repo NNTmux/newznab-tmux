@@ -1,3 +1,5 @@
+2017-05-04 DariusIII
+	* Chg: Set PHP 7.1.0 as minimum version supported by NNTmux
 2017-04-27 DariusIII
 	* Chg: Update Movie class
 	* Fix: Fix fetchFanartTvProperties function in Movie class
