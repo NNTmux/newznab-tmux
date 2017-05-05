@@ -12,9 +12,6 @@
  */
 
 namespace tests;
-if (!defined('NN_INSTALLER')) {
-	define('NN_INSTALLER', true);
-}
 
 require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 include_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
@@ -38,11 +35,13 @@ class InstallTest extends \PHPUnit_Framework_TestCase
 	 */
 	public $config;
 
-	/**
-	 *
-	 */
+
 	public function testFullInstall()
 	{
+		if (!defined('NN_INSTALLER')) {
+			define('NN_INSTALLER', true);
+		}
+
 		$this->config = new Configure('install');
 
 		$pdo = new DB();
