@@ -16,8 +16,8 @@ if (!defined('NN_INSTALLER')) {
 	define('NN_INSTALLER', true);
 }
 
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
-include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+include_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
 
 use app\extensions\util\Versions;
 use nntmux\config\Configure;
