@@ -8,13 +8,13 @@ if (!$page->users->isLoggedIn()) {
 
 $sab = new SABnzbd($page);
 
-$output = "";
+$output = '';
 
-$json = $sab->getQueue();
+$json = $sab->getAdvQueue();
 
 if ($json !== false) {
 	$obj = json_decode($json);
-	$queue = $obj->{'jobs'};
+	$queue = $obj->{'queue'};
 	$count = 1;
 
 	$output .=
@@ -24,8 +24,8 @@ if ($json !== false) {
 			<div style='width:16.666666667%;float:left;'><b>Status:</b><br /> " . ucwords(strtolower($obj->{'state'})) . " </div>
 			<div style='width:16.666666667%;float:left;'><b>Free (temp):</b><br /> " . round($obj->{'diskspace1'}) . "GB </div>
 			<div style='width:16.666666667%;float:left;'><b>Free Space:</b><br /> " . round($obj->{'diskspace2'}) . "GB</div>
-			<div style='width:16.666666667%;float:left;'><b>Stats:</b><br /> " . preg_replace('/\s+\|\s+| /', ',', $obj->{'loadavg'}) . " </div>
-		</div>";
+			<div style='width:16.666666667%;float:left;'><b>Stats:</b><br /> " . preg_replace('/\s+\|\s+| /', ',', $obj->{'loadavg'}) . ' </div>
+		</div>';
 
 	if (count($queue) > 0) {
 		$output .=
@@ -45,15 +45,15 @@ if ($json !== false) {
 				</thead>
 				<tbody>";
 
-		foreach ($queue as $item) {
-			if (strpos($item->{'filename'}, "fetch NZB") === false) {
+		foreach ($queue->{'slots'} as $item) {
+			if (strpos($item->{'filename'}, 'fetch NZB') === false) {
 				$output .=
 					"<tr>" .
 						"<td style='text-align:center;width:10px'>" . $count . "</td>" .
 						"<td style='text-align:left;'>" . $item->{'filename'} . "</td>" .
 						"<td style='text-align:center;'>" . round($item->{'mb'}, 2) . " MB</td>" .
 						"<td style='text-align:center;'>" . round($item->{'mbleft'}, 2) . " MB</td>" .
-						"<td style='text-align:center;'>" . ($item->{'mb'} == 0 ? 0 : round(100 - ($item->{'mbleft'} / $item->{'mb'}) * 100)) . "%</td>" .
+						"<td style='text-align:center;'>" . ($item->{'mb'} === 0 ? 0 : round(100 - ($item->{'mbleft'} / $item->{'mb'}) * 100)) . "%</td>" .
 						"<td style='text-align:center;'>" . $item->{'timeleft'} . "</td>" .
 						"<td style='text-align:center;'><a  onclick=\"return confirm('Are you sure?');\" href='?del=" . $item->{'id'} . "'>Delete</a></td>" .
 						"<td style='text-align:center;'><a href='?pause=" . $item->{'id'} . "'>Pause</a></td>" .
