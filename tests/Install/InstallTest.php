@@ -33,8 +33,6 @@ use nntmux\Users;
  */
 class InstallTest extends \PHPUnit_Framework_TestCase
 {
-
-
 	/**
 	 * @var Configure
 	 */
