@@ -48,11 +48,6 @@ before_script:
      # Change PHP settings.
      - echo 'max_execution_time = 120' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
      - echo 'memory_limit = 1024M' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-     # Required for PHP 7
-     - if [[ -f ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf.default ]]; then sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf; fi
-      - sudo a2enmod rewrite actions fastcgi alias
-      - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-      - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
      # Set permissions, can't use newgrp with travis so we need to do it this way.
      - sudo chmod -R 777 /home/travis/
      # Configure mysql environment settings
