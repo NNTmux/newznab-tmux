@@ -1,4 +1,5 @@
 2017-05-05 DariusIII
+	* Chg: Change lenght of releases table name and searchname columns to 400 and 300 respectively
 	* Chg: Add more specific TV UHD categorization
 	* Chg: Move around tests and phpunit.xml
 	* Chg: Update .scrutinizer.yml to use php 7.1
