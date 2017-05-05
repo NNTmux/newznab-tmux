@@ -1,4 +1,5 @@
 2017-05-05 DariusIII
+	* Chg: Add more specific TV UHD categorization
 	* Chg: Move around tests and phpunit.xml
 	* Chg: Update .scrutinizer.yml to use php 7.1
 	* Chg: Remove PHP7.0 from .travis.yml
@@ -75,7 +76,7 @@
 	* Chg: Add aharen/omdbapi library and use it in Movies class to retrieve data from OMDb
 2017-04-11 DariusIII
 	* Chg: Add php-console support for Chrome browser (dev tool)
-	* Chg: Add monolog/monolog and illuminate/filesystem to composer 
+	* Chg: Add monolog/monolog and illuminate/filesystem to composer
 	* Chg: Use proper project API key for TheTVDB
 	* Chg: Adjust TMDB class
 	* Chg: Add exceptions handling, fix incorrect library usage
