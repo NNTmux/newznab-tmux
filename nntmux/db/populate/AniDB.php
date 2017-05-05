@@ -358,7 +358,7 @@ class AniDB
 	/**
 	 *  Grabs AniDB Full Dump XML and inserts it into anidb table
 	 */
-	private function populateMainTable(): void
+	private function populateMainTable()
 	{
 		$lastUpdate = (new \DateTime)->setTimestamp($this->lastUpdate);
 		$current = new \DateTime();
@@ -425,8 +425,8 @@ class AniDB
 	{
 		if (empty($anidbId)) {
 			$anidbIds = $this->pdo->query(sprintf(
-				'SELECT DISTINCT at.anidbid 
-					FROM anidb_titles at 
+				'SELECT DISTINCT at.anidbid
+					FROM anidb_titles at
 					LEFT JOIN anidb_info ai ON ai.anidbid = at.anidbid
                     WHERE ai.updated IS NULL'
 				)

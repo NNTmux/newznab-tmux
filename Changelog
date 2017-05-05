@@ -1,3 +1,5 @@
+2017-05-05 DariusIII
+	* Fix: Remove void return type from nntmux/db/populate/AniDB.php populateMainTable function (fixes issue #136)
 2017-05-04 DariusIII
 	* Chg: Switch lithium to 1.1-beta branch, update rest of the libraries
 	* Mrg: Merge PR #137 by Nightah - Updated new anime group regexes to match more explicitly
