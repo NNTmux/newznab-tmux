@@ -132,7 +132,10 @@ class AniDB
 	/**
 	 * Retrieves supplemental anime info from the AniDB API
 	 *
+	 * @param $anidbId
+	 *
 	 * @return array|bool
+	 * @throws \Exception
 	 */
 	private function getAniDbAPI($anidbId)
 	{
@@ -420,8 +423,10 @@ class AniDB
 	 * Directs flow for populating the AniDB Info/Episodes table
 	 *
 	 * @param string $anidbId
+	 *
+	 * @throws \Exception
 	 */
-	private function populateInfoTable($anidbId = ''): void
+	private function populateInfoTable($anidbId = '')
 	{
 		if (empty($anidbId)) {
 			$anidbIds = $this->pdo->query(sprintf(
