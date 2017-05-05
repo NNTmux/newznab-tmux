@@ -38,7 +38,6 @@ install:
     - composer install --prefer-dist
 
 before_script:
-     - curl -O https://raw.githubusercontent.com/NNTmux/travis-ci/master/cat_logs.sh
      # Create mysql user.
      - mysql -u root -e "GRANT ALL ON TEST.* TO 'NNTMUX'@'localhost' IDENTIFIED BY 'NNTMUX';"
      - mysql -u root -e "GRANT FILE ON *.* TO 'NNTMUX'@'localhost';"
@@ -49,18 +48,13 @@ before_script:
      # Change PHP settings.
      - echo 'max_execution_time = 120' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
      - echo 'memory_limit = 1024M' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+     # Required for PHP 7
+     - if [[ -f ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf.default ]]; then sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf; fi
+      - sudo a2enmod rewrite actions fastcgi alias
+      - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+      - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
      # Set permissions, can't use newgrp with travis so we need to do it this way.
      - sudo chmod -R 777 /home/travis/
-     # Configure NNTmux settings.
-     - cp nntmux/config/settings.example.php nntmux/config/settings.php
-     - sed -i "s/'NN_DEBUG', false/'NN_DEBUG', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGGING', false/'NN_LOGGING', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGINFO', false/'NN_LOGINFO', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGNOTICE', false/'NN_LOGNOTICE', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGWARNING', false/'NN_LOGWARNING', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGERROR', false/'NN_LOGERROR', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGFATAL', false/'NN_LOGFATAL', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGQUERIES', false/'NN_LOGQUERIES', true/" nntmux/config/settings.php
      # Configure mysql environment settings
      - cp .env.example .env
      - sed -i 's/DB_USER\ \=/DB_USER\ \=\ NNTMUX/g' .env
@@ -72,10 +66,3 @@ before_script:
 
 script:
    phpunit
-
-# Get contents of logs regardless of success / failure, this will help us fix potential minor issues.
-after_success:
-   - bash cat_logs.sh
-after_failure:
-   - bash cat_logs.sh
-

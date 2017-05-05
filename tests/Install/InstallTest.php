@@ -34,9 +34,9 @@ use nntmux\Users;
 class InstallTest extends \PHPUnit_Framework_TestCase
 {
 	/**
-	 * @test
+	 *
 	 */
-	public function Install()
+	public function testFullInstall()
 	{
 		$config = new Configure('install');
 
