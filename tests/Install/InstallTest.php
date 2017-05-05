@@ -33,12 +33,19 @@ use nntmux\Users;
  */
 class InstallTest extends \PHPUnit_Framework_TestCase
 {
+
+
+	/**
+	 * @var Configure
+	 */
+	public $config;
+
 	/**
 	 *
 	 */
 	public function testFullInstall()
 	{
-		$config = new Configure('install');
+		$this->config = new Configure('install');
 
 		$pdo = new DB();
 		$error = false;
@@ -48,7 +55,7 @@ class InstallTest extends \PHPUnit_Framework_TestCase
 			exit();
 		}
 
-// Check if user selected right DB type.
+		// Check if user selected right DB type.
 		if (getenv('DB_SYSTEM') !== 'mysql') {
 			ColorCLI::doEcho(ColorCLI::error('Invalid database system. Must be: mysql ; Not: ' . getenv('DB_SYSTEM')));
 			$error = true;
