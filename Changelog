@@ -1,4 +1,5 @@
 2017-05-05 DariusIII
+	* Chg: Move around tests and phpunit.xml
 	* Chg: Update .scrutinizer.yml to use php 7.1
 	* Chg: Remove PHP7.0 from .travis.yml
 	* Chg: Update sabnzbd queue handling for the new sab API changes

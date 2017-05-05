@@ -71,7 +71,7 @@ before_script:
      - sed -i 's/ADMIN_EMAIL\ \=/ADMIN_EMAIL\ \=\ example@example.com/g' .env
 
 script:
-   phpunit --configuration tests/phpunit.xml
+   phpunit
 
 # Get contents of logs regardless of success / failure, this will help us fix potential minor issues.
 after_success:
