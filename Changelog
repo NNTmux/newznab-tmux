@@ -1,4 +1,5 @@
 2017-05-05 DariusIII
+	* Chg: Remove PHP7.0 from .travis.yml
 	* Chg: Update sabnzbd queue handling for the new sab API changes
 	* Fix: Remove void return type from nntmux/db/populate/AniDB.php populateMainTable function (fixes issue #136)
 2017-05-04 DariusIII
