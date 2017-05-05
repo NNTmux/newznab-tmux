@@ -86,6 +86,8 @@ class SABnzbd
 	 * Construct.
 	 *
 	 * @param \BasePage $page
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(&$page)
 	{
@@ -100,8 +102,8 @@ class SABnzbd
 				if (!empty($_COOKIE['sabnzbd_' . $this->uid . '__apikey']) && !empty($_COOKIE['sabnzbd_' . $this->uid . '__host'])) {
 					$this->url = $_COOKIE['sabnzbd_' . $this->uid . '__host'];
 					$this->apikey = $_COOKIE['sabnzbd_' . $this->uid . '__apikey'];
-					$this->priority = (isset($_COOKIE['sabnzbd_' . $this->uid . '__priority'])) ? $_COOKIE['sabnzbd_' . $this->uid . '__priority'] : 0;
-					$this->apikeytype = (isset($_COOKIE['sabnzbd_' . $this->uid . '__apitype'])) ? $_COOKIE['sabnzbd_' . $this->uid . '__apitype'] : 1;
+					$this->priority = $_COOKIE['sabnzbd_' . $this->uid . '__priority'] ?? 0;
+					$this->apikeytype = $_COOKIE['sabnzbd_' . $this->uid . '__apitype'] ?? 1;
 				} else if (!empty($page->userdata['sabapikey']) && !empty($page->userdata['saburl'])) {
 					$this->url = $page->userdata['saburl'];
 					$this->apikey = $page->userdata['sabapikey'];
@@ -121,7 +123,8 @@ class SABnzbd
 				break;
 
 			case self::INTEGRATION_TYPE_SITEWIDE:
-				if ((Settings::value('apps.sabnzbplus.apikey') != '') && (Settings::value('apps.sabnzbplus.url') != '')) {
+				if ((Settings::value('apps.sabnzbplus.apikey') !== '') && (Settings::value('apps.sabnzbplus.url')
+						!== '')) {
 					$this->url = Settings::value('apps.sabnzbplus.url');
 					$this->apikey = Settings::value('apps.sabnzbplus.apikey');
 					$this->priority = Settings::value('apps.sabnzbplus.priority');
@@ -134,7 +137,7 @@ class SABnzbd
 			case self::INTEGRATION_TYPE_NONE:
 				$this->integrated = self::INTEGRATION_TYPE_NONE;
 				// This is for nzbget.
-				if ($page->userdata['queuetype'] == 2) {
+				if ($page->userdata['queuetype'] === 2) {
 					$this->integratedBool = true;
 				}
 				break;
@@ -184,20 +187,6 @@ class SABnzbd
 	}
 
 	/**
-	 * Get JSON representation of the SAB queue.
-	 *
-	 * @return bool|mixed
-	 */
-	public function getQueue()
-	{
-		return $this->client->get(
-					$this->url .
-					"api?mode=qstatus&output=json&apikey=" .
-					$this->apikey
-		);
-	}
-
-	/**
 	 * Get JSON representation of the full SAB queue.
 	 *
 	 * @return bool|mixed
@@ -206,8 +195,23 @@ class SABnzbd
 	{
 		return $this->client->get(
 					$this->url .
-					"api?mode=queue&start=START&limit=LIMIT&output=json&apikey=" .
+					'api?mode=queue&start=START&limit=LIMIT&output=json&apikey=' .
 					$this->apikey
+
+		);
+	}
+
+	/**
+	 * Get JSON representation of SAB history.
+	 *
+	 * @return bool|mixed
+	 */
+	public function getHistory()
+	{
+		return $this->client->get(
+			$this->url .
+			'api?mode=history&start=START&limit=LIMIT&category=CATEGORY&search=SEARCH&failed_only=0&output=json&apikey=' .
+			$this->apikey
 
 		);
 	}
@@ -223,9 +227,9 @@ class SABnzbd
 	{
 		return $this->client->get(
 		$this->url .
-			"api?mode=queue&name=delete&value=" .
+			'api?mode=queue&name=delete&value=' .
 			$id .
-			"&apikey=" .
+			'&apikey=' .
 			$this->apikey);
 	}
 
@@ -240,9 +244,9 @@ class SABnzbd
 	{
 		return $this->client->get(
 		$this->url .
-			"api?mode=queue&name=pause&value=" .
+			'api?mode=queue&name=pause&value=' .
 			$id .
-			"&apikey=" .
+			'&apikey=' .
 			$this->apikey);
 	}
 
@@ -257,9 +261,9 @@ class SABnzbd
 	{
 		return $this->client->get(
 		$this->url .
-			"api?mode=queue&name=resume&value=" .
+		'api?mode=queue&name=resume&value=' .
 			$id .
-			"&apikey=" .
+		'&apikey=' .
 			$this->apikey
 		);
 	}
@@ -273,8 +277,8 @@ class SABnzbd
 	{
 		return $this->client->get(
 		$this->url .
-			"api?mode=pause" .
-			"&apikey=" .
+		'api?mode=pause' .
+		'&apikey=' .
 			$this->apikey
 		);
 	}
@@ -288,8 +292,8 @@ class SABnzbd
 	{
 		return $this->client->get(
 		$this->url .
-			"api?mode=resume" .
-			"&apikey=" .
+		'api?mode=resume' .
+		'&apikey=' .
 			$this->apikey
 		);
 	}
@@ -328,10 +332,10 @@ class SABnzbd
 	 */
 	public function setCookie($host, $apikey, $priority, $apitype)
 	{
-		setcookie('sabnzbd_' . $this->uid . '__host', $host, (time() + 2592000));
-		setcookie('sabnzbd_' . $this->uid . '__apikey', $apikey, (time() + 2592000));
-		setcookie('sabnzbd_' . $this->uid . '__priority', $priority, (time() + 2592000));
-		setcookie('sabnzbd_' . $this->uid . '__apitype', $apitype, (time() + 2592000));
+		setcookie('sabnzbd_' . $this->uid . '__host', $host, time() + 2592000);
+		setcookie('sabnzbd_' . $this->uid . '__apikey', $apikey, time() + 2592000);
+		setcookie('sabnzbd_' . $this->uid . '__priority', $priority, time() + 2592000);
+		setcookie('sabnzbd_' . $this->uid . '__apitype', $apitype, time() + 2592000);
 	}
 
 	/**
@@ -339,9 +343,9 @@ class SABnzbd
 	 */
 	public function unsetCookie()
 	{
-		setcookie('sabnzbd_' . $this->uid . '__host', '', (time() - 2592000));
-		setcookie('sabnzbd_' . $this->uid . '__apikey', '', (time() - 2592000));
-		setcookie('sabnzbd_' . $this->uid . '__priority', '', (time() - 2592000));
-		setcookie('sabnzbd_' . $this->uid . '__apitype', '', (time() - 2592000));
+		setcookie('sabnzbd_' . $this->uid . '__host', '', time() - 2592000);
+		setcookie('sabnzbd_' . $this->uid . '__apikey', '', time() - 2592000);
+		setcookie('sabnzbd_' . $this->uid . '__priority', '', time() - 2592000);
+		setcookie('sabnzbd_' . $this->uid . '__apitype', '', time() - 2592000);
 	}
 }

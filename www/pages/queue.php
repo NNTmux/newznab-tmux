@@ -18,7 +18,7 @@ $queueType = $error = '';
 $queue = null;
 switch(Settings::value('apps.sabnzbplus.integrationtype')) {
 	case SABnzbd::INTEGRATION_TYPE_NONE:
-		if ($userData['queuetype'] == 2) {
+		if ($userData['queuetype'] === 2) {
 			$queueType = 'NZBGet';
 			$queue = new NZBGet($page);
 		}
@@ -41,7 +41,7 @@ switch(Settings::value('apps.sabnzbplus.integrationtype')) {
 		break;
 }
 
-if (!is_null($queue)) {
+if ($queue !== null) {
 
 	if ($queueType === 'Sabnzbd') {
 		if (empty($queue->url)) {
@@ -58,23 +58,23 @@ if (!is_null($queue)) {
 	}
 
 	if ($error === '') {
-		if (isset($_REQUEST["del"])) {
+		if (isset($_REQUEST['del'])) {
 			$queue->delFromQueue($_REQUEST['del']);
 		}
 
-		if (isset($_REQUEST["pause"])) {
+		if (isset($_REQUEST['pause'])) {
 			$queue->pauseFromQueue($_REQUEST['pause']);
 		}
 
-		if (isset($_REQUEST["resume"])) {
+		if (isset($_REQUEST['resume'])) {
 			$queue->resumeFromQueue($_REQUEST['resume']);
 		}
 
-		if (isset($_REQUEST["pall"])) {
+		if (isset($_REQUEST['pall'])) {
 			$queue->pauseAll();
 		}
 
-		if (isset($_REQUEST["rall"])) {
+		if (isset($_REQUEST['rall'])) {
 			$queue->resumeAll();
 		}
 
@@ -83,10 +83,9 @@ if (!is_null($queue)) {
 }
 
 $page->smarty->assign(array('queueType' => $queueType, 'error' => $error, 'user', $page->users));
-$page->title = "Your $queueType Download Queue";
-$page->meta_title = "View $queueType Queue";
-$page->meta_keywords = "view," . strtolower($queueType) .",queue";
-$page->meta_description = "View $queueType Queue";
-
+$page->title = 'Your ' . $queueType . ' Download Queue';
+$page->meta_title = 'View' . $queueType . ' Queue';
+$page->meta_keywords = 'view,' . strtolower($queueType) . ',queue';
+$page->meta_description = 'View' . $queueType . ' Queue';
 $page->content = $page->smarty->fetch('viewqueue.tpl');
 $page->render();
