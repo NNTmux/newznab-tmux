@@ -39,8 +39,8 @@ install:
 
 before_script:
      # Create mysql user.
-     - mysql -u root -e "GRANT ALL ON TEST.* TO 'NNTMUX'@'localhost' IDENTIFIED BY 'NNTMUX';"
-     - mysql -u root -e "GRANT FILE ON *.* TO 'NNTMUX'@'localhost';"
+     - mysql -u root -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"
+     - mysql -u root -e "GRANT FILE ON *.* TO 'TEST'@'localhost';"
      # Disable apparmor.
      - if service apparmor status; then service apparmor stop; update-rc.d -f apparmor remove; service apparmor teardown; fi
      # Change MySQL settings.
@@ -50,14 +50,8 @@ before_script:
      - echo 'memory_limit = 1024M' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
      # Set permissions, can't use newgrp with travis so we need to do it this way.
      - sudo chmod -R 777 /home/travis/
-     # Configure mysql environment settings
-     - cp .env.example .env
-     - sed -i 's/DB_USER\ \=/DB_USER\ \=\ NNTMUX/g' .env
-     - sed -i 's/DB_PASSWORD\ \=/DB_PASSWORD\ \=\ NNTMUX/g' .env
-     - sed -i 's/DB_NAME\ \=/DB_NAME\ \=\ TEST/g' .env
-     - sed -i 's/ADMIN_USER\ \=/ADMIN_USER\ \=\ NNTMUX/g' .env
-     - sed -i 's/ADMIN_PASS\ \=/ADMIN_PASS\ \=\ NNTMUX/g' .env
-     - sed -i 's/ADMIN_EMAIL\ \=/ADMIN_EMAIL\ \=\ example@example.com/g' .env
+     # Configure environment settings
+     - cp .env.travis .env
 
 script:
    phpunit
