@@ -32,7 +32,7 @@ switch ($reqtype)
 
             $output .= '<p><b>Download speed:</b> ' .$speed. 'B/s - <b>Queued:</b> ' .$queued. ' - <b>Status:</b> ' .$status. '</p>';
 
-            if (count($queue['slots']) > 0) {
+            if (count($queue->{'slots'}) > 0) {
                 $output.= '<table class="data highlight">';
                 $output.="<tr>
                             <th></th>
