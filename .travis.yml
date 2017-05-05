@@ -38,7 +38,8 @@ install:
     - composer install --prefer-dist
 
 before_script:
-     # Create mysql user.
+     # Create mysql database and user.
+     - mysql -u root -e "CREATE DATABASE TEST;"
      - mysql -u root -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"
      - mysql -u root -e "GRANT FILE ON *.* TO 'TEST'@'localhost';"
      # Disable apparmor.

@@ -53,8 +53,6 @@ class InstallTest extends \PHPUnit_Framework_TestCase
 			ColorCLI::doEcho(ColorCLI::error('Invalid database system. Must be: mysql ; Not: ' . getenv('DB_SYSTEM')));
 			$error = true;
 		} else {
-			//create the database
-			$pdo->query('CREATE DATABASE ' . getenv('DB_NAME') .   ' DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci');
 			// Connect to the SQL server.
 			try {
 				// HAS to be DB because settings table does not exist yet.
