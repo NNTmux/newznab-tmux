@@ -738,7 +738,7 @@ class Categorize extends Category
 	 */
 	public function isUHDTV(): bool
 	{
-		if (preg_match('/2160p.*(Netflix|Amazon).*(TrollUHD|NTb|VLAD)/i', $this->releaseName)) {
+		if (preg_match('/(S\d+).*(2160p).*(Netflix|Amazon).*(TrollUHD|NTb|VLAD)/i', $this->releaseName)) {
 			$this->tmpCat = Category::TV_UHD;
 			return true;
 		}
@@ -889,7 +889,7 @@ class Categorize extends Category
 	 */
 	public function isMovieUHD(): bool
 	{
-		if (stripos($this->releaseName, '2160p')) {
+		if (!preg_match('/(S\d+).*(2160p).*(Netflix|Amazon).*(TrollUHD|NTb|VLAD)/i', $this->releaseName) && preg_match('/2160p/i', $this->releaseName)) {
 			$this->tmpCat = Category::MOVIE_UHD;
 			return true;
 		}
