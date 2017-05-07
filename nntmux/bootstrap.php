@@ -19,7 +19,6 @@
  * @copyright 2016 nZEDb
  */
 require_once NN_ROOT . 'app/libraries/autoload.php';
-//require_once 'config' . DS . 'Configure.php';
 
 use nntmux\config\Configure;
 use nntmux\utility\Utility;
