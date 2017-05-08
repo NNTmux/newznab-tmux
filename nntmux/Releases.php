@@ -1098,15 +1098,15 @@ class Releases
 
 		$baseSql = sprintf(
 			"SELECT r.*,
-				at.*, ai.*, ae.*,
+				anit.*, ai.*, ae.*,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
 				rn.releases_id AS nfoid,
 				re.releases_id AS reid
 			FROM releases r
-			LEFT OUTER JOIN anidb_titles at ON r.anidbid = at.anidbid
-			LEFT OUTER JOIN anidb_info ai ON at.anidbidid = ai.anidbid
+			LEFT OUTER JOIN anidb_titles anit ON r.anidbid = anit.anidbid
+			LEFT OUTER JOIN anidb_info ai ON anit.anidbidid = ai.anidbid
 			LEFT OUTER JOIN anidb_episodes ae ON r.anidbid = ae.anidbid
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
