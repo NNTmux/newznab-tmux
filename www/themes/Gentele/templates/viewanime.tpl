@@ -29,7 +29,8 @@
 			<br/>
 		{/if}
 		<p>
-			{if $animeCategories != ''}<b>{$animeCategories}</b><br/>{/if}
+            {if $animeType != ''}({$animeType|escape:"htmlall"}){/if}<br>
+            {if $animeCategories != ''}<b>{$animeCategories}</b><br/>{/if}
 			<span class="descinitial">{$animeDescription|escape:"htmlall"|nl2br|magicurl|truncate:"1500":" </span><a class=\"descmore\" href=\"#\"> more...</a>"}
 				{if $animeDescription|strlen > 1500}<span
 						class="descfull">{$animeDescription|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}
