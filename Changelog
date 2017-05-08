@@ -1,4 +1,5 @@
 2017-05-08 DariusIII
+	* Chg: Use reset function in NameFixer
 	* Chg: Update AniDb queries and handling
 	* Chg: Update series page
 2017-05-05 DariusIII

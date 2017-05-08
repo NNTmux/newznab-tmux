@@ -241,7 +241,7 @@ class NameFixer
 						continue;
 					}
 
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->checkName($releaseRow, $echo, $type, $nameStatus, $show, $preId);
 					$this->_echoRenamed($show);
 				}
@@ -303,7 +303,7 @@ class NameFixer
 				echo ColorCLI::primary(number_format($total) . ' file names to process.');
 
 				foreach ($releases as $release) {
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
 					$this->checked++;
 					$this->_echoRenamed($show);
@@ -365,7 +365,7 @@ class NameFixer
 				echo ColorCLI::primary(number_format($total) . ' xxx file names to process.');
 
 				foreach ($releases as $release) {
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->xxxNameCheck($release, $echo, $type, $nameStatus, $show);
 					$this->checked++;
 					$this->_echoRenamed($show);
@@ -426,7 +426,7 @@ class NameFixer
 				echo ColorCLI::primary(number_format($total) . ' srr file extensions to process.');
 
 				foreach ($releases as $release) {
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->srrNameCheck($release, $echo, $type, $nameStatus, $show);
 					$this->checked++;
 					$this->_echoRenamed($show);
@@ -567,7 +567,7 @@ class NameFixer
 				echo ColorCLI::primary(number_format($total) . ' unique ids to process.');
 				foreach ($releases as $rel) {
 					$this->checked++;
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->uidCheck($rel, $echo, $type, $nameStatus, $show);
 					$this->_echoRenamed($show);
 				}
@@ -638,7 +638,7 @@ class NameFixer
 				echo ColorCLI::primary(number_format($total) . ' hash_16K to process.');
 				foreach ($releases as $rel) {
 					$this->checked++;
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->hashCheck($rel, $echo, $type, $nameStatus, $show);
 					$this->_echoRenamed($show);
 				}
@@ -1907,7 +1907,7 @@ class NameFixer
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
 				LEFT JOIN release_unique ru ON ru.releases_id = r.id
-				WHERE ru.releases_id IS NOT NULL 
+				WHERE ru.releases_id IS NOT NULL
 				AND ru.uniqueid = UNHEX({$this->pdo->escapeString($release['uid'])})
 				AND ru.releases_id != {$release['releases_id']}
 				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = 'nonscene@Ef.net (EF)')"
