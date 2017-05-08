@@ -1090,7 +1090,7 @@ class Releases
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			$this->showPasswords,
 			NZB::NZB_ADDED,
-			($aniDbID > -1 ? sprintf(' AND anidbid = %d ', $aniDbID) : ''),
+			($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
 			$this->category->getCategorySearch($cat),
 			($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
