@@ -21,23 +21,29 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 		$page->show404();
 	} else if (!$aniDbInfo) {
 		$page->smarty->assign('nodata', 'No AniDB information for this series.');
-	} elseif (!$aniDbReleases) {
+	} else if (!$aniDbReleases) {
 		$page->smarty->assign('nodata', 'No releases for this series.');
 	} else {
 
 		$page->smarty->assign('anidb', $aniDbInfo);
 		$page->smarty->assign('animeEpisodeTitles', $aniDbReleases);
-		$page->smarty->assign('animeAnidbid', $aniDbInfo['anidbid']);
-		$page->smarty->assign('animeTitle', $aniDbInfo['title']);
-		$page->smarty->assign('animeType', $aniDbInfo['type']);
-		$page->smarty->assign('animePicture', $aniDbInfo['picture']);
-		$page->smarty->assign('animeStartDate', $aniDbInfo['startdate']);
-		$page->smarty->assign('animeEndDate', $aniDbInfo['enddate']);
-		$page->smarty->assign('animeDescription', $aniDbInfo['description']);
-		$page->smarty->assign('animeRating', $aniDbInfo['rating']);
-		$page->smarty->assign('animeRelated', $aniDbInfo['related']);
-		$page->smarty->assign('animeSimilar', $aniDbInfo['similar']);
-		$page->smarty->assign('animeCategories', $aniDbInfo['categories']);
+		$page->smarty->assign(
+			[
+				'animeAnidbid'     => $aniDbInfo['anidbid'],
+				'animeTitle'       => $aniDbInfo['title'],
+				'animeType'        => $aniDbInfo['type'],
+				'animePicture'     => $aniDbInfo['picture'],
+				'animeStartDate'   => $aniDbInfo['startdate'],
+				'animeEndDate'     => $aniDbInfo['enddate'],
+				'animeDescription' => $aniDbInfo['description'],
+				'animeRating'      => $aniDbInfo['rating'],
+				'animeRelated'     => $aniDbInfo['related'],
+				'animeSimilar'     => $aniDbInfo['similar'],
+				'animeCategories'  => $aniDbInfo['categories'],
+				'animeCreators'    => $aniDbInfo['creators'],
+				'animeCharacters'  => $aniDbInfo['characters']
+			]
+		);
 
 		$page->smarty->assign('nodata', '');
 
@@ -49,9 +55,13 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 	$page->content = $page->smarty->fetch('viewanime.tpl');
 	$page->render();
 } else {
-	$letter = (isset($_GET['id']) && preg_match('/^(0\-9|[A-Z])$/i', $_GET['id'])) ? $_GET['id'] : '0-9';
+	$letter = (isset($_GET['id']) && preg_match('/^(0\-9|[A-Z])$/i', $_GET['id'])) ?
+		$_GET['id'] :
+		'0-9';
 
-	$animetitle = (isset($_GET['title']) && !empty($_GET['title'])) ? $_GET['title'] : '';
+	$animetitle = (isset($_GET['title']) && !empty($_GET['title'])) ?
+		$_GET['title'] :
+		'';
 
 	if ($animetitle !== '' && !isset($_GET['id'])) {
 		$letter = '';

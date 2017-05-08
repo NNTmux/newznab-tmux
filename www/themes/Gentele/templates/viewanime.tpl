@@ -34,8 +34,17 @@
 				{if $animeDescription|strlen > 1500}<span
 						class="descfull">{$animeDescription|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}
 		</p>
+        <p>
+            {if $animeCharacters != ''}<br>Characters: {$animeCharacters|escape:"htmlall"}{/if}
+            <br>
+            {if $animeCreators !=''}<br><b>Created by: {$animeCreators|escape:"htmlall"}</b>{/if}
+        </p>
 		<p>
-			{if $animeRating != ''}<br><b>AniDB Rating: {$animeRating|escape:"htmlall"}</b>{/if}
+            {if $animeStartDate != '' && $animeStartDate != '1970-01-01'}<br><b>Started:
+                {$animeStartDate|escape:"htmlall"}</b>{/if}
+            {if $animeEndDate != '' && $animeEndDate != '1970-01-01'}<br><b>Ended:
+                {$animeEndDate|escape:"htmlall"}</b>{/if}
+            {if $animeRating != ''}<br><b>AniDB Rating: {$animeRating|escape:"htmlall"}</b>{/if}
 			{if $animeRelated != ''}<br><i>Related Anime: {$animeRelated|escape:"htmlall"}</i><br/>{/if}
 		</p>
 		<div style="text-align: center;">
