@@ -973,9 +973,9 @@ class Releases
 				WHERE (%s) %s %s %s
 				GROUP BY v.id",
 				implode(' OR ', $siteSQL),
-				($series != '' ? sprintf('AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)) : ''),
-				($episode != '' ? sprintf('AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)) : ''),
-				($airdate != '' ? sprintf('AND DATE(tve.firstaired) = %s', $this->pdo->escapeString($airdate)) : '')
+				($series !== '' ? sprintf('AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)) : ''),
+				($episode !== '' ? sprintf('AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)) : ''),
+				($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', $this->pdo->escapeString($airdate)) : '')
 			);
 			$show = $this->pdo->queryOneRow($showQry);
 			if ($show !== false) {
@@ -1010,11 +1010,11 @@ class Releases
 		}
 
 		$whereSql = sprintf(
-			"%s
+			'%s
 			WHERE r.categories_id BETWEEN %d AND %d
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s",
+			%s %s %s %s %s',
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			Category::TV_ROOT,
 			Category::TV_OTHER,
@@ -1053,9 +1053,9 @@ class Releases
 		);
 
 		$sql = sprintf(
-			"%s
+			'%s
 			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d",
+			LIMIT %d OFFSET %d',
 			$baseSql,
 			$limit,
 			$offset
@@ -1083,10 +1083,10 @@ class Releases
 	public function searchbyAnidbId($aniDbID, $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1)
 	{
 		$whereSql = sprintf(
-			"%s
+			'%s
 			WHERE r.passwordstatus %s
 			AND r.nzbstatus = %d
-			%s %s %s %s",
+			%s %s %s %s',
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			$this->showPasswords,
 			NZB::NZB_ADDED,
@@ -1098,12 +1098,16 @@ class Releases
 
 		$baseSql = sprintf(
 			"SELECT r.*,
+				at.*, ai.*, ae.*,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
 				rn.releases_id AS nfoid,
 				re.releases_id AS reid
 			FROM releases r
+			LEFT OUTER JOIN anidb_titles at ON r.anidbid = at.anidbid
+			LEFT OUTER JOIN anidb_info ai ON at.anidbidid = ai.anidbid
+			LEFT OUTER JOIN anidb_episodes ae ON r.anidbid = ae.anidbid
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT JOIN groups g ON g.id = r.groups_id
@@ -1115,9 +1119,9 @@ class Releases
 		);
 
 		$sql = sprintf(
-			"%s
+			'%s
 			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d",
+			LIMIT %d OFFSET %d',
 			$baseSql,
 			$limit,
 			$offset
@@ -1175,9 +1179,9 @@ class Releases
 		);
 
 		$sql = sprintf(
-			"%s
+			'%s
 			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d",
+			LIMIT %d OFFSET %d',
 			$baseSql,
 			$limit,
 			$offset
@@ -1206,7 +1210,7 @@ class Releases
 						NN_MAX_PAGER_RESULTS
 				), true, NN_CACHE_EXPIRY_SHORT
 		);
-		return (isset($count[0]['count']) ? $count[0]['count'] : 0);
+		return $count[0]['count'] ?? 0;
 	}
 
 	/**
@@ -1251,7 +1255,7 @@ class Releases
 	}
 
 	/**
-	 * @param string|array $guid
+	 * @param array|string $guid
 	 *
 	 * @return array|bool
 	 */

@@ -209,9 +209,11 @@ class AniDB
 			sprintf('
 				SELECT at.anidbid, at.lang, at.title,
 					ai.startdate, ai.enddate, ai.updated, ai.related, ai.creators, ai.description,
-					ai.rating, ai.picture, ai.categories, ai.characters, ai.type, ai.similar
+					ai.rating, ai.picture, ai.categories, ai.characters, ai.type, ai.similar, ae.episodeid, ae
+					.episode_title, ae.episode_no, ae.airdate
 				FROM anidb_titles AS at
 				LEFT JOIN anidb_info AS ai USING (anidbid)
+				LEFT JOIN anidb_episodes ae USING (anidbid)
 				WHERE at.anidbid = %d',
 				$anidbID
 			)
