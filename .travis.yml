@@ -42,6 +42,7 @@ before_script:
      - mysql -u root -e "CREATE DATABASE TEST;"
      - mysql -u root -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"
      - mysql -u root -e "GRANT FILE ON *.* TO 'TEST'@'localhost';"
+     - mysql -u TEST -pTEST TEST < resources/db/schema/mysql-ddl.sql
      # Disable apparmor.
      - if service apparmor status; then service apparmor stop; update-rc.d -f apparmor remove; service apparmor teardown; fi
      # Change MySQL settings.
