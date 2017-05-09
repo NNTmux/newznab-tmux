@@ -3,6 +3,7 @@ build:
         # Overwrites inferred commands
         override:
           - 'composer install --no-interaction --prefer-source --no-scripts --ignore-platform-reqs'
+        before:
           - 'cp .env.travis .env'
 
     environment:
