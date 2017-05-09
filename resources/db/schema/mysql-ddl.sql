@@ -749,6 +749,10 @@ CREATE TABLE         releases (
   proc_nfo          TINYINT(1)                     NOT NULL DEFAULT '0',
   proc_files        TINYINT(1)                     NOT NULL DEFAULT '0',
   proc_uid          TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_srr          TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been srr
+processed',
+  proc_hash16k      TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been hash16k
+processed',
   PRIMARY KEY                                 (id, categories_id),
   INDEX ix_releases_name                      (name),
   INDEX ix_releases_groupsid                  (groups_id,passwordstatus),
