@@ -605,8 +605,7 @@ class NameFixer
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
 					ph.hash AS hash
 				FROM releases rel
-				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
-				WHERE ph.releases_id IS NOT NULL
+				STRAIGHT_JOIN par_hashes ph ON ph.releases_id = rel.id
 				AND rel.nzbstatus = %d
 				AND rel.predb_id = 0',
 				NZB::NZB_ADDED
