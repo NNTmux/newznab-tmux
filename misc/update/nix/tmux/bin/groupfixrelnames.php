@@ -20,7 +20,10 @@ if (!isset($argv[1])) {
 }
 $namefixer = new NameFixer(['Settings' => $pdo]);
 $sorter = new MiscSorter(true, $pdo);
-list($guidChar, $maxperrun, $thread) = explode(' ', $argv[1]);
+$pieces = explode(' ', $argv[1]);
+$guidChar = $pieces[1];
+$maxperrun = $pieces[2];
+$thread = $pieces[3];
 
 switch (true) {
 
