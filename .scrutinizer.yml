@@ -6,10 +6,10 @@ build:
         before:
           - 'cp .env.travis .env'
           - 'mysql -u root -e "CREATE DATABASE TEST;"'
-          - 'mysql -u root -e "GRANT ALL ON TEST.* TO "TEST"@"localhost" IDENTIFIED BY "TEST";"'
-          - 'mysql -u root -e "GRANT FILE ON *.* TO "TEST"@"localhost";"'
+          - 'mysql -u root -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"'
+          - 'mysql -u root -e "GRANT FILE ON *.* TO 'TEST'@'localhost';"'
           - 'mysql -u TEST -pTEST TEST < resources/db/schema/mysql-ddl.sql'
-          - 'mysql -u TEST -pTEST -e "LOAD DATA LOCAL INFILE "resources/db/schema/data/10-settings.tsv" IGNORE INTO TABLE TEST.settings FIELDS TERMINATED BY "\t" OPTIONALLY ENCLOSED BY "\"" LINES TERMINATED BY "\n" IGNORE 1 LINES (section,subsection,name,value,hint,setting);"'
+          - 'mysql -u TEST -pTEST -e "LOAD DATA LOCAL INFILE 'resources/db/schema/data/10-settings.tsv' IGNORE INTO TABLE TEST.settings FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\'' LINES TERMINATED BY '\n' IGNORE 1 LINES (section,subsection,name,value,hint,setting);"'
 
     environment:
         memcached:            true
@@ -92,3 +92,5 @@ coding_style:
 
 filter:
     excluded_paths: [app/libraries/*, libraries/*, libs/*, resources/*]
+tools:
+    sensiolabs_security_checker: true
