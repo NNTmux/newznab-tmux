@@ -28,7 +28,7 @@ use nntmux\Users;
  *
  * @package tests
  */
-class InstallTest extends \PHPUnit_Framework_TestCase
+class InstallTest extends \PHPUnit\Framework\TestCase
 {
 	/**
 	 * @var Configure
