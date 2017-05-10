@@ -1,4 +1,5 @@
 2017-05-10 DariusIII
+	* Chg: Change one switch-case to if-else, add PHPDOC blokcs to functions in Tmux class
 	* Chg: Update query in Namefixer class fixNamesWithParHash function
 	* Fix: Sorting of users in admin area, users list page
 	* Chg: Revert groupfixrelnames to original state
