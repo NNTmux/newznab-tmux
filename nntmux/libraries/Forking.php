@@ -117,8 +117,8 @@ class Forking extends \fork_daemon
 		$this->processEndWork();
 
 		if (NN_ECHOCLI) {
-			$this->_colorCLI->doEcho(
-				$this->_colorCLI->header(
+			ColorCLI::doEcho(
+				ColorCLI::header(
 					'Multi-processing for ' . $this->workType . ' finished in ' . (microtime(true) - $startTime) .
 					' seconds at ' . date(DATE_RFC2822) . '.' . PHP_EOL
 				)
@@ -214,8 +214,8 @@ class Forking extends \fork_daemon
 		if ($this->_workCount > 0) {
 
 			if (NN_ECHOCLI) {
-				$this->_colorCLI->doEcho(
-					$this->_colorCLI->header(
+				ColorCLI::doEcho(
+					ColorCLI::header(
 						'Multi-processing started at ' . date(DATE_RFC2822) . ' for ' . $this->workType . ' with ' . $this->_workCount .
 						' job(s) to do using a max of ' . $this->maxProcesses . ' child process(es).'
 					)
@@ -226,8 +226,8 @@ class Forking extends \fork_daemon
 			$this->process_work(true);
 		} else {
 			if (NN_ECHOCLI) {
-				$this->_colorCLI->doEcho(
-					$this->_colorCLI->header('No work to do!')
+				ColorCLI::doEcho(
+					ColorCLI::header('No work to do!')
 				);
 			}
 		}
@@ -278,6 +278,7 @@ class Forking extends \fork_daemon
 
 	/**
 	 * @return int
+	 * @throws \Exception
 	 */
 	private function backfillMainMethod()
 	{
@@ -293,6 +294,10 @@ class Forking extends \fork_daemon
 		return Settings::value('..backfillthreads');
 	}
 
+	/**
+	 * @param        $groups
+	 * @param string $identifier
+	 */
 	public function backFillChildWorker($groups, $identifier = '')
 	{
 		foreach ($groups as $group) {
@@ -305,6 +310,7 @@ class Forking extends \fork_daemon
 
 	/**
 	 * @return int
+	 * @throws \Exception
 	 */
 	private function safeBackfillMainMethod()
 	{
@@ -386,6 +392,10 @@ class Forking extends \fork_daemon
 		return $threads;
 	}
 
+	/**
+	 * @param        $ranges
+	 * @param string $identifier
+	 */
 	public function safeBackfillChildWorker($ranges, $identifier = '')
 	{
 		foreach ($ranges as $range) {
@@ -401,6 +411,10 @@ class Forking extends \fork_daemon
 	//////////////////////////////////////// All binaries code here ////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * @return null|string
+	 * @throws \Exception
+	 */
 	private function binariesMainMethod()
 	{
 		$this->register_child_run([0 => $this, 1 => 'binariesChildWorker']);
@@ -414,6 +428,10 @@ class Forking extends \fork_daemon
 		return Settings::value('..binarythreads');
 	}
 
+	/**
+	 * @param        $groups
+	 * @param string $identifier
+	 */
 	public function binariesChildWorker($groups, $identifier = '')
 	{
 		foreach ($groups as $group) {
@@ -425,6 +443,7 @@ class Forking extends \fork_daemon
 
 	/**
 	 * @return int
+	 * @throws \Exception
 	 */
 	private function safeBinariesMainMethod()
 	{
@@ -479,6 +498,10 @@ class Forking extends \fork_daemon
 		return $threads;
 	}
 
+	/**
+	 * @param        $ranges
+	 * @param string $identifier
+	 */
 	public function safeBinariesChildWorker($ranges, $identifier = '')
 	{
 		foreach ($ranges as $range) {
@@ -494,6 +517,10 @@ class Forking extends \fork_daemon
 	//////////////////////////////////// All fix release names code here ///////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * @return int|null|string
+	 * @throws \Exception
+	 */
 	private function fixRelNamesMainMethod()
 	{
 		$this->register_child_run([0 => $this, 1 => 'fixRelNamesChildWorker']);
@@ -541,6 +568,10 @@ class Forking extends \fork_daemon
 		return $threads;
 	}
 
+	/**
+	 * @param        $guids
+	 * @param string $identifier
+	 */
 	public function fixRelNamesChildWorker($guids, $identifier = '')
 	{
 		foreach ($guids as $guid) {
@@ -554,6 +585,10 @@ class Forking extends \fork_daemon
 	//////////////////////////////////////// All releases code here ////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * @return null|string
+	 * @throws \Exception
+	 */
 	private function releasesMainMethod()
 	{
 		$this->register_child_run([0 => $this, 1 => 'releasesChildWorker']);
@@ -571,6 +606,10 @@ class Forking extends \fork_daemon
 		return Settings::value('..releasethreads');
 	}
 
+	/**
+	 * @param        $groups
+	 * @param string $identifier
+	 */
 	public function releasesChildWorker($groups, $identifier = '')
 	{
 		foreach ($groups as $group) {
@@ -615,8 +654,8 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Check if we should process Additional's.
-	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
 	private function checkProcessAdditional()
 	{
@@ -647,6 +686,10 @@ class Forking extends \fork_daemon
 		);
 	}
 
+	/**
+	 * @return int|null|string
+	 * @throws \Exception
+	 */
 	private function postProcessAddMainMethod()
 	{
 		$maxProcesses = 1;
@@ -680,8 +723,8 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Check if we should process NFO's.
-	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
 	private function checkProcessNfo()
 	{
@@ -701,6 +744,10 @@ class Forking extends \fork_daemon
 		return false;
 	}
 
+	/**
+	 * @return int|null|string
+	 * @throws \Exception
+	 */
 	private function postProcessNfoMainMethod()
 	{
 		$maxProcesses = 1;
@@ -725,8 +772,8 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Check if we should process Movies.
-	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
 	private function checkProcessMovies()
 	{
@@ -754,6 +801,10 @@ class Forking extends \fork_daemon
 		return false;
 	}
 
+	/**
+	 * @return int|null|string
+	 * @throws \Exception
+	 */
 	private function postProcessMovMainMethod()
 	{
 		$maxProcesses = 1;
@@ -784,8 +835,8 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Check if we should process TV's.
-	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
 	private function checkProcessTV()
 	{
@@ -814,6 +865,10 @@ class Forking extends \fork_daemon
 		return false;
 	}
 
+	/**
+	 * @return int|null|string
+	 * @throws \Exception
+	 */
 	private function postProcessTvMainMethod()
 	{
 		$maxProcesses = 1;
@@ -847,8 +902,8 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Process sharing.
-	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
 	private function processSharing()
 	{
@@ -883,6 +938,10 @@ class Forking extends \fork_daemon
 	////////////////////////////////////// All requestID code goes here ////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * @return null|string
+	 * @throws \Exception
+	 */
 	private function requestIDMainMethod()
 	{
 		$this->register_child_run([0 => $this, 1 => 'requestIDChildWorker']);
@@ -904,6 +963,10 @@ class Forking extends \fork_daemon
 		return Settings::value('..reqidthreads');
 	}
 
+	/**
+	 * @param        $groups
+	 * @param string $identifier
+	 */
 	public function requestIDChildWorker($groups, $identifier = '')
 	{
 		foreach ($groups as $group) {
@@ -915,6 +978,10 @@ class Forking extends \fork_daemon
 	///////////////////////////////// All "update_per_Group" code goes here ////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * @return null|string
+	 * @throws \Exception
+	 */
 	private function updatePerGroupMainMethod()
 	{
 		$this->register_child_run([0 => $this, 1 => 'updatePerGroupChildWorker']);
@@ -923,6 +990,10 @@ class Forking extends \fork_daemon
 		return Settings::value('..releasethreads');
 	}
 
+	/**
+	 * @param        $groups
+	 * @param string $identifier
+	 */
 	public function updatePerGroupChildWorker($groups, $identifier = '')
 	{
 		foreach ($groups as $group) {
@@ -1006,8 +1077,8 @@ class Forking extends \fork_daemon
 	public function childExit($pid, $identifier = '')
 	{
 		if (NN_ECHOCLI) {
-			$this->_colorCLI->doEcho(
-				$this->_colorCLI->header(
+			ColorCLI::doEcho(
+				ColorCLI::header(
 					'Process ID #' . $pid . ' has completed.' . PHP_EOL .
 					'There are ' . ($this->forked_children_count - 1) . ' process(es) still active with ' .
 					(--$this->_workCount) . ' job(s) left in the queue.' . PHP_EOL

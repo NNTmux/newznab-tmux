@@ -1,3 +1,5 @@
+2017-05-10 DariusIII
+	* Chg: Add PHPDOC blocks to Forking class functions
 2017-05-09 DariusIII
 	* Chg: Update guzzlehttp
 	* Chg: Change hash16k and srr name fixing queries and support in groupfixrelnames and NameFixer
