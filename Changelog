@@ -1,4 +1,5 @@
 2017-05-10 DariusIII
+	* Fix: Sorting of users in admin area, users list page
 	* Chg: Revert groupfixrelnames to original state
 	* Chg: Use list to assign values to $pieces array
 	* Chg: Add PHPDOC blocks to Forking class functions

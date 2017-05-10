@@ -189,7 +189,7 @@ class Users
 	{
 		if ($apiRequests) {
 			$this->clearApiRequests(false);
-			$query = ("
+			$query = "
 				SELECT users.*, user_roles.name AS rolename, COUNT(user_requests.id) AS apirequests
 				FROM users
 				INNER JOIN user_roles ON user_roles.id = users.role
@@ -198,15 +198,15 @@ class Users
 				AND email != 'sharing@nZEDb.com'
 				GROUP BY users.id
 				ORDER BY %s %s %s"
-			);
+			;
 		} else {
-			$query = ("
+			$query = '
 				SELECT users.*, user_roles.name AS rolename
 				FROM users
 				INNER JOIN user_roles ON user_roles.id = users.role
 				WHERE 1=1 %s %s %s %s
-				ORDER BY %s %s %s"
-			);
+				ORDER BY %s %s %s'
+			;
 		}
 
 		$order = $this->getBrowseOrder($orderBy);
@@ -226,14 +226,14 @@ class Users
 	}
 
 	/**
-	 * @param $orderBy
+	 * @param string $orderBy
 	 *
 	 * @return array
 	 */
 	public function getBrowseOrder($orderBy)
 	{
-		$order = $orderBy === '' ? 'username_desc' : $orderBy;
-		$orderArr = explode(' ', $order);
+		$order = ($orderBy === '' ? 'username_desc' : $orderBy);
+		$orderArr = explode('_', $order);
 		switch ($orderArr[0]) {
 			case 'username':
 				$orderField = 'username';
@@ -269,8 +269,7 @@ class Users
 				$orderField = 'username';
 				break;
 		}
-		$orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'DESC';
-
+		$orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 		return [$orderField, $orderSort];
 	}
 
