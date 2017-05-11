@@ -1,4 +1,5 @@
 2017-05-11 DariusIII
+	* Chg: Posible fix for not removed missed_parts from multigroup_missed_parts table
 	* Chg: Remove require.php and replace the require_once line with path to bootstrap.php
 	* Chg: Update switch.php
 	* Chg: Return false if there is an exception or runtime error when retrieving images in ReleaseImage class

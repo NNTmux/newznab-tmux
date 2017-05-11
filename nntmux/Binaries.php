@@ -1136,14 +1136,13 @@ class Binaries
 	 */
 	public function partRepair($groupArr): void
 	{
-		$tableNames = $this->_groups->getCBPTableNames($groupArr['id']);
 		// Get all parts in partrepair table.
 		$missingParts = $this->_pdo->query(
 			sprintf('
 				SELECT * FROM %s
 				WHERE groups_id = %d AND attempts < %d
 				ORDER BY numberid ASC LIMIT %d',
-				$tableNames['prname'],
+				$this->tableNames['prname'],
 				$groupArr['id'],
 				$this->_partRepairMaxTries,
 				$this->_partRepairLimit
@@ -1210,7 +1209,7 @@ class Binaries
 					FROM %s
 					WHERE groups_id = %d
 					AND numberid <= %d',
-					$tableNames['prname'],
+					$this->tableNames['prname'],
 					$groupArr['id'],
 					$missingParts[$missingCount - 1]['numberid']
 				)
@@ -1229,7 +1228,7 @@ class Binaries
 						SET attempts = attempts + 1
 						WHERE groups_id = %d
 						AND numberid <= %d',
-						$tableNames['prname'],
+						$this->tableNames['prname'],
 						$groupArr['id'],
 						$missingParts[$missingCount - 1]['numberid']
 					)
@@ -1251,7 +1250,7 @@ class Binaries
 		$this->_pdo->queryExec(
 			sprintf(
 				'DELETE FROM %s WHERE attempts >= %d AND groups_id = %d',
-				$tableNames['prname'],
+				$this->tableNames['prname'],
 				$this->_partRepairMaxTries,
 				$groupArr['id']
 			)
