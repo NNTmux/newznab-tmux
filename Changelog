@@ -1,4 +1,5 @@
 2017-05-11 DariusIII
+	* Chg: Update switch.php
 	* Chg: Return false if there is an exception or runtime error when retrieving images in ReleaseImage class
 	* Chg: Remove unused classes from check_covers script
 2017-05-10 DariusIII
