@@ -12,7 +12,7 @@ use nntmux\db\DB;
 class Tmux
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
