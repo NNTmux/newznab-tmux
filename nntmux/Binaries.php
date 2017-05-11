@@ -379,7 +379,7 @@ class Binaries
 				if ($this->_echoCLI) {
 					ColorCLI::doEcho(ColorCLI::primary('Part repair enabled. Checking for missing parts.'), true);
 				}
-				$this->partRepair($groupMySQL);
+				$this->partRepair($this->tableNames['prname'], $groupMySQL);
 			} else if ($this->_echoCLI) {
 				ColorCLI::doEcho(ColorCLI::primary('Part repair disabled by user.'), true);
 			}
@@ -1134,7 +1134,7 @@ class Binaries
 	 *
 	 * @return void
 	 */
-	public function partRepair($groupArr): void
+	public function partRepair($tableName, $groupArr): void
 	{
 		// Get all parts in partrepair table.
 		$missingParts = $this->_pdo->query(
@@ -1142,7 +1142,7 @@ class Binaries
 				SELECT * FROM %s
 				WHERE groups_id = %d AND attempts < %d
 				ORDER BY numberid ASC LIMIT %d',
-				$this->tableNames['prname'],
+				$tableName,
 				$groupArr['id'],
 				$this->_partRepairMaxTries,
 				$this->_partRepairLimit
@@ -1209,7 +1209,7 @@ class Binaries
 					FROM %s
 					WHERE groups_id = %d
 					AND numberid <= %d',
-					$this->tableNames['prname'],
+					$tableName,
 					$groupArr['id'],
 					$missingParts[$missingCount - 1]['numberid']
 				)
@@ -1228,7 +1228,7 @@ class Binaries
 						SET attempts = attempts + 1
 						WHERE groups_id = %d
 						AND numberid <= %d',
-						$this->tableNames['prname'],
+						$tableName,
 						$groupArr['id'],
 						$missingParts[$missingCount - 1]['numberid']
 					)
@@ -1250,7 +1250,7 @@ class Binaries
 		$this->_pdo->queryExec(
 			sprintf(
 				'DELETE FROM %s WHERE attempts >= %d AND groups_id = %d',
-				$this->tableNames['prname'],
+				$tableName,
 				$this->_partRepairMaxTries,
 				$groupArr['id']
 			)
