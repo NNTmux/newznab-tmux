@@ -379,12 +379,12 @@ class Binaries
 				if ($this->_echoCLI) {
 					ColorCLI::doEcho(ColorCLI::primary('Part repair enabled. Checking for missing parts.'), true);
 				}
-				$this->partRepair('', $groupMySQL);
+				$this->partRepair($groupMySQL, '');
 
 				$mgrPosters = $this->getMultiGroupPosters();
 				if(!empty($mgrPosters)) {
 					$tableNames = ProcessReleasesMultiGroup::tableNames();
-					$this->partRepair($tableNames, $groupMySQL);
+					$this->partRepair($groupMySQL, $tableNames);
 				}
 
 			} else if ($this->_echoCLI) {
@@ -1142,7 +1142,7 @@ class Binaries
 	 * @param array $groupArr The info for this group from mysql.
 	 * @return void
 	 */
-	public function partRepair($tables = '', $groupArr): void
+	public function partRepair($groupArr, $tables = ''): void
 	{
 		$tableNames = $tables;
 
