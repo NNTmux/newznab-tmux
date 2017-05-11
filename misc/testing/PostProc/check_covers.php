@@ -51,7 +51,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
 			}
 		}
 	}
-	echo ColorCLI::header('Total releases missing covers that ' . $couldbe . ' their covers fixed = ' . number_format($counterfixed));
+	echo ColorCLI::header('Total releases missing covers that ' . $couldbe . 'their covers fixed = ' . number_format($counterfixed));
 } else {
 	exit(ColorCLI::header("\nThis script checks if release covers actually exist on disk.\n\n"
 		. "Releases without covers may be reset for post-processing, thus regenerating them and related meta data.\n\n"
