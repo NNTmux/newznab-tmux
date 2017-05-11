@@ -1,3 +1,5 @@
+2017-05-11 DariusIII
+	* Chg: Remove unused classes from check_covers script
 2017-05-10 DariusIII
 	* Chg: Change one switch-case to if-else, add PHPDOC blokcs to functions in Tmux class
 	* Chg: Update query in Namefixer class fixNamesWithParHash function
