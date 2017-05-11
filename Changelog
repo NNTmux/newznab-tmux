@@ -1,4 +1,5 @@
 2017-05-11 DariusIII
+	* Chg: Return false if there is an exception or runtime error when retrieving images in ReleaseImage class
 	* Chg: Remove unused classes from check_covers script
 2017-05-10 DariusIII
 	* Chg: Change one switch-case to if-else, add PHPDOC blokcs to functions in Tmux class
