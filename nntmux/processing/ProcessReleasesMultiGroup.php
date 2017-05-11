@@ -25,7 +25,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 	 *
 	 * @void
 	 */
-	protected function formFromNamesQuery()
+	protected function formFromNamesQuery(): void
 	{
 		$this->fromNamesQuery = '';
 	}
@@ -35,7 +35,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 	 *
 	 * @return bool
 	 */
-	public static function isMultiGroup($fromName)
+	public static function isMultiGroup($fromName): bool
 	{
 		$poster = MultigroupPosters::find('first', ['conditions' => ['poster' => $fromName]]);
 		return (empty($poster) ? false : true);
@@ -48,7 +48,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 	 *
 	 * @return void
 	 */
-	protected function initiateTableNames($groupID)
+	protected function initiateTableNames($groupID): void
 	{
 		$this->tables = self::tableNames();
 	}
@@ -58,7 +58,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 	 *
 	 * @return array
 	 */
-	public static function tableNames()
+	public static function tableNames(): array
 	{
 		return [
 			'cname' => 'multigroup_collections',
