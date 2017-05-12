@@ -11,7 +11,7 @@ use nntmux\db\DB;
 class DnzbFailures
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
