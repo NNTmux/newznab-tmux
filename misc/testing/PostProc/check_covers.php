@@ -40,7 +40,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
 				echo ColorCLI::warning('Missing cover ' . $nzbpath);
 				if ($argv[1] === 'true') {
 					$cover = $movie->updateMovieInfo($row['imdbid']);
-					if($cover === false) {
+					if($cover === false || !file_exists($nzbpath)) {
 						$pdo->queryExec('UPDATE movieinfo m SET m.cover = 0 WHERE m.imdbid = %d', $row['imdbid']);
 					}
 				}
