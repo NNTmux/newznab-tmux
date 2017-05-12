@@ -207,6 +207,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id = %d)
+					AND rel.predb_id = 0
 					AND rel.proc_nfo = %d',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
@@ -288,6 +289,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN(%d, %d))
+					AND rel.predb_id = 0
 					AND proc_files = %d',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
@@ -350,6 +352,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
+					AND rel.predb_id = 0
 					AND rf.name %s',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
@@ -411,6 +414,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
+					AND rel.predb_id = 0
 					AND rf.name %s
 					AND rel.proc_srr = %d',
 				self::IS_RENAMED_NONE,
@@ -470,6 +474,7 @@ class NameFixer
 					SELECT rel.id AS releases_id, rel.guid, rel.groups_id, rel.fromname
 					FROM releases rel
 					WHERE rel.isrenamed = %d
+					AND rel.predb_id = 0
 					AND rel.proc_par2 = %d',
 				self::IS_RENAMED_NONE,
 				self::PROC_PAR2_NONE
@@ -553,6 +558,7 @@ class NameFixer
 				WHERE ru.releases_id IS NOT NULL
 				AND rel.nzbstatus = %d
 				AND rel.isrenamed = %d
+				AND rel.predb_id = 0
 				AND rel.categories_id IN (%d, %d)
 				AND rel.proc_uid = %d',
 				NZB::NZB_ADDED,
@@ -623,6 +629,7 @@ class NameFixer
 				AND rel.nzbstatus = %d
 				AND rel.isrenamed = %d
 				AND rel.categories_id IN (%d, %d)
+				AND rel.predb_id = 0
 				AND rel.proc_hash16k = %d',
 				NZB::NZB_ADDED,
 				self::IS_RENAMED_NONE,
