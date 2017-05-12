@@ -72,7 +72,7 @@ class ReleaseRemover
 	protected $method = '';
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	protected $pdo;
 
@@ -210,7 +210,7 @@ class ReleaseRemover
 	 * @param int|string $time                   Time in hours (to select old releases) or 'full' for no time limit.
 	 * @param string     $type                   Type of query to run [blacklist, executable, gibberish, hashed, installbin, passworded,
 	 *                                           passwordurl, sample, scr, short, size, ''] ('' runs against all types)
-	 * @param string     $blacklistID
+	 * @param string|int     $blacklistID
 	 *
 	 * @return string|bool
 	 */
@@ -220,7 +220,7 @@ class ReleaseRemover
 		$this->delete = $delete;
 		$this->blacklistID = '';
 
-		if (isset($blacklistID) && is_numeric($blacklistID)) {
+		if ($blacklistID !== '' && is_numeric($blacklistID)) {
 			$this->blacklistID = sprintf('AND id = %d', $blacklistID);
 		}
 
@@ -228,24 +228,20 @@ class ReleaseRemover
 		$this->crapTime = '';
 		$type = strtolower(trim($type));
 
-		switch ($time) {
-			case 'full':
-				if ($this->echoCLI) {
-					echo ColorCLI::header('Removing ' . ($type === '' ? 'All crap releases ' : $type . ' crap releases') . ' - no time limit.\n');
-				}
-				break;
-			default:
-				if (!is_numeric($time)) {
-					$this->error = 'Error, time must be a number or full.';
+		if ($time === 'full') {
+			if ($this->echoCLI) {
+				echo ColorCLI::header('Removing ' . ($type === '' ? 'All crap releases ' : $type . ' crap releases') . ' - no time limit.\n');
+			}
+		} else {
+			if (!is_numeric($time)) {
+				$this->error = 'Error, time must be a number or full.';
 
-					return $this->returnError();
-				}
-				if ($this->echoCLI) {
-					echo ColorCLI::header('Removing ' . ($type === '' ? 'All crap releases ' : $type . ' crap releases') . ' from the past ' . $time . ' hour(s).\n');
-				}
-				$this->crapTime = ' AND r.adddate > (NOW() - INTERVAL ' . $time . ' HOUR)';
-				break;
-
+				return $this->returnError();
+			}
+			if ($this->echoCLI) {
+				echo ColorCLI::header('Removing ' . ($type === '' ? 'All crap releases ' : $type . ' crap releases') . ' from the past ' . $time . ' hour(s).\n');
+			}
+			$this->crapTime = ' AND r.adddate > (NOW() - INTERVAL ' . $time . ' HOUR)';
 		}
 
 		$this->deletedCount = 0;
@@ -1112,7 +1108,7 @@ class ReleaseRemover
 							foreach ($groups as $group) {
 								$gQuery .= $group['id'] . ',';
 							}
-							$gQuery = substr($gQuery, 0, strlen($gQuery) - 1) . ')';
+							$gQuery = substr($gQuery, 0, -0) . ')';
 
 							return $gQuery;
 						default:
@@ -1267,13 +1263,12 @@ class ReleaseRemover
 	{
 		if ($this->browser) {
 			return $this->error . '<br />';
-		} else {
-			if ($this->echoCLI && $this->error !== '') {
-				echo ColorCLI::error($this->error);
-			}
-
-			return false;
 		}
+
+		if ($this->echoCLI && $this->error !== '') {
+			echo ColorCLI::error($this->error);
+		}
+		return false;
 	}
 
 	protected function extractSrchFromRegx($dbRegex = '')
