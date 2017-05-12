@@ -147,6 +147,7 @@ class Movie
 
 	/**
 	 * @param array $options Class instances / Echo to CLI.
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -979,7 +980,7 @@ class Movie
 			foreach ($imdb_regex_multi as $field => $regex) {
 				if (preg_match_all($regex, $buffer, $matches)) {
 					$match2 = $matches[1];
-					$match3 = array_map("trim", $match2);
+					$match3 = array_map('trim', $match2);
 					$ret[$field] = $match3;
 				}
 			}
@@ -1019,7 +1020,7 @@ class Movie
 				}
 			}
 			if ($this->echooutput && isset($ret['title'])) {
-				ColorCLI::doEcho(ColorCLI::headerOver("IMDb Found ") . ColorCLI::primaryOver($ret['title']), true);
+				ColorCLI::doEcho(ColorCLI::headerOver('IMDb Found ') . ColorCLI::primaryOver($ret['title']), true);
 			}
 			return $ret;
 		}
@@ -1361,7 +1362,7 @@ class Movie
 	{
 		try {
 			$buffer = $this->client->get(
-				"http://www.bing.com/search?q=" .
+				'http://www.bing.com/search?q=' .
 				urlencode(
 					'("' .
 					$this->currentTitle .
@@ -1404,7 +1405,7 @@ class Movie
 	{
 		try {
 			$buffer = $this->client->get(
-				"http://search.yahoo.com/search?n=10&ei=UTF-8&va_vt=title&vo_vt=any&ve_vt=any&vp_vt=any&vf=all&vm=p&fl=0&fr=fp-top&p=" .
+				'http://search.yahoo.com/search?n=10&ei=UTF-8&va_vt=title&vo_vt=any&ve_vt=any&vp_vt=any&vf=all&vm=p&fl=0&fr=fp-top&p=' .
 				urlencode(
 					'' .
 					implode('+',
