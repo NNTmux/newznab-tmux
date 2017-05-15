@@ -741,6 +741,7 @@ class Movie
 		if ($this->checkVariable($fanart['banner'])) {
 			$mov['banner'] = $this->releaseImage->saveImage($imdbId . '-banner', $fanart['banner'], $this->imgSavePath);
 		}
+
 		$mov['title']   = $this->setTmdbImdbTraktVar($imdb['title']  , $tmdb['title'], $trakt['title']);
 		$mov['rating']  = $this->setTmdbImdbTraktVar($imdb['rating'] , $tmdb['rating'], $trakt['rating']);
 		$mov['plot']    = $this->setTmdbImdbTraktVar($imdb['plot']   , $tmdb['plot'], $trakt['overview']);
@@ -1091,19 +1092,19 @@ class Movie
 		if ($this->omdbapikey !== '') {
 			$this->omdb = new OMDbAPI($this->omdbapikey);
 		}
-		$resp = $this->omdb->search('tt' . $imdbId, 'movie');
+		$resp = $this->omdb->fetch('i', 'tt' . $imdbId);
 
 		if ($resp->data->Response !== 'False') {
 			$ret = [];
 
-			if (isset($resp->data->Search[0]->Title)) {
-				$ret['title'] = $resp->data->Search[0]->Title;
+			if (isset($resp->data->Title)) {
+				$ret['title'] = $resp->data->Title;
 			} else {
 				return false;
 			}
 
-			if (isset($resp->data->Search[0]->Poster)) {
-				$ret['cover'] = $resp->data->Search[0]->Poster;
+			if (isset($resp->data->Poster)) {
+				$ret['cover'] = $resp->data->Poster;
 			} else {
 				return false;
 			}
