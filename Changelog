@@ -1,4 +1,5 @@
 2017-05-15 DariusIII
+	* Fix: Wrong table structure for release_regexes table in mysql-ddl.sql
 	* Chg: Use fetch method for fetching OMDbAPI data
 	* Chg: Add OMDbAPI apikey support for future use as it will go private soon
 	* Chg: Update aharen/omdbapi to version 2.0.6
