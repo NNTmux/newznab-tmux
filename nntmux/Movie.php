@@ -703,7 +703,7 @@ class Movie
 		$trakt = $this->fetchTraktTVProperties($imdbId);
 
 		// Check OMDb for movie info
-		$omdb = $this->fetchOmdbAPIproperties($imdbId);
+		$omdb = $this->fetchOmdbAPIProperties($imdbId);
 		if (!$imdb && !$tmdb && !$trakt && !$omdb) {
 			return false;
 		}
