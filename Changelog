@@ -1,4 +1,5 @@
 2017-05-15 DariusIII
+	* Chg: Add OMDbAPI apikey support for future use as it will go private soon
 	* Chg: Update aharen/omdbapi to version 2.0.6
 2017-05-12 DariusIII
 	* Chg: Declare proper @var for pdo (DB) in DnzbFailures

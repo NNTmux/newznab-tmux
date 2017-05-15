@@ -249,6 +249,17 @@
 			</div>
 		</td>
 	</tr>
+	<tr>
+		<td style="width:180px;"><label for="omdbkey">Omdb API key:</label></td>
+		<td>
+			<input id="omdbkey" class="long" name="omdbkey" type="text" value="{$site->omdbkey}"/>
+
+			<div class="hint">OmdbAPI key obtained from Omdb.Used for OmdbAPI lookups. This key is private and needs
+				monthly pledge. You can check the info on OmdbAPI site http://www.omdbapi.com/. You need an pledge
+				with poster api access (currently 5$/month).
+			</div>
+		</td>
+	</tr>
 
 <tr>
 	<td style="width:180px;"><label for="giantbombkey">Giant Bomb API Key:</label></td>

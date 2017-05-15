@@ -116,6 +116,11 @@ class Movie
 	public $fanartapikey;
 
 	/**
+	 * @var null|string
+	 */
+	public $omdbapikey;
+
+	/**
 	 * @var bool
 	 */
 	public $imdburl;
@@ -170,9 +175,12 @@ class Movie
 			]
 		]
 		);
-		$this->omdb = new OMDbAPI();
 		$this->fanartapikey = Settings::value('APIs..fanarttvkey');
 		$this->fanart = new FanartTV($this->fanartapikey);
+		$this->omdbapikey = Settings::value('APIs..omdbkey');
+		if ($this->omdbapikey !== '') {
+			$this->omdb = new OMDbAPI($this->omdbapikey);
+		}
 
 		$this->lookuplanguage = Settings::value('indexer.categorise.imdblanguage') !== '' ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
 
@@ -632,14 +640,11 @@ class Movie
 	 *
 	 * @param $variable
 	 *
-	 * @return string
+	 * @return bool
 	 */
-	protected function checkVariable(&$variable): string
+	protected function checkVariable(&$variable): bool
 	{
-		if (isset($variable) && $variable !== '') {
-			return true;
-		}
-		return false;
+		 return isset($variable) && $variable !== '' ? true : false;
 	}
 
 	/**
@@ -686,7 +691,10 @@ class Movie
 
 		// Check TRAKT for movie info
 		$trakt = $this->fetchTraktTVProperties($imdbId);
-		if (!$imdb && !$tmdb && !$trakt) {
+
+		// Check OMDb for movie info
+		$omdb = $this->fetchOmdbAPIproperties($imdbId);
+		if (!$imdb && !$tmdb && !$trakt && !$omdb) {
 			return false;
 		}
 
@@ -701,13 +709,15 @@ class Movie
 		$mov['imdbid'] = $imdbId;
 		$mov['tmdbid'] = (!isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
 
-		// Prefer Fanart.tv cover over TMDB and TMDB over IMDB.
+		// Prefer Fanart.tv cover over TMDB,TMDB over IMDB and IMDB over OMDB.
 		if ($this->checkVariable($fanart['cover'])) {
 			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $fanart['cover'], $this->imgSavePath);
-		} else if ($this->checkVariable($tmdb['cover'])) {
+		} elseif ($this->checkVariable($tmdb['cover'])) {
 			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $tmdb['cover'], $this->imgSavePath);
-		} else if ($this->checkVariable($imdb['cover'])) {
+		} elseif ($this->checkVariable($imdb['cover'])) {
 			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $imdb['cover'], $this->imgSavePath);
+		} elseif ($this->checkVariable($omdb['cover'])) {
+			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $omdb['cover'], $this->imgSavePath);
 		}
 
 		// Backdrops.
@@ -863,7 +873,7 @@ class Movie
 			if ($percent < 40) {
 				if ($this->debug) {
 					$this->debugging->log(
-						get_class(),
+						__CLASS__,
 						__FUNCTION__,
 						'Found (' .
 						$ret['title'] .
@@ -991,7 +1001,7 @@ class Movie
 				if ($percent < 40) {
 					if ($this->debug) {
 						$this->debugging->log(
-							get_class(),
+							__CLASS__,
 							__FUNCTION__,
 							'Found (' .
 							$ret['title'] .
@@ -1053,6 +1063,43 @@ class Movie
 			}
 			if ($this->echooutput) {
 				ColorCLI::doEcho(ColorCLI::alternateOver('Trakt Found ') . ColorCLI::headerOver($ret['title']), true);
+			}
+			return $ret;
+		}
+		return false;
+	}
+
+	/**
+	 * Fetch OMDb backdrop / cover / title.
+	 *
+	 * @param $imdbId
+	 *
+	 * @return bool|array
+	 */
+	protected function fetchOmdbAPIProperties($imdbId)
+	{
+		if ($this->omdbapikey !== '') {
+			$this->omdb = new OMDbAPI($this->omdbapikey);
+		}
+		$resp = $this->omdb->search('tt' . $imdbId, 'movie');
+
+		if ($resp->data->Response !== 'False') {
+			$ret = [];
+
+			if (isset($resp->data->Search[0]->Title)) {
+				$ret['title'] = $resp->data->Search[0]->Title;
+			} else {
+				return false;
+			}
+
+			if (isset($resp->data->Search[0]->Poster)) {
+				$ret['cover'] = $resp->data->Search[0]->Poster;
+			} else {
+				return false;
+			}
+
+			if ($this->echooutput) {
+				ColorCLI::doEcho(ColorCLI::alternateOver('OMDbAPI Found ') . ColorCLI::headerOver($ret['title']), true);
 			}
 			return $ret;
 		}
@@ -1165,16 +1212,18 @@ class Movie
 					}
 				}
 
-				// Check OMDB api.
-				$buffer = $this->omdb->search($this->currentTitle, 'movies', $this->currentYear !== false ? "'" . $this->currentYear . "'" : '');
+				if ($this->omdbapikey !== '') {
+					// Check OMDB api.
+					$buffer = $this->omdb->search($this->currentTitle, 'movies', $this->currentYear !== false ? "'" . $this->currentYear . "'" : '');
 
-				if (!empty($buffer) && $buffer->data->Response !== 'False') {
-					$getIMDBid = $buffer->data->Search[0]->imdbID;
+					if (!empty($buffer) && $buffer->data->Response !== 'False') {
+						$getIMDBid = $buffer->data->Search[0]->imdbID;
 
-					if (!empty($getIMDBid)) {
-						$imdbID = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $arr['id']);
-						if ($imdbID !== false) {
-							continue;
+						if (!empty($getIMDBid)) {
+							$imdbID = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $arr['id']);
+							if ($imdbID !== false) {
+								continue;
+							}
 						}
 					}
 				}
