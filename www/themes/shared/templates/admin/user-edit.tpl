@@ -100,16 +100,12 @@
                     <input id="notes" name='notes' type="text" value="{$user.notes|escape:htmlall}" />
                 </td>
             </tr>
+            {/if}
             <tr>
                 <td></td>
                 <td>
-                    {if $user.role!="2"}<a class="confirm_action btn btn-danger" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">Delete user</a>{/if}
-                </td>
-            </tr>
-            {/if}
-            <tr>
-                <td>
-                    <input class="btn btn-primary" type="submit" value="Save"/>
+                    <input class="btn btn-primary" type="submit" value="Save" />
+                    {if isset($user.id) && $user.role!="2"}<a class="confirm_action btn btn-danger" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">Delete user</a>{/if}
                 </td>
             </tr>
         </table>
