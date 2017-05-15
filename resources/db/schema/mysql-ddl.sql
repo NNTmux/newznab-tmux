@@ -836,8 +836,8 @@ CREATE TABLE releases_groups (
 DROP TABLE IF EXISTS release_regexes;
 CREATE TABLE release_regexes (
   releases_id           INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  collection_regex_id   INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  naming_regex_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  collection_regex_id   INT(11) NOT NULL DEFAULT '0',
+  naming_regex_id       INT(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (releases_id, collection_regex_id, naming_regex_id)
 )
   ENGINE          = MYISAM

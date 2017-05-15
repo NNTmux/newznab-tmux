@@ -1,4 +1,5 @@
 2017-05-15 DariusIII
+	* Fix: Alter columns in release_regexes tables to allow signed values for collection_regexes_id and naming_regexes_id
 	* Fix: Wrong table structure for release_regexes table in mysql-ddl.sql
 	* Chg: Use fetch method for fetching OMDbAPI data
 	* Chg: Add OMDbAPI apikey support for future use as it will go private soon
