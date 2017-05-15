@@ -111,9 +111,19 @@ class Movie
 	protected $lookuplanguage;
 
 	/**
+	 * @var FanartTV
+	 */
+	public $fanart;
+
+	/**
 	 * @var null|string
 	 */
 	public $fanartapikey;
+
+	/**
+	 * @var OMDbAPI
+	 */
+	public $omdb;
 
 	/**
 	 * @var null|string
