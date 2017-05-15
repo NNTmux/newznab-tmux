@@ -105,7 +105,7 @@
                 <td></td>
                 <td>
                     <input class="btn btn-primary" type="submit" value="Save" />
-                    {if isset($user.id) && $user.role!="2"}<a class="confirm_action btn btn-danger" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">Delete user</a>{/if}
+                    {if !empty($user.id) && $user.role!="2"}<a class="confirm_action btn btn-danger" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">Delete user</a>{/if}
                 </td>
             </tr>
         </table>
