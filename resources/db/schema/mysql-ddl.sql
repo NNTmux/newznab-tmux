@@ -833,8 +833,8 @@ CREATE TABLE releases_groups (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS releases_regexes;
-CREATE TABLE releases_regexes (
+DROP TABLE IF EXISTS release_regexes;
+CREATE TABLE release_regexes (
   releases_id           INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
   regex_id              INT(11) UNSIGNED        NOT NULL,
   PRIMARY KEY (releases_id, regex_id)
