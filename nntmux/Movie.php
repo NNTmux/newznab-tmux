@@ -1441,7 +1441,7 @@ class Movie
 				if($e->getCode() === 404) {
 					ColorCLI::doEcho(ColorCLI::notice('Data not available on Bing search'));
 				} else if ($e->getCode() === 503) {
-					ColorCLI::doEcho(ColorCLI::notice('Bing dearch service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('Bing search service unavailable'));
 				} else {
 					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Bing search , http error reported: ' . $e->getCode()));
 				}
