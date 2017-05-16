@@ -203,7 +203,7 @@ class Movie
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI && $this->pdo->cli);
 		$this->imgSavePath = NN_COVERS . 'movies' . DS;
 		$this->service = '';
-		$this->catWhere = 'AND categories_id BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER;
+		$this->catWhere = 'PARTITION (movies)';
 
 		if (NN_DEBUG || NN_LOGGING) {
 			$this->debug = true;
@@ -1152,7 +1152,7 @@ class Movie
 				$movCheck = $this->getMovieInfo($imdbID);
 				if ($movCheck === false || (isset($movCheck['updateddate']) && (time() - strtotime($movCheck['updateddate'])) > 2592000)) {
 					if ($this->updateMovieInfo($imdbID) === false) {
-						$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d', $id));
+						$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 %s WHERE id = %d', $this->catWhere, $id));
 					}
 				}
 			}
@@ -1178,9 +1178,10 @@ class Movie
 			sprintf('
 				SELECT r.searchname, r.id
 				FROM releases r
+				%s
 				WHERE r.imdbid IS NULL
 				AND r.nzbstatus = 1
-				%s %s %s %s
+				%s %s %s
 				LIMIT %d',
 				$this->catWhere,
 				($groupID === '' ? '' : ('AND r.groups_id = ' . $groupID)),
@@ -1204,7 +1205,7 @@ class Movie
 				// Try to get a name/year.
 				if ($this->parseMovieSearchName($arr['searchname']) === false) {
 					//We didn't find a name, so set to all 0's so we don't parse again.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d', $arr['id']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 %s WHERE id = %d', $this->catWhere, $arr['id']));
 					continue;
 				}
 				$this->currentRelID = $arr['id'];
@@ -1263,7 +1264,7 @@ class Movie
 				}
 
 				// We failed to get an IMDB id from all sources.
-				$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d', $arr['id']));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 %s WHERE id = %d', $this->catWhere, $arr['id']));
 			}
 		}
 	}
