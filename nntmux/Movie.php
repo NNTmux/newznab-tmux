@@ -1228,10 +1228,10 @@ class Movie
 					}
 				}
 
-				// Check OMDB api.
+				// Check OMDbAPI
 				$buffer = $this->omdb->search($this->currentTitle, 'movies');
 
-				if (!empty($buffer) && $buffer->data->Response !== 'False') {
+				if (is_object($buffer) && $buffer->data->Response !== 'False') {
 					$getIMDBid = $buffer->data->Search[0]->imdbID;
 
 					if (!empty($getIMDBid)) {
@@ -1296,7 +1296,7 @@ class Movie
 			$pieces = explode(' ', $this->currentTitle);
 			$tempTitle = '%';
 			foreach ($pieces as $piece) {
-				$tempTitle .= str_replace(["'", "!", '"'], '', $piece) . '%';
+				$tempTitle .= str_replace(["'", '!', '"'], '', $piece) . '%';
 			}
 			$IMDBCheck = $this->pdo->queryOneRow(
 				sprintf("%s WHERE replace(replace(title, \"'\", ''), '!', '') %s %s",
@@ -1320,7 +1320,7 @@ class Movie
 					$pieces = explode(' ', $tempTitle);
 					$tempTitle = '%';
 					foreach ($pieces as $piece) {
-						$tempTitle .= str_replace(["'", "!", '"'], "", $piece) . '%';
+						$tempTitle .= str_replace(["'", '!', '"'], '', $piece) . '%';
 					}
 					$IMDBCheck = $this->pdo->queryOneRow(
 						sprintf("%s WHERE replace(replace(replace(title, \"'\", ''), '!', ''), '\"', '') %s %s",
