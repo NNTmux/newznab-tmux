@@ -1228,23 +1228,21 @@ class Movie
 					}
 				}
 
-				if ($this->omdbapikey !== '') {
-					// Check OMDB api.
-					$buffer = $this->omdb->search($this->currentTitle, 'movies', $this->currentYear !== false ? "'" . $this->currentYear . "'" : '');
+				// Check OMDB api.
+				$buffer = $this->omdb->search($this->currentTitle, 'movies');
 
-					if (!empty($buffer) && $buffer->data->Response !== 'False') {
-						$getIMDBid = $buffer->data->Search[0]->imdbID;
+				if (!empty($buffer) && $buffer->data->Response !== 'False') {
+					$getIMDBid = $buffer->data->Search[0]->imdbID;
 
-						if (!empty($getIMDBid)) {
-							$imdbID = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $arr['id']);
-							if ($imdbID !== false) {
-								continue;
-							}
+					if (!empty($getIMDBid)) {
+						$imdbID = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $arr['id']);
+						if ($imdbID !== false) {
+							continue;
 						}
 					}
 				}
 
-				// Check on trakt.
+				// Check on Trakt.
 				$data = $this->traktTv->client->movieSummary($movieName, 'full');
 				if ($data !== false) {
 					$this->parseTraktTv($data);
