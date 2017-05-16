@@ -783,14 +783,12 @@ class Forking extends \fork_daemon
 				sprintf('
 						SELECT id
 						FROM releases
+						PARTITION (movies)
 						WHERE nzbstatus = %d
 						AND imdbid IS NULL
-						AND categories_id BETWEEN %d AND %d
 						%s %s
 						LIMIT 1',
 					NZB::NZB_ADDED,
-					Category::MOVIE_ROOT,
-					Category::MOVIE_OTHER,
 					(Settings::value('..lookupimdb') == 2 ? 'AND isrenamed = 1' : ''),
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
@@ -815,9 +813,9 @@ class Forking extends \fork_daemon
 				sprintf('
 					SELECT leftguid AS id, %d AS renamed
 					FROM releases
+					PARTITION (movies)
 					WHERE nzbstatus = %d
 					AND imdbid IS NULL
-					AND categories_id BETWEEN ' . Category::MOVIE_ROOT . ' AND ' . Category::MOVIE_OTHER . '
 					%s %s
 					GROUP BY leftguid
 					LIMIT 16',
@@ -846,15 +844,13 @@ class Forking extends \fork_daemon
 				sprintf('
 						SELECT id
 						FROM releases
+						PARTITION (tv)
 						WHERE nzbstatus = %d
 						AND size > 1048576
 						AND tv_episodes_id BETWEEN -2 AND 0
-						AND categories_id BETWEEN %d AND %d
 						%s %s
 						LIMIT 1',
 					NZB::NZB_ADDED,
-					Category::TV_ROOT,
-					Category::TV_OTHER,
 					(Settings::value('..lookuptvrage') == 2 ? 'AND isrenamed = 1' : ''),
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
@@ -879,17 +875,15 @@ class Forking extends \fork_daemon
 				sprintf('
 					SELECT leftguid AS id, %d AS renamed
 					FROM releases
+					PARTITION (tv)
 					WHERE nzbstatus = %d
 					AND tv_episodes_id BETWEEN -2 AND 0
 					AND size > 1048576
-					AND categories_id BETWEEN %d AND %d
 					%s %s
 					GROUP BY leftguid
 					LIMIT 16',
 					($this->ppRenamedOnly ? 2 : 1),
 					NZB::NZB_ADDED,
-					Category::TV_ROOT,
-					Category::TV_OTHER,
 					(Settings::value('..lookuptvrage') == 2 ? 'AND isrenamed = 1' : ''),
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
