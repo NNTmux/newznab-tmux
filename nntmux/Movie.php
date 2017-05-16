@@ -1145,14 +1145,14 @@ class Movie
 				ColorCLI::doEcho(ColorCLI::headerOver($service . ' found IMDBid: ') . ColorCLI::primary('tt' . $imdbID));
 			}
 
-			$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE id = %d %s', $this->pdo->escapeString($imdbID), $id, $this->catWhere));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE id = %d', $this->pdo->escapeString($imdbID), $id));
 
 			// If set, scan for imdb info.
 			if ($processImdb === 1) {
 				$movCheck = $this->getMovieInfo($imdbID);
 				if ($movCheck === false || (isset($movCheck['updateddate']) && (time() - strtotime($movCheck['updateddate'])) > 2592000)) {
 					if ($this->updateMovieInfo($imdbID) === false) {
-						$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE id = %d %s', 0000000, $id, $this->catWhere));
+						$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d', $id));
 					}
 				}
 			}
@@ -1204,7 +1204,7 @@ class Movie
 				// Try to get a name/year.
 				if ($this->parseMovieSearchName($arr['searchname']) === false) {
 					//We didn't find a name, so set to all 0's so we don't parse again.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d %s', $arr['id'], $this->catWhere));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d', $arr['id']));
 					continue;
 				}
 				$this->currentRelID = $arr['id'];
@@ -1263,7 +1263,7 @@ class Movie
 				}
 
 				// We failed to get an IMDB id from all sources.
-				$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d %s', $arr['id'], $this->catWhere));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 WHERE id = %d', $arr['id']));
 			}
 		}
 	}

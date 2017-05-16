@@ -1,4 +1,5 @@
 2017-05-16 DariusIII
+	* Chg: Remove ambiguous category selection in update queries when updating imdbid for release with specific id
 	* Chg: Fix messed up guzzlehttp error text for search on google, bing and yahoo
 	* Fix: Fix OMDbAPI searches for imdbID
 	* Chg: Use more information from OMDb for movies
