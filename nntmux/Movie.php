@@ -1098,53 +1098,21 @@ class Movie
 	 */
 	protected function fetchOmdbAPIProperties($imdbId)
 	{
-		if ($this->omdbapikey !== '') {
-			$this->omdb = new OMDbAPI($this->omdbapikey);
-		}
 		$resp = $this->omdb->fetch('i', 'tt' . $imdbId);
 
 		if ($resp->data->Response !== 'False') {
-			$ret = [];
-
-			if (!empty($resp->data->Title)) {
-				$ret['title'] = $resp->data->Title;
-			}
-
-			if (!empty($resp->data->Poster)) {
-				$ret['cover'] = $resp->data->Poster;
-			}
-
-			if (!empty($resp->data->Genre)) {
-				$ret['genre'] = $resp->data->Genre;
-			}
-
-			if (!empty($resp->data->Year)) {
-				$ret['year'] = $resp->data->Year;
-			}
-
-			if (!empty($resp->data->Plot)) {
-				$ret['plot'] = $resp->data->Plot;
-			}
-
-			if (!empty($resp->data->imdbRating)) {
-				$ret['rating'] = $resp->data->imdbRating;
-			}
-
-			if (!empty($resp->data->Tagline)) {
-				$ret['tagline'] = $resp->data->Tagline;
-			}
-
-			if (!empty($resp->data->Director)) {
-				$ret['director'] = $resp->data->Director;
-			}
-
-			if (!empty($resp->data->Actors)) {
-				$ret['actors'] = $resp->data->Actors;
-			}
-
-			if (!empty($resp->data->Language)) {
-				$ret['language'] = $resp->data->Language;
-			}
+			$ret = [
+				'title' => !empty($resp->data->Title) ? $resp->data->Title : '',
+				'cover' => !empty($resp->data->Poster) ? $resp->data->Poster : '',
+				'genre' => !empty($resp->data->Genre) ? $resp->data->Genre : '',
+				'year'  => !empty($resp->data->Year) ? $resp->data->Year : '',
+				'plot'  => !empty($resp->data->Plot) ? $resp->data->Plot : '',
+				'rating'  => !empty($resp->data->imdbRating) ? $resp->data->imdbRating : '',
+				'tagline' => !empty($resp->data->Tagline) ? $resp->data->Tagline : '',
+				'director' => !empty($resp->data->Director) ? $resp->data->Director : '',
+				'actors'   => !empty($resp->data->Actors) ? $resp->data->Actors : '',
+				'language' => !empty($resp->data->Language) ? $resp->data->Language : ''
+			];
 
 			if ($this->echooutput) {
 				ColorCLI::doEcho(ColorCLI::alternateOver('OMDbAPI Found ') . ColorCLI::headerOver($ret['title']), true);
