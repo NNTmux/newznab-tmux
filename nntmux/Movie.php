@@ -1229,7 +1229,8 @@ class Movie
 				}
 
 				// Check OMDbAPI
-				$buffer = $this->omdb->search($this->currentTitle, 'movies');
+				$omdbTitle = strtolower(str_replace(' ', '_', $this->currentTitle));
+				$buffer = $this->omdb->search($omdbTitle, 'movie');
 
 				if (is_object($buffer) && $buffer->data->Response !== 'False') {
 					$getIMDBid = $buffer->data->Search[0]->imdbID;
