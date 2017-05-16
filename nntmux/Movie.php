@@ -654,7 +654,7 @@ class Movie
 	 */
 	protected function checkVariable(&$variable): bool
 	{
-		 return isset($variable) && $variable !== '' ? true : false;
+		 return !empty($variable) ? true : false;
 	}
 
 	/**
@@ -666,7 +666,7 @@ class Movie
 	 *
 	 * @return array|string
 	 */
-	protected function setTmdbImdbTraktVar(&$variable1, &$variable2, &$variable3)
+	protected function setVariables(&$variable1, &$variable2, &$variable3, &$variable4)
 	{
 		if ($this->checkVariable($variable1)) {
 			return $variable1;
@@ -676,6 +676,9 @@ class Movie
 		}
 		if ($this->checkVariable($variable3)) {
 			return $variable3;
+		}
+		if ($this->checkVariable($variable4)) {
+			return $variable4;
 		}
 		return '';
 	}
@@ -742,12 +745,12 @@ class Movie
 			$mov['banner'] = $this->releaseImage->saveImage($imdbId . '-banner', $fanart['banner'], $this->imgSavePath);
 		}
 
-		$mov['title']   = $this->setTmdbImdbTraktVar($imdb['title']  , $tmdb['title'], $trakt['title']);
-		$mov['rating']  = $this->setTmdbImdbTraktVar($imdb['rating'] , $tmdb['rating'], $trakt['rating']);
-		$mov['plot']    = $this->setTmdbImdbTraktVar($imdb['plot']   , $tmdb['plot'], $trakt['overview']);
-		$mov['tagline'] = $this->setTmdbImdbTraktVar($imdb['tagline'], $tmdb['tagline'], $trakt['tagline']);
-		$mov['year']    = $this->setTmdbImdbTraktVar($imdb['year']   , $tmdb['year'], $trakt['year']);
-		$mov['genre']   = $this->setTmdbImdbTraktVar($imdb['genre']  , $tmdb['genre'], $trakt['genres']);
+		$mov['title']   = $this->setVariables($imdb['title']  , $tmdb['title'], $trakt['title'], $omdb['title']);
+		$mov['rating']  = $this->setVariables($imdb['rating'] , $tmdb['rating'], $trakt['rating'], $omdb['rating']);
+		$mov['plot']    = $this->setVariables($imdb['plot']   , $tmdb['plot'], $trakt['overview'], $omdb['plot']);
+		$mov['tagline'] = $this->setVariables($imdb['tagline'], $tmdb['tagline'], $trakt['tagline'], $omdb['tagline']);
+		$mov['year']    = $this->setVariables($imdb['year']   , $tmdb['year'], $trakt['year'], $omdb['year']);
+		$mov['genre']   = $this->setVariables($imdb['genre']  , $tmdb['genre'], $trakt['genres'], $omdb['genre']);
 
 		if ($this->checkVariable($imdb['type'])) {
 			$mov['type'] = $imdb['type'];
@@ -755,14 +758,20 @@ class Movie
 
 		if ($this->checkVariable($imdb['director'])) {
 			$mov['director'] = is_array($imdb['director']) ? implode(', ', array_unique($imdb['director'])) : $imdb['director'];
+		} else if ($this->checkVariable($omdb['director'])) {
+			$mov['director'] = is_array($omdb['director']) ? implode(', ', array_unique($omdb['director'])) : $omdb['director'];
 		}
 
 		if ($this->checkVariable($imdb['actors'])) {
 			$mov['actors'] = is_array($imdb['actors']) ? implode(', ', array_unique($imdb['actors'])) : $imdb['actors'];
+		} else if ($this->checkVariable($omdb['actors'])) {
+			$mov['actors'] = is_array($omdb['actors']) ? implode(', ', array_unique($omdb['actors'])) : $omdb['actors'];
 		}
 
 		if ($this->checkVariable($imdb['language'])) {
 			$mov['language'] = is_array($imdb['language']) ? implode(', ', array_unique($imdb['language'])) : $imdb['language'];
+		} else if ($this->checkVariable($omdb['language'])) {
+			$mov['language'] = is_array($imdb['language']) ? implode(', ', array_unique($omdb['language'])) : $omdb['language'];
 		}
 
 		if (is_array($mov['genre'])) {
@@ -1097,16 +1106,44 @@ class Movie
 		if ($resp->data->Response !== 'False') {
 			$ret = [];
 
-			if (isset($resp->data->Title)) {
+			if (!empty($resp->data->Title)) {
 				$ret['title'] = $resp->data->Title;
-			} else {
-				return false;
 			}
 
-			if (isset($resp->data->Poster)) {
+			if (!empty($resp->data->Poster)) {
 				$ret['cover'] = $resp->data->Poster;
-			} else {
-				return false;
+			}
+
+			if (!empty($resp->data->Genre)) {
+				$ret['genre'] = $resp->data->Genre;
+			}
+
+			if (!empty($resp->data->Year)) {
+				$ret['year'] = $resp->data->Year;
+			}
+
+			if (!empty($resp->data->Plot)) {
+				$ret['plot'] = $resp->data->Plot;
+			}
+
+			if (!empty($resp->data->imdbRating)) {
+				$ret['rating'] = $resp->data->imdbRating;
+			}
+
+			if (!empty($resp->data->Tagline)) {
+				$ret['tagline'] = $resp->data->Tagline;
+			}
+
+			if (!empty($resp->data->Director)) {
+				$ret['director'] = $resp->data->Director;
+			}
+
+			if (!empty($resp->data->Actors)) {
+				$ret['actors'] = $resp->data->Actors;
+			}
+
+			if (!empty($resp->data->Language)) {
+				$ret['language'] = $resp->data->Language;
 			}
 
 			if ($this->echooutput) {

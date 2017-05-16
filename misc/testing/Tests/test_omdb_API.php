@@ -30,5 +30,5 @@ if (!empty($argv[1]) && !empty($argv[2]) && ($argv[2] !== 'series' || $argv[2] !
 		exit(ColorCLI::error('Error retrieving OMDb API data.'));
 	}
 } else {
-	exit(ColorCLI::error('Invalid arguments. This script requires a text string (show name).'));
+	exit(ColorCLI::error('Invalid arguments. This script requires a text string (show name), and a second argument, movie or series.'));
 }
