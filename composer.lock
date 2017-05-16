@@ -1528,12 +1528,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dborsatto/php-giantbomb.git",
-                "reference": "05e5dbc31cdff29e4ee870f3f3eda73056e2a63a"
+                "reference": "cc004daa5bcd6581ed3c05af86022cd82000ba92"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dborsatto/php-giantbomb/zipball/05e5dbc31cdff29e4ee870f3f3eda73056e2a63a",
-                "reference": "05e5dbc31cdff29e4ee870f3f3eda73056e2a63a",
+                "url": "https://api.github.com/repos/dborsatto/php-giantbomb/zipball/cc004daa5bcd6581ed3c05af86022cd82000ba92",
+                "reference": "cc004daa5bcd6581ed3c05af86022cd82000ba92",
                 "shasum": ""
             },
             "require": {
@@ -1562,7 +1562,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-02-04 18:39:42"
+            "time": "2017-05-15 23:16:25"
         },
         {
             "name": "doctrine/annotations",
@@ -2127,12 +2127,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "0031313a708d4ff027b30dfae605398abaa031cc"
+                "reference": "1739e8b94e058421d4da8b66887c52ee523f7d45"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/0031313a708d4ff027b30dfae605398abaa031cc",
-                "reference": "0031313a708d4ff027b30dfae605398abaa031cc",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/1739e8b94e058421d4da8b66887c52ee523f7d45",
+                "reference": "1739e8b94e058421d4da8b66887c52ee523f7d45",
                 "shasum": ""
             },
             "require": {
@@ -2184,7 +2184,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2017-05-09 06:57:15"
+            "time": "2017-05-15 08:45:24"
         },
         {
             "name": "guzzlehttp/promises",
