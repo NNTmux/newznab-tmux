@@ -1098,6 +1098,9 @@ class Movie
 	 */
 	protected function fetchOmdbAPIProperties($imdbId)
 	{
+		if ($this->omdbapikey !== '') {
+			$this->omdb = new OMDbAPI($this->omdbapikey);
+		}
 		$resp = $this->omdb->fetch('i', 'tt' . $imdbId);
 
 		if ($resp->data->Response !== 'False') {
@@ -1152,7 +1155,7 @@ class Movie
 				$movCheck = $this->getMovieInfo($imdbID);
 				if ($movCheck === false || (isset($movCheck['updateddate']) && (time() - strtotime($movCheck['updateddate'])) > 2592000)) {
 					if ($this->updateMovieInfo($imdbID) === false) {
-						$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 %s WHERE id = %d', $this->catWhere, $id));
+						$this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $id));
 					}
 				}
 			}
@@ -1205,7 +1208,7 @@ class Movie
 				// Try to get a name/year.
 				if ($this->parseMovieSearchName($arr['searchname']) === false) {
 					//We didn't find a name, so set to all 0's so we don't parse again.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 %s WHERE id = %d', $this->catWhere, $arr['id']));
+					$this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $arr['id']));
 					continue;
 				}
 				$this->currentRelID = $arr['id'];
@@ -1264,7 +1267,7 @@ class Movie
 				}
 
 				// We failed to get an IMDB id from all sources.
-				$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = 0000000 %s WHERE id = %d', $this->catWhere, $arr['id']));
+				$this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $arr['id']));
 			}
 		}
 	}
