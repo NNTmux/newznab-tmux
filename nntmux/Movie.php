@@ -1391,11 +1391,11 @@ class Movie
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
 				if($e->getCode() === 404) {
-					ColorCLI::doEcho(ColorCLI::notice('Data not available on IMDB server'));
+					ColorCLI::doEcho(ColorCLI::notice('Data not available on Google search'));
 				} else if ($e->getCode() === 503) {
-					ColorCLI::doEcho(ColorCLI::notice('IMDB service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('Google service unavailable'));
 				} else {
-					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from IMDB, http error reported: ' . $e->getCode()));
+					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Google, http error reported: ' . $e->getCode()));
 				}
 			}
 		} catch (\RuntimeException $e) {
@@ -1439,11 +1439,11 @@ class Movie
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
 				if($e->getCode() === 404) {
-					ColorCLI::doEcho(ColorCLI::notice('Data not available on IMDB server'));
+					ColorCLI::doEcho(ColorCLI::notice('Data not available on Bing search'));
 				} else if ($e->getCode() === 503) {
-					ColorCLI::doEcho(ColorCLI::notice('IMDB service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('Bing dearch service unavailable'));
 				} else {
-					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from IMDB , http error reported: ' . $e->getCode()));
+					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Bing search , http error reported: ' . $e->getCode()));
 				}
 			}
 		} catch (\RuntimeException $e) {
@@ -1495,11 +1495,11 @@ class Movie
 		} catch (RequestException $e) {
 			if ($e->hasResponse()) {
 				if($e->getCode() === 404) {
-					ColorCLI::doEcho(ColorCLI::notice('Data not available on IMDB server'));
+					ColorCLI::doEcho(ColorCLI::notice('Data not available on Yahoo search'));
 				} else if ($e->getCode() === 503) {
-					ColorCLI::doEcho(ColorCLI::notice('IMDB service unavailable'));
+					ColorCLI::doEcho(ColorCLI::notice('Yahoo search service unavailable'));
 				} else {
-					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from IMDB, http error reported: ' . $e->getCode()));
+					ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Yahoo search, http error reported: ' . $e->getCode()));
 				}
 			}
 		} catch (\RuntimeException $e) {
