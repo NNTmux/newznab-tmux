@@ -766,8 +766,8 @@ class Console
 							AND consoleinfo_id IS NULL %s
 							ORDER BY postdate DESC
 							LIMIT %d',
-				NZB::NZB_ADDED,
 				$this->catWhere,
+				NZB::NZB_ADDED,
 				$this->renamed,
 				$this->gameqty
 			)
