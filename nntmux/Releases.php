@@ -494,7 +494,7 @@ class Releases
 					rn.releases_id AS nfoid, re.releases_id AS reid,
 					tve.firstaired,
 					(SELECT df.failed) AS failed
-				FROM releases r
+				FROM releases PARTITION (tv) r
 				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 				LEFT JOIN groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
@@ -504,7 +504,6 @@ class Releases
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				WHERE %s %s
 				AND r.nzbstatus = %d
-				AND r.categories_id BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . "
 				AND r.passwordstatus %s
 				%s
 				GROUP BY r.id
@@ -536,10 +535,9 @@ class Releases
 		return $this->getPagerCount(
 			sprintf(
 				'SELECT r.id
-				FROM releases r
+				FROM releases PARTITION (tv) r
 				WHERE %s %s
 				AND r.nzbstatus = %d
-				AND r.categories_id BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . "
 				AND r.passwordstatus %s
 				%s',
 				$this->uSQL($userShows, 'videos_id'),
@@ -565,10 +563,9 @@ class Releases
 		return $this->getPagerCount(
 			sprintf(
 				'SELECT r.id
-				FROM releases r
+				FROM releases PARTITION (movies) r
 				WHERE %s %s
 				AND r.nzbstatus = %d
-				AND r.categories_id BETWEEN " . Category::MOVIE_ROOT . " AND " . Category::MOVIE_OTHER . "
 				AND r.passwordstatus %s
 				%s',
 				$this->uSQL($userMovies, 'imdbid'),
@@ -1011,13 +1008,10 @@ class Releases
 
 		$whereSql = sprintf(
 			'%s
-			WHERE r.categories_id BETWEEN %d AND %d
-			AND r.nzbstatus = %d
+			WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
 			%s %s %s %s %s',
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
-			Category::TV_ROOT,
-			Category::TV_OTHER,
 			NZB::NZB_ADDED,
 			$this->showPasswords,
 			$showSql,
@@ -1038,7 +1032,7 @@ class Releases
 				g.name AS group_name,
 				rn.releases_id AS nfoid,
 				re.releases_id AS reid
-			FROM releases r
+			FROM releases PARTITION (tv) r
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id AND v.type = 0
 			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
@@ -1144,8 +1138,7 @@ class Releases
 	{
 		$whereSql = sprintf(
 			"%s
-			WHERE r.categories_id BETWEEN " . Category::MOVIE_ROOT . " AND " . Category::MOVIE_OTHER . "
-			AND r.nzbstatus = %d
+			WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
 			%s %s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
@@ -1164,7 +1157,7 @@ class Releases
 				%s AS category_ids,
 				g.name AS group_name,
 				rn.releases_id AS nfoid
-			FROM releases r
+			FROM releases PARTITION (movies) r
 			LEFT JOIN groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
@@ -1352,12 +1345,11 @@ class Releases
 			sprintf(
 				"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name,
 				g.name AS group_name
-				FROM releases r
+				FROM releases PARTITION (tv) r
 				LEFT JOIN groups g ON g.id = r.groups_id
 				LEFT JOIN categories c ON c.id = r.categories_id
 				LEFT JOIN categories cp ON cp.id = c.parentid
-				WHERE r.categories_id BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . "
-				AND r.passwordstatus %s
+				WHERE r.passwordstatus %s
 				AND videos_id = %d %s %s",
 				$this->showPasswords,
 				$rageID,
@@ -1506,10 +1498,9 @@ class Releases
 			"SELECT r.imdbid, r.guid, r.name, r.searchname, r.size, r.completion,
 				postdate, categories_id, comments, grabs,
 				m.cover
-			FROM releases r
+			FROM releases PARTITION (movies) r
 			INNER JOIN movieinfo m USING (imdbid)
-			WHERE r.categories_id BETWEEN " . Category::MOVIE_ROOT . " AND " . Category::MOVIE_OTHER . "
-			AND m.imdbid > 0
+			WHERE m.imdbid > 0
 			AND m.cover = 1
 			AND r.id in (select max(id) from releases where imdbid > 0 group by imdbid)
 			ORDER BY r.postdate DESC
@@ -1528,10 +1519,9 @@ class Releases
 			"SELECT r.xxxinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				xxx.cover, xxx.title
-			FROM releases r
+			FROM releases PARTITION (xxx) r
 			INNER JOIN xxxinfo xxx ON r.xxxinfo_id = xxx.id
-			WHERE r.categories_id BETWEEN " . Category::XXX_ROOT . " AND " . Category::XXX_OTHER . "
-			AND xxx.id > 0
+			WHERE xxx.id > 0
 			AND xxx.cover = 1
 			AND r.id in (select max(id) from releases where xxxinfo_id > 0 group by xxxinfo_id)
 			ORDER BY r.postdate DESC
@@ -1550,10 +1540,9 @@ class Releases
 			"SELECT r.consoleinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				con.cover
-			FROM releases r
+			FROM releases PARTITION (console) r
 			INNER JOIN consoleinfo con ON r.consoleinfo_id = con.id
-			WHERE r.categories_id BETWEEN " . Category::GAME_ROOT . " AND " . Category::GAME_OTHER . "
-			AND con.id > 0
+			WHERE con.id > 0
 			AND con.cover > 0
 			AND r.id in (select max(id) from releases where consoleinfo_id > 0 group by consoleinfo_id)
 			ORDER BY r.postdate DESC
@@ -1594,10 +1583,9 @@ class Releases
 			"SELECT r.musicinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				m.cover
-			FROM releases r
+			FROM releases PARTITION (music) r
 			INNER JOIN musicinfo m ON r.musicinfo_id = m.id
-			WHERE r.categories_id BETWEEN " . Category::MUSIC_ROOT . " AND " . Category::MUSIC_OTHER . "
-			AND r.categories_id != " . Category::MUSIC_AUDIOBOOK ."
+			WHERE r.categories_id != " . Category::MUSIC_AUDIOBOOK ."
 			AND m.id > 0
 			AND m.cover > 0
 			AND r.id in (select max(id) from releases where musicinfo_id > 0 group by musicinfo_id)
@@ -1641,11 +1629,10 @@ class Releases
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				v.id AS tvid, v.title AS tvtitle, v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
 				tvi.image
-			FROM releases r
+			FROM releases PARTITION (tv) r
 			INNER JOIN videos v ON r.videos_id = v.id
 			INNER JOIN tv_info tvi ON r.videos_id = tvi.videos_id
-			WHERE r.categories_id BETWEEN " . Category::TV_ROOT . " AND " . Category::TV_OTHER . "
-			AND v.id > 0
+			WHERE v.id > 0
 			AND v.type = 0
 			AND tvi.image = 1
 			AND r.id in (select max(id) from releases where videos_id > 0 group by videos_id)

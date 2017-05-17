@@ -1,4 +1,5 @@
 2017-05-17 DariusIII
+	* Chg: Use prtititions in queries in Releases class
 	* Chg: Improve matching and pulling data of PC Games
 	* Fix: Fix adding of blacklist in Binaries class
 	* Chg: Improve logic for movie releases data lookup
