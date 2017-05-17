@@ -1,3 +1,5 @@
+2017-05-17 DariusIII
+	* Fix: Misplaced operator in Games class
 2017-05-16 DariusIII
 	* Fix: Fix partition schema in mysql-ddl
 	* Chg: Use partition command in queries in Movie class
