@@ -1662,13 +1662,10 @@ class Binaries
 	}
 
 	/**
-	 * Updates a blacklist from binary blacklist edit admin web page.
-	 *
-	 * @param array $blacklistArray
-	 *
-	 * @return boolean
+	 * @param $blacklistArray
+	 * @return bool|\PDOStatement
 	 */
-	public function updateBlacklist($blacklistArray): bool
+	public function updateBlacklist($blacklistArray)
 	{
 		return $this->_pdo->queryExec(
 			sprintf('
