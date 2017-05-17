@@ -121,11 +121,6 @@ class Movie
 	public $fanartapikey;
 
 	/**
-	 * @var OMDbAPI
-	 */
-	public $omdb;
-
-	/**
 	 * @var null|string
 	 */
 	public $omdbapikey;
@@ -188,9 +183,6 @@ class Movie
 		$this->fanartapikey = Settings::value('APIs..fanarttvkey');
 		$this->fanart = new FanartTV($this->fanartapikey);
 		$this->omdbapikey = Settings::value('APIs..omdbkey');
-		if ($this->omdbapikey !== '') {
-			$this->omdb = new OMDbAPI($this->omdbapikey);
-		}
 
 		$this->lookuplanguage = Settings::value('indexer.categorise.imdblanguage') !== '' ? (string)Settings::value('indexer.categorise.imdblanguage') : 'en';
 
@@ -454,6 +446,11 @@ class Movie
 	 * @var null|TraktTv
 	 */
 	public $traktTv = null;
+
+	/**
+	 * @var OMDbAPI|null
+	 */
+	public $omdbApi = null;
 
 	/**
 	 * Get trailer using IMDB Id.
@@ -1098,29 +1095,30 @@ class Movie
 	 */
 	protected function fetchOmdbAPIProperties($imdbId)
 	{
-		if ($this->omdbapikey !== '') {
-			$this->omdb = new OMDbAPI($this->omdbapikey);
-		}
-		$resp = $this->omdb->fetch('i', 'tt' . $imdbId);
+		if ($this->omdbapikey !== '' && $this->omdbApi === null) {
+			$this->omdbApi = new OMDbAPI($this->omdbapikey);
+			$resp = $this->omdbApi->fetch('i', 'tt' . $imdbId);
 
-		if ($resp->data->Response !== 'False') {
-			$ret = [
-				'title' => !empty($resp->data->Title) ? $resp->data->Title : '',
-				'cover' => !empty($resp->data->Poster) ? $resp->data->Poster : '',
-				'genre' => !empty($resp->data->Genre) ? $resp->data->Genre : '',
-				'year'  => !empty($resp->data->Year) ? $resp->data->Year : '',
-				'plot'  => !empty($resp->data->Plot) ? $resp->data->Plot : '',
-				'rating'  => !empty($resp->data->imdbRating) ? $resp->data->imdbRating : '',
-				'tagline' => !empty($resp->data->Tagline) ? $resp->data->Tagline : '',
-				'director' => !empty($resp->data->Director) ? $resp->data->Director : '',
-				'actors'   => !empty($resp->data->Actors) ? $resp->data->Actors : '',
-				'language' => !empty($resp->data->Language) ? $resp->data->Language : ''
-			];
+			if (is_object($resp) && $resp->message === 'OK' && $resp->data->Response !== 'False') {
+				$ret = [
+					'title' => !empty($resp->data->Title) ? $resp->data->Title : '',
+					'cover' => !empty($resp->data->Poster) ? $resp->data->Poster : '',
+					'genre' => !empty($resp->data->Genre) ? $resp->data->Genre : '',
+					'year'  => !empty($resp->data->Year) ? $resp->data->Year : '',
+					'plot'  => !empty($resp->data->Plot) ? $resp->data->Plot : '',
+					'rating'  => !empty($resp->data->imdbRating) ? $resp->data->imdbRating : '',
+					'tagline' => !empty($resp->data->Tagline) ? $resp->data->Tagline : '',
+					'director' => !empty($resp->data->Director) ? $resp->data->Director : '',
+					'actors'   => !empty($resp->data->Actors) ? $resp->data->Actors : '',
+					'language' => !empty($resp->data->Language) ? $resp->data->Language : ''
+				];
 
-			if ($this->echooutput) {
-				ColorCLI::doEcho(ColorCLI::alternateOver('OMDbAPI Found ') . ColorCLI::headerOver($ret['title']), true);
+				if ($this->echooutput) {
+					ColorCLI::doEcho(ColorCLI::alternateOver('OMDbAPI Found ') . ColorCLI::headerOver($ret['title']), true);
+				}
+				return $ret;
 			}
-			return $ret;
+			return false;
 		}
 		return false;
 	}
@@ -1180,7 +1178,7 @@ class Movie
 		$res = $this->pdo->query(
 			sprintf('
 				SELECT searchname, id
-				FROM releases 
+				FROM releases
 				%s
 				WHERE imdbid IS NULL
 				AND nzbstatus = 1
@@ -1222,52 +1220,65 @@ class Movie
 					ColorCLI::doEcho(ColorCLI::primaryOver('Looking up: ') . ColorCLI::headerOver($movieName), true);
 				}
 
+				$movieUpdated = false;
+
 				// Check local DB.
 				$getIMDBid = $this->localIMDBsearch();
 
 				if ($getIMDBid !== false) {
 					$imdbID = $this->doMovieUpdate('tt' . $getIMDBid, 'Local DB', $arr['id']);
 					if ($imdbID !== false) {
-						continue;
+						$movieUpdated = true;
 					}
 				}
 
 				// Check OMDbAPI
-				$omdbTitle = strtolower(str_replace(' ', '_', $this->currentTitle));
-				$buffer = $this->omdb->search($omdbTitle, 'movie');
+				if ($movieUpdated === false) {
+					$omdbTitle = strtolower(str_replace(' ', '_', $this->currentTitle));
+					if ($this->omdbapikey !== '' && $this->omdbApi === null) {
+						$this->omdbApi = new OMDbAPI($this->omdbapikey);
+						$buffer = $this->omdbApi->search($omdbTitle, 'movie');
 
-				if (is_object($buffer) && $buffer->data->Response !== 'False') {
-					$getIMDBid = $buffer->data->Search[0]->imdbID;
+						if (is_object($buffer) && $buffer->message === 'OK' && $buffer->data->Response !== 'False') {
+							$getIMDBid = $buffer->data->Search[0]->imdbID;
 
-					if (!empty($getIMDBid)) {
-						$imdbID = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $arr['id']);
-						if ($imdbID !== false) {
-							continue;
+							if (!empty($getIMDBid)) {
+								$imdbID = $this->doMovieUpdate($getIMDBid, 'OMDbAPI', $arr['id']);
+								if ($imdbID !== false) {
+									$movieUpdated = true;
+								}
+							}
 						}
 					}
 				}
 
 				// Check on Trakt.
-				$data = $this->traktTv->client->movieSummary($movieName, 'full');
-				if ($data !== false) {
-					$this->parseTraktTv($data);
-					if (!empty($data['ids']['imdb'])) {
-						$imdbID = $this->doMovieUpdate($data['ids']['imdb'], 'Trakt', $arr['id']);
-						if ($imdbID !== false) {
-							continue;
+				if ($movieUpdated === false) {
+					$data = $this->traktTv->client->movieSummary($movieName, 'full');
+					if ($data !== false) {
+						$this->parseTraktTv($data);
+						if (!empty($data['ids']['imdb'])) {
+							$imdbID = $this->doMovieUpdate($data['ids']['imdb'], 'Trakt', $arr['id']);
+							if ($imdbID !== false) {
+								$movieUpdated = true;
+							}
 						}
 					}
 				}
 
 				// Try on search engines.
-				if ($this->searchEngines && $this->currentYear !== false) {
-					if ($this->imdbIDFromEngines() === true) {
-						continue;
+				if ($movieUpdated === false) {
+					if ($this->searchEngines && $this->currentYear !== false) {
+						if ($this->imdbIDFromEngines() === true) {
+							$movieUpdated = true;
+						}
 					}
 				}
 
 				// We failed to get an IMDB id from all sources.
-				$this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $arr['id']));
+				if ($movieUpdated === false) {
+					$this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $arr['id']));
+				}
 			}
 		}
 	}
