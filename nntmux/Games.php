@@ -205,16 +205,16 @@ class Games
 	}
 
 	/**
-	 * @param       $cat
-	 * @param       $start
-	 * @param       $num
-	 * @param       $orderBy
-	 * @param int|string   $maxAge
-	 * @param array $excludedCats
+	 * @param        $cat
+	 * @param        $start
+	 * @param        $num
+	 * @param string|array $orderBy
+	 * @param string $maxAge
+	 * @param array  $excludedCats
 	 *
 	 * @return array
 	 */
-	public function getGamesRange($cat, $start, $num, $orderBy, $maxAge = '', array $excludedCats = []): array
+	public function getGamesRange($cat, $start, $num, $orderBy = '', $maxAge = '', array $excludedCats = []): array
 	{
 		$browseBy = $this->getBrowseBy();
 
@@ -310,13 +310,13 @@ class Games
 	}
 
 	/**
-	 * @param $orderBy
+	 * @param string|array $orderBy
 	 *
 	 * @return array
 	 */
 	public function getGamesOrder($orderBy): array
 	{
-		$order = ($orderBy === '') ? 'r.postdate' : $orderBy;
+		$order = $orderBy === '' ? 'r.postdate' : $orderBy;
 		$orderArr = explode('_', $order);
 		switch ($orderArr[0]) {
 			case 'title':
