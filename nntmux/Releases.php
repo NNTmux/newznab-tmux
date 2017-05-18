@@ -78,11 +78,11 @@ class Releases
 	{
 		$parameters['id'] = $this->pdo->queryInsert(
 			sprintf(
-				"INSERT INTO releases
+				'INSERT INTO releases
 					(name, searchname, totalpart, groups_id, adddate, guid, leftguid, postdate, fromname,
 					size, passwordstatus, haspreview, categories_id, nfostatus, nzbstatus,
 					isrenamed, iscategorized, reqidstatus, predb_id)
-				VALUES (%s, %s, %d, %d, NOW(), %s, LEFT(%s, 1), %s, %s, %s, %d, -1, %d, -1, %d, %d, 1, %d, %d)",
+				VALUES (%s, %s, %d, %d, NOW(), %s, LEFT(%s, 1), %s, %s, %s, %d, -1, %d, -1, %d, %d, 1, %d, %d)',
 				$parameters['name'],
 				$parameters['searchname'],
 				$parameters['totalpart'],
@@ -174,17 +174,17 @@ class Releases
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s %s %s %s',
-				($groupName != -1 ? 'LEFT JOIN groups g ON g.id = r.groups_id' : ''),
+				($groupName !== -1 ? 'LEFT JOIN groups g ON g.id = r.groups_id' : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords,
-				($groupName != -1 ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
+				($groupName !== -1 ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
 				$this->category->getCategorySearch($cat),
 				($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY ') : ''),
 				(count($excludedCats) ? (' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')') : '')
 			), true, NN_CACHE_EXPIRY_SHORT
 		);
 
-		return (isset($count[0]['count']) ? $count[0]['count'] : 0);
+		return $count[0]['count'] ?? 0;
 	}
 
 	/**
@@ -193,7 +193,7 @@ class Releases
 	 * @param array  $cat
 	 * @param        $start
 	 * @param        $num
-	 * @param string $orderBy
+	 * @param string|array $orderBy
 	 * @param int    $maxAge
 	 * @param array  $excludedCats
 	 * @param mixed $groupName
@@ -236,9 +236,9 @@ class Releases
 			NZB::NZB_ADDED,
 			$this->showPasswords,
 			$this->category->getCategorySearch($cat),
-			($maxAge > 0 ? (" AND postdate > NOW() - INTERVAL " . $maxAge . ' DAY ') : ''),
+			($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL ' . $maxAge . ' DAY ') : ''),
 			(count($excludedCats) ? (' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')') : ''),
-			($groupName != -1 ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
+			($groupName !== -1 ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
 			($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
 			$orderBy[0],
 			$orderBy[1],
@@ -284,7 +284,7 @@ class Releases
 	 */
 	public function getBrowseOrder($orderBy)
 	{
-		$orderArr = explode('_', ($orderBy == '' ? 'posted_desc' : $orderBy));
+		$orderArr = explode('_', ($orderBy === '' ? 'posted_desc' : $orderBy));
 		switch ($orderArr[0]) {
 			case 'cat':
 				$orderField = 'categories_id';
@@ -306,7 +306,7 @@ class Releases
 				$orderField = 'postdate';
 				break;
 		}
-		return [$orderField, (isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1]) ? $orderArr[1] : 'desc')];
+		return [$orderField, isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1]) ? $orderArr[1] : 'desc'];
 	}
 
 	/**
@@ -355,7 +355,7 @@ class Releases
 				NZB::NZB_ADDED,
 				$this->exportDateString($postFrom),
 				$this->exportDateString($postTo, false),
-				(($groupID != '' && $groupID != '-1') ? sprintf(' AND r.groups_id = %d ', $groupID) : '')
+				$groupID !== '' && $groupID !== -1 ? sprintf(' AND r.groups_id = %d ', $groupID) : ''
 			)
 		);
 	}
@@ -368,9 +368,9 @@ class Releases
 	 *
 	 * @return string
 	 */
-	private function exportDateString($date, $from = true)
+	private function exportDateString($date = '', $from = true)
 	{
-		if ($date != '') {
+		if ($date !== '') {
 			$dateParts = explode('/', $date);
 			if (count($dateParts) === 3) {
 				$date = sprintf(
@@ -381,8 +381,6 @@ class Releases
 						($from ? ' 00:00:00' : ' 23:59:59')
 					)
 				);
-			} else {
-				$date = '';
 			}
 		}
 		return $date;
@@ -454,7 +452,7 @@ class Releases
 	 */
 	public function getConcatenatedCategoryIDs()
 	{
-		if (is_null($this->concatenatedCategoryIDsCache)) {
+		if ($this->concatenatedCategoryIDsCache === null) {
 			$result = $this->pdo->query(
 				"SELECT CONCAT(cp.id, ',', c.id) AS category_ids
 				FROM categories c
@@ -476,7 +474,7 @@ class Releases
 	 * @param          $userShows
 	 * @param int|bool $offset
 	 * @param int      $limit
-	 * @param string   $orderBy
+	 * @param string|array   $orderBy
 	 * @param int      $maxAge
 	 * @param array    $excludedCats
 	 *
@@ -649,7 +647,7 @@ class Releases
 		}
 
 		// Delete from DB.
-		$query = $this->pdo->prepare('CALL delete_release(:is_numeric, :identifier)');
+		$query = $this->pdo->Prepare('CALL delete_release(:is_numeric, :identifier)');
 		$query->bindParam(':is_numeric', $param1, \PDO::PARAM_BOOL);
 		$query->bindParam(':identifier', $param2);
 
@@ -722,7 +720,7 @@ class Releases
 		}
 
 		$update = [
-			'categories_id'     => (($category == '-1') ? 'categories_id' : $category),
+			'categories_id'     => (($category === -1) ? 'categories_id' : $category),
 			'grabs'          => $grabs,
 			'videos_id'      => $videoId,
 			'tv_episodes_id' => $episodeId,
@@ -732,7 +730,7 @@ class Releases
 
 		$updateSql = [];
 		foreach ($update as $key => $value) {
-			if ($value != '') {
+			if ($value !== '') {
 				$updateSql[] = sprintf($key . '=%s', $this->pdo->escapeString($value));
 			}
 		}
@@ -768,7 +766,7 @@ class Releases
 		$sql = '(1=2 ';
 		foreach ($userQuery as $query) {
 			$sql .= sprintf('OR (r.%s = %d', $type, $query[$type]);
-			if ($query['categories'] != '') {
+			if ($query['categories'] !== '') {
 				$catsArr = explode('|', $query['categories']);
 				if (count($catsArr) > 1) {
 					$sql .= sprintf(' AND r.categories_id IN (%s)', implode(',', $catsArr));
@@ -789,22 +787,23 @@ class Releases
 	 * @param string $searchName
 	 * @param string $usenetName
 	 * @param string $posterName
-	 * @param string $groupName
 	 * @param string $fileName
-	 * @param int    $sizeFrom
-	 * @param int    $sizeTo
-	 * @param int    $hasNfo
-	 * @param int    $hasComments
-	 * @param int    $daysNew
-	 * @param int    $daysOld
-	 * @param int    $offset
-	 * @param int    $limit
-	 * @param string $orderBy
-	 * @param int    $maxAge
+	 * @param string $groupName
+	 * @param int $sizeFrom
+	 * @param int $sizeTo
+	 * @param int $hasNfo
+	 * @param int $hasComments
+	 * @param int $daysNew
+	 * @param int $daysOld
+	 * @param int $offset
+	 * @param int $limit
+	 * @param string|array $orderBy
+	 * @param int $maxAge
 	 * @param integer[] $excludedCats
 	 * @param string $type
-	 * @param array  $cat
+	 * @param array $cat
 	 *
+	 * @param int $minSize
 	 * @return array
 	 */
 	public function search(
@@ -842,7 +841,7 @@ class Releases
 			11 => 640,
 		];
 
-		if ($orderBy == '') {
+		if ($orderBy === '') {
 			$orderBy = [];
 			$orderBy[0] = 'postdate ';
 			$orderBy[1] = 'desc ';
@@ -851,33 +850,33 @@ class Releases
 		}
 
 		$searchOptions = [];
-		if ($searchName != -1) {
+		if ($searchName !== -1) {
 			$searchOptions['searchname'] = $searchName;
 		}
-		if ($usenetName != -1) {
+		if ($usenetName !== -1) {
 			$searchOptions['name'] = $usenetName;
 		}
-		if ($posterName != -1) {
+		if ($posterName !== -1) {
 			$searchOptions['fromname'] = $posterName;
 		}
-		if ($fileName != -1) {
+		if ($fileName !== -1) {
 			$searchOptions['filename'] = $fileName;
 		}
 
 		$whereSql = sprintf(
-			"%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s %s",
+			'%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s %s',
 			$this->releaseSearch->getFullTextJoinString(),
 			$this->showPasswords,
 			NZB::NZB_ADDED,
 			($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-			($groupName != -1 ? sprintf(' AND r.groups_id = %d ', $this->groups->getIDByName($groupName)) : ''),
+			($groupName !== -1 ? sprintf(' AND r.groups_id = %d ', $this->groups->getIDByName($groupName)) : ''),
 			(array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > ' . (string)(104857600 * (int)$sizeRange[$sizeFrom]) . ' ' : ''),
 			(array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < ' . (string)(104857600 * (int)$sizeRange[$sizeTo]) . ' ' : ''),
-			($hasNfo != 0 ? ' AND r.nfostatus = 1 ' : ''),
-			($hasComments != 0 ? ' AND r.comments > 0 ' : ''),
-			($type !== 'advanced' ? $this->category->getCategorySearch($cat) : ($cat[0] != '-1' ? sprintf('AND r.categories_id = %d ', $cat[0]) : '')),
-			($daysNew != -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
-			($daysOld != -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
+			($hasNfo !== 0 ? ' AND r.nfostatus = 1 ' : ''),
+			($hasComments !== 0 ? ' AND r.comments > 0 ' : ''),
+			($type !== 'advanced' ? $this->category->getCategorySearch($cat) : ($cat[0] !== -1 ? sprintf('AND r.categories_id = %d ', $cat[0]) : '')),
+			($daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
+			($daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
 			(count($excludedCats) > 0 ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 			(count($searchOptions) > 0 ? $this->releaseSearch->getSearchSQL($searchOptions) : ''),
 			($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
@@ -909,11 +908,11 @@ class Releases
 		);
 
 		$sql = sprintf(
-			"SELECT * FROM (
+			'SELECT * FROM (
 				%s
 			) r
 			ORDER BY r.%s %s
-			LIMIT %d OFFSET %d",
+			LIMIT %d OFFSET %d',
 			$baseSql,
 			$orderBy[0],
 			$orderBy[1],
@@ -1137,15 +1136,15 @@ class Releases
 	public function searchbyImdbId($imDbId, $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1, $minSize = 0)
 	{
 		$whereSql = sprintf(
-			"%s
+			'%s
 			WHERE r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s",
+			%s %s %s %s %s',
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			NZB::NZB_ADDED,
 			$this->showPasswords,
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-			(($imDbId != '-1' && is_numeric($imDbId)) ? sprintf(' AND imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
+			(($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
 			$this->category->getCategorySearch($cat),
 			($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
 			($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
@@ -1324,16 +1323,16 @@ class Releases
 	 */
 	public function getbyRageId($rageID, $series = '', $episode = '')
 	{
-		if ($series != '') {
+		if ($series !== '') {
 			// Exclude four digit series, which will be the year 2010 etc.
-			if (is_numeric($series) && strlen($series) != 4) {
+			if (is_numeric($series) && strlen($series) !== 4) {
 				$series = sprintf('S%02d', $series);
 			}
 
 			$series = sprintf(' AND UPPER(r.season) = UPPER(%s)', $this->pdo->escapeString($series));
 		}
 
-		if ($episode != '') {
+		if ($episode !== '') {
 			if (is_numeric($episode)) {
 				$episode = sprintf('E%02d', $episode);
 			}
@@ -1421,7 +1420,7 @@ class Releases
 		return $this->pdo->queryOneRow(
 			sprintf(
 				'SELECT releases_id %s FROM release_nfos WHERE releases_id = %d AND nfo IS NOT NULL',
-				($getNfoString ? ", UNCOMPRESS(nfo) AS nfo" : ''),
+				$getNfoString ? ', UNCOMPRESS(nfo) AS nfo' : '',
 				$id
 			)
 		);
@@ -1495,7 +1494,7 @@ class Releases
 	public function getNewestMovies()
 	{
 		return $this->pdo->query(
-			"SELECT r.imdbid, r.guid, r.name, r.searchname, r.size, r.completion,
+			'SELECT r.imdbid, r.guid, r.name, r.searchname, r.size, r.completion,
 				postdate, categories_id, comments, grabs,
 				m.cover
 			FROM releases PARTITION (movies) r
@@ -1504,7 +1503,7 @@ class Releases
 			AND m.cover = 1
 			AND r.id in (select max(id) from releases where imdbid > 0 group by imdbid)
 			ORDER BY r.postdate DESC
-			LIMIT 24", true, NN_CACHE_EXPIRY_LONG
+			LIMIT 24', true, NN_CACHE_EXPIRY_LONG
 		);
 	}
 
@@ -1516,7 +1515,7 @@ class Releases
 	public function getNewestXXX()
 	{
 		return $this->pdo->query(
-			"SELECT r.xxxinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
+			'SELECT r.xxxinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				xxx.cover, xxx.title
 			FROM releases PARTITION (xxx) r
@@ -1525,7 +1524,7 @@ class Releases
 			AND xxx.cover = 1
 			AND r.id in (select max(id) from releases where xxxinfo_id > 0 group by xxxinfo_id)
 			ORDER BY r.postdate DESC
-			LIMIT 20", true, NN_CACHE_EXPIRY_LONG
+			LIMIT 20', true, NN_CACHE_EXPIRY_LONG
 		);
 	}
 
@@ -1537,7 +1536,7 @@ class Releases
 	public function getNewestConsole()
 	{
 		return $this->pdo->query(
-			"SELECT r.consoleinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
+			'SELECT r.consoleinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				con.cover
 			FROM releases PARTITION (console) r
@@ -1546,7 +1545,7 @@ class Releases
 			AND con.cover > 0
 			AND r.id in (select max(id) from releases where consoleinfo_id > 0 group by consoleinfo_id)
 			ORDER BY r.postdate DESC
-			LIMIT 35"
+			LIMIT 35'
 		);
 	}
 
@@ -1558,7 +1557,7 @@ class Releases
 	public function getNewestGames()
 	{
 		return $this->pdo->query(
-			"SELECT r.gamesinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
+			'SELECT r.gamesinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				gi.cover
 			FROM releases r
@@ -1568,7 +1567,7 @@ class Releases
 			AND gi.cover > 0
 			AND r.id in (select max(id) from releases where gamesinfo_id > 0 group by gamesinfo_id)
 			ORDER BY r.postdate DESC
-			LIMIT 24", true, NN_CACHE_EXPIRY_LONG
+			LIMIT 24', true, NN_CACHE_EXPIRY_LONG
 		);
 	}
 
@@ -1580,17 +1579,17 @@ class Releases
 	public function getNewestMP3s()
 	{
 		return $this->pdo->query(
-			"SELECT r.musicinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
+			sprintf('SELECT r.musicinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				m.cover
-			FROM releases PARTITION (music) r
+			FROM releases PARTITION (audio) r
 			INNER JOIN musicinfo m ON r.musicinfo_id = m.id
-			WHERE r.categories_id != " . Category::MUSIC_AUDIOBOOK ."
-			AND m.id > 0
+			WHERE m.id > 0
 			AND m.cover > 0
+			OR r.categories_id != %d
 			AND r.id in (select max(id) from releases where musicinfo_id > 0 group by musicinfo_id)
 			ORDER BY r.postdate DESC
-			LIMIT 24", true, NN_CACHE_EXPIRY_LONG
+			LIMIT 24', Category::MUSIC_AUDIOBOOK), true, NN_CACHE_EXPIRY_LONG
 		);
 	}
 
@@ -1602,18 +1601,17 @@ class Releases
 	public function getNewestBooks()
 	{
 		return $this->pdo->query(
-			"SELECT r.bookinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
+			sprintf('SELECT r.bookinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				b.url,	b.cover, b.title as booktitle, b.author
-			FROM releases r
+			FROM releases PARTITION (books) r
 			INNER JOIN bookinfo b ON r.bookinfo_id = b.id
-			WHERE r.categories_id BETWEEN " . Category::BOOKS_ROOT . " AND " . Category::BOOKS_UNKNOWN . "
-			OR r.categories_id = " . Category::MUSIC_AUDIOBOOK ."
-			AND b.id > 0
+			WHERE b.id > 0
+			OR r.categories_id = %d
 			AND b.cover > 0
 			AND r.id in (select max(id) from releases where bookinfo_id > 0 group by bookinfo_id)
 			ORDER BY r.postdate DESC
-			LIMIT 24", true, NN_CACHE_EXPIRY_LONG
+			LIMIT 24', Category::MUSIC_AUDIOBOOK), true, NN_CACHE_EXPIRY_LONG
 		);
 	}
 
@@ -1625,7 +1623,7 @@ class Releases
 	public function getNewestTV()
 	{
 		return $this->pdo->query(
-			"SELECT r.videos_id, r.guid, r.name, r.searchname, r.size, r.completion,
+			'SELECT r.videos_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				v.id AS tvid, v.title AS tvtitle, v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
 				tvi.image
@@ -1637,7 +1635,7 @@ class Releases
 			AND tvi.image = 1
 			AND r.id in (select max(id) from releases where videos_id > 0 group by videos_id)
 			ORDER BY r.postdate DESC
-			LIMIT 24", true, NN_CACHE_EXPIRY_LONG
+			LIMIT 24', true, NN_CACHE_EXPIRY_LONG
 		);
 	}
 
