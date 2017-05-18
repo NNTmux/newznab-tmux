@@ -131,30 +131,18 @@
 								</div>
 								<div class="movextra">
 									<div style="text-align: center;">
-										{if $result.classused == "gb"}<a class="rndbtn badge"
+										{if $result.classused == "GiantBomb"}<a class="rndbtn badge"
 																		 target="_blank"
 																		 href="{$site->dereferrer_link}{$result.url}"
 																		 name="giantbomb{$result.gamesinfo_id}"
 																		 title="View GiantBomb page">
 												GiantBomb</a>{/if}
-										{if $result.classused == "steam"}<a class="rndbtn badge fa fa-steam"
+										{if $result.classused == "Steam"}<a class="rndbtn badge fa fa-steam"
 																			target="_blank"
 																			href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
 																			name="steam{$result.gamesinfo_id}"
 																			title="View Steam page">
 												Steam</a>{/if}
-										{if $result.classused == "gl"}<a class="rndbtn badge"
-																		 target="_blank"
-																		 href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
-																		 name="greenlight{$result.gamesinfo_id}"
-																		 title="View greenlight page">
-												GreenLight</a>{/if}
-										{if $result.classused == "desura"}<a class="rndbtn badge"
-																			 target="_blank"
-																			 href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
-																			 name="desura{$result.gamesinfo_id}"
-																			 title="View Desura page">
-												Desura</a>{/if}
 										{if isset($mnfo[$m@index]) && $mnfo[$m@index] > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}" title="View Nfo" class="rndbtn modal_nfo badge" rel="nfo">Nfo</a>{/if}
 										<a class="rndbtn badge" href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}" title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Grp</a>
 									</div>
