@@ -72,7 +72,7 @@ class Games
 	protected $_gameID;
 
 	/**
-	 * @var array
+	 * @var array|bool
 	 */
 	protected $_gameResults;
 
@@ -460,6 +460,8 @@ class Games
 	 * @param $gameInfo
 	 *
 	 * @return bool
+	 * @throws \RuntimeException
+	 * @throws \InvalidArgumentException
 	 */
 	public function updateGamesInfo($gameInfo): bool
 	{
@@ -470,17 +472,17 @@ class Games
 
 		$game = [];
 
-		// Process Steam first before giantbomb
-		// Steam has more details
+		// Process Steam first before GiantBomb as Steam has more details
 		$this->_gameResults = false;
 		$genreName = '';
 		$this->_getGame = new Steam(['DB' => $this->pdo]);
 		$this->_classUsed = 'Steam';
+
 		$steamGameID = $this->_getGame->search($gameInfo['title']);
+
 		if ($steamGameID !== false) {
-			$result = $this->_getGame->getAll($steamGameID);
-			if ($result !== false) {
-				$this->_gameResults = $result;
+			$this->_gameResults = $this->_getGame->getAll($steamGameID);
+			if ($this->_gameResults !== false) {
 				if (empty($this->_gameResults['title'])) {
 					return false;
 				}
@@ -527,12 +529,12 @@ class Games
 			}
 		}
 
-		if ($this->_gameResults === false) {
+		if ($steamGameID === false || $this->_gameResults === false) {
 			$bestMatch = false;
 			$this->_classUsed = 'GiantBomb';
-			$result = $this->giantbomb->search($gameInfo['title'], 'game');
+			$result = $this->giantbomb->search($gameInfo['title'], 'Game');
 
-			if (!empty($result)) {
+			if (!is_object($result)) {
 				foreach ($result as $res) {
 					similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent1);
 					similar_text(strtolower($gameInfo['title']), strtolower($res->aliases), $percent2);
@@ -554,7 +556,11 @@ class Games
 
 					$game['title'] = (string)$this->_gameResults->get('name');
 					$game['asin'] = $this->_gameResults->get('id');
-					$game['url'] = (string)$this->_gameResults->get('site_detail_url');
+					if (!empty($this->_gameResults->get('site_detail_url'))) {
+						$game['url'] = (string)$this->_gameResults->get('site_detail_url');
+					} else {
+						$game['url'] = '';
+					}
 
 					if ($this->_gameResults->get('publishers') !== '') {
 						$game['publisher'] = (string)$this->_gameResults->publishers[0]['name'];
@@ -580,18 +586,15 @@ class Games
 					if ($this->_gameResults->deck !== '') {
 						$game['review'] = (string)$this->_gameResults->deck;
 					}
-
-					if ($this->_gameResults->genres !== '') {
-						$genres = implode(',', array_column($this->_gameResults->genres, 'name'));
-						$genreName = $this->_matchGenre($genres);
-					}
 				} else {
 					ColorCLI::doEcho(ColorCLI::notice('GiantBomb returned no valid results'));
 
 					return false;
 				}
+			} else {
+				ColorCLI::doEcho(ColorCLI::notice('GiantBomb found no valid results'));
+				return false;
 			}
-			return false;
 		}
 
 		// Load genres.
@@ -734,6 +737,8 @@ class Games
 
 	/**
 	 *
+	 * @throws \InvalidArgumentException
+	 * @throws \RuntimeException
 	 */
 	public function processGamesReleases(): void
 	{
