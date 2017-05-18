@@ -160,7 +160,7 @@ class Releases
 	 * @param array  $cat
 	 * @param int    $maxAge
 	 * @param array  $excludedCats
-	 * @param string $groupName
+	 * @param string|int $groupName
 	 *
 	 * @return int
 	 */
@@ -196,7 +196,7 @@ class Releases
 	 * @param string|array $orderBy
 	 * @param int    $maxAge
 	 * @param array  $excludedCats
-	 * @param mixed $groupName
+	 * @param string|int $groupName
 	 * @param int    $minSize
 	 *
 	 * @return array
@@ -278,7 +278,7 @@ class Releases
 	/**
 	 * Use to order releases on site.
 	 *
-	 * @param string $orderBy
+	 * @param string|array $orderBy
 	 *
 	 * @return array
 	 */
@@ -337,7 +337,7 @@ class Releases
 	 *
 	 * @param string $postFrom (optional) Date in this format : 01/01/2014
 	 * @param string $postTo   (optional) Date in this format : 01/01/2014
-	 * @param string $groupID  (optional) Group ID.
+	 * @param string|int $groupID  (optional) Group ID.
 	 *
 	 * @return array
 	 */
@@ -788,7 +788,7 @@ class Releases
 	 * @param string $usenetName
 	 * @param string $posterName
 	 * @param string $fileName
-	 * @param string $groupName
+	 * @param string|int $groupName
 	 * @param int $sizeFrom
 	 * @param int $sizeTo
 	 * @param int $hasNfo
@@ -874,7 +874,7 @@ class Releases
 			(array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < ' . (string)(104857600 * (int)$sizeRange[$sizeTo]) . ' ' : ''),
 			($hasNfo !== 0 ? ' AND r.nfostatus = 1 ' : ''),
 			($hasComments !== 0 ? ' AND r.comments > 0 ' : ''),
-			($type !== 'advanced' ? $this->category->getCategorySearch($cat) : ($cat[0] !== -1 ? sprintf('AND r.categories_id = %d ', $cat[0]) : '')),
+			($type !== 'advanced' ? $this->category->getCategorySearch($cat) : $cat[0] !== -1 ? sprintf('AND r.categories_id = %d ', $cat[0]) : ''),
 			($daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
 			($daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
 			(count($excludedCats) > 0 ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
