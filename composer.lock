@@ -1528,12 +1528,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dborsatto/php-giantbomb.git",
-                "reference": "cc004daa5bcd6581ed3c05af86022cd82000ba92"
+                "reference": "e95553774caf9b6dace6d044710c7e03dee3af43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dborsatto/php-giantbomb/zipball/cc004daa5bcd6581ed3c05af86022cd82000ba92",
-                "reference": "cc004daa5bcd6581ed3c05af86022cd82000ba92",
+                "url": "https://api.github.com/repos/dborsatto/php-giantbomb/zipball/e95553774caf9b6dace6d044710c7e03dee3af43",
+                "reference": "e95553774caf9b6dace6d044710c7e03dee3af43",
                 "shasum": ""
             },
             "require": {
@@ -1562,7 +1562,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-05-15 23:16:25"
+            "time": "2017-05-18 16:20:43"
         },
         {
             "name": "doctrine/annotations",
@@ -4830,16 +4830,16 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "3.0.2",
+            "version": "3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "11e7710b7724d42c62249b0e9d3030240398949d"
+                "reference": "02b6b2c7aefe2cdb1185b8dbf8718b0bcedf3ab3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/11e7710b7724d42c62249b0e9d3030240398949d",
-                "reference": "11e7710b7724d42c62249b0e9d3030240398949d",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/02b6b2c7aefe2cdb1185b8dbf8718b0bcedf3ab3",
+                "reference": "02b6b2c7aefe2cdb1185b8dbf8718b0bcedf3ab3",
                 "shasum": ""
             },
             "require": {
@@ -4876,7 +4876,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2017-04-21T14:40:32+00:00"
+            "time": "2017-05-18T10:10:00+00:00"
         },
         {
             "name": "sebastian/exporter",

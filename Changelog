@@ -1,4 +1,5 @@
 2017-15-18 DariusIII
+	* Chg: Update php-giantbomb to version 1.0.2
 	* Chg: More improvements in pc games matching
 	* Chg: Update declarations for string|int type of values
 	* Chg: Update Releases class, fix wrong (music) partition name
