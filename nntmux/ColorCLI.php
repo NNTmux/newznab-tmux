@@ -6,7 +6,7 @@ namespace nntmux;
 
 class ColorCLI
 {
-	static $foreground_colors = [
+	private static $foreground_colors = [
 		'Black' => '30',
 		'Blue' => '34',
 		'Green' => '32',
@@ -17,7 +17,7 @@ class ColorCLI
 		'Gray' => '37',
 	];
 	// Feel free to add any other colors that you like here.
-	static $colors256 = [
+	private static $colors256 = [
 		'Gray' => '008', 'Red' => '009',
 		'Green' => '010', 'Yellow' => '011',
 		'Blue' => '012', 'Purple' => '013',
@@ -143,129 +143,199 @@ class ColorCLI
 		'Grey28' => '252', 'Grey29' => '253',
 		'Grey30' => '254', 'Grey31' => '255',
 	];
-	static $background_colors = [
+	private static $background_colors = [
 		'Black' => '40', 'Red' => '41',
 		'Green' => '42', 'Yellow' => '43',
 		'Blue' => '44', 'Purple' => '45',
 		'Cyan' => '46', 'White' => '47',
 	];
-	static $options = [
+	private static $options = [
 		'Norm' => '0', 'Bold' => '1',
 		'Dim' => '2', 'Uline' => '4',
 		'Blink' => '5', 'Rev' => '7',
 		'Hidden' => '8', 'Crossout' => '9',
 	];
 
-	public static function bell($count = 1)
+	/**
+	 * @param int $count
+	 */
+	public static function bell($count = 1): void
 	{
 		echo str_repeat("\007", $count);
 	}
 
-	public static function setColor($fg, $opt = "None", $bg = "None")
+	/**
+	 * @param $fg
+	 * @param string $opt
+	 * @param string $bg
+	 * @return string
+	 */
+	public static function setColor($fg, $opt = 'None', $bg = 'None'): string
 	{
 		$colored_string = "\033[" . self::$foreground_colors[$fg];
 		if (isset(self::$options[$opt])) {
-			$colored_string .= ";" . self::$options[$opt];
+			$colored_string .= ';' . self::$options[$opt];
 		}
 		if (isset(self::$background_colors[$bg])) {
-			$colored_string .= ";" . self::$background_colors[$bg];
+			$colored_string .= ';' . self::$background_colors[$bg];
 		}
-		$colored_string .= "m";
+		$colored_string .= 'm';
 		return $colored_string;
 	}
 
-	public static function set256($fg, $opt = "None", $bg = "None")
+	/**
+	 * @param $fg
+	 * @param string $opt
+	 * @param string $bg
+	 * @return string
+	 */
+	public static function set256($fg, $opt = 'None', $bg = 'None'): string
 	{
 		$colored_string = "\033[38;5;" . self::$colors256[$fg];
-		if (isset(self::$options[$opt]) && $opt != 'Norm') {
-			$colored_string .= ";" . self::$options[$opt];
+		if ($opt !== 'Norm' && isset(self::$options[$opt])) {
+			$colored_string .= ';' . self::$options[$opt];
 		}
 		if (isset(self::$background_colors[$bg])) {
-			$colored_string .= ";48;5;" . self::$colors256[$bg];
+			$colored_string .= ';48;5;' . self::$colors256[$bg];
 		}
-		$colored_string .= "m";
+		$colored_string .= 'm';
 		return $colored_string;
 	}
 
-	public static function debug($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function debug($str): string
 	{
 		$debugstring = "\033[" . self::$foreground_colors['Gray'] . "mDebug: $str\033[0m\n";
 		return $debugstring;
 	}
 
-	public static function info($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function info($str): string
 	{
 		$infostring = "\033[" . self::$foreground_colors['Purple'] . "mInfo: $str\033[0m\n";
 		return $infostring;
 	}
 
-	public static function notice($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function notice($str): string
 	{
 		$noticstring = "\033[38;5;" . self::$colors256['Blue'] . "mNotice: $str\033[0m\n";
 		return $noticstring;
 	}
 
-	public static function warning($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function warning($str): string
 	{
 		$warnstring = "\033[" . self::$foreground_colors['Yellow'] . "mWarning: $str\033[0m\n";
 		return $warnstring;
 	}
 
-	public static function error($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function error($str): string
 	{
 		$errorstring = "\033[" . self::$foreground_colors['Red'] . "mError: $str\033[0m\n";
 		return $errorstring;
 	}
 
-	public static function primary($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function primary($str): string
 	{
 		$str = "\033[38;5;" . self::$colors256['Green'] . "m$str\033[0m\n";
 		return $str;
 	}
 
-	public static function header($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function header($str): string
 	{
 		$str = "\033[38;5;" . self::$colors256['Yellow'] . "m$str\033[0m\n";
 		return $str;
 	}
 
-	public static function alternate($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function alternate($str): string
 	{
 		$str = "\033[38;5;" . self::$colors256['DeepPink1'] . "m$str\033[0m\n";
 		return $str;
 	}
 
-	public static function tmuxOrange($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function tmuxOrange($str): string
 	{
 		$str = "\033[38;5;" . self::$colors256['Orange'] . "m$str\033[0m\n";
 		return $str;
 	}
 
-	public static function primaryOver($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function primaryOver($str): string
 	{
 		$str = "\033[38;5;" . self::$colors256['Green'] . "m$str\033[0m";
 		return $str;
 	}
 
-	public static function headerOver($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function headerOver($str): string
 	{
 		$str = "\033[38;5;" . self::$colors256['Yellow'] . "m$str\033[0m";
 		return $str;
 	}
 
-	public static function alternateOver($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function alternateOver($str): string
 	{
 		$str = "\033[38;5;" . self::$colors256['DeepPink1'] . "m$str\033[0m";
 		return $str;
 	}
 
-	public static function warningOver($str)
+	/**
+	 * @param $str
+	 * @return string
+	 */
+	public static function warningOver($str): string
 	{
-		$str = "\033[38;5;" . self::$colors256['Red'] . "m";
+		$str = "\033[38;5;" . self::$colors256['Red'] . "m$str\033[0m";
 		return $str;
 	}
 
-	public static function rsetColor()
+	/**
+	 * @return string
+	 */
+	public static function rsetColor(): string
 	{
 		return "\033[0m";
 	}
@@ -277,7 +347,7 @@ class ColorCLI
 	 * @param bool $nl Add a new line?
 	 * @void
 	 */
-	public static function doEcho($message, $nl = false)
+	public static function doEcho($message, $nl = false): void
 	{
 		echo $message . ($nl ? PHP_EOL : '');
 	}
