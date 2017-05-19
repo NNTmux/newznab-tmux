@@ -63,16 +63,16 @@
         },
         {
             "name": "aharen/omdbapi",
-            "version": "v2.0.6",
+            "version": "v2.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aharen/OMDbAPI.git",
-                "reference": "4d2d186cf3acf2a0396a5ff611052506f5d4077f"
+                "reference": "7e982afa6645439efff3e87395a7869b8b91bffa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aharen/OMDbAPI/zipball/4d2d186cf3acf2a0396a5ff611052506f5d4077f",
-                "reference": "4d2d186cf3acf2a0396a5ff611052506f5d4077f",
+                "url": "https://api.github.com/repos/aharen/OMDbAPI/zipball/7e982afa6645439efff3e87395a7869b8b91bffa",
+                "reference": "7e982afa6645439efff3e87395a7869b8b91bffa",
                 "shasum": ""
             },
             "require": {
@@ -101,7 +101,7 @@
                 "omdb api",
                 "tv shows"
             ],
-            "time": "2017-05-14T22:58:27+00:00"
+            "time": "2017-05-19T02:39:02+00:00"
         },
         {
             "name": "b3rs3rk/steamfront",
@@ -4778,23 +4778,23 @@
         },
         {
             "name": "sebastian/diff",
-            "version": "1.4.1",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/diff.git",
-                "reference": "13edfd8706462032c2f52b4b862974dd46b71c9e"
+                "reference": "3c7d21999e815cdfac70c6c7d79d3a9cb1bc7bc2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/13edfd8706462032c2f52b4b862974dd46b71c9e",
-                "reference": "13edfd8706462032c2f52b4b862974dd46b71c9e",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/3c7d21999e815cdfac70c6c7d79d3a9cb1bc7bc2",
+                "reference": "3c7d21999e815cdfac70c6c7d79d3a9cb1bc7bc2",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": "^5.3.3 || ^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.8"
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.0"
             },
             "type": "library",
             "extra": {
@@ -4826,7 +4826,7 @@
             "keywords": [
                 "diff"
             ],
-            "time": "2015-12-08T07:14:41+00:00"
+            "time": "2017-05-18T13:44:30+00:00"
         },
         {
             "name": "sebastian/environment",

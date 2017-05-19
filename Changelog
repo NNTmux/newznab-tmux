@@ -1,4 +1,5 @@
 2017-15-19 DariusIII
+	* Chg: Update aharen/omdbapi to version 2.0.8
 	* Fix: Use proper date for steam games
 2017-15-18 DariusIII
 	* Chg: Update php-giantbomb to version 1.0.2
