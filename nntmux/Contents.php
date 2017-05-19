@@ -130,12 +130,12 @@ class Contents
 
 	public function validate($content)
 	{
-		if (substr($content->url, 0, 1) != '/') {
-			$content->url = "/" . $content->url;
+		if ($content->url[0] !== '/') {
+			$content->url = '/' . $content->url;
 		}
 
-		if (substr($content->url, strlen($content->url) - 1) != '/') {
-			$content->url = $content->url . "/";
+		if (substr($content->url, strlen($content->url) - 1) !== '/') {
+			$content->url .= '/';
 		}
 
 		return $content;
@@ -145,7 +145,7 @@ class Contents
 	{
 		$content = $this->row2Object($form);
 		$content = $this->validate($content);
-		if ($content->ordinal == 1) {
+		if ($content->ordinal === 1) {
 			$this->pdo->queryDirect('UPDATE content SET ordinal = ordinal + 1 WHERE ordinal > 0');
 		}
 		return $this->data_add($content);
@@ -165,7 +165,7 @@ class Contents
 		return $content;
 	}
 
-	public function row2Object($row, $prefix = "")
+	public function row2Object($row, $prefix = '')
 	{
 		$obj = new Content();
 		if (isset($row[$prefix . 'id'])) {
@@ -230,7 +230,7 @@ class Contents
 
 	public function data_getFrontPage()
 	{
-		return $this->pdo->query(sprintf("SELECT * FROM content WHERE status = 1 AND contenttype = %d ORDER BY ordinal ASC, COALESCE(ordinal, 1000000), id", Contents::TYPEINDEX));
+		return $this->pdo->query(sprintf('SELECT * FROM content WHERE status = 1 AND contenttype = %d ORDER BY ordinal ASC, COALESCE(ordinal, 1000000), id', Contents::TYPEINDEX));
 	}
 
 	public function data_getIndex()
