@@ -1,4 +1,5 @@
 2017-15-19 DariusIII
+	* Chg: Update ConsoleTools class
 	* Chg: Update ColorCLI class
 	* Chg: Update aharen/omdbapi to version 2.0.8
 	* Fix: Use proper date for steam games
