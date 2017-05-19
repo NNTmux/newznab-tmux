@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: darius
- * Date: 3.2.17.
- * Time: 22.25
- */
 
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\Steam;
 

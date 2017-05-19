@@ -482,6 +482,7 @@ class Games
 
 		if ($steamGameID !== false) {
 			$this->_gameResults = $this->_getGame->getAll($steamGameID);
+
 			if ($this->_gameResults !== false) {
 				if (empty($this->_gameResults['title'])) {
 					return false;
@@ -512,7 +513,7 @@ class Games
 
 				if (!empty($this->_gameResults['releasedate'])) {
 					$dateReleased = $this->_gameResults['releasedate'];
-					$date = \DateTime::createFromFormat('M/j/Y', $dateReleased);
+					$date = \DateTime::createFromFormat('M j, Y', $dateReleased);
 					if ($date instanceof \DateTime) {
 						$game['releasedate'] = (string)$date->format('Y-m-d');
 					}
