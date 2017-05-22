@@ -17,7 +17,7 @@ class Releases
 	const PASSWD_RAR       = 10; // Definitely passworded.
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -48,6 +48,7 @@ class Releases
 
 	/**
 	 * @var array $options Class instances.
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -108,7 +109,7 @@ class Releases
 	 * Create a GUID for a release.
 	 * @return string
 	 */
-	public function createGUID()
+	public function createGUID(): string
 	{
 		return bin2hex(openssl_random_pseudo_bytes(20));
 	}
@@ -116,7 +117,7 @@ class Releases
 	/**
 	 * @return array
 	 */
-	public function get()
+	public function get(): array
 	{
 		return $this->pdo->query(
 			sprintf(
@@ -138,7 +139,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getRange($start, $num)
+	public function getRange($start, $num): array
 	{
 		return $this->pdo->query(
 			sprintf(
@@ -164,7 +165,7 @@ class Releases
 	 *
 	 * @return int
 	 */
-	public function getBrowseCount($cat, $maxAge = -1, $excludedCats = [], $groupName = '')
+	public function getBrowseCount($cat, $maxAge = -1, array $excludedCats = [], $groupName = ''): int
 	{
 		$count = $this->pdo->query(
 			sprintf(
@@ -201,7 +202,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [], $groupName = -1, $minSize = 0)
+	public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): array
 	{
 		$orderBy = $this->getBrowseOrder($orderBy);
 
@@ -256,8 +257,9 @@ class Releases
 	 * Return site setting for hiding/showing passworded releases.
 	 *
 	 * @return string
+	 * @throws \Exception
 	 */
-	public static function showPasswords()
+	public static function showPasswords(): ?string
 	{
 		$setting = Settings::value('..showpasswordedrelease', true);
 		$setting = (isset($setting) && is_numeric($setting)) ? $setting : 10;
@@ -282,7 +284,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getBrowseOrder($orderBy)
+	public function getBrowseOrder($orderBy): array
 	{
 		$orderArr = explode('_', ($orderBy === '' ? 'posted_desc' : $orderBy));
 		switch ($orderArr[0]) {
@@ -314,7 +316,7 @@ class Releases
 	 *
 	 * @return string[]
 	 */
-	public function getBrowseOrdering()
+	public function getBrowseOrdering(): array
 	{
 		return [
 			'name_asc',
@@ -341,7 +343,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getForExport($postFrom = '', $postTo = '', $groupID = '')
+	public function getForExport($postFrom = '', $postTo = '', $groupID = ''): array
 	{
 		return $this->pdo->query(
 			sprintf(
@@ -368,7 +370,7 @@ class Releases
 	 *
 	 * @return string
 	 */
-	private function exportDateString($date = '', $from = true)
+	private function exportDateString($date = '', $from = true): string
 	{
 		if ($date !== '') {
 			$dateParts = explode('/', $date);
@@ -420,7 +422,7 @@ class Releases
 	 * @note Used for exporting NZB's.
 	 * @return array
 	 */
-	public function getReleasedGroupsForSelect($blnIncludeAll = true)
+	public function getReleasedGroupsForSelect($blnIncludeAll = true): array
 	{
 		$groups = $this->pdo->query(
 			'SELECT DISTINCT g.id, g.name
@@ -448,7 +450,7 @@ class Releases
 	/**
 	 * Gets / sets a string of concatenated category ID's used in queries.
 	 *
-	 * @return array|null
+	 * @return array|null|string
 	 */
 	public function getConcatenatedCategoryIDs()
 	{
@@ -480,7 +482,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getShowsRange($userShows, $offset, $limit, $orderBy, $maxAge = -1, $excludedCats = [])
+	public function getShowsRange($userShows, $offset, $limit, $orderBy, $maxAge = -1, array $excludedCats = []): array
 	{
 		$orderBy = $this->getBrowseOrder($orderBy);
 		return $this->pdo->query(
@@ -528,7 +530,7 @@ class Releases
 	 *
 	 * @return int
 	 */
-	public function getShowsCount($userShows, $maxAge = -1, $excludedCats = [])
+	public function getShowsCount($userShows, $maxAge = -1, array $excludedCats = []): int
 	{
 		return $this->getPagerCount(
 			sprintf(
@@ -556,7 +558,7 @@ class Releases
 	 *
 	 * @return int
 	 */
-	public function getMovieCount($userMovies, $maxAge = -1, $excludedCats = [])
+	public function getMovieCount($userMovies, $maxAge = -1, array $excludedCats = []): int
 	{
 		return $this->getPagerCount(
 			sprintf(
@@ -580,7 +582,7 @@ class Releases
 	 *
 	 * @return int
 	 */
-	public function getCount()
+	public function getCount(): int
 	{
 		$res = $this->pdo->query(
 			'SELECT COUNT(id) AS num FROM releases',
@@ -595,7 +597,7 @@ class Releases
 	 * @param array|int|string $list   Array of GUID or ID of releases to delete.
 	 * @param bool             $isGUID Are the identifiers GUID or ID?
 	 */
-	public function deleteMultiple($list, $isGUID = false)
+	public function deleteMultiple($list, $isGUID = false): void
 	{
 		if (!is_array($list)) {
 			$list = [$list];
@@ -624,7 +626,7 @@ class Releases
 	 * @param NZB          $nzb
 	 * @param ReleaseImage $releaseImage
 	 */
-	public function deleteSingle($identifiers, $nzb, $releaseImage)
+	public function deleteSingle($identifiers, $nzb, $releaseImage): void
 	{
 		// Delete NZB from disk.
 		$nzbPath = $nzb->NZBPath($identifiers['g']);
@@ -674,7 +676,7 @@ class Releases
 	 *
 	 */
 	public function update($ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size,
-						   $postedDate, $addedDate, $videoId, $episodeId, $imDbID, $aniDbID)
+						   $postedDate, $addedDate, $videoId, $episodeId, $imDbID, $aniDbID): void
 	{
 		$this->pdo->queryExec(
 			sprintf(
@@ -720,7 +722,7 @@ class Releases
 		}
 
 		$update = [
-			'categories_id'     => (($category === -1) ? 'categories_id' : $category),
+			'categories_id'     => $category === -1 ? 'categories_id' : $category,
 			'grabs'          => $grabs,
 			'videos_id'      => $videoId,
 			'tv_episodes_id' => $episodeId,
@@ -761,7 +763,7 @@ class Releases
 	 *
 	 * @return string
 	 */
-	public function uSQL($userQuery, $type)
+	public function uSQL($userQuery, $type): string
 	{
 		$sql = '(1=2 ';
 		foreach ($userQuery as $query) {
@@ -806,7 +808,8 @@ class Releases
 	 * @param int $minSize
 	 * @return array
 	 */
-	public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, $excludedCats = [], $type = 'basic', $cat = [-1], $minSize = 0) {
+	public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0): array
+	{
 		$sizeRange = [
 			1 => 1,
 			2 => 2.5,
@@ -843,20 +846,27 @@ class Releases
 			$searchOptions['filename'] = $fileName;
 		}
 
+		$catQuery = '';
+		if ($type === 'basic' ){
+			$catQuery = $this->category->getCategorySearch($cat);
+		} else if ($type === 'advanced' && (int)$cat[0] !== -1) {
+			$catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
+		}
+
 		$whereSql = sprintf(
 			'%s WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s %s',
 			$this->releaseSearch->getFullTextJoinString(),
 			$this->showPasswords,
 			NZB::NZB_ADDED,
 			($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-			($groupName !== -1 ? sprintf(' AND r.groups_id = %d ', $this->groups->getIDByName($groupName)) : ''),
+			((int)$groupName !== -1 ? sprintf(' AND r.groups_id = %d ', $this->groups->getIDByName($groupName)) : ''),
 			(array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > ' . (string)(104857600 * (int)$sizeRange[$sizeFrom]) . ' ' : ''),
 			(array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < ' . (string)(104857600 * (int)$sizeRange[$sizeTo]) . ' ' : ''),
-			($hasNfo !== 0 ? ' AND r.nfostatus = 1 ' : ''),
-			($hasComments !== 0 ? ' AND r.comments > 0 ' : ''),
-			($type !== 'advanced' ? $this->category->getCategorySearch($cat) : $cat[0] !== -1 ? sprintf('AND r.categories_id = %d ', $cat[0]) : ''),
-			($daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
-			($daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
+			((int)$hasNfo !== 0 ? ' AND r.nfostatus = 1 ' : ''),
+			((int)$hasComments !== 0 ? ' AND r.comments > 0 ' : ''),
+			$catQuery,
+			((int)$daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
+			((int)$daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
 			(count($excludedCats) > 0 ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 			(count($searchOptions) > 0 ? $this->releaseSearch->getSearchSQL($searchOptions) : ''),
 			($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
@@ -866,7 +876,7 @@ class Releases
 			"SELECT r.*,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
-				(SELECT df.failed) AS failed,
+				df.failed AS failed,
 				g.name AS group_name,
 				rn.releases_id AS nfoid,
 				re.releases_id AS reid,
@@ -899,6 +909,7 @@ class Releases
 			$limit,
 			$offset
 		);
+
 		$releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 		if (!empty($releases) && count($releases)) {
 			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
@@ -923,9 +934,9 @@ class Releases
 	 * @return array
 	 */
 	public function searchShows(
-		$siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0,
-		$limit = 100, $name = '', $cat = [-1], $maxAge = -1, $minSize = 0
-	)
+		array $siteIdArr = [], $series = '', $episode = '', $airdate = '', $offset = 0,
+		$limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0
+	): array
 	{
 		$siteSQL = [];
 		$showSql = '';
@@ -1053,7 +1064,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function searchbyAnidbId($aniDbID, $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1)
+	public function searchbyAnidbId($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1): array
 	{
 		$whereSql = sprintf(
 			'%s
@@ -1104,16 +1115,17 @@ class Releases
 	}
 
 	/**
-	 * @param int    $imDbId
-	 * @param int    $offset
-	 * @param int    $limit
+	 * @param int $imDbId
+	 * @param int $offset
+	 * @param int $limit
 	 * @param string $name
-	 * @param array  $cat
-	 * @param int    $maxAge
+	 * @param array $cat
+	 * @param int $maxAge
+	 * @param int $minSize
 	 *
 	 * @return array
 	 */
-	public function searchbyImdbId($imDbId, $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1, $minSize = 0)
+	public function searchbyImdbId($imDbId, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
 	{
 		$whereSql = sprintf(
 			'%s
@@ -1169,7 +1181,7 @@ class Releases
 	 *
 	 * @return int
 	 */
-	private function getPagerCount($query)
+	private function getPagerCount($query): int
 	{
 		$count = $this->pdo->query(
 				sprintf(
@@ -1189,7 +1201,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function searchSimilar($currentID, $name, $limit = 6, $excludedCats = [])
+	public function searchSimilar($currentID, $name, $limit = 6, array $excludedCats = []): array
 	{
 		// Get the category for the parent of this release.
 		$currRow = $this->getById($currentID);
@@ -1217,7 +1229,7 @@ class Releases
 	 *
 	 * @return string
 	 */
-	public function getSimilarName($name)
+	public function getSimilarName($name): string
 	{
 		return implode(' ', array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
 	}
@@ -1264,13 +1276,13 @@ class Releases
 		return is_array($guid) ? $this->pdo->query($sql) : $this->pdo->queryOneRow($sql);
 	}
 
-	// Writes a zip file of an array of release guids directly to the stream.
 	/**
-	 * @param $guids
+	 * Writes a zip file of an array of release guids directly to the stream.
 	 *
+	 * @param $guids
 	 * @return string
 	 */
-	public function getZipped($guids)
+	public function getZipped($guids): string
 	{
 		$nzb = new NZB($this->pdo);
 		$zipFile = new \ZipFile();
@@ -1409,7 +1421,7 @@ class Releases
 	/**
 	 * @param string $guid
 	 */
-	public function updateGrab($guid)
+	public function updateGrab($guid): void
 	{
 		if ($this->updategrabs) {
 			$this->pdo->queryExec(
@@ -1421,7 +1433,7 @@ class Releases
 	/**
 	 * @return array
 	 */
-	public function getTopDownloads()
+	public function getTopDownloads(): array
 	{
 		return $this->pdo->query(
 			'SELECT id, searchname, guid, adddate, SUM(grabs) AS grabs
@@ -1437,7 +1449,7 @@ class Releases
 	/**
 	 * @return array
 	 */
-	public function getTopComments()
+	public function getTopComments(): array
 	{
 		return $this->pdo->query(
 			'SELECT id, guid, searchname, adddate, SUM(comments) AS comments
@@ -1453,7 +1465,7 @@ class Releases
 	/**
 	 * @return array
 	 */
-	public function getRecentlyAdded()
+	public function getRecentlyAdded(): array
 	{
 		return $this->pdo->query(
 				"SELECT CONCAT(cp.title, ' > ', categories.title) AS title, COUNT(r.id) AS count
@@ -1471,7 +1483,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getNewestMovies()
+	public function getNewestMovies(): array
 	{
 		return $this->pdo->query(
 			'SELECT r.imdbid, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1492,7 +1504,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getNewestXXX()
+	public function getNewestXXX(): array
 	{
 		return $this->pdo->query(
 			'SELECT r.xxxinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1513,7 +1525,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getNewestConsole()
+	public function getNewestConsole(): array
 	{
 		return $this->pdo->query(
 			'SELECT r.consoleinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1534,7 +1546,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getNewestGames()
+	public function getNewestGames(): array
 	{
 		return $this->pdo->query(
 			'SELECT r.gamesinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1556,7 +1568,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getNewestMP3s()
+	public function getNewestMP3s(): array
 	{
 		return $this->pdo->query(
 			sprintf('SELECT r.musicinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1578,7 +1590,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getNewestBooks()
+	public function getNewestBooks(): array
 	{
 		return $this->pdo->query(
 			sprintf('SELECT r.bookinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1600,7 +1612,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getNewestTV()
+	public function getNewestTV(): array
 	{
 		return $this->pdo->query(
 			'SELECT r.videos_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1624,7 +1636,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getNewestAnime()
+	public function getNewestAnime(): array
 	{
 		return $this->pdo->query(
 			"SELECT r.anidbid, r.guid, r.name, r.searchname, r.size, r.completion,

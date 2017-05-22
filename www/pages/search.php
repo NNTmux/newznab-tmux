@@ -110,7 +110,7 @@ if (isset($_REQUEST['searchadvr']) && !isset($_REQUEST['id']) && !isset($_REQUES
 	foreach ($ordering as $orderType) {
 		$page->smarty->assign(
 			'orderby' . $orderType,
-			WWW_TOP . "/search?$orderByString&search_type=adv&amp;ob=$orderType"
+			WWW_TOP . '/search?' . $orderByString . '&search_type=adv&ob=' . $orderType
 		);
 	}
 
@@ -134,7 +134,7 @@ if (isset($_REQUEST['searchadvr']) && !isset($_REQUEST['id']) && !isset($_REQUES
 			'pageroffset' => $offset,
 			'pageritemsperpage' => ITEMS_PER_PAGE,
 			'pagerquerysuffix' => '#results',
-			'pagerquerybase' => WWW_TOP . "/search?$orderByString&search_type=adv&amp;ob=$orderBy&amp;offset="
+			'pagerquerybase' => WWW_TOP . '/search?' . $orderByString . '&search_type=adv&ob=' . $orderBy . '&offset='
 		]
 	);
 }

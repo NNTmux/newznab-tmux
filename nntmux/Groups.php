@@ -180,7 +180,7 @@ class Groups
 	 *
 	 * @param string $name The group name.
 	 *
-	 * @return string Empty string on failure, groups_id on success.
+	 * @return string|int Empty string on failure, groups_id on success.
 	 */
 	public function getIDByName($name)
 	{

@@ -129,11 +129,11 @@ class Category
 	/**
 	 * Parse category search constraints
 	 *
-	 * @param array $cat
+	 * @param array|string $cat
 	 *
 	 * @return string $catsrch
 	 */
-	public function getCategorySearch(array $cat = [])
+	public function getCategorySearch(array $cat = []): string
 	{
 		$categories = [];
 
@@ -149,7 +149,7 @@ class Category
 		}
 
 		foreach ($cat as $category) {
-			if ($category != -1 && $this->isParent($category)) {
+			if ($category !== -1 && $this->isParent($category)) {
 				foreach ($this->getChildren($category) as $child) {
 					$categories[] = $child['id'];
 				}
@@ -167,7 +167,7 @@ class Category
 				break;
 			// One category constraint
 			case 1:
-				$catsrch = " AND r.categories_id = {$categories[0]}";
+				$catsrch = $categories[0] !== -1 ? ' AND r.categories_id = ' . $categories[0] : '';
 				break;
 			// Multiple category constraints
 			default:
