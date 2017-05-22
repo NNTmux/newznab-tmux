@@ -54,8 +54,8 @@ if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && !isset($_REQUEST[
 	}
 	foreach ($releases->getBrowseOrdering() as $orderType) {
 		$page->smarty->assign(
-			"orderby$orderType",
-			WWW_TOP . '/search/' . htmlentities($searchString) . '?t=' . implode(',', $categoryID) . "&amp;ob=$orderType"
+			'orderby' . $orderType,
+			WWW_TOP . '/search/' . htmlentities($searchString) . '?t=' . implode(',', $categoryID) . '&amp;ob='. $orderType
 		);
 	}
 

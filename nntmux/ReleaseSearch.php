@@ -126,7 +126,7 @@ class ReleaseSearch
 	 *
 	 * @return string
 	 */
-	private function likeSQL(): string
+	private function likeSQL()
 	{
 		$return = '';
 		foreach ($this->searchOptions as $columnName => $searchString) {
@@ -154,7 +154,7 @@ class ReleaseSearch
 	 *
 	 * @return string
 	 */
-	private function sphinxSQL(): string
+	private function sphinxSQL()
 	{
 		$searchQuery = $fullReturn = '';
 

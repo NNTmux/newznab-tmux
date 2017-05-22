@@ -1,4 +1,5 @@
 2017-05-22 DariusIII
+	* Chg: Small change in classes
 	* Chg: Update search page
 2017-15-19 DariusIII
 	* Chg: Replace $this->colorcli with ColorCLI:: in Groups class

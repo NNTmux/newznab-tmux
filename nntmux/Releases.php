@@ -799,34 +799,14 @@ class Releases
 	 * @param int $limit
 	 * @param string|array $orderBy
 	 * @param int $maxAge
-	 * @param integer[] $excludedCats
+	 * @param integer|array $excludedCats
 	 * @param string $type
 	 * @param array $cat
 	 *
 	 * @param int $minSize
 	 * @return array
 	 */
-	public function search(
-		$searchName,
-		$usenetName,
-		$posterName,
-		$fileName,
-		$groupName,
-		$sizeFrom,
-		$sizeTo,
-		$hasNfo,
-		$hasComments,
-		$daysNew,
-		$daysOld,
-		$offset = 0,
-		$limit = 1000,
-		$orderBy = '',
-		$maxAge = -1,
-		$excludedCats = [],
-		$type = 'basic',
-		$cat = [-1],
-		$minSize = 0
-	) {
+	public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, $excludedCats = [], $type = 'basic', $cat = [-1], $minSize = 0) {
 		$sizeRange = [
 			1 => 1,
 			2 => 2.5,
