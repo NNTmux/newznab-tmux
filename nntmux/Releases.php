@@ -239,7 +239,7 @@ class Releases
 			$this->category->getCategorySearch($cat),
 			($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL ' . $maxAge . ' DAY ') : ''),
 			(count($excludedCats) ? (' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')') : ''),
-			($groupName !== -1 ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
+			((int)$groupName !== -1 ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
 			($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
 			$orderBy[0],
 			$orderBy[1],
