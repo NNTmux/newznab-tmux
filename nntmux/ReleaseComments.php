@@ -124,8 +124,7 @@ class ReleaseComments
 	public function deleteCommentsForRelease($id): void
 	{
 		$res = $this->getCommentById($id);
-		if ($res)
-		{
+		if ($res) {
 			$this->pdo->queryExec(sprintf('DELETE rc.* FROM release_comments rc JOIN releases r ON r.gid = rc.gid WHERE r.id = %d', $id));
 			$this->updateReleaseCommentCount($res['gid']);
 		}
@@ -139,11 +138,9 @@ class ReleaseComments
 	public function deleteCommentsForUser($id): void
 	{
 		$numcomments = $this->getCommentCountForUser($id);
-		if ($numcomments > 0)
-		{
+		if ($numcomments > 0) {
 			$comments = $this->getCommentsForUserRange($id, 0, $numcomments);
-			foreach ($comments as $comment)
-			{
+			foreach ($comments as $comment) {
 				$this->deleteComment($comment['id']);
 				$this->updateReleaseCommentCount($comment['gid']);
 			}
