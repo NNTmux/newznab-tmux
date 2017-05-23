@@ -10,6 +10,7 @@ use nntmux\db\DB;
  */
 class DnzbFailures
 {
+	const FAILED = 1;
 	/**
 	 * @var DB
 	 */
@@ -59,6 +60,8 @@ class DnzbFailures
 
 	/**
 	 * Get a count of failed releases for pager. used in admin manage failed releases list
+	 *
+	 * @return mixed
 	 */
 	public function getCount()
 	{
@@ -77,7 +80,7 @@ class DnzbFailures
 	 *
 	 * @return array
 	 */
-	public function getFailedRange($start, $num)
+	public function getFailedRange($start, $num): array
 	{
 		if ($start === false) {
 			$limit = '';
@@ -102,7 +105,7 @@ class DnzbFailures
 	 * @param string $userid
 	 * @return string
 	 */
-	public function getAlternate($guid, $userid)
+	public function getAlternate($guid, $userid): string
 	{
 		$rel = $this->pdo->queryOneRow(
 			sprintf('
@@ -120,9 +123,10 @@ class DnzbFailures
 		$insert = $this->pdo->queryInsert(
 			sprintf('
 				INSERT IGNORE INTO dnzb_failures (release_id, users_id, failed)
-				VALUES (%d, %d, 1)',
+				VALUES (%d, %d, %d)',
 				$rel['id'],
-				$userid
+				$userid,
+				self::FAILED
 			)
 		);
 
@@ -151,7 +155,7 @@ class DnzbFailures
 	}
 
 	/**
-	 * @note  Post comment for the release if that release has no comment for failure.
+	 *        Post comment for the release if that release has no comment for failure.
 	 *        Only one user is allowed to post comment for that release, rest will just
 	 *        update the failed count in dnzb_failures table
 	 *
@@ -159,7 +163,7 @@ class DnzbFailures
 	 * @param $gid
 	 * @param $uid
 	 */
-	public function postComment($relid, $gid, $uid)
+	public function postComment($relid, $gid, $uid): void
 	{
 		$dupe = 0;
 		$text = 'This release has failed to download properly. It might fail for other users too.
