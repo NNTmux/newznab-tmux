@@ -16,7 +16,7 @@ if (isset($_REQUEST['t'])) {
 
 $grp = -1;
 if (isset($_REQUEST['g'])) {
-	$grp = $_REQUEST['g'];
+	$grp = is_numeric($_REQUEST['g']) ? -1 : $_REQUEST['g'];
 }
 
 $catarray = [];
@@ -26,9 +26,8 @@ $page->smarty->assign('category', $category);
 
 $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
 $ordering = $releases->getBrowseOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST['ob'] : '';
+$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
 
-$results = [];
 $results = $releases->getBrowseRange($catarray, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata['categoryexclusions'], $grp);
 
 if(isset($results[0]['_totalcount'])) {
@@ -49,30 +48,30 @@ $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
 $covgroup = '';
-if ($category === -1 && $grp === -1) {
+if ($category === -1 && (int)$grp === -1) {
 	$page->smarty->assign('catname', 'All');
-} elseif ($category !== -1 && $grp === -1) {
+} elseif ((int)$category !== -1 && (int)$grp === -1) {
 	$cat = new Category(['Settings' => $releases->pdo]);
 	$cdata = $cat->getById($category);
 	if ($cdata) {
 		$page->smarty->assign('catname', $cdata['title']);
-		if ($cdata['parentid'] == Category::GAME_ROOT || $cdata['id'] == Category::GAME_ROOT) {
+		if ($cdata['parentid'] === Category::GAME_ROOT || $cdata['id'] === Category::GAME_ROOT) {
 			$covgroup = 'console';
-		} elseif ($cdata['parentid'] == Category::MOVIE_ROOT || $cdata['id'] == Category::MOVIE_ROOT) {
+		} elseif ($cdata['parentid'] === Category::MOVIE_ROOT || $cdata['id'] === Category::MOVIE_ROOT) {
 			$covgroup = 'movies';
-		} elseif ($cdata['parentid'] == Category::XXX_ROOT || $cdata['id'] == Category::XXX_ROOT) {
+		} elseif ($cdata['parentid'] === Category::XXX_ROOT || $cdata['id'] === Category::XXX_ROOT) {
 			$covgroup = 'xxx';
-		} elseif ($cdata['parentid'] == Category::PC_ROOT || $cdata['id'] == Category::PC_GAMES) {
+		} elseif ($cdata['parentid'] === Category::PC_ROOT || $cdata['id'] === Category::PC_GAMES) {
 			$covgroup = 'games';
-		} elseif ($cdata['parentid'] == Category::MUSIC_ROOT || $cdata['id'] == Category::MUSIC_ROOT) {
+		} elseif ($cdata['parentid'] === Category::MUSIC_ROOT || $cdata['id'] === Category::MUSIC_ROOT) {
 			$covgroup = 'music';
-		} elseif ($cdata['parentid'] == Category::BOOKS_ROOT || $cdata['id'] == Category::BOOKS_ROOT) {
+		} elseif ($cdata['parentid'] === Category::BOOKS_ROOT || $cdata['id'] === Category::BOOKS_ROOT) {
 			$covgroup = 'books';
 		}
 	} else {
 		$page->show404();
 	}
-} elseif ($grp !== -1) {
+} elseif ((int)$grp !== -1) {
 	$page->smarty->assign('catname', $grp);
 }
 
