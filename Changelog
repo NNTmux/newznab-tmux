@@ -1,4 +1,5 @@
 2017-05-24 DariusIII
+	* Fix: Fix return type declaration in ReleaseCleaner generic_town function
 	* Chg: Update removing of executable crap files
 	* Chg: Change return values and logic for starting and stopping tmux scripts
 	* Fix: Fix user creation in admin area
