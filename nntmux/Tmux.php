@@ -585,33 +585,39 @@ class Tmux
 		if ($running === false) {
 			throw new \RuntimeException('Tmux\\\'s running flag was not found in the database.' . PHP_EOL . 'Please check the tables are correctly setup.' . PHP_EOL);
 		}
-		return ($running === 1);
+		if ((int)$running === 0) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
 	 * Check if Tmux is running, if it is, stop it.
 	 *
 	 * @return bool true if scripts were running, false otherwise.
+	 * @throws \RuntimeException
 	 * @access public
 	 */
 	public function stopIfRunning(): bool
 	{
-		if ($this->isRunning() === 1) {
+		if ($this->isRunning() === true) {
 			$this->pdo->queryExec("UPDATE tmux SET value = 0 WHERE setting = 'running'");
 			$sleep = $this->get()->monitor_delay;
 			echo ColorCLI::header('Stopping tmux scripts and waiting ' . $sleep . ' seconds for all panes to shutdown');
 			sleep($sleep);
 			return true;
 		}
+		ColorCLI::doEcho(ColorCLI::info('Tmux scripts are not running!'));
 		return false;
 	}
 
 	/**
 	 * @return bool|\PDOStatement
+	 * @throws \RuntimeException
 	 */
 	public function startRunning()
 	{
-		if (!$this->isRunning()) {
+		if ($this->isRunning() === false) {
 			return $this->pdo->queryExec("UPDATE tmux SET value = 1 WHERE setting = 'running'");
 		}
 		return true;

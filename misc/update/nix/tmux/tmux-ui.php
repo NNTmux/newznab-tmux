@@ -29,15 +29,15 @@ Start or stop the processing of tmux scripts. This is functionally equivalent to
 'tmux running' setting in admin.
 HELP_TEXT;
 
-if ($argc == 1) {
+if ($argc === 1) {
 	exit($message);
 }
 
-if (in_array($argv[1], $start)) {
+if (in_array($argv[1], $start, false)) {
 	passthru('php start.php');
-} else if (in_array($argv[1], $stop)) {
+} else if (in_array($argv[1], $stop, false)) {
 	passthru('php stop.php');
 } else {
-	echo "Unrecognised command '{$argv[1]}''\n";
+	echo 'Unrecognised command '. $argv[1] . PHP_EOL;
 	exit($message);
 }
