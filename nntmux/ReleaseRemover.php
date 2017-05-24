@@ -111,6 +111,7 @@ class ReleaseRemover
 	 * Construct.
 	 *
 	 * @param array $options Class instances / various options.
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -285,6 +286,9 @@ class ReleaseRemover
 			case 'huge':
 				$this->removeHuge();
 				break;
+			case 'nzb':
+				$this->removeSingleNZB();
+				break;
 			case 'codec':
 				$this->removeCodecPoster();
 				break;
@@ -304,6 +308,7 @@ class ReleaseRemover
 				$this->removeShort();
 				$this->removeSize();
 				$this->removeHuge();
+				$this->removeSingleNZB();
 				$this->removeCodecPoster();
 				break;
 			default:
@@ -587,6 +592,31 @@ class ReleaseRemover
 			FROM releases r
 			WHERE r.totalpart = 1
 			AND r.size > 209715200 %s',
+			$this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
+	}
+
+	/**
+	 * Remove releases that are just a single nzb file.
+	 *
+	 * @return boolean|string
+	 */
+	protected function removeSingleNZB()
+	{
+		$this->method = '.nzb';
+		$this->query = sprintf(
+			'SELECT r.guid, r.searchname, r.id
+			FROM releases r
+			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			WHERE r.totalpart = 1
+			AND rf.name %s %s',
+			$this->pdo->likeString('.nzb', true, false),
 			$this->crapTime
 		);
 

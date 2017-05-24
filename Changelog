@@ -1,4 +1,5 @@
 2017-05-24 DariusIII
+	* Chg: Update crap removal with option to remove releases containing single nzb file
 	* Fix: Fix return type declaration in ReleaseCleaner generic_town function
 	* Chg: Update removing of executable crap files
 	* Chg: Change return values and logic for starting and stopping tmux scripts
