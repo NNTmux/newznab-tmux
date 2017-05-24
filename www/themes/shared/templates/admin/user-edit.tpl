@@ -30,6 +30,12 @@
                     {/if}
                 </td>
             </tr>
+            <tr>
+                <td><label for="role">Role:</label></td>
+                <td>
+                    {html_radios id="role" name='role' values=$role_ids output=$role_names selected=$user.role separator='<br />'}
+                </td>
+            </tr>
             {if !empty($user.id)}
                 <tr>
                     <td>Grabs:</td>
@@ -46,25 +52,25 @@
             <tr>
                 <td>Movie View:</td>
                 <td>
-                    <input name="movieview" type="checkbox" value="1" {if $user.movieview=="1"}checked="checked"{/if}" />
+                    <input name="movieview" type="checkbox" value=1 {if $user.movieview==1}checked="checked"{/if}" />
                 </td>
             </tr>
             <tr>
                 <td>XXX View:</td>
                 <td>
-                    <input name="xxxview" type="checkbox" value="1" {if $user.xxxview=="1"}checked="checked"{/if}" />
+                    <input name="xxxview" type="checkbox" value=1 {if $user.xxxview==1}checked="checked"{/if}" />
                 </td>
             </tr>
             <tr>
                 <td>Music View:</td>
                 <td>
-                    <input name="musicview" type="checkbox" value="1" {if $user.musicview=="1"}checked="checked"{/if}" />
+                    <input name="musicview" type="checkbox" value=1 {if $user.musicview==1}checked="checked"{/if}" />
                 </td>
             </tr>
             <tr>
                 <td>Console View:</td>
                 <td>
-                    <input name="consoleview" type="checkbox" value="1" {if $user.consoleview=="1"}checked="checked"{/if}" />
+                    <input name="consoleview" type="checkbox" value=1 {if $user.consoleview==1}checked="checked"{/if}" />
                 </td>
             </tr>
             <tr>
@@ -72,20 +78,14 @@
                 <td>
                     <input name="gameview"
                            type="checkbox"
-                           value="1"
-                           {if $user.gameview=="1"}checked="checked"{/if}" />
+                           value=1
+                           {if $user.gameview==1}checked="checked"{/if}" />
                 </td>
             </tr>
             <tr>
                 <td>Book View:</td>
                 <td>
-                    <input name="bookview" type="checkbox" value="1" {if $user.bookview=="1"}checked="checked"{/if}" />
-                </td>
-            </tr>
-            <tr>
-                <td><label for="role">Role:</label></td>
-                <td>
-                    {html_radios id="role" name='role' values=$role_ids output=$role_names selected=$user.role separator='<br />'}
+                    <input name="bookview" type="checkbox" value=1 {if $user.bookview==1}checked="checked"{/if}" />
                 </td>
             </tr>
             <tr>
@@ -94,18 +94,18 @@
                     <input name="rolechangedate" class="form-control" type="text" style="width: 20%" data-provide="datepicker" data-date-format="yyyy-mm-dd" data-date-autoclose="true" data-date-today-highlight="true" data-date-clear-btn="true" value="{$user.rolechangedate}"/>
                 </td>
             </tr>
+            {/if}
             <tr>
                 <td><label for="notes">Notes:</label></td>
                 <td>
                     <input id="notes" name='notes' type="text" value="{$user.notes|escape:htmlall}" />
                 </td>
             </tr>
-            {/if}
             <tr>
                 <td></td>
                 <td>
                     <input class="btn btn-primary" type="submit" value="Save" />
-                    {if !empty($user.id) && $user.role!="2"}<a class="confirm_action btn btn-danger" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">Delete user</a>{/if}
+                    {if !empty($user.id) && $user.role!=2}<a class="confirm_action btn btn-danger" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">Delete user</a>{/if}
                 </td>
             </tr>
         </table>
