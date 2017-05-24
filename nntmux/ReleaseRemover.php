@@ -423,15 +423,12 @@ class ReleaseRemover
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			INNER JOIN release_search_data rs on rs.releases_id = r.id
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name %s
-			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d) %s',
+			AND r.categories_id NOT IN (%d, %d, %d, %d) %s',
 			$this->pdo->likeString('.exe', true, false),
 			Category::PC_0DAY,
 			Category::PC_GAMES,
-			Category::PC_ISO,
-			Category::PC_MAC,
 			Category::OTHER_MISC,
 			Category::OTHER_HASHED,
 			$this->crapTime

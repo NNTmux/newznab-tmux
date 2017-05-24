@@ -1,6 +1,7 @@
 2017-05-24 DariusIII
+	* Chg: Update removing of executable crap files
 	* Chg: Change return values and logic for starting and stopping tmux scripts
-	*  Fix: Fix user creation in admin area
+	* Fix: Fix user creation in admin area
 2017-05-23 DariusIII
 	* Chg: Update ReleaseComments and comments-list
 	* Chg: Update DNZBFailures class
