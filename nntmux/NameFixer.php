@@ -805,7 +805,7 @@ class NameFixer
 
 					echo
 						ColorCLI::headerOver(PHP_EOL . 'New name:  ') .
-						ColorCLI::primary(substr($newName, 0, 255)) .
+						ColorCLI::primary(substr($newName, 0, 299)) .
 						ColorCLI::headerOver('Old name:  ') .
 						ColorCLI::primary($release['searchname']) .
 						ColorCLI::headerOver('Use name:  ') .
@@ -831,7 +831,7 @@ class NameFixer
 					}
 				}
 
-				$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
+				$newTitle = $this->pdo->escapeString(substr($newName, 0, 299));
 
 				if ($echo === true) {
 					if ($nameStatus === 1) {
@@ -883,7 +883,7 @@ class NameFixer
 						);
 						$this->sphinx->updateRelease($release['releases_id'], $this->pdo);
 					} else {
-						$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
+						$newTitle = $this->pdo->escapeString(substr($newName, 0, 299));
 						$this->pdo->queryExec(
 							sprintf('
 								UPDATE releases

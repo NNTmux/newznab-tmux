@@ -1,3 +1,5 @@
+2017-05-25 DariusIII
+	* Chg: Increase character limit to 299 in NameFixer class
 2017-05-24 DariusIII
 	* Chg: Update crap removal with option to remove releases containing single nzb file
 	* Fix: Fix return type declaration in ReleaseCleaner generic_town function
