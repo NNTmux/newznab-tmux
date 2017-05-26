@@ -103,9 +103,11 @@ class ReleaseImage
 					} else {
 						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
 					}
+					return false;
 				}
 			} catch (\RuntimeException $e) {
 				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
+				return false;
 			}
 
 		} else if (is_file($imgLoc)) {

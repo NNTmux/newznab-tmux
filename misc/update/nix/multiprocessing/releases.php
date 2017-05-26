@@ -1,6 +1,6 @@
 <?php
 declare(ticks=1);
-require __DIR__ . DIRECTORY_SEPARATOR . '.do_not_run/require.php';
+require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\libraries\Forking;
 

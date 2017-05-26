@@ -236,9 +236,9 @@ class ReleaseCleaning
 	}
 
 	/**
-	 * @return array
+	 * @return array|string
 	 */
-	public function generic_town(): array
+	public function generic_town()
 	{
 		//<TOWN><www.town.ag > <download all our files with>>> www.ssl-news.info <<< > [05/87] - "Deep.Black.Ass.5.XXX.1080p.WEBRip.x264-TBP.part03.rar" - 7,87 GB yEnc
 		//<TOWN><www.town.ag > <partner of www.ssl-news.info > [02/24] - "Dragons.Den.UK.S11E02.HDTV.x264-ANGELiC.nfo" - 288,96 MB yEnc

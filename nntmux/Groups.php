@@ -180,7 +180,7 @@ class Groups
 	 *
 	 * @param string $name The group name.
 	 *
-	 * @return string Empty string on failure, groups_id on success.
+	 * @return string|int Empty string on failure, groups_id on success.
 	 */
 	public function getIDByName($name)
 	{
@@ -643,8 +643,8 @@ class Groups
 	public function disableIfNotExist($id)
 	{
 		$this->updateGroupStatus($id, 'active', 0);
-		$this->colorCLI->doEcho(
-			$this->colorCLI->error(
+		ColorCLI::doEcho(
+			ColorCLI::error(
 				'Group does not exist on server, disabling'
 			)
 		);

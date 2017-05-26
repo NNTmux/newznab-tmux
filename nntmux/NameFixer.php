@@ -21,8 +21,10 @@ class NameFixer
 	const PROC_PAR2_DONE = 1;
 	const PROC_UID_NONE = 0;
 	const PROC_UID_DONE = 1;
-	const PROC_HASH_NONE = 0;
-	const PROC_HASH_DONE = 1;
+	const PROC_HASH16K_NONE = 0;
+	const PROC_HASH16K_DONE = 1;
+	const PROC_SRR_NONE = 0;
+	const PROC_SRR_DONE = 1;
 
 	// Constants for overall rename status
 	const IS_RENAMED_NONE = 0;
@@ -205,6 +207,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id = %d)
+					AND rel.predb_id = 0
 					AND rel.proc_nfo = %d',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
@@ -241,7 +244,7 @@ class NameFixer
 						continue;
 					}
 
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->checkName($releaseRow, $echo, $type, $nameStatus, $show, $preId);
 					$this->_echoRenamed($show);
 				}
@@ -286,6 +289,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN(%d, %d))
+					AND rel.predb_id = 0
 					AND proc_files = %d',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
@@ -303,7 +307,7 @@ class NameFixer
 				echo ColorCLI::primary(number_format($total) . ' file names to process.');
 
 				foreach ($releases as $release) {
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->checkName($release, $echo, $type, $nameStatus, $show, $preId);
 					$this->checked++;
 					$this->_echoRenamed($show);
@@ -348,6 +352,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
+					AND rel.predb_id = 0
 					AND rf.name %s',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
@@ -365,7 +370,7 @@ class NameFixer
 				echo ColorCLI::primary(number_format($total) . ' xxx file names to process.');
 
 				foreach ($releases as $release) {
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->xxxNameCheck($release, $echo, $type, $nameStatus, $show);
 					$this->checked++;
 					$this->_echoRenamed($show);
@@ -388,8 +393,8 @@ class NameFixer
 	 */
 	public function fixNamesWithSrr($time, $echo, $cats, $nameStatus, $show): void
 	{
-		$this->_echoStartMessage($time, 'file names');
-		$type = 'Filenames, ';
+		$this->_echoStartMessage($time, 'SRR file names');
+		$type = 'SRR, ';
 
 		if ($cats === 3) {
 			$query = sprintf('
@@ -409,11 +414,14 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_files rf ON (rf.releases_id = rel.id)
 					WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-					AND rf.name %s',
+					AND rel.predb_id = 0
+					AND rf.name %s
+					AND rel.proc_srr = %d',
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
 				Category::OTHER_HASHED,
-				$this->pdo->likeString('.srr', true, false)
+				$this->pdo->likeString('.srr', true, false),
+				self::PROC_SRR_NONE
 			);
 		}
 
@@ -426,7 +434,7 @@ class NameFixer
 				echo ColorCLI::primary(number_format($total) . ' srr file extensions to process.');
 
 				foreach ($releases as $release) {
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->srrNameCheck($release, $echo, $type, $nameStatus, $show);
 					$this->checked++;
 					$this->_echoRenamed($show);
@@ -466,6 +474,7 @@ class NameFixer
 					SELECT rel.id AS releases_id, rel.guid, rel.groups_id, rel.fromname
 					FROM releases rel
 					WHERE rel.isrenamed = %d
+					AND rel.predb_id = 0
 					AND rel.proc_par2 = %d',
 				self::IS_RENAMED_NONE,
 				self::PROC_PAR2_NONE
@@ -549,6 +558,7 @@ class NameFixer
 				WHERE ru.releases_id IS NOT NULL
 				AND rel.nzbstatus = %d
 				AND rel.isrenamed = %d
+				AND rel.predb_id = 0
 				AND rel.categories_id IN (%d, %d)
 				AND rel.proc_uid = %d',
 				NZB::NZB_ADDED,
@@ -567,7 +577,7 @@ class NameFixer
 				echo ColorCLI::primary(number_format($total) . ' unique ids to process.');
 				foreach ($releases as $rel) {
 					$this->checked++;
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->uidCheck($rel, $echo, $type, $nameStatus, $show);
 					$this->_echoRenamed($show);
 				}
@@ -601,8 +611,7 @@ class NameFixer
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
 					ph.hash AS hash
 				FROM releases rel
-				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
-				WHERE ph.releases_id IS NOT NULL
+				STRAIGHT_JOIN par_hashes ph ON ph.releases_id = rel.id
 				AND rel.nzbstatus = %d
 				AND rel.predb_id = 0',
 				NZB::NZB_ADDED
@@ -616,21 +625,22 @@ class NameFixer
 					rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
 					ph.hash AS hash
 				FROM releases rel
-				LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
-				WHERE ph.releases_id IS NOT NULL
+				STRAIGHT_JOIN par_hashes ph ON ph.releases_id = rel.id
 				AND rel.nzbstatus = %d
 				AND rel.isrenamed = %d
 				AND rel.categories_id IN (%d, %d)
-				AND rel.proc_par2 = %d',
+				AND rel.predb_id = 0
+				AND rel.proc_hash16k = %d',
 				NZB::NZB_ADDED,
 				self::IS_RENAMED_NONE,
 				Category::OTHER_MISC,
 				Category::OTHER_HASHED,
-				self::PROC_PAR2_NONE
+				self::PROC_HASH16K_NONE
 			);
 		}
 
 		$releases = $this->_getReleases($time, $cats, $query);
+
 		if ($releases instanceof \Traversable) {
 			$total = $releases->rowCount();
 			if ($total > 0) {
@@ -638,7 +648,7 @@ class NameFixer
 				echo ColorCLI::primary(number_format($total) . ' hash_16K to process.');
 				foreach ($releases as $rel) {
 					$this->checked++;
-					$this->done = $this->matched = false;
+					$this->reset();
 					$this->hashCheck($rel, $echo, $type, $nameStatus, $show);
 					$this->_echoRenamed($show);
 				}
@@ -667,15 +677,15 @@ class NameFixer
 			echo ColorCLI::header($query . $this->timeother . $queryLimit . ";\n");
 			$releases = $this->pdo->queryDirect($query . $this->timeother . $queryLimit);
 		} // 24 hours, all cats
-		else if ($time === 1 && $cats === 2) {
+		if ($time === 1 && $cats === 2) {
 			echo ColorCLI::header($query . $this->timeall . $queryLimit . ";\n");
 			$releases = $this->pdo->queryDirect($query . $this->timeall . $queryLimit);
 		} //other cats
-		else if ($time === 2 && $cats === 1) {
+		if ($time === 2 && $cats === 1) {
 			echo ColorCLI::header($query . $this->fullother . $queryLimit . ";\n");
 			$releases = $this->pdo->queryDirect($query . $this->fullother . $queryLimit);
 		} // all cats
-		else if ($time === 2 && $cats === 2) {
+		if ($time === 2 && $cats === 2) {
 			echo ColorCLI::header($query . $this->fullall . $queryLimit . ";\n");
 			$releases = $this->pdo->queryDirect($query . $this->fullall . $queryLimit);
 		}
@@ -795,7 +805,7 @@ class NameFixer
 
 					echo
 						ColorCLI::headerOver(PHP_EOL . 'New name:  ') .
-						ColorCLI::primary(substr($newName, 0, 255)) .
+						ColorCLI::primary(substr($newName, 0, 299)) .
 						ColorCLI::headerOver('Old name:  ') .
 						ColorCLI::primary($release['searchname']) .
 						ColorCLI::headerOver('Use name:  ') .
@@ -821,7 +831,7 @@ class NameFixer
 					}
 				}
 
-				$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
+				$newTitle = $this->pdo->escapeString(substr($newName, 0, 299));
 
 				if ($echo === true) {
 					if ($nameStatus === 1) {
@@ -850,6 +860,12 @@ class NameFixer
 							case 'UID, ':
 								$status = 'isrenamed = 1, iscategorized = 1, proc_uid = 1,';
 								break;
+							case 'PAR2 hash, ':
+								$status = 'isrenamed = 1, iscategorized = 1, proc_hash16k = 1,';
+								break;
+							case 'SRR, ':
+								$status = 'isrenamed = 1, iscategorized = 1, proc_srr = 1,';
+								break;
 						}
 						$this->pdo->queryExec(
 							sprintf('
@@ -867,7 +883,7 @@ class NameFixer
 						);
 						$this->sphinx->updateRelease($release['releases_id'], $this->pdo);
 					} else {
-						$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
+						$newTitle = $this->pdo->escapeString(substr($newName, 0, 299));
 						$this->pdo->queryExec(
 							sprintf('
 								UPDATE releases
@@ -1291,6 +1307,9 @@ class NameFixer
 				case 'UID, ':
 					$this->uidCheck($release, $echo, $type, $namestatus, $show);
 					break;
+				case 'SRR, ':
+					$this->srrNameCheck($release, $echo, $type, $namestatus, $show);
+					break;
 				case 'NFO, ':
 					$this->nfoCheckTV($release, $echo, $type, $namestatus, $show);
 					$this->nfoCheckMov($release, $echo, $type, $namestatus, $show);
@@ -1318,8 +1337,13 @@ class NameFixer
 						$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releases_id']);
 						break;
 					case 'PAR2, ':
+						$this->_updateSingleColumn('proc_par2', self::PROC_PAR2_DONE, $release['releases_id']);
+						break;
 					case 'PAR2 hash, ':
-						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releases_id']);
+						$this->_updateSingleColumn('proc_hash16k', self::PROC_HASH16K_DONE, $release['releases_id']);
+						break;
+					case 'SRR, ':
+						$this->_updateSingleColumn('proc_srr', self::PROC_SRR_DONE, $release['releases_id']);
 						break;
 					case 'UID, ':
 						$this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
@@ -1907,7 +1931,7 @@ class NameFixer
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
 				FROM releases r
 				LEFT JOIN release_unique ru ON ru.releases_id = r.id
-				WHERE ru.releases_id IS NOT NULL 
+				WHERE ru.releases_id IS NOT NULL
 				AND ru.uniqueid = UNHEX({$this->pdo->escapeString($release['uid'])})
 				AND ru.releases_id != {$release['releases_id']}
 				AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = 'nonscene@Ef.net (EF)')"
@@ -2030,7 +2054,7 @@ class NameFixer
 				}
 			}
 		}
-		$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releases_id']);
+		$this->_updateSingleColumn('proc_srr', self::PROC_SRR_DONE, $release['releases_id']);
 		return false;
 	}
 
@@ -2050,8 +2074,8 @@ class NameFixer
 		if ($this->done === false && $this->relid !== (int)$release['releases_id']) {
 			$result = $this->pdo->queryDirect("
 				SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
-				FROM par_hashes ph
-				STRAIGHT_JOIN releases r ON ph.releases_id = r.id
+				FROM releases r
+				STRAIGHT_JOIN par_hashes ph ON ph.releases_id = r.id
 				WHERE ph.hash = {$this->pdo->escapeString($release['hash'])}
 				AND ph.releases_id != {$release['releases_id']}
 				AND (r.predb_id > 0 OR r.anidbid > 0)"
@@ -2076,7 +2100,7 @@ class NameFixer
 				}
 			}
 		}
-		$this->_updateSingleColumn('proc_par2', self::PROC_PAR2_DONE, $release['releases_id']);
+		$this->_updateSingleColumn('proc_hash16k', self::PROC_HASH16K_DONE, $release['releases_id']);
 		return false;
 	}
 

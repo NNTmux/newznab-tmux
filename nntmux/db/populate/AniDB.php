@@ -132,7 +132,10 @@ class AniDB
 	/**
 	 * Retrieves supplemental anime info from the AniDB API
 	 *
+	 * @param $anidbId
+	 *
 	 * @return array|bool
+	 * @throws \Exception
 	 */
 	private function getAniDbAPI($anidbId)
 	{
@@ -358,7 +361,7 @@ class AniDB
 	/**
 	 *  Grabs AniDB Full Dump XML and inserts it into anidb table
 	 */
-	private function populateMainTable(): void
+	private function populateMainTable()
 	{
 		$lastUpdate = (new \DateTime)->setTimestamp($this->lastUpdate);
 		$current = new \DateTime();
@@ -420,13 +423,15 @@ class AniDB
 	 * Directs flow for populating the AniDB Info/Episodes table
 	 *
 	 * @param string $anidbId
+	 *
+	 * @throws \Exception
 	 */
-	private function populateInfoTable($anidbId = ''): void
+	private function populateInfoTable($anidbId = '')
 	{
 		if (empty($anidbId)) {
 			$anidbIds = $this->pdo->query(sprintf(
-				'SELECT DISTINCT at.anidbid 
-					FROM anidb_titles at 
+				'SELECT DISTINCT at.anidbid
+					FROM anidb_titles at
 					LEFT JOIN anidb_info ai ON ai.anidbid = at.anidbid
                     WHERE ai.updated IS NULL'
 				)

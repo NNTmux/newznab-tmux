@@ -3,11 +3,16 @@ build:
         # Overwrites inferred commands
         override:
           - 'composer install --no-interaction --prefer-source --no-scripts --ignore-platform-reqs'
+        before:
+          - cp .env.scrutinizer .env
+          - mysql -u root -e "CREATE DATABASE TEST;"
+          - mysql -u root TEST < resources/db/schema/mysql-ddl.sql
+          - mysql --local-infile=1 -u root -e "LOAD DATA LOCAL INFILE 'resources/db/schema/data/10-settings.tsv' IGNORE INTO TABLE TEST.settings FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\'' LINES TERMINATED BY '\n' IGNORE 1 LINES (section,subsection,name,value,hint,setting);"
 
     environment:
         memcached:            true
         php:
-            version: 7.0.8
+            version: '7.1'
             ini:
                 memory_limit:     "4096M"
 checks:
@@ -85,3 +90,5 @@ coding_style:
 
 filter:
     excluded_paths: [app/libraries/*, libraries/*, libs/*, resources/*]
+tools:
+    sensiolabs_security_checker: true

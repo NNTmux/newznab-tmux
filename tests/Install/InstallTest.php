@@ -12,12 +12,9 @@
  */
 
 namespace tests;
-if (!defined('NN_INSTALLER')) {
-	define('NN_INSTALLER', true);
-}
 
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
-include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+include_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
 
 use app\extensions\util\Versions;
 use nntmux\config\Configure;
@@ -31,14 +28,21 @@ use nntmux\Users;
  *
  * @package tests
  */
-class InstallTest extends \PHPUnit_Framework_TestCase
+class InstallTest extends \PHPUnit\Framework\TestCase
 {
 	/**
-	 * @test
+	 * @var Configure
 	 */
-	public function Install()
+	public $config;
+
+
+	public function testFullInstall()
 	{
-		$config = new Configure('install');
+		if (!defined('NN_INSTALLER')) {
+			define('NN_INSTALLER', true);
+		}
+
+		$this->config = new Configure('install');
 
 		$pdo = new DB();
 		$error = false;
@@ -48,7 +52,7 @@ class InstallTest extends \PHPUnit_Framework_TestCase
 			exit();
 		}
 
-// Check if user selected right DB type.
+		// Check if user selected right DB type.
 		if (getenv('DB_SYSTEM') !== 'mysql') {
 			ColorCLI::doEcho(ColorCLI::error('Invalid database system. Must be: mysql ; Not: ' . getenv('DB_SYSTEM')));
 			$error = true;

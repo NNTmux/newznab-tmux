@@ -21,7 +21,6 @@ notifications:
       - "\x030[\x0310Travis-ci\x030]\x03 Commit \x0314{%{commit}}\x03 by \x0315(%{author})\x03@\x0313%{repository_name}/%{branch}\x03 has \x037%{result}\x03: \x032%{build_url}\x03"
 
 php:
-  - '7.0'
   - '7.1'
 
 addons:
@@ -39,10 +38,12 @@ install:
     - composer install --prefer-dist
 
 before_script:
-     - curl -O https://raw.githubusercontent.com/NNTmux/travis-ci/master/cat_logs.sh
-     # Create mysql user.
-     - mysql -u root -e "GRANT ALL ON TEST.* TO 'NNTMUX'@'localhost' IDENTIFIED BY 'NNTMUX';"
-     - mysql -u root -e "GRANT FILE ON *.* TO 'NNTMUX'@'localhost';"
+     # Create mysql database and user.
+     - mysql -u root -e "CREATE DATABASE TEST;"
+     - mysql -u root -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"
+     - mysql -u root -e "GRANT FILE ON *.* TO 'TEST'@'localhost';"
+     - mysql -u TEST -pTEST TEST < resources/db/schema/mysql-ddl.sql
+     - mysql -u TEST -pTEST -e "LOAD DATA LOCAL INFILE 'resources/db/schema/data/10-settings.tsv' IGNORE INTO TABLE TEST.settings FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\'' LINES TERMINATED BY '\n' IGNORE 1 LINES (section,subsection,name,value,hint,setting);"
      # Disable apparmor.
      - if service apparmor status; then service apparmor stop; update-rc.d -f apparmor remove; service apparmor teardown; fi
      # Change MySQL settings.
@@ -52,31 +53,8 @@ before_script:
      - echo 'memory_limit = 1024M' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
      # Set permissions, can't use newgrp with travis so we need to do it this way.
      - sudo chmod -R 777 /home/travis/
-     # Configure NNTmux settings.
-     - cp nntmux/config/settings.example.php nntmux/config/settings.php
-     - sed -i "s/'NN_DEBUG', false/'NN_DEBUG', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGGING', false/'NN_LOGGING', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGINFO', false/'NN_LOGINFO', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGNOTICE', false/'NN_LOGNOTICE', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGWARNING', false/'NN_LOGWARNING', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGERROR', false/'NN_LOGERROR', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGFATAL', false/'NN_LOGFATAL', true/" nntmux/config/settings.php
-     - sed -i "s/'NN_LOGQUERIES', false/'NN_LOGQUERIES', true/" nntmux/config/settings.php
-     # Configure mysql environment settings
-     - cp .env.example .env
-     - sed -i 's/DB_USER\ \=/DB_USER\ \=\ NNTMUX/g' .env
-     - sed -i 's/DB_PASSWORD\ \=/DB_PASSWORD\ \=\ NNTMUX/g' .env
-     - sed -i 's/DB_NAME\ \=/DB_NAME\ \=\ TEST/g' .env
-     - sed -i 's/ADMIN_USER\ \=/ADMIN_USER\ \=\ NNTMUX/g' .env
-     - sed -i 's/ADMIN_PASS\ \=/ADMIN_PASS\ \=\ NNTMUX/g' .env
-     - sed -i 's/ADMIN_EMAIL\ \=/ADMIN_EMAIL\ \=\ example@example.com/g' .env
+     # Configure environment settings
+     - cp .env.travis .env
 
 script:
-   phpunit --configuration tests/phpunit.xml
-
-# Get contents of logs regardless of success / failure, this will help us fix potential minor issues.
-after_success:
-   - bash cat_logs.sh
-after_failure:
-   - bash cat_logs.sh
-
+   phpunit

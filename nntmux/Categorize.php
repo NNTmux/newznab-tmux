@@ -405,6 +405,15 @@ class Categorize extends Category
 							break;
 					}
 					break;
+				case $group === 'alt.binaries.hdtv':
+					switch (true) {
+						case $this->isTV():
+						case $this->isMovie():
+							break;
+						default:
+							return false;
+					}
+					break;
 				case $group === 'alt.binaries.inner-sanctum':
 					switch (true) {
 						case $this->isMusic():
@@ -579,7 +588,7 @@ class Categorize extends Category
 //			return false;
 //		}
 
-		if (preg_match('/Daily[-_\.]Show|Nightly News|^\[[a-zA-Z\.\-]+\].*[-_].*\d{1,3}[-_. ]((\[|\()(h264-)?\d{3,4}(p|i)(\]|\))\s?(\[AAC\])?|\[[a-fA-F0-9]{8}\]|(8|10)BIT|hi10p)(\[[a-fA-F0-9]{8}\])?|(\d\d-){2}[12]\d{3}|[12]\d{3}(\.\d\d){2}|\d+x\d+|\.e\d{1,3}\.|s\d{1,3}[-._ ]?[ed]\d{1,3}([ex]\d{1,3}|[-.\w ])|[-._ ](\dx\d\d|C4TV|Complete[-._ ]Season|DSR|(D|H|P|S)DTV|EP[-._ ]?\d{1,3}|S\d{1,3}.+Extras|SUBPACK|Season[-._ ]\d{1,2})([-._ ]|$)|TVRIP|TV[-._ ](19|20)\d\d|TrollHD/i', $this->releaseName)
+		if (preg_match('/Daily[-_\.]Show|Nightly News|^\[[a-zA-Z\.\-]+\].*[-_].*\d{1,3}[-_. ]((\[|\()(h264-)?\d{3,4}(p|i)(\]|\))\s?(\[AAC\])?|\[[a-fA-F0-9]{8}\]|(8|10)BIT|hi10p)(\[[a-fA-F0-9]{8}\])?|(\d\d-){2}[12]\d{3}|[12]\d{3}(\.\d\d){2}|\d+x\d+|\.e\d{1,3}\.|s\d{1,3}[-._ ]?[ed]\d{1,3}([ex]\d{1,3}|[-.\w ])|[-._ ](\dx\d\d|C4TV|Complete[-._ ]Season|DSR|(D|H|P|S)DTV|EP[-._ ]?\d{1,3}|S\d{1,3}.+Extras|SUBPACK|Season[-._ ]\d{1,2})([-._ ]|$)|TVRIP|TV[-._ ](19|20)\d\d|Troll(HD|UHD)/i', $this->releaseName)
 			&& !preg_match('/[-._ ](flac|imageset|mp3|xxx)[-._ ]|[ .]exe$/i', $this->releaseName)) {
 			switch (true) {
 				case $this->isOtherTV():
@@ -729,7 +738,7 @@ class Categorize extends Category
 	 */
 	public function isUHDTV(): bool
 	{
-		if (stripos($this->releaseName, '2160p') !== false) {
+		if (preg_match('/(S\d+).*(2160p).*(Netflix|Amazon).*(TrollUHD|NTb|VLAD)/i', $this->releaseName)) {
 			$this->tmpCat = Category::TV_UHD;
 			return true;
 		}
@@ -880,7 +889,7 @@ class Categorize extends Category
 	 */
 	public function isMovieUHD(): bool
 	{
-		if (stripos($this->releaseName, '2160p')) {
+		if (!preg_match('/(S\d+).*(2160p).*(Netflix|Amazon).*(TrollUHD|NTb|VLAD)/i', $this->releaseName) && preg_match('/2160p/i', $this->releaseName)) {
 			$this->tmpCat = Category::MOVIE_UHD;
 			return true;
 		}

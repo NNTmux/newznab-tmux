@@ -96,7 +96,7 @@ class Console
 		$this->sleeptime = (Settings::value('..amazonsleep') != '') ? Settings::value('..amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'console' . DS;
 		$this->renamed = Settings::value('..lookupgames') == 2 ? 'AND isrenamed = 1' : '';
-		$this->catWhere = 'AND categories_id BETWEEN ' . Category::GAME_ROOT . ' AND ' . Category::GAME_OTHER;
+		$this->catWhere = 'PARTITION (console)';
 
 		$this->failCache =[];
 	}
@@ -761,13 +761,14 @@ class Console
 			sprintf('
 							SELECT searchname, id
 							FROM releases
-							WHERE nzbstatus = %d %s
+							%s
+							WHERE nzbstatus = %d
 							AND consoleinfo_id IS NULL %s
 							ORDER BY postdate DESC
 							LIMIT %d',
+				$this->catWhere,
 				NZB::NZB_ADDED,
 				$this->renamed,
-				$this->catWhere,
 				$this->gameqty
 			)
 		);
@@ -831,11 +832,12 @@ class Console
 				$this->pdo->queryExec(
 					sprintf('
 								UPDATE releases
+								%s
 								SET consoleinfo_id = %d
-								WHERE id = %d %s',
+								WHERE id = %d',
+						$this->catWhere,
 						$gameId,
-						$arr['id'],
-						$this->catWhere
+						$arr['id']
 					)
 				);
 

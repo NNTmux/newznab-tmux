@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "df39295abb752901ff04e1ab001b2dc4",
+    "content-hash": "a9563463542fa483d403d0c08b7b4c59",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -63,16 +63,16 @@
         },
         {
             "name": "aharen/omdbapi",
-            "version": "v2.0.5",
+            "version": "v2.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aharen/OMDbAPI.git",
-                "reference": "80536f44db66a6f7e5491074c20a64651c6244f8"
+                "reference": "7e982afa6645439efff3e87395a7869b8b91bffa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aharen/OMDbAPI/zipball/80536f44db66a6f7e5491074c20a64651c6244f8",
-                "reference": "80536f44db66a6f7e5491074c20a64651c6244f8",
+                "url": "https://api.github.com/repos/aharen/OMDbAPI/zipball/7e982afa6645439efff3e87395a7869b8b91bffa",
+                "reference": "7e982afa6645439efff3e87395a7869b8b91bffa",
                 "shasum": ""
             },
             "require": {
@@ -101,7 +101,7 @@
                 "omdb api",
                 "tv shows"
             ],
-            "time": "2017-02-20T05:40:43+00:00"
+            "time": "2017-05-19T02:39:02+00:00"
         },
         {
             "name": "b3rs3rk/steamfront",
@@ -205,16 +205,16 @@
         },
         {
             "name": "bower-asset/autosize",
-            "version": "3.0.20",
+            "version": "3.0.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jackmoore/autosize.git",
-                "reference": "6c198a8e95c576dd9d5b8b9a1f996963ae1ea15c"
+                "reference": "5284a460d160bd11fda219941b20eb2a82155294"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/6c198a8e95c576dd9d5b8b9a1f996963ae1ea15c",
-                "reference": "6c198a8e95c576dd9d5b8b9a1f996963ae1ea15c",
+                "url": "https://api.github.com/repos/jackmoore/autosize/zipball/5284a460d160bd11fda219941b20eb2a82155294",
+                "reference": "5284a460d160bd11fda219941b20eb2a82155294",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1528,12 +1528,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dborsatto/php-giantbomb.git",
-                "reference": "05e5dbc31cdff29e4ee870f3f3eda73056e2a63a"
+                "reference": "e95553774caf9b6dace6d044710c7e03dee3af43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dborsatto/php-giantbomb/zipball/05e5dbc31cdff29e4ee870f3f3eda73056e2a63a",
-                "reference": "05e5dbc31cdff29e4ee870f3f3eda73056e2a63a",
+                "url": "https://api.github.com/repos/dborsatto/php-giantbomb/zipball/e95553774caf9b6dace6d044710c7e03dee3af43",
+                "reference": "e95553774caf9b6dace6d044710c7e03dee3af43",
                 "shasum": ""
             },
             "require": {
@@ -1562,7 +1562,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-02-04 18:39:42"
+            "time": "2017-05-18 16:20:43"
         },
         {
             "name": "doctrine/annotations",
@@ -2127,12 +2127,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "b517bd912afa5aa1033ce434d7138641fd6c31ab"
+                "reference": "1739e8b94e058421d4da8b66887c52ee523f7d45"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/b517bd912afa5aa1033ce434d7138641fd6c31ab",
-                "reference": "b517bd912afa5aa1033ce434d7138641fd6c31ab",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/1739e8b94e058421d4da8b66887c52ee523f7d45",
+                "reference": "1739e8b94e058421d4da8b66887c52ee523f7d45",
                 "shasum": ""
             },
             "require": {
@@ -2142,7 +2142,7 @@
             },
             "require-dev": {
                 "ext-curl": "*",
-                "phpunit/phpunit": "^4.0",
+                "phpunit/phpunit": "^4.0 || ^5.0",
                 "psr/log": "^1.0"
             },
             "suggest": {
@@ -2184,7 +2184,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2017-04-07 20:03:48"
+            "time": "2017-05-15 08:45:24"
         },
         {
             "name": "guzzlehttp/promises",
@@ -3043,17 +3043,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "1196fb8f4bf78e53204838bbdda6f10547541f12"
+                "reference": "ccffea64be8575eaa7ad09cd16dfeedfa4711607"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/1196fb8f4bf78e53204838bbdda6f10547541f12",
-                "reference": "1196fb8f4bf78e53204838bbdda6f10547541f12",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/ccffea64be8575eaa7ad09cd16dfeedfa4711607",
+                "reference": "ccffea64be8575eaa7ad09cd16dfeedfa4711607",
                 "shasum": ""
             },
             "conflict": {
                 "adodb/adodb-php": "<5.20.6",
-                "amphp/artax": ">=2,<2.0.4|>0.7.1,<1.0.4",
+                "amphp/artax": ">=2,<2.0.6|<1.0.6",
                 "aws/aws-sdk-php": ">=3,<3.2.1",
                 "bugsnag/bugsnag-laravel": ">=2,<2.0.2",
                 "cakephp/cakephp": ">=3,<3.0.15|>=2,<2.4.99|>=2.5,<2.5.99|>=2.6,<2.6.12|>=1.3,<1.3.18|>=2.7,<2.7.6|>=3.1,<3.1.4",
@@ -3073,8 +3073,8 @@
                 "doctrine/mongodb-odm-bundle": ">=2,<3.0.1",
                 "doctrine/orm": ">=2,<2.4.8|>=2.5,<2.5.1",
                 "dompdf/dompdf": ">=0.6,<0.6.2",
-                "drupal/core": ">=8,<8.2.7",
-                "drupal/drupal": ">=8,<8.2.7",
+                "drupal/core": ">=8,<8.2.8|>=8.3,<8.3.1",
+                "drupal/drupal": ">=8,<8.2.8|>=8.3,<8.3.1",
                 "firebase/php-jwt": "<2",
                 "friendsofsymfony/rest-bundle": ">=1.2,<1.2.2",
                 "friendsofsymfony/user-bundle": ">=1.2,<1.3.5",
@@ -3170,7 +3170,7 @@
                 }
             ],
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",
-            "time": "2017-03-31T06:31:44+00:00"
+            "time": "2017-05-13T14:02:28+00:00"
         },
         {
             "name": "rtheunissen/guzzle-log-middleware",
@@ -3771,24 +3771,24 @@
         },
         {
             "name": "unionofrad/lithium",
-            "version": "1.2.x-dev",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "0224e1ed92ecc18f9a246c4b8a0e35d0cc956b0c"
+                "reference": "5d337263469dc14df1f4c05c226e2f24041f112b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/0224e1ed92ecc18f9a246c4b8a0e35d0cc956b0c",
-                "reference": "0224e1ed92ecc18f9a246c4b8a0e35d0cc956b0c",
+                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/5d337263469dc14df1f4c05c226e2f24041f112b",
+                "reference": "5d337263469dc14df1f4c05c226e2f24041f112b",
                 "shasum": ""
             },
             "require": {
                 "composer/installers": "1.*",
-                "php": "^5.6 || ^7.0.3"
+                "php": "^5.5.14 || ^7.0.3"
             },
             "require-dev": {
-                "unionofrad/li3_fixtures": "^1.1"
+                "unionofrad/li3_fixtures": "1.1.*@dev"
             },
             "bin": [
                 "console/li3"
@@ -3813,7 +3813,7 @@
                 "li3",
                 "lithium"
             ],
-            "time": "2017-04-23 09:48:41"
+            "time": "2017-04-23T09:19:40+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -4526,16 +4526,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "6.1.2",
+            "version": "6.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "fbf2e46d5c563ee78c9b559bcbeb1c97cad6af0f"
+                "reference": "42b7f394a8e009516582331b1e03a1aba40175d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/fbf2e46d5c563ee78c9b559bcbeb1c97cad6af0f",
-                "reference": "fbf2e46d5c563ee78c9b559bcbeb1c97cad6af0f",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/42b7f394a8e009516582331b1e03a1aba40175d1",
+                "reference": "42b7f394a8e009516582331b1e03a1aba40175d1",
                 "shasum": ""
             },
             "require": {
@@ -4555,8 +4555,8 @@
                 "phpunit/php-timer": "^1.0.6",
                 "phpunit/phpunit-mock-objects": "^4.0",
                 "sebastian/comparator": "^2.0",
-                "sebastian/diff": "^1.2",
-                "sebastian/environment": "^3.0.1",
+                "sebastian/diff": "^1.4.3 || ^2.0",
+                "sebastian/environment": "^3.0.2",
                 "sebastian/exporter": "^3.1",
                 "sebastian/global-state": "^1.1 || ^2.0",
                 "sebastian/object-enumerator": "^3.0.2",
@@ -4606,7 +4606,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-04-25T21:30:13+00:00"
+            "time": "2017-05-22T07:45:30+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -4778,23 +4778,23 @@
         },
         {
             "name": "sebastian/diff",
-            "version": "1.4.1",
+            "version": "1.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/diff.git",
-                "reference": "13edfd8706462032c2f52b4b862974dd46b71c9e"
+                "reference": "7f066a26a962dbe58ddea9f72a4e82874a3975a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/13edfd8706462032c2f52b4b862974dd46b71c9e",
-                "reference": "13edfd8706462032c2f52b4b862974dd46b71c9e",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/7f066a26a962dbe58ddea9f72a4e82874a3975a4",
+                "reference": "7f066a26a962dbe58ddea9f72a4e82874a3975a4",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": "^5.3.3 || ^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.8"
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.0"
             },
             "type": "library",
             "extra": {
@@ -4826,20 +4826,20 @@
             "keywords": [
                 "diff"
             ],
-            "time": "2015-12-08T07:14:41+00:00"
+            "time": "2017-05-22T07:24:03+00:00"
         },
         {
             "name": "sebastian/environment",
-            "version": "3.0.2",
+            "version": "3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "11e7710b7724d42c62249b0e9d3030240398949d"
+                "reference": "02b6b2c7aefe2cdb1185b8dbf8718b0bcedf3ab3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/11e7710b7724d42c62249b0e9d3030240398949d",
-                "reference": "11e7710b7724d42c62249b0e9d3030240398949d",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/02b6b2c7aefe2cdb1185b8dbf8718b0bcedf3ab3",
+                "reference": "02b6b2c7aefe2cdb1185b8dbf8718b0bcedf3ab3",
                 "shasum": ""
             },
             "require": {
@@ -4876,7 +4876,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2017-04-21T14:40:32+00:00"
+            "time": "2017-05-18T10:10:00+00:00"
         },
         {
             "name": "sebastian/exporter",
@@ -4947,23 +4947,23 @@
         },
         {
             "name": "sebastian/global-state",
-            "version": "1.1.1",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/global-state.git",
-                "reference": "bc37d50fea7d017d3d340f230811c9f1d7280af4"
+                "reference": "e8ba02eed7bbbb9e59e43dedd3dddeff4a56b0c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/global-state/zipball/bc37d50fea7d017d3d340f230811c9f1d7280af4",
-                "reference": "bc37d50fea7d017d3d340f230811c9f1d7280af4",
+                "url": "https://api.github.com/repos/sebastianbergmann/global-state/zipball/e8ba02eed7bbbb9e59e43dedd3dddeff4a56b0c4",
+                "reference": "e8ba02eed7bbbb9e59e43dedd3dddeff4a56b0c4",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": "^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.2"
+                "phpunit/phpunit": "^6.0"
             },
             "suggest": {
                 "ext-uopz": "*"
@@ -4971,7 +4971,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0-dev"
+                    "dev-master": "2.0-dev"
                 }
             },
             "autoload": {
@@ -4994,7 +4994,7 @@
             "keywords": [
                 "global state"
             ],
-            "time": "2015-10-12T03:26:01+00:00"
+            "time": "2017-04-27T15:39:26+00:00"
         },
         {
             "name": "sebastian/object-enumerator",
@@ -5364,13 +5364,13 @@
         "guzzlehttp/guzzle": 20,
         "joshpinkney/tv-maze-php-api": 20,
         "kbjr/git.php": 20,
-        "unionofrad/lithium": 20,
+        "unionofrad/lithium": 10,
         "unionofrad/manual": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.0.0",
+        "php": ">=7.1.0",
         "ext-ctype": "*",
         "ext-curl": "*",
         "ext-exif": "*",

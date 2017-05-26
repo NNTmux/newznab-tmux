@@ -27,7 +27,7 @@ $thread = $pieces[3];
 
 switch (true) {
 
-	case $pieces[0] === 'standard' && isset($guidChar) && isset($maxperrun) && is_numeric($maxperrun):
+	case $pieces[0] === 'standard' && $guidChar !== null && $maxperrun !== null && is_numeric($maxperrun):
 
 		// Allow for larger filename return sets
 		$pdo->queryExec('SET SESSION group_concat_max_len = 32768');
@@ -38,7 +38,8 @@ switch (true) {
 			sprintf("
 					SELECT
 						r.id AS releases_id, r.guid, r.groups_id, r.categories_id, r.name, r.searchname, r.proc_nfo,
-						r.proc_uid, r.proc_files, r.proc_par2, r.proc_sorter, r.ishashed, r.dehashstatus, r.nfostatus,
+						r.proc_uid, r.proc_files, r.proc_par2, r.proc_srr, r.proc_hash16k, r.proc_sorter, r.ishashed, r
+						.dehashstatus, r.nfostatus,
 						r.size AS relsize, r.predb_id,
 						IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash,
 						IFNULL(GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|'), '') AS filestring,
@@ -65,6 +66,8 @@ switch (true) {
 						OR r.proc_files = %d
 						OR r.proc_uid = %d
 						OR r.proc_par2 = %d
+						OR r.proc_srr = %d
+						OR r.proc_hash16k = %d
 						OR
 						(
 							r.nfostatus = %5\$d
@@ -89,6 +92,8 @@ switch (true) {
 				NameFixer::PROC_FILES_NONE,
 				NameFixer::PROC_UID_NONE,
 				NameFixer::PROC_PAR2_NONE,
+				NameFixer::PROC_SRR_NONE,
+				NameFixer::PROC_HASH16K_NONE,
 				MiscSorter::PROC_SORTER_NONE,
 				Category::getCategoryOthersGroup(),
 				$maxperrun
@@ -132,6 +137,30 @@ switch (true) {
 				}
 				$namefixer->reset();
 
+				if ($release['proc_srr'] == NameFixer::PROC_SRR_NONE) {
+					echo ColorCLI::primaryOver('sr');
+					$namefixer->srrNameCheck($release, true, 'SRR, ', 1, 1);
+				}
+				// Not all gate requirements in query always set column status as PP Add check is in query
+				$namefixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release['releases_id']);
+
+				if ($namefixer->matched) {
+					continue;
+				}
+				$namefixer->reset();
+
+				if ($release['proc_hash16k'] == NameFixer::PROC_HASH16K_NONE && !empty($release['hash'])) {
+					echo ColorCLI::primaryOver('U');
+					$namefixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1);
+				}
+				// Not all gate requirements in query always set column status as PP Add check is in query
+				$namefixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release['releases_id']);
+
+				if ($namefixer->matched) {
+					continue;
+				}
+				$namefixer->reset();
+
 				if ($release['nfostatus'] == Nfo::NFO_FOUND && $release['proc_nfo'] == NameFixer::PROC_NFO_NONE) {
 					if (!empty($release['textstring']) && !preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])) {
 						echo ColorCLI::primaryOver('n');
@@ -160,10 +189,6 @@ switch (true) {
 								if ($namefixer->matched === false) {
 									echo ColorCLI::primaryOver('xf');
 									$namefixer->xxxNameCheck($releaseFile, true, 'Filenames, ', 1, 1);
-									if ($namefixer->matched === false) {
-										echo ColorCLI::primaryOver('e');
-										$namefixer->srrNameCheck($releaseFile, true, 'Filenames, ', 1, 1);
-									}
 								}
 							}
 						}

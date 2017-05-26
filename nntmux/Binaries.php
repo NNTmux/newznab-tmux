@@ -379,7 +379,14 @@ class Binaries
 				if ($this->_echoCLI) {
 					ColorCLI::doEcho(ColorCLI::primary('Part repair enabled. Checking for missing parts.'), true);
 				}
-				$this->partRepair($groupMySQL);
+				$this->partRepair($groupMySQL, '');
+
+				$mgrPosters = $this->getMultiGroupPosters();
+				if(!empty($mgrPosters)) {
+					$tableNames = ProcessReleasesMultiGroup::tableNames();
+					$this->partRepair($groupMySQL, $tableNames);
+				}
+
 			} else if ($this->_echoCLI) {
 				ColorCLI::doEcho(ColorCLI::primary('Part repair disabled by user.'), true);
 			}
@@ -786,6 +793,7 @@ class Binaries
 		$this->timeInsert = number_format($this->startPR - $this->startUpdate, 2);
 
 		if ($partRepair && count($headersRepaired) > 0) {
+
 			$this->removeRepairedParts($headersRepaired, $this->tableNames['prname'], $this->groupMySQL['id']);
 		}
 		unset($headersRepaired);
@@ -1130,13 +1138,17 @@ class Binaries
 	/**
 	 * Attempt to get missing article headers.
 	 *
+	 * @param array|string $tables
 	 * @param array $groupArr The info for this group from mysql.
-	 *
 	 * @return void
 	 */
-	public function partRepair($groupArr): void
+	public function partRepair($groupArr, $tables = ''): void
 	{
-		$tableNames = $this->_groups->getCBPTableNames($groupArr['id']);
+		$tableNames = $tables;
+
+		if ($tableNames === '') {
+			$tableNames = $this->_groups->getCBPTableNames($groupArr['id']);
+		}
 		// Get all parts in partrepair table.
 		$missingParts = $this->_pdo->query(
 			sprintf('
@@ -1650,13 +1662,10 @@ class Binaries
 	}
 
 	/**
-	 * Updates a blacklist from binary blacklist edit admin web page.
-	 *
-	 * @param array $blacklistArray
-	 *
-	 * @return boolean
+	 * @param $blacklistArray
+	 * @return bool|\PDOStatement
 	 */
-	public function updateBlacklist($blacklistArray): bool
+	public function updateBlacklist($blacklistArray)
 	{
 		return $this->_pdo->queryExec(
 			sprintf('
