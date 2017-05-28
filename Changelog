@@ -1,3 +1,5 @@
+2017-05-28 DariusIII
+	* Chg: Possible fix for videos query in getVideoFromSiteID function
 2017-05-26 DariusIII
 	* Mrg: Merge PR #140 by Nightah - Included a.b.multimedia.cartoons in anime regexes
 	* Fix: Fix bad formating in 10-release_naming_regexes.tsv in regex 1148 description that caused regexes after to be inserted into its description
