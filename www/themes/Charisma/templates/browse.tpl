@@ -96,7 +96,7 @@
 										<td>
 											<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}"
 											   class="title">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>{if !empty($result.failed)}
-											<i class="fa fa-exclamation-circle" style="color: red"
+											<i class="zmdi zmdi-alarm" style="color: red"
 											   title="This release has failed to download for some users"></i>{/if}
 											<br/>
 											<span class="label label-default">{$result.grabs}
@@ -123,9 +123,9 @@
 														href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}">View Anime</a>
 												</span>{/if}
 											{if !empty($result.failed)}<span class="label label-default">
-												<i class="fa fa-thumbs-o-up"></i>
+												<i class="zmdi zmdi-thumbs-o-up"></i>
 												{$result.grabs} Grab{if $result.grabs != 1}s{/if} /
-												<i class="fa fa-thumbs-o-down"></i>
+												<i class="zmdi zmdi-thumbs-o-down"></i>
 												{$result.failed} Failed Download{if $result.failed != 1}s{/if}
 												</span>{/if}
 											<span class="label label-primary">{$result.group_name}</span>
@@ -138,14 +138,14 @@
 										<td>
 											<a href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"
 											   class="icon_nzb"><i
-														class="fa fa-cloud-download"
+														class="zmdi zmdi-cloud-download"
 														title="Download NZB"></i></a>
 											<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
-														class="fa fa-comments-o"
+														class="zmdi zmdi-comments-o"
 														title="Comments"></i></a>
 											<a href="#"><i
 														id="guid{$result.guid}"
-														class="icon_cart fa fa-shopping-basket"
+														class="icon_cart zmdi zmdi-shopping-basket"
 														title="Send to my Download Basket">
 
 												</i>
@@ -153,7 +153,7 @@
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<a href="#"><i
 															id="guid{$result.guid}"
-															class="icon_sab fa fa-share"
+															class="icon_sab zmdi zmdi-share"
 															title="Send to my Queue">
 
 													</i>
@@ -161,7 +161,7 @@
 											{/if}
 											{if $weHasVortex}
 												<a href="#" class="icon_vortex"><i
-															class="fa fa-share" title="Send to NZBVortex"></i></a>
+															class="zmdi zmdi-share" title="Send to NZBVortex"></i></a>
 											{/if}
 										</td>
 									</tr>

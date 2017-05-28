@@ -166,6 +166,9 @@ class AEBN
 	{
 		if ($ret = $this->_html->find('div#md-boxCover, img[itemprop=thumbnailUrl]', 1)) {
 			$ret = trim($ret->src);
+			if (strpos($ret, '//') === 0) {
+				$ret = 'http:' . $ret;
+			}
 			$this->_res['boxcover'] = str_ireplace('160w.jpg', 'xlf.jpg', $ret);
 			$this->_res['backcover'] = str_ireplace('160w.jpg', 'xlb.jpg', $ret);
 		}
@@ -336,8 +339,9 @@ class AEBN
 		if (is_array($this->genres())) {
 			$results = array_merge($results, $this->genres());
 		}
-		if (is_array($this->covers())) {
-			$results = array_merge($results, $this->covers());
+		$covers = $this->covers();
+		if (is_array($covers)) {
+			$results = array_merge($results, $covers);
 		}
 		if (is_array($this->trailers())) {
 			$results = array_merge($results, $this->trailers());
@@ -364,13 +368,15 @@ class AEBN
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+						ColorCLI::doEcho(ColorCLI::notice('Data not available on AEBN server'));
 					} else if ($e->getCode() === 503) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+						ColorCLI::doEcho(ColorCLI::notice('AEBN service unavailable'));
 					} else {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from AEBN, http error reported: ' . $e->getCode()));
 					}
 				}
+			} catch (\RuntimeException $e) {
+				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
 			}
 		} else {
 			try {
@@ -378,13 +384,15 @@ class AEBN
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+						ColorCLI::doEcho(ColorCLI::notice('Data not available on AEBN server'));
 					} else if ($e->getCode() === 503) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+						ColorCLI::doEcho(ColorCLI::notice('AEBN service unavailable'));
 					} else {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from AEBN, http error reported: ' . $e->getCode()));
 					}
 				}
+			} catch (\RuntimeException $e) {
+				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
 			}
 		}
 

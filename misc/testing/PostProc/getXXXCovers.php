@@ -1,6 +1,6 @@
 <?php
 //This script will update all records in the xxxinfo table where there is no cover
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\db\DB;
 use nntmux\XXX;

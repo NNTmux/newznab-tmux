@@ -96,7 +96,7 @@ class Console
 		$this->sleeptime = (Settings::value('..amazonsleep') != '') ? Settings::value('..amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'console' . DS;
 		$this->renamed = Settings::value('..lookupgames') == 2 ? 'AND isrenamed = 1' : '';
-		$this->catWhere = 'AND categories_id BETWEEN ' . Category::GAME_ROOT . ' AND ' . Category::GAME_OTHER;
+		$this->catWhere = 'PARTITION (console)';
 
 		$this->failCache =[];
 	}
@@ -253,7 +253,7 @@ class Console
 				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 		if (!empty($return)) {
-			$return[0]['_totalcount'] = (isset($consoles['total']) ?? 0);
+			$return[0]['_totalcount'] = $consoles['total'] ?? 0;
 		}
 		return $return;
 	}
@@ -396,14 +396,14 @@ class Console
 
 				if ($this->echooutput) {
 					if ($consoleId !== -2) {
-						$this->pdo->log->doEcho(
-							$this->pdo->log->header('Added/updated game: ') .
-							$this->pdo->log->alternateOver('   Title:    ') .
-							$this->pdo->log->primary($con['title']) .
-							$this->pdo->log->alternateOver('   Platform: ') .
-							$this->pdo->log->primary($con['platform']) .
-							$this->pdo->log->alternateOver('   Genre: ') .
-							$this->pdo->log->primary($con['consolegenre'])
+						ColorCLI::doEcho(
+							ColorCLI::header('Added/updated game: ') .
+							ColorCLI::alternateOver('   Title:    ') .
+							ColorCLI::primary($con['title']) .
+							ColorCLI::alternateOver('   Platform: ') .
+							ColorCLI::primary($con['platform']) .
+							ColorCLI::alternateOver('   Genre: ') .
+							ColorCLI::primary($con['consolegenre'])
 						);
 					}
 				}
@@ -761,13 +761,14 @@ class Console
 			sprintf('
 							SELECT searchname, id
 							FROM releases
-							WHERE nzbstatus = %d %s
+							%s
+							WHERE nzbstatus = %d
 							AND consoleinfo_id IS NULL %s
 							ORDER BY postdate DESC
 							LIMIT %d',
+				$this->catWhere,
 				NZB::NZB_ADDED,
 				$this->renamed,
-				$this->catWhere,
 				$this->gameqty
 			)
 		);
@@ -775,7 +776,7 @@ class Console
 		if ($res instanceof \Traversable && $res->rowCount() > 0) {
 
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho($this->pdo->log->header('Processing ' . $res->rowCount() . ' console release(s).'));
+				ColorCLI::doEcho(ColorCLI::header('Processing ' . $res->rowCount() . ' console release(s).'));
 			}
 
 			foreach ($res as $arr) {
@@ -786,9 +787,9 @@ class Console
 
 				if ($gameInfo !== false) {
 					if ($this->echooutput) {
-						$this->pdo->log->doEcho(
-							$this->pdo->log->headerOver('Looking up: ') .
-							$this->pdo->log->primary(
+						ColorCLI::doEcho(
+							ColorCLI::headerOver('Looking up: ') .
+							ColorCLI::primary(
 								$gameInfo['title'] .
 								' (' .
 								$gameInfo['platform'] . ')'
@@ -802,7 +803,7 @@ class Console
 					if ($gameCheck === false && in_array($gameInfo['title'] . $gameInfo['platform'], $this->failCache)) {
 						// Lookup recently failed, no point trying again
 						if ($this->echooutput) {
-							$this->pdo->log->doEcho($this->pdo->log->headerOver('Cached previous failure. Skipping.') . PHP_EOL);
+							ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.') . PHP_EOL);
 						}
 						$gameId = -2;
 					} else if ($gameCheck === false) {
@@ -814,9 +815,9 @@ class Console
 						}
 					} else {
 						if ($this->echooutput) {
-							$this->pdo->log->doEcho(
-								$this->pdo->log->headerOver("Found Local: ") .
-								$this->pdo->log->primary("{$gameCheck['title']} - {$gameCheck['platform']}") .
+							ColorCLI::doEcho(
+								ColorCLI::headerOver("Found Local: ") .
+								ColorCLI::primary("{$gameCheck['title']} - {$gameCheck['platform']}") .
 								PHP_EOL
 							);
 						}
@@ -831,11 +832,12 @@ class Console
 				$this->pdo->queryExec(
 					sprintf('
 								UPDATE releases
+								%s
 								SET consoleinfo_id = %d
-								WHERE id = %d %s',
+								WHERE id = %d',
+						$this->catWhere,
 						$gameId,
-						$arr['id'],
-						$this->catWhere
+						$arr['id']
 					)
 				);
 
@@ -847,7 +849,7 @@ class Console
 			}
 
 		} else if ($this->echooutput) {
-			$this->pdo->log->doEcho($this->pdo->log->header('No console releases to process.'));
+			ColorCLI::doEcho(ColorCLI::header('No console releases to process.'));
 		}
 	}
 

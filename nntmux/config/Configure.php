@@ -22,61 +22,84 @@ namespace nntmux\config;
 
 class Configure
 {
-	private $environments = [
+	private static $environments = [
 		'indexer' => [
-			'config'	=> true,
+			'.env'	=> true,
 			'settings'	=> false
 		],
 		'install' => [
-			'config'	=> false,
+			'.env'	=> true,
 			'settings'	=> false
 		],
 		'smarty'  => [
-			'config'	=> true,
+			'.env'	=> true,
 			'settings'	=> false
 		],
 	];
 
+	/**
+	 * Configure constructor.
+	 *
+	 * @param string $environment
+	 */
 	public function __construct($environment = 'indexer')
 	{
-		$this->loadEnvironment($environment);
+		try {
+			$this->loadEnvironment($environment);
+		} catch (\RuntimeException $e) {
+			echo $e->getMessage();
+		}
 	}
 
+	/**
+	 * @param $environment
+	 * @throws \RuntimeException
+	 */
 	private function loadEnvironment($environment)
 	{
-		if (array_key_exists($environment, $this->environments)) {
-			foreach ($this->environments[$environment] as $config => $throwException) {
+		if (array_key_exists($environment, Configure::$environments)) {
+			foreach (Configure::$environments[$environment] as $config => $throwException) {
 				$this->loadSettings($config, $throwException);
 			}
 		} else {
-			throw new \RuntimeException("Unknown environment passed to Configure class!");
+			throw new \RuntimeException('Unknown environment passed to Configure class!');
 		}
 	}
 
+	/**
+	 * @param      $filename
+	 * @param bool $throwException
+	 * @throws \RuntimeException
+	 */
 	public function loadSettings($filename, $throwException = true)
 	{
-		$file = NN_CONFIGS . $filename . '.php';
-		if (!file_exists($file)) {
-			if ($throwException) {
-				$errorCode = (int)($filename === 'config');
-				throw new \RuntimeException(
-					"Unable to load configuration file '$file'. Make sure it has been created and contains correct settings.",
-					$errorCode
-				);
-			}
-		} else {
+
+		if ($filename === '.env') {
+			$file = NN_ROOT . '.env';
+		} else  {
+			$file = NN_CONFIGS . $filename . '.php';
+		}
+		if (!file_exists($file) && $throwException) {
+			$errorCode = (int)($filename === '.env');
+			throw new \RuntimeException(
+				"Unable to load configuration file '$file'. Make sure it has been created and contains correct settings.",
+				$errorCode
+			);
+		}
+		if ($file !== NN_ROOT . '.env' && file_exists($file)) {
 			require_once $file;
 		}
 
+
 		switch ($filename) {
-			case 'config':
+			case '.env':
 				$this->defaultSSL();
 				break;
 			case 'settings':
 				$settings_file = NN_CONFIGS . 'settings.php';
 				if (is_file($settings_file)) {
-					require_once($settings_file);
-					if (php_sapi_name() == 'cli') {
+					require_once $settings_file;
+					if (PHP_SAPI === 'cli') {
 						$current_settings_file_version = 4; // Update this when updating settings.example.php
 						if (!defined('NN_SETTINGS_FILE_VERSION') ||
 							NN_SETTINGS_FILE_VERSION != $current_settings_file_version

@@ -259,7 +259,7 @@ class Books
 		);
 		$return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 		if (!empty($return)) {
-			$return[0]['_totalcount'] = (isset($books['total']) ?? 0);
+			$return[0]['_totalcount'] = $books['total'] ?? 0;
 		}
 		return $return;
 	}
@@ -317,9 +317,12 @@ class Books
 		);
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getBrowseByOptions()
 	{
-		return array('author' => 'author', 'title' => 'title');
+		return ['author' => 'author', 'title' => 'title'];
 	}
 
 	public function getBrowseBy()
@@ -420,7 +423,7 @@ class Books
 	{
 		if ($res instanceof \Traversable && $res->rowCount() > 0) {
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho($this->pdo->log->header("\nProcessing " . $res->rowCount() . ' book release(s) for categories id ' . $categoryID));
+				ColorCLI::doEcho(ColorCLI::header("\nProcessing " . $res->rowCount() . ' book release(s) for categories id ' . $categoryID));
 			}
 
 			foreach ($res as $arr) {
@@ -437,7 +440,7 @@ class Books
 
 				if ($bookInfo !== false) {
 					if ($this->echooutput) {
-						$this->pdo->log->doEcho($this->pdo->log->headerOver('Looking up: ') . $this->pdo->log->primary($bookInfo));
+						ColorCLI::doEcho(ColorCLI::headerOver('Looking up: ') . ColorCLI::primary($bookInfo));
 					}
 
 					// Do a local lookup first
@@ -446,7 +449,7 @@ class Books
 					if ($bookCheck === false && in_array($bookInfo, $this->failCache)) {
 						// Lookup recently failed, no point trying again
 						if ($this->echooutput) {
-							$this->pdo->log->doEcho($this->pdo->log->headerOver('Cached previous failure. Skipping.') . PHP_EOL);
+							ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.') . PHP_EOL);
 						}
 						$bookId = -2;
 					} else if ($bookCheck === false) {
@@ -475,7 +478,7 @@ class Books
 				}
 			}
 		} else if ($this->echooutput) {
-			$this->pdo->log->doEcho($this->pdo->log->header('No book releases to process for categories id ' . $categoryID));
+			ColorCLI::doEcho(ColorCLI::header('No book releases to process for categories id ' . $categoryID));
 		}
 	}
 
@@ -492,12 +495,12 @@ class Books
 		$releasename = trim(preg_replace('/\s\s+/i', ' ', $d));
 
 		// the default existing type was ebook, this handles that in the same manor as before
-		if ($releasetype == 'ebook') {
+		if ($releasetype === 'ebook') {
 			if (preg_match('/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O(c|k)tober|November|De(c|z)ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i', $releasename)) {
 
 				if ($this->echooutput) {
-					$this->pdo->log->doEcho(
-						$this->pdo->log->headerOver('Changing category to misc books: ') . $this->pdo->log->primary($releasename)
+					ColorCLI::doEcho(
+						ColorCLI::headerOver('Changing category to misc books: ') . ColorCLI::primary($releasename)
 					);
 				}
 				$this->pdo->queryExec(sprintf('UPDATE releases SET categories_id = %s WHERE id = %d', Category::BOOKS_UNKNOWN, $releaseID));
@@ -505,8 +508,8 @@ class Books
 			} else if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun( |e|$)|Jul( |y|$)|Aug( |ust|$)|Sep( |tember|$)|O(c|k)t( |ober|$)|Nov( |ember|$)|De(c|z)( |ember|$))/ui', $releasename) && !preg_match('/Part \d+/i', $releasename)) {
 
 				if ($this->echooutput) {
-					$this->pdo->log->doEcho(
-						$this->pdo->log->headerOver('Changing category to magazines: ') . $this->pdo->log->primary($releasename)
+					ColorCLI::doEcho(
+						ColorCLI::headerOver('Changing category to magazines: ') . ColorCLI::primary($releasename)
 					);
 				}
 				$this->pdo->queryExec(sprintf('UPDATE releases SET categories_id = %s WHERE id = %d', Category::BOOKS_MAGAZINES, $releaseID));
@@ -516,13 +519,12 @@ class Books
 			} else {
 				return false;
 			}
-		} else if ($releasetype == 'audiobook') {
+		} else if ($releasetype === 'audiobook') {
 			if (!empty($releasename) && !preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
 				// we can skip category for audiobooks, since we already know it, so as long as the release name is valid return it so that it is postprocessed by amazon.  In the future, determining the type of audiobook could be added (Lecture or book), since we can skip lookups on lectures, but for now handle them all the same way
 				return $releasename;
-			} else {
-				return false;
 			}
+			return false;
 		}
 	}
 
@@ -642,22 +644,22 @@ class Books
 
 		if ($bookId) {
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho($this->pdo->log->header('Added/updated book: '));
+				ColorCLI::doEcho(ColorCLI::header('Added/updated book: '));
 				if ($book['author'] !== '') {
-					$this->pdo->log->doEcho($this->pdo->log->alternateOver('   Author: ') . $this->pdo->log->primary($book['author']));
+					ColorCLI::doEcho(ColorCLI::alternateOver('   Author: ') . ColorCLI::primary($book['author']));
 				}
-				echo $this->pdo->log->alternateOver('   Title: ') . $this->pdo->log->primary(' ' . $book['title']);
+				echo ColorCLI::alternateOver('   Title: ') . ColorCLI::primary(' ' . $book['title']);
 				if ($book['genre'] !== 'null') {
-					$this->pdo->log->doEcho($this->pdo->log->alternateOver('   Genre: ') . $this->pdo->log->primary(' ' . $book['genre']));
+					ColorCLI::doEcho(ColorCLI::alternateOver('   Genre: ') . ColorCLI::primary(' ' . $book['genre']));
 				}
 			}
 
 			$book['cover'] = $ri->saveImage($bookId, $book['coverurl'], $this->imgSavePath, 250, 250);
 		} else {
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho(
-					$this->pdo->log->header('Nothing to update: ') .
-					$this->pdo->log->header($book['author'] .
+				ColorCLI::doEcho(
+					ColorCLI::header('Nothing to update: ') .
+					ColorCLI::header($book['author'] .
 						' - ' .
 						$book['title'])
 				);

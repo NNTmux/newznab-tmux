@@ -28,7 +28,7 @@
 	<form method="get" action="{$smarty.const.WWW_TOP}/search">
 		<div id="sbasic" class="row" style="text-align:center;{if $sadvanced} display:none;{/if}">
 			<div class="col-md-6">
-				<input id="search" class="form-control" maxlength="50" name="search" value="{$search|escape:'html'}"
+				<input id="search" class="form-control" maxlength="500" name="search" value="{$search|escape:'htmlall'}"
 					   type="search" placeholder="What are you looking for?"/>
 			</div>
 			<div class="col-md-6">
@@ -214,7 +214,7 @@
 					<td class="item">
 						<label for="chk{$result.guid|substr:0:7}">
 							<a class="title" title="View details"
-							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">{$result.searchname|escape:"htmlall"|truncate:150:"...":true}</a>{if !empty($result.failed)} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}</label value="Searchname">
+							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">{$result.searchname|escape:"htmlall"|truncate:150:"...":true}</a>{if !empty($result.failed)} <i class="zmdi zmdi-alarm" style="color: red" title="This release has failed to download for some users"></i>{/if}</label value="Searchname">
 						<div class="resextra">
 							<div class="btns" style="float:right">
 								{release_flag($result.searchname, browse)}
@@ -284,7 +284,7 @@
 									   title="Browse {$result.group_name}">{$result.group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>
 								{/if}
 								{if !empty($result.failed)}<span class="label label-default">
-									<i class ="fa fa-thumbs-o-up"></i> {$result.grabs} Grab{if $result.grabs != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$result.failed} Failed Download{if $result.failed != 1}s{/if}</span>
+									<i class ="zmdi zmdi-thumbs-o-up"></i> {$result.grabs} Grab{if $result.grabs != 1}s{/if} / <i class ="zmdi zmdi-thumbs-o-down"></i> {$result.failed} Failed Download{if $result.failed != 1}s{/if}</span>
 								{/if}
 							</div>
 						</div>
@@ -325,20 +325,20 @@
 					</td>
 					<td class="icon_nzb"><a
 								href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"><i
-									class="fa fa-cloud-download text-muted"
+									class="zmdi zmdi-cloud-download text-muted"
 									title="Download NZB"></i></a>
 						<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
-									class="fa fa-comments-o text-muted"
+									class="zmdi zmdi-comments-o text-muted"
 									title="Comments"></i></a>
 						<a href="#" class="icon_cart text-muted"><i
-									class="fa fa-shopping-basket" title="Send to my Download Basket"></i></a>
+									class="zmdi zmdi-shopping-basket" title="Send to my Download Basket"></i></a>
 						{if isset($sabintegrated) && $sabintegrated !=""}
-							<a href="#" class="icon_sab text-muted"><i class="fa fa-share"
+							<a href="#" class="icon_sab text-muted"><i class="zmdi zmdi-share"
 																	   title="Send to my Queue"></i></a>
 						{/if}
 						{if $weHasVortex}
 							<a href="#" class="icon_vortex text-muted"><i
-										class="fa fa-share" title="Send to NZBVortex"></i></a>
+										class="zmdi zmdi-share" title="Send to NZBVortex"></i></a>
 						{/if}
 					</td>
 				</tr>

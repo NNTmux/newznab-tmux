@@ -1,13 +1,13 @@
 <?php
-require_once './config.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 use nntmux\Groups;
 
 $page   = new AdminPage();
 $groups = new Groups(['Settings' => $page->settings]);
 
-$groupName = (isset($_REQUEST['groupname']) && !empty($_REQUEST['groupname']) ? $_REQUEST['groupname'] : '');
-$offset    = (isset($_REQUEST['offset']) ? $_REQUEST['offset'] : 0);
+$groupName = $_REQUEST['groupname'] ?? '';
+$offset    = $_REQUEST['offset'] ?? 0;
 
 $page->smarty->assign(
 	[
@@ -16,7 +16,7 @@ $page->smarty->assign(
 		'pageroffset' => $offset,
 		'pageritemsperpage' => ITEMS_PER_PAGE,
 		'pagerquerybase' =>
-			WWW_TOP . "/group-list.php?" . (($groupName != '') ? "groupname=$groupName&amp;" : '') . 'offset=',
+			WWW_TOP . '/group-list.php?' . (($groupName !== '') ? "groupname=$groupName" : '') . '&offset=',
 		'pagerquerysuffix' => '',
 		'grouplist' => $groups->getRange($offset, ITEMS_PER_PAGE, $groupName, -1)
 	]

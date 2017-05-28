@@ -79,7 +79,7 @@ class Steam
 		}
 
 		if ($res === false) {
-			$this->pdo->log->doEcho($this->pdo->log->notice('Steam did not return game data'));
+			ColorCLI::doEcho(ColorCLI::notice('Steam did not return game data'));
 		}
 
 		return false;
@@ -97,7 +97,7 @@ class Steam
 		$bestMatch = false;
 
 		if (empty($searchTerm)) {
-			$this->pdo->log->doEcho($this->pdo->log->notice('Search term cannot be empty'));
+			ColorCLI::doEcho(ColorCLI::notice('Search term cannot be empty'));
 
 			return $bestMatch;
 		}
@@ -118,21 +118,22 @@ class Steam
 				if ($result['name'] === $searchTerm) {
 					$bestMatch = $result['appid'];
 					break;
-				} else {
-					similar_text(strtolower($result['name']), strtolower($searchTerm), $percent);
-					// If similartext reports an exact match set best match and break out
-					if ($percent === 100) {
-						$bestMatch = $result['appid'];
-						break;
-					} else if ($percent >= self::STEAM_MATCH_PERCENTAGE && $percent > $bestMatchPct) {
-						$bestMatch = $result['appid'];
-						$bestMatchPct = $percent;
-					}
+				}
+
+				similar_text(strtolower($result['name']), strtolower($searchTerm), $percent);
+				// If similar_text reports an exact match set best match and break out
+				if ($percent === 100) {
+					$bestMatch = $result['appid'];
+					break;
+				}
+				if ($percent >= self::STEAM_MATCH_PERCENTAGE && $percent > $bestMatchPct) {
+					$bestMatch = $result['appid'];
+					$bestMatchPct = $percent;
 				}
 			}
 		}
 		if ($bestMatch === false) {
-			$this->pdo->log->doEcho($this->pdo->log->notice('Steam search returned no valid results'));
+			ColorCLI::doEcho(ColorCLI::notice('Steam search returned no valid results'));
 		}
 
 		return $bestMatch;
@@ -141,7 +142,7 @@ class Steam
 	/**
 	 * Downloads full Steam Store dump and imports data into local table
 	 */
-	public function populateSteamAppsTable()
+	public function populateSteamAppsTable(): void
 	{
 		$lastUpdate = Settings::value('APIs.Steam.last_update');
 		$this->lastUpdate = $lastUpdate > 0 ? $lastUpdate : 0;
@@ -150,7 +151,7 @@ class Steam
 			$this->setLastUpdated();
 			$fullAppArray = $this->steamFront->getFullAppList();
 			$inserted = $dupe = 0;
-			echo $this->pdo->log->info('Populating steam apps table') . PHP_EOL;
+			echo ColorCLI::info('Populating steam apps table') . PHP_EOL;
 			foreach ($fullAppArray as $appsArray) {
 				foreach ($appsArray as $appArray) {
 					foreach ($appArray as $app) {
@@ -167,9 +168,9 @@ class Steam
 						);
 
 						if ($dupeCheck === null) {
-							$this->pdo->queryExec(sprintf('INSERT IGNORE INTO steam_apps (name, appid) VALUES (%s, %d)', $app['name'], $app['appid']));
+							$this->pdo->queryExec(sprintf('INSERT IGNORE INTO steam_apps (name, appid) VALUES (%s, %d)', $this->pdo->escapeString($app['name']), $app['appid']));
 							$inserted++;
-							if ($inserted % 500 == 0) {
+							if ($inserted % 500 === 0) {
 								echo PHP_EOL . number_format($inserted) . ' apps inserted.' . PHP_EOL;
 							} else {
 								echo '.';
@@ -187,7 +188,7 @@ class Steam
 	/**
 	 * Sets the database time for last full AniDB update
 	 */
-	private function setLastUpdated()
+	private function setLastUpdated(): void
 	{
 		Settings::update(
 			['value' => time()],

@@ -6,19 +6,19 @@ If after import you have a bunch of zero sized releases run this
 Author: lordgnu <lordgnu@me.com>
 */
 
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use app\models\Settings;
 use nntmux\db\DB;
 use nntmux\NZB;
 
 $pdo = new DB;
-$nzb = new NZB;
+$nzb = new NZB($pdo);
 
-$items = $pdo->query("SELECT id,guid FROM releases WHERE size = 0");
+$items = $pdo->query('SELECT id,guid FROM releases WHERE size = 0');
 $total = count($items);
 $compl = 0;
-echo "Updating file size for " . count($items) . " release(s)\n";
+echo 'Updating file size for ' . count($items) . ' release(s)' . PHP_EOL;
 
 while ($item = array_pop($items))
 {

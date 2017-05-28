@@ -180,7 +180,7 @@ class Groups
 	 *
 	 * @param string $name The group name.
 	 *
-	 * @return string Empty string on failure, groups_id on success.
+	 * @return string|int Empty string on failure, groups_id on success.
 	 */
 	public function getIDByName($name)
 	{
@@ -216,7 +216,7 @@ class Groups
 					)
 					: ''
 				),
-				($active > -1 ? 'AND g.active = {$active}' : '')
+				($active > -1 ? sprintf('AND g.active = %d', $active) : '')
 			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 
@@ -253,8 +253,8 @@ class Groups
 					)
 					: ''
 				),
-				($active > -1 ? 'AND g.active = {$active}' : ''),
-				($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+				$active > -1 ? sprintf('AND g.active = %d', $active) : '',
+				$start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start
 			), true, NN_CACHE_EXPIRY_SHORT
 		);
 	}
@@ -576,7 +576,7 @@ class Groups
 			WHERE id = {$id}"
 		);
 
-		return "Group {$id}: {$column} has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
+		return "Group {$id}: {$column} has been " . (($status === 0) ? 'deactivated' : 'activated') . '.';
 	}
 
 	/**
@@ -643,8 +643,8 @@ class Groups
 	public function disableIfNotExist($id)
 	{
 		$this->updateGroupStatus($id, 'active', 0);
-		$this->colorCLI->doEcho(
-			$this->colorCLI->error(
+		ColorCLI::doEcho(
+			ColorCLI::error(
 				'Group does not exist on server, disabling'
 			)
 		);

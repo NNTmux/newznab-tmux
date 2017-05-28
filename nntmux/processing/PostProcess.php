@@ -5,6 +5,7 @@ use app\models\Settings;
 use dariusiii\rarinfo\Par2Info;
 use nntmux\Books;
 use nntmux\Category;
+use nntmux\ColorCLI;
 use nntmux\Console;
 use nntmux\Games;
 use nntmux\Groups;
@@ -280,8 +281,8 @@ class PostProcess
 		$processed = $spotnab->processGID(500);
 		if ($processed > 0) {
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho(
-					$this->pdo->log->primary('Updating GID in releases table ' . $processed . ' release(s) updated')
+				ColorCLI::doEcho(
+					ColorCLI::primary('Updating GID in releases table ' . $processed . ' release(s) updated')
 				);
 			}
 		}

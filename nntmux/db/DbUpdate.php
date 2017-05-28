@@ -298,7 +298,7 @@ class DbUpdate
 
 					// Skip comments.
 					if (preg_match('!^\s*(#|--|//)\s*(.+?)\s*$!', $line, $matches)) {
-						echo $this->pdo->log->info("COMMENT: " . $matches[2]);
+						echo ColorCLI::info("COMMENT: " . $matches[2]);
 						continue;
 					}
 
@@ -306,7 +306,7 @@ class DbUpdate
 					if (preg_match('#^\s*DELIMITER\s+(?P<delimiter>.+)\s*$#i', $line, $matches)) {
 						$delimiter = $matches['delimiter'];
 						if (NN_DEBUG) {
-							echo $this->pdo->log->debug("DEBUG: Delimiter switched to $delimiter");
+							echo ColorCLI::debug("DEBUG: Delimiter switched to $delimiter");
 						}
 						if ($delimiter != $options['delimiter']) {
 							continue;

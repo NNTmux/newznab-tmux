@@ -72,7 +72,7 @@ class ReleaseRemover
 	protected $method = '';
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	protected $pdo;
 
@@ -111,6 +111,7 @@ class ReleaseRemover
 	 * Construct.
 	 *
 	 * @param array $options Class instances / various options.
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -187,8 +188,8 @@ class ReleaseRemover
 		$this->deleteReleases();
 
 		if ($this->echoCLI) {
-			echo $this->pdo->log->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ') . $this->deletedCount . ' release(s). This script ran for ');
-			echo $this->pdo->log->header($this->consoleTools->convertTime(time() - $this->timeStart));
+			echo ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ') . $this->deletedCount . ' release(s). This script ran for ');
+			echo ColorCLI::header($this->consoleTools->convertTime(time() - $this->timeStart));
 		}
 
 		return ($this->browser
@@ -210,7 +211,7 @@ class ReleaseRemover
 	 * @param int|string $time                   Time in hours (to select old releases) or 'full' for no time limit.
 	 * @param string     $type                   Type of query to run [blacklist, executable, gibberish, hashed, installbin, passworded,
 	 *                                           passwordurl, sample, scr, short, size, ''] ('' runs against all types)
-	 * @param string     $blacklistID
+	 * @param string|int     $blacklistID
 	 *
 	 * @return string|bool
 	 */
@@ -220,7 +221,7 @@ class ReleaseRemover
 		$this->delete = $delete;
 		$this->blacklistID = '';
 
-		if (isset($blacklistID) && is_numeric($blacklistID)) {
+		if ($blacklistID !== '' && is_numeric($blacklistID)) {
 			$this->blacklistID = sprintf('AND id = %d', $blacklistID);
 		}
 
@@ -228,24 +229,20 @@ class ReleaseRemover
 		$this->crapTime = '';
 		$type = strtolower(trim($type));
 
-		switch ($time) {
-			case 'full':
-				if ($this->echoCLI) {
-					echo $this->pdo->log->header('Removing ' . ($type === '' ? 'All crap releases ' : $type . ' crap releases') . ' - no time limit.\n');
-				}
-				break;
-			default:
-				if (!is_numeric($time)) {
-					$this->error = 'Error, time must be a number or full.';
+		if ($time === 'full') {
+			if ($this->echoCLI) {
+				echo ColorCLI::header('Removing ' . ($type === '' ? 'All crap releases ' : $type . ' crap releases') . ' - no time limit.\n');
+			}
+		} else {
+			if (!is_numeric($time)) {
+				$this->error = 'Error, time must be a number or full.';
 
-					return $this->returnError();
-				}
-				if ($this->echoCLI) {
-					echo $this->pdo->log->header('Removing ' . ($type === '' ? 'All crap releases ' : $type . ' crap releases') . ' from the past ' . $time . ' hour(s).\n');
-				}
-				$this->crapTime = ' AND r.adddate > (NOW() - INTERVAL ' . $time . ' HOUR)';
-				break;
-
+				return $this->returnError();
+			}
+			if ($this->echoCLI) {
+				echo ColorCLI::header('Removing ' . ($type === '' ? 'All crap releases ' : $type . ' crap releases') . ' from the past ' . $time . ' hour(s).\n');
+			}
+			$this->crapTime = ' AND r.adddate > (NOW() - INTERVAL ' . $time . ' HOUR)';
 		}
 
 		$this->deletedCount = 0;
@@ -289,6 +286,9 @@ class ReleaseRemover
 			case 'huge':
 				$this->removeHuge();
 				break;
+			case 'nzb':
+				$this->removeSingleNZB();
+				break;
 			case 'codec':
 				$this->removeCodecPoster();
 				break;
@@ -308,6 +308,7 @@ class ReleaseRemover
 				$this->removeShort();
 				$this->removeSize();
 				$this->removeHuge();
+				$this->removeSingleNZB();
 				$this->removeCodecPoster();
 				break;
 			default:
@@ -317,8 +318,8 @@ class ReleaseRemover
 		}
 
 		if ($this->echoCLI) {
-			echo $this->pdo->log->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ') . $this->deletedCount . ' release(s). This script ran for ');
-			echo $this->pdo->log->header($this->consoleTools->convertTime(time() - $this->timeStart));
+			echo ColorCLI::headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ') . $this->deletedCount . ' release(s). This script ran for ');
+			echo ColorCLI::header($this->consoleTools->convertTime(time() - $this->timeStart));
 		}
 
 		return ($this->browser
@@ -427,15 +428,12 @@ class ReleaseRemover
 		$this->query = sprintf(
 			'SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			INNER JOIN release_search_data rs on rs.releases_id = r.id
 			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
 			WHERE rf.name %s
-			AND r.categories_id NOT IN (%d, %d, %d, %d, %d, %d) %s',
+			AND r.categories_id NOT IN (%d, %d, %d, %d) %s',
 			$this->pdo->likeString('.exe', true, false),
 			Category::PC_0DAY,
 			Category::PC_GAMES,
-			Category::PC_ISO,
-			Category::PC_MAC,
 			Category::OTHER_MISC,
 			Category::OTHER_HASHED,
 			$this->crapTime
@@ -594,6 +592,31 @@ class ReleaseRemover
 			FROM releases r
 			WHERE r.totalpart = 1
 			AND r.size > 209715200 %s',
+			$this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
+	}
+
+	/**
+	 * Remove releases that are just a single nzb file.
+	 *
+	 * @return boolean|string
+	 */
+	protected function removeSingleNZB()
+	{
+		$this->method = '.nzb';
+		$this->query = sprintf(
+			'SELECT r.guid, r.searchname, r.id
+			FROM releases r
+			STRAIGHT_JOIN release_files rf ON r.id = rf.releases_id
+			WHERE r.totalpart = 1
+			AND rf.name %s %s',
+			$this->pdo->likeString('.nzb', true, false),
 			$this->crapTime
 		);
 
@@ -771,7 +794,7 @@ class ReleaseRemover
 				}
 
 				// Provide useful output of operations
-				echo $this->pdo->log->header(sprintf("Finding crap releases for %s: Using %s method against release %s.\n" .
+				echo ColorCLI::header(sprintf("Finding crap releases for %s: Using %s method against release %s.\n" .
 						'%s', $this->method, $blType, $opTypeName, $ftUsing
 					)
 				);
@@ -798,7 +821,7 @@ class ReleaseRemover
 
 			}
 		} else {
-			echo $this->pdo->log->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.\n");
+			echo ColorCLI::error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.\n");
 		}
 
 		return true;
@@ -868,7 +891,7 @@ class ReleaseRemover
 
 
 				// Provide useful output of operations
-				echo $this->pdo->log->header(sprintf('Finding crap releases for %s: Using %s method against release filenames.' . PHP_EOL .
+				echo ColorCLI::header(sprintf('Finding crap releases for %s: Using %s method against release filenames.' . PHP_EOL .
 						'%s', $this->method, $blType, $ftUsing
 					)
 				);
@@ -989,10 +1012,10 @@ class ReleaseRemover
 			if ($this->delete) {
 				$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
 				if ($this->echoCLI) {
-					echo $this->pdo->log->primary('Deleting: ' . $this->method . ': ' . $release['searchname']);
+					echo ColorCLI::primary('Deleting: ' . $this->method . ': ' . $release['searchname']);
 				}
 			} elseif ($this->echoCLI) {
-				echo $this->pdo->log->primary('Would be deleting: ' . $this->method . ': ' . $release['searchname']);
+				echo ColorCLI::primary('Would be deleting: ' . $this->method . ': ' . $release['searchname']);
 			}
 			$deletedCount++;
 		}
@@ -1112,7 +1135,7 @@ class ReleaseRemover
 							foreach ($groups as $group) {
 								$gQuery .= $group['id'] . ',';
 							}
-							$gQuery = substr($gQuery, 0, strlen($gQuery) - 1) . ')';
+							$gQuery = substr($gQuery, 0, -0) . ')';
 
 							return $gQuery;
 						default:
@@ -1210,7 +1233,7 @@ class ReleaseRemover
 		}
 
 		// Print the query to the user, ask them if they want to continue using it.
-		echo $this->pdo->log->primary(
+		echo ColorCLI::primary(
 			'This is the query we have formatted using your criteria, you can run it in SQL to see if you like the results:' .
 			self::N . $this->query . ';' . self::N .
 			'If you are satisfied, type yes and press enter. Anything else will exit.'
@@ -1219,7 +1242,7 @@ class ReleaseRemover
 		// Check the users response.
 		$userInput = trim(fgets(fopen('php://stdin', 'brt')));
 		if ($userInput !== 'yes') {
-			echo $this->pdo->log->primary('You typed: "' . $userInput . '", the program will exit.');
+			echo ColorCLI::primary('You typed: "' . $userInput . '", the program will exit.');
 
 			return false;
 		}
@@ -1267,13 +1290,12 @@ class ReleaseRemover
 	{
 		if ($this->browser) {
 			return $this->error . '<br />';
-		} else {
-			if ($this->echoCLI && $this->error !== '') {
-				echo $this->pdo->log->error($this->error);
-			}
-
-			return false;
 		}
+
+		if ($this->echoCLI && $this->error !== '') {
+			echo ColorCLI::error($this->error);
+		}
+		return false;
 	}
 
 	protected function extractSrchFromRegx($dbRegex = '')

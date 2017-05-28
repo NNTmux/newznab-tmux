@@ -3,6 +3,7 @@ namespace nntmux\libraries;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use nntmux\ColorCLI;
 use nntmux\db\DB;
 
 /**
@@ -11,7 +12,7 @@ use nntmux\db\DB;
  */
 Class TraktAPI {
 
-	const API_URL = 'https://api-v2launch.trakt.tv/';
+	const API_URL = 'https://api.trakt.tv/';
 
 	/**
 	 * @var array	List of site IDs that trakt,tv supports. Only trakt is guaranteed to exist.
@@ -48,9 +49,8 @@ Class TraktAPI {
 		if (empty($headers)) {
 			// Can't work without headers.
 			exit;
-		} else {
-			$this->requestHeaders = $headers;
 		}
+		$this->requestHeaders = $headers;
 
 		$this->client = new Client();
 		$this->pdo = new DB();
@@ -153,7 +153,7 @@ Class TraktAPI {
 		if ($extended === '') {
 			$extendedString = '';
 		} else {
-			$extendedString = "?extended=" . $extended;
+			$extendedString = '?extended=' . $extended;
 		}
 
 		if (!empty($this->requestHeaders)) {
@@ -168,13 +168,17 @@ Class TraktAPI {
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+						ColorCLI::doEcho(ColorCLI::notice('Data not available on TraktTV server'));
 					} else if ($e->getCode() === 503) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+						ColorCLI::doEcho(ColorCLI::notice('TraktTV service unavailable'));
+					} else if ($e->getCode() === 401) {
+						ColorCLI::doEcho(ColorCLI::notice('Unauthorized - OAuth must be provided for TraktTV'));
 					} else {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, server responded with code: ' . $e->getCode()));
+						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from TraktTV, server responded with code: ' . $e->getCode()));
 					}
 				}
+			} catch (\RuntimeException $e) {
+				ColorCLI::doEcho(ColorCLI::notice('Unknown error occurred!'));
 			}
 
 			if (isset($json) && $json !== false) {

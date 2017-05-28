@@ -1,4 +1,6 @@
 <?php
+require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+
 use nntmux\db\DB;
 
 try {

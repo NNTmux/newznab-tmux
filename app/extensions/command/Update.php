@@ -18,6 +18,7 @@
  */
 namespace app\extensions\command;
 
+use app\extensions\console\Command;
 use \app\extensions\util\Git;
 use \app\extensions\util\Versions;
 use \lithium\console\command\Help;
@@ -36,7 +37,7 @@ use \Smarty;
  *
  *@package app\extensions\command
  */
-class Update extends \app\extensions\console\Command
+class Update extends Command
 {
 	const UPDATES_FILE = NN_CONFIGS . 'updates.json';
 
@@ -79,7 +80,7 @@ class Update extends \app\extensions\console\Command
 	{
 		// TODO Add check to determine if the indexer or other scripts are running. Hopefully
 		// also prevent web access.
-		$this->out("Checking database version...", 'primary');
+		$this->out('Checking database version...', 'primary');
 
 		$versions = new Versions(['git' => ($this->git instanceof Git) ? $this->git : null]);
 
@@ -97,7 +98,7 @@ class Update extends \app\extensions\console\Command
 			$db = new DbUpdate(['backup' => false]);
 			$db->processPatches(['safe' => false]);
 		} else {
-			$this->out("Up to date.", 'info');
+			$this->out('Up to date.', 'info');
 		}
 	}
 
@@ -106,14 +107,17 @@ class Update extends \app\extensions\console\Command
 		// TODO Add check to determine if the indexer or other scripts are running. Hopefully
 		// also prevent web access.
 		$this->initialiseGit();
-		if (!in_array($this->git->getBranch(), $this->git->getBranchesMain())) {
-			$this->out("Not on the stable or dev branch! Refusing to update repository", 'error');
+		if (!in_array($this->git->getBranch(), $this->git->getBranchesMain(), false)) {
+			$this->out('Not on the stable or dev branch! Refusing to update repository', 'error');
 			return;
 		}
 
 		$this->out($this->git->pull());
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function nntmux()
 	{
 		try {
@@ -145,7 +149,7 @@ class Update extends \app\extensions\console\Command
 				$this->out('The Smarty compiled template cache has been cleaned for you', 'primary');
 			} else {
 				$this->out('You should clear your Smarty compiled template cache at: ' .
-					NN_RES . "smarty" . DS . 'templates_c',
+					NN_RES . 'smarty' . DS . 'templates_c',
 					'primary');
 			}
 		} catch (\Exception $e) {
@@ -191,9 +195,11 @@ class Update extends \app\extensions\console\Command
 	protected function composer()
 	{
 		$this->initialiseGit();
-		$command = 'composer install --prefer-source';
+		$command = 'composer install';
 		if (in_array($this->gitBranch, $this->git->getBranchesStable())) {
-			$command .= ' --no-dev';
+			$command .= ' --prefer-dist --no-dev';
+		} else {
+			$command .= ' --prefer-source';
 		}
 		$this->out('Running composer install process...', 'primary');
 		system($command, $status);

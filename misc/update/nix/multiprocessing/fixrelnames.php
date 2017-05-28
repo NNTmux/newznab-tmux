@@ -7,7 +7,7 @@ if (!isset($argv[1]) || !in_array($argv[1], ['standard', 'predbft'])) {
 	);
 }
 
-require('.do_not_run/require.php');
+require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\libraries\Forking;
 

@@ -8,55 +8,62 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-$Releases = new Releases(['Settings' => $page->settings]);
-$AniDB = new AniDB(['Settings' => $page->settings]);
+$releases = new Releases(['Settings' => $page->settings]);
+$aniDB = new AniDB(['Settings' => $page->settings]);
 
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 
 	# force the category to TV_ANIME as it should be for anime, as $catarray was NULL and we know the category for sure for anime
-	$releases = $Releases->searchbyAnidbId($_GET['id'], 0, 1000, '', [Category::TV_ANIME], -1);
-	$anidb = $AniDB->getAnimeInfo($_GET['id']);
+	$aniDbReleases = $releases->searchbyAnidbId($_GET['id'], 0, 1000, '', [Category::TV_ANIME], -1);
+	$aniDbInfo = $aniDB->getAnimeInfo($_GET['id']);
 
-	if (!$releases && !$anidb) {
+	if (!$releases && !$aniDbInfo) {
 		$page->show404();
-	} else if (!$anidb) {
+	} else if (!$aniDbInfo) {
 		$page->smarty->assign('nodata', 'No AniDB information for this series.');
-	} elseif (!$releases) {
+	} else if (!$aniDbReleases) {
 		$page->smarty->assign('nodata', 'No releases for this series.');
 	} else {
 
-		$page->smarty->assign('anidb', $anidb);
-		$page->smarty->assign('animeEpisodeTitlesSize', count($releases));
-		$page->smarty->assign('animeEpisodeTitles', $releases);
-		$page->smarty->assign('animeAnidbID', $anidb['anidbid']);
-		# case is off on old variable this resolves that, I do not think the other is ever used, but left if anyways
-		$page->smarty->assign('animeAnidbid', $anidb['anidbid']);
-		$page->smarty->assign('animeTitle', $anidb['title']);
-		$page->smarty->assign('animeType', $anidb['type']);
-		$page->smarty->assign('animePicture', $anidb['picture']);
-		$page->smarty->assign('animeStartDate', $anidb['startdate']);
-		$page->smarty->assign('animeEndDate', $anidb['enddate']);
-		$page->smarty->assign('animeDescription', $anidb['description']);
-		$page->smarty->assign('animeRating', $anidb['rating']);
-		$page->smarty->assign('animeRelated', $anidb['related']);
-		$page->smarty->assign('animeSimilar', $anidb['similar']);
-		$page->smarty->assign('animeCategories', $anidb['categories']);
+		$page->smarty->assign('anidb', $aniDbInfo);
+		$page->smarty->assign('animeEpisodeTitles', $aniDbReleases);
+		$page->smarty->assign(
+			[
+				'animeAnidbid'     => $aniDbInfo['anidbid'],
+				'animeTitle'       => $aniDbInfo['title'],
+				'animeType'        => $aniDbInfo['type'],
+				'animePicture'     => $aniDbInfo['picture'],
+				'animeStartDate'   => $aniDbInfo['startdate'],
+				'animeEndDate'     => $aniDbInfo['enddate'],
+				'animeDescription' => $aniDbInfo['description'],
+				'animeRating'      => $aniDbInfo['rating'],
+				'animeRelated'     => $aniDbInfo['related'],
+				'animeSimilar'     => $aniDbInfo['similar'],
+				'animeCategories'  => $aniDbInfo['categories'],
+				'animeCreators'    => $aniDbInfo['creators'],
+				'animeCharacters'  => $aniDbInfo['characters']
+			]
+		);
 
 		$page->smarty->assign('nodata', '');
 
-		$page->title = $anidb['title'];
-		$page->meta_title = 'View Anime ' . $anidb['title'];
+		$page->title = $aniDbInfo['title'];
+		$page->meta_title = 'View Anime ' . $aniDbInfo['title'];
 		$page->meta_keywords = 'view,anime,anidb,description,details';
-		$page->meta_description = 'View ' . $anidb['title'] . ' Anime';
+		$page->meta_description = 'View ' . $aniDbInfo['title'] . ' Anime';
 	}
 	$page->content = $page->smarty->fetch('viewanime.tpl');
 	$page->render();
 } else {
-	$letter = (isset($_GET['id']) && preg_match('/^(0\-9|[A-Z])$/i', $_GET['id'])) ? $_GET['id'] : '0-9';
+	$letter = (isset($_GET['id']) && preg_match('/^(0\-9|[A-Z])$/i', $_GET['id'])) ?
+		$_GET['id'] :
+		'0-9';
 
-	$animetitle = (isset($_GET['title']) && !empty($_GET['title'])) ? $_GET['title'] : '';
+	$animetitle = (isset($_GET['title']) && !empty($_GET['title'])) ?
+		$_GET['title'] :
+		'';
 
-	if ($animetitle != '' && !isset($_GET['id'])) {
+	if ($animetitle !== '' && !isset($_GET['id'])) {
 		$letter = '';
 	}
 
@@ -67,7 +74,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 	$page->meta_keywords = 'view,anime,series,description,details';
 	$page->meta_description = 'View Anime List';
 
-	$animelist = array();
+	$animelist = [];
 	if ($masterserieslist instanceof \Traversable) {
 		foreach ($masterserieslist as $s) {
 			if (preg_match('/^[0-9]/', $s['title'])) {

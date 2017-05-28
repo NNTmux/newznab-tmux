@@ -25,21 +25,25 @@
 					   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$release.id}&amp;from={$smarty.server.HTTP_REFERER}"
 					   title="Delete release">Delete</a>
 				{/if}
-				{if $movie && $release.videos_id <= 0}
-					<a class="label label-primary" target="_blank"
-					   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbid}/"
-					   title="View at IMDB">IMDB</a>
-					<a target="_blank"
-					   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$release.imdbid}/"
-					   name="trakt{$release.imdbid}" title="View Trakt page"
-					   class="label label-primary" rel="trakt">TRAKT</a>
-					{if $movie.tmdbid != ''}
+				{if $movie && $release.videos_id <= 0 }
+					{if $movie.imdbid > 0}
+						<a class="label label-primary" target="_blank"
+					   		href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$movie.imdbid}/"
+					   		title="View at IMDB">IMDB</a>
+						<a target="_blank"
+					   		href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$movie.imdbid}/"
+					   		name="trakt{$release.imdbid}" title="View Trakt page"
+					   		class="label label-primary" rel="trakt">TRAKT</a>
+					{/if}
+					{if $movie.tmdbid > 0}
 						<a class="label label-primary" target="_blank"
 						   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}"
 						   title="View at TMDb">TMDb</a>
 					{/if}
-					<a class="label label-primary" href="{$smarty.const.WWW_TOP}/movies?imdb={$release.imdbid}"
-					   title="View all versions">Movie View</a>
+					{if $movie.imdbid > 0}
+						<a class="label label-primary" href="{$smarty.const.WWW_TOP}/movies?imdb={$movie.imdbid}"
+					   	title="View all versions">Movie View</a>
+					{/if}
 				{/if}
 				{if $anidb && $release.anidbid > 0}
 					<a class="label label-primary" href="{$serverroot}anime/{$release.anidbid}"
@@ -246,11 +250,11 @@
 													   id="guid{$release.guid}"></i> Send to Queue
 												</button>
 											{/if}
-											{if !empty($release.imdbid)}
+											{if !empty($movie.imdbid)}
 												{if !empty($cpurl) && !empty($cpapi)}
 													<button
 															type="button"
-															id="imdb{$release.imdbid}"
+															id="imdb{$movie.imdbid}"
 															href="javascript:;"
 															class="btn btn-primary btn-sm btn-info btn-transparent sendtocouch">
 														<i class="fa fa-bed"></i>
@@ -275,7 +279,7 @@
 											<tr valign="top">
 												<td>
 													<table class="data table table-striped responsive-utilities jambo-table">
-														{if $movie && $release.videos_id <= 0}
+														{if $movie && $release.videos_id <= 0 && $movie.imdbid > 0}
 															<tr>
 																<th width="140">Name
 																</th>
@@ -318,7 +322,7 @@
 																</tr>
 															{/if}
 														{/if}
-														{if $movie && $release.videos_id <= 0}
+														{if $movie && $release.videos_id <= 0 && $movie.imdbid > 0 }
 															<tr>
 																<th width="140">
 																	Starring

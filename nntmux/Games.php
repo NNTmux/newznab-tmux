@@ -72,12 +72,12 @@ class Games
 	protected $_gameID;
 
 	/**
-	 * @var array
+	 * @var array|bool
 	 */
 	protected $_gameResults;
 
 	/**
-	 * @var object
+	 * @var Steam
 	 */
 	protected $_getGame;
 
@@ -107,9 +107,9 @@ class Games
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		$this->publicKey = Settings::value('APIs..giantbombkey');
-		$this->gameQty = Settings::value('..maxgamesprocessed' != '') ? Settings::value('..maxgamesprocessed') : 150;
+		$this->gameQty = Settings::value('..maxgamesprocessed') !== '' ? Settings::value('..maxgamesprocessed') : 150;
 		$this->imgSavePath = NN_COVERS . 'games' . DS;
-		$this->renamed = Settings::value('..lookupgames') == 2 ? 'AND isrenamed = 1' : '';
+		$this->renamed = Settings::value('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
 		$this->matchPercentage = 60;
 		$this->maxHitRequest = false;
 		$this->catWhere = 'AND categories_id = ' . Category::PC_GAMES . ' ';
@@ -162,16 +162,16 @@ class Games
 				if ($result['title'] === $title) {
 					$bestMatch = $result;
 					break;
-				} else {
-					similar_text(strtolower($result['title']), strtolower($title), $percent);
-					// If similartext reports an exact match set best match and break out
-					if ($percent === 100) {
-						$bestMatch = $result;
-						break;
-					} else if ($percent >= self::GAME_MATCH_PERCENTAGE && $percent > $bestMatchPct) {
-						$bestMatch = $result;
-						$bestMatchPct = $percent;
-					}
+				}
+				similar_text(strtolower($result['title']), strtolower($title), $percent);
+				// If similar_text reports an exact match set best match and break out
+				if ($percent === 100) {
+					$bestMatch = $result;
+					break;
+				}
+				if ($percent >= self::GAME_MATCH_PERCENTAGE && $percent > $bestMatchPct) {
+					$bestMatch = $result;
+					$bestMatchPct = $percent;
 				}
 			}
 		}
@@ -185,7 +185,7 @@ class Games
 	 *
 	 * @return array
 	 */
-	public function getRange($start, $num)
+	public function getRange($start, $num): array
 	{
 		return $this->pdo->query(
 			sprintf(
@@ -195,35 +195,36 @@ class Games
 		);
 	}
 
-	public function getCount()
+	/**
+	 * @return int
+	 */
+	public function getCount(): int
 	{
 		$res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM gamesinfo');
 		return ($res === false ? 0 : $res['num']);
 	}
 
 	/**
-	 * @param       $cat
-	 * @param       $start
-	 * @param       $num
-	 * @param       $orderBy
-	 * @param int|string   $maxAge
-	 * @param array $excludedCats
+	 * @param        $cat
+	 * @param        $start
+	 * @param        $num
+	 * @param string|array $orderBy
+	 * @param string $maxAge
+	 * @param array  $excludedCats
 	 *
 	 * @return array
 	 */
-	public function getGamesRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = array())
+	public function getGamesRange($cat, $start, $num, $orderBy = '', $maxAge = '', array $excludedCats = []): array
 	{
 		$browseBy = $this->getBrowseBy();
 
 		$catsrch = '';
-		if (count($cat) > 0 && $cat[0] != -1) {
+		if (count($cat) > 0 && $cat[0] !== -1) {
 			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		if ($maxAge > 0) {
 			$maxAge = sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge);
-		} else {
-			$maxAge = '';
 		}
 
 		$exccatlist = '';
@@ -303,19 +304,19 @@ class Games
 				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 		if (!empty($return)) {
-			$return[0]['_totalcount'] = (isset($games['total']) ? $games['total'] : 0);
+			$return[0]['_totalcount'] = $games['total'] ?? 0;
 		}
 		return $return;
 	}
 
 	/**
-	 * @param $orderBy
+	 * @param string|array $orderBy
 	 *
 	 * @return array
 	 */
-	public function getGamesOrder($orderBy)
+	public function getGamesOrder($orderBy): array
 	{
-		$order = ($orderBy == '') ? 'r.postdate' : $orderBy;
+		$order = $orderBy === '' ? 'r.postdate' : $orderBy;
 		$orderArr = explode('_', $order);
 		switch ($orderArr[0]) {
 			case 'title':
@@ -346,7 +347,10 @@ class Games
 		return [$orderField, $orderSort];
 	}
 
-	public function getGamesOrdering()
+	/**
+	 * @return array
+	 */
+	public function getGamesOrdering(): array
 	{
 		return [
 			'title_asc', 'title_desc', 'posted_asc', 'posted_desc', 'size_asc', 'size_desc',
@@ -355,16 +359,21 @@ class Games
 		];
 	}
 
-	public function getBrowseByOptions()
+	/**
+	 * @return array
+	 */
+	public function getBrowseByOptions(): array
 	{
 		return ['title' => 'title', 'genre' => 'genres_id', 'year' => 'year'];
 	}
 
-	public function getBrowseBy()
+	/**
+	 * @return string
+	 */
+	public function getBrowseBy(): string
 	{
-		$browseBy = '';
+		$browseBy = ' ';
 		$browseByArr = $this->getBrowseByOptions();
-		$like = 'LIKE';
 
 		foreach ($browseByArr as $bbk => $bbv) {
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
@@ -386,13 +395,13 @@ class Games
 	 *
 	 * @return string
 	 */
-	public function makeFieldLinks($data, $field)
+	public function makeFieldLinks($data, $field): string
 	{
 		$tmpArr = explode(', ', $data[$field]);
 		$newArr = [];
 		$i = 0;
 		foreach ($tmpArr as $ta) {
-			if (trim($ta) == '') {
+			if (trim($ta) === '') {
 				continue;
 			}
 			// Only use first 6.
@@ -422,7 +431,7 @@ class Games
 	 * @param $trailerUrl
 	 * @param $genreID
 	 */
-	public function update($id, $title, $asin, $url, $publisher, $releaseDate, $esrb, $cover, $trailerUrl, $genreID)
+	public function update($id, $title, $asin, $url, $publisher, $releaseDate, $esrb, $cover, $trailerUrl, $genreID): void
 	{
 
 		$this->pdo->queryExec(
@@ -446,13 +455,15 @@ class Games
 	}
 
 	/**
-	 * Process each game, updating game information from Steam, Giantbomb, Desura and GreenLight
+	 * Process each game, updating game information from Steam and Giantbomb
 	 *
 	 * @param $gameInfo
 	 *
 	 * @return bool
+	 * @throws \RuntimeException
+	 * @throws \InvalidArgumentException
 	 */
-	public function updateGamesInfo($gameInfo)
+	public function updateGamesInfo($gameInfo): bool
 	{
 		//wait 10 seconds before proceeding (steam api limit)
 		sleep(10);
@@ -461,88 +472,81 @@ class Games
 
 		$game = [];
 
-		// Process Steam first before giantbomb
-		// Steam has more details
-		$this->_gameResults = [];
+		// Process Steam first before GiantBomb as Steam has more details
+		$this->_gameResults = false;
+		$genreName = '';
 		$this->_getGame = new Steam(['DB' => $this->pdo]);
-		$this->_classUsed = 'steam';
-		$this->_getGame->searchTerm = $gameInfo['title'];
+		$this->_classUsed = 'Steam';
+
 		$steamGameID = $this->_getGame->search($gameInfo['title']);
-		if ($steamGameID !== false){
-			$result = $this->_getGame->getAll($steamGameID);
-			if ($result !== false) {
-				$this->_gameResults[] = $result;
+
+		if ($steamGameID !== false) {
+			$this->_gameResults = $this->_getGame->getAll($steamGameID);
+
+			if ($this->_gameResults !== false) {
+				if (empty($this->_gameResults['title'])) {
+					return false;
+				}
+				if (!empty($this->_gameResults['cover'])) {
+					$game['coverurl'] = (string)$this->_gameResults['cover'];
+				}
+
+				if (!empty($this->_gameResults['backdrop'])) {
+					$game['backdropurl'] = (string)$this->_gameResults['backdrop'];
+				}
+
+				$game['title'] = (string)$this->_gameResults['title'];
+				$game['asin'] = $this->_gameResults['steamid'];
+				$game['url'] = (string)$this->_gameResults['directurl'];
+
+				if (!empty($this->_gameResults['publisher'])) {
+					$game['publisher'] = (string)$this->_gameResults['publisher'];
+				} else {
+					$game['publisher'] = 'Unknown';
+				}
+
+				if (!empty($this->_gameResults['rating'])) {
+					$game['esrb'] = (string)$this->_gameResults['rating'];
+				} else {
+					$game['esrb'] = 'Not Rated';
+				}
+
+				if (!empty($this->_gameResults['releasedate'])) {
+					$dateReleased = $this->_gameResults['releasedate'];
+					$date = \DateTime::createFromFormat('M j, Y', $dateReleased);
+					if ($date instanceof \DateTime) {
+						$game['releasedate'] = (string)$date->format('Y-m-d');
+					}
+				}
+
+				if (!empty($this->_gameResults['description'])) {
+					$game['review'] = (string)$this->_gameResults['description'];
+				}
+
+				if (!empty($this->_gameResults['genres'])) {
+					$genres = $this->_gameResults['genres'];
+					$genreName = $this->_matchGenre($genres);
+				}
 			}
 		}
 
-		if (count($this->_gameResults) < 1) {
+		if ($steamGameID === false || $this->_gameResults === false) {
 			$bestMatch = false;
-			$this->_classUsed = 'giantbomb';
-			$result = $this->giantbomb->search($gameInfo['title'], 'game');
-			if (!empty($result)) {
+			$this->_classUsed = 'GiantBomb';
+			$result = $this->giantbomb->search($gameInfo['title'], 'Game');
+
+			if (!is_object($result)) {
 				foreach ($result as $res) {
-					similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent);
-					if ($percent >= self::GAME_MATCH_PERCENTAGE) {
+					similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent1);
+					similar_text(strtolower($gameInfo['title']), strtolower($res->aliases), $percent2);
+					if ($percent1 >= self::GAME_MATCH_PERCENTAGE || $percent2 >= self::GAME_MATCH_PERCENTAGE ) {
 						$bestMatch = $res->id;
 					}
 				}
+
 				if ($bestMatch !== false) {
-					$this->_gameResults[] = $this->giantbomb->findOne('Game', '3030-' . $bestMatch);
-				}
-			}
-		}
-		if (empty($this->_gameResults['title']) || empty($this->_gameResults->name)){
-			return false;
-		}
-		if (!is_array($this->_gameResults)){
-			return false;
-		}
-		if (count($this->_gameResults) > 1) {
-			$genreName = '';
-			switch ($this->_classUsed) {
-				case 'steam':
-					if (!empty($this->_gameResults['cover'])) {
-						$game['coverurl'] = (string)$this->_gameResults['cover'];
-					}
+					$this->_gameResults = $this->giantbomb->findOne('Game', '3030-' . $bestMatch);
 
-					if (!empty($this->_gameResults['backdrop'])) {
-						$game['backdropurl'] = (string)$this->_gameResults['backdrop'];
-					}
-
-					$game['title'] = (string)$this->_gameResults['title'];
-					$game['asin'] = $this->_gameResults['steamid'];
-					$game['url'] = (string)$this->_gameResults['directurl'];
-
-					if (!empty($this->_gameResults['publisher'])) {
-						$game['publisher'] = (string)$this->_gameResults['publisher'];
-					} else {
-						$game['publisher'] = 'Unknown';
-					}
-
-					if (!empty($this->_gameResults['rating'])) {
-						$game['esrb'] = (string)$this->_gameResults['rating'];
-					} else {
-						$game['esrb'] = 'Not Rated';
-					}
-
-					if (!empty($this->_gameResults['releasedate'])) {
-						$dateReleased = $this->_gameResults['releasedate'];
-						$date = \DateTime::createFromFormat('M/j/Y', $dateReleased);
-						if ($date instanceof \DateTime) {
-							$game['releasedate'] = (string)$date->format('Y-m-d');
-						}
-					}
-
-					if (!empty($this->_gameResults['description'])) {
-						$game['review'] = (string)$this->_gameResults['description'];
-					}
-
-					if (!empty($this->_gameResults['genres'])) {
-						$genres = $this->_gameResults['genres'];
-						$genreName = $this->_matchGenre($genres);
-					}
-					break;
-				case 'giantbomb':
 					if (!empty($this->_gameResults->image['medium_url'])) {
 						$game['coverurl'] = (string)$this->_gameResults->image['medium_url'];
 					}
@@ -551,11 +555,15 @@ class Games
 						$game['backdropurl'] = (string)$this->_gameResults->image['screen_url'];
 					}
 
-					$game['title'] = (string)$this->_gameResults->name;
-					$game['asin'] = $this->_gameResults->id;
-					$game['url'] = (string)$this->_gameResults->site_detail_url;
+					$game['title'] = (string)$this->_gameResults->get('name');
+					$game['asin'] = $this->_gameResults->get('id');
+					if (!empty($this->_gameResults->get('site_detail_url'))) {
+						$game['url'] = (string)$this->_gameResults->get('site_detail_url');
+					} else {
+						$game['url'] = '';
+					}
 
-					if (!empty($this->_gameResults->publishers)) {
+					if ($this->_gameResults->get('publishers') !== '') {
 						$game['publisher'] = (string)$this->_gameResults->publishers[0]['name'];
 					} else {
 						$game['publisher'] = 'Unknown';
@@ -568,7 +576,7 @@ class Games
 						$game['esrb'] = 'Not Rated';
 					}
 
-					if (!empty($this->_gameResults->original_release_date)) {
+					if ($this->_gameResults->original_release_date !== '') {
 						$dateReleased = $this->_gameResults->original_release_date;
 						$date = \DateTime::createFromFormat('Y-m-d H:i:s', $dateReleased);
 						if ($date instanceof \DateTime) {
@@ -576,21 +584,20 @@ class Games
 						}
 					}
 
-					if (!empty($this->_gameResults->deck)) {
+					if ($this->_gameResults->deck !== '') {
 						$game['review'] = (string)$this->_gameResults->deck;
 					}
+				} else {
+					ColorCLI::doEcho(ColorCLI::notice('GiantBomb returned no valid results'));
 
-					if (!empty($this->_gameResults->genres)) {
-						$genres = implode(',', array_column($this->_gameResults->genres, 'name'));
-						$genreName = $this->_matchGenre($genres);
-					}
-					break;
-				default:
 					return false;
+				}
+			} else {
+				ColorCLI::doEcho(ColorCLI::notice('GiantBomb found no valid results'));
+				return false;
 			}
-		} else {
-			return false;
 		}
+
 		// Load genres.
 		$defaultGenres = $gen->getGenres(Genres::GAME_TYPE);
 		$genreAssoc = [];
@@ -616,10 +623,10 @@ class Games
 			$game['title'] = $gameInfo['title'];
 		}
 		if(!isset($game['releasedate'])){
-			$game['releasedate'] = "";
+			$game['releasedate'] = '';
 		}
 
-		if ($game['releasedate'] == '') {
+		if ($game['releasedate'] === '') {
 			$game['releasedate'] = '';
 		}
 		if(!isset($game['review'])){
@@ -631,8 +638,8 @@ class Games
 			$genreName = 'Unknown';
 		}
 
-		if (in_array(strtolower($genreName), $genreAssoc)) {
-			$genreKey = array_search(strtolower($genreName), $genreAssoc);
+		if (in_array(strtolower($genreName), $genreAssoc, false)) {
+			$genreKey = array_search(strtolower($genreName), $genreAssoc, false);
 		} else {
 			$genreKey = $this->pdo->queryInsert(
 				sprintf('
@@ -665,9 +672,9 @@ class Games
 					$this->pdo->escapeString($game['asin']),
 					$this->pdo->escapeString($game['url']),
 					$this->pdo->escapeString($game['publisher']),
-					($game['gamesgenreID'] == -1 ? "null" : $game['gamesgenreID']),
+					($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']),
 					$this->pdo->escapeString($game['esrb']),
-					($game['releasedate'] != '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
+					($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
 					$this->pdo->escapeString(substr($game['review'], 0, 3000)),
 					$game['cover'],
 					$game['backdrop'],
@@ -688,9 +695,9 @@ class Games
 					$this->pdo->escapeString($game['asin']),
 					$this->pdo->escapeString($game['url']),
 					$this->pdo->escapeString($game['publisher']),
-					($game['gamesgenreID'] == -1 ? "null" : $game['gamesgenreID']),
+					($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']),
 					$this->pdo->escapeString($game['esrb']),
-					($game['releasedate'] != '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
+					($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
 					$this->pdo->escapeString(substr($game['review'], 0, 3000)),
 					$game['cover'],
 					$game['backdrop'],
@@ -703,10 +710,12 @@ class Games
 
 		if ($gamesId) {
 			if ($this->echoOutput) {
-				$this->pdo->log->doEcho(
-					$this->pdo->log->header('Added/updated game: ') .
-					$this->pdo->log->alternateOver('   Title:    ') .
-					$this->pdo->log->primary($game['title'])
+				ColorCLI::doEcho(
+					ColorCLI::header('Added/updated game: ') .
+					ColorCLI::alternateOver('   Title:    ') .
+					ColorCLI::primary($game['title']) .
+					ColorCLI::alternateOver( '   Source:   ') .
+					ColorCLI::primary($this->_classUsed)
 				);
 			}
 			if($game['cover'] === 1){
@@ -717,9 +726,9 @@ class Games
 			}
 		} else {
 			if ($this->echoOutput) {
-				$this->pdo->log->doEcho(
-					$this->pdo->log->headerOver('Nothing to update: ') .
-					$this->pdo->log->primary($game['title'] . ' (PC)' )
+				ColorCLI::doEcho(
+					ColorCLI::headerOver('Nothing to update: ') .
+					ColorCLI::primary($game['title'] . ' (PC)' )
 				);
 			}
 		}
@@ -727,7 +736,12 @@ class Games
 		return $gamesId;
 	}
 
-	public function processGamesReleases()
+	/**
+	 *
+	 * @throws \InvalidArgumentException
+	 * @throws \RuntimeException
+	 */
+	public function processGamesReleases(): void
 	{
 		$res = $this->pdo->queryDirect(
 			sprintf('
@@ -745,7 +759,7 @@ class Games
 
 		if ($res instanceof \Traversable && $res->rowCount() > 0) {
 			if ($this->echoOutput) {
-				$this->pdo->log->doEcho($this->pdo->log->header('Processing ' . $res->rowCount() . ' games release(s).'));
+				ColorCLI::doEcho(ColorCLI::header('Processing ' . $res->rowCount() . ' games release(s).'));
 			}
 
 			foreach ($res as $arr) {
@@ -757,9 +771,9 @@ class Games
 				if ($gameInfo !== false) {
 
 					if ($this->echoOutput) {
-						$this->pdo->log->doEcho(
-							$this->pdo->log->headerOver('Looking up: ') .
-							$this->pdo->log->primary($gameInfo['title'] . ' (PC)' )
+						ColorCLI::doEcho(
+							ColorCLI::headerOver('Looking up: ') .
+							ColorCLI::primary($gameInfo['title'] . ' (PC)' )
 						);
 					}
 
@@ -793,7 +807,7 @@ class Games
 			}
 		} else {
 			if ($this->echoOutput) {
-				$this->pdo->log->doEcho($this->pdo->log->header('No games releases to process.'));
+				ColorCLI::doEcho(ColorCLI::header('No games releases to process.'));
 			}
 		}
 	}
@@ -872,7 +886,7 @@ class Games
 	 *
 	 * @return string
 	 */
-	protected function _matchGenre($genre = '')
+	protected function _matchGenre($genre = ''): string
 	{
 		$genreName = '';
 		$a = str_replace('-', ' ', $genre);

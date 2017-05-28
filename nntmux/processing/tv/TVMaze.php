@@ -2,6 +2,7 @@
 namespace nntmux\processing\tv;
 
 use JPinkney\TVMaze\TVMaze as Client;
+use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
 
 /**
@@ -46,7 +47,7 @@ class TVMaze extends TV
 	 *
 	 * @return bool
 	 */
-	public function getBanner($videoId, $siteID)
+	public function getBanner($videoId, $siteID): bool
 	{
 		return false;
 	}
@@ -60,14 +61,14 @@ class TVMaze extends TV
 	 * @param      $process
 	 * @param bool $local
 	 */
-	public function processSite ($groupID, $guidChar, $process, $local = false)
+	public function processSite ($groupID, $guidChar, $process, $local = false): void
 	{
 		$res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVMAZE);
 
 		$tvcount = $res->rowCount();
 
 		if ($this->echooutput && $tvcount > 0) {
-			echo $this->pdo->log->header("Processing TVMaze lookup for " . number_format($tvcount) . " release(s).");
+			echo ColorCLI::header('Processing TVMaze lookup for ' . number_format($tvcount) . ' release(s).');
 		}
 
 		if ($res instanceof \Traversable) {
@@ -83,11 +84,11 @@ class TVMaze extends TV
 				$release = $this->parseInfo($row['searchname']);
 				if (is_array($release) && $release['name'] != '') {
 
-					if (in_array($release['cleanname'], $this->titleCache)) {
+					if (in_array($release['cleanname'], $this->titleCache, false)) {
 						if ($this->echooutput) {
-							echo $this->pdo->log->headerOver("Title: ") .
-									$this->pdo->log->warningOver('"' . $release['cleanname'] . '"') .
-									$this->pdo->log->header(" already failed lookup for this site.  Skipping.");
+							echo ColorCLI::headerOver('Title: ') .
+									ColorCLI::warningOver($release['cleanname']) .
+									ColorCLI::header(' already failed lookup for this site.  Skipping.');
 						}
 						$this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
 						continue;
@@ -97,7 +98,7 @@ class TVMaze extends TV
 					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV, parent::SOURCE_TVMAZE);
 
 					// Force local lookup only
-					if ($local == true) {
+					if ($local === true) {
 						$lookupSetting = false;
 					} else {
 						$lookupSetting = true;
@@ -106,9 +107,9 @@ class TVMaze extends TV
 					if ($videoId === false && $lookupSetting) {
 						// If lookups are allowed lets try to get it.
 						if ($this->echooutput) {
-							echo $this->pdo->log->primaryOver("Checking TVMaze for previously failed title: ") .
-									$this->pdo->log->headerOver($release['cleanname']) .
-									$this->pdo->log->primary(".");
+							echo ColorCLI::primaryOver('Checking TVMaze for previously failed title: ') .
+									ColorCLI::headerOver($release['cleanname']) .
+									ColorCLI::primary('.');
 						}
 
 						// Get the show from TVMaze
@@ -132,9 +133,9 @@ class TVMaze extends TV
 						}
 					} else {
 						if ($this->echooutput) {
-							echo $this->pdo->log->primaryOver("Found local TVMaze match for: ") .
-									$this->pdo->log->headerOver($release['cleanname']) .
-									$this->pdo->log->primary(".  Attempting episode lookup!");
+							echo ColorCLI::primaryOver('Found local TVMaze match for: ') .
+									ColorCLI::headerOver($release['cleanname']) .
+									ColorCLI::primary('.  Attempting episode lookup!');
 						}
 						$tvmazeid = $this->getSiteIDFromVideoID('tvmaze', $videoId);
 					}
@@ -149,7 +150,7 @@ class TVMaze extends TV
 						if ($episodeNo === 'all') {
 							// Set the video ID and leave episode 0
 							$this->setVideoIdFound($videoId, $row['id'], 0);
-							echo $this->pdo->log->primary("Found TVDB Match for Full Season!");
+							echo ColorCLI::primary('Found TVMaze Match for Full Season!');
 							continue;
 						}
 
@@ -179,13 +180,12 @@ class TVMaze extends TV
 							// Mark the releases video and episode IDs
 							$this->setVideoIdFound($videoId, $row['id'], $episode);
 							if ($this->echooutput) {
-								echo $this->pdo->log->primary("Found TVMaze Match!");
+								echo ColorCLI::primary('Found TVMaze Match!');
 							}
 							continue;
-						} else {
-							//Processing failed, set the episode ID to the next processing group
-							$this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
 						}
+						//Processing failed, set the episode ID to the next processing group
+						$this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
 					} else {
 						//Processing failed, set the episode ID to the next processing group
 						$this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
@@ -279,24 +279,23 @@ class TVMaze extends TV
 				if (strtolower($show->name) === strtolower($cleanName)) {
 					$highest = $show;
 					break;
-				} else {
-					// Check each show title for similarity and then find the highest similar value
-					$matchPercent = $this->checkMatch(strtolower($show->name), strtolower($cleanName), self::MATCH_PROBABILITY);
+				}
+				// Check each show title for similarity and then find the highest similar value
+				$matchPercent = $this->checkMatch(strtolower($show->name), strtolower($cleanName), self::MATCH_PROBABILITY);
 
-					// If new match has a higher percentage, set as new matched title
-					if ($matchPercent > $highestMatch) {
-						$highestMatch = $matchPercent;
-						$highest = $show;
-					}
+				// If new match has a higher percentage, set as new matched title
+				if ($matchPercent > $highestMatch) {
+					$highestMatch = $matchPercent;
+					$highest = $show;
+				}
 
-					// Check for show aliases and try match those too
-					if (is_array($show->akas) && !empty($show->akas)) {
-						foreach ($show->akas as $key => $aka) {
-							$matchPercent = $this->checkMatch(strtolower($aka['name']), strtolower($cleanName), $matchPercent);
-							if ($matchPercent > $highestMatch) {
-								$highestMatch = $matchPercent;
-								$highest = $show;
-							}
+				// Check for show aliases and try match those too
+				if (is_array($show->akas) && !empty($show->akas)) {
+					foreach ($show->akas as $key => $aka) {
+						$matchPercent = $this->checkMatch(strtolower($aka['name']), strtolower($cleanName), $matchPercent);
+						if ($matchPercent > $highestMatch) {
+							$highestMatch = $matchPercent;
+							$highest = $show;
 						}
 					}
 				}
@@ -316,7 +315,7 @@ class TVMaze extends TV
 	 *
 	 * @return int
 	 */
-	public function getPoster($videoId, $showId = 0)
+	public function getPoster($videoId, $showId = 0): int
 	{
 		$ri = new ReleaseImage($this->pdo);
 
@@ -324,7 +323,7 @@ class TVMaze extends TV
 		$hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '');
 
 		// Mark it retrieved if we saved an image
-		if ($hascover == 1) {
+		if ($hascover === 1) {
 			$this->setCoverFound($videoId);
 		}
 		return $hascover;
@@ -387,9 +386,9 @@ class TVMaze extends TV
 	 *
 	 * @return array
 	 */
-	protected function formatShowInfo($show)
+	protected function formatShowInfo($show): array
 	{
-		$this->posterUrl = (string)(isset($show->mediumImage) ? $show->mediumImage : '');
+		$this->posterUrl = (string)$show->mediumImage ?? '';
 
 		return [
 			'type'      => (int)parent::TYPE_TV,
@@ -400,12 +399,12 @@ class TVMaze extends TV
 			'country'   => (string)$show->country,
 			'source'    => (int)parent::SOURCE_TVMAZE,
 			'imdb'      => 0,
-			'tvdb'      => (int)(isset($show->externalIDs['thetvdb']) ? $show->externalIDs['thetvdb'] : 0),
+			'tvdb'      => (int)($show->externalIDs['thetvdb'] ?? 0),
 			'tvmaze'    => (int)$show->id,
 			'trakt'     => 0,
-			'tvrage'    => (int)(isset($show->externalIDs['tvrage']) ? $show->externalIDs['tvrage'] : 0),
+			'tvrage'    => (int)($show->externalIDs['tvrage'] ?? 0),
 			'tmdb'      => 0,
-			'aliases'   => (!empty($show->akas) ? (array)$show->akas : ''),
+			'aliases'   => !empty($show->akas) ? (array)$show->akas : '',
 			'localzone' => "''"
 		];
 	}
@@ -418,7 +417,7 @@ class TVMaze extends TV
 	 *
 	 * @return array
 	 */
-	protected function formatEpisodeInfo($episode)
+	protected function formatEpisodeInfo($episode): array
 	{
 		return [
 			'title'       => (string)$episode->name,

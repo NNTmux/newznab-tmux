@@ -749,6 +749,10 @@ CREATE TABLE         releases (
   proc_nfo          TINYINT(1)                     NOT NULL DEFAULT '0',
   proc_files        TINYINT(1)                     NOT NULL DEFAULT '0',
   proc_uid          TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_srr          TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been srr
+processed',
+  proc_hash16k      TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been hash16k
+processed',
   PRIMARY KEY                                 (id, categories_id),
   INDEX ix_releases_name                      (name),
   INDEX ix_releases_groupsid                  (groups_id,passwordstatus),
@@ -784,7 +788,7 @@ CREATE TABLE         releases (
     PARTITION pc      VALUES LESS THAN (5000),
     PARTITION tv      VALUES LESS THAN (6000),
     PARTITION xxx     VALUES LESS THAN (7000),
-    PARTITION books   VALUES LESS THAN (9000)
+    PARTITION books   VALUES LESS THAN (8000)
   );
 
 
@@ -829,16 +833,16 @@ CREATE TABLE releases_groups (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS releases_regexes;
-CREATE TABLE releases_regexes (
-  releases_id           INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
-  regex_id              INT(11) UNSIGNED        NOT NULL,
-  PRIMARY KEY (releases_id, regex_id)
+DROP TABLE IF EXISTS release_regexes;
+CREATE TABLE release_regexes (
+  releases_id           INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  collection_regex_id   INT(11) NOT NULL DEFAULT '0',
+  naming_regex_id       INT(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (releases_id, collection_regex_id, naming_regex_id)
 )
   ENGINE          = MYISAM
   DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  AUTO_INCREMENT = 1;
+  COLLATE         = utf8_unicode_ci;
 
 
 DROP TABLE IF EXISTS release_unique;

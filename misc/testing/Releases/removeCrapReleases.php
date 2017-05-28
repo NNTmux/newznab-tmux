@@ -1,6 +1,6 @@
 <?php
 /* This script deletes releases that match certain criteria, type php removeCrapReleases.php false for details. */
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\ColorCLI;
 use nntmux\ReleaseRemover;
@@ -31,12 +31,14 @@ if ($argCnt === 2) {
 			'arg2 (Required) = full/number' . $n .
 			'                  full   = Run without a time limit.' . $n .
 			'                  number = Run on releases up to this old.' . $n . $n .
-			'arg3 (Optional) = blacklist | blfiles | codec | executable | gibberish | hashed | huge | installbin | passworded | passwordurl | sample | scr | short | size | wmv_all' . $n .
+			'arg3 (Optional) = blacklist | blfiles | codec | executable | gibberish | hashed | huge | nzb | installbin | passworded | passwordurl | sample | scr | short | size | wmv_all' . $n .
 			'                  blfiles     = Remove releases using the enabled blacklists in admin section of site against filenames.' . $n .
 			'                  codec       = Remove releases where the release contains AVI or WMV file and is in x264 category (the spammer).' . $n .
 			'                  executable  = Remove releases containing an exe file.' . $n .
 			'                  gibberish   = Remove releases where the name is letters/numbers only and 15 characters or longer.' . $n .
 			'                  hashed      = Remove releases where the name is letters/numbers only and 25 characters or longer.' . $n .
+			'                  huge        = Remove releases with single file with size of over 200 megabytes.' . $n .
+			'                  nzb         = Remove releases having 1 file that is an nzb file.' . $n .
 			'                  installbin  = Remove releases which contain an install.bin file.' . $n .
 			'                  passworded  = Remove releases which contain the word password in the title.' . $n .
 			'                  passwordurl = Remove releases which contain a password.url file.' . $n .
@@ -64,4 +66,4 @@ if (isset($argv[3]) && $argv[3] === 'blacklist' && isset($argv[4])) {
 }
 
 $RR = new ReleaseRemover();
-$RR->removeCrap(($argv[1] === 'true' ? true : false), $argv[2], (isset($argv[3]) ? $argv[3] : ''), (isset($blacklistID) ? $argv[4] : ''));
+$RR->removeCrap($argv[1] === 'true' ? true : false, $argv[2], $argv[3] ?? '', isset($blacklistID) ? $argv[4] : '');

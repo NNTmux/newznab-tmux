@@ -86,7 +86,7 @@
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
-														<i class="fa fa-exclamation-circle" style="color: red"
+														<i class="zmdi zmdi-alarm" style="color: red"
 														   title="This release has failed to download for some users"></i>{/if}
 													</a>
 													{if $result.classused == "ade"}
@@ -156,7 +156,7 @@
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
 														<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-															<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
+															<i class="zmdi zmdi-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class="zmdi zmdi-thumbs-o-down"></i> {$mfailed[$m@index]}Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
 													{/if}
 												</div>
 												<div class="col-md-9 small-gutter-left">
@@ -184,26 +184,26 @@
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
-																		class="fa fa-cloud-download"></i><span
+																		class="zmdi zmdi-cloud-download"></i><span
 																		class="badge"> {$mgrabs[$m@index]}
 																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 															<a role="button" class="btn btn-default btn-xs"
 															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
-																		class="fa fa-comment-o"></i><span
+																		class="zmdi zmdi-comment-o"></i><span
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 															<span
 																	id="guid{$mguid[$m@index]}"
 																	class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																	title="Send to my Download Basket"><i
-																		class="fa fa-shopping-basket"></i>
+																		class="zmdi zmdi-shopping-basket"></i>
 																		</span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
 																<span
 																		id="guid{$mguid[$m@index]}"
 																		class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																		title="Send to my Queue"><i
-																			class="fa fa-share"></i>
+																			class="zmdi zmdi-share"></i>
 																			</span>
 															{/if}
 														</div>
@@ -244,7 +244,7 @@
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
-														<i class="fa fa-exclamation-circle" style="color: red"
+														<i class="zmdi zmdi-alarm" style="color: red"
 														   title="This release has failed to download for some users"></i>{/if}
 													</a>
 													{if $result.classused == "ade"}
@@ -314,7 +314,7 @@
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 													{if !empty($mfailed[$m@index])}
 														<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-															<i class="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]}Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
+															<i class="zmdi zmdi-thumbs-o-up"></i> {$mgrabs[$m@index]} Grab{if {$mgrabs[$m@index]} != 1}s{/if} / <i class="zmdi zmdi-thumbs-o-down"></i> {$mfailed[$m@index]}Failed Download{if {$mfailed[$m@index]} > 1}s{/if}</span>
 													{/if}
 												</div>
 												<div class="col-md-9 small-gutter-left">
@@ -342,26 +342,26 @@
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
-																		class="fa fa-cloud-download"></i><span
+																		class="zmdi zmdi-cloud-download"></i><span
 																		class="badge"> {$mgrabs[$m@index]}
 																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 															<a role="button" class="btn btn-default btn-xs"
 															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
-																		class="fa fa-comment-o"></i><span
+																		class="zmdi zmdi-comment-o"></i><span
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 															<span
 																	id="guid{$mguid[$m@index]}"
 																	class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																	title="Send to my Download Basket"><i
-																		class="fa fa-shopping-basket"></i>
+																		class="zmdi zmdi-shopping-basket"></i>
 																		</span>
 															{if isset($sabintegrated) && $sabintegrated !=""}
 																<span
 																		id="guid{$mguid[$m@index]}"
 																		class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																		title="Send to my Queue"><i
-																			class="fa fa-share"></i>
+																			class="zmdi zmdi-share"></i>
 																			</span>
 															{/if}
 														</div>

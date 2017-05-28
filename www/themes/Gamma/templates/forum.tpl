@@ -26,7 +26,16 @@
 			{/if}
 		</td>
 		<td>
-			<a title="View profile" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}">{$result.username}</a>
+			<a title="View profile" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}"><h5><strong>{$result.username}</strong></h5></a>
+			{if $result.rolename === 'Admin' || $result.rolename === 'Moderator' || $result.rolename === 'Friend'}
+				<span class="btn btn-success btn-xs">{$result.rolename}</span>
+			{elseif $result.rolename === 'Supporter'}
+				<span class="btn btn-warning btn-xs">{$result.rolename}</span>
+			{elseif $result.rolename === 'Supporter ++'}
+				<span class="btn btn-danger btn-xs">{$result.rolename}</span>
+			{else}
+				<span class="btn btn-info btn-xs">{$result.rolename}</span>
+			{/if}
 			<br/>
 			on <span title="{$result.createddate}">{$result.createddate|date_format}</span> <div class="hint">({$result.createddate|timeago})</div>
 		</td>
@@ -72,13 +81,13 @@
 		<div class="control-group">
 			<label class="control-label" for="addSubject">Subject</label>
 			<div class="controls">
-				<input class="input input-xlarge" type="text" maxlength="200" id="addSubject" name="addSubject" />
+				<input class="input input-xlarge" type="text" maxlength="200" id="addSubject" name="addSubject"/>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="addMessage">Message</label>
 			<div class="controls">
-				<textarea id="addMessage" name="addMessage" ></textarea>
+				<textarea id="addMessage" name="addMessage"></textarea>
 			</div>
 			<input class="btn btn-success" type="submit" value="submit"/>
 			<input class="btn btn-warning" value="Cancel" onclick="if(confirm('Are you SURE you wish to cancel?')) history.back();" />

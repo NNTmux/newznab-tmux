@@ -6,6 +6,7 @@ use dariusiii\rarinfo\ArchiveInfo;
 use dariusiii\rarinfo\Par2Info;
 use nntmux\Categorize;
 use nntmux\Category;
+use nntmux\ColorCLI;
 use nntmux\Groups;
 use nntmux\NameFixer;
 use nntmux\Nfo;
@@ -1832,7 +1833,7 @@ class ProcessAdditional
 												'new_category' => $newCat,
 												'old_category' => $rQuery['id'],
 												'group' => $rQuery['groups_id'],
-												'release_id' => $this->_release['id'],
+												'releases_id' => $this->_release['id'],
 												'method' => 'ProcessAdditional->_getAudioInfo'
 											]
 										);
@@ -2411,7 +2412,7 @@ class ProcessAdditional
 								'new_category' => $newCategory,
 								'old_category' => $this->_release['categories_id'],
 								'group' => $this->_release['groups_id'],
-								'release_id' => $this->_release['id'],
+								'releases_id' => $this->_release['id'],
 								'method' => 'ProcessAdditional->_processU4ETitle'
 							]
 						);
@@ -2555,7 +2556,7 @@ class ProcessAdditional
 	protected function _echo($string, $type, $newLine = true)
 	{
 		if ($this->_echoCLI) {
-			$this->pdo->log->doEcho($this->pdo->log->$type($string), $newLine);
+			ColorCLI::doEcho(ColorCLI::$type($string), $newLine);
 		}
 	}
 

@@ -4,8 +4,10 @@ namespace nntmux\processing\post;
 
 use app\models\Settings;
 use nntmux\Category;
+use nntmux\ColorCLI;
 use nntmux\NZB;
 use nntmux\db\DB;
+use nntmux\db\populate\AniDB as PaDb;
 
 class AniDB
 {
@@ -20,12 +22,12 @@ class AniDB
 	public $echooutput;
 
 	/**
-	 * @var \nntmux\db\populate\AniDB
+	 * @var PaDb
 	 */
 	public $padb;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -54,7 +56,7 @@ class AniDB
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		$qty = Settings::value('..maxanidbprocessed');
-		$this->aniqty = !empty($qty) ? $qty : 100;
+		$this->aniqty = $qty ?? 100;
 
 		$this->status = 'NULL';
 	}
@@ -62,7 +64,7 @@ class AniDB
 	/**
 	 * Queues anime releases for processing
 	 */
-	public function processAnimeReleases()
+	public function processAnimeReleases(): void
 	{
 		$results = $this->pdo->queryDirect(
 			sprintf('
@@ -83,7 +85,7 @@ class AniDB
 
 			$this->doRandomSleep();
 
-			$this->padb = new \nntmux\db\populate\AniDB(
+			$this->padb = new PaDb(
 				[
 					'Echo'     => $this->echooutput,
 					'Settings' => $this->pdo
@@ -105,7 +107,7 @@ class AniDB
 				}
 			}
 		} else {
-			$this->pdo->log->doEcho($this->pdo->log->info("No work to process."), true);
+			ColorCLI::doEcho(ColorCLI::info('No anidb releases to  process.'), true);
 		}
 	}
 
@@ -135,9 +137,9 @@ class AniDB
 	/**
 	 * Sleeps between 10 and 15 seconds for AniDB API cooldown
 	 */
-	private function doRandomSleep()
+	private function doRandomSleep(): void
 	{
-		sleep(rand(10, 15));
+		sleep(random_int(10, 15));
 	}
 
 	/**
@@ -145,9 +147,9 @@ class AniDB
 	 *
 	 * @param string $cleanName
 	 *
-	 * @return array
+	 * @return array $matches
 	 */
-	private function extractTitleEpisode($cleanName = '')
+	private function extractTitleEpisode($cleanName = ''): array
 	{
 		$cleanName = str_replace('_', ' ', $cleanName);
 
@@ -156,7 +158,7 @@ class AniDB
 			$matches)
 		) {
 			$matches['epno'] = (int)$matches['epno'];
-			if (in_array($matches['epno'], ['Movie', 'OVA'])) {
+			if (in_array($matches['epno'], ['Movie', 'OVA'], false)) {
 				$matches['epno'] = 1;
 			}
 		} else if (preg_match('/^(\[[a-zA-Z\.\-!?]+\][\s_]*)?(\[BD\])?(\[\d{3,4}[ip]\])?(?P<title>[\w\s_.+!?\'-\(\)]+)(New Edit|(Blu-?ray)?( ?Box)?( ?Set)?)?\s*[\(\[](BD|\d{3,4}[ipx])/i',
@@ -166,7 +168,7 @@ class AniDB
 			$matches['epno'] = 1;
 		} else {
 			if (NN_DEBUG) {
-				$this->pdo->log->doEcho(
+				ColorCLI::doEcho(
 					PHP_EOL . "Could not parse searchname {$cleanName}.",
 					true
 				);
@@ -191,10 +193,10 @@ class AniDB
 	private function getAnidbByName($searchName = '')
 	{
 		return $this->pdo->queryOneRow(
-			sprintf("
+			sprintf('
 				SELECT at.anidbid, at.title
 				FROM anidb_titles AS at
-				WHERE at.title %s",
+				WHERE at.title %s',
 				$this->pdo->likeString($searchName, true, true)
 			)
 		);
@@ -208,7 +210,7 @@ class AniDB
 	 *
 	 * @return bool
 	 */
-	private function matchAnimeRelease($release = [])
+	private function matchAnimeRelease(array $release = []): bool
 	{
 		$matched = false;
 		$type    = 'Local';
@@ -218,9 +220,9 @@ class AniDB
 
 		if (is_array($cleanArr) && isset($cleanArr['title']) && is_numeric($cleanArr['epno'])) {
 
-			echo $this->pdo->log->header(PHP_EOL . "Looking Up: ") .
-				$this->pdo->log->primary("   Title: {$cleanArr['title']}" . PHP_EOL .
-					"   Episode: {$cleanArr['epno']}");
+			echo ColorCLI::header(PHP_EOL . 'Looking Up: ') .
+				ColorCLI::primary('   Title: ' . $cleanArr['title'] .  PHP_EOL .
+					'   Episode: ' . $cleanArr['epno']);
 
 			// get anidb number for the title of the name
 			$anidbId = $this->getAnidbByName($cleanArr['title']);
@@ -242,29 +244,29 @@ class AniDB
 						$type = 'Remote';
 					} else {
 						echo PHP_EOL .
-							$this->pdo->log->info("This AniDB ID was not found to be accurate locally, but has been updated too recently to check AniDB.") .
+							ColorCLI::info('This AniDB ID was not found to be accurate locally, but has been updated too recently to check AniDB.') .
 							PHP_EOL;
 					}
 				}
 
 				$this->updateRelease($anidbId['anidbid'], $release['id']);
 
-				$this->pdo->log->doEcho(
-					$this->pdo->log->headerOver("Matched {$type} AniDB ID: ") .
-					$this->pdo->log->primary($anidbId['anidbid']) .
-					$this->pdo->log->alternateOver("   Title: ") .
-					$this->pdo->log->primary($anidbId['title']) .
-					$this->pdo->log->alternateOver("   Episode #: ") .
-					$this->pdo->log->primary($cleanArr['epno']) .
-					$this->pdo->log->alternateOver("   Episode Title: ") .
-					$this->pdo->log->primary($updatedAni['episode_title'])
+				ColorCLI::doEcho(
+					ColorCLI::headerOver('Matched ' . $type . ' AniDB ID: ') .
+					ColorCLI::primary($anidbId['anidbid']) .
+					ColorCLI::alternateOver('   Title: ') .
+					ColorCLI::primary($anidbId['title']) .
+					ColorCLI::alternateOver('   Episode #: ') .
+					ColorCLI::primary($cleanArr['epno']) .
+					ColorCLI::alternateOver('   Episode Title: ') .
+					ColorCLI::primary($updatedAni['episode_title'])
 				);
 
 				$matched = true;
 			} else {
 				if (NN_DEBUG) {
-					$this->pdo->log->doEcho(
-						PHP_EOL . "Could not match searchname: {$release['searchname']}.",
+					ColorCLI::doEcho(
+						PHP_EOL . 'Could not match searchname:' . $release['searchname'],
 						true
 					);
 				}
@@ -279,13 +281,13 @@ class AniDB
 	 * @param $anidbId
 	 * @param $relId
 	 */
-	private function updateRelease($anidbId, $relId)
+	private function updateRelease($anidbId, $relId): void
 	{
 		$this->pdo->queryExec(
-			sprintf("
+			sprintf('
 				UPDATE releases
 				SET anidbid = %d
-				WHERE id = %d",
+				WHERE id = %d',
 				$anidbId,
 				$relId
 			)
@@ -302,11 +304,11 @@ class AniDB
 	private function updateTimeCheck($anidbId)
 	{
 		return $this->pdo->queryOneRow(
-			sprintf("
+			sprintf('
 				SELECT anidbid
 				FROM anidb_info ai
 				WHERE ai.updated < (NOW() - INTERVAL 7 DAY)
-				AND ai.anidbid = %d",
+				AND ai.anidbid = %d',
 				$anidbId
 			)
 		);

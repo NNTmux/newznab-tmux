@@ -379,9 +379,9 @@ class Utility
 			];
 		} else {
 			$options = [
-				'verify_peer'       => ($forceIgnore ? false : (bool)NN_SSL_VERIFY_PEER),
-				'verify_peer_name'  => ($forceIgnore ? false : (bool)NN_SSL_VERIFY_HOST),
-				'allow_self_signed' => ($forceIgnore ? true : (bool)NN_SSL_ALLOW_SELF_SIGNED),
+				'verify_peer'       => $forceIgnore ? false : (bool)NN_SSL_VERIFY_PEER,
+				'verify_peer_name'  => $forceIgnore ? false : (bool)NN_SSL_VERIFY_HOST,
+				'allow_self_signed' => $forceIgnore ? true : (bool)NN_SSL_ALLOW_SELF_SIGNED,
 			];
 			if (!empty(NN_SSL_CAFILE)) {
 				$options['cafile'] = NN_SSL_CAFILE;

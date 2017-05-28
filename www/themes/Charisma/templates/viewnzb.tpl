@@ -13,7 +13,7 @@
 			<div class="panel panel-default">
 				<div class="panel-body pagination2">
 					<h1>{$release.searchname|escape:"htmlall"} {if !empty($failed) }<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-							<i class ="fa fa-thumbs-o-up"></i> {$release.grabs} Grab{if $release.grabs != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
+							<i class ="zmdi zmdi-thumbs-o-up"></i> {$release.grabs} Grab{if $release.grabs != 1}s{/if} / <i class ="zmdi zmdi-thumbs-o-down"></i> {$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
 					{if isset($isadmin)}
 						<a class="label label-warning"
 						   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$release.id}&amp;from={$smarty.server.REQUEST_URI}"
@@ -22,20 +22,22 @@
 						   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$release.id}&amp;from={$smarty.server.HTTP_REFERER}"
 						   title="Delete release">Delete</a>
 					{/if}
-					{if $movie && $release.videos_id <= 0}
-						<a class="label label-default" target="_blank"
-						   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbid}/"
-						   title="View at IMDB">IMDB</a>
-						<a target="_blank"
-						   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$release.imdbid}/"
-						   name="trakt{$release.imdbid}" title="View Trakt page"
-						   class="label label-default" rel="trakt">TRAKT</a>
+					{if $movie && $release.videos_id <= 0 && $movie.imdbid > 0}
+						{if $movie.imdbid > 0}
+							<a class="label label-primary" target="_blank"
+							   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$movie.imdbid}/"
+							   title="View at IMDB">IMDB</a>
+							<a target="_blank"
+							   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$movie.imdbid}/"
+							   name="trakt{$movie.imdbid}" title="View Trakt page"
+							   class="label label-primary" rel="trakt">TRAKT</a>
+						{/if}
 						{if $movie.tmdbid != ''}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}"
 							   title="View at TMDb">TMDb</a>
 						{/if}
-						<a class="label label-default" href="{$smarty.const.WWW_TOP}/movies?imdb={$release.imdbid}" title="View all versions">Movie View</a>
+						<a class="label label-default" href="{$smarty.const.WWW_TOP}/movies?imdb={$movie.imdbid}" title="View all versions">Movie View</a>
 					{/if}
 					{if $anidb && $release.anidbid > 0}
 						<a class="label label-default" href="{$serverroot}anime/{$release.anidbid}"
@@ -228,29 +230,29 @@
 												<div class="btn-group btn-group-vertical">
 													<a class="btn btn-primary btn-sm btn-success btn-transparent"
 													   href="{$smarty.const.WWW_TOP}/getnzb/{$release.guid}"><i
-																class="fa fa-cloud-download"></i>
+																class="zmdi zmdi-cloud-download"></i>
 														Download</a>
 													<button type="button"
 															class="btn btn-primary btn-sm btn-info btn-transparent cartadd">
-														<i class="icon icon_cart fa fa-shopping-basket guid"
+														<i class="icon icon_cart zmdi zmdi-shopping-basket guid"
 														   id="guid{$release.guid}"></i> Add to
 														Cart
 													</button>
 													{if isset($sabintegrated) && $sabintegrated !=""}
 														<button type="button"
 																class="btn btn-primary btn-sm btn-transparent sabsend">
-														<i class="icon_sab fa fa-arrow-right"
+														<i class="icon_sab zmdi zmdi-arrow-right"
 														   id="guid{$release.guid}"></i> Send to
 														Queue
 														</button>{/if}
-													{if !empty($release.imdbid)}
+													{if !empty($movie.imdbid)}
 														{if !empty($cpurl) && !empty($cpapi)}
 															<button
 																type="button"
-																id="imdb{$release.imdbid}"
+																id="imdb{$movie.imdbid}"
 																href="javascript:;"
 																class="btn btn-primary btn-sm btn-info btn-transparent sendtocouch">
-																<i class="fa fa-bed"></i>
+																<i class="zmdi zmdi-bed"></i>
 																Send to CouchPotato
 															</button>
 														{/if}
@@ -258,7 +260,7 @@
 													{if $weHasVortex}
 														<button type="button"
 																class="btn btn-primary btn-sm btn-transparent vortexsend">
-														<i class="icon_sab fa fa-arrow-right"
+														<i class="icon_sab zmdi zmdi-arrow-right"
 														   id="guid{$release.guid}"></i> Send to
 														NZBVortex
 														</button>{/if}
@@ -273,7 +275,7 @@
 														<td>
 															<table class="data table table-condensed table-striped table-responsive table-hover">
 																<tbody>
-																{if $movie && $release.videos_id <= 0}
+																{if $movie && $release.videos_id <= 0 && $movie.imdbid > 0}
 																	<tr>
 																		<th width="140">Name
 																		</th>
@@ -316,7 +318,7 @@
 																		</tr>
 																	{/if}
 																{/if}
-																{if $movie && $release.videos_id <= 0}
+																{if $movie && $release.videos_id <= 0 && $movie.imdbid > 0}
 																	<tr>
 																		<th width="140">
 																			Starring
@@ -527,10 +529,10 @@
 																			<code>{$rf.name}</code>
 																			<br/>
 																			{if $rf.passworded != 1}
-																				<i class="fa fa-unlock"></i>
+																				<i class="zmdi zmdi-unlock"></i>
 																				<span class="label label-success">No Password</span>
 																			{else}
-																				<i class="fa fa-lock"></i>
+																				<i class="zmdi zmdi-lock"></i>
 																				<span class="label label-danger">Passworded</span>
 																			{/if}
 																			<span class="label label-default">{$rf.size|fsize_format:"MB"}</span>

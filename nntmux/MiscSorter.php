@@ -1,6 +1,7 @@
 <?php
 namespace nntmux;
 
+use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 use app\models\Settings;
 use nntmux\db\DB;
 use ApaiIO\Configuration\GenericConfiguration;
@@ -21,7 +22,6 @@ class MiscSorter
 	private $echooutput;
 	private $DEBUGGING;
 	private $pdo;
-	private $category;
 	private $movie;
 	private $music;
 
@@ -42,32 +42,37 @@ class MiscSorter
 
 	/**
 	 * @param bool $echooutput
-	 * @param object $pdo
+	 * @param      $pdo
 	 */
-	public function __construct($echooutput = false, &$pdo = null)
+	public function __construct($echooutput = false, &$pdo)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);
 		$this->qty = 100;
 		$this->DEBUGGING = NN_DEBUG;
 
 		$this->pdo = ($pdo instanceof DB ? $pdo : new DB());
-
-		$this->category = new Categorize(['Settings' => $this->pdo]);
 		$this->movie = new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 		$this->music = new Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
+		$this->book = new Books(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 		$this->pubkey = Settings::value('APIs..amazonpubkey');
 		$this->privkey = Settings::value('APIs..amazonprivkey');
 		$this->asstag = Settings::value('APIs..amazonassociatetag');
 	}
 
 	// Main function that determines which operation(s) should be run based on the releases NFO file
-	public function nfosorter($category = 0, $id = 0)
+	/**
+	 * @param int|string $category
+	 * @param int $id
+	 *
+	 * @return bool
+	 */
+	public function nfosorter($category, $id)
 	{
-		$idarr = ($id != 0 ? sprintf('AND r.id = %d', $id) : '');
-		$cat = ($category = 0 ? sprintf('AND r.categories_id = %d', Category::OTHER_MISC) : sprintf('AND r.categories_id = %d', $category));
+		$idarr = ($id != '' ? sprintf('AND r.id = %d', $id) : '');
+		$cat = ($category == '' ? sprintf('AND r.categories_id = %d', Category::OTHER_MISC) : sprintf('AND r.categories_id = %d', $category));
 
 		$res = $this->pdo->queryDirect(
-			sprintf("
+			sprintf('
 							SELECT UNCOMPRESS(rn.nfo) AS nfo,
 								r.id, r.name, r.searchname
 							FROM release_nfos rn
@@ -75,13 +80,13 @@ class MiscSorter
 							INNER JOIN groups g ON r.groups_id = g.id
 							WHERE rn.nfo IS NOT NULL
 							AND r.proc_sorter = %d
-							AND r.predb_id = 0 %s",
+							AND r.predb_id = 0 %s',
 				self::PROC_SORTER_NONE,
-				($idarr = '' ? $cat : $idarr)
+				$idarr = '' ? $cat : $idarr
 			)
 		);
 
-		if ($res !== false && $res instanceof \Traversable) {
+		if ($res instanceof \Traversable) {
 
 			foreach ($res as $row) {
 
@@ -99,7 +104,7 @@ class MiscSorter
 
 						$case = (isset($m) ? str_replace(' ', '', $m) : '');
 
-						if (in_array($m, ['os', 'platform', 'console']) && preg_match('/(?:\bos\b(?: type)??|platform|console)[ \.\:\}]+(\w+?).??(\w*?)/iU', $nfo, $set)) {
+						if (in_array($m, ['os', 'platform', 'console'], false) && preg_match('/(?:\bos\b(?: type)??|platform|console)[ \.\:\}]+(\w+?).??(\w*?)/iU', $nfo, $set)) {
 							if (is_array($set)) {
 								if (isset($set[1])) {
 									$case = strtolower($set[1]);
@@ -125,24 +130,40 @@ class MiscSorter
 		return false;
 	}
 
+	/**
+	 * @param $nfo
+	 * @param $str
+	 *
+	 * @return bool|float|int
+	 */
 	private function nfopos($nfo, $str)
 	{
 		$pos = stripos($nfo, $str);
 		if ($pos !== false) {
 			return $pos / strlen($nfo);
-		} else {
-			return false;
 		}
+
+		return false;
+
 	}
 
+	/**
+	 * @param $str
+	 *
+	 * @return mixed
+	 */
 	private function _cleanStrForPos($str)
 	{
-		$str = str_replace([' ', '\t', '_', '.', '?'], " ", $str);
-		$str = str_replace('  ', " ", $str);
-		$str = preg_replace('/^\s+?/Umi', "", $str);
+		$str = str_replace([' ', '  ',  '\t', '_', '.', '?'], ' ', $str);
+		$str = preg_replace('/^\s+?/Umi', '', $str);
 		return $str;
 	}
 
+	/**
+	 * @param $matches
+	 *
+	 * @return array
+	 */
 	private function doarray($matches)
 	{
 		$r = [];
@@ -155,33 +176,33 @@ class MiscSorter
 			$x = -1;
 
 			if (strlen($m) < 50) {
-				$str = preg_replace("/\s/iU", "", $m);
+				$str = preg_replace("/\s/iU", '', $m);
 
 				$m = strtolower($str);
 
 				$x = 0;
 
-				if ($m == 'imdb') {
+				if ($m === 'imdb') {
 					$x = -11;
-				} else if ($m == 'anidb.net') {
+				} else if ($m ==='anidb.net') {
 					$x = -10;
-				} else if ($m == 'upc') {
+				} else if ($m === 'upc') {
 					$x = -9;
-				} else if ($m == 'amazon.') {
+				} else if ($m === 'amazon.') {
 					$x = -8;
-				} else if ($m == 'asin' || $m == 'isbn') {
+				} else if ($m === 'asin' || $m === 'isbn') {
 					$x = -7;
-				} else if ($m == 'tvrage') {
+				} else if ($m === 'tvrage') {
 					$x = -6;
-				} else if ($m == 'audiobook') {
+				} else if ($m === 'audiobook') {
 					$x = -5;
-				} else if ($m == 'os') {
+				} else if ($m === 'os') {
 					$x = -4;
-				} else if (in_array($m, ['mac', 'macintosh', 'dmg', 'macos', 'macosx', 'osx'])) {
+				} else if (in_array($m, ['mac', 'macintosh', 'dmg', 'macos', 'macosx', 'osx'], false)) {
 					$x = -3;
-				} else if ($m == 'itunes.apple.com/') {
+				} else if ($m === 'itunes.apple.com/') {
 					$x = -2;
-				} else if (in_array($m, ['documentaries', 'documentary', 'doku'])) {
+				} else if (in_array($m, ['documentaries', 'documentary', 'doku'], false)) {
 					$x = -1;
 				} else if (preg_match('/sport|deportes|nhl|nfl|\bnba/i', $m)) {
 					$x = 1000;
@@ -189,7 +210,7 @@ class MiscSorter
 					$x = 1001;
 				} else if (preg_match('/\.(?:rar|001)/i', $m)) {
 					$x = 1002;
-				} else if (preg_match('/pdf/i', $m)) {
+				} else if (stripos($m, 'pdf') !== false) {
 					$x = 1003;
 				}
 			}
@@ -198,7 +219,7 @@ class MiscSorter
 				if ($x == 0) {
 					$r[$i++] = $m;
 				} else if (isset($r[$x])) {
-					$r[$x + mt_rand(0, 100) / 100] = $m;
+					$r[$x + random_int(0, 100) / 100] = $m;
 				} else {
 					$r[$x] = $m;
 				}
@@ -219,40 +240,48 @@ class MiscSorter
 	{
 		do {
 			$original = $name;
-			$name = preg_replace("/[\{\[\(]\d+[ \.\-\/]+\d+[\]\}\)]/iU", " ", $name);
-			$name = preg_replace("/[\x01-\x1f\!\?\[\{\}\]\/\:\|]+/iU", " ", $name);
-			$name = str_replace("  ", " ", $name);
-			$name = preg_replace("/^[\s\.]+|[\s\.]{2,}$/iU", "", $name);
-			$name = str_replace(" - - ", " - ", $name);
-			$name = preg_replace("/^[\s\-\_\.]/iU", "", $name);
+			$name = preg_replace('/[\{\[\(]\d+[ \.\-\/]+\d+[\]\}\)]/iU', ' ', $name);
+			$name = preg_replace('/[\x01-\x1f\!\?\[\{\}\]\/\:\|]+/iU', ' ', $name);
+			$name = str_replace('  ', ' ', $name);
+			$name = preg_replace('/^[\s\.]+|[\s\.]{2,}$/iU', '', $name);
+			$name = str_replace(' - - ', ' - ', $name);
+			$name = preg_replace('/^[\s\-\_\.]/iU', '', $name);
 			$name = trim($name);
 		} while ($original != $name);
 
 		return mb_strimwidth($name, 0, 255);
 	}
 
+	/**
+	 * @param int    $id
+	 * @param string $name
+	 * @param int    $typeid
+	 * @param string $type
+	 *
+	 * @return bool
+	 */
 	private function dodbupdate($id = 0, $name = '', $typeid = 0, $type = '')
 	{
 		$nameChanged = false;
 
 		$release = $this->pdo->queryOneRow(
-			sprintf("
+			sprintf('
 							SELECT r.id AS releases_id, r.searchname AS searchname,
 								r.name AS name, r.fromname, r.categories_id, r.groups_id
 							FROM releases r
-							WHERE r.id = %d",
+							WHERE r.id = %d',
 				$id
 			)
 		);
 
 		if ($release !== false && is_array($release) && $name !== '' && $name !== $release['searchname'] && strlen($name) >= 10) {
-			(new NameFixer(['Settings' => $this->pdo]))->updateRelease($release, $name, $type, true, "sorter ", 1, 1);
+			(new NameFixer(['Settings' => $this->pdo]))->updateRelease($release, $name, $type, true, 'sorter ', 1, 1);
 			$nameChanged = true;
 		} else {
 			$this->_setProcSorter(self::PROC_SORTER_DONE, $id);
 		}
 
-		if ($type !== '' && in_array($type, ['bookinfo_id', 'consoleinfo_id', 'imdbid', 'musicinfo_id'])) {
+		if ($type !== '' && in_array($type, ['bookinfo_id', 'consoleinfo_id', 'imdbid', 'musicinfo_id'], false)) {
 			$this->pdo->queryExec(
 				sprintf('
 								UPDATE releases
@@ -267,13 +296,19 @@ class MiscSorter
 		return $nameChanged;
 	}
 
+	/**
+	 * @param string $nfo
+	 * @param int    $id
+	 *
+	 * @return bool
+	 */
 	private function doOS($nfo = '', $id = 0)
 	{
 		$ok = false;
 		$tmp = [];
 
-		$nfo = preg_replace("/[^\x09-\x80]|\?/", "", $nfo);
-		$nfo = preg_replace("/[\x01-\x09\x0e-\x20]/", " ", $nfo);
+		$nfo = preg_replace('/[^\x09-\x80]|\?/', '', $nfo);
+		$nfo = preg_replace('/[\x01-\x09\x0e-\x20]/', ' ', $nfo);
 
 		$cleanNfo = $this->_cleanStrForPos($nfo);
 
@@ -297,11 +332,24 @@ class MiscSorter
 		return $ok;
 	}
 
+	/**
+	 * @param string $pattern
+	 * @param string $nfo
+	 *
+	 * @return array
+	 */
 	private function _doOSpregSplit($pattern = '', $nfo = '')
 	{
 		return preg_split($pattern, $nfo, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 	}
 
+	/**
+	 * @param string $nfo
+	 * @param int    $imdb
+	 * @param string $name
+	 *
+	 * @return string
+	 */
 	private function moviename($nfo = '', $imdb = 0, $name = '')
 	{
 		$tmp = [];
@@ -309,27 +357,27 @@ class MiscSorter
 		$qual = $this->_getVideoQuality($nfo);
 
 		//Clean up the name
-		$name = preg_replace("/[a-f0-9]{10,}/i", " ", $name);
-		$name = str_replace("\\", " ", $name);
+		$name = preg_replace('/[a-f0-9]{10,}/i', ' ', $name);
+		$name = str_replace('\\', ' ', $name);
 
-		$name1 = str_replace(["  ", "--", "\_\_"], " ", trim($name));
+		$name1 = str_replace(['  ', '--', '\_\_'], ' ', trim($name));
 
 		if ($imdb > 0) {
 			$movie = $this->movie->getMovieInfo($imdb);
 			if ($movie !== false) {
 				$name2 = '';
-				$word = "/" . $movie['title'] . " " . $movie['year'] . "/i";
+				$word = '/' . $movie['title'] . ' ' . $movie['year'] . '/i';
 				$tmp[] = preg_split($word, $name1);
 				if ($tmp instanceof \Traversable) {
 					foreach ($tmp as $t) {
-						$name2 .= " " . $t[1];
+						$name2 .= ' ' . $t[1];
 					}
 				}
 				$name1 = $name2;
 			}
 		}
 
-		$retName = (isset($movie) && $qual !== false ? $movie['title'] . "." . $movie['year'] . "." . $name1 . "." . $qual : $name1);
+		$retName = (isset($movie) && $qual !== false ? $movie['title'] . '.' . $movie['year'] . '.' . $name1 . '.' . $qual : $name1);
 		return trim($retName);
 	}
 
@@ -369,7 +417,7 @@ class MiscSorter
 				->setAccessKey($this->pubkey)
 				->setSecretKey($this->privkey)
 				->setAssociateTag($this->asstag)
-				->setResponseTransformer('\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
+				->setResponseTransformer(new XmlToSimpleXmlObject());
 		} catch (\Exception $e) {
 			echo $e->getMessage();
 		}
@@ -383,7 +431,6 @@ class MiscSorter
 
 			switch ($case) {
 				case 'upc':
-					//$amaz = $amazon->getItemByUpc(trim($q), $region);
 					$amalookup->getName();
 					$amalookup->setItemId(trim($q));
 					$amalookup->setSearchIndex($region);
@@ -392,14 +439,12 @@ class MiscSorter
 					$response = $apaiIo->runOperation($amalookup);
 					break;
 				case 'asin':
-					//$amaz = $amazon->getItemByAsin(trim($q), $region);
 					$amalookup->getName();
 					$amalookup->setItemId(trim($q));
 					$amalookup->setResponseGroup(['Medium']);
 					$response = $apaiIo->runOperation($amalookup);
 					break;
 				case 'isbn':
-					//$amaz = $amazon->searchProducts(trim($q), '', "ISBN");
 					$amalookup->getName();
 					$amalookup->setItemId(trim($q));
 					$amalookup->setSearchIndex($region);
@@ -415,7 +460,7 @@ class MiscSorter
 			echo 'Caught exception: ', $e->getMessage() . PHP_EOL;
 		}
 
-		if (isset($response) && isset($response->Items->Item)) {
+		if (isset($response, $response->Items->Item)) {
 			$type = $response->Items->Item->ItemAttributes->ProductGroup;
 			switch ($type) {
 				case 'Audible':
@@ -438,7 +483,7 @@ class MiscSorter
 					$ok = $this->_doAmazonVG($response, $id);
 					break;
 				default:
-					echo PHP_EOL . $this->pdo->log->error("Amazon category $type could not be parsed for " . $name) . PHP_EOL;
+					echo PHP_EOL . ColorCLI::error("Amazon category $type could not be parsed for " . $name) . PHP_EOL;
 			}
 		}
 
@@ -457,11 +502,11 @@ class MiscSorter
 	{
 		$audiobook = false;
 		$v = (string)$response->Items->Item->ItemAttributes->Format;
-		if (stripos($v, "audiobook") !== false) {
+		if (stripos($v, 'audiobook') !== false) {
 			$audiobook = true;
 		}
 		$new = (string)$response->Items->Item->ItemAttributes->Author;
-		$name = $new . " - " . (string)$response->Items->Item->ItemAttributes->Title;
+		$name = $new . ' - ' . (string)$response->Items->Item->ItemAttributes->Title;
 
 		$rel = $this->_doAmazonLocal('bookinfo', (string)$response->Items->Item->ASIN);
 
@@ -514,7 +559,7 @@ class MiscSorter
 	{
 		$new = (string)$response->Items->Item->ItemAttributes->Artist;
 		if ($new != '') {
-			$new .= " - ";
+			$new .= ' - ';
 		}
 		$name = $new . (string)$response->Items->Item->ItemAttributes->Title;
 
@@ -542,7 +587,7 @@ class MiscSorter
 	private function _doAmazonMovies($response = [], $id = 0, $nfo)
 	{
 		$new = (string)$response->Items->Item->ItemAttributes->Title;
-		$new = $new . " (" . substr((string)$response->Items->Item->ItemAttributes->ReleaseDate, 0, 4) . ")";
+		$new = $new . ' (' . substr((string)$response->Items->Item->ItemAttributes->ReleaseDate, 0, 4) . ')';
 		$name = $this->moviename($nfo, 0, $new);
 
 		return $this->dodbupdate($id, $name, null, 'amazonMov');
@@ -559,8 +604,8 @@ class MiscSorter
 	private function _doAmazonVG($response = [], $id = 0)
 	{
 		$name = (string)$response->Items->Item->ItemAttributes->Title;
-		$name .= "." . (string)$response->Items->Item->ItemAttributes->Region . ".";
-		$name .= "-" . (string)$response->Items->Item->ItemAttributes->Platform;
+		$name .= '.' . (string)$response->Items->Item->ItemAttributes->Region . '.';
+		$name .= '-' . (string)$response->Items->Item->ItemAttributes->Platform;
 
 		$rel = $this->_doAmazonLocal('consoleinfo', (string)$response->Items->Item->ASIN);
 
@@ -627,7 +672,7 @@ class MiscSorter
 				$ok = $this->doOS($nfo, $row['id']);
 				break;
 			case 'game':
-				$set = preg_split('/\>(.*)\</Ui', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+				$set = preg_split('/\>(.*)\</U', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 				if (isset($set[1])) {
 					$ok = $this->dodbupdate($row['id'], $this->cleanname($set[1]));
 				} else {
@@ -658,20 +703,20 @@ class MiscSorter
 
 					if (strlen($set[1]) <= 13) {
 						$set[2] = $set[1];
-						$set[1] = "com";
+						$set[1] = 'com';
 						$ok = $this->doAmazon($row['name'], $row['id'], $nfo, $set[2], $set[1], $case, $row);
 					}
 				}
 				break;
-			case "amazon.":
+			case 'amazon.':
 				if (preg_match('/amazon\.([a-z]*?\.?[a-z]{2,3}?)\/.*\/dp\/([a-zA-Z0-9]{8,10}?)/iU', $nfo, $set)) {
 					$ok = $this->doAmazon($row['name'], $row['id'], $nfo, $set[2], $set[1], 'asin', $row);
 				}
 				break;
-			case "upc":
+			case 'upc':
 				if (preg_match('/UPC\:?? *?([a-zA-Z0-9]*?)/iU', $nfo, $set)) {
 					$set[2] = $set[1];
-					$set[1] = "All";
+					$set[1] = 'All';
 					$ok = $this->doAmazon($row['name'], $row['id'], $nfo, $set[2], $set[1], $case, $row);
 				}
 				break;
@@ -698,13 +743,13 @@ class MiscSorter
 				$title = preg_split('/(?:t+\s?i+\s?t+\s?l+\s?e+\b|a\s?l\s?b\s?u\s?m\b|r\s?e\s?l\s?e\s?a\s?s\s?e\b) *?(?!(?:[^\s\.\:\}\]\*\x{2500}-\x{3000}\?] ?){2,}?\b)(?:[\*\?\-\=\|\;\:\.\[\}\]\(\s\x{2500}-\x{3000}\?]+?)[\s\.\>\:\(\)\x{2500}-\x{3000}\?]((?!\:) ?\w.+)(?:\n|$|\s{3}|\.{3})/Uuim', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
 			}
 
-			if (!isset($title[1]) || !isset($artist[1])) {
+			if (!isset($title[1], $artist[1])) {
 				if (preg_match('/presents[\W\. \xb0-\x{3000}]+? ([^\-]+?) \- ([a-z0-9]?(?!\:).+(?:\s\s\s))/iuUm', $nfo, $matches)) {
 					$artist[1] = $matches[1];
 					$title[1] = $matches[2];
 				}
 				if (!isset($matches[2]) && preg_match('/[\h\_\.\:\xb0-\x{3000}]{2,}?([a-z].+) \- (.+?)(?:[\?\s\_\.\:\xb0-\x{3000}]{2,}|$)/Uiu', $nfo, $matches)) {
-					$pos = $this->nfopos($this->_cleanStrForPos($nfo), $this->_cleanStrForPos($matches[1] . " - " . $matches[2]));
+					$pos = $this->nfopos($this->_cleanStrForPos($nfo), $this->_cleanStrForPos($matches[1] . ' - ' . $matches[2]));
 					if ($pos !== false && $pos < 0.45 && !preg_match('/\:\d\d$/', $matches[2]) && strlen($matches[1]) < 48 && strlen($matches[2]) < 64
 						&& strpos('title', $matches[1]) === false && strpos('title', $matches[2]) === false
 					) {
@@ -713,11 +758,11 @@ class MiscSorter
 					}
 				}
 			}
-			if (isset($artist[1]) && $artist[1] == " ") {
+			if (!empty($artist[1])) {
 				$artist[1] = $artist[3];
 			}
-			if (isset($title[1]) && isset($artist[1])) {
-				return $this->dodbupdate($row['id'], $this->cleanname($artist[1] . " - " . $title[1]), null, 'audioNFO');
+			if (isset($title[1],$artist[1])) {
+				return $this->dodbupdate($row['id'], $this->cleanname($artist[1] . ' - ' . $title[1]), null, 'audioNFO');
 			}
 		}
 
@@ -734,7 +779,7 @@ class MiscSorter
 	 */
 	private function _matchNfoImdb($nfo, $row)
 	{
-		$imdb = $this->movie->doMovieUpdate($nfo, "sorter", $row['id']);
+		$imdb = $this->movie->doMovieUpdate($nfo, 'sorter', $row['id']);
 		if (isset($imdb) && $imdb > 0) {
 			return $this->dodbupdate($row['id'], $this->moviename($row['id'], $row['searchname']), $imdb, 'imdbid');
 		}
@@ -754,13 +799,13 @@ class MiscSorter
 		$author = preg_split('/(?:a\s?u\s?t\s?h\s?o\s?r\b)+? *?(?!(?:[^\s\.\:\}\]\*\xb0-\x{3000}\?] ?){2,}?\b)(?:[\*\?\-\=\|\;\:\.\[\}\]\(\s\xb0-\x{3000}\?]+?)[\s\.\>\:\(\)]((?!\:) ?[a-z0-9\&].+)(?:\s\s\s|$|\.\.\.)/Uuim', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
 		$title = preg_split('/(?:t\s?i\s?t\s?l\s?e\b|b\s?o\s?o\s?k\b)+? *?(?!(?:[^\s\.\:\}\]\*\xb0-\x{3000}\?] ?){2,}?\b)(?:[\*\?\-\=\|\;\:\.\[\}\]\(\s\xb0-\x{3000}\?]+?)[\s\.\>\:\(\)]((?!\:) ?[a-z0-9\&].+)(?:\s\s\s|$|\.\.\.)/Uuim', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
 
-		if (isset($author[1]) && isset($title[1])) {
-			return $this->dodbupdate($row['id'], Category::MUSIC_AUDIOBOOK, $this->cleanname($author[1] . " - " . $title[1]));
+		if (isset($author[1], $title[1])) {
+			return $this->dodbupdate($row['id'], Category::MUSIC_AUDIOBOOK, $this->cleanname($author[1] . ' - ' . $title[1]));
 		} else if (preg_match('/[\h\_\.\:\xb0-\x{3000}]{2,}?([a-z].+) \- (.+)(?:[\s\_\.\:\xb0-\x{3000}]{2,}|$)/iu', $nfo, $matches)) {
-			$pos = $this->nfopos($this->_cleanStrForPos($nfo), $this->_cleanStrForPos($matches[1] . " - " . $matches[2]));
+			$pos = $this->nfopos($this->_cleanStrForPos($nfo), $this->_cleanStrForPos($matches[1] . ' - ' . $matches[2]));
 			if ($pos !== false && $pos < 0.4 && !preg_match('/\:\d\d$/', $matches[2]) && strlen($matches[1]) < 48 && strlen($matches[2]) < 48
 				&& strpos('title', $matches[1]) === false && strpos('title', $matches[2]) === false) {
-				return $this->dodbupdate($row['id'], $this->cleanname($matches[1] . " - " . $matches[2]), null, 'bookNFO');
+				return $this->dodbupdate($row['id'], $this->cleanname($matches[1] . ' - ' . $matches[2]), null, 'bookNFO');
 			}
 		}
 		return false;

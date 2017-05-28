@@ -5,8 +5,8 @@ use nntmux\Contents;
 $contents = new Contents(['Settings' => $page->settings]);
 
 $role = 0;
-if ($page->userdata != null) {
-	$role = $page->userdata["role"];
+if (!empty($page->userdata) && $page->users->isLoggedIn()) {
+	$role = $page->userdata['role'];
 }
 
 /* The role column in the content table values are :
@@ -23,26 +23,26 @@ if ($page->userdata != null) {
  *
  * Admins and mods should be the only ones to see admin content.
  */
-$page->smarty->assign('admin', (($role == 2 || $role == 4) ? 'true' : 'false'));
+$page->smarty->assign('admin', (($role === 2 || $role === 4) ? 'true' : 'false'));
 
-$contentid = 0;
-if (isset($_GET["id"])) {
-	$contentid = $_GET["id"];
+$contentId = 0;
+if (!empty($_GET['id'])) {
+	$contentId = $_GET['id'];
 }
 
 $request = false;
-if (isset($_REQUEST['page'])) {
+if (!empty($_REQUEST['page'])) {
 	$request = $_REQUEST['page'];
 }
 
-if ($contentid == 0 && $request == 'content') {
+if ($contentId === 0 && $request === 'content') {
 	$content = $contents->getAllButFront();
 	$page->smarty->assign('front', false);
 	$page->meta_title = 'Contents page';
 	$page->meta_keywords = 'contents';
 	$page->meta_description = 'This is the contents page.';
-} else if ($contentid != 0 && $request !== false) {
-	$content = array($contents->getByID($contentid, $role));
+} else if ($contentId !== 0 && $request !== false) {
+	$content = [$contents->getByID($contentId, $role)];
 	$page->smarty->assign('front', false);
 	$page->meta_title = 'Contents page';
 	$page->meta_keywords = 'contents';
@@ -56,7 +56,7 @@ if ($contentid == 0 && $request == 'content') {
 	$page->meta_description = $index->metadescription;
 }
 
-if ($content == null) {
+if (empty($content)) {
 	$page->show404();
 }
 

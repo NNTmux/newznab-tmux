@@ -116,12 +116,14 @@
 												{if $result.jpgstatus == 1 && $userdata.canpreview == 1}<span><a
 															href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
 															name="name{$result.guid}"
-															class="modal_prev label label-primary"
+															data-fancybox
+															class="label label-primary"
 															rel="preview">Sample</a></span>{/if}
 												{if $result.haspreview == 1 && $userdata.canpreview == 1}<span><a
 															href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 															name="name{$result.guid}"
-															class="modal_prev label label-primary"
+															data-fancybox
+															class="label label-primary"
 															rel="preview">Preview</a></span>{/if}
 												{if $result.videos_id > 0}<span><a
 															href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}"

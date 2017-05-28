@@ -374,7 +374,7 @@ class Logger
 		$defaultLogName = (defined('NN_LOGGING_LOG_NAME') ? NN_LOGGING_LOG_NAME : 'nntmux');
 		$defaultLogName = (ctype_alnum($defaultLogName) ? $defaultLogName : 'nntmux');
 		$defaultLogFolder = (defined('NN_LOGGING_LOG_FOLDER') && is_dir(NN_LOGGING_LOG_FOLDER) ? NN_LOGGING_LOG_FOLDER : NN_LOGS);
-		$defaultLogFolder = (in_array(substr($defaultLogFolder, -1), ['/', '\\']) ? $defaultLogFolder : $defaultLogFolder . DS);
+		$defaultLogFolder = (in_array(substr($defaultLogFolder, -1), ['/', '\\'], false) ? $defaultLogFolder : $defaultLogFolder . DS);
 		return [
 			'LogFolder' => $defaultLogFolder,
 			'LogName'   => $defaultLogName,
@@ -692,12 +692,12 @@ class Logger
 	{
 		$time = '';
 		if ($seconds > 3600) {
-			$time .= str_pad(round((($seconds % 86400) / 3600)), 2, '0', STR_PAD_LEFT) . 'H:';
+			$time .= str_pad(round(($seconds % 86400) / 3600), 2, '0', STR_PAD_LEFT) . 'H:';
 		} else {
 			$time .= '00H:';
 		}
 		if ($seconds > 60) {
-			$time .= str_pad(round((($seconds % 3600) / 60)), 2 , '0', STR_PAD_LEFT) . 'M:';
+			$time .= str_pad(round(($seconds % 3600) / 60), 2 , '0', STR_PAD_LEFT) . 'M:';
 		} else {
 			$time .= '00M:';
 		}

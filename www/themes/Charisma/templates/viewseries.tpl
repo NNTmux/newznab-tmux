@@ -39,7 +39,7 @@
 	</div>
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default"
-		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS for TV Show <i class="fa fa-rss"></i></a>
+		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS for TV Show <i class="zmdi zmdi-rss"></i></a>
 		{if $show.tvdb > 0}
 			<a class="btn btn-sm btn-info" target="_blank"
 			   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
@@ -206,13 +206,13 @@
 														<td class="icons" style='width:100px;'>
 															<a title="Download Nzb"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"><i
-																		class="fa fa-cloud-download text-muted"></i></a>
-															<a class="fa fa-shopping-basket icon_cart text-muted"
+																		class="zmdi zmdi-cloud-download text-muted"></i></a>
+															<a class="zmdi zmdi-shopping-basket icon_cart text-muted"
 															   href="#"
 															   title="Send to my Download Basket">
 															</a>
 															{if isset($sabintegrated) && $sabintegrated !=""}
-																<a class="fa fa-share icon_sab text-muted"
+																<a class="zmdi zmdi-share icon_sab text-muted"
 																   href="#"
 																   title="Send to my Queue">
 																</a>

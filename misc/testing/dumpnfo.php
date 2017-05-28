@@ -5,7 +5,7 @@
 // Its not very efficient to pull them all out, should really work out which day you need and go from there.
 //
 
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\db\DB;
 use nntmux\utility\Utility;

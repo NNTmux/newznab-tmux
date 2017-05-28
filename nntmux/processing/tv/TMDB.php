@@ -2,6 +2,7 @@
 namespace nntmux\processing\tv;
 
 use app\models\Settings;
+use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
 use Tmdb\ApiToken;
 use Tmdb\Client;
@@ -54,7 +55,12 @@ class TMDB extends TV
 	{
 		parent::__construct($options);
 		$this->token = new ApiToken(Settings::value('APIs..tmdbkey'));
-		$this->client = new Client($this->token);
+		$this->client = new Client($this->token, [
+			'cache' => [
+				'path' => NN_TMP
+			]
+		]
+		);
 		$this->configRepository = new ConfigurationRepository($this->client);
 		$this->config = $this->configRepository->load();
 		$this->helper = new ImageHelper($this->config);
@@ -68,7 +74,7 @@ class TMDB extends TV
 	 *
 	 * @return bool
 	 */
-	public function getBanner($videoId, $siteID)
+	public function getBanner($videoId, $siteID): bool
 	{
 		return false;
 	}
@@ -82,14 +88,15 @@ class TMDB extends TV
 	 * @param      $process
 	 * @param bool $local
 	 */
-	public function processSite ($groupID, $guidChar, $process, $local = false)
+	public function processSite ($groupID, $guidChar, $process, $local = false): void
 	{
 		$res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TMDB);
 
 		$tvcount = $res->rowCount();
+		$lookupSetting = true;
 
 		if ($this->echooutput && $tvcount > 0) {
-			echo $this->pdo->log->header("Processing TMDB lookup for " . number_format($tvcount) . " release(s).");
+			echo ColorCLI::header('Processing TMDB lookup for ' . number_format($tvcount) . ' release(s).');
 		}
 
 		if ($res instanceof \Traversable) {
@@ -104,13 +111,13 @@ class TMDB extends TV
 				// Clean the show name for better match probability
 				$release = $this->parseInfo($row['searchname']);
 
-				if (is_array($release) && $release['name'] != '') {
+				if (is_array($release) && $release['name'] !== '') {
 
-					if (in_array($release['cleanname'], $this->titleCache)) {
+					if (in_array($release['cleanname'], $this->titleCache, false)) {
 						if ($this->echooutput) {
-							echo $this->pdo->log->headerOver("Title: ") .
-									$this->pdo->log->warningOver('"' . $release['cleanname'] . '"') .
-									$this->pdo->log->header(" already failed lookup for this site.  Skipping.");
+							echo ColorCLI::headerOver('Title: ') .
+									ColorCLI::warningOver($release['cleanname']) .
+									ColorCLI::header(' already failed lookup for this site.  Skipping.');
 						}
 						$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
 						continue;
@@ -120,18 +127,16 @@ class TMDB extends TV
 					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV, parent::SOURCE_TMDB);
 
 					// Force local lookup only
-					if ($local == true) {
+					if ($local === true) {
 						$lookupSetting = false;
-					} else {
-						$lookupSetting = true;
 					}
 
 					// If lookups are allowed lets try to get it.
 					if ($videoId === false && $lookupSetting) {
 						if ($this->echooutput) {
-							echo $this->pdo->log->primaryOver("Checking TMDB for previously failed title: ") .
-									$this->pdo->log->headerOver($release['cleanname']) .
-									$this->pdo->log->primary(".");
+							echo ColorCLI::primaryOver('Checking TMDB for previously failed title: ') .
+									ColorCLI::headerOver($release['cleanname']) .
+									ColorCLI::primary('.');
 						}
 
 						// Get the show from TMDB
@@ -152,9 +157,9 @@ class TMDB extends TV
 						}
 					} else {
 						if ($this->echooutput) {
-							echo $this->pdo->log->primaryOver("Found local TMDB match for: ") .
-									$this->pdo->log->headerOver($release['cleanname']) .
-									$this->pdo->log->primary(".  Attempting episode lookup!");
+							echo ColorCLI::primaryOver('Found local TMDB match for: ') .
+									ColorCLI::headerOver($release['cleanname']) .
+									ColorCLI::primary('.  Attempting episode lookup!');
 						}
 						$tmdbid = $this->getSiteIDFromVideoID('tmdb', $videoId);
 					}
@@ -169,7 +174,7 @@ class TMDB extends TV
 						if ($episodeNo === 'all') {
 							// Set the video ID and leave episode 0
 							$this->setVideoIdFound($videoId, $row['id'], 0);
-							echo $this->pdo->log->primary("Found TMDB Match for Full Season!");
+							echo ColorCLI::primary('Found TMDB Match for Full Season!');
 							continue;
 						}
 
@@ -199,13 +204,12 @@ class TMDB extends TV
 							// Mark the releases video and episode IDs
 							$this->setVideoIdFound($videoId, $row['id'], $episode);
 							if ($this->echooutput) {
-								echo $this->pdo->log->primary("Found TMDB Match!");
+								echo ColorCLI::primary('Found TMDB Match!');
 							}
 							continue;
-						} else {
-							//Processing failed, set the episode ID to the next processing group
-							$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
 						}
+						//Processing failed, set the episode ID to the next processing group
+						$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
 					} else {
 						//Processing failed, set the episode ID to the next processing group
 						$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
@@ -240,8 +244,8 @@ class TMDB extends TV
 
 		sleep(1);
 
-		if (is_array($response) && !empty($response)) {
-			$return = $this->matchShowInfo($response, $cleanName);
+		if (is_array($response) && !empty($response['results'])) {
+			$return = $this->matchShowInfo($response['results'], $cleanName);
 		}
 		return $return;
 	}
@@ -257,21 +261,21 @@ class TMDB extends TV
 		$return = false;
 		$highestMatch = 0;
 
+		$show = [];
 		foreach ($shows AS $show) {
 			if ($this->checkRequiredAttr($show, 'tmdbS')) {
 				// Check for exact title match first and then terminate if found
 				if (strtolower($show['name']) === strtolower($cleanName)) {
 					$highest = $show;
 					break;
-				} else {
-					// Check each show title for similarity and then find the highest similar value
-					$matchPercent = $this->checkMatch(strtolower($show['name']), strtolower($cleanName), self::MATCH_PROBABILITY);
+				}
+				// Check each show title for similarity and then find the highest similar value
+				$matchPercent = $this->checkMatch(strtolower($show['name']), strtolower($cleanName), self::MATCH_PROBABILITY);
 
-					// If new match has a higher percentage, set as new matched title
-					if ($matchPercent > $highestMatch) {
-						$highestMatch = $matchPercent;
-						$highest = $show;
-					}
+				// If new match has a higher percentage, set as new matched title
+				if ($matchPercent > $highestMatch) {
+					$highestMatch = $matchPercent;
+					$highest = $show;
 				}
 			}
 		}
@@ -288,12 +292,12 @@ class TMDB extends TV
 				return false;
 			}
 
-			if (isset($showAlternativeTitles['alternative_titles']['results']) && is_array($showAlternativeTitles['alternative_titles']['results'])) {
-				foreach ($showAlternativeTitles['alternative_titles']['results'] AS $aka) {
+			if ($showAlternativeTitles !== null && is_array($showAlternativeTitles)) {
+				foreach ($showAlternativeTitles AS $aka) {
 					$highest['alternative_titles'][] = $aka['title'];
 				}
-				$highest['network'] = (isset($show['networks'][0]['name']) ?? '');
-				$highest['external_ids'] = $showExternalIds['external_ids'];
+				$highest['network'] = $show['networks'][0]['name'] ?? '';
+				$highest['external_ids'] = $showExternalIds;
 			}
 			$return = $this->formatShowInfo($highest);
 		}
@@ -308,7 +312,7 @@ class TMDB extends TV
 	 *
 	 * @return int
 	 */
-	public function getPoster($videoId, $showId = 0)
+	public function getPoster($videoId, $showId = 0): int
 	{
 		$ri = new ReleaseImage($this->pdo);
 
@@ -361,7 +365,7 @@ class TMDB extends TV
 	 *
 	 * @return array
 	 */
-	protected function formatShowInfo($show)
+	protected function formatShowInfo($show): array
 	{
 		$this->posterUrl = isset($show['poster_path']) ? 'https:' . $this->helper->getUrl($show['poster_path']) : '';
 
@@ -375,7 +379,7 @@ class TMDB extends TV
 				'summary'   => (string)$show['overview'],
 				'started'   => (string)$show['first_air_date'],
 				'publisher' => isset($show['network']) ? (string)$show['network'] : '',
-				'country'   => (string)(isset($show['origin_country'][0]) ?? ''),
+				'country'   => (string)$show['origin_country'][0] ?? '',
 				'source'    => (int)parent::SOURCE_TMDB,
 				'imdb'      => isset($imdb['imdbid']) ? (int)$imdb['imdbid'] : 0,
 				'tvdb'      => isset($show['external_ids']['tvdb_id']) ? (int)$show['external_ids']['tvdb_id'] : 0,
@@ -396,7 +400,7 @@ class TMDB extends TV
 	 *
 	 * @return array
 	 */
-	protected function formatEpisodeInfo($episode)
+	protected function formatEpisodeInfo($episode): array
 	{
 		return [
 				'title'       => (string)$episode['name'],

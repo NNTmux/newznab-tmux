@@ -341,29 +341,33 @@ class ADE
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+						ColorCLI::doEcho(ColorCLI::notice('Data not available on ADE server'));
 					} else if ($e->getCode() === 503) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+						ColorCLI::doEcho(ColorCLI::notice('ADE service unavailable'));
 					} else {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from ADE, http error reported: ' . $e->getCode()));
 					}
 				}
+			} catch (\RuntimeException $e) {
+				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
 			}
 		}
 		if (!empty($this->directLink)) {
 			try {
 				$this->_response = $this->client->get($this->directLink)->getBody()->getContents();
-				$this->directLink = "";
+				$this->directLink = '';
 			} catch (RequestException $e) {
 				if ($e->hasResponse()) {
 					if($e->getCode() === 404) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Data not available on server'));
+						ColorCLI::doEcho(ColorCLI::notice('Data not available on ADE server'));
 					} else if ($e->getCode() === 503) {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Service unavailable'));
+						ColorCLI::doEcho(ColorCLI::notice('ADE service unavailable'));
 					} else {
-						$this->pdo->log->doEcho($this->pdo->log->notice('Unable to fetch data, http error reported: ' . $e->getCode()));
+						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from ADE, http error reported: ' . $e->getCode()));
 					}
 				}
+			} catch (\RuntimeException $e) {
+				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
 			}
 		}
 

@@ -2,6 +2,7 @@
 namespace nntmux\libraries;
 
 use nntmux\db\DB;
+use nntmux\ColorCLI;
 
 
 /**
@@ -44,12 +45,12 @@ class ForkingImportNZB extends Forking
 		$this->_workCount = count($directories);
 
 		if ($this->_workCount == 0) {
-			echo $this->pdo->log->error('No sub-folders were found in your specified folder (' . $folder . ').');
+			echo ColorCLI::error('No sub-folders were found in your specified folder (' . $folder . ').');
 			exit();
 		}
 
 		if (NN_ECHOCLI) {
-			echo $this->pdo->log->header(
+			echo ColorCLI::header(
 				'Multi-processing started at ' . date(DATE_RFC2822) . ' with ' . $this->_workCount .
 				' job(s) to do using a max of ' . $maxProcesses . ' child process(es).'
 			);
@@ -67,8 +68,8 @@ class ForkingImportNZB extends Forking
 		$this->process_work(true);
 
 		if (NN_ECHOCLI) {
-			$this->pdo->log->doEcho(
-				$this->pdo->log->header(
+			ColorCLI::doEcho(
+				ColorCLI::header(
 					'Multi-processing for import finished in ' . (microtime(true) - $startTime) .
 					' seconds at ' . date(DATE_RFC2822) . '.' . PHP_EOL
 				)

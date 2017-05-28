@@ -45,13 +45,15 @@
 	<!-- flexboxgrid -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/flexboxgrid/dist/flexboxgrid.min.css" rel="stylesheet"
 		  type="text/css"/>
-	<!-- Font Awesome Icons -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
+	<!-- Material design Icons -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.css" type="text/css" media="screen"/>
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/square/blue.css" rel="stylesheet">
+	<!-- Materializecss css -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/materialize/dist/css/materialize.min.css" type="text/css" media="screen"/>
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico">
 </head>
@@ -86,51 +88,49 @@
 					<ul class="nav nav-pills nav-stacked main-menu">
 						{if $loggedin == "true"}
 							<li class="nav-header">Main</li>
-							<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
-											class="fa arrow"></span></a></li>
+							<li><a href="{$site->home_link}"><i class="zmdi zmdi-home"></i><span> Home</span></a></li>
 							<li class="accordion">
-								<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
+								<a href="#"><i class="zmdi zmdi-view-list-alt"></i><span> Browse</span></a>
 								<ul class="nav nav-pills nav-stacked">
 									<li><a href="{$smarty.const.WWW_TOP}/newposterwall"><i
-													class="fa fa-fire"></i><span> New Releases</span></a></li>
+													class="zmdi zmdi-fire"></i><span> New Releases</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/console"><i
-													class="fa fa-gamepad"></i><span> Console</span></a></li>
+													class="zmdi zmdi-xbox"></i><span> Console</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/movies"><i
-													class="fa fa-film"></i><span> Movies</span></a></li>
+													class="zmdi zmdi-movie-alt"></i><span> Movies</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/music"><i
-													class="fa fa-music"></i><span> Music</span></a></li>
+													class="zmdi zmdi-audio"></i><span> Music</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/games"><i
-													class="fa fa-gamepad"></i><span> Games</span></a></li>
+													class="zmdi zmdi-keyboard"></i><span> Games</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/series"><i
-													class="fa fa-television"></i><span> TV</span></a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/xxx"><i class="fa fa-venus-mars"></i><span> Adult</span></a>
+													class="zmdi zmdi-tv-play"></i><span> TV</span></a></li>
+									<li><a href="{$smarty.const.WWW_TOP}/xxx"><i class="zmdi zmdi-male-female"></i><span> Adult</span></a>
 									</li>
 									<li><a href="{$smarty.const.WWW_TOP}/books"><i
-													class="fa fa-book"></i><span> Books</span></a></li>
-									<li><a href="{$smarty.const.WWW_TOP}/browse"><i class="fa fa-list-ul"></i><span> Browse All Releases</span></a>
+													class="zmdi zmdi-book"></i><span> Books</span></a></li>
+									<li><a href="{$smarty.const.WWW_TOP}/browse"><i class="zmdi zmdi-view-list-alt"></i><span> Browse All Releases</span></a>
 									</li>
-									<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i class="fa fa-object-group"></i><span> Browse Groups</span></a>
+									<li><a href="{$smarty.const.WWW_TOP}/browsegroup"><i class="zmdi zmdi-group"></i><span> Browse Groups</span></a>
 									</li>
 								</ul>
 							</li>
 						{/if}
 						<li class="accordion">
-							<a href="#"><i class="fa fa-list-ol"></i><span> Articles & Links</span></a>
+							<a href="#"><i class="zmdi zmdi-view-list-alt"></i><span> Articles & Links</span></a>
 							<ul class="nav nav-pills nav-stacked">
 								<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
-												class="fa fa-envelope-o"></i><span> Contact</span> <span
-												class="fa arrow"></span></a></li>
+												class="zmdi zmdi-email"></i><span> Contact</span></a></li>
 								{if $loggedin == "true"}
-								<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="fa fa-forumbee"></i> Forum</a>
+								<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="zmdi zmdi-disqus"></i> Forum</a>
 								</li>
-								<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a>
+								<li><a href="{$smarty.const.WWW_TOP}/search"><i class="zmdi zmdi-search-for"></i> Search</a>
 								</li>
-								<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
-								<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i> API</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/rss"><i class="zmdi zmdi-rss"></i> RSS Feeds</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="zmdi zmdi-cloud"></i> API</a></li>
 							</ul>
 						</li>
 						<li><a href="{$smarty.const.WWW_TOP}/logout"><i
-										class="fa fa-unlock"></i><span> Logout</span></a>
+										class="zmdi zmdi-lock-open"></i><span> Logout</span></a>
 							{/if}
 						</li>
 					</ul>
@@ -170,7 +170,7 @@
 	</div>
 	<footer class="row">
 		<div class="box col-md-12">
-			<p class="col-md-9 col-sm-9 col-xs-12 copyright">&copy; <i class="fa fa-github-alt"></i><a
+			<p class="col-md-9 col-sm-9 col-xs-12 copyright">&copy; <i class="zmdi zmdi-github-alt"></i><a
 						href="https://github.com/NNTmux/" target="_blank"> NNTmux</a>
 				newznab-tmux {$smarty.now|date_format:"%Y"}</p>
 	</footer>
@@ -234,5 +234,7 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.buttons.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.confirm.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.nonblock.js"></script>
+<!-- materializecss js -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/materialize/dist/js/materialize.min.js"></script
 </body>
 </html>

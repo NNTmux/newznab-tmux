@@ -17,11 +17,11 @@ use nntmux\AniDB;
 use nntmux\Books;
 use nntmux\PreDb;
 
-if (!$page->users->isLoggedIn())
+if (!$page->users->isLoggedIn()) {
 	$page->show403();
+}
 
-if (isset($_GET['id']))
-{
+if (isset($_GET['id'])) {
 	$releases = new Releases(['Settings' => $page->settings]);
 	$rc = new ReleaseComments;
 	$re = new ReleaseExtra;
@@ -32,11 +32,13 @@ if (isset($_GET['id']))
 	$cpurl = $user['cp_url'];
 	$releaseRegex = ReleaseRegexes::find('first', ['conditions' => ['releases_id' => $data['id']]]);
 
-	if (!$data)
+	if (!$data) {
 		$page->show404();
+	}
 
-	if ($page->isPostBack())
+	if ($page->isPostBack()) {
 		$rc->addComment($data['id'], $data['gid'], $_POST['txtAddComment'], $page->users->currentUserId(), $_SERVER['REMOTE_ADDR']);
+	}
 
 	$nfo = $releases->getReleaseNfo($data['id'], true);
 	$reVideo = $re->getVideo($data['id']);
@@ -55,19 +57,19 @@ if (isset($_GET['id']))
 	}
 
 	$mov = '';
-	if ($data['imdbid'] != '' && $data['imdbid'] != 0000000) {
+	if ($data['imdbid'] !== '' && $data['imdbid'] !== 0000000) {
 		$movie = new Movie(['Settings' => $page->settings]);
 		$mov   = $movie->getMovieInfo($data['imdbid']);
-		if ($mov && isset($mov['title'])) {
+		if (!empty($mov['title'])) {
 			$mov['title']    = str_replace(['/', '\\'], '', $mov['title']);
 			$mov['actors']   = $movie->makeFieldLinks($mov, 'actors');
 			$mov['genre']    = $movie->makeFieldLinks($mov, 'genre');
 			$mov['director'] = $movie->makeFieldLinks($mov, 'director');
 			if (Settings::value('site.trailers.trailers_display')) {
-				$trailer = (!isset($mov['trailer']) || empty($mov['trailer']) || $mov['trailer'] == '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer']);
+				$trailer = empty($mov['trailer']) || $mov['trailer'] === '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer'];
 				if ($trailer) {
 					$mov['trailer'] = sprintf(
-						"<iframe width=\"%d\" height=\"%d\" src=\"%s\"></iframe>",
+						'<iframe width=\"%d\" height=\"%d\" src=\"%s\"></iframe>',
 						Settings::value('site.trailers.trailers_size_x'),
 						Settings::value('site.trailers.trailers_size_y'),
 						$trailer
@@ -78,7 +80,7 @@ if (isset($_GET['id']))
 	}
 
 	$xxx = '';
-	if ($data['xxxinfo_id'] != '' && $data['xxxinfo_id'] != 0) {
+	if ($data['xxxinfo_id'] !== '' && $data['xxxinfo_id'] !== 0) {
 		$x = new XXX();
 		$xxx = $x->getXXXInfo($data['xxxinfo_id']);
 
@@ -97,38 +99,37 @@ if (isset($_GET['id']))
 	}
 
 	$game = '';
-	if ($data['gamesinfo_id'] != '') {
+	if ($data['gamesinfo_id'] !== '') {
 		$g = new Games();
 		$game = $g->getGamesInfoById($data['gamesinfo_id']);
 	}
 
 	$mus = '';
-	if ($data['musicinfo_id'] != '') {
+	if ($data['musicinfo_id'] !== '') {
 		$music = new Music(['Settings' => $page->settings]);
 		$mus = $music->getMusicInfo($data['musicinfo_id']);
 	}
 
 	$book = '';
-	if ($data['bookinfo_id'] != '') {
+	if ($data['bookinfo_id'] !== '') {
 		$b = new Books();
 		$book = $b->getBookInfo($data['bookinfo_id']);
 	}
 
 	$con = '';
-	if ($data['consoleinfo_id'] != '') {
+	if ($data['consoleinfo_id'] !== '') {
 		$c = new Console();
 		$con = $c->getConsoleInfo($data['consoleinfo_id']);
 	}
 
 	$AniDBAPIArray = '';
-	if ($data["anidbid"] > 0)
-	{
+	if ($data['anidbid'] > 0) {
 		$AniDB = new AniDB(['Settings' => $releases->pdo]);
-		$AniDBAPIArray = $AniDB->getAnimeInfo($data["anidbid"]);
+		$AniDBAPIArray = $AniDB->getAnimeInfo($data['anidbid']);
 	}
 
 	$prehash = new PreDb();
-	$pre = $prehash->getForRelease($data["predb_id"]);
+	$pre = $prehash->getForRelease($data['predb_id']);
 
 	$rf = new ReleaseFiles;
 	$releasefiles = $rf->get($data['id']);

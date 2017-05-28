@@ -296,7 +296,7 @@ class RequestIDLocal extends RequestID
 					'new_category' => $this->category->getNameByID($determinedCat),
 					'old_category' => $this->category->getNameByID($this->_release['categories_id']),
 					'group'        => $this->_release['groupname'],
-					'release_id'   => $this->_release['id'],
+					'releases_id'   => $this->_release['id'],
 					'method'       => 'RequestIDLocal'
 				)
 			);

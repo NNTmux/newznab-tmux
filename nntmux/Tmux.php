@@ -12,7 +12,7 @@ use nntmux\db\DB;
 class Tmux
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -26,15 +26,15 @@ class Tmux
 	 *
 	 * @param DB|null $pdo
 	 */
-	function __construct(DB $pdo = null)
+	public function __construct(DB $pdo = null)
 	{
-		$this->pdo = (empty($pdo) ? new DB() : $pdo);
+		$this->pdo = $pdo ?? new DB();
 	}
 
 	/**
 	 * @return string
 	 */
-	public function version()
+	public function version(): string
 	{
 		return (new Versions())->getGitTagInRepo();
 	}
@@ -44,7 +44,7 @@ class Tmux
 	 *
 	 * @return \stdClass
 	 */
-	public function update($form)
+	public function update($form): \stdClass
 	{
 		$pdo = $this->pdo;
 		$tmux = $this->row2Object($form);
@@ -54,11 +54,11 @@ class Tmux
 			if (is_array($settingV)) {
 				$settingV = implode(', ', $settingV);
 			}
-			$sql[] = sprintf("WHEN %s THEN %s", $pdo->escapeString($settingK), $pdo->escapeString($settingV));
+			$sql[] = sprintf('WHEN %s THEN %s', $pdo->escapeString($settingK), $pdo->escapeString($settingV));
 			$sqlKeys[] = $pdo->escapeString($settingK);
 		}
 
-		$pdo->queryExec(sprintf("UPDATE tmux SET value = CASE setting %s END WHERE setting IN (%s)", implode(' ', $sql), implode(', ', $sqlKeys)));
+		$pdo->queryExec(sprintf('UPDATE tmux SET value = CASE setting %s END WHERE setting IN (%s)', implode(' ', $sql), implode(', ', $sqlKeys)));
 
 		return $tmux;
 	}
@@ -73,7 +73,7 @@ class Tmux
 		$pdo = $this->pdo;
 		$where = ($setting !== '' ? sprintf('WHERE setting = %s', $pdo->escapeString($setting)) : '');
 
-		$rows = $pdo->query(sprintf("SELECT * FROM tmux %s", $where));
+		$rows = $pdo->query(sprintf('SELECT * FROM tmux %s', $where));
 
 		if ($rows === false) {
 			return false;
@@ -90,47 +90,13 @@ class Tmux
 	public function getConnectionsInfo($constants)
 	{
 		$runVar['connections']['port_a'] = $runVar['connections']['host_a'] = $runVar['connections']['ip_a'] = false;
-
-		if ($constants['nntpproxy'] == 0) {
-			$runVar['connections']['port'] = NNTP_PORT;
-			$runVar['connections']['host'] = NNTP_SERVER;
-			$runVar['connections']['ip'] = gethostbyname($runVar['connections']['host']);
-			if ($constants['alternate_nntp'] === '1') {
-				$runVar['connections']['port_a'] = NNTP_PORT_A;
-				$runVar['connections']['host_a'] = NNTP_SERVER_A;
-				$runVar['connections']['ip_a'] = gethostbyname($runVar['connections']['host_a']);
-			}
-		} else {
-			$filename = NN_MISC . "update/python/lib/nntpproxy.conf";
-			$fp = fopen($filename, "r") or die("Couldn't open $filename");
-			while (!feof($fp)) {
-				$line = fgets($fp);
-				if (preg_match('/"host": "(.+)",$/', $line, $match)) {
-					$runVar['connections']['host'] = $match[1];
-				}
-				if (preg_match('/"port": (.+),$/', $line, $match)) {
-					$runVar['connections']['port'] = $match[1];
-					break;
-				}
-			}
-			if ($constants['alternate_nntp']) {
-				$filename = NN_MISC . "update/python/lib/nntpproxy_a.conf";
-				$fp = fopen($filename, "r") or die("Couldn't open $filename");
-				while (!feof($fp)) {
-					$line = fgets($fp);
-					if (preg_match('/"host": "(.+)",$/', $line, $match)) {
-						$runVar['connections']['host_a'] = $match[1];
-					}
-					if (preg_match('/"port": (.+),$/', $line, $match)) {
-						$runVar['connections']['port_a'] = $match[1];
-						break;
-					}
-				}
-			}
-			$runVar['connections']['ip'] = gethostbyname($runVar['connections']['host']);
-			if ($constants['alternate_nntp'] === '1') {
-				$runVar['connections']['ip_a'] = gethostbyname($runVar['connections']['host_a']);
-			}
+		$runVar['connections']['port'] = getenv('NNTP_PORT');
+		$runVar['connections']['host'] = getenv('NNTP_SERVER');
+		$runVar['connections']['ip'] = gethostbyname($runVar['connections']['host']);
+		if ($constants['alternate_nntp'] === '1') {
+			$runVar['connections']['port_a'] = getenv('NNTP_PORT_A');
+			$runVar['connections']['host_a'] = getenv('NNTP_SERVER_A');
+			$runVar['connections']['ip_a'] = gethostbyname($runVar['connections']['host_a']);
 		}
 		return $runVar['connections'];
 	}
@@ -181,7 +147,7 @@ class Tmux
 	 *
 	 * @return array
 	 */
-	public function getListOfPanes($constants)
+	public function getListOfPanes($constants): array
 	{
 		$panes = ['zero' => '', 'one' => '', 'two' => ''];
 		switch ($constants['sequential']) {
@@ -214,7 +180,7 @@ class Tmux
 	/**
 	 * @return string
 	 */
-	public function getConstantSettings()
+	public function getConstantSettings(): string
 	{
 		$tmuxstr = 'SELECT value FROM tmux WHERE setting =';
 		$settstr = 'SELECT value FROM settings WHERE setting =';
@@ -226,8 +192,7 @@ class Tmux
 					(%1\$s 'run_ircscraper') AS run_ircscraper,
 					(%2\$s 'sqlpatch') AS sqlpatch,
 					(%2\$s 'alternate_nntp') AS alternate_nntp,
-					(%2\$s 'delaytime') AS delaytime,
-					(%2\$s 'nntpproxy') AS nntpproxy",
+					(%2\$s 'delaytime') AS delaytime",
 			$tmuxstr,
 			$settstr
 		);
@@ -237,7 +202,7 @@ class Tmux
 	/**
 	 * @return string
 	 */
-	public function getMonitorSettings()
+	public function getMonitorSettings(): string
 	{
 		$tmuxstr = 'SELECT value FROM tmux WHERE setting =';
 		$settstr = 'SELECT value FROM settings WHERE setting =';
@@ -315,7 +280,7 @@ class Tmux
 	 *
 	 * @return \stdClass
 	 */
-	public function rows2Object($rows)
+	public function rows2Object($rows): \stdClass
 	{
 		$obj = new \stdClass;
 		foreach ($rows as $row) {
@@ -331,7 +296,7 @@ class Tmux
 	 *
 	 * @return \stdClass
 	 */
-	public function row2Object($row)
+	public function row2Object($row): \stdClass
 	{
 		$obj = new \stdClass;
 		$rowKeys = array_keys($row);
@@ -350,7 +315,7 @@ class Tmux
 	public function updateItem($setting, $value)
 	{
 		$pdo = $this->pdo;
-		$sql = sprintf("UPDATE tmux SET value = %s WHERE setting = %s", $pdo->escapeString($value), $pdo->escapeString($setting));
+		$sql = sprintf('UPDATE tmux SET value = %s WHERE setting = %s', $pdo->escapeString($value), $pdo->escapeString($setting));
 		return $pdo->queryExec($sql);
 	}
 
@@ -358,9 +323,9 @@ class Tmux
 	/**
 	 * @return float
 	 */
-	public function microtime_float()
+	public function microtime_float(): float
 	{
-		list($usec, $sec) = explode(" ", microtime());
+		[$usec, $sec] = explode(' ', microtime());
 		return ((float)$usec + (float)$sec);
 	}
 
@@ -369,7 +334,7 @@ class Tmux
 	 *
 	 * @return string
 	 */
-	public function decodeSize($bytes)
+	public function decodeSize($bytes): string
 	{
 		$types = ['B', 'KB', 'MB', 'GB', 'TB'];
 		/*
@@ -386,7 +351,7 @@ class Tmux
 			}
 			$bytes /= 1024;
 		}
-		return (round($bytes, 2) . " " . $suffix);
+		return (round($bytes, 2) . ' ' . $suffix);
 	}
 
 	/**
@@ -394,17 +359,16 @@ class Tmux
 	 *
 	 * @return string
 	 */
-	public function writelog($pane)
+	public function writelog($pane): ?string
 	{
 		$path = NN_LOGS;
-		$getdate = gmdate("Ymd");
+		$getdate = gmdate('Ymd');
 		$tmux = $this->get();
-		$logs = (isset($tmux->write_logs)) ? $tmux->write_logs : 0;
-		if ($logs == 1) {
+		$logs = $tmux->write_logs ?? 0;
+		if ($logs === 1) {
 			return "2>&1 | tee -a $path/$pane-$getdate.log";
-		} else {
-			return "";
 		}
+		return '';
 	}
 
 	/**
@@ -414,12 +378,12 @@ class Tmux
 	 *
 	 * @return int
 	 */
-	public function get_color($colors_start, $colors_end, $colors_exc)
+	public function get_color($colors_start, $colors_end, $colors_exc): int
 	{
-		$exception = str_replace(".", ".", $colors_exc);
-		$exceptions = explode(",", $exception);
+		$exception = str_replace('.', '.', $colors_exc);
+		$exceptions = explode(',', $exception);
 		sort($exceptions);
-		$number = mt_rand($colors_start, $colors_end - count($exceptions));
+		$number = random_int($colors_start, $colors_end - count($exceptions));
 		foreach ($exceptions as $exception) {
 			if ($number >= $exception) {
 				$number++;
@@ -437,15 +401,14 @@ class Tmux
 	 *
 	 * @return bool
 	 */
-	public function rand_bool($loop, $chance = 60)
+	public function rand_bool($loop, $chance = 60): bool
 	{
 		$tmux = $this->get();
-		$usecache = (isset($tmux->usecache)) ? $tmux->usecache : 0;
-		if ($loop == 1 || $usecache == 0) {
+		$usecache = $tmux->usecache ?? 0;
+		if ($loop === 1 || $usecache === 0) {
 			return false;
-		} else {
-			return (mt_rand(1, 100) <= $chance);
 		}
+		return (random_int(1, 100) <= $chance);
 	}
 
 	/**
@@ -453,14 +416,14 @@ class Tmux
 	 *
 	 * @return string
 	 */
-	public function relativeTime($_time)
+	public function relativeTime($_time): string
 	{
 		$d = [];
-		$d[0] = [1, "sec"];
-		$d[1] = [60, "min"];
-		$d[2] = [3600, "hr"];
-		$d[3] = [86400, "day"];
-		$d[4] = [31104000, "yr"];
+		$d[0] = [1, 'sec'];
+		$d[1] = [60, 'min'];
+		$d[2] = [3600, 'hr'];
+		$d[3] = [86400, 'day'];
+		$d[4] = [31104000, 'yr'];
 
 		$w = [];
 
@@ -470,10 +433,10 @@ class Tmux
 		$secondsLeft = $diff;
 
 		for ($i = 4; $i > -1; $i--) {
-			$w[$i] = intval($secondsLeft / $d[$i][0]);
+			$w[$i] = (int)($secondsLeft / $d[$i][0]);
 			$secondsLeft -= ($w[$i] * $d[$i][0]);
-			if ($w[$i] != 0) {
-				$return .= $w[$i] . " " . $d[$i][1] . (($w[$i] > 1) ? 's' : '') . " ";
+			if ($w[$i] !== 0) {
+				$return .= $w[$i] . ' ' . $d[$i][1] . (($w[$i] > 1) ? 's' : '') . ' ';
 			}
 		}
 		return $return;
@@ -484,7 +447,7 @@ class Tmux
 	 *
 	 * @return bool
 	 */
-	public function command_exist($cmd)
+	public function command_exist($cmd): bool
 	{
 		$returnVal = shell_exec("which $cmd 2>/dev/null");
 		return (empty($returnVal) ? false : true);
@@ -516,7 +479,7 @@ class Tmux
 					SUM(IF(nzbstatus = %1\$d AND categories_id BETWEEN %d AND %d AND xxxinfo_id = 0,1,0)) AS processxxx,
 					SUM(IF(1=1 %s,1,0)) AS processnfo,
 					SUM(IF(nzbstatus = %1\$d AND isrenamed = %d AND predb_id = 0 AND passwordstatus >= 0 AND nfostatus > %d
-						AND ((nfostatus = %d AND proc_nfo = %d) OR proc_files = %d OR proc_uid = %d OR proc_par2 = %d OR (nfostatus = %20\$d AND proc_sorter = %d)
+						AND ((nfostatus = %d AND proc_nfo = %d) OR proc_files = %d OR proc_uid = %d OR proc_hash16k = %d OR proc_srr = %d OR proc_par2 = %d OR (nfostatus = %20\$d AND proc_sorter = %d)
 							OR (ishashed = 1 AND dehashstatus BETWEEN -6 AND 0)) AND categories_id IN (%s),1,0)) AS processrenames,
 					SUM(IF(isrenamed = %d,1,0)) AS renamed,
 					SUM(IF(nzbstatus = %1\$d AND nfostatus = %20\$d,1,0)) AS nfo,
@@ -548,6 +511,8 @@ class Tmux
 					NameFixer::PROC_NFO_NONE,
 					NameFixer::PROC_FILES_NONE,
 					NameFixer::PROC_UID_NONE,
+					NameFixer::PROC_HASH16K_NONE,
+					NameFixer::PROC_SRR_NONE,
 					NameFixer::PROC_PAR2_NONE,
 					MiscSorter::PROC_SORTER_NONE,
 					Category::getCategoryOthersGroup(),
@@ -600,11 +565,11 @@ class Tmux
 					$this->pdo->escapeString($db_name)
 				);
 			case 6:
-				return "SELECT
+				return 'SELECT
 					(SELECT searchname FROM releases ORDER BY id DESC LIMIT 1) AS newestrelname,
 					(SELECT UNIX_TIMESTAMP(MIN(dateadded)) FROM collections) AS oldestcollection,
 					(SELECT UNIX_TIMESTAMP(MAX(predate)) FROM predb) AS newestpre,
-					(SELECT UNIX_TIMESTAMP(adddate) FROM releases ORDER BY id DESC LIMIT 1) AS newestrelease";
+					(SELECT UNIX_TIMESTAMP(adddate) FROM releases ORDER BY id DESC LIMIT 1) AS newestrelease';
 			default:
 				return false;
 		}
@@ -612,41 +577,48 @@ class Tmux
 
 	/**
 	 * @return bool true if tmux is running, false otherwise.
+	 * @throws \RuntimeException
 	 */
-	public function isRunning()
+	public function isRunning(): bool
 	{
 		$running = $this->get()->running;
 		if ($running === false) {
-			throw new \RuntimeException("Tmux's running flag was not found in the database.\nPlease check the tables are correctly setup.\n");
+			throw new \RuntimeException('Tmux\\\'s running flag was not found in the database.' . PHP_EOL . 'Please check the tables are correctly setup.' . PHP_EOL);
 		}
-		return ($running == 1);
+		if ((int)$running === 0) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
 	 * Check if Tmux is running, if it is, stop it.
 	 *
 	 * @return bool true if scripts were running, false otherwise.
+	 * @throws \RuntimeException
 	 * @access public
 	 */
-	public function stopIfRunning()
+	public function stopIfRunning(): bool
 	{
-		if ($this->isRunning() == 1) {
-			$this->pdo->queryExec("UPDATE tmux SET value = '0' WHERE setting = 'running'");
+		if ($this->isRunning() === true) {
+			$this->pdo->queryExec("UPDATE tmux SET value = 0 WHERE setting = 'running'");
 			$sleep = $this->get()->monitor_delay;
-			echo $this->pdo->log->header("Stopping tmux scripts and waiting $sleep seconds for all panes to shutdown");
+			echo ColorCLI::header('Stopping tmux scripts and waiting ' . $sleep . ' seconds for all panes to shutdown');
 			sleep($sleep);
 			return true;
 		}
+		ColorCLI::doEcho(ColorCLI::info('Tmux scripts are not running!'));
 		return false;
 	}
 
 	/**
 	 * @return bool|\PDOStatement
+	 * @throws \RuntimeException
 	 */
 	public function startRunning()
 	{
-		if (!$this->isRunning()) {
-			return $this->pdo->queryExec("UPDATE tmux SET value = '1' WHERE setting = 'running'");
+		if ($this->isRunning() === false) {
+			return $this->pdo->queryExec("UPDATE tmux SET value = 1 WHERE setting = 'running'");
 		}
 		return true;
 	}

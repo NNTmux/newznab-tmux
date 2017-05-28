@@ -6,7 +6,7 @@
  * reason, it will allow the password hash on the account to be changed.
  * Hopefully that will allow admin access to fix any further problems.
  */
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\db\DB;
 use nntmux\Users;

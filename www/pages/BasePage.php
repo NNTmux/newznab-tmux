@@ -106,7 +106,7 @@ class BasePage
 			NN_WWW . 'plugins/',
 			SMARTY_DIR . 'plugins/',
 		]);
-		$this->smarty->error_reporting = ((NN_DEBUG ? E_ALL : E_ALL - E_NOTICE));
+		$this->smarty->error_reporting = (NN_DEBUG ? E_ALL : E_ALL - E_NOTICE);
 
 		if (isset($_SERVER['SERVER_NAME'])) {
 			$this->serverurl = (
@@ -117,7 +117,7 @@ class BasePage
 			$this->smarty->assign('serverroot', $this->serverurl);
 		}
 
-		$this->page = (isset($_GET['page'])) ? $_GET['page'] : 'content';
+		$this->page = $_GET['page'] ?? 'content';
 
 		$this->users = new Users(['Settings' => $this->settings]);
 		if ($this->users->isLoggedIn()) {

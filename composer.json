@@ -10,7 +10,6 @@
     },
     "classmap": [
       "www/pages/",
-      "libs/pixelead0/Tmdb/",
       "libs/PEAR/Net_NNTP/NNTP/",
       "libs/"
     ]
@@ -20,17 +19,20 @@
     "preferred-install": {
       "*": "source"
     },
+    "fxp-asset" : {
+      "installer-paths": {
+        "npm-asset-library": "www/themes/shared/assets",
+        "bower-asset-library": "www/themes/shared/assets"
+      }
+    },
     "vendor-dir": "app/libraries"
   },
   "description": "A Usenet Indexer",
   "extra": {
     "branch-alias": {
       "dev-dev": "0.x-dev"
-    },
-    "asset-installer-paths": {
-      "npm-asset-library": "www/themes/shared/assets",
-      "bower-asset-library": "www/themes/shared/assets"
     }
+
   },
   "keywords": [
     "NNTmux",
@@ -63,7 +65,7 @@
     }
   ],
   "require": {
-    "php": ">=7.0.0",
+    "php": ">=7.1.0",
     "roave/security-advisories": "dev-master",
     "barracudanetworks/forkdaemon-php": "~1.0",
     "b3rs3rk/steamfront": "dev-master",
@@ -97,7 +99,7 @@
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
     "kbjr/Git.php": "dev-master",
-    "moinax/tvdb": "~1.0",
+    "adrenth/thetvdb2": "~1.0",
     "phpmailer/phpmailer": "~5.2",
     "php-tmdb/api": "~2.1",
     "exeu/apai-io": "~2.0",
@@ -112,17 +114,21 @@
     "bower-asset/colorbox": "~1.6.3",
     "bower-asset/chosen": "^1.6",
     "bower-asset/DataTables": "~1.10.11",
+    "bower-asset/fancyBox": "~v3.0",
     "bower-asset/fastclick": "~1.0.6",
     "bower-asset/flexboxgrid": "^6.3",
     "bower-asset/font-awesome": "~4.5",
     "bower-asset/html5shiv": "~3.7.3",
     "bower-asset/icheck": "~1.0.2",
     "bower-asset/jquery-2.2.x": "~2.2.1",
-    "bower-asset/jquery-3.1.x": "~3.1.0",
+    "bower-asset/jquery-3.2.x": "~3.2",
     "bower-asset/jquery-bootswatch": "~0.0.8",
+    "bower-asset/jquery-goup": "~v1.1",
     "bower-asset/jquery.nicescroll": "~3.6.8",
-    "bower-asset/jquery-migrate-1.4.x": "~1.4.0",
-    "bower-asset/jquery-migrate-3.0.x": "~3.0.0",
+    "bower-asset/jquery-migrate-1.4.x": "~1.4",
+    "bower-asset/jquery-migrate-3.0.x": "~3.0",
+    "bower-asset/material-design-iconic-font": "~2.2.0",
+    "bower-asset/materialize": "~0.98.1",
     "bower-asset/pace": "~1.0.2",
     "bower-asset/pnotify": "~3.0",
     "bower-asset/respond": "~1.4.2",
@@ -130,19 +136,23 @@
     "bower-asset/select2": "~4.0.2",
     "bower-asset/slimScroll": "~1.3.7",
     "bower-asset/tinymce-builded": "~4.4.3",
-    "unionofrad/lithium": "^1.2-dev"
+    "unionofrad/lithium": "^1.1.0-beta",
+    "illuminate/filesystem": "^5.4",
+    "monolog/monolog": "^1.22",
+    "aharen/omdbapi": "^2.0",
+    "vlucas/phpdotenv": "^2.4"
   },
 
   "require-dev": {
-    "unionofrad/manual": "1.1.x-dev"
+    "unionofrad/manual": "1.1.x-dev",
+    "phpunit/phpunit": "^6.1"
   },
 
   "scripts": {
   },
   "suggest": {
-    "ext-simple_php_yenc_decode": "Greatly improves yEnc decoding speed in PHP 5.x",
     "ext-xdebug": "For developement work",
-    "ext-yenc": "PHP7 and PHP5 yEnc decoding extension"
+    "ext-yenc": "PHP7 yEnc decoding extension"
   },
   "type": "project"
 }

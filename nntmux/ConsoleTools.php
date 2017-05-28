@@ -38,24 +38,7 @@ class ConsoleTools
 	 * @param string $message
 	 * @param bool   $reset
 	 */
-	public function overWriteHeader($message, $reset = False)
-	{
-		if ($reset)
-			$this->lastMessageLength = 0;
-
-		echo str_repeat(chr(8), $this->lastMessageLength);
-		echo str_repeat(" ", $this->lastMessageLength);
-		echo str_repeat(chr(8), $this->lastMessageLength);
-
-		$this->lastMessageLength = strlen($message);
-		echo $this->cli->headerOver($message);
-	}
-
-	/**
-	 * @param string $message
-	 * @param bool   $reset
-	 */
-	public function overWritePrimary($message, $reset = False)
+	public function overWriteHeader($message, $reset = false): void
 	{
 		if ($reset) {
 			$this->lastMessageLength = 0;
@@ -66,14 +49,32 @@ class ConsoleTools
 		echo str_repeat(chr(8), $this->lastMessageLength);
 
 		$this->lastMessageLength = strlen($message);
-		echo $this->cli->primaryOver($message);
+		echo ColorCLI::headerOver($message);
 	}
 
 	/**
 	 * @param string $message
 	 * @param bool   $reset
 	 */
-	public function overWrite($message, $reset = False)
+	public function overWritePrimary($message, $reset = false): void
+	{
+		if ($reset) {
+			$this->lastMessageLength = 0;
+		}
+
+		echo str_repeat(chr(8), $this->lastMessageLength);
+		echo str_repeat(' ', $this->lastMessageLength);
+		echo str_repeat(chr(8), $this->lastMessageLength);
+
+		$this->lastMessageLength = strlen($message);
+		echo ColorCLI::primaryOver($message);
+	}
+
+	/**
+	 * @param string $message
+	 * @param bool   $reset
+	 */
+	public function overWrite($message, $reset = false): void
 	{
 		if ($reset) {
 			$this->lastMessageLength = 0;
@@ -90,7 +91,7 @@ class ConsoleTools
 	/**
 	 * @param string $message
 	 */
-	public function appendWrite($message)
+	public function appendWrite($message): void
 	{
 		echo $message;
 		$this->lastMessageLength += strlen($message);
@@ -102,10 +103,10 @@ class ConsoleTools
 	 *
 	 * @return string
 	 */
-	public function percentString($cur, $total)
+	public function percentString($cur, $total): string
 	{
 		$percent = 100 * $cur / $total;
-		$formatString = "% " . strlen($total) . "d/%d (% 2d%%)";
+		$formatString = '% ' . strlen($total) . 'd/%d (% 2d%%)';
 		return sprintf($formatString, $cur, $total, $percent);
 	}
 
@@ -116,11 +117,11 @@ class ConsoleTools
 	 *
 	 * @return string
 	 */
-	public function percentString2($first, $last, $total)
+	public function percentString2($first, $last, $total): string
 	{
 		$percent1 = 100 * ($first - 1) / $total;
 		$percent2 = 100 * $last / $total;
-		$formatString = "% " . strlen($total) . "d-% " . strlen($total) . "d/%d (% 2d%%-% 3d%%)";
+		$formatString = '% ' . strlen($total) . 'd-% ' . strlen($total) . 'd/%d (% 2d%%-% 3d%%)';
 		return sprintf($formatString, $first, $last, $total, $percent1, $percent2);
 	}
 
@@ -131,16 +132,16 @@ class ConsoleTools
 	 *
 	 * @return string
 	 */
-	public function convertTime($seconds)
+	public function convertTime($seconds): string
 	{
 
 		if ($seconds > 3600) {
 			return round($seconds / 3600) . ' hour(s)';
-		} else if ($seconds > 60) {
-			return round($seconds / 60) . ' minute(s)';
-		} else {
-			return $seconds . ' second(s)';
 		}
+		if ($seconds > 60) {
+			return round($seconds / 60) . ' minute(s)';
+		}
+		return $seconds . ' second(s)';
 	}
 
 	/**
@@ -150,9 +151,9 @@ class ConsoleTools
 	 *
 	 * @return string
 	 */
-	public function convertTimer($seconds)
+	public function convertTimer($seconds): string
 	{
-		return " " . sprintf("%02dh:%02dm:%02ds", floor($seconds / 3600), floor(($seconds / 60) % 60), $seconds % 60);
+		return ' ' . sprintf('%02dh:%02dm:%02ds', floor($seconds / 3600), floor(($seconds / 60) % 60), $seconds % 60);
 	}
 
 	/**
@@ -160,7 +161,7 @@ class ConsoleTools
 	 *
 	 * @param int $seconds
 	 */
-	public function showSleep($seconds)
+	public function showSleep($seconds): void
 	{
 		for ($i = $seconds; $i >= 0; $i--) {
 			$this->overWriteHeader('Sleeping for ' . $i . ' seconds.');

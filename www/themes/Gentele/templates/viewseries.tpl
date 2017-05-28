@@ -184,8 +184,9 @@
 																	<a
 																			href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 																			name="name{$result.guid}"
+																			data-fancybox
 																			title="View Screenshot"
-																			class="modal_prev label label-primary"
+																			class="label label-primary"
 																			rel="preview">Preview</a>{/if}
 																	<span class="label label-primary">{$result.grabs}
 																		Grab{if $result.grabs != 1}s{/if}</span>

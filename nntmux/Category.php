@@ -129,11 +129,11 @@ class Category
 	/**
 	 * Parse category search constraints
 	 *
-	 * @param array $cat
+	 * @param array|string $cat
 	 *
 	 * @return string $catsrch
 	 */
-	public function getCategorySearch(array $cat = [])
+	public function getCategorySearch(array $cat = []): string
 	{
 		$categories = [];
 
@@ -149,7 +149,7 @@ class Category
 		}
 
 		foreach ($cat as $category) {
-			if ($category != -1 && $this->isParent($category)) {
+			if ($category !== -1 && $this->isParent($category)) {
 				foreach ($this->getChildren($category) as $child) {
 					$categories[] = $child['id'];
 				}
@@ -167,7 +167,7 @@ class Category
 				break;
 			// One category constraint
 			case 1:
-				$catsrch = " AND r.categories_id = {$categories[0]}";
+				$catsrch = $categories[0] !== -1 ? ' AND r.categories_id = ' . $categories[0] : '';
 				break;
 			// Multiple category constraints
 			default:
@@ -230,7 +230,7 @@ class Category
 	 */
 	public function getFlat($activeonly = false)
 	{
-		$act = "";
+		$act = '';
 		if ($activeonly) {
 			$act = sprintf(' WHERE c.status = %d ', Category::STATUS_ACTIVE);
 		}
@@ -377,7 +377,7 @@ class Category
 			if($val['id'] == '0') {
 				$item = $arr[$key];
 				unset($arr[$key]);
-				array_push($arr, $item);
+				$arr[] = $item;
 				break;
 			}
 		}
@@ -439,7 +439,7 @@ class Category
 	 *
 	 * @return array
 	 */
-	public function getCategories($activeonly = false, $excludedcats = [])
+	public function getCategories($activeonly = false, array $excludedcats = [])
 	{
 		return $this->pdo->query(
 			"SELECT c.id, CONCAT(cp.title, ' > ',c.title) AS title, cp.id AS parentid, c.status
@@ -447,12 +447,12 @@ class Category
 			INNER JOIN categories cp ON cp.id = c.parentid " .
 			($activeonly ?
 				sprintf(
-					" WHERE c.status = %d %s ",
+					' WHERE c.status = %d %s ',
 					Category::STATUS_ACTIVE,
-					(count($excludedcats) > 0 ? " AND c.id NOT IN (" . implode(",", $excludedcats) . ")" : '')
+					(count($excludedcats) > 0 ? ' AND c.id NOT IN (' . implode(',', $excludedcats) . ')' : '')
 				) : ''
 			) .
-			" ORDER BY c.id"
+			' ORDER BY c.id'
 		);
 	}
 }

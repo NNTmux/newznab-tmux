@@ -1,3 +1,250 @@
+2017-05-28 DariusIII
+	* Chg: Possible fix for videos query in getVideoFromSiteID function
+2017-05-26 DariusIII
+	* Mrg: Merge PR #140 by Nightah - Included a.b.multimedia.cartoons in anime regexes
+	* Fix: Fix bad formating in 10-release_naming_regexes.tsv in regex 1148 description that caused regexes after to be inserted into its description
+2017-05-25 DariusIII
+	* Chg: Increase character limit to 299 in NameFixer class
+2017-05-24 DariusIII
+	* Chg: Update crap removal with option to remove releases containing single nzb file
+	* Fix: Fix return type declaration in ReleaseCleaner generic_town function
+	* Chg: Update removing of executable crap files
+	* Chg: Change return values and logic for starting and stopping tmux scripts
+	* Fix: Fix user creation in admin area
+2017-05-23 DariusIII
+	* Chg: Update ReleaseComments and comments-list
+	* Chg: Update DNZBFailures class
+	* Fix: Fix browsing of releases
+2017-05-22 DariusIII
+	* Fix: Fix basic/advanced search
+	* Chg: Small change in classes
+	* Chg: Update search page
+2017-15-19 DariusIII
+	* Chg: Replace $this->colorcli with ColorCLI:: in Groups class
+	* Chg: Update ConsoleTools class
+	* Chg: Update ColorCLI class
+	* Chg: Update aharen/omdbapi to version 2.0.8
+	* Fix: Use proper date for steam games
+2017-15-18 DariusIII
+	* Chg: Update php-giantbomb to version 1.0.2
+	* Chg: More improvements in pc games matching
+	* Chg: Update declarations for string|int type of values
+	* Chg: Update Releases class, fix wrong (music) partition name
+2017-05-17 DariusIII
+	* Chg: Use prtititions in queries in Releases class
+	* Chg: Improve matching and pulling data of PC Games
+	* Fix: Fix adding of blacklist in Binaries class
+	* Chg: Improve logic for movie releases data lookup
+	* Fix: Misplaced operator in Games class
+2017-05-16 DariusIII
+	* Fix: Fix partition schema in mysql-ddl
+	* Chg: Use partition command in queries in Movie class
+	* Chg: Update guzzlehttp and php-giantbomb
+	* Chg: Remove ambiguous category selection in update queries when updating imdbid for release with specific id
+	* Chg: Fix messed up guzzlehttp error text for search on google, bing and yahoo
+	* Fix: Fix OMDbAPI searches for imdbID
+	* Chg: Use more information from OMDb for movies
+2017-05-15 DariusIII
+	* Fix: Alter columns in release_regexes tables to allow signed values for collection_regexes_id and naming_regexes_id
+	* Fix: Wrong table structure for release_regexes table in mysql-ddl.sql
+	* Chg: Use fetch method for fetching OMDbAPI data
+	* Chg: Add OMDbAPI apikey support for future use as it will go private soon
+	* Chg: Update aharen/omdbapi to version 2.0.6
+2017-05-12 DariusIII
+	* Chg: Declare proper @var for pdo (DB) in DnzbFailures
+	* Chg: Update queries in NameFixer so releases that are matched to predb do not get renamed again
+	* Chg: Replace get_class() function with __CLASS__ constant in nntmux/db/DB class
+	* Chg: Update ReleaseRemover by using if-else where case is used as such, change check for blacklist id from null to empty string
+	* Chg: Properly handle missing covers in check_covers script
+2017-05-11 DariusIII
+	* Chg: Shorten the interval to 5 hours for check_covers script from 2 days
+	* Fix: Properly declare pdo in Tmux class
+	* Chg: Use null coalescing operator in Tmux class, add proc_srr and proc_hash16k to checked columns for renaming
+	* Chg: Declare return types in ProcessReleasesMultiGroup
+	* Chg: Posible fix for not removed missed_parts from multigroup_missed_parts table
+	* Chg: Remove require.php and replace the require_once line with path to bootstrap.php
+	* Chg: Update switch.php
+	* Chg: Return false if there is an exception or runtime error when retrieving images in ReleaseImage class
+	* Chg: Remove unused classes from check_covers script
+2017-05-10 DariusIII
+	* Chg: Change one switch-case to if-else, add PHPDOC blokcs to functions in Tmux class
+	* Chg: Update query in Namefixer class fixNamesWithParHash function
+	* Fix: Sorting of users in admin area, users list page
+	* Chg: Revert groupfixrelnames to original state
+	* Chg: Use list to assign values to $pieces array
+	* Chg: Add PHPDOC blocks to Forking class functions
+2017-05-09 DariusIII
+	* Chg: Update guzzlehttp
+	* Chg: Change hash16k and srr name fixing queries and support in groupfixrelnames and NameFixer
+2017-05-08 DariusIII
+	* Chg: Use reset function in NameFixer
+	* Chg: Update AniDb queries and handling
+	* Chg: Update series page
+2017-05-05 DariusIII
+	* Chg: Change lenght of releases table name and searchname columns to 400 and 300 respectively
+	* Chg: Add more specific TV UHD categorization
+	* Chg: Move around tests and phpunit.xml
+	* Chg: Update .scrutinizer.yml to use php 7.1
+	* Chg: Remove PHP7.0 from .travis.yml
+	* Chg: Update sabnzbd queue handling for the new sab API changes
+	* Fix: Remove void return type from nntmux/db/populate/AniDB.php populateMainTable function (fixes issue #136)
+2017-05-04 DariusIII
+	* Chg: Switch lithium to 1.1-beta branch, update rest of the libraries
+	* Mrg: Merge PR #137 by Nightah - Updated new anime group regexes to match more explicitly
+	* Chg: Set PHP 7.1.0 as minimum version supported by NNTmux
+2017-04-27 DariusIII
+	* Chg: Update Movie class
+	* Fix: Fix fetchFanartTvProperties function in Movie class
+	* Chg: Add install test for travis, change .travis.yml to use new test
+	* Chg: Update Steam and Game classes with some minor fixes
+2017-04-26 DariusIII
+	* Fix: Fix loading of settings.php if file does not exist
+	* Chg: Change test suite for travis, add phpunit tests
+	* Chg: Add new installation to nntmux, remove web based one
+2017-04-25 DariusIII
+	* Mrg: Merge dev-env branch into dev
+		Note: You need to copy .env.example, which is found in your sites root folder,  into .env and edit database and USP connection fields with proper data
+			Install will still create config.php in nntmux/config folder but that file is not used anymore
+	* Fix: Fix wrong return type declared In ReleaseSearch fullTextSQL function
+	* Chg: Use secure tvdb api site
+	* Fix: Fix SSL connections to USP and IRC
+2017-04-24 DariusIII
+	* Chg: Declare return types in AniDB class
+	* Chg: Chage some if-else loop logic in TMDB class
+	* Chg: Update lithium, pnotify and composer/installers
+2017-04-23 DariusIII
+	* Fix: Remove return type declaration from _getXFeatureTextResponse function (should fix issue #135)
+2017-04-22 DariusIII
+	* Fix: Fix wrong declared return type in NNTP class, fixes issue 135
+	* Fix: Return value of cleanMatchFiles function
+2017-04-21 DariusIII
+	* Chg: Update TV related classes, fix trakttv covers
+	* Chg: Update Videos class
+	* Chg: Update NNTP class, small refactor of if - else
+	* Chg: Update Binaries class for PHP7
+	* Chg: Make guzzlehttp return codes more service specific
+	* Chg: Remove duplicated checks in XXX class
+	* Chg: Update composer with new versions of libraries
+	* Fix: Anime page layout in Gentele theme
+2017-04-20 DariusIII
+	* Chg: Adjust the renaming logic in NameFixer
+	* Chg: Change definition of XXX movies array
+	* Chg: Update PreDB class for PHP7
+	* Fix: Fix usage of fixRelNames script
+	* Mrg: Merge PR #133 from Nightah - Rebase all anime regexes
+	* Chg: Update XXX class for better PHP7 support
+	* Fix: Properly update anidb_episodes table on anidb updates
+2017-04-19 DariusIII
+	* Fix: Fix bad logic for namefixer release update function
+	* Fix: Cast $release['releases_id'] as integer when comparing to $this->relid in NameFixer class
+	* Chg: Declare PHP7 return types, remove duplicated TV naming regex in NameFixer class
+	* Chg: Declare PHP7 return types in Categorize class and add PHPDOC blocks to functions
+	* Chg: Declare PHP7 return types in AniDB related classes, update anidbid handling
+2017-04-18 DariusIII
+	* Chg: Update the data/cli/populate_anidb.php script
+	* Chg: Update nntmux/db/populate/AniDB.php to properly update anidb_episodes table (still need to find a way to prevent bans)
+2017-04-17 DariusIII
+	* Chg: Update AniDB and related pages updateTitle function
+	* Mrg: Merge PR #131 from Nightah (update a.b.anime regexes)
+2017-04-13 DariusIII
+	* Fix: Fix notice display and movies display when imdbid is 000000
+	* Fix: Properly categorize HAiKU and ANiHLS releases into TV->Anime category
+	* Fix: Fix settings statuses of groups in admin groups page
+	* Chg: Update forum and forumpost related tpl's and pages
+2017-04-12 DariusIII
+	* Chg: Update dariusiii/rarinfo package
+	* Chg: Update TV processing classes, remove TVRage as site is dead long time
+	* Chg: Add new Fanart.TV class for handling API requests to Fanart.TV, adjust Movie class to use it
+	* Chg: Adjust viewnzb templates in Charisma/Gentele/omicron themes
+	* Chg: Add aharen/omdbapi library and use it in Movies class to retrieve data from OMDb
+2017-04-11 DariusIII
+	* Chg: Add php-console support for Chrome browser (dev tool)
+	* Chg: Add monolog/monolog and illuminate/filesystem to composer
+	* Chg: Use proper project API key for TheTVDB
+	* Chg: Adjust TMDB class
+	* Chg: Add exceptions handling, fix incorrect library usage
+2017-04-10 DariusIII
+	* Chg: Update Tv, TVDB classes for new TVDB v2 library
+	* Chg: Update fxp-assest-plugin, guzzlehttp, remove moinax/tvdb add adrenth/thetvdb2 for thetvdb api v2 support
+2017-04-07 DariusIII
+	* Chg: Update NameFixer class, change code slightly, remove duplicated conditions
+2017-04-05 DariusIII
+	* Chg: Use parts of material design in Charisma theme
+	* Chg: Use chevron instead of arrow in pager.tpl
+	* Chg: Add materializecss to composer
+2017-04-04 DariusIII
+	* Chg: Change path handling in scripts
+	* Chg: Use ColorCLI directly
+	* Chg: Add material design icons
+2017-04-03 DariusIII
+	* Chg: Update Category class
+	* Chg: Small changes in Books and Categorize classes
+	* Chg: Update used unserialize function to match PHP7 usage in IRCScraper class
+2017-03-30 DariusIII
+	* Chg: Update AniDB related classes and scripts
+2017-03-30 DariusIII
+	* Chg: Further improve mediainfo renaming
+	* Chg: Update barracudanetworks/forkdaemon-php to version 1.0.10
+2017-03-29 DariusIII
+	* Chg: Improve mediainfo renaming
+2017-03-28 DariusIII
+	* Chg: Update composer.lock with new versions of getid3 and chosen
+2017-03-24 DariusIII
+	* Chg: Increase search term maxlenght on search page in Charisma/Gentele/omicron themes
+2017-03-23 DariusIII
+	* Chg: Remove sweetalert update forum theme templates for required fields
+	* Chg: Update composer.lock and .json with new sweetalert and update guzzlehttp
+2017-03-22 DariusIII
+	* Chg: Use fancybox for image modals
+	* Chg: Update jquery3 to version 3.2.x
+	* Chg: Use jquery3 in Gentele theme
+	* Fix: Fix page count when selecting user roles in users list
+	* Fix: Fix empty groups list when selecting active/inactive groups
+2017-03-21 DariusIII
+	* Chg: Add jquery-goup script to composer
+	* Chg: Update forums with coloured roles
+	* Chg: Use resources/tmp with TMDB client
+	* Chg: Display user role in forums
+	* Chg: Update guzzlehhtp/psr7 and jquery
+2017-03-20 DariusIII
+	* Chg: Update composer.json with new fxp-asset setting
+	* Chg: Update user-list.php
+	* Chg: Remove dependecy on config.php in www/admin by calling smarty.php directly
+	* Fix: Possible fix for contact us page erros
+	* Fix: Possible fix for role error on content page when not logged in
+2017-03-17 DariusIII
+	* Chg: Remove now unused pixelead0 tmdb library, update jquery
+2017-03-16 DariusIII
+	* Fix: Possible fix for bad nzb details pages
+	* Chg: Update renaming of SDCLiP releases
+2017-03-15 DariusIII
+	* Chg: Update some of the pages
+	* Chg: Update ReleaseImage class
+2017-03-14 DariusIII
+	* Chg: Remove deprecated scripts
+	* Chg: Remove python folder with python scripts
+	* Chg: Remove references to nntpproxy and options for its usage
+	* Chg: Remove python backfill script from tmux.
+2017-03-13 DariusIII
+	* Fix: Fix fetching of covers from AEBN (thanks to @niel, ported from nZEDb)
+2017-03-08 DariusIII
+	* Chg: Update guzzlehttp
+2017-03-07 DariusIII
+	* Fix: Fix missing pdo when calling NZB class
+	* Chg: Small refactor of NZB class
+	* Chg: Slightly change NNTP class
+	* Chg: Remove tvrage code, reformat some of the existing code in Nfo class
+2017-03-06 DariusIII
+	* Chg: Make maxage parameter in getGamesRange function an empty string
+	* Fix: Fix wrong usage of null coalescing operator
+	* Chg: Remove unused classes (Desura, Greenlight), update Logger, Logging, Menu, MiscSorter classes
+2017-03-03 DariusIII
+	* Chg: Update ternary to PHP 7 style in start.php
+	* Fix: Fix function name in ajax_group-edit.php (Fixes issue #126)
+	* Chg: Remove unnecessary parenthesys in monitor.php
+	* Chg: Lower PHP 7 version requirement and add new NN_MINIMUM_MARIA_VERSION constant to constants.php
+	* Fix: Fix for missing email error in forgottenpassword.php
+	* Fix: Fix errors in Version.php
 2017-03-02 DariusIII
 	* Fix: Catch error blocks in TMDB
 	* Chg: Use new tmdb library in TMDB class

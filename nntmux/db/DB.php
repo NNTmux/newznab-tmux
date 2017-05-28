@@ -112,13 +112,13 @@ class DB extends \PDO
 			'checkVersion'	=> false,
 			'createDb'		=> false, // create dbname if it does not exist?
 			'ct'			=> new ConsoleTools(),
-			'dbhost'		=> defined('DB_HOST') ? DB_HOST : '',
-			'dbname'		=> defined('DB_NAME') ? DB_NAME : '',
-			'dbpass'		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
-			'dbport'		=> defined('DB_PORT') ? DB_PORT : '',
-			'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
-			'dbtype'		=> defined('DB_SYSTEM') ? DB_SYSTEM : '',
-			'dbuser'		=> defined('DB_USER') ? DB_USER : '',
+			'dbhost'		=> getenv('DB_HOST'),
+			'dbname'		=> getenv('DB_NAME'),
+			'dbpass'		=> getenv('DB_PASSWORD'),
+			'dbport'		=> getenv('DB_PORT'),
+			'dbsock'		=> getenv('DB_SOCKET'),
+			'dbtype'		=> getenv('DB_SYSTEM'),
+			'dbuser'		=> getenv('DB_USER'),
 			'log'			=> new ColorCLI(),
 			'persist'		=> false,
 		];
@@ -414,7 +414,7 @@ class DB extends \PDO
 	protected function echoError($error, $method, $severity, $exit = false)
 	{
 		if ($this->_debug) {
-			$this->debugging->log(get_class(), $method, $error, $severity);
+			$this->debugging->log(__CLASS__, $method, $error, $severity);
 
 			echo(
 			($this->cli ? $this->log->error($error) . PHP_EOL : '<div class="error">' . $error . '</div>')
@@ -512,7 +512,7 @@ class DB extends \PDO
 		}
 		if ($this->_debug) {
 			$this->echoError($error, 'queryInsert', 4);
-			$this->debugging->log(get_class(), __FUNCTION__, $query, Logger::LOG_SQL);
+			$this->debugging->log(__CLASS__, __FUNCTION__, $query, Logger::LOG_SQL);
 		}
 		return false;
 	}
@@ -570,7 +570,7 @@ class DB extends \PDO
 		}
 		if ($silent === false && $this->_debug) {
 			$this->echoError($error, 'queryExec', 4);
-			$this->debugging->log(get_class(), __FUNCTION__, $query, Logger::LOG_SQL);
+			$this->debugging->log(__CLASS__, __FUNCTION__, $query, Logger::LOG_SQL);
 		}
 		return false;
 	}
@@ -665,7 +665,7 @@ class DB extends \PDO
 				$this->echoError($e->getMessage(), 'Exec', 4, false);
 
 				if ($this->_debug) {
-					$this->debugging->log(get_class(), __FUNCTION__, $query, Logger::LOG_SQL);
+					$this->debugging->log(__CLASS__, __FUNCTION__, $query, Logger::LOG_SQL);
 				}
 			}
 
@@ -840,7 +840,7 @@ class DB extends \PDO
 				if ($ignore === false) {
 					$this->echoError($e->getMessage(), 'queryDirect', 4, false);
 					if ($this->_debug) {
-						$this->debugging->log(get_class(), __FUNCTION__, $query, Logger::LOG_SQL);
+						$this->debugging->log(__CLASS__, __FUNCTION__, $query, Logger::LOG_SQL);
 					}
 				}
 				$result = false;
@@ -1004,7 +1004,7 @@ class DB extends \PDO
 
 		}
 		if ($this->_debug) {
-			$this->debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_INFO);
+			$this->debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_INFO);
 		}
 	}
 
@@ -1247,7 +1247,7 @@ class DB extends \PDO
 			$PDOstatement = $this->pdo->prepare($query, $options);
 		} catch (\PDOException $e) {
 			if ($this->_debug) {
-				$this->debugging->log(get_class(), __FUNCTION__, $e->getMessage(), Logger::LOG_INFO);
+				$this->debugging->log(__CLASS__, __FUNCTION__, $e->getMessage(), Logger::LOG_INFO);
 			}
 			echo $this->log->error("\n" . $e->getMessage());
 			$PDOstatement = false;
@@ -1270,7 +1270,7 @@ class DB extends \PDO
 				$result = $this->pdo->getAttribute($attribute);
 			} catch (\PDOException $e) {
 				if ($this->_debug) {
-					$this->debugging->log(get_class(), __FUNCTION__, $e->getMessage(), Logger::LOG_INFO);
+					$this->debugging->log(__CLASS__, __FUNCTION__, $e->getMessage(), Logger::LOG_INFO);
 				}
 				echo $this->log->error("\n" . $e->getMessage());
 				$result = false;

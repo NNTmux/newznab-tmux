@@ -1,5 +1,5 @@
 <?php
-require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use app\models\Settings;
 use nntmux\db\DB;
@@ -18,7 +18,6 @@ $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
 $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $colors = (isset($tmux->colors)) ? $tmux->colors : 0;
-$nntpproxy = Settings::value('..nntpproxy');
 $delaytimet = Settings::value('..delaytime');
 $delaytimet = ($delaytimet) ? (int)$delaytimet : 2;
 
@@ -28,14 +27,8 @@ Utility::clearScreen();
 echo "Starting Tmux...\n";
 // Create a placeholder session so tmux commands do not throw server not found errors.
 exec('tmux new-session -ds placeholder 2>/dev/null');
-// Search for NNTPProxy session that might be running from a user threaded.php run. Setup a clean environment to run in.
-exec("tmux list-session | grep NNTPProxy", $nntpkill);
-if (count($nntpkill) !== 0) {
-	exec("tmux kill-session -t NNTPProxy");
-	echo $pdo->log->notice("Found NNTPProxy tmux session and killing it.");
-} else {
-	exec("tmux list-session", $session);
-}
+exec('tmux list-session', $session);
+
 
 //check if session exists
 $session = shell_exec("tmux list-session | grep $tmux_session");
@@ -43,19 +36,6 @@ $session = shell_exec("tmux list-session | grep $tmux_session");
 exec('tmux kill-session -t placeholder');
 if (count($session) !== 0) {
 	exit($pdo->log->error("tmux session: '" . $tmux_session . "' is already running, aborting.\n"));
-}
-
-$nntpproxy = Settings::value('..nntpproxy');
-if ($nntpproxy == '1') {
-	$modules = ["nntp", "socketpool"];
-	foreach ($modules as &$value) {
-		if (!python_module_exist($value)) {
-			exit($pdo->log->error("\nNNTP Proxy requires " . $value .
-				" python module but it's not installed. Aborting.\n"
-			)
-			);
-		}
-	}
 }
 
 //reset collections dateadded to now if dateadded > delay time check
@@ -115,16 +95,6 @@ function python_module_exist($module)
 	return ($returnCode == 0 ? true : false);
 }
 
-$nntpproxy = Settings::value('..nntpproxy');
-if ($nntpproxy == '1') {
-	$modules = array("nntp", "socketpool");
-	foreach ($modules as &$value) {
-		if (!python_module_exist($value)) {
-			exit($pdo->log->error("\nNNTP Proxy requires " . $value . " python module but it's not installed. Aborting.\n"));
-		}
-	}
-}
-
 function start_apps($tmux_session)
 {
 	$t = new Tmux();
@@ -172,29 +142,6 @@ function start_apps($tmux_session)
 
 	if ($console_bash == 1) {
 		exec("tmux new-window -t $tmux_session -n bash 'printf \"\033]2;Bash\033\" && bash -i'");
-	}
-}
-
-function window_proxy($tmux_session, $window)
-{
-	global $pdo;
-	$nntpproxy = Settings::value('..nntpproxy');
-	if ($nntpproxy === '1') {
-		$DIR = NN_MISC;
-		$nntpproxypy = $DIR . "update/python/nntpproxy.py";
-		if (file_exists($DIR . "update/python/lib/nntpproxy.conf")) {
-			$nntpproxyconf = $DIR . "update/python/lib/nntpproxy.conf";
-			exec("tmux new-window -t $tmux_session -n nntpproxy 'printf \"\033]2;NNTPProxy\033\" && python $nntpproxypy $nntpproxyconf'");
-		}
-	}
-
-	if ($nntpproxy === '1' && (Settings::value('..alternate_nntp') == '1')) {
-		$DIR = NN_MISC;
-		$nntpproxypy = $DIR . "update/python/nntpproxy.py";
-		if (file_exists($DIR . "python/lib/nntpproxy_a.conf")) {
-			$nntpproxyconf = $DIR . "python/lib/nntpproxy_a.conf";
-			exec("tmux selectp -t $tmux_session:$window.0; tmux splitw -t $tmux_session:$window -h -p 50 'printf \"\033]2;NNTPProxy\033\" && python $nntpproxypy $nntpproxyconf'");
-		}
 	}
 }
 
@@ -273,14 +220,8 @@ if ($seq == 1) {
 
 	window_utilities($tmux_session);
 	window_post($tmux_session);
-	if ($nntpproxy == 1) {
-		window_ircscraper($tmux_session);
-		window_proxy($tmux_session, 4);
-		window_sharing($tmux_session);
-	} else {
-		window_ircscraper($tmux_session);
-		window_sharing($tmux_session);
-	}
+	window_ircscraper($tmux_session);
+	window_sharing($tmux_session);
 	start_apps($tmux_session);
 	attach($DIR, $tmux_session);
 } else if ($seq == 2) {
@@ -289,15 +230,8 @@ if ($seq == 1) {
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
 
 	window_stripped_utilities($tmux_session);
-	if ($nntpproxy == 1) {
-		window_ircscraper($tmux_session);
-		window_proxy($tmux_session, 3);
-		window_sharing($tmux_session);
-	} else {
-		window_ircscraper($tmux_session);
-		window_sharing($tmux_session);
-	}
-
+	window_ircscraper($tmux_session);
+	window_sharing($tmux_session);
 	start_apps($tmux_session);
 	attach($DIR, $tmux_session);
 } else {
@@ -309,14 +243,8 @@ if ($seq == 1) {
 
 	window_utilities($tmux_session);
 	window_post($tmux_session);
-	if ($nntpproxy == 1) {
-		window_ircscraper($tmux_session);
-		window_proxy($tmux_session, 4);
-		window_sharing($tmux_session);
-	} else {
-		window_ircscraper($tmux_session);
-		window_sharing($tmux_session);
-	}
+	window_ircscraper($tmux_session);
+	window_sharing($tmux_session);
 	start_apps($tmux_session);
 	attach($DIR, $tmux_session);
 }

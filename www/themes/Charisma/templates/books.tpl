@@ -76,7 +76,7 @@
 															<img src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfo_id}.jpg{else}{$smarty.const.WWW_THEMES}/shared/images/no-cover.png{/if}"
 																 class="img-responsive img-rounded"
 																 width="140" border="0"
-																 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
+																 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0} <i class="zmdi zmdi-alarm" style="color: red" title="This release has failed to download for some users"></i>{/if}
 														</a>
 														{if isset($result.url) && $result.url != ""}<a
 															class="label label-default" target="_blank"
@@ -91,7 +91,7 @@
 														   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
 														   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
 														{if isset($mfailed[$m@index]) && $mfailed[$m@index] > 0}
-														<span class="btn btn-hover btn-default btn-xs"><i class="fa fa-thumbs-o-down"></i><span
+														<span class="btn btn-hover btn-default btn-xs"><i class="zmdi zmdi-thumbs-o-down"></i><span
 																	class="badge"> {$mfailed[$m@index]}
 																Failed Download{if $mfailed[$m@index] > 1}s{/if}</span>
 															{/if}
@@ -137,26 +137,26 @@
 																	<div>
 																		<a role="button" class="btn btn-default btn-xs"
 																		   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
-																					class="fa fa-cloud-download"></i><span
+																					class="zmdi zmdi-cloud-download"></i><span
 																					class="badge">{$mgrabs[$m@index]}
 																				Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																		<a role="button" class="btn btn-default btn-xs"
 																		   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}#comments"><i
-																					class="fa fa-comment-o"></i><span
+																					class="zmdi zmdi-comment-o"></i><span
 																					class="badge">{$mcomments[$m@index]}
 																				Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 																		<span
 																			id="guid{$mguid[$m@index]}"
 																			class="btn btn-hover btn-default btn-xs icon_cart text-muted"
 																			title="Send to my Download Basket"><i
-																			class="fa fa-shopping-basket"></i>
+																			class="zmdi zmdi-shopping-basket"></i>
 																		</span>
 																		{if isset($sabintegrated) && $sabintegrated !=""}
 																			<span
 																				id="guid{$mguid[$m@index]}"
 																				class="btn btn-hover btn-default btn-xs icon_sab text-muted"
 																				title="Send to my Queue"><i
-																				class="fa fa-share"></i>
+																				class="zmdi zmdi-share"></i>
 																			</span>
 																		{/if}
 																	</div>

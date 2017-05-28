@@ -85,15 +85,15 @@ abstract class RequestID
 
 		if ($this->_releases !== false && $this->_releases->rowCount() > 0) {
 			$this->_totalReleases = $this->_releases->rowCount();
-			$this->pdo->log->doEcho($this->pdo->log->primary('Processing ' . $this->_totalReleases . " releases for RequestID's."));
+			ColorCLI::doEcho(ColorCLI::primary('Processing ' . $this->_totalReleases . " releases for RequestID's."));
 			$renamed = $this->_processReleases();
 			if ($this->echoOutput) {
-				echo $this->pdo->log->header(
+				echo ColorCLI::header(
 					"\nRenamed " . number_format($renamed) . " releases in " . $this->consoleTools->convertTime(time() - $startTime) . "."
 				);
 			}
 		} elseif ($this->echoOutput) {
-			$this->pdo->log->doEcho($this->pdo->log->primary("No RequestID's to process."));
+			ColorCLI::doEcho(ColorCLI::primary("No RequestID's to process."));
 		}
 
 		return $renamed;

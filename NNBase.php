@@ -1,15 +1,15 @@
 <?php
-include_once 'nntmux/constants.php';
+include_once __DIR__ . DIRECTORY_SEPARATOR . 'nntmux/constants.php';
 
 if ($argc > 1) {
 	$constant = $argv[1];
-	include_once 'nntmux/constants.php';
+	include_once __DIR__ . DIRECTORY_SEPARATOR . 'nntmux/constants.php';
 	if (defined($constant)) {
 		exit(constant($constant));
 	}
 
 }
 
-exit(dirname(__FILE__));
+exit(__DIR__ . __FILE__);
 
 ?>

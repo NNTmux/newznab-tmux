@@ -6,11 +6,11 @@
  *
  * It will start the tmux server and monitoring scripts if needed.
  */
-//require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
-require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\db\DB;
 use nntmux\Tmux;
+use nntmux\ColorCLI;
 
 $pdo = new DB();
 
@@ -18,15 +18,15 @@ $pdo = new DB();
 if (`which tmux`) {
 	$tmux_version = trim(str_replace('tmux ', '', shell_exec('tmux -V')));
 	if (version_compare($tmux_version, '2.0', '>') && version_compare($tmux_version, '2.3', '<')) {
-		exit($pdo->log->error("tmux versions 2.1 and 2.2 are not compatible with NNTmux. Aborting\n"));
+		exit(ColorCLI::error('tmux versions 2.1 and 2.2 are not compatible with NNTmux. Aborting' . PHP_EOL));
 	}
 } else {
-	exit($pdo->log->error("tmux binary not found. Aborting\n"));
+	exit(ColorCLI::error('tmux binary not found. Aborting' . PHP_EOL));
 }
 
 $tmux = new Tmux();
 $tmux_settings = $tmux->get();
-$tmux_session = (isset($tmux_settings->tmux_session)) ? $tmux_settings->tmux_session : 0;
+$tmux_session = $tmux_settings->tmux_session ?? 0;
 $path = __DIR__;
 
 // Set running value to on.
@@ -39,7 +39,7 @@ exec('tmux new-session -ds placeholder 2>/dev/null');
 $session = shell_exec("tmux list-session | grep $tmux_session");
 // Kill the placeholder
 exec('tmux kill-session -t placeholder');
-if (count($session) == 0) {
-	echo $pdo->log->info("Starting the tmux server and monitor script.\n");
+if (count($session) === 0) {
+	echo ColorCLI::info("Starting the tmux server and monitor script.\n");
 	passthru("php $path/run.php");
 }

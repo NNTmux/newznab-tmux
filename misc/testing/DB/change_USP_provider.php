@@ -1,5 +1,5 @@
 <?php
-require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\db\DB;
 use nntmux\NNTP;
@@ -35,21 +35,21 @@ foreach ($groups as $group) {
 	$bfdays = daysOldstr($group['first_record_postdate']);
 	$currdays = daysOldstr($group['last_record_postdate']);
 	$bfartnum = daytopost($nntp, $group['name'], $bfdays, true, true);
-	echo "Our Current backfill postdate was: " . $pdo->log->setColor('Yellow') . date('r', strtotime($group['first_record_postdate'])) . $pdo->log->rsetcolor() . "\n";
+	echo 'Our Current backfill postdate was: ' . $pdo->log->setColor('Yellow') . date('r', strtotime($group['first_record_postdate'])) . $pdo->log->rsetcolor() . "\n";
 	$currartnum = daytopost($nntp, $group['name'], $currdays, true, false);
-	echo "Our Current current postdate was: " . $pdo->log->setColor('Yellow') . date('r', strtotime($group['last_record_postdate'])) . $pdo->log->rsetcolor() . "\n";
-	$pdo->queryExec(sprintf("UPDATE groups SET first_record = %s, last_record = %s WHERE id = %d", $pdo->escapeString($bfartnum), $pdo->escapeString($currartnum), $group['id']));
+	echo 'Our Current current postdate was: ' . $pdo->log->setColor('Yellow') . date('r', strtotime($group['last_record_postdate'])) . $pdo->log->rsetcolor() . PHP_EOL;
+	$pdo->queryExec(sprintf('UPDATE groups SET first_record = %s, last_record = %s WHERE id = %d', $pdo->escapeString($bfartnum), $pdo->escapeString($currartnum), $group['id']));
 	$endtime = microtime(true);
-	echo $pdo->log->setColor('Gray', 'Dim') . "This group took " . gmdate("H:i:s", $endtime - $starttime) . " to process.\n";
+	echo $pdo->log->setColor('Gray', 'Dim') . 'This group took ' . gmdate("H:i:s", $endtime - $starttime) . ' to process.' . PHP_EOL;
 	$numofgroups--;
-	echo "There are " . $numofgroups . " left to process.\n\n" . $pdo->log->rsetcolor() . "";
+	echo 'There are ' . $numofgroups . ' left to process.' . PHP_EOL . PHP_EOL . $pdo->log->rsetcolor() . '';
 }
 
 $totalend = microtime(true);
-echo $pdo->log->header('Total time to update all groups ' . gmdate("H:i:s", $totalend - $totalstart));
+echo $pdo->log->header('Total time to update all groups ' . gmdate('H:i:s', $totalend - $totalstart));
 
 // Truncate tables to complete the change to the new USP.
-$arr = array("parts", "missed_parts", "binaries");
+$arr = ['parts', 'missed_parts', 'binaries', 'collections', 'multigroup_parts', 'multigroup_missed_parts', 'multigroup_binaries', 'multigroup_collections'];
 foreach ($arr as &$value) {
 	$rel = $pdo->queryExec("TRUNCATE TABLE $value");
 	if ($rel !== false) {
@@ -129,7 +129,7 @@ function daytopost($nntp, $group, $days, $debug = true, $bfcheck = true)
 	}
 
 	if ($debug && $bfcheck) {
-		echo $pdo->log->primary("Searching for postdates.\nGroup's Firstdate: " . $firstDate . ' (' . ((is_int($firstDate)) ? date('r', $firstDate) : 'n/a') . ").\nGroup's Lastdate: " . $lastDate . ' (' . date('r', $lastDate) . ").");
+		echo $pdo->log->primary("Searching for postdates.\nGroup's Firstdate: " . $firstDate . ' (' . (is_int($firstDate) ? date('r', $firstDate) : 'n/a') . ").\nGroup's Lastdate: " . $lastDate . ' (' . date('r', $lastDate) . ").");
 	}
 
 	$interval = floor(($upperbound - $lowerbound) * 0.5);
@@ -138,15 +138,15 @@ function daytopost($nntp, $group, $days, $debug = true, $bfcheck = true)
 	// Match on days not timestamp to speed things up.
 	while (daysOld($dateofnextone) < $days) {
 		while (($tmpDate = $binaries->postdate(($upperbound - $interval), $data)) > $goaldate) {
-			$upperbound = $upperbound - $interval;
+			$upperbound -= $interval;
 		}
 
 		if (!$templowered) {
-			$interval = ceil(($interval / 2));
+			$interval = ceil($interval / 2);
 		}
-		$dateofnextone = $binaries->postdate(($upperbound - 1), $data);
+		$dateofnextone = $binaries->postdate($upperbound - 1, $data);
 		while (!$dateofnextone) {
-			$dateofnextone = $binaries->postdate(($upperbound - 1), $data);
+			$dateofnextone = $binaries->postdate($upperbound - 1, $data);
 		}
 	}
 	if ($st === true) {

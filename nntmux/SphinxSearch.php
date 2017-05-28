@@ -7,7 +7,7 @@ class SphinxSearch
 {
 	/**
 	 * SphinxQL connection.
-	 * @var \nntmux\db\DB
+	 * @var DB
 	 */
 	public $sphinxQL = null;
 
@@ -16,7 +16,7 @@ class SphinxSearch
 	 */
 	public function __construct()
 	{
-		if (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX) {
+		if (NN_RELEASE_SEARCH_TYPE === ReleaseSearch::SPHINX) {
 			if (!defined('NN_SPHINXQL_HOST_NAME')) {
 				define('NN_SPHINXQL_HOST_NAME', '0');
 			}
@@ -41,9 +41,9 @@ class SphinxSearch
 	 * Insert release into Sphinx RT table.
 	 * @param $parameters
 	 */
-	public function insertRelease($parameters)
+	public function insertRelease($parameters): void
 	{
-		if (!is_null($this->sphinxQL) && $parameters['id']) {
+		if ($this->sphinxQL !== null && $parameters['id']) {
 			$this->sphinxQL->queryExec(
 				sprintf(
 					'REPLACE INTO releases_rt (id, name, searchname, fromname, filename) VALUES (%d, %s, %s, %s, %s)',
@@ -60,11 +60,11 @@ class SphinxSearch
 	/**
 	 * Delete release from Sphinx RT tables.
 	 * @param array $identifiers ['g' => Release GUID(mandatory), 'id' => ReleaseID(optional, pass false)]
-	 * @param \nntmux\db\DB $pdo
+	 * @param DB $pdo
 	 */
-	public function deleteRelease($identifiers, DB $pdo)
+	public function deleteRelease($identifiers, DB $pdo): void
 	{
-		if (!is_null($this->sphinxQL)) {
+		if ($this->sphinxQL !== null) {
 			if ($identifiers['i'] === false) {
 				$identifiers['i'] = $pdo->queryOneRow(
 					sprintf('SELECT id FROM releases WHERE guid = %s', $pdo->escapeString($identifiers['g']))
@@ -79,6 +79,11 @@ class SphinxSearch
 		}
 	}
 
+	/**
+	 * @param $string
+	 *
+	 * @return mixed
+	 */
 	public static function escapeString($string)
 	{
 		$from = [
@@ -99,11 +104,11 @@ class SphinxSearch
 	 * Update Sphinx Relases index for given releases_id.
 	 *
 	 * @param int $releaseID
-	 * @param \nntmux\db\DB $pdo
+	 * @param DB $pdo
 	 */
-	public function updateRelease($releaseID, DB $pdo)
+	public function updateRelease($releaseID, DB $pdo): void
 	{
-		if (!is_null($this->sphinxQL)) {
+		if ($this->sphinxQL !== null) {
 			$new = $pdo->queryOneRow(
 						sprintf('
 							SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
@@ -124,9 +129,9 @@ class SphinxSearch
 	 * Truncate a RT index.
 	 * @param string $indexName
 	 */
-	public function truncateRTIndex($indexName)
+	public function truncateRTIndex($indexName): void
 	{
-		if (!is_null($this->sphinxQL)) {
+		if ($this->sphinxQL !== null) {
 			$this->sphinxQL->queryExec(sprintf('TRUNCATE RTINDEX %s', $indexName));
 		}
 	}
@@ -135,9 +140,9 @@ class SphinxSearch
 	 * Optimize a RT index.
 	 * @param string $indexName
 	 */
-	public function optimizeRTIndex($indexName)
+	public function optimizeRTIndex($indexName): void
 	{
-		if (!is_null($this->sphinxQL)) {
+		if ($this->sphinxQL !== null) {
 			$this->sphinxQL->queryExec(sprintf('FLUSH RTINDEX %s', $indexName));
 			$this->sphinxQL->queryExec(sprintf('OPTIMIZE INDEX %s', $indexName));
 		}

@@ -27,7 +27,8 @@ class AniDB
 	/**
 	 * Updates stored AniDB entries in the database
 	 *
-	 * @param int $anidbID
+	 * @param int    $anidbID
+	 * @param string       $title
 	 * @param string $type
 	 * @param string $startdate
 	 * @param string $enddate
@@ -38,13 +39,18 @@ class AniDB
 	 * @param string $rating
 	 * @param string $categories
 	 * @param string $characters
+	 * @param        $epnos
+	 * @param        $airdates
+	 * @param        $episodetitles
 	 */
-	public function updateTitle($anidbID, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters)
+	public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles)
 	{
-		// FIXME fix the missing variables for this query
 		$this->pdo->queryExec(
 			sprintf('
-				UPDATE anidb_titles AS at INNER JOIN anidb_info ai USING (anidbid) SET title = %s, type = %s, startdate = %s, enddate = %s,
+				UPDATE anidb_titles at
+				INNER JOIN anidb_info ai ON ai.anidbid = at.anidbid
+				INNER JOIN anidb_episodes ae ON ae.anidbid = at.anidbid
+				SET title = %s, type = %s, startdate = %s, enddate = %s,
 					related = %s, similar = %s, creators = %s, description = %s, rating = %s,
 					categories = %s, characters = %s, epnos = %s, airdates = %s,
 					episodetitles = %s, unixtime = %d WHERE anidbid = %d',
@@ -62,8 +68,8 @@ class AniDB
 				$this->pdo->escapeString($epnos),
 				$this->pdo->escapeString($airdates),
 				$this->pdo->escapeString($episodetitles),
-				$anidbID,
-				time()
+				time(),
+				$anidbID
 			)
 		);
 	}
@@ -98,14 +104,14 @@ class AniDB
 	{
 		$rsql = $tsql = '';
 
-		if ($letter != '') {
-			if ($letter == '0-9') {
+		if ($letter !== '') {
+			if ($letter === '0-9') {
 				$letter = '[0-9]';
 			}
 			$rsql .= sprintf('AND at.title REGEXP %s', $this->pdo->escapeString('^' . $letter));
 		}
 
-		if ($animetitle != '') {
+		if ($animetitle !== '') {
 			$tsql .= sprintf('AND at.title %s', $this->pdo->likeString($animetitle, true, true));
 		}
 
@@ -144,7 +150,7 @@ class AniDB
 		}
 
 		$rsql = '';
-		if ($animetitle != '') {
+		if ($animetitle !== '') {
 			$rsql = sprintf('AND at.title %s', $this->pdo->likeString($animetitle, true, true));
 		}
 
@@ -173,7 +179,7 @@ class AniDB
 	public function getAnimeCount($animetitle = '')
 	{
 		$rsql = '';
-		if ($animetitle != '') {
+		if ($animetitle !== '') {
 			$rsql .= sprintf('AND at.title %s', $this->pdo->likeString($animetitle, true, true));
 		}
 
@@ -203,15 +209,16 @@ class AniDB
 			sprintf('
 				SELECT at.anidbid, at.lang, at.title,
 					ai.startdate, ai.enddate, ai.updated, ai.related, ai.creators, ai.description,
-					ai.rating, ai.picture, ai.categories, ai.characters, ai.type, ai.similar
+					ai.rating, ai.picture, ai.categories, ai.characters, ai.type, ai.similar, ae.episodeid, ae
+					.episode_title, ae.episode_no, ae.airdate
 				FROM anidb_titles AS at
 				LEFT JOIN anidb_info AS ai USING (anidbid)
+				LEFT JOIN anidb_episodes ae USING (anidbid)
 				WHERE at.anidbid = %d',
 				$anidbID
 			)
 		);
 
-		return isset($animeInfo[0]) ? $animeInfo[0] : false;
+		return $animeInfo[0] ?? false;
 	}
-
 }

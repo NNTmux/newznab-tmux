@@ -1,10 +1,10 @@
 <?php
 
 if (!isset($argv[1])) {
-	exit("This script is not intended to be run manually." . PHP_EOL);
+	exit('This script is not intended to be run manually.' . PHP_EOL);
 }
 
-require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 5) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use app\models\Settings;
 use \nntmux\db\DB;
@@ -29,12 +29,12 @@ switch ($options[1]) {
 	// $options[2] => (string)group name, Name of group to work on.
 	// $options[3] => (int)   backfill type from tmux settings. 1 = Backfill interval , 2 = Bakfill all
 	case 'backfill':
-		if (in_array((int)$options[3], [1, 2])) {
+		if (in_array((int)$options[3], [1, 2], false)) {
 			$pdo = new DB();
 			$value = $pdo->queryOneRow("SELECT value FROM tmux WHERE setting = 'backfill_qty'");
 			if ($value !== false) {
 				$nntp = nntp($pdo);
-				(new Backfill())->backfillAllGroups($options[2], ($options[3] == 1 ? '' : $value['value']));
+				(new Backfill())->backfillAllGroups($options[2], ($options[3] === 1 ? '' : $value['value']));
 			}
 		}
 		break;
@@ -273,7 +273,7 @@ switch ($options[1]) {
 	case 'pp_tv':
 		if (charCheck($options[2])) {
 			$pdo = new DB();
-			(new PostProcess(['Settings' => $pdo]))->processTv('', $options[2], (isset($options[3]) ? $options[3] : ''));
+			(new PostProcess(['Settings' => $pdo]))->processTv('', $options[2], $options[3] ?? '');
 		}
 		break;
 }
@@ -296,7 +296,7 @@ function processReleases($releases, $groupID)
 		$nzbFilesAdded = $releases->createNZBs($groupID);
 
 		// This loops as long as the number of releases or nzbs added was >= the limit (meaning there are more waiting to be created)
-	} while (($releasesCount['added'] + $releasesCount['dupes'] >= $releaseCreationLimit || $nzbFilesAdded >= $releaseCreationLimit));
+	} while ($releasesCount['added'] + $releasesCount['dupes'] >= $releaseCreationLimit || $nzbFilesAdded >= $releaseCreationLimit);
 	$releases->deleteCollections($groupID);
 }
 
@@ -309,7 +309,7 @@ function processReleases($releases, $groupID)
  */
 function charCheck($char)
 {
-	if (in_array($char, ['a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'])) {
+	if (in_array($char, ['a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'], false)) {
 		return true;
 	}
 	return false;
@@ -340,7 +340,7 @@ function &nntp(&$pdo, $alternate = false)
 {
 	$nntp = new NNTP(['Settings' => $pdo]);
 	if (($alternate && Settings::value('..alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
-		exit("ERROR: Unable to connect to usenet." . PHP_EOL);
+		exit('ERROR: Unable to connect to usenet.' . PHP_EOL);
 	}
 
 	return $nntp;

@@ -39,6 +39,8 @@
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/flat/green.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" type="text/css"
 		  media="screen"/>
+	<!-- fancybox css -->
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/fancybox/dist/jquery.fancybox.css" rel="stylesheet">
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
 	<script src="{$smarty.const.WWW_THEMES}/shared/assets/html5shiv/dist/html5shiv.min.js"></script>
@@ -178,7 +180,7 @@
 
 </div>
 <!-- jQuery 3.1.0 -->
-<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
+<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-3.2.x/dist/jquery.min.js" type="text/javascript"></script>
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"
 		type="text/javascript"></script>
 <!-- bootstrap progress js -->
@@ -195,7 +197,7 @@
 		src="{$smarty.const.WWW_THEMES}/shared/assets/tinymce-builded/js/tinymce/tinymce.min.js"></script>
 <!-- jQuery migrate script -->
 <script type="text/javascript"
-		src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
+		src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-3.0.x/jquery-migrate.min.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
@@ -217,6 +219,23 @@
 
 <!-- pace -->
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/pace/pace.min.js"></script>
+<!-- scrollup -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-goup/jquery.goup.min.js"></script>
+
+<!-- fancybox js -->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/fancybox/dist/jquery.fancybox.js"></script>
+
+<script>
+    jQuery(document).ready(function(){
+        jQuery.goup({
+			containerColor: "#8bc5c5",
+			arrowColor: "#fdf8f8",
+			bottomOffset: 100,
+			goupSpeed: "normal",
+			title: "Scroll to top"
+		});
+    });
+</script>
 
 </body>
 

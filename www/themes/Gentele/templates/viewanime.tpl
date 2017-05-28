@@ -1,3 +1,4 @@
+<div class="well well-small"
 {if isset($nodata) && $nodata !=''}
 	<div class="header">
 		<h2>View > <strong>Anime</strong></h2>
@@ -13,16 +14,13 @@
 			</ol>
 		</div>
 	</div>
-	<h1>
-		<div class="well well-sm">
-			{$animeTitle}
+	<div class="well well-sm">
+		<h1>{$animeTitle}
 			{if isset($isadmin)}
 				<a class="btn btn-xs btn-warning" title="Edit AniDB data"
 				   href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeAnidbid}&amp; from={$smarty.server.REQUEST_URI|escape:"url"}">Edit</a>
 			{/if}
-		</div>
-	</h1>
-	<div class="well well-sm">
+		</h1>
 		{if animePicture != ''}
 			<div style="text-align: center;">
 				<img class="shadow img img-polaroid" alt="{$animeTitle} Picture"
@@ -31,24 +29,34 @@
 			<br/>
 		{/if}
 		<p>
-			{if $animeCategories != ''}<b>{$animeCategories}</b><br/>{/if}
+            {if $animeType != ''}({$animeType|escape:"htmlall"}){/if}<br>
+            {if $animeCategories != ''}<b>{$animeCategories}</b><br/>{/if}
 			<span class="descinitial">{$animeDescription|escape:"htmlall"|nl2br|magicurl|truncate:"1500":" </span><a class=\"descmore\" href=\"#\"> more...</a>"}
 				{if $animeDescription|strlen > 1500}<span
 						class="descfull">{$animeDescription|escape:"htmlall"|nl2br|magicurl}</span>{else}</span>{/if}
 		</p>
+        <p>
+            {if $animeCharacters != ''}<br>Characters: {$animeCharacters|escape:"htmlall"}{/if}
+            <br>
+            {if $animeCreators !=''}<br><b>Created by: {$animeCreators|escape:"htmlall"}</b>{/if}
+        </p>
 		<p>
-			{if $animeRating != ''}<br><b>AniDB Rating: {$animeRating|escape:"htmlall"}</b>{/if}
+            {if $animeStartDate != '' && $animeStartDate != '1970-01-01'}<br><b>Started:
+                {$animeStartDate|escape:"htmlall"}</b>{/if}
+            {if $animeEndDate != '' && $animeEndDate != '1970-01-01'}<br><b>Ended:
+                {$animeEndDate|escape:"htmlall"}</b>{/if}
+            {if $animeRating != ''}<br><b>AniDB Rating: {$animeRating|escape:"htmlall"}</b>{/if}
 			{if $animeRelated != ''}<br><i>Related Anime: {$animeRelated|escape:"htmlall"}</i><br/>{/if}
 		</p>
-	</div>
-	<div style="text-align: center;">
-		<div class="btn-group">
-			<a class="btn btn-sm btn-default"
-			   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={$animeAnidbid}"
-			   title="View AniDB">View AniDB</a>
-			<a class="btn btn-sm btn-default"
-			   href="{$smarty.const.WWW_TOP}/rss?anidb={$animeAnidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
-				feed for this Anime <i class="fa fa-rss"></i></a>
+		<div style="text-align: center;">
+			<div class="btn-group">
+				<a class="btn btn-sm btn-default"
+				   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={$animeAnidbid}"
+				   title="View AniDB">View AniDB</a>
+				<a class="btn btn-sm btn-default"
+				   href="{$smarty.const.WWW_TOP}/rss?anidb={$animeAnidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
+					feed for this Anime <i class="fa fa-rss"></i></a>
+			</div>
 		</div>
 	</div>
 	<form id="nzb_multi_operations_form" action="get">
@@ -100,8 +108,8 @@
 									<tr class="{cycle values=",alt"}">
 										<td>
 											<input id="guid{$result.guid}"
-																 type="checkbox" class="flat"
-																 value="{$result.guid}"/></td>
+												   type="checkbox" class="flat"
+												   value="{$result.guid}"/></td>
 										<td>
 											<a title="View details"
 											   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
@@ -137,19 +145,20 @@
 														data-original-title="Comments"></i></a>
 											<a href="#">
 												<i
-													id="guid{$result.guid}" class="icon_cart fa fa-shopping-basket" data-toggle="tooltip"
-													data-placement="top" title
-													data-original-title="Send to my Download Basket">
+														id="guid{$result.guid}" class="icon_cart fa fa-shopping-basket"
+														data-toggle="tooltip"
+														data-placement="top" title
+														data-original-title="Send to my Download Basket">
 												</i>
 											</a>
 											{if isset($sabintegrated) && $sabintegrated !=""}
 												<a href="#">
 													<i
-														id="guid{$result.guid}"
-														class="fa fa-share"
-														data-toggle="tooltip"
-														data-placement="top" title
-														data-original-title="Send to My Queue">
+															id="guid{$result.guid}"
+															class="fa fa-share"
+															data-toggle="tooltip"
+															data-placement="top" title
+															data-original-title="Send to My Queue">
 													</i>
 												</a>
 											{/if}
@@ -163,5 +172,10 @@
 									</tr>
 								{/foreach}
 							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</form>
 {/if}

@@ -1,5 +1,5 @@
 <?php
-require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use app\models\Settings;
 use nntmux\Category;
@@ -18,11 +18,11 @@ $runVar['paths']['misc'] = NN_MISC;
 $runVar['paths']['cli'] = NN_ROOT . 'cli/';
 $runVar['paths']['scraper'] = NN_MISC . 'IRCScraper' . DS . 'scrape.php';
 
-$db_name = DB_NAME;
-$dbtype = DB_SYSTEM;
+$db_name = getenv('DB_NAME');
+$dbtype = getenv('DB_SYSTEM');
 $tmux = $tRun->get('niceness');
 
-$tmux_niceness = (isset($tmux->niceness) ?? 2);
+$tmux_niceness = $tmux->niceness ?? 2;
 
 $runVar['constants'] = $pdo->queryOneRow($tRun->getConstantSettings());
 
@@ -56,7 +56,7 @@ $runVar['timers']['query']['tpg1_time'] = 0;
 
 // Analyze release table if not using innoDB (innoDB uses online analysis)
 $engine = $pdo->queryOneRow(sprintf("SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'releases'", $pdo->escapeString($db_name)));
-if (!in_array($engine['engine'], ['InnoDB', 'TokuDB'])) {
+if (!in_array($engine['engine'], ['InnoDB', 'TokuDB'], false)) {
 	printf($pdo->log->info(PHP_EOL . 'Analyzing your tables to refresh your indexes.'));
 	$pdo->optimise(false, 'analyze', false, ['releases']);
 	Utility::clearScreen();
@@ -73,7 +73,7 @@ $psTableRowCount = $pdo->Prepare($tblCount);
 while ($runVar['counts']['iterations'] > 0) {
 
 	//check the db connection
-	if ($pdo->ping(true) == false) {
+	if ($pdo->ping(true) === false) {
 		unset($pdo);
 		$pdo = new DB();
 	}
@@ -108,9 +108,6 @@ while ($runVar['counts']['iterations'] > 0) {
 	switch ((int)$runVar['settings']['backfill']) {
 		case 1:
 			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/backfill.php";
-			break;
-		case 2:
-			$runVar['scripts']['backfill'] = "{$runVar['commands']['_python']} {$runVar['paths']['misc']}update/python/backfill_threaded.py group";
 			break;
 		case 4:
 			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/safe.php backfill";
