@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+
 use nntmux\Videos;
 
 $page   = new AdminPage();

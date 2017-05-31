@@ -4,7 +4,6 @@ require_once("config.php");
 
 use nntmux\Contents;
 
-
 $page        = new AdminPage();
 $contents    = new Contents(['Settings' => $page->settings]);
 $contentlist = $contents->getAll();
