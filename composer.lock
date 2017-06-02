@@ -1528,12 +1528,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dborsatto/php-giantbomb.git",
-                "reference": "e95553774caf9b6dace6d044710c7e03dee3af43"
+                "reference": "909b2b75200270daf62b1cd3dab91ffdca49ab23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dborsatto/php-giantbomb/zipball/e95553774caf9b6dace6d044710c7e03dee3af43",
-                "reference": "e95553774caf9b6dace6d044710c7e03dee3af43",
+                "url": "https://api.github.com/repos/dborsatto/php-giantbomb/zipball/909b2b75200270daf62b1cd3dab91ffdca49ab23",
+                "reference": "909b2b75200270daf62b1cd3dab91ffdca49ab23",
                 "shasum": ""
             },
             "require": {
@@ -1562,7 +1562,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-05-18 16:20:43"
+            "time": "2017-05-29 12:05:57"
         },
         {
             "name": "doctrine/annotations",
@@ -2752,16 +2752,16 @@
         },
         {
             "name": "php-tmdb/api",
-            "version": "2.1.8",
+            "version": "v2.1.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-tmdb/api.git",
-                "reference": "5aae08086a17301b78aa26fd59bd6c10910cd5f6"
+                "reference": "1c2e87653f6df62ea9075b7118c2a80dcb355f66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-tmdb/api/zipball/5aae08086a17301b78aa26fd59bd6c10910cd5f6",
-                "reference": "5aae08086a17301b78aa26fd59bd6c10910cd5f6",
+                "url": "https://api.github.com/repos/php-tmdb/api/zipball/1c2e87653f6df62ea9075b7118c2a80dcb355f66",
+                "reference": "1c2e87653f6df62ea9075b7118c2a80dcb355f66",
                 "shasum": ""
             },
             "require": {
@@ -2785,7 +2785,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0-dev"
+                    "dev-master": "2.1-dev"
                 }
             },
             "autoload": {
@@ -2816,7 +2816,7 @@
                 "tvdb",
                 "wrapper"
             ],
-            "time": "2017-02-28T23:30:08+00:00"
+            "time": "2017-06-02T03:27:09+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
@@ -4526,16 +4526,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "6.1.4",
+            "version": "6.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "42b7f394a8e009516582331b1e03a1aba40175d1"
+                "reference": "16999a1e9a8a25d68f0ab8cc8ab818b043ad5374"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/42b7f394a8e009516582331b1e03a1aba40175d1",
-                "reference": "42b7f394a8e009516582331b1e03a1aba40175d1",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/16999a1e9a8a25d68f0ab8cc8ab818b043ad5374",
+                "reference": "16999a1e9a8a25d68f0ab8cc8ab818b043ad5374",
                 "shasum": ""
             },
             "require": {
@@ -4580,7 +4580,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "6.1.x-dev"
+                    "dev-master": "6.2.x-dev"
                 }
             },
             "autoload": {
@@ -4606,7 +4606,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-05-22T07:45:30+00:00"
+            "time": "2017-06-02T12:24:37+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",

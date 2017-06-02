@@ -1,3 +1,5 @@
+2017-06-02 DariusIII
+	* Chg: Update php-tmdb and php-giantbomb libraries
 2017-05-28 DariusIII
 	* Chg: Possible fix for videos query in getVideoFromSiteID function
 2017-05-26 DariusIII
