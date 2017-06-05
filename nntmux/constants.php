@@ -3,7 +3,7 @@
 
 define('NN_MINIMUM_PHP_VERSION', '7.1.0');
 define('NN_MINIMUM_MYSQL_VERSION', '5.6');
-define('NN_MINIMUM_MARIA_VERSION', '10.0');
+define('NN_MINIMUM_MARIA_VERSION', '10.1');
 
 define('DS', DIRECTORY_SEPARATOR);
 

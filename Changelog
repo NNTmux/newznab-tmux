@@ -1,4 +1,5 @@
 2017-06-05 DariusIII
+	* Chg: Update minimum MariaDB version to 10.1
 	* Chg: Add laravel/framework to composer.json for future usage
 2017-06-02 DariusIII
 	* Chg: Update php-tmdb and php-giantbomb libraries
