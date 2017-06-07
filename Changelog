@@ -1,3 +1,5 @@
+2017-06-06 DariusIII
+	* Chg: Update composer.lock
 2017-06-05 DariusIII
 	* Chg: Update minimum MariaDB version to 10.1
 	* Chg: Add laravel/framework to composer.json for future usage
