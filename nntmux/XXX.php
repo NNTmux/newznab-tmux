@@ -749,7 +749,7 @@ class XXX
 	 *
 	 * @return string - If array .. 1,2,3,4 if string .. 1
 	 */
-	private function getGenreID($arr): string
+	protected function getGenreID($arr): string
 	{
 		$ret = null;
 
