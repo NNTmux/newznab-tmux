@@ -5,6 +5,9 @@
     }
   ],
   "autoload": {
+    "files": [
+      "app/libraries/laravel/framework/src/Illuminate/Support/helpers.php"
+    ],
     "psr-4": {
       "nntmux\\": "nntmux/"
     },
