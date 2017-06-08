@@ -1,14 +1,10 @@
 <?php
 namespace nntmux;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Cookie\SetCookie;
-use GuzzleHttp\Exception\RequestException;
 use nntmux\db\DB;
-use nntmux\utility\Utility;
+use nntmux\processing\adult\AdultMovies;
 
-class ADM
+class ADM extends AdultMovies
 {
 	/**
 	 * Override if 18 years+ or older
@@ -51,21 +47,6 @@ class ADM
 	protected $_html;
 
 	/**
-	 * @var Client
-	 */
-	protected $client;
-
-	/**
-	 * @var DB
-	 */
-	protected $pdo;
-
-	/**
-	 * POST Paramaters for getUrl Method
-	 */
-	protected $_postParams;
-
-	/**
 	 * Results returned from each method
 	 *
 	 * @var array
@@ -90,16 +71,11 @@ class ADM
 	 */
 	protected $_title = '';
 
-	public function __construct()
+	public function __construct(array $options = [])
 	{
+		parent::__construct($options);
 		$this->_html = new \simple_html_dom();
-		$this->client = new Client();
-		$this->cookiejar = new CookieJar();
 		$this->pdo = new DB();
-		if (!empty($this->cookie)) {
-			$cookieJar = $this->cookiejar->setCookie(SetCookie::fromString($this->cookie));
-			$this->client = new Client(['cookies' => $cookieJar]);
-		}
 	}
 
 	/**
@@ -133,6 +109,7 @@ class ADM
 
 	/**
 	 * Gets the synopsis
+	 *
 	 * @return array
 	 */
 	public function synopsis()
@@ -148,7 +125,7 @@ class ADM
 	}
 
 	/**
-	 * Get Product Informtion and Director
+	 * Get Product Information and Director
 	 *
 	 *
 	 * @return array
@@ -224,7 +201,9 @@ class ADM
 		$result = false;
 		if (!empty($this->searchTerm)) {
 			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($this->searchTerm);
-			if ($this->getUrl() !== false) {
+			$this->_response = getUrl(self::ADMURL . $this->_trailUrl);
+			if ($this->_response !== false) {
+				$this->_html->load($this->_response);
 				if ($ret = $this->_html->find('img[rel=license]')) {
 					if (count($ret) > 0) {
 						foreach ($this->_html->find('img[rel=license]') as $ret) {
@@ -286,54 +265,5 @@ class ADM
 
 		$results = empty($results) ? false : $results;
 		return $results;
-	}
-
-	/**
-	 * Get Raw html of webpage
-	 *
-	 * @return bool
-	 */
-	private function getUrl()
-	{
-		if (!empty($this->_trailUrl)) {
-			try {
-				$this->_response = $this->client->get(self::ADMURL . $this->_trailUrl)->getBody()->getContents();
-			} catch (RequestException $e) {
-				if ($e->hasResponse()) {
-					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on ADM server'));
-					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('ADM Service unavailable'));
-					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from ADM, http error reported: ' . $e->getCode()));
-					}
-				}
-			} catch (\RuntimeException $e) {
-				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
-			}
-		} else {
-			try {
-				$this->_response = $this->client->get(self::IF18)->getBody()->getContents();
-			} catch (RequestException $e) {
-				if ($e->hasResponse()) {
-					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on ADM server'));
-					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('ADM service unavailable'));
-					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from ADM, http error reported: ' . $e->getCode()));
-					}
-				}
-			} catch (\RuntimeException $e) {
-				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
-			}
-		}
-
-		if (!$this->_response) {
-			return false;
-		}
-
-		$this->_html->load($this->_response);
-		return true;
 	}
 }

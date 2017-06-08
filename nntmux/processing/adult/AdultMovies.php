@@ -6,7 +6,7 @@ namespace nntmux\processing\adult;
 use nntmux\ColorCLI;
 use nntmux\XXX;
 
-class AdultMovies extends XXX
+abstract class AdultMovies extends XXX
 {
 	// Television Sources
 	const SOURCE_NONE    = 0;

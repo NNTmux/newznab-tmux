@@ -1,7 +1,9 @@
 <?php
 namespace nntmux;
 
-class Hotmovies
+use nntmux\processing\adult\AdultMovies;
+
+class Hotmovies extends AdultMovies
 {
 
 	/**
@@ -78,10 +80,14 @@ class Hotmovies
 	 */
 	protected $_title = '';
 
-
-
-	public function __construct()
+	/**
+	 * Hotmovies constructor.
+	 *
+	 * @param array $options
+	 */
+	public function __construct(array $options = [])
 	{
+		parent::__construct($options);
 		$this->_html = new \simple_html_dom();
 
 		// Set a cookie to override +18 warning.

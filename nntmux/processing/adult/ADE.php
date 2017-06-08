@@ -1,16 +1,14 @@
 <?php
 namespace nntmux;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use nntmux\db\DB;
-use nntmux\utility\Utility;
+use nntmux\processing\adult\AdultMovies;
 
 
 /**
  * Class adultdvdempire
  */
-class ADE
+class ADE extends AdultMovies
 {
 	/**
 	 * If a direct link is given parse it rather then search
@@ -72,22 +70,11 @@ class ADE
 	protected $_edithtml;
 	protected $_ch;
 
-	/**
-	 * @var Client
-	 */
-	protected $client;
-
-	/**
-	 * @var DB
-	 */
-	protected $pdo;
-
-	public function __construct()
+	public function __construct(array $options = [])
 	{
+		parent::__construct($options);
 		$this->_html = new \simple_html_dom();
 		$this->_edithtml = new \simple_html_dom();
-		$this->client = new Client();
-		$this->pdo = new DB();
 	}
 
 	/**
@@ -295,9 +282,8 @@ class ADE
 		if (empty($this->searchTerm)) {
 			return false;
 		}
-		if ($this->getUrl($this->_dvdQuery . rawurlencode($this->searchTerm)) === false) {
-			return false;
-		} else {
+		$this->_response = getUrl($this->_dvdQuery . rawurlencode($this->searchTerm));
+		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
 			if ($ret = $this->_html->find('a.boxcover', 0)) {
 				$title = $ret->title;
@@ -312,7 +298,7 @@ class ADE
 					$this->_title     = trim($title);
 					unset($ret);
 					$this->_html->clear();
-					$this->getUrl($this->_urlFound);
+					getUrl($this->_urlFound);
 					$this->_html->load($this->_response);
 				} else {
 					$this->found = false;
@@ -324,58 +310,6 @@ class ADE
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Gets raw html content using adeurl and any trailing url.
-	 *
-	 * @param string $trailing - required
-	 *
-	 * @return bool - true if page has content
-	 */
-	private function getUrl($trailing = "")
-	{
-		if (!empty($trailing)) {
-			try {
-				$this->_response = $this->client->get(self::ADE . $trailing)->getBody()->getContents();
-			} catch (RequestException $e) {
-				if ($e->hasResponse()) {
-					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on ADE server'));
-					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('ADE service unavailable'));
-					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from ADE, http error reported: ' . $e->getCode()));
-					}
-				}
-			} catch (\RuntimeException $e) {
-				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
-			}
-		}
-		if (!empty($this->directLink)) {
-			try {
-				$this->_response = $this->client->get($this->directLink)->getBody()->getContents();
-				$this->directLink = '';
-			} catch (RequestException $e) {
-				if ($e->hasResponse()) {
-					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on ADE server'));
-					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('ADE service unavailable'));
-					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from ADE, http error reported: ' . $e->getCode()));
-					}
-				}
-			} catch (\RuntimeException $e) {
-				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
-			}
-		}
-
-		if (!$this->_response) {
-			return false;
-		}
-
-		return $this->_response;
 	}
 
 	/**

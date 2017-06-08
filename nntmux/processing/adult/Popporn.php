@@ -1,9 +1,10 @@
 <?php
 namespace nntmux;
 
+use nntmux\processing\adult\AdultMovies;
 use nntmux\utility\Utility;
 
-class Popporn
+class Popporn extends AdultMovies
 {
 
 	/**
@@ -70,8 +71,9 @@ class Popporn
 	 */
 	protected $_trailUrl = "";
 
-	public function __construct()
+	public function __construct(array $options = [])
 	{
+		parent::__construct($options);
 		$this->_html = new \simple_html_dom();
 		if (isset($this->cookie)) {
 			$this->getUrl();

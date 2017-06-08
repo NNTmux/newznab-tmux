@@ -6,8 +6,9 @@ use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Client;
 use nntmux\db\DB;
+use nntmux\processing\adult\AdultMovies;
 
-class AEBN
+class AEBN extends AdultMovies
 {
 	/**
 	 * Cookie File location used in curl
@@ -119,8 +120,9 @@ class AEBN
 	 * Sets the variables that used throughout the class
 	 *
 	 */
-	public function __construct()
+	public function __construct(array $options = [])
 	{
+		parent::__construct($options);
 		$this->_whichSite = ['straight' => self::AEBNSURL, 'gay' => self::AEBNGURL];
 		$this->_html = new \simple_html_dom();
 		$this->client = new Client();

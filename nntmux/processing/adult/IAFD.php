@@ -1,9 +1,10 @@
 <?php
 namespace nntmux;
 
+use nntmux\processing\adult\AdultMovies;
 use nntmux\utility\Utility;
 
-class IAFD
+class IAFD extends AdultMovies
 {
 	public $classUsed = '';
 	public $cookie = '';
@@ -24,8 +25,9 @@ class IAFD
 	protected $_response;
 
 
-	public function __construct()
+	public function __construct(array $options = [])
 	{
+		parent::__construct($options);
 		$this->_html = new \simple_html_dom();
 		if (!empty($this->cookie)) {
 			@$this->getUrl();
