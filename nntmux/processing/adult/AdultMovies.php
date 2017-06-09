@@ -38,6 +38,46 @@ abstract class AdultMovies extends XXX
 	}
 
 	/**
+	 * @return mixed
+	 */
+	abstract protected function productInfo();
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function covers();
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function synopsis();
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function cast();
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function genres();
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function search();
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function getAll();
+
+	/**
+	 * @return mixed
+	 */
+	abstract protected function trailers();
+
+	/**
 	 * Fetch xxx info for the movie.
 	 *
 	 * @param $xxxmovie

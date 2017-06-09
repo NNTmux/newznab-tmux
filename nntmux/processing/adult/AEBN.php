@@ -27,17 +27,10 @@ class AEBN extends AdultMovies
 	/**
 	 * Url Constants used within this class
 	 */
-	const AEBNGURL = 'http://gay.theater.aebn.net';
 	const AEBNSURL = 'http://straight.theater.aebn.net';
 	const IF18 = 'http://straight.theater.aebn.net/dispatcher/frontDoor?genreId=101&theaterId=13992&locale=en&refid=AEBN-000001';
 	const TRAILINGSEARCH = '/dispatcher/fts?theaterId=13992&genreId=101&locale=en&count=30&imageType=Large&targetSearchMode=basic&isAdvancedSearch=false&isFlushAdvancedSearchCriteria=false&sortType=Relevance&userQuery=title%3A+%2B';
 	const TRAILERURL = '/dispatcher/previewPlayer?locale=en&theaterId=13992&genreId=101&movieId=';
-
-	/**
-	 * Sets the current site to search
-	 * @var string
-	 */
-	protected $_currentSite = 'straight';
 
 	/**
 	 * Direct Url in getAll method
@@ -52,23 +45,6 @@ class AEBN extends AdultMovies
 	protected $_html;
 
 	/**
-	 * @var Client
-	 */
-	protected $client;
-
-	/**
-	 * @var DB
-	 */
-	protected $pdo;
-
-	/**
-	 * Post Parameters to use with curl
-	 *
-	 * @var array
-	 */
-	protected $_postParams = [];
-
-	/**
 	 * Raw Html response from curl
 	 *
 	 */
@@ -79,7 +55,7 @@ class AEBN extends AdultMovies
 	 *
 	 * @var array
 	 */
-	protected $_res = [
+	protected static $res = [
 		'backcover'		=> [],
 		'boxcover'		=> [],
 		'cast'			=> [],
@@ -106,41 +82,18 @@ class AEBN extends AdultMovies
 	 * Trailing Url
 	 * @var string
 	 */
-	protected $_trailUrl = '';
-
-	/**
-	 * Used in __construct
-	 * @var array - straight, gay
-	 */
-	protected $_whichSite = [];
-
+	protected $_trailerUrl = '';
 
 
 	/**
 	 * Sets the variables that used throughout the class
 	 *
+	 * @param array $options
 	 */
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->_whichSite = ['straight' => self::AEBNSURL, 'gay' => self::AEBNGURL];
 		$this->_html = new \simple_html_dom();
-		$this->client = new Client();
-		$this->cookiejar = new CookieJar();
-		$this->pdo = new DB();
-		if (!empty($this->cookie)) {
-			$cookieJar = $this->cookiejar->setCookie(SetCookie::fromString($this->cookie));
-			$this->client = new Client(['cookies' => $cookieJar]);
-		}
-	}
-
-	/**
-	 * If they arent' removed from memory. Force them.
-	 */
-	public function __destruct()
-	{
-		$this->_html->clear();
-		unset($this->_response, $this->_res);
 	}
 
 	/**
@@ -148,15 +101,15 @@ class AEBN extends AdultMovies
 	 *
 	 * @return array|bool
 	 */
-	public function trailers()
+	protected function trailers()
 	{
 		$ret = $this->_html->find('a[itemprop=trailer]', 0);
 		if (preg_match('/movieId=(?<movieid>\d+)&/', trim($ret->href), $matches)) {
 			$movieid = $matches['movieid'];
-			$this->_res['trailers']['url'] = $this->_whichSite[$this->_currentSite] . self::TRAILERURL . $movieid;
+			AEBN::$res['trailers']['url'] = AEBN::AEBNSURL . self::TRAILERURL . $movieid;
 		}
 
-		return $this->_res;
+		return AEBN::$res;
 	}
 
 	/**
@@ -164,17 +117,17 @@ class AEBN extends AdultMovies
 	 *
 	 * @return array
 	 */
-	public function covers()
+	protected function covers()
 	{
 		if ($ret = $this->_html->find('div#md-boxCover, img[itemprop=thumbnailUrl]', 1)) {
 			$ret = trim($ret->src);
 			if (strpos($ret, '//') === 0) {
 				$ret = 'http:' . $ret;
 			}
-			$this->_res['boxcover'] = str_ireplace('160w.jpg', 'xlf.jpg', $ret);
-			$this->_res['backcover'] = str_ireplace('160w.jpg', 'xlb.jpg', $ret);
+			AEBN::$res['boxcover'] = str_ireplace('160w.jpg', 'xlf.jpg', $ret);
+			AEBN::$res['backcover'] = str_ireplace('160w.jpg', 'xlb.jpg', $ret);
 		}
-		return $this->_res;
+		return AEBN::$res;
 	}
 
 	/**
@@ -182,15 +135,15 @@ class AEBN extends AdultMovies
 	 *
 	 * @return array
 	 */
-	public function genres()
+	protected function genres()
 	{
 		if ($ret = $this->_html->find('div.md-detailsCategories', 0)) {
 			foreach ($ret->find('a[itemprop=genre]') as $genre) {
-				$this->_res['genres'][] = trim($genre->plaintext);
+				AEBN::$res['genres'][] = trim($genre->plaintext);
 			}
 		}
-		$this->_res['genres'] = array_unique($this->_res['genres']);
-		return $this->_res;
+		AEBN::$res['genres'] = array_unique(AEBN::$res['genres']);
+		return AEBN::$res;
 	}
 
 	/**
@@ -198,23 +151,23 @@ class AEBN extends AdultMovies
 	 *
 	 * @return array
 	 */
-	public function cast()
+	protected function cast()
 	{
 		if ($ret = $this->_html->find('div.starsFull', 0)) {
 			foreach ($ret->find('span[itemprop=name]') as $star) {
-				$this->_res['cast'][] = trim($star->plaintext);
+				AEBN::$res['cast'][] = trim($star->plaintext);
 			}
 		} else {
 			if ($ret = $this->_html->find('div.detailsLink', 0)) {
 				foreach ($ret->find('span') as $star) {
 					if (strpos($star->plaintext, '/More/') !== false && strpos($star->plaintext, '/Stars/') !== false) {
-						$this->_res['cast'][] = trim($star->plaintext);
+						AEBN::$res['cast'][] = trim($star->plaintext);
 					}
 				}
 			}
 		}
 
-		return $this->_res;
+		return AEBN::$res;
 	}
 
 	/**
@@ -222,27 +175,27 @@ class AEBN extends AdultMovies
 	 *
 	 * @return array
 	 */
-	public function productInfo()
+	protected function productInfo()
 	{
 		if ($ret = $this->_html->find('div#md-detailsLeft', 0)) {
 			foreach ($ret->find('div') as $div) {
 				foreach ($div->find('span') as $span) {
 					$span->plaintext = rawurldecode($span->plaintext);
 					$span->plaintext = preg_replace('/&nbsp;/', '', $span->plaintext);
-					$this->_res['productinfo'][] = trim($span->plaintext);
+					AEBN::$res['productinfo'][] = trim($span->plaintext);
 				}
 			}
-			if (false !== $key = array_search('Running Time:', $this->_res['productinfo'])) {
-				unset($this->_res['productinfo'][$key + 2]);
+			if (false !== $key = array_search('Running Time:', AEBN::$res['productinfo'])) {
+				unset(AEBN::$res['productinfo'][$key + 2]);
 			}
-			if (false !== $key = array_search("Director:", $this->_res['productinfo'])) {
-				$this->_res['director'] = $this->_res['productinfo'][$key + 1];
-				unset($this->_res['productinfo'][$key], $this->_res['productinfo'][$key + 1]);
+			if (false !== $key = array_search("Director:", AEBN::$res['productinfo'])) {
+				AEBN::$res['director'] = AEBN::$res['productinfo'][$key + 1];
+				unset(AEBN::$res['productinfo'][$key], AEBN::$res['productinfo'][$key + 1]);
 			}
-			$this->_res['productinfo'] = array_chunk($this->_res['productinfo'], 2, false);
+			AEBN::$res['productinfo'] = array_chunk(AEBN::$res['productinfo'], 2, false);
 		}
 
-		return $this->_res;
+		return AEBN::$res;
 	}
 
 	/**
@@ -251,20 +204,19 @@ class AEBN extends AdultMovies
 	 * @return array
 	 *
 	 */
-	public function synopsis()
+	protected function synopsis()
 	{
 		if ($ret = $this->_html->find('span[itemprop=about]', 0)) {
 			if ($ret === null) {
 				if ($ret = $this->_html->find('div.movieDetailDescription', 0)) {
-					$this->_res['synopsis'] = trim($ret->plaintext);
-					$this->_res['synopsis'] = preg_replace('/Description:\s/', "", $this->_res['plot']);
+					AEBN::$res['synopsis'] = preg_replace('/Description:\s/', '', AEBN::$res['plot']);
 				}
 			} else {
-				$this->_res['synopsis'] = trim($ret->plaintext);
+				AEBN::$res['synopsis'] = trim($ret->plaintext);
 			}
 		}
 
-		return $this->_res;
+		return AEBN::$res;
 	}
 
 	/**
@@ -272,17 +224,19 @@ class AEBN extends AdultMovies
 	 *
 	 * @return bool
 	 */
-	public function search()
+	protected function search()
 	{
 		if (empty($this->searchTerm)) {
 			return false;
 		}
-		$this->_trailUrl = self::TRAILINGSEARCH . urlencode($this->searchTerm);
-		if ($this->getUrl($this->_currentSite) === false) {
-			return false;
-		} else {
-			if ($count = count($this->_html->find('div.movie'))) {
-				$i = 1;
+		$this->_response = false;
+		$this->_trailerUrl = self::TRAILINGSEARCH . urlencode($this->searchTerm);
+		$this->_response = getUrl(self::IF18);
+		if ($this->_response !== false) {
+			$this->_html->load($this->_response);
+			$count = count($this->_html->find('div.movie'));
+			$i = 1;
+			while ($count >= $i) {
 				foreach ($this->_html->find('div.movie') as $movie) {
 					$string = 'a#FTSMovieSearch_link_title_detail_' . $i;
 					if ($ret = $movie->find($string, 0)) {
@@ -292,26 +246,18 @@ class AEBN extends AdultMovies
 						similar_text(strtolower($this->searchTerm), strtolower($title), $p);
 						if ($p >= 90) {
 							$this->_title = trim($ret->title);
-							$this->_trailUrl = html_entity_decode($ret->href);
-							$this->_directUrl = $this->_whichSite[$this->_currentSite] . $this->_trailUrl;
-							$this->getUrl($this->_currentSite);
+							$this->_trailerUrl = html_entity_decode($ret->href);
+							$this->_directUrl = self::AEBNSURL . $this->_trailerUrl;
+							getUrl(self::AEBNSURL);
 							return true;
-						} else {
-							continue;
 						}
+						continue;
 					}
 					$i++;
 				}
-				if ($i === $count || $count === 0) {
-					if ($this->_currentSite === 'gay') {
-						return false;
-					}
-					$this->_currentSite = 'gay';
-					$this->search();
-				}
-			} else {
-				return false;
 			}
+
+			return false;
 		}
 
 		return false;
@@ -348,61 +294,10 @@ class AEBN extends AdultMovies
 		if (is_array($this->trailers())) {
 			$results = array_merge($results, $this->trailers());
 		}
-		if (empty($results) === true) {
-			return false;
-		} else {
-			return $results;
-		}
-	}
-
-	/**
-	 * Get Raw html of webpage
-	 *
-	 * @param string $site
-	 *
-	 * @return bool
-	 */
-	private function getUrl($site = 'straight')
-	{
-		if (!empty($this->_trailUrl)) {
-			try {
-				$this->_response = $this->client->get($this->_whichSite[$site] . $this->_trailUrl)->getBody()->getContents();
-			} catch (RequestException $e) {
-				if ($e->hasResponse()) {
-					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on AEBN server'));
-					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('AEBN service unavailable'));
-					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from AEBN, http error reported: ' . $e->getCode()));
-					}
-				}
-			} catch (\RuntimeException $e) {
-				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
-			}
-		} else {
-			try {
-				$this->_response = $this->client->get(self::IF18)->getBody()->getContents();
-			} catch (RequestException $e) {
-				if ($e->hasResponse()) {
-					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on AEBN server'));
-					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('AEBN service unavailable'));
-					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from AEBN, http error reported: ' . $e->getCode()));
-					}
-				}
-			} catch (\RuntimeException $e) {
-				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
-			}
-		}
-
-		if (!$this->_response) {
+		if (empty($results)) {
 			return false;
 		}
 
-		$this->_html->load($this->_response);
-		return true;
+		return $results;
 	}
 }

@@ -91,7 +91,7 @@ class ADM extends AdultMovies
 	 * Get Box Cover Images
 	 * @return array - boxcover,backcover
 	 */
-	public function covers()
+	protected function covers()
 	{
 		$baseUrl = 'http://www.adultdvdmarketplace.com/';
 		if ($ret = $this->_html->find('a[rel=fancybox-button]', 0)) {
@@ -112,7 +112,7 @@ class ADM extends AdultMovies
 	 *
 	 * @return array
 	 */
-	public function synopsis()
+	protected function synopsis()
 	{
 		$this->_res['synopsis'] = 'N/A';
 		foreach ($this->_html->find('h3') as $heading) {
@@ -130,7 +130,7 @@ class ADM extends AdultMovies
 	 *
 	 * @return array
 	 */
-	public function productInfo()
+	protected function productInfo()
 	{
 
 		foreach ($this->_html->find('ul.list-unstyled li') as $li) {
@@ -154,7 +154,7 @@ class ADM extends AdultMovies
 	 * Gets the cast members
 	 * @return array
 	 */
-	public function cast()
+	protected function cast()
 	{
 		$cast = [];
 		foreach ($this->_html->find('h3') as $heading) {
@@ -175,7 +175,7 @@ class ADM extends AdultMovies
 	 * Gets categories
 	 * @return array
 	 */
-	public function genres()
+	protected function genres()
 	{
 		$genres = [];
 		foreach ($this->_html->find('ul.list-unstyled li') as $li) {
@@ -196,7 +196,7 @@ class ADM extends AdultMovies
 	 * Searches for match against searchterm
 	 * @return bool - true if search = 100%
 	 */
-	public function search()
+	protected function search()
 	{
 		$result = false;
 		if (!empty($this->searchTerm)) {
@@ -235,7 +235,7 @@ class ADM extends AdultMovies
 	 * Gets all information
 	 * @return array
 	 */
-	public function getAll()
+	protected function getAll()
 	{
 		$results = [];
 		if (!empty($this->_directUrl)) {
