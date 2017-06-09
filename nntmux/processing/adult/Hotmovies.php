@@ -19,7 +19,7 @@ class Hotmovies extends AdultMovies
 	 *
 	 * @var string
 	 */
-	public $searchTerm = '';
+	protected $searchTerm = '';
 	/**
 	 * Define a cookie location
 	 *
@@ -96,10 +96,6 @@ class Hotmovies extends AdultMovies
 		}
 	}
 
-	/*
-	 * Remove from memory if it still exists
-	 */
-
 	/**
 	 * Get Raw html of webpage
 	 *
@@ -150,12 +146,19 @@ class Hotmovies extends AdultMovies
 		unset($this->_response, $this->_res);
 	}
 
+	protected function trailers()
+	{
+		// TODO: Implement trailers() method.
+
+		return false;
+	}
+
 	/**
 	 * Directly gets the link if directlink is set, and parses it.
 	 *
 	 * @return bool|array
 	 */
-	public function getDirect()
+	protected function getDirect()
 	{
 		if (!empty($this->directLink)) {
 			if ($this->getUrl() === false) {
@@ -171,15 +174,15 @@ class Hotmovies extends AdultMovies
 	 * Gets all information
 	 * @return bool|array
 	 */
-	public function getAll()
+	protected function getAll()
 	{
 		$results = [];
 		if (!empty($this->_directUrl)) {
 			$results['title'] = $this->_title;
 			$results['directurl'] = $this->_directUrl;
 		}
-		if (is_array($this->sypnosis())) {
-			$results = array_merge($results, $this->sypnosis());
+		if (is_array($this->synopsis())) {
+			$results = array_merge($results, $this->synopsis());
 		}
 		if (is_array($this->productInfo())) {
 			$results = array_merge($results, $this->productInfo());
@@ -202,16 +205,16 @@ class Hotmovies extends AdultMovies
 	}
 
 	/**
-	 * Gets the sypnosis
+	 * Gets the synopsis
 	 *
 	 * @return array
 	 */
-	public function sypnosis()
+	protected function synopsis()
 	{
 		if ($this->_html->find('.desc_link', 0)) {
 			preg_match('/var descfullcontent = (?<content>.*)/', $this->_response,$matches);
 			if (is_array($matches)) {
-				$this->_res['sypnosis'] = rawurldecode($matches['content']);
+				$this->_res['synopsis'] = rawurldecode($matches['content']);
 			}
 		}
 
@@ -222,7 +225,7 @@ class Hotmovies extends AdultMovies
 	 *
 	 * @return array
 	 */
-	public function productInfo()
+	protected function productInfo()
 	{
 		$studio = false;
 		$director = false;
@@ -275,7 +278,7 @@ class Hotmovies extends AdultMovies
 	 *
 	 *@return array
 	 */
-	public function cast()
+	protected function cast()
 	{
 		$cast = null;
 		if ($this->_html->find('a[itemprop=actor]')) {
@@ -296,7 +299,7 @@ class Hotmovies extends AdultMovies
 	 *
 	 *@return array
 	 */
-	public function genres()
+	protected function genres()
 	{
 		$genres = [];
 		if ($ret = $this->_html->find('div.categories',0)) {
@@ -317,7 +320,7 @@ class Hotmovies extends AdultMovies
 	 * Get Box Cover Images
 	 * @return bool|array - boxcover,backcover
 	 */
-	public function covers()
+	protected function covers()
 	{
 		if ($ret = $this->_html->find('div#large_cover, img#cover', 1)) {
 			$this->_res['boxcover'] = trim($ret->src);
@@ -333,12 +336,12 @@ class Hotmovies extends AdultMovies
 	 * Searches for match against searchterm
 	 * @return bool, true if search >= 90%
 	 */
-	public function search()
+	public function search ($movie)
 	{
-		if (empty($this->searchTerm)) {
+		if (empty($movie)) {
 			return false;
 		}
-		$this->_getLink = self::HMURL . self::TRAILINGSEARCH . urlencode($this->searchTerm) . self::EXTRASEARCH;
+		$this->_getLink = self::HMURL . self::TRAILINGSEARCH . urlencode($movie) . self::EXTRASEARCH;
 		if ($this->getUrl() === false) {
 			return false;
 		} else {
@@ -355,7 +358,7 @@ class Hotmovies extends AdultMovies
 				return false;
 			}
 			if (!empty($title)) {
-				similar_text($this->searchTerm, $title, $p);
+				similar_text($movie, $title, $p);
 				if ($p >= 90) {
 					$this->_title = $title;
 					// 90$ match found, load the url to start parsing

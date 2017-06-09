@@ -133,13 +133,13 @@ class ADE extends AdultMovies
 	}
 
 	/**
-	 * Gets the sypnosis and tagline
+	 * Gets the synopsis and tagline
 	 *
 	 * @param bool $tagline - Include tagline? true/false
 	 *
 	 * @return array - plot,tagline
 	 */
-	public function sypnosis($tagline = false)
+	public function synopsis($tagline = false)
 	{
 		if ($tagline === true) {
 			$ret = $this->_html->find('p.Tagline', 0);
@@ -148,7 +148,7 @@ class ADE extends AdultMovies
 			}
 		}
 		if ($ret = @$this->_html->find('p.Tagline', 0)->next_sibling()->next_sibling()) {
-			$this->_res['sypnosis'] = trim($ret->innertext);
+			$this->_res['synopsis'] = trim($ret->innertext);
 		}
 
 		return $this->_res;
@@ -277,12 +277,12 @@ class ADE extends AdultMovies
 	 * Searches xxx name.
 	 * @return bool - True if releases has 90% match, else false
 	 */
-	public function search()
+	public function search($movie)
 	{
-		if (empty($this->searchTerm)) {
+		if (empty($movie)) {
 			return false;
 		}
-		$this->_response = getUrl($this->_dvdQuery . rawurlencode($this->searchTerm));
+		$this->_response = getUrl($this->_dvdQuery . rawurlencode($movie));
 		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
 			if ($ret = $this->_html->find('a.boxcover', 0)) {
@@ -290,7 +290,7 @@ class ADE extends AdultMovies
 				$title = str_replace('/XXX/', '', $title);
 				$title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
 				$ret   = (string)trim($ret->href);
-				similar_text(strtolower($this->searchTerm), strtolower($title), $p);
+				similar_text(strtolower($movie), strtolower($title), $p);
 				if ($p >= 90) {
 					$this->found      = true;
 					$this->_urlFound  = $ret;
@@ -300,14 +300,12 @@ class ADE extends AdultMovies
 					$this->_html->clear();
 					getUrl($this->_urlFound);
 					$this->_html->load($this->_response);
-				} else {
-					$this->found = false;
-
-					return false;
+					return true;
 				}
-			} else {
+				$this->found = false;
 				return false;
 			}
+			return false;
 		}
 		return false;
 	}
@@ -317,15 +315,15 @@ class ADE extends AdultMovies
 	 *
 	 * @return array
 	 */
-	public function getAll()
+	protected function getAll()
 	{
 		$results = [];
 		if (!empty($this->_directUrl)) {
 			$results['directurl'] = $this->_directUrl;
 			$results['title']     = $this->_title;
 		}
-		if (is_array($this->sypnosis(true))) {
-			$results = array_merge($results, $this->sypnosis(true));
+		if (is_array($this->synopsis(true))) {
+			$results = array_merge($results, $this->synopsis(true));
 		}
 		if (is_array($this->productInfo(true))) {
 			$results = array_merge($results, $this->productInfo(true));

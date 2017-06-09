@@ -280,11 +280,11 @@ class Popporn extends AdultMovies
 	 * Searches for match against searchterm
 	 * @return bool, true if search >= 90%
 	 */
-	public function search()
+	public function search($movie)
 	{
 		$result = false;
-		if (isset($this->searchTerm)) {
-			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($this->searchTerm);
+		if (isset($movie)) {
+			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($movie);
 			if ($this->getUrl() !== false) {
 				if ($ret = $this->_html->find('div.product-info, div.title', 1)) {
 					$this->_title = trim($ret->plaintext);
@@ -297,7 +297,7 @@ class Popporn extends AdultMovies
 							if ($ret = $this->_html->find('#link-to-this', 0)) {
 								$this->_directUrl = trim($ret->href);
 							}
-							similar_text(strtolower($this->searchTerm), strtolower($title), $p);
+							similar_text(strtolower($movie), strtolower($title), $p);
 							if ($p >= 90) {
 								$result = true;
 							}
@@ -314,7 +314,7 @@ class Popporn extends AdultMovies
 	 * Gets all information
 	 * @return array|bool
 	 */
-	public function getAll()
+	protected function getAll()
 	{
 		$results = [];
 		if (isset($this->_directUrl)) {

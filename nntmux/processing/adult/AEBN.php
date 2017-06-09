@@ -39,6 +39,11 @@ class AEBN extends AdultMovies
 	protected $_response;
 
 	/**
+	 * @var string
+	 */
+	protected $_trailerUrl = '';
+
+	/**
 	 * Returned results in all methods except search/geturl
 	 *
 	 * @var array
@@ -206,30 +211,30 @@ class AEBN extends AdultMovies
 	 *
 	 * @return bool
 	 */
-	protected function search()
+	public function search($movie)
 	{
-		if (empty($this->searchTerm)) {
+		if (empty($movie)) {
 			return false;
 		}
 		$this->_response = false;
-		$this->_trailerUrl = self::TRAILINGSEARCH . urlencode($this->searchTerm);
-		$this->_response = getUrl(self::IF18, false);
+		$this->_trailerUrl = self::TRAILINGSEARCH . urlencode($movie);
+		$this->_response = getUrl(self::IF18);
 		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
 			$count = count($this->_html->find('div.movie'));
 			$i = 1;
 			while ($count >= $i) {
-				foreach ($this->_html->find('div.movie') as $movie) {
+				foreach ($this->_html->find('div.movie') as $mov) {
 					$string = 'a#FTSMovieSearch_link_title_detail_' . $i;
-					if ($ret = $movie->find($string, 0)) {
+					if ($ret = $mov->find($string, 0)) {
 						$title = str_replace('/XXX/', '', $ret->title);
 						$title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
 						$title = trim($title);
-						similar_text(strtolower($this->searchTerm), strtolower($title), $p);
+						similar_text(strtolower($mov), strtolower($title), $p);
 						if ($p >= 90) {
 							$this->_title = trim($ret->title);
 							$this->_trailerUrl = html_entity_decode($ret->href);
-							$this->_directUrl = self::AEBNSURL . $this->_trailerUrl;
+							$this->_directUrl = self::AEBNSURL . self::TRAILINGSEARCH . urlencode($movie);
 							getUrl(self::AEBNSURL);
 							return true;
 						}
@@ -250,7 +255,7 @@ class AEBN extends AdultMovies
 	 *
 	 * @return array|bool
 	 */
-	public function getAll()
+	protected function getAll()
 	{
 		$results = [];
 		if (!empty($this->_directUrl)) {

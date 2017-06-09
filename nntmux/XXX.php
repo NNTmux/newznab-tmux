@@ -73,6 +73,8 @@ class XXX
 
 	/**
 	 * @param array $options Echo to cli / Class instances.
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -410,57 +412,178 @@ class XXX
 	}
 
 	/**
-	 * Fetch xxx info for the movie.
+	 * Get all genres for search-filter.tpl
 	 *
-	 * @param $xxxmovie
+	 * @param bool $activeOnly
+	 *
+	 * @return array|null
+	 */
+	public function getAllGenres($activeOnly = false)
+	{
+		$ret = null;
+
+		if ($activeOnly) {
+			$res = $this->pdo->query('SELECT title FROM genres WHERE disabled = 0 AND type = ' .
+				Category::XXX_ROOT . ' ORDER BY title'
+			);
+		} else {
+			$res = $this->pdo->query('SELECT title FROM genres WHERE disabled = 1 AND type = ' .
+				Category::XXX_ROOT . ' ORDER BY title'
+			);
+		}
+
+		foreach ($res as $arr => $value) {
+			$ret[] = $value['title'];
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Get Genres for activeonly and/or an ID
+	 *
+	 * @param bool        $activeOnly
+	 * @param null|string $gid
+	 *
+	 * @return array|bool
+	 */
+	public function getGenres($activeOnly = false, $gid = null)
+	{
+		if ($gid !== null) {
+			$gid = ' AND id = ' . $this->pdo->escapeString($gid) . ' ORDER BY title';
+		} else {
+			$gid = ' ORDER BY title';
+		}
+
+		if ($activeOnly) {
+			return $this->pdo->queryOneRow('SELECT title FROM genres WHERE disabled = 0 AND type = ' . Category::XXX_ROOT . $gid);
+		}
+
+		return $this->pdo->queryOneRow('SELECT title FROM genres WHERE disabled = 1 AND type = ' . Category::XXX_ROOT . $gid);
+	}
+
+	/**
+	 * Get Genre id's Of the title
+	 *
+	 * @param $arr - Array or String
+	 *
+	 * @return string - If array .. 1,2,3,4 if string .. 1
+	 */
+	protected function getGenreID($arr): string
+	{
+		$ret = null;
+
+		if (!is_array($arr)) {
+			$res = $this->pdo->queryOneRow('SELECT id FROM genres WHERE title = ' . $this->pdo->escapeString($arr));
+			if ($res !== false) {
+				return $res['id'];
+			}
+		}
+
+		foreach ($arr as $key => $value) {
+			$res = $this->pdo->queryOneRow('SELECT id FROM genres WHERE title = ' . $this->pdo->escapeString($value));
+			if ($res !== false) {
+				$ret .= ',' . $res['id'];
+			} else {
+				$ret .= ',' . $this->insertGenre($value);
+			}
+		}
+
+		$ret = ltrim($ret, ',');
+
+		return $ret;
+	}
+
+	/**
+	 * Inserts Genre and returns last affected row (Genre ID)
+	 *
+	 * @param $genre
 	 *
 	 * @return bool
 	 */
-	public function updateXXXInfo($xxxmovie): bool
+	private function insertGenre($genre): bool
+	{
+		$res = '';
+		if ($genre !== null) {
+			$res = $this->pdo->queryInsert(sprintf('INSERT INTO genres (title, type, disabled) VALUES (%s ,%d ,%d)', $this->pdo->escapeString($genre), Category::XXX_ROOT, 0));
+		}
+
+		return $res;
+	}
+
+	/**
+	 * Inserts Trailer Code by Class
+	 *
+	 * @param $whichclass
+	 * @param $res
+	 *
+	 * @return string
+	 */
+	public function insertSwf($whichclass, $res): string
+	{
+		$ret = '';
+		if ($whichclass === 'ade') {
+			if (!empty($res)) {
+				$trailers = unserialize($res, 'ade');
+				$ret .= "<object width='360' height='240' type='application/x-shockwave-flash' id='EmpireFlashPlayer' name='EmpireFlashPlayer' data='" . $trailers['url'] . "'>";
+				$ret .= "<param name='flashvars' value= 'streamID=" . $trailers['streamid'] . "&amp;autoPlay=false&amp;BaseStreamingUrl=" . $trailers['baseurl'] . "'>";
+				$ret .= "</object>";
+
+				return $ret;
+			}
+		}
+		if ($whichclass === 'pop') {
+			if (!empty($res)) {
+				$trailers = unserialize($res, 'pop');
+				$ret .= "<embed id='trailer' width='480' height='360'";
+				$ret .= "flashvars='" . $trailers['flashvars'] . "' allowfullscreen='true' allowscriptaccess='always' quality='high' name='trailer' style='undefined'";
+				$ret .= "src='" . $trailers['baseurl'] . "' type='application/x-shockwave-flash'>";
+
+				return $ret;
+			}
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Fetch xxx info for the movie.
+	 *
+	 * @param $movie
+	 *
+	 * @return bool
+	 */
+	public function updateXXXInfo($movie): bool
 	{
 
 		$res = false;
 		$this->whichclass = '';
-
-		$iafd = new IAFD();
-		$iafd->searchTerm = $xxxmovie;
-
-		if ($iafd->findme() !== false) {
-
-			switch ($iafd->classUsed) {
-				case 'ade':
-					$mov = new ADE();
-					$mov->directLink = (string)$iafd->directUrl;
-					$res = $mov->getDirect();
-					$res['title'] = $iafd->title;
-					$res['directurl'] = (string)$iafd->directUrl;
-					$this->whichclass = $iafd->classUsed;
-					ColorCLI::doEcho(ColorCLI::primary('Fetching XXX info from IAFD -> Adult DVD Empire'));
-					break;
-			}
-		}
 
 		if ($res === false) {
 
 			$this->whichclass = 'aebn';
 			$mov = new AEBN();
 			$mov->cookie = $this->cookie;
-			$mov->searchTerm = $xxxmovie;
-			$res = $mov->search();
+			$res = $mov->search($movie);
 
 			if ($res === false) {
 				$this->whichclass = 'ade';
 				$mov = new ADE();
-				$mov->searchTerm = $xxxmovie;
-				$res = $mov->search();
+				$res = $mov->search($movie);
 			}
 
 			if ($res === false) {
 				$this->whichclass = 'pop';
 				$mov = new Popporn();
 				$mov->cookie = $this->cookie;
-				$mov->searchTerm = $xxxmovie;
-				$res = $mov->search();
+				$res = $mov->search($movie);
+			}
+
+			if ($res === false) {
+				$this->whichclass = 'hotmovies';
+				$mov = new Hotmovies();
+				$mov->cookie = $this->cookie;
+				$res = $mov->search($movie);
 			}
 
 			// Last in list as it doesn't have trailers
@@ -468,8 +591,7 @@ class XXX
 				$this->whichclass = 'adm';
 				$mov = new ADM();
 				$mov->cookie = $this->cookie;
-				$mov->searchTerm = $xxxmovie;
-				$res = $mov->search();
+				$res = $mov->search($movie);
 			}
 
 
@@ -489,6 +611,9 @@ class XXX
 							break;
 						case 'adm':
 							$fromstr = 'Adult DVD Marketplace';
+							break;
+						case 'hotmovies':
+							$fromstr = 'HotMovies';
 							break;
 						default:
 							$fromstr = null;
@@ -512,7 +637,7 @@ class XXX
 			'backdrop'    => !empty($res['backcover']) ? $res['backcover'] : 0,
 			'cover'       => !empty($res['boxcover']) ? $res['boxcover'] : 0,
 			'title'       => !empty($res['title']) ? html_entity_decode($res['title'], ENT_QUOTES, 'UTF-8') : '',
-			'plot'        => !empty($res['sypnosis']) ? html_entity_decode($res['sypnosis'], ENT_QUOTES, 'UTF-8') : '',
+			'plot'        => !empty($res['synopsis']) ? html_entity_decode($res['synopsis'], ENT_QUOTES, 'UTF-8') : '',
 			'tagline'     => !empty($res['tagline']) ? html_entity_decode($res['tagline'], ENT_QUOTES, 'UTF-8') : '',
 			'genre'       => !empty($res['genres']) ? html_entity_decode($res['genres'], ENT_QUOTES, 'UTF-8') : '',
 			'director'    => !empty($res['director']) ? html_entity_decode($res['director'], ENT_QUOTES, 'UTF-8') : '',
@@ -689,140 +814,5 @@ class XXX
 		}
 
 		return false;
-	}
-
-	/**
-	 * Get all genres for search-filter.tpl
-	 *
-	 * @param bool $activeOnly
-	 *
-	 * @return array|null
-	 */
-	public function getAllGenres($activeOnly = false)
-	{
-		$ret = null;
-
-		if ($activeOnly) {
-			$res = $this->pdo->query('SELECT title FROM genres WHERE disabled = 0 AND type = ' .
-				Category::XXX_ROOT . ' ORDER BY title'
-			);
-		} else {
-			$res = $this->pdo->query('SELECT title FROM genres WHERE disabled = 1 AND type = ' .
-				Category::XXX_ROOT . ' ORDER BY title'
-			);
-		}
-
-		foreach ($res as $arr => $value) {
-			$ret[] = $value['title'];
-		}
-
-		return $ret;
-	}
-
-	/**
-	 * Get Genres for activeonly and/or an ID
-	 *
-	 * @param bool        $activeOnly
-	 * @param null|string $gid
-	 *
-	 * @return array|bool
-	 */
-	public function getGenres($activeOnly = false, $gid = null)
-	{
-		if ($gid !== null) {
-			$gid = ' AND id = ' . $this->pdo->escapeString($gid) . ' ORDER BY title';
-		} else {
-			$gid = ' ORDER BY title';
-		}
-
-		if ($activeOnly) {
-			return $this->pdo->queryOneRow('SELECT title FROM genres WHERE disabled = 0 AND type = ' . Category::XXX_ROOT . $gid);
-		}
-
-		return $this->pdo->queryOneRow('SELECT title FROM genres WHERE disabled = 1 AND type = ' . Category::XXX_ROOT . $gid);
-	}
-
-	/**
-	 * Get Genre id's Of the title
-	 *
-	 * @param $arr - Array or String
-	 *
-	 * @return string - If array .. 1,2,3,4 if string .. 1
-	 */
-	protected function getGenreID($arr): string
-	{
-		$ret = null;
-
-		if (!is_array($arr)) {
-			$res = $this->pdo->queryOneRow('SELECT id FROM genres WHERE title = ' . $this->pdo->escapeString($arr));
-			if ($res !== false) {
-				return $res['id'];
-			}
-		}
-
-		foreach ($arr as $key => $value) {
-			$res = $this->pdo->queryOneRow('SELECT id FROM genres WHERE title = ' . $this->pdo->escapeString($value));
-			if ($res !== false) {
-				$ret .= ',' . $res['id'];
-			} else {
-				$ret .= ',' . $this->insertGenre($value);
-			}
-		}
-
-		$ret = ltrim($ret, ',');
-
-		return $ret;
-	}
-
-	/**
-	 * Inserts Genre and returns last affected row (Genre ID)
-	 *
-	 * @param $genre
-	 *
-	 * @return bool
-	 */
-	private function insertGenre($genre): bool
-	{
-		$res = '';
-		if ($genre !== null) {
-			$res = $this->pdo->queryInsert(sprintf('INSERT INTO genres (title, type, disabled) VALUES (%s ,%d ,%d)', $this->pdo->escapeString($genre), Category::XXX_ROOT, 0));
-		}
-
-		return $res;
-	}
-
-	/**
-	 * Inserts Trailer Code by Class
-	 *
-	 * @param $whichclass
-	 * @param $res
-	 *
-	 * @return string
-	 */
-	public function insertSwf($whichclass, $res): string
-	{
-		$ret = '';
-		if ($whichclass === 'ade') {
-			if (!empty($res)) {
-				$trailers = unserialize($res, 'ade');
-				$ret .= "<object width='360' height='240' type='application/x-shockwave-flash' id='EmpireFlashPlayer' name='EmpireFlashPlayer' data='" . $trailers['url'] . "'>";
-				$ret .= "<param name='flashvars' value= 'streamID=" . $trailers['streamid'] . "&amp;autoPlay=false&amp;BaseStreamingUrl=" . $trailers['baseurl'] . "'>";
-				$ret .= "</object>";
-
-				return $ret;
-			}
-		}
-		if ($whichclass === 'pop') {
-			if (!empty($res)) {
-				$trailers = unserialize($res, 'pop');
-				$ret .= "<embed id='trailer' width='480' height='360'";
-				$ret .= "flashvars='" . $trailers['flashvars'] . "' allowfullscreen='true' allowscriptaccess='always' quality='high' name='trailer' style='undefined'";
-				$ret .= "src='" . $trailers['baseurl'] . "' type='application/x-shockwave-flash'>";
-
-				return $ret;
-			}
-		}
-
-		return $ret;
 	}
 }

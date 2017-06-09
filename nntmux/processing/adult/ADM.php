@@ -194,13 +194,16 @@ class ADM extends AdultMovies
 
 	/**
 	 * Searches for match against searchterm
+	 *
+	 * @param $movie
+	 *
 	 * @return bool - true if search = 100%
 	 */
-	protected function search()
+	public function search function getAll($movie)
 	{
 		$result = false;
-		if (!empty($this->searchTerm)) {
-			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($this->searchTerm);
+		if (!empty($movie)) {
+			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($movie);
 			$this->_response = getUrl(self::ADMURL . $this->_trailUrl);
 			if ($this->_response !== false) {
 				$this->_html->load($this->_response);
@@ -211,7 +214,7 @@ class ADM extends AdultMovies
 								$title = trim($ret->alt, '"');
 								$title = str_replace('/XXX/', '', $title);
 								$comparetitle = preg_replace('/[\W]/', '', $title);
-								$comparesearch = preg_replace('/[\W]/', '', $this->searchTerm);
+								$comparesearch = preg_replace('/[\W]/', '', $movie);
 								similar_text($comparetitle, $comparesearch, $p);
 								if ($p === 100) {
 									if (preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)) {

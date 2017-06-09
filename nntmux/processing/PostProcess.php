@@ -3,23 +3,28 @@ namespace nntmux\processing;
 
 use app\models\Settings;
 use dariusiii\rarinfo\Par2Info;
+use nntmux\ADE;
+use nntmux\ADM;
+use nntmux\AEBN;
 use nntmux\Books;
 use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\Console;
 use nntmux\Games;
 use nntmux\Groups;
+use nntmux\Hotmovies;
 use nntmux\Logger;
 use nntmux\Movie;
 use nntmux\Music;
 use nntmux\NameFixer;
 use nntmux\Nfo;
+use nntmux\Popporn;
 use nntmux\Sharing;
+use nntmux\processing\adult\AdultMovies;
 use nntmux\processing\tv\TVDB;
 use nntmux\processing\tv\TVMaze;
 use nntmux\processing\tv\TMDB;
 use nntmux\processing\tv\TraktTv;
-use nntmux\XXX;
 use nntmux\ReleaseFiles;
 use nntmux\db\DB;
 use nntmux\processing\post\AniDB;
@@ -299,7 +304,11 @@ class PostProcess
 	public function processXXX()
 	{
 		if (Settings::value('..lookupxxx') == 1) {
-			(new XXX(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
+			(new ADE(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
+			(new ADM(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
+			(new AEBN(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
+			(new Popporn(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
+			(new Hotmovies(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
 		}
 	}
 
