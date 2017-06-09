@@ -1,28 +1,16 @@
 <?php
 namespace nntmux;
 
-use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Cookie\SetCookie;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Client;
-use nntmux\db\DB;
 use nntmux\processing\adult\AdultMovies;
 
 class AEBN extends AdultMovies
 {
 	/**
-	 * Cookie File location used in curl
-	 *
-	 * @var string
-	 */
-	public $cookie = "";
-
-	/**
 	 * Keyword to search
 	 *
 	 * @var string
 	 */
-	public $searchTerm = "";
+	public $searchTerm = '';
 
 	/**
 	 * Url Constants used within this class
@@ -78,12 +66,6 @@ class AEBN extends AdultMovies
 	 */
 	protected $_title = '';
 
-	/**
-	 * Trailing Url
-	 * @var string
-	 */
-	protected $_trailerUrl = '';
-
 
 	/**
 	 * Sets the variables that used throughout the class
@@ -106,10 +88,10 @@ class AEBN extends AdultMovies
 		$ret = $this->_html->find('a[itemprop=trailer]', 0);
 		if (preg_match('/movieId=(?<movieid>\d+)&/', trim($ret->href), $matches)) {
 			$movieid = $matches['movieid'];
-			AEBN::$res['trailers']['url'] = AEBN::AEBNSURL . self::TRAILERURL . $movieid;
+			self::$res['trailers']['url'] = self::AEBNSURL . self::TRAILERURL . $movieid;
 		}
 
-		return AEBN::$res;
+		return self::$res;
 	}
 
 	/**
@@ -124,10 +106,10 @@ class AEBN extends AdultMovies
 			if (strpos($ret, '//') === 0) {
 				$ret = 'http:' . $ret;
 			}
-			AEBN::$res['boxcover'] = str_ireplace('160w.jpg', 'xlf.jpg', $ret);
-			AEBN::$res['backcover'] = str_ireplace('160w.jpg', 'xlb.jpg', $ret);
+			self::$res['boxcover'] = str_ireplace('160w.jpg', 'xlf.jpg', $ret);
+			self::$res['backcover'] = str_ireplace('160w.jpg', 'xlb.jpg', $ret);
 		}
-		return AEBN::$res;
+		return self::$res;
 	}
 
 	/**
@@ -139,11 +121,11 @@ class AEBN extends AdultMovies
 	{
 		if ($ret = $this->_html->find('div.md-detailsCategories', 0)) {
 			foreach ($ret->find('a[itemprop=genre]') as $genre) {
-				AEBN::$res['genres'][] = trim($genre->plaintext);
+				self::$res['genres'][] = trim($genre->plaintext);
 			}
 		}
-		AEBN::$res['genres'] = array_unique(AEBN::$res['genres']);
-		return AEBN::$res;
+		self::$res['genres'] = array_unique(self::$res['genres']);
+		return self::$res;
 	}
 
 	/**
@@ -155,19 +137,19 @@ class AEBN extends AdultMovies
 	{
 		if ($ret = $this->_html->find('div.starsFull', 0)) {
 			foreach ($ret->find('span[itemprop=name]') as $star) {
-				AEBN::$res['cast'][] = trim($star->plaintext);
+				self::$res['cast'][] = trim($star->plaintext);
 			}
 		} else {
 			if ($ret = $this->_html->find('div.detailsLink', 0)) {
 				foreach ($ret->find('span') as $star) {
 					if (strpos($star->plaintext, '/More/') !== false && strpos($star->plaintext, '/Stars/') !== false) {
-						AEBN::$res['cast'][] = trim($star->plaintext);
+						self::$res['cast'][] = trim($star->plaintext);
 					}
 				}
 			}
 		}
 
-		return AEBN::$res;
+		return self::$res;
 	}
 
 	/**
@@ -182,20 +164,20 @@ class AEBN extends AdultMovies
 				foreach ($div->find('span') as $span) {
 					$span->plaintext = rawurldecode($span->plaintext);
 					$span->plaintext = preg_replace('/&nbsp;/', '', $span->plaintext);
-					AEBN::$res['productinfo'][] = trim($span->plaintext);
+					self::$res['productinfo'][] = trim($span->plaintext);
 				}
 			}
-			if (false !== $key = array_search('Running Time:', AEBN::$res['productinfo'])) {
-				unset(AEBN::$res['productinfo'][$key + 2]);
+			if (false !== $key = array_search('Running Time:', self::$res['productinfo'])) {
+				unset(self::$res['productinfo'][$key + 2]);
 			}
-			if (false !== $key = array_search("Director:", AEBN::$res['productinfo'])) {
-				AEBN::$res['director'] = AEBN::$res['productinfo'][$key + 1];
-				unset(AEBN::$res['productinfo'][$key], AEBN::$res['productinfo'][$key + 1]);
+			if (false !== $key = array_search("Director:", self::$res['productinfo'])) {
+				self::$res['director'] = self::$res['productinfo'][$key + 1];
+				unset(self::$res['productinfo'][$key], self::$res['productinfo'][$key + 1]);
 			}
-			AEBN::$res['productinfo'] = array_chunk(AEBN::$res['productinfo'], 2, false);
+			self::$res['productinfo'] = array_chunk(self::$res['productinfo'], 2, false);
 		}
 
-		return AEBN::$res;
+		return self::$res;
 	}
 
 	/**
@@ -209,14 +191,14 @@ class AEBN extends AdultMovies
 		if ($ret = $this->_html->find('span[itemprop=about]', 0)) {
 			if ($ret === null) {
 				if ($ret = $this->_html->find('div.movieDetailDescription', 0)) {
-					AEBN::$res['synopsis'] = preg_replace('/Description:\s/', '', AEBN::$res['plot']);
+					self::$res['synopsis'] = preg_replace('/Description:\s/', '', self::$res['plot']);
 				}
 			} else {
-				AEBN::$res['synopsis'] = trim($ret->plaintext);
+				self::$res['synopsis'] = trim($ret->plaintext);
 			}
 		}
 
-		return AEBN::$res;
+		return self::$res;
 	}
 
 	/**
@@ -231,7 +213,7 @@ class AEBN extends AdultMovies
 		}
 		$this->_response = false;
 		$this->_trailerUrl = self::TRAILINGSEARCH . urlencode($this->searchTerm);
-		$this->_response = getUrl(self::IF18);
+		$this->_response = getUrl(self::IF18, false);
 		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
 			$count = count($this->_html->find('div.movie'));

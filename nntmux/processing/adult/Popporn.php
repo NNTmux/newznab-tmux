@@ -81,16 +81,6 @@ class Popporn extends AdultMovies
 	}
 
 	/**
-	 * Remove from memory.
-	 */
-	public function __destruct()
-	{
-		$this->_html->clear();
-		unset($this->_response);
-		unset($this->_res);
-	}
-
-	/**
 	 * Get Box Cover Images
 	 * @return array - boxcover,backcover
 	 */
@@ -98,10 +88,10 @@ class Popporn extends AdultMovies
 	{
 		if ($ret = $this->_html->find('div[id=box-art], a[rel=box-art]', 1)) {
 			$this->_res['boxcover'] = trim($ret->href);
-			if (stristr(trim($ret->href), "_aa")) {
-				$this->_res['backcover'] = str_ireplace("_aa", "_bb", trim($ret->href));
+			if (false !== stripos(trim($ret->href), '_aa')) {
+				$this->_res['backcover'] = str_ireplace('_aa', '_bb', trim($ret->href));
 			} else {
-				$this->_res['backcover'] = str_ireplace(".jpg", "_b.jpg", trim($ret->href));
+				$this->_res['backcover'] = str_ireplace('.jpg', '_b.jpg', trim($ret->href));
 			}
 		} else {
 			if ($ret = $this->_html->find('img.front', 0)) {
@@ -116,20 +106,20 @@ class Popporn extends AdultMovies
 	}
 
 	/**
-	 * Gets the sypnosis
+	 * Gets the synopsis
 	 * @return array|bool
 	 */
-	public function sypnosis()
+	public function synopsis()
 	{
 		if ($ret = $this->_html->find('div[id=product-info] ,h3[class=highlight]', 1)) {
 			if ($ret->next_sibling()->plaintext) {
 				if (!stristr(trim($ret->next_sibling()->plaintext), "POPPORN EXCLUSIVE")) {
-					$this->_res['sypnosis'] = trim($ret->next_sibling()->plaintext);
+					$this->_res['synopsis'] = trim($ret->next_sibling()->plaintext);
 				} else {
 					if ($ret->next_sibling()->next_sibling()) {
-						$this->_res['sypnosis'] = trim($ret->next_sibling()->next_sibling()->next_sibling()->plaintext);
+						$this->_res['synopsis'] = trim($ret->next_sibling()->next_sibling()->next_sibling()->plaintext);
 					} else {
-						$this->_res['sypnosis'] = "N/A";
+						$this->_res['synopsis'] = "N/A";
 					}
 				}
 			}
@@ -322,7 +312,7 @@ class Popporn extends AdultMovies
 
 	/**
 	 * Gets all information
-	 * @return array
+	 * @return array|bool
 	 */
 	public function getAll()
 	{
@@ -331,8 +321,8 @@ class Popporn extends AdultMovies
 			$results['title']     = $this->_title;
 			$results['directurl'] = $this->_directUrl;
 		}
-		if (is_array($this->sypnosis())) {
-			$results = array_merge($results, $this->sypnosis());
+		if (is_array($this->synopsis())) {
+			$results = array_merge($results, $this->synopsis());
 		}
 		if (is_array($this->productInfo(true))) {
 			$results = array_merge($results, $this->productInfo(true));
@@ -349,11 +339,10 @@ class Popporn extends AdultMovies
 		if (is_array($this->trailers())) {
 			$results = array_merge($results, $this->trailers());
 		}
-		if (empty($results) === true) {
+		if (empty($results)) {
 			return false;
-		} else {
-			return $results;
 		}
+		return $results;
 	}
 
 	/**
