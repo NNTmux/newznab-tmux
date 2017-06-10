@@ -336,16 +336,18 @@ class Hotmovies extends AdultMovies
 	 * Searches for match against searchterm
 	 * @return bool, true if search >= 90%
 	 */
-	public function search ($movie)
+	public function processSite($movie)
 	{
 		if (empty($movie)) {
 			return false;
 		}
 		$this->_getLink = self::HMURL . self::TRAILINGSEARCH . urlencode($movie) . self::EXTRASEARCH;
-		if ($this->getUrl() === false) {
+		$this->_response = getUrl($this->_getLink);
+		if ($this->_response === false) {
 			return false;
-		} else {
-			if ($ret = $this->_html->find('h3[class=title]', 0)) {
+		}
+		$this->_html->load($this->_response);
+		if ($ret = $this->_html->find('h3[class=title]', 0)) {
 				if ($ret->find('a[title]',0)){
 					$ret = $ret->find('a[title]', 0);
 					$title = trim($ret->title);
@@ -361,17 +363,13 @@ class Hotmovies extends AdultMovies
 				similar_text($movie, $title, $p);
 				if ($p >= 90) {
 					$this->_title = $title;
-					// 90$ match found, load the url to start parsing
-					$this->getUrl();
 					unset($ret);
 
 					return true;
-				} else {
-					return false;
 				}
-			} else {
 				return false;
+
 			}
+			return false;
 		}
-	}
 }

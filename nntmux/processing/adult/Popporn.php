@@ -75,9 +75,6 @@ class Popporn extends AdultMovies
 	{
 		parent::__construct($options);
 		$this->_html = new \simple_html_dom();
-		if (isset($this->cookie)) {
-			$this->getUrl();
-		}
 	}
 
 	/**
@@ -280,12 +277,14 @@ class Popporn extends AdultMovies
 	 * Searches for match against searchterm
 	 * @return bool, true if search >= 90%
 	 */
-	public function search($movie)
+	public function processSite($movie)
 	{
 		$result = false;
 		if (isset($movie)) {
 			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($movie);
-			if ($this->getUrl() !== false) {
+			$this->_response = getUrl(self::POPURL . $this->_trailUrl);
+			if ($this->_response !== false) {
+				$this->_html->load($this->_response);
 				if ($ret = $this->_html->find('div.product-info, div.title', 1)) {
 					$this->_title = trim($ret->plaintext);
 					$title = preg_replace('/XXX/', '', $ret->plaintext);
@@ -306,7 +305,6 @@ class Popporn extends AdultMovies
 				}
 			}
 		}
-
 		return $result;
 	}
 

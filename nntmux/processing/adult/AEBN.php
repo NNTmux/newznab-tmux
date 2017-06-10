@@ -211,7 +211,7 @@ class AEBN extends AdultMovies
 	 *
 	 * @return bool
 	 */
-	public function search($movie)
+	public function processSite($movie)
 	{
 		if (empty($movie)) {
 			return false;

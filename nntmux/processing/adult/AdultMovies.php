@@ -64,9 +64,11 @@ abstract class AdultMovies extends XXX
 	abstract protected function genres();
 
 	/**
+	 * @param string $movie
+	 *
 	 * @return mixed
 	 */
-	abstract protected function search($movie);
+	abstract protected function processSite($movie);
 
 	/**
 	 * @return mixed

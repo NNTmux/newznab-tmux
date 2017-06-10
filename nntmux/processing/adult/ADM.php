@@ -199,7 +199,7 @@ class ADM extends AdultMovies
 	 *
 	 * @return bool - true if search = 100%
 	 */
-	public function search function getAll($movie)
+	public function processSite($movie)
 	{
 		$result = false;
 		if (!empty($movie)) {
@@ -216,7 +216,7 @@ class ADM extends AdultMovies
 								$comparetitle = preg_replace('/[\W]/', '', $title);
 								$comparesearch = preg_replace('/[\W]/', '', $movie);
 								similar_text($comparetitle, $comparesearch, $p);
-								if ($p === 100) {
+								if ($p >= 90) {
 									if (preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)) {
 										$this->_title = trim($title);
 										$this->_trailUrl = '/dvd_view_' . (string)$matches['sku'] . '.html';

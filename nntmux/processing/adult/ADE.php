@@ -277,7 +277,7 @@ class ADE extends AdultMovies
 	 * Searches xxx name.
 	 * @return bool - True if releases has 90% match, else false
 	 */
-	public function search($movie)
+	public function processSite($movie)
 	{
 		if (empty($movie)) {
 			return false;

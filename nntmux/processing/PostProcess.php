@@ -259,12 +259,13 @@ class PostProcess
 	/**
 	 * Process all TV related releases which will assign their series/episode/rage data.
 	 *
-	 * @param string     $groupID   (Optional) ID of a group to work on.
-	 * @param string     $guidChar  (Optional) First letter of a release GUID to use to get work.
-	 * @param string|int $processTV (Optional) 0 Don't process, 1 process all releases,
+	 * @param string     $groupID              (Optional) ID of a group to work on.
+	 * @param string     $guidChar             (Optional) First letter of a release GUID to use to get work.
+	 * @param string|int $processTV            (Optional) 0 Don't process, 1 process all releases,
 	 *                                         2 process renamed releases only, '' check site setting
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function processTv($groupID = '', $guidChar = '', $processTV = '')
 	{
@@ -304,7 +305,7 @@ class PostProcess
 	public function processXXX()
 	{
 		if (Settings::value('..lookupxxx') == 1) {
-			(new ADE(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
+			(new ADE(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite();
 			(new ADM(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
 			(new AEBN(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
 			(new Popporn(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
