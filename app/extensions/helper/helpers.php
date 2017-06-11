@@ -6,9 +6,9 @@ use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Cookie\CookieJar;
 use nntmux\ColorCLI;
 
-if (!function_exists('getUrl')) {
+if (!function_exists('getRawHtml')) {
 
-	function getUrl($url, $cookie = false)
+	function getRawHtml($url, $cookie = false)
 	{
 		$response = false;
 		$cookiejar = new CookieJar();

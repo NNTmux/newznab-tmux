@@ -1,7 +1,6 @@
 <?php
-namespace nntmux;
+namespace nntmux\processing\adult;
 
-use nntmux\processing\adult\AdultMovies;
 use nntmux\utility\Utility;
 
 class Popporn extends AdultMovies
@@ -11,28 +10,28 @@ class Popporn extends AdultMovies
 	 * Define a cookie file location for curl
 	 * @var string string
 	 */
-	public $cookie = "";
+	public $cookie = '';
 
 	/**
 	 * Set this for what you are searching for.
 	 * @var string
 	 */
-	public $searchTerm = "";
+	public $searchTerm = '';
 
 	/**
 	 * Override if 18 years+ or older
 	 * Define Popporn url
 	 * Needed Search Queries Constant
 	 */
-	const IF18 = "http://www.popporn.com/popporn/4";
-	const POPURL = "http://www.popporn.com";
-	const TRAILINGSEARCH = "/results/index.cfm?v=4&g=0&searchtext=";
+	const IF18 = 'http://www.popporn.com/popporn/4';
+	const POPURL = 'http://www.popporn.com';
+	const TRAILINGSEARCH = '/results/index.cfm?v=4&g=0&searchtext=';
 
 	/**
 	 * Sets the directurl for the return results array
 	 * @var string
 	 */
-	protected $_directUrl = "";
+	protected $_directUrl = '';
 
 	/**
 	 * Simple Html Dom Object
@@ -40,11 +39,6 @@ class Popporn extends AdultMovies
 	 * @var \simple_html_dom
 	 */
 	protected $_html;
-
-	/**
-	 * POST Paramaters for Trailers Method
-	 */
-	protected $_postParams;
 
 	/**
 	 * Curl Raw Html
@@ -63,13 +57,13 @@ class Popporn extends AdultMovies
 	 *
 	 * @var string
 	 */
-	protected $_title = "";
+	protected $_title = '';
 
 	/**
 	 * Add this to popurl to get results
 	 * @var string
 	 */
-	protected $_trailUrl = "";
+	protected $_trailUrl = '';
 
 	public function __construct(array $options = [])
 	{
@@ -136,13 +130,13 @@ class Popporn extends AdultMovies
 			$ret->value = str_replace("..", "", $ret->value);
 			$tmprsp = $this->_response;
 			$this->_trailUrl = $ret->value;
-			$this->getUrl();
+			$this->getRawHtml();
 			if (preg_match_all('/productID="\+(?<id>[0-9]+),/', $this->_response, $matches)) {
 				$productid = $matches['id'][0];
 				$random = ((float)rand() / (float)getrandmax()) * 5400000000000000;
 				$this->_trailUrl = "/com/tlavideo/vod/FlvAjaxSupportService.cfc?random=" . $random;
 				$this->_postParams = "method=pipeStreamLoc&productID=" . $productid;
-				$this->getUrl(true);
+				$this->getRawHtml(true);
 				$ret = json_decode(json_decode($this->_response, true), true);
 				$this->_res['trailers']['baseurl'] = self::POPURL . "/flashmediaserver/trailerPlayer.swf";
 				$this->_res['trailers']['flashvars'] = "subscribe=false&image=&file=" . self::POPURL . "/" . $ret['LOC'] . "&autostart=false";
@@ -282,7 +276,7 @@ class Popporn extends AdultMovies
 		$result = false;
 		if (isset($movie)) {
 			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($movie);
-			$this->_response = getUrl(self::POPURL . $this->_trailUrl);
+			$this->_response = getRawHtml(self::POPURL . $this->_trailUrl);
 			if ($this->_response !== false) {
 				$this->_html->load($this->_response);
 				if ($ret = $this->_html->find('div.product-info, div.title', 1)) {
@@ -292,7 +286,7 @@ class Popporn extends AdultMovies
 					$title = trim($title);
 					if ($ret = $ret->find('a', 0)) {
 						$this->_trailUrl = trim($ret->href);
-						if ($this->getUrl() !== false) {
+						if ($this->getRawHtml() !== false) {
 							if ($ret = $this->_html->find('#link-to-this', 0)) {
 								$this->_directUrl = trim($ret->href);
 							}
@@ -350,7 +344,7 @@ class Popporn extends AdultMovies
 	 *
 	 * @return bool
 	 */
-	private function getUrl($usepost = false)
+	private function getRawHtml($usepost = false)
 	{
 		if (isset($this->_trailUrl)) {
 			$ch = curl_init(self::POPURL . $this->_trailUrl);

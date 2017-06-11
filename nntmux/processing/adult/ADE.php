@@ -1,9 +1,5 @@
 <?php
-namespace nntmux;
-
-use nntmux\db\DB;
-use nntmux\processing\adult\AdultMovies;
-
+namespace nntmux\processing\adult;
 
 /**
  * Class adultdvdempire
@@ -95,7 +91,7 @@ class ADE extends AdultMovies
 	 */
 	public function trailers()
 	{
-		$this->getUrl($this->_trailers . $this->_urlFound);
+		$this->_response = getRawHtml($this->_trailers . $this->_urlFound);
 		$this->_html->load($this->_response);
 		if (preg_match("/(\"|')(?P<swf>[^\"']+.swf)(\"|')/i", $this->_response, $matches)) {
 			$this->_res['trailers']['url'] = self::ADE . trim(trim($matches['swf']), '"');
@@ -267,7 +263,7 @@ class ADE extends AdultMovies
 	 */
 	public function getDirect()
 	{
-		if (!empty($this->directLink) && $this->getUrl() !== false) {
+		if (!empty($this->directLink) && $this->getRawHtml() !== false) {
 			$this->_html->load($this->_response);
 			return $this->getAll();
 		}
@@ -282,7 +278,7 @@ class ADE extends AdultMovies
 		if (empty($movie)) {
 			return false;
 		}
-		$this->_response = getUrl($this->_dvdQuery . rawurlencode($movie));
+		$this->_response = getRawHtml($this->_dvdQuery . rawurlencode($movie));
 		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
 			if ($ret = $this->_html->find('a.boxcover', 0)) {
@@ -298,7 +294,7 @@ class ADE extends AdultMovies
 					$this->_title     = trim($title);
 					unset($ret);
 					$this->_html->clear();
-					getUrl($this->_urlFound);
+					$this->_response = getRawHtml($this->_urlFound);
 					$this->_html->load($this->_response);
 					return true;
 				}

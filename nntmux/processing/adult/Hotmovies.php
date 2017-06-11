@@ -1,7 +1,5 @@
 <?php
-namespace nntmux;
-
-use nntmux\processing\adult\AdultMovies;
+namespace nntmux\processing\adult;
 
 class Hotmovies extends AdultMovies
 {
@@ -84,66 +82,13 @@ class Hotmovies extends AdultMovies
 	 * Hotmovies constructor.
 	 *
 	 * @param array $options
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
 		$this->_html = new \simple_html_dom();
-
-		// Set a cookie to override +18 warning.
-		if (!empty($this->cookie)) {
-			@$this->getUrl();
-		}
-	}
-
-	/**
-	 * Get Raw html of webpage
-	 *
-	 * @param bool $usepost
-	 *
-	 * @return bool
-	 */
-	private function getUrl($usepost = false)
-	{
-		if (!empty($this->_getLink)) {
-			$ch = curl_init($this->_getLink);
-		} else {
-			$ch = curl_init(self::HMURL);
-		}
-		if (!empty($this->directLink)) {
-			$ch = curl_init($this->directLink);
-			$this->directLink = '';
-		}
-		if ($usepost === true){
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-			curl_setopt($ch, CURLOPT_POST, 1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_postParams);
-		}
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_VERBOSE, 0);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36');
-		curl_setopt($ch, CURLOPT_FAILONERROR, 1);
-		if (!empty($this->cookie)) {
-			curl_setopt($ch, CURLOPT_COOKIEJAR, $this->cookie);
-			curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie);
-		}
-		$this->_response = curl_exec($ch);
-		if (!$this->_response) {
-			curl_close($ch);
-
-			return false;
-		}
-		$this->_html->load($this->_response);
-		curl_close($ch);
-		return true;
-	}
-
-	public function __destruct()
-	{
-		$this->_html->clear();
-		unset($this->_response, $this->_res);
 	}
 
 	protected function trailers()
@@ -161,11 +106,10 @@ class Hotmovies extends AdultMovies
 	protected function getDirect()
 	{
 		if (!empty($this->directLink)) {
-			if ($this->getUrl() === false) {
+			if (getRawHtml($this->_directUrl) === false) {
 				return false;
-			} else {
-				return $this->getAll();
 			}
+			return $this->getAll();
 		}
 		return false;
 	}
@@ -180,6 +124,8 @@ class Hotmovies extends AdultMovies
 		if (!empty($this->_directUrl)) {
 			$results['title'] = $this->_title;
 			$results['directurl'] = $this->_directUrl;
+			$this->_response = getRawHtml($this->_directUrl);
+			$this->_html->load($this->_response);
 		}
 		if (is_array($this->synopsis())) {
 			$results = array_merge($results, $this->synopsis());
@@ -197,11 +143,11 @@ class Hotmovies extends AdultMovies
 			$results = array_merge($results, $this->covers());
 		}
 
-		if (empty($results) === true){
+		if (empty($results)){
 			return false;
-		}else{
-			return $results;
 		}
+		return $results;
+
 	}
 
 	/**
@@ -212,9 +158,10 @@ class Hotmovies extends AdultMovies
 	protected function synopsis()
 	{
 		if ($this->_html->find('.desc_link', 0)) {
-			preg_match('/var descfullcontent = (?<content>.*)/', $this->_response,$matches);
-			if (is_array($matches)) {
-				$this->_res['synopsis'] = rawurldecode($matches['content']);
+			foreach ($this->_html->find('[itemprop=description]') as $heading) {
+				if (trim($heading->plaintext) === 'description') {
+					$this->_res['synopsis'] = trim($heading->next_sibling()->plaintext);
+				}
 			}
 		}
 
@@ -269,7 +216,6 @@ class Hotmovies extends AdultMovies
 		if (is_array($this->_res['productinfo'])) {
 			$this->_res['productinfo'] = array_chunk($this->_res['productinfo'], 2, false);
 		}
-
 		return $this->_res;
 	}
 
@@ -342,7 +288,7 @@ class Hotmovies extends AdultMovies
 			return false;
 		}
 		$this->_getLink = self::HMURL . self::TRAILINGSEARCH . urlencode($movie) . self::EXTRASEARCH;
-		$this->_response = getUrl($this->_getLink);
+		$this->_response = getRawHtml($this->_getLink);
 		if ($this->_response === false) {
 			return false;
 		}
@@ -363,12 +309,17 @@ class Hotmovies extends AdultMovies
 				similar_text($movie, $title, $p);
 				if ($p >= 90) {
 					$this->_title = $title;
-					unset($ret);
-
+					if (!empty($this->_getLink)) {
+						$this->_response = getRawHtml($this->_getLink);
+					} else {
+						$this->_response = getRawHtml(self::HMURL);
+					}
+					if (!empty($this->directLink)) {
+						$this->_response = getRawHtml($this->directLink);
+						$this->directLink = '';
+					}
 					return true;
 				}
-				return false;
-
 			}
 			return false;
 		}

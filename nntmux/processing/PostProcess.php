@@ -30,6 +30,7 @@ use nntmux\db\DB;
 use nntmux\processing\post\AniDB;
 use nntmux\processing\post\ProcessAdditional;
 use nntmux\SpotNab;
+use nntmux\XXX;
 
 class PostProcess
 {
@@ -301,15 +302,13 @@ class PostProcess
 
 	/**
 	 * Lookup xxx if enabled.
+	 *
+	 * @throws \Exception
 	 */
 	public function processXXX()
 	{
 		if (Settings::value('..lookupxxx') == 1) {
-			(new ADE(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite();
-			(new ADM(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
-			(new AEBN(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
-			(new Popporn(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
-			(new Hotmovies(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
+			(new XXX(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
 		}
 	}
 

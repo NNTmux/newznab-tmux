@@ -4,6 +4,11 @@ namespace nntmux;
 
 use app\models\Settings;
 use nntmux\db\DB;
+use nntmux\processing\adult\AEBN;
+use nntmux\processing\adult\ADM;
+use nntmux\processing\adult\ADE;
+use nntmux\processing\adult\Hotmovies;
+use nntmux\processing\adult\Popporn;
 
 
 /**
@@ -552,79 +557,77 @@ class XXX
 	 * @param $movie
 	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public function updateXXXInfo($movie): bool
 	{
-
-		$res = false;
-		$this->whichclass = '';
+		$this->whichclass = 'aebn';
+		$mov = new AEBN();
+		$mov->cookie = $this->cookie;  ColorCLI::doEcho(ColorCLI::info('Checking AEBN for movie info'));
+		$res = $mov->processSite($movie);
 
 		if ($res === false) {
+			$this->whichclass = 'ade';
+			$mov = new ADE();
+			ColorCLI::doEcho(ColorCLI::info('Checking ADE for movie info'));
+			$res = $mov->processSite($movie);
+		}
 
-			$this->whichclass = 'aebn';
-			$mov = new AEBN();
+		if ($res === false) {
+			$this->whichclass = 'pop';
+			$mov = new Popporn();
 			$mov->cookie = $this->cookie;
-			$res = $mov->search($movie);
+			ColorCLI::doEcho(ColorCLI::info('Checking PopPorn for movie info'));
+			$res = $mov->processSite($movie);
+		}
 
-			if ($res === false) {
-				$this->whichclass = 'ade';
-				$mov = new ADE();
-				$res = $mov->search($movie);
-			}
+		if ($res === false) {
+			$this->whichclass = 'hotmovies';
+			$mov = new Hotmovies();
+			$mov->cookie = $this->cookie;
+			ColorCLI::doEcho(ColorCLI::info('Checking HotMovies for movie info'));
+			$res = $mov->processSite($movie);
+		}
 
-			if ($res === false) {
-				$this->whichclass = 'pop';
-				$mov = new Popporn();
-				$mov->cookie = $this->cookie;
-				$res = $mov->search($movie);
-			}
-
-			if ($res === false) {
-				$this->whichclass = 'hotmovies';
-				$mov = new Hotmovies();
-				$mov->cookie = $this->cookie;
-				$res = $mov->search($movie);
-			}
-
-			// Last in list as it doesn't have trailers
-			if ($res === false) {
-				$this->whichclass = 'adm';
-				$mov = new ADM();
-				$mov->cookie = $this->cookie;
-				$res = $mov->search($movie);
-			}
+		// Last in list as it doesn't have trailers
+		if ($res === false) {
+			$this->whichclass = 'adm';
+			$mov = new ADM();
+			$mov->cookie = $this->cookie;
+			ColorCLI::doEcho(ColorCLI::info('Checking ADM for movie info'));
+			$res = $mov->processSite($movie);
+		}
 
 
-			// If a result is true getAll information.
-			if ($res !== false) {
-				if ($this->echooutput) {
+		// If a result is true getAll information.
+		if ($res) {
+			if ($this->echooutput) {
 
-					switch ($this->whichclass) {
-						case 'aebn':
-							$fromstr = 'Adult Entertainment Broadcast Network';
-							break;
-						case 'ade':
-							$fromstr = 'Adult DVD Empire';
-							break;
-						case 'pop':
-							$fromstr = 'PopPorn';
-							break;
-						case 'adm':
-							$fromstr = 'Adult DVD Marketplace';
-							break;
-						case 'hotmovies':
-							$fromstr = 'HotMovies';
-							break;
-						default:
-							$fromstr = null;
-					}
-					ColorCLI::doEcho(ColorCLI::primary('Fetching XXX info from: ' . $fromstr));
+				switch ($this->whichclass) {
+					case 'aebn':
+						$fromstr = 'Adult Entertainment Broadcast Network';
+						break;
+					case 'ade':
+						$fromstr = 'Adult DVD Empire';
+						break;
+					case 'pop':
+						$fromstr = 'PopPorn';
+						break;
+					case 'adm':
+						$fromstr = 'Adult DVD Marketplace';
+						break;
+					case 'hotmovies':
+						$fromstr = 'HotMovies';
+						break;
+					default:
+						$fromstr = null;
 				}
-				$res = $mov->getAll();
-			} else {
-				// Nothing was found, go ahead and set to -2
-				return -2;
+				ColorCLI::doEcho(ColorCLI::primary('Fetching XXX info from: ' . $fromstr));
 			}
+			$res = $mov->getAll();
+		} else {
+			// Nothing was found, go ahead and set to -2
+			return -2;
 		}
 
 		$res['cast'] = !empty($res['cast']) ? implode(',', $res['cast']) : '';
@@ -652,7 +655,7 @@ class XXX
 			$xxxID = $check['id'];
 		}
 
-		// Update Current XXX Information - getXXXCovers.php
+		// Update Current XXX Information
 		if ($xxxID > 0) {
 			$this->update($check['id'], $mov['title'], $mov['tagline'], $mov['plot'], $mov['genre'], $mov['director'], $mov['actors'], $mov['extras'], $mov['productinfo'], $mov['trailers'], $mov['directurl'], $mov['classused']);
 			$xxxID = $check['id'];

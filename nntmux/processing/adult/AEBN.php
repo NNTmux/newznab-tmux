@@ -1,7 +1,5 @@
 <?php
-namespace nntmux;
-
-use nntmux\processing\adult\AdultMovies;
+namespace nntmux\processing\adult;
 
 class AEBN extends AdultMovies
 {
@@ -218,7 +216,7 @@ class AEBN extends AdultMovies
 		}
 		$this->_response = false;
 		$this->_trailerUrl = self::TRAILINGSEARCH . urlencode($movie);
-		$this->_response = getUrl(self::IF18);
+		$this->_response = getRawHtml(self::AEBNSURL);
 		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
 			$count = count($this->_html->find('div.movie'));
@@ -235,7 +233,6 @@ class AEBN extends AdultMovies
 							$this->_title = trim($ret->title);
 							$this->_trailerUrl = html_entity_decode($ret->href);
 							$this->_directUrl = self::AEBNSURL . self::TRAILINGSEARCH . urlencode($movie);
-							getUrl(self::AEBNSURL);
 							return true;
 						}
 						continue;

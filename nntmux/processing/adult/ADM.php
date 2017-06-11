@@ -1,8 +1,7 @@
 <?php
-namespace nntmux;
+namespace nntmux\processing\adult;
 
 use nntmux\db\DB;
-use nntmux\processing\adult\AdultMovies;
 
 class ADM extends AdultMovies
 {
@@ -204,7 +203,7 @@ class ADM extends AdultMovies
 		$result = false;
 		if (!empty($movie)) {
 			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($movie);
-			$this->_response = getUrl(self::ADMURL . $this->_trailUrl);
+			$this->_response = getRawHtml(self::ADMURL . $this->_trailUrl);
 			if ($this->_response !== false) {
 				$this->_html->load($this->_response);
 				if ($ret = $this->_html->find('img[rel=license]')) {
@@ -221,16 +220,15 @@ class ADM extends AdultMovies
 										$this->_title = trim($title);
 										$this->_trailUrl = '/dvd_view_' . (string)$matches['sku'] . '.html';
 										$this->_directUrl = self::ADMURL . $this->_trailUrl;
+										$result = true;
 									}
 								}
 							}
 						}
 					}
 				}
-				$result = true;
 			}
 		}
-
 		return $result;
 	}
 
@@ -268,5 +266,12 @@ class ADM extends AdultMovies
 
 		$results = empty($results) ? false : $results;
 		return $results;
+	}
+
+	protected function trailers()
+	{
+		// TODO: Implement trailers() method.
+
+		return false;
 	}
 }
