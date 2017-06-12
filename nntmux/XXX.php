@@ -637,7 +637,7 @@ class XXX
 		$mov = [
 			'trailers'    => !empty($res['trailers']) ? serialize($res['trailers']) : '',
 			'extras'      => !empty($res['extras']) ? serialize($res['extras']) : '',
-			'productinfo' => !empty($res['productinfo']) ? serialize($res['productinfo'][0]) : '',
+			'productinfo' => !empty($res['productinfo']) ? serialize($res['productinfo']) : '',
 			'backdrop'    => !empty($res['backcover']) ? $res['backcover'] : 0,
 			'cover'       => !empty($res['boxcover']) ? $res['boxcover'] : 0,
 			'title'       => !empty($res['title']) ? html_entity_decode($res['title'], ENT_QUOTES, 'UTF-8') : '',

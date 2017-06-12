@@ -130,7 +130,7 @@ class AEBN extends AdultMovies
 	 *
 	 * @return array
 	 */
-	protected function cast()
+	protected function cast(): array
 	{
 		if ($ret = $this->_html->find('div.starsFull', 0)) {
 			foreach ($ret->find('span[itemprop=name]') as $star) {
@@ -203,14 +203,13 @@ class AEBN extends AdultMovies
 	 *
 	 * @return bool
 	 */
-	public function processSite($movie)
+	public function processSite($movie): bool
 	{
 		if (empty($movie)) {
 			return false;
 		}
-		$this->_response = false;
 		$this->_trailerUrl = self::TRAILINGSEARCH . urlencode($movie);
-		$this->_response = getRawHtml(self::AEBNSURL);
+		$this->_response = getRawHtml(self::AEBNSURL . $this->_trailerUrl);
 		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
 			$count = count($this->_html->find('div.movie'));
@@ -227,6 +226,8 @@ class AEBN extends AdultMovies
 							$this->_title = trim($ret->title);
 							$this->_trailerUrl = html_entity_decode($ret->href);
 							$this->_directUrl = self::AEBNSURL . self::TRAILINGSEARCH . urlencode($movie);
+							$this->_response = getRawHtml($this->_directUrl);
+							$this->_html->load($this->_response);
 							return true;
 						}
 						continue;

@@ -220,6 +220,8 @@ class ADM extends AdultMovies
 										$this->_title = trim($title);
 										$this->_trailUrl = '/dvd_view_' . (string)$matches['sku'] . '.html';
 										$this->_directUrl = self::ADMURL . $this->_trailUrl;
+										$this->_response = getRawHtml($this->_directUrl);
+										$this->_html->load($this->_response);
 										$result = true;
 									}
 								}

@@ -91,7 +91,7 @@ class ADE extends AdultMovies
 	 */
 	public function trailers()
 	{
-		$this->_response = getRawHtml($this->_trailers . $this->_urlFound);
+		$this->_response = getRawHtml($this->_trailers . $this->_directUrl);
 		$this->_html->load($this->_response);
 		if (preg_match("/(\"|')(?P<swf>[^\"']+.swf)(\"|')/i", $this->_response, $matches)) {
 			$this->_res['trailers']['url'] = self::ADE . trim(trim($matches['swf']), '"');
@@ -129,21 +129,13 @@ class ADE extends AdultMovies
 	}
 
 	/**
-	 * Gets the synopsis and tagline
+	 * Gets the synopsis
 	 *
-	 * @param bool $tagline - Include tagline? true/false
-	 *
-	 * @return array - plot,tagline
+	 * @return array - plot
 	 */
-	public function synopsis($tagline = false)
+	public function synopsis()
 	{
-		if ($tagline === true) {
-			$ret = $this->_html->find('p.Tagline', 0);
-			if (!empty($ret->plaintext)) {
-				$this->_res['tagline'] = trim($ret->plaintext);
-			}
-		}
-		if ($ret = @$this->_html->find('p.Tagline', 0)->next_sibling()->next_sibling()) {
+		if ($ret = $this->_html->find('meta[name="og:description"]', 0)->content()) {
 			$this->_res['synopsis'] = trim($ret->innertext);
 		}
 
@@ -273,7 +265,7 @@ class ADE extends AdultMovies
 	 * Searches xxx name.
 	 * @return bool - True if releases has 90% match, else false
 	 */
-	public function processSite($movie)
+	public function processSite($movie): bool
 	{
 		if (empty($movie)) {
 			return false;
@@ -281,24 +273,20 @@ class ADE extends AdultMovies
 		$this->_response = getRawHtml($this->_dvdQuery . rawurlencode($movie));
 		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
-			if ($ret = $this->_html->find('a.boxcover', 0)) {
+			if ($ret = $this->_html->find('div[id=boxcover]', 0)) {
 				$title = $ret->title;
 				$title = str_replace('/XXX/', '', $title);
 				$title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
 				$ret   = (string)trim($ret->href);
 				similar_text(strtolower($movie), strtolower($title), $p);
 				if ($p >= 90) {
-					$this->found      = true;
 					$this->_urlFound  = $ret;
 					$this->_directUrl = self::ADE . $ret;
 					$this->_title     = trim($title);
-					unset($ret);
-					$this->_html->clear();
-					$this->_response = getRawHtml($this->_urlFound);
+					$this->_response = getRawHtml($this->_directUrl);
 					$this->_html->load($this->_response);
 					return true;
 				}
-				$this->found = false;
 				return false;
 			}
 			return false;

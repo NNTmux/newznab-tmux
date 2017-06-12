@@ -127,8 +127,6 @@ class Hotmovies extends AdultMovies
 		if (!empty($this->_directUrl)) {
 			$results['title'] = $this->_title;
 			$results['directurl'] = $this->_directUrl;
-			$this->_response = getRawHtml($this->_directUrl);
-			$this->_html->load($this->_response);
 		}
 		if (is_array($this->synopsis())) {
 			$results = array_merge($results, $this->synopsis());
@@ -302,29 +300,23 @@ class Hotmovies extends AdultMovies
 					$title = trim($ret->title);
 					$title = str_replace('/XXX/', '', $title);
 					$title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
-					$this->_getLink = trim($ret->href);
-					$this->_directUrl = trim($ret->href);
+					if (!empty($title)) {
+						similar_text($movie, $title, $p);
+						if ($p >= 90) {
+							$this->_title = $title;
+							$this->_getLink = trim($ret->href);
+							$this->_directUrl = trim($ret->href);
+							$this->_response = getRawHtml($this->_directUrl);
+							$this->_html->load($this->_response);
+							return true;
+						}
+					}
 				}
 			}
 		} else {
 			return false;
 		}
-		if (!empty($title)) {
-			similar_text($movie, $title, $p);
-			if ($p >= 90) {
-				$this->_title = $title;
-				if (!empty($this->_getLink)) {
-					$this->_response = getRawHtml($this->_getLink);
-				} else {
-					$this->_response = getRawHtml(self::HMURL);
-				}
-				if (!empty($this->directLink)) {
-					$this->_response = getRawHtml($this->directLink);
-					$this->directLink = '';
-				}
-				return true;
-			}
-		}
+
 
 		return false;
 	}

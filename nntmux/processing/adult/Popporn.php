@@ -271,10 +271,9 @@ class Popporn extends AdultMovies
 	 * Searches for match against searchterm
 	 * @return bool, true if search >= 90%
 	 */
-	public function processSite($movie)
+	public function processSite($movie): bool
 	{
-		$result = false;
-		if (isset($movie)) {
+		if (!empty($movie)) {
 			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($movie);
 			$this->_response = getRawHtml(self::POPURL . $this->_trailUrl);
 			if ($this->_response !== false) {
@@ -286,20 +285,24 @@ class Popporn extends AdultMovies
 					$title = trim($title);
 					if ($ret = $ret->find('a', 0)) {
 						$this->_trailUrl = trim($ret->href);
-						if ($this->getRawHtml() !== false) {
+						$this->_response = getRawHtml($this->_trailUrl);
+						if ($this->_response !== false) {
+							$this->_html->load($this->_response);
 							if ($ret = $this->_html->find('#link-to-this', 0)) {
 								$this->_directUrl = trim($ret->href);
+								$this->_response = getRawHtml($this->_directUrl);
+								$this->_html->load($this->_response);
 							}
 							similar_text(strtolower($movie), strtolower($title), $p);
 							if ($p >= 90) {
-								$result = true;
+								return true;
 							}
 						}
 					}
 				}
 			}
 		}
-		return $result;
+		return false;
 	}
 
 	/**
