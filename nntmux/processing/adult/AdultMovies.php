@@ -6,6 +6,14 @@ use nntmux\XXX;
 
 abstract class AdultMovies extends XXX
 {
+	const PROCESS_AEBN          =  0;   // Process AEBN First
+	const PROCESS_ADE           = -1;   // Process ADE Second
+	const PROCESS_POPPORN       = -2;   // Process POPPORN Third
+	const PROCESS_HOTMOVIES     = -3;   // Process HOTMOVIES Fourth
+	const PROCESS_ADM           = -4;   // Process ADM Fifth
+	const NO_MATCH_FOUND        = -6;   // Failed All Methods
+	const FAILED_PARSE          = -100; // Failed Parsing
+
 	/**
 	 * AdultMovies constructor.
 	 *
@@ -59,25 +67,4 @@ abstract class AdultMovies extends XXX
 	 * @return mixed
 	 */
 	abstract protected function trailers();
-
-	/**
-	 * Updates the release xxxinfo_id status when scraper match is not found
-	 *
-	 * @param $status
-	 * @param $Id
-	 */
-	public function setXXXNotFound($status, $Id): void
-	{
-		$this->pdo->queryExec(
-			sprintf('
-				UPDATE releases
-				SET xxxinfo_id = %d
-				WHERE %s
-				AND id = %d',
-				$status,
-				$this->catWhere,
-				$Id
-			)
-		);
-	}
 }

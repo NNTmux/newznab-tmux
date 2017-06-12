@@ -1,4 +1,5 @@
 <?php
+
 namespace nntmux\processing\adult;
 
 class Hotmovies extends AdultMovies
@@ -109,8 +110,10 @@ class Hotmovies extends AdultMovies
 			if (getRawHtml($this->_directUrl) === false) {
 				return false;
 			}
+
 			return $this->getAll();
 		}
+
 		return false;
 	}
 
@@ -143,9 +146,10 @@ class Hotmovies extends AdultMovies
 			$results = array_merge($results, $this->covers());
 		}
 
-		if (empty($results)){
+		if (empty($results)) {
 			return false;
 		}
+
 		return $results;
 
 	}
@@ -155,10 +159,10 @@ class Hotmovies extends AdultMovies
 	 *
 	 * @return array
 	 */
-	protected function synopsis()
+	protected function synopsis(): array
 	{
 		if ($this->_html->find('.desc_link', 0)) {
-			foreach ($this->_html->find('[itemprop=description]') as $heading) {
+			foreach ($this->_html->find('div[itemprop=description]') as $heading) {
 				if (trim($heading->plaintext) === 'description') {
 					$this->_res['synopsis'] = trim($heading->next_sibling()->plaintext);
 				}
@@ -172,18 +176,14 @@ class Hotmovies extends AdultMovies
 	 *
 	 * @return array
 	 */
-	protected function productInfo()
+	protected function productInfo(): array
 	{
 		$studio = false;
 		$director = false;
 		if ($ret = $this->_html->find('div.page_video_info', 0)) {
 			foreach ($ret->find('text') as $e) {
 				$e = trim($e->innertext);
-				$rArray = [
-					',',
-					'...',
-					'&nbsp:'
-				];
+				$rArray = [',', '...', '&nbsp:'];
 				$e = str_replace($rArray, '', $e);
 				if (stripos($e, 'Studio:') !== false) {
 					$studio = true;
@@ -216,21 +216,22 @@ class Hotmovies extends AdultMovies
 		if (is_array($this->_res['productinfo'])) {
 			$this->_res['productinfo'] = array_chunk($this->_res['productinfo'], 2, false);
 		}
+
 		return $this->_res;
 	}
 
 	/**
 	 * Gets the cast members and director
 	 *
-	 *@return array
+	 * @return array
 	 */
 	protected function cast()
 	{
 		$cast = null;
-		if ($this->_html->find('a[itemprop=actor]')) {
-			foreach ($this->_html->find('a[itemprop=actor]') as $e) {
+		if ($this->_html->find('a[itemprop=actors]')) {
+			foreach ($this->_html->find('a[itemprop=actors]') as $e) {
 				$e = trim($e->title);
-				$e = preg_replace('/\((.*)\)/','',$e);
+				$e = preg_replace('/\((.*)\)/', '', $e);
 				$cast[] = trim($e);
 			}
 			$this->_res['cast'] = $cast;
@@ -243,15 +244,15 @@ class Hotmovies extends AdultMovies
 	/**
 	 * Gets categories
 	 *
-	 *@return array
+	 * @return array
 	 */
 	protected function genres()
 	{
 		$genres = [];
-		if ($ret = $this->_html->find('div.categories',0)) {
+		if ($ret = $this->_html->find('div.categories', 0)) {
 			foreach ($ret->find('a') as $e) {
 				if (strpos($e->title, '->') !== false) {
-					$e = explode('->',$e->plaintext);
+					$e = explode('->', $e->plaintext);
 					$genres[] = trim($e[1]);
 				}
 			}
@@ -271,7 +272,7 @@ class Hotmovies extends AdultMovies
 		if ($ret = $this->_html->find('div#large_cover, img#cover', 1)) {
 			$this->_res['boxcover'] = trim($ret->src);
 			$this->_res['backcover'] = str_ireplace('.cover', '.back', trim($ret->src));
-		}else{
+		} else {
 			return false;
 		}
 
@@ -279,22 +280,24 @@ class Hotmovies extends AdultMovies
 	}
 
 	/**
-	 * Searches for match against searchterm
-	 * @return bool, true if search >= 90%
+	 * Searches for match against xxx movie name
+	 *
+	 * @param string $movie
+	 *
+	 * @return bool , true if search >= 90%
 	 */
-	public function processSite($movie)
+	public function processSite($movie): bool
 	{
 		if (empty($movie)) {
 			return false;
 		}
+		$this->_response = false;
 		$this->_getLink = self::HMURL . self::TRAILINGSEARCH . urlencode($movie) . self::EXTRASEARCH;
 		$this->_response = getRawHtml($this->_getLink);
-		if ($this->_response === false) {
-			return false;
-		}
-		$this->_html->load($this->_response);
-		if ($ret = $this->_html->find('h3[class=title]', 0)) {
-				if ($ret->find('a[title]',0)){
+		if ($this->_response !== false) {
+			$this->_html->load($this->_response);
+			if ($ret = $this->_html->find('h3[class=title]', 0)) {
+				if ($ret->find('a[title]', 0)) {
 					$ret = $ret->find('a[title]', 0);
 					$title = trim($ret->title);
 					$title = str_replace('/XXX/', '', $title);
@@ -302,25 +305,27 @@ class Hotmovies extends AdultMovies
 					$this->_getLink = trim($ret->href);
 					$this->_directUrl = trim($ret->href);
 				}
-			} else {
-				return false;
 			}
-			if (!empty($title)) {
-				similar_text($movie, $title, $p);
-				if ($p >= 90) {
-					$this->_title = $title;
-					if (!empty($this->_getLink)) {
-						$this->_response = getRawHtml($this->_getLink);
-					} else {
-						$this->_response = getRawHtml(self::HMURL);
-					}
-					if (!empty($this->directLink)) {
-						$this->_response = getRawHtml($this->directLink);
-						$this->directLink = '';
-					}
-					return true;
-				}
-			}
+		} else {
 			return false;
 		}
+		if (!empty($title)) {
+			similar_text($movie, $title, $p);
+			if ($p >= 90) {
+				$this->_title = $title;
+				if (!empty($this->_getLink)) {
+					$this->_response = getRawHtml($this->_getLink);
+				} else {
+					$this->_response = getRawHtml(self::HMURL);
+				}
+				if (!empty($this->directLink)) {
+					$this->_response = getRawHtml($this->directLink);
+					$this->directLink = '';
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

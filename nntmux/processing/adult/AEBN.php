@@ -58,12 +58,6 @@ class AEBN extends AdultMovies
 	];
 
 	/**
-	 * If searchTerm is found
-	 * @var bool
-	 */
-	protected $_searchFound = false;
-
-	/**
 	 * Sets title in getAll method
 	 * @var string
 	 */

@@ -4,6 +4,7 @@ namespace nntmux;
 
 use app\models\Settings;
 use nntmux\db\DB;
+use nntmux\processing\adult\AdultMovies;
 use nntmux\processing\adult\AEBN;
 use nntmux\processing\adult\ADM;
 use nntmux\processing\adult\ADE;
@@ -626,8 +627,8 @@ class XXX
 			}
 			$res = $mov->getAll();
 		} else {
-			// Nothing was found, go ahead and set to -2
-			return -2;
+			// Nothing was found, go ahead and set to -6
+			return AdultMovies::NO_MATCH_FOUND;
 		}
 
 		$res['cast'] = !empty($res['cast']) ? implode(',', $res['cast']) : '';
@@ -636,7 +637,7 @@ class XXX
 		$mov = [
 			'trailers'    => !empty($res['trailers']) ? serialize($res['trailers']) : '',
 			'extras'      => !empty($res['extras']) ? serialize($res['extras']) : '',
-			'productinfo' => !empty($res['productinfo']) ? serialize($res['productinfo']) : '',
+			'productinfo' => !empty($res['productinfo']) ? serialize($res['productinfo'][0]) : '',
 			'backdrop'    => !empty($res['backcover']) ? $res['backcover'] : 0,
 			'cover'       => !empty($res['boxcover']) ? $res['boxcover'] : 0,
 			'title'       => !empty($res['title']) ? html_entity_decode($res['title'], ENT_QUOTES, 'UTF-8') : '',
@@ -648,6 +649,7 @@ class XXX
 			'directurl'   => !empty($res['directurl']) ? html_entity_decode($res['directurl'], ENT_QUOTES, 'UTF-8') : '',
 			'classused'   => $this->whichclass
 		];
+		print_r($mov);
 
 		$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM xxxinfo WHERE title = %s', $this->pdo->escapeString($mov['title'])));
 		$xxxID = 0;
@@ -673,14 +675,14 @@ class XXX
 			$this->pdo->queryExec(sprintf('UPDATE xxxinfo SET cover = %d, backdrop = %d  WHERE id = %d', $mov['cover'], $mov['backdrop'], $xxxID));
 
 		} else {
-			$xxxID = -2;
+			$xxxID = AdultMovies::NO_MATCH_FOUND;
 		}
 
 		// Insert New XXX Information
 		if ($check === false) {
 			$xxxID = $this->pdo->queryInsert(
 				sprintf('
-					INSERT INTO xxxinfo
+					INSERT IGNORE INTO xxxinfo
 						(title, tagline, plot, genre, director, actors, extras, productinfo, trailers, directurl, classused, cover, backdrop, createddate, updateddate)
 					VALUES
 						(%s, %s, COMPRESS(%s), %s, %s, %s, %s, %s, %s, %s, %s, 0, 0, NOW(), NOW())',
@@ -711,6 +713,7 @@ class XXX
 	/**
 	 * Process XXX releases where xxxinfo is 0
 	 *
+	 * @throws \Exception
 	 */
 	public function processXXXReleases(): void
 	{
@@ -736,7 +739,7 @@ class XXX
 			// Loop over releases.
 			foreach ($res as $arr) {
 
-				$idcheck = -2;
+				$idcheck = AdultMovies::NO_MATCH_FOUND;
 
 				// Try to get a name.
 				if ($this->parseXXXSearchName($arr['searchname']) !== false) {
@@ -756,7 +759,7 @@ class XXX
 						$idcheck = (int)$check['id'];
 					}
 				} else {
-					ColorCLI::doEcho('.', true);
+					ColorCLI::doEcho('.');
 				}
 				$this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE id = %d %s', $idcheck, $arr['id'], $this->catWhere));
 			}
@@ -813,7 +816,6 @@ class XXX
 
 				return true;
 			}
-			ColorCLI::doEcho('.', false);
 		}
 
 		return false;
