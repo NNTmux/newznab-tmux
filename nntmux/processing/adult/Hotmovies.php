@@ -100,24 +100,6 @@ class Hotmovies extends AdultMovies
 	}
 
 	/**
-	 * Directly gets the link if directlink is set, and parses it.
-	 *
-	 * @return bool|array
-	 */
-	protected function getDirect()
-	{
-		if (!empty($this->directLink)) {
-			if (getRawHtml($this->_directUrl) === false) {
-				return false;
-			}
-
-			return $this->getAll();
-		}
-
-		return false;
-	}
-
-	/**
 	 * Gets all information
 	 * @return bool|array
 	 */
@@ -159,11 +141,11 @@ class Hotmovies extends AdultMovies
 	 */
 	protected function synopsis(): array
 	{
+		$this->_res['synopsis'] = 'N/A';
 		if ($this->_html->find('.desc_link', 0)) {
-			foreach ($this->_html->find('div[itemprop=description]') as $heading) {
-				if (trim($heading->plaintext) === 'description') {
-					$this->_res['synopsis'] = trim($heading->next_sibling()->plaintext);
-				}
+			$ret = $this->_html->find('.video_description', 0);
+			if ($ret !== false) {
+				$this->_res['synopsis'] = trim($ret->innertext);
 			}
 		}
 
@@ -225,9 +207,10 @@ class Hotmovies extends AdultMovies
 	 */
 	protected function cast()
 	{
-		$cast = null;
-		if ($this->_html->find('a[itemprop=actors]')) {
-			foreach ($this->_html->find('a[itemprop=actors]') as $e) {
+		$cast = [];
+		if ($this->_html->find('.stars bottom_margin')) {
+			file_put_contents('hm_cast.txt', $this->_html->find('.stars bottom_margin'));
+			foreach ($this->_html->find('a[title]') as $e) {
 				$e = trim($e->title);
 				$e = preg_replace('/\((.*)\)/', '', $e);
 				$cast[] = trim($e);
@@ -246,17 +229,15 @@ class Hotmovies extends AdultMovies
 	 */
 	protected function genres()
 	{
-		$genres = [];
-		if ($ret = $this->_html->find('div.categories', 0)) {
-			foreach ($ret->find('a') as $e) {
-				if (strpos($e->title, '->') !== false) {
-					$e = explode('->', $e->plaintext);
-					$genres[] = trim($e[1]);
-				}
-			}
-			$this->_res['genres'] = $genres;
 
+		$genres = [];
+		foreach ($this->_html->find('span[itemprop=genre]') as $e) {
+			if (strpos($e->innertext, ' -> ') !== false) {
+				$e = explode(' -> ', $e->plaintext);
+				$genres[] = $e;
+			}
 		}
+		$this->_res['genres'] = $genres;
 
 		return $this->_res;
 	}
@@ -291,7 +272,7 @@ class Hotmovies extends AdultMovies
 		}
 		$this->_response = false;
 		$this->_getLink = self::HMURL . self::TRAILINGSEARCH . urlencode($movie) . self::EXTRASEARCH;
-		$this->_response = getRawHtml($this->_getLink);
+		$this->_response = getRawHtml($this->_getLink, $this->cookie);
 		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
 			if ($ret = $this->_html->find('h3[class=title]', 0)) {
@@ -306,8 +287,16 @@ class Hotmovies extends AdultMovies
 							$this->_title = $title;
 							$this->_getLink = trim($ret->href);
 							$this->_directUrl = trim($ret->href);
-							$this->_response = getRawHtml($this->_directUrl);
-							$this->_html->load($this->_response);
+							$this->_html->clear();
+							unset($this->_response);
+							if (!empty($this->_getLink)) {
+								$this->_response = getRawHtml($this->_getLink, $this->cookie);
+								$this->_html->load($this->_response);
+							} else {
+								$this->_response = getRawHtml($this->_directUrl, $this->cookie);
+								$this->_html->load($this->_response);
+							}
+
 							return true;
 						}
 					}
@@ -316,7 +305,6 @@ class Hotmovies extends AdultMovies
 		} else {
 			return false;
 		}
-
 
 		return false;
 	}

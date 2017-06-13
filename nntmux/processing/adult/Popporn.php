@@ -75,7 +75,7 @@ class Popporn extends AdultMovies
 	 * Get Box Cover Images
 	 * @return array - boxcover,backcover
 	 */
-	public function covers()
+	public function covers(): array
 	{
 		if ($ret = $this->_html->find('div[id=box-art], a[rel=box-art]', 1)) {
 			$this->_res['boxcover'] = trim($ret->href);
@@ -110,7 +110,7 @@ class Popporn extends AdultMovies
 					if ($ret->next_sibling()->next_sibling()) {
 						$this->_res['synopsis'] = trim($ret->next_sibling()->next_sibling()->next_sibling()->plaintext);
 					} else {
-						$this->_res['synopsis'] = "N/A";
+						$this->_res['synopsis'] = 'N/A';
 					}
 				}
 			}
@@ -127,19 +127,19 @@ class Popporn extends AdultMovies
 	{
 		if ($ret = $this->_html->find('input#thickbox-trailer-link', 0)) {
 			$ret->value = trim($ret->value);
-			$ret->value = str_replace("..", "", $ret->value);
+			$ret->value = str_replace('..', '', $ret->value);
 			$tmprsp = $this->_response;
 			$this->_trailUrl = $ret->value;
 			$this->getRawHtml();
 			if (preg_match_all('/productID="\+(?<id>[0-9]+),/', $this->_response, $matches)) {
 				$productid = $matches['id'][0];
 				$random = ((float)rand() / (float)getrandmax()) * 5400000000000000;
-				$this->_trailUrl = "/com/tlavideo/vod/FlvAjaxSupportService.cfc?random=" . $random;
-				$this->_postParams = "method=pipeStreamLoc&productID=" . $productid;
+				$this->_trailUrl = '/com/tlavideo/vod/FlvAjaxSupportService.cfc?random=' . $random;
+				$this->_postParams = 'method=pipeStreamLoc&productID=' . $productid;
 				$this->getRawHtml(true);
 				$ret = json_decode(json_decode($this->_response, true), true);
-				$this->_res['trailers']['baseurl'] = self::POPURL . "/flashmediaserver/trailerPlayer.swf";
-				$this->_res['trailers']['flashvars'] = "subscribe=false&image=&file=" . self::POPURL . "/" . $ret['LOC'] . "&autostart=false";
+				$this->_res['trailers']['baseurl'] = self::POPURL . '/flashmediaserver/trailerPlayer.swf';
+				$this->_res['trailers']['flashvars'] = 'subscribe=false&image=&file=' . self::POPURL . '/' . $ret['LOC'] . '&autostart=false';
 				unset($this->_response);
 				$this->_response = $tmprsp;
 			}
@@ -161,14 +161,14 @@ class Popporn extends AdultMovies
 		if ($ret = $this->_html->find('div#lside', 0)) {
 			foreach ($ret->find("text") as $e) {
 				$e = trim($e->innertext);
-				$e = str_replace(",", "", $e);
-				$e = str_replace("...", "", $e);
-				$e = str_replace("&nbsp;", "", $e);
-				if (stristr($e, "Country:")) {
+				$e = str_replace(',', '', $e);
+				$e = str_replace('...', '', $e);
+				$e = str_replace('&nbsp;', '', $e);
+				if (stristr($e, 'Country:')) {
 					$country = true;
 				}
 				if ($country === true) {
-					if (!stristr($e, "addthis_config")) {
+					if (!stristr($e, 'addthis_config')) {
 						if (!empty($e)) {
 							$this->_res['productinfo'][] = $e;
 						}
@@ -187,11 +187,11 @@ class Popporn extends AdultMovies
 				foreach ($this->_html->find('ul.stock-information') as $ul) {
 					foreach ($ul->find('li') as $e) {
 						$e = trim($e->plaintext);
-						if ($e == "Features:") {
+						if ($e == 'Features:') {
 							$features = true;
 							$e = null;
 						}
-						if ($features == true) {
+						if ($features === true) {
 							if (!empty($e)) {
 								$this->_res['extras'][] = $e;
 							}
@@ -214,16 +214,16 @@ class Popporn extends AdultMovies
 		$director = false;
 		$er = [];
 		if ($ret = $this->_html->find('div#lside', 0)) {
-			foreach ($ret->find("text") as $e) {
+			foreach ($ret->find('text') as $e) {
 				$e = trim($e->innertext);
-				$e = str_replace(",", "", $e);
-				$e = str_replace("&nbsp;", "", $e);
-				if (stristr($e, "Cast")) {
+				$e = str_replace(',', '', $e);
+				$e = str_replace('&nbsp;', '', $e);
+				if (stristr($e, 'Cast')) {
 					$cast = true;
 				}
-				$e = str_replace("Cast:", "", $e);
+				$e = str_replace('Cast:', '', $e);
 				if ($cast === true) {
-					if (stristr($e, "Director:")) {
+					if (stristr($e, 'Director:')) {
 						$director = true;
 						$e = null;
 					}
@@ -235,7 +235,7 @@ class Popporn extends AdultMovies
 							$e = null;
 						}
 					}
-					if (!stristr($e, "Country:")) {
+					if (!stristr($e, 'Country:')) {
 						if (!empty($e)) {
 							$er[] = $e;
 						}
@@ -269,13 +269,16 @@ class Popporn extends AdultMovies
 
 	/**
 	 * Searches for match against searchterm
-	 * @return bool, true if search >= 90%
+	 *
+	 * @param string $movie
+	 *
+	 * @return bool , true if search >= 90%
 	 */
 	public function processSite($movie): bool
 	{
 		if (!empty($movie)) {
 			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($movie);
-			$this->_response = getRawHtml(self::POPURL . $this->_trailUrl);
+			$this->_response = getRawHtml(self::POPURL . $this->_trailUrl, $this->cookie);
 			if ($this->_response !== false) {
 				$this->_html->load($this->_response);
 				if ($ret = $this->_html->find('div.product-info, div.title', 1)) {
@@ -285,12 +288,16 @@ class Popporn extends AdultMovies
 					$title = trim($title);
 					if ($ret = $ret->find('a', 0)) {
 						$this->_trailUrl = trim($ret->href);
-						$this->_response = getRawHtml($this->_trailUrl);
+						$this->_html->clear();
+						unset($this->_response);
+						$this->_response = getRawHtml($this->_trailUrl, $this->cookie);
 						if ($this->_response !== false) {
 							$this->_html->load($this->_response);
 							if ($ret = $this->_html->find('#link-to-this', 0)) {
 								$this->_directUrl = trim($ret->href);
-								$this->_response = getRawHtml($this->_directUrl);
+								$this->_html->clear();
+								unset($this->_response);
+								$this->_response = getRawHtml($this->_directUrl, $this->cookie);
 								$this->_html->load($this->_response);
 							}
 							similar_text(strtolower($movie), strtolower($title), $p);
@@ -300,6 +307,13 @@ class Popporn extends AdultMovies
 						}
 					}
 				}
+			} else {
+				$this->_response = getRawHtml(self::IF18);
+				if ($this->_response !== false) {
+					$this->_html->load($this->_response);
+					return true;
+				}
+				return false;
 			}
 		}
 		return false;
@@ -338,46 +352,5 @@ class Popporn extends AdultMovies
 			return false;
 		}
 		return $results;
-	}
-
-	/**
-	 * Get Raw html of webpage
-	 *
-	 * @param bool $usepost
-	 *
-	 * @return bool
-	 */
-	private function getRawHtml($usepost = false)
-	{
-		if (isset($this->_trailUrl)) {
-			$ch = curl_init(self::POPURL . $this->_trailUrl);
-		} else {
-			$ch = curl_init(self::IF18);
-		}
-
-		if ($usepost === true) {
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-			curl_setopt($ch, CURLOPT_POST, 1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_postParams);
-		}
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_VERBOSE, 0);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
-		curl_setopt($ch, CURLOPT_FAILONERROR, 1);
-		if (isset($this->cookie)) {
-			curl_setopt($ch, CURLOPT_COOKIEJAR, $this->cookie);
-			curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie);
-		}
-		curl_setopt_array($ch, Utility::curlSslContextOptions());
-		$this->_response = curl_exec($ch);
-		if (!$this->_response) {
-			curl_close($ch);
-			return false;
-		}
-		curl_close($ch);
-		$this->_html->load($this->_response);
-		return true;
 	}
 }

@@ -564,7 +564,8 @@ class XXX
 	{
 		$this->whichclass = 'aebn';
 		$mov = new AEBN();
-		$mov->cookie = $this->cookie;  ColorCLI::doEcho(ColorCLI::info('Checking AEBN for movie info'));
+		$mov->cookie = $this->cookie;
+		ColorCLI::doEcho(ColorCLI::info('Checking AEBN for movie info'));
 		$res = $mov->processSite($movie);
 
 		if ($res === false) {

@@ -14,7 +14,7 @@ if (!function_exists('getRawHtml')) {
 		$cookiejar = new CookieJar();
 		$client = new Client();
 		if ($cookie !== false) {
-			$cookieJar = $cookiejar->setCookie(SetCookie::fromString($this->cookie));
+			$cookieJar = $cookiejar->setCookie(SetCookie::fromString($cookie));
 			$client = new Client(['cookies' => $cookieJar]);
 		}
 		try {

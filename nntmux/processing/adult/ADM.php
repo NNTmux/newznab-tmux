@@ -177,7 +177,7 @@ class ADM extends AdultMovies
 	protected function genres()
 	{
 		$genres = [];
-		foreach ($this->_html->find('ul.list-unstyled li') as $li) {
+		foreach ($this->_html->find('ul.list-unstyled') as $li) {
 			$category = explode(':', $li->plaintext);
 			if (trim($category[0]) === 'Category') {
 				$genre = explode(',', $category[1]);
@@ -203,7 +203,7 @@ class ADM extends AdultMovies
 		$result = false;
 		if (!empty($movie)) {
 			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($movie);
-			$this->_response = getRawHtml(self::ADMURL . $this->_trailUrl);
+			$this->_response = getRawHtml(self::ADMURL . $this->_trailUrl, $this->cookie);
 			if ($this->_response !== false) {
 				$this->_html->load($this->_response);
 				if ($ret = $this->_html->find('img[rel=license]')) {
@@ -220,7 +220,9 @@ class ADM extends AdultMovies
 										$this->_title = trim($title);
 										$this->_trailUrl = '/dvd_view_' . (string)$matches['sku'] . '.html';
 										$this->_directUrl = self::ADMURL . $this->_trailUrl;
-										$this->_response = getRawHtml($this->_directUrl);
+										$this->_html->clear();
+										unset($this->_response);
+										$this->_response = getRawHtml($this->_directUrl, $this->cookie);
 										$this->_html->load($this->_response);
 										$result = true;
 									}

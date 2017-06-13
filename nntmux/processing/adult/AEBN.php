@@ -201,6 +201,8 @@ class AEBN extends AdultMovies
 	/**
 	 * Searches for a XXX name
 	 *
+	 * @param string $movie
+	 *
 	 * @return bool
 	 */
 	public function processSite($movie): bool
@@ -209,7 +211,7 @@ class AEBN extends AdultMovies
 			return false;
 		}
 		$this->_trailerUrl = self::TRAILINGSEARCH . urlencode($movie);
-		$this->_response = getRawHtml(self::AEBNSURL . $this->_trailerUrl);
+		$this->_response = getRawHtml(self::AEBNSURL . $this->_trailerUrl, $this->cookie);
 		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
 			$count = count($this->_html->find('div.movie'));
@@ -226,7 +228,9 @@ class AEBN extends AdultMovies
 							$this->_title = trim($ret->title);
 							$this->_trailerUrl = html_entity_decode($ret->href);
 							$this->_directUrl = self::AEBNSURL . self::TRAILINGSEARCH . urlencode($movie);
-							$this->_response = getRawHtml($this->_directUrl);
+							$this->_html->clear();
+							unset($this->_response);
+							$this->_response = getRawHtml($this->_directUrl, $this->cookie);
 							$this->_html->load($this->_response);
 							return true;
 						}
