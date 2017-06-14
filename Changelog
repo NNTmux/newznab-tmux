@@ -1,4 +1,5 @@
 2017-06-14 DariusIII
+	* Chg: Use monolog/monolog to handle logging
 	* Chg: Update composer libraries
 2017-06-09 DariusIII
 	* Chg: Update composer.lock

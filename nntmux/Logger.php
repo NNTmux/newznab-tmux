@@ -1,5 +1,8 @@
 <?php
 namespace nntmux;
+
+use Monolog\Logger as MonoLogger;
+use Monolog\Handler\StreamHandler;
 /**
  * Show log message to CLI/Web and log it to a file.
  * Turn these on in automated.config.php
@@ -168,6 +171,8 @@ class Logger
 	 *
 	 * @access public
 	 * @throws LoggerException
+	 * @throws \Exception
+	 * @throws \InvalidArgumentException
 	 */
 	public function __construct(array $options = [])
 	{
@@ -181,8 +186,6 @@ class Logger
 			'LogFileName' => ''
 		];
 		$options += $defaults;
-
-		$this->colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
 
 		$this->getSettings();
 
@@ -198,21 +201,12 @@ class Logger
 				: $this->currentLogName
 		) . '.log';
 
-		$this->setLogFile();
-
 		$this->outputCLI = (strtolower(PHP_SAPI) === 'cli');
 		$this->isWindows = (strtolower(substr(PHP_OS, 0, 3)) === 'win');
 		$this->timeStart = time();
-	}
 
-	/**
-	 * Close the log file resource.
-	 *
-	 * @access public
-	 */
-	public function __destruct()
-	{
-		$this->closeFile();
+		$this->logger = new MonoLogger('nntmux');
+		$this->logger->pushHandler(new StreamHandler($this->currentLogFolder . $this->currentLogName, MonoLogger::DEBUG));
 	}
 
 	/**
@@ -283,17 +277,14 @@ class Logger
 					round(
 						$actualUsage
 						/
-						pow(
-							1024,
-							($i =
+						(1024 ** ($i =
 								floor(
 									log(
 										$actualUsage,
 										1024
 									)
 								)
-							)
-						), 2
+							)), 2
 					)
 				), 4, '~~~', STR_PAD_LEFT
 			) .
@@ -353,13 +344,14 @@ class Logger
 	 *
 	 * @param string $folder   Folder where the log should be stored.
 	 * @param string $fileName Name of the file (must be alphanumeric and contain no file extensions).
+	 *
 	 * @access public
+	 * @throws \nntmux\LoggerException
 	 */
 	public function changeLogFileLocation($folder, $fileName)
 	{
 		$this->currentLogFolder = $folder;
 		$this->currentLogName = $fileName;
-		$this->setLogFile();
 	}
 
 	/**
@@ -382,34 +374,6 @@ class Logger
 		];
 	}
 
-	/**
-	 * Sets the path and name for the log file.
-	 *
-	 * @throws LoggerException
-	 * @access private
-	 */
-	private function setLogFile()
-	{
-		// Only run this if NN_LOGGING is on.
-		if (!NN_LOGGING) {
-			return;
-		}
-
-		$this->closeFile();
-
-		$this->logPath = $this->currentLogFolder . $this->currentLogName;
-
-		if (!is_dir($this->currentLogFolder)) {
-			$this->createFolder();
-		}
-
-		$this->initiateLog();
-
-		// Check if we need to rotate the log if it exceeds max size..
-		$this->rotateLog();
-
-		$this->openFile();
-	}
 
 	/**
 	 * Get/set all settings.
@@ -430,34 +394,6 @@ class Logger
 		$this->currentLogFolder = $paths['LogFolder'];
 	}
 
-	/**
-	 * Close the file resource.
-	 *
-	 * @access private
-	 */
-	private function closeFile()
-	{
-		if (is_resource($this->resource)) {
-			@fclose($this->resource);
-		}
-		$this->resource = null;
-	}
-
-	/**
-	 * Opens the log file.
-	 *
-	 * @throws LoggerException
-	 */
-	private function openFile()
-	{
-		if (!is_resource($this->resource)) {
-			$this->resource = @fopen($this->logPath, 'ab');
-
-			if (!$this->resource) {
-				throw new LoggerException('Unable to open log file ' . $this->logPath);
-			}
-		}
-	}
 
 	/**
 	 * Log message to file.
@@ -471,17 +407,7 @@ class Logger
 			return;
 		}
 
-		clearstatcache(true, $this->logPath);
-
-		// Check if we should rotate the logs.
-		$this->rotateLog();
-
-		// If another process deleted the file, try to re-open it.
-		if (!is_file($this->logPath)) {
-			$this->setLogFile();
-		}
-
-		@fwrite($this->resource, $this->logMessage . PHP_EOL);
+		$this->logger->info($this->logMessage);
 	}
 
 	/**
@@ -503,114 +429,6 @@ class Logger
 	}
 
 	/**
-	 * Check if the log folder exists, if not create it.
-	 *
-	 * @access private
-	 * @throws LoggerException
-	 */
-	private function createFolder()
-	{
-		// Check if the log folder exists, create it if not.
-		if (!is_dir($this->currentLogFolder)) {
-			$old = umask(0777);
-			if (!mkdir($this->currentLogFolder)) {
-				throw new LoggerException('Unable to create log file folder ' . $this->currentLogFolder);
-			}
-			chmod($this->currentLogFolder, 0777);
-			umask($old);
-		}
-	}
-
-	/**
-	 * Initiate a log file.
-	 *
-	 * @access private
-	 * @throws LoggerException
-	 */
-	private function initiateLog()
-	{
-		if (!is_file($this->logPath)) {
-			if (!file_put_contents(
-					$this->logPath,
-					'[' . $this->getDate() . '] [INIT]   [Initiating new log file.]' . PHP_EOL)
-			) {
-				throw new LoggerException('Unable to create new log file ' . $this->logPath);
-			}
-			chmod($this->logPath, 0664);
-		}
-	}
-
-	/**
-	 * Rotate log file if it exceeds a certain size.
-	 *
-	 * @access private
-	 */
-	private function rotateLog()
-	{
-		// Check if we need to rotate the log if it exceeds max size..
-		$logSize = filesize($this->logPath);
-		if ($logSize === false) {
-			return;
-		} else if ($logSize >= ($this->maxLogSize * 1024 * 1024)) {
-			$this->closeFile();
-			$this->compressLog();
-			$this->initiateLog();
-			$this->pruneLogs();
-			$this->openFile();
-		}
-	}
-
-	/**
-	 * Compress the old log using GZip.
-	 *
-	 * @access private
-	 */
-	private function compressLog()
-	{
-		$handle = @fopen($this->logPath, 'rb');
-		$zipHandle = @gzopen(str_replace('.log', '', $this->logPath) . '.' . time() . '.gz', 'w6');
-		if (!$handle || !$zipHandle) {
-			return;
-		}
-
-		while (!feof($handle)) {
-			$data = @fread($handle, 32768);
-			@gzwrite($zipHandle, $data);
-		}
-
-		@fclose($handle);
-		@gzclose($zipHandle);
-
-		// Delete the original uncompressed log file.
-		unlink($this->logPath);
-	}
-
-	/**
-	 * Delete old logs (if we have more than $this->maxLogs).
-	 *
-	 * @access private
-	 */
-	private function pruneLogs()
-	{
-		// Get all the logs with the name.
-		$logs = glob(str_replace('.log', '', $this->logPath) . '.[0-9]*.gz');
-
-		// If there are no old logs or less than maxLogs return false.
-		if (!$logs || (count($logs) < $this->maxLogs)) {
-			return;
-		}
-
-		// Sort the logs alphabetically, so the oldest ones are at the top, the new at the bottom.
-		asort($logs);
-
-		// Remove all new logs from array (all elements under the last 51 elements of the array).
-		array_splice($logs, -$this->maxLogs+1);
-
-		// Delete all the logs left in the array.
-		array_map('unlink', $logs);
-	}
-
-	/**
 	 * Echo log message to CLI or web.
 	 *
 	 * @access private
@@ -623,7 +441,7 @@ class Logger
 
 		// Check if this is CLI or web.
 		if ($this->outputCLI) {
-			echo $this->colorCLI->debug($this->logMessage);
+			ColorCLI::doEcho(ColorCLI::debug($this->logMessage));
 		} else {
 			echo '<pre>' . $this->logMessage . '</pre><br />';
 		}
