@@ -6,7 +6,8 @@
   ],
   "autoload": {
     "files": [
-      "app/libraries/laravel/framework/src/Illuminate/Support/helpers.php"
+      "app/libraries/laravel/framework/src/Illuminate/Support/helpers.php",
+      "app/extensions/helper/helpers.php"
     ],
     "psr-4": {
       "nntmux\\": "nntmux/"
@@ -143,7 +144,8 @@
     "monolog/monolog": "^1.22",
     "aharen/omdbapi": "^2.0",
     "vlucas/phpdotenv": "^2.4",
-    "laravel/framework": "^5.4"
+    "laravel/framework": "^5.4",
+    "fabpot/goutte": "^3.2"
   },
 
   "require-dev": {

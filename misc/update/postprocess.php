@@ -37,9 +37,9 @@ $bool = array(
 	'false'
 );
 
-if (!isset($argv[1]) || !in_array($argv[1], $args) || !isset($argv[2]) || !in_array($argv[2], $bool)) {
+if (!isset($argv[1]) || !in_array($argv[1], $args, false) || !isset($argv[2]) || !in_array($argv[2], $bool, false)) {
 	exit(
-	$pdo->log->error(
+	\nntmux\ColorCLI::error(
 		"\nIncorrect arguments.\n"
 		. "The second argument (true/false) determines wether to echo or not.\n\n"
 		. "php postprocess.php all true         ...: Does all the types of post processing.\n"
@@ -65,12 +65,12 @@ if (!isset($argv[1]) || !in_array($argv[1], $args) || !isset($argv[2]) || !in_ar
 $nntp = null;
 if ($args[$argv[1]] === true) {
 	$nntp = new NNTP(['Settings' => $pdo]);
-	if ((Settings::value('..alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
-		exit($pdo->log->error("Unable to connect to usenet." . PHP_EOL));
+	if ((Settings::value('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+		exit($pdo->log->error('Unable to connect to usenet.' . PHP_EOL));
 	}
 }
 
-$postProcess = new PostProcess(['Settings' => $pdo, 'Echo' => ($argv[2] === 'true' ? true : false)]);
+$postProcess = new PostProcess(['Settings' => $pdo, 'Echo' => $argv[2] === 'true' ? true : false]);
 
 $charArray = ['a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'];
 
@@ -87,7 +87,7 @@ switch ($argv[1]) {
 		}
 		break;
 	case 'additional':
-		$postProcess->processAdditional($nntp, '', (isset($argv[3]) && in_array($argv[3], $charArray) ? $argv[3] : ''));
+		$postProcess->processAdditional($nntp, '', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
 		break;
 	case 'amazon':
 		$postProcess->processBooks();
@@ -109,10 +109,10 @@ switch ($argv[1]) {
 		$postProcess->processGames();
 		break;
 	case 'nfo':
-		$postProcess->processNfos($nntp, '', (isset($argv[3]) && in_array($argv[3], $charArray) ? $argv[3] : ''));
+		$postProcess->processNfos($nntp, '', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
 		break;
 	case 'movies':
-		$postProcess->processMovies('', (isset($argv[3]) && in_array($argv[3], $charArray) ? $argv[3] : ''));
+		$postProcess->processMovies('', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
 		break;
 	case 'music':
 		$postProcess->processMusic();
@@ -126,7 +126,7 @@ switch ($argv[1]) {
 		$postProcess->processSpotnab();
 		break;
 	case 'tv':
-		$postProcess->processTv('', (isset($argv[3]) && in_array($argv[3], $charArray) ? $argv[3] : ''));
+		$postProcess->processTv('', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
 		break;
 	case 'xxx':
 		$postProcess->processXXX();

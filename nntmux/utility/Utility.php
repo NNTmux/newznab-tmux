@@ -413,7 +413,7 @@ class Utility
 		if ($verify && NN_SSL_VERIFY_HOST && (!empty(NN_SSL_CAFILE) || !empty(NN_SSL_CAPATH))) {
 			$options += [
 				CURLOPT_SSL_VERIFYPEER => (bool)NN_SSL_VERIFY_PEER,
-				CURLOPT_SSL_VERIFYHOST => (NN_SSL_VERIFY_HOST ? 2 : 0),
+				CURLOPT_SSL_VERIFYHOST => NN_SSL_VERIFY_HOST ? 2 : 0,
 			];
 			if (!empty(NN_SSL_CAFILE)) {
 				$options += [CURLOPT_CAINFO => NN_SSL_CAFILE];
@@ -466,24 +466,24 @@ class Utility
 		switch ($options['language']) {
 			case 'fr':
 			case 'fr-fr':
-				$options['language'] = "fr-fr";
+				$options['language'] = 'fr-fr';
 				break;
 			case 'de':
 			case 'de-de':
-				$options['language'] = "de-de";
+				$options['language'] = 'de-de';
 				break;
 			case 'en-us':
-				$options['language'] = "en-us";
+				$options['language'] = 'en-us';
 				break;
 			case 'en-gb':
-				$options['language'] = "en-gb";
+				$options['language'] = 'en-gb';
 				break;
 			case '':
 			case 'en':
 			default:
 				$options['language'] = 'en';
 		}
-		$header[] = "Accept-Language: " . $options['language'];
+		$header[] = 'Accept-Language: ' . $options['language'];
 		if (is_array($options['requestheaders'])) {
 			$header += $options['requestheaders'];
 		}
@@ -526,9 +526,9 @@ class Utility
 
 		if ($err !== 0) {
 			return false;
-		} else {
-			return $buffer;
 		}
+
+		return $buffer;
 	}
 
 

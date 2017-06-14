@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f2aa144131a6fb8b3d72a01fc6bed139",
+    "content-hash": "c400d847c0aca8f687814725c5590f42",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -2080,6 +2080,55 @@
                 "rest"
             ],
             "time": "2017-02-24T10:12:27+00:00"
+        },
+        {
+            "name": "fabpot/goutte",
+            "version": "v3.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FriendsOfPHP/Goutte.git",
+                "reference": "db5c28f4a010b4161d507d5304e28a7ebf211638"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FriendsOfPHP/Goutte/zipball/db5c28f4a010b4161d507d5304e28a7ebf211638",
+                "reference": "db5c28f4a010b4161d507d5304e28a7ebf211638",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.0",
+                "php": ">=5.5.0",
+                "symfony/browser-kit": "~2.1|~3.0",
+                "symfony/css-selector": "~2.1|~3.0",
+                "symfony/dom-crawler": "~2.1|~3.0"
+            },
+            "type": "application",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Goutte\\": "Goutte"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "A simple PHP Web Scraper",
+            "homepage": "https://github.com/FriendsOfPHP/Goutte",
+            "keywords": [
+                "scraper"
+            ],
+            "time": "2017-01-03T13:21:43+00:00"
         },
         {
             "name": "fxp/composer-asset-plugin",
