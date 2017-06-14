@@ -103,9 +103,9 @@ class DnzbFailures
 	 *
 	 * @param string $guid
 	 * @param string $userid
-	 * @return string
+	 * @return string|array
 	 */
-	public function getAlternate($guid, $userid): string
+	public function getAlternate($guid, $userid)
 	{
 		$rel = $this->pdo->queryOneRow(
 			sprintf('
