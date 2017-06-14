@@ -229,16 +229,16 @@ class Hotmovies extends AdultMovies
 	 */
 	protected function genres()
 	{
-
 		$genres = [];
-		foreach ($this->_html->find('span[itemprop=genre]') as $e) {
-			if (strpos($e->innertext, ' -> ') !== false) {
-				$e = explode(' -> ', $e->plaintext);
-				$genres[] = $e;
+		if ($ret = $this->_html->find('div.categories',0)) {
+			foreach ($ret->find('a') as $e) {
+				if (strpos($e->title, '->') !== false) {
+					$e = explode('->', $e->plaintext);
+					$genres[] = trim($e[1]);
+				}
 			}
+			$this->_res['genres'] = $genres;
 		}
-		$this->_res['genres'] = $genres;
-
 		return $this->_res;
 	}
 

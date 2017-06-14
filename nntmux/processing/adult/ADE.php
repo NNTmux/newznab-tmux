@@ -261,8 +261,12 @@ class ADE extends AdultMovies
 		}
 		return false;
 	}
+
 	/**
 	 * Searches xxx name.
+	 *
+	 * @param string $movie
+	 *
 	 * @return bool - True if releases has 90% match, else false
 	 */
 	public function processSite($movie): bool

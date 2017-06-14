@@ -1,4 +1,5 @@
 <?php
+
 namespace nntmux\processing\adult;
 
 class AEBN extends AdultMovies
@@ -20,12 +21,14 @@ class AEBN extends AdultMovies
 
 	/**
 	 * Direct Url in getAll method
+	 *
 	 * @var string
 	 */
 	protected $_directUrl = '';
 
 	/**
 	 * Simple Html Dom Object
+	 *
 	 * @var \simple_html_dom
 	 */
 	protected $_html;
@@ -47,18 +50,19 @@ class AEBN extends AdultMovies
 	 * @var array
 	 */
 	protected static $res = [
-		'backcover'		=> [],
-		'boxcover'		=> [],
-		'cast'			=> [],
-		'director'		=> [],
-		'genres'		=> [],
-		'productinfo'	=> [],
-		'synopsis'		=> [],
-		'trailers'		=> ['url' =>[]],
+		'backcover'   => [],
+		'boxcover'    => [],
+		'cast'        => [],
+		'director'    => [],
+		'genres'      => [],
+		'productinfo' => [],
+		'synopsis'    => [],
+		'trailers'    => ['url' => []],
 	];
 
 	/**
 	 * Sets title in getAll method
+	 *
 	 * @var string
 	 */
 	protected $_title = '';
@@ -106,6 +110,7 @@ class AEBN extends AdultMovies
 			self::$res['boxcover'] = str_ireplace('160w.jpg', 'xlf.jpg', $ret);
 			self::$res['backcover'] = str_ireplace('160w.jpg', 'xlb.jpg', $ret);
 		}
+
 		return self::$res;
 	}
 
@@ -122,6 +127,7 @@ class AEBN extends AdultMovies
 			}
 		}
 		self::$res['genres'] = array_unique(self::$res['genres']);
+
 		return self::$res;
 	}
 
@@ -214,33 +220,29 @@ class AEBN extends AdultMovies
 		$this->_response = getRawHtml(self::AEBNSURL . $this->_trailerUrl, $this->cookie);
 		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
-			$count = count($this->_html->find('div.movie'));
 			$i = 1;
-			while ($count >= $i) {
-				foreach ($this->_html->find('div.movie') as $mov) {
-					$string = 'a#FTSMovieSearch_link_title_detail_' . $i;
-					if ($ret = $mov->find($string, 0)) {
-						$title = str_replace('/XXX/', '', $ret->title);
-						$title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
-						$title = trim($title);
-						similar_text(strtolower($mov), strtolower($title), $p);
-						if ($p >= 90) {
-							$this->_title = trim($ret->title);
-							$this->_trailerUrl = html_entity_decode($ret->href);
-							$this->_directUrl = self::AEBNSURL . self::TRAILINGSEARCH . urlencode($movie);
-							$this->_html->clear();
-							unset($this->_response);
-							$this->_response = getRawHtml($this->_directUrl, $this->cookie);
-							$this->_html->load($this->_response);
-							return true;
-						}
-						continue;
-					}
-					$i++;
-				}
-			}
+			foreach ($this->_html->find('div.movie') as $mov) {
+				$string = 'a#FTSMovieSearch_link_title_detail_' . $i;
+				if ($ret = $mov->find($string, 0)) {
+					$title = str_replace('/XXX/', '', $ret->title);
+					$title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
+					$title = trim($title);
+					similar_text(strtolower($mov), strtolower($title), $p);
+					if ($p >= 90) {
+						$this->_title = trim($ret->title);
+						$this->_trailerUrl = html_entity_decode($ret->href);
+						$this->_directUrl = self::AEBNSURL . self::TRAILINGSEARCH . urlencode($movie);
+						$this->_html->clear();
+						unset($this->_response);
+						$this->_response = getRawHtml($this->_directUrl, $this->cookie);
+						$this->_html->load($this->_response);
 
-			return false;
+						return true;
+					}
+					continue;
+				}
+				$i++;
+			}
 		}
 
 		return false;

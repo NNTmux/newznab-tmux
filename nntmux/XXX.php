@@ -747,20 +747,21 @@ class XXX
 					$check = $this->checkXXXInfoExists($this->currentTitle);
 					if ($check === false) {
 						$this->currentRelID = $arr['id'];
-						$movieName = $this->currentTitle;
 						if ($this->debug && $this->echooutput) {
 							ColorCLI::doEcho('DB name: ' . $arr['searchname'], true);
 						}
 						if ($this->echooutput) {
-							ColorCLI::doEcho(ColorCLI::primaryOver('Looking up: ') . ColorCLI::headerOver($movieName), true);
+							ColorCLI::doEcho(ColorCLI::primaryOver('Looking up: ') . ColorCLI::headerOver($this ->currentTitle), true);
 						}
 
-						$idcheck = $this->updateXXXInfo($movieName);
+						ColorCLI::doEcho(ColorCLI::info('Local match not found, checking web!'), true);
+						$idcheck = $this->updateXXXInfo($this->currentTitle);
 					} else {
+						ColorCLI::doEcho(ColorCLI::info('Local match found for XXX Movie: ' . ColorCLI::headerOver($this->currentTitle)), true);
 						$idcheck = (int)$check['id'];
 					}
 				} else {
-					ColorCLI::doEcho('.');
+					ColorCLI::doEcho('.', true);
 				}
 				$this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE id = %d %s', $idcheck, $arr['id'], $this->catWhere));
 			}
@@ -778,7 +779,7 @@ class XXX
 	 */
 	protected function checkXXXInfoExists($releaseName)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT id, title FROM xxxinfo WHERE title %s', $this->pdo->likeString($releaseName, false, true)));
+		return $this->pdo->queryOneRow(sprintf('SELECT id, title FROM xxxinfo WHERE title %s', $this->pdo->likeString($releaseName, true, true)));
 	}
 
 	/**
