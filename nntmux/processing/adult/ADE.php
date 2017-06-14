@@ -34,7 +34,7 @@ class ADE extends AdultMovies
 	 *
 	 * @var string
 	 */
-	protected $_directUrl = "";
+	protected $_directUrl = '';
 
 	/**
 	 * If a url is found that matches the keyword
@@ -47,7 +47,7 @@ class ADE extends AdultMovies
 	 *
 	 * @var string
 	 */
-	protected $_title = "";
+	protected $_title = '';
 
 	/** Trailing urls */
 	protected $_dvdQuery = '/dvd/search?q=';
@@ -70,19 +70,6 @@ class ADE extends AdultMovies
 	{
 		parent::__construct($options);
 		$this->_html = new \simple_html_dom();
-		$this->_edithtml = new \simple_html_dom();
-	}
-
-	/**
-	 *
-	 * Remove from memory if they were not removed
-	 *
-	 */
-	public function __destruct()
-	{
-		$this->_html->clear();
-		$this->_edithtml->clear();
-		unset($this->_response, $this->_tmpResponse);
 	}
 
 	/**
@@ -91,7 +78,7 @@ class ADE extends AdultMovies
 	 */
 	public function trailers()
 	{
-		$this->_response = getRawHtml($this->_trailers . $this->_directUrl);
+		$this->_response = getRawHtml(self::ADE . $this->_trailers . $this->_directUrl);
 		$this->_html->load($this->_response);
 		if (preg_match("/(\"|')(?P<swf>[^\"']+.swf)(\"|')/i", $this->_response, $matches)) {
 			$this->_res['trailers']['url'] = self::ADE . trim(trim($matches['swf']), '"');
@@ -108,8 +95,6 @@ class ADE extends AdultMovies
 				$this->_res['trailers']['baseurl'] = $matches['baseurl'];
 			}
 		}
-		unset($matches);
-		$this->_html->clear();
 
 		return $this->_res;
 	}
@@ -135,8 +120,9 @@ class ADE extends AdultMovies
 	 */
 	public function synopsis()
 	{
-		if ($ret = $this->_html->find('meta[name="og:description"]', 0)->content()) {
-			$this->_res['synopsis'] = trim($ret->innertext);
+		$ret = $this->_html->find('meta[name=og:description]', 0)->content;
+		if ($ret !== false) {
+			$this->_res['synopsis'] = trim($ret);
 		}
 
 		return $this->_res;
@@ -145,34 +131,16 @@ class ADE extends AdultMovies
 	/**
 	 * Gets the cast members and/or awards
 	 *
-	 * @param bool $awards - Include Awards? true/false
 	 *
 	 * @return array - cast, awards
 	 */
-	public function cast($awards = false)
+	public function cast()
 	{
-		$this->_tmpResponse = str_ireplace('Section Cast', 'scast', $this->_response);
-		$this->_edithtml->load($this->_tmpResponse);
-
-
-		if ($ret = $this->_edithtml->find('div[class=scast]', 0)) {
-			$this->_tmpResponse = trim($ret->outertext);
-			$ret = $this->_edithtml->load($this->_tmpResponse);
-			foreach ($ret->find('a.PerformerName') as $a) {
+			foreach ($this->_html->find('a.PerformerName') as $a) {
 				if ($a->plaintext !== '(bio)' && $a->plaintext !== '(interview)') {
-					$this->_res['cast'][] = trim($a->plaintext);
+					$this->_res['cast'][] = trim($a->innertext);
 					}
 				}
-			}
-			if ($awards === true) {
-				if ($ret->find('ul', 1)) {
-					foreach ($ret->find('ul', 1)->find('li, strong') as $li) {
-						$this->_res['awards'][] = trim($li->plaintext);
-					}
-				}
-			}
-			$this->_edithtml->clear();
-			unset($ret, $this->_tmpResponse);
 
 		return $this->_res;
 	}
@@ -184,28 +152,22 @@ class ADE extends AdultMovies
 	public function genres()
 	{
 		$genres = [];
-		$this->_tmpResponse = str_ireplace('Section Categories', 'scat', $this->_response);
-		$this->_edithtml->load($this->_tmpResponse);
-		if ($ret = $this->_edithtml->find('div[class=scat]', 0)) {
-			$ret = $ret->find('p', 0);
-			$this->_tmpResponse = trim($ret->outertext);
-			$ret = $this->_edithtml->load($this->_tmpResponse);
-
-			foreach ($ret->find('a') as $categories) {
-				$categories = trim($categories->plaintext);
-				if (strpos($categories, ',') !== false) {
-					$genres = explode(',', $categories);
-					$genres = array_map('trim', $genres);
-				} else {
-					$genres[] = $categories;
+		$ret = $this->_html->find('h2[border-bottom-site-default]');
+			foreach ($ret as $categories) {
+				$cats = $categories->find('a[label]');
+				foreach ($cats as $c) {
+					$categories = trim($c);
+					if (strpos($categories, ',') !== false) {
+						$genres = explode(',', $categories);
+						$genres = array_map('trim', $genres);
+					} else {
+						$genres[] = $categories;
+					}
 				}
 			}
 			if (is_array($genres)) {
 				$this->_res['genres'] = array_unique($genres);
 			}
-		}
-		$this->_edithtml->clear();
-		unset($this->_tmpResponse, $ret);
 		return $this->_res;
 	}
 
@@ -220,10 +182,10 @@ class ADE extends AdultMovies
 	{
 		$dofeature = null;
 		$this->_tmpResponse = str_ireplace('Section ProductInfo', 'spdinfo', $this->_response);
-		$this->_edithtml->load($this->_tmpResponse);
-		if ($ret = $this->_edithtml->find('div[class=spdinfo]', 0)) {
+		$this->_html->load($this->_tmpResponse);
+		if ($ret = $this->_html->find('div[class=spdinfo]', 0)) {
 			$this->_tmpResponse = trim($ret->outertext);
-			$ret                = $this->_edithtml->load($this->_tmpResponse);
+			$ret                = $this->_html->load($this->_tmpResponse);
 			foreach ($ret->find("text") as $strong) {
 				if (trim($strong->innertext) === 'Features') {
 					$dofeature = true;
@@ -243,23 +205,8 @@ class ADE extends AdultMovies
 			array_shift($this->_res['productinfo']);
 			$this->_res['productinfo'] = array_chunk($this->_res['productinfo'], 2, false);
 		}
-		$this->_edithtml->clear();
-		unset($this->_tmpResponse, $ret);
 
 		return $this->_res;
-	}
-
-	/**
-	 * Gets the direct link information and returns it
-	 * @return array|bool
-	 */
-	public function getDirect()
-	{
-		if (!empty($this->directLink) && $this->getRawHtml() !== false) {
-			$this->_html->load($this->_response);
-			return $this->getAll();
-		}
-		return false;
 	}
 
 	/**
@@ -274,22 +221,26 @@ class ADE extends AdultMovies
 		if (empty($movie)) {
 			return false;
 		}
-		$this->_response = getRawHtml($this->_dvdQuery . rawurlencode($movie));
+		$this->_response = getRawHtml(self::ADE . $this->_dvdQuery . rawurlencode($movie));
 		if ($this->_response !== false) {
 			$this->_html->load($this->_response);
-			if ($ret = $this->_html->find('div[id=boxcover]', 0)) {
-				$title = $ret->title;
-				$title = str_replace('/XXX/', '', $title);
-				$title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
-				$ret   = (string)trim($ret->href);
-				similar_text(strtolower($movie), strtolower($title), $p);
-				if ($p >= 90) {
-					$this->_urlFound  = $ret;
-					$this->_directUrl = self::ADE . $ret;
-					$this->_title     = trim($title);
-					$this->_response = getRawHtml($this->_directUrl);
-					$this->_html->load($this->_response);
-					return true;
+			if ($res = $this->_html->find('a[class=boxcover]')) {
+				foreach ($res as $ret) {
+					$title = $ret->title;
+					$title = str_replace('/XXX/', '', $title);
+					$title = preg_replace('/\(.*?\)|[-._]/', ' ', $title);
+					$url = (string)trim($ret->href);
+					similar_text(strtolower($movie), strtolower($title), $p);
+					if ($p >= 90) {
+						$this->_directUrl = self::ADE . $url;
+						$this->_title = trim($title);
+						$this->_html->clear();
+						unset($this->_response);
+						$this->_response = getRawHtml($this->_directUrl);
+						$this->_html->load($this->_response);
+						return true;
+					}
+					continue;
 				}
 				return false;
 			}
@@ -310,14 +261,14 @@ class ADE extends AdultMovies
 			$results['directurl'] = $this->_directUrl;
 			$results['title']     = $this->_title;
 		}
-		if (is_array($this->synopsis(true))) {
-			$results = array_merge($results, $this->synopsis(true));
+		if (is_array($this->synopsis())) {
+			$results = array_merge($results, $this->synopsis());
 		}
 		if (is_array($this->productInfo(true))) {
 			$results = array_merge($results, $this->productInfo(true));
 		}
-		if (is_array($this->cast(true))) {
-			$results = array_merge($results, $this->cast(true));
+		if (is_array($this->cast())) {
+			$results = array_merge($results, $this->cast());
 		}
 		if (is_array($this->genres())) {
 			$results = array_merge($results, $this->genres());

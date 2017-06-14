@@ -232,8 +232,8 @@ class Hotmovies extends AdultMovies
 		$genres = [];
 		if ($ret = $this->_html->find('div.categories',0)) {
 			foreach ($ret->find('a') as $e) {
-				if (strpos($e->title, '->') !== false) {
-					$e = explode('->', $e->plaintext);
+				if (strpos($e->title, ' -> ') !== false) {
+					$e = explode(' -> ',$e->plaintext);
 					$genres[] = trim($e[1]);
 				}
 			}
@@ -289,7 +289,7 @@ class Hotmovies extends AdultMovies
 							$this->_directUrl = trim($ret->href);
 							$this->_html->clear();
 							unset($this->_response);
-							if (!empty($this->_getLink)) {
+							if ($this->_getLink !== false) {
 								$this->_response = getRawHtml($this->_getLink, $this->cookie);
 								$this->_html->load($this->_response);
 							} else {
