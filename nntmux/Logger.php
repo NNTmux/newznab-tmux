@@ -51,11 +51,9 @@ class Logger
 	private $severity = '';
 
 	/**
-	 * Class instance of colorCLI
-	 * @var object
-	 * @access private
+	 * @var MonoLogger
 	 */
-	private $colorCLI;
+	private $logger;
 
 	/**
 	 * Should we echo to CLI or web?
