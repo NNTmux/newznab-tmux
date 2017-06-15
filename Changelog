@@ -1,3 +1,5 @@
+2017-06-15 DariusIII
+	* Fix: Fix collection regexes testing page
 2017-06-14 DariusIII
 	* Chg: Use monolog/monolog to handle logging
 	* Chg: Update composer libraries
