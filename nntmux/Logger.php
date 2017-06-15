@@ -200,7 +200,7 @@ class Logger
 		) . '.log';
 
 		$this->outputCLI = (strtolower(PHP_SAPI) === 'cli');
-		$this->isWindows = (strtolower(substr(PHP_OS, 0, 3)) === 'win');
+		$this->isWindows = stripos(PHP_OS, 'win') === 0;
 		$this->timeStart = time();
 
 		$this->logger = new MonoLogger('nntmux');
