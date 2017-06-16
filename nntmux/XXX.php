@@ -4,7 +4,6 @@ namespace nntmux;
 
 use app\models\Settings;
 use nntmux\db\DB;
-use nntmux\processing\adult\AdultMovies;
 use nntmux\processing\adult\AEBN;
 use nntmux\processing\adult\ADM;
 use nntmux\processing\adult\ADE;
@@ -682,7 +681,7 @@ class XXX
 		if ($check === false) {
 			$xxxID = $this->pdo->queryInsert(
 				sprintf('
-					INSERT IGNORE INTO xxxinfo
+					INSERT INTO xxxinfo
 						(title, tagline, plot, genre, director, actors, extras, productinfo, trailers, directurl, classused, cover, backdrop, createddate, updateddate)
 					VALUES
 						(%s, %s, COMPRESS(%s), %s, %s, %s, %s, %s, %s, %s, %s, 0, 0, NOW(), NOW())',
