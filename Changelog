@@ -1,3 +1,5 @@
+2017-06-16 DariusIII
+	* Chg: Add more debugging output to DbUpdate class and install_nntmux script
 2017-06-15 DariusIII
 	* Fix: Fix collection regexes testing page
 2017-06-14 DariusIII
