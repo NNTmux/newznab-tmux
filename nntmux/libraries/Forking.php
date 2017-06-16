@@ -602,6 +602,7 @@ class Forking extends \fork_daemon
 						$this->work[] = ['id' => $group['id']];
 					}
 				} catch (\PDOException $e) {
+					$e->getMessage();
 				}
 			}
 		}

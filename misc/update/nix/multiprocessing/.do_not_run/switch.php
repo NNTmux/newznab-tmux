@@ -327,7 +327,8 @@ function collectionCheck(&$pdo, $groupID)
 		if ($pdo->queryOneRow(sprintf('SELECT id FROM collections_%d LIMIT 1', $groupID)) === false) {
 			exit();
 		}
-	} catch (\PDOException $e) {
+	} catch (PDOException $e) {
+		$e->getMessage();
 	}
 }
 
