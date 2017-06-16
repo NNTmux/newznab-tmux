@@ -601,7 +601,7 @@ class Forking extends \fork_daemon
 					if ($this->pdo->queryOneRow(sprintf('SELECT id FROM collections_%d  LIMIT 1', $group['id'])) !== false) {
 						$this->work[] = ['id' => $group['id']];
 					}
-				} catch (\Exception $e) {
+				} catch (\PDOException $e) {
 				}
 			}
 		}
