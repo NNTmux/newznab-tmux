@@ -654,22 +654,24 @@ class XXX
 			$xxxID = $check['id'];
 		}
 
+		// BoxCover.
+		$cover = 0;
+		if (isset($mov['cover'])) {
+			$cover = $this->releaseImage->saveImage($xxxID . '-cover', $mov['cover'], $this->imgSavePath);
+		}
+
+		// BackCover.
+		$backdrop = 0;
+		if (isset($mov['backdrop'])) {
+			$backdrop = $this->releaseImage->saveImage($xxxID . '-backdrop', $mov['backdrop'], $this->imgSavePath, 1920, 1024);
+		}
+
 		// Update Current XXX Information
 		if ($xxxID > 0) {
 			$this->update($check['id'], $mov['title'], $mov['tagline'], $mov['plot'], $mov['genre'], $mov['director'], $mov['actors'], $mov['extras'], $mov['productinfo'], $mov['trailers'], $mov['directurl'], $mov['classused']);
 			$xxxID = $check['id'];
 
-			// BoxCover.
-			if (isset($mov['cover'])) {
-				$mov['cover'] = $this->releaseImage->saveImage($xxxID . '-cover', $mov['cover'], $this->imgSavePath);
-			}
-
-			// BackCover.
-			if (isset($mov['backdrop'])) {
-				$mov['backdrop'] = $this->releaseImage->saveImage($xxxID . '-backdrop', $mov['backdrop'], $this->imgSavePath, 1920, 1024);
-			}
-
-			$this->pdo->queryExec(sprintf('UPDATE xxxinfo SET cover = %d, backdrop = %d  WHERE id = %d', $mov['cover'], $mov['backdrop'], $xxxID));
+			$this->pdo->queryExec(sprintf('UPDATE xxxinfo SET cover = %d, backdrop = %d  WHERE id = %d', $cover, $backdrop, $xxxID));
 
 		} else {
 			$xxxID = -2;
@@ -682,7 +684,7 @@ class XXX
 					INSERT INTO xxxinfo
 						(title, tagline, plot, genre, director, actors, extras, productinfo, trailers, directurl, classused, cover, backdrop, createddate, updateddate)
 					VALUES
-						(%s, %s, COMPRESS(%s), %s, %s, %s, %s, %s, %s, %s, %s, 0, 0, NOW(), NOW())',
+						(%s, %s, COMPRESS(%s), %s, %s, %s, %s, %s, %s, %s, %s, %d, %d, NOW(), NOW())',
 					$this->pdo->escapeString($mov['title']),
 					$this->pdo->escapeString($mov['tagline']),
 					$this->pdo->escapeString($mov['plot']),
@@ -693,14 +695,16 @@ class XXX
 					$this->pdo->escapeString($mov['productinfo']),
 					$this->pdo->escapeString($mov['trailers']),
 					$this->pdo->escapeString($mov['directurl']),
-					$this->pdo->escapeString($mov['classused'])
+					$this->pdo->escapeString($mov['classused']),
+					$cover,
+					$backdrop
 				)
 			);
 		}
 
 		if ($this->echooutput) {
 			ColorCLI::doEcho(
-				ColorCLI::headerOver(($xxxID !== false ? 'Added XXX movie: ' . ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: ' . ColorCLI::primary($mov['title'])))
+				ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: ' . ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: ' . ColorCLI::primary($mov['title'])))
 			);
 		}
 
