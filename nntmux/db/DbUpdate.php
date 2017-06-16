@@ -127,11 +127,13 @@ class DbUpdate
 							$file = str_replace("\\", '\/', $file);
 						}
 						$this->pdo->queryExec(sprintf($sql, $file, $table, $fields));
-						$success = $this->pdo->query(sprintf('SELECT COUNT(id) AS num FROM %s', $table));
-						if (empty($success[0]['num'])) {
-							ColorCLI::doEcho(ColorCLI::error('Failed to insert data into table: ' . $table ));
-						} else {
-							ColorCLI::doEcho(ColorCLI::notice('Successfully inserted data into ' . $table . ' table'));
+						if ($table !== 'settings') {
+							$success = $this->pdo->query(sprintf('SELECT COUNT(id) AS num FROM %s', $table));
+							if (empty($success[0]['num'])) {
+								ColorCLI::doEcho(ColorCLI::error('Failed to insert data into table: ' . $table));
+							} else {
+								ColorCLI::doEcho(ColorCLI::notice('Successfully inserted data into ' . $table . ' table'));
+							}
 						}
 					} else {
 						exit("Failed to open file: '$file'\n");
