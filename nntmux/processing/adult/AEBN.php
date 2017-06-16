@@ -102,7 +102,8 @@ class AEBN extends AdultMovies
 	 */
 	protected function covers()
 	{
-		if ($ret = $this->_html->find('div#md-boxCover, img[itemprop=thumbnailUrl]', 1)) {
+		$ret = $this->_html->find('div#md-boxCover, img[itemprop=thumbnailUrl]', 1);
+		if ($ret !== false) {
 			$ret = trim($ret->src);
 			if (strpos($ret, '//') === 0) {
 				$ret = 'http:' . $ret;
