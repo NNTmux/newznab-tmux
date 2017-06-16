@@ -584,7 +584,7 @@ class XXX
 		}
 
 		if ($res === false) {
-			$this->whichclass = 'hotmovies';
+			$this->whichclass = 'hotm';
 			$mov = new Hotmovies();
 			$mov->cookie = $this->cookie;
 			ColorCLI::doEcho(ColorCLI::info('Checking HotMovies for movie info'));
@@ -618,7 +618,7 @@ class XXX
 					case 'adm':
 						$fromstr = 'Adult DVD Marketplace';
 						break;
-					case 'hotmovies':
+					case 'hotm':
 						$fromstr = 'HotMovies';
 						break;
 					default:
