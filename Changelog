@@ -1,4 +1,6 @@
 2017-06-16 DariusIII
+	* Chg: Increase xref column in collections and multigroup_collections to 1024 and change classused
+		in xxxinfo table to varchar(20) and empty default value
 	* Chg: Remove getXXXSamples script from tmux loop as it serves no purpose anymore
 	* Chg: Add more debugging output to DbUpdate class and install_nntmux script
 2017-06-15 DariusIII

@@ -622,7 +622,7 @@ class XXX
 						$fromstr = 'HotMovies';
 						break;
 					default:
-						$fromstr = null;
+						$fromstr = '';
 				}
 				ColorCLI::doEcho(ColorCLI::primary('Fetching XXX info from: ' . $fromstr));
 			}
