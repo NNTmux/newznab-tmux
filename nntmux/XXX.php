@@ -628,8 +628,8 @@ class XXX
 			}
 			$res = $mov->getAll();
 		} else {
-			// Nothing was found, go ahead and set to -6
-			return AdultMovies::NO_MATCH_FOUND;
+			// Nothing was found, go ahead and set to -2
+			return -2;
 		}
 
 		$res['cast'] = !empty($res['cast']) ? implode(',', $res['cast']) : '';
@@ -675,7 +675,7 @@ class XXX
 			$this->pdo->queryExec(sprintf('UPDATE xxxinfo SET cover = %d, backdrop = %d  WHERE id = %d', $mov['cover'], $mov['backdrop'], $xxxID));
 
 		} else {
-			$xxxID = AdultMovies::NO_MATCH_FOUND;
+			$xxxID = -2;
 		}
 
 		// Insert New XXX Information
@@ -739,7 +739,7 @@ class XXX
 			// Loop over releases.
 			foreach ($res as $arr) {
 
-				$idcheck = AdultMovies::NO_MATCH_FOUND;
+				$idcheck = -2;
 
 				// Try to get a name.
 				if ($this->parseXXXSearchName($arr['searchname']) !== false) {
