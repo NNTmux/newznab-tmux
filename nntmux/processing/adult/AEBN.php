@@ -72,6 +72,8 @@ class AEBN extends AdultMovies
 	 * Sets the variables that used throughout the class
 	 *
 	 * @param array $options
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{

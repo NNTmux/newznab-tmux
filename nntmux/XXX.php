@@ -552,14 +552,12 @@ class XXX
 	}
 
 	/**
-	 * Fetch xxx info for the movie.
-	 *
 	 * @param $movie
 	 *
-	 * @return bool
+	 * @return false|int|string
 	 * @throws \Exception
 	 */
-	public function updateXXXInfo($movie): bool
+	public function updateXXXInfo($movie)
 	{
 		$this->whichclass = 'aebn';
 		$mov = new AEBN();
@@ -651,7 +649,7 @@ class XXX
 		];
 
 		$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM xxxinfo WHERE title = %s', $this->pdo->escapeString($mov['title'])));
-		$xxxID = 0;
+		$xxxID = -2;
 		if (isset($check['id'])) {
 			$xxxID = $check['id'];
 		}
@@ -702,7 +700,7 @@ class XXX
 
 		if ($this->echooutput) {
 			ColorCLI::doEcho(
-				ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: ' . ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: ' . ColorCLI::primary($mov['title'])))
+				ColorCLI::headerOver(($xxxID !== false ? 'Added XXX movie: ' . ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: ' . ColorCLI::primary($mov['title'])))
 			);
 		}
 
