@@ -323,8 +323,11 @@ function charCheck($char)
  */
 function collectionCheck(&$pdo, $groupID)
 {
-	if ($pdo->queryOneRow(sprintf('SELECT id FROM collections_%d LIMIT 1', $groupID)) === false) {
-		exit();
+	try {
+		if ($pdo->queryOneRow(sprintf('SELECT id FROM collections_%d LIMIT 1', $groupID)) === false) {
+			exit();
+		}
+	} catch (\Exception $e) {
 	}
 }
 
