@@ -1,4 +1,5 @@
 2017-06-16 DariusIII
+	* Chg: Remove getXXXSamples script from tmux loop as it serves no purpose anymore
 	* Chg: Add more debugging output to DbUpdate class and install_nntmux script
 2017-06-15 DariusIII
 	* Fix: Fix collection regexes testing page
