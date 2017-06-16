@@ -778,7 +778,7 @@ class XXX
 	 */
 	protected function checkXXXInfoExists($releaseName)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT id, title FROM xxxinfo WHERE title %s', $this->pdo->likeString($releaseName, true, true)));
+		return $this->pdo->queryOneRow(sprintf('SELECT id, title FROM xxxinfo WHERE title %s', $this->pdo->likeString($releaseName,  false, true)));
 	}
 
 	/**
