@@ -642,16 +642,6 @@
 				</div>
 			</td>
 		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="safebackfilldate">Safe Backfill Date:</label></td>
-			<td>
-				<input class="small" id="safebackfilldate" name="safebackfilldate" type="text"
-					   value="{$ftmux->safebackfilldate}"/>
-
-				<div class="hint">The target date for safe backfill. Format: YYYY-MM-DD</div>
-			</td>
-		</tr>
 	</table>
 </fieldset>
 
