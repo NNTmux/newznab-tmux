@@ -23,7 +23,7 @@
 			</li>
 			<li><a><i class="fa fa-tint"></i><span> Categories</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
-					<li><a href="{$smarty.const.WWW_TOP}/category-list.php?action=add">Edit categories</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/category-list.php?action=add">Edit Categories</a></li>
 				</ul>
 			</li>
 			<li><a><i class="fa fa-object-group"></i><span> Groups</span><span class="fa fa-chevron-down"></span></a>
