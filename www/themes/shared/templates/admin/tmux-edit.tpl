@@ -217,8 +217,7 @@
 					loop. <br \>
 					example: you have Backfill Threads = 10, Backfill Quantity = 20k, Max Messages = 5k: you will run 10
 					threads, queue of 40 and download 200k headers.<br/>
-					Interval - Backfills the number of groups (set in tmux), by backfill days (set in admin-view
-					groups), completely.<br/>
+					All - Backfills the number of groups (set in tmux), completely.<br/>
 					Newest - Sorts the group selection with the least backfill days backfilled, first.<br/>
 					Oldest - Sorts the group selection with the most backfill days backfilled, first.<br/>
 					Alphabetical - Sorts the group selection from a to z.<br/>
