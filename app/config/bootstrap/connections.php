@@ -89,7 +89,7 @@ if (!defined('NN_INSTALLER')) {
 		);
 	}
 
-	switch (getenv('DB_SYSTEM')) {
+	switch (env('DB_SYSTEM')) {
 		case 'mysql':
 			$adapter = 'MySql';
 			break;
@@ -101,10 +101,10 @@ if (!defined('NN_INSTALLER')) {
 	}
 
 	if (isset($adapter)) {
-		if (empty(getenv('DB_SOCKET'))) {
-			$host = empty(getenv('DB_PORT')) ? getenv('DB_HOST') : getenv('DB_HOST') . ':' . getenv('DB_PORT');
+		if (empty(env('DB_SOCKET'))) {
+			$host = empty(env('DB_PORT')) ? env('DB_HOST') : env('DB_HOST') . ':' . env('DB_PORT');
 		} else {
-			$host = getenv('DB_SOCKET');
+			$host = env('DB_SOCKET');
 		}
 
 		Connections::add('default',
@@ -112,9 +112,9 @@ if (!defined('NN_INSTALLER')) {
 				'type'       => 'database',
 				'adapter'    => $adapter,
 				'host'       => $host,
-				'login'      => getenv('DB_USER'),
-				'password'   => getenv('DB_PASSWORD'),
-				'database'   => getenv('DB_NAME'),
+				'login'      => env('DB_USER', 'nntmux'),
+				'password'   => env('DB_PASSWORD', 'nntmux'),
+				'database'   => env('DB_NAME', 'nntmux'),
 				'encoding'   => 'UTF-8',
 				'persistent' => false,
 			]

@@ -84,6 +84,7 @@ class DbUpdate
 	public function loadTables(array $options = [])
 	{
 		$defaults = [
+			'enclosedby'	=> null,
 			'ext'	=> 'tsv',
 			'files'	=> [],
 			'path'	=> NN_RES . 'db' . DS . 'schema' . DS . 'data',
@@ -96,8 +97,10 @@ class DbUpdate
 		$files = empty($options['files']) ? Utility::getDirFiles($options) : $options['files'];
 		natsort($files);
 		$local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
+		$enclosedby = empty($options['enclosedby']) ? '' : 'OPTIONALLY ENCLOSED BY "' .
+			$options['enclosedby'] . '"';
 		$sql = 'LOAD DATA ' .
-			$local . 'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" OPTIONALLY ENCLOSED BY "\"" LINES TERMINATED BY "\n" IGNORE 1 LINES (%s)';
+			$local . 'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" ' . $enclosedby .  'LINES TERMINATED BY "\n" IGNORE 1 LINES (%s)';
 		foreach ($files as $file) {
 			if ($show === true) {
 				echo "File: $file\n";
@@ -107,7 +110,7 @@ class DbUpdate
 				if (preg_match($options['regex'], $file, $matches)) {
 					$table = $matches['table'];
 					// Get the first line of the file which holds the columns used.
-					$handle = @fopen($file, "r");
+					$handle = @fopen($file, 'rb');
 					if (is_resource($handle)) {
 						$line = fgets($handle);
 						fclose($handle);
@@ -118,12 +121,20 @@ class DbUpdate
 						$fields = trim($line);
 
 						if ($show === true) {
-							echo "Inserting data into table: '$table'\n";
+							ColorCLI::doEcho(ColorCLI::info('Inserting data into table: ' . $table));
 						}
 						if (Utility::isWin()) {
 							$file = str_replace("\\", '\/', $file);
 						}
-						$this->pdo->exec(sprintf($sql, $file, $table, $fields));
+						$this->pdo->queryExec(sprintf($sql, $file, $table, $fields));
+						if ($table !== 'settings') {
+							$success = $this->pdo->query(sprintf('SELECT COUNT(id) AS num FROM %s', $table));
+							if (empty($success[0]['num'])) {
+								ColorCLI::doEcho(ColorCLI::error('Failed to insert data into table: ' . $table));
+							} else {
+								ColorCLI::doEcho(ColorCLI::notice('Successfully inserted data into ' . $table . ' table'));
+							}
+						}
 					} else {
 						exit("Failed to open file: '$file'\n");
 					}

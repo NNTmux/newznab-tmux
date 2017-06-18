@@ -126,7 +126,7 @@ abstract class TV extends Videos
 	 */
 	abstract protected function formatEpisodeInfo($episode): array;
 
-		/**
+	/**
 	 * Retrieve releases for TV processing
 	 * Returns a PDO Object of rows or false if none found
 	 *

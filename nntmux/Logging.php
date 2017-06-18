@@ -16,13 +16,13 @@ class Logging
 	private $newLine;
 
 	/**
-	 * @var object DB Class instance.
+	 * @var DB Class instance.
 	 * @access public
 	 */
 	public $pdo;
 
 	/**
-	 * @var object Class instance.
+	 * @var ColorCLI
 	 * @access public
 	 */
 	public $colorCLI;
@@ -51,7 +51,7 @@ class Logging
 	 *
 	 * @access public
 	 */
-	public function get()
+	public function get(): array
 	{
 		return $this->pdo->query('SELECT * FROM logging');
 	}
@@ -63,28 +63,29 @@ class Logging
 	 * @param string $host
 	 *
 	 * @return void
+	 * @throws \Exception
 	 *
 	 * @access public
 	 */
-	public function LogBadPasswd($username = '', $host = '')
+	public function LogBadPasswd($username = '', $host = ''): void
 	{
 		// If logggingopt is = 0, then we do nothing, 0 = logging off.
 		$loggingOpt = Settings::value('site.main.loggingopt');
 		$logFile = Settings::value('site.main.logfile');
-		if ($loggingOpt == '1') {
+		if ((int)$loggingOpt === 1) {
 			$this->pdo->queryInsert(sprintf('INSERT INTO logging (time, username, host) VALUES (NOW(), %s, %s)',
 				$this->pdo->escapeString($username), $this->pdo->escapeString($host)));
-		} else if ($loggingOpt == '2') {
+		} else if ((int)$loggingOpt === 2) {
 			$this->pdo->queryInsert(sprintf('INSERT INTO logging (time, username, host) VALUES (NOW(), %s, %s)',
 				$this->pdo->escapeString($username), $this->pdo->escapeString($host)));
-			$logData = date('M d H:i:s ') . "Login Failed for " . $username . " from " . $host . "." .
+			$logData = date('M d H:i:s ') . 'Login Failed for ' . $username . ' from ' . $host . '.' .
 				$this->newLine;
-			if (!empty($logFile)) {
+			if ($logFile !== null) {
 				file_put_contents($logFile, $logData, FILE_APPEND);
 			}
-		} else if ($loggingOpt == '3') {
+		} else if ((int)$loggingOpt === 3) {
 			$logData = date('M d H:i:s ') . 'Login Failed for ' . $username . ' from ' . $host . '.' . $this->newLine;
-			if (!empty($logFile)) {
+			if ($logFile !== null) {
 				file_put_contents($logFile, $logData, FILE_APPEND);
 			}
 		}
@@ -95,7 +96,7 @@ class Logging
 	 *
 	 * @access public
 	 */
-	public function getTopCombined()
+	public function getTopCombined(): array
 	{
 		return $this->pdo->query('SELECT MAX(time) AS time, username, host, COUNT(host) AS count FROM logging GROUP BY host, username ORDER BY count DESC LIMIT 10');
 	}
@@ -105,7 +106,7 @@ class Logging
 	 *
 	 * @access public
 	 */
-	public function getTopIPs()
+	public function getTopIPs(): array
 	{
 		return $this->pdo->query('SELECT MAX(time) AS time, host, COUNT(host) AS count FROM logging GROUP BY host ORDER BY count DESC LIMIT 10');
 	}

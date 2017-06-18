@@ -58,7 +58,7 @@ foreach (['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies',
 }
 
 // Set up covers paths.
-if (getenv('DB_PASSWORD') !== '') {
+if (env('DB_PASSWORD') !== '') {
 	$ri = new ReleaseImage();
 
 	$folders[$ri->audSavePath]      = [R, W];
