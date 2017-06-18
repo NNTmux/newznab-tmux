@@ -1,4 +1,5 @@
 2017-06-18 DariusIII
+	* Chg: Improve XXX releases logic
 	* Mrg: Merge PR #145 by Nightah - Admin Menu cleanup
 2017-06-16 DariusIII
 	* Chg: Catch exception when checking for existing and missing collection tables (irritating message about Base table or view not found)

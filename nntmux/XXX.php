@@ -559,6 +559,8 @@ class XXX
 	 */
 	public function updateXXXInfo($movie)
 	{
+		$cover = $backdrop = 0;
+		$xxxID = -2;
 		$this->whichclass = 'aebn';
 		$mov = new AEBN();
 		$mov->cookie = $this->cookie;
@@ -649,32 +651,23 @@ class XXX
 		];
 
 		$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM xxxinfo WHERE title = %s', $this->pdo->escapeString($mov['title'])));
-		$xxxID = -2;
-		if (isset($check['id'])) {
-			$xxxID = $check['id'];
-		}
 
-		// BoxCover.
-		$cover = 0;
-		if (isset($mov['cover'])) {
-			$cover = $this->releaseImage->saveImage($xxxID . '-cover', $mov['cover'], $this->imgSavePath);
-		}
+		if ($check['id'] > 0) {
 
-		// BackCover.
-		$backdrop = 0;
-		if (isset($mov['backdrop'])) {
-			$backdrop = $this->releaseImage->saveImage($xxxID . '-backdrop', $mov['backdrop'], $this->imgSavePath, 1920, 1024);
-		}
-
-		// Update Current XXX Information
-		if ($xxxID > 0) {
-			$this->update($check['id'], $mov['title'], $mov['tagline'], $mov['plot'], $mov['genre'], $mov['director'], $mov['actors'], $mov['extras'], $mov['productinfo'], $mov['trailers'], $mov['directurl'], $mov['classused']);
 			$xxxID = $check['id'];
 
-			$this->pdo->queryExec(sprintf('UPDATE xxxinfo SET cover = %d, backdrop = %d  WHERE id = %d', $cover, $backdrop, $xxxID));
+			// Update BoxCover.
+			if (!empty($mov['cover'])) {
+				$cover = $this->releaseImage->saveImage($xxxID . '-cover', $mov['cover'], $this->imgSavePath);
+			}
 
-		} else {
-			$xxxID = -2;
+			// BackCover.
+			if (!empty($mov['backdrop'])) {
+				$backdrop = $this->releaseImage->saveImage($xxxID . '-backdrop', $mov['backdrop'], $this->imgSavePath, 1920, 1024);
+			}
+
+			// Update Current XXX Information
+			$this->update($check['id'], $mov['title'], $mov['tagline'], $mov['plot'], $mov['genre'], $mov['director'], $mov['actors'], $mov['extras'], $mov['productinfo'], $mov['trailers'], $mov['directurl'], $mov['classused'], $cover, $backdrop);
 		}
 
 		// Insert New XXX Information
@@ -682,9 +675,9 @@ class XXX
 			$xxxID = $this->pdo->queryInsert(
 				sprintf('
 					INSERT INTO xxxinfo
-						(title, tagline, plot, genre, director, actors, extras, productinfo, trailers, directurl, classused, cover, backdrop, createddate, updateddate)
+						(title, tagline, plot, genre, director, actors, extras, productinfo, trailers, directurl, classused, createddate, updateddate)
 					VALUES
-						(%s, %s, COMPRESS(%s), %s, %s, %s, %s, %s, %s, %s, %s, %d, %d, NOW(), NOW())',
+						(%s, %s, COMPRESS(%s), %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())',
 					$this->pdo->escapeString($mov['title']),
 					$this->pdo->escapeString($mov['tagline']),
 					$this->pdo->escapeString($mov['plot']),
@@ -695,11 +688,20 @@ class XXX
 					$this->pdo->escapeString($mov['productinfo']),
 					$this->pdo->escapeString($mov['trailers']),
 					$this->pdo->escapeString($mov['directurl']),
-					$this->pdo->escapeString($mov['classused']),
-					$cover,
-					$backdrop
+					$this->pdo->escapeString($mov['classused'])
 				)
 			);
+			// Update BoxCover.
+			if (!empty($mov['cover'])) {
+				$cover = $this->releaseImage->saveImage($xxxID . '-cover', $mov['cover'], $this->imgSavePath);
+			}
+
+			// BackCover.
+			if (!empty($mov['backdrop'])) {
+				$backdrop = $this->releaseImage->saveImage($xxxID . '-backdrop', $mov['backdrop'], $this->imgSavePath, 1920, 1024);
+			}
+
+			$this->pdo->queryExec(sprintf('UPDATE xxxinfo SET cover = %d, backdrop = %d WHERE id = %d', $cover, $backdrop, $xxxID));
 		}
 
 		if ($this->echooutput) {
