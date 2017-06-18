@@ -5,7 +5,6 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 use nntmux\Regexes;
 use nntmux\Category;
 
-
 $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'category_regexes']);
 

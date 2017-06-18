@@ -6,7 +6,6 @@ use nntmux\Contents;
 use nntmux\Content;
 use nntmux\Users;
 
-
 $page     = new AdminPage();
 $contents = new Contents(['Settings' => $page->settings]);
 $id       = 0;

@@ -1,5 +1,4 @@
 <?php
-
 // Check if the user is running from CLI.
 if (PHP_SAPI === 'cli') {
 	exit('This is a web only script, run misc/testing/nzb-import.php instead.');

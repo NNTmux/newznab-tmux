@@ -23,7 +23,7 @@
 			</li>
 			<li><a><i class="fa fa-tint"></i><span> Categories</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
-					<li><a href="{$smarty.const.WWW_TOP}/category-list.php?action=add">Edit categories</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/category-list.php?action=add">Edit Categories</a></li>
 				</ul>
 			</li>
 			<li><a><i class="fa fa-object-group"></i><span> Groups</span><span class="fa fa-chevron-down"></span></a>
@@ -35,8 +35,8 @@
 			</li>
 			<li><a><i class="fa fa-registered"></i><span> Regexes</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
-					<li><a href="{$smarty.const.WWW_TOP}/category_regexes-edit.php?action=add">Add Category Regex</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/category_regexes-list.php">View category Regexes</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/category_regexes-edit.php?action=add">Add Category Regexes</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/category_regexes-list.php">View Category Regexes</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/collection_regexes-edit.php?action=add">Add Collection Regexes</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/collection_regexes-test.php?action=add">Test Collection Regexes</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/collection_regexes-list.php">View Collection Regexes</a></li>

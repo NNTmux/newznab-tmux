@@ -217,15 +217,14 @@
 					loop. <br \>
 					example: you have Backfill Threads = 10, Backfill Quantity = 20k, Max Messages = 5k: you will run 10
 					threads, queue of 40 and download 200k headers.<br/>
-					Interval - Backfills the number of groups (set in tmux), by backfill days (set in admin-view
-					groups), completely.<br/>
+					All - Backfills the number of groups (set in tmux), completely.<br/>
 					Newest - Sorts the group selection with the least backfill days backfilled, first.<br/>
 					Oldest - Sorts the group selection with the most backfill days backfilled, first.<br/>
 					Alphabetical - Sorts the group selection from a to z.<br/>
 					Alphabetical Reverse - Sorts the group selection from z to a.<br /a>
 					Most Posts - Sorts the group selection by the highest number of posts, first.<br /a>
 					Fewest Posts - Sorts the group selection by the lowest number of posts, first.<br/>
-					Backfill days - Days per Group from admin->view group or the Safe Backfill Date from admin->tmux.
+					Backfill days - Days per Group from admin->view group or the Safe Backfill Date from admin->edit group.
 				</div>
 			</td>
 		</tr>
@@ -640,16 +639,6 @@
 					will need to copy the default theme located at powerline/powerline/themes/default.sh to
 					powerline/powerline/themes/tmux.sh and edit that file for what is displayed, colors, etc.
 				</div>
-			</td>
-		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="safebackfilldate">Safe Backfill Date:</label></td>
-			<td>
-				<input class="small" id="safebackfilldate" name="safebackfilldate" type="text"
-					   value="{$ftmux->safebackfilldate}"/>
-
-				<div class="hint">The target date for safe backfill. Format: YYYY-MM-DD</div>
 			</td>
 		</tr>
 	</table>
