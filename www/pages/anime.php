@@ -59,15 +59,15 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 		$_GET['id'] :
 		'0-9';
 
-	$animetitle = (isset($_GET['title']) && !empty($_GET['title'])) ?
+	$animeTitle = (isset($_GET['title']) && !empty($_GET['title'])) ?
 		$_GET['title'] :
 		'';
 
-	if ($animetitle !== '' && !isset($_GET['id'])) {
+	if ($animeTitle !== '' && !isset($_GET['id'])) {
 		$letter = '';
 	}
 
-	$masterserieslist = $AniDB->getAnimeList($letter, $animetitle);
+	$masterserieslist = $aniDB->getAnimeList($letter, $animeTitle);
 
 	$page->title = 'Anime List';
 	$page->meta_title = 'View Anime List';
@@ -91,7 +91,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 	$page->smarty->assign('animelist', $animelist);
 	$page->smarty->assign('animerange', range('A', 'Z'));
 	$page->smarty->assign('animeletter', $letter);
-	$page->smarty->assign('animetitle', $animetitle);
+	$page->smarty->assign('animetitle', $animeTitle);
 
 	$page->content = $page->smarty->fetch('viewanimelist.tpl');
 	$page->render();
