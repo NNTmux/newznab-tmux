@@ -24,6 +24,7 @@ use \app\extensions\util\Versions;
 use \lithium\console\command\Help;
 use \nntmux\db\DbUpdate;
 use \Smarty;
+use nntmux\ColorCLI;
 
 
 /**
@@ -80,7 +81,7 @@ class Update extends Command
 	{
 		// TODO Add check to determine if the indexer or other scripts are running. Hopefully
 		// also prevent web access.
-		$this->out('Checking database version...', 'primary');
+		echo ColorCLI::primary('Checking database version...');
 
 		$versions = new Versions(['git' => ($this->git instanceof Git) ? $this->git : null]);
 
@@ -88,17 +89,17 @@ class Update extends Command
 			$currentDb = $versions->getSQLPatchFromDB();
 			$currentXML = $versions->getSQLPatchFromFile();
 		} catch (\PDOException $e) {
-			$this->out('Error fetching patch versions!', 'error');
+			echo ColorCLI::error('Error fetching patch versions!');
 			return 1;
 		}
 
-		$this->out("Db: $currentDb,\tFile: $currentXML");
+		echo ColorCLI::primary("Db: $currentDb,\tFile: $currentXML");
 
 		if ($currentDb < $currentXML) {
 			$db = new DbUpdate(['backup' => false]);
 			$db->processPatches(['safe' => false]);
 		} else {
-			$this->out('Up to date.', 'info');
+			echo ColorCLI::primary('Up to date.');
 		}
 	}
 
