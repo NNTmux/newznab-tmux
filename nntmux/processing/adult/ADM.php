@@ -1,14 +1,9 @@
 <?php
-namespace nntmux;
+namespace nntmux\processing\adult;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Cookie\SetCookie;
-use GuzzleHttp\Exception\RequestException;
 use nntmux\db\DB;
-use nntmux\utility\Utility;
 
-class ADM
+class ADM extends AdultMovies
 {
 	/**
 	 * Override if 18 years+ or older
@@ -51,21 +46,6 @@ class ADM
 	protected $_html;
 
 	/**
-	 * @var Client
-	 */
-	protected $client;
-
-	/**
-	 * @var DB
-	 */
-	protected $pdo;
-
-	/**
-	 * POST Paramaters for getUrl Method
-	 */
-	protected $_postParams;
-
-	/**
 	 * Results returned from each method
 	 *
 	 * @var array
@@ -90,16 +70,11 @@ class ADM
 	 */
 	protected $_title = '';
 
-	public function __construct()
+	public function __construct(array $options = [])
 	{
+		parent::__construct($options);
 		$this->_html = new \simple_html_dom();
-		$this->client = new Client();
-		$this->cookiejar = new CookieJar();
 		$this->pdo = new DB();
-		if (!empty($this->cookie)) {
-			$cookieJar = $this->cookiejar->setCookie(SetCookie::fromString($this->cookie));
-			$this->client = new Client(['cookies' => $cookieJar]);
-		}
 	}
 
 	/**
@@ -115,7 +90,7 @@ class ADM
 	 * Get Box Cover Images
 	 * @return array - boxcover,backcover
 	 */
-	public function covers()
+	protected function covers()
 	{
 		$baseUrl = 'http://www.adultdvdmarketplace.com/';
 		if ($ret = $this->_html->find('a[rel=fancybox-button]', 0)) {
@@ -133,9 +108,10 @@ class ADM
 
 	/**
 	 * Gets the synopsis
+	 *
 	 * @return array
 	 */
-	public function synopsis()
+	protected function synopsis()
 	{
 		$this->_res['synopsis'] = 'N/A';
 		foreach ($this->_html->find('h3') as $heading) {
@@ -148,12 +124,12 @@ class ADM
 	}
 
 	/**
-	 * Get Product Informtion and Director
+	 * Get Product Information and Director
 	 *
 	 *
 	 * @return array
 	 */
-	public function productInfo()
+	protected function productInfo()
 	{
 
 		foreach ($this->_html->find('ul.list-unstyled li') as $li) {
@@ -177,7 +153,7 @@ class ADM
 	 * Gets the cast members
 	 * @return array
 	 */
-	public function cast()
+	protected function cast()
 	{
 		$cast = [];
 		foreach ($this->_html->find('h3') as $heading) {
@@ -198,10 +174,10 @@ class ADM
 	 * Gets categories
 	 * @return array
 	 */
-	public function genres()
+	protected function genres()
 	{
 		$genres = [];
-		foreach ($this->_html->find('ul.list-unstyled li') as $li) {
+		foreach ($this->_html->find('ul.list-unstyled') as $li) {
 			$category = explode(':', $li->plaintext);
 			if (trim($category[0]) === 'Category') {
 				$genre = explode(',', $category[1]);
@@ -217,14 +193,19 @@ class ADM
 
 	/**
 	 * Searches for match against searchterm
+	 *
+	 * @param $movie
+	 *
 	 * @return bool - true if search = 100%
 	 */
-	public function search()
+	public function processSite($movie)
 	{
 		$result = false;
-		if (!empty($this->searchTerm)) {
-			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($this->searchTerm);
-			if ($this->getUrl() !== false) {
+		if (!empty($movie)) {
+			$this->_trailUrl = self::TRAILINGSEARCH . urlencode($movie);
+			$this->_response = getRawHtml(self::ADMURL . $this->_trailUrl, $this->cookie);
+			if ($this->_response !== false) {
+				$this->_html->load($this->_response);
 				if ($ret = $this->_html->find('img[rel=license]')) {
 					if (count($ret) > 0) {
 						foreach ($this->_html->find('img[rel=license]') as $ret) {
@@ -232,23 +213,26 @@ class ADM
 								$title = trim($ret->alt, '"');
 								$title = str_replace('/XXX/', '', $title);
 								$comparetitle = preg_replace('/[\W]/', '', $title);
-								$comparesearch = preg_replace('/[\W]/', '', $this->searchTerm);
+								$comparesearch = preg_replace('/[\W]/', '', $movie);
 								similar_text($comparetitle, $comparesearch, $p);
-								if ($p === 100) {
+								if ($p >= 90) {
 									if (preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)) {
 										$this->_title = trim($title);
 										$this->_trailUrl = '/dvd_view_' . (string)$matches['sku'] . '.html';
 										$this->_directUrl = self::ADMURL . $this->_trailUrl;
+										$this->_html->clear();
+										unset($this->_response);
+										$this->_response = getRawHtml($this->_directUrl, $this->cookie);
+										$this->_html->load($this->_response);
+										$result = true;
 									}
 								}
 							}
 						}
 					}
 				}
-				$result = true;
 			}
 		}
-
 		return $result;
 	}
 
@@ -256,7 +240,7 @@ class ADM
 	 * Gets all information
 	 * @return array
 	 */
-	public function getAll()
+	protected function getAll()
 	{
 		$results = [];
 		if (!empty($this->_directUrl)) {
@@ -288,52 +272,10 @@ class ADM
 		return $results;
 	}
 
-	/**
-	 * Get Raw html of webpage
-	 *
-	 * @return bool
-	 */
-	private function getUrl()
+	protected function trailers()
 	{
-		if (!empty($this->_trailUrl)) {
-			try {
-				$this->_response = $this->client->get(self::ADMURL . $this->_trailUrl)->getBody()->getContents();
-			} catch (RequestException $e) {
-				if ($e->hasResponse()) {
-					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on ADM server'));
-					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('ADM Service unavailable'));
-					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from ADM, http error reported: ' . $e->getCode()));
-					}
-				}
-			} catch (\RuntimeException $e) {
-				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
-			}
-		} else {
-			try {
-				$this->_response = $this->client->get(self::IF18)->getBody()->getContents();
-			} catch (RequestException $e) {
-				if ($e->hasResponse()) {
-					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on ADM server'));
-					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('ADM service unavailable'));
-					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from ADM, http error reported: ' . $e->getCode()));
-					}
-				}
-			} catch (\RuntimeException $e) {
-				ColorCLI::doEcho(ColorCLI::notice('Runtime error: ' . $e->getCode()));
-			}
-		}
+		// TODO: Implement trailers() method.
 
-		if (!$this->_response) {
-			return false;
-		}
-
-		$this->_html->load($this->_response);
-		return true;
+		return false;
 	}
 }

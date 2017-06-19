@@ -1,3 +1,27 @@
+2017-06-18 DariusIII
+	* Chg: Improve XXX releases logic
+	* Mrg: Merge PR #145 by Nightah - Admin Menu cleanup
+2017-06-16 DariusIII
+	* Chg: Catch exception when checking for existing and missing collection tables (irritating message about Base table or view not found)
+	* Chg: Increase xref column in collections and multigroup_collections to 1024 and change classused
+		in xxxinfo table to varchar(20) and empty default value
+	* Chg: Remove getXXXSamples script from tmux loop as it serves no purpose anymore
+	* Chg: Add more debugging output to DbUpdate class and install_nntmux script
+2017-06-15 DariusIII
+	* Fix: Fix collection regexes testing page
+2017-06-14 DariusIII
+	* Chg: Use monolog/monolog to handle logging
+	* Chg: Update composer libraries
+2017-06-09 DariusIII
+	* Chg: Update composer.lock
+2017-06-06 DariusIII
+	* Chg: Use laravel helpers file and replace getenv with env function
+	* Chg: Update composer.lock
+2017-06-05 DariusIII
+	* Chg: Update minimum MariaDB version to 10.1
+	* Chg: Add laravel/framework to composer.json for future usage
+2017-06-02 DariusIII
+	* Chg: Update php-tmdb and php-giantbomb libraries
 2017-05-28 DariusIII
 	* Chg: Possible fix for videos query in getVideoFromSiteID function
 2017-05-26 DariusIII

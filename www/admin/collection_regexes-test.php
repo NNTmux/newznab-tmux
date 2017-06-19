@@ -6,9 +6,7 @@ use nntmux\Regexes;
 
 $page = new AdminPage();
 
-$page->title = "Collections Regex Test";
-
-$page->smarty->assign('tpg', $tpg);
+$page->title = 'Collections Regex Test';
 
 $group = trim(isset($_POST['group']) && !empty($_POST['group']) ? $_POST['group'] : '');
 $regex = trim(isset($_POST['regex']) && !empty($_POST['regex']) ? $_POST['regex'] : '');

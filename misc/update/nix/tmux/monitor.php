@@ -18,8 +18,8 @@ $runVar['paths']['misc'] = NN_MISC;
 $runVar['paths']['cli'] = NN_ROOT . 'cli/';
 $runVar['paths']['scraper'] = NN_MISC . 'IRCScraper' . DS . 'scrape.php';
 
-$db_name = getenv('DB_NAME');
-$dbtype = getenv('DB_SYSTEM');
+$db_name = env('DB_NAME');
+$dbtype = env('DB_SYSTEM');
 $tmux = $tRun->get('niceness');
 
 $tmux_niceness = $tmux->niceness ?? 2;
