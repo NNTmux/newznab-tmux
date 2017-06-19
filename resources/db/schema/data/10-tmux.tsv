@@ -16,6 +16,7 @@ releases_threaded	0
 fix_names	0
 seq_timer	30
 bins_timer	30
+bins_kill_timer	1
 back_timer	30
 import_timer	30
 rel_timer	30

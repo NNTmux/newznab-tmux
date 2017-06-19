@@ -192,8 +192,7 @@
 		<tr>
 			<td style="width:180px;"><label for="bins_kill_timer">Binaries Kill Timer:</label></td>
 			<td>
-				<input id="bins_kill_timer" name="bins_kill_timer" class="short" type="text"
-					   value="{$ftmux->bins_kill_timer}"/>
+				<input id="bins_kill_timer" name="bins_kill_timer" class="short" type="text" value="{$ftmux->bins_kill_timer}"/>
 
 				<div class="hint">The time update_binaries is allowed to run with no updates.Time is in minutes.</div>
 			</td>
@@ -212,17 +211,15 @@
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{html_options style="width:180px;" class="siteeditstyle" id="backfill_days" name='backfill_days' values=$backfill_days_ids output=$backfill_days selected=$ftmux->backfill_days}
 				<div class="hint">Choose to run backfill type. Backfill gets from your first_record back.<br/>
 					Disabled - Disables backfill from running.<br/>
-					Safe - Backfills 1 group by backfill days (set in admin-view groups), using the number of threads
-					set in admin. This downloads Backfill Quantity times the Backfill Threads, each
-					loop. <br \>
+					Safe - Backfills 1 group by backfill days (set in admin-view groups), using the number of threads set in admin. This downloads Backfill Quantity times the Backfill Threads, each loop.<br/>
 					example: you have Backfill Threads = 10, Backfill Quantity = 20k, Max Messages = 5k: you will run 10
 					threads, queue of 40 and download 200k headers.<br/>
-					All - Backfills the number of groups (set in tmux), completely.<br/>
+					All - Backfills groups completely. This downloads Backfill Groups (set in tmux) by Backfill Quantity (set in tmux) times the Backfill Threads (set in admin-edit site), each loop.<br/>
 					Newest - Sorts the group selection with the least backfill days backfilled, first.<br/>
 					Oldest - Sorts the group selection with the most backfill days backfilled, first.<br/>
 					Alphabetical - Sorts the group selection from a to z.<br/>
-					Alphabetical Reverse - Sorts the group selection from z to a.<br /a>
-					Most Posts - Sorts the group selection by the highest number of posts, first.<br /a>
+					Alphabetical Reverse - Sorts the group selection from z to a.<br/>
+					Most Posts - Sorts the group selection by the highest number of posts, first.<br/>
 					Fewest Posts - Sorts the group selection by the lowest number of posts, first.<br/>
 					Backfill days - Days per Group from admin->view group or the Safe Backfill Date from admin->edit group.
 				</div>
@@ -679,7 +676,7 @@
 			<td style="width:180px;"><label for="vnstat">vnstat:</label></td>
 			<td>
 				{html_radios id="vnstat" name='vnstat' values=$yesno_ids output=$yesno_names selected=$ftmux->vnstat separator='<br />'}
-				<input id="vnstat_ARGS" name="vnstat_ARGS" class="text" type="text" value="{$ftmux->vnstat_ARGS}"/>
+				<input id="vnstat_args" name="vnstat_args" class="text" type="text" value="{$ftmux->vnstat_args}"/>
 
 				<div class="hint">vnStat is a console-based network traffic monitor for Linux and BSD that keeps a log
 					of network traffic for the selected interface(s). Any additional arguments should be placed in the
