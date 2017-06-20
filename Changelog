@@ -1,8 +1,4 @@
-2017-06-20 DariusIII
-	* Chg: Change updating script used, change  Command and Update classes to use symfony components
-		note: update now uses php so is run as: php tmux update nntmux or php tmux update db
 2017-06-19 DariusIII
-	* Chg: Add new update function that uses laravel/symfony components
 	* Fix: Fix wrong variable name used in anime.php page
 	* Mrg: Merge PR #145 by Nightah - Fixed remaining issues for tmux-edit templates
 2017-06-18 DariusIII

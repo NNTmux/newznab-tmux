@@ -20,47 +20,35 @@
  */
 namespace app\extensions\console;
 
-use Symfony\Component\Console\Output\ConsoleOutput;
 
-class Command extends \Illuminate\Console\Command
+use lithium\data\DocumentSchema;
+
+class Command extends \lithium\console\Command
 {
 	protected $_classes = [
-			'response'	=> Response::class
+			'response'	=> 'app\extensions\console\Response'
 	];
 
-	/**
-	 * Command constructor.
-	 *
-	 * @param array $config
-	 */
 	public function __construct(array $config = array())
 	{
-		parent::__construct();
-		$this->output = new ConsoleOutput();
+		$defaults = ['request' => null, 'response' => [], 'classes' => $this->_classes];
+		parent::__construct($config + $defaults);
 	}
 
-	public function info($text, $verbosity = null)
+	public function info($text)
 	{
-		if ($this->output->isQuiet()) {
+		if ($this->silent) {
 			return;
 		}
-		$this->output->writeln('<info>' . $text . '</info>', $verbosity);
+		$this->out($text, 'info');
 	}
 
 	public function primary($text)
 	{
-		if ($this->output->isQuiet()) {
+		if ($this->silent) {
 			return;
 		}
-		$this->output->writeln('<comment>' . $text . '</comment>');
-	}
-
-	public function error($text, $verbosity = null)
-	{
-		if ($this->output->isQuiet()) {
-			return;
-		}
-		$this->output->writeln('<error>' . $text . '</error>', $verbosity);
+		$this->out($text, 'primary');
 	}
 }
 ?>

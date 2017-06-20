@@ -19,10 +19,9 @@
 namespace app\extensions\util;
 
 use app\models\Settings;
-use lithium\core\Object;
 use nntmux\utility\Utility;
 
-class Versions extends Object
+class Versions extends \lithium\core\Object
 {
 	/**
 	 * These constants are bitwise for checking what has changed.
@@ -37,7 +36,7 @@ class Versions extends Object
 	protected $changes = 0;
 
 	/**
-	 * @var Git object.
+	 * @var \app\extensions\util\Git object.
 	 */
 	protected $git;
 
@@ -70,9 +69,7 @@ class Versions extends Object
 	 * Checks the git's latest version tag against the XML's stored value. Version should be
 	 * Major.Minor.Revision[.fix][-dev|-RCx]
 	 *
-	 * @param bool $update
-	 *
-	 * @return false|string version string if matched or false.
+	 * @return string|false version string if matched or false.
 	 */
 	public function checkGitTagInFile($update = false)
 	{
@@ -143,7 +140,7 @@ class Versions extends Object
 		$this->loadXMLFile();
 		$patch = $this->getSQLPatchFromDB();
 
-		if ($this->versions->sql->db->__toString() !== $patch) {
+		if ($this->versions->sql->db->__toString() != $patch) {
 			if ($verbose) {
 				echo "Updating Db revision to $patch" . PHP_EOL;
 			}
@@ -159,13 +156,18 @@ class Versions extends Object
 		$this->loadXMLFile();
 		$lastFile = $this->getSQLPatchLast();
 
-		if ($lastFile !== false && $this->versions->sql->file->__toString() !== $lastFile) {
+		if ($lastFile !== false && $this->versions->sql->file->__toString() != $lastFile) {
 			if ($verbose === true) {
 				echo "Updating latest patch file to $lastFile" . PHP_EOL;
 			}
 			$this->versions->sql->file = $lastFile;
 			$this->changes |= self::UPDATED_SQL_FILE_LAST;
 		}
+		/*
+				if ($this->versions->sql->file->__toString() != $lastFile) {
+					$this->versions->sql->file = $lastFile;
+					$this->changes |= self::UPDATED_SQL_DB_PATCH;
+				}*/
 	}
 
 	public function getGitBranch()
@@ -197,7 +199,7 @@ class Versions extends Object
 		$dbVersion = Settings::value('..sqlpatch', true);
 
 		if (!is_numeric($dbVersion)) {
-			throw new \RuntimeException('Bad sqlpatch value');
+			throw new \Exception('Bad sqlpatch value');
 		}
 
 		return $dbVersion;
@@ -221,7 +223,7 @@ class Versions extends Object
 		$files = Utility::getDirFiles($options);
 		natsort($files);
 
-		return preg_match($options['regex'], end($files), $matches) ? (int)$matches['patch'] : false;
+		return (preg_match($options['regex'], end($files), $matches)) ? (int)$matches['patch'] : false;
 	}
 
 	public function getTagVersion()
@@ -243,7 +245,7 @@ class Versions extends Object
 	 */
 	public function hasChanged()
 	{
-		return $this->changes !== 0;
+		return $this->changes != 0;
 	}
 
 	public function save($verbose = true)
@@ -251,18 +253,18 @@ class Versions extends Object
 		if ($this->hasChanged()) {
 			if ($verbose === true && $this->changes > 0) {
 				if ($this->isChanged(self::UPDATED_GIT_TAG)) {
-					echo 'Updated git tag version to ' . $this->versions->git->tag . PHP_EOL;
+					echo "Updated git tag version to " . $this->versions->git->tag . PHP_EOL;
 				}
 
 				if ($this->isChanged(self::UPDATED_SQL_DB_PATCH)) {
-					echo 'Updated Db SQL revision to ' . $this->versions->sql->db . PHP_EOL;
+					echo "Updated Db SQL revision to " . $this->versions->sql->db . PHP_EOL;
 				}
 
 				if ($this->isChanged(self::UPDATED_SQL_FILE_LAST)) {
-					echo 'Updated latest SQL file to ' . $this->versions->sql->file . PHP_EOL;
+					echo "Updated latest SQL file to " . $this->versions->sql->file . PHP_EOL;
 				}
-			} else if ($this->changes === 0) {
-				echo 'Version file already up to date.' . PHP_EOL;
+			} else if ($this->changes == 0) {
+				echo "Version file already up to date." . PHP_EOL;
 			}
 			$this->xml->asXML($this->_config['path']);
 			$this->changes = false;
@@ -276,14 +278,14 @@ class Versions extends Object
 
 	protected function initialiseGit()
 	{
-		if (!($this->git instanceof Git)) {
-			$this->git = new Git();
+		if (!($this->git instanceof \app\extensions\util\Git)) {
+			$this->git = new \app\extensions\util\Git();
 		}
 	}
 
 	protected function isChanged($property)
 	{
-		return (($this->changes & $property) === $property);
+		return (($this->changes & $property) == $property);
 	}
 
 	protected function loadXMLFile()
@@ -295,15 +297,15 @@ class Versions extends Object
 
 			if ($this->xml === false) {
 				$this->error("Your versions XML file ($this->_config['path']) is broken, try updating from git.");
-				throw new \RuntimeException("Failed to open versions XML file '{$this->_config['path']}'");
+				throw new \Exception("Failed to open versions XML file '{$this->_config['path']}'");
 			}
 
 			if ($this->xml->count() > 0) {
 				$vers = $this->xml->xpath('/nntmux/versions');
 
-				if ($vers[0]->count() === 0) {
+				if ($vers[0]->count() == 0) {
 					$this->error("Your versions XML file ({$this->_config['path']}) does not contain version info, try updating from git.");
-					throw new \RuntimeException("Failed to find versions node in XML file '{$this->_config['path']}'");
+					throw new \Exception("Failed to find versions node in XML file '{$this->_config['path']}'");
 				} else {
 					$this->versions = &$this->xml->versions; // Create a convenience shortcut
 				}
@@ -317,7 +319,7 @@ class Versions extends Object
 	{
 		parent::_init();
 
-		if ($this->_config['git'] instanceof Git) {
+		if ($this->_config['git'] instanceof \app\extensions\util\Git) {
 			$this->git =& $this->_config['git'];
 		}
 	}

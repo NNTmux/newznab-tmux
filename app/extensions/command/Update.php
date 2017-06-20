@@ -1,19 +1,42 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: darius
- * Date: 19.6.17.
- * Time: 15.17
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program (see LICENSE.txt in the base directory.  If
+ * not, see:
+ *
+ * @link      <http://www.gnu.org/licenses/>.
+ * @author    niel
+ * @copyright 2016 nZEDb
  */
-
 namespace app\extensions\command;
 
 use app\extensions\console\Command;
-use app\extensions\util\Git;
-use app\extensions\util\Versions;
-use nntmux\db\DbUpdate;
-use Symfony\Component\Process\Process;
+use \app\extensions\util\Git;
+use \app\extensions\util\Versions;
+use \lithium\console\command\Help;
+use \nntmux\db\DbUpdate;
+use \Smarty;
 
+
+/**
+ * Update various aspects of your indexer.
+ *
+ * Actions:
+ *  * all|nntmux Fetches current git repo, composer dependencies, and update latest Db patches.
+ *  * db		Update the Db with any patches not yet applied.
+ *  * git		Performs git pull.
+ *  * predb		Fetch and import TSV files into the predb table.
+ *
+ *@package app\extensions\command
+ */
 class Update extends Command
 {
 	const UPDATES_FILE = NN_CONFIGS . 'updates.json';
@@ -30,24 +53,22 @@ class Update extends Command
 
 	private $gitBranch;
 
-	/**
-	 * NewUpdate constructor.
-	 *
-	 */
-	public function __construct()
-	{
+	private $gitTag;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param array $config
+	 */
+	public function __construct(array $config = [])
+	{
 		$defaults = [
 			'classes'	=> $this->_classes,
 			'git'		=> null,
 			'request'	=> null,
 			'response'	=> [],
 		];
-		$this->setName('Update')
-			->setHelp('This function is used to update nntmux. Run it by typing: php tmux update and then nntmux or db as second argument. ie: php tmux update nntmux');
-		parent::__construct($defaults);
-
-
+		parent::__construct($config + $defaults);
 	}
 
 	public function all()
@@ -59,7 +80,7 @@ class Update extends Command
 	{
 		// TODO Add check to determine if the indexer or other scripts are running. Hopefully
 		// also prevent web access.
-		$this->primary('Checking database version');
+		$this->out('Checking database version...', 'primary');
 
 		$versions = new Versions(['git' => ($this->git instanceof Git) ? $this->git : null]);
 
@@ -67,18 +88,17 @@ class Update extends Command
 			$currentDb = $versions->getSQLPatchFromDB();
 			$currentXML = $versions->getSQLPatchFromFile();
 		} catch (\PDOException $e) {
-			$this->error('Error fetching patch versions!');
-
+			$this->out('Error fetching patch versions!', 'error');
 			return 1;
 		}
 
-		$this->primary("Db: $currentDb,\tFile: $currentXML");
+		$this->out("Db: $currentDb,\tFile: $currentXML");
 
 		if ($currentDb < $currentXML) {
 			$db = new DbUpdate(['backup' => false]);
 			$db->processPatches(['safe' => false]);
 		} else {
-			$this->primary('Up to date.');
+			$this->out('Up to date.', 'info');
 		}
 	}
 
@@ -88,12 +108,11 @@ class Update extends Command
 		// also prevent web access.
 		$this->initialiseGit();
 		if (!in_array($this->git->getBranch(), $this->git->getBranchesMain(), false)) {
-			$this->error('Not on the stable or dev branch! Refusing to update repository');
-
+			$this->out('Not on the stable or dev branch! Refusing to update repository', 'error');
 			return;
 		}
 
-		$this->primary($this->git->pull());
+		$this->out($this->git->pull());
 	}
 
 	/**
@@ -104,35 +123,65 @@ class Update extends Command
 		try {
 			$output = $this->git();
 			if ($output === 'Already up-to-date.') {
-				$this->primary($output);
+				$this->out($output, 'info');
 			} else {
 				$status = $this->composer();
 				if ($status) {
-					$this->error('Composer failed to update!!');
+					$this->out('Composer failed to update!!', 'error');
 
 					return false;
-				}
-				$fail = $this->db();
-				if ($fail) {
-					$this->error('Db updating failed!!');
-					return 1;
-					}
+				} else {
+					$fail = $this->db();
+					if ($fail) {
+						$this->out('Db updating failed!!', 'error');
 
+						return 1;
+					}
+				};
 			}
 
-			$smarty = new \Smarty();
+			$this->scripts();
+
+			$smarty = new Smarty();
 			$smarty->setCompileDir(NN_SMARTY_TEMPLATES);
 			$cleared = $smarty->clearCompiledTemplate();
 			if ($cleared) {
-				$this->primary('The Smarty compiled template cache has been cleaned for you');
+				$this->out('The Smarty compiled template cache has been cleaned for you', 'primary');
 			} else {
-				$this->primary('You should clear your Smarty compiled template cache at: ' .
-					NN_RES . 'smarty' . DS . 'templates_c'
-				);
+				$this->out('You should clear your Smarty compiled template cache at: ' .
+					NN_RES . 'smarty' . DS . 'templates_c',
+					'primary');
 			}
 		} catch (\Exception $e) {
 			$this->error($e->getMessage());
 		}
+	}
+
+	/**
+	 * Import/Update the predb table using tab separated value files.
+	 */
+	public function predb()
+	{
+		$this->out('predb not available yet!', 'error');
+	}
+
+	public function run($command = null)
+	{
+		if (!$command || !$this->request->args()) {
+			return $this->_help($command);
+		}
+
+		if (!$command) {
+			return $this->_help($command);
+		}
+
+		if ($this->_execute($command)) {
+			return true;
+		}
+
+		$this->error("{$command} could not be created.");
+
+		return false;
 	}
 
 	/**
@@ -142,33 +191,72 @@ class Update extends Command
 	 * option is added to the command to prevent development packages being also downloded.
 	 *
 	 * @return integer Return status from Composer.
-	 * @throws \Symfony\Component\Process\Exception\LogicException
-	 * @throws \Symfony\Component\Process\Exception\RuntimeException
 	 */
 	protected function composer()
 	{
 		$this->initialiseGit();
 		$command = 'composer install';
-		if (in_array($this->gitBranch, $this->git->getBranchesStable(), false)) {
+		if (in_array($this->gitBranch, $this->git->getBranchesStable())) {
 			$command .= ' --prefer-dist --no-dev';
 		} else {
 			$command .= ' --prefer-source';
 		}
-		$this->primary('Running composer install process...');
-		$process = new Process($command);
-		$process->run(function ($type, $buffer){
-		if (Process::ERR === $type) {
-			echo $buffer;
-		}
-		});
-
-		return $process->getOutput();
+		$this->out('Running composer install process...', 'primary');
+		system($command, $status);
+		return $status;
 	}
 
 	protected function initialiseGit()
 	{
 		if (!($this->git instanceof Git)) {
 			$this->git = new Git();
+		}
+	}
+
+	/**
+	 * Invokes the `Help` command.
+	 * The invoked Help command will take over request and response objects of
+	 * the originally invoked command. Thus the response of the Help command
+	 * becomes the response of the original one.
+	 *
+	 * @return boolean
+	 */
+	protected function _help()
+	{
+		$help = new Help([
+			'request'  => $this->request,
+			'response' => $this->response,
+			'classes'  => $this->_classes
+		]);
+
+		return $help->run(get_class($this));
+	}
+
+	/**
+	 * Class initializer. Parses template and sets up params that need to be filled.
+	 *
+	 * @return void
+	 */
+	protected function _init()
+	{
+		parent::_init();
+
+		if ($this->_config['git'] instanceof Git) {
+			$this->git =& $this->_config['git'];
+		}
+
+		if (file_exists(self::UPDATES_FILE)) {
+			$this->updates = json_decode(file_get_contents(self::UPDATES_FILE), true);
+		}
+	}
+
+	/**
+	 * Fetches and executes scripts for customised updating tasks.
+	 */
+	protected function scripts()
+	{
+		if (![$this->updates]) {
+			$this->updates = ['script' => '0000-00-00 00:00:00'];
 		}
 	}
 }
