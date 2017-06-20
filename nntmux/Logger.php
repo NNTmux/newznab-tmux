@@ -1,8 +1,13 @@
 <?php
 namespace nntmux;
 
-use Monolog\Logger as MonoLogger;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Logger as Monolog;
 use Monolog\Handler\StreamHandler;
+use Monolog\Processor\GitProcessor;
+use Monolog\Processor\IntrospectionProcessor;
+use Monolog\Processor\MemoryUsageProcessor;
+
 /**
  * Show log message to CLI/Web and log it to a file.
  * Turn these on in automated.config.php
@@ -51,7 +56,7 @@ class Logger
 	private $severity = '';
 
 	/**
-	 * @var MonoLogger
+	 * @var Monolog
 	 */
 	private $logger;
 
@@ -203,8 +208,18 @@ class Logger
 		$this->isWindows = stripos(PHP_OS, 'win') === 0;
 		$this->timeStart = time();
 
-		$this->logger = new MonoLogger('nntmux');
-		$this->logger->pushHandler(new StreamHandler($this->currentLogFolder . $this->currentLogName, MonoLogger::DEBUG));
+		$this->logger = new Monolog('nntmux');
+		$this->formatter = new LineFormatter($this->formLogMessage());
+		$this->introspection = new IntrospectionProcessor();
+		$this->gitprocessor = new GitProcessor();
+		$this->memoryUsage = new MemoryUsageProcessor();
+		$this->streamHandler = new StreamHandler($this->currentLogFolder . $this->currentLogName, Monolog::DEBUG);
+		$this->streamHandler->setFormatter($this->formatter);
+		$this->logger->pushHandler($this->streamHandler);
+		$this->logger->pushProcessor($this->introspection);
+		$this->logger->pushProcessor($this->gitprocessor);
+		$this->logger->pushProcessor($this->memoryUsage);
+
 	}
 
 	/**
@@ -359,7 +374,7 @@ class Logger
 	 * @access public
 	 * @static
 	 */
-	static public function getDefaultLogPaths()
+	public static function getDefaultLogPaths()
 	{
 		$defaultLogName = (defined('NN_LOGGING_LOG_NAME') ? NN_LOGGING_LOG_NAME : 'nntmux');
 		$defaultLogName = (ctype_alnum($defaultLogName) ? $defaultLogName : 'nntmux');
@@ -493,6 +508,7 @@ class Logger
 			) .
 
 			']';
+		return $this->logMessage;
 	}
 
 	/**
