@@ -61,11 +61,14 @@ class Logger
 	private $logger;
 
 	/**
-	 * Should we echo to CLI or web?
-	 * @var bool
-	 * @access private
+	 * @var LineFormatter
 	 */
-	private $outputCLI = true;
+	private $formatter;
+
+	/**
+	 * @var bool
+	 */
+	private $outputCLI;
 
 	/**
 	 * Cache of the date.
@@ -96,12 +99,6 @@ class Logger
 	private $timeStart;
 
 	/**
-	 * @var resource|null Resource for log file.
-	 * @access private
-	 */
-	private $resource = null;
-
-	/**
 	 * How many old logs can we have max in the logs folder.
 	 * (per log type, ex.: debug can have x logs, not_yEnc can have x logs, etc)
 	 * @var int
@@ -115,13 +112,6 @@ class Logger
 	 * @access private
 	 */
 	private $maxLogSize;
-
-	/**
-	 * Full path to the log file.
-	 * @var string
-	 * @access private
-	 */
-	private $logPath;
 
 	/**
 	 * Current name of the log file.
@@ -209,7 +199,7 @@ class Logger
 		$this->timeStart = time();
 
 		$this->logger = new Monolog('nntmux');
-		$this->formatter = new LineFormatter(null, null, false, true);
+		$this->formatter = new LineFormatter(null, $this->getDate(), false, true);
 		$this->introspection = new IntrospectionProcessor();
 		$this->gitprocessor = new GitProcessor();
 		$this->memoryUsage = new MemoryUsageProcessor();
@@ -218,7 +208,9 @@ class Logger
 		$this->logger->pushHandler($this->streamHandler);
 		$this->logger->pushProcessor($this->introspection);
 		$this->logger->pushProcessor($this->gitprocessor);
-		$this->logger->pushProcessor($this->memoryUsage);
+		if ($this->showMemoryUsage === true) {
+			$this->logger->pushProcessor($this->memoryUsage);
+		}
 
 	}
 
@@ -258,50 +250,6 @@ class Logger
 		$this->formLogMessage();
 		$this->echoMessage();
 		$this->logMessage();
-	}
-
-	/**
-	 * Return current/peak memory usage or difference between current/peak memory usage and previous usage.
-	 *
-	 * @param int  $oldUsage  Output from a previous memory_get_usage().
-	 * @param bool $realUsage Use (true)system memory usage or (false)emalloc() usage, use emalloc() for debugging.
-	 * @param bool $peak      Get peak memory usage.
-	 *
-	 * @return string
-	 *
-	 * @access public
-	 */
-	public function showMemUsage($oldUsage = 0, $realUsage = false, $peak = false)
-	{
-		$currentUsage = ($peak ? memory_get_peak_usage($realUsage)  : memory_get_usage($realUsage));
-		$actualUsage = ($oldUsage > 0 ? $currentUsage - $oldUsage : $currentUsage);
-
-		$units = [
-			'B ',
-			'KB',
-			'MB',
-			'GB',
-			'TB',
-			'PB'
-		];
-		return
-			str_pad(
-				number_format(
-					round(
-						$actualUsage
-						/
-						(1024 ** ($i =
-								floor(
-									log(
-										$actualUsage,
-										1024
-									)
-								)
-							)), 2
-					)
-				), 4, '~~~', STR_PAD_LEFT
-			) .
-			$units[(int)$i];
 	}
 
 	/**
@@ -470,9 +418,6 @@ class Logger
 		$pid = getmypid();
 
 		$this->logMessage =
-			// Current date/time ; [02/Mar/2014 14:50 EST
-			'[' . $this->getDate() . '] ' .
-
 			// The severity.
 			$this->severity .
 
@@ -481,9 +426,6 @@ class Logger
 
 			// Script running time.
 			($this->showRunningTime ? ' [' . $this->formatTimeString(time() - $this->timeStart) . ']' : '') .
-
-			// PHP memory usage.
-			($this->showMemoryUsage ? ' [MEM:' . $this->showMemUsage(0, true) . ']' : '') .
 
 			// Resource usage (user time, system time, major page faults, memory swaps).
 			(($this->showResourceUsage && !$this->isWindows) ? ' [' . $this->getResUsage() . ']' : '') .
