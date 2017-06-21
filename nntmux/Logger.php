@@ -214,7 +214,7 @@ class Logger
 		$this->gitprocessor = new GitProcessor();
 		$this->memoryUsage = new MemoryUsageProcessor();
 		$this->streamHandler = new StreamHandler($this->currentLogFolder . $this->currentLogName, Monolog::DEBUG);
-		//$this->streamHandler->setFormatter($this->formatter);
+		$this->streamHandler->setFormatter($this->formatter);
 		$this->logger->pushHandler($this->streamHandler);
 		$this->logger->pushProcessor($this->introspection);
 		$this->logger->pushProcessor($this->gitprocessor);
