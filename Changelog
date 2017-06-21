@@ -1,3 +1,5 @@
+2017-06-21 DariusIII
+	* Chg: Update env support
 2017-06-19 DariusIII
 	* Fix: Fix wrong variable name used in anime.php page
 	* Mrg: Merge PR #145 by Nightah - Fixed remaining issues for tmux-edit templates
