@@ -102,7 +102,8 @@
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
 														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
+																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"
+															width="100"></a>
 													{/if}
 													{if $result.classused == "adm"}
 														<a
@@ -111,7 +112,8 @@
 																name="viewadm{$result.title}"
 																title="View AdultDVDMarketplace page"
 														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/adm.png"></a>
+																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/adm.png"
+																	width="100"></a>
 													{/if}
 													{if $result.classused == "aebn"}
 														<a
@@ -119,7 +121,8 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewaebn{$result.title}"
 																title="View AEBN page"
-														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/aebn.png"></a>
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/aebn.png"
+															  width="100"></a>
 													{/if}
 													{if $result.classused == "hotm"}
 														<a
@@ -127,7 +130,8 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewhm{$result.title}"
 																title="View HotMovies page"
-														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"
+															  width="100"></a>
 													{/if}
 													{if $result.classused == "pop"}
 														<a
@@ -135,7 +139,8 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewpop{$result.id}"
 																title="View Popporn page"
-														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"></a>
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"
+															  width="100"></a>
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
@@ -265,7 +270,18 @@
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
 														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
+																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"
+																	width="100"></a>
+													{/if}
+													{if $result.classused == "adm"}
+														<a
+																target="_blank"
+																href="{$site->dereferrer_link}{$result.directurl}"
+																name="viewadm{$result.title}"
+																title="View AdultDVDMarketplace page"
+														><img
+																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/adm.png"
+																	width="100"></a>
 													{/if}
 													{if $result.classused == "aebn"}
 														<a
@@ -273,7 +289,8 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewaebn{$result.title}"
 																title="View AEBN page"
-														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/aebn.png"></a>
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/aebn.png"
+															  width="100"></a>
 													{/if}
 													{if $result.classused == "hotm"}
 														<a
@@ -281,7 +298,8 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewhm{$result.title}"
 																title="View HotMovies page"
-														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"
+															  width="100"></a>
 													{/if}
 													{if $result.classused == "pop"}
 														<a
@@ -289,7 +307,8 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewpop{$result.id}"
 																title="View Popporn page"
-														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"></a>
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"
+															  width="100"></a>
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
