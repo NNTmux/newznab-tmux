@@ -137,7 +137,7 @@ class ADE extends AdultMovies
 	public function cast()
 	{
 			foreach ($this->_html->find('a.PerformerName') as $a) {
-				if ($a->plaintext !== '(bio)' && $a->plaintext !== '(interview)') {
+				if ($a->plaintext !== 'bio' && $a->plaintext !== 'interview') {
 					$this->_res['cast'][] = trim($a->innertext);
 					}
 				}
