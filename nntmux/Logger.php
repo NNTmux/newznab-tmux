@@ -71,20 +71,6 @@ class Logger
 	private $outputCLI;
 
 	/**
-	 * Cache of the date.
-	 * @var string
-	 * @access private
-	 */
-	private $dateCache = '';
-
-	/**
-	 * Cache of unix time.
-	 * @var int
-	 * @access private
-	 */
-	private $timeCache;
-
-	/**
 	 * Is this the windows O/S?
 	 * @var bool
 	 * @access private
@@ -199,7 +185,7 @@ class Logger
 		$this->timeStart = time();
 
 		$this->logger = new Monolog('nntmux');
-		$this->formatter = new LineFormatter(null, $this->getDate(), false, true);
+		$this->formatter = new LineFormatter(null, 'd/M/Y H:i', false, true);
 		$this->introspection = new IntrospectionProcessor();
 		$this->gitprocessor = new GitProcessor();
 		$this->memoryUsage = new MemoryUsageProcessor();
@@ -369,24 +355,6 @@ class Logger
 		}
 
 		$this->logger->debug($this->logMessage);
-	}
-
-	/**
-	 * Get the date and cache it.
-	 *
-	 * @return string
-	 *
-	 * @access private
-	 */
-	private function getDate()
-	{
-		// Cache the date, update it every 1 minute, since date() is extremely slow and time() is extremely fast.
-		if ($this->dateCache === '' || $this->timeCache < (time() - 60)) {
-			$this->dateCache = date('d/M/Y H:i');
-			$this->timeCache = time();
-		}
-
-		return $this->dateCache;
 	}
 
 	/**
