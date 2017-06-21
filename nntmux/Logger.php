@@ -209,12 +209,12 @@ class Logger
 		$this->timeStart = time();
 
 		$this->logger = new Monolog('nntmux');
-		$this->formatter = new LineFormatter($this->formLogMessage());
+		$this->formatter = new LineFormatter(null, null, false, true);
 		$this->introspection = new IntrospectionProcessor();
 		$this->gitprocessor = new GitProcessor();
 		$this->memoryUsage = new MemoryUsageProcessor();
 		$this->streamHandler = new StreamHandler($this->currentLogFolder . $this->currentLogName, Monolog::DEBUG);
-		$this->streamHandler->setFormatter($this->formatter);
+		//$this->streamHandler->setFormatter($this->formatter);
 		$this->logger->pushHandler($this->streamHandler);
 		$this->logger->pushProcessor($this->introspection);
 		$this->logger->pushProcessor($this->gitprocessor);
@@ -420,7 +420,7 @@ class Logger
 			return;
 		}
 
-		$this->logger->info($this->logMessage);
+		$this->logger->debug($this->logMessage);
 	}
 
 	/**
