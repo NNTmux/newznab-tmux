@@ -136,12 +136,13 @@ class ADE extends AdultMovies
 	 */
 	public function cast()
 	{
-			foreach ($this->_html->find('a.PerformerName') as $a) {
-				if ($a->plaintext !== '(bio)' && $a->plaintext !== '(interview)') {
-					$this->_res['cast'][] = trim($a->innertext);
-					}
+		$cast = [];
+		foreach ($this->_html->find('[Label="Performers - detail"]') as $a) {
+			if ($a->plaintext !== false) {
+				$cast[] = trim($a->plaintext);
 				}
-
+			}
+		$this->_res['cast'] = $cast;
 		return $this->_res;
 	}
 
@@ -152,22 +153,12 @@ class ADE extends AdultMovies
 	public function genres()
 	{
 		$genres = [];
-		$ret = $this->_html->find('h2[border-bottom-site-default]');
-			foreach ($ret as $categories) {
-				$cats = $categories->find('a[label]');
-				foreach ($cats as $c) {
-					$categories = trim($c);
-					if (strpos($categories, ',') !== false) {
-						$genres = explode(',', $categories);
-						$genres = array_map('trim', $genres);
-					} else {
-						$genres[] = $categories;
-					}
-				}
+		foreach ($this->_html->find('[Label="Category"]') as $a) {
+			if ($a->plaintext !== false) {
+				$genres[] = trim($a->plaintext);
 			}
-			if (is_array($genres)) {
-				$this->_res['genres'] = array_unique($genres);
-			}
+		}
+		$this->_res['genres'] = $genres;
 		return $this->_res;
 	}
 

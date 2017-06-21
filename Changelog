@@ -1,3 +1,9 @@
+2017-06-21 DariusIII
+	* Fix: Potential fix for multiplicated cast from ADE
+	* Chg: Update env support
+2017-06-19 DariusIII
+	* Fix: Fix wrong variable name used in anime.php page
+	* Mrg: Merge PR #145 by Nightah - Fixed remaining issues for tmux-edit templates
 2017-06-18 DariusIII
 	* Chg: Improve XXX releases logic
 	* Mrg: Merge PR #145 by Nightah - Admin Menu cleanup

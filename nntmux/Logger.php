@@ -1,8 +1,13 @@
 <?php
 namespace nntmux;
 
-use Monolog\Logger as MonoLogger;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Logger as Monolog;
 use Monolog\Handler\StreamHandler;
+use Monolog\Processor\GitProcessor;
+use Monolog\Processor\IntrospectionProcessor;
+use Monolog\Processor\MemoryUsageProcessor;
+
 /**
  * Show log message to CLI/Web and log it to a file.
  * Turn these on in automated.config.php
@@ -51,30 +56,19 @@ class Logger
 	private $severity = '';
 
 	/**
-	 * @var MonoLogger
+	 * @var Monolog
 	 */
 	private $logger;
 
 	/**
-	 * Should we echo to CLI or web?
+	 * @var LineFormatter
+	 */
+	private $formatter;
+
+	/**
 	 * @var bool
-	 * @access private
 	 */
-	private $outputCLI = true;
-
-	/**
-	 * Cache of the date.
-	 * @var string
-	 * @access private
-	 */
-	private $dateCache = '';
-
-	/**
-	 * Cache of unix time.
-	 * @var int
-	 * @access private
-	 */
-	private $timeCache;
+	private $outputCLI;
 
 	/**
 	 * Is this the windows O/S?
@@ -91,12 +85,6 @@ class Logger
 	private $timeStart;
 
 	/**
-	 * @var resource|null Resource for log file.
-	 * @access private
-	 */
-	private $resource = null;
-
-	/**
 	 * How many old logs can we have max in the logs folder.
 	 * (per log type, ex.: debug can have x logs, not_yEnc can have x logs, etc)
 	 * @var int
@@ -110,13 +98,6 @@ class Logger
 	 * @access private
 	 */
 	private $maxLogSize;
-
-	/**
-	 * Full path to the log file.
-	 * @var string
-	 * @access private
-	 */
-	private $logPath;
 
 	/**
 	 * Current name of the log file.
@@ -203,8 +184,20 @@ class Logger
 		$this->isWindows = stripos(PHP_OS, 'win') === 0;
 		$this->timeStart = time();
 
-		$this->logger = new MonoLogger('nntmux');
-		$this->logger->pushHandler(new StreamHandler($this->currentLogFolder . $this->currentLogName, MonoLogger::DEBUG));
+		$this->logger = new Monolog('nntmux');
+		$this->formatter = new LineFormatter(null, 'd/M/Y H:i', false, true);
+		$this->introspection = new IntrospectionProcessor();
+		$this->gitprocessor = new GitProcessor();
+		$this->memoryUsage = new MemoryUsageProcessor();
+		$this->streamHandler = new StreamHandler($this->currentLogFolder . $this->currentLogName, Monolog::DEBUG);
+		$this->streamHandler->setFormatter($this->formatter);
+		$this->logger->pushHandler($this->streamHandler);
+		$this->logger->pushProcessor($this->introspection);
+		$this->logger->pushProcessor($this->gitprocessor);
+		if ($this->showMemoryUsage === true) {
+			$this->logger->pushProcessor($this->memoryUsage);
+		}
+
 	}
 
 	/**
@@ -243,50 +236,6 @@ class Logger
 		$this->formLogMessage();
 		$this->echoMessage();
 		$this->logMessage();
-	}
-
-	/**
-	 * Return current/peak memory usage or difference between current/peak memory usage and previous usage.
-	 *
-	 * @param int  $oldUsage  Output from a previous memory_get_usage().
-	 * @param bool $realUsage Use (true)system memory usage or (false)emalloc() usage, use emalloc() for debugging.
-	 * @param bool $peak      Get peak memory usage.
-	 *
-	 * @return string
-	 *
-	 * @access public
-	 */
-	public function showMemUsage($oldUsage = 0, $realUsage = false, $peak = false)
-	{
-		$currentUsage = ($peak ? memory_get_peak_usage($realUsage)  : memory_get_usage($realUsage));
-		$actualUsage = ($oldUsage > 0 ? $currentUsage - $oldUsage : $currentUsage);
-
-		$units = [
-			'B ',
-			'KB',
-			'MB',
-			'GB',
-			'TB',
-			'PB'
-		];
-		return
-			str_pad(
-				number_format(
-					round(
-						$actualUsage
-						/
-						(1024 ** ($i =
-								floor(
-									log(
-										$actualUsage,
-										1024
-									)
-								)
-							)), 2
-					)
-				), 4, '~~~', STR_PAD_LEFT
-			) .
-			$units[(int)$i];
 	}
 
 	/**
@@ -359,7 +308,7 @@ class Logger
 	 * @access public
 	 * @static
 	 */
-	static public function getDefaultLogPaths()
+	public static function getDefaultLogPaths()
 	{
 		$defaultLogName = (defined('NN_LOGGING_LOG_NAME') ? NN_LOGGING_LOG_NAME : 'nntmux');
 		$defaultLogName = (ctype_alnum($defaultLogName) ? $defaultLogName : 'nntmux');
@@ -405,25 +354,7 @@ class Logger
 			return;
 		}
 
-		$this->logger->info($this->logMessage);
-	}
-
-	/**
-	 * Get the date and cache it.
-	 *
-	 * @return string
-	 *
-	 * @access private
-	 */
-	private function getDate()
-	{
-		// Cache the date, update it every 1 minute, since date() is extremely slow and time() is extremely fast.
-		if ($this->dateCache === '' || $this->timeCache < (time() - 60)) {
-			$this->dateCache = date('d/M/Y H:i');
-			$this->timeCache = time();
-		}
-
-		return $this->dateCache;
+		$this->logger->debug($this->logMessage);
 	}
 
 	/**
@@ -455,9 +386,6 @@ class Logger
 		$pid = getmypid();
 
 		$this->logMessage =
-			// Current date/time ; [02/Mar/2014 14:50 EST
-			'[' . $this->getDate() . '] ' .
-
 			// The severity.
 			$this->severity .
 
@@ -466,9 +394,6 @@ class Logger
 
 			// Script running time.
 			($this->showRunningTime ? ' [' . $this->formatTimeString(time() - $this->timeStart) . ']' : '') .
-
-			// PHP memory usage.
-			($this->showMemoryUsage ? ' [MEM:' . $this->showMemUsage(0, true) . ']' : '') .
 
 			// Resource usage (user time, system time, major page faults, memory swaps).
 			(($this->showResourceUsage && !$this->isWindows) ? ' [' . $this->getResUsage() . ']' : '') .
@@ -493,6 +418,7 @@ class Logger
 			) .
 
 			']';
+		return $this->logMessage;
 	}
 
 	/**
