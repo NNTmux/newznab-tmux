@@ -214,7 +214,7 @@
 					Safe - Backfills 1 group by backfill days (set in admin-view groups), using the number of threads set in admin. This downloads Backfill Quantity times the Backfill Threads, each loop.<br/>
 					example: you have Backfill Threads = 10, Backfill Quantity = 20k, Max Messages = 5k: you will run 10
 					threads, queue of 40 and download 200k headers.<br/>
-					All - Backfills groups completely. This downloads Backfill Groups (set in tmux) by Backfill Quantity (set in tmux) times the Backfill Threads (set in admin-edit site), each loop.<br/>
+					All - Backfills groups completely. This downloads Backfill Groups by Backfill Quantity (set in tmux) times the Backfill Threads (set in admin-edit site), each loop.<br/>
 					Newest - Sorts the group selection with the least backfill days backfilled, first.<br/>
 					Oldest - Sorts the group selection with the most backfill days backfilled, first.<br/>
 					Alphabetical - Sorts the group selection from a to z.<br/>
