@@ -1,4 +1,5 @@
 2017-06-21 DariusIII
+	* Mrg: Merge PR #148 by Nightah
 	* Fix: Potential fix for multiplicated cast from ADE
 	* Chg: Update env support
 2017-06-19 DariusIII
