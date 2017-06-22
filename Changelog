@@ -1,3 +1,8 @@
+2017-06-22 DariusIII
+	* Chg: Update travis.yml Mysql with barracuda and large prefix support
+	* Chg: Create all the tables in mysql-ddl.sql as InnoDB tables
+	* Chg: Increase varchar columns sizes in xxxinfo table
+	* Fix: Fixed fetching information from PopPorn, updated the logo
 2017-06-21 DariusIII
 	* Chg: Adjust all the themes XXX pages for new source icons display
 	* Chg: Update adm, ade, aebn and hotmovies logos
