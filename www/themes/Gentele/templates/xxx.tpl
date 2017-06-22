@@ -329,8 +329,6 @@
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|escape:"htmlall"}</a></span>
-
-													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tr>
 															<td id="guid{$mguid[$m@index]}">
@@ -345,8 +343,13 @@
 																<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
 																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
-																<br/><br/><br/>
-
+																<br>
+																<div class="release-subtitle">{if $result.genre != ''}Genre: {$result.genre}, {/if}</div>
+																<br>
+																<div class="release-subtitle">{if $result.plot != ''}Plot: {$result.plot}, {/if}</div>
+																<br>
+																<div class="release-subtitle">{if $result.actors != ''}Cast: {$result.actors}, {/if}</div>
+																<br>
 																<div class="release-name text-muted"><a
 																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
