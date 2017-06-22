@@ -8,7 +8,7 @@ CREATE TABLE allgroups (
   PRIMARY KEY (id),
   INDEX ix_allgroups_name (name)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -28,7 +28,7 @@ CREATE TABLE anidb_episodes (
   airdate       DATE                    NOT NULL,
   PRIMARY KEY (anidbid, episodeid)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET =utf8
   COLLATE =utf8_unicode_ci;
 
@@ -61,7 +61,7 @@ CREATE TABLE anidb_info (
   PRIMARY KEY (anidbid),
   KEY ix_anidb_info_datetime (startdate, enddate, updated)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET =utf8
   COLLATE =utf8_unicode_ci;
 
@@ -79,7 +79,7 @@ CREATE TABLE anidb_titles (
           COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (anidbid, type, lang, title)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -101,7 +101,7 @@ CREATE TABLE audio_data (
   PRIMARY KEY (id),
   UNIQUE INDEX ix_releaseaudio_releaseid_audioid (releases_id, audioid)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -123,7 +123,7 @@ CREATE TABLE binaries (
   INDEX ix_binaries_partcheck  (partcheck),
   INDEX ix_binaries_collection (collections_id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -143,7 +143,7 @@ CREATE TABLE binaryblacklist (
   INDEX ix_binaryblacklist_groupname (groupname),
   INDEX ix_binaryblacklist_status    (status)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1000001;
@@ -171,7 +171,7 @@ CREATE TABLE bookinfo (
   FULLTEXT INDEX ix_bookinfo_author_title_ft (author, title),
   UNIQUE INDEX ix_bookinfo_asin (asin)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -191,7 +191,7 @@ CREATE TABLE categories (
   INDEX ix_categories_status   (status),
   INDEX ix_categories_parentid (parentid)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1000001;
@@ -212,7 +212,7 @@ CREATE TABLE category_regexes (
   INDEX ix_category_regexes_ordinal     (ordinal),
   INDEX ix_category_regexes_categories_id (categories_id)
 )
-  ENGINE          = MYISAM
+  ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 100000;
@@ -244,7 +244,7 @@ CREATE TABLE         collections (
   INDEX        ix_collection_releaseid      (releases_id),
   UNIQUE INDEX ix_collection_collectionhash (collectionhash)
 )
-  ENGINE          = MYISAM
+  ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 1;
@@ -263,7 +263,7 @@ CREATE TABLE collection_regexes (
   INDEX ix_collection_regexes_status      (status),
   INDEX ix_collection_regexes_ordinal     (ordinal)
 )
-  ENGINE          = MYISAM
+  ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 100000;
@@ -289,7 +289,7 @@ CREATE TABLE consoleinfo (
   FULLTEXT INDEX ix_consoleinfo_title_platform_ft (title, platform),
   UNIQUE INDEX ix_consoleinfo_asin (asin)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -316,7 +316,7 @@ CREATE TABLE dnzb_failures (
   failed      INT UNSIGNED      NOT NULL DEFAULT '0',
   PRIMARY KEY (release_id, userid)
 )
-  ENGINE =MYISAM
+  ENGINE =InnoDB
   DEFAULT CHARSET =utf8
   COLLATE =utf8_unicode_ci;
 
@@ -339,7 +339,7 @@ CREATE TABLE forumpost (
   KEY createddate (createddate),
   KEY updateddate (updateddate)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -381,7 +381,7 @@ CREATE TABLE genres (
   disabled TINYINT(1)   NOT NULL DEFAULT '0',
   PRIMARY KEY (id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1000001;
@@ -406,7 +406,7 @@ CREATE TABLE groups (
   KEY active                  (active),
   UNIQUE INDEX ix_groups_name (name)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1000001;
@@ -420,7 +420,7 @@ CREATE TABLE invitations (
   createddate DATETIME         NOT NULL,
   PRIMARY KEY (id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -434,7 +434,7 @@ CREATE TABLE logging (
   host     VARCHAR(40) DEFAULT NULL,
   PRIMARY KEY (id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -453,7 +453,7 @@ CREATE TABLE menu (
   PRIMARY KEY (id),
   INDEX ix_role_ordinal (role, ordinal)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1000001;
@@ -471,7 +471,7 @@ CREATE TABLE missed_parts (
   INDEX ix_missed_parts_numberid_groupsid_attempts (numberid, groups_id, attempts),
   UNIQUE INDEX ix_missed_parts_numberid_groupsid          (numberid, groups_id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -501,7 +501,7 @@ CREATE TABLE movieinfo (
   INDEX ix_movieinfo_title  (title),
   UNIQUE INDEX ix_movieinfo_imdbid (imdbid)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -528,7 +528,7 @@ CREATE TABLE musicinfo (
   FULLTEXT INDEX ix_musicinfo_artist_title_ft (artist, title),
   UNIQUE INDEX ix_musicinfo_asin (asin)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -559,7 +559,7 @@ CREATE TABLE         multigroup_collections (
   INDEX        ix_collection_releaseid      (releases_id),
   UNIQUE INDEX ix_collection_collectionhash (collectionhash)
 )
-  ENGINE          = MYISAM
+  ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 1;
@@ -571,7 +571,7 @@ CREATE TABLE multigroup_posters (
   PRIMARY KEY (id) ,
   UNIQUE KEY (poster)
 )
-  ENGINE          = MYISAM
+  ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -592,7 +592,7 @@ CREATE TABLE content (
   role            INT             NOT NULL DEFAULT '0',
   INDEX ix_showinmenu_status_contenttype_role (showinmenu, status, contenttype, role)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1000001;
@@ -604,7 +604,7 @@ CREATE TABLE par_hashes (
   hash VARCHAR(32) NOT NULL COMMENT 'hash_16k block of par2',
   PRIMARY KEY (releases_id, hash)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -617,7 +617,7 @@ CREATE TABLE parts (
   size          MEDIUMINT UNSIGNED                       NOT NULL DEFAULT '0',
   PRIMARY KEY (binaries_id,number)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -649,7 +649,7 @@ CREATE TABLE predb (
   FULLTEXT INDEX ft_predb_filename (filename),
   INDEX ix_predb_searched  (searched)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -661,7 +661,7 @@ CREATE TABLE predb_hashes (
   hash VARBINARY(20)      NOT NULL DEFAULT '',
   PRIMARY KEY (hash)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
 
@@ -694,7 +694,7 @@ CREATE TABLE predb_imports (
   groupname  VARCHAR(255)
                COLLATE utf8_unicode_ci          DEFAULT NULL
 )
-  ENGINE =MYISAM
+  ENGINE =InnoDB
   DEFAULT CHARSET =utf8
   COLLATE =utf8_unicode_ci;
 
@@ -776,7 +776,7 @@ processed',
   INDEX ix_releases_dehashstatus              (dehashstatus,ishashed),
   INDEX ix_releases_reqidstatus               (adddate,reqidstatus,isrequestid)
 )
-  ENGINE          = MYISAM
+  ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 1
@@ -816,7 +816,7 @@ CREATE TABLE release_comments (
   INDEX ix_releasecomment_releases_id (releases_id),
   INDEX ix_releasecomment_userid    (users_id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -829,7 +829,7 @@ CREATE TABLE releases_groups (
   COMMENT 'FK to groups.id',
   PRIMARY KEY (releases_id, groups_id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -840,7 +840,7 @@ CREATE TABLE release_regexes (
   naming_regex_id       INT(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (releases_id, collection_regex_id, naming_regex_id)
 )
-  ENGINE          = MYISAM
+  ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci;
 
@@ -862,7 +862,7 @@ CREATE TABLE releaseextrafull (
   mediainfo   TEXT NULL,
   PRIMARY KEY (releases_id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -878,7 +878,7 @@ CREATE TABLE release_files (
   PRIMARY KEY (releases_id, name),
   KEY ix_releasefiles_ishashed (ishashed)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -896,7 +896,7 @@ CREATE TABLE release_naming_regexes (
   INDEX ix_release_naming_regexes_status      (status),
   INDEX ix_release_naming_regexes_ordinal     (ordinal)
 )
-  ENGINE          = MYISAM
+  ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 100000;
@@ -908,7 +908,7 @@ CREATE TABLE release_nfos (
   nfo       BLOB             NULL DEFAULT NULL,
   PRIMARY KEY (releases_id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -928,7 +928,7 @@ CREATE TABLE release_search_data (
   INDEX          ix_releasesearch_releases_id          (releases_id),
   INDEX          ix_releasesearch_guid               (guid)
 )
-  ENGINE          = MYISAM
+  ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 1;
@@ -943,7 +943,7 @@ CREATE TABLE release_subtitles (
   PRIMARY KEY (id),
   UNIQUE INDEX ix_releasesubs_releases_id_subsid (releases_id, subsid)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -960,7 +960,7 @@ CREATE TABLE settings (
   PRIMARY KEY (section, subsection, name),
   UNIQUE KEY ui_settings_setting (setting)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -982,7 +982,7 @@ CREATE TABLE sharing (
   max_pull       MEDIUMINT UNSIGNED NOT NULL DEFAULT '20000',
   PRIMARY KEY (site_guid)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -998,7 +998,7 @@ CREATE TABLE sharing_sites (
   comments   MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1014,7 +1014,7 @@ CREATE TABLE short_groups (
   PRIMARY KEY (id),
   INDEX ix_shortgroups_name (name)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1047,7 +1047,7 @@ CREATE TABLE steam_apps (
   PRIMARY KEY (appid, name),
   FULLTEXT INDEX ix_name_ft (name)
 )
-  ENGINE          = MYISAM
+  ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -1060,7 +1060,7 @@ CREATE TABLE tmux (
   PRIMARY KEY (id),
   UNIQUE INDEX ix_tmux_setting (setting)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1107,7 +1107,7 @@ CREATE TABLE upcoming_releases (
   PRIMARY KEY (id),
   UNIQUE INDEX ix_upcoming_source (source, typeid)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1156,7 +1156,7 @@ CREATE TABLE users (
   PRIMARY KEY (id),
   INDEX ix_role (role)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1171,7 +1171,7 @@ CREATE TABLE users_releases (
   PRIMARY KEY (id),
   UNIQUE INDEX ix_usercart_userrelease (users_id, releases_id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1188,7 +1188,7 @@ CREATE TABLE user_downloads (
   KEY userid    (users_id),
   KEY timestamp (timestamp)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1203,7 +1203,7 @@ CREATE TABLE user_excluded_categories (
   PRIMARY KEY (id),
   UNIQUE INDEX ix_userexcat_usercat (users_id, categories_id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1233,7 +1233,7 @@ CREATE TABLE user_movies (
   PRIMARY KEY (id),
   INDEX ix_usermovies_userid (users_id, imdbid)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1250,7 +1250,7 @@ CREATE TABLE user_requests (
   KEY userid    (users_id),
   KEY timestamp (timestamp)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1268,7 +1268,7 @@ CREATE TABLE user_roles (
   hideads          TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 4;
@@ -1284,7 +1284,7 @@ CREATE TABLE user_series (
   PRIMARY KEY (id),
   INDEX ix_userseries_videos_id (users_id, videos_id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1305,7 +1305,7 @@ CREATE TABLE video_data (
   videolibrary    VARCHAR(50) DEFAULT NULL,
   PRIMARY KEY (releases_id)
 )
-  ENGINE = MYISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -1372,7 +1372,7 @@ CREATE TABLE         xxxinfo (
   PRIMARY KEY                   (id),
   UNIQUE INDEX ix_xxxinfo_title (title)
 )
-  ENGINE          = MYISAM
+  ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 1;
