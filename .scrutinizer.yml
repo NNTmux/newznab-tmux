@@ -5,8 +5,8 @@ build:
           - 'composer install --no-interaction --prefer-source --no-scripts --ignore-platform-reqs'
         before:
           - cp .env.scrutinizer .env
-          - mysql -u root -e "SET GLOBAL innodb_file_format = Barracuda;"
-          - mysql -u root -e "SET GLOBAL innodb_large_prefix = 1;"
+          - mysql -u root -e "SET GLOBAL innodb_file_format = 'barracuda';"
+          - mysql -u root -e "SET GLOBAL innodb_large_prefix = true;"
           - mysql -u root -e "CREATE DATABASE TEST;"
           - mysql -u root TEST < resources/db/schema/mysql-ddl.sql
           - mysql --local-infile=1 -u root -e "LOAD DATA LOCAL INFILE 'resources/db/schema/data/10-settings.tsv' IGNORE INTO TABLE TEST.settings FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\'' LINES TERMINATED BY '\n' IGNORE 1 LINES (section,subsection,name,value,hint,setting);"
