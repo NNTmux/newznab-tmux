@@ -1,4 +1,5 @@
 2017-06-23 DariusIII
+	* Chg: Slightly improve misc/update/backfill.php script
 	* Chg: Fix compressed headers check in backfill
 	* Chg: Rearrange order in which sites are scraped for XXX movie info
 	* Chg: Update guzzlehttp to latest version
