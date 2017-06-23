@@ -1,3 +1,5 @@
+2017-06-23 DariusIII
+	* Chg: Update guzzlehttp to latest version
 2017-06-22 DariusIII
 	* Mrg: Merge PR #149 by Nightah - Adjusted views for Browse -> New Releases
 	* Chg: Update travis.yml Mysql with barracuda and large prefix support
