@@ -568,13 +568,6 @@ class XXX
 		$res = $mov->processSite($movie);
 
 		if ($res === false) {
-			$this->whichclass = 'ade';
-			$mov = new ADE();
-			ColorCLI::doEcho(ColorCLI::info('Checking ADE for movie info'));
-			$res = $mov->processSite($movie);
-		}
-
-		if ($res === false) {
 			$this->whichclass = 'pop';
 			$mov = new Popporn();
 			$mov->cookie = $this->cookie;
@@ -583,19 +576,25 @@ class XXX
 		}
 
 		if ($res === false) {
-			$this->whichclass = 'hotm';
-			$mov = new Hotmovies();
-			$mov->cookie = $this->cookie;
-			ColorCLI::doEcho(ColorCLI::info('Checking HotMovies for movie info'));
-			$res = $mov->processSite($movie);
-		}
-
-		// Last in list as it doesn't have trailers
-		if ($res === false) {
 			$this->whichclass = 'adm';
 			$mov = new ADM();
 			$mov->cookie = $this->cookie;
 			ColorCLI::doEcho(ColorCLI::info('Checking ADM for movie info'));
+			$res = $mov->processSite($movie);
+		}
+
+		if ($res === false) {
+			$this->whichclass = 'ade';
+			$mov = new ADE();
+			ColorCLI::doEcho(ColorCLI::info('Checking ADE for movie info'));
+			$res = $mov->processSite($movie);
+		}
+
+		if ($res === false) {
+			$this->whichclass = 'hotm';
+			$mov = new Hotmovies();
+			$mov->cookie = $this->cookie;
+			ColorCLI::doEcho(ColorCLI::info('Checking HotMovies for movie info'));
 			$res = $mov->processSite($movie);
 		}
 

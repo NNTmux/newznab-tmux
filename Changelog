@@ -1,4 +1,5 @@
 2017-06-23 DariusIII
+	* Chg: Rearrange order in which sites are scraped for XXX movie info
 	* Chg: Update guzzlehttp to latest version
 2017-06-22 DariusIII
 	* Mrg: Merge PR #149 by Nightah - Adjusted views for Browse -> New Releases
