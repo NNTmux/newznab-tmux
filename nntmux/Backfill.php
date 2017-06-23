@@ -191,7 +191,7 @@ class Backfill
 				ColorCLI::doEcho(ColorCLI::primary($dMessage));
 			}
 		} else {
-			$dMessage = "No groups specified. Ensure groups are added to nntmux's database for updating.";
+			$dMessage = 'No groups specified. Ensure groups are added to database for updating.';
 			if ($this->_debug) {
 				$this->_debugging->log(__CLASS__, __FUNCTION__, $dMessage, Logger::LOG_FATAL);
 			}
@@ -250,7 +250,7 @@ class Backfill
 		}
 
 		// Check if this is days or post backfill.
-		$postCheck = $articles === '' ? false : true;
+		$postCheck = $articles !== '';
 
 		// Get target post based on date or user specified number.
 		$targetpost = (string)($postCheck
