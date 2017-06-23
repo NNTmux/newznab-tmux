@@ -82,6 +82,8 @@ class Backfill
 	 * Constructor.
 	 *
 	 * @param array $options Class instances / Echo to cli?
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -113,8 +115,8 @@ class Backfill
 
 		$this->_compressedHeaders = (int)Settings::value('..compressedheaders') === 1 ? true : false;
 		$this->_safeBackFillDate = Settings::value('..safebackfilldate') !== '' ? (string)Settings::value('safebackfilldate') : '2008-08-14';
-		$this->_safePartRepair = Settings::value('..safepartrepair') === 1 ? 'update' : 'backfill';
-		$this->_disableBackfillGroup = Settings::value('..disablebackfillgroup') === 1 ? true : false;
+		$this->_safePartRepair = (int)Settings::value('..safepartrepair') === 1 ? 'update' : 'backfill';
+		$this->_disableBackfillGroup = (int)Settings::value('..disablebackfillgroup') === 1 ? true : false;
 	}
 
 	/**
