@@ -497,7 +497,7 @@ class TmuxRun extends Tmux
 					}
 
 					//Check to see if the pane is dead, if so respawn it.
-					if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:1 | grep ^1 | grep -c dead") === 1) {
+					if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:1 | grep ^1 | grep -c dead") == 1) {
 
 						// Run remove crap releases.
 						shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.1 ' \
@@ -728,7 +728,7 @@ class TmuxRun extends Tmux
 	{
 		if ((int)$runVar['constants']['run_ircscraper'] === 1) {
 			//Check to see if the pane is dead, if so respawn it.
-			if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") === 1) {
+			if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
 				shell_exec(
 					"tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
 					{$runVar['commands']['_phpn']} {$runVar['paths']['scraper']} true'"
@@ -748,7 +748,7 @@ class TmuxRun extends Tmux
 		$sharing = $this->pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 
 		if ((int)$runVar['settings']['run_sharing'] === 1 && (int)$sharing['enabled'] === 1 && ((int)$sharing['posting'] === 1 || (int)$sharing['fetching'] === 1)) {
-			if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") === 1) {
+			if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
 				shell_exec(
 					"tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}/update/postprocess.php spotnab true; \
