@@ -655,8 +655,8 @@ class Forking extends \fork_daemon
 		}
 	}
 
-	private $ppAddMinSize = '';
-	private $ppAddMaxSize = '';
+	private $ppAddMinSize;
+	private $ppAddMaxSize;
 
 	/**
 	 * Check if we should process Additional's.
