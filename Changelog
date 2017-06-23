@@ -1,4 +1,5 @@
 2017-06-23 DariusIII
+	* Chg: Rename misc/update/nix/tmux/tmux-ui.php to just tmux-ui
 	* Chg: Use strict comparisons and cast int where needed in TmuxRun class
 	* Chg: Cast int type to all Settings::value lines, as that function returns string
 	* Chg: Change error message with no group selected in Backfill class
