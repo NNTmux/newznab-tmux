@@ -12,31 +12,23 @@ $nntp = new NNTP(['Settings' => $pdo]);
 if ($nntp->doConnect() !== true) {
 	exit($pdo->log->error('Unable to connect to usenet.'));
 }
-if (isset($argv[1]) && preg_match('/^alt\.binaries\..+$/i', $argv[1])) {
-	$groupName = $argv[1];
-}
 
 if (isset($argv[1]) && $argv[1] === 'all' && !isset($argv[2])) {
 	$backfill = new Backfill(['NNTP' => $nntp, 'Settings' => $pdo]);
 	$backfill->backfillAllGroups();
-}
-if (isset($argv[1]) && !isset($argv[2]) && preg_match('/^alt\.binaries\..+$/i', $argv[1])) {
+} else if (isset($argv[1]) && !isset($argv[2]) && preg_match('/^alt\.binaries\..+$/i', $argv[1])) {
 	$backfill = new Backfill(['NNTP' => $nntp, 'Settings' => $pdo]);
 	$backfill->backfillAllGroups($argv[1]);
-}
-if (isset($argv[1], $argv[2]) && is_numeric($argv[2]) && preg_match('/^alt\.binaries\..+$/i', $argv[1])) {
+} else if (isset($argv[1], $argv[2]) && is_numeric($argv[2]) && preg_match('/^alt\.binaries\..+$/i', $argv[1])) {
 	$backfill = new Backfill(['NNTP' => $nntp, 'Settings' => $pdo]);
 	$backfill->backfillAllGroups($argv[1], $argv[2]);
-}
-if (isset($argv[1], $argv[2]) && $argv[1] === 'alph' && is_numeric($argv[2])) {
+} else if (isset($argv[1], $argv[2]) && $argv[1] === 'alph' && is_numeric($argv[2])) {
 	$backfill = new Backfill(['NNTP' => $nntp, 'Settings' => $pdo]);
 	$backfill->backfillAllGroups('', $argv[2], 'normal');
-}
-if (isset($argv[1], $argv[2]) && $argv[1] === 'date' && is_numeric($argv[2])) {
+} else if (isset($argv[1], $argv[2]) && $argv[1] === 'date' && is_numeric($argv[2])) {
 	$backfill = new Backfill(['NNTP' => $nntp, 'Settings' => $pdo]);
 	$backfill->backfillAllGroups('', $argv[2], 'date');
-}
-if (isset($argv[1], $argv[2]) && $argv[1] === 'safe' && is_numeric($argv[2])) {
+} else if (isset($argv[1], $argv[2]) && $argv[1] === 'safe' && is_numeric($argv[2])) {
 	$backfill = new Backfill(['NNTP' => $nntp, 'Settings' => $pdo]);
 	$backfill->safeBackfill($argv[2]);
 } else {
