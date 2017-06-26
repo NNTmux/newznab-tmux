@@ -1,6 +1,8 @@
-2017-06-23 DariusIII
+2017-06-26 DariusIII
+	* Chg: Optimize $this->_html declaration by using it only in AdultMovies abstract class
 	* Chg: Use versioning for guzzlehttp in composer
-	* Chg: Update guzzlehttp to latest
+        * Chg: Update guzzlehttp to latest
+2017-06-23 DariusIII
 	* Chg: Uncomment safe_backfill in Forking class for processStartWork function, fixes backfill
 	* Chg: Move tmux starting tmux-ui script to root of the NNTmux install
 	* Chg: Rename misc/update/nix/tmux/tmux-ui.php to just tmux-ui

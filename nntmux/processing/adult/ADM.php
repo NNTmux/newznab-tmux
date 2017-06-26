@@ -39,13 +39,6 @@ class ADM extends AdultMovies
 	protected $_directUrl = '';
 
 	/**
-	 * Simple Html Dom Object
-	 *
-	 * @var \simple_html_dom
-	 */
-	protected $_html;
-
-	/**
 	 * Results returned from each method
 	 *
 	 * @var array
@@ -73,7 +66,6 @@ class ADM extends AdultMovies
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->_html = new \simple_html_dom();
 		$this->pdo = new DB();
 	}
 

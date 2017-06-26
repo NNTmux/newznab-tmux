@@ -46,13 +46,6 @@ class Hotmovies extends AdultMovies
 	protected $_getLink = '';
 
 	/**
-	 * Simple Html Dom Object
-	 *
-	 * @var \simple_html_dom
-	 */
-	protected $_html;
-
-	/**
 	 * POST parameters used with curl
 	 *
 	 * @var array
@@ -89,7 +82,6 @@ class Hotmovies extends AdultMovies
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->_html = new \simple_html_dom();
 	}
 
 	protected function trailers()

@@ -27,13 +27,6 @@ class AEBN extends AdultMovies
 	protected $_directUrl = '';
 
 	/**
-	 * Simple Html Dom Object
-	 *
-	 * @var \simple_html_dom
-	 */
-	protected $_html;
-
-	/**
 	 * Raw Html response from curl
 	 *
 	 */
@@ -78,7 +71,6 @@ class AEBN extends AdultMovies
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->_html = new \simple_html_dom();
 	}
 
 	/**

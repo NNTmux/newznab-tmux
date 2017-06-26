@@ -62,14 +62,11 @@ class ADE extends AdultMovies
 	protected $_response;
 	protected $_res = [];
 	protected $_tmpResponse;
-	protected $_html;
-	protected $_edithtml;
 	protected $_ch;
 
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->_html = new \simple_html_dom();
 	}
 
 	/**
