@@ -30,7 +30,7 @@ class Hotmovies extends AdultMovies
 	 *
 	 * @var string
 	 */
-	public $directLink = '';
+	protected $directLink = '';
 	/**
 	 * Sets the direct url in the getAll method
 	 *
@@ -95,7 +95,7 @@ class Hotmovies extends AdultMovies
 	 * Gets all information
 	 * @return bool|array
 	 */
-	protected function getAll()
+	public function getAll()
 	{
 		$results = [];
 		if (!empty($this->_directUrl)) {

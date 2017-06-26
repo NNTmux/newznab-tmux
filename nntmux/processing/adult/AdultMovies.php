@@ -2,9 +2,8 @@
 
 namespace nntmux\processing\adult;
 
-use nntmux\XXX;
 
-abstract class AdultMovies extends XXX
+abstract class AdultMovies
 {
 	/**
 	 * @var \simple_html_dom
@@ -21,7 +20,6 @@ abstract class AdultMovies extends XXX
 	public function __construct(array $options = [])
 	{
 		$this->_html = new \simple_html_dom();
-		parent::__construct($options);
 	}
 
 	/**
@@ -54,12 +52,12 @@ abstract class AdultMovies extends XXX
 	 *
 	 * @return mixed
 	 */
-	abstract protected function processSite($movie);
+	abstract public function processSite($movie);
 
 	/**
 	 * @return mixed
 	 */
-	abstract protected function getAll();
+	abstract public function getAll();
 
 	/**
 	 * @return mixed

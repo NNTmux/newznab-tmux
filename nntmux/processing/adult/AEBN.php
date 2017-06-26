@@ -250,7 +250,7 @@ class AEBN extends AdultMovies
 	 *
 	 * @return array|bool
 	 */
-	protected function getAll()
+	public function getAll()
 	{
 		$results = [];
 		if (!empty($this->_directUrl)) {

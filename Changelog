@@ -1,4 +1,5 @@
 2017-06-26 DariusIII
+	* Chg: Update XXX processing, set protected on most methods, AdultMovies do not extend XXX anymore to fix circular reference
 	* Chg: Add check to XXX class for false returned result in updateXXXInfo function
 	* Chg: Remove safe_backfill from processStartWork and processEndWork functions in Forking class
 	* Chg: Optimize $this->_html declaration by using it only in AdultMovies abstract class

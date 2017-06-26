@@ -24,13 +24,13 @@ class ADM extends AdultMovies
 	 * Direct Link given from outside url doesn't do a search
 	 * @var string
 	 */
-	public $directLink = '';
+	protected $directLink = '';
 
 	/**
 	 * Set this for what you are searching for.
 	 * @var string
 	 */
-	public $searchTerm = '';
+	protected $searchTerm = '';
 
 	/**
 	 * Sets the directurl for the return results array
@@ -67,15 +67,6 @@ class ADM extends AdultMovies
 	{
 		parent::__construct($options);
 		$this->pdo = new DB();
-	}
-
-	/**
-	 * Remove from memory.
-	 */
-	public function __destruct()
-	{
-		$this->_html->clear();
-		unset($this->_response, $this->_res);
 	}
 
 	/**
@@ -232,7 +223,7 @@ class ADM extends AdultMovies
 	 * Gets all information
 	 * @return array
 	 */
-	protected function getAll()
+	public function getAll()
 	{
 		$results = [];
 		if (!empty($this->_directUrl)) {
