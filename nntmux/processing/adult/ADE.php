@@ -150,11 +150,10 @@ class ADE extends AdultMovies
 	/**
 	 * Gets Product Information and/or Features
 	 *
-	 * @param bool $features Include features? true/false
-	 *
+	 * @param bool $extras
 	 * @return array - ProductInfo/Extras = features
 	 */
-	protected function productInfo($features = false)
+	protected function productInfo($extras = false)
 	{
 		$dofeature = null;
 		$this->_tmpResponse = str_ireplace('Section ProductInfo', 'spdinfo', $this->_response);
@@ -171,7 +170,7 @@ class ADE extends AdultMovies
 						$this->_res['productinfo'][] = trim($strong->innertext);
 					}
 				} else {
-					if ($features === true) {
+					if ($extras === true) {
 						$this->_res['extras'][] = trim($strong->innertext);
 					}
 				}
@@ -223,38 +222,5 @@ class ADE extends AdultMovies
 			return false;
 		}
 		return false;
-	}
-
-	/**
-	 * Gets All Information from the methods
-	 *
-	 * @return array
-	 */
-	public function getAll()
-	{
-		$results = [];
-		if (!empty($this->_directUrl)) {
-			$results['directurl'] = $this->_directUrl;
-			$results['title']     = $this->_title;
-		}
-		if (is_array($this->synopsis())) {
-			$results = array_merge($results, $this->synopsis());
-		}
-		if (is_array($this->productInfo(true))) {
-			$results = array_merge($results, $this->productInfo(true));
-		}
-		if (is_array($this->cast())) {
-			$results = array_merge($results, $this->cast());
-		}
-		if (is_array($this->genres())) {
-			$results = array_merge($results, $this->genres());
-		}
-		if (is_array($this->covers())) {
-			$results = array_merge($results, $this->covers());
-		}
-		if (is_array($this->trailers())) {
-			$results = array_merge($results, $this->trailers());
-		}
-		return $results;
 	}
 }

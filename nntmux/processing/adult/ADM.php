@@ -110,9 +110,11 @@ class ADM extends AdultMovies
 	 * Get Product Information and Director
 	 *
 	 *
+	 * @param bool $extras
+	 *
 	 * @return array
 	 */
-	protected function productInfo()
+	protected function productInfo($extras = false)
 	{
 
 		foreach ($this->_html->find('ul.list-unstyled li') as $li) {
@@ -219,41 +221,6 @@ class ADM extends AdultMovies
 		return $result;
 	}
 
-	/**
-	 * Gets all information
-	 * @return array
-	 */
-	public function getAll()
-	{
-		$results = [];
-		if (!empty($this->_directUrl)) {
-			$results['title'] = $this->_title;
-			$results['directurl'] = $this->_directUrl;
-		}
-
-		if (is_array($this->synopsis())) {
-			$results = array_merge($results, $this->synopsis());
-		}
-
-		if (is_array($this->productInfo())) {
-			$results = array_merge($results, $this->productInfo());
-		}
-
-		if (is_array($this->cast())) {
-			$results = array_merge($results, $this->cast());
-		}
-
-		if (is_array($this->genres())) {
-			$results = array_merge($results, $this->genres());
-		}
-
-		if (is_array($this->covers())) {
-			$results = array_merge($results, $this->covers());
-		}
-
-		$results = empty($results) ? false : $results;
-		return $results;
-	}
 
 	protected function trailers()
 	{

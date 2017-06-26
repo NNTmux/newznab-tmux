@@ -151,7 +151,7 @@ class Popporn extends AdultMovies
 	 *
 	 * @return array|bool
 	 */
-	protected function productInfo($extras = true)
+	protected function productInfo($extras = false)
 	{
 		$country = false;
 		if ($ret = $this->_html->find('div#lside', 0)) {
@@ -323,42 +323,5 @@ class Popporn extends AdultMovies
 		}
 
 		return false;
-	}
-
-	/**
-	 * Gets all information
-	 *
-	 * @return array|bool
-	 */
-	public function getAll()
-	{
-		$results = [];
-		if (isset($this->_directUrl)) {
-			$results['title'] = $this->_title;
-			$results['directurl'] = $this->_directUrl;
-		}
-		if (is_array($this->synopsis())) {
-			$results = array_merge($results, $this->synopsis());
-		}
-		if (is_array($this->productInfo(true))) {
-			$results = array_merge($results, $this->productInfo(true));
-		}
-		if (is_array($this->cast())) {
-			$results = array_merge($results, $this->cast());
-		}
-		if (is_array($this->genres())) {
-			$results = array_merge($results, $this->genres());
-		}
-		if (is_array($this->covers())) {
-			$results = array_merge($results, $this->covers());
-		}
-		if (is_array($this->trailers())) {
-			$results = array_merge($results, $this->trailers());
-		}
-		if (empty($results)) {
-			return false;
-		}
-
-		return $results;
 	}
 }

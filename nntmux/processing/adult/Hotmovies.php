@@ -92,41 +92,6 @@ class Hotmovies extends AdultMovies
 	}
 
 	/**
-	 * Gets all information
-	 * @return bool|array
-	 */
-	public function getAll()
-	{
-		$results = [];
-		if (!empty($this->_directUrl)) {
-			$results['title'] = $this->_title;
-			$results['directurl'] = $this->_directUrl;
-		}
-		if (is_array($this->synopsis())) {
-			$results = array_merge($results, $this->synopsis());
-		}
-		if (is_array($this->productInfo())) {
-			$results = array_merge($results, $this->productInfo());
-		}
-		if (is_array($this->cast())) {
-			$results = array_merge($results, $this->cast());
-		}
-		if (is_array($this->genres())) {
-			$results = array_merge($results, $this->genres());
-		}
-		if (is_array($this->covers())) {
-			$results = array_merge($results, $this->covers());
-		}
-
-		if (empty($results)) {
-			return false;
-		}
-
-		return $results;
-
-	}
-
-	/**
 	 * Gets the synopsis
 	 *
 	 * @return array
@@ -146,9 +111,11 @@ class Hotmovies extends AdultMovies
 
 	/**Process ProductInfo
 	 *
+	 * @param bool $extras
+	 *
 	 * @return array
 	 */
-	protected function productInfo(): array
+	protected function productInfo($extras = false): array
 	{
 		$studio = false;
 		$director = false;

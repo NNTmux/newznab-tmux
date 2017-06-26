@@ -11,6 +11,11 @@ abstract class AdultMovies
 	protected $_html;
 
 	/**
+	 * @var string
+	 */
+	protected $_title;
+
+	/**
 	 * AdultMovies constructor.
 	 *
 	 * @param array $options
@@ -23,9 +28,11 @@ abstract class AdultMovies
 	}
 
 	/**
+	 * @param bool $extras
+	 *
 	 * @return mixed
 	 */
-	abstract protected function productInfo();
+	abstract protected function productInfo($extras = false);
 
 	/**
 	 * @return mixed
@@ -55,12 +62,46 @@ abstract class AdultMovies
 	abstract public function processSite($movie);
 
 	/**
-	 * @return mixed
+	 * Gets all information
+	 *
+	 * @return array|bool
 	 */
-	abstract public function getAll();
+	public function getAll()
+	{
+		$results = [];
+		if (isset($this->_directUrl)) {
+			$results['title'] = $this->_title;
+			$results['directurl'] = $this->_directUrl;
+		}
+		if (is_array($this->synopsis())) {
+			$results = array_merge($results, $this->synopsis());
+		}
+		if (is_array($this->productInfo(true))) {
+			$results = array_merge($results, $this->productInfo(true));
+		}
+		if (is_array($this->cast())) {
+			$results = array_merge($results, $this->cast());
+		}
+		if (is_array($this->genres())) {
+			$results = array_merge($results, $this->genres());
+		}
+		if (is_array($this->covers())) {
+			$results = array_merge($results, $this->covers());
+		}
+		if (is_array($this->trailers())) {
+			$results = array_merge($results, $this->trailers());
+		}
+		if (empty($results)) {
+			return false;
+		}
+
+		return $results;
+	}
 
 	/**
 	 * @return mixed
 	 */
 	abstract protected function trailers();
+
+
 }
