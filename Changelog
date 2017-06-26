@@ -1,4 +1,5 @@
 2017-06-23 DariusIII
+	* Chg: Use versioning for guzzlehttp in composer
 	* Chg: Update guzzlehttp to latest
 	* Chg: Uncomment safe_backfill in Forking class for processStartWork function, fixes backfill
 	* Chg: Move tmux starting tmux-ui script to root of the NNTmux install

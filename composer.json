@@ -99,7 +99,7 @@
     "ext-zlib": "*",
     "fxp/composer-asset-plugin": "~1.1",
     "google/recaptcha": "~1.1",
-    "guzzlehttp/guzzle":"dev-master",
+    "guzzlehttp/guzzle": "^6.3",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
     "kbjr/Git.php": "dev-master",

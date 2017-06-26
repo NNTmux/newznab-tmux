@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f2aa144131a6fb8b3d72a01fc6bed139",
+    "content-hash": "1843f9fa4b6cdad0cf839a3ab266ca5b",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -2187,16 +2187,16 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "dev-master",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "b29b37f2ccecb5ab9a6cb85ce2134d4d025d6616"
+                "reference": "f4db5a78a5ea468d4831de7f0bf9d9415e348699"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/b29b37f2ccecb5ab9a6cb85ce2134d4d025d6616",
-                "reference": "b29b37f2ccecb5ab9a6cb85ce2134d4d025d6616",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/f4db5a78a5ea468d4831de7f0bf9d9415e348699",
+                "reference": "f4db5a78a5ea468d4831de7f0bf9d9415e348699",
                 "shasum": ""
             },
             "require": {
@@ -2248,7 +2248,7 @@
                 "rest",
                 "web service"
             ],
-            "time": "2017-06-23 22:56:09"
+            "time": "2017-06-22T18:50:49+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -5772,7 +5772,6 @@
         "b3rs3rk/steamfront": 20,
         "dariusiii/rarinfo": 20,
         "dborsatto/php-giantbomb": 20,
-        "guzzlehttp/guzzle": 20,
         "joshpinkney/tv-maze-php-api": 20,
         "kbjr/git.php": 20,
         "unionofrad/lithium": 10,
