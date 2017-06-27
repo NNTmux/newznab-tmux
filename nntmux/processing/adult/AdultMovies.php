@@ -16,6 +16,11 @@ abstract class AdultMovies
 	protected $_title;
 
 	/**
+	 * @var string
+	 */
+	protected $_directUrl;
+
+	/**
 	 * AdultMovies constructor.
 	 *
 	 * @param array $options
@@ -62,6 +67,11 @@ abstract class AdultMovies
 	abstract public function processSite($movie);
 
 	/**
+	 * @return mixed
+	 */
+	abstract protected function trailers();
+
+	/**
 	 * Gets all information
 	 *
 	 * @return array|bool
@@ -69,27 +79,39 @@ abstract class AdultMovies
 	public function getAll()
 	{
 		$results = [];
-		if (isset($this->_directUrl)) {
+		if ($this->_directUrl !== null) {
 			$results['title'] = $this->_title;
 			$results['directurl'] = $this->_directUrl;
 		}
-		if (is_array($this->synopsis())) {
-			$results = array_merge($results, $this->synopsis());
+
+		$dummy = $this->synopsis();
+		if (is_array($dummy)) {
+			$results = array_merge($results, $dummy);
 		}
-		if (is_array($this->productInfo(true))) {
-			$results = array_merge($results, $this->productInfo(true));
+
+		$dummy = $this->productInfo(true);
+		if (is_array($dummy)) {
+			$results = array_merge($results, $dummy);
 		}
-		if (is_array($this->cast())) {
-			$results = array_merge($results, $this->cast());
+
+		$dummy = $this->cast();
+		if (is_array($dummy)) {
+			$results = array_merge($results, $dummy);
 		}
-		if (is_array($this->genres())) {
-			$results = array_merge($results, $this->genres());
+
+		$dummy = $this->genres();
+		if (is_array($dummy)) {
+			$results = array_merge($results, $dummy);
 		}
-		if (is_array($this->covers())) {
-			$results = array_merge($results, $this->covers());
+
+		$dummy = $this->covers();
+		if (is_array($dummy)) {
+			$results = array_merge($results, $dummy);
 		}
-		if (is_array($this->trailers())) {
-			$results = array_merge($results, $this->trailers());
+
+		$dummy = $this->trailers();
+		if (is_array($dummy)) {
+			$results = array_merge($results, $dummy);
 		}
 		if (empty($results)) {
 			return false;
@@ -97,11 +119,4 @@ abstract class AdultMovies
 
 		return $results;
 	}
-
-	/**
-	 * @return mixed
-	 */
-	abstract protected function trailers();
-
-
 }
