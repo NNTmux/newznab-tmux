@@ -14,7 +14,8 @@ build:
           - mysql -u TEST -pTEST TEST < resources/db/schema/mysql-ddl.sql
           - mysql --local-infile=1 -u TEST -pTEST -e "LOAD DATA LOCAL INFILE 'resources/db/schema/data/10-settings.tsv' IGNORE INTO TABLE TEST.settings FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\'' LINES TERMINATED BY '\n' IGNORE 1 LINES (section,subsection,name,value,hint,setting);"
     environment:
-        memcached:            true
+        memcached: true
+        mysql: 5.6
         php:
             version: '7.1'
             ini:
