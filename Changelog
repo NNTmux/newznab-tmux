@@ -1,3 +1,5 @@
+2017-06-27 DariusIII
+	* Mrg: Merge PR #150 by Nightah - Fix TravisCI builds
 2017-06-26 DariusIII
 	* Chg: Move getAll function to AdultMovies class
 	* Chg: Update XXX processing, set protected on most methods, AdultMovies do not extend XXX anymore to fix circular reference
