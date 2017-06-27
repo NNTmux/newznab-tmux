@@ -126,6 +126,14 @@ class DbUpdate
 						if (Utility::isWin()) {
 							$file = str_replace("\\", '\/', $file);
 						}
+						$this->pdo->exec("SET @@session.sql_mode =
+    											CASE WHEN @@session.sql_mode NOT LIKE '%NO_AUTO_VALUE_ON_ZERO%'
+        											THEN CASE WHEN LENGTH(@@session.sql_mode)>0
+            											THEN CONCAT_WS(',',@@session.sql_mode,'NO_AUTO_VALUE_ON_ZERO')
+            											ELSE 'NO_AUTO_VALUE_ON_ZERO'
+        											END
+        											ELSE @@session.sql_mode
+    											END;");
 						$this->pdo->queryExec(sprintf($sql, $file, $table, $fields));
 						if ($table !== 'settings') {
 							$success = $this->pdo->query(sprintf('SELECT COUNT(id) AS num FROM %s', $table));

@@ -98,11 +98,6 @@ if (!$error) {
 
 	try {
 		$DbSetup->processSQLFile(); // Setup default schema
-		$DbSetup->processSQLFile( // Process any custom stuff.
-			[
-				'filepath' => NN_RES . 'db' . DS . 'schema' . DS . 'mysql-data.sql'
-			]
-		);
 		$DbSetup->loadTables(); // Load default data files
 	} catch (\PDOException $err) {
 		$error = true;

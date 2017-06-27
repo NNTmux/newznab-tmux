@@ -1,4 +1,6 @@
 2017-06-27 DariusIII
+	* Chg: Update install procedure and insertion of zero value into auto_increment id fields for categories
+		(fixes problem with wrong id of OTHER root category) and user_roles, no need to load mysql-data.sql file anymore
 	* Mrg: Merge PR #150 by Nightah - Fix TravisCI builds
 2017-06-26 DariusIII
 	* Chg: Move getAll function to AdultMovies class

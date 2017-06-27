@@ -1,11 +1,12 @@
 id, title, parentid
-1000	Console	\N
-2000	Movies	\N
-3000	Audio	\N
-4000	PC	\N
-5000	TV	\N
-6000	XXX	\N
-7000	Books	\N
+0	Other
+1000	Console
+2000	Movies
+3000	Audio
+4000	PC
+5000	TV
+6000	XXX
+7000	Books
 0010	Misc	0000
 0020	Hashed	0000
 1010	NDS	1000
