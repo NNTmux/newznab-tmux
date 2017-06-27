@@ -1375,6 +1375,7 @@ CREATE TABLE         xxxinfo (
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
 
 DROP TABLE IF EXISTS multigroup_binaries;
