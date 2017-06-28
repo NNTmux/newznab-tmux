@@ -141,6 +141,8 @@ class Steam
 
 	/**
 	 * Downloads full Steam Store dump and imports data into local table
+	 *
+	 * @throws \Exception
 	 */
 	public function populateSteamAppsTable(): void
 	{
@@ -155,20 +157,10 @@ class Steam
 			foreach ($fullAppArray as $appsArray) {
 				foreach ($appsArray as $appArray) {
 					foreach ($appArray as $app) {
-						$dupeCheck = SteamApps::find('first',
-							[
-								'conditions' =>
-									[
-										'name'  => $app['name'],
-										'appid' => $app['appid'],
-									],
-								'fields'     => ['appid'],
-								'limit'      => 1,
-							]
-						);
+						$dupeCheck = SteamApps::query()->where('appid', '=', $app['appid'])->value('appid');
 
 						if ($dupeCheck === null) {
-							$this->pdo->queryExec(sprintf('INSERT IGNORE INTO steam_apps (name, appid) VALUES (%s, %d)', $this->pdo->escapeString($app['name']), $app['appid']));
+							SteamApps::query()->insert(['name' => $this->pdo->escapeString($app['name']), 'appid' => $app['appid']]);
 							$inserted++;
 							if ($inserted % 500 === 0) {
 								echo PHP_EOL . number_format($inserted) . ' apps inserted.' . PHP_EOL;
@@ -181,18 +173,25 @@ class Steam
 					}
 				}
 			}
-			echo PHP_EOL . 'Added ' . $inserted . ' new steam apps, ' . $dupe . ' duplicates skipped' . PHP_EOL;
+			echo PHP_EOL . 'Added ' . $inserted . ' new steam app(s), ' . $dupe . ' duplicates skipped' . PHP_EOL;
 		}
 	}
 
 	/**
-	 * Sets the database time for last full AniDB update
+	 * Sets the database time for last full Steam update
 	 */
 	private function setLastUpdated(): void
 	{
-		Settings::update(
-			['value' => time()],
-			['section' => 'APIs', 'subsection' => 'Steam', 'name' => 'last_update']
+		Settings::query()->where(
+			[
+				['section', '=', 'APIs'],
+				['subsection', '=', 'Steam'],
+				['name', '=', 'last_update']
+			]
+		)->update(
+			[
+				'value' => time()
+			]
 		);
 	}
 }

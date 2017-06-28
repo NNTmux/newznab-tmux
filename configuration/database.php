@@ -18,7 +18,8 @@ $capsule->addConnection([
 	'password' => env('DB_PASSWORD', ''),
 	'unix_socket' => env('DB_SOCKET', ''),
 	'charset' => 'utf8',
-	'collation' => 'utf8_unicode_ci'
+	'collation' => 'utf8_unicode_ci',
+	'strict' => false
 ], 'default');
 $capsule->bootEloquent();
 $capsule->setAsGlobal();

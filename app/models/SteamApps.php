@@ -22,10 +22,37 @@ use Illuminate\Database\Eloquent\Model;
 
 class SteamApps extends Model
 {
+	/**
+	 * @var string
+	 */
 	protected $table = 'steam_apps';
+
+	/**
+	 * @var bool
+	 */
 	public $timestamps = false;
+
+	/**
+	 * @var bool
+	 */
 	public $dateFormat = false;
+
+	/**
+	 * @var array
+	 */
+	protected $fillable = ['name', 'appid'];
+
+	/**
+	 * @var array
+	 */
 	protected $primaryKey = 'name';
+
+	protected $keyType = 'string';
+
+	/**
+	 * @var bool
+	 */
+	public $incrementing = false;
 }
 
 ?>
