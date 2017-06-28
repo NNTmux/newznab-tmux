@@ -19,17 +19,19 @@
 
 namespace app\models;
 
+use Illuminate\Database\Eloquent\Model;
 use nntmux\utility\Utility;
+use app\extensions\console\Command;
 
 /**
  * Settings - model for settings table.
  *
- * li3 app completely ignore the 'setting' column and only uses 'section', 'subsection', and 'name'
+ * laravel app completely ignore the 'setting' column and only uses 'section', 'subsection', and 'name'
  * for finding values/hints.
  *
  *@package app\models
  */
-class Settings extends \lithium\data\Model
+class Settings extends Model
 {
 	const REGISTER_STATUS_OPEN = 0;
 
@@ -59,55 +61,42 @@ class Settings extends \lithium\data\Model
 
 	const ERR_BAD_YYDECODER_PATH = -10;
 
-	public $validates = [
-		'section' => [
-			[
-				'required'	=> false
-			]
-		],
-		'subsection' => [
-			[
-				'required' => false
-			]
-		],
-		'name' => [
-			[
-				'required' => true
-			],
-			[
-				'notEmpty',
-				'message' => 'You must supply a name for this setting.'
-			]
-		],
-		'value' => [
-			[
-				'required' => true
-			]
-		],
-		'hint' => [
-			[
-				'required' => true
-			],
-			[
-				'notEmpty',
-				'message' => 'You must supply a hint/description for this setting.'
-			]
-		],
-		'setting' => [
-			[
-				'required' => true
-			],
-			[
-				'notEmpty',
-				'message' => 'You must supply a name for this setting.'
-			]
-		],
-	];
+	/**
+	 * @var Command
+	 */
+	protected $console;
+	/**
+	 * @var array
+	 */
+	protected $primaryKey = ['section', 'subsection', 'name'];
 
-	protected $_meta = [
-		'key' => ['section', 'subsection', 'name']
-	];
+	/**
+	 * @var string
+	 */
+	protected $table = 'settings';
 
+	/**
+	 * @var bool
+	 */
+	protected $dateFormat = false;
+
+	/**
+	 * @var bool
+	 */
+	public $timestamps = false;
+
+	/**
+	 * @var bool
+	 */
+	public $incrementing = false;
+
+	/**
+	 * @param Command $console
+	 *
+	 * @return bool
+	 * @throws \Exception
+	 * @throws \InvalidArgumentException
+	 */
 	public static function hasAllEntries($console = null)
 	{
 		$filepath = Utility::pathCombine(['db', 'schema', 'data', '10-settings.tsv'], NN_RES);
@@ -118,7 +107,7 @@ class Settings extends \lithium\data\Model
 
 		if (!is_array($settings)) {
 			var_dump($settings);
-			throw new \InvalidArgumentException("Settings is not an array!");
+			throw new \InvalidArgumentException('Settings is not an array!');
 		}
 
 		$setting = [];
@@ -126,8 +115,9 @@ class Settings extends \lithium\data\Model
 		$result = false;
 		if ($dummy !== null) {
 			if ($console !== null) {
-				$console->primary("Verifying settings table...");
-				$console->info("(section, subsection, name):");
+				$console = new Command();
+				$console->primary('Verifying settings table...');
+				$console->info('(section, subsection, name):');
 			}
 			$result = true;
 			foreach ($settings as $line) {
@@ -144,40 +134,17 @@ class Settings extends \lithium\data\Model
 					true);
 				if ($value === null) {
 					$result = false;
-					$message = "error";
+					$message = 'error';
 				}
 
-				if ($message != '' && $console !== null) {
-					$console->out(" {$setting['section']}, {$setting['subsection']}, {$setting['name']}: "
-						. "MISSING!");
+				if ($message !== '' && $console !== null) {
+					$console->error(" {$setting['section']}, {$setting['subsection']}, {$setting['name']}: "
+						. 'MISSING!');
 				}
 			}
 		}
 
 		return $result;
-	}
-
-	public static function init()
-	{
-		static::finder('setting',
-			function ($params, $next) {
-
-				$params['options']['conditions'] = self::settingToArray($params['options']['conditions']);
-				$params['type'] = 'first';
-
-				$array = array_diff_key(
-					$params['options'],
-					array_fill_keys(['conditions', 'fields', 'order', 'limit', 'page'], 0)
-				);
-				$params['options'] = array_diff_key($params['options'], $array);
-				$params['options']['fields'] = ['value', 'hint'];
-
-
-				$result = $next($params);
-
-				return $result;
-			}
-		);
 	}
 
 	/**
@@ -192,8 +159,8 @@ class Settings extends \lithium\data\Model
 	public static function toTree(array $options = [], $excludeUnsectioned = true)
 	{
 		$results = empty($options) ?
-			Settings::find('all') :
-			Settings::find('all', $options);
+			Settings::all():
+			Settings::all()->find($options);
 
 		$tree = [];
 		if (is_array($results)) {
@@ -205,7 +172,7 @@ class Settings extends \lithium\data\Model
 			}
 		} else {
 			throw new \RuntimeException(
-				"NO results from Settings table! Check your table has been created and populated."
+				'NO results from Settings table! Check your table has been created and populated.'
 			);
 		}
 
@@ -217,15 +184,15 @@ class Settings extends \lithium\data\Model
 	 * either the value is passed to Settings::dottedToArray() for conversion. Otherwise the
 	 * value is returned unchanged.
 	 *
-	 * @param $setting    Setting array/string to check.
+	 * @param $setting array|bool
 	 *
-	 * @return array|boolean
+	 * @return array|bool
 	 */
 	public static function settingToArray($setting)
 	{
 		if (!is_array($setting)) {
 			$setting = self::dottedToArray($setting);
-		} elseif (count($setting) == 1) {
+		} elseif (count($setting) === 1) {
 			$setting = self::dottedToArray($setting[0]);
 		}
 
@@ -248,12 +215,17 @@ class Settings extends \lithium\data\Model
 	 */
 	public static function value($setting, $returnAlways = false)
 	{
-		$result = Settings::find('setting', ['conditions' => $setting, 'fields' => ['value']]);
+		$setting = self::settingToArray($setting);
+		$result = Settings::query()->where([
+												['section', '=', $setting['section']],
+												['subsection', '=', $setting['subsection']],
+												['name', '=', $setting['name']]
+											])->value('value');
 
-		if ($result !== false && $result->count() > 0) {
-			$value = $result->data()[0]['value'];
+		if ($result !== false) {
+			$value = $result;
 		} else if ($returnAlways === false) {
-			throw new \Exception("Unable to fetch setting from Db!");
+			throw new \RuntimeException('Unable to fetch setting from Db!');
 		} else {
 			$value = null;
 		}
@@ -288,5 +260,3 @@ class Settings extends \lithium\data\Model
 
 	}
 }
-
-Settings::init();

@@ -1,12 +1,7 @@
 <?php
-/**
- * Lithium: the most rad php framework
- *
- * @copyright     Copyright 2015, Union of RAD (http://union-of-rad.org)
- * @license       http://opensource.org/licenses/bsd-license.php The BSD License
- */
 
 require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
+require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'configuration' . DIRECTORY_SEPARATOR . 'database.php';
 
 /**
  * This is the primary bootstrap file of your application, and is loaded immediately after the front
