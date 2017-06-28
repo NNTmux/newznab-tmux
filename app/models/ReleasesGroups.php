@@ -19,12 +19,15 @@
 namespace app\models;
 
 
-class ReleasesGroups extends \lithium\data\Model
-{
-	public $belongsTo = ['Releases'];
-	public $hasMany = ['Groups'];
+use Illuminate\Database\Eloquent\Model;
 
-	protected $_meta = [
-		'key'			=> ['releases_id', 'groups_id'],
-	];
+class ReleasesGroups extends Model
+{
+	protected $table = 'releases_groups';
+
+	public $timestamps = false;
+
+	public $dateFormat = false;
+
+	protected $primaryKey = ['releases_id', 'groups_id'];
 }

@@ -18,13 +18,14 @@
  */
 namespace app\models;
 
-class SteamApps extends \lithium\data\Model
+use Illuminate\Database\Eloquent\Model;
+
+class SteamApps extends Model
 {
-	protected $_meta = [
-		'key' => [
-			'name'
-		],
-	];
+	protected $table = 'steam_apps';
+	public $timestamps = false;
+	public $dateFormat = false;
+	protected $primaryKey = 'name';
 }
 
 ?>

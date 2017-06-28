@@ -19,12 +19,17 @@
 namespace app\models;
 
 
-class ReleaseRegexes extends \lithium\data\Model
-{
-	public $belongsTo = ['Releases'];
-	public $hasMany = ['Collection_regexes'];
+use Illuminate\Database\Eloquent\Model;
 
-	protected $_meta = [
-		'key'			=> ['releases_id', 'collection_regex_id', 'naming_regex_id'],
+class ReleaseRegexes extends Model
+{
+	protected $table = 'release_regexes';
+
+	public $timestamps = false;
+
+	public $dateFormat = false;
+
+	protected $primaryKey = [
+		['releases_id', 'collection_regex_id', 'naming_regex_id'],
 	];
 }
