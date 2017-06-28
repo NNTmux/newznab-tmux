@@ -322,7 +322,6 @@ class Versions extends Collection
 
 	protected function _init()
 	{
-
 		if ($this->_config['git'] instanceof Git) {
 			$this->git =& $this->_config['git'];
 		}

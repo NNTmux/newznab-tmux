@@ -19,13 +19,20 @@
 namespace app\extensions\util;
 
 use \GitRepo;
+use Illuminate\Database\Eloquent\Collection;
+use Symfony\Component\Process\Process;
 
-class Git extends \lithium\core\Object
+class Git extends Collection
 {
 	/**
 	 * @var \GitRepo object
 	 */
 	protected $repo;
+
+	/**
+	 * @var array
+	 */
+	public $_config;
 
 	protected $gitTagLatest = null;
 
@@ -43,6 +50,8 @@ class Git extends \lithium\core\Object
 			'filepath'		=> NN_ROOT,
 		];
 
+		$config += $defaults;
+		$this->_config = $config;
 		parent::__construct($config += $defaults);
 	}
 
@@ -52,10 +61,14 @@ class Git extends \lithium\core\Object
 	 * @param string $options
 	 *
 	 * @return string
+	 * @throws \Symfony\Component\Process\Exception\LogicException
+	 * @throws \Symfony\Component\Process\Exception\RuntimeException
 	 */
 	public function describe($options = null)
 	{
-		return $this->run("describe $options");
+		$command = new Process('describe' . $options);
+		$command->run();
+		return $command->getOutput();
 	}
 
 	/**
@@ -92,7 +105,9 @@ class Git extends \lithium\core\Object
 
 	public function getHeadHash()
 	{
-		return $this->run('rev-parse HEAD');
+		$command = new Process('git rev-parse HEAD');
+		$command->run();
+		return $command->getOutput();
 	}
 
 	/**
@@ -108,13 +123,15 @@ class Git extends \lithium\core\Object
 		$cmd = "cat-file -e $gitObject";
 
 		try {
-			$result = $this->run($cmd);
+			$result = new Process($cmd);
+			$result->run();
+			return $result->getOutput();
 		} catch (\Exception $e) {
 			$message = explode("\n", $e->getMessage());
 			if ($message[0] === "fatal: Not a valid object name $gitObject") {
 				$result = false;
 			} else {
-				throw new \Exception($message);
+				throw new \RuntimeException($message);
 			}
 		}
 
@@ -140,13 +157,17 @@ class Git extends \lithium\core\Object
 	 * @param null $options
 	 *
 	 * @return string
+	 * @throws \Symfony\Component\Process\Exception\LogicException
+	 * @throws \Symfony\Component\Process\Exception\RuntimeException
 	 */
 	public function log($options = null)
 	{
-		return $this->run("log $options");
+		$command = new Process("log $options");
+		$command->run();
+		return $command->getOutput();
 	}
 
-	public function pull(array $options = [])
+	public function gitPull(array $options = [])
 	{
 		$default = [
 			'branch'	=> $this->getBranch(),
@@ -167,7 +188,7 @@ class Git extends \lithium\core\Object
 	 *
 	 * @return  string
 	 */
-	public function run($command)
+	public function gitRun($command)
 	{
 		return $this->repo->run($command);
 	}
@@ -181,7 +202,7 @@ class Git extends \lithium\core\Object
 	 */
 	public function tag($options = null)
 	{
-		return $this->run("tag $options");
+		return $this->gitRun("tag $options");
 	}
 
 	/**
@@ -201,8 +222,6 @@ class Git extends \lithium\core\Object
 
 	protected function _init()
 	{
-		parent::_init();
-
 		$this->repo = new GitRepo(
 			$this->_config['filepath'],
 			$this->_config['create'],

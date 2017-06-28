@@ -10,7 +10,8 @@
       "app/extensions/helper/helpers.php"
     ],
     "psr-4": {
-      "nntmux\\": "nntmux/"
+      "nntmux\\": "nntmux/",
+      "app\\": "app/"
     },
     "classmap": [
       "www/pages/",
