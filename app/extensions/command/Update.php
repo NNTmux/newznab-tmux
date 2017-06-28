@@ -38,7 +38,6 @@ class Update extends Command
 	{
 
 		$defaults = [
-			'classes'	=> $this->_classes,
 			'git'		=> null,
 			'request'	=> null,
 			'response'	=> [],

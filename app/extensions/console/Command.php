@@ -24,10 +24,6 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Command extends \Illuminate\Console\Command
 {
-	protected $_classes = [
-			'response'	=> Response::class
-	];
-
 	/**
 	 * Command constructor.
 	 *

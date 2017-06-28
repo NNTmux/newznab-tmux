@@ -19,10 +19,10 @@
 namespace app\extensions\util;
 
 use app\models\Settings;
-use lithium\core\Object;
+use Illuminate\Database\Eloquent\Collection;
 use nntmux\utility\Utility;
 
-class Versions extends Object
+class Versions extends Collection
 {
 	/**
 	 * These constants are bitwise for checking what has changed.
@@ -42,6 +42,11 @@ class Versions extends Object
 	protected $git;
 
 	/**
+	 * @var
+	 */
+	protected $_config;
+
+	/**
 	 * @var \simpleXMLElement object.
 	 */
 	protected $versions = null;
@@ -57,8 +62,10 @@ class Versions extends Object
 			'git'	=> null,
 			'path'	=> NN_VERSIONS,
 		];
+		$config += $defaults;
 
-		parent::__construct($config += $defaults);
+		$this->_config = $config;
+		parent::__construct($config+$defaults);
 	}
 
 	public function checkGitTag($update = false)
@@ -315,7 +322,6 @@ class Versions extends Object
 
 	protected function _init()
 	{
-		parent::_init();
 
 		if ($this->_config['git'] instanceof Git) {
 			$this->git =& $this->_config['git'];

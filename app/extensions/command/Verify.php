@@ -37,14 +37,9 @@ class Verify extends \app\extensions\console\Command
 	 */
 	public function __construct(array $config = [])
 	{
-		$defaults = [
-			'classes'  => $this->_classes,
-			'request'  => null,
-			'response' => [],
-		];
 		$this->setName('verify')
 			->setHelp('This function is used to verify that settings table is properly populated');
-		parent::__construct($config + $defaults);
+		parent::__construct($config);
 	}
 
 	public function settingstable()
