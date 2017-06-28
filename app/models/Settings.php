@@ -90,6 +90,8 @@ class Settings extends Model
 	 */
 	public $incrementing = false;
 
+	protected $fillable = ['section', 'subsection', 'name', 'value', 'hint', 'setting'];
+
 	/**
 	 * @param Command $console
 	 *
@@ -143,7 +145,7 @@ class Settings extends Model
 				}
 			}
 		}
-
+		$console->info('Settings table has all the required data');
 		return $result;
 	}
 
@@ -222,7 +224,7 @@ class Settings extends Model
 												['name', '=', $setting['name']]
 											])->value('value');
 
-		if ($result !== false) {
+		if ($result !== null) {
 			$value = $result;
 		} else if ($returnAlways === false) {
 			throw new \RuntimeException('Unable to fetch setting from Db!');
