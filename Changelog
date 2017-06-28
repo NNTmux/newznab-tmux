@@ -1,3 +1,5 @@
+2017-06-28 DariusIII
+	* Mrg: Merge PR #151 by Nightah - Fix safe_backfill
 2017-06-27 DariusIII
 	* Chg: Slightly improve XXX processing speed
 	* Chg: Update scrutinizer.yml
