@@ -663,14 +663,13 @@ class ProcessReleases
 						);
 
 						// Add the id of regex that matched the collection and release name to release_regexes table
-						$releasesRegexes = ReleaseRegexes::create(
+						ReleaseRegexes::query()->insert(
 							[
 								'releases_id'            => $releaseID,
 								'collection_regex_id'    => $collection['collection_regexes_id'],
-								'naming_regex_id'        => isset($cleanedName['id']) ? $cleanedName['id'] : 0,
+								'naming_regex_id'        => $cleanedName['id'] ?? 0,
 							]
 						);
-						$releasesRegexes->save();
 
 						if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
 							foreach ($matches[1] as $grp) {
@@ -695,26 +694,20 @@ class ProcessReleases
 										);
 									}
 
-									$relGroupsChk = ReleasesGroups::find('first',
+									$relGroupsChk = ReleasesGroups::query()->where(
 										[
-											'conditions' =>
-												[
-													'releases_id' => $releaseID,
-													'groups_id'   => $xrefGrpID,
-												],
-											'fields'     => ['releases_id'],
-											'limit'      => 1,
+											['releases_id', '=', $releaseID],
+											['groups_id', '=', $xrefGrpID]
 										]
-									);
+									)->first();
 
 									if ($relGroupsChk === null) {
-										$relGroups = ReleasesGroups::create(
+										ReleasesGroups::query()->insert(
 											[
 												'releases_id' => $releaseID,
 												'groups_id'   => $xrefGrpID,
 											]
 										);
-										$relGroups->save();
 									}
 								}
 							}

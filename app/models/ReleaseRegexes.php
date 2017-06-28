@@ -29,7 +29,9 @@ class ReleaseRegexes extends Model
 
 	public $dateFormat = false;
 
+	protected $fillable = ['releases_id', 'collection_regex_id', 'naming_regex_id'];
+
 	protected $primaryKey = [
-		['releases_id', 'collection_regex_id', 'naming_regex_id'],
+		['releases_id', 'collection_regex_id', 'naming_regex_id']
 	];
 }

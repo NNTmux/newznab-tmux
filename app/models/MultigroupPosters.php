@@ -22,22 +22,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class MultigroupPosters extends Model
 {
+	protected $table = 'multigroup_posters';
+
+	protected $keyType = 'string';
+
 	protected $primaryKey = 'poster';
 
 	public $dateFormat = false;
 
 	public $timestamps = false;
 
-	public $incrementing = false;
 
-	protected $table = 'multigroup_posters';
 
-	public $validates = [
-		'poster' => [
-			'notEmpty',
-			'message' => 'Empty poster value is not permitted.'
-		]
-	];
 
 	public static function commaSeparatedList()
 	{

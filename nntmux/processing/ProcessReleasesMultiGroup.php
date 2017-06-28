@@ -37,7 +37,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 	 */
 	public static function isMultiGroup($fromName): bool
 	{
-		$poster = MultigroupPosters::find('first', ['conditions' => ['poster' => $fromName]]);
+		$poster = MultigroupPosters::query()->where('poster', '=', $fromName)->first();
 		return (empty($poster) ? false : true);
 	}
 
