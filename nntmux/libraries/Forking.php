@@ -241,6 +241,7 @@ class Forking extends \fork_daemon
 	private function processStartWork()
 	{
 		switch ($this->workType) {
+			case 'safe_backfill':
 			case 'safe_binaries':
 				$this->_executeCommand(
 					PHP_BINARY . ' ' . NN_NIX . 'tmux/bin/update_groups.php'
