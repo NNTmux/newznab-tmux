@@ -51,11 +51,11 @@ class Version extends Command
 		$this->versions = new Versions();
 		$this->setName('version')
 			->setHelp('Returns the current version (or branch) of the indexer.
-		Actions:
-		all		Show all of following info.
-		branch		Show git branch name.
-  		git		Show git tag for current version.
-		sql		Show SQL patch level');
+						Actions:
+						all		Show all of following info.
+						branch		Show git branch name.
+  						git		Show git tag for current version.
+						sql		Show SQL patch level');
 		parent::__construct($config);
 	}
 
