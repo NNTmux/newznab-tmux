@@ -12,6 +12,7 @@ use nntmux\db\DB;
 use nntmux\db\DbUpdate;
 use nntmux\ColorCLI;
 use nntmux\Users;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 $config = new Configure('install');
 
@@ -161,26 +162,21 @@ switch (env('DB_SYSTEM')) {
 		break;
 }
 
-if ($adapter !== null) {
-	if (empty(env('DB_SOCKET'))) {
-		$host = empty(env('DB_PORT')) ? env('DB_HOST') : env('DB_HOST') . ':' . env('DB_PORT');
-	} else {
-		$host = env('DB_SOCKET');
-	}
-
-	lithium\data\Connections::add('default',
-		[
-			'type'       => 'database',
-			'adapter'    => $adapter,
-			'host'       => $host,
-			'login'      => env('DB_USER'),
-			'password'   => env('DB_PASSWORD'),
-			'database'   => env('DB_NAME'),
-			'encoding'   => 'UTF-8',
-			'persistent' => false,
-		]
-	);
-}
+	$capsule = new Capsule;
+// Same as database configuration file of Laravel.
+	$capsule->addConnection([
+		'driver' => env('DB_SYSTEM'),
+		'host' => env('DB_HOST', '127.0.0.1'),
+		'port' => env('DB_PORT', '3306'),
+		'database' => env('DB_NAME', 'nntmux'),
+		'username' => env('DB_USER', 'root'),
+		'password' => env('DB_PASSWORD', ''),
+		'unix_socket' => env('DB_SOCKET', ''),
+		'charset' => 'utf8',
+		'collation' => 'utf8_unicode_ci',
+		'strict' => false
+	], 'default');
+$capsule->bootEloquent();
 
 $user = new Users();
 if (!$user->isValidUsername(env('ADMIN_USER'))) {
