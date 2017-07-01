@@ -1,4 +1,7 @@
-#Add updated regex
+#Update old regexes
+UPDATE release_naming_regexes SET group_regex = '^alt\\.binaries\\.warez(|\\.ibm-pc)\\.0-day$' WHERE id IN (1074, 1075, 1076, 1077, 1078);
+
+#Add new regexes
 INSERT INTO release_naming_regexes (id, group_regex, regex, status, description, ordinal)
 VALUES (
   1157,
