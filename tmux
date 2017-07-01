@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 <?php
-require_once __DIR__ . '/app/config/bootstrap.php';
+require_once __DIR__ . '/bootstrap/bootstrap.php';
 
 use app\extensions\command\Update;
 use app\extensions\command\Verify;

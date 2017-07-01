@@ -18,8 +18,8 @@
  * @author niel
  * @copyright 2015 NN
  */
-require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php');
-require_once NN_ROOT . 'app' . DS . 'config' . DS . 'bootstrap.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
+require_once NN_ROOT . 'bootstrap' . DS . 'bootstrap.php';
 
 use nntmux\config\Configure;
 
