@@ -53,6 +53,13 @@ class Git extends Collection
 		$config += $defaults;
 		$this->_config = $config;
 		parent::__construct($config += $defaults);
+
+		$this->repo = new GitRepo(
+			$this->_config['filepath'],
+			$this->_config['create'],
+			$this->_config['initialise']
+		);
+		$this->branch = $this->repo->active_branch();
 	}
 
 	/**
@@ -66,7 +73,7 @@ class Git extends Collection
 	 */
 	public function describe($options = null)
 	{
-		$command = new Process('describe' . $options);
+		$command = new Process('git describe ' . $options);
 		$command->run();
 		return $command->getOutput();
 	}
@@ -93,9 +100,7 @@ class Git extends Collection
 	 */
 	public function getBranchesMain()
 	{
-		$main = array_merge($this->getBranchesStable(), $this->getBranchesDevelop());
-
-		return $main;
+		return array_merge($this->getBranchesStable(), $this->getBranchesDevelop());
 	}
 
 	public function getBranchesStable()
@@ -143,9 +148,8 @@ class Git extends Collection
 		foreach ($this->getBranchesStable() as $pattern) {
 			if (!preg_match("#$pattern#", $branch)) {
 				continue;
-			} else {
-				return true;
 			}
+			return true;
 		}
 
 		return false;
@@ -162,7 +166,7 @@ class Git extends Collection
 	 */
 	public function log($options = null)
 	{
-		$command = new Process("log $options");
+		$command = new Process("git log $options");
 		$command->run();
 		return $command->getOutput();
 	}
@@ -199,10 +203,14 @@ class Git extends Collection
 	 * @param string $options
 	 *
 	 * @return string
+	 * @throws \Symfony\Component\Process\Exception\RuntimeException
+	 * @throws \Symfony\Component\Process\Exception\LogicException
 	 */
 	public function tag($options = null)
 	{
-		return $this->gitRun("tag $options");
+		$command = new Process('git tag' . $options);
+		$command->run();
+		return $command->getOutput();
 	}
 
 	/**
@@ -211,22 +219,14 @@ class Git extends Collection
 	 * Be aware this might cause problems if tags are added out of order?
 	 *
 	 * @return string
+	 * @throws \Symfony\Component\Process\Exception\RuntimeException
+	 * @throws \Symfony\Component\Process\Exception\LogicException
 	 */
 	public function tagLatest($cached = true)
 	{
 		if (empty($this->gitTagLatest) || $cached === false) {
-			$this->gitTagLatest = trim($this->describe("--tags --abbrev=0 HEAD"));
+			$this->gitTagLatest = trim($this->describe('--tags --abbrev=0 HEAD'));
 		}
 		return $this->gitTagLatest;
-	}
-
-	protected function _init()
-	{
-		$this->repo = new GitRepo(
-			$this->_config['filepath'],
-			$this->_config['create'],
-			$this->_config['initialise']
-		);
-		$this->branch = $this->repo->active_branch();
 	}
 }
