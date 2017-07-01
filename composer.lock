@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "1843f9fa4b6cdad0cf839a3ab266ca5b",
+    "content-hash": "06218ccb831c21ee8e3473c9ee594976",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -109,12 +109,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/b3rs3rk/steamfront.git",
-                "reference": "91926f883c7cff6dcdd844e5e34310d56da49113"
+                "reference": "dc06fe132db557170c68cbd8c19c1773330906b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/b3rs3rk/steamfront/zipball/91926f883c7cff6dcdd844e5e34310d56da49113",
-                "reference": "91926f883c7cff6dcdd844e5e34310d56da49113",
+                "url": "https://api.github.com/repos/b3rs3rk/steamfront/zipball/dc06fe132db557170c68cbd8c19c1773330906b7",
+                "reference": "dc06fe132db557170c68cbd8c19c1773330906b7",
                 "shasum": ""
             },
             "require": {
@@ -139,7 +139,7 @@
                 }
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
-            "time": "2017-02-07 02:15:29"
+            "time": "2017-06-30 12:49:25"
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -1384,120 +1384,6 @@
             ]
         },
         {
-            "name": "composer/installers",
-            "version": "v1.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/composer/installers.git",
-                "reference": "79ad876c7498c0bbfe7eed065b8651c93bfd6045"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/79ad876c7498c0bbfe7eed065b8651c93bfd6045",
-                "reference": "79ad876c7498c0bbfe7eed065b8651c93bfd6045",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.0"
-            },
-            "replace": {
-                "roundcube/plugin-installer": "*",
-                "shama/baton": "*"
-            },
-            "require-dev": {
-                "composer/composer": "1.0.*@dev",
-                "phpunit/phpunit": "4.1.*"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "Composer\\Installers\\Plugin",
-                "branch-alias": {
-                    "dev-master": "1.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Composer\\Installers\\": "src/Composer/Installers"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kyle Robinson Young",
-                    "email": "kyle@dontkry.com",
-                    "homepage": "https://github.com/shama"
-                }
-            ],
-            "description": "A multi-framework Composer library installer",
-            "homepage": "https://composer.github.io/installers/",
-            "keywords": [
-                "Craft",
-                "Dolibarr",
-                "Eliasis",
-                "Hurad",
-                "ImageCMS",
-                "Kanboard",
-                "MODX Evo",
-                "Mautic",
-                "Maya",
-                "OXID",
-                "Plentymarkets",
-                "Porto",
-                "RadPHP",
-                "SMF",
-                "Thelia",
-                "WolfCMS",
-                "agl",
-                "aimeos",
-                "annotatecms",
-                "attogram",
-                "bitrix",
-                "cakephp",
-                "chef",
-                "cockpit",
-                "codeigniter",
-                "concrete5",
-                "croogo",
-                "dokuwiki",
-                "drupal",
-                "elgg",
-                "expressionengine",
-                "fuelphp",
-                "grav",
-                "installer",
-                "itop",
-                "joomla",
-                "kohana",
-                "laravel",
-                "lavalite",
-                "lithium",
-                "magento",
-                "mako",
-                "mediawiki",
-                "modulework",
-                "moodle",
-                "phpbb",
-                "piwik",
-                "ppi",
-                "puppet",
-                "reindex",
-                "roundcube",
-                "shopware",
-                "silverstripe",
-                "sydes",
-                "symfony",
-                "typo3",
-                "wordpress",
-                "yawik",
-                "zend",
-                "zikula"
-            ],
-            "time": "2017-04-24T06:37:16+00:00"
-        },
-        {
             "name": "dariusiii/rarinfo",
             "version": "dev-master",
             "source": {
@@ -2541,16 +2427,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.4.27",
+            "version": "v5.4.28",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "66f5e1b37cbd66e730ea18850ded6dc0ad570404"
+                "reference": "442511fc62121085d184355e4f964c88942bbecb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/66f5e1b37cbd66e730ea18850ded6dc0ad570404",
-                "reference": "66f5e1b37cbd66e730ea18850ded6dc0ad570404",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/442511fc62121085d184355e4f964c88942bbecb",
+                "reference": "442511fc62121085d184355e4f964c88942bbecb",
                 "shasum": ""
             },
             "require": {
@@ -2666,7 +2552,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2017-06-15T19:08:25+00:00"
+            "time": "2017-06-30T13:43:07+00:00"
         },
         {
             "name": "league/flysystem",
@@ -4181,52 +4067,6 @@
             "time": "2017-06-07T18:47:58+00:00"
         },
         {
-            "name": "unionofrad/lithium",
-            "version": "v1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/UnionOfRAD/lithium.git",
-                "reference": "5d337263469dc14df1f4c05c226e2f24041f112b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/lithium/zipball/5d337263469dc14df1f4c05c226e2f24041f112b",
-                "reference": "5d337263469dc14df1f4c05c226e2f24041f112b",
-                "shasum": ""
-            },
-            "require": {
-                "composer/installers": "1.*",
-                "php": "^5.5.14 || ^7.0.3"
-            },
-            "require-dev": {
-                "unionofrad/li3_fixtures": "1.1.*@dev"
-            },
-            "bin": [
-                "console/li3"
-            ],
-            "type": "lithium-library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Union of RAD"
-                },
-                {
-                    "name": "The Community"
-                }
-            ],
-            "description": "The core library of the Lithium PHP framework",
-            "homepage": "http://li3.me",
-            "keywords": [
-                "framework",
-                "li3",
-                "lithium"
-            ],
-            "time": "2017-04-23T09:19:40+00:00"
-        },
-        {
             "name": "vlucas/phpdotenv",
             "version": "v2.4.0",
             "source": {
@@ -5021,16 +4861,16 @@
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "4.0.1",
+            "version": "4.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "eabce450df194817a7d7e27e19013569a903a2bf"
+                "reference": "d8833b396dce9162bb2eb5d59aee5a3ab3cfa5b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/eabce450df194817a7d7e27e19013569a903a2bf",
-                "reference": "eabce450df194817a7d7e27e19013569a903a2bf",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/d8833b396dce9162bb2eb5d59aee5a3ab3cfa5b4",
+                "reference": "d8833b396dce9162bb2eb5d59aee5a3ab3cfa5b4",
                 "shasum": ""
             },
             "require": {
@@ -5076,7 +4916,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2017-03-03T06:30:20+00:00"
+            "time": "2017-06-30T08:15:21+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -5678,43 +5518,6 @@
             "time": "2017-04-07T12:08:54+00:00"
         },
         {
-            "name": "unionofrad/manual",
-            "version": "1.1.x-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/UnionOfRAD/manual.git",
-                "reference": "5e7781e131916b2401245ae7d12e77a41ecc5d2b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/UnionOfRAD/manual/zipball/5e7781e131916b2401245ae7d12e77a41ecc5d2b",
-                "reference": "5e7781e131916b2401245ae7d12e77a41ecc5d2b",
-                "shasum": ""
-            },
-            "require": {
-                "composer/installers": "*"
-            },
-            "type": "lithium-library",
-            "license": [
-                "BSD-3-clause"
-            ],
-            "description": "li3 full-fledged documentation effort.",
-            "homepage": "https://github.com/UnionOfRAD/manual",
-            "keywords": [
-                "docblock",
-                "docs",
-                "documentation",
-                "documented",
-                "li3",
-                "lithium"
-            ],
-            "support": {
-                "source": "https://github.com/UnionOfRAD/manual/tree/1.1",
-                "issues": "https://github.com/UnionOfRAD/manual/issues"
-            },
-            "time": "2016-05-31 20:16:51"
-        },
-        {
             "name": "webmozart/assert",
             "version": "1.2.0",
             "source": {
@@ -5773,9 +5576,7 @@
         "dariusiii/rarinfo": 20,
         "dborsatto/php-giantbomb": 20,
         "joshpinkney/tv-maze-php-api": 20,
-        "kbjr/git.php": 20,
-        "unionofrad/lithium": 10,
-        "unionofrad/manual": 20
+        "kbjr/git.php": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
