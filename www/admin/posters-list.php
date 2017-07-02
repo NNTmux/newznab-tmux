@@ -7,7 +7,7 @@ use nntmux\db\DB;
 
 $page   = new AdminPage();
 $pdo = new DB();
-$posters = MultigroupPosters::all('poster')->sortBy('poster');
+$posters = MultigroupPosters::all('id', 'poster')->sortBy('poster');
 
 $poster = (isset($_REQUEST['poster']) && !empty($_REQUEST['poster']) ? $_REQUEST['poster'] : '');
 

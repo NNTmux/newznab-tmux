@@ -20,7 +20,7 @@ switch ($action) {
 			]);
 		} else {
 			// Update an existing mg poster.
-			$poster = MultigroupPosters::query()->update(['poster' => $_POST['poster']]);
+			$poster = MultigroupPosters::query()->update(['poster' => $_POST['poster'], 'id' => $_POST['id']]);
 		}
 
 		header('Location:' . WWW_TOP . '/posters-list.php');
@@ -30,21 +30,7 @@ switch ($action) {
 	default:
 		if (!empty($_GET['id'])) {
 			$page->title = 'MultiGroup Poster Edit';
-			// Note: explicitly setting default stuff below, which could be shortened to:
-			// $entry = MultigroupPosters::find($_GET['id']);
-			$poster = MultigroupPosters::find('first',
-				[
-					'conditions' =>
-						[
-							'id' => $_GET['id']
-						],
-					'fields' =>
-						[
-							'id',
-							'poster'
-						]
-				]
-			);
+			$poster = MultigroupPosters::query()->where('id', '=', $_GET['id'])->firstOrFail();
 		} else {
 			$page->title = 'MultiGroup Poster Add';
 			$poster = '';

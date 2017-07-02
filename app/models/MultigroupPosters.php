@@ -24,16 +24,11 @@ class MultigroupPosters extends Model
 {
 	protected $table = 'multigroup_posters';
 
-	protected $keyType = 'string';
-
-	protected $primaryKey = 'poster';
+	protected $fillable = ['poster', 'id'];
 
 	public $dateFormat = false;
 
 	public $timestamps = false;
-
-
-
 
 	public static function commaSeparatedList()
 	{
