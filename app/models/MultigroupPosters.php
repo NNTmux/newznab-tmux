@@ -24,13 +24,16 @@ class MultigroupPosters extends Model
 {
 	protected $table = 'multigroup_posters';
 
-	protected $fillable = ['poster', 'id'];
+	protected $fillable = ['id', 'poster'];
 
 	public $dateFormat = false;
 
 	public $timestamps = false;
 
-	public static function commaSeparatedList()
+	/**
+	 * @return string
+	 */
+	public static function commaSeparatedList(): string
 	{
 		$list = [];
 		$posters = MultigroupPosters::all('poster');
