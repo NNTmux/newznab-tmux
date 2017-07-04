@@ -50,7 +50,7 @@ if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
 	}
 }
 
-app\extensions\util\Yenc::config(
+app\extensions\util\Yenc(
 	[
 		'default' => [
 			'adapter' => $adapter
@@ -63,15 +63,5 @@ app\extensions\util\Yenc::config(
 		'php' => [
 			'adapter' => 'Php'
 		],
-
-		'simple' => [
-			'adapter' => 'SimplePhpYencDecode'
-		],
-
-		'ydecode' => [
-			'adapter' => 'Ydecode'
-		],
 	]
 );
-
-?>
