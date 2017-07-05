@@ -20,38 +20,25 @@
 namespace app\extensions\util;
 
 
-class Yenc extends \lithium\core\Adaptable
+class Yenc
 {
-	/**
-	 * `Libraries::locate()`-compatible path to adapter for this class.
-	 *
-	 * @see lithium\core\Libraries::locate()
-	 * @var string Dot-delimited path.
-	 */
-	protected static $_adapters = 'adapter.extensions.util.yenc';
 
-	/**
-	 * Contains adapter configurations for `yEnc` adapter.
-	 *
-	 * @var array
-	 */
-	protected static $_configurations = [];
-
-	/**
-	 * @param       $text	 yEncoded text to decode back to an 8 bit form.
-	 * @param array $options Options needed for method. Mainly:
-	 *						 - 'name' of the configuration to use.
-	 *                       * 'file' whether to create the file or just return the string.
-	 *
-	 * @return string		 8 bit decoded version of $text.
-	 */
-	public static function decode(&$text, array $options = [])
+	public function __construct(array $options = [])
 	{
 		$options += [
 			'name' => 'default',
 			'file' => true,
 		];
-		return static::adapter($options['name'])->decode($text);
+	}
+
+	/**
+	 * @param       $text	 yEncoded text to decode back to an 8 bit form.
+	 *
+	 * @return string		 8 bit decoded version of $text.
+	 */
+	public static function decode(&$text)
+	{
+		return static::decode($text);
 	}
 
 	public static function decodeIgnore(&$text, array $options = [])
@@ -60,8 +47,7 @@ class Yenc extends \lithium\core\Adaptable
 			'name' => 'default',
 			'file' => true,
 		];
-
-		return static::adapter($options['name'])->decodeIgnore($text);
+		return (object)$options['name']->decodeIgnore($text);
 	}
 
 	/**
@@ -76,8 +62,10 @@ class Yenc extends \lithium\core\Adaptable
 	 */
 	public static function encode(&$data, $filename, $line = 128, $crc32 = true, array $options = [])
 	{
-		$options += ['name' => 'default'];
-
-		return static::adapter($options['name'])->encode($data, $filename, $line, $crc32);
+		$options += [
+			'name' => 'default',
+			'file' => true,
+		];
+		return (object)$options['name']->encode($data, $filename, $line, $crc32);
 	}
 }
