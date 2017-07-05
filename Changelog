@@ -1,4 +1,5 @@
 2017-07-05 DariusIII
+	* Mrg: Merge PR #155 by Nightah - Adjust ordinal in patch 314 to match 10-release_naming_regexes.tsv
 	* Mrg: Merge PR #154 by Nightah - Updated some /admin templates
 2017-07-01 DariusIII
 	* Mrg: Merge PR #152 by Nightah - Release Naming Regexes
