@@ -19,26 +19,55 @@
 
 namespace app\extensions\util;
 
+use Illuminate\Support\ServiceProvider;
 
-class Yenc
+class Yenc extends ServiceProvider
 {
+	/**
+	 * @var array
+	 */
+	protected static $_adapters = [];
 
-	public function __construct(array $options = [])
+	/**
+	 * Contains adapter configurations for `yEnc` adapter.
+	 *
+	 * @var array
+	 */
+	protected static $_configurations = [];
+
+	/**
+ 	* @param array $adapters
+ 	*/
+	public static function setAdapters($adapters)
+	{
+		self::$_adapters[] = $adapters;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getAdapters(): array
+	{
+		return self::$_adapters;
+	}
+
+	/**
+	 * @param       $text	 yEncoded text to decode back to an 8 bit form.
+	 * @param array $options Options needed for method. Mainly:
+	 *						 - 'name' of the configuration to use.
+	 *                       * 'file' whether to create the file or just return the string.
+	 *
+	 * @return string		 8 bit decoded version of $text.
+	 */
+	public static function decode(&$text, array $options = [])
 	{
 		$options += [
 			'name' => 'default',
 			'file' => true,
 		];
-	}
+		$_adapters = self::getAdapters();
 
-	/**
-	 * @param       $text	 yEncoded text to decode back to an 8 bit form.
-	 *
-	 * @return string		 8 bit decoded version of $text.
-	 */
-	public static function decode(&$text)
-	{
-		return static::decode($text);
+		return $_adapters($options['name'])->decode($text);
 	}
 
 	public static function decodeIgnore(&$text, array $options = [])
@@ -47,7 +76,9 @@ class Yenc
 			'name' => 'default',
 			'file' => true,
 		];
-		return (object)$options['name']->decodeIgnore($text);
+		$_adapters = self::getAdapters();
+
+		return $_adapters($options['name'])->decodeIgnore($text);
 	}
 
 	/**
@@ -62,10 +93,10 @@ class Yenc
 	 */
 	public static function encode(&$data, $filename, $line = 128, $crc32 = true, array $options = [])
 	{
-		$options += [
-			'name' => 'default',
-			'file' => true,
-		];
-		return (object)$options['name']->encode($data, $filename, $line, $crc32);
+		$options += ['name' => 'default'];
+
+		$_adapters = self::getAdapters();
+
+		return $_adapters($options['name'])->encode($data, $filename, $line, $crc32);
 	}
 }

@@ -17,40 +17,31 @@
  * @copyright 2016 nZEDb
  */
 
-use app\models\Settings;
+use app\extensions\util\Yenc;
 
 
 if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
 	$adapter = 'Php';
 } else {
-	switch (true) {
-		case extension_loaded('yenc'):
-			if (method_exists('yenc\yEnc', 'version') &&
-				version_compare(
-					yenc\yEnc::version(),
-					'1.2.2',
-					'>='
-				)
-			) {
-				$adapter = 'NzedbYenc';
-				break;
-			}
-			trigger_error('Your version of the php-yenc extension is out of date and will be
-			ignored. Please update it to use the extension.', E_USER_WARNING);
-
-		case extension_loaded('simple_php_yenc_decode'):
-			$adapter = 'SimplePhpYencDecode';
-			break;
-		case !empty(Settings::value('apps..yydecoderpath', true)) &&
-			(strpos(Settings::value('apps..yydecoderpath', true), 'simple_php_yenc_decode') === false):
-			$adapter = 'Ydecode';
-			break;
-		default:
-			$adapter = 'Php';
+	if (extension_loaded('yenc') === true) {
+		if (method_exists('yenc\yEnc', 'version') &&
+			version_compare(
+				yenc\yEnc::version(),
+				'1.3.0',
+				'>='
+			)
+		) {
+			$adapter = 'NzedbYenc';
+		}
+		trigger_error('Your version of the php-yenc extension is out of date and will be
+			ignored. Please update it to use the extension.', E_USER_WARNING
+		);
+	} else {
+		$adapter = 'Php';
 	}
 }
 
-app\extensions\util\Yenc(
+Yenc::setAdapters(
 	[
 		'default' => [
 			'adapter' => $adapter
