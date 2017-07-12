@@ -41,18 +41,4 @@ if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
 	}
 }
 
-Yenc::setAdapters(
-	[
-		'default' => [
-			'adapter' => $adapter
-		],
-
-		'nzedb' => [
-			'adapter' => 'NzedbYenc'
-		],
-
-		'php' => [
-			'adapter' => 'Php'
-		],
-	]
-);
+Yenc::setAdapter($adapter);

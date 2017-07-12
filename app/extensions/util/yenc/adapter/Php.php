@@ -19,13 +19,16 @@
 
 namespace app\extensions\util\yenc\adapter;
 
+use Illuminate\Support\ServiceProvider;
+use nntmux\Logger;
+
 
 /**
  * Class Php
  *
  * @package app\extensions\util\yenc\adapter
  */
-class Php extends \lithium\core\Object
+class Php extends ServiceProvider
 {
 	public static function decode(&$text, $ignore = false)
 	{
@@ -52,8 +55,7 @@ class Php extends \lithium\core\Object
 		if ($headerSize != $trailerSize) {
 			$message = 'Header and trailer file sizes do not match. This is a violation of the yEnc specification.';
 			if (NN_LOGGING || NN_DEBUG) {
-				//TODO replace with lithium logger.
-//				$this->_debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_NOTICE);
+				$_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
 			}
 
 			throw new \RuntimeException($message);

@@ -19,10 +19,11 @@
 
 namespace app\extensions\util\yenc\adapter;
 
+use Illuminate\Support\ServiceProvider;
 use yenc\yenc;
 
 
-class NzedbYenc extends \lithium\core\Object
+class NzedbYenc extends ServiceProvider
 {
 	public static function decode(&$text, $ignore = false, array $options = [])
 	{
@@ -47,11 +48,6 @@ class NzedbYenc extends \lithium\core\Object
 	public static function encode($data, $filename, $lineLength = 128)
 	{
 		return (new yenc())->encode($data, $filename, $lineLength);
-	}
-
-	protected function _init()
-	{
-		parent::_init();
 	}
 }
 

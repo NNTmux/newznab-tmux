@@ -24,31 +24,24 @@ use Illuminate\Support\ServiceProvider;
 class Yenc extends ServiceProvider
 {
 	/**
-	 * @var array
+	 * @var string
 	 */
-	protected static $_adapters = [];
+	protected static $_adapter = 'app\extensions\util\yenc\adapter\\';
 
 	/**
-	 * Contains adapter configurations for `yEnc` adapter.
-	 *
-	 * @var array
+	 * @param string $adapter
 	 */
-	protected static $_configurations = [];
-
-	/**
- 	* @param array $adapters
- 	*/
-	public static function setAdapters($adapters)
+	public static function setAdapter(string $adapter)
 	{
-		self::$_adapters[] = $adapters;
+		self::$_adapter = self::$_adapter .= $adapter;
 	}
 
 	/**
-	 * @return array
+	 * @return string
 	 */
-	public static function getAdapters(): array
+	public static function getAdapter(): string
 	{
-		return self::$_adapters;
+		return self::$_adapter;
 	}
 
 	/**
@@ -65,9 +58,9 @@ class Yenc extends ServiceProvider
 			'name' => 'default',
 			'file' => true,
 		];
-		$_adapters = self::getAdapters();
+		$_adapters = self::getAdapter();
 
-		return $_adapters($options['name'])->decode($text);
+		return $_adapters . $options['name']->decode($text);
 	}
 
 	public static function decodeIgnore(&$text, array $options = [])
@@ -76,9 +69,8 @@ class Yenc extends ServiceProvider
 			'name' => 'default',
 			'file' => true,
 		];
-		$_adapters = self::getAdapters();
 
-		return $_adapters($options['name'])->decodeIgnore($text);
+		return (\app\extensions\util\yenc\adapter\$options['name'])->decodeIgnore($text);
 	}
 
 	/**
@@ -95,8 +87,8 @@ class Yenc extends ServiceProvider
 	{
 		$options += ['name' => 'default'];
 
-		$_adapters = self::getAdapters();
+		$_adapters = self::getAdapter();
 
-		return $_adapters($options['name'])->encode($data, $filename, $line, $crc32);
+		return $_adapters . $options['name']->encode($data, $filename, $line, $crc32);
 	}
 }
