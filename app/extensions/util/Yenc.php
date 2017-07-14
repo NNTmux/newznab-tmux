@@ -20,75 +20,40 @@
 namespace app\extensions\util;
 
 use Illuminate\Support\ServiceProvider;
+use app\extensions\util\yenc\adapter\NzedbYenc;
 
 class Yenc extends ServiceProvider
 {
 	/**
-	 * @var string
-	 */
-	protected static $_adapter = 'app\extensions\util\yenc\adapter\\';
-
-	/**
-	 * @param string $adapter
-	 */
-	public static function setAdapter(string $adapter)
-	{
-		self::$_adapter = self::$_adapter .= $adapter;
-	}
-
-	/**
-	 * @return string
-	 */
-	public static function getAdapter(): string
-	{
-		return self::$_adapter;
-	}
-
-	/**
-	 * @param       $text	 yEncoded text to decode back to an 8 bit form.
-	 * @param array $options Options needed for method. Mainly:
-	 *						 - 'name' of the configuration to use.
-	 *                       * 'file' whether to create the file or just return the string.
+	 * @param       $text	yEncoded text to decode back to an 8 bit form.
 	 *
-	 * @return string		 8 bit decoded version of $text.
+	 * @return string		8 bit decoded version of $text.
 	 */
-	public static function decode(&$text, array $options = [])
+	public static function decode(&$text)
 	{
-		$options += [
-			'name' => 'default',
-			'file' => true,
-		];
-		$_adapters = self::getAdapter();
-
-		return $_adapters . $options['name']->decode($text);
-	}
-
-	public static function decodeIgnore(&$text, array $options = [])
-	{
-		$options += [
-			'name' => 'default',
-			'file' => true,
-		];
-
-		return (\app\extensions\util\yenc\adapter\$options['name'])->decodeIgnore($text);
+		return NzedbYenc::decode($text);
 	}
 
 	/**
-	 * @param binary  $data     8 bit data to convert to yEncoded text.
+	 * @param $text
+	 *
+	 * @return mixed
+	 */
+	public static function decodeIgnore(&$text)
+	{
+		return NzedbYenc::decodeIgnore($text);
+	}
+
+	/**
+	 * @param 		  $data     8 bit data to convert to yEncoded text.
 	 * @param string  $filename Name of file to recreate as.
 	 * @param int     $line     Maximum number of characters in each line.
-	 * @param boolean $crc32    Whether to add CRC checksum to yend line. This is recommended.
-	 * @param array $options    Options needed for method. Mainly the 'name' of the configuration
 	 *                          to use.
 	 *
 	 * @return string|\Exception The yEncoded version of $data.
 	 */
-	public static function encode(&$data, $filename, $line = 128, $crc32 = true, array $options = [])
+	public static function encode(&$data, $filename, $line = 128)
 	{
-		$options += ['name' => 'default'];
-
-		$_adapters = self::getAdapter();
-
-		return $_adapters . $options['name']->encode($data, $filename, $line, $crc32);
+		return NzedbYenc::encode($data, $filename, $line);
 	}
 }
