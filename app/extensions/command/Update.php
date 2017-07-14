@@ -92,7 +92,7 @@ class Update extends Command
 			return;
 		}
 
-		$this->primary($this->git->pull());
+		$this->primary($this->git->gitPull());
 	}
 
 	/**
