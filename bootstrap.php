@@ -17,6 +17,6 @@
  * @copyright 2016 nZEDb
  */
 
-require_once __DIR__ . '/app/config/bootstrap.php';
+require_once __DIR__ . '/bootstrap/bootstrap.php';
 
 ?>

@@ -18,28 +18,25 @@
  */
 namespace app\models;
 
-class MultigroupPosters extends \lithium\data\Model
+use Illuminate\Database\Eloquent\Model;
+
+class MultigroupPosters extends Model
 {
-	protected $_meta = [
-		'key' => ['poster']
-	];
+	protected $table = 'multigroup_posters';
 
-	public $validates = [
-		'poster' => [
-			'notEmpty',
-			'message' => 'Empty poster value is not permitted.'
-		]
-	];
+	protected $fillable = ['id', 'poster'];
 
-	public static function commaSeparatedList()
+	public $dateFormat = false;
+
+	public $timestamps = false;
+
+	/**
+	 * @return string
+	 */
+	public static function commaSeparatedList(): string
 	{
 		$list = [];
-		$posters = MultigroupPosters::find('all',
-			[
-				'fields' => ['poster'],
-				'order'  => ['poster' => 'ASC'],
-			]
-		);
+		$posters = MultigroupPosters::all('poster');
 
 		foreach ($posters as $poster) {
 			$list[] = $poster->poster;

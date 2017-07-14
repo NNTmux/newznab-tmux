@@ -19,13 +19,20 @@
 namespace app\extensions\util;
 
 use \GitRepo;
+use Illuminate\Database\Eloquent\Collection;
+use Symfony\Component\Process\Process;
 
-class Git extends \lithium\core\Object
+class Git extends Collection
 {
 	/**
 	 * @var \GitRepo object
 	 */
 	protected $repo;
+
+	/**
+	 * @var array
+	 */
+	public $_config;
 
 	protected $gitTagLatest = null;
 
@@ -43,7 +50,16 @@ class Git extends \lithium\core\Object
 			'filepath'		=> NN_ROOT,
 		];
 
+		$config += $defaults;
+		$this->_config = $config;
 		parent::__construct($config += $defaults);
+
+		$this->repo = new GitRepo(
+			$this->_config['filepath'],
+			$this->_config['create'],
+			$this->_config['initialise']
+		);
+		$this->branch = $this->repo->active_branch();
 	}
 
 	/**
@@ -52,10 +68,14 @@ class Git extends \lithium\core\Object
 	 * @param string $options
 	 *
 	 * @return string
+	 * @throws \Symfony\Component\Process\Exception\LogicException
+	 * @throws \Symfony\Component\Process\Exception\RuntimeException
 	 */
 	public function describe($options = null)
 	{
-		return $this->run("describe $options");
+		$command = new Process('git describe ' . $options);
+		$command->run();
+		return $command->getOutput();
 	}
 
 	/**
@@ -80,9 +100,7 @@ class Git extends \lithium\core\Object
 	 */
 	public function getBranchesMain()
 	{
-		$main = array_merge($this->getBranchesStable(), $this->getBranchesDevelop());
-
-		return $main;
+		return array_merge($this->getBranchesStable(), $this->getBranchesDevelop());
 	}
 
 	public function getBranchesStable()
@@ -92,7 +110,9 @@ class Git extends \lithium\core\Object
 
 	public function getHeadHash()
 	{
-		return $this->run('rev-parse HEAD');
+		$command = new Process('git rev-parse HEAD');
+		$command->run();
+		return $command->getOutput();
 	}
 
 	/**
@@ -108,13 +128,15 @@ class Git extends \lithium\core\Object
 		$cmd = "cat-file -e $gitObject";
 
 		try {
-			$result = $this->run($cmd);
+			$result = new Process($cmd);
+			$result->run();
+			return $result->getOutput();
 		} catch (\Exception $e) {
 			$message = explode("\n", $e->getMessage());
 			if ($message[0] === "fatal: Not a valid object name $gitObject") {
 				$result = false;
 			} else {
-				throw new \Exception($message);
+				throw new \RuntimeException($message);
 			}
 		}
 
@@ -126,9 +148,8 @@ class Git extends \lithium\core\Object
 		foreach ($this->getBranchesStable() as $pattern) {
 			if (!preg_match("#$pattern#", $branch)) {
 				continue;
-			} else {
-				return true;
 			}
+			return true;
 		}
 
 		return false;
@@ -140,13 +161,17 @@ class Git extends \lithium\core\Object
 	 * @param null $options
 	 *
 	 * @return string
+	 * @throws \Symfony\Component\Process\Exception\LogicException
+	 * @throws \Symfony\Component\Process\Exception\RuntimeException
 	 */
 	public function log($options = null)
 	{
-		return $this->run("log $options");
+		$command = new Process("git log $options");
+		$command->run();
+		return $command->getOutput();
 	}
 
-	public function pull(array $options = [])
+	public function gitPull(array $options = [])
 	{
 		$default = [
 			'branch'	=> $this->getBranch(),
@@ -167,7 +192,7 @@ class Git extends \lithium\core\Object
 	 *
 	 * @return  string
 	 */
-	public function run($command)
+	public function gitRun($command)
 	{
 		return $this->repo->run($command);
 	}
@@ -178,10 +203,14 @@ class Git extends \lithium\core\Object
 	 * @param string $options
 	 *
 	 * @return string
+	 * @throws \Symfony\Component\Process\Exception\RuntimeException
+	 * @throws \Symfony\Component\Process\Exception\LogicException
 	 */
 	public function tag($options = null)
 	{
-		return $this->run("tag $options");
+		$command = new Process('git tag' . $options);
+		$command->run();
+		return $command->getOutput();
 	}
 
 	/**
@@ -190,24 +219,14 @@ class Git extends \lithium\core\Object
 	 * Be aware this might cause problems if tags are added out of order?
 	 *
 	 * @return string
+	 * @throws \Symfony\Component\Process\Exception\RuntimeException
+	 * @throws \Symfony\Component\Process\Exception\LogicException
 	 */
 	public function tagLatest($cached = true)
 	{
 		if (empty($this->gitTagLatest) || $cached === false) {
-			$this->gitTagLatest = trim($this->describe("--tags --abbrev=0 HEAD"));
+			$this->gitTagLatest = trim($this->describe('--tags --abbrev=0 HEAD'));
 		}
 		return $this->gitTagLatest;
-	}
-
-	protected function _init()
-	{
-		parent::_init();
-
-		$this->repo = new GitRepo(
-			$this->_config['filepath'],
-			$this->_config['create'],
-			$this->_config['initialise']
-		);
-		$this->branch = $this->repo->active_branch();
 	}
 }

@@ -1,6 +1,5 @@
 <?php
-require_once 'smarty.php';
-require_once NN_ROOT . 'app' . DS . 'config' . DS . 'bootstrap' . DS . 'libraries.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'smarty.php';
 
 use app\models\Settings;
 

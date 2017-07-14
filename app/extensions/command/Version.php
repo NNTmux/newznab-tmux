@@ -16,27 +16,28 @@
  * @author    niel
  * @copyright 2016 nZEDb
  */
+
 namespace app\extensions\command;
 
+use app\extensions\console\Command;
 use \app\extensions\util\Versions;
-use \lithium\console\command\Help;
 
 
 /**
  * Returns the current version (or branch) of the indexer.
  *
  * Actions:
- *  * all		Show all of following info.
- *  * branch	Show git branch name.
- *  * git		Show git tag for current version.
- *  * sql		Show SQL patch level
+ *  * all        Show all of following info.
+ *  * branch    Show git branch name.
+ *  * git        Show git tag for current version.
+ *  * sql        Show SQL patch level
  *
  * @package app\extensions\command
  */
-class Version extends \app\extensions\console\Command
+class Version extends Command
 {
 	/**
-	 * @var \app\extensions\util\Versions;
+	 * @var Versions;
 	 */
 	protected $versions = null;
 
@@ -47,30 +48,24 @@ class Version extends \app\extensions\console\Command
 	 */
 	public function __construct(array $config = [])
 	{
-		$defaults = [
-			'classes'	=> $this->_classes,
-			'request'	=> null,
-			'response'	=> [],
-		];
-		parent::__construct($config + $defaults);
+		$this->versions = new Versions();
+		$this->setName('version')
+			->setHelp('Returns the current version (or branch) of the indexer.
+						Actions:
+						all		Show all of following info.
+						branch		Show git branch name.
+  						git		Show git tag for current version.
+						sql		Show SQL patch level');
+		parent::__construct($config);
 	}
 
-	public function run()
-	{
-		if (!$this->request->args()) {
-			return $this->_help();
-		}
-
-		return false;
-	}
-
-	protected function all()
+	public function all()
 	{
 		$this->git();
 		$this->sql();
 	}
 
-	protected function branch()
+	public function branch()
 	{
 		$this->primary('Git branch: ' . $this->versions->getGitBranch());
 	}
@@ -78,69 +73,34 @@ class Version extends \app\extensions\console\Command
 	/**
 	 * Fetch git tag for latest version.
 	 */
-	protected function git()
+	public function git()
 	{
-		if (!$this->plain) {
-			$this->primary('Looking up Git tag version(s)');
-		}
-		$this->out('Hash: ' . $this->versions->getGitHeadHash(), 0);
-		$this->out('XML version: ' . $this->versions->getGitTagInFile());
-		$this->out('Git version: ' . $this->versions->getGitTagInRepo());
+
+		$this->primary('Looking up Git tag version(s)');
+
+		$this->info('Hash: ' . $this->versions->getGitHeadHash());
+		$this->info('XML version: ' . $this->versions->getGitTagInFile());
+		$this->info('Git version: ' . $this->versions->getGitTagInRepo());
 	}
 
 	/**
 	 * Fetch SQL latest patch version.
 	 */
-	protected function sql()
+	public function sql()
 	{
-		if (!$this->plain) {
-			$this->primary('Looking up SQL patch version(s)');
+
+		$this->primary('Looking up SQL patch version(s)');
+
+
+		$latest = $this->versions->getSQLPatchFromFile();
+		$this->info("XML version: $latest");
+
+		try {
+			$dbVersion = $this->versions->getSQLPatchFromDB();
+			$this->info(' DB version: ' . $dbVersion);
+		} catch (\Exception $e) {
+			$this->error($e->getMessage());
 		}
 
-		if (in_array($this->request->params['args']['sqlcheck'], ['xml', 'both', 'all'], false)) {
-			$latest = $this->versions->getSQLPatchFromFile();
-			$this->out("XML version: $latest");
-		}
-
-		if (in_array($this->request->params['args']['sqlcheck'], ['db', 'both', 'all'], false)) {
-			try {
-				$dbVersion = $this->versions->getSQLPatchFromDB();
-				$this->out(' DB version: ' . $dbVersion);
-			} catch (\Exception $e) {
-				$this->error($e->getMessage());
-			}
-		}
-	}
-
-	/**
-	 * Invokes the `Help` command.
-	 * The invoked Help command will take over request and response objects of
-	 * the originally invoked command. Thus the response of the Help command
-	 * becomes the response of the original one.
-	 *
-	 * @return boolean
-	 */
-	protected function _help()
-	{
-		$help = new Help([
-			'request'  => $this->request,
-			'response' => $this->response,
-			'classes'  => $this->_classes
-		]);
-
-		return $help->run(get_class($this));
-	}
-
-	/**
-	 * Class initializer. Parses template and sets up params that need to be filled.
-	 *
-	 * @return void
-	 */
-	protected function _init()
-	{
-		parent::_init();
-
-		$this->request->params['args'] += ['sqlcheck' => 'all'];    // Default to all versions/
-		$this->versions = new Versions();
 	}
 }

@@ -15,14 +15,11 @@ switch ($action) {
 	case 'submit':
 		if ($_POST['id'] === '') {
 			// Add a new mg poster.
-			$poster = MultigroupPosters::create([
-				'poster' => $_POST['poster'],
-			]);
+			$poster = MultigroupPosters::query()->create(['poster' => $_POST['poster']]);
 		} else {
 			// Update an existing mg poster.
-			$poster = MultigroupPosters::find($_POST['id']);
+			$poster = MultigroupPosters::query()->where('id', '=', $_POST['id'])->update(['poster' => $_POST['poster']]);
 		}
-		$poster->save();
 
 		header('Location:' . WWW_TOP . '/posters-list.php');
 		break;
@@ -31,21 +28,7 @@ switch ($action) {
 	default:
 		if (!empty($_GET['id'])) {
 			$page->title = 'MultiGroup Poster Edit';
-			// Note: explicitly setting default stuff below, which could be shortened to:
-			// $entry = MultigroupPosters::find($_GET['id']);
-			$poster = MultigroupPosters::find('first',
-				[
-					'conditions' =>
-						[
-							'id' => $_GET['id']
-						],
-					'fields' =>
-						[
-							'id',
-							'poster'
-						]
-				]
-			);
+			$poster = MultigroupPosters::query()->where('id', '=', $_GET['id'])->firstOrFail();
 		} else {
 			$page->title = 'MultiGroup Poster Add';
 			$poster = '';

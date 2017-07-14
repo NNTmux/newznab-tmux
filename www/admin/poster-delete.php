@@ -8,11 +8,12 @@ $page = new AdminPage();
 
 if (isset($_GET['id']))
 {
-	MultigroupPosters::remove(['id' => $_GET['id']]);
+	MultigroupPosters::query()->where('id', '=', $_GET['id'])->delete();
 }
 
-if (isset($_GET['from']))
+if (isset($_GET['from'])) {
 	$referrer = $_GET['from'];
-else
+} else {
 	$referrer = $_SERVER['HTTP_REFERER'];
-header("Location: " . $referrer);
+}
+header('Location: ' . $referrer);

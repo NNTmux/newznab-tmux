@@ -30,7 +30,7 @@ if (isset($_GET['id'])) {
 	$user = $page->users->getById($page->users->currentUserId());
 	$cpapi = $user['cp_api'];
 	$cpurl = $user['cp_url'];
-	$releaseRegex = ReleaseRegexes::find('first', ['conditions' => ['releases_id' => $data['id']]]);
+	$releaseRegex = ReleaseRegexes::query()->where('releases_id', '=', $data['id'])->first();
 
 	if (!$data) {
 		$page->show404();
