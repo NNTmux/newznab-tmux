@@ -1,9 +1,9 @@
 <div class="well well-sm" id="group_list">
 	<h1>{$page->title}</h1>
-	<p>
-		Below is a list of MultiGroup posters
-	</p>
-	{if $posters}
+	{if !empty($check)}
+		<p>
+			Below is a list of MultiGroup posters
+		</p>
 		<table style="width:100%;" class="data table table-striped responsive-utilities sortable">
 			<tr>
 				<th>Poster name</th>
