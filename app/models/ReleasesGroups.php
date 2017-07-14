@@ -25,6 +25,8 @@ class ReleasesGroups extends Model
 {
 	protected $table = 'releases_groups';
 
+	public $incrementing = false;
+
 	public $timestamps = false;
 
 	public $dateFormat = false;
