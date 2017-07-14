@@ -15,12 +15,10 @@ switch ($action) {
 	case 'submit':
 		if ($_POST['id'] === '') {
 			// Add a new mg poster.
-			$poster = MultigroupPosters::query()->insert([
-				'poster' => $_POST['poster'],
-			]);
+			$poster = MultigroupPosters::query()->create(['poster' => $_POST['poster']]);
 		} else {
 			// Update an existing mg poster.
-			$poster = MultigroupPosters::query()->update(['poster' => $_POST['poster'], 'id' => $_POST['id']]);
+			$poster = MultigroupPosters::query()->where('id', '=', $_POST['id'])->update(['poster' => $_POST['poster']]);
 		}
 
 		header('Location:' . WWW_TOP . '/posters-list.php');
