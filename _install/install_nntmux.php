@@ -151,17 +151,6 @@ if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') =
 	exit();
 }
 
-switch (env('DB_SYSTEM')) {
-	case 'mysql':
-		$adapter = 'MySql';
-		break;
-	case 'pgsql':
-		$adapter = 'PostgreSql';
-		break;
-	default:
-		break;
-}
-
 	$capsule = new Capsule;
 // Same as database configuration file of Laravel.
 	$capsule->addConnection([

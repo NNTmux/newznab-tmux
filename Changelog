@@ -1,4 +1,5 @@
 2017-07-14 DariusIII
+	* Fix: Remove $adapter assignment from install and installtest
 	* Fix: Fix phpunit install test
 	* Fix: Fix phpunit.xml bootstrap.php path
 	* Mrg: Merge dev-laravel-switch branch into dev
