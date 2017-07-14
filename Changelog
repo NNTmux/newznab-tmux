@@ -1,4 +1,5 @@
 2017-07-14 DariusIII
+	* Fix: Fix phpunit.xml bootstrap.php path
 	* Mrg: Merge dev-laravel-switch branch into dev
 2017-07-05 DariusIII
 	* Mrg: Merge PR #155 by Nightah - Adjust ordinal in patch 314 to match 10-release_naming_regexes.tsv
