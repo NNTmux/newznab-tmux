@@ -1,12 +1,10 @@
 <?php
-
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 
 use nntmux\ReleaseRegex;
 use nntmux\Groups;
 use nntmux\Category;
-
 
 $page = new AdminPage();
 $reg = new ReleaseRegex();

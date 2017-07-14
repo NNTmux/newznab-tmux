@@ -6,15 +6,53 @@
 </p>
 
 <form name="search" action="" method="post" style="margin-bottom:5px;">
-	<label for="group" style="padding-right:1px">Group:</label>
-	<input id="group" type="text" name="group" value="{$group|htmlentities}" size="20" /><br />
-	<label for="regex" style="padding-right:1px">Regex:</label>
-	<input id="regex" type="text" name="regex" value="{$regex|htmlentities}" size="100" /><br/>
-	<label for="showlimit" style="padding-right:7px">Maximum releases to display:</label>
-	<input id="showlimit" type="text" name="showlimit" value="{$showlimit}" size="8" /><br/>
-	<label for="querylimit" style="padding-right:7px">Query limit:</label>
-	<input id="querylimit" type="text" name="querylimit" value="{$querylimit}" size="8" /><br/>
-	<input class="btn btn-default" type="submit" value="Test" />
+	<table class="input data table table-striped responsive-utilities jambo-table">
+		<tr>
+			<td><label for="group" style="padding-right:1px">Group:</label>
+			<td>
+				<input id="group" type="text" name="group" value="{$group|htmlentities}" size="20" /><br />
+				<div class="hint">
+					Regex to match against a group.<br />
+					Delimiters are already added.<br />
+					An example of matching a group: alt.binaries.example
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td><label for="regex" style="padding-right:1px">Regex:</label>
+			<td>
+				<input id="regex" type="text" name="regex" value="{$regex|htmlentities}" size="100" /><br/>
+				<div class="hint">
+					The regex to use when trying to name a release using the usenet subject.<br />
+					The regex delimiters are not added, you MUST add them. See <a href="http://php.net/manual/en/regexp.reference.delimiters.php">this</a> page.<br />
+					To make the regex case insensitive, add i after the last delimiter.<br />
+					You MUST include at least one regex capture group.<br />
+					You MUST name your regex capture groups (the ones you want included).<br />
+					The named capture groups will be concatenated into a string.<br />
+					Capture groups are sorted alphabetically (by capture group name) when concatenating the string.<br />
+					Capture groups named 'reqid' and 'parts' are ignored.
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td><label for="showlimit" style="padding-right:7px">Maximum releases to display:</label>
+			<td>
+				<input id="showlimit" type="text" name="showlimit" value="{$showlimit}" size="8" /><br/>
+			</td>
+		</tr>
+		<tr>
+			<td><label for="querylimit" style="padding-right:7px">Query limit:</label>
+			<td>
+				<input id="querylimit" type="text" name="querylimit" value="{$querylimit}" size="8" /><br/>
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<input class="btn btn-default" type="submit" value="Test" />
+			</td>
+		</tr>
+	</table>
 </form>
 {if isset($data)}
 	<table style="margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">

@@ -1,10 +1,8 @@
 <?php
-
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 
 use nntmux\AniDB;
-
 
 $page = new AdminPage();
 

@@ -1,9 +1,8 @@
 <?php
-require_once("config.php");
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 
 use nntmux\Contents;
-
 
 $page        = new AdminPage();
 $contents    = new Contents(['Settings' => $page->settings]);

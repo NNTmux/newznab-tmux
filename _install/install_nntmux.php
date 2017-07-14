@@ -24,8 +24,8 @@ if (file_exists(NN_ROOT . '_install/install.lock')) {
 }
 
 // Check if user selected right DB type.
-if (getenv('DB_SYSTEM') !== 'mysql') {
-	ColorCLI::doEcho(ColorCLI::error('Invalid database system. Must be: mysql ; Not: ' . getenv('DB_SYSTEM')));
+if (env('DB_SYSTEM') !== 'mysql') {
+	ColorCLI::doEcho(ColorCLI::error('Invalid database system. Must be: mysql ; Not: ' . env('DB_SYSTEM')));
 	$error = true;
 } else {
 	// Connect to the SQL server.
@@ -35,13 +35,13 @@ if (getenv('DB_SYSTEM') !== 'mysql') {
 			[
 				'checkVersion' => true,
 				'createDb'     => true,
-				'dbhost'       => getenv('DB_HOST'),
-				'dbname'       => getenv('DB_NAME'),
-				'dbpass'       => getenv('DB_PASSWORD'),
-				'dbport'       => getenv('PORT'),
-				'dbsock'       => getenv('DB_SOCKET'),
-				'dbtype'       => getenv('DB_SYSTEM'),
-				'dbuser'       => getenv('DB_USER'),
+				'dbhost'       => env('DB_HOST'),
+				'dbname'       => env('DB_NAME'),
+				'dbpass'       => env('DB_PASSWORD'),
+				'dbport'       => env('PORT'),
+				'dbsock'       => env('DB_SOCKET'),
+				'dbtype'       => env('DB_SYSTEM'),
+				'dbuser'       => env('DB_USER'),
 			]
 		);
 		$dbConnCheck = true;
@@ -78,7 +78,7 @@ if (getenv('DB_SYSTEM') !== 'mysql') {
 			$error = true;
 			ColorCLI::doEcho(ColorCLI::error(
 				'You are using an unsupported version of ' .
-				getenv('DB_SYSTEM') .
+				env('DB_SYSTEM') .
 				' the minimum allowed version is ' .
 				NN_MINIMUM_MYSQL_VERSION
 			)
@@ -98,11 +98,6 @@ if (!$error) {
 
 	try {
 		$DbSetup->processSQLFile(); // Setup default schema
-		$DbSetup->processSQLFile( // Process any custom stuff.
-			[
-				'filepath' => NN_RES . 'db' . DS . 'schema' . DS . 'mysql-data.sql'
-			]
-		);
 		$DbSetup->loadTables(); // Load default data files
 	} catch (\PDOException $err) {
 		$error = true;
@@ -149,13 +144,13 @@ if (!$error) {
 	}
 }
 //Insert admin user into database
-if (getenv('ADMIN_USER') === '' || getenv('ADMIN_PASS') === '' || getenv('ADMIN_EMAIL') === '') {
+if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') === '') {
 	$error = true;
 	ColorCLI::doEcho(ColorCLI::error('Admin user data cannot be empty! Please edit .env file and fill in admin user details and run this script again!'));
 	exit();
 }
 
-switch (getenv('DB_SYSTEM')) {
+switch (env('DB_SYSTEM')) {
 	case 'mysql':
 		$adapter = 'MySql';
 		break;
@@ -167,10 +162,10 @@ switch (getenv('DB_SYSTEM')) {
 }
 
 if ($adapter !== null) {
-	if (empty(getenv('DB_SOCKET'))) {
-		$host = empty(getenv('DB_PORT')) ? getenv('DB_HOST') : getenv('DB_HOST') . ':' . getenv('DB_PORT');
+	if (empty(env('DB_SOCKET'))) {
+		$host = empty(env('DB_PORT')) ? env('DB_HOST') : env('DB_HOST') . ':' . env('DB_PORT');
 	} else {
-		$host = getenv('DB_SOCKET');
+		$host = env('DB_SOCKET');
 	}
 
 	lithium\data\Connections::add('default',
@@ -178,9 +173,9 @@ if ($adapter !== null) {
 			'type'       => 'database',
 			'adapter'    => $adapter,
 			'host'       => $host,
-			'login'      => getenv('DB_USER'),
-			'password'   => getenv('DB_PASSWORD'),
-			'database'   => getenv('DB_NAME'),
+			'login'      => env('DB_USER'),
+			'password'   => env('DB_PASSWORD'),
+			'database'   => env('DB_NAME'),
 			'encoding'   => 'UTF-8',
 			'persistent' => false,
 		]
@@ -188,20 +183,20 @@ if ($adapter !== null) {
 }
 
 $user = new Users();
-if (!$user->isValidUsername(getenv('ADMIN_USER'))) {
+if (!$user->isValidUsername(env('ADMIN_USER'))) {
 	$error = true;
 } else {
-	$usrCheck = $user->getByUsername(getenv('ADMIN_USER'));
+	$usrCheck = $user->getByUsername(env('ADMIN_USER'));
 	if ($usrCheck) {
 		$error = true;
 	}
 }
-if (!$user->isValidEmail(getenv('ADMIN_EMAIL'))) {
+if (!$user->isValidEmail(env('ADMIN_EMAIL'))) {
 	$error = true;
 }
 
 if (!$error) {
-	$adminCheck = $user->add(getenv('ADMIN_USER'), getenv('ADMIN_PASS'), getenv('ADMIN_EMAIL'), 2, '', '');
+	$adminCheck = $user->add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '');
 	if (!is_numeric($adminCheck)) {
 		$error = true;
 	}

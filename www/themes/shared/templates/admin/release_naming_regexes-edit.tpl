@@ -13,7 +13,7 @@
 				<input type="text" id="group_regex" name="group_regex" value="{if isset($regex.group_regex)}{$regex.group_regex|escape:html}{else}{/if}" />
 				<div class="hint">
 					Regex to match against a group or multiple groups.<br />
-					Delimiters are already added, and PCRE_CASELESS is added after for case insensitivity.<br /> >
+					Delimiters are already added, and PCRE_CASELESS is added after for case insensitivity.<br />
 					An example of matching a single group: alt\.binaries\.example<br />
 					An example of matching multiple groups: alt\.binaries.*
 				</div>

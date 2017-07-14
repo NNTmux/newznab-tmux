@@ -1,5 +1,13 @@
 <?php
 namespace nntmux;
+
+use Monolog\Formatter\LineFormatter;
+use Monolog\Logger as Monolog;
+use Monolog\Handler\StreamHandler;
+use Monolog\Processor\GitProcessor;
+use Monolog\Processor\IntrospectionProcessor;
+use Monolog\Processor\MemoryUsageProcessor;
+
 /**
  * Show log message to CLI/Web and log it to a file.
  * Turn these on in automated.config.php
@@ -48,32 +56,19 @@ class Logger
 	private $severity = '';
 
 	/**
-	 * Class instance of colorCLI
-	 * @var object
-	 * @access private
+	 * @var Monolog
 	 */
-	private $colorCLI;
+	private $logger;
 
 	/**
-	 * Should we echo to CLI or web?
+	 * @var LineFormatter
+	 */
+	private $formatter;
+
+	/**
 	 * @var bool
-	 * @access private
 	 */
-	private $outputCLI = true;
-
-	/**
-	 * Cache of the date.
-	 * @var string
-	 * @access private
-	 */
-	private $dateCache = '';
-
-	/**
-	 * Cache of unix time.
-	 * @var int
-	 * @access private
-	 */
-	private $timeCache;
+	private $outputCLI;
 
 	/**
 	 * Is this the windows O/S?
@@ -90,12 +85,6 @@ class Logger
 	private $timeStart;
 
 	/**
-	 * @var resource|null Resource for log file.
-	 * @access private
-	 */
-	private $resource = null;
-
-	/**
 	 * How many old logs can we have max in the logs folder.
 	 * (per log type, ex.: debug can have x logs, not_yEnc can have x logs, etc)
 	 * @var int
@@ -109,13 +98,6 @@ class Logger
 	 * @access private
 	 */
 	private $maxLogSize;
-
-	/**
-	 * Full path to the log file.
-	 * @var string
-	 * @access private
-	 */
-	private $logPath;
 
 	/**
 	 * Current name of the log file.
@@ -168,6 +150,8 @@ class Logger
 	 *
 	 * @access public
 	 * @throws LoggerException
+	 * @throws \Exception
+	 * @throws \InvalidArgumentException
 	 */
 	public function __construct(array $options = [])
 	{
@@ -181,8 +165,6 @@ class Logger
 			'LogFileName' => ''
 		];
 		$options += $defaults;
-
-		$this->colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
 
 		$this->getSettings();
 
@@ -198,21 +180,24 @@ class Logger
 				: $this->currentLogName
 		) . '.log';
 
-		$this->setLogFile();
-
 		$this->outputCLI = (strtolower(PHP_SAPI) === 'cli');
-		$this->isWindows = (strtolower(substr(PHP_OS, 0, 3)) === 'win');
+		$this->isWindows = stripos(PHP_OS, 'win') === 0;
 		$this->timeStart = time();
-	}
 
-	/**
-	 * Close the log file resource.
-	 *
-	 * @access public
-	 */
-	public function __destruct()
-	{
-		$this->closeFile();
+		$this->logger = new Monolog('nntmux');
+		$this->formatter = new LineFormatter(null, 'd/M/Y H:i', false, true);
+		$this->introspection = new IntrospectionProcessor();
+		$this->gitprocessor = new GitProcessor();
+		$this->memoryUsage = new MemoryUsageProcessor();
+		$this->streamHandler = new StreamHandler($this->currentLogFolder . $this->currentLogName, Monolog::DEBUG);
+		$this->streamHandler->setFormatter($this->formatter);
+		$this->logger->pushHandler($this->streamHandler);
+		$this->logger->pushProcessor($this->introspection);
+		$this->logger->pushProcessor($this->gitprocessor);
+		if ($this->showMemoryUsage === true) {
+			$this->logger->pushProcessor($this->memoryUsage);
+		}
+
 	}
 
 	/**
@@ -251,53 +236,6 @@ class Logger
 		$this->formLogMessage();
 		$this->echoMessage();
 		$this->logMessage();
-	}
-
-	/**
-	 * Return current/peak memory usage or difference between current/peak memory usage and previous usage.
-	 *
-	 * @param int  $oldUsage  Output from a previous memory_get_usage().
-	 * @param bool $realUsage Use (true)system memory usage or (false)emalloc() usage, use emalloc() for debugging.
-	 * @param bool $peak      Get peak memory usage.
-	 *
-	 * @return string
-	 *
-	 * @access public
-	 */
-	public function showMemUsage($oldUsage = 0, $realUsage = false, $peak = false)
-	{
-		$currentUsage = ($peak ? memory_get_peak_usage($realUsage)  : memory_get_usage($realUsage));
-		$actualUsage = ($oldUsage > 0 ? $currentUsage - $oldUsage : $currentUsage);
-
-		$units = [
-			'B ',
-			'KB',
-			'MB',
-			'GB',
-			'TB',
-			'PB'
-		];
-		return
-			str_pad(
-				number_format(
-					round(
-						$actualUsage
-						/
-						pow(
-							1024,
-							($i =
-								floor(
-									log(
-										$actualUsage,
-										1024
-									)
-								)
-							)
-						), 2
-					)
-				), 4, '~~~', STR_PAD_LEFT
-			) .
-			$units[(int)$i];
 	}
 
 	/**
@@ -353,13 +291,14 @@ class Logger
 	 *
 	 * @param string $folder   Folder where the log should be stored.
 	 * @param string $fileName Name of the file (must be alphanumeric and contain no file extensions).
+	 *
 	 * @access public
+	 * @throws \nntmux\LoggerException
 	 */
 	public function changeLogFileLocation($folder, $fileName)
 	{
 		$this->currentLogFolder = $folder;
 		$this->currentLogName = $fileName;
-		$this->setLogFile();
 	}
 
 	/**
@@ -369,7 +308,7 @@ class Logger
 	 * @access public
 	 * @static
 	 */
-	static public function getDefaultLogPaths()
+	public static function getDefaultLogPaths()
 	{
 		$defaultLogName = (defined('NN_LOGGING_LOG_NAME') ? NN_LOGGING_LOG_NAME : 'nntmux');
 		$defaultLogName = (ctype_alnum($defaultLogName) ? $defaultLogName : 'nntmux');
@@ -382,34 +321,6 @@ class Logger
 		];
 	}
 
-	/**
-	 * Sets the path and name for the log file.
-	 *
-	 * @throws LoggerException
-	 * @access private
-	 */
-	private function setLogFile()
-	{
-		// Only run this if NN_LOGGING is on.
-		if (!NN_LOGGING) {
-			return;
-		}
-
-		$this->closeFile();
-
-		$this->logPath = $this->currentLogFolder . $this->currentLogName;
-
-		if (!is_dir($this->currentLogFolder)) {
-			$this->createFolder();
-		}
-
-		$this->initiateLog();
-
-		// Check if we need to rotate the log if it exceeds max size..
-		$this->rotateLog();
-
-		$this->openFile();
-	}
 
 	/**
 	 * Get/set all settings.
@@ -430,34 +341,6 @@ class Logger
 		$this->currentLogFolder = $paths['LogFolder'];
 	}
 
-	/**
-	 * Close the file resource.
-	 *
-	 * @access private
-	 */
-	private function closeFile()
-	{
-		if (is_resource($this->resource)) {
-			@fclose($this->resource);
-		}
-		$this->resource = null;
-	}
-
-	/**
-	 * Opens the log file.
-	 *
-	 * @throws LoggerException
-	 */
-	private function openFile()
-	{
-		if (!is_resource($this->resource)) {
-			$this->resource = @fopen($this->logPath, 'ab');
-
-			if (!$this->resource) {
-				throw new LoggerException('Unable to open log file ' . $this->logPath);
-			}
-		}
-	}
 
 	/**
 	 * Log message to file.
@@ -471,143 +354,7 @@ class Logger
 			return;
 		}
 
-		clearstatcache(true, $this->logPath);
-
-		// Check if we should rotate the logs.
-		$this->rotateLog();
-
-		// If another process deleted the file, try to re-open it.
-		if (!is_file($this->logPath)) {
-			$this->setLogFile();
-		}
-
-		@fwrite($this->resource, $this->logMessage . PHP_EOL);
-	}
-
-	/**
-	 * Get the date and cache it.
-	 *
-	 * @return string
-	 *
-	 * @access private
-	 */
-	private function getDate()
-	{
-		// Cache the date, update it every 1 minute, since date() is extremely slow and time() is extremely fast.
-		if ($this->dateCache === '' || $this->timeCache < (time() - 60)) {
-			$this->dateCache = date('d/M/Y H:i');
-			$this->timeCache = time();
-		}
-
-		return $this->dateCache;
-	}
-
-	/**
-	 * Check if the log folder exists, if not create it.
-	 *
-	 * @access private
-	 * @throws LoggerException
-	 */
-	private function createFolder()
-	{
-		// Check if the log folder exists, create it if not.
-		if (!is_dir($this->currentLogFolder)) {
-			$old = umask(0777);
-			if (!mkdir($this->currentLogFolder)) {
-				throw new LoggerException('Unable to create log file folder ' . $this->currentLogFolder);
-			}
-			chmod($this->currentLogFolder, 0777);
-			umask($old);
-		}
-	}
-
-	/**
-	 * Initiate a log file.
-	 *
-	 * @access private
-	 * @throws LoggerException
-	 */
-	private function initiateLog()
-	{
-		if (!is_file($this->logPath)) {
-			if (!file_put_contents(
-					$this->logPath,
-					'[' . $this->getDate() . '] [INIT]   [Initiating new log file.]' . PHP_EOL)
-			) {
-				throw new LoggerException('Unable to create new log file ' . $this->logPath);
-			}
-			chmod($this->logPath, 0664);
-		}
-	}
-
-	/**
-	 * Rotate log file if it exceeds a certain size.
-	 *
-	 * @access private
-	 */
-	private function rotateLog()
-	{
-		// Check if we need to rotate the log if it exceeds max size..
-		$logSize = filesize($this->logPath);
-		if ($logSize === false) {
-			return;
-		} else if ($logSize >= ($this->maxLogSize * 1024 * 1024)) {
-			$this->closeFile();
-			$this->compressLog();
-			$this->initiateLog();
-			$this->pruneLogs();
-			$this->openFile();
-		}
-	}
-
-	/**
-	 * Compress the old log using GZip.
-	 *
-	 * @access private
-	 */
-	private function compressLog()
-	{
-		$handle = @fopen($this->logPath, 'rb');
-		$zipHandle = @gzopen(str_replace('.log', '', $this->logPath) . '.' . time() . '.gz', 'w6');
-		if (!$handle || !$zipHandle) {
-			return;
-		}
-
-		while (!feof($handle)) {
-			$data = @fread($handle, 32768);
-			@gzwrite($zipHandle, $data);
-		}
-
-		@fclose($handle);
-		@gzclose($zipHandle);
-
-		// Delete the original uncompressed log file.
-		unlink($this->logPath);
-	}
-
-	/**
-	 * Delete old logs (if we have more than $this->maxLogs).
-	 *
-	 * @access private
-	 */
-	private function pruneLogs()
-	{
-		// Get all the logs with the name.
-		$logs = glob(str_replace('.log', '', $this->logPath) . '.[0-9]*.gz');
-
-		// If there are no old logs or less than maxLogs return false.
-		if (!$logs || (count($logs) < $this->maxLogs)) {
-			return;
-		}
-
-		// Sort the logs alphabetically, so the oldest ones are at the top, the new at the bottom.
-		asort($logs);
-
-		// Remove all new logs from array (all elements under the last 51 elements of the array).
-		array_splice($logs, -$this->maxLogs+1);
-
-		// Delete all the logs left in the array.
-		array_map('unlink', $logs);
+		$this->logger->debug($this->logMessage);
 	}
 
 	/**
@@ -623,7 +370,7 @@ class Logger
 
 		// Check if this is CLI or web.
 		if ($this->outputCLI) {
-			echo $this->colorCLI->debug($this->logMessage);
+			ColorCLI::doEcho(ColorCLI::debug($this->logMessage));
 		} else {
 			echo '<pre>' . $this->logMessage . '</pre><br />';
 		}
@@ -639,9 +386,6 @@ class Logger
 		$pid = getmypid();
 
 		$this->logMessage =
-			// Current date/time ; [02/Mar/2014 14:50 EST
-			'[' . $this->getDate() . '] ' .
-
 			// The severity.
 			$this->severity .
 
@@ -650,9 +394,6 @@ class Logger
 
 			// Script running time.
 			($this->showRunningTime ? ' [' . $this->formatTimeString(time() - $this->timeStart) . ']' : '') .
-
-			// PHP memory usage.
-			($this->showMemoryUsage ? ' [MEM:' . $this->showMemUsage(0, true) . ']' : '') .
 
 			// Resource usage (user time, system time, major page faults, memory swaps).
 			(($this->showResourceUsage && !$this->isWindows) ? ' [' . $this->getResUsage() . ']' : '') .
@@ -677,6 +418,7 @@ class Logger
 			) .
 
 			']';
+		return $this->logMessage;
 	}
 
 	/**

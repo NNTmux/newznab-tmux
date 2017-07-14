@@ -82,6 +82,8 @@ class Backfill
 	 * Constructor.
 	 *
 	 * @param array $options Class instances / Echo to cli?
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -111,10 +113,10 @@ class Backfill
 			}
 		}
 
-		$this->_compressedHeaders = Settings::value('..compressedheaders') === 1 ? true : false;
+		$this->_compressedHeaders = (int)Settings::value('..compressedheaders') === 1 ? true : false;
 		$this->_safeBackFillDate = Settings::value('..safebackfilldate') !== '' ? (string)Settings::value('safebackfilldate') : '2008-08-14';
-		$this->_safePartRepair = Settings::value('..safepartrepair') === 1 ? 'update' : 'backfill';
-		$this->_disableBackfillGroup = Settings::value('..disablebackfillgroup') === 1 ? true : false;
+		$this->_safePartRepair = (int)Settings::value('..safepartrepair') === 1 ? 'update' : 'backfill';
+		$this->_disableBackfillGroup = (int)Settings::value('..disablebackfillgroup') === 1 ? true : false;
 	}
 
 	/**
@@ -189,7 +191,7 @@ class Backfill
 				ColorCLI::doEcho(ColorCLI::primary($dMessage));
 			}
 		} else {
-			$dMessage = "No groups specified. Ensure groups are added to nntmux's database for updating.";
+			$dMessage = 'No groups specified. Ensure groups are added to database for updating.';
 			if ($this->_debug) {
 				$this->_debugging->log(__CLASS__, __FUNCTION__, $dMessage, Logger::LOG_FATAL);
 			}
@@ -248,7 +250,7 @@ class Backfill
 		}
 
 		// Check if this is days or post backfill.
-		$postCheck = $articles === '' ? false : true;
+		$postCheck = $articles !== '';
 
 		// Get target post based on date or user specified number.
 		$targetpost = (string)($postCheck

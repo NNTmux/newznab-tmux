@@ -135,6 +135,8 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Get work for our workers to work on, set the max child processes here.
+	 *
+	 * @throws \Exception
 	 */
 	private function getWork()
 	{
@@ -239,7 +241,7 @@ class Forking extends \fork_daemon
 	private function processStartWork()
 	{
 		switch ($this->workType) {
-			//case 'safe_backfill':
+			case 'safe_backfill':
 			case 'safe_binaries':
 				$this->_executeCommand(
 					PHP_BINARY . ' ' . NN_NIX . 'tmux/bin/update_groups.php'
@@ -264,11 +266,6 @@ class Forking extends \fork_daemon
 					$this->dnr_path . 'releases  ' . count($this->work) . '_"'
 				);
 				break;
-			case 'safe_backfill':
-				$this->_executeCommand(
-					$this->dnr_path . 'backfill_all_quantity  ' . $this->safeBackfillGroup . '  1000' . '"'
-				);
-				break;
 		}
 	}
 
@@ -291,7 +288,7 @@ class Forking extends \fork_daemon
 			)
 		);
 
-		return Settings::value('..backfillthreads');
+		return (int)Settings::value('..backfillthreads');
 	}
 
 	/**
@@ -525,8 +522,8 @@ class Forking extends \fork_daemon
 	{
 		$this->register_child_run([0 => $this, 1 => 'fixRelNamesChildWorker']);
 
-		$threads = Settings::value('..fixnamethreads');
-		$maxperrun = Settings::value('..fixnamesperrun');
+		$threads = (int)Settings::value('..fixnamethreads');
+		$maxperrun = (int)Settings::value('..fixnamesperrun');
 
 		if ($threads > 16) {
 			$threads = 16;
@@ -597,13 +594,17 @@ class Forking extends \fork_daemon
 
 		if ($groups instanceof \Traversable) {
 			foreach ($groups as $group) {
-				if ($this->pdo->queryOneRow(sprintf('SELECT id FROM collections_%d  LIMIT 1', $group['id'])) !== false) {
-					$this->work[] = ['id' => $group['id']];
+				try {
+					if ($this->pdo->queryOneRow(sprintf('SELECT id FROM collections_%d  LIMIT 1', $group['id'])) !== false) {
+						$this->work[] = ['id' => $group['id']];
+					}
+				} catch (\PDOException $e) {
+					$e->getMessage();
 				}
 			}
 		}
 
-		return Settings::value('..releasethreads');
+		return (int)Settings::value('..releasethreads');
 	}
 
 	/**
@@ -649,8 +650,8 @@ class Forking extends \fork_daemon
 		}
 	}
 
-	private $ppAddMinSize = '';
-	private $ppAddMaxSize = '';
+	private $ppAddMinSize;
+	private $ppAddMaxSize;
 
 	/**
 	 * Check if we should process Additional's.
@@ -660,10 +661,10 @@ class Forking extends \fork_daemon
 	private function checkProcessAdditional()
 	{
 		$this->ppAddMinSize =
-			(Settings::value('..minsizetopostprocess') != '') ? (int)Settings::value('..minsizetopostprocess') : 1;
+			(Settings::value('..minsizetopostprocess') !== '') ? (int)Settings::value('..minsizetopostprocess') : 1;
 		$this->ppAddMinSize = ($this->ppAddMinSize > 0 ? ('AND r.size > ' . ($this->ppAddMinSize * 1048576)) : '');
 		$this->ppAddMaxSize =
-			(Settings::value('..maxsizetopostprocess') != '') ? (int)Settings::value('..maxsizetopostprocess') : 100;
+			(Settings::value('..maxsizetopostprocess') !== '') ? (int)Settings::value('..maxsizetopostprocess') : 100;
 		$this->ppAddMaxSize = ($this->ppAddMaxSize > 0 ? ('AND r.size < ' . ($this->ppAddMaxSize * 1073741824)) : '');
 
 		return (
@@ -713,7 +714,7 @@ class Forking extends \fork_daemon
 					$this->ppAddMinSize
 				)
 			);
-			$maxProcesses = Settings::value('..postthreads');
+			$maxProcesses = (int)Settings::value('..postthreads');
 		}
 
 		return $maxProcesses;
@@ -764,7 +765,7 @@ class Forking extends \fork_daemon
 					$this->nfoQueryString
 				)
 			);
-			$maxProcesses = Settings::value('..nfothreads');
+			$maxProcesses = (int)Settings::value('..nfothreads');
 		}
 
 		return $maxProcesses;
@@ -789,7 +790,7 @@ class Forking extends \fork_daemon
 						%s %s
 						LIMIT 1',
 					NZB::NZB_ADDED,
-					(Settings::value('..lookupimdb') == 2 ? 'AND isrenamed = 1' : ''),
+					((int)Settings::value('..lookupimdb') === 2 ? 'AND isrenamed = 1' : ''),
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
 			) === false ? false : true
@@ -821,11 +822,11 @@ class Forking extends \fork_daemon
 					LIMIT 16',
 					($this->ppRenamedOnly ? 2 : 1),
 					NZB::NZB_ADDED,
-					(Settings::value('..lookupimdb') == 2 ? 'AND isrenamed = 1' : ''),
+					((int)Settings::value('..lookupimdb') === 2 ? 'AND isrenamed = 1' : ''),
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
 			);
-			$maxProcesses = Settings::value('..postthreadsnon');
+			$maxProcesses = (int)Settings::value('..postthreadsnon');
 		}
 
 		return $maxProcesses;
@@ -851,8 +852,8 @@ class Forking extends \fork_daemon
 						%s %s
 						LIMIT 1',
 					NZB::NZB_ADDED,
-					(Settings::value('..lookuptvrage') == 2 ? 'AND isrenamed = 1' : ''),
-					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
+					(int)Settings::value('..lookuptvrage') === 2 ? 'AND isrenamed = 1' : '',
+					$this->ppRenamedOnly ? 'AND isrenamed = 1' : ''
 				)
 			) === false ? false : true
 			);
@@ -884,11 +885,11 @@ class Forking extends \fork_daemon
 					LIMIT 16',
 					($this->ppRenamedOnly ? 2 : 1),
 					NZB::NZB_ADDED,
-					(Settings::value('..lookuptvrage') == 2 ? 'AND isrenamed = 1' : ''),
+					(int)Settings::value('..lookuptvrage') === 2 ? 'AND isrenamed = 1' : '',
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
 			);
-			$maxProcesses = Settings::value('..postthreadsnon');
+			$maxProcesses = (int)Settings::value('..postthreadsnon');
 		}
 
 		return $maxProcesses;
@@ -904,7 +905,7 @@ class Forking extends \fork_daemon
 		$sharing = $this->pdo->queryOneRow('SELECT enabled FROM sharing');
 		if ($sharing !== false && $sharing['enabled'] == 1) {
 			$nntp = new NNTP(['Settings' => $this->pdo]);
-			if ((Settings::value('..alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
+			if ((int)(Settings::value('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
 				(new PostProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]))->processSharing($nntp);
 			}
 
@@ -916,6 +917,8 @@ class Forking extends \fork_daemon
 
 	/**
 	 * Process all that require a single thread.
+	 *
+	 * @throws \Exception
 	 */
 	private function processSingle()
 	{
@@ -954,7 +957,7 @@ class Forking extends \fork_daemon
 			)
 		);
 
-		return Settings::value('..reqidthreads');
+		return (int)Settings::value('..reqidthreads');
 	}
 
 	/**
@@ -981,7 +984,7 @@ class Forking extends \fork_daemon
 		$this->register_child_run([0 => $this, 1 => 'updatePerGroupChildWorker']);
 		$this->work = $this->pdo->query('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
 
-		return Settings::value('..releasethreads');
+		return (int)Settings::value('..releasethreads');
 	}
 
 	/**
@@ -1108,7 +1111,7 @@ class Forking extends \fork_daemon
 	 *
 	 * @var string
 	 */
-	private $dnr_path = '';
+	private $dnr_path;
 
 	/**
 	 * Work to work on.

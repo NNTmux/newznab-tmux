@@ -53,7 +53,7 @@ if ($handle) {
 					if (trim($match['table']) === 'collections') {
 						$tables = $pdo->query("SHOW TABLES");
 						foreach ($tables as $row) {
-							$tbl = $row['tables_in_' . getenv('DB_NAME')];
+							$tbl = $row['tables_in_' . env('DB_NAME')];
 							if (preg_match('/collections_\d+/', $tbl)) {
 								$check = $pdo->checkColumnIndex($tbl, $column);
 								if (!isset($check_collections['key_name'])) {
@@ -67,7 +67,7 @@ if ($handle) {
 					} else if (trim($match['table']) === 'binaries') {
 						$tables = $pdo->query("SHOW TABLES");
 						foreach ($tables as $row) {
-							$tbl = $row['tables_in_' . getenv('DB_NAME')];
+							$tbl = $row['tables_in_' . env('DB_NAME')];
 							if (preg_match('/binaries_\d+/', $tbl)) {
 								$checkBinaries = $pdo->checkColumnIndex($tbl, $column);
 								if (!isset($checkBinaries['key_name'])) {
@@ -81,7 +81,7 @@ if ($handle) {
 					} else if (trim($match['table']) === 'parts') {
 						$tables = $pdo->query("SHOW TABLES");
 						foreach ($tables as $row) {
-							$tbl = $row['tables_in_' . getenv('DB_NAME')];
+							$tbl = $row['tables_in_' . env('DB_NAME')];
 							if (preg_match('/parts_\d+/', $tbl)) {
 								$checkParts = $pdo->checkColumnIndex($tbl, $column);
 								if (!isset($checkParts['key_name'])) {
@@ -95,7 +95,7 @@ if ($handle) {
 					} else if (trim($match['table']) === 'missed_parts') {
 						$tables = $pdo->query("SHOW TABLES");
 						foreach ($tables as $row) {
-							$tbl = $row['tables_in_' . getenv('DB_NAME')];
+							$tbl = $row['tables_in_' . env('DB_NAME')];
 							if (preg_match('/partrepair_\d+/', $tbl)) {
 								$checkPartRepair = $pdo->checkColumnIndex($tbl, $column);
 								if (!isset($checkPartRepair['key_name'])) {

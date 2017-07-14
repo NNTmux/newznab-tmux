@@ -1,3 +1,75 @@
+2017-07-05 DariusIII
+	* Mrg: Merge PR #155 by Nightah - Adjust ordinal in patch 314 to match 10-release_naming_regexes.tsv
+	* Mrg: Merge PR #154 by Nightah - Updated some /admin templates
+2017-07-01 DariusIII
+	* Mrg: Merge PR #152 by Nightah - Release Naming Regexes
+2017-06-28 DariusIII
+	* Mrg: Merge PR #151 by Nightah - Fix safe_backfill
+2017-06-27 DariusIII
+	* Chg: Slightly improve XXX processing speed
+	* Chg: Update scrutinizer.yml
+	* Chg: Update install procedure and insertion of zero value into auto_increment id fields for categories
+		(fixes problem with wrong id of OTHER root category) and user_roles, no need to load mysql-data.sql file anymore
+	* Mrg: Merge PR #150 by Nightah - Fix TravisCI builds
+2017-06-26 DariusIII
+	* Chg: Move getAll function to AdultMovies class
+	* Chg: Update XXX processing, set protected on most methods, AdultMovies do not extend XXX anymore to fix circular reference
+	* Chg: Add check to XXX class for false returned result in updateXXXInfo function
+	* Chg: Remove safe_backfill from processStartWork and processEndWork functions in Forking class
+	* Chg: Optimize $this->_html declaration by using it only in AdultMovies abstract class
+	* Chg: Use versioning for guzzlehttp in composer
+        * Chg: Update guzzlehttp to latest
+2017-06-23 DariusIII
+	* Chg: Uncomment safe_backfill in Forking class for processStartWork function, fixes backfill
+	* Chg: Move tmux starting tmux-ui script to root of the NNTmux install
+	* Chg: Rename misc/update/nix/tmux/tmux-ui.php to just tmux-ui
+	* Chg: Use strict comparisons and cast int where needed in TmuxRun class
+	* Chg: Cast int type to all Settings::value lines, as that function returns string
+	* Chg: Change error message with no group selected in Backfill class
+	* Chg: Use ColorCLI in update_binaries script
+	* Chg: Slightly improve misc/update/backfill.php script
+	* Chg: Fix compressed headers check in backfill
+	* Chg: Rearrange order in which sites are scraped for XXX movie info
+	* Chg: Update guzzlehttp to latest version
+2017-06-22 DariusIII
+	* Mrg: Merge PR #149 by Nightah - Adjusted views for Browse -> New Releases
+	* Chg: Update travis.yml Mysql with barracuda and large prefix support
+	* Chg: Create all the tables in mysql-ddl.sql as InnoDB tables
+	* Chg: Increase varchar columns sizes in xxxinfo table
+	* Fix: Fixed fetching information from PopPorn, updated the logo
+2017-06-21 DariusIII
+	* Chg: Adjust all the themes XXX pages for new source icons display
+	* Chg: Update adm, ade, aebn and hotmovies logos
+	* Mrg: Merge PR #148 by Nightah
+	* Fix: Potential fix for multiplicated cast from ADE
+	* Chg: Update env support
+2017-06-19 DariusIII
+	* Fix: Fix wrong variable name used in anime.php page
+	* Mrg: Merge PR #145 by Nightah - Fixed remaining issues for tmux-edit templates
+2017-06-18 DariusIII
+	* Chg: Improve XXX releases logic
+	* Mrg: Merge PR #145 by Nightah - Admin Menu cleanup
+2017-06-16 DariusIII
+	* Chg: Catch exception when checking for existing and missing collection tables (irritating message about Base table or view not found)
+	* Chg: Increase xref column in collections and multigroup_collections to 1024 and change classused
+		in xxxinfo table to varchar(20) and empty default value
+	* Chg: Remove getXXXSamples script from tmux loop as it serves no purpose anymore
+	* Chg: Add more debugging output to DbUpdate class and install_nntmux script
+2017-06-15 DariusIII
+	* Fix: Fix collection regexes testing page
+2017-06-14 DariusIII
+	* Chg: Use monolog/monolog to handle logging
+	* Chg: Update composer libraries
+2017-06-09 DariusIII
+	* Chg: Update composer.lock
+2017-06-06 DariusIII
+	* Chg: Use laravel helpers file and replace getenv with env function
+	* Chg: Update composer.lock
+2017-06-05 DariusIII
+	* Chg: Update minimum MariaDB version to 10.1
+	* Chg: Add laravel/framework to composer.json for future usage
+2017-06-02 DariusIII
+	* Chg: Update php-tmdb and php-giantbomb libraries
 2017-05-28 DariusIII
 	* Chg: Possible fix for videos query in getVideoFromSiteID function
 2017-05-26 DariusIII

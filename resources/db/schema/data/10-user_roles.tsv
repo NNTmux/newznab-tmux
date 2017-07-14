@@ -1,0 +1,7 @@
+id, name, apirequests, downloadrequests, defaultinvites, isdefault, canpreview
+0	Guest	0	0	0	0	0	0
+1	User	10	10	1	1	0	0
+2	Admin	1000	1000	1000	0	1	0
+3	Disabled	0	0	0	0	0	0
+4	Moderator	1000	1000	1000	0	1	0
+5	Friend	100	100	5	0	1	0

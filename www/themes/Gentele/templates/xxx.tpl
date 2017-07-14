@@ -102,32 +102,36 @@
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
 														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
-													{else}
+																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"
+															width="100"></a>
+													{/if}
+													{if $result.classused == "adm"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}http://www.adultdvdempire.com/dvd/search?q={$result.title}"
-																name="viewade{$result.title}"
-																title="Search AdultdvdEmpire page"
+																href="{$site->dereferrer_link}{$result.directurl}"
+																name="viewadm{$result.title}"
+																title="View AdultDVDMarketplace page"
 														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
+																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/adm.png"
+																	width="100"></a>
 													{/if}
-													{if $result.classused == "hm"}
+													{if $result.classused == "aebn"}
+														<a
+																target="_blank"
+																href="{$site->dereferrer_link}{$result.directurl}"
+																name="viewaebn{$result.title}"
+																title="View AEBN page"
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/aebn.png"
+															  width="100"></a>
+													{/if}
+													{if $result.classused == "hotm"}
 														<a
 																target="_blank"
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewhm{$result.title}"
-																title="View Hot Movies page"
-														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
-													{else}
-														<a
-																target="_blank"
-																href="{$site->dereferrer_link}http://www.hotmovies.com/search.php?words={$result.title}&complete=on&search_in=video_title"
-																name="viewhm{$result.title}"
-																title="Search Hot Movies page"
-														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
+																title="View HotMovies page"
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"
+															  width="100"></a>
 													{/if}
 													{if $result.classused == "pop"}
 														<a
@@ -135,24 +139,9 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewpop{$result.id}"
 																title="View Popporn page"
-														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"></a>
-													{else}
-														<a
-																target="_blank"
-																href="{$site->dereferrer_link}http://www.popporn.com/results/index.cfm?v=4&g=0&searchtext={$result.title}"
-																name="viewpop{$result.id}"
-																title="Search Popporn page"
-														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"></a>
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"
+															  width="100"></a>
 													{/if}
-													<a
-															target="_blank"
-															href="{$site->dereferrer_link}http://www.iafd.com/results.asp?searchtype=title&searchstring={$result.title}"
-															name="viewiafd{$result.title}"
-															title="Search Internet Adult Film Database"
-													><img
-																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															   title="View NFO" class="label label-primary"
@@ -173,7 +162,6 @@
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|escape:"htmlall"}</a></span>
 
-													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tr>
 															<td id="guid{$mguid[$m@index]}">
@@ -188,8 +176,13 @@
 																<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
 																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
-																<br/><br/><br/>
-
+																<br>
+																<div class="release-subtitle">{if $result.genre != ''}Genre: {$result.genre}, {/if}</div>
+																<br>
+																<div class="release-subtitle">{if $result.plot != ''}Plot: {$result.plot}, {/if}</div>
+																<br>
+																<div class="release-subtitle">{if $result.actors != ''}Cast: {$result.actors}, {/if}</div>
+																<br>
 																<div class="release-name text-muted"><a
 																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>
@@ -277,32 +270,36 @@
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
 														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
-													{else}
+																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"
+																	width="100"></a>
+													{/if}
+													{if $result.classused == "adm"}
 														<a
 																target="_blank"
-																href="{$site->dereferrer_link}http://www.adultdvdempire.com/dvd/search?q={$result.title}"
-																name="viewade{$result.title}"
-																title="Search AdultdvdEmpire page"
+																href="{$site->dereferrer_link}{$result.directurl}"
+																name="viewadm{$result.title}"
+																title="View AdultDVDMarketplace page"
 														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"></a>
+																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/adm.png"
+																	width="100"></a>
 													{/if}
-													{if $result.classused == "hm"}
+													{if $result.classused == "aebn"}
+														<a
+																target="_blank"
+																href="{$site->dereferrer_link}{$result.directurl}"
+																name="viewaebn{$result.title}"
+																title="View AEBN page"
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/aebn.png"
+															  width="100"></a>
+													{/if}
+													{if $result.classused == "hotm"}
 														<a
 																target="_blank"
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewhm{$result.title}"
-																title="View Hot Movies page"
-														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
-													{else}
-														<a
-																target="_blank"
-																href="{$site->dereferrer_link}http://www.hotmovies.com/search.php?words={$result.title}&complete=on&search_in=video_title"
-																name="viewhm{$result.title}"
-																title="Search Hot Movies page"
-														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"></a>
+																title="View HotMovies page"
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"
+															  width="100"></a>
 													{/if}
 													{if $result.classused == "pop"}
 														<a
@@ -310,24 +307,9 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewpop{$result.id}"
 																title="View Popporn page"
-														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"></a>
-													{else}
-														<a
-																target="_blank"
-																href="{$site->dereferrer_link}http://www.popporn.com/results/index.cfm?v=4&g=0&searchtext={$result.title}"
-																name="viewpop{$result.id}"
-																title="Search Popporn page"
-														><img
-																	src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"></a>
+														><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"
+															  width="100"></a>
 													{/if}
-													<a
-															target="_blank"
-															href="{$site->dereferrer_link}http://www.iafd.com/results.asp?searchtype=title&searchstring={$result.title}"
-															name="viewiafd{$result.title}"
-															title="Search Internet Adult Film Database"
-													><img
-																src="{$smarty.const.WWW_THEMES}/shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
 															   title="View NFO" class="label label-primary"
@@ -347,8 +329,6 @@
 												<div class="col-md-9 small-gutter-left table-responsive">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|escape:"htmlall"}</a></span>
-
-													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
 													<table class="data table table-striped responsive-utilities jambo-table">
 														<tr>
 															<td id="guid{$mguid[$m@index]}">
@@ -363,8 +343,13 @@
 																<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
 																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
-																<br/><br/><br/>
-
+																<br>
+																<div class="release-subtitle">{if $result.genre != ''}Genre: {$result.genre}, {/if}</div>
+																<br>
+																<div class="release-subtitle">{if $result.plot != ''}Plot: {$result.plot}, {/if}</div>
+																<br>
+																<div class="release-subtitle">{if $result.actors != ''}Cast: {$result.actors}, {/if}</div>
+																<br>
 																<div class="release-name text-muted"><a
 																			href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 																</div>

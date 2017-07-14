@@ -2,6 +2,7 @@
 require_once dirname(__DIR__, 5) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use nntmux\db\DB;
+use nntmux\ColorCLI;
 use nntmux\ConsoleTools;
 use nntmux\NNTP;
 
@@ -13,16 +14,16 @@ $consoleTools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 // Create the connection here and pass
 $nntp = new NNTP(['Settings' => $pdo]);
 if ($nntp->doConnect() !== true) {
-	exit($pdo->log->error("Unable to connect to usenet."));
+	exit(ColorCLI::error('Unable to connect to usenet.'));
 }
 
-echo $pdo->log->header("Getting first/last for all your active groups.");
+echo ColorCLI::header('Getting first/last for all your active groups.');
 $data = $nntp->getGroups();
 if ($nntp->isError($data)) {
-	exit($pdo->log->error("Failed to getGroups() from nntp server."));
+	exit(ColorCLI::error('Failed to getGroups() from nntp server.'));
 }
 
-echo $pdo->log->header("Inserting new values into short_groups table.");
+echo ColorCLI::header('Inserting new values into short_groups table.');
 
 $pdo->queryExec('TRUNCATE TABLE short_groups');
 
@@ -32,10 +33,10 @@ $res = $pdo->query('SELECT name FROM groups WHERE active = 1 OR backfill = 1');
 foreach ($data as $newgroup) {
 	if (myInArray($res, $newgroup['group'], 'name')) {
 		$pdo->queryInsert(sprintf('INSERT INTO short_groups (name, first_record, last_record, updated) VALUES (%s, %s, %s, NOW())', $pdo->escapeString($newgroup['group']), $pdo->escapeString($newgroup['first']), $pdo->escapeString($newgroup['last'])));
-		echo $pdo->log->primary('Updated ' . $newgroup['group']);
+		echo ColorCLI::primary('Updated ' . $newgroup['group']);
 	}
 }
-echo $pdo->log->header('Running time: ' . $consoleTools->convertTimer(time() - $start));
+echo ColorCLI::header('Running time: ' . $consoleTools->convertTimer(time() - $start));
 
 function myInArray($array, $value, $key)
 {

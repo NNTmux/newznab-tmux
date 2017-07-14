@@ -3,28 +3,34 @@ namespace nntmux\processing;
 
 use app\models\Settings;
 use dariusiii\rarinfo\Par2Info;
+use nntmux\ADE;
+use nntmux\ADM;
+use nntmux\AEBN;
 use nntmux\Books;
 use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\Console;
 use nntmux\Games;
 use nntmux\Groups;
+use nntmux\Hotmovies;
 use nntmux\Logger;
 use nntmux\Movie;
 use nntmux\Music;
 use nntmux\NameFixer;
 use nntmux\Nfo;
+use nntmux\Popporn;
 use nntmux\Sharing;
+use nntmux\processing\adult\AdultMovies;
 use nntmux\processing\tv\TVDB;
 use nntmux\processing\tv\TVMaze;
 use nntmux\processing\tv\TMDB;
 use nntmux\processing\tv\TraktTv;
-use nntmux\XXX;
 use nntmux\ReleaseFiles;
 use nntmux\db\DB;
 use nntmux\processing\post\AniDB;
 use nntmux\processing\post\ProcessAdditional;
 use nntmux\SpotNab;
+use nntmux\XXX;
 
 class PostProcess
 {
@@ -254,12 +260,13 @@ class PostProcess
 	/**
 	 * Process all TV related releases which will assign their series/episode/rage data.
 	 *
-	 * @param string     $groupID   (Optional) ID of a group to work on.
-	 * @param string     $guidChar  (Optional) First letter of a release GUID to use to get work.
-	 * @param string|int $processTV (Optional) 0 Don't process, 1 process all releases,
+	 * @param string     $groupID              (Optional) ID of a group to work on.
+	 * @param string     $guidChar             (Optional) First letter of a release GUID to use to get work.
+	 * @param string|int $processTV            (Optional) 0 Don't process, 1 process all releases,
 	 *                                         2 process renamed releases only, '' check site setting
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function processTv($groupID = '', $guidChar = '', $processTV = '')
 	{
@@ -295,6 +302,8 @@ class PostProcess
 
 	/**
 	 * Lookup xxx if enabled.
+	 *
+	 * @throws \Exception
 	 */
 	public function processXXX()
 	{

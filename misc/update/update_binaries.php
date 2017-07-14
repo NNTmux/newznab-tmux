@@ -3,24 +3,25 @@ require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 use app\models\Settings;
 use nntmux\db\DB;
+use nntmux\ColorCLI;
 use nntmux\NNTP;
 use nntmux\Binaries;
 use nntmux\Groups;
 
 $pdo = new DB();
 
-$maxHeaders = Settings::value('max.headers.iteration') ?: 1000000;
+$maxHeaders = (int)Settings::value('max.headers.iteration') ?: 1000000;
 
 // Create the connection here and pass
 $nntp = new NNTP(['Settings' => $pdo]);
 if ($nntp->doConnect() !== true) {
-	exit($pdo->log->error("Unable to connect to usenet."));
+	exit(ColorCLI::error('Unable to connect to usenet.'));
 }
 $binaries = new Binaries(['NNTP' => $nntp, 'Settings' => $pdo]);
 
 if (isset($argv[1]) && !is_numeric($argv[1])) {
 	$groupName = $argv[1];
-	echo $pdo->log->header("Updating group: $groupName");
+	echo ColorCLI::header("Updating group: $groupName");
 
 	$grp = new Groups(['Settings' => $pdo]);
 	$group = $grp->getByName($groupName);
