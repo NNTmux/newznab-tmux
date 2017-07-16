@@ -1,6 +1,6 @@
 <?php
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\Releases;
 use nntmux\http\API;
 use nntmux\utility\Utility;

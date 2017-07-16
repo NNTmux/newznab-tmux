@@ -17,11 +17,11 @@
  * @copyright 2016 nZEDb
  */
 
-namespace app\models;
+namespace App\models;
 
 use Illuminate\Database\Eloquent\Model;
 use nntmux\utility\Utility;
-use app\extensions\console\Command;
+use App\extensions\console\Command;
 
 /**
  * Settings - model for settings table.

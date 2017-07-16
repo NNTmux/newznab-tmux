@@ -1,6 +1,6 @@
 <?php
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\Releases;
 use nntmux\NZB;
 use nntmux\utility\Utility;

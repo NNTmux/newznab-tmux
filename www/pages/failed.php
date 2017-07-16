@@ -1,6 +1,6 @@
 <?php
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\DnzbFailures;
 
 // Page is accessible only by the rss token, or logged in users.

@@ -1,8 +1,8 @@
 <?php
 namespace nntmux;
 
-use app\extensions\util\Yenc;
-use app\models\Settings;
+use App\extensions\util\Yenc;
+use App\models\Settings;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 
@@ -914,7 +914,7 @@ class NNTP extends \Net_NNTP_Client
 	/**
 	 * yEncodes a string and returns it.
 	 *
-	 * @deprecated use app\extensions\util\Yenc::encode instead.
+	 * @deprecated use App\extensions\util\Yenc::encode instead.
 	 * @param string $string     String to encode.
 	 * @param string $filename   Name to use as the filename in the yEnc header (this does not have to be an actual file).
 	 * @param int    $lineLength Line length to use (can be up to 254 characters).
@@ -978,7 +978,7 @@ class NNTP extends \Net_NNTP_Client
 	/**
 	 * yDecodes an encoded string and either writes the result to a file or returns it as a string.
 	 *
-	 * @deprecated use app\extensions\util\Yenc::decode instead.
+	 * @deprecated use App\extensions\util\Yenc::decode instead.
 	 *
 	 * @param string $string yEncoded string to decode.
 	 *
@@ -1046,7 +1046,7 @@ class NNTP extends \Net_NNTP_Client
 	/**
 	 * Decode a string of text encoded with yEnc. Ignores all errors.
 	 *
-	 * @deprecated use app\extensions\util\Yenc::decodeIgnore instead.
+	 * @deprecated use App\extensions\util\Yenc::decodeIgnore instead.
 	 *
 	 * @param  string|bool $data The encoded text to decode.
 	 *

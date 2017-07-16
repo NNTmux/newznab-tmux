@@ -2,7 +2,7 @@
 
 namespace nntmux\processing\post;
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\NZB;

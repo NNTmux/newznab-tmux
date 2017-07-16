@@ -17,10 +17,10 @@
  * @copyright 2016 nZEDb
  */
 
-namespace app\extensions\util;
+namespace App\extensions\util;
 
 use Illuminate\Support\ServiceProvider;
-use app\extensions\util\yenc\adapter\NzedbYenc;
+use App\extensions\util\yenc\adapter\NzedbYenc;
 
 class Yenc extends ServiceProvider
 {

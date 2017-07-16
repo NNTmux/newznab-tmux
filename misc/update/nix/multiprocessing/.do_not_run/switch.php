@@ -6,7 +6,7 @@ if (!isset($argv[1])) {
 
 require_once dirname(__DIR__, 5) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-use app\models\Settings;
+use App\models\Settings;
 use \nntmux\db\DB;
 use \nntmux\processing\PostProcess;
 use \nntmux\processing\ProcessReleases;

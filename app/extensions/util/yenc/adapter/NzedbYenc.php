@@ -17,7 +17,7 @@
  * @copyright 2016 nZEDb
  */
 
-namespace app\extensions\util\yenc\adapter;
+namespace App\extensions\util\yenc\adapter;
 
 use Illuminate\Support\ServiceProvider;
 use yenc\yenc;

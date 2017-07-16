@@ -6,7 +6,7 @@ if (!defined('NN_INSTALLER')) {
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 include_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
 
-use app\extensions\util\Versions;
+use App\extensions\util\Versions;
 use nntmux\config\Configure;
 use nntmux\db\DB;
 use nntmux\db\DbUpdate;

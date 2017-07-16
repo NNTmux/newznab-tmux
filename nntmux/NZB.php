@@ -1,8 +1,8 @@
 <?php
 namespace nntmux;
 
-use app\extensions\util\Versions as li3Versions;
-use app\models\Settings;
+use App\extensions\util\Versions as li3Versions;
+use App\models\Settings;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 

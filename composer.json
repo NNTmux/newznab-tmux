@@ -11,7 +11,7 @@
     ],
     "psr-4": {
       "nntmux\\": "nntmux/",
-      "app\\": "app/"
+      "App\\": "app/"
     },
     "classmap": [
       "www/pages/",

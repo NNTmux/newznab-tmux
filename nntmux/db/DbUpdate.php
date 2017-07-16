@@ -20,7 +20,7 @@
  */
 namespace nntmux\db;
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\ColorCLI;
 use nntmux\db\DB;
 use nntmux\utility\Git;

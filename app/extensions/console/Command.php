@@ -18,7 +18,7 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
-namespace app\extensions\console;
+namespace App\extensions\console;
 
 use Symfony\Component\Console\Output\ConsoleOutput;
 

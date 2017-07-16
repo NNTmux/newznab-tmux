@@ -3,7 +3,7 @@ namespace nntmux;
 
 
 use nntmux\db\DB;
-use app\extensions\util\Yenc;
+use App\extensions\util\Yenc;
 
 // Help out those who don't have SSL enabled
 if(!defined('OPENSSL_KEYTYPE_RSA')) {

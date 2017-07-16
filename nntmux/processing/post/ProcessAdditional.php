@@ -1,7 +1,7 @@
 <?php
 namespace nntmux\processing\post;
 
-use app\models\Settings;
+use App\models\Settings;
 use dariusiii\rarinfo\ArchiveInfo;
 use dariusiii\rarinfo\Par2Info;
 use nntmux\Categorize;

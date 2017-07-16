@@ -2,9 +2,9 @@
 <?php
 require_once __DIR__ . '/bootstrap/bootstrap.php';
 
-use app\extensions\command\Update;
-use app\extensions\command\Verify;
-use app\extensions\command\Version;
+use App\extensions\command\Update;
+use App\extensions\command\Verify;
+use App\extensions\command\Version;
 
 $update = new Update();
 $verify = new Verify();

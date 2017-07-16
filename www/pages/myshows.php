@@ -1,6 +1,6 @@
 <?php
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\Category;
 use nntmux\Releases;
 use nntmux\UserSeries;

@@ -1,7 +1,7 @@
 <?php
 namespace nntmux\processing\tv;
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
 use Tmdb\ApiToken;

@@ -1,6 +1,6 @@
 <?php
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\Users;
 use nntmux\Contents;
 use nntmux\Forum;

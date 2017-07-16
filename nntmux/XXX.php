@@ -2,7 +2,7 @@
 
 namespace nntmux;
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\db\DB;
 use nntmux\processing\adult\AEBN;
 use nntmux\processing\adult\ADM;

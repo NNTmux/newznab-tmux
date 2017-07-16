@@ -2,7 +2,7 @@
 
 require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\db\DB;
 use nntmux\Users;
 use nntmux\SABnzbd;

@@ -16,7 +16,7 @@
  * @author    niel
  * @copyright 2016 nZEDb
  */
-namespace app\extensions\util;
+namespace App\extensions\util;
 
 use \GitRepo;
 use Illuminate\Database\Eloquent\Collection;

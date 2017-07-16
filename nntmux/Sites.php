@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use app\extensions\util\Versions;
+use App\extensions\util\Versions;
 use nntmux\libraries\Cache;
 use nntmux\db\DB;
 

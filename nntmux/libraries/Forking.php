@@ -1,7 +1,7 @@
 <?php
 namespace nntmux\libraries;
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\MiscSorter;

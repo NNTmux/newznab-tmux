@@ -16,9 +16,9 @@
  * @author    niel
  * @copyright 2016 nZEDb
  */
-namespace app\extensions\util;
+namespace App\extensions\util;
 
-use app\models\Settings;
+use App\models\Settings;
 use Illuminate\Database\Eloquent\Collection;
 use nntmux\utility\Utility;
 

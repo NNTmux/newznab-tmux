@@ -1,6 +1,6 @@
 <?php
 
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\utility\Utility;
 use nntmux\Captcha;
 

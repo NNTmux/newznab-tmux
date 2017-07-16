@@ -1,8 +1,8 @@
 <?php
 namespace nntmux\utility;
 
-use app\models\Settings;
-use app\extensions\util\Versions;
+use App\models\Settings;
+use App\extensions\util\Versions;
 use nntmux\db\DB;
 use nntmux\ColorCLI;
 

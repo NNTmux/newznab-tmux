@@ -20,8 +20,8 @@
  */
 namespace nntmux\http;
 
-use app\extensions\util\Versions;
-use app\models\Settings;
+use App\extensions\util\Versions;
+use App\models\Settings;
 use nntmux\Category;
 use nntmux\db\DB;
 use nntmux\utility\Utility;

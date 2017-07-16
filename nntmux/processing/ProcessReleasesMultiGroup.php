@@ -2,7 +2,7 @@
 
 namespace nntmux\processing;
 
-use app\models\MultigroupPosters;
+use App\models\MultigroupPosters;
 use nntmux\NZBMultiGroup;
 use nntmux\utility\Utility;
 

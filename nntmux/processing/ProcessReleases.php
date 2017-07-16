@@ -1,10 +1,10 @@
 <?php
 namespace nntmux\processing;
 
-use app\models\MultigroupPosters;
-use app\models\ReleasesGroups;
-use app\models\ReleaseRegexes;
-use app\models\Settings;
+use App\models\MultigroupPosters;
+use App\models\ReleasesGroups;
+use App\models\ReleaseRegexes;
+use App\models\Settings;
 use nntmux\Categorize;
 use nntmux\Category;
 use nntmux\ColorCLI;

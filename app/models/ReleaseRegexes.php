@@ -16,7 +16,7 @@
  * @author    DariusIII
  * @copyright 2017 NNTmux/nZEDb
  */
-namespace app\models;
+namespace App\models;
 
 
 use Illuminate\Database\Eloquent\Model;

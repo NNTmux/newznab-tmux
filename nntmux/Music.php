@@ -3,7 +3,7 @@ namespace nntmux;
 
 use ApaiIO\Request\GuzzleRequest;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
-use app\models\Settings;
+use App\models\Settings;
 use GuzzleHttp\Client;
 use nntmux\db\DB;
 use ApaiIO\Configuration\GenericConfiguration;

@@ -1,7 +1,7 @@
 <?php
 
-use app\models\ReleaseRegexes;
-use app\models\Settings;
+use App\models\ReleaseRegexes;
+use App\models\Settings;
 use nntmux\Console;
 use nntmux\ReleaseComments;
 use nntmux\ReleaseExtra;

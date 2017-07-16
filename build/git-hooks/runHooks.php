@@ -23,7 +23,7 @@ define('GIT_PRE_COMMIT', true);
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
 use nntmux\utility\Git;
-use app\extensions\util\Versions;
+use App\extensions\util\Versions;
 
 echo "Running pre-commit hooks\n";
 

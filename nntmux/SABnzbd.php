@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use app\models\Settings;
+use App\models\Settings;
 use GuzzleHttp\Client;
 use nntmux\utility\Utility;
 

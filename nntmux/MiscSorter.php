@@ -2,7 +2,7 @@
 namespace nntmux;
 
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
-use app\models\Settings;
+use App\models\Settings;
 use nntmux\db\DB;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ApaiIO;

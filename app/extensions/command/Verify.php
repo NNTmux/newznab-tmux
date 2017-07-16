@@ -16,10 +16,10 @@
  * @author    niel
  * @copyright 2016 nZEDb
  */
-namespace app\extensions\command;
+namespace App\extensions\command;
 
-use app\models\Settings;
-use lithium\console\command\Help;
+use App\extensions\console\Command;
+use App\models\Settings;
 
 
 /**
@@ -28,7 +28,7 @@ use lithium\console\command\Help;
  * Actions:
  *  * settings_table	Checks that all settings in the 10~settings.tsv exist in your Db.
  */
-class Verify extends \app\extensions\console\Command
+class Verify extends Command
 {
 	/**
 	 * Constructor.
