@@ -14,26 +14,45 @@
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    DariusIII
- * @copyright 2017 NNTmux/nZEDb
+ * @copyright 2016 NNTmux/nZEDb
  */
-namespace App\models;
-
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ReleaseRegexes extends Model
+class SteamApps extends Model
 {
-	protected $table = 'release_regexes';
+	/**
+	 * @var string
+	 */
+	protected $table = 'steam_apps';
 
+	/**
+	 * @var bool
+	 */
 	public $timestamps = false;
 
+	/**
+	 * @var bool
+	 */
 	public $dateFormat = false;
 
+	/**
+	 * @var array
+	 */
+	protected $fillable = ['name', 'appid'];
+
+	/**
+	 * @var array
+	 */
+	protected $primaryKey = 'name';
+
+	protected $keyType = 'string';
+
+	/**
+	 * @var bool
+	 */
 	public $incrementing = false;
-
-	protected $fillable = ['releases_id', 'collection_regex_id', 'naming_regex_id'];
-
-	protected $primaryKey = [
-		['releases_id', 'collection_regex_id', 'naming_regex_id']
-	];
 }
+
+?>

@@ -1,4 +1,5 @@
-2017-17-16 DariusIII
+2017-07-17 DariusIII
+	* Chg: Change folder names in app to upper case first letter
 	* Chg: Replace app with App in classes used
 	* Chg: Update composer.lock
 2017-07-14 DariusIII

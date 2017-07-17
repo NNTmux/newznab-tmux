@@ -16,13 +16,15 @@
  *
  * @link <http://www.gnu.org/licenses/>.
  * @author niel
- * @copyright 2014 nZEDb
+ * @edited by DariusIII
+ * @copyright 2014 nZEDb, 2017 NNTmux
  */
 namespace App\extensions\console;
 
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Illuminate\Console\Command as LaravelCommand;
 
-class Command extends \Illuminate\Console\Command
+class Command extends LaravelCommand
 {
 	/**
 	 * Command constructor.
@@ -36,7 +38,11 @@ class Command extends \Illuminate\Console\Command
 		$this->output = new ConsoleOutput();
 	}
 
-	public function info($text, $verbosity = null)
+	/**
+	 * @param string $text
+	 * @param null   $verbosity
+	 */
+	public function info($text, $verbosity = null): void
 	{
 		if ($this->output->isQuiet()) {
 			return;
@@ -44,6 +50,9 @@ class Command extends \Illuminate\Console\Command
 		$this->output->writeln('<info>' . $text . '</info>', $verbosity);
 	}
 
+	/**
+	 * @param $text
+	 */
 	public function primary($text)
 	{
 		if ($this->output->isQuiet()) {
@@ -52,7 +61,11 @@ class Command extends \Illuminate\Console\Command
 		$this->output->writeln('<comment>' . $text . '</comment>');
 	}
 
-	public function error($text, $verbosity = null)
+	/**
+	 * @param string $text
+	 * @param null   $verbosity
+	 */
+	public function error($text, $verbosity = null): void
 	{
 		if ($this->output->isQuiet()) {
 			return;

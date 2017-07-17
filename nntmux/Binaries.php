@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use App\models\Settings;
+use App\Models\Settings;
 use nntmux\ColorCLI;
 use nntmux\db\DB;
 use nntmux\processing\ProcessReleasesMultiGroup;

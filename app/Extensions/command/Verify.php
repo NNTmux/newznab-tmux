@@ -19,7 +19,7 @@
 namespace App\extensions\command;
 
 use App\extensions\console\Command;
-use App\models\Settings;
+use App\Models\Settings;
 
 
 /**

@@ -13,23 +13,27 @@
  * not, see:
  *
  * @link      <http://www.gnu.org/licenses/>.
- * @author    niel
- * @copyright 2016 nZEDb
+ * @author    DariusIII
+ * @copyright 2017 NNTmux/nZEDb
  */
-namespace App\models;
+namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
 
-class ReleasesGroups extends Model
+class ReleaseRegexes extends Model
 {
-	protected $table = 'releases_groups';
-
-	public $incrementing = false;
+	protected $table = 'release_regexes';
 
 	public $timestamps = false;
 
 	public $dateFormat = false;
 
-	protected $primaryKey = ['releases_id', 'groups_id'];
+	public $incrementing = false;
+
+	protected $fillable = ['releases_id', 'collection_regex_id', 'naming_regex_id'];
+
+	protected $primaryKey = [
+		['releases_id', 'collection_regex_id', 'naming_regex_id']
+	];
 }

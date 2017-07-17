@@ -18,7 +18,7 @@
  */
 namespace App\extensions\util;
 
-use App\models\Settings;
+use App\Models\Settings;
 use Illuminate\Database\Eloquent\Collection;
 use nntmux\utility\Utility;
 

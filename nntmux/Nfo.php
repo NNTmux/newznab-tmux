@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use App\models\Settings;
+use App\Models\Settings;
 use dariusiii\rarinfo\Par2Info;
 use dariusiii\rarinfo\SfvInfo;
 use nntmux\db\DB;

@@ -2,7 +2,7 @@
 
 namespace nntmux\db\populate;
 
-use App\models\Settings;
+use App\Models\Settings;
 use nntmux\ColorCLI;
 use nntmux\ReleaseImage;
 use nntmux\db\DB;

@@ -13,46 +13,23 @@
  * not, see:
  *
  * @link      <http://www.gnu.org/licenses/>.
- * @author    DariusIII
- * @copyright 2016 NNTmux/nZEDb
+ * @author    niel
+ * @copyright 2016 nZEDb
  */
-namespace App\models;
+namespace App\Models;
+
 
 use Illuminate\Database\Eloquent\Model;
 
-class SteamApps extends Model
+class ReleasesGroups extends Model
 {
-	/**
-	 * @var string
-	 */
-	protected $table = 'steam_apps';
+	protected $table = 'releases_groups';
 
-	/**
-	 * @var bool
-	 */
+	public $incrementing = false;
+
 	public $timestamps = false;
 
-	/**
-	 * @var bool
-	 */
 	public $dateFormat = false;
 
-	/**
-	 * @var array
-	 */
-	protected $fillable = ['name', 'appid'];
-
-	/**
-	 * @var array
-	 */
-	protected $primaryKey = 'name';
-
-	protected $keyType = 'string';
-
-	/**
-	 * @var bool
-	 */
-	public $incrementing = false;
+	protected $primaryKey = ['releases_id', 'groups_id'];
 }
-
-?>

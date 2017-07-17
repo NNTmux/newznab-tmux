@@ -2,7 +2,7 @@
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 
-use App\models\Settings;
+use App\Models\Settings;
 use nntmux\Category;
 use nntmux\SABnzbd;
 use nntmux\Sites;

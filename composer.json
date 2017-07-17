@@ -6,8 +6,8 @@
   ],
   "autoload": {
     "files": [
-      "app/libraries/laravel/framework/src/Illuminate/Support/helpers.php",
-      "app/extensions/helper/helpers.php"
+      "app/Libraries/laravel/framework/src/Illuminate/Support/helpers.php",
+      "app/Extensions/helper/helpers.php"
     ],
     "psr-4": {
       "nntmux\\": "nntmux/",
@@ -24,13 +24,15 @@
     "preferred-install": {
       "*": "source"
     },
+    "sort-packages": true,
+    "optimize-autoloader": true,
     "fxp-asset" : {
       "installer-paths": {
         "npm-asset-library": "www/themes/shared/assets",
         "bower-asset-library": "www/themes/shared/assets"
       }
     },
-    "vendor-dir": "app/libraries"
+    "vendor-dir": "app/Libraries"
   },
   "description": "A Usenet Indexer",
   "extra": {
@@ -140,6 +142,12 @@
   },
 
   "scripts": {
+    "post-install-cmd": [
+      "Illuminate\\Foundation\\ComposerScripts::postInstall"
+    ],
+    "post-update-cmd": [
+      "Illuminate\\Foundation\\ComposerScripts::postUpdate"
+    ]
   },
   "suggest": {
     "ext-xdebug": "For developement work",

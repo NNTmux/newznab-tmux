@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-use App\models\Settings;
+use App\Models\Settings;
 use nntmux\db\DB;
 use nntmux\processing\PostProcess;
 use nntmux\NNTP;

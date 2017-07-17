@@ -2,7 +2,7 @@
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 
-use App\models\MultigroupPosters;
+use App\Models\MultigroupPosters;
 use nntmux\processing\ProcessReleasesMultiGroup;
 
 $page = new AdminPage();

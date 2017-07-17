@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use App\models\Settings;
+use App\Models\Settings;
 use aharen\OMDbAPI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;

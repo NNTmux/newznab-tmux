@@ -1,7 +1,7 @@
 <?php
 namespace nntmux;
 
-use App\models\Settings;
+use App\Models\Settings;
 use DBorsatto\GiantBomb\Config;
 use DBorsatto\GiantBomb\Client;
 use nntmux\db\DB;

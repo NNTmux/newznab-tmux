@@ -1,7 +1,7 @@
 <?php
 namespace nntmux\processing;
 
-use App\models\Settings;
+use App\Models\Settings;
 use dariusiii\rarinfo\Par2Info;
 use nntmux\ADE;
 use nntmux\ADM;

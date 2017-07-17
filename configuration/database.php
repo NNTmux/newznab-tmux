@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . 'autoload.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'app/Libraries' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Dotenv\Dotenv;

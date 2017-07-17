@@ -1,7 +1,7 @@
 <?php
 namespace nntmux\processing\tv;
 
-use App\models\Settings;
+use App\Models\Settings;
 use nntmux\processing\Videos;
 use nntmux\utility\Country;
 use nntmux\utility\Utility;

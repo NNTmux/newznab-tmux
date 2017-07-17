@@ -1,6 +1,6 @@
 <?php
 
-use App\models\Settings;
+use App\Models\Settings;
 
 $page->title = "Terms and Conditions";
 $page->meta_title = Settings::value('site.main.title')." - Terms and conditions";

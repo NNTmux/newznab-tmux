@@ -10,4 +10,4 @@ if (!defined('NN_ROOT')) {
 	define('NN_ROOT', dirname(NN_APP_PATH, 2));
 }
 
-require_once NN_APP_PATH . DS . 'libraries' . DS . 'autoload.php';
+require_once NN_APP_PATH . DS . 'Libraries' . DS . 'autoload.php';

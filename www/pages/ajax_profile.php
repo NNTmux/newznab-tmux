@@ -1,6 +1,6 @@
 <?php
 
-use App\models\Settings;
+use App\Models\Settings;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();
