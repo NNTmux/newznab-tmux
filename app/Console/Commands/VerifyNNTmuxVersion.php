@@ -53,7 +53,7 @@ class VerifyNNTmuxVersion extends Command
 		} else if($this->argument('type') === 'all') {
 			$this->call($this->version->all());
 		} else {
-			$this->error('Wrong argument used');
+			$this->error($this->description);
 		}
     }
 }
