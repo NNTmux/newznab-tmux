@@ -22,7 +22,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use nntmux\utility\Utility;
-use App\Extensions\console\Command;
+use Illuminate\Console\Command;
 
 /**
  * Settings - model for settings table.
@@ -97,7 +97,7 @@ class Settings extends Model
 	 * @throws \Exception
 	 * @throws \InvalidArgumentException
 	 */
-	public static function hasAllEntries($console = null)
+	public static function hasAllEntries($console)
 	{
 		$filepath = Utility::pathCombine(['db', 'schema', 'data', '10-settings.tsv'], NN_RES);
 		if (!file_exists($filepath)) {
@@ -114,9 +114,8 @@ class Settings extends Model
 		$dummy = array_shift($settings);
 		$result = false;
 		if ($dummy !== null) {
-			if ($console !== null) {
-				$console = new Command();
-				$console->primary('Verifying settings table...');
+			if ($console) {
+				$console->info('Verifying settings table...');
 				$console->info('(section, subsection, name):');
 			}
 			$result = true;
