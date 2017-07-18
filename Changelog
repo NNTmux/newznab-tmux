@@ -1,3 +1,5 @@
+2017-07-19 DariusIII
+	* Chg: "Laravelize" NNTmux (use laravel in NNTmux)
 2017-07-17 DariusIII
 	* Chg: Adjust tmux-ui permissions
 	* Chg: Adjust Categorize class settings values
