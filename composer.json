@@ -6,7 +6,7 @@
   ],
   "autoload": {
     "files": [
-      "app/Libraries/laravel/framework/src/Illuminate/Support/helpers.php",
+      "app/libraries/laravel/framework/src/Illuminate/Support/helpers.php",
       "app/Extensions/helper/helpers.php"
     ],
     "psr-4": {
@@ -16,7 +16,8 @@
     "classmap": [
       "www/pages/",
       "libs/PEAR/Net_NNTP/NNTP/",
-      "libs/"
+      "libs/",
+      "database"
     ]
   },
   "config": {
@@ -32,7 +33,7 @@
         "bower-asset-library": "www/themes/shared/assets"
       }
     },
-    "vendor-dir": "app/Libraries"
+    "vendor-dir": "app/libraries"
   },
   "description": "A Usenet Indexer",
   "extra": {
@@ -143,10 +144,11 @@
 
   "scripts": {
     "post-install-cmd": [
-      "Illuminate\\Foundation\\ComposerScripts::postInstall"
+      "nntmux\\build\\ComposerScripts::postInstall",
+      "nntmux\\build\\ComposerScripts::postInstallCmd"
     ],
     "post-update-cmd": [
-      "Illuminate\\Foundation\\ComposerScripts::postUpdate"
+      "nntmux\\build\\ComposerScripts::postUpdate"
     ]
   },
   "suggest": {
