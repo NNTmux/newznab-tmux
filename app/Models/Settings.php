@@ -14,7 +14,8 @@
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
- * @copyright 2016 nZEDb
+ * @author    DariusIII
+ * @copyright 2016 nZEDb, 2017 NNTmux
  */
 
 namespace App\Models;
