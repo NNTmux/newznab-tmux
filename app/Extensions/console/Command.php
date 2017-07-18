@@ -19,7 +19,7 @@
  * @edited by DariusIII
  * @copyright 2014 nZEDb, 2017 NNTmux
  */
-namespace App\extensions\console;
+namespace App\Extensions\console;
 
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Illuminate\Console\Command as LaravelCommand;

@@ -6,11 +6,11 @@
  * Time: 15.17
  */
 
-namespace App\extensions\command;
+namespace App\Extensions\command;
 
-use App\extensions\console\Command;
-use App\extensions\util\Git;
-use App\extensions\util\Versions;
+use App\Extensions\console\Command;
+use App\Extensions\util\Git;
+use App\Extensions\util\Versions;
 use nntmux\db\DbUpdate;
 use Symfony\Component\Process\Process;
 

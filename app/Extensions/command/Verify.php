@@ -16,9 +16,9 @@
  * @author    niel
  * @copyright 2016 nZEDb
  */
-namespace App\extensions\command;
+namespace App\Extensions\command;
 
-use App\extensions\console\Command;
+use App\Extensions\console\Command;
 use App\Models\Settings;
 
 

@@ -22,7 +22,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use nntmux\utility\Utility;
-use App\extensions\console\Command;
+use App\Extensions\console\Command;
 
 /**
  * Settings - model for settings table.

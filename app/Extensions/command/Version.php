@@ -17,10 +17,10 @@
  * @copyright 2016 nZEDb
  */
 
-namespace App\extensions\command;
+namespace App\Extensions\command;
 
-use App\extensions\console\Command;
-use App\extensions\util\Versions;
+use App\Extensions\console\Command;
+use App\Extensions\util\Versions;
 
 
 /**

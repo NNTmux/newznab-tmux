@@ -20,7 +20,7 @@
  */
 namespace nntmux\db;
 
-use App\extensions\util\Versions;
+use App\Extensions\util\Versions;
 use nntmux\utility\Utility;
 
 class Settings extends DB
