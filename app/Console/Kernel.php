@@ -2,6 +2,10 @@
 
 namespace App\Console;
 
+use App\Console\Commands\UpdateNNTmux;
+use App\Console\Commands\UpdateNNTmuxComposer;
+use App\Console\Commands\UpdateNNTmuxDB;
+use App\Console\Commands\UpdateNNTmuxGit;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -13,7 +17,10 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        UpdateNNTmux::class,
+		UpdateNNTmuxDB::class,
+		UpdateNNTmuxGit::class,
+		UpdateNNTmuxComposer::class
     ];
 
     /**
