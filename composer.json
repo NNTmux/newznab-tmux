@@ -6,12 +6,14 @@
   ],
   "autoload": {
     "files": [
-      "app/libraries/laravel/framework/src/Illuminate/Support/helpers.php",
+      "app/Libraries/laravel/framework/src/Illuminate/Support/helpers.php",
       "app/Extensions/helper/helpers.php"
     ],
     "psr-4": {
       "nntmux\\": "nntmux/",
-      "App\\": "app/"
+      "App\\": "app/",
+      "App\\Http\\Controllers\\": "nntmux/Controllers",
+      "App\\Http\\Middleware\\": "nntmux/Middleware"
     },
     "classmap": [
       "www/pages/",
@@ -33,7 +35,7 @@
         "bower-asset-library": "www/themes/shared/assets"
       }
     },
-    "vendor-dir": "app/libraries"
+    "vendor-dir": "app/Libraries"
   },
   "description": "A Usenet Indexer",
   "extra": {
@@ -144,6 +146,9 @@
   },
 
   "scripts": {
+    "post-create-project-cmd": [
+      "php artisan key:generate"
+    ],
     "post-install-cmd": [
       "nntmux\\build\\ComposerScripts::postInstall",
       "nntmux\\build\\ComposerScripts::postInstallCmd"

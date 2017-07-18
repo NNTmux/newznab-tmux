@@ -26,10 +26,7 @@ use App\extensions\console\Command;
 /**
  * Settings - model for settings table.
  *
- * laravel app completely ignore the 'setting' column and only uses 'section', 'subsection', and 'name'
- * for finding values/hints.
- *
- *@package app\models
+ *@package App\Models
  */
 class Settings extends Model
 {
