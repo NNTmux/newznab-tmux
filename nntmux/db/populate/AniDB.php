@@ -24,7 +24,7 @@ class AniDB
 	public $imgSavePath;
 
 	/**
-	 * @var Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -60,6 +60,8 @@ class AniDB
 
 	/**
 	 * @param array $options Class instances / Echo to cli.
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -86,8 +88,10 @@ class AniDB
 	/**
 	 * Main switch that initiates AniDB table population
 	 *
-	 * @param string $type
-	 * @param int|string    $anidbId
+	 * @param string     $type
+	 * @param int|string $anidbId
+	 *
+	 * @throws \Exception
 	 */
 	public function populateTable($type = '', $anidbId = ''): void
 	{
@@ -508,7 +512,7 @@ class AniDB
 	 */
 	private function setLastUpdated(): void
 	{
-		Settings::update(
+		(new Settings)->update(
 			['value' => time()],
 			['section' => 'APIs', 'subsection' => 'AniDB', 'name' => 'last_full_update']
 		);

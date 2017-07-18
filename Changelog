@@ -1,5 +1,7 @@
 2017-07-17 DariusIII
-	* Chg: Change folder names in app to upper case first letter
+	* Chg: Adjust tmux-ui permissions
+	* Chg: Adjust Categorize class settings values
+2017-07-16 DariusIII
 	* Chg: Replace app with App in classes used
 	* Chg: Update composer.lock
 2017-07-14 DariusIII

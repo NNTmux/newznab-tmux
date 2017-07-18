@@ -53,12 +53,14 @@ class Categorize extends Category
 	 * Construct.
 	 *
 	 * @param array $options Class instances.
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->categorizeForeign = Settings::value('indexer.categorise.categorizeforeign');
-		$this->catWebDL = Settings::value('indexer.categorise.catwebdl');
+		$this->categorizeForeign = (int)Settings::value('indexer.categorise.categorizeforeign');
+		$this->catWebDL = (int)Settings::value('indexer.categorise.catwebdl');
 		$this->regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'category_regexes']);
 	}
 
