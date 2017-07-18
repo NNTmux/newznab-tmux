@@ -94,6 +94,6 @@ coding_style:
                 true_false_null: undefined
 
 filter:
-    excluded_paths: [app/libraries/*, libraries/*, libs/*, resources/*]
+    excluded_paths: [app/Libraries/*, libraries/*, libs/*, resources/*]
 tools:
     sensiolabs_security_checker: true

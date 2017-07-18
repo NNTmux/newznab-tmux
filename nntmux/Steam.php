@@ -1,8 +1,8 @@
 <?php
 namespace nntmux;
 
-use App\models\SteamApps;
-use App\models\Settings;
+use App\Models\SteamApps;
+use App\Models\Settings;
 use b3rs3rk\steamfront\Main;
 use nntmux\db\DB;
 

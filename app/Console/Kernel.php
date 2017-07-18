@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Console;
+
+use App\Console\Commands\UpdateNNTmux;
+use App\Console\Commands\UpdateNNTmuxComposer;
+use App\Console\Commands\UpdateNNTmuxDB;
+use App\Console\Commands\UpdateNNTmuxGit;
+use App\Console\Commands\VerifyNNTmuxSettings;
+use App\Console\Commands\VerifyNNTmuxVersion;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+
+class Kernel extends ConsoleKernel
+{
+    /**
+     * The Artisan commands provided by your application.
+     *
+     * @var array
+     */
+    protected $commands = [
+        UpdateNNTmux::class,
+		UpdateNNTmuxDB::class,
+		UpdateNNTmuxGit::class,
+		UpdateNNTmuxComposer::class,
+		VerifyNNTmuxSettings::class,
+		VerifyNNTmuxVersion::class
+    ];
+
+    /**
+     * Define the application's command schedule.
+     *
+     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @return void
+     */
+    protected function schedule(Schedule $schedule)
+    {
+        // $schedule->command('inspire')
+        //          ->hourly();
+    }
+
+    /**
+     * Register the Closure based commands for the application.
+     *
+     * @return void
+     */
+    protected function commands()
+    {
+        require base_path('routes/console.php');
+    }
+}

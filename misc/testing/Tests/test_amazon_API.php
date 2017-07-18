@@ -4,7 +4,7 @@ require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 use ApaiIO\ApaiIO;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\Operations\Search;
-use App\models\Settings;
+use App\Models\Settings;
 
 
 $pubkey = Settings::value('APIs..amazonpubkey');

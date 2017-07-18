@@ -16,7 +16,7 @@ namespace tests;
 require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 include_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
 
-use App\extensions\util\Versions;
+use App\Extensions\util\Versions;
 use nntmux\config\Configure;
 use nntmux\db\DB;
 use nntmux\db\DbUpdate;

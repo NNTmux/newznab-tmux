@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__DIR__, 5) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-use App\models\Settings;
+use App\Models\Settings;
 use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\MiscSorter;
