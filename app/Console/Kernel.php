@@ -6,6 +6,8 @@ use App\Console\Commands\UpdateNNTmux;
 use App\Console\Commands\UpdateNNTmuxComposer;
 use App\Console\Commands\UpdateNNTmuxDB;
 use App\Console\Commands\UpdateNNTmuxGit;
+use App\Console\Commands\VerifyNNTmuxSettings;
+use App\Console\Commands\VerifyNNTmuxVersion;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -20,7 +22,9 @@ class Kernel extends ConsoleKernel
         UpdateNNTmux::class,
 		UpdateNNTmuxDB::class,
 		UpdateNNTmuxGit::class,
-		UpdateNNTmuxComposer::class
+		UpdateNNTmuxComposer::class,
+		VerifyNNTmuxSettings::class,
+		VerifyNNTmuxVersion::class
     ];
 
     /**
