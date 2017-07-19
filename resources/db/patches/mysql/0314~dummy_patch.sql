@@ -1,0 +1,1 @@
+UPDATE settings SET  value = value - 1 where setting = 'sqlpatch';
