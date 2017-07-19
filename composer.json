@@ -154,12 +154,10 @@
     ],
     "post-install-cmd": [
       "nntmux\\build\\ComposerScripts::postInstall",
-      "nntmux\\build\\ComposerScripts::postInstallCmd",
-      "php tmux optimize"
+      "nntmux\\build\\ComposerScripts::postInstallCmd"
     ],
     "post-update-cmd": [
-      "nntmux\\build\\ComposerScripts::postUpdate",
-      "php tmux optimize"
+      "nntmux\\build\\ComposerScripts::postUpdate"
     ]
   },
   "suggest": {
