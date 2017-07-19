@@ -1,4 +1,5 @@
 2017-07-19 DariusIII
+	* Chg: Update travis.yml, move before_script to the beginning
 	* Chg: "Laravelize" NNTmux (use laravel in NNTmux)
 2017-07-17 DariusIII
 	* Chg: Adjust tmux-ui permissions
