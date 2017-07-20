@@ -1,3 +1,5 @@
+2017-07-20 DariusIII
+	* Chg: Update laravel/framework and laravel/tinker to latest versions
 2017-07-19 DariusIII
 	* Chg: Update travis.yml, move before_script to the beginning
 	* Chg: "Laravelize" NNTmux (use laravel in NNTmux)
