@@ -5,6 +5,7 @@ use App\Models\Settings;
 use App\Extensions\util\Versions;
 use nntmux\db\DB;
 use nntmux\ColorCLI;
+use nntmux\Logger;
 
 
 /**
@@ -31,11 +32,11 @@ class Utility
 	 */
 	public static function canExecuteRead($path)
 	{
-		$paths = preg_split('#/#', $path);
+		$paths = explode('#/#', $path);
 		$fullPath = DS;
-		foreach ($paths as $path) {
-			if ($path !== '') {
-				$fullPath .= $path . DS;
+		foreach ($paths as $singlePath) {
+			if ($singlePath !== '') {
+				$fullPath .= $singlePath . DS;
 				if (!is_readable($fullPath) || !is_executable($fullPath)) {
 					return "The '$fullPath' directory must be readable and executable by all ." .PHP_EOL;
 				}
@@ -44,7 +45,10 @@ class Utility
 		return true;
 	}
 
-	static public function clearScreen()
+	/**
+	 *
+	 */
+	public static function clearScreen(): void
 	{
 		if (self::isCLI()) {
 			if (self::isWin()) {
@@ -65,7 +69,7 @@ class Utility
 	 * @static
 	 * @access public
 	 */
-	static public function collapseWhiteSpace($text)
+	public static function collapseWhiteSpace($text): string
 	{
 		// Strip leading/trailing white space.
 		return trim(
@@ -92,7 +96,7 @@ class Utility
 	 *
 	 * @return string
 	 */
-	static public function cutStringUsingLast($character, $string, $side, $keep_character = true)
+	public static function cutStringUsingLast($character, $string, $side, $keep_character = true): string
 	{
 		$offset = ($keep_character ? 1 : 0);
 		$whole_length = strlen($string);
@@ -100,7 +104,7 @@ class Utility
 		$left_length = ($whole_length - $right_length - 1);
 		switch ($side) {
 			case 'left':
-				$piece = substr($string, 0, ($left_length + $offset));
+				$piece = substr($string, 0, $left_length + $offset);
 				break;
 			case 'right':
 				$start = (0 - ($right_length + $offset));
@@ -111,10 +115,15 @@ class Utility
 				break;
 		}
 
-		return ($piece);
+		return $piece;
 	}
 
-	static public function getDirFiles(array $options = null)
+	/**
+	 * @param array|null $options
+	 *
+	 * @return array|null
+	 */
+	public static function getDirFiles(array $options = null): ?array
 	{
 		$defaults = [
 			'dir'   => false,
@@ -156,12 +165,15 @@ class Utility
 		return $files;
 	}
 
-	public static function getThemesList()
+	/**
+	 * @return array
+	 */
+	public static function getThemesList(): array
 	{
-		$themes = scandir(NN_THEMES);
+		$themes = scandir(NN_THEMES, 'ASC');
 		$themelist[] = 'None';
 		foreach ($themes as $theme) {
-			if (strpos($theme, ".") === false &&
+			if (strpos($theme, '.') === false &&
 				is_dir(NN_THEMES . $theme) &&
 				ucfirst($theme) === $theme
 			) {
@@ -185,21 +197,21 @@ class Utility
 	 *
 	 * @return bool|null Returns true if found, false if not found, and null if which is not detected.
 	 */
-	static public function hasCommand($cmd)
+	public static function hasCommand($cmd): ?bool
 	{
 		if ('HAS_WHICH') {
 			$returnVal = shell_exec("which $cmd");
 
 			return (empty($returnVal) ? false : true);
-		} else {
-			return null;
 		}
+
+		return null;
 	}
 
 	/**
 	 * Check for availability of which command
 	 */
-	static public function hasWhich()
+	public static function hasWhich(): bool
 	{
 		exec('which which', $output, $error);
 
@@ -211,15 +223,15 @@ class Utility
 	 *
 	 * @return bool
 	 */
-	static public function isCLI()
+	public static function isCLI()
 	{
-		return ((strtolower(PHP_SAPI) === 'cli') ? true : false);
+		return (strtolower(PHP_SAPI) === 'cli');
 	}
 
-	static public function isGZipped($filename)
+	public static function isGZipped($filename)
 	{
 		$gzipped = null;
-		if (($fp = fopen($filename, 'r')) !== false) {
+		if (($fp = fopen($filename, 'rb')) !== false) {
 			if (@fread($fp, 2) == "\x1F\x8B") { // this is a gzip'd file
 				fseek($fp, -4, SEEK_END);
 				if (strlen($datum = @fread($fp, 4)) == 4) {
@@ -229,25 +241,32 @@ class Utility
 			fclose($fp);
 		}
 
-		return ($gzipped);
+		return $gzipped;
 	}
 
-	public static function isPatched(DB $pdo = null)
+	/**
+	 * @param DB|null $pdo
+	 *
+	 * @return bool
+	 * @throws \Exception
+	 * @throws \RuntimeException
+	 */
+	public static function isPatched(DB $pdo = null): bool
 	{
 		$versions = self::getValidVersionsFile();
 
 		if (!($pdo instanceof DB)) {
 			$pdo = new DB();
 		}
-		$patch = Settings::value(['section' => '', 'subsection' => '', 'name' => 'sqlpatch']);
+		$patch = Settings::value('..sqlpatch');
 		$ver = $versions->versions->sql->file;
 
 		// Check database patch version
 		if ($patch < $ver) {
 			$message = "\nYour database is not up to date. Reported patch levels\n   Db: $patch\nfile: $ver\nPlease update.\n php " .
-				NN_ROOT . "./tmux update db\n";
+				NN_ROOT . "./tmux nntmux:db\n";
 			if (self::isCLI()) {
-				echo (new ColorCLI())->error($message);
+				echo ColorCLI::error($message);
 			}
 			throw new \RuntimeException($message);
 		}
@@ -255,20 +274,32 @@ class Utility
 		return true;
 	}
 
-	static public function isWin()
+	/**
+	 * @return bool
+	 */
+	public static function isWin(): bool
 	{
-		return (strtolower(substr(PHP_OS, 0, 3)) === 'win');
+		return stripos(PHP_OS,'win') === 0;
 	}
 
-	public static  function pathCombine(array $elements, $prefix = '')
+	/**
+	 * @param array  $elements
+	 * @param string $prefix
+	 *
+	 * @return string
+	 */
+	public static function pathCombine(array $elements, $prefix = ''): string
 	{
 		return $prefix . implode(DS, $elements);
 	}
 
-	static public function stripBOM(&$text)
+	/**
+	 * @param $text
+	 */
+	public static function stripBOM(&$text): void
 	{
-		$bom = pack("CCC", 0xef, 0xbb, 0xbf);
-		if (0 == strncmp($text, $bom, 3)) {
+		$bom = pack('CCC', 0xef, 0xbb, 0xbf);
+		if (0 === strncmp($text, $bom, 3)) {
 			$text = substr($text, 3);
 		}
 	}
@@ -283,7 +314,7 @@ class Utility
 	 *
 	 * @return string    The stripped variable.
 	 */
-	static public function stripNonPrintingChars(&$text)
+	public static function stripNonPrintingChars(&$text): string
 	{
 		$lowChars = [
 			"\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07",
@@ -296,9 +327,14 @@ class Utility
 		return $text;
 	}
 
-	static public function trailingSlash($path)
+	/**
+	 * @param $path
+	 *
+	 * @return string
+	 */
+	public static function trailingSlash($path): string
 	{
-		if (substr($path, strlen($path) - 1) != '/') {
+		if (substr($path, strlen($path) - 1) !== '/') {
 			$path .= '/';
 		}
 
@@ -312,7 +348,7 @@ class Utility
 	 *
 	 * @return bool|string
 	 */
-	static public function unzipGzipFile($filePath)
+	public static function unzipGzipFile($filePath)
 	{
 		/* Potential issues with this, so commenting out.
 		$length = Utility::isGZipped($filePath);
@@ -369,7 +405,7 @@ class Utility
 	 * @static
 	 * @access public
 	 */
-	public static function streamSslContextOptions($forceIgnore = false)
+	public static function streamSslContextOptions($forceIgnore = false): array
 	{
 		if (empty(NN_SSL_CAFILE) && empty(NN_SSL_CAPATH)) {
 			$options = [
@@ -407,7 +443,7 @@ class Utility
 	 * @static
 	 * @access public
 	 */
-	public static function curlSslContextOptions($verify = true)
+	public static function curlSslContextOptions($verify = true): array
 	{
 		$options = [];
 		if ($verify && NN_SSL_VERIFY_HOST && (!empty(NN_SSL_CAFILE) || !empty(NN_SSL_CAPATH))) {
@@ -540,17 +576,22 @@ class Utility
 	 *
 	 * @return string
 	 */
-	static public function bytesToSizeString($bytes, $precision = 0)
+	public static function bytesToSizeString($bytes, $precision = 0): string
 	{
-		if ($bytes == 0) {
+		if ($bytes === 0) {
 			return '0B';
 		}
 		$unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
 
-		return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
+		return round($bytes / (1024 ** $i = floor(log($bytes, 1024))), $precision) . $unit[(int)$i];
 	}
 
-	public static function getCoverURL(array $options = [])
+	/**
+	 * @param array $options
+	 *
+	 * @return string
+	 */
+	public static function getCoverURL(array $options = []): string
 	{
 		$defaults = [
 			'id'     => null,
@@ -562,7 +603,7 @@ class Utility
 		$fileSpec = '';
 
 		if (!empty($options['id']) && in_array($options['type'],
-				['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx']
+				['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'], false
 			)
 		) {
 			$fileSpec = sprintf($fileSpecTemplate, $options['type'], $options['id'], $options['suffix']);
@@ -582,7 +623,8 @@ class Utility
 	 *
 	 * @return array            The associate array of the XML namespaced file
 	 */
-	public static function xmlToArray(\SimpleXMLElement $xml, $options = []) {
+	public static function xmlToArray(\SimpleXMLElement $xml, array $options = []): array
+	{
 		$defaults = array(
 			'namespaceSeparator' => ':',//you may want this to be something other than a colon
 			'attributePrefix' => '@',   //to distinguish between attributes and nodes with the same name
@@ -625,7 +667,7 @@ class Utility
 					//only entry with this key
 					//test if tags of this type should always be arrays, no matter the element count
 					$tagsArray[$childTagName] =
-						in_array($childTagName, $options['alwaysArray']) || !$options['autoArray']
+						in_array($childTagName, $options['alwaysArray'], false) || !$options['autoArray']
 							? array($childProperties) : $childProperties;
 				} elseif (
 					is_array($tagsArray[$childTagName]) && array_keys($tagsArray[$childTagName])
@@ -657,7 +699,20 @@ class Utility
 
 
 	// Central function for sending site email.
-	static public function sendEmail($to, $subject, $contents, $from)
+
+	/**
+	 * @param $to
+	 * @param $subject
+	 * @param $contents
+	 * @param $from
+	 *
+	 * @return bool
+	 * @throws \nntmux\LoggerException
+	 * @throws \InvalidArgumentException
+	 * @throws \Exception
+	 * @throws \phpmailerException
+	 */
+	public static function sendEmail($to, $subject, $contents, $from): bool
 	{
 		$mail = new \PHPMailer;
 
@@ -681,11 +736,13 @@ class Utility
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . $eol;
 			$headers .= $eol;
 
+			(new Logger())->log(__CLASS__, __FUNCTION__, 'Phpmailer could not be instantiated, falling back to PHP mail() function', Logger::LOG_ERROR);
+
 			return mail($to, $subject, $body, $headers);
 		}
 
 		// Check to make sure the user has their settings correct.
-		if (PHPMAILER_USE_SMTP == true) {
+		if (PHPMAILER_USE_SMTP === true) {
 			if ((!defined('PHPMAILER_SMTP_HOST') || PHPMAILER_SMTP_HOST === '') ||
 				(!defined('PHPMAILER_SMTP_PORT') || PHPMAILER_SMTP_PORT === '')
 			) {
@@ -695,7 +752,7 @@ class Utility
 			}
 
 			// If the user enabled SMTP & Auth but did not setup credentials, throw an exception.
-			if (defined('PHPMAILER_SMTP_AUTH') && PHPMAILER_SMTP_AUTH == true) {
+			if (defined('PHPMAILER_SMTP_AUTH') && PHPMAILER_SMTP_AUTH === true) {
 				if ((!defined('PHPMAILER_SMTP_USER') || PHPMAILER_SMTP_USER === '') ||
 					(!defined('PHPMAILER_SMTP_PASSWORD') || PHPMAILER_SMTP_PASSWORD === '')
 				) {
@@ -723,11 +780,10 @@ class Utility
 				$mail->Password = PHPMAILER_SMTP_PASSWORD;
 			}
 		}
-		$settings = new DB();
 
-		$fromEmail = (PHPMAILER_FROM_EMAIL == '') ? Settings::value('site.main.email') : PHPMAILER_FROM_EMAIL;
-		$fromName  = (PHPMAILER_FROM_NAME == '') ? Settings::value('site.main.title') : PHPMAILER_FROM_NAME;
-		$replyTo   = (PHPMAILER_REPLYTO == '') ? $from : PHPMAILER_REPLYTO;
+		$fromEmail = (PHPMAILER_FROM_EMAIL === '') ? Settings::value('site.main.email') : PHPMAILER_FROM_EMAIL;
+		$fromName  = (PHPMAILER_FROM_NAME === '') ? Settings::value('site.main.title') : PHPMAILER_FROM_NAME;
+		$replyTo   = (PHPMAILER_REPLYTO === '') ? $from : PHPMAILER_REPLYTO;
 
 		(PHPMAILER_BCC !== '') ? $mail->addBCC(PHPMAILER_BCC) : null;
 
@@ -741,7 +797,7 @@ class Utility
 		$sent = $mail->send();
 
 		if (!$sent) {
-			//@todo Log failed email send attempt.
+			(new Logger())->log(__CLASS__, __FUNCTION__, $mail->ErrorInfo, Logger::LOG_ERROR);
 			throw new \phpmailerException('Unable to send mail. Error: ' . $mail->ErrorInfo);
 		}
 
@@ -755,6 +811,7 @@ class Utility
 	 * @param string $path Path to the file / folder to check.
 	 *
 	 * @return string File info. Empty string on failure.
+	 * @throws \Exception
 	 */
 	public static function fileInfo($path)
 	{
@@ -792,9 +849,14 @@ class Utility
 	}
 
 
+	/**
+	 * @param $code
+	 *
+	 * @return bool
+	 */
 	public function checkStatus($code)
 	{
-		return ($code == 0) ? true : false;
+		return ($code === 0) ? true : false;
 	}
 
 	/**
@@ -804,7 +866,7 @@ class Utility
 	 *
 	 * @return string
 	 */
-	public static function cp437toUTF($string)
+	public static function cp437toUTF($string): string
 	{
 		return iconv('CP437', 'UTF-8//IGNORE//TRANSLIT', $string);
 	}
@@ -816,7 +878,7 @@ class Utility
 	 *
 	 * @return string
 	 */
-	public static function imdb_trailers($imdbID)
+	public static function imdb_trailers($imdbID): string
 	{
 		$xml = Utility::getUrl(['url' => 'http://api.traileraddict.com/?imdb=' . $imdbID]);
 		if ($xml !== false) {
@@ -827,14 +889,25 @@ class Utility
 		return '';
 	}
 
-// Check if O/S is windows.
-	public static function isWindows()
+	/**
+	 * Check if O/S is windows.
+	 *
+	 * @return bool
+	 */
+	public static function isWindows(): bool
 	{
 		return Utility::isWin();
 	}
 
-// Convert obj to array.
-	public static function objectsIntoArray($arrObjData, $arrSkipIndices = [])
+	/**
+	 * Convert obj to array.
+	 *
+	 * @param       $arrObjData
+	 * @param array $arrSkipIndices
+	 *
+	 * @return array
+	 */
+	public static function objectsIntoArray($arrObjData, array $arrSkipIndices = []): array
 	{
 		$arrData = [];
 
@@ -849,7 +922,7 @@ class Utility
 				if (is_object($value) || is_array($value)) {
 					$value = Utility::objectsIntoArray($value, $arrSkipIndices);
 				}
-				if (in_array($index, $arrSkipIndices)) {
+				if (in_array($index, $arrSkipIndices, false)) {
 					continue;
 				}
 				$arrData[$index] = $value;
@@ -870,7 +943,7 @@ class Utility
 	public static function runCmd($command, $debug = false)
 	{
 		$nl = PHP_EOL;
-		if (Utility::isWindows() && strpos(phpversion(), "5.2") !== false) {
+		if (Utility::isWindows() && strpos(PHP_VERSION, '5.3') !== false) {
 			$command = "\"" . $command . "\"";
 		}
 
@@ -907,18 +980,18 @@ class Utility
 		(
 			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
 			// 32 bits for "time_low"
-			mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+			random_int(0, 0xffff), random_int(0, 0xffff),
 			// 16 bits for "time_mid"
-			mt_rand(0, 0xffff),
+			random_int(0, 0xffff),
 			// 16 bits for "time_hi_and_version",
 			// four most significant bits holds version number 4
-			mt_rand(0, 0x0fff) | 0x4000,
+			random_int(0, 0x0fff) | 0x4000,
 			// 16 bits, 8 bits for "clk_seq_hi_res",
 			// 8 bits for "clk_seq_low",
 			// two most significant bits holds zero and one for variant DCE1.1
-			mt_rand(0, 0x3fff) | 0x8000,
+			random_int(0, 0x3fff) | 0x8000,
 			// 48 bits for "node"
-			mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+			random_int(0, 0xffff), random_int(0, 0xffff), random_int(0, 0xffff)
 		);
 
 		return $key;
@@ -926,9 +999,7 @@ class Utility
 
 	public static function startsWith($haystack, $needle)
 	{
-		$length = strlen($needle);
-
-		return (substr($haystack, 0, $length) === $needle);
+		return (strpos($haystack, $needle) === 0);
 	}
 
 	public static function endsWith($haystack, $needle)
@@ -942,9 +1013,8 @@ class Utility
 	public static function responseXmlToObject($input)
 	{
 		$input = str_replace('<newznab:', '<', $input);
-		$xml = @simplexml_load_string($input);
 
-		return $xml;
+		return @simplexml_load_string($input);
 	}
 
 	/**
@@ -977,7 +1047,8 @@ class Utility
 	 *
 	 * @return int $e
 	 */
-	public static function convertRomanToInt($string) {
+	public static function convertRomanToInt($string): int
+	{
 		switch (strtolower($string)) {
 			case 'i': $e = 1;
 				break;
@@ -1031,7 +1102,7 @@ class Utility
 	 * @param int    $errorCode
 	 * @param string $errorText
 	 */
-	public static function showApiError($errorCode = 900, $errorText = '')
+	public static function showApiError($errorCode = 900, $errorText = ''): void
 	{
 		if ($errorText === '') {
 			switch ($errorCode) {
@@ -1106,7 +1177,7 @@ class Utility
 	 *
 	 * @return string
 	 */
-	public static function htmlfmt($string)
+	public static function htmlfmt($string): string
 	{
 		return htmlspecialchars($string, ENT_QUOTES, 'utf-8');
 	}
@@ -1121,8 +1192,8 @@ class Utility
 	 *
 	 * @return string
 	 */
-	public static function convertMultiArray($array, $separator)
+	public static function convertMultiArray($array, $separator): string
 	{
-		return implode("$separator",array_map(function($a) {return implode(",",$a);},$array));
+		return implode("$separator",array_map(function($a) {return implode(',',$a);},$array));
 	}
 }
