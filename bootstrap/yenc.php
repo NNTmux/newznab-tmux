@@ -17,8 +17,6 @@
  * @copyright 2016 nZEDb
  */
 
-use app\models\Settings;
-
 
 if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
 	$adapter = 'Php';
@@ -36,25 +34,21 @@ if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
 				break;
 			} else {
 				trigger_error('Your version of the php-yenc extension is out of date and will be
-				ignored. Please update it to use the extension.', E_USER_WARNING);
+				ignored. Please update it to use the extension.', E_USER_WARNING
+				);
 			}
 		default:
 			$adapter = 'Php';
 	}
 }
 
-\App\Extensions\util\Yenc::config([
-	'default' => [
-		'adapter' => $adapter
-	],
-
-	'nzedb' => [
-		'adapter' => 'NzedbYenc'
-	],
-
-	'php' => [
-		'adapter' => 'Php'
-	],
-]);
+\App\Providers\YencServiceProvider::config([
+		['name' =>
+			 [
+				 'default' => $adapter
+			 ]
+		]
+	]
+);
 
 ?>

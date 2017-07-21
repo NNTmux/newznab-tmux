@@ -22,7 +22,7 @@ namespace App\Extensions\util\yenc\adapter;
 use yenc\yenc;
 
 
-class NzedbYenc extends \App\Extensions\util\Yenc
+class NzedbYenc
 {
 	public static function decode(&$text, $ignore = false, array $options = [])
 	{

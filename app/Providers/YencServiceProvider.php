@@ -2,8 +2,9 @@
 
 namespace App\Providers;
 
-use App\Extensions\util\Yenc;
 use Illuminate\Support\ServiceProvider;
+use App\Extensions\util\yenc\adapter\NzedbYenc;
+use App\Extensions\util\yenc\adapter\Php;
 
 class YencServiceProvider extends ServiceProvider
 {
@@ -15,7 +16,7 @@ class YencServiceProvider extends ServiceProvider
 	 */
 	public function boot()
 	{
-		//
+
 	}
 
 	/**
@@ -25,31 +26,32 @@ class YencServiceProvider extends ServiceProvider
 	 */
 	public function register()
 	{
-		//
+
 	}
 
+	/**
+	 * @param array $options
+	 *
+	 * @return mixed
+	 * @internal param $option
+	 *
+	 */
 	public static function config(array $options = [])
 	{
 		$defaults = [
 			['name' =>
 				 [
-					 'default' => [
-						 'adapter' => ''
-					 ],
-
-					 'nzedb' => [
-						 'adapter' => 'NzedbYenc'
-					 ],
-
-					 'php' => [
-						 'adapter' => 'Php'
-					 ],
-				 ]
+				'default' => 'Php'
+				]
 			]
 		];
 
 		$options += $defaults;
 
-		return $options['name'];
+		$namespace = '\App\Extensions\util\yenc\adapter\\';
+
+		$class = $namespace . $options[0]['name']['default'];
+
+		return new $class;
 	}
 }

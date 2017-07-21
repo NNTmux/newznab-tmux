@@ -37,7 +37,7 @@ class Yenc extends YencServiceProvider
 			'name' => 'default',
 			'file' => true,
 		];
-		return static::config($options['name'])->decode($text);
+		return static::config($options)->decode($text);
 	}
 
 	/**
@@ -54,7 +54,7 @@ class Yenc extends YencServiceProvider
 			'file' => true,
 		];
 
-		return static::config($options['name'])->decodeIgnore($text);
+		return static::config($options)->decodeIgnore($text);
 	}
 
 	/**
@@ -72,6 +72,6 @@ class Yenc extends YencServiceProvider
 	{
 		$options += ['name' => 'default'];
 
-		return static::config($options['name'])->encode($data, $filename, $line, $crc32);
+		return static::config($options)->encode($data, $filename, $line, $crc32);
 	}
 }

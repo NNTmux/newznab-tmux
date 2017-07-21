@@ -17,9 +17,8 @@
  * @copyright 2016 nZEDb
  */
 
-namespace app\extensions\util\yenc\adapter;
+namespace App\Extensions\util\yenc\adapter;
 
-use App\Extensions\util\Yenc;
 use nntmux\Logger;
 
 
@@ -28,7 +27,7 @@ use nntmux\Logger;
  *
  * @package app\extensions\util\yenc\adapter
  */
-class Php extends Yenc
+class Php
 {
 	public static function decode(&$text, $ignore = false)
 	{
