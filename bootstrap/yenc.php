@@ -17,37 +17,38 @@
  * @copyright 2016 nZEDb
  */
 
-namespace App\Extensions\util\yenc\adapter;
 
-use yenc\yenc;
-
-
-class NzedbYenc
-{
-	public static function decode(&$text, $ignore = false, array $options = [])
-	{
-		return (new yenc())->decode($text);
-	}
-
-	public static function decodeIgnore(&$text, array $options = [])
-	{
-		return (new yenc())->decode($text, true);
-	}
-
-	/**
-	 * Determines if this adapter is enabled by checking if the `yenc` extension is loaded.
-	 *
-	 * @return boolean Returns `true` if enabled, otherwise `false`.
-	 */
-	public static function enabled()
-	{
-		return extension_loaded('yenc');
-	}
-
-	public static function encode($data, $filename, $lineLength = 128)
-	{
-		return (new yenc())->encode($data, $filename, $lineLength);
+if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
+	$adapter = 'Php';
+} else {
+	switch (true) {
+		case extension_loaded('yenc'):
+			if (method_exists('yenc\yEnc', 'version') &&
+				version_compare(
+					yenc\yEnc::version(),
+					'1.3.0',
+					'>='
+				)
+			) {
+				$adapter = 'NzedbYenc';
+				break;
+			} else {
+				trigger_error('Your version of the php-yenc extension is out of date and will be
+				ignored. Please update it to use the extension.', E_USER_WARNING
+				);
+			}
+		default:
+			$adapter = 'Php';
 	}
 }
+
+\App\Providers\YencServiceProvider::config([
+		['name' =>
+			 [
+				 'default' => $adapter
+			 ]
+		]
+	]
+);
 
 ?>

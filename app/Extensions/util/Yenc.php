@@ -19,41 +19,59 @@
 
 namespace App\Extensions\util;
 
-use Illuminate\Support\ServiceProvider;
-use App\Extensions\util\yenc\adapter\NzedbYenc;
+use App\Providers\YencServiceProvider;
 
-class Yenc extends ServiceProvider
+class Yenc extends YencServiceProvider
 {
+
 	/**
-	 * @param       $text	yEncoded text to decode back to an 8 bit form.
+	 * @param       $text    yEncoded text to decode back to an 8 bit form.
 	 *
-	 * @return string		8 bit decoded version of $text.
+	 * @param array $options
+	 *
+	 * @return string 8 bit decoded version of $text.
 	 */
-	public static function decode(&$text)
+	public static function decode(&$text, array $options = [])
 	{
-		return NzedbYenc::decode($text);
+		$options += [
+			'name' => 'default',
+			'file' => true,
+		];
+		return static::config($options)->decode($text);
 	}
 
 	/**
-	 * @param $text
+	 * @param       $text
+	 *
+	 * @param array $options
 	 *
 	 * @return mixed
 	 */
-	public static function decodeIgnore(&$text)
+	public static function decodeIgnore(&$text, array $options = [])
 	{
-		return NzedbYenc::decodeIgnore($text);
+		$options += [
+			'name' => 'default',
+			'file' => true,
+		];
+
+		return static::config($options)->decodeIgnore($text);
 	}
 
 	/**
-	 * @param 		  $data     8 bit data to convert to yEncoded text.
-	 * @param string  $filename Name of file to recreate as.
-	 * @param int     $line     Maximum number of characters in each line.
+	 * @param        $data      8 bit data to convert to yEncoded text.
+	 * @param string $filename  Name of file to recreate as.
+	 * @param int    $line      Maximum number of characters in each line.
 	 *                          to use.
 	 *
-	 * @return string|\Exception The yEncoded version of $data.
+	 * @param bool   $crc32
+	 * @param array  $options
+	 *
+	 * @return \Exception|string The yEncoded version of $data.
 	 */
-	public static function encode(&$data, $filename, $line = 128)
+	public static function encode(&$data, $filename, $line = 128, $crc32 = true, array $options = [])
 	{
-		return NzedbYenc::encode($data, $filename, $line);
+		$options += ['name' => 'default'];
+
+		return static::config($options)->encode($data, $filename, $line, $crc32);
 	}
 }
