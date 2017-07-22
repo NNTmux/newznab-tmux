@@ -14,7 +14,7 @@ use nntmux\utility\Utility;
 Class NZBContents
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 * @access protected
 	 */
 	public $pdo;
@@ -65,16 +65,17 @@ Class NZBContents
 	 * Construct.
 	 *
 	 * @param array $options
-	 *     array(
+	 *         array(
 	 *         'Echo'        => bool        ; To echo to CLI or not.
 	 *         'NNTP'        => NNTP        ; Class NNTP.
 	 *         'Nfo'         => Nfo         ; Class Nfo.
 	 *         'NZB'         => NZB         ; Class NZB.
 	 *         'Settings'    => DB          ; Class nntmux\db\Settings.
 	 *         'PostProcess' => PostProcess ; Class PostProcess.
-	 *     )
+	 *         )
 	 *
 	 * @access public
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
