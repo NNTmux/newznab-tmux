@@ -1,3 +1,5 @@
+2017-07-23 DariusIII
+	* Fix: Fix error for scandir in profileedit page
 2017-07-22 DariusIII
 	* Chg: Update composer.lock
 2017-07-20 DariusIII

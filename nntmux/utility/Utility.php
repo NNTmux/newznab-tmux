@@ -170,7 +170,7 @@ class Utility
 	 */
 	public static function getThemesList(): array
 	{
-		$themes = scandir(NN_THEMES, 'ASC');
+		$themes = scandir(NN_THEMES, SCANDIR_SORT_ASCENDING);
 		$themelist[] = 'None';
 		foreach ($themes as $theme) {
 			if (strpos($theme, '.') === false &&
