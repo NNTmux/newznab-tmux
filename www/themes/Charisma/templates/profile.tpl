@@ -134,7 +134,7 @@
 																</tr>
 																<tr>
 																	<th title="Admin Notes">Notes:</th>
-																	<td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}<br/>{/if}<a href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes" class="label label-info">Add/Edit</a></td>
+																	<td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}<br/>{/if}{if isset($isadmin)}<a href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes" class="label label-info">Add/Edit</a>{/if}</td>
 																</tr>
 															{/if}
 															</tbody>

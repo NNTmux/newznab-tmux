@@ -63,6 +63,10 @@ switch ($action) {
 			if ($_POST['rolechangedate'] !== '') {
 				$users->updateUserRoleChangeDate($_POST['id'], $_POST['rolechangedate']);
 			}
+			if ($_POST['role'] !== '') {
+				$email = $_POST['email'] ?? $_GET['email'];
+				\nntmux\utility\Utility::sendEmail($email, 'Account changed', 'Your account role has been changed to ' . $_POST['role'], \App\Models\Settings::value('site.main.email'));
+			}
 		}
 
 		if ($ret >= 0) {

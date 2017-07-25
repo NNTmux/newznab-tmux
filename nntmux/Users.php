@@ -472,8 +472,9 @@ class Users
 	 * @param $msgbody
 	 *
 	 * @return int
+	 * @throws \Exception
 	 */
-	public function updateExpiredRoles($msgsubject, $msgbody)
+	public function updateExpiredRoles($msgsubject, $msgbody): int
 	{
 		$data = $this->pdo->query(sprintf('SELECT id,email FROM users WHERE rolechangedate < now()'));
 		foreach ($data as $u) {
