@@ -992,7 +992,7 @@ class ProcessReleases
 
 		// Cleanup orphaned collections, binaries and parts
 		// this really shouldn't happen, but just incase - so we only run 1/200 of the time
-		if (mt_rand(0, 200) <= 1) {
+		if (random_int(0, 200) <= 1) {
 			// CBP collection orphaned with no binaries or parts.
 			if ($this->echoCLI) {
 				echo (

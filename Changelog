@@ -1,4 +1,5 @@
 2017-07-25 DariusIII
+	* Chg: Replace mt_rand with random_int in ProcessReleases class
 	* Chg: Try to prevent creating new session on every BasePage load
 	* Chg: Add automatic user profile role change for expired roles (role change date) on users list check (admin area)
 2017-07-23 DariusIII
