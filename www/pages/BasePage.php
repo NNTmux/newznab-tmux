@@ -10,12 +10,12 @@ use nntmux\SABnzbd;
 class BasePage
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $settings = null;
 
 	/**
-	 * @var nntmux\Users
+	 * @var Users
 	 */
 	public $users = null;
 
@@ -79,17 +79,21 @@ class BasePage
 	 *
 	 * @var string
 	 */
-	protected $theme = 'Omicron';
+	protected $theme = 'Gentele';
 
 	/**
 	 * Set up session / smarty / user variables.
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct()
 	{
-		$this->https = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? true : false);
+		$this->https = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
 
-		session_set_cookie_params(0, '/', '', $this->https, true);
-		@session_start();
+		if (session_id() === '') {
+			session_set_cookie_params(0, '/', '', $this->https, true);
+			@session_start();
+		}
 
 		if (NN_FLOOD_CHECK) {
 			$this->floodCheck();
@@ -111,7 +115,7 @@ class BasePage
 		if (isset($_SERVER['SERVER_NAME'])) {
 			$this->serverurl = (
 				($this->https === true ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] .
-				(($_SERVER['SERVER_PORT'] != '80' && $_SERVER['SERVER_PORT'] != '443') ? ':' . $_SERVER['SERVER_PORT'] : '') .
+				(((int)$_SERVER['SERVER_PORT'] !== 80 && (int)$_SERVER['SERVER_PORT'] !== 443) ? ':' . $_SERVER['SERVER_PORT'] : '') .
 				WWW_TOP . '/'
 			);
 			$this->smarty->assign('serverroot', $this->serverurl);
