@@ -1,4 +1,5 @@
 2017-07-26 DariusIII
+	* Fix: Fix the logic for limits in release_naming_regexes-test and Regexes class. Should fix issue #156
 	* Chg: Declare return types and add @throw annotations where needed in Regexes and ReleaseCleaning classes
 	* Chg: Make all releases by posters with @md-hobbys.com go into XXX-SD category
 	* Mrg: Merge PR #158 by Nightah - Display SABnzbd Integration on profile page for all themes

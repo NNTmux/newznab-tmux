@@ -251,9 +251,9 @@ class Regexes
 
 		$rows = $this->pdo->query(
 			sprintf(
-				'SELECT name, searchname, id FROM releases WHERE groups_id = %d LIMIT %d',
+				'SELECT name, searchname, id FROM releases WHERE groups_id = %d %s',
 				$groupID,
-				$queryLimit
+				(int)$queryLimit === 0 ? '' : sprintf('LIMIT %d', $queryLimit)
 			)
 		);
 
@@ -268,7 +268,7 @@ class Regexes
 						'old_name' => $row['searchname'],
 						'new_name' => $match
 					];
-					if ($limit++ > $displayLimit) {
+					if ($displayLimit > 0 && $limit++ > $displayLimit) {
 						break;
 					}
 				}
