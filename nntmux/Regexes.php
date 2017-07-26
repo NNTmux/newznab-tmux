@@ -268,7 +268,7 @@ class Regexes
 						'old_name' => $row['searchname'],
 						'new_name' => $match
 					];
-					if ($displayLimit > 0 && $limit++ > $displayLimit) {
+					if ((int)$displayLimit > 0 && $limit++ >= (int)$displayLimit) {
 						break;
 					}
 				}
