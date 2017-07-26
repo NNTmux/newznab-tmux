@@ -1,4 +1,5 @@
 2017-07-26 DariusIII
+	* Chg: Make all releases by posters with @md-hobbys.com go into XXX-SD category
 	* Mrg: Merge PR #158 by Nightah - Display SABnzbd Integration on profile page for all themes
 	* Fix: Add missing SABNzbd settings to profile pages in all themes
 2017-07-25 DariusIII
