@@ -99,6 +99,7 @@ class ReleaseCleaning
 	 * @param bool $usepre
 	 *
 	 * @return array|bool|null
+	 * @throws \Exception
 	 */
 	public function releaseCleaner($subject, $fromName, $size, $groupName, $usepre = false)
 	{

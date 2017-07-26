@@ -52,7 +52,7 @@ class Regexes
 	 *
 	 * @return bool
 	 */
-	public function addRegex(array $data)
+	public function addRegex(array $data): bool
 	{
 		return (bool)$this->pdo->queryInsert(
 			sprintf(
@@ -76,7 +76,7 @@ class Regexes
 	 *
 	 * @return bool
 	 */
-	public function updateRegex(array $data)
+	public function updateRegex(array $data): bool
 	{
 		return (bool)$this->pdo->queryExec(
 			sprintf(
@@ -102,7 +102,7 @@ class Regexes
 	 *
 	 * @return array
 	 */
-	public function getRegexByID($id)
+	public function getRegexByID($id): array
 	{
 		return $this->pdo->queryOneRow(sprintf('SELECT * FROM %s WHERE id = %d', $this->tableName, $id));
 	}
@@ -116,7 +116,7 @@ class Regexes
 	 *
 	 * @return array
 	 */
-	public function getRegex($group_regex = '', $limit = 0, $offset = 0)
+	public function getRegex($group_regex = '', $limit = 0, $offset = 0): array
 	{
 		return $this->pdo->query(
 			sprintf(
@@ -135,7 +135,7 @@ class Regexes
 	 *
 	 * @return int
 	 */
-	public function getCount($group_regex = '')
+	public function getCount($group_regex = ''): int
 	{
 		$query = $this->pdo->queryOneRow(
 			sprintf(
@@ -152,7 +152,7 @@ class Regexes
 	 *
 	 * @param int $id
 	 */
-	public function deleteRegex($id)
+	public function deleteRegex($id): void
 	{
 		$this->pdo->queryExec(sprintf('DELETE FROM %s WHERE id = %d', $this->tableName, $id));
 	}
@@ -168,7 +168,7 @@ class Regexes
 	 *
 	 * @return array
 	 */
-	public function testCollectionRegex($groupName, $regex, $limit)
+	public function testCollectionRegex($groupName, $regex, $limit): array
 	{
 		$groups = new Groups(['Settings' => $this->pdo]);
 		$groupID = $groups->getIDByName($groupName);
@@ -238,8 +238,9 @@ class Regexes
 	 * @param int    $queryLimit
 	 *
 	 * @return array
+	 * @throws \Exception
 	 */
-	public function testReleaseNamingRegex($groupName, $regex, $displayLimit, $queryLimit)
+	public function testReleaseNamingRegex($groupName, $regex, $displayLimit, $queryLimit): array
 	{
 		$groups = new Groups(['Settings' => $this->pdo]);
 		$groupID = $groups->getIDByName($groupName);
@@ -283,8 +284,9 @@ class Regexes
 	 * @param string $groupName
 	 *
 	 * @return string
+	 * @throws \Exception
 	 */
-	public function tryRegex($subject, $groupName)
+	public function tryRegex($subject, $groupName): string
 	{
 		$this->matchedRegex = 0;
 
@@ -316,10 +318,10 @@ class Regexes
 	 *
 	 * @param string $groupName
 	 */
-	protected function _fetchRegex($groupName)
+	protected function _fetchRegex($groupName): void
 	{
 		// Check if we need to do an initial cache or refresh our cache.
-		if (isset($this->_regexCache[$groupName]['ttl']) && (time() - $this->_regexCache[$groupName]['ttl']) < 900) {
+		if (isset($this->_regexCache[$groupName]['ttl']) && (time() - $this->_regexCache[$groupName]['ttl']) < NN_CACHE_EXPIRY_LONG) {
 			return;
 		}
 
@@ -330,7 +332,7 @@ class Regexes
 				($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
 				$this->tableName,
 				$this->pdo->escapeString($groupName)
-			), true, 900
+			), true, NN_CACHE_EXPIRY_LONG
 		);
 		// Set the TTL.
 		$this->_regexCache[$groupName]['ttl'] = time();
@@ -345,8 +347,9 @@ class Regexes
 	 * @param string $subject
 	 *
 	 * @return string
+	 * @throws \Exception
 	 */
-	protected function _matchRegex($regex, $subject)
+	protected function _matchRegex($regex, $subject): string
 	{
 		$returnString = '';
 		if (@preg_match($regex, $subject, $matches) === false) {
@@ -384,7 +387,7 @@ class Regexes
 	 *
 	 * @return string
 	 */
-	protected function _groupQueryString($group_regex)
+	protected function _groupQueryString($group_regex): string
 	{
 		return ($group_regex ? ('WHERE group_regex ' . $this->pdo->likeString($group_regex)) : '');
 	}
