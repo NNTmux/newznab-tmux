@@ -152,7 +152,7 @@
 				<span class="help-block">Set the priority level for NZBs that are added to your queue</span>
 			</div>
 		</div>
-		<<div class="control-group">>
+		<div class="control-group">
 			<label class="control-label" for="sabsetting">Setting Storage:</label>
 			<div class="control-group">
 				{html_radios id="sabsetting" name='sabsetting' values=$sabsetting_ids output=$sabsetting_names selected=$sabsetting_selected separator='&nbsp;&nbsp;'}{if $sabsetting_selected == 2}&nbsp;&nbsp;[<a class="confirm_action" href="?action=clearcookies">Clear Cookies</a>]{/if}
