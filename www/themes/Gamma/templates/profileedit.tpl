@@ -145,6 +145,20 @@
 				<span class="help-block">Select the type of api key you entered in the above setting. Using your full SAB api key will allow you access to the SAB queue from within this site.</span>
 			</div>
 		</div>
+		<div class="control-group">
+			<label class="control-label" for="sabpriority">Priority Level:</label>
+			<div class="controls">
+				{html_options id="sabpriority" class="form-control" name='sabpriority' values=$sabpriority_ids output=$sabpriority_names selected=$sabpriority_selected}
+				<span class="help-block">Set the priority level for NZBs that are added to your queue</span>
+			</div>
+		</div>
+		<<div class="control-group">>
+			<label class="control-label" for="sabsetting">Setting Storage:</label>
+			<div class="control-group">
+				{html_radios id="sabsetting" name='sabsetting' values=$sabsetting_ids output=$sabsetting_names selected=$sabsetting_selected separator='&nbsp;&nbsp;'}{if $sabsetting_selected == 2}&nbsp;&nbsp;[<a class="confirm_action" href="?action=clearcookies">Clear Cookies</a>]{/if}
+				<span class="help-block">Where to store the SAB setting.<br />&bull; <b>Cookie</b> will store the setting in your browsers coookies and will only work when using your current browser.<br/>&bull; <b>Site</b> will store the setting in your user account enabling it to work no matter where you are logged in from.<br /><span class="warning"><b>Please Note:</b></span> You should only store your full SAB api key with sites you trust.</span>
+			</div>
+		</div>
 	</fieldset>
 	<fieldset>
     <legend>NZBGet Integration</legend>

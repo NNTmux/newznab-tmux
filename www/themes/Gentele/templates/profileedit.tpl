@@ -222,6 +222,20 @@
 																</div>
 															</td>
 														</tr>
+														<tr>
+															<th width="200">Priority Level</th>
+															<td>
+																{html_options id="sabpriority" class="form-control" name='sabpriority' values=$sabpriority_ids output=$sabpriority_names selected=$sabpriority_selected}
+																<div class="hint">Set the priority level for NZBs that are added to your queue</div>
+															</td>
+														</tr>
+														<tr>
+															<th width="200">Setting Storage </th>
+															<td>
+																{html_radios id="sabsetting" name='sabsetting' values=$sabsetting_ids output=$sabsetting_names selected=$sabsetting_selected separator='&nbsp;&nbsp;'}{if $sabsetting_selected == 2}&nbsp;&nbsp;[<a class="confirm_action" href="?action=clearcookies">Clear Cookies</a>]{/if}
+																<div class="hint">Where to store the SAB setting.<br />&bull; <b>Cookie</b> will store the setting in your browsers coookies and will only work when using your current browser.<br/>&bull; <b>Site</b> will store the setting in your user account enabling it to work no matter where you are logged in from.<br /><span class="warning"><b>Please Note:</b></span> You should only store your full SAB api key with sites you trust.</div>
+															</td>
+														</tr>
 														</tbody>
 													</table>
 												{/if}
