@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Console\Commands\TmuxUIStart;
+use App\Console\Commands\TmuxUIStop;
 use App\Console\Commands\UpdateNNTmux;
 use App\Console\Commands\UpdateNNTmuxComposer;
 use App\Console\Commands\UpdateNNTmuxDB;
@@ -24,7 +26,9 @@ class Kernel extends ConsoleKernel
 		UpdateNNTmuxGit::class,
 		UpdateNNTmuxComposer::class,
 		VerifyNNTmuxSettings::class,
-		VerifyNNTmuxVersion::class
+		VerifyNNTmuxVersion::class,
+		TmuxUIStart::class,
+		TmuxUIStop::class
     ];
 
     /**
