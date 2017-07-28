@@ -9,22 +9,21 @@ use nntmux\ColorCLI;
 
 $pdo = new DB();
 $DIR = NN_TMUX;
-$c = new ColorCLI();
 $t = new Tmux();
 $tmux = $t->get();
 $patch = Settings::value('..sqlpatch');
-$import = (isset($tmux->import)) ? $tmux->import : 0;
-$tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
-$seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
-$powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
-$colors = (isset($tmux->colors)) ? $tmux->colors : 0;
+$import = $tmux->import ?? 0;
+$tmux_session = $tmux->tmux_session ?? 0;
+$seq = $tmux->sequential ?? 0;
+$powerline = $tmux->powerline ?? 0;
+$colors = $tmux->colors ?? 0;
 $delaytimet = Settings::value('..delaytime');
-$delaytimet = ($delaytimet) ? (int)$delaytimet : 2;
+$delaytimet = $delaytimet ? (int)$delaytimet : 2;
 
 Utility::isPatched();
 Utility::clearScreen();
 
-echo "Starting Tmux...\n";
+echo 'Starting Tmux...' . PHP_EOL;
 // Create a placeholder session so tmux commands do not throw server not found errors.
 exec('tmux new-session -ds placeholder 2>/dev/null');
 exec('tmux list-session', $session);
@@ -35,13 +34,13 @@ $session = shell_exec("tmux list-session | grep $tmux_session");
 // Kill the placeholder
 exec('tmux kill-session -t placeholder');
 if (count($session) !== 0) {
-	exit($pdo->log->error("tmux session: '" . $tmux_session . "' is already running, aborting.\n"));
+	exit(ColorCLI::error("tmux session: '" . $tmux_session . "' is already running, aborting.\n"));
 }
 
 //reset collections dateadded to now if dateadded > delay time check
-echo $pdo->log->header("Resetting expired collections dateadded to now. This could take a minute or two. Really.");
+echo ColorCLI::header('Resetting expired collections dateadded to now. This could take a minute or two. Really.');
 
-$sql = "SHOW table status";
+$sql = 'SHOW table status';
 $tables = $pdo->queryDirect($sql);
 $ran = 0;
 foreach ($tables as $row) {
@@ -56,20 +55,20 @@ foreach ($tables as $row) {
 		}
 	}
 }
-echo $pdo->log->primary(number_format($ran) . " collections reset.");
+echo ColorCLI::primary(number_format($ran) . ' collections reset.');
 sleep(2);
 
 function writelog($pane)
 {
-	$path = NN_RES . "logs";
-	$getdate = gmdate("Ymd");
+	$path = NN_RES . 'logs';
+	$getdate = gmdate('Ymd');
 	$tmux = new Tmux();
 	$logs = $tmux->get()->write_logs;
-	if ($logs == 1) {
+	if ((int)$logs === 1) {
 		return "2>&1 | tee -a $path/$pane-$getdate.log";
-	} else {
-		return "";
 	}
+	return '';
+
 }
 
 function command_exist($cmd)
@@ -80,19 +79,21 @@ function command_exist($cmd)
 }
 
 //check for apps
-$apps = array("time", "tmux", "nice", "python", "tee");
+$apps = array('time', 'tmux', 'nice', 'python', 'tee');
 foreach ($apps as &$value) {
 	if (!command_exist($value)) {
-		exit($c->error("Tmux scripts require " . $value . " but it's not installed. Aborting.\n"));
+		exit(ColorCLI::error('Tmux scripts require ' . $value . ' but its not installed. Aborting.' . PHP_EOL));
 	}
 }
+
+unset($value);
 
 function python_module_exist($module)
 {
 	$output = $returnCode = '';
 	exec("python -c \"import $module\"", $output, $returnCode);
 
-	return ($returnCode == 0 ? true : false);
+	return ((int)$returnCode === 0 ? true : false);
 }
 
 function start_apps($tmux_session)
@@ -111,36 +112,36 @@ function start_apps($tmux_session)
 	$processupdate = $tmux->processupdate;
 	$console_bash = $tmux->console;
 
-	if ($htop == 1 && command_exist("htop")) {
+	if ((int)$htop === 1 && command_exist('htop')) {
 		exec("tmux new-window -t $tmux_session -n htop 'printf \"\033]2;htop\033\" && htop'");
 	}
 
-	if ($nmon == 1 && command_exist("nmon")) {
+	if ((int)$nmon === 1 && command_exist('nmon')) {
 		exec("tmux new-window -t $tmux_session -n nmon 'printf \"\033]2;nmon\033\" && nmon -t'");
 	}
 
-	if ($vnstat == 1 && command_exist("vnstat")) {
+	if ((int)$vnstat === 1 && command_exist('vnstat')) {
 		exec("tmux new-window -t $tmux_session -n vnstat 'printf \"\033]2;vnstat\033\" && watch -n10 \"vnstat ${vnstat_args}\"'");
 	}
 
-	if ($tcptrack == 1 && command_exist("tcptrack")) {
+	if ((int)$tcptrack === 1 && command_exist('tcptrack')) {
 		exec("tmux new-window -t $tmux_session -n tcptrack 'printf \"\033]2;tcptrack\033\" && tcptrack ${tcptrack_args}'");
 	}
 
-	if ($bwmng == 1 && command_exist("bwm-ng")) {
+	if ((int)$bwmng === 1 && command_exist('bwm-ng')) {
 		exec("tmux new-window -t $tmux_session -n bwm-ng 'printf \"\033]2;bwm-ng\033\" && bwm-ng'");
 	}
 
-	if ($mytop == 1 && command_exist("mytop")) {
+	if ((int)$mytop === 1 && command_exist('mytop')) {
 		exec("tmux new-window -t $tmux_session -n mytop 'printf \"\033]2;mytop\033\" && mytop -u'");
 	}
 
-	if ($showprocesslist == 1) {
+	if ((int)$showprocesslist === 1) {
 		exec("tmux new-window -t $tmux_session -n showprocesslist 'printf \"\033]2;showprocesslist\033\" && watch -n .5 \"mysql -e \\\"SELECT time, state, info FROM information_schema.processlist WHERE command != \\\\\\\"Sleep\\\\\\\" AND time >= $processupdate ORDER BY time DESC \\\G\\\"\"'");
 	}
 	//exec("tmux new-window -t $tmux_session -n showprocesslist 'printf \"\033]2;showprocesslist\033\" && watch -n .2 \"mysql -e \\\"SELECT time, state, rows_examined, info FROM information_schema.processlist WHERE command != \\\\\\\"Sleep\\\\\\\" AND time >= $processupdate ORDER BY time DESC \\\G\\\"\"'");
 
-	if ($console_bash == 1) {
+	if ((int)$console_bash === 1) {
 		exec("tmux new-window -t $tmux_session -n bash 'printf \"\033]2;Bash\033\" && bash -i'");
 	}
 }
@@ -183,37 +184,33 @@ function window_sharing($tmux_session)
 	$sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 	$t = new Tmux();
 	$tmux = $t->get();
-	$tmux_share = (isset($tmux->run_sharing)) ? $tmux->run_sharing : 0;
+	$tmux_share = $tmux->run_sharing ?? 0;
 
-	if ($tmux_share && $sharing['enabled'] == 1 && ($sharing['posting'] == 1 || $sharing['fetching'] == 1)) {
+	if ($tmux_share && (int)$sharing['enabled'] === 1 && ((int)$sharing['posting'] === 1 || (int)$sharing['fetching'] === 1)) {
 		exec("tmux new-window -t $tmux_session -n Sharing 'printf \"\033]2;comment_sharing\033\"'");
 	}
 }
 
 function attach($DIR, $tmux_session)
 {
-	if (command_exist("php5")) {
-		$PHP = "php5";
-	} else {
-		$PHP = "php";
-	}
+	$PHP = 'php';
 
 	//get list of panes by name
 	$panes_win_1 = exec("echo `tmux list-panes -t $tmux_session:0 -F '#{pane_title}'`");
-	$panes0 = str_replace("\n", '', explode(" ", $panes_win_1));
+	$panes0 = str_replace("\n", '', explode(' ', $panes_win_1));
 	$log = writelog($panes0[0]);
 	exec("tmux respawnp -t $tmux_session:0.0 '$PHP " . $DIR . "monitor.php $log'");
 	exec("tmux select-window -t $tmux_session:0; tmux attach-session -d -t $tmux_session");
 }
 
 //create tmux session
-if ($powerline == 1) {
-	$tmuxconfig = $DIR . "powerline/tmux.conf";
+if ((int)$powerline === 1) {
+	$tmuxconfig = $DIR . 'powerline/tmux.conf';
 } else {
-	$tmuxconfig = $DIR . "tmux.conf";
+	$tmuxconfig = $DIR . 'tmux.conf';
 }
 
-if ($seq == 1) {
+if ((int)$seq === 1) {
 	exec("cd ${DIR}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_releases\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
@@ -224,7 +221,7 @@ if ($seq == 1) {
 	window_sharing($tmux_session);
 	start_apps($tmux_session);
 	attach($DIR, $tmux_session);
-} else if ($seq == 2) {
+} else if ((int)$seq === 2) {
 	exec("cd ${DIR}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;sequential\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");

@@ -60,6 +60,7 @@ Class NZBContents
 	 * @access protected
 	 */
 	protected $echooutput;
+	protected $alternateNNTP;
 
 	/**
 	 * Construct.
@@ -99,10 +100,8 @@ Class NZBContents
 			: new PostProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo, 'Settings' => $this->pdo])
 		);
 		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
-		$t = new Tmux();
-		$this->tmux = $t->get();
-		$this->lookuppar2 = Settings::value('..lookuppar2') == 1 ? true : false;
-		$this->alternateNNTP = Settings::value('..alternate_nntp') == 1 ? true : false;
+		$this->lookuppar2 = (int)Settings::value('..lookuppar2') === 1 ? true : false;
+		$this->alternateNNTP = (int)Settings::value('..alternate_nntp') === 1 ? true : false;
 	}
 
 	/**
@@ -229,7 +228,9 @@ Class NZBContents
 
 			if ($foundNFO === true && strlen($messageID) > 1) {
 				return array('hidden' => false, 'id' => $messageID);
-			} elseif ($hiddenNFO === true && strlen($hiddenID) > 1) {
+			}
+
+			if ($hiddenNFO === true && strlen($hiddenID) > 1) {
 				return array('hidden' => true, 'id' => $hiddenID);
 			}
 		}
