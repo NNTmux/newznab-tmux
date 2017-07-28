@@ -8,11 +8,8 @@
  */
 require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-use nntmux\db\DB;
 use nntmux\Tmux;
 use nntmux\ColorCLI;
-
-$pdo = new DB();
 
 // Ensure compatible tmux version is installed $tmux_version == "tmux 2.1\n" || $tmux_version == "tmux 2.2\n"
 if (`which tmux`) {
