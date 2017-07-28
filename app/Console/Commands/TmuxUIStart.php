@@ -19,7 +19,8 @@ class TmuxUIStart extends Command
      *
      * @var string
      */
-    protected $description = 'Start tmux processing';
+    protected $description = 'Start the processing of tmux scripts. This is functionally equivalent to setting the
+\'tmux running\' setting in admin.';
 
     /**
      * Create a new command instance.
