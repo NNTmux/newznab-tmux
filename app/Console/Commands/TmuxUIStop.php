@@ -37,6 +37,7 @@ class TmuxUIStop extends Command
 	 * Execute the console command.
 	 *
 	 * @return mixed
+	 * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
 	 * @throws \Symfony\Component\Process\Exception\LogicException
 	 * @throws \Symfony\Component\Process\Exception\RuntimeException
 	 * @throws \RuntimeException
@@ -45,6 +46,7 @@ class TmuxUIStop extends Command
     {
 		if ($this->argument('type') === 'false' || $this->argument('type') === 'true') {
 			$process = new Process('php misc/update/nix/tmux/stop.php');
+			$process->setTimeout(600);
 			$process->run(function ($type, $buffer) {
 				if (Process::ERR === $type) {
 					echo 'ERR > ' . $buffer;

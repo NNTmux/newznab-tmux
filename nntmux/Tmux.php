@@ -2,6 +2,7 @@
 namespace nntmux;
 
 use App\Extensions\util\Versions;
+use App\Models\Tmux as TmuxModel;
 use nntmux\db\DB;
 
 /**
@@ -70,10 +71,11 @@ class Tmux
 	 */
 	public function get($setting = '')
 	{
-		$pdo = $this->pdo;
-		$where = ($setting !== '' ? sprintf('WHERE setting = %s', $pdo->escapeString($setting)) : '');
-
-		$rows = $pdo->query(sprintf('SELECT * FROM tmux %s', $where));
+		if ($setting === '') {
+			$rows = TmuxModel::all();
+		} else {
+			$rows = TmuxModel::query()->where('setting', $setting)->get();
+		}
 
 		if ($rows === false) {
 			return false;
