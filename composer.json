@@ -11,9 +11,7 @@
     ],
     "psr-4": {
       "nntmux\\": "nntmux/",
-      "App\\": "app/",
-      "App\\Http\\Controllers\\": "nntmux/Controllers",
-      "App\\Http\\Middleware\\": "nntmux/Middleware"
+      "App\\": "app/"
     },
     "classmap": [
       "www/pages/",

@@ -1,4 +1,5 @@
 2017-07-30 DariusIII
+	* Chg: Update composer files
 	* Chg: Move Controllers and Middleware folders back to app/Http/ folder
 2017-07-28 DariusIII
 	* Chg: Remove unused class from tmux start script
