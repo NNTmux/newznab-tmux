@@ -1,4 +1,5 @@
 2017-07-30 DariusIII
+	* Chg: Rename bootstrap/bootstrap.php to autoload.php
 	* Chg: Update composer files
 	* Chg: Move Controllers and Middleware folders back to app/Http/ folder
 2017-07-28 DariusIII
