@@ -39,9 +39,9 @@ switch ($action) {
 		if (isset($_POST['saburl']) && !Utility::endsWith($_POST['saburl'], '/') &&strlen(trim($_POST['saburl'])) > 0)
 			$_POST['saburl'] .= '/';
 
-		if ($_POST['password'] != '' && $_POST['password'] != $_POST['confirmpassword']) {
+		if ($_POST['password'] !== '' && $_POST['password'] !== $_POST['confirmpassword']) {
 			$errorStr = 'Password Mismatch';
-		} else if ($_POST['password'] != '' && !$page->users->isValidPassword($_POST['password'])) {
+		} else if ($_POST['password'] !== '' && !$page->users->isValidPassword($_POST['password'])) {
 			$errorStr = 'Your password must be longer than five characters.';
 		} else if (!empty($_POST['nzbgeturl']) && $nzbGet->verifyURL($_POST['nzbgeturl']) === false) {
 			$errorStr = 'The NZBGet URL you entered is invalid!';
@@ -49,7 +49,7 @@ switch ($action) {
 			$errorStr = 'Your email is not a valid format.';
 		} else {
 			$res = $page->users->getByEmail($_POST['email']);
-			if ($res && $res['id'] != $userid) {
+			if ($res && (int)$res['id'] !== (int)$userid) {
 				$errorStr = 'Sorry, the email is already in use.';
 			} elseif ((empty($_POST['saburl']) && !empty($_POST['sabapikey'])) || (!empty($_POST['saburl']) && empty($_POST['sabapikey']))) {
 				$errorStr = 'Insert a SABnzdb URL and API key.';
@@ -91,7 +91,7 @@ switch ($action) {
 				$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? [] : $_POST['exccat'];
 				$page->users->addCategoryExclusions($userid, $_POST['exccat']);
 
-				if ($_POST['password'] != '')
+				if ($_POST['password'] !== '')
 					$page->users->updatePassword($userid, $_POST['password']);
 
 				header('Location:' . WWW_TOP . '/profile');
@@ -104,7 +104,7 @@ switch ($action) {
 	default:
 		break;
 }
-if (Settings::value('site.main.userselstyle') == 1) {
+if ((int)Settings::value('site.main.userselstyle') === 1) {
 // Get the list of themes.
 	$page->smarty->assign('themelist', Utility::getThemesList());
 }
@@ -118,11 +118,11 @@ $page->smarty->assign('sabapikey_selected', $sab->apikey);
 
 $page->smarty->assign('sabapikeytype_ids', [SABnzbd::API_TYPE_NZB, SABnzbd::API_TYPE_FULL]);
 $page->smarty->assign('sabapikeytype_names', ['Nzb Api Key', 'Full Api Key']);
-$page->smarty->assign('sabapikeytype_selected', ($sab->apikeytype == '') ? SABnzbd::API_TYPE_NZB : $sab->apikeytype);
+$page->smarty->assign('sabapikeytype_selected', ($sab->apikeytype === '') ? SABnzbd::API_TYPE_NZB : $sab->apikeytype);
 
 $page->smarty->assign('sabpriority_ids', [SABnzbd::PRIORITY_FORCE, SABnzbd::PRIORITY_HIGH, SABnzbd::PRIORITY_NORMAL, SABnzbd::PRIORITY_LOW, SABnzbd::PRIORITY_PAUSED]);
 $page->smarty->assign('sabpriority_names', ['Force', 'High', 'Normal', 'Low', 'Paused']);
-$page->smarty->assign('sabpriority_selected', ($sab->priority == '') ? SABnzbd::PRIORITY_NORMAL : $sab->priority);
+$page->smarty->assign('sabpriority_selected', ($sab->priority === '') ? SABnzbd::PRIORITY_NORMAL : $sab->priority);
 
 $page->smarty->assign('sabsetting_ids', [1, 2]);
 $page->smarty->assign('sabsetting_names', ['Site', 'Cookie']);
@@ -146,9 +146,9 @@ $page->smarty->assign([
 	]
 );
 
-$page->meta_title = "Edit User Profile";
-$page->meta_keywords = "edit,profile,user,details";
-$page->meta_description = "Edit User Profile for " . $data["username"];
+$page->meta_title = 'Edit User Profile';
+$page->meta_keywords = 'edit,profile,user,details';
+$page->meta_description = 'Edit User Profile for ' . $data['username'];
 
 $page->smarty->assign('cp_url_selected', $data['cp_url']);
 $page->smarty->assign('cp_api_selected', $data['cp_api']);

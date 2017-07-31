@@ -1232,7 +1232,7 @@ DROP TABLE IF EXISTS user_downloads;
 CREATE TABLE user_downloads (
   id          INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   users_id    INT(16) UNSIGNED  NOT NULL,
-  hosthash    VARCHAR(50)       NOT NULL,
+  hosthash    VARCHAR(50)       NOT NULL DEFAULT '',
   timestamp   DATETIME          NOT NULL,
   releases_id INT(11)           NOT NULL COMMENT 'FK to releases.id',
   PRIMARY KEY (id),
@@ -1297,7 +1297,7 @@ DROP TABLE IF EXISTS user_requests;
 CREATE TABLE user_requests (
   id        INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   users_id    INT(16) UNSIGNED  NOT NULL,
-  hosthash VARCHAR(50)      NOT NULL,
+  hosthash VARCHAR(50)      NOT NULL DEFAULT '',
   request   VARCHAR(255)     NOT NULL,
   timestamp DATETIME         NOT NULL,
   PRIMARY KEY (id),

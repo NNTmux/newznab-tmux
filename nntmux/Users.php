@@ -4,6 +4,7 @@ namespace nntmux;
 use App\Models\Settings;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
+use App\Models\User;
 
 class Users
 {
@@ -41,6 +42,11 @@ class Users
 	const QUEUE_NZBGET = 2;
 
 	/**
+	 * @var DB
+	 */
+	private $pdo;
+
+	/**
 	 * @param array $options Class instances.
 	 */
 	public function __construct(array $options = [])
@@ -66,7 +72,7 @@ class Users
 	 *
 	 * @return bool
 	 */
-	public function checkPassword($password, $hash, $userID = -1)
+	public function checkPassword($password, $hash, $userID = -1): bool
 	{
 		if (password_verify($password, $hash) === false) {
 			return false;
@@ -74,27 +80,22 @@ class Users
 
 		// Update the hash if it needs to be.
 		if (is_numeric($userID) && $userID > 0 && password_needs_rehash($hash, PASSWORD_DEFAULT, ['cost' => $this->password_hash_cost])) {
-			$hash = Users::hashPassword($password);
+			$hash = $this->hashPassword($password);
 
 			if ($hash !== false) {
-				$this->pdo->queryExec(
-					sprintf(
-						'UPDATE users SET password = %s WHERE id = %d',
-						$this->pdo->escapeString((string)$hash),
-						$userID
-					)
-				);
+				User::query()->where('id', $userID)->update(['password' => $hash]);
 			}
 		}
 		return true;
 	}
 
+
 	/**
 	 * @return array
 	 */
-	public function get()
+	public function get(): array
 	{
-		return $this->pdo->query('SELECT * FROM users');
+		return User::all()->all();
 	}
 
 	/**
@@ -106,14 +107,14 @@ class Users
 	 */
 	public function getStyle($userID)
 	{
-		$row = $this->pdo->queryOneRow(sprintf('SELECT style FROM users WHERE id = %d', $userID));
-		return ($row === false ? 'None' : $row['style']);
+		$row = User::query()->where('id', $userID)->value('style');
+		return $row ?? 'None';
 	}
 
 	/**
 	 * @param $id
 	 */
-	public function delete($id)
+	public function delete($id): void
 	{
 		$this->delCartForUser($id);
 		$this->delUserCategoryExclusions($id);
@@ -132,13 +133,13 @@ class Users
 		$forum = new Forum();
 		$forum->deleteUser($id);
 
-		$this->pdo->queryExec(sprintf('DELETE FROM users WHERE id = %d', $id));
+		User::query()->where('id', $id)->delete();
 	}
 
 	/**
 	 * @param $uid
 	 */
-	public function delCartForUser($uid)
+	public function delCartForUser($uid): void
 	{
 		$this->pdo->queryExec(sprintf('DELETE FROM users_releases WHERE users_id = %d', $uid));
 	}
@@ -146,7 +147,7 @@ class Users
 	/**
 	 * @param $uid
 	 */
-	public function delUserCategoryExclusions($uid)
+	public function delUserCategoryExclusions($uid): void
 	{
 		$this->pdo->queryExec(sprintf('DELETE FROM user_excluded_categories WHERE users_id = %d', $uid));
 	}
@@ -185,7 +186,7 @@ class Users
 	 *
 	 * @return array
 	 */
-	public function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false)
+	public function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false): array
 	{
 		if ($apiRequests) {
 			$this->clearApiRequests(false);
@@ -230,7 +231,7 @@ class Users
 	 *
 	 * @return array
 	 */
-	public function getBrowseOrder($orderBy)
+	public function getBrowseOrder($orderBy): array
 	{
 		$order = ($orderBy === '' ? 'username_desc' : $orderBy);
 		$orderArr = explode('_', $order);
@@ -314,31 +315,32 @@ class Users
 	 * @param string $style
 	 *
 	 * @return int
+	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
-	public function update($id, $userName, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false, $style = 'None')
+	public function update($id, $userName, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false, $style = 'None'): int
 	{
 		$userName = trim($userName);
 		$email = trim($email);
 
 		if (!$this->isValidUsername($userName)) {
-			return Users::ERR_SIGNUP_BADUNAME;
+			return self::ERR_SIGNUP_BADUNAME;
 		}
 
 		if (!$this->isValidEmail($email)) {
-			return Users::ERR_SIGNUP_BADEMAIL;
+			return self::ERR_SIGNUP_BADEMAIL;
 		}
 
 		$res = $this->getByUsername($userName);
 		if ($res) {
-			if ($res['id'] != $id) {
-				return Users::ERR_SIGNUP_UNAMEINUSE;
+			if ((int)$res['id'] !== $id) {
+				return self::ERR_SIGNUP_UNAMEINUSE;
 			}
 		}
 
 		$res = $this->getByEmail($email);
 		if ($res) {
-			if ($res['id'] != $id) {
-				return Users::ERR_SIGNUP_EMAILINUSE;
+			if ((int)$res['id'] !== $id) {
+				return self::ERR_SIGNUP_EMAILINUSE;
 			}
 		}
 
@@ -404,7 +406,7 @@ class Users
 	 *
 	 * @return int
 	 */
-	public function isValidUsername(string $userName)
+	public function isValidUsername(string $userName): int
 	{
 		return preg_match('/^[a-z][a-z0-9_]{2,}$/i', $userName);
 	}
@@ -416,7 +418,7 @@ class Users
 	 *
 	 * @return bool
 	 */
-	public function isValidEmail(string $email)
+	public function isValidEmail(string $email): bool
 	{
 		return (bool)preg_match('/^([\w\+-]+)(\.[\w\+-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/i', $email);
 	}
@@ -434,11 +436,12 @@ class Users
 	/**
 	 * @param string $email
 	 *
-	 * @return array|bool
+	 * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model
+	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
 	public function getByEmail(string $email)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT * FROM users WHERE lower(email) = %s', $this->pdo->escapeString(strtolower($email))));
+		return User::query()->where('email', '=', $email)->firstOrFail();
 	}
 
 	/**
@@ -447,11 +450,11 @@ class Users
 	 *
 	 * @return int
 	 */
-	public function updateUserRole(int $uid, int $role)
+	public function updateUserRole(int $uid, int $role): int
 	{
-		$this->pdo->queryExec(sprintf('UPDATE users SET role = %d WHERE id = %d', $role, $uid));
+		User::query()->where('id', $uid)->update(['role' => $role]);
 
-		return Users::SUCCESS;
+		return self::SUCCESS;
 	}
 
 	/**
@@ -460,11 +463,11 @@ class Users
 	 *
 	 * @return int
 	 */
-	public function updateUserRoleChangeDate($uid, $date)
+	public function updateUserRoleChangeDate($uid, $date): int
 	{
-		$this->pdo->queryExec(sprintf('UPDATE users SET rolechangedate = %s WHERE id = %d', $this->pdo->escapeString($date), $uid));
+		User::query()->where('id', $uid)->update(['rolechangedate' => $date]);
 
-		return Users::SUCCESS;
+		return self::SUCCESS;
 	}
 
 	/**
@@ -476,13 +479,14 @@ class Users
 	 */
 	public function updateExpiredRoles($msgsubject, $msgbody): int
 	{
-		$data = $this->pdo->query(sprintf('SELECT id,email FROM users WHERE rolechangedate < now()'));
+		$data = User::query()->whereDate('rolechangedate', '<', date('Y-m-d h:m:s'))->select(['id', 'email'])->get();
+
 		foreach ($data as $u) {
 			Utility::sendEmail($u['email'], $msgsubject, $msgbody, Settings::value('site.main.email'));
-			$this->pdo->queryExec(sprintf('UPDATE users SET role = %d, rolechangedate = null WHERE id = %d', Users::ROLE_USER , $u['id']));
+			User::query()->where('id', $u['id'])->update(['role' => self::ROLE_USER, 'rolechangedate' => null]);
 		}
 
-		return Users::SUCCESS;
+		return self::SUCCESS;
 	}
 
 	/**
@@ -490,12 +494,11 @@ class Users
 	 *
 	 * @return int
 	 */
-	public function updateRssKey($uid)
+	public function updateRssKey($uid): int
 	{
+		User::query()->where('id', $uid)->update(['rsstoken' => md5(uniqid('', true))]);
 
-		$this->pdo->queryExec(sprintf('UPDATE users SET rsstoken = md5(%s) WHERE id = %d', $this->pdo->escapeString(uniqid()), $uid));
-
-		return Users::SUCCESS;
+		return self::SUCCESS;
 	}
 
 	/**
@@ -504,12 +507,11 @@ class Users
 	 *
 	 * @return int
 	 */
-	public function updatePassResetGuid($id, $guid)
+	public function updatePassResetGuid($id, $guid): int
 	{
+		User::query()->where('id', $id)->update(['resetguid' => $guid]);
 
-		$this->pdo->queryExec(sprintf('UPDATE users SET resetguid = %s WHERE id = %d', $this->pdo->escapeString($guid), $id));
-
-		return Users::SUCCESS;
+		return self::SUCCESS;
 	}
 
 	/**
@@ -518,12 +520,11 @@ class Users
 	 *
 	 * @return int
 	 */
-	public function updatePassword(int $id, string $password)
+	public function updatePassword(int $id, string $password): int
 	{
+		User::query()->where('id', $id)->update(['password' => $this->hashPassword($password), 'userseed' => md5(Utility::generateUuid())]);
 
-		$this->pdo->queryExec(sprintf('UPDATE users SET password = %s, userseed = md5(%s) WHERE id = %d', $this->pdo->escapeString(Users::hashPassword($password)), $this->pdo->escapeString(Utility::generateUuid()), $id));
-
-		return Users::SUCCESS;
+		return self::SUCCESS;
 	}
 
 	/**
@@ -543,7 +544,7 @@ class Users
 	 *
 	 * @return string
 	 */
-	public static function hashSHA1(string $string)
+	public static function hashSHA1(string $string): string
 	{
 		return sha1($string);
 	}
@@ -551,21 +552,21 @@ class Users
 	/**
 	 * @param $guid
 	 *
-	 * @return array|bool
+	 * @return \Illuminate\Database\Eloquent\Model|static
+	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
 	public function getByPassResetGuid(string $guid)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT * FROM users WHERE resetguid = %s', $this->pdo->escapeString($guid)));
+		return User::query()->where('resetguid', $guid)->firstOrFail();
 	}
 
 	/**
 	 * @param     $id
 	 * @param int $num
 	 */
-	public function incrementGrabs(int $id, $num = 1)
+	public function incrementGrabs(int $id, $num = 1): void
 	{
-
-		$this->pdo->queryExec(sprintf('UPDATE users SET grabs = grabs + %d WHERE id = %d', $num, $id));
+		User::query()->where('id', $id)->increment('grabs', $num);
 	}
 
 	/**
@@ -583,7 +584,7 @@ class Users
 			return false;
 		}
 
-		return ($user['rsstoken'] != $rssToken ? false : $user);
+		return ($user['rsstoken'] !== $rssToken ? false : $user);
 	}
 
 	/**
@@ -612,7 +613,7 @@ class Users
 	/**
 	 * @return array
 	 */
-	public function getBrowseOrdering()
+	public function getBrowseOrdering(): array
 	{
 		return ['username_asc', 'username_desc', 'email_asc', 'email_desc', 'host_asc', 'host_desc', 'createddate_asc', 'createddate_desc', 'lastlogin_asc', 'lastlogin_desc', 'apiaccess_asc', 'apiaccess_desc', 'apirequests_asc', 'apirequests_desc', 'grabs_asc', 'grabs_desc', 'role_asc', 'role_desc', 'rolechangedate_asc', 'rolechangedate_desc'];
 	}
@@ -622,7 +623,7 @@ class Users
 	 *
 	 * @return bool
 	 */
-	public function isDisabled($username)
+	public function isDisabled($username): bool
 	{
 		return $this->roleCheck(self::ROLE_DISABLED, $username);
 	}
@@ -632,7 +633,7 @@ class Users
 	 *
 	 * @return bool
 	 */
-	public function isValidUrl($url)
+	public function isValidUrl($url): bool
 	{
 		return (!preg_match('/^(http|https|ftp):\/\/([A-Z0-9][A-Z0-9_-]*(?:\.[A-Z0-9][A-Z0-9_-]*)+):?(\d+)?\/?/i', $url)) ? false : true;
 	}
@@ -644,22 +645,22 @@ class Users
 	 *
 	 * @return string
 	 */
-	public function generateUsername($email)
+	public function generateUsername($email): string
 	{
 		$string = '';
 		if (preg_match('/[A-Za-z0-9]+/', $email, $matches)) {
 			$string = $matches[0];
 		}
 
-		return 'u' . substr(md5(uniqid()), 0, 7) . $string;
+		return 'u' . substr(md5(uniqid('', true)), 0, 7) . $string;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function generatePassword()
+	public function generatePassword(): string
 	{
-		return substr(md5(uniqid()), 0, 8);
+		return substr(md5(uniqid('', true)), 0, 8);
 	}
 
 	/**
@@ -676,6 +677,8 @@ class Users
 	 * @param bool   $forceInviteMode
 	 *
 	 * @return bool|int
+	 * @throws \Exception
+	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
 	public function signup($userName, $password, $email, $host, $role = self::ROLE_USER, $notes, $invites = self::DEFAULT_INVITES, $inviteCode = '', $forceInviteMode = false)
 	{
@@ -685,11 +688,11 @@ class Users
 		$email = trim($email);
 
 		if (!$this->isValidUsername($userName)) {
-			return Users::ERR_SIGNUP_BADUNAME;
+			return self::ERR_SIGNUP_BADUNAME;
 		}
 
 		if (!$this->isValidPassword($password)) {
-			return Users::ERR_SIGNUP_BADPASS;
+			return self::ERR_SIGNUP_BADPASS;
 		}
 
 		if (!$this->isValidEmail($email)) {
@@ -698,17 +701,17 @@ class Users
 
 		$res = $this->getByUsername($userName);
 		if ($res) {
-			return Users::ERR_SIGNUP_UNAMEINUSE;
+			return self::ERR_SIGNUP_UNAMEINUSE;
 		}
 
 		$res = $this->getByEmail($email);
 		if ($res) {
-			return Users::ERR_SIGNUP_EMAILINUSE;
+			return self::ERR_SIGNUP_EMAILINUSE;
 		}
 
 		// Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.
 		$invitedBy = 0;
-		if (!$forceInviteMode && Settings::value('..registerstatus') == Settings::REGISTER_STATUS_INVITE) {
+		if (!$forceInviteMode && (int)Settings::value('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
 			if ($inviteCode === '') {
 				return self::ERR_SIGNUP_BADINVITECODE;
 			}
@@ -727,7 +730,7 @@ class Users
 	 *
 	 * @return bool
 	 */
-	public function isValidPassword(string $password)
+	public function isValidPassword(string $password): bool
 	{
 		return (strlen($password) > 5);
 	}
@@ -739,14 +742,14 @@ class Users
 	 *
 	 * @return int
 	 */
-	public function checkAndUseInvite($inviteCode)
+	public function checkAndUseInvite($inviteCode): int
 	{
 		$invite = $this->getInvite($inviteCode);
 		if (!$invite) {
 			return -1;
 		}
 
-		$this->pdo->queryExec(sprintf('UPDATE users SET invites = invites-1 WHERE id = %d', $invite['users_id']));
+		User::query()->where('id', $invite['users_id'])->decrement('invites');
 		$this->deleteInvite($inviteCode);
 		return $invite['users_id'];
 	}
@@ -774,7 +777,7 @@ class Users
 	/**
 	 * @param $inviteToken
 	 */
-	public function deleteInvite(string $inviteToken)
+	public function deleteInvite(string $inviteToken): void
 	{
 
 		$this->pdo->queryExec(sprintf('DELETE FROM invitations WHERE guid = %s', $this->pdo->escapeString($inviteToken)));
@@ -784,21 +787,22 @@ class Users
 	/**
 	 * Add a new user.
 	 *
-	 * @param string  $userName
-	 * @param string|bool  $password
-	 * @param string  $email
-	 * @param integer $role
-	 * @param         $notes
-	 * @param         $host
-	 * @param integer $invites
-	 * @param integer $invitedBy
+	 * @param string      $userName
+	 * @param string|bool $password
+	 * @param string      $email
+	 * @param integer     $role
+	 * @param             $notes
+	 * @param             $host
+	 * @param integer     $invites
+	 * @param integer     $invitedBy
 	 *
 	 * @return bool|int
+	 * @throws \Exception
 	 */
 	public function add($userName, $password, $email, $role, $notes, $host, $invites = self::DEFAULT_INVITES, $invitedBy = 0)
 	{
 
-		$password = Users::hashPassword($password);
+		$password = $this->hashPassword($password);
 		if (!$password) {
 			return false;
 		}
@@ -811,10 +815,10 @@ class Users
 				$this->pdo->escapeString((string)$password),
 				$this->pdo->escapeString($email),
 				$role,
-				$this->pdo->escapeString((Settings::value('..storeuserips') == 1 ? $host : '')),
-				$this->pdo->escapeString(uniqid()),
+				$this->pdo->escapeString((int)Settings::value('..storeuserips') === 1 ? $host : ''),
+				$this->pdo->escapeString(uniqid('', true)),
 				$invites,
-				($invitedBy == 0 ? 'NULL' : $invitedBy),
+				((int)$invitedBy === 0 ? 'NULL' : $invitedBy),
 				$this->pdo->escapeString($this->pdo->uuid()),
 				$this->pdo->escapeString($notes)
 			)
@@ -825,15 +829,17 @@ class Users
 	 * Verify if the user is logged in.
 	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
-	public function isLoggedIn()
+	public function isLoggedIn(): bool
 	{
 		if (isset($_SESSION['uid'])) {
 			return true;
-		} else if (isset($_COOKIE['uid'], $_COOKIE['idh'])) {
+		}
+		if (isset($_COOKIE['uid'], $_COOKIE['idh'])) {
 			$u = $this->getById($_COOKIE['uid']);
 
-			if ($u['role'] != self::ROLE_DISABLED && $_COOKIE['idh'] == Users::hashSHA1($u['userseed'] . $_COOKIE['uid'])) {
+			if ((int)$u['role'] !== self::ROLE_DISABLED && $_COOKIE['idh'] === self::hashSHA1($u['userseed'] . $_COOKIE['uid'])) {
 				$this->login($_COOKIE['uid'], $_SERVER['REMOTE_ADDR']);
 			}
 		}
@@ -846,18 +852,20 @@ class Users
 	 * @param int    $userID   ID of the user.
 	 * @param string $host
 	 * @param string $remember Save the user in cookies to keep them logged in.
+	 *
+	 * @throws \Exception
 	 */
-	public function login($userID, $host = '', $remember = '')
+	public function login($userID, $host = '', $remember = ''): void
 	{
 		$_SESSION['uid'] = $userID;
 
-		if (Settings::value('..storeuserips') != 1) {
+		if ((int)Settings::value('..storeuserips') !== 1) {
 			$host = '';
 		}
 
 		$this->updateSiteAccessed($userID, $host);
 
-		if ($remember == 1) {
+		if ((int)$remember === 1) {
 			$this->setCookies($userID);
 		}
 	}
@@ -868,7 +876,7 @@ class Users
 	 * @param int    $userID ID of the user.
 	 * @param string $host
 	 */
-	public function updateSiteAccessed($userID, $host = '')
+	public function updateSiteAccessed($userID, $host = ''): void
 	{
 		$this->pdo->queryExec(
 			sprintf(
@@ -884,19 +892,19 @@ class Users
 	 *
 	 * @param int $userID
 	 */
-	public function setCookies($userID)
+	public function setCookies($userID): void
 	{
 		$user = $this->getById($userID);
-		$secure_cookie = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? '1' : '0');
-		setcookie('uid', $userID, (time() + 2592000), '/', null, $secure_cookie, true);
-		setcookie('idh', (Users::hashSHA1($user['userseed'] . $userID)), (time() + 2592000), '/', null, $secure_cookie, true);	}
+		$secure_cookie = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? '1' : '0');
+		setcookie('uid', $userID, time() + 2592000, '/', null, $secure_cookie, true);
+		setcookie('idh', self::hashSHA1($user['userseed'] . $userID), time() + 2592000, '/', null, $secure_cookie, true);	}
 
 	/**
 	 * Return the User ID of the user.
 	 *
 	 * @return int
 	 */
-	public function currentUserId()
+	public function currentUserId(): int
 	{
 		return $_SESSION['uid'] ?? -1;
 	}
@@ -904,11 +912,11 @@ class Users
 	/**
 	 * Logout the user, destroying his cookies and session.
 	 */
-	public function logout()
+	public function logout(): void
 	{
 		session_unset();
 		session_destroy();
-		$secure_cookie = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? '1' : '0');
+		$secure_cookie = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? '1' : '0');
 		setcookie('uid', null, -1, '/', null, $secure_cookie, true);
 		setcookie('idh', null, -1, '/', null, $secure_cookie, true);
 	}
@@ -916,10 +924,10 @@ class Users
 	/**
 	 * @param $uid
 	 */
-	public function updateApiAccessed($uid)
+	public function updateApiAccessed($uid): void
 	{
 
-		$this->pdo->queryExec(sprintf('UPDATE users SET apiaccess = now() WHERE id = %d', $uid));
+		User::query()->where('id', $uid)->update(['apiaccess' => date('Y-m-d h:m:s')]);
 	}
 
 	/**
@@ -942,7 +950,7 @@ class Users
 	 *
 	 * @return array
 	 */
-	public function getCart($uid, $releaseId = '')
+	public function getCart($uid, $releaseId = ''): array
 	{
 
 		if ($releaseId !== '') {
@@ -958,7 +966,7 @@ class Users
 	 *
 	 * @return bool
 	 */
-	public function delCartByGuid($guids, $userID)
+	public function delCartByGuid($guids, $userID): bool
 	{
 		if (!is_array($guids)) {
 			return false;
@@ -983,7 +991,7 @@ class Users
 	 * @param $guid
 	 * @param $uid
 	 */
-	public function delCartByUserAndRelease($guid, $uid)
+	public function delCartByUserAndRelease($guid, $uid): void
 	{
 		$rel = $this->pdo->queryOneRow(sprintf('SELECT id FROM releases WHERE guid = %s', $this->pdo->escapeString($guid)));
 		if ($rel) {
@@ -994,7 +1002,7 @@ class Users
 	/**
 	 * @param $rid
 	 */
-	public function delCartForRelease($rid)
+	public function delCartForRelease($rid): void
 	{
 		$this->pdo->queryExec(sprintf('DELETE FROM users_releases WHERE releases_id = %d', $rid));
 	}
@@ -1004,7 +1012,7 @@ class Users
 	 * @param       $uid
 	 * @param array $catids
 	 */
-	public function addCategoryExclusions($uid, array $catids)
+	public function addCategoryExclusions($uid, array $catids): void
 	{
 		$this->delUserCategoryExclusions($uid);
 		if (count($catids) > 0) {
@@ -1019,7 +1027,7 @@ class Users
 	 *
 	 * @return array
 	 */
-	public function getRoleCategoryExclusion($role)
+	public function getRoleCategoryExclusion($role): array
 	{
 		$ret = [];
 		$categories = $this->pdo->query(sprintf('SELECT categories_id FROM role_excluded_categories WHERE role = %d', $role));
@@ -1034,7 +1042,7 @@ class Users
 	 * @param $role
 	 * @param $catids
 	 */
-	public function addRoleCategoryExclusions($role, array $catids)
+	public function addRoleCategoryExclusions($role, array $catids): void
 	{
 		$this->delRoleCategoryExclusions($role);
 		if (count($catids) > 0) {
@@ -1047,7 +1055,7 @@ class Users
 	/**
 	 * @param $role
 	 */
-	public function delRoleCategoryExclusions($role)
+	public function delRoleCategoryExclusions($role): void
 	{
 		$this->pdo->queryExec(sprintf('DELETE FROM role_excluded_categories WHERE role = %d', $role));
 	}
@@ -1059,7 +1067,7 @@ class Users
 	 *
 	 * @return array
 	 */
-	public function getCategoryExclusion($userID)
+	public function getCategoryExclusion($userID): array
 	{
 		$ret = [];
 		$categories = $this->pdo->query(sprintf('SELECT categories_id FROM user_excluded_categories WHERE users_id = %d', $userID));
@@ -1077,7 +1085,7 @@ class Users
 	 *
 	 * @return array
 	 */
-	public function getCategoryExclusionNames($userID)
+	public function getCategoryExclusionNames($userID): array
 	{
 		$data = $this->getCategoryExclusion($userID);
 		$category = new Category(['Settings' => $this->pdo]);
@@ -1095,7 +1103,7 @@ class Users
 	 * @param $uid
 	 * @param $catid
 	 */
-	public function delCategoryExclusion($uid, $catid)
+	public function delCategoryExclusion($uid, $catid): void
 	{
 		$this->pdo->queryExec(sprintf('DELETE FROM user_excluded_categories WHERE users_id = %d AND categories_id = %d', $uid, $catid));
 	}
@@ -1108,11 +1116,12 @@ class Users
 	 * @param $emailto
 	 *
 	 * @return string
+	 * @throws \Exception
 	 */
-	public function sendInvite($sitetitle, $siteemail, $serverurl, $uid, $emailto)
+	public function sendInvite($sitetitle, $siteemail, $serverurl, $uid, $emailto): string
 	{
 		$sender = $this->getById($uid);
-		$token = Users::hashSHA1(uniqid());
+		$token = self::hashSHA1(uniqid('', true));
 		$subject = $sitetitle . ' Invitation';
 		$url = $serverurl . 'register?invitecode=' . $token;
 		$contents = $sender['username'] . ' has sent an invite to join ' . $sitetitle . ' to this email address. To accept the invitation click the following link. ' . $url;
@@ -1127,7 +1136,7 @@ class Users
 	 * @param $uid
 	 * @param $inviteToken
 	 */
-	public function addInvite(int $uid, string $inviteToken)
+	public function addInvite(int $uid, string $inviteToken): void
 	{
 		$this->pdo->queryInsert(sprintf('INSERT INTO invitations (guid, users_id, createddate) VALUES (%s, %d, now())', $this->pdo->escapeString($inviteToken), $uid));
 	}
@@ -1135,7 +1144,7 @@ class Users
 	/**
 	 * @return array
 	 */
-	public function getTopGrabbers()
+	public function getTopGrabbers(): array
 	{
 		return $this->pdo->query('SELECT id, username, SUM(grabs) as grabs FROM users
 							GROUP BY id, username
@@ -1150,7 +1159,7 @@ class Users
 	 *
 	 * @return array
 	 */
-	public function getUsersByMonth()
+	public function getUsersByMonth(): array
 	{
 		return $this->pdo->query("
 			SELECT DATE_FORMAT(createddate, '%M %Y') AS mth, COUNT(id) AS num
@@ -1163,12 +1172,13 @@ class Users
 
 	/**
 	 * @return array
+	 * @throws \Exception
 	 */
-	public function getUsersByHostHash()
+	public function getUsersByHostHash(): array
 	{
 		$ipsql = "('-1')";
 
-		if (Settings::value('..userhostexclusion') != '') {
+		if (Settings::value('..userhostexclusion') !== '') {
 			$ipsql = '';
 			$ips = explode(',', Settings::value('..userhostexclusion'));
 			foreach ($ips as $ip) {
@@ -1195,13 +1205,14 @@ class Users
 
 	/**
 	 * @param        $host
-	 * @param string $siteseed
+	 * @param string|null $siteseed
 	 *
 	 * @return string
+	 * @throws \Exception
 	 */
-	public function getHostHash($host, string $siteseed = '')
+	public function getHostHash($host, string $siteseed = ''): string
 	{
-		if ($siteseed == '') {
+		if ($siteseed === '') {
 			$siteseed = Settings::value('..siteseed');
 		}
 
@@ -1211,7 +1222,7 @@ class Users
 	/**
 	 * @return array
 	 */
-	public function getUsersByRole()
+	public function getUsersByRole(): array
 	{
 		return $this->pdo->query('SELECT ur.name, COUNT(u.id) as num FROM users u
 							INNER JOIN user_roles ur ON ur.id = u.role
@@ -1223,7 +1234,7 @@ class Users
 	/**
 	 * @return array
 	 */
-	public function getLoginCountsByMonth()
+	public function getLoginCountsByMonth(): array
 	{
 		return $this->pdo->query("SELECT 'Login' as type,
 			sum(case when lastlogin > curdate() - INTERVAL 1 DAY then 1 else 0 end) as 1day,
@@ -1248,7 +1259,7 @@ class Users
 	/**
 	 * @return array
 	 */
-	public function getRoles()
+	public function getRoles(): array
 	{
 		return $this->pdo->query('SELECT * FROM user_roles');
 	}
@@ -1296,7 +1307,7 @@ class Users
 	 */
 	public function updateRole($id, $name, $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $hideads)
 	{
-		if ($isdefault == 1) {
+		if ((int)$isdefault === 1) {
 			$this->pdo->queryExec('UPDATE user_roles SET isdefault = 0');
 		}
 		return $this->pdo->queryExec(sprintf('UPDATE user_roles SET name = %s, apirequests = %d, downloadrequests = %d, defaultinvites = %d, isdefault = %d, canpreview = %d, hideads = %d WHERE id = %d', $this->pdo->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $hideads, $id));
@@ -1375,7 +1386,7 @@ class Users
 	 *
 	 * @return void
 	 */
-	protected function clearApiRequests($userID)
+	protected function clearApiRequests($userID): void
 	{
 		if ($userID === false) {
 			$this->pdo->queryExec('DELETE FROM user_requests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)');
@@ -1399,7 +1410,7 @@ class Users
 	 */
 	public function pruneRequestHistory($days = 0)
 	{
-		if ($days == 0) {
+		if ($days === 0) {
 			$days = 1;
 			$this->pdo->queryExec('UPDATE user_downloads SET releases_id = null');
 		}
@@ -1415,7 +1426,7 @@ class Users
 	 *
 	 * @return int
 	 */
-	public function getDownloadRequests($userID)
+	public function getDownloadRequests($userID): int
 	{
 		// Clear old requests.
 		$this->pdo->queryExec(
@@ -1433,7 +1444,12 @@ class Users
 		return ($value === false ? 0 : (int) $value['num']);
 	}
 
-	public function getDownloadRequestsForUser($userID)
+	/**
+	 * @param $userID
+	 *
+	 * @return array
+	 */
+	public function getDownloadRequestsForUser($userID): array
 	{
 		return $this->pdo->query(sprintf('SELECT u.*, r.guid, r.searchname FROM user_downloads u
 										  LEFT OUTER JOIN releases r ON r.id = u.releases_id
@@ -1483,7 +1499,8 @@ class Users
 	 * @param string|int $user
 	 * @return bool
 	 */
-	public function roleCheck($roleID, $user) {
+	public function roleCheck($roleID, $user): bool
+	{
 
 		if (is_string($user) && strlen($user) > 0) {
 			$user = $this->pdo->escapeString($user);
@@ -1501,7 +1518,7 @@ class Users
 			)
 		);
 
-		return ((integer)$result['role'] == (integer) $roleID) ? true : false;
+		return (int)$result['role'] === (int)$roleID ? true : false;
 	}
 
 	/**
@@ -1511,7 +1528,7 @@ class Users
 	 * @return bool
 	 */
 	public function isAdmin($userID) {
-		return $this->roleCheck(self::ROLE_ADMIN, (integer) $userID);
+		return $this->roleCheck(self::ROLE_ADMIN, (int)$userID);
 	}
 
 	/**
@@ -1521,6 +1538,6 @@ class Users
 	 * @return bool
 	 */
 	public function isModerator($userId) {
-		return $this->roleCheck(self::ROLE_MODERATOR, (integer) $userId);
+		return $this->roleCheck(self::ROLE_MODERATOR, (int)$userId);
 	}
 }
