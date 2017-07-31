@@ -28,4 +28,4 @@ test.php
 /resources/nzb/*
 /resources/tmp/*
 /templates_c/*
-/www/themes/shared/assets
+/public/themes/shared/assets
