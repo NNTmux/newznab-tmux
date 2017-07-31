@@ -1,4 +1,5 @@
 2017-07-31 DariusIII
+	* Chg: Rename www folder into public, adjust constants.php acordingly
 	* Chg: Add Models/User
 	* Fix: Fix used type of value in Models/Tmux from string to bool
 	* Chg: Update www/index.php
