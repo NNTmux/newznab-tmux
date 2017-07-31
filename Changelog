@@ -1,4 +1,5 @@
 2017-07-31 DariusIII
+	* Fix: Fix used type of value in Models/Tmux from string to bool
 	* Chg: Update www/index.php
 	* Chg: Update www/smarty.php (also fixes apache errors)
 2017-07-30 DariusIII

@@ -17,9 +17,9 @@ class Tmux extends Model
 	protected $dateFormat = false;
 
 	/**
-	 * @var string
+	 * @var bool
 	 */
-	public $timestamps = 'false';
+	public $timestamps = false;
 
 	/**
 	 * @var array
@@ -36,7 +36,7 @@ class Tmux extends Model
 	 */
 	public static function value($setting, $returnAlways = false)
 	{
-		$result = Tmux::query()->where('setting', $setting)->value('value');
+		$result = self::query()->where('setting', $setting)->value('value');
 
 		if ($result !== null) {
 			$value = $result;
