@@ -19,22 +19,24 @@
  * @copyright 2015 NN
  */
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
-require_once NN_ROOT . 'bootstrap' . DS . 'bootstrap.php';
+require_once NN_ROOT . 'bootstrap' . DS . 'autoload.php';
 
 use nntmux\config\Configure;
 
 try {
 	$config = new Configure('smarty');
 } catch (\RuntimeException $e) {
-	if ($e->getCode() == 1) {
-		if (file_exists(NN_WWW . 'config.php')) {
-			echo "Move: .../www/config.php to .../nzedb/config/config.php<br />\n Remove any line that says require_once 'automated.config.php';<br />\n";
+	if ((int)$e->getCode() === 1) {
+		if (file_exists(NN_ROOT . '.env')) {
+			echo "Move: .../www/config.php to .../n/config/config.php<br />\n Remove any line that says require_once 'automated.config.php';<br />\n";
 			if (file_exists(NN_WWW . 'settings.php')) {
-				echo "Move: .../www/settings.php to  .../nzedb/config/settings.php<br />\n";
+				echo "Move: .../www/settings.php to  .../nntmux/config/settings.php<br />\n";
 			}
 			exit();
-		} else if (is_dir("install")) {
-			header("location: install");
+		}
+
+		if (is_dir('install')) {
+			header('Location: install');
 			exit();
 		}
 	}
@@ -47,13 +49,11 @@ if (function_exists('ini_set') && function_exists('ini_get')) {
 // Path to smarty files. (not prefixed with NN as the name is needed in smarty files).
 //define('SMARTY_DIR', NN_LIBS . 'smarty' . DS);
 
-$www_top = str_replace("\\", "/", dirname($_SERVER['PHP_SELF']));
-if (strlen($www_top) == 1) {
-	$www_top = "";
+$www_top = str_replace("\\", '/', dirname($_SERVER['PHP_SELF']));
+if ((int)strlen($www_top) === 1) {
+	$www_top = '';
 }
 
 // Used everywhere an href is output, includes the full path to the NNTmux install.
 define('WWW_TOP', $www_top);
 define('WWW_THEMES', '/themes');
-
-?>

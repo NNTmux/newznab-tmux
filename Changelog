@@ -1,3 +1,5 @@
+2017-07-31 DariusIII
+	Chg: Update www/smarty.php (also fixes apache errors)
 2017-07-30 DariusIII
 	* Chg: Rename bootstrap/bootstrap.php to autoload.php
 	* Chg: Update composer files
