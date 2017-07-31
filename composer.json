@@ -14,7 +14,7 @@
       "App\\": "app/"
     },
     "classmap": [
-      "www/pages/",
+      "public/pages/",
       "libs/PEAR/Net_NNTP/NNTP/",
       "libs/",
       "database"
