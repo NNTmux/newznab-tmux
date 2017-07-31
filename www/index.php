@@ -63,8 +63,8 @@ switch ($page->page) {
 	case 'xxx':
 	case 'xxxmodal':
 		// Don't show these pages if it's an API-only site.
-		if (!$page->users->isLoggedIn() && Settings::value('..registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
-			header("Location: " . Settings::value('site.main.code'));
+		if (!$page->users->isLoggedIn() && (int)Settings::value('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
+			header('Location: ' . Settings::value('site.main.code'));
 			break;
 		}
 	case 'api':
@@ -73,7 +73,7 @@ switch ($page->page) {
 	case 'login':
 	case 'preinfo':
 	case 'rss':
-		include(NN_WWW . 'pages/' . $page->page . '.php');
+		include NN_WWW . 'pages/' . $page->page . '.php';
 		break;
 	default:
 		$page->show404();
