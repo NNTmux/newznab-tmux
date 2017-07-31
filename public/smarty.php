@@ -50,7 +50,7 @@ if (function_exists('ini_set') && function_exists('ini_get')) {
 //define('SMARTY_DIR', NN_LIBS . 'smarty' . DS);
 
 $www_top = str_replace("\\", '/', dirname($_SERVER['PHP_SELF']));
-if ((int)strlen($www_top) === 1) {
+if (strlen($www_top) === 1) {
 	$www_top = '';
 }
 
