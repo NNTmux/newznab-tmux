@@ -1627,7 +1627,7 @@ class Binaries
 					binaryblacklist.id, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description,
 					binaryblacklist.groupname AS groupname, binaryblacklist.regex, groups.id AS group_id, binaryblacklist.msgcol,
 					binaryblacklist.last_activity as last_activity
-				FROM binaryblacklist bb
+				FROM binaryblacklist
 				LEFT OUTER JOIN groups ON groups.name %s binaryblacklist.groupname
 				WHERE 1=1 %s %s %s
 				ORDER BY coalesce(groupname,\'zzz\')',
