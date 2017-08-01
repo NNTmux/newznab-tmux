@@ -274,14 +274,14 @@ class Binaries
 
 		$this->messageBuffer = Settings::value('..maxmssgs') !== '' ?
 			(int)Settings::value('..maxmssgs') : 20000;
-		$this->_compressedHeaders = Settings::value('..compressedheaders') === 1 ? true : false;
-		$this->_partRepair = Settings::value('..partrepair') === 1 ? true : false;
-		$this->_newGroupScanByDays = Settings::value('..newgroupscanmethod') === 1 ? true : false;
+		$this->_compressedHeaders = Settings::value('..compressedheaders') === 1;
+		$this->_partRepair = Settings::value('..partrepair') === 1;
+		$this->_newGroupScanByDays = Settings::value('..newgroupscanmethod') === 1;
 		$this->_newGroupMessagesToScan = Settings::value('..newgroupmsgstoscan') !== '' ? (int)Settings::value('..newgroupmsgstoscan') : 50000;
 		$this->_newGroupDaysToScan = Settings::value('..newgroupdaystoscan') !== '' ? (int)Settings::value('..newgroupdaystoscan') : 3;
 		$this->_partRepairLimit = Settings::value('..maxpartrepair') !== '' ? (int)Settings::value('..maxpartrepair') : 15000;
 		$this->_partRepairMaxTries = (Settings::value('..partrepairmaxtries') !== '' ? (int)Settings::value('..partrepairmaxtries') : 3);
-		$this->_showDroppedYEncParts = Settings::value('..showdroppedyencparts') === 1 ? true : false;
+		$this->_showDroppedYEncParts = Settings::value('..showdroppedyencparts') === 1;
 
 		$this->blackList = $this->whiteList = [];
 	}
@@ -342,7 +342,8 @@ class Binaries
 	 */
 	public function logIndexerStart(): void
 	{
-		$this->_pdo->queryExec("UPDATE settings SET value = NOW() WHERE setting = 'last_run_time'");
+		Settings::query()->where('setting', '=', 'last_run_time')->update(['value' => date('Y-m-d h:m:s')]);
+		/*$this->_pdo->queryExec("UPDATE settings SET value = NOW() WHERE setting = 'last_run_time'");*/
 	}
 
 	/**
@@ -376,12 +377,12 @@ class Binaries
 		}
 
 		// Attempt to repair any missing parts before grabbing new ones.
-		if ($groupMySQL['last_record'] != 0) {
+		if ((int)$groupMySQL['last_record'] !== 0) {
 			if ($this->_partRepair) {
 				if ($this->_echoCLI) {
 					ColorCLI::doEcho(ColorCLI::primary('Part repair enabled. Checking for missing parts.'), true);
 				}
-				$this->partRepair($groupMySQL, '');
+				$this->partRepair($groupMySQL);
 
 				$mgrPosters = $this->getMultiGroupPosters();
 				if(!empty($mgrPosters)) {
@@ -395,7 +396,7 @@ class Binaries
 		}
 
 		// Generate postdate for first record, for those that upgraded.
-		if ($groupMySQL['first_record_postdate'] === null && $groupMySQL['first_record'] != 0) {
+		if ($groupMySQL['first_record_postdate'] === null && (int)$groupMySQL['first_record'] !== 0) {
 
 			$groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
 
@@ -411,7 +412,7 @@ class Binaries
 		}
 
 		// Get first article we want aka the oldest.
-		if ($groupMySQL['last_record'] == 0) {
+		if ((int)$groupMySQL['last_record'] === 0) {
 			if ($this->_newGroupScanByDays) {
 				// For new newsgroups - determine here how far we want to go back using date.
 				$first = $this->daytopost($this->_newGroupDaysToScan, $groupNNTP);
@@ -471,7 +472,7 @@ class Binaries
 			if ($this->_echoCLI) {
 				ColorCLI::doEcho(
 					ColorCLI::primary(
-						($groupMySQL['last_record'] == 0
+						((int)$groupMySQL['last_record'] === 0
 							? 'New group ' . $groupNNTP['group'] . ' starting with ' .
 							($this->_newGroupScanByDays
 								? $this->_newGroupDaysToScan . ' days'
@@ -519,7 +520,7 @@ class Binaries
 				if (!empty($scanSummary)) {
 
 					// If new group, update first record & postdate
-					if ($groupMySQL['first_record_postdate'] === null && $groupMySQL['first_record'] == 0) {
+					if ($groupMySQL['first_record_postdate'] === null && (int)$groupMySQL['first_record'] === 0) {
 						$groupMySQL['first_record'] = $scanSummary['firstArticleNumber'];
 
 						if (isset($scanSummary['firstArticleDate'])) {
@@ -568,7 +569,7 @@ class Binaries
 					);
 				}
 
-				if ($last == $groupLast) {
+				if ((int)$last === (int)$groupLast) {
 					$done = true;
 				} else {
 					$first = $last;
@@ -651,7 +652,7 @@ class Binaries
 						'UPDATE %s SET attempts = attempts + 1 WHERE groups_id = %d AND numberid %s',
 						$this->tableNames['prname'],
 						$this->groupMySQL['id'],
-						($this->first == $this->last ? '= ' . $this->first : 'IN (' . implode(',', range($this->first, $this->last)) . ')')
+						((int)$this->first === (int)$this->last ? '= ' . $this->first : 'IN (' . implode(',', range($this->first, $this->last)) . ')')
 					)
 				);
 				return $returnArray;
@@ -670,7 +671,7 @@ class Binaries
 
 			// Check if the non-compression headers have an error.
 			if ($this->_nntp->isError($headers)) {
-				$message = ($headers->code == 0 ? 'Unknown error' : $headers->message);
+				$message = ((int)$headers->code === 0 ? 'Unknown error' : $headers->message);
 				$this->log(
 					"Code {$headers->code}: $message\nSkipping group: {$this->groupMySQL['name']}",
 					__FUNCTION__,
@@ -711,7 +712,7 @@ class Binaries
 			}
 
 			// If set we are running in partRepair mode.
-			if ($partRepair === true && !is_null($missingParts)) {
+			if ($partRepair === true && $missingParts !== null) {
 				if (!in_array($header['Number'], $missingParts, false)) {
 					// If article isn't one that is missing skip it.
 					continue;
@@ -1302,8 +1303,7 @@ class Binaries
 						FROM %s c
 						INNER JOIN %s b ON(c.id=b.collections_id)
 						INNER JOIN %s p ON(b.id=p.binaries_id)
-						WHERE p.number = %s
-						LIMIT 1',
+						WHERE p.number = %s',
 						$group['cname'],
 						$group['bname'],
 						$group['pname'],
@@ -1449,14 +1449,14 @@ class Binaries
 				if ($this->_echoCLI) {
 					echo '+';
 				}
-			} else if ($articleTime == $goalTime) {
+			} else if ($articleTime === $goalTime) {
 				// Exact match. We did it! (this will likely never happen though)
 				break;
 			}
 
 			// We seem to be flip-flopping between 2 articles, assume we're out of articles to check.
 			// End on an article more recent than our oldest so that we don't miss any releases.
-			if ($reallyOldArticle == $wantedArticle && ($goalTime - $articleTime) <= 0) {
+			if ($reallyOldArticle === $wantedArticle && ($goalTime - $articleTime) <= 0) {
 				break;
 			}
 		}
@@ -1627,7 +1627,7 @@ class Binaries
 					binaryblacklist.id, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description,
 					binaryblacklist.groupname AS groupname, binaryblacklist.regex, groups.id AS group_id, binaryblacklist.msgcol,
 					binaryblacklist.last_activity as last_activity
-				FROM binaryblacklist
+				FROM binaryblacklist bb
 				LEFT OUTER JOIN groups ON groups.name %s binaryblacklist.groupname
 				WHERE 1=1 %s %s %s
 				ORDER BY coalesce(groupname,\'zzz\')',
@@ -1674,7 +1674,7 @@ class Binaries
 				UPDATE binaryblacklist
 				SET groupname = %s, regex = %s, status = %d, description = %s, optype = %d, msgcol = %d
 				WHERE id = %d ',
-				($blacklistArray['groupname'] == ''
+				($blacklistArray['groupname'] === ''
 					? 'null'
 					: $this->_pdo->escapeString(preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']))
 				),
@@ -1700,7 +1700,7 @@ class Binaries
 			sprintf('
 				INSERT INTO binaryblacklist (groupname, regex, status, description, optype, msgcol)
 				VALUES (%s, %s, %d, %s, %d, %d)',
-				($blacklistArray['groupname'] == ''
+				($blacklistArray['groupname'] === ''
 					? 'null'
 					: $this->_pdo->escapeString(preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']))
 				),
