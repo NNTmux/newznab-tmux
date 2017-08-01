@@ -1,3 +1,5 @@
+2017-08-01 DariusIII
+	* Chg: Update pnotify to latest version
 2017-07-31 DariusIII
 	* Chg: Rename www folder into public, adjust constants.php acordingly
 	* Chg: Add Models/User

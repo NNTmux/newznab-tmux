@@ -1188,16 +1188,16 @@
         },
         {
             "name": "bower-asset/pnotify",
-            "version": "3.2.0",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sciactive/pnotify.git",
-                "reference": "ffb47b2b4f1ed4aaf6c60db0b84d6218a05dfd22"
+                "reference": "56d7a345485d3af0195069e2ebdce97c349064b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sciactive/pnotify/zipball/ffb47b2b4f1ed4aaf6c60db0b84d6218a05dfd22",
-                "reference": "ffb47b2b4f1ed4aaf6c60db0b84d6218a05dfd22",
+                "url": "https://api.github.com/repos/sciactive/pnotify/zipball/56d7a345485d3af0195069e2ebdce97c349064b4",
+                "reference": "56d7a345485d3af0195069e2ebdce97c349064b4",
                 "shasum": ""
             },
             "require": {
