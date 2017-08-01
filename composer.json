@@ -21,6 +21,7 @@
     ]
   },
   "config": {
+    "discard-changes": true,
     "process-timeout": 3600,
     "preferred-install": {
       "*": "source"
