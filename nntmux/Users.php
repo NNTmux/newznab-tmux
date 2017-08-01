@@ -479,7 +479,7 @@ class Users
 	 */
 	public function updateExpiredRoles($msgsubject, $msgbody): int
 	{
-		$data = User::query()->whereDate('rolechangedate', '<', date('Y-m-d h:m:s'))->select(['id', 'email'])->get();
+		$data = User::query()->whereDate('rolechangedate', '<', (new \DateTime())->format('Y-m-d H:i:s'))->select(['id', 'email'])->get();
 
 		foreach ($data as $u) {
 			Utility::sendEmail($u['email'], $msgsubject, $msgbody, Settings::value('site.main.email'));
