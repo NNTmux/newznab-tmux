@@ -36,7 +36,7 @@ class MultigroupPosters extends Model
 	public static function commaSeparatedList(): string
 	{
 		$list = [];
-		$posters = MultigroupPosters::all('poster');
+		$posters = self::all('poster');
 
 		foreach ($posters as $poster) {
 			$list[] = $poster->poster;

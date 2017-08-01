@@ -1,4 +1,5 @@
 2017-08-01 DariusIII
+	* Chg: Use self:: reference in commaSeparatedList function
 	* Chg: Remove nntmux/data folder
 	* Chg: Update pnotify to latest version
 2017-07-31 DariusIII
