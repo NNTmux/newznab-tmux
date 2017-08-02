@@ -46,8 +46,7 @@ switch ($action) {
 		$page->smarty->assign('user', $user);
 		break;
 	case 'submit':
-
-		if ($_POST['id'] === '') {
+		if (empty($_POST['id'])) {
 			$invites = $defaultInvites;
 			foreach ($userRoles as $role) {
 				if ($role['id'] === $_POST['role']) {
@@ -101,7 +100,7 @@ switch ($action) {
 				'role'      => $_POST['role'],
 				'invites'   => $_POST['invites'] ?? 0,
 				'movieview' => $_POST['movieview'],
-				'bookview' => $_POST['bookview']
+				'bookview'  => $_POST['bookview']
 			];
 			$page->smarty->assign('user', $user);
 		}

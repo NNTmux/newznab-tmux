@@ -1,4 +1,5 @@
 2017-08-02 DariusIII
+	* Fix: Errors on user edit in admin area
 	* Chg: Use default composer install folder (vendor) to align with laravel defaults
 	* Chg: Add @throws PHPDOC to some of the functions in Binaries class
 	* Chg: Remove deprecated functions from NNTP class

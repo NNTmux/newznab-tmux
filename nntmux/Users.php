@@ -332,14 +332,14 @@ class Users
 
 		$res = $this->getByUsername($userName);
 		if ($res) {
-			if ((int)$res['id'] !== $id) {
+			if ((int)$res['id'] !== (int)$id) {
 				return self::ERR_SIGNUP_UNAMEINUSE;
 			}
 		}
 
 		$res = $this->getByEmail($email);
 		if ($res) {
-			if ((int)$res['id'] !== $id) {
+			if ((int)$res['id'] !== (int)$id) {
 				return self::ERR_SIGNUP_EMAILINUSE;
 			}
 		}
@@ -436,12 +436,12 @@ class Users
 	/**
 	 * @param string $email
 	 *
-	 * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model
+	 * @return \Illuminate\Database\Eloquent\Model|static
 	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
 	public function getByEmail(string $email)
 	{
-		return User::query()->where('email', '=', $email)->firstOrFail();
+		return User::query()->where('email', '=', $email)->first();
 	}
 
 	/**
