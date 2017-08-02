@@ -1,4 +1,5 @@
 2017-08-02 DariusIII
+	* Chg: Remove deprecated functions from NNTP class
 	* Chg: Remove commented code from Binaries class
 	* Chg: Fix some errors in TMDB class
 	* Chg: Update rewrite rule for admin in .htaccess

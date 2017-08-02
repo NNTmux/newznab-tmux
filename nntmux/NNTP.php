@@ -4,7 +4,6 @@ namespace nntmux;
 use App\Extensions\util\Yenc;
 use App\Models\Settings;
 use nntmux\db\DB;
-use nntmux\utility\Utility;
 
 /**
  * Class for connecting to the usenet, retrieving articles and article headers,
@@ -96,16 +95,18 @@ class NNTP extends \Net_NNTP_Client
 	 * @param array $options Class instances and echo to CLI bool.
 	 *
 	 * @access public
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
-		parent::__construct();
 		$defaults = [
 			'Echo'      => true,
 			'Logger' => null,
 			'Settings'  => null,
 		];
 		$options += $defaults;
+
+		parent::__construct();
 
 		$this->_echo = ($options['Echo'] && NN_ECHOCLI);
 
@@ -120,7 +121,7 @@ class NNTP extends \Net_NNTP_Client
 			}
 		}
 
-		$this->_nntpRetries = Settings::value('..nntpretries') != '' ? (int)Settings::value('..nntpretries') : 0 + 1;
+		$this->_nntpRetries = Settings::value('..nntpretries') !== '' ? (int)Settings::value('..nntpretries') : 0 + 1;
 	}
 
 	/**
@@ -141,6 +142,7 @@ class NNTP extends \Net_NNTP_Client
 	 * @param boolean $alternate   Use the alternate NNTP connection.
 	 *
 	 * @return mixed  On success = (bool)   Did we successfully connect to the usenet?
+	 * @throws \Exception
 	 *                On failure = (object) PEAR_Error.
 	 *
 	 * @access public
@@ -273,7 +275,7 @@ class NNTP extends \Net_NNTP_Client
 			// If we are connected and authenticated, try enabling compression if we have it enabled.
 			if ($connected === true && $authenticated === true) {
 				// Check if we should use compression on the connection.
-				if ($compression === false || Settings::value('..compressedheaders') == 0) {
+				if ($compression === false || (int)Settings::value('..compressedheaders') === 0) {
 					$this->_compressionSupported = false;
 				}
 				if ($this->_debugBool) {
@@ -340,13 +342,15 @@ class NNTP extends \Net_NNTP_Client
 
 	/**
 	 * Attempt to enable compression if the admin enabled the site setting.
-	 * @note This can be used to enable compression if the server was connected without compression.
+	 *
+	 * @note   This can be used to enable compression if the server was connected without compression.
 	 *
 	 * @access public
+	 * @throws \Exception
 	 */
 	public function enableCompression(): void
 	{
-		if (!Settings::value('..compressedheaders') == 1) {
+		if ((int)Settings::value('..compressedheaders') !== 1) {
 			return;
 		}
 		$this->_enableCompression();
@@ -358,6 +362,7 @@ class NNTP extends \Net_NNTP_Client
 	 * @param bool   $force    Force a refresh to get updated data from the usenet server.
 	 *
 	 * @return mixed On success : (array)  Group information.
+	 * @throws \Exception
 	 *               On failure : (object) PEAR_Error.
 	 *
 	 * @access public
@@ -381,10 +386,11 @@ class NNTP extends \Net_NNTP_Client
 	 * Fetch an overview of article(s) in the currently selected group.
 	 *
 	 * @param string $range
-	 * @param bool $names
-	 * @param bool $forceNames
+	 * @param bool   $names
+	 * @param bool   $forceNames
 	 *
 	 * @return mixed On success : (array)  Multidimensional array with article headers.
+	 * @throws \Exception
 	 *               On failure : (object) PEAR_Error.
 	 *
 	 * @access public
@@ -427,6 +433,7 @@ class NNTP extends \Net_NNTP_Client
 	 *                      Message-ID:                    "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
 	 *
 	 * @return array|object Multi-dimensional Array of headers on success, PEAR object on failure.
+	 * @throws \Exception
 	 */
 	public function getXOVER($range)
 	{
@@ -528,6 +535,7 @@ class NNTP extends \Net_NNTP_Client
 	 * @param bool   $alternate   Use the alternate NNTP provider?
 	 *
 	 * @return mixed On success : (string) The article bodies.
+	 * @throws \Exception
 	 *               On failure : (object) PEAR_Error.
 	 *
 	 * @access public
@@ -734,10 +742,11 @@ class NNTP extends \Net_NNTP_Client
 	 * Download a full article header.
 	 *
 	 * @param string $groupName  The name of the group the article is in.
-	 * @param mixed $identifier (string) The message-ID of the article to download.
-	 *                          (int)    The article number.
+	 * @param mixed  $identifier (string) The message-ID of the article to download.
+	 *                           (int)    The article number.
 	 *
 	 * @return mixed On success : (array)  The header.
+	 * @throws \Exception
 	 *               On failure : (object) PEAR_Error.
 	 *
 	 * @access public
@@ -802,12 +811,14 @@ class NNTP extends \Net_NNTP_Client
 	 * @param string|array $groups   mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
 	 *                          (string) Group.  ie.: $groups = 'alt.test';
 	 * @param string $subject  string  The subject.     ie.: $subject = 'Test article';
-	 * @param string $body     string  The message.     ie.: $message = 'This is only a test, please disregard.';
+	 * @param string|\Exception $body     string  The message.     ie.: $message = 'This is only a test, please disregard.';
 	 * @param string $from     string  The poster.      ie.: $from = '<anon@anon.com>';
 	 * @param $extra    string  Extra, separated by \r\n
 	 *                                           ie.: $extra  = 'Organization: <NNTmux>\r\nNNTP-Posting-Host: <127.0.0.1>';
 	 * @param $yEnc     bool    Encode the message with yEnc?
 	 * @param $compress bool    Compress the message with GZip?
+	 *
+	 * @throws \Exception
 	 *
 	 * @return          mixed   On success : (bool)   True.
 	 *                          On failure : (object) PEAR_Error.
@@ -863,7 +874,7 @@ class NNTP extends \Net_NNTP_Client
 		// From is required by NNTP servers, but parent function mail does not require it, so format it.
 		$from = 'From: ' . $from;
 		// If we had extra stuff to post, format it with from.
-		if ($extra != '') {
+		if ($extra !== '') {
 			$from = $from . "\r\n" . $extra;
 		}
 
@@ -876,9 +887,10 @@ class NNTP extends \Net_NNTP_Client
 	 *
 	 * @param NNTP   $nntp  Instance of class NNTP.
 	 * @param string $group Name of the group.
-	 * @param bool   $comp Use compression or not?
+	 * @param bool   $comp  Use compression or not?
 	 *
 	 * @return mixed On success : (array)  The group summary.
+	 * @throws \Exception
 	 *               On Failure : (object) PEAR_Error.
 	 *
 	 * @access public
@@ -912,202 +924,6 @@ class NNTP extends \Net_NNTP_Client
 	}
 
 	/**
-	 * yEncodes a string and returns it.
-	 *
-	 * @deprecated use App\Extensions\util\Yenc::encode instead.
-	 * @param string $string     String to encode.
-	 * @param string $filename   Name to use as the filename in the yEnc header (this does not have to be an actual file).
-	 * @param int    $lineLength Line length to use (can be up to 254 characters).
-	 * @param bool   $crc32      Pass True to include a CRC checksum in the trailer to allow decoders to verify data integrity.
-	 *
-	 * @return mixed On success: (string) yEnc encoded string.
-	 *               On failure: (bool)   False.
-	 *
-	 * @access public
-	 */
-	public function encodeYEnc($string, $filename, $lineLength = 128, $crc32 = true)
-	{
-		trigger_error('Deprecated. Use app\extensions\util\Yenc::encode instead.' . PHP_EOL);
-		// yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.
-		if ($lineLength > 254) {
-			$lineLength = 254;
-		}
-
-		if ($lineLength < 1) {
-			$message = $lineLength . ' is not a valid line length.';
-			if ($this->_debugBool) {
-				$this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-			}
-			return $this->throwError($message);
-		}
-
-		$encoded = '';
-		$stringLength = strlen($string);
-		// Encode each character of the string one at a time.
-		for ($i = 0; $i < $stringLength; $i++) {
-			$value = ((ord($string{$i}) + 42) % 256);
-
-			// Escape NULL, TAB, LF, CR, space, . and = characters.
-			if ($value == 0 || $value == 9 || $value == 10 || $value == 13 || $value == 32 || $value == 46 || $value == 61) {
-				$encoded .= ('=' . chr(($value + 64) % 256));
-			} else {
-				$encoded .= chr($value);
-			}
-		}
-
-		$encoded =
-			'=ybegin line=' .
-			$lineLength .
-			' size=' .
-			$stringLength .
-			' name=' .
-			trim($filename) .
-			"\r\n" .
-			trim(chunk_split($encoded, $lineLength)) .
-			"\r\n=yend size=" .
-			$stringLength;
-
-		// Add a CRC32 checksum if desired.
-		if ($crc32 === true) {
-			$encoded .= ' crc32=' . strtolower(sprintf("%04X", crc32($string)));
-		}
-
-		return $encoded . "\r\n";
-	}
-
-	/**
-	 * yDecodes an encoded string and either writes the result to a file or returns it as a string.
-	 *
-	 * @deprecated use App\Extensions\util\Yenc::decode instead.
-	 *
-	 * @param string $string yEncoded string to decode.
-	 *
-	 * @return mixed On success: (string) The decoded string.
-	 *               On failure: (object) PEAR_Error.
-	 * @access public
-	 */
-	public function decodeYEnc($string)
-	{
-		trigger_error('Deprecated. Use app\extensions\util\Yenc::decode instead.' . PHP_EOL);
-		$crc = '';
-		// Extract the yEnc string itself.
-		if (preg_match("/=ybegin.*size=([^ $]+).*\\r\\n(.*)\\r\\n=yend.*size=([^ $\\r\\n]+)(.*)/ims", $string, $encoded)) {
-			if (preg_match('/crc32=([^ $\\r\\n]+)/ims', $encoded[4], $trailer)) {
-				$crc = trim($trailer[1]);
-			}
-			$headerSize  = $encoded[1];
-			$trailerSize = $encoded[3];
-			$encoded     = $encoded[2];
-
-		} else {
-			return false;
-		}
-
-		// Remove line breaks from the string.
-		$encoded = trim(str_replace("\r\n", '', $encoded));
-
-		// Make sure the header and trailer file sizes match up.
-		if ($headerSize != $trailerSize) {
-			$message = 'Header and trailer file sizes do not match. This is a violation of the yEnc specification.';
-			if ($this->_debugBool) {
-				$this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-			}
-			return $this->throwError($message);
-		}
-
-		// Decode.
-		$decoded = '';
-		$encodedLength = strlen($encoded);
-		for ($chr = 0; $chr < $encodedLength; $chr++) {
-			$decoded .= ($encoded[$chr] !== '=' ? chr(ord($encoded[$chr]) - 42) : chr((ord($encoded[++$chr]) - 64) - 42));
-		}
-
-		// Make sure the decoded file size is the same as the size specified in the header.
-		if (strlen($decoded) != $headerSize) {
-			$message = 'Header file size and actual file size do not match. The file is probably corrupt.';
-			if ($this->_debugBool) {
-				$this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-			}
-			return $this->throwError($message);
-		}
-
-		// Check the CRC value
-		if ($crc !== '' && (strtolower($crc) !== strtolower(sprintf('%04X', crc32($decoded))))) {
-			$message = 'CRC32 checksums do not match. The file is probably corrupt.';
-			if ($this->_debugBool) {
-				$this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-			}
-			return $this->throwError($message);
-		}
-
-		return $decoded;
-	}
-
-	/**
-	 * Decode a string of text encoded with yEnc. Ignores all errors.
-	 *
-	 * @deprecated use App\Extensions\util\Yenc::decodeIgnore instead.
-	 *
-	 * @param  string|bool $data The encoded text to decode.
-	 *
-	 * @return string The decoded yEnc string, or the input string, if it's not yEnc.
-	 * @access protected
-	 */
-	protected function _decodeIgnoreYEnc(&$data): string
-	{
-		trigger_error('Deprecated. Use app\extensions\util\Yenc::decodeIgnore instead.' . PHP_EOL);
-		if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $data, $input)) {
-			// If there user has no yyDecode path set, use PHP to decode yEnc.
-			if ($this->_yyDecoderPath === false) {
-				$data = '';
-				$input =
-					trim(
-						preg_replace(
-							'/\r\n/im', '',
-							preg_replace(
-								'/(^=yEnd.*)/im', '',
-								preg_replace(
-									'/(^=yPart.*\\r\\n)/im', '',
-									preg_replace('/(^=yBegin.*\\r\\n)/im', '', $input[1], 1),
-									1),
-								1)
-						)
-					);
-
-				$length = strlen($input);
-				for ($chr = 0; $chr < $length; $chr++) {
-					$data .= ($input[$chr] !== '=' ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
-				}
-
-			} else if ($this->_yEncExtension) {
-				$data = \simple_yenc_decode($input[1]);
-			} else {
-				$inFile = $this->_yEncTempInput . random_int(0, 999999);
-				$ouFile = $this->_yEncTempOutput . random_int(0, 999999);
-				file_put_contents($inFile, $input[1]);
-				file_put_contents($ouFile, '');
-				Utility::runCmd(
-					"'" .
-					$this->_yyDecoderPath .
-					"' '" .
-					$inFile .
-					"' -o '" .
-					$ouFile .
-					"' -f -b" .
-					$this->_yEncSilence
-				);
-				$data = file_get_contents($ouFile);
-				if ($data === false) {
-					$data = $this->throwError('Error getting data from yydecode.');
-				}
-				unlink($inFile);
-				unlink($ouFile);
-			}
-		}
-		return $data;
-	}
-
-	/**
 	 * Path to yyDecoder binary.
 	 * @var bool|string
 	 * @access protected
@@ -1134,12 +950,6 @@ class NNTP extends \Net_NNTP_Client
 	 * @access protected
 	 */
 	protected $_yEncTempOutput;
-
-	/**
-	 * Use the simple_php_yenc_decode extension for decoding yEnc articles?
-	 * @var bool
-	 */
-	protected $_yEncExtension = false;
 
 	/**
 	 * Split a string into lines of 510 chars ending with \r\n.
@@ -1385,11 +1195,12 @@ class NNTP extends \Net_NNTP_Client
 	/**
 	 * Download an article body (an article without the header).
 	 *
-	 * @param string $groupName The name of the group the article is in.
-	 * @param mixed $identifier (string) The message-ID of the article to download.
-	 *                          (int)    The article number.
+	 * @param string $groupName  The name of the group the article is in.
+	 * @param mixed  $identifier (string) The message-ID of the article to download.
+	 *                           (int)    The article number.
 	 *
 	 * @return string On success : (string) The article's body.
+	 * @throws \Exception
 	 *               On failure : (object) PEAR_Error.
 	 *
 	 * @access protected
@@ -1422,47 +1233,46 @@ class NNTP extends \Net_NNTP_Client
 		}
 
 		$body = '';
-		switch ($response) {
-			// 222, RFC977: 'n <a> article retrieved - body follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_BODY_FOLLOWS:
+		if ($response === NET_NNTP_PROTOCOL_RESPONSECODE_BODY_FOLLOWS) {
 
-				// Continue until connection is lost
-				while (!feof($this->_socket)) {
+			// Continue until connection is lost
+			while (!feof($this->_socket)) {
 
-					// Retrieve and append up to 1024 characters from the server.
-					$line = fgets($this->_socket, 1024);
+				// Retrieve and append up to 1024 characters from the server.
+				$line = fgets($this->_socket, 1024);
 
-					// If the socket is empty/ an error occurs, false is returned.
-					// Since the socket is blocking, the socket should not be empty, so it's definitely an error.
-					if ($line === false) {
-						return $this->throwError('Failed to read line from socket.', null);
-					}
-
-					// Check if the line terminates the text response.
-					if ($line === ".\r\n") {
-						if ($this->_debugBool) {
-							$this->_debugging->log(__CLASS__,
-								__FUNCTION__, 'Fetched body for article ' . $identifier, Logger::LOG_INFO
-							);
-						}
-						// Attempt to yEnc decode and return the body.
-						return Yenc::decodeIgnore($body);
-					}
-
-					// Check for line that starts with double period, remove one.
-					if ($line[0] === '.' && $line[1] === '.') {
-						$line = substr($line, 1);
-					}
-
-					// Add the line to the rest of the lines.
-					$body .= $line;
-
+				// If the socket is empty/ an error occurs, false is returned.
+				// Since the socket is blocking, the socket should not be empty, so it's definitely an error.
+				if ($line === false) {
+					return $this->throwError('Failed to read line from socket.', null);
 				}
-				return $this->throwError('End of stream! Connection lost?', null);
 
-			default:
-				return $this->_handleErrorResponse($response);
+				// Check if the line terminates the text response.
+				if ($line === ".\r\n") {
+					if ($this->_debugBool) {
+						$this->_debugging->log(__CLASS__,
+							__FUNCTION__, 'Fetched body for article ' . $identifier, Logger::LOG_INFO
+						);
+					}
+
+					// Attempt to yEnc decode and return the body.
+					return Yenc::decodeIgnore($body);
+				}
+
+				// Check for line that starts with double period, remove one.
+				if ($line[0] === '.' && $line[1] === '.') {
+					$line = substr($line, 1);
+				}
+
+				// Add the line to the rest of the lines.
+				$body .= $line;
+
+			}
+
+			return $this->throwError('End of stream! Connection lost?', null);
 		}
+
+		return $this->_handleErrorResponse($response);
 	}
 
 	/**
@@ -1471,6 +1281,7 @@ class NNTP extends \Net_NNTP_Client
 	 * @param  bool $reSelectGroup Select back the group after connecting?
 	 *
 	 * @return mixed On success: (bool)   True;
+	 * @throws \Exception
 	 *               On failure: (object) PEAR_Error
 	 *
 	 * @access protected
