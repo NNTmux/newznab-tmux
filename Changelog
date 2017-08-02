@@ -1,3 +1,5 @@
+2017-08-02 DariusIII
+	* Chg: Update rewrite rule for admin in .htaccess
 2017-08-01 DariusIII
 	* Chg: Use strict comparison in Binaries class
 	* Chg: Use self:: reference in commaSeparatedList function
