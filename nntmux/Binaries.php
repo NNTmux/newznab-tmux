@@ -343,7 +343,6 @@ class Binaries
 	public function logIndexerStart(): void
 	{
 		Settings::query()->where('setting', '=', 'last_run_time')->update(['value' => (new \DateTime())->format('Y-m-d H:i:s')]);
-		/*$this->_pdo->queryExec("UPDATE settings SET value = NOW() WHERE setting = 'last_run_time'");*/
 	}
 
 	/**
