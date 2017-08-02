@@ -50,6 +50,7 @@ class TMDB extends TV
 	 * @param array $options Class instances.
 	 *
 	 * @access public
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -230,7 +231,7 @@ class TMDB extends TV
 	 *
 	 * @param $cleanName
 	 *
-	 * @return array|false
+	 * @return array|bool
 	 */
 	protected function getShowInfo($cleanName)
 	{
@@ -254,7 +255,7 @@ class TMDB extends TV
 	 * @param array $shows
 	 * @param string $cleanName
 	 *
-	 * @return array|false
+	 * @return array|bool
 	 */
 	private function matchShowInfo($shows, $cleanName)
 	{
@@ -317,7 +318,7 @@ class TMDB extends TV
 		$ri = new ReleaseImage($this->pdo);
 
 		// Try to get the Poster
-		$hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '');
+		$hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
 
 		// Mark it retrieved if we saved an image
 		if ($hascover === 1) {
@@ -374,13 +375,13 @@ class TMDB extends TV
 		}
 
 		return [
-				'type'      => (int)parent::TYPE_TV,
+				'type'      => parent::TYPE_TV,
 				'title'     => (string)$show['name'],
 				'summary'   => (string)$show['overview'],
 				'started'   => (string)$show['first_air_date'],
 				'publisher' => isset($show['network']) ? (string)$show['network'] : '',
-				'country'   => (string)$show['origin_country'][0] ?? '',
-				'source'    => (int)parent::SOURCE_TMDB,
+				'country'   => $show['origin_country'][0] ?? '',
+				'source'    => parent::SOURCE_TMDB,
 				'imdb'      => isset($imdb['imdbid']) ? (int)$imdb['imdbid'] : 0,
 				'tvdb'      => isset($show['external_ids']['tvdb_id']) ? (int)$show['external_ids']['tvdb_id'] : 0,
 				'trakt'     => 0,
@@ -406,7 +407,7 @@ class TMDB extends TV
 				'title'       => (string)$episode['name'],
 				'series'      => (int)$episode['season_number'],
 				'episode'     => (int)$episode['episode_number'],
-				'se_complete' => (string)'S' . sprintf('%02d', $episode['season_number']) . 'E' . sprintf('%02d', $episode['episode_number']),
+				'se_complete' => 'S' . sprintf('%02d', $episode['season_number']) . 'E' . sprintf('%02d', $episode['episode_number']),
 				'firstaired'  => (string)$episode['air_date'],
 				'summary'     => (string)$episode['overview']
 		];
