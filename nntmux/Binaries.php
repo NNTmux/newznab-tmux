@@ -292,6 +292,7 @@ class Binaries
 	 * @param int $maxHeaders (Optional) How many headers to download max.
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function updateAllGroups($maxHeaders = 100000): void
 	{
@@ -352,6 +353,7 @@ class Binaries
 	 * @param int   $maxHeaders (Optional) How many headers to download max.
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function updateGroup($groupMySQL, $maxHeaders = 0): void
 	{
@@ -605,6 +607,7 @@ class Binaries
 	 * @param null|array $missingParts If we are running in partrepair, the list of missing article numbers.
 	 *
 	 * @return array Empty on failure.
+	 * @throws \Exception
 	 */
 	public function scan($groupMySQL, $first, $last, $type = 'update', $missingParts = null): array
 	{
@@ -1141,8 +1144,10 @@ class Binaries
 	 * Attempt to get missing article headers.
 	 *
 	 * @param array|string $tables
-	 * @param array $groupArr The info for this group from mysql.
+	 * @param array        $groupArr The info for this group from mysql.
+	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function partRepair($groupArr, $tables = ''): void
 	{
@@ -1275,10 +1280,11 @@ class Binaries
 	/**
 	 * Returns unix time for an article number.
 	 *
-	 * @param int    $post      The article number to get the time from.
-	 * @param array  $groupData Usenet group info from NNTP selectGroup method.
+	 * @param int   $post      The article number to get the time from.
+	 * @param array $groupData Usenet group info from NNTP selectGroup method.
 	 *
-	 * @return int	Timestamp.
+	 * @return int    Timestamp.
+	 * @throws \Exception
 	 */
 	public function postdate($post, array $groupData): int
 	{
@@ -1376,12 +1382,13 @@ class Binaries
 	/**
 	 * Returns article number based on # of days.
 	 *
-	 * @param int   $days      How many days back we want to go.
-	 * @param array $data      Group data from usenet.
+	 * @param int   $days How many days back we want to go.
+	 * @param array $data Group data from usenet.
 	 *
 	 * @return string
+	 * @throws \Exception
 	 */
-	public function daytopost($days, $data)
+	public function daytopost($days, $data): string
 	{
 		$goalTime = time() - (86400 * $days);
 		// The time we want = current unix time (ex. 1395699114) - minus 86400 (seconds in a day)
