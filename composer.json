@@ -6,7 +6,7 @@
   ],
   "autoload": {
     "files": [
-      "app/Libraries/laravel/framework/src/Illuminate/Support/helpers.php",
+      "vendor/laravel/framework/src/Illuminate/Support/helpers.php",
       "app/Extensions/helper/helpers.php"
     ],
     "psr-4": {
@@ -33,8 +33,7 @@
         "npm-asset-library": "public/themes/shared/assets",
         "bower-asset-library": "public/themes/shared/assets"
       }
-    },
-    "vendor-dir": "app/Libraries"
+    }
   },
   "description": "A Usenet Indexer",
   "extra": {

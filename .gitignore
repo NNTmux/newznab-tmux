@@ -14,7 +14,7 @@ test.php
 *.orig
 
 /.idea/
-/app/Libraries/*
+/vendor/*
 /app/resources/tmp/*
 /nntmux/config/settings.php
 /nntmux/config/ircscraper_settings.php
