@@ -90,6 +90,15 @@ class Games
 	 * @var array|bool|int|string
 	 */
 	public $catWhere;
+	/**
+	 * @var Config
+	 */
+	protected $config;
+
+	/**
+	 * @var Client
+	 */
+	protected $giantBomb;
 
 	/**
 	 * @param array $options Class instances / Echo to cli.
@@ -117,7 +126,7 @@ class Games
 		$this->catWhere = 'AND categories_id = ' . Category::PC_GAMES . ' ';
 		if ($this->publicKey !== '') {
 			$this->config = new Config($this->publicKey);
-			$this->giantbomb = new Client($this->config);
+			$this->giantBomb = new Client($this->config);
 		}
 	}
 
@@ -538,7 +547,7 @@ class Games
 			if ($steamGameID === false || $this->_gameResults === false) {
 				$bestMatch = false;
 				$this->_classUsed = 'GiantBomb';
-				$result = $this->giantbomb->search($gameInfo['title'], 'Game');
+				$result = $this->giantBomb->search($gameInfo['title'], 'Game');
 
 				if (!is_object($result)) {
 					foreach ($result as $res) {
@@ -550,7 +559,7 @@ class Games
 					}
 
 					if ($bestMatch !== false) {
-						$this->_gameResults = $this->giantbomb->findOne('Game', '3030-' . $bestMatch);
+						$this->_gameResults = $this->giantBomb->findOne('Game', '3030-' . $bestMatch);
 
 						if (!empty($this->_gameResults->image['medium_url'])) {
 							$game['coverurl'] = (string)$this->_gameResults->image['medium_url'];
