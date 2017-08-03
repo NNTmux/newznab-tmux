@@ -115,7 +115,7 @@ class Games
 		$this->matchPercentage = 60;
 		$this->maxHitRequest = false;
 		$this->catWhere = 'AND categories_id = ' . Category::PC_GAMES . ' ';
-		if($this->publicKey !== '') {
+		if ($this->publicKey !== '') {
 			$this->config = new Config($this->publicKey);
 			$this->giantbomb = new Client($this->config);
 		}
