@@ -10,6 +10,8 @@ class AdminPage extends BasePage
 {
 	/**
 	 * Default constructor.
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct()
 	{
@@ -24,8 +26,9 @@ class AdminPage extends BasePage
 			]
 		);
 
-		if (!$this->users->isLoggedIn() || !isset($this->userdata["role"]) || $this->userdata["role"] != Users::ROLE_ADMIN)
+		if (!isset($this->userdata['role']) || (int)$this->userdata['role'] !== Users::ROLE_ADMIN || !$this->users->isLoggedIn()) {
 			$this->show403(true);
+		}
 
 		$category = new Category();
 		$this->smarty->assign('catClass', $category);
@@ -34,15 +37,17 @@ class AdminPage extends BasePage
 
 	/**
 	 * Output a page using the admin template.
+	 *
+	 * @throws \Exception
 	 */
-	public function render()
+	public function render(): void
 	{
 		$this->smarty->assign('page',$this);
 
 		$admin_menu = $this->smarty->fetch('adminmenu.tpl');
 		$this->smarty->assign('admin_menu',$admin_menu);
 
-		$this->page_template = "baseadminpage.tpl";
+		$this->page_template = 'baseadminpage.tpl';
 
 		parent::render();
 	}

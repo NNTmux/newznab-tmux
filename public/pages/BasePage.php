@@ -157,7 +157,7 @@ class BasePage
 	/**
 	 * Check if the user is flooding.
 	 */
-	public function floodCheck()
+	public function floodCheck(): void
 	{
 		$waitTime = (NN_FLOOD_WAIT_TIME < 1 ? 5 : NN_FLOOD_WAIT_TIME);
 		// Check if this is not from CLI.
@@ -193,7 +193,7 @@ class BasePage
 	 *
 	 * @param int $seconds
 	 */
-	public function showFloodWarning($seconds = 5)
+	public function showFloodWarning($seconds = 5): void
 	{
 		header('Retry-After: ' . $seconds);
 		$this->show503(
@@ -204,20 +204,24 @@ class BasePage
 		);
 	}
 
-	//
-	// Inject content into the html head
-	//
-	public function addToHead($headcontent)
+	/**
+	 * Inject content into the html head
+	 *
+	 * @param $headcontent
+	 */
+	public function addToHead($headcontent): void
 	{
 		$this->head = $this->head."\n".$headcontent;
 	}
 
-	//
-	// Inject js/attributes into the html body tag
-	//
-	public function addToBody($attr)
+	/**
+	 * Inject js/attributes into the html body tag
+	 *
+	 * @param $attr
+	 */
+	public function addToBody($attr): void
 	{
-		$this->body = $this->body." ".$attr;
+		$this->body = $this->body. ' ' .$attr;
 	}
 
 	/**
@@ -235,7 +239,7 @@ class BasePage
 	{
 		header('HTTP/1.1 404 Not Found');
 		exit(
-		sprintf("
+		sprintf('
 				<html>
 					<head>
 						<title>404 - File not found.</title>
@@ -245,7 +249,7 @@ class BasePage
 						<p>%s%s</p>
 						<p>We could not find the above page or file on our servers.</p>
 					</body>
-				</html>",
+				</html>',
 			$this->serverurl,
 			$this->page
 		)
@@ -257,7 +261,7 @@ class BasePage
 	 *
 	 * @param bool $from_admin
 	 */
-	public function show403($from_admin = false)
+	public function show403($from_admin = false): void
 	{
 		header(
 			'Location: ' .
@@ -273,11 +277,11 @@ class BasePage
 	 *
 	 * @param string $message Message to display.
 	 */
-	public function show503($message = 'Your maximum api or download limit has been reached for the day.')
+	public function show503($message = 'Your maximum api or download limit has been reached for the day.'): void
 	{
 		header('HTTP/1.1 503 Service Temporarily Unavailable');
 		exit(
-		sprintf("
+		sprintf('
 				<html>
 					<head>
 						<title>Service Unavailable.</title>
@@ -286,19 +290,22 @@ class BasePage
 						<h1>Service Unavailable.</h1>
 						<p>%s</p>
 					</body>
-				</html>",
+				</html>',
 			$message
 		)
 		);
 	}
 
-	public function show429($retry='')
+	/**
+	 * @param string $retry
+	 */
+	public function show429($retry=''): void
 	{
 		header('HTTP/1.1 429 Too Many Requests');
-		if ($retry != '')
+		if ($retry !== '')
 			header('Retry-After: '.$retry);
 
-		echo "
+		echo '
 			<html>
 			<head>
 				<title>Too Many Requests</title>
@@ -307,10 +314,10 @@ class BasePage
 			<body>
 				<h1>Too Many Requests</h1>
 
-				<p>Wait ".(($retry != '') ? ceil($retry/60).' minutes ' : '')."or risk being temporarily banned.</p>
+				<p>Wait ' .(($retry !== '') ? ceil($retry/60) . ' minutes ' : '') . 'or risk being temporarily banned.</p>
 
 			</body>
-			</html>";
+			</html>';
 		die();
 	}
 
@@ -319,16 +326,16 @@ class BasePage
 		$this->smarty->display($this->page_template);
 	}
 
-	protected function setUserPreferences()
+	protected function setUserPreferences(): void
 	{
 		$this->userdata = $this->users->getById($this->users->currentUserId());
 		$this->userdata['categoryexclusions'] = $this->users->getCategoryExclusion($this->users->currentUserId());
 		$this->userdata['rolecategoryexclusions'] = $this->users->getRoleCategoryExclusion($this->userdata['role']);
 
 		// Change the theme to user's selected theme if they selected one, else use the admin one.
-		if (Settings::value('site.main.userselstyle') == 1) {
-			$this->theme = isset($this->userdata['style']) ? $this->userdata['style'] : 'None';
-			if ($this->theme == 'None') {
+		if ((int)Settings::value('site.main.userselstyle') === 1) {
+			$this->theme = $this->userdata['style'] ?? 'None';
+			if ($this->theme === 'None') {
 				$this->theme = Settings::value('site.main.style');
 			}
 
@@ -350,7 +357,7 @@ class BasePage
 		$this->smarty->assign('userdata',$this->userdata);
 		$this->smarty->assign('loggedin',"true");
 
-		if ($this->userdata['nzbvortex_api_key'] != '' && $this->userdata['nzbvortex_server_url'] != '') {
+		if ($this->userdata['nzbvortex_api_key'] !== '' && $this->userdata['nzbvortex_server_url'] !== '') {
 			$this->smarty->assign('weHasVortex', true);
 		} else {
 			$this->smarty->assign('weHasVortex', false);
@@ -358,7 +365,7 @@ class BasePage
 
 		$sab = new SABnzbd($this);
 		$this->smarty->assign('sabintegrated', $sab->integratedBool);
-		if ($sab->integratedBool !== false && $sab->url != '' && $sab->apikey != '') {
+		if ($sab->integratedBool !== false && $sab->url !== '' && $sab->apikey !== '') {
 			$this->smarty->assign('sabapikeytype', $sab->apikeytype);
 		}
 		switch ((int)$this->userdata['role']) {
@@ -379,6 +386,7 @@ class BasePage
 	 * @param $setting
 	 *
 	 * @return array|bool|mixed|null|string
+	 * @throws \Exception
 	 */
 	public function getSetting($setting)
 	{
@@ -394,7 +402,13 @@ class BasePage
 
 	}
 
-	public function getSettingValue($setting)
+	/**
+	 * @param $setting
+	 *
+	 * @return null|string
+	 * @throws \Exception
+	 */
+	public function getSettingValue($setting): ?string
 	{
 		return Settings::value($setting);
 	}

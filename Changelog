@@ -1,4 +1,5 @@
 2017-08-03 DariusIII
+	* Chg: Update AdminPage and BasePage classess
 	* Chg: Declare config and giantBomb properties, rename giantbomb to giantBomb
 	* Chg: Add check for existing GiantBomb api key
 	* Chg: Update laravel/framework to version 5.4.31 and doctrine/inflector to latest
