@@ -1,4 +1,5 @@
 2017-08-03 DariusIII
+	* Chg: Update composer files with new versions of libraries
 	* Chg: Update AdminPage and BasePage classess
 	* Chg: Declare config and giantBomb properties, rename giantbomb to giantBomb
 	* Chg: Add check for existing GiantBomb api key

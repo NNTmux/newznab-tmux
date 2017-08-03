@@ -65,7 +65,7 @@
     "roave/security-advisories": "dev-master",
     "barracudanetworks/forkdaemon-php": "~1.0",
     "b3rs3rk/steamfront": "dev-master",
-    "dariusiii/rarinfo": "dev-master",
+    "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "dev-master",
     "ext-ctype": "*",
     "ext-curl": "*",
