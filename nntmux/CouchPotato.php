@@ -62,7 +62,9 @@ class CouchPotato
 	 * Send a movie to CouchPotato.
 	 *
 	 * @param string $id
+	 *
 	 * @return bool|mixed
+	 * @throws \RuntimeException
 	 */
 	public function sendToCouchPotato($id)
 	{
