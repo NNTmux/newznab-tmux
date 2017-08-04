@@ -2,6 +2,7 @@
 namespace nntmux;
 
 
+use App\Models\DnzbFailure;
 use nntmux\db\DB;
 
 
@@ -36,40 +37,28 @@ class DnzbFailures
 	}
 
 	/**
-	 * @note Read failed downloads count for requested release_id
+	 * Read failed downloads count for requested release_id
 	 *
-	 * @param string $relId
 	 *
-	 * @return array|bool
+	 * @param $relId
+	 *
+	 * @return bool|mixed
 	 */
 	public function getFailedCount($relId)
 	{
-		$result = $this->pdo->query(
-				sprintf('
-				SELECT failed AS num
-				FROM dnzb_failures
-				WHERE release_id = %s',
-						$relId
-				)
-		);
-		if (is_array($result) && !empty($result)) {
-			return $result[0]['num'];
+		$result = DnzbFailure::query()->where('release_id', $relId)->value('failed');
+		if (!empty($result)) {
+			return $result;
 		}
 		return false;
 	}
 
 	/**
-	 * Get a count of failed releases for pager. used in admin manage failed releases list
-	 *
-	 * @return mixed
+	 * @return int
 	 */
-	public function getCount()
+	public function getCount(): int
 	{
-		$res = $this->pdo->queryOneRow('
-			SELECT COUNT(release_id) AS num
-			FROM dnzb_failures'
-		);
-		return $res['num'];
+		return DnzbFailure::query()->count('release_id');
 	}
 
 	/**
@@ -103,7 +92,9 @@ class DnzbFailures
 	 *
 	 * @param string $guid
 	 * @param string $userid
+	 *
 	 * @return string|array
+	 * @throws \Exception
 	 */
 	public function getAlternate($guid, $userid)
 	{
@@ -120,20 +111,24 @@ class DnzbFailures
 			return false;
 		}
 
-		$insert = $this->pdo->queryInsert(
+		$this->pdo->queryInsert(
 			sprintf('
 				INSERT IGNORE INTO dnzb_failures (release_id, users_id, failed)
-				VALUES (%d, %d, %d)',
+				VALUES (%d, %d, %d) ON DUPLICATE KEY UPDATE failed = failed + 1',
 				$rel['id'],
 				$userid,
 				self::FAILED
+
 			)
 		);
 
 		// If we didn't actually insert the row, don't add a comment
+		//Commenting out the code as return value is always 0
+		/*
 		if (is_numeric($insert) && $insert > 0) {
 			$this->postComment($rel['id'], $rel['gid'], $userid);
 		}
+		*/
 
 		$alternate = $this->pdo->queryOneRow(
 			sprintf('
@@ -155,17 +150,19 @@ class DnzbFailures
 	}
 
 	/**
-	 *        Post comment for the release if that release has no comment for failure.
-	 *        Only one user is allowed to post comment for that release, rest will just
-	 *        update the failed count in dnzb_failures table
+	 * Post comment for the release if that release has no comment for failure.
+	 * Only one user is allowed to post comment for that release, rest will just
+	 * update the failed count in dnzb_failures table
 	 *
 	 * @param $relid
 	 * @param $gid
 	 * @param $uid
+	 *
+	 * @throws \Exception
 	 */
 	public function postComment($relid, $gid, $uid): void
 	{
-		$dupe = 0;
+		$dupe = false;
 		$text = 'This release has failed to download properly. It might fail for other users too.
 		This comment is automatically generated.';
 
@@ -181,12 +178,12 @@ class DnzbFailures
 		if ($check instanceof \Traversable) {
 			foreach ($check AS $dbl) {
 				if ($dbl['text'] === $text) {
-					$dupe = 1;
+					$dupe = true;
 					break;
 				}
 			}
 		}
-		if ($dupe === 0) {
+		if ($dupe === false) {
 			$this->rc->addComment($relid, $gid, $text, $uid, '');
 		}
 	}
