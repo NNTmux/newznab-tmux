@@ -108,8 +108,9 @@ class CollectionsCleaning
 	 * @param string $groupName Group to work in.
 	 *
 	 * @return array The ID of the Regex Matched and the cleaned collection name
+	 * @throws \Exception
 	 */
-	public function collectionsCleaner($subject, $groupName)
+	public function collectionsCleaner($subject, $groupName): ?array
 	{
 		$this->subject = $subject;
 		$this->groupName = $groupName;
@@ -134,8 +135,12 @@ class CollectionsCleaning
 		}
 	}
 
-	//	Cleans usenet subject before inserting, used for collectionhash. If no regexes matched on collectionsCleaner.
-	protected function generic()
+	/**
+	 * Cleans usenet subject before inserting, used for collectionhash. If no regexes matched on collectionsCleaner.
+	 *
+	 * @return array|null
+	 */
+	protected function generic(): ?array
 	{
 		// For non music groups.
 		if (!preg_match('/\.(flac|lossless|mp3|music|sounds)/', $this->groupName)) {
@@ -208,14 +213,18 @@ class CollectionsCleaning
 		}
 	}
 
-	// Generic regexes for music groups.
+	/**
+	 * Generic regexes for music groups.
+	 *
+	 * @return bool
+	 */
 	protected function musicSubject()
 	{
 		//Broderick_Smith-Unknown_Country-2009-404 "00-broderick_smith-unknown_country-2009.sfv" yEnc
 		if (preg_match('/^(\w{10,}-[a-zA-Z0-9]+ ")\d\d-.+?" yEnc$/', $this->subject, $match)) {
 			return $match[1];
-		} else {
-			return false;
 		}
+
+		return false;
 	}
 }
