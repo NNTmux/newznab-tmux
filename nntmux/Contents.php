@@ -10,7 +10,7 @@ class Contents
 	const TYPEINDEX = 3;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -27,6 +27,9 @@ class Contents
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 	}
 
+	/**
+	 * @return array|bool
+	 */
 	public function get()
 	{
 		$arr = [];
@@ -42,6 +45,9 @@ class Contents
 		return $arr;
 	}
 
+	/**
+	 * @return array|bool
+	 */
 	public function getAll()
 	{
 		$arr = [];
@@ -77,6 +83,9 @@ class Contents
 		return $arr;
 	}
 
+	/**
+	 * @return array|bool
+	 */
 	public function getFrontPage()
 	{
 		$arr = [];
@@ -92,6 +101,12 @@ class Contents
 		return $arr;
 	}
 
+	/**
+	 * @param $id
+	 * @param $role
+	 *
+	 * @return array|bool
+	 */
 	public function getForMenuByTypeAndRole($id, $role)
 	{
 
@@ -108,6 +123,9 @@ class Contents
 		return $arr;
 	}
 
+	/**
+	 * @return bool|Content
+	 */
 	public function getIndex()
 	{
 		$row = $this->data_getIndex();
@@ -118,6 +136,12 @@ class Contents
 		return $this->row2Object($row);
 	}
 
+	/**
+	 * @param $id
+	 * @param $role
+	 *
+	 * @return bool|Content
+	 */
 	public function getByID($id, $role)
 	{
 		$row = $this->data_getByID($id, $role);
@@ -128,6 +152,11 @@ class Contents
 		return $this->row2Object($row);
 	}
 
+	/**
+	 * @param $content
+	 *
+	 * @return mixed
+	 */
 	public function validate($content)
 	{
 		if ($content->url[0] !== '/') {
@@ -141,6 +170,11 @@ class Contents
 		return $content;
 	}
 
+	/**
+	 * @param $form
+	 *
+	 * @return false|int|string
+	 */
 	public function add($form)
 	{
 		$content = $this->row2Object($form);
@@ -151,11 +185,21 @@ class Contents
 		return $this->data_add($content);
 	}
 
+	/**
+	 * @param $id
+	 *
+	 * @return bool|\PDOStatement
+	 */
 	public function delete($id)
 	{
 		return $this->pdo->queryExec(sprintf('DELETE FROM content WHERE id = %d', $id));
 	}
 
+	/**
+	 * @param $form
+	 *
+	 * @return mixed|Content
+	 */
 	public function update($form)
 	{
 		$content = $this->row2Object($form);
@@ -165,6 +209,12 @@ class Contents
 		return $content;
 	}
 
+	/**
+	 * @param        $row
+	 * @param string $prefix
+	 *
+	 * @return Content
+	 */
 	public function row2Object($row, $prefix = '')
 	{
 		$obj = new Content();
@@ -187,22 +237,38 @@ class Contents
 		return $obj;
 	}
 
+	/**
+	 * @param $content
+	 *
+	 * @return bool|\PDOStatement
+	 */
 	public function data_update($content)
 	{
 		return $this->pdo->queryExec(sprintf('UPDATE content SET role = %d, title = %s, url = %s, body = %s, metadescription = %s, metakeywords = %s, contenttype = %d, showinmenu = %d, status = %d, ordinal = %d WHERE id = %d', $content->role, $this->pdo->escapeString($content->title), $this->pdo->escapeString($content->url), $this->pdo->escapeString($content->body), $this->pdo->escapeString($content->metadescription), $this->pdo->escapeString($content->metakeywords), $content->contenttype, $content->showinmenu, $content->status, $content->ordinal, $content->id));
 	}
 
+	/**
+	 * @param $content
+	 *
+	 * @return false|int|string
+	 */
 	public function data_add($content)
 	{
 		return $this->pdo->queryInsert(sprintf('INSERT INTO content (role, title, url, body, metadescription, metakeywords, contenttype, showinmenu, status, ordinal) values (%d, %s, %s, %s, %s, %s, %d, %d, %d, %d )', $content->role, $this->pdo->escapeString($content->title), $this->pdo->escapeString($content->url), $this->pdo->escapeString($content->body), $this->pdo->escapeString($content->metadescription), $this->pdo->escapeString($content->metakeywords), $content->contenttype, $content->showinmenu, $content->status, $content->ordinal));
 	}
 
-	public function data_get()
+	/**
+	 * @return array
+	 */
+	public function data_get(): array
 	{
 		return $this->pdo->query(sprintf('SELECT * FROM content WHERE status = 1 ORDER BY contenttype, COALESCE(ordinal, 1000000)'));
 	}
 
-	public function data_getAll()
+	/**
+	 * @return array
+	 */
+	public function data_getAll(): array
 	{
 		return $this->pdo->query(sprintf('SELECT * FROM content ORDER BY contenttype, COALESCE(ordinal, 1000000)'));
 	}
@@ -212,15 +278,21 @@ class Contents
 	 *
 	 * @return array
 	 */
-	public function data_getAllButFront()
+	public function data_getAllButFront(): array
 	{
 		return $this->pdo->query(sprintf('SELECT * FROM content WHERE id != 1 ORDER BY contenttype, COALESCE(ordinal, 1000000)'));
 	}
 
+	/**
+	 * @param $id
+	 * @param $role
+	 *
+	 * @return array|bool
+	 */
 	public function data_getByID($id, $role)
 	{
 		if ($role === Users::ROLE_ADMIN) {
-			$role = "";
+			$role = '';
 		} else {
 			$role = sprintf('AND (role = %d OR role = 0)', $role);
 		}
@@ -228,17 +300,29 @@ class Contents
 		return $this->pdo->queryOneRow(sprintf('SELECT * FROM content WHERE id = %d %s', $id, $role));
 	}
 
-	public function data_getFrontPage()
+	/**
+	 * @return array
+	 */
+	public function data_getFrontPage(): array
 	{
 		return $this->pdo->query(sprintf('SELECT * FROM content WHERE status = 1 AND contenttype = %d ORDER BY ordinal ASC, COALESCE(ordinal, 1000000), id', Contents::TYPEINDEX));
 	}
 
+	/**
+	 * @return array|bool
+	 */
 	public function data_getIndex()
 	{
 		return $this->pdo->queryOneRow(sprintf('SELECT * FROM content WHERE status = 1 AND contenttype = %d', Contents::TYPEINDEX));
 	}
 
-	public function data_getForMenuByTypeAndRole($id, $role)
+	/**
+	 * @param $id
+	 * @param $role
+	 *
+	 * @return array
+	 */
+	public function data_getForMenuByTypeAndRole($id, $role): array
 	{
 		if ($role === Users::ROLE_ADMIN) {
 			$role = '';
