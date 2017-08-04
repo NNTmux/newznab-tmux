@@ -358,6 +358,8 @@ class Category
 	/**
 	 * @param array $excludedcats
 	 *
+	 * @param array $roleexcludedcats
+	 *
 	 * @return array
 	 */
 	public function getForMenu(array $excludedcats = [], array $roleexcludedcats = []): array
