@@ -6,7 +6,7 @@ use nntmux\db\DB;
 class AniDB
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -43,7 +43,7 @@ class AniDB
 	 * @param        $airdates
 	 * @param        $episodetitles
 	 */
-	public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles)
+	public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles): void
 	{
 		$this->pdo->queryExec(
 			sprintf('
@@ -79,7 +79,7 @@ class AniDB
 	 *
 	 * @param int $anidbID
 	 */
-	public function deleteTitle($anidbID)
+	public function deleteTitle($anidbID): void
 	{
 		$this->pdo->queryExec(
 			sprintf('
@@ -176,7 +176,7 @@ class AniDB
 	 * @param string $animetitle
 	 * @return int
 	 */
-	public function getAnimeCount($animetitle = '')
+	public function getAnimeCount($animetitle = ''): int
 	{
 		$rsql = '';
 		if ($animetitle !== '') {
