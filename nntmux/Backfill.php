@@ -113,22 +113,23 @@ class Backfill
 			}
 		}
 
-		$this->_compressedHeaders = (int)Settings::value('..compressedheaders') === 1 ? true : false;
+		$this->_compressedHeaders = (int)Settings::value('..compressedheaders') === 1;
 		$this->_safeBackFillDate = Settings::value('..safebackfilldate') !== '' ? (string)Settings::value('safebackfilldate') : '2008-08-14';
 		$this->_safePartRepair = (int)Settings::value('..safepartrepair') === 1 ? 'update' : 'backfill';
-		$this->_disableBackfillGroup = (int)Settings::value('..disablebackfillgroup') === 1 ? true : false;
+		$this->_disableBackfillGroup = (int)Settings::value('..disablebackfillgroup') === 1;
 	}
 
 	/**
 	 * Backfill all the groups up to user specified time/date.
 	 *
-	 * @param string $groupName
+	 * @param string     $groupName
 	 * @param string|int $articles
-	 * @param string $type
+	 * @param string     $type
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
-	public function backfillAllGroups($groupName = '', $articles ='', $type = '')
+	public function backfillAllGroups($groupName = '', $articles ='', $type = ''): void
 	{
 		$res = [];
 		if ($groupName !== '') {
@@ -205,13 +206,14 @@ class Backfill
 	/**
 	 * Backfill single group.
 	 *
-	 * @param array $groupArr
-	 * @param int $left
+	 * @param array      $groupArr
+	 * @param int        $left
 	 * @param int|string $articles
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
-	public function backfillGroup($groupArr, $left, $articles = '')
+	public function backfillGroup($groupArr, $left, $articles = ''): void
 	{
 		// Start time for this group.
 		$startGroup = microtime(true);
@@ -387,8 +389,9 @@ class Backfill
 	 * @param string $articles
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
-	public function safeBackfill($articles = '')
+	public function safeBackfill($articles = ''): void
 	{
 		$groupname = $this->pdo->queryOneRow(
 			sprintf('
