@@ -107,7 +107,7 @@ class Category
 	private $tmpCat = 0;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -184,7 +184,7 @@ class Category
 	 *
 	 * @return string
 	 */
-	public static function getCategoryOthersGroup()
+	public static function getCategoryOthersGroup(): string
 	{
 		return implode(',',
 			[
@@ -202,6 +202,11 @@ class Category
 		);
 	}
 
+	/**
+	 * @param $category
+	 *
+	 * @return mixed
+	 */
 	public static function getCategoryValue($category)
 	{
 		return constant('self::' . $category);
@@ -214,7 +219,7 @@ class Category
 	 *
 	 * @return bool
 	 */
-	public function isParent($cid)
+	public function isParent($cid): bool
 	{
 		$ret = $this->pdo->query(
 			sprintf('SELECT id FROM categories WHERE id = %d AND parentid IS NULL', $cid),
@@ -228,7 +233,7 @@ class Category
 	 *
 	 * @return array
 	 */
-	public function getFlat($activeonly = false)
+	public function getFlat($activeonly = false): array
 	{
 		$act = '';
 		if ($activeonly) {
@@ -244,7 +249,7 @@ class Category
 	 *
 	 * @return array
 	 */
-	public function getChildren($cid)
+	public function getChildren($cid): array
 	{
 		return $this->pdo->query(
 			sprintf('SELECT c.* FROM categories c WHERE parentid = %d', $cid),
@@ -256,7 +261,7 @@ class Category
 	 * Get names of enabled parent categories.
 	 * @return array
 	 */
-	public function getEnabledParentNames()
+	public function getEnabledParentNames(): array
 	{
 		return $this->pdo->query(
 			'SELECT title FROM categories WHERE parentid IS NULL AND status = 1',
@@ -269,7 +274,7 @@ class Category
 	 *
 	 * @return array
 	 */
-	public function getDisabledIDs()
+	public function getDisabledIDs(): array
 	{
 		return $this->pdo->query(
 			'SELECT id FROM categories WHERE status = 2 OR parentid IN (SELECT id FROM categories WHERE status = 2 AND parentid IS NULL)',
@@ -308,9 +313,9 @@ class Category
 					WHERE c.id IN (%s)", implode(',', $ids)
 				), true, NN_CACHE_EXPIRY_LONG
 			);
-		} else {
-			return false;
 		}
+
+		return false;
 	}
 
 	/**
@@ -319,7 +324,7 @@ class Category
 	 *
 	 * @return string
 	 */
-	public function getNameByID($ID)
+	public function getNameByID($ID): string
 	{
 		$cat = $this->pdo->queryOneRow(
 			sprintf('
@@ -355,7 +360,7 @@ class Category
 	 *
 	 * @return array
 	 */
-	public function getForMenu($excludedcats = [], $roleexcludedcats = [])
+	public function getForMenu(array $excludedcats = [], array $roleexcludedcats = []): array
 	{
 		$ret = [];
 
@@ -364,17 +369,17 @@ class Category
 			$exccatlist = ' AND id NOT IN (' . implode(',', $excludedcats) . ')';
 		} elseif (count($excludedcats) > 0 && count($roleexcludedcats) > 0) {
 			$exccatlist = ' AND id NOT IN (' . implode(',', $excludedcats) . ',' . implode(',', $roleexcludedcats) . ')';
-		} elseif (count($excludedcats) == 0 && count($roleexcludedcats) > 0) {
+		} elseif (count($excludedcats) === 0 && count($roleexcludedcats) > 0) {
 			$exccatlist = ' AND id NOT IN (' . implode(',', $roleexcludedcats) . ')';
 		}
 
 		$arr = $this->pdo->query(
-			sprintf('SELECT * FROM categories WHERE status = %d %s', Category::STATUS_ACTIVE, $exccatlist),
+			sprintf('SELECT * FROM categories WHERE status = %d %s', self::STATUS_ACTIVE, $exccatlist),
 			true, NN_CACHE_EXPIRY_LONG
 		);
 
 		foreach($arr as $key => $val) {
-			if($val['id'] == '0') {
+			if($val['id'] === '0') {
 				$item = $arr[$key];
 				unset($arr[$key]);
 				$arr[] = $item;
@@ -392,7 +397,7 @@ class Category
 			$subcatlist = [];
 			$subcatnames = [];
 			foreach ($arr as $a) {
-				if ($a['parentid'] == $parent['id']) {
+				if ($a['parentid'] === $parent['id']) {
 					$subcatlist[] = $a;
 					$subcatnames[] = $a['title'];
 				}
@@ -415,7 +420,7 @@ class Category
 	 *
 	 * @return array
 	 */
-	public function getForSelect($blnIncludeNoneSelected = true)
+	public function getForSelect($blnIncludeNoneSelected = true): array
 	{
 		$categories = $this->getCategories();
 		$temp_array = [];
@@ -439,7 +444,7 @@ class Category
 	 *
 	 * @return array
 	 */
-	public function getCategories($activeonly = false, array $excludedcats = [])
+	public function getCategories($activeonly = false, array $excludedcats = []): array
 	{
 		return $this->pdo->query(
 			"SELECT c.id, CONCAT(cp.title, ' > ',c.title) AS title, cp.id AS parentid, c.status
@@ -448,7 +453,7 @@ class Category
 			($activeonly ?
 				sprintf(
 					' WHERE c.status = %d %s ',
-					Category::STATUS_ACTIVE,
+					self::STATUS_ACTIVE,
 					(count($excludedcats) > 0 ? ' AND c.id NOT IN (' . implode(',', $excludedcats) . ')' : '')
 				) : ''
 			) .
