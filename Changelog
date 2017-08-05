@@ -1,3 +1,5 @@
+2017-08-05 DariusIII
+	* Chg: Update composer.lock
 2017-08-04 DariusIII
 	* Chg: Update failed releases handling classes and pages
 	* Chg: Add DnzbFailure model
