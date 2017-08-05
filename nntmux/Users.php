@@ -881,7 +881,7 @@ class Users
 		$this->pdo->queryExec(
 			sprintf(
 				'UPDATE users SET lastlogin = NOW() %s WHERE id = %d',
-				($host == '' ? '' : (', host = ' . $this->pdo->escapeString($host))),
+				($host === '' ? '' : (', host = ' . $this->pdo->escapeString($host))),
 				$userID
 			)
 		);
@@ -1518,7 +1518,7 @@ class Users
 			)
 		);
 
-		return (int)$result['role'] === (int)$roleID ? true : false;
+		return $result['role'] === $roleID;
 	}
 
 	/**
