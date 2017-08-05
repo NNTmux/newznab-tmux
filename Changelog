@@ -1,3 +1,5 @@
+2017-08-06 DariusIII
+	* Fix: Inability to login, register or retrieve forgotten password
 2017-08-05 DariusIII
 	* Chg: Update composer.lock
 2017-08-04 DariusIII

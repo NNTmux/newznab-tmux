@@ -557,7 +557,7 @@ class Users
 	 */
 	public function getByPassResetGuid(string $guid)
 	{
-		return User::query()->where('resetguid', $guid)->firstOrFail();
+		return User::query()->where('resetguid', $guid)->first();
 	}
 
 	/**

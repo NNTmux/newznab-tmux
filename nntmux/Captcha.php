@@ -116,9 +116,10 @@ class Captcha {
 	/**
 	 * Return formatted error messages.
 	 *
-	 * @return string
+	 *
+	 * @return bool|string
 	 */
-	public function getError(): string
+	public function getError()
 	{
 		return $this->error;
 	}
