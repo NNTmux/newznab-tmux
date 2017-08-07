@@ -3,12 +3,12 @@
 use nntmux\Category;
 use nntmux\Releases;
 
-$page = new AdminPage(true);
+$page = new AdminPage();
 $releases = new Releases(['Settings' => $page->settings]);
 $category = new Category(['Settings' => $page->settings]);
 
 // Set the current action.
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
+$action = $_REQUEST['action'] ?? '';
 
 // Request is for id, but guid is actually being provided
 if (isset($_REQUEST['id']) && is_array($_REQUEST['id'])) {
@@ -26,19 +26,19 @@ switch ($action) {
 	case 'doedit':
 	case 'edit':
 		$success = false;
-		if ($action == 'doedit') {
+		if ($action === 'doedit') {
 			$success = $releases->updateMulti(
-				$_POST["id"],
-				$_POST["category"],
-				$_POST["grabs"],
-				$_POST["videosid"],
-				$_POST["episodesid"],
-				$_POST["anidbid"],
+				$_POST['id'],
+				$_POST['category'],
+				$_POST['grabs'],
+				$_POST['videosid'],
+				$_POST['episodesid'],
+				$_POST['anidbid'],
 				$_POST['imdbid']);
 		}
 		$page->smarty->assign('release', $rel);
 		$page->smarty->assign('success', $success);
-		$page->smarty->assign('from', (isset($_POST['from']) ? $_POST['from'] : ''));
+		$page->smarty->assign('from', $_POST['from'] ?? '');
 		$page->smarty->assign('catlist', $category->getForSelect(false));
 		$page->content = $page->smarty->fetch('ajax_release-edit.tpl');
 		echo $page->content;
