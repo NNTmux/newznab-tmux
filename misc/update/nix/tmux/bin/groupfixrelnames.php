@@ -109,7 +109,7 @@ switch (true) {
 
 				echo PHP_EOL . ColorCLI::primaryOver("[{$release['releases_id']}]");
 
-				if ($release['ishashed'] === 1 && $release['dehashstatus'] >= -6 && $release['dehashstatus'] <= 0) {
+				if ((int)$release['ishashed'] === 1 && (int)$release['dehashstatus'] >= -6 && (int)$release['dehashstatus'] <= 0) {
 					echo ColorCLI::primaryOver('m');
 					if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['name'], $matches)) {
 						$namefixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
@@ -125,7 +125,7 @@ switch (true) {
 				}
 				$namefixer->reset();
 
-				if ($release['proc_uid'] == NameFixer::PROC_UID_NONE && !empty($release['uid'])) {
+				if ((int)$release['proc_uid'] === NameFixer::PROC_UID_NONE && !empty($release['uid'])) {
 					echo ColorCLI::primaryOver('U');
 					$namefixer->uidCheck($release, true, 'UID, ', 1, 1);
 				}
@@ -137,7 +137,7 @@ switch (true) {
 				}
 				$namefixer->reset();
 
-				if ($release['proc_srr'] == NameFixer::PROC_SRR_NONE) {
+				if ((int)$release['proc_srr'] === NameFixer::PROC_SRR_NONE) {
 					echo ColorCLI::primaryOver('sr');
 					$namefixer->srrNameCheck($release, true, 'SRR, ', 1, 1);
 				}
@@ -149,7 +149,7 @@ switch (true) {
 				}
 				$namefixer->reset();
 
-				if ($release['proc_hash16k'] == NameFixer::PROC_HASH16K_NONE && !empty($release['hash'])) {
+				if ((int)$release['proc_hash16k'] === NameFixer::PROC_HASH16K_NONE && !empty($release['hash'])) {
 					echo ColorCLI::primaryOver('U');
 					$namefixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1);
 				}
@@ -161,7 +161,7 @@ switch (true) {
 				}
 				$namefixer->reset();
 
-				if ($release['nfostatus'] == Nfo::NFO_FOUND && $release['proc_nfo'] == NameFixer::PROC_NFO_NONE) {
+				if ((int)$release['nfostatus'] === Nfo::NFO_FOUND && (int)$release['proc_nfo'] === NameFixer::PROC_NFO_NONE) {
 					if (!empty($release['textstring']) && !preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])) {
 						echo ColorCLI::primaryOver('n');
 						$namefixer->done = $namefixer->matched = false;
@@ -175,7 +175,7 @@ switch (true) {
 				}
 				$namefixer->reset();
 
-				if ($release['fileid'] > 0 && $release['proc_files'] == NameFixer::PROC_FILES_NONE) {
+				if ((int)$release['fileid'] > 0 && (int)$release['proc_files'] === NameFixer::PROC_FILES_NONE) {
 					echo ColorCLI::primaryOver('F');
 					$namefixer->done = $namefixer->matched = false;
 					$fileNames = explode('|', $release['filestring']);
@@ -202,11 +202,11 @@ switch (true) {
 				}
 				$namefixer->reset();
 
-				if ($release['proc_par2'] == NameFixer::PROC_PAR2_NONE) {
+				if ((int)$release['proc_par2'] === NameFixer::PROC_PAR2_NONE) {
 					echo ColorCLI::primaryOver('p');
 					if (!isset($nzbcontents)) {
 						$nntp = new NNTP(['Settings' => $pdo]);
-						if ((Settings::value('..alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+						if (((int)Settings::value('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 							ColorCLI::error('Unable to connect to usenet.');
 						}
 						$Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);
@@ -230,7 +230,7 @@ switch (true) {
 				}
 				$namefixer->reset();
 
-				if ($release['nfostatus'] == Nfo::NFO_FOUND && $release['proc_sorter'] == MiscSorter::PROC_SORTER_NONE) {
+				if ((int)$release['nfostatus'] === Nfo::NFO_FOUND && (int)$release['proc_sorter'] === MiscSorter::PROC_SORTER_NONE) {
 					echo ColorCLI::primaryOver('S');
 					$res = $sorter->nfosorter(null, $release['releases_id']);
 					// All gate requirements in query, only set column status if it ran the routine
