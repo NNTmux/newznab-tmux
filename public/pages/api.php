@@ -64,7 +64,7 @@ if ($page->users->isLoggedIn()) {
 		Utility::showApiError(101);
 	}
 } else {
-	if ($function != 'c' && $function != 'r') {
+	if ($function !== 'c' && $function !== 'r') {
 		if (!isset($_GET['apikey'])) {
 			Utility::showApiError(200, 'Missing parameter (apikey)');
 		} else {
@@ -86,7 +86,7 @@ if ($page->users->isLoggedIn()) {
 }
 
 // Record user access to the api, if its been called by a user (i.e. capabilities request do not require a user to be logged in or key provided).
-if ($uid != '') {
+if ($uid !== '') {
 	$page->users->updateApiAccessed($uid);
 	$apiRequests = $page->users->getApiRequests($uid);
 	if ($apiRequests > $maxRequests) {
@@ -98,13 +98,13 @@ $releases = new Releases(['Settings' => $page->settings]);
 $api = new API(['Settings' => $page->settings, 'Request' => $_GET]);
 
 // Set Query Parameters based on Request objects
-$outputXML = (isset($_GET['o']) && $_GET['o'] == 'json' ? false : true);
+$outputXML = !(isset($_GET['o']) && $_GET['o'] === 'json');
 $minSize = (isset($_GET['minsize']) && $_GET['minsize'] > 0 ? $_GET['minsize'] : 0);
 $offset = $api->offset();
 
 // Set API Parameters based on Request objects
-$params['extended'] = (isset($_GET['extended']) && $_GET['extended'] == 1 ? '1' : '0');
-$params['del'] = (isset($_GET['del']) && $_GET['del'] == 1 ? '1' : '0');
+$params['extended'] = (isset($_GET['extended']) && $_GET['extended'] === 1 ? '1' : '0');
+$params['del'] = (isset($_GET['del']) && $_GET['del'] === 1 ? '1' : '0');
 $params['uid'] = $uid;
 $params['token'] = $apiKey;
 
@@ -121,7 +121,7 @@ switch ($function) {
 		if (isset($_GET['q'])) {
 			$relData = $releases->search(
 				$_GET['q'], -1, -1, -1, $groupName, -1, -1, 0, 0, -1, -1, $offset, $limit, '', $maxAge, $catExclusions,
-				"basic", $categoryID, $minSize
+				'basic', $categoryID, $minSize
 			);
 		} else {
 			$relData = $releases->getBrowseRange(
@@ -146,13 +146,13 @@ switch ($function) {
 		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
 		$siteIdArr = [
-			'id'     => (isset($_GET['vid']) ? $_GET['vid'] : '0'),
-			'tvdb'   => (isset($_GET['tvdbid']) ? $_GET['tvdbid'] : '0'),
-			'trakt'  => (isset($_GET['traktid']) ? $_GET['traktid'] : '0'),
-			'tvrage' => (isset($_GET['rid']) ? $_GET['rid'] : '0'),
-			'tvmaze' => (isset($_GET['tvmazeid']) ? $_GET['tvmazeid'] : '0'),
-			'imdb'   => (isset($_GET['imdbid']) ? $_GET['imdbid'] : '0'),
-			'tmdb'   => (isset($_GET['tmdbid']) ? $_GET['tmdbid'] : '0')
+			'id'     => $_GET['vid'] ?? '0',
+			'tvdb'   => $_GET['tvdbid'] ?? '0',
+			'trakt'  => $_GET['traktid'] ?? '0',
+			'tvrage' => $_GET['rid'] ?? '0',
+			'tvmaze' => $_GET['tvmazeid'] ?? '0',
+			'imdb'   => $_GET['imdbid'] ?? '0',
+			'tmdb'   => $_GET['tmdbid'] ?? '0'
 		];
 
 		// Process season only queries or Season and Episode/Airdate queries
@@ -170,12 +170,12 @@ switch ($function) {
 
 		$relData = $releases->searchShows(
 			$siteIdArr,
-			(isset($series) ? $series : ''),
-			(isset($episode) ? $episode : ''),
-			(isset($airdate) ? $airdate : ''),
+			$series ?? '',
+			$episode ?? '',
+			$airdate ?? '',
 			$offset,
 			$api->limit(),
-			(isset($_GET['q']) ? $_GET['q'] : ''),
+			$_GET['q'] ?? '',
 			$api->categoryID(),
 			$maxAge,
 			$minSize
@@ -192,13 +192,13 @@ switch ($function) {
 		$maxAge = $api->maxAge();
 		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
-		$imdbId = (isset($_GET['imdbid']) ? $_GET['imdbid'] : '-1');
+		$imdbId = ($_GET['imdbid'] ?? '-1');
 
 		$relData = $releases->searchbyImdbId(
 			$imdbId,
 			$offset,
 			$api->limit(),
-			(isset($_GET['q']) ? $_GET['q'] : ''),
+			$_GET['q'] ?? '',
 			$api->categoryID(),
 			$maxAge,
 			$minSize
@@ -229,7 +229,7 @@ switch ($function) {
 				$apiKey .
 				'&id=' .
 				$relData['guid'] .
-				((isset($_GET['del']) && $_GET['del'] == '1') ? '&del=1' : '')
+				((isset($_GET['del']) && $_GET['del'] === '1') ? '&del=1' : '')
 			);
 		} else {
 			Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
@@ -259,18 +259,18 @@ switch ($function) {
 		}
 
 		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
-		$rel = $releases->getByGuid($_GET["id"]);
+		$rel = $releases->getByGuid($_GET['id']);
 		$data = $releases->getReleaseNfo($rel['id']);
 
 		if ($rel !== false && !empty($rel)) {
 			if ($data !== false) {
-				if (isset($_GET['o']) && $_GET['o'] == 'file') {
-					header("Content-type: application/octet-stream");
+				if (isset($_GET['o']) && $_GET['o'] === 'file') {
+					header('Content-type: application/octet-stream');
 					header("Content-disposition: attachment; filename={$rel['searchname']}.nfo");
 					exit($data['nfo']);
-				} else {
-					echo nl2br(Utility::cp437toUTF($data['nfo']));
 				}
+
+				echo nl2br(Utility::cp437toUTF($data['nfo']));
 			} else {
 				Utility::showApiError(300, 'Release does not have an NFO file associated.');
 			}
@@ -287,7 +287,7 @@ switch ($function) {
 	case 'r':
 		$api->verifyEmptyParameter('email');
 
-		if (!in_array((int)Settings::value('..registerstatus'), [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_API_ONLY])) {
+		if (!in_array((int)Settings::value('..registerstatus'), [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_API_ONLY], false)) {
 			Utility::showApiError(104);
 		}
 		// Check email is valid format.

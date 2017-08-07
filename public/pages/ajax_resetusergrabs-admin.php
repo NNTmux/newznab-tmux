@@ -5,8 +5,8 @@ use nntmux\Users;
 $page = new AdminPage();
 $u = new Users();
 
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
-$id = (isset($_REQUEST['id'])) ? $_REQUEST['id'] : '';
+$action = $_REQUEST['action'] ?? '';
+$id = $_REQUEST['id'] ?? '';
 
 switch($action)
 {

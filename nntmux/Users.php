@@ -154,22 +154,18 @@ class Users
 
 	/**
 	 * @param $userID
-	 *
-	 * @return bool|\PDOStatement
 	 */
-	public function delDownloadRequests($userID)
+	public function delDownloadRequests($userID): void
 	{
-		return $this->pdo->queryExec(sprintf('DELETE FROM user_downloads WHERE users_id = %d', $userID));
+		$this->pdo->queryExec(sprintf('DELETE FROM user_downloads WHERE users_id = %d', $userID));
 	}
 
 	/**
 	 * @param $userID
-	 *
-	 * @return bool|\PDOStatement
 	 */
-	public function delApiRequests($userID)
+	public function delApiRequests($userID): void
 	{
-		return $this->pdo->queryExec(sprintf('DELETE FROM user_requests WHERE users_id = %d', $userID));
+		$this->pdo->queryExec(sprintf('DELETE FROM user_requests WHERE users_id = %d', $userID));
 	}
 
 	/**
@@ -1364,11 +1360,10 @@ class Users
 	 * @param int    $userID  ID of the user.
 	 * @param string $request The API request.
 	 *
-	 * @return bool|int
 	 */
-	public function addApiRequest($userID, $request)
+	public function addApiRequest($userID, $request): void
 	{
-		return $this->pdo->queryInsert(
+		$this->pdo->queryInsert(
 			sprintf(
 				'INSERT INTO user_requests (users_id, request, timestamp) VALUES (%d, %s, NOW())',
 				$userID,
