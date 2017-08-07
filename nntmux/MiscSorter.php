@@ -18,11 +18,34 @@ class MiscSorter
 	const PROC_SORTER_NONE = 0; //Release has not been run through MiscSorter before
 	const PROC_SORTER_DONE = 1; //Release has been processed by MiscSorter
 
+	/**
+	 * @var int
+	 */
 	private $qty;
+
+	/**
+	 * @var bool
+	 */
 	private $echooutput;
-	private $DEBUGGING;
+
+	/**
+	 * @var bool
+	 */
+	private $debugging;
+
+	/**
+	 * @var DB
+	 */
 	private $pdo;
+
+	/**
+	 * @var Movie
+	 */
 	private $movie;
+
+	/**
+	 * @var Music
+	 */
 	private $music;
 
 	/**
@@ -41,14 +64,19 @@ class MiscSorter
 	public $asstag;
 
 	/**
+	 * @var Books
+	 */
+	private $book;
+
+	/**
 	 * @param bool $echooutput
 	 * @param      $pdo
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct($echooutput = false, &$pdo)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);
-		$this->qty = 100;
-		$this->DEBUGGING = NN_DEBUG;
 
 		$this->pdo = ($pdo instanceof DB ? $pdo : new DB());
 		$this->movie = new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
@@ -68,8 +96,8 @@ class MiscSorter
 	 */
 	public function nfosorter($category, $id)
 	{
-		$idarr = ($id != '' ? sprintf('AND r.id = %d', $id) : '');
-		$cat = ($category == '' ? sprintf('AND r.categories_id = %d', Category::OTHER_MISC) : sprintf('AND r.categories_id = %d', $category));
+		$idarr = ($id !== '' ? sprintf('AND r.id = %d', $id) : '');
+		$cat = ($category === '' ? sprintf('AND r.categories_id = %d', Category::OTHER_MISC) : sprintf('AND r.categories_id = %d', $category));
 
 		$res = $this->pdo->queryDirect(
 			sprintf('
@@ -117,9 +145,12 @@ class MiscSorter
 						}
 
 						$pos = $this->nfopos($this->_cleanStrForPos($nfo), $this->_cleanStrForPos($m));
+
 						if ($pos !== false && $pos > 0.55 && $case !== 'imdb') {
 							break;
-						} else if ($ret = $this->matchnfo($case, $nfo, $row)) {
+						}
+
+						if ($ret = $this->matchnfo($case, $nfo, $row)) {
 							return $ret;
 						}
 					}
@@ -164,7 +195,7 @@ class MiscSorter
 	 *
 	 * @return array
 	 */
-	private function doarray($matches)
+	private function doarray($matches): array
 	{
 		$r = [];
 		$i = 0;
@@ -215,8 +246,8 @@ class MiscSorter
 				}
 			}
 
-			if ($x != -1) {
-				if ($x == 0) {
+			if ($x !== -1) {
+				if ($x === 0) {
 					$r[$i++] = $m;
 				} else if (isset($r[$x])) {
 					$r[$x + random_int(0, 100) / 100] = $m;
@@ -236,7 +267,7 @@ class MiscSorter
 	 * @param string $name
 	 * @return string $name
 	 */
-	private function cleanname($name)
+	private function cleanname($name): string
 	{
 		do {
 			$original = $name;
@@ -247,7 +278,7 @@ class MiscSorter
 			$name = str_replace(' - - ', ' - ', $name);
 			$name = preg_replace('/^[\s\-\_\.]/iU', '', $name);
 			$name = trim($name);
-		} while ($original != $name);
+		} while ($original !== $name);
 
 		return mb_strimwidth($name, 0, 255);
 	}
@@ -260,7 +291,7 @@ class MiscSorter
 	 *
 	 * @return bool
 	 */
-	private function dodbupdate($id = 0, $name = '', $typeid = 0, $type = '')
+	private function dodbupdate($id = 0, $name = '', $typeid = 0, $type = ''): bool
 	{
 		$nameChanged = false;
 
@@ -302,7 +333,7 @@ class MiscSorter
 	 *
 	 * @return bool
 	 */
-	private function doOS($nfo = '', $id = 0)
+	private function doOS($nfo = '', $id = 0): bool
 	{
 		$ok = false;
 		$tmp = [];
@@ -338,7 +369,7 @@ class MiscSorter
 	 *
 	 * @return array
 	 */
-	private function _doOSpregSplit($pattern = '', $nfo = '')
+	private function _doOSpregSplit($pattern = '', $nfo = ''): array
 	{
 		return preg_split($pattern, $nfo, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 	}
@@ -350,7 +381,7 @@ class MiscSorter
 	 *
 	 * @return string
 	 */
-	private function moviename($nfo = '', $imdb = 0, $name = '')
+	private function moviename($nfo = '', $imdb = 0, $name = ''): string
 	{
 		$tmp = [];
 
@@ -381,6 +412,11 @@ class MiscSorter
 		return trim($retName);
 	}
 
+	/**
+	 * @param string $nfo
+	 *
+	 * @return bool|mixed
+	 */
 	private function _getVideoQuality($nfo = '')
 	{
 		$qualities = ['(:?..)?tv', '480[ip]?', '640[ip]?', '720[ip]?', '1080[ip]?', 'ac3', 'audio_ts', 'avi', 'bd[\- ]?rip', 'bd25', 'bd50',
@@ -408,7 +444,7 @@ class MiscSorter
 	 *
 	 * @return bool
 	 */
-	private function doAmazon($name = '', $id = 0, $nfo = "", $q, $region = 'com', $case = false, $row = '')
+	private function doAmazon($name = '', $id = 0, $nfo = "", $q, $region = 'com', $case = false, $row = ''): bool
 	{
 		$conf = new GenericConfiguration();
 		try {
@@ -490,15 +526,17 @@ class MiscSorter
 		return $ok;
 	}
 
-	// Main switch for determining operation type after parsing the NFO file
-
 	/**
+	 * Main switch for determining operation type after parsing the NFO file
+	 *
+	 *
 	 * @param array $response
 	 * @param int   $id
 	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
-	private function _doAmazonBooks($response = [], $id = 0)
+	private function _doAmazonBooks(array $response = [], $id = 0): bool
 	{
 		$audiobook = false;
 		$v = (string)$response->Items->Item->ItemAttributes->Format;
@@ -510,7 +548,7 @@ class MiscSorter
 
 		$rel = $this->_doAmazonLocal('bookinfo', (string)$response->Items->Item->ASIN);
 
-		if (count($rel) == 0) {
+		if (count($rel) === 0) {
 			$bookId = $this->book->updateBookInfo('', $response);
 			unset($book);
 		} else {
@@ -525,8 +563,6 @@ class MiscSorter
 
 		return $ok;
 	}
-
-	// tries to derive artist and title of album/song from release NFO
 
 	/**
 	 * @param string $table
@@ -547,7 +583,6 @@ class MiscSorter
 		);
 	}
 
-	// tries to derive the IMDB id from release NFO
 
 	/**
 	 * @param array $response
@@ -558,7 +593,7 @@ class MiscSorter
 	private function _doAmazonMusic($response = [], $id = 0)
 	{
 		$new = (string)$response->Items->Item->ItemAttributes->Artist;
-		if ($new != '') {
+		if ($new !== '') {
 			$new .= ' - ';
 		}
 		$name = $new . (string)$response->Items->Item->ItemAttributes->Title;
@@ -584,7 +619,7 @@ class MiscSorter
 	 *
 	 * @return bool
 	 */
-	private function _doAmazonMovies($response = [], $id = 0, $nfo)
+	private function _doAmazonMovies(array $response = [], $id = 0, $nfo): bool
 	{
 		$new = (string)$response->Items->Item->ItemAttributes->Title;
 		$new = $new . ' (' . substr((string)$response->Items->Item->ItemAttributes->ReleaseDate, 0, 4) . ')';
@@ -592,8 +627,6 @@ class MiscSorter
 
 		return $this->dodbupdate($id, $name, null, 'amazonMov');
 	}
-
-	// Sets the release to its proper status in the database
 
 	/**
 	 * @param array $response
@@ -625,7 +658,6 @@ class MiscSorter
 		return $ok;
 	}
 
-// Main switch for determining operation type after parsing the NFO file
 	/**
 	 * @param $case
 	 * @param string $nfo
@@ -733,7 +765,7 @@ class MiscSorter
 	 *
 	 * @return bool
 	 */
-	private function _matchNfoAudio($nfo, $row)
+	private function _matchNfoAudio($nfo, $row): bool
 	{
 		if (preg_match('/(a\s?r\s?t\s?i\s?s\s?t|l\s?a\s?b\s?e\s?l|mp3|e\s?n\s?c\s?o\s?d\s?e\s?r|rip|stereo|mono|single charts)/i', $nfo)
 			&& !preg_match('/(\bavi\b|x\.?264|divx|mvk|xvid|install(?!ation)|Setup\.exe|unzip|unrar)/i', $nfo)
@@ -777,7 +809,7 @@ class MiscSorter
 	 *
 	 * @return bool
 	 */
-	private function _matchNfoImdb($nfo, $row)
+	private function _matchNfoImdb($nfo, $row): bool
 	{
 		$imdb = $this->movie->doMovieUpdate($nfo, 'sorter', $row['id']);
 		if (isset($imdb) && $imdb > 0) {
@@ -794,7 +826,7 @@ class MiscSorter
 	 *
 	 * @return bool
 	 */
-	private function _matchNfoBook($nfo, $row)
+	private function _matchNfoBook($nfo, $row): bool
 	{
 		$author = preg_split('/(?:a\s?u\s?t\s?h\s?o\s?r\b)+? *?(?!(?:[^\s\.\:\}\]\*\xb0-\x{3000}\?] ?){2,}?\b)(?:[\*\?\-\=\|\;\:\.\[\}\]\(\s\xb0-\x{3000}\?]+?)[\s\.\>\:\(\)]((?!\:) ?[a-z0-9\&].+)(?:\s\s\s|$|\.\.\.)/Uuim', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
 		$title = preg_split('/(?:t\s?i\s?t\s?l\s?e\b|b\s?o\s?o\s?k\b)+? *?(?!(?:[^\s\.\:\}\]\*\xb0-\x{3000}\?] ?){2,}?\b)(?:[\*\?\-\=\|\;\:\.\[\}\]\(\s\xb0-\x{3000}\?]+?)[\s\.\>\:\(\)]((?!\:) ?[a-z0-9\&].+)(?:\s\s\s|$|\.\.\.)/Uuim', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
@@ -817,7 +849,7 @@ class MiscSorter
 	 * @param int $status
 	 * @param int $id
 	 */
-	private function _setProcSorter($status = 0, $id = 0)
+	private function _setProcSorter($status = 0, $id = 0): void
 	{
 		$this->pdo->queryExec(
 			sprintf('
@@ -837,7 +869,7 @@ class MiscSorter
 	 *
 	 * @return array
 	 */
-	private function _sortTypeFromNFO($nfo = '')
+	private function _sortTypeFromNFO($nfo = ''): array
 	{
 		$pattern = '/.+(\.rar|\.001) [0-9a-f]{6,10}?|(imdb)\.[a-z0-9\.\_\-\/]+?(?:tt|\?)\d+?\/?|(tvrage)\.com\/|(\bASIN)|' .
 			'(isbn)|(UPC\b)|(comic book)|(comix)|(tv series)|(\bos\b)|(documentaries)|(documentary)|(doku)|(macintosh)|' .
