@@ -38,11 +38,11 @@ class Forum
 	 */
 	public function add($parentid, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0)
 	{
-		if ($message == '') {
+		if ($message === '') {
 			return -1;
 		}
 
-		if ($parentid != 0) {
+		if ($parentid !== 0) {
 			$par = $this->getParent($parentid);
 			if ($par === false) {
 				return -1;
@@ -84,7 +84,7 @@ class Forum
 	 *
 	 * @return array
 	 */
-	public function getPosts($parent)
+	public function getPosts($parent): array
 	{
 		return $this->pdo->query(
 			sprintf('
@@ -118,7 +118,7 @@ class Forum
 	 *
 	 * @return int
 	 */
-	public function getBrowseCount()
+	public function getBrowseCount(): int
 	{
 		$res = $this->pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM forumpost WHERE parentid = 0'));
 		return ($res === false ? 0 : $res['num']);
@@ -132,7 +132,7 @@ class Forum
 	 *
 	 * @return array
 	 */
-	public function getBrowseRange($start, $num)
+	public function getBrowseRange($start, $num): array
 	{
 		return $this->pdo->query(
 			sprintf('
@@ -152,7 +152,7 @@ class Forum
 	 *
 	 * @param $parent
 	 */
-	public function deleteParent($parent)
+	public function deleteParent($parent): void
 	{
 		$this->pdo->queryExec(sprintf('DELETE FROM forumpost WHERE id = %d OR parentid = %d', $parent, $parent));
 	}
@@ -162,11 +162,11 @@ class Forum
 	 *
 	 * @param $id
 	 */
-	public function deletePost($id)
+	public function deletePost($id): void
 	{
 		$post = $this->getPost($id);
 		if ($post) {
-			if ($post['parentid'] == '0') {
+			if ((int)$post['parentid'] === 0) {
 				$this->deleteParent($id);
 			} else {
 				$this->pdo->queryExec(sprintf('DELETE FROM forumpost WHERE id = %d', $id));
@@ -179,7 +179,7 @@ class Forum
 	 *
 	 * @param $id
 	 */
-	public function deleteUser($id)
+	public function deleteUser($id): void
 	{
 		$this->pdo->queryExec(sprintf('DELETE FROM forumpost WHERE users_id = %d', $id));
 	}
@@ -191,7 +191,7 @@ class Forum
 	 *
 	 * @return int
 	 */
-	public function getCountForUser($uid)
+	public function getCountForUser($uid): int
 	{
 		$res = $this->pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM forumpost WHERE users_id = %d', $uid));
 		return ($res === false ? 0 : $res['num']);
@@ -206,7 +206,7 @@ class Forum
 	 *
 	 * @return array
 	 */
-	public function getForUserRange($uid, $start, $num)
+	public function getForUserRange($uid, $start, $num): array
 	{
 		return $this->pdo->query(
 			sprintf('
@@ -228,7 +228,7 @@ class Forum
 	 * @param $message
 	 * @param $uid
 	 */
-	public function editPost($id, $message, $uid)
+	public function editPost($id, $message, $uid): void
 	{
 		$post = $this->getPost($id);
 		if ($post) {
@@ -251,7 +251,7 @@ class Forum
 	 * @param $id
 	 * @param $lock
 	 */
-	public function lockUnlockTopic($id, $lock)
+	public function lockUnlockTopic($id, $lock): void
 	{
 		$this->pdo->queryExec(sprintf('
 						UPDATE forumpost
