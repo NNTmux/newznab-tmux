@@ -29,7 +29,7 @@ class Releases
 	/**
 	 * @var bool
 	 */
-	public $updategrabs;
+	public $updateGrabs;
 
 	/**
 	 * @var ReleaseSearch
@@ -47,6 +47,16 @@ class Releases
 	public $showPasswords;
 
 	/**
+	 * @var int
+	 */
+	public $passwordStatus;
+
+	/**
+	 * @var Category
+	 */
+	public $category;
+
+	/**
 	 * @var array $options Class instances.
 	 * @throws \Exception
 	 */
@@ -60,10 +70,10 @@ class Releases
 
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
-		$this->updategrabs = (Settings::value('..grabstatus') == '0' ? false : true);
-		$this->passwordStatus = (Settings::value('..checkpasswordedrar') == 1 ? -1 : 0);
+		$this->updateGrabs = ((int)Settings::value('..grabstatus') !== 0);
+		$this->passwordStatus = ((int)Settings::value('..checkpasswordedrar') === 1 ? -1 : 0);
 		$this->sphinxSearch = new SphinxSearch();
-		$this->releaseSearch = new ReleaseSearch($this->pdo, $this->sphinxSearch);
+		$this->releaseSearch = new ReleaseSearch($this->pdo);
 		$this->category = new Category(['Settings' => $this->pdo]);
 		$this->showPasswords = self::showPasswords();
 	}
@@ -266,14 +276,14 @@ class Releases
 
 		switch ($setting) {
 			case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
-				return ('= ' . Releases::PASSWD_NONE);
+				return ('= ' . self::PASSWD_NONE);
 			case 1: // Show releases with no password or a potential password (Show unprocessed releases).
-				return ('<= ' . Releases::PASSWD_POTENTIAL);
+				return ('<= ' . self::PASSWD_POTENTIAL);
 			case 2: // Hide releases with a password or a potential password (Show unprocessed releases).
-				return ('<= ' . Releases::PASSWD_NONE);
+				return ('<= ' . self::PASSWD_NONE);
 			case 10: // Shows everything.
 			default:
-				return ('<= ' . Releases::PASSWD_RAR);
+				return ('<= ' . self::PASSWD_RAR);
 		}
 	}
 
@@ -596,6 +606,8 @@ class Releases
 	 *
 	 * @param array|int|string $list   Array of GUID or ID of releases to delete.
 	 * @param bool             $isGUID Are the identifiers GUID or ID?
+	 *
+	 * @throws \Exception
 	 */
 	public function deleteMultiple($list, $isGUID = false): void
 	{
@@ -1217,7 +1229,7 @@ class Releases
 
 		$ret = [];
 		foreach ($results as $res) {
-			if ($res['id'] != $currentID && $res['categoryparentid'] == $parentCat) {
+			if ($res['id'] !== $currentID && $res['categoryparentid'] === $parentCat) {
 				$ret[] = $res;
 			}
 		}
@@ -1280,7 +1292,9 @@ class Releases
 	 * Writes a zip file of an array of release guids directly to the stream.
 	 *
 	 * @param $guids
+	 *
 	 * @return string
+	 * @throws \Exception
 	 */
 	public function getZipped($guids): string
 	{
@@ -1423,7 +1437,7 @@ class Releases
 	 */
 	public function updateGrab($guid): void
 	{
-		if ($this->updategrabs) {
+		if ($this->updateGrabs) {
 			$this->pdo->queryExec(
 				sprintf('UPDATE releases SET grabs = grabs + 1 WHERE guid = %s', $this->pdo->escapeString($guid))
 			);
