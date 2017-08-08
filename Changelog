@@ -1,4 +1,5 @@
 2017-08-08 DariusIII
+	* Chg: Possible fix for mail support errors when not using PhpMailer
 	* Chg: Update Releases class
 	* Chg: Update misc/testing/PostProc/getMovieCovers.php script
 	* Chg: Update misc/testing/PostProc/getImdb.php script

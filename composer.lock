@@ -3547,12 +3547,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "626c97bd5b45a08db902a0fb0b13f58f3785b439"
+                "reference": "9df1a9e73fc7caa573adaf98d159623048a7feed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/626c97bd5b45a08db902a0fb0b13f58f3785b439",
-                "reference": "626c97bd5b45a08db902a0fb0b13f58f3785b439",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/9df1a9e73fc7caa573adaf98d159623048a7feed",
+                "reference": "9df1a9e73fc7caa573adaf98d159623048a7feed",
                 "shasum": ""
             },
             "conflict": {
@@ -3607,7 +3607,7 @@
                 "silverstripe/framework": ">=3,<3.3",
                 "silverstripe/userforms": "<3",
                 "simplesamlphp/saml2": "<1.8.1|>=1.9,<1.9.1|>=1.10,<1.10.3|>=2,<2.3.3",
-                "simplesamlphp/simplesamlphp": "<1.14.12",
+                "simplesamlphp/simplesamlphp": "<1.14.15",
                 "simplesamlphp/simplesamlphp-module-infocard": "<1.0.1",
                 "socalnick/scn-social-auth": "<1.15.2",
                 "squizlabs/php_codesniffer": ">=1,<2.8.1",
@@ -3676,7 +3676,7 @@
                 }
             ],
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",
-            "time": "2017-07-28T07:54:11+00:00"
+            "time": "2017-08-08T18:44:50+00:00"
         },
         {
             "name": "rtheunissen/guzzle-log-middleware",

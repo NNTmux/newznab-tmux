@@ -84,8 +84,8 @@ if ($showRegister === 1) {
 				}
 			}
 			break;
-		case "view": {
-			$inviteCode = $_GET["invitecode"] ?? null;
+		case 'view': {
+			$inviteCode = $_GET['invitecode'] ?? null;
 			if (isset($inviteCode)) {
 				// See if it is a valid invite.
 				$invite = $page->users->getInvite($inviteCode);
