@@ -723,7 +723,7 @@ class Utility
 		$body .= '</body>' . $eol;
 		$body .= '</html>' . $eol;
 
-		if (defined('PHPMAILER_ENABLED') || PHPMAILER_ENABLED === true) {
+		if (PHPMAILER_ENABLED === true) {
 			$mail = new \PHPMailer;
 
 			// Check to make sure the user has their settings correct.
