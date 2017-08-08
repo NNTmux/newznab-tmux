@@ -1,4 +1,5 @@
 2017-08-08 DariusIII
+	* Chg: Update misc/testing/PostProc/getImdb.php script
 	* Chg: Update Steam class
 	* Fix: Use proper type casting in groupfixrelnames (Fixes issue #159)
 2017-08-07 DariusIII

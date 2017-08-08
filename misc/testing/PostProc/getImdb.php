@@ -7,24 +7,27 @@ use nntmux\ColorCLI;
 use nntmux\Movie;
 
 $pdo = new DB();
-$c = new ColorCLI();
 $movie = new Movie(['Echo' => true, 'Settings' => $pdo]);
 
 
-$movies = $pdo->queryDirect("SELECT imdbid FROM movieinfo WHERE tmdbid = 0 ORDER BY id ASC");
+$movies = $pdo->queryDirect('SELECT imdbid FROM movieinfo WHERE tmdbid = 0 ORDER BY id ASC');
 if ($movies instanceof \Traversable) {
-	echo $pdo->log->header("Updating movie info for " . number_format($movies->rowCount()) . " movies.");
+	$count = $movies->rowCount();
+	if ($count > 0) {
+		echo ColorCLI::header('Updating movie info for ' . number_format($count) . ' movies.');
 
-	foreach ($movies as $mov) {
-		$starttime = microtime(true);
-		$mov = $movie->updateMovieInfo($mov['imdbid']);
+		foreach ($movies as $mov) {
+			$startTime = microtime(true);
+			$mov = $movie->updateMovieInfo($mov['imdbid']);
 
-		// tmdb limits are 30 per 10 sec, not certain for imdb
-		$diff = floor((microtime(true) - $starttime) * 1000000);
-		if (333333 - $diff > 0) {
-			echo "sleeping\n";
-			usleep(333333 - $diff);
+			// tmdb limits are 30 per 10 sec, not certain for imdb
+			$diff = floor((microtime(true) - $startTime) * 1000000);
+			if (333333 - $diff > 0) {
+				echo "sleeping\n";
+				usleep(333333 - $diff);
+			}
 		}
+	} else {
+		echo ColorCLI::header('No movies to update');
 	}
-	echo "\n";
 }
