@@ -31,6 +31,11 @@ class Steam
 	protected $lastUpdate;
 
 	/**
+	 * @var Main
+	 */
+	protected $steamFront;
+
+	/**
 	 * Steam constructor.
 	 *
 	 * @param array $options
@@ -91,6 +96,7 @@ class Steam
 	 * @param string $searchTerm The parsed game name from the release searchname
 	 *
 	 * @return false|int $bestMatch The Best match from the given search term
+	 * @throws \Exception
 	 */
 	public function search($searchTerm)
 	{
