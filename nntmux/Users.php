@@ -1346,7 +1346,7 @@ class Users
 	 * @return int
 	 * @throws \Exception
 	 */
-	public function getApiRequests($userID)
+	public function getApiRequests($userID): int
 	{
 		// Clear old requests.
 		$this->clearApiRequests($userID);
@@ -1514,7 +1514,8 @@ class Users
 	 * @param int $userID
 	 * @return bool
 	 */
-	public function isAdmin($userID) {
+	public function isAdmin($userID): bool
+	{
 		return $this->roleCheck(self::ROLE_ADMIN, (int)$userID);
 	}
 
@@ -1524,7 +1525,8 @@ class Users
 	 * @param int $userId
 	 * @return bool
 	 */
-	public function isModerator($userId) {
+	public function isModerator($userId): bool
+	{
 		return $this->roleCheck(self::ROLE_MODERATOR, (int)$userId);
 	}
 }
