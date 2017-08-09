@@ -941,16 +941,16 @@
         },
         {
             "name": "bower-asset/jquery-goup",
-            "version": "v1.1.1",
+            "version": "v1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dnlnrs/jquery-goup.git",
-                "reference": "475c278d39dc652349152693e8a96bde0bc2f7bb"
+                "reference": "2d8a80cfec7983fbd201b7d2224e0c128a474e17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dnlnrs/jquery-goup/zipball/475c278d39dc652349152693e8a96bde0bc2f7bb",
-                "reference": "475c278d39dc652349152693e8a96bde0bc2f7bb",
+                "url": "https://api.github.com/repos/dnlnrs/jquery-goup/zipball/2d8a80cfec7983fbd201b7d2224e0c128a474e17",
+                "reference": "2d8a80cfec7983fbd201b7d2224e0c128a474e17",
                 "shasum": ""
             },
             "type": "bower-asset-library",
