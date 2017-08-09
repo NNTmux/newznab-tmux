@@ -2,6 +2,7 @@
 namespace nntmux;
 
 use App\Models\Settings;
+use App\Models\UserRequest;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 use App\Models\User;
@@ -165,7 +166,7 @@ class Users
 	 */
 	public function delApiRequests($userID): void
 	{
-		$this->pdo->queryExec(sprintf('DELETE FROM user_requests WHERE users_id = %d', $userID));
+		UserRequest::query()->where('users_id', $userID)->delete();
 	}
 
 	/**
@@ -1343,15 +1344,14 @@ class Users
 	 * @param int $userID
 	 *
 	 * @return int
+	 * @throws \Exception
 	 */
 	public function getApiRequests($userID)
 	{
 		// Clear old requests.
 		$this->clearApiRequests($userID);
-		$requests = $this->pdo->queryOneRow(
-			sprintf('SELECT COUNT(id) AS num FROM user_requests WHERE users_id = %d', $userID)
-		);
-		return (!$requests ? 0 : (int)$requests['num']);
+		$requests = UserRequest::query()->where('users_id', $userID)->count('id');
+		return (!$requests ? 0 : $requests);
 	}
 
 	/**
@@ -1363,35 +1363,25 @@ class Users
 	 */
 	public function addApiRequest($userID, $request): void
 	{
-		$this->pdo->queryInsert(
-			sprintf(
-				'INSERT INTO user_requests (users_id, request, timestamp) VALUES (%d, %s, NOW())',
-				$userID,
-				$this->pdo->escapeString($request)
-			)
-		);
+		UserRequest::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> new \DateTime('Y-m-d H:i:s')]);
 	}
 
 	/**
 	 * Delete api requests older than a day.
 	 *
-	 * @param int|bool  $userID
+	 * @param int|bool $userID
 	 *                   int The users ID.
 	 *                   bool false do all user ID's..
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	protected function clearApiRequests($userID): void
 	{
 		if ($userID === false) {
-			$this->pdo->queryExec('DELETE FROM user_requests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)');
+			UserRequest::query()->where('timestamp', '<', date_sub(new \DateTime('Y-m-d H:i:s'), new \DateInterval('P1D')))->delete();
 		} else {
-			$this->pdo->queryExec(
-				sprintf(
-					'DELETE FROM user_requests WHERE users_id = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)',
-					$userID
-				)
-			);
+			UserRequest::query()->where('users_id', $userID)->where('timestamp', '<', date_sub(new \DateTime('Y-M-D H:i:s'), new \DateInterval('P1D')))->delete();
 		}
 	}
 
@@ -1402,15 +1392,17 @@ class Users
 	 * limits to apply.
 	 *
 	 * @param int $days
+	 *
+	 * @throws \Exception
 	 */
-	public function pruneRequestHistory($days = 0)
+	public function pruneRequestHistory($days = 0): void
 	{
 		if ($days === 0) {
 			$days = 1;
 			$this->pdo->queryExec('UPDATE user_downloads SET releases_id = null');
 		}
 
-		$this->pdo->queryExec(sprintf('DELETE FROM user_requests WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)', $days));
+		UserRequest::query()->where('timestamp', '<', date_sub(new \DateTime('Y-m-d H:i:s'), new \DateInterval('P' . $days . 'D')))->delete();
 		$this->pdo->queryExec(sprintf('DELETE FROM user_downloads WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)', $days));
 	}
 
