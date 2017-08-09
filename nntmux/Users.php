@@ -1363,7 +1363,7 @@ class Users
 	 */
 	public function addApiRequest($userID, $request): void
 	{
-		UserRequest::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> new \DateTime('Y-m-d H:i:s')]);
+		UserRequest::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> new \DateTime('NOW')]);
 	}
 
 	/**
@@ -1379,9 +1379,9 @@ class Users
 	protected function clearApiRequests($userID): void
 	{
 		if ($userID === false) {
-			UserRequest::query()->where('timestamp', '<', date_sub(new \DateTime('Y-m-d H:i:s'), new \DateInterval('P1D')))->delete();
+			UserRequest::query()->where('timestamp', '<', date_sub(new \DateTime('NOW'), new \DateInterval('P1D')))->delete();
 		} else {
-			UserRequest::query()->where('users_id', $userID)->where('timestamp', '<', date_sub(new \DateTime('Y-M-D H:i:s'), new \DateInterval('P1D')))->delete();
+			UserRequest::query()->where('users_id', $userID)->where('timestamp', '<', date_sub(new \DateTime('NOW'), new \DateInterval('P1D')))->delete();
 		}
 	}
 
@@ -1402,7 +1402,7 @@ class Users
 			$this->pdo->queryExec('UPDATE user_downloads SET releases_id = null');
 		}
 
-		UserRequest::query()->where('timestamp', '<', date_sub(new \DateTime('Y-m-d H:i:s'), new \DateInterval('P' . $days . 'D')))->delete();
+		UserRequest::query()->where('timestamp', '<', date_sub(new \DateTime('NOW'), new \DateInterval('P' . $days . 'D')))->delete();
 		$this->pdo->queryExec(sprintf('DELETE FROM user_downloads WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)', $days));
 	}
 
