@@ -5,6 +5,9 @@ use App\Models\Settings;
 
 $page = new Page;
 
+if ($app->isDownForMaintenance()) {
+	$page->showMaintenance();
+}
 
 switch ($page->page) {
 	case 'ajax_mediainfo':

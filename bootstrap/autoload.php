@@ -4,9 +4,11 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPAR
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'bootstrap.php';
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'nntmux.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'yenc.php';
+require __DIR__ . DIRECTORY_SEPARATOR . 'app.php';
 
 
 use Dotenv\Dotenv;
+use Illuminate\Contracts\Console\Kernel;
 
 $dotenv = new Dotenv(dirname(__DIR__, 1));
 $dotenv->load();
@@ -20,3 +22,5 @@ if (!defined('NN_ROOT')) {
 }
 
 require_once NN_ROOT . DS . 'vendor' . DS . 'autoload.php';
+
+$app->make(Kernel::class)->bootstrap();

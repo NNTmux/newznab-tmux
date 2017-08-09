@@ -4,8 +4,8 @@ require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
 
 use App\Models\Settings;
 use nntmux\db\DB;
-use nntmux\Users;
 use nntmux\SABnzbd;
+use nntmux\Users;
 
 class BasePage
 {
@@ -37,6 +37,7 @@ class BasePage
 
 	/**
 	 * Current page the user is browsing. ie browse
+	 *
 	 * @var string
 	 */
 	public $page = '';
@@ -45,24 +46,28 @@ class BasePage
 
 	/**
 	 * User settings from the MySQL DB.
+	 *
 	 * @var array|bool
 	 */
 	public $userdata = [];
 
 	/**
 	 * URL of the server. ie http://localhost/
+	 *
 	 * @var string
 	 */
 	public $serverurl = '';
 
 	/**
 	 * Whether to trim white space before rendering the page or not.
+	 *
 	 * @var bool
 	 */
 	public $trimWhiteSpace = true;
 
 	/**
 	 * Is the current session HTTPS?
+	 *
 	 * @var bool
 	 */
 	public $https = false;
@@ -107,9 +112,10 @@ class BasePage
 		$this->smarty->setConfigDir(NN_SMARTY_CONFIGS);
 		$this->smarty->setCacheDir(NN_SMARTY_CACHE);
 		$this->smarty->setPluginsDir([
-			NN_WWW . 'plugins/',
-			SMARTY_DIR . 'plugins/',
-		]);
+				NN_WWW . 'plugins/',
+				SMARTY_DIR . 'plugins/',
+			]
+		);
 		$this->smarty->error_reporting = (NN_DEBUG ? E_ALL : E_ALL - E_NOTICE);
 
 		if (isset($_SERVER['SERVER_NAME'])) {
@@ -211,7 +217,7 @@ class BasePage
 	 */
 	public function addToHead($headcontent): void
 	{
-		$this->head = $this->head."\n".$headcontent;
+		$this->head = $this->head . "\n" . $headcontent;
 	}
 
 	/**
@@ -221,7 +227,7 @@ class BasePage
 	 */
 	public function addToBody($attr): void
 	{
-		$this->body = $this->body. ' ' .$attr;
+		$this->body = $this->body . ' ' . $attr;
 	}
 
 	/**
@@ -297,13 +303,66 @@ class BasePage
 	}
 
 	/**
+	 * Show maintenance page.
+	 *
+	 */
+	public function showMaintenance(): void
+	{
+		header('HTTP/1.1 503 Service Temporarily Unavailable');
+		die('
+				<html>
+					<head>
+        				<title>Be right back.</title>
+
+        				<link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
+
+       					 <style>
+            					html, body {
+                				height: 100%;
+            					}
+            					body {
+                						margin: 0;
+                						padding: 0;
+                						width: 100%;
+                						color: #B0BEC5;
+                						display: table;
+                						font-weight: 100;
+                						font-family: \'Lato\', sans-serif;
+            							}
+            					.container {
+               					text-align: center;
+                				display: table-cell;
+                				vertical-align: middle;
+            					}
+            					.content {
+                				text-align: center;
+                				display: inline-block;
+            					}
+            					.title {
+                				font-size: 72px;
+                				margin-bottom: 40px;
+            					}
+        				</style>
+    				</head>
+   					 <body>
+        				<div class="container">
+            				<div class="content">
+                				<div class="title">We are currently having an maintenance. Please try later!</div>
+            				</div>
+       					</div>
+    				</body>
+				</html>'
+		);
+	}
+
+	/**
 	 * @param string $retry
 	 */
-	public function show429($retry=''): void
+	public function show429($retry = ''): void
 	{
 		header('HTTP/1.1 429 Too Many Requests');
 		if ($retry !== '')
-			header('Retry-After: '.$retry);
+			header('Retry-After: ' . $retry);
 
 		echo '
 			<html>
@@ -314,7 +373,7 @@ class BasePage
 			<body>
 				<h1>Too Many Requests</h1>
 
-				<p>Wait ' .(($retry !== '') ? ceil($retry/60) . ' minutes ' : '') . 'or risk being temporarily banned.</p>
+				<p>Wait ' . (($retry !== '') ? ceil($retry / 60) . ' minutes ' : '') . 'or risk being temporarily banned.</p>
 
 			</body>
 			</html>';
@@ -354,8 +413,8 @@ class BasePage
 			$this->users->updateSiteAccessed($this->userdata['id']);
 		}
 
-		$this->smarty->assign('userdata',$this->userdata);
-		$this->smarty->assign('loggedin',"true");
+		$this->smarty->assign('userdata', $this->userdata);
+		$this->smarty->assign('loggedin', "true");
 
 		if ($this->userdata['nzbvortex_api_key'] !== '' && $this->userdata['nzbvortex_server_url'] !== '') {
 			$this->smarty->assign('weHasVortex', true);
@@ -393,7 +452,8 @@ class BasePage
 		if (strpos($setting, '.') === false) {
 			trigger_error(
 				'You should update your template to use the newer method "$page->getSettingValue()"" of fetching values from the "settings" table! This method *will* be removed in a future version.',
-				E_USER_WARNING);
+				E_USER_WARNING
+			);
 		} else {
 			return $this->getSettingValue($setting);
 		}
