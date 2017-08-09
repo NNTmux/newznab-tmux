@@ -22,5 +22,5 @@ $capsule->addConnection([
 	'strict' => false
 ]);
 
-$capsule->bootEloquent();
 $capsule->setAsGlobal();
+$capsule->bootEloquent();

@@ -347,7 +347,7 @@ class BasePage
    					 <body>
         				<div class="container">
             				<div class="content">
-                				<div class="title">We are currently having an maintenance. Please try later!</div>
+                				<div class="title">We are currently performing maintenance. Please try again later!</div>
             				</div>
        					</div>
     				</body>
