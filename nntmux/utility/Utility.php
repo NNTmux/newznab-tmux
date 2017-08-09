@@ -798,8 +798,6 @@ class Utility
 		$headers .= 'Content-type: text/html; charset=iso-8859-1' . $eol;
 		$headers .= $eol;
 
-		(new Logger())->log(__CLASS__, __FUNCTION__, 'Phpmailer could not be instantiated, falling back to PHP mail() function', Logger::LOG_ERROR);
-
 		return mail($to, $subject, $body, $headers);
 	}
 

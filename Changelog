@@ -1,3 +1,5 @@
+2017-08-09 DariusIII
+	* Chg: Remove confusing error message from sendEmail function
 2017-08-08 DariusIII
 	* Chg: Possible fix for mail support errors when not using PhpMailer
 	* Chg: Update Releases class
