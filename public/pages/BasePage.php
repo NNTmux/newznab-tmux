@@ -241,25 +241,10 @@ class BasePage
 	/**
 	 * Show 404 page.
 	 */
-	public function show404()
+	public function show404(): void
 	{
 		header('HTTP/1.1 404 Not Found');
-		exit(
-		sprintf('
-				<html>
-					<head>
-						<title>404 - File not found.</title>
-					</head>
-					<body>
-						<h1>404 - File not found.</h1>
-						<p>%s%s</p>
-						<p>We could not find the above page or file on our servers.</p>
-					</body>
-				</html>',
-			$this->serverurl,
-			$this->page
-		)
-		);
+		die(view('errors.404'));
 	}
 
 	/**
@@ -306,7 +291,7 @@ class BasePage
 	 * Show maintenance page.
 	 *
 	 */
-	public function showMaintenance()
+	public function showMaintenance(): void
 	{
 		header('HTTP/1.1 503 Service Temporarily Unavailable');
 		die(view('errors.503'));
@@ -336,6 +321,7 @@ class BasePage
 			</html>';
 		die();
 	}
+
 
 	public function render()
 	{
