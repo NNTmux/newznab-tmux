@@ -1,3 +1,5 @@
+2017-08-10 DariusIII
+	* Chg: Further improve maintenance mode
 2017-08-09 DariusIII
 	* Chg: Add maintenance mode with custom page displayed
 	* Chg: Add UserRequest model and use it in Users class
