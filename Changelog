@@ -1,3 +1,5 @@
+2017-08-11 DariusIII
+	* Chg: Increase rsstoken column to varchar(64) to accommodate new api key size
 2017-08-10 DariusIII
 	* Chg: Use Hash facade for password management in Users class
 	* Chg: Add customized 404 page

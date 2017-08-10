@@ -4,6 +4,7 @@ namespace nntmux;
 use App\Models\Settings;
 use App\Models\UserRequest;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 use App\Models\User;
@@ -494,7 +495,7 @@ class Users
 	 */
 	public function updateRssKey($uid): int
 	{
-		User::query()->where('id', $uid)->update(['rsstoken' => md5(uniqid('', true))]);
+		User::query()->where('id', $uid)->update(['rsstoken' => Password::getRepository()->createNewToken()]);
 
 		return self::SUCCESS;
 	}
@@ -814,7 +815,7 @@ class Users
 				$this->pdo->escapeString($email),
 				$role,
 				$this->pdo->escapeString((int)Settings::value('..storeuserips') === 1 ? $host : ''),
-				$this->pdo->escapeString(uniqid('', true)),
+				$this->pdo->escapeString(Password::getRepository()->createNewToken()),
 				$invites,
 				((int)$invitedBy === 0 ? 'NULL' : $invitedBy),
 				$this->pdo->escapeString($this->pdo->uuid()),
