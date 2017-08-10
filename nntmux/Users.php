@@ -3,6 +3,7 @@ namespace nntmux;
 
 use App\Models\Settings;
 use App\Models\UserRequest;
+use Illuminate\Support\Facades\Hash;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 use App\Models\User;
@@ -75,12 +76,12 @@ class Users
 	 */
 	public function checkPassword($password, $hash, $userID = -1): bool
 	{
-		if (password_verify($password, $hash) === false) {
+		if (Hash::check($password, $hash) === false) {
 			return false;
 		}
 
 		// Update the hash if it needs to be.
-		if (is_numeric($userID) && $userID > 0 && password_needs_rehash($hash, PASSWORD_DEFAULT, ['cost' => $this->password_hash_cost])) {
+		if (is_numeric($userID) && $userID > 0 && Hash::needsRehash($hash)) {
 			$hash = $this->hashPassword($password);
 
 			if ($hash !== false) {
@@ -533,7 +534,7 @@ class Users
 	 */
 	public function hashPassword($password)
 	{
-		return password_hash($password, PASSWORD_DEFAULT, ['cost' => $this->password_hash_cost]);
+		return Hash::make($password);
 	}
 
 	/**
