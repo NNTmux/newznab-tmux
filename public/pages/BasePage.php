@@ -308,7 +308,8 @@ class BasePage
 	 */
 	public function showMaintenance()
 	{
-		die(response()->view('errors.503', [], 503));
+		header('HTTP/1.1 503 Service Temporarily Unavailable');
+		die(view('errors.503'));
 	}
 
 	/**
