@@ -1173,7 +1173,7 @@ CREATE TABLE users (
   role           INT              NOT NULL DEFAULT '1',
   host           VARCHAR(40)      NULL,
   grabs          INT              NOT NULL DEFAULT '0',
-  rsstoken       VARCHAR(32)      NOT NULL,
+  rsstoken       VARCHAR(64)      NOT NULL,
   createddate    DATETIME         NOT NULL,
   resetguid      VARCHAR(50)      NULL,
   lastlogin      DATETIME                  DEFAULT NULL,
