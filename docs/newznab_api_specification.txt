@@ -7,7 +7,7 @@ Authors:
 ensi     ensisoft@gmail.com
 newznab  http://newznab.com/
 nZEDb    https://github.com/nZEDb/nZEDb
-newznab-tmux https://github.com/DariusIII/newznab-tmux
+newznab-tmux https://github.com/NNTmux/newznab-tmux
 
 1.  Introduction
 2.  Functions
