@@ -1,4 +1,5 @@
 2017-08-11 DariusIII
+	* Chg: Remove duplicate zipfile.php
 	* Chg: Add 2 more files originating from laravel installation(server.php for local dev web server used by laravel)
 	* Chg: Increase rsstoken column to varchar(64) to accommodate new api key size
 2017-08-10 DariusIII
