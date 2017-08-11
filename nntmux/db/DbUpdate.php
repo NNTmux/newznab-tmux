@@ -165,6 +165,8 @@ class DbUpdate
 	 * numbers to order them. i.e. +1~settings.sql, +2~predb.sql, etc.
 	 *
 	 * @param array $options
+	 *
+	 * @throws \Exception
 	 */
 	public function newPatches(array $options = [])
 	{
@@ -195,7 +197,7 @@ class DbUpdate
 				} else {
 					echo $this->log->header('Processing patch file: ' . $file);
 					$this->splitSQL($file, ['local' => $local, 'data' => $options['data']]);
-					$current = (integer)Settings::value('..sqlpatch');
+					$current = Settings::value('..sqlpatch');
 					$current++;
 					$this->pdo->queryExec("UPDATE settings SET value = '$current' WHERE setting = 'sqlpatch';");
 					$newName = $matches['drive'] . $matches['path'] .
@@ -248,7 +250,7 @@ class DbUpdate
 					$patch,
 					$matches)
 				) {
-					$patch = (integer)$matches['patch'];
+					$patch = (int)$matches['patch'];
 				} else {
 					throw new \RuntimeException("No patch information available, stopping!!");
 				}
@@ -259,7 +261,7 @@ class DbUpdate
 					}
 					$this->splitSQL($file, ['local' => $local, 'data' => $data]);
 					if ($setPatch) {
-						$this->pdo->queryExec("UPDATE settings SET value = '$patch' WHERE setting = 'sqlpatch';");
+						Settings::query()->where('setting', '=', 'sqlpatch')->update(['value' => $patch]);
 					}
 					$patched++;
 				}
