@@ -102,7 +102,7 @@ Class RSS extends Capabilities
 				($videosId > 0 ? sprintf('AND r.videos_id = %d %s', $videosId, ($catSearch === '' ? $catLimit : '')) : ''),
 				($aniDbID > 0 ? sprintf('AND r.anidbid = %d %s', $aniDbID, ($catSearch === '' ? $catLimit : '')) : ''),
 				($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY)', $airDate) : ''),
-				(' LIMIT 0,' . ($offset > 100 ? 100 : $offset))
+				' LIMIT 0,' . ($offset > 100 ? 100 : $offset)
 			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 		return $sql;
@@ -156,7 +156,7 @@ Class RSS extends Capabilities
 				Category::TV_ROOT,
 				Category::TV_OTHER,
 				$this->releases->showPasswords,
-				(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
+				' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0'
 			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 	}
@@ -206,7 +206,7 @@ Class RSS extends Capabilities
 				Category::MOVIE_ROOT,
 				Category::MOVIE_OTHER,
 				$this->releases->showPasswords,
-				(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
+				' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0'
 			),
 			true,
 			NN_CACHE_EXPIRY_MEDIUM

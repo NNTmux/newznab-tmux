@@ -135,7 +135,7 @@ abstract class Capabilities
 		return [
 			'server' => [
 				'appversion' => (new Versions())->getGitTagInFile(),
-				'version'    => '0.1',
+				'version'    => (new Versions())->getGitTagInRepo(),
 				'title'      => Settings::value('site.main.title'),
 				'strapline'  => Settings::value('site.main.strapline'),
 				'email'      => Settings::value('site.main.email'),
