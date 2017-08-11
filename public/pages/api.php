@@ -103,7 +103,7 @@ $minSize = (isset($_GET['minsize']) && $_GET['minsize'] > 0 ? $_GET['minsize'] :
 $offset = $api->offset();
 
 // Set API Parameters based on Request objects
-$params['extended'] = (isset($_GET['extended']) && $_GET['extended'] === 1 ? '1' : '0');
+$params['extended'] = (isset($_GET['extended']) && (int)$_GET['extended'] === 1 ? '1' : '0');
 $params['del'] = (isset($_GET['del']) && $_GET['del'] === 1 ? '1' : '0');
 $params['uid'] = $uid;
 $params['token'] = $apiKey;
