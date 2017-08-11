@@ -1,4 +1,5 @@
 2017-08-11 DariusIII
+	* Fix: Fix API/RSS feeds
 	* Chg: Update API/RSS related classes
 	* Chg: Revert inserting apikey into old behavior
 	* Chg: Change the length of rsstoken (api key)

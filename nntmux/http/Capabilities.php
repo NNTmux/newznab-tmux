@@ -127,7 +127,7 @@ abstract class Capabilities
 		if (isset($_SERVER['SERVER_NAME'])) {
 			$serverroot = (
 				($https === true ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] .
-				(($_SERVER['SERVER_PORT'] !== '80' && $_SERVER['SERVER_PORT'] !== '443') ? ':' . $_SERVER['SERVER_PORT'] : '') .
+				(((int)$_SERVER['SERVER_PORT'] !== 80 && (int)$_SERVER['SERVER_PORT'] !== 443) ? ':' . $_SERVER['SERVER_PORT'] : '') .
 				WWW_TOP . '/'
 			);
 		}

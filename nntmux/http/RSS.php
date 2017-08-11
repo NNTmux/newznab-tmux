@@ -2,7 +2,6 @@
 
 namespace nntmux\http;
 
-use nntmux\db\DB;
 use nntmux\Releases;
 use nntmux\Category;
 use nntmux\NZB;
@@ -19,11 +18,6 @@ Class RSS extends Capabilities
 	 */
 	public $releases;
 
-	/** DB class
-	 * @var \nntmux\db\Settings
-	 */
-	public $pdo;
-
 	/**
 	 * @param array $options
 	 *
@@ -38,7 +32,6 @@ Class RSS extends Capabilities
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
 	}
 
@@ -109,7 +102,7 @@ Class RSS extends Capabilities
 				($videosId > 0 ? sprintf('AND r.videos_id = %d %s', $videosId, ($catSearch === '' ? $catLimit : '')) : ''),
 				($aniDbID > 0 ? sprintf('AND r.anidbid = %d %s', $aniDbID, ($catSearch === '' ? $catLimit : '')) : ''),
 				($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY)', $airDate) : ''),
-				' LIMIT 0,' . ($offset > 100 ? 100 : $offset)
+				(' LIMIT 0,' . ($offset > 100 ? 100 : $offset))
 			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 		return $sql;
@@ -163,7 +156,7 @@ Class RSS extends Capabilities
 				Category::TV_ROOT,
 				Category::TV_OTHER,
 				$this->releases->showPasswords,
-				' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0'
+				(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
 			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 	}
@@ -213,7 +206,7 @@ Class RSS extends Capabilities
 				Category::MOVIE_ROOT,
 				Category::MOVIE_OTHER,
 				$this->releases->showPasswords,
-				' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0'
+				(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
 			),
 			true,
 			NN_CACHE_EXPIRY_MEDIUM
@@ -231,11 +224,11 @@ Class RSS extends Capabilities
 	public function getFirstInstance($column, $table, $order)
 	{
 		return $this->pdo->queryOneRow(
-			sprintf("
-				SELECT %1\$s
-				FROM %2\$s
-				WHERE %1\$s > 0
-				ORDER BY %3\$s ASC",
+			sprintf('
+				SELECT %1$s
+				FROM %2$s
+				WHERE %1$s > 0
+				ORDER BY %3$s ASC',
 				$column,
 				$table,
 				$order
