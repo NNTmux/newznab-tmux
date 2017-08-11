@@ -18,22 +18,22 @@ class Versions
 	const UPDATED_SQL_FILE_LAST	= 8;
 
 	/**
-	 * @var \nntmux\utility\Git instance variable.
+	 * @var Git instance variable.
 	 */
 	public $git;
 
 	/**
-	 * @var object nntmux\ColorCLI
+	 * @var ColorCLI
 	 */
 	public $out;
 
 	/**
-	 * @var integer Bitwise mask of elements that have been changed.
+	 * @var int
 	 */
 	protected $_changes = 0;
 
 	/**
-	 * @var string Path and filename for the XML file.
+	 * @var null|string
 	 */
 	protected $_filespec;
 
@@ -84,7 +84,7 @@ class Versions
 		$this->getValidVersionsFile();
 	}
 
-	public function changes()
+	public function changes(): int
 	{
 		return $this->_changes;
 	}
@@ -116,15 +116,15 @@ class Versions
 		}
 
 		$count = $this->git->commits();
-		if ($this->_vers->git->commit->__toString() < $count || GIT_PRE_COMMIT === true) {
+		if (GIT_PRE_COMMIT === true || $this->_vers->git->commit->__toString() < $count) {
 			// Allow pre-commit to override the commit number (often branch number is higher than dev's)
 			if ($update) {
 				if (GIT_PRE_COMMIT === true) {
 					// only the pre-commit script is allowed to set the NEXT commit number
-					$count += 1;
+					$count++;
 				}
-				if ($count != $this->_vers->git->commit) {
-					echo $this->out->primary("Updating commit number to {$count}");
+				if ($count !== $this->_vers->git->commit) {
+					echo ColorCLI::primary("Updating commit number to {$count}");
 					$this->_vers->git->commit = $count;
 					$this->_changes |= self::UPDATED_GIT_COMMIT;
 				}
@@ -143,13 +143,14 @@ class Versions
 	public function checkGitTag($update = true)
 	{
 		trigger_error(
-			"This method is deprecated. Use app/extensions/utils/Versions::checkGitTag() instead.");
+			'This method is deprecated. Use app/extensions/utils/Versions::checkGitTag() instead.'
+		);
 
 		$branch = $this->git->getBranch();
 		$this->_gitHighestTag = $latest = trim($this->git->tagLatest());
 		$ver = preg_match('#v(\d+\.\d+\.\d+).*#', $latest, $matches) ? $matches[1] : $latest;
 
-		if (!in_array($branch, $this->_stable)) {
+		if (!in_array($branch, $this->_stable, false)) {
 			if (version_compare($this->_vers->git->tag, '0.0.0', '!=')) {
 				$this->_vers->git->tag = '0.0.0';
 				$this->_changes |= self::UPDATED_GIT_TAG;
@@ -159,16 +160,16 @@ class Versions
 		// Check if version file's entry is the same as current branch's tag
 		if (version_compare($this->_vers->git->tag, $latest, '!=')) {
 			if ($update) {
-				echo $this->out->primaryOver("Updating tag version to ") . $this->out->headerOver($latest);
+				echo ColorCLI::primaryOver('Updating tag version to ') . ColorCLI::headerOver($latest);
 				$this->_vers->git->tag = $ver;
 				$this->_changes |= self::UPDATED_GIT_TAG;
 			} else {
-				echo $this->out->primaryOver("Leaving tag version at ") .
-					$this->out->headerOver($this->_vers->git->tag);
+				echo ColorCLI::primaryOver('Leaving tag version at ') .
+					ColorCLI::headerOver($this->_vers->git->tag);
 			}
 			return $this->_vers->git->tag;
 		} else {
-			echo $this->out->primaryOver("Tag version is ") . $this->out->header($latest);
+			echo ColorCLI::primaryOver('Tag version is ') . ColorCLI::header($latest);
 		}
 		return false;
 	}
@@ -180,16 +181,16 @@ class Versions
 	 *
 	 * @return boolean The new database sqlpatch version, or false.
 	 */
-	public function checkSQLDb($update = false)
+	public function checkSQLDb($update = false): bool
 	{
 		$this->checkSQLFileLatest($update);
 
 		//$settings = new DB();
 		//$setting  = $settings->getSetting('sqlpatch');
 
-		if ($this->_vers->sql->db->__toString() != $this->_vers->sql->file->__toString()) {
+		if ($this->_vers->sql->db->__toString() !== $this->_vers->sql->file->__toString()) {
 			if ($update) {
-				echo $this->out->primaryOver("Updating Db revision to " . $this->_vers->sql->file);
+				echo ColorCLI::primaryOver('Updating Db revision to ' . $this->_vers->sql->file);
 				$this->_vers->sql->db = $this->_vers->sql->file->__toString();
 				$this->_changes |= self::UPDATED_SQL_DB_PATCH;
 			}
@@ -218,16 +219,16 @@ class Versions
 		$files = Utility::getDirFiles($options);
 		natsort($files);
 
-		$last = (preg_match($options['regex'], end($files), $matches)) ? (int)$matches['patch'] : false;
+		$last = preg_match($options['regex'], end($files), $matches) ? (int)$matches['patch'] : false;
 
 		if ($update) {
-			if ($last !== false && $this->_vers->sql->file->__toString() != $last) {
-				echo $this->out->primary("Updating latest patch file to " . $last);
+			if ($last !== false && $this->_vers->sql->file->__toString() !== $last) {
+				echo ColorCLI::primary('Updating latest patch file to ' . $last);
 				$this->_vers->sql->file = $last;
 				$this->_changes |= self::UPDATED_SQL_FILE_LAST;
 			}
 
-			if ($this->_vers->sql->file->__toString() != $last) {
+			if ($this->_vers->sql->file->__toString() !== $last) {
 				$this->_vers->sql->file = $last;
 				$this->_changes |= self::UPDATED_SQL_DB_PATCH;
 			}
@@ -263,6 +264,12 @@ class Versions
 		return $this->_gitHighestTag;
 	}
 
+	/**
+	 * @param null|string $filepath
+	 *
+	 * @return object|\SimpleXMLElement
+	 * @throws \Exception
+	 */
 	public function getValidVersionsFile($filepath = null)
 	{
 		$filepath = empty($filepath) ? $this->_filespec : $filepath;
@@ -273,19 +280,19 @@ class Versions
 
 		if ($this->_xml === false) {
 			if (Utility::isCLI()) {
-				$this->out->error("Your versions XML file ($filepath) is broken, try updating from git.");
+				ColorCLI::error("Your versions XML file ($filepath) is broken, try updating from git.");
 			}
-			throw new \Exception("Failed to open versions XML file '$filepath'");
+			throw new \RuntimeException("Failed to open versions XML file '$filepath'");
 		}
 
 		if ($this->_xml->count() > 0) {
 			$vers = $this->_xml->xpath('/nntmux/versions');
 
-			if ($vers[0]->count() == 0) {
-				$this->out->error("Your versions XML file ({NN_VERSIONS}) does not contain version info, try updating from git.");
-				throw new \Exception("Failed to find versions node in XML file '$filepath'");
+			if ($vers[0]->count() === 0) {
+				ColorCLI::error('Your versions XML file ({NN_VERSIONS}) does not contain version info, try updating from git.');
+				throw new \RuntimeException("Failed to find versions node in XML file '$filepath'");
 			} else {
-				$this->out->primary("Your versions XML file ({NN_VERSIONS}) looks okay, continuing.");
+				ColorCLI::primary('Your versions XML file ({NN_VERSIONS}) looks okay, continuing.');
 				$this->_vers = &$this->_xml->versions;
 			}
 		} else {
@@ -299,12 +306,12 @@ class Versions
 	 * Check whether the XML has been changed by one of the methods here.
 	 * @return boolean True if the XML has been changed.
 	 */
-	public function hasChanged()
+	public function hasChanged(): bool
 	{
-		return $this->_changes != 0;
+		return $this->_changes !== 0;
 	}
 
-	public function save()
+	public function save(): void
 	{
 		if ($this->hasChanged()) {
 			$this->_xml->asXML($this->_filespec);
@@ -312,4 +319,3 @@ class Versions
 		}
 	}
 }
-?>
