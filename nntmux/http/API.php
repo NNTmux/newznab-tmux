@@ -32,11 +32,6 @@ use nntmux\Groups;
  */
 class API extends Capabilities {
 
-	/** DB class
-	 * @var \nntmux\db\Settings
-	 */
-	public $pdo;
-
 	/**
 	 * @var array $_GET The get request from the web server
 	 */
@@ -54,7 +49,6 @@ class API extends Capabilities {
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->getRequest = $options['Request'];
 	}
 
@@ -85,11 +79,11 @@ class API extends Capabilities {
 	 *
 	 * @return int $maxAge The maximum age of the release
 	 */
-	public function maxAge()
+	public function maxAge(): int
 	{
 		$maxAge = -1;
 		if (isset($this->getRequest['maxage'])) {
-			if ($this->getRequest['maxage'] == '') {
+			if ($this->getRequest['maxage'] === '') {
 				Utility::showApiError(201, 'Incorrect parameter (maxage must not be empty)');
 			} elseif (!is_numeric($this->getRequest['maxage'])) {
 				Utility::showApiError(201, 'Incorrect parameter (maxage must be numeric)');
@@ -104,14 +98,14 @@ class API extends Capabilities {
 	 * Verify cat parameter.
 	 * @return array
 	 */
-	public function categoryID()
+	public function categoryID(): array
 	{
 		$categoryID[] = -1;
 		if (isset($this->getRequest['cat'])) {
 			$categoryIDs = urldecode($this->getRequest['cat']);
 			// Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
-			if (strpos($categoryIDs, (string)Category::TV_HD) !== false &&
-				strpos($categoryIDs, (string)Category::TV_WEBDL) === false) {
+			if (strpos($categoryIDs, Category::TV_HD) !== false &&
+				strpos($categoryIDs, Category::TV_WEBDL) === false) {
 				$categoryIDs .= (',' . Category::TV_WEBDL);
 			}
 			$categoryID = explode(',', $categoryIDs);
@@ -139,7 +133,7 @@ class API extends Capabilities {
 	 * Verify limit parameter.
 	 * @return int
 	 */
-	public function limit()
+	public function limit(): int
 	{
 		$limit = 100;
 		if (isset($this->getRequest['limit']) && is_numeric($this->getRequest['limit']) && $this->getRequest['limit'] < 100) {
@@ -152,7 +146,7 @@ class API extends Capabilities {
 	 * Verify offset parameter.
 	 * @return int
 	 */
-	public function offset()
+	public function offset(): int
 	{
 		$offset = 0;
 		if (isset($this->getRequest['offset']) && is_numeric($this->getRequest['offset'])) {
@@ -167,7 +161,7 @@ class API extends Capabilities {
 	 */
 	public function verifyEmptyParameter($parameter)
 	{
-		if (isset($this->getRequest[$parameter]) && $this->getRequest[$parameter] == '') {
+		if (isset($this->getRequest[$parameter]) && $this->getRequest[$parameter] === '') {
 			Utility::showApiError(201, 'Incorrect parameter (' . $parameter . ' must not be empty)');
 		}
 	}

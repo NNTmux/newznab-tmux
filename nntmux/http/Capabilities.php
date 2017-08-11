@@ -34,7 +34,7 @@ use nntmux\utility\Utility;
 abstract class Capabilities
 {
 	/**
-	 * @var Settings
+	 * @var DB
 	 */
 	public $pdo;
 
@@ -66,8 +66,10 @@ abstract class Capabilities
 	 * @param bool   $xml    True: Print as XML False: Print as JSON.
 	 * @param int    $offset How much releases to skip
 	 * @param string $type   What type of API query to format if XML
+	 *
+	 * @throws \Exception
 	 */
-	public function output($data, $params, $xml = true, $offset, $type = '')
+	public function output($data, $params, $xml = true, $offset, $type = ''): void
 	{
 		$this->type = $type;
 
@@ -115,23 +117,24 @@ abstract class Capabilities
 	 * Collect and return various capability information for usage in API
 	 *
 	 * @return array
+	 * @throws \Exception
 	 */
-	public function getForMenu()
+	public function getForMenu(): array
 	{
 		$serverroot = '';
-		$https = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? true : false);
+		$https = (isset($_SERVER['HTTPS']) && (int)$_SERVER['HTTPS'] === 'on');
 
 		if (isset($_SERVER['SERVER_NAME'])) {
 			$serverroot = (
 				($https === true ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] .
-				(($_SERVER['SERVER_PORT'] != '80' && $_SERVER['SERVER_PORT'] != '443') ? ':' . $_SERVER['SERVER_PORT'] : '') .
+				(($_SERVER['SERVER_PORT'] !== '80' && $_SERVER['SERVER_PORT'] !== '443') ? ':' . $_SERVER['SERVER_PORT'] : '') .
 				WWW_TOP . '/'
 			);
 		}
 
 		return [
 			'server' => [
-				'appversion' => (new Versions())->getGitTagInRepo(),
+				'appversion' => (new Versions())->getGitTagInFile(),
 				'version'    => '0.1',
 				'title'      => Settings::value('site.main.title'),
 				'strapline'  => Settings::value('site.main.strapline'),
@@ -146,7 +149,7 @@ abstract class Capabilities
 			],
 			'registration' => [
 				'available' => 'yes',
-				'open'      => Settings::value('..registerstatus') == 0 ? 'yes' : 'no'
+				'open'      => (int)Settings::value('..registerstatus') === 0 ? 'yes' : 'no'
 			],
 			'searching' => [
 				'search'       => ['available' => 'yes', 'supportedParams' => 'q'],
@@ -155,10 +158,9 @@ abstract class Capabilities
 				'audio-search' => ['available' => 'no',  'supportedParams' => '']
 			],
 			'categories' =>
-				($this->type === 'caps'
+				$this->type === 'caps'
 					? (new Category(['Settings' => $this->pdo]))->getForMenu()
 					: null
-				)
 		];
 	}
 }
