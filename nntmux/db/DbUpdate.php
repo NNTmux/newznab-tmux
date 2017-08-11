@@ -32,12 +32,12 @@ class DbUpdate
 	public $backedup;
 
 	/**
-	 * @var \nntmux\db\DB    Instance variable for DB object.
+	 * @var DB    Instance variable for DB object.
 	 */
 	public $pdo;
 
 	/**
-	 * @var \nntmux\utility\Git instance
+	 * @var Git instance
 	 */
 	public $git;
 
@@ -62,7 +62,7 @@ class DbUpdate
 	/**
 	 * @var bool    Should we perform a backup?
 	 */
-	private $backup = false;
+	private $backup;
 
 	public function __construct(array $options = [])
 	{
@@ -81,7 +81,10 @@ class DbUpdate
 		$this->_DbSystem = strtolower($this->pdo->DbSystem());
 	}
 
-	public function loadTables(array $options = [])
+	/**
+	 * @param array $options
+	 */
+	public function loadTables(array $options = []): void
 	{
 		$defaults = [
 			'enclosedby'	=> null,
@@ -168,7 +171,7 @@ class DbUpdate
 	 *
 	 * @throws \Exception
 	 */
-	public function newPatches(array $options = [])
+	public function newPatches(array $options = []): void
 	{
 		$defaults = [
 			'data'	=> NN_RES . 'db' . DS . 'schema' . DS . 'data' . DS,
@@ -199,7 +202,7 @@ class DbUpdate
 					$this->splitSQL($file, ['local' => $local, 'data' => $options['data']]);
 					$current = Settings::value('..sqlpatch');
 					$current++;
-					$this->pdo->queryExec("UPDATE settings SET value = '$current' WHERE setting = 'sqlpatch';");
+					Settings::query()->where('setting', '=', 'sqlpatch')->update(['value' => $current]);
 					$newName = $matches['drive'] . $matches['path'] .
 						str_pad($current, 4, '0', STR_PAD_LEFT) . '~' .
 						$matches['table'] . '.sql';
@@ -213,7 +216,13 @@ class DbUpdate
 		}
 	}
 
-	public function processPatches(array $options = [])
+	/**
+	 * @param array $options
+	 *
+	 * @return int
+	 * @throws \RuntimeException
+	 */
+	public function processPatches(array $options = []): int
 	{
 		$patched = 0;
 		$defaults = [
@@ -252,11 +261,11 @@ class DbUpdate
 				) {
 					$patch = (int)$matches['patch'];
 				} else {
-					throw new \RuntimeException("No patch information available, stopping!!");
+					throw new \RuntimeException('No patch information available, stopping!!');
 				}
 				if ($patch > $currentVersion) {
 					echo $this->log->header('Processing patch file: ' . $file);
-					if ($options['safe'] && !$this->backedUp) {
+					if (!$this->backedUp && $options['safe']) {
 						$this->_backupDb();
 					}
 					$this->splitSQL($file, ['local' => $local, 'data' => $data]);
@@ -276,7 +285,10 @@ class DbUpdate
 		return $patched;
 	}
 
-	public function processSQLFile(array $options = [])
+	/**
+	 * @param array $options
+	 */
+	public function processSQLFile(array $options = []): void
 	{
 		$defaults = [
 			'filepath' => NN_RES . 'db' . DS . 'schema' . DS . $this->_DbSystem . '-ddl.sql',
@@ -288,7 +300,11 @@ class DbUpdate
 		$this->pdo->exec($sql);
 	}
 
-	public function splitSQL($file, array $options = [])
+	/**
+	 * @param       $file
+	 * @param array $options
+	 */
+	public function splitSQL($file, array $options = []): void
 	{
 		$defaults = [
 			'data'		=> null,
@@ -298,13 +314,13 @@ class DbUpdate
 		$options += $defaults;
 
 		if (!empty($options['vars'])) {
-			extract($options['vars']);
+			extract($options['vars'], 'EXTR_OVERWRITE');
 		}
 
 		set_time_limit(0);
 
 		if (is_file($file)) {
-			$file = fopen($file, 'r');
+			$file = fopen($file, 'r, b');
 
 			if (is_resource($file)) {
 				$query = [];
@@ -319,7 +335,7 @@ class DbUpdate
 
 					// Skip comments.
 					if (preg_match('!^\s*(#|--|//)\s*(.+?)\s*$!', $line, $matches)) {
-						echo ColorCLI::info("COMMENT: " . $matches[2]);
+						echo ColorCLI::info('COMMENT: ' . $matches[2]);
 						continue;
 					}
 
@@ -329,13 +345,13 @@ class DbUpdate
 						if (NN_DEBUG) {
 							echo ColorCLI::debug("DEBUG: Delimiter switched to $delimiter");
 						}
-						if ($delimiter != $options['delimiter']) {
+						if ($delimiter !== $options['delimiter']) {
 							continue;
 						}
 					}
 
 					// Check if the line has delimiter that is non default ($$ for example).
-					if ($delimiter != $options['delimiter'] && preg_match('#^(.+?)' . preg_quote($delimiter) . '\s*$#', $line, $matches)) {
+					if ($delimiter !== $options['delimiter'] && preg_match('#^(.+?)' . preg_quote($delimiter) . '\s*$#', $line, $matches)) {
 						// Check if the line has also the default delimiter (;), remove it.
 						if (preg_match('#^(.+?)' . preg_quote($options['delimiter']) . '\s*$#', $matches[1], $matches2)) {
 							$matches[1] = $matches2[1];
@@ -346,7 +362,7 @@ class DbUpdate
 
 					$query[] = $line;
 
-					if (preg_match('~' . preg_quote($delimiter, '~') . '\s*$~iS', $line) == 1) {
+					if (preg_match('~' . preg_quote($delimiter, '~') . '\s*$~iS', $line) === 1) {
 						$query = trim(implode('', $query));
 						if ($options['local'] !== null) {
 							$query = str_replace('{:local:}', $options['local'], $query);
@@ -356,7 +372,7 @@ class DbUpdate
 						}
 
 						try {
-							$qry = $this->pdo->prepare($query);
+							$qry = $this->pdo->Prepare($query);
 							$qry->execute();
 							echo $this->log->alternateOver('SUCCESS: ') . $this->log->primary($query);
 						} catch (\PDOException $e) {
@@ -371,10 +387,10 @@ class DbUpdate
 							);
 
 							if (
-								in_array($e->errorInfo[1], [1091, 1060, 1061, 1071, 1146]) ||
-								in_array($e->errorInfo[0], [23505, 42701, 42703, '42P07', '42P16'])
+								in_array($e->errorInfo[1], [1091, 1060, 1061, 1071, 1146], false) ||
+								in_array($e->errorInfo[0], [23505, 42701, 42703, '42P07', '42P16'], false)
 							) {
-								if ($e->errorInfo[1] == 1060) {
+								if ($e->errorInfo[1] === 1060) {
 									echo $this->log->warning(
 										"$query The column already exists - No need to worry \{" .
 										$e->errorInfo[1] . "}.\n"
@@ -387,7 +403,7 @@ class DbUpdate
 								}
 							} else {
 								if (preg_match('/ALTER IGNORE/i', $query)) {
-									$this->pdo->queryExec("SET SESSION old_alter_table = 1");
+									$this->pdo->queryExec('SET SESSION old_alter_table = 1');
 									try {
 										$this->pdo->exec($query);
 										echo $this->log->alternateOver('SUCCESS: ') . $this->log->primary($query);
@@ -414,7 +430,10 @@ class DbUpdate
 		}
 	}
 
-	public function updateSchemaData(array $options = [])
+	/**
+	 * @param array $options
+	 */
+	public function updateSchemaData(array $options = []): void
 	{
 		$changed	= false;
 		$default	= [
@@ -435,7 +454,7 @@ class DbUpdate
 			while ($index < $count) {
 				if (preg_match($options['regex'], $file[$index], $matches)) {
 					if (VERBOSE) {
-						echo $this->log->primary("Matched: " . $file[$index]);
+						echo $this->log->primary('Matched: ' . $file[$index]);
 					}
 					$index++;
 
@@ -451,18 +470,14 @@ class DbUpdate
 
 		if ($changed) {
 			if (file_put_contents($filespec, implode("\n", $file)) === false) {
-				echo $this->log->error("Error writing file to disc!!");
+				echo $this->log->error('Error writing file to disc!!');
 			}
 		}
 	}
 
-	protected function _backupDb()
+	protected function _backupDb(): void
 	{
-		if (Utility::hasCommand("php5")) {
-			$PHP = "php5";
-		} else {
-			$PHP = "php";
-		}
+		$PHP = 'php';
 
 		system("$PHP " . NN_MISC . 'testing' . DS . 'DB' . DS . $this->_DbSystem .
 			'dump_tables.php db dump');
