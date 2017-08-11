@@ -184,6 +184,7 @@ class Users
 	 * @param bool   $apiRequests
 	 *
 	 * @return array
+	 * @throws \Exception
 	 */
 	public function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false): array
 	{
@@ -809,7 +810,7 @@ class Users
 			sprintf('
 				INSERT INTO users (username, password, email, role, createddate, host, rsstoken,
 					invites, invitedby, userseed, notes)
-				VALUES (%s, %s, LOWER(%s), %d, NOW(), %s, MD5(%s), %d, %s, MD5(%s), %s)',
+				VALUES (%s, %s, LOWER(%s), %d, NOW(), %s, %s, %d, %s, MD5(%s), %s)',
 				$this->pdo->escapeString($userName),
 				$this->pdo->escapeString((string)$password),
 				$this->pdo->escapeString($email),
