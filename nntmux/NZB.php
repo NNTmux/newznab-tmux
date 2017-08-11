@@ -43,15 +43,12 @@ class NZB
 	protected $groupID;
 
 	/**
-	 * Instance of class db.
-	 *
-	 * @var \nntmux\db\Settings
-	 * @access public
+	 * @var DB
 	 */
 	public $pdo;
 
 	/**
-	 * @var \nntmux\Logger
+	 * @var Logger
 	 */
 	protected $debugging;
 
@@ -148,7 +145,7 @@ class NZB
 		$this->groupID = $groupID;
 		// Set table names
 
-		if ($this->groupID == '') {
+		if ($this->groupID === '') {
 			exit("{$this->groupID} is missing\n");
 		}
 		$this->_tableNames = [
@@ -159,7 +156,7 @@ class NZB
 		$this->setQueries();
 	}
 
-	protected function setQueries()
+	protected function setQueries(): void
 	{
 		$this->_collectionsQuery = "
 			SELECT c.*, UNIX_TIMESTAMP(c.date) AS udate,
@@ -191,7 +188,7 @@ class NZB
 	 *
 	 * @access public
 	 */
-	public function writeNZBforReleaseId($relID, $relGuid, $name, $cTitle)
+	public function writeNZBforReleaseId($relID, $relGuid, $name, $cTitle): bool
 	{
 		$collections = $this->pdo->queryDirect($this->_collectionsQuery . $relID);
 
@@ -343,7 +340,7 @@ class NZB
 	 *
 	 * @access public
 	 */
-	public function getNZBPath($releaseGuid, $levelsToSplit = 0, $createIfNotExist = false)
+	public function getNZBPath($releaseGuid, $levelsToSplit = 0, $createIfNotExist = false): string
 	{
 		if ($levelsToSplit === 0) {
 			$levelsToSplit = $this->nzbSplitLevel;
@@ -382,7 +379,7 @@ class NZB
 	 *
 	 * @access public
 	 */
-	public function nzbFileList($nzb, array $options = [])
+	public function nzbFileList($nzb, array $options = []): array
 	{
 		$defaults = [
 			'no-file-key' => true,

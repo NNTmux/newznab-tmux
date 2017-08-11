@@ -13,6 +13,8 @@ class NZBMultiGroup extends NZB
 	 * @access public
 	 *
 	 * @param $pdo
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(&$pdo)
 	{
