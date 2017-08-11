@@ -122,7 +122,7 @@ abstract class Capabilities
 	public function getForMenu(): array
 	{
 		$serverroot = '';
-		$https = (isset($_SERVER['HTTPS']) && (int)$_SERVER['HTTPS'] === 'on');
+		$https = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
 
 		if (isset($_SERVER['SERVER_NAME'])) {
 			$serverroot = (
