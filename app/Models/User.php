@@ -22,5 +22,13 @@ class User extends Model
 	public $timestamps = false;
 
 
+	/**
+	 * @var array
+	 */
 	protected $fillable = ['username', 'email', 'password', 'role'];
+
+	/**
+	 * @var array
+	 */
+	protected $hidden = ['password', 'rsstoken'];
 }
