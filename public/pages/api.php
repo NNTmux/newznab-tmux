@@ -104,7 +104,7 @@ $offset = $api->offset();
 
 // Set API Parameters based on Request objects
 $params['extended'] = (isset($_GET['extended']) && (int)$_GET['extended'] === 1 ? '1' : '0');
-$params['del'] = (isset($_GET['del']) && $_GET['del'] === 1 ? '1' : '0');
+$params['del'] = (isset($_GET['del']) && (int)$_GET['del'] === 1 ? '1' : '0');
 $params['uid'] = $uid;
 $params['token'] = $apiKey;
 
@@ -157,7 +157,7 @@ switch ($function) {
 
 		// Process season only queries or Season and Episode/Airdate queries
 		if (!empty($_GET['season']) && !empty($_GET['ep'])) {
-			if (preg_match('#^(19|20)\d{2}$#', $_GET['season'], $year) && stripos($_GET['ep'], '/') !== false) {
+			if (preg_match('#^(19|20)\d{2}$#', $_GET['season'], $year) && strpos($_GET['ep'], '/') !== false) {
 				$airdate = str_replace('/', '-', $year[0] . '-' . $_GET['ep']);
 			} else {
 				$series = $_GET['season'];
