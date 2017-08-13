@@ -3,6 +3,7 @@ namespace nntmux;
 
 use App\Models\Settings;
 use App\Models\UserRequest;
+use App\Models\UserRole;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use nntmux\db\DB;
@@ -1267,19 +1268,17 @@ class Users
 	 */
 	public function getRoles(): array
 	{
-		return $this->pdo->query('SELECT * FROM user_roles');
+		return UserRole::all()->toArray();
 	}
 
 	/**
 	 * @param $id
 	 *
-	 * @return array|bool
+	 * @return \Illuminate\Database\Eloquent\Model|null|static
 	 */
 	public function getRoleById($id)
 	{
-		$sql = sprintf('SELECT * FROM user_roles WHERE id = %d', $id);
-
-		return $this->pdo->queryOneRow($sql);
+		return UserRole::query()->where('id', $id)->first();
 	}
 
 	/**
@@ -1294,9 +1293,16 @@ class Users
 	 */
 	public function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $hideads)
 	{
-		$sql = sprintf('INSERT INTO user_roles (name, apirequests, downloadrequests, defaultinvites, canpreview, hideads) VALUES (%s, %d, %d, %d, %d, %d)', $this->pdo->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $canpreview, $hideads);
-
-		return $this->pdo->queryInsert($sql);
+		return UserRole::query()->insertGetId(
+			[
+				'name' => $name,
+				'apirequests' => $apirequests,
+				'downloadrequests' => $downloadrequests,
+				'defaultinvites' => $defaultinvites,
+				'canpreview' => $canpreview,
+				'hideads' => $hideads
+			]
+		);
 	}
 
 	/**
@@ -1309,14 +1315,24 @@ class Users
 	 * @param $canpreview
 	 * @param $hideads
 	 *
-	 * @return bool|\PDOStatement
+	 * @return int
 	 */
 	public function updateRole($id, $name, $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $hideads)
 	{
 		if ((int)$isdefault === 1) {
-			$this->pdo->queryExec('UPDATE user_roles SET isdefault = 0');
+			UserRole::query()->update(['isdefault' => 0]);
 		}
-		return $this->pdo->queryExec(sprintf('UPDATE user_roles SET name = %s, apirequests = %d, downloadrequests = %d, defaultinvites = %d, isdefault = %d, canpreview = %d, hideads = %d WHERE id = %d', $this->pdo->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $hideads, $id));
+		return UserRole::query()->where('id', $id)->update(
+			[
+				'name' => $name,
+				'apirequests' => $apirequests,
+				'downloadrequests' => $downloadrequests,
+				'defaultinvites' => $defaultinvites,
+				'isdefault' => $isdefault,
+				'canpreview' => $canpreview,
+				'hideads' => $hideads
+			]
+		);
 	}
 
 	/**
@@ -1336,15 +1352,15 @@ class Users
 			$this->pdo->queryExec(sprintf('UPDATE users SET role = %d WHERE id IN (%s)', $defaultrole['id'], implode(',', $userids)));
 		}
 
-		return $this->pdo->queryExec(sprintf('DELETE FROM user_roles WHERE id = %d', $id));
+		return UserRole::query()->where('id', $id)->delete();
 	}
 
 	/**
-	 * @return array|bool
+	 * @return \Illuminate\Database\Eloquent\Model|null|static
 	 */
 	public function getDefaultRole()
 	{
-		return $this->pdo->queryOneRow('SELECT * FROM user_roles WHERE isdefault = 1');
+		return UserRole::query()->where('isdefault', '=', 1)->first();
 	}
 
 	/**

@@ -8,7 +8,7 @@ $page = new AdminPage();
 
 $users = new Users();
 
-$page->title = "User Role List";
+$page->title = 'User Role List';
 
 //get the user roles
 $userroles = $users->getRoles();
