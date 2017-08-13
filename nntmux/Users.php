@@ -590,7 +590,7 @@ class Users
 	/**
 	 * @param $id
 	 *
-	 * @return mixed
+	 * @return array|bool
 	 */
 	public function getById($id)
 	{
@@ -598,6 +598,10 @@ class Users
 		$sql = sprintf('SELECT users.*, user_roles.name as rolename, user_roles.hideads, user_roles.canpreview, user_roles.apirequests, user_roles.downloadrequests, NOW() as now FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE users.id = %d', $id);
 
 		$result = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+
+		if (empty($result)) {
+			return false;
+		}
 
 		return $result[0];
 	}
