@@ -660,7 +660,7 @@ class Users
 	 */
 	public function generatePassword(): string
 	{
-		return substr(md5(uniqid('', true)), 0, 8);
+		return str_random(8);
 	}
 
 	/**

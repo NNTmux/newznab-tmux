@@ -281,7 +281,7 @@ switch ($function) {
 
 	// Capabilities request.
 	case 'c':
-		$api->output('', $params, $outputXML, $offset, 'caps');
+		$api->output([], $params, $outputXML, $offset, 'caps');
 		break;
 	// Register request.
 	case 'r':
@@ -317,6 +317,6 @@ switch ($function) {
 		$params['password'] = $password;
 		$params['token'] = $userData['rsstoken'];
 
-		$api->output('', $params, true, $offset, 'reg');
+		$api->output([], $params, true, $offset, 'reg');
 		break;
 }
