@@ -309,7 +309,7 @@ switch ($function) {
 		);
 		// Check if it succeeded.
 		$userData = $page->users->getById($uid);
-		if (!$userData) {
+		if (empty($userData)) {
 			Utility::showApiError(107);
 		}
 
