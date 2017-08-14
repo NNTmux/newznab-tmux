@@ -2,7 +2,10 @@
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 
+use App\Models\Settings;
+use App\Models\UserRole;
 use nntmux\Users;
+use nntmux\utility\Utility;
 
 $page = new AdminPage();
 $users = new Users();
@@ -66,8 +69,9 @@ switch ($action) {
 				$users->updateUserRoleChangeDate($_POST['id'], $_POST['rolechangedate']);
 			}
 			if ($_POST['role'] !== '') {
+				$newRole = UserRole::query()->where('id', $_POST['role'])->value('name');
 				$email = $_POST['email'] ?? $_GET['email'];
-				\nntmux\utility\Utility::sendEmail($email, 'Account changed', 'Your account role has been changed to ' . $_POST['role'], \App\Models\Settings::value('site.main.email'));
+				Utility::sendEmail($email, 'Account changed', 'Your account role has been changed to ' . $newRole, Settings::value('site.main.email'));
 			}
 		}
 
