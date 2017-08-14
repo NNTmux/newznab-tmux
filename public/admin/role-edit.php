@@ -14,9 +14,9 @@ foreach ($userRoles as $userRole) {
 	$roles[$userRole['id']] = $userRole['name'];
 }
 
-switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
+switch ($_REQUEST['action'] ?? 'view') {
 	case 'add':
-		$page->title              = "User Roles Add";
+		$page->title              = 'User Roles Add';
 		$role = [
 			'id'               => '',
 			'name'             => '',
@@ -30,29 +30,30 @@ switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
 		break;
 
 	case 'submit':
-		if ($_POST["id"] == "") {
-			$ret = $page->users->addRole($_POST['name'], $_POST['apirequests'], $_POST['downloadrequests'],
+		if ($_POST['id'] === '') {
+			$role = $page->users->addRole($_POST['name'], $_POST['apirequests'], $_POST['downloadrequests'],
 				$_POST['defaultinvites'], $_POST['canpreview'], $_POST['hideads']
 			);
-			header("Location:" . WWW_TOP . "/role-list.php");
+			header('Location:' . WWW_TOP . '/role-list.php');
 		} else {
-			$ret = $page->users->updateRole($_POST['id'], $_POST['name'], $_POST['apirequests'],
+			$role = $page->users->updateRole($_POST['id'], $_POST['name'], $_POST['apirequests'],
 				$_POST['downloadrequests'], $_POST['defaultinvites'], $_POST['isdefault'], $_POST['canpreview'], $_POST['hideads']
 			);
-			header("Location:" . WWW_TOP . "/role-list.php");
+			header('Location:' . WWW_TOP . '/role-list.php');
 
 			$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? [] : $_POST['exccat'];
 			$page->users->addRoleCategoryExclusions($_POST['id'], $_POST['exccat']);
 		}
+		$page->smarty->assign('role', $role);
 		break;
 
 	case 'view':
 	default:
-		if (isset($_GET["id"])) {
-			$page->title = "User Roles Edit";
-			$role = $page->users->getRoleById($_GET["id"]);
+		if (isset($_GET['id'])) {
+			$page->title = 'User Roles Edit';
+			$role = $page->users->getRoleById($_GET['id']);
 			$page->smarty->assign('role', $role);
-			$page->smarty->assign('roleexccat', $page->users->getRoleCategoryExclusion($_GET["id"]));
+			$page->smarty->assign('roleexccat', $page->users->getRoleCategoryExclusion($_GET['id']));
 		}
 		break;
 }

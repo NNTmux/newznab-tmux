@@ -1,3 +1,5 @@
+2017-08-14 DariusIII
+	* Fix: Fix adding of new user roles
 2017-08-13 DariusIII
 	* Chg: Add UserRole model
 	* Chg: Cache user data for better response times and improved speed
