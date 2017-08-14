@@ -823,7 +823,7 @@ class Users
 				'rsstoken' => md5(Password::getRepository()->createNewToken()),
 				'invites' => $invites,
 				'invitedby' => (int)$invitedBy === 0 ? 'NULL' : $invitedBy,
-				'userseed' => md5($this->pdo->uuid()),
+				'userseed' => md5(Utility::generateUuid()),
 				'notes' => $notes
 			]
 		);

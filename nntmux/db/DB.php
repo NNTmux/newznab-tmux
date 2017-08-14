@@ -1188,9 +1188,6 @@ class DB extends \PDO
 	}
 
 	/**
-	 * Interpretation of mysql's UUID method.
-	 * Return uuid v4 string. http://www.php.net/manual/en/function.uniqid.php#94959
-	 *
 	 * @return string
 	 */
 	public function uuid()
