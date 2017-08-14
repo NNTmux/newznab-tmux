@@ -25,7 +25,19 @@ class User extends Model
 	/**
 	 * @var array
 	 */
-	protected $fillable = ['username', 'email', 'password', 'role'];
+	protected $fillable = [
+		'username',
+		'password',
+		'email',
+		'role',
+		'createddate',
+		'host',
+		'rsstoken',
+		'invites',
+		'invitedby',
+		'userseed',
+		'notes'
+	];
 
 	/**
 	 * @var array

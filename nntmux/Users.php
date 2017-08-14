@@ -792,19 +792,18 @@ class Users
 
 
 	/**
-	 * Add a new user.
+	 * Add a new user
 	 *
-	 * @param string      $userName
-	 * @param string|bool $password
-	 * @param string      $email
-	 * @param integer     $role
-	 * @param             $notes
-	 * @param             $host
-	 * @param integer     $invites
-	 * @param integer     $invitedBy
+	 * @param     $userName
+	 * @param     $password
+	 * @param     $email
+	 * @param     $role
+	 * @param     $notes
+	 * @param     $host
+	 * @param int $invites
+	 * @param int $invitedBy
 	 *
 	 * @return bool|int
-	 * @throws \Exception
 	 */
 	public function add($userName, $password, $email, $role, $notes, $host, $invites = self::DEFAULT_INVITES, $invitedBy = 0)
 	{
@@ -813,22 +812,20 @@ class Users
 		if (!$password) {
 			return false;
 		}
-		return $this->pdo->queryInsert(
-			sprintf('
-				INSERT INTO users (username, password, email, role, createddate, host, rsstoken,
-					invites, invitedby, userseed, notes)
-				VALUES (%s, %s, LOWER(%s), %d, NOW(), %s, MD5(%s), %d, %s, MD5(%s), %s)',
-				$this->pdo->escapeString($userName),
-				$this->pdo->escapeString((string)$password),
-				$this->pdo->escapeString($email),
-				$role,
-				$this->pdo->escapeString((int)Settings::value('..storeuserips') === 1 ? $host : ''),
-				$this->pdo->escapeString(Password::getRepository()->createNewToken()),
-				$invites,
-				((int)$invitedBy === 0 ? 'NULL' : $invitedBy),
-				$this->pdo->escapeString($this->pdo->uuid()),
-				$this->pdo->escapeString($notes)
-			)
+		return User::query()->insertGetId(
+			[
+				'username' => $userName,
+				'password' => $password,
+				'email' => $email,
+				'role' => $role,
+				'createddate' => new \DateTime('NOW'),
+				'host' => (int)Settings::value('..storeuserips') === 1 ? $host : '',
+				'rsstoken' => md5(Password::getRepository()->createNewToken()),
+				'invites' => $invites,
+				'invitedby' => (int)$invitedBy === 0 ? 'NULL' : $invitedBy,
+				'userseed' => md5($this->pdo->uuid()),
+				'notes' => $notes
+			]
 		);
 	}
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b0c59d4718da3860750d883f03701223",
+    "content-hash": "52914747bd3536ce45474cf35a9fd45c",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -5884,11 +5884,11 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "roave/security-advisories": 20,
         "b3rs3rk/steamfront": 20,
         "dborsatto/php-giantbomb": 20,
         "joshpinkney/tv-maze-php-api": 20,
-        "kbjr/git.php": 20
+        "kbjr/git.php": 20,
+        "roave/security-advisories": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

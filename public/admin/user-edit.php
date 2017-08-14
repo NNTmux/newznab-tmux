@@ -11,7 +11,9 @@ $user = [
 	'id' => '',
 	'username' => '',
 	'email' => '',
-	'password' => ''
+	'password' => '',
+	'role' => Users::ROLE_USER,
+	'notes' => ''
 ];
 
 // set the current action
@@ -36,12 +38,12 @@ switch ($action) {
 			'role'        => $defaultRole,
 			'notes'       => '',
 			'invites'     => $defaultInvites,
-			'movieview'   => 1,
-			'xxxview'     => 1,
-			'musicview'   => 1,
-			'consoleview' => 1,
-			'gameview'    => 1,
-			'bookview'    => 1
+			'movieview'   => 0,
+			'xxxview'     => 0,
+			'musicview'   => 0,
+			'consoleview' => 0,
+			'gameview'    => 0,
+			'bookview'    => 0
 		];
 		$page->smarty->assign('user', $user);
 		break;
@@ -54,6 +56,7 @@ switch ($action) {
 				}
 			}
 			$ret = $users->signup($_POST['username'], $_POST['password'], $_POST['email'], '', $_POST['role'], $_POST['notes'], $invites, '', true);
+			$page->smarty->assign('role', $_POST['role']);
 		} else {
 			$ret = $users->update($_POST['id'], $_POST['username'], $_POST['email'], $_POST['grabs'], $_POST['role'], $_POST['notes'], $_POST['invites'], (isset($_POST['movieview']) ? 1 : 0), (isset($_POST['musicview']) ? 1 : 0), (isset($_POST['gameview']) ? 1 : 0), (isset($_POST['xxxview']) ? 1 : 0), (isset($_POST['consoleview']) ? 1 : 0), (isset($_POST['bookview']) ? 1 : 0));
 			if ($_POST['password'] !== '') {
@@ -91,16 +94,12 @@ switch ($action) {
 					$page->smarty->assign('error', 'Unknown save error.');
 					break;
 			}
-			$user = [
+			$user += [
 				'id'        => $_POST['id'],
 				'username'  => $_POST['username'],
 				'email'     => $_POST['email'],
-				'notes'     => $_POST['notes'],
-				'grabs'     => $_POST['grabs'] ?? 0,
 				'role'      => $_POST['role'],
-				'invites'   => $_POST['invites'] ?? 0,
-				'movieview' => $_POST['movieview'],
-				'bookview'  => $_POST['bookview']
+				'notes'     => $_POST['notes']
 			];
 			$page->smarty->assign('user', $user);
 		}
@@ -124,6 +123,7 @@ $page->smarty->assign('yesno_names', array('Yes', 'No'));
 
 $page->smarty->assign('role_ids', array_keys($roles));
 $page->smarty->assign('role_names', $roles);
+$page->smarty->assign('user', $user);
 
 $page->content = $page->smarty->fetch('user-edit.tpl');
 $page->render();
