@@ -345,59 +345,35 @@ class Users
 			}
 		}
 
-		$sql = [];
+		$sql = [
+			'username' => $userName,
+			'email' => $email,
+			'grabs' => $grabs,
+			'role' => $role,
+			'notes' => substr($notes, 0, 255),
+			'invites' => $invites,
+			'movieview' => $movieview,
+			'musicview' => $musicview,
+			'gameview' => $gameview,
+			'xxxview' => $xxxview,
+			'consoleview' => $consoleview,
+			'bookview' => $bookview,
+			'style' => $style,
+			'queuetype'  => $queueType,
+			'nzbgeturl' => $nzbgetURL,
+			'nzbgetusername' => $nzbgetUsername,
+			'nzbgetpassword' => $nzbgetPassword,
+			'saburl' => $saburl,
+			'sabapikey' => $sabapikey,
+			'sabapikeytype' => $sabapikeytype,
+			'sabpriority' => $sabpriority,
+			'nzbvortex_server_url' => $nzbvortexServerUrl,
+			'nzbvortex_api_key' => $nzbvortexApiKey,
+			'cp_url' => $cp_url,
+			'cp_api' => $cp_api
+		];
 
-		$sql[] = sprintf('username = %s', $this->pdo->escapeString($userName));
-		$sql[] = sprintf('email = %s', $this->pdo->escapeString($email));
-		$sql[] = sprintf('grabs = %d', $grabs);
-		$sql[] = sprintf('role = %d', $role);
-		$sql[] = sprintf('notes = %s', $this->pdo->escapeString(substr($notes, 0, 255)));
-		$sql[] = sprintf('invites = %d', $invites);
-		$sql[] = sprintf('movieview = %d', $movieview);
-		$sql[] = sprintf('musicview = %d', $musicview);
-		$sql[] = sprintf('gameview = %d', $gameview);
-		$sql[] = sprintf('xxxview = %d', $xxxview);
-		$sql[] = sprintf('consoleview = %d', $consoleview);
-		$sql[] = sprintf('bookview = %d', $bookview);
-		$sql[] = sprintf('style = %s', $this->pdo->escapeString($style));
-
-		if ($queueType !== '') {
-			$sql[] = sprintf('queuetype = %d', $queueType);
-		}
-
-		if ($nzbgetURL !== '') {
-			$sql[] = sprintf('nzbgeturl = %s', $this->pdo->escapeString($nzbgetURL));
-		}
-
-		$sql[] = sprintf('nzbgetusername = %s', $this->pdo->escapeString($nzbgetUsername));
-		$sql[] = sprintf('nzbgetpassword = %s', $this->pdo->escapeString($nzbgetPassword));
-
-		if ($saburl !== '') {
-			$sql[] = sprintf('saburl = %s', $this->pdo->escapeString($saburl));
-		}
-		if ($sabapikey !== '') {
-			$sql[] = sprintf('sabapikey = %s', $this->pdo->escapeString($sabapikey));
-		}
-		if ($sabpriority !== '') {
-			$sql[] = sprintf('sabpriority = %d', $sabpriority);
-		}
-		if ($sabapikeytype !== '') {
-			$sql[] = sprintf('sabapikeytype = %d', $sabapikeytype);
-		}
-		if ($nzbvortexServerUrl !== false) {
-			$sql[] = sprintf("nzbvortex_server_url = '%s'", $nzbvortexServerUrl);
-		}
-		if ($nzbvortexApiKey !== false) {
-			$sql[] = sprintf("nzbvortex_api_key = '%s'", $nzbvortexApiKey);
-		}
-		if ($cp_url !== false) {
-			$sql[] = sprintf('cp_url = %s', $this->pdo->escapeString($cp_url));
-		}
-		if ($cp_api !== false) {
-			$sql[] = sprintf('cp_api = %s', $this->pdo->escapeString($cp_api));
-		}
-
-		$this->pdo->queryExec(sprintf('UPDATE users SET %s WHERE id = %d', implode(', ', $sql), $id));
+		User::query()->where('id', $id)->update($sql);
 
 		return self::SUCCESS;
 	}
