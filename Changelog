@@ -1,3 +1,5 @@
+2017-08-15 DariusIII
+	* Chg: Update composer.json
 2017-08-14 DariusIII
 	* Chg: Update returned role value
 	* Chg: Use User model to update users
