@@ -1,4 +1,5 @@
 2017-08-15 DariusIII
+	* Chg: Update doctrine/inflector and laravel/framework to latest versions
 	* Chg: Update install script to generate the app key
 	* Chg: Update composer.json
 2017-08-14 DariusIII
