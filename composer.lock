@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "52914747bd3536ce45474cf35a9fd45c",
+    "content-hash": "e9e9dd3d4dbdd1ce945c6c10f5efc5c8",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -327,6 +327,58 @@
                 "less",
                 "mobile-first",
                 "responsive",
+                "web"
+            ]
+        },
+        {
+            "name": "bower-asset/bootstrap-4.x",
+            "version": "v4.0.0-beta1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twbs/bootstrap.git",
+                "reference": "35f80bb12e4e71fd777ee60ffa43711d8f84b1a6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/35f80bb12e4e71fd777ee60ffa43711d8f84b1a6",
+                "reference": "35f80bb12e4e71fd777ee60ffa43711d8f84b1a6",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.9.1",
+                "bower-asset/popper.js": ">=1.11.0,<2.0.0"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "scss/bootstrap.scss",
+                    "dist/js/bootstrap.js"
+                ],
+                "bower-asset-ignore": [
+                    "/.*",
+                    "/_*",
+                    "about",
+                    "assets",
+                    "docs",
+                    "js/tests",
+                    "nuget",
+                    "CNAME",
+                    "composer.json",
+                    "Gruntfile.js"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
+            "keywords": [
+                "css",
+                "framework",
+                "front-end",
+                "js",
+                "mobile-first",
+                "responsive",
+                "sass",
                 "web"
             ]
         },
@@ -1237,6 +1289,44 @@
                 "Apache-2.0"
             ],
             "description": "JavaScript notification plugin."
+        },
+        {
+            "name": "bower-asset/popper.js",
+            "version": "v1.12.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FezVrasta/popper.js.git",
+                "reference": "3d95d9e7e281a8f4b5c5ffc7b11a421000e6de8c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FezVrasta/popper.js/zipball/3d95d9e7e281a8f4b5c5ffc7b11a421000e6de8c",
+                "reference": "3d95d9e7e281a8f4b5c5ffc7b11a421000e6de8c",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "dist/umd/popper.js",
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "node_modules",
+                    "bower_components",
+                    "tests"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "A kickass library to manage your poppers",
+            "keywords": [
+                "attached",
+                "component",
+                "drop",
+                "popover",
+                "popperjs",
+                "position",
+                "tooltip"
+            ]
         },
         {
             "name": "bower-asset/respond",
@@ -5885,6 +5975,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "b3rs3rk/steamfront": 20,
+        "bower-asset/bootstrap-4.x": 20,
         "dborsatto/php-giantbomb": 20,
         "joshpinkney/tv-maze-php-api": 20,
         "kbjr/git.php": 20,
