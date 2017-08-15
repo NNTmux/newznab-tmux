@@ -210,6 +210,7 @@ class Regexes
 					}
 					$newCollectionHash = sha1($string . $row['fromname'] . $groupID . $files);
 					$data['New hash: ' . $newCollectionHash . $string2][$row['binaryhash']] = [
+						'new_collection_hash' => $newCollectionHash,
 						'file_name'           => $row['name'],
 						'file_total_parts'    => $row['totalparts'],
 						'file_current_parts'  => $row['currentparts'],
