@@ -152,7 +152,7 @@ if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') =
 }
 
 	$capsule = new Capsule;
-// Same as database configuration file of Laravel.
+	// Same as database configuration file of Laravel.
 	$capsule->addConnection([
 		'driver' => env('DB_SYSTEM'),
 		'host' => env('DB_HOST', '127.0.0.1'),
@@ -164,7 +164,7 @@ if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') =
 		'charset' => 'utf8',
 		'collation' => 'utf8_unicode_ci',
 		'strict' => false
-	], 'default');
+	]);
 $capsule->bootEloquent();
 
 $user = new Users();
@@ -251,6 +251,8 @@ if (!$error) {
 
 if (!$error) {
 	@file_put_contents(NN_ROOT . '_install/install.lock', '');
+	ColorCLI::doEcho(ColorCLI::header('Generating application key'));
+	passthru('php ' . NN_ROOT . 'tmux key:generate');
 	ColorCLI::doEcho(ColorCLI::alternate('NNTmux installation completed successfully'));
 	exit();
 }
