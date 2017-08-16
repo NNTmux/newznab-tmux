@@ -1,4 +1,5 @@
 2017-08-16 DariusIII
+	* Chg: Update PHPDOC block with exception
 	* Chg: Remove bootstrap 4, update symfony components
 2017-08-15 DariusIII
 	* Chg: Add bootstrap 4 for future usage

@@ -845,8 +845,10 @@ class Binaries
 	/**
 	 * Parse headers into collections/binaries and store header data as parts
 	 *
-	 * @param array $headers The retrieved headers
+	 * @param array $headers    The retrieved headers
 	 * @param bool  $multiGroup Is this task being run in MGR mode?
+	 *
+	 * @throws \Exception
 	 */
 	protected function storeHeaders(array $headers, $multiGroup): void
 	{
