@@ -11,6 +11,7 @@ use nntmux\ColorCLI;
 use nntmux\ConsoleTools;
 use nntmux\Genres;
 use nntmux\Groups;
+use nntmux\NNTP;
 use nntmux\NZB;
 use nntmux\PreDb;
 use nntmux\ReleaseCleaning;
@@ -35,7 +36,7 @@ class ProcessReleases
 	const FILE_COMPLETE   = 1; // We have all the parts for the file (binaries table partcheck column).
 
 	/**
-	 * @var \nntmux\Groups
+	 * @var Groups
 	 */
 	public $groups;
 
@@ -70,32 +71,32 @@ class ProcessReleases
 	public $echoCLI;
 
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 */
 	public $pdo;
 
 	/**
-	 * @var \nntmux\ConsoleTools
+	 * @var ConsoleTools
 	 */
 	public $consoleTools;
 
 	/**
-	 * @var \nntmux\NZB
+	 * @var NZB
 	 */
 	public $nzb;
 
 	/**
-	 * @var \nntmux\ReleaseCleaning
+	 * @var ReleaseCleaning
 	 */
 	public $releaseCleaning;
 
 	/**
-	 * @var \nntmux\Releases
+	 * @var Releases
 	 */
 	public $releases;
 
 	/**
-	 * @var \nntmux\ReleaseImage
+	 * @var ReleaseImage
 	 */
 	public $releaseImage;
 
@@ -116,6 +117,8 @@ class ProcessReleases
 
 	/**
 	 * @param array $options Class instances / Echo to cli ?
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -142,31 +145,32 @@ class ProcessReleases
 		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 
 		$dummy = Settings::value('..delaytime');
-		$this->collectionDelayTime = ($dummy != '' ? (int)$dummy : 2);
+		$this->collectionDelayTime = ($dummy !== '' ? (int)$dummy : 2);
 		$dummy = Settings::value('..crossposttime');
-		$this->crossPostTime = ($dummy != '' ? (int)$dummy : 2);
+		$this->crossPostTime = ($dummy !== '' ? (int)$dummy : 2);
 		$dummy = Settings::value('..maxnzbsprocessed');
-		$this->releaseCreationLimit = ($dummy != '' ? (int)$dummy : 1000);
+		$this->releaseCreationLimit = ($dummy !== '' ? (int)$dummy : 1000);
 		$dummy = Settings::value('..completionpercent');
-		$this->completion = ($dummy != '' ? (int)$dummy : 0);
+		$this->completion = ($dummy !== '' ? (int)$dummy : 0);
 		$this->processRequestIDs = (int)Settings::value('lookup_reqids');
 		if ($this->completion > 100) {
 			$this->completion = 100;
 			echo ColorCLI::error(PHP_EOL . 'You have an invalid setting for completion. It cannot be higher than 100.');
 		}
-		$this->collectionTimeout = intval(Settings::value('indexer.processing.collection_timeout'));
+		$this->collectionTimeout = (int)Settings::value('indexer.processing.collection_timeout');
 	}
 
 	/**
 	 * Main method for creating releases/NZB files from collections.
 	 *
-	 * @param int    $categorize
-	 * @param int    $postProcess
-	 * @param string $groupName (optional)
-	 * @param \nntmux\NNTP   $nntp
-	 * @param bool   $echooutput
+	 * @param int          $categorize
+	 * @param int          $postProcess
+	 * @param string       $groupName (optional)
+	 * @param \nntmux\NNTP $nntp
+	 * @param bool         $echooutput
 	 *
 	 * @return int
+	 * @throws \Exception
 	 */
 	public function processReleases($categorize, $postProcess, $groupName, &$nntp, $echooutput)
 	{
@@ -180,7 +184,7 @@ class ProcessReleases
 
 		$processReleases = microtime(true);
 		if ($this->echoCLI) {
-			ColorCLI::doEcho(ColorCLI::header("Starting release update process (" . date('Y-m-d H:i:s') . ")"), true);
+			ColorCLI::doEcho(ColorCLI::header('Starting release update process (' . date('Y-m-d H:i:s') . ')'), true);
 		}
 
 		if (!file_exists(Settings::value('..nzbpath'))) {
@@ -214,7 +218,7 @@ class ProcessReleases
 			} else if ($this->processRequestIDs === 2) {
 				$requestIDTime = time();
 				if ($this->echoCLI) {
-					ColorCLI::doEcho(ColorCLI::header("Process Releases -> Request ID Threaded lookup."));
+					ColorCLI::doEcho(ColorCLI::header('Process Releases -> Request ID Threaded lookup.'));
 				}
 				passthru("${DIR}update/nix/multiprocessing/requestid.php");
 				if ($this->echoCLI) {
@@ -254,7 +258,7 @@ class ProcessReleases
 	 * @void
 	 * @access public
 	 */
-	public function resetCategorize($where = '')
+	public function resetCategorize($where = ''): void
 	{
 		$this->pdo->queryExec(
 			sprintf('UPDATE releases SET categories_id = %d, iscategorized = 0 %s', Category::OTHER_MISC, $where)
@@ -268,9 +272,10 @@ class ProcessReleases
 	 * @param string $where Optional "where" query parameter.
 	 *
 	 * @return int Quantity of categorized releases.
+	 * @throws \Exception
 	 * @access public
 	 */
-	public function categorizeRelease($type, $where = '')
+	public function categorizeRelease($type, $where = ''): int
 	{
 		$cat = new Categorize(['Settings' => $this->pdo]);
 		$categorized = $total = 0;
@@ -309,13 +314,16 @@ class ProcessReleases
 		return $categorized;
 	}
 
-	public function processIncompleteCollections($groupID)
+	/**
+	 * @param $groupID
+	 */
+	public function processIncompleteCollections($groupID): void
 	{
 		$startTime = time();
 		$this->initiateTableNames($groupID);
 
 		if ($this->echoCLI) {
-			ColorCLI::doEcho(ColorCLI::header("Process Releases -> Attempting to find complete collections."));
+			ColorCLI::doEcho(ColorCLI::header('Process Releases -> Attempting to find complete collections.'));
 		}
 
 		$where = (!empty($groupID) ? ' AND c.groups_id = ' . $groupID . ' ' : ' ');
@@ -348,7 +356,10 @@ class ProcessReleases
 		}
 	}
 
-	public function processCollectionSizes($groupID)
+	/**
+	 * @param $groupID
+	 */
+	public function processCollectionSizes($groupID): void
 	{
 		$startTime = time();
 		$this->initiateTableNames($groupID);
@@ -386,7 +397,12 @@ class ProcessReleases
 		}
 	}
 
-	public function deleteUnwantedCollections($groupID)
+	/**
+	 * @param $groupID
+	 *
+	 * @throws \Exception
+	 */
+	public function deleteUnwantedCollections($groupID): void
 	{
 		$startTime = time();
 		$this->initiateTableNames($groupID);
@@ -435,8 +451,7 @@ class ProcessReleases
 
 				$deleteQuery = $this->pdo->queryExec(
 					sprintf('
-						DELETE c, b, p
-						FROM %s c
+						DELETE c, b, p FROM %s c
 						LEFT JOIN %s b ON c.id = b.collections_id
 						LEFT JOIN %s p ON b.id = p.binaries_id
 						WHERE c.filecheck = %d
@@ -478,26 +493,28 @@ class ProcessReleases
 					}
 				}
 
-				$deleteQuery = $this->pdo->queryExec(
-					sprintf('
+				if ($minFilesSetting > 0 || $groupMinFilesSetting > 0) {
+					$deleteQuery = $this->pdo->queryExec(
+						sprintf('
 						DELETE c, b, p FROM %s c
 						LEFT JOIN %s b ON c.id = b.collections_id
 						LEFT JOIN %s p ON b.id = p.binaries_id
 						WHERE c.filecheck = %d
 						AND GREATEST(%d, %d) > 0
 						AND c.totalfiles < GREATEST(%d, %d)',
-						$this->tables['cname'],
-						$this->tables['bname'],
-						$this->tables['pname'],
-						self::COLLFC_SIZED,
-						$groupMinFilesSetting,
-						$minFilesSetting,
-						$groupMinFilesSetting,
-						$minFilesSetting
-					)
-				);
-				if ($deleteQuery !== false) {
-					$minFilesDeleted += $deleteQuery->rowCount();
+							$this->tables['cname'],
+							$this->tables['bname'],
+							$this->tables['pname'],
+							self::COLLFC_SIZED,
+							$groupMinFilesSetting,
+							$minFilesSetting,
+							$groupMinFilesSetting,
+							$minFilesSetting
+						)
+					);
+					if ($deleteQuery !== false) {
+						$minFilesDeleted += $deleteQuery->rowCount();
+					}
 				}
 			}
 		}
@@ -520,7 +537,7 @@ class ProcessReleases
 	 *
 	 * @void
 	 */
-	protected function initiateTableNames($groupID)
+	protected function initiateTableNames($groupID): void
 	{
 		$this->tables = $this->groups->getCBPTableNames($groupID);
 	}
@@ -530,7 +547,7 @@ class ProcessReleases
 	 *
 	 * @void
 	 */
-	protected function formFromNamesQuery()
+	protected function formFromNamesQuery(): void
 	{
 		$posters = MultigroupPosters::commaSeparatedList();
 		$this->fromNamesQuery = sprintf("AND r.fromname NOT IN('%s')", $posters);
@@ -540,8 +557,9 @@ class ProcessReleases
 	 * @param int|string $groupID (optional)
 	 *
 	 * @return array
+	 * @throws \Exception
 	 */
-	public function createReleases($groupID)
+	public function createReleases($groupID): array
 	{
 		$startTime = time();
 		$this->initiateTableNames($groupID);
@@ -612,8 +630,8 @@ class ProcessReleases
 
 					if (is_array($cleanedName)) {
 						$properName = $cleanedName['properlynamed'];
-						$preID = (isset($cleanerName['predb']) ? $cleanerName['predb'] : false);
-						$isReqID = (isset($cleanerName['requestid']) ? $cleanerName['requestid'] : false);
+						$preID = $cleanerName['predb'] ?? false;
+						$isReqID = $cleanerName['requestid'] ?? false;
 						$cleanedName = $cleanedName['cleansubject'];
 					} else {
 						$properName = true;
@@ -763,7 +781,7 @@ class ProcessReleases
 	 * @return int
 	 * @access public
 	 */
-	public function createNZBs($groupID)
+	public function createNZBs($groupID): int
 	{
 		$startTime = time();
 		$this->formFromNamesQuery();
@@ -821,16 +839,17 @@ class ProcessReleases
 	/**
 	 * Process RequestID's.
 	 *
-	 * @param int|string  $groupID
-	 * @param int  $limit
-	 * @param bool $local
+	 * @param int|string $groupID
+	 * @param int        $limit
+	 * @param bool       $local
 	 *
 	 * @access public
 	 * @void
+	 * @throws \Exception
 	 */
-	public function processRequestIDs($groupID = '', $limit = 5000, $local = true)
+	public function processRequestIDs($groupID = '', $limit = 5000, $local = true): void
 	{
-		if ($local === false && Settings::value('..lookup_reqids') == 0) {
+		if ($local === false && (int)Settings::value('..lookup_reqids') === 0) {
 			return;
 		}
 
@@ -885,12 +904,13 @@ class ProcessReleases
 	 * Categorize releases.
 	 *
 	 * @param int        $categorize
-	 * @param int|string $groupID    (optional)
+	 * @param int|string $groupID (optional)
 	 *
 	 * @void
 	 * @access public
+	 * @throws \Exception
 	 */
-	public function categorizeReleases($categorize, $groupID = '')
+	public function categorizeReleases($categorize, $groupID = ''): void
 	{
 		$startTime = time();
 		if ($this->echoCLI) {
@@ -921,15 +941,16 @@ class ProcessReleases
 	/**
 	 * Post-process releases.
 	 *
-	 * @param int        $postProcess
-	 * @param \nntmux\NNTP       $nntp
+	 * @param int  $postProcess
+	 * @param NNTP $nntp
 	 *
 	 * @void
 	 * @access public
+	 * @throws \Exception
 	 */
-	public function postProcessReleases($postProcess, &$nntp)
+	public function postProcessReleases($postProcess, &$nntp): void
 	{
-		if ($postProcess == 1) {
+		if ((int)$postProcess === 1) {
 			(new PostProcess(['Echo' => $this->echoCLI, 'Settings' => $this->pdo, 'Groups' => $this->groups]))->processAll($nntp);
 		} else {
 			if ($this->echoCLI) {
@@ -943,7 +964,12 @@ class ProcessReleases
 		}
 	}
 
-	public function deleteCollections($groupID)
+	/**
+	 * @param $groupID
+	 *
+	 * @throws \Exception
+	 */
+	public function deleteCollections($groupID): void
 	{
 		$startTime = time();
 		$this->initiateTableNames($groupID);
@@ -1157,8 +1183,9 @@ class ProcessReleases
 	 *
 	 * @void
 	 * @access public
+	 * @throws \Exception
 	 */
-	public function deletedReleasesByGroup($groupID = '')
+	public function deletedReleasesByGroup($groupID = ''): void
 	{
 		$startTime = time();
 		$minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
@@ -1212,26 +1239,27 @@ class ProcessReleases
 					}
 				}
 			}
-
-			$releases = $this->pdo->queryDirect(
-				sprintf('
-					SELECT SQL_NO_CACHE r.id, r.guid
-					FROM releases r
-					INNER JOIN groups g ON g.id = r.groups_id
-					WHERE r.groups_id = %d
-					AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
-					AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)',
-					$grpID['id'],
-					$minFilesSetting,
-					$minFilesSetting
-				)
-			);
-			if ($releases instanceof \Traversable) {
-				foreach ($releases as $release) {
-					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
-					$minFilesDeleted++;
-				}
-			}
+			 if ($minFilesSetting > 0) {
+				 $releases = $this->pdo->queryDirect(
+					 sprintf('
+				SELECT SQL_NO_CACHE r.id, r.guid
+				FROM releases r
+				INNER JOIN groups g ON g.id = r.groups_id
+				WHERE r.groups_id = %d
+				AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
+				AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)',
+						 $grpID['id'],
+						 $minFilesSetting,
+						 $minFilesSetting
+					 )
+				 );
+				 if ($releases instanceof \Traversable) {
+					 foreach ($releases as $release) {
+						 $this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+						 $minFilesDeleted++;
+					 }
+				 }
+			 }
 		}
 
 		if ($this->echoCLI) {
@@ -1253,8 +1281,9 @@ class ProcessReleases
 	 *
 	 * @void
 	 * @access public
+	 * @throws \Exception
 	 */
-	public function deleteReleases()
+	public function deleteReleases(): void
 	{
 		$startTime = time();
 		$category = new Category(['Settings' => $this->pdo]);
@@ -1268,11 +1297,11 @@ class ProcessReleases
 		}
 
 		// Releases past retention.
-		if (Settings::value('..releaseretentiondays') != 0) {
+		if ((int)Settings::value('..releaseretentiondays') !== 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT SQL_NO_CACHE id, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
-					Settings::value('..releaseretentiondays')
+					(int)Settings::value('..releaseretentiondays')
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -1284,7 +1313,7 @@ class ProcessReleases
 		}
 
 		// Passworded releases.
-		if (Settings::value('..deletepasswordedrelease') == 1) {
+		if ((int)Settings::value('..deletepasswordedrelease') === 1) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT SQL_NO_CACHE id, guid FROM releases WHERE passwordstatus = %d',
@@ -1300,7 +1329,7 @@ class ProcessReleases
 		}
 
 		// Possibly passworded releases.
-		if (Settings::value('..deletepossiblerelease') == 1) {
+		if ((int)Settings::value('..deletepossiblerelease') === 1) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT SQL_NO_CACHE id, guid FROM releases WHERE passwordstatus = %d',
@@ -1315,7 +1344,7 @@ class ProcessReleases
 			}
 		}
 
-		if ($this->crossPostTime != 0) {
+		if ((int)$this->crossPostTime !== 0) {
 			// Crossposted releases.
 			$releases = $this->pdo->queryDirect(
 				sprintf(
@@ -1348,7 +1377,7 @@ class ProcessReleases
 		if (count($disabledCategories) > 0) {
 			foreach ($disabledCategories as $disabledCategory) {
 				$releases = $this->pdo->queryDirect(
-					sprintf('SELECT SQL_NO_CACHE id, guid FROM releases WHERE categories_id = %d', $disabledCategory['id'])
+					sprintf('SELECT SQL_NO_CACHE id, guid FROM releases WHERE categories_id = %d', (int)$disabledCategory['id'])
 				);
 				if ($releases instanceof \Traversable) {
 					foreach ($releases as $release) {
@@ -1370,7 +1399,7 @@ class ProcessReleases
 
 		if ($categories instanceof \Traversable) {
 			foreach ($categories as $category) {
-				if ($category['minsize'] > 0) {
+				if ((int)$category['minsize'] > 0) {
 					$releases = $this->pdo->queryDirect(
 						sprintf('
 							SELECT SQL_NO_CACHE r.id, r.guid
@@ -1378,8 +1407,8 @@ class ProcessReleases
 							WHERE r.categories_id = %d
 							AND r.size < %d
 							LIMIT 1000',
-							$category['id'],
-							$category['minsize']
+							(int)$category['id'],
+							(int)$category['minsize']
 						)
 					);
 					if ($releases instanceof \Traversable) {
@@ -1406,7 +1435,7 @@ class ProcessReleases
 							FROM musicinfo
 							WHERE musicinfo.genre_id = %d
 						) mi ON musicinfo_id = mid',
-						$genre['id']
+						(int)$genre['id']
 					)
 				);
 				if ($releases instanceof \Traversable) {
@@ -1427,7 +1456,7 @@ class ProcessReleases
 					WHERE categories_id = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					Category::OTHER_MISC,
-					Settings::value('..miscotherretentionhours')
+					(int)Settings::value('..miscotherretentionhours')
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -1439,7 +1468,7 @@ class ProcessReleases
 		}
 
 		// Misc hashed.
-		if (Settings::value('..mischashedretentionhours') > 0) {
+		if ((int)Settings::value('..mischashedretentionhours') > 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf('
 					SELECT SQL_NO_CACHE id, guid
@@ -1447,7 +1476,7 @@ class ProcessReleases
 					WHERE categories_id = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					Category::OTHER_HASHED,
-					Settings::value('..mischashedretentionhours')
+					(int)Settings::value('..mischashedretentionhours')
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -1510,7 +1539,7 @@ class ProcessReleases
 	 * @return string
 	 * @access private
 	 */
-	private function maxQueryFormulator($groupName, $difference)
+	private function maxQueryFormulator($groupName, $difference): string
 	{
 		$maxID = $this->pdo->queryOneRow(
 			sprintf('
@@ -1533,7 +1562,7 @@ class ProcessReleases
 	 * @void
 	 * @access private
 	 */
-	private function collectionFileCheckStage1(&$where)
+	private function collectionFileCheckStage1(&$where): void
 	{
 
 		$this->pdo->queryExec(
@@ -1573,7 +1602,7 @@ class ProcessReleases
 	 * @void
 	 * @access private
 	 */
-	private function collectionFileCheckStage2(&$where)
+	private function collectionFileCheckStage2(&$where): void
 	{
 		$this->pdo->queryExec(
 			sprintf('
@@ -1619,7 +1648,7 @@ class ProcessReleases
 	 * @void
 	 * @access private
 	 */
-	private function collectionFileCheckStage3($where)
+	private function collectionFileCheckStage3($where): void
 	{
 
 		$this->pdo->queryExec(
@@ -1680,7 +1709,7 @@ class ProcessReleases
 	 * @void
 	 * @access private
 	 */
-	private function collectionFileCheckStage4(&$where)
+	private function collectionFileCheckStage4(&$where): void
 	{
 
 		$this->pdo->queryExec(
@@ -1711,7 +1740,7 @@ class ProcessReleases
 	 * @void
 	 * @access private
 	 */
-	private function collectionFileCheckStage5(&$where)
+	private function collectionFileCheckStage5(&$where): void
 	{
 
 		$this->pdo->queryExec(
@@ -1737,7 +1766,7 @@ class ProcessReleases
 	 * @void
 	 * @access private
 	 */
-	private function collectionFileCheckStage6(&$where)
+	private function collectionFileCheckStage6(&$where): void
 	{
 
 		$this->pdo->queryExec(
@@ -1763,8 +1792,9 @@ class ProcessReleases
 	 *
 	 * @void
 	 * @access private
+	 * @throws \Exception
 	 */
-	private function processStuckCollections($where)
+	private function processStuckCollections($where): void
 	{
 		$lastRun = Settings::value('indexer.processing.last_run_time');
 
