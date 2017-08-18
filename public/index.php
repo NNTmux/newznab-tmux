@@ -74,7 +74,6 @@ switch ($page->page) {
 	case 'failed':
 	case 'getnzb':
 	case 'login':
-	case 'preinfo':
 	case 'rss':
 		include NN_WWW . 'pages/' . $page->page . '.php';
 		break;

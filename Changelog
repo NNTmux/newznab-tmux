@@ -1,4 +1,5 @@
 2017-08-18 DariusIII
+	* Chg: Remove preinfo page, no reason for it to exist
 	* Chg: Remove now unneeded code from public/smarty.php
 	* Fix: Declare $nzb property as public, which fixes releases processing
 	* Chg: Update ProcessReleases class, declare some settings table values as integers
