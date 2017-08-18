@@ -10,9 +10,16 @@ use nntmux\utility\Utility;
 class ProcessReleasesMultiGroup extends ProcessReleases
 {
 	/**
+	 * @var NZBMultiGroup
+	 */
+	protected $nzb;
+
+	/**
 	 * ProcessReleasesMultiGroup constructor.
 	 *
 	 * @param array $options
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
