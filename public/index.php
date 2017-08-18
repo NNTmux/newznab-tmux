@@ -58,8 +58,6 @@ switch ($page->page) {
 	case 'sendtocouch':
 	case 'sendtoqueue':
 	case 'series':
-	case 'sitemap':
-	case 'sysinfo':
 	case 'terms-and-conditions':
 	case 'topic_delete':
 	case 'upcoming':
