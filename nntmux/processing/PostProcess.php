@@ -37,7 +37,7 @@ use nntmux\XXX;
 class PostProcess
 {
 	/**
-	 * @var Settings
+	 * @var DB
 	 */
 	public $pdo;
 
