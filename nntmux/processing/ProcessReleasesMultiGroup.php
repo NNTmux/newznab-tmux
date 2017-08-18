@@ -12,7 +12,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
 	/**
 	 * @var NZBMultiGroup
 	 */
-	protected $nzb;
+	public $nzb;
 
 	/**
 	 * ProcessReleasesMultiGroup constructor.
