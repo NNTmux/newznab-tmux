@@ -111,24 +111,8 @@ class DnzbFailures
 			return false;
 		}
 
-		$this->pdo->queryInsert(
-			sprintf('
-				INSERT IGNORE INTO dnzb_failures (release_id, users_id, failed)
-				VALUES (%d, %d, %d) ON DUPLICATE KEY UPDATE failed = failed + 1',
-				$rel['id'],
-				$userid,
-				self::FAILED
+		DnzbFailure::query()->updateOrCreate(['release_id' => $rel['id'], 'users_id' => $userid], ['release_id' => $rel['id'], 'users_id' => $userid, 'failed' => 'failed + 1']);
 
-			)
-		);
-
-		// If we didn't actually insert the row, don't add a comment
-		//Commenting out the code as return value is always 0
-		/*
-		if (is_numeric($insert) && $insert > 0) {
-			$this->postComment($rel['id'], $rel['gid'], $userid);
-		}
-		*/
 
 		$alternate = $this->pdo->queryOneRow(
 			sprintf('
@@ -140,51 +124,12 @@ class DnzbFailures
 				AND r.categories_id = %d
 				AND r.id != %d
 				ORDER BY r.postdate DESC',
-				$this->pdo->likeString($rel['searchname'], true, true),
+				$this->pdo->likeString($rel['searchname']),
 				$rel['categories_id'],
 				$rel['id']
 			)
 		);
 
 		return $alternate;
-	}
-
-	/**
-	 * Post comment for the release if that release has no comment for failure.
-	 * Only one user is allowed to post comment for that release, rest will just
-	 * update the failed count in dnzb_failures table
-	 *
-	 * @param $relid
-	 * @param $gid
-	 * @param $uid
-	 *
-	 * @throws \Exception
-	 */
-	public function postComment($relid, $gid, $uid): void
-	{
-		$dupe = false;
-		$text = 'This release has failed to download properly. It might fail for other users too.
-		This comment is automatically generated.';
-
-		$check = $this->pdo->queryDirect(
-				sprintf('
-				SELECT text
-				FROM release_comments
-				WHERE releases_id = %d',
-				$relid
-				)
-		);
-
-		if ($check instanceof \Traversable) {
-			foreach ($check AS $dbl) {
-				if ($dbl['text'] === $text) {
-					$dupe = true;
-					break;
-				}
-			}
-		}
-		if ($dupe === false) {
-			$this->rc->addComment($relid, $gid, $text, $uid, '');
-		}
 	}
 }
