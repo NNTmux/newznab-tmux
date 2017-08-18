@@ -34,7 +34,7 @@ $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_R
 $ordering = $console->getConsoleOrdering();
 $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
 
-$results = $consoles = [];
+$consoles = [];
 $results = $console->getConsoleRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, $page->userdata['categoryexclusions']);
 
 $maxwords = 50;
@@ -75,7 +75,7 @@ $page->smarty->assign('pagerquerysuffix', '#results');
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-if ($category == -1) {
+if ((int)$category === -1) {
 	$page->smarty->assign('catname', 'All');
 } else {
 	$cdata = $cat->getById($category);
