@@ -27,14 +27,6 @@ try {
 	$config = new Configure('smarty');
 } catch (\RuntimeException $e) {
 	if ((int)$e->getCode() === 1) {
-		if (file_exists(NN_ROOT . '.env')) {
-			echo "Move: .../www/config.php to .../n/config/config.php<br />\n Remove any line that says require_once 'automated.config.php';<br />\n";
-			if (file_exists(NN_WWW . 'settings.php')) {
-				echo "Move: .../www/settings.php to  .../nntmux/config/settings.php<br />\n";
-			}
-			exit();
-		}
-
 		if (is_dir('install')) {
 			header('Location: install');
 			exit();
@@ -45,9 +37,6 @@ try {
 if (function_exists('ini_set') && function_exists('ini_get')) {
 	ini_set('include_path', NN_WWW . PATH_SEPARATOR . ini_get('include_path'));
 }
-
-// Path to smarty files. (not prefixed with NN as the name is needed in smarty files).
-//define('SMARTY_DIR', NN_LIBS . 'smarty' . DS);
 
 $www_top = str_replace("\\", '/', dirname($_SERVER['PHP_SELF']));
 if (strlen($www_top) === 1) {
