@@ -3,6 +3,7 @@ namespace nntmux\processing;
 
 use App\Models\Settings;
 use dariusiii\rarinfo\Par2Info;
+use dariusiii\rarinfo\SrrInfo;
 use nntmux\ADE;
 use nntmux\ADM;
 use nntmux\AEBN;
@@ -18,6 +19,7 @@ use nntmux\Movie;
 use nntmux\Music;
 use nntmux\NameFixer;
 use nntmux\Nfo;
+use nntmux\NNTP;
 use nntmux\Popporn;
 use nntmux\Sharing;
 use nntmux\processing\adult\AdultMovies;
@@ -35,7 +37,7 @@ use nntmux\XXX;
 class PostProcess
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var Settings
 	 */
 	public $pdo;
 
@@ -53,12 +55,12 @@ class PostProcess
 	protected $nameFixer;
 
 	/**
-	 * @var \dariusiii\rarinfo\Par2Info
+	 * @var Par2Info
 	 */
 	protected $_par2Info;
 
 	/**
-	 * @var \dariusiii\rarinfo\SrrInfo
+	 * @var SrrInfo
 	 */
 	protected $_srrInfo;
 
@@ -81,12 +83,12 @@ class PostProcess
 	private $echooutput;
 
 	/**
-	 * @var \nntmux\Groups
+	 * @var Groups
 	 */
 	private $groups;
 
 	/**
-	 * @var \nntmux\Nfo
+	 * @var Nfo
 	 */
 	private $Nfo;
 
@@ -99,6 +101,8 @@ class PostProcess
 	 * Constructor.
 	 *
 	 * @param array $options Pass in class instances.
+	 *
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -126,8 +130,8 @@ class PostProcess
 		$this->releaseFiles = (($options['ReleaseFiles'] instanceof ReleaseFiles) ? $options['ReleaseFiles'] : new ReleaseFiles($this->pdo));
 
 		// Site settings.
-		$this->addpar2 = (Settings::value('..addpar2') == 0) ? false : true;
-		$this->alternateNNTP = (Settings::value('..alternate_nntp') == 1 ? true : false);
+		$this->addpar2 = (int)Settings::value('..addpar2') !== 0;
+		$this->alternateNNTP = (int)Settings::value('..alternate_nntp') === 1;
 	}
 
 	/**
@@ -136,8 +140,9 @@ class PostProcess
 	 * @param $nntp
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
-	public function processAll($nntp)
+	public function processAll($nntp): void
 	{
 		$this->processAdditional($nntp);
 		$this->processNfos($nntp);
@@ -158,9 +163,9 @@ class PostProcess
 	 *
 	 * @return void
 	 */
-	public function processAnime()
+	public function processAnime(): void
 	{
-		if (Settings::value('..lookupanidb') != 0) {
+		if ((int)Settings::value('..lookupanidb') !== 0) {
 			(new AniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processAnimeReleases();
 		}
 	}
@@ -169,10 +174,11 @@ class PostProcess
 	 * Process books using amazon.com.
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
-	public function processBooks()
+	public function processBooks(): void
 	{
-		if (Settings::value('..lookupbooks') != 0) {
+		if ((int)Settings::value('..lookupbooks') !== 0) {
 			(new Books(['Echo' => $this->echooutput, 'Settings' => $this->pdo, ]))->processBookReleases();
 		}
 	}
@@ -182,9 +188,9 @@ class PostProcess
 	 *
 	 * @return void
 	 */
-	public function processConsoles()
+	public function processConsoles(): void
 	{
-		if (Settings::value('..lookupgames') != 0) {
+		if ((int)Settings::value('..lookupgames') !== 0) {
 			(new Console(['Settings' => $this->pdo, 'Echo' => $this->echooutput]))->processConsoleReleases();
 		}
 	}
@@ -193,10 +199,11 @@ class PostProcess
 	 * Lookup games if enabled.
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
-	public function processGames()
+	public function processGames(): void
 	{
-		if (Settings::value('..lookupgames') != 0) {
+		if ((int)Settings::value('..lookupgames') !== 0) {
 			(new Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processGamesReleases();
 		}
 	}
@@ -204,14 +211,15 @@ class PostProcess
 	/**
 	 * Lookup imdb if enabled.
 	 *
-	 * @param string     $groupID       (Optional) ID of a group to work on.
-	 * @param string     $guidChar      (Optional) First letter of a release GUID to use to get work.
-	 * @param int|string $processMovies (Optional) 0 Don't process, 1 process all releases,
+	 * @param string          $groupID             (Optional) ID of a group to work on.
+	 * @param string          $guidChar            (Optional) First letter of a release GUID to use to get work.
+	 * @param int|string|null $processMovies       (Optional) 0 Don't process, 1 process all releases,
 	 *                                             2 process renamed releases only, '' check site setting
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
-	public function processMovies($groupID = '', $guidChar = '', $processMovies = '')
+	public function processMovies($groupID = '', $guidChar = '', $processMovies = ''): void
 	{
 		$processMovies = (is_numeric($processMovies) ? $processMovies : Settings::value('..lookupimdb'));
 		if ($processMovies > 0) {
@@ -224,9 +232,9 @@ class PostProcess
 	 *
 	 * @return void
 	 */
-	public function processMusic()
+	public function processMusic(): void
 	{
-		if (Settings::value('..lookupmusic') != 0) {
+		if ((int)Settings::value('..lookupmusic') !== 0) {
 			(new Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMusicReleases();
 		}
 	}
@@ -234,15 +242,16 @@ class PostProcess
 	/**
 	 * Process nfo files.
 	 *
-	 * @param \nntmux\NNTP   $nntp
+	 * @param NNTP   $nntp
 	 * @param string $groupID  (Optional) ID of a group to work on.
 	 * @param string $guidChar (Optional) First letter of a release GUID to use to get work.
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
-	public function processNfos(&$nntp, $groupID = '', $guidChar = '')
+	public function processNfos(&$nntp, $groupID = '', $guidChar = ''): void
 	{
-		if (Settings::value('..lookupnfo') == 1) {
+		if ((int)Settings::value('..lookupnfo') === 1) {
 			$this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int)Settings::value('..lookupimdb'), (int)Settings::value('..lookuptvrage'));
 		}
 	}
@@ -250,9 +259,9 @@ class PostProcess
 	/**
 	 * Process comments.
 	 *
-	 * @param \nntmux\NNTP $nntp
+	 * @param NNTP $nntp
 	 */
-	public function processSharing(&$nntp)
+	public function processSharing(&$nntp): void
 	{
 		(new Sharing(['Settings' => $this->pdo, 'NNTP' => $nntp]))->start();
 	}
@@ -262,13 +271,13 @@ class PostProcess
 	 *
 	 * @param string     $groupID              (Optional) ID of a group to work on.
 	 * @param string     $guidChar             (Optional) First letter of a release GUID to use to get work.
-	 * @param string|int $processTV            (Optional) 0 Don't process, 1 process all releases,
+	 * @param string|int|null $processTV       (Optional) 0 Don't process, 1 process all releases,
 	 *                                         2 process renamed releases only, '' check site setting
 	 *
 	 * @return void
 	 * @throws \Exception
 	 */
-	public function processTv($groupID = '', $guidChar = '', $processTV = '')
+	public function processTv($groupID = '', $guidChar = '', $processTV = ''): void
 	{
 		$processTV = (is_numeric($processTV) ? $processTV : Settings::value('..lookuptvrage'));
 		if ($processTV > 0) {
@@ -282,10 +291,10 @@ class PostProcess
 	/**
 	 * Process Global IDs
 	 */
-	public function processSpotnab()
+	public function processSpotnab(): void
 	{
 		$spotnab = new SpotNab();
-		$processed = $spotnab->processGID(500);
+		$processed = $spotnab->processGID();
 		if ($processed > 0) {
 			if ($this->echooutput) {
 				ColorCLI::doEcho(
@@ -305,9 +314,9 @@ class PostProcess
 	 *
 	 * @throws \Exception
 	 */
-	public function processXXX()
+	public function processXXX(): void
 	{
-		if (Settings::value('..lookupxxx') == 1) {
+		if ((int)Settings::value('..lookupxxx') === 1) {
 			(new XXX(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
 		}
 	}
@@ -317,13 +326,13 @@ class PostProcess
 	 *
 	 * @note Called externally by tmux/bin/update_per_group and update/postprocess.php
 	 *
-	 * @param \nntmux\NNTP       $nntp    Class NNTP
+	 * @param NNTP       $nntp    Class NNTP
 	 * @param int|string $groupID  (Optional) ID of a group to work on.
 	 * @param string     $guidChar (Optional) First char of release GUID, can be used to select work.
 	 *
 	 * @return void
 	 */
-	public function processAdditional(&$nntp, $groupID = '', $guidChar = '')
+	public function processAdditional(&$nntp, $groupID = '', $guidChar = ''): void
 	{
 		(new ProcessAdditional(['Echo' => $this->echooutput, 'NNTP' => $nntp, 'Settings' => $this->pdo, 'Groups' => $this->groups, 'NameFixer' => $this->nameFixer, 'Nfo' => $this->Nfo, 'ReleaseFiles' => $this->releaseFiles]))->start($groupID, $guidChar);
 	}
@@ -336,12 +345,13 @@ class PostProcess
 	 * @param string $messageID MessageID from NZB file.
 	 * @param int    $relID     ID of the release.
 	 * @param int    $groupID   Group ID of the release.
-	 * @param \nntmux\NNTP   $nntp      Class NNTP
+	 * @param NNTP   $nntp      Class NNTP
 	 * @param int    $show      Only show result or apply iy.
 	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
-	public function parsePAR2($messageID, $relID, $groupID, &$nntp, $show)
+	public function parsePAR2($messageID, $relID, $groupID, &$nntp, $show): bool
 	{
 		if ($messageID === '') {
 			return false;
@@ -363,11 +373,7 @@ class PostProcess
 
 		// Only get a new name if the category is OTHER.
 		$foundName = true;
-		if (in_array(
-			(int)$query['categories_id'],
-			Category::OTHERS_GROUP
-		)
-		) {
+		if (in_array((int)$query['categories_id'], Category::OTHERS_GROUP, false)) {
 			$foundName = false;
 		}
 
