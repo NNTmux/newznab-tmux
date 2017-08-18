@@ -29,11 +29,12 @@ if ($lock !== null) {
 	$forum->lockUnlockTopic($lock, 1);
 	header('Location:' . WWW_TOP . '/forum');
 	die();
-} elseif ($unlock !== null) {
+} else {
 	$forum->lockUnlockTopic($unlock, 0);
 	header('Location:' . WWW_TOP . '/forum');
 	die();
 }
+
 
 $browsecount = $forum->getBrowseCount();
 
@@ -47,7 +48,7 @@ $page->smarty->assign('pageroffset',$offset);
 $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/forum?offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
-$page->smarty->assign('privateprofiles', Settings::value('..privateprofiles') === 1 ? true : false );
+$page->smarty->assign('privateprofiles', (int)Settings::value('..privateprofiles') === 1);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);

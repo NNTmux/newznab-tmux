@@ -13,13 +13,13 @@ $sab = new SABnzbd($page);
 $nzbget = new NZBGet($page);
 
 $userID = $page->users->currentUserId();
-$privileged = ($page->users->isAdmin($userID) || $page->users->isModerator($userID)) ? true : false;
-$privateProfiles = (int)Settings::value('..privateprofiles') === 1 ? true : false;
+$privileged = $page->users->isAdmin($userID) || $page->users->isModerator($userID);
+$privateProfiles = (int)Settings::value('..privateprofiles') === 1;
 $publicView = false;
 
-if (!$privateProfiles || $privileged) {
+if ($privileged || !$privateProfiles) {
 
-	$altID = (isset($_GET['id']) && $_GET['id'] >= 0) ? (int) $_GET['id'] : false;
+	$altID = (isset($_GET['id']) && (int)$_GET['id'] >= 0) ? (int)$_GET['id'] : false;
 	$altUsername = (isset($_GET['name']) && strlen($_GET['name']) > 0) ? $_GET['name'] : false;
 
 	// If both 'id' and 'name' are specified, 'id' should take precedence.
@@ -77,7 +77,7 @@ $sabSettings = [1 => 'Site', 2 => 'Cookie'];
 
 // Pager must be fetched after the variables are assigned to smarty.
 $page->smarty->assign([
-		'pager'         => $page->smarty->fetch("pager.tpl"),
+		'pager'         => $page->smarty->fetch('pager.tpl'),
 		'commentslist'  => $rc->getCommentsForUserRange($userID, $offset, ITEMS_PER_PAGE),
 		'exccats'       => implode(',', $page->users->getCategoryExclusionNames($userID)),
 		'saburl'        => $sab->url,

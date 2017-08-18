@@ -40,7 +40,7 @@ if (isset($_GET['id'])) {
 		$rc->addComment($data['id'], $data['gid'], $_POST['txtAddComment'], $page->users->currentUserId(), $_SERVER['REMOTE_ADDR']);
 	}
 
-	$nfo = $releases->getReleaseNfo($data['id'], true);
+	$nfo = $releases->getReleaseNfo($data['id']);
 	$reVideo = $re->getVideo($data['id']);
 	$reAudio = $re->getAudio($data['id']);
 	$reSubs = $re->getSubs($data['id']);
@@ -152,7 +152,7 @@ if (isset($_GET['id'])) {
 	$page->smarty->assign('comments',$comments);
 	$page->smarty->assign('searchname',$releases->getSimilarName($data['searchname']));
 	$page->smarty->assign('similars', $similars);
-	$page->smarty->assign('privateprofiles', (Settings::value('..privateprofiles') == 1) ? true : false );
+	$page->smarty->assign('privateprofiles', (int)Settings::value('..privateprofiles') === 1);
 	$page->smarty->assign('failed', $failed);
 	$page->smarty->assign('cpapi', $cpapi);
 	$page->smarty->assign('cpurl', $cpurl);
