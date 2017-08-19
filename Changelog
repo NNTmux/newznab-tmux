@@ -1,3 +1,5 @@
+2017-08-19 DariusIII
+	* Fix: Possible fix for forum page redirect loop error
 2017-08-18 DariusIII
 	* Chg: Remove 2 non-existing pages (sitemap and sysinfo) from index.php
 	* Chg: Remove preinfo page, no reason for it to exist

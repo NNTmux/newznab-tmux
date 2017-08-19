@@ -29,7 +29,9 @@ if ($lock !== null) {
 	$forum->lockUnlockTopic($lock, 1);
 	header('Location:' . WWW_TOP . '/forum');
 	die();
-} else {
+}
+
+if($unlock !== null) {
 	$forum->lockUnlockTopic($unlock, 0);
 	header('Location:' . WWW_TOP . '/forum');
 	die();
@@ -40,7 +42,6 @@ $browsecount = $forum->getBrowseCount();
 
 $offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? $_REQUEST['offset'] : 0;
 
-$results = [];
 $results = $forum->getBrowseRange($offset, ITEMS_PER_PAGE);
 
 $page->smarty->assign('pagertotalitems',$browsecount);
@@ -60,4 +61,3 @@ $page->meta_description = 'Forum';
 
 $page->content = $page->smarty->fetch('forum.tpl');
 $page->render();
-
