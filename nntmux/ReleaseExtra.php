@@ -1,22 +1,25 @@
 <?php
 namespace nntmux;
 
+use App\Models\ReleaseExtraFull;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 
 class ReleaseExtra
 {
 	/**
-	 * @var \nntmux\db\Settings
+	 * @var DB|null
 	 */
 	public $pdo;
 
 	/**
-	 * @param \nntmux\db\DB $settings
+	 * ReleaseExtra constructor.
+	 *
+	 * @param null $settings
 	 */
 	public function __construct($settings = null)
 	{
-		$this->pdo = ($settings instanceof DB ? $settings : new DB());
+		$this->pdo = $settings instanceof DB ? $settings : new DB();
 	}
 
 	/**
@@ -24,7 +27,7 @@ class ReleaseExtra
 	 *
 	 * @return string
 	 */
-	public function makeCodecPretty($codec)
+	public function makeCodecPretty($codec): string
 	{
 		switch (true) {
 			case preg_match('#(?:^36$|HEVC)#i', $codec):
@@ -324,32 +327,32 @@ class ReleaseExtra
 	/**
 	 * @param $id
 	 *
-	 * @return array|bool
+	 * @return \Illuminate\Database\Eloquent\Model|null|static
 	 */
 	public function getFull($id)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT * FROM releaseextrafull WHERE releases_id = %d', $id));
+		return ReleaseExtraFull::query()->where('releases_id', $id)->first();
 	}
 
-	/**
+	/***
 	 * @param $id
 	 *
-	 * @return bool|\PDOStatement
+	 * @return mixed
 	 */
 	public function deleteFull($id)
 	{
-		return $this->pdo->queryExec(sprintf('DELETE FROM releaseextrafull WHERE releases_id = %d', $id));
+		return ReleaseExtraFull::query()->where('releases_id', $id)->delete();
 	}
 
 	/**
 	 * @param $id
-	 * @param string $xml
+	 * @param $xml
 	 */
 	public function addFull($id, $xml)
 	{
-		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM releaseextrafull WHERE releases_id = %s', $id));
+		$ckid = ReleaseExtraFull::query()->where('releases_id', $id)->first();
 		if (!isset($ckid['releases_id'])) {
-			$this->pdo->queryExec(sprintf('INSERT INTO releaseextrafull (releases_id, mediainfo) VALUES (%d, %s)', $id, $this->pdo->escapeString($xml)));
+			ReleaseExtraFull::query()->insert(['releases_id' => $id, 'mediainfo' => $xml]);
 		}
 	}
 }

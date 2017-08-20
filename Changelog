@@ -1,3 +1,5 @@
+2017-08-20 DariusIII
+	* Chg: Add ReleaseExtraFull model and use it in ReleaseExtra class
 2017-08-19 DariusIII
 	* Fix: Possible fix for forum page redirect loop error
 2017-08-18 DariusIII
