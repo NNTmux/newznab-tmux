@@ -1,6 +1,7 @@
 <?php
 namespace nntmux;
 
+use App\Models\AudioData;
 use App\Models\ReleaseExtraFull;
 use App\Models\VideoData;
 use nntmux\db\DB;
@@ -85,11 +86,11 @@ class ReleaseExtra
 	/**
 	 * @param $id
 	 *
-	 * @return array
+	 * @return \Illuminate\Database\Eloquent\Collection|static[]
 	 */
 	public function getAudio($id)
 	{
-		return $this->pdo->query(sprintf('SELECT * from audio_data WHERE releases_id = %d ORDER BY audioid ASC', $id));
+		return AudioData::query()->where('releases_id', $id)->orderBy('audioid')->get();
 	}
 
 	/**
@@ -129,7 +130,7 @@ class ReleaseExtra
 	 */
 	public function delete($id)
 	{
-		$this->pdo->queryExec(sprintf('DELETE FROM audio_data WHERE releases_id = %d', $id));
+		AudioData::query()->where('releases_id', $id)->delete();
 		$this->pdo->queryExec(sprintf('DELETE FROM release_subtitles WHERE releases_id = %d', $id));
 		VideoData::query()->where('releases_id', $id)->delete();
 	}
@@ -290,9 +291,23 @@ class ReleaseExtra
 	 */
 	public function addAudio($releaseID, $audioID, $audioformat, $audiomode, $audiobitratemode, $audiobitrate, $audiochannels, $audiosamplerate, $audiolibrary, $audiolanguage, $audiotitle)
 	{
-		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM audio_data WHERE releases_id = %s', $releaseID));
-		if (!isset($ckid['releases_id'])) {
-			return $this->pdo->queryExec(sprintf('INSERT INTO audio_data (releases_id, audioid, audioformat, audiomode, audiobitratemode, audiobitrate, audiochannels, audiosamplerate, audiolibrary ,audiolanguage, audiotitle) VALUES (%d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s)', $releaseID, $audioID, $this->pdo->escapeString($audioformat), $this->pdo->escapeString($audiomode), $this->pdo->escapeString($audiobitratemode), $this->pdo->escapeString(substr($audiobitrate, 0, 10)), $this->pdo->escapeString($audiochannels), $this->pdo->escapeString(substr($audiosamplerate, 0, 25)), $this->pdo->escapeString(substr($audiolibrary, 0, 50)), $this->pdo->escapeString($audiolanguage), $this->pdo->escapeString(substr($audiotitle, 0, 50))));
+		$ckid = AudioData::query()->where('releases_id', $releaseID)->value('release_id');
+		if (!isset($ckid)) {
+			return AudioData::query()->insert(
+				[
+					'releases_id' => $releaseID,
+					'audioid' => $audioID,
+					'audioformat' => $audioformat,
+					'audiomode' => $audiomode,
+					'audiobitratemode' => $audiobitratemode,
+					'audiobitrate' => substr($audiobitrate, 0, 10),
+					'audiochannels' => $audiochannels,
+					'audiosamplerate' => substr($audiosamplerate, 0, 25),
+					'audiolibrary' => substr($audiolibrary, 0, 50),
+					'audiolanguage' => $audiolanguage,
+					'audiotitle' => substr($audiotitle, 0, 50)
+				]
+			);
 		}
 	}
 
