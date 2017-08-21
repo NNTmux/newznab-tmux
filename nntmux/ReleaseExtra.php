@@ -3,6 +3,7 @@ namespace nntmux;
 
 use App\Models\AudioData;
 use App\Models\ReleaseExtraFull;
+use App\Models\ReleaseSubtitle;
 use App\Models\VideoData;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
@@ -96,11 +97,11 @@ class ReleaseExtra
 	/**
 	 * @param $id
 	 *
-	 * @return array|bool
+	 * @return \Illuminate\Database\Eloquent\Model|null|static
 	 */
 	public function getSubs($id)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT GROUP_CONCAT(subslanguage SEPARATOR ', ') AS subs FROM release_subtitles WHERE releases_id = %d ORDER BY subsid ASC", $id));
+		return ReleaseSubtitle::query()->where('releases_id', $id)->selectRaw("GROUP_CONCAT(subslanguage SEPARATOR ', ') AS subs")->orderBy('subsid')->first();
 	}
 
 	/**
@@ -131,7 +132,7 @@ class ReleaseExtra
 	public function delete($id)
 	{
 		AudioData::query()->where('releases_id', $id)->delete();
-		$this->pdo->queryExec(sprintf('DELETE FROM release_subtitles WHERE releases_id = %d', $id));
+		ReleaseSubtitle::query()->where('releases_id', $id)->delete();
 		VideoData::query()->where('releases_id', $id)->delete();
 	}
 
@@ -320,9 +321,9 @@ class ReleaseExtra
 	 */
 	public function addSubs($releaseID, $subsID, $subslanguage)
 	{
-		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM release_subtitles WHERE releases_id = %s', $releaseID));
-		if (!isset($ckid['releases_id'])) {
-			return $this->pdo->queryExec(sprintf('INSERT INTO release_subtitles (releases_id, subsid, subslanguage) VALUES (%d, %d, %s)', $releaseID, $subsID, $this->pdo->escapeString($subslanguage)));
+		$ckid = ReleaseSubtitle::query()->where('releases_id', $releaseID)->value('release_id');
+		if (!isset($ckid)) {
+			return ReleaseSubtitle::query()->insert(['releases_id' => $releaseID, 'subsid' => $subsID, 'subslanguage' => $subslanguage]);
 		}
 	}
 
