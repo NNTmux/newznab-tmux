@@ -292,7 +292,7 @@ class ReleaseExtra
 	 */
 	public function addAudio($releaseID, $audioID, $audioformat, $audiomode, $audiobitratemode, $audiobitrate, $audiochannels, $audiosamplerate, $audiolibrary, $audiolanguage, $audiotitle)
 	{
-		$ckid = AudioData::query()->where('releases_id', $releaseID)->value('release_id');
+		$ckid = AudioData::query()->where('releases_id', $releaseID)->value('releases_id');
 		if (!isset($ckid)) {
 			return AudioData::query()->insert(
 				[
