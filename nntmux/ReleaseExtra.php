@@ -226,7 +226,7 @@ class ReleaseExtra
 							$audiotitle = $track['Title'];
 						}
 						$this->addAudio($releaseID, $audioID, $audioformat, $audiomode, $audiobitratemode, $audiobitrate, $audiochannels, $audiosamplerate, $audiolibrary, $audiolanguage, $audiotitle);
-					} else if ($track['@attributes']['type'] == 'Text') {
+					} else if ($track['@attributes']['type'] === 'Text') {
 						$subsID = 1;
 						$subslanguage = 'Unknown';
 						if (isset($track['@attributes']['streamid'])) {
