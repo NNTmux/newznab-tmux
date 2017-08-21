@@ -30,4 +30,9 @@ class ReleaseExtraFull extends Model
 	 * @var array
 	 */
     protected $fillable = ['releases_id', 'mediainfo'];
+
+	/**
+	 * @var string
+	 */
+	protected $primaryKey = 'releases_id';
 }
