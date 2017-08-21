@@ -321,7 +321,7 @@ class ReleaseExtra
 	 */
 	public function addSubs($releaseID, $subsID, $subslanguage)
 	{
-		$ckid = ReleaseSubtitle::query()->where('releases_id', $releaseID)->value('release_id');
+		$ckid = ReleaseSubtitle::query()->where('releases_id', $releaseID)->value('releases_id');
 		if (!isset($ckid)) {
 			return ReleaseSubtitle::query()->insert(['releases_id' => $releaseID, 'subsid' => $subsID, 'subslanguage' => $subslanguage]);
 		}
