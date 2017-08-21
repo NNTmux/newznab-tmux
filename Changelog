@@ -1,4 +1,5 @@
 2017-08-20 DariusIII
+	* Chg: Add VideoData model and use it ib ReleaseExtra class
 	* Chg: Add primaryKey property to ReleaseExtraFull model
 	* Chg: Add ReleaseExtraFull model and use it in ReleaseExtra class
 2017-08-19 DariusIII

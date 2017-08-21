@@ -2,6 +2,7 @@
 namespace nntmux;
 
 use App\Models\ReleaseExtraFull;
+use App\Models\VideoData;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 
@@ -63,22 +64,22 @@ class ReleaseExtra
 	/**
 	 * @param $id
 	 *
-	 * @return array|bool
+	 * @return \Illuminate\Database\Eloquent\Model|null|static
 	 */
 	public function get($id)
 	{
 		// hopefully nothing will use this soon and it can be deleted
-		return $this->pdo->queryOneRow(sprintf('SELECT * FROM video_data WHERE releases_id = %d', $id));
+		return VideoData::query()->where('releases_id', $id)->first();
 	}
 
 	/**
 	 * @param $id
 	 *
-	 * @return array|bool
+	 * @return \Illuminate\Database\Eloquent\Model|null|static
 	 */
 	public function getVideo($id)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT * from video_data WHERE releases_id = %d', $id));
+		return VideoData::query()->where('releases_id', $id)->first();
 	}
 
 	/**
@@ -124,13 +125,13 @@ class ReleaseExtra
 	/**
 	 * @param $id
 	 *
-	 * @return bool|\PDOStatement
+	 * @return mixed
 	 */
 	public function delete($id)
 	{
 		$this->pdo->queryExec(sprintf('DELETE FROM audio_data WHERE releases_id = %d', $id));
 		$this->pdo->queryExec(sprintf('DELETE FROM release_subtitles WHERE releases_id = %d', $id));
-		return $this->pdo->queryExec(sprintf('DELETE FROM video_data WHERE releases_id = %d', $id));
+		VideoData::query()->where('releases_id', $id)->delete();
 	}
 
 	/**
@@ -149,7 +150,7 @@ class ReleaseExtra
 				if (isset($track['@attributes']) && isset($track['@attributes']['type'])) {
 
 
-					if ($track['@attributes']['type'] == 'General') {
+					if ($track['@attributes']['type'] === 'General') {
 						if (isset($track['Format'])) {
 							$containerformat = $track['Format'];
 						}
@@ -162,7 +163,7 @@ class ReleaseExtra
 								$this->addUID($releaseID, $uniqueid);
 							}
 						}
-					} else if ($track['@attributes']['type'] == 'Video') {
+					} else if ($track['@attributes']['type'] === 'Video') {
 						$videoduration = $videoformat = $videocodec = $videowidth = $videoheight = $videoaspect = $videoframerate = $videolibrary = '';
 						if (isset($track['Duration'])) {
 							$videoduration = $track['Duration'];
@@ -189,7 +190,7 @@ class ReleaseExtra
 							$videolibrary = $track['Writing_library'];
 						}
 						$this->addVideo($releaseID, $containerformat, $overallbitrate, $videoduration, $videoformat, $videocodec, $videowidth, $videoheight, $videoaspect, $videoframerate, $videolibrary);
-					} else if ($track['@attributes']['type'] == 'Audio') {
+					} else if ($track['@attributes']['type'] === 'Audio') {
 						$audioID = 1;
 						$audioformat = $audiomode = $audiobitratemode = $audiobitrate = $audiochannels = $audiosamplerate = $audiolibrary = $audiolanguage = $audiotitle = '';
 						if (isset($track['@attributes']['streamid'])) {
@@ -251,14 +252,24 @@ class ReleaseExtra
 	 * @param $videoaspect
 	 * @param $videoframerate
 	 * @param $videolibrary
-	 *
-	 * @return bool|\PDOStatement
 	 */
 	public function addVideo($releaseID, $containerformat, $overallbitrate, $videoduration, $videoformat, $videocodec, $videowidth, $videoheight, $videoaspect, $videoframerate, $videolibrary)
 	{
-		$ckid = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM video_data WHERE releases_id = %s', $releaseID));
-		if (!isset($ckid['releases_id'])) {
-			return $this->pdo->queryExec(sprintf('INSERT INTO video_data (releases_id, containerformat, overallbitrate, videoduration, videoformat, videocodec, videowidth, videoheight, videoaspect, videoframerate, videolibrary) VALUES (%d, %s, %s, %s, %s, %s, %d, %d, %s, %d, %s)', $releaseID, $this->pdo->escapeString($containerformat), $this->pdo->escapeString($overallbitrate), $this->pdo->escapeString($videoduration), $this->pdo->escapeString($videoformat), $this->pdo->escapeString($videocodec), $videowidth, $videoheight, $this->pdo->escapeString($videoaspect), $videoframerate, $this->pdo->escapeString(substr($videolibrary, 0, 50))));
+		$ckid = VideoData::query()->where('releases_id', $releaseID)->value('releases_id');
+		if (!isset($ckid)) {
+			VideoData::query()->insert(['releases_id' => $releaseID,
+											   'containerformat' => $containerformat,
+											   'overallbitrate' => $overallbitrate,
+											   'videoduration' => $videoduration,
+											   'videoformat' => $videoformat,
+											   'videocodec' => $videocodec,
+											   'videowidth' => $videowidth,
+											   'videoheight' => $videoheight,
+											   'videoaspect' => $videoaspect,
+											   'videoframerate' => $videoframerate,
+											   'videolibrary' => substr($videolibrary, 0, 50)
+			]
+			);
 		}
 	}
 
