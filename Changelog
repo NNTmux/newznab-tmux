@@ -1,4 +1,5 @@
 2017-08-20 DariusIII
+	* Fix: Fix the logical error on line 794 of MiscSorter class
 	* Chg: Add ReleaseSubtitle model and use it in ReleaseExtra class
 	* Chg: Add AudioData model and use it in ReleaseExtra class
 	* Chg: Add VideoData model and use it in ReleaseExtra class

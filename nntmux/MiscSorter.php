@@ -790,7 +790,7 @@ class MiscSorter
 					}
 				}
 			}
-			if (!empty($artist[1])) {
+			if (empty($artist[1])) {
 				$artist[1] = $artist[3];
 			}
 			if (isset($title[1],$artist[1])) {
