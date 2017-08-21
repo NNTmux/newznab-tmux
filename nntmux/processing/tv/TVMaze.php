@@ -17,7 +17,7 @@ class TVMaze extends TV
 	/**
 	 * Client for TVMaze API
 	 *
-	 * @var \JPinkney\TVMaze\TVMaze
+	 * @var Client
 	 */
 	public $client;
 
@@ -82,7 +82,7 @@ class TVMaze extends TV
 
 				// Clean the show name for better match probability
 				$release = $this->parseInfo($row['searchname']);
-				if (is_array($release) && $release['name'] != '') {
+				if (is_array($release) && $release['name'] !== '') {
 
 					if (in_array($release['cleanname'], $this->titleCache, false)) {
 						if ($this->echooutput) {
@@ -98,11 +98,8 @@ class TVMaze extends TV
 					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV, parent::SOURCE_TVMAZE);
 
 					// Force local lookup only
-					if ($local === true) {
-						$lookupSetting = false;
-					} else {
-						$lookupSetting = true;
-					}
+					//$local = true, $lookupsetting = false and vice versa
+					$lookupSetting = $local !== true;
 
 					if ($videoId === false && $lookupSetting) {
 						// If lookups are allowed lets try to get it.
@@ -119,7 +116,7 @@ class TVMaze extends TV
 							$tvmazeid = (int)$tvmazeShow['tvmaze'];
 							// Check if we have the TVDB ID already, if we do use that Video ID, unless it is 0
 							$dupeCheck = false;
-							if ($tvmazeShow['tvdb'] != 0) {
+							if ((int)$tvmazeShow['tvdb'] !== 0) {
 								$dupeCheck = $this->getVideoIDFromSiteID('tvdb', $tvmazeShow['tvdb']);
 							}
 							if ($dupeCheck === false) {
@@ -365,7 +362,7 @@ class TVMaze extends TV
 			foreach ($response as $singleEpisode) {
 				if ($this->checkRequiredAttr($singleEpisode, 'tvmazeE')) {
 					// If this is an airdate lookup and it matches the airdate, set a return
-					if ($airdate !== '' && $airdate == $singleEpisode->airdate) {
+					if ($airdate !== '' && $airdate === $singleEpisode->airdate) {
 						$return = $this->formatEpisodeInfo($singleEpisode);
 					} else {
 						// Insert the episode
@@ -388,16 +385,16 @@ class TVMaze extends TV
 	 */
 	protected function formatShowInfo($show): array
 	{
-		$this->posterUrl = (string)$show->mediumImage ?? '';
+		$this->posterUrl = (string)($show->mediumImage ?? '');
 
 		return [
-			'type'      => (int)parent::TYPE_TV,
+			'type'      => parent::TYPE_TV,
 			'title'     => (string)$show->name,
 			'summary'   => (string)$show->summary,
 			'started'   => (string)$show->premiered,
 			'publisher' => (string)$show->network,
 			'country'   => (string)$show->country,
-			'source'    => (int)parent::SOURCE_TVMAZE,
+			'source'    => parent::SOURCE_TVMAZE,
 			'imdb'      => 0,
 			'tvdb'      => (int)($show->externalIDs['thetvdb'] ?? 0),
 			'tvmaze'    => (int)$show->id,
@@ -423,7 +420,7 @@ class TVMaze extends TV
 			'title'       => (string)$episode->name,
 			'series'      => (int)$episode->season,
 			'episode'     => (int)$episode->number,
-			'se_complete' => (string)'S' . sprintf('%02d', $episode->season) . 'E' . sprintf('%02d', $episode->number),
+			'se_complete' => 'S' . sprintf('%02d', $episode->season) . 'E' . sprintf('%02d', $episode->number),
 			'firstaired'  => (string)$episode->airdate,
 			'summary'     => (string)$episode->summary
 		];
