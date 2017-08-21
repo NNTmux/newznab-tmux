@@ -16,7 +16,7 @@ class Nfo
 {
 	/**
 	 * Instance of class Settings
-	 * @var \nntmux\db\Settings
+	 * @var DB
 	 * @access private
 	 */
 	public $pdo;
@@ -74,6 +74,7 @@ class Nfo
 	 * @param array $options Class instance / echo to cli.
 	 *
 	 * @access public
+	 * @throws \Exception
 	 */
 	public function __construct(array $options = [])
 	{
@@ -84,10 +85,10 @@ class Nfo
 		$options += $defaults;
 		$this->echo = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->nzbs = Settings::value('..maxnfoprocessed') != '' ? (int)Settings::value('..maxnfoprocessed') : 100;
-		$this->maxsize = Settings::value('..maxsizetoprocessnfo') != '' ? (int)Settings::value('..maxsizetoprocessnfo') : 100;
+		$this->nzbs = Settings::value('..maxnfoprocessed') !== '' ? (int)Settings::value('..maxnfoprocessed') : 100;
+		$this->maxsize = Settings::value('..maxsizetoprocessnfo') !== '' ? (int)Settings::value('..maxsizetoprocessnfo') : 100;
 		$this->maxsize = $this->maxsize > 0 ? ('AND size < ' . ($this->maxsize * 1073741824)) : '';
-		$this->minsize = Settings::value('..minsizetoprocessnfo') != '' ? (int)Settings::value('..minsizetoprocessnfo') : 100;
+		$this->minsize = Settings::value('..minsizetoprocessnfo') !== '' ? (int)Settings::value('..minsizetoprocessnfo') : 100;
 		$this->minsize = $this->minsize > 0 ? ('AND size > ' . ($this->minsize * 1048576)) : '';
 		$this->maxRetries = (int)Settings::value('..maxnforetries') >= 0 ? -((int)Settings::value('..maxnforetries') + 1) : self::NFO_UNPROC;
 		$this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
@@ -98,7 +99,7 @@ class Nfo
 	}
 
 	/**
-	 * Look for a TV Show ID in a string. TODO: Add other scrape sources
+	 * Look for a TV Show ID in a string.
 	 *
 	 * @param string  $str   The string with a Show ID.
 	 *
@@ -110,12 +111,28 @@ class Nfo
 	{
 		$return = false;
 
-		if (preg_match('/tvrage\.com\/shows\/id-(\d{1,6})/i', $str, $matches)) {
+		if (preg_match('/tvmaze\.com\/shows\/(\d{1,6})/i', $str, $matches)) {
 			$return =
 			[
 				'showid' => trim($matches[1]),
-				'site'   => 'tvrage'
+				'site'   => 'tvmaze'
 			];
+		}
+
+		if (preg_match('/imdb\.com\/title\/(tt\d{1,8})/i', $str, $matches)) {
+			$return =
+				[
+					'showid' => trim($matches[1]),
+					'site'   => 'imdb'
+				];
+		}
+
+		if (preg_match('/thetvdb\.com\/\?tab=series&id=(\d{1,8})/i', $str, $matches)) {
+			$return =
+				[
+					'showid' => trim($matches[1]),
+					'site'   => 'thetvdb'
+				];
 		}
 		return $return;
 	}
@@ -127,10 +144,12 @@ class Nfo
 	 * @param string $guid        The guid of the release.
 	 *
 	 * @return bool               True on success, False on failure.
+	 * @throws \Exception
 	 *
 	 * @access public
 	 */
-	public function isNFO(&$possibleNFO, $guid) {
+	public function isNFO(&$possibleNFO, $guid): bool
+	{
 		if ($possibleNFO === false) {
 			return false;
 		}
@@ -157,9 +176,9 @@ class Nfo
 					return true;
 
 					// Or binary.
-				} else if (preg_match('/^(JPE?G|Parity|PNG|RAR|XML|(7-)?[Zz]ip)/', $result) ||
-					preg_match('/[\x00-\x08\x12-\x1F\x0B\x0E\x0F]/', $possibleNFO))
-				{
+				}
+
+				if (preg_match('/^(JPE?G|Parity|PNG|RAR|XML|(7-)?[Zz]ip)/', $result) || preg_match('/[\x00-\x08\x12-\x1F\x0B\x0E\x0F]/', $possibleNFO)) {
 					@unlink($tmpPath);
 					return false;
 				}
@@ -174,7 +193,6 @@ class Nfo
 				$par2info = new Par2Info();
 				$par2info->setData($possibleNFO);
 				if ($par2info->error) {
-
 					// Check if it's an SFV.
 					$sfv = new SfvInfo();
 					$sfv->setData($possibleNFO);
@@ -192,13 +210,14 @@ class Nfo
 	 *
 	 * @param string $nfo     The nfo.
 	 * @param array  $release The SQL row for this release.
-	 * @param object $nntp    Instance of class NNTP.
+	 * @param NNTP   $nntp    Instance of class NNTP.
 	 *
 	 * @return bool           True on success, False on failure.
+	 * @throws \Exception
 	 *
 	 * @access public
 	 */
-	public function addAlternateNfo(&$nfo, $release, $nntp)
+	public function addAlternateNfo(&$nfo, $release, $nntp): bool
 	{
 		if ($release['id'] > 0 && $this->isNFO($nfo, $release['guid'])) {
 
@@ -219,7 +238,7 @@ class Nfo
 				$release['completion'] = 0;
 			}
 
-			if ($release['completion'] == 0) {
+			if ((int)$release['completion'] === 0) {
 				$nzbContents = new NZBContents(
 					[
 						'Echo' => $this->echo,
@@ -241,33 +260,24 @@ class Nfo
 	 * "AND r.nzbstatus = 1 AND r.nfostatus BETWEEN -8 AND -1 AND r.size < 1073741824 AND r.size > 1048576"
 	 * To use in a query.
 	 *
-	 * @param DB $pdo
-	 *
 	 * @return string
+	 * @throws \Exception
 	 * @access public
 	 * @static
 	 */
-	static public function NfoQueryString(&$pdo)
+	public static function NfoQueryString()
 	{
-		if ($pdo instanceof DB) {
-			$maxSize = Settings::value('..maxsizetoprocessnfo');
-			$minSize = Settings::value('..minsizetoprocessnfo');
-			$maxRetries = (int)Settings::value('..maxnforetries') >= 0 ?
-				-((int)Settings::value('..maxnforetries') + 1) : self::NFO_UNPROC;
-		} else {
-			$maxSize = Settings::value('..maxsizetoprocessnfo');
-			$minSize = Settings::value('..minsizetoprocessnfo');
-			$value = Settings::value('..maxnforetries');
-			$maxRetries = (int)$value >= 0 ? -((int)$value + 1) : self::NFO_UNPROC;
-		}
-		return
-		sprintf(
+		$maxSize = (int)Settings::value('..maxsizetoprocessnfo');
+		$minSize = (int)Settings::value('..minsizetoprocessnfo');
+		$dummy = (int)Settings::value('..maxnforetries');
+		$maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
+		return sprintf(
 			'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
 			NZB::NZB_ADDED,
 			($maxRetries < -8 ? -8 : $maxRetries),
 			self::NFO_UNPROC,
-			(($maxSize != '' && $maxSize > 0) ? ('AND r.size < ' . ($maxSize * 1073741824)) : ''),
-			(($minSize != '' && $minSize > 0) ? ('AND r.size > ' . ($minSize * 1048576)) : '')
+			($maxSize > 0 ? ('AND r.size < ' . ($maxSize * 1073741824)) : ''),
+			($minSize > 0 ? ('AND r.size > ' . ($minSize * 1048576)) : '')
 		);
 	}
 
@@ -281,10 +291,11 @@ class Nfo
 	 * @param int    $processTv   (optional) Attempt to find Tv id's in the NZB?
 	 *
 	 * @return int How many NFO's were processed?
+	 * @throws \Exception
 	 *
 	 * @access public
 	 */
-	public function processNfoFiles($nntp, $groupID = '', $guidChar = '', $processImdb = 1, $processTv = 1)
+	public function processNfoFiles($nntp, $groupID = '', $guidChar = '', $processImdb = 1, $processTv = 1): int
 	{
 		$ret = 0;
 		$guidCharQuery = ($guidChar === '' ? '' : 'AND r.leftguid = ' . $this->pdo->escapeString($guidChar));
@@ -369,7 +380,7 @@ class Nfo
 					$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb);
 
 					// If set scan for tv info.
-					if ($processTv == 1) {
+					if ($processTv === 1) {
 						(new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo]))->processTv($groupID, $guidChar, $processTv);
 					}
 				}
