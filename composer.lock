@@ -4,26 +4,26 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "52914747bd3536ce45474cf35a9fd45c",
+    "content-hash": "a2e709b36f5708590640322bab0f6a22",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
-            "version": "1.0.5",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/adrenth/thetvdb2.git",
-                "reference": "f746cff968f66b88d9f63cd15e036eb6eab2d2b4"
+                "reference": "1b3f549497bfe7c032fdc026f7b45b700b313156"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/adrenth/thetvdb2/zipball/f746cff968f66b88d9f63cd15e036eb6eab2d2b4",
-                "reference": "f746cff968f66b88d9f63cd15e036eb6eab2d2b4",
+                "url": "https://api.github.com/repos/adrenth/thetvdb2/zipball/1b3f549497bfe7c032fdc026f7b45b700b313156",
+                "reference": "1b3f549497bfe7c032fdc026f7b45b700b313156",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.0",
-                "illuminate/support": "^5.2",
-                "php": ">=5.5",
+                "illuminate/support": "^5.3",
+                "php": ">=7.1",
                 "symfony/serializer": "^2.7|^3.0"
             },
             "require-dev": {
@@ -59,7 +59,7 @@
                 "thetvdb",
                 "thetvdb.com"
             ],
-            "time": "2016-11-29T18:38:40+00:00"
+            "time": "2017-06-07T18:13:11+00:00"
         },
         {
             "name": "aharen/omdbapi",

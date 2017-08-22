@@ -84,7 +84,7 @@
     "ext-spl": "*",
     "ext-xmlwriter": "*",
     "ext-zlib": "*",
-    "adrenth/thetvdb2": "~1.0",
+    "adrenth/thetvdb2": "~2.0",
     "aharen/omdbapi": "^2.0",
     "b3rs3rk/steamfront": "dev-master",
     "barracudanetworks/forkdaemon-php": "~1.0",
