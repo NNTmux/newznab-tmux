@@ -7,47 +7,47 @@ use nntmux\Category;
 $page = new AdminPage();
 $bin  = new Binaries(['Settings' => $page->settings]);
 $error = '';
-$regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => ''];
+$regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1];
 
-switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
+switch ($_REQUEST['action'] ?? 'view') {
 	case 'submit':
-		if ($_POST["groupname"] == '') {
-			$error = "Group must be a valid usenet group";
+		if ($_POST['groupname'] === '') {
+			$error = 'Group must be a valid usenet group';
 			break;
 		}
 
-		if ($_POST["regex"] == '') {
-			$error = "Regex cannot be empty";
+		if ($_POST['regex'] === '') {
+			$error = 'Regex cannot be empty';
 			break;
 		}
 
-		if ($_POST["id"] == '') {
+		if ($_POST['id'] === '') {
 			$bin->addBlacklist($_POST);
 		} else {
-			$ret = $bin->updateBlacklist($_POST);
+			$bin->updateBlacklist($_POST);
 		}
 
-		header("Location:" . WWW_TOP . "/binaryblacklist-list.php");
+		header('Location:' . WWW_TOP . '/binaryblacklist-list.php');
 		break;
 
 	case 'addtest':
-		if (isset($_GET['regex']) && isset($_GET['groupname'])) {
+		if (isset($_GET['regex'], $_GET['groupname'])) {
 			$regex += [
 					'groupname' => $_GET['groupname'],
-					'regex' => $_GET['regex'],
-					'ordinal' => '1',
-					'status'    => '1'
+					'regex'     => $_GET['regex'],
+					'ordinal'   => 1,
+					'status'    => 1
 			];
 		}
 		break;
 
 	case 'view':
 	default:
-		if (isset($_GET["id"])) {
-			$page->title = "Binary Black/Whitelist Edit";
-			$regex = $bin->getBlacklistByID($_GET["id"]);
+		if (isset($_GET['id'])) {
+			$page->title = 'Binary Black/Whitelist Edit';
+			$regex = $bin->getBlacklistByID($_GET['id']);
 		} else {
-			$page->title = "Binary Black/Whitelist Add";
+			$page->title = 'Binary Black/Whitelist Add';
 			$regex += [
 					'status' => 1,
 					'optype' => 1,

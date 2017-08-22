@@ -1,8 +1,8 @@
 <?php
 namespace nntmux;
 
+use App\Models\BinaryBlacklist;
 use App\Models\Settings;
-use nntmux\ColorCLI;
 use nntmux\db\DB;
 use nntmux\processing\ProcessReleasesMultiGroup;
 
@@ -1077,11 +1077,7 @@ class Binaries
 	 */
 	protected function updateBlacklistUsage(): void
 	{
-		$this->_pdo->queryExec(
-			sprintf('UPDATE binaryblacklist SET last_activity = NOW() WHERE id IN (%s)',
-				implode(',', $this->_binaryBlacklistIdsToUpdate)
-			)
-		);
+		BinaryBlacklist::query()->whereIn('id', implode(',', $this->_binaryBlacklistIdsToUpdate))->update(['last_activity' => new \DateTime('NOW')]);
 		$this->_binaryBlacklistIdsToUpdate = [];
 	}
 
@@ -1632,17 +1628,17 @@ class Binaries
 		return $this->_pdo->query(
 			sprintf('
 				SELECT
-					binaryblacklist.id, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description,
-					binaryblacklist.groupname AS groupname, binaryblacklist.regex, groups.id AS group_id, binaryblacklist.msgcol,
-					binaryblacklist.last_activity as last_activity
-				FROM binaryblacklist
-				LEFT OUTER JOIN groups ON groups.name %s binaryblacklist.groupname
+					bb.id, bb.optype, bb.status, bb.description,
+					bb.groupname AS groupname, bb.regex, g.id AS group_id, bb.msgcol,
+					bb.last_activity as last_activity
+				FROM binaryblacklist bb
+				LEFT OUTER JOIN groups g ON g.name %s bb.groupname
 				WHERE 1=1 %s %s %s
 				ORDER BY coalesce(groupname,\'zzz\')',
 				($groupRegex ? 'REGEXP' : '='),
-				($activeOnly ? 'AND binaryblacklist.status = 1' : ''),
+				($activeOnly ? 'AND bb.status = 1' : ''),
 				$opType,
-				($groupName ? ('AND groups.name REGEXP ' . $this->_pdo->escapeString($groupName)) : '')
+				($groupName ? ('AND g.name REGEXP ' . $this->_pdo->escapeString($groupName)) : '')
 			)
 		);
 	}
@@ -1652,11 +1648,11 @@ class Binaries
 	 *
 	 * @param int $id The blacklist ID.
 	 *
-	 * @return array|bool
+	 * @return \Illuminate\Database\Eloquent\Model|null|static
 	 */
 	public function getBlacklistByID($id)
 	{
-		return $this->_pdo->queryOneRow(sprintf('SELECT * FROM binaryblacklist WHERE id = %d', $id));
+		return BinaryBlacklist::query()->where('id', $id)->first();
 	}
 
 	/**
@@ -1664,34 +1660,26 @@ class Binaries
 	 *
 	 * @param int $id The ID of the blacklist.
 	 *
-	 * @return bool
 	 */
-	public function deleteBlacklist($id): bool
+	public function deleteBlacklist($id): void
 	{
-		return $this->_pdo->queryExec(sprintf('DELETE FROM binaryblacklist WHERE id = %d', $id));
+		BinaryBlacklist::query()->where('id', $id)->delete();
 	}
 
 	/**
 	 * @param $blacklistArray
-	 * @return bool|\PDOStatement
 	 */
-	public function updateBlacklist($blacklistArray)
+	public function updateBlacklist($blacklistArray): void
 	{
-		return $this->_pdo->queryExec(
-			sprintf('
-				UPDATE binaryblacklist
-				SET groupname = %s, regex = %s, status = %d, description = %s, optype = %d, msgcol = %d
-				WHERE id = %d ',
-				($blacklistArray['groupname'] === ''
-					? 'null'
-					: $this->_pdo->escapeString(preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']))
-				),
-				$this->_pdo->escapeString($blacklistArray['regex']), $blacklistArray['status'],
-				$this->_pdo->escapeString($blacklistArray['description']),
-				$blacklistArray['optype'],
-				$blacklistArray['msgcol'],
-				$blacklistArray['id']
-			)
+		BinaryBlacklist::query()->where('id', $blacklistArray['id'])->update(
+			[
+				'groupname' => $blacklistArray['groupname'] === '' ? 'null' : preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']),
+				'regex' => $blacklistArray['regex'],
+				'status' => $blacklistArray['status'],
+				'description' => $blacklistArray['description'],
+				'optype' => $blacklistArray['optype'],
+				'msgcol' => $blacklistArray['msgcol']
+			]
 		);
 	}
 
@@ -1700,24 +1688,18 @@ class Binaries
 	 *
 	 * @param array $blacklistArray
 	 *
-	 * @return bool
 	 */
-	public function addBlacklist($blacklistArray): bool
+	public function addBlacklist($blacklistArray): void
 	{
-		return $this->_pdo->queryInsert(
-			sprintf('
-				INSERT INTO binaryblacklist (groupname, regex, status, description, optype, msgcol)
-				VALUES (%s, %s, %d, %s, %d, %d)',
-				($blacklistArray['groupname'] === ''
-					? 'null'
-					: $this->_pdo->escapeString(preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']))
-				),
-				$this->_pdo->escapeString($blacklistArray['regex']),
-				$blacklistArray['status'],
-				$this->_pdo->escapeString($blacklistArray['description']),
-				$blacklistArray['optype'],
-				$blacklistArray['msgcol']
-			)
+		BinaryBlacklist::query()->insert(
+			[
+				'groupname' => $blacklistArray['groupname'] === '' ? 'null' : preg_replace('/a\.b\./i', 'alt.binaries.', $blacklistArray['groupname']),
+				'regex' => $blacklistArray['regex'],
+				'status' => $blacklistArray['status'],
+				'description' => $blacklistArray['description'],
+				'optype' => $blacklistArray['optype'],
+				'msgcol' => $blacklistArray['msgcol']
+			]
 		);
 	}
 
