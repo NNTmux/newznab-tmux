@@ -167,7 +167,7 @@ class SABnzbd
 	 */
 	public function sendToSab($guid)
 	{
-		return $this->client->get(
+		return $this->client->post(
 				$this->url .
 					'api?mode=addurl&priority=' .
 					$this->priority .
