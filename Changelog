@@ -1,4 +1,5 @@
 2017-08-22 DariusIII
+	* Chg: Use RFC4122 formatted GUID in releases table
 	* Chg: Change sendToSab function from get to post
 2017-08-20 DariusIII
 	* Chg: Update Nfo class
