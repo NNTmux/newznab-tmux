@@ -22,7 +22,7 @@ $page->smarty->assign([
 		'pageritemsperpage' => ITEMS_PER_PAGE,
 		'regex'             => $regex,
 		'pagerquerybase'    => WWW_TOP . '/category_regexes-list.php?' . $group . 'offset=',
-		'pager'             => $page->smarty->fetch('pager.tpl')
+		'pager'             => $page->smarty->fetch('pager.tpl'),
 	]
 );
 
