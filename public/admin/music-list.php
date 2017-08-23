@@ -14,10 +14,15 @@ $page->title = 'Music List';
 $musCount = Utility::getCount('musicinfo');
 
 $offset = $_REQUEST['offset'] ?? 0;
-$page->smarty->assign('pagertotalitems',$musCount);
-$page->smarty->assign('pageroffset',$offset);
-$page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
-$page->smarty->assign('pagerquerybase', WWW_TOP. '/music-list.php?offset=');
+
+$page->smarty->assign([
+	'pagertotalitems' => $musCount,
+	'pagerquerysuffix'  => '#results',
+	'pageroffset' => $offset,
+	'pageritemsperpage' => ITEMS_PER_PAGE,
+	'pagerquerybase' => WWW_TOP. '/music-list.php?offset=',
+]);
+
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
