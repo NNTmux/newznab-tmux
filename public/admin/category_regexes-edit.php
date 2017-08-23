@@ -1,7 +1,6 @@
 <?php
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
-
 use nntmux\Regexes;
 use nntmux\Category;
 
@@ -9,49 +8,49 @@ $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'category_regexes']);
 
 // Set the current action.
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = $_REQUEST['action'] ?? 'view';
 
 switch($action) {
 	case 'submit':
-		if ($_POST["group_regex"] == '') {
-			$page->smarty->assign('error', "Group regex must not be empty!");
+		if ($_POST['group_regex'] === '') {
+			$page->smarty->assign('error', 'Group regex must not be empty!');
 			break;
 		}
 
-		if ($_POST["regex"] == '') {
-			$page->smarty->assign('error', "Regex cannot be empty");
+		if ($_POST['regex'] === '') {
+			$page->smarty->assign('error', 'Regex cannot be empty');
 			break;
 		}
 
-		if ($_POST['description'] == '') {
+		if ($_POST['description'] === '') {
 			$_POST['description'] = '';
 		}
 
 		if (!is_numeric($_POST['ordinal']) || $_POST['ordinal'] < 0) {
-			$page->smarty->assign('error', "Ordinal must be a number, 0 or higher.");
+			$page->smarty->assign('error', 'Ordinal must be a number, 0 or higher.');
 			break;
 		}
 
-		if ($_POST["id"] == '') {
+		if ($_POST['id'] === '') {
 			$regexes->addRegex($_POST);
 		} else {
 			$regexes->updateRegex($_POST);
 		}
 
-		header("Location:".WWW_TOP."/category_regexes-list.php");
+		header('Location:' .WWW_TOP. '/category_regexes-list.php');
 		break;
 
 	case 'view':
 	default:
-		if (isset($_GET["id"])) {
-			$page->title = "Category Regex Edit";
-			$id = $_GET["id"];
-			$r = $regexes->getRegexByID($id);
+		if (isset($_GET['id'])) {
+			$page->title = 'Category Regex Edit';
+			$id = $_GET['id'];
+			$regex = $regexes->getRegexByID($id);
 		} else {
-			$page->title = "Category Regex Add";
-			$r = ['status' => 1];
+			$page->title = 'Category Regex Add';
+			$regex = ['status' => 1];
 		}
-		$page->smarty->assign('regex', $r);
+		$page->smarty->assign('regex', $regex);
 		break;
 }
 
