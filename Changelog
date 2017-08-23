@@ -1,4 +1,5 @@
 2017-08-23 DariusIII
+	* Chg: Update laravel/framework to version 5.4.34
 	* Chg: Move getRange and getCount functions to Utility class to reduce code duplication
 2017-08-22 DariusIII
 	* Chg: Update adrenth/thetvdb2 to version 2.0.0
