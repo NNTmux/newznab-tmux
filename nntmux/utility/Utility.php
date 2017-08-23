@@ -1195,7 +1195,7 @@ class Utility
 			sprintf(
 				'SELECT * %s FROM %s ORDER BY createddate DESC %s',
 				($tableName === 'xxxinfo' ? ', UNCOMPRESS(plot) AS plot' : ''),
-				$pdo->escapeString($tableName),
+				$tableName,
 				($start === false ? '' : ('LIMIT ' . $num . ' OFFSET ' . $start))
 			)
 		);
@@ -1209,7 +1209,7 @@ class Utility
 	public static function getCount($tableName): int
 	{
 		$pdo = new DB();
-		$res = $pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM %s', $pdo->escapeString($tableName)));
+		$res = $pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM %s', $tableName));
 		return ($res === false ? 0 : $res['num']);
 	}
 }
