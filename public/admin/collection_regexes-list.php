@@ -22,6 +22,7 @@ $page->smarty->assign([
 		'pagerquerysuffix'  => ''
 	]
 );
+
 $page->smarty->assign('pager', $page->smarty->fetch('pager.tpl'));
 
 $page->content = $page->smarty->fetch('collection_regexes-list.tpl');
