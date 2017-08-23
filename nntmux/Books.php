@@ -152,33 +152,6 @@ class Books
 		return $pdo->queryOneRow(sprintf('SELECT * FROM bookinfo WHERE %s', $searchsql));
 	}
 
-
-	/**
-	 * @param $start
-	 * @param $num
-	 *
-	 * @return array
-	 */
-	public function getRange($start, $num): array
-	{
-		if ($start === false) {
-			$limit = '';
-		} else {
-			$limit = ' LIMIT ' . $num . ' OFFSET ' . $start;
-		}
-
-		return $this->pdo->query('SELECT * FROM bookinfo ORDER BY createddate DESC' . $limit);
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getCount()
-	{
-		$res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM bookinfo');
-		return $res['num'];
-	}
-
 	/**
 	 * @param       $cat
 	 * @param       $start

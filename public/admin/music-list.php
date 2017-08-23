@@ -3,26 +3,27 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 
 use nntmux\Music;
+use nntmux\utility\Utility;
 
 $page = new AdminPage();
 
-$m = new Music();
+$music = new Music();
 
-$page->title = "Music List";
+$page->title = 'Music List';
 
-$mcount = $m->getCount();
+$musCount = Utility::getCount('musicinfo');
 
-$offset = isset($_REQUEST["offset"]) ? $_REQUEST["offset"] : 0;
-$page->smarty->assign('pagertotalitems',$mcount);
+$offset = $_REQUEST['offset'] ?? 0;
+$page->smarty->assign('pagertotalitems',$musCount);
 $page->smarty->assign('pageroffset',$offset);
 $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
-$page->smarty->assign('pagerquerybase', WWW_TOP."/music-list.php?offset=");
-$pager = $page->smarty->fetch("pager.tpl");
+$page->smarty->assign('pagerquerybase', WWW_TOP. '/music-list.php?offset=');
+$pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$musiclist = $m->getRange($offset, ITEMS_PER_PAGE);
+$musicList = Utility::getRange('musicinfo', $offset, ITEMS_PER_PAGE);
 
-$page->smarty->assign('musiclist',$musiclist);
+$page->smarty->assign('musiclist',$musicList);
 
 $page->content = $page->smarty->fetch('music-list.tpl');
 $page->render();

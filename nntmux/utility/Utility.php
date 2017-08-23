@@ -1180,4 +1180,36 @@ class Utility
 	{
 		return implode("$separator",array_map(function($a) {return implode(',',$a);},$array));
 	}
+
+	/**
+	 * @param string $tableName
+	 * @param $start
+	 * @param $num
+	 *
+	 * @return array
+	 */
+	public static function getRange($tableName, $start, $num): array
+	{
+		$pdo = new DB();
+		return $pdo->query(
+			sprintf(
+				'SELECT * %s FROM %s ORDER BY createddate DESC %s',
+				($tableName === 'xxxinfo' ? ', UNCOMPRESS(plot) AS plot' : ''),
+				$pdo->escapeString($tableName),
+				($start === false ? '' : ('LIMIT ' . $num . ' OFFSET ' . $start))
+			)
+		);
+	}
+
+	/**
+	 * @param string $tableName
+	 *
+	 * @return int
+	 */
+	public static function getCount($tableName): int
+	{
+		$pdo = new DB();
+		$res = $pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM %s', $pdo->escapeString($tableName)));
+		return ($res === false ? 0 : $res['num']);
+	}
 }

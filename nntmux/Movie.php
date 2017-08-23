@@ -248,37 +248,6 @@ class Movie
 	}
 
 	/**
-	 * Get movies for movie-list admin page.
-	 *
-	 * @param int $start
-	 * @param int $num
-	 *
-	 * @return array
-	 */
-	public function getRange($start, $num): array
-	{
-		return $this->pdo->query(
-			sprintf('
-				SELECT *
-				FROM movieinfo
-				ORDER BY createddate DESC %s',
-				($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
-			)
-		);
-	}
-
-	/**
-	 * Get count of movies for movie-list admin page.
-	 *
-	 * @return int
-	 */
-	public function getCount(): int
-	{
-		$res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM movieinfo');
-		return ($res === false ? 0 : $res['num']);
-	}
-
-	/**
 	 * Get movie releases with covers for movie browse page.
 	 *
 	 * @param       $cat

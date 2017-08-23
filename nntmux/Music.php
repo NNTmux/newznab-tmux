@@ -145,35 +145,6 @@ class Music
 	}
 
 	/**
-	 * @param $start
-	 * @param $num
-	 *
-	 * @return array
-	 */
-	public function getRange($start, $num)
-	{
-
-
-		if ($start === false) {
-			$limit = '';
-		} else {
-			$limit = ' LIMIT ' . $num . ' OFFSET ' . $start;
-		}
-
-		return $this->pdo->query('SELECT * FROM musicinfo ORDER BY createddate DESC' . $limit);
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getCount()
-	{
-
-		$res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM musicinfo');
-		return $res['num'];
-	}
-
-	/**
 	 * @param       $cat
 	 * @param       $start
 	 * @param       $num

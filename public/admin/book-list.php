@@ -3,26 +3,27 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 
 use nntmux\Books;
+use nntmux\utility\Utility;
 
 $page = new AdminPage();
 
 $book = new Books();
 
-$page->title = "Book List";
+$page->title = 'Book List';
 
-$concount = $book->getCount();
+$bookCount = Utility::getCount('bookinfo');
 
-$offset = isset($_REQUEST["offset"]) ? $_REQUEST["offset"] : 0;
-$page->smarty->assign('pagertotalitems',$concount);
+$offset = $_REQUEST['offset'] ?? 0;
+$page->smarty->assign('pagertotalitems',$bookCount);
 $page->smarty->assign('pageroffset',$offset);
 $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
-$page->smarty->assign('pagerquerybase', WWW_TOP."/book-list.php?offset=");
-$pager = $page->smarty->fetch("pager.tpl");
+$page->smarty->assign('pagerquerybase', WWW_TOP. '/book-list.php?offset=');
+$pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$booklist = $book->getRange($offset, ITEMS_PER_PAGE);
+$bookList = Utility::getRange('bookinfo', $offset, ITEMS_PER_PAGE);
 
-$page->smarty->assign('booklist',$booklist);
+$page->smarty->assign('booklist',$bookList);
 
 $page->content = $page->smarty->fetch('book-list.tpl');
 $page->render();

@@ -3,24 +3,25 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 
 use nntmux\Movie;
+use nntmux\utility\Utility;
 
 $page  = new AdminPage();
 $movie = new Movie(['Settings' => $page->settings]);
 
-$page->title = "Movie List";
+$page->title = 'Movie List';
 
-$movcount = $movie->getCount();
+$movCount = Utility::getCount('movieinfo');
 
-$offset = isset($_REQUEST["offset"]) ? $_REQUEST["offset"] : 0;
-$page->smarty->assign('pagertotalitems', $movcount);
+$offset = $_REQUEST['offset'] ?? 0;
+$page->smarty->assign('pagertotalitems', $movCount);
 $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
-$page->smarty->assign('pagerquerybase', WWW_TOP . "/movie-list.php?offset=");
-$pager = $page->smarty->fetch("pager.tpl");
+$page->smarty->assign('pagerquerybase', WWW_TOP . '/movie-list.php?offset=');
+$pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$movielist = $movie->getRange($offset, ITEMS_PER_PAGE);
-$page->smarty->assign('movielist', $movielist);
+$movieList = Utility::getRange('movieinfo', $offset, ITEMS_PER_PAGE);
+$page->smarty->assign('movielist', $movieList);
 
 $page->content = $page->smarty->fetch('movie-list.tpl');
 $page->render();

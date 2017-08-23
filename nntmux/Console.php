@@ -138,22 +138,6 @@ class Console
 		return $this->pdo->queryOneRow(sprintf('SELECT * FROM consoleinfo WHERE %s', $searchsql));
 	}
 
-	public function getRange($start, $num)
-	{
-		return $this->pdo->query(
-			sprintf(
-				'SELECT * FROM consoleinfo ORDER BY createddate DESC %s',
-				($start === false ? '' : ('LIMIT ' . $num . ' OFFSET ' . $start))
-			)
-		);
-	}
-
-	public function getCount()
-	{
-		$res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM consoleinfo');
-		return ($res === false ? 0 : $res['num']);
-	}
-
 	/**
 	 * @param       $cat
 	 * @param       $start

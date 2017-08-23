@@ -3,25 +3,26 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
 
 use nntmux\Console;
+use nntmux\utility\Utility;
 
 $page = new AdminPage();
 $con  = new Console(['Settings' => $page->settings]);
 
-$page->title = "Console List";
+$page->title = 'Console List';
 
-$concount = $con->getCount();
+$conCount = Utility::getCount('consoleinfo');
 
-$offset = isset($_REQUEST["offset"]) ? $_REQUEST["offset"] : 0;
-$page->smarty->assign('pagertotalitems',$concount);
+$offset = $_REQUEST['offset'] ?? 0;
+$page->smarty->assign('pagertotalitems',$conCount);
 $page->smarty->assign('pageroffset',$offset);
 $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
-$page->smarty->assign('pagerquerybase', WWW_TOP."/console-list.php?offset=");
-$pager = $page->smarty->fetch("pager.tpl");
+$page->smarty->assign('pagerquerybase', WWW_TOP. '/console-list.php?offset=');
+$pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$consolelist = $con->getRange($offset, ITEMS_PER_PAGE);
+$consoleList = Utility::getRange('consoleinfo', $offset, ITEMS_PER_PAGE);
 
-$page->smarty->assign('consolelist',$consolelist);
+$page->smarty->assign('consolelist',$consoleList);
 
 $page->content = $page->smarty->fetch('console-list.tpl');
 $page->render();
