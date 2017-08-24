@@ -1,4 +1,5 @@
 2017-08-24 DariusIII
+	* Chg: Update collection_regexes-edit.php
 	* Chg: Update uuid generation functions id DB and Utility classes
 2017-08-23 DariusIII
 	* Chg: Update laravel/framework to version 5.4.34

@@ -10,43 +10,43 @@ $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'collecti
 $error = '';
 $regex = ['id' => '', 'regex' => '', 'description' => '', 'group_regex' => '', 'ordinal' => ''];
 
-switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
+switch ($_REQUEST['action'] ?? 'view') {
 	case 'submit':
-		if ($_POST["group_regex"] == '') {
-			$error = "Group regex must not be empty!";
+		if ($_POST['group_regex'] === '') {
+			$error = 'Group regex must not be empty!';
 			break;
 		}
 
-		if ($_POST["regex"] == '') {
-			$error = "Regex cannot be empty";
+		if ($_POST['regex'] === '') {
+			$error = 'Regex cannot be empty';
 			break;
 		}
 
-		if ($_POST['description'] == '') {
+		if ($_POST['description'] === '') {
 			$_POST['description'] = '';
 		}
 
 		if (!is_numeric($_POST['ordinal']) || $_POST['ordinal'] < 0) {
-			$error = "Ordinal must be a number, 0 or higher.";
+			$error = 'Ordinal must be a number, 0 or higher.';
 			break;
 		}
 
-		if ($_POST["id"] == "") {
+		if ($_POST['id'] === '') {
 			$regexes->addRegex($_POST);
 		} else {
 			$regexes->updateRegex($_POST);
 		}
 
-		header("Location:" . WWW_TOP . "/collection_regexes-list.php");
+		header('Location:' . WWW_TOP . '/collection_regexes-list.php');
 		break;
 
 	case 'view':
 	default:
-		if (isset($_GET["id"])) {
-			$page->title = "Collections Regex Edit";
-			$regex = $regexes->getRegexByID($_GET["id"]);
+		if (isset($_GET['id'])) {
+			$page->title = 'Collections Regex Edit';
+			$regex = $regexes->getRegexByID($_GET['id']);
 		} else {
-			$page->title = "Collections Regex Add";
+			$page->title = 'Collections Regex Add';
 			$regex += ['status' => 1];
 		}
 		break;
