@@ -975,10 +975,9 @@ class Utility
 	/**
 	 * @return string
 	 */
-	public static function generateUuid()
+	public static function generateUuid(): string
 	{
-		$uuid = Uuid::uuid4();
-		return $uuid->toString();
+		return Uuid::uuid4()->toString();
 	}
 
 	public static function startsWith($haystack, $needle)

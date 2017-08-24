@@ -1192,8 +1192,7 @@ class DB extends \PDO
 	 */
 	public function uuid()
 	{
-		$uuid = Uuid::uuid4();
-		return $uuid->toString();
+		return Uuid::uuid4()->toString();
 	}
 
 	/**
