@@ -22,10 +22,6 @@ switch($action) {
 			break;
 		}
 
-		if ($_POST['description'] === '') {
-			$_POST['description'] = '';
-		}
-
 		if (!is_numeric($_POST['ordinal']) || $_POST['ordinal'] < 0) {
 			$page->smarty->assign('error', 'Ordinal must be a number, 0 or higher.');
 			break;
