@@ -1,4 +1,5 @@
 2017-08-24 DariusIII
+	* Fix: Fix category_regexes-edit page
 	* Chg: Update category_regexes-edit.php
 	* Chg: Update collection_regexes-edit.php
 	* Chg: Update uuid generation functions id DB and Utility classes

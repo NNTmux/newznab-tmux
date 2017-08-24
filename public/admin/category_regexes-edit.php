@@ -10,6 +10,17 @@ $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'category
 // Set the current action.
 $action = $_REQUEST['action'] ?? 'view';
 
+$regex = [
+	'id' => '',
+	'group_regex' => '',
+	'regex' => '',
+	'description' => '',
+	'ordinal' => '',
+	'categories_id' => '',
+	'status' => 1];
+
+$page->smarty->assign('regex', $regex);
+
 switch($action) {
 	case 'submit':
 		if ($_POST['group_regex'] === '') {
@@ -44,7 +55,6 @@ switch($action) {
 			$regex = $regexes->getRegexByID($id);
 		} else {
 			$page->title = 'Category Regex Add';
-			$regex = ['status' => 1];
 		}
 		$page->smarty->assign('regex', $regex);
 		break;
