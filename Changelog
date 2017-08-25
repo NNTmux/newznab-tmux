@@ -1,4 +1,5 @@
 2017-08-25 DariusIII
+	* Chg: Use getGitTagInFile in Tmux class version function
 	* Chg: Add timezone setting as editable in .env file
 2017-08-24 DariusIII
 	* Fix: Fix category_regexes-edit page

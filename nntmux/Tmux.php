@@ -37,7 +37,7 @@ class Tmux
 	 */
 	public function version(): string
 	{
-		return (new Versions())->getGitTagInRepo();
+		return (new Versions())->getGitTagInFile();
 	}
 
 	/**
