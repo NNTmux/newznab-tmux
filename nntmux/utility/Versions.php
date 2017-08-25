@@ -272,10 +272,10 @@ class Versions
 	 */
 	public function getValidVersionsFile($filepath = null)
 	{
-		$filepath = empty($filepath) ? $this->_filespec : $filepath;
+		$filepath = $filepath ?? $this->_filespec;
 
 		$temp = libxml_use_internal_errors(true);
-		$this->_xml = simplexml_load_file($filepath);
+		$this->_xml = simplexml_load_string(file_get_contents($filepath));
 		libxml_use_internal_errors($temp);
 
 		if ($this->_xml === false) {
@@ -291,10 +291,9 @@ class Versions
 			if ($vers[0]->count() === 0) {
 				ColorCLI::error('Your versions XML file ({NN_VERSIONS}) does not contain version info, try updating from git.');
 				throw new \RuntimeException("Failed to find versions node in XML file '$filepath'");
-			} else {
-				ColorCLI::primary('Your versions XML file ({NN_VERSIONS}) looks okay, continuing.');
-				$this->_vers = &$this->_xml->versions;
 			}
+			ColorCLI::primary('Your versions XML file ({NN_VERSIONS}) looks okay, continuing.');
+			$this->_vers = &$this->_xml->versions;
 		} else {
 			throw new \RuntimeException("No elements in file!\n");
 		}

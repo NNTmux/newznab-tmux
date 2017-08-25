@@ -1,4 +1,5 @@
 2017-08-25 DariusIII
+	* Chg: Update nntmux\utility\Versions class to prevent this 5 years old bug (https://bugs.php.net/bug.php?id=62577)
 	* Chg: Use getGitTagInFile in Tmux class version function
 	* Chg: Add timezone setting as editable in .env file
 2017-08-24 DariusIII
