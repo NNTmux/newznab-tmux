@@ -1077,7 +1077,7 @@ class Binaries
 	 */
 	protected function updateBlacklistUsage(): void
 	{
-		BinaryBlacklist::query()->whereIn('id', implode(',', $this->_binaryBlacklistIdsToUpdate))->update(['last_activity' => new \DateTime('NOW')]);
+		BinaryBlacklist::query()->whereIn('id', $this->_binaryBlacklistIdsToUpdate)->update(['last_activity' => new \DateTime('NOW')]);
 		$this->_binaryBlacklistIdsToUpdate = [];
 	}
 
