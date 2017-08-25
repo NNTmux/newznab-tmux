@@ -1,3 +1,5 @@
+2017-08-25 DariusIII
+	* Chg: Add timezone setting as editable in .env file
 2017-08-24 DariusIII
 	* Fix: Fix category_regexes-edit page
 	* Chg: Update category_regexes-edit.php
