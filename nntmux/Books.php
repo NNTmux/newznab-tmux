@@ -3,6 +3,7 @@ namespace nntmux;
 
 use ApaiIO\Request\GuzzleRequest;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
+use App\Models\BookInfo;
 use App\Models\Settings;
 use GuzzleHttp\Client;
 use nntmux\db\DB;
@@ -106,11 +107,11 @@ class Books
 	/**
 	 * @param $id
 	 *
-	 * @return array|bool
+	 * @return \Illuminate\Database\Eloquent\Model|null|static
 	 */
 	public function getBookInfo($id)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT bookinfo.* FROM bookinfo WHERE bookinfo.id = %d', $id));
+		return BookInfo::query()->where('id', $id)->first();
 	}
 
 	/**
@@ -122,33 +123,24 @@ class Books
 	public function getBookInfoByName($author, $title)
 	{
 		$pdo = $this->pdo;
-		$like = 'ILIKE';
-		if ($pdo->DbSystem() === 'mysql') {
-			$like = 'LIKE';
-		}
 
 		//only used to get a count of words
 		$searchwords = $searchsql = '';
-		$ft = $pdo->queryDirect("SHOW INDEX FROM bookinfo WHERE key_name = 'ix_bookinfo_author_title_ft'");
-		if ($ft->rowCount() !== 2) {
-			$searchsql .= sprintf(" author LIKE %s AND title %s %s'", $pdo->escapeString('%' . $author . '%'), $like, $pdo->escapeString('%' . $title . '%'));
-		} else {
-			$title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
-			$title = preg_replace('/[^\w ]+/', '', $title);
-			$title = trim(preg_replace('/\s\s+/i', ' ', $title));
-			$title = trim($title);
-			$words = explode(' ', $title);
+		$title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
+		$title = preg_replace('/[^\w ]+/', '', $title);
+		$title = trim(preg_replace('/\s\s+/i', ' ', $title));
+		$title = trim($title);
+		$words = explode(' ', $title);
 
-			foreach ($words as $word) {
-				$word = trim(rtrim(trim($word), '-'));
-				if ($word !== '' && $word !== '-') {
-					$word = '+' . $word;
-					$searchwords .= sprintf('%s ', $word);
-				}
+		foreach ($words as $word) {
+			$word = trim(rtrim(trim($word), '-'));
+			if ($word !== '' && $word !== '-') {
+				$word = '+' . $word;
+				$searchwords .= sprintf('%s ', $word);
 			}
-			$searchwords = trim($searchwords);
-			$searchsql .= sprintf(' MATCH(author, title) AGAINST(%s IN BOOLEAN MODE)', $pdo->escapeString($searchwords));
 		}
+		$searchwords = trim($searchwords);
+		$searchsql .= sprintf(' MATCH(author, title) AGAINST(%s IN BOOLEAN MODE)', $pdo->escapeString($searchwords));
 		return $pdo->queryOneRow(sprintf('SELECT * FROM bookinfo WHERE %s', $searchsql));
 	}
 
@@ -423,9 +415,11 @@ class Books
 	/**
 	 * Process book releases.
 	 *
-	 * @param \PDOStatement|bool $res      Array containing unprocessed book SQL data set.
+	 * @param \PDOStatement|bool $res        Array containing unprocessed book SQL data set.
 	 * @param int                $categoryID The category id.
+	 *
 	 * @void
+	 * @throws \Exception
 	 */
 	protected function processBookReleasesHelper($res, $categoryID): void
 	{
@@ -634,39 +628,46 @@ class Books
 			$book['cover'] = 0;
 		}
 
-		$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM bookinfo WHERE asin = %s', $this->pdo->escapeString($book['asin'])));
+		$check = BookInfo::query()->where('asin', $book['asin'])->first();
 		if ($check === false) {
-			$bookId = $this->pdo->queryInsert(
-				sprintf('
-								INSERT INTO bookinfo
-									(title, author, asin, isbn, ean, url, salesrank, publisher, publishdate, pages,
-									overview, genre, cover, createddate, updateddate)
-								VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, now(), now())',
-					$this->pdo->escapeString($book['title']), $this->pdo->escapeString($book['author']),
-					$this->pdo->escapeString($book['asin']), $this->pdo->escapeString($book['isbn']),
-					$this->pdo->escapeString($book['ean']), $this->pdo->escapeString($book['url']),
-					$book['salesrank'], $this->pdo->escapeString($book['publisher']),
-					$this->pdo->escapeString($book['publishdate']), $book['pages'],
-					$this->pdo->escapeString($book['overview']), $this->pdo->escapeString($book['genre']),
-					$book['cover']
-				)
+			$bookId = BookInfo::query()->insertGetId(
+				[
+					'title' => $book['title'],
+					'author' => $book['author'],
+					'asin' => $book['asin'],
+					'isbn' => $book['isbn'],
+					'ean' => $book['ean'],
+					'url' => $book['url'],
+					'salesrank' => $book['salesrank'],
+					'publisher' => $book['publisher'],
+					'publishdate' => $book['publishdate'],
+					'pages' => $book['pages'],
+					'overview' =>$book['overview'],
+					'genre' => $book['genre'],
+					'cover' => $book['cover'],
+					'createddate' => new \DateTime('NOW'),
+					'updateddate' => new \DateTime('NOW')
+				]
 			);
 		} else {
 			$bookId = $check['id'];
-			$this->pdo->queryExec(
-				sprintf('
-							UPDATE bookinfo
-							SET title = %s, author = %s, asin = %s, isbn = %s, ean = %s, url = %s, salesrank = %s, publisher = %s,
-								publishdate = %s, pages = %s, overview = %s, genre = %s, cover = %d, updateddate = NOW()
-							WHERE id = %d',
-					$this->pdo->escapeString($book['title']), $this->pdo->escapeString($book['author']),
-					$this->pdo->escapeString($book['asin']), $this->pdo->escapeString($book['isbn']),
-					$this->pdo->escapeString($book['ean']), $this->pdo->escapeString($book['url']),
-					$book['salesrank'], $this->pdo->escapeString($book['publisher']),
-					$this->pdo->escapeString($book['publishdate']), $book['pages'],
-					$this->pdo->escapeString($book['overview']), $this->pdo->escapeString($book['genre']),
-					$book['cover'], $bookId
-				)
+			BookInfo::query()->where('id', $bookId)->update(
+				[
+					'title' => $book['title'],
+					'author' => $book['author'],
+					'asin' => $book['asin'],
+					'isbn' => $book['isbn'],
+					'ean' => $book['ean'],
+					'url' => $book['url'],
+					'salesrank' => $book['salesrank'],
+					'publisher' => $book['publisher'],
+					'publishdate' => $book['publishdate'],
+					'pages' => $book['pages'],
+					'overview' => $book['overview'],
+					'genre' => $book['genre'],
+					'cover' => $book['cover'],
+					'updateddate' => new \DateTime('NOW')
+				]
 			);
 		}
 
