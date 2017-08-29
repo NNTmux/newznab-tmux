@@ -36,7 +36,7 @@
 <body>
 <div class="container">
     <div class="content">
-        <div class="title">Service temporarily unavailable. Please try again later!</div>
+        <div class="title">We are currently performing maintenance. Please try again later!</div>
     </div>
 </div>
 </body>

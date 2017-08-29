@@ -274,26 +274,11 @@ class BasePage
 
 	/**
 	 * Show 503 page.
-	 *
-	 * @param string $message Message to display.
 	 */
-	public function show503($message = 'Your maximum api or download limit has been reached for the day.'): void
+	public function show503(): void
 	{
 		header('HTTP/1.1 503 Service Temporarily Unavailable');
-		exit(
-		sprintf('
-				<html>
-					<head>
-						<title>Service Unavailable.</title>
-					</head>
-					<body>
-						<h1>Service Unavailable.</h1>
-						<p>%s</p>
-					</body>
-				</html>',
-			$message
-		)
-		);
+		die(view('errors.503'));
 	}
 
 	/**
@@ -303,7 +288,7 @@ class BasePage
 	public function showMaintenance(): void
 	{
 		header('HTTP/1.1 503 Service Temporarily Unavailable');
-		die(view('errors.503'));
+		die(view('errors.maintenance'));
 	}
 
 	/**
@@ -348,11 +333,6 @@ class BasePage
 			$this->theme = $this->userdata['style'] ?? 'None';
 			if ($this->theme === 'None') {
 				$this->theme = Settings::value('site.main.style');
-			}
-
-			if (lcfirst($this->theme) === $this->theme) {
-				// TODO add redirect to error page telling the user their theme name is invalid (after SQL patch to update current users is added).
-				$this->theme = ucfirst($this->theme);
 			}
 		} else {
 			$this->theme = Settings::value('site.main.style');
