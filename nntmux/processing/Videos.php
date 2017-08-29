@@ -109,7 +109,7 @@ abstract class Videos
 	 */
 	protected function getLocalZoneFromVideoID($videoID)
 	{
-		$result = $this->pdo->queryOneRow('SELECT localzone FROM tv_info WHERE videos_id = %d', $videoID);
+		$result = $this->pdo->queryOneRow(sprintf('SELECT localzone FROM tv_info WHERE videos_id = %d', $videoID));
 
 		return $result['localzone'] ?? '';
 	}
