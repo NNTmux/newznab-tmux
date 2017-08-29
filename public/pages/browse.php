@@ -30,19 +30,16 @@ $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false)
 
 $results = $releases->getBrowseRange($catarray, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata['categoryexclusions'], $grp);
 
-if(isset($results[0]['_totalcount'])) {
-	$browsecount = $results[0]['_totalcount'];
-}
+$browsecount = $results[0]['_totalcount'] ?? 0;
 
-if (isset($browsecount)) {
-	$page->smarty->assign('pagertotalitems', $browsecount);
-}
-$page->smarty->assign('pageroffset',$offset);
-$page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
-$page->smarty->assign('pagerquerybase', WWW_TOP . '/browse?t=' . $category . '&amp;g=' . $grp . '&amp;ob=' . $orderby . '&amp;offset=');
-$page->smarty->assign('pagerquerysuffix', '#results');
-
-
+$page->smarty->assign(
+	[
+		'pagertotalitems' => $browsecount,
+		'pageroffset'=> $offset,
+		'pageritemsperpage'=> ITEMS_PER_PAGE,
+		'pagerquerybase' => WWW_TOP . '/browse?t=' . $category . '&amp;g=' . $grp . '&amp;ob=' . $orderby . '&amp;offset=',
+		'pagerquerysuffix' => '#results'
+	]);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
