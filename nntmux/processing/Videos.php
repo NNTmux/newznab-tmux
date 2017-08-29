@@ -92,7 +92,7 @@ abstract class Videos
 	protected function getSiteIDFromVideoID($siteColumn, $videoID)
 	{
 		if (in_array($siteColumn, Videos::$sites, false)) {
-			$result = $this->pdo->queryOneRow("SELECT $siteColumn FROM videos WHERE id = $videoID");
+			$result = $this->pdo->queryOneRow(sprintf('SELECT %s FROM videos WHERE id = %d', $siteColumn, $videoID));
 
 			return $result[$siteColumn] ?? false;
 		}
@@ -107,7 +107,7 @@ abstract class Videos
 	 *
 	 * @return string Empty string if no query return or tz style timezone
 	 */
-	protected function getLocalZoneFromVideoID($videoID)
+	protected function getLocalZoneFromVideoID($videoID): string
 	{
 		$result = $this->pdo->queryOneRow(sprintf('SELECT localzone FROM tv_info WHERE videos_id = %d', $videoID));
 
