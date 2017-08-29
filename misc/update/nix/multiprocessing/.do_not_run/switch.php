@@ -335,7 +335,7 @@ function collectionCheck(&$pdo, $groupID)
 /**
  * Connect to usenet, return NNTP object.
  *
- * @param \nntmux\db\DB $pdo
+ * @param DB $pdo
  * @param bool               $alternate Use alternate NNTP provider.
  *
  * @return NNTP
@@ -343,7 +343,7 @@ function collectionCheck(&$pdo, $groupID)
 function &nntp(&$pdo, $alternate = false)
 {
 	$nntp = new NNTP(['Settings' => $pdo]);
-	if (($alternate && Settings::value('..alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+	if (($alternate && (int)Settings::value('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 		exit('ERROR: Unable to connect to usenet.' . PHP_EOL);
 	}
 
