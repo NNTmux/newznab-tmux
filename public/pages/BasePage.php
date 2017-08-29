@@ -87,6 +87,11 @@ class BasePage
 	protected $theme = 'Gentele';
 
 	/**
+	 * @var string
+	 */
+	public $token;
+
+	/**
 	 * Set up session / smarty / user variables.
 	 *
 	 * @throws \Exception
@@ -97,7 +102,11 @@ class BasePage
 
 		if (session_id() === '') {
 			session_set_cookie_params(0, '/', '', $this->https, true);
-			@session_start();
+			session_start();
+			if (empty($_SESSION['token'])) {
+				$_SESSION['token'] = bin2hex(random_bytes(32));
+			}
+			$this->token = $_SESSION['token'];
 		}
 
 		if (NN_FLOOD_CHECK) {

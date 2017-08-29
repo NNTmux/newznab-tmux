@@ -10,6 +10,7 @@
                 Enter you information below, all the fields are required.
         </p>
 	<form class="form-horizontal" action="register?action=submit" method="post">
+		<input type="hidden" name="_token" value="{$csrf_token}">
 		<table class="data">
 
 		{if $error != ''}

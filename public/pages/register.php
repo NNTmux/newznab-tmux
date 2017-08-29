@@ -34,53 +34,57 @@ if ($showRegister === 1) {
 	switch ($action) {
 		case 'submit':
 			if ($captcha->getError() === false) {
-				$userName = $_POST['username'];
-				$password = $_POST['password'];
-				$confirmPassword = $_POST['confirmpassword'];
-				$email = $_POST['email'];
-				if (!empty($_REQUEST['invitecode'])) {
-					$inviteCode = $_REQUEST['invitecode'];
-				}
+				if (Utility::checkCsrfToken() === true) {
+					$userName = $_POST['username'];
+					$password = $_POST['password'];
+					$confirmPassword = $_POST['confirmpassword'];
+					$email = $_POST['email'];
+					if (!empty($_REQUEST['invitecode'])) {
+						$inviteCode = $_REQUEST['invitecode'];
+					}
 
-				// Check uname/email isn't in use, password valid. If all good create new user account and redirect back to home page.
-				if ($password !== $confirmPassword) {
-					$error = 'Password Mismatch';
-				} else {
-					// Get the default user role.
-					$userDefault = $page->users->getDefaultRole();
-
-					$ret = $page->users->signup($userName, $password, $email,
-						$_SERVER['REMOTE_ADDR'], $userDefault['id'], '', $userDefault['defaultinvites'], $inviteCode
-					);
-
-					if ($ret > 0) {
-						$page->users->login($ret, $_SERVER['REMOTE_ADDR']);
-						header('Location: ' . WWW_TOP . '/');
+					// Check uname/email isn't in use, password valid. If all good create new user account and redirect back to home page.
+					if ($password !== $confirmPassword) {
+						$error = 'Password Mismatch';
 					} else {
-						switch ($ret) {
-							case Users::ERR_SIGNUP_BADUNAME:
-								$error = 'Your username must be at least five characters.';
-								break;
-							case Users::ERR_SIGNUP_BADPASS:
-								$error = 'Your password must be longer than eight characters.';
-								break;
-							case Users::ERR_SIGNUP_BADEMAIL:
-								$error = 'Your email is not a valid format.';
-								break;
-							case Users::ERR_SIGNUP_UNAMEINUSE:
-								$error = 'Sorry, the username is already taken.';
-								break;
-							case Users::ERR_SIGNUP_EMAILINUSE:
-								$error = 'Sorry, the email is already in use.';
-								break;
-							case Users::ERR_SIGNUP_BADINVITECODE:
-								$error = 'Sorry, the invite code is old or has been used.';
-								break;
-							default:
-								$error = 'Failed to register.';
-								break;
+						// Get the default user role.
+						$userDefault = $page->users->getDefaultRole();
+
+						$ret = $page->users->signup($userName, $password, $email,
+							$_SERVER['REMOTE_ADDR'], $userDefault['id'], '', $userDefault['defaultinvites'], $inviteCode
+						);
+
+						if ($ret > 0) {
+							$page->users->login($ret, $_SERVER['REMOTE_ADDR']);
+							header('Location: ' . WWW_TOP . '/');
+						} else {
+							switch ($ret) {
+								case Users::ERR_SIGNUP_BADUNAME:
+									$error = 'Your username must be at least five characters.';
+									break;
+								case Users::ERR_SIGNUP_BADPASS:
+									$error = 'Your password must be longer than eight characters.';
+									break;
+								case Users::ERR_SIGNUP_BADEMAIL:
+									$error = 'Your email is not a valid format.';
+									break;
+								case Users::ERR_SIGNUP_UNAMEINUSE:
+									$error = 'Sorry, the username is already taken.';
+									break;
+								case Users::ERR_SIGNUP_EMAILINUSE:
+									$error = 'Sorry, the email is already in use.';
+									break;
+								case Users::ERR_SIGNUP_BADINVITECODE:
+									$error = 'Sorry, the invite code is old or has been used.';
+									break;
+								default:
+									$error = 'Failed to register.';
+									break;
+							}
 						}
 					}
+				} else {
+					$page->show503('Security token mismatch');
 				}
 			}
 			break;
@@ -108,7 +112,8 @@ $page->smarty->assign([
 		'invitecode'        => Utility::htmlfmt($inviteCode),
 		'invite_code_query' => Utility::htmlfmt($inviteCodeQuery),
 		'showregister'      => $showRegister,
-		'error'             => $error
+		'error'             => $error,
+		'csrf_token'        => $page->token
 	]
 );
 $page->meta_title = 'Register';

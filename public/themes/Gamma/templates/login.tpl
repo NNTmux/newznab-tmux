@@ -2,6 +2,7 @@
   <h1>Login</h1>
   <br>
 	<form class="form-horizontal" action="login" method="post">
+		<input type="hidden" name="_token" value="{$csrf_token}">
 		{if isset($redirect)}
 			<input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}" />
 		{/if}

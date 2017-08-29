@@ -1211,4 +1211,12 @@ class Utility
 		$res = $pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM %s', $tableName));
 		return ($res === false ? 0 : $res['num']);
 	}
+
+	/**
+	 * @return bool
+	 */
+	public static function checkCsrfToken(): bool
+	{
+		return !empty($_POST['_token']) && hash_equals($_SESSION['token'], $_POST['_token']);
+	}
 }
