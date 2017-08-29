@@ -15,7 +15,6 @@
     },
     "classmap": [
       "public/pages/",
-      "libs/PEAR/Net_NNTP/NNTP/",
       "libs/",
       "database"
     ]
@@ -58,6 +57,10 @@
     {
       "type": "vcs",
       "url": "https://github.com/nZEDb/Git.php"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/pear/Net_NNTP"
     }
   ],
   "require": {
@@ -132,6 +135,7 @@
     "laravel/framework": "^5.4",
     "laravel/tinker": "~1.0",
     "monolog/monolog": "^1.22",
+    "pear/net_nntp": "^1.5",
     "php-tmdb/api": "~2.1",
     "phpmailer/phpmailer": "~5.2",
     "ramsey/uuid": "^3.7",

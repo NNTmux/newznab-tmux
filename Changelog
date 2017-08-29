@@ -1,4 +1,5 @@
 2017-08-29 DariusIII
+	* Chg: Use Pear/Net_NNTP library directly from github, remove local files
 	* Chg: Update the browse page for empty browsecount result
 	* Chg: Update maintenance and 503 error pages
 	* Chg: Add basic csrf protection to login and register pages
