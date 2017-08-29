@@ -1,3 +1,5 @@
+2017-08-29 DariusIII
+	* Chg: Update phpmailer to latest version
 2017-08-28 DariusIII
 	* Chg: Add BookInfo model and use it in Books class
 	* Chg: Update b3rs3rk/steamfront to latest version
