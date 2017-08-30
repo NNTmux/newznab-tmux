@@ -1,4 +1,5 @@
 2017-08-30 DariusIII
+	* Chg: Disable caching for php-tmdb
 	* Chg: Update Tmux class, use Models/Tmux and change usage of $pdo variable
 	* Chg: Update bytesToSizeString function in Utility class
 2017-08-29 DariusIII

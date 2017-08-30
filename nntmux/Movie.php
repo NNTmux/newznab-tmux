@@ -176,7 +176,7 @@ class Movie
 		$this->tmdbtoken = new ApiToken(Settings::value('APIs..tmdbkey'));
 		$this->tmdbclient = new TmdbClient($this->tmdbtoken, [
 			'cache' => [
-				'path' => NN_TMP
+				'enabled' => false
 			]
 		]
 		);
