@@ -84,7 +84,7 @@ if ($showRegister === 1) {
 						}
 					}
 				} else {
-					$page->show503('Security token mismatch');
+					$page->showTokenError();
 				}
 			}
 			break;

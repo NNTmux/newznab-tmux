@@ -211,12 +211,7 @@ class BasePage
 	public function showFloodWarning($seconds = 5): void
 	{
 		header('Retry-After: ' . $seconds);
-		$this->show503(
-			sprintf(
-				'Too many requests!</p><p>You must wait <b>%s seconds</b> before trying again.',
-				$seconds
-			)
-		);
+		$this->show503();
 	}
 
 	/**
@@ -289,6 +284,15 @@ class BasePage
 	{
 		header('HTTP/1.1 503 Service Temporarily Unavailable');
 		die(view('errors.maintenance'));
+	}
+
+	/**
+	 * Show Security token mismatch page.
+	 */
+	public function showTokenError(): void
+	{
+		header('HTTP/1.1 503 Service Temporarily Unavailable');
+		die(view('errors.tokenError'));
 	}
 
 	/**

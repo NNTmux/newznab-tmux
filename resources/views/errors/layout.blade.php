@@ -1,16 +1,9 @@
-@extends('errors.layout)
-
-@section('title')
-    Be right back.
-@endsection
-
-@section('content')
-    We are currently performing maintenance. Please try again later!
-    @endsection
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Be right back.</title>
+    <title>
+        @yield('title')
+    </title>
 
     <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
 
@@ -18,6 +11,7 @@
         html, body {
             height: 100%;
         }
+
         body {
             margin: 0;
             padding: 0;
@@ -27,15 +21,18 @@
             font-weight: 100;
             font-family: \'Lato\', sans-serif;
         }
+
         .container {
             text-align: center;
             display: table-cell;
             vertical-align: middle;
         }
+
         .content {
             text-align: center;
             display: inline-block;
         }
+
         .title {
             font-size: 72px;
             margin-bottom: 40px;
@@ -44,9 +41,7 @@
 </head>
 <body>
 <div class="container">
-    <div class="content">
-        <div class="title">We are currently performing maintenance. Please try again later!</div>
-    </div>
+    @yield('content')
 </div>
 </body>
 </html>

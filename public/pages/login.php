@@ -41,7 +41,7 @@ if (!isset($_POST['username']) || !isset($_POST['password'])) {
 			$logging->LogBadPasswd($username, $_SERVER['REMOTE_ADDR']);
 		}
 	} else {
-		$page->show503('Security token mismatch!');
+		$page->showTokenError();
 	}
 }
 
