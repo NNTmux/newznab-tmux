@@ -146,10 +146,10 @@
 
   "scripts": {
     "post-root-package-install": [
-      "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ],
     "post-create-project-cmd": [
-      "php tmux key:generate"
+      "@php tmux key:generate"
     ],
     "post-install-cmd": [
       "nntmux\\build\\ComposerScripts::postInstall",
@@ -157,6 +157,10 @@
     ],
     "post-update-cmd": [
       "nntmux\\build\\ComposerScripts::postUpdate"
+    ],
+    "post-autoload-dump": [
+      "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+      "@php tmux package:discover"
     ]
   },
   "suggest": {
