@@ -1,4 +1,4 @@
-@extends('errors.layout)
+@extends('errors.layout')
 
 @section('title')
 	Security token mismatch

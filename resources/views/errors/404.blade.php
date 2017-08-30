@@ -1,4 +1,4 @@
-@extends('errors.layout)
+@extends('errors.layout')
 
 @section('title')
         HTTP/1.1 404 Not Found
