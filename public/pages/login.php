@@ -23,7 +23,7 @@ if (!isset($_POST['username']) || !isset($_POST['password'])) {
 			if ($dis) {
 				$page->smarty->assign('error', 'Your account has been disabled.');
 			} else if ($page->users->checkPassword($_POST['password'], $res['password'], $res['id'])) {
-				$rememberMe = (isset($_POST['rememberme']) && $_POST['rememberme'] === 'on') ? 1 : 0;
+				$rememberMe = (isset($_POST['rememberme']) && $_POST['rememberme'] === 'on');
 				$page->users->login($res['id'], $_SERVER['REMOTE_ADDR'], $rememberMe);
 
 				if (isset($_POST['redirect']) && $_POST['redirect'] !== '') {
