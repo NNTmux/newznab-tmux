@@ -47,7 +47,6 @@ class Tmux
 	 */
 	public function update($form): \stdClass
 	{
-		$pdo = $this->pdo;
 		$tmux = $this->row2Object($form);
 
 		$sql = $sqlKeys = [];
@@ -55,11 +54,11 @@ class Tmux
 			if (is_array($settingV)) {
 				$settingV = implode(', ', $settingV);
 			}
-			$sql[] = sprintf('WHEN %s THEN %s', $pdo->escapeString($settingK), $pdo->escapeString($settingV));
-			$sqlKeys[] = $pdo->escapeString($settingK);
+			$sql[] = sprintf('WHEN %s THEN %s', $this->pdo->escapeString($settingK), $this->pdo->escapeString($settingV));
+			$sqlKeys[] = $this->pdo->escapeString($settingK);
 		}
 
-		$pdo->queryExec(sprintf('UPDATE tmux SET value = CASE setting %s END WHERE setting IN (%s)', implode(' ', $sql), implode(', ', $sqlKeys)));
+		$this->pdo->queryExec(sprintf('UPDATE tmux SET value = CASE setting %s END WHERE setting IN (%s)', implode(' ', $sql), implode(', ', $sqlKeys)));
 
 		return $tmux;
 	}
@@ -316,9 +315,7 @@ class Tmux
 	 */
 	public function updateItem($setting, $value)
 	{
-		$pdo = $this->pdo;
-		$sql = sprintf('UPDATE tmux SET value = %s WHERE setting = %s', $pdo->escapeString($value), $pdo->escapeString($setting));
-		return $pdo->queryExec($sql);
+		return TmuxModel::query()->where('setting', '=', $setting)->update(['value' => $value]);
 	}
 
 	//get microtime
@@ -339,12 +336,6 @@ class Tmux
 	public function decodeSize($bytes): string
 	{
 		$types = ['B', 'KB', 'MB', 'GB', 'TB'];
-		/*
-		for ($i = 0; $bytes >= 1024 && $i < (count($types) - 1); $bytes /= 1024, $i++);
-
-		return (round($bytes, 2) . " " . $types[$i]);
-		*/
-
 		$suffix = 'B';
 		foreach ($types as $type) {
 			if ($bytes < 1024.0) {
@@ -464,6 +455,7 @@ class Tmux
 	 * @param string $ppmin
 	 *
 	 * @return bool|string
+	 * @throws \Exception
 	 */
 	public function proc_query($qry, $bookreqids, $request_hours, $db_name, $ppmax = '', $ppmin = '')
 	{
@@ -506,7 +498,7 @@ class Tmux
 					Category::PC_GAMES,
 					Category::XXX_ROOT,
 					Category::XXX_X264,
-					Nfo::NfoQueryString($this->pdo),
+					Nfo::NfoQueryString(),
 					NameFixer::IS_RENAMED_NONE,
 					Nfo::NFO_UNPROC,
 					Nfo::NFO_FOUND,
@@ -587,10 +579,8 @@ class Tmux
 		if ($running === false) {
 			throw new \RuntimeException('Tmux\\\'s running flag was not found in the database.' . PHP_EOL . 'Please check the tables are correctly setup.' . PHP_EOL);
 		}
-		if ((int)$running === 0) {
-			return false;
-		}
-		return true;
+
+		return !((int)$running === 0);
 	}
 
 	/**
@@ -603,7 +593,7 @@ class Tmux
 	public function stopIfRunning(): bool
 	{
 		if ($this->isRunning() === true) {
-			$this->pdo->queryExec("UPDATE tmux SET value = 0 WHERE setting = 'running'");
+			TmuxModel::query()->where('setting', '=', 'running')->update(['value' => 0]);
 			$sleep = $this->get()->monitor_delay;
 			echo ColorCLI::header('Stopping tmux scripts and waiting ' . $sleep . ' seconds for all panes to shutdown');
 			sleep($sleep);
@@ -614,15 +604,13 @@ class Tmux
 	}
 
 	/**
-	 * @return bool|\PDOStatement
 	 * @throws \RuntimeException
 	 */
 	public function startRunning()
 	{
 		if ($this->isRunning() === false) {
-			return $this->pdo->queryExec("UPDATE tmux SET value = 1 WHERE setting = 'running'");
+			TmuxModel::query()->where('setting', '=', 'running')->update(['value' => 1]);
 		}
-		return true;
 	}
 
 	/**

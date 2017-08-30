@@ -1,5 +1,6 @@
 2017-08-30 DariusIII
-	*  Chg: Update bytesToSizeString function in Utility class
+	* Chg: Update Tmux class, use Models/Tmux and change usage of $pdo variable
+	* Chg: Update bytesToSizeString function in Utility class
 2017-08-29 DariusIII
 	* Fix: Another query change in Videos class
 	* Fix: Add missing sprintf in Videos class getLocalZoneFromVideoID function
