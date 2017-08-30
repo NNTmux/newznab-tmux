@@ -572,19 +572,21 @@ class Utility
 	/**
 	 * Get human readable size string from bytes.
 	 *
-	 * @param int $bytes     Bytes number to convert.
+	 * @param int $size     Bytes number to convert.
 	 * @param int $precision How many floating point units to add.
 	 *
 	 * @return string
 	 */
-	public static function bytesToSizeString($bytes, $precision = 0): string
+	public static function bytesToSizeString($size, $precision = 0): string
 	{
-		if ($bytes === 0) {
-			return '0B';
+		static $units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+		$step = 1024;
+		$i = 0;
+		while (($size / $step) > 0.9) {
+			$size /= $step;
+			$i++;
 		}
-		$unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
-
-		return round($bytes / (1024 ** $i = floor(log($bytes, 1024))), $precision) . $unit[(int)$i];
+		return round($size, $precision).$units[$i];
 	}
 
 	/**
