@@ -1,42 +1,43 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
+
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Binaries;
 use nntmux\Category;
 
 $page = new AdminPage();
-$bin  = new Binaries(['Settings' => $page->settings]);
+$bin = new Binaries(['Settings' => $page->settings]);
 $error = '';
 $regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1];
 
 switch ($_REQUEST['action'] ?? 'view') {
 	case 'submit':
 		if ($_POST['groupname'] === '') {
-			$error = 'Group must be a valid usenet group';
-			break;
+		    $error = 'Group must be a valid usenet group';
+		    break;
 		}
 
 		if ($_POST['regex'] === '') {
-			$error = 'Regex cannot be empty';
-			break;
+		    $error = 'Regex cannot be empty';
+		    break;
 		}
 
 		if ($_POST['id'] === '') {
-			$bin->addBlacklist($_POST);
+		    $bin->addBlacklist($_POST);
 		} else {
-			$bin->updateBlacklist($_POST);
+		    $bin->updateBlacklist($_POST);
 		}
 
-		header('Location:' . WWW_TOP . '/binaryblacklist-list.php');
+		header('Location:'.WWW_TOP.'/binaryblacklist-list.php');
 		break;
 
 	case 'addtest':
 		if (isset($_GET['regex'], $_GET['groupname'])) {
-			$regex += [
+		    $regex += [
 					'groupname' => $_GET['groupname'],
 					'regex'     => $_GET['regex'],
 					'ordinal'   => 1,
-					'status'    => 1
+					'status'    => 1,
 			];
 		}
 		break;
@@ -44,14 +45,14 @@ switch ($_REQUEST['action'] ?? 'view') {
 	case 'view':
 	default:
 		if (isset($_GET['id'])) {
-			$page->title = 'Binary Black/Whitelist Edit';
-			$regex = $bin->getBlacklistByID($_GET['id']);
+		    $page->title = 'Binary Black/Whitelist Edit';
+		    $regex = $bin->getBlacklistByID($_GET['id']);
 		} else {
-			$page->title = 'Binary Black/Whitelist Add';
-			$regex += [
+		    $page->title = 'Binary Black/Whitelist Add';
+		    $regex += [
 					'status' => 1,
 					'optype' => 1,
-					'msgcol' => 1
+					'msgcol' => 1,
 			];
 		}
 		break;
@@ -67,9 +68,9 @@ $page->smarty->assign([
 				'msgcol_ids'   => [
 						Binaries::BLACKLIST_FIELD_SUBJECT,
 						Binaries::BLACKLIST_FIELD_FROM,
-						Binaries::BLACKLIST_FIELD_MESSAGEID
+						Binaries::BLACKLIST_FIELD_MESSAGEID,
 				],
-				'msgcol_names' => ['Subject', 'Poster', 'MessageId']
+				'msgcol_names' => ['Subject', 'Poster', 'MessageId'],
 		]
 );
 

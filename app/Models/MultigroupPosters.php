@@ -10,40 +10,39 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
  * @copyright 2016 nZEDb
  */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class MultigroupPosters extends Model
 {
-	protected $table = 'multigroup_posters';
+    protected $table = 'multigroup_posters';
 
-	protected $fillable = ['id', 'poster'];
+    protected $fillable = ['id', 'poster'];
 
-	public $dateFormat = false;
+    public $dateFormat = false;
 
-	public $timestamps = false;
+    public $timestamps = false;
 
-	/**
-	 * @return string
-	 */
-	public static function commaSeparatedList(): string
-	{
-		$list = [];
-		$posters = self::all('poster');
+    /**
+     * @return string
+     */
+    public static function commaSeparatedList(): string
+    {
+        $list = [];
+        $posters = self::all('poster');
 
-		foreach ($posters as $poster) {
-			$list[] = $poster->poster;
-		}
+        foreach ($posters as $poster) {
+            $list[] = $poster->poster;
+        }
 
-		return implode(',', $list);
-	}
+        return implode(',', $list);
+    }
 }
-
-?>

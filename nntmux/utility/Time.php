@@ -18,29 +18,29 @@
  * @author    ruhllatio
  * @copyright 2015 nZEDb
  */
+
 namespace nntmux\utility;
 
 /**
- * Class Time -- functions for working with time string and DTOs
- *
- * @package nntmux\utility
+ * Class Time -- functions for working with time string and DTOs.
  */
 class Time
 {
-	/**
-	 * For a given timestamp, calculate the localized show/episode airdate
-	 * via the provided local airing timezone
-	 *
-	 * @param string $time
-	 * @param string $zone
-	 *
-	 * @return string
-	 */
-	public static function localizeAirdate($time = '', $zone = '')
-	{
-		$datetime = new \DateTime($time);
-		$newzone = new \DateTimeZone($zone);
-		$datetime->setTimezone($newzone);
-		return $datetime->format('Y-m-d');
-	}
+    /**
+     * For a given timestamp, calculate the localized show/episode airdate
+     * via the provided local airing timezone.
+     *
+     * @param string $time
+     * @param string $zone
+     *
+     * @return string
+     */
+    public static function localizeAirdate($time = '', $zone = '')
+    {
+        $datetime = new \DateTime($time);
+        $newzone = new \DateTimeZone($zone);
+        $datetime->setTimezone($newzone);
+
+        return $datetime->format('Y-m-d');
+    }
 }

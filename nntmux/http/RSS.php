@@ -2,69 +2,67 @@
 
 namespace nntmux\http;
 
-use nntmux\Releases;
-use nntmux\Category;
 use nntmux\NZB;
+use nntmux\Category;
+use nntmux\Releases;
 
 /**
- * Class RSS -- contains specific functions for RSS
- *
- * @package nntmux
+ * Class RSS -- contains specific functions for RSS.
  */
-Class RSS extends Capabilities
+class RSS extends Capabilities
 {
-	/** Releases class
-	 * @var Releases
-	 */
-	public $releases;
+    /** Releases class
+     * @var Releases
+     */
+    public $releases;
 
-	/**
-	 * @param array $options
-	 *
-	 * @throws \Exception
-	 */
-	public function __construct(array $options = [])
-	{
-		parent::__construct($options);
-		$defaults = [
+    /**
+     * @param array $options
+     *
+     * @throws \Exception
+     */
+    public function __construct(array $options = [])
+    {
+        parent::__construct($options);
+        $defaults = [
 			'Settings' => null,
-			'Releases' => null
+			'Releases' => null,
 		];
-		$options += $defaults;
+        $options += $defaults;
 
-		$this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
-	}
+        $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
+    }
 
-	/**
-	 * Get releases for RSS.
-	 *
-	 * @param     $cat
-	 * @param int $offset
-	 * @param int $userID
-	 * @param int $videosId
-	 * @param int $aniDbID
-	 * @param int $airDate
-	 *
-	 * @return array
-	 */
-	public function getRss($cat, $offset, $videosId, $aniDbID, $userID = 0, $airDate = -1): array
-	{
-		$catSearch = $cartSearch = '';
+    /**
+     * Get releases for RSS.
+     *
+     * @param     $cat
+     * @param int $offset
+     * @param int $userID
+     * @param int $videosId
+     * @param int $aniDbID
+     * @param int $airDate
+     *
+     * @return array
+     */
+    public function getRss($cat, $offset, $videosId, $aniDbID, $userID = 0, $airDate = -1): array
+    {
+        $catSearch = $cartSearch = '';
 
-		$catLimit = 'AND r.categories_id BETWEEN ' . Category::TV_ROOT . ' AND ' . Category::TV_OTHER;
+        $catLimit = 'AND r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
 
-		if (count($cat)) {
-			if ((int)$cat[0] === -2) {
-				$cartSearch = sprintf(
+        if (count($cat)) {
+            if ((int) $cat[0] === -2) {
+                $cartSearch = sprintf(
 					'INNER JOIN users_releases ON users_releases.users_id = %d AND users_releases.releases_id = r.id',
 					$userID
 				);
-			} else if ((int)$cat[0] !== -1) {
-				$catSearch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
-			}
-		}
+            } elseif ((int) $cat[0] !== -1) {
+                $catSearch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+            }
+        }
 
-		$sql = $this->pdo->query(
+        $sql = $this->pdo->query(
 			sprintf(
 				"SELECT r.*,
 					m.cover, m.imdbid, m.rating, m.plot, m.year, m.genre, m.director, m.actors,
@@ -102,25 +100,26 @@ Class RSS extends Capabilities
 				($videosId > 0 ? sprintf('AND r.videos_id = %d %s', $videosId, ($catSearch === '' ? $catLimit : '')) : ''),
 				($aniDbID > 0 ? sprintf('AND r.anidbid = %d %s', $aniDbID, ($catSearch === '' ? $catLimit : '')) : ''),
 				($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY)', $airDate) : ''),
-				' LIMIT 0,' . ($offset > 100 ? 100 : $offset)
+				' LIMIT 0,'.($offset > 100 ? 100 : $offset)
 			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
-		return $sql;
-	}
 
-	/**
-	 * Get TV shows for RSS.
-	 *
-	 * @param int   $limit
-	 * @param int   $userID
-	 * @param array $excludedCats
-	 * @param int   $airDate
-	 *
-	 * @return array
-	 */
-	public function getShowsRss($limit, $userID = 0, array $excludedCats = [], $airDate = -1): array
-	{
-		return $this->pdo->query(
+        return $sql;
+    }
+
+    /**
+     * Get TV shows for RSS.
+     *
+     * @param int   $limit
+     * @param int   $userID
+     * @param array $excludedCats
+     * @param int   $airDate
+     *
+     * @return array
+     */
+    public function getShowsRss($limit, $userID = 0, array $excludedCats = [], $airDate = -1): array
+    {
+        return $this->pdo->query(
 			sprintf("
 				SELECT r.*, v.id, v.title, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
@@ -150,29 +149,29 @@ Class RSS extends Capabilities
 					),
 					'videos_id'
 				),
-				(count($excludedCats) ? 'AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				(count($excludedCats) ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
 				($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
 				NZB::NZB_ADDED,
 				Category::TV_ROOT,
 				Category::TV_OTHER,
 				$this->releases->showPasswords,
-				' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0'
+				' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
 			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
-	}
+    }
 
-	/**
-	 * Get movies for RSS.
-	 *
-	 * @param int   $limit
-	 * @param int   $userID
-	 * @param array $excludedCats
-	 *
-	 * @return array
-	 */
-	public function getMyMoviesRss($limit, $userID = 0, array $excludedCats = []): array
-	{
-		return $this->pdo->query(
+    /**
+     * Get movies for RSS.
+     *
+     * @param int   $limit
+     * @param int   $userID
+     * @param array $excludedCats
+     *
+     * @return array
+     */
+    public function getMyMoviesRss($limit, $userID = 0, array $excludedCats = []): array
+    {
+        return $this->pdo->query(
 			sprintf("
 				SELECT r.*, mi.title AS releasetitle, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
@@ -201,29 +200,29 @@ Class RSS extends Capabilities
 					),
 					'imdbid'
 				),
-				(count($excludedCats) ? ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				(count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
 				NZB::NZB_ADDED,
 				Category::MOVIE_ROOT,
 				Category::MOVIE_OTHER,
 				$this->releases->showPasswords,
-				' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0'
+				' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
 			),
 			true,
 			NN_CACHE_EXPIRY_MEDIUM
 		);
-	}
+    }
 
-	/**
-	 * @param $column
-	 * @param $table
-	 *
-	 * @param $order
-	 *
-	 * @return array|bool
-	 */
-	public function getFirstInstance($column, $table, $order)
-	{
-		return $this->pdo->queryOneRow(
+    /**
+     * @param $column
+     * @param $table
+     *
+     * @param $order
+     *
+     * @return array|bool
+     */
+    public function getFirstInstance($column, $table, $order)
+    {
+        return $this->pdo->queryOneRow(
 			sprintf('
 				SELECT %1$s
 				FROM %2$s
@@ -234,5 +233,5 @@ Class RSS extends Capabilities
 				$order
 			)
 		);
-	}
+    }
 }

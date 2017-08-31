@@ -18,15 +18,15 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
-namespace nntmux\db;
 
+namespace nntmux\db;
 
 class PreDb extends DB
 {
-	/**
-	 * @var array Prepared Statement objects
-	 */
-	protected $ps = [
+    /**
+     * @var array Prepared Statement objects
+     */
+    protected $ps = [
 		'AddGroups'		=> null,
 		'DeleteShort' 	=> null,
 		'Export'		=> null,
@@ -37,48 +37,48 @@ class PreDb extends DB
 		'UpdateGroupID'	=> null,
 	];
 
-	public function __construct(array $options = [])
-	{
-		$defaults = [];
-		$options += $defaults;
-		parent::__construct($options);
+    public function __construct(array $options = [])
+    {
+        $defaults = [];
+        $options += $defaults;
+        parent::__construct($options);
 
-		$this->tableMain = 'predb';
-		$this->tableTemp = 'predb_imports';
-	}
+        $this->tableMain = 'predb';
+        $this->tableTemp = 'predb_imports';
+    }
 
-	public function executeAddGroups()
-	{
-		if (!isset($this->ps['AddGroups'])) {
-			$this->prepareSQLAddGroups();
-		}
+    public function executeAddGroups()
+    {
+        if (! isset($this->ps['AddGroups'])) {
+            $this->prepareSQLAddGroups();
+        }
 
-		return $this->ps['AddGroups']->execute();
-	}
+        return $this->ps['AddGroups']->execute();
+    }
 
-	public function executeDeleteShort()
-	{
-		if (!isset($this->ps['DeleteShort'])) {
-			$this->prepareSQLDeleteShort();
-		}
+    public function executeDeleteShort()
+    {
+        if (! isset($this->ps['DeleteShort'])) {
+            $this->prepareSQLDeleteShort();
+        }
 
-		return $this->ps['DeleteShort']->execute();
-	}
+        return $this->ps['DeleteShort']->execute();
+    }
 
-	/**
-	 * @param array|null $options array of parameter.
-	 *		'enclosedby'	- string for enclosed by clause. default: empty string,
-	 *		'fields'		- string for FIELDS SEPARATED BY clause. default: '\t',
-	 *		'limit'			- string for LIMIT clause. Zero indicate no clause. Default:  0,
-	 *		'lines'			- string for LINES TERMINATED BY. Default: '\r\n' (Windows style EOLs to allow \n to be used in text),
-	 *		'path'			- path (including filename) to write data to.
-	 *       All parameter will be escaped before use.
-	 *
-	 * @return false|\PDOStatement
-	 */
-	public function executeExport(array $options = null)
-	{
-		$defaults = [
+    /**
+     * @param array|null $options array of parameter.
+     *		'enclosedby'	- string for enclosed by clause. default: empty string,
+     *		'fields'		- string for FIELDS SEPARATED BY clause. default: '\t',
+     *		'limit'			- string for LIMIT clause. Zero indicate no clause. Default:  0,
+     *		'lines'			- string for LINES TERMINATED BY. Default: '\r\n' (Windows style EOLs to allow \n to be used in text),
+     *		'path'			- path (including filename) to write data to.
+     *       All parameter will be escaped before use.
+     *
+     * @return false|\PDOStatement
+     */
+    public function executeExport(array $options = null)
+    {
+        $defaults = [
 			'enclosedby'	=> '',
 			'fields'		=> '\t',
 			'limit'			=> 0,
@@ -86,143 +86,144 @@ class PreDb extends DB
 			'local'			=> false,
 			'path'			=> null,
 		];
-		$options += $defaults;
+        $options += $defaults;
 
-		if (empty($options['path'])) {
-			return null;
-		} else if (!is_numeric($options['limit'])) {
-			return null;
-		}
+        if (empty($options['path'])) {
+            return null;
+        } elseif (! is_numeric($options['limit'])) {
+            return null;
+        }
 
-		$limit = $options['limit'] > 0 ? "LIMIT {$options['limit']}" : '';
+        $limit = $options['limit'] > 0 ? "LIMIT {$options['limit']}" : '';
 
-		$enclosedby = empty($options['enclosedby']) ? '' : "ENCLOSED BY {$this->escapeString($options['enclosedby'])}";
+        $enclosedby = empty($options['enclosedby']) ? '' : "ENCLOSED BY {$this->escapeString($options['enclosedby'])}";
 
-		$sql   = <<<SQL_EXPORT
+        $sql = <<<SQL_EXPORT
 SELECT title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, g.name
 	FROM {$this->tableMain} p LEFT OUTER JOIN groups g ON p.groups_id = g.id $limit
 	INTO OUTFILE '{$options['path']}'
 	FIELDS TERMINATED BY '{$options['fields']}' $enclosedby
 	LINES TERMINATED BY '{$options['lines']}';
 SQL_EXPORT;
-		if (NN_DEBUG) {
-			echo "$sql\n";
-		}
+        if (NN_DEBUG) {
+            echo "$sql\n";
+        }
 
-		return $this->queryDirect($sql);
-	}
+        return $this->queryDirect($sql);
+    }
 
-	public function executeInsert()
-	{
-		if (!isset($this->ps['Insert'])) {
-			$this->prepareSQLInsert();
-		}
+    public function executeInsert()
+    {
+        if (! isset($this->ps['Insert'])) {
+            $this->prepareSQLInsert();
+        }
 
-		return $this->ps['Insert']->execute();
-	}
+        return $this->ps['Insert']->execute();
+    }
 
-	public function executeLoadData(array $options = null)
-	{
-		$defaults = [
+    public function executeLoadData(array $options = null)
+    {
+        $defaults = [
 			'path'		=> null,
 		];
-		$options += $defaults;
+        $options += $defaults;
 
-		if (empty($options['path'])) {
-			return null;
-		}
+        if (empty($options['path'])) {
+            return null;
+        }
 
-		if (!isset($this->ps['LoadData'])) {
-			// TODO detect LOCAL here and pass parameter as appropriate
-			$this->prepareSQLLoadData($options);
-		}
+        if (! isset($this->ps['LoadData'])) {
+            // TODO detect LOCAL here and pass parameter as appropriate
+            $this->prepareSQLLoadData($options);
+        }
 
-		return $this->ps['LoadData']->execute([':path' => $options['path']]);
-	}
+        return $this->ps['LoadData']->execute([':path' => $options['path']]);
+    }
 
-	public function executeTruncate()
-	{
-		if (!isset($this->ps['Truncate'])) {
-			$this->prepareSQLTruncate();
-		}
-		return $this->ps['Truncate']->execute();
-	}
+    public function executeTruncate()
+    {
+        if (! isset($this->ps['Truncate'])) {
+            $this->prepareSQLTruncate();
+        }
 
-	public function executeUpdateGroupID()
-	{
-		if (!isset($this->ps['UpdateGroupID'])) {
-			$this->prepareSQLUpdateGroupIDs();
-		}
+        return $this->ps['Truncate']->execute();
+    }
 
-		return $this->ps['UpdateGroupID']->execute();
-	}
+    public function executeUpdateGroupID()
+    {
+        if (! isset($this->ps['UpdateGroupID'])) {
+            $this->prepareSQLUpdateGroupIDs();
+        }
 
-	public function import($filespec, $localDB = false)
-	{
-		if (!($this->ps['AddGroups'] instanceof \PDOStatement)) {
-			$this->prepareImportSQL($localDB);
-		}
+        return $this->ps['UpdateGroupID']->execute();
+    }
 
-		$this->ps['Truncate']->execute();
+    public function import($filespec, $localDB = false)
+    {
+        if (! ($this->ps['AddGroups'] instanceof \PDOStatement)) {
+            $this->prepareImportSQL($localDB);
+        }
 
-		$this->ps['LoadData']->execute([':path' => $filespec]);
+        $this->ps['Truncate']->execute();
 
-		$this->ps['DeleteShort']->execute();
+        $this->ps['LoadData']->execute([':path' => $filespec]);
 
-		$this->ps['AddGroups']->execute();
+        $this->ps['DeleteShort']->execute();
 
-		$this->ps['UpdateGroupID']->execute();
+        $this->ps['AddGroups']->execute();
 
-		$this->ps['Insert']->execute();
-	}
+        $this->ps['UpdateGroupID']->execute();
 
-	public function progress($settings = null, array $options = [])
-	{
-		$defaults = [
-			'path'	=> NN_ROOT . 'cli' . DS . 'data' . DS . 'predb_progress.txt',
+        $this->ps['Insert']->execute();
+    }
+
+    public function progress($settings = null, array $options = [])
+    {
+        $defaults = [
+			'path'	=> NN_ROOT.'cli'.DS.'data'.DS.'predb_progress.txt',
 			'read'	=> true,
 		];
-		$options += $defaults;
+        $options += $defaults;
 
-		if (!$options['read'] || !is_file($options['path'])) {
-			file_put_contents($options['path'], base64_encode(serialize($settings)));
-		} else {
-			$settings = unserialize(base64_decode(file_get_contents($options['path'])));
-		}
+        if (! $options['read'] || ! is_file($options['path'])) {
+            file_put_contents($options['path'], base64_encode(serialize($settings)));
+        } else {
+            $settings = unserialize(base64_decode(file_get_contents($options['path'])));
+        }
 
-		return $settings;
-	}
+        return $settings;
+    }
 
-	protected function prepareImportSQL($localDB = false, $enclosedby = '')
-	{
-		$this->prepareSQLTruncate();
+    protected function prepareImportSQL($localDB = false, $enclosedby = '')
+    {
+        $this->prepareSQLTruncate();
 
-		$this->prepareSQLLoadData(['local' => $localDB, 'enclosedby' => $enclosedby, 'optional' => true]);
+        $this->prepareSQLLoadData(['local' => $localDB, 'enclosedby' => $enclosedby, 'optional' => true]);
 
-		$this->prepareSQLDeleteShort();
+        $this->prepareSQLDeleteShort();
 
-		$this->prepareSQLAddGroups();
+        $this->prepareSQLAddGroups();
 
-		$this->prepareSQLUpdateGroupIDs();
+        $this->prepareSQLUpdateGroupIDs();
 
-		$this->prepareSQLInsert();
-	}
+        $this->prepareSQLInsert();
+    }
 
-	/**
-	 * @param $sql
-	 * @param string $index
-	 */
-	protected function prepareSQLStatement($sql, $index)
-	{
-		$this->ps[$index] = $this->prepare($sql);
-	}
+    /**
+     * @param $sql
+     * @param string $index
+     */
+    protected function prepareSQLStatement($sql, $index)
+    {
+        $this->ps[$index] = $this->prepare($sql);
+    }
 
-	/**
-	 * Add any groups that are not in our current groups table
-	 */
-	protected function prepareSQLAddGroups()
-	{
-		$sql = <<<SQL_ADD_GROUPS
+    /**
+     * Add any groups that are not in our current groups table.
+     */
+    protected function prepareSQLAddGroups()
+    {
+        $sql = <<<'SQL_ADD_GROUPS'
 INSERT IGNORE INTO groups (name, description)
 	SELECT groupname, 'Added by predb import script'
 	FROM predb_imports AS pi LEFT JOIN groups AS g ON pi.groupname = g.name
@@ -230,17 +231,17 @@ INSERT IGNORE INTO groups (name, description)
 	GROUP BY groupname;
 SQL_ADD_GROUPS;
 
-		$this->prepareSQLStatement($sql, 'AddGroups');
-	}
+        $this->prepareSQLStatement($sql, 'AddGroups');
+    }
 
-	protected function prepareSQLDeleteShort()
-	{
-		$this->prepareSQLStatement('DELETE FROM predb_imports WHERE LENGTH(title) <= 8', 'DeleteShort');
-	}
+    protected function prepareSQLDeleteShort()
+    {
+        $this->prepareSQLStatement('DELETE FROM predb_imports WHERE LENGTH(title) <= 8', 'DeleteShort');
+    }
 
-	protected function prepareSQLInsert()
-	{
-		$sql = <<<SQL_INSERT
+    protected function prepareSQLInsert()
+    {
+        $sql = <<<SQL_INSERT
 INSERT INTO {$this->tableMain} (title, nfo, size, files, filename, nuked, nukereason, category, predate, SOURCE, requestid, groups_id)
   SELECT pi.title, pi.nfo, pi.size, pi.files, pi.filename, pi.nuked, pi.nukereason, pi.category, pi.predate, pi.source, pi.requestid, groups_id
     FROM predb_imports AS pi
@@ -255,48 +256,48 @@ INSERT INTO {$this->tableMain} (title, nfo, size, files, filename, nuked, nukere
 	  predb.groups_id = IF(predb.groups_id = 0, pi.groups_id, predb.groups_id);
 SQL_INSERT;
 
-		$this->prepareSQLStatement($sql, 'Insert');
-	}
+        $this->prepareSQLStatement($sql, 'Insert');
+    }
 
-	protected function prepareSQLLoadData(array $options = [])
-	{
-		$enclosedby = '';
-		$defaults = [
+    protected function prepareSQLLoadData(array $options = [])
+    {
+        $enclosedby = '';
+        $defaults = [
 			'enclosedby'	=> "'",
 			'fields'		=> '\t',
 			'lines'			=> '\r\n',    // Windows' style EOL to allow \n to be used in text.
 			'local'			=> false,
 			'optional'		=> true,
 		];
-		$options += $defaults;
+        $options += $defaults;
 
-		$local = $options['local'] === false ? 'LOCAL' : '';
-		if (!empty($options['enclosedby'])) {
-			$optional = $options['optional'] === true ? ' OPTIONALLY' : '';
-			$enclosedby = "$optional ENCLOSED BY \"{$options['enclosedby']}\"";
-		}
-		$sql = <<<SQL_LOAD_DATA
+        $local = $options['local'] === false ? 'LOCAL' : '';
+        if (! empty($options['enclosedby'])) {
+            $optional = $options['optional'] === true ? ' OPTIONALLY' : '';
+            $enclosedby = "$optional ENCLOSED BY \"{$options['enclosedby']}\"";
+        }
+        $sql = <<<SQL_LOAD_DATA
 LOAD DATA $local INFILE :path
   IGNORE INTO TABLE predb_imports
   FIELDS TERMINATED BY '{$options['fields']}' {$enclosedby}
   LINES TERMINATED BY '{$options['lines']}'
   (title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, groupname);
 SQL_LOAD_DATA;
-		if (NN_DEBUG) {
-			echo "$sql\n";
-		}
+        if (NN_DEBUG) {
+            echo "$sql\n";
+        }
 
-		$this->prepareSQLStatement($sql, 'LoadData');
-	}
+        $this->prepareSQLStatement($sql, 'LoadData');
+    }
 
-	protected function prepareSQLTruncate()
-	{
-		$this->prepareSQLStatement('TRUNCATE TABLE predb_imports', 'Truncate');
-	}
+    protected function prepareSQLTruncate()
+    {
+        $this->prepareSQLStatement('TRUNCATE TABLE predb_imports', 'Truncate');
+    }
 
-	protected function prepareSQLUpdateGroupIDs()
-	{
-		$sql = "UPDATE predb_imports AS pi SET groups_id = (SELECT id FROM groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL";
-		$this->prepareSQLStatement($sql, 'UpdateGroupID');
-	}
+    protected function prepareSQLUpdateGroupIDs()
+    {
+        $sql = 'UPDATE predb_imports AS pi SET groups_id = (SELECT id FROM groups WHERE name = pi.groupname) WHERE groupname IS NOT NULL';
+        $this->prepareSQLStatement($sql, 'UpdateGroupID');
+    }
 }

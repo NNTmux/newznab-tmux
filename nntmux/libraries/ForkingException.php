@@ -18,8 +18,8 @@
  * @author niel
  * @copyright 2015 nZEDb
  */
-namespace nntmux\libraries;
 
+namespace nntmux\libraries;
 
 class ForkingException extends \Exception
 {

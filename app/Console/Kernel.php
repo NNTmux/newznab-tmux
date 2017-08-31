@@ -2,15 +2,15 @@
 
 namespace App\Console;
 
-use App\Console\Commands\TmuxUIStart;
 use App\Console\Commands\TmuxUIStop;
+use App\Console\Commands\TmuxUIStart;
 use App\Console\Commands\UpdateNNTmux;
-use App\Console\Commands\UpdateNNTmuxComposer;
 use App\Console\Commands\UpdateNNTmuxDB;
 use App\Console\Commands\UpdateNNTmuxGit;
-use App\Console\Commands\VerifyNNTmuxSettings;
-use App\Console\Commands\VerifyNNTmuxVersion;
 use Illuminate\Console\Scheduling\Schedule;
+use App\Console\Commands\VerifyNNTmuxVersion;
+use App\Console\Commands\UpdateNNTmuxComposer;
+use App\Console\Commands\VerifyNNTmuxSettings;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
 		VerifyNNTmuxSettings::class,
 		VerifyNNTmuxVersion::class,
 		TmuxUIStart::class,
-		TmuxUIStop::class
+		TmuxUIStop::class,
     ];
 
     /**
@@ -44,14 +44,14 @@ class Kernel extends ConsoleKernel
     }
 
     /**
-	 * Register the commands for the application.
+     * Register the commands for the application.
      *
      * @return void
      */
     protected function commands()
     {
-		$this->load(__DIR__.'/Commands');
+        $this->load(__DIR__.'/Commands');
 
-    	require base_path('routes/console.php');
+        require base_path('routes/console.php');
     }
 }

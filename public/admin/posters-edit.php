@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\MultigroupPosters;
 use nntmux\processing\ProcessReleasesMultiGroup;
@@ -14,24 +14,24 @@ $action = $_REQUEST['action'] ?? 'view';
 switch ($action) {
 	case 'submit':
 		if ($_POST['id'] === '') {
-			// Add a new mg poster.
-			$poster = MultigroupPosters::query()->create(['poster' => $_POST['poster']]);
+		    // Add a new mg poster.
+		    $poster = MultigroupPosters::query()->create(['poster' => $_POST['poster']]);
 		} else {
-			// Update an existing mg poster.
-			$poster = MultigroupPosters::query()->where('id', '=', $_POST['id'])->update(['poster' => $_POST['poster']]);
+		    // Update an existing mg poster.
+		    $poster = MultigroupPosters::query()->where('id', '=', $_POST['id'])->update(['poster' => $_POST['poster']]);
 		}
 
-		header('Location:' . WWW_TOP . '/posters-list.php');
+		header('Location:'.WWW_TOP.'/posters-list.php');
 		break;
 
 	case 'view':
 	default:
-		if (!empty($_GET['id'])) {
-			$page->title = 'MultiGroup Poster Edit';
-			$poster = MultigroupPosters::query()->where('id', '=', $_GET['id'])->firstOrFail();
+		if (! empty($_GET['id'])) {
+		    $page->title = 'MultiGroup Poster Edit';
+		    $poster = MultigroupPosters::query()->where('id', '=', $_GET['id'])->firstOrFail();
 		} else {
-			$page->title = 'MultiGroup Poster Add';
-			$poster = '';
+		    $page->title = 'MultiGroup Poster Add';
+		    $poster = '';
 		}
 		$page->smarty->assign('poster', $poster);
 		break;

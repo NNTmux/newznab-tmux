@@ -6,25 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class AudioData extends Model
 {
-	/**
-	 * @var string
-	 */
-	protected $table = 'audio_data';
+    /**
+     * @var string
+     */
+    protected $table = 'audio_data';
 
-	/**
-	 * @var bool
-	 */
-	public $timestamps = false;
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
 
-	/**
-	 * @var bool
-	 */
-	protected $dateFormat = false;
+    /**
+     * @var bool
+     */
+    protected $dateFormat = false;
 
-	/**
-	 * @var array
-	 */
-	protected $fillable = [
+    /**
+     * @var array
+     */
+    protected $fillable = [
 		'id',
 		'releases_id',
 		'audioid',
@@ -36,6 +36,6 @@ class AudioData extends Model
 		'audiosamplerate',
 		'audiolibrary',
 		'audiolanguage',
-		'audiotitle'
+		'audiotitle',
 	];
 }

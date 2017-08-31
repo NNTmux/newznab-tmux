@@ -18,8 +18,8 @@
  * @author niel
  * @copyright 2015 nZEDb
  */
-namespace nntmux\processing\post;
 
+namespace nntmux\processing\post;
 
 class ProcessAdditionalException extends \Exception
 {

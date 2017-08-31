@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Logger;
 
@@ -16,7 +16,7 @@ $logPath = $logPath['LogPath'];
 
 $regex = false;
 
-switch($type) {
+switch ($type) {
 	case 'info':
 		$regex = '/\[INFO\]/';
 		break;
@@ -42,44 +42,44 @@ switch($type) {
 
 $data = $file = false;
 if (is_file($logPath)) {
-	$file = file($logPath);
+    $file = file($logPath);
 }
 $total = 0;
 if ($file !== false) {
-	rsort($file);
-	$data = [];
-	foreach ($file as $line) {
-		$line = str_replace(array('>', '<'), '', $line);
-		if ($regex !== false) {
-			if (preg_match($regex, $line)) {
-				$data[] = $line;
-			}
-		} else {
-			$data[] = $line;
-		}
-	}
-	if (count($data) === 0) {
-		$data = false;
-	} else {
-		$total = count($data);
-		$data = array_slice($data, $offset, ITEMS_PER_PAGE);
-	}
+    rsort($file);
+    $data = [];
+    foreach ($file as $line) {
+        $line = str_replace(['>', '<'], '', $line);
+        if ($regex !== false) {
+            if (preg_match($regex, $line)) {
+                $data[] = $line;
+            }
+        } else {
+            $data[] = $line;
+        }
+    }
+    if (count($data) === 0) {
+        $data = false;
+    } else {
+        $total = count($data);
+        $data = array_slice($data, $offset, ITEMS_PER_PAGE);
+    }
 }
 
 $page->smarty->assign(
-	array(
+	[
 		'data' => $data,
 		'types' => ['all', 'info', 'notice', 'warning', 'error', 'fatal', 'sql'],
-		'path'  => NN_WWW . 'smarty.php'
-	)
+		'path'  => NN_WWW.'smarty.php',
+	]
 );
 
 $page->smarty->assign('pagertotalitems', $total);
 $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
-$page->smarty->assign('pagerquerybase', WWW_TOP . "/view-logs.php?t=" . $type . "&amp;offset=");
+$page->smarty->assign('pagerquerybase', WWW_TOP.'/view-logs.php?t='.$type.'&amp;offset=');
 
-$pager = $page->smarty->fetch("pager.tpl");
+$pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
 $page->content = $page->smarty->fetch('view-logs.tpl');

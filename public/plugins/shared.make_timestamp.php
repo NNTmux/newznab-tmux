@@ -1,9 +1,6 @@
 <?php
 /**
- * Smarty shared plugin
- *
- * @package    Smarty
- * @subpackage PluginsShared
+ * Smarty shared plugin.
  */
 
 /**
@@ -33,7 +30,7 @@ function smarty_make_timestamp($string)
     } else {
         // strtotime should handle it
         $time = strtotime($string);
-        if ($time == - 1 || $time === false) {
+        if ($time == -1 || $time === false) {
             // strtotime() was not able to parse $string, use "now":
             return time();
         }

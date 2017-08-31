@@ -18,29 +18,29 @@
  * @author niel
  * @copyright 2015 NN
  */
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
-require_once NN_ROOT . 'bootstrap' . DS . 'autoload.php';
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'nntmux'.DIRECTORY_SEPARATOR.'constants.php';
+require_once NN_ROOT.'bootstrap'.DS.'autoload.php';
 
 use nntmux\config\Configure;
 
 try {
-	$config = new Configure('smarty');
+    $config = new Configure('smarty');
 } catch (\RuntimeException $e) {
-	if ((int)$e->getCode() === 1) {
-		if (is_dir('install')) {
-			header('Location: install');
-			exit();
-		}
-	}
+    if ((int) $e->getCode() === 1) {
+        if (is_dir('install')) {
+            header('Location: install');
+            exit();
+        }
+    }
 }
 
 if (function_exists('ini_set') && function_exists('ini_get')) {
-	ini_set('include_path', NN_WWW . PATH_SEPARATOR . ini_get('include_path'));
+    ini_set('include_path', NN_WWW.PATH_SEPARATOR.ini_get('include_path'));
 }
 
-$www_top = str_replace("\\", '/', dirname($_SERVER['PHP_SELF']));
+$www_top = str_replace('\\', '/', dirname($_SERVER['PHP_SELF']));
 if (strlen($www_top) === 1) {
-	$www_top = '';
+    $www_top = '';
 }
 
 // Used everywhere an href is output, includes the full path to the NNTmux install.

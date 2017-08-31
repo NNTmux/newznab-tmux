@@ -18,13 +18,11 @@
  * @author niel
  * @copyright 2015 nZEDb
  */
+
 namespace nntmux\libraries;
 
-
 /**
- * Class CacheException
- *
- * @package \nzedb\libraries
+ * Class CacheException.
  */
 class CacheException extends \Exception
 {

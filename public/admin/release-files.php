@@ -1,11 +1,11 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Releases;
-use nntmux\Users;
 use nntmux\NZB;
 use nntmux\db\DB;
+use nntmux\Users;
+use nntmux\Releases;
 
 $page = new AdminPage;
 $users = new Users;
@@ -13,19 +13,21 @@ $releases = new Releases;
 $pdo = new DB();
 $nzb = new NZB($pdo);
 
-if (!$users->isLoggedIn())
-	$page->show403();
+if (! $users->isLoggedIn()) {
+    $page->show403();
+}
 
-if (isset($_GET["id"]))
-{
-	$rel = $releases->getByGuid($_GET["id"]);
-	if (!$rel)
-		$page->show404();
-
-    $nzbpath = $nzb->getNZBPath($_GET["id"], $page->getSettingValue('..nzbpath'));
-
-    if (!file_exists($nzbpath))
+if (isset($_GET['id'])) {
+    $rel = $releases->getByGuid($_GET['id']);
+    if (! $rel) {
         $page->show404();
+    }
+
+    $nzbpath = $nzb->getNZBPath($_GET['id'], $page->getSettingValue('..nzbpath'));
+
+    if (! file_exists($nzbpath)) {
+        $page->show404();
+    }
 
     ob_start();
     @readgzfile($nzbpath);
@@ -37,12 +39,11 @@ if (isset($_GET["id"]))
     $page->smarty->assign('rel', $rel);
     $page->smarty->assign('files', $ret);
 
-	$page->title = "File List";
-	$page->meta_title = "View Nzb file list";
-	$page->meta_keywords = "view,nzb,file,list,description,details";
-	$page->meta_description = "View Nzb File List";
+    $page->title = 'File List';
+    $page->meta_title = 'View Nzb file list';
+    $page->meta_keywords = 'view,nzb,file,list,description,details';
+    $page->meta_description = 'View Nzb File List';
 
-	$page->content = $page->smarty->fetch('release-files.tpl');
-	$page->render();
+    $page->content = $page->smarty->fetch('release-files.tpl');
+    $page->render();
 }
-

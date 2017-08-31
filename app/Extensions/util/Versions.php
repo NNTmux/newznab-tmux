@@ -10,326 +10,335 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
  * @copyright 2016 nZEDb
  */
+
 namespace App\Extensions\util;
 
 use App\Models\Settings;
-use Illuminate\Database\Eloquent\Collection;
 use nntmux\utility\Utility;
+use Illuminate\Database\Eloquent\Collection;
 
 class Versions extends Collection
 {
-	/**
-	 * These constants are bitwise for checking what has changed.
-	 */
-	const UPDATED_GIT_TAG		= 1;
-	const UPDATED_SQL_DB_PATCH	= 2;
-	const UPDATED_SQL_FILE_LAST	= 4;
+    /**
+     * These constants are bitwise for checking what has changed.
+     */
+    const UPDATED_GIT_TAG = 1;
+    const UPDATED_SQL_DB_PATCH = 2;
+    const UPDATED_SQL_FILE_LAST = 4;
 
-	/**
-	 * @var integer Bitwise mask of elements that have been changed.
-	 */
-	protected $changes = 0;
+    /**
+     * @var int Bitwise mask of elements that have been changed.
+     */
+    protected $changes = 0;
 
-	/**
-	 * @var Git object.
-	 */
-	protected $git;
+    /**
+     * @var Git object.
+     */
+    protected $git;
 
-	/**
-	 * @var
-	 */
-	protected $_config;
+    /**
+     * @var
+     */
+    protected $_config;
 
-	/**
-	 * @var \simpleXMLElement object.
-	 */
-	protected $versions = null;
+    /**
+     * @var \simpleXMLElement object.
+     */
+    protected $versions = null;
 
-	/**
-	 * @var \simpleXMLElement object
-	 */
-	protected $xml = null;
+    /**
+     * @var \simpleXMLElement object
+     */
+    protected $xml = null;
 
-	public function __construct(array $config = [])
-	{
-		$defaults = [
+    public function __construct(array $config = [])
+    {
+        $defaults = [
 			'git'	=> null,
 			'path'	=> NN_VERSIONS,
 		];
-		$config += $defaults;
+        $config += $defaults;
 
-		$this->_config = $config;
-		parent::__construct($config+$defaults);
-	}
+        $this->_config = $config;
+        parent::__construct($config + $defaults);
+    }
 
-	public function checkGitTag($update = false)
-	{
-		$this->checkGitTagInFile();
-	}
+    public function checkGitTag($update = false)
+    {
+        $this->checkGitTagInFile();
+    }
 
-	/**
-	 * Checks the git's latest version tag against the XML's stored value. Version should be
-	 * Major.Minor.Revision[.fix][-dev|-RCx]
-	 *
-	 * @param bool $update
-	 *
-	 * @return false|string version string if matched or false.
-	 */
-	public function checkGitTagInFile($update = false)
-	{
-		$this->initialiseGit();
-		$result = preg_match(Utility::VERSION_REGEX, $this->git->tagLatest(), $matches) ? $matches['all'] : false;
+    /**
+     * Checks the git's latest version tag against the XML's stored value. Version should be
+     * Major.Minor.Revision[.fix][-dev|-RCx].
+     *
+     * @param bool $update
+     *
+     * @return false|string version string if matched or false.
+     */
+    public function checkGitTagInFile($update = false)
+    {
+        $this->initialiseGit();
+        $result = preg_match(Utility::VERSION_REGEX, $this->git->tagLatest(), $matches) ? $matches['all'] : false;
 
-		if ($result !== false) {
-			if (!$this->git->isStable($this->git->getBranch())) {
-				$this->loadXMLFile();
-				$result = preg_match(Utility::VERSION_REGEX, $this->versions->git->tag->__toString(),
+        if ($result !== false) {
+            if (! $this->git->isStable($this->git->getBranch())) {
+                $this->loadXMLFile();
+                $result = preg_match(Utility::VERSION_REGEX, $this->versions->git->tag->__toString(),
 					$matches) ? $matches['digits'] : false;
-				if ($result !== false) {
-					if (version_compare($matches['digits'], '0.0.0', '!=')) {
-						$this->versions->git->tag = '0.0.0-dev';
-						$this->changes |= self::UPDATED_GIT_TAG;
-					}
-				}
+                if ($result !== false) {
+                    if (version_compare($matches['digits'], '0.0.0', '!=')) {
+                        $this->versions->git->tag = '0.0.0-dev';
+                        $this->changes |= self::UPDATED_GIT_TAG;
+                    }
+                }
 
-				$result = $this->versions->git->tag;
-			} else {
-				$result = $this->checkGitTagsAreEqual(['update' => $update]);
-			}
-		}
+                $result = $this->versions->git->tag;
+            } else {
+                $result = $this->checkGitTagsAreEqual(['update' => $update]);
+            }
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	public function checkGitTagsAreEqual(array $options = [])
-	{
-		$options += [
+    public function checkGitTagsAreEqual(array $options = [])
+    {
+        $options += [
 			'update' => true,
 			'verbose' => true,
 		];
 
-		$this->loadXMLFile();
-		$latestTag = $this->git->tagLatest();
+        $this->loadXMLFile();
+        $latestTag = $this->git->tagLatest();
 
-		// Check if file's entry is the same as current branch's tag
-		if (version_compare($this->versions->git->tag, $latestTag, '!=')) {
-			if ($options['update'] === true) {
-				if ($options['verbose'] === true) {
-					echo "Updating tag version to $latestTag" . PHP_EOL;
-				}
-				$this->versions->git->tag = $this->git->tagLatest();
-				$this->changes |= self::UPDATED_GIT_TAG;
+        // Check if file's entry is the same as current branch's tag
+        if (version_compare($this->versions->git->tag, $latestTag, '!=')) {
+            if ($options['update'] === true) {
+                if ($options['verbose'] === true) {
+                    echo "Updating tag version to $latestTag".PHP_EOL;
+                }
+                $this->versions->git->tag = $this->git->tagLatest();
+                $this->changes |= self::UPDATED_GIT_TAG;
 
-				return $this->versions->git->tag;
-			} else { // They're NOT the same but we were told not to update.
-				if ($options['verbose'] === true) {
-					echo "Current tag version $latestTag, skipping update!" . PHP_EOL;
-				}
-				return false;
-			}
-		} else { // They're the same so return true
-			return true;
-		}
-	}
+                return $this->versions->git->tag;
+            } else { // They're NOT the same but we were told not to update.
+                if ($options['verbose'] === true) {
+                    echo "Current tag version $latestTag, skipping update!".PHP_EOL;
+                }
 
-	/**
-	 * Checks the database sqlpatch setting against the XML's stored value.
-	 *
-	 * @param boolean $verbose
-	 *
-	 * @return boolean|string The new database sqlpatch version, or false.
-	 */
-	public function checkSQLDb($verbose = true)
-	{
-		$this->loadXMLFile();
-		$patch = $this->getSQLPatchFromDB();
+                return false;
+            }
+        } else { // They're the same so return true
+            return true;
+        }
+    }
 
-		if ($this->versions->sql->db->__toString() !== $patch) {
-			if ($verbose) {
-				echo "Updating Db revision to $patch" . PHP_EOL;
-			}
-			$this->versions->sql->db = $patch;
-			$this->changes |= self::UPDATED_SQL_DB_PATCH;
-		}
+    /**
+     * Checks the database sqlpatch setting against the XML's stored value.
+     *
+     * @param bool $verbose
+     *
+     * @return bool|string The new database sqlpatch version, or false.
+     */
+    public function checkSQLDb($verbose = true)
+    {
+        $this->loadXMLFile();
+        $patch = $this->getSQLPatchFromDB();
 
-		return $this->isChanged(self::UPDATED_SQL_DB_PATCH) ? $patch : false;
-	}
+        if ($this->versions->sql->db->__toString() !== $patch) {
+            if ($verbose) {
+                echo "Updating Db revision to $patch".PHP_EOL;
+            }
+            $this->versions->sql->db = $patch;
+            $this->changes |= self::UPDATED_SQL_DB_PATCH;
+        }
 
-	public function checkSQLFileLatest($verbose = true)
-	{
-		$this->loadXMLFile();
-		$lastFile = $this->getSQLPatchLast();
+        return $this->isChanged(self::UPDATED_SQL_DB_PATCH) ? $patch : false;
+    }
 
-		if ($lastFile !== false && $this->versions->sql->file->__toString() !== $lastFile) {
-			if ($verbose === true) {
-				echo "Updating latest patch file to $lastFile" . PHP_EOL;
-			}
-			$this->versions->sql->file = $lastFile;
-			$this->changes |= self::UPDATED_SQL_FILE_LAST;
-		}
-	}
+    public function checkSQLFileLatest($verbose = true)
+    {
+        $this->loadXMLFile();
+        $lastFile = $this->getSQLPatchLast();
 
-	public function getGitBranch()
-	{
-		$this->initialiseGit();
-		return $this->git->getBranch();
-	}
+        if ($lastFile !== false && $this->versions->sql->file->__toString() !== $lastFile) {
+            if ($verbose === true) {
+                echo "Updating latest patch file to $lastFile".PHP_EOL;
+            }
+            $this->versions->sql->file = $lastFile;
+            $this->changes |= self::UPDATED_SQL_FILE_LAST;
+        }
+    }
 
-	public function getGitHeadHash()
-	{
-		$this->initialiseGit();
-		return $this->git->getHeadHash();
-	}
+    public function getGitBranch()
+    {
+        $this->initialiseGit();
 
-	public function getGitTagInFile()
-	{
-		$this->loadXMLFile();
-		return ($this->versions === null) ? null : $this->versions->git->tag->__toString();
-	}
+        return $this->git->getBranch();
+    }
 
-	public function getGitTagInRepo()
-	{
-		$this->initialiseGit();
-		return $this->git->tagLatest();
-	}
+    public function getGitHeadHash()
+    {
+        $this->initialiseGit();
 
-	public function getSQLPatchFromDB()
-	{
-		$dbVersion = Settings::value('..sqlpatch', true);
+        return $this->git->getHeadHash();
+    }
 
-		if (!is_numeric($dbVersion)) {
-			throw new \RuntimeException('Bad sqlpatch value');
-		}
+    public function getGitTagInFile()
+    {
+        $this->loadXMLFile();
 
-		return $dbVersion;
-	}
+        return ($this->versions === null) ? null : $this->versions->git->tag->__toString();
+    }
 
-	public function getSQLPatchFromFile()
-	{
-		$this->loadXMLFile();
-		return ($this->versions === null) ? null : $this->versions->sql->file->__toString();
-	}
+    public function getGitTagInRepo()
+    {
+        $this->initialiseGit();
 
-	public function getSQLPatchLast()
-	{
-		$options = [
-			'data'  => NN_RES . 'db' . DS . 'schema' . DS . 'data' . DS,
+        return $this->git->tagLatest();
+    }
+
+    public function getSQLPatchFromDB()
+    {
+        $dbVersion = Settings::value('..sqlpatch', true);
+
+        if (! is_numeric($dbVersion)) {
+            throw new \RuntimeException('Bad sqlpatch value');
+        }
+
+        return $dbVersion;
+    }
+
+    public function getSQLPatchFromFile()
+    {
+        $this->loadXMLFile();
+
+        return ($this->versions === null) ? null : $this->versions->sql->file->__toString();
+    }
+
+    public function getSQLPatchLast()
+    {
+        $options = [
+			'data'  => NN_RES.'db'.DS.'schema'.DS.'data'.DS,
 			'ext'   => 'sql',
-			'path'  => NN_RES . 'db' . DS . 'patches' . DS . 'mysql',
-			'regex' => '#^' . Utility::PATH_REGEX . '(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
+			'path'  => NN_RES.'db'.DS.'patches'.DS.'mysql',
+			'regex' => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
 			'safe'  => true,
 		];
-		$files = Utility::getDirFiles($options);
-		natsort($files);
+        $files = Utility::getDirFiles($options);
+        natsort($files);
 
-		return preg_match($options['regex'], end($files), $matches) ? (int)$matches['patch'] : false;
-	}
+        return preg_match($options['regex'], end($files), $matches) ? (int) $matches['patch'] : false;
+    }
 
-	public function getTagVersion()
-	{
-		$this->deprecated(__METHOD__, 'getGitTagInRepo');
-		return $this->getGitTagInRepo();
-	}
+    public function getTagVersion()
+    {
+        $this->deprecated(__METHOD__, 'getGitTagInRepo');
 
-	public function getValidVersionsFile()
-	{
-		$this->loadXMLFile();
-		return $this->xml;
-	}
+        return $this->getGitTagInRepo();
+    }
 
-	/**
-	 * Check whether the XML has been changed by one of the methods here.
-	 *
-	 * @return boolean True if the XML has been changed.
-	 */
-	public function hasChanged()
-	{
-		return $this->changes !== 0;
-	}
+    public function getValidVersionsFile()
+    {
+        $this->loadXMLFile();
 
-	public function save($verbose = true)
-	{
-		if ($this->hasChanged()) {
-			if ($verbose === true && $this->changes > 0) {
-				if ($this->isChanged(self::UPDATED_GIT_TAG)) {
-					echo 'Updated git tag version to ' . $this->versions->git->tag . PHP_EOL;
-				}
+        return $this->xml;
+    }
 
-				if ($this->isChanged(self::UPDATED_SQL_DB_PATCH)) {
-					echo 'Updated Db SQL revision to ' . $this->versions->sql->db . PHP_EOL;
-				}
+    /**
+     * Check whether the XML has been changed by one of the methods here.
+     *
+     * @return bool True if the XML has been changed.
+     */
+    public function hasChanged()
+    {
+        return $this->changes !== 0;
+    }
 
-				if ($this->isChanged(self::UPDATED_SQL_FILE_LAST)) {
-					echo 'Updated latest SQL file to ' . $this->versions->sql->file . PHP_EOL;
-				}
-			} else if ($this->changes === 0) {
-				echo 'Version file already up to date.' . PHP_EOL;
-			}
-			$this->xml->asXML($this->_config['path']);
-			$this->changes = false;
-		}
-	}
+    public function save($verbose = true)
+    {
+        if ($this->hasChanged()) {
+            if ($verbose === true && $this->changes > 0) {
+                if ($this->isChanged(self::UPDATED_GIT_TAG)) {
+                    echo 'Updated git tag version to '.$this->versions->git->tag.PHP_EOL;
+                }
 
-	protected function error($message)
-	{
-		// TODO handle console error message.
-	}
+                if ($this->isChanged(self::UPDATED_SQL_DB_PATCH)) {
+                    echo 'Updated Db SQL revision to '.$this->versions->sql->db.PHP_EOL;
+                }
 
-	protected function initialiseGit()
-	{
-		if (!($this->git instanceof Git)) {
-			$this->git = new Git();
-		}
-	}
+                if ($this->isChanged(self::UPDATED_SQL_FILE_LAST)) {
+                    echo 'Updated latest SQL file to '.$this->versions->sql->file.PHP_EOL;
+                }
+            } elseif ($this->changes === 0) {
+                echo 'Version file already up to date.'.PHP_EOL;
+            }
+            $this->xml->asXML($this->_config['path']);
+            $this->changes = false;
+        }
+    }
 
-	protected function isChanged($property)
-	{
-		return (($this->changes & $property) === $property);
-	}
+    protected function error($message)
+    {
+        // TODO handle console error message.
+    }
 
-	protected function loadXMLFile()
-	{
-		if (empty($this->versions)) {
-			$temp = libxml_use_internal_errors(true);
-			$this->xml = simplexml_load_file($this->_config['path']);
-			libxml_use_internal_errors($temp);
+    protected function initialiseGit()
+    {
+        if (! ($this->git instanceof Git)) {
+            $this->git = new Git();
+        }
+    }
 
-			if ($this->xml === false) {
-				$this->error("Your versions XML file ($this->_config['path']) is broken, try updating from git.");
-				throw new \RuntimeException("Failed to open versions XML file '{$this->_config['path']}'");
-			}
+    protected function isChanged($property)
+    {
+        return ($this->changes & $property) === $property;
+    }
 
-			if ($this->xml->count() > 0) {
-				$vers = $this->xml->xpath('/nntmux/versions');
+    protected function loadXMLFile()
+    {
+        if (empty($this->versions)) {
+            $temp = libxml_use_internal_errors(true);
+            $this->xml = simplexml_load_file($this->_config['path']);
+            libxml_use_internal_errors($temp);
 
-				if ($vers[0]->count() === 0) {
-					$this->error("Your versions XML file ({$this->_config['path']}) does not contain version info, try updating from git.");
-					throw new \RuntimeException("Failed to find versions node in XML file '{$this->_config['path']}'");
-				} else {
-					$this->versions = &$this->xml->versions; // Create a convenience shortcut
-				}
-			} else {
-				throw new \RuntimeException("No elements in file!\n");
-			}
-		}
-	}
+            if ($this->xml === false) {
+                $this->error("Your versions XML file ($this->_config['path']) is broken, try updating from git.");
+                throw new \RuntimeException("Failed to open versions XML file '{$this->_config['path']}'");
+            }
 
-	protected function _init()
-	{
-		if ($this->_config['git'] instanceof Git) {
-			$this->git =& $this->_config['git'];
-		}
-	}
+            if ($this->xml->count() > 0) {
+                $vers = $this->xml->xpath('/nntmux/versions');
 
-	private function deprecated($methodOld, $methodUse)
-	{
-		trigger_error("This method ($methodOld) is deprecated. Please use '$methodUse' instead.",
+                if ($vers[0]->count() === 0) {
+                    $this->error("Your versions XML file ({$this->_config['path']}) does not contain version info, try updating from git.");
+                    throw new \RuntimeException("Failed to find versions node in XML file '{$this->_config['path']}'");
+                } else {
+                    $this->versions = &$this->xml->versions; // Create a convenience shortcut
+                }
+            } else {
+                throw new \RuntimeException("No elements in file!\n");
+            }
+        }
+    }
+
+    protected function _init()
+    {
+        if ($this->_config['git'] instanceof Git) {
+            $this->git = &$this->_config['git'];
+        }
+    }
+
+    private function deprecated($methodOld, $methodUse)
+    {
+        trigger_error("This method ($methodOld) is deprecated. Please use '$methodUse' instead.",
 			E_USER_NOTICE);
-	}
+    }
 }

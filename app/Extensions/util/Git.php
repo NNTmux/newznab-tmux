@@ -10,223 +10,230 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
  * @copyright 2016 nZEDb
  */
+
 namespace App\Extensions\util;
 
-use \GitRepo;
-use Illuminate\Database\Eloquent\Collection;
+use GitRepo;
 use Symfony\Component\Process\Process;
+use Illuminate\Database\Eloquent\Collection;
 
 class Git extends Collection
 {
-	/**
-	 * @var \GitRepo object
-	 */
-	protected $repo;
+    /**
+     * @var \GitRepo object
+     */
+    protected $repo;
 
-	/**
-	 * @var array
-	 */
-	public $_config;
+    /**
+     * @var array
+     */
+    public $_config;
 
-	protected $gitTagLatest = null;
+    protected $gitTagLatest = null;
 
-	private $branch;
+    private $branch;
 
-	public function __construct(array $config = [])
-	{
-		$defaults = [
+    public function __construct(array $config = [])
+    {
+        $defaults = [
 			'branches'		=> [
 				'stable' => ['0.x', 'Latest-testing', '\d+\.\d+\.\d+(\.\d+)?'],
-				'development' => ['dev', 'dev-test']
+				'development' => ['dev', 'dev-test'],
 			],
 			'create'		=> false,
 			'initialise'	=> false,
 			'filepath'		=> NN_ROOT,
 		];
 
-		$config += $defaults;
-		$this->_config = $config;
-		parent::__construct($config += $defaults);
+        $config += $defaults;
+        $this->_config = $config;
+        parent::__construct($config += $defaults);
 
-		$this->repo = new GitRepo(
+        $this->repo = new GitRepo(
 			$this->_config['filepath'],
 			$this->_config['create'],
 			$this->_config['initialise']
 		);
-		$this->branch = $this->repo->active_branch();
-	}
+        $this->branch = $this->repo->active_branch();
+    }
 
-	/**
-	 * Run describe command.
-	 *
-	 * @param string $options
-	 *
-	 * @return string
-	 * @throws \Symfony\Component\Process\Exception\LogicException
-	 * @throws \Symfony\Component\Process\Exception\RuntimeException
-	 */
-	public function describe($options = null)
-	{
-		$command = new Process('git describe ' . $options);
-		$command->run();
-		return $command->getOutput();
-	}
+    /**
+     * Run describe command.
+     *
+     * @param string $options
+     *
+     * @return string
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function describe($options = null)
+    {
+        $command = new Process('git describe '.$options);
+        $command->run();
 
-	/**
-	 * Return the currently active branch
-	 *
-	 * @return string
-	 */
-	public function getBranch()
-	{
-		return $this->branch;
-	}
+        return $command->getOutput();
+    }
 
-	public function getBranchesDevelop()
-	{
-		return $this->_config['branches']['development'];
-	}
+    /**
+     * Return the currently active branch.
+     *
+     * @return string
+     */
+    public function getBranch()
+    {
+        return $this->branch;
+    }
 
-	/**
-	 * Fetches the array of branch names that are considered to be core.
-	 *
-	 * @return array
-	 */
-	public function getBranchesMain()
-	{
-		return array_merge($this->getBranchesStable(), $this->getBranchesDevelop());
-	}
+    public function getBranchesDevelop()
+    {
+        return $this->_config['branches']['development'];
+    }
 
-	public function getBranchesStable()
-	{
-		return $this->_config['branches']['stable'];
-	}
+    /**
+     * Fetches the array of branch names that are considered to be core.
+     *
+     * @return array
+     */
+    public function getBranchesMain()
+    {
+        return array_merge($this->getBranchesStable(), $this->getBranchesDevelop());
+    }
 
-	public function getHeadHash()
-	{
-		$command = new Process('git rev-parse HEAD');
-		$command->run();
-		return $command->getOutput();
-	}
+    public function getBranchesStable()
+    {
+        return $this->_config['branches']['stable'];
+    }
 
-	/**
-	 * Determine if the supplied object is commited to the repository or not.
-	 *
-	 * @param $gitObject
-	 *
-	 * @return bool
-	 * @throws \Exception
-	 */
-	public function isCommited($gitObject)
-	{
-		$cmd = "cat-file -e $gitObject";
+    public function getHeadHash()
+    {
+        $command = new Process('git rev-parse HEAD');
+        $command->run();
 
-		try {
-			$result = new Process($cmd);
-			$result->run();
-			return $result->getOutput();
-		} catch (\Exception $e) {
-			$message = explode("\n", $e->getMessage());
-			if ($message[0] === "fatal: Not a valid object name $gitObject") {
-				$result = false;
-			} else {
-				throw new \RuntimeException($message);
-			}
-		}
+        return $command->getOutput();
+    }
 
-		return ($result === '');
-	}
+    /**
+     * Determine if the supplied object is commited to the repository or not.
+     *
+     * @param $gitObject
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function isCommited($gitObject)
+    {
+        $cmd = "cat-file -e $gitObject";
 
-	public function isStable($branch)
-	{
-		foreach ($this->getBranchesStable() as $pattern) {
-			if (!preg_match("#$pattern#", $branch)) {
-				continue;
-			}
-			return true;
-		}
+        try {
+            $result = new Process($cmd);
+            $result->run();
 
-		return false;
-	}
+            return $result->getOutput();
+        } catch (\Exception $e) {
+            $message = explode("\n", $e->getMessage());
+            if ($message[0] === "fatal: Not a valid object name $gitObject") {
+                $result = false;
+            } else {
+                throw new \RuntimeException($message);
+            }
+        }
 
-	/**
-	 * Run the log command.
-	 *
-	 * @param null $options
-	 *
-	 * @return string
-	 * @throws \Symfony\Component\Process\Exception\LogicException
-	 * @throws \Symfony\Component\Process\Exception\RuntimeException
-	 */
-	public function log($options = null)
-	{
-		$command = new Process("git log $options");
-		$command->run();
-		return $command->getOutput();
-	}
+        return $result === '';
+    }
 
-	public function gitPull(array $options = [])
-	{
-		$default = [
+    public function isStable($branch)
+    {
+        foreach ($this->getBranchesStable() as $pattern) {
+            if (! preg_match("#$pattern#", $branch)) {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Run the log command.
+     *
+     * @param null $options
+     *
+     * @return string
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     */
+    public function log($options = null)
+    {
+        $command = new Process("git log $options");
+        $command->run();
+
+        return $command->getOutput();
+    }
+
+    public function gitPull(array $options = [])
+    {
+        $default = [
 			'branch'	=> $this->getBranch(),
 			'remote'	=> 'origin',
 		];
-		$options += $default;
+        $options += $default;
 
-		return $this->repo->pull($options['remote'], $options['branch']);
-	}
+        return $this->repo->pull($options['remote'], $options['branch']);
+    }
 
-	/**
-	 * Run a git command in the git repository
-	 * Accepts a git command to run
-	 *
-	 * @access  public
-	 *
-	 * @param   string  $command Command to run
-	 *
-	 * @return  string
-	 */
-	public function gitRun($command)
-	{
-		return $this->repo->run($command);
-	}
+    /**
+     * Run a git command in the git repository
+     * Accepts a git command to run.
+     *
+     *
+     * @param   string  $command Command to run
+     *
+     * @return  string
+     */
+    public function gitRun($command)
+    {
+        return $this->repo->run($command);
+    }
 
-	/**
-	 * Run the tag command.
-	 *
-	 * @param string $options
-	 *
-	 * @return string
-	 * @throws \Symfony\Component\Process\Exception\RuntimeException
-	 * @throws \Symfony\Component\Process\Exception\LogicException
-	 */
-	public function tag($options = null)
-	{
-		$command = new Process('git tag' . $options);
-		$command->run();
-		return $command->getOutput();
-	}
+    /**
+     * Run the tag command.
+     *
+     * @param string $options
+     *
+     * @return string
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     */
+    public function tag($options = null)
+    {
+        $command = new Process('git tag'.$options);
+        $command->run();
 
-	/**
-	 * Fetch the most recently added tag.
-	 *
-	 * Be aware this might cause problems if tags are added out of order?
-	 *
-	 * @return string
-	 * @throws \Symfony\Component\Process\Exception\RuntimeException
-	 * @throws \Symfony\Component\Process\Exception\LogicException
-	 */
-	public function tagLatest($cached = true)
-	{
-		if (empty($this->gitTagLatest) || $cached === false) {
-			$this->gitTagLatest = trim($this->describe('--tags --abbrev=0 HEAD'));
-		}
-		return $this->gitTagLatest;
-	}
+        return $command->getOutput();
+    }
+
+    /**
+     * Fetch the most recently added tag.
+     *
+     * Be aware this might cause problems if tags are added out of order?
+     *
+     * @return string
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     */
+    public function tagLatest($cached = true)
+    {
+        if (empty($this->gitTagLatest) || $cached === false) {
+            $this->gitTagLatest = trim($this->describe('--tags --abbrev=0 HEAD'));
+        }
+
+        return $this->gitTagLatest;
+    }
 }

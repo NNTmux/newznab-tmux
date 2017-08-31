@@ -20,7 +20,7 @@
  */
 define('GIT_PRE_COMMIT', true);
 
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once realpath(dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'bootstrap.php');
 
 use nntmux\utility\Git;
 use App\Extensions\util\Versions;
@@ -35,36 +35,35 @@ $error = false;
 //	echo "Filename: $file\n";
 //}
 
-/**
+/*
  * Add all hooks BEFORE the versions are updated so they can be skipped on any errors
  */
 if ($error === false) {
-	$git = new Git();
-	$branch = $git->active_branch();
-	if (in_array($branch, $git->mainBranches(), false)) {
-		// Only update versions, etc. on specific branches to lessen conflicts
+    $git = new Git();
+    $branch = $git->active_branch();
+    if (in_array($branch, $git->mainBranches(), false)) {
+        // Only update versions, etc. on specific branches to lessen conflicts
 
-		if ($error === false) {
-			try {
-				$vers = new Versions();
-				$vers->checkGitTag(true);
-				$vers->checkSQLFileLatest(false);
-				$vers->checkSQLDb(false);
-				$vers->save();
+        if ($error === false) {
+            try {
+                $vers = new Versions();
+                $vers->checkGitTag(true);
+                $vers->checkSQLFileLatest(false);
+                $vers->checkSQLDb(false);
+                $vers->save();
 
-				$git->add(NN_VERSIONS);
-			} catch (\Exception $e) {
-				$error = 1;
-				echo "Error while checking versions!\n";
-				echo $e->getMessage() . PHP_EOL;
-			}
-		}
-	} else {
-		echo "not 'dev' or '0.x' branch, skipping version/patch updates\n";
-	}
+                $git->add(NN_VERSIONS);
+            } catch (\Exception $e) {
+                $error = 1;
+                echo "Error while checking versions!\n";
+                echo $e->getMessage().PHP_EOL;
+            }
+        }
+    } else {
+        echo "not 'dev' or '0.x' branch, skipping version/patch updates\n";
+    }
 } else {
-	echo "Error in pre-commit hooks!!\n";
+    echo "Error in pre-commit hooks!!\n";
 }
 
 exit($error);
-?>

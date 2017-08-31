@@ -1,77 +1,75 @@
 <?php
+
 namespace nntmux\libraries;
 
+use nntmux\db\DB;
+use nntmux\ColorCLI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use nntmux\ColorCLI;
-use nntmux\db\DB;
 
 /**
  * Class TraktAPI
  * Retrive info from the Trakt API.
  */
-Class TraktAPI {
+class TraktAPI
+{
+    const API_URL = 'https://api.trakt.tv/';
 
-	const API_URL = 'https://api.trakt.tv/';
+    /**
+     * @var array	List of site IDs that trakt,tv supports. Only trakt is guaranteed to exist.
+     */
+    private $types = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvrage'];
 
-	/**
-	 * @var array	List of site IDs that trakt,tv supports. Only trakt is guaranteed to exist.
-	 */
-	private $types = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvrage'];
+    /**
+     * List of headers to send to Trakt.tv when making a request.
+     *
+     * @see http://docs.trakt.apiary.io/#introduction/required-headers
+     * @var array
+     */
+    private $requestHeaders;
 
-	/**
-	 * List of headers to send to Trakt.tv when making a request.
-	 *
-	 * @see http://docs.trakt.apiary.io/#introduction/required-headers
-	 * @var array
-	 */
-	private $requestHeaders;
+    /**
+     * @var Client
+     */
+    protected $client;
 
-	/**
-	 * @var Client
-	 */
-	protected $client;
+    /**
+     * @var DB
+     */
+    protected $pdo;
 
-	/**
-	 * @var DB
-	 */
-	protected $pdo;
+    /**
+     * Construct. Assign passed request headers.  Headers should be complete with API key.
+     *
+     *
+     * @param $headers
+     */
+    public function __construct($headers)
+    {
+        if (empty($headers)) {
+            // Can't work without headers.
+            exit;
+        }
+        $this->requestHeaders = $headers;
 
-	/**
-	 * Construct. Assign passed request headers.  Headers should be complete with API key.
-	 *
-	 * @access public
-	 *
-	 * @param $headers
-	 */
-	public function __construct($headers)
-	{
-		if (empty($headers)) {
-			// Can't work without headers.
-			exit;
-		}
-		$this->requestHeaders = $headers;
+        $this->client = new Client();
+        $this->pdo = new DB();
+    }
 
-		$this->client = new Client();
-		$this->pdo = new DB();
-	}
-
-	/**
-	 * Fetches summary from trakt.tv for the TV show using the trakt ID/season/episode.
-	 *
-	 * @param int    $id
-	 * @param string $season
-	 * @param string $ep
-	 * @param string $type
-	 *
-	 * @return array|bool
-	 * @see    http://docs.trakt.apiary.io/#reference/episodes/summary/get-a-single-episode-for-a-show
-	 *
-	 * @access public
-	 */
-	public function episodeSummary($id, $season = '', $ep = '', $type = 'min')
-	{
-		switch($type) {
+    /**
+     * Fetches summary from trakt.tv for the TV show using the trakt ID/season/episode.
+     *
+     * @param int    $id
+     * @param string $season
+     * @param string $ep
+     * @param string $type
+     *
+     * @return array|bool
+     * @see    http://docs.trakt.apiary.io/#reference/episodes/summary/get-a-single-episode-for-a-show
+     */
+    public function episodeSummary($id, $season = '', $ep = '', $type = 'min')
+    {
+        switch ($type) {
 			case 'aliases':
 			case 'full':
 			case 'images':
@@ -83,135 +81,130 @@ Class TraktAPI {
 				$extended = 'min';
 		}
 
-		$url = self::API_URL . "shows/{$id}/seasons/{$season}/episodes/{$ep}";
+        $url = self::API_URL."shows/{$id}/seasons/{$season}/episodes/{$ep}";
 
-		$array = $this->getJsonArray($url, $extended);
-		if (!is_array($array)) {
-			return false;
-		}
-		return $array;
-	}
+        $array = $this->getJsonArray($url, $extended);
+        if (! is_array($array)) {
+            return false;
+        }
 
-	/**
-	 * Fetches weekend box office data from trakt.tv, updated every monday.
-	 *
-	 * @return array|bool
-	 * @see    http://docs.trakt.apiary.io/#reference/movies/box-office/get-the-weekend-box-office
-	 *
-	 * @access public
-	 */
-	public function getBoxOffice()
-	{
-		$array = $this->getJsonArray(
-				self::API_URL . 'movies/boxoffice'
+        return $array;
+    }
+
+    /**
+     * Fetches weekend box office data from trakt.tv, updated every monday.
+     *
+     * @return array|bool
+     * @see    http://docs.trakt.apiary.io/#reference/movies/box-office/get-the-weekend-box-office
+     */
+    public function getBoxOffice()
+    {
+        $array = $this->getJsonArray(
+				self::API_URL.'movies/boxoffice'
 		);
-		if (!$array) {
-			return false;
-		}
+        if (! $array) {
+            return false;
+        }
 
-		return $array;
-	}
+        return $array;
+    }
 
-	/**
-	 * Fetches shows calendar from trakt.tv .
-	 *
-	 * @param string $start Start date of calendar ie. 2015-09-01.Default value is today.
-	 * @param int    $days  Number of days to lookup ahead. Default value is 7 days
-	 *
-	 * @return array|bool
-	 * @see    http://docs.trakt.apiary.io/#reference/calendars/all-shows/get-shows
-	 *
-	 * @access public
-	 */
-	public function getCalendar($start = '', $days = 7)
-	{
-		$array = $this->getJsonArray(
-				self::API_URL . 'calendars/all/shows/' . $start . '/' . $days
+    /**
+     * Fetches shows calendar from trakt.tv .
+     *
+     * @param string $start Start date of calendar ie. 2015-09-01.Default value is today.
+     * @param int    $days  Number of days to lookup ahead. Default value is 7 days
+     *
+     * @return array|bool
+     * @see    http://docs.trakt.apiary.io/#reference/calendars/all-shows/get-shows
+     */
+    public function getCalendar($start = '', $days = 7)
+    {
+        $array = $this->getJsonArray(
+				self::API_URL.'calendars/all/shows/'.$start.'/'.$days
 		);
-		if (!$array) {
-			return false;
-		}
+        if (! $array) {
+            return false;
+        }
 
-		return $array;
-	}
+        return $array;
+    }
 
-	/**
-	 * Download JSON from Trakt, convert to array.
-	 *
-	 * @param string $URI      URI to download.
-	 * @param string $extended Extended info from trakt tv.
-	 *                         Valid values:
-	 *                         'min'         Returns enough info to match locally. (Default)
-	 *                         'images'      Minimal info and all images.
-	 *                         'full'        Complete info for an item.
-	 *                         'full,images' Complete info and all images.
-	 *
-	 * @return array|false
-	 */
-	private function getJsonArray($URI, $extended = 'min')
-	{
-		if ($extended === '') {
-			$extendedString = '';
-		} else {
-			$extendedString = '?extended=' . $extended;
-		}
+    /**
+     * Download JSON from Trakt, convert to array.
+     *
+     * @param string $URI      URI to download.
+     * @param string $extended Extended info from trakt tv.
+     *                         Valid values:
+     *                         'min'         Returns enough info to match locally. (Default)
+     *                         'images'      Minimal info and all images.
+     *                         'full'        Complete info for an item.
+     *                         'full,images' Complete info and all images.
+     *
+     * @return array|false
+     */
+    private function getJsonArray($URI, $extended = 'min')
+    {
+        if ($extended === '') {
+            $extendedString = '';
+        } else {
+            $extendedString = '?extended='.$extended;
+        }
 
-		if (!empty($this->requestHeaders)) {
-
-			try {
-				$json = $this->client->get(
-					$URI . $extendedString,
+        if (! empty($this->requestHeaders)) {
+            try {
+                $json = $this->client->get(
+					$URI.$extendedString,
 					[
-						'headers' => $this->requestHeaders
+						'headers' => $this->requestHeaders,
 					]
 				)->getBody()->getContents();
-			} catch (RequestException $e) {
-				if ($e->hasResponse()) {
-					if($e->getCode() === 404) {
-						ColorCLI::doEcho(ColorCLI::notice('Data not available on TraktTV server'));
-					} else if ($e->getCode() === 503) {
-						ColorCLI::doEcho(ColorCLI::notice('TraktTV service unavailable'));
-					} else if ($e->getCode() === 401) {
-						ColorCLI::doEcho(ColorCLI::notice('Unauthorized - OAuth must be provided for TraktTV'));
-					} else {
-						ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from TraktTV, server responded with code: ' . $e->getCode()));
-					}
-				}
-			} catch (\RuntimeException $e) {
-				ColorCLI::doEcho(ColorCLI::notice('Unknown error occurred!'));
-			}
+            } catch (RequestException $e) {
+                if ($e->hasResponse()) {
+                    if ($e->getCode() === 404) {
+                        ColorCLI::doEcho(ColorCLI::notice('Data not available on TraktTV server'));
+                    } elseif ($e->getCode() === 503) {
+                        ColorCLI::doEcho(ColorCLI::notice('TraktTV service unavailable'));
+                    } elseif ($e->getCode() === 401) {
+                        ColorCLI::doEcho(ColorCLI::notice('Unauthorized - OAuth must be provided for TraktTV'));
+                    } else {
+                        ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from TraktTV, server responded with code: '.$e->getCode()));
+                    }
+                }
+            } catch (\RuntimeException $e) {
+                ColorCLI::doEcho(ColorCLI::notice('Unknown error occurred!'));
+            }
 
-			if (isset($json) && $json !== false) {
-				$json = json_decode($json, true);
-				if (!is_array($json) || (isset($json['status']) && $json['status'] === 'failure')) {
-					return false;
-				}
-				return $json;
-			}
-		}
+            if (isset($json) && $json !== false) {
+                $json = json_decode($json, true);
+                if (! is_array($json) || (isset($json['status']) && $json['status'] === 'failure')) {
+                    return false;
+                }
 
-		return false;
-	}
+                return $json;
+            }
+        }
 
-	/**
-	 * Fetches summary from trakt.tv for the movie.
-	 * Accept a title (the-big-lebowski-1998), a IMDB id, or a TMDB id.
-	 *
-	 * @param string $movie Title or IMDB id.
-	 * @param string $type  imdbID:      Return only the IMDB ID (returns string)
-	 *                      full:        Return all extended properties (minus images). (returns array)
-	 *                      images:      Return extended images properties (returns array)
-	 *                      full,images: Return all extended properties (plus images). (returns array)
-	 *
-	 * @see    http://docs.trakt.apiary.io/#reference/movies/summary/get-a-movie
-	 *
-	 * @return bool|array|string
-	 *
-	 * @access public
-	 */
-	public function movieSummary($movie = '', $type = 'imdbID')
-	{
-		switch ($type) {
+        return false;
+    }
+
+    /**
+     * Fetches summary from trakt.tv for the movie.
+     * Accept a title (the-big-lebowski-1998), a IMDB id, or a TMDB id.
+     *
+     * @param string $movie Title or IMDB id.
+     * @param string $type  imdbID:      Return only the IMDB ID (returns string)
+     *                      full:        Return all extended properties (minus images). (returns array)
+     *                      images:      Return extended images properties (returns array)
+     *                      full,images: Return all extended properties (plus images). (returns array)
+     *
+     * @see    http://docs.trakt.apiary.io/#reference/movies/summary/get-a-movie
+     *
+     * @return bool|array|string
+     */
+    public function movieSummary($movie = '', $type = 'imdbID')
+    {
+        switch ($type) {
 			case 'full':
 			case 'images':
 			case 'full,images':
@@ -221,98 +214,94 @@ Class TraktAPI {
 			default:
 				$extended = 'min';
 		}
-		$array = $this->getJsonArray(self::API_URL . 'movies/' . $this->slugify($movie), $extended);
-		if (!$array) {
-			return false;
-		} else {
-			if ($type === 'imdbID' && isset($array['ids']['imdb'])) {
-				return $array['ids']['imdb'];
-			}
-		}
+        $array = $this->getJsonArray(self::API_URL.'movies/'.$this->slugify($movie), $extended);
+        if (! $array) {
+            return false;
+        } else {
+            if ($type === 'imdbID' && isset($array['ids']['imdb'])) {
+                return $array['ids']['imdb'];
+            }
+        }
 
-		return $array;
-	}
+        return $array;
+    }
 
-	/**
-	 * Search for entry using on of the supported site IDs.
-	 *
-	 * @param integer	$id		The ID to look for.
-	 * @param string	$site	One of the supported sites ('imdb', 'tmdb', 'trakt', 'tvdb', 'tvrage')
-	 * @param integer	$type	videos.type flag (-1 for episodes).
-	 *
-	 * @return bool
-	 */
-	public function searchId($id, $site = 'trakt', $type = 0)
-	{
-		if (!in_array($site, $this->types) || !ctype_digit($id)) {
-			return null;
-		} else if ($site == 'imdb') {
-			$id = 'tt' . $id;
-		}
+    /**
+     * Search for entry using on of the supported site IDs.
+     *
+     * @param int	$id		The ID to look for.
+     * @param string	$site	One of the supported sites ('imdb', 'tmdb', 'trakt', 'tvdb', 'tvrage')
+     * @param int	$type	videos.type flag (-1 for episodes).
+     *
+     * @return bool
+     */
+    public function searchId($id, $site = 'trakt', $type = 0)
+    {
+        if (! in_array($site, $this->types) || ! ctype_digit($id)) {
+            return null;
+        } elseif ($site == 'imdb') {
+            $id = 'tt'.$id;
+        }
 
-		switch (true) {
+        switch (true) {
 			case $site == 'trakt' && ($type == 0 || $type == 2):
-				$type = $site . '-show';
+				$type = $site.'-show';
 				break;
 			case $site == 'trakt' && $type == 1:
-				$type = $site . '-movie';
+				$type = $site.'-movie';
 				break;
 			case $site == 'trakt' && $type == -1:
-				$type = $site . '-episode';
+				$type = $site.'-episode';
 				break;
 			default:
 		}
 
-		$url = self::API_URL . "search?id_type=$type&id=$id";
+        $url = self::API_URL."search?id_type=$type&id=$id";
 
-		return $this->getJsonArray($url, '');
-	}
+        return $this->getJsonArray($url, '');
+    }
 
-	/**
-	 * Fetches summary from trakt.tv for the show by doing a search.
-	 * Accepts a search string
-	 *
-	 * @param string $show title
-	 * @param string $type show
-	 *
-	 * @see    http://docs.trakt.apiary.io/#reference/search/get-text-query-results
-	 *
-	 * @return bool|array|string
-	 *
-	 * @access public
-	 */
-	public function showSearch($show = '', $type = 'show')
-	{
-		$searchUrl = self::API_URL . 'search?query=' .
-				str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $show)) .
-				'&type=' . $type;
+    /**
+     * Fetches summary from trakt.tv for the show by doing a search.
+     * Accepts a search string.
+     *
+     * @param string $show title
+     * @param string $type show
+     *
+     * @see    http://docs.trakt.apiary.io/#reference/search/get-text-query-results
+     *
+     * @return bool|array|string
+     */
+    public function showSearch($show = '', $type = 'show')
+    {
+        $searchUrl = self::API_URL.'search?query='.
+				str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $show)).
+				'&type='.$type;
 
-		return $this->getJsonArray($searchUrl, '');
-	}
+        return $this->getJsonArray($searchUrl, '');
+    }
 
-	/**
-	 * Fetches summary from trakt.tv for the show.
-	 * Accepts a trakt slug (game-of-thrones), a IMDB id, or Trakt id.
-	 *
-	 * @param string $show  Title or IMDB id.
-	 * @param string $type  full:        Return all extended properties (minus images). (returns array)
-	 *                      images:      Return extended images properties (returns array)
-	 *                      full,images: Return all extended properties (plus images). (returns array)
-	 *
-	 * @see    http://docs.trakt.apiary.io/#reference/shows/summary/get-a-single-show
-	 *
-	 * @return bool|array|string
-	 *
-	 * @access public
-	 */
-	public function showSummary($show = '', $type = 'full')
-	{
-		if (empty($show)) {
-			return null;
-		}
-		$showUrl = self::API_URL . 'shows/' . $this->slugify($show);
+    /**
+     * Fetches summary from trakt.tv for the show.
+     * Accepts a trakt slug (game-of-thrones), a IMDB id, or Trakt id.
+     *
+     * @param string $show  Title or IMDB id.
+     * @param string $type  full:        Return all extended properties (minus images). (returns array)
+     *                      images:      Return extended images properties (returns array)
+     *                      full,images: Return all extended properties (plus images). (returns array)
+     *
+     * @see    http://docs.trakt.apiary.io/#reference/shows/summary/get-a-single-show
+     *
+     * @return bool|array|string
+     */
+    public function showSummary($show = '', $type = 'full')
+    {
+        if (empty($show)) {
+            return null;
+        }
+        $showUrl = self::API_URL.'shows/'.$this->slugify($show);
 
-		switch ($type) {
+        switch ($type) {
 			case 'images':
 			case 'full,images':
 				$extended = $type;
@@ -324,21 +313,21 @@ Class TraktAPI {
 				$extended = '';
 		}
 
-		return $this->getJsonArray($showUrl, $extended);
-	}
+        return $this->getJsonArray($showUrl, $extended);
+    }
 
-	/**
-	 * Generate and return a slug for a given ``$phrase``.
-	 *
-	 * @param $phrase
-	 *
-	 * @return mixed
-	 */
-	public function slugify($phrase)
-	{
-		$result = preg_replace('#[^a-z0-9\s-]#', '', strtolower($phrase));
-		$result = preg_replace('#\s#', '-', trim(preg_replace('#[\s-]+#', ' ', $result)));
+    /**
+     * Generate and return a slug for a given ``$phrase``.
+     *
+     * @param $phrase
+     *
+     * @return mixed
+     */
+    public function slugify($phrase)
+    {
+        $result = preg_replace('#[^a-z0-9\s-]#', '', strtolower($phrase));
+        $result = preg_replace('#\s#', '-', trim(preg_replace('#[\s-]+#', ' ', $result)));
 
-		return $result;
-	}
+        return $result;
+    }
 }

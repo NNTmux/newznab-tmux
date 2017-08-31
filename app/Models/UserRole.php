@@ -4,27 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-
 class UserRole extends Model
 {
-	/**
-	 * @var string
-	 */
-	protected $table = 'user_roles';
+    /**
+     * @var string
+     */
+    protected $table = 'user_roles';
 
-	/**
-	 * @var bool
-	 */
-	public $timestamps = false;
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
 
-	/**
-	 * @var bool
-	 */
+    /**
+     * @var bool
+     */
     protected $dateFormat = false;
 
-	/**
-	 * @var array
-	 */
+    /**
+     * @var array
+     */
     protected $fillable = [
     	'id',
 		'name',
@@ -33,7 +32,6 @@ class UserRole extends Model
 		'defaultinvites',
 		'isdefault',
 		'canpreview',
-		'hideads'
+		'hideads',
 	];
-
 }

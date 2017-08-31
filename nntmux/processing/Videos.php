@@ -18,251 +18,251 @@
  * @author    niel
  * @copyright 2015 nZEDb
  */
+
 namespace nntmux\processing;
 
 use nntmux\db\DB;
 
 /**
  * Parent class for TV/Film and any similar classes to inherit from.
- *
- * @package nntmux\processing
  */
 abstract class Videos
 {
-	// Video Type Identifiers
-	const TYPE_TV		= 0; // Type of video is a TV Programme/Show
-	const TYPE_FILM		= 1; // Type of video is a Film/Movie
-	const TYPE_ANIME	= 2; // Type of video is a Anime
+    // Video Type Identifiers
+	const TYPE_TV = 0; // Type of video is a TV Programme/Show
+	const TYPE_FILM = 1; // Type of video is a Film/Movie
+	const TYPE_ANIME = 2; // Type of video is a Anime
 
-	/**
-	 * @var DB
-	 */
-	public $pdo;
+    /**
+     * @var DB
+     */
+    public $pdo;
 
-	/**
-	 * @var bool
-	 */
-	public $echooutput;
+    /**
+     * @var bool
+     */
+    public $echooutput;
 
-	/**
-	 * @var array	sites	The sites that we have an ID columns for in our video table.
-	 */
-	private static $sites = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvmaze', 'tvrage'];
+    /**
+     * @var array	sites	The sites that we have an ID columns for in our video table.
+     */
+    private static $sites = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvmaze', 'tvrage'];
 
-	/**
-	 * @var array Temp Array of cached failed lookups
-	 */
-	public $titleCache;
+    /**
+     * @var array Temp Array of cached failed lookups
+     */
+    public $titleCache;
 
-	public function __construct(array $options = [])
-	{
-		$defaults = [
+    public function __construct(array $options = [])
+    {
+        $defaults = [
 			'Echo'     => false,
 			'Settings' => null,
 		];
-		$options += $defaults;
+        $options += $defaults;
 
-		// Sets the default timezone for this script (and its children).
-		//date_default_timezone_set('UTC'); TODO: Make this a DTO instead and use as needed
+        // Sets the default timezone for this script (and its children).
+        //date_default_timezone_set('UTC'); TODO: Make this a DTO instead and use as needed
 
-		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->titleCache = [];
-	}
+        $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
+        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->titleCache = [];
+    }
 
-	/**
-	 * Main processing director function for scrapers
-	 * Calls work query function and initiates processing
-	 *
-	 * @param      $groupID
-	 * @param      $guidChar
-	 * @param      $process
-	 * @param bool $local
-	 */
-	abstract protected function processSite($groupID, $guidChar, $process, $local = false): void;
+    /**
+     * Main processing director function for scrapers
+     * Calls work query function and initiates processing.
+     *
+     * @param      $groupID
+     * @param      $guidChar
+     * @param      $process
+     * @param bool $local
+     */
+    abstract protected function processSite($groupID, $guidChar, $process, $local = false): void;
 
-	/**
-	 * Get video info from a Video ID and column.
-	 *
-	 * @param string  $siteColumn
-	 * @param integer $videoID
-	 *
-	 * @return array|false    False if invalid site, or ID not found; Site id value otherwise.
-	 */
-	protected function getSiteIDFromVideoID($siteColumn, $videoID)
-	{
-		if (in_array($siteColumn, Videos::$sites, false)) {
-			$result = $this->pdo->queryOneRow(sprintf('SELECT %s FROM videos WHERE id = %d', $siteColumn, $videoID));
+    /**
+     * Get video info from a Video ID and column.
+     *
+     * @param string  $siteColumn
+     * @param int $videoID
+     *
+     * @return array|false    False if invalid site, or ID not found; Site id value otherwise.
+     */
+    protected function getSiteIDFromVideoID($siteColumn, $videoID)
+    {
+        if (in_array($siteColumn, self::$sites, false)) {
+            $result = $this->pdo->queryOneRow(sprintf('SELECT %s FROM videos WHERE id = %d', $siteColumn, $videoID));
 
-			return $result[$siteColumn] ?? false;
-		}
+            return $result[$siteColumn] ?? false;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Get TV show local timezone from a Video ID
-	 *
-	 * @param integer $videoID
-	 *
-	 * @return string Empty string if no query return or tz style timezone
-	 */
-	protected function getLocalZoneFromVideoID($videoID): string
-	{
-		$result = $this->pdo->queryOneRow(sprintf('SELECT localzone FROM tv_info WHERE videos_id = %d', $videoID));
+    /**
+     * Get TV show local timezone from a Video ID.
+     *
+     * @param int $videoID
+     *
+     * @return string Empty string if no query return or tz style timezone
+     */
+    protected function getLocalZoneFromVideoID($videoID): string
+    {
+        $result = $this->pdo->queryOneRow(sprintf('SELECT localzone FROM tv_info WHERE videos_id = %d', $videoID));
 
-		return $result['localzone'] ?? '';
-	}
+        return $result['localzone'] ?? '';
+    }
 
+    /**
+     * Get video info from a Site ID and column.
+     *
+     * @param string	$siteColumn
+     * @param int	$siteID
+     *
+     * @return int|false	False if invalid site, or ID not found; video.id value otherwise.
+     */
+    protected function getVideoIDFromSiteID($siteColumn, $siteID)
+    {
+        if (in_array($siteColumn, self::$sites, false)) {
+            $result = $this->pdo->queryOneRow(sprintf('SELECT id FROM videos WHERE %s = %d', $siteColumn, $siteID));
 
-	/**
-	 * Get video info from a Site ID and column.
-	 *
-	 * @param string	$siteColumn
-	 * @param integer	$siteID
-	 *
-	 * @return int|false	False if invalid site, or ID not found; video.id value otherwise.
-	 */
-	protected function getVideoIDFromSiteID($siteColumn, $siteID)
-	{
-		if (in_array($siteColumn, Videos::$sites, false)) {
-			$result = $this->pdo->queryOneRow(sprintf('SELECT id FROM videos WHERE %s = %d', $siteColumn, $siteID));
+            return isset($result['id']) ? (int) $result['id'] : false;
+        }
 
-			return isset($result['id']) ? (int)$result['id'] : false;
-		}
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Attempt a local lookup via the title first by exact match and then by like.
-	 * Returns a false for no match or the Video ID of the match.
-	 *
-	 * @param        $title
-	 * @param        $type
-	 * @param int    $source
-	 *
-	 * @return false|int
-	 */
-	public function getByTitle($title, $type, $source = 0)
-	{
-		// Check if we already have an entry for this show.
-		$res = $this->getTitleExact($title, $type, $source);
-		if (isset($res['id'])) {
-			return $res['id'];
-		}
+    /**
+     * Attempt a local lookup via the title first by exact match and then by like.
+     * Returns a false for no match or the Video ID of the match.
+     *
+     * @param        $title
+     * @param        $type
+     * @param int    $source
+     *
+     * @return false|int
+     */
+    public function getByTitle($title, $type, $source = 0)
+    {
+        // Check if we already have an entry for this show.
+        $res = $this->getTitleExact($title, $type, $source);
+        if (isset($res['id'])) {
+            return $res['id'];
+        }
 
-		$title2 = str_replace(' and ', ' & ', $title);
-		if ((string)$title !== (string)$title2) {
-			$res = $this->getTitleExact($title2, $type, $source);
-			if (isset($res['id'])) {
-				return $res['id'];
-			}
-			$pieces = explode(' ', $title2);
-			$title2 = '%';
-			foreach ($pieces as $piece) {
-				$title2 .= str_replace(["'", '!'], '', $piece) . '%';
-			}
-			$res = $this->getTitleLoose($title2, $type, $source);
-			if (isset($res['id'])) {
-				return $res['id'];
-			}
-		}
+        $title2 = str_replace(' and ', ' & ', $title);
+        if ((string) $title !== (string) $title2) {
+            $res = $this->getTitleExact($title2, $type, $source);
+            if (isset($res['id'])) {
+                return $res['id'];
+            }
+            $pieces = explode(' ', $title2);
+            $title2 = '%';
+            foreach ($pieces as $piece) {
+                $title2 .= str_replace(["'", '!'], '', $piece).'%';
+            }
+            $res = $this->getTitleLoose($title2, $type, $source);
+            if (isset($res['id'])) {
+                return $res['id'];
+            }
+        }
 
-		// Some words are spelled correctly 2 ways
-		// example theatre and theater
-		$title2 = str_replace('er', 're', $title);
-		if ((string)$title !== (string)$title2) {
-			$res = $this->getTitleExact($title2, $type, $source);
-			if (isset($res['id'])) {
-				return $res['id'];
-			}
-			$pieces = explode(' ', $title2);
-			$title2 = '%';
-			foreach ($pieces as $piece) {
-				$title2 .= str_replace(["'", '!'], '', $piece) . '%';
-			}
-			$res = $this->getTitleLoose($title2, $type, $source);
-			if (isset($res['id'])) {
-				return $res['id'];
-			}
-		}
+        // Some words are spelled correctly 2 ways
+        // example theatre and theater
+        $title2 = str_replace('er', 're', $title);
+        if ((string) $title !== (string) $title2) {
+            $res = $this->getTitleExact($title2, $type, $source);
+            if (isset($res['id'])) {
+                return $res['id'];
+            }
+            $pieces = explode(' ', $title2);
+            $title2 = '%';
+            foreach ($pieces as $piece) {
+                $title2 .= str_replace(["'", '!'], '', $piece).'%';
+            }
+            $res = $this->getTitleLoose($title2, $type, $source);
+            if (isset($res['id'])) {
+                return $res['id'];
+            }
+        }
 
-		// If there was not an exact title match, look for title with missing chars
-		// example release name :Zorro 1990, tvrage name Zorro (1990)
-		// Only search if the title contains more than one word to prevent incorrect matches
-		$pieces = explode(' ', $title);
-		if (count($pieces) > 1) {
-			$title2 = '%';
-			foreach ($pieces as $piece) {
-				$title2 .= str_replace(["'", '!'], '', $piece) . '%';
-			}
-			$res = $this->getTitleLoose($title2, $type, $source);
-			if (isset($res['id'])) {
-				return $res['id'];
-			}
-		}
-		return false;
-	}
+        // If there was not an exact title match, look for title with missing chars
+        // example release name :Zorro 1990, tvrage name Zorro (1990)
+        // Only search if the title contains more than one word to prevent incorrect matches
+        $pieces = explode(' ', $title);
+        if (count($pieces) > 1) {
+            $title2 = '%';
+            foreach ($pieces as $piece) {
+                $title2 .= str_replace(["'", '!'], '', $piece).'%';
+            }
+            $res = $this->getTitleLoose($title2, $type, $source);
+            if (isset($res['id'])) {
+                return $res['id'];
+            }
+        }
 
-	/**
-	 * Supplementary function for getByTitle that queries for exact match
-	 *
-	 * @param        $title
-	 * @param        $type
-	 * @param int    $source
-	 *
-	 * @return array|false
-	 */
-	public function getTitleExact($title, $type, $source = 0)
-	{
-		$return = false;
-		if (!empty($title)) {
-			$return = $this->pdo->queryOneRow(
-				sprintf("
+        return false;
+    }
+
+    /**
+     * Supplementary function for getByTitle that queries for exact match.
+     *
+     * @param        $title
+     * @param        $type
+     * @param int    $source
+     *
+     * @return array|false
+     */
+    public function getTitleExact($title, $type, $source = 0)
+    {
+        $return = false;
+        if (! empty($title)) {
+            $return = $this->pdo->queryOneRow(
+				sprintf('
 					SELECT v.id
 					FROM videos v
-					WHERE v.title = %1\$s
-					AND v.type = %2\$d %3\$s",
+					WHERE v.title = %1$s
+					AND v.type = %2$d %3$s',
 					$this->pdo->escapeString($title),
 					$type,
-					($source > 0 ? 'AND v.source = ' . $source : '')
+					($source > 0 ? 'AND v.source = '.$source : '')
 				)
 			);
-			// Try for an alias
-			if ($return === false) {
-				$return = $this->pdo->queryOneRow(
-					sprintf("
+            // Try for an alias
+            if ($return === false) {
+                $return = $this->pdo->queryOneRow(
+					sprintf('
 						SELECT v.id
 						FROM videos v
 						INNER JOIN videos_aliases va ON v.id = va.videos_id
-						WHERE va.title = %1\$s
-						AND v.type = %2\$d %3\$s",
+						WHERE va.title = %1$s
+						AND v.type = %2$d %3$s',
 						$this->pdo->escapeString($title),
 						$type,
-						($source > 0 ? 'AND v.source = ' . $source : '')
+						($source > 0 ? 'AND v.source = '.$source : '')
 					)
 				);
-			}
-		}
+            }
+        }
 
-		return $return;
-	}
+        return $return;
+    }
 
-	/**
-	 * Supplementary function for getByTitle that queries for a like match
-	 *
-	 * @param        $title
-	 * @param        $type
-	 * @param int    $source
-	 *
-	 * @return array|false
-	 */
-	public function getTitleLoose($title, $type, $source = 0)
-	{
-		$return = false;
+    /**
+     * Supplementary function for getByTitle that queries for a like match.
+     *
+     * @param        $title
+     * @param        $type
+     * @param int    $source
+     *
+     * @return array|false
+     */
+    public function getTitleLoose($title, $type, $source = 0)
+    {
+        $return = false;
 
-		if (!empty($title)) {
-			$return = $this->pdo->queryOneRow(
+        if (! empty($title)) {
+            $return = $this->pdo->queryOneRow(
 				sprintf('
 					SELECT v.id
 					FROM videos v
@@ -270,12 +270,12 @@ abstract class Videos
 					AND type = %d %s',
 					$this->pdo->likeString(rtrim($title, '%'), false, false),
 					$type,
-					($source > 0 ? 'AND v.source = ' . $source : '')
+					($source > 0 ? 'AND v.source = '.$source : '')
 				)
 			);
-			// Try for an alias
-			if ($return === false) {
-				$return = $this->pdo->queryOneRow(
+            // Try for an alias
+            if ($return === false) {
+                $return = $this->pdo->queryOneRow(
 					sprintf('
 						SELECT v.id
 						FROM videos v
@@ -284,34 +284,34 @@ abstract class Videos
 						AND type = %d %s',
 						$this->pdo->likeString(rtrim($title, '%'), false, false),
 						$type,
-						($source > 0 ? 'AND v.source = ' . $source : '')
+						($source > 0 ? 'AND v.source = '.$source : '')
 					)
 				);
-			}
-		}
+            }
+        }
 
-		return $return;
-	}
+        return $return;
+    }
 
-	/**
-	 * Inserts aliases for videos
-	 *
-	 * @param       $videoId
-	 * @param array $aliases
-	 */
-	public function addAliases($videoId, array $aliases = []): void
-	{
-		if (!empty($aliases) && $videoId > 0) {
-			foreach ($aliases AS $key => $title) {
-				// Check for tvmaze style aka
-				if (is_array($title) && !empty($title['name'])) {
-					$title = $title['name'];
-				}
-				// Check if we have the AKA already
-				$check = $this->getAliases(0, $title);
+    /**
+     * Inserts aliases for videos.
+     *
+     * @param       $videoId
+     * @param array $aliases
+     */
+    public function addAliases($videoId, array $aliases = []): void
+    {
+        if (! empty($aliases) && $videoId > 0) {
+            foreach ($aliases as $key => $title) {
+                // Check for tvmaze style aka
+                if (is_array($title) && ! empty($title['name'])) {
+                    $title = $title['name'];
+                }
+                // Check if we have the AKA already
+                $check = $this->getAliases(0, $title);
 
-				if ($check === false) {
-					$this->pdo->queryInsert(
+                if ($check === false) {
+                    $this->pdo->queryInsert(
 						sprintf('
 							INSERT IGNORE INTO videos_aliases
 							(videos_id, title)
@@ -320,37 +320,38 @@ abstract class Videos
 							$this->pdo->escapeString($title)
 						)
 					);
-				}
-			}
-		}
-	}
+                }
+            }
+        }
+    }
 
-	/**
-	 * Retrieves all aliases for given VideoID or VideoID for a given alias
-	 *
-	 * @param int    $videoId
-	 * @param string $alias
-	 *
-	 * @return \PDOStatement|false
-	 */
-	public function getAliases($videoId = 0, $alias = '')
-	{
-		$return = false;
-		$sql = '';
+    /**
+     * Retrieves all aliases for given VideoID or VideoID for a given alias.
+     *
+     * @param int    $videoId
+     * @param string $alias
+     *
+     * @return \PDOStatement|false
+     */
+    public function getAliases($videoId = 0, $alias = '')
+    {
+        $return = false;
+        $sql = '';
 
-		if ($videoId > 0) {
-			$sql = 'videos_id = ' . $videoId;
-		} else if ($alias !== '') {
-			$sql = 'title = ' . $this->pdo->escapeString($alias);
-		}
+        if ($videoId > 0) {
+            $sql = 'videos_id = '.$videoId;
+        } elseif ($alias !== '') {
+            $sql = 'title = '.$this->pdo->escapeString($alias);
+        }
 
-		if ($sql !== '') {
-			$return = $this->pdo->query('
+        if ($sql !== '') {
+            $return = $this->pdo->query('
 				SELECT *
 				FROM videos_aliases
-				WHERE ' . $sql, true, NN_CACHE_EXPIRY_MEDIUM
+				WHERE '.$sql, true, NN_CACHE_EXPIRY_MEDIUM
 			);
-		}
-		return (empty($return) ? false : $return);
-	}
+        }
+
+        return empty($return) ? false : $return;
+    }
 }

@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Users;
 use nntmux\Releases;
@@ -9,7 +9,7 @@ $page = new AdminPage();
 $users = new Users();
 $releases = new Releases();
 
-$page->title = "Site Stats";
+$page->title = 'Site Stats';
 
 $topgrabs = $users->getTopGrabbers();
 $page->smarty->assign('topgrabs', $topgrabs);
@@ -39,4 +39,3 @@ $page->smarty->assign('loginsbymonth', $loginsbymonth);
 
 $page->content = $page->smarty->fetch('site-stats.tpl');
 $page->render();
-

@@ -1,4 +1,5 @@
 <?php
+
 // Author l2g
 // Date: Mar 17th, 2013
 // Version: 0.97.4
@@ -172,7 +173,7 @@ SHARING
 		recognize or want to test out the source.
 */
 
-require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap.php';
 
 use nntmux\SpotNab;
 
@@ -181,291 +182,293 @@ use nntmux\SpotNab;
 // by applying the password key against the md5 some of the message content
 // itself.  Unmatched content is ignored.
 
-$shortopts = "";
-$shortopts .= "G";
-$shortopts .= "g";
-$shortopts .= "r";
-$shortopts .= "p";
-$shortopts .= "f";
-$shortopts .= "t";
-$shortopts .= "k";
-$shortopts .= "o";
-$shortopts .= "K";
-$shortopts .= "d";
-$shortopts .= "b";
-$shortopts .= "F::";
+$shortopts = '';
+$shortopts .= 'G';
+$shortopts .= 'g';
+$shortopts .= 'r';
+$shortopts .= 'p';
+$shortopts .= 'f';
+$shortopts .= 't';
+$shortopts .= 'k';
+$shortopts .= 'o';
+$shortopts .= 'K';
+$shortopts .= 'd';
+$shortopts .= 'b';
+$shortopts .= 'F::';
 
-$longopts = array(
-	"post",
-	"fetch",
-	"fetch-backfill::",
-	"discover",
-	"broadcast",
-	"test",
-	"populate-gid",
-	"populate-fix-gid",
-	"soft-reset",
-	"keygen",
-	"force-keygen",
-	"clean-orphan-comments"
-);
+$longopts = [
+	'post',
+	'fetch',
+	'fetch-backfill::',
+	'discover',
+	'broadcast',
+	'test',
+	'populate-gid',
+	'populate-fix-gid',
+	'soft-reset',
+	'keygen',
+	'force-keygen',
+	'clean-orphan-comments',
+];
 
 $options = getopt($shortopts, $longopts);
 
-function display_help(){
-	echo "\n";
-	echo "SpotNab v0.97.4, Author: l2g\n";
-	echo "Syntax: spotnab.php <action>\n";
-	echo "\n";
-	echo "Actions:\n";
-	echo "   -g, --populate-gid        This could be considered phase one of "
+function display_help()
+{
+    echo "\n";
+    echo "SpotNab v0.97.4, Author: l2g\n";
+    echo "Syntax: spotnab.php <action>\n";
+    echo "\n";
+    echo "Actions:\n";
+    echo '   -g, --populate-gid        This could be considered phase one of '
 			."this project.\n";
-	echo "                              requiring that your releases database"
+    echo '                              requiring that your releases database'
 			." table is up to date\n";
-	echo "                              with all GID (Global Identifiers) so"
+    echo '                              with all GID (Global Identifiers) so'
 			." it can correctly\n";
-	echo "                              communicate with other servers that "
+    echo '                              communicate with other servers that '
 			."share the same content\n";
-	echo "                              from the servers configured.\n";
-	echo "   -G, --populate-fix-gid    Same as -g except broken nzb files are "
+    echo "                              from the servers configured.\n";
+    echo '   -G, --populate-fix-gid    Same as -g except broken nzb files are '
 			."also broken releases.\n";
-	echo "                              Specifying this switch will remove "
+    echo '                              Specifying this switch will remove '
 			."these dead releses.\n";
-	echo "   -f, --fetch               Get latest spotnab comments from "
+    echo '   -f, --fetch               Get latest spotnab comments from '
 			."usenet using the information\n";
-	echo "\n";
-	echo "   -F=DAYS\n";
-	echo "   --fetch-backfill=DAYS     Get latest spotnab comments as far back"
+    echo "\n";
+    echo "   -F=DAYS\n";
+    echo '   --fetch-backfill=DAYS     Get latest spotnab comments as far back'
 			." as the days specified.\n";
-	echo "\n";
-	echo "   -p, --post                Post latest updates from local system "
+    echo "\n";
+    echo '   -p, --post                Post latest updates from local system '
 			."to usenet.\n";
-	echo "\n";
-	echo "   -k, --keygen              Generate a new SSL Public/Private Key "
+    echo "\n";
+    echo '   -k, --keygen              Generate a new SSL Public/Private Key '
 			."pair only if one isn't\n";
-	echo "                              already generated.\n";
-	echo "   -K, --force-keygen        Generate a new SSL Public/Private Key "
+    echo "                              already generated.\n";
+    echo '   -K, --force-keygen        Generate a new SSL Public/Private Key '
 			."pair\n";
-	echo "\n";
-	echo "   -d, --discover            Attempt to discovery all sources available.\n";
-	echo "\n";
-	echo "   -o, --clean-orphan-comments\n";
-	echo "                             Eliminate all fetched comments that you do not have a"
+    echo "\n";
+    echo "   -d, --discover            Attempt to discovery all sources available.\n";
+    echo "\n";
+    echo "   -o, --clean-orphan-comments\n";
+    echo '                             Eliminate all fetched comments that you do not have a'
 			." release\n";
-	echo "                             associated with.\n";
-	echo "\n";
-	echo "   -b, --broadcast           Broadast information for others so they can discover.\n";
-	echo "\n";
-	echo "   -r, --soft-reset          Safely resets sources as though they were\n";
-	echo "                              just added. This is ideal to do if you\n";
-	echo "                              change usenet servers.\n";
-	echo "   -t, --test                Produces a whole lot of garbage, but "
+    echo "                             associated with.\n";
+    echo "\n";
+    echo "   -b, --broadcast           Broadast information for others so they can discover.\n";
+    echo "\n";
+    echo "   -r, --soft-reset          Safely resets sources as though they were\n";
+    echo "                              just added. This is ideal to do if you\n";
+    echo "                              change usenet servers.\n";
+    echo '   -t, --test                Produces a whole lot of garbage, but '
 			."is used for testing\n";
-	echo "                              the internals of the class...\n";
-	echo "\n";
+    echo "                              the internals of the class...\n";
+    echo "\n";
 }
 
-if(!$options){ display_help(); exit(1);}
-if(!count($options)){ display_help(); exit(1);}
+if (! $options) {
+    display_help();
+    exit(1);
+}
+if (! count($options)) {
+    display_help();
+    exit(1);
+}
 
 $delete_broken_releases = false;
-if(array_key_exists("G", $options) ||
-	array_key_exists("populate-fix-gid", $options)){
-	echo "Updating GID in releases table + fix ...";
-	$spotnab = new SpotNab();
-	$spotnab->processGID(0,5000,true);
-	echo "Done\n";
+if (array_key_exists('G', $options) ||
+	array_key_exists('populate-fix-gid', $options)) {
+    echo 'Updating GID in releases table + fix ...';
+    $spotnab = new SpotNab();
+    $spotnab->processGID(0, 5000, true);
+    echo "Done\n";
 }
 
-if(array_key_exists("g", $options) ||
-	array_key_exists("populate-gid", $options)){
-	echo "Updating GID in releases table ...";
-	$spotnab = new SpotNab();
-	$spotnab->processGID();
-	echo "Done\n";
+if (array_key_exists('g', $options) ||
+	array_key_exists('populate-gid', $options)) {
+    echo 'Updating GID in releases table ...';
+    $spotnab = new SpotNab();
+    $spotnab->processGID();
+    echo "Done\n";
 }
 
-if(array_key_exists("r", $options) ||
-	array_key_exists("soft-reset", $options)){
-	echo "Soft Reseting Spotnab... ";
-	$spotnab = new SpotNab();
-	$spotnab->soft_reset();
-	echo "Done\n";
+if (array_key_exists('r', $options) ||
+	array_key_exists('soft-reset', $options)) {
+    echo 'Soft Reseting Spotnab... ';
+    $spotnab = new SpotNab();
+    $spotnab->soft_reset();
+    echo "Done\n";
 }
 
 $force_keygen_save = false;
-if(array_key_exists("K", $options) ||
-	array_key_exists("force-keygen", $options)){
-	$spotnab = new SpotNab();
-	$spotnab->keygen(true, true);
-}
-else if(array_key_exists("k", $options) ||
-	array_key_exists("keygen", $options)){
-	$spotnab = new SpotNab();
-	$spotnab->keygen(true);
-}
-
-if(array_key_exists("p", $options) ||
-	array_key_exists("post", $options)){
-	echo "Posting... ";
-	$spotnab = new SpotNab();
-	$spotnab->post();
-	echo "Done\n";
+if (array_key_exists('K', $options) ||
+	array_key_exists('force-keygen', $options)) {
+    $spotnab = new SpotNab();
+    $spotnab->keygen(true, true);
+} elseif (array_key_exists('k', $options) ||
+	array_key_exists('keygen', $options)) {
+    $spotnab = new SpotNab();
+    $spotnab->keygen(true);
 }
 
-if(array_key_exists("d", $options) ||
-	array_key_exists("discover", $options)){
-	echo "Discovering... ";
-	$spotnab = new SpotNab();
-	$spotnab->fetch_discovery();
-	echo "Done\n";
+if (array_key_exists('p', $options) ||
+	array_key_exists('post', $options)) {
+    echo 'Posting... ';
+    $spotnab = new SpotNab();
+    $spotnab->post();
+    echo "Done\n";
 }
 
-if(array_key_exists("F", $options) ||
-	array_key_exists("fetch-backfill", $options)){
-	$days = array_key_exists("F", $options)?$options["F"]:$options["fetch-backfill"];
-    try{
-    	$days = abs(intval($days));
-    }catch(Exception $e){
-		$days = -1;
+if (array_key_exists('d', $options) ||
+	array_key_exists('discover', $options)) {
+    echo 'Discovering... ';
+    $spotnab = new SpotNab();
+    $spotnab->fetch_discovery();
+    echo "Done\n";
+}
+
+if (array_key_exists('F', $options) ||
+	array_key_exists('fetch-backfill', $options)) {
+    $days = array_key_exists('F', $options) ? $options['F'] : $options['fetch-backfill'];
+    try {
+        $days = abs(intval($days));
+    } catch (Exception $e) {
+        $days = -1;
     }
 
-    if($days <= 0){
-    	echo "Error: A SpotNab fetch backfill requires you specify the number of days to look back.\n";
-    	echo "Syntax: php spontnab.php -F=<days>\n";
+    if ($days <= 0) {
+        echo "Error: A SpotNab fetch backfill requires you specify the number of days to look back.\n";
+        echo "Syntax: php spontnab.php -F=<days>\n";
         exit(1);
     }
-	echo "Fetching $days day(s) back ... ";
-	$spotnab = new SpotNab();
-	$spotnab->fetch(time()-($days*86400));
-	echo "Done\n";
-
-
-}else if (array_key_exists("f", $options) ||
-	array_key_exists("fetch", $options)){
-	echo "Fetching... ";
-	$spotnab = new SpotNab();
-	$spotnab->fetch();
-	echo "Done\n";
+    echo "Fetching $days day(s) back ... ";
+    $spotnab = new SpotNab();
+    $spotnab->fetch(time() - ($days * 86400));
+    echo "Done\n";
+} elseif (array_key_exists('f', $options) ||
+	array_key_exists('fetch', $options)) {
+    echo 'Fetching... ';
+    $spotnab = new SpotNab();
+    $spotnab->fetch();
+    echo "Done\n";
 }
 
-if(array_key_exists("b", $options) ||
-	array_key_exists("broadcast", $options)){
-	echo "Broadcasting... ";
-	$spotnab = new SpotNab();
-	$spotnab->post_discovery();
-	echo "Done\n";
+if (array_key_exists('b', $options) ||
+	array_key_exists('broadcast', $options)) {
+    echo 'Broadcasting... ';
+    $spotnab = new SpotNab();
+    $spotnab->post_discovery();
+    echo "Done\n";
 }
 
-if(array_key_exists("t", $options) ||
-	array_key_exists("test", $options)){
-	$spotnab = new SpotNab();
+if (array_key_exists('t', $options) ||
+	array_key_exists('test', $options)) {
+    $spotnab = new SpotNab();
 
-	if($spotnab->has_openssl())
-	{
-		printf("%s INFO - Testing SSL Key Generator ...",
-					date("Y-m-d H:i:s"));
-		$keys = $spotnab->keygen(false);
-		if(is_array($keys) &&
-			array_key_exists("pubkey", $keys) &&
-			array_key_exists("prvkey", $keys))
-		{
-			$prvkey = $spotnab->decompstr($keys['prvkey']);
-			$pubkey = $spotnab->decompstr($keys['pubkey']);
-			$refc = $spotnab->getRandomStr(80);
-			$refd = $spotnab->decrypt($spotnab->encrypt($refc, $prvkey), $pubkey);
-			echo ($refc == $refd)?"Successful!\n":"Failed!\n";
-		}else{
-			echo "Failed!\n";
-		}
+    if ($spotnab->has_openssl()) {
+        printf('%s INFO - Testing SSL Key Generator ...',
+					date('Y-m-d H:i:s'));
+        $keys = $spotnab->keygen(false);
+        if (is_array($keys) &&
+			array_key_exists('pubkey', $keys) &&
+			array_key_exists('prvkey', $keys)) {
+            $prvkey = $spotnab->decompstr($keys['prvkey']);
+            $pubkey = $spotnab->decompstr($keys['pubkey']);
+            $refc = $spotnab->getRandomStr(80);
+            $refd = $spotnab->decrypt($spotnab->encrypt($refc, $prvkey), $pubkey);
+            echo ($refc == $refd) ? "Successful!\n" : "Failed!\n";
+        } else {
+            echo "Failed!\n";
+        }
 
-		printf("%s INFO - Testing SSL encryption/decryption ...",
-				date("Y-m-d H:i:s"));
-		$preMsg = $spotnab->getRandomStr(800);
-		$postMsg = $spotnab->decrypt($spotnab->encrypt($preMsg));
-		if($postMsg === false){
-			echo "Failed!\n";
-		}else if(!strcmp($preMsg, $postMsg)){
-				echo "Successful!\n";
-		}else{
-			echo "Failed!\n";
-		}
+        printf('%s INFO - Testing SSL encryption/decryption ...',
+				date('Y-m-d H:i:s'));
+        $preMsg = $spotnab->getRandomStr(800);
+        $postMsg = $spotnab->decrypt($spotnab->encrypt($preMsg));
+        if ($postMsg === false) {
+            echo "Failed!\n";
+        } elseif (! strcmp($preMsg, $postMsg)) {
+            echo "Successful!\n";
+        } else {
+            echo "Failed!\n";
+        }
 
-		printf("%s INFO - Testing small message encode/decode ...",
-					date("Y-m-d H:i:s"));
-		$before = array(
-			'server' => array(
+        printf('%s INFO - Testing small message encode/decode ...',
+					date('Y-m-d H:i:s'));
+        $before = [
+			'server' => [
 				'code' => 'l2g',
-				'title' => 'l2g newznab'
-			),
+				'title' => 'l2g newznab',
+			],
 			'postdate_utc' => $spotnab->local2utc(),
-			'comments' => array(
-				array(
+			'comments' => [
+				[
 					'gid' => 'ABCDEFHIJKLMNOPQRSTUVWXYZ0123456',
 					'cid' => 'ABCDEFHIJKLMNOPQRSTUVWXYZ0123456',
 					'comment' => 'testing comment 1',
 					'username' => 'l2g',
 					'is_visible' => 1,
-					'postdate_utc' => $spotnab->local2utc(time()-86400)
-				),
-				array(
+					'postdate_utc' => $spotnab->local2utc(time() - 86400),
+				],
+				[
 					'gid' => 'ABCDEFHIJKLMNOPQRSTUVWXYZ0123456',
 					'cid' => 'ABCDEFHIJKLMNOPQRSTUVWXYZ0123456',
 					'username' => 'l2g-hater',
 					'is_visible' => 1,
 					'comment' => 'testing comment 2',
-					'postdate_utc' => $spotnab->local2utc(time()-86000)
-				)
-			)
-		);
-		$article = $spotnab->encodePost($before, Null, true);
-		if($article !== false){
-			$after = $spotnab->decodePost($article[1]);
-			if($before === $after){
-				echo "Successful!\n";
-			}else{
-				echo "Failed!\n";
-			}
-		}else{
-			echo "Failed!\n";
-		}
-		printf("%s INFO - Testing big message encode/decode ...",
-					date("Y-m-d H:i:s"));
-		$before = array(
-			'server' => array(
+					'postdate_utc' => $spotnab->local2utc(time() - 86000),
+				],
+			],
+		];
+        $article = $spotnab->encodePost($before, null, true);
+        if ($article !== false) {
+            $after = $spotnab->decodePost($article[1]);
+            if ($before === $after) {
+                echo "Successful!\n";
+            } else {
+                echo "Failed!\n";
+            }
+        } else {
+            echo "Failed!\n";
+        }
+        printf('%s INFO - Testing big message encode/decode ...',
+					date('Y-m-d H:i:s'));
+        $before = [
+			'server' => [
 				'code' => 'l2g',
-				'title' => 'l2g newznab'
-			),
+				'title' => 'l2g newznab',
+			],
 			'postdate_utc' => $spotnab->local2utc(),
-			'comments' => []
-		);
-		for($i=0;$i<3000;$i++){
-			// Build large post
-			$before['comments'][] =array(
+			'comments' => [],
+		];
+        for ($i = 0; $i < 3000; $i++) {
+            // Build large post
+            $before['comments'][] = [
 				'gid' => 'ABCDEFHIJKLMNOPQRSTUVWXYZ0123456',
 				'cid' => 'ABCDEFHIJKLMNOPQRSTUVWXYZ0123456',
-				'comment' => $refc = $spotnab->getRandomStr(rand(15,200)),
+				'comment' => $refc = $spotnab->getRandomStr(rand(15, 200)),
 				'username' => 'bb',
 				'is_visible' => 1,
-				'postdate_utc' => $spotnab->local2utc(time()-86400)
-			);
-		}
-		$article = $spotnab->encodePost($before, Null, true);
-		if($article !== false){
-			$after = $spotnab->decodePost($article[1]);
-			if($before === $after){
-				echo "Successful!\n";
-			}else{
-				echo "Failed!\n";
-			}
-		}else{
-			echo "Failed!\n";
-		}
+				'postdate_utc' => $spotnab->local2utc(time() - 86400),
+			];
+        }
+        $article = $spotnab->encodePost($before, null, true);
+        if ($article !== false) {
+            $after = $spotnab->decodePost($article[1]);
+            if ($before === $after) {
+                echo "Successful!\n";
+            } else {
+                echo "Failed!\n";
+            }
+        } else {
+            echo "Failed!\n";
+        }
 
-		printf("%s INFO - Testing fake usenet parse ...",
-				date("Y-m-d H:i:s"));
-		// Fake group hash table
-		$hash = array(array(
+        printf('%s INFO - Testing fake usenet parse ...',
+				date('Y-m-d H:i:s'));
+        // Fake group hash table
+        $hash = [[
 			'ID' => 0,
 			'key' => $spotnab->decompstr($keys['pubkey']),
 			'user' => 'nntp',
@@ -473,60 +476,60 @@ if(array_key_exists("t", $options) ||
 			// We want to find new content, so to make our header
 			// new, we need to take our ref time and back down
 			// one second so it can be processed..
-			'ref' => $article[2]['Epoch']-1
-		));
+			'ref' => $article[2]['Epoch'] - 1,
+		]];
 
-		// Fake headers (use debug information from encodePost)
-		$headers = array($article[2]);
+        // Fake headers (use debug information from encodePost)
+        $headers = [$article[2]];
 
-		$matched = $spotnab->process_comment_headers($headers, $hash, false);
-		if($matched !== false){
-			$inserted = $matched[0];
-			$updated = $matched[1];
-			echo ($matched > 0)?"Successful!\n":"Failed!\n";
-		}else{
-			echo "Failed\n";
-		}
-	}else{
-		printf("%s WARNING - openssl is not correctly installed; broadcasts and posts will be disabled.\n",
-				date("Y-m-d H:i:s"));
-	}
+        $matched = $spotnab->process_comment_headers($headers, $hash, false);
+        if ($matched !== false) {
+            $inserted = $matched[0];
+            $updated = $matched[1];
+            echo ($matched > 0) ? "Successful!\n" : "Failed!\n";
+        } else {
+            echo "Failed\n";
+        }
+    } else {
+        printf("%s WARNING - openssl is not correctly installed; broadcasts and posts will be disabled.\n",
+				date('Y-m-d H:i:s'));
+    }
 
-	printf("%s INFO - Testing UTC/Local conversions [1/6]...",
-				date("Y-m-d H:i:s"));
-	$refa = $spotnab->utc2local();
-	$refb = $spotnab->utc2local($spotnab->local2utc($refa));
-	echo ($refa == $refb)?"Successful!\n":"Failed!\n";
-	printf("%s INFO - Testing UTC/Local conversions [2/6]...",
-				date("Y-m-d H:i:s"));
-	$refa = $spotnab->local2utc();
-	$refb = $spotnab->local2utc($spotnab->utc2local($refa));
-	echo ($refa == $refb)?"Successful!\n":"Failed!\n";
-	printf("%s INFO - Testing UTC/Local conversions [3/6]...",
-				date("Y-m-d H:i:s"));
-	$refa = $spotnab->local2utc(date("Y-m-d H:i:s"));
-	$refb = $spotnab->local2utc($spotnab->utc2local($refa));
-	echo ($refa == $refb)?"Successful!\n":"Failed!\n";
-	printf("%s INFO - Testing UTC/Local conversions [4/6]...",
-				date("Y-m-d H:i:s"));
-	$refa = $spotnab->utc2local(time());
-	$refb = $spotnab->utc2local($spotnab->local2utc($refa));
-	echo ($refa == $refb)?"Successful!\n":"Failed!\n";
-	printf("%s INFO - Testing UTC/Local conversions [5/6]...",
-				date("Y-m-d H:i:s"));
-	$refa = $spotnab->local2utc(time());
-	$refb = $spotnab->local2utc($spotnab->utc2local($refa));
-	echo ($refa == $refb)?"Successful!\n":"Failed!\n";
-	printf("%s INFO - Testing UTC/Local conversions [6/6]...",
-				date("Y-m-d H:i:s"));
-	$refa = $spotnab->utc2local(gmdate("Y-m-d H:i:s"));
-	$refb = $spotnab->utc2local($spotnab->local2utc($refa));
-	echo ($refa == $refb)?"Successful!\n":"Failed!\n";
+    printf('%s INFO - Testing UTC/Local conversions [1/6]...',
+				date('Y-m-d H:i:s'));
+    $refa = $spotnab->utc2local();
+    $refb = $spotnab->utc2local($spotnab->local2utc($refa));
+    echo ($refa == $refb) ? "Successful!\n" : "Failed!\n";
+    printf('%s INFO - Testing UTC/Local conversions [2/6]...',
+				date('Y-m-d H:i:s'));
+    $refa = $spotnab->local2utc();
+    $refb = $spotnab->local2utc($spotnab->utc2local($refa));
+    echo ($refa == $refb) ? "Successful!\n" : "Failed!\n";
+    printf('%s INFO - Testing UTC/Local conversions [3/6]...',
+				date('Y-m-d H:i:s'));
+    $refa = $spotnab->local2utc(date('Y-m-d H:i:s'));
+    $refb = $spotnab->local2utc($spotnab->utc2local($refa));
+    echo ($refa == $refb) ? "Successful!\n" : "Failed!\n";
+    printf('%s INFO - Testing UTC/Local conversions [4/6]...',
+				date('Y-m-d H:i:s'));
+    $refa = $spotnab->utc2local(time());
+    $refb = $spotnab->utc2local($spotnab->local2utc($refa));
+    echo ($refa == $refb) ? "Successful!\n" : "Failed!\n";
+    printf('%s INFO - Testing UTC/Local conversions [5/6]...',
+				date('Y-m-d H:i:s'));
+    $refa = $spotnab->local2utc(time());
+    $refb = $spotnab->local2utc($spotnab->utc2local($refa));
+    echo ($refa == $refb) ? "Successful!\n" : "Failed!\n";
+    printf('%s INFO - Testing UTC/Local conversions [6/6]...',
+				date('Y-m-d H:i:s'));
+    $refa = $spotnab->utc2local(gmdate('Y-m-d H:i:s'));
+    $refb = $spotnab->utc2local($spotnab->local2utc($refa));
+    echo ($refa == $refb) ? "Successful!\n" : "Failed!\n";
 }
 
-if(array_key_exists("o", $options) ||
-	array_key_exists("clean-orphan-comments", $options)){
-	echo "Removing orphan comments...";
-	$spotnab = new SpotNab();
-	printf("%d record(s) removed.\n", $spotnab->orphan_comment_clean());
+if (array_key_exists('o', $options) ||
+	array_key_exists('clean-orphan-comments', $options)) {
+    echo 'Removing orphan comments...';
+    $spotnab = new SpotNab();
+    printf("%d record(s) removed.\n", $spotnab->orphan_comment_clean());
 }

@@ -1,42 +1,41 @@
 <?php
+
 namespace nntmux;
 
 /**
  * Attempts to find a PRE name for a release using a request id from our local pre database,
- * or internet request id database using a Standalone -- more intensive methods
+ * or internet request id database using a Standalone -- more intensive methods.
  *
  * Class RequestIDLocal
  */
 class RequestIDLocal extends RequestID
 {
+    /**
+     * @param array $options Class instances / Echo to cli?
+     */
+    public function __construct(array $options = [])
+    {
+        parent::__construct($options);
+    }
 
-	/**
-	 * @param array $options Class instances / Echo to cli?
-	 */
-	public function __construct(array $options = [])
-	{
-		parent::__construct($options);
-	}
-
-	/**
-	 * Fetch releases with requestid's from MySQL.
-	 */
-	protected function _getReleases()
-	{
-		$query =
+    /**
+     * Fetch releases with requestid's from MySQL.
+     */
+    protected function _getReleases()
+    {
+        $query =
 			'SELECT r.id, r.name, r.fromname, r.categories_id, r.reqidstatus, g.name AS groupname, g.id as gid
 			FROM releases r
 			LEFT JOIN groups g ON r.groups_id = g.id
 			WHERE r.nzbstatus = 1
 			AND r.predb_id = 0
-			AND r.isrequestID = 1'
-		;
+			AND r.isrequestID = 1';
 
-		$query .= ($this->_charGUID === '' ? '' : ' AND r.leftguid = ' . $this->pdo->escapeString($this->_charGUID));
-		$query .= ($this->_groupID === '' ? '' : ' AND r.groups_id = ' . $this->_groupID);
-		$query .= ($this->_maxTime === 0 ? '' : sprintf(' AND r.adddate > NOW() - INTERVAL %d HOUR', $this->_maxTime));
+        $query .= ($this->_charGUID === '' ? '' : ' AND r.leftguid = '.$this->pdo->escapeString($this->_charGUID));
+        $query .= ($this->_groupID === '' ? '' : ' AND r.groups_id = '.$this->_groupID);
+        $query .= ($this->_maxTime === 0 ? '' : sprintf(' AND r.adddate > NOW() - INTERVAL %d HOUR', $this->_maxTime));
 
-		switch ($this->_limit) {
+        switch ($this->_limit) {
 			case 'full':
 				$query .= sprintf(
 					' AND r.reqidstatus in (%d, %d, %d)',
@@ -58,56 +57,55 @@ class RequestIDLocal extends RequestID
 			default:
 				break;
 		}
-		$this->_releases = $this->pdo->queryDirect($query);
-	}
+        $this->_releases = $this->pdo->queryDirect($query);
+    }
 
-	/**
-	 * Process releases for requestid's.
-	 *
-	 * @return int How many did we rename?
-	 */
-	protected function _processReleases()
-	{
-		$renamed = $checked = 0;
-		if ($this->_releases instanceof \Traversable) {
-			foreach ($this->_releases as $this->_release) {
-				$this->_requestID = $this->_siftReqId();
+    /**
+     * Process releases for requestid's.
+     *
+     * @return int How many did we rename?
+     */
+    protected function _processReleases()
+    {
+        $renamed = $checked = 0;
+        if ($this->_releases instanceof \Traversable) {
+            foreach ($this->_releases as $this->_release) {
+                $this->_requestID = $this->_siftReqId();
 
-				// Do a local lookup using multiple possible methods
-				$this->_newTitle = $this->_getNewTitle();
+                // Do a local lookup using multiple possible methods
+                $this->_newTitle = $this->_getNewTitle();
 
-				if ($this->_newTitle !== false && isset($this->_newTitle['title'])) {
-					$this->_updateRelease();
-					$renamed++;
-				} else {
-					$this->_requestIdNotFound($this->_release['id'], ($this->_release['reqidstatus'] === self::REQID_UPROC ? self::REQID_NOLL : self::REQID_NONE));
-				}
+                if ($this->_newTitle !== false && isset($this->_newTitle['title'])) {
+                    $this->_updateRelease();
+                    $renamed++;
+                } else {
+                    $this->_requestIdNotFound($this->_release['id'], ($this->_release['reqidstatus'] === self::REQID_UPROC ? self::REQID_NOLL : self::REQID_NONE));
+                }
 
-				if ($this->echoOutput && $this->_show === 0) {
-					$this->consoleTools->overWritePrimary(
-						'Checked Releases: [' . number_format($checked) . '] ' .
+                if ($this->echoOutput && $this->_show === 0) {
+                    $this->consoleTools->overWritePrimary(
+						'Checked Releases: ['.number_format($checked).'] '.
 						$this->consoleTools->percentString(++$checked, $this->_totalReleases)
 					);
-				}
+                }
+            }
+        }
 
-			}
-		}
+        return $renamed;
+    }
 
-		return $renamed;
-	}
+    /**
+     * Get a new title / pre id for a release.
+     *
+     * @return array|bool
+     */
+    protected function _getNewTitle()
+    {
+        if ($this->_requestID === -2) {
+            return $this->_multiLookup();
+        }
 
-	/**
-	 * Get a new title / pre id for a release.
-	 *
-	 * @return array|bool
-	 */
-	protected function _getNewTitle()
-	{
-		if ($this->_requestID === -2) {
-			return $this->_multiLookup();
-		}
-
-		$check = $this->pdo->queryDirect(
+        $check = $this->pdo->queryDirect(
 			sprintf(
 				'SELECT id, title FROM predb WHERE requestid = %d AND groups_id = %d',
 				$this->_requestID,
@@ -115,53 +113,53 @@ class RequestIDLocal extends RequestID
 			)
 		);
 
-		if ($check instanceof \Traversable) {
-			if ($check->rowCount() === 1) {
-				foreach ($check as $row) {
-					if (preg_match('/s\d+/i', $row['title']) && !preg_match('/s\d+e\d+/i', $row['title'])) {
-						return false;
-					}
-					return array('title' => $row['title'], 'id' => $row['id']);
-				}
-			} else {
-				//Prevents multiple releases with the same request id/group from being renamed to the same Pre.
-				return $this->_multiLookup();
-			}
-		} else {
-			$result = $this->_singleAltLookup();
-			if (is_array($result) && is_numeric($result['id']) && $result['title'] !== '') {
-				return $result;
-			} else {
-				return $this->_multiLookup();
-			}
-		}
-		return false;
-	}
+        if ($check instanceof \Traversable) {
+            if ($check->rowCount() === 1) {
+                foreach ($check as $row) {
+                    if (preg_match('/s\d+/i', $row['title']) && ! preg_match('/s\d+e\d+/i', $row['title'])) {
+                        return false;
+                    }
 
-	/**
-	 * Sub function that attempts to match RequestID Releases
-	 * by preg_matching the title from the usenet name
-	 *
-	 * @return array|bool
-	 */
-	protected function _multiLookup()
-	{
-		$regex1 =
-				'/^\[\s*\d+\s*\][ -]+(\[(ISO|FULL|PART|MP3|0DAY|android)\][ -]+)?\[(alt-?bin| ?#?a[a-z0-9. -]+)((@?ef{1,2})?net)? ?\]' .
-				'[ -]+(\[(ISO|FULL|PART|MP3|0DAY|android)\][ -]+)?(\[\s*\d+\s*\][ -]+)?(\[\d+\/\d+\][ -]+)?(\"|\[)\s*' .
-				'(?P<title>.+?)(\.+(vol\d+\+\d+\.)?(-cd\d\.)?(avi|jpg|nzb|m3u|mkv|par2|part\d+|nfo|sample|sfv|rar|r?\d{1,3}|\d+|zip)*)?\s*(\"|\])' .
-				'[ -]*(\[\d+\/\d+\][ -]*)?((\"\s*(?P<filename1>.+?)([-.]sample)?([-.]cd(\d|[ab]))?(\.+(vol\d+\+\d+\.)?([-.]d\d\.)?([-.]part\d+)?' .
-				'(avi|jpg|nzb|m3u|mkv|par2|nfo|sample|sfv|rar|r?\d{1,3}|\d+|zip)*)?\s*\")| - (?P<filename2>.+?) (yEnc|\(\d+\/\d+\)))?.*/i'
-		;
+                    return ['title' => $row['title'], 'id' => $row['id']];
+                }
+            } else {
+                //Prevents multiple releases with the same request id/group from being renamed to the same Pre.
+                return $this->_multiLookup();
+            }
+        } else {
+            $result = $this->_singleAltLookup();
+            if (is_array($result) && is_numeric($result['id']) && $result['title'] !== '') {
+                return $result;
+            } else {
+                return $this->_multiLookup();
+            }
+        }
 
-		$regex2 =
-				'/^\[\s*\d+\s*\].*' .
-				'\"\s*(?P<title>.+?)(\.+(vol\d+\+\d+\.)?(-cd\d\.)?' .
-				'(avi|jpg|nzb|m3u|mkv|par2|part\d+|nfo|sample|sfv|rar|r?\d{1,3}|\d+|zip)*)\s*\".*/i'
-		;
+        return false;
+    }
 
-		$matches = [];
-		switch (true) {
+    /**
+     * Sub function that attempts to match RequestID Releases
+     * by preg_matching the title from the usenet name.
+     *
+     * @return array|bool
+     */
+    protected function _multiLookup()
+    {
+        $regex1 =
+				'/^\[\s*\d+\s*\][ -]+(\[(ISO|FULL|PART|MP3|0DAY|android)\][ -]+)?\[(alt-?bin| ?#?a[a-z0-9. -]+)((@?ef{1,2})?net)? ?\]'.
+				'[ -]+(\[(ISO|FULL|PART|MP3|0DAY|android)\][ -]+)?(\[\s*\d+\s*\][ -]+)?(\[\d+\/\d+\][ -]+)?(\"|\[)\s*'.
+				'(?P<title>.+?)(\.+(vol\d+\+\d+\.)?(-cd\d\.)?(avi|jpg|nzb|m3u|mkv|par2|part\d+|nfo|sample|sfv|rar|r?\d{1,3}|\d+|zip)*)?\s*(\"|\])'.
+				'[ -]*(\[\d+\/\d+\][ -]*)?((\"\s*(?P<filename1>.+?)([-.]sample)?([-.]cd(\d|[ab]))?(\.+(vol\d+\+\d+\.)?([-.]d\d\.)?([-.]part\d+)?'.
+				'(avi|jpg|nzb|m3u|mkv|par2|nfo|sample|sfv|rar|r?\d{1,3}|\d+|zip)*)?\s*\")| - (?P<filename2>.+?) (yEnc|\(\d+\/\d+\)))?.*/i';
+
+        $regex2 =
+				'/^\[\s*\d+\s*\].*'.
+				'\"\s*(?P<title>.+?)(\.+(vol\d+\+\d+\.)?(-cd\d\.)?'.
+				'(avi|jpg|nzb|m3u|mkv|par2|part\d+|nfo|sample|sfv|rar|r?\d{1,3}|\d+|zip)*)\s*\".*/i';
+
+        $matches = [];
+        switch (true) {
 			case preg_match($regex1, $this->_release['name'], $matches):
 			case preg_match($regex2, $this->_release['name'], $matches):
 				$check = $this->pdo->queryOneRow(
@@ -171,36 +169,37 @@ class RequestIDLocal extends RequestID
 						$this->pdo->escapeString($matches['title']),
 						(
 							isset($matches['filename1']) && $matches['filename1'] !== ''
-							? 'OR filename = ' . $this->pdo->escapeString($matches['filename1'])
+							? 'OR filename = '.$this->pdo->escapeString($matches['filename1'])
 							:
 							(
 								isset($matches['filename2']) && $matches['filename2'] !== ''
-								? 'OR filename = ' . $this->pdo->escapeString($matches['filename2'])
+								? 'OR filename = '.$this->pdo->escapeString($matches['filename2'])
 								: ''
 							)
 						)
 					)
 				);
 				if ($check !== false) {
-					return array('title' => $check['title'], 'id' => $check['id']);
+				    return ['title' => $check['title'], 'id' => $check['id']];
 				}
 				continue;
 			default:
 				return false;
 		}
-		return false;
-	}
 
-	private $groupIDCache = [];
+        return false;
+    }
 
-	/**
-	 * Attempts to remap the release groups_id by extracting the new group name from the release usenet name.
-	 *
-	 * @return array|bool
-	 */
-	protected function _singleAltLookup()
-	{
-		switch (true) {
+    private $groupIDCache = [];
+
+    /**
+     * Attempts to remap the release groups_id by extracting the new group name from the release usenet name.
+     *
+     * @return array|bool
+     */
+    protected function _singleAltLookup()
+    {
+        switch (true) {
 			case $this->_release['name'] === 'alt.binaries.etc':
 				$groupName = 'alt.binaries.teevee';
 				break;
@@ -231,33 +230,34 @@ class RequestIDLocal extends RequestID
 			default:
 				return false;
 		}
-		if (isset($this->groupIDCache[$groupName])) {
-			$groupID = $this->groupIDCache[$groupName];
-		} else {
-			$groupID = $this->groups->getIDByName($groupName);
-		}
-		$check = $this->pdo->queryOneRow(
+        if (isset($this->groupIDCache[$groupName])) {
+            $groupID = $this->groupIDCache[$groupName];
+        } else {
+            $groupID = $this->groups->getIDByName($groupName);
+        }
+        $check = $this->pdo->queryOneRow(
 			sprintf('
 				SELECT id, title FROM predb WHERE requestid = %d AND groups_id = %d',
 				$this->_requestID,
 				($groupID === '' ? 0 : $groupID)
 			)
 		);
-		if ($check !== false) {
-			return array('title' => $check['title'], 'id' => $check['id']);
-		}
-		return false;
-	}
+        if ($check !== false) {
+            return ['title' => $check['title'], 'id' => $check['id']];
+        }
 
-	/**
-	 * Updates release information when a proper Request id match is found.
-	 */
-	protected function _updateRelease()
-	{
-		$determinedCat = $this->category->determineCategory($this->_release['gid'], $this->_newTitle['title'], $this->_release['fromname']);
-		if ($determinedCat === $this->_release['categories_id']) {
-			$newTitle = $this->pdo->escapeString($this->_newTitle['title']);
-			$this->pdo->queryExec(
+        return false;
+    }
+
+    /**
+     * Updates release information when a proper Request id match is found.
+     */
+    protected function _updateRelease()
+    {
+        $determinedCat = $this->category->determineCategory($this->_release['gid'], $this->_newTitle['title'], $this->_release['fromname']);
+        if ($determinedCat === $this->_release['categories_id']) {
+            $newTitle = $this->pdo->escapeString($this->_newTitle['title']);
+            $this->pdo->queryExec(
 				sprintf('
 					UPDATE releases
 					SET predb_id = %d, reqidstatus = %d, isrenamed = 1, iscategorized = 1, searchname = %s
@@ -268,10 +268,10 @@ class RequestIDLocal extends RequestID
 					$this->_release['id']
 				)
 			);
-			$this->sphinx->updateRelease($this->_release['id'], $this->pdo);
-		} else {
-			$newTitle = $this->pdo->escapeString($this->_newTitle['title']);
-			$this->pdo->queryExec(
+            $this->sphinx->updateRelease($this->_release['id'], $this->pdo);
+        } else {
+            $newTitle = $this->pdo->escapeString($this->_newTitle['title']);
+            $this->pdo->queryExec(
 				sprintf('
 					UPDATE releases SET
 						videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL, consoleinfo_id = NULL,
@@ -285,21 +285,21 @@ class RequestIDLocal extends RequestID
 					$this->_release['id']
 				)
 			);
-			$this->sphinx->updateRelease($this->_release['id'], $this->pdo);
-		}
+            $this->sphinx->updateRelease($this->_release['id'], $this->pdo);
+        }
 
-		if ($this->_show === 1 && $this->_release['name'] !== $this->_newTitle['title']) {
-			NameFixer::echoChangedReleaseName(
-				array(
+        if ($this->_show === 1 && $this->_release['name'] !== $this->_newTitle['title']) {
+            NameFixer::echoChangedReleaseName(
+				[
 					'new_name'     => $this->_newTitle['title'],
 					'old_name'     => $this->_release['name'],
 					'new_category' => $this->category->getNameByID($determinedCat),
 					'old_category' => $this->category->getNameByID($this->_release['categories_id']),
 					'group'        => $this->_release['groupname'],
 					'releases_id'   => $this->_release['id'],
-					'method'       => 'RequestIDLocal'
-				)
+					'method'       => 'RequestIDLocal',
+				]
 			);
-		}
-	}
+        }
+    }
 }

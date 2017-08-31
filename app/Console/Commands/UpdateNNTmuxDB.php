@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
+use nntmux\db\DbUpdate;
+use App\Extensions\util\Git;
 use Illuminate\Console\Command;
 use App\Extensions\util\Versions;
-use App\Extensions\util\Git;
-use nntmux\db\DbUpdate;
 
 class UpdateNNTmuxDB extends Command
 {
@@ -23,15 +23,14 @@ class UpdateNNTmuxDB extends Command
      */
     protected $description = 'Update NNTmux database with new patches';
 
-	/**
-	 * @var \app\extensions\util\Git object.
-	 */
-	protected $git;
+    /**
+     * @var \app\extensions\util\Git object.
+     */
+    protected $git;
 
-	/**
-	 * Create a new command instance.
-	 *
-	 */
+    /**
+     * Create a new command instance.
+     */
     public function __construct()
     {
         parent::__construct();
@@ -44,28 +43,28 @@ class UpdateNNTmuxDB extends Command
      */
     public function handle()
     {
-		// TODO Add check to determine if the indexer or other scripts are running. Hopefully
-		// also prevent web access.
-		$this->output->writeln('<info>Checking database version</info>');
+        // TODO Add check to determine if the indexer or other scripts are running. Hopefully
+        // also prevent web access.
+        $this->output->writeln('<info>Checking database version</info>');
 
-		$versions = new Versions(['git' => ($this->git instanceof Git) ? $this->git : null]);
+        $versions = new Versions(['git' => ($this->git instanceof Git) ? $this->git : null]);
 
-		try {
-			$currentDb = $versions->getSQLPatchFromDB();
-			$currentXML = $versions->getSQLPatchFromFile();
-		} catch (\PDOException $e) {
-			$this->error('Error fetching patch versions!');
+        try {
+            $currentDb = $versions->getSQLPatchFromDB();
+            $currentXML = $versions->getSQLPatchFromFile();
+        } catch (\PDOException $e) {
+            $this->error('Error fetching patch versions!');
 
-			return 1;
-		}
+            return 1;
+        }
 
-		$this->info("Db: $currentDb,\tFile: $currentXML");
+        $this->info("Db: $currentDb,\tFile: $currentXML");
 
-		if ($currentDb < $currentXML) {
-			$db = new DbUpdate(['backup' => false]);
-			$db->processPatches(['safe' => false]);
-		} else {
-			$this->info('Up to date.');
-		}
+        if ($currentDb < $currentXML) {
+            $db = new DbUpdate(['backup' => false]);
+            $db->processPatches(['safe' => false]);
+        } else {
+            $this->info('Up to date.');
+        }
     }
 }

@@ -18,35 +18,35 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
-require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once realpath(dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap.php');
 
 use nntmux\utility\Utility;
 use nntmux\utility\Versions;
 
-if (!Utility::isCLI()) {
-	exit;
+if (! Utility::isCLI()) {
+    exit;
 }
 
 $vers = new Versions();
 if (isset($argc) && $argc > 1 && isset($argv[1]) && $argv[1] == true) {
-	echo $vers->out->header("Checking versions...");
+    echo $vers->out->header('Checking versions...');
 
-	if ($vers->checkAll()) {
-		$vers->save();
-	} else {
-		echo "No changes detected.\n";
-		output($vers);
-	}
+    if ($vers->checkAll()) {
+        $vers->save();
+    } else {
+        echo "No changes detected.\n";
+        output($vers);
+    }
 } else {
-	$vers->checkAll(false);
-	echo "Version info in file:\n";
-	output($vers);
+    $vers->checkAll(false);
+    echo "Version info in file:\n";
+    output($vers);
 }
 
 function output($vers)
 {
-	echo "  Commit: " . $vers->out->primary($vers->getCommit());
-	echo "SQL   DB: " . $vers->out->primary($vers->getSQLPatchFromDb());
-	echo "SQL File: " . $vers->out->primary($vers->getSQLPatchFromFiles());
-	echo "     Tag: " . $vers->out->primary($vers->getTagVersion());
+    echo '  Commit: '.$vers->out->primary($vers->getCommit());
+    echo 'SQL   DB: '.$vers->out->primary($vers->getSQLPatchFromDb());
+    echo 'SQL File: '.$vers->out->primary($vers->getSQLPatchFromFiles());
+    echo '     Tag: '.$vers->out->primary($vers->getTagVersion());
 }

@@ -10,26 +10,26 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
  * @copyright 2016 nZEDb
  */
-namespace App\Models;
 
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class ReleasesGroups extends Model
 {
-	protected $table = 'releases_groups';
+    protected $table = 'releases_groups';
 
-	public $incrementing = false;
+    public $incrementing = false;
 
-	public $timestamps = false;
+    public $timestamps = false;
 
-	public $dateFormat = false;
+    public $dateFormat = false;
 
-	protected $primaryKey = ['releases_id', 'groups_id'];
+    protected $primaryKey = ['releases_id', 'groups_id'];
 }

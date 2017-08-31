@@ -1,4 +1,5 @@
 <?php
+
 $page->users->logout();
 
-header("Location: ".WWW_TOP."/login");
+header('Location: '.WWW_TOP.'/login');

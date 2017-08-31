@@ -32,23 +32,23 @@ class TmuxUIStart extends Command
         parent::__construct();
     }
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @return mixed
-	 * @throws \Symfony\Component\Process\Exception\LogicException
-	 * @throws \Symfony\Component\Process\Exception\RuntimeException
-	 */
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     */
     public function handle()
     {
         $process = new Process('php misc/update/nix/tmux/start.php');
         $process->setTty(true);
-		$process->run(function ($type, $buffer) {
-			if (Process::ERR === $type) {
-				echo 'ERR > '.$buffer;
-			} else {
-				echo $buffer;
-			}
-		});
+        $process->run(function ($type, $buffer) {
+            if (Process::ERR === $type) {
+                echo 'ERR > '.$buffer;
+            } else {
+                echo $buffer;
+            }
+        });
     }
 }

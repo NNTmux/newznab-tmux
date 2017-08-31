@@ -1,4 +1,5 @@
 <?php
+
 // If lazy set all usernames/nicknames/names here.
 // MAKE SURE THIS IS UNIQUE, IF SOMEONE HAS THE USERNAME ALREADY YOU WILL GET A BUNCH OF ERRORS, YOU HAVE BEEN WARNED.
 $username = '';
@@ -20,7 +21,7 @@ define('SCRAPE_IRC_CATEGORY_IGNORE', '');
 // Set to true to ignore a source.
 define('SCRAPE_IRC_SOURCE_IGNORE',
 serialize(
-	array(
+	[
 		'#a.b.cd.image'               => false,
 		'#a.b.console.ps3'            => false,
 		'#a.b.dvd'                    => false,
@@ -45,7 +46,7 @@ serialize(
 		'prelist'    => false,
 		'srrdb'      => false,
 		'u4all.eu'   => false,
-		'zenet'      => false
-	)
+		'zenet'      => false,
+	]
 )
 );

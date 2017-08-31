@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\ReleaseRegex;
 
@@ -8,14 +8,15 @@ $page = new AdminPage();
 
 $reg = new ReleaseRegex();
 
-$page->title = "Release Regex List";
+$page->title = 'Release Regex List';
 
 $reggrouplist = $reg->getGroupsForSelect();
 $page->smarty->assign('reggrouplist', $reggrouplist);
 
-$group=".*";
-if (isset($_REQUEST["group"]))
-	$group = $_REQUEST["group"];
+$group = '.*';
+if (isset($_REQUEST['group'])) {
+    $group = $_REQUEST['group'];
+}
 
 $page->smarty->assign('selectedgroup', $group);
 
@@ -24,4 +25,3 @@ $page->smarty->assign('regexlist', $regexlist);
 
 $page->content = $page->smarty->fetch('regex-list.tpl');
 $page->render();
-

@@ -1,5 +1,6 @@
 <?php
-require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap.php';
 
 use nntmux\db\DB;
 use nntmux\Releases;
@@ -26,7 +27,6 @@ foreach(new RecursiveIteratorIterator($it) as $file)
 	}
 }
 */
-
 
 //
 // Option Two - delete all from the database where it doesnt exist on disk

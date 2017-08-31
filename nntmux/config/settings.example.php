@@ -1,4 +1,5 @@
 <?php
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////// Copy this file to settings.php and edit the options. //////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,7 +12,7 @@ use nntmux\utility\Utility;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////// MISC //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
+/*
  * When we update settings.example.php, we will raise this version, you will get a message saying your settings.php
  * is out of date, you will need to update it and change the version number.
  *
@@ -24,21 +25,21 @@ define('NN_SETTINGS_FILE_VERSION', 4);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// Web Settings //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
+/*
  * How many releases to show per page in list view.
  *
  * @default '50'
  */
 define('ITEMS_PER_PAGE', '50');
 
-/**
+/*
  * How many releases to show per page in cover view.
  *
  * @default '20'
  */
 define('ITEMS_PER_COVER_PAGE', '20');
 
-/**
+/*
  * How many releases maximum to display in total on browse/search/etc.
  * If you have ITEMS_PER_PAGE set to 50, and NN_MAX_PAGER_RESULTS set to 125000, you would get a maximum of
  * 2,500 pages of results in searches/browse.
@@ -50,14 +51,14 @@ define('ITEMS_PER_COVER_PAGE', '20');
  */
 define('NN_MAX_PAGER_RESULTS', '125000');
 
-/**
+/*
  * If the PRE API page (preinfo) is open to the public or only accessible by registered / api users.
  *
  * @default false
  */
 define('NN_PREINFO_OPEN', false);
 
-/**
+/*
  * Whether to check if a person is trying to send too many requests in a given amount of time,
  * lock out the person of the site for a amount of time.
  *
@@ -65,14 +66,14 @@ define('NN_PREINFO_OPEN', false);
  */
 define('NN_FLOOD_CHECK', false);
 
-/**
+/*
  * How many seconds should the person be locked out of the site.
  *
  * @default 5
  */
 define('NN_FLOOD_WAIT_TIME', 5);
 
-/**
+/*
  * How many requests in a second can a person send to the site max before being locked out for
  * NN_FLOOD_WAIT_TIME seconds.
  *
@@ -80,7 +81,7 @@ define('NN_FLOOD_WAIT_TIME', 5);
  */
 define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
 
-/**
+/*
  * The higher this number, the more secure the password algorithm for the website will be, at the cost
  * of server resources.
  * To find a good number for your server, run the misc/testing/Various/find_password_hash_cost.php script.
@@ -90,7 +91,7 @@ define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
  */
 define('NN_PASSWORD_HASH_COST', 11);
 
-/**
+/*
  * The type of search system to use on the site.
  *
  * 0 = The default system, which uses fulltext indexing (very fast but search results can be unexpected).
@@ -105,7 +106,7 @@ define('NN_RELEASE_SEARCH_TYPE', 0);
 /////////////////////////////////////////////// Sphinx Settings ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
+/*
  * This is the hostname to use when connecting to the SphinxQL server,
  *
  * @note    Using localhost / 127.0.0.1 has caused me issues and only 0 worked on my local server.
@@ -114,14 +115,14 @@ define('NN_RELEASE_SEARCH_TYPE', 0);
  */
 define('NN_SPHINXQL_HOST_NAME', '0');
 
-/**
+/*
  * This is the port to the SphinxQL server.
  *
  * @default 9306
  */
 define('NN_SPHINXQL_PORT', 9306);
 
-/**
+/*
  * This is the (optional) location to the SphinxQL server socket file, if you set the "listen" setting to a sock file.
  *
  * @default ''
@@ -131,21 +132,21 @@ define('NN_SPHINXQL_SOCK_FILE', '');
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// CLI Settings //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
+/*
  * Display text to console(terminal) output.
  *
  * @default true
  */
 define('NN_ECHOCLI', true);
 
-/**
+/*
  * Rename releases using PAR2 files (if they match on PRE titles)?
  *
  * @default true
  */
 define('NN_RENAME_PAR2', true);
 
-/**
+/*
  * Rename music releases using media info from the MP3/FLAC/etc tags (names are created using info found in the tags)?
  *
  * @default true
@@ -155,7 +156,7 @@ define('NN_RENAME_MUSIC_MEDIAINFO', true);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////// Cache Settings /////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
+/*
  * Type of cache server(s) to use:
  * 0 - disabled   ; No cache server(s) will be used.
  * 1 - memcached  ; Memcached server(s) will be used for caching.
@@ -172,7 +173,7 @@ define('NN_RENAME_MUSIC_MEDIAINFO', true);
  */
 define('NN_CACHE_TYPE', 0);
 
-/**
+/*
  * List of redis or memcached servers to connect to. Separate them by comma.
  * Host:   (string)  Address for the cache server. '127.0.0.1' for a local server.
  * Port:   (integer) Default for memcached is 11211, Default for redis is 6379
@@ -186,12 +187,12 @@ define('NN_CACHE_HOSTS', serialize(
 		'Server1' => [
 			'host'   => '127.0.0.1',
 			'port'   => 11211,
-			'weight' => 0
+			'weight' => 0,
 		],
 	]
 ));
 
-/**
+/*
  * Optional path to unix socket file, leave '' if to not use.
  * If using a unix socket file, the server list is overridden.
  * This should be faster than using the host/port if your cache server is local.
@@ -203,14 +204,14 @@ define('NN_CACHE_HOSTS', serialize(
  */
 define('NN_CACHE_SOCKET_FILE', '');
 
-/**
+/*
  * Timeout for connecting to cache server(s).
  *
  * @default 10
  */
 define('NN_CACHE_TIMEOUT', 10);
 
-/**
+/*
  * Memcached allows to compress the data, saving RAM at the expense of CPU time.
  *
  * @note    Does nothing on redis.
@@ -218,7 +219,7 @@ define('NN_CACHE_TIMEOUT', 10);
  */
 define('NN_CACHE_COMPRESSION', false);
 
-/**
+/*
  * Serialization is a way of converting data in PHP into strings of text which can be stored on the cache server.
  *
  * 0 - Use the PHP serializer. Recommended for most people.
@@ -236,7 +237,7 @@ define('NN_CACHE_COMPRESSION', false);
  */
 define('NN_CACHE_SERIALIZER', 0);
 
-/**
+/*
  * Amount of time in seconds to expire data from the cache server.
  * The developers of NN decide what should be set as short/medium/long, depending on the type of data.
  *
@@ -249,21 +250,21 @@ define('NN_CACHE_EXPIRY_LONG', 900);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// Log Settings //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
+/*
  * Display debug messages on console or web page.
  *
  * @default false
  */
 define('NN_DEBUG', false);
 
-/**
+/*
  * Log debug messages to newznab/resources/debug.log
  *
  * @default false
  */
 define('NN_LOGGING', false);
 
-/**
+/*
  * var_dump missing autoloader files.
  *
  * @note    Dev setting.
@@ -271,21 +272,21 @@ define('NN_LOGGING', false);
  */
 define('NN_LOGAUTOLOADER', false);
 
-/**
+/*
  * How many log files to keep in the log folder.
  *
  * @default 20
  */
 define('NN_LOGGING_MAX_LOGS', 20);
 
-/**
+/*
  * How large can the log files be in MegaBytes before we create a new one? The old files are compressed.
  *
  * @default 30
  */
 define('NN_LOGGING_MAX_SIZE', 30);
 
-/**
+/*
  * The folder to put the log files in. Put quotes, example : '/var/log/NN/'
  * The default is in the NN root folder /resources/logs/
  *
@@ -294,7 +295,7 @@ define('NN_LOGGING_MAX_SIZE', 30);
  */
 define('NN_LOGGING_LOG_FOLDER', NN_LOGS);
 
-/**
+/*
  * The name of the log file.
  * Must be alphanumeric (a-z 0-9) and contain no file extensions.
  *
@@ -302,28 +303,28 @@ define('NN_LOGGING_LOG_FOLDER', NN_LOGS);
  */
 define('NN_LOGGING_LOG_NAME', 'nntmux');
 
-/**
+/*
  * Display memory usage in log file and debug message output?
  *
  * @default true
  */
 define('NN_LOGGING_LOG_MEMORY_USAGE', true);
 
-/**
+/*
  * Display CPU load in log file and debug message output?
  *
  * @default true
  */
 define('NN_LOGGING_LOG_CPU_LOAD', true);
 
-/**
+/*
  * Display running time in log file and debug message output?
  *
  * @default true
  */
 define('NN_LOGGING_LOG_RUNNING_TIME', true);
 
-/**
+/*
  * Display resource usage in log file and debug message output?
  *
  * @default false
@@ -334,42 +335,42 @@ define('NN_LOGGING_LOG_RESOURCE_USAGE', false);
  * The following options require either NN_DEBUG OR NN_LOGGING to be true: *
  *********************************************************************************/
 
-/**
+/*
  * Log and/or echo debug Info messages.
  *
  * @default false
  */
 define('NN_LOGINFO', false);
 
-/**
+/*
  * Log and/or echo debug Notice messages.
  *
  * @default false
  */
 define('NN_LOGNOTICE', false);
 
-/**
+/*
  * Log and/or echo debug Warning messages.
  *
  * @default false
  */
 define('NN_LOGWARNING', false);
 
-/**
+/*
  * Log and/or echo debug Error messages.
  *
  * @default false
  */
 define('NN_LOGERROR', false);
 
-/**
+/*
  * Log and/or echo debug Fatal messages.
  *
  * @default false
  */
 define('NN_LOGFATAL', false);
 
-/**
+/*
  * Log and/or echo debug failed SQL queries.
  *
  * @default false
@@ -379,7 +380,7 @@ define('NN_LOGQUERIES', false);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// SQL Settings //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
+/*
  * Strip white space (space, carriage return, new line, tab, etc) from queries before sending to MySQL.
  * This is useful if you use the MySQL slow query log.
  *
@@ -388,7 +389,7 @@ define('NN_LOGQUERIES', false);
  */
 define('NN_QUERY_STRIP_WHITESPACE', false);
 
-/**
+/*
  * Use transactions when doing certain SQL jobs.
  * This has advantages and disadvantages.
  * If there's a problem during a transaction, MySQL can revert the row inserts which is beneficial.
@@ -399,7 +400,7 @@ define('NN_QUERY_STRIP_WHITESPACE', false);
  */
 define('NN_USE_SQL_TRANSACTIONS', true);
 
-/**
+/*
  * Allows the use of LOW_PRIORITY in certain DELETE queries.
  * This prevents table locks by deleting only when no SELECT queries are active on the table.
  * This works on MyISAM/ARIA, not INNODB.
@@ -411,7 +412,7 @@ define('NN_USE_SQL_TRANSACTIONS', true);
  */
 define('NN_SQL_DELETE_LOW_PRIORITY', false);
 
-/**
+/*
  * Allows the use QUICK in certain DELETE queries.
  * This makes DELETE queries faster on MyISAM/ARIA tables by not merging index leaves.
  * Only supported on MyISAM/ARIA
@@ -426,13 +427,13 @@ define('NN_SQL_DELETE_QUICK', false);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////// PHPMailer Settings //////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
+/*
  * Simple constant to let us know this file is included and we should use PHPMailer library.
  * Uncomment the line below after setting the other constants.
  */
 define('PHPMAILER_ENABLED', false);
 
-/**
+/*
  * Global "From" Address.
  * This address will be set as the From: address on every email sent by NN.
  *
@@ -442,7 +443,7 @@ define('PHPMAILER_ENABLED', false);
  */
 define('PHPMAILER_FROM_EMAIL', '');
 
-/**
+/*
  * Global "From" Name.
  * Along with the email above, this will display as the name.
  *
@@ -452,7 +453,7 @@ define('PHPMAILER_FROM_EMAIL', '');
  */
 define('PHPMAILER_FROM_NAME', '');
 
-/**
+/*
  * Global "Reply-to" Address.
  * This address will be set as the Reply-to: address on every email sent by NN.
  *
@@ -462,7 +463,7 @@ define('PHPMAILER_FROM_NAME', '');
  */
 define('PHPMAILER_REPLYTO', '');
 
-/**
+/*
  * Always BCC.
  * This email address will be blind carbon copied on every email sent from this site.
  *
@@ -471,7 +472,7 @@ define('PHPMAILER_REPLYTO', '');
  */
 define('PHPMAILER_BCC', '');
 
-/**
+/*
  * Should we use a SMTP server to send mail?
  * If false, it will use your default settings from php.ini.
  *
@@ -484,7 +485,7 @@ define('PHPMAILER_USE_SMTP', false);
  * The following options require PHPMAILER_USE_SMTP to be true: *
  *********************************************************************************/
 
-/**
+/*
  * This is the hostname to use if connecting to a SMTP server.
  *
  * @note    You can specify main and backup hosts, delimit with a semicolon. (i.e. 'main.host.com;backup.host.com')
@@ -492,7 +493,7 @@ define('PHPMAILER_USE_SMTP', false);
  */
 define('PHPMAILER_SMTP_HOST', '');
 
-/**
+/*
  * TLS & SSL Support for your SMTP server.
  *
  * @note    Possible values: false, 'tls', 'ssl'
@@ -500,7 +501,7 @@ define('PHPMAILER_SMTP_HOST', '');
  */
 define('PHPMAILER_SMTP_SECURE', 'tls');
 
-/**
+/*
  * SMTP Port
  *
  * @note    Usually this is 25, 465, or 587
@@ -508,7 +509,7 @@ define('PHPMAILER_SMTP_SECURE', 'tls');
  */
 define('PHPMAILER_SMTP_PORT', 587);
 
-/**
+/*
  * Does your SMTP host require authentication?
  *
  * @note    Be sure to set credentials below if changing to true.
@@ -520,14 +521,14 @@ define('PHPMAILER_SMTP_AUTH', false);
  * The following options require both PHPMAILER_USE_SMTP & PHPMAILER_SMTP_AUTH to be true: *
  *********************************************************************************/
 
-/**
+/*
  * SMTP username for authentication.
  *
  * @default ''
  */
 define('PHPMAILER_SMTP_USER', '');
 
-/**
+/*
  * SMTP password for authentication.
  *
  * @default ''
@@ -539,173 +540,173 @@ define('PHPMAILER_SMTP_PASSWORD', '');
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 if (Utility::isCLI()) {
 
-	/**
+	/*
 	 * Your server's local timezone.
 	 * @note    Uncomment to enable.
 	 * @see     https://secure.php.net/manual/en/timezones.php
 	 * @version 4
 	 */
-	//ini_set('date.timezone', 'America/New_York');
+    //ini_set('date.timezone', 'America/New_York');
 
-	/**
-	 * Maximum amount of memory a PHP script can consume before being terminated.
-	 * @note    Uncomment to enable.
-	 * @default '1024M'
-	 * @version 4
-	 */
-	//ini_set('memory_limit', '1024M');
+    /*
+     * Maximum amount of memory a PHP script can consume before being terminated.
+     * @note    Uncomment to enable.
+     * @default '1024M'
+     * @version 4
+     */
+    //ini_set('memory_limit', '1024M');
 
-	/**
-	 * Show PHP errors on CLI output.
-	 * @note    Set to '1' for development.
-	 * @default '0'
-	 * @version 4
-	 */
-	ini_set('display_errors', '0');
+    /*
+     * Show PHP errors on CLI output.
+     * @note    Set to '1' for development.
+     * @default '0'
+     * @version 4
+     */
+    ini_set('display_errors', '0');
 
-	/**
-	 * Show startup errors on CLI output.
-	 * @note    Set to '1' for development/debugging.
-	 * @default '0'
-	 * @version 4
-	 */
-	ini_set('display_startup_errors', '0');
+    /*
+     * Show startup errors on CLI output.
+     * @note    Set to '1' for development/debugging.
+     * @default '0'
+     * @version 4
+     */
+    ini_set('display_startup_errors', '0');
 
-	/**
-	 * Type of errors to display.
-	 * @note    For development/debugging set to E_ALL
-	 * @default E_ALL & ~E_DEPRECATED & ~E_STRICT
-	 * @see     https://secure.php.net/manual/en/errorfunc.constants.php
-	 * @version 4
-	 */
-	ini_set('error_reporting', E_ALL);
+    /*
+     * Type of errors to display.
+     * @note    For development/debugging set to E_ALL
+     * @default E_ALL & ~E_DEPRECATED & ~E_STRICT
+     * @see     https://secure.php.net/manual/en/errorfunc.constants.php
+     * @version 4
+     */
+    ini_set('error_reporting', E_ALL);
 
-	/**
-	 * Turn off HTML tags in error messages.
-	 * @default '1'
-	 * @version 4
-	 */
-	ini_set('html_errors', '1');
+    /*
+     * Turn off HTML tags in error messages.
+     * @default '1'
+     * @version 4
+     */
+    ini_set('html_errors', '1');
 
-	/**
-	 * Set the location to log PHP errors.
-	 * @default NN_LOGS . 'php_errors.log'
-	 * @note    To log to syslog, put in 'syslog'
-	 * @version 4
-	 */
-	ini_set('error_log', NN_LOGS . 'php_errors_cli.log');
+    /*
+     * Set the location to log PHP errors.
+     * @default NN_LOGS . 'php_errors.log'
+     * @note    To log to syslog, put in 'syslog'
+     * @version 4
+     */
+    ini_set('error_log', NN_LOGS.'php_errors_cli.log');
 
-	/**
-	 * Log errors to error_log?
-	 * @default '1'
-	 * @version 4
-	 */
-	ini_set('log_errors', '1');
+    /*
+     * Log errors to error_log?
+     * @default '1'
+     * @version 4
+     */
+    ini_set('log_errors', '1');
 
-	/**
-	 * Max line length for a error.
-	 * @default 1024
-	 * @version 4
-	 */
-	ini_set('log_errors_max_len', '1024');
+    /*
+     * Max line length for a error.
+     * @default 1024
+     * @version 4
+     */
+    ini_set('log_errors_max_len', '1024');
 
-	/**
-	 * Store the last PHP error in $php_errormsg
-	 * @default '0'
-	 * @note    This is a development/debugging option.
-	 * @version 4
-	 */
-	ini_set('track_errors', '0');
+    /*
+     * Store the last PHP error in $php_errormsg
+     * @default '0'
+     * @note    This is a development/debugging option.
+     * @version 4
+     */
+    ini_set('track_errors', '0');
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////// PHP Web Settings ///////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 } else {
 
-	/**
+	/*
 	 * Your server's local timezone.
 	 * @note    Uncomment to enable.
 	 * @see     https://secure.php.net/manual/en/timezones.php
 	 * @version 4
 	 */
-	//ini_set('date.timezone', 'America/New_York');
+    //ini_set('date.timezone', 'America/New_York');
 
-	/**
-	 * Maximum amount of seconds a script can run before being terminated.
-	 * @default '120'
-	 * @version 4
-	 */
-	ini_set('max_execution_time', '120');
+    /*
+     * Maximum amount of seconds a script can run before being terminated.
+     * @default '120'
+     * @version 4
+     */
+    ini_set('max_execution_time', '120');
 
-	/**
-	 * Maximum amount of memory a PHP script can consume before being terminated.
-	 * @note    Uncomment to enable.
-	 * @default '1024M'
-	 * @version 4
-	 */
-	//ini_set('memory_limit', '1024M');
+    /*
+     * Maximum amount of memory a PHP script can consume before being terminated.
+     * @note    Uncomment to enable.
+     * @default '1024M'
+     * @version 4
+     */
+    //ini_set('memory_limit', '1024M');
 
-	/**
-	 * Show PHP errors on web browser.
-	 * @note    Set to '1' for development.
-	 * @default '0'
-	 * @version 4
-	 */
-	ini_set('display_errors', '0');
+    /*
+     * Show PHP errors on web browser.
+     * @note    Set to '1' for development.
+     * @default '0'
+     * @version 4
+     */
+    ini_set('display_errors', '0');
 
-	/**
-	 * Show startup errors on web browser.
-	 * @note    Set to '1' for development/debugging.
-	 * @default '0'
-	 * @version 4
-	 */
-	ini_set('display_startup_errors', '0');
+    /*
+     * Show startup errors on web browser.
+     * @note    Set to '1' for development/debugging.
+     * @default '0'
+     * @version 4
+     */
+    ini_set('display_startup_errors', '0');
 
-	/**
-	 * Type of errors to display.
-	 * @note    For development/debugging set to E_ALL
-	 * @default E_ALL & ~E_DEPRECATED & ~E_STRICT
-	 * @see     https://secure.php.net/manual/en/errorfunc.constants.php
-	 * @version 4
-	 */
-	ini_set('error_reporting', E_ALL);
+    /*
+     * Type of errors to display.
+     * @note    For development/debugging set to E_ALL
+     * @default E_ALL & ~E_DEPRECATED & ~E_STRICT
+     * @see     https://secure.php.net/manual/en/errorfunc.constants.php
+     * @version 4
+     */
+    ini_set('error_reporting', E_ALL);
 
-	/**
-	 * Turn off HTML tags in error messages.
-	 * @default '1'
-	 * @version 4
-	 */
-	ini_set('html_errors', '1');
+    /*
+     * Turn off HTML tags in error messages.
+     * @default '1'
+     * @version 4
+     */
+    ini_set('html_errors', '1');
 
-	/**
-	 * Set the location to log PHP errors.
-	 * @default NN_LOGS . 'php_errors.log'
-	 * @note    To log to syslog, put in 'syslog'
-	 * @version 4
-	 */
-	ini_set('error_log', NN_LOGS . 'php_errors_web.log');
+    /*
+     * Set the location to log PHP errors.
+     * @default NN_LOGS . 'php_errors.log'
+     * @note    To log to syslog, put in 'syslog'
+     * @version 4
+     */
+    ini_set('error_log', NN_LOGS.'php_errors_web.log');
 
-	/**
-	 * Log errors to error_log?
-	 * @default '1'
-	 * @version 4
-	 */
-	ini_set('log_errors', '1');
+    /*
+     * Log errors to error_log?
+     * @default '1'
+     * @version 4
+     */
+    ini_set('log_errors', '1');
 
-	/**
-	 * Max line length for a error.
-	 * @default 1024
-	 * @version 4
-	 */
-	ini_set('log_errors_max_len', '1024');
+    /*
+     * Max line length for a error.
+     * @default 1024
+     * @version 4
+     */
+    ini_set('log_errors_max_len', '1024');
 
-	/**
-	 * Store the last PHP error in $php_errormsg
-	 * @default '0'
-	 * @note    This is a development/debugging option.
-	 * @version 4
-	 */
-	ini_set('track_errors', '0');
+    /*
+     * Store the last PHP error in $php_errormsg
+     * @default '0'
+     * @note    This is a development/debugging option.
+     * @version 4
+     */
+    ini_set('track_errors', '0');
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -713,45 +714,45 @@ if (Utility::isCLI()) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 if (extension_loaded('xdebug')) {
 
-	/**
+	/*
 	 * Display colors on xdebug CLI output?
 	 * 0 - off, 1 - on only if on a TTY with ansi support, 2 - on regardless of TTY or ansi support.
 	 * @default 0
 	 * @version 4
 	 */
-	ini_set('xdebug.cli_color', '0');
+    ini_set('xdebug.cli_color', '0');
 
-	/**
-	 * Replace PHP's var_dump with xdebug's own?
-	 * @default '1'
-	 * @version 4
-	 */
-	ini_set('xdebug.overload_var_dump', '1');
+    /*
+     * Replace PHP's var_dump with xdebug's own?
+     * @default '1'
+     * @version 4
+     */
+    ini_set('xdebug.overload_var_dump', '1');
 
-	/**
-	 * How many items in a array or object to display on var_dump.
-	 * @note    Set to '-1' for no limit.
-	 * @default '128'
-	 * @version 4
-	 */
-	ini_set('xdebug.var_display_max_children', '128');
+    /*
+     * How many items in a array or object to display on var_dump.
+     * @note    Set to '-1' for no limit.
+     * @default '128'
+     * @version 4
+     */
+    ini_set('xdebug.var_display_max_children', '128');
 
-	/**
-	 * Maximum string length on var_dump. (anything over is truncated)
-	 * @note    Set to '-1' for no limit.
-	 * @default '512'
-	 * @version 4
-	 */
-	ini_set('xdebug.var_display_max_data', '512');
+    /*
+     * Maximum string length on var_dump. (anything over is truncated)
+     * @note    Set to '-1' for no limit.
+     * @default '512'
+     * @version 4
+     */
+    ini_set('xdebug.var_display_max_data', '512');
 
-	/**
-	 * How many nested arrays / objects deep to display on var_dump.
-	 * @note    Set to '-1' for no limit.
-	 * @note    Maximum value is '1023'
-	 * @default '3'
-	 * @version 4
-	 */
-	ini_set('xdebug.var_display_max_depth', '3');
+    /*
+     * How many nested arrays / objects deep to display on var_dump.
+     * @note    Set to '-1' for no limit.
+     * @note    Maximum value is '1023'
+     * @default '3'
+     * @version 4
+     */
+    ini_set('xdebug.var_display_max_depth', '3');
 }
 
 /***********************************************************************************************************************

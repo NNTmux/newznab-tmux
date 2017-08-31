@@ -1,5 +1,6 @@
 <?php
-require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
 use nntmux\db\DB;
 
@@ -11,19 +12,17 @@ try {
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Start the transaction
-    if( $db->beginTransaction() )
-    {
+    if ($db->beginTransaction()) {
         // Loop 20 times
-        for($i=1 ; $i<=20 ; $i++ )
-        {
+        for ($i = 1; $i <= 20; $i++) {
             // Header
-            echo "--[ Insert run: {$i} ]----------------------------------------". PHP_EOL;
+            echo "--[ Insert run: {$i} ]----------------------------------------".PHP_EOL;
 
             // Create a new db class instance (multiple can exist)
             $newDb = new DB();
 
             // Check that there is a new db class instance, but no new PDO instance
-            var_dump( $newDb, $newDb->getPDO() );
+            var_dump($newDb, $newDb->getPDO());
 
             // Insert some data
             $sql = sprintf("
@@ -32,15 +31,15 @@ try {
                 VALUES
                 ('%s', '%s', '%s', '%s', '%s')", $i, $i, $i, $i, $i
             );
-            $newDb->exec( $sql );
+            $newDb->exec($sql);
 
             // Check for inserted data
-            var_dump( $newDb->query( sprintf( "SELECT * FROM `testdata` WHERE id = %d", $i ) ) );
+            var_dump($newDb->query(sprintf('SELECT * FROM `testdata` WHERE id = %d', $i)));
         }
 
         // Now rollback using the last db class instance
-        var_dump( $newDb->rollback() );
+        var_dump($newDb->rollback());
     }
-} catch(PDOException $e) {
-    var_dump( $e );
+} catch (PDOException $e) {
+    var_dump($e);
 }

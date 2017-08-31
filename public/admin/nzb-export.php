@@ -1,69 +1,69 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Releases;
 use nntmux\NZBExport;
 
 if (\nntmux\utility\Utility::isCLI()) {
-	exit ('This script is only for exporting from the web, use the script in misc/testing' .
+    exit('This script is only for exporting from the web, use the script in misc/testing'.
 		PHP_EOL);
 }
 
 $page = new AdminPage();
-$rel  = new Releases(['Settings' => $page->settings]);
+$rel = new Releases(['Settings' => $page->settings]);
 
 if ($page->isPostBack()) {
-	$retVal = $path = '';
+    $retVal = $path = '';
 
-	$path     = $_POST["folder"];
-	$postFrom = (isset($_POST["postfrom"]) ? $_POST["postfrom"] : '');
-	$postTo   = (isset($_POST["postto"]) ? $_POST["postto"] : '');
-	$group    = ($_POST["group"] === '-1' ? 0 : (int)$_POST["group"]);
-	$gzip     = ($_POST["gzip"] === '1' ? true : false);
+    $path = $_POST['folder'];
+    $postFrom = (isset($_POST['postfrom']) ? $_POST['postfrom'] : '');
+    $postTo = (isset($_POST['postto']) ? $_POST['postto'] : '');
+    $group = ($_POST['group'] === '-1' ? 0 : (int) $_POST['group']);
+    $gzip = ($_POST['gzip'] === '1' ? true : false);
 
-	if ($path !== "") {
-		$NE = new NZBExport([
+    if ($path !== '') {
+        $NE = new NZBExport([
 			'Browser'  => true, 'Settings' => $page->settings,
-			'Releases' => $rel
+			'Releases' => $rel,
 		]);
-		$retVal = $NE->beginExport(
+        $retVal = $NE->beginExport(
 			[
 				$path,
 				$postFrom,
 				$postTo,
 				$group,
-				$gzip
+				$gzip,
 			]
 		);
-	} else {
-		$retVal = 'Error, a path is required!';
-	}
+    } else {
+        $retVal = 'Error, a path is required!';
+    }
 
-	$page->smarty->assign(
+    $page->smarty->assign(
 		[
 			'folder'   => $path,
 			'output'   => $retVal,
 			'fromdate' => $postFrom,
 			'todate'   => $postTo,
-			'group'    => $_POST["group"],
-			'gzip'     => $_POST["gzip"]
+			'group'    => $_POST['group'],
+			'gzip'     => $_POST['gzip'],
 		]
 	);
 } else {
-	$page->smarty->assign(
+    $page->smarty->assign(
 		[
 			'fromdate' => $rel->getEarliestUsenetPostDate(),
-			'todate'   => $rel->getLatestUsenetPostDate()
+			'todate'   => $rel->getLatestUsenetPostDate(),
 		]
 	);
 }
 
-$page->title = "Export Nzbs";
+$page->title = 'Export Nzbs';
 $page->smarty->assign(
 	[
 		'gziplist'  => [1 => 'True', 0 => 'False'],
-		'grouplist' => $rel->getReleasedGroupsForSelect(true)
+		'grouplist' => $rel->getReleasedGroupsForSelect(true),
 	]
 );
 $page->content = $page->smarty->fetch('nzb-export.tpl');

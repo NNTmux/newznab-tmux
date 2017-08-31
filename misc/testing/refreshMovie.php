@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap.php';
 
 use nntmux\db\DB;
 use nntmux\Movie;
@@ -29,16 +29,14 @@ $sleepsecsbetweenscrape = 1;
 // CASE 5 - UPDATE ALL WITH NO TRAILER
 //$movies = $db->query("SELECT imdbid from movieinfo where trailer is null and tmdbid is not null");
 
-
-if (count($movies) == 0)
-{
+if (count($movies) == 0) {
     echo "No records selected to update - either uncomment case or no matches found.\n";
     die();
 }
 
-echo "Updating ".count($movies)." records - Sleep interval ".$sleepsecsbetweenscrape." second(s)\n";
+echo 'Updating '.count($movies).' records - Sleep interval '.$sleepsecsbetweenscrape." second(s)\n";
 foreach ($movies as $mov) {
-    echo "Updating ".$mov['imdbid']." (".$counter++."/".count($movies).")\n";
-	$mov = $movie->updateMovieInfo($mov['imdbid']);
-	sleep($sleepsecsbetweenscrape);
+    echo 'Updating '.$mov['imdbid'].' ('.$counter++.'/'.count($movies).")\n";
+    $mov = $movie->updateMovieInfo($mov['imdbid']);
+    sleep($sleepsecsbetweenscrape);
 }

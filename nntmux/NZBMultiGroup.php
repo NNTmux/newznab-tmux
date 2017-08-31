@@ -1,4 +1,5 @@
 <?php
+
 namespace nntmux;
 
 /**
@@ -7,35 +8,33 @@ namespace nntmux;
  */
 class NZBMultiGroup extends NZB
 {
-	/**
-	 * Default constructor.
-	 *
-	 * @access public
-	 *
-	 * @param $pdo
-	 *
-	 * @throws \Exception
-	 */
-	public function __construct(&$pdo)
-	{
-		parent::__construct($pdo);
-	}
+    /**
+     * Default constructor.
+     *
+     *
+     * @param $pdo
+     *
+     * @throws \Exception
+     */
+    public function __construct(&$pdo)
+    {
+        parent::__construct($pdo);
+    }
 
-	/**
-	 * Initiate class vars when writing NZB's.
-	 *
-	 * @access public
-	 *
-	 * @param int $groupID
-	 */
-	public function initiateForWrite($groupID)
-	{
-		$this->_tableNames = [
+    /**
+     * Initiate class vars when writing NZB's.
+     *
+     *
+     * @param int $groupID
+     */
+    public function initiateForWrite($groupID)
+    {
+        $this->_tableNames = [
 			'cName' => 'multigroup_collections',
 			'bName' => 'multigroup_binaries',
 			'pName' => 'multigroup_parts',
 		];
 
-		$this->setQueries();
-	}
+        $this->setQueries();
+    }
 }

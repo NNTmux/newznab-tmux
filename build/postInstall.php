@@ -10,19 +10,16 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
  * @copyright 2016 nZEDb
  */
+require_once '..'.DIRECTORY_SEPARATOR.'bootstrap.php';
 
-require_once '..' . DIRECTORY_SEPARATOR . 'bootstrap.php';
-
-$updates = NN_CONFIGS . 'updates.json';
-if (!file_exists($updates)) {
-	$json = [ 'script' => time()];
-	file_put_contents(json_encode($json, JSON_PRETTY_PRINT));
+$updates = NN_CONFIGS.'updates.json';
+if (! file_exists($updates)) {
+    $json = ['script' => time()];
+    file_put_contents(json_encode($json, JSON_PRETTY_PRINT));
 }
-
-?>

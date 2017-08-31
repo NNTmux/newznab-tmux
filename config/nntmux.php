@@ -1,8 +1,9 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
+
 use Dotenv\Dotenv;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 $dotenv = new Dotenv(dirname(__DIR__, 1));
 $dotenv->load();
@@ -19,7 +20,7 @@ $capsule->addConnection([
 	'unix_socket' => env('DB_SOCKET', ''),
 	'charset' => 'utf8',
 	'collation' => 'utf8_unicode_ci',
-	'strict' => false
+	'strict' => false,
 ]);
 
 $capsule->setAsGlobal();

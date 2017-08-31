@@ -18,105 +18,107 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
+
 namespace nntmux\utility;
 
 /**
  * Class Git - Wrapper for various git operations.
- * @package nntmux\utility
  */
 class Git extends \GitRepo
 {
-	private $branch;
-	private $mainBranches = ['dev', '0.5.x', '0.x'];
+    private $branch;
+    private $mainBranches = ['dev', '0.5.x', '0.x'];
 
-	public function __construct(array $options = [])
-	{
-		$defaults = [
+    public function __construct(array $options = [])
+    {
+        $defaults = [
 			'create'		=> false,
 			'initialise'	=> false,
 			'filepath'		=> NN_ROOT,
 		];
-		$options += $defaults;
+        $options += $defaults;
 
-		parent::__construct($options['filepath'], $options['create'], $options['initialise']);
-		$this->branch = parent::active_branch();
-	}
+        parent::__construct($options['filepath'], $options['create'], $options['initialise']);
+        $this->branch = parent::active_branch();
+    }
 
-	/**
-	 * Return the number of commits made to repo
-	 */
-	public function commits()
-	{
-		$count = 0;
-		$log = explode("\n", $this->log());
-		foreach ($log as $line) {
-			if (preg_match('#^commit#', $line)) {
-				++$count;
-			}
-		}
-		return $count;
-	}
+    /**
+     * Return the number of commits made to repo.
+     */
+    public function commits()
+    {
+        $count = 0;
+        $log = explode("\n", $this->log());
+        foreach ($log as $line) {
+            if (preg_match('#^commit#', $line)) {
+                ++$count;
+            }
+        }
 
-	/**
-	 * @param string $options
-	 *
-	 * @return string
-	 */
-	public function describe($options = null)
-	{
-		return $this->run("describe $options");
-	}
+        return $count;
+    }
 
-	public function getBranch()
-	{
-		return $this->branch;
-	}
+    /**
+     * @param string $options
+     *
+     * @return string
+     */
+    public function describe($options = null)
+    {
+        return $this->run("describe $options");
+    }
 
-	/**
-	 * @param $gitObject
-	 *
-	 * @return bool
-	 * @throws \Exception
-	 */
-	public function isCommited($gitObject)
-	{
-		$cmd = "cat-file -e $gitObject";
+    public function getBranch()
+    {
+        return $this->branch;
+    }
 
-		try {
-			$result = $this->run($cmd);
-		} catch (\Exception $e) {
-			$message = explode("\n", $e->getMessage());
-			if ($message[0] === "fatal: Not a valid object name $gitObject") {
-				$result = false;
-			} else {
-				throw new \Exception($message);
-			}
-		}
-		return ($result === '');
-	}
+    /**
+     * @param $gitObject
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function isCommited($gitObject)
+    {
+        $cmd = "cat-file -e $gitObject";
 
-	public function log($options = null)
-	{
-		return $this->run("log $options");
-	}
+        try {
+            $result = $this->run($cmd);
+        } catch (\Exception $e) {
+            $message = explode("\n", $e->getMessage());
+            if ($message[0] === "fatal: Not a valid object name $gitObject") {
+                $result = false;
+            } else {
+                throw new \Exception($message);
+            }
+        }
 
-	public function mainBranches()
-	{
-		return $this->mainBranches;
-	}
+        return $result === '';
+    }
 
-	/**
-	 * @param string $options
-	 *
-	 * @return string
-	 */
-	public function tag($options = null)
-	{
-		return $this->run("tag $options");
-	}
+    public function log($options = null)
+    {
+        return $this->run("log $options");
+    }
 
-	public function tagLatest()
-	{
-		return $this->describe("--tags --abbrev=0 HEAD");
-	}
+    public function mainBranches()
+    {
+        return $this->mainBranches;
+    }
+
+    /**
+     * @param string $options
+     *
+     * @return string
+     */
+    public function tag($options = null)
+    {
+        return $this->run("tag $options");
+    }
+
+    public function tagLatest()
+    {
+        return $this->describe('--tags --abbrev=0 HEAD');
+    }
 }

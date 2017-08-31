@@ -18,31 +18,30 @@
  * @author    ruhllatio
  * @copyright 2015 nZEDb
  */
+
 namespace nntmux\utility;
 
 use nntmux\db\DB;
 
 /**
- * Class Country
- *
- * @package nntmux\utility
+ * Class Country.
  */
-Class Country
+class Country
 {
-	/**
-	 * Get a country code for a country name.
-	 *
-	 * @param string $country
-	 *
-	 * @param DB $pdo
-	 *
-	 * @return mixed
-	 */
-	public static function countryCode($country, $pdo)
-	{
-		$pdo = ($pdo instanceof DB ? $pdo : new DB());
-		if (!is_array($country) && strlen($country) > 2) {
-			$code = $pdo->queryOneRow(
+    /**
+     * Get a country code for a country name.
+     *
+     * @param string $country
+     *
+     * @param DB $pdo
+     *
+     * @return mixed
+     */
+    public static function countryCode($country, $pdo)
+    {
+        $pdo = ($pdo instanceof DB ? $pdo : new DB());
+        if (! is_array($country) && strlen($country) > 2) {
+            $code = $pdo->queryOneRow(
 				sprintf('
 					SELECT id
 					FROM countries
@@ -50,10 +49,11 @@ Class Country
 					$pdo->escapeString($country)
 				)
 			);
-			if (isset($code['id'])) {
-				return $code['id'];
-			}
-		}
-		return '';
-	}
+            if (isset($code['id'])) {
+                return $code['id'];
+            }
+        }
+
+        return '';
+    }
 }

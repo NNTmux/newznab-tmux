@@ -1,182 +1,183 @@
 <?php
+
 namespace nntmux;
 
-use ApaiIO\Request\GuzzleRequest;
-use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
+use nntmux\db\DB;
+use ApaiIO\ApaiIO;
+use GuzzleHttp\Client;
 use App\Models\BookInfo;
 use App\Models\Settings;
-use GuzzleHttp\Client;
-use nntmux\db\DB;
-use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\Operations\Search;
-use ApaiIO\ApaiIO;
+use ApaiIO\Request\GuzzleRequest;
+use ApaiIO\Configuration\GenericConfiguration;
+use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
 /*
  * Class for processing book info.
  */
 class Books
 {
-	/**
-	 * @var DB
-	 */
-	public $pdo;
+    /**
+     * @var DB
+     */
+    public $pdo;
 
-	/**
-	 * @var bool
-	 */
-	public $echooutput;
+    /**
+     * @var bool
+     */
+    public $echooutput;
 
-	/**
-	 * @var array|bool|string
-	 */
-	public $pubkey;
+    /**
+     * @var array|bool|string
+     */
+    public $pubkey;
 
-	/**
-	 * @var array|bool|string
-	 */
-	public $privkey;
+    /**
+     * @var array|bool|string
+     */
+    public $privkey;
 
-	/**
-	 * @var array|bool|string
-	 */
-	public $asstag;
+    /**
+     * @var array|bool|string
+     */
+    public $asstag;
 
-	/**
-	 * @var array|bool|int|string
-	 */
-	public $bookqty;
+    /**
+     * @var array|bool|int|string
+     */
+    public $bookqty;
 
-	/**
-	 * @var array|bool|int|string
-	 */
-	public $sleeptime;
+    /**
+     * @var array|bool|int|string
+     */
+    public $sleeptime;
 
-	/**
-	 * @var string
-	 */
-	public $imgSavePath;
+    /**
+     * @var string
+     */
+    public $imgSavePath;
 
-	/**
-	 * @var array|bool|int|string
-	 */
-	public $bookreqids;
+    /**
+     * @var array|bool|int|string
+     */
+    public $bookreqids;
 
-	/**
-	 * @var string
-	 */
-	public $renamed;
+    /**
+     * @var string
+     */
+    public $renamed;
 
-	/**
-	 * Store names of failed Amazon lookup items
-	 * @var array
-	 */
-	public $failCache;
+    /**
+     * Store names of failed Amazon lookup items.
+     * @var array
+     */
+    public $failCache;
 
-	/**
-	 * @param array $options Class instances / Echo to cli.
-	 *
-	 * @throws \Exception
-	 */
-	public function __construct(array $options =[])
-	{
-		$defaults = [
+    /**
+     * @param array $options Class instances / Echo to cli.
+     *
+     * @throws \Exception
+     */
+    public function __construct(array $options = [])
+    {
+        $defaults = [
 			'Echo'     => false,
 			'Settings' => null,
 		];
-		$options += $defaults;
+        $options += $defaults;
 
-		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
+        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
-		$this->pubkey = Settings::value('APIs..amazonpubkey');
-		$this->privkey = Settings::value('APIs..amazonprivkey');
-		$this->asstag = Settings::value('APIs..amazonassociatetag');
-		$this->bookqty = Settings::value('..maxbooksprocessed') !== '' ? Settings::value('..maxbooksprocessed') : 300;
-		$this->sleeptime = Settings::value('..amazonsleep') !== '' ? Settings::value('..amazonsleep') : 1000;
-		$this->imgSavePath = NN_COVERS . 'book' . DS;
-		$result = Settings::value('..book_reqids');
-		$this->bookreqids = empty($result) ? Category::BOOKS_EBOOK : $result;
-		$this->renamed = '';
-		if ((int)Settings::value('..lookupbooks') === 2) {
-			$this->renamed = 'AND isrenamed = 1';
-		}
+        $this->pubkey = Settings::value('APIs..amazonpubkey');
+        $this->privkey = Settings::value('APIs..amazonprivkey');
+        $this->asstag = Settings::value('APIs..amazonassociatetag');
+        $this->bookqty = Settings::value('..maxbooksprocessed') !== '' ? Settings::value('..maxbooksprocessed') : 300;
+        $this->sleeptime = Settings::value('..amazonsleep') !== '' ? Settings::value('..amazonsleep') : 1000;
+        $this->imgSavePath = NN_COVERS.'book'.DS;
+        $result = Settings::value('..book_reqids');
+        $this->bookreqids = empty($result) ? Category::BOOKS_EBOOK : $result;
+        $this->renamed = '';
+        if ((int) Settings::value('..lookupbooks') === 2) {
+            $this->renamed = 'AND isrenamed = 1';
+        }
 
-		$this->failCache = [];
-	}
+        $this->failCache = [];
+    }
 
-	/**
-	 * @param $id
-	 *
-	 * @return \Illuminate\Database\Eloquent\Model|null|static
-	 */
-	public function getBookInfo($id)
-	{
-		return BookInfo::query()->where('id', $id)->first();
-	}
+    /**
+     * @param $id
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null|static
+     */
+    public function getBookInfo($id)
+    {
+        return BookInfo::query()->where('id', $id)->first();
+    }
 
-	/**
-	 * @param $author
-	 * @param $title
-	 *
-	 * @return array|bool
-	 */
-	public function getBookInfoByName($author, $title)
-	{
-		$pdo = $this->pdo;
+    /**
+     * @param $author
+     * @param $title
+     *
+     * @return array|bool
+     */
+    public function getBookInfoByName($author, $title)
+    {
+        $pdo = $this->pdo;
 
-		//only used to get a count of words
-		$searchwords = $searchsql = '';
-		$title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
-		$title = preg_replace('/[^\w ]+/', '', $title);
-		$title = trim(preg_replace('/\s\s+/i', ' ', $title));
-		$title = trim($title);
-		$words = explode(' ', $title);
+        //only used to get a count of words
+        $searchwords = $searchsql = '';
+        $title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
+        $title = preg_replace('/[^\w ]+/', '', $title);
+        $title = trim(preg_replace('/\s\s+/i', ' ', $title));
+        $title = trim($title);
+        $words = explode(' ', $title);
 
-		foreach ($words as $word) {
-			$word = trim(rtrim(trim($word), '-'));
-			if ($word !== '' && $word !== '-') {
-				$word = '+' . $word;
-				$searchwords .= sprintf('%s ', $word);
-			}
-		}
-		$searchwords = trim($searchwords);
-		$searchsql .= sprintf(' MATCH(author, title) AGAINST(%s IN BOOLEAN MODE)', $pdo->escapeString($searchwords));
-		return $pdo->queryOneRow(sprintf('SELECT * FROM bookinfo WHERE %s', $searchsql));
-	}
+        foreach ($words as $word) {
+            $word = trim(rtrim(trim($word), '-'));
+            if ($word !== '' && $word !== '-') {
+                $word = '+'.$word;
+                $searchwords .= sprintf('%s ', $word);
+            }
+        }
+        $searchwords = trim($searchwords);
+        $searchsql .= sprintf(' MATCH(author, title) AGAINST(%s IN BOOLEAN MODE)', $pdo->escapeString($searchwords));
 
-	/**
-	 * @param       $cat
-	 * @param       $start
-	 * @param       $num
-	 * @param       $orderby
-	 * @param array $excludedcats
-	 *
-	 * @return array
-	 * @throws \Exception
-	 */
-	public function getBookRange($cat, $start, $num, $orderby, array $excludedcats = []): array
-	{
+        return $pdo->queryOneRow(sprintf('SELECT * FROM bookinfo WHERE %s', $searchsql));
+    }
 
-		$browseby = $this->getBrowseBy();
+    /**
+     * @param       $cat
+     * @param       $start
+     * @param       $num
+     * @param       $orderby
+     * @param array $excludedcats
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function getBookRange($cat, $start, $num, $orderby, array $excludedcats = []): array
+    {
+        $browseby = $this->getBrowseBy();
 
-		$catsrch = '';
-		if (count($cat) > 0 && $cat[0] !== -1) {
-			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
-		}
+        $catsrch = '';
+        if (count($cat) > 0 && $cat[0] !== -1) {
+            $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+        }
 
-		$maxage = '';
-		if ($maxage > 0) {
-			$maxage = sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage);
-		}
+        $maxage = '';
+        if ($maxage > 0) {
+            $maxage = sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage);
+        }
 
-		$exccatlist = '';
-		if (count($excludedcats) > 0) {
-			$exccatlist = ' AND r.categories_id NOT IN (' . implode(',', $excludedcats) . ')';
-		}
+        $exccatlist = '';
+        if (count($excludedcats) > 0) {
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
+        }
 
-		$order = $this->getBookOrder($orderby);
+        $order = $this->getBookOrder($orderby);
 
-		$books = $this->pdo->queryCalc(
+        $books = $this->pdo->queryCalc(
 				sprintf("
 				SELECT SQL_CALC_FOUND_ROWS boo.id,
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
@@ -196,20 +197,20 @@ class Books
 						$exccatlist,
 						$order[0],
 						$order[1],
-						($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+						($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
 				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 
-		$bookIDs = $releaseIDs = false;
+        $bookIDs = $releaseIDs = false;
 
-		if (is_array($books['result'])) {
-			foreach ($books['result'] AS $book => $id) {
-				$bookIDs[] = $id['id'];
-				$releaseIDs[] = $id['grp_release_id'];
-			}
-		}
+        if (is_array($books['result'])) {
+            foreach ($books['result'] as $book => $id) {
+                $bookIDs[] = $id['id'];
+                $releaseIDs[] = $id['grp_release_id'];
+            }
+        }
 
-		$sql = sprintf("
+        $sql = sprintf("
 			SELECT
 				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 				GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
@@ -245,24 +246,24 @@ class Books
 				$order[0],
 				$order[1]
 		);
-		$return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
-		if (!empty($return)) {
-			$return[0]['_totalcount'] = $books['total'] ?? 0;
-		}
-		return $return;
-	}
+        $return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+        if (! empty($return)) {
+            $return[0]['_totalcount'] = $books['total'] ?? 0;
+        }
 
+        return $return;
+    }
 
-	/**
-	 * @param $orderby
-	 *
-	 * @return array
-	 */
-	public function getBookOrder($orderby): array
-	{
-		$order = ($orderby === '') ? 'r.postdate' : $orderby;
-		$orderArr = explode('_', $order);
-		switch ($orderArr[0]) {
+    /**
+     * @param $orderby
+     *
+     * @return array
+     */
+    public function getBookOrder($orderby): array
+    {
+        $order = ($orderby === '') ? 'r.postdate' : $orderby;
+        $orderArr = explode('_', $order);
+        switch ($orderArr[0]) {
 			case 'title':
 				$orderfield = 'boo.title';
 				break;
@@ -286,16 +287,17 @@ class Books
 				$orderfield = 'r.postdate';
 				break;
 		}
-		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
-		return array($orderfield, $ordersort);
-	}
+        $ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
-	/**
-	 * @return array
-	 */
-	public function getBookOrdering(): array
-	{
-		return array(
+        return [$orderfield, $ordersort];
+    }
+
+    /**
+     * @return array
+     */
+    public function getBookOrdering(): array
+    {
+        return [
 			'title_asc',
 			'title_desc',
 			'posted_asc',
@@ -309,94 +311,94 @@ class Books
 			'releasedate_asc',
 			'releasedate_desc',
 			'author_asc',
-			'author_desc'
-		);
-	}
+			'author_desc',
+		];
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getBrowseByOptions(): array
-	{
-		return ['author' => 'author', 'title' => 'title'];
-	}
+    /**
+     * @return array
+     */
+    public function getBrowseByOptions(): array
+    {
+        return ['author' => 'author', 'title' => 'title'];
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getBrowseBy(): string
-	{
-		$browseby = ' ';
-		$browsebyArr = $this->getBrowseByOptions();
-		foreach ($browsebyArr as $bbk => $bbv) {
-			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
-				$bbs = stripslashes($_REQUEST[$bbk]);
-				$browseby .= 'AND boo.' . $bbv . ' ' . $this->pdo->likeString($bbs, true, true);
-			}
-		}
-		return $browseby;
-	}
+    /**
+     * @return string
+     */
+    public function getBrowseBy(): string
+    {
+        $browseby = ' ';
+        $browsebyArr = $this->getBrowseByOptions();
+        foreach ($browsebyArr as $bbk => $bbv) {
+            if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
+                $bbs = stripslashes($_REQUEST[$bbk]);
+                $browseby .= 'AND boo.'.$bbv.' '.$this->pdo->likeString($bbs, true, true);
+            }
+        }
 
-	/**
-	 * @param $title
-	 *
-	 * @return bool|mixed
-	 * @throws \Exception
-	 */
-	public function fetchAmazonProperties($title)
-	{
-		$conf = new GenericConfiguration();
-		$client = new Client();
-		$request = new GuzzleRequest($client);
+        return $browseby;
+    }
 
-		try {
-			$conf
+    /**
+     * @param $title
+     *
+     * @return bool|mixed
+     * @throws \Exception
+     */
+    public function fetchAmazonProperties($title)
+    {
+        $conf = new GenericConfiguration();
+        $client = new Client();
+        $request = new GuzzleRequest($client);
+
+        try {
+            $conf
 				->setCountry('com')
 				->setAccessKey($this->pubkey)
 				->setSecretKey($this->privkey)
 				->setAssociateTag($this->asstag)
 				->setRequest($request)
 				->setResponseTransformer(new XmlToSimpleXmlObject());
-		} catch (\Exception $e) {
-				echo $e->getMessage();
-			}
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
 
-		$search = new Search();
-		$search->setCategory('Books');
-		$search->setKeywords($title);
-		$search->setResponseGroup(['Large']);
+        $search = new Search();
+        $search->setCategory('Books');
+        $search->setKeywords($title);
+        $search->setResponseGroup(['Large']);
 
-		$apaiIo = new ApaiIO($conf);
+        $apaiIo = new ApaiIO($conf);
 
-		$response = $apaiIo->runOperation($search);
-		if ($response === false)
-		{
-			throw new \RuntimeException('Could not connect to Amazon');
-		}
+        $response = $apaiIo->runOperation($search);
+        if ($response === false) {
+            throw new \RuntimeException('Could not connect to Amazon');
+        }
 
-		if (isset($response->Items->Item->ItemAttributes->Title))
-		{
-			return $response;
-		}
-		return false;
-	}
+        if (isset($response->Items->Item->ItemAttributes->Title)) {
+            return $response;
+        }
 
-	/**
-	 * Process book releases, 1 category at a time.
-	 */
-	public function processBookReleases(): void
-	{
-		$bookids =[];
-		if (ctype_digit((string)$this->bookreqids)) {
-			$bookids[] = $this->bookreqids;
-		} else {
-			$bookids = explode(', ', $this->bookreqids);
-		}
+        return false;
+    }
 
-		$total = count($bookids);
-		if ($total > 0) {
-			for ($i = 0; $i < $total; $i++) {
-				$this->processBookReleasesHelper(
+    /**
+     * Process book releases, 1 category at a time.
+     */
+    public function processBookReleases(): void
+    {
+        $bookids = [];
+        if (ctype_digit((string) $this->bookreqids)) {
+            $bookids[] = $this->bookreqids;
+        } else {
+            $bookids = explode(', ', $this->bookreqids);
+        }
+
+        $total = count($bookids);
+        if ($total > 0) {
+            for ($i = 0; $i < $total; $i++) {
+                $this->processBookReleasesHelper(
 					$this->pdo->queryDirect(
 						sprintf('
 						SELECT searchname, id, categories_id
@@ -408,229 +410,230 @@ class Books
 						DESC LIMIT %d', $this->renamed, $bookids[$i], $this->bookqty)
 					), $bookids[$i]
 				);
-			}
-		}
-	}
+            }
+        }
+    }
 
-	/**
-	 * Process book releases.
-	 *
-	 * @param \PDOStatement|bool $res        Array containing unprocessed book SQL data set.
-	 * @param int                $categoryID The category id.
-	 *
-	 * @void
-	 * @throws \Exception
-	 */
-	protected function processBookReleasesHelper($res, $categoryID): void
-	{
-		if ($res instanceof \Traversable && $res->rowCount() > 0) {
-			if ($this->echooutput) {
-				ColorCLI::doEcho(ColorCLI::header("\nProcessing " . $res->rowCount() . ' book release(s) for categories id ' . $categoryID));
-			}
+    /**
+     * Process book releases.
+     *
+     * @param \PDOStatement|bool $res        Array containing unprocessed book SQL data set.
+     * @param int                $categoryID The category id.
+     *
+     * @void
+     * @throws \Exception
+     */
+    protected function processBookReleasesHelper($res, $categoryID): void
+    {
+        if ($res instanceof \Traversable && $res->rowCount() > 0) {
+            if ($this->echooutput) {
+                ColorCLI::doEcho(ColorCLI::header("\nProcessing ".$res->rowCount().' book release(s) for categories id '.$categoryID));
+            }
 
-			foreach ($res as $arr) {
-				$startTime = microtime(true);
-				$usedAmazon = false;
-				// audiobooks are also books and should be handled in an identical manor, even though it falls under a music category
-				if ($arr['categories_id'] === '3030') {
-					// audiobook
-					$bookInfo = $this->parseTitle($arr['searchname'], $arr['id'], 'audiobook');
-				} else {
-					// ebook
-					$bookInfo = $this->parseTitle($arr['searchname'], $arr['id'], 'ebook');
-				}
+            foreach ($res as $arr) {
+                $startTime = microtime(true);
+                $usedAmazon = false;
+                // audiobooks are also books and should be handled in an identical manor, even though it falls under a music category
+                if ($arr['categories_id'] === '3030') {
+                    // audiobook
+                    $bookInfo = $this->parseTitle($arr['searchname'], $arr['id'], 'audiobook');
+                } else {
+                    // ebook
+                    $bookInfo = $this->parseTitle($arr['searchname'], $arr['id'], 'ebook');
+                }
 
-				if ($bookInfo !== false) {
-					if ($this->echooutput) {
-						ColorCLI::doEcho(ColorCLI::headerOver('Looking up: ') . ColorCLI::primary($bookInfo));
-					}
+                if ($bookInfo !== false) {
+                    if ($this->echooutput) {
+                        ColorCLI::doEcho(ColorCLI::headerOver('Looking up: ').ColorCLI::primary($bookInfo));
+                    }
 
-					// Do a local lookup first
-					$bookCheck = $this->getBookInfoByName('', $bookInfo);
+                    // Do a local lookup first
+                    $bookCheck = $this->getBookInfoByName('', $bookInfo);
 
-					if ($bookCheck === false && in_array($bookInfo, $this->failCache, false)) {
-						// Lookup recently failed, no point trying again
-						if ($this->echooutput) {
-							ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.') . PHP_EOL);
-						}
-						$bookId = -2;
-					} else if ($bookCheck === false) {
-						$bookId = $this->updateBookInfo($bookInfo);
-						$usedAmazon = true;
-						if ($bookId === false) {
-							$bookId = -2;
-							$this->failCache[] = $bookInfo;
-						}
-					} else {
-						$bookId = $bookCheck['id'];
-					}
+                    if ($bookCheck === false && in_array($bookInfo, $this->failCache, false)) {
+                        // Lookup recently failed, no point trying again
+                        if ($this->echooutput) {
+                            ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.').PHP_EOL);
+                        }
+                        $bookId = -2;
+                    } elseif ($bookCheck === false) {
+                        $bookId = $this->updateBookInfo($bookInfo);
+                        $usedAmazon = true;
+                        if ($bookId === false) {
+                            $bookId = -2;
+                            $this->failCache[] = $bookInfo;
+                        }
+                    } else {
+                        $bookId = $bookCheck['id'];
+                    }
 
-					// Update release.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET bookinfo_id = %d WHERE id = %d', $bookId, $arr['id']));
-				} else { // Could not parse release title.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET bookinfo_id = %d WHERE id = %d', -2, $arr['id']));
-					if ($this->echooutput) {
-						echo '.';
-					}
-				}
-				// Sleep to not flood amazon.
-				$diff = floor((microtime(true) - $startTime) * 1000000);
-				if ($this->sleeptime * 1000 - $diff > 0 && $usedAmazon === true) {
-					usleep($this->sleeptime * 1000 - $diff);
-				}
-			}
-		} else if ($this->echooutput) {
-			ColorCLI::doEcho(ColorCLI::header('No book releases to process for categories id ' . $categoryID));
-		}
-	}
+                    // Update release.
+                    $this->pdo->queryExec(sprintf('UPDATE releases SET bookinfo_id = %d WHERE id = %d', $bookId, $arr['id']));
+                } else { // Could not parse release title.
+                    $this->pdo->queryExec(sprintf('UPDATE releases SET bookinfo_id = %d WHERE id = %d', -2, $arr['id']));
+                    if ($this->echooutput) {
+                        echo '.';
+                    }
+                }
+                // Sleep to not flood amazon.
+                $diff = floor((microtime(true) - $startTime) * 1000000);
+                if ($this->sleeptime * 1000 - $diff > 0 && $usedAmazon === true) {
+                    usleep($this->sleeptime * 1000 - $diff);
+                }
+            }
+        } elseif ($this->echooutput) {
+            ColorCLI::doEcho(ColorCLI::header('No book releases to process for categories id '.$categoryID));
+        }
+    }
 
-	/**
-	 * @param $release_name
-	 * @param $releaseID
-	 * @param $releasetype
-	 *
-	 * @return bool|string
-	 */
-	public function parseTitle($release_name, $releaseID, $releasetype)
-	{
-		$a = preg_replace('/\d{1,2} \d{1,2} \d{2,4}|(19|20)\d\d|anybody got .+?[a-z]\? |[-._ ](Novel|TIA)([-._ ]|$)|( |\.)HQ(-|\.| )|[\(\)\.\-_ ](AVI|AZW3?|DOC|EPUB|LIT|MOBI|NFO|RETAIL|(si)?PDF|RTF|TXT)[\)\]\.\-_ ](?![a-z0-9])|compleet|DAGSTiDNiNGEN|DiRFiX|\+ extra|r?e ?Books?([\.\-_ ]English|ers)?|azw3?|ePu(b|p)s?|html|mobi|^NEW[\.\-_ ]|PDF([\.\-_ ]English)?|Please post more|Post description|Proper|Repack(fix)?|[\.\-_ ](Chinese|English|French|German|Italian|Retail|Scan|Swedish)|^R4 |Repost|Skytwohigh|TIA!+|TruePDF|V413HAV|(would someone )?please (re)?post.+? "|with the authors name right/i', '', $release_name);
-		$b = preg_replace('/^(As Req |conversion |eq |Das neue Abenteuer \d+|Fixed version( ignore previous post)?|Full |Per Req As Found|(\s+)?R4 |REQ |revised |version |\d+(\s+)?$)|(COMPLETE|INTERNAL|RELOADED| (AZW3|eB|docx|ENG?|exe|FR|Fix|gnv64|MU|NIV|R\d\s+\d{1,2} \d{1,2}|R\d|Req|TTL|UC|v(\s+)?\d))(\s+)?$/i', '', $a);
+    /**
+     * @param $release_name
+     * @param $releaseID
+     * @param $releasetype
+     *
+     * @return bool|string
+     */
+    public function parseTitle($release_name, $releaseID, $releasetype)
+    {
+        $a = preg_replace('/\d{1,2} \d{1,2} \d{2,4}|(19|20)\d\d|anybody got .+?[a-z]\? |[-._ ](Novel|TIA)([-._ ]|$)|( |\.)HQ(-|\.| )|[\(\)\.\-_ ](AVI|AZW3?|DOC|EPUB|LIT|MOBI|NFO|RETAIL|(si)?PDF|RTF|TXT)[\)\]\.\-_ ](?![a-z0-9])|compleet|DAGSTiDNiNGEN|DiRFiX|\+ extra|r?e ?Books?([\.\-_ ]English|ers)?|azw3?|ePu(b|p)s?|html|mobi|^NEW[\.\-_ ]|PDF([\.\-_ ]English)?|Please post more|Post description|Proper|Repack(fix)?|[\.\-_ ](Chinese|English|French|German|Italian|Retail|Scan|Swedish)|^R4 |Repost|Skytwohigh|TIA!+|TruePDF|V413HAV|(would someone )?please (re)?post.+? "|with the authors name right/i', '', $release_name);
+        $b = preg_replace('/^(As Req |conversion |eq |Das neue Abenteuer \d+|Fixed version( ignore previous post)?|Full |Per Req As Found|(\s+)?R4 |REQ |revised |version |\d+(\s+)?$)|(COMPLETE|INTERNAL|RELOADED| (AZW3|eB|docx|ENG?|exe|FR|Fix|gnv64|MU|NIV|R\d\s+\d{1,2} \d{1,2}|R\d|Req|TTL|UC|v(\s+)?\d))(\s+)?$/i', '', $a);
 
-		//remove book series from title as this gets more matches on amazon
-		$c = preg_replace('/ - \[.+\]|\[.+\]/', '', $b);
+        //remove book series from title as this gets more matches on amazon
+        $c = preg_replace('/ - \[.+\]|\[.+\]/', '', $b);
 
-		//remove any brackets left behind
-		$d = preg_replace('/(\(\)|\[\])/', '', $c);
-		$releasename = trim(preg_replace('/\s\s+/i', ' ', $d));
+        //remove any brackets left behind
+        $d = preg_replace('/(\(\)|\[\])/', '', $c);
+        $releasename = trim(preg_replace('/\s\s+/i', ' ', $d));
 
-		// the default existing type was ebook, this handles that in the same manor as before
-		if ($releasetype === 'ebook') {
-			if (preg_match('/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O(c|k)tober|November|De(c|z)ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i', $releasename)) {
-
-				if ($this->echooutput) {
-					ColorCLI::doEcho(
-						ColorCLI::headerOver('Changing category to misc books: ') . ColorCLI::primary($releasename)
+        // the default existing type was ebook, this handles that in the same manor as before
+        if ($releasetype === 'ebook') {
+            if (preg_match('/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O(c|k)tober|November|De(c|z)ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i', $releasename)) {
+                if ($this->echooutput) {
+                    ColorCLI::doEcho(
+						ColorCLI::headerOver('Changing category to misc books: ').ColorCLI::primary($releasename)
 					);
-				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET categories_id = %s WHERE id = %d', Category::BOOKS_UNKNOWN, $releaseID));
-				return false;
-			}
+                }
+                $this->pdo->queryExec(sprintf('UPDATE releases SET categories_id = %s WHERE id = %d', Category::BOOKS_UNKNOWN, $releaseID));
 
-			if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun( |e|$)|Jul( |y|$)|Aug( |ust|$)|Sep( |tember|$)|O(c|k)t( |ober|$)|Nov( |ember|$)|De(c|z)( |ember|$))/ui', $releasename) && !preg_match('/Part \d+/i', $releasename)) {
+                return false;
+            }
 
-				if ($this->echooutput) {
-					ColorCLI::doEcho(
-						ColorCLI::headerOver('Changing category to magazines: ') . ColorCLI::primary($releasename)
+            if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun( |e|$)|Jul( |y|$)|Aug( |ust|$)|Sep( |tember|$)|O(c|k)t( |ober|$)|Nov( |ember|$)|De(c|z)( |ember|$))/ui', $releasename) && ! preg_match('/Part \d+/i', $releasename)) {
+                if ($this->echooutput) {
+                    ColorCLI::doEcho(
+						ColorCLI::headerOver('Changing category to magazines: ').ColorCLI::primary($releasename)
 					);
-				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET categories_id = %s WHERE id = %d', Category::BOOKS_MAGAZINES, $releaseID));
-				return false;
-			}
-			if (!empty($releasename) && !preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
-				return $releasename;
-			}
+                }
+                $this->pdo->queryExec(sprintf('UPDATE releases SET categories_id = %s WHERE id = %d', Category::BOOKS_MAGAZINES, $releaseID));
 
-			return false;
-		}
-		if ($releasetype === 'audiobook') {
-			if (!empty($releasename) && !preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
-				// we can skip category for audiobooks, since we already know it, so as long as the release name is valid return it so that it is postprocessed by amazon.  In the future, determining the type of audiobook could be added (Lecture or book), since we can skip lookups on lectures, but for now handle them all the same way
-				return $releasename;
-			}
-			return false;
-		}
+                return false;
+            }
+            if (! empty($releasename) && ! preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
+                return $releasename;
+            }
 
-		return false;
-	}
+            return false;
+        }
+        if ($releasetype === 'audiobook') {
+            if (! empty($releasename) && ! preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
+                // we can skip category for audiobooks, since we already know it, so as long as the release name is valid return it so that it is postprocessed by amazon.  In the future, determining the type of audiobook could be added (Lecture or book), since we can skip lookups on lectures, but for now handle them all the same way
+                return $releasename;
+            }
 
-	/**
-	 * @param string $bookInfo
-	 * @param null   $amazdata
-	 *
-	 * @return false|int|string
-	 * @throws \Exception
-	 */
-	public function updateBookInfo($bookInfo = '', $amazdata = null)
-	{
-		$ri = new ReleaseImage($this->pdo);
+            return false;
+        }
 
-		$book =[];
+        return false;
+    }
 
-		$amaz = false;
-		if ($bookInfo !== '') {
-			$amaz = $this->fetchAmazonProperties($bookInfo);
-		} else if ($amazdata !== null) {
-			$amaz = $amazdata;
-		}
+    /**
+     * @param string $bookInfo
+     * @param null   $amazdata
+     *
+     * @return false|int|string
+     * @throws \Exception
+     */
+    public function updateBookInfo($bookInfo = '', $amazdata = null)
+    {
+        $ri = new ReleaseImage($this->pdo);
 
-		if (!$amaz) {
-			return false;
-		}
+        $book = [];
 
-		$book['title'] = (string)$amaz->Items->Item->ItemAttributes->Title;
-		$book['author'] = (string)$amaz->Items->Item->ItemAttributes->Author;
-		$book['asin'] = (string)$amaz->Items->Item->ASIN;
-		$book['isbn'] = (string)$amaz->Items->Item->ItemAttributes->ISBN;
-		if ($book['isbn'] === '') {
-			$book['isbn'] = 'null';
-		}
+        $amaz = false;
+        if ($bookInfo !== '') {
+            $amaz = $this->fetchAmazonProperties($bookInfo);
+        } elseif ($amazdata !== null) {
+            $amaz = $amazdata;
+        }
 
-		$book['ean'] = (string)$amaz->Items->Item->ItemAttributes->EAN;
-		if ($book['ean'] === '') {
-			$book['ean'] = 'null';
-		}
+        if (! $amaz) {
+            return false;
+        }
 
-		$book['url'] = (string)$amaz->Items->Item->DetailPageURL;
-		$book['url'] = str_replace('%26tag%3Dws', '%26tag%3Dopensourceins%2D21', $book['url']);
+        $book['title'] = (string) $amaz->Items->Item->ItemAttributes->Title;
+        $book['author'] = (string) $amaz->Items->Item->ItemAttributes->Author;
+        $book['asin'] = (string) $amaz->Items->Item->ASIN;
+        $book['isbn'] = (string) $amaz->Items->Item->ItemAttributes->ISBN;
+        if ($book['isbn'] === '') {
+            $book['isbn'] = 'null';
+        }
 
-		$book['salesrank'] = (string)$amaz->Items->Item->SalesRank;
-		if ($book['salesrank'] === '') {
-			$book['salesrank'] = 'null';
-		}
+        $book['ean'] = (string) $amaz->Items->Item->ItemAttributes->EAN;
+        if ($book['ean'] === '') {
+            $book['ean'] = 'null';
+        }
 
-		$book['publisher'] = (string)$amaz->Items->Item->ItemAttributes->Publisher;
-		if ($book['publisher'] === '') {
-			$book['publisher'] = 'null';
-		}
+        $book['url'] = (string) $amaz->Items->Item->DetailPageURL;
+        $book['url'] = str_replace('%26tag%3Dws', '%26tag%3Dopensourceins%2D21', $book['url']);
 
-		$book['publishdate'] = date('Y-m-d', strtotime((string)$amaz->Items->Item->ItemAttributes->PublicationDate));
-		if ($book['publishdate'] === '') {
-			$book['publishdate'] = 'null';
-		}
+        $book['salesrank'] = (string) $amaz->Items->Item->SalesRank;
+        if ($book['salesrank'] === '') {
+            $book['salesrank'] = 'null';
+        }
 
-		$book['pages'] = (string)$amaz->Items->Item->ItemAttributes->NumberOfPages;
-		if ($book['pages'] === '') {
-			$book['pages'] = 'null';
-		}
+        $book['publisher'] = (string) $amaz->Items->Item->ItemAttributes->Publisher;
+        if ($book['publisher'] === '') {
+            $book['publisher'] = 'null';
+        }
 
-		if (isset($amaz->Items->Item->EditorialReviews->EditorialReview->Content)) {
-			$book['overview'] = strip_tags((string)$amaz->Items->Item->EditorialReviews->EditorialReview->Content);
-			if ($book['overview'] === '') {
-				$book['overview'] = 'null';
-			}
-		} else {
-			$book['overview'] = 'null';
-		}
+        $book['publishdate'] = date('Y-m-d', strtotime((string) $amaz->Items->Item->ItemAttributes->PublicationDate));
+        if ($book['publishdate'] === '') {
+            $book['publishdate'] = 'null';
+        }
 
-		if (isset($amaz->Items->Item->BrowseNodes->BrowseNode->Name)) {
-			$book['genre'] = (string)$amaz->Items->Item->BrowseNodes->BrowseNode->Name;
-			if ($book['genre'] === '') {
-				$book['genre'] = 'null';
-			}
-		} else {
-			$book['genre'] = 'null';
-		}
+        $book['pages'] = (string) $amaz->Items->Item->ItemAttributes->NumberOfPages;
+        if ($book['pages'] === '') {
+            $book['pages'] = 'null';
+        }
 
-		$book['coverurl'] = (string)$amaz->Items->Item->LargeImage->URL;
-		if ($book['coverurl'] !== '') {
-			$book['cover'] = 1;
-		} else {
-			$book['cover'] = 0;
-		}
+        if (isset($amaz->Items->Item->EditorialReviews->EditorialReview->Content)) {
+            $book['overview'] = strip_tags((string) $amaz->Items->Item->EditorialReviews->EditorialReview->Content);
+            if ($book['overview'] === '') {
+                $book['overview'] = 'null';
+            }
+        } else {
+            $book['overview'] = 'null';
+        }
 
-		$check = BookInfo::query()->where('asin', $book['asin'])->first();
-		if ($check === false) {
-			$bookId = BookInfo::query()->insertGetId(
+        if (isset($amaz->Items->Item->BrowseNodes->BrowseNode->Name)) {
+            $book['genre'] = (string) $amaz->Items->Item->BrowseNodes->BrowseNode->Name;
+            if ($book['genre'] === '') {
+                $book['genre'] = 'null';
+            }
+        } else {
+            $book['genre'] = 'null';
+        }
+
+        $book['coverurl'] = (string) $amaz->Items->Item->LargeImage->URL;
+        if ($book['coverurl'] !== '') {
+            $book['cover'] = 1;
+        } else {
+            $book['cover'] = 0;
+        }
+
+        $check = BookInfo::query()->where('asin', $book['asin'])->first();
+        if ($check === false) {
+            $bookId = BookInfo::query()->insertGetId(
 				[
 					'title' => $book['title'],
 					'author' => $book['author'],
@@ -646,12 +649,12 @@ class Books
 					'genre' => $book['genre'],
 					'cover' => $book['cover'],
 					'createddate' => new \DateTime('NOW'),
-					'updateddate' => new \DateTime('NOW')
+					'updateddate' => new \DateTime('NOW'),
 				]
 			);
-		} else {
-			$bookId = $check['id'];
-			BookInfo::query()->where('id', $bookId)->update(
+        } else {
+            $bookId = $check['id'];
+            BookInfo::query()->where('id', $bookId)->update(
 				[
 					'title' => $book['title'],
 					'author' => $book['author'],
@@ -666,34 +669,35 @@ class Books
 					'overview' => $book['overview'],
 					'genre' => $book['genre'],
 					'cover' => $book['cover'],
-					'updateddate' => new \DateTime('NOW')
+					'updateddate' => new \DateTime('NOW'),
 				]
 			);
-		}
+        }
 
-		if ($bookId) {
-			if ($this->echooutput) {
-				ColorCLI::doEcho(ColorCLI::header('Added/updated book: '));
-				if ($book['author'] !== '') {
-					ColorCLI::doEcho(ColorCLI::alternateOver('   Author: ') . ColorCLI::primary($book['author']));
-				}
-				echo ColorCLI::alternateOver('   Title: ') . ColorCLI::primary(' ' . $book['title']);
-				if ($book['genre'] !== 'null') {
-					ColorCLI::doEcho(ColorCLI::alternateOver('   Genre: ') . ColorCLI::primary(' ' . $book['genre']));
-				}
-			}
+        if ($bookId) {
+            if ($this->echooutput) {
+                ColorCLI::doEcho(ColorCLI::header('Added/updated book: '));
+                if ($book['author'] !== '') {
+                    ColorCLI::doEcho(ColorCLI::alternateOver('   Author: ').ColorCLI::primary($book['author']));
+                }
+                echo ColorCLI::alternateOver('   Title: ').ColorCLI::primary(' '.$book['title']);
+                if ($book['genre'] !== 'null') {
+                    ColorCLI::doEcho(ColorCLI::alternateOver('   Genre: ').ColorCLI::primary(' '.$book['genre']));
+                }
+            }
 
-			$book['cover'] = $ri->saveImage($bookId, $book['coverurl'], $this->imgSavePath, 250, 250);
-		} else {
-			if ($this->echooutput) {
-				ColorCLI::doEcho(
-					ColorCLI::header('Nothing to update: ') .
-					ColorCLI::header($book['author'] .
-						' - ' .
+            $book['cover'] = $ri->saveImage($bookId, $book['coverurl'], $this->imgSavePath, 250, 250);
+        } else {
+            if ($this->echooutput) {
+                ColorCLI::doEcho(
+					ColorCLI::header('Nothing to update: ').
+					ColorCLI::header($book['author'].
+						' - '.
 						$book['title'])
 				);
-			}
-		}
-		return $bookId;
-	}
+            }
+        }
+
+        return $bookId;
+    }
 }

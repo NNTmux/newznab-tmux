@@ -1,22 +1,23 @@
 <?php
-require_once dirname(__DIR__, 5) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-use App\Models\Settings;
+require_once dirname(__DIR__, 5).DIRECTORY_SEPARATOR.'bootstrap.php';
+
+use nntmux\Nfo;
+use nntmux\NZB;
+use nntmux\NNTP;
+use nntmux\db\DB;
 use nntmux\Category;
 use nntmux\ColorCLI;
-use nntmux\MiscSorter;
 use nntmux\NameFixer;
-use nntmux\Nfo;
-use nntmux\NNTP;
-use nntmux\NZB;
+use nntmux\MiscSorter;
 use nntmux\NZBContents;
-use nntmux\db\DB;
+use App\Models\Settings;
 use nntmux\processing\PostProcess;
 
 $pdo = new DB();
 
-if (!isset($argv[1])) {
-	exit(ColorCLI::error('This script is not intended to be run manually, it is called from Multiprocessing.'));
+if (! isset($argv[1])) {
+    exit(ColorCLI::error('This script is not intended to be run manually, it is called from Multiprocessing.'));
 }
 $namefixer = new NameFixer(['Settings' => $pdo]);
 $sorter = new MiscSorter(true, $pdo);
@@ -101,142 +102,140 @@ switch (true) {
 		);
 
 		if ($releases instanceof \Traversable) {
+		    foreach ($releases as $release) {
+		        $namefixer->checked++;
+		        $namefixer->reset();
 
-			foreach ($releases as $release) {
+		        echo PHP_EOL.ColorCLI::primaryOver("[{$release['releases_id']}]");
 
-				$namefixer->checked++;
-				$namefixer->reset();
+		        if ((int) $release['ishashed'] === 1 && (int) $release['dehashstatus'] >= -6 && (int) $release['dehashstatus'] <= 0) {
+		            echo ColorCLI::primaryOver('m');
+		            if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['name'], $matches)) {
+		                $namefixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
+		            }
+		            if ($namefixer->matched === false && ! empty($release['filehash']) && preg_match('/[a-fA-F0-9]{32,40}/i', $release['filehash'], $matches)) {
+		                echo ColorCLI::primaryOver('h');
+		                $namefixer->matchPredbHash($matches[0], $release, true, 1, true, 1);
+		            }
+		        }
 
-				echo PHP_EOL . ColorCLI::primaryOver("[{$release['releases_id']}]");
+		        if ($namefixer->matched) {
+		            continue;
+		        }
+		        $namefixer->reset();
 
-				if ((int)$release['ishashed'] === 1 && (int)$release['dehashstatus'] >= -6 && (int)$release['dehashstatus'] <= 0) {
-					echo ColorCLI::primaryOver('m');
-					if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['name'], $matches)) {
-						$namefixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
-					}
-					if ($namefixer->matched === false && !empty($release['filehash']) && preg_match('/[a-fA-F0-9]{32,40}/i', $release['filehash'], $matches)) {
-						echo ColorCLI::primaryOver('h');
-						$namefixer->matchPredbHash($matches[0], $release, true, 1, true, 1);
-					}
-				}
+		        if ((int) $release['proc_uid'] === NameFixer::PROC_UID_NONE && ! empty($release['uid'])) {
+		            echo ColorCLI::primaryOver('U');
+		            $namefixer->uidCheck($release, true, 'UID, ', 1, 1);
+		        }
+		        // Not all gate requirements in query always set column status as PP Add check is in query
+		        $namefixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release['releases_id']);
 
-				if ($namefixer->matched) {
-					continue;
-				}
-				$namefixer->reset();
+		        if ($namefixer->matched) {
+		            continue;
+		        }
+		        $namefixer->reset();
 
-				if ((int)$release['proc_uid'] === NameFixer::PROC_UID_NONE && !empty($release['uid'])) {
-					echo ColorCLI::primaryOver('U');
-					$namefixer->uidCheck($release, true, 'UID, ', 1, 1);
-				}
-				// Not all gate requirements in query always set column status as PP Add check is in query
-				$namefixer->_updateSingleColumn('proc_uid', NameFixer::PROC_UID_DONE, $release['releases_id']);
+		        if ((int) $release['proc_srr'] === NameFixer::PROC_SRR_NONE) {
+		            echo ColorCLI::primaryOver('sr');
+		            $namefixer->srrNameCheck($release, true, 'SRR, ', 1, 1);
+		        }
+		        // Not all gate requirements in query always set column status as PP Add check is in query
+		        $namefixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release['releases_id']);
 
-				if ($namefixer->matched) {
-					continue;
-				}
-				$namefixer->reset();
+		        if ($namefixer->matched) {
+		            continue;
+		        }
+		        $namefixer->reset();
 
-				if ((int)$release['proc_srr'] === NameFixer::PROC_SRR_NONE) {
-					echo ColorCLI::primaryOver('sr');
-					$namefixer->srrNameCheck($release, true, 'SRR, ', 1, 1);
-				}
-				// Not all gate requirements in query always set column status as PP Add check is in query
-				$namefixer->_updateSingleColumn('proc_srr', NameFixer::PROC_SRR_DONE, $release['releases_id']);
+		        if ((int) $release['proc_hash16k'] === NameFixer::PROC_HASH16K_NONE && ! empty($release['hash'])) {
+		            echo ColorCLI::primaryOver('U');
+		            $namefixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1);
+		        }
+		        // Not all gate requirements in query always set column status as PP Add check is in query
+		        $namefixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release['releases_id']);
 
-				if ($namefixer->matched) {
-					continue;
-				}
-				$namefixer->reset();
+		        if ($namefixer->matched) {
+		            continue;
+		        }
+		        $namefixer->reset();
 
-				if ((int)$release['proc_hash16k'] === NameFixer::PROC_HASH16K_NONE && !empty($release['hash'])) {
-					echo ColorCLI::primaryOver('U');
-					$namefixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1);
-				}
-				// Not all gate requirements in query always set column status as PP Add check is in query
-				$namefixer->_updateSingleColumn('proc_hash16k', NameFixer::PROC_HASH16K_DONE, $release['releases_id']);
+		        if ((int) $release['nfostatus'] === Nfo::NFO_FOUND && (int) $release['proc_nfo'] === NameFixer::PROC_NFO_NONE) {
+		            if (! empty($release['textstring']) && ! preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])) {
+		                echo ColorCLI::primaryOver('n');
+		                $namefixer->done = $namefixer->matched = false;
+		                $namefixer->checkName($release, true, 'NFO, ', 1, 1);
+		            }
+		            $namefixer->_updateSingleColumn('proc_nfo', NameFixer::PROC_NFO_DONE, $release['releases_id']);
+		        }
 
-				if ($namefixer->matched) {
-					continue;
-				}
-				$namefixer->reset();
+		        if ($namefixer->matched) {
+		            continue;
+		        }
+		        $namefixer->reset();
 
-				if ((int)$release['nfostatus'] === Nfo::NFO_FOUND && (int)$release['proc_nfo'] === NameFixer::PROC_NFO_NONE) {
-					if (!empty($release['textstring']) && !preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])) {
-						echo ColorCLI::primaryOver('n');
-						$namefixer->done = $namefixer->matched = false;
-						$namefixer->checkName($release, true, 'NFO, ', 1, 1);
-					}
-					$namefixer->_updateSingleColumn('proc_nfo', NameFixer::PROC_NFO_DONE, $release['releases_id']);
-				}
+		        if ((int) $release['fileid'] > 0 && (int) $release['proc_files'] === NameFixer::PROC_FILES_NONE) {
+		            echo ColorCLI::primaryOver('F');
+		            $namefixer->done = $namefixer->matched = false;
+		            $fileNames = explode('|', $release['filestring']);
+		            if (is_array($fileNames)) {
+		                $releaseFile = $release;
+		                foreach ($fileNames as $fileName) {
+		                    if ($namefixer->matched === false) {
+		                        echo ColorCLI::primaryOver('f');
+		                        $releaseFile['textstring'] = $fileName;
+		                        $namefixer->checkName($releaseFile, true, 'Filenames, ', 1, 1);
+		                        if ($namefixer->matched === false) {
+		                            echo ColorCLI::primaryOver('xf');
+		                            $namefixer->xxxNameCheck($releaseFile, true, 'Filenames, ', 1, 1);
+		                        }
+		                    }
+		                }
+		            }
+		        }
+		        // Not all gate requirements in query always set column status as PP Add check is in query
+		        $namefixer->_updateSingleColumn('proc_files', NameFixer::PROC_FILES_DONE, $release['releases_id']);
 
-				if ($namefixer->matched) {
-					continue;
-				}
-				$namefixer->reset();
+		        if ($namefixer->matched) {
+		            continue;
+		        }
+		        $namefixer->reset();
 
-				if ((int)$release['fileid'] > 0 && (int)$release['proc_files'] === NameFixer::PROC_FILES_NONE) {
-					echo ColorCLI::primaryOver('F');
-					$namefixer->done = $namefixer->matched = false;
-					$fileNames = explode('|', $release['filestring']);
-					if (is_array($fileNames)) {
-						$releaseFile = $release;
-						foreach ($fileNames AS $fileName) {
-							if ($namefixer->matched === false) {
-								echo ColorCLI::primaryOver('f');
-								$releaseFile['textstring'] = $fileName;
-								$namefixer->checkName($releaseFile, true, 'Filenames, ', 1, 1);
-								if ($namefixer->matched === false) {
-									echo ColorCLI::primaryOver('xf');
-									$namefixer->xxxNameCheck($releaseFile, true, 'Filenames, ', 1, 1);
-								}
-							}
-						}
-					}
-				}
-				// Not all gate requirements in query always set column status as PP Add check is in query
-				$namefixer->_updateSingleColumn('proc_files', NameFixer::PROC_FILES_DONE, $release['releases_id']);
-
-				if ($namefixer->matched) {
-					continue;
-				}
-				$namefixer->reset();
-
-				if ((int)$release['proc_par2'] === NameFixer::PROC_PAR2_NONE) {
-					echo ColorCLI::primaryOver('p');
-					if (!isset($nzbcontents)) {
-						$nntp = new NNTP(['Settings' => $pdo]);
-						if (((int)Settings::value('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
-							ColorCLI::error('Unable to connect to usenet.');
-						}
-						$Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);
-						$nzbcontents = new NZBContents(
+		        if ((int) $release['proc_par2'] === NameFixer::PROC_PAR2_NONE) {
+		            echo ColorCLI::primaryOver('p');
+		            if (! isset($nzbcontents)) {
+		                $nntp = new NNTP(['Settings' => $pdo]);
+		                if (((int) Settings::value('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+		                    ColorCLI::error('Unable to connect to usenet.');
+		                }
+		                $Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);
+		                $nzbcontents = new NZBContents(
 							[
 								'Echo'        => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,
-								'PostProcess' => new PostProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer])
+								'PostProcess' => new PostProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer]),
 							]
 						);
-					}
-					if ($namefixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1) === false) {
-						$nzbcontents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], 1, 1);
-					}
-				}
+		            }
+		            if ($namefixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1) === false) {
+		                $nzbcontents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], 1, 1);
+		            }
+		        }
 
-				// Not all gate requirements in query always set column status as PP Add check is in query
-				$namefixer->_updateSingleColumn('proc_par2', NameFixer::PROC_PAR2_DONE, $release['releases_id']);
+		        // Not all gate requirements in query always set column status as PP Add check is in query
+		        $namefixer->_updateSingleColumn('proc_par2', NameFixer::PROC_PAR2_DONE, $release['releases_id']);
 
-				if ($namefixer->matched) {
-					continue;
-				}
-				$namefixer->reset();
+		        if ($namefixer->matched) {
+		            continue;
+		        }
+		        $namefixer->reset();
 
-				if ((int)$release['nfostatus'] === Nfo::NFO_FOUND && (int)$release['proc_sorter'] === MiscSorter::PROC_SORTER_NONE) {
-					echo ColorCLI::primaryOver('S');
-					$res = $sorter->nfosorter(null, $release['releases_id']);
-					// All gate requirements in query, only set column status if it ran the routine
-					$namefixer->_updateSingleColumn('proc_sorter', MiscSorter::PROC_SORTER_DONE, $release['releases_id']);
-				}
-			}
+		        if ((int) $release['nfostatus'] === Nfo::NFO_FOUND && (int) $release['proc_sorter'] === MiscSorter::PROC_SORTER_NONE) {
+		            echo ColorCLI::primaryOver('S');
+		            $res = $sorter->nfosorter(null, $release['releases_id']);
+		            // All gate requirements in query, only set column status if it ran the routine
+		            $namefixer->_updateSingleColumn('proc_sorter', MiscSorter::PROC_SORTER_DONE, $release['releases_id']);
+		        }
+		    }
 		}
 		break;
 
@@ -257,20 +256,20 @@ switch (true) {
 		);
 
 		if ($pres instanceof \Traversable) {
-			foreach ($pres as $pre) {
-				$namefixer->done = $namefixer->matched = false;
-				$ftmatched = $searched = 0;
-				$ftmatched = $namefixer->matchPredbFT($pre, true, 1, true, 1);
-				if ($ftmatched > 0) {
-					$searched = 1;
-				} elseif ($ftmatched < 0) {
-					$searched = -6;
-					echo '*';
-				} else {
-					$searched = $pre['searched'] - 1;
-					echo '.';
-				}
-				$pdo->queryExec(
+		    foreach ($pres as $pre) {
+		        $namefixer->done = $namefixer->matched = false;
+		        $ftmatched = $searched = 0;
+		        $ftmatched = $namefixer->matchPredbFT($pre, true, 1, true, 1);
+		        if ($ftmatched > 0) {
+		            $searched = 1;
+		        } elseif ($ftmatched < 0) {
+		            $searched = -6;
+		            echo '*';
+		        } else {
+		            $searched = $pre['searched'] - 1;
+		            echo '.';
+		        }
+		        $pdo->queryExec(
 					sprintf('
 							UPDATE predb
 							SET searched = %d
@@ -279,7 +278,7 @@ switch (true) {
 						$pre['predb_id']
 					)
 				);
-				$namefixer->checked++;
-			}
+		        $namefixer->checked++;
+		    }
 		}
 }

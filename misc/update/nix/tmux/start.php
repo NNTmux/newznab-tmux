@@ -6,19 +6,19 @@
  *
  * It will start the tmux server and monitoring scripts if needed.
  */
-require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap.php';
 
 use nntmux\Tmux;
 use nntmux\ColorCLI;
 
 // Ensure compatible tmux version is installed $tmux_version == "tmux 2.1\n" || $tmux_version == "tmux 2.2\n"
 if (`which tmux`) {
-	$tmux_version = trim(str_replace('tmux ', '', shell_exec('tmux -V')));
-	if (version_compare($tmux_version, '2.0', '>') && version_compare($tmux_version, '2.4', '<')) {
-		exit(ColorCLI::error('tmux versions above 2.0 are not compatible with NNTmux. Aborting' . PHP_EOL));
-	}
+    $tmux_version = trim(str_replace('tmux ', '', shell_exec('tmux -V')));
+    if (version_compare($tmux_version, '2.0', '>') && version_compare($tmux_version, '2.4', '<')) {
+        exit(ColorCLI::error('tmux versions above 2.0 are not compatible with NNTmux. Aborting'.PHP_EOL));
+    }
 } else {
-	exit(ColorCLI::error('tmux binary not found. Aborting' . PHP_EOL));
+    exit(ColorCLI::error('tmux binary not found. Aborting'.PHP_EOL));
 }
 
 $tmux = new Tmux();
@@ -37,6 +37,6 @@ $session = shell_exec("tmux list-session | grep $tmux_session");
 // Kill the placeholder
 exec('tmux kill-session -t placeholder');
 if (count($session) === 0) {
-	echo ColorCLI::info("Starting the tmux server and monitor script.\n");
-	passthru("php $path/run.php");
+    echo ColorCLI::info("Starting the tmux server and monitor script.\n");
+    passthru("php $path/run.php");
 }

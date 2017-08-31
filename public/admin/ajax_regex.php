@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Regexes;
 use nntmux\Binaries;
@@ -8,20 +8,20 @@ use nntmux\Binaries;
 // Login Check
 $admin = new AdminPage;
 
-if (!isset($_GET['action'])) {
-	exit();
+if (! isset($_GET['action'])) {
+    exit();
 }
 
-switch($_GET['action']) {
+switch ($_GET['action']) {
 	case 1:
 		$id = (int) $_GET['col_id'];
 		(new Regexes(['Settings' => $admin->settings]))->deleteRegex($id);
-		print "Regex $id deleted.";
+		echo "Regex $id deleted.";
 		break;
 
 	case 2:
 		$id = (int) $_GET['bin_id'];
 		(new Binaries(['Settings' => $admin->settings]))->deleteBlacklist($id);
-		print "Blacklist $id deleted.";
+		echo "Blacklist $id deleted.";
 		break;
 }

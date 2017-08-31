@@ -18,7 +18,6 @@
  * @author niel
  */
 
-
 namespace nntmux;
 
 /**
@@ -28,7 +27,5 @@ namespace nntmux;
  */
 class NetworkException extends \RuntimeException
 {
-	protected $code = 503;
+    protected $code = 503;
 }
-
-?>

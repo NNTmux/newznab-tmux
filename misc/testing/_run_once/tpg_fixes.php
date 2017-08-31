@@ -18,33 +18,31 @@
  * @author niel / kevin
  * @copyright 2014 nZEDb
  */
-
-if (!isset($argv[1]) || !in_array($argv[1], ['1'])) {
-	exit(
-		'Options: (enter a number, it\'s not recommended to rerun the same fix)' . PHP_EOL .
-		'1: 2014-07-28: Add unique key to binaryhash to be able to do multiple updates in 1 statement.' . PHP_EOL
+if (! isset($argv[1]) || ! in_array($argv[1], ['1'])) {
+    exit(
+		'Options: (enter a number, it\'s not recommended to rerun the same fix)'.PHP_EOL.
+		'1: 2014-07-28: Add unique key to binaryhash to be able to do multiple updates in 1 statement.'.PHP_EOL
 	);
 }
-require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
-use App\Models\Settings;
 use nntmux\db\DB;
+use App\Models\Settings;
 
 $pdo = new DB();
 
-if (!Settings::value('..tablepergroup')) {
-	exit("Tables per groups is not enabled, quitting!");
+if (! Settings::value('..tablepergroup')) {
+    exit('Tables per groups is not enabled, quitting!');
 }
 
 $groups = $pdo->queryDirect('SELECT id FROM groups WHERE active = 1 OR backfill = 1');
 
 if ($groups === false) {
-	echo "No active groups. Fix not needed.\n";
+    echo "No active groups. Fix not needed.\n";
 } else {
+    $queries = [];
 
-	$queries = [];
-
-	switch ($argv[1]) {
+    switch ($argv[1]) {
 		case 1:
 			// Drop this index, as we will recreate it as a unique.
 			$queries[] = ['t' => 1, 'q' => 'ALTER TABLE binaries_%d DROP INDEX ix_binary_binaryhash'];
@@ -55,12 +53,12 @@ if ($groups === false) {
 			exit();
 	}
 
-	$groupCount = $groups->rowCount();
-	if ($groups instanceof \Traversable && count($queries) && $groupCount) {
-		foreach ($groups as $group) {
-			echo 'Fixing group ' . $group['id'] . PHP_EOL;
-			foreach ($queries as $query) {
-				switch ($query['t']) {
+    $groupCount = $groups->rowCount();
+    if ($groups instanceof \Traversable && count($queries) && $groupCount) {
+        foreach ($groups as $group) {
+            echo 'Fixing group '.$group['id'].PHP_EOL;
+            foreach ($queries as $query) {
+                switch ($query['t']) {
 					// Queries needing 1 group id.
 					case 1:
 						$pdo->queryExec(sprintf($query['q'], $group['id']), true);
@@ -74,9 +72,9 @@ if ($groups === false) {
 						$pdo->queryExec(sprintf($query['q'], $group['id'], $group['id'], $group['id']), true);
 						break;
 				}
-			}
-			echo 'Finished fixing group ' . $group['id'] . ', ' . (--$groupCount) . ' to go!' .PHP_EOL;
-		}
-	}
-	echo 'All done!' . PHP_EOL;
+            }
+            echo 'Finished fixing group '.$group['id'].', '.(--$groupCount).' to go!'.PHP_EOL;
+        }
+    }
+    echo 'All done!'.PHP_EOL;
 }
