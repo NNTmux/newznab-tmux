@@ -146,7 +146,7 @@ switch ($_GET['action']) {
 		echo($_GET['hide_status'] === 1 ? 'Enabled' : 'Disabled').' hiding of user names!';
 		break;
 
-	case 'sharing_toggle_all_sites' :
+	case 'sharing_toggle_all_sites':
 		$admin->settings->queryExec(sprintf('UPDATE sharing_sites SET enabled = %d', $_GET['toggle_all']));
 		break;
 }

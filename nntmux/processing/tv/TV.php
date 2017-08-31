@@ -35,9 +35,9 @@ abstract class TV extends Videos
 	const NO_MATCH_FOUND = -6;   // Failed All Methods
 	const FAILED_PARSE = -100; // Failed Parsing
 
-	/**
-	 * @var int
-	 */
+    /**
+     * @var int
+     */
     public $tvqty;
 
     /**

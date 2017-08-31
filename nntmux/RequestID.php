@@ -21,9 +21,9 @@ abstract class RequestID
 	const IS_REQID_TRUE = 1; // releases.isrequestid is 1
 	const IS_REQID_FALSE = 0; // releases.isrequestid is 0
 
-	/**
-	 * @var Groups
-	 */
+    /**
+     * @var Groups
+     */
     public $groups;
 
     /**

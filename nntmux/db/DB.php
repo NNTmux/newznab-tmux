@@ -419,7 +419,7 @@ class DB extends \PDO
         if ($this->_debug) {
             $this->debugging->log(__CLASS__, $method, $error, $severity);
 
-            echo 
+            echo
 			$this->cli ? $this->log->error($error).PHP_EOL : '<div class="error">'.$error.'</div>';
         }
 

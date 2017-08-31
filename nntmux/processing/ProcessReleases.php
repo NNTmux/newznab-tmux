@@ -36,9 +36,9 @@ class ProcessReleases
 	const FILE_INCOMPLETE = 0; // We don't have all the parts yet for the file (binaries table partcheck column).
 	const FILE_COMPLETE = 1; // We have all the parts for the file (binaries table partcheck column).
 
-	/**
-	 * @var Groups
-	 */
+    /**
+     * @var Groups
+     */
     public $groups;
 
     /**

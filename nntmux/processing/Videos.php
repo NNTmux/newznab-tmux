@@ -33,9 +33,9 @@ abstract class Videos
 	const TYPE_FILM = 1; // Type of video is a Film/Movie
 	const TYPE_ANIME = 2; // Type of video is a Anime
 
-	/**
-	 * @var DB
-	 */
+    /**
+     * @var DB
+     */
     public $pdo;
 
     /**
