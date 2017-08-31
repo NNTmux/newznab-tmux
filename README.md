@@ -1,8 +1,11 @@
-
-[![Code Climate](https://codeclimate.com/github/NNTmux/newznab-tmux/badges/gpa.svg)](https://codeclimate.com/github/NNTmux/newznab-tmux)  [![Build Status](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/build.png?b=dev)](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/build-status/dev) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/quality-score.png?b=dev)](https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/?branch=dev)
-[![Build Status](https://travis-ci.org/NNTmux/newznab-tmux.svg?branch=dev)](https://travis-ci.org/NNTmux/newznab-tmux)
-<a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/license.svg" alt="License"></a>
+<p align="center">
+    <a href="https://codeclimate.com/github/NNTmux/newznab-tmux"><img src="https://codeclimate.com/github/NNTmux/newznab-tmux/badges/gpa.svg"></a>
+    <a href="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/build-status/dev"><img src="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/build.png?b=dev"></a>
+    <a href="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/?branch=dev"><img src="https://scrutinizer-ci.com/g/NNTmux/newznab-tmux/badges/quality-score.png?b=dev"></a>
+    <a href="https://travis-ci.org/NNTmux/newznab-tmux"><img src="https://travis-ci.org/NNTmux/newznab-tmux.svg?branch=dev"></a>
+    <a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/v/stable.svg" alt="Latest Stable Version"></a>
+    <a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/license.svg" alt="License"></a>
+</p>
 
 
 
