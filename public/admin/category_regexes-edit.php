@@ -1,5 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
+
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Regexes;
 use nntmux\Category;
@@ -17,50 +18,50 @@ $regex = [
 	'description' => '',
 	'ordinal' => '',
 	'categories_id' => '',
-	'status' => 1];
+	'status' => 1, ];
 
 $page->smarty->assign('regex', $regex);
 
-switch($action) {
+switch ($action) {
 	case 'submit':
 		if ($_POST['group_regex'] === '') {
-			$page->smarty->assign('error', 'Group regex must not be empty!');
-			break;
+		    $page->smarty->assign('error', 'Group regex must not be empty!');
+		    break;
 		}
 
 		if ($_POST['regex'] === '') {
-			$page->smarty->assign('error', 'Regex cannot be empty');
-			break;
+		    $page->smarty->assign('error', 'Regex cannot be empty');
+		    break;
 		}
 
-		if (!is_numeric($_POST['ordinal']) || $_POST['ordinal'] < 0) {
-			$page->smarty->assign('error', 'Ordinal must be a number, 0 or higher.');
-			break;
+		if (! is_numeric($_POST['ordinal']) || $_POST['ordinal'] < 0) {
+		    $page->smarty->assign('error', 'Ordinal must be a number, 0 or higher.');
+		    break;
 		}
 
 		if ($_POST['id'] === '') {
-			$regexes->addRegex($_POST);
+		    $regexes->addRegex($_POST);
 		} else {
-			$regexes->updateRegex($_POST);
+		    $regexes->updateRegex($_POST);
 		}
 
-		header('Location:' .WWW_TOP. '/category_regexes-list.php');
+		header('Location:'.WWW_TOP.'/category_regexes-list.php');
 		break;
 
 	case 'view':
 	default:
 		if (isset($_GET['id'])) {
-			$page->title = 'Category Regex Edit';
-			$id = $_GET['id'];
-			$regex = $regexes->getRegexByID($id);
+		    $page->title = 'Category Regex Edit';
+		    $id = $_GET['id'];
+		    $regex = $regexes->getRegexByID($id);
 		} else {
-			$page->title = 'Category Regex Add';
+		    $page->title = 'Category Regex Add';
 		}
 		$page->smarty->assign('regex', $regex);
 		break;
 }
 
-$page->smarty->assign('status_ids', [Category::STATUS_ACTIVE,Category::STATUS_INACTIVE]);
+$page->smarty->assign('status_ids', [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE]);
 $page->smarty->assign('status_names', ['Yes', 'No']);
 
 $categories_db = $page->settings->queryDirect(
@@ -72,10 +73,10 @@ $categories_db = $page->settings->queryDirect(
 );
 $categories = ['category_names', 'category_ids'];
 if ($categories_db) {
-	foreach($categories_db as $category_db) {
-		$categories['category_names'][] = $category_db['parent_title'] . ' ' . $category_db['title'] . ': ' . $category_db['id'];
-		$categories['category_ids'][] = $category_db['id'];
-	}
+    foreach ($categories_db as $category_db) {
+        $categories['category_names'][] = $category_db['parent_title'].' '.$category_db['title'].': '.$category_db['id'];
+        $categories['category_ids'][] = $category_db['id'];
+    }
 }
 $page->smarty->assign('category_names', $categories['category_names']);
 $page->smarty->assign('category_ids', $categories['category_ids']);

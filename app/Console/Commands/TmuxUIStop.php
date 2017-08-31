@@ -33,45 +33,44 @@ class TmuxUIStop extends Command
         parent::__construct();
     }
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @return mixed
-	 * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
-	 * @throws \Symfony\Component\Process\Exception\LogicException
-	 * @throws \Symfony\Component\Process\Exception\RuntimeException
-	 * @throws \RuntimeException
-	 */
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \RuntimeException
+     */
     public function handle()
     {
-		if ($this->argument('type') === 'false' || $this->argument('type') === 'true') {
-			$process = new Process('php misc/update/nix/tmux/stop.php');
-			$process->setTimeout(600);
-			$process->run(function ($type, $buffer) {
-				if (Process::ERR === $type) {
-					echo 'ERR > ' . $buffer;
-				} else {
-					echo $buffer;
-				}
-			}
+        if ($this->argument('type') === 'false' || $this->argument('type') === 'true') {
+            $process = new Process('php misc/update/nix/tmux/stop.php');
+            $process->setTimeout(600);
+            $process->run(function ($type, $buffer) {
+                if (Process::ERR === $type) {
+                    echo 'ERR > '.$buffer;
+                } else {
+                    echo $buffer;
+                }
+            }
 			);
 
-			if ($this->argument('type') === 'true') {
-
-				$sessionName = Tmux::value('tmux_session');
-				$tmuxSession = new Process('tmux kill-session -t ' . $sessionName);
-				$this->info('Killing active tmux session: ' . $sessionName);
-				$tmuxSession->run(function ($type, $buffer) {
-					if (Process::ERR === $type) {
-						echo 'ERR > ' . $buffer;
-					} else {
-						echo $buffer;
-					}
-				}
+            if ($this->argument('type') === 'true') {
+                $sessionName = Tmux::value('tmux_session');
+                $tmuxSession = new Process('tmux kill-session -t '.$sessionName);
+                $this->info('Killing active tmux session: '.$sessionName);
+                $tmuxSession->run(function ($type, $buffer) {
+                    if (Process::ERR === $type) {
+                        echo 'ERR > '.$buffer;
+                    } else {
+                        echo $buffer;
+                    }
+                }
 				);
-			}
-		}else {
-			$this->error($this->description);
-		}
+            }
+        } else {
+            $this->error($this->description);
+        }
     }
 }

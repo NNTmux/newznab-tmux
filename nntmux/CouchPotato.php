@@ -22,61 +22,60 @@
 namespace nntmux;
 
 use GuzzleHttp\Client;
-use nntmux\utility\Utility;
 
 /**
- * Class CouchPotato
+ * Class CouchPotato.
  */
 class CouchPotato
 {
-	/**
-	 * URL to the CP server.
-	 * @var string|array|bool
-	 */
-	public $cpurl = '';
+    /**
+     * URL to the CP server.
+     * @var string|array|bool
+     */
+    public $cpurl = '';
 
-	/**
-	 * The CP key.
-	 * @var string|array|bool
-	 */
-	public $cpapi = '';
+    /**
+     * The CP key.
+     * @var string|array|bool
+     */
+    public $cpapi = '';
 
-	/**
-	 * Imdb ID
-	 * @var string
-	 */
-	public $imdbid = '';
+    /**
+     * Imdb ID.
+     * @var string
+     */
+    public $imdbid = '';
 
-	/**
-	 * Construct.
-	 *
-	 * @param \BasePage $page
-	 */
-	public function __construct(&$page)
-	{
-		$this->cpurl = !empty($page->userdata['cp_url']) ? $page->userdata['cp_url'] : '';
-		$this->cpapi = !empty($page->userdata['cp_api']) ? $page->userdata['cp_api'] : '';
-	}
+    /**
+     * Construct.
+     *
+     * @param \BasePage $page
+     */
+    public function __construct(&$page)
+    {
+        $this->cpurl = ! empty($page->userdata['cp_url']) ? $page->userdata['cp_url'] : '';
+        $this->cpapi = ! empty($page->userdata['cp_api']) ? $page->userdata['cp_api'] : '';
+    }
 
-	/**
-	 * Send a movie to CouchPotato.
-	 *
-	 * @param string $id
-	 *
-	 * @return bool|mixed
-	 * @throws \RuntimeException
-	 */
-	public function sendToCouchPotato($id)
-	{
-		$this->imdbid = $id;
+    /**
+     * Send a movie to CouchPotato.
+     *
+     * @param string $id
+     *
+     * @return bool|mixed
+     * @throws \RuntimeException
+     */
+    public function sendToCouchPotato($id)
+    {
+        $this->imdbid = $id;
 
-		return (new Client(['verify' => false]))->get(
-				$this->cpurl .
-					'/api/' .
-					$this->cpapi .
-					'/movie.add/?identifier=tt' .
+        return (new Client(['verify' => false]))->get(
+				$this->cpurl.
+					'/api/'.
+					$this->cpapi.
+					'/movie.add/?identifier=tt'.
 					$this->imdbid
 
 		)->getBody()->getContents();
-	}
+    }
 }

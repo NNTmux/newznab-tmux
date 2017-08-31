@@ -1,12 +1,13 @@
 <?php
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'smarty.php';
+
+require_once __DIR__.DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\Settings;
 
 $page = new Page;
 
 if ($app->isDownForMaintenance()) {
-	$page->showMaintenance();
+    $page->showMaintenance();
 }
 
 switch ($page->page) {
@@ -64,16 +65,16 @@ switch ($page->page) {
 	case 'xxx':
 	case 'xxxmodal':
 		// Don't show these pages if it's an API-only site.
-		if (!$page->users->isLoggedIn() && (int)Settings::value('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
-			header('Location: ' . Settings::value('site.main.code'));
-			break;
+		if (! $page->users->isLoggedIn() && (int) Settings::value('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
+		    header('Location: '.Settings::value('site.main.code'));
+		    break;
 		}
 	case 'api':
 	case 'failed':
 	case 'getnzb':
 	case 'login':
 	case 'rss':
-		include NN_WWW . 'pages/' . $page->page . '.php';
+		include NN_WWW.'pages/'.$page->page.'.php';
 		break;
 	default:
 		$page->show404();

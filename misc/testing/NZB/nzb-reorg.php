@@ -1,12 +1,13 @@
 <?php
-require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-use nntmux\ConsoleTools;
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+
 use nntmux\NZB;
 use nntmux\db\DB;
+use nntmux\ConsoleTools;
 
-if (!isset($argv[1]) || !isset($argv[2])) {
-	exit("ERROR: You must supply the level you want to reorganize it to, and the source directory  (You would use: 3 .../newznab/resources/nzb/ to move it to 3 levels deep)\n");
+if (! isset($argv[1]) || ! isset($argv[2])) {
+    exit("ERROR: You must supply the level you want to reorganize it to, and the source directory  (You would use: 3 .../newznab/resources/nzb/ to move it to 3 levels deep)\n");
 }
 
 $pdo = new DB();
@@ -24,51 +25,50 @@ $time = time();
 echo "\nReorganizing files to Level $newLevel from: $sourcePath This could take a while...\n";
 //$consoleTools = new \ConsoleTools();
 foreach ($objects as $filestoprocess => $nzbFile) {
-	if ($nzbFile->getExtension() != "gz") {
-		continue;
-	}
+    if ($nzbFile->getExtension() != 'gz') {
+        continue;
+    }
 
-	$newFileName = $nzb->getNZBPath(str_replace(".nzb.gz", "", $nzbFile->getBasename()),
+    $newFileName = $nzb->getNZBPath(str_replace('.nzb.gz', '', $nzbFile->getBasename()),
 									$newLevel,
 									true);
-	if ($newFileName != $nzbFile) {
-		rename($nzbFile, $newFileName);
-		chmod($newFileName, 0777);
-	}
-	$iFilesProcessed++;
-	if ($iFilesProcessed % 100 == 0) {
-		$consoleTools->overWrite("Reorganized $iFilesProcessed");
-	}
+    if ($newFileName != $nzbFile) {
+        rename($nzbFile, $newFileName);
+        chmod($newFileName, 0777);
+    }
+    $iFilesProcessed++;
+    if ($iFilesProcessed % 100 == 0) {
+        $consoleTools->overWrite("Reorganized $iFilesProcessed");
+    }
 }
 
 $pdo->ping(true);
 $pdo->queryExec(sprintf("UPDATE settings SET value = %s WHERE setting = 'nzbsplitlevel'", $argv[1]));
-$consoleTools->overWrite("Processed $iFilesProcessed nzbs in " . relativeTime($time) . "\n");
+$consoleTools->overWrite("Processed $iFilesProcessed nzbs in ".relativeTime($time)."\n");
 
 function relativeTime($_time)
 {
-	$d = array();
-	$d[0] = array(1, "sec");
-	$d[1] = array(60, "min");
-	$d[2] = array(3600, "hr");
-	$d[3] = array(86400, "day");
-	$d[4] = array(31104000, "yr");
+    $d = [];
+    $d[0] = [1, 'sec'];
+    $d[1] = [60, 'min'];
+    $d[2] = [3600, 'hr'];
+    $d[3] = [86400, 'day'];
+    $d[4] = [31104000, 'yr'];
 
-	$w = array();
+    $w = [];
 
-	$return      = "";
-	$now         = time();
-	$diff        = ($now - $_time);
-	$secondsLeft = $diff;
+    $return = '';
+    $now = time();
+    $diff = ($now - $_time);
+    $secondsLeft = $diff;
 
-	for ($i = 4; $i > -1; $i--) {
-		$w[$i] = intval($secondsLeft / $d[$i][0]);
-		$secondsLeft -= ($w[$i] * $d[$i][0]);
-		if ($w[$i] != 0) {
-			$return .= $w[$i] . " " . $d[$i][1] . (($w[$i] > 1) ? 's' : '') . " ";
-		}
-	}
-	return $return;
+    for ($i = 4; $i > -1; $i--) {
+        $w[$i] = intval($secondsLeft / $d[$i][0]);
+        $secondsLeft -= ($w[$i] * $d[$i][0]);
+        if ($w[$i] != 0) {
+            $return .= $w[$i].' '.$d[$i][1].(($w[$i] > 1) ? 's' : '').' ';
+        }
+    }
+
+    return $return;
 }
-
-?>

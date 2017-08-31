@@ -2,14 +2,13 @@
 // #newznab-tmux : Denotes modifications done for newznab-tmux integration.
 
 /* #newznab-tmux */
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
-
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 $page = new AdminPage();
 $NNURL = $page->serverurl;
 /* #newznab-tmux */
 
-/**
+/*
  * OPcache GUI
  *
  * A simple but effective single-file GUI for the OPcache PHP extension.
@@ -20,121 +19,125 @@ $NNURL = $page->serverurl;
  * @license MIT, http://acollington.mit-license.org/
  */
 
-if (!extension_loaded('Zend OPcache')) {
-	die('The Zend OPcache extension does not appear to be installed');
+if (! extension_loaded('Zend OPcache')) {
+    die('The Zend OPcache extension does not appear to be installed');
 }
 
 class OpCacheService
 {
-	protected $data;
-	protected $options = [
-		'allow_invalidate' => true
+    protected $data;
+    protected $options = [
+		'allow_invalidate' => true,
 	];
 
-	private function __construct($options = [])
-	{
-		$this->data = $this->compileState();
-		$this->options = array_merge($this->options, $options);
-	}
+    private function __construct($options = [])
+    {
+        $this->data = $this->compileState();
+        $this->options = array_merge($this->options, $options);
+    }
 
-	public static function init($options = [])
-	{
-		$self = new self($options);
-		if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+    public static function init($options = [])
+    {
+        $self = new self($options);
+        if (! empty($_SERVER['HTTP_X_REQUESTED_WITH'])
 			&& strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
 		) {
-			if ((isset($_GET['reset']))) {
-				echo '{ "success": "' . ($self->resetCache() ? 'yes' : 'no') . '" }';
-			} else if ((isset($_GET['invalidate']))) {
-				echo '{ "success": "' . ($self->resetCache($_GET['invalidate']) ? 'yes' : 'no') . '" }';
-			} else {
-				echo json_encode($self->getData(@$_GET['section'] ?: null));
-			}
-			exit;
-		} else if ((isset($_GET['reset']))) {
-			$self->resetCache();
-		} else if ((isset($_GET['invalidate']))) {
-			$self->resetCache($_GET['invalidate']);
-		}
-		return $self;
-	}
+            if ((isset($_GET['reset']))) {
+                echo '{ "success": "'.($self->resetCache() ? 'yes' : 'no').'" }';
+            } elseif ((isset($_GET['invalidate']))) {
+                echo '{ "success": "'.($self->resetCache($_GET['invalidate']) ? 'yes' : 'no').'" }';
+            } else {
+                echo json_encode($self->getData(@$_GET['section'] ?: null));
+            }
+            exit;
+        } elseif ((isset($_GET['reset']))) {
+            $self->resetCache();
+        } elseif ((isset($_GET['invalidate']))) {
+            $self->resetCache($_GET['invalidate']);
+        }
 
-	public function getOption($name = null)
-	{
-		if ($name === null) {
-			return $this->options;
-		}
-		return (isset($this->options[$name])
+        return $self;
+    }
+
+    public function getOption($name = null)
+    {
+        if ($name === null) {
+            return $this->options;
+        }
+
+        return isset($this->options[$name])
 			? $this->options[$name]
-			: null
-		);
-	}
+			: null;
+    }
 
-	public function getData($section = null, $property = null)
-	{
-		if ($section === null) {
-			return $this->data;
-		}
-		$section = strtolower($section);
-		if (isset($this->data[$section])) {
-			if ($property === null || !isset($this->data[$section][$property])) {
-				return $this->data[$section];
-			}
-			return $this->data[$section][$property];
-		}
-		return null;
-	}
+    public function getData($section = null, $property = null)
+    {
+        if ($section === null) {
+            return $this->data;
+        }
+        $section = strtolower($section);
+        if (isset($this->data[$section])) {
+            if ($property === null || ! isset($this->data[$section][$property])) {
+                return $this->data[$section];
+            }
 
-	public function canInvalidate()
-	{
-		return ($this->getOption('allow_invalidate') && function_exists('opcache_invalidate'));
-	}
+            return $this->data[$section][$property];
+        }
 
-	public function resetCache($file = null)
-	{
-		$success = false;
-		if ($file === null) {
-			$success = opcache_reset();
-		} else if (function_exists('opcache_invalidate')) {
-			$success = opcache_invalidate(urldecode($file), true);
-		}
-		if ($success) {
-			$this->compileState();
-		}
-		return $success;
-	}
+        return null;
+    }
 
-	protected function compileState()
-	{
-		$status = opcache_get_status();
-		$config = opcache_get_configuration();
-		$memsize = function($size, $precision = 3, $space = false)
-		{
-			$i = 0;
-			$val = array(' bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
-			while (($size / 1024) > 1) {
-				$size /= 1024;
-				++$i;
-			}
-			return sprintf("%.{$precision}f%s%s", $size, (($space && $i) ? ' ' : ''), $val[$i]);
-		};
+    public function canInvalidate()
+    {
+        return $this->getOption('allow_invalidate') && function_exists('opcache_invalidate');
+    }
 
-		$files = [];
-		if (!empty($status['scripts'])) {
-			uasort($status['scripts'], function($a, $b) {
-				return $a['hits'] < $b['hits'];
-			});
-			foreach ($status['scripts'] as &$file) {
-				$file['full_path'] = str_replace('\\', '/', $file['full_path']);
-				$file['readable'] = [
+    public function resetCache($file = null)
+    {
+        $success = false;
+        if ($file === null) {
+            $success = opcache_reset();
+        } elseif (function_exists('opcache_invalidate')) {
+            $success = opcache_invalidate(urldecode($file), true);
+        }
+        if ($success) {
+            $this->compileState();
+        }
+
+        return $success;
+    }
+
+    protected function compileState()
+    {
+        $status = opcache_get_status();
+        $config = opcache_get_configuration();
+        $memsize = function ($size, $precision = 3, $space = false) {
+            $i = 0;
+            $val = [' bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            while (($size / 1024) > 1) {
+                $size /= 1024;
+                ++$i;
+            }
+
+            return sprintf("%.{$precision}f%s%s", $size, (($space && $i) ? ' ' : ''), $val[$i]);
+        };
+
+        $files = [];
+        if (! empty($status['scripts'])) {
+            uasort($status['scripts'], function ($a, $b) {
+                return $a['hits'] < $b['hits'];
+            });
+            foreach ($status['scripts'] as &$file) {
+                $file['full_path'] = str_replace('\\', '/', $file['full_path']);
+                $file['readable'] = [
 					'hits'               => number_format($file['hits']),
-					'memory_consumption' => $memsize($file['memory_consumption'])
+					'memory_consumption' => $memsize($file['memory_consumption']),
 				];
-			}
-			$files = array_values($status['scripts']);
-		}
+            }
+            $files = array_values($status['scripts']);
+        }
 
-		$overview = array_merge(
+        $overview = array_merge(
 			$status['memory_usage'], $status['opcache_statistics'], [
 				'used_memory_percentage'  => round(100 * (
 						($status['memory_usage']['used_memory'] + $status['memory_usage']['wasted_memory'])
@@ -156,18 +159,18 @@ class OpCacheService
 					'last_restart_time'  => ($status['opcache_statistics']['last_restart_time'] == 0
 						? 'never'
 						: date_format(date_create("@{$status['opcache_statistics']['last_restart_time']}"), 'Y-m-d H:i:s')
-					)
-				]
+					),
+				],
 			]
 		);
 
-		$directives = [];
-		ksort($config['directives']);
-		foreach ($config['directives'] as $k => $v) {
-			$directives[] = ['k' => $k, 'v' => $v];
-		}
+        $directives = [];
+        ksort($config['directives']);
+        foreach ($config['directives'] as $k => $v) {
+            $directives[] = ['k' => $k, 'v' => $v];
+        }
 
-		$version = array_merge(
+        $version = array_merge(
 			$config['version'],
 			[
 				'php'    => phpversion(),
@@ -180,19 +183,19 @@ class OpCacheService
 							: $_SERVER['SERVER_NAME']
 						)
 					)
-				)
+				),
 			]
 		);
 
-		return [
+        return [
 			'version'    => $version,
 			'overview'   => $overview,
 			'files'      => $files,
 			'directives' => $directives,
 			'blacklist'  => $config['blacklist'],
-			'functions'  => get_extension_funcs('Zend OPcache')
+			'functions'  => get_extension_funcs('Zend OPcache'),
 		];
-	}
+    }
 }
 
 $opcache = OpCacheService::init();
@@ -336,7 +339,7 @@ $opcache = OpCacheService::init();
 <script type="text/javascript">
 	var realtime = false;
 	var opstate = <?php echo json_encode($opcache->getData()); ?>;
-	var canInvalidate = <?php echo ($opcache->canInvalidate() ? 'true' : 'false'); ?>;
+	var canInvalidate = <?php echo $opcache->canInvalidate() ? 'true' : 'false'; ?>;
 
 	$(function(){
 		function updateStatus() {

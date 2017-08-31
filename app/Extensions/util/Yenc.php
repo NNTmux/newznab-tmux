@@ -10,7 +10,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
@@ -23,55 +23,55 @@ use App\Providers\YencServiceProvider;
 
 class Yenc extends YencServiceProvider
 {
-
-	/**
-	 * @param       $text    yEncoded text to decode back to an 8 bit form.
-	 *
-	 * @param array $options
-	 *
-	 * @return string 8 bit decoded version of $text.
-	 */
-	public static function decode(&$text, array $options = [])
-	{
-		$options += [
-			'name' => 'default',
-			'file' => true,
-		];
-		return static::config($options)->decode($text);
-	}
-
-	/**
-	 * @param       $text
-	 *
-	 * @param array $options
-	 *
-	 * @return mixed
-	 */
-	public static function decodeIgnore(&$text, array $options = [])
-	{
-		$options += [
+    /**
+     * @param       $text    yEncoded text to decode back to an 8 bit form.
+     *
+     * @param array $options
+     *
+     * @return string 8 bit decoded version of $text.
+     */
+    public static function decode(&$text, array $options = [])
+    {
+        $options += [
 			'name' => 'default',
 			'file' => true,
 		];
 
-		return static::config($options)->decodeIgnore($text);
-	}
+        return static::config($options)->decode($text);
+    }
 
-	/**
-	 * @param        $data      8 bit data to convert to yEncoded text.
-	 * @param string $filename  Name of file to recreate as.
-	 * @param int    $line      Maximum number of characters in each line.
-	 *                          to use.
-	 *
-	 * @param bool   $crc32
-	 * @param array  $options
-	 *
-	 * @return \Exception|string The yEncoded version of $data.
-	 */
-	public static function encode(&$data, $filename, $line = 128, $crc32 = true, array $options = [])
-	{
-		$options += ['name' => 'default'];
+    /**
+     * @param       $text
+     *
+     * @param array $options
+     *
+     * @return mixed
+     */
+    public static function decodeIgnore(&$text, array $options = [])
+    {
+        $options += [
+			'name' => 'default',
+			'file' => true,
+		];
 
-		return static::config($options)->encode($data, $filename, $line, $crc32);
-	}
+        return static::config($options)->decodeIgnore($text);
+    }
+
+    /**
+     * @param        $data      8 bit data to convert to yEncoded text.
+     * @param string $filename  Name of file to recreate as.
+     * @param int    $line      Maximum number of characters in each line.
+     *                          to use.
+     *
+     * @param bool   $crc32
+     * @param array  $options
+     *
+     * @return \Exception|string The yEncoded version of $data.
+     */
+    public static function encode(&$data, $filename, $line = 128, $crc32 = true, array $options = [])
+    {
+        $options += ['name' => 'default'];
+
+        return static::config($options)->encode($data, $filename, $line, $crc32);
+    }
 }

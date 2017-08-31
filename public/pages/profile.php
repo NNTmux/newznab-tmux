@@ -1,12 +1,13 @@
 <?php
 
+use nntmux\NZBGet;
+use nntmux\SABnzbd;
 use App\Models\Settings;
 use nntmux\ReleaseComments;
-use nntmux\SABnzbd;
-use nntmux\NZBGet;
 
-if (!$page->users->isLoggedIn())
-	$page->show403();
+if (! $page->users->isLoggedIn()) {
+    $page->show403();
+}
 
 $rc = new ReleaseComments;
 $sab = new SABnzbd($page);
@@ -14,38 +15,37 @@ $nzbget = new NZBGet($page);
 
 $userID = $page->users->currentUserId();
 $privileged = $page->users->isAdmin($userID) || $page->users->isModerator($userID);
-$privateProfiles = (int)Settings::value('..privateprofiles') === 1;
+$privateProfiles = (int) Settings::value('..privateprofiles') === 1;
 $publicView = false;
 
-if ($privileged || !$privateProfiles) {
+if ($privileged || ! $privateProfiles) {
+    $altID = (isset($_GET['id']) && (int) $_GET['id'] >= 0) ? (int) $_GET['id'] : false;
+    $altUsername = (isset($_GET['name']) && strlen($_GET['name']) > 0) ? $_GET['name'] : false;
 
-	$altID = (isset($_GET['id']) && (int)$_GET['id'] >= 0) ? (int)$_GET['id'] : false;
-	$altUsername = (isset($_GET['name']) && strlen($_GET['name']) > 0) ? $_GET['name'] : false;
-
-	// If both 'id' and 'name' are specified, 'id' should take precedence.
-	if ($altID === false && $altUsername !== false) {
-		$user = $page->users->getByUsername($altUsername);
-		if ($user) {
-			$altID = $user['id'];
-			$userID = $altID;
-		}
-	} else if ($altID !== false) {
-		$userID = $altID;
-		$publicView = true;
-	}
+    // If both 'id' and 'name' are specified, 'id' should take precedence.
+    if ($altID === false && $altUsername !== false) {
+        $user = $page->users->getByUsername($altUsername);
+        if ($user) {
+            $altID = $user['id'];
+            $userID = $altID;
+        }
+    } elseif ($altID !== false) {
+        $userID = $altID;
+        $publicView = true;
+    }
 }
 
 $downloadlist = $page->users->getDownloadRequestsForUser($userID);
-$page->smarty->assign('downloadlist',$downloadlist);
+$page->smarty->assign('downloadlist', $downloadlist);
 
 $data = $page->users->getById($userID);
-if (!$data) {
-	$page->show404();
+if (! $data) {
+    $page->show404();
 }
 
 // Check if the user selected a theme.
-if (!isset($data['style']) || $data['style'] === 'None') {
-	$data['style'] = 'Using the admin selected theme.';
+if (! isset($data['style']) || $data['style'] === 'None') {
+    $data['style'] = 'Using the admin selected theme.';
 }
 
 $offset = $_REQUEST['offset'] ?? 0;
@@ -60,18 +60,18 @@ $page->smarty->assign([
 		'pagertotalitems'   => $rc->getCommentCountForUser($userID),
 		'pageroffset'       => $offset,
 		'pageritemsperpage' => ITEMS_PER_PAGE,
-		'pagerquerybase'    => '/profile?id=' . $userID . '&offset=',
-		'pagerquerysuffix'  => '#comments'
+		'pagerquerybase'    => '/profile?id='.$userID.'&offset=',
+		'pagerquerysuffix'  => '#comments',
 	]
 );
 
 $sabApiKeyTypes = [
 	SABnzbd::API_TYPE_NZB => 'Nzb Api Key',
-	SABnzbd::API_TYPE_FULL => 'Full Api Key'
+	SABnzbd::API_TYPE_FULL => 'Full Api Key',
 ];
 $sabPriorities = [
 	SABnzbd::PRIORITY_FORCE  => 'Force', SABnzbd::PRIORITY_HIGH => 'High',
-	SABnzbd::PRIORITY_NORMAL => 'Normal', SABnzbd::PRIORITY_LOW => 'Low'
+	SABnzbd::PRIORITY_NORMAL => 'Normal', SABnzbd::PRIORITY_LOW => 'Low',
 ];
 $sabSettings = [1 => 'Site', 2 => 'Cookie'];
 
@@ -84,13 +84,13 @@ $page->smarty->assign([
 		'sabapikey'     => $sab->apikey,
 		'sabapikeytype' => $sab->apikeytype !== '' ? $sabApiKeyTypes[$sab->apikeytype] : '',
 		'sabpriority'   => $sab->priority !== '' ? $sabPriorities[$sab->priority] : '',
-		'sabsetting'    => $sabSettings[$sab->checkCookie() === true ? 2 : 1]
+		'sabsetting'    => $sabSettings[$sab->checkCookie() === true ? 2 : 1],
 	]
 );
 
-$page->meta_title       = 'View User Profile';
-$page->meta_keywords    = 'view,profile,user,details';
-$page->meta_description = 'View User Profile for ' . $data['username'];
+$page->meta_title = 'View User Profile';
+$page->meta_keywords = 'view,profile,user,details';
+$page->meta_description = 'View User Profile for '.$data['username'];
 
 $page->content = $page->smarty->fetch('profile.tpl');
 $page->render();

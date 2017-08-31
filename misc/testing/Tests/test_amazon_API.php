@@ -1,11 +1,11 @@
 <?php
-require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
 use ApaiIO\ApaiIO;
-use ApaiIO\Configuration\GenericConfiguration;
-use ApaiIO\Operations\Search;
 use App\Models\Settings;
-
+use ApaiIO\Operations\Search;
+use ApaiIO\Configuration\GenericConfiguration;
 
 $pubkey = Settings::value('APIs..amazonpubkey');
 $privkey = Settings::value('APIs..amazonprivkey');

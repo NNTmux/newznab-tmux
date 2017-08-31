@@ -10,7 +10,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
@@ -21,33 +21,30 @@ namespace App\Extensions\util\yenc\adapter;
 
 use yenc\yenc;
 
-
 class NzedbYenc
 {
-	public static function decode(&$text, $ignore = false, array $options = [])
-	{
-		return (new yenc())->decode($text);
-	}
+    public static function decode(&$text, $ignore = false, array $options = [])
+    {
+        return (new yenc())->decode($text);
+    }
 
-	public static function decodeIgnore(&$text, array $options = [])
-	{
-		return (new yenc())->decode($text, true);
-	}
+    public static function decodeIgnore(&$text, array $options = [])
+    {
+        return (new yenc())->decode($text, true);
+    }
 
-	/**
-	 * Determines if this adapter is enabled by checking if the `yenc` extension is loaded.
-	 *
-	 * @return boolean Returns `true` if enabled, otherwise `false`.
-	 */
-	public static function enabled()
-	{
-		return extension_loaded('yenc');
-	}
+    /**
+     * Determines if this adapter is enabled by checking if the `yenc` extension is loaded.
+     *
+     * @return bool Returns `true` if enabled, otherwise `false`.
+     */
+    public static function enabled()
+    {
+        return extension_loaded('yenc');
+    }
 
-	public static function encode($data, $filename, $lineLength = 128)
-	{
-		return (new yenc())->encode($data, $filename, $lineLength);
-	}
+    public static function encode($data, $filename, $lineLength = 128)
+    {
+        return (new yenc())->encode($data, $filename, $lineLength);
+    }
 }
-
-?>

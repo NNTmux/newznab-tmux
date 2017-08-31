@@ -24,89 +24,80 @@ use nntmux\processing\tv\TV;
 
 class smartyTV extends TV
 {
-	/**
-	 * Main processing director function for scrapers
-	 * Calls work query function and initiates processing
-	 *
-	 * @param      $groupID
-	 * @param      $guidChar
-	 * @param      $process
-	 * @param bool $local
-	 */
-	protected function processSite($groupID, $guidChar, $process, $local = false)
-	{
-		;
-	}
+    /**
+     * Main processing director function for scrapers
+     * Calls work query function and initiates processing.
+     *
+     * @param      $groupID
+     * @param      $guidChar
+     * @param      $process
+     * @param bool $local
+     */
+    protected function processSite($groupID, $guidChar, $process, $local = false)
+    {
+    }
 
-	protected function getBanner($videoID, $siteId)
-	{
-		;
-	}
+    protected function getBanner($videoID, $siteId)
+    {
+    }
 
-	/**
-	 * Retrieve info of TV episode from site using its API.
-	 *
-	 * @param integer $siteId
-	 * @param integer $series
-	 * @param integer $episode
-	 *
-	 * @return array|false    False on failure, an array of information fields otherwise.
-	 */
-	protected function getEpisodeInfo($siteId, $series, $episode)
-	{
-		;
-	}
+    /**
+     * Retrieve info of TV episode from site using its API.
+     *
+     * @param int $siteId
+     * @param int $series
+     * @param int $episode
+     *
+     * @return array|false    False on failure, an array of information fields otherwise.
+     */
+    protected function getEpisodeInfo($siteId, $series, $episode)
+    {
+    }
 
-	/**
-	 * Retrieve poster image for TV episode from site using its API.
-	 *
-	 * @param integer $videoId ID from videos table.
-	 * @param integer $siteId ID that this site uses for the programme.
-	 *
-	 * @return null
-	 */
-	protected function getPoster($videoId, $siteId)
-	{
-		;
-	}
+    /**
+     * Retrieve poster image for TV episode from site using its API.
+     *
+     * @param int $videoId ID from videos table.
+     * @param int $siteId ID that this site uses for the programme.
+     *
+     * @return null
+     */
+    protected function getPoster($videoId, $siteId)
+    {
+    }
 
-	/**
-	 * Retrieve info of TV programme from site using it's API.
-	 *
-	 * @param string $name Title of programme to look up. Usually a cleaned up version from releases table.
-	 *
-	 * @return array|false    False on failure, an array of information fields otherwise.
-	 */
-	protected function getShowInfo($name)
-	{
-		;
-	}
+    /**
+     * Retrieve info of TV programme from site using it's API.
+     *
+     * @param string $name Title of programme to look up. Usually a cleaned up version from releases table.
+     *
+     * @return array|false    False on failure, an array of information fields otherwise.
+     */
+    protected function getShowInfo($name)
+    {
+    }
 
-	/**
-	 * Assigns API show response values to a formatted array for insertion
-	 * Returns the formatted array
-	 *
-	 * @param $show
-	 *
-	 * @return array
-	 */
-	protected function formatShowInfo($show)
-	{
-		;
-	}
+    /**
+     * Assigns API show response values to a formatted array for insertion
+     * Returns the formatted array.
+     *
+     * @param $show
+     *
+     * @return array
+     */
+    protected function formatShowInfo($show)
+    {
+    }
 
-	/**
-	 * Assigns API episode response values to a formatted array for insertion
-	 * Returns the formatted array
-	 *
-	 * @param $episode
-	 *
-	 * @return array
-	 */
-	protected function formatEpisodeInfo($episode)
-	{
-		;
-	}
+    /**
+     * Assigns API episode response values to a formatted array for insertion
+     * Returns the formatted array.
+     *
+     * @param $episode
+     *
+     * @return array
+     */
+    protected function formatEpisodeInfo($episode)
+    {
+    }
 }
-
-?>

@@ -10,12 +10,13 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
  * @copyright 2017 nZEDb
  */
+
 namespace nntmux\build;
 
 use Composer\Script\Event;
@@ -23,59 +24,57 @@ use Illuminate\Foundation\Application;
 
 class ComposerScripts
 {
-	public static function postInstallCmd()
-	{
-		$last = $output = $return = null;
-		if ((int)getenv('COMPOSER_DEV_MODE') === 1) {
-			echo 'Updating git hooks... ';
-			$last = exec('build/git-hooks/addHooks.sh', $output, $return);
-			if ($return > 0) {
-				echo PHP_EOL;
-				exit($last);
-			}
-			echo 'done' . PHP_EOL;
-		}
-	}
+    public static function postInstallCmd()
+    {
+        $last = $output = $return = null;
+        if ((int) getenv('COMPOSER_DEV_MODE') === 1) {
+            echo 'Updating git hooks... ';
+            $last = exec('build/git-hooks/addHooks.sh', $output, $return);
+            if ($return > 0) {
+                echo PHP_EOL;
+                exit($last);
+            }
+            echo 'done'.PHP_EOL;
+        }
+    }
 
-	/**
-	 * Handle the post-install Composer event.
-	 *
-	 * @param  \Composer\Script\Event  $event
-	 * @return void
-	 */
-	public static function postInstall(Event $event)
-	{
-		require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
+    /**
+     * Handle the post-install Composer event.
+     *
+     * @param  \Composer\Script\Event  $event
+     * @return void
+     */
+    public static function postInstall(Event $event)
+    {
+        require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
-		static::clearCompiled();
-	}
+        static::clearCompiled();
+    }
 
-	/**
-	 * Handle the post-update Composer event.
-	 *
-	 * @param  \Composer\Script\Event  $event
-	 * @return void
-	 */
-	public static function postUpdate(Event $event)
-	{
-		require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
+    /**
+     * Handle the post-update Composer event.
+     *
+     * @param  \Composer\Script\Event  $event
+     * @return void
+     */
+    public static function postUpdate(Event $event)
+    {
+        require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
-		static::clearCompiled();
-	}
+        static::clearCompiled();
+    }
 
-	/**
-	 * Clear the cached Laravel bootstrapping files.
-	 *
-	 * @return void
-	 */
-	protected static function clearCompiled()
-	{
-		$nntmux = new Application(getcwd());
+    /**
+     * Clear the cached Laravel bootstrapping files.
+     *
+     * @return void
+     */
+    protected static function clearCompiled()
+    {
+        $nntmux = new Application(getcwd());
 
-		if (file_exists($servicesPath = $nntmux->getCachedServicesPath())) {
-			@unlink($servicesPath);
-		}
-	}
+        if (file_exists($servicesPath = $nntmux->getCachedServicesPath())) {
+            @unlink($servicesPath);
+        }
+    }
 }
-
-?>

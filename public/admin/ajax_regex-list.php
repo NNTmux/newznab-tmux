@@ -1,16 +1,15 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\ReleaseRegex;
 
 // login check
 $admin = new AdminPage;
-$regex  = new ReleaseRegex();
+$regex = new ReleaseRegex();
 
-if (isset($_GET['action']) && $_GET['action'] == "2")
-{
-		$id     = (int)$_GET['regex_id'];
-		$regex->delete($id);
-		print "Regex $id deleted.";
+if (isset($_GET['action']) && $_GET['action'] == '2') {
+    $id = (int) $_GET['regex_id'];
+    $regex->delete($id);
+    echo "Regex $id deleted.";
 }

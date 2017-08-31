@@ -1,13 +1,14 @@
 <?php
+
 // Test the cache server connection.
-require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
 use nntmux\libraries\Cache;
 
 try {
-	$cache = new Cache();
+    $cache = new Cache();
 } catch (\Exception $error) {
-	exit($error->getMessage() . PHP_EOL);
+    exit($error->getMessage().PHP_EOL);
 }
 
 print_r($cache->serverStatistics());

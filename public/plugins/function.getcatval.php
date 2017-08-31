@@ -10,13 +10,12 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
  * @copyright 2016 nZEDb
  */
-
 use nntmux\Category;
 
 /**
@@ -29,7 +28,5 @@ use nntmux\Category;
  */
 function smarty_function_getcatval($params)
 {
-	return Category::getCategoryValue($params['category']);
+    return Category::getCategoryValue($params['category']);
 }
-
-?>

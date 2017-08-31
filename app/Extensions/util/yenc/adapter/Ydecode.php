@@ -10,7 +10,7 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
@@ -20,68 +20,62 @@
 namespace App\Extensions\util\yenc\adapter;
 
 use App\Extensions\util\Yenc;
-use App\Models\Settings;
-use nntmux\utility\Utility;
 
 class Ydecode
 {
-	/**
-	 * Path to yyDecoder binary.
-	 *
-	 * @var bool|string
-	 * @access protected
-	 */
-	protected static $pathBin;
+    /**
+     * Path to yyDecoder binary.
+     *
+     * @var bool|string
+     */
+    protected static $pathBin;
 
-	/**
-	 * If on unix, hide yydecode CLI output.
-	 *
-	 * @var string
-	 * @access protected
-	 */
-	protected static $silent;
+    /**
+     * If on unix, hide yydecode CLI output.
+     *
+     * @var string
+     */
+    protected static $silent;
 
-	public static function decode(&$text, $ignore = false)
-	{
-		$result = preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $text, $input);
-		switch (true) {
-			case !$result:
+    public static function decode(&$text, $ignore = false)
+    {
+        $result = preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $text, $input);
+        switch (true) {
+			case ! $result:
 				throw new \RuntimeException('Text does not look like yEnc.');
 			case self::$pathBin === false:
 				throw new \InvalidArgumentException('No valid path to yydecoder binary found!');
 			default:
 		}
 
-		$ignoreFlag = $ignore ? '-b ' : '';
-		$data = shell_exec(
-			"echo '{$input[1]}' | {" . self::$pathBin . '} -o - ' . $ignoreFlag . self::$silent
+        $ignoreFlag = $ignore ? '-b ' : '';
+        $data = shell_exec(
+			"echo '{$input[1]}' | {".self::$pathBin.'} -o - '.$ignoreFlag.self::$silent
 		);
-		if ($data === null) {
-			throw new \RuntimeException('Error getting data from yydecode.');
-		}
+        if ($data === null) {
+            throw new \RuntimeException('Error getting data from yydecode.');
+        }
 
-		return $data;
-	}
+        return $data;
+    }
 
-	public static function decodeIgnore(&$text)
-	{
-		self::decode($text, true);
-	}
+    public static function decodeIgnore(&$text)
+    {
+        self::decode($text, true);
+    }
 
-	/**
-	 * Determines if this adapter is enabled by checking if the `yydecode` path is enabled.
-	 *
-	 * @return boolean Returns `true` if enabled, otherwise `false`.
-	 */
-	public static function enabled()
-	{
-		return !empty(self::$pathBin);
-	}
+    /**
+     * Determines if this adapter is enabled by checking if the `yydecode` path is enabled.
+     *
+     * @return bool Returns `true` if enabled, otherwise `false`.
+     */
+    public static function enabled()
+    {
+        return ! empty(self::$pathBin);
+    }
 
-	public static function encode($data, $filename, $lineLength, $crc32)
-	{
-		return Yenc::encode($data, $filename, $lineLength, $crc32, ['name' => 'Php']);
-	}
+    public static function encode($data, $filename, $lineLength, $crc32)
+    {
+        return Yenc::encode($data, $filename, $lineLength, $crc32, ['name' => 'Php']);
+    }
 }
-
-?>

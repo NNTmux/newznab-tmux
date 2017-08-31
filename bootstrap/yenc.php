@@ -10,20 +10,18 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    niel
  * @copyright 2016 nZEDb
  */
-
-
 use App\Models\Settings;
 
 if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
-	$adapter = 'Php';
+    $adapter = 'Php';
 } else {
-	switch (true) {
+    switch (true) {
 		case extension_loaded('yenc'):
 			if (method_exists('yenc\yEnc', 'version') &&
 				version_compare(
@@ -32,14 +30,14 @@ if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
 					'>='
 				)
 			) {
-				$adapter = 'NzedbYenc';
-				break;
+			    $adapter = 'NzedbYenc';
+			    break;
 			} else {
-				trigger_error('Your version of the php-yenc extension is out of date and will be
+			    trigger_error('Your version of the php-yenc extension is out of date and will be
 				ignored. Please update it to use the extension.', E_USER_WARNING
 				);
 			}
-		case !empty(Settings::value('apps..yydecoderpath', true)):
+		case ! empty(Settings::value('apps..yydecoderpath', true)):
 			$adapter = 'Ydecode';
 			break;
 		default:
@@ -48,12 +46,9 @@ if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
 }
 
 \App\Providers\YencServiceProvider::config([
-		['name' =>
-			 [
-				 'default' => $adapter
-			 ]
-		]
+		['name' => [
+				 'default' => $adapter,
+			 ],
+		],
 	]
 );
-
-?>

@@ -1,23 +1,23 @@
 <?php
-require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
-use nntmux\ReleaseSearch;
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap.php';
+
 use nntmux\db\DB;
+use nntmux\ReleaseSearch;
 
-
-if (!isset($argv[1]) || !in_array($argv[1], ['sphinx', 'standard'])) {
-	exit('Argument1 (required) is the method of search you would like to optimize for.  Choices are sphinx or standard.' . PHP_EOL .
-		'Argument2 (optional) is the storage engine and row_format you would like the release_search_data table to use. If not entered it will be left default.' . PHP_EOL .
-		'Choices are (c|d)(myisam|innodb) (Compressed|Dynamic)(MyISAM|InnoDB) entered like dinnodb.  This argument has no effect if optimizing for Sphinx.' . PHP_EOL .
-		'Please stop all processing scripts before running this script.' . PHP_EOL);
+if (! isset($argv[1]) || ! in_array($argv[1], ['sphinx', 'standard'])) {
+    exit('Argument1 (required) is the method of search you would like to optimize for.  Choices are sphinx or standard.'.PHP_EOL.
+		'Argument2 (optional) is the storage engine and row_format you would like the release_search_data table to use. If not entered it will be left default.'.PHP_EOL.
+		'Choices are (c|d)(myisam|innodb) (Compressed|Dynamic)(MyISAM|InnoDB) entered like dinnodb.  This argument has no effect if optimizing for Sphinx.'.PHP_EOL.
+		'Please stop all processing scripts before running this script.'.PHP_EOL);
 }
 
 switch ($argv[1]) {
 	case 'sphinx':
 		if (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX) {
-			optimizeForSphinx(new DB());
+		    optimizeForSphinx(new DB());
 		} else {
-			echo PHP_EOL . $pdo->log->error('Error, NN_RELEASE_SEARCH_TYPE in www/settings.php must be set to SPHINX to optimize for Sphinx!' . PHP_EOL);
+		    echo PHP_EOL.$pdo->log->error('Error, NN_RELEASE_SEARCH_TYPE in www/settings.php must be set to SPHINX to optimize for Sphinx!'.PHP_EOL);
 		}
 		break;
 	case 'standard':
@@ -28,23 +28,22 @@ switch ($argv[1]) {
 // Optimize database usage for Sphinx full-text
 function optimizeForSphinx($pdo)
 {
-	echo PHP_EOL . $pdo->log->info('Dropping search triggers to save CPU and lower QPS. (Quick)' . PHP_EOL);
-	dropSearchTriggers($pdo);
+    echo PHP_EOL.$pdo->log->info('Dropping search triggers to save CPU and lower QPS. (Quick)'.PHP_EOL);
+    dropSearchTriggers($pdo);
 
-	echo $pdo->log->info('Truncating release_search_data table to free up memory pools/buffers.  (Quick)' . PHP_EOL);
-	$pdo->queryExec('TRUNCATE TABLE release_search_data');
+    echo $pdo->log->info('Truncating release_search_data table to free up memory pools/buffers.  (Quick)'.PHP_EOL);
+    $pdo->queryExec('TRUNCATE TABLE release_search_data');
 
-	echo $pdo->log->header('Optimization for Sphinx process complete!' . PHP_EOL);
+    echo $pdo->log->header('Optimization for Sphinx process complete!'.PHP_EOL);
 }
 
 //Revert database to standard schema
 function revertToStandard($pdo)
 {
-	$engFormat = '';
+    $engFormat = '';
 
-	if (isset($argv[2]) && in_array($argv[2], ['cinnodb', 'dinnodb', 'cmyisam', 'dmyisam'])) {
-
-		switch ($argv[2]) {
+    if (isset($argv[2]) && in_array($argv[2], ['cinnodb', 'dinnodb', 'cmyisam', 'dmyisam'])) {
+        switch ($argv[2]) {
 			case 'cinnnodb':
 				$engFormat = 'ENGINE = InnoDB ROW_FORMAT = Compressed';
 				break;
@@ -58,11 +57,11 @@ function revertToStandard($pdo)
 				$engFormat = 'ENGINE = MyISAM ROW_FORMAT = Dynamic';
 				break;
 		}
-	}
+    }
 
-	echo PHP_EOL . $pdo->log->info('Dropping old table data and recreating fresh from schema. (Quick)' . PHP_EOL);
-	$pdo->queryExec('DROP TABLE IF EXISTS release_search_data');
-	$pdo->queryExec(
+    echo PHP_EOL.$pdo->log->info('Dropping old table data and recreating fresh from schema. (Quick)'.PHP_EOL);
+    $pdo->queryExec('DROP TABLE IF EXISTS release_search_data');
+    $pdo->queryExec(
 			sprintf("
 				CREATE TABLE release_search_data (
 					id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -86,15 +85,15 @@ function revertToStandard($pdo)
 			)
 	);
 
-	echo $pdo->log->info('Populating the releasearch table with initial data. (Slow)' . PHP_EOL);
-	$pdo->queryInsert('INSERT INTO release_search_data (releases_id, guid, name, searchname, fromname)
+    echo $pdo->log->info('Populating the releasearch table with initial data. (Slow)'.PHP_EOL);
+    $pdo->queryInsert('INSERT INTO release_search_data (releases_id, guid, name, searchname, fromname)
 				SELECT id, guid, name, searchname, fromname FROM releases');
 
-	echo $pdo->log->info('Adding the auto-population triggers. (Quick)' . PHP_EOL);
+    echo $pdo->log->info('Adding the auto-population triggers. (Quick)'.PHP_EOL);
 
-	dropSearchTriggers($pdo);
+    dropSearchTriggers($pdo);
 
-	$pdo->exec('
+    $pdo->exec('
 				CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW
 					BEGIN
 						INSERT INTO release_search_data (releases_id, guid, name, searchname, fromname)
@@ -126,13 +125,13 @@ function revertToStandard($pdo)
 						WHERE releases_id = OLD.id;
 					END;'
 	);
-	echo $pdo->log->header('Standard search should once again be available.' . PHP_EOL);
+    echo $pdo->log->header('Standard search should once again be available.'.PHP_EOL);
 }
 
 //Drops existing triggers
 function dropSearchTriggers($pdo)
 {
-	$pdo->queryExec('DROP TRIGGER IF EXISTS insert_search');
-	$pdo->queryExec('DROP TRIGGER IF EXISTS update_search');
-	$pdo->queryExec('DROP TRIGGER IF EXISTS delete_search');
+    $pdo->queryExec('DROP TRIGGER IF EXISTS insert_search');
+    $pdo->queryExec('DROP TRIGGER IF EXISTS update_search');
+    $pdo->queryExec('DROP TRIGGER IF EXISTS delete_search');
 }

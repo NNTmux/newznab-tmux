@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Settings;
+use Illuminate\Console\Command;
 
 class VerifyNNTmuxSettings extends Command
 {
@@ -21,23 +21,22 @@ class VerifyNNTmuxSettings extends Command
      */
     protected $description = 'Verify settings table data';
 
-	/**
-	 * Create a new command instance.
-	 *
-	 */
+    /**
+     * Create a new command instance.
+     */
     public function __construct()
     {
         parent::__construct();
     }
 
-	/**
-	 * Execute the console command.
-	 *
-	 * @return mixed
-	 * @throws \Exception
-	 */
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     * @throws \Exception
+     */
     public function handle()
     {
-		Settings::hasAllEntries($this);
+        Settings::hasAllEntries($this);
     }
 }

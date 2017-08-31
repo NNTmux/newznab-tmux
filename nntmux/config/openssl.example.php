@@ -18,11 +18,8 @@
  * @author niel
  * @copyright 2015 NN
  */
-
 define('NN_SSL_ALLOW_SELF_SIGNED', '1');
 define('NN_SSL_CAFILE', '');
 define('NN_SSL_CAPATH', '');
 define('NN_SSL_VERIFY_HOST', '0');
 define('NN_SSL_VERIFY_PEER', '0');
-
-?>

@@ -1,6 +1,7 @@
 <?php
-if (!$page->users->isLoggedIn()) {
-	$page->show403();
+
+if (! $page->users->isLoggedIn()) {
+    $page->show403();
 }
 
 use nntmux\Groups;

@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Books;
 use nntmux\utility\Utility;
@@ -20,7 +20,7 @@ $page->smarty->assign([
 	'pagerquerysuffix'  => '#results',
 	'pageroffset' => $offset,
 	'pageritemsperpage' => ITEMS_PER_PAGE,
-	'pagerquerybase' => WWW_TOP. '/book-list.php?offset=',
+	'pagerquerybase' => WWW_TOP.'/book-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
@@ -28,7 +28,7 @@ $page->smarty->assign('pager', $pager);
 
 $bookList = Utility::getRange('bookinfo', $offset, ITEMS_PER_PAGE);
 
-$page->smarty->assign('booklist',$bookList);
+$page->smarty->assign('booklist', $bookList);
 
 $page->content = $page->smarty->fetch('book-list.tpl');
 $page->render();

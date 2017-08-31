@@ -18,17 +18,13 @@
  * @author    niel
  * @copyright 2016 nZEDb
  */
-require_once NN_ROOT . 'vendor/autoload.php';
+require_once NN_ROOT.'vendor/autoload.php';
 
-use nntmux\config\Configure;
 use nntmux\utility\Utility;
+use nntmux\config\Configure;
 
-
-if (!defined('HAS_WHICH')) {
-	define('HAS_WHICH', Utility::hasWhich() ? true : false);
+if (! defined('HAS_WHICH')) {
+    define('HAS_WHICH', Utility::hasWhich() ? true : false);
 }
 
-
 new Configure('indexer');
-
-?>

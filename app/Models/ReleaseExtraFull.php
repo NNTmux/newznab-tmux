@@ -6,33 +6,33 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReleaseExtraFull extends Model
 {
-	/**
-	 * @var string
-	 */
-	protected $table = 'releaseextrafull';
+    /**
+     * @var string
+     */
+    protected $table = 'releaseextrafull';
 
-	/**
-	 * @var bool
-	 */
-	public $timestamps = false;
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
 
-	/**
-	 * @var bool
-	 */
-	protected $dateFormat = false;
+    /**
+     * @var bool
+     */
+    protected $dateFormat = false;
 
-	/**
-	 * @var bool
-	 */
-	public $incrementing = false;
+    /**
+     * @var bool
+     */
+    public $incrementing = false;
 
-	/**
-	 * @var array
-	 */
+    /**
+     * @var array
+     */
     protected $fillable = ['releases_id', 'mediainfo'];
 
-	/**
-	 * @var string
-	 */
-	protected $primaryKey = 'releases_id';
+    /**
+     * @var string
+     */
+    protected $primaryKey = 'releases_id';
 }

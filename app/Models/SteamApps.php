@@ -10,49 +10,48 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program (see LICENSE.txt in the base directory.  If
- * not, see:
+ * not, see:.
  *
  * @link      <http://www.gnu.org/licenses/>.
  * @author    DariusIII
  * @copyright 2016 NNTmux/nZEDb
  */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class SteamApps extends Model
 {
-	/**
-	 * @var string
-	 */
-	protected $table = 'steam_apps';
+    /**
+     * @var string
+     */
+    protected $table = 'steam_apps';
 
-	/**
-	 * @var bool
-	 */
-	public $timestamps = false;
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
 
-	/**
-	 * @var bool
-	 */
-	public $dateFormat = false;
+    /**
+     * @var bool
+     */
+    public $dateFormat = false;
 
-	/**
-	 * @var array
-	 */
-	protected $fillable = ['name', 'appid'];
+    /**
+     * @var array
+     */
+    protected $fillable = ['name', 'appid'];
 
-	/**
-	 * @var array
-	 */
-	protected $primaryKey = 'name';
+    /**
+     * @var array
+     */
+    protected $primaryKey = 'name';
 
-	protected $keyType = 'string';
+    protected $keyType = 'string';
 
-	/**
-	 * @var bool
-	 */
-	public $incrementing = false;
+    /**
+     * @var bool
+     */
+    public $incrementing = false;
 }
-
-?>

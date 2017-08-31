@@ -1,4 +1,3 @@
 <?php
 
-print $page->smarty->fetch('opensearch.tpl');
-
+echo $page->smarty->fetch('opensearch.tpl');

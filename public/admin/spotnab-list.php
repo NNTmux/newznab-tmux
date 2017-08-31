@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\SpotNab;
 
@@ -11,15 +11,15 @@ $spotnab = new SpotNab();
 // set the current action
 $toggle = isset($_REQUEST['toggle']) ? $_REQUEST['toggle'] : 'view';
 
-if ( (isset($_GET["toggle"])) && (isset($_GET["id"])) ) {
-	$spotnab->toggleSource($_GET["id"],$_GET["toggle"]);
+if ((isset($_GET['toggle'])) && (isset($_GET['id']))) {
+    $spotnab->toggleSource($_GET['id'], $_GET['toggle']);
 }
 
-$page->title = "Spotnab Sources List";
+$page->title = 'Spotnab Sources List';
 
 //get the list of Sources
 $spotnab = $spotnab->getSources();
 
-$page->smarty->assign('spotnab',$spotnab);
+$page->smarty->assign('spotnab', $spotnab);
 $page->content = $page->smarty->fetch('spotnab-list.tpl');
 $page->render();

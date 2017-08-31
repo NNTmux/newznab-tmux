@@ -18,28 +18,26 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
-require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
-use App\Models\Settings;
 use nntmux\db\DB;
+use App\Models\Settings;
 
 $pdo = new DB();
 
-if (!Settings::value('..tablepergroup')) {
-	exit("Tables per groups is not enabled, quitting!");
+if (! Settings::value('..tablepergroup')) {
+    exit('Tables per groups is not enabled, quitting!');
 }
 
 // Doing it this way in case there are tables existing not related to the active/backfill list (i.e. I don't have a clue when these tables get deleted so I'm doing any that are there).
 $tables = $pdo->queryDirect("SELECT SUBSTR(TABLE_NAME, 12) AS suffix FROM information_schema.TABLES WHERE TABLE_SCHEMA = (SELECT DATABASE()) AND TABLE_NAME LIKE 'collections_%' ORDER BY TABLE_NAME");
 
-$query1 = "DROP TRIGGER IF EXISTS delete_collections%s";
+$query1 = 'DROP TRIGGER IF EXISTS delete_collections%s';
 
 if ($tables instanceof \Traversable) {
-	foreach ($tables as $table) {
-		echo "Updating table collections{$table['suffix']}" . PHP_EOL;
-		$pdo->queryExec(sprintf($query1, $table['suffix']), true);
-	}
-	echo 'All done!' . PHP_EOL;
+    foreach ($tables as $table) {
+        echo "Updating table collections{$table['suffix']}".PHP_EOL;
+        $pdo->queryExec(sprintf($query1, $table['suffix']), true);
+    }
+    echo 'All done!'.PHP_EOL;
 }
-
-?>

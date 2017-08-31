@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\DnzbFailures;
 
@@ -18,7 +18,7 @@ $page->smarty->assign([
 		'pagerquerysuffix'  => '#results',
 		'pageroffset'       => $offset,
 		'pageritemsperpage' => ITEMS_PER_PAGE,
-		'pagerquerybase'    => WWW_TOP . '/failrel-list.php?offset=',
+		'pagerquerybase'    => WWW_TOP.'/failrel-list.php?offset=',
 	]
 );
 $pager = $page->smarty->fetch('pager.tpl');
@@ -29,4 +29,3 @@ $page->smarty->assign('releaselist', $frellist);
 
 $page->content = $page->smarty->fetch('failrel-list.tpl');
 $page->render();
-

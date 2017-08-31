@@ -18,138 +18,144 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
+
 namespace nntmux\db\populate;
 
-use GuzzleHttp\Client;
 use nntmux\db\DB;
+use GuzzleHttp\Client;
 
 class PopulateTitles
 {
-	/**
-	 * @var \nntmux\db\Settings
-	 */
-	public $pdo;
+    /**
+     * @var \nntmux\db\Settings
+     */
+    public $pdo;
 
-	/**
-	 * @var \SimpleXMLElement
-	 */
-	protected $dataXML;
+    /**
+     * @var \SimpleXMLElement
+     */
+    protected $dataXML;
 
-	/**
-	 * @var \PDOStatement
-	 */
-	protected $checkForDuplicate;
+    /**
+     * @var \PDOStatement
+     */
+    protected $checkForDuplicate;
 
-	/**
-	 * @var \PDOStatement
-	 */
-	protected $insertEntry;
+    /**
+     * @var \PDOStatement
+     */
+    protected $insertEntry;
 
-	protected $mainTable;
+    protected $mainTable;
 
-	/**
-	 * URL of source data.
-	 *
-	 * @var string
-	 */
-	protected $sourceURL;
+    /**
+     * URL of source data.
+     *
+     * @var string
+     */
+    protected $sourceURL;
 
-	protected $tempTable;
+    protected $tempTable;
 
-	/**
-	 * @var Client
-	 */
-	protected $client;
+    /**
+     * @var Client
+     */
+    protected $client;
 
-	/**
-	 * @param $options
-	 */
-
-	public function  __construct($options)
-	{
-		$defaults = [
+    /**
+     * @param $options
+     */
+    public function __construct($options)
+    {
+        $defaults = [
 			'pdo'	=> null,
 		];
-		$options += $defaults;
+        $options += $defaults;
 
-		$this->sourceURL = $options['data-source-url'];
-		$this->mainTable = $options['main-table'];
-		$this->tempTable = $options['main-table'] . '_tmp';
+        $this->sourceURL = $options['data-source-url'];
+        $this->mainTable = $options['main-table'];
+        $this->tempTable = $options['main-table'].'_tmp';
 
-		if (isset($options['pdo']) && $options['pdo'] instanceof DB) {
-			$this->pdo = $options['pdo'];
-		}
-	}
+        if (isset($options['pdo']) && $options['pdo'] instanceof DB) {
+            $this->pdo = $options['pdo'];
+        }
+    }
 
-	protected function checkForDuplicate(array $parameters)
-	{
-		if ($this->checkForDuplicate instanceof \PDOStatement) {
-			$this->checkForDuplicate->execute($parameters);
-			return $this->checkForDuplicate->fetchAll();
-		} else {
-			throw new \RuntimeException('Duplicate check query not yet prepared!');
-		}
-	}
+    protected function checkForDuplicate(array $parameters)
+    {
+        if ($this->checkForDuplicate instanceof \PDOStatement) {
+            $this->checkForDuplicate->execute($parameters);
 
-	protected function createTempTable()
-	{
-		// Clear the old temporary table.
-		$sql = "DROP TABLE IF EXISTS {$this->tempTable}";
-		$result = $this->pdo()->exec($sql);
+            return $this->checkForDuplicate->fetchAll();
+        } else {
+            throw new \RuntimeException('Duplicate check query not yet prepared!');
+        }
+    }
 
-		if ($result !== false) {
-			$sql = "CREATE TABLE {$this->tempTable} LIKE {$this->mainTable}";
-			$result = $this->pdo()->exec($sql);
-		}
-		return $result;
-	}
+    protected function createTempTable()
+    {
+        // Clear the old temporary table.
+        $sql = "DROP TABLE IF EXISTS {$this->tempTable}";
+        $result = $this->pdo()->exec($sql);
 
-	protected function insertEntry(array $parameters)
-	{
-		if ($this->insertEntry instanceof \PDOStatement) {
-			$this->insertEntry->execute($parameters);
-			return $this->insertEntry->fetchAll();
-		} else {
-			throw new \RuntimeException('Insertion query not yet prepared!');
-		}
-	}
+        if ($result !== false) {
+            $sql = "CREATE TABLE {$this->tempTable} LIKE {$this->mainTable}";
+            $result = $this->pdo()->exec($sql);
+        }
 
-	protected function loadXMLFromFile($file)
-	{
-		$useErrors = libxml_use_internal_errors(true);
-		$this->dataXML = simplexml_load_file($file);
+        return $result;
+    }
 
-		if (!$this->dataXML) {
-			foreach (libxml_get_errors() as $error) {
-				echo "\t", $error->message;
-			}
-		}
+    protected function insertEntry(array $parameters)
+    {
+        if ($this->insertEntry instanceof \PDOStatement) {
+            $this->insertEntry->execute($parameters);
 
-		libxml_use_internal_errors($useErrors);
-		return ($this->dataXML !== false);
-	}
+            return $this->insertEntry->fetchAll();
+        } else {
+            throw new \RuntimeException('Insertion query not yet prepared!');
+        }
+    }
 
-	protected function pdo()
-	{
-		if ($this->pdo === null) {
-			$this->pdo = new DB();
-		}
-		return $this->pdo;
-	}
+    protected function loadXMLFromFile($file)
+    {
+        $useErrors = libxml_use_internal_errors(true);
+        $this->dataXML = simplexml_load_file($file);
 
-	/**
-	 * @param string $pathname full path to file for saving. Will be overwritten.
-	 *
-	 * @return bool|int
-	 */
-	protected function saveSourceFile($pathname)
-	{
-		$client = new Client();
-		$result = false;
-		$file = $client->get($this->sourceURL)->getBody();
-		if ($file !== false) {
-			$result = file_put_contents($pathname, $file);
-		}
-		return $result;
-	}
+        if (! $this->dataXML) {
+            foreach (libxml_get_errors() as $error) {
+                echo "\t", $error->message;
+            }
+        }
+
+        libxml_use_internal_errors($useErrors);
+
+        return $this->dataXML !== false;
+    }
+
+    protected function pdo()
+    {
+        if ($this->pdo === null) {
+            $this->pdo = new DB();
+        }
+
+        return $this->pdo;
+    }
+
+    /**
+     * @param string $pathname full path to file for saving. Will be overwritten.
+     *
+     * @return bool|int
+     */
+    protected function saveSourceFile($pathname)
+    {
+        $client = new Client();
+        $result = false;
+        $file = $client->get($this->sourceURL)->getBody();
+        if ($file !== false) {
+            $result = file_put_contents($pathname, $file);
+        }
+
+        return $result;
+    }
 }

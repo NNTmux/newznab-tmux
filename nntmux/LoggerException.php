@@ -19,10 +19,9 @@
  * @author niel
  * @copyright 2015 nZEDb
  */
-namespace nntmux;
 
+namespace nntmux;
 
 class LoggerException extends \Exception
 {
-
 }

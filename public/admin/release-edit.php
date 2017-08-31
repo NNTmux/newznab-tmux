@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Category;
 use nntmux\Releases;
@@ -30,18 +30,18 @@ switch ($action) {
 			$_POST['imdbid'],
 			$_POST['anidbid']);
 
-		if (isset($_POST['from']) && !empty($_POST['from'])) {
-			header('Location:' . $_POST['from']);
-			exit;
+		if (isset($_POST['from']) && ! empty($_POST['from'])) {
+		    header('Location:'.$_POST['from']);
+		    exit;
 		}
-		header('Location:' . WWW_TOP . '/release-list.php');
+		header('Location:'.WWW_TOP.'/release-list.php');
 		break;
 
 	case 'view':
 	default:
 		$page->title = 'Release Edit';
-		$id          = $_GET['id'];
-		$release     = $releases->getById($id);
+		$id = $_GET['id'];
+		$release = $releases->getById($id);
 		$page->smarty->assign('release', $release);
 		break;
 }

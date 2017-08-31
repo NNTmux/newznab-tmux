@@ -1,20 +1,21 @@
 <?php
-// To troubleshoot what's actually on usenet.
-require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
+// To troubleshoot what's actually on usenet.
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+
+use nntmux\NNTP;
 use nntmux\Binaries;
 use nntmux\ColorCLI;
-use nntmux\NNTP;
 
 $cli = new ColorCLI();
 
-if (!isset($argv[2]) || !is_numeric($argv[2])) {
-	exit($cli->error("\nTest your nntp connection, get group information and postdate for specific article.\n\n"
-		. "php $argv[0] alt.binaries.teevee 595751142    ...: To test nntp on alt.binaries.teevee with artivle 595751142.\n"));
+if (! isset($argv[2]) || ! is_numeric($argv[2])) {
+    exit($cli->error("\nTest your nntp connection, get group information and postdate for specific article.\n\n"
+		."php $argv[0] alt.binaries.teevee 595751142    ...: To test nntp on alt.binaries.teevee with artivle 595751142.\n"));
 }
 $nntp = new NNTP();
 if ($nntp->doConnect() !== true) {
-	exit();
+    exit();
 }
 
 $first = $argv[2];
@@ -25,7 +26,7 @@ $groupArr = $nntp->selectGroup($group);
 print_r($groupArr);
 
 // Insert actual local part numbers here.
-$msg = $nntp->getXOVER($first . '-' . $first);
+$msg = $nntp->getXOVER($first.'-'.$first);
 
 // Print out the array of headers.
 print_r($msg);
@@ -33,4 +34,4 @@ print_r($msg);
 // get postdate for an article
 $binaries = new Binaries(['NNTP' => $nntp]);
 $newdate = $binaries->postdate($first, $groupArr);
-echo $cli->primary("The posted date for " . $group . ", article " . $first . " is " . date('Y-m-d H:i:s', $newdate));
+echo $cli->primary('The posted date for '.$group.', article '.$first.' is '.date('Y-m-d H:i:s', $newdate));

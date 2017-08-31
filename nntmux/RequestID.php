@@ -1,21 +1,22 @@
 <?php
+
 namespace nntmux;
 
-use GuzzleHttp\Client;
 use nntmux\db\DB;
+use GuzzleHttp\Client;
 
 /**
- * Class RequestID
+ * Class RequestID.
  */
 abstract class RequestID
 {
-	// Request id.
-	const REQID_OLD    = -4; // We rechecked the web a second time and didn't find a title so don't process it again.
-	const REQID_NONE   = -3; // The Request id was not found locally or via web lookup.
-	const REQID_ZERO   = -2; // The Request id was 0.
-	const REQID_NOLL   = -1; // Request id was not found via local lookup.
-	const REQID_UPROC  =  0; // Release has not been processed.
-	const REQID_FOUND  =  1; // Request id found and release was updated.
+    // Request id.
+	const REQID_OLD = -4; // We rechecked the web a second time and didn't find a title so don't process it again.
+	const REQID_NONE = -3; // The Request id was not found locally or via web lookup.
+	const REQID_ZERO = -2; // The Request id was 0.
+	const REQID_NOLL = -1; // Request id was not found via local lookup.
+	const REQID_UPROC = 0; // Release has not been processed.
+	const REQID_FOUND = 1; // Request id found and release was updated.
 
 	const IS_REQID_TRUE = 1; // releases.isrequestid is 1
 	const IS_REQID_FALSE = 0; // releases.isrequestid is 0
@@ -23,19 +24,19 @@ abstract class RequestID
 	/**
 	 * @var Groups
 	 */
-	public $groups;
+    public $groups;
 
-	/**
-	 * @var Client
-	 */
-	public $client;
+    /**
+     * @var Client
+     */
+    public $client;
 
-	/**
-	 * @param array $options Class instances / Echo to cli?
-	 */
-	public function __construct(array $options = [])
-	{
-		$defaults = [
+    /**
+     * @param array $options Class instances / Echo to cli?
+     */
+    public function __construct(array $options = [])
+    {
+        $defaults = [
 			'Echo'         => true,
 			'Categorize'   => null,
 			'ConsoleTools' => null,
@@ -43,195 +44,202 @@ abstract class RequestID
 			'Settings'     => null,
 			'SphinxSearch' => null,
 		];
-		$options += $defaults;
+        $options += $defaults;
 
-		$this->echoOutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
-		$this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
-		$this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools(['ColorCLI' => $this->pdo->log]));
-		$this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
-		$this->client = new Client();
-	}
+        $this->echoOutput = ($options['Echo'] && NN_ECHOCLI);
+        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
+        $this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
+        $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools(['ColorCLI' => $this->pdo->log]));
+        $this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
+        $this->client = new Client();
+    }
 
-	/**
-	 * Look up request id's for releases.
-	 *
-	 * @param array $options
-	 *
-	 * @return int Quantity of releases matched to a request id.
-	 */
-	public function lookupRequestIDs(array $options = [])
-	{
-		$curOptions = [
+    /**
+     * Look up request id's for releases.
+     *
+     * @param array $options
+     *
+     * @return int Quantity of releases matched to a request id.
+     */
+    public function lookupRequestIDs(array $options = [])
+    {
+        $curOptions = [
 			'charGUID'      => '',
 			'GroupID'       => '',
 			'limit'         => '',
 			'show'          => 1,
 			'time'          => 0,
 		];
-		$curOptions = array_replace($curOptions, $options);
+        $curOptions = array_replace($curOptions, $options);
 
-		$startTime = time();
-		$renamed = 0;
+        $startTime = time();
+        $renamed = 0;
 
-		$this->_charGUID = $curOptions['charGUID'];
-		$this->_groupID = $curOptions['GroupID'];
-		$this->_show = $curOptions['show'];
-		$this->_maxTime = $curOptions['time'];
-		$this->_limit = $curOptions['limit'];
+        $this->_charGUID = $curOptions['charGUID'];
+        $this->_groupID = $curOptions['GroupID'];
+        $this->_show = $curOptions['show'];
+        $this->_maxTime = $curOptions['time'];
+        $this->_limit = $curOptions['limit'];
 
-		$this->_getReleases();
+        $this->_getReleases();
 
-		if ($this->_releases !== false && $this->_releases->rowCount() > 0) {
-			$this->_totalReleases = $this->_releases->rowCount();
-			ColorCLI::doEcho(ColorCLI::primary('Processing ' . $this->_totalReleases . " releases for RequestID's."));
-			$renamed = $this->_processReleases();
-			if ($this->echoOutput) {
-				echo ColorCLI::header(
-					"\nRenamed " . number_format($renamed) . " releases in " . $this->consoleTools->convertTime(time() - $startTime) . "."
+        if ($this->_releases !== false && $this->_releases->rowCount() > 0) {
+            $this->_totalReleases = $this->_releases->rowCount();
+            ColorCLI::doEcho(ColorCLI::primary('Processing '.$this->_totalReleases." releases for RequestID's."));
+            $renamed = $this->_processReleases();
+            if ($this->echoOutput) {
+                echo ColorCLI::header(
+					"\nRenamed ".number_format($renamed).' releases in '.$this->consoleTools->convertTime(time() - $startTime).'.'
 				);
-			}
-		} elseif ($this->echoOutput) {
-			ColorCLI::doEcho(ColorCLI::primary("No RequestID's to process."));
-		}
+            }
+        } elseif ($this->echoOutput) {
+            ColorCLI::doEcho(ColorCLI::primary("No RequestID's to process."));
+        }
 
-		return $renamed;
-	}
+        return $renamed;
+    }
 
-	/**
-	 * Fetch releases with requestid's from MySQL.
-	 */
-	protected function _getReleases() { }
+    /**
+     * Fetch releases with requestid's from MySQL.
+     */
+    protected function _getReleases()
+    {
+    }
 
-	/**
-	 * Process releases for requestid's.
-	 *
-	 * @return int How many did we rename?
-	 */
-	protected function _processReleases() { }
+    /**
+     * Process releases for requestid's.
+     *
+     * @return int How many did we rename?
+     */
+    protected function _processReleases()
+    {
+    }
 
-	/**
-	 * No request id was found, update the release.
-	 *
-	 * @param int $releaseID
-	 * @param int $status
-	 */
-	protected function _requestIdNotFound($releaseID, $status)
-	{
-		if ($releaseID == 0) {
-			return;
-		}
+    /**
+     * No request id was found, update the release.
+     *
+     * @param int $releaseID
+     * @param int $status
+     */
+    protected function _requestIdNotFound($releaseID, $status)
+    {
+        if ($releaseID == 0) {
+            return;
+        }
 
-		$this->pdo->queryExec(
+        $this->pdo->queryExec(
 			sprintf('
 				UPDATE releases SET reqidstatus = %d WHERE id = %d',
 				$status, $releaseID
 			)
 		);
-	}
+    }
 
-	/**
-	 * Get a new title / pre id for a release.
-	 *
-	 * @return array|bool
-	 */
-	protected function _getNewTitle() { }
+    /**
+     * Get a new title / pre id for a release.
+     *
+     * @return array|bool
+     */
+    protected function _getNewTitle()
+    {
+    }
 
-	/**
-	 * Find a RequestID in a usenet subject.
-	 *
-	 * @return int
-	 */
-	protected function _siftReqId()
-	{
-		$requestID = [];
-		switch (true) {
+    /**
+     * Find a RequestID in a usenet subject.
+     *
+     * @return int
+     */
+    protected function _siftReqId()
+    {
+        $requestID = [];
+        switch (true) {
 			case preg_match('/\[\s*#?scnzb@?efnet\s*\]\[(\d+)\]/', $this->_release['name'], $requestID):
 			case preg_match('/\[\s*(\d+)\s*\]/', $this->_release['name'], $requestID):
 			case preg_match('/^REQ\s*(\d{4,6})/i', $this->_release['name'], $requestID):
 			case preg_match('/^(\d{4,6})-\d{1}\[/', $this->_release['name'], $requestID):
-			case preg_match('/(\d{4,6}) -/',$this->_release['name'], $requestID):
+			case preg_match('/(\d{4,6}) -/', $this->_release['name'], $requestID):
 				if ((int) $requestID[1] > 0) {
-					return (int) $requestID[1];
+				    return (int) $requestID[1];
 				}
 		}
-		return self::REQID_ZERO;
-	}
 
-	/**
-	 * @var bool Echo to CLI?
-	 */
-	protected $echoOutput;
+        return self::REQID_ZERO;
+    }
 
-	/**
-	 * @var Categorize
-	 */
-	protected $category;
+    /**
+     * @var bool Echo to CLI?
+     */
+    protected $echoOutput;
 
-	/**
-	 * @var \nntmux\db\Settings
-	 */
-	protected $pdo;
+    /**
+     * @var Categorize
+     */
+    protected $category;
 
-	/**
-	 * @var ConsoleTools
-	 */
-	protected $consoleTools;
+    /**
+     * @var \nntmux\db\Settings
+     */
+    protected $pdo;
 
-	/**
-	 * @var ColorCLI
-	 */
-	protected $colorCLI;
+    /**
+     * @var ConsoleTools
+     */
+    protected $consoleTools;
 
-	/**
-	 * The found request id for the release.
-	 * @var int
-	 */
-	protected $_requestID = self::REQID_ZERO;
+    /**
+     * @var ColorCLI
+     */
+    protected $colorCLI;
 
-	/**
-	 * The title found from a request id lookup.
-	 * @var bool|string|array
-	 */
-	protected $_newTitle = false;
+    /**
+     * The found request id for the release.
+     * @var int
+     */
+    protected $_requestID = self::REQID_ZERO;
 
-	/**
-	 * Releases with potential Request id's we can work on.
-	 * @var \PDOStatement|bool
-	 */
-	protected $_releases;
+    /**
+     * The title found from a request id lookup.
+     * @var bool|string|array
+     */
+    protected $_newTitle = false;
 
-	/**
-	 * Total amount of releases we will be working on.
-	 * @var int
-	 */
-	protected $_totalReleases;
+    /**
+     * Releases with potential Request id's we can work on.
+     * @var \PDOStatement|bool
+     */
+    protected $_releases;
 
-	/**
-	 * Release we are currently working on.
-	 * @var array
-	 */
-	protected $_release;
+    /**
+     * Total amount of releases we will be working on.
+     * @var int
+     */
+    protected $_totalReleases;
 
-	/**
-	 * @var int To show the result or not.
-	 */
-	protected $_show = 0;
+    /**
+     * Release we are currently working on.
+     * @var array
+     */
+    protected $_release;
 
-	/**
-	 * GroupID, which is optional, to limit query results.
-	 * @var string
-	 */
-	protected $_groupID;
+    /**
+     * @var int To show the result or not.
+     */
+    protected $_show = 0;
 
-	/**
-	 * First character of a release GUID, which is optional, to limit query results.
-	 * @var string
-	 */
-	protected $_charGUID;
+    /**
+     * GroupID, which is optional, to limit query results.
+     * @var string
+     */
+    protected $_groupID;
 
-	protected $_limit;
+    /**
+     * First character of a release GUID, which is optional, to limit query results.
+     * @var string
+     */
+    protected $_charGUID;
 
-	protected $_maxTime;
+    protected $_limit;
+
+    protected $_maxTime;
 }

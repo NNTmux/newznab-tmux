@@ -22,54 +22,53 @@
 /* TODO better tune the queries for performance, including pre-fetching groups_id and other data for
 	faster inclusion in the main query.
 */
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bootstrap.php');
+require_once realpath(dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'bootstrap.php');
 
-use GuzzleHttp\Client;
 use nntmux\db\PreDb;
 use nntmux\utility\Utility;
 
-if (!Utility::isWin()) {
-	if (NN_DEBUG) {
-		echo "Checking resource path\n";
-	}
-	$canExeRead = Utility::canExecuteRead(NN_RES);
-	if (is_string($canExeRead)) {
-		exit($canExeRead);
-	}
-	unset($canExeRead);
+if (! Utility::isWin()) {
+    if (NN_DEBUG) {
+        echo "Checking resource path\n";
+    }
+    $canExeRead = Utility::canExecuteRead(NN_RES);
+    if (is_string($canExeRead)) {
+        exit($canExeRead);
+    }
+    unset($canExeRead);
 }
 
 if (NN_DEBUG) {
-	echo "Checking directory is writable\n";
+    echo "Checking directory is writable\n";
 }
-if (!is_writable(NN_RES)) {
-	exit('The (' . NN_RES . ') folder must be writable.' . PHP_EOL);
+if (! is_writable(NN_RES)) {
+    exit('The ('.NN_RES.') folder must be writable.'.PHP_EOL);
 }
 
-if (!isset($argv[1]) || (!is_numeric($argv[1]) && $argv[1] !== 'progress') || !isset($argv[2]) ||
-	!in_array($argv[2], ['local', 'remote']) || !isset($argv[3]) ||
-	!in_array($argv[3], ['true', 'false'])
+if (! isset($argv[1]) || (! is_numeric($argv[1]) && $argv[1] !== 'progress') || ! isset($argv[2]) ||
+	! in_array($argv[2], ['local', 'remote']) || ! isset($argv[3]) ||
+	! in_array($argv[3], ['true', 'false'])
 ) {
-	exit('This script quickly imports the daily PreDB dumps.' . PHP_EOL .
-		'Argument 1: Enter the unix time of the patch to start at.' . PHP_EOL .
-		'You can find the unix time in the file name of the patch, it\'s the long number.' .
-		PHP_EOL .
-		'You can put in 0 to import all the daily PreDB dumps.' . PHP_EOL .
-		'You can put in progress to track progress of the imports and only import newer ones.' .
-		PHP_EOL .
-		'Argument 2: If your MySQL server is local, type local else type remote.' . PHP_EOL .
-		'Argument 3: Show output of queries or not, true | false' . PHP_EOL
+    exit('This script quickly imports the daily PreDB dumps.'.PHP_EOL.
+		'Argument 1: Enter the unix time of the patch to start at.'.PHP_EOL.
+		'You can find the unix time in the file name of the patch, it\'s the long number.'.
+		PHP_EOL.
+		'You can put in 0 to import all the daily PreDB dumps.'.PHP_EOL.
+		'You can put in progress to track progress of the imports and only import newer ones.'.
+		PHP_EOL.
+		'Argument 2: If your MySQL server is local, type local else type remote.'.PHP_EOL.
+		'Argument 3: Show output of queries or not, true | false'.PHP_EOL
 	);
 }
 if (NN_DEBUG) {
-	echo "Parameter check completed\n";
+    echo "Parameter check completed\n";
 }
 
-$url         = 'https://api.github.com/repos/nZEDb/nZEDbPre_Dumps/contents/dumps/';
+$url = 'https://api.github.com/repos/nZEDb/nZEDbPre_Dumps/contents/dumps/';
 $filePattern = '(?P<filename>(?P<stamp>\d+)_predb_dump\.csv\.gz)';
 
 if (NN_DEBUG) {
-	echo "Fetching predb_dump directory list from GitHub\n";
+    echo "Fetching predb_dump directory list from GitHub\n";
 }
 
 $result = getDirListing($url);
@@ -78,111 +77,110 @@ $dirs = json_decode($result, true);
 
 if (is_null($dirs) ||
 	(isset($dirs['message']) && substr($dirs['message'], 0, 27) == 'API rate limit exceeded for')) {
-	exit("Error: $result");
+    exit("Error: $result");
 }
 
-
 if (NN_DEBUG) {
-	echo "Fetching predb_dump lists from GitHub\n";
+    echo "Fetching predb_dump lists from GitHub\n";
 }
 
 foreach ($dirs as $dir) {
-	if ($dir['name'] == '0README.txt') {
-		continue;
-	}
+    if ($dir['name'] == '0README.txt') {
+        continue;
+    }
 
-	$result = getDirListing($url . $dir['name'] . '/');
+    $result = getDirListing($url.$dir['name'].'/');
 
-	if (NN_DEBUG) {
-		echo "Extracting filenames from list.\n";
-	}
+    if (NN_DEBUG) {
+        echo "Extracting filenames from list.\n";
+    }
 
-	$temp = json_decode($result, true);
-	if (is_null($temp)) {
-		exit("Error: $result");
-	}
+    $temp = json_decode($result, true);
+    if (is_null($temp)) {
+        exit("Error: $result");
+    }
 
-	$data[$dir['name']] = $temp;
+    $data[$dir['name']] = $temp;
 }
 
 $total = 0;
 foreach ($data as $dir => $files) {
-	$total += count($files);
+    $total += count($files);
 }
-$total --;
+$total--;
 
 $predb = new PreDb();
 
 $progress = $predb->progress(settings_array());
 
 foreach ($data as $dir => $files) {
-	foreach ($files as $file) {
-		//var_dump($file);
-		if (preg_match("#^https://raw\.githubusercontent\.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$#",
+    foreach ($files as $file) {
+        //var_dump($file);
+        if (preg_match("#^https://raw\.githubusercontent\.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$#",
 			$file['download_url'])) {
-			if (preg_match("#^$filePattern$#", $file['name'], $match)) {
-				$timematch = $progress['last'];
+            if (preg_match("#^$filePattern$#", $file['name'], $match)) {
+                $timematch = $progress['last'];
 
-				// Skip patches the user does not want.
-				if ($match[1] < $timematch) {
-					echo 'Skipping dump ' . $match[2] .
-						', as your minimum unix time argument is ' .
-						$timematch . PHP_EOL;
-					--$total;
-					continue;
-				}
+                // Skip patches the user does not want.
+                if ($match[1] < $timematch) {
+                    echo 'Skipping dump '.$match[2].
+						', as your minimum unix time argument is '.
+						$timematch.PHP_EOL;
+                    --$total;
+                    continue;
+                }
 
-				// Download the dump.
-				$dump = Utility::getUrl(['url' => $file['download_url']]);
-				echo "Downloading: {$file['download_url']}\n";
+                // Download the dump.
+                $dump = Utility::getUrl(['url' => $file['download_url']]);
+                echo "Downloading: {$file['download_url']}\n";
 
-				if (!$dump) {
-					echo "Error downloading dump {$match[2]} you can try manually importing it." .
+                if (! $dump) {
+                    echo "Error downloading dump {$match[2]} you can try manually importing it.".
 						PHP_EOL;
-					continue;
-				} else {
-					if (NN_DEBUG) {
-						echo "Dump {$match[2]} downloaded\n";
-					}
-				}
+                    continue;
+                } else {
+                    if (NN_DEBUG) {
+                        echo "Dump {$match[2]} downloaded\n";
+                    }
+                }
 
-				// Make sure we didn't get an HTML page.
-				if (strpos($dump, '<!DOCTYPE html>') !== false) {
-					echo "The dump file {$match[2]} might be missing from GitHub." . PHP_EOL;
-					continue;
-				}
+                // Make sure we didn't get an HTML page.
+                if (strpos($dump, '<!DOCTYPE html>') !== false) {
+                    echo "The dump file {$match[2]} might be missing from GitHub.".PHP_EOL;
+                    continue;
+                }
 
-				// Decompress.
-				$dump = gzdecode($dump);
+                // Decompress.
+                $dump = gzdecode($dump);
 
-				if (!$dump) {
-					echo "Error decompressing dump {$match[2]}." . PHP_EOL;
-					continue;
-				}
+                if (! $dump) {
+                    echo "Error decompressing dump {$match[2]}.".PHP_EOL;
+                    continue;
+                }
 
-				// Store the dump.
-				$dumpFile = NN_RES . $match[2] . '_predb_dump.csv';
-				$fetched = file_put_contents($dumpFile, $dump);
-				if (!$fetched) {
-					echo "Error storing dump file {$match[2]} in (" . NN_RES . ').' .
+                // Store the dump.
+                $dumpFile = NN_RES.$match[2].'_predb_dump.csv';
+                $fetched = file_put_contents($dumpFile, $dump);
+                if (! $fetched) {
+                    echo "Error storing dump file {$match[2]} in (".NN_RES.').'.
 						PHP_EOL;
-					continue;
-				}
+                    continue;
+                }
 
-				// Make sure it's readable by all.
-				chmod($dumpFile, 0777);
-				$local = strtolower($argv[2]) === 'local';
-				$verbose = $argv[3] === true;
+                // Make sure it's readable by all.
+                chmod($dumpFile, 0777);
+                $local = strtolower($argv[2]) === 'local';
+                $verbose = $argv[3] === true;
 
-				if ($verbose) {
-					echo $predb->log->info('Clearing import table');
-				}
+                if ($verbose) {
+                    echo $predb->log->info('Clearing import table');
+                }
 
-				// Truncate to clear any old data
-				$predb->executeTruncate();
+                // Truncate to clear any old data
+                $predb->executeTruncate();
 
-				// Import file into predb_imports
-				$predb->executeLoadData(
+                // Import file into predb_imports
+                $predb->executeLoadData(
 					[
 						'fields' => '\\t\\t',
 						'lines'  => '\\r\\n',
@@ -190,71 +188,71 @@ foreach ($data as $dir => $files) {
 						'path'   => $dumpFile,
 					]);
 
-				// Remove any titles where length <=8
-				if ($verbose === true) {
-					echo $predb->log->info('Deleting any records where title <=8 from Temporary Table');
-				}
-				$predb->executeDeleteShort();
+                // Remove any titles where length <=8
+                if ($verbose === true) {
+                    echo $predb->log->info('Deleting any records where title <=8 from Temporary Table');
+                }
+                $predb->executeDeleteShort();
 
-				// Add any groups that do not currently exist
-				$predb->executeAddGroups();
+                // Add any groups that do not currently exist
+                $predb->executeAddGroups();
 
-				// Fill the groups_id
-				$predb->executeUpdateGroupID();
+                // Fill the groups_id
+                $predb->executeUpdateGroupID();
 
-				echo $predb->log->info('Inserting records from temporary table into predb table');
-				$predb->executeInsert();
+                echo $predb->log->info('Inserting records from temporary table into predb table');
+                $predb->executeInsert();
 
-				// Delete the dump.
-				unlink($dumpFile);
+                // Delete the dump.
+                unlink($dumpFile);
 
-				$progress = $predb->progress(settings_array($match[2] + 1, $progress),
+                $progress = $predb->progress(settings_array($match[2] + 1, $progress),
 					['read' => false]);
-				echo sprintf("Successfully imported PreDB dump %d (%s), %d dumps remaining\n",
+                echo sprintf("Successfully imported PreDB dump %d (%s), %d dumps remaining\n",
 					$match[2],
 					date('Y-m-d', $match[2]),
 					--$total
 				);
-			} else {
-				echo "Ignoring: {$file['download_url']}\n";
-			}
-		} else {
-			if (NN_DEBUG) {
-				echo "^https://raw.githubusercontent.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$\n {$file['download_url']}\n";
-			}
-		}
-	}
+            } else {
+                echo "Ignoring: {$file['download_url']}\n";
+            }
+        } else {
+            if (NN_DEBUG) {
+                echo "^https://raw.githubusercontent.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$\n {$file['download_url']}\n";
+            }
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function settings_array($last = null, $settings = null)
 {
-	if ($settings === null) {
-		$settings['last'] = 0;
-	}
+    if ($settings === null) {
+        $settings['last'] = 0;
+    }
 
-	if ($last !== null) {
-		$settings['last'] = $last;
-	}
+    if ($last !== null) {
+        $settings['last'] = $last;
+    }
 
-	return $settings;
+    return $settings;
 }
 
 function getDirListing($url)
 {
-	$result = Utility::getUrl(
+    $result = Utility::getUrl(
 		[
 			'url'            => $url,
 			'requestheaders' => [
 				'Content-Type: application/json',
-				'User-Agent: nZEDb'
-			]
+				'User-Agent: nZEDb',
+			],
 		]);
 
-	if ($result === false) {
-		exit('Error connecting to GitHub, try again later?' . PHP_EOL);
-	}
+    if ($result === false) {
+        exit('Error connecting to GitHub, try again later?'.PHP_EOL);
+    }
 
-	return $result;
+    return $result;
 }

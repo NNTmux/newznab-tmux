@@ -1,11 +1,9 @@
 <?php
 /**
- * Smarty plugin
- * @package Smarty
- * @subpackage plugins
+ * Smarty plugin.
  */
 /**
- * Smarty plugin
+ * Smarty plugin.
  *
  * Type:     modifier<br>
  * Name:     nl2br<br>
@@ -25,7 +23,6 @@
  */
 function smarty_modifier_nl2br($string)
 {
-	return nl2br($string);
+    return nl2br($string);
 }
 /* vim: set expandtab: */
-?>

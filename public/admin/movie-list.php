@@ -1,11 +1,11 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Movie;
 use nntmux\utility\Utility;
 
-$page  = new AdminPage();
+$page = new AdminPage();
 $movie = new Movie(['Settings' => $page->settings]);
 
 $page->title = 'Movie List';
@@ -19,7 +19,7 @@ $page->smarty->assign([
 	'pagerquerysuffix'  => '#results',
 	'pageroffset' => $offset,
 	'pageritemsperpage' => ITEMS_PER_PAGE,
-	'pagerquerybase' => WWW_TOP. '/movie-list.php?offset=',
+	'pagerquerybase' => WWW_TOP.'/movie-list.php?offset=',
 ]);
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
@@ -29,4 +29,3 @@ $page->smarty->assign('movielist', $movieList);
 
 $page->content = $page->smarty->fetch('movie-list.tpl');
 $page->render();
-

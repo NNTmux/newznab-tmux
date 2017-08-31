@@ -6,26 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
-	/**
-	 * @var string
-	 */
-	protected $table = 'users';
+    /**
+     * @var string
+     */
+    protected $table = 'users';
 
-	/**
-	 * @var bool
-	 */
-	protected $dateFormat = false;
+    /**
+     * @var bool
+     */
+    protected $dateFormat = false;
 
-	/**
-	 * @var bool
-	 */
-	public $timestamps = false;
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
 
-
-	/**
-	 * @var array
-	 */
-	protected $fillable = [
+    /**
+     * @var array
+     */
+    protected $fillable = [
 		'username',
 		'password',
 		'email',
@@ -36,11 +35,11 @@ class User extends Model
 		'invites',
 		'invitedby',
 		'userseed',
-		'notes'
+		'notes',
 	];
 
-	/**
-	 * @var array
-	 */
-	protected $hidden = ['password', 'rsstoken'];
+    /**
+     * @var array
+     */
+    protected $hidden = ['password', 'rsstoken'];
 }

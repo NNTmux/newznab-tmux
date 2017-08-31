@@ -1,58 +1,58 @@
 <?php
 
-if (!$page->users->isLoggedIn()) {
-	$page->show403();
+if (! $page->users->isLoggedIn()) {
+    $page->show403();
 }
 
-use nntmux\Releases;
-use nntmux\Contents;
 use nntmux\Category;
+use nntmux\Contents;
+use nntmux\Releases;
 
 $releases = new Releases(['Settings' => $page->settings]);
 $contents = new Contents(['Settings' => $page->settings]);
 $category = new Category(['Settings' => $page->settings]);
-$error    = false;
+$error = false;
 
 // Array with all the possible poster wall types.
-$startTypes = array('Books', 'Console', 'Movies', 'XXX', 'Audio', 'PC', 'TV', 'Anime'/*, 'Recent'*/);
+$startTypes = ['Books', 'Console', 'Movies', 'XXX', 'Audio', 'PC', 'TV', 'Anime'/*, 'Recent'*/];
 // Array that will contain the poster wall types (the above array minus whatever they have disabled in admin).
 $types = [];
 // Get the names of all enabled parent categories.
 $categories = $category->getEnabledParentNames();
 // Loop through our possible ones and check if they are in the enabled categories.
 if (count($categories) > 0) {
-	foreach ($categories as $pType) {
-		if (in_array($pType['title'], $startTypes)) {
-			$types[] = $pType['title'];
-			if ($pType['title'] == 'TV') {
-				$types[] = 'Anime';
-			}
-		}
-	}
+    foreach ($categories as $pType) {
+        if (in_array($pType['title'], $startTypes)) {
+            $types[] = $pType['title'];
+            if ($pType['title'] == 'TV') {
+                $types[] = 'Anime';
+            }
+        }
+    }
 } else {
-	$error = "No categories are enabled!";
+    $error = 'No categories are enabled!';
 }
 
 if (count($types) === 0) {
-	$error = 'No categories enabled for the new poster wall. Possible choices are: ' . implode(', ', $startTypes) . '.';
+    $error = 'No categories enabled for the new poster wall. Possible choices are: '.implode(', ', $startTypes).'.';
 }
 
-if (!$error) {
+if (! $error) {
 
 	// Check if the user did not pass the required t parameter, set it to the first type.
-	if (!isset($_REQUEST['t'])) {
-		$_REQUEST['t'] = $types[0];
-	}
+    if (! isset($_REQUEST['t'])) {
+        $_REQUEST['t'] = $types[0];
+    }
 
-	// Check if the user passed an invalid t parameter.
-	if (!in_array($_REQUEST['t'], $types)) {
-		$_REQUEST['t'] = $types[0];
-	}
+    // Check if the user passed an invalid t parameter.
+    if (! in_array($_REQUEST['t'], $types)) {
+        $_REQUEST['t'] = $types[0];
+    }
 
-	$page->smarty->assign('types', $types);
-	$page->smarty->assign('type', $_REQUEST['t']);
+    $page->smarty->assign('types', $types);
+    $page->smarty->assign('type', $_REQUEST['t']);
 
-	switch ($_REQUEST['t']) {
+    switch ($_REQUEST['t']) {
 		case 'Movies':
 			$getnewestmovies = $releases->getNewestMovies();
 			$page->smarty->assign('newest', $getnewestmovies);
@@ -112,13 +112,13 @@ if (!$error) {
 			break;
 
 		default:
-			$error = "ERROR: Invalid ?t parameter (" . $_REQUEST['t'] . ").";
+			$error = 'ERROR: Invalid ?t parameter ('.$_REQUEST['t'].').';
 	}
 }
-$page->title = 'New ' . $_REQUEST['t'] . ' Releases';
-$page->meta_title = $_REQUEST['t'] . ' Poster Wall';
-$page->meta_keywords = "view,new,releases,posters,wall";
-$page->meta_description = "The newest " . $_REQUEST['t'] . ' releases';
+$page->title = 'New '.$_REQUEST['t'].' Releases';
+$page->meta_title = $_REQUEST['t'].' Poster Wall';
+$page->meta_keywords = 'view,new,releases,posters,wall';
+$page->meta_description = 'The newest '.$_REQUEST['t'].' releases';
 $page->smarty->assign('error', $error);
 $page->content = $page->smarty->fetch('newposterwall.tpl');
 $page->render();

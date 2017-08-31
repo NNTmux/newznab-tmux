@@ -6,35 +6,35 @@ use Illuminate\Database\Eloquent\Model;
 
 class VideoData extends Model
 {
-	/**
-	 * @var string
-	 */
-	protected $table = 'video_data';
+    /**
+     * @var string
+     */
+    protected $table = 'video_data';
 
-	/**
-	 * @var bool
-	 */
-	public $timestamps = false;
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
 
-	/**
-	 * @var bool
-	 */
-	protected $dateFormat = false;
+    /**
+     * @var bool
+     */
+    protected $dateFormat = false;
 
-	/**
-	 * @var bool
-	 */
-	public $incrementing = false;
+    /**
+     * @var bool
+     */
+    public $incrementing = false;
 
-	/**
-	 * @var string
-	 */
-	protected $primaryKey = 'releases_id';
+    /**
+     * @var string
+     */
+    protected $primaryKey = 'releases_id';
 
-	/**
-	 * @var array
-	 */
-	protected $fillable = [
+    /**
+     * @var array
+     */
+    protected $fillable = [
 		'releases_id',
 		'containerformat',
 		'overallbitrate',
@@ -45,6 +45,6 @@ class VideoData extends Model
 		'videoheight',
 		'videoaspect',
 		'videoframerate',
-		'videolibrary'
+		'videolibrary',
 	];
 }

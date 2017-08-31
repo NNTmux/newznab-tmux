@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Regexes;
 
@@ -9,7 +9,7 @@ $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'category
 
 $page->title = 'Category Regex List';
 
-$group = isset($_REQUEST['group']) && !empty($_REQUEST['group']) ? $_REQUEST['group'] : '';
+$group = isset($_REQUEST['group']) && ! empty($_REQUEST['group']) ? $_REQUEST['group'] : '';
 $offset = ($_REQUEST['offset'] ?? 0);
 $regex = $regexes->getRegex($group, ITEMS_PER_PAGE, $offset);
 
@@ -20,7 +20,7 @@ $page->smarty->assign([
 		'pageroffset'       => $offset,
 		'pageritemsperpage' => ITEMS_PER_PAGE,
 		'regex'             => $regex,
-		'pagerquerybase'    => WWW_TOP . '/category_regexes-list.php?' . $group . 'offset=',
+		'pagerquerybase'    => WWW_TOP.'/category_regexes-list.php?'.$group.'offset=',
 	]
 );
 

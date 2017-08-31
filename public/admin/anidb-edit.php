@@ -1,12 +1,12 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\AniDB;
 
-$page  = new AdminPage();
+$page = new AdminPage();
 $AniDB = new AniDB(['Settings' => $page->settings]);
-$id    = 0;
+$id = 0;
 
 // Set the current action.
 $action = $_REQUEST['action'] ?? 'view';
@@ -29,24 +29,24 @@ switch ($action) {
 				$_POST['airdates'],
 				$_POST['episodetitles']);
 
-		if (!empty($_POST['from'])) {
-			header('Location:' . $_POST['from']);
-			exit;
+		if (! empty($_POST['from'])) {
+		    header('Location:'.$_POST['from']);
+		    exit;
 		}
 
-		header('Location:' . WWW_TOP . '/anidb-list.php');
+		header('Location:'.WWW_TOP.'/anidb-list.php');
 		break;
 
 	case 'view':
 	default:
 		if (isset($_GET['id'])) {
-			$page->title   = 'AniDB Edit';
-			$AniDBAPIArray = $AniDB->getAnimeInfo($_GET['id']);
-			$page->smarty->assign('anime', $AniDBAPIArray);
+		    $page->title = 'AniDB Edit';
+		    $AniDBAPIArray = $AniDB->getAnimeInfo($_GET['id']);
+		    $page->smarty->assign('anime', $AniDBAPIArray);
 		}
 		break;
 }
 
-$page->title   = 'Edit AniDB Data';
+$page->title = 'Edit AniDB Data';
 $page->content = $page->smarty->fetch('anidb-edit.tpl');
 $page->render();

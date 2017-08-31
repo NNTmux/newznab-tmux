@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\ReleaseComments;
 
@@ -17,12 +17,12 @@ $page->smarty->assign([
 		'pageroffset' => $offset,
 		'pageritemsperpage' => ITEMS_PER_PAGE,
 		'pagerquerybase' => WWW_TOP.'/comments-list.php?offset=',
-		'pagerquerysuffix' => '']);
+		'pagerquerysuffix' => '', ]);
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
 $commentslist = $releases->getCommentsRange($offset, ITEMS_PER_PAGE);
-$page->smarty->assign('commentslist',$commentslist);
+$page->smarty->assign('commentslist', $commentslist);
 
 $page->content = $page->smarty->fetch('comments-list.tpl');
 $page->render();

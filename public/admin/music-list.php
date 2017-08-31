@@ -1,6 +1,6 @@
 <?php
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'smarty.php';
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Music;
 use nntmux\utility\Utility;
@@ -20,7 +20,7 @@ $page->smarty->assign([
 	'pagerquerysuffix'  => '#results',
 	'pageroffset' => $offset,
 	'pageritemsperpage' => ITEMS_PER_PAGE,
-	'pagerquerybase' => WWW_TOP. '/music-list.php?offset=',
+	'pagerquerybase' => WWW_TOP.'/music-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
@@ -28,8 +28,7 @@ $page->smarty->assign('pager', $pager);
 
 $musicList = Utility::getRange('musicinfo', $offset, ITEMS_PER_PAGE);
 
-$page->smarty->assign('musiclist',$musicList);
+$page->smarty->assign('musiclist', $musicList);
 
 $page->content = $page->smarty->fetch('music-list.tpl');
 $page->render();
-

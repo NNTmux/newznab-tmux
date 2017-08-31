@@ -1,4 +1,5 @@
 <?php
+
 namespace nntmux;
 
 use nntmux\db\DB;
@@ -8,81 +9,81 @@ use nntmux\db\DB;
  */
 class ReleaseFiles
 {
-	/**
-	 * @var \nntmux\db\Settings
-	 */
-	protected $pdo;
+    /**
+     * @var \nntmux\db\Settings
+     */
+    protected $pdo;
 
-	/**
-	 * @var SphinxSearch
-	 */
-	public $sphinxSearch;
+    /**
+     * @var SphinxSearch
+     */
+    public $sphinxSearch;
 
-	/**
-	 * @param \nntmux\db\DB $settings
-	 */
-	public function __construct($settings = null)
-	{
-		$this->pdo = ($settings instanceof DB ? $settings : new DB());
-		$this->sphinxSearch = new SphinxSearch();
-	}
+    /**
+     * @param \nntmux\db\DB $settings
+     */
+    public function __construct($settings = null)
+    {
+        $this->pdo = ($settings instanceof DB ? $settings : new DB());
+        $this->sphinxSearch = new SphinxSearch();
+    }
 
+    /**
+     * Get releasefiles row by id.
+     *
+     * @param $id
+     *
+     * @return array
+     */
+    public function get($id)
+    {
+        return $this->pdo->query(sprintf('SELECT * FROM release_files WHERE releases_id = %d ORDER BY release_files.name ', $id));
+    }
 
-	/**
-	 * Get releasefiles row by id.
-	 *
-	 * @param $id
-	 *
-	 * @return array
-	 */
-	public function get($id)
-	{
-		return $this->pdo->query(sprintf("SELECT * FROM release_files WHERE releases_id = %d ORDER BY release_files.name ", $id));
-	}
+    /**
+     * Get releasefiles row by release.GUID.
+     *
+     * @param $guid
+     *
+     * @return array
+     */
+    public function getByGuid($guid)
+    {
+        return $this->pdo->query(sprintf('SELECT release_files.* FROM release_files INNER JOIN releases r ON r.id = release_files.releases_id WHERE r.guid = %s ORDER BY release_files.name ', $this->pdo->escapeString($guid)));
+    }
 
-	/**
-	 * Get releasefiles row by release.GUID.
-	 *
-	 * @param $guid
-	 *
-	 * @return array
-	 */
-	public function getByGuid($guid)
-	{
-		return $this->pdo->query(sprintf("SELECT release_files.* FROM release_files INNER JOIN releases r ON r.id = release_files.releases_id WHERE r.guid = %s ORDER BY release_files.name ", $this->pdo->escapeString($guid)));
-	}
+    /**
+     * Delete a releasefiles row.
+     *
+     * @param $id
+     *
+     * @return bool|\PDOStatement
+     */
+    public function delete($id)
+    {
+        $res = $this->pdo->queryExec(sprintf('DELETE FROM release_files WHERE releases_id = %d', $id));
+        $this->sphinxSearch->updateRelease($id, $this->pdo);
 
-	/**
-	 * Delete a releasefiles row.
-	 *
-	 * @param $id
-	 *
-	 * @return bool|\PDOStatement
-	 */
-	public function delete($id)
-	{
-		$res = $this->pdo->queryExec(sprintf("DELETE FROM release_files WHERE releases_id = %d", $id));
-		$this->sphinxSearch->updateRelease($id, $this->pdo);
-		return $res;
-	}
+        return $res;
+    }
 
-	/**
-	 * Add new files for a release ID.
-	 *
-	 * @param int    $id          The ID of the release.
-	 * @param string $name        Name of the file.
-	 * @param string $hash        hash_16k of par2
-	 * @param int $size Size of the file.
-	 * @param int    $createdTime Unix time the file was created.
-	 * @param int    $hasPassword Does it have a password (see Releases class constants)?
-	 *
-	 * @return mixed
-	 */
-	public function add($id, $name, $hash = '', $size, $createdTime, $hasPassword)
-	{
-		$insert = 0;
+    /**
+     * Add new files for a release ID.
+     *
+     * @param int    $id          The ID of the release.
+     * @param string $name        Name of the file.
+     * @param string $hash        hash_16k of par2
+     * @param int $size Size of the file.
+     * @param int    $createdTime Unix time the file was created.
+     * @param int    $hasPassword Does it have a password (see Releases class constants)?
+     *
+     * @return mixed
+     */
+    public function add($id, $name, $hash = '', $size, $createdTime, $hasPassword)
+    {
+        $insert = 0;
 
-		$duplicateCheck = $this->pdo->queryOneRow(
+        $duplicateCheck = $this->pdo->queryOneRow(
 				sprintf('
 				SELECT releases_id
 				FROM release_files
@@ -92,8 +93,8 @@ class ReleaseFiles
 				)
 		);
 
-		if ($duplicateCheck === false) {
-			$insert = $this->pdo->queryInsert(
+        if ($duplicateCheck === false) {
+            $insert = $this->pdo->queryInsert(
 					sprintf('
 						INSERT INTO release_files
 						(releases_id, name, size, createddate, passworded)
@@ -107,8 +108,8 @@ class ReleaseFiles
 					)
 			);
 
-			if (strlen($hash) === 32) {
-				$this->pdo->queryExec(
+            if (strlen($hash) === 32) {
+                $this->pdo->queryExec(
 					sprintf('
 						INSERT INTO par_hashes
 						(releases_id, hash)
@@ -117,9 +118,10 @@ class ReleaseFiles
 						$this->pdo->escapeString($hash)
 					)
 				);
-			}
-			$this->sphinxSearch->updateRelease($id, $this->pdo);
-		}
-		return $insert;
-	}
+            }
+            $this->sphinxSearch->updateRelease($id, $this->pdo);
+        }
+
+        return $insert;
+    }
 }

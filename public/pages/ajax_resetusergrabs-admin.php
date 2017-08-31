@@ -8,8 +8,7 @@ $u = new Users();
 $action = $_REQUEST['action'] ?? '';
 $id = $_REQUEST['id'] ?? '';
 
-switch($action)
-{
+switch ($action) {
 	case 'grabs':
 		$u->delDownloadRequests($id);
 	break;
@@ -20,4 +19,3 @@ switch($action)
 		$page->show404();
 	break;
 }
-

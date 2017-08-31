@@ -6,7 +6,7 @@
  * reason, it will allow the password hash on the account to be changed.
  * Hopefully that will allow admin access to fix any further problems.
  */
-require_once dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
 use nntmux\db\DB;
 use nntmux\Users;
@@ -14,11 +14,11 @@ use nntmux\Users;
 $pdo = new DB();
 
 if ($argc < 3) {
-	exit(
+    exit(
 		$pdo->log->error(
-			'Not enough parameters!' . PHP_EOL .
-			'Argument 1: New password.' . PHP_EOL .
-			'Argument 2: ID or username of the user.' . PHP_EOL
+			'Not enough parameters!'.PHP_EOL.
+			'Argument 1: New password.'.PHP_EOL.
+			'Argument 2: ID or username of the user.'.PHP_EOL
 		)
 	);
 }
@@ -26,36 +26,36 @@ if ($argc < 3) {
 $password = $argv[1];
 $identifier = $argv[2];
 if (is_numeric($password)) {
-	exit($pdo->log->error('Password cannot be numbers only!'));
+    exit($pdo->log->error('Password cannot be numbers only!'));
 }
 
 $field = (is_numeric($identifier) ? 'id' : 'username');
 $user = $pdo->queryOneRow(
 	sprintf(
-		"SELECT id, username FROM users WHERE %s = %s",
+		'SELECT id, username FROM users WHERE %s = %s',
 		$field,
 		(is_numeric($identifier) ? $identifier : $pdo->escapeString($identifier))
 	)
 );
 
 if ($user !== false) {
-	$users = new Users(['Settings' => $pdo]);
-	$hash = $users->hashPassword($password);
-	$result = false;
-	if ($hash !== false) {
-		$hash = $pdo->queryExec(
+    $users = new Users(['Settings' => $pdo]);
+    $hash = $users->hashPassword($password);
+    $result = false;
+    if ($hash !== false) {
+        $hash = $pdo->queryExec(
 			sprintf(
 				'UPDATE users SET password = %s WHERE id = %d',
 				$hash, $user['id']
 			)
 		);
-	}
+    }
 
-	if ($result === false || $hash === false) {
-		$pdo->log->error('An error occured during update attempt.' . PHP_EOL);
-	} else {
-		$pdo->log->headerOver("Updated {$user['username']}'s password hash to: ") . $pdo->log->primary("$hash");
-	}
+    if ($result === false || $hash === false) {
+        $pdo->log->error('An error occured during update attempt.'.PHP_EOL);
+    } else {
+        $pdo->log->headerOver("Updated {$user['username']}'s password hash to: ").$pdo->log->primary("$hash");
+    }
 } else {
-	$pdo->log->error("Unable to find {$field} '{$identifier}' in the users. Cannot change password.");
+    $pdo->log->error("Unable to find {$field} '{$identifier}' in the users. Cannot change password.");
 }
