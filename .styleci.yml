@@ -1,0 +1,6 @@
+preset: laravel
+
+risky: false
+
+disabled:
+    - no_tab_indentation
