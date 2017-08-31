@@ -1,4 +1,5 @@
 2017-08-31 DariusIII
+	* Chg: Fix path in smarty.php
 	* Chg: Update yenc.php
 	* Chg: Add styleci badge to README.md
 	* Chg: Add .styleci.yml config
