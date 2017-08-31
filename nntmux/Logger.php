@@ -28,10 +28,10 @@ class Logger
 	const LOG_INFO = 5; // Info message, not important.
 	const LOG_SQL = 6; // Full SQL query when it fails.
 
-	/**
-	 * Name of class we are currently logging.
-	 * @var string
-	 */
+    /**
+     * Name of class we are currently logging.
+     * @var string
+     */
     private $class;
 
     /**

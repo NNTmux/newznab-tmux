@@ -17,9 +17,9 @@ class MiscSorter
     const PROC_SORTER_NONE = 0; //Release has not been run through MiscSorter before
 	const PROC_SORTER_DONE = 1; //Release has been processed by MiscSorter
 
-	/**
-	 * @var int
-	 */
+    /**
+     * @var int
+     */
     private $qty;
 
     /**

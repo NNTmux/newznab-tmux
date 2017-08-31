@@ -17,9 +17,9 @@ class Releases
 	const BAD_FILE = 2; // Possibly broken RAR/ZIP.
 	const PASSWD_RAR = 10; // Definitely passworded.
 
-	/**
-	 * @var DB
-	 */
+    /**
+     * @var DB
+     */
     public $pdo;
 
     /**

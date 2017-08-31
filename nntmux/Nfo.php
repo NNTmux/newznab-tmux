@@ -62,13 +62,13 @@ class Nfo
 	const NFO_NONFO = 0; // Release has no NFO.
 	const NFO_FOUND = 1; // Release has an NFO.
 
-	/**
-	 * Default constructor.
-	 *
-	 * @param array $options Class instance / echo to cli.
-	 *
-	 * @throws \Exception
-	 */
+    /**
+     * Default constructor.
+     *
+     * @param array $options Class instance / echo to cli.
+     *
+     * @throws \Exception
+     */
     public function __construct(array $options = [])
     {
         $defaults = [

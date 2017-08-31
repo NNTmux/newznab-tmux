@@ -20,9 +20,9 @@ class PreDb
 	const PRE_RENUKED = 4; // Pre was re nuked.
 	const PRE_OLDNUKE = 5; // Pre is nuked for being old.
 
-	/**
-	 * @var bool stdClass
-	 */
+    /**
+     * @var bool stdClass
+     */
     protected $site;
 
     /**

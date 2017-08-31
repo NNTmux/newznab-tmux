@@ -29,10 +29,10 @@ class SABnzbd
     const PRIORITY_NORMAL = 0;
     const PRIORITY_HIGH = 1; // Sab is completely disabled - no user can use it.
 	const PRIORITY_FORCE = 2; // Sab is enabled, 1 remote SAB server for the whole site.
-	/**
-	 * URL to the SAB server.
-	 * @var string|array|bool
-	 */
+    /**
+     * URL to the SAB server.
+     * @var string|array|bool
+     */
     public $url = '';
 
     /**

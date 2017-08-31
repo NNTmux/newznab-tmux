@@ -8,12 +8,12 @@ use GuzzleHttp\Exception\RequestException;
 
 if (! function_exists('getRawHtml')) {
 
-	/**
-	 * @param      $url
-	 * @param bool|string $cookie
-	 *
-	 * @return bool|string
-	 */
+    /**
+     * @param      $url
+     * @param bool|string $cookie
+     *
+     * @return bool|string
+     */
     function getRawHtml($url, $cookie = false)
     {
         $response = false;
