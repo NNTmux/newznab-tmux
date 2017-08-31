@@ -4,3 +4,13 @@ risky: false
 
 disabled:
     - no_tab_indentation
+
+finder:
+    exclude:
+      - "tests"
+      - "storage"
+      - "vendor"
+      - "docs"
+      - "public/themes"
+      - "libs"
+      - "resources"
