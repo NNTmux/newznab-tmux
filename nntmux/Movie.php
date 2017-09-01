@@ -156,17 +156,17 @@ class Movie
      */
     public $catWhere;
 
-	/**
-	 * @var ApiToken
-	 */
-	public $tmdbtoken;
+    /**
+     * @var ApiToken
+     */
+    public $tmdbtoken;
 
-	/**
-	 * @var bool
-	 */
-	public $_debug;
+    /**
+     * @var bool
+     */
+    public $_debug;
 
-	/**
+    /**
      * @param array $options Class instances / Echo to CLI.
      * @throws \Exception
      */
@@ -934,12 +934,12 @@ class Movie
         return $ret;
     }
 
-	/**
-	 * @param $imdbId
-	 *
-	 * @return array|bool
-	 * @throws \Exception
-	 */
+    /**
+     * @param $imdbId
+     *
+     * @return array|bool
+     * @throws \Exception
+     */
     protected function fetchIMDBProperties($imdbId)
     {
         $imdb_regex = [
