@@ -156,7 +156,17 @@ class Movie
      */
     public $catWhere;
 
-    /**
+	/**
+	 * @var ApiToken
+	 */
+	public $tmdbtoken;
+
+	/**
+	 * @var bool
+	 */
+	public $_debug;
+
+	/**
      * @param array $options Class instances / Echo to CLI.
      * @throws \Exception
      */
@@ -790,7 +800,7 @@ class Movie
 			);
         }
 
-        return $movieID === 0 ? false : true;
+        return $movieID !== 0;
     }
 
     /**
@@ -856,10 +866,6 @@ class Movie
         } catch (TmdbApiException $e) {
             return false;
         }
-        /*$status = $tmdbLookup['status_code'];
-        if (!$status || (isset($status) && $status !== 1)) {
-        	return false;
-        }*/
 
         $ret = [];
         $ret['title'] = $tmdbLookup['original_title'];
@@ -928,11 +934,12 @@ class Movie
         return $ret;
     }
 
-    /**
-     * @param $imdbId
-     *
-     * @return array|bool
-     */
+	/**
+	 * @param $imdbId
+	 *
+	 * @return array|bool
+	 * @throws \Exception
+	 */
     protected function fetchIMDBProperties($imdbId)
     {
         $imdb_regex = [
@@ -955,7 +962,7 @@ class Movie
 				$this->client->get(
 					'http://'.($this->imdburl === false ? 'www' : 'akas').'.imdb.com/title/tt'.$imdbId.'/',
 					['headers' => [
-						'Accept-Language' => ((Settings::settingValue('indexer.categorise.imdblanguage') != '') ? Settings::settingValue('indexer.categorise.imdblanguage') : 'en'),
+						'Accept-Language' => (Settings::settingValue('indexer.categorise.imdblanguage') !== '') ? Settings::settingValue('indexer.categorise.imdblanguage') : 'en',
 						'useragent'       => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) '.
 							'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar',
 					],
@@ -1363,13 +1370,6 @@ class Movie
         if ($this->yahooLimit < 41 && $this->yahooSearch() === true) {
             return true;
         }
-
-        // Not using this right now because bing's advanced search is not good enough.
-        /*if ($this->bingLimit < 41) {
-        	if ($this->bingSearch() === true) {
-        		return true;
-        	}
-        }*/
 
         return false;
     }
