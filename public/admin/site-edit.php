@@ -14,7 +14,7 @@ $sites = new Sites();
 $id = 0;
 
 // set the current action
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = $_REQUEST['action'] ?? 'view';
 
 switch ($action) {
 	case 'submit':
@@ -27,26 +27,26 @@ switch ($action) {
 		$error = '';
 		$ret = $page->settings->settingsUpdate($_POST);
 		if (is_int($ret)) {
-		    if ($ret == Settings::ERR_BADUNRARPATH) {
+		    if ($ret === Settings::ERR_BADUNRARPATH) {
 		        $error = 'The unrar path does not point to a valid binary';
-		    } elseif ($ret == Settings::ERR_BADFFMPEGPATH) {
+		    } elseif ($ret === Settings::ERR_BADFFMPEGPATH) {
 		        $error = 'The ffmpeg path does not point to a valid binary';
-		    } elseif ($ret == Settings::ERR_BADMEDIAINFOPATH) {
+		    } elseif ($ret === Settings::ERR_BADMEDIAINFOPATH) {
 		        $error = 'The mediainfo path does not point to a valid binary';
-		    } elseif ($ret == Settings::ERR_BADNZBPATH) {
+		    } elseif ($ret === Settings::ERR_BADNZBPATH) {
 		        $error = 'The nzb path does not point to a valid directory';
-		    } elseif ($ret == Settings::ERR_DEEPNOUNRAR) {
+		    } elseif ($ret === Settings::ERR_DEEPNOUNRAR) {
 		        $error = 'Deep password check requires a valid path to unrar binary';
-		    } elseif ($ret == Settings::ERR_BADTMPUNRARPATH) {
+		    } elseif ($ret === Settings::ERR_BADTMPUNRARPATH) {
 		        $error = 'The temp unrar path is not a valid directory';
-		    } elseif ($ret == Sites::ERR_BADLAMEPATH) {
+		    } elseif ($ret === Sites::ERR_BADLAMEPATH) {
 		        $error = 'The lame path is not a valid directory';
-		    } elseif ($ret == Sites::ERR_SABCOMPLETEPATH) {
+		    } elseif ($ret === Sites::ERR_SABCOMPLETEPATH) {
 		        $error = 'The sab complete path is not a valid directory';
 		    }
 		}
 
-		if ($error == '') {
+		if ($error === '') {
 		    $site = $ret;
 		    $returnid = $site['id'];
 		    header('Location:'.WWW_TOP.'/site-edit.php?id='.$returnid);
@@ -141,7 +141,7 @@ $page->smarty->assign('lookup_reqids_names', ['Disabled', 'Lookup Request IDs', 
 $page->smarty->assign('coversPath', NN_COVERS);
 
 // return a list of audiobooks, mags, ebooks, technical and foreign books
-$result = $page->settings->query("SELECT id, title FROM categories WHERE id IN ({$category->getCategoryValue('MUSIC_AUDIOBOOK')}, {$category->getCategoryValue('BOOKS_MAGAZINES')}, {$category->getCategoryValue('BOOKS_TECHNICAL')}, {$category->getCategoryValue('BOOKS_FOREIGN')})");
+$result = $page->settings->query("SELECT id, title FROM categories WHERE id IN ({Category::getCategoryValue('MUSIC_AUDIOBOOK')}, {$category->getCategoryValue('BOOKS_MAGAZINES')}, {$category->getCategoryValue('BOOKS_TECHNICAL')}, {$category->getCategoryValue('BOOKS_FOREIGN')})");
 
 // setup the display lists for these categories, this could have been static, but then if names changed they would be wrong
 $book_reqids_ids = [];
