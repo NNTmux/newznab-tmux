@@ -1084,9 +1084,9 @@ class DB extends \PDO
             $sql = $sqlKeys = [];
             foreach ($form as $settingK => $settingV) {
                 $sql[] = sprintf('WHEN %s THEN %s',
-					$this->escapeString($settingK),
-					$this->escapeString($settingV));
-                $sqlKeys[] = $this->escapeString($settingK);
+					$this->escapeString(trim($settingK)),
+					$this->escapeString(trim($settingV)));
+                $sqlKeys[] = $this->escapeString(trim($settingK));
             }
 
             $this->queryExec(
