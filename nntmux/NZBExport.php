@@ -23,7 +23,7 @@ class NZBExport
     protected $retVal;
 
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     protected $pdo;
 

@@ -31,7 +31,7 @@ class ProcessAdditional
     const maxCompressedFilesToCheck = 20;
 
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     public $pdo;
 

@@ -13,7 +13,7 @@ use nntmux\utility\Utility;
 class NZBImport
 {
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     protected $pdo;
 

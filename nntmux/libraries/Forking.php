@@ -1139,7 +1139,7 @@ class Forking extends \fork_daemon
     private $safeBackfillGroup = '';
 
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     public $pdo;
 

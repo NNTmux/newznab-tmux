@@ -17,7 +17,7 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 class Music
 {
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     public $pdo;
 

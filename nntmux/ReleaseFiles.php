@@ -10,7 +10,7 @@ use nntmux\db\DB;
 class ReleaseFiles
 {
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     protected $pdo;
 

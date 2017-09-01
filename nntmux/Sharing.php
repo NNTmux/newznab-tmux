@@ -44,7 +44,7 @@ class Sharing
      */
 
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     protected $pdo;
 

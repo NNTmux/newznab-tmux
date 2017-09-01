@@ -178,7 +178,7 @@ abstract class RequestID
     protected $category;
 
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     protected $pdo;
 

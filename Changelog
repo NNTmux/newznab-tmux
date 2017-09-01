@@ -1,4 +1,5 @@
 2017-09-01 DariusIII
+	* Chg: Replace leftover references to nntmux\db\Settings with proper nntmux\db\DB
 	* Chg: Add predis/predis
 	* Chg: Update value fetching and autoloading
 	* Chg: Update database connection settings

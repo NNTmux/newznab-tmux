@@ -27,7 +27,7 @@ use GuzzleHttp\Client;
 class PopulateTitles
 {
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     public $pdo;
 

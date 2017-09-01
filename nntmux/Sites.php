@@ -23,7 +23,7 @@ class Sites
     const ERR_SABCOMPLETEPATH = -8;
 
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     protected $_db;
 

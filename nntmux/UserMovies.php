@@ -10,7 +10,7 @@ use nntmux\db\DB;
 class UserMovies
 {
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     public $pdo;
 

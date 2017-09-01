@@ -12,7 +12,7 @@ use nntmux\db\DB;
 class UserSeries
 {
     /**
-     * @var \nntmux\db\Settings
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
