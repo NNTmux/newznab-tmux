@@ -215,8 +215,8 @@ class Settings extends Model
     {
         $setting = self::settingToArray($setting);
         $result = self::query()->where([
-												'section' => $setting['section'],
-												'subsection' => $setting['subsection'],
+												'section' => $setting['section'] ?? '',
+												'subsection' => $setting['subsection'] ?? '',
 												'name' => $setting['name'],
 											])->value('value');
 

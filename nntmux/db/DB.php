@@ -117,7 +117,7 @@ class DB extends \PDO
 			'dbname'		=> env('DB_NAME', 'nntmux'),
 			'dbpass'		=> env('DB_PASSWORD', 'nntmux'),
 			'dbport'		=> env('DB_PORT', '3306'),
-			'dbsock'		=> env('DB_SOCKET'),
+			'dbsock'		=> env('DB_SOCKET', ''),
 			'dbtype'		=> env('DB_SYSTEM', 'mysql'),
 			'dbuser'		=> env('DB_USER', 'nntmux'),
 			'log'			=> new ColorCLI(),
@@ -172,8 +172,6 @@ class DB extends \PDO
         if (defined('NN_SQL_DELETE_QUICK') && NN_SQL_DELETE_QUICK) {
             $this->DELETE_QUICK = ' QUICK ';
         }
-
-        return $this->pdo;
     }
 
     public function __destruct()
