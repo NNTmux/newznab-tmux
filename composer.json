@@ -134,6 +134,7 @@
     "monolog/monolog": "^1.22",
     "php-tmdb/api": "~2.1",
     "phpmailer/phpmailer": "~5.2",
+    "predis/predis": "^1.1",
     "ramsey/uuid": "^3.7",
     "roave/security-advisories": "dev-master",
     "smarty/smarty": "~3.1",
