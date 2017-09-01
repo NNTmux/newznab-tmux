@@ -37,7 +37,7 @@ if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
 			ignored. Please update it to use the extension.', E_USER_WARNING
 			);
 
-		case Settings::settingValue('apps..yydecoderpath') !== null:
+		case Settings::settingValue('apps..yydecoderpath', true) !== null:
 			$adapter = 'Ydecode';
 			break;
 		default:

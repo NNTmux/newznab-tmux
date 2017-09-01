@@ -1,11 +1,11 @@
 <?php
 
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'nntmux'.DIRECTORY_SEPARATOR.'constants.php';
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'nntmux'.DIRECTORY_SEPARATOR.'bootstrap.php';
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'nntmux.php';
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
-require_once __DIR__.DIRECTORY_SEPARATOR.'yenc.php';
 require __DIR__.DIRECTORY_SEPARATOR.'app.php';
+require_once __DIR__.DIRECTORY_SEPARATOR.'yenc.php';
 
 use Dotenv\Dotenv;
 use Illuminate\Contracts\Console\Kernel;
