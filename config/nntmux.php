@@ -12,7 +12,7 @@ $capsule = new Capsule;
 
 $capsule->addConnection([
 	'driver' => env('DB_SYSTEM'),
-	'host' => env('DB_HOST', '127.0.0.1'),
+	'host' => env('DB_HOST', 'localhost'),
 	'port' => env('DB_PORT', '3306'),
 	'database' => env('DB_NAME', 'nntmux'),
 	'username' => env('DB_USER', 'root'),

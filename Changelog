@@ -1,4 +1,5 @@
 2017-09-01 DariusIII
+	* Chg: Update database connection settings
 	* Chg: Update Movie class
 	* Chg: Remove now unused nntmux/db/Settings class
 	* Chg: Rename Models/Settings value function into settingValue to prevent collision with query builder value response
