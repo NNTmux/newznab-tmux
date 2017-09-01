@@ -19,7 +19,7 @@
  * @copyright 2015 NN
  */
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'nntmux'.DIRECTORY_SEPARATOR.'constants.php';
-require_once NN_ROOT.'bootstrap'.DS.'autoload.php';
+require_once NN_ROOT.DS.'bootstrap'.DS.'autoload.php';
 
 use nntmux\config\Configure;
 
