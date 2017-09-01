@@ -450,7 +450,7 @@ class Forking extends \fork_daemon
 			ORDER BY a.last_record DESC'
 		);
 
-        if (!empty($groups)) {
+        if (! empty($groups)) {
             $i = 1;
             $queue = [];
             foreach ($groups as $group) {
