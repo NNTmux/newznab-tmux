@@ -212,7 +212,7 @@ class Settings extends Model
      * @throws \Exception
      */
     public static function settingValue($setting, $returnAlways = false): ?string
-	{
+    {
         $setting = self::settingToArray($setting);
         $result = self::query()->where([
 												'section' => $setting['section'],
