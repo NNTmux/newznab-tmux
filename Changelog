@@ -1,4 +1,5 @@
 2017-09-01 DariusIII
+	* Chg: Update laravel/framework to version 5.5.1
 	* Chg: Trim leading/trailing whitespace in DB->settingsUpdate function
 	* Chg: Use array in where clause of query in value function of Settings model
 2017-08-31 DariusIII
