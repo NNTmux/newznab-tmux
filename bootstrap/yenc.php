@@ -32,12 +32,12 @@ if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
 			) {
 			    $adapter = 'NzedbYenc';
 			    break;
-			} else {
-			    trigger_error('Your version of the php-yenc extension is out of date and will be
-				ignored. Please update it to use the extension.', E_USER_WARNING
-				);
 			}
-		case ! empty(Settings::settingValue('apps..yydecoderpath')):
+		    trigger_error('Your version of the php-yenc extension is out of date and will be
+			ignored. Please update it to use the extension.', E_USER_WARNING
+			);
+
+		case Settings::settingValue('apps..yydecoderpath') !== null:
 			$adapter = 'Ydecode';
 			break;
 		default:
