@@ -1,4 +1,5 @@
 2017-09-01 DariusIII
+	* Chg: Update Forking class check for non-empty array $groups
 	* Chg: Change check from !empty to !== null in bootstrap/yenc.php
 	* Chg: Replace leftover references to nntmux\db\Settings with proper nntmux\db\DB
 	* Chg: Add predis/predis
