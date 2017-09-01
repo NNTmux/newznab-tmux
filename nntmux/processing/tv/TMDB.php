@@ -55,7 +55,7 @@ class TMDB extends TV
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->token = new ApiToken(Settings::value('APIs..tmdbkey'));
+        $this->token = new ApiToken(Settings::settingValue('APIs..tmdbkey'));
         $this->client = new Client($this->token, [
 			'cache' => [
 				'enabled' => false,

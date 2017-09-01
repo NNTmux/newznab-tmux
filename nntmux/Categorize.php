@@ -60,8 +60,8 @@ class Categorize extends Category
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->categorizeForeign = (int) Settings::value('indexer.categorise.categorizeforeign');
-        $this->catWebDL = (int) Settings::value('indexer.categorise.catwebdl');
+        $this->categorizeForeign = (int) Settings::settingValue('indexer.categorise.categorizeforeign');
+        $this->catWebDL = (int) Settings::settingValue('indexer.categorise.catwebdl');
         $this->regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'category_regexes']);
     }
 

@@ -48,7 +48,7 @@ $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/forum?offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
-$page->smarty->assign('privateprofiles', (int) Settings::value('..privateprofiles') === 1);
+$page->smarty->assign('privateprofiles', (int) Settings::settingValue('..privateprofiles') === 1);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);

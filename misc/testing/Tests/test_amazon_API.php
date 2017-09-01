@@ -7,9 +7,9 @@ use App\Models\Settings;
 use ApaiIO\Operations\Search;
 use ApaiIO\Configuration\GenericConfiguration;
 
-$pubkey = Settings::value('APIs..amazonpubkey');
-$privkey = Settings::value('APIs..amazonprivkey');
-$asstag = Settings::value('APIs..amazonassociatetag');
+$pubkey = Settings::settingValue('APIs..amazonpubkey');
+$privkey = Settings::settingValue('APIs..amazonprivkey');
+$asstag = Settings::settingValue('APIs..amazonassociatetag');
 
 $conf = new GenericConfiguration();
 $client = new \GuzzleHttp\Client();

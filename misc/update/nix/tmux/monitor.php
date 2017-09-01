@@ -364,7 +364,7 @@ while ($runVar['counts']['iterations'] > 0) {
         $tRun->runPane('notrunning', $runVar);
     }
 
-    $exit = Settings::value('tmux.running.exit');
+    $exit = Settings::settingValue('tmux.running.exit');
     if ($exit == 0) {
         $runVar['counts']['iterations']++;
         sleep(10);

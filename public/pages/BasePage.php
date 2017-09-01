@@ -148,7 +148,7 @@ class BasePage
             $this->smarty->assign('loggedin', 'false');
         }
         if ($this->theme === 'None') {
-            $this->theme = Settings::value('site.main.style');
+            $this->theme = Settings::settingValue('site.main.style');
         }
 
         $this->smarty->assign('theme', $this->theme);
@@ -331,13 +331,13 @@ class BasePage
         $this->userdata['rolecategoryexclusions'] = $this->users->getRoleCategoryExclusion($this->userdata['role']);
 
         // Change the theme to user's selected theme if they selected one, else use the admin one.
-        if ((int) Settings::value('site.main.userselstyle') === 1) {
+        if ((int) Settings::settingValue('site.main.userselstyle') === 1) {
             $this->theme = $this->userdata['style'] ?? 'None';
             if ($this->theme === 'None') {
-                $this->theme = Settings::value('site.main.style');
+                $this->theme = Settings::settingValue('site.main.style');
             }
         } else {
-            $this->theme = Settings::value('site.main.style');
+            $this->theme = Settings::settingValue('site.main.style');
         }
 
         // Update last login every 15 mins.
@@ -403,6 +403,6 @@ class BasePage
      */
     public function getSettingValue($setting): ?string
     {
-        return Settings::value($setting);
+        return Settings::settingValue($setting);
     }
 }

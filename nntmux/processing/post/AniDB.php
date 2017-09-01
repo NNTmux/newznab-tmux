@@ -55,7 +55,7 @@ class AniDB
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
-        $qty = Settings::value('..maxanidbprocessed');
+        $qty = Settings::settingValue('..maxanidbprocessed');
         $this->aniqty = $qty ?? 100;
 
         $this->status = 'NULL';

@@ -255,7 +255,7 @@ class Utility
         if (! ($pdo instanceof DB)) {
             $pdo = new DB();
         }
-        $patch = Settings::value('..sqlpatch');
+        $patch = Settings::settingValue('..sqlpatch');
         $ver = $versions->versions->sql->file;
 
         // Check database patch version
@@ -769,8 +769,8 @@ class Utility
                 }
             }
 
-            $fromEmail = (PHPMAILER_FROM_EMAIL === '') ? Settings::value('site.main.email') : PHPMAILER_FROM_EMAIL;
-            $fromName = (PHPMAILER_FROM_NAME === '') ? Settings::value('site.main.title') : PHPMAILER_FROM_NAME;
+            $fromEmail = (PHPMAILER_FROM_EMAIL === '') ? Settings::settingValue('site.main.email') : PHPMAILER_FROM_EMAIL;
+            $fromName = (PHPMAILER_FROM_NAME === '') ? Settings::settingValue('site.main.title') : PHPMAILER_FROM_NAME;
             $replyTo = (PHPMAILER_REPLYTO === '') ? $from : PHPMAILER_REPLYTO;
 
             (PHPMAILER_BCC !== '') ? $mail->addBCC(PHPMAILER_BCC) : null;
@@ -815,7 +815,7 @@ class Utility
      */
     public static function fileInfo($path)
     {
-        $magicPath = Settings::value('apps.indexer.magic_file_path');
+        $magicPath = Settings::settingValue('apps.indexer.magic_file_path');
         if (self::hasCommand('file') && (! self::isWin() || ! empty($magicPath))) {
             $magicSwitch = empty($magicPath) ? '' : " -m $magicPath";
             $output = self::runCmd('file'.$magicSwitch.' -b "'.$path.'"');

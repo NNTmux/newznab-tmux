@@ -21,7 +21,7 @@ $compl = 0;
 echo 'Updating file size for '.count($items).' release(s)'.PHP_EOL;
 
 while ($item = array_pop($items)) {
-    $nzbpath = $nzb->getNZBPath($item['guid'], Settings::value('..nzbpath'));
+    $nzbpath = $nzb->getNZBPath($item['guid'], Settings::settingValue('..nzbpath'));
 
     ob_start();
     @readgzfile($nzbpath);

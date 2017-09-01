@@ -8,7 +8,7 @@ if ($page->users->isLoggedIn()) {
     $uid = $page->users->currentUserId();
     $rssToken = $page->userdata['rsstoken'];
 } else {
-    if ((int) Settings::value('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
+    if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
         if (! isset($_GET['rsstoken'])) {
             header('X-DNZB-RCode: 400');
             header('X-DNZB-RText: Bad request, please supply all parameters!');

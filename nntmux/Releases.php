@@ -71,8 +71,8 @@ class Releases
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
-        $this->updateGrabs = ((int) Settings::value('..grabstatus') !== 0);
-        $this->passwordStatus = ((int) Settings::value('..checkpasswordedrar') === 1 ? -1 : 0);
+        $this->updateGrabs = ((int) Settings::settingValue('..grabstatus') !== 0);
+        $this->passwordStatus = ((int) Settings::settingValue('..checkpasswordedrar') === 1 ? -1 : 0);
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch($this->pdo);
         $this->category = new Category(['Settings' => $this->pdo]);
@@ -277,7 +277,7 @@ class Releases
      */
     public static function showPasswords(): ?string
     {
-        $setting = Settings::value('..showpasswordedrelease', true);
+        $setting = Settings::settingValue('..showpasswordedrelease', true);
         $setting = (isset($setting) && is_numeric($setting)) ? $setting : 10;
 
         switch ($setting) {

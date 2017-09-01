@@ -77,7 +77,7 @@ switch ($options[1]) {
 			}
 		}
 		$binaries = new Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => $groups]);
-		$return = $binaries->scan($groupMySQL, $options[4], $options[5], (Settings::value('..safepartrepair') == 1 ? 'update' : 'backfill'));
+		$return = $binaries->scan($groupMySQL, $options[4], $options[5], (Settings::settingValue('..safepartrepair') == 1 ? 'update' : 'backfill'));
 		if (empty($return)) {
 			exit();
 		}
@@ -286,7 +286,7 @@ switch ($options[1]) {
  */
 function processReleases($releases, $groupID)
 {
-	$releaseCreationLimit = (Settings::value('..maxnzbsprocessed') != '' ? (int)Settings::value('..maxnzbsprocessed') : 1000);
+	$releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') != '' ? (int)Settings::settingValue('..maxnzbsprocessed') : 1000);
 	$releases->processIncompleteCollections($groupID);
 	$releases->processCollectionSizes($groupID);
 	$releases->deleteUnwantedCollections($groupID);
@@ -343,7 +343,7 @@ function collectionCheck(&$pdo, $groupID)
 function &nntp(&$pdo, $alternate = false)
 {
 	$nntp = new NNTP(['Settings' => $pdo]);
-	if (($alternate && (int)Settings::value('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+	if (($alternate && (int)Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 		exit('ERROR: Unable to connect to usenet.' . PHP_EOL);
 	}
 

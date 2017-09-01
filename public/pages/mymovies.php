@@ -63,7 +63,7 @@ switch ($action) {
 		    $categories = [];
 		    foreach ($tmpcats as $c) {
 		        // If MOVIE WEB-DL categorization is disabled, don't include it as an option
-		        if (Settings::value('indexer.categorise.catwebdl') == 0 && $c['id'] == Category::MOVIE_WEBDL) {
+		        if (Settings::settingValue('indexer.categorise.catwebdl') == 0 && $c['id'] == Category::MOVIE_WEBDL) {
 		            continue;
 		        }
 		        $categories[$c['id']] = $c['title'];

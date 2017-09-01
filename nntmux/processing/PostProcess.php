@@ -125,8 +125,8 @@ class PostProcess
         $this->releaseFiles = (($options['ReleaseFiles'] instanceof ReleaseFiles) ? $options['ReleaseFiles'] : new ReleaseFiles($this->pdo));
 
         // Site settings.
-        $this->addpar2 = (int) Settings::value('..addpar2') !== 0;
-        $this->alternateNNTP = (int) Settings::value('..alternate_nntp') === 1;
+        $this->addpar2 = (int) Settings::settingValue('..addpar2') !== 0;
+        $this->alternateNNTP = (int) Settings::settingValue('..alternate_nntp') === 1;
     }
 
     /**
@@ -160,7 +160,7 @@ class PostProcess
      */
     public function processAnime(): void
     {
-        if ((int) Settings::value('..lookupanidb') !== 0) {
+        if ((int) Settings::settingValue('..lookupanidb') !== 0) {
             (new AniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processAnimeReleases();
         }
     }
@@ -173,7 +173,7 @@ class PostProcess
      */
     public function processBooks(): void
     {
-        if ((int) Settings::value('..lookupbooks') !== 0) {
+        if ((int) Settings::settingValue('..lookupbooks') !== 0) {
             (new Books(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processBookReleases();
         }
     }
@@ -185,7 +185,7 @@ class PostProcess
      */
     public function processConsoles(): void
     {
-        if ((int) Settings::value('..lookupgames') !== 0) {
+        if ((int) Settings::settingValue('..lookupgames') !== 0) {
             (new Console(['Settings' => $this->pdo, 'Echo' => $this->echooutput]))->processConsoleReleases();
         }
     }
@@ -198,7 +198,7 @@ class PostProcess
      */
     public function processGames(): void
     {
-        if ((int) Settings::value('..lookupgames') !== 0) {
+        if ((int) Settings::settingValue('..lookupgames') !== 0) {
             (new Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processGamesReleases();
         }
     }
@@ -216,7 +216,7 @@ class PostProcess
      */
     public function processMovies($groupID = '', $guidChar = '', $processMovies = ''): void
     {
-        $processMovies = (is_numeric($processMovies) ? $processMovies : Settings::value('..lookupimdb'));
+        $processMovies = (is_numeric($processMovies) ? $processMovies : Settings::settingValue('..lookupimdb'));
         if ($processMovies > 0) {
             (new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMovieReleases($groupID, $guidChar, $processMovies);
         }
@@ -229,7 +229,7 @@ class PostProcess
      */
     public function processMusic(): void
     {
-        if ((int) Settings::value('..lookupmusic') !== 0) {
+        if ((int) Settings::settingValue('..lookupmusic') !== 0) {
             (new Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMusicReleases();
         }
     }
@@ -246,8 +246,8 @@ class PostProcess
      */
     public function processNfos(&$nntp, $groupID = '', $guidChar = ''): void
     {
-        if ((int) Settings::value('..lookupnfo') === 1) {
-            $this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int) Settings::value('..lookupimdb'), (int) Settings::value('..lookuptvrage'));
+        if ((int) Settings::settingValue('..lookupnfo') === 1) {
+            $this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
         }
     }
 
@@ -274,7 +274,7 @@ class PostProcess
      */
     public function processTv($groupID = '', $guidChar = '', $processTV = ''): void
     {
-        $processTV = (is_numeric($processTV) ? $processTV : Settings::value('..lookuptvrage'));
+        $processTV = (is_numeric($processTV) ? $processTV : Settings::settingValue('..lookuptvrage'));
         if ($processTV > 0) {
             (new TVDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
             (new TVMaze(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
@@ -311,7 +311,7 @@ class PostProcess
      */
     public function processXXX(): void
     {
-        if ((int) Settings::value('..lookupxxx') === 1) {
+        if ((int) Settings::settingValue('..lookupxxx') === 1) {
             (new XXX(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
         }
     }

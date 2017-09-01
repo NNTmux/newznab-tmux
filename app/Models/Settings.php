@@ -204,15 +204,15 @@ class Settings extends Model
      * so it will be slower: Explicitly use the array format if speed it paramount.
      * Be aware that this method only returns the first of any values found, so make sure your
      * $setting produces a unique result.
-     * @param      $setting
+     * @param bool|array $setting
      * @param bool $returnAlways Indicates if the method should throw an exception (false) or return
      *                           null on failure. Defaults to throwing an exception.
      *
      * @return string|null		 The setting's value, or null on failure IF 'returnAlways' is true.
      * @throws \Exception
      */
-    public static function value($setting, $returnAlways = false)
-    {
+    public static function settingValue($setting, $returnAlways = false): ?string
+	{
         $setting = self::settingToArray($setting);
         $result = self::query()->where([
 												'section' => $setting['section'],

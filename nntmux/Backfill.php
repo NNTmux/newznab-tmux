@@ -114,10 +114,10 @@ class Backfill
             }
         }
 
-        $this->_compressedHeaders = (int) Settings::value('..compressedheaders') === 1;
-        $this->_safeBackFillDate = Settings::value('..safebackfilldate') !== '' ? (string) Settings::value('safebackfilldate') : '2008-08-14';
-        $this->_safePartRepair = (int) Settings::value('..safepartrepair') === 1 ? 'update' : 'backfill';
-        $this->_disableBackfillGroup = (int) Settings::value('..disablebackfillgroup') === 1;
+        $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
+        $this->_safeBackFillDate = Settings::settingValue('..safebackfilldate') !== '' ? (string) Settings::settingValue('safebackfilldate') : '2008-08-14';
+        $this->_safePartRepair = (int) Settings::settingValue('..safepartrepair') === 1 ? 'update' : 'backfill';
+        $this->_disableBackfillGroup = (int) Settings::settingValue('..disablebackfillgroup') === 1;
     }
 
     /**

@@ -74,11 +74,11 @@ class AniDB
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
-        $anidbupdint = Settings::value('APIs.AniDB.max_update_frequency');
-        $lastupdated = Settings::value('APIs.AniDB.last_full_update');
+        $anidbupdint = Settings::settingValue('APIs.AniDB.max_update_frequency');
+        $lastupdated = Settings::settingValue('APIs.AniDB.last_full_update');
 
         $this->imgSavePath = NN_COVERS.'anime'.DS;
-        $this->apiKey = Settings::value('APIs..anidbkey');
+        $this->apiKey = Settings::settingValue('APIs..anidbkey');
 
         $this->updateInterval = $anidbupdint ?? '7';
         $this->lastUpdate = $lastupdated ?? '0';
@@ -143,7 +143,7 @@ class AniDB
      */
     private function getAniDbAPI($anidbId)
     {
-        $timestamp = Settings::value('APIs.AniDB.banned') + 90000;
+        $timestamp = Settings::settingValue('APIs.AniDB.banned') + 90000;
         if ($timestamp > time()) {
             echo 'Banned from AniDB lookups until '.date('Y-m-d H:i:s', $timestamp).PHP_EOL;
 

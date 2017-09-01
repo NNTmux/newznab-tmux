@@ -287,7 +287,7 @@ switch ($function) {
 	case 'r':
 		$api->verifyEmptyParameter('email');
 
-		if (! in_array((int) Settings::value('..registerstatus'), [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_API_ONLY], false)) {
+		if (! in_array((int) Settings::settingValue('..registerstatus'), [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_API_ONLY], false)) {
 		    Utility::showApiError(104);
 		}
 		// Check email is valid format.

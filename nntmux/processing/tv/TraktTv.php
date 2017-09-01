@@ -76,7 +76,7 @@ class TraktTv extends TV
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->clientId = Settings::value('APIs..trakttvclientkey');
+        $this->clientId = Settings::settingValue('APIs..trakttvclientkey');
         $this->requestHeaders = [
 				'Content-Type' => 'application/json',
 				'trakt-api-version' => 2,

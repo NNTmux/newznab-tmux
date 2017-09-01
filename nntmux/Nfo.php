@@ -78,14 +78,14 @@ class Nfo
         $options += $defaults;
         $this->echo = ($options['Echo'] && NN_ECHOCLI);
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->nzbs = Settings::value('..maxnfoprocessed') !== '' ? (int) Settings::value('..maxnfoprocessed') : 100;
-        $this->maxsize = Settings::value('..maxsizetoprocessnfo') !== '' ? (int) Settings::value('..maxsizetoprocessnfo') : 100;
+        $this->nzbs = Settings::settingValue('..maxnfoprocessed') !== '' ? (int) Settings::settingValue('..maxnfoprocessed') : 100;
+        $this->maxsize = Settings::settingValue('..maxsizetoprocessnfo') !== '' ? (int) Settings::settingValue('..maxsizetoprocessnfo') : 100;
         $this->maxsize = $this->maxsize > 0 ? ('AND size < '.($this->maxsize * 1073741824)) : '';
-        $this->minsize = Settings::value('..minsizetoprocessnfo') !== '' ? (int) Settings::value('..minsizetoprocessnfo') : 100;
+        $this->minsize = Settings::settingValue('..minsizetoprocessnfo') !== '' ? (int) Settings::settingValue('..minsizetoprocessnfo') : 100;
         $this->minsize = $this->minsize > 0 ? ('AND size > '.($this->minsize * 1048576)) : '';
-        $this->maxRetries = (int) Settings::value('..maxnforetries') >= 0 ? -((int) Settings::value('..maxnforetries') + 1) : self::NFO_UNPROC;
+        $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : self::NFO_UNPROC;
         $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
-        $this->tmpPath = (string) Settings::value('..tmpunrarpath');
+        $this->tmpPath = (string) Settings::settingValue('..tmpunrarpath');
         if (! preg_match('/[\/\\\\]$/', $this->tmpPath)) {
             $this->tmpPath .= DS;
         }
@@ -256,9 +256,9 @@ class Nfo
      */
     public static function NfoQueryString()
     {
-        $maxSize = (int) Settings::value('..maxsizetoprocessnfo');
-        $minSize = (int) Settings::value('..minsizetoprocessnfo');
-        $dummy = (int) Settings::value('..maxnforetries');
+        $maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
+        $minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
+        $dummy = (int) Settings::settingValue('..maxnforetries');
         $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
 
         return sprintf(

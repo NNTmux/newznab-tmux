@@ -31,7 +31,7 @@ use App\Models\Settings;
 
 $pdo = new DB();
 
-if (! Settings::value('..tablepergroup')) {
+if (! Settings::settingValue('..tablepergroup')) {
     exit('Tables per groups is not enabled, quitting!');
 }
 

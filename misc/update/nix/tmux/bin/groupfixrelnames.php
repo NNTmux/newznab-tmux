@@ -205,7 +205,7 @@ switch (true) {
 		            echo ColorCLI::primaryOver('p');
 		            if (! isset($nzbcontents)) {
 		                $nntp = new NNTP(['Settings' => $pdo]);
-		                if (((int) Settings::value('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+		                if (((int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 		                    ColorCLI::error('Unable to connect to usenet.');
 		                }
 		                $Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);

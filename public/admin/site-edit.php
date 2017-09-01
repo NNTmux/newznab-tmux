@@ -157,7 +157,7 @@ $page->smarty->assign('book_reqids_ids', $book_reqids_ids);
 $page->smarty->assign('book_reqids_names', $book_reqids_names);
 
 // convert from a list to an array as we need to use an array, but teh Settings table only saves strings
-$books_selected = explode(',', Settings::value('..book_reqids'));
+$books_selected = explode(',', Settings::settingValue('..book_reqids'));
 
 // convert from a string array to an int array
 $books_selected = array_map(create_function('$value', 'return (int)$value;'), $books_selected);

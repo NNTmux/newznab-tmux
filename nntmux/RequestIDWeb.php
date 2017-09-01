@@ -34,7 +34,7 @@ class RequestIDWeb extends RequestID
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->_request_hours = (Settings::value('..request_hours') != '') ? (int) Settings::value('..request_hours') : 1;
+        $this->_request_hours = (Settings::settingValue('..request_hours') != '') ? (int) Settings::settingValue('..request_hours') : 1;
     }
 
     /**
@@ -152,7 +152,7 @@ class RequestIDWeb extends RequestID
 
         // Do a web lookup.
         try {
-            $returnXml = $this->client->request('POST', Settings::value('..request_url'),
+            $returnXml = $this->client->request('POST', Settings::settingValue('..request_url'),
 				['Link' => 'data='.serialize($requestArray)]
 			)->getBody();
         } catch (RequestException $e) {

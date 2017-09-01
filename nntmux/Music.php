@@ -81,14 +81,14 @@ class Music
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->pubkey = Settings::value('APIs..amazonpubkey');
-        $this->privkey = Settings::value('APIs..amazonprivkey');
-        $this->asstag = Settings::value('APIs..amazonassociatetag');
-        $this->musicqty = Settings::value('..maxmusicprocessed') != '' ? Settings::value('..maxmusicprocessed') : 150;
-        $this->sleeptime = Settings::value('..amazonsleep') != '' ? Settings::value('..amazonsleep') : 1000;
+        $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
+        $this->privkey = Settings::settingValue('APIs..amazonprivkey');
+        $this->asstag = Settings::settingValue('APIs..amazonassociatetag');
+        $this->musicqty = Settings::settingValue('..maxmusicprocessed') != '' ? Settings::settingValue('..maxmusicprocessed') : 150;
+        $this->sleeptime = Settings::settingValue('..amazonsleep') != '' ? Settings::settingValue('..amazonsleep') : 1000;
         $this->imgSavePath = NN_COVERS.'music'.DS;
         $this->renamed = '';
-        if (Settings::value('..lookupmusic') == 2) {
+        if (Settings::settingValue('..lookupmusic') == 2) {
             $this->renamed = 'AND isrenamed = 1';
         }
 

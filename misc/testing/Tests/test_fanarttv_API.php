@@ -6,7 +6,7 @@ use nntmux\ColorCLI;
 use App\Models\Settings;
 use nntmux\libraries\FanartTV;
 
-$fanart = new FanartTV(Settings::value('APIs..fanarttvkey'));
+$fanart = new FanartTV(Settings::settingValue('APIs..fanarttvkey'));
 
 if (! empty($argv[1])) {
 

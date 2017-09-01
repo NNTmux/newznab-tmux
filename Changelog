@@ -1,4 +1,5 @@
 2017-09-01 DariusIII
+	* Chg: Rename Models/Settings value function into settingValue to prevent collision with query builder value response
 	* Chg: Update laravel/framework to version 5.5.1
 	* Chg: Trim leading/trailing whitespace in DB->settingsUpdate function
 	* Chg: Use array in where clause of query in value function of Settings model
@@ -232,7 +233,7 @@
 	* Chg: Move tmux starting tmux-ui script to root of the NNTmux install
 	* Chg: Rename misc/update/nix/tmux/tmux-ui.php to just tmux-ui
 	* Chg: Use strict comparisons and cast int where needed in TmuxRun class
-	* Chg: Cast int type to all Settings::value lines, as that function returns string
+	* Chg: Cast int type to all Settings::settingValue lines, as that function returns string
 	* Chg: Change error message with no group selected in Backfill class
 	* Chg: Use ColorCLI in update_binaries script
 	* Chg: Slightly improve misc/update/backfill.php script
@@ -820,7 +821,7 @@
 	* Chg: Add user notes to themes and fix notes in admin area
 2016-09-07 DariusIII
 	* Chg: Use PHP own decodeIgnore in yenc
-	* Chg: Make Settings::value more robust
+	* Chg: Make Settings::settingValue more robust
 2016-09-05 DariusIII
 	* Chg: Update XSS vulnerability protection in themes.
 	* Chg: Update composer installer to version 1.2.0

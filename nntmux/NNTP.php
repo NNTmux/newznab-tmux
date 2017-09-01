@@ -110,7 +110,7 @@ class NNTP extends \Net_NNTP_Client
             }
         }
 
-        $this->_nntpRetries = Settings::value('..nntpretries') !== '' ? (int) Settings::value('..nntpretries') : 0 + 1;
+        $this->_nntpRetries = Settings::settingValue('..nntpretries') !== '' ? (int) Settings::settingValue('..nntpretries') : 0 + 1;
     }
 
     /**
@@ -262,7 +262,7 @@ class NNTP extends \Net_NNTP_Client
             // If we are connected and authenticated, try enabling compression if we have it enabled.
             if ($connected === true && $authenticated === true) {
                 // Check if we should use compression on the connection.
-                if ($compression === false || (int) Settings::value('..compressedheaders') === 0) {
+                if ($compression === false || (int) Settings::settingValue('..compressedheaders') === 0) {
                     $this->_compressionSupported = false;
                 }
                 if ($this->_debugBool) {
@@ -335,7 +335,7 @@ class NNTP extends \Net_NNTP_Client
      */
     public function enableCompression(): void
     {
-        if ((int) Settings::value('..compressedheaders') !== 1) {
+        if ((int) Settings::settingValue('..compressedheaders') !== 1) {
             return;
         }
         $this->_enableCompression();

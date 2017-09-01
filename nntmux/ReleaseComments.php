@@ -160,7 +160,7 @@ class ReleaseComments
      */
     public function addComment($id, $gid, $text, $userid, $host)
     {
-        if ((int) Settings::value('..storeuserips') !== 1) {
+        if ((int) Settings::settingValue('..storeuserips') !== 1) {
             $host = '';
         }
 

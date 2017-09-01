@@ -12,13 +12,13 @@ $pdo = new DB();
 $DIR = NN_TMUX;
 $t = new Tmux();
 $tmux = $t->get();
-$patch = Settings::value('..sqlpatch');
+$patch = Settings::settingValue('..sqlpatch');
 $import = $tmux->import ?? 0;
 $tmux_session = $tmux->tmux_session ?? 0;
 $seq = $tmux->sequential ?? 0;
 $powerline = $tmux->powerline ?? 0;
 $colors = $tmux->colors ?? 0;
-$delaytimet = Settings::value('..delaytime');
+$delaytimet = Settings::settingValue('..delaytime');
 $delaytimet = $delaytimet ? (int) $delaytimet : 2;
 
 Utility::isPatched();

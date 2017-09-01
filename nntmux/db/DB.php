@@ -1051,7 +1051,7 @@ class DB extends \PDO
 
     public function setCovers()
     {
-        $path = Settings::value([
+        $path = Settings::settingValue([
 			'section'    => 'site',
 			'subsection' => 'main',
 			'name'       => 'coverspath',

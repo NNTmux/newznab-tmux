@@ -97,7 +97,7 @@ class SABnzbd
         $this->client = new Client(['verify' => false]);
 
         // Set up properties.
-        switch (Settings::value('apps.sabnzbplus.integrationtype')) {
+        switch (Settings::settingValue('apps.sabnzbplus.integrationtype')) {
 			case self::INTEGRATION_TYPE_USER:
 				if (! empty($_COOKIE['sabnzbd_'.$this->uid.'__apikey']) && ! empty($_COOKIE['sabnzbd_'.$this->uid.'__host'])) {
 				    $this->url = $_COOKIE['sabnzbd_'.$this->uid.'__host'];
@@ -123,12 +123,12 @@ class SABnzbd
 				break;
 
 			case self::INTEGRATION_TYPE_SITEWIDE:
-				if ((Settings::value('apps.sabnzbplus.apikey') !== '') && (Settings::value('apps.sabnzbplus.url')
+				if ((Settings::settingValue('apps.sabnzbplus.apikey') !== '') && (Settings::settingValue('apps.sabnzbplus.url')
 						!== '')) {
-				    $this->url = Settings::value('apps.sabnzbplus.url');
-				    $this->apikey = Settings::value('apps.sabnzbplus.apikey');
-				    $this->priority = Settings::value('apps.sabnzbplus.priority');
-				    $this->apikeytype = Settings::value('apps.sabnzbplus.apikeytype');
+				    $this->url = Settings::settingValue('apps.sabnzbplus.url');
+				    $this->apikey = Settings::settingValue('apps.sabnzbplus.apikey');
+				    $this->priority = Settings::settingValue('apps.sabnzbplus.priority');
+				    $this->apikeytype = Settings::settingValue('apps.sabnzbplus.apikeytype');
 				}
 				$this->integrated = self::INTEGRATION_TYPE_SITEWIDE;
 				$this->integratedBool = true;

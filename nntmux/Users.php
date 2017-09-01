@@ -460,7 +460,7 @@ class Users
         $data = User::query()->whereDate('rolechangedate', '<', (new \DateTime())->format('Y-m-d H:i:s'))->select(['id', 'email'])->get();
 
         foreach ($data as $u) {
-            Utility::sendEmail($u['email'], $msgsubject, $msgbody, Settings::value('site.main.email'));
+            Utility::sendEmail($u['email'], $msgsubject, $msgbody, Settings::settingValue('site.main.email'));
             User::query()->where('id', $u['id'])->update(['role' => self::ROLE_USER, 'rolechangedate' => null]);
         }
 
@@ -693,7 +693,7 @@ class Users
 
         // Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.
         $invitedBy = 0;
-        if (! $forceInviteMode && (int) Settings::value('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
+        if (! $forceInviteMode && (int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE) {
             if ($inviteCode === '') {
                 return self::ERR_SIGNUP_BADINVITECODE;
             }
@@ -793,7 +793,7 @@ class Users
 				'email' => $email,
 				'role' => $role,
 				'createddate' => new \DateTime('NOW'),
-				'host' => (int) Settings::value('..storeuserips') === 1 ? $host : '',
+				'host' => (int) Settings::settingValue('..storeuserips') === 1 ? $host : '',
 				'rsstoken' => md5(Password::getRepository()->createNewToken()),
 				'invites' => $invites,
 				'invitedby' => (int) $invitedBy === 0 ? 'NULL' : $invitedBy,
@@ -838,7 +838,7 @@ class Users
     {
         $_SESSION['uid'] = $userID;
 
-        if ((int) Settings::value('..storeuserips') !== 1) {
+        if ((int) Settings::settingValue('..storeuserips') !== 1) {
             $host = '';
         }
 
@@ -1155,11 +1155,11 @@ class Users
     {
         $ipsql = "('-1')";
 
-        if (Settings::value('..userhostexclusion') !== '') {
+        if (Settings::settingValue('..userhostexclusion') !== '') {
             $ipsql = '';
-            $ips = explode(',', Settings::value('..userhostexclusion'));
+            $ips = explode(',', Settings::settingValue('..userhostexclusion'));
             foreach ($ips as $ip) {
-                $ipsql .= $this->pdo->escapeString($this->getHostHash($ip, Settings::value('..siteseed'))).',';
+                $ipsql .= $this->pdo->escapeString($this->getHostHash($ip, Settings::settingValue('..siteseed'))).',';
             }
             $ipsql = '('.$ipsql." '-1')";
         }
@@ -1190,7 +1190,7 @@ class Users
     public function getHostHash($host, string $siteseed = ''): string
     {
         if ($siteseed === '') {
-            $siteseed = Settings::value('..siteseed');
+            $siteseed = Settings::settingValue('..siteseed');
         }
 
         return self::hashSHA1($siteseed.$host.$siteseed);

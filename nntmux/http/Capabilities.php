@@ -134,10 +134,10 @@ abstract class Capabilities
 			'server' => [
 				'appversion' => (new Versions())->getGitTagInFile(),
 				'version'    => (new Versions())->getGitTagInRepo(),
-				'title'      => Settings::value('site.main.title'),
-				'strapline'  => Settings::value('site.main.strapline'),
-				'email'      => Settings::value('site.main.email'),
-				'meta'       => Settings::value('site.main.metakeywords'),
+				'title'      => Settings::settingValue('site.main.title'),
+				'strapline'  => Settings::settingValue('site.main.strapline'),
+				'email'      => Settings::settingValue('site.main.email'),
+				'meta'       => Settings::settingValue('site.main.metakeywords'),
 				'url'        => $serverroot,
 				'image'      => $serverroot.'themes/shared/images/tmux_logo.png',
 			],
@@ -147,7 +147,7 @@ abstract class Capabilities
 			],
 			'registration' => [
 				'available' => 'yes',
-				'open'      => (int) Settings::value('..registerstatus') === 0 ? 'yes' : 'no',
+				'open'      => (int) Settings::settingValue('..registerstatus') === 0 ? 'yes' : 'no',
 			],
 			'searching' => [
 				'search'       => ['available' => 'yes', 'supportedParams' => 'q'],

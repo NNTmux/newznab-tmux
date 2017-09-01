@@ -65,13 +65,13 @@ if (isset($_GET['id'])) {
             $mov['actors'] = $movie->makeFieldLinks($mov, 'actors');
             $mov['genre'] = $movie->makeFieldLinks($mov, 'genre');
             $mov['director'] = $movie->makeFieldLinks($mov, 'director');
-            if (Settings::value('site.trailers.trailers_display')) {
+            if (Settings::settingValue('site.trailers.trailers_display')) {
                 $trailer = empty($mov['trailer']) || $mov['trailer'] === '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer'];
                 if ($trailer) {
                     $mov['trailer'] = sprintf(
 						'<iframe width=\"%d\" height=\"%d\" src=\"%s\"></iframe>',
-						Settings::value('site.trailers.trailers_size_x'),
-						Settings::value('site.trailers.trailers_size_y'),
+						Settings::settingValue('site.trailers.trailers_size_x'),
+						Settings::settingValue('site.trailers.trailers_size_y'),
 						$trailer
 					);
                 }
@@ -152,7 +152,7 @@ if (isset($_GET['id'])) {
     $page->smarty->assign('comments', $comments);
     $page->smarty->assign('searchname', $releases->getSimilarName($data['searchname']));
     $page->smarty->assign('similars', $similars);
-    $page->smarty->assign('privateprofiles', (int) Settings::value('..privateprofiles') === 1);
+    $page->smarty->assign('privateprofiles', (int) Settings::settingValue('..privateprofiles') === 1);
     $page->smarty->assign('failed', $failed);
     $page->smarty->assign('cpapi', $cpapi);
     $page->smarty->assign('cpurl', $cpurl);

@@ -199,7 +199,7 @@ class DbUpdate
                 } else {
                     echo $this->log->header('Processing patch file: '.$file);
                     $this->splitSQL($file, ['local' => $local, 'data' => $options['data']]);
-                    $current = Settings::value('..sqlpatch');
+                    $current = Settings::settingValue('..sqlpatch');
                     $current++;
                     Settings::query()->where('setting', '=', 'sqlpatch')->update(['value' => $current]);
                     $newName = $matches['drive'].$matches['path'].
@@ -233,7 +233,7 @@ class DbUpdate
 		];
         $options += $defaults;
 
-        $currentVersion = Settings::value('..sqlpatch');
+        $currentVersion = Settings::settingValue('..sqlpatch');
         if (! is_numeric($currentVersion)) {
             exit("Bad sqlpatch value: '$currentVersion'\n");
         }

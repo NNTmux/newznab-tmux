@@ -64,8 +64,8 @@ class Logging
     public function LogBadPasswd($username = '', $host = ''): void
     {
         // If logggingopt is = 0, then we do nothing, 0 = logging off.
-        $loggingOpt = Settings::value('site.main.loggingopt');
-        $logFile = Settings::value('site.main.logfile');
+        $loggingOpt = Settings::settingValue('site.main.loggingopt');
+        $logFile = Settings::settingValue('site.main.logfile');
         if ((int) $loggingOpt === 1) {
             $this->pdo->queryInsert(sprintf('INSERT INTO logging (time, username, host) VALUES (NOW(), %s, %s)',
 				$this->pdo->escapeString($username), $this->pdo->escapeString($host)));

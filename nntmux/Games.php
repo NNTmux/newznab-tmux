@@ -117,10 +117,10 @@ class Games
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
-        $this->publicKey = Settings::value('APIs..giantbombkey');
-        $this->gameQty = Settings::value('..maxgamesprocessed') !== '' ? Settings::value('..maxgamesprocessed') : 150;
+        $this->publicKey = Settings::settingValue('APIs..giantbombkey');
+        $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? Settings::settingValue('..maxgamesprocessed') : 150;
         $this->imgSavePath = NN_COVERS.'games'.DS;
-        $this->renamed = Settings::value('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
+        $this->renamed = Settings::settingValue('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
         $this->matchPercentage = 60;
         $this->maxHitRequest = false;
         $this->catWhere = 'AND categories_id = '.Category::PC_GAMES.' ';

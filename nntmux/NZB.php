@@ -103,9 +103,9 @@ class NZB
     {
         $this->pdo = ($pdo instanceof DB ? $pdo : new DB());
 
-        $nzbSplitLevel = Settings::value('..nzbsplitlevel');
+        $nzbSplitLevel = Settings::settingValue('..nzbsplitlevel');
         $this->nzbSplitLevel = (empty($nzbSplitLevel) ? 1 : $nzbSplitLevel);
-        $this->siteNzbPath = (string) Settings::value('..nzbpath');
+        $this->siteNzbPath = (string) Settings::settingValue('..nzbpath');
         if (substr($this->siteNzbPath, -1) !== DS) {
             $this->siteNzbPath .= DS;
         }

@@ -153,7 +153,7 @@ class Steam
      */
     public function populateSteamAppsTable(): void
     {
-        $lastUpdate = Settings::value('APIs.Steam.last_update');
+        $lastUpdate = Settings::settingValue('APIs.Steam.last_update');
         $this->lastUpdate = $lastUpdate > 0 ? $lastUpdate : 0;
         if ((time() - (int) $this->lastUpdate) > 86400) {
             // Set time we updated steam_apps table

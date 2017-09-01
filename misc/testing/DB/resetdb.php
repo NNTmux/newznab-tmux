@@ -61,7 +61,7 @@ $pdo->optimise(false, 'full');
 
 echo ColorCLI::header('Deleting nzbfiles subfolders.');
 try {
-    $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(Settings::value('..nzbpath'), \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
+    $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(Settings::settingValue('..nzbpath'), \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
     foreach ($files as $file) {
         if (basename($file) !== '.gitignore' && basename($file) !== 'tmpunrar') {
             $todo = ($file->isDir() ? 'rmdir' : 'unlink');

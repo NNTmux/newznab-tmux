@@ -145,20 +145,20 @@ class ProcessReleases
         $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo, 'Groups' => $this->groups]));
         $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 
-        $dummy = Settings::value('..delaytime');
+        $dummy = Settings::settingValue('..delaytime');
         $this->collectionDelayTime = ($dummy !== '' ? (int) $dummy : 2);
-        $dummy = Settings::value('..crossposttime');
+        $dummy = Settings::settingValue('..crossposttime');
         $this->crossPostTime = ($dummy !== '' ? (int) $dummy : 2);
-        $dummy = Settings::value('..maxnzbsprocessed');
+        $dummy = Settings::settingValue('..maxnzbsprocessed');
         $this->releaseCreationLimit = ($dummy !== '' ? (int) $dummy : 1000);
-        $dummy = Settings::value('..completionpercent');
+        $dummy = Settings::settingValue('..completionpercent');
         $this->completion = ($dummy !== '' ? (int) $dummy : 0);
-        $this->processRequestIDs = (int) Settings::value('lookup_reqids');
+        $this->processRequestIDs = (int) Settings::settingValue('lookup_reqids');
         if ($this->completion > 100) {
             $this->completion = 100;
             echo ColorCLI::error(PHP_EOL.'You have an invalid setting for completion. It cannot be higher than 100.');
         }
-        $this->collectionTimeout = (int) Settings::value('indexer.processing.collection_timeout');
+        $this->collectionTimeout = (int) Settings::settingValue('indexer.processing.collection_timeout');
     }
 
     /**
@@ -188,10 +188,10 @@ class ProcessReleases
             ColorCLI::doEcho(ColorCLI::header('Starting release update process ('.date('Y-m-d H:i:s').')'), true);
         }
 
-        if (! file_exists(Settings::value('..nzbpath'))) {
+        if (! file_exists(Settings::settingValue('..nzbpath'))) {
             if ($this->echoCLI) {
                 ColorCLI::doEcho(
-					ColorCLI::error('Bad or missing nzb directory - '.Settings::value('..nzbpath')),
+					ColorCLI::error('Bad or missing nzb directory - '.Settings::settingValue('..nzbpath')),
 					true
 				);
             }
@@ -419,9 +419,9 @@ class ProcessReleases
 
         $minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
-        $maxSizeSetting = Settings::value('.release.maxsizetoformrelease');
-        $minSizeSetting = Settings::value('.release.minsizetoformrelease');
-        $minFilesSetting = Settings::value('.release.minfilestoformrelease');
+        $maxSizeSetting = Settings::settingValue('.release.maxsizetoformrelease');
+        $minSizeSetting = Settings::settingValue('.release.minsizetoformrelease');
+        $minFilesSetting = Settings::settingValue('.release.minfilestoformrelease');
 
         foreach ($groupIDs as $grpID) {
             $groupMinSizeSetting = $groupMinFilesSetting = 0;
@@ -841,7 +841,7 @@ class ProcessReleases
      */
     public function processRequestIDs($groupID = '', $limit = 5000, $local = true): void
     {
-        if ($local === false && (int) Settings::value('..lookup_reqids') === 0) {
+        if ($local === false && (int) Settings::settingValue('..lookup_reqids') === 0) {
             return;
         }
 
@@ -972,7 +972,7 @@ class ProcessReleases
 				ColorCLI::header('Process Releases -> Delete finished collections.'.PHP_EOL).
 				ColorCLI::primary(sprintf(
 					'Deleting collections/binaries/parts older than %d hours.',
-					Settings::value('..partretentionhours')
+					Settings::settingValue('..partretentionhours')
 				));
         }
 
@@ -987,7 +987,7 @@ class ProcessReleases
 				$this->tables['cname'],
 				$this->tables['bname'],
 				$this->tables['pname'],
-				Settings::value('..partretentionhours')
+				Settings::settingValue('..partretentionhours')
 			)
 		);
 
@@ -1183,9 +1183,9 @@ class ProcessReleases
 
         $groupID === '' ? $groupIDs = $this->groups->getActiveIDs() : $groupIDs = [['id' => $groupID]];
 
-        $maxSizeSetting = Settings::value('.release.maxsizetoformrelease');
-        $minSizeSetting = Settings::value('.release.minsizetoformrelease');
-        $minFilesSetting = Settings::value('.release.minfilestoformrelease');
+        $maxSizeSetting = Settings::settingValue('.release.maxsizetoformrelease');
+        $minSizeSetting = Settings::settingValue('.release.minsizetoformrelease');
+        $minFilesSetting = Settings::settingValue('.release.minfilestoformrelease');
 
         foreach ($groupIDs as $grpID) {
             $releases = $this->pdo->queryDirect(
@@ -1283,11 +1283,11 @@ class ProcessReleases
         }
 
         // Releases past retention.
-        if ((int) Settings::value('..releaseretentiondays') !== 0) {
+        if ((int) Settings::settingValue('..releaseretentiondays') !== 0) {
             $releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT SQL_NO_CACHE id, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
-					(int) Settings::value('..releaseretentiondays')
+					(int) Settings::settingValue('..releaseretentiondays')
 				)
 			);
             if ($releases instanceof \Traversable) {
@@ -1299,7 +1299,7 @@ class ProcessReleases
         }
 
         // Passworded releases.
-        if ((int) Settings::value('..deletepasswordedrelease') === 1) {
+        if ((int) Settings::settingValue('..deletepasswordedrelease') === 1) {
             $releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT SQL_NO_CACHE id, guid FROM releases WHERE passwordstatus = %d',
@@ -1315,7 +1315,7 @@ class ProcessReleases
         }
 
         // Possibly passworded releases.
-        if ((int) Settings::value('..deletepossiblerelease') === 1) {
+        if ((int) Settings::settingValue('..deletepossiblerelease') === 1) {
             $releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT SQL_NO_CACHE id, guid FROM releases WHERE passwordstatus = %d',
@@ -1434,7 +1434,7 @@ class ProcessReleases
         }
 
         // Misc other.
-        if (Settings::value('..miscotherretentionhours') > 0) {
+        if (Settings::settingValue('..miscotherretentionhours') > 0) {
             $releases = $this->pdo->queryDirect(
 				sprintf('
 					SELECT SQL_NO_CACHE id, guid
@@ -1442,7 +1442,7 @@ class ProcessReleases
 					WHERE categories_id = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					Category::OTHER_MISC,
-					(int) Settings::value('..miscotherretentionhours')
+					(int) Settings::settingValue('..miscotherretentionhours')
 				)
 			);
             if ($releases instanceof \Traversable) {
@@ -1454,7 +1454,7 @@ class ProcessReleases
         }
 
         // Misc hashed.
-        if ((int) Settings::value('..mischashedretentionhours') > 0) {
+        if ((int) Settings::settingValue('..mischashedretentionhours') > 0) {
             $releases = $this->pdo->queryDirect(
 				sprintf('
 					SELECT SQL_NO_CACHE id, guid
@@ -1462,7 +1462,7 @@ class ProcessReleases
 					WHERE categories_id = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					Category::OTHER_HASHED,
-					(int) Settings::value('..mischashedretentionhours')
+					(int) Settings::settingValue('..mischashedretentionhours')
 				)
 			);
             if ($releases instanceof \Traversable) {
@@ -1770,7 +1770,7 @@ class ProcessReleases
      */
     private function processStuckCollections($where): void
     {
-        $lastRun = Settings::value('indexer.processing.last_run_time');
+        $lastRun = Settings::settingValue('indexer.processing.last_run_time');
 
         $obj = $this->pdo->queryExec(
 			sprintf("

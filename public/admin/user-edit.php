@@ -71,7 +71,7 @@ switch ($action) {
 		    if ($_POST['role'] !== '') {
 		        $newRole = UserRole::query()->where('id', $_POST['role'])->value('name');
 		        $email = $_POST['email'] ?? $_GET['email'];
-		        Utility::sendEmail($email, 'Account changed', 'Your account role has been changed to '.$newRole, Settings::value('site.main.email'));
+		        Utility::sendEmail($email, 'Account changed', 'Your account role has been changed to '.$newRole, Settings::settingValue('site.main.email'));
 		    }
 		}
 

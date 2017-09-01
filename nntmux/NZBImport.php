@@ -116,7 +116,7 @@ class NZBImport
         $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['settings' => $this->pdo]));
         $this->groups = new Groups(['Settings' => $this->pdo]);
 
-        $this->crossPostt = Settings::value('..crossposttime') !== '' ? Settings::value('..crossposttime') : 2;
+        $this->crossPostt = Settings::settingValue('..crossposttime') !== '' ? Settings::settingValue('..crossposttime') : 2;
         $this->browser = $options['Browser'];
         $this->retVal = '';
     }

@@ -22,7 +22,7 @@ class TmuxRun extends Tmux
     public function __construct(DB $pdo = null)
     {
         parent::__construct($pdo);
-        $dateFormat = Settings::value(
+        $dateFormat = Settings::settingValue(
 			[
 				'section'    => 'shell',
 				'subsection' => 'date',
