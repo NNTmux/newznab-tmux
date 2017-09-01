@@ -1,3 +1,5 @@
+2017-09-01 DariusIII
+	* Chg: Use array in where clause of query in value function of Settings model
 2017-08-31 DariusIII
 	* Chg: Add styleci badge to README.md
 	* Chg: Add .styleci.yml config
