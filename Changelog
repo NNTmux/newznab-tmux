@@ -1,3 +1,5 @@
+2017-09-02 DariusIII
+	* Chg: Add placeholders for new models and database migrations
 2017-09-01 DariusIII
 	* Chg: Update admin/site-edit.php
 	* Chg: Update Forking class check for non-empty array $groups
