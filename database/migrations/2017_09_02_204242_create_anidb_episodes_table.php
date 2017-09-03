@@ -22,7 +22,7 @@ class CreateAnidbEpisodesTable extends Migration
             $table->index(
                 [
                     'anidbid',
-                    'episodeid'
+                    'episodeid',
                 ]
             );
         });

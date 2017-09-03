@@ -29,7 +29,6 @@ class AnidbEpisodes extends Model
         'episodeid',
         'episode_no',
         'episode_title',
-        'airdate'
+        'airdate',
     ];
-
 }
