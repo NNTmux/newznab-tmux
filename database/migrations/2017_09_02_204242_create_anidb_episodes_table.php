@@ -14,8 +14,17 @@ class CreateAnidbEpisodesTable extends Migration
     public function up()
     {
         Schema::create('anidb_episodes', function (Blueprint $table) {
-            $table->increments('id');
-            $table->timestamps();
+            $table->integer('anidbid')->comment('ID of title from AniDB');
+            $table->integer('episodeid');
+            $table->smallInteger('episode_no');
+            $table->string('episode_title');
+            $table->date('airdate');
+            $table->index(
+                [
+                    'anidbid',
+                    'episodeid'
+                ]
+            );
         });
     }
 
