@@ -235,12 +235,10 @@ class SpotNab
             .'LVDl';
 
         // Auto-Discovery Flags
-        $this->_can_broadcast = (trim((int) Settings::settingValue('site.spotnab.spotnabbroadcast')) === 1) ?
-            true : false;
+        $this->_can_broadcast = trim((int) Settings::settingValue('site.spotnab.spotnabbroadcast')) === 1;
         $this->_can_broadcast = ($this->_can_broadcast && $this->_can_post);
 
-        $this->_can_discover = (trim((int) Settings::settingValue('spotnabdiscover')) === 1) ?
-            true : false;
+        $this->_can_discover = trim((int) Settings::settingValue('site.spotnab.spotnabdiscover')) === 1;
 
         if (! $this->has_openssl()) {
             // Can SpotNab even work; if not, we disable all flags
