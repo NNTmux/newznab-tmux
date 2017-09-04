@@ -22,6 +22,6 @@ class Genre extends Model
         'id',
         'title',
         'type',
-        'disabled'
+        'disabled',
     ];
 }
