@@ -14,6 +14,8 @@ class Page extends BasePage
 {
     /**
      * Default constructor.
+     *
+     * @throws \Exception
      */
     public function __construct()
     {
@@ -21,12 +23,12 @@ class Page extends BasePage
 
         // Tell Smarty which directories to use for templates
         $this->smarty->setTemplateDir(
-			[
-				'user' 		=> NN_THEMES.$this->theme.'/templates',
-				'shared' 	=> NN_THEMES.'shared/templates',
-				'default' 	=> NN_THEMES.'Gentele/templates',
-			]
-		);
+            [
+                'user'        => NN_THEMES.$this->theme.'/templates',
+                'shared'    => NN_THEMES.'shared/templates',
+                'default'    => NN_THEMES.'Gentele/templates',
+            ]
+        );
 
         $role = Users::ROLE_GUEST;
         if ($this->userdata != null) {

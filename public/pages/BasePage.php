@@ -91,6 +91,11 @@ class BasePage
     public $token;
 
     /**
+     * @var \nntmux\db\DB
+     */
+    public $pdo;
+
+    /**
      * Set up session / smarty / user variables.
      *
      * @throws \Exception
@@ -113,31 +118,33 @@ class BasePage
         }
 
         // Buffer settings/DB connection.
-        $this->settings = new DB();
+        $this->settings = new Settings();
+        $this->pdo = new DB();
         $this->smarty = new Smarty();
 
         $this->smarty->setCompileDir(NN_SMARTY_TEMPLATES);
         $this->smarty->setConfigDir(NN_SMARTY_CONFIGS);
         $this->smarty->setCacheDir(NN_SMARTY_CACHE);
-        $this->smarty->setPluginsDir([
-				NN_WWW.'plugins/',
-				SMARTY_DIR.'plugins/',
-			]
-		);
+        $this->smarty->setPluginsDir(
+            [
+                NN_WWW.'plugins/',
+                SMARTY_DIR.'plugins/',
+            ]
+        );
         $this->smarty->error_reporting = (NN_DEBUG ? E_ALL : E_ALL - E_NOTICE);
 
         if (isset($_SERVER['SERVER_NAME'])) {
             $this->serverurl = (
-				($this->https === true ? 'https://' : 'http://').$_SERVER['SERVER_NAME'].
-				(((int) $_SERVER['SERVER_PORT'] !== 80 && (int) $_SERVER['SERVER_PORT'] !== 443) ? ':'.$_SERVER['SERVER_PORT'] : '').
-				WWW_TOP.'/'
-			);
+                ($this->https === true ? 'https://' : 'http://').$_SERVER['SERVER_NAME'].
+                (((int) $_SERVER['SERVER_PORT'] !== 80 && (int) $_SERVER['SERVER_PORT'] !== 443) ? ':'.$_SERVER['SERVER_PORT'] : '').
+                WWW_TOP.'/'
+            );
             $this->smarty->assign('serverroot', $this->serverurl);
         }
 
         $this->page = $_GET['page'] ?? 'content';
 
-        $this->users = new Users(['Settings' => $this->settings]);
+        $this->users = new Users(['Settings' => $this->pdo]);
         if ($this->users->isLoggedIn()) {
             $this->setUserPreferences();
         } else {
@@ -258,11 +265,11 @@ class BasePage
     public function show403($from_admin = false): void
     {
         header(
-			'Location: '.
-			($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).
-			'/login?redirect='.
-			urlencode($_SERVER['REQUEST_URI'])
-		);
+            'Location: '.
+            ($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).
+            '/login?redirect='.
+            urlencode($_SERVER['REQUEST_URI'])
+        );
         exit();
     }
 
@@ -342,8 +349,8 @@ class BasePage
 
         // Update last login every 15 mins.
         if ((strtotime($this->userdata['now']) - 900) >
-			strtotime($this->userdata['lastlogin'])
-		) {
+            strtotime($this->userdata['lastlogin'])
+        ) {
             $this->users->updateSiteAccessed($this->userdata['id']);
         }
 
@@ -362,12 +369,12 @@ class BasePage
             $this->smarty->assign('sabapikeytype', $sab->apikeytype);
         }
         switch ((int) $this->userdata['role']) {
-			case Users::ROLE_ADMIN:
-				$this->smarty->assign('isadmin', 'true');
-				break;
-			case Users::ROLE_MODERATOR:
-				$this->smarty->assign('ismod', 'true');
-		}
+            case Users::ROLE_ADMIN:
+                $this->smarty->assign('isadmin', 'true');
+                break;
+            case Users::ROLE_MODERATOR:
+                $this->smarty->assign('ismod', 'true');
+        }
     }
 
     /**
@@ -385,9 +392,9 @@ class BasePage
     {
         if (strpos($setting, '.') === false) {
             trigger_error(
-				'You should update your template to use the newer method "$page->getSettingValue()"" of fetching values from the "settings" table! This method *will* be removed in a future version.',
-				E_USER_WARNING
-			);
+                'You should update your template to use the newer method "$page->getSettingValue()"" of fetching values from the "settings" table! This method *will* be removed in a future version.',
+                E_USER_WARNING
+            );
         } else {
             return $this->getSettingValue($setting);
         }

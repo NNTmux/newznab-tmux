@@ -1,4 +1,5 @@
 2017-09-04 DariusIII
+	* Fix: Fix errors on webpages causing http 503 responses
 	* Chg: Update SpotNab class
 	* Chg: Update DB class
 	* Fix: Fix checkAnidbInfo query

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Settings;
 use nntmux\Captcha;
 use nntmux\Logging;
 use nntmux\utility\Utility;
@@ -9,7 +10,7 @@ $page->smarty->assign(['error' => '', 'username' => '', 'rememberme' => '']);
 $captcha = new Captcha($page);
 
 if (! $page->users->isLoggedIn()) {
-    if (! isset($_POST['username']) || ! isset($_POST['password'])) {
+    if (! isset($_POST['username'], $_POST['password'])) {
         $page->smarty->assign('error', 'Please enter your username and password.');
     } elseif ($captcha->getError() === false) {
         $username = htmlspecialchars($_POST['username']);
@@ -29,7 +30,7 @@ if (! $page->users->isLoggedIn()) {
                     if (isset($_POST['redirect']) && $_POST['redirect'] !== '') {
                         header('Location: '.$_POST['redirect']);
                     } else {
-                        header('Location: '.WWW_TOP.$page->settings->home_link);
+                        header('Location: '.WWW_TOP.Settings::settingValue('site.main.home_link'));
                     }
                     die();
                 } else {
@@ -45,7 +46,7 @@ if (! $page->users->isLoggedIn()) {
         }
     }
 } else {
-    header('Location: '.WWW_TOP.$page->settings->home_link);
+    header('Location: '.WWW_TOP.Settings::settingValue('site.main.home_link'));
 }
 
 $page->smarty->assign('redirect', $_GET['redirect'] ?? '');

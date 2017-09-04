@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Settings;
 use ReCaptcha\ReCaptcha;
 
 class Captcha
@@ -60,8 +61,8 @@ class Captcha
     /**
      * Settings key literals.
      */
-    const RECAPTCHA_SETTING_SITEKEY = 'recaptchapublickey';
-    const RECAPTCHA_SETTING_SECRETKEY = 'recaptchaprivatekey';
+    const RECAPTCHA_SETTING_SITEKEY = 'APIs.recaptcha.sitekey';
+    const RECAPTCHA_SETTING_SECRETKEY = 'APIs.recaptcha.secretkey';
 
     /**
      * Construct and decide whether to show the captcha or not.
@@ -103,6 +104,7 @@ class Captcha
      * allow display of recaptcha.
      *
      * @return bool
+     * @throws \Exception
      * @throws \RuntimeException
      */
     public function shouldDisplay(): bool
@@ -163,21 +165,21 @@ class Captcha
 
         foreach ($codes as $c) {
             switch ($c) {
-				case self::RECAPTCHA_ERROR_MISSING_SECRET:
-					$rc_error .= 'Missing Secret Key';
-					break;
-				case self::RECAPTCHA_ERROR_INVALID_SECRET:
-					$rc_error .= 'Invalid Secret Key';
-					break;
-				case self::RECAPTCHA_ERROR_MISSING_RESPONSE:
-					$rc_error .= 'No Response!';
-					break;
-				case self::RECAPTCHA_ERROR_INVALID_RESPONSE:
-					$rc_error .= 'Invalid response! You are a bot!';
-					break;
-				default:
-					$rc_error .= 'Unknown Error!';
-			}
+                case self::RECAPTCHA_ERROR_MISSING_SECRET:
+                    $rc_error .= 'Missing Secret Key';
+                    break;
+                case self::RECAPTCHA_ERROR_INVALID_SECRET:
+                    $rc_error .= 'Invalid Secret Key';
+                    break;
+                case self::RECAPTCHA_ERROR_MISSING_RESPONSE:
+                    $rc_error .= 'No Response!';
+                    break;
+                case self::RECAPTCHA_ERROR_INVALID_RESPONSE:
+                    $rc_error .= 'Invalid response! You are a bot!';
+                    break;
+                default:
+                    $rc_error .= 'Unknown Error!';
+            }
         }
 
         $this->error = $rc_error;
@@ -188,6 +190,7 @@ class Captcha
      * Return bool on success/failure.
      *
      * @return bool
+     * @throws \Exception
      * @throws \RuntimeException
      */
     private function _bootstrapCaptcha(): bool
@@ -196,8 +199,8 @@ class Captcha
             return true;
         }
 
-        $this->sitekey = $this->page->settings->getSetting(self::RECAPTCHA_SETTING_SITEKEY);
-        $this->secretkey = $this->page->settings->getSetting(self::RECAPTCHA_SETTING_SECRETKEY);
+        $this->sitekey = Settings::settingValue(self::RECAPTCHA_SETTING_SITEKEY);
+        $this->secretkey = Settings::settingValue(self::RECAPTCHA_SETTING_SECRETKEY);
 
         if ($this->sitekey !== false && $this->sitekey !== '' && $this->secretkey !== false && $this->secretkey !== '') {
             $this->recaptcha = new ReCaptcha($this->secretkey);
