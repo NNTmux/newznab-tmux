@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Settings;
 use nntmux\db\DB;
+use App\Models\Settings;
 use App\Extensions\util\Yenc;
 
 // Help out those who don't have SSL enabled
@@ -199,14 +199,14 @@ class SpotNab
         $this->_discovery_lastarticle = (int) Settings::settingValue('site.spotnab.spotnablastarticle');
 
         // Posting Flag
-        $this->_can_post = trim((int)Settings::settingValue('site.spotnab.spotnabpost')) === 1;
+        $this->_can_post = trim((int) Settings::settingValue('site.spotnab.spotnabpost')) === 1;
 
         // Auto Enable Flag
-        $this->_auto_enable = (trim((int)Settings::settingValue('site.spotnab.spotnabautoenable')) === 1) ?
+        $this->_auto_enable = (trim((int) Settings::settingValue('site.spotnab.spotnabautoenable')) === 1) ?
             true : false;
 
         // Spotnab Privacy Posting
-        $this->_post_privacy = (trim((int)Settings::settingValue('site.spotnab.spotnabprivacy')) === 1) ?
+        $this->_post_privacy = (trim((int) Settings::settingValue('site.spotnab.spotnabprivacy')) === 1) ?
             true : false;
 
         // Auto-Discovery Private Key (used for Posting)
@@ -235,11 +235,11 @@ class SpotNab
             .'LVDl';
 
         // Auto-Discovery Flags
-        $this->_can_broadcast = (trim((int)Settings::settingValue('site.spotnab.spotnabbroadcast')) === 1) ?
+        $this->_can_broadcast = (trim((int) Settings::settingValue('site.spotnab.spotnabbroadcast')) === 1) ?
             true : false;
         $this->_can_broadcast = ($this->_can_broadcast && $this->_can_post);
 
-        $this->_can_discover = (trim((int)Settings::settingValue('spotnabdiscover')) === 1) ?
+        $this->_can_discover = (trim((int) Settings::settingValue('spotnabdiscover')) === 1) ?
             true : false;
 
         if (! $this->has_openssl()) {
@@ -401,7 +401,7 @@ class SpotNab
 
         // Connect to server
         try {
-            if (((int)Settings::settingValue('alternate_nntp') === 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+            if (((int) Settings::settingValue('alternate_nntp') === 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
                 exit($this->_pdo->log->error('Unable to connect to usenet.'.PHP_EOL));
             }
         } catch (\Exception $e) {
@@ -754,7 +754,7 @@ class SpotNab
 
         // Connect to server
         try {
-            if (((int)Settings::settingValue('alternate_nntp') === 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+            if (((int) Settings::settingValue('alternate_nntp') === 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
                 exit($this->_pdo->log->error('Unable to connect to usenet.'.PHP_EOL));
             }
         } catch (\Exception $e) {
@@ -1180,7 +1180,7 @@ class SpotNab
                     }
                 }
 
-                if ((int)$interval === 1) {
+                if ((int) $interval === 1) {
                     // We're soo close now...
                     $curfew--;
                     if ($curfew <= 0) {
@@ -1931,7 +1931,7 @@ class SpotNab
         $msg_id = $matches['id'];
 
         // Connect to server
-        if (((int)Settings::settingValue('alternate_nntp') === 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+        if (((int) Settings::settingValue('alternate_nntp') === 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
             exit($this->_pdo->log->error('Unable to connect to usenet.'.PHP_EOL));
         }
         while ($retries > 0) {
@@ -1989,7 +1989,7 @@ class SpotNab
         }
 
         // Attempt to reconnect
-        if (((int)Settings::settingValue('alternate_nntp') === 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+        if (((int) Settings::settingValue('alternate_nntp') === 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
             exit($this->_pdo->log->error('Unable to connect to usenet.'.PHP_EOL));
         }
 
