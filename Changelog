@@ -1,3 +1,5 @@
+2017-09-05 DariusIII
+	* Chg: Update laravel/framework to 5.5.2
 2017-09-04 DariusIII
 	* Fix: Search page
 	* Fix: Fix errors on webpages causing http 503 responses
