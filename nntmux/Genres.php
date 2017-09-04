@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Genre;
 use nntmux\db\DB;
+use App\Models\Genre;
 
 class Genres
 {
