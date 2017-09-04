@@ -22,33 +22,37 @@ if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
     $adapter = 'Php';
 } else {
     switch (true) {
-		case extension_loaded('yenc'):
-			if (method_exists('yenc\yEnc', 'version') &&
-				version_compare(
-					yenc\yEnc::version(),
-					'1.3.0',
-					'>='
-				)
-			) {
-			    $adapter = 'NzedbYenc';
-			    break;
-			}
-		    trigger_error('Your version of the php-yenc extension is out of date and will be
-			ignored. Please update it to use the extension.', E_USER_WARNING
-			);
+        case extension_loaded('yenc'):
+            if (method_exists('yenc\yEnc', 'version') &&
+                version_compare(
+                    yenc\yEnc::version(),
+                    '1.3.0',
+                    '>='
+                )
+            ) {
+                $adapter = 'NzedbYenc';
+                break;
+            }
+            trigger_error(
+                'Your version of the php-yenc extension is out of date and will be
+			ignored. Please update it to use the extension.',
+                E_USER_WARNING
+            );
 
-		case Settings::settingValue('apps..yydecoderpath', true) !== null:
-			$adapter = 'Ydecode';
-			break;
-		default:
-			$adapter = 'Php';
-	}
+            // no break
+        case Settings::settingValue('apps..yydecoderpath', true) !== null:
+            $adapter = 'Ydecode';
+            break;
+        default:
+            $adapter = 'Php';
+    }
 }
 
-\App\Providers\YencServiceProvider::config([
-		['name' => [
-				 'default' => $adapter,
-			 ],
-		],
-	]
+\App\Providers\YencServiceProvider::config(
+    [
+        ['name' => [
+                 'default' => $adapter,
+             ],
+        ],
+    ]
 );

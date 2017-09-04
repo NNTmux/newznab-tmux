@@ -24,19 +24,29 @@ class Genres
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Settings' => null,
-		];
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
     }
 
-    public function getGenres($type = '', $activeonly = false)
+    /**
+     * @param string $type
+     * @param bool $activeonly
+     * @return array
+     */
+    public function getGenres($type = '', $activeonly = false): array
     {
         return $this->pdo->query($this->getListQuery($type, $activeonly), true, NN_CACHE_EXPIRY_LONG);
     }
 
-    private function getListQuery($type = '', $activeonly = false)
+    /**
+     * @param string $type
+     * @param bool $activeonly
+     * @return string
+     */
+    private function getListQuery($type = '', $activeonly = false): string
     {
         if (! empty($type)) {
             $typesql = sprintf(' AND g.type = %d', $type);
@@ -45,7 +55,8 @@ class Genres
         }
 
         if ($activeonly) {
-            $sql = sprintf('
+            $sql = sprintf(
+                '
 						SELECT g.*
 						FROM genres g
 						INNER JOIN
@@ -64,8 +75,8 @@ class Genres
 							(SELECT DISTINCT genres_id FROM gamesinfo) x
 							ON x.genres_id = g.id %1$s
 							ORDER BY title',
-				$typesql
-			);
+                $typesql
+            );
         } else {
             $sql = sprintf('SELECT g.* FROM genres g WHERE 1 %s ORDER BY g.title', $typesql);
         }
@@ -73,7 +84,14 @@ class Genres
         return $sql;
     }
 
-    public function getRange($type = '', $activeonly = false, $start, $num)
+    /**
+     * @param string $type
+     * @param bool $activeonly
+     * @param $start
+     * @param $num
+     * @return array
+     */
+    public function getRange($type = '', $activeonly = false, $start, $num): array
     {
         $sql = $this->getListQuery($type, $activeonly);
         $sql .= ' LIMIT '.$num.' OFFSET '.$start;
@@ -81,6 +99,11 @@ class Genres
         return $this->pdo->query($sql);
     }
 
+    /**
+     * @param string $type
+     * @param bool $activeonly
+     * @return mixed
+     */
     public function getCount($type = '', $activeonly = false)
     {
         if (! empty($type)) {
@@ -90,7 +113,8 @@ class Genres
         }
 
         if ($activeonly) {
-            $sql = sprintf('
+            $sql = sprintf(
+                '
 						SELECT COUNT(id) AS num
 						FROM genres g
 						INNER JOIN
@@ -108,8 +132,8 @@ class Genres
 						INNER JOIN
 							(SELECT DISTINCT genres_id FROM gamesinfo) x
 							ON x.genres_id = g.id %1$s',
-				$typesql
-			);
+                $typesql
+            );
         } else {
             $sql = sprintf('SELECT COUNT(g.id) AS num FROM genres g WHERE 1 %s ORDER BY g.title', $typesql);
         }
@@ -119,17 +143,29 @@ class Genres
         return $res['num'];
     }
 
+    /**
+     * @param $id
+     * @return array|bool
+     */
     public function getById($id)
     {
         return $this->pdo->queryOneRow(sprintf('SELECT * FROM genres WHERE id = %d', $id));
     }
 
+    /**
+     * @param $id
+     * @param $disabled
+     * @return bool|\PDOStatement
+     */
     public function update($id, $disabled)
     {
         return $this->pdo->queryExec(sprintf('UPDATE genres SET disabled = %d WHERE id = %d', $disabled, $id));
     }
 
-    public function getDisabledIDs()
+    /**
+     * @return array
+     */
+    public function getDisabledIDs(): array
     {
         return $this->pdo->query('SELECT id FROM genres WHERE disabled = 1', true, NN_CACHE_EXPIRY_LONG);
     }
