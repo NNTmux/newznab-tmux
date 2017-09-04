@@ -2,11 +2,11 @@
 
 namespace nntmux\db\populate;
 
-use App\Models\AnidbEpisode;
 use nntmux\db\DB;
 use nntmux\ColorCLI;
 use App\Models\Settings;
 use nntmux\ReleaseImage;
+use App\Models\AnidbEpisode;
 
 class AniDB
 {
@@ -357,7 +357,7 @@ class AniDB
                         'episodeid' => $episode['episode_id'],
                         'episode_no' => $episode['episode_no'],
                         'episode_title' => $episode['episode_title'],
-                        'airdate' => $episode['airdate']
+                        'airdate' => $episode['airdate'],
                     ]
                 );
             }
