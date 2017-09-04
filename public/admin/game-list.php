@@ -5,7 +5,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use nntmux\Games;
 
 $page = new AdminPage();
-$game = new Games(['Settings' => $page->settings]);
+$game = new Games(['Settings' => $page->pdo]);
 
 $page->title = 'Game List';
 
@@ -14,11 +14,11 @@ $gameCount = $game->getCount();
 $offset = $_REQUEST['offset'] ?? 0;
 
 $page->smarty->assign([
-	'pagertotalitems' => $gameCount,
-	'pagerquerysuffix'  => '#results',
-	'pageroffset' => $offset,
-	'pageritemsperpage' => ITEMS_PER_PAGE,
-	'pagerquerybase' => WWW_TOP.'/game-list.php?offset=',
+    'pagertotalitems' => $gameCount,
+    'pagerquerysuffix'  => '#results',
+    'pageroffset' => $offset,
+    'pageritemsperpage' => ITEMS_PER_PAGE,
+    'pagerquerybase' => WWW_TOP.'/game-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');

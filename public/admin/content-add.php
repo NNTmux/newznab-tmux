@@ -7,44 +7,44 @@ use nntmux\Content;
 use nntmux\Contents;
 
 $page = new AdminPage();
-$contents = new Contents(['Settings' => $page->settings]);
+$contents = new Contents(['Settings' => $page->pdo]);
 $id = 0;
 
 // Set the current action.
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
 switch ($action) {
-	case 'add':
-		$page->title = 'Content Add';
-		$content = new Content();
-		$content->showinmenu = '1';
-		$content->status = '1';
-		$content->contenttype = '2';
-		$page->smarty->assign('content', $content);
-		break;
+    case 'add':
+        $page->title = 'Content Add';
+        $content = new Content();
+        $content->showinmenu = '1';
+        $content->status = '1';
+        $content->contenttype = '2';
+        $page->smarty->assign('content', $content);
+        break;
 
-	case 'submit':
-		// Validate and add or update.
-		$returnid = 0;
-		if (! isset($_POST['id']) || $_POST['id'] == '') {
-		    $returnid = $contents->add($_POST);
-		} else {
-		    $content = $contents->update($_POST);
-		    $returnid = $content->id;
-		}
-		header('Location:content-add.php?id='.$returnid);
-		break;
+    case 'submit':
+        // Validate and add or update.
+        $returnid = 0;
+        if (! isset($_POST['id']) || $_POST['id'] == '') {
+            $returnid = $contents->add($_POST);
+        } else {
+            $content = $contents->update($_POST);
+            $returnid = $content->id;
+        }
+        header('Location:content-add.php?id='.$returnid);
+        break;
 
-	case 'view':
-	default:
-		if (isset($_GET['id'])) {
-		    $page->title = 'Content Edit';
-		    $id = $_GET['id'];
+    case 'view':
+    default:
+        if (isset($_GET['id'])) {
+            $page->title = 'Content Edit';
+            $id = $_GET['id'];
 
-		    $content = $contents->getByID($id, Users::ROLE_ADMIN);
-		    $page->smarty->assign('content', $content);
-		}
-		break;
+            $content = $contents->getByID($id, Users::ROLE_ADMIN);
+            $page->smarty->assign('content', $content);
+        }
+        break;
 }
 
 $page->smarty->assign('status_ids', [1, 0]);

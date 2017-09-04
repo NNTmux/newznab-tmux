@@ -15,7 +15,7 @@ $queryLimit = (isset($_POST['querylimit']) && is_numeric($_POST['querylimit']) ?
 $page->smarty->assign(['group' => $group, 'regex' => $regex, 'showlimit' => $showLimit, 'querylimit' => $queryLimit]);
 
 if ($group && $regex) {
-    $page->smarty->assign('data', (new Regexes(['Settings' => $page->settings, 'Table_Name' => 'release_naming_regexes']))->testReleaseNamingRegex($group, $regex, $showLimit, $queryLimit));
+    $page->smarty->assign('data', (new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'release_naming_regexes']))->testReleaseNamingRegex($group, $regex, $showLimit, $queryLimit));
 }
 
 $page->content = $page->smarty->fetch('release_naming_regexes-test.tpl');

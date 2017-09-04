@@ -6,7 +6,7 @@ require_once NN_WWW.'pages/smartyTV.php';
 $page = new AdminPage();
 
 if (isset($_GET['id'])) {
-    (new smartyTV(['Settings' => $page->settings]))->delete($_GET['id']);
+    (new smartyTV(['Settings' => $page->pdo]))->delete($_GET['id']);
 }
 
 $referrer = $_SERVER['HTTP_REFERER'];

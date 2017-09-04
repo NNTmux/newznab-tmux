@@ -5,7 +5,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use nntmux\Releases;
 
 $page = new AdminPage();
-$releases = new Releases(['Settings' => $page->settings]);
+$releases = new Releases(['Settings' => $page->pdo]);
 
 $success = false;
 

@@ -5,7 +5,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use nntmux\Regexes;
 
 $page = new AdminPage();
-$regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'release_naming_regexes']);
+$regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'release_naming_regexes']);
 
 $page->title = 'Release Naming Regex List';
 

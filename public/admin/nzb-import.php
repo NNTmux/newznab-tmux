@@ -26,7 +26,7 @@ if ($page->isPostBack()) {
         }
     } else {
 
-		// Check if the user wants to use the file name as the release name.
+        // Check if the user wants to use the file name as the release name.
         $useNzbName = (isset($_POST['usefilename']) && $_POST['usefilename'] == 'on') ? true : false;
 
         // Check if the user wants to delete the NZB file when done importing.
@@ -44,11 +44,13 @@ if ($page->isPostBack()) {
 
     if (count($filesToProcess) > 0) {
 
-		// Create a new instance of NZBImport and send it the file locations.
-        $NZBImport = new NZBImport(['Browser' => true, 'Settings' => $page->settings]);
+        // Create a new instance of NZBImport and send it the file locations.
+        $NZBImport = new NZBImport(['Browser' => true, 'Settings' => $page->pdo]);
 
-        $page->smarty->assign('output',
-			$NZBImport->beginImport($filesToProcess, $useNzbName, $deleteNZB));
+        $page->smarty->assign(
+            'output',
+            $NZBImport->beginImport($filesToProcess, $useNzbName, $deleteNZB)
+        );
     }
 }
 

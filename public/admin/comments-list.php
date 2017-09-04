@@ -6,18 +6,18 @@ use nntmux\ReleaseComments;
 
 $page = new AdminPage();
 
-$releases = new ReleaseComments($page->settings);
+$releases = new ReleaseComments($page->pdo);
 
 $page->title = 'Comments List';
 
 $commentcount = $releases->getCommentCount();
 $offset = $_REQUEST['offset'] ?? 0;
 $page->smarty->assign([
-		'pagertotalitems' => $commentcount,
-		'pageroffset' => $offset,
-		'pageritemsperpage' => ITEMS_PER_PAGE,
-		'pagerquerybase' => WWW_TOP.'/comments-list.php?offset=',
-		'pagerquerysuffix' => '', ]);
+        'pagertotalitems' => $commentcount,
+        'pageroffset' => $offset,
+        'pageritemsperpage' => ITEMS_PER_PAGE,
+        'pagerquerybase' => WWW_TOP.'/comments-list.php?offset=',
+        'pagerquerysuffix' => '', ]);
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 

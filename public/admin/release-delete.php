@@ -7,7 +7,7 @@ use nntmux\Releases;
 $page = new AdminPage();
 
 if (isset($_GET['id'])) {
-    $releases = new Releases(['Settings' => $page->settings]);
+    $releases = new Releases(['Settings' => $page->pdo]);
     $releases->deleteMultiple($_GET['id']);
 }
 

@@ -5,7 +5,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use nntmux\Movie;
 
 $page = new AdminPage();
-$movie = new Movie(['Settings' => $page->settings]);
+$movie = new Movie(['Settings' => $page->pdo]);
 $id = 0;
 
 $page->title = 'Movie Add';

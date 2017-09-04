@@ -6,29 +6,29 @@ require_once NN_WWW.'pages/smartyTV.php';
 use nntmux\Videos;
 
 $page = new AdminPage();
-$tv = new smartyTV(['Settings' => $page->settings]);
-$video = new Videos(['Settings' => $page->settings]);
+$tv = new smartyTV(['Settings' => $page->pdo]);
+$video = new Videos(['Settings' => $page->pdo]);
 
 switch ($_REQUEST['action'] ?? 'view') {
-	case 'submit':
-		//TODO: Use a function that allows overwrites
-		//$tv->update($_POST["id"], $_POST["title"],$_POST["summary"], $_POST['countries_id']);
+    case 'submit':
+        //TODO: Use a function that allows overwrites
+        //$tv->update($_POST["id"], $_POST["title"],$_POST["summary"], $_POST['countries_id']);
 
-		if (isset($_POST['from']) && ! empty($_POST['from'])) {
-		    header('Location:'.$_POST['from']);
-		    exit;
-		}
+        if (isset($_POST['from']) && ! empty($_POST['from'])) {
+            header('Location:'.$_POST['from']);
+            exit;
+        }
 
-		header('Location:'.WWW_TOP.'/show-list.php');
-		break;
+        header('Location:'.WWW_TOP.'/show-list.php');
+        break;
 
-	case 'view':
-	default:
-		if (isset($_GET['id'])) {
-		    $page->title = 'TV Show Edit';
-		    $show = $video->getByVideoID($_GET['id']);
-		}
-		break;
+    case 'view':
+    default:
+        if (isset($_GET['id'])) {
+            $page->title = 'TV Show Edit';
+            $show = $video->getByVideoID($_GET['id']);
+        }
+        break;
 }
 
 $page->smarty->assign('show', $show);

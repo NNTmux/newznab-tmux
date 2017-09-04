@@ -120,15 +120,16 @@ class Settings extends Model
             foreach ($settings as $line) {
                 $message = '';
                 list($setting['section'], $setting['subsection'], $setting['name']) =
-					explode("\t", $line);
+                    explode("\t", $line);
 
-                $value = self::value(
-					[
-						'section'    => $setting['section'],
-						'subsection' => $setting['subsection'],
-						'name'       => $setting['name'],
-					],
-					true);
+                $value = self::settingValue(
+                    [
+                        'section'    => $setting['section'],
+                        'subsection' => $setting['subsection'],
+                        'name'       => $setting['name'],
+                    ],
+                    true
+                );
                 if ($value === null) {
                     $result = false;
                     $message = 'error';
@@ -136,7 +137,7 @@ class Settings extends Model
 
                 if ($message !== '' && $console !== null) {
                     $console->error(" {$setting['section']}, {$setting['subsection']}, {$setting['name']}: "
-						.'MISSING!');
+                        .'MISSING!');
                 }
             }
         }
@@ -157,21 +158,21 @@ class Settings extends Model
     public static function toTree(array $options = [], $excludeUnsectioned = true)
     {
         $results = empty($options) ?
-			self::all() :
-			self::all()->find($options);
+            self::all() :
+            self::all()->find($options);
 
         $tree = [];
         if (is_array($results)) {
             foreach ($results as $result) {
                 if (! empty($result['section']) || ! $excludeUnsectioned) {
                     $tree[$result['section']][$result['subsection']][$result['name']] =
-						['value' => $result['value'], 'hint' => $result['hint']];
+                        ['value' => $result['value'], 'hint' => $result['hint']];
                 }
             }
         } else {
             throw new \RuntimeException(
-				'NO results from Settings table! Check your table has been created and populated.'
-			);
+                'NO results from Settings table! Check your table has been created and populated.'
+            );
         }
 
         return $tree;
@@ -215,10 +216,10 @@ class Settings extends Model
     {
         $setting = self::settingToArray($setting);
         $result = self::query()->where([
-												'section' => $setting['section'] ?? '',
-												'subsection' => $setting['subsection'] ?? '',
-												'name' => $setting['name'],
-											])->value('value');
+                                                'section' => $setting['section'] ?? '',
+                                                'subsection' => $setting['subsection'] ?? '',
+                                                'name' => $setting['name'],
+                                            ])->value('value');
 
         if ($result !== null) {
             $value = $result;
@@ -246,9 +247,9 @@ class Settings extends Model
                 $count++;
             }
             list(
-				$result['section'],
-				$result['subsection'],
-				$result['name']) = $array;
+                $result['section'],
+                $result['subsection'],
+                $result['name']) = $array;
         } else {
             return false;
         }

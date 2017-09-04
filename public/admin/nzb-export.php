@@ -7,11 +7,11 @@ use nntmux\NZBExport;
 
 if (\nntmux\utility\Utility::isCLI()) {
     exit('This script is only for exporting from the web, use the script in misc/testing'.
-		PHP_EOL);
+        PHP_EOL);
 }
 
 $page = new AdminPage();
-$rel = new Releases(['Settings' => $page->settings]);
+$rel = new Releases(['Settings' => $page->pdo]);
 
 if ($page->isPostBack()) {
     $retVal = $path = '';
@@ -24,47 +24,47 @@ if ($page->isPostBack()) {
 
     if ($path !== '') {
         $NE = new NZBExport([
-			'Browser'  => true, 'Settings' => $page->settings,
-			'Releases' => $rel,
-		]);
+            'Browser'  => true, 'Settings' => $page->pdo,
+            'Releases' => $rel,
+        ]);
         $retVal = $NE->beginExport(
-			[
-				$path,
-				$postFrom,
-				$postTo,
-				$group,
-				$gzip,
-			]
-		);
+            [
+                $path,
+                $postFrom,
+                $postTo,
+                $group,
+                $gzip,
+            ]
+        );
     } else {
         $retVal = 'Error, a path is required!';
     }
 
     $page->smarty->assign(
-		[
-			'folder'   => $path,
-			'output'   => $retVal,
-			'fromdate' => $postFrom,
-			'todate'   => $postTo,
-			'group'    => $_POST['group'],
-			'gzip'     => $_POST['gzip'],
-		]
-	);
+        [
+            'folder'   => $path,
+            'output'   => $retVal,
+            'fromdate' => $postFrom,
+            'todate'   => $postTo,
+            'group'    => $_POST['group'],
+            'gzip'     => $_POST['gzip'],
+        ]
+    );
 } else {
     $page->smarty->assign(
-		[
-			'fromdate' => $rel->getEarliestUsenetPostDate(),
-			'todate'   => $rel->getLatestUsenetPostDate(),
-		]
-	);
+        [
+            'fromdate' => $rel->getEarliestUsenetPostDate(),
+            'todate'   => $rel->getLatestUsenetPostDate(),
+        ]
+    );
 }
 
 $page->title = 'Export Nzbs';
 $page->smarty->assign(
-	[
-		'gziplist'  => [1 => 'True', 0 => 'False'],
-		'grouplist' => $rel->getReleasedGroupsForSelect(true),
-	]
+    [
+        'gziplist'  => [1 => 'True', 0 => 'False'],
+        'grouplist' => $rel->getReleasedGroupsForSelect(true),
+    ]
 );
 $page->content = $page->smarty->fetch('nzb-export.tpl');
 $page->render();

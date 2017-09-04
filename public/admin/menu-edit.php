@@ -5,7 +5,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use nntmux\Menu;
 
 $page = new AdminPage();
-$menu = new Menu($page->settings);
+$menu = new Menu($page->pdo);
 $id = 0;
 
 // Get the user roles.
@@ -19,29 +19,29 @@ foreach ($userroles as $r) {
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
 switch ($action) {
-	case 'submit':
-		if ($_POST['id'] == '') {
-		    $menu->add($_POST);
-		} else {
-		    $ret = $menu->update($_POST);
-		}
+    case 'submit':
+        if ($_POST['id'] == '') {
+            $menu->add($_POST);
+        } else {
+            $ret = $menu->update($_POST);
+        }
 
-		header('Location:'.WWW_TOP.'/menu-list.php');
-		break;
+        header('Location:'.WWW_TOP.'/menu-list.php');
+        break;
 
-	case 'view':
-	default:
-		$menuRow = [
-			'id' => '', 'title' => '', 'href' => '', 'tooltip' => '',
-			'menueval' => '', 'role' => 0, 'ordinal' => 0, 'newwindow' => 0,
-		];
-		if (isset($_GET['id'])) {
-		    $id = $_GET['id'];
-		    $menuRow = $menu->getByID($id);
-		}
-		$page->title = 'Menu Edit';
-		$page->smarty->assign('menu', $menuRow);
-		break;
+    case 'view':
+    default:
+        $menuRow = [
+            'id' => '', 'title' => '', 'href' => '', 'tooltip' => '',
+            'menueval' => '', 'role' => 0, 'ordinal' => 0, 'newwindow' => 0,
+        ];
+        if (isset($_GET['id'])) {
+            $id = $_GET['id'];
+            $menuRow = $menu->getByID($id);
+        }
+        $page->title = 'Menu Edit';
+        $page->smarty->assign('menu', $menuRow);
+        break;
 }
 
 $page->smarty->assign('yesno_ids', [1, 0]);

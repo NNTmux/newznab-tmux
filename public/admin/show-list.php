@@ -5,24 +5,26 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use nntmux\Videos;
 
 $page = new AdminPage();
-$tv = new Videos(['Settings' => $page->settings]);
+$tv = new Videos(['Settings' => $page->pdo]);
 
 $page->title = 'TV Shows List';
 
 $tvshowname = (isset($_REQUEST['showname']) && ! empty($_REQUEST['showname']) ? $_REQUEST['showname'] : '');
 $offset = isset($_REQUEST['offset']) ? $_REQUEST['offset'] : 0;
 
-$page->smarty->assign([
-		'showname'          => $tvshowname,
-		'tvshowlist'        => $tv->getRange($offset, ITEMS_PER_PAGE, $tvshowname),
-		'pagertotalitems'   => $tv->getCount($tvshowname),
-		'pageroffset'       => $offset,
-		'pageritemsperpage' => ITEMS_PER_PAGE,
-		'pagerquerysuffix'  => '',
-		'pagerquerybase'    => (WWW_TOP.'/show-list.php?'.
-		($tvshowname != '' ? 'showname='.$tvshowname.'&amp;' : '').'&offset='
-		),
-	]
+$page->smarty->assign(
+    [
+        'showname'          => $tvshowname,
+        'tvshowlist'        => $tv->getRange($offset, ITEMS_PER_PAGE, $tvshowname),
+        'pagertotalitems'   => $tv->getCount($tvshowname),
+        'pageroffset'       => $offset,
+        'pageritemsperpage' => ITEMS_PER_PAGE,
+        'pagerquerysuffix'  => '',
+        'pagerquerybase'    => (
+            WWW_TOP.'/show-list.php?'.
+        ($tvshowname != '' ? 'showname='.$tvshowname.'&amp;' : '').'&offset='
+        ),
+    ]
 );
 $page->smarty->assign('pager', $page->smarty->fetch('pager.tpl'));
 

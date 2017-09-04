@@ -7,7 +7,7 @@ use nntmux\ReleaseComments;
 $page = new AdminPage();
 
 if (isset($_GET['id'])) {
-    $rc = new ReleaseComments($page->settings);
+    $rc = new ReleaseComments($page->pdo);
     $rc->deleteComment($_GET['id']);
 }
 

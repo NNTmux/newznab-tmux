@@ -5,7 +5,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use nntmux\Groups;
 
 $page = new AdminPage();
-$groups = new Groups(['Settings' => $page->settings]);
+$groups = new Groups(['Settings' => $page->pdo]);
 
 $gname = '';
 if (! empty($_REQUEST['groupname'])) {
