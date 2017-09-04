@@ -1080,7 +1080,7 @@ class DB extends \PDO
             case ! is_readable($fields['nzbpath']):
                 $error = Settings::ERR_BADNZBPATH_UNREADABLE;
                 break;
-            case (int)$fields['checkpasswordedrar'] === 1 && ! is_file($fields['unrarpath']):
+            case (int) $fields['checkpasswordedrar'] === 1 && ! is_file($fields['unrarpath']):
                 $error = Settings::ERR_DEEPNOUNRAR;
                 break;
             case $fields['tmpunrarpath'] !== '' && ! file_exists($fields['tmpunrarpath']):
