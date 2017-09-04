@@ -66,11 +66,11 @@ class DbUpdate
     public function __construct(array $options = [])
     {
         $options += [
-			'backup' => true,
-			'db'     => null,
-			'git'    => new Git(),
-			'logger' => new ColorCLI(),
-		];
+            'backup' => true,
+            'db'     => null,
+            'git'    => new Git(),
+            'logger' => new ColorCLI(),
+        ];
 
         $this->backup = $options['backup'];
         $this->git = $options['git'];
@@ -86,12 +86,12 @@ class DbUpdate
     public function loadTables(array $options = []): void
     {
         $defaults = [
-			'enclosedby'	=> null,
-			'ext'	=> 'tsv',
-			'files'	=> [],
-			'path'	=> NN_RES.'db'.DS.'schema'.DS.'data',
-			'regex'	=> '#^'.Utility::PATH_REGEX.'(?P<order>\d+)-(?P<table>\w+)\.tsv$#',
-		];
+            'enclosedby'    => null,
+            'ext'    => 'tsv',
+            'files'    => [],
+            'path'    => NN_RES.'db'.DS.'schema'.DS.'data',
+            'regex'    => '#^'.Utility::PATH_REGEX.'(?P<order>\d+)-(?P<table>\w+)\.tsv$#',
+        ];
         $options += $defaults;
 
         $show = (Utility::isCLI() || NN_DEBUG);
@@ -100,9 +100,9 @@ class DbUpdate
         natsort($files);
         $local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
         $enclosedby = empty($options['enclosedby']) ? '' : 'OPTIONALLY ENCLOSED BY "'.
-			$options['enclosedby'].'"';
+            $options['enclosedby'].'"';
         $sql = 'LOAD DATA '.
-			$local.'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" '.$enclosedby.'LINES TERMINATED BY "\n" IGNORE 1 LINES (%s)';
+            $local.'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" '.$enclosedby.'LINES TERMINATED BY "\n" IGNORE 1 LINES (%s)';
         foreach ($files as $file) {
             if ($show === true) {
                 echo "File: $file\n";
@@ -150,7 +150,7 @@ class DbUpdate
                     }
                 } else {
                     echo "Incorrectly formatted filename '$file' (should match ".
-						str_replace('#', '', $options['regex'])."\n";
+                        str_replace('#', '', $options['regex'])."\n";
                 }
             } else {
                 echo $this->log->error("  Unable to read file: '$file'");
@@ -173,12 +173,12 @@ class DbUpdate
     public function newPatches(array $options = []): void
     {
         $defaults = [
-			'data'	=> NN_RES.'db'.DS.'schema'.DS.'data'.DS,
-			'ext'	=> 'sql',
-			'path'	=> NN_RES.'db'.DS.'patches'.DS.$this->_DbSystem,
-			'regex'	=> '#^'.Utility::PATH_REGEX.'\+(?P<order>\d+)~(?P<table>\w+)\.sql$#',
-			'safe'	=> true,
-		];
+            'data'    => NN_RES.'db'.DS.'schema'.DS.'data'.DS,
+            'ext'    => 'sql',
+            'path'    => NN_RES.'db'.DS.'patches'.DS.$this->_DbSystem,
+            'regex'    => '#^'.Utility::PATH_REGEX.'\+(?P<order>\d+)~(?P<table>\w+)\.sql$#',
+            'safe'    => true,
+        ];
         $options += $defaults;
 
         $this->processPatches(['safe' => $options['safe']]); // Make sure we are completely up to date!
@@ -203,8 +203,8 @@ class DbUpdate
                     $current++;
                     Settings::query()->where('setting', '=', 'sqlpatch')->update(['value' => $current]);
                     $newName = $matches['drive'].$matches['path'].
-						str_pad($current, 4, '0', STR_PAD_LEFT).'~'.
-						$matches['table'].'.sql';
+                        str_pad($current, 4, '0', STR_PAD_LEFT).'~'.
+                        $matches['table'].'.sql';
                     rename($matches[0], $newName);
                     $this->git->add($newName);
                     if ($this->git->isCommited($this->git->getBranch().':'.str_replace(NN_ROOT, '', $matches[0]))) {
@@ -225,12 +225,12 @@ class DbUpdate
     {
         $patched = 0;
         $defaults = [
-			'data'	=> NN_RES.'db'.DS.'schema'.DS.'data'.DS,
-			'ext'	=> 'sql',
-			'path'	=> NN_RES.'db'.DS.'patches'.DS.$this->_DbSystem,
-			'regex'	=> '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
-			'safe'	=> true,
-		];
+            'data'    => NN_RES.'db'.DS.'schema'.DS.'data'.DS,
+            'ext'    => 'sql',
+            'path'    => NN_RES.'db'.DS.'patches'.DS.$this->_DbSystem,
+            'regex'    => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
+            'safe'    => true,
+        ];
         $options += $defaults;
 
         $currentVersion = Settings::settingValue('..sqlpatch');
@@ -254,10 +254,11 @@ class DbUpdate
                     $patch = (int) $matches['patch'];
                     $setPatch = true;
                 } elseif (preg_match(
-					'/UPDATE `?site`? SET `?value`? = \'?(?P<patch>\d+)\'? WHERE `?setting`? = \'sqlpatch\'/i',
-					$patch,
-					$matches)
-				) {
+                    '/UPDATE `?site`? SET `?value`? = \'?(?P<patch>\d+)\'? WHERE `?setting`? = \'sqlpatch\'/i',
+                    $patch,
+                    $matches
+                )
+                ) {
                     $patch = (int) $matches['patch'];
                 } else {
                     throw new \RuntimeException('No patch information available, stopping!!');
@@ -291,8 +292,8 @@ class DbUpdate
     public function processSQLFile(array $options = []): void
     {
         $defaults = [
-			'filepath' => NN_RES.'db'.DS.'schema'.DS.$this->_DbSystem.'-ddl.sql',
-		];
+            'filepath' => NN_RES.'db'.DS.'schema'.DS.$this->_DbSystem.'-ddl.sql',
+        ];
         $options += $defaults;
 
         $sql = file_get_contents($options['filepath']);
@@ -307,10 +308,10 @@ class DbUpdate
     public function splitSQL($file, array $options = []): void
     {
         $defaults = [
-			'data'		=> null,
-			'delimiter'	=> ';',
-			'local'		=> null,
-		];
+            'data'        => null,
+            'delimiter'    => ';',
+            'local'        => null,
+        ];
         $options += $defaults;
 
         if (! empty($options['vars'])) {
@@ -378,28 +379,28 @@ class DbUpdate
                         } catch (\PDOException $e) {
                             // Log the problem and the query.
                             file_put_contents(
-								NN_LOGS.'patcherrors.log',
-								'['.date('r').'] [ERROR] ['.
-								trim(preg_replace('/\s+/', ' ', $e->getMessage())).']'.PHP_EOL.
-								'['.date('r').'] [QUERY] ['.
-								trim(preg_replace('/\s+/', ' ', $query)).']'.PHP_EOL,
-								FILE_APPEND
-							);
+                                NN_LOGS.'patcherrors.log',
+                                '['.date('r').'] [ERROR] ['.
+                                trim(preg_replace('/\s+/', ' ', $e->getMessage())).']'.PHP_EOL.
+                                '['.date('r').'] [QUERY] ['.
+                                trim(preg_replace('/\s+/', ' ', $query)).']'.PHP_EOL,
+                                FILE_APPEND
+                            );
 
                             if (
-								in_array($e->errorInfo[1], [1091, 1060, 1061, 1071, 1146], false) ||
-								in_array($e->errorInfo[0], [23505, 42701, 42703, '42P07', '42P16'], false)
-							) {
+                                in_array($e->errorInfo[1], [1091, 1060, 1061, 1071, 1146], false) ||
+                                in_array($e->errorInfo[0], [23505, 42701, 42703, '42P07', '42P16'], false)
+                            ) {
                                 if ($e->errorInfo[1] === 1060) {
                                     echo $this->log->warning(
-										"$query The column already exists - No need to worry \{".
-										$e->errorInfo[1]."}.\n"
-									);
+                                        "$query The column already exists - No need to worry \{".
+                                        $e->errorInfo[1]."}.\n"
+                                    );
                                 } else {
                                     echo $this->log->warning(
-										"$query Skipped - No need to worry \{".
-										$e->errorInfo[1]."}.\n"
-									);
+                                        "$query Skipped - No need to worry \{".
+                                        $e->errorInfo[1]."}.\n"
+                                    );
                                 }
                             } else {
                                 if (preg_match('/ALTER IGNORE/i', $query)) {
@@ -437,13 +438,13 @@ class DbUpdate
     {
         $changed = false;
         $default = [
-			'file'	=> '10-settings.tsv',
-			'path'	=> 'resources'.DS.'db'.DS.'schema'.DS.'data'.DS,
-			'regex'	=> '#^(?P<section>.*)\t(?P<subsection>.*)\t(?P<name>.*)\t(?P<value>.*)\t(?P<hint>.*)\t(?P<setting>.*)$#',
-			'value'	=> function (array $matches) {
-			    return "{$matches['section']}\t{$matches['subsection']}\t{$matches['name']}\t{$matches['value']}\t{$matches['hint']}\t{$matches['setting']}";
-			}, // WARNING: leaving this empty will blank not remove lines.
-		];
+            'file'    => '10-settings.tsv',
+            'path'    => 'resources'.DS.'db'.DS.'schema'.DS.'data'.DS,
+            'regex'    => '#^(?P<section>.*)\t(?P<subsection>.*)\t(?P<name>.*)\t(?P<value>.*)\t(?P<hint>.*)\t(?P<setting>.*)$#',
+            'value'    => function (array $matches) {
+                return "{$matches['section']}\t{$matches['subsection']}\t{$matches['name']}\t{$matches['value']}\t{$matches['hint']}\t{$matches['setting']}";
+            }, // WARNING: leaving this empty will blank not remove lines.
+        ];
         $options += $default;
 
         $file = [];
@@ -480,7 +481,7 @@ class DbUpdate
         $PHP = 'php';
 
         system("$PHP ".NN_MISC.'testing'.DS.'DB'.DS.$this->_DbSystem.
-			'dump_tables.php db dump');
+            'dump_tables.php db dump');
         $this->backedup = true;
     }
 }

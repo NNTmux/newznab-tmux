@@ -110,19 +110,19 @@ class DB extends \PDO
         $this->cli = Utility::isCLI();
 
         $defaults = [
-			'checkVersion'	=> false,
-			'createDb'		=> false, // create dbname if it does not exist?
-			'ct'			=> new ConsoleTools(),
-			'dbhost'		=> env('DB_HOST', '127.0.0.1'),
-			'dbname'		=> env('DB_NAME', 'nntmux'),
-			'dbpass'		=> env('DB_PASSWORD', 'nntmux'),
-			'dbport'		=> env('DB_PORT', '3306'),
-			'dbsock'		=> env('DB_SOCKET', ''),
-			'dbtype'		=> env('DB_SYSTEM', 'mysql'),
-			'dbuser'		=> env('DB_USER', 'nntmux'),
-			'log'			=> new ColorCLI(),
-			'persist'		=> false,
-		];
+            'checkVersion'    => false,
+            'createDb'        => false, // create dbname if it does not exist?
+            'ct'            => new ConsoleTools(),
+            'dbhost'        => env('DB_HOST', '127.0.0.1'),
+            'dbname'        => env('DB_NAME', 'nntmux'),
+            'dbpass'        => env('DB_PASSWORD', 'nntmux'),
+            'dbport'        => env('DB_PORT', '3306'),
+            'dbsock'        => env('DB_SOCKET', ''),
+            'dbtype'        => env('DB_SYSTEM', 'mysql'),
+            'dbuser'        => env('DB_USER', 'nntmux'),
+            'log'            => new ColorCLI(),
+            'persist'        => false,
+        ];
         $options += $defaults;
 
         if (! $this->cli) {
@@ -215,12 +215,12 @@ class DB extends \PDO
     public function checkIndex($table, $index)
     {
         $result = $this->pdo->query(
-			sprintf(
-				"SHOW INDEX FROM %s WHERE key_name = '%s'",
-				trim($table),
-				trim($index)
-			)
-		);
+            sprintf(
+                "SHOW INDEX FROM %s WHERE key_name = '%s'",
+                trim($table),
+                trim($index)
+            )
+        );
         if ($result === false) {
             return false;
         }
@@ -231,12 +231,12 @@ class DB extends \PDO
     public function checkColumnIndex($table, $column)
     {
         $result = $this->pdo->query(
-			sprintf(
-				"SHOW INDEXES IN %s WHERE non_unique = 0 AND column_name = '%s'",
-				trim($table),
-				trim($column)
-			)
-		);
+            sprintf(
+                "SHOW INDEXES IN %s WHERE non_unique = 0 AND column_name = '%s'",
+                trim($table),
+                trim($column)
+            )
+        );
         if ($result === false) {
             return false;
         }
@@ -281,8 +281,10 @@ class DB extends \PDO
     {
         $where = $excludeUnsectioned ? "WHERE section != ''" : '';
 
-        $sql = sprintf('SELECT section, subsection, name, value, hint FROM settings %s ORDER BY section, subsection, name',
-			$where);
+        $sql = sprintf(
+            'SELECT section, subsection, name, value, hint FROM settings %s ORDER BY section, subsection, name',
+            $where
+        );
         $results = $this->queryArray($sql);
 
         $tree = [];
@@ -290,7 +292,7 @@ class DB extends \PDO
             foreach ($results as $result) {
                 if (! empty($result['section']) || ! $excludeUnsectioned) {
                     $tree[$result['section']][$result['subsection']][$result['name']] =
-						['value' => $result['value'], 'hint' => $result['hint']];
+                        ['value' => $result['value'], 'hint' => $result['hint']];
                 }
             }
         } else {
@@ -352,11 +354,11 @@ class DB extends \PDO
         $dsn .= ';charset=utf8';
 
         $options = [
-			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-			\PDO::ATTR_TIMEOUT => 180,
-			\PDO::ATTR_PERSISTENT => $this->opts['persist'],
-			\PDO::MYSQL_ATTR_LOCAL_INFILE => true,
-		];
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_TIMEOUT => 180,
+            \PDO::ATTR_PERSISTENT => $this->opts['persist'],
+            \PDO::MYSQL_ATTR_LOCAL_INFILE => true,
+        ];
 
         $this->dsn = $dsn;
         // removed try/catch to let the instantiating code handle the problem (Install for
@@ -392,11 +394,11 @@ class DB extends \PDO
         // In case PDO is not set to produce exceptions (PHP's default behaviour).
         if ($this->pdo === false) {
             $this->echoError(
-				'Unable to create connection to the Database!',
-				'initialiseDatabase',
-				1,
-				true
-			);
+                'Unable to create connection to the Database!',
+                'initialiseDatabase',
+                1,
+                true
+            );
         }
 
         // For backwards compatibility, no need for a patch.
@@ -418,7 +420,7 @@ class DB extends \PDO
             $this->debugging->log(__CLASS__, $method, $error, $severity);
 
             echo
-			$this->cli ? $this->log->error($error).PHP_EOL : '<div class="error">'.$error.'</div>';
+            $this->cli ? $this->log->error($error).PHP_EOL : '<div class="error">'.$error.'</div>';
         }
 
         if ($exit) {
@@ -494,10 +496,12 @@ class DB extends \PDO
             if (is_array($result) && isset($result['deadlock'])) {
                 $error = $result['message'];
                 if ($result['deadlock'] === true) {
-                    $this->echoError('A Deadlock or lock wait timeout has occurred, sleeping. ('.
-						($i - 1).')',
-						'queryInsert',
-						4);
+                    $this->echoError(
+                        'A Deadlock or lock wait timeout has occurred, sleeping. ('.
+                        ($i - 1).')',
+                        'queryInsert',
+                        4
+                    );
                     $this->ct->showsleep($i * ($i / 2));
                     $i++;
                 } else {
@@ -603,21 +607,21 @@ class DB extends \PDO
         } catch (\PDOException $e) {
             // Deadlock or lock wait timeout, try 10 times.
             if (
-				$e->errorInfo[1] == 1213 ||
-				$e->errorInfo[0] == 40001 ||
-				$e->errorInfo[1] == 1205 ||
-				$e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
-			) {
+                $e->errorInfo[1] == 1213 ||
+                $e->errorInfo[0] == 40001 ||
+                $e->errorInfo[1] == 1205 ||
+                $e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
+            ) {
                 return ['deadlock' => true, 'message' => $e->getMessage()];
             }
 
             // Check if we lost connection to MySQL.
             elseif ($this->_checkGoneAway($e->getMessage()) !== false) {
 
-				// Reconnect to MySQL.
+                // Reconnect to MySQL.
                 if ($this->_reconnect() === true) {
 
-					// If we reconnected, retry the query.
+                    // If we reconnected, retry the query.
                     return $this->queryExecHelper($query, $insert);
                 }
             }
@@ -649,13 +653,13 @@ class DB extends \PDO
             return $this->pdo->exec($query);
         } catch (\PDOException $e) {
 
-			// Check if we lost connection to MySQL.
+            // Check if we lost connection to MySQL.
             if ($this->_checkGoneAway($e->getMessage()) !== false) {
 
-				// Reconnect to MySQL.
+                // Reconnect to MySQL.
                 if ($this->_reconnect() === true) {
 
-					// If we reconnected, retry the query.
+                    // If we reconnected, retry the query.
                     return $this->exec($query, $silent);
                 } else {
                     // If we are not reconnected, return false.
@@ -749,10 +753,10 @@ class DB extends \PDO
         }
 
         return
-			[
-				'total' => ($result === false ? 0 : $result['total']),
-				'result' => $data,
-			];
+            [
+                'total' => ($result === false ? 0 : $result['total']),
+                'result' => $data,
+            ];
     }
 
     /**
@@ -823,13 +827,13 @@ class DB extends \PDO
             $result = $this->pdo->query($query);
         } catch (\PDOException $e) {
 
-			// Check if we lost connection to MySQL.
+            // Check if we lost connection to MySQL.
             if ($this->_checkGoneAway($e->getMessage()) !== false) {
 
-				// Reconnect to MySQL.
+                // Reconnect to MySQL.
                 if ($this->_reconnect() === true) {
 
-					// If we reconnected, retry the query.
+                    // If we reconnected, retry the query.
                     $result = $this->queryDirect($query);
                 } else {
                     // If we are not reconnected, return false.
@@ -939,18 +943,18 @@ class DB extends \PDO
         }
 
         switch ($type) {
-			case 'space':
-				$tableArray = $this->queryDirect('SHOW TABLE STATUS WHERE Data_free / Data_length > 0.005'.$tableAnd);
-				$myIsamTables = $this->queryDirect("SHOW TABLE STATUS WHERE ENGINE LIKE 'myisam' AND Data_free / Data_length > 0.005".$tableAnd);
-				break;
-			case 'analyze':
-			case '':
-			case 'full':
-			default:
-				$tableArray = $this->queryDirect('SHOW TABLE STATUS WHERE 1=1'.$tableAnd);
-				$myIsamTables = $this->queryDirect("SHOW TABLE STATUS WHERE ENGINE LIKE 'myisam'".$tableAnd);
-				break;
-		}
+            case 'space':
+                $tableArray = $this->queryDirect('SHOW TABLE STATUS WHERE Data_free / Data_length > 0.005'.$tableAnd);
+                $myIsamTables = $this->queryDirect("SHOW TABLE STATUS WHERE ENGINE LIKE 'myisam' AND Data_free / Data_length > 0.005".$tableAnd);
+                break;
+            case 'analyze':
+            case '':
+            case 'full':
+            default:
+                $tableArray = $this->queryDirect('SHOW TABLE STATUS WHERE 1=1'.$tableAnd);
+                $myIsamTables = $this->queryDirect("SHOW TABLE STATUS WHERE ENGINE LIKE 'myisam'".$tableAnd);
+                break;
+        }
 
         $optimised = 0;
         if ($tableArray instanceof \Traversable && $tableArray->rowCount()) {
@@ -1050,11 +1054,11 @@ class DB extends \PDO
     public function setCovers()
     {
         $path = Settings::settingValue([
-			'section'    => 'site',
-			'subsection' => 'main',
-			'name'       => 'coverspath',
-			'setting'    => 'coverspath',
-		]);
+            'section'    => 'site',
+            'subsection' => 'main',
+            'name'       => 'coverspath',
+            'setting'    => 'coverspath',
+        ]);
         Utility::setCoversConstant($path);
     }
 
@@ -1081,18 +1085,21 @@ class DB extends \PDO
         if ($error === null) {
             $sql = $sqlKeys = [];
             foreach ($form as $settingK => $settingV) {
-                $sql[] = sprintf('WHEN %s THEN %s',
-					$this->escapeString(trim($settingK)),
-					$this->escapeString(trim($settingV)));
+                $sql[] = sprintf(
+                    'WHEN %s THEN %s',
+                    $this->escapeString(trim($settingK)),
+                    $this->escapeString(trim($settingV))
+                );
                 $sqlKeys[] = $this->escapeString(trim($settingK));
             }
 
             $this->queryExec(
-				sprintf('UPDATE settings SET value = CASE setting %s END WHERE setting IN (%s)',
-					implode(' ', $sql),
-					implode(', ', $sqlKeys)
-				)
-			);
+                sprintf(
+                    'UPDATE settings SET value = CASE setting %s END WHERE setting IN (%s)',
+                    implode(' ', $sql),
+                    implode(', ', $sqlKeys)
+                )
+            );
         } else {
             $form = $error;
         }
@@ -1103,49 +1110,49 @@ class DB extends \PDO
     protected function settingsValidate(array $fields)
     {
         $defaults = [
-			'checkpasswordedrar' => false,
-			'ffmpegpath'         => '',
-			'mediainfopath'      => '',
-			'nzbpath'            => '',
-			'tmpunrarpath'       => '',
-			'unrarpath'          => '',
-			'yydecoderpath'      => '',
-		];
+            'checkpasswordedrar' => false,
+            'ffmpegpath'         => '',
+            'mediainfopath'      => '',
+            'nzbpath'            => '',
+            'tmpunrarpath'       => '',
+            'unrarpath'          => '',
+            'yydecoderpath'      => '',
+        ];
         $fields += $defaults;    // Make sure keys exist to avoid error notices.
         ksort($fields);
         // Validate settings
         $fields['nzbpath'] = Utility::trailingSlash($fields['nzbpath']);
         $error = null;
         switch (true) {
-			case $fields['mediainfopath'] != '' && ! is_file($fields['mediainfopath']):
-				$error = Settings::ERR_BADMEDIAINFOPATH;
-				break;
-			case $fields['ffmpegpath'] != '' && ! is_file($fields['ffmpegpath']):
-				$error = Settings::ERR_BADFFMPEGPATH;
-				break;
-			case $fields['unrarpath'] != '' && ! is_file($fields['unrarpath']):
-				$error = Settings::ERR_BADUNRARPATH;
-				break;
-			case empty($fields['nzbpath']):
-				$error = Settings::ERR_BADNZBPATH_UNSET;
-				break;
-			case ! file_exists($fields['nzbpath']) || ! is_dir($fields['nzbpath']):
-				$error = Settings::ERR_BADNZBPATH;
-				break;
-			case ! is_readable($fields['nzbpath']):
-				$error = Settings::ERR_BADNZBPATH_UNREADABLE;
-				break;
-			case $fields['checkpasswordedrar'] == 1 && ! is_file($fields['unrarpath']):
-				$error = Settings::ERR_DEEPNOUNRAR;
-				break;
-			case $fields['tmpunrarpath'] != '' && ! file_exists($fields['tmpunrarpath']):
-				$error = Settings::ERR_BADTMPUNRARPATH;
-				break;
-			case $fields['yydecoderpath'] != '' &&
-				$fields['yydecoderpath'] !== 'simple_php_yenc_decode' &&
-				! file_exists($fields['yydecoderpath']):
-				$error = Settings::ERR_BAD_YYDECODER_PATH;
-		}
+            case $fields['mediainfopath'] != '' && ! is_file($fields['mediainfopath']):
+                $error = Settings::ERR_BADMEDIAINFOPATH;
+                break;
+            case $fields['ffmpegpath'] != '' && ! is_file($fields['ffmpegpath']):
+                $error = Settings::ERR_BADFFMPEGPATH;
+                break;
+            case $fields['unrarpath'] != '' && ! is_file($fields['unrarpath']):
+                $error = Settings::ERR_BADUNRARPATH;
+                break;
+            case empty($fields['nzbpath']):
+                $error = Settings::ERR_BADNZBPATH_UNSET;
+                break;
+            case ! file_exists($fields['nzbpath']) || ! is_dir($fields['nzbpath']):
+                $error = Settings::ERR_BADNZBPATH;
+                break;
+            case ! is_readable($fields['nzbpath']):
+                $error = Settings::ERR_BADNZBPATH_UNREADABLE;
+                break;
+            case $fields['checkpasswordedrar'] == 1 && ! is_file($fields['unrarpath']):
+                $error = Settings::ERR_DEEPNOUNRAR;
+                break;
+            case $fields['tmpunrarpath'] != '' && ! file_exists($fields['tmpunrarpath']):
+                $error = Settings::ERR_BADTMPUNRARPATH;
+                break;
+            case $fields['yydecoderpath'] != '' &&
+                $fields['yydecoderpath'] !== 'simple_php_yenc_decode' &&
+                ! file_exists($fields['yydecoderpath']):
+                $error = Settings::ERR_BAD_YYDECODER_PATH;
+        }
 
         return $error;
     }
