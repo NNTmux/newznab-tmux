@@ -2,12 +2,12 @@
 
 namespace nntmux\processing\post;
 
-use App\Models\AnidbEpisode;
 use nntmux\NZB;
 use nntmux\db\DB;
 use nntmux\Category;
 use nntmux\ColorCLI;
 use App\Models\Settings;
+use App\Models\AnidbEpisode;
 use nntmux\db\populate\AniDB as PaDb;
 
 class AniDB
@@ -57,7 +57,7 @@ class AniDB
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
-        $qty = (int)Settings::settingValue('..maxanidbprocessed');
+        $qty = (int) Settings::settingValue('..maxanidbprocessed');
         $this->aniqty = $qty ?? 100;
 
         $this->status = 'NULL';
@@ -128,14 +128,14 @@ class AniDB
         return AnidbEpisode::query()->whereColumn(
             [
                 'anidbid' => $anidbId,
-                'episode_no' => $episode
+                'episode_no' => $episode,
             ]
         )->first(
             [
                 'anidbid',
                 'episode_no',
                 'airdate',
-                'episode_title'
+                'episode_title',
             ]
         );
     }
