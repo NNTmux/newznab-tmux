@@ -2,7 +2,7 @@
 
 namespace nntmux\db\populate;
 
-use App\Models\AnidbEpisodes;
+use App\Models\AnidbEpisode;
 use nntmux\db\DB;
 use nntmux\ColorCLI;
 use App\Models\Settings;
@@ -351,7 +351,7 @@ class AniDB
     {
         if (! empty($episodeArr)) {
             foreach ($episodeArr as $episode) {
-                AnidbEpisodes::query()->updateOrCreate(
+                AnidbEpisode::query()->updateOrCreate(
                     [
                         'anidbid' => $anidbId,
                         'episodeid' => $episode['episode_id'],

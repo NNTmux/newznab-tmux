@@ -2,7 +2,7 @@
 
 namespace nntmux\processing\post;
 
-use App\Models\AnidbEpisodes;
+use App\Models\AnidbEpisode;
 use nntmux\NZB;
 use nntmux\db\DB;
 use nntmux\Category;
@@ -125,7 +125,7 @@ class AniDB
      */
     private function checkAniDBInfo($anidbId, $episode = -1)
     {
-        return AnidbEpisodes::query()->whereColumn(
+        return AnidbEpisode::query()->whereColumn(
             [
                 'anidbid' => $anidbId,
                 'episode_no' => $episode

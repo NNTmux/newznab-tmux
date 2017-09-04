@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AnidbEpisodes extends Model
+class AnidbEpisode extends Model
 {
     /**
      * @var bool

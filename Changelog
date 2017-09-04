@@ -1,4 +1,5 @@
 2017-09-04 DariusIII
+	* Chg: Rename AnidbEpisodes to AnidbEpisode
 	* Chg: Use AnidbEpisodes model where applicable
 	* Chg: Update and use Genre model, update related migration
 	* Chg: Add PHPDOC blocks and update code
