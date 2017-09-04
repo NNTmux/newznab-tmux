@@ -125,7 +125,7 @@ class AniDB
      */
     private function checkAniDBInfo($anidbId, $episode = -1)
     {
-        return AnidbEpisode::query()->whereColumn(
+        return AnidbEpisode::query()->where(
             [
                 'anidbid' => $anidbId,
                 'episode_no' => $episode,
