@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Genre;
 use nntmux\db\DB;
 
 class Genres
@@ -145,11 +146,11 @@ class Genres
 
     /**
      * @param $id
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getById($id)
     {
-        return $this->pdo->queryOneRow(sprintf('SELECT * FROM genres WHERE id = %d', $id));
+        return Genre::query()->where('id', $id)->first();
     }
 
     /**
@@ -159,7 +160,7 @@ class Genres
      */
     public function update($id, $disabled)
     {
-        return $this->pdo->queryExec(sprintf('UPDATE genres SET disabled = %d WHERE id = %d', $disabled, $id));
+        return Genre::query()->where('id', $id)->update(['disabled' => $disabled]);
     }
 
     /**

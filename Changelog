@@ -1,4 +1,5 @@
 2017-09-04 DariusIII
+	* Chg: Update and use Genre model, update related migration
 	* Chg: Add PHPDOC blocks and update code
 	* Chg: Add .php-cs config file for PHP-CS-Fixer
 2017-09-03 DariusIII
