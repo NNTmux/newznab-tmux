@@ -147,8 +147,8 @@ class Versions
     public function checkGitTag($update = true)
     {
         trigger_error(
-			'This method is deprecated. Use app/extensions/utils/Versions::checkGitTag() instead.'
-		);
+            'This method is deprecated. Use app/extensions/utils/Versions::checkGitTag() instead.'
+        );
 
         $branch = $this->git->getBranch();
         $this->_gitHighestTag = $latest = trim($this->git->tagLatest());
@@ -170,7 +170,7 @@ class Versions
                 $this->_changes |= self::UPDATED_GIT_TAG;
             } else {
                 echo ColorCLI::primaryOver('Leaving tag version at ').
-					ColorCLI::headerOver($this->_vers->git->tag);
+                    ColorCLI::headerOver($this->_vers->git->tag);
             }
 
             return $this->_vers->git->tag;
@@ -191,9 +191,6 @@ class Versions
     public function checkSQLDb($update = false): bool
     {
         $this->checkSQLFileLatest($update);
-
-        //$settings = new DB();
-        //$setting  = $settings->getSetting('sqlpatch');
 
         if ($this->_vers->sql->db->__toString() !== $this->_vers->sql->file->__toString()) {
             if ($update) {
@@ -218,12 +215,12 @@ class Versions
     public function checkSQLFileLatest($update = true)
     {
         $options = [
-			'data'  => NN_RES.'db'.DS.'schema'.DS.'data'.DS,
-			'ext'   => 'sql',
-			'path'  => NN_RES.'db'.DS.'patches'.DS.'mysql',
-			'regex' => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
-			'safe'  => true,
-		];
+            'data'  => NN_RES.'db'.DS.'schema'.DS.'data'.DS,
+            'ext'   => 'sql',
+            'path'  => NN_RES.'db'.DS.'patches'.DS.'mysql',
+            'regex' => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
+            'safe'  => true,
+        ];
         $files = Utility::getDirFiles($options);
         natsort($files);
 

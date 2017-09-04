@@ -1,4 +1,5 @@
 2017-09-04 DariusIII
+	* Chg: Update SpotNab class
 	* Chg: Update DB class
 	* Fix: Fix checkAnidbInfo query
 	* Chg: Update code style in DB and DbUpdate classes
