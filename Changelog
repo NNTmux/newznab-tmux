@@ -1,4 +1,5 @@
 2017-09-04 DariusIII
+	* Chg: Update DB class
 	* Fix: Fix checkAnidbInfo query
 	* Chg: Update code style in DB and DbUpdate classes
 	* Chg: Use AnidbInfo model, update related migration

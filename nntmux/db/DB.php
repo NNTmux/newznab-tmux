@@ -104,6 +104,7 @@ class DB extends \PDO
      * if needed, otherwise returns the current one.
      *
      * @param array $options
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
@@ -138,7 +139,7 @@ class DB extends \PDO
             $this->initialiseDatabase();
         }
 
-        $this->cacheEnabled = (defined('NN_CACHE_TYPE') && (NN_CACHE_TYPE > 0) ? true : false);
+        $this->cacheEnabled = defined('NN_CACHE_TYPE') && (NN_CACHE_TYPE > 0);
 
         if ($this->cacheEnabled) {
             try {
@@ -179,13 +180,6 @@ class DB extends \PDO
         $this->pdo = null;
     }
 
-    public function __get($name)
-    {
-        $result = $this->queryOneRow("SELECT value FROM settings WHERE setting = '$name' LIMIT 1");
-
-        return is_array($result) ? $result['value'] : $result;
-    }
-
     public function checkDbExists($name = null)
     {
         if (empty($name)) {
@@ -193,9 +187,9 @@ class DB extends \PDO
         }
 
         $found = false;
-        $tables = self::getTableList();
+        $tables = $this->getTableList();
         foreach ($tables as $table) {
-            if ($table['Database'] == $name) {
+            if ($table['Database'] === $name) {
                 $found = true;
                 break;
             }
@@ -260,52 +254,9 @@ class DB extends \PDO
         }
     }
 
-    public function getSetting($name)
-    {
-        $result = $this->queryOneRow("SELECT value FROM settings WHERE setting = '$name' LIMIT 1");
-
-        return is_array($result) ? $result['value'] : $result;
-    }
-
-    /**
-     * Return a tree-like array of all or selected settings.
-     *
-     * @param array $options            Options array for Settings::find() i.e. ['conditions' => ...].
-     * @param bool  $excludeUnsectioned If rows with empty 'section' field should be excluded.
-     *                                  Note this doesn't prevent empty 'subsection' fields.
-     *
-     * @return array
-     * @throws \RuntimeException
-     */
-    public function getSettingsAsTree($excludeUnsectioned = true)
-    {
-        $where = $excludeUnsectioned ? "WHERE section != ''" : '';
-
-        $sql = sprintf(
-            'SELECT section, subsection, name, value, hint FROM settings %s ORDER BY section, subsection, name',
-            $where
-        );
-        $results = $this->queryArray($sql);
-
-        $tree = [];
-        if (is_array($results)) {
-            foreach ($results as $result) {
-                if (! empty($result['section']) || ! $excludeUnsectioned) {
-                    $tree[$result['section']][$result['subsection']][$result['name']] =
-                        ['value' => $result['value'], 'hint' => $result['hint']];
-                }
-            }
-        } else {
-            echo "NO results!!\n";
-        }
-
-        return $tree;
-    }
-
     public function getTableList()
     {
-        $query = ($this->opts['dbtype'] === 'mysql' ? 'SHOW DATABASES' : 'SELECT datname AS Database FROM pg_database');
-        $result = $this->pdo->query($query);
+        $result = $this->pdo->query('SHOW DATABASES');
 
         return $result->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -319,17 +270,17 @@ class DB extends \PDO
      *
      * @return bool Whether the Db is definitely on the local machine.
      */
-    public function isLocalDb()
+    public function isLocalDb(): bool
     {
         $local = false;
-        if (! empty($this->opts['dbsock']) || $this->opts['dbhost'] == 'localhost') {
+        if (! empty($this->opts['dbsock']) || $this->opts['dbhost'] === 'localhost') {
             $local = true;
         } else {
             preg_match_all('/inet'.'6?'.' addr: ?([^ ]+)/', `ifconfig`, $ips);
 
             // Check for dotted quad - if exists compare against local IP number(s)
             if (preg_match('#^\d+\.\d+\.\d+\.\d+$#', $this->opts['dbhost'])) {
-                if (in_array($this->opts['dbhost'], $ips[1])) {
+                if (in_array($this->opts['dbhost'], $ips[1], false)) {
                     $local = true;
                 }
             }
@@ -340,6 +291,8 @@ class DB extends \PDO
 
     /**
      * Init PDO instance.
+     *
+     * @throws \RuntimeException
      */
     private function initialiseDatabase()
     {
@@ -365,30 +318,29 @@ class DB extends \PDO
         // instance can output a message that connecting failed.
         $this->pdo = new \PDO($dsn, $this->opts['dbuser'], $this->opts['dbpass'], $options);
 
-        if ($this->opts['dbname'] != '') {
+        if ($this->opts['dbname'] !== '') {
             if ($this->opts['createDb']) {
-                $found = self::checkDbExists();
+                $found = $this->checkDbExists();
                 if ($found) {
                     try {
-                        $this->pdo->query('DROP DATABASE '.$this->opts['dbname']);
+                        $this->pdo->exec('DROP DATABASE '.$this->opts['dbname']);
                     } catch (\Exception $e) {
                         throw new \RuntimeException("Error trying to drop your old database: '{$this->opts['dbname']}'", 2);
                     }
-                    $found = self::checkDbExists();
+                    $found = $this->checkDbExists();
                 }
 
                 if ($found) {
-                    var_dump(self::getTableList());
+                    var_dump($this->getTableList());
                     throw new \RuntimeException("Could not drop your old database: '{$this->opts['dbname']}'", 2);
-                } else {
-                    $this->pdo->query("CREATE DATABASE `{$this->opts['dbname']}`  DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci");
+                }
+                $this->pdo->exec("CREATE DATABASE `{$this->opts['dbname']}`  DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci");
 
-                    if (! self::checkDbExists()) {
-                        throw new \RuntimeException("Could not create new database: '{$this->opts['dbname']}'", 3);
-                    }
+                if (! $this->checkDbExists()) {
+                    throw new \RuntimeException("Could not create new database: '{$this->opts['dbname']}'", 3);
                 }
             }
-            $this->pdo->query("USE {$this->opts['dbname']}");
+            $this->pdo->exec("USE {$this->opts['dbname']}");
         }
 
         // In case PDO is not set to produce exceptions (PHP's default behaviour).
@@ -431,7 +383,7 @@ class DB extends \PDO
     /**
      * @return string mysql.
      */
-    public function DbSystem()
+    public function DbSystem(): string
     {
         return $this->dbSystem;
     }
@@ -443,9 +395,9 @@ class DB extends \PDO
      *
      * @return string
      */
-    public function escapeString($str)
+    public function escapeString($str): string
     {
-        if (is_null($str)) {
+        if ($str === null) {
             return 'NULL';
         }
 
@@ -461,7 +413,7 @@ class DB extends \PDO
      *
      * @return string
      */
-    public function likeString($str, $left = true, $right = true)
+    public function likeString($str, $left = true, $right = true): string
     {
         return 'LIKE '.$this->escapeString(($left ? '%' : '').$str.($right ? '%' : ''));
     }
@@ -471,7 +423,7 @@ class DB extends \PDO
      *
      * @return bool
      */
-    public function isInitialised()
+    public function isInitialised(): bool
     {
         return $this->pdo instanceof \PDO;
     }
@@ -585,38 +537,32 @@ class DB extends \PDO
     /**
      * Helper method for queryInsert and queryExec, checks for deadlocks.
      *
-     * @param string $query
-     * @param bool   $insert
-     *
-     * @return array|\PDOStatement
+     * @param $query
+     * @param bool $insert
+     * @return array|\PDOStatement|string
      */
     protected function queryExecHelper($query, $insert = false)
     {
         try {
             if ($insert === false) {
-                $run = $this->pdo->prepare($query);
-                $run->execute();
-
-                return $run;
-            } else {
-                $ins = $this->pdo->prepare($query);
-                $ins->execute();
-
-                return $this->pdo->lastInsertId();
+                return $this->pdo->query($query);
             }
+            $this->pdo->exec($query);
+
+            return $this->pdo->lastInsertId();
         } catch (\PDOException $e) {
             // Deadlock or lock wait timeout, try 10 times.
             if (
-                $e->errorInfo[1] == 1213 ||
-                $e->errorInfo[0] == 40001 ||
-                $e->errorInfo[1] == 1205 ||
-                $e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
+                $e->errorInfo[1] === 1213 ||
+                $e->errorInfo[0] === 40001 ||
+                $e->errorInfo[1] === 1205 ||
+                $e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
             ) {
                 return ['deadlock' => true, 'message' => $e->getMessage()];
             }
 
             // Check if we lost connection to MySQL.
-            elseif ($this->_checkGoneAway($e->getMessage()) !== false) {
+            if ($this->_checkGoneAway($e->getMessage()) !== false) {
 
                 // Reconnect to MySQL.
                 if ($this->_reconnect() === true) {
@@ -685,9 +631,9 @@ class DB extends \PDO
      * @param bool   $cache       Indicates if the query result should be cached.
      * @param int    $cacheExpiry The time in seconds before deleting the query result from the cache server.
      *
-     * @return array Array of results (possibly empty) on success, empty array on failure.
+     * @return array|bool Array of results (possibly empty) on success, empty array on failure.
      */
-    public function query($query, $cache = false, $cacheExpiry = 600)
+    public function query($query, $cache = false, $cacheExpiry = 600): array
     {
         if (! $this->parseQuery($query)) {
             return false;
@@ -724,7 +670,7 @@ class DB extends \PDO
      *
      * @return array Array of results (possibly empty) on success, empty array on failure.
      */
-    public function queryCalc($query, $cache = false, $cacheExpiry = 600)
+    public function queryCalc($query, $cache = false, $cacheExpiry = 600): array
     {
         $data = $this->query($query, $cache, $cacheExpiry);
 
@@ -754,7 +700,7 @@ class DB extends \PDO
 
         return
             [
-                'total' => ($result === false ? 0 : $result['total']),
+                'total' => $result === false ? 0 : $result['total'],
                 'result' => $data,
             ];
     }
@@ -792,18 +738,19 @@ class DB extends \PDO
      */
     public function queryAssoc($query)
     {
-        if ($query == '') {
+        if ($query === '') {
             return false;
         }
         $mode = $this->pdo->getAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE);
-        if ($mode != \PDO::FETCH_ASSOC) {
+        if ($mode !== \PDO::FETCH_ASSOC) {
             $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
         }
 
         $result = $this->queryArray($query);
 
-        if ($mode != \PDO::FETCH_ASSOC) {
-            $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, $mode); // Restore old mode
+        if ($mode !== \PDO::FETCH_ASSOC) {
+            // Restore old mode
+            $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, $mode);
         }
 
         return $result;
@@ -859,18 +806,14 @@ class DB extends \PDO
      * @see ping(), _checkGoneAway() for checking the connection.
      *
      * @return bool
+     * @throws \RuntimeException
      */
-    protected function _reconnect()
+    protected function _reconnect(): bool
     {
         $this->initialiseDatabase();
 
         // Check if we are really connected to MySQL.
-        if ($this->ping() === false) {
-            // If we are not reconnected, return false.
-            return false;
-        }
-
-        return true;
+        return ! ($this->ping() === false);
     }
 
     /**
@@ -880,13 +823,9 @@ class DB extends \PDO
      *
      * @return bool
      */
-    protected function _checkGoneAway($errorMessage)
+    protected function _checkGoneAway($errorMessage): bool
     {
-        if (stripos($errorMessage, 'MySQL server has gone away') !== false) {
-            return true;
-        }
-
-        return false;
+        return stripos($errorMessage, 'MySQL server has gone away') !== false;
     }
 
     /**
@@ -913,7 +852,7 @@ class DB extends \PDO
         }
 
         $rows = $this->query($query);
-        if (! $rows || count($rows) == 0) {
+        if (! $rows || count($rows) === 0) {
             $rows = false;
         }
 
@@ -927,7 +866,7 @@ class DB extends \PDO
      * @param string $type     'full' | '' Force optimize of all tables.
      *                         'space'     Optimise tables with 5% or more free space.
      *                         'analyze'   Analyze tables to rebuild statistics.
-     * @param bool  $local     Only analyze local tables. Good if running replication.
+     * @param bool|string  $local     Only analyze local tables. Good if running replication.
      * @param array $tableList (optional) Names of tables to analyze.
      *
      * @return int Quantity optimized/analyzed
@@ -964,7 +903,7 @@ class DB extends \PDO
             }
             $tableNames = rtrim($tableNames, ',');
 
-            $local = ($local ? 'LOCAL' : '');
+            $local = $local ? 'LOCAL' : '';
             if ($type === 'analyze') {
                 $this->queryExec(sprintf('ANALYZE %s TABLE %s', $local, $tableNames));
                 $this->logOptimize($admin, 'ANALYZE', $tableNames);
@@ -1014,7 +953,7 @@ class DB extends \PDO
      *
      * @return bool
      */
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
         if (NN_USE_SQL_TRANSACTIONS) {
             return $this->pdo->beginTransaction();
@@ -1028,7 +967,7 @@ class DB extends \PDO
      *
      * @return bool
      */
-    public function Commit()
+    public function Commit(): bool
     {
         if (NN_USE_SQL_TRANSACTIONS) {
             return $this->pdo->commit();
@@ -1042,7 +981,7 @@ class DB extends \PDO
      *
      * @return bool
      */
-    public function Rollback()
+    public function Rollback(): bool
     {
         if (NN_USE_SQL_TRANSACTIONS) {
             return $this->pdo->rollBack();
@@ -1057,7 +996,6 @@ class DB extends \PDO
             'section'    => 'site',
             'subsection' => 'main',
             'name'       => 'coverspath',
-            'setting'    => 'coverspath',
         ]);
         Utility::setCoversConstant($path);
     }
@@ -1124,13 +1062,13 @@ class DB extends \PDO
         $fields['nzbpath'] = Utility::trailingSlash($fields['nzbpath']);
         $error = null;
         switch (true) {
-            case $fields['mediainfopath'] != '' && ! is_file($fields['mediainfopath']):
+            case $fields['mediainfopath'] !== '' && ! is_file($fields['mediainfopath']):
                 $error = Settings::ERR_BADMEDIAINFOPATH;
                 break;
-            case $fields['ffmpegpath'] != '' && ! is_file($fields['ffmpegpath']):
+            case $fields['ffmpegpath'] !== '' && ! is_file($fields['ffmpegpath']):
                 $error = Settings::ERR_BADFFMPEGPATH;
                 break;
-            case $fields['unrarpath'] != '' && ! is_file($fields['unrarpath']):
+            case $fields['unrarpath'] !== '' && ! is_file($fields['unrarpath']):
                 $error = Settings::ERR_BADUNRARPATH;
                 break;
             case empty($fields['nzbpath']):
@@ -1142,13 +1080,13 @@ class DB extends \PDO
             case ! is_readable($fields['nzbpath']):
                 $error = Settings::ERR_BADNZBPATH_UNREADABLE;
                 break;
-            case $fields['checkpasswordedrar'] == 1 && ! is_file($fields['unrarpath']):
+            case (int)$fields['checkpasswordedrar'] === 1 && ! is_file($fields['unrarpath']):
                 $error = Settings::ERR_DEEPNOUNRAR;
                 break;
-            case $fields['tmpunrarpath'] != '' && ! file_exists($fields['tmpunrarpath']):
+            case $fields['tmpunrarpath'] !== '' && ! file_exists($fields['tmpunrarpath']):
                 $error = Settings::ERR_BADTMPUNRARPATH;
                 break;
-            case $fields['yydecoderpath'] != '' &&
+            case $fields['yydecoderpath'] !== '' &&
                 $fields['yydecoderpath'] !== 'simple_php_yenc_decode' &&
                 ! file_exists($fields['yydecoderpath']):
                 $error = Settings::ERR_BAD_YYDECODER_PATH;
@@ -1163,7 +1101,7 @@ class DB extends \PDO
      *
      * @return string
      */
-    public function from_unixtime($utime)
+    public function from_unixtime($utime): string
     {
         return 'FROM_UNIXTIME('.$utime.')';
     }
@@ -1174,7 +1112,7 @@ class DB extends \PDO
      *
      * @return int
      */
-    public function unix_timestamp($date)
+    public function unix_timestamp($date): int
     {
         return strtotime($date);
     }
@@ -1188,7 +1126,7 @@ class DB extends \PDO
      *
      * @return string
      */
-    public function unix_timestamp_column($column, $outputName = 'unix_time')
+    public function unix_timestamp_column($column, $outputName = 'unix_time'): string
     {
         return 'UNIX_TIMESTAMP('.$column.') AS '.$outputName;
     }
@@ -1196,7 +1134,7 @@ class DB extends \PDO
     /**
      * @return string
      */
-    public function uuid()
+    public function uuid(): string
     {
         return Uuid::uuid4()->toString();
     }
@@ -1209,13 +1147,14 @@ class DB extends \PDO
      * @param bool $restart Whether an attempt should be made to reinitialise the Db object on failure.
      *
      * @return bool
+     * @throws \RuntimeException
      */
-    public function ping($restart = false)
+    public function ping($restart = false): ?bool
     {
         try {
             return (bool) $this->pdo->query('SELECT 1+1');
         } catch (\PDOException $e) {
-            if ($restart == true) {
+            if ($restart === true) {
                 $this->initialiseDatabase();
             }
 
@@ -1261,7 +1200,7 @@ class DB extends \PDO
     public function getAttribute($attribute)
     {
         $result = false;
-        if ($attribute != '') {
+        if ($attribute !== '') {
             try {
                 $result = $this->pdo->getAttribute($attribute);
             } catch (\PDOException $e) {
@@ -1281,7 +1220,7 @@ class DB extends \PDO
      *
      * @return string
      */
-    public function getDbVersion()
+    public function getDbVersion(): string
     {
         return $this->dbVersion;
     }
@@ -1292,7 +1231,7 @@ class DB extends \PDO
      * @return bool|null       TRUE if Db version is greater than or eaqual to $requiredVersion,
      * false if not, and null if the version isn't available to check against.
      */
-    public function isDbVersionAtLeast($requiredVersion)
+    public function isDbVersionAtLeast($requiredVersion): ?bool
     {
         if (empty($this->dbVersion)) {
             return null;
@@ -1320,7 +1259,7 @@ class DB extends \PDO
      *
      * @return bool
      */
-    private function parseQuery(&$query)
+    private function parseQuery(&$query): bool
     {
         if (empty($query)) {
             return false;
