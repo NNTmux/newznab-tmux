@@ -86,7 +86,30 @@ class Settings extends Model
      */
     public $incrementing = false;
 
+    /**
+     * @var array
+     */
     protected $fillable = ['section', 'subsection', 'name', 'value', 'hint', 'setting'];
+
+    /**
+     * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        $override = self::query()->where('name', $key)->first();
+
+        // If there's an override and no mutator has been explicitly defined on
+        // the model then use the override value
+        if ($override && ! $this->hasGetMutator($key)) {
+            return $override->value;
+        }
+
+        // If the attribute is not overridden the use the usual __get() magic method
+        return parent::__get($key);
+    }
 
     /**
      * @param Command $console
@@ -155,11 +178,9 @@ class Settings extends Model
      * @return array
      * @throws \RuntimeException
      */
-    public static function toTree(array $options = [], $excludeUnsectioned = true)
+    public static function toTree($excludeUnsectioned = true)
     {
-        $results = empty($options) ?
-            self::all() :
-            self::all()->find($options);
+        $results = self::query()->get()->all();
 
         $tree = [];
         if (is_array($results)) {

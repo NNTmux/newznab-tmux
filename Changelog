@@ -1,4 +1,5 @@
 2017-09-05 DariusIII
+	* Fix: Override __get method and fix site edit page
 	* Chg: Update .php-cs to exclude bootstrap/cache from checks
 	* Chg: Update pages
 	* Chg: Update laravel/framework to 5.5.2
