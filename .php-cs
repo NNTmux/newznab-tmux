@@ -19,7 +19,8 @@ $excludes = [
     'storage',
     'docs',
     'public/themes',
-    'libs'
+    'libs',
+    'bootstrap/cache'
 ];
 return PhpCsFixer\Config::create()
     ->setRules($rules)
