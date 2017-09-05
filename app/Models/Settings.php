@@ -92,7 +92,7 @@ class Settings extends Model
     protected $fillable = ['section', 'subsection', 'name', 'value', 'hint', 'setting'];
 
     /**
-     * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes
+     * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes.
      *
      * @param string $key
      * @return mixed
