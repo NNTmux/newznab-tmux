@@ -172,7 +172,6 @@ class Settings extends Model
     /**
      * Return a tree-like array of all or selected settings.
      *
-     *	@param array $options	Options array for Settings::find() i.e. ['conditions' => ...].
      * @param bool $excludeUnsectioned If rows with empty 'section' field should be excluded.
      *		Note this doesn't prevent empty 'subsection' fields.
      * @return array
