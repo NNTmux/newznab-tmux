@@ -139,7 +139,7 @@
                 }
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
-            "time": "2017-08-27T15:14:06+00:00"
+            "time": "2017-08-27 15:14:06"
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -478,16 +478,16 @@
         },
         {
             "name": "bower-asset/chosen",
-            "version": "v1.8.0",
+            "version": "v1.8.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/harvesthq/chosen-package.git",
-                "reference": "08da7c188e04a3d508a6d211e78ec9c17081b9c2"
+                "reference": "1423a33bf7da8b0dc5b30aae857a2d91e4a87932"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/harvesthq/chosen-package/zipball/08da7c188e04a3d508a6d211e78ec9c17081b9c2",
-                "reference": "08da7c188e04a3d508a6d211e78ec9c17081b9c2",
+                "url": "https://api.github.com/repos/harvesthq/chosen-package/zipball/1423a33bf7da8b0dc5b30aae857a2d91e4a87932",
+                "reference": "1423a33bf7da8b0dc5b30aae857a2d91e4a87932",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1468,7 +1468,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-05-29T12:05:57+00:00"
+            "time": "2017-05-29 12:05:57"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -2290,7 +2290,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2016-05-04T01:31:56+00:00"
+            "time": "2016-05-04 01:31:56"
         },
         {
             "name": "kbjr/Git.php",
@@ -2316,7 +2316,7 @@
                 "source": "https://github.com/kbjr/Git.php/tree/master",
                 "issues": "https://github.com/kbjr/Git.php/issues"
             },
-            "time": "2015-03-31T14:10:29+00:00"
+            "time": "2015-03-31 14:10:29"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
