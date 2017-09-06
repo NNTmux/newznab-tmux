@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Content;
 use nntmux\db\DB;
 
 class Contents
@@ -17,12 +18,13 @@ class Contents
 
     /**
      * @param array $options Class instances.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Settings' => null,
-		];
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
@@ -180,7 +182,7 @@ class Contents
         $content = $this->row2Object($form);
         $content = $this->validate($content);
         if ($content->ordinal === 1) {
-            $this->pdo->queryDirect('UPDATE content SET ordinal = ordinal + 1 WHERE ordinal > 0');
+            Content::query()->where('ordinal', '>', 0)->increment('ordinal');
         }
 
         return $this->data_add($content);
@@ -193,7 +195,7 @@ class Contents
      */
     public function delete($id)
     {
-        return $this->pdo->queryExec(sprintf('DELETE FROM content WHERE id = %d', $id));
+        return Content::query()->where('id', $id)->delete();
     }
 
     /**
@@ -241,12 +243,26 @@ class Contents
 
     /**
      * @param $content
-     *
-     * @return bool|\PDOStatement
+     * @return int
      */
-    public function data_update($content)
+    public function data_update($content): int
     {
-        return $this->pdo->queryExec(sprintf('UPDATE content SET role = %d, title = %s, url = %s, body = %s, metadescription = %s, metakeywords = %s, contenttype = %d, showinmenu = %d, status = %d, ordinal = %d WHERE id = %d', $content->role, $this->pdo->escapeString($content->title), $this->pdo->escapeString($content->url), $this->pdo->escapeString($content->body), $this->pdo->escapeString($content->metadescription), $this->pdo->escapeString($content->metakeywords), $content->contenttype, $content->showinmenu, $content->status, $content->ordinal, $content->id));
+        return Content::query()
+            ->where('id', $content->id)
+            ->update(
+                [
+                    'role' => $content->role,
+                    'title' => $content->title,
+                    'url' => $content->url,
+                    'body' => $content->body,
+                    'metadescription' => $content->metadescription,
+                    'metakeywords' => $content->metakeywords,
+                    'contenttype' => $content->contenttype,
+                    'showinmenu' => $content->showinmenu,
+                    'status' => $content->status,
+                    'ordinal' => $content->ordinal,
+                ]
+            );
     }
 
     /**
@@ -256,7 +272,21 @@ class Contents
      */
     public function data_add($content)
     {
-        return $this->pdo->queryInsert(sprintf('INSERT INTO content (role, title, url, body, metadescription, metakeywords, contenttype, showinmenu, status, ordinal) values (%d, %s, %s, %s, %s, %s, %d, %d, %d, %d )', $content->role, $this->pdo->escapeString($content->title), $this->pdo->escapeString($content->url), $this->pdo->escapeString($content->body), $this->pdo->escapeString($content->metadescription), $this->pdo->escapeString($content->metakeywords), $content->contenttype, $content->showinmenu, $content->status, $content->ordinal));
+        return Content::query()
+            ->insertGetId(
+                [
+                    'role' => $content->role,
+                    'title' => $content->title,
+                    'url' => $content->url,
+                    'body' => $content->body,
+                    'metadescription' => $content->metadescription,
+                    'metakeywords' => $content->metakeywords,
+                    'contenttype' => $content->contenttype,
+                    'showinmenu' => $content->showinmenu,
+                    'status' => $content->status,
+                    'ordinal' => $content->ordinal,
+                ]
+            );
     }
 
     /**
@@ -264,7 +294,11 @@ class Contents
      */
     public function data_get(): array
     {
-        return $this->pdo->query(sprintf('SELECT * FROM content WHERE status = 1 ORDER BY contenttype, COALESCE(ordinal, 1000000)'));
+        return Content::query()
+            ->where('status', '=', 1)
+            ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
+            ->get()
+            ->all();
     }
 
     /**
@@ -272,7 +306,7 @@ class Contents
      */
     public function data_getAll(): array
     {
-        return $this->pdo->query(sprintf('SELECT * FROM content ORDER BY contenttype, COALESCE(ordinal, 1000000)'));
+        return Content::query()->select()->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')->get()->all();
     }
 
     /**
@@ -282,7 +316,11 @@ class Contents
      */
     public function data_getAllButFront(): array
     {
-        return $this->pdo->query(sprintf('SELECT * FROM content WHERE id != 1 ORDER BY contenttype, COALESCE(ordinal, 1000000)'));
+        return Content::query()
+            ->where('id', '!=', 1)
+            ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
+            ->get()
+            ->all();
     }
 
     /**
@@ -307,15 +345,29 @@ class Contents
      */
     public function data_getFrontPage(): array
     {
-        return $this->pdo->query(sprintf('SELECT * FROM content WHERE status = 1 AND contenttype = %d ORDER BY ordinal ASC, COALESCE(ordinal, 1000000), id', self::TYPEINDEX));
+        return Content::query()
+            ->where(
+                [
+                    ['status' => 1],
+                    ['contenttype' => self::TYPEINDEX],
+                ]
+            )
+            ->orderByRaw('ordinal ASC, COALESCE(ordinal, 1000000), id')
+            ->get()
+            ->all();
     }
 
     /**
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function data_getIndex()
     {
-        return $this->pdo->queryOneRow(sprintf('SELECT * FROM content WHERE status = 1 AND contenttype = %d', self::TYPEINDEX));
+        return Content::query()->where(
+            [
+                ['status' => 1],
+                ['contenttype' => self::TYPEINDEX],
+            ]
+        )->first();
     }
 
     /**

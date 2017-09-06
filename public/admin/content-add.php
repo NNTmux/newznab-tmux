@@ -11,7 +11,7 @@ $contents = new Contents(['Settings' => $page->pdo]);
 $id = 0;
 
 // Set the current action.
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = $_REQUEST['action'] ?? 'view';
 
 switch ($action) {
     case 'add':
@@ -26,7 +26,7 @@ switch ($action) {
     case 'submit':
         // Validate and add or update.
         $returnid = 0;
-        if (! isset($_POST['id']) || $_POST['id'] == '') {
+        if (! isset($_POST['id']) || $_POST['id'] === '') {
             $returnid = $contents->add($_POST);
         } else {
             $content = $contents->update($_POST);

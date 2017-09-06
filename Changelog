@@ -1,4 +1,5 @@
 2017-09-06 DariusIII
+	* Chg: Update Content model, class and migration
 	* Chg: Update .scrutinizer.yml
 	* Chg: Add check for existence of genres before querying Steam in Steam class
 	* Chg: Try and prevent insertion of empty arrays in ReleaseExtra class
