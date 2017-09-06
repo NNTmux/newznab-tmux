@@ -24,7 +24,7 @@ $content = (object) [
     'status' => '',
     'ordinal' => '',
     'createddate' => '',
-    'role' => ''
+    'role' => '',
 ];
 
 switch ($action) {
