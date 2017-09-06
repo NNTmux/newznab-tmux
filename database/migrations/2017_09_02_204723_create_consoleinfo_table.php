@@ -14,8 +14,24 @@ class CreateConsoleinfoTable extends Migration
     public function up()
     {
         Schema::create('consoleinfo', function (Blueprint $table) {
+            $table->engine = 'innodb';
             $table->increments('id');
-            $table->timestamps();
+            $table->string('title');
+            $table->string('asin', '128')->nullable();
+            $table->string('url', '1000')->nullable();
+            $table->unsignedInteger('salesrank')->nullable();
+            $table->string('platform')->nullable();
+            $table->string('publisher')->nullable();
+            $table->integer('genres_id')->nullable();
+            $table->string('esrb')->nullable();
+            $table->dateTime('releasedate')->nullable();
+            $table->string('review', '3000')->nullable();
+            $table->unsignedTinyInteger('cover')->default('0');
+            $table->dateTime('createddate');
+            $table->dateTime('updateddate');
+            $table->primary('id');
+            $table->index('asin')->unique();
+            DB::statement('ALTER TABLE consoleinfo ADD FULLTEXT INDEX ix_consoleinfo_title_platform_ft (title, platform)');
         });
     }
 

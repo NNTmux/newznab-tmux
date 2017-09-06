@@ -1,3 +1,5 @@
+2017-09-06 DariusIII
+	* Chg: Update Console class, ConsoleInfo model and related migration
 2017-09-05 DariusIII
 	* Chg: Update chosen to latest version
 	* Chg: Update Category model and migration

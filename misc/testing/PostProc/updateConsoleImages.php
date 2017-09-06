@@ -2,12 +2,13 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
+use App\Models\ConsoleInfo;
 use nntmux\db\DB;
 
 $pdo = new DB();
 $covers = $updated = $deleted = 0;
 
-if ($argc == 1 || $argv[1] != 'true') {
+if ($argc === 1 || $argv[1] !== 'true') {
     exit($pdo->log->error("\nThis script will check all images in covers/console and compare to db->consoleinfo.\nTo run:\nphp $argv[0] true\n"));
 }
 
@@ -19,12 +20,17 @@ foreach ($itr as $filePath) {
     if (is_file($filePath) && preg_match('/\d+\.jpg/', $filePath)) {
         preg_match('/(\d+)\.jpg/', basename($filePath), $match);
         if (isset($match[1])) {
-            $run = $pdo->queryDirect('UPDATE consoleinfo SET cover = 1 WHERE cover = 0 AND id = '.$match[1]);
-            if ($run->rowCount() >= 1) {
+            $run = ConsoleInfo::query()->where(
+                [
+                    ['cover' => 0],
+                    ['id' => $match[1]]
+                ]
+            )->update(['cover' => 1]);
+            if ($run >= 1) {
                 $covers++;
             } else {
-                $run = $pdo->queryDirect('SELECT id FROM consoleinfo WHERE id = '.$match[1]);
-                if ($run->rowCount() == 0) {
+                $run = ConsoleInfo::query()->where('id', $match[1])->value('id');
+                if ($run->rowCount() === 0) {
                     echo $pdo->log->info($filePath.' not found in db.');
                 }
             }
@@ -32,11 +38,16 @@ foreach ($itr as $filePath) {
     }
 }
 
-$qry = $pdo->queryDirect('SELECT id FROM consoleinfo WHERE cover = 1');
+$qry = ConsoleInfo::query()->where('cover', '=', 1)->value('id');
 if ($qry instanceof \Traversable) {
     foreach ($qry as $rows) {
         if (! is_file($path2covers.$rows['id'].'.jpg')) {
-            $pdo->queryDirect('UPDATE consoleinfo SET cover = 0 WHERE cover = 1 AND id = '.$rows['id']);
+            ConsoleInfo::query()->where(
+                [
+                    ['cover' => 1],
+                    ['id' => $rows['id']],
+                ]
+            )->update(['cover' => 0]);
             echo $pdo->log->info($path2covers.$rows['id'].'.jpg does not exist.');
             $deleted++;
         }
