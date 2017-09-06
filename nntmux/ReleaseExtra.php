@@ -334,21 +334,26 @@ class ReleaseExtra
     public function addUID($releaseID, $uniqueid)
     {
         $dupecheck = $this->pdo->queryOneRow(
-            "
+            sprintf(
+                '
 			SELECT releases_id
 			FROM release_unique
-			WHERE releases_id = {$releaseID}
+			WHERE releases_id = %d
 			OR (
-				releases_id = {$releaseID}
-				AND uniqueid = UNHEX('{$uniqueid}')
-			)"
+				releases_id = %d
+				AND uniqueid = UNHEX(%d)
+			)',
+                $releaseID,
+                $releaseID,
+                $uniqueid
+        )
         );
 
         if ($dupecheck === false) {
             $this->pdo->queryExec(
-                "
+                sprintf('
 				INSERT INTO release_unique (releases_id, uniqueid)
-				VALUES ({$releaseID}, UNHEX('{$uniqueid}'))"
+				VALUES (%d, UNHEX(%d))', $releaseID, $uniqueid)
             );
         }
     }
