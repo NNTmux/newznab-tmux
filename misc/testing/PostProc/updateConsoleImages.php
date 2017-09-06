@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
-use App\Models\ConsoleInfo;
 use nntmux\db\DB;
+use App\Models\ConsoleInfo;
 
 $pdo = new DB();
 $covers = $updated = $deleted = 0;
@@ -23,7 +23,7 @@ foreach ($itr as $filePath) {
             $run = ConsoleInfo::query()->where(
                 [
                     ['cover' => 0],
-                    ['id' => $match[1]]
+                    ['id' => $match[1]],
                 ]
             )->update(['cover' => 1]);
             if ($run >= 1) {

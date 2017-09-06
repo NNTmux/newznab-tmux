@@ -2,13 +2,13 @@
 
 namespace nntmux;
 
-use App\Models\ConsoleInfo;
-use Illuminate\Support\Carbon;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use GuzzleHttp\Client;
 use App\Models\Settings;
+use App\Models\ConsoleInfo;
 use ApaiIO\Operations\Search;
+use Illuminate\Support\Carbon;
 use ApaiIO\Request\GuzzleRequest;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
@@ -392,7 +392,7 @@ class Console
                     'cover' => $cover,
                     'genres_id' => $genreID,
                     'review' => $review === 'review' ? $review : substr($review, 0, 3000),
-                    'updateddate' => Carbon::now()
+                    'updateddate' => Carbon::now(),
                 ]
             );
     }
@@ -832,9 +832,6 @@ class Console
         }
     }
 
-    /**
-     *
-     */
     public function processConsoleReleases(): void
     {
         $res = $this->pdo->queryDirect(
