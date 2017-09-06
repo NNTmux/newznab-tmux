@@ -3,7 +3,6 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Users;
-use nntmux\Content;
 use nntmux\Contents;
 
 $page = new AdminPage();
@@ -13,14 +12,27 @@ $id = 0;
 // Set the current action.
 $action = $_REQUEST['action'] ?? 'view';
 
+$content = (object) [
+    'id' => '',
+    'title' => '',
+    'url' => '',
+    'body' => '',
+    'metadescription' => '',
+    'metakeywords' => '',
+    'contenttype' => '',
+    'showinmenu' => '',
+    'status' => '',
+    'ordinal' => '',
+    'createddate' => '',
+    'role' => ''
+];
+
 switch ($action) {
     case 'add':
         $page->title = 'Content Add';
-        $content = new Content();
         $content->showinmenu = '1';
         $content->status = '1';
         $content->contenttype = '2';
-        $page->smarty->assign('content', $content);
         break;
 
     case 'submit':
@@ -42,7 +54,6 @@ switch ($action) {
             $id = $_GET['id'];
 
             $content = $contents->getByID($id, Users::ROLE_ADMIN);
-            $page->smarty->assign('content', $content);
         }
         break;
 }
@@ -55,6 +66,8 @@ $page->smarty->assign('yesno_names', ['Yes', 'No']);
 
 $contenttypelist = ['1' => 'Useful Link', '2' => 'Article', '3' => 'Homepage'];
 $page->smarty->assign('contenttypelist', $contenttypelist);
+
+$page->smarty->assign('content', $content);
 
 $rolelist = ['0' => 'Everyone', '1' => 'Logged in Users', '2' => 'Admins'];
 $page->smarty->assign('rolelist', $rolelist);

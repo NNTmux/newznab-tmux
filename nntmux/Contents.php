@@ -161,7 +161,7 @@ class Contents
      */
     public function validate($content)
     {
-        if ($content->url[0] !== '/') {
+        if ($content->url !== '/') {
             $content->url = '/'.$content->url;
         }
 
