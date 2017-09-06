@@ -34,32 +34,32 @@ class ReleaseExtra
     public function makeCodecPretty($codec): string
     {
         switch (true) {
-			case preg_match('#(?:^36$|HEVC)#i', $codec):
-				$codec = 'HEVC';
-				break;
-			case preg_match('#(?:^(?:7|27|H264)$|AVC)#i', $codec):
-				$codec = 'h.264';
-				break;
-			case preg_match('#(?:^(?:20|FMP4|MP42|MP43|MPG4)$|ASP)#i', $codec):
-				$codec = 'MPEG-4';
-				break;
-			case preg_match('#^2$#i', $codec):
-				$codec = 'MPEG-2';
-				break;
-			case preg_match('#^MPEG$#', $codec):
-				$codec = 'MPEG-1';
-				break;
-			case preg_match('#DX50|DIVX|DIV3#i', $codec):
-				$codec = 'DivX';
-				break;
-			case preg_match('#XVID#i', $codec):
-				$codec = 'XviD';
-				break;
-			case preg_match('#(?:wmv|WVC1)#i', $codec):
-				$codec = 'wmv';
-				break;
-			default:
-		}
+            case preg_match('#(?:^36$|HEVC)#i', $codec):
+                $codec = 'HEVC';
+                break;
+            case preg_match('#(?:^(?:7|27|H264)$|AVC)#i', $codec):
+                $codec = 'h.264';
+                break;
+            case preg_match('#(?:^(?:20|FMP4|MP42|MP43|MPG4)$|ASP)#i', $codec):
+                $codec = 'MPEG-4';
+                break;
+            case preg_match('#^2$#i', $codec):
+                $codec = 'MPEG-2';
+                break;
+            case preg_match('#^MPEG$#', $codec):
+                $codec = 'MPEG-1';
+                break;
+            case preg_match('#DX50|DIVX|DIV3#i', $codec):
+                $codec = 'DivX';
+                break;
+            case preg_match('#XVID#i', $codec):
+                $codec = 'XviD';
+                break;
+            case preg_match('#(?:wmv|WVC1)#i', $codec):
+                $codec = 'wmv';
+                break;
+            default:
+        }
 
         return $codec;
     }
@@ -221,7 +221,7 @@ class ReleaseExtra
                         if (isset($track['Language'])) {
                             $audiolanguage = $track['Language'];
                         }
-                        if (isset($track['Title'])) {
+                        if (! empty($track['Title'])) {
                             $audiotitle = $track['Title'];
                         }
                         $this->addAudio($releaseID, $audioID, $audioformat, $audiomode, $audiobitratemode, $audiobitrate, $audiochannels, $audiosamplerate, $audiolibrary, $audiolanguage, $audiotitle);
@@ -258,19 +258,20 @@ class ReleaseExtra
     {
         $ckid = VideoData::query()->where('releases_id', $releaseID)->value('releases_id');
         if (! isset($ckid)) {
-            VideoData::query()->insert(['releases_id' => $releaseID,
-											   'containerformat' => $containerformat,
-											   'overallbitrate' => $overallbitrate,
-											   'videoduration' => $videoduration,
-											   'videoformat' => $videoformat,
-											   'videocodec' => $videocodec,
-											   'videowidth' => $videowidth,
-											   'videoheight' => $videoheight,
-											   'videoaspect' => $videoaspect,
-											   'videoframerate' => $videoframerate,
-											   'videolibrary' => substr($videolibrary, 0, 50),
-			]
-			);
+            VideoData::query()->insert(
+                ['releases_id' => $releaseID,
+                                               'containerformat' => $containerformat,
+                                               'overallbitrate' => $overallbitrate,
+                                               'videoduration' => $videoduration,
+                                               'videoformat' => $videoformat,
+                                               'videocodec' => $videocodec,
+                                               'videowidth' => $videowidth,
+                                               'videoheight' => $videoheight,
+                                               'videoaspect' => $videoaspect,
+                                               'videoframerate' => $videoframerate,
+                                               'videolibrary' => substr($videolibrary, 0, 50),
+            ]
+            );
         }
     }
 
@@ -294,20 +295,20 @@ class ReleaseExtra
         $ckid = AudioData::query()->where('releases_id', $releaseID)->value('releases_id');
         if (! isset($ckid)) {
             return AudioData::query()->insert(
-				[
-					'releases_id' => $releaseID,
-					'audioid' => $audioID,
-					'audioformat' => $audioformat,
-					'audiomode' => $audiomode,
-					'audiobitratemode' => $audiobitratemode,
-					'audiobitrate' => substr($audiobitrate, 0, 10),
-					'audiochannels' => $audiochannels,
-					'audiosamplerate' => substr($audiosamplerate, 0, 25),
-					'audiolibrary' => substr($audiolibrary, 0, 50),
-					'audiolanguage' => $audiolanguage,
-					'audiotitle' => substr($audiotitle, 0, 50),
-				]
-			);
+                [
+                    'releases_id' => $releaseID,
+                    'audioid' => $audioID,
+                    'audioformat' => $audioformat,
+                    'audiomode' => $audiomode,
+                    'audiobitratemode' => $audiobitratemode,
+                    'audiobitrate' => substr($audiobitrate, 0, 10),
+                    'audiochannels' => $audiochannels,
+                    'audiosamplerate' => substr($audiosamplerate, 0, 25),
+                    'audiolibrary' => substr($audiolibrary, 0, 50),
+                    'audiolanguage' => $audiolanguage,
+                    'audiotitle' => substr($audiotitle, 0, 50),
+                ]
+            );
         }
     }
 
@@ -332,7 +333,8 @@ class ReleaseExtra
      */
     public function addUID($releaseID, $uniqueid)
     {
-        $dupecheck = $this->pdo->queryOneRow("
+        $dupecheck = $this->pdo->queryOneRow(
+            "
 			SELECT releases_id
 			FROM release_unique
 			WHERE releases_id = {$releaseID}
@@ -340,13 +342,14 @@ class ReleaseExtra
 				releases_id = {$releaseID}
 				AND uniqueid = UNHEX('{$uniqueid}')
 			)"
-		);
+        );
 
         if ($dupecheck === false) {
-            $this->pdo->queryExec("
+            $this->pdo->queryExec(
+                "
 				INSERT INTO release_unique (releases_id, uniqueid)
 				VALUES ({$releaseID}, UNHEX('{$uniqueid}'))"
-			);
+            );
         }
     }
 
