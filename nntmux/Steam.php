@@ -49,11 +49,11 @@ class Steam
         $this->pdo = ($options['DB'] instanceof DB ? $options['DB'] : new DB());
 
         $this->steamFront = new Main(
-			[
-				'country_code' => 'us',
-				'local_lang'   => 'english',
-			]
-		);
+            [
+                'country_code' => 'us',
+                'local_lang'   => 'english',
+            ]
+        );
     }
 
     /**
@@ -69,17 +69,17 @@ class Steam
 
         if ($res !== false) {
             $result = [
-				'title'       => $res->name,
-				'description' => $res->description['short'],
-				'cover'       => $res->images['header'],
-				'backdrop'    => $res->images['background'],
-				'steamid'     => $res->appid,
-				'directurl'   => Main::STEAM_STORE_ROOT.'app/'.$res->appid,
-				'publisher'   => $res->publishers,
-				'rating'      => $res->metacritic['score'],
-				'releasedate' => $res->releasedate['date'],
-				'genres'      => implode(',', array_column($res->genres, 'description')),
-			];
+                'title'       => $res->name,
+                'description' => $res->description['short'],
+                'cover'       => $res->images['header'],
+                'backdrop'    => $res->images['background'],
+                'steamid'     => $res->appid,
+                'directurl'   => Main::STEAM_STORE_ROOT.'app/'.$res->appid,
+                'publisher'   => $res->publishers,
+                'rating'      => $res->metacritic['score'],
+                'releasedate' => $res->releasedate['date'],
+                'genres'      => $res->genres !== null ? implode(',', array_column($res->genres, 'description')) : '',
+            ];
 
             return $result;
         }
@@ -111,12 +111,13 @@ class Steam
 
         $this->populateSteamAppsTable();
 
-        $results = $this->pdo->queryDirect("
+        $results = $this->pdo->queryDirect(
+            "
 			SELECT name, appid
 			FROM steam_apps
 			WHERE MATCH(name) AGAINST({$this->pdo->escapeString($searchTerm)})
 			LIMIT 20"
-		);
+        );
 
         if ($results instanceof \Traversable) {
             $bestMatchPct = 0;
@@ -190,15 +191,15 @@ class Steam
     private function setLastUpdated(): void
     {
         Settings::query()->where(
-			[
-				['section', '=', 'APIs'],
-				['subsection', '=', 'Steam'],
-				['name', '=', 'last_update'],
-			]
-		)->update(
-			[
-				'value' => time(),
-			]
-		);
+            [
+                ['section', '=', 'APIs'],
+                ['subsection', '=', 'Steam'],
+                ['name', '=', 'last_update'],
+            ]
+        )->update(
+            [
+                'value' => time(),
+            ]
+        );
     }
 }
