@@ -1,4 +1,5 @@
 2017-09-06 DariusIII
+	* Fix: Fix syntax used in Contents class
 	* Chg: Update Steam class
 	* Chg: Update Content model, class and migration
 	* Chg: Update .scrutinizer.yml

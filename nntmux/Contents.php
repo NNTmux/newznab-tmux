@@ -348,8 +348,8 @@ class Contents
         return Content::query()
             ->where(
                 [
-                    ['status' => 1],
-                    ['contenttype' => self::TYPEINDEX],
+                    'status' => 1,
+                    'contenttype' => self::TYPEINDEX,
                 ]
             )
             ->orderByRaw('ordinal ASC, COALESCE(ordinal, 1000000), id')
@@ -364,8 +364,8 @@ class Contents
     {
         return Content::query()->where(
             [
-                ['status' => 1],
-                ['contenttype' => self::TYPEINDEX],
+                'status' => 1,
+                'contenttype' => self::TYPEINDEX,
             ]
         )->first();
     }
