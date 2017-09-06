@@ -101,5 +101,6 @@ filter:
       - "storage/"
       - "public/themes/"
       - "public/plugins/"
+      - "database/"
 tools:
     sensiolabs_security_checker: true
