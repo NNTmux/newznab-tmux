@@ -17,7 +17,7 @@ build:
         memcached: true
         mysql: 5.6
         php:
-            version: '7.1.1'
+            version: '7.1.6'
             ini:
                 memory_limit:     "4096M"
 checks:
@@ -94,6 +94,12 @@ coding_style:
                 true_false_null: undefined
 
 filter:
-    excluded_paths: [vendor/*, libraries/*, libs/*, resources/*]
+    excluded_paths:
+      - "vendor/"
+      - "libs/"
+      - "resources/"
+      - "storage/"
+      - "public/themes/"
+      - "public/plugins/"
 tools:
     sensiolabs_security_checker: true
