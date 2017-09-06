@@ -40,6 +40,7 @@ class Steam
      * Steam constructor.
      *
      * @param array $options
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
