@@ -1,5 +1,4 @@
 2017-09-06 DariusIII
-	* Chg: Remove imagick extension installation from travis config
 	* Fix: Fix errors related to adding and editing contents
 	* Fix: Fix syntax used in Contents class
 	* Chg: Update Steam class
