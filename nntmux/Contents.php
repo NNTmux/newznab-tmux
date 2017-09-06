@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Content;
 use nntmux\db\DB;
+use App\Models\Content;
 
 class Contents
 {
