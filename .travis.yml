@@ -30,12 +30,10 @@ addons:
       - curl
 
 before_install:
-    - sudo add-apt-repository ppa:ondrej/php -y
-    - sudo apt-get update -q
-    - sudo apt-get install -y php-imagick
     - composer validate
 
 install:
+    - yes '' | pecl install imagick
     # Install composer packages.
     - composer install --prefer-dist
 
