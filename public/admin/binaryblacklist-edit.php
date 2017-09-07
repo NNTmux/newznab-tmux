@@ -8,7 +8,7 @@ use nntmux\Category;
 $page = new AdminPage();
 $bin = new Binaries(['Settings' => $page->pdo]);
 $error = '';
-$regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1];
+$regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1, 'status' => 1, 'optype' => 1];
 
 switch ($_REQUEST['action'] ?? 'view') {
     case 'submit':
