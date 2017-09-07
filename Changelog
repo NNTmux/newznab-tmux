@@ -1,4 +1,5 @@
 2017-09-07 DariusIII
+	* Fix: Fix undefined index regex notice
 	* Fix: Fix adding of binaryblacklist regexes
 2017-09-06 DariusIII
 	* Chg: Update travis config

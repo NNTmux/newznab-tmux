@@ -8,22 +8,24 @@ use nntmux\Category;
 $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'release_naming_regexes']);
 
+
+
 // Set the current action.
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = $_REQUEST['action'] ?? 'view';
 
 switch ($action) {
     case 'submit':
-        if ($_POST['group_regex'] == '') {
+        if ($_POST['group_regex'] === '') {
             $page->smarty->assign('error', 'Group regex must not be empty!');
             break;
         }
 
-        if ($_POST['regex'] == '') {
+        if ($_POST['regex'] === '') {
             $page->smarty->assign('error', 'Regex cannot be empty');
             break;
         }
 
-        if ($_POST['description'] == '') {
+        if ($_POST['description'] === '') {
             $_POST['description'] = '';
         }
 
@@ -32,10 +34,10 @@ switch ($action) {
             break;
         }
 
-        if ($_POST['id'] == '') {
-            $regexes->addRegex($_POST);
+        if ($_POST['id'] === '') {
+            $regex = $regexes->addRegex($_POST);
         } else {
-            $regexes->updateRegex($_POST);
+            $regex = $regexes->updateRegex($_POST);
         }
 
         header('Location:'.WWW_TOP.'/release_naming_regexes-list.php');
@@ -46,17 +48,17 @@ switch ($action) {
         if (isset($_GET['id'])) {
             $page->title = 'Release Naming Regex Edit';
             $id = $_GET['id'];
-            $r = $regexes->getRegexByID($id);
+            $regex = $regexes->getRegexByID($id);
         } else {
             $page->title = 'Release Naming Regex Add';
-            $r = ['status' => 1];
+            $regex = ['status' => 1];
         }
-        $page->smarty->assign('regex', $r);
         break;
 }
 
 $page->smarty->assign('status_ids', [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE]);
 $page->smarty->assign('status_names', ['Yes', 'No']);
+$page->smarty->assign('regex', $regex);
 
 $page->content = $page->smarty->fetch('release_naming_regexes-edit.tpl');
 $page->render();
