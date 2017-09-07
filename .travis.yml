@@ -31,6 +31,8 @@ addons:
 
 before_install:
     - composer validate
+    - sudo add-apt-repository ppa:ondrej/php -y
+    - sudo apt-get update -q
     - sudo apt-get install -y php-imagick
 
 install:
