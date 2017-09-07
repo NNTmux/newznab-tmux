@@ -1412,7 +1412,6 @@ class Users
     {
         if ($days === 0) {
             $days = 1;
-            $this->pdo->queryExec('UPDATE user_downloads SET releases_id = null');
             UserDownload::query()->update(['releases_id' => null]);
         }
 
