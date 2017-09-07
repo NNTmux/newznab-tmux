@@ -17,7 +17,8 @@
       "public/pages/",
       "libs/PEAR/Net_NNTP/NNTP/",
       "libs/",
-      "database"
+      "database/seeds",
+      "database/factories"
     ]
   },
   "config": {
@@ -44,6 +45,7 @@
   },
   "keywords": [
     "NNTmux",
+    "newznab-tmux",
     "usenet",
     "indexer",
     "Laravel",
@@ -142,6 +144,9 @@
   },
 
   "require-dev": {
+    "filp/whoops": "~2.0",
+    "fzaninotto/faker": "~1.4",
+    "mockery/mockery": "0.9.*",
     "phpunit/phpunit": "^6.1"
   },
 
