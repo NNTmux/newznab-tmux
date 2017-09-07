@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use App\Models\UserDownload;
+use Carbon\Carbon;
 use nntmux\db\DB;
 use App\Models\User;
 use App\Models\Settings;
@@ -52,18 +54,26 @@ class Users
     private $pdo;
 
     /**
+     * @var \Carbon\Carbon
+     */
+    private $carbon;
+
+    /**
      * @param array $options Class instances.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Settings' => null,
-		];
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->pdo = $options['Settings'] instanceof DB ? $options['Settings'] : new DB();
 
         $this->password_hash_cost = defined('NN_PASSWORD_HASH_COST') ? NN_PASSWORD_HASH_COST : 11;
+
+        $this->carbon = new Carbon();
     }
 
     /**
@@ -163,7 +173,7 @@ class Users
      */
     public function delDownloadRequests($userID): void
     {
-        $this->pdo->queryExec(sprintf('DELETE FROM user_downloads WHERE users_id = %d', $userID));
+        UserDownload::query()->where('users_id', $userID)->delete();
     }
 
     /**
@@ -214,17 +224,17 @@ class Users
         $order = $this->getBrowseOrder($orderBy);
 
         return $this->pdo->query(
-			sprintf(
-				$query,
-				($userName !== '' ? ('AND users.username '.$this->pdo->likeString($userName)) : ''),
-				($email !== '' ? ('AND users.email '.$this->pdo->likeString($email)) : ''),
-				($host !== '' ? ('AND users.host '.$this->pdo->likeString($host)) : ''),
-				($role !== '' ? ('AND users.role = '.$role) : ''),
-				$order[0],
-				$order[1],
-				($start === false ? '' : ('LIMIT '.$offset.' OFFSET '.$start))
-			)
-		);
+            sprintf(
+                $query,
+                ($userName !== '' ? ('AND users.username '.$this->pdo->likeString($userName)) : ''),
+                ($email !== '' ? ('AND users.email '.$this->pdo->likeString($email)) : ''),
+                ($host !== '' ? ('AND users.host '.$this->pdo->likeString($host)) : ''),
+                ($role !== '' ? ('AND users.role = '.$role) : ''),
+                $order[0],
+                $order[1],
+                ($start === false ? '' : ('LIMIT '.$offset.' OFFSET '.$start))
+            )
+        );
     }
 
     /**
@@ -237,40 +247,40 @@ class Users
         $order = ($orderBy === '' ? 'username_desc' : $orderBy);
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
-			case 'username':
-				$orderField = 'username';
-				break;
-			case 'email':
-				$orderField = 'email';
-				break;
-			case 'host':
-				$orderField = 'host';
-				break;
-			case 'createddate':
-				$orderField = 'createddate';
-				break;
-			case 'lastlogin':
-				$orderField = 'lastlogin';
-				break;
-			case 'apiaccess':
-				$orderField = 'apiaccess';
-				break;
-			case 'apirequests':
-				$orderField = 'apirequests';
-				break;
-			case 'grabs':
-				$orderField = 'grabs';
-				break;
-			case 'role':
-				$orderField = 'role';
-				break;
-			case 'rolechangedate':
-				$orderField = 'rolechangedate';
-				break;
-			default:
-				$orderField = 'username';
-				break;
-		}
+            case 'username':
+                $orderField = 'username';
+                break;
+            case 'email':
+                $orderField = 'email';
+                break;
+            case 'host':
+                $orderField = 'host';
+                break;
+            case 'createddate':
+                $orderField = 'createddate';
+                break;
+            case 'lastlogin':
+                $orderField = 'lastlogin';
+                break;
+            case 'apiaccess':
+                $orderField = 'apiaccess';
+                break;
+            case 'apirequests':
+                $orderField = 'apirequests';
+                break;
+            case 'grabs':
+                $orderField = 'grabs';
+                break;
+            case 'role':
+                $orderField = 'role';
+                break;
+            case 'rolechangedate':
+                $orderField = 'rolechangedate';
+                break;
+            default:
+                $orderField = 'username';
+                break;
+        }
         $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderField, $orderSort];
@@ -347,32 +357,32 @@ class Users
         }
 
         $sql = [
-			'username' => $userName,
-			'email' => $email,
-			'grabs' => $grabs,
-			'role' => $role,
-			'notes' => substr($notes, 0, 255),
-			'invites' => $invites,
-			'movieview' => $movieview,
-			'musicview' => $musicview,
-			'gameview' => $gameview,
-			'xxxview' => $xxxview,
-			'consoleview' => $consoleview,
-			'bookview' => $bookview,
-			'style' => $style,
-			'queuetype'  => $queueType,
-			'nzbgeturl' => $nzbgetURL,
-			'nzbgetusername' => $nzbgetUsername,
-			'nzbgetpassword' => $nzbgetPassword,
-			'saburl' => $saburl,
-			'sabapikey' => $sabapikey,
-			'sabapikeytype' => $sabapikeytype,
-			'sabpriority' => $sabpriority,
-			'nzbvortex_server_url' => $nzbvortexServerUrl,
-			'nzbvortex_api_key' => $nzbvortexApiKey,
-			'cp_url' => $cp_url,
-			'cp_api' => $cp_api,
-		];
+            'username' => $userName,
+            'email' => $email,
+            'grabs' => $grabs,
+            'role' => $role,
+            'notes' => substr($notes, 0, 255),
+            'invites' => $invites,
+            'movieview' => $movieview,
+            'musicview' => $musicview,
+            'gameview' => $gameview,
+            'xxxview' => $xxxview,
+            'consoleview' => $consoleview,
+            'bookview' => $bookview,
+            'style' => $style,
+            'queuetype'  => $queueType,
+            'nzbgeturl' => $nzbgetURL,
+            'nzbgetusername' => $nzbgetUsername,
+            'nzbgetpassword' => $nzbgetPassword,
+            'saburl' => $saburl,
+            'sabapikey' => $sabapikey,
+            'sabapikeytype' => $sabapikeytype,
+            'sabpriority' => $sabpriority,
+            'nzbvortex_server_url' => $nzbvortexServerUrl,
+            'nzbvortex_api_key' => $nzbvortexApiKey,
+            'cp_url' => $cp_url,
+            'cp_api' => $cp_api,
+        ];
 
         User::query()->where('id', $id)->update($sql);
 
@@ -750,11 +760,11 @@ class Users
         $this->pdo->queryExec(sprintf('DELETE FROM invitations WHERE createddate < now() - INTERVAL %d DAY', self::DEFAULT_INVITE_EXPIRY_DAYS));
 
         return $this->pdo->queryOneRow(
-			sprintf(
-				'SELECT * FROM invitations WHERE guid = %s',
-				$this->pdo->escapeString($inviteToken)
-			)
-		);
+            sprintf(
+                'SELECT * FROM invitations WHERE guid = %s',
+                $this->pdo->escapeString($inviteToken)
+            )
+        );
     }
 
     /**
@@ -787,20 +797,20 @@ class Users
         }
 
         return User::query()->insertGetId(
-			[
-				'username' => $userName,
-				'password' => $password,
-				'email' => $email,
-				'role' => $role,
-				'createddate' => new \DateTime('NOW'),
-				'host' => (int) Settings::settingValue('..storeuserips') === 1 ? $host : '',
-				'rsstoken' => md5(Password::getRepository()->createNewToken()),
-				'invites' => $invites,
-				'invitedby' => (int) $invitedBy === 0 ? 'NULL' : $invitedBy,
-				'userseed' => md5(Utility::generateUuid()),
-				'notes' => $notes,
-			]
-		);
+            [
+                'username' => $userName,
+                'password' => $password,
+                'email' => $email,
+                'role' => $role,
+                'createddate' => new \DateTime('NOW'),
+                'host' => (int) Settings::settingValue('..storeuserips') === 1 ? $host : '',
+                'rsstoken' => md5(Password::getRepository()->createNewToken()),
+                'invites' => $invites,
+                'invitedby' => (int) $invitedBy === 0 ? 'NULL' : $invitedBy,
+                'userseed' => md5(Utility::generateUuid()),
+                'notes' => $notes,
+            ]
+        );
     }
 
     /**
@@ -858,12 +868,12 @@ class Users
     public function updateSiteAccessed($userID, $host = ''): void
     {
         $this->pdo->queryExec(
-			sprintf(
-				'UPDATE users SET lastlogin = NOW() %s WHERE id = %d',
-				($host === '' ? '' : (', host = '.$this->pdo->escapeString($host))),
-				$userID
-			)
-		);
+            sprintf(
+                'UPDATE users SET lastlogin = NOW() %s WHERE id = %d',
+                ($host === '' ? '' : (', host = '.$this->pdo->escapeString($host))),
+                $userID
+            )
+        );
     }
 
     /**
@@ -958,10 +968,12 @@ class Users
         }
 
         return (bool) $this->pdo->queryExec(
-			sprintf(
-				'DELETE FROM users_releases WHERE releases_id IN (%s) AND users_id = %d', implode(',', $del), $userID
-			)
-		);
+            sprintf(
+                'DELETE FROM users_releases WHERE releases_id IN (%s) AND users_id = %d',
+                implode(',', $del),
+                $userID
+            )
+        );
     }
 
     /**
@@ -1123,12 +1135,13 @@ class Users
      */
     public function getTopGrabbers(): array
     {
-        return $this->pdo->query('SELECT id, username, SUM(grabs) as grabs FROM users
+        return $this->pdo->query(
+            'SELECT id, username, SUM(grabs) as grabs FROM users
 							GROUP BY id, username
 							HAVING SUM(grabs) > 0
 							ORDER BY grabs DESC
 							LIMIT 10'
-		);
+        );
     }
 
     /**
@@ -1138,13 +1151,14 @@ class Users
      */
     public function getUsersByMonth(): array
     {
-        return $this->pdo->query("
+        return $this->pdo->query(
+            "
 			SELECT DATE_FORMAT(createddate, '%M %Y') AS mth, COUNT(id) AS num
 			FROM users
 			WHERE createddate IS NOT NULL AND createddate != '0000-00-00 00:00:00'
 			GROUP BY mth
 			ORDER BY createddate DESC"
-		);
+        );
     }
 
     /**
@@ -1164,7 +1178,8 @@ class Users
             $ipsql = '('.$ipsql." '-1')";
         }
 
-        $sql = sprintf("SELECT hosthash, group_concat(users_id) AS user_string, group_concat(username) AS user_names
+        $sql = sprintf(
+            "SELECT hosthash, group_concat(users_id) AS user_string, group_concat(username) AS user_names
 							FROM
 							(
 							SELECT hosthash, users_id, username FROM user_downloads LEFT OUTER JOIN users ON users.id = user_downloads.users_id WHERE hosthash IS NOT NULL AND hosthash NOT IN %s GROUP BY hosthash, users_id
@@ -1174,8 +1189,10 @@ class Users
 							GROUP BY hosthash
 							HAVING CAST((LENGTH(group_concat(users_id)) - LENGTH(REPLACE(group_concat(users_id), ',', ''))) / LENGTH(',') AS UNSIGNED) < 9
 							ORDER BY CAST((LENGTH(group_concat(users_id)) - LENGTH(REPLACE(group_concat(users_id), ',', ''))) / LENGTH(',') AS UNSIGNED) DESC
-							limit 10", $ipsql, $ipsql
-		);
+							limit 10",
+            $ipsql,
+            $ipsql
+        );
 
         return $this->pdo->query($sql);
     }
@@ -1201,11 +1218,12 @@ class Users
      */
     public function getUsersByRole(): array
     {
-        return $this->pdo->query('SELECT ur.name, COUNT(u.id) as num FROM users u
+        return $this->pdo->query(
+            'SELECT ur.name, COUNT(u.id) as num FROM users u
 							INNER JOIN user_roles ur ON ur.id = u.role
 							GROUP BY ur.name
 							ORDER BY COUNT(u.id) DESC'
-		);
+        );
     }
 
     /**
@@ -1213,7 +1231,8 @@ class Users
      */
     public function getLoginCountsByMonth(): array
     {
-        return $this->pdo->query("SELECT 'Login' as type,
+        return $this->pdo->query(
+            "SELECT 'Login' as type,
 			sum(case when lastlogin > curdate() - INTERVAL 1 DAY then 1 else 0 end) as 1day,
 			sum(case when lastlogin > curdate() - INTERVAL 7 DAY AND lastlogin < curdate() - INTERVAL 1 DAY then 1 else 0 end) as 7day,
 			sum(case when lastlogin > curdate() - INTERVAL 1 MONTH AND lastlogin < curdate() - INTERVAL 7 DAY then 1 else 0 end) as 1month,
@@ -1230,7 +1249,7 @@ class Users
 			sum(case when apiaccess > curdate() - INTERVAL 6 MONTH AND apiaccess < curdate() - INTERVAL 3 MONTH then 1 else 0 end) as 6month,
 			sum(case when apiaccess < curdate() - INTERVAL 6 MONTH then 1 else 0 end) as 12month
 			FROM users"
-		);
+        );
     }
 
     /**
@@ -1264,15 +1283,15 @@ class Users
     public function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $hideads)
     {
         return UserRole::query()->insertGetId(
-			[
-				'name' => $name,
-				'apirequests' => $apirequests,
-				'downloadrequests' => $downloadrequests,
-				'defaultinvites' => $defaultinvites,
-				'canpreview' => $canpreview,
-				'hideads' => $hideads,
-			]
-		);
+            [
+                'name' => $name,
+                'apirequests' => $apirequests,
+                'downloadrequests' => $downloadrequests,
+                'defaultinvites' => $defaultinvites,
+                'canpreview' => $canpreview,
+                'hideads' => $hideads,
+            ]
+        );
     }
 
     /**
@@ -1294,16 +1313,16 @@ class Users
         }
 
         return UserRole::query()->where('id', $id)->update(
-			[
-				'name' => $name,
-				'apirequests' => $apirequests,
-				'downloadrequests' => $downloadrequests,
-				'defaultinvites' => $defaultinvites,
-				'isdefault' => $isdefault,
-				'canpreview' => $canpreview,
-				'hideads' => $hideads,
-			]
-		);
+            [
+                'name' => $name,
+                'apirequests' => $apirequests,
+                'downloadrequests' => $downloadrequests,
+                'defaultinvites' => $defaultinvites,
+                'isdefault' => $isdefault,
+                'canpreview' => $canpreview,
+                'hideads' => $hideads,
+            ]
+        );
     }
 
     /**
@@ -1382,24 +1401,23 @@ class Users
     }
 
     /**
-     * deletes old rows FROM the userrequest and user_downloads tables.
+     * deletes old rows FROM the user_requests and user_downloads tables.
      * if site->userdownloadpurgedays SET to 0 then all release history is removed but
      * the download/request rows must remain for at least one day to allow the role based
      * limits to apply.
      *
      * @param int $days
-     *
-     * @throws \Exception
      */
     public function pruneRequestHistory($days = 0): void
     {
         if ($days === 0) {
             $days = 1;
             $this->pdo->queryExec('UPDATE user_downloads SET releases_id = null');
+            UserDownload::query()->update(['releases_id' => null]);
         }
 
-        UserRequest::query()->where('timestamp', '<', date_sub(new \DateTime('NOW'), new \DateInterval('P'.$days.'D')))->delete();
-        $this->pdo->queryExec(sprintf('DELETE FROM user_downloads WHERE timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)', $days));
+        UserRequest::query()->where('timestamp', '<', Carbon::now()->subDays($days))->delete();
+        UserDownload::query()->where('timestamp', '<', Carbon::now()->subDays($days))->delete();
     }
 
     /**
@@ -1412,20 +1430,10 @@ class Users
     public function getDownloadRequests($userID): int
     {
         // Clear old requests.
-        $this->pdo->queryExec(
-			sprintf(
-				'DELETE FROM user_downloads WHERE users_id = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)',
-				$userID
-			)
-		);
-        $value = $this->pdo->queryOneRow(
-			sprintf(
-				'SELECT COUNT(id) AS num FROM user_downloads WHERE users_id = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)',
-				$userID
-			)
-		);
+        UserDownload::query()->where('users_id', $userID)->where('timestamp', '<', Carbon::now()->subDay())->delete();
+        $value = UserDownload::query()->where('users_id', $userID)->where('timestamp', '>', Carbon::now()->subDay())->count('id');
 
-        return $value === false ? 0 : (int) $value['num'];
+        return $value === false ? 0 : $value;
     }
 
     /**
@@ -1435,14 +1443,16 @@ class Users
      */
     public function getDownloadRequestsForUser($userID): array
     {
-        return $this->pdo->query(sprintf('SELECT u.*, r.guid, r.searchname FROM user_downloads u
+        return $this->pdo->query(
+            sprintf(
+            'SELECT u.*, r.guid, r.searchname FROM user_downloads u
 										  LEFT OUTER JOIN releases r ON r.id = u.releases_id
 										  WHERE u.users_id = %d
 										  ORDER BY u.timestamp
 										  DESC',
-											$userID
-										)
-									);
+                                            $userID
+                                        )
+                                    );
     }
 
     /**
@@ -1456,23 +1466,23 @@ class Users
      */
     public function addDownloadRequest($userID, $releaseID)
     {
-        return $this->pdo->queryInsert(
-			sprintf(
-				'INSERT INTO user_downloads (users_id, releases_id, timestamp) VALUES (%d, %d, NOW())',
-				$userID,
-				$releaseID
-			)
-		);
+        return UserDownload::query()
+            ->insertGetId(
+                [
+                    'users_id' => $userID,
+                    'releases_id' => $releaseID,
+                    'timestamp' => Carbon::now(),
+                ]
+            );
     }
 
     /**
-     * @param $releaseID
-     *
-     * @return false|int|string
+     * @param int $releaseID
+     * @return mixed
      */
     public function delDownloadRequestsForRelease(int $releaseID)
     {
-        return $this->pdo->queryInsert(sprintf('DELETE FROM user_downloads WHERE releases_id = %d', $releaseID));
+        return UserDownload::query()->where('releases_id', $releaseID)->delete();
     }
 
     /**
@@ -1495,11 +1505,11 @@ class Users
         }
 
         $result = $this->pdo->queryOneRow(
-			sprintf(
-				'SELECT role FROM users WHERE %s',
-				$querySuffix
-			)
-		);
+            sprintf(
+                'SELECT role FROM users WHERE %s',
+                $querySuffix
+            )
+        );
 
         return $result['role'] === $roleID;
     }

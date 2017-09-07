@@ -6,5 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserDownload extends Model
 {
-    //
+    /**
+     * @var bool
+     */
+    protected $dateFormat = false;
+
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
+     * @var array
+     */
+    protected $fillable = ['id', 'users_id', 'releases_id', 'hosthash', 'timestamp'];
 }

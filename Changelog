@@ -1,4 +1,5 @@
 2017-09-07 DariusIII
+	* Chg: Update UserDownload model and migration, use it in Users class
 	* Fix: Fix undefined index regex notice
 	* Fix: Fix adding of binaryblacklist regexes
 2017-09-06 DariusIII

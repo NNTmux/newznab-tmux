@@ -14,8 +14,14 @@ class CreateUserDownloadsTable extends Migration
     public function up()
     {
         Schema::create('user_downloads', function (Blueprint $table) {
+            $table->engine = 'innodb';
             $table->increments('id');
-            $table->timestamps();
+            $table->unsignedInteger('users_id');
+            $table->string('hosthash', 50);
+            $table->dateTime('timestamp');
+            $table->integer('releases_id')->comment('FK to releases.id');
+            $table->index('users_id', 'ix_users_id');
+            $table->index('timestamp', 'ix_timestamp');
         });
     }
 
