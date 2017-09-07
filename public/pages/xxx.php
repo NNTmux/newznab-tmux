@@ -31,7 +31,7 @@ $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_R
 $ordering = $movie->getXXXOrdering();
 $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
 
-$results = $movies = [];
+$movies = [];
 $results = $movie->getXXXRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, -1, $page->userdata['categoryexclusions']);
 foreach ($results as $result) {
     $result['genre'] = $movie->makeFieldLinks($result, 'genre');
@@ -64,7 +64,7 @@ $page->smarty->assign('pagerquerysuffix', '#results');
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-if ($category == -1) {
+if ((int) $category === -1) {
     $page->smarty->assign('catname', 'All');
 } else {
     $cdata = $cat->getById($category);
