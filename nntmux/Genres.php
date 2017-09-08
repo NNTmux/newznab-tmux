@@ -21,6 +21,7 @@ class Genres
 
     /**
      * @param array $options Class instances.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {

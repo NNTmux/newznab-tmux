@@ -23,12 +23,13 @@ class DnzbFailures
 
     /**
      * @var array Class instances.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         $defaults = [
-				'Settings' => null,
-		];
+                'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
@@ -77,14 +78,15 @@ class DnzbFailures
             $limit = ' LIMIT '.$start.','.$num;
         }
 
-        return $this->pdo->query("
+        return $this->pdo->query(
+            "
 			SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name
 			FROM releases r
 			RIGHT JOIN dnzb_failures df ON df.release_id = r.id
 			LEFT OUTER JOIN categories c ON c.id = r.categories_id
 			LEFT OUTER JOIN categories cp ON cp.id = c.parentid
 			ORDER BY postdate DESC".$limit
-		);
+        );
     }
 
     /**
@@ -99,13 +101,14 @@ class DnzbFailures
     public function getAlternate($guid, $userid)
     {
         $rel = $this->pdo->queryOneRow(
-			sprintf('
+            sprintf(
+                '
 				SELECT id, searchname, categories_id
 				FROM releases
 				WHERE guid = %s',
-				$this->pdo->escapeString($guid)
-			)
-		);
+                $this->pdo->escapeString($guid)
+            )
+        );
 
         if ($rel === false) {
             return false;
@@ -114,7 +117,8 @@ class DnzbFailures
         DnzbFailure::query()->updateOrCreate(['release_id' => $rel['id'], 'users_id' => $userid], ['release_id' => $rel['id'], 'users_id' => $userid, 'failed' => 'failed + 1']);
 
         $alternate = $this->pdo->queryOneRow(
-			sprintf('
+            sprintf(
+                '
 				SELECT r.guid
 				FROM releases r
 				LEFT JOIN dnzb_failures df ON r.id = df.release_id
@@ -123,11 +127,11 @@ class DnzbFailures
 				AND r.categories_id = %d
 				AND r.id != %d
 				ORDER BY r.postdate DESC',
-				$this->pdo->likeString($rel['searchname']),
-				$rel['categories_id'],
-				$rel['id']
-			)
-		);
+                $this->pdo->likeString($rel['searchname']),
+                $rel['categories_id'],
+                $rel['id']
+            )
+        );
 
         return $alternate;
     }

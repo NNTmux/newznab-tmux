@@ -32,13 +32,14 @@ class Groups
      * Construct.
      *
      * @param array $options Class instances.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Settings' => null,
-			'ColorCLI' => null,
-		];
+            'Settings' => null,
+            'ColorCLI' => null,
+        ];
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
@@ -51,7 +52,7 @@ class Groups
      *
      * @return array
      */
-    public function getGroupsForSelect()
+    public function getGroupsForSelect(): array
     {
         $groups = $this->getActive();
         $temp_array = [];
@@ -76,11 +77,12 @@ class Groups
      */
     public function getByID($id)
     {
-        return $this->pdo->queryOneRow("
+        return $this->pdo->queryOneRow(
+            "
 			SELECT g.*
 			FROM groups g
 			WHERE g.id = {$id}"
-		);
+        );
     }
 
     /**
@@ -88,13 +90,13 @@ class Groups
      *
      * @return array
      */
-    public function getActive()
+    public function getActive(): array
     {
         return $this->pdo->query(
-			'SELECT g.* FROM groups g WHERE g.active = 1 ORDER BY g.name ASC',
-			true,
-			NN_CACHE_EXPIRY_SHORT
-		);
+            'SELECT g.* FROM groups g WHERE g.active = 1 ORDER BY g.name ASC',
+            true,
+            NN_CACHE_EXPIRY_SHORT
+        );
     }
 
     /**
@@ -104,25 +106,25 @@ class Groups
      *
      * @return array
      */
-    public function getActiveBackfill($order)
+    public function getActiveBackfill($order): array
     {
         switch ($order) {
-			case '':
-			case 'normal':
-				$orderBy = 'g.name ASC';
-				break;
-			case 'date':
-				$orderBy = 'g.first_record_postdate DESC';
-				break;
-			default:
-				return [];
-		}
+            case '':
+            case 'normal':
+                $orderBy = 'g.name ASC';
+                break;
+            case 'date':
+                $orderBy = 'g.first_record_postdate DESC';
+                break;
+            default:
+                return [];
+        }
 
         return $this->pdo->query(
-			"SELECT g.* FROM groups g WHERE g.backfill = 1 AND g.last_record != 0 ORDER BY {$orderBy}",
-			true,
-			NN_CACHE_EXPIRY_SHORT
-		);
+            "SELECT g.* FROM groups g WHERE g.backfill = 1 AND g.last_record != 0 ORDER BY {$orderBy}",
+            true,
+            NN_CACHE_EXPIRY_SHORT
+        );
     }
 
     /**
@@ -130,16 +132,17 @@ class Groups
      *
      * @return array
      */
-    public function getActiveIDs()
+    public function getActiveIDs(): array
     {
-        return $this->pdo->query('
+        return $this->pdo->query(
+            '
 			SELECT g.id
 			FROM groups g
 			WHERE g.active = 1
 			ORDER BY g.name ASC',
-			true,
-			NN_CACHE_EXPIRY_SHORT
-		);
+            true,
+            NN_CACHE_EXPIRY_SHORT
+        );
     }
 
     /**
@@ -151,11 +154,12 @@ class Groups
      */
     public function getByName($grp)
     {
-        return $this->pdo->queryOneRow("
+        return $this->pdo->queryOneRow(
+            "
 			SELECT g.*
 			FROM groups g
 			WHERE g.name = {$this->pdo->escapeString($grp)}"
-		);
+        );
     }
 
     /**
@@ -165,13 +169,14 @@ class Groups
      *
      * @return string Empty string on failure, groupName on success.
      */
-    public function getNameByID($id)
+    public function getNameByID($id): string
     {
-        $res = $this->pdo->queryOneRow("
+        $res = $this->pdo->queryOneRow(
+            "
 			SELECT g.name
 			FROM groups g
 			WHERE g.id = {$id}"
-		);
+        );
 
         return $res === false ? '' : $res['name'];
     }
@@ -185,11 +190,12 @@ class Groups
      */
     public function getIDByName($name)
     {
-        $res = $this->pdo->queryOneRow("
+        $res = $this->pdo->queryOneRow(
+            "
 			SELECT g.id
 			FROM groups g
 			WHERE g.name = {$this->pdo->escapeString($name)}"
-		);
+        );
 
         return $res === false ? '' : $res['id'];
     }
@@ -205,21 +211,25 @@ class Groups
     public function getCount($groupname = '', $active = -1)
     {
         $res = $this->pdo->query(
-			sprintf('
+            sprintf(
+                '
 				SELECT COUNT(g.id) AS num
 				FROM groups g
 				WHERE 1=1 %s %s',
-				($groupname !== ''
-					?
-					sprintf(
-						'AND g.name %s',
-						$this->pdo->likeString($groupname, true, true)
-					)
-					: ''
-				),
-				($active > -1 ? sprintf('AND g.active = %d', $active) : '')
-			), true, NN_CACHE_EXPIRY_MEDIUM
-		);
+                (
+                    $groupname !== ''
+                    ?
+                    sprintf(
+                        'AND g.name %s',
+                        $this->pdo->likeString($groupname, true, true)
+                    )
+                    : ''
+                ),
+                ($active > -1 ? sprintf('AND g.active = %d', $active) : '')
+            ),
+            true,
+            NN_CACHE_EXPIRY_MEDIUM
+        );
 
         return empty($res) ? 0 : $res[0]['num'];
     }
@@ -237,7 +247,8 @@ class Groups
     public function getRange($start = false, $num = -1, $groupname = '', $active = -1)
     {
         return $this->pdo->query(
-			sprintf('
+            sprintf(
+                '
 				SELECT g.*,
 				COALESCE(COUNT(r.id), 0) AS num_releases
 				FROM groups g
@@ -246,18 +257,21 @@ class Groups
 				GROUP BY g.id
 				ORDER BY g.name ASC
 				%s',
-				($groupname !== ''
-					?
-					sprintf(
-						'AND g.name %s',
-						$this->pdo->likeString($groupname, true, true)
-					)
-					: ''
-				),
-				$active > -1 ? sprintf('AND g.active = %d', $active) : '',
-				$start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start
-			), true, NN_CACHE_EXPIRY_SHORT
-		);
+                (
+                    $groupname !== ''
+                    ?
+                    sprintf(
+                        'AND g.name %s',
+                        $this->pdo->likeString($groupname, true, true)
+                    )
+                    : ''
+                ),
+                $active > -1 ? sprintf('AND g.active = %d', $active) : '',
+                $start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start
+            ),
+            true,
+            NN_CACHE_EXPIRY_SHORT
+        );
     }
 
     /**
@@ -267,46 +281,46 @@ class Groups
      *
      * @return bool
      */
-    public function update($group)
+    public function update($group): bool
     {
         $minFileString =
-			(
-			$group['minfilestoformrelease'] == ''
-				? 'minfilestoformrelease = NULL,'
-				: sprintf(
-				' minfilestoformrelease = %d,',
-				$this->formatNumberString($group['minfilestoformrelease'], false)
-			)
-			);
+            (
+            $group['minfilestoformrelease'] === ''
+                ? 'minfilestoformrelease = NULL,'
+                : sprintf(
+                ' minfilestoformrelease = %d,',
+                $this->formatNumberString($group['minfilestoformrelease'], false)
+            )
+            );
 
         $minSizeString =
-			(
-			$group['minsizetoformrelease'] == ''
-				? 'minsizetoformrelease = NULL'
-				: sprintf(
-				' minsizetoformrelease = %d',
-				$this->formatNumberString($group['minsizetoformrelease'], false)
-			)
-			);
+            (
+            $group['minsizetoformrelease'] === ''
+                ? 'minsizetoformrelease = NULL'
+                : sprintf(
+                ' minsizetoformrelease = %d',
+                $this->formatNumberString($group['minsizetoformrelease'], false)
+            )
+            );
 
         return $this->pdo->queryExec(
-			sprintf(
-				'UPDATE groups
+            sprintf(
+                'UPDATE groups
 				SET name = %s, description = %s, backfill_target = %s, first_record = %s, last_record = %s,
 				last_updated = NOW(), active = %s, backfill = %s, %s %s
 				WHERE id = %d',
-				$this->pdo->escapeString(trim($group['name'])),
-				$this->pdo->escapeString(trim($group['description'])),
-				$this->formatNumberString($group['backfill_target']),
-				$this->formatNumberString($group['first_record']),
-				$this->formatNumberString($group['last_record']),
-				$this->formatNumberString($group['active']),
-				$this->formatNumberString($group['backfill']),
-				$minFileString,
-				$minSizeString,
-				$group['id']
-			)
-		);
+                $this->pdo->escapeString(trim($group['name'])),
+                $this->pdo->escapeString(trim($group['description'])),
+                $this->formatNumberString($group['backfill_target']),
+                $this->formatNumberString($group['first_record']),
+                $this->formatNumberString($group['last_record']),
+                $this->formatNumberString($group['active']),
+                $this->formatNumberString($group['backfill']),
+                $minFileString,
+                $minSizeString,
+                $group['id']
+            )
+        );
     }
 
     /**
@@ -332,39 +346,40 @@ class Groups
      *
      * @return bool
      */
-    public function add($group)
+    public function add($group): bool
     {
         $minFileString =
-			(
-			$group['minfilestoformrelease'] == ''
-				? 'NULL'
-				: sprintf('%d', $this->formatNumberString($group['minfilestoformrelease'], false))
-			);
+            (
+            $group['minfilestoformrelease'] === ''
+                ? 'NULL'
+                : sprintf('%d', $this->formatNumberString($group['minfilestoformrelease'], false))
+            );
 
         $minSizeString =
-			(
-			$group['minsizetoformrelease'] == ''
-				? 'NULL'
-				: sprintf('%d', $this->formatNumberString($group['minsizetoformrelease'], false))
-			);
+            (
+            $group['minsizetoformrelease'] === ''
+                ? 'NULL'
+                : sprintf('%d', $this->formatNumberString($group['minsizetoformrelease'], false))
+            );
 
         return $this->pdo->queryInsert(
-			sprintf('
+            sprintf(
+                '
 				INSERT INTO groups
 					(name, description, backfill_target, first_record, last_record, last_updated,
 					active, backfill, minfilestoformrelease, minsizetoformrelease)
 				VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s)',
-				$this->pdo->escapeString(trim($group['name'])),
-				(isset($group['description']) ? $this->pdo->escapeString(trim($group['description'])) : "''"),
-				(isset($group['backfill_target']) ? $this->formatNumberString($group['backfill_target']) : '1'),
-				(isset($group['first_record']) ? $this->formatNumberString($group['first_record']) : '0'),
-				(isset($group['last_record']) ? $this->formatNumberString($group['last_record']) : '0'),
-				(isset($group['active']) ? $this->formatNumberString($group['active']) : '0'),
-				(isset($group['backfill']) ? $this->formatNumberString($group['backfill']) : '0'),
-				$minFileString,
-				$minSizeString
-			)
-		);
+                $this->pdo->escapeString(trim($group['name'])),
+                (isset($group['description']) ? $this->pdo->escapeString(trim($group['description'])) : "''"),
+                (isset($group['backfill_target']) ? $this->formatNumberString($group['backfill_target']) : '1'),
+                (isset($group['first_record']) ? $this->formatNumberString($group['first_record']) : '0'),
+                (isset($group['last_record']) ? $this->formatNumberString($group['last_record']) : '0'),
+                (isset($group['active']) ? $this->formatNumberString($group['active']) : '0'),
+                (isset($group['backfill']) ? $this->formatNumberString($group['backfill']) : '0'),
+                $minFileString,
+                $minSizeString
+            )
+        );
     }
 
     /**
@@ -391,16 +406,18 @@ class Groups
      * @param int|string $id ID of the group.
      *
      * @return bool
+     * @throws \Exception
      */
     public function delete($id)
     {
         $this->purge($id);
 
-        return $this->pdo->queryExec("
+        return $this->pdo->queryExec(
+            "
 			DELETE g
 			FROM groups g
 			WHERE g.id = {$id}"
-		);
+        );
     }
 
     /**
@@ -409,32 +426,35 @@ class Groups
      * @param string|int $id The group ID.
      *
      * @return bool
+     * @throws \Exception
      */
-    public function reset($id)
+    public function reset($id): bool
     {
         // Remove rows from collections / binaries / parts.
         (new Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
 
         // Remove rows from part repair.
-        $this->pdo->queryExec("
+        $this->pdo->queryExec(
+            "
 			DELETE mp
 			FROM missed_parts mp
 			WHERE mp.groups_id = {$id}"
-		);
+        );
 
         foreach ($this->cbpm as $tablePrefix) {
             $this->pdo->queryExec(
-				"DROP TABLE IF EXISTS {$tablePrefix}_{$id}"
-			);
+                "DROP TABLE IF EXISTS {$tablePrefix}_{$id}"
+            );
         }
 
         // Reset the group stats.
-        return $this->pdo->queryExec("
+        return $this->pdo->queryExec(
+            "
 			UPDATE groups
 			SET backfill_target = 1, first_record = 0, first_record_postdate = NULL, last_record = 0,
 				last_record_postdate = NULL, last_updated = NULL
 			WHERE id = {$id}"
-		);
+        );
     }
 
     /**
@@ -442,7 +462,7 @@ class Groups
      *
      * @return bool
      */
-    public function resetall()
+    public function resetall(): bool
     {
         foreach ($this->cbpm as $tablePrefix) {
             $this->pdo->queryExec("TRUNCATE TABLE {$tablePrefix}");
@@ -459,17 +479,19 @@ class Groups
         }
 
         // Reset the group stats.
-        return $this->pdo->queryExec('
+        return $this->pdo->queryExec(
+            '
 			UPDATE groups
 			SET backfill_target = 1, first_record = 0, first_record_postdate = NULL,
 				last_record = 0, last_record_postdate = NULL, last_updated = NULL, active = 0'
-		);
+        );
     }
 
     /**
      * Purge a single group or all groups.
      *
      * @param int|string|bool $id The group ID. If false, purge all groups.
+     * @throws \Exception
      */
     public function purge($id = false)
     {
@@ -480,12 +502,13 @@ class Groups
         }
 
         $res = $this->pdo->queryDirect(
-			sprintf('
+            sprintf(
+                '
 				SELECT r.id, r.guid
 				FROM releases r %s',
-				($id === false ? '' : 'WHERE r.groups_id = '.$id)
-			)
-		);
+                ($id === false ? '' : 'WHERE r.groups_id = '.$id)
+            )
+        );
 
         if ($res instanceof \Traversable) {
             $releases = new Releases(['Settings' => $this->pdo, 'Groups' => $this]);
@@ -493,13 +516,13 @@ class Groups
             $releaseImage = new ReleaseImage($this->pdo);
             foreach ($res as $row) {
                 $releases->deleteSingle(
-					[
-						'g' => $row['guid'],
-						'i' => $row['id'],
-					],
-					$nzb,
-					$releaseImage
-				);
+                    [
+                        'g' => $row['guid'],
+                        'i' => $row['id'],
+                    ],
+                    $nzb,
+                    $releaseImage
+                );
             }
         }
     }
@@ -508,10 +531,11 @@ class Groups
      * Adds new newsgroups based on a regular expression match against USP available.
      *
      * @param string $groupList
-     * @param int    $active
-     * @param int    $backfill
+     * @param int $active
+     * @param int $backfill
      *
      * @return array|string
+     * @throws \Exception
      */
     public function addBulk($groupList, $active = 1, $backfill = 1)
     {
@@ -538,13 +562,13 @@ class Groups
                     $res = $this->getIDByName($group['group']);
                     if ($res === '') {
                         $this->add(
-							[
-								'name'        => $group['group'],
-								'active'      => $active,
-								'backfill'    => $backfill,
-								'description' => 'Added by bulkAdd',
-							]
-						);
+                            [
+                                'name'        => $group['group'],
+                                'active'      => $active,
+                                'backfill'    => $backfill,
+                                'description' => 'Added by bulkAdd',
+                            ]
+                        );
                         $ret[] = ['group' => $group['group'], 'msg' => 'Created'];
                     }
                 }
@@ -567,13 +591,14 @@ class Groups
      *
      * @return string
      */
-    public function updateGroupStatus($id, $column, $status = 0)
+    public function updateGroupStatus($id, $column, $status = 0): string
     {
-        $this->pdo->queryExec("
+        $this->pdo->queryExec(
+            "
 			UPDATE groups
 			SET {$column} = {$status}
 			WHERE id = {$id}"
-		);
+        );
 
         return "Group {$id}: {$column} has been ".(($status === 0) ? 'deactivated' : 'activated').'.';
     }
@@ -586,7 +611,7 @@ class Groups
      *
      * @return array The table names.
      */
-    public function getCBPTableNames($groupID)
+    public function getCBPTableNames($groupID): array
     {
         $groupKey = $groupID;
 
@@ -618,14 +643,14 @@ class Groups
      *
      * @return bool
      */
-    public function createNewTPGTables($groupID)
+    public function createNewTPGTables($groupID): bool
     {
         foreach ($this->cbpm as $tablePrefix) {
             if ($this->pdo->queryExec(
-					"CREATE TABLE IF NOT EXISTS {$tablePrefix}_{$groupID} LIKE {$tablePrefix}",
-					true
-				) === false
-			) {
+                    "CREATE TABLE IF NOT EXISTS {$tablePrefix}_{$groupID} LIKE {$tablePrefix}",
+                    true
+                ) === false
+            ) {
                 return false;
             }
         }
@@ -638,13 +663,13 @@ class Groups
      *
      * @param int $id The Group ID to disable
      */
-    public function disableIfNotExist($id)
+    public function disableIfNotExist($id): void
     {
         $this->updateGroupStatus($id, 'active', 0);
         ColorCLI::doEcho(
-			ColorCLI::error(
-				'Group does not exist on server, disabling'
-			)
-		);
+            ColorCLI::error(
+                'Group does not exist on server, disabling'
+            )
+        );
     }
 }

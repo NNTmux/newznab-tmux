@@ -12,9 +12,9 @@ class Games
     const GAME_MATCH_PERCENTAGE = 85;
 
     const GAMES_TITLE_PARSE_REGEX =
-		'#(?P<title>[\w\s\.]+)(-(?P<relgrp>FLT|RELOADED|SKIDROW|PROPHET|RAZOR1911|CORE|REFLEX))?\s?(\s*(\(?('.
-		'(?P<reltype>PROPER|MULTI\d|RETAIL|CRACK(FIX)?|ISO|(RE)?(RIP|PACK))|(?P<year>(19|20)\d{2})|V\s?'.
-		'(?P<version>(\d+\.)+\d+)|(-\s)?(?P=relgrp))\)?)\s?)*\s?(\.\w{2,4})?#i';
+        '#(?P<title>[\w\s\.]+)(-(?P<relgrp>FLT|RELOADED|SKIDROW|PROPHET|RAZOR1911|CORE|REFLEX))?\s?(\s*(\(?('.
+        '(?P<reltype>PROPER|MULTI\d|RETAIL|CRACK(FIX)?|ISO|(RE)?(RIP|PACK))|(?P<year>(19|20)\d{2})|V\s?'.
+        '(?P<version>(\d+\.)+\d+)|(-\s)?(?P=relgrp))\)?)\s?)*\s?(\.\w{2,4})?#i';
 
     /**
      * @var bool
@@ -108,10 +108,10 @@ class Games
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Echo'     => false,
-			'ColorCLI' => null,
-			'Settings' => null,
-		];
+            'Echo'     => false,
+            'ColorCLI' => null,
+            'Settings' => null,
+        ];
         $options += $defaults;
         $this->echoOutput = ($options['Echo'] && NN_ECHOCLI);
 
@@ -138,14 +138,15 @@ class Games
     public function getGamesInfoById($id)
     {
         return $this->pdo->queryOneRow(
-			sprintf('
+            sprintf(
+                '
 				SELECT gi.*, g.title AS genres
 				FROM gamesinfo gi
 				LEFT OUTER JOIN genres g ON g.id = gi.genres_id
 				WHERE gi.id = %d',
-				$id
-			)
-		);
+                $id
+            )
+        );
     }
 
     /**
@@ -161,12 +162,13 @@ class Games
             return $bestMatch;
         }
 
-        $results = $this->pdo->queryDirect("
+        $results = $this->pdo->queryDirect(
+            "
 			SELECT *
 			FROM gamesinfo
 			WHERE MATCH(title) AGAINST({$this->pdo->escapeString($title)})
 			LIMIT 20"
-		);
+        );
 
         if ($results instanceof \Traversable) {
             $bestMatchPct = 0;
@@ -201,11 +203,11 @@ class Games
     public function getRange($start, $num): array
     {
         return $this->pdo->query(
-			sprintf(
-				'SELECT gi.*, g.title AS genretitle FROM gamesinfo gi INNER JOIN genres g ON gi.genres_id = g.id ORDER BY createddate DESC %s',
-				($start === false ? '' : 'LIMIT '.$num.' OFFSET '.$start)
-			)
-		);
+            sprintf(
+                'SELECT gi.*, g.title AS genretitle FROM gamesinfo gi INNER JOIN genres g ON gi.genres_id = g.id ORDER BY createddate DESC %s',
+                ($start === false ? '' : 'LIMIT '.$num.' OFFSET '.$start)
+            )
+        );
     }
 
     /**
@@ -249,7 +251,8 @@ class Games
         $order = $this->getGamesOrder($orderBy);
 
         $games = $this->pdo->queryCalc(
-				sprintf("
+                sprintf(
+                    "
 				SELECT SQL_CALC_FOUND_ROWS gi.id,
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
 				FROM gamesinfo gi
@@ -261,16 +264,18 @@ class Games
 				%s %s %s %s
 				GROUP BY gi.id
 				ORDER BY %s %s %s",
-						Releases::showPasswords(),
-						$browseBy,
-						$catsrch,
-						$maxAge,
-						$exccatlist,
-						$order[0],
-						$order[1],
-						($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-				), true, NN_CACHE_EXPIRY_MEDIUM
-		);
+                        Releases::showPasswords(),
+                        $browseBy,
+                        $catsrch,
+                        $maxAge,
+                        $exccatlist,
+                        $order[0],
+                        $order[1],
+                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+                ),
+            true,
+            NN_CACHE_EXPIRY_MEDIUM
+        );
 
         $gameIDs = $releaseIDs = false;
 
@@ -282,7 +287,8 @@ class Games
         }
 
         $return = $this->pdo->query(
-				sprintf("
+                sprintf(
+                    "
 				SELECT
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
@@ -310,13 +316,15 @@ class Games
 				%s
 				GROUP BY gi.id
 				ORDER BY %s %s",
-						(is_array($gameIDs) ? implode(',', $gameIDs) : -1),
-						(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-						$catsrch,
-						$order[0],
-						$order[1]
-				), true, NN_CACHE_EXPIRY_MEDIUM
-		);
+                        (is_array($gameIDs) ? implode(',', $gameIDs) : -1),
+                        (is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+                        $catsrch,
+                        $order[0],
+                        $order[1]
+                ),
+            true,
+            NN_CACHE_EXPIRY_MEDIUM
+        );
         if (! empty($return)) {
             $return[0]['_totalcount'] = $games['total'] ?? 0;
         }
@@ -334,29 +342,29 @@ class Games
         $order = $orderBy === '' ? 'r.postdate' : $orderBy;
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
-			case 'title':
-				$orderField = 'gi.title';
-				break;
-			case 'releasedate':
-				$orderField = 'gi.releasedate';
-				break;
-			case 'genre':
-				$orderField = 'gi.genres_id';
-				break;
-			case 'size':
-				$orderField = 'r.size';
-				break;
-			case 'files':
-				$orderField = 'r.totalpart';
-				break;
-			case 'stats':
-				$orderField = 'r.grabs';
-				break;
-			case 'posted':
-			default:
-				$orderField = 'r.postdate';
-				break;
-		}
+            case 'title':
+                $orderField = 'gi.title';
+                break;
+            case 'releasedate':
+                $orderField = 'gi.releasedate';
+                break;
+            case 'genre':
+                $orderField = 'gi.genres_id';
+                break;
+            case 'size':
+                $orderField = 'r.size';
+                break;
+            case 'files':
+                $orderField = 'r.totalpart';
+                break;
+            case 'stats':
+                $orderField = 'r.grabs';
+                break;
+            case 'posted':
+            default:
+                $orderField = 'r.postdate';
+                break;
+        }
         $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderField, $orderSort];
@@ -368,10 +376,10 @@ class Games
     public function getGamesOrdering(): array
     {
         return [
-			'title_asc', 'title_desc', 'posted_asc', 'posted_desc', 'size_asc', 'size_desc',
-			'files_asc', 'files_desc', 'stats_asc', 'stats_desc',
-			'releasedate_asc', 'releasedate_desc', 'genre_asc', 'genre_desc',
-		];
+            'title_asc', 'title_desc', 'posted_asc', 'posted_desc', 'size_asc', 'size_desc',
+            'files_asc', 'files_desc', 'stats_asc', 'stats_desc',
+            'releasedate_asc', 'releasedate_desc', 'genre_asc', 'genre_desc',
+        ];
     }
 
     /**
@@ -424,8 +432,8 @@ class Games
                 break;
             }
             $newArr[] =
-				'<a href="'.WWW_TOP.'/games?'.$field.'='.urlencode($ta).'" title="'.
-				$ta.'">'.$ta.'</a>';
+                '<a href="'.WWW_TOP.'/games?'.$field.'='.urlencode($ta).'" title="'.
+                $ta.'">'.$ta.'</a>';
             $i++;
         }
 
@@ -449,23 +457,24 @@ class Games
     public function update($id, $title, $asin, $url, $publisher, $releaseDate, $esrb, $cover, $trailerUrl, $genreID): void
     {
         $this->pdo->queryExec(
-			sprintf('
+            sprintf(
+                '
 				UPDATE gamesinfo
 				SET title = %s, asin = %s, url = %s, publisher = %s,
 					releasedate = %s, esrb = %s, cover = %d, trailer = %s, genres_id = %d, updateddate = NOW()
 				WHERE id = %d',
-				$this->pdo->escapeString($title),
-				$this->pdo->escapeString($asin),
-				$this->pdo->escapeString($url),
-				$this->pdo->escapeString($publisher),
-				$this->pdo->escapeString($releaseDate),
-				$this->pdo->escapeString($esrb),
-				$cover,
-				$this->pdo->escapeString($trailerUrl),
-				$genreID,
-				$id
-			)
-		);
+                $this->pdo->escapeString($title),
+                $this->pdo->escapeString($asin),
+                $this->pdo->escapeString($url),
+                $this->pdo->escapeString($publisher),
+                $this->pdo->escapeString($releaseDate),
+                $this->pdo->escapeString($esrb),
+                $cover,
+                $this->pdo->escapeString($trailerUrl),
+                $genreID,
+                $id
+            )
+        );
     }
 
     /**
@@ -658,81 +667,85 @@ class Games
             $genreKey = array_search(strtolower($genreName), $genreAssoc, false);
         } else {
             $genreKey = $this->pdo->queryInsert(
-				sprintf('
+                sprintf(
+                    '
 					INSERT INTO genres (title, type)
 					VALUES (%s, %d)',
-					$this->pdo->escapeString($genreName),
-					Genres::GAME_TYPE
-				)
-			);
+                    $this->pdo->escapeString($genreName),
+                    Genres::GAME_TYPE
+                )
+            );
         }
 
         $game['gamesgenre'] = $genreName;
         $game['gamesgenreID'] = $genreKey;
 
         $check = $this->pdo->queryOneRow(
-			sprintf('
+            sprintf(
+                '
 				SELECT id
 				FROM gamesinfo
 				WHERE asin = %s',
-				$this->pdo->escapeString($game['asin'])
-			)
-		);
+                $this->pdo->escapeString($game['asin'])
+            )
+        );
         if ($check === false) {
             $gamesId = $this->pdo->queryInsert(
-				sprintf('
+                sprintf(
+                    '
 					INSERT INTO gamesinfo
 						(title, asin, url, publisher, genres_id, esrb, releasedate, review, cover, backdrop, trailer, classused, createddate, updateddate)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %d, %d, %s, %s, NOW(), NOW())',
-					$this->pdo->escapeString($game['title']),
-					$this->pdo->escapeString($game['asin']),
-					$this->pdo->escapeString($game['url']),
-					$this->pdo->escapeString($game['publisher']),
-					($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']),
-					$this->pdo->escapeString($game['esrb']),
-					($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
-					$this->pdo->escapeString(substr($game['review'], 0, 3000)),
-					$game['cover'],
-					$game['backdrop'],
-					$this->pdo->escapeString($game['trailer']),
-					$this->pdo->escapeString($game['classused'])
-				)
-			);
+                    $this->pdo->escapeString($game['title']),
+                    $this->pdo->escapeString($game['asin']),
+                    $this->pdo->escapeString($game['url']),
+                    $this->pdo->escapeString($game['publisher']),
+                    ($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']),
+                    $this->pdo->escapeString($game['esrb']),
+                    ($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
+                    $this->pdo->escapeString(substr($game['review'], 0, 3000)),
+                    $game['cover'],
+                    $game['backdrop'],
+                    $this->pdo->escapeString($game['trailer']),
+                    $this->pdo->escapeString($game['classused'])
+                )
+            );
         } else {
             $gamesId = $check['id'];
             $this->pdo->queryExec(
-				sprintf('
+                sprintf(
+                    '
 					UPDATE gamesinfo
 					SET
 						title = %s, asin = %s, url = %s, publisher = %s, genres_id = %s,
 						esrb = %s, releasedate = %s, review = %s, cover = %d, backdrop = %d, trailer = %s, classused = %s, updateddate = NOW()
 					WHERE id = %d',
-					$this->pdo->escapeString($game['title']),
-					$this->pdo->escapeString($game['asin']),
-					$this->pdo->escapeString($game['url']),
-					$this->pdo->escapeString($game['publisher']),
-					($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']),
-					$this->pdo->escapeString($game['esrb']),
-					($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
-					$this->pdo->escapeString(substr($game['review'], 0, 3000)),
-					$game['cover'],
-					$game['backdrop'],
-					$this->pdo->escapeString($game['trailer']),
-					$this->pdo->escapeString($game['classused']),
-					$gamesId
-				)
-			);
+                    $this->pdo->escapeString($game['title']),
+                    $this->pdo->escapeString($game['asin']),
+                    $this->pdo->escapeString($game['url']),
+                    $this->pdo->escapeString($game['publisher']),
+                    ($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']),
+                    $this->pdo->escapeString($game['esrb']),
+                    ($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
+                    $this->pdo->escapeString(substr($game['review'], 0, 3000)),
+                    $game['cover'],
+                    $game['backdrop'],
+                    $this->pdo->escapeString($game['trailer']),
+                    $this->pdo->escapeString($game['classused']),
+                    $gamesId
+                )
+            );
         }
 
         if ($gamesId) {
             if ($this->echoOutput) {
                 ColorCLI::doEcho(
-					ColorCLI::header('Added/updated game: ').
-					ColorCLI::alternateOver('   Title:    ').
-					ColorCLI::primary($game['title']).
-					ColorCLI::alternateOver('   Source:   ').
-					ColorCLI::primary($this->_classUsed)
-				);
+                    ColorCLI::header('Added/updated game: ').
+                    ColorCLI::alternateOver('   Title:    ').
+                    ColorCLI::primary($game['title']).
+                    ColorCLI::alternateOver('   Source:   ').
+                    ColorCLI::primary($this->_classUsed)
+                );
             }
             if ($game['cover'] === 1) {
                 $game['cover'] = $ri->saveImage($gamesId, $game['coverurl'], $this->imgSavePath, 250, 250);
@@ -743,9 +756,9 @@ class Games
         } else {
             if ($this->echoOutput) {
                 ColorCLI::doEcho(
-					ColorCLI::headerOver('Nothing to update: ').
-					ColorCLI::primary($game['title'].' (PC)')
-				);
+                    ColorCLI::headerOver('Nothing to update: ').
+                    ColorCLI::primary($game['title'].' (PC)')
+                );
             }
         }
 
@@ -759,18 +772,19 @@ class Games
     public function processGamesReleases(): void
     {
         $res = $this->pdo->queryDirect(
-			sprintf('
+            sprintf(
+                '
 				SELECT searchname, id
 				FROM releases
 				WHERE nzbstatus = 1 %s
 				AND gamesinfo_id = 0 %s
 				ORDER BY postdate DESC
 				LIMIT %d',
-				$this->renamed,
-				$this->catWhere,
-				$this->gameQty
-			)
-		);
+                $this->renamed,
+                $this->catWhere,
+                $this->gameQty
+            )
+        );
 
         if ($res instanceof \Traversable && $res->rowCount() > 0) {
             if ($this->echoOutput) {
@@ -779,16 +793,16 @@ class Games
 
             foreach ($res as $arr) {
 
-				// Reset maxhitrequest
+                // Reset maxhitrequest
                 $this->maxHitRequest = false;
 
                 $gameInfo = $this->parseTitle($arr['searchname']);
                 if ($gameInfo !== false) {
                     if ($this->echoOutput) {
                         ColorCLI::doEcho(
-							ColorCLI::headerOver('Looking up: ').
-							ColorCLI::primary($gameInfo['title'].' (PC)')
-						);
+                            ColorCLI::headerOver('Looking up: ').
+                            ColorCLI::primary($gameInfo['title'].' (PC)')
+                        );
                     }
 
                     // Check for existing games entry.
@@ -835,7 +849,7 @@ class Games
     public function parseTitle($releaseName)
     {
 
-		// Get name of the game from name of release.
+        // Get name of the game from name of release.
         if (preg_match(self::GAMES_TITLE_PARSE_REGEX, preg_replace('/\sMulti\d?\s/i', '', $releaseName), $matches)) {
             // Replace dots, underscores, colons, or brackets with spaces.
             $result = [];
@@ -870,24 +884,24 @@ class Games
 
         //Game genres
         switch ($gameGenre) {
-			case 'Action':
-			case 'Adventure':
-			case 'Arcade':
-			case 'Board Games':
-			case 'Cards':
-			case 'Casino':
-			case 'Flying':
-			case 'Puzzle':
-			case 'Racing':
-			case 'Rhythm':
-			case 'Role-Playing':
-			case 'Simulation':
-			case 'Sports':
-			case 'Strategy':
-			case 'Trivia':
-				$str = $gameGenre;
-				break;
-		}
+            case 'Action':
+            case 'Adventure':
+            case 'Arcade':
+            case 'Board Games':
+            case 'Cards':
+            case 'Casino':
+            case 'Flying':
+            case 'Puzzle':
+            case 'Racing':
+            case 'Rhythm':
+            case 'Role-Playing':
+            case 'Simulation':
+            case 'Sports':
+            case 'Strategy':
+            case 'Trivia':
+                $str = $gameGenre;
+                break;
+        }
 
         return ($str !== '') ? $str : false;
     }

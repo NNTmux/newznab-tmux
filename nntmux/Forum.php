@@ -17,8 +17,8 @@ class Forum
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Settings' => null,
-		];
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
@@ -53,12 +53,19 @@ class Forum
         }
 
         return $this->pdo->queryInsert(
-			sprintf('
+            sprintf(
+                '
 				INSERT INTO forumpost (forumid, parentid, users_id, subject, message, locked, sticky, replies, createddate, updateddate)
 				VALUES (1, %d, %d, %s, %s, %d, %d, %d, NOW(), NOW())',
-				$parentid, $userid, $this->pdo->escapeString($subject), $this->pdo->escapeString($message), $locked, $sticky, $replies
-			)
-		);
+                $parentid,
+                $userid,
+                $this->pdo->escapeString($subject),
+                $this->pdo->escapeString($message),
+                $locked,
+                $sticky,
+                $replies
+            )
+        );
     }
 
     /**
@@ -71,11 +78,11 @@ class Forum
     public function getParent($parent)
     {
         return $this->pdo->queryOneRow(
-			sprintf(
-				'SELECT f.*, u.username FROM forumpost f LEFT OUTER JOIN users u ON u.id = f.users_id WHERE f.id = %d',
-				$parent
-			)
-		);
+            sprintf(
+                'SELECT f.*, u.username FROM forumpost f LEFT OUTER JOIN users u ON u.id = f.users_id WHERE f.id = %d',
+                $parent
+            )
+        );
     }
 
     /**
@@ -88,7 +95,8 @@ class Forum
     public function getPosts($parent): array
     {
         return $this->pdo->query(
-			sprintf('
+            sprintf(
+                '
 				SELECT f.*, u.username, ur.name AS rolename
 				FROM forumpost f
 				LEFT OUTER JOIN users u ON u.id = f.users_id
@@ -96,10 +104,10 @@ class Forum
 				WHERE f.id = %d OR f.parentid = %d
 				ORDER BY f.createddate ASC
 				LIMIT 250',
-				$parent,
-				$parent
-			)
-		);
+                $parent,
+                $parent
+            )
+        );
     }
 
     /**
@@ -137,16 +145,17 @@ class Forum
     public function getBrowseRange($start, $num): array
     {
         return $this->pdo->query(
-			sprintf('
+            sprintf(
+                '
 				SELECT f.*, u.username, ur.name AS rolename
 				FROM forumpost f
 				LEFT OUTER JOIN users u ON u.id = f.users_id
 				LEFT JOIN user_roles ur ON ur.id = u.role
 				WHERE f.parentid = 0
 				ORDER BY f.updateddate DESC %s',
-				($start === false ? '' : (' LIMIT '.$num.' OFFSET '.$start))
-			)
-		);
+                ($start === false ? '' : (' LIMIT '.$num.' OFFSET '.$start))
+            )
+        );
     }
 
     /**
@@ -212,16 +221,17 @@ class Forum
     public function getForUserRange($uid, $start, $num): array
     {
         return $this->pdo->query(
-			sprintf('
+            sprintf(
+                '
 				SELECT forumpost.*, users.username
 				FROM forumpost
 				LEFT OUTER JOIN users ON users.id = forumpost.users_id
 				WHERE users_id = %d
 				ORDER BY forumpost.createddate DESC %s',
-				($start === false ? '' : (' LIMIT '.$num.' OFFSET '.$start)),
-				$uid
-			)
-		);
+                ($start === false ? '' : (' LIMIT '.$num.' OFFSET '.$start)),
+                $uid
+            )
+        );
     }
 
     /**
@@ -235,16 +245,18 @@ class Forum
     {
         $post = $this->getPost($id);
         if ($post) {
-            $this->pdo->queryExec(sprintf('
+            $this->pdo->queryExec(
+                sprintf(
+                '
 							UPDATE forumpost
 							SET message = %s
 							WHERE id = %d
 							AND users_id = %d',
-				$this->pdo->escapeString($message),
-				$post['id'],
-				$uid
-			)
-			);
+                $this->pdo->escapeString($message),
+                $post['id'],
+                $uid
+            )
+            );
         }
     }
 
@@ -256,15 +268,17 @@ class Forum
      */
     public function lockUnlockTopic($id, $lock): void
     {
-        $this->pdo->queryExec(sprintf('
+        $this->pdo->queryExec(
+            sprintf(
+            '
 						UPDATE forumpost
 						SET locked = %d
 						WHERE id = %d
 						OR parentid = %d',
-				$lock,
-				$id,
-				$id
-			)
-		);
+                $lock,
+                $id,
+                $id
+            )
+        );
     }
 }

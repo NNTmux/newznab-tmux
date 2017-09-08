@@ -66,57 +66,60 @@ class IRCScraper extends IRCClient
      * Construct.
      *
      * @param bool $silent Run this in silent mode (no text output).
-     * @param bool $debug  Turn on debug? Shows sent/received socket buffer messages.
+     * @param bool $debug Turn on debug? Shows sent/received socket buffer messages.
+     * @throws \Exception
      */
     public function __construct(&$silent, &$debug)
     {
         if (defined('SCRAPE_IRC_SOURCE_IGNORE')) {
-            $this->_ignoredChannels = unserialize(SCRAPE_IRC_SOURCE_IGNORE, ['allowed_classes' => ['#a.b.cd.image',
-																				  '#a.b.console.ps3',
-																				  '#a.b.dvd',
-																				  '#a.b.erotica',
-																				  '#a.b.flac',
-																				  '#a.b.foreign',
-																				  '#a.b.games.nintendods',
-																				  '#a.b.inner-sanctum',
-																				  '#a.b.moovee',
-																				  '#a.b.movies.divx',
-																				  '#a.b.sony.psp',
-																				  '#a.b.sounds.mp3.complete_cd',
-																				  '#a.b.teevee',
-																				  '#a.b.games.wii',
-																				  '#a.b.warez',
-																				  '#a.b.games.xbox360',
-																				  '#pre@corrupt',
-																				  '#scnzb',
-																				  '#tvnzb',
-																				  'srrdb',
-																				 ],
-			]
-			);
+            $this->_ignoredChannels = unserialize(
+                SCRAPE_IRC_SOURCE_IGNORE,
+                ['allowed_classes' => ['#a.b.cd.image',
+                                                                                  '#a.b.console.ps3',
+                                                                                  '#a.b.dvd',
+                                                                                  '#a.b.erotica',
+                                                                                  '#a.b.flac',
+                                                                                  '#a.b.foreign',
+                                                                                  '#a.b.games.nintendods',
+                                                                                  '#a.b.inner-sanctum',
+                                                                                  '#a.b.moovee',
+                                                                                  '#a.b.movies.divx',
+                                                                                  '#a.b.sony.psp',
+                                                                                  '#a.b.sounds.mp3.complete_cd',
+                                                                                  '#a.b.teevee',
+                                                                                  '#a.b.games.wii',
+                                                                                  '#a.b.warez',
+                                                                                  '#a.b.games.xbox360',
+                                                                                  '#pre@corrupt',
+                                                                                  '#scnzb',
+                                                                                  '#tvnzb',
+                                                                                  'srrdb',
+                                                                                 ],
+            ]
+            );
         } else {
             $this->_ignoredChannels = [
-				'#a.b.cd.image'               => false,
-				'#a.b.console.ps3'            => false,
-				'#a.b.dvd'                    => false,
-				'#a.b.erotica'                => false,
-				'#a.b.flac'                   => false,
-				'#a.b.foreign'                => false,
-				'#a.b.games.nintendods'       => false,
-				'#a.b.inner-sanctum'          => false,
-				'#a.b.moovee'                 => false,
-				'#a.b.movies.divx'            => false,
-				'#a.b.sony.psp'               => false,
-				'#a.b.sounds.mp3.complete_cd' => false,
-				'#a.b.teevee'                 => false,
-				'#a.b.games.wii'              => false,
-				'#a.b.warez'                  => false,
-				'#a.b.games.xbox360'          => false,
-				'#pre@corrupt'                => false,
-				'#scnzb'                      => false,
-				'#tvnzb'                      => false,
-				'srrdb'                       => false,
-			];
+                '#a.b.cd.image'               => false,
+                '#a.b.console.ps3'            => false,
+                '#a.b.dvd'                    => false,
+                '#a.b.erotica'                => false,
+                '#a.b.flac'                   => false,
+                '#a.b.foreign'                => false,
+                '#a.b.games.nintendods'       => false,
+                '#a.b.inner-sanctum'          => false,
+                '#a.b.moovee'                 => false,
+                '#a.b.movies.divx'            => false,
+                '#a.b.sony.psp'               => false,
+                '#a.b.sounds.mp3.complete_cd' => false,
+                '#a.b.teevee'                 => false,
+                '#a.b.games.wii'              => false,
+                '#a.b.warez'                  => false,
+                '#a.b.games.xbox360'          => false,
+                '#pre@corrupt'                => false,
+                '#scnzb'                      => false,
+                '#tvnzb'                      => false,
+                'srrdb'                       => false,
+            ];
         }
 
         $this->_categoryIgnoreRegex = false;
@@ -148,25 +151,25 @@ class IRCScraper extends IRCClient
     protected function _startScraping()
     {
 
-		// Connect to IRC.
+        // Connect to IRC.
         if ($this->connect(SCRAPE_IRC_SERVER, SCRAPE_IRC_PORT, SCRAPE_IRC_TLS) === false) {
             exit(
-				'Error connecting to ('.
-				SCRAPE_IRC_SERVER.
-				':'.
-				SCRAPE_IRC_PORT.
-				'). Please verify your server information and try again.'.
-				PHP_EOL
-			);
+                'Error connecting to ('.
+                SCRAPE_IRC_SERVER.
+                ':'.
+                SCRAPE_IRC_PORT.
+                '). Please verify your server information and try again.'.
+                PHP_EOL
+            );
         }
 
         // Login to IRC.
         if ($this->login(SCRAPE_IRC_NICKNAME, SCRAPE_IRC_REALNAME, SCRAPE_IRC_USERNAME, SCRAPE_IRC_PASSWORD) === false) {
             exit('Error logging in to: ('.
-				SCRAPE_IRC_SERVER.':'.SCRAPE_IRC_PORT.') nickname: ('.SCRAPE_IRC_NICKNAME.
-				'). Verify your connection information, you might also be banned from this server or there might have been a connection issue.'.
-				PHP_EOL
-			);
+                SCRAPE_IRC_SERVER.':'.SCRAPE_IRC_PORT.') nickname: ('.SCRAPE_IRC_NICKNAME.
+                '). Verify your connection information, you might also be banned from this server or there might have been a connection issue.'.
+                PHP_EOL
+            );
         }
 
         // Join channels.
@@ -175,16 +178,16 @@ class IRCScraper extends IRCClient
 
         if (! $this->_silent) {
             echo
-				'['.
-				date('r').
-				'] [Scraping of IRC channels for ('.
-				SCRAPE_IRC_SERVER.
-				':'.
-				SCRAPE_IRC_PORT.
-				') ('.
-				SCRAPE_IRC_NICKNAME.
-				') started.]'.
-				PHP_EOL;
+                '['.
+                date('r').
+                '] [Scraping of IRC channels for ('.
+                SCRAPE_IRC_SERVER.
+                ':'.
+                SCRAPE_IRC_PORT.
+                ') ('.
+                SCRAPE_IRC_NICKNAME.
+                ') started.]'.
+                PHP_EOL;
         }
 
         // Scan incoming IRC messages.
@@ -194,12 +197,14 @@ class IRCScraper extends IRCClient
     /**
      * Process bot messages, insert/update PREs.
      */
-    protected function processChannelMessages()
+    protected function processChannelMessages(): void
     {
         if (preg_match(
-			'/^(NEW|UPD|NUK): \[DT: (?P<time>.+?)\]\s?\[TT: (?P<title>.+?)\]\s?\[SC: (?P<source>.+?)\]\s?\[CT: (?P<category>.+?)\]\s?\[RQ: (?P<req>.+?)\]'.
-			'\s?\[SZ: (?P<size>.+?)\]\s?\[FL: (?P<files>.+?)\]\s?(\[FN: (?P<filename>.+?)\]\s?)?(\[(?P<nuked>(UN|MOD|RE|OLD)?NUKED?): (?P<reason>.+?)\])?$/i',
-			$this->_channelData['message'], $matches)) {
+            '/^(NEW|UPD|NUK): \[DT: (?P<time>.+?)\]\s?\[TT: (?P<title>.+?)\]\s?\[SC: (?P<source>.+?)\]\s?\[CT: (?P<category>.+?)\]\s?\[RQ: (?P<req>.+?)\]'.
+            '\s?\[SZ: (?P<size>.+?)\]\s?\[FL: (?P<files>.+?)\]\s?(\[FN: (?P<filename>.+?)\]\s?)?(\[(?P<nuked>(UN|MOD|RE|OLD)?NUKED?): (?P<reason>.+?)\])?$/i',
+            $this->_channelData['message'],
+            $matches
+        )) {
             if (isset($this->_ignoredChannels[$matches['source']]) && $this->_ignoredChannels[$matches['source']] === true) {
                 return;
             }
@@ -235,22 +240,22 @@ class IRCScraper extends IRCClient
 
             if (isset($matches['nuked'])) {
                 switch ($matches['nuked']) {
-					case 'NUKED':
-						$this->_curPre['nuked'] = PreDb::PRE_NUKED;
-						break;
-					case 'UNNUKED':
-						$this->_curPre['nuked'] = PreDb::PRE_UNNUKED;
-						break;
-					case 'MODNUKED':
-						$this->_curPre['nuked'] = PreDb::PRE_MODNUKE;
-						break;
-					case 'RENUKED':
-						$this->_curPre['nuked'] = PreDb::PRE_RENUKED;
-						break;
-					case 'OLDNUKE':
-						$this->_curPre['nuked'] = PreDb::PRE_OLDNUKE;
-						break;
-				}
+                    case 'NUKED':
+                        $this->_curPre['nuked'] = PreDb::PRE_NUKED;
+                        break;
+                    case 'UNNUKED':
+                        $this->_curPre['nuked'] = PreDb::PRE_UNNUKED;
+                        break;
+                    case 'MODNUKED':
+                        $this->_curPre['nuked'] = PreDb::PRE_MODNUKE;
+                        break;
+                    case 'RENUKED':
+                        $this->_curPre['nuked'] = PreDb::PRE_RENUKED;
+                        break;
+                    case 'OLDNUKE':
+                        $this->_curPre['nuked'] = PreDb::PRE_OLDNUKE;
+                        break;
+                }
                 $this->_curPre['reason'] = (isset($matches['reason']) ? substr($matches['reason'], 0, 255) : '');
             }
             $this->_checkForDupe();
@@ -273,6 +278,8 @@ class IRCScraper extends IRCClient
 
     /**
      * Insert new PRE into the DB.
+     *
+     * @throws \RuntimeException
      */
     protected function _insertNewPre()
     {
@@ -310,17 +317,19 @@ class IRCScraper extends IRCClient
         $this->_pdo->ping(true);
 
         $this->_pdo->queryExec(
-			sprintf(
-				$query,
-				$this->_pdo->escapeString($this->_curPre['title'])
-			)
-		);
+            sprintf(
+                $query,
+                $this->_pdo->escapeString($this->_curPre['title'])
+            )
+        );
 
         $this->_doEcho(true);
     }
 
     /**
      * Updates PRE data in the DB.
+     *
+     * @throws \RuntimeException
      */
     protected function _updatePre()
     {
@@ -340,10 +349,10 @@ class IRCScraper extends IRCClient
         $query .= (! empty($this->_curPre['nuked']) ? 'nuked = '.$this->_curPre['nuked'].', ' : '');
         $query .= (! empty($this->_curPre['filename']) ? 'filename = '.$this->_pdo->escapeString($this->_curPre['filename']).', ' : '');
         $query .= (
-		(empty($this->_oldPre['category']) && ! empty($this->_curPre['category']))
-			? 'category = '.$this->_pdo->escapeString($this->_curPre['category']).', '
-			: ''
-		);
+        (empty($this->_oldPre['category']) && ! empty($this->_curPre['category']))
+            ? 'category = '.$this->_pdo->escapeString($this->_curPre['category']).', '
+            : ''
+        );
 
         if ($query === 'UPDATE predb SET ') {
             return;
@@ -370,46 +379,48 @@ class IRCScraper extends IRCClient
             $nukeString = '';
             if ($this->_nuked !== false) {
                 switch ((int) $this->_curPre['nuked']) {
-					case PreDb::PRE_NUKED:
-						$nukeString = '[ NUKED ] ';
-						break;
-					case PreDb::PRE_UNNUKED:
-						$nukeString = '[UNNUKED] ';
-						break;
-					case PreDb::PRE_MODNUKE:
-						$nukeString = '[MODNUKE] ';
-						break;
-					case PreDb::PRE_OLDNUKE:
-						$nukeString = '[OLDNUKE] ';
-						break;
-					case PreDb::PRE_RENUKED:
-						$nukeString = '[RENUKED] ';
-						break;
-					default:
-						break;
-				}
+                    case PreDb::PRE_NUKED:
+                        $nukeString = '[ NUKED ] ';
+                        break;
+                    case PreDb::PRE_UNNUKED:
+                        $nukeString = '[UNNUKED] ';
+                        break;
+                    case PreDb::PRE_MODNUKE:
+                        $nukeString = '[MODNUKE] ';
+                        break;
+                    case PreDb::PRE_OLDNUKE:
+                        $nukeString = '[OLDNUKE] ';
+                        break;
+                    case PreDb::PRE_RENUKED:
+                        $nukeString = '[RENUKED] ';
+                        break;
+                    default:
+                        break;
+                }
                 $nukeString .= '['.$this->_curPre['reason'].'] ';
             }
 
             echo
-				'['.
-				date('r').
-				($new ? '] [ Added Pre ] [' : '] [Updated Pre] [').
-				$this->_curPre['source'].
-				'] '.
-				$nukeString.
-				'['.
-				$this->_curPre['title'].
-				']'.
-				(! empty($this->_curPre['category'])
-					? ' ['.$this->_curPre['category'].']'
-					: (! empty($this->_oldPre['category'])
-						? ' ['.$this->_oldPre['category'].']'
-						: ''
-					)
-				).
-				(! empty($this->_curPre['size']) ? ' ['.$this->_curPre['size'].']' : '').
-				PHP_EOL;
+                '['.
+                date('r').
+                ($new ? '] [ Added Pre ] [' : '] [Updated Pre] [').
+                $this->_curPre['source'].
+                '] '.
+                $nukeString.
+                '['.
+                $this->_curPre['title'].
+                ']'.
+                (
+                    ! empty($this->_curPre['category'])
+                    ? ' ['.$this->_curPre['category'].']'
+                    : (
+                        ! empty($this->_oldPre['category'])
+                        ? ' ['.$this->_oldPre['category'].']'
+                        : ''
+                    )
+                ).
+                (! empty($this->_curPre['size']) ? ' ['.$this->_curPre['size'].']' : '').
+                PHP_EOL;
         }
     }
 
@@ -438,18 +449,18 @@ class IRCScraper extends IRCClient
         $this->_nuked = false;
         $this->_oldPre = [];
         $this->_curPre =
-			[
-				'title'    => '',
-				'size'     => '',
-				'predate'  => '',
-				'category' => '',
-				'source'   => '',
-				'group_id'  => '',
-				'reqid'    => '',
-				'nuked'    => '',
-				'reason'   => '',
-				'files'    => '',
-				'filename' => '',
-			];
+            [
+                'title'    => '',
+                'size'     => '',
+                'predate'  => '',
+                'category' => '',
+                'source'   => '',
+                'group_id'  => '',
+                'reqid'    => '',
+                'nuked'    => '',
+                'reason'   => '',
+                'files'    => '',
+                'filename' => '',
+            ];
     }
 }
