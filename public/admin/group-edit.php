@@ -11,6 +11,19 @@ $id = 0;
 // Set the current action.
 $action = $_REQUEST['action'] ?? 'view';
 
+$group = [
+    'id'                    => '',
+    'name'                  => '',
+    'description'           => '',
+    'minfilestoformrelease' => 0,
+    'active'                => 0,
+    'backfill'              => 0,
+    'minsizetoformrelease'  => 0,
+    'first_record'          => 0,
+    'last_record'           => 0,
+    'backfill_target'       => 0,
+];
+
 switch ($action) {
     case 'submit':
         if ($_POST['id'] === '') {
@@ -34,25 +47,14 @@ switch ($action) {
             $group = $groups->getByID($id);
         } else {
             $page->title = 'Newsgroup Add';
-            $group = [
-                'id'                    => '',
-                'name'                  => '',
-                'description'           => '',
-                'minfilestoformrelease' => 0,
-                'active'                => 0,
-                'backfill'              => 0,
-                'minsizetoformrelease'  => 0,
-                'first_record'          => 0,
-                'last_record'           => 0,
-                'backfill_target'       => 0,
-            ];
         }
-        $page->smarty->assign('group', $group);
         break;
 }
 
 $page->smarty->assign('yesno_ids', [1, 0]);
 $page->smarty->assign('yesno_names', ['Yes', 'No']);
+
+$page->smarty->assign('group', $group);
 
 $page->content = $page->smarty->fetch('group-edit.tpl');
 $page->render();
