@@ -37,14 +37,15 @@ class API extends Capabilities
 
     /**
      * @param array $options
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         parent::__construct($options);
         $defaults = [
-			'Settings' => null,
-			'Request'  => null,
-		];
+            'Settings' => null,
+            'Request'  => null,
+        ];
         $options += $defaults;
 
         $this->getRequest = $options['Request'];
@@ -59,11 +60,12 @@ class API extends Capabilities
         if ($releases && count($releases)) {
             foreach ($releases as $key => $release) {
                 if (isset($release['id'])) {
-                    $language = $this->pdo->queryOneRow("
+                    $language = $this->pdo->queryOneRow(
+                        "
 						SELECT audiolanguage
 						FROM audio_data
 						WHERE releases_id = {$release['id']}"
-					);
+                    );
                     if ($language !== false) {
                         $releases[$key]['searchname'] = $releases[$key]['searchname'].' '.$language['audiolanguage'];
                     }
@@ -104,7 +106,7 @@ class API extends Capabilities
             $categoryIDs = urldecode($this->getRequest['cat']);
             // Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
             if (strpos($categoryIDs, Category::TV_HD) !== false &&
-				strpos($categoryIDs, Category::TV_WEBDL) === false) {
+                strpos($categoryIDs, Category::TV_WEBDL) === false) {
                 $categoryIDs .= (','.Category::TV_WEBDL);
             }
             $categoryID = explode(',', $categoryIDs);
