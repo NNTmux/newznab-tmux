@@ -400,6 +400,7 @@ class Console
     /**
      * @param $gameInfo
      * @return int|mixed
+     * @throws \Exception
      */
     public function updateConsoleInfo($gameInfo)
     {
