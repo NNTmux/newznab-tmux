@@ -518,7 +518,7 @@ class Forking extends \fork_daemon
 
         if ($threads > 16) {
             $threads = 16;
-        } elseif ($threads == 0) {
+        } elseif ($threads === 0) {
             $threads = 1;
         }
 

@@ -1,4 +1,5 @@
 2017-09-08 DariusIII
+	* Chg: Try to fix some renaming issues (cycling of same releases)
 	* Chg: Update laravel/framework and fxp/composer-asset-plugin to latest versions
 2017-09-07 DariusIII
 	* Chg: User model now extends Illuminate\Foundation\Auth\User
