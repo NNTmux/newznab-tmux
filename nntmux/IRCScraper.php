@@ -297,7 +297,7 @@ class IRCScraper extends IRCClient
         $query .= (! empty($this->_curPre['reqid']) ? 'requestid, ' : '');
         $query .= (! empty($this->_curPre['group_id']) ? 'groups_id, ' : '');
         $query .= (! empty($this->_curPre['nuked']) ? 'nuked, ' : '');
-        $query .= (! empty($this->_curPre['filename']) ? 'filename, ' : '');
+        $query .= (! empty($this->_curPre['filename']) && ! preg_match('/^sample$/i', $this->_curPre['filename']) ? 'filename, ' : '');
 
         $query .= 'predate, title) VALUES (';
 
@@ -309,7 +309,7 @@ class IRCScraper extends IRCClient
         $query .= (! empty($this->_curPre['reqid']) ? $this->_curPre['reqid'].', ' : '');
         $query .= (! empty($this->_curPre['group_id']) ? $this->_curPre['group_id'].', ' : '');
         $query .= (! empty($this->_curPre['nuked']) ? $this->_curPre['nuked'].', ' : '');
-        $query .= (! empty($this->_curPre['filename']) ? $this->_pdo->escapeString($this->_curPre['filename']).', ' : '');
+        $query .= (! empty($this->_curPre['filename']) && ! preg_match('/^sample$/i', $this->_curPre['filename']) ? $this->_pdo->escapeString($this->_curPre['filename']).', ' : '');
         $query .= (! empty($this->_curPre['predate']) ? $this->_curPre['predate'].', ' : 'NOW(), ');
 
         $query .= '%s)';
@@ -347,7 +347,7 @@ class IRCScraper extends IRCClient
         $query .= (! empty($this->_curPre['group_id']) ? 'groups_id = '.$this->_curPre['group_id'].', ' : '');
         $query .= (! empty($this->_curPre['predate']) ? 'predate = '.$this->_curPre['predate'].', ' : '');
         $query .= (! empty($this->_curPre['nuked']) ? 'nuked = '.$this->_curPre['nuked'].', ' : '');
-        $query .= (! empty($this->_curPre['filename']) ? 'filename = '.$this->_pdo->escapeString($this->_curPre['filename']).', ' : '');
+        $query .= (! empty($this->_curPre['filename']) && ! preg_match('/^sample$/i', $this->_curPre['filename']) ? 'filename = '.$this->_pdo->escapeString($this->_curPre['filename']).', ' : '');
         $query .= (
         (empty($this->_oldPre['category']) && ! empty($this->_curPre['category']))
             ? 'category = '.$this->_pdo->escapeString($this->_curPre['category']).', '
