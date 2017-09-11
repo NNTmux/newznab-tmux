@@ -139,7 +139,7 @@
                 }
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
-            "time": "2017-08-27 15:14:06"
+            "time": "2017-08-27T15:14:06+00:00"
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -1468,7 +1468,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-05-29 12:05:57"
+            "time": "2017-05-29T12:05:57+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -2290,7 +2290,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2016-05-04 01:31:56"
+            "time": "2016-05-04T01:31:56+00:00"
         },
         {
             "name": "kbjr/Git.php",
@@ -2316,7 +2316,7 @@
                 "source": "https://github.com/kbjr/Git.php/tree/master",
                 "issues": "https://github.com/kbjr/Git.php/issues"
             },
-            "time": "2015-03-31 14:10:29"
+            "time": "2015-03-31T14:10:29+00:00"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
@@ -2950,16 +2950,16 @@
         },
         {
             "name": "php-tmdb/api",
-            "version": "v2.1.9",
+            "version": "v2.1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-tmdb/api.git",
-                "reference": "1c2e87653f6df62ea9075b7118c2a80dcb355f66"
+                "reference": "dc1089bc93505908cf79d8b1119ce6b71c70d7cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-tmdb/api/zipball/1c2e87653f6df62ea9075b7118c2a80dcb355f66",
-                "reference": "1c2e87653f6df62ea9075b7118c2a80dcb355f66",
+                "url": "https://api.github.com/repos/php-tmdb/api/zipball/dc1089bc93505908cf79d8b1119ce6b71c70d7cf",
+                "reference": "dc1089bc93505908cf79d8b1119ce6b71c70d7cf",
                 "shasum": ""
             },
             "require": {
@@ -3014,7 +3014,7 @@
                 "tvdb",
                 "wrapper"
             ],
-            "time": "2017-06-02T03:27:09+00:00"
+            "time": "2017-09-09T13:44:00+00:00"
         },
         {
             "name": "phpmailer/phpmailer",

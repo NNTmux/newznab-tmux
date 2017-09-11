@@ -1,3 +1,5 @@
+2017-09-11 DariusIII
+	* Chg: Update php-tmdb/api to version 2.1.10
 2017-09-08 DariusIII
 	* Chg: Update predb_hashes table and triggers
 	* Fix: Fix notice when adding/editing groups
