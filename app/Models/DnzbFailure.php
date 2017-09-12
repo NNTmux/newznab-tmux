@@ -32,7 +32,7 @@ class DnzbFailure extends Model
     protected $fillable = ['release_id', 'userid', 'failed'];
 
     /**
-     * Solution taken from https://stackoverflow.com/a/40371760
+     * Solution taken from https://stackoverflow.com/a/40371760.
      *
      * @param array $attributes
      * @return static
