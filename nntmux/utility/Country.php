@@ -21,7 +21,7 @@
 
 namespace nntmux\utility;
 
-use nntmux\db\DB;
+use App\Models\Country as CountryModel;
 
 /**
  * Class Country.
@@ -33,22 +33,13 @@ class Country
      *
      * @param string $country
      *
-     * @param DB $pdo
      *
      * @return mixed
      */
-    public static function countryCode($country, $pdo)
+    public static function countryCode($country)
     {
-        $pdo = ($pdo instanceof DB ? $pdo : new DB());
         if (! is_array($country) && strlen($country) > 2) {
-            $code = $pdo->queryOneRow(
-				sprintf('
-					SELECT id
-					FROM countries
-					WHERE country = %s',
-					$pdo->escapeString($country)
-				)
-			);
+            $code = CountryModel::query()->where('country', $country)->first(['id']);
             if (isset($code['id'])) {
                 return $code['id'];
             }

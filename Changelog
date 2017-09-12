@@ -1,3 +1,5 @@
+2017-09-12 DariusIIi
+	* Chg: Update Country model and related migration
 2017-09-11 DariusIII
 	* Chg: Improve folder matching regex
 	* Chg: Update mysql-ddl.sql
