@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
-use App\Models\Forumpost;
-use Carbon\Carbon;
 use nntmux\db\DB;
+use Carbon\Carbon;
+use App\Models\Forumpost;
 
 class Forum
 {
