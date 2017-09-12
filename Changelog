@@ -1,4 +1,5 @@
 2017-09-12 DariusIIi
+	* Chg: Declare table name in ForumPost model
 	* Chg: Update ForumPost model, migration and usage
 	* Chg: Update Country model and related migration
 2017-09-11 DariusIII
