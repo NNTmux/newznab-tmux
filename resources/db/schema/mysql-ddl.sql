@@ -326,9 +326,9 @@ CREATE TABLE countries (
 DROP TABLE IF EXISTS dnzb_failures;
 CREATE TABLE dnzb_failures (
   release_id   INT(11) UNSIGNED  NOT NULL,
-  userid      INT(11) UNSIGNED  NOT NULL,
+  users_id      INT(11) UNSIGNED  NOT NULL,
   failed      INT UNSIGNED      NOT NULL DEFAULT '0',
-  PRIMARY KEY (release_id, userid)
+  PRIMARY KEY (release_id, users_id)
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8

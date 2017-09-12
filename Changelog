@@ -1,4 +1,5 @@
 2017-09-12 DariusIII
+	* Chg: Update failed downloads handling
 	* Fix: Add custom function for insert ignore into DNZBFailure model that fixes getAlternate function
 	* Chg: Declare table name in ForumPost model
 	* Chg: Update ForumPost model, migration and usage

@@ -140,7 +140,8 @@
     "ramsey/uuid": "^3.7",
     "roave/security-advisories": "dev-master",
     "smarty/smarty": "~3.1",
-    "vlucas/phpdotenv": "^2.4"
+    "vlucas/phpdotenv": "^2.4",
+    "yadakhov/insert-on-duplicate-key": "^1.2"
   },
 
   "require-dev": {

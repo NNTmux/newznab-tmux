@@ -113,7 +113,7 @@ class DnzbFailures
         if ($rel === false) {
             return false;
         }
-        DnzbFailure::insertIgnore(['release_id' => $rel['id'], 'userid' => $userid, 'failed' => 1]);
+        DnzbFailure::insertIgnore(['release_id' => $rel['id'], 'users_id' => $userid, 'failed' => 1]);
 
         $alternate = $this->pdo->queryOneRow(
             sprintf(

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f7395c328784da288ed8a131706cdb58",
+    "content-hash": "b3321758e8748dd1649c36dce4bf2821",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -139,7 +139,7 @@
                 }
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
-            "time": "2017-08-27T15:14:06+00:00"
+            "time": "2017-08-27 15:14:06"
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -1468,7 +1468,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-05-29T12:05:57+00:00"
+            "time": "2017-05-29 12:05:57"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -2290,7 +2290,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2016-05-04T01:31:56+00:00"
+            "time": "2016-05-04 01:31:56"
         },
         {
             "name": "kbjr/Git.php",
@@ -2316,7 +2316,7 @@
                 "source": "https://github.com/kbjr/Git.php/tree/master",
                 "issues": "https://github.com/kbjr/Git.php/issues"
             },
-            "time": "2015-03-31T14:10:29+00:00"
+            "time": "2015-03-31 14:10:29"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
@@ -4765,6 +4765,51 @@
                 "environment"
             ],
             "time": "2016-09-01T10:05:43+00:00"
+        },
+        {
+            "name": "yadakhov/insert-on-duplicate-key",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yadakhov/insert-on-duplicate-key.git",
+                "reference": "13962f769aed9887138bc7e78fd4aac97a7ebf9c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yadakhov/insert-on-duplicate-key/zipball/13962f769aed9887138bc7e78fd4aac97a7ebf9c",
+                "reference": "13962f769aed9887138bc7e78fd4aac97a7ebf9c",
+                "shasum": ""
+            },
+            "require-dev": {
+                "illuminate/database": "^5.1",
+                "phpunit/dbunit": "^2.0",
+                "phpunit/phpunit": "~5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Yadakhov\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Yada Khov",
+                    "email": "yada.khov@gmail.com",
+                    "homepage": "https://github.com/yadakhov"
+                }
+            ],
+            "description": "A trait for MySQL INSERT ON DUPLICATE KEY UPDATE.",
+            "homepage": "https://github.com/yadakhov/insert-on-duplicate-key",
+            "keywords": [
+                "database",
+                "eloquent",
+                "mysql"
+            ],
+            "time": "2017-04-27T16:19:41+00:00"
         }
     ],
     "packages-dev": [
