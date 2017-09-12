@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use App\Models\Forumpost;
+use Carbon\Carbon;
 use nntmux\db\DB;
 
 class Forum
@@ -13,6 +15,7 @@ class Forum
 
     /**
      * @param array $options Class instances.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
@@ -49,22 +52,22 @@ class Forum
                 return -1;
             }
 
-            $this->pdo->queryExec(sprintf('UPDATE forumpost SET replies = replies + 1, updateddate = NOW() WHERE id = %d', $parentid));
+            Forumpost::query()->where('id', $parentid)->increment('replies', 1, ['updateddate' => Carbon::now()]);
         }
 
-        return $this->pdo->queryInsert(
-            sprintf(
-                '
-				INSERT INTO forumpost (forumid, parentid, users_id, subject, message, locked, sticky, replies, createddate, updateddate)
-				VALUES (1, %d, %d, %s, %s, %d, %d, %d, NOW(), NOW())',
-                $parentid,
-                $userid,
-                $this->pdo->escapeString($subject),
-                $this->pdo->escapeString($message),
-                $locked,
-                $sticky,
-                $replies
-            )
+        return Forumpost::query()->insertGetId(
+            [
+             'forumid' => 1,
+             'parentid' => $parentid,
+             'users_id' => $userid,
+             'subject' => $subject,
+             'message' => $message,
+             'locked' => $locked,
+             'sticky' => $sticky,
+             'replies' => $replies,
+             'createddate' => Carbon::now(),
+             'updateddate' => Carbon::now(),
+            ]
         );
     }
 
@@ -119,7 +122,7 @@ class Forum
      */
     public function getPost($id)
     {
-        return $this->pdo->queryOneRow(sprintf('SELECT * FROM forumpost WHERE id = %d', $id));
+        return Forumpost::query()->where('id', $id)->first();
     }
 
     /**
@@ -129,9 +132,9 @@ class Forum
      */
     public function getBrowseCount(): int
     {
-        $res = $this->pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM forumpost WHERE parentid = 0'));
+        $res = Forumpost::query()->count('id');
 
-        return $res === false ? 0 : $res['num'];
+        return $res === false ? 0 : $res;
     }
 
     /**
@@ -165,7 +168,7 @@ class Forum
      */
     public function deleteParent($parent): void
     {
-        $this->pdo->queryExec(sprintf('DELETE FROM forumpost WHERE id = %d OR parentid = %d', $parent, $parent));
+        Forumpost::query()->where('id', $parent)->orWhere('parentid', $parent)->delete();
     }
 
     /**
@@ -180,7 +183,7 @@ class Forum
             if ((int) $post['parentid'] === 0) {
                 $this->deleteParent($id);
             } else {
-                $this->pdo->queryExec(sprintf('DELETE FROM forumpost WHERE id = %d', $id));
+                Forumpost::query()->where('id', $id)->delete();
             }
         }
     }
@@ -192,7 +195,7 @@ class Forum
      */
     public function deleteUser($id): void
     {
-        $this->pdo->queryExec(sprintf('DELETE FROM forumpost WHERE users_id = %d', $id));
+        Forumpost::query()->where('users_id', $id)->delete();
     }
 
     /**
@@ -204,9 +207,9 @@ class Forum
      */
     public function getCountForUser($uid): int
     {
-        $res = $this->pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM forumpost WHERE users_id = %d', $uid));
+        $res = Forumpost::query()->where('users_id', $uid)->count('id');
 
-        return $res === false ? 0 : $res['num'];
+        return $res === false ? 0 : $res;
     }
 
     /**
@@ -245,18 +248,7 @@ class Forum
     {
         $post = $this->getPost($id);
         if ($post) {
-            $this->pdo->queryExec(
-                sprintf(
-                '
-							UPDATE forumpost
-							SET message = %s
-							WHERE id = %d
-							AND users_id = %d',
-                $this->pdo->escapeString($message),
-                $post['id'],
-                $uid
-            )
-            );
+            Forumpost::query()->where(['id' => $id, 'users_id' => $uid])->update(['message' => $message]);
         }
     }
 
@@ -268,17 +260,6 @@ class Forum
      */
     public function lockUnlockTopic($id, $lock): void
     {
-        $this->pdo->queryExec(
-            sprintf(
-            '
-						UPDATE forumpost
-						SET locked = %d
-						WHERE id = %d
-						OR parentid = %d',
-                $lock,
-                $id,
-                $id
-            )
-        );
+        Forumpost::query()->where('id', $id)->orWhere('parentid', $id)->update(['locked' => $lock]);
     }
 }

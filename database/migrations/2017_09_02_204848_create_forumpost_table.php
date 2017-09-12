@@ -15,7 +15,21 @@ class CreateForumpostTable extends Migration
     {
         Schema::create('forumpost', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamps();
+            $table->integer('forumid')->default(1);
+            $table->integer('parentid')->default(0);
+            $table->unsignedInteger('users_id');
+            $table->string('subject', 255);
+            $table->text('message');
+            $table->unsignedTinyInteger('locked')->default(0);
+            $table->unsignedTinyInteger('sticky')->default(0);
+            $table->integer('replies')->default(0);
+            $table->dateTime('createddate');
+            $table->dateTime('updateddate');
+            $table->primary('id');
+            $table->index('parentid');
+            $table->index('users_id');
+            $table->index('createddate');
+            $table->index('updateddate');
         });
     }
 
