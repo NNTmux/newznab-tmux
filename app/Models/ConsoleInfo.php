@@ -6,15 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class ConsoleInfo extends Model
 {
+    const CREATED_AT = 'createddate';
+    const UPDATED_AT = 'updateddate';
+
     /**
      * @var string
      */
     protected $table = 'consoleinfo';
-
-    /**
-     * @var bool
-     */
-    public $timestamps = false;
 
     /**
      * @var bool

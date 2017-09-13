@@ -8,6 +8,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     use Notifiable;
+
+    const CREATED_AT = 'createddate';
+    const UPDATED_AT = 'updateddate';
+
     /**
      * @var string
      */
@@ -19,11 +23,6 @@ class User extends Authenticatable
     protected $dateFormat = false;
 
     /**
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
      * @var array
      */
     protected $fillable = [
@@ -32,6 +31,7 @@ class User extends Authenticatable
         'email',
         'role',
         'createddate',
+        'updateddate',
         'host',
         'rsstoken',
         'invites',

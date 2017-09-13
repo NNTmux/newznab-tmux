@@ -6,15 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class BookInfo extends Model
 {
+    const CREATED_AT = 'createddate';
+    const UPDATED_AT = 'updateddate';
+
     /**
      * @var string
      */
     protected $table = 'bookinfo';
-
-    /**
-     * @var bool
-     */
-    public $timestamps = false;
 
     /**
      * @var bool
@@ -25,20 +23,20 @@ class BookInfo extends Model
      * @var array
      */
     protected $fillable = [
-		'title',
-		'author',
-		'asin',
-		'isbn',
-		'ean',
-		'url',
-		'salesrank',
-		'publisher',
-		'publishdate',
-		'pages',
-		'overview',
-		'genre',
-		'cover',
-		'createddate',
-		'updateddate',
-	];
+        'title',
+        'author',
+        'asin',
+        'isbn',
+        'ean',
+        'url',
+        'salesrank',
+        'publisher',
+        'publishdate',
+        'pages',
+        'overview',
+        'genre',
+        'cover',
+        'createddate',
+        'updateddate',
+    ];
 }

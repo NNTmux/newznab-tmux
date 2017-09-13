@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Forumpost extends Model
 {
+    const CREATED_AT = 'createddate';
+    const UPDATED_AT = 'updateddate';
+
     /**
      * @var string
      */
@@ -15,11 +18,6 @@ class Forumpost extends Model
      * @var bool
      */
     protected $dateFormat = false;
-
-    /**
-     * @var bool
-     */
-    public $timestamps = false;
 
     /**
      * @var array
