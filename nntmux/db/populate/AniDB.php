@@ -2,6 +2,7 @@
 
 namespace nntmux\db\populate;
 
+use Carbon\Carbon;
 use nntmux\db\DB;
 use nntmux\ColorCLI;
 use App\Models\Settings;
@@ -369,8 +370,8 @@ class AniDB
      */
     private function populateMainTable()
     {
-        $lastUpdate = (new \DateTime)->setTimestamp($this->lastUpdate);
-        $current = new \DateTime();
+        $lastUpdate = Carbon::createFromTimestamp($this->lastUpdate);
+        $current = Carbon::now();
 
         if ($current->diff($lastUpdate)->format('%d') > $this->updateInterval) {
             if ($this->echooutput) {

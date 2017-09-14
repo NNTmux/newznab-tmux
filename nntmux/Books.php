@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use Carbon\Carbon;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use GuzzleHttp\Client;
@@ -81,9 +82,9 @@ class Books
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Echo'     => false,
-			'Settings' => null,
-		];
+            'Echo'     => false,
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
@@ -178,7 +179,8 @@ class Books
         $order = $this->getBookOrder($orderby);
 
         $books = $this->pdo->queryCalc(
-				sprintf("
+                sprintf(
+                    "
 				SELECT SQL_CALC_FOUND_ROWS boo.id,
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
 				FROM bookinfo boo
@@ -190,16 +192,18 @@ class Books
 				%s %s %s %s
 				GROUP BY boo.id
 				ORDER BY %s %s %s",
-						Releases::showPasswords(),
-						$browseby,
-						$catsrch,
-						$maxage,
-						$exccatlist,
-						$order[0],
-						$order[1],
-						($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-				), true, NN_CACHE_EXPIRY_MEDIUM
-		);
+                        Releases::showPasswords(),
+                        $browseby,
+                        $catsrch,
+                        $maxage,
+                        $exccatlist,
+                        $order[0],
+                        $order[1],
+                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+                ),
+            true,
+            NN_CACHE_EXPIRY_MEDIUM
+        );
 
         $bookIDs = $releaseIDs = false;
 
@@ -210,7 +214,8 @@ class Books
             }
         }
 
-        $sql = sprintf("
+        $sql = sprintf(
+            "
 			SELECT
 				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 				GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
@@ -240,12 +245,12 @@ class Books
 			%s
 			GROUP BY boo.id
 			ORDER BY %s %s",
-				(is_array($bookIDs) ? implode(',', $bookIDs) : -1),
-				(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-				$catsrch,
-				$order[0],
-				$order[1]
-		);
+                (is_array($bookIDs) ? implode(',', $bookIDs) : -1),
+                (is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+                $catsrch,
+                $order[0],
+                $order[1]
+        );
         $return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
         if (! empty($return)) {
             $return[0]['_totalcount'] = $books['total'] ?? 0;
@@ -264,29 +269,29 @@ class Books
         $order = ($orderby === '') ? 'r.postdate' : $orderby;
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
-			case 'title':
-				$orderfield = 'boo.title';
-				break;
-			case 'author':
-				$orderfield = 'boo.author';
-				break;
-			case 'publishdate':
-				$orderfield = 'boo.publishdate';
-				break;
-			case 'size':
-				$orderfield = 'r.size';
-				break;
-			case 'files':
-				$orderfield = 'r.totalpart';
-				break;
-			case 'stats':
-				$orderfield = 'r.grabs';
-				break;
-			case 'posted':
-			default:
-				$orderfield = 'r.postdate';
-				break;
-		}
+            case 'title':
+                $orderfield = 'boo.title';
+                break;
+            case 'author':
+                $orderfield = 'boo.author';
+                break;
+            case 'publishdate':
+                $orderfield = 'boo.publishdate';
+                break;
+            case 'size':
+                $orderfield = 'r.size';
+                break;
+            case 'files':
+                $orderfield = 'r.totalpart';
+                break;
+            case 'stats':
+                $orderfield = 'r.grabs';
+                break;
+            case 'posted':
+            default:
+                $orderfield = 'r.postdate';
+                break;
+        }
         $ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderfield, $ordersort];
@@ -298,21 +303,21 @@ class Books
     public function getBookOrdering(): array
     {
         return [
-			'title_asc',
-			'title_desc',
-			'posted_asc',
-			'posted_desc',
-			'size_asc',
-			'size_desc',
-			'files_asc',
-			'files_desc',
-			'stats_asc',
-			'stats_desc',
-			'releasedate_asc',
-			'releasedate_desc',
-			'author_asc',
-			'author_desc',
-		];
+            'title_asc',
+            'title_desc',
+            'posted_asc',
+            'posted_desc',
+            'size_asc',
+            'size_desc',
+            'files_asc',
+            'files_desc',
+            'stats_asc',
+            'stats_desc',
+            'releasedate_asc',
+            'releasedate_desc',
+            'author_asc',
+            'author_desc',
+        ];
     }
 
     /**
@@ -354,12 +359,12 @@ class Books
 
         try {
             $conf
-				->setCountry('com')
-				->setAccessKey($this->pubkey)
-				->setSecretKey($this->privkey)
-				->setAssociateTag($this->asstag)
-				->setRequest($request)
-				->setResponseTransformer(new XmlToSimpleXmlObject());
+                ->setCountry('com')
+                ->setAccessKey($this->pubkey)
+                ->setSecretKey($this->privkey)
+                ->setAssociateTag($this->asstag)
+                ->setRequest($request)
+                ->setResponseTransformer(new XmlToSimpleXmlObject());
         } catch (\Exception $e) {
             echo $e->getMessage();
         }
@@ -399,8 +404,8 @@ class Books
         if ($total > 0) {
             for ($i = 0; $i < $total; $i++) {
                 $this->processBookReleasesHelper(
-					$this->pdo->queryDirect(
-						sprintf('
+                    $this->pdo->queryDirect(
+                        sprintf('
 						SELECT searchname, id, categories_id
 						FROM releases
 						WHERE nzbstatus = 1 %s
@@ -408,8 +413,9 @@ class Books
 						AND categories_id in (%s)
 						ORDER BY postdate
 						DESC LIMIT %d', $this->renamed, $bookids[$i], $this->bookqty)
-					), $bookids[$i]
-				);
+                    ),
+                    $bookids[$i]
+                );
             }
         }
     }
@@ -510,8 +516,8 @@ class Books
             if (preg_match('/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O(c|k)tober|November|De(c|z)ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i', $releasename)) {
                 if ($this->echooutput) {
                     ColorCLI::doEcho(
-						ColorCLI::headerOver('Changing category to misc books: ').ColorCLI::primary($releasename)
-					);
+                        ColorCLI::headerOver('Changing category to misc books: ').ColorCLI::primary($releasename)
+                    );
                 }
                 $this->pdo->queryExec(sprintf('UPDATE releases SET categories_id = %s WHERE id = %d', Category::BOOKS_UNKNOWN, $releaseID));
 
@@ -521,8 +527,8 @@ class Books
             if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun( |e|$)|Jul( |y|$)|Aug( |ust|$)|Sep( |tember|$)|O(c|k)t( |ober|$)|Nov( |ember|$)|De(c|z)( |ember|$))/ui', $releasename) && ! preg_match('/Part \d+/i', $releasename)) {
                 if ($this->echooutput) {
                     ColorCLI::doEcho(
-						ColorCLI::headerOver('Changing category to magazines: ').ColorCLI::primary($releasename)
-					);
+                        ColorCLI::headerOver('Changing category to magazines: ').ColorCLI::primary($releasename)
+                    );
                 }
                 $this->pdo->queryExec(sprintf('UPDATE releases SET categories_id = %s WHERE id = %d', Category::BOOKS_MAGAZINES, $releaseID));
 
@@ -634,44 +640,44 @@ class Books
         $check = BookInfo::query()->where('asin', $book['asin'])->first();
         if ($check === false) {
             $bookId = BookInfo::query()->insertGetId(
-				[
-					'title' => $book['title'],
-					'author' => $book['author'],
-					'asin' => $book['asin'],
-					'isbn' => $book['isbn'],
-					'ean' => $book['ean'],
-					'url' => $book['url'],
-					'salesrank' => $book['salesrank'],
-					'publisher' => $book['publisher'],
-					'publishdate' => $book['publishdate'],
-					'pages' => $book['pages'],
-					'overview' =>$book['overview'],
-					'genre' => $book['genre'],
-					'cover' => $book['cover'],
-					'createddate' => new \DateTime('NOW'),
-					'updateddate' => new \DateTime('NOW'),
-				]
-			);
+                [
+                    'title' => $book['title'],
+                    'author' => $book['author'],
+                    'asin' => $book['asin'],
+                    'isbn' => $book['isbn'],
+                    'ean' => $book['ean'],
+                    'url' => $book['url'],
+                    'salesrank' => $book['salesrank'],
+                    'publisher' => $book['publisher'],
+                    'publishdate' => $book['publishdate'],
+                    'pages' => $book['pages'],
+                    'overview' =>$book['overview'],
+                    'genre' => $book['genre'],
+                    'cover' => $book['cover'],
+                    'createddate' => Carbon::now(),
+                    'updateddate' => Carbon::now(),
+                ]
+            );
         } else {
             $bookId = $check['id'];
             BookInfo::query()->where('id', $bookId)->update(
-				[
-					'title' => $book['title'],
-					'author' => $book['author'],
-					'asin' => $book['asin'],
-					'isbn' => $book['isbn'],
-					'ean' => $book['ean'],
-					'url' => $book['url'],
-					'salesrank' => $book['salesrank'],
-					'publisher' => $book['publisher'],
-					'publishdate' => $book['publishdate'],
-					'pages' => $book['pages'],
-					'overview' => $book['overview'],
-					'genre' => $book['genre'],
-					'cover' => $book['cover'],
-					'updateddate' => new \DateTime('NOW'),
-				]
-			);
+                [
+                    'title' => $book['title'],
+                    'author' => $book['author'],
+                    'asin' => $book['asin'],
+                    'isbn' => $book['isbn'],
+                    'ean' => $book['ean'],
+                    'url' => $book['url'],
+                    'salesrank' => $book['salesrank'],
+                    'publisher' => $book['publisher'],
+                    'publishdate' => $book['publishdate'],
+                    'pages' => $book['pages'],
+                    'overview' => $book['overview'],
+                    'genre' => $book['genre'],
+                    'cover' => $book['cover'],
+                    'updateddate' => Carbon::now(),
+                ]
+            );
         }
 
         if ($bookId) {
@@ -690,11 +696,11 @@ class Books
         } else {
             if ($this->echooutput) {
                 ColorCLI::doEcho(
-					ColorCLI::header('Nothing to update: ').
-					ColorCLI::header($book['author'].
-						' - '.
-						$book['title'])
-				);
+                    ColorCLI::header('Nothing to update: ').
+                    ColorCLI::header($book['author'].
+                        ' - '.
+                        $book['title'])
+                );
             }
         }
 

@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use Carbon\Carbon;
 use nntmux\db\DB;
 use App\Models\Settings;
 use App\Models\BinaryBlacklist;
@@ -344,7 +345,7 @@ class Binaries
      */
     public function logIndexerStart(): void
     {
-        Settings::query()->where('setting', '=', 'last_run_time')->update(['value' => (new \DateTime())->format('Y-m-d H:i:s')]);
+        Settings::query()->where('setting', '=', 'last_run_time')->update(['value' => Carbon::now()]);
     }
 
     /**
@@ -1088,7 +1089,7 @@ class Binaries
      */
     protected function updateBlacklistUsage(): void
     {
-        BinaryBlacklist::query()->whereIn('id', $this->_binaryBlacklistIdsToUpdate)->update(['last_activity' => new \DateTime('NOW')]);
+        BinaryBlacklist::query()->whereIn('id', $this->_binaryBlacklistIdsToUpdate)->update(['last_activity' => Carbon::now()]);
         $this->_binaryBlacklistIdsToUpdate = [];
     }
 

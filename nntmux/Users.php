@@ -467,7 +467,7 @@ class Users
      */
     public function updateExpiredRoles($msgsubject, $msgbody): int
     {
-        $data = User::query()->whereDate('rolechangedate', '<', (new \DateTime())->format('Y-m-d H:i:s'))->select(['id', 'email'])->get();
+        $data = User::query()->whereDate('rolechangedate', '<', Carbon::now())->select(['id', 'email'])->get();
 
         foreach ($data as $u) {
             Utility::sendEmail($u['email'], $msgsubject, $msgbody, Settings::settingValue('site.main.email'));
@@ -802,7 +802,7 @@ class Users
                 'password' => $password,
                 'email' => $email,
                 'role' => $role,
-                'createddate' => new \DateTime('NOW'),
+                'createddate' => Carbon::now(),
                 'host' => (int) Settings::settingValue('..storeuserips') === 1 ? $host : '',
                 'rsstoken' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
@@ -1378,7 +1378,7 @@ class Users
      */
     public function addApiRequest($userID, $request): void
     {
-        UserRequest::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> new \DateTime('NOW')]);
+        UserRequest::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> Carbon::now()]);
     }
 
     /**
@@ -1394,9 +1394,9 @@ class Users
     protected function clearApiRequests($userID): void
     {
         if ($userID === false) {
-            UserRequest::query()->where('timestamp', '<', date_sub(new \DateTime('NOW'), new \DateInterval('P1D')))->delete();
+            UserRequest::query()->where('timestamp', '<', Carbon::now()->subDay())->delete();
         } else {
-            UserRequest::query()->where('users_id', $userID)->where('timestamp', '<', date_sub(new \DateTime('NOW'), new \DateInterval('P1D')))->delete();
+            UserRequest::query()->where('users_id', $userID)->where('timestamp', '<', Carbon::now()->subDay())->delete();
         }
     }
 

@@ -1,3 +1,5 @@
+2017-09-14 DariusIII
+	* Chg: Replace DateTime with Carbon
 2017-09-13 DariusIII
 	* Chg: Let eloquemt handle timestamps
 	* Chg: Update laravel/framework to 5.5.4

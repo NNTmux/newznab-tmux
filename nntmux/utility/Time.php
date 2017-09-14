@@ -21,6 +21,8 @@
 
 namespace nntmux\utility;
 
+use Carbon\Carbon;
+
 /**
  * Class Time -- functions for working with time string and DTOs.
  */
@@ -37,7 +39,7 @@ class Time
      */
     public static function localizeAirdate($time = '', $zone = '')
     {
-        $datetime = new \DateTime($time);
+        $datetime = Carbon::createFromTimestamp($time);
         $newzone = new \DateTimeZone($zone);
         $datetime->setTimezone($newzone);
 
