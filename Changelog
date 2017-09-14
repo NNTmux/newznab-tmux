@@ -1,4 +1,5 @@
 2017-09-14 DariusIII
+	* Chg: Update ReleaseUnique model and migration, update ReleaseExtra class addUID function
 	* Chg: Remove unneeded type casting in TraktTv class
 	* Fix: Fix time parsing in Time class utility
 	* Chg: Replace DateTime with Carbon

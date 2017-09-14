@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\ReleaseUnique;
 use nntmux\db\DB;
 use App\Models\AudioData;
 use App\Models\VideoData;
@@ -331,30 +332,24 @@ class ReleaseExtra
      * @param $releaseID
      * @param $uniqueid
      */
-    public function addUID($releaseID, $uniqueid)
+    public function addUID($releaseID, $uniqueid): void
     {
-        $dupecheck = $this->pdo->queryOneRow(
-            sprintf(
-                '
-			SELECT releases_id
-			FROM release_unique
-			WHERE releases_id = %d
-			OR (
-				releases_id = %d
-				AND uniqueid = UNHEX(%s)
-			)',
-                $releaseID,
-                $releaseID,
-                $uniqueid
-        )
-        );
-
-        if ($dupecheck === false) {
-            $this->pdo->queryExec(
-                sprintf('
-				INSERT INTO release_unique (releases_id, uniqueid)
-				VALUES (%d, UNHEX(%s))', $releaseID, $uniqueid)
-            );
+        $dupecheck = ReleaseUnique::query()
+            ->where('releases_id', $releaseID)
+            ->orWhere(
+                [
+                    'releases_id' => $releaseID,
+                    'uniqueid' => hex2bin($uniqueid)
+                ]
+            )->first(['releases_id']);
+        if ($dupecheck === null) {
+            ReleaseUnique::query()
+                ->insert(
+                    [
+                        'releases_id' => $releaseID,
+                        'uniqueid' => hex2bin($uniqueid),
+                    ]
+                );
         }
     }
 

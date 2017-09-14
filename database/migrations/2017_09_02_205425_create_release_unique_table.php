@@ -14,8 +14,9 @@ class CreateReleaseUniqueTable extends Migration
     public function up()
     {
         Schema::create('release_unique', function (Blueprint $table) {
-            $table->increments('id');
-            $table->timestamps();
+            $table->unsignedInteger('releases_id');
+            $table->binary('uniqueid');
+            $table->primary(['releases_id', 'uniqueid']);
         });
     }
 
