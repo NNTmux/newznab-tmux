@@ -37,12 +37,8 @@ class Time
      *
      * @return string
      */
-    public static function localizeAirdate($time = '', $zone = '')
+    public static function localizeAirdate($time = '', $zone = ''): string
     {
-        $datetime = Carbon::createFromTimestamp($time);
-        $newzone = new \DateTimeZone($zone);
-        $datetime->setTimezone($newzone);
-
-        return $datetime->format('Y-m-d');
+        return Carbon::parse($time, $zone)->format('Y-m-d');
     }
 }
