@@ -2,11 +2,11 @@
 
 namespace nntmux;
 
-use App\Models\ReleaseUnique;
 use nntmux\db\DB;
 use App\Models\AudioData;
 use App\Models\VideoData;
 use nntmux\utility\Utility;
+use App\Models\ReleaseUnique;
 use App\Models\ReleaseSubtitle;
 use App\Models\ReleaseExtraFull;
 
@@ -339,7 +339,7 @@ class ReleaseExtra
             ->orWhere(
                 [
                     'releases_id' => $releaseID,
-                    'uniqueid' => hex2bin($uniqueid)
+                    'uniqueid' => hex2bin($uniqueid),
                 ]
             )->first(['releases_id']);
         if ($dupecheck === null) {
