@@ -112,7 +112,7 @@ switch (true) {
                 if ((int) $release['ishashed'] === 1 && (int) $release['dehashstatus'] >= -6 && (int) $release['dehashstatus'] <= 0) {
                     echo ColorCLI::primaryOver('m');
                     if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['name'], $matches)) {
-                        $nameFixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
+                        $nameFixer->matchPredbHash($matches[0], $release, true, 1, true, 1);
                     }
                     if ($nameFixer->matched === false && ! empty($release['filehash']) && preg_match('/[a-fA-F0-9]{32,40}/i', $release['filehash'], $matches)) {
                         echo ColorCLI::primaryOver('h');

@@ -846,7 +846,7 @@ class NameFixer
                 $newTitle = $this->pdo->escapeString(substr($newName, 0, 299));
 
                 if ($echo === true) {
-                    if ((int) $nameStatus === 1) {
+                    if ($nameStatus === 1) {
                         $status = '';
                         switch ($type) {
                             case 'NFO, ':
@@ -1252,7 +1252,6 @@ class NameFixer
      */
     public function matchPredbHash($hash, $release, $echo, $namestatus, $echooutput, $show): int
     {
-        $pdo = $this->pdo;
         $matching = 0;
         $this->matched = false;
 
@@ -1263,14 +1262,14 @@ class NameFixer
             $hashtype = 'MD5, ';
         }
 
-        $row = $pdo->queryOneRow(
+        $row = $this->pdo->queryOneRow(
             sprintf(
                 '
 						SELECT p.id AS predb_id, p.title, p.source
 						FROM predb p INNER JOIN predb_hashes h ON h.predb_id = p.id
 						WHERE h.hash = UNHEX(%s)
 						LIMIT 1',
-                $pdo->escapeString($hash)
+                $this->pdo->escapeString($hash)
             )
         );
 
