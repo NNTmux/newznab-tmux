@@ -1175,6 +1175,7 @@ CREATE TABLE users (
   grabs          INT              NOT NULL DEFAULT '0',
   rsstoken       VARCHAR(64)      NOT NULL,
   createddate    DATETIME         NOT NULL,
+  updateddate    DATETIME         NOT NULL,
   resetguid      VARCHAR(50)      NULL,
   lastlogin      DATETIME                  DEFAULT NULL,
   apiaccess      DATETIME                  DEFAULT NULL,
