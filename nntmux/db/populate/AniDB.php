@@ -2,8 +2,8 @@
 
 namespace nntmux\db\populate;
 
-use Carbon\Carbon;
 use nntmux\db\DB;
+use Carbon\Carbon;
 use nntmux\ColorCLI;
 use App\Models\Settings;
 use nntmux\ReleaseImage;
