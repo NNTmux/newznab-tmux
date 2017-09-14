@@ -72,17 +72,18 @@ class TraktTv extends TV
      * Construct. Set up API key.
      *
      * @param array $options Class instances.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         parent::__construct($options);
         $this->clientId = Settings::settingValue('APIs..trakttvclientkey');
         $this->requestHeaders = [
-				'Content-Type' => 'application/json',
-				'trakt-api-version' => 2,
-				'trakt-api-key' => $this->clientId,
-				'Content-Length' => 0,
-		];
+                'Content-Type' => 'application/json',
+                'trakt-api-version' => 2,
+                'trakt-api-key' => $this->clientId,
+                'Content-Length' => 0,
+        ];
         $this->client = new TraktAPI($this->requestHeaders);
     }
 
@@ -112,12 +113,12 @@ class TraktTv extends TV
 
                 // Clean the show name for better match probability
                 $release = $this->parseInfo($row['searchname']);
-                if (is_array($release) && $release['name'] != '') {
+                if (is_array($release) && $release['name'] !== '') {
                     if (in_array($release['cleanname'], $this->titleCache, false)) {
                         if ($this->echooutput) {
                             echo ColorCLI::headerOver('Title: ').
-									ColorCLI::warningOver($release['cleanname']).
-									ColorCLI::header(' already failed lookup for this site.  Skipping.');
+                                    ColorCLI::warningOver($release['cleanname']).
+                                    ColorCLI::header(' already failed lookup for this site.  Skipping.');
                         }
                         $this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
                         continue;
@@ -135,11 +136,11 @@ class TraktTv extends TV
 
                     if ($videoId === false && $lookupSetting) {
 
-						// If it doesn't exist locally and lookups are allowed lets try to get it.
+                        // If it doesn't exist locally and lookups are allowed lets try to get it.
                         if ($this->echooutput) {
                             echo ColorCLI::primaryOver('Checking Trakt for previously failed title: ').
-									ColorCLI::headerOver($release['cleanname']).
-									ColorCLI::primary('.');
+                                    ColorCLI::headerOver($release['cleanname']).
+                                    ColorCLI::primary('.');
                         }
 
                         // Get the show from TRAKT
@@ -152,8 +153,8 @@ class TraktTv extends TV
                     } else {
                         if ($this->echooutput) {
                             echo ColorCLI::primaryOver('Found local TMDB match for: ').
-									ColorCLI::headerOver($release['cleanname']).
-									ColorCLI::primary('.  Attempting episode lookup!');
+                                    ColorCLI::headerOver($release['cleanname']).
+                                    ColorCLI::primary('.  Attempting episode lookup!');
                         }
                         $traktid = $this->getSiteIDFromVideoID('trakt', $videoId);
                         $this->localizedTZ = $this->getLocalZoneFromVideoID($videoId);
@@ -179,10 +180,10 @@ class TraktTv extends TV
                         if ($episode === false && $lookupSetting) {
                             // Send the request for the episode to TRAKT
                             $traktEpisode = $this->getEpisodeInfo(
-									$traktid,
-									$seasonNo,
-									$episodeNo
-							);
+                                    $traktid,
+                                    $seasonNo,
+                                    $episodeNo
+                            );
 
                             if ($traktEpisode) {
                                 $episode = $this->addEpisode($videoId, $traktEpisode);
@@ -310,7 +311,7 @@ class TraktTv extends TV
         if (is_array($response)) {
             foreach ($response as $show) {
 
-				// Check for exact title match first and then terminate if found
+                // Check for exact title match first and then terminate if found
                 if ($show['show']['title'] === $name) {
                     $highest = $show;
                     break;
@@ -352,22 +353,22 @@ class TraktTv extends TV
         $this->localizedTZ = $show['airs']['timezone'];
 
         return [
-				'type'      => (int) parent::TYPE_TV,
-				'title'     => (string) $show['title'],
-				'summary'   => (string) $show['overview'],
-				'started'   => (string) Time::localizeAirdate($show['first_aired'], $this->localizedTZ),
-				'publisher' => (string) $show['network'],
-				'country'   => (string) $show['country'],
-				'source'    => (int) parent::SOURCE_TRAKT,
-				'imdb'      => (int) ($imdb['imdbid'] ?? 0),
-				'tvdb'      => (int) ($show['ids']['tvdb'] ?? 0),
-				'trakt'     => (int) $show['ids']['trakt'],
-				'tvrage'    => (int) ($show['ids']['tvrage'] ?? 0),
-				'tvmaze'    => 0,
-				'tmdb'      => (int) ($show['ids']['tmdb'] ?? 0),
-				'aliases'   => isset($show['aliases']) && ! empty($show['aliases']) ? (array) $show['aliases'] : '',
-				'localzone' => (string) $this->localizedTZ,
-		];
+                'type'      => parent::TYPE_TV,
+                'title'     => (string) $show['title'],
+                'summary'   => (string) $show['overview'],
+                'started'   => Time::localizeAirdate($show['first_aired'], $this->localizedTZ),
+                'publisher' => (string) $show['network'],
+                'country'   => (string) $show['country'],
+                'source'    => parent::SOURCE_TRAKT,
+                'imdb'      => (int) ($imdb['imdbid'] ?? 0),
+                'tvdb'      => (int) ($show['ids']['tvdb'] ?? 0),
+                'trakt'     => (int) $show['ids']['trakt'],
+                'tvrage'    => (int) ($show['ids']['tvrage'] ?? 0),
+                'tvmaze'    => 0,
+                'tmdb'      => (int) ($show['ids']['tmdb'] ?? 0),
+                'aliases'   => isset($show['aliases']) && ! empty($show['aliases']) ? (array) $show['aliases'] : '',
+                'localzone' => $this->localizedTZ,
+        ];
     }
 
     /**
@@ -381,12 +382,12 @@ class TraktTv extends TV
     public function formatEpisodeInfo($episode): array
     {
         return [
-				'title'       => (string) $episode['title'],
-				'series'      => (int) $episode['season'],
-				'episode'     => (int) $episode['epsiode'],
-				'se_complete' => (string) 'S'.sprintf('%02d', $episode['season']).'E'.sprintf('%02d', $episode['episode']),
-				'firstaired'  => (string) Time::localizeAirdate($episode['first_aired'], $this->localizedTZ),
-				'summary'     => (string) $episode['overview'],
-		];
+                'title'       => (string) $episode['title'],
+                'series'      => (int) $episode['season'],
+                'episode'     => (int) $episode['epsiode'],
+                'se_complete' => 'S'.sprintf('%02d', $episode['season']).'E'.sprintf('%02d', $episode['episode']),
+                'firstaired'  => Time::localizeAirdate($episode['first_aired'], $this->localizedTZ),
+                'summary'     => (string) $episode['overview'],
+        ];
     }
 }

@@ -1,4 +1,5 @@
 2017-09-14 DariusIII
+	* Chg: Remove unneeded type casting in TraktTv class
 	* Fix: Fix time parsing in Time class utility
 	* Chg: Replace DateTime with Carbon
 2017-09-13 DariusIII
