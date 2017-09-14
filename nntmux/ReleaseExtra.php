@@ -341,7 +341,7 @@ class ReleaseExtra
 			WHERE releases_id = %d
 			OR (
 				releases_id = %d
-				AND uniqueid = UNHEX(%d)
+				AND uniqueid = UNHEX(%s)
 			)',
                 $releaseID,
                 $releaseID,
@@ -353,7 +353,7 @@ class ReleaseExtra
             $this->pdo->queryExec(
                 sprintf('
 				INSERT INTO release_unique (releases_id, uniqueid)
-				VALUES (%d, UNHEX(%d))', $releaseID, $uniqueid)
+				VALUES (%d, UNHEX(%s))', $releaseID, $uniqueid)
             );
         }
     }
