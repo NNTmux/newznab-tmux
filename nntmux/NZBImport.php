@@ -302,6 +302,7 @@ class NZBImport
                                 'description' => 'Added by NZBimport script.',
                                 'backfill_target' => 1,
                                 'minfilestoformrelease' => '',
+                                'minsizetoformrelease' => '',
                                 'first_record' => 0,
                                 'last_record' => 0,
                                 'active' => 0,
