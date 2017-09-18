@@ -125,6 +125,7 @@
     "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "dev-master",
     "exeu/apai-io": "~2.0",
+    "fideloper/proxy": "^3.3",
     "fxp/composer-asset-plugin": "~1.1",
     "google/recaptcha": "~1.1",
     "guzzlehttp/guzzle": "^6.3",

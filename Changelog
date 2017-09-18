@@ -1,4 +1,5 @@
 2017-09-18 DariusIII
+	* Chg: Add fideloper/proxy to satisfy laravel requirement
 	* Chg: Update nzb import scripts and class
 2017-09-14 DariusIII
 	* Chg: Add updateddate column to users table
