@@ -30,7 +30,7 @@ class CreateConsoleinfoTable extends Migration
             $table->dateTime('createddate');
             $table->dateTime('updateddate');
             $table->primary('id');
-            $table->index('asin')->unique();
+            $table->unique('asin', 'ix_consoleinfo_asin');
             DB::statement('ALTER TABLE consoleinfo ADD FULLTEXT INDEX ix_consoleinfo_title_platform_ft (title, platform)');
         });
     }

@@ -1,4 +1,5 @@
 2017-09-18 DariusIII
+	* Chg: Update XxxInfo model and migration
 	* Chg: Add fideloper/proxy to satisfy laravel requirement
 	* Chg: Update nzb import scripts and class
 2017-09-14 DariusIII
