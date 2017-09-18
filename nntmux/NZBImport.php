@@ -139,6 +139,7 @@ class NZBImport
             if ($this->browser) {
                 return $this->retVal;
             }
+
             return false;
         }
 
@@ -248,6 +249,7 @@ class NZBImport
         if ($this->browser) {
             return $this->retVal;
         }
+
         return true;
     }
 
