@@ -1,4 +1,5 @@
 2017-09-18 DariusIII
+	* Chg: Increase xref column size
 	* Chg: Update XXX class cs
 	* Chg: Update XxxInfo model and migration
 	* Chg: Add fideloper/proxy to satisfy laravel requirement
