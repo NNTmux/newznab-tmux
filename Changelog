@@ -1,3 +1,5 @@
+2017-09-19 DariusIII
+	* Chg: Update XXX class to use query builder
 2017-09-18 DariusIII
 	* Chg: Increase xref column size
 	* Chg: Update XXX class cs

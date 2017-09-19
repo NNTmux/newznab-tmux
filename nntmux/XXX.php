@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\XxxInfo;
 use nntmux\db\DB;
 use App\Models\Settings;
 use nntmux\processing\adult\ADE;
@@ -121,13 +122,12 @@ class XXX
     /**
      * Get info for a xxx id.
      *
-     * @param int $xxxid
-     *
-     * @return array|bool
+     * @param $xxxid
+     * @return \Illuminate\Database\Query\Builder|static
      */
     public function getXXXInfo($xxxid)
     {
-        return $this->pdo->queryOneRow(sprintf('SELECT *, UNCOMPRESS(plot) AS plot FROM xxxinfo WHERE id = %d', $xxxid));
+        return XxxInfo::query()->where('id', $xxxid)->selectRaw(' *, UNCOMPRESS(plot) as plot')->first();
     }
 
     /**
@@ -374,27 +374,22 @@ class XXX
         $backdrop = ''
     ): void {
         if (! empty($id)) {
-            $this->pdo->queryExec(
-                sprintf(
-                    'UPDATE xxxinfo	SET title = %s, tagline = %s, plot = COMPRESS(%s), genre = %s, director = %s,
-					actors = %s, extras = %s, productinfo = %s, trailers = %s, directurl = %s,
-					classused = %s, cover = %d, backdrop = %d, updateddate = NOW()
-					WHERE id = %d',
-                    $this->pdo->escapeString($title),
-                    $this->pdo->escapeString($tagLine),
-                    $this->pdo->escapeString($plot),
-                    $this->pdo->escapeString(substr($genre, 0, 64)),
-                    $this->pdo->escapeString($director),
-                    $this->pdo->escapeString($actors),
-                    $this->pdo->escapeString($extras),
-                    $this->pdo->escapeString($productInfo),
-                    $this->pdo->escapeString($trailers),
-                    $this->pdo->escapeString($directUrl),
-                    $this->pdo->escapeString($classUsed),
-                    (empty($cover) ? 0 : $cover),
-                    (empty($backdrop) ? 0 : $backdrop),
-                    $id
-                )
+            XxxInfo::query()->where('id', $id)->update(
+                [
+                    'title' => $title,
+                    'tagline' => $tagLine,
+                    'plot' => "\x1f\x8b\x08\x00".gzcompress($plot),
+                    'genre' => substr($genre, 0, 64),
+                    'director' => $director,
+                    'actors' => $actors,
+                    'extras' => $extras,
+                    'productinfo' => $productInfo,
+                    'trailers'=> $trailers,
+                    'directurl' => $directUrl,
+                    'classused' => $classUsed,
+                    'cover' => empty($cover) ? 0 : $cover,
+                    'backdrop' => empty($backdrop) ? 0 : $backdrop,
+                ]
             );
         }
     }
@@ -406,7 +401,7 @@ class XXX
      *
      * @return array|null
      */
-    public function getAllGenres($activeOnly = false)
+    public function getAllGenres($activeOnly = false): ?array
     {
         $ret = null;
 
@@ -632,9 +627,9 @@ class XXX
             'classused'   => $this->whichclass,
         ];
 
-        $check = $this->pdo->queryOneRow(sprintf('SELECT id FROM xxxinfo WHERE title = %s', $this->pdo->escapeString($mov['title'])));
+        $check = XxxInfo::query()->where('title', $mov['title'])->first(['id']);
 
-        if ($check !== false && $check['id'] > 0) {
+        if ($check !== null && $check['id'] > 0) {
             $xxxID = $check['id'];
 
             // Update BoxCover.
@@ -652,26 +647,21 @@ class XXX
         }
 
         // Insert New XXX Information
-        if ($check === false) {
-            $xxxID = $this->pdo->queryInsert(
-                sprintf(
-                    '
-					INSERT INTO xxxinfo
-						(title, tagline, plot, genre, director, actors, extras, productinfo, trailers, directurl, classused, createddate, updateddate)
-					VALUES
-						(%s, %s, COMPRESS(%s), %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())',
-                    $this->pdo->escapeString($mov['title']),
-                    $this->pdo->escapeString($mov['tagline']),
-                    $this->pdo->escapeString($mov['plot']),
-                    $this->pdo->escapeString(substr($mov['genre'], 0, 64)),
-                    $this->pdo->escapeString($mov['director']),
-                    $this->pdo->escapeString($mov['actors']),
-                    $this->pdo->escapeString($mov['extras']),
-                    $this->pdo->escapeString($mov['productinfo']),
-                    $this->pdo->escapeString($mov['trailers']),
-                    $this->pdo->escapeString($mov['directurl']),
-                    $this->pdo->escapeString($mov['classused'])
-                )
+        if ($check === null) {
+            $xxxID = XxxInfo::query()->insertGetId(
+                [
+                    'title' => $mov['title'],
+                    'tagline' => $mov['tagline'],
+                    'plot' => "\x1f\x8b\x08\x00".gzcompress($mov['plot']),
+                    'genre' => substr($mov['genre'], 0, 64),
+                    'director' => $mov['director'],
+                    'actors' => $mov['actors'],
+                    'extras' => $mov['extras'],
+                    'productinfo' => $mov['productinfo'],
+                    'trailers' => $mov['trailers'],
+                    'directurl' => $mov['directurl'],
+                    'classused' => $mov['classused']
+                ]
             );
             // Update BoxCover.
             if (! empty($mov['cover'])) {
@@ -683,7 +673,7 @@ class XXX
                 $backdrop = $this->releaseImage->saveImage($xxxID.'-backdrop', $mov['backdrop'], $this->imgSavePath, 1920, 1024);
             }
 
-            $this->pdo->queryExec(sprintf('UPDATE xxxinfo SET cover = %d, backdrop = %d WHERE id = %d', $cover, $backdrop, $xxxID));
+            XxxInfo::query()->where('id', $xxxID)->update(['cover' => $cover, 'backdrop' => $backdrop]);
         }
 
         if ($this->echooutput) {
@@ -729,7 +719,7 @@ class XXX
                 // Try to get a name.
                 if ($this->parseXXXSearchName($arr['searchname']) !== false) {
                     $check = $this->checkXXXInfoExists($this->currentTitle);
-                    if ($check === false) {
+                    if ($check === null) {
                         $this->currentRelID = $arr['id'];
                         if ($this->debug && $this->echooutput) {
                             ColorCLI::doEcho('DB name: '.$arr['searchname'], true);
@@ -758,12 +748,11 @@ class XXX
      * Checks xxxinfo to make sure releases exist.
      *
      * @param $releaseName
-     *
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     protected function checkXXXInfoExists($releaseName)
     {
-        return $this->pdo->queryOneRow(sprintf('SELECT id, title FROM xxxinfo WHERE title %s', $this->pdo->likeString($releaseName, false, true)));
+        return XxxInfo::query()->where('title', 'like', '%' . $releaseName . '%')->first(['id', 'title']);
     }
 
     /**
