@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\XxxInfo;
 use nntmux\db\DB;
+use App\Models\XxxInfo;
 use App\Models\Settings;
 use nntmux\processing\adult\ADE;
 use nntmux\processing\adult\ADM;
@@ -660,7 +660,7 @@ class XXX
                     'productinfo' => $mov['productinfo'],
                     'trailers' => $mov['trailers'],
                     'directurl' => $mov['directurl'],
-                    'classused' => $mov['classused']
+                    'classused' => $mov['classused'],
                 ]
             );
             // Update BoxCover.
@@ -752,7 +752,7 @@ class XXX
      */
     protected function checkXXXInfoExists($releaseName)
     {
-        return XxxInfo::query()->where('title', 'like', '%' . $releaseName . '%')->first(['id', 'title']);
+        return XxxInfo::query()->where('title', 'like', '%'.$releaseName.'%')->first(['id', 'title']);
     }
 
     /**
