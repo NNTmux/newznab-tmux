@@ -1,4 +1,5 @@
 2017-09-19 DariusIII
+	* Chg: Update laravel/framework to version 5.5.7 and fancybox to latest
 	* Chg: Remove nZEDbPre2 channel from IRCScraper
 	* Chg: Update XXX class to use query builder
 2017-09-18 DariusIII

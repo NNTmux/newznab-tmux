@@ -139,7 +139,7 @@
                 }
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
-            "time": "2017-08-27T15:14:06+00:00"
+            "time": "2017-08-27 15:14:06"
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -602,16 +602,16 @@
         },
         {
             "name": "bower-asset/fancybox",
-            "version": "v3.1.20",
+            "version": "v3.1.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fancyapps/fancybox.git",
-                "reference": "3607c5562130ff4eb4ced258e30de6613dc7c2c1"
+                "reference": "8d2d48da812375154fb801927783575157b7bd1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/3607c5562130ff4eb4ced258e30de6613dc7c2c1",
-                "reference": "3607c5562130ff4eb4ced258e30de6613dc7c2c1",
+                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/8d2d48da812375154fb801927783575157b7bd1f",
+                "reference": "8d2d48da812375154fb801927783575157b7bd1f",
                 "shasum": ""
             },
             "require": {
@@ -636,7 +636,8 @@
                 "plugin",
                 "responsive",
                 "touch"
-            ]
+            ],
+            "time": "2017-09-18T15:58:32+00:00"
         },
         {
             "name": "bower-asset/fastclick",
@@ -1468,7 +1469,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-05-29T12:05:57+00:00"
+            "time": "2017-05-29 12:05:57"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -2347,7 +2348,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2016-05-04T01:31:56+00:00"
+            "time": "2016-05-04 01:31:56"
         },
         {
             "name": "kbjr/Git.php",
@@ -2373,7 +2374,7 @@
                 "source": "https://github.com/kbjr/Git.php/tree/master",
                 "issues": "https://github.com/kbjr/Git.php/issues"
             },
-            "time": "2015-03-31T14:10:29+00:00"
+            "time": "2015-03-31 14:10:29"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
@@ -2455,16 +2456,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.5.4",
+            "version": "v5.5.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "d3e0493bead126cf7fb9a005c64e6b58a9190e51"
+                "reference": "7a7b7c92ac6feae474cfe036a06643f5052d2e40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/d3e0493bead126cf7fb9a005c64e6b58a9190e51",
-                "reference": "d3e0493bead126cf7fb9a005c64e6b58a9190e51",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/7a7b7c92ac6feae474cfe036a06643f5052d2e40",
+                "reference": "7a7b7c92ac6feae474cfe036a06643f5052d2e40",
                 "shasum": ""
             },
             "require": {
@@ -2583,7 +2584,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2017-09-13T13:36:29+00:00"
+            "time": "2017-09-19T17:46:51+00:00"
         },
         {
             "name": "laravel/tinker",
