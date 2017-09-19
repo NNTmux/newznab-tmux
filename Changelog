@@ -1,4 +1,5 @@
 2017-09-19 DariusIII
+	* Chg: Remove nZEDbPre2 channel from IRCScraper
 	* Chg: Update XXX class to use query builder
 2017-09-18 DariusIII
 	* Chg: Increase xref column size

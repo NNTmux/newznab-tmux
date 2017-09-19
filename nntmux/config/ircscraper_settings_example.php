@@ -69,44 +69,45 @@ define('SCRAPE_IRC_TITLE_IGNORE', '');
 /***********************************************************************************************************************
  * This is a list of all the channels we fetch PRE's from.
  **********************************************************************************************************************/
-define('SCRAPE_IRC_CHANNELS',
-	serialize(
-		[
-			//'#Channel'                => 'Password',
-			'#PreNNTmux'                => null,
-			'#nZEDbPRE'                 => null,
-			'#nZEDbPRE2'                => null,
-		]
-	)
+define(
+    'SCRAPE_IRC_CHANNELS',
+    serialize(
+        [
+            //'#Channel'                => 'Password',
+            '#PreNNTmux'                => null,
+            '#nZEDbPRE'                 => null,
+        ]
+    )
 );
 
 /***********************************************************************************************************************
  * This is a list of all the sources we fetch PRE's from.
  * If you want to ignore a source, change it from false to true.
  **********************************************************************************************************************/
-define('SCRAPE_IRC_SOURCE_IGNORE',
-	serialize(
-		[
-			'#a.b.cd.image'               => false,
-			'#a.b.console.ps3'            => false,
-			'#a.b.dvd'                    => false,
-			'#a.b.erotica'                => false,
-			'#a.b.flac'                   => false,
-			'#a.b.foreign'                => false,
-			'#a.b.games.nintendods'       => false,
-			'#a.b.inner-sanctum'          => false,
-			'#a.b.moovee'                 => false,
-			'#a.b.movies.divx'            => false,
-			'#a.b.sony.psp'               => false,
-			'#a.b.sounds.mp3.complete_cd' => false,
-			'#a.b.teevee'                 => false,
-			'#a.b.games.wii'              => false,
-			'#a.b.warez'                  => false,
-			'#a.b.games.xbox360'          => false,
-			'#pre@corrupt'                => false,
-			'#scnzb'                      => false,
-			'#tvnzb'                      => false,
-			'srrdb'                       => false,
-		]
-	)
+define(
+    'SCRAPE_IRC_SOURCE_IGNORE',
+    serialize(
+        [
+            '#a.b.cd.image'               => false,
+            '#a.b.console.ps3'            => false,
+            '#a.b.dvd'                    => false,
+            '#a.b.erotica'                => false,
+            '#a.b.flac'                   => false,
+            '#a.b.foreign'                => false,
+            '#a.b.games.nintendods'       => false,
+            '#a.b.inner-sanctum'          => false,
+            '#a.b.moovee'                 => false,
+            '#a.b.movies.divx'            => false,
+            '#a.b.sony.psp'               => false,
+            '#a.b.sounds.mp3.complete_cd' => false,
+            '#a.b.teevee'                 => false,
+            '#a.b.games.wii'              => false,
+            '#a.b.warez'                  => false,
+            '#a.b.games.xbox360'          => false,
+            '#pre@corrupt'                => false,
+            '#scnzb'                      => false,
+            '#tvnzb'                      => false,
+            'srrdb'                       => false,
+        ]
+    )
 );
