@@ -22,7 +22,7 @@ class Games
     public $echoOutput;
 
     /**
-     * @var array|bool|int|string
+     * @var int|null|string
      */
     public $gameQty;
 
@@ -42,7 +42,7 @@ class Games
     public $maxHitRequest;
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -77,7 +77,7 @@ class Games
     protected $_gameResults;
 
     /**
-     * @var Steam
+     * @var
      */
     protected $_getGame;
 
@@ -90,19 +90,21 @@ class Games
      * @var array|bool|int|string
      */
     public $catWhere;
+
     /**
-     * @var Config
+     * @var \DBorsatto\GiantBomb\Config
      */
     protected $config;
 
     /**
-     * @var Client
+     * @var \DBorsatto\GiantBomb\Client
      */
     protected $giantBomb;
 
     /**
-     * @param array $options Class instances / Echo to cli.
+     * Games constructor.
      *
+     * @param array $options
      * @throws \Exception
      */
     public function __construct(array $options = [])
@@ -118,7 +120,7 @@ class Games
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
         $this->publicKey = Settings::settingValue('APIs..giantbombkey');
-        $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? Settings::settingValue('..maxgamesprocessed') : 150;
+        $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
         $this->imgSavePath = NN_COVERS.'games'.DS;
         $this->renamed = Settings::settingValue('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
         $this->matchPercentage = 60;
@@ -226,9 +228,10 @@ class Games
      * @param        $num
      * @param string|array $orderBy
      * @param string $maxAge
-     * @param array  $excludedCats
+     * @param array $excludedCats
      *
      * @return array
+     * @throws \Exception
      */
     public function getGamesRange($cat, $start, $num, $orderBy = '', $maxAge = '', array $excludedCats = []): array
     {
@@ -483,6 +486,7 @@ class Games
      * @param $gameInfo
      *
      * @return bool
+     * @throws \Exception
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
@@ -680,64 +684,28 @@ class Games
         $game['gamesgenre'] = $genreName;
         $game['gamesgenreID'] = $genreKey;
 
-        $check = $this->pdo->queryOneRow(
-            sprintf(
-                '
+        if (! empty($game['asin'])) {
+            $check = $this->pdo->queryOneRow(sprintf('
 				SELECT id
 				FROM gamesinfo
-				WHERE asin = %s',
-                $this->pdo->escapeString($game['asin'])
-            )
-        );
-        if ($check === false) {
-            $gamesId = $this->pdo->queryInsert(
-                sprintf(
-                    '
+				WHERE asin = %s', $this->pdo->escapeString($game['asin'])));
+            if ($check === false) {
+                $gamesId = $this->pdo->queryInsert(sprintf('
 					INSERT INTO gamesinfo
 						(title, asin, url, publisher, genres_id, esrb, releasedate, review, cover, backdrop, trailer, classused, createddate, updateddate)
-					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %d, %d, %s, %s, NOW(), NOW())',
-                    $this->pdo->escapeString($game['title']),
-                    $this->pdo->escapeString($game['asin']),
-                    $this->pdo->escapeString($game['url']),
-                    $this->pdo->escapeString($game['publisher']),
-                    ($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']),
-                    $this->pdo->escapeString($game['esrb']),
-                    ($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
-                    $this->pdo->escapeString(substr($game['review'], 0, 3000)),
-                    $game['cover'],
-                    $game['backdrop'],
-                    $this->pdo->escapeString($game['trailer']),
-                    $this->pdo->escapeString($game['classused'])
-                )
-            );
-        } else {
-            $gamesId = $check['id'];
-            $this->pdo->queryExec(
-                sprintf(
-                    '
+					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %d, %d, %s, %s, NOW(), NOW())', $this->pdo->escapeString($game['title']), $this->pdo->escapeString($game['asin']), $this->pdo->escapeString($game['url']), $this->pdo->escapeString($game['publisher']), ($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']), $this->pdo->escapeString($game['esrb']), ($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'), $this->pdo->escapeString(substr($game['review'], 0, 3000)), $game['cover'], $game['backdrop'], $this->pdo->escapeString($game['trailer']), $this->pdo->escapeString($game['classused'])));
+            } else {
+                $gamesId = $check['id'];
+                $this->pdo->queryExec(sprintf('
 					UPDATE gamesinfo
 					SET
 						title = %s, asin = %s, url = %s, publisher = %s, genres_id = %s,
 						esrb = %s, releasedate = %s, review = %s, cover = %d, backdrop = %d, trailer = %s, classused = %s, updateddate = NOW()
-					WHERE id = %d',
-                    $this->pdo->escapeString($game['title']),
-                    $this->pdo->escapeString($game['asin']),
-                    $this->pdo->escapeString($game['url']),
-                    $this->pdo->escapeString($game['publisher']),
-                    ($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']),
-                    $this->pdo->escapeString($game['esrb']),
-                    ($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'),
-                    $this->pdo->escapeString(substr($game['review'], 0, 3000)),
-                    $game['cover'],
-                    $game['backdrop'],
-                    $this->pdo->escapeString($game['trailer']),
-                    $this->pdo->escapeString($game['classused']),
-                    $gamesId
-                )
-            );
+					WHERE id = %d', $this->pdo->escapeString($game['title']), $this->pdo->escapeString($game['asin']), $this->pdo->escapeString($game['url']), $this->pdo->escapeString($game['publisher']), ($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']), $this->pdo->escapeString($game['esrb']), ($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'), $this->pdo->escapeString(substr($game['review'], 0, 3000)), $game['cover'], $game['backdrop'], $this->pdo->escapeString($game['trailer']), $this->pdo->escapeString($game['classused']), $gamesId));
+            }
         }
 
-        if ($gamesId) {
+        if (! empty($gamesId)) {
             if ($this->echoOutput) {
                 ColorCLI::doEcho(
                     ColorCLI::header('Added/updated game: ').
@@ -762,12 +730,13 @@ class Games
             }
         }
 
-        return $gamesId;
+        return ! empty($gamesId) ? $gamesId : false;
     }
 
     /**
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
+     * @throws \Exception
      */
     public function processGamesReleases(): void
     {
