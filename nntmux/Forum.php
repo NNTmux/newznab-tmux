@@ -103,7 +103,7 @@ class Forum
 				SELECT f.*, u.username, ur.name AS rolename
 				FROM forumpost f
 				LEFT OUTER JOIN users u ON u.id = f.users_id
-				LEFT JOIN user_roles ur ON ur.id = u.role
+				LEFT JOIN user_roles ur ON ur.id = u.user_roles_id
 				WHERE f.id = %d OR f.parentid = %d
 				ORDER BY f.createddate ASC
 				LIMIT 250',
@@ -153,7 +153,7 @@ class Forum
 				SELECT f.*, u.username, ur.name AS rolename
 				FROM forumpost f
 				LEFT OUTER JOIN users u ON u.id = f.users_id
-				LEFT JOIN user_roles ur ON ur.id = u.role
+				LEFT JOIN user_roles ur ON ur.id = u.user_roles_id
 				WHERE f.parentid = 0
 				ORDER BY f.updateddate DESC %s',
                 ($start === false ? '' : (' LIMIT '.$num.' OFFSET '.$start))

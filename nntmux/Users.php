@@ -1216,7 +1216,7 @@ class Users
     {
         return $this->pdo->query(
             'SELECT ur.name, COUNT(u.id) as num FROM users u
-							INNER JOIN user_roles ur ON ur.id = u.role
+							INNER JOIN user_roles ur ON ur.id = u.user_roles_id
 							GROUP BY ur.name
 							ORDER BY COUNT(u.id) DESC'
         );
