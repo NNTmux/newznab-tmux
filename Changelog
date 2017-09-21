@@ -1,3 +1,5 @@
+2017-09-21 DariusIII
+	* Chg: Update laravel/framework to version 5.5.9
 2017-09-20 DariusIII
 	* Chg: Update GamesInfo to better handle missing info before inserting into database
 2017-09-19 DariusIII
