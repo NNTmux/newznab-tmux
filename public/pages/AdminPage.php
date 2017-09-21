@@ -19,14 +19,14 @@ class AdminPage extends BasePage
 
         // Tell Smarty which directories to use for templates
         $this->smarty->setTemplateDir(
-			[
-				'admin' 	=> NN_THEMES.'shared/templates/admin',
-				'shared' 	=> NN_THEMES.'shared/templates',
-				'default' 	=> NN_THEMES.'Omicron/templates',
-			]
-		);
+            [
+                'admin'    => NN_THEMES.'shared/templates/admin',
+                'shared'    => NN_THEMES.'shared/templates',
+                'default'    => NN_THEMES.'Omicron/templates',
+            ]
+        );
 
-        if (! isset($this->userdata['role']) || (int) $this->userdata['role'] !== Users::ROLE_ADMIN || ! $this->users->isLoggedIn()) {
+        if (! isset($this->userdata['user_roles_id']) || (int) $this->userdata['user_roles_id'] !== Users::ROLE_ADMIN || ! $this->users->isLoggedIn()) {
             $this->show403(true);
         }
 

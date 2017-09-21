@@ -335,7 +335,7 @@ class BasePage
     {
         $this->userdata = $this->users->getById($this->users->currentUserId());
         $this->userdata['categoryexclusions'] = $this->users->getCategoryExclusion($this->users->currentUserId());
-        $this->userdata['rolecategoryexclusions'] = $this->users->getRoleCategoryExclusion($this->userdata['role']);
+        $this->userdata['rolecategoryexclusions'] = $this->users->getRoleCategoryExclusion($this->userdata['user_roles_id']);
 
         // Change the theme to user's selected theme if they selected one, else use the admin one.
         if ((int) Settings::settingValue('site.main.userselstyle') === 1) {
@@ -368,7 +368,7 @@ class BasePage
         if ($sab->integratedBool !== false && $sab->url !== '' && $sab->apikey !== '') {
             $this->smarty->assign('sabapikeytype', $sab->apikeytype);
         }
-        switch ((int) $this->userdata['role']) {
+        switch ((int) $this->userdata['user_roles_id']) {
             case Users::ROLE_ADMIN:
                 $this->smarty->assign('isadmin', 'true');
                 break;

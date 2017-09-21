@@ -413,12 +413,11 @@ class Users
 
     /**
      * @param string $userName
-     *
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getByUsername(string $userName)
     {
-        return $this->pdo->queryOneRow(sprintf('SELECT users.*, user_roles.name as rolename, user_roles.apirequests, user_roles.downloadrequests FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE username = %s', $this->pdo->escapeString($userName)));
+        return User::query()->where('username', $userName)->first();
     }
 
     /**
@@ -429,7 +428,7 @@ class Users
      */
     public function getByEmail(string $email)
     {
-        return User::query()->where('email', '=', $email)->first();
+        return User::query()->where('email', $email)->first();
     }
 
     /**
@@ -440,7 +439,7 @@ class Users
      */
     public function updateUserRole(int $uid, int $role): int
     {
-        User::query()->where('id', $uid)->update(['role' => $role]);
+        User::query()->where('id', $uid)->update(['user_roles_id' => $role]);
 
         return self::SUCCESS;
     }
@@ -572,7 +571,7 @@ class Users
             return false;
         }
 
-        return $user['rsstoken'] !== $rssToken ? false : $user;
+        return $user->rsstoken !== $rssToken ? false : $user;
     }
 
     /**
@@ -582,25 +581,22 @@ class Users
      */
     public function getById($id)
     {
-        $sql = sprintf('SELECT users.*, user_roles.name as rolename, user_roles.hideads, user_roles.canpreview, user_roles.apirequests, user_roles.downloadrequests, NOW() as now FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE users.id = %d', $id);
-
-        $result = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+        $result = User::find($id);
 
         if (empty($result)) {
             return false;
         }
 
-        return $result[0];
+        return $result;
     }
 
     /**
      * @param string $rssToken
-     *
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getByRssToken(string $rssToken)
     {
-        return $this->pdo->queryOneRow(sprintf('SELECT users.*, user_roles.apirequests, user_roles.downloadrequests, NOW() as now FROM users INNER JOIN user_roles on user_roles.id = users.role WHERE users.rsstoken = %s', $this->pdo->escapeString($rssToken)));
+        return User::query()->where('rsstoken', $rssToken)->first();
     }
 
     /**
@@ -1494,23 +1490,13 @@ class Users
      */
     public function roleCheck($roleID, $user): bool
     {
-        if (is_string($user) && strlen($user) > 0) {
-            $user = $this->pdo->escapeString($user);
-            $querySuffix = "username = $user";
-        } elseif (is_int($user) && $user >= 0) {
-            $querySuffix = "id = $user";
-        } else {
-            return false;
+        $result = User::query()->where('username', $user)->orWhere('id', $user)->first(['user_roles_id']);
+
+        if ($result !== null) {
+            return $result['user_roles_id'] === $roleID;
         }
 
-        $result = $this->pdo->queryOneRow(
-            sprintf(
-                'SELECT role FROM users WHERE %s',
-                $querySuffix
-            )
-        );
-
-        return $result['role'] === $roleID;
+        return false;
     }
 
     /**

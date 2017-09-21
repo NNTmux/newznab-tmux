@@ -32,7 +32,7 @@ class Page extends BasePage
 
         $role = Users::ROLE_GUEST;
         if ($this->userdata != null) {
-            $role = $this->userdata['role'];
+            $role = $this->userdata['user_roles_id'];
         }
 
         $content = new Contents(['Settings' => $this->settings]);
