@@ -29,7 +29,7 @@ class User extends Authenticatable
         'username',
         'password',
         'email',
-        'role',
+        'user_roles_id',
         'createddate',
         'updateddate',
         'host',
@@ -44,4 +44,10 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = ['password', 'rsstoken'];
+
+
+    public function role()
+    {
+        return $this->belongsTo('App\Models\UserRole', 'user_roles_id');
+    }
 }

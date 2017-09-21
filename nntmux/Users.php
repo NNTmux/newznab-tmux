@@ -1339,7 +1339,7 @@ class Users
                 $userids[] = $user['id'];
             }
             $defaultrole = $this->getDefaultRole();
-            $this->pdo->queryExec(sprintf('UPDATE users SET role = %d WHERE id IN (%s)', $defaultrole['id'], implode(',', $userids)));
+            $this->pdo->queryExec(sprintf('UPDATE users SET user_roles_id = %d WHERE id IN (%s)', $defaultrole['id'], implode(',', $userids)));
         }
 
         return UserRole::query()->where('id', $id)->delete();

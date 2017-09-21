@@ -1170,7 +1170,7 @@ CREATE TABLE users (
   lastname       VARCHAR(255)              DEFAULT NULL,
   email          VARCHAR(255)     NOT NULL,
   password       VARCHAR(255)     NOT NULL,
-  role           INT              NOT NULL DEFAULT '1',
+  user_roles_id  INT              NOT NULL DEFAULT '1' COMMENT 'FK to user_roles.id',
   host           VARCHAR(40)      NULL,
   grabs          INT              NOT NULL DEFAULT '0',
   rsstoken       VARCHAR(64)      NOT NULL,

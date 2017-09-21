@@ -25,13 +25,18 @@ class UserRole extends Model
      * @var array
      */
     protected $fillable = [
-    	'id',
-		'name',
-		'apirequests',
-		'downloadrequests',
-		'defaultinvites',
-		'isdefault',
-		'canpreview',
-		'hideads',
-	];
+        'id',
+        'name',
+        'apirequests',
+        'downloadrequests',
+        'defaultinvites',
+        'isdefault',
+        'canpreview',
+        'hideads',
+    ];
+
+    public function users()
+    {
+        return $this->hasMany('App\Models\User', 'user_roles_id');
+    }
 }
