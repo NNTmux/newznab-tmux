@@ -271,8 +271,8 @@ class Users
             case 'grabs':
                 $orderField = 'grabs';
                 break;
-            case 'role':
-                $orderField = 'role';
+            case 'user_roles_id':
+                $orderField = 'users_role_id';
                 break;
             case 'rolechangedate':
                 $orderField = 'rolechangedate';
@@ -360,7 +360,7 @@ class Users
             'username' => $userName,
             'email' => $email,
             'grabs' => $grabs,
-            'role' => $role,
+            'user_roles_id' => $role,
             'notes' => substr($notes, 0, 255),
             'invites' => $invites,
             'movieview' => $movieview,
@@ -470,7 +470,7 @@ class Users
 
         foreach ($data as $u) {
             Utility::sendEmail($u['email'], $msgsubject, $msgbody, Settings::settingValue('site.main.email'));
-            User::query()->where('id', $u['id'])->update(['role' => self::ROLE_USER, 'rolechangedate' => null]);
+            User::query()->where('id', $u['id'])->update(['user_roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
         }
 
         return self::SUCCESS;
@@ -797,7 +797,7 @@ class Users
                 'username' => $userName,
                 'password' => $password,
                 'email' => $email,
-                'role' => $role,
+                'user_roles_id' => $role,
                 'createddate' => Carbon::now(),
                 'host' => (int) Settings::settingValue('..storeuserips') === 1 ? $host : '',
                 'rsstoken' => md5(Password::getRepository()->createNewToken()),
@@ -823,7 +823,7 @@ class Users
         if (isset($_COOKIE['uid'], $_COOKIE['idh'])) {
             $u = $this->getById($_COOKIE['uid']);
 
-            if ((int) $u['role'] !== self::ROLE_DISABLED && $_COOKIE['idh'] === self::hashSHA1($u['userseed'].$_COOKIE['uid'])) {
+            if ((int) $u['user_roles_id'] !== self::ROLE_DISABLED && $_COOKIE['idh'] === self::hashSHA1($u['userseed'].$_COOKIE['uid'])) {
                 $this->login($_COOKIE['uid'], $_SERVER['REMOTE_ADDR']);
             }
         }
