@@ -37,6 +37,6 @@ class GamesInfo extends Model
         'trailer',
         'classused',
         'createddate',
-        'updateddate'
+        'updateddate',
     ];
 }

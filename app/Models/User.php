@@ -45,7 +45,6 @@ class User extends Authenticatable
      */
     protected $hidden = ['password', 'rsstoken'];
 
-
     public function role()
     {
         return $this->belongsTo('App\Models\UserRole', 'user_roles_id');
