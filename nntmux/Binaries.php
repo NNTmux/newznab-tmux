@@ -276,14 +276,14 @@ class Binaries
 
         $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ?
             (int) Settings::settingValue('..maxmssgs') : 20000;
-        $this->_compressedHeaders = Settings::settingValue('..compressedheaders') === 1;
-        $this->_partRepair = Settings::settingValue('..partrepair') === 1;
-        $this->_newGroupScanByDays = Settings::settingValue('..newgroupscanmethod') === 1;
+        $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
+        $this->_partRepair = (int) Settings::settingValue('..partrepair') === 1;
+        $this->_newGroupScanByDays = (int)Settings::settingValue('..newgroupscanmethod') === 1;
         $this->_newGroupMessagesToScan = Settings::settingValue('..newgroupmsgstoscan') !== '' ? (int) Settings::settingValue('..newgroupmsgstoscan') : 50000;
         $this->_newGroupDaysToScan = Settings::settingValue('..newgroupdaystoscan') !== '' ? (int) Settings::settingValue('..newgroupdaystoscan') : 3;
         $this->_partRepairLimit = Settings::settingValue('..maxpartrepair') !== '' ? (int) Settings::settingValue('..maxpartrepair') : 15000;
         $this->_partRepairMaxTries = (Settings::settingValue('..partrepairmaxtries') !== '' ? (int) Settings::settingValue('..partrepairmaxtries') : 3);
-        $this->_showDroppedYEncParts = Settings::settingValue('..showdroppedyencparts') === 1;
+        $this->_showDroppedYEncParts = (int) Settings::settingValue('..showdroppedyencparts') === 1;
 
         $this->blackList = $this->whiteList = [];
     }

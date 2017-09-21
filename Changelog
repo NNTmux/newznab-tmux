@@ -1,4 +1,5 @@
 2017-09-21 DariusIII
+	* Fix: Fix various errors related to bad type casting in Binaries class
 	* Chg: Fix another role issue
 	* Chg: Update and fix RSS feed
 	* Chg: Add relationship between User and UserRequest models
