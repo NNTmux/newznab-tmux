@@ -81,7 +81,7 @@ if ($page->users->isLoggedIn()) {
 
         $uid = $res['id'];
         $catExclusions = $page->users->getCategoryExclusion($uid);
-        $maxRequests = $res['apirequests'];
+        $maxRequests = $res->role->apirequests;
     }
 }
 
