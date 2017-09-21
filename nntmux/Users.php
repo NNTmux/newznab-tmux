@@ -206,7 +206,7 @@ class Users
             $query = "
 				SELECT users.*, user_roles.name AS rolename, COUNT(user_requests.id) AS apirequests
 				FROM users
-				INNER JOIN user_roles ON user_roles.id = users.role
+				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
 				LEFT JOIN user_requests ON user_requests.users_id = users.id
 				WHERE users.id != 0 %s %s %s %s
 				AND email != 'sharing@nZEDb.com'
@@ -216,7 +216,7 @@ class Users
             $query = '
 				SELECT users.*, user_roles.name AS rolename
 				FROM users
-				INNER JOIN user_roles ON user_roles.id = users.role
+				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
 				WHERE 1=1 %s %s %s %s
 				ORDER BY %s %s %s';
         }
@@ -229,7 +229,7 @@ class Users
                 ($userName !== '' ? ('AND users.username '.$this->pdo->likeString($userName)) : ''),
                 ($email !== '' ? ('AND users.email '.$this->pdo->likeString($email)) : ''),
                 ($host !== '' ? ('AND users.host '.$this->pdo->likeString($host)) : ''),
-                ($role !== '' ? ('AND users.role = '.$role) : ''),
+                ($role !== '' ? ('AND users.user_roles_id = '.$role) : ''),
                 $order[0],
                 $order[1],
                 ($start === false ? '' : ('LIMIT '.$offset.' OFFSET '.$start))
