@@ -49,4 +49,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\Models\UserRole', 'user_roles_id');
     }
+
+    public function request()
+    {
+        return $this->hasMany('App\Models\UserRequest', 'id');
+    }
 }
