@@ -21,10 +21,13 @@ class UserRequest extends Model
      */
     public $timestamps = false;
 
+    /**
+     * @var array
+     */
     protected $fillable = ['id', 'users_id', 'request', 'hosthash', 'timestamp'];
 
     public function user()
     {
-        return $this->hasMany('App\Models\User', 'users_id');
+        return $this->belongsTo('App\Models\User', 'users_id');
     }
 }
