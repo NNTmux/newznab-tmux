@@ -1,4 +1,5 @@
 2017-09-21 DariusIII
+	* Chg: Update and fix RSS feed
 	* Chg: Add relationship between User and UserRequest models
 	* Chg: Possible fix for apiaccess limit problem
 	* Chg: Use new column name and update User <-> UserRole relation and use it

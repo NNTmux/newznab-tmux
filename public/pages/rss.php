@@ -13,7 +13,7 @@ $offset = 0;
 if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
     // User has to either be logged in, or using rsskey.
     if (! $page->users->isLoggedIn()) {
-        if (Settings::settingValue('..registerstatus') != Settings::REGISTER_STATUS_API_ONLY) {
+        if ((int) Settings::settingValue('..registerstatus') !== Settings::REGISTER_STATUS_API_ONLY) {
             Utility::showApiError(100);
         } else {
             header('Location: '.Settings::settingValue('site.main.code'));
@@ -40,11 +40,12 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
         $page->smarty->assign('anidb', 1);
     }
 
-    $page->smarty->assign([
-			'categorylist'       => $category->getCategories(true, $page->userdata['categoryexclusions']),
-			'parentcategorylist' => $category->getForMenu($page->userdata['categoryexclusions']),
-		]
-	);
+    $page->smarty->assign(
+        [
+            'categorylist'       => $category->getCategories(true, $page->userdata['categoryexclusions']),
+            'parentcategorylist' => $category->getForMenu($page->userdata['categoryexclusions']),
+        ]
+    );
 
     $page->content = $page->smarty->fetch('rssdesc.tpl');
     $page->render();
@@ -54,9 +55,9 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
     if ($page->users->isLoggedIn()) {
         $uid = $page->userdata['id'];
         $rssToken = $page->userdata['rsstoken'];
-        $maxRequests = $page->userdata['apirequests'];
+        $maxRequests = $page->userdata->role->apirequests;
     } else {
-        if (Settings::settingValue('..registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
+        if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
             $res = $page->users->getById(0);
         } else {
             if (! isset($_GET['i']) || ! isset($_GET['r'])) {
@@ -72,7 +73,7 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
 
         $uid = $res['id'];
         $rssToken = $res['rsstoken'];
-        $maxRequests = $res['apirequests'];
+        $maxRequests = $res->role->apirequests;
         $username = $res['username'];
 
         if ($page->users->isDisabled($username)) {
@@ -89,29 +90,29 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
     // Valid or logged in user, get them the requested feed.
     $userShow = $userAnidb = -1;
     if (isset($_GET['show'])) {
-        $userShow = ($_GET['show'] == 0 ? -1 : $_GET['show'] + 0);
+        $userShow = ((int) $_GET['show'] === 0 ? -1 : $_GET['show'] + 0);
     } elseif (isset($_GET['anidb'])) {
-        $userAnidb = ($_GET['anidb'] == 0 ? -1 : $_GET['anidb'] + 0);
+        $userAnidb = ((int) $_GET['anidb'] === 0 ? -1 : $_GET['anidb'] + 0);
     }
 
-    $outputXML = (isset($_GET['o']) && $_GET['o'] == 'json' ? false : true);
+    $outputXML = (! (isset($_GET['o']) && $_GET['o'] === 'json'));
 
-    $userCat = (isset($_GET['t']) ? ($_GET['t'] == 0 ? -1 : $_GET['t']) : -1);
+    $userCat = (isset($_GET['t']) ? ((int) $_GET['t'] === 0 ? -1 : $_GET['t']) : -1);
     $userNum = (isset($_GET['num']) && is_numeric($_GET['num']) ? abs($_GET['num']) : 100);
     $userAirDate = (isset($_GET['airdate']) && is_numeric($_GET['airdate']) ? abs($_GET['airdate']) : -1);
 
     $params =
-		[
-			'dl'       => (isset($_GET['dl']) && $_GET['dl'] == '1' ? '1' : '0'),
-			'del'      => (isset($_GET['del']) && $_GET['del'] == '1' ? '1' : '0'),
-			'extended' => 1,
-			'uid'      => $uid,
-			'token'    => $rssToken,
-		];
+        [
+            'dl'       => isset($_GET['dl']) && $_GET['dl'] === '1' ? '1' : '0',
+            'del'      => isset($_GET['del']) && $_GET['del'] === '1' ? '1' : '0',
+            'extended' => 1,
+            'uid'      => $uid,
+            'token'    => $rssToken,
+        ];
 
-    if ($userCat == -3) {
+    if ((int) $userCat === -3) {
         $relData = $rss->getShowsRss($userNum, $uid, $page->users->getCategoryExclusion($uid), $userAirDate);
-    } elseif ($userCat == -4) {
+    } elseif ((int) $userCat === -4) {
         $relData = $rss->getMyMoviesRss($userNum, $uid, $page->users->getCategoryExclusion($uid));
     } else {
         $relData = $rss->getRss(explode(',', $userCat), $userNum, $userShow, $userAnidb, $uid, $userAirDate);
