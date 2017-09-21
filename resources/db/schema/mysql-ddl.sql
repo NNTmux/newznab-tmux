@@ -1204,7 +1204,7 @@ CREATE TABLE users (
   style          VARCHAR(255)     NULL     DEFAULT NULL,
   rolechangedate DATETIME         NULL     DEFAULT NULL COMMENT 'When does the role expire',
   PRIMARY KEY (id),
-  INDEX ix_role (role)
+  INDEX ix_user_roles (user_roles_id)
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
