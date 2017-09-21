@@ -10,16 +10,16 @@ $uid = 0;
 // Page is accessible only by the rss token, or logged in users.
 if ($page->users->isLoggedIn()) {
     $uid = $page->users->currentUserId();
-    $maxDownloads = $page->userdata['downloadrequests'];
+    $maxDownloads = $page->userdata->role->downloadrequests;
     $rssToken = $page->userdata['rsstoken'];
     if ($page->users->isDisabled($page->userdata['username'])) {
         Utility::showApiError(101);
     }
 } else {
-    if (Settings::settingValue('..registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
+    if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
         $res = $page->users->getById(0);
     } else {
-        if ((! isset($_GET['i']) || ! isset($_GET['r']))) {
+        if (! isset($_GET['i']) || ! isset($_GET['r'])) {
             Utility::showApiError(200);
         }
 
@@ -30,7 +30,7 @@ if ($page->users->isLoggedIn()) {
     }
     $uid = $res['id'];
     $rssToken = $res['rsstoken'];
-    $maxDownloads = $res['downloadrequests'];
+    $maxDownloads = $res->role->downloadrequests;
     if ($page->users->isDisabled($res['username'])) {
         Utility::showApiError(101);
     }
@@ -44,7 +44,7 @@ if (isset($_GET['id'])) {
 // A hash of the users ip to record against the download
 //
 $hosthash = '';
-if (Settings::settingValue('..storeuserips') == 1) {
+if ((int) Settings::settingValue('..storeuserips') === 1) {
     $hosthash = $page->users->getHostHash($_SERVER['REMOTE_ADDR'], Settings::settingValue('..siteseed'));
 }
 
@@ -55,7 +55,7 @@ if ($requests > $maxDownloads) {
 }
 
 if (! isset($_GET['id'])) {
-    Utility::showApiError(200, 'parameter id is required');
+    Utility::showApiError(200, 'Parameter id is required');
 }
 
 // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
@@ -63,9 +63,9 @@ $_GET['id'] = str_ireplace('.nzb', '', $_GET['id']);
 
 $rel = new Releases(['Settings' => $page->settings]);
 // User requested a zip of guid,guid,guid releases.
-if (isset($_GET['zip']) && $_GET['zip'] == '1') {
+if (isset($_GET['zip']) && $_GET['zip'] === '1') {
     $guids = explode(',', $_GET['id']);
-    if ($requests['num'] + sizeof($guids) > $maxDownloads) {
+    if ($requests['num'] + count($guids) > $maxDownloads) {
         Utility::showApiError(501);
     }
 
@@ -76,7 +76,7 @@ if (isset($_GET['zip']) && $_GET['zip'] == '1') {
             $rel->updateGrab($guid);
             $page->users->addDownloadRequest($uid, $guid);
 
-            if (isset($_GET['del']) && $_GET['del'] == 1) {
+            if (isset($_GET['del']) && (int) $_GET['del'] === 1) {
                 $page->users->delCartByUserAndRelease($guid, $uid);
             }
         }
@@ -99,7 +99,7 @@ if ($relData) {
     $rel->updateGrab($_GET['id']);
     $page->users->addDownloadRequest($uid, $relData['id']);
     $page->users->incrementGrabs($uid);
-    if (isset($_GET['del']) && $_GET['del'] == 1) {
+    if (isset($_GET['del']) && (int) $_GET['del'] === 1) {
         $page->users->delCartByUserAndRelease($_GET['id'], $uid);
     }
 } else {
@@ -129,7 +129,7 @@ if (! empty($relData['imdbid']) && $relData['imdbid'] > 0) {
     header('X-DNZB-MoreInfo: http://www.thetvdb.com/?tab=series&id='.$relData['tvdb']);
 }
 header('X-DNZB-Name: '.$cleanName);
-if ($relData['nfostatus'] == 1) {
+if ((int)$relData['nfostatus'] === 1) {
     header('X-DNZB-NFO: '.$page->serverurl.'nfo/'.$_GET['id']);
 }
 header('X-DNZB-RCode: 200');
