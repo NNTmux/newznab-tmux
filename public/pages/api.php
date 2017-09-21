@@ -59,7 +59,7 @@ if ($page->users->isLoggedIn()) {
     $uid = $page->userdata['id'];
     $apiKey = $page->userdata['rsstoken'];
     $catExclusions = $page->userdata['categoryexclusions'];
-    $maxRequests = $page->userdata['apirequests'];
+    $maxRequests = $page->userdata->role->apirequests;
     if ($page->users->isDisabled($page->userdata['username'])) {
         Utility::showApiError(101);
     }

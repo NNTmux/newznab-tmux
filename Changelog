@@ -1,4 +1,5 @@
 2017-09-21 DariusIII
+	* Chg: Possible fix for apiaccess limit problem
 	* Chg: Use new column name and update User <-> UserRole relation and use it
 	* Chg: Update Users table, rename role to user_roles_id
 	* Chg: Update GamesInfo model and migration
