@@ -129,7 +129,7 @@ if (! empty($relData['imdbid']) && $relData['imdbid'] > 0) {
     header('X-DNZB-MoreInfo: http://www.thetvdb.com/?tab=series&id='.$relData['tvdb']);
 }
 header('X-DNZB-Name: '.$cleanName);
-if ((int)$relData['nfostatus'] === 1) {
+if ((int) $relData['nfostatus'] === 1) {
     header('X-DNZB-NFO: '.$page->serverurl.'nfo/'.$_GET['id']);
 }
 header('X-DNZB-RCode: 200');
