@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
-use App\Models\Group;
-use Carbon\Carbon;
 use nntmux\db\DB;
+use Carbon\Carbon;
+use App\Models\Group;
 
 class Groups
 {
@@ -98,7 +98,6 @@ class Groups
      *
      * @param $order
      * @return array|\Illuminate\Database\Eloquent\Collection|static[]
-     *
      */
     public function getActiveBackfill($order)
     {
@@ -259,8 +258,8 @@ class Groups
                 'last_updated' => Carbon::now(),
                 'active' => $group['active'],
                 'backfill' => $group['backfill'],
-                'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ?  null : $group['minsizetoformrelease'],
-                'minfilestoformrelease' => $group['minfilestoformrelease'] === '' ?  null : $group['minfilestoformrelease'],
+                'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ? null : $group['minsizetoformrelease'],
+                'minfilestoformrelease' => $group['minfilestoformrelease'] === '' ? null : $group['minfilestoformrelease'],
             ]
         );
     }
@@ -299,8 +298,8 @@ class Groups
                 'last_record' => $group['last_record'] ?? 0,
                 'active' => $group['active'] ?? 0,
                 'backfill' => $group['backfill'] ?? 0,
-                'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ?  null : $group['minsizetoformrelease'],
-                'minfilestoformrelease' => $group['minfilestoformrelease'] === '' ?  null : $group['minfilestoformrelease'],
+                'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ? null : $group['minsizetoformrelease'],
+                'minfilestoformrelease' => $group['minfilestoformrelease'] === '' ? null : $group['minfilestoformrelease'],
             ]
         );
     }
