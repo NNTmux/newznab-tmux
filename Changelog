@@ -1,4 +1,5 @@
 2017-09-22 DariusIII
+	* Chg: Remove unused scripts from misc/IRCScraper folder
 	* Chg: Update laravel/framework to version 5.5.11
 	* Chg: Update .scrutinizer.yml
 	* Chg: Add relation between User and UserDownload models
