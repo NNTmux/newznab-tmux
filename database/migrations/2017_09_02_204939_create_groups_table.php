@@ -29,7 +29,7 @@ class CreateGroupsTable extends Migration
             $table->primary('id');
             $table->index('active', 'ix_active');
             $table->unique('name', 'ix_groups_name');
-            DB::update('ALTER TABLE category_regexes AUTO_INCREMENT = 1000001');
+            DB::update('ALTER TABLE groups AUTO_INCREMENT = 1000001');
         });
     }
 
