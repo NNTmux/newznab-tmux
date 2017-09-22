@@ -1,4 +1,5 @@
 2017-09-22 DariusIII
+	* Chg: Update Group model and related migration
 	* Chg: Remove unused scripts from misc/IRCScraper folder
 	* Chg: Update laravel/framework to version 5.5.11
 	* Chg: Update .scrutinizer.yml
