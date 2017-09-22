@@ -1,3 +1,5 @@
+2017-09-22 DariusIII
+	* Chg: Add relation between User and UserDownload models
 2017-09-21 DariusIII
 	* Chg: Fix UserRequest model relationship
 	* Fix: Fix various errors related to bad type casting in Binaries class

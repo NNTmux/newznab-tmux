@@ -54,4 +54,9 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\UserRequest', 'id');
     }
+
+    public function download()
+    {
+        return $this->hasMany('App\Models\UserDownload', 'id');
+    }
 }

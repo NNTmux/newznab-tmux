@@ -20,4 +20,9 @@ class UserDownload extends Model
      * @var array
      */
     protected $fillable = ['id', 'users_id', 'releases_id', 'hosthash', 'timestamp'];
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User', 'users_id');
+    }
 }
