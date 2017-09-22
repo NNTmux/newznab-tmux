@@ -2,17 +2,19 @@
 
 namespace nntmux;
 
+use App\Models\Group;
+use Carbon\Carbon;
 use nntmux\db\DB;
 
 class Groups
 {
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
     /**
-     * @var ColorCLI
+     * @var \nntmux\ColorCLI
      */
     public $colorCLI;
 
@@ -71,18 +73,13 @@ class Groups
     /**
      * Get all properties of a single group by its ID.
      *
-     * @param $id
      *
-     * @return array|bool
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getByID($id)
     {
-        return $this->pdo->queryOneRow(
-            "
-			SELECT g.*
-			FROM groups g
-			WHERE g.id = {$id}"
-        );
+        return Group::query()->where('id', $id)->first();
     }
 
     /**
@@ -92,74 +89,53 @@ class Groups
      */
     public function getActive(): array
     {
-        return $this->pdo->query(
-            'SELECT g.* FROM groups g WHERE g.active = 1 ORDER BY g.name ASC',
-            true,
-            NN_CACHE_EXPIRY_SHORT
-        );
+        return Group::query()->where('active', '=', 1)->orderBy('name')->get();
     }
 
     /**
      * Get active backfill groups ordered by name ascending.
      *
-     * @param string $order The type of operation designating the order
      *
-     * @return array
+     * @param $order
+     * @return array|\Illuminate\Database\Eloquent\Collection|static[]
+     *
      */
-    public function getActiveBackfill($order): array
+    public function getActiveBackfill($order)
     {
         switch ($order) {
             case '':
             case 'normal':
-                $orderBy = 'g.name ASC';
+                return Group::query()->where('backfill', '=', 1)->where('last_record', '!=', 0)->orderBy('name')->get();
                 break;
             case 'date':
-                $orderBy = 'g.first_record_postdate DESC';
+                return Group::query()->where('backfill', '=', 1)->where('last_record', '!=', 0)->orderBy('first_record_postdate', 'DESC')->get();
                 break;
             default:
                 return [];
         }
-
-        return $this->pdo->query(
-            "SELECT g.* FROM groups g WHERE g.backfill = 1 AND g.last_record != 0 ORDER BY {$orderBy}",
-            true,
-            NN_CACHE_EXPIRY_SHORT
-        );
     }
 
     /**
      * Get all active group IDs.
      *
-     * @return array
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getActiveIDs(): array
+    public function getActiveIDs()
     {
-        return $this->pdo->query(
-            '
-			SELECT g.id
-			FROM groups g
-			WHERE g.active = 1
-			ORDER BY g.name ASC',
-            true,
-            NN_CACHE_EXPIRY_SHORT
-        );
+        return Group::query()->where('active', '=', 1)->orderBy('name')->get(['id']);
     }
 
     /**
      * Get all group columns by Name.
      *
-     * @param $grp
      *
-     * @return array|bool
+     * @param $grp
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getByName($grp)
     {
-        return $this->pdo->queryOneRow(
-            "
-			SELECT g.*
-			FROM groups g
-			WHERE g.name = {$this->pdo->escapeString($grp)}"
-        );
+        return Group::query()->where('name', $grp)->first();
     }
 
     /**
@@ -171,14 +147,9 @@ class Groups
      */
     public function getNameByID($id): string
     {
-        $res = $this->pdo->queryOneRow(
-            "
-			SELECT g.name
-			FROM groups g
-			WHERE g.id = {$id}"
-        );
+        $res = Group::query()->where('id', $id)->first(['name']);
 
-        return $res === false ? '' : $res['name'];
+        return $res->name ?? '';
     }
 
     /**
@@ -190,14 +161,9 @@ class Groups
      */
     public function getIDByName($name)
     {
-        $res = $this->pdo->queryOneRow(
-            "
-			SELECT g.id
-			FROM groups g
-			WHERE g.name = {$this->pdo->escapeString($name)}"
-        );
+        $res = Group::query()->where('name', $name)->first(['id']);
 
-        return $res === false ? '' : $res['id'];
+        return $res === false ? '' : $res->id;
     }
 
     /**
@@ -283,43 +249,19 @@ class Groups
      */
     public function update($group): bool
     {
-        $minFileString =
-            (
-            $group['minfilestoformrelease'] === ''
-                ? 'minfilestoformrelease = NULL,'
-                : sprintf(
-                ' minfilestoformrelease = %d,',
-                $this->formatNumberString($group['minfilestoformrelease'], false)
-            )
-            );
-
-        $minSizeString =
-            (
-            $group['minsizetoformrelease'] === ''
-                ? 'minsizetoformrelease = NULL'
-                : sprintf(
-                ' minsizetoformrelease = %d',
-                $this->formatNumberString($group['minsizetoformrelease'], false)
-            )
-            );
-
-        return $this->pdo->queryExec(
-            sprintf(
-                'UPDATE groups
-				SET name = %s, description = %s, backfill_target = %s, first_record = %s, last_record = %s,
-				last_updated = NOW(), active = %s, backfill = %s, %s %s
-				WHERE id = %d',
-                $this->pdo->escapeString(trim($group['name'])),
-                $this->pdo->escapeString(trim($group['description'])),
-                $this->formatNumberString($group['backfill_target']),
-                $this->formatNumberString($group['first_record']),
-                $this->formatNumberString($group['last_record']),
-                $this->formatNumberString($group['active']),
-                $this->formatNumberString($group['backfill']),
-                $minFileString,
-                $minSizeString,
-                $group['id']
-            )
+        return Group::query()->where('id', $group['id'])->update(
+            [
+                'name' => trim($group['name']),
+                'description' => trim($group['description']),
+                'backfill_target' => $group['backfill_target'],
+                'first_record' => $group['first_record'],
+                'last_record' => $group['last_record'],
+                'last_updated' => Carbon::now(),
+                'active' => $group['active'],
+                'backfill' => $group['backfill'],
+                'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ?  null : $group['minsizetoformrelease'],
+                'minfilestoformrelease' => $group['minfilestoformrelease'] === '' ?  null : $group['minfilestoformrelease'],
+            ]
         );
     }
 
@@ -348,37 +290,18 @@ class Groups
      */
     public function add($group): bool
     {
-        $minFileString =
-            (
-            $group['minfilestoformrelease'] === ''
-                ? 'NULL'
-                : sprintf('%d', $this->formatNumberString($group['minfilestoformrelease'], false))
-            );
-
-        $minSizeString =
-            (
-            $group['minsizetoformrelease'] === ''
-                ? 'NULL'
-                : sprintf('%d', $this->formatNumberString($group['minsizetoformrelease'], false))
-            );
-
-        return $this->pdo->queryInsert(
-            sprintf(
-                '
-				INSERT INTO groups
-					(name, description, backfill_target, first_record, last_record, last_updated,
-					active, backfill, minfilestoformrelease, minsizetoformrelease)
-				VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s)',
-                $this->pdo->escapeString(trim($group['name'])),
-                (isset($group['description']) ? $this->pdo->escapeString(trim($group['description'])) : "''"),
-                (isset($group['backfill_target']) ? $this->formatNumberString($group['backfill_target']) : '1'),
-                (isset($group['first_record']) ? $this->formatNumberString($group['first_record']) : '0'),
-                (isset($group['last_record']) ? $this->formatNumberString($group['last_record']) : '0'),
-                (isset($group['active']) ? $this->formatNumberString($group['active']) : '0'),
-                (isset($group['backfill']) ? $this->formatNumberString($group['backfill']) : '0'),
-                $minFileString,
-                $minSizeString
-            )
+        return Group::query()->insertGetId(
+            [
+                'name' => trim($group['name']),
+                'description' => isset($group['description']) ? trim($group['description']) : '',
+                'backfill_target' => $group['backfill_target'] ?? 1,
+                'first_record' => $group['first_record'] ?? 0,
+                'last_record' => $group['last_record'] ?? 0,
+                'active' => $group['active'] ?? 0,
+                'backfill' => $group['backfill'] ?? 0,
+                'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ?  null : $group['minsizetoformrelease'],
+                'minfilestoformrelease' => $group['minfilestoformrelease'] === '' ?  null : $group['minfilestoformrelease'],
+            ]
         );
     }
 
@@ -393,8 +316,8 @@ class Groups
     protected function formatNumberString($setting, $escape = true)
     {
         $setting = trim($setting);
-        if ($setting === '0' || ! is_numeric($setting)) {
-            $setting = '0';
+        if ($setting === 0 || ! is_numeric($setting)) {
+            $setting = 0;
         }
 
         return $escape ? $this->pdo->escapeString($setting) : (int) $setting;
@@ -408,16 +331,11 @@ class Groups
      * @return bool
      * @throws \Exception
      */
-    public function delete($id)
+    public function delete($id): bool
     {
         $this->purge($id);
 
-        return $this->pdo->queryExec(
-            "
-			DELETE g
-			FROM groups g
-			WHERE g.id = {$id}"
-        );
+        return Group::query()->where('id', $id)->delete();
     }
 
     /**
@@ -448,12 +366,16 @@ class Groups
         }
 
         // Reset the group stats.
-        return $this->pdo->queryExec(
-            "
-			UPDATE groups
-			SET backfill_target = 1, first_record = 0, first_record_postdate = NULL, last_record = 0,
-				last_record_postdate = NULL, last_updated = NULL
-			WHERE id = {$id}"
+        return Group::query()->where('id', $id)->update(
+            [
+                'backfill_target' => 1,
+                'first_record' => 0,
+                'first_record_postdate' => null,
+                'last_record' => 0,
+                'člast_record_postdate' => null,
+                'last_updated' => null,
+                'active' => 0,
+            ]
         );
     }
 
@@ -479,11 +401,17 @@ class Groups
         }
 
         // Reset the group stats.
-        return $this->pdo->queryExec(
-            '
-			UPDATE groups
-			SET backfill_target = 1, first_record = 0, first_record_postdate = NULL,
-				last_record = 0, last_record_postdate = NULL, last_updated = NULL, active = 0'
+
+        return Group::query()->update(
+            [
+            'backfill_target' => 1,
+            'first_record' => 0,
+            'first_record_postdate' => null,
+            'last_record' => 0,
+            'člast_record_postdate' => null,
+            'last_updated' => null,
+            'active' => 0,
+        ]
         );
     }
 
