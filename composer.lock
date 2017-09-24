@@ -139,7 +139,7 @@
                 }
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
-            "time": "2017-08-27T15:14:06+00:00"
+            "time": "2017-08-27 15:14:06"
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -1293,16 +1293,16 @@
         },
         {
             "name": "bower-asset/select2",
-            "version": "4.0.3",
+            "version": "4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/select2/select2.git",
-                "reference": "566c7846fbf8c3b7674346f26d0ee872c0a77629"
+                "reference": "16f6b10628f9000918708cef9b3da615119cf6d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/select2/select2/zipball/566c7846fbf8c3b7674346f26d0ee872c0a77629",
-                "reference": "566c7846fbf8c3b7674346f26d0ee872c0a77629",
+                "url": "https://api.github.com/repos/select2/select2/zipball/16f6b10628f9000918708cef9b3da615119cf6d6",
+                "reference": "16f6b10628f9000918708cef9b3da615119cf6d6",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -1312,7 +1312,11 @@
                     "src/scss/core.scss"
                 ]
             },
-            "description": "Select2 is a jQuery based replacement for select boxes. It supports searching, remote data sets, and infinite scrolling of results."
+            "license": [
+                "MIT"
+            ],
+            "description": "Select2 is a jQuery based replacement for select boxes. It supports searching, remote data sets, and infinite scrolling of results.",
+            "time": "2017-09-24T16:09:35+00:00"
         },
         {
             "name": "bower-asset/slimscroll",
@@ -1469,7 +1473,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-05-29T12:05:57+00:00"
+            "time": "2017-05-29 12:05:57"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -2348,7 +2352,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2016-05-04T01:31:56+00:00"
+            "time": "2016-05-04 01:31:56"
         },
         {
             "name": "kbjr/Git.php",
@@ -2374,7 +2378,7 @@
                 "source": "https://github.com/kbjr/Git.php/tree/master",
                 "issues": "https://github.com/kbjr/Git.php/issues"
             },
-            "time": "2015-03-31T14:10:29+00:00"
+            "time": "2015-03-31 14:10:29"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
@@ -2456,16 +2460,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.5.11",
+            "version": "v5.5.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "56f1ffd0880255e9ebbf0dbf47024cc5c2941c7a"
+                "reference": "bfbe20d32ee9f98c89df852847827407a5127be4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/56f1ffd0880255e9ebbf0dbf47024cc5c2941c7a",
-                "reference": "56f1ffd0880255e9ebbf0dbf47024cc5c2941c7a",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/bfbe20d32ee9f98c89df852847827407a5127be4",
+                "reference": "bfbe20d32ee9f98c89df852847827407a5127be4",
                 "shasum": ""
             },
             "require": {
@@ -2584,7 +2588,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2017-09-21T18:59:13+00:00"
+            "time": "2017-09-24T19:09:38+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -3470,16 +3474,16 @@
         },
         {
             "name": "ramsey/uuid",
-            "version": "3.7.0",
+            "version": "3.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/uuid.git",
-                "reference": "0ef23d1b10cf1bc576e9d865a7e9c47982c5715e"
+                "reference": "45cffe822057a09e05f7bd09ec5fb88eeecd2334"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/uuid/zipball/0ef23d1b10cf1bc576e9d865a7e9c47982c5715e",
-                "reference": "0ef23d1b10cf1bc576e9d865a7e9c47982c5715e",
+                "url": "https://api.github.com/repos/ramsey/uuid/zipball/45cffe822057a09e05f7bd09ec5fb88eeecd2334",
+                "reference": "45cffe822057a09e05f7bd09ec5fb88eeecd2334",
                 "shasum": ""
             },
             "require": {
@@ -3548,7 +3552,7 @@
                 "identifier",
                 "uuid"
             ],
-            "time": "2017-08-04T13:39:04+00:00"
+            "time": "2017-09-22T20:46:04+00:00"
         },
         {
             "name": "roave/security-advisories",
@@ -5751,16 +5755,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "6.3.0",
+            "version": "6.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "9501bab711403a1ab5b8378a8adb4ec3db3debdb"
+                "reference": "c0ff817b36a827e64bf5f57bc72278150cf30a77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/9501bab711403a1ab5b8378a8adb4ec3db3debdb",
-                "reference": "9501bab711403a1ab5b8378a8adb4ec3db3debdb",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c0ff817b36a827e64bf5f57bc72278150cf30a77",
+                "reference": "c0ff817b36a827e64bf5f57bc72278150cf30a77",
                 "shasum": ""
             },
             "require": {
@@ -5831,7 +5835,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-08-04T05:20:39+00:00"
+            "time": "2017-09-24T07:25:54+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",

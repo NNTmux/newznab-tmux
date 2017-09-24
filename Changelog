@@ -1,3 +1,5 @@
+2017-09-24 DariusIII
+	* Chg: Update laravel/framework, phpunit, uuid to latest versions
 2017-09-23 DariusIII
 	* Chg: Use Group model in Groups class
 2017-09-22 DariusIII
