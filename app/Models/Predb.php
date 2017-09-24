@@ -24,6 +24,6 @@ class Predb extends Model
         'nukereason',
         'files',
         'filename',
-        'searched'
+        'searched',
     ];
 }
