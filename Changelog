@@ -1,3 +1,5 @@
+2017-09-26 DariusIII
+	* Fix: Use proper check in getGroupsForSelect function
 2017-09-25 DariusIII
 	* Fix: Add missing status to collection regex edit page that prevented proper adding of regexes
 	* Chg: Update NZB  class

@@ -61,7 +61,7 @@ class Groups
 
         $temp_array[-1] = '--Please Select--';
 
-        if (is_array($groups)) {
+        if (is_object($groups)) {
             foreach ($groups as $group) {
                 $temp_array[$group['name']] = $group['name'];
             }
