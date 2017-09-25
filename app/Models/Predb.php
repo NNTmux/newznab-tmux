@@ -40,4 +40,9 @@ class Predb extends Model
         'filename',
         'searched',
     ];
+
+    public function hash()
+    {
+        return $this->hasMany('App\Models\PredbHash', 'predb_id');
+    }
 }

@@ -14,8 +14,8 @@ class CreatePredbHashesTable extends Migration
     public function up()
     {
         Schema::create('predb_hashes', function (Blueprint $table) {
-            $table->increments('id');
-            $table->timestamps();
+            $table->unsignedInteger('predb_id');
+            $table->binary('hash')->primary();
         });
     }
 
