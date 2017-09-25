@@ -45,10 +45,12 @@ if (isset($_GET['id'])) {
     $reAudio = $re->getAudio($data['id']);
     $reSubs = $re->getSubs($data['id']);
     $comments = $rc->getCommentsByGid($data['gid']);
-    $similars = $releases->searchSimilar($data['id'],
-		$data['searchname'],
-		6,
-		$page->userdata['categoryexclusions']);
+    $similars = $releases->searchSimilar(
+        $data['id'],
+        $data['searchname'],
+        6,
+        $page->userdata['categoryexclusions']
+    );
     $failed = $df->getFailedCount($data['id']);
 
     $showInfo = '';
@@ -69,11 +71,11 @@ if (isset($_GET['id'])) {
                 $trailer = empty($mov['trailer']) || $mov['trailer'] === '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer'];
                 if ($trailer) {
                     $mov['trailer'] = sprintf(
-						'<iframe width=\"%d\" height=\"%d\" src=\"%s\"></iframe>',
-						Settings::settingValue('site.trailers.trailers_size_x'),
-						Settings::settingValue('site.trailers.trailers_size_y'),
-						$trailer
-					);
+                        '<iframe width=\"%d\" height=\"%d\" src=\"%s\"></iframe>',
+                        Settings::settingValue('site.trailers.trailers_size_x'),
+                        Settings::settingValue('site.trailers.trailers_size_y'),
+                        $trailer
+                    );
                 }
             }
         }
@@ -128,8 +130,8 @@ if (isset($_GET['id'])) {
         $AniDBAPIArray = $AniDB->getAnimeInfo($data['anidbid']);
     }
 
-    $prehash = new PreDb();
-    $pre = $prehash->getForRelease($data['predb_id']);
+    $preDb = new PreDb();
+    $pre = $preDb->getForRelease($data['predb_id']);
 
     $rf = new ReleaseFiles;
     $releasefiles = $rf->get($data['id']);

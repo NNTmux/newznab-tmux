@@ -1,4 +1,5 @@
 2017-09-25 DariusIII
+	* Chg: Use Predb model in Predb, move parseTitles function into NameFixer
 	* Chg: Fix return type of getActive function
 2017-09-24 DariusIII
 	* Chg: Update laravel/framework, phpunit, uuid to latest versions

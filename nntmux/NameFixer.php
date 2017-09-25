@@ -1286,6 +1286,76 @@ class NameFixer
     }
 
     /**
+     * Matches the hashes within the predb table to release files and subjects (names) which are hashed.
+     *
+     * @param $time
+     * @param $echo
+     * @param $cats
+     * @param $namestatus
+     * @param $show
+     *
+     * @return int
+     * @throws \Exception
+     */
+    public function parseTitles($time, $echo, $cats, $namestatus, $show): int
+    {
+        $updated = $checked = 0;
+
+        $tq = '';
+        if ($time === 1) {
+            $tq = 'AND r.adddate > (NOW() - INTERVAL 3 HOUR) ORDER BY rf.releases_id, rf.size DESC';
+        }
+        $ct = '';
+        if ($cats === 1) {
+            $ct = sprintf('AND r.categories_id IN (%s)', $this->othercats);
+        }
+
+        if ($this->echooutput) {
+            $te = '';
+            if ($time === 1) {
+                $te = ' in the past 3 hours';
+            }
+            echo ColorCLI::header('Fixing search names'.$te.' using the predb hash.');
+        }
+        $regex = 'AND (r.ishashed = 1 OR rf.ishashed = 1)';
+
+        if ($cats === 3) {
+            $query = sprintf('SELECT r.id AS releases_id, r.name, r.searchname, r.categories_id, r.groups_id, '
+                .'dehashstatus, rf.name AS filename FROM releases r '
+                .'LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id '
+                .'WHERE nzbstatus = 1 AND dehashstatus BETWEEN -6 AND 0 AND predb_id = 0 %s', $regex);
+        } else {
+            $query = sprintf('SELECT r.id AS releases_id, r.name, r.searchname, r.categories_id, r.groups_id, '
+                .'dehashstatus, rf.name AS filename FROM releases r '
+                .'LEFT OUTER JOIN release_files rf ON r.id = rf.releases_id '
+                .'WHERE nzbstatus = 1 AND isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
+        }
+
+        $res = $this->pdo->queryDirect($query);
+        $total = $res->rowCount();
+        echo ColorCLI::primary(number_format($total).' releases to process.');
+        if ($res instanceof \Traversable) {
+            foreach ($res as $row) {
+                if (preg_match('/[a-fA-F0-9]{32,40}/i', $row['name'], $matches)) {
+                    $updated += $this->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                } elseif (preg_match('/[a-fA-F0-9]{32,40}/i', $row['filename'], $matches)) {
+                    $updated += $this->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                }
+                if ($show === 2) {
+                    ColorCLI::overWritePrimary('Renamed Releases: ['.number_format($updated).'] '.$this->consoletools->percentString($checked++, $total));
+                }
+            }
+        }
+        if ($echo === 1) {
+            echo ColorCLI::header(PHP_EOL.$updated.' releases have had their names changed out of: '.number_format($checked).' files.');
+        } else {
+            echo ColorCLI::header(PHP_EOL.$updated.' releases could have their names changed. '.number_format($checked).' files were checked.');
+        }
+
+        return $updated;
+    }
+
+    /**
      * Check the array using regex for a clean name.
      *
      * @param         $release
