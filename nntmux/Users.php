@@ -2,7 +2,6 @@
 
 namespace nntmux;
 
-use App\Models\UsersRelease;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
@@ -11,6 +10,7 @@ use App\Models\UserRole;
 use App\Models\UserRequest;
 use nntmux\utility\Utility;
 use App\Models\UserDownload;
+use App\Models\UsersRelease;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 
