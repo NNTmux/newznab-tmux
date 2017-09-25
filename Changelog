@@ -1,4 +1,5 @@
 2017-09-25 DariusIII
+	* Chg: Update relation between User and UsersRelease models
 	* Chg: Use UsersReleases model in Users class
 	* Chg: Update UsersRelease model and related migration
 	* Chg: Update Predb and PredbHash models and migration

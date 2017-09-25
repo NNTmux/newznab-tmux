@@ -12,4 +12,9 @@ class UsersRelease extends Model
     protected $dateFormat = false;
 
     protected $guarded = ['id'];
+
+    public function user()
+    {
+        return $this->belongsTo('\App\Models\User', 'users_id');
+    }
 }
