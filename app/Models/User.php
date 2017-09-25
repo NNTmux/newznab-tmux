@@ -52,11 +52,11 @@ class User extends Authenticatable
 
     public function request()
     {
-        return $this->hasMany('App\Models\UserRequest', 'id');
+        return $this->hasMany('App\Models\UserRequest', 'users_id');
     }
 
     public function download()
     {
-        return $this->hasMany('App\Models\UserDownload', 'id');
+        return $this->hasMany('App\Models\UserDownload', 'users_id');
     }
 }
