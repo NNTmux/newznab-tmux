@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Predb as PredbModel;
 use nntmux\db\DB;
+use App\Models\Predb as PredbModel;
 
 /**
  * Class for inserting names/categories etc from PreDB sources into the DB,
