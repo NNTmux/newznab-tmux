@@ -15,7 +15,11 @@ class CreateUsersReleasesTable extends Migration
     {
         Schema::create('users_releases', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamps();
+            $table->integer('users_id');
+            $table->integer('releases_id');
+            $table->dateTime('createddate');
+            $table->dateTime('updateddate');
+            $table->unique(['users_id', 'releases_id'], 'ix_usercart_userrelease');
         });
     }
 

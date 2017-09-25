@@ -1,4 +1,5 @@
 2017-09-25 DariusIII
+	* Chg: Update UsersRelease model and related migration
 	* Chg: Update Predb and PredbHash models and migration
 	* Chg: Update Predb model with proper table name
 	* Chg: Use Predb model in Predb, move parseTitles function into NameFixer
