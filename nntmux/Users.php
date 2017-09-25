@@ -966,7 +966,7 @@ class Users
             }
         }
 
-        return UsersRelease::query()->whereIn('releases_id', implode(',', $del))->where('users_id', $userID)->delete();
+        return UsersRelease::query()->whereIn('releases_id', $del)->where('users_id', $userID)->delete();
     }
 
     /**
