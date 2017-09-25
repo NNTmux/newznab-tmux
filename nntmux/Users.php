@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\UsersRelease;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
@@ -157,7 +158,7 @@ class Users
      */
     public function delCartForUser($uid): void
     {
-        $this->pdo->queryExec(sprintf('DELETE FROM users_releases WHERE users_id = %d', $uid));
+        UsersRelease::query()->where('users_id', $uid)->delete();
     }
 
     /**
@@ -918,14 +919,17 @@ class Users
     /**
      * @param $uid
      * @param $releaseid
-     *
-     * @return false|int|string
+     * @return int
      */
-    public function addCart($uid, $releaseid)
+    public function addCart($uid, $releaseid): int
     {
-        $sql = sprintf('INSERT INTO users_releases (users_id, releases_id, createddate) VALUES (%d, %d, now())', $uid, $releaseid);
-
-        return $this->pdo->queryInsert($sql);
+        return UsersRelease::query()->insertGetId(
+            [
+                'users_id' => $uid,
+                'releases_id' => $releaseid,
+                'createddate' => Carbon::now(),
+            ]
+        );
     }
 
     /**
@@ -944,12 +948,11 @@ class Users
     }
 
     /**
-     * @param array $guids
+     * @param $guids
      * @param $userID
-     *
-     * @return bool
+     * @return bool|mixed
      */
-    public function delCartByGuid($guids, $userID): bool
+    public function delCartByGuid($guids, $userID)
     {
         if (! is_array($guids)) {
             return false;
@@ -963,13 +966,7 @@ class Users
             }
         }
 
-        return (bool) $this->pdo->queryExec(
-            sprintf(
-                'DELETE FROM users_releases WHERE releases_id IN (%s) AND users_id = %d',
-                implode(',', $del),
-                $userID
-            )
-        );
+        return UsersRelease::query()->whereIn('releases_id', implode(',', $del))->where('users_id', $userID)->delete();
     }
 
     /**
@@ -980,7 +977,7 @@ class Users
     {
         $rel = $this->pdo->queryOneRow(sprintf('SELECT id FROM releases WHERE guid = %s', $this->pdo->escapeString($guid)));
         if ($rel) {
-            $this->pdo->queryExec(sprintf('DELETE FROM users_releases WHERE users_id = %d AND releases_id = %d', $uid, $rel['id']));
+            UsersRelease::query()->where(['users_id' => $uid, 'releases_id' => $rel['id']])->delete();
         }
     }
 
@@ -989,7 +986,7 @@ class Users
      */
     public function delCartForRelease($rid): void
     {
-        $this->pdo->queryExec(sprintf('DELETE FROM users_releases WHERE releases_id = %d', $rid));
+        UsersRelease::query()->where('releases_id', $rid)->delete();
     }
 
     /**
