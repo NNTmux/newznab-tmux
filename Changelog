@@ -1,3 +1,5 @@
+2017-09-25 DariusIII
+	* Chg: Fix return type of getActive function
 2017-09-24 DariusIII
 	* Chg: Update laravel/framework, phpunit, uuid to latest versions
 2017-09-23 DariusIII

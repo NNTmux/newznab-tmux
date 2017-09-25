@@ -83,11 +83,9 @@ class Groups
     }
 
     /**
-     * Get all properties of all groups ordered by name ascending.
-     *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getActive(): array
+    public function getActive()
     {
         return Group::query()->where('active', '=', 1)->orderBy('name')->get();
     }
