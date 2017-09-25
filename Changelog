@@ -1,4 +1,5 @@
 2017-09-25 DariusIII
+	* Fix: Add missing status to collection regex edit page that prevented proper adding of regexes
 	* Chg: Update NZB  class
 	* Chg: Update relation between User and UsersRelease models
 	* Chg: Use UsersReleases model in Users class
