@@ -34,4 +34,9 @@ class Group extends Model
         'backfill',
         'description',
     ];
+
+    public function release()
+    {
+        return $this->hasMany('App\Models\Release', 'groups_id');
+    }
 }

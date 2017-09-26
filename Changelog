@@ -1,4 +1,5 @@
 2017-09-26 DariusIII
+	* Chg: Add Release model and migration, add starter relations to Release and Group models
 	* Chg: Fix collection regex deletion
 	* Fix: Fix collection regexes testing error
 	* Fix: Use proper check in getGroupsForSelect function
