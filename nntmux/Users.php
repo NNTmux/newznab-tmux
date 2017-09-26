@@ -295,7 +295,7 @@ class Users
      */
     public function getCount($role = '')
     {
-        $res = $this->pdo->queryOneRow(sprintf("SELECT COUNT(id) as num FROM users WHERE email != 'sharing@nZEDb.com' %s", $role !== '' ? sprintf('AND role = %d', $role) : ''));
+        $res = $this->pdo->queryOneRow(sprintf("SELECT COUNT(id) as num FROM users WHERE email != 'sharing@nZEDb.com' %s", $role !== '' ? sprintf('AND users_role_id = %d', $role) : ''));
 
         return $res['num'];
     }
