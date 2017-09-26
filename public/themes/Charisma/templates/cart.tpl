@@ -41,16 +41,16 @@
 							{foreach $results as $result}
 								<tr class="{cycle values=",alt"}">
 									<td class="check">
-										<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="square"
-											   value="{$result.guid}"/>
+										<input id="chk{$result->release->guid|substr:0:7}" type="checkbox" class="square"
+											   value="{$result->release->guid}"/>
 									</td>
 									<td>
 										<a title="View details"
-										   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
+										   href="{$smarty.const.WWW_TOP}/details/{$result->release->guid}">{$result->release->searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 									</td>
 									<td class="less"
 										title="Added on {$result.createddate}">{$result.createddate|date_format}</td>
-									<td><a title="Delete from your cart" href="?delete={$result.guid}"
+									<td><a title="Delete from your cart" href="?delete={$result->release->guid}"
 										   class="btn btn-danger btn-sm" style="padding-bottom:2px;">Delete</a></td>
 								</tr>
 							{/foreach}

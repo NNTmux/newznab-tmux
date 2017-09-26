@@ -214,11 +214,19 @@
 															</tr>
 															{foreach $downloadlist as $download}
 																{if $download@iteration == 10}
-																	<tr class="more"><td colspan="3"><a onclick="$('tr.extra').toggle();$('tr.more').toggle();return false;" href="#">show all...</a></td></tr>
+																	<tr class="more">
+																		<td colspan="3"><a
+																					onclick="$('tr.extra').toggle();$('tr.more').toggle();return false;"
+																					href="#">show all...</a></td>
+																	</tr>
 																{/if}
-																<tr {if $download@iteration >= 10}class="extra" style="display:none;"{/if}>
-																	<td width="80" title="{$download.timestamp}">{$download.timestamp|date_format}</td>
-																	<td>{if $download.guid == ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download.guid}">{$download.searchname}</a>{/if}</td>
+																<tr {if $download@iteration >= 10}class="extra"
+																	style="display:none;"{/if}>
+																	<td width="80"
+																		title="{$download.timestamp}">{$download.timestamp|date_format}</td>
+																	<td>{if $download->release->guid == ""}n/a{else}<a
+																			href="{$smarty.const.WWW_TOP}/details/{$download->release->guid}">{$download->release->searchname}</a>{/if}
+																	</td>
 																</tr>
 															{/foreach}
 														</table>

@@ -17,4 +17,9 @@ class UsersRelease extends Model
     {
         return $this->belongsTo('\App\Models\User', 'users_id');
     }
+
+    public function release()
+    {
+        return $this->belongsTo('App\Models\Release', 'id');
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Release;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
@@ -933,18 +934,12 @@ class Users
     }
 
     /**
-     * @param        $uid
-     * @param int|string $releaseId
-     *
-     * @return array
+     * @param $uid
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getCart($uid, $releaseId = ''): array
+    public function getCart($uid)
     {
-        if ($releaseId !== '') {
-            $releaseId = ' AND releases.id = '.$releaseId;
-        }
-
-        return $this->pdo->query(sprintf('SELECT users_releases.*, releases.searchname,releases.guid FROM users_releases INNER JOIN releases on releases.id = users_releases.releases_id WHERE users_id = %d %s', $uid, $releaseId));
+        return UsersRelease::query()->with('release')->where(['users_id' => $uid])->get();
     }
 
     /**
@@ -960,8 +955,8 @@ class Users
 
         $del = [];
         foreach ($guids as $guid) {
-            $rel = $this->pdo->queryOneRow(sprintf('SELECT id FROM releases WHERE guid = %s', $this->pdo->escapeString($guid)));
-            if ($rel) {
+            $rel = Release::query()->where('guid', $guid)->first(['id']);
+            if ($rel !== null) {
                 $del[] = $rel['id'];
             }
         }
@@ -975,7 +970,7 @@ class Users
      */
     public function delCartByUserAndRelease($guid, $uid): void
     {
-        $rel = $this->pdo->queryOneRow(sprintf('SELECT id FROM releases WHERE guid = %s', $this->pdo->escapeString($guid)));
+        $rel = Release::query()->where('guid', $guid)->first(['id']);
         if ($rel) {
             UsersRelease::query()->where(['users_id' => $uid, 'releases_id' => $rel['id']])->delete();
         }
@@ -1430,21 +1425,11 @@ class Users
 
     /**
      * @param $userID
-     *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getDownloadRequestsForUser($userID): array
+    public function getDownloadRequestsForUser($userID)
     {
-        return $this->pdo->query(
-            sprintf(
-            'SELECT u.*, r.guid, r.searchname FROM user_downloads u
-										  LEFT OUTER JOIN releases r ON r.id = u.releases_id
-										  WHERE u.users_id = %d
-										  ORDER BY u.timestamp
-										  DESC',
-                                            $userID
-                                        )
-                                    );
+        return UserDownload::query()->where('users_id', $userID)->with('release')->orderBy('timestamp', 'DESC')->get();
     }
 
     /**
