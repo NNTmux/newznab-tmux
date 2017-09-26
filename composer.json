@@ -124,6 +124,7 @@
     "bower-asset/tinymce-builded": "~4.4.3",
     "dariusiii/rarinfo": "^2.5",
     "dborsatto/php-giantbomb": "dev-master",
+    "doctrine/dbal": "^2.6",
     "exeu/apai-io": "~2.0",
     "fideloper/proxy": "^3.3",
     "fxp/composer-asset-plugin": "~1.1",
