@@ -160,7 +160,7 @@ class Groups
     {
         $res = Group::query()->where('name', $name)->first(['id']);
 
-        return $res === false ? '' : $res->id;
+        return $res === null ? '' : $res->id;
     }
 
     /**
