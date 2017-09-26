@@ -33,7 +33,7 @@
             <tr>
                 <td><label for="role">Role:</label></td>
                 <td>
-                    {html_radios id="role" name='role' values=$role_ids output=$role_names selected=$user->role separator='<br />'}
+                    {html_radios id="role" name="role" values=$role_ids output=$role_names selected=$user->role->id separator="<br />"}
                 </td>
             </tr>
             {if !empty($user.id)}
