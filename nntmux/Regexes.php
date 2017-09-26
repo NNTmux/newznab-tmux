@@ -33,13 +33,14 @@ class Regexes
 
     /**
      * @param array $options
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Settings' => null,
-			'Table_Name' => '',
-		];
+            'Settings' => null,
+            'Table_Name' => '',
+        ];
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
@@ -56,18 +57,18 @@ class Regexes
     public function addRegex(array $data): bool
     {
         return (bool) $this->pdo->queryInsert(
-			sprintf(
-				'INSERT INTO %s (group_regex, regex, status, description, ordinal%s) VALUES (%s, %s, %d, %s, %d%s)',
-				$this->tableName,
-				($this->tableName === 'category_regexes' ? ', categories_id' : ''),
-				trim($this->pdo->escapeString($data['group_regex'])),
-				trim($this->pdo->escapeString($data['regex'])),
-				$data['status'],
-				trim($this->pdo->escapeString($data['description'])),
-				$data['ordinal'],
-				($this->tableName === 'category_regexes' ? (', '.$data['categories_id']) : '')
-			)
-		);
+            sprintf(
+                'INSERT INTO %s (group_regex, regex, status, description, ordinal%s) VALUES (%s, %s, %d, %s, %d%s)',
+                $this->tableName,
+                ($this->tableName === 'category_regexes' ? ', categories_id' : ''),
+                trim($this->pdo->escapeString($data['group_regex'])),
+                trim($this->pdo->escapeString($data['regex'])),
+                $data['status'],
+                trim($this->pdo->escapeString($data['description'])),
+                $data['ordinal'],
+                ($this->tableName === 'category_regexes' ? (', '.$data['categories_id']) : '')
+            )
+        );
     }
 
     /**
@@ -80,20 +81,20 @@ class Regexes
     public function updateRegex(array $data): bool
     {
         return (bool) $this->pdo->queryExec(
-			sprintf(
-				'UPDATE %s
+            sprintf(
+                'UPDATE %s
 				SET group_regex = %s, regex = %s, status = %d, description = %s, ordinal = %d %s
 				WHERE id = %d',
-				$this->tableName,
-				trim($this->pdo->escapeString($data['group_regex'])),
-				trim($this->pdo->escapeString($data['regex'])),
-				$data['status'],
-				trim($this->pdo->escapeString($data['description'])),
-				$data['ordinal'],
-				($this->tableName === 'category_regexes' ? (', categories_id = '.$data['categories_id']) : ''),
-				$data['id']
-			)
-		);
+                $this->tableName,
+                trim($this->pdo->escapeString($data['group_regex'])),
+                trim($this->pdo->escapeString($data['regex'])),
+                $data['status'],
+                trim($this->pdo->escapeString($data['description'])),
+                $data['ordinal'],
+                ($this->tableName === 'category_regexes' ? (', categories_id = '.$data['categories_id']) : ''),
+                $data['id']
+            )
+        );
     }
 
     /**
@@ -120,13 +121,13 @@ class Regexes
     public function getRegex($group_regex = '', $limit = 0, $offset = 0): array
     {
         return $this->pdo->query(
-			sprintf(
-				'SELECT * FROM %s %s ORDER BY id %s',
-				$this->tableName,
-				$this->_groupQueryString($group_regex),
-				($limit ? ('LIMIT '.$limit.' OFFSET '.$offset) : '')
-			)
-		);
+            sprintf(
+                'SELECT * FROM %s %s ORDER BY id %s',
+                $this->tableName,
+                $this->_groupQueryString($group_regex),
+                ($limit ? ('LIMIT '.$limit.' OFFSET '.$offset) : '')
+            )
+        );
     }
 
     /**
@@ -139,12 +140,12 @@ class Regexes
     public function getCount($group_regex = ''): int
     {
         $query = $this->pdo->queryOneRow(
-			sprintf(
-				'SELECT COUNT(id) AS count FROM %s %s',
-				$this->tableName,
-				$this->_groupQueryString($group_regex)
-			)
-		);
+            sprintf(
+                'SELECT COUNT(id) AS count FROM %s %s',
+                $this->tableName,
+                $this->_groupQueryString($group_regex)
+            )
+        );
 
         return (int) $query['count'];
     }
@@ -182,15 +183,16 @@ class Regexes
         $tableNames = $groups->getCBPTableNames($groupID);
 
         $rows = $this->pdo->query(
-			sprintf(
-				'SELECT
+            sprintf(
+                'SELECT
 					b.name, b.totalparts, b.currentparts, HEX(b.binaryhash) AS binaryhash,
 					c.fromname, c.collectionhash
 				FROM %s b
 				INNER JOIN %s c ON c.id = b.collections_id',
-				$tableNames['bname'], $tableNames['cname']
-			)
-		);
+                $tableNames['bname'],
+                $tableNames['cname']
+            )
+        );
 
         $data = [];
         if ($rows) {
@@ -212,13 +214,13 @@ class Regexes
                     }
                     $newCollectionHash = sha1($string.$row['fromname'].$groupID.$files);
                     $data['New hash: '.$newCollectionHash.$string2][$row['binaryhash']] = [
-						'new_collection_hash' => $newCollectionHash,
-						'file_name'           => $row['name'],
-						'file_total_parts'    => $row['totalparts'],
-						'file_current_parts'  => $row['currentparts'],
-						'collection_poster'   => $row['fromname'],
-						'old_collection_hash' => $row['collectionhash'],
-					];
+                        'new_collection_hash' => $newCollectionHash,
+                        'file_name'           => $row['name'],
+                        'file_total_parts'    => $row['totalparts'],
+                        'file_current_parts'  => $row['currentparts'],
+                        'collection_poster'   => $row['fromname'],
+                        'old_collection_hash' => $row['collectionhash'],
+                    ];
 
                     if ($limit > 0) {
                         if (count($hashes) > $limit) {
@@ -254,12 +256,12 @@ class Regexes
         }
 
         $rows = $this->pdo->query(
-			sprintf(
-				'SELECT name, searchname, id FROM releases WHERE groups_id = %d %s',
-				$groupID,
-				(int) $queryLimit === 0 ? '' : sprintf('LIMIT %d', $queryLimit)
-			)
-		);
+            sprintf(
+                'SELECT name, searchname, id FROM releases WHERE groups_id = %d %s',
+                $groupID,
+                (int) $queryLimit === 0 ? '' : sprintf('LIMIT %d', $queryLimit)
+            )
+        );
 
         $data = [];
         if ($rows) {
@@ -268,10 +270,10 @@ class Regexes
                 $match = $this->_matchRegex($regex, $row['name']);
                 if ($match) {
                     $data[$row['id']] = [
-						'subject'  => $row['name'],
-						'old_name' => $row['searchname'],
-						'new_name' => $match,
-					];
+                        'subject'  => $row['name'],
+                        'old_name' => $row['searchname'],
+                        'new_name' => $match,
+                    ];
                     if ((int) $displayLimit > 0 && $limit++ >= (int) $displayLimit) {
                         break;
                     }
@@ -332,13 +334,15 @@ class Regexes
 
         // Get all regex from DB which match the current group name. Cache them for 15 minutes. #CACHEDQUERY#
         $this->_regexCache[$groupName]['regex'] = $this->pdo->query(
-			sprintf(
-				'SELECT r.id, r.regex%s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
-				($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
-				$this->tableName,
-				$this->pdo->escapeString($groupName)
-			), true, NN_CACHE_EXPIRY_LONG
-		);
+            sprintf(
+                'SELECT r.id, r.regex%s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
+                ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
+                $this->tableName,
+                $this->pdo->escapeString($groupName)
+            ),
+            true,
+            NN_CACHE_EXPIRY_LONG
+        );
         // Set the TTL.
         $this->_regexCache[$groupName]['ttl'] = time();
     }
@@ -368,18 +372,18 @@ class Regexes
             ksort($matches);
             foreach ($matches as $key => $value) {
                 switch ($this->tableName) {
-					case 'collection_regexes': // Put this at the top since it's the most important for performance.
-					case 'release_naming_regexes':
-						// Ignore non-named capture groups. Only named capture groups are important.
-						if (is_int($key) || preg_match('#reqid|parts#i', $key)) {
-						    continue 2;
-						}
-						$returnString .= $value; // Concatenate the string to return.
-						break;
-					case 'category_regexes':
-						$returnString = $this->_categoriesID; // Regex matched, so return the category ID.
-						break 2;
-				}
+                    case 'collection_regexes': // Put this at the top since it's the most important for performance.
+                    case 'release_naming_regexes':
+                        // Ignore non-named capture groups. Only named capture groups are important.
+                        if (is_int($key) || preg_match('#reqid|parts#i', $key)) {
+                            continue 2;
+                        }
+                        $returnString .= $value; // Concatenate the string to return.
+                        break;
+                    case 'category_regexes':
+                        $returnString = $this->_categoriesID; // Regex matched, so return the category ID.
+                        break 2;
+                }
             }
         }
 

@@ -563,7 +563,7 @@ function ajax_releaseregex_delete(id)
 {
     // no caching of results
 	$.ajax({
-	  url       : WWW_TOP + '/ajax_regex-list.php?action=2&rand=' + $.now(),
+	  url       : WWW_TOP + '/ajax.php?action=2&rand=' + $.now(),
 	  data      : { regex_id: id},
 	  dataType  : "html",
 	  success   : function(data)
@@ -666,7 +666,7 @@ function ajax_collection_regex_delete(id)
     // no caching of results
     var rand_no = Math.random();
     $.ajax({
-        url       : WWW_TOP + '/ajax_regex.php?action=1&rand=' + rand_no,
+        url       : WWW_TOP + '/ajax.php?action=1&rand=' + rand_no,
         data      : { col_id: id},
         dataType  : "html",
         success   : function(data)
