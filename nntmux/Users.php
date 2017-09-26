@@ -2,10 +2,10 @@
 
 namespace nntmux;
 
-use App\Models\Release;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UserRole;
 use App\Models\UserRequest;
