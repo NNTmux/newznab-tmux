@@ -1,4 +1,5 @@
 2017-09-26 DariusIII
+	* Fix: Fix user-edit page
 	* Chg: Update Release, UserDownload, UsersReleases models and relations, use them where applicable
 	* Chg: Add Release model and migration, add starter relations to Release and Group models
 	* Chg: Fix collection regex deletion

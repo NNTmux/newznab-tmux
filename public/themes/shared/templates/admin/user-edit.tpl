@@ -33,7 +33,7 @@
             <tr>
                 <td><label for="role">Role:</label></td>
                 <td>
-                    {html_radios id="role" name='role' values=$role_ids output=$role_names selected=$user.role separator='<br />'}
+                    {html_radios id="role" name='role' values=$role_ids output=$role_names selected=$user->role separator='<br />'}
                 </td>
             </tr>
             {if !empty($user.id)}
@@ -105,7 +105,7 @@
                 <td></td>
                 <td>
                     <input class="btn btn-primary" type="submit" value="Save" />
-                    {if !empty($user.id) && $user.role!=2}<a class="confirm_action btn btn-danger" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">Delete user</a>{/if}
+                    {if !empty($user.id) && $user->role->id != 2}<a class="confirm_action btn btn-danger" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">Delete user</a>{/if}
                 </td>
             </tr>
         </table>
