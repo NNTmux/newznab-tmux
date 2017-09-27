@@ -378,7 +378,7 @@
 			<tr>
 				<td style="width:160px;"><label for="sabintegrationtype">Integration Type</label>:</td>
 				<td>
-					{html_radios id="sabintegrationtype" name='sabintegrationtype' values=$sabintegrationtype_ids output=$sabintegrationtype_names selected=$site->sabintegrationtype separator='<br />'}
+					{html_radios id="sabintegrationtype" name='sabintegrationtype' values=$sabintegrationtype_ids output=$sabintegrationtype_names selected=$site->integrationtype separator='<br />'}
 					<div class="hint">Whether to allow integration with a SAB/NZBGet install and if so what type of integration<br/></div>
 				</td>
 			</tr>
@@ -750,7 +750,7 @@
 	<tr>
 		<td style="width:180px;"><label for="fetchlastcompressedfiles">Download last compressed file:</label></td>
 		<td>
-			{html_radios id="fetchlastcompressedfiles" name='fetchlastcompressedfiles' values=$yesno_ids output=$yesno_names selected=$site->fetchlastcompressedfiles separator='<br />'}
+			{html_radios id="fetchlastcompressedfiles" name='fetchlastcompressedfiles' values=$yesno_ids output=$yesno_names selected=$site->end separator='<br />'}
 			<div class="hint">Try to download the last rar or zip file? (This is good if most of the files are at the end.) Note: The first rar/zip is still downloaded.
 			</div>
 		</td>

@@ -1,3 +1,5 @@
+2017-09-27 DariusIII
+	* Fix: Fix bad settings values that prevented proper site settings change
 2017-09-26 DariusIII
 	* Fix: Fix user-edit page
 	* Chg: Update Release, UserDownload, UsersReleases models and relations, use them where applicable
