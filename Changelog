@@ -1,4 +1,5 @@
 2017-09-27 DariusIII
+	* Fix: Use proper, user_roles_id, column when updating profile (prevents changing user role to guest)
 	* Chg: Change profile page download fetching method
 	* Fix: Fix bad settings values that prevented proper site settings change
 2017-09-26 DariusIII
