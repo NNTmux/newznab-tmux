@@ -139,7 +139,7 @@
                 }
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
-            "time": "2017-08-27T15:14:06+00:00"
+            "time": "2017-08-27 15:14:06"
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -1473,7 +1473,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-05-29T12:05:57+00:00"
+            "time": "2017-05-29 12:05:57"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -2196,16 +2196,16 @@
         },
         {
             "name": "fxp/composer-asset-plugin",
-            "version": "v1.4.0",
+            "version": "v1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/composer-asset-plugin.git",
-                "reference": "dd559b0f69628277c868dcf3deeb17948e3e9b19"
+                "reference": "aaaf9c040cd309afb43f51b097f388354d6f842e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/dd559b0f69628277c868dcf3deeb17948e3e9b19",
-                "reference": "dd559b0f69628277c868dcf3deeb17948e3e9b19",
+                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/aaaf9c040cd309afb43f51b097f388354d6f842e",
+                "reference": "aaaf9c040cd309afb43f51b097f388354d6f842e",
                 "shasum": ""
             },
             "require": {
@@ -2251,7 +2251,7 @@
                 "npm",
                 "package"
             ],
-            "time": "2017-09-07T09:01:09+00:00"
+            "time": "2017-09-27T16:59:09+00:00"
         },
         {
             "name": "google/recaptcha",
@@ -2633,7 +2633,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2016-05-04T01:31:56+00:00"
+            "time": "2016-05-04 01:31:56"
         },
         {
             "name": "kbjr/Git.php",
@@ -2659,7 +2659,7 @@
                 "source": "https://github.com/kbjr/Git.php/tree/master",
                 "issues": "https://github.com/kbjr/Git.php/issues"
             },
-            "time": "2015-03-31T14:10:29+00:00"
+            "time": "2015-03-31 14:10:29"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
