@@ -152,7 +152,7 @@
 		<tr {if $download@iteration >= 10}class="extra" style="display:none;"{/if}>
 			<td class="less" title="{$download.timestamp}">{$download.timestamp|date_format}</td>
 			<td title="{$download.hosthash}">{if $download.hosthash == ""}n/a{else}{$download.hosthash|truncate:10}{/if}</td>
-			<td>{if $download->release->guid == ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download->release->guid}">{$download->release->searchname}</a>{/if}</td>
+			<td>{if $download.release.guid == ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download.release.guid}">{$download.release.searchname}</a>{/if}</td>
 		</tr>
 		{/foreach}
 	</table>
