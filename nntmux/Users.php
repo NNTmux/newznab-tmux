@@ -2,13 +2,13 @@
 
 namespace nntmux;
 
-use App\Models\Invitation;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UserRole;
+use App\Models\Invitation;
 use App\Models\UserRequest;
 use nntmux\utility\Utility;
 use App\Models\UserDownload;
