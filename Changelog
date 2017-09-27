@@ -1,4 +1,5 @@
 2017-09-27 DariusIII
+	* Chg: Move music check to the end of determineCategory function in Categorize class
 	* Fix: Final fix for profile page errors relted to wrong foreign key in model relation
 	* Fix: Prevent errors if admin did not allow user selectable site themes
 	* Fix: Use proper, user_roles_id, column when updating profile (prevents changing user role to guest)
