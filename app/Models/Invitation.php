@@ -20,4 +20,9 @@ class Invitation extends Model
      * @var array
      */
     protected $guarded = ['id'];
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User', 'users_id');
+    }
 }

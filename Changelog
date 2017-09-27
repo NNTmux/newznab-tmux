@@ -1,4 +1,5 @@
 2017-09-27 DariusIII
+	* Chg: Update Invitation and User model relation
 	* Chg: Update Invitation model and related migration, use the model in Users class
 	* Chg: Update fxp-asset library
 	* Chg: Move music check to the end of determineCategory function in Categorize class

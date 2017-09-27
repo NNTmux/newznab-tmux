@@ -64,4 +64,9 @@ class User extends Authenticatable
     {
         return $this->hasMany('\App\Models\UsersRelease', 'users_id');
     }
+
+    public function invitation()
+    {
+        return $this->hasMany('App\Models\Invitation', 'users_id');
+    }
 }
