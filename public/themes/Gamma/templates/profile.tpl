@@ -53,7 +53,7 @@
 		</tr>
 		<tr>
 			<th>Grabs Today:</th>
-			<td><span id="ugrtd">{$grabstoday}</span> {if $user.grabs >= $user.downloadrequests}&nbsp;&nbsp;<small>(Next DL in {($grabstoday.nextdl/3600)|intval}h {($grabstoday.nextdl/60) % 60}m)</small>{/if}{if isset($isadmin) && $user.grabs> 0}&nbsp;&nbsp;&nbsp;<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;" class="btn btn-mini btn-info" href="#">Reset</a>{/if}</td>
+			<td><span id="ugrtd">{$grabstoday}</span> {if $user.grabs >= $user->role->downloadrequests}&nbsp;&nbsp;<small>(Next DL in {($grabstoday.nextdl/3600)|intval}h {($grabstoday.nextdl/60) % 60}m)</small>{/if}{if isset($isadmin) && $user.grabs> 0}&nbsp;&nbsp;&nbsp;<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;" class="btn btn-mini btn-info" href="#">Reset</a>{/if}</td>
 		</tr>
 	{/if}
 	<tr>
@@ -111,7 +111,7 @@
 			<td>{$exccats|replace:",":"<br/>"}</td>
 		</tr>
 	{/if}
-	{if $site->sabintegrationtype == 2 && !$publicview}
+	{if $site->integrationtype == 2 && !$publicview}
 		<tr>
 			<th>SABnzbd Integration:</th>
 			<td>

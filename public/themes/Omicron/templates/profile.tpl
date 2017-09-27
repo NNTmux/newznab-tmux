@@ -107,11 +107,11 @@
 															<tr>
 																<th>Downloads last 24 hours</th>
 																<td><span id="ugrtd">{$grabstoday}</span> /
-																	{if $user.grabs >= $user.downloadrequests}&nbsp;&nbsp;
+																	{if $user.grabs >= $user->role->downloadrequests}&nbsp;&nbsp;
 																		<small>(Next DL
 																		in {($grabstoday.nextdl/3600)|intval}
 																		h {($grabstoday.nextdl/60) % 60}
-																		m)</small> {else} {$user.downloadrequests} {/if}
+																		m)</small> {else} {$user->role->downloadrequests} {/if}
 																	{if isset($isadmin) && $grabstoday > 0}
 																		<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
 																			href="#" class="label label-danger">
@@ -122,7 +122,7 @@
 																<th>Downloads Total</th>
 																<td>{$user.grabs}</td>
 															</tr>
-															{if $site->sabintegrationtype == 2 && !$publicview}
+															{if $site->integrationtype == 2 && !$publicview}
 																<tr>
 																	<th>SABnzbd Integration:</th>
 																	<td>
