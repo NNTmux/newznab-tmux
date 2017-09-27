@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Invitation;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
@@ -747,22 +748,16 @@ class Users
 
     /**
      * @param $inviteToken
-     *
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getInvite($inviteToken)
     {
         //
         // Tidy any old invites sent greater than DEFAULT_INVITE_EXPIRY_DAYS days ago.
         //
-        $this->pdo->queryExec(sprintf('DELETE FROM invitations WHERE createddate < now() - INTERVAL %d DAY', self::DEFAULT_INVITE_EXPIRY_DAYS));
+        Invitation::query()->where('createddate', '<', Carbon::now()->subDays(self::DEFAULT_INVITE_EXPIRY_DAYS));
 
-        return $this->pdo->queryOneRow(
-            sprintf(
-                'SELECT * FROM invitations WHERE guid = %s',
-                $this->pdo->escapeString($inviteToken)
-            )
-        );
+        return Invitation::query()->where('guid', $inviteToken)->first();
     }
 
     /**
@@ -770,7 +765,7 @@ class Users
      */
     public function deleteInvite(string $inviteToken): void
     {
-        $this->pdo->queryExec(sprintf('DELETE FROM invitations WHERE guid = %s', $this->pdo->escapeString($inviteToken)));
+        Invitation::query()->where('guid', $inviteToken)->delete();
     }
 
     /**
@@ -1110,12 +1105,12 @@ class Users
     }
 
     /**
-     * @param $uid
-     * @param $inviteToken
+     * @param int $uid
+     * @param string $inviteToken
      */
-    public function addInvite(int $uid, string $inviteToken): void
+    public function addInvite(int $uid, string $inviteToken)
     {
-        $this->pdo->queryInsert(sprintf('INSERT INTO invitations (guid, users_id, createddate) VALUES (%s, %d, now())', $this->pdo->escapeString($inviteToken), $uid));
+        Invitation::query()->insertGetId(['guid' => $inviteToken, 'users_id' => $uid, 'createddate' => Carbon::now()]);
     }
 
     /**

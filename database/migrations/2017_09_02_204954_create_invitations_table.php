@@ -15,7 +15,9 @@ class CreateInvitationsTable extends Migration
     {
         Schema::create('invitations', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamps();
+            $table->string('guid', 50);
+            $table->integer('users_id');
+            $table->dateTime('createddate');
         });
     }
 
