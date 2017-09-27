@@ -20,6 +20,6 @@ class UsersRelease extends Model
 
     public function release()
     {
-        return $this->belongsTo('App\Models\Release', 'id');
+        return $this->belongsTo('App\Models\Release', 'releases_id');
     }
 }
