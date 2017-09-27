@@ -208,7 +208,7 @@
 															</tbody>
 														</table>
 													{/if}
-													{if isset($isadmin) && $downloadlist|@count > 0}
+													{if isset($isadmin) && $downloadlist != null}
 														<table class="data data table table-striped responsive-utilities jambo-table">
 															<tbody>
 															<tr class="bg-aqua-active">

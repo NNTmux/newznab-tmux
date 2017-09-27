@@ -36,7 +36,7 @@ if ($privileged || ! $privateProfiles) {
 }
 
 $downloadlist = $page->users->getDownloadRequestsForUser($userID);
-$page->smarty->assign('downloadlist', $downloadlist);
+$page->smarty->assign('downloadlist', ! empty($downloadlist[0]) ? $downloadlist : null);
 
 $data = $page->users->getById($userID);
 if (! $data) {
