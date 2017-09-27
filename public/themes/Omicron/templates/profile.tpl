@@ -224,7 +224,7 @@
 																	style="display:none;"{/if}>
 																	<td width="80"
 																		title="{$download.timestamp}">{$download.timestamp|date_format}</td>
-																	<td>{if $download->release->guid == null}n/a{else}<a
+																	<td>{if $download->release->guid == ""}n/a{else}<a
 																			href="{$smarty.const.WWW_TOP}/details/{$download->release->guid}">{$download->release->searchname}</a>{/if}
 																	</td>
 																</tr>

@@ -208,7 +208,7 @@
 															</tbody>
 														</table>
 													{/if}
-													{if isset($isadmin) && $downloadlist != null}
+													{if isset($isadmin) && $downloadlist|@count > 0}
 														<table class="data data table table-striped responsive-utilities jambo-table">
 															<tbody>
 															<tr class="bg-aqua-active">
@@ -232,7 +232,7 @@
 																	style="display:none;"{/if}>
 																	<td width="80"
 																		title="{$download.timestamp}">{$download.timestamp|date_format}</td>
-																	<td>{if $download->release->guid == null}n/a{else}<a
+																	<td>{if $download->release->guid == ""}n/a{else}<a
 																			href="{$smarty.const.WWW_TOP}/details/{$download->release->guid}">{$download->release->searchname}</a>{/if}
 																	</td>
 																</tr>
