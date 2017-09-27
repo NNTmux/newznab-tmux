@@ -88,7 +88,7 @@ switch ($action) {
                     $_POST['nzbvortex_api_key'] ?? false,
                     $_POST['cp_url'] ?? '',
                     $_POST['cp_api'] ?? '',
-                    $_POST['style']
+                    (int) Settings::settingValue('site.main.userselstyle') === 1 ? $_POST['style'] : 'None'
                 );
 
                 $_POST['exccat'] = (! isset($_POST['exccat']) || ! is_array($_POST['exccat'])) ? [] : $_POST['exccat'];
