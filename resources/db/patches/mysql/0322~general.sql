@@ -24,7 +24,7 @@ ALTER TABLE musicinfo CHANGE COLUMN updateddate updated_at DATETIME NOT NULL;
 ALTER TABLE release_comments CHANGE COLUMN createddate created_at DATETIME NOT NULL;
 ALTER TABLE release_comments ADD COLUMN updated_at DATETIME NOT NULL;
 
-ALTER TABLE release_files CHANGE COLUMN createddate created_at DATETIME NOT NULL;
+ALTER TABLE release_files CHANGE COLUMN createddate created_at DATETIME DEFAULT NULL;
 ALTER TABLE release_files ADD COLUMN updated_at DATETIME NOT NULL;
 
 ALTER TABLE users CHANGE COLUMN createddate created_at DATETIME NOT NULL;
