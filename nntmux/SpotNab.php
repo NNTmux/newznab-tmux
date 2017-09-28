@@ -343,7 +343,7 @@ class SpotNab
             ."value = '0' "
             ."WHERE setting = 'spotnablastarticle'";
         $broadcast = 'Update settings SET '
-            ."updated_at = '1980-01-01 00:00:00' "
+            ."updateddate = '1980-01-01 00:00:00' "
             ."WHERE setting = 'spotnabbroadcast'";
 
         // Discovery should only be set back X days worth defined
@@ -353,11 +353,11 @@ class SpotNab
             time() - (self::POST_BROADCAST_INTERVAL)
         );
         $discovery_b = 'Update settings SET '
-            ."updated_at = '1980-01-01 00:00:00' "
+            ."updateddate = '1980-01-01 00:00:00' "
             ."WHERE setting = 'spotnabdiscover'";
 
         $post = 'Update settings SET '
-            ."updated_at = '$reftime' "
+            ."updateddate = '$reftime' "
             ."WHERE setting = 'spotnabpost'";
         $this->_pdo->queryExec($sources);
         $this->_pdo->queryExec($discovery_a);
@@ -385,11 +385,11 @@ class SpotNab
         }
 
         if ($reftime === null) {
-            $q = 'SELECT updated_at FROM settings WHERE '
+            $q = 'SELECT updateddate FROM settings WHERE '
                 ."setting = 'spotnabdiscover'";
             $res = $this->_pdo->queryOneRow($q);
             if ($res) {
-                $reftime = $res['updated_at'];
+                $reftime = $res['updateddate'];
             } else {
                 // Fetch local time (but look back the maximum duration
                 // that a discovery message can exist for
@@ -496,7 +496,7 @@ class SpotNab
         printf("%d new and %d updated source(s).\n", $inserted, $updated);
 
         // Update reference point
-        $q = 'Update settings SET updated_at = NOW() WHERE '
+        $q = 'Update settings SET updateddate = NOW() WHERE '
             ."setting = 'spotnabdiscover'";
         $this->_pdo->queryExec($q);
 
@@ -507,16 +507,16 @@ class SpotNab
     public function auto_post_discovery($repost_sec = self::POST_BROADCAST_INTERVAL)
     {
         // performs a post discovery once the time in seconds has elapsed
-        $q = 'SELECT updated_at FROM settings WHERE '
+        $q = 'SELECT updateddate FROM settings WHERE '
             ."setting = 'spotnabbroadcast'";
         $res = $this->_pdo->queryOneRow($q);
-        $then = strtotime($res['updated_at']);
+        $then = strtotime($res['updateddate']);
         $now = time();
         if (($now - $then) > $repost_sec) {
             // perform a post
             if ($this->post_discovery()) {
                 // Update post time
-                $q = 'Update settings SET updated_at = NOW() WHERE '
+                $q = 'Update settings SET updateddate = NOW() WHERE '
                     ."setting = 'spotnabbroadcast'";
                 $res = $this->_pdo->queryExec($q);
             }
