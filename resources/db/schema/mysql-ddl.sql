@@ -436,6 +436,7 @@ CREATE TABLE invitations (
   guid        VARCHAR(50)      NOT NULL,
   users_id INT(11) UNSIGNED NOT NULL,
   created_at DATETIME         NOT NULL,
+  updated_at DATETIME NOT NULL,
   PRIMARY KEY (id)
 )
   ENGINE          = InnoDB
@@ -838,6 +839,7 @@ CREATE TABLE release_comments (
   username    VARCHAR(255)     NOT NULL DEFAULT '',
   users_id     INT(11) UNSIGNED NOT NULL,
   created_at DATETIME DEFAULT NULL,
+  updated_at DATETIME NOT NULL,
   host        VARCHAR(15)      NULL,
   shared      TINYINT(1)       NOT NULL DEFAULT '0',
   shareid     VARCHAR(40)      NOT NULL DEFAULT '',
@@ -911,6 +913,7 @@ CREATE TABLE release_files (
   size bigint(20) unsigned NOT NULL DEFAULT '0',
   ishashed tinyint(1) NOT NULL DEFAULT '0',
   created_at datetime DEFAULT NULL,
+  updated_at DATETIME NOT NULL,
   passworded tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (releases_id, name),
   KEY ix_releasefiles_ishashed (ishashed)
@@ -1219,6 +1222,7 @@ CREATE TABLE users_releases (
   users_id INT(16) UNSIGNED    NOT NULL,
   releases_id   INT              NOT NULL COMMENT 'FK to releases.id',
   created_at DATETIME         NOT NULL,
+  updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX ix_usercart_userrelease (users_id, releases_id)
 )
@@ -1253,6 +1257,7 @@ CREATE TABLE user_excluded_categories (
   users_id    INT(16) UNSIGNED  NOT NULL,
   categories_id  INT              NOT NULL,
   created_at DATETIME         NOT NULL,
+  updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX ix_userexcat_usercat (users_id, categories_id)
 )
@@ -1269,6 +1274,7 @@ CREATE TABLE role_excluded_categories
     role            INT(11) NOT NULL,
     categories_id   INT(11),
     created_at     DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     PRIMARY KEY (id),
     UNIQUE INDEX ix_roleexcat_rolecat (role, categories_id)
 )
@@ -1284,6 +1290,7 @@ CREATE TABLE user_movies (
   imdbid      MEDIUMINT(7) UNSIGNED ZEROFILL NULL,
   categories  VARCHAR(64)                    NULL DEFAULT NULL COMMENT 'List of categories for user movies',
   created_at DATETIME                       NOT NULL,
+  updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
   INDEX ix_usermovies_userid (users_id, imdbid)
 )
@@ -1338,6 +1345,7 @@ CREATE TABLE user_series (
   videos_id   INT(16)          NOT NULL COMMENT 'FK to videos.id',
   categories  VARCHAR(64)      NULL DEFAULT NULL COMMENT 'List of categories for user tv shows',
   created_at DATETIME         NOT NULL,
+  updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
   INDEX ix_userseries_videos_id (users_id, videos_id)
 )
