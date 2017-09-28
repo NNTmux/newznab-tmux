@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use Carbon\Carbon;
 use nntmux\db\DB;
 
 /**
@@ -99,13 +100,14 @@ class ReleaseFiles
                     sprintf(
                         '
 						INSERT INTO release_files
-						(releases_id, name, size, created_at, passworded)
+						(releases_id, name, size, created_at, updated_at, passworded)
 						VALUES
 						(%d, %s, %s, %s, %d)',
                             $id,
                             $this->pdo->escapeString(utf8_encode($name)),
                             $this->pdo->escapeString($size),
                             $this->pdo->from_unixtime($createdTime),
+                            Carbon::now(),
                             $hasPassword
                     )
             );
