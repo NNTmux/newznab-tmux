@@ -1,4 +1,5 @@
 2017-09-28 DariusIII
+	* Chg: Update MovieInfo model and related migration
 	* Chg: Update code style of Releases and ReleaseSearch
 	* Chg: Update paragonie/random_compat
 	* Chg: Update groupfixrelnames with new renaming method
