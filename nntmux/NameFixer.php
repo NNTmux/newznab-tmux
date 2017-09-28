@@ -620,7 +620,7 @@ class NameFixer
 				FROM releases rel
 				INNER JOIN releaseextrafull rf ON (rf.releases_id = rel.id)
 				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
-                AND rf.mediainfo REGEXP '\<Movie_name\>PSArips\.com|RMZ\.cr\<\/Movie_name\>'
+                AND rf.mediainfo REGEXP '\<Movie_name\>'
                 AND rel.nzbstatus = %d
                 AND rel.predb_id = 0",
                 NZB::NZB_ADDED
@@ -634,7 +634,7 @@ class NameFixer
 				FROM releases rel
 				INNER JOIN releaseextrafull rf ON (rf.releases_id = rel.id)
 				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
-				AND rf.mediainfo REGEXP '\<Movie_name\>PSArips\.com|RMZ\.cr\<\/Movie_name\>'
+				AND rf.mediainfo REGEXP '\<Movie_name\>'
 				AND rel.nzbstatus = %d
                 AND rel.isrenamed = %d
                 AND rel.predb_id = 0
@@ -658,7 +658,7 @@ class NameFixer
                     $this->mediaMovieNameCheck($rel, $echo, $type, $nameStatus, $show);
                     $this->_echoRenamed($show);
                 }
-                $this->_echoFoundCount($echo, ' MediaInof\'s');
+                $this->_echoFoundCount($echo, ' MediaInfo\'s');
             } else {
                 echo ColorCLI::info('Nothing to fix.');
             }
