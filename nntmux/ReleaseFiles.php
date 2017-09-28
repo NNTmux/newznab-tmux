@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use Carbon\Carbon;
 use nntmux\db\DB;
+use Carbon\Carbon;
 
 /**
  * This class handles storage and retrieval of releasefiles.
