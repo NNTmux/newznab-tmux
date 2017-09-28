@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\ReleaseFile;
 use nntmux\db\DB;
 use Carbon\Carbon;
 
@@ -84,32 +85,18 @@ class ReleaseFiles
     {
         $insert = 0;
 
-        $duplicateCheck = $this->pdo->queryOneRow(
-                sprintf(
-                    '
-				SELECT releases_id
-				FROM release_files
-				WHERE releases_id = %d AND name = %s',
-                        $id,
-                        $this->pdo->escapeString(utf8_encode($name))
-                )
-        );
+        $duplicateCheck = ReleaseFile::query()->where(['releases_id' => $id, 'name' => utf8_encode($name)])->first();
 
-        if ($duplicateCheck === false) {
-            $insert = $this->pdo->queryInsert(
-                    sprintf(
-                        '
-						INSERT INTO release_files
-						(releases_id, name, size, created_at, updated_at, passworded)
-						VALUES
-						(%d, %s, %s, %s, %s, %d)',
-                            $id,
-                            $this->pdo->escapeString(utf8_encode($name)),
-                            $this->pdo->escapeString($size),
-                            $this->pdo->from_unixtime($createdTime),
-                            Carbon::now(),
-                            $hasPassword
-                    )
+        if ($duplicateCheck === null) {
+            $insert = ReleaseFile::query()->insertGetId(
+                [
+                    'releases_id' => $id,
+                    'name' => utf8_encode($name),
+                    'size' => $size,
+                    'created_at' => Carbon::createFromTimestamp($createdTime),
+                    'updated_at' => Carbon::now(),
+                    'passworded' => $hasPassword
+                ]
             );
 
             if (strlen($hash) === 32) {
