@@ -39,7 +39,7 @@
 									<td>
 										<span class="label label-default">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</span>
 									</td>
-									<td title="Added on {$show.createddate}">{$show.createddate|date_format}</td>
+									<td title="Added on {$show.created_at}">{$show.created_at|date_format}</td>
 									<td>
 										<div class="btn-group">
 											<a class="btn btn-xs btn-warning myshows"

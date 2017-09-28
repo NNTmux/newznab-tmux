@@ -84,40 +84,43 @@ class ReleaseFiles
         $insert = 0;
 
         $duplicateCheck = $this->pdo->queryOneRow(
-				sprintf('
+                sprintf(
+                    '
 				SELECT releases_id
 				FROM release_files
 				WHERE releases_id = %d AND name = %s',
-						$id,
-						$this->pdo->escapeString(utf8_encode($name))
-				)
-		);
+                        $id,
+                        $this->pdo->escapeString(utf8_encode($name))
+                )
+        );
 
         if ($duplicateCheck === false) {
             $insert = $this->pdo->queryInsert(
-					sprintf('
+                    sprintf(
+                        '
 						INSERT INTO release_files
-						(releases_id, name, size, createddate, passworded)
+						(releases_id, name, size, created_at, passworded)
 						VALUES
 						(%d, %s, %s, %s, %d)',
-							$id,
-							$this->pdo->escapeString(utf8_encode($name)),
-							$this->pdo->escapeString($size),
-							$this->pdo->from_unixtime($createdTime),
-							$hasPassword
-					)
-			);
+                            $id,
+                            $this->pdo->escapeString(utf8_encode($name)),
+                            $this->pdo->escapeString($size),
+                            $this->pdo->from_unixtime($createdTime),
+                            $hasPassword
+                    )
+            );
 
             if (strlen($hash) === 32) {
                 $this->pdo->queryExec(
-					sprintf('
+                    sprintf(
+                        '
 						INSERT INTO par_hashes
 						(releases_id, hash)
 						VALUES (%d, %s)',
-						$id,
-						$this->pdo->escapeString($hash)
-					)
-				);
+                        $id,
+                        $this->pdo->escapeString($hash)
+                    )
+                );
             }
             $this->sphinxSearch->updateRelease($id, $this->pdo);
         }

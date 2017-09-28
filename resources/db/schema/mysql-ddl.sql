@@ -172,8 +172,8 @@ CREATE TABLE bookinfo (
   overview    VARCHAR(3000)    DEFAULT NULL,
   genre       VARCHAR(255)        NOT NULL,
   cover       TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  createddate DATETIME            NOT NULL,
-  updateddate DATETIME            NOT NULL,
+  created_at DATETIME            NOT NULL,
+  updated_at DATETIME            NOT NULL,
   PRIMARY KEY (id),
   FULLTEXT INDEX ix_bookinfo_author_title_ft (author, title),
   UNIQUE INDEX ix_bookinfo_asin (asin)
@@ -295,8 +295,8 @@ CREATE TABLE consoleinfo (
   releasedate DATETIME                     DEFAULT NULL,
   review      VARCHAR(3000)                DEFAULT NULL,
   cover       TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  createddate DATETIME            NOT NULL,
-  updateddate DATETIME            NOT NULL,
+  created_at DATETIME            NOT NULL,
+  updated_at DATETIME            NOT NULL,
   PRIMARY KEY (id),
   FULLTEXT INDEX ix_consoleinfo_title_platform_ft (title, platform),
   UNIQUE INDEX ix_consoleinfo_asin (asin)
@@ -346,13 +346,13 @@ CREATE TABLE forumpost (
   locked      TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   sticky      TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   replies     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  createddate DATETIME            NOT NULL,
-  updateddate DATETIME            NOT NULL,
+  created_at DATETIME            NOT NULL,
+  updated_at DATETIME            NOT NULL,
   PRIMARY KEY (id),
   KEY parentid    (parentid),
   KEY userid      (users_id),
-  KEY createddate (createddate),
-  KEY updateddate (updateddate)
+  KEY created_at (created_at),
+  KEY updated_at (updated_at)
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -376,8 +376,8 @@ CREATE TABLE gamesinfo (
   backdrop    TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   trailer     VARCHAR(1000)       NOT NULL DEFAULT '',
   classused   VARCHAR(10)         NOT NULL DEFAULT 'steam',
-  createddate DATETIME            NOT NULL,
-  updateddate DATETIME            NOT NULL,
+  created_at DATETIME            NOT NULL,
+  updated_at DATETIME            NOT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX  ix_gamesinfo_asin (asin),
   INDEX         ix_title (title),
@@ -435,7 +435,7 @@ CREATE TABLE invitations (
   id          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   guid        VARCHAR(50)      NOT NULL,
   users_id INT(11) UNSIGNED NOT NULL,
-  createddate DATETIME         NOT NULL,
+  created_at DATETIME         NOT NULL,
   PRIMARY KEY (id)
 )
   ENGINE          = InnoDB
@@ -516,8 +516,8 @@ CREATE TABLE movieinfo (
   language    VARCHAR(64)                    NOT NULL DEFAULT '',
   cover       TINYINT(1) UNSIGNED            NOT NULL DEFAULT '0',
   backdrop    TINYINT(1) UNSIGNED            NOT NULL DEFAULT '0',
-  createddate DATETIME                       NOT NULL,
-  updateddate DATETIME                       NOT NULL,
+  created_at DATETIME                       NOT NULL,
+  updated_at DATETIME                       NOT NULL,
   trailer     VARCHAR(255)                   NOT NULL DEFAULT '',
   PRIMARY KEY (id),
   INDEX ix_movieinfo_title  (title),
@@ -545,8 +545,8 @@ CREATE TABLE musicinfo (
   genres_id INT(10)             NULL,
   tracks      VARCHAR(3000)       NULL,
   cover       TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  createddate DATETIME            NOT NULL,
-  updateddate DATETIME            NOT NULL,
+  created_at DATETIME            NOT NULL,
+  updated_at DATETIME            NOT NULL,
   PRIMARY KEY (id),
   FULLTEXT INDEX ix_musicinfo_artist_title_ft (artist, title),
   UNIQUE INDEX ix_musicinfo_asin (asin)
@@ -837,7 +837,7 @@ CREATE TABLE release_comments (
   text_hash   VARCHAR(32)      NOT NULL DEFAULT '',
   username    VARCHAR(255)     NOT NULL DEFAULT '',
   users_id     INT(11) UNSIGNED NOT NULL,
-  createddate DATETIME DEFAULT NULL,
+  created_at DATETIME DEFAULT NULL,
   host        VARCHAR(15)      NULL,
   shared      TINYINT(1)       NOT NULL DEFAULT '0',
   shareid     VARCHAR(40)      NOT NULL DEFAULT '',
@@ -910,7 +910,7 @@ CREATE TABLE release_files (
   name varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   size bigint(20) unsigned NOT NULL DEFAULT '0',
   ishashed tinyint(1) NOT NULL DEFAULT '0',
-  createddate datetime DEFAULT NULL,
+  created_at datetime DEFAULT NULL,
   passworded tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (releases_id, name),
   KEY ix_releasefiles_ishashed (ishashed)
@@ -1103,7 +1103,7 @@ CREATE TABLE tmux (
   id          INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   setting     VARCHAR(64)      NOT NULL,
   value       VARCHAR(19000)            DEFAULT NULL,
-  updateddate TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE INDEX ix_tmux_setting (setting)
 )
@@ -1151,7 +1151,7 @@ CREATE TABLE upcoming_releases (
   source      VARCHAR(20)                           NOT NULL,
   typeid      INT(10)                               NOT NULL,
   info        TEXT                                  NULL,
-  updateddate TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE INDEX ix_upcoming_source (source, typeid)
 )
@@ -1174,8 +1174,8 @@ CREATE TABLE users (
   host           VARCHAR(40)      NULL,
   grabs          INT              NOT NULL DEFAULT '0',
   rsstoken       VARCHAR(64)      NOT NULL,
-  createddate    DATETIME         NOT NULL,
-  updateddate    DATETIME         NOT NULL,
+  created_at    DATETIME         NOT NULL,
+  updated_at    DATETIME         NOT NULL,
   resetguid      VARCHAR(50)      NULL,
   lastlogin      DATETIME                  DEFAULT NULL,
   apiaccess      DATETIME                  DEFAULT NULL,
@@ -1218,7 +1218,7 @@ CREATE TABLE users_releases (
   id          INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   users_id INT(16) UNSIGNED    NOT NULL,
   releases_id   INT              NOT NULL COMMENT 'FK to releases.id',
-  createddate DATETIME         NOT NULL,
+  created_at DATETIME         NOT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX ix_usercart_userrelease (users_id, releases_id)
 )
@@ -1252,7 +1252,7 @@ CREATE TABLE user_excluded_categories (
   id          INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   users_id    INT(16) UNSIGNED  NOT NULL,
   categories_id  INT              NOT NULL,
-  createddate DATETIME         NOT NULL,
+  created_at DATETIME         NOT NULL,
   PRIMARY KEY (id),
   UNIQUE INDEX ix_userexcat_usercat (users_id, categories_id)
 )
@@ -1268,7 +1268,7 @@ CREATE TABLE role_excluded_categories
     id              INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
     role            INT(11) NOT NULL,
     categories_id   INT(11),
-    createddate     DATETIME NOT NULL,
+    created_at     DATETIME NOT NULL,
     PRIMARY KEY (id),
     UNIQUE INDEX ix_roleexcat_rolecat (role, categories_id)
 )
@@ -1283,7 +1283,7 @@ CREATE TABLE user_movies (
   users_id    INT(16) UNSIGNED  NOT NULL,
   imdbid      MEDIUMINT(7) UNSIGNED ZEROFILL NULL,
   categories  VARCHAR(64)                    NULL DEFAULT NULL COMMENT 'List of categories for user movies',
-  createddate DATETIME                       NOT NULL,
+  created_at DATETIME                       NOT NULL,
   PRIMARY KEY (id),
   INDEX ix_usermovies_userid (users_id, imdbid)
 )
@@ -1337,7 +1337,7 @@ CREATE TABLE user_series (
   users_id    INT(16) UNSIGNED  NOT NULL,
   videos_id   INT(16)          NOT NULL COMMENT 'FK to videos.id',
   categories  VARCHAR(64)      NULL DEFAULT NULL COMMENT 'List of categories for user tv shows',
-  createddate DATETIME         NOT NULL,
+  created_at DATETIME         NOT NULL,
   PRIMARY KEY (id),
   INDEX ix_userseries_videos_id (users_id, videos_id)
 )
@@ -1426,8 +1426,8 @@ CREATE TABLE         xxxinfo (
   classused   VARCHAR(20)                    NOT NULL DEFAULT '',
   cover       TINYINT(1) UNSIGNED            NOT NULL DEFAULT '0',
   backdrop    TINYINT(1) UNSIGNED            NOT NULL DEFAULT '0',
-  createddate DATETIME                       NOT NULL,
-  updateddate DATETIME                       NOT NULL,
+  created_at DATETIME                       NOT NULL,
+  updated_at DATETIME                       NOT NULL,
   PRIMARY KEY                   (id),
   UNIQUE INDEX ix_xxxinfo_title (title)
 )

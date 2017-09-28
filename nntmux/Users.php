@@ -259,8 +259,8 @@ class Users
             case 'host':
                 $orderField = 'host';
                 break;
-            case 'createddate':
-                $orderField = 'createddate';
+            case 'created_at':
+                $orderField = 'created_at';
                 break;
             case 'lastlogin':
                 $orderField = 'lastlogin';
@@ -755,7 +755,7 @@ class Users
         //
         // Tidy any old invites sent greater than DEFAULT_INVITE_EXPIRY_DAYS days ago.
         //
-        Invitation::query()->where('createddate', '<', Carbon::now()->subDays(self::DEFAULT_INVITE_EXPIRY_DAYS));
+        Invitation::query()->where('created_at', '<', Carbon::now()->subDays(self::DEFAULT_INVITE_EXPIRY_DAYS));
 
         return Invitation::query()->where('guid', $inviteToken)->first();
     }
@@ -795,7 +795,7 @@ class Users
                 'password' => $password,
                 'email' => $email,
                 'user_roles_id' => $role,
-                'createddate' => Carbon::now(),
+                'created_at' => Carbon::now(),
                 'host' => (int) Settings::settingValue('..storeuserips') === 1 ? $host : '',
                 'rsstoken' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
@@ -923,7 +923,7 @@ class Users
             [
                 'users_id' => $uid,
                 'releases_id' => $releaseid,
-                'createddate' => Carbon::now(),
+                'created_at' => Carbon::now(),
             ]
         );
     }
@@ -988,7 +988,7 @@ class Users
         $this->delUserCategoryExclusions($uid);
         if (count($catids) > 0) {
             foreach ($catids as $catid) {
-                $this->pdo->queryInsert(sprintf('INSERT INTO user_excluded_categories (users_id, categories_id, createddate) VALUES (%d, %d, now())', $uid, $catid));
+                $this->pdo->queryInsert(sprintf('INSERT INTO user_excluded_categories (users_id, categories_id, created_at) VALUES (%d, %d, now())', $uid, $catid));
             }
         }
     }
@@ -1018,7 +1018,7 @@ class Users
         $this->delRoleCategoryExclusions($role);
         if (count($catids) > 0) {
             foreach ($catids as $catid) {
-                $this->pdo->queryInsert(sprintf('INSERT INTO role_excluded_categories (role, categories_id, createddate) VALUES (%d, %d, now())', $role, $catid));
+                $this->pdo->queryInsert(sprintf('INSERT INTO role_excluded_categories (role, categories_id, created_at) VALUES (%d, %d, now())', $role, $catid));
             }
         }
     }
@@ -1110,7 +1110,7 @@ class Users
      */
     public function addInvite(int $uid, string $inviteToken)
     {
-        Invitation::query()->insertGetId(['guid' => $inviteToken, 'users_id' => $uid, 'createddate' => Carbon::now()]);
+        Invitation::query()->insertGetId(['guid' => $inviteToken, 'users_id' => $uid, 'created_at' => Carbon::now()]);
     }
 
     /**
@@ -1136,11 +1136,11 @@ class Users
     {
         return $this->pdo->query(
             "
-			SELECT DATE_FORMAT(createddate, '%M %Y') AS mth, COUNT(id) AS num
+			SELECT DATE_FORMAT(created_at, '%M %Y') AS mth, COUNT(id) AS num
 			FROM users
-			WHERE createddate IS NOT NULL AND createddate != '0000-00-00 00:00:00'
+			WHERE created_at IS NOT NULL AND created_at != '0000-00-00 00:00:00'
 			GROUP BY mth
-			ORDER BY createddate DESC"
+			ORDER BY created_at DESC"
         );
     }
 

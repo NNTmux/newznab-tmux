@@ -6,9 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Forumpost extends Model
 {
-    const CREATED_AT = 'createddate';
-    const UPDATED_AT = 'updateddate';
-
     /**
      * @var string
      */
@@ -32,7 +29,7 @@ class Forumpost extends Model
         'locked',
         'sticky',
         'replies',
-        'createddate',
+        'created_at',
         'updatedate',
     ];
 }

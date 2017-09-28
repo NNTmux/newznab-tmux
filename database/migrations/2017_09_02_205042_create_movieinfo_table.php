@@ -30,8 +30,8 @@ class CreateMovieinfoTable extends Migration
             $table->string('trailer', 255)->default('');
             $table->tinyInteger('cover')->default(0);
             $table->tinyInteger('backdrop')->default(0);
-            $table->dateTime('createddate');
-            $table->dateTime('updateddate');
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
             $table->index('title', 'ix_movieinfo_title');
             $table->unique('imdbid', 'ix_movieinfo_imdbid');
             DB::statement('ALTER TABLE movieinfo CHANGE imdbid imdbid MEDIUMINT(7) UNSIGNED ZEROFILL NOT NULL');

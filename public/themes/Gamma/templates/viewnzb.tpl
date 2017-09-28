@@ -321,7 +321,7 @@
 									<td>{$rf.name}</td>
 									<td class="mid">{if $rf.passworded != 1}No{else}Yes{/if}</td>
 									<td class="right">{$rf.size|fsize_format:"MB"}</td>
-									<td title="{$rf.createddate}" class="right" >{$rf.createddate|date_format}</td>
+									<td title="{$rf.created_at}" class="right" >{$rf.created_at|date_format}</td>
 								</tr>
 							{/foreach}
 						</table>
@@ -580,7 +580,7 @@
 						</tr>
 						{foreach from=$comments item=comment}
 							<tr>
-								<td style="text-align:right;" class="less" title="{$comment.createddate}">{if $comment.sourceid == 0}<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>{else}{$comment.username}<br/><span style="color: #ce0000;">(syndicated)</span>{/if}<br/>{$comment.createddate|date_format}</td>
+								<td style="text-align:right;" class="less" title="{$comment.created_at}">{if $comment.sourceid == 0}<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>{else}{$comment.username}<br/><span style="color: #ce0000;">(syndicated)</span>{/if}<br/>{$comment.created_at|date_format}</td>
 								<td style="margin-left:30px;">{$comment.text|escape:"htmlall"|nl2br}</td>
 							</tr>
 						{/foreach}

@@ -63,7 +63,7 @@
 						</td>
 						<td class="less">{if $movie.categoryNames != ''}{$movie.categoryNames|escape:"htmlall"}{else}All{/if}</td>
 						<td class="less" style="width:100px;"
-							title="Added on {$movie.createddate}">{$movie.createddate|date_format}</td>
+							title="Added on {$movie.created_at}">{$movie.created_at|date_format}</td>
 						<td class="mid" style="width:100px;">
 							<div class="btn-group">
 								<a class="btn btn-mini btn-warning mymovies"

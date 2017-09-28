@@ -275,8 +275,8 @@ class SpotNab
         $offset = 0;
         $sql = 'SELECT DISTINCT(gid) as gid FROM release_comments '
             .'WHERE releases_id = 0 '
-            ."AND createddate < NOW() - INTERVAL $max_days DAY "
-            .'ORDER BY createddate '
+            ."AND created_at < NOW() - INTERVAL $max_days DAY "
+            .'ORDER BY created_at '
             .'LIMIT %d,%d';
 
         $sql_rel = "SELECT gid FROM releases WHERE gid IN ('%s') ";
@@ -343,7 +343,7 @@ class SpotNab
             ."value = '0' "
             ."WHERE setting = 'spotnablastarticle'";
         $broadcast = 'Update settings SET '
-            ."updateddate = '1980-01-01 00:00:00' "
+            ."updated_at = '1980-01-01 00:00:00' "
             ."WHERE setting = 'spotnabbroadcast'";
 
         // Discovery should only be set back X days worth defined
@@ -353,11 +353,11 @@ class SpotNab
             time() - (self::POST_BROADCAST_INTERVAL)
         );
         $discovery_b = 'Update settings SET '
-            ."updateddate = '1980-01-01 00:00:00' "
+            ."updated_at = '1980-01-01 00:00:00' "
             ."WHERE setting = 'spotnabdiscover'";
 
         $post = 'Update settings SET '
-            ."updateddate = '$reftime' "
+            ."updated_at = '$reftime' "
             ."WHERE setting = 'spotnabpost'";
         $this->_pdo->queryExec($sources);
         $this->_pdo->queryExec($discovery_a);
@@ -385,11 +385,11 @@ class SpotNab
         }
 
         if ($reftime === null) {
-            $q = 'SELECT updateddate FROM settings WHERE '
+            $q = 'SELECT updated_at FROM settings WHERE '
                 ."setting = 'spotnabdiscover'";
             $res = $this->_pdo->queryOneRow($q);
             if ($res) {
-                $reftime = $res['updateddate'];
+                $reftime = $res['updated_at'];
             } else {
                 // Fetch local time (but look back the maximum duration
                 // that a discovery message can exist for
@@ -496,7 +496,7 @@ class SpotNab
         printf("%d new and %d updated source(s).\n", $inserted, $updated);
 
         // Update reference point
-        $q = 'Update settings SET updateddate = NOW() WHERE '
+        $q = 'Update settings SET updated_at = NOW() WHERE '
             ."setting = 'spotnabdiscover'";
         $this->_pdo->queryExec($q);
 
@@ -507,16 +507,16 @@ class SpotNab
     public function auto_post_discovery($repost_sec = self::POST_BROADCAST_INTERVAL)
     {
         // performs a post discovery once the time in seconds has elapsed
-        $q = 'SELECT updateddate FROM settings WHERE '
+        $q = 'SELECT updated_at FROM settings WHERE '
             ."setting = 'spotnabbroadcast'";
         $res = $this->_pdo->queryOneRow($q);
-        $then = strtotime($res['updateddate']);
+        $then = strtotime($res['updated_at']);
         $now = time();
         if (($now - $then) > $repost_sec) {
             // perform a post
             if ($this->post_discovery()) {
                 // Update post time
-                $q = 'Update settings SET updateddate = NOW() WHERE '
+                $q = 'Update settings SET updated_at = NOW() WHERE '
                     ."setting = 'spotnabbroadcast'";
                 $res = $this->_pdo->queryExec($q);
             }
@@ -1288,7 +1288,7 @@ class SpotNab
         // Comments
         $sql_new_cmt = 'INSERT INTO release_comments ('.
             'id, sourceid, username, users_id, gid, cid, isvisible, '.
-            'releases_id, text, createddate, issynced, nzb_guid) VALUES ('.
+            'releases_id, text, created_at, issynced, nzb_guid) VALUES ('.
             'NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, UNHEX(%s))';
         $sql_upd_cmt = 'UPDATE release_comments SET '.
             'isvisible = %d, text = %s'.
@@ -2204,7 +2204,7 @@ class SpotNab
 
         // Now we fetch for any new posts since reference point
         $sql = sprintf('SELECT r.gid, rc.id, rc.text, u.username, '
-            .'rc.isvisible, rc.createddate, rc.host '
+            .'rc.isvisible, rc.created_at, rc.host '
             .'FROM release_comments rc '
             .'JOIN releases r ON r.id = rc.releases_id AND rc.releases_id != 0 '
             .'JOIN users u ON rc.users_id = u.id AND rc.users_id != 0 '
@@ -2241,7 +2241,7 @@ class SpotNab
             }
 
             // Hash a unique Comment id to associate with this message
-            $cid = md5($comment['id'].$comment['username'].$comment['createddate'].$comment['host']);
+            $cid = md5($comment['id'].$comment['username'].$comment['created_at'].$comment['host']);
 
             // Keep list of IDs (required for cleanup)
             $ids[] = $comment['id'];
@@ -2259,7 +2259,7 @@ class SpotNab
                 // Store visibility flag
                 'is_visible' => $comment['isvisible'],
                 // Convert createddate to UTC
-                'postdate_utc' => $this->local2utc($comment['createddate']),
+                'postdate_utc' => $this->local2utc($comment['created_at']),
             ];
         }
 

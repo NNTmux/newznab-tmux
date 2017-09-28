@@ -27,8 +27,8 @@ class CreateConsoleinfoTable extends Migration
             $table->dateTime('releasedate')->nullable();
             $table->string('review', '3000')->nullable();
             $table->unsignedTinyInteger('cover')->default('0');
-            $table->dateTime('createddate');
-            $table->dateTime('updateddate');
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
             $table->primary('id');
             $table->unique('asin', 'ix_consoleinfo_asin');
             DB::statement('ALTER TABLE consoleinfo ADD FULLTEXT INDEX ix_consoleinfo_title_platform_ft (title, platform)');

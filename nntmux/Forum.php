@@ -52,7 +52,7 @@ class Forum
                 return -1;
             }
 
-            Forumpost::query()->where('id', $parentid)->increment('replies', 1, ['updateddate' => Carbon::now()]);
+            Forumpost::query()->where('id', $parentid)->increment('replies', 1, ['updated_at' => Carbon::now()]);
         }
 
         return Forumpost::query()->insertGetId(
@@ -65,8 +65,8 @@ class Forum
              'locked' => $locked,
              'sticky' => $sticky,
              'replies' => $replies,
-             'createddate' => Carbon::now(),
-             'updateddate' => Carbon::now(),
+             'created_at' => Carbon::now(),
+             'updated_at' => Carbon::now(),
             ]
         );
     }
@@ -105,7 +105,7 @@ class Forum
 				LEFT OUTER JOIN users u ON u.id = f.users_id
 				LEFT JOIN user_roles ur ON ur.id = u.user_roles_id
 				WHERE f.id = %d OR f.parentid = %d
-				ORDER BY f.createddate ASC
+				ORDER BY f.created_at ASC
 				LIMIT 250',
                 $parent,
                 $parent
@@ -155,7 +155,7 @@ class Forum
 				LEFT OUTER JOIN users u ON u.id = f.users_id
 				LEFT JOIN user_roles ur ON ur.id = u.user_roles_id
 				WHERE f.parentid = 0
-				ORDER BY f.updateddate DESC %s',
+				ORDER BY f.updated_at DESC %s',
                 ($start === false ? '' : (' LIMIT '.$num.' OFFSET '.$start))
             )
         );
@@ -230,7 +230,7 @@ class Forum
 				FROM forumpost
 				LEFT OUTER JOIN users ON users.id = forumpost.users_id
 				WHERE users_id = %d
-				ORDER BY forumpost.createddate DESC %s',
+				ORDER BY forumpost.created_at DESC %s',
                 ($start === false ? '' : (' LIMIT '.$num.' OFFSET '.$start)),
                 $uid
             )

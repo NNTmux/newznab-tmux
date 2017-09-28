@@ -46,13 +46,13 @@
 							<span class="btn btn-info btn-xs">{$result.rolename}</span>
 						{/if}
 						<br/>
-						on <span title="{$result.createddate}">{$result.createddate|date_format}</span>
-						<div class="hint">({$result.createddate|timeago})</div>
+						on <span title="{$result.created_at}">{$result.created_at|date_format}</span>
+						<div class="hint">({$result.created_at|timeago})</div>
 					</td>
 					<td>
 						<a href="{$smarty.const.WWW_TOP}/forumpost/{$result.id}#last"
-						   title="{$result.updateddate}">{$result.updateddate|date_format}</a>
-						<div class="hint">({$result.updateddate|timeago})</div>
+						   title="{$result.updated_at}">{$result.updated_at|date_format}</a>
+						<div class="hint">({$result.updated_at|timeago})</div>
 					</td>
 					<td class="mid">{$result.replies}</td>
 					<td>

@@ -612,9 +612,9 @@ class Movie
         $validKeys = $this->getColumnKeys();
 
         $query = [
-            '0' => 'INSERT INTO movieinfo (updateddate, createddate, ',
+            '0' => 'INSERT INTO movieinfo (updated_at, created_at, ',
             '1' => ' VALUES (NOW(), NOW(), ',
-            '2' => 'ON DUPLICATE KEY UPDATE updateddate = NOW(), ',
+            '2' => 'ON DUPLICATE KEY UPDATE updated_at = NOW(), ',
         ];
         $found = 0;
         foreach ($values as $key => $value) {
@@ -1158,7 +1158,7 @@ class Movie
             // If set, scan for imdb info.
             if ($processImdb === 1) {
                 $movCheck = $this->getMovieInfo($imdbID);
-                if ($movCheck === false || (isset($movCheck['updateddate']) && (time() - strtotime($movCheck['updateddate'])) > 2592000)) {
+                if ($movCheck === false || (isset($movCheck['updated_at']) && (time() - strtotime($movCheck['updated_at'])) > 2592000)) {
                     if ($this->updateMovieInfo($imdbID) === false) {
                         $this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $id));
                     }

@@ -233,8 +233,8 @@ class Contents
         $obj->showinmenu = $row[$prefix.'showinmenu'];
         $obj->status = $row[$prefix.'status'];
         $obj->ordinal = $row[$prefix.'ordinal'];
-        if (isset($row[$prefix.'createddate'])) {
-            $obj->createddate = $row[$prefix.'createddate'];
+        if (isset($row[$prefix.'created_at'])) {
+            $obj->created_at = $row[$prefix.'created_at'];
         }
         $obj->role = $row[$prefix.'role'];
 

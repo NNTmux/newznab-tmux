@@ -18,7 +18,7 @@
 		<td class="less">{$book.id}</td>
 		<td><a title="Edit" href="{$smarty.const.WWW_TOP}/book-edit.php?id={$book.id}">{$book.title}</a></td>
 		<td>{$book.author}</td>
-		<td class="mid">{$book.createddate|date_format}</td>
+		<td class="mid">{$book.created_at|date_format}</td>
 	</tr>
 	{/foreach}
 

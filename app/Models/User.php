@@ -9,9 +9,6 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    const CREATED_AT = 'createddate';
-    const UPDATED_AT = 'updateddate';
-
     /**
      * @var string
      */
@@ -30,8 +27,8 @@ class User extends Authenticatable
         'password',
         'email',
         'user_roles_id',
-        'createddate',
-        'updateddate',
+        'created_at',
+        'updated_at',
         'host',
         'rsstoken',
         'invites',

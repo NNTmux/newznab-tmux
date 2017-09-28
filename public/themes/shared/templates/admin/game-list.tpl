@@ -14,7 +14,7 @@
 				<td class="less">{$game.id}</td>
 				<td><a title="Edit" href="{$smarty.const.WWW_TOP}/game-edit.php?id={$game.id}">{$game.title}</a></td>
 				<td>{$game.genretitle}</td>
-				<td>{$game.createddate|date_format}</td>
+				<td>{$game.created_at|date_format}</td>
 			</tr>
 		{/foreach}
 	</table>

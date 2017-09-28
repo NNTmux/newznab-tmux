@@ -6,9 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class BookInfo extends Model
 {
-    const CREATED_AT = 'createddate';
-    const UPDATED_AT = 'updateddate';
-
     /**
      * @var string
      */
@@ -36,7 +33,7 @@ class BookInfo extends Model
         'overview',
         'genre',
         'cover',
-        'createddate',
-        'updateddate',
+        'created_at',
+        'updated_at',
     ];
 }

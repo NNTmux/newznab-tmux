@@ -20,8 +20,8 @@ class UserMovies
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Settings' => null,
-		];
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
@@ -39,14 +39,14 @@ class UserMovies
     public function addMovie($uid, $imdbid, $catID = [])
     {
         return $this->pdo->queryInsert(
-			sprintf(
-				'INSERT INTO user_movies (users_id, imdbid, categories, createddate)
+            sprintf(
+                'INSERT INTO user_movies (users_id, imdbid, categories, created_at)
 				VALUES (%d, %d, %s, now())',
-				$uid,
-				$imdbid,
-				(! empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : 'NULL')
-			)
-		);
+                $uid,
+                $imdbid,
+                (! empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : 'NULL')
+            )
+        );
     }
 
     /**
@@ -59,15 +59,15 @@ class UserMovies
     public function getMovies($uid)
     {
         return $this->pdo->query(
-			sprintf(
-				'SELECT um.*, mi.year, mi.plot, mi.cover, mi.title
+            sprintf(
+                'SELECT um.*, mi.year, mi.plot, mi.cover, mi.title
 				FROM user_movies um
 				LEFT OUTER JOIN movieinfo mi ON mi.imdbid = um.imdbid
 				WHERE users_id = %d
 				ORDER BY mi.title ASC',
-				$uid
-			)
-		);
+                $uid
+            )
+        );
     }
 
     /**
@@ -80,14 +80,15 @@ class UserMovies
      */
     public function delMovie($uid, $imdbid)
     {
-        return $this->pdo->queryExec(sprintf(
-			'DELETE FROM user_movies
+        return $this->pdo->queryExec(
+            sprintf(
+            'DELETE FROM user_movies
 			WHERE users_id = %d
 			AND imdbid = %d ',
-			$uid,
-			$imdbid
-			)
-		);
+            $uid,
+            $imdbid
+            )
+        );
     }
 
     /**
@@ -100,16 +101,17 @@ class UserMovies
      */
     public function getMovie($uid, $imdbid)
     {
-        return $this->pdo->queryOneRow(sprintf(
-			'SELECT um.*, mi.title
+        return $this->pdo->queryOneRow(
+            sprintf(
+            'SELECT um.*, mi.title
 			FROM user_movies um
 			LEFT OUTER JOIN movieinfo mi ON mi.imdbid = um.imdbid
 			WHERE um.users_id = %d
 			AND um.imdbid = %d ',
-			$uid,
-			$imdbid
-			)
-		);
+            $uid,
+            $imdbid
+            )
+        );
     }
 
     /**
@@ -117,12 +119,13 @@ class UserMovies
      */
     public function delMovieForUser($uid)
     {
-        $this->pdo->queryExec(sprintf(
-			'DELETE FROM user_movies
+        $this->pdo->queryExec(
+            sprintf(
+            'DELETE FROM user_movies
 			WHERE users_id = %d',
-			$uid
-			)
-		);
+            $uid
+            )
+        );
     }
 
     /**
@@ -135,15 +138,15 @@ class UserMovies
     public function updateMovie($uid, $imdbid, $catID = [])
     {
         $this->pdo->queryExec(
-			sprintf(
-				'UPDATE user_movies
+            sprintf(
+                'UPDATE user_movies
 				SET categories = %s
 				WHERE users_id = %d
 				AND imdbid = %d',
-				(! empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : 'NULL'),
-				$uid,
-				$imdbid
-			)
-		);
+                (! empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : 'NULL'),
+                $uid,
+                $imdbid
+            )
+        );
     }
 }

@@ -6,9 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ConsoleInfo extends Model
 {
-    const CREATED_AT = 'createddate';
-    const UPDATED_AT = 'updateddate';
-
     /**
      * @var string
      */
@@ -35,7 +32,7 @@ class ConsoleInfo extends Model
         'releasedate',
         'review',
         'cover',
-        'createddate',
-        'updateddate',
+        'created_at',
+        'updated_at',
     ];
 }

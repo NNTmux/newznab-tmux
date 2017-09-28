@@ -18,7 +18,7 @@
 	{/if}
 	<tr>
 		<th>Registered:</th>
-		<td title="{$user.createddate}">{$user.createddate|date_format}  ({$user.createddate|timeago} ago)</td>
+		<td title="{$user.created_at}">{$user.created_at|date_format}  ({$user.created_at|timeago} ago)</td>
 	</tr>
 	<tr>
 		<th>Last Login:</th>
@@ -172,7 +172,7 @@
 		</tr>
 		{foreach from=$commentslist item=comment}
 		<tr>
-			<td width="80" title="{$comment.createddate}">{$comment.createddate|date_format}</td>
+			<td width="80" title="{$comment.created_at}">{$comment.created_at|date_format}</td>
 			<td><a href="{$smarty.const.WWW_TOP}/details/{$comment.guid}">{$comment.searchname}</a></td>
 			<td>{$comment.text|escape:"htmlall"|nl2br}</td>
 		</tr>

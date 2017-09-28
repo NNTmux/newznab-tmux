@@ -206,7 +206,7 @@ class Games
     {
         return $this->pdo->query(
             sprintf(
-                'SELECT gi.*, g.title AS genretitle FROM gamesinfo gi INNER JOIN genres g ON gi.genres_id = g.id ORDER BY createddate DESC %s',
+                'SELECT gi.*, g.title AS genretitle FROM gamesinfo gi INNER JOIN genres g ON gi.genres_id = g.id ORDER BY created_at DESC %s',
                 ($start === false ? '' : 'LIMIT '.$num.' OFFSET '.$start)
             )
         );
@@ -464,7 +464,7 @@ class Games
                 '
 				UPDATE gamesinfo
 				SET title = %s, asin = %s, url = %s, publisher = %s,
-					releasedate = %s, esrb = %s, cover = %d, trailer = %s, genres_id = %d, updateddate = NOW()
+					releasedate = %s, esrb = %s, cover = %d, trailer = %s, genres_id = %d, updated_at = NOW()
 				WHERE id = %d',
                 $this->pdo->escapeString($title),
                 $this->pdo->escapeString($asin),
@@ -692,7 +692,7 @@ class Games
             if ($check === false) {
                 $gamesId = $this->pdo->queryInsert(sprintf('
 					INSERT INTO gamesinfo
-						(title, asin, url, publisher, genres_id, esrb, releasedate, review, cover, backdrop, trailer, classused, createddate, updateddate)
+						(title, asin, url, publisher, genres_id, esrb, releasedate, review, cover, backdrop, trailer, classused, created_at, updated_at)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %d, %d, %s, %s, NOW(), NOW())', $this->pdo->escapeString($game['title']), $this->pdo->escapeString($game['asin']), $this->pdo->escapeString($game['url']), $this->pdo->escapeString($game['publisher']), ($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']), $this->pdo->escapeString($game['esrb']), ($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'), $this->pdo->escapeString(substr($game['review'], 0, 3000)), $game['cover'], $game['backdrop'], $this->pdo->escapeString($game['trailer']), $this->pdo->escapeString($game['classused'])));
             } else {
                 $gamesId = $check['id'];
@@ -700,7 +700,7 @@ class Games
 					UPDATE gamesinfo
 					SET
 						title = %s, asin = %s, url = %s, publisher = %s, genres_id = %s,
-						esrb = %s, releasedate = %s, review = %s, cover = %d, backdrop = %d, trailer = %s, classused = %s, updateddate = NOW()
+						esrb = %s, releasedate = %s, review = %s, cover = %d, backdrop = %d, trailer = %s, classused = %s, updated_at = NOW()
 					WHERE id = %d', $this->pdo->escapeString($game['title']), $this->pdo->escapeString($game['asin']), $this->pdo->escapeString($game['url']), $this->pdo->escapeString($game['publisher']), ($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']), $this->pdo->escapeString($game['esrb']), ($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'), $this->pdo->escapeString(substr($game['review'], 0, 3000)), $game['cover'], $game['backdrop'], $this->pdo->escapeString($game['trailer']), $this->pdo->escapeString($game['classused']), $gamesId));
             }
         }

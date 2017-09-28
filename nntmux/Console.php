@@ -392,7 +392,7 @@ class Console
                     'cover' => $cover,
                     'genres_id' => $genreID,
                     'review' => $review === 'review' ? $review : substr($review, 0, 3000),
-                    'updateddate' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
                 ]
             );
     }
@@ -756,8 +756,8 @@ class Console
                         'esrb' => $con['esrb'],
                         'releasedate' => $con['releasedate'] !== '' ? $con['releasedate'] : 'null',
                         'review' => substr($con['review'], 0, 3000),
-                        'createddate' => Carbon::now(),
-                        'updateddate' => Carbon::now(),
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
                     ]
                 );
             if ($con['cover'] === 1) {

@@ -540,7 +540,7 @@
 																		<span class="label label-danger">Passworded</span>
 																	{/if}
 																	<span class="label label-primary">{$rf.size|fsize_format:"MB"}</span>
-																	<span class="label label-primary">{$rf.createddate|date_format}</span>
+																	<span class="label label-primary">{$rf.created_at|date_format}</span>
 																	<br/>
 																{/foreach}
 															</td>
@@ -635,14 +635,14 @@
 										</tr>
 										{foreach $comments|@array_reverse:true as $comment}
 										<tr>
-											<td class="less" title="{$comment.createddate}">
+											<td class="less" title="{$comment.created_at}">
 												{if !$privateprofiles || isset($isadmin) || isset($ismod)}
 													<a title="View {$comment.username}'s profile"
 													   href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
 												{else}
 													{$comment.username}
 												{/if}
-												<br/>{$comment.createddate|daysago}
+												<br/>{$comment.created_at|daysago}
 											</td>
 											{if isset($comment.shared) && $comment.shared == 2}
 												<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>

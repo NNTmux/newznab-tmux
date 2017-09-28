@@ -17,7 +17,7 @@ class CreateInvitationsTable extends Migration
             $table->increments('id');
             $table->string('guid', 50);
             $table->integer('users_id');
-            $table->dateTime('createddate');
+            $table->dateTime('created_at');
         });
     }
 

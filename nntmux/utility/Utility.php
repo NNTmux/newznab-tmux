@@ -69,13 +69,14 @@ class Utility
     {
         // Strip leading/trailing white space.
         return trim(
-		// Replace 2 or more white space for a single space.
-			preg_replace('/\s{2,}/',
-				' ',
-				// Replace new lines and carriage returns. DO NOT try removing '\r' or '\n' as they are valid in queries which uses this method.
-				str_replace(["\n", "\r"], ' ', $text)
-			)
-		);
+        // Replace 2 or more white space for a single space.
+            preg_replace(
+                '/\s{2,}/',
+                ' ',
+                // Replace new lines and carriage returns. DO NOT try removing '\r' or '\n' as they are valid in queries which uses this method.
+                str_replace(["\n", "\r"], ' ', $text)
+            )
+        );
     }
 
     /**
@@ -99,17 +100,17 @@ class Utility
         $right_length = (strlen(strrchr($string, $character)) - 1);
         $left_length = ($whole_length - $right_length - 1);
         switch ($side) {
-			case 'left':
-				$piece = substr($string, 0, $left_length + $offset);
-				break;
-			case 'right':
-				$start = (0 - ($right_length + $offset));
-				$piece = substr($string, $start);
-				break;
-			default:
-				$piece = false;
-				break;
-		}
+            case 'left':
+                $piece = substr($string, 0, $left_length + $offset);
+                break;
+            case 'right':
+                $start = (0 - ($right_length + $offset));
+                $piece = substr($string, $start);
+                break;
+            default:
+                $piece = false;
+                break;
+        }
 
         return $piece;
     }
@@ -122,12 +123,12 @@ class Utility
     public static function getDirFiles(array $options = null): ?array
     {
         $defaults = [
-			'dir'   => false,
-			'ext'   => '', // no full stop (period) separator should be used.
-			'file'	=> true,
-			'path'  => '',
-			'regex' => '',
-		];
+            'dir'   => false,
+            'ext'   => '', // no full stop (period) separator should be used.
+            'file'    => true,
+            'path'  => '',
+            'regex' => '',
+        ];
         $options += $defaults;
         if (! $options['dir'] && ! $options['file']) {
             return null;
@@ -135,27 +136,27 @@ class Utility
 
         // Replace windows style path separators with unix style.
         $iterator = new \FilesystemIterator(
-			str_replace('\\', '/', $options['path']),
-			\FilesystemIterator::KEY_AS_PATHNAME |
-			\FilesystemIterator::SKIP_DOTS |
-			\FilesystemIterator::UNIX_PATHS
-		);
+            str_replace('\\', '/', $options['path']),
+            \FilesystemIterator::KEY_AS_PATHNAME |
+            \FilesystemIterator::SKIP_DOTS |
+            \FilesystemIterator::UNIX_PATHS
+        );
 
         $files = [];
         foreach ($iterator as $fileInfo) {
             $file = $iterator->key();
             switch (true) {
-				case ! $options['dir'] && $fileInfo->isDir():
-					break;
-				case ! empty($options['ext']) && $fileInfo->getExtension() != $options['ext']:
-					break;
-				case empty($options['regex']) || ! preg_match($options['regex'], $file):
-					break;
-				case ! $options['file'] && $fileInfo->isFile():
-					break;
-				default:
-					$files[] = $file;
-			}
+                case ! $options['dir'] && $fileInfo->isDir():
+                    break;
+                case ! empty($options['ext']) && $fileInfo->getExtension() != $options['ext']:
+                    break;
+                case empty($options['regex']) || ! preg_match($options['regex'], $file):
+                    break;
+                case ! $options['file'] && $fileInfo->isFile():
+                    break;
+                default:
+                    $files[] = $file;
+            }
         }
 
         return $files;
@@ -170,9 +171,9 @@ class Utility
         $themelist[] = 'None';
         foreach ($themes as $theme) {
             if (strpos($theme, '.') === false &&
-				is_dir(NN_THEMES.$theme) &&
-				ucfirst($theme) === $theme
-			) {
+                is_dir(NN_THEMES.$theme) &&
+                ucfirst($theme) === $theme
+            ) {
                 $themelist[] = $theme;
             }
         }
@@ -261,7 +262,7 @@ class Utility
         // Check database patch version
         if ($patch < $ver) {
             $message = "\nYour database is not up to date. Reported patch levels\n   Db: $patch\nfile: $ver\nPlease update.\n php ".
-				NN_ROOT."./tmux nntmux:db\n";
+                NN_ROOT."./tmux nntmux:db\n";
             if (self::isCLI()) {
                 echo ColorCLI::error($message);
             }
@@ -314,11 +315,11 @@ class Utility
     public static function stripNonPrintingChars(&$text): string
     {
         $lowChars = [
-			"\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07",
-			"\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
-			"\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17",
-			"\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
-		];
+            "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07",
+            "\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
+            "\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17",
+            "\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
+        ];
         $text = str_replace($lowChars, '', $text);
 
         return $text;
@@ -376,19 +377,19 @@ class Utility
     {
         if (! defined('NN_COVERS')) {
             switch (true) {
-				case substr($path, 0, 1) == '/' ||
-					substr($path, 1, 1) == ':' ||
-					substr($path, 0, 1) == '\\':
-					define('NN_COVERS', self::trailingSlash($path));
-					break;
-				case strlen($path) > 0 && substr($path, 0, 1) != '/' && substr($path, 1, 1) != ':' &&
-					substr($path, 0, 1) != '\\':
-					define('NN_COVERS', realpath(NN_ROOT.self::trailingSlash($path)));
-					break;
-				case empty($path): // Default to resources location.
-				default:
-					define('NN_COVERS', NN_RES.'covers'.DS);
-			}
+                case substr($path, 0, 1) == '/' ||
+                    substr($path, 1, 1) == ':' ||
+                    substr($path, 0, 1) == '\\':
+                    define('NN_COVERS', self::trailingSlash($path));
+                    break;
+                case strlen($path) > 0 && substr($path, 0, 1) != '/' && substr($path, 1, 1) != ':' &&
+                    substr($path, 0, 1) != '\\':
+                    define('NN_COVERS', realpath(NN_ROOT.self::trailingSlash($path)));
+                    break;
+                case empty($path): // Default to resources location.
+                default:
+                    define('NN_COVERS', NN_RES.'covers'.DS);
+            }
         }
     }
 
@@ -405,16 +406,16 @@ class Utility
     {
         if (empty(NN_SSL_CAFILE) && empty(NN_SSL_CAPATH)) {
             $options = [
-				'verify_peer'       => false,
-				'verify_peer_name'  => false,
-				'allow_self_signed' => true,
-			];
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true,
+            ];
         } else {
             $options = [
-				'verify_peer'       => $forceIgnore ? false : (bool) NN_SSL_VERIFY_PEER,
-				'verify_peer_name'  => $forceIgnore ? false : (bool) NN_SSL_VERIFY_HOST,
-				'allow_self_signed' => $forceIgnore ? true : (bool) NN_SSL_ALLOW_SELF_SIGNED,
-			];
+                'verify_peer'       => $forceIgnore ? false : (bool) NN_SSL_VERIFY_PEER,
+                'verify_peer_name'  => $forceIgnore ? false : (bool) NN_SSL_VERIFY_HOST,
+                'allow_self_signed' => $forceIgnore ? true : (bool) NN_SSL_ALLOW_SELF_SIGNED,
+            ];
             if (! empty(NN_SSL_CAFILE)) {
                 $options['cafile'] = NN_SSL_CAFILE;
             }
@@ -443,9 +444,9 @@ class Utility
         $options = [];
         if ($verify && NN_SSL_VERIFY_HOST && (! empty(NN_SSL_CAFILE) || ! empty(NN_SSL_CAPATH))) {
             $options += [
-				CURLOPT_SSL_VERIFYPEER => (bool) NN_SSL_VERIFY_PEER,
-				CURLOPT_SSL_VERIFYHOST => NN_SSL_VERIFY_HOST ? 2 : 0,
-			];
+                CURLOPT_SSL_VERIFYPEER => (bool) NN_SSL_VERIFY_PEER,
+                CURLOPT_SSL_VERIFYHOST => NN_SSL_VERIFY_HOST ? 2 : 0,
+            ];
             if (! empty(NN_SSL_CAFILE)) {
                 $options += [CURLOPT_CAINFO => NN_SSL_CAFILE];
             }
@@ -454,9 +455,9 @@ class Utility
             }
         } else {
             $options += [
-				CURLOPT_SSL_VERIFYPEER => false,
-				CURLOPT_SSL_VERIFYHOST => 0,
-			];
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => 0,
+            ];
         }
 
         return $options;
@@ -473,19 +474,19 @@ class Utility
     public static function getUrl(array $options = [])
     {
         $defaults = [
-			'url'            => '',    // String ; The URL to download.
-			'method'         => 'get', // String ; Http method, get/post/etc..
-			'postdata'       => '',    // String ; Data to send on post method.
-			'language'       => '',    // String ; Language in request header string.
-			'debug'          => false, // Bool   ; Show curl debug information.
-			'useragent'      => '',    // String ; User agent string.
-			'cookie'         => '',    // String ; Cookie string.
-			'requestheaders' => [],    // Array  ; List of request headers.
-			//          Example: ["Content-Type: application/json", "DNT: 1"]
-			'verifycert'     => true,  // Bool   ; Verify certificate authenticity?
-			//          Since curl does not have a verify self signed certs option,
-			//          you should use this instead if your cert is self signed.
-		];
+            'url'            => '',    // String ; The URL to download.
+            'method'         => 'get', // String ; Http method, get/post/etc..
+            'postdata'       => '',    // String ; Data to send on post method.
+            'language'       => '',    // String ; Language in request header string.
+            'debug'          => false, // Bool   ; Show curl debug information.
+            'useragent'      => '',    // String ; User agent string.
+            'cookie'         => '',    // String ; Cookie string.
+            'requestheaders' => [],    // Array  ; List of request headers.
+            //          Example: ["Content-Type: application/json", "DNT: 1"]
+            'verifycert'     => true,  // Bool   ; Verify certificate authenticity?
+            //          Since curl does not have a verify self signed certs option,
+            //          you should use this instead if your cert is self signed.
+        ];
 
         $options += $defaults;
 
@@ -494,25 +495,25 @@ class Utility
         }
 
         switch ($options['language']) {
-			case 'fr':
-			case 'fr-fr':
-				$options['language'] = 'fr-fr';
-				break;
-			case 'de':
-			case 'de-de':
-				$options['language'] = 'de-de';
-				break;
-			case 'en-us':
-				$options['language'] = 'en-us';
-				break;
-			case 'en-gb':
-				$options['language'] = 'en-gb';
-				break;
-			case '':
-			case 'en':
-			default:
-				$options['language'] = 'en';
-		}
+            case 'fr':
+            case 'fr-fr':
+                $options['language'] = 'fr-fr';
+                break;
+            case 'de':
+            case 'de-de':
+                $options['language'] = 'de-de';
+                break;
+            case 'en-us':
+                $options['language'] = 'en-us';
+                break;
+            case 'en-gb':
+                $options['language'] = 'en-gb';
+                break;
+            case '':
+            case 'en':
+            default:
+                $options['language'] = 'en';
+        }
         $header[] = 'Accept-Language: '.$options['language'];
         if (is_array($options['requestheaders'])) {
             $header += $options['requestheaders'];
@@ -521,12 +522,12 @@ class Utility
         $ch = curl_init();
 
         $context = [
-			CURLOPT_URL            => $options['url'],
-			CURLOPT_HTTPHEADER     => $header,
-			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_FOLLOWLOCATION => 1,
-			CURLOPT_TIMEOUT        => 15,
-		];
+            CURLOPT_URL            => $options['url'],
+            CURLOPT_HTTPHEADER     => $header,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_FOLLOWLOCATION => 1,
+            CURLOPT_TIMEOUT        => 15,
+        ];
         $context += self::curlSslContextOptions($options['verifycert']);
         if (! empty($options['useragent'])) {
             $context += [CURLOPT_USERAGENT => $options['useragent']];
@@ -536,17 +537,17 @@ class Utility
         }
         if ($options['method'] === 'post') {
             $context += [
-				CURLOPT_POST       => 1,
-				CURLOPT_POSTFIELDS => $options['postdata'],
-			];
+                CURLOPT_POST       => 1,
+                CURLOPT_POSTFIELDS => $options['postdata'],
+            ];
         }
         if ($options['debug']) {
             $context += [
-				CURLOPT_HEADER      => true,
-				CURLINFO_HEADER_OUT => true,
-				CURLOPT_NOPROGRESS  => false,
-				CURLOPT_VERBOSE     => true,
-			];
+                CURLOPT_HEADER      => true,
+                CURLINFO_HEADER_OUT => true,
+                CURLOPT_NOPROGRESS  => false,
+                CURLOPT_VERBOSE     => true,
+            ];
         }
         curl_setopt_array($ch, $context);
 
@@ -590,21 +591,23 @@ class Utility
     public static function getCoverURL(array $options = []): string
     {
         $defaults = [
-			'id'     => null,
-			'suffix' => '-cover.jpg',
-			'type'   => '',
-		];
+            'id'     => null,
+            'suffix' => '-cover.jpg',
+            'type'   => '',
+        ];
         $options += $defaults;
         $fileSpecTemplate = '%s/%s%s';
         $fileSpec = '';
 
-        if (! empty($options['id']) && in_array($options['type'],
-				['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'], false
-			)
-		) {
+        if (! empty($options['id']) && in_array(
+            $options['type'],
+                ['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'],
+            false
+            )
+        ) {
             $fileSpec = sprintf($fileSpecTemplate, $options['type'], $options['id'], $options['suffix']);
             $fileSpec = file_exists(NN_COVERS.$fileSpec) ? $fileSpec :
-				sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
+                sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
         }
 
         return $fileSpec;
@@ -622,15 +625,15 @@ class Utility
     public static function xmlToArray(\SimpleXMLElement $xml, array $options = []): array
     {
         $defaults = [
-			'namespaceSeparator' => ':', //you may want this to be something other than a colon
-			'attributePrefix' => '@',   //to distinguish between attributes and nodes with the same name
-			'alwaysArray' => [],   //array of xml tag names which should always become arrays
-			'autoArray' => true,        //only create arrays for tags which appear more than once
-			'textContent' => '$',       //key used for the text content of elements
-			'autoText' => true,         //skip textContent key if node has no attributes or child nodes
-			'keySearch' => false,       //optional search and replace on tag and attribute names
-			'keyReplace' => false,       //replace values for above search values (as passed to str_replace())
-		];
+            'namespaceSeparator' => ':', //you may want this to be something other than a colon
+            'attributePrefix' => '@',   //to distinguish between attributes and nodes with the same name
+            'alwaysArray' => [],   //array of xml tag names which should always become arrays
+            'autoArray' => true,        //only create arrays for tags which appear more than once
+            'textContent' => '$',       //key used for the text content of elements
+            'autoText' => true,         //skip textContent key if node has no attributes or child nodes
+            'keySearch' => false,       //optional search and replace on tag and attribute names
+            'keyReplace' => false,       //replace values for above search values (as passed to str_replace())
+        ];
         $options = array_merge($defaults, $options);
         $namespaces = $xml->getDocNamespaces();
         $namespaces[''] = null; //add base (empty) namespace
@@ -642,11 +645,11 @@ class Utility
                 //replace characters in attribute name
                 if ($options['keySearch']) {
                     $attributeName =
-					str_replace($options['keySearch'], $options['keyReplace'], $attributeName);
+                    str_replace($options['keySearch'], $options['keyReplace'], $attributeName);
                 }
                 $attributeKey = $options['attributePrefix']
-					.($prefix ? $prefix.$options['namespaceSeparator'] : '')
-					.$attributeName;
+                    .($prefix ? $prefix.$options['namespaceSeparator'] : '')
+                    .$attributeName;
                 $attributesArray[$attributeKey] = (string) $attribute;
             }
             //get child nodes from all namespaces
@@ -658,7 +661,7 @@ class Utility
                 //replace characters in tag name
                 if ($options['keySearch']) {
                     $childTagName =
-					str_replace($options['keySearch'], $options['keyReplace'], $childTagName);
+                    str_replace($options['keySearch'], $options['keyReplace'], $childTagName);
                 }
                 //add namespace prefix, if any
                 if ($prefix) {
@@ -669,12 +672,12 @@ class Utility
                     //only entry with this key
                     //test if tags of this type should always be arrays, no matter the element count
                     $tagsArray[$childTagName] =
-						in_array($childTagName, $options['alwaysArray'], false) || ! $options['autoArray']
-							? [$childProperties] : $childProperties;
+                        in_array($childTagName, $options['alwaysArray'], false) || ! $options['autoArray']
+                            ? [$childProperties] : $childProperties;
                 } elseif (
-					is_array($tagsArray[$childTagName]) && array_keys($tagsArray[$childTagName])
-					=== range(0, count($tagsArray[$childTagName]) - 1)
-				) {
+                    is_array($tagsArray[$childTagName]) && array_keys($tagsArray[$childTagName])
+                    === range(0, count($tagsArray[$childTagName]) - 1)
+                ) {
                     //key already exists and is integer indexed array
                     $tagsArray[$childTagName][] = $childProperties;
                 } else {
@@ -693,12 +696,12 @@ class Utility
 
         //stick it all together
         $propertiesArray = ! $options['autoText'] || $attributesArray || $tagsArray || ($plainText === '')
-			? array_merge($attributesArray, $tagsArray, $textContentArray) : $plainText;
+            ? array_merge($attributesArray, $tagsArray, $textContentArray) : $plainText;
 
         //return node as array
         return [
-			$xml->getName() => $propertiesArray,
-		];
+            $xml->getName() => $propertiesArray,
+        ];
     }
 
     // Central function for sending site email.
@@ -732,21 +735,21 @@ class Utility
             // Check to make sure the user has their settings correct.
             if (PHPMAILER_USE_SMTP === true) {
                 if ((! defined('PHPMAILER_SMTP_HOST') || PHPMAILER_SMTP_HOST === '') ||
-					(! defined('PHPMAILER_SMTP_PORT') || PHPMAILER_SMTP_PORT === '')
-				) {
+                    (! defined('PHPMAILER_SMTP_PORT') || PHPMAILER_SMTP_PORT === '')
+                ) {
                     throw new \phpmailerException(
-						'You opted to use SMTP but the PHPMAILER_SMTP_HOST and/or PHPMAILER_SMTP_PORT is/are not defined correctly! Either fix the missing/incorrect values or change PHPMAILER_USE_SMTP to false in the www/settings.php'
-					);
+                        'You opted to use SMTP but the PHPMAILER_SMTP_HOST and/or PHPMAILER_SMTP_PORT is/are not defined correctly! Either fix the missing/incorrect values or change PHPMAILER_USE_SMTP to false in the www/settings.php'
+                    );
                 }
 
                 // If the user enabled SMTP & Auth but did not setup credentials, throw an exception.
                 if (defined('PHPMAILER_SMTP_AUTH') && PHPMAILER_SMTP_AUTH === true) {
                     if ((! defined('PHPMAILER_SMTP_USER') || PHPMAILER_SMTP_USER === '') ||
-						(! defined('PHPMAILER_SMTP_PASSWORD') || PHPMAILER_SMTP_PASSWORD === '')
-					) {
+                        (! defined('PHPMAILER_SMTP_PASSWORD') || PHPMAILER_SMTP_PASSWORD === '')
+                    ) {
                         throw new \phpmailerException(
-							'You opted to use SMTP and SMTP Auth but the PHPMAILER_SMTP_USER and/or PHPMAILER_SMTP_PASSWORD is/are not defined correctly. Please set them in www/settings.php'
-						);
+                            'You opted to use SMTP and SMTP Auth but the PHPMAILER_SMTP_USER and/or PHPMAILER_SMTP_PASSWORD is/are not defined correctly. Please set them in www/settings.php'
+                        );
                     }
                 }
             }
@@ -822,16 +825,16 @@ class Utility
 
             if (is_array($output)) {
                 switch (count($output)) {
-					case 0:
-						$output = '';
-						break;
-					case 1:
-						$output = $output[0];
-						break;
-					default:
-						$output = implode(' ', $output);
-						break;
-				}
+                    case 0:
+                        $output = '';
+                        break;
+                    case 1:
+                        $output = $output[0];
+                        break;
+                    default:
+                        $output = implode(' ', $output);
+                        break;
+                }
             } else {
                 $output = '';
             }
@@ -1035,49 +1038,49 @@ class Utility
     public static function convertRomanToInt($string): int
     {
         switch (strtolower($string)) {
-			case 'i': $e = 1;
-				break;
-			case 'ii': $e = 2;
-				break;
-			case 'iii': $e = 3;
-				break;
-			case 'iv': $e = 4;
-				break;
-			case 'v': $e = 5;
-				break;
-			case 'vi': $e = 6;
-				break;
-			case 'vii': $e = 7;
-				break;
-			case 'viii': $e = 8;
-				break;
-			case 'ix': $e = 9;
-				break;
-			case 'x': $e = 10;
-				break;
-			case 'xi': $e = 11;
-				break;
-			case 'xii': $e = 12;
-				break;
-			case 'xiii': $e = 13;
-				break;
-			case 'xiv': $e = 14;
-				break;
-			case 'xv': $e = 15;
-				break;
-			case 'xvi': $e = 16;
-				break;
-			case 'xvii': $e = 17;
-				break;
-			case 'xviii': $e = 18;
-				break;
-			case 'xix': $e = 19;
-				break;
-			case 'xx': $e = 20;
-				break;
-			default:
-				$e = 0;
-		}
+            case 'i': $e = 1;
+                break;
+            case 'ii': $e = 2;
+                break;
+            case 'iii': $e = 3;
+                break;
+            case 'iv': $e = 4;
+                break;
+            case 'v': $e = 5;
+                break;
+            case 'vi': $e = 6;
+                break;
+            case 'vii': $e = 7;
+                break;
+            case 'viii': $e = 8;
+                break;
+            case 'ix': $e = 9;
+                break;
+            case 'x': $e = 10;
+                break;
+            case 'xi': $e = 11;
+                break;
+            case 'xii': $e = 12;
+                break;
+            case 'xiii': $e = 13;
+                break;
+            case 'xiv': $e = 14;
+                break;
+            case 'xv': $e = 15;
+                break;
+            case 'xvi': $e = 16;
+                break;
+            case 'xvii': $e = 17;
+                break;
+            case 'xviii': $e = 18;
+                break;
+            case 'xix': $e = 19;
+                break;
+            case 'xx': $e = 20;
+                break;
+            default:
+                $e = 0;
+        }
 
         return $e;
     }
@@ -1091,63 +1094,63 @@ class Utility
     {
         if ($errorText === '') {
             switch ($errorCode) {
-				case 100:
-					$errorText = 'Incorrect user credentials';
-					break;
-				case 101:
-					$errorText = 'Account suspended';
-					break;
-				case 102:
-					$errorText = 'Insufficient privileges/not authorized';
-					break;
-				case 103:
-					$errorText = 'Registration denied';
-					break;
-				case 104:
-					$errorText = 'Registrations are closed';
-					break;
-				case 105:
-					$errorText = 'Invalid registration (Email Address Taken)';
-					break;
-				case 106:
-					$errorText = 'Invalid registration (Email Address Bad Format)';
-					break;
-				case 107:
-					$errorText = 'Registration Failed (Data error)';
-					break;
-				case 200:
-					$errorText = 'Missing parameter';
-					break;
-				case 201:
-					$errorText = 'Incorrect parameter';
-					break;
-				case 202:
-					$errorText = 'No such function';
-					break;
-				case 203:
-					$errorText = 'Function not available';
-					break;
-				case 300:
-					$errorText = 'No such item';
-					break;
-				case 500:
-					$errorText = 'Request limit reached';
-					break;
-				case 501:
-					$errorText = 'Download limit reached';
-					break;
-				case 910:
-					$errorText = 'API disabled';
-					break;
-				default:
-					$errorText = 'Unknown error';
-					break;
-			}
+                case 100:
+                    $errorText = 'Incorrect user credentials';
+                    break;
+                case 101:
+                    $errorText = 'Account suspended';
+                    break;
+                case 102:
+                    $errorText = 'Insufficient privileges/not authorized';
+                    break;
+                case 103:
+                    $errorText = 'Registration denied';
+                    break;
+                case 104:
+                    $errorText = 'Registrations are closed';
+                    break;
+                case 105:
+                    $errorText = 'Invalid registration (Email Address Taken)';
+                    break;
+                case 106:
+                    $errorText = 'Invalid registration (Email Address Bad Format)';
+                    break;
+                case 107:
+                    $errorText = 'Registration Failed (Data error)';
+                    break;
+                case 200:
+                    $errorText = 'Missing parameter';
+                    break;
+                case 201:
+                    $errorText = 'Incorrect parameter';
+                    break;
+                case 202:
+                    $errorText = 'No such function';
+                    break;
+                case 203:
+                    $errorText = 'Function not available';
+                    break;
+                case 300:
+                    $errorText = 'No such item';
+                    break;
+                case 500:
+                    $errorText = 'Request limit reached';
+                    break;
+                case 501:
+                    $errorText = 'Download limit reached';
+                    break;
+                case 910:
+                    $errorText = 'API disabled';
+                    break;
+                default:
+                    $errorText = 'Unknown error';
+                    break;
+            }
         }
 
         $response =
-			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
-			'<error code="'.$errorCode.'" description="'.$errorText."\"/>\n";
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
+            '<error code="'.$errorCode.'" description="'.$errorText."\"/>\n";
         header('Content-type: text/xml');
         header('Content-Length: '.strlen($response));
         header('X-NNTmux: API ERROR ['.$errorCode.'] '.$errorText);
@@ -1196,13 +1199,13 @@ class Utility
         $pdo = new DB();
 
         return $pdo->query(
-			sprintf(
-				'SELECT * %s FROM %s ORDER BY createddate DESC %s',
-				($tableName === 'xxxinfo' ? ', UNCOMPRESS(plot) AS plot' : ''),
-				$tableName,
-				($start === false ? '' : ('LIMIT '.$num.' OFFSET '.$start))
-			)
-		);
+            sprintf(
+                'SELECT * %s FROM %s ORDER BY created_at DESC %s',
+                ($tableName === 'xxxinfo' ? ', UNCOMPRESS(plot) AS plot' : ''),
+                $tableName,
+                ($start === false ? '' : ('LIMIT '.$num.' OFFSET '.$start))
+            )
+        );
     }
 
     /**

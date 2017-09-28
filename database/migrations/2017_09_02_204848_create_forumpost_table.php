@@ -23,13 +23,13 @@ class CreateForumpostTable extends Migration
             $table->unsignedTinyInteger('locked')->default(0);
             $table->unsignedTinyInteger('sticky')->default(0);
             $table->integer('replies')->default(0);
-            $table->dateTime('createddate');
-            $table->dateTime('updateddate');
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
             $table->primary('id');
             $table->index('parentid');
             $table->index('users_id');
-            $table->index('createddate');
-            $table->index('updateddate');
+            $table->index('created_at');
+            $table->index('updated_at');
         });
     }
 

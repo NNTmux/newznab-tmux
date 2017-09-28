@@ -18,7 +18,7 @@
 		<td class="less">{$console.id}</td>
 		<td><a title="Edit" href="{$smarty.const.WWW_TOP}/console-edit.php?id={$console.id}">{$console.title}</a></td>
 		<td>{$console.platform}</td>
-		<td>{$console.createddate|date_format}</td>
+		<td>{$console.created_at|date_format}</td>
 	</tr>
 	{/foreach}
 

@@ -654,8 +654,8 @@ class Books
                     'overview' =>$book['overview'],
                     'genre' => $book['genre'],
                     'cover' => $book['cover'],
-                    'createddate' => Carbon::now(),
-                    'updateddate' => Carbon::now(),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
                 ]
             );
         } else {
@@ -675,7 +675,7 @@ class Books
                     'overview' => $book['overview'],
                     'genre' => $book['genre'],
                     'cover' => $book['cover'],
-                    'updateddate' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
                 ]
             );
         }

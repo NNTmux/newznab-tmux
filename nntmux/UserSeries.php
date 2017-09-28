@@ -22,8 +22,8 @@ class UserSeries
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Settings' => null,
-		];
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
@@ -41,13 +41,13 @@ class UserSeries
     public function addShow($uID, $videoId, $catID = [])
     {
         return $this->pdo->queryInsert(
-			sprintf(
-				'INSERT INTO user_series (users_id, videos_id, categories, createddate) VALUES (%d, %d, %s, NOW())',
-				$uID,
-				$videoId,
-				(! empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : 'NULL')
-			)
-		);
+            sprintf(
+                'INSERT INTO user_series (users_id, videos_id, categories, created_at) VALUES (%d, %d, %s, NOW())',
+                $uID,
+                $videoId,
+                (! empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : 'NULL')
+            )
+        );
     }
 
     /**
@@ -60,15 +60,16 @@ class UserSeries
     public function getShows($uID)
     {
         return $this->pdo->query(
-			sprintf('
+            sprintf(
+                '
 				SELECT us.*, v.title
 				FROM user_series us
 				INNER JOIN videos v ON v.id = us.videos_id
 				WHERE users_id = %d
 				ORDER BY v.title ASC',
-				$uID
-			)
-		);
+                $uID
+            )
+        );
     }
 
     /**
@@ -80,12 +81,12 @@ class UserSeries
     public function delShow($uID, $videoId)
     {
         $this->pdo->queryExec(
-			sprintf(
-				'DELETE FROM user_series WHERE users_id = %d AND videos_id = %d',
-				$uID,
-				$videoId
-			)
-		);
+            sprintf(
+                'DELETE FROM user_series WHERE users_id = %d AND videos_id = %d',
+                $uID,
+                $videoId
+            )
+        );
     }
 
     /**
@@ -99,16 +100,17 @@ class UserSeries
     public function getShow($uID, $videoId)
     {
         return $this->pdo->queryOneRow(
-			sprintf('
+            sprintf(
+                '
 				SELECT us.*, v.title
 				FROM user_series us
 				LEFT OUTER JOIN videos v ON v.id = us.videos_id
 				WHERE us.users_id = %d
 				AND us.videos_id = %d',
-				$uID,
-				$videoId
-			)
-		);
+                $uID,
+                $videoId
+            )
+        );
     }
 
     /**
@@ -119,11 +121,11 @@ class UserSeries
     public function delShowForUser($uID)
     {
         $this->pdo->queryExec(
-			sprintf(
-				'DELETE FROM user_series WHERE users_id = %d',
-				$uID
-			)
-		);
+            sprintf(
+                'DELETE FROM user_series WHERE users_id = %d',
+                $uID
+            )
+        );
     }
 
     /**
@@ -134,11 +136,11 @@ class UserSeries
     public function delShowForSeries($videoId)
     {
         $this->pdo->queryExec(
-			sprintf(
-				'DELETE FROM user_series WHERE videos_id = %d',
-				$videoId
-			)
-		);
+            sprintf(
+                'DELETE FROM user_series WHERE videos_id = %d',
+                $videoId
+            )
+        );
     }
 
     /**
@@ -151,12 +153,12 @@ class UserSeries
     public function updateShow($uID, $videoId, $catID = [])
     {
         $this->pdo->queryExec(
-			sprintf(
-				'UPDATE user_series SET categories = %s WHERE users_id = %d AND videos_id = %d',
-				(! empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : 'NULL'),
-				$uID,
-				$videoId
-			)
-		);
+            sprintf(
+                'UPDATE user_series SET categories = %s WHERE users_id = %d AND videos_id = %d',
+                (! empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : 'NULL'),
+                $uID,
+                $videoId
+            )
+        );
     }
 }

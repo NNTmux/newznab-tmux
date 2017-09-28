@@ -21,7 +21,7 @@
 				<a title="View details" href="{$smarty.const.WWW_TOP}/series/{$show.videos_id}{if $show.categories != ''}?t={$show.categories|replace:"|":","}{/if}"><h5>{$show.title|escape:"htmlall"|wordwrap:75:"\n":true}</h5></a>
 			</td>
 			<td class="less">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</td>
-			<td class="less" style="width:100px;" title="Added on {$show.createddate}">{$show.createddate|date_format}</td>
+			<td class="less" style="width:100px;" title="Added on {$show.created_at}">{$show.created_at|date_format}</td>
 			<td class="mid" style="width:100px;">
 				<div class="btn-group">
 					<a class="btn btn-mini btn-warning myshows" href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.videos_id}" rel="edit" name="series{$show.videos_id}" title="Edit Categories">Edit</a>&nbsp;&nbsp;

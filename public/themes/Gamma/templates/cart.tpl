@@ -35,7 +35,7 @@
 			<td>
 				<a title="View details" href="{$smarty.const.WWW_TOP}/details/{$result->release->guid}">{$result->release->searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 			</td>
-			<td class="less" title="Added on {$result.createddate}">{$result.createddate|date_format}</td>
+			<td class="less" title="Added on {$result.created_at}">{$result.created_at|date_format}</td>
 			<td><a class="btn btn-mini btn-danger" title="Delete from your Download Basket" href="?delete={$result->release->id}">Delete</a></td>
 		</tr>
 		{/foreach}

@@ -17,8 +17,8 @@ class CreateUsersReleasesTable extends Migration
             $table->increments('id');
             $table->integer('users_id');
             $table->integer('releases_id');
-            $table->dateTime('createddate');
-            $table->dateTime('updateddate');
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
             $table->unique(['users_id', 'releases_id'], 'ix_usercart_userrelease');
         });
     }

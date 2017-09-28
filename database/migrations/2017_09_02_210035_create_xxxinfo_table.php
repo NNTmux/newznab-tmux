@@ -28,8 +28,8 @@ class CreateXxxInfoTable extends Migration
             $table->string('classused', 20);
             $table->unsignedTinyInteger('cover');
             $table->unsignedTinyInteger('backdrop');
-            $table->dateTime('createddate');
-            $table->dateTime('updateddate');
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
             $table->unique('title', 'ix_xxxinfo_title');
         });
     }

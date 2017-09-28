@@ -23,7 +23,7 @@
 					<span class="btn btn-info btn-xs">{$result.rolename}</span>
 				{/if}
 				<br/>
-				on <span title="{$result.createddate}">{$result.createddate|date_format}</span> <div class="hint">({$result.createddate|timeago})</div>
+				on <span title="{$result.created_at}">{$result.created_at|date_format}</span> <div class="hint">({$result.created_at|timeago})</div>
 				{if $userdata.id == $result.users_id && $result.locked != 1 || isset($isadmin)}
 					<div>
 						<a class="rndbtn btn btn-mini btn-warning"

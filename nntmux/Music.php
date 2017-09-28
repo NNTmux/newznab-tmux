@@ -73,9 +73,9 @@ class Music
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Echo'     => false,
-			'Settings' => null,
-		];
+            'Echo'     => false,
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
@@ -172,7 +172,8 @@ class Music
         $order = $this->getMusicOrder($orderby);
 
         $music = $this->pdo->queryCalc(
-				sprintf("
+                sprintf(
+                    "
 				SELECT SQL_CALC_FOUND_ROWS
 					m.id,
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
@@ -185,15 +186,17 @@ class Music
 				%s %s %s
 				GROUP BY m.id
 				ORDER BY %s %s %s",
-						Releases::showPasswords(),
-						$browseby,
-						$catsrch,
-						$exccatlist,
-						$order[0],
-						$order[1],
-						($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-				), true, NN_CACHE_EXPIRY_MEDIUM
-		);
+                        Releases::showPasswords(),
+                        $browseby,
+                        $catsrch,
+                        $exccatlist,
+                        $order[0],
+                        $order[1],
+                        ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+                ),
+            true,
+            NN_CACHE_EXPIRY_MEDIUM
+        );
 
         $musicIDs = $releaseIDs = false;
 
@@ -204,7 +207,8 @@ class Music
             }
         }
 
-        $sql = sprintf("
+        $sql = sprintf(
+            "
 			SELECT
 				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 				GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
@@ -234,12 +238,12 @@ class Music
 			%s
 			GROUP BY m.id
 			ORDER BY %s %s",
-				(is_array($musicIDs) ? implode(',', $musicIDs) : -1),
-				(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
-				$catsrch,
-				$order[0],
-				$order[1]
-		);
+                (is_array($musicIDs) ? implode(',', $musicIDs) : -1),
+                (is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+                $catsrch,
+                $order[0],
+                $order[1]
+        );
         $return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
         if (! empty($return)) {
             $return[0]['_totalcount'] = $music['total'] ?? 0;
@@ -258,29 +262,29 @@ class Music
         $order = ($orderby == '') ? 'r.postdate' : $orderby;
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
-			case 'artist':
-				$orderfield = 'm.artist';
-				break;
-			case 'size':
-				$orderfield = 'r.size';
-				break;
-			case 'files':
-				$orderfield = 'r.totalpart';
-				break;
-			case 'stats':
-				$orderfield = 'r.grabs';
-				break;
-			case 'year':
-				$orderfield = 'm.year';
-				break;
-			case 'genre':
-				$orderfield = 'm.genres_id';
-				break;
-			case 'posted':
-			default:
-				$orderfield = 'r.postdate';
-				break;
-		}
+            case 'artist':
+                $orderfield = 'm.artist';
+                break;
+            case 'size':
+                $orderfield = 'r.size';
+                break;
+            case 'files':
+                $orderfield = 'r.totalpart';
+                break;
+            case 'stats':
+                $orderfield = 'r.grabs';
+                break;
+            case 'year':
+                $orderfield = 'm.year';
+                break;
+            case 'genre':
+                $orderfield = 'm.genres_id';
+                break;
+            case 'posted':
+            default:
+                $orderfield = 'r.postdate';
+                break;
+        }
         $ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderfield, $ordersort];
@@ -365,17 +369,26 @@ class Music
     public function update($id, $title, $asin, $url, $salesrank, $artist, $publisher, $releasedate, $year, $tracks, $cover, $genres_id)
     {
         $this->pdo->queryExec(
-					sprintf('
+                    sprintf(
+                        '
 						UPDATE musicinfo
 						SET title = %s, asin = %s, url = %s, salesrank = %s, artist = %s, publisher = %s, releasedate = %s,
-							year = %s, tracks = %s, cover = %d, genres_id = %d, updateddate = NOW()
+							year = %s, tracks = %s, cover = %d, genres_id = %d, updated_at = NOW()
 						WHERE id = %d',
-						$this->pdo->escapeString($title), $this->pdo->escapeString($asin),
-						$this->pdo->escapeString($url), $salesrank, $this->pdo->escapeString($artist),
-						$this->pdo->escapeString($publisher), $this->pdo->escapeString($releasedate),
-						$this->pdo->escapeString($year), $this->pdo->escapeString($tracks), $cover, $genres_id, $id
-					)
-		);
+                        $this->pdo->escapeString($title),
+                        $this->pdo->escapeString($asin),
+                        $this->pdo->escapeString($url),
+                        $salesrank,
+                        $this->pdo->escapeString($artist),
+                        $this->pdo->escapeString($publisher),
+                        $this->pdo->escapeString($releasedate),
+                        $this->pdo->escapeString($year),
+                        $this->pdo->escapeString($tracks),
+                        $cover,
+                        $genres_id,
+                        $id
+                    )
+        );
     }
 
     /**
@@ -499,13 +512,14 @@ class Music
                 $genreKey = array_search(strtolower($genreName), $genreassoc, false);
             } else {
                 $genreKey = $this->pdo->queryInsert(
-									sprintf('
+                                    sprintf(
+                                        '
 										INSERT INTO genres (title, type)
 										VALUES (%s, %d)',
-										$this->pdo->escapeString($genreName),
-										Genres::MUSIC_TYPE
-									)
-				);
+                                        $this->pdo->escapeString($genreName),
+                                        Genres::MUSIC_TYPE
+                                    )
+                );
             }
         }
         $mus['musicgenre'] = $genreName;
@@ -514,26 +528,26 @@ class Music
         $check = $this->pdo->queryOneRow(sprintf('SELECT id FROM musicinfo WHERE asin = %s', $this->pdo->escapeString($mus['asin'])));
         if ($check === false) {
             $musicId = $this->pdo->queryInsert(sprintf('INSERT INTO musicinfo (title, asin, url, salesrank, artist, publisher, '
-					.'releasedate, review, year, genres_id, tracks, cover, createddate, updateddate) VALUES '
-					.'(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, now(), now())', $this->pdo->escapeString($mus['title']), $this->pdo->escapeString($mus['asin']), $this->pdo->escapeString($mus['url']), $mus['salesrank'], $this->pdo->escapeString($mus['artist']), $this->pdo->escapeString($mus['publisher']), $mus['releasedate'], $this->pdo->escapeString($mus['review']), $this->pdo->escapeString($mus['year']), ($mus['musicgenres_id'] == -1 ? 'null' : $mus['musicgenres_id']), $this->pdo->escapeString($mus['tracks']), $mus['cover']));
+                    .'releasedate, review, year, genres_id, tracks, cover, created_at, updated_at) VALUES '
+                    .'(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, now(), now())', $this->pdo->escapeString($mus['title']), $this->pdo->escapeString($mus['asin']), $this->pdo->escapeString($mus['url']), $mus['salesrank'], $this->pdo->escapeString($mus['artist']), $this->pdo->escapeString($mus['publisher']), $mus['releasedate'], $this->pdo->escapeString($mus['review']), $this->pdo->escapeString($mus['year']), ($mus['musicgenres_id'] == -1 ? 'null' : $mus['musicgenres_id']), $this->pdo->escapeString($mus['tracks']), $mus['cover']));
         } else {
             $musicId = $check['id'];
             $this->pdo->queryExec(sprintf('UPDATE musicinfo SET title = %s, asin = %s, url = %s, salesrank = %s, artist = %s, '
-					.'publisher = %s, releasedate = %s, review = %s, year = %s, genres_id = %s, tracks = %s, cover = %s, '
-					.'updateddate = NOW() WHERE id = %d', $this->pdo->escapeString($mus['title']), $this->pdo->escapeString($mus['asin']), $this->pdo->escapeString($mus['url']), $mus['salesrank'], $this->pdo->escapeString($mus['artist']), $this->pdo->escapeString($mus['publisher']), $mus['releasedate'], $this->pdo->escapeString($mus['review']), $this->pdo->escapeString($mus['year']), ($mus['musicgenres_id'] == -1 ? 'null' : $mus['musicgenres_id']), $this->pdo->escapeString($mus['tracks']), $mus['cover'], $musicId));
+                    .'publisher = %s, releasedate = %s, review = %s, year = %s, genres_id = %s, tracks = %s, cover = %s, '
+                    .'updated_at = NOW() WHERE id = %d', $this->pdo->escapeString($mus['title']), $this->pdo->escapeString($mus['asin']), $this->pdo->escapeString($mus['url']), $mus['salesrank'], $this->pdo->escapeString($mus['artist']), $this->pdo->escapeString($mus['publisher']), $mus['releasedate'], $this->pdo->escapeString($mus['review']), $this->pdo->escapeString($mus['year']), ($mus['musicgenres_id'] == -1 ? 'null' : $mus['musicgenres_id']), $this->pdo->escapeString($mus['tracks']), $mus['cover'], $musicId));
         }
 
         if ($musicId) {
             if ($this->echooutput) {
                 ColorCLI::doEcho(
-					ColorCLI::header(PHP_EOL.'Added/updated album: ').
-					ColorCLI::alternateOver('   Artist: ').
-					ColorCLI::primary($mus['artist']).
-					ColorCLI::alternateOver('   Title:  ').
-					ColorCLI::primary($mus['title']).
-					ColorCLI::alternateOver('   Year:   ').
-					ColorCLI::primary($mus['year'])
-				);
+                    ColorCLI::header(PHP_EOL.'Added/updated album: ').
+                    ColorCLI::alternateOver('   Artist: ').
+                    ColorCLI::primary($mus['artist']).
+                    ColorCLI::alternateOver('   Title:  ').
+                    ColorCLI::primary($mus['title']).
+                    ColorCLI::alternateOver('   Year:   ').
+                    ColorCLI::primary($mus['year'])
+                );
             }
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
         } else {
@@ -544,15 +558,15 @@ class Music
                     $artist = 'Artist: '.$mus['artist'].', Album: ';
                 }
                 ColorCLI::doEcho(
-					ColorCLI::headerOver('Nothing to update: ').
-					ColorCLI::primaryOver(
-						$artist.
-						$mus['title'].
-						' ('.
-						$mus['year'].
-						')'
-					)
-				);
+                    ColorCLI::headerOver('Nothing to update: ').
+                    ColorCLI::primaryOver(
+                        $artist.
+                        $mus['title'].
+                        ' ('.
+                        $mus['year'].
+                        ')'
+                    )
+                );
             }
         }
 
@@ -574,12 +588,12 @@ class Music
 
         try {
             $conf
-				->setCountry('com')
-				->setAccessKey($this->pubkey)
-				->setSecretKey($this->privkey)
-				->setAssociateTag($this->asstag)
-				->setRequest($request)
-				->setResponseTransformer(new XmlToSimpleXmlObject());
+                ->setCountry('com')
+                ->setAccessKey($this->pubkey)
+                ->setSecretKey($this->privkey)
+                ->setAssociateTag($this->asstag)
+                ->setRequest($request)
+                ->setResponseTransformer(new XmlToSimpleXmlObject());
         } catch (\Exception $e) {
             echo $e->getMessage();
         }
@@ -654,7 +668,8 @@ class Music
     public function processMusicReleases($local = false)
     {
         $res = $this->pdo->queryDirect(
-			sprintf('
+            sprintf(
+                '
 					SELECT searchname, id
 					FROM releases
 					WHERE musicinfo_id IS NULL
@@ -662,19 +677,20 @@ class Music
 					AND categories_id IN (%s, %s, %s)
 					ORDER BY postdate DESC
 					LIMIT %d',
-				$this->renamed,
-				Category::MUSIC_MP3,
-				Category::MUSIC_LOSSLESS,
-				Category::MUSIC_OTHER,
-				$this->musicqty
-			)
-		);
+                $this->renamed,
+                Category::MUSIC_MP3,
+                Category::MUSIC_LOSSLESS,
+                Category::MUSIC_OTHER,
+                $this->musicqty
+            )
+        );
         if ($res instanceof \Traversable && $res->rowCount() > 0) {
             if ($this->echooutput) {
                 ColorCLI::doEcho(
-					ColorCLI::header('Processing '.$res->rowCount().' music release(s).'
-					)
-				);
+                    ColorCLI::header(
+                        'Processing '.$res->rowCount().' music release(s).'
+                    )
+                );
             }
 
             foreach ($res as $arr) {
@@ -774,7 +790,8 @@ class Music
     public function getGenres($activeOnly = false)
     {
         if ($activeOnly) {
-            return $this->pdo->query('
+            return $this->pdo->query(
+                '
 				SELECT ge.*
 				FROM genres ge
 				INNER JOIN
@@ -784,13 +801,14 @@ class Music
 				) x ON x.genres_id = ge.id
 				WHERE ge.type = " . Category::MUSIC_ROOT . "
 				ORDER BY title'
-			);
+            );
         } else {
-            return $this->pdo->query('
+            return $this->pdo->query(
+                '
 				SELECT * FROM genres
 				WHERE type = " . Category::MUSIC_ROOT . "
 				ORDER BY title'
-			);
+            );
         }
     }
 
@@ -805,98 +823,98 @@ class Music
 
         //music nodes above mp3 download nodes
         switch ($nodeId) {
-			case '163420':
-				$str = 'Music Video & Concerts';
-				break;
-			case '30':
-			case '624869011':
-				$str = 'Alternative Rock';
-				break;
-			case '31':
-			case '624881011':
-				$str = 'Blues';
-				break;
-			case '265640':
-			case '624894011':
-				$str = 'Broadway & Vocalists';
-				break;
-			case '173425':
-			case '624899011':
-				$str = "Children's Music";
-				break;
-			case '173429': //christian
-			case '2231705011': //gospel
-			case '624905011': //christian & gospel
-				$str = 'Christian & Gospel';
-				break;
-			case '67204':
-			case '624916011':
-				$str = 'Classic Rock';
-				break;
-			case '85':
-			case '624926011':
-				$str = 'Classical';
-				break;
-			case '16':
-			case '624976011':
-				$str = 'Country';
-				break;
-			case '7': //dance & electronic
-			case '624988011': //dance & dj
-				$str = 'Dance & Electronic';
-				break;
-			case '32':
-			case '625003011':
-				$str = 'Folk';
-				break;
-			case '67207':
-			case '625011011':
-				$str = 'Hard Rock & Metal';
-				break;
-			case '33': //world music
-			case '625021011': //international
-				$str = 'World Music';
-				break;
-			case '34':
-			case '625036011':
-				$str = 'Jazz';
-				break;
-			case '289122':
-			case '625054011':
-				$str = 'Latin Music';
-				break;
-			case '36':
-			case '625070011':
-				$str = 'New Age';
-				break;
-			case '625075011':
-				$str = 'Opera & Vocal';
-				break;
-			case '37':
-			case '625092011':
-				$str = 'Pop';
-				break;
-			case '39':
-			case '625105011':
-				$str = 'R&B';
-				break;
-			case '38':
-			case '625117011':
-				$str = 'Rap & Hip-Hop';
-				break;
-			case '40':
-			case '625129011':
-				$str = 'Rock';
-				break;
-			case '42':
-			case '625144011':
-				$str = 'Soundtracks';
-				break;
-			case '35':
-			case '625061011':
-				$str = 'Miscellaneous';
-				break;
-		}
+            case '163420':
+                $str = 'Music Video & Concerts';
+                break;
+            case '30':
+            case '624869011':
+                $str = 'Alternative Rock';
+                break;
+            case '31':
+            case '624881011':
+                $str = 'Blues';
+                break;
+            case '265640':
+            case '624894011':
+                $str = 'Broadway & Vocalists';
+                break;
+            case '173425':
+            case '624899011':
+                $str = "Children's Music";
+                break;
+            case '173429': //christian
+            case '2231705011': //gospel
+            case '624905011': //christian & gospel
+                $str = 'Christian & Gospel';
+                break;
+            case '67204':
+            case '624916011':
+                $str = 'Classic Rock';
+                break;
+            case '85':
+            case '624926011':
+                $str = 'Classical';
+                break;
+            case '16':
+            case '624976011':
+                $str = 'Country';
+                break;
+            case '7': //dance & electronic
+            case '624988011': //dance & dj
+                $str = 'Dance & Electronic';
+                break;
+            case '32':
+            case '625003011':
+                $str = 'Folk';
+                break;
+            case '67207':
+            case '625011011':
+                $str = 'Hard Rock & Metal';
+                break;
+            case '33': //world music
+            case '625021011': //international
+                $str = 'World Music';
+                break;
+            case '34':
+            case '625036011':
+                $str = 'Jazz';
+                break;
+            case '289122':
+            case '625054011':
+                $str = 'Latin Music';
+                break;
+            case '36':
+            case '625070011':
+                $str = 'New Age';
+                break;
+            case '625075011':
+                $str = 'Opera & Vocal';
+                break;
+            case '37':
+            case '625092011':
+                $str = 'Pop';
+                break;
+            case '39':
+            case '625105011':
+                $str = 'R&B';
+                break;
+            case '38':
+            case '625117011':
+                $str = 'Rap & Hip-Hop';
+                break;
+            case '40':
+            case '625129011':
+                $str = 'Rock';
+                break;
+            case '42':
+            case '625144011':
+                $str = 'Soundtracks';
+                break;
+            case '35':
+            case '625061011':
+                $str = 'Miscellaneous';
+                break;
+        }
 
         return ($str != '') ? $str : false;
     }

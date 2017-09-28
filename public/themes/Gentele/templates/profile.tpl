@@ -45,8 +45,8 @@
 														{/if}
 														<tr>
 															<th width="200">Registered</th>
-															<td>{$user.createddate|date_format}
-																({$user.createddate|timeago} ago)
+															<td>{$user.created_at|date_format}
+																({$user.created_at|timeago} ago)
 															</td>
 														</tr>
 														<tr>

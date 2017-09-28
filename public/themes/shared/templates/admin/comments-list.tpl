@@ -19,7 +19,7 @@
 						{$comment.username}
 					{/if}
 				</td>
-				<td title="{$comment.createddate}">{$comment.createddate|timeago}</td>
+				<td title="{$comment.created_at}">{$comment.created_at|timeago}</td>
 				{if $comment.shared == 2}
 					<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>
 				{else}
