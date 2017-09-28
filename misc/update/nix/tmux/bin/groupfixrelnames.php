@@ -47,12 +47,14 @@ switch (true) {
 						IFNULL(GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|'), '') AS filestring,
 						IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring,
 						IFNULL(HEX(ru.uniqueid), '') AS uid,
-						IFNULL(ph.hash, 0) AS hash
+						IFNULL(ph.hash, 0) AS hash,
+						IFNULL(rf.mediainfo, '') AS mediainfo
 					FROM releases r
 					LEFT JOIN release_nfos rn ON r.id = rn.releases_id
 					LEFT JOIN release_files rf ON r.id = rf.releases_id
 					LEFT JOIN release_unique ru ON ru.releases_id = r.id
 					LEFT JOIN par_hashes ph ON ph.releases_id = r.id
+					LEFT JOIN releaseextrafull rf ON rf.releases_id = r.id
 					WHERE r.leftguid = %s
 					AND r.nzbstatus = %d
 					AND r.isrenamed = %d
@@ -79,6 +81,10 @@ switch (true) {
 						(
 							r.ishashed = 1
 							AND r.dehashstatus BETWEEN -6 AND 0
+						)
+						OR (
+						    r.name REGEXP '[a-z0-9]{32,64}'
+				            AND rf.mediainfo REGEXP '\<Movie_name\>'
 						)
 					)
 					AND r.categories_id IN (%s)
@@ -125,8 +131,9 @@ switch (true) {
                 }
                 $nameFixer->reset();
 
-                if ((int) $release['proc_uid'] === NameFixer::PROC_UID_NONE && ! empty($release['uid'])) {
+                if ((int) $release['proc_uid'] === NameFixer::PROC_UID_NONE && (! empty($release['uid']) || ! empty($release['mediainfo']))) {
                     echo ColorCLI::primaryOver('U');
+                    $nameFixer->mediaMovieNameCheck($release, true, 'Mediainfo, ', 1, 1);
                     $nameFixer->uidCheck($release, true, 'UID, ', 1, 1);
                 }
                 // Not all gate requirements in query always set column status as PP Add check is in query
