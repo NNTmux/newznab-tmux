@@ -1,4 +1,5 @@
 2017-09-28 DariusIII
+	* Fix: Fix wrong number of arguments in sprintf
 	* Chg: Rename columns createddate and updateddate to created_at and updated_at to comply with laravel
 	* Chg: Update MovieInfo model and related migration
 	* Chg: Update code style of Releases and ReleaseSearch
