@@ -456,7 +456,7 @@ class Movie
             return false;
         }
 
-        $trailer = MovieInfo::query()->where('imdbid', $imdbID)->where('trailer', '!=', '')->first('trailer');
+        $trailer = MovieInfo::query()->where('imdbid', $imdbID)->where('trailer', '!=', '')->first(['trailer']);
         if ($trailer !== null) {
             return $trailer['trailer'];
         }
