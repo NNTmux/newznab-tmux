@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
-use App\Models\ReleaseFile;
 use nntmux\db\DB;
 use Carbon\Carbon;
+use App\Models\ReleaseFile;
 
 /**
  * This class handles storage and retrieval of releasefiles.
@@ -95,7 +95,7 @@ class ReleaseFiles
                     'size' => $size,
                     'created_at' => Carbon::createFromTimestamp($createdTime),
                     'updated_at' => Carbon::now(),
-                    'passworded' => $hasPassword
+                    'passworded' => $hasPassword,
                 ]
             );
 
