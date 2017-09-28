@@ -89,6 +89,12 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
         case 16:
             $namefixer->fixNamesWithParHash(2, $update, $other, $setStatus, $show);
             break;
+        case 17:
+            $namefixer->fixNamesWithMediaMovieName(1, $update, $other, $setStatus, $show);
+            break;
+        case 18:
+            $namefixer->fixNamesWithMediaMovieName(2, $update, $other, $setStatus, $show);
+            // no break
         default:
             exit(ColorCLI::error(PHP_EOL.'ERROR: Wrong argument, type php $argv[0] to see a list of valid arguments.'.PHP_EOL));
             break;

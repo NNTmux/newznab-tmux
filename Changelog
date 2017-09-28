@@ -1,3 +1,5 @@
+2017-09-28 DariusIII
+	* Add: Add renaming of releases by using additional mediainfo
 2017-09-27 DariusIII
 	* Chg: Update Invitation and User model relation
 	* Chg: Update Invitation model and related migration, use the model in Users class

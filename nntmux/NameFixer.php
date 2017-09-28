@@ -600,6 +600,72 @@ class NameFixer
     }
 
     /**
+     * @param $time
+     * @param $echo
+     * @param $cats
+     * @param $nameStatus
+     * @param $show
+     */
+    public function fixNamesWithMediaMovieName($time, $echo, $cats, $nameStatus, $show): void
+    {
+        $type = 'Mediainfo, ';
+
+        $this->_echoStartMessage($time, 'Mediainfo movie_name');
+
+        // Re-check all releases we haven't matched to a PreDB
+        if ($cats === 3) {
+            $query = sprintf(
+                "
+				SELECT rel.id AS releases_id, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
+				FROM releases rel
+				INNER JOIN releaseextrafull rf ON (rf.releases_id = rel.id)
+				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
+                AND rf.mediainfo REGEXP '\<Movie_name\>PSArips\.com|RMZ\.cr\<\/Movie_name\>'
+                AND rel.nzbstatus = %d
+                AND rel.predb_id = 0",
+                NZB::NZB_ADDED
+            );
+            $cats = 2;
+            // Otherwise check only releases we haven't renamed and checked uid before in Misc categories
+        } else {
+            $query = sprintf(
+                "
+				SELECT rel.id AS releases_id, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
+				FROM releases rel
+				INNER JOIN releaseextrafull rf ON (rf.releases_id = rel.id)
+				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
+				AND rf.mediainfo REGEXP '\<Movie_name\>PSArips\.com|RMZ\.cr\<\/Movie_name\>'
+				AND rel.nzbstatus = %d
+                AND rel.isrenamed = %d
+                AND rel.predb_id = 0
+				AND rel.categories_id IN (%d, %d)",
+                NZB::NZB_ADDED,
+                self::IS_RENAMED_NONE,
+                Category::OTHER_MISC,
+                Category::OTHER_HASHED
+            );
+        }
+
+        $releases = $this->_getReleases($time, $cats, $query);
+        if ($releases instanceof \Traversable) {
+            $total = $releases->rowCount();
+            if ($total > 0) {
+                $this->_totalReleases = $total;
+                echo ColorCLI::primary(number_format($total).' mediainfo movie names to process.');
+                foreach ($releases as $rel) {
+                    $this->checked++;
+                    $this->reset();
+                    $this->mediaMovieNameCheck($rel, $echo, $type, $nameStatus, $show);
+                    $this->_echoRenamed($show);
+                }
+                $this->_echoFoundCount($echo, ' MediaInof\'s');
+            } else {
+                echo ColorCLI::info('Nothing to fix.');
+            }
+        }
+    }
+
+    /**
      * Attempts to fix release names using the par2 hash_16K block.
      *
      * @param int     $time 1: 24 hours, 2: no time limit
@@ -1394,6 +1460,9 @@ class NameFixer
                 case 'UID, ':
                     $this->uidCheck($release, $echo, $type, $namestatus, $show);
                     break;
+                case 'Mediainfo, ':
+                    $this->mediaMovieNameCheck($release, $echo, $type, $namestatus, $show);
+                    break;
                 case 'SRR, ':
                     $this->srrNameCheck($release, $echo, $type, $namestatus, $show);
                     break;
@@ -2038,6 +2107,39 @@ class NameFixer
                         return true;
                     }
                 }
+            }
+        }
+        $this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
+
+        return false;
+    }
+
+    /**
+     * Look for a name based on mediainfo xml Unique_ID.
+     *
+     * @param array   $release The release to be matched
+     * @param bool $echo Should we show CLI output
+     * @param string  $type The rename type
+     * @param int     $namestatus Should we rename the release if match is found
+     * @param int     $show Should we show the rename results
+     *
+     * @return bool Whether or not we matched the release
+     */
+    public function mediaMovieNameCheck($release, $echo, $type, $namestatus, $show): bool
+    {
+        if ($this->done === false && $this->relid !== (int) $release['releases_id']) {
+            if (preg_match('/<Movie_name>(.+)<\/Movie_name>/i', $release['mediainfo'], $match)) {
+                $media = $match[1];
+                if (preg_match(self::PREDB_REGEX, $media, $match)) {
+                    $newName = $match[1];
+                } elseif (preg_match('/(.+)[\,](\sRMZ\.cr)?/i', $media, $match)) {
+                    $newName = $match[1];
+                }
+            }
+
+            if (! empty($newName)) {
+                $this->updateRelease($release, $newName, $method = 'MediaInfo: Movie Name', $echo, $type, $namestatus, $show, $release['predb_id']);
+                return true;
             }
         }
         $this->_updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release['releases_id']);
