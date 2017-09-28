@@ -54,7 +54,7 @@ switch (true) {
 					LEFT JOIN release_files rf ON r.id = rf.releases_id
 					LEFT JOIN release_unique ru ON ru.releases_id = r.id
 					LEFT JOIN par_hashes ph ON ph.releases_id = r.id
-					LEFT JOIN releaseextrafull rf ON rf.releases_id = r.id
+					LEFT JOIN releaseextrafull re ON re.releases_id = r.id
 					WHERE r.leftguid = %s
 					AND r.nzbstatus = %d
 					AND r.isrenamed = %d
@@ -84,7 +84,7 @@ switch (true) {
 						)
 						OR (
 						    r.name REGEXP '[a-z0-9]{32,64}'
-				            AND rf.mediainfo REGEXP '\<Movie_name\>'
+				            AND re.mediainfo REGEXP '\<Movie_name\>'
 						)
 					)
 					AND r.categories_id IN (%s)
