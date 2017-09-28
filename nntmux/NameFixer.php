@@ -616,7 +616,7 @@ class NameFixer
         if ($cats === 3) {
             $query = sprintf(
                 "
-				SELECT rel.id AS releases_id, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
+				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
 				FROM releases rel
 				INNER JOIN releaseextrafull rf ON (rf.releases_id = rel.id)
 				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
@@ -630,7 +630,7 @@ class NameFixer
         } else {
             $query = sprintf(
                 "
-				SELECT rel.id AS releases_id, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
+				SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.mediainfo AS mediainfo
 				FROM releases rel
 				INNER JOIN releaseextrafull rf ON (rf.releases_id = rel.id)
 				WHERE rel.name REGEXP '[a-z0-9]{32,64}'
