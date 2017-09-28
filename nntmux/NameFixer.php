@@ -2139,6 +2139,7 @@ class NameFixer
 
             if (! empty($newName)) {
                 $this->updateRelease($release, $newName, $method = 'MediaInfo: Movie Name', $echo, $type, $namestatus, $show, $release['predb_id']);
+
                 return true;
             }
         }
