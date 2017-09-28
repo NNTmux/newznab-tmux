@@ -33,17 +33,17 @@ class ReleaseSearch
     public function __construct(DB $settings)
     {
         switch (NN_RELEASE_SEARCH_TYPE) {
-			case self::LIKE:
-				$this->fullTextJoinString = '';
-				break;
-			case self::SPHINX:
-				$this->fullTextJoinString = 'INNER JOIN releases_se rse ON rse.id = r.id';
-				break;
-			case self::FULLTEXT:
-			default:
-			$this->fullTextJoinString = 'INNER JOIN release_search_data rs on rs.releases_id = r.id';
-				break;
-		}
+            case self::LIKE:
+                $this->fullTextJoinString = '';
+                break;
+            case self::SPHINX:
+                $this->fullTextJoinString = 'INNER JOIN releases_se rse ON rse.id = r.id';
+                break;
+            case self::FULLTEXT:
+            default:
+            $this->fullTextJoinString = 'INNER JOIN release_search_data rs on rs.releases_id = r.id';
+                break;
+        }
 
         $this->sphinxQueryOpt = ';limit=10000;maxmatches=10000;sort=relevance;mode=extended';
         $this->pdo = ($settings instanceof DB ? $settings : new DB());
@@ -66,17 +66,17 @@ class ReleaseSearch
         }
 
         switch (NN_RELEASE_SEARCH_TYPE) {
-			case self::LIKE:
-				$SQL = $this->likeSQL();
-				break;
-			case self::SPHINX:
-				$SQL = $this->sphinxSQL();
-				break;
-			case self::FULLTEXT:
-			default:
-				$SQL = $this->fullTextSQL();
-				break;
-		}
+            case self::LIKE:
+                $SQL = $this->likeSQL();
+                break;
+            case self::SPHINX:
+                $SQL = $this->sphinxSQL();
+                break;
+            case self::FULLTEXT:
+            default:
+                $SQL = $this->fullTextSQL();
+                break;
+        }
 
         return $SQL;
     }
@@ -172,10 +172,11 @@ class ReleaseSearch
             }
             $searchWords = rtrim($searchWords, "\n\t\r\0\x0B ");
             if ($searchWords !== '') {
-                $searchQuery .= sprintf('@%s %s ',
-					$columnName,
-					$searchWords
-				);
+                $searchQuery .= sprintf(
+                    '@%s %s ',
+                    $columnName,
+                    $searchWords
+                );
             }
         }
         if ($searchQuery !== '') {
