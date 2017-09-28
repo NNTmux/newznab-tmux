@@ -139,7 +139,7 @@
                 }
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
-            "time": "2017-08-27 15:14:06"
+            "time": "2017-08-27T15:14:06+00:00"
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -1473,7 +1473,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-05-29 12:05:57"
+            "time": "2017-05-29T12:05:57+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -2633,7 +2633,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2016-05-04 01:31:56"
+            "time": "2016-05-04T01:31:56+00:00"
         },
         {
             "name": "kbjr/Git.php",
@@ -2659,7 +2659,7 @@
                 "source": "https://github.com/kbjr/Git.php/tree/master",
                 "issues": "https://github.com/kbjr/Git.php/issues"
             },
-            "time": "2015-03-31 14:10:29"
+            "time": "2015-03-31T14:10:29+00:00"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
@@ -3245,16 +3245,16 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "v2.0.10",
+            "version": "v2.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "634bae8e911eefa89c1abfbf1b66da679ac8f54d"
+                "reference": "5da4d3c796c275c55f057af5a643ae297d96b4d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/634bae8e911eefa89c1abfbf1b66da679ac8f54d",
-                "reference": "634bae8e911eefa89c1abfbf1b66da679ac8f54d",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/5da4d3c796c275c55f057af5a643ae297d96b4d8",
+                "reference": "5da4d3c796c275c55f057af5a643ae297d96b4d8",
                 "shasum": ""
             },
             "require": {
@@ -3289,7 +3289,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2017-03-13T16:27:32+00:00"
+            "time": "2017-09-27T21:40:39+00:00"
         },
         {
             "name": "php-tmdb/api",
