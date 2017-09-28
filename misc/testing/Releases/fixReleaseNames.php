@@ -120,5 +120,7 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
             .'php '.$argv[0].' 13 false other no ...: Fix release names in misc categories using SRR files in the past 6 hours.'.PHP_EOL
             .'php '.$argv[0].' 14 false other no ...: Fix release names in misc categories using SRR files.'.PHP_EOL
             .'php '.$argv[0].' 15 false other no ...: Fix release names in misc categories using PAR2 hash_16K block in the past 6 hours.'.PHP_EOL
-            .'php '.$argv[0].' 16 false other no ...: Fix release names in misc categories using PAR2 hash_16K block.'.PHP_EOL));
+            .'php '.$argv[0].' 16 false other no ...: Fix release names in misc categories using PAR2 hash_16K block.'.PHP_EOL
+            .'php '.$argv[0].' 17 false other no ...: Fix release names in misc categories using Mediainfo in the past 6 hours.'.PHP_EOL
+            .'php '.$argv[0].' 18 false other no ...: Fix release names in misc categories using Mediainfo.'.PHP_EOL));
 }
