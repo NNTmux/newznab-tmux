@@ -48,7 +48,7 @@ switch (true) {
 						IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring,
 						IFNULL(HEX(ru.uniqueid), '') AS uid,
 						IFNULL(ph.hash, 0) AS hash,
-						IFNULL(rf.mediainfo, '') AS mediainfo
+						IFNULL(re.mediainfo, '') AS mediainfo
 					FROM releases r
 					LEFT JOIN release_nfos rn ON r.id = rn.releases_id
 					LEFT JOIN release_files rf ON r.id = rf.releases_id
