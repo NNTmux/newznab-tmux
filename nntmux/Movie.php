@@ -2,12 +2,12 @@
 
 namespace nntmux;
 
-use App\Models\MovieInfo;
 use nntmux\db\DB;
 use Tmdb\ApiToken;
 use aharen\OMDbAPI;
 use GuzzleHttp\Client;
 use App\Models\Settings;
+use App\Models\MovieInfo;
 use nntmux\utility\Utility;
 use nntmux\libraries\FanartTV;
 use Tmdb\Client as TmdbClient;
