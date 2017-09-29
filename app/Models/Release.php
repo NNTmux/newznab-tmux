@@ -35,4 +35,9 @@ class Release extends Model
     {
         return $this->hasMany('App\Models\UsersRelease', 'releases_id');
     }
+
+    public function file()
+    {
+        return $this->hasMany('App\Models\ReleaseFile', 'releases_id');
+    }
 }

@@ -20,4 +20,9 @@ class ReleaseFile extends Model
      * @var string
      */
     protected $primaryKey = 'releases_id';
+
+    public function release()
+    {
+        return $this->belongsTo('App\Models\Release', 'releases_id');
+    }
 }

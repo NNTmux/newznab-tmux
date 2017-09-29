@@ -14,8 +14,14 @@ class CreateReleaseFilesTable extends Migration
     public function up()
     {
         Schema::create('release_files', function (Blueprint $table) {
-            $table->increments('id');
+            $table->unsignedInteger('releases_id');
+            $table->string('name', 255)->default('');
+            $table->unsignedBigInteger('size')->default(0);
+            $table->tinyInteger('ishashed')->default(0);
+            $table->unsignedTinyInteger('passworded')->default(0);
             $table->timestamps();
+            $table->primary(['releases_id', 'name']);
+            $table->index('ishashed', 'ix_releasefiles_ishashed');
         });
     }
 

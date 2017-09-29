@@ -16,7 +16,6 @@ $files = $rf->getByGuid($_REQUEST['id']);
 if (count($files) === 0) {
     echo 'No files';
 } else {
-    //print "<h3 class=\"tooltiphead\">rar archive contains...</h3>\n";
     echo "<ul>\n";
     foreach ($files as $f) {
         echo '<li>'.htmlentities($f['name'], ENT_QUOTES).'&nbsp;'.($f['passworded'] === 1 ? '<img width="12" src="'.WWW_TOP.'/themes/shared/images/icons/lock.gif" />' : '')."</li>\n";

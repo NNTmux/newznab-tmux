@@ -17,12 +17,13 @@ class ReleaseFiles
     protected $pdo;
 
     /**
-     * @var SphinxSearch
+     * @var \nntmux\SphinxSearch
      */
     public $sphinxSearch;
 
     /**
      * @param \nntmux\db\DB $settings
+     * @throws \Exception
      */
     public function __construct($settings = null)
     {
@@ -33,25 +34,22 @@ class ReleaseFiles
     /**
      * Get releasefiles row by id.
      *
-     * @param $id
      *
-     * @return array
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function get($id)
     {
-        return $this->pdo->query(sprintf('SELECT * FROM release_files WHERE releases_id = %d ORDER BY release_files.name ', $id));
+        return ReleaseFile::query()->where('releases_id', $id)->orderBy('name')->get();
     }
 
-    /**
-     * Get releasefiles row by release.GUID.
-     *
-     * @param $guid
-     *
-     * @return array
-     */
+
     public function getByGuid($guid)
     {
-        return $this->pdo->query(sprintf('SELECT release_files.* FROM release_files INNER JOIN releases r ON r.id = release_files.releases_id WHERE r.guid = %s ORDER BY release_files.name ', $this->pdo->escapeString($guid)));
+        return ReleaseFile::query()
+            ->join('releases', 'releases.id', '=', 'release_files.releases_id')
+            ->where('releases.guid', $guid)
+            ->orderBy('release_files.name')->get();
     }
 
     /**
@@ -63,7 +61,7 @@ class ReleaseFiles
      */
     public function delete($id)
     {
-        $res = $this->pdo->queryExec(sprintf('DELETE FROM release_files WHERE releases_id = %d', $id));
+        $res = ReleaseFile::query()->where('releases_id', $id)->delete();
         $this->sphinxSearch->updateRelease($id, $this->pdo);
 
         return $res;
