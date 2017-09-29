@@ -43,7 +43,6 @@ class ReleaseFiles
         return ReleaseFile::query()->where('releases_id', $id)->orderBy('name')->get();
     }
 
-
     public function getByGuid($guid)
     {
         return ReleaseFile::query()
