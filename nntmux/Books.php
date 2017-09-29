@@ -474,7 +474,7 @@ class Books
                     // Update release.
                     Release::query()->where('id', $arr['id'])->update(['bookinfo_id' => $bookId]);
                 } else { // Could not parse release title.
-                    Release::query()->where('id', $arr['id'])->update(['bookinfo_id' => $bookId);
+                    Release::query()->where('id', $arr['id'])->update(['bookinfo_id' => $bookId]);
                     if ($this->echooutput) {
                         echo '.';
                     }
