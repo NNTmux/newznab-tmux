@@ -41,9 +41,9 @@
 			<th>Host<br/><a title="Sort Descending" href="{$orderbyhost_desc}"><span><i class="fa fa-chevron-down"></i></span></a><a
 						title="Sort Ascending" href="{$orderbyhost_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
-			<th>Join date<br/><a title="Sort Descending" href="{$orderbycreated_at_desc}"><span><i
+			<th>Join date<br/><a title="Sort Descending" href="{$orderbycreatedat_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
-																			 href="{$orderbycreated_at_asc}"><span><i
+																			 href="{$orderbycreatedat_asc}"><span><i
 								class="fa fa-chevron-up"></i></span></a></th>
 			<th>last login<br/><a title="Sort Descending" href="{$orderbylastlogin_desc}"><span><i
 								class="fa fa-chevron-down"></i></span></a><a title="Sort Ascending"
