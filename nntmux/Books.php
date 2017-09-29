@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Release;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use Carbon\Carbon;
@@ -19,7 +20,7 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 class Books
 {
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -29,27 +30,27 @@ class Books
     public $echooutput;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     public $pubkey;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     public $privkey;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     public $asstag;
 
     /**
-     * @var array|bool|int|string
+     * @var int|null|string
      */
     public $bookqty;
 
     /**
-     * @var array|bool|int|string
+     * @var int|null|string
      */
     public $sleeptime;
 
@@ -59,7 +60,7 @@ class Books
     public $imgSavePath;
 
     /**
-     * @var array|bool|int|string
+     * @var null|string
      */
     public $bookreqids;
 
@@ -69,7 +70,6 @@ class Books
     public $renamed;
 
     /**
-     * Store names of failed Amazon lookup items.
      * @var array
      */
     public $failCache;
@@ -93,15 +93,12 @@ class Books
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
         $this->asstag = Settings::settingValue('APIs..amazonassociatetag');
-        $this->bookqty = Settings::settingValue('..maxbooksprocessed') !== '' ? Settings::settingValue('..maxbooksprocessed') : 300;
-        $this->sleeptime = Settings::settingValue('..amazonsleep') !== '' ? Settings::settingValue('..amazonsleep') : 1000;
+        $this->bookqty = Settings::settingValue('..maxbooksprocessed') !== '' ? (int) Settings::settingValue('..maxbooksprocessed') : 300;
+        $this->sleeptime = Settings::settingValue('..amazonsleep') !== '' ? (int) Settings::settingValue('..amazonsleep') : 1000;
         $this->imgSavePath = NN_COVERS.'book'.DS;
         $result = Settings::settingValue('..book_reqids');
         $this->bookreqids = empty($result) ? Category::BOOKS_EBOOK : $result;
-        $this->renamed = '';
-        if ((int) Settings::settingValue('..lookupbooks') === 2) {
-            $this->renamed = 'AND isrenamed = 1';
-        }
+        $this->renamed = (int) Settings::settingValue('..lookupbooks') === 2 ? 'AND isrenamed = 1' : '';
 
         $this->failCache = [];
     }
@@ -117,14 +114,11 @@ class Books
     }
 
     /**
-     * @param $author
      * @param $title
-     *
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
-    public function getBookInfoByName($author, $title)
+    public function getBookInfoByName($title)
     {
-        $pdo = $this->pdo;
 
         //only used to get a count of words
         $searchwords = $searchsql = '';
@@ -142,9 +136,9 @@ class Books
             }
         }
         $searchwords = trim($searchwords);
-        $searchsql .= sprintf(' MATCH(author, title) AGAINST(%s IN BOOLEAN MODE)', $pdo->escapeString($searchwords));
+        $searchsql .= sprintf(' MATCH(author, title) AGAINST(%s IN BOOLEAN MODE)', $this->pdo->escapeString($searchwords));
 
-        return $pdo->queryOneRow(sprintf('SELECT * FROM bookinfo WHERE %s', $searchsql));
+        return BookInfo::query()->whereRaw($searchsql)->first();
     }
 
     /**
@@ -390,6 +384,8 @@ class Books
 
     /**
      * Process book releases, 1 category at a time.
+     *
+     * @throws \Exception
      */
     public function processBookReleases(): void
     {
@@ -423,7 +419,7 @@ class Books
     /**
      * Process book releases.
      *
-     * @param \PDOStatement|bool $res        Array containing unprocessed book SQL data set.
+     * @param \PDOStatement $res        Array containing unprocessed book SQL data set.
      * @param int                $categoryID The category id.
      *
      * @void
@@ -436,6 +432,7 @@ class Books
                 ColorCLI::doEcho(ColorCLI::header("\nProcessing ".$res->rowCount().' book release(s) for categories id '.$categoryID));
             }
 
+            $bookId = -2;
             foreach ($res as $arr) {
                 $startTime = microtime(true);
                 $usedAmazon = false;
@@ -454,7 +451,7 @@ class Books
                     }
 
                     // Do a local lookup first
-                    $bookCheck = $this->getBookInfoByName('', $bookInfo);
+                    $bookCheck = $this->getBookInfoByName($bookInfo);
 
                     if ($bookCheck === false && in_array($bookInfo, $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
@@ -465,18 +462,19 @@ class Books
                     } elseif ($bookCheck === false) {
                         $bookId = $this->updateBookInfo($bookInfo);
                         $usedAmazon = true;
-                        if ($bookId === false) {
-                            $bookId = -2;
+                        if ($bookId === -2) {
                             $this->failCache[] = $bookInfo;
                         }
                     } else {
-                        $bookId = $bookCheck['id'];
+                        if (! empty($bookCheck)) {
+                            $bookId = $bookCheck['id'];
+                        }
                     }
 
                     // Update release.
-                    $this->pdo->queryExec(sprintf('UPDATE releases SET bookinfo_id = %d WHERE id = %d', $bookId, $arr['id']));
+                    Release::query()->where('id', $arr['id'])->update(['bookinfo_id' => $bookId]);
                 } else { // Could not parse release title.
-                    $this->pdo->queryExec(sprintf('UPDATE releases SET bookinfo_id = %d WHERE id = %d', -2, $arr['id']));
+                    Release::query()->where('id', $arr['id'])->update(['bookinfo_id' => $bookId);
                     if ($this->echooutput) {
                         echo '.';
                     }
@@ -564,6 +562,7 @@ class Books
         $ri = new ReleaseImage($this->pdo);
 
         $book = [];
+        $bookId = -2;
 
         $amaz = false;
         if ($bookInfo !== '') {
@@ -638,7 +637,7 @@ class Books
         }
 
         $check = BookInfo::query()->where('asin', $book['asin'])->first();
-        if ($check === false) {
+        if ($check === null) {
             $bookId = BookInfo::query()->insertGetId(
                 [
                     'title' => $book['title'],
@@ -659,7 +658,9 @@ class Books
                 ]
             );
         } else {
-            $bookId = $check['id'];
+            if ($check !== null) {
+                $bookId = $check['id'];
+            }
             BookInfo::query()->where('id', $bookId)->update(
                 [
                     'title' => $book['title'],
@@ -680,7 +681,7 @@ class Books
             );
         }
 
-        if ($bookId) {
+        if ($bookId && $bookId !== -2) {
             if ($this->echooutput) {
                 ColorCLI::doEcho(ColorCLI::header('Added/updated book: '));
                 if ($book['author'] !== '') {
