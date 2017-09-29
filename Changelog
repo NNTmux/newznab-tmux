@@ -1,4 +1,5 @@
 2017-09-29 DariusIII
+	* Chg: Update auth related controllers
 	* Chg: Update Console class
 	* Chg: Update Books class
 	* Chg: Update ReleaseFile model, related migration, update ReleaseFiles
