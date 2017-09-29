@@ -22,7 +22,7 @@ class Console
     const CONS_NTFND = -2;
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -32,27 +32,27 @@ class Console
     public $echooutput;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     public $pubkey;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     public $privkey;
 
     /**
-     * @var array|bool|string
+     * @var null|string
      */
     public $asstag;
 
     /**
-     * @var array|bool|int|string
+     * @var int|null|string
      */
     public $gameqty;
 
     /**
-     * @var array|bool|int|string
+     * @var int|null|string
      */
     public $sleeptime;
 
@@ -67,7 +67,7 @@ class Console
     public $renamed;
 
     /**
-     * @var array|bool|int|string
+     * @var string
      */
     public $catWhere;
 
@@ -95,8 +95,8 @@ class Console
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
         $this->asstag = Settings::settingValue('APIs..amazonassociatetag');
-        $this->gameqty = (Settings::settingValue('..maxgamesprocessed') !== '') ? Settings::settingValue('..maxgamesprocessed') : 150;
-        $this->sleeptime = (Settings::settingValue('..amazonsleep') !== '') ? Settings::settingValue('..amazonsleep') : 1000;
+        $this->gameqty = (Settings::settingValue('..maxgamesprocessed') !== '') ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
+        $this->sleeptime = (Settings::settingValue('..amazonsleep') !== '') ? (int) Settings::settingValue('..amazonsleep') : 1000;
         $this->imgSavePath = NN_COVERS.'console'.DS;
         $this->renamed = (int) Settings::settingValue('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
         $this->catWhere = 'PARTITION (console)';
@@ -121,7 +121,7 @@ class Console
     /**
      * @param $title
      * @param $platform
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getConsoleInfoByName($title, $platform)
     {
@@ -148,7 +148,7 @@ class Console
             $searchsql .= sprintf(' MATCH(title, platform) AGAINST(%s IN BOOLEAN MODE) AND platform = %s', $this->pdo->escapeString($searchwords), $this->pdo->escapeString($platform));
         }
 
-        return $this->pdo->queryOneRow(sprintf('SELECT * FROM consoleinfo WHERE %s', $searchsql));
+        return ConsoleInfo::query()->whereRaw($searchsql)->first();
     }
 
     /**
@@ -648,6 +648,7 @@ class Console
 
     /**
      * @return array
+     * @throws \Exception
      */
     protected function _loadGenres(): array
     {
@@ -742,7 +743,7 @@ class Console
 
         $check = ConsoleInfo::query()->where('asin', $con['asin'])->first(['id']);
 
-        if ($check['id'] === null) {
+        if ($check === null) {
             $consoleId = ConsoleInfo::query()
                 ->insertGetId(
                     [
