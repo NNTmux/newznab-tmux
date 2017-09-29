@@ -2,11 +2,11 @@
 
 namespace nntmux;
 
-use App\Models\Release;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use App\Models\Release;
 use App\Models\BookInfo;
 use App\Models\Settings;
 use ApaiIO\Operations\Search;
