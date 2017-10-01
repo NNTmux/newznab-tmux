@@ -16,11 +16,13 @@ class SABnzbd
     const INTEGRATION_TYPE_NONE = 0;
     const INTEGRATION_TYPE_SITEWIDE = 1;
     const INTEGRATION_TYPE_USER = 2;
+
     /**
      * Type of SAB API key.
      */
     const API_TYPE_NZB = 1;
     const API_TYPE_FULL = 2;
+
     /**
      * Priority to send the NZB to SAB.
      */
@@ -28,7 +30,8 @@ class SABnzbd
     const PRIORITY_LOW = -1;
     const PRIORITY_NORMAL = 0;
     const PRIORITY_HIGH = 1; // Sab is completely disabled - no user can use it.
-	const PRIORITY_FORCE = 2; // Sab is enabled, 1 remote SAB server for the whole site.
+    const PRIORITY_FORCE = 2; // Sab is enabled, 1 remote SAB server for the whole site.
+
     /**
      * URL to the SAB server.
      * @var string|array|bool
@@ -98,50 +101,50 @@ class SABnzbd
 
         // Set up properties.
         switch (Settings::settingValue('apps.sabnzbplus.integrationtype')) {
-			case self::INTEGRATION_TYPE_USER:
-				if (! empty($_COOKIE['sabnzbd_'.$this->uid.'__apikey']) && ! empty($_COOKIE['sabnzbd_'.$this->uid.'__host'])) {
-				    $this->url = $_COOKIE['sabnzbd_'.$this->uid.'__host'];
-				    $this->apikey = $_COOKIE['sabnzbd_'.$this->uid.'__apikey'];
-				    $this->priority = $_COOKIE['sabnzbd_'.$this->uid.'__priority'] ?? 0;
-				    $this->apikeytype = $_COOKIE['sabnzbd_'.$this->uid.'__apitype'] ?? 1;
-				} elseif (! empty($page->userdata['sabapikey']) && ! empty($page->userdata['saburl'])) {
-				    $this->url = $page->userdata['saburl'];
-				    $this->apikey = $page->userdata['sabapikey'];
-				    $this->priority = $page->userdata['sabpriority'];
-				    $this->apikeytype = $page->userdata['sabapikeytype'];
-				}
-				$this->integrated = self::INTEGRATION_TYPE_USER;
-				switch ((int) $page->userdata['queuetype']) {
-					case 1:
-					case 2:
-						$this->integratedBool = true;
-						break;
-					default:
-						$this->integratedBool = false;
-						break;
-				}
-				break;
+            case self::INTEGRATION_TYPE_USER:
+                if (! empty($_COOKIE['sabnzbd_'.$this->uid.'__apikey']) && ! empty($_COOKIE['sabnzbd_'.$this->uid.'__host'])) {
+                    $this->url = $_COOKIE['sabnzbd_'.$this->uid.'__host'];
+                    $this->apikey = $_COOKIE['sabnzbd_'.$this->uid.'__apikey'];
+                    $this->priority = $_COOKIE['sabnzbd_'.$this->uid.'__priority'] ?? 0;
+                    $this->apikeytype = $_COOKIE['sabnzbd_'.$this->uid.'__apitype'] ?? 1;
+                } elseif (! empty($page->userdata['sabapikey']) && ! empty($page->userdata['saburl'])) {
+                    $this->url = $page->userdata['saburl'];
+                    $this->apikey = $page->userdata['sabapikey'];
+                    $this->priority = $page->userdata['sabpriority'];
+                    $this->apikeytype = $page->userdata['sabapikeytype'];
+                }
+                $this->integrated = self::INTEGRATION_TYPE_USER;
+                switch ((int) $page->userdata['queuetype']) {
+                    case 1:
+                    case 2:
+                        $this->integratedBool = true;
+                        break;
+                    default:
+                        $this->integratedBool = false;
+                        break;
+                }
+                break;
 
-			case self::INTEGRATION_TYPE_SITEWIDE:
-				if ((Settings::settingValue('apps.sabnzbplus.apikey') !== '') && (Settings::settingValue('apps.sabnzbplus.url')
-						!== '')) {
-				    $this->url = Settings::settingValue('apps.sabnzbplus.url');
-				    $this->apikey = Settings::settingValue('apps.sabnzbplus.apikey');
-				    $this->priority = Settings::settingValue('apps.sabnzbplus.priority');
-				    $this->apikeytype = Settings::settingValue('apps.sabnzbplus.apikeytype');
-				}
-				$this->integrated = self::INTEGRATION_TYPE_SITEWIDE;
-				$this->integratedBool = true;
-				break;
+            case self::INTEGRATION_TYPE_SITEWIDE:
+                if ((Settings::settingValue('apps.sabnzbplus.apikey') !== '') && (Settings::settingValue('apps.sabnzbplus.url')
+                        !== '')) {
+                    $this->url = Settings::settingValue('apps.sabnzbplus.url');
+                    $this->apikey = Settings::settingValue('apps.sabnzbplus.apikey');
+                    $this->priority = Settings::settingValue('apps.sabnzbplus.priority');
+                    $this->apikeytype = Settings::settingValue('apps.sabnzbplus.apikeytype');
+                }
+                $this->integrated = self::INTEGRATION_TYPE_SITEWIDE;
+                $this->integratedBool = true;
+                break;
 
-			case self::INTEGRATION_TYPE_NONE:
-				$this->integrated = self::INTEGRATION_TYPE_NONE;
-				// This is for nzbget.
-				if ($page->userdata['queuetype'] === 2) {
-				    $this->integratedBool = true;
-				}
-				break;
-		}
+            case self::INTEGRATION_TYPE_NONE:
+                $this->integrated = self::INTEGRATION_TYPE_NONE;
+                // This is for nzbget.
+                if ($page->userdata['queuetype'] === 2) {
+                    $this->integratedBool = true;
+                }
+                break;
+        }
         // Verify the URL is good, fix it if not.
         if ($this->url !== '' && preg_match('/(?P<first>\/)?(?P<sab>[a-z]+)?(?P<last>\/)?$/i', $this->url, $matches)) {
             if (! isset($matches['first'])) {
@@ -168,22 +171,22 @@ class SABnzbd
     public function sendToSab($guid)
     {
         return $this->client->post(
-				$this->url.
-					'api?mode=addurl&priority='.
-					$this->priority.
-					'&apikey='.
-					$this->apikey.
-					'&name='.
-					urlencode(
-						$this->serverurl.
-						'getnzb/'.
-						$guid.
-						'&i='.
-						$this->uid.
-						'&r='.
-						$this->rsstoken
-					)
-		);
+                $this->url.
+                    'api?mode=addurl&priority='.
+                    $this->priority.
+                    '&apikey='.
+                    $this->apikey.
+                    '&name='.
+                    urlencode(
+                        $this->serverurl.
+                        'getnzb/'.
+                        $guid.
+                        '&i='.
+                        $this->uid.
+                        '&r='.
+                        $this->rsstoken
+                    )
+        );
     }
 
     /**
@@ -194,11 +197,11 @@ class SABnzbd
     public function getAdvQueue()
     {
         return $this->client->get(
-					$this->url.
-					'api?mode=queue&start=START&limit=LIMIT&output=json&apikey='.
-					$this->apikey
+                    $this->url.
+                    'api?mode=queue&start=START&limit=LIMIT&output=json&apikey='.
+                    $this->apikey
 
-		);
+        );
     }
 
     /**
@@ -209,11 +212,11 @@ class SABnzbd
     public function getHistory()
     {
         return $this->client->get(
-			$this->url.
-			'api?mode=history&start=START&limit=LIMIT&category=CATEGORY&search=SEARCH&failed_only=0&output=json&apikey='.
-			$this->apikey
+            $this->url.
+            'api?mode=history&start=START&limit=LIMIT&category=CATEGORY&search=SEARCH&failed_only=0&output=json&apikey='.
+            $this->apikey
 
-		);
+        );
     }
 
     /**
@@ -226,11 +229,12 @@ class SABnzbd
     public function delFromQueue($id)
     {
         return $this->client->get(
-		$this->url.
-			'api?mode=queue&name=delete&value='.
-			$id.
-			'&apikey='.
-			$this->apikey);
+        $this->url.
+            'api?mode=queue&name=delete&value='.
+            $id.
+            '&apikey='.
+            $this->apikey
+        );
     }
 
     /**
@@ -243,11 +247,12 @@ class SABnzbd
     public function pauseFromQueue($id)
     {
         return $this->client->get(
-		$this->url.
-			'api?mode=queue&name=pause&value='.
-			$id.
-			'&apikey='.
-			$this->apikey);
+        $this->url.
+            'api?mode=queue&name=pause&value='.
+            $id.
+            '&apikey='.
+            $this->apikey
+        );
     }
 
     /**
@@ -260,12 +265,12 @@ class SABnzbd
     public function resumeFromQueue($id)
     {
         return $this->client->get(
-		$this->url.
-		'api?mode=queue&name=resume&value='.
-			$id.
-		'&apikey='.
-			$this->apikey
-		);
+        $this->url.
+        'api?mode=queue&name=resume&value='.
+            $id.
+        '&apikey='.
+            $this->apikey
+        );
     }
 
     /**
@@ -276,11 +281,11 @@ class SABnzbd
     public function pauseAll()
     {
         return $this->client->get(
-		$this->url.
-		'api?mode=pause'.
-		'&apikey='.
-			$this->apikey
-		);
+        $this->url.
+        'api?mode=pause'.
+        '&apikey='.
+            $this->apikey
+        );
     }
 
     /**
@@ -291,11 +296,11 @@ class SABnzbd
     public function resumeAll()
     {
         return $this->client->get(
-		$this->url.
-		'api?mode=resume'.
-		'&apikey='.
-			$this->apikey
-		);
+        $this->url.
+        'api?mode=resume'.
+        '&apikey='.
+            $this->apikey
+        );
     }
 
     /**
