@@ -32,10 +32,6 @@ switch ($action) {
             $_POST['anidbid']
         );
 
-        if (isset($_POST['from']) && ! empty($_POST['from'])) {
-            header('Location:'.$_POST['from']);
-            exit;
-        }
         header('Location:'.WWW_TOP.'/release-list.php');
         break;
 

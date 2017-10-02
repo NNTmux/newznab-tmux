@@ -11,9 +11,6 @@ if (isset($_GET['id'])) {
     $releases->deleteMultiple($_GET['id']);
 }
 
-if (isset($_GET['from'])) {
-    $referrer = $_GET['from'];
-} else {
-    $referrer = $_SERVER['HTTP_REFERER'];
-}
+$referrer = $_SERVER['HTTP_REFERER'];
+
 header('Location: '.$referrer);
