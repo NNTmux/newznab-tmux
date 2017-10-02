@@ -1103,7 +1103,6 @@ class Movie
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
             $resp = $this->omdbApi->fetch('i', 'tt'.$imdbId);
 
-
             if (is_object($resp) && $resp->message === 'OK' && $resp->data->Response !== 'False') {
                 $ret = [
                     'title' => ! empty($resp->data->Title) ? $resp->data->Title : '',
