@@ -1,4 +1,8 @@
+2017-10-01 DariusIII
+	* Chg: Update swiftmailer to latest version
+	* Chg: Update cs of SABnzbd class
 2017-09-29 DariusIII
+	* Chg: Update auth related controllers
 	* Chg: Update Console class
 	* Chg: Update Books class
 	* Chg: Update ReleaseFile model, related migration, update ReleaseFiles
