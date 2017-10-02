@@ -35,7 +35,7 @@ switch ($action) {
         $release = $releases->getById($_POST['id']);
         $page->smarty->assign('release', $release);
 
-        header('Location:'.WWW_TOP.'/release-list.php');
+        header('Location:'.WWW_TOP.'/../details/' . $release['guid']);
         break;
 
     case 'view':
