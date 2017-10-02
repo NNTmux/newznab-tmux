@@ -16,10 +16,10 @@
 							<i class ="zmdi zmdi-thumbs-o-up"></i> {$release.grabs} Grab{if $release.grabs != 1}s{/if} / <i class ="zmdi zmdi-thumbs-o-down"></i> {$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
 					{if isset($isadmin)}
 						<a class="label label-warning"
-						   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$release.id}&amp;from={$smarty.server.REQUEST_URI}"
+						   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$release.id}"
 						   title="Edit release">Edit</a>
 						<a class="label label-danger"
-						   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$release.id}&amp;from={$smarty.server.HTTP_REFERER}"
+						   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$release.id}"
 						   title="Delete release">Delete</a>
 					{/if}
 					{if $movie && $release.videos_id <= 0 && $movie.imdbid > 0}

@@ -1,4 +1,5 @@
 2017-10-02 DariusIII
+	* Chg: Remove HTTP_REFERER and REQUEST_URI from viewnzb.tpl in all themes
 	* Chg: Use laravel Mail facade, remove phpmailer, update seeting.example.php accordingly, remove Utility sendEmail function
 2017-10-01 DariusIII
 	* Chg: Update swiftmailer to latest version

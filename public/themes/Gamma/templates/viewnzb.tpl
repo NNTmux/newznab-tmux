@@ -43,8 +43,8 @@
 				<div class="well well-sm pull-right">
 					Admin :
 					<div class="btn-group">
-						<a href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$release.id}&amp;from={$smarty.server.REQUEST_URI}" class="btn btn-small btn-warning" >Edit</a>
-						<a href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$release.id}&amp;from={$smarty.server.HTTP_REFERER}" class=" btn btn-small btn-danger" >Delete</a>
+						<a href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$release.id}" class="btn btn-small btn-warning" >Edit</a>
+						<a href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$release.id}" class=" btn btn-small btn-danger" >Delete</a>
 					</div>
 				</div>
 			{/if}
