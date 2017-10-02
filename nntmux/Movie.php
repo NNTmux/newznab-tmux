@@ -1103,6 +1103,7 @@ class Movie
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
             $resp = $this->omdbApi->fetch('i', 'tt'.$imdbId);
 
+
             if (is_object($resp) && $resp->message === 'OK' && $resp->data->Response !== 'False') {
                 $ret = [
                     'title' => ! empty($resp->data->Title) ? $resp->data->Title : '',
@@ -1111,10 +1112,13 @@ class Movie
                     'year'  => ! empty($resp->data->Year) ? $resp->data->Year : '',
                     'plot'  => ! empty($resp->data->Plot) ? $resp->data->Plot : '',
                     'rating'  => ! empty($resp->data->imdbRating) ? $resp->data->imdbRating : '',
+                    'rottenTomatoes' => ! empty($resp->data->Ratings[1]->Source) ? $resp->data->Ratings[1]->Source : '',
+                    'rtRating' => ! empty($resp->data->Ratings[1]->Value) ? $resp->data->Ratings[1]->Value : '',
                     'tagline' => ! empty($resp->data->Tagline) ? $resp->data->Tagline : '',
                     'director' => ! empty($resp->data->Director) ? $resp->data->Director : '',
                     'actors'   => ! empty($resp->data->Actors) ? $resp->data->Actors : '',
                     'language' => ! empty($resp->data->Language) ? $resp->data->Language : '',
+                    'boxOffice' => ! empty($resp->data->BoxOffice) ? $resp->data->BoxOffice : '',
                 ];
 
                 if ($this->echooutput) {

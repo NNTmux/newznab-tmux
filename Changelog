@@ -1,4 +1,5 @@
 2017-10-02 DariusIII
+	* CHg: Pull RT ratings from OMDBApi
 	* Chg: Update headers for release-edit so they go back to release
 	* Chg: Remove references to from in release-edit and relese-delete
 	* Chg: Remove HTTP_REFERER and REQUEST_URI from viewnzb.tpl in all themes
