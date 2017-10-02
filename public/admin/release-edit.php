@@ -32,6 +32,9 @@ switch ($action) {
             $_POST['anidbid']
         );
 
+        $release = $releases->getById($_POST['id']);
+        $page->smarty->assign('release', $release);
+
         header('Location:'.WWW_TOP.'/release-list.php');
         break;
 
