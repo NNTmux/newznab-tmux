@@ -1,9 +1,9 @@
 <?php
 
-use App\Mail\ForgottenPassword;
-use App\Mail\PasswordReset;
-use Illuminate\Support\Facades\Mail;
 use nntmux\Captcha;
+use App\Mail\PasswordReset;
+use App\Mail\ForgottenPassword;
+use Illuminate\Support\Facades\Mail;
 
 if ($page->users->isLoggedIn()) {
     header('Location: '.WWW_TOP.'/');

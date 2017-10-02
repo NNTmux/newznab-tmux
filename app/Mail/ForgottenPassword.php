@@ -2,8 +2,8 @@
 
 namespace App\Mail;
 
-use App\Models\Settings;
 use App\Models\User;
+use App\Models\Settings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -36,6 +36,6 @@ class ForgottenPassword extends Mailable
      */
     public function build()
     {
-        return $this->from(Settings::settingValue('site.main.email'))->subject('Forgotten password reset')->view('emails.forgottenPassword')->with(['resetLink' => $this->resetLink, 'site' => Settings::settingValue('site.main.title'),]);
+        return $this->from(Settings::settingValue('site.main.email'))->subject('Forgotten password reset')->view('emails.forgottenPassword')->with(['resetLink' => $this->resetLink, 'site' => Settings::settingValue('site.main.title')]);
     }
 }

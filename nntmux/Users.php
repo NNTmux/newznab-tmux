@@ -2,21 +2,21 @@
 
 namespace nntmux;
 
-use App\Mail\AccountChange;
-use App\Mail\SendInvite;
-use Illuminate\Support\Facades\Mail;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Release;
+use App\Mail\SendInvite;
 use App\Models\Settings;
 use App\Models\UserRole;
 use App\Models\Invitation;
+use App\Mail\AccountChange;
 use App\Models\UserRequest;
 use nntmux\utility\Utility;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 
 class Users

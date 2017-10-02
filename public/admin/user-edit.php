@@ -2,10 +2,10 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Mail\AccountChange;
-use Illuminate\Support\Facades\Mail;
 use nntmux\Users;
 use App\Models\UserRole;
+use App\Mail\AccountChange;
+use Illuminate\Support\Facades\Mail;
 
 $page = new AdminPage();
 $users = new Users();
