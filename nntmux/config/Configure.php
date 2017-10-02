@@ -24,19 +24,19 @@ namespace nntmux\config;
 class Configure
 {
     private static $environments = [
-		'indexer' => [
-			'.env'	=> true,
-			'settings'	=> false,
-		],
-		'install' => [
-			'.env'	=> true,
-			'settings'	=> false,
-		],
-		'smarty'  => [
-			'.env'	=> true,
-			'settings'	=> false,
-		],
-	];
+        'indexer' => [
+            '.env'    => true,
+            'settings'    => false,
+        ],
+        'install' => [
+            '.env'    => true,
+            'settings'    => false,
+        ],
+        'smarty'  => [
+            '.env'    => true,
+            'settings'    => false,
+        ],
+    ];
 
     /**
      * Configure constructor.
@@ -82,63 +82,63 @@ class Configure
         if (! file_exists($file) && $throwException) {
             $errorCode = (int) ($filename === '.env');
             throw new \RuntimeException(
-				"Unable to load configuration file '$file'. Make sure it has been created and contains correct settings.",
-				$errorCode
-			);
+                "Unable to load configuration file '$file'. Make sure it has been created and contains correct settings.",
+                $errorCode
+            );
         }
         if ($file !== NN_ROOT.'.env' && file_exists($file)) {
             require_once $file;
         }
 
         switch ($filename) {
-			case '.env':
-				$this->defaultSSL();
-				break;
-			case 'settings':
-				$settings_file = NN_CONFIGS.'settings.php';
-				if (is_file($settings_file)) {
-				    require_once $settings_file;
-				    if (PHP_SAPI === 'cli') {
-				        $current_settings_file_version = 4; // Update this when updating settings.example.php
-				        if (! defined('NN_SETTINGS_FILE_VERSION') ||
-							NN_SETTINGS_FILE_VERSION != $current_settings_file_version
-						) {
-				            echo "\033[0;31mNotice: Your $settings_file file is either out of date or you have not updated".
-								 " NN_SETTINGS_FILE_VERSION to $current_settings_file_version in that file.\033[0m".
-								 PHP_EOL;
-				        }
-				        unset($current_settings_file_version);
-				    }
-				} elseif (! defined('ITEMS_PER_PAGE')) {
-				    define('ITEMS_PER_PAGE', '50');
-				    define('ITEMS_PER_COVER_PAGE', '20');
-				    define('NN_ECHOCLI', true);
-				    define('NN_DEBUG', false);
-				    define('NN_LOGGING', false);
-				    define('NN_LOGINFO', false);
-				    define('NN_LOGNOTICE', false);
-				    define('NN_LOGWARNING', false);
-				    define('NN_LOGERROR', false);
-				    define('NN_LOGFATAL', false);
-				    define('NN_LOGQUERIES', false);
-				    define('NN_LOGAUTOLOADER', false);
-				    define('NN_QUERY_STRIP_WHITESPACE', false);
-				    define('NN_RENAME_PAR2', true);
-				    define('NN_RENAME_MUSIC_MEDIAINFO', true);
-				    define('NN_CACHE_EXPIRY_SHORT', 300);
-				    define('NN_CACHE_EXPIRY_MEDIUM', 600);
-				    define('NN_CACHE_EXPIRY_LONG', 900);
-				    define('NN_PREINFO_OPEN', false);
-				    define('NN_FLOOD_CHECK', false);
-				    define('NN_FLOOD_WAIT_TIME', 5);
-				    define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
-				    define('NN_USE_SQL_TRANSACTIONS', true);
-				    define('NN_RELEASE_SEARCH_TYPE', 0);
-				    define('NN_MAX_PAGER_RESULTS', '125000');
-				}
-				unset($settings_file);
-				break;
-		}
+            case '.env':
+                $this->defaultSSL();
+                break;
+            case 'settings':
+                $settings_file = NN_CONFIGS.'settings.php';
+                if (is_file($settings_file)) {
+                    require_once $settings_file;
+                    if (PHP_SAPI === 'cli') {
+                        $current_settings_file_version = 5; // Update this when updating settings.example.php
+                        if (! defined('NN_SETTINGS_FILE_VERSION') ||
+                            NN_SETTINGS_FILE_VERSION !== $current_settings_file_version
+                        ) {
+                            echo "\033[0;31mNotice: Your $settings_file file is either out of date or you have not updated".
+                                 " NN_SETTINGS_FILE_VERSION to $current_settings_file_version in that file.\033[0m".
+                                 PHP_EOL;
+                        }
+                        unset($current_settings_file_version);
+                    }
+                } elseif (! defined('ITEMS_PER_PAGE')) {
+                    define('ITEMS_PER_PAGE', '50');
+                    define('ITEMS_PER_COVER_PAGE', '20');
+                    define('NN_ECHOCLI', true);
+                    define('NN_DEBUG', false);
+                    define('NN_LOGGING', false);
+                    define('NN_LOGINFO', false);
+                    define('NN_LOGNOTICE', false);
+                    define('NN_LOGWARNING', false);
+                    define('NN_LOGERROR', false);
+                    define('NN_LOGFATAL', false);
+                    define('NN_LOGQUERIES', false);
+                    define('NN_LOGAUTOLOADER', false);
+                    define('NN_QUERY_STRIP_WHITESPACE', false);
+                    define('NN_RENAME_PAR2', true);
+                    define('NN_RENAME_MUSIC_MEDIAINFO', true);
+                    define('NN_CACHE_EXPIRY_SHORT', 300);
+                    define('NN_CACHE_EXPIRY_MEDIUM', 600);
+                    define('NN_CACHE_EXPIRY_LONG', 900);
+                    define('NN_PREINFO_OPEN', false);
+                    define('NN_FLOOD_CHECK', false);
+                    define('NN_FLOOD_WAIT_TIME', 5);
+                    define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
+                    define('NN_USE_SQL_TRANSACTIONS', true);
+                    define('NN_RELEASE_SEARCH_TYPE', 0);
+                    define('NN_MAX_PAGER_RESULTS', '125000');
+                }
+                unset($settings_file);
+                break;
+        }
     }
 
     private function defaultSSL()

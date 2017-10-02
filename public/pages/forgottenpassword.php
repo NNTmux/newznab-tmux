@@ -1,8 +1,9 @@
 <?php
 
+use App\Mail\ForgottenPassword;
+use App\Mail\PasswordReset;
+use Illuminate\Support\Facades\Mail;
 use nntmux\Captcha;
-use App\Models\Settings;
-use nntmux\utility\Utility;
 
 if ($page->users->isLoggedIn()) {
     header('Location: '.WWW_TOP.'/');
@@ -14,76 +15,72 @@ $captcha = new Captcha($page);
 $email = $sent = $confirmed = '';
 
 switch ($action) {
-	case 'reset':
-		if (! isset($_REQUEST['guid'])) {
-		    $page->smarty->assign('error', 'No reset code provided.');
-		    break;
-		}
+    case 'reset':
+        if (! isset($_REQUEST['guid'])) {
+            $page->smarty->assign('error', 'No reset code provided.');
+            break;
+        }
 
-		$ret = $page->users->getByPassResetGuid($_REQUEST['guid']);
-		if (! $ret) {
-		    $page->smarty->assign('error', 'Bad reset code provided.');
-		    break;
-		} else {
-		    //
-		    // reset the password, inform the user, send out the email
-		    //
-		    $page->users->updatePassResetGuid($ret['id'], '');
-		    $newpass = $page->users->generatePassword();
-		    $page->users->updatePassword($ret['id'], $newpass);
+        $ret = $page->users->getByPassResetGuid($_REQUEST['guid']);
+        if (! $ret) {
+            $page->smarty->assign('error', 'Bad reset code provided.');
+            break;
+        }
 
-		    $to = $ret['email'];
-		    $subject = Settings::settingValue('site.main.title').' Password Reset';
-		    $contents = 'Your password has been reset to '.$newpass;
-		    $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
-		    Utility::sendEmail($to, $subject, $contents, Settings::settingValue('site.main.email'));
-		    $page->smarty->assign('notice', $onscreen);
-		    $confirmed = true;
-		    break;
-		}
+        //
+        // reset the password, inform the user, send out the email
+        //
+        $page->users->updatePassResetGuid($ret['id'], '');
+        $newpass = $page->users->generatePassword();
+        $page->users->updatePassword($ret['id'], $newpass);
 
-		break;
-	case 'submit':
+        $to = $ret['email'];
+        $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
+        Mail::to($to)->send(new PasswordReset($ret['id'], $newpass));
+        $page->smarty->assign('notice', $onscreen);
+        $confirmed = true;
+        break;
 
-		if ($captcha->getError() === false) {
-		    $email = $_POST['email'] ?? '';
-		    if (empty($email)) {
-		        $page->smarty->assign('error', 'Missing Email');
-		    } else {
-		        //
-		        // Check users exists and send an email
-		        //
-		        $ret = $page->users->getByEmail($email);
-		        if (! $ret) {
-		            $page->smarty->assign('error', 'The email address is not recognised.');
-		            $sent = true;
-		            break;
-		        } else {
-		            //
-		            // Generate a forgottenpassword guid, store it in the user table
-		            //
-		            $guid = md5(uniqid('', false));
-		            $page->users->updatePassResetGuid($ret['id'], $guid);
+        break;
+    case 'submit':
 
-		            //
-		            // Send the email
-		            //
-		            $to = $ret['email'];
-		            $subject = Settings::settingValue('site.main.title').' Forgotten Password Request';
-		            $contents = 'Someone has requested a password reset for this email address. To reset the password use the following link. '.PHP_EOL.PHP_EOL.$page->serverurl.'forgottenpassword?action=reset&guid='.$guid;
-		            Utility::sendEmail($to, $subject, $contents, Settings::settingValue('site.main.email'));
-		            $sent = true;
-		            break;
-		        }
-		    }
-		    break;
-		}
+        if ($captcha->getError() === false) {
+            $email = $_POST['email'] ?? '';
+            if (empty($email)) {
+                $page->smarty->assign('error', 'Missing Email');
+            } else {
+                //
+                // Check users exists and send an email
+                //
+                $ret = $page->users->getByEmail($email);
+                if (! $ret) {
+                    $page->smarty->assign('error', 'The email address is not recognised.');
+                    $sent = true;
+                    break;
+                }
+                //
+                // Generate a forgottenpassword guid, store it in the user table
+                //
+                $guid = md5(uniqid('', false));
+                $page->users->updatePassResetGuid($ret['id'], $guid);
+                //
+                // Send the email
+                //
+                $to = $ret['email'];
+                $resetLink = $page->serverurl.'forgottenpassword?action=reset&guid='.$guid;
+                Mail::to($to)->send(new ForgottenPassword($ret['id'], $resetLink));
+                $sent = true;
+                break;
+            }
+            break;
+        }
 }
-$page->smarty->assign([
-		'email'     => $email,
-		'confirmed' => $confirmed,
-		'sent'      => $sent,
-	]
+$page->smarty->assign(
+    [
+        'email'     => $email,
+        'confirmed' => $confirmed,
+        'sent'      => $sent,
+    ]
 );
 
 $page->title = 'Forgotten Password';

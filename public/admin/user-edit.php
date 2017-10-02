@@ -2,10 +2,10 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+use App\Mail\AccountChange;
+use Illuminate\Support\Facades\Mail;
 use nntmux\Users;
-use App\Models\Settings;
 use App\Models\UserRole;
-use nntmux\utility\Utility;
 
 $page = new AdminPage();
 $users = new Users();
@@ -71,7 +71,7 @@ switch ($action) {
             if ($_POST['role'] !== '') {
                 $newRole = UserRole::query()->where('id', $_POST['role'])->value('name');
                 $email = $_POST['email'] ?? $_GET['email'];
-                Utility::sendEmail($email, 'Account changed', 'Your account role has been changed to '.$newRole, Settings::settingValue('site.main.email'));
+                Mail::to($email)->send(new AccountChange($_POST['id']));
             }
         }
 

@@ -3,7 +3,6 @@
 namespace nntmux\utility;
 
 use nntmux\db\DB;
-use nntmux\Logger;
 use nntmux\ColorCLI;
 use Ramsey\Uuid\Uuid;
 use App\Models\Settings;
@@ -702,109 +701,6 @@ class Utility
         return [
             $xml->getName() => $propertiesArray,
         ];
-    }
-
-    // Central function for sending site email.
-
-    /**
-     * @param $to
-     * @param $subject
-     * @param $contents
-     * @param $from
-     *
-     * @return bool
-     * @throws \nntmux\LoggerException
-     * @throws \InvalidArgumentException
-     * @throws \Exception
-     * @throws \phpmailerException
-     */
-    public static function sendEmail($to, $subject, $contents, $from): bool
-    {
-        //Setup the body first since we need it regardless of sending method.
-        $eol = PHP_EOL;
-
-        $body = '<html>'.$eol;
-        $body .= '<body style=\'font-family:Verdana, Verdana, Geneva, sans-serif; font-size:12px; color:#666666;\'>'.$eol;
-        $body .= $contents;
-        $body .= '</body>'.$eol;
-        $body .= '</html>'.$eol;
-
-        if (PHPMAILER_ENABLED === true) {
-            $mail = new \PHPMailer;
-
-            // Check to make sure the user has their settings correct.
-            if (PHPMAILER_USE_SMTP === true) {
-                if ((! defined('PHPMAILER_SMTP_HOST') || PHPMAILER_SMTP_HOST === '') ||
-                    (! defined('PHPMAILER_SMTP_PORT') || PHPMAILER_SMTP_PORT === '')
-                ) {
-                    throw new \phpmailerException(
-                        'You opted to use SMTP but the PHPMAILER_SMTP_HOST and/or PHPMAILER_SMTP_PORT is/are not defined correctly! Either fix the missing/incorrect values or change PHPMAILER_USE_SMTP to false in the www/settings.php'
-                    );
-                }
-
-                // If the user enabled SMTP & Auth but did not setup credentials, throw an exception.
-                if (defined('PHPMAILER_SMTP_AUTH') && PHPMAILER_SMTP_AUTH === true) {
-                    if ((! defined('PHPMAILER_SMTP_USER') || PHPMAILER_SMTP_USER === '') ||
-                        (! defined('PHPMAILER_SMTP_PASSWORD') || PHPMAILER_SMTP_PASSWORD === '')
-                    ) {
-                        throw new \phpmailerException(
-                            'You opted to use SMTP and SMTP Auth but the PHPMAILER_SMTP_USER and/or PHPMAILER_SMTP_PASSWORD is/are not defined correctly. Please set them in www/settings.php'
-                        );
-                    }
-                }
-            }
-
-            //Finally we can send the mail.
-            $mail->isHTML(true);
-
-            if (PHPMAILER_USE_SMTP) {
-                $mail->isSMTP();
-
-                $mail->Host = PHPMAILER_SMTP_HOST;
-                $mail->Port = PHPMAILER_SMTP_PORT;
-
-                $mail->SMTPSecure = PHPMAILER_SMTP_SECURE;
-
-                if (PHPMAILER_SMTP_AUTH) {
-                    $mail->SMTPAuth = true;
-                    $mail->Username = PHPMAILER_SMTP_USER;
-                    $mail->Password = PHPMAILER_SMTP_PASSWORD;
-                }
-            }
-
-            $fromEmail = (PHPMAILER_FROM_EMAIL === '') ? Settings::settingValue('site.main.email') : PHPMAILER_FROM_EMAIL;
-            $fromName = (PHPMAILER_FROM_NAME === '') ? Settings::settingValue('site.main.title') : PHPMAILER_FROM_NAME;
-            $replyTo = (PHPMAILER_REPLYTO === '') ? $from : PHPMAILER_REPLYTO;
-
-            (PHPMAILER_BCC !== '') ? $mail->addBCC(PHPMAILER_BCC) : null;
-
-            $mail->setFrom($fromEmail, $fromName);
-            $mail->addAddress($to);
-            $mail->addReplyTo($replyTo);
-            $mail->Subject = $subject;
-            $mail->Body = $body;
-            $mail->AltBody = $mail->html2text($body, true);
-
-            $sent = $mail->send();
-
-            if (! $sent) {
-                (new Logger())->log(__CLASS__, __FUNCTION__, $mail->ErrorInfo, Logger::LOG_ERROR);
-                throw new \phpmailerException('Unable to send mail. Error: '.$mail->ErrorInfo);
-            }
-
-            return $sent;
-        }
-
-        // We don't use PHPMAILER so send the email using PHP mail function
-        $headers = 'From: '.$from.$eol;
-        $headers .= 'Reply-To: '.$from.$eol;
-        $headers .= 'Return-Path: '.$from.$eol;
-        $headers .= 'X-Mailer: newznab'.$eol;
-        $headers .= 'MIME-Version: 1.0'.$eol;
-        $headers .= 'Content-type: text/html; charset=iso-8859-1'.$eol;
-        $headers .= $eol;
-
-        return mail($to, $subject, $body, $headers);
     }
 
     /**

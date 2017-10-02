@@ -2,6 +2,9 @@
 
 namespace nntmux;
 
+use App\Mail\AccountChange;
+use App\Mail\SendInvite;
+use Illuminate\Support\Facades\Mail;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
@@ -461,18 +464,14 @@ class Users
     }
 
     /**
-     * @param $msgsubject
-     * @param $msgbody
-     *
      * @return int
-     * @throws \Exception
      */
-    public function updateExpiredRoles($msgsubject, $msgbody): int
+    public function updateExpiredRoles(): int
     {
-        $data = User::query()->whereDate('rolechangedate', '<', Carbon::now())->select(['id', 'email'])->get();
+        $data = User::query()->whereDate('rolechangedate', '<', Carbon::now())->get();
 
         foreach ($data as $u) {
-            Utility::sendEmail($u['email'], $msgsubject, $msgbody, Settings::settingValue('site.main.email'));
+            Mail::to($u['email'])->send(new AccountChange($u));
             User::query()->where('id', $u['id'])->update(['user_roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
         }
 
@@ -1081,24 +1080,17 @@ class Users
     }
 
     /**
-     * @param $sitetitle
-     * @param $siteemail
-     * @param $serverurl
+     * @param $serverUrl
      * @param $uid
-     * @param $emailto
-     *
+     * @param $emailTo
      * @return string
-     * @throws \Exception
      */
-    public function sendInvite($sitetitle, $siteemail, $serverurl, $uid, $emailto): string
+    public function sendInvite($serverUrl, $uid, $emailTo): string
     {
-        $sender = $this->getById($uid);
         $token = self::hashSHA1(uniqid('', true));
-        $subject = $sitetitle.' Invitation';
-        $url = $serverurl.'register?invitecode='.$token;
-        $contents = $sender['username'].' has sent an invite to join '.$sitetitle.' to this email address. To accept the invitation click the following link. '.$url;
+        $url = $serverUrl.'register?invitecode='.$token;
 
-        Utility::sendEmail($emailto, $subject, $contents, $siteemail);
+        Mail::to($emailTo)->send(new SendInvite($uid, $url));
         $this->addInvite($uid, $token);
 
         return $url;

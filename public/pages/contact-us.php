@@ -1,8 +1,9 @@
 <?php
 
+use App\Mail\ContactUs;
+use Illuminate\Support\Facades\Mail;
 use nntmux\Captcha;
 use App\Models\Settings;
-use nntmux\utility\Utility;
 
 $captcha = new Captcha($page);
 $msg = '';
@@ -14,19 +15,17 @@ if (isset($_POST['useremail'])) {
 
     if ($captcha->getError() === false) {
         $email = $_POST['useremail'];
-        $mailto = Settings::settingValue('site.main.email');
-        $mailsubj = 'Contact Form Submitted';
-        $mailhead = "From: $email\n";
-        $mailbody = "Values submitted from contact form:\n";
+        $mailTo = Settings::settingValue('site.main.email');
+        $mailBody = "Values submitted from contact form:\n";
 
         foreach ($_POST as $key => $value) {
             if ($key !== 'submit') {
-                $mailbody .= "$key : $value<br />\r\n";
+                $mailBody .= "$key : $value<br />\r\n";
             }
         }
 
         if (! preg_match("/\n/i", $_POST['useremail'])) {
-            Utility::sendEmail($mailto, $mailsubj, $mailbody, $email);
+            Mail::to($mailTo)->send(new ContactUs($email, $mailBody));
         }
         $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".Settings::settingValue('site.main.title').'.</h2>';
     }

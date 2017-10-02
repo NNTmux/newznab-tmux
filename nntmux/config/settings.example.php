@@ -18,9 +18,9 @@ use nntmux\utility\Utility;
  *
  * @note    Developers: When updating settings.example.php, up this version
  *                   and $current_settings_file_version in nntmux\config\Configure.php
- * @version 4
+ * @version 5
  */
-define('NN_SETTINGS_FILE_VERSION', 4);
+define('NN_SETTINGS_FILE_VERSION', 5);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// Web Settings //////////////////////////////////////////////////////////
@@ -183,13 +183,13 @@ define('NN_CACHE_TYPE', 0);
  *                   http://php.net/manual/en/memcached.addserver.php
  */
 define('NN_CACHE_HOSTS', serialize(
-	[
-		'Server1' => [
-			'host'   => '127.0.0.1',
-			'port'   => 11211,
-			'weight' => 0,
-		],
-	]
+    [
+        'Server1' => [
+            'host'   => '127.0.0.1',
+            'port'   => 11211,
+            'weight' => 0,
+        ],
+    ]
 ));
 
 /*
@@ -425,127 +425,16 @@ define('NN_SQL_DELETE_LOW_PRIORITY', false);
 define('NN_SQL_DELETE_QUICK', false);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////// PHPMailer Settings //////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
- * Simple constant to let us know this file is included and we should use PHPMailer library.
- * Uncomment the line below after setting the other constants.
- */
-define('PHPMAILER_ENABLED', false);
-
-/*
- * Global "From" Address.
- * This address will be set as the From: address on every email sent by NN.
- *
- * @example 'noreply@example.com'
- * @note    Depending on server configurations, it may not respect this value.
- * @default '' (uses the contact email configured in 'Edit Site' settings)
- */
-define('PHPMAILER_FROM_EMAIL', '');
-
-/*
- * Global "From" Name.
- * Along with the email above, this will display as the name.
- *
- * @example 'KingCat'
- * @note    Depending on server configurations, it may not respect this value.
- * @default '' (uses the site title configured in 'Edit Site' settings)
- */
-define('PHPMAILER_FROM_NAME', '');
-
-/*
- * Global "Reply-to" Address.
- * This address will be set as the Reply-to: address on every email sent by NN.
- *
- * @example 'support@example.com'
- * @note    It's a good idea to set this to your support email account (if possible)
- * @default '' (uses the contact email configured in 'Edit Site' settings)
- */
-define('PHPMAILER_REPLYTO', '');
-
-/*
- * Always BCC.
- * This email address will be blind carbon copied on every email sent from this site.
- *
- * @note    This has very specific uses, don't enable unless you're sure you want to get the deluge.
- * @default ''
- */
-define('PHPMAILER_BCC', '');
-
-/*
- * Should we use a SMTP server to send mail?
- * If false, it will use your default settings from php.ini.
- *
- * @note    If set to true, be sure to set the server settings below.
- * @default false
- */
-define('PHPMAILER_USE_SMTP', false);
-
-/*********************************************************************************
- * The following options require PHPMAILER_USE_SMTP to be true: *
- *********************************************************************************/
-
-/*
- * This is the hostname to use if connecting to a SMTP server.
- *
- * @note    You can specify main and backup hosts, delimit with a semicolon. (i.e. 'main.host.com;backup.host.com')
- * @default ''
- */
-define('PHPMAILER_SMTP_HOST', '');
-
-/*
- * TLS & SSL Support for your SMTP server.
- *
- * @note    Possible values: false, 'tls', 'ssl'
- * @default 'tls'
- */
-define('PHPMAILER_SMTP_SECURE', 'tls');
-
-/*
- * SMTP Port
- *
- * @note    Usually this is 25, 465, or 587
- * @default 587
- */
-define('PHPMAILER_SMTP_PORT', 587);
-
-/*
- * Does your SMTP host require authentication?
- *
- * @note    Be sure to set credentials below if changing to true.
- * @default false
- */
-define('PHPMAILER_SMTP_AUTH', false);
-
-/*********************************************************************************
- * The following options require both PHPMAILER_USE_SMTP & PHPMAILER_SMTP_AUTH to be true: *
- *********************************************************************************/
-
-/*
- * SMTP username for authentication.
- *
- * @default ''
- */
-define('PHPMAILER_SMTP_USER', '');
-
-/*
- * SMTP password for authentication.
- *
- * @default ''
- */
-define('PHPMAILER_SMTP_PASSWORD', '');
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////// PHP CLI Settings ///////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 if (Utility::isCLI()) {
 
-	/*
-	 * Your server's local timezone.
-	 * @note    Uncomment to enable.
-	 * @see     https://secure.php.net/manual/en/timezones.php
-	 * @version 4
-	 */
+    /*
+     * Your server's local timezone.
+     * @note    Uncomment to enable.
+     * @see     https://secure.php.net/manual/en/timezones.php
+     * @version 4
+     */
     //ini_set('date.timezone', 'America/New_York');
 
     /*
@@ -623,12 +512,12 @@ if (Utility::isCLI()) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 } else {
 
-	/*
-	 * Your server's local timezone.
-	 * @note    Uncomment to enable.
-	 * @see     https://secure.php.net/manual/en/timezones.php
-	 * @version 4
-	 */
+    /*
+     * Your server's local timezone.
+     * @note    Uncomment to enable.
+     * @see     https://secure.php.net/manual/en/timezones.php
+     * @version 4
+     */
     //ini_set('date.timezone', 'America/New_York');
 
     /*
@@ -714,12 +603,12 @@ if (Utility::isCLI()) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 if (extension_loaded('xdebug')) {
 
-	/*
-	 * Display colors on xdebug CLI output?
-	 * 0 - off, 1 - on only if on a TTY with ansi support, 2 - on regardless of TTY or ansi support.
-	 * @default 0
-	 * @version 4
-	 */
+    /*
+     * Display colors on xdebug CLI output?
+     * 0 - off, 1 - on only if on a TTY with ansi support, 2 - on regardless of TTY or ansi support.
+     * @default 0
+     * @version 4
+     */
     ini_set('xdebug.cli_color', '0');
 
     /*
