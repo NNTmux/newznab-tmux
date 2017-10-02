@@ -21,12 +21,12 @@ use Monolog\Processor\IntrospectionProcessor;
 class Logger
 {
     // You can use these constants when using the start method.
-	const LOG_FATAL = 1; // Fatal error, the program exited.
-	const LOG_ERROR = 2; // Recoverable error.
-	const LOG_WARNING = 3; // Warnings.
-	const LOG_NOTICE = 4; // Notices.
-	const LOG_INFO = 5; // Info message, not important.
-	const LOG_SQL = 6; // Full SQL query when it fails.
+    const LOG_FATAL = 1; // Fatal error, the program exited.
+    const LOG_ERROR = 2; // Recoverable error.
+    const LOG_WARNING = 3; // Warnings.
+    const LOG_NOTICE = 4; // Notices.
+    const LOG_INFO = 5; // Info message, not important.
+    const LOG_SQL = 6; // Full SQL query when it fails.
 
     /**
      * Name of class we are currently logging.
@@ -146,25 +146,25 @@ class Logger
         }
 
         $defaults = [
-			'ColorCLI'    => null,
-			'LogFolder'   => '',
-			'LogFileName' => '',
-		];
+            'ColorCLI'    => null,
+            'LogFolder'   => '',
+            'LogFileName' => '',
+        ];
         $options += $defaults;
 
         $this->getSettings();
 
         $this->currentLogFolder = (
-			! empty($options['LogFolder'])
-				? $options['LogFolder']
-				: $this->currentLogFolder
-		);
+            ! empty($options['LogFolder'])
+                ? $options['LogFolder']
+                : $this->currentLogFolder
+        );
 
         $this->currentLogName = (
-			! empty($options['LogFileName'])
-				? $options['LogFileName']
-				: $this->currentLogName
-		).'.log';
+            ! empty($options['LogFileName'])
+                ? $options['LogFileName']
+                : $this->currentLogName
+        ).'.log';
 
         $this->outputCLI = (strtolower(PHP_SAPI) === 'cli');
         $this->isWindows = stripos(PHP_OS, 'win') === 0;
@@ -199,7 +199,7 @@ class Logger
      *               5 Info     - General info, like we logged in to usenet for example.
      *               6 Query    - Failed SQL queries. (the full query).
      */
-    public function log($class, $method, $message, $severity)
+    public function log($class, $method, $message, $severity): void
     {
         // Check if echo debugging or logging is on.
         if (! NN_DEBUG && ! NN_LOGGING) {
@@ -232,10 +232,10 @@ class Logger
             $usage = getrusage();
 
             return
-				'USR: '.$this->formatTimeString($usage['ru_utime.tv_sec']).
-				' SYS: '.$this->formatTimeString($usage['ru_stime.tv_sec']).
-				' FAULTS: '.$usage['ru_majflt'].
-				' SWAPS: '.$usage['ru_nswap'];
+                'USR: '.$this->formatTimeString($usage['ru_utime.tv_sec']).
+                ' SYS: '.$this->formatTimeString($usage['ru_stime.tv_sec']).
+                ' FAULTS: '.$usage['ru_majflt'].
+                ' SWAPS: '.$usage['ru_nswap'];
         }
 
         return false;
@@ -276,7 +276,7 @@ class Logger
      *
      * @throws \nntmux\LoggerException
      */
-    public function changeLogFileLocation($folder, $fileName)
+    public function changeLogFileLocation($folder, $fileName): void
     {
         $this->currentLogFolder = $folder;
         $this->currentLogName = $fileName;
@@ -296,10 +296,10 @@ class Logger
         $defaultLogFolder = (in_array(substr($defaultLogFolder, -1), ['/', '\\'], false) ? $defaultLogFolder : $defaultLogFolder.DS);
 
         return [
-			'LogFolder' => $defaultLogFolder,
-			'LogName'   => $defaultLogName,
-			'LogPath'   => $defaultLogFolder.$defaultLogName.'.log',
-		];
+            'LogFolder' => $defaultLogFolder,
+            'LogName'   => $defaultLogName,
+            'LogPath'   => $defaultLogFolder.$defaultLogName.'.log',
+        ];
     }
 
     /**
@@ -358,38 +358,40 @@ class Logger
         $pid = getmypid();
 
         $this->logMessage =
-			// The severity.
-			$this->severity.
+            // The severity.
+            $this->severity.
 
-			// Average system load.
-			(($this->showCPULoad && ! $this->isWindows) ? ' ['.$this->getSystemLoad().']' : '').
+            // Average system load.
+            (($this->showCPULoad && ! $this->isWindows) ? ' ['.$this->getSystemLoad().']' : '').
 
-			// Script running time.
-			($this->showRunningTime ? ' ['.$this->formatTimeString(time() - $this->timeStart).']' : '').
+            // Script running time.
+            ($this->showRunningTime ? ' ['.$this->formatTimeString(time() - $this->timeStart).']' : '').
 
-			// Resource usage (user time, system time, major page faults, memory swaps).
-			(($this->showResourceUsage && ! $this->isWindows) ? ' ['.$this->getResUsage().']' : '').
+            // Resource usage (user time, system time, major page faults, memory swaps).
+            (($this->showResourceUsage && ! $this->isWindows) ? ' ['.$this->getResUsage().']' : '').
 
-			// Running process id.
-			($pid ? ' [PID:'.$pid.']' : '').
+            // Running process id.
+            ($pid ? ' [PID:'.$pid.']' : '').
 
-			// The class/function.
-			' ['.$this->class.'.'.$this->method.']'.
+            // The class/function.
+            ' ['.$this->class.'.'.$this->method.']'.
 
-			' ['.
+            ' ['.
 
-			// Now reformat the log message, first stripping leading spaces.
-			trim(
+            // Now reformat the log message, first stripping leading spaces.
+            trim(
 
-				// Removing 2 or more spaces.
-				preg_replace('/\s{2,}/', ' ',
+                // Removing 2 or more spaces.
+                preg_replace(
+                    '/\s{2,}/',
+                    ' ',
 
-					// Removing new lines and carriage returns.
-					str_replace(["\n", '\n', "\r", '\r'], ' ', $this->logMessage)
-				)
-			).
+                    // Removing new lines and carriage returns.
+                    str_replace(["\n", '\n', "\r", '\r'], ' ', $this->logMessage)
+                )
+            ).
 
-			']';
+            ']';
 
         return $this->logMessage;
     }
@@ -427,56 +429,56 @@ class Logger
     private function checkSeverity()
     {
         switch ($this->severity) {
-			case self::LOG_FATAL:
-				if (NN_LOGFATAL) {
-				    $this->severity = '[FATAL] ';
+            case self::LOG_FATAL:
+                if (NN_LOGFATAL) {
+                    $this->severity = '[FATAL] ';
 
-				    return true;
-				}
+                    return true;
+                }
 
-				return false;
-			case self::LOG_ERROR:
-				if (NN_LOGERROR) {
-				    $this->severity = '[ERROR] ';
+                return false;
+            case self::LOG_ERROR:
+                if (NN_LOGERROR) {
+                    $this->severity = '[ERROR] ';
 
-				    return true;
-				}
+                    return true;
+                }
 
-				return false;
-			case self::LOG_WARNING:
-				if (NN_LOGWARNING) {
-				    $this->severity = '[WARN]  ';
+                return false;
+            case self::LOG_WARNING:
+                if (NN_LOGWARNING) {
+                    $this->severity = '[WARN]  ';
 
-				    return true;
-				}
+                    return true;
+                }
 
-				return false;
-			case self::LOG_NOTICE:
-				if (NN_LOGNOTICE) {
-				    $this->severity = '[NOTICE]';
+                return false;
+            case self::LOG_NOTICE:
+                if (NN_LOGNOTICE) {
+                    $this->severity = '[NOTICE]';
 
-				    return true;
-				}
+                    return true;
+                }
 
-				return false;
-			case self::LOG_INFO:
-				if (NN_LOGINFO) {
-				    $this->severity = '[INFO]  ';
+                return false;
+            case self::LOG_INFO:
+                if (NN_LOGINFO) {
+                    $this->severity = '[INFO]  ';
 
-				    return true;
-				}
+                    return true;
+                }
 
-				return false;
-			case self::LOG_SQL:
-				if (NN_LOGQUERIES) {
-				    $this->severity = '[SQL]   ';
+                return false;
+            case self::LOG_SQL:
+                if (NN_LOGQUERIES) {
+                    $this->severity = '[SQL]   ';
 
-				    return true;
-				}
+                    return true;
+                }
 
-				return false;
-			default:
-				return false;
-		}
+                return false;
+            default:
+                return false;
+        }
     }
 }
