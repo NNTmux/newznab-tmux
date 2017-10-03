@@ -140,6 +140,7 @@
 																<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
 																<span class="label label-primary">{$result.year}</span>
 																<span class="label label-primary">{if $result.rating != ''}{$result.rating}/10{/if}</span>
+																<span class="label label-primary">{if $result.rtrating != ''}RottenTomatoes Score {$result.rtrating}{/if}</span>
 																<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
 																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
@@ -279,6 +280,7 @@
 																<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
 																<span class="label label-primary">{$result.year}</span>
 																<span class="label label-primary">{if $result.rating != ''}{$result.rating}/10{/if}</span>
+																<span class="label label-primary">{if $result.rtrating != ''}RottenTomatoes Score {$result.rtrating}{/if}</span>
 																<span class="label label-primary">{$msize[$m@index]|fsize_format:"MB"}</span>
 																	<span class="label label-primary">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
