@@ -740,6 +740,11 @@ class Movie
             $mov['banner'] = $this->releaseImage->saveImage($imdbId.'-banner', $fanart['banner'], $this->imgSavePath);
         }
 
+        //RottenTomatoes rating from OmdbAPI
+        if ($this->checkVariable($omdb['rtRating'])) {
+            $mov['rtrating'] = $omdb['rtRating'];
+        }
+
         $mov['title'] = $this->setVariables($imdb['title'], $tmdb['title'], $trakt['title'], $omdb['title']);
         $mov['rating'] = $this->setVariables($imdb['rating'], $tmdb['rating'], $trakt['rating'], $omdb['rating']);
         $mov['plot'] = $this->setVariables($imdb['plot'], $tmdb['plot'], $trakt['overview'], $omdb['plot']);
@@ -790,6 +795,7 @@ class Movie
             'language'  => html_entity_decode($mov['language'], ENT_QUOTES, 'UTF-8'),
             'plot'      => html_entity_decode(preg_replace('/\s+See full summary »/', ' ', $mov['plot']), ENT_QUOTES, 'UTF-8'),
             'rating'    => round($mov['rating'], 1),
+            'rtrating' => $mov['rtrating'],
             'tagline'   => html_entity_decode($mov['tagline'], ENT_QUOTES, 'UTF-8'),
             'title'     => $mov['title'],
             'tmdbid'    => $mov['tmdbid'],
@@ -1111,7 +1117,6 @@ class Movie
                     'year'  => ! empty($resp->data->Year) ? $resp->data->Year : '',
                     'plot'  => ! empty($resp->data->Plot) ? $resp->data->Plot : '',
                     'rating'  => ! empty($resp->data->imdbRating) ? $resp->data->imdbRating : '',
-                    'rottenTomatoes' => ! empty($resp->data->Ratings[1]->Source) ? $resp->data->Ratings[1]->Source : '',
                     'rtRating' => ! empty($resp->data->Ratings[1]->Value) ? $resp->data->Ratings[1]->Value : '',
                     'tagline' => ! empty($resp->data->Tagline) ? $resp->data->Tagline : '',
                     'director' => ! empty($resp->data->Director) ? $resp->data->Director : '',
