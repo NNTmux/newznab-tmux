@@ -1,4 +1,5 @@
 2017-10-03 DariusIII
+	* Chg: Update laravel/framework to version  5.5.14
 	* Chg: Update movieinfo table for rottentomatoes rating
 2017-10-02 DariusIII
 	* CHg: Pull RT ratings from OMDBApi
