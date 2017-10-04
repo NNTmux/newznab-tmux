@@ -17,11 +17,11 @@ class AccountChange extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param \App\Models\User $user
+     * @param $userId
      */
-    public function __construct(User $user)
+    public function __construct($userId)
     {
-        $this->user = $user;
+        $this->user = User::query()->where('id', $userId)->first();
     }
 
     /**

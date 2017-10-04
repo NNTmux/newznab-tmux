@@ -1,3 +1,5 @@
+2017-10-04 DariusIII
+	* Fix: Fix sending email on account change
 2017-10-03 DariusIII
 	* Chg: Add display of RT score
 	* Chg: Update laravel/framework to version  5.5.14
