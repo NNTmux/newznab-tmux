@@ -1,4 +1,5 @@
 2017-10-05 DariusIII
+	* Chg: Update Release and Category models relationship
 	* Fix: Fix adding of RT rating
 2017-10-04 DariusIII
 	* Fix: Fix sending email on account change

@@ -19,14 +19,20 @@ class Category extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-        'id',
-        'title',
-        'parentid',
-        'status',
-        'description',
-        'disablepreview',
-        'minsizetoformrelease',
-        'maxsizetoformrelease',
-    ];
+    protected $guarded = [];
+
+    public function releases()
+    {
+        return $this->hasMany('App\Models\Release', 'categories_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(static::class, 'parentid');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(static::class, 'parentid');
+    }
 }

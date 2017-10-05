@@ -40,4 +40,9 @@ class Release extends Model
     {
         return $this->hasMany('App\Models\ReleaseFile', 'releases_id');
     }
+
+    public function category()
+    {
+        return $this->belongsTo('App\Models\Category', 'categories_id');
+    }
 }
