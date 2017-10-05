@@ -349,10 +349,12 @@
 																	/10
 																</td>
 															</tr>
+															{if !empty($movie.rtrating)}
 															<tr>
 																<th width="140">RottenTomatoes score</th>
 																<td>{if $movie.rtrating} == ''} N/A{/if}{$movie.rtrating}</td>
 															</tr>
+															{/if}
 														{/if}
 														{if $show && $release.videos_id > 0}
 															{if $release.firstaired != ""}

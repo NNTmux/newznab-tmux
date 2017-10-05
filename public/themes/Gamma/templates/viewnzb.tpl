@@ -82,8 +82,10 @@
 					<dd>{$movie.year}</dd>
 					<dt>Rating</dt>
 					<dd><strong>{if $movie.rating == ''}N/A{/if}{$movie.rating}/10</strong></dd>
+					{if !empty($movie.rtrating)}
 					<dt>RottenTomatoes score</dt>
 						<dd>{if $movie.rtrating} == ''} N/A{/if}{$movie.rtrating}</dd>
+					{/if}
 					{if $movie.tagline != ''}
 						<dt>Tagline</dt>
 						<dd>{$movie.tagline|escape:"htmlall"}</dd>
