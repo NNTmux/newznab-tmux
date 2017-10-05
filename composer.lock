@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "94196be2e996be2788d268ca1f0b4fce",
+    "content-hash": "1c8957faaf972f683a756a5d1de63c2f",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -2478,6 +2478,69 @@
                 "url"
             ],
             "time": "2017-03-20T17:10:46+00:00"
+        },
+        {
+            "name": "igaster/laravel-theme",
+            "version": "v2.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/igaster/laravel-theme.git",
+                "reference": "3db2869e85b4ed2d1f1fc89503e0a8487be42ff6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/igaster/laravel-theme/zipball/3db2869e85b4ed2d1f1fc89503e0a8487be42ff6",
+                "reference": "3db2869e85b4ed2d1f1fc89503e0a8487be42ff6",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "5.4.*|5.5.*"
+            },
+            "require-dev": {
+                "orchestra/testbench": "~3.4",
+                "phpunit/phpunit": "^6.0"
+            },
+            "suggest": {
+                "orchestra/asset": "Use '@css' and '@js' in Blade files"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Igaster\\LaravelTheme\\themeServiceProvider"
+                    ],
+                    "aliases": {
+                        "Theme": "Igaster\\LaravelTheme\\Facades\\Theme"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Igaster\\LaravelTheme\\": "src/",
+                    "Igaster\\LaravelTheme\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Giannis Gasteratos",
+                    "email": "igasteratos@gmail.com"
+                }
+            ],
+            "description": "Laravel 5 Themes: Asset & Views folder per theme. Theme inheritance. Blade integration and more...",
+            "homepage": "https://github.com/Igaster/laravel-theme.git",
+            "keywords": [
+                "assets",
+                "blade",
+                "laravel-5",
+                "package",
+                "themes",
+                "views"
+            ],
+            "time": "2017-09-27T11:05:13+00:00"
         },
         {
             "name": "jakub-onderka/php-console-color",
@@ -5076,6 +5139,82 @@
                 "mysql"
             ],
             "time": "2017-04-27T16:19:41+00:00"
+        },
+        {
+            "name": "ytake/laravel-smarty",
+            "version": "2.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ytake/Laravel.Smarty.git",
+                "reference": "b0c33cc9db91e85db83fac80bfedecc82affb237"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ytake/Laravel.Smarty/zipball/b0c33cc9db91e85db83fac80bfedecc82affb237",
+                "reference": "b0c33cc9db91e85db83fac80bfedecc82affb237",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/config": "^5.5",
+                "illuminate/console": "^5.5",
+                "illuminate/events": "^5.5",
+                "illuminate/support": "^5.5",
+                "illuminate/view": "^5.5",
+                "php": ">=7.0.0",
+                "smarty/smarty": "^3.1.31"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^1.11.6",
+                "pdepend/pdepend": "^2.2.4",
+                "phploc/phploc": "*",
+                "phpmd/phpmd": "@stable",
+                "phpunit/phpunit": "^5.0",
+                "predis/predis": "~1.0",
+                "satooshi/php-coveralls": "*",
+                "sebastian/phpcpd": "*",
+                "sensiolabs/security-checker": "^4.0.0",
+                "squizlabs/php_codesniffer": "~2.7",
+                "symfony/console": "^3.0",
+                "symfony/framework-bundle": "^3.0"
+            },
+            "suggest": {
+                "ext-memcached": "memcached Template Cache Driver",
+                "predis/predis": "Redis Template Cache Driver"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Ytake\\LaravelSmarty\\SmartyServiceProvider",
+                        "Ytake\\LaravelSmarty\\SmartyConsoleServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ytake\\LaravelSmarty\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Yuuki Takezawa",
+                    "email": "yuuki.takezawa@comnect.jp.net"
+                }
+            ],
+            "description": "Smarty template engine for Laravel and Lumen",
+            "keywords": [
+                "cache",
+                "laravel",
+                "lumen",
+                "smarty",
+                "template",
+                "view"
+            ],
+            "time": "2017-09-05T17:47:10+00:00"
         }
     ],
     "packages-dev": [

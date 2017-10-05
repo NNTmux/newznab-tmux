@@ -176,7 +176,13 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-		App\Providers\YencServiceProvider::class,
+        App\Providers\YencServiceProvider::class,
+
+        // add smarty extension
+        \Ytake\LaravelSmarty\SmartyServiceProvider::class,
+        // add artisan commands
+        \Ytake\LaravelSmarty\SmartyConsoleServiceProvider::class,
+        Igaster\LaravelTheme\themeServiceProvider::class,
 
     ],
 
@@ -226,6 +232,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+        'Theme' => Igaster\LaravelTheme\Facades\Theme::class,
 
     ],
 
