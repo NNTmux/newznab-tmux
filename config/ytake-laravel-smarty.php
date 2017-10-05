@@ -12,11 +12,10 @@
  * and is licensed under the MIT license.
  *
  * Copyright (c) 2014-2017 Yuuki Takezawa
- *
  */
 
 /**
- * Smarty configure
+ * Smarty configure.
  * @author  yuuki.takezawa<yuuki.takezawa@comnect.jp.net>
  * @license http://opensource.org/licenses/MIT MIT
  */
@@ -43,25 +42,25 @@ return [
     'right_delimiter'                     => '}',
 
     // path info
-    'template_path'                       => base_path() . '/resources/views',
+    'template_path'                       => base_path().'/resources/views',
 
     // smarty cache directory
-    'cache_path'                          => storage_path() . '/framework/smarty/cache',
+    'cache_path'                          => storage_path().'/framework/smarty/cache',
 
     // smarty template compiler
-    'compile_path'                        => storage_path() . '/framework/smarty/compile',
+    'compile_path'                        => storage_path().'/framework/smarty/compile',
 
     // smarty plugins
     'plugins_paths'                       => [
-        base_path() . '/resources/smarty/plugins',
+        base_path().'/resources/smarty/plugins',
     ],
 
     // smarty configure
     'config_paths'                        => [
-        base_path() . '/resources/smarty/config',
+        base_path().'/resources/smarty/config',
     ],
 
-    /**
+    /*
      * for develop true
      * for production false
      */
@@ -75,7 +74,7 @@ return [
         [
             'host'   => '127.0.0.1',
             'port'   => 11211,
-            'weight' => 100
+            'weight' => 100,
         ],
     ],
 
@@ -156,7 +155,6 @@ return [
 //    'tpl_vars'                            => null,
 //    'parent'                              => null,
 //    'config_vars'                         => null,
-
 
     /*
      *  If true smarty will enable security `$smarty->enableSecurity()`

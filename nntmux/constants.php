@@ -39,7 +39,7 @@ define('NN_TMUX', NN_UPDATE.'nix'.DS.'tmux'.DS);
 define('NN_MULTIPROCESSING', NN_NIX.'multiprocessing'.DS);
 
 // Refers to the web root for the Smarty lib
-define('NN_WWW', NN_ROOT.'resources'.DS . 'views' . DS);
+define('NN_WWW', NN_ROOT.'resources'.DS.'views'.DS);
 
 // Used to refer to the resources folder
 define('NN_RES', NN_ROOT.'resources'.DS);
