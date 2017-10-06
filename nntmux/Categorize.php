@@ -21,7 +21,6 @@ class Categorize extends Category
      */
     protected $catWebDL;
 
-
     /**
      * Release name to sort through.
      * @var string
