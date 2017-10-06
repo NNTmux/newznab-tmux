@@ -1,83 +1,56 @@
 <?php
 
-require_once __DIR__.DIRECTORY_SEPARATOR.'smarty.php';
+/**
+ * Laravel - A PHP Framework For Web Artisans
+ *
+ * @package  Laravel
+ * @author   Taylor Otwell <taylor@laravel.com>
+ */
 
-use App\Models\Settings;
+/*
+|--------------------------------------------------------------------------
+| Register The Auto Loader
+|--------------------------------------------------------------------------
+|
+| Composer provides a convenient, automatically generated class loader for
+| our application. We just need to utilize it! We'll simply require it
+| into the script here so that we don't have to worry about manual
+| loading any of our classes later on. It feels great to relax.
+|
+*/
 
-$page = new Page;
+require __DIR__.'/../bootstrap/autoload.php';
 
-if ($app->isDownForMaintenance()) {
-    $page->showMaintenance();
-}
+/*
+|--------------------------------------------------------------------------
+| Turn On The Lights
+|--------------------------------------------------------------------------
+|
+| We need to illuminate PHP development, so let us turn on the lights.
+| This bootstraps the framework and gets it ready for use, then it
+| will load up this application so that we can run it and send
+| the responses back to the browser and delight our users.
+|
+*/
 
-switch ($page->page) {
-    case 'ajax_mediainfo':
-    case 'ajax_mymovies':
-    case 'ajax_preinfo':
-    case 'ajax_profile':
-    case 'ajax_release-admin':
-    case 'ajax_resetusergrabs-admin':
-    case 'ajax_rarfilelist':
-    case 'ajax_titleinfo':
-    case 'ajax_tvinfo':
-    case 'anime':
-    case 'apihelp':
-    case 'bookmodal':
-    case 'books':
-    case 'browse':
-    case 'browsegroup':
-    case 'cart':
-    case 'console':
-    case 'consolemodal':
-    case 'contact-us':
-    case 'content':
-    case 'details':
-    case 'filelist':
-    case 'forgottenpassword':
-    case 'forum':
-    case 'forumpost':
-    case 'games':
-    case 'getimage':
-    case 'logout':
-    case 'movies':
-    case 'movie':
-    case 'music':
-    case 'musicmodal':
-    case 'myshows':
-    case 'mymovies':
-    case 'mymoviesedit':
-    case 'newposterwall':
-    case 'nfo':
-    case 'nzbgetqueuedata':
-    case 'post_edit':
-    case 'profile':
-    case 'profileedit':
-    case 'queue':
-    case 'register':
-    case 'sabqueuedata':
-    case 'search':
-    case 'sendtocouch':
-    case 'sendtoqueue':
-    case 'series':
-    case 'terms-and-conditions':
-    case 'topic_delete':
-    case 'upcoming':
-    case 'xxx':
-    case 'xxxmodal':
-        // Don't show these pages if it's an API-only site.
-        if (! $page->users->isLoggedIn() && (int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
-            header('Location: '.Settings::settingValue('site.main.code'));
-            break;
-        }
-        // no break
-    case 'api':
-    case 'failed':
-    case 'getnzb':
-    case 'login':
-    case 'rss':
-        include NN_WWW.'pages/'.$page->page.'.php';
-        break;
-    default:
-        $page->show404();
-        break;
-}
+/*
+|--------------------------------------------------------------------------
+| Run The Application
+|--------------------------------------------------------------------------
+|
+| Once we have the application, we can handle the incoming request
+| through the kernel, and send the associated response back to
+| the client's browser allowing them to enjoy the creative
+| and wonderful application we have prepared for them.
+|
+*/
+
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+);
+
+$response->send();
+
+$kernel->terminate($request, $response);

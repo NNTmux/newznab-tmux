@@ -95,23 +95,23 @@ return [
         */
         'Charisma' => [
                'extends'        => null,    // doesn't extend any theme
-                'views-path'    => 'resources/views/themes/Charisma', // = resources/views/example_theme
-                'asset-path'    => 'resources/views/themes/shared/assets', // = public/example_theme
+                'views-path'    => 'Charisma', // = resources/views/example_theme
+                'asset-path'    => 'shared/assets', // = public/example_theme
             ],
         'Gama' => [
             'extends'        => null,    // doesn't extend any theme
-            'views-path'    => 'resources/views/themes/Gamma', // = resources/views/example_theme
-            'asset-path'    => 'resources/views/themes/shared/assets', // = public/example_theme
+            'views-path'    => 'Gamma', // = resources/views/example_theme
+            'asset-path'    => 'shared/assets', // = public/example_theme
         ],
         'Gentele' => [
             'extends'        => null,    // doesn't extend any theme
-            'views-path'    => 'resources/views/themes/Gentele', // = resources/views/example_theme
-            'asset-path'    => 'resources/views/themes/shared/assets', // = public/example_theme
+            'views-path'    => 'Gentele', // = resources/views/example_theme
+            'asset-path'    => 'shared/assets', // = public/example_theme
         ],
         'Omicron' => [
             'extends'        => null,    // doesn't extend any theme
-            'views-path'    => 'resources/views/themes/Omicron', // = resources/views/example_theme
-            'asset-path'    => 'resources/views/themes/shared/assets', // = public/example_theme
+            'views-path'    => 'Omicron', // = resources/views/example_theme
+            'asset-path'    => 'shared/assets', // = public/example_theme
         ],
     ],
 
