@@ -80,7 +80,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
             $cdata = ['title' => ''];
             $catid = '';
         }
-        $page->smarty->assign('catname', $cdata['title']);
+        $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title . ' > ' . $cdata->title : $cdata->title);
         $page->smarty->assign('category', $catid);
         $page->smarty->assign('nodata', '');
     }

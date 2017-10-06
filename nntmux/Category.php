@@ -276,11 +276,11 @@ class Category
      *
      *
      * @param $id
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getById($id)
     {
-        return CategoryModel::query()->where('id', $id)->get();
+        return CategoryModel::query()->where('id', $id)->first();
     }
 
     /**
@@ -306,7 +306,7 @@ class Category
      * @param $ID
      * @return string
      */
-    public function getNameByID($ID)
+    public function getNameByID($ID): string
     {
         $cat = CategoryModel::query()->where('id', $ID)->first();
 
