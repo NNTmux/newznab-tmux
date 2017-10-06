@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Category as CategoryModel;
 use nntmux\db\DB;
+use App\Models\Category as CategoryModel;
 
 /**
  * This class manages the site wide categories.
@@ -310,7 +310,7 @@ class Category
     {
         $cat = CategoryModel::query()->where('id', $ID)->first();
 
-        return $cat !== null ? $cat->parent->title .' -> '.$cat->title : '';
+        return $cat !== null ? $cat->parent->title.' -> '.$cat->title : '';
     }
 
     /**
