@@ -47,65 +47,66 @@ function smarty_function_html_options_multiple($params, $template)
     $extra = '';
     foreach ($params as $_key => $_val) {
         switch ($_key) {
-			case 'name':
-			case 'class':
-			case 'id':
-				$$_key = (string) $_val;
-				break;
-			case 'options':
-				$options = (array) $_val;
-				break;
-			case 'values':
-			case 'output':
-				$$_key = array_values((array) $_val);
-				break;
-			case 'selected':
-				if (is_array($_val)) {
-				    $selected = [];
-				    foreach ($_val as $_sel) {
-				        if (is_object($_sel)) {
-				            if (method_exists($_sel, '__toString')) {
-				                $_sel = smarty_function_escape_special_chars((string) $_sel->__toString());
-				            } else {
-				                trigger_error("html_options_multiple: selected attribute contains an object of class '".get_class($_sel)."' without __toString() method", E_USER_NOTICE);
-				                continue;
-				            }
-				        } else {
-				            $_sel = smarty_function_escape_special_chars((string) $_sel);
-				        }
-				        $selected[$_sel] = true;
-				    }
-				} elseif (is_object($_val)) {
-				    if (method_exists($_val, '__toString')) {
-				        $selected = smarty_function_escape_special_chars((string) $_val->__toString());
-				    } else {
-				        trigger_error("html_options_multiple: selected attribute is an object of class '".get_class($_val)."' without __toString() method", E_USER_NOTICE);
-				    }
-				} else {
-				    $selected = smarty_function_escape_special_chars((string) $_val);
-				}
-				break;
-			case 'strict': break;
-			case 'disabled':
-			case 'readonly':
-				if (! empty($params['strict'])) {
-				    if (! is_scalar($_val)) {
-				        trigger_error("html_options_multiple: $_key attribute must be a scalar, only boolean true or string '$_key' will actually add the attribute", E_USER_NOTICE);
-				    }
-				    if ($_val === true || $_val === $_key) {
-				        $extra .= ' '.$_key.'="'.smarty_function_escape_special_chars($_key).'"';
-				    }
-				    break;
-				}
-			// omit break; to fall through!
-			default:
-				if (! is_array($_val)) {
-				    $extra .= ' '.$_key.'="'.smarty_function_escape_special_chars($_val).'"';
-				} else {
-				    trigger_error("html_options_multiple: extra attribute '$_key' cannot be an array", E_USER_NOTICE);
-				}
-				break;
-		}
+            case 'name':
+            case 'class':
+            case 'id':
+                $$_key = (string) $_val;
+                break;
+            case 'options':
+                $options = (array) $_val;
+                break;
+            case 'values':
+            case 'output':
+                $$_key = array_values((array) $_val);
+                break;
+            case 'selected':
+                if (is_array($_val)) {
+                    $selected = [];
+                    foreach ($_val as $_sel) {
+                        if (is_object($_sel)) {
+                            if (method_exists($_sel, '__toString')) {
+                                $_sel = smarty_function_escape_special_chars((string) $_sel->__toString());
+                            } else {
+                                trigger_error("html_options_multiple: selected attribute contains an object of class '".get_class($_sel)."' without __toString() method", E_USER_NOTICE);
+                                continue;
+                            }
+                        } else {
+                            $_sel = smarty_function_escape_special_chars((string) $_sel);
+                        }
+                        $selected[$_sel] = true;
+                    }
+                } elseif (is_object($_val)) {
+                    if (method_exists($_val, '__toString')) {
+                        $selected = smarty_function_escape_special_chars((string) $_val->__toString());
+                    } else {
+                        trigger_error("html_options_multiple: selected attribute is an object of class '".get_class($_val)."' without __toString() method", E_USER_NOTICE);
+                    }
+                } else {
+                    $selected = smarty_function_escape_special_chars((string) $_val);
+                }
+                break;
+            case 'strict': break;
+            case 'disabled':
+            case 'readonly':
+                if (! empty($params['strict'])) {
+                    if (! is_scalar($_val)) {
+                        trigger_error("html_options_multiple: $_key attribute must be a scalar, only boolean true or string '$_key' will actually add the attribute", E_USER_NOTICE);
+                    }
+                    if ($_val === true || $_val === $_key) {
+                        $extra .= ' '.$_key.'="'.smarty_function_escape_special_chars($_key).'"';
+                    }
+                    break;
+                }
+            // omit break; to fall through!
+            // no break
+            default:
+                if (! is_array($_val)) {
+                    $extra .= ' '.$_key.'="'.smarty_function_escape_special_chars($_val).'"';
+                } else {
+                    trigger_error("html_options_multiple: extra attribute '$_key' cannot be an array", E_USER_NOTICE);
+                }
+                break;
+        }
     }
     if (! isset($options) && ! isset($values)) {
         /* raise error here? */

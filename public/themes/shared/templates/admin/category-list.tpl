@@ -19,13 +19,13 @@
 		<th>disable preview</th>
 	</tr>
 
-	{foreach from=$categorylist item=category}
+	{foreach $categorylist as $category}
 	<tr class="{cycle values=",alt"}">
 		<td>{$category.id}</td>
 		<td><a href="{$smarty.const.WWW_TOP}/category-edit.php?id={$category.id}">{$category.title}</a></td>
 		<td>
 			{if $category.parentid != null}
-				{$category.parentName}
+				{$category->parent->title}
 			{else}
 				n/a
 			{/if}

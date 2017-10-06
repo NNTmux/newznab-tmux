@@ -17,10 +17,10 @@ function smarty_modifier_timeAgo($date)
         return 'n/a';
     }
     $timeStrings = ['now',      // 0
-						'Sec', 'Secs',    // 1,1
-						'Min', 'Mins',     // 3,3
-						'Hour', 'Hrs',  // 5,5
-						'Day', 'Days', ];
+                        'Sec', 'Secs',    // 1,1
+                        'Min', 'Mins',     // 3,3
+                        'Hour', 'Hrs',  // 5,5
+                        'Day', 'Days', ];
     $sec = time() - ((! is_numeric($date) && strtotime($date)) ? strtotime($date) : $date);
     if ($sec <= 0) {
         return $timeStrings[0];

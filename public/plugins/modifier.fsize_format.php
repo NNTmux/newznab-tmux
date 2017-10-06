@@ -9,17 +9,17 @@
 * Author:    Joscha Feth, joscha@feth.com
 * Purpose: formats a filesize (in bytes) to human-readable format
 * Usage:    In the template, use
-			{$filesize|fsize_format}    =>    123.45 B|KB|MB|GB|TB
-			or
-			{$filesize|fsize_format:"MB"}    =>    123.45 MB
-			or
-			{$filesize|fsize_format:"TB":4}    =>    0.0012 TB
+            {$filesize|fsize_format}    =>    123.45 B|KB|MB|GB|TB
+            or
+            {$filesize|fsize_format:"MB"}    =>    123.45 MB
+            or
+            {$filesize|fsize_format:"TB":4}    =>    0.0012 TB
 * Params:
-			int        size            the filesize in bytes
-			string    format            the format, the output shall be: B, KB, MB, GB or TB
-			int        precision        the rounding precision
-			string    dec_point        the decimal separator
-			string    thousands_sep    the thousands separator
+            int        size            the filesize in bytes
+            string    format            the format, the output shall be: B, KB, MB, GB or TB
+            int        precision        the rounding precision
+            string    dec_point        the decimal separator
+            string    thousands_sep    the thousands separator
 * Install: Drop into the plugin directory
 * Version:
 *            2007-05-24    Version 0.3    - added the peta, exa, zeta, and yeta byte magnitudes thanks to coreone (at) gmail (dot) com

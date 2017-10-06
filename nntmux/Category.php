@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Category as CategoryModel;
 use nntmux\db\DB;
 
 /**
@@ -91,19 +92,23 @@ class Category
     const STATUS_DISABLED = 2;
 
     const OTHERS_GROUP =
-		[
-			self::BOOKS_UNKNOWN,
-			self::GAME_OTHER,
-			self::MOVIE_OTHER,
-			self::MUSIC_OTHER,
-			self::PC_PHONE_OTHER,
-			self::TV_OTHER,
-			self::OTHER_HASHED,
-			self::XXX_OTHER,
-			self::OTHER_MISC,
-		];
+        [
+            self::BOOKS_UNKNOWN,
+            self::GAME_OTHER,
+            self::MOVIE_OTHER,
+            self::MUSIC_OTHER,
+            self::PC_PHONE_OTHER,
+            self::TV_OTHER,
+            self::OTHER_HASHED,
+            self::XXX_OTHER,
+            self::OTHER_MISC,
+        ];
 
-    private $tmpCat = 0;
+    /**
+     * Temporary category while we sort through the name.
+     * @var int
+     */
+    protected $tmpCat = self::OTHER_MISC;
 
     /**
      * @var DB
@@ -114,12 +119,13 @@ class Category
      * Construct.
      *
      * @param array $options Class instances.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Settings' => null,
-		];
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
@@ -128,7 +134,7 @@ class Category
     /**
      * Parse category search constraints.
      *
-     * @param array|string $cat
+     * @param array $cat
      *
      * @return string $catsrch
      */
@@ -160,19 +166,19 @@ class Category
         $catCount = count($categories);
 
         switch ($catCount) {
-			//No category constraint
-			case 0:
-				$catsrch = ' AND 1=1 ';
-				break;
-			// One category constraint
-			case 1:
-				$catsrch = $categories[0] !== -1 ? ' AND r.categories_id = '.$categories[0] : '';
-				break;
-			// Multiple category constraints
-			default:
-				$catsrch = ' AND r.categories_id IN ('.implode(', ', $categories).') ';
-				break;
-		}
+            //No category constraint
+            case 0:
+                $catsrch = ' AND 1=1 ';
+                break;
+            // One category constraint
+            case 1:
+                $catsrch = $categories[0] !== -1 ? ' AND r.categories_id = '.$categories[0] : '';
+                break;
+            // Multiple category constraints
+            default:
+                $catsrch = ' AND r.categories_id IN ('.implode(', ', $categories).') ';
+                break;
+        }
 
         return $catsrch;
     }
@@ -184,20 +190,20 @@ class Category
      */
     public static function getCategoryOthersGroup(): string
     {
-        return implode(',',
-			[
-				self::BOOKS_UNKNOWN,
-				self::GAME_OTHER,
-				self::MOVIE_OTHER,
-				self::MUSIC_OTHER,
-				self::PC_PHONE_OTHER,
-				self::TV_OTHER,
-				self::OTHER_HASHED,
-				self::XXX_OTHER,
-				self::OTHER_MISC,
-				self::OTHER_HASHED,
-			]
-		);
+        return implode(
+            ',',
+            [
+                self::BOOKS_UNKNOWN,
+                self::GAME_OTHER,
+                self::MOVIE_OTHER,
+                self::MUSIC_OTHER,
+                self::PC_PHONE_OTHER,
+                self::TV_OTHER,
+                self::OTHER_HASHED,
+                self::XXX_OTHER,
+                self::OTHER_MISC,
+            ]
+        );
     }
 
     /**
@@ -219,79 +225,62 @@ class Category
      */
     public function isParent($cid): bool
     {
-        $ret = $this->pdo->query(
-			sprintf('SELECT id FROM categories WHERE id = %d AND parentid IS NULL', $cid),
-			true, NN_CACHE_EXPIRY_LONG
-		);
+        $ret = CategoryModel::query()->where(['id' => $cid, 'parentid' => null])->first();
 
-        return isset($ret[0]['id']);
+        return $ret !== null;
     }
 
     /**
-     * @param bool $activeonly
-     *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getFlat($activeonly = false): array
+    public function getFlat()
     {
-        $act = '';
-        if ($activeonly) {
-            $act = sprintf(' WHERE c.status = %d ', self::STATUS_ACTIVE);
-        }
-
-        return $this->pdo->query('SELECT c.*, (SELECT title FROM categories WHERE id=c.parentid) AS parentName FROM categories c '.$act.' ORDER BY c.id');
+        return CategoryModel::query()->get();
     }
 
     /**
      * Get children of a parent category.
      *
-     * @param $cid
      *
-     * @return array
+     * @param $cid
+     * @return mixed
      */
-    public function getChildren($cid): array
+    public function getChildren($cid)
     {
-        return $this->pdo->query(
-			sprintf('SELECT c.* FROM categories c WHERE parentid = %d', $cid),
-			true, NN_CACHE_EXPIRY_LONG
-		);
+        return CategoryModel::find($cid)->children;
     }
 
     /**
      * Get names of enabled parent categories.
-     * @return array
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getEnabledParentNames(): array
+    public function getEnabledParentNames()
     {
-        return $this->pdo->query(
-			'SELECT title FROM categories WHERE parentid IS NULL AND status = 1',
-			true, NN_CACHE_EXPIRY_LONG
-		);
+        return CategoryModel::query()->where(['parentid' => null, 'status' => 1])->get(['title']);
     }
 
     /**
      * Returns category ID's for site disabled categories.
      *
-     * @return array
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getDisabledIDs(): array
+    public function getDisabledIDs()
     {
-        return $this->pdo->query(
-			'SELECT id FROM categories WHERE status = 2 OR parentid IN (SELECT id FROM categories WHERE status = 2 AND parentid IS NULL)',
-			true, NN_CACHE_EXPIRY_LONG
-		);
+        return CategoryModel::query()->where('status', '=', 2)->orWhere(['status' => 2, 'parentid' => null])->get(['id']);
     }
 
     /**
      * Get a category row by its id.
      *
-     * @param $id
      *
-     * @return array|bool
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function getById($id)
     {
-        return $this->pdo->queryOneRow(sprintf("SELECT c.disablepreview, c.id, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentid from categories c left outer join categories cp on cp.id = c.parentid where c.id = %d", $id));
+        return CategoryModel::query()->where('id', $id)->get();
     }
 
     /**
@@ -304,14 +293,7 @@ class Category
     public function getByIds($ids)
     {
         if (count($ids) > 0) {
-            return $this->pdo->query(
-				sprintf(
-					"SELECT CONCAT(cp.title, ' > ',c.title) AS title
-					FROM categories c
-					INNER JOIN categories cp ON cp.id = c.parentid
-					WHERE c.id IN (%s)", implode(',', $ids)
-				), true, NN_CACHE_EXPIRY_LONG
-			);
+            return CategoryModel::query()->whereIn('id', $ids)->get();
         }
 
         return false;
@@ -319,40 +301,41 @@ class Category
 
     /**
      * Return the parent and category name from the supplied categoryID.
-     * @param $ID
      *
+     *
+     * @param $ID
      * @return string
      */
-    public function getNameByID($ID): string
+    public function getNameByID($ID)
     {
-        $cat = $this->pdo->queryOneRow(
-			sprintf('
-				SELECT c.title AS ctitle, cp.title AS ptitle
-				FROM categories c
-				INNER JOIN categories cp ON c.parentid = cp.id
-				WHERE c.id = %d',
-				$ID
-			)
-		);
+        $cat = CategoryModel::query()->where('id', $ID)->first();
 
-        return $cat['ptitle'].' -> '.$cat['ctitle'];
+        return $cat !== null ? $cat->parent->title .' -> '.$cat->title : '';
     }
 
     /**
      * Update a category.
      *
+     *
      * @param $id
      * @param $status
-     * @param $desc
+     * @param $desc->update
      * @param $disablepreview
      * @param $minsize
      * @param $maxsize
-     *
-     * @return bool|\PDOStatement
+     * @return int
      */
-    public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
+    public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize): int
     {
-        return $this->pdo->queryExec(sprintf('UPDATE categories SET disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s WHERE id = %d', $disablepreview, $status, $minsize, $maxsize, $this->pdo->escapeString($desc), $id));
+        return CategoryModel::query()->where('id', $id)->update(
+            [
+                'disablepreview' => $disablepreview,
+                'status' => $status,
+                'minsizetoformrelease' => $minsize,
+                'maxsizetoformrelease' => $maxsize,
+                'description' => $desc,
+            ]
+        );
     }
 
     /**
@@ -376,9 +359,10 @@ class Category
         }
 
         $arr = $this->pdo->query(
-			sprintf('SELECT * FROM categories WHERE status = %d %s', self::STATUS_ACTIVE, $exccatlist),
-			true, NN_CACHE_EXPIRY_LONG
-		);
+            sprintf('SELECT * FROM categories WHERE status = %d %s', self::STATUS_ACTIVE, $exccatlist),
+            true,
+            NN_CACHE_EXPIRY_LONG
+        );
 
         foreach ($arr as $key => $val) {
             if ($val['id'] === '0') {
@@ -440,27 +424,25 @@ class Category
     }
 
     /**
-     * Get array of categories in DB.
-     *
-     * @param bool  $activeonly
+     * @param bool $activeonly
      * @param array $excludedcats
-     *
-     * @return array
+     * @return string|static
      */
-    public function getCategories($activeonly = false, array $excludedcats = []): array
+    public function getCategories($activeonly = false, array $excludedcats = [])
     {
         return $this->pdo->query(
-			"SELECT c.id, CONCAT(cp.title, ' > ',c.title) AS title, cp.id AS parentid, c.status
+            "SELECT c.id, CONCAT(cp.title, ' > ',c.title) AS title, cp.id AS parentid, c.status
 			FROM categories c
 			INNER JOIN categories cp ON cp.id = c.parentid ".
-			($activeonly ?
-				sprintf(
-					' WHERE c.status = %d %s ',
-					self::STATUS_ACTIVE,
-					(count($excludedcats) > 0 ? ' AND c.id NOT IN ('.implode(',', $excludedcats).')' : '')
-				) : ''
-			).
-			' ORDER BY c.id'
-		);
+            (
+                $activeonly ?
+                sprintf(
+                    ' WHERE c.status = %d %s ',
+                    self::STATUS_ACTIVE,
+                    (count($excludedcats) > 0 ? ' AND c.id NOT IN ('.implode(',', $excludedcats).')' : '')
+                ) : ''
+            ).
+            ' ORDER BY c.id'
+        );
     }
 }

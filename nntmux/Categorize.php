@@ -21,11 +21,6 @@ class Categorize extends Category
      */
     protected $catWebDL;
 
-    /**
-     * Temporary category while we sort through the name.
-     * @var int
-     */
-    protected $tmpCat = Category::OTHER_MISC;
 
     /**
      * Release name to sort through.
@@ -80,7 +75,6 @@ class Categorize extends Category
     {
         $this->releaseName = $releaseName;
         $this->groupid = $groupID;
-        $this->tmpCat = Category::OTHER_MISC;
         $this->poster = $poster;
 
         switch (true) {

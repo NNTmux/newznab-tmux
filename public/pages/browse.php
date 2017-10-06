@@ -33,13 +33,14 @@ $results = $releases->getBrowseRange($catarray, $offset, ITEMS_PER_PAGE, $orderb
 $browsecount = $results[0]['_totalcount'] ?? 0;
 
 $page->smarty->assign(
-	[
-		'pagertotalitems' => $browsecount,
-		'pageroffset'=> $offset,
-		'pageritemsperpage'=> ITEMS_PER_PAGE,
-		'pagerquerybase' => WWW_TOP.'/browse?t='.$category.'&amp;g='.$grp.'&amp;ob='.$orderby.'&amp;offset=',
-		'pagerquerysuffix' => '#results',
-	]);
+    [
+        'pagertotalitems' => $browsecount,
+        'pageroffset'=> $offset,
+        'pageritemsperpage'=> ITEMS_PER_PAGE,
+        'pagerquerybase' => WWW_TOP.'/browse?t='.$category.'&amp;g='.$grp.'&amp;ob='.$orderby.'&amp;offset=',
+        'pagerquerysuffix' => '#results',
+    ]
+);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
