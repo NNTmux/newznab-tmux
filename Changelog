@@ -1,4 +1,5 @@
 2017-10-06 DariusIII
+	* Chg: Update services.php with proper user model
 	* Fix: Fix category display on pages
 	* Chg: Update cs of some files, use Category model in Category class
 2017-10-05 DariusIII
