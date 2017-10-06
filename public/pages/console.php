@@ -80,7 +80,7 @@ if ((int) $category === -1) {
 } else {
     $cdata = $cat->getById($category);
     if ($cdata) {
-        $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title . ' > ' . $cdata->title : $cdata->title);
+        $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
     } else {
         $page->show404();
     }
