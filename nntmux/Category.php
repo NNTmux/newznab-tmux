@@ -314,6 +314,18 @@ class Category
     }
 
     /**
+     * @param $title
+     * @param $parent
+     * @return bool|mixed
+     */
+    public function getIdByName($title, $parent)
+    {
+        $cat = CategoryModel::query()->where('title', $title)->with('parent.' . $parent)->first(['id']);
+
+        return $cat !== null ? $cat->id : false;
+    }
+
+    /**
      * Update a category.
      *
      *

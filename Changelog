@@ -1,4 +1,5 @@
 2017-10-06 DariusIII
+	* Chg: Add getIdByName function to Category class
 	* Chg: Update services.php with proper user model
 	* Fix: Fix category display on pages
 	* Chg: Update cs of some files, use Category model in Category class
