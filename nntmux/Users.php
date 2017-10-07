@@ -471,7 +471,7 @@ class Users
         $data = User::query()->whereDate('rolechangedate', '<', Carbon::now())->get();
 
         foreach ($data as $u) {
-            Mail::to($u['email'])->send(new AccountChange($u));
+            Mail::to($u['email'])->send(new AccountChange($u['id']));
             User::query()->where('id', $u['id'])->update(['user_roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
         }
 
