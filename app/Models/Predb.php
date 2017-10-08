@@ -37,6 +37,6 @@ class Predb extends Model
 
     public function release()
     {
-        return $this->hasMany('App\Models\Release', 'predb_id');
+        return $this->hasOne('App\Models\Release', 'predb_id');
     }
 }
