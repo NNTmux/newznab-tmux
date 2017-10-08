@@ -1,4 +1,5 @@
 2017-10-08 DariusIII
+	* Chg: Update Release and PreDb models relationship
 	* Chg: Update symfony components
 2017-10-07 DariusIII
 	* Chg: Fix user list

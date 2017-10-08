@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property mixed $release
+ * @property mixed $hash
+ */
 class Predb extends Model
 {
     /**
@@ -24,25 +28,15 @@ class Predb extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-        'id',
-        'title',
-        'nfo',
-        'size',
-        'category',
-        'predate',
-        'source',
-        'requestid',
-        'groups_id',
-        'nuked',
-        'nukereason',
-        'files',
-        'filename',
-        'searched',
-    ];
+    protected $guarded = [];
 
     public function hash()
     {
         return $this->hasMany('App\Models\PredbHash', 'predb_id');
+    }
+
+    public function release()
+    {
+        return $this->hasMany('App\Models\Release', 'predb_id');
     }
 }

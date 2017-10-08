@@ -45,4 +45,9 @@ class Release extends Model
     {
         return $this->belongsTo('App\Models\Category', 'categories_id');
     }
+
+    public function predb()
+    {
+        return $this->belongsTo('App\Models\Predb', 'predb_id');
+    }
 }
