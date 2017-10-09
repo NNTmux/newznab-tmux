@@ -1,6 +1,6 @@
 <?php
 
-// YOU SHOULD NOT EDIT ANYTHING IN THIS FILE, COPY .../nzedb/config/settings.example.php TO .../nzedb/config/settings.php AND EDIT THAT FILE!
+// YOU SHOULD NOT EDIT ANYTHING IN THIS FILE, COPY .../ntmux/config/settings.example.php TO .../nntmux/config/settings.php AND EDIT THAT FILE!
 
 define('NN_MINIMUM_PHP_VERSION', '7.1.0');
 define('NN_MINIMUM_MYSQL_VERSION', '5.6');
