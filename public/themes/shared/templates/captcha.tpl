@@ -1,4 +1,4 @@
-{if isset($showCaptcha) && $showCaptcha == true}
+{if !empty($sitekey)}
 	<div class="g-recaptcha" data-sitekey="{$sitekey}"></div>
 	<script type="text/javascript"
 			src="https://www.google.com/recaptcha/api.js?hl=en">
@@ -7,7 +7,7 @@
 		<div style="width: 302px; height: 422px;">
 			<div style="width: 302px; height: 422px; position: relative;">
 				<div style="width: 302px; height: 422px; position: absolute;">
-					<iframe src="https://www.google.com/recaptcha/api/fallback?k=your_site_key"
+					<iframe src="https://www.google.com/recaptcha/api/fallback?k={$sitekey}"
 							frameborder="0" scrolling="no"
 							style="width: 302px; height:422px; border-style: none;">
 					</iframe>

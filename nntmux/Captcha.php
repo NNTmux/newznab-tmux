@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Settings;
-use ReCaptcha\ReCaptcha;
+use Vinkla\Recaptcha\Recaptcha;
+use Vinkla\Recaptcha\RecaptchaException;
 
 class Captcha
 {
@@ -23,46 +23,9 @@ class Captcha
     private $sitekey;
 
     /**
-     * ReCaptcha Secret Key from the
-     * settings database.
-     *
-     * @var bool|string
-     */
-    private $secretkey;
-
-    /**
-     * ReCaptcha instance if enabled.
-     *
-     * @var \ReCaptcha\ReCaptcha
+     * @var \Vinkla\Recaptcha\Recaptcha
      */
     private $recaptcha;
-
-    /**
-     * Contains the error output if ReCaptcha
-     * validation fails.
-     *
-     * @var string|bool
-     */
-    private $error = false;
-
-    /**
-     * $_POST key for the user-supplied ReCaptcha response.
-     */
-    const RECAPTCHA_POSTKEY = 'g-recaptcha-response';
-
-    /**
-     * Error key literals.
-     */
-    const RECAPTCHA_ERROR_MISSING_SECRET = 'missing-input-secret';
-    const RECAPTCHA_ERROR_INVALID_SECRET = 'invalid-input-secret';
-    const RECAPTCHA_ERROR_MISSING_RESPONSE = 'missing-input-response';
-    const RECAPTCHA_ERROR_INVALID_RESPONSE = 'invalid-input-response';
-
-    /**
-     * Settings key literals.
-     */
-    const RECAPTCHA_SETTING_SITEKEY = 'APIs.recaptcha.sitekey';
-    const RECAPTCHA_SETTING_SECRETKEY = 'APIs.recaptcha.secretkey';
 
     /**
      * Construct and decide whether to show the captcha or not.
@@ -81,133 +44,30 @@ class Captcha
         }
 
         $this->page = $page;
+        $this->sitekey = env('RECAPTCHA_SITEKEY');
+        $this->page->smarty->assign('sitekey', $this->sitekey);
+        $this->error = '';
+        $this->recaptcha = new Recaptcha(env('RECAPTCHA_SECRETKEY'));
 
-        if ($this->shouldDisplay()) {
-            $this->page->smarty->assign('showCaptcha', true);
-            $this->page->smarty->assign('sitekey', $this->sitekey);
-
-            if ($this->page->isPostBack()) {
-                if (! $this->processCaptcha($_POST, $_SERVER['REMOTE_ADDR'])) {
-                    $this->page->smarty->assign('error', $this->getError());
-                }
-                //Delete this key after using so it doesn't interfere with normal $_POST
-                //processing. (i.e. contact-us)
-                unset($_POST[self::RECAPTCHA_POSTKEY]);
-            }
-        } else {
-            $this->page->smarty->assign('showCaptcha', false);
+        if (! $this->processCaptcha()) {
+            $this->page->smarty->assign('error', $this->error);
         }
-    }
-
-    /**
-     * If site admin setup keys properly,
-     * allow display of recaptcha.
-     *
-     * @return bool
-     * @throws \Exception
-     * @throws \RuntimeException
-     */
-    public function shouldDisplay(): bool
-    {
-        if ($this->_bootstrapCaptcha()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Return formatted error messages.
-     *
-     *
-     * @return bool|string
-     */
-    public function getError()
-    {
-        return $this->error;
     }
 
     /**
      * Process the submitted captcha and validate.
      *
-     * @param array $response
-     * @param string $ip
+     *
      * @return bool
      */
-    public function processCaptcha($response, $ip): bool
+    public function processCaptcha(): bool
     {
-        if (isset($response[self::RECAPTCHA_POSTKEY])) {
-            $post_response = $response[self::RECAPTCHA_POSTKEY];
-        } else {
-            $post_response = '';
-        }
-
-        $verify_response = $this->recaptcha->verify($post_response, $ip);
-
-        if (! $verify_response->isSuccess()) {
-            $this->_handleErrors($verify_response->getErrorCodes());
-
+        try {
+            $this->recaptcha->verify('g-recaptcha-response');
+        } catch (RecaptchaException $e) {
+            $this->error = $e->getMessage();
             return false;
         }
-
         return true;
-    }
-
-    /**
-     * Build formatted error string for output using
-     * Google's reCaptcha error codes.
-     *
-     * @param array $codes
-     */
-    private function _handleErrors($codes): void
-    {
-        $rc_error = 'ReCaptcha Failed: ';
-
-        foreach ($codes as $c) {
-            switch ($c) {
-                case self::RECAPTCHA_ERROR_MISSING_SECRET:
-                    $rc_error .= 'Missing Secret Key';
-                    break;
-                case self::RECAPTCHA_ERROR_INVALID_SECRET:
-                    $rc_error .= 'Invalid Secret Key';
-                    break;
-                case self::RECAPTCHA_ERROR_MISSING_RESPONSE:
-                    $rc_error .= 'No Response!';
-                    break;
-                case self::RECAPTCHA_ERROR_INVALID_RESPONSE:
-                    $rc_error .= 'Invalid response! You are a bot!';
-                    break;
-                default:
-                    $rc_error .= 'Unknown Error!';
-            }
-        }
-
-        $this->error = $rc_error;
-    }
-
-    /**
-     * Instantiate the ReCaptcha library and store it.
-     * Return bool on success/failure.
-     *
-     * @return bool
-     * @throws \Exception
-     * @throws \RuntimeException
-     */
-    private function _bootstrapCaptcha(): bool
-    {
-        if ($this->recaptcha instanceof ReCaptcha) {
-            return true;
-        }
-
-        $this->sitekey = Settings::settingValue(self::RECAPTCHA_SETTING_SITEKEY);
-        $this->secretkey = Settings::settingValue(self::RECAPTCHA_SETTING_SECRETKEY);
-
-        if ($this->sitekey !== false && $this->sitekey !== '' && $this->secretkey !== false && $this->secretkey !== '') {
-            $this->recaptcha = new ReCaptcha($this->secretkey);
-
-            return true;
-        }
-
-        return false;
     }
 }
