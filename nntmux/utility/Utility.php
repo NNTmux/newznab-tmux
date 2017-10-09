@@ -166,11 +166,12 @@ class Utility
      */
     public static function getThemesList(): array
     {
+        $ignoredThemes = ['admin', 'shared'];
         $themes = scandir(NN_THEMES, SCANDIR_SORT_ASCENDING);
         $themelist[] = 'None';
         foreach ($themes as $theme) {
             if (strpos($theme, '.') === false &&
-                is_dir(NN_THEMES.$theme) && NN_THEMES.$theme !== 'admin'
+                is_dir(NN_THEMES.$theme) && ! in_array($theme, $ignoredThemes, false)
             ) {
                 $themelist[] = $theme;
             }
