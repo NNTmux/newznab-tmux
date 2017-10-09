@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateReleaseNfosTable extends Migration
+class CreateBinariesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class CreateReleaseNfosTable extends Migration
      */
     public function up()
     {
-        Schema::create('release_nfos', function (Blueprint $table) {
-            $table->unsignedInteger('releases_id');
-            $table->binary('nfo');
-            $table->primary('releases_id');
+        Schema::create('binaries', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestamps();
         });
     }
 
@@ -27,6 +26,6 @@ class CreateReleaseNfosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('release_nfos');
+        Schema::dropIfExists('binaries');
     }
 }
