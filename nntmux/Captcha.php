@@ -54,6 +54,7 @@ class Captcha
         $this->error = false;
         $this->recaptcha = new Recaptcha(env('RECAPTCHA_SECRETKEY'));
 
+
         if (! $this->processCaptcha()) {
             $this->page->smarty->assign('error', $this->error);
         }
@@ -67,12 +68,15 @@ class Captcha
      */
     public function processCaptcha(): bool
     {
-        try {
-            $this->recaptcha->verify('g-recaptcha-response');
-        } catch (RecaptchaException $e) {
-            $this->error = $e->getMessage();
+        if (! empty($this->sitekey) && ! empty(env('RECAPTCHA_SECRETKEY'))) {
+            try {
+                $this->recaptcha->verify('g-recaptcha-response');
+            } catch (RecaptchaException $e) {
+                $this->error = $e->getMessage();
 
-            return false;
+                return false;
+            }
+            return true;
         }
 
         return true;
