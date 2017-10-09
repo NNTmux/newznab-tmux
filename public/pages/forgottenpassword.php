@@ -44,7 +44,7 @@ switch ($action) {
         break;
     case 'submit':
 
-        if ($captcha->getError() === false) {
+        if ($captcha->error === false) {
             $email = $_POST['email'] ?? '';
             if (empty($email)) {
                 $page->smarty->assign('error', 'Missing Email');

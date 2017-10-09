@@ -28,6 +28,11 @@ class Captcha
     private $recaptcha;
 
     /**
+     * @var bool
+     */
+    public $error;
+
+    /**
      * Construct and decide whether to show the captcha or not.
      *
      * @note Passing $page by reference to setup smarty vars easily.
@@ -46,7 +51,7 @@ class Captcha
         $this->page = $page;
         $this->sitekey = env('RECAPTCHA_SITEKEY');
         $this->page->smarty->assign('sitekey', $this->sitekey);
-        $this->error = '';
+        $this->error = false;
         $this->recaptcha = new Recaptcha(env('RECAPTCHA_SECRETKEY'));
 
         if (! $this->processCaptcha()) {
