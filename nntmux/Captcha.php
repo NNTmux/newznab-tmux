@@ -1,4 +1,5 @@
 <?php
+
 namespace nntmux;
 
 use app\models\Settings;
@@ -7,7 +8,7 @@ use ReCaptcha\ReCaptcha;
 class Captcha
 {
     /**
-     * Smarty $page
+     * Smarty $page.
      *
      * @var \Page
      */
@@ -58,7 +59,7 @@ class Captcha
     const RECAPTCHA_ERROR_INVALID_RESPONSE = 'invalid-input-response';
 
     /**
-     * Settings key literals
+     * Settings key literals.
      */
     const RECAPTCHA_SETTING_SITEKEY = 'APIs.recaptcha.sitekey';
     const RECAPTCHA_SETTING_SECRETKEY = 'APIs.recaptcha.secretkey';
@@ -107,8 +108,10 @@ class Captcha
         if ($this->_bootstrapCaptcha()) {
             return true;
         }
+
         return false;
     }
+
     /**
      * Return formatted error messages.
      *
@@ -118,6 +121,7 @@ class Captcha
     {
         return $this->error;
     }
+
     /**
      * Process the submitted captcha and validate.
      *
@@ -136,10 +140,13 @@ class Captcha
         $verify_response = $this->recaptcha->verify($post_response, $ip);
         if (! $verify_response->isSuccess()) {
             $this->_handleErrors($verify_response->getErrorCodes());
+
             return false;
         }
+
         return true;
     }
+
     /**
      * Build formatted error string for output using
      * Google's reCaptcha error codes.
@@ -188,9 +195,11 @@ class Captcha
             $this->secretkey = env('RECAPTCHA_SECRETKEY');
             if ($this->sitekey !== '' && $this->secretkey !== '') {
                 $this->recaptcha = new ReCaptcha($this->secretkey);
+
                 return true;
             }
         }
+
         return false;
     }
 }
