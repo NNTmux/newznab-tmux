@@ -1,9 +1,11 @@
-2017-10-08 DariusIII
+2017-10-09 DariusIII
+	* Chg: Remove recaptcha settings from settings table
 	* Fix: Fix recaptcha (use the old method)
-	* Chg: Update captcha.tpl
-	* Chg: Move tpl files out of /templates into root theme folder
-	* Chg: Update ReCaptcha handling
-	* Chg: Use vinkla/recaptcha
+        * Chg: Update captcha.tpl
+        * Chg: Move tpl files out of /templates into root theme folder
+        * Chg: Update ReCaptcha handling
+        * Chg: Use vinkla/recaptcha
+2017-10-08 DariusIII
 	* Chg: Update Release and PreDb models relationship
 	* Chg: Update symfony components
 2017-10-07 DariusIII

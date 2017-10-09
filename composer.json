@@ -132,7 +132,7 @@
     "guzzlehttp/guzzle": "^6.3",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
-    "kbjr/Git.php": "dev-master",
+    "nzedb/Git.php": "dev-master",
     "laravel/framework": "^5.5",
     "laravel/tinker": "~1.0",
     "monolog/monolog": "^1.22",
@@ -143,7 +143,6 @@
     "ramsey/uuid": "^3.7",
     "roave/security-advisories": "dev-master",
     "smarty/smarty": "~3.1",
-    "vinkla/recaptcha": "^3.0",
     "vlucas/phpdotenv": "^2.4",
     "yadakhov/insert-on-duplicate-key": "^1.2"
   },

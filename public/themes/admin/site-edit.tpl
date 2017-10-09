@@ -1525,39 +1525,6 @@
 </table>
 </fieldset>
 
-<fieldset>
-<legend>Recaptcha</legend>
-<table class="input data table table-striped responsive-utilities jambo-table">
-
-<tr>
-  <td style="width:130px;"><label for="recaptchasitekey">ReCaptcha Public Key</label>:</td>
-  <td>
-    <input id="recaptchasitekey" class="medium" name="recaptchasitekey" type="text" value="{$site->recaptchasitekey}" />
-    <div class="hint">The public key supplied by recaptcha.net. Sign up for recaptcha at <a href="https://www.google.com/recaptcha/admin/create">https://www.google.com/recaptcha/admin/create</a></div>
-  </td>
-</tr>
-
-<tr>
-  <td style="width:130px;"><label for="recaptchasecretkey">ReCaptcha Private Key</label>:</td>
-  <td>
-    <input id="recaptchasecretkey" class="medium" name="recaptchasecretkey" type="text" value="{$site->recaptchasecretkey}" />
-    <div class="hint">The private key supplied by recaptcha.net</div>
-  </td>
-</tr>
-
-
-
-<tr>
-	<td><label for="registerrecaptcha">Register Recaptcha</label>:</td>
-	<td>
-		{html_radios id="registerrecaptcha" name='registerrecaptcha' values=$yesno_ids output=$yesno_names selected=$site->registerrecaptcha separator='<br />'}
-		<div class="hint">Whether to display a ReCaptcha captcha for registering.</div>
-	</td>
-</tr>
-
-</table>
-</fieldset>
-
 <input class="btn btn-default" type="submit" value="Save Site Settings" />
 
 </form>

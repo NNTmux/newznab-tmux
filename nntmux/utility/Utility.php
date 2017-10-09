@@ -170,8 +170,7 @@ class Utility
         $themelist[] = 'None';
         foreach ($themes as $theme) {
             if (strpos($theme, '.') === false &&
-                is_dir(NN_THEMES.$theme) &&
-                ucfirst($theme) === $theme
+                is_dir(NN_THEMES.$theme) && NN_THEMES.$theme !== 'admin'
             ) {
                 $themelist[] = $theme;
             }
