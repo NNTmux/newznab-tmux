@@ -71,8 +71,10 @@ class Captcha
             $this->recaptcha->verify('g-recaptcha-response');
         } catch (RecaptchaException $e) {
             $this->error = $e->getMessage();
+
             return false;
         }
+
         return true;
     }
 }
