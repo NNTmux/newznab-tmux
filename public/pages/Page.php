@@ -31,7 +31,7 @@ class Page extends BasePage
         );
 
         $role = Users::ROLE_GUEST;
-        if ($this->userdata !== null) {
+        if (! empty($this->userdata)) {
             $role = $this->userdata['user_roles_id'];
         }
 
