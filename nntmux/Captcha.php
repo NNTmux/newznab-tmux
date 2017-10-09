@@ -54,7 +54,6 @@ class Captcha
         $this->error = false;
         $this->recaptcha = new Recaptcha(env('RECAPTCHA_SECRETKEY'));
 
-
         if (! $this->processCaptcha()) {
             $this->page->smarty->assign('error', $this->error);
         }
@@ -76,6 +75,7 @@ class Captcha
 
                 return false;
             }
+
             return true;
         }
 
