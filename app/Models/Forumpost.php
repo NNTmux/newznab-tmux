@@ -19,17 +19,5 @@ class Forumpost extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-        'id',
-        'forumid',
-        'parentid',
-        'users_id',
-        'subject',
-        'message',
-        'locked',
-        'sticky',
-        'replies',
-        'created_at',
-        'updatedate',
-    ];
+    protected $guarded = [];
 }

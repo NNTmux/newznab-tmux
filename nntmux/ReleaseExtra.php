@@ -21,6 +21,7 @@ class ReleaseExtra
      * ReleaseExtra constructor.
      *
      * @param null $settings
+     * @throws \Exception
      */
     public function __construct($settings = null)
     {

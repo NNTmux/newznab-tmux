@@ -50,4 +50,19 @@ class Release extends Model
     {
         return $this->belongsTo('App\Models\Predb', 'predb_id');
     }
+
+    public function failed()
+    {
+        return $this->hasMany('App\Models\DnzbFailure', 'release_id');
+    }
+
+    public function releaseExtra()
+    {
+        return $this->hasOne('App\Models\Release', 'releases_id');
+    }
+
+    public function nfo()
+    {
+        return $this->hasOne('App\Models\ReleaseNfo', 'releases_id');
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use App\Models\Release;
+use App\Models\ReleaseNfo;
 use nntmux\db\DB;
 use App\Models\Settings;
 use nntmux\utility\Utility;
@@ -209,18 +211,13 @@ class Nfo
     public function addAlternateNfo(&$nfo, $release, $nntp): bool
     {
         if ($release['id'] > 0 && $this->isNFO($nfo, $release['guid'])) {
-            $check = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM release_nfos WHERE releases_id = %d', $release['id']));
+            $check = ReleaseNfo::query()->where('releases_id', $release['id'])->first(['releases_id']);
 
-            if ($check === false) {
-                $this->pdo->queryInsert(
-					sprintf('INSERT INTO release_nfos (nfo, releases_id) VALUES (compress(%s), %d)',
-						$this->pdo->escapeString($nfo),
-						$release['id']
-					)
-				);
+            if ($check === null) {
+                ReleaseNfo::query()->insertGetId(['releases_id' => $release['id'], 'nfo' =>"\x1f\x8b\x08\x00".gzcompress($nfo)]);
             }
 
-            $this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', self::NFO_FOUND, $release['id']));
+            Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FOUND]);
 
             if (! isset($release['completion'])) {
                 $release['completion'] = 0;
@@ -254,7 +251,7 @@ class Nfo
      * @throws \Exception
      * @static
      */
-    public static function NfoQueryString()
+    public static function NfoQueryString(): string
     {
         $maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
@@ -288,7 +285,7 @@ class Nfo
         $ret = 0;
         $guidCharQuery = ($guidChar === '' ? '' : 'AND r.leftguid = '.$this->pdo->escapeString($guidChar));
         $groupIDQuery = ($groupID === '' ? '' : 'AND r.groups_id = '.$groupID);
-        $optionsQuery = self::NfoQueryString($this->pdo);
+        $optionsQuery = self::NfoQueryString();
 
         $res = $this->pdo->query(
 			sprintf('
@@ -356,14 +353,12 @@ class Nfo
                 $fetchedBinary = $nzbContents->getNfoFromNZB($arr['guid'], $arr['id'], $arr['groups_id'], $groups->getNameByID($arr['groups_id']));
                 if ($fetchedBinary !== false) {
                     // Insert nfo into database.
-                    $cp = 'COMPRESS(%s)';
-                    $nc = $this->pdo->escapeString($fetchedBinary);
 
-                    $ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT releases_id FROM release_nfos WHERE releases_id = %d', $arr['id']));
-                    if (! isset($ckreleaseid['id'])) {
-                        $this->pdo->queryInsert(sprintf('INSERT INTO release_nfos (nfo, releases_id) VALUES ('.$cp.', %d)', $nc, $arr['id']));
+                    $ckReleaseId = ReleaseNfo::query()->where('releases_id', $arr['id'])->first(['releases_id']);
+                    if ($ckReleaseId === null) {
+                        ReleaseNfo::query()->insertGetId(['releases_id' => $arr['id'], 'nfo' =>"\x1f\x8b\x08\x00".gzcompress($fetchedBinary)]);
                     }
-                    $this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', self::NFO_FOUND, $arr['id']));
+                    Release::query()->where('id', $arr['id'])->update(['nfostatus' => self::NFO_FOUND]);
                     $ret++;
                     $movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb);
 
@@ -393,19 +388,10 @@ class Nfo
         if ($releases instanceof \Traversable) {
             foreach ($releases as $release) {
                 // remove any releasenfo for failed
-                $this->pdo->queryExec(sprintf('
-					DELETE FROM release_nfos WHERE nfo IS NULL AND releases_id = %d',
-						$release['id']
-					)
-				);
+                ReleaseNfo::query()->where('releases_id', $release['id'])->delete();
 
                 // set release.nfostatus to failed
-                $this->pdo->queryExec(sprintf('
-					UPDATE releases r SET r.nfostatus = %d WHERE r.id = %d',
-						self::NFO_FAILED,
-						$release['id']
-					)
-				);
+                Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FAILED]);
             }
         }
 

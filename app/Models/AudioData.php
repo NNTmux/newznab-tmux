@@ -24,18 +24,5 @@ class AudioData extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-		'id',
-		'releases_id',
-		'audioid',
-		'audioformat',
-		'audiomode',
-		'audiobitratemode',
-		'audiobitrate',
-		'audiochannels',
-		'audiosamplerate',
-		'audiolibrary',
-		'audiolanguage',
-		'audiotitle',
-	];
+    protected $guarded = [];
 }

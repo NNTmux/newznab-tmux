@@ -19,21 +19,5 @@ class BookInfo extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-        'title',
-        'author',
-        'asin',
-        'isbn',
-        'ean',
-        'url',
-        'salesrank',
-        'publisher',
-        'publishdate',
-        'pages',
-        'overview',
-        'genre',
-        'cover',
-        'created_at',
-        'updated_at',
-    ];
+    protected $guarded = [];
 }

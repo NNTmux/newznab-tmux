@@ -13,13 +13,14 @@ class AniDB
 
     /**
      * @param array $options Class instances / Echo to cli.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Echo'     => false,
-			'Settings' => null,
-		];
+            'Echo'     => false,
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
@@ -47,7 +48,8 @@ class AniDB
     public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles): void
     {
         $this->pdo->queryExec(
-			sprintf('
+            sprintf(
+                '
 				UPDATE anidb_titles at
 				INNER JOIN anidb_info ai ON ai.anidbid = at.anidbid
 				INNER JOIN anidb_episodes ae ON ae.anidbid = at.anidbid
@@ -55,24 +57,24 @@ class AniDB
 					related = %s, similar = %s, creators = %s, description = %s, rating = %s,
 					categories = %s, characters = %s, epnos = %s, airdates = %s,
 					episodetitles = %s, unixtime = %d WHERE anidbid = %d',
-				$this->pdo->escapeString($title),
-				$this->pdo->escapeString($type),
-				$this->pdo->escapeString($startdate),
-				$this->pdo->escapeString($enddate),
-				$this->pdo->escapeString($related),
-				$this->pdo->escapeString($similar),
-				$this->pdo->escapeString($creators),
-				$this->pdo->escapeString($description),
-				$this->pdo->escapeString($rating),
-				$this->pdo->escapeString($categories),
-				$this->pdo->escapeString($characters),
-				$this->pdo->escapeString($epnos),
-				$this->pdo->escapeString($airdates),
-				$this->pdo->escapeString($episodetitles),
-				time(),
-				$anidbID
-			)
-		);
+                $this->pdo->escapeString($title),
+                $this->pdo->escapeString($type),
+                $this->pdo->escapeString($startdate),
+                $this->pdo->escapeString($enddate),
+                $this->pdo->escapeString($related),
+                $this->pdo->escapeString($similar),
+                $this->pdo->escapeString($creators),
+                $this->pdo->escapeString($description),
+                $this->pdo->escapeString($rating),
+                $this->pdo->escapeString($categories),
+                $this->pdo->escapeString($characters),
+                $this->pdo->escapeString($epnos),
+                $this->pdo->escapeString($airdates),
+                $this->pdo->escapeString($episodetitles),
+                time(),
+                $anidbID
+            )
+        );
     }
 
     /**
@@ -83,15 +85,16 @@ class AniDB
     public function deleteTitle($anidbID): void
     {
         $this->pdo->queryExec(
-			sprintf('
+            sprintf(
+                '
 				DELETE at, ai, ae
 				FROM anidb_titles AS at
 				LEFT OUTER JOIN anidb_info ai USING (anidbid)
 				LEFT OUTER JOIN anidb_episodes ae USING (anidbid)
 				WHERE anidbid = %d',
-				$anidbID
-			)
-		);
+                $anidbID
+            )
+        );
     }
 
     /**
@@ -117,7 +120,8 @@ class AniDB
         }
 
         return $this->pdo->queryDirect(
-			sprintf('
+            sprintf(
+                '
 				SELECT at.anidbid, at.title,
 					ai.type, ai.categories, ai.rating, ai.startdate, ai.enddate
 				FROM anidb_titles at
@@ -127,11 +131,11 @@ class AniDB
 				AND r.categories_id = %d
 				GROUP BY at.anidbid
 				ORDER BY at.title ASC',
-				$rsql,
-				$tsql,
-				Category::TV_ANIME
-			)
-		);
+                $rsql,
+                $tsql,
+                Category::TV_ANIME
+            )
+        );
     }
 
     /**
@@ -156,7 +160,8 @@ class AniDB
         }
 
         return $this->pdo->query(
-			sprintf("
+            sprintf(
+                "
 				SELECT at.anidbid, GROUP_CONCAT(at.title SEPARATOR ', ') AS title,
 					ai.description
 				FROM anidb_titles AS at
@@ -165,10 +170,10 @@ class AniDB
 				AND at.lang = 'en'
 				GROUP BY at.anidbid
 				ORDER BY at.anidbid ASC %s",
-				$rsql,
-				$limit
-			)
-		);
+                $rsql,
+                $limit
+            )
+        );
     }
 
     /**
@@ -185,15 +190,16 @@ class AniDB
         }
 
         $res = $this->pdo->queryOneRow(
-			sprintf('
+            sprintf(
+                '
 				SELECT COUNT(DISTINCT at.anidbid) AS num
 				FROM anidb_titles AS at
 				LEFT JOIN anidb_info AS ai USING (anidbid)
 				WHERE 1=1
 				%s',
-				$rsql
-			)
-		);
+                $rsql
+            )
+        );
 
         return $res['num'];
     }
@@ -207,7 +213,8 @@ class AniDB
     public function getAnimeInfo($anidbID)
     {
         $animeInfo = $this->pdo->query(
-			sprintf('
+            sprintf(
+                '
 				SELECT at.anidbid, at.lang, at.title,
 					ai.startdate, ai.enddate, ai.updated, ai.related, ai.creators, ai.description,
 					ai.rating, ai.picture, ai.categories, ai.characters, ai.type, ai.similar, ae.episodeid, ae
@@ -216,9 +223,9 @@ class AniDB
 				LEFT JOIN anidb_info AS ai USING (anidbid)
 				LEFT JOIN anidb_episodes ae USING (anidbid)
 				WHERE at.anidbid = %d',
-				$anidbID
-			)
-		);
+                $anidbID
+            )
+        );
 
         return $animeInfo[0] ?? false;
     }

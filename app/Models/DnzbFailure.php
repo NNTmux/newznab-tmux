@@ -31,5 +31,15 @@ class DnzbFailure extends Model
     /**
      * @var array
      */
-    protected $fillable = ['release_id', 'users_id', 'failed'];
+    protected $guarded = [];
+
+    public function release()
+    {
+        return $this->belongsTo('App\Models\Release', 'release_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User', 'users_id');
+    }
 }

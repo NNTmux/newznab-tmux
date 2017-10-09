@@ -6,11 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Country extends Model
 {
+    /**
+     * @var bool
+     */
     public $incrementing = false;
 
+    /**
+     * @var bool
+     */
     protected $dateFormat = false;
 
+    /**
+     * @var bool
+     */
     public $timestamps = false;
 
-    protected $fillable = ['id', 'iso3', 'country'];
+    /**
+     * @var array
+     */
+    protected $guarded = [];
 }

@@ -24,14 +24,5 @@ class BinaryBlacklist extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-		'id',
-		'groupname',
-		'regex',
-		'msgcol',
-		'optype',
-		'status',
-		'description',
-		'last_activity',
-	];
+    protected $guarded = [];
 }

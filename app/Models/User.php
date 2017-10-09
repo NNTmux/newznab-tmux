@@ -66,4 +66,9 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Invitation', 'users_id');
     }
+
+    public function failedRelease()
+    {
+        return $this->hasMany('App\Models\DnzbFailure', 'users_id');
+    }
 }

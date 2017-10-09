@@ -19,21 +19,7 @@ class Group extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-        'id',
-        'name',
-        'backfill_target',
-        'first_record',
-        'first_record_postdate',
-        'last_record',
-        'last_record_postdate',
-        'last_updated',
-        'minfilestoformrelease',
-        'minsizetoformrelease',
-        'active',
-        'backfill',
-        'description',
-    ];
+    protected $guarded = [];
 
     public function release()
     {

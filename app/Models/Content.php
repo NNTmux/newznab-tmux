@@ -24,17 +24,5 @@ class Content extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-        'id',
-        'title',
-        'url',
-        'body',
-        'metadescription',
-        'metakeywords',
-        'contenttype',
-        'showinmenu',
-        'status',
-        'ordinal',
-        'role',
-    ];
+    protected $guarded = [];
 }

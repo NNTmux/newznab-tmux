@@ -1,4 +1,5 @@
 2017-10-09 DariusIII
+	* Chg: Update model relations, update ReleaseNfo model and fix one bug
 	* Chg: Ignore shared and admin folders for theme list
 	* Chg: Remove recaptcha settings from settings table
 	* Fix: Fix recaptcha (use the old method)

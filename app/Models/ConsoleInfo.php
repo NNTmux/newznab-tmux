@@ -19,20 +19,5 @@ class ConsoleInfo extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-        'id',
-        'title',
-        'asin',
-        'url',
-        'salesrank',
-        'platform',
-        'publisher',
-        'genres_id',
-        'esrb',
-        'releasedate',
-        'review',
-        'cover',
-        'created_at',
-        'updated_at',
-    ];
+    protected $guarded = [];
 }

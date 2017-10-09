@@ -29,10 +29,15 @@ class ReleaseExtraFull extends Model
     /**
      * @var array
      */
-    protected $fillable = ['releases_id', 'mediainfo'];
+    protected $guarded = [];
 
     /**
      * @var string
      */
     protected $primaryKey = 'releases_id';
+
+    public function release()
+    {
+        return $this->belongsTo('App\Models\Release', 'releases_id');
+    }
 }
