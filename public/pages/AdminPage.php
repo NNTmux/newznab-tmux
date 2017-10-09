@@ -20,9 +20,9 @@ class AdminPage extends BasePage
         // Tell Smarty which directories to use for templates
         $this->smarty->setTemplateDir(
             [
-                'admin'    => NN_THEMES.'shared/templates/admin',
-                'shared'    => NN_THEMES.'shared/templates',
-                'default'    => NN_THEMES.'Omicron/templates',
+                'admin'    => NN_THEMES.'admin',
+                'shared'    => NN_THEMES.'shared',
+                'default'    => NN_THEMES.'Gentele',
             ]
         );
 

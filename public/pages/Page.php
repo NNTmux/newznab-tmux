@@ -24,14 +24,14 @@ class Page extends BasePage
         // Tell Smarty which directories to use for templates
         $this->smarty->setTemplateDir(
             [
-                'user'        => NN_THEMES.$this->theme.'/templates',
-                'shared'    => NN_THEMES.'shared/templates',
-                'default'    => NN_THEMES.'Gentele/templates',
+                'user'        => NN_THEMES.$this->theme,
+                'shared'    => NN_THEMES.'shared',
+                'default'    => NN_THEMES.'Gentele',
             ]
         );
 
         $role = Users::ROLE_GUEST;
-        if ($this->userdata != null) {
+        if ($this->userdata !== null) {
             $role = $this->userdata['user_roles_id'];
         }
 
@@ -41,7 +41,7 @@ class Page extends BasePage
         $this->smarty->assign('menulist', $menu->get($role, $this->serverurl));
         $this->smarty->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
         $this->smarty->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
-        if ($this->userdata != null) {
+        if ($this->userdata !== null) {
             $this->smarty->assign('recentforumpostslist', $f->getPosts(Settings::settingValue('..showrecentforumposts')));
         }
 
