@@ -12,7 +12,7 @@ $captcha = new Captcha($page);
 if (! $page->users->isLoggedIn()) {
     if (! isset($_POST['username'], $_POST['password'])) {
         $page->smarty->assign('error', 'Please enter your username and password.');
-    } elseif ($captcha->error === false) {
+    } elseif ($captcha->getError() === false) {
         $username = htmlspecialchars($_POST['username']);
         $page->smarty->assign('username', $username);
         if (Utility::checkCsrfToken() === true) {

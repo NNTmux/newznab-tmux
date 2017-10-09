@@ -32,7 +32,7 @@ if ($showRegister === 1) {
 
     switch ($action) {
         case 'submit':
-            if ($captcha->error === false) {
+            if ($captcha->getError() === false) {
                 if (Utility::checkCsrfToken() === true) {
                     $userName = $_POST['username'];
                     $password = $_POST['password'];

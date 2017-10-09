@@ -13,7 +13,7 @@ if (isset($_POST['useremail'])) {
     // send the contact info and report back to user.
     //
 
-    if ($captcha->error === false) {
+    if ($captcha->getError() === false) {
         $email = $_POST['useremail'];
         $mailTo = Settings::settingValue('site.main.email');
         $mailBody = "Values submitted from contact form:\n";
