@@ -2,10 +2,10 @@
 
 namespace nntmux;
 
-use App\Models\Release;
-use App\Models\ReleaseNfo;
 use nntmux\db\DB;
+use App\Models\Release;
 use App\Models\Settings;
+use App\Models\ReleaseNfo;
 use nntmux\utility\Utility;
 use dariusiii\rarinfo\SfvInfo;
 use dariusiii\rarinfo\Par2Info;
