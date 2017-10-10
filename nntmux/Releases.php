@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Release;
 use nntmux\db\DB;
 use App\Models\Settings;
 use nntmux\utility\Utility;
@@ -18,12 +19,12 @@ class Releases
     const PASSWD_RAR = 10; // Definitely passworded.
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
     /**
-     * @var Groups
+     * @var \nntmux\Groups
      */
     public $groups;
 
@@ -33,12 +34,12 @@ class Releases
     public $updateGrabs;
 
     /**
-     * @var ReleaseSearch
+     * @var \nntmux\ReleaseSearch
      */
     public $releaseSearch;
 
     /**
-     * @var SphinxSearch
+     * @var \nntmux\SphinxSearch
      */
     public $sphinxSearch;
 
@@ -53,7 +54,7 @@ class Releases
     public $passwordStatus;
 
     /**
-     * @var Category
+     * @var \nntmux\Category
      */
     public $category;
 
@@ -717,35 +718,29 @@ class Releases
         $parts,
         $grabs,
         $size,
-                           $postedDate,
+        $postedDate,
         $addedDate,
         $videoId,
         $episodeId,
         $imDbID,
         $aniDbID
     ): void {
-        $this->pdo->queryExec(
-            sprintf(
-                'UPDATE releases
-				SET name = %s, searchname = %s, fromname = %s, categories_id = %d,
-					totalpart = %d, grabs = %d, size = %s, postdate = %s, adddate = %s, videos_id = %d,
-					tv_episodes_id = %s, imdbid = %d, anidbid = %d
-				WHERE id = %d',
-                $this->pdo->escapeString($name),
-                $this->pdo->escapeString($searchName),
-                $this->pdo->escapeString($fromName),
-                $categoryID,
-                $parts,
-                $grabs,
-                $this->pdo->escapeString($size),
-                $this->pdo->escapeString($postedDate),
-                $this->pdo->escapeString($addedDate),
-                $videoId,
-                $episodeId,
-                $imDbID,
-                $aniDbID,
-                $ID
-            )
+        Release::query()->where('id', $ID)->update(
+            [
+                'name' => $name,
+                'searchname' => $searchName,
+                'fromname' => $fromName,
+                'categories_id' => $categoryID,
+                'totalpart' => $parts,
+                'grabs' => $grabs,
+                'size' => $size,
+                'postdate' => $postedDate,
+                'addate' => $addedDate,
+                'videos_id' => $videoId,
+                'tv_episodes_id' => $episodeId,
+                'imdbid' => $imDbID,
+                'anidbid' => $aniDbID,
+            ]
         );
         $this->sphinxSearch->updateRelease($ID, $this->pdo);
     }
@@ -758,8 +753,7 @@ class Releases
      * @param $episodeId
      * @param $anidbId
      * @param $imdbId
-     *
-     * @return array|bool|int
+     * @return bool|int
      */
     public function updateMulti($guids, $category, $grabs, $videoId, $episodeId, $anidbId, $imdbId)
     {
@@ -776,29 +770,7 @@ class Releases
             'imdbid'         => $imdbId,
         ];
 
-        $updateSql = [];
-        foreach ($update as $key => $value) {
-            if ($value !== '') {
-                $updateSql[] = sprintf($key.'=%s', $this->pdo->escapeString($value));
-            }
-        }
-
-        if (count($updateSql) < 1) {
-            return -1;
-        }
-
-        $updateGuids = [];
-        foreach ($guids as $guid) {
-            $updateGuids[] = $this->pdo->escapeString($guid);
-        }
-
-        return $this->pdo->queryExec(
-            sprintf(
-                'UPDATE releases SET %s WHERE guid IN (%s)',
-                implode(', ', $updateSql),
-                implode(', ', $updateGuids)
-            )
-        );
+        return Release::query()->whereIn('guid', $guids)->update($update);
     }
 
     /**

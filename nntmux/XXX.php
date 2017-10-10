@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Genre;
 use nntmux\db\DB;
 use App\Models\XxxInfo;
 use App\Models\Settings;
@@ -305,41 +306,6 @@ class XXX
     }
 
     /**
-     * Create click-able links to actors/genres/directors/etc..
-     *
-     * @param $data
-     * @param $field
-     *
-     * @return string
-     */
-    public function makeFieldLinks($data, $field): string
-    {
-        if (empty($data[$field])) {
-            return '';
-        }
-
-        $tmpArr = explode(',', $data[$field]);
-        $newArr = [];
-        $i = 0;
-        foreach ($tmpArr as $ta) {
-            if (trim($ta) === '') {
-                continue;
-            }
-            if ($field === 'genre') {
-                $ta = $this->getGenres(true, $ta);
-                $ta = $ta['title'];
-            }
-            if ($i > 7) {
-                break;
-            } //only use first 8
-            $newArr[] = '<a href="'.WWW_TOP.'/xxx?'.$field.'='.urlencode($ta).'" title="'.$ta.'">'.$ta.'</a>';
-            $i++;
-        }
-
-        return implode(', ', $newArr);
-    }
-
-    /**
      * Update XXX Information from getXXXCovers.php in misc/testing/PostProc.
      *
      * @param string $id
@@ -397,24 +363,17 @@ class XXX
     /**
      * Get all genres for search-filter.tpl.
      *
-     * @param bool $activeOnly
      *
-     * @return array|null
+     * @param bool $activeOnly
+     * @return array
      */
-    public function getAllGenres($activeOnly = false): ?array
+    public function getAllGenres($activeOnly = false): array
     {
-        $ret = null;
-
+        $ret = [];
         if ($activeOnly) {
-            $res = $this->pdo->query(
-                'SELECT title FROM genres WHERE disabled = 0 AND type = '.
-                Category::XXX_ROOT.' ORDER BY title'
-            );
+            $res = Genre::query()->where(['disabled' => 0, 'type' => Category::XXX_ROOT])->orderBy('title')->get(['title']);
         } else {
-            $res = $this->pdo->query(
-                'SELECT title FROM genres WHERE disabled = 1 AND type = '.
-                Category::XXX_ROOT.' ORDER BY title'
-            );
+            $res = Genre::query()->where(['type' => Category::XXX_ROOT])->orderBy('title')->get(['title']);
         }
 
         foreach ($res as $arr => $value) {
@@ -434,17 +393,15 @@ class XXX
      */
     public function getGenres($activeOnly = false, $gid = null)
     {
-        if ($gid !== null) {
-            $gid = ' AND id = '.$this->pdo->escapeString($gid).' ORDER BY title';
-        } else {
-            $gid = ' ORDER BY title';
-        }
-
         if ($activeOnly) {
-            return $this->pdo->queryOneRow('SELECT title FROM genres WHERE disabled = 0 AND type = '.Category::XXX_ROOT.$gid);
+            return Genre::query()->where(['disabled' => 0, 'type' => Category::XXX_ROOT])->when($gid !== null, function ($query) use ($gid) {
+                return $query->where('id', $gid);
+            })->orderBy('title')->get(['title']);
         }
 
-        return $this->pdo->queryOneRow('SELECT title FROM genres WHERE disabled = 1 AND type = '.Category::XXX_ROOT.$gid);
+        return Genre::query()->where(['disabled' => 1, 'type' => Category::XXX_ROOT])->when($gid !== null, function ($query) use ($gid) {
+            return $query->where('id', $gid);
+        })->orderBy('title')->get(['title']);
     }
 
     /**
@@ -459,15 +416,15 @@ class XXX
         $ret = null;
 
         if (! is_array($arr)) {
-            $res = $this->pdo->queryOneRow('SELECT id FROM genres WHERE title = '.$this->pdo->escapeString($arr));
-            if ($res !== false) {
+            $res = Genre::query()->where('title', $arr)->first(['id']);
+            if ($res !== null) {
                 return $res['id'];
             }
         }
 
         foreach ($arr as $key => $value) {
-            $res = $this->pdo->queryOneRow('SELECT id FROM genres WHERE title = '.$this->pdo->escapeString($value));
-            if ($res !== false) {
+            $res = Genre::query()->where('title', $value)->first(['id']);
+            if ($res !== null) {
                 $ret .= ','.$res['id'];
             } else {
                 $ret .= ','.$this->insertGenre($value);
@@ -482,15 +439,15 @@ class XXX
     /**
      * Inserts Genre and returns last affected row (Genre ID).
      *
-     * @param $genre
      *
-     * @return bool
+     * @param $genre
+     * @return int|string
      */
-    private function insertGenre($genre): bool
+    private function insertGenre($genre)
     {
         $res = '';
         if ($genre !== null) {
-            $res = $this->pdo->queryInsert(sprintf('INSERT INTO genres (title, type, disabled) VALUES (%s ,%d ,%d)', $this->pdo->escapeString($genre), Category::XXX_ROOT, 0));
+            $res = Genre::query()->insertGetId(['title' => $genre, 'type' => Category::XXX_ROOT, 'disabled' => 0]);
         }
 
         return $res;

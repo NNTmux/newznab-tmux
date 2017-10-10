@@ -19,4 +19,9 @@ class Genre extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public function music()
+    {
+        return $this->hasMany('App\Models\MusicInfo', 'genres_id');
+    }
 }
