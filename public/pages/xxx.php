@@ -34,9 +34,9 @@ $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false)
 $movies = [];
 $results = $movie->getXXXRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, -1, $page->userdata['categoryexclusions']);
 foreach ($results as $result) {
-    $result['genre'] = $movie->makeFieldLinks($result, 'genre');
-    $result['actors'] = $movie->makeFieldLinks($result, 'actors');
-    $result['director'] = $movie->makeFieldLinks($result, 'director');
+    $result['genre'] = makeFieldLinks($result, 'genre', 'xxx');
+    $result['actors'] = makeFieldLinks($result, 'actors', 'xxx');
+    $result['director'] = makeFieldLinks($result, 'director', 'xxx');
     $movies[] = $result;
 }
 $title = (isset($_REQUEST['title']) && ! empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
@@ -48,7 +48,7 @@ $page->smarty->assign('actors', $actors);
 $director = (isset($_REQUEST['director']) && ! empty($_REQUEST['director'])) ? stripslashes($_REQUEST['director']) : '';
 $page->smarty->assign('director', $director);
 
-$genres = (array) $movie->getAllGenres(true);
+$genres = $movie->getAllGenres(true);
 $genre = (isset($_REQUEST['genre']) && in_array($_REQUEST['genre'], $genres, false)) ? $_REQUEST['genre'] : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);

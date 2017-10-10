@@ -1,3 +1,5 @@
+2017-10-10 DariusIIi
+	* Chg: Move makeFieldLinks function from classes to helper
 2017-10-09 DariusIII
 	* Chg: Update model relations, update ReleaseNfo model and fix one bug
 	* Chg: Ignore shared and admin folders for theme list

@@ -14,9 +14,9 @@ if (isset($_GET['modal']) && isset($_GET['id']) && ctype_digit($_GET['id'])) {
         $page->show404();
     }
 
-    $mov['actors'] = $movie->makeFieldLinks($mov, 'actors');
-    $mov['genre'] = $movie->makeFieldLinks($mov, 'genre');
-    $mov['director'] = $movie->makeFieldLinks($mov, 'director');
+    $mov['actors'] = makeFieldLinks($mov, 'actors', 'xxx');
+    $mov['genre'] = makeFieldLinks($mov, 'genre', 'xxx');
+    $mov['director'] = makeFieldLinks($mov, 'director', 'xxx');
 
     $page->smarty->assign(['movie' => $mov, 'modal' => true]);
 

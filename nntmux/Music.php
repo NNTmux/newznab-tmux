@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use App\Models\Genre;
+use App\Models\Release;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use GuzzleHttp\Client;
@@ -69,6 +71,7 @@ class Music
 
     /**
      * @param array $options Class instances/ echo to CLI.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
@@ -84,13 +87,10 @@ class Music
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
         $this->privkey = Settings::settingValue('APIs..amazonprivkey');
         $this->asstag = Settings::settingValue('APIs..amazonassociatetag');
-        $this->musicqty = Settings::settingValue('..maxmusicprocessed') != '' ? Settings::settingValue('..maxmusicprocessed') : 150;
-        $this->sleeptime = Settings::settingValue('..amazonsleep') != '' ? Settings::settingValue('..amazonsleep') : 1000;
+        $this->musicqty = Settings::settingValue('..maxmusicprocessed') !== '' ? (int) Settings::settingValue('..maxmusicprocessed') : 150;
+        $this->sleeptime = Settings::settingValue('..amazonsleep') !== '' ? (int) Settings::settingValue('..amazonsleep') : 1000;
         $this->imgSavePath = NN_COVERS.'music'.DS;
-        $this->renamed = '';
-        if (Settings::settingValue('..lookupmusic') == 2) {
-            $this->renamed = 'AND isrenamed = 1';
-        }
+        $this->renamed = Settings::settingValue('..lookupmusic') === 2;
 
         $this->failCache = [];
     }
@@ -328,31 +328,6 @@ class Music
     }
 
     /**
-     * @param $data
-     * @param $field
-     *
-     * @return string
-     */
-    public function makeFieldLinks($data, $field)
-    {
-        $tmpArr = explode(', ', $data[$field]);
-        $newArr = [];
-        $i = 0;
-        foreach ($tmpArr as $ta) {
-            if (trim($ta) == '') {
-                continue;
-            }
-            if ($i > 5) {
-                break;
-            } //only use first 6
-            $newArr[] = '<a href="'.WWW_TOP.'/music?'.$field.'='.urlencode($ta).'" title="'.$ta.'">'.$ta.'</a>';
-            $i++;
-        }
-
-        return implode(', ', $newArr);
-    }
-
-    /**
      * @param $id
      * @param $title
      * @param $asin
@@ -397,6 +372,7 @@ class Music
      * @param null $amazdata
      *
      * @return bool
+     * @throws \Exception
      */
     public function updateMusicInfo($title, $year, $amazdata = null)
     {
@@ -405,7 +381,7 @@ class Music
         $titlepercent = 0;
 
         $mus = [];
-        if ($title != '') {
+        if ($title !== '') {
             $amaz = $this->fetchAmazonProperties($title);
         } elseif ($amazdata != null) {
             $amaz = $amazdata;
@@ -435,7 +411,7 @@ class Music
 
         // Get album properties.
         $mus['coverurl'] = (string) $amaz->Items->Item->LargeImage->URL;
-        if ($mus['coverurl'] != '') {
+        if ($mus['coverurl'] !== '') {
             $mus['cover'] = 1;
         } else {
             $mus['cover'] = 0;
@@ -447,7 +423,7 @@ class Music
         $mus['url'] = str_replace('%26tag%3Dws', '%26tag%3Dopensourceins%2D21', $mus['url']);
 
         $mus['salesrank'] = (string) $amaz->Items->Item->SalesRank;
-        if ($mus['salesrank'] == '') {
+        if ($mus['salesrank'] === '') {
             $mus['salesrank'] = 'null';
         }
 
@@ -462,7 +438,7 @@ class Music
         $mus['publisher'] = (string) $amaz->Items->Item->ItemAttributes->Publisher;
 
         $mus['releasedate'] = $this->pdo->escapeString((string) $amaz->Items->Item->ItemAttributes->ReleaseDate);
-        if ($mus['releasedate'] == "''") {
+        if ($mus['releasedate'] === "''") {
             $mus['releasedate'] = 'null';
         }
 
@@ -472,8 +448,8 @@ class Music
         }
 
         $mus['year'] = $year;
-        if ($mus['year'] == '') {
-            $mus['year'] = ($mus['releasedate'] != 'null' ? substr($mus['releasedate'], 1, 4) : date('Y'));
+        if ($mus['year'] === '') {
+            $mus['year'] = ($mus['releasedate'] !== 'null' ? substr($mus['releasedate'], 1, 4) : date('Y'));
         }
 
         $mus['tracks'] = '';
@@ -511,15 +487,7 @@ class Music
             if (in_array(strtolower($genreName), $genreassoc, false)) {
                 $genreKey = array_search(strtolower($genreName), $genreassoc, false);
             } else {
-                $genreKey = $this->pdo->queryInsert(
-                                    sprintf(
-                                        '
-										INSERT INTO genres (title, type)
-										VALUES (%s, %d)',
-                                        $this->pdo->escapeString($genreName),
-                                        Genres::MUSIC_TYPE
-                                    )
-                );
+                $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
             }
         }
         $mus['musicgenre'] = $genreName;
@@ -552,7 +520,7 @@ class Music
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
         } else {
             if ($this->echooutput) {
-                if ($mus['artist'] == '') {
+                if ($mus['artist'] === '') {
                     $artist = '';
                 } else {
                     $artist = 'Artist: '.$mus['artist'].', Album: ';
@@ -664,26 +632,13 @@ class Music
 
     /**
      * @param bool $local
+     * @throws \Exception
      */
     public function processMusicReleases($local = false)
     {
-        $res = $this->pdo->queryDirect(
-            sprintf(
-                '
-					SELECT searchname, id
-					FROM releases
-					WHERE musicinfo_id IS NULL
-					AND nzbstatus = 1 %s
-					AND categories_id IN (%s, %s, %s)
-					ORDER BY postdate DESC
-					LIMIT %d',
-                $this->renamed,
-                Category::MUSIC_MP3,
-                Category::MUSIC_LOSSLESS,
-                Category::MUSIC_OTHER,
-                $this->musicqty
-            )
-        );
+        $res = Release::query()->where(['musicinfo_id' => null, 'nzbstatus' => NZB::NZB_ADDED])->when($this->renamed === true, function ($query) {
+            return $query->where('isrenamed', '=', 1);
+        })->whereIn('categories_id', [Category::MUSIC_MP3, Category::MUSIC_LOSSLESS, Category::MUSIC_OTHER])->orderBy('postdate', 'DESC')->limit($this->musicqty)->get(['searchname', 'id']);
         if ($res instanceof \Traversable && $res->rowCount() > 0) {
             if ($this->echooutput) {
                 ColorCLI::doEcho(
@@ -723,12 +678,10 @@ class Music
                     } else {
                         $albumId = $musicCheck['id'];
                     }
-
-                    // Update release.
-                    $this->pdo->queryExec(sprintf('UPDATE releases SET musicinfo_id = %d WHERE id = %d', $albumId, $arr['id']));
+                    Release::query()->where('id', $arr['id'])->update(['musicinfo_id' => $albumId]);
                 } // No album found.
                 else {
-                    $this->pdo->queryExec(sprintf('UPDATE releases SET musicinfo_id = %d WHERE id = %d', -2, $arr['id']));
+                    Release::query()->where('id', $arr['id'])->update(['musicinfo_id' => -2]);
                     echo '.';
                 }
 
@@ -787,7 +740,7 @@ class Music
      *
      * @return array
      */
-    public function getGenres($activeOnly = false)
+    public function getGenres($activeOnly = false): ?array
     {
         if ($activeOnly) {
             return $this->pdo->query(
@@ -916,6 +869,6 @@ class Music
                 break;
         }
 
-        return ($str != '') ? $str : false;
+        return ($str !== '') ? $str : false;
     }
 }

@@ -553,37 +553,6 @@ class Movie
     }
 
     /**
-     * Create click-able links to IMDB actors/genres/directors/etc..
-     *
-     * @param $data
-     * @param $field
-     *
-     * @return string
-     */
-    public function makeFieldLinks($data, $field): string
-    {
-        if (! isset($data[$field]) || $data[$field] === '') {
-            return '';
-        }
-
-        $tmpArr = explode(', ', $data[$field]);
-        $newArr = [];
-        $i = 0;
-        foreach ($tmpArr as $ta) {
-            if (trim($ta) === '') {
-                continue;
-            }
-            if ($i > 5) {
-                break;
-            } //only use first 6
-            $newArr[] = '<a href="'.WWW_TOP.'/movies?'.$field.'='.urlencode($ta).'" title="'.$ta.'">'.$ta.'</a>';
-            $i++;
-        }
-
-        return implode(', ', $newArr);
-    }
-
-    /**
      * Get array of column keys, for inserting / updating.
      *
      * @return array
