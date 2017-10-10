@@ -43,6 +43,10 @@
 				<input autocomplete="off" id="email" name="email" value="{$email}" type="email" class="form-control" placeholder="Email"/>
 				<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
 			</div>
+			<div class="form-group has-feedback">
+				<input autocomplete="off" id="apikey" name="apikey" value="{$apikey}" type="text" class="form-control" placeholder="Apikey"/>
+				<span class="glyphicon glyphicon-user form-control-feedback"></span>
+			</div>
 			<div class="row">
 				<div class="col-xs-6">
 					{$page->smarty->fetch('captcha.tpl')}

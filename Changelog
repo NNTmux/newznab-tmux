@@ -1,4 +1,5 @@
 2017-10-10 DariusIIi
+	* Chg: Add possibility to reset password by using apikey
 	* Chg: Update Genre model, MusicInfo model and related migration, use these models in some of the queries
 	* Chg: Move makeFieldLinks function from classes to helper
 2017-10-09 DariusIII

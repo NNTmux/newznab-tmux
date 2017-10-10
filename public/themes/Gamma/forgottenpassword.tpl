@@ -22,7 +22,9 @@ border: 1px solid #e1e1e8;
 				</div>
 			{/if}
 			<input class="input-block-level" autocomplete="off"  type="email" id="username prependedInput" value="{$email}" name="email" placeholder="Email" style="margin-bottom:5px;">
-			<div>
+			<input class="input-block-level" autocomplete="off"  type="text" id="username prependedInput" value="{$apikey}" name="apikey" placeholder="Apikey" style="margin-bottom:5px;">
+
+				<div>
 				{$page->smarty->fetch('captcha.tpl')}
 			</div>
 			<br>
