@@ -14,9 +14,6 @@ use ApaiIO\Request\GuzzleRequest;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
-/*
- * Class for processing book info.
- */
 class Books
 {
     /**
@@ -121,7 +118,7 @@ class Books
     {
 
         //only used to get a count of words
-        $searchwords = $searchsql = '';
+        $searchWords = $searchsql = '';
         $title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
         $title = preg_replace('/[^\w ]+/', '', $title);
         $title = trim(preg_replace('/\s\s+/i', ' ', $title));
@@ -132,13 +129,12 @@ class Books
             $word = trim(rtrim(trim($word), '-'));
             if ($word !== '' && $word !== '-') {
                 $word = '+'.$word;
-                $searchwords .= sprintf('%s ', $word);
+                $searchWords .= sprintf('%s ', $word);
             }
         }
-        $searchwords = trim($searchwords);
-        $searchsql .= sprintf(' MATCH(author, title) AGAINST(%s IN BOOLEAN MODE)', $this->pdo->escapeString($searchwords));
+        $searchWords = trim($searchWords);
 
-        return BookInfo::query()->whereRaw($searchsql)->first();
+        return BookInfo::query()->whereRaw('MATCH(author, title) AGAINST(? IN BOOLEAN MODE)', $searchWords)->first();
     }
 
     /**
@@ -517,7 +513,7 @@ class Books
                         ColorCLI::headerOver('Changing category to misc books: ').ColorCLI::primary($releasename)
                     );
                 }
-                $this->pdo->queryExec(sprintf('UPDATE releases SET categories_id = %s WHERE id = %d', Category::BOOKS_UNKNOWN, $releaseID));
+                Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_UNKNOWN]);
 
                 return false;
             }
@@ -528,7 +524,7 @@ class Books
                         ColorCLI::headerOver('Changing category to magazines: ').ColorCLI::primary($releasename)
                     );
                 }
-                $this->pdo->queryExec(sprintf('UPDATE releases SET categories_id = %s WHERE id = %d', Category::BOOKS_MAGAZINES, $releaseID));
+                Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_MAGAZINES]);
 
                 return false;
             }
@@ -676,7 +672,6 @@ class Books
                     'overview' => $book['overview'],
                     'genre' => $book['genre'],
                     'cover' => $book['cover'],
-                    'updated_at' => Carbon::now(),
                 ]
             );
         }
