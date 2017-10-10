@@ -650,11 +650,11 @@ class Music
         $res = Release::query()->where(['musicinfo_id' => null, 'nzbstatus' => NZB::NZB_ADDED])->when($this->renamed === true, function ($query) {
             return $query->where('isrenamed', '=', 1);
         })->whereIn('categories_id', [Category::MUSIC_MP3, Category::MUSIC_LOSSLESS, Category::MUSIC_OTHER])->orderBy('postdate', 'DESC')->limit($this->musicqty)->get(['searchname', 'id']);
-        if ($res instanceof \Traversable && $res->rowCount() > 0) {
+        if ($res instanceof \Traversable && ! empty($res)) {
             if ($this->echooutput) {
                 ColorCLI::doEcho(
                     ColorCLI::header(
-                        'Processing '.$res->rowCount().' music release(s).'
+                        'Processing '.$res->count().' music release(s).'
                     )
                 );
             }
