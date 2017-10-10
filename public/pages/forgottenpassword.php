@@ -12,7 +12,7 @@ if ($page->users->isLoggedIn()) {
 $action = $_REQUEST['action'] ?? 'view';
 
 $captcha = new Captcha($page);
-$email = $sent = $confirmed = '';
+$email = $rssToken = $sent = $confirmed = '';
 
 switch ($action) {
     case 'reset':
@@ -46,15 +46,20 @@ switch ($action) {
 
         if ($captcha->getError() === false) {
             $email = $_POST['email'] ?? '';
-            if (empty($email)) {
-                $page->smarty->assign('error', 'Missing Email');
+            $rssToken = $_POST['apikey'] ?? '';
+            if (empty($email) && empty($rssToken)) {
+                $page->smarty->assign('error', 'Missing parameter(email and/or apikey to send password reset');
             } else {
                 //
                 // Check users exists and send an email
                 //
-                $ret = $page->users->getByEmail($email);
+                if (isset($rssToken)) {
+                    $ret = $page->users->getByRssToken($rssToken);
+                } else {
+                    $ret = $page->users->getByEmail($email);
+                }
                 if (! $ret) {
-                    $page->smarty->assign('error', 'The email address is not recognised.');
+                    $page->smarty->assign('error', 'The email or apikey are not recognised.');
                     $sent = true;
                     break;
                 }
@@ -78,6 +83,7 @@ switch ($action) {
 $page->smarty->assign(
     [
         'email'     => $email,
+        'apikey'    => $rssToken,
         'confirmed' => $confirmed,
         'sent'      => $sent,
     ]

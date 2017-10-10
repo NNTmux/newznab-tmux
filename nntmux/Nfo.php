@@ -60,9 +60,9 @@ class Nfo
     protected $echo;
 
     const NFO_FAILED = -9; // We failed to get a NFO after admin set max retries.
-	const NFO_UNPROC = -1; // Release has not been processed yet.
-	const NFO_NONFO = 0; // Release has no NFO.
-	const NFO_FOUND = 1; // Release has an NFO.
+    const NFO_UNPROC = -1; // Release has not been processed yet.
+    const NFO_NONFO = 0; // Release has no NFO.
+    const NFO_FOUND = 1; // Release has an NFO.
 
     /**
      * Default constructor.
@@ -74,9 +74,9 @@ class Nfo
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Echo'     => false,
-			'Settings' => null,
-		];
+            'Echo'     => false,
+            'Settings' => null,
+        ];
         $options += $defaults;
         $this->echo = ($options['Echo'] && NN_ECHOCLI);
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
@@ -106,26 +106,26 @@ class Nfo
 
         if (preg_match('/tvmaze\.com\/shows\/(\d{1,6})/i', $str, $matches)) {
             $return =
-			[
-				'showid' => trim($matches[1]),
-				'site'   => 'tvmaze',
-			];
+            [
+                'showid' => trim($matches[1]),
+                'site'   => 'tvmaze',
+            ];
         }
 
         if (preg_match('/imdb\.com\/title\/(tt\d{1,8})/i', $str, $matches)) {
             $return =
-				[
-					'showid' => trim($matches[1]),
-					'site'   => 'imdb',
-				];
+                [
+                    'showid' => trim($matches[1]),
+                    'site'   => 'imdb',
+                ];
         }
 
         if (preg_match('/thetvdb\.com\/\?tab=series&id=(\d{1,8})/i', $str, $matches)) {
             $return =
-				[
-					'showid' => trim($matches[1]),
-					'site'   => 'thetvdb',
-				];
+                [
+                    'showid' => trim($matches[1]),
+                    'site'   => 'thetvdb',
+                ];
         }
 
         return $return;
@@ -149,9 +149,11 @@ class Nfo
         // Make sure it's not too big or small, size needs to be at least 12 bytes for header checking. Ignore common file types.
         $size = strlen($possibleNFO);
         if ($size < 65535 &&
-			$size > 11 &&
-			! preg_match(
-				'/\A(\s*<\?xml|=newz\[NZB\]=|RIFF|\s*[RP]AR|.{0,10}(JFIF|matroska|ftyp|ID3))|;\s*Generated\s*by.*SF\w/i', $possibleNFO)) {
+            $size > 11 &&
+            ! preg_match(
+                '/\A(\s*<\?xml|=newz\[NZB\]=|RIFF|\s*[RP]AR|.{0,10}(JFIF|matroska|ftyp|ID3))|;\s*Generated\s*by.*SF\w/i',
+                $possibleNFO
+            )) {
             // File/GetId3 work with files, so save to disk.
             $tmpPath = $this->tmpPath.$guid.'.nfo';
             file_put_contents($tmpPath, $possibleNFO);
@@ -160,7 +162,7 @@ class Nfo
             $result = Utility::fileInfo($tmpPath);
             if (! empty($result)) {
 
-				// Check if it's text.
+                // Check if it's text.
                 if (preg_match('/(ASCII|ISO-8859|UTF-(8|16|32).*?)\s*text/', $result)) {
                     @unlink($tmpPath);
 
@@ -181,7 +183,7 @@ class Nfo
             @unlink($tmpPath);
             if (isset($check['error'])) {
 
-				// Check if it's a par2.
+                // Check if it's a par2.
                 $par2info = new Par2Info();
                 $par2info->setData($possibleNFO);
                 if ($par2info->error) {
@@ -225,14 +227,14 @@ class Nfo
 
             if ((int) $release['completion'] === 0) {
                 $nzbContents = new NZBContents(
-					[
-						'Echo' => $this->echo,
-						'NNTP' => $nntp,
-						'Nfo'  => $this,
-						'Settings'   => $this->pdo,
-						'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this]),
-					]
-				);
+                    [
+                        'Echo' => $this->echo,
+                        'NNTP' => $nntp,
+                        'Nfo'  => $this,
+                        'Settings'   => $this->pdo,
+                        'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this]),
+                    ]
+                );
                 $nzbContents->parseNZB($release['guid'], $release['id'], $release['groups_id']);
             }
 
@@ -259,13 +261,13 @@ class Nfo
         $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
 
         return sprintf(
-			'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
-			NZB::NZB_ADDED,
-			($maxRetries < -8 ? -8 : $maxRetries),
-			self::NFO_UNPROC,
-			($maxSize > 0 ? ('AND r.size < '.($maxSize * 1073741824)) : ''),
-			($minSize > 0 ? ('AND r.size > '.($minSize * 1048576)) : '')
-		);
+            'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
+            NZB::NZB_ADDED,
+            ($maxRetries < -8 ? -8 : $maxRetries),
+            self::NFO_UNPROC,
+            ($maxSize > 0 ? ('AND r.size < '.($maxSize * 1073741824)) : ''),
+            ($minSize > 0 ? ('AND r.size > '.($minSize * 1048576)) : '')
+        );
     }
 
     /**
@@ -288,46 +290,48 @@ class Nfo
         $optionsQuery = self::NfoQueryString();
 
         $res = $this->pdo->query(
-			sprintf('
+            sprintf(
+                '
 				SELECT r.id, r.guid, r.groups_id, r.name
 				FROM releases r
 				WHERE 1=1 %s %s %s
 				ORDER BY r.nfostatus ASC, r.postdate DESC
 				LIMIT %d',
-				$optionsQuery,
-				$guidCharQuery,
-				$groupIDQuery,
-				$this->nzbs
-			)
-		);
+                $optionsQuery,
+                $guidCharQuery,
+                $groupIDQuery,
+                $this->nzbs
+            )
+        );
         $nfoCount = count($res);
 
         if ($nfoCount > 0) {
             ColorCLI::doEcho(
-				ColorCLI::primary(
-					PHP_EOL.
-					($guidChar === '' ? '' : '['.$guidChar.'] ').
-					($groupID === '' ? '' : '['.$groupID.'] ').
-					'Processing '.$nfoCount.
-					' NFO(s), starting at '.$this->nzbs.
-					' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
-				)
-			);
+                ColorCLI::primary(
+                    PHP_EOL.
+                    ($guidChar === '' ? '' : '['.$guidChar.'] ').
+                    ($groupID === '' ? '' : '['.$groupID.'] ').
+                    'Processing '.$nfoCount.
+                    ' NFO(s), starting at '.$this->nzbs.
+                    ' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
+                )
+            );
 
             if ($this->echo) {
                 // Get count of releases per nfo status
                 $nfoStats = $this->pdo->queryDirect(
-					sprintf('
+                    sprintf(
+                        '
 						SELECT r.nfostatus AS status, COUNT(r.id) AS count
 						FROM releases r
 						WHERE 1=1 %s %s %s
 						GROUP BY r.nfostatus
 						ORDER BY r.nfostatus ASC',
-						$optionsQuery,
-						$guidCharQuery,
-						$groupIDQuery
-					)
-				);
+                        $optionsQuery,
+                        $guidCharQuery,
+                        $groupIDQuery
+                    )
+                );
                 if ($nfoStats instanceof \Traversable) {
                     $outString = PHP_EOL.'Available to process';
                     foreach ($nfoStats as $row) {
@@ -339,14 +343,14 @@ class Nfo
 
             $groups = new Groups(['Settings' => $this->pdo]);
             $nzbContents = new NZBContents(
-				[
-					'Echo' => $this->echo,
-					'NNTP' => $nntp,
-					'Nfo' => $this,
-					'Settings' => $this->pdo,
-					'PostProcess' => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this, 'Settings' => $this->pdo]),
-				]
-			);
+                [
+                    'Echo' => $this->echo,
+                    'NNTP' => $nntp,
+                    'Nfo' => $this,
+                    'Settings' => $this->pdo,
+                    'PostProcess' => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this, 'Settings' => $this->pdo]),
+                ]
+            );
             $movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
             foreach ($res as $arr) {
@@ -372,18 +376,18 @@ class Nfo
 
         // Remove nfo that we cant fetch after 5 attempts.
         $releases = $this->pdo->queryDirect(
-			sprintf(
-				'SELECT r.id
+            sprintf(
+                'SELECT r.id
 				FROM releases r
 				WHERE r.nzbstatus = %d
 				AND r.nfostatus < %d AND r.nfostatus > %d %s %s',
-				NZB::NZB_ADDED,
-				$this->maxRetries,
-				self::NFO_FAILED,
-				$groupIDQuery,
-				$guidCharQuery
-			)
-		);
+                NZB::NZB_ADDED,
+                $this->maxRetries,
+                self::NFO_FAILED,
+                $groupIDQuery,
+                $guidCharQuery
+            )
+        );
 
         if ($releases instanceof \Traversable) {
             foreach ($releases as $release) {

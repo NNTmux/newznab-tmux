@@ -44,9 +44,9 @@ $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering) ? $_RE
 $results = $movies = [];
 $results = $movie->getMovieRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, -1, $page->userdata['categoryexclusions']);
 foreach ($results as $result) {
-    $result['genre'] = $movie->makeFieldLinks($result, 'genre');
-    $result['actors'] = $movie->makeFieldLinks($result, 'actors');
-    $result['director'] = $movie->makeFieldLinks($result, 'director');
+    $result['genre'] = makeFieldLinks($result, 'genre', 'movies');
+    $result['actors'] = makeFieldLinks($result, 'actors', 'movies');
+    $result['director'] = makeFieldLinks($result, 'director', 'movies');
     $result['languages'] = explode(', ', $result['language']);
 
     $movies[] = $result;

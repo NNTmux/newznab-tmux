@@ -50,6 +50,12 @@
 							</div>
 							<div class="clearfix"></div>
 							<br>
+							<div class="input-group input-group-lg">
+								<span class="input-group-addon"><i class="glyphicon glyphicon-user red"></i></span>
+								<input autocomplete="off" id="apikey" name="apikey" value="{$apikey}" type="text" class="form-control" placeholder="Apikey"/>
+							</div>
+							<div class="clearfix"></div>
+							<br>
 							<p class="center col-md-5">
 							<p class="center col-md-5">
 								{$page->smarty->fetch('captcha.tpl')}

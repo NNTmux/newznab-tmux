@@ -64,9 +64,9 @@ if (isset($_GET['id'])) {
         $mov = $movie->getMovieInfo($data['imdbid']);
         if (! empty($mov['title'])) {
             $mov['title'] = str_replace(['/', '\\'], '', $mov['title']);
-            $mov['actors'] = $movie->makeFieldLinks($mov, 'actors');
-            $mov['genre'] = $movie->makeFieldLinks($mov, 'genre');
-            $mov['director'] = $movie->makeFieldLinks($mov, 'director');
+            $mov['actors'] = makeFieldLinks($mov, 'actors', 'movies');
+            $mov['genre'] = makeFieldLinks($mov, 'genre', 'movies');
+            $mov['director'] = makeFieldLinks($mov, 'director', 'movies');
             if (Settings::settingValue('site.trailers.trailers_display')) {
                 $trailer = empty($mov['trailer']) || $mov['trailer'] === '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer'];
                 if ($trailer) {
@@ -92,9 +92,9 @@ if (isset($_GET['id'])) {
 
         if ($xxx && isset($xxx['title'])) {
             $xxx['title'] = str_replace(['/', '\\'], '', $xxx['title']);
-            $xxx['actors'] = $x->makeFieldLinks($xxx, 'actors');
-            $xxx['genre'] = $x->makeFieldLinks($xxx, 'genre');
-            $xxx['director'] = $x->makeFieldLinks($xxx, 'director');
+            $xxx['actors'] = makeFieldLinks($xxx, 'actors', 'xxx');
+            $xxx['genre'] = makeFieldLinks($xxx, 'genre', 'xxx');
+            $xxx['director'] = makeFieldLinks($xxx, 'director', 'xxx');
         } else {
             $xxx = false;
         }

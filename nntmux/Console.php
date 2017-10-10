@@ -337,31 +337,6 @@ class Console
     }
 
     /**
-     * @param $data
-     * @param $field
-     * @return string
-     */
-    public function makeFieldLinks($data, $field): string
-    {
-        $tmpArr = explode(', ', $data[$field]);
-        $newArr = [];
-        $i = 0;
-        foreach ($tmpArr as $ta) {
-            if (trim($ta) === '') {
-                continue;
-            }
-            // Only use first 6.
-            if ($i > 5) {
-                break;
-            }
-            $newArr[] = '<a href="'.WWW_TOP.'/console?'.$field.'='.urlencode($ta).'" title="'.$ta.'">'.$ta.'</a>';
-            $i++;
-        }
-
-        return implode(', ', $newArr);
-    }
-
-    /**
      * @param $id
      * @param $title
      * @param $asin

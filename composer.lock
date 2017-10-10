@@ -139,7 +139,7 @@
                 }
             ],
             "description": "PHP Wrapper for Accessing the Steam Storefront API",
-            "time": "2017-08-27 15:14:06"
+            "time": "2017-08-27T15:14:06+00:00"
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
@@ -1525,7 +1525,7 @@
                 }
             ],
             "description": "A PHP library that acts as a wrapper for the GiantBomb API.",
-            "time": "2017-05-29 12:05:57"
+            "time": "2017-05-29T12:05:57+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -2685,7 +2685,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2016-05-04 01:31:56"
+            "time": "2016-05-04T01:31:56+00:00"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
@@ -3292,7 +3292,7 @@
             "support": {
                 "source": "https://github.com/nZEDb/Git.php/tree/master"
             },
-            "time": "2016-10-30 19:06:19"
+            "time": "2016-10-30T19:06:19+00:00"
         },
         {
             "name": "paragonie/random_compat",
