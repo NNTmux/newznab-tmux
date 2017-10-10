@@ -673,13 +673,13 @@ class Music
                     // Do a local lookup first
                     $musicCheck = $this->getMusicInfoByName('', $album['name']);
 
-                    if ($musicCheck === false && in_array($album['name'].$album['year'], $this->failCache, false)) {
+                    if ($musicCheck === null && in_array($album['name'].$album['year'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
                             ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.').PHP_EOL);
                         }
                         $albumId = -2;
-                    } elseif ($musicCheck === false && $local === false) {
+                    } elseif ($musicCheck === null && $local === false) {
                         $albumId = $this->updateMusicInfo($album['name'], $album['year']);
                         $usedAmazon = true;
                         if ($albumId === false) {
