@@ -2,10 +2,10 @@
 
 namespace nntmux;
 
-use App\Models\Release;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use GuzzleHttp\Client;
+use App\Models\Release;
 use App\Models\Settings;
 use App\Models\ConsoleInfo;
 use ApaiIO\Operations\Search;
