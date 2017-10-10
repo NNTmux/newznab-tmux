@@ -2,14 +2,14 @@
 
 namespace nntmux;
 
-use App\Models\Genre;
-use App\Models\MusicInfo;
-use App\Models\Release;
-use Carbon\Carbon;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
+use Carbon\Carbon;
+use App\Models\Genre;
 use GuzzleHttp\Client;
+use App\Models\Release;
 use App\Models\Settings;
+use App\Models\MusicInfo;
 use ApaiIO\Operations\Search;
 use ApaiIO\Request\GuzzleRequest;
 use ApaiIO\Configuration\GenericConfiguration;
