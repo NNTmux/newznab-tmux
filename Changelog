@@ -1,3 +1,5 @@
+2017-10-11 DariusIII
+	* Fix: Fix console processing
 2017-10-10 DariusIIi
 	* Fix: Fix a bug in book processing
 	* Chg: Check for null and not false in Music class

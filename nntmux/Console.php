@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Release;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use GuzzleHttp\Client;
@@ -98,7 +99,7 @@ class Console
         $this->gameqty = (Settings::settingValue('..maxgamesprocessed') !== '') ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
         $this->sleeptime = (Settings::settingValue('..amazonsleep') !== '') ? (int) Settings::settingValue('..amazonsleep') : 1000;
         $this->imgSavePath = NN_COVERS.'console'.DS;
-        $this->renamed = (int) Settings::settingValue('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
+        $this->renamed = (int) Settings::settingValue('..lookupgames') === 2 ? 'isrenamed => 1' : '';
         $this->catWhere = 'PARTITION (console)';
 
         $this->failCache = [];
@@ -127,28 +128,23 @@ class Console
     {
         //only used to get a count of words
         $searchwords = $searchsql = '';
-        $ft = $this->pdo->queryDirect("SHOW INDEX FROM consoleinfo WHERE key_name = 'ix_consoleinfo_title_platform_ft'");
-        if ($ft->rowCount() !== 2) {
-            $searchsql .= sprintf(" title %s AND platform %s'", $this->pdo->likeString($title), $this->pdo->likeString($platform));
-        } else {
-            $title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
-            $title = preg_replace('/[^\w ]+/', '', $title);
-            $title = trim(preg_replace('/\s\s+/i', ' ', $title));
-            $title = trim($title);
-            $words = explode(' ', $title);
 
-            foreach ($words as $word) {
-                $word = trim(rtrim(trim($word), '-'));
-                if ($word !== '' && $word !== '-') {
-                    $word = '+'.$word;
-                    $searchwords .= sprintf('%s ', $word);
-                }
+        $title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
+        $title = preg_replace('/[^\w ]+/', '', $title);
+        $title = trim(preg_replace('/\s\s+/i', ' ', $title));
+        $title = trim($title);
+        $words = explode(' ', $title);
+
+        foreach ($words as $word) {
+            $word = trim(rtrim(trim($word), '-'));
+            if ($word !== '' && $word !== '-') {
+                $word = '+'.$word;
+                $searchwords .= sprintf('%s ', $word);
             }
-            $searchwords = trim($searchwords);
-            $searchsql .= sprintf(' MATCH(title, platform) AGAINST(%s IN BOOLEAN MODE) AND platform = %s', $this->pdo->escapeString($searchwords), $this->pdo->escapeString($platform));
         }
+        $searchwords = trim($searchwords);
 
-        return ConsoleInfo::query()->whereRaw($searchsql)->first();
+        return ConsoleInfo::query()->whereRaw('MATCH(title, platform) AGAINST(? IN BOOLEAN MODE) AND platform = ?', $searchwords, $platform)->first();
     }
 
     /**
@@ -367,7 +363,6 @@ class Console
                     'cover' => $cover,
                     'genres_id' => $genreID,
                     'review' => $review === 'review' ? $review : substr($review, 0, 3000),
-                    'updated_at' => Carbon::now(),
                 ]
             );
     }
@@ -811,26 +806,11 @@ class Console
 
     public function processConsoleReleases(): void
     {
-        $res = $this->pdo->queryDirect(
-            sprintf(
-                '
-							SELECT searchname, id
-							FROM releases
-							%s
-							WHERE nzbstatus = %d
-							AND consoleinfo_id IS NULL %s
-							ORDER BY postdate DESC
-							LIMIT %d',
-                $this->catWhere,
-                NZB::NZB_ADDED,
-                $this->renamed,
-                $this->gameqty
-            )
-        );
+        $res = Release::query()->whereRaw('PARTITION(console)')->where(['nzbstatus' => NZB::NZB_ADDED, 'consoleinfo_id' => null, $this->renamed])->limit($this->gameqty)->orderBy('postdate')->get();
 
-        if ($res instanceof \Traversable && $res->rowCount() > 0) {
+        if ($res instanceof \Traversable && $res->count() > 0) {
             if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$res->rowCount().' console release(s).'));
+                ColorCLI::doEcho(ColorCLI::header('Processing '.$res->count().' console release(s).'));
             }
 
             foreach ($res as $arr) {
