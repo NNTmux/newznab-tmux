@@ -347,7 +347,7 @@ $opcache = OpCacheService::init($options);
     <nav>
         <ul>
             <!-- #newznab-tmux -->
-            <li><a href="<?php echo $NNURL; ?>" class="button">Newznab</a></li>
+            <li><a href="<?php echo $NNURL; ?>" class="button">NNTmux</a></li>
             <!-- #newznab-tmux -->
             <li><a data-for="overview" href="#overview" class="active">Overview</a></li>
             <?php if ($opcache->getOption('allow_filelist')): ?>
