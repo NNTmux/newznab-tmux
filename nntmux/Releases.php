@@ -735,7 +735,7 @@ class Releases
                 'grabs' => $grabs,
                 'size' => $size,
                 'postdate' => $postedDate,
-                'addate' => $addedDate,
+                'adddate' => $addedDate,
                 'videos_id' => $videoId,
                 'tv_episodes_id' => $episodeId,
                 'imdbid' => $imDbID,
