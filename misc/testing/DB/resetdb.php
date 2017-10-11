@@ -39,8 +39,8 @@ $pdo->queryExec('UPDATE groups SET first_record = 0, first_record_postdate = NUL
 echo ColorCLI::primary('Reseting all groups completed.');
 
 $arr = [
-		'videos', 'tv_episodes', 'tv_info', 'release_nfos', 'release_comments', 'sharing', 'sharing_sites',
-		'users_releases', 'user_movies', 'user_series', 'movieinfo', 'musicinfo', 'release_files', 'audio_data', 'release_subtitles', 'video_data', 		'releaseextrafull', 'releases', 'spotnabsources', 'anidb_titles', 'anidb_info', 'anidb_episodes', 'releases_groups',
+        'videos', 'tv_episodes', 'tv_info', 'release_nfos', 'release_comments', 'sharing', 'sharing_sites',
+        'users_releases', 'user_movies', 'user_series', 'movieinfo', 'musicinfo', 'release_files', 'audio_data', 'release_subtitles', 'video_data',        'releaseextrafull', 'releases', 'spotnabsources', 'anidb_titles', 'anidb_info', 'anidb_episodes', 'releases_groups',
 ];
 foreach ($arr as &$value) {
     $rel = $pdo->queryExec("TRUNCATE TABLE $value");
@@ -50,7 +50,7 @@ foreach ($arr as &$value) {
 }
 unset($value);
 
-$sql = "SELECT CALL loop_cbpm('truncate)";
+$sql = "SELECT CALL loop_cbpm('truncate')";
 echo ColorCLI::primary('Truncating binaries, collections, missed_parts and parts tables...');
 $result = $pdo->query($sql);
 echo ColorCLI::primary('Truncating completed.');
