@@ -6,7 +6,6 @@
 ///////////////////////////////// Scroll down to the bottom for a change log. //////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use nntmux\utility\Utility;
 
 /**********************************************************************************************************************/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +19,7 @@ use nntmux\utility\Utility;
  *                   and $current_settings_file_version in nntmux\config\Configure.php
  * @version 5
  */
-define('NN_SETTINGS_FILE_VERSION', 5);
+define('NN_SETTINGS_FILE_VERSION', 6);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// Web Settings //////////////////////////////////////////////////////////
@@ -425,180 +424,6 @@ define('NN_SQL_DELETE_LOW_PRIORITY', false);
 define('NN_SQL_DELETE_QUICK', false);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////// PHP CLI Settings ///////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-if (Utility::isCLI()) {
-
-    /*
-     * Your server's local timezone.
-     * @note    Uncomment to enable.
-     * @see     https://secure.php.net/manual/en/timezones.php
-     * @version 4
-     */
-    //ini_set('date.timezone', 'America/New_York');
-
-    /*
-     * Maximum amount of memory a PHP script can consume before being terminated.
-     * @note    Uncomment to enable.
-     * @default '1024M'
-     * @version 4
-     */
-    //ini_set('memory_limit', '1024M');
-
-    /*
-     * Show PHP errors on CLI output.
-     * @note    Set to '1' for development.
-     * @default '0'
-     * @version 4
-     */
-    ini_set('display_errors', '0');
-
-    /*
-     * Show startup errors on CLI output.
-     * @note    Set to '1' for development/debugging.
-     * @default '0'
-     * @version 4
-     */
-    ini_set('display_startup_errors', '0');
-
-    /*
-     * Type of errors to display.
-     * @note    For development/debugging set to E_ALL
-     * @default E_ALL & ~E_DEPRECATED & ~E_STRICT
-     * @see     https://secure.php.net/manual/en/errorfunc.constants.php
-     * @version 4
-     */
-    ini_set('error_reporting', E_ALL);
-
-    /*
-     * Turn off HTML tags in error messages.
-     * @default '1'
-     * @version 4
-     */
-    ini_set('html_errors', '1');
-
-    /*
-     * Set the location to log PHP errors.
-     * @default NN_LOGS . 'php_errors.log'
-     * @note    To log to syslog, put in 'syslog'
-     * @version 4
-     */
-    ini_set('error_log', NN_LOGS.'php_errors_cli.log');
-
-    /*
-     * Log errors to error_log?
-     * @default '1'
-     * @version 4
-     */
-    ini_set('log_errors', '1');
-
-    /*
-     * Max line length for a error.
-     * @default 1024
-     * @version 4
-     */
-    ini_set('log_errors_max_len', '1024');
-
-    /*
-     * Store the last PHP error in $php_errormsg
-     * @default '0'
-     * @note    This is a development/debugging option.
-     * @version 4
-     */
-    ini_set('track_errors', '0');
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////// PHP Web Settings ///////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-} else {
-
-    /*
-     * Your server's local timezone.
-     * @note    Uncomment to enable.
-     * @see     https://secure.php.net/manual/en/timezones.php
-     * @version 4
-     */
-    //ini_set('date.timezone', 'America/New_York');
-
-    /*
-     * Maximum amount of seconds a script can run before being terminated.
-     * @default '120'
-     * @version 4
-     */
-    ini_set('max_execution_time', '120');
-
-    /*
-     * Maximum amount of memory a PHP script can consume before being terminated.
-     * @note    Uncomment to enable.
-     * @default '1024M'
-     * @version 4
-     */
-    //ini_set('memory_limit', '1024M');
-
-    /*
-     * Show PHP errors on web browser.
-     * @note    Set to '1' for development.
-     * @default '0'
-     * @version 4
-     */
-    ini_set('display_errors', '0');
-
-    /*
-     * Show startup errors on web browser.
-     * @note    Set to '1' for development/debugging.
-     * @default '0'
-     * @version 4
-     */
-    ini_set('display_startup_errors', '0');
-
-    /*
-     * Type of errors to display.
-     * @note    For development/debugging set to E_ALL
-     * @default E_ALL & ~E_DEPRECATED & ~E_STRICT
-     * @see     https://secure.php.net/manual/en/errorfunc.constants.php
-     * @version 4
-     */
-    ini_set('error_reporting', E_ALL);
-
-    /*
-     * Turn off HTML tags in error messages.
-     * @default '1'
-     * @version 4
-     */
-    ini_set('html_errors', '1');
-
-    /*
-     * Set the location to log PHP errors.
-     * @default NN_LOGS . 'php_errors.log'
-     * @note    To log to syslog, put in 'syslog'
-     * @version 4
-     */
-    ini_set('error_log', NN_LOGS.'php_errors_web.log');
-
-    /*
-     * Log errors to error_log?
-     * @default '1'
-     * @version 4
-     */
-    ini_set('log_errors', '1');
-
-    /*
-     * Max line length for a error.
-     * @default 1024
-     * @version 4
-     */
-    ini_set('log_errors_max_len', '1024');
-
-    /*
-     * Store the last PHP error in $php_errormsg
-     * @default '0'
-     * @note    This is a development/debugging option.
-     * @version 4
-     */
-    ini_set('track_errors', '0');
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// PHP Xdebug Settings //////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 if (extension_loaded('xdebug')) {
@@ -649,6 +474,7 @@ if (extension_loaded('xdebug')) {
  * //////////////////////////////////////////////// Change log ////////////////////////////////////////////////////////////
  * ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  *
+ * 2017-10-11       v6  Remove settings for PHP web/CLI SAPI's as these are now handled by Laravel
  * 2015-08-26       v4  Add settings for PHP web/CLI SAPI's.
  *                        Add settings for Xdebug.
  *                        All new settings start from the "PHP CLI Settings" up to the "Change log", lines ~544 to ~768
