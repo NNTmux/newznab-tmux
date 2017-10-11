@@ -50,7 +50,7 @@ foreach ($arr as &$value) {
 }
 unset($value);
 
-$sql = "SELECT CALL loop_cbpm('truncate')";
+$sql = "CALL loop_cbpm('truncate')";
 echo ColorCLI::primary('Truncating binaries, collections, missed_parts and parts tables...');
 $result = $pdo->query($sql);
 echo ColorCLI::primary('Truncating completed.');
