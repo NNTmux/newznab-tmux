@@ -52,7 +52,7 @@ if ($category === -1 && (int) $grp === -1) {
     $cat = new Category(['Settings' => $releases->pdo]);
     $cdata = $cat->getById($category);
     if ($cdata) {
-        $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
+        $page->smarty->assign('catname', $cdata['title']);
         if ($cdata['parentid'] === Category::GAME_ROOT || $cdata['id'] === Category::GAME_ROOT) {
             $covgroup = 'console';
         } elseif ($cdata['parentid'] === Category::MOVIE_ROOT || $cdata['id'] === Category::MOVIE_ROOT) {

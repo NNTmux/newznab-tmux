@@ -1,4 +1,5 @@
 2017-10-11 DariusIII
+	* Fix: Fix getById function in Category class
 	* Fix: Fix resetdb script
 	* Chg: Update settings.example.php - remove PHPCLI/WEB settings as they are now handled by laravel
 	* Fix: Fix console releases processing

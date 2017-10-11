@@ -280,7 +280,7 @@ class Category
      */
     public function getById($id)
     {
-        return CategoryModel::query()->where('id', $id)->first();
+        return CategoryModel::query()->with('parent')->select(['disablepreview', 'minsizetoformrelease', 'id', 'status', 'parentid'])->selectRaw("CONCAT(COALESCE(title,'')) AS title")->where('id', $id)->first();
     }
 
     /**
