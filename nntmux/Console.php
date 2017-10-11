@@ -99,7 +99,7 @@ class Console
         $this->gameqty = (Settings::settingValue('..maxgamesprocessed') !== '') ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
         $this->sleeptime = (Settings::settingValue('..amazonsleep') !== '') ? (int) Settings::settingValue('..amazonsleep') : 1000;
         $this->imgSavePath = NN_COVERS.'console'.DS;
-        $this->renamed = (int) Settings::settingValue('..lookupgames') === 2 ? 'isrenamed => 1' : '';
+        $this->renamed = (int) Settings::settingValue('..lookupgames') === 2;
         $this->catWhere = 'PARTITION (console)';
 
         $this->failCache = [];
@@ -806,7 +806,9 @@ class Console
 
     public function processConsoleReleases(): void
     {
-        $res = Release::query()->whereRaw('PARTITION(console)')->where(['nzbstatus' => NZB::NZB_ADDED, 'consoleinfo_id' => null, $this->renamed])->limit($this->gameqty)->orderBy('postdate')->get();
+        $res = Release::query()->raw('PARTITION(console)')->where(['nzbstatus' => NZB::NZB_ADDED, 'consoleinfo_id' => null])->when($this->renamed === true, function ($query) {
+            return $query->where('isrenamed', '=', 1);
+        })->limit($this->gameqty)->orderBy('postdate')->get();
 
         if ($res instanceof \Traversable && $res->count() > 0) {
             if ($this->echooutput) {

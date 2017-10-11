@@ -1,4 +1,5 @@
 2017-10-11 DariusIII
+	* Fix: Fix console releases processing
 	* Chg: Update OpCacheStats to latest version
 	* Fix: Fix console processing
 2017-10-10 DariusIIi
