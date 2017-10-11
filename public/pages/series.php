@@ -20,6 +20,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
         $category = $_REQUEST['t'];
     }
 
+    $catarray = [];
     $catarray[] = $category;
 
     $rel = $releases->searchShows(['id' => $_GET['id']], '', '', '', 0, 1000, '', $catarray, -1);
@@ -73,13 +74,10 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
         $page->meta_description = 'View TV Series';
 
         if ($category !== -1) {
-            $cdata = $cat->getById($category);
             $catid = $category;
         } else {
-            $cdata = ['title' => ''];
             $catid = '';
         }
-        $page->smarty->assign('catname', $cdata['title']);
         $page->smarty->assign('category', $catid);
         $page->smarty->assign('nodata', '');
     }

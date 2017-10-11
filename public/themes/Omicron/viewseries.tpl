@@ -24,7 +24,6 @@
 	<h1>
 		<div style="text-align: center;">{$seriestitles} ({$show.publisher})</div>
 	</h1>
-	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 	<div class="tvseriesheading">
 		{if $show.image != 0}
 			<div style="text-align: center;">

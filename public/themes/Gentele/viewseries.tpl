@@ -21,7 +21,6 @@
 			</ol>
 		</div>
 	</div>
-	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 	<div class="well well-sm">
 		<div class="tvseriesheading">
 			<h1>

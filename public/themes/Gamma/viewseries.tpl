@@ -11,8 +11,6 @@
 
 <h2>
 	{$seriestitles} ({$show.publisher})
-
-	{if $catname != ''} in {$catname|escape:"htmlall"}{/if}
 </h2>
 
 <div>
