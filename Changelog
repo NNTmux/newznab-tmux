@@ -1,4 +1,5 @@
 2017-10-12 DariusIII
+	* Chg: Add database seeds
 	* Chg: Use xethron/migrations-generator only in dev environment
 	* Chg: Add xethron/migrations-generator and generate migrations
 	* Chg: Update some of the models
