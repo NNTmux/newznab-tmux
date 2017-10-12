@@ -384,24 +384,21 @@ class XXX
     }
 
     /**
-     * Get Genres for activeonly and/or an ID.
-     *
-     * @param bool        $activeOnly
-     * @param null|string $gid
-     *
-     * @return array|bool
+     * @param bool $activeOnly
+     * @param null $gid
+     * @return mixed
      */
     public function getGenres($activeOnly = false, $gid = null)
     {
         if ($activeOnly) {
             return Genre::query()->where(['disabled' => 0, 'type' => Category::XXX_ROOT])->when($gid !== null, function ($query) use ($gid) {
                 return $query->where('id', $gid);
-            })->orderBy('title')->get(['title']);
+            })->orderBy('title')->first(['title']);
         }
 
         return Genre::query()->where([ 'type' => Category::XXX_ROOT])->when($gid !== null, function ($query) use ($gid) {
             return $query->where('id', $gid);
-        })->orderBy('title')->get(['title']);
+        })->orderBy('title')->first(['title']);
     }
 
     /**
