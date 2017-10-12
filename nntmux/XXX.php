@@ -399,7 +399,7 @@ class XXX
             })->orderBy('title')->get(['title']);
         }
 
-        return Genre::query()->where(['disabled' => 1, 'type' => Category::XXX_ROOT])->when($gid !== null, function ($query) use ($gid) {
+        return Genre::query()->where([ 'type' => Category::XXX_ROOT])->when($gid !== null, function ($query) use ($gid) {
             return $query->where('id', $gid);
         })->orderBy('title')->get(['title']);
     }

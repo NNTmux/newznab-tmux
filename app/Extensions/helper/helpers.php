@@ -5,6 +5,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\RequestException;
+use nntmux\XXX;
 
 if (! function_exists('getRawHtml')) {
 
@@ -59,6 +60,10 @@ if (! function_exists('makeFieldLinks')) {
         foreach ($tmpArr as $ta) {
             if (trim($ta) === '') {
                 continue;
+            }
+            if ($type === 'xxx' && $field === 'genre') {
+                $ta = (new XXX())->getGenres(true, $ta);
+                $ta = $ta['title'];
             }
             if ($i > 7) {
                 break;
