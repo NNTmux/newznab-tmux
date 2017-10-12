@@ -1,4 +1,5 @@
 2017-10-12 DariusIII
+	* Chg: Use xethron/migrations-generator only in dev environment
 	* Chg: Add xethron/migrations-generator and generate migrations
 	* Chg: Update some of the models
 	* Fix: Possible fix for bad genres display on XXX cover page
