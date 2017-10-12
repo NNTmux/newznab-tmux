@@ -396,7 +396,7 @@ class XXX
             })->orderBy('title')->first(['title']);
         }
 
-        return Genre::query()->where([ 'type' => Category::XXX_ROOT])->when($gid !== null, function ($query) use ($gid) {
+        return Genre::query()->where(['type' => Category::XXX_ROOT])->when($gid !== null, function ($query) use ($gid) {
             return $query->where('id', $gid);
         })->orderBy('title')->first(['title']);
     }
