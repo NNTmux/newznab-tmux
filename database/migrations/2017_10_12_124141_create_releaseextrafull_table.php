@@ -14,7 +14,7 @@ class CreateReleaseextrafullTable extends Migration
     {
         Schema::create('releaseextrafull', function (Blueprint $table) {
             $table->integer('releases_id')->unsigned()->primary()->comment('FK to releases.id');
-            $table->text('mediainfo', 65535)->nullable()->default('NULL');
+            $table->text('mediainfo', 65535)->nullable()->default(null);
         });
     }
 

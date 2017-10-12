@@ -15,7 +15,7 @@ class CreateTmuxTable extends Migration
         Schema::create('tmux', function (Blueprint $table) {
             $table->increments('id');
             $table->string('setting', 64)->unique('ix_tmux_setting');
-            $table->string('value', 19000)->nullable()->default('NULL');
+            $table->string('value', 19000)->nullable()->default(null);
             $table->dateTime('updateddate')->default('current_timestamp()');
         });
     }

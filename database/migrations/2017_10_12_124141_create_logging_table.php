@@ -14,9 +14,9 @@ class CreateLoggingTable extends Migration
     {
         Schema::create('logging', function (Blueprint $table) {
             $table->increments('id');
-            $table->dateTime('time')->nullable()->default('NULL');
-            $table->string('username', 50)->nullable()->default('NULL');
-            $table->string('host', 40)->nullable()->default('NULL');
+            $table->dateTime('time')->nullable()->default(null);
+            $table->string('username', 50)->nullable()->default(null);
+            $table->string('host', 40)->nullable()->default(null);
         });
     }
 

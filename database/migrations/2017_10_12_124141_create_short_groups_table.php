@@ -17,7 +17,7 @@ class CreateShortGroupsTable extends Migration
             $table->string('name')->default('\'\'')->index('ix_shortgroups_name');
             $table->bigInteger('first_record')->unsigned()->default(0);
             $table->bigInteger('last_record')->unsigned()->default(0);
-            $table->dateTime('updated')->nullable()->default('NULL');
+            $table->dateTime('updated')->nullable()->default(null);
         });
     }
 

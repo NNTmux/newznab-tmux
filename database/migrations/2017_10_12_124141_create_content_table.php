@@ -15,14 +15,14 @@ class CreateContentTable extends Migration
         Schema::create('content', function (Blueprint $table) {
             $table->integer('id', true);
             $table->string('title');
-            $table->string('url', 2000)->nullable()->default('NULL');
-            $table->text('body', 65535)->nullable()->default('NULL');
+            $table->string('url', 2000)->nullable()->default(null);
+            $table->text('body', 65535)->nullable()->default(null);
             $table->string('metadescription', 1000);
             $table->string('metakeywords', 1000);
             $table->integer('contenttype');
             $table->integer('showinmenu');
             $table->integer('status');
-            $table->integer('ordinal')->nullable()->default('NULL');
+            $table->integer('ordinal')->nullable()->default(null);
             $table->integer('role')->default(0);
             $table->index(['showinmenu', 'status', 'contenttype', 'role'], 'ix_showinmenu_status_contenttype_role');
         });

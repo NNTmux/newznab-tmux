@@ -14,7 +14,7 @@ class CreateReleaseNfosTable extends Migration
     {
         Schema::create('release_nfos', function (Blueprint $table) {
             $table->integer('releases_id')->unsigned()->primary()->comment('FK to releases.id');
-            $table->binary('nfo', 65535)->nullable()->default('NULL');
+            $table->binary('nfo', 65535)->nullable()->default(null);
         });
     }
 

@@ -20,10 +20,10 @@ class CreateSpotnabsourcesTable extends Migration
             $table->string('publickey', 512);
             $table->boolean('active')->default(0);
             $table->string('description')->nullable()->default('\'\'');
-            $table->dateTime('lastupdate')->nullable()->default('NULL');
-            $table->dateTime('lastbroadcast')->nullable()->default('NULL');
+            $table->dateTime('lastupdate')->nullable()->default(null);
+            $table->dateTime('lastbroadcast')->nullable()->default(null);
             $table->bigInteger('lastarticle')->unsigned()->default(0);
-            $table->dateTime('dateadded')->nullable()->default('NULL');
+            $table->dateTime('dateadded')->nullable()->default(null);
             $table->unique(['username', 'useremail', 'usenetgroup'], 'spotnabsources_ix1');
         });
     }

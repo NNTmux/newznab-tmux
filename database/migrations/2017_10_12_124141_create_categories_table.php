@@ -15,9 +15,9 @@ class CreateCategoriesTable extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title');
-            $table->integer('parentid')->nullable()->default('NULL')->index('ix_categories_parentid');
+            $table->integer('parentid')->nullable()->default(null)->index('ix_categories_parentid');
             $table->integer('status')->default(1)->index('ix_categories_status');
-            $table->string('description')->nullable()->default('NULL');
+            $table->string('description')->nullable()->default(null);
             $table->boolean('disablepreview')->default(0);
             $table->bigInteger('minsizetoformrelease')->unsigned()->default(0);
             $table->bigInteger('maxsizetoformrelease')->unsigned()->default(0);

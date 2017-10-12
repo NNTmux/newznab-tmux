@@ -16,8 +16,8 @@ class CreateSharingSitesTable extends Migration
             $table->increments('id');
             $table->string('site_name')->default('\'\'');
             $table->string('site_guid', 40)->default('\'\'');
-            $table->dateTime('last_time')->nullable()->default('NULL');
-            $table->dateTime('first_time')->nullable()->default('NULL');
+            $table->dateTime('last_time')->nullable()->default(null);
+            $table->dateTime('first_time')->nullable()->default(null);
             $table->boolean('enabled')->default(0);
             $table->integer('comments')->unsigned()->default(0);
         });

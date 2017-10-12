@@ -16,7 +16,7 @@ class CreateUserSeriesTable extends Migration
             $table->increments('id');
             $table->integer('users_id')->unsigned();
             $table->integer('videos_id')->comment('FK to videos.id');
-            $table->string('categories', 64)->nullable()->default('NULL')->comment('List of categories for user tv shows');
+            $table->string('categories', 64)->nullable()->default(null)->comment('List of categories for user tv shows');
             $table->timestamps();
             $table->index(['users_id', 'videos_id'], 'ix_userseries_videos_id');
         });
