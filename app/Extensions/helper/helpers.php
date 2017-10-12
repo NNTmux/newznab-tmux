@@ -1,11 +1,11 @@
 <?php
 
+use nntmux\XXX;
 use nntmux\ColorCLI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\RequestException;
-use nntmux\XXX;
 
 if (! function_exists('getRawHtml')) {
 
