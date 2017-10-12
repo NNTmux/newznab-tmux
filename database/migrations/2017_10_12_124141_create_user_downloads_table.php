@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateUserDownloadsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -21,7 +20,6 @@ class CreateUserDownloadsTable extends Migration
             $table->integer('releases_id')->comment('FK to releases.id');
         });
     }
-
 
     /**
      * Reverse the migrations.

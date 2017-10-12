@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateMusicinfoTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -28,10 +27,9 @@ class CreateMusicinfoTable extends Migration
             $table->string('tracks', 3000)->nullable()->default('NULL');
             $table->boolean('cover')->default(0);
             $table->timestamps();
-            $table->index(['artist','title'], 'ix_musicinfo_artist_title_ft');
+            $table->index(['artist', 'title'], 'ix_musicinfo_artist_title_ft');
         });
     }
-
 
     /**
      * Reverse the migrations.

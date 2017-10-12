@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateReleaseCommentsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -31,10 +30,9 @@ class CreateReleaseCommentsTable extends Migration
             $table->string('siteid', 40)->default('\'\'');
             $table->bigInteger('sourceid')->unsigned()->nullable()->default('NULL');
             $table->binary('nzb_guid', 16)->default('\'0$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$\'');
-            $table->unique(['text_hash','releases_id'], 'ix_release_comments_hash_releases_id');
+            $table->unique(['text_hash', 'releases_id'], 'ix_release_comments_hash_releases_id');
         });
     }
-
 
     /**
      * Reverse the migrations.

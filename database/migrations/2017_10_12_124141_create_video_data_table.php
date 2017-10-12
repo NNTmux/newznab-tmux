@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateVideoDataTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -27,7 +26,6 @@ class CreateVideoDataTable extends Migration
             $table->string('videolibrary', 50)->nullable()->default('NULL');
         });
     }
-
 
     /**
      * Reverse the migrations.

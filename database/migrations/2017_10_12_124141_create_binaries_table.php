@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateBinariesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,7 +24,6 @@ class CreateBinariesTable extends Migration
             $table->bigInteger('partsize')->unsigned()->default(0);
         });
     }
-
 
     /**
      * Reverse the migrations.

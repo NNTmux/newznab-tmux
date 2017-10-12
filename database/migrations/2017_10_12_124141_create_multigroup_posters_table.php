@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateMultigroupPostersTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,7 +17,6 @@ class CreateMultigroupPostersTable extends Migration
             $table->string('poster')->default('\'\'')->unique('poster');
         });
     }
-
 
     /**
      * Reverse the migrations.

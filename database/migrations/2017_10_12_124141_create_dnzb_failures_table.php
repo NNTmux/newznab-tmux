@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateDnzbFailuresTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -17,10 +16,9 @@ class CreateDnzbFailuresTable extends Migration
             $table->integer('release_id')->unsigned();
             $table->integer('userid')->unsigned();
             $table->integer('failed')->unsigned()->default(0);
-            $table->primary(['release_id','userid']);
+            $table->primary(['release_id', 'userid']);
         });
     }
-
 
     /**
      * Reverse the migrations.

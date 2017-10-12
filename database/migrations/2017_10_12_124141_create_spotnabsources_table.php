@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateSpotnabsourcesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,10 +24,9 @@ class CreateSpotnabsourcesTable extends Migration
             $table->dateTime('lastbroadcast')->nullable()->default('NULL');
             $table->bigInteger('lastarticle')->unsigned()->default(0);
             $table->dateTime('dateadded')->nullable()->default('NULL');
-            $table->unique(['username','useremail','usenetgroup'], 'spotnabsources_ix1');
+            $table->unique(['username', 'useremail', 'usenetgroup'], 'spotnabsources_ix1');
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateCategoryRegexesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -23,7 +22,6 @@ class CreateCategoryRegexesTable extends Migration
             $table->smallInteger('categories_id')->unsigned()->default(10)->index('ix_category_regexes_categories_id')->comment('Which categories id to put the release in');
         });
     }
-
 
     /**
      * Reverse the migrations.
