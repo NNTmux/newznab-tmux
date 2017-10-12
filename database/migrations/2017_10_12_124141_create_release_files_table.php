@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateReleaseFilesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -20,10 +19,9 @@ class CreateReleaseFilesTable extends Migration
             $table->boolean('ishashed')->default(0)->index('ix_releasefiles_ishashed');
             $table->timestamps();
             $table->boolean('passworded')->default(0);
-            $table->primary(['releases_id','name']);
+            $table->primary(['releases_id', 'name']);
         });
     }
-
 
     /**
      * Reverse the migrations.

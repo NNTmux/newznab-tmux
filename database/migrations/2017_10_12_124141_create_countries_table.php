@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateCountriesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -19,7 +18,6 @@ class CreateCountriesTable extends Migration
             $table->string('country', 180)->unique('country')->comment('Name of the country.');
         });
     }
-
 
     /**
      * Reverse the migrations.

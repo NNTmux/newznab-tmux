@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateContentTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,10 +24,9 @@ class CreateContentTable extends Migration
             $table->integer('status');
             $table->integer('ordinal')->nullable()->default('NULL');
             $table->integer('role')->default(0);
-            $table->index(['showinmenu','status','contenttype','role'], 'ix_showinmenu_status_contenttype_role');
+            $table->index(['showinmenu', 'status', 'contenttype', 'role'], 'ix_showinmenu_status_contenttype_role');
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateBookinfoTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -29,10 +28,9 @@ class CreateBookinfoTable extends Migration
             $table->string('genre');
             $table->boolean('cover')->default(0);
             $table->timestamps();
-            $table->index(['author','title'], 'ix_bookinfo_author_title_ft');
+            $table->index(['author', 'title'], 'ix_bookinfo_author_title_ft');
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateGroupsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -29,7 +28,6 @@ class CreateGroupsTable extends Migration
             $table->string('description')->nullable()->default('\'\'');
         });
     }
-
 
     /**
      * Reverse the migrations.

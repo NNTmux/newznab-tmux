@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateReleaseNfosTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,7 +17,6 @@ class CreateReleaseNfosTable extends Migration
             $table->binary('nfo', 65535)->nullable()->default('NULL');
         });
     }
-
 
     /**
      * Reverse the migrations.

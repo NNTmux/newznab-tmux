@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateAnidbTitlesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,10 +17,9 @@ class CreateAnidbTitlesTable extends Migration
             $table->string('type', 25)->comment('type of title.');
             $table->string('lang', 25);
             $table->string('title');
-            $table->primary(['anidbid','type','lang','title']);
+            $table->primary(['anidbid', 'type', 'lang', 'title']);
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateBinaryblacklistTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -24,7 +23,6 @@ class CreateBinaryblacklistTable extends Migration
             $table->date('last_activity')->nullable()->default('NULL');
         });
     }
-
 
     /**
      * Reverse the migrations.

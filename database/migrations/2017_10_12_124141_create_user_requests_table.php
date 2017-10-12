@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateUserRequestsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -21,7 +20,6 @@ class CreateUserRequestsTable extends Migration
             $table->dateTime('timestamp')->index('timestamp');
         });
     }
-
 
     /**
      * Reverse the migrations.
