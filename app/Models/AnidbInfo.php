@@ -29,19 +29,15 @@ class AnidbInfo extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-        'anidbid',
-        'type',
-        'startdate',
-        'enddate',
-        'updated',
-        'related',
-        'similar',
-        'creators',
-        'description',
-        'rating',
-        'picture',
-        'categories',
-        'characters',
-    ];
+    protected $guarded = [];
+
+    public function title()
+    {
+        return $this->belongsTo('App\Models\AnidbTitle', 'anidbid');
+    }
+
+    public function episode()
+    {
+        return $this->belongsTo('App\Models\AnidbEpisode', 'anidbid');
+    }
 }

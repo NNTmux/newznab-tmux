@@ -7,11 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class UserRole extends Model
 {
     /**
-     * @var string
-     */
-    protected $table = 'user_roles';
-
-    /**
      * @var bool
      */
     public $timestamps = false;
@@ -24,17 +19,11 @@ class UserRole extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-        'id',
-        'name',
-        'apirequests',
-        'downloadrequests',
-        'defaultinvites',
-        'isdefault',
-        'canpreview',
-        'hideads',
-    ];
+    protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function users()
     {
         return $this->hasMany('App\Models\User', 'user_roles_id');

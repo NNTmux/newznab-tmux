@@ -4,17 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AnidbEpisode extends Model
+class AnidbTitle extends Model
 {
-    /**
-     * @var bool
-     */
-    protected $dateFormat = false;
-
     /**
      * @var string
      */
     protected $primaryKey = 'anidbid';
+
+    /**
+     * @var bool
+     */
+    protected $dateFormat = false;
 
     /**
      * @var bool
@@ -31,13 +31,13 @@ class AnidbEpisode extends Model
      */
     protected $guarded = [];
 
-    public function title()
+    public function episode()
     {
-        return $this->belongsTo('App\Models\AnidbTitle', 'anidbid');
+        return $this->hasMany('App\Models\AnidbEpisode', 'anidbid');
     }
 
     public function info()
     {
-        return $this->hasMany('App\Modles\AnidbInfo', 'anidbid');
+        return $this->hasMany('App\Models\AnidbInfo', 'anidbid');
     }
 }
