@@ -4,9 +4,8 @@ use Illuminate\Database\Seeder;
 
 class ForumpostTableSeeder extends Seeder
 {
-
     /**
-     * Auto generated seed file
+     * Auto generated seed file.
      *
      * @return void
      */
@@ -15,8 +14,7 @@ class ForumpostTableSeeder extends Seeder
         \DB::table('forumpost')->delete();
 
         \DB::table('forumpost')->insert([
-            0 =>
-            [
+            0 => [
                 'id' => 1,
                 'forumid' => 1,
                 'parentid' => 0,
