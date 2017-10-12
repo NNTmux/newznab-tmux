@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateConsoleinfoTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -27,10 +26,9 @@ class CreateConsoleinfoTable extends Migration
             $table->string('review', 3000)->nullable()->default('NULL');
             $table->boolean('cover')->default(0);
             $table->timestamps();
-            $table->index(['title','platform'], 'ix_consoleinfo_title_platform_ft');
+            $table->index(['title', 'platform'], 'ix_consoleinfo_title_platform_ft');
         });
     }
-
 
     /**
      * Reverse the migrations.

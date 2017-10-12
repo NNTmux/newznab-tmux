@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateCollectionRegexesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -22,7 +21,6 @@ class CreateCollectionRegexesTable extends Migration
             $table->integer('ordinal')->default(0)->index('ix_collection_regexes_ordinal')->comment('Order to run the regex in');
         });
     }
-
 
     /**
      * Reverse the migrations.

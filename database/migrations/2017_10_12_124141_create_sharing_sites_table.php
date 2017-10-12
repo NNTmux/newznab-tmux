@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateSharingSitesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -23,7 +22,6 @@ class CreateSharingSitesTable extends Migration
             $table->integer('comments')->unsigned()->default(0);
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateUsersReleasesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -19,10 +18,9 @@ class CreateUsersReleasesTable extends Migration
             $table->integer('releases_id')->comment('FK to releases.id');
             $table->timestamps();
             $table->dateTime('updateddate');
-            $table->unique(['users_id','releases_id'], 'ix_usercart_userrelease');
+            $table->unique(['users_id', 'releases_id'], 'ix_usercart_userrelease');
         });
     }
-
 
     /**
      * Reverse the migrations.

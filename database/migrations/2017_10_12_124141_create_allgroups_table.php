@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateAllgroupsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -21,7 +20,6 @@ class CreateAllgroupsTable extends Migration
             $table->dateTime('updated')->nullable()->default('NULL');
         });
     }
-
 
     /**
      * Reverse the migrations.

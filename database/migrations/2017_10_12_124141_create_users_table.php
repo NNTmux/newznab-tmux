@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateUsersTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -55,7 +54,6 @@ class CreateUsersTable extends Migration
             $table->string('remember_token', 100)->nullable()->default('\'NULL\'');
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateUpcomingReleasesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -19,10 +18,9 @@ class CreateUpcomingReleasesTable extends Migration
             $table->integer('typeid');
             $table->text('info', 65535)->nullable()->default('NULL');
             $table->dateTime('updateddate')->default('current_timestamp()');
-            $table->unique(['source','typeid'], 'ix_upcoming_source');
+            $table->unique(['source', 'typeid'], 'ix_upcoming_source');
         });
     }
-
 
     /**
      * Reverse the migrations.

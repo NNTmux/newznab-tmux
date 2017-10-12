@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateRoleExcludedCategoriesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,10 +17,9 @@ class CreateRoleExcludedCategoriesTable extends Migration
             $table->integer('role');
             $table->integer('categories_id')->nullable()->default('NULL');
             $table->timestamps();
-            $table->unique(['role','categories_id'], 'ix_roleexcat_rolecat');
+            $table->unique(['role', 'categories_id'], 'ix_roleexcat_rolecat');
         });
     }
-
 
     /**
      * Reverse the migrations.

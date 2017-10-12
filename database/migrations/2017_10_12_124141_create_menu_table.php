@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateMenuTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -22,10 +21,9 @@ class CreateMenuTable extends Migration
             $table->integer('role')->unsigned();
             $table->integer('ordinal')->unsigned();
             $table->string('menueval', 2000)->default('\'\'');
-            $table->index(['role','ordinal'], 'ix_role_ordinal');
+            $table->index(['role', 'ordinal'], 'ix_role_ordinal');
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateMultigroupCollectionsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -31,7 +30,6 @@ class CreateMultigroupCollectionsTable extends Migration
             $table->char('noise', 32)->default('\'\'');
         });
     }
-
 
     /**
      * Reverse the migrations.

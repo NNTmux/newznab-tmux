@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateUserExcludedCategoriesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -18,10 +17,9 @@ class CreateUserExcludedCategoriesTable extends Migration
             $table->integer('users_id')->unsigned();
             $table->integer('categories_id');
             $table->timestamps();
-            $table->unique(['users_id','categories_id'], 'ix_userexcat_usercat');
+            $table->unique(['users_id', 'categories_id'], 'ix_userexcat_usercat');
         });
     }
-
 
     /**
      * Reverse the migrations.

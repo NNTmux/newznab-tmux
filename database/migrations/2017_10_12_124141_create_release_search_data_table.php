@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateReleaseSearchDataTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -22,7 +21,6 @@ class CreateReleaseSearchDataTable extends Migration
             $table->string('fromname')->nullable()->default('NULL')->index('ix_releasesearch_fromname_ft');
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateReleaseNamingRegexesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -22,7 +21,6 @@ class CreateReleaseNamingRegexesTable extends Migration
             $table->integer('ordinal')->default(0)->index('ix_release_naming_regexes_ordinal')->comment('Order to run the regex in');
         });
     }
-
 
     /**
      * Reverse the migrations.

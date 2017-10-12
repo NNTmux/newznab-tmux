@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateCategoriesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -24,7 +23,6 @@ class CreateCategoriesTable extends Migration
             $table->bigInteger('maxsizetoformrelease')->unsigned()->default(0);
         });
     }
-
 
     /**
      * Reverse the migrations.

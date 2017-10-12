@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreatePartsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -19,10 +18,9 @@ class CreatePartsTable extends Migration
             $table->bigInteger('number')->unsigned()->default(0);
             $table->integer('partnumber')->unsigned()->default(0);
             $table->integer('size')->unsigned()->default(0);
-            $table->primary(['binaries_id','number']);
+            $table->primary(['binaries_id', 'number']);
         });
     }
-
 
     /**
      * Reverse the migrations.

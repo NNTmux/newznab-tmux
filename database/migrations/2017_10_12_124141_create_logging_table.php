@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateLoggingTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -20,7 +19,6 @@ class CreateLoggingTable extends Migration
             $table->string('host', 40)->nullable()->default('NULL');
         });
     }
-
 
     /**
      * Reverse the migrations.

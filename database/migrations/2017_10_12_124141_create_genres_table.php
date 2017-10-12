@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateGenresTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -20,7 +19,6 @@ class CreateGenresTable extends Migration
             $table->boolean('disabled')->default(0);
         });
     }
-
 
     /**
      * Reverse the migrations.

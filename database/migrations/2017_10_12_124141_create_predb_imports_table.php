@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreatePredbImportsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -30,7 +29,6 @@ class CreatePredbImportsTable extends Migration
             $table->string('groupname')->nullable()->default('NULL');
         });
     }
-
 
     /**
      * Reverse the migrations.
