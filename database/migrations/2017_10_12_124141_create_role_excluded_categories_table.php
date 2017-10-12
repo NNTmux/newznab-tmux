@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+
+class CreateRoleExcludedCategoriesTable extends Migration
+{
+
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('role_excluded_categories', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('role');
+            $table->integer('categories_id')->nullable()->default('NULL');
+            $table->timestamps();
+            $table->unique(['role','categories_id'], 'ix_roleexcat_rolecat');
+        });
+    }
+
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('role_excluded_categories');
+    }
+}
