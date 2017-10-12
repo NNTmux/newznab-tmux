@@ -4,9 +4,8 @@ use Illuminate\Database\Seeder;
 
 class MenuTableSeeder extends Seeder
 {
-
     /**
-     * Auto generated seed file
+     * Auto generated seed file.
      *
      * @return void
      */
@@ -15,8 +14,7 @@ class MenuTableSeeder extends Seeder
         \DB::table('menu')->delete();
 
         \DB::table('menu')->insert([
-            0 =>
-            [
+            0 => [
                 'id' => 1000001,
                 'href' => 'search',
                 'title' => 'Advanced Search',
@@ -26,8 +24,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 10,
                 'menueval' => '',
             ],
-            1 =>
-            [
+            1 => [
                 'id' => 1000002,
                 'href' => 'browsegroup',
                 'title' => 'Groups List',
@@ -37,8 +34,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 25,
                 'menueval' => '',
             ],
-            2 =>
-            [
+            2 => [
                 'id' => 1000003,
                 'href' => 'movies',
                 'title' => 'Movies',
@@ -48,8 +44,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 40,
                 'menueval' => '',
             ],
-            3 =>
-            [
+            3 => [
                 'id' => 1000004,
                 'href' => 'upcoming',
                 'title' => 'Theatres',
@@ -59,8 +54,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 45,
                 'menueval' => '',
             ],
-            4 =>
-            [
+            4 => [
                 'id' => 1000005,
                 'href' => 'series',
                 'title' => 'TV Series',
@@ -70,8 +64,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 50,
                 'menueval' => '',
             ],
-            5 =>
-            [
+            5 => [
                 'id' => 1000006,
                 'href' => 'predb',
                 'title' => 'PreDB',
@@ -81,8 +74,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 51,
                 'menueval' => '',
             ],
-            6 =>
-            [
+            6 => [
                 'id' => 1000007,
                 'href' => 'anime',
                 'title' => 'Anime',
@@ -92,8 +84,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 55,
                 'menueval' => '',
             ],
-            7 =>
-            [
+            7 => [
                 'id' => 1000008,
                 'href' => 'music',
                 'title' => 'Music',
@@ -103,8 +94,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 60,
                 'menueval' => '',
             ],
-            8 =>
-            [
+            8 => [
                 'id' => 1000009,
                 'href' => 'console',
                 'title' => 'Console',
@@ -114,8 +104,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 65,
                 'menueval' => '',
             ],
-            9 =>
-            [
+            9 => [
                 'id' => 1000010,
                 'href' => 'books',
                 'title' => 'Books',
@@ -125,8 +114,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 67,
                 'menueval' => '',
             ],
-            10 =>
-            [
+            10 => [
                 'id' => 1000011,
                 'href' => 'admin',
                 'title' => 'Admin',
@@ -136,8 +124,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 70,
                 'menueval' => '',
             ],
-            11 =>
-            [
+            11 => [
                 'id' => 1000012,
                 'href' => 'cart',
                 'title' => 'My Cart',
@@ -147,8 +134,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 75,
                 'menueval' => '',
             ],
-            12 =>
-            [
+            12 => [
                 'id' => 1000013,
                 'href' => 'myshows',
                 'title' => 'My Shows',
@@ -158,8 +144,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 77,
                 'menueval' => '',
             ],
-            13 =>
-            [
+            13 => [
                 'id' => 1000014,
                 'href' => 'mymovies',
                 'title' => 'My Movies',
@@ -169,8 +154,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 78,
                 'menueval' => '',
             ],
-            14 =>
-            [
+            14 => [
                 'id' => 1000015,
                 'href' => 'apihelp',
                 'title' => 'API',
@@ -180,8 +164,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 79,
                 'menueval' => '',
             ],
-            15 =>
-            [
+            15 => [
                 'id' => 1000016,
                 'href' => 'rss',
                 'title' => 'RSS',
@@ -191,8 +174,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 80,
                 'menueval' => '',
             ],
-            16 =>
-            [
+            16 => [
                 'id' => 1000017,
                 'href' => 'queue',
                 'title' => 'My Queue',
@@ -202,8 +184,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 0,
                 'menueval' => '',
             ],
-            17 =>
-            [
+            17 => [
                 'id' => 1000018,
                 'href' => 'forum',
                 'title' => 'Forum',
@@ -213,8 +194,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 85,
                 'menueval' => '',
             ],
-            18 =>
-            [
+            18 => [
                 'id' => 1000019,
                 'href' => 'login',
                 'title' => 'Login',
@@ -224,8 +204,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 100,
                 'menueval' => '',
             ],
-            19 =>
-            [
+            19 => [
                 'id' => 1000020,
                 'href' => 'register',
                 'title' => 'Register',
@@ -235,8 +214,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 110,
                 'menueval' => '',
             ],
-            20 =>
-            [
+            20 => [
                 'id' => 1000021,
                 'href' => 'newposterwall',
                 'title' => 'New Releases',
@@ -246,8 +224,7 @@ class MenuTableSeeder extends Seeder
                 'ordinal' => 11,
                 'menueval' => '',
             ],
-            21 =>
-            [
+            21 => [
                 'id' => 1000022,
                 'href' => 'content',
                 'title' => 'Contents page',

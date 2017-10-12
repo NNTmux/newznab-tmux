@@ -4,9 +4,8 @@ use Illuminate\Database\Seeder;
 
 class UserRolesTableSeeder extends Seeder
 {
-
     /**
-     * Auto generated seed file
+     * Auto generated seed file.
      *
      * @return void
      */
@@ -15,8 +14,7 @@ class UserRolesTableSeeder extends Seeder
         \DB::table('user_roles')->delete();
 
         \DB::table('user_roles')->insert([
-            0 =>
-            [
+            0 => [
                 'id' => 0,
                 'name' => 'Guest',
                 'apirequests' => 0,
@@ -26,8 +24,7 @@ class UserRolesTableSeeder extends Seeder
                 'canpreview' => 0,
                 'hideads' => 0,
             ],
-            1 =>
-            [
+            1 => [
                 'id' => 1,
                 'name' => 'User',
                 'apirequests' => 10,
@@ -37,8 +34,7 @@ class UserRolesTableSeeder extends Seeder
                 'canpreview' => 0,
                 'hideads' => 0,
             ],
-            2 =>
-            [
+            2 => [
                 'id' => 2,
                 'name' => 'Admin',
                 'apirequests' => 1000,
@@ -48,8 +44,7 @@ class UserRolesTableSeeder extends Seeder
                 'canpreview' => 1,
                 'hideads' => 0,
             ],
-            3 =>
-            [
+            3 => [
                 'id' => 3,
                 'name' => 'Disabled',
                 'apirequests' => 0,
@@ -59,8 +54,7 @@ class UserRolesTableSeeder extends Seeder
                 'canpreview' => 0,
                 'hideads' => 0,
             ],
-            4 =>
-            [
+            4 => [
                 'id' => 4,
                 'name' => 'Moderator',
                 'apirequests' => 1000,
@@ -70,8 +64,7 @@ class UserRolesTableSeeder extends Seeder
                 'canpreview' => 1,
                 'hideads' => 0,
             ],
-            5 =>
-            [
+            5 => [
                 'id' => 5,
                 'name' => 'Friend',
                 'apirequests' => 100,
