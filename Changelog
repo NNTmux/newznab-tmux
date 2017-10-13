@@ -1,4 +1,5 @@
 2017-10-13 DariusIII
+	* Chg: Update Console processConsolereleases function
 	* Chg: Update forgottenpassword handling
 	* Chg: Add env value for recaptcha
 2017-10-12 DariusIII

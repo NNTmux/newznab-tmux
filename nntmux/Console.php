@@ -806,9 +806,9 @@ class Console
 
     public function processConsoleReleases(): void
     {
-        $res = Release::query()->raw('PARTITION(console)')->where(['nzbstatus' => NZB::NZB_ADDED, 'consoleinfo_id' => null])->when($this->renamed === true, function ($query) {
+        $res = Release::query()->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->where(['nzbstatus' => NZB::NZB_ADDED, 'consoleinfo_id' => null])->when($this->renamed === true, function ($query) {
             return $query->where('isrenamed', '=', 1);
-        })->limit($this->gameqty)->orderBy('postdate')->get();
+        })->limit($this->gameqty)->orderBy('postdate')->get(['searchname', 'id']);
 
         if ($res instanceof \Traversable && $res->count() > 0) {
             if ($this->echooutput) {
