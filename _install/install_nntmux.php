@@ -33,18 +33,18 @@ if (env('DB_SYSTEM') !== 'mysql') {
     try {
         // HAS to be DB because settings table does not exist yet.
         $pdo = new DB(
-			[
-				'checkVersion' => true,
-				'createDb'     => true,
-				'dbhost'       => env('DB_HOST'),
-				'dbname'       => env('DB_NAME'),
-				'dbpass'       => env('DB_PASSWORD'),
-				'dbport'       => env('PORT'),
-				'dbsock'       => env('DB_SOCKET'),
-				'dbtype'       => env('DB_SYSTEM'),
-				'dbuser'       => env('DB_USER'),
-			]
-		);
+            [
+                'checkVersion' => true,
+                'createDb'     => true,
+                'dbhost'       => env('DB_HOST'),
+                'dbname'       => env('DB_NAME'),
+                'dbpass'       => env('DB_PASSWORD'),
+                'dbport'       => env('PORT'),
+                'dbsock'       => env('DB_SOCKET'),
+                'dbtype'       => env('DB_SYSTEM'),
+                'dbuser'       => env('DB_USER'),
+            ]
+        );
         $dbConnCheck = true;
     } catch (\PDOException $e) {
         ColorCLI::doEcho(ColorCLI::error('Unable to connect to MySQL server.'));
@@ -52,16 +52,15 @@ if (env('DB_SYSTEM') !== 'mysql') {
         $dbConnCheck = false;
     } catch (\RuntimeException $e) {
         switch ($e->getCode()) {
-			case 1:
-			case 2:
-			case 3:
-				$error = true;
-				ColorCLI::doEcho(ColorCLI::alternate($e->getMessage()));
-				break;
-			default:
-				var_dump($e);
-				throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
-		}
+            case 1:
+            case 2:
+            case 3:
+                $error = true;
+                ColorCLI::doEcho(ColorCLI::alternate($e->getMessage()));
+                break;
+            default:
+                throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     // Check if the MySQL version is correct.
@@ -77,13 +76,14 @@ if (env('DB_SYSTEM') !== 'mysql') {
 
         if ($goodVersion === false) {
             $error = true;
-            ColorCLI::doEcho(ColorCLI::error(
-				'You are using an unsupported version of '.
-				env('DB_SYSTEM').
-				' the minimum allowed version is '.
-				NN_MINIMUM_MYSQL_VERSION
-			)
-			);
+            ColorCLI::doEcho(
+                ColorCLI::error(
+                'You are using an unsupported version of '.
+                env('DB_SYSTEM').
+                ' the minimum allowed version is '.
+                NN_MINIMUM_MYSQL_VERSION
+            )
+            );
         }
     }
 }
@@ -91,15 +91,15 @@ if (env('DB_SYSTEM') !== 'mysql') {
 // Start inserting data into the DB.
 if (! $error) {
     $DbSetup = new DbUpdate(
-		[
-			'backup' => false,
-			'db'     => $pdo,
-		]
-	);
+        [
+            'backup' => false,
+            'db'     => $pdo,
+        ]
+    );
 
     try {
         $DbSetup->processSQLFile(); // Setup default schema
-		$DbSetup->loadTables(); // Load default data files
+        $DbSetup->loadTables(); // Load default data files
     } catch (\PDOException $err) {
         $error = true;
         ColorCLI::doEcho(ColorCLI::error('Error inserting: ('.$err->getMessage().')'));
@@ -127,8 +127,8 @@ if (! $error) {
             $updateSettings = false;
             if ($patch > 0) {
                 $updateSettings = $pdo->exec(
-					"UPDATE settings SET value = '$patch' WHERE section = '' AND subsection = '' AND name = 'sqlpatch'"
-				);
+                    "UPDATE settings SET value = '$patch' WHERE section = '' AND subsection = '' AND name = 'sqlpatch'"
+                );
             }
             // If it all worked, continue the install process.
             if ($updateSettings) {
@@ -151,20 +151,20 @@ if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') =
     exit();
 }
 
-	$capsule = new Capsule;
-	// Same as database configuration file of Laravel.
-	$capsule->addConnection([
-		'driver' => env('DB_SYSTEM'),
-		'host' => env('DB_HOST', '127.0.0.1'),
-		'port' => env('DB_PORT', '3306'),
-		'database' => env('DB_NAME', 'nntmux'),
-		'username' => env('DB_USER', 'root'),
-		'password' => env('DB_PASSWORD', ''),
-		'unix_socket' => env('DB_SOCKET', ''),
-		'charset' => 'utf8',
-		'collation' => 'utf8_unicode_ci',
-		'strict' => false,
-	]);
+    $capsule = new Capsule;
+    // Same as database configuration file of Laravel.
+    $capsule->addConnection([
+        'driver' => env('DB_SYSTEM'),
+        'host' => env('DB_HOST', '127.0.0.1'),
+        'port' => env('DB_PORT', '3306'),
+        'database' => env('DB_NAME', 'nntmux'),
+        'username' => env('DB_USER', 'root'),
+        'password' => env('DB_PASSWORD', ''),
+        'unix_socket' => env('DB_SOCKET', ''),
+        'charset' => 'utf8',
+        'collation' => 'utf8_unicode_ci',
+        'strict' => false,
+    ]);
 $capsule->bootEloquent();
 
 $user = new Users();
