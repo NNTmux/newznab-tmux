@@ -144,7 +144,7 @@ class Console
         }
         $searchwords = trim($searchwords);
 
-        return ConsoleInfo::query()->whereRaw('MATCH(title, platform) AGAINST(? IN BOOLEAN MODE) AND platform = ?', $searchwords, $platform)->first();
+        return ConsoleInfo::query()->whereRaw('MATCH(title, platform) AGAINST(? IN BOOLEAN MODE) AND platform = ?', [$searchwords, $platform])->first();
     }
 
     /**
@@ -836,16 +836,16 @@ class Console
                     // Check for existing console entry.
                     $gameCheck = $this->getConsoleInfoByName($gameInfo['title'], $gameInfo['platform']);
 
-                    if ($gameCheck === false && in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
+                    if ($gameCheck === null && in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
                             ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.').PHP_EOL);
                         }
                         $gameId = -2;
-                    } elseif ($gameCheck === false) {
+                    } elseif ($gameCheck === null) {
                         $gameId = $this->updateConsoleInfo($gameInfo);
                         $usedAmazon = true;
-                        if ($gameId === false) {
+                        if ($gameId === null) {
                             $gameId = -2;
                             $this->failCache[] = $gameInfo['title'].$gameInfo['platform'];
                         }
