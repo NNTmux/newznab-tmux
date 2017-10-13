@@ -53,12 +53,12 @@ switch ($action) {
                 //
                 // Check users exists and send an email
                 //
-                if (isset($rssToken)) {
+                if (! empty($rssToken)) {
                     $ret = $page->users->getByRssToken($rssToken);
                 } else {
                     $ret = $page->users->getByEmail($email);
                 }
-                if (! $ret) {
+                if ($ret === null) {
                     $page->smarty->assign('error', 'The email or apikey are not recognised.');
                     $sent = true;
                     break;
@@ -71,9 +71,8 @@ switch ($action) {
                 //
                 // Send the email
                 //
-                $to = $ret['email'];
                 $resetLink = $page->serverurl.'forgottenpassword?action=reset&guid='.$guid;
-                Mail::to($to)->send(new ForgottenPassword($ret['id'], $resetLink));
+                Mail::to($ret['email'])->send(new ForgottenPassword($resetLink));
                 $sent = true;
                 break;
             }

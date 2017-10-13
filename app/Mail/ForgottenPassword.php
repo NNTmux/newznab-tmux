@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\User;
 use App\Models\Settings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -19,12 +18,10 @@ class ForgottenPassword extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param $userId
-     * @param $newPass
+     * @param $resetLink
      */
-    public function __construct($userId, $resetLink)
+    public function __construct($resetLink)
     {
-        $this->user = User::query()->where('id', $userId)->first();
         $this->resetLink = $resetLink;
     }
 
