@@ -189,8 +189,7 @@ class Captcha
         if ($this->recaptcha instanceof ReCaptcha) {
             return true;
         }
-        $enabled = Settings::settingValue(self::RECAPTCHA_SETTING_ENABLED);
-        if ($enabled || $enabled === null) { // Only disable if the setting exists and is truish.
+        if (env('RECAPTCHA_ENABLED') === true) {
             $this->sitekey = env('RECAPTCHA_SITEKEY');
             $this->secretkey = env('RECAPTCHA_SECRETKEY');
             if ($this->sitekey !== '' && $this->secretkey !== '') {
