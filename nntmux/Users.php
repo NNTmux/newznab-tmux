@@ -2,7 +2,6 @@
 
 namespace nntmux;
 
-use App\Models\RoleExcludedCategory;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
@@ -16,6 +15,7 @@ use App\Models\UserRequest;
 use nntmux\utility\Utility;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
+use App\Models\RoleExcludedCategory;
 use App\Models\UserExcludedCategory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
