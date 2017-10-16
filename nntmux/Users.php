@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\RoleExcludedCategory;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
@@ -1001,7 +1002,7 @@ class Users
     public function getRoleCategoryExclusion($role): array
     {
         $ret = [];
-        $categories = UserExcludedCategory::query()->where('role', $role)->get(['categories_id']);
+        $categories = RoleExcludedCategory::query()->where('role', $role)->get(['categories_id']);
         foreach ($categories as $category) {
             $ret[] = $category['categories_id'];
         }

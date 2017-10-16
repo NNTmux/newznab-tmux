@@ -1,3 +1,5 @@
+2017-10-17 DariusIII
+	* Fix: Wrong model used in getRoleCategoryExclusion function
 2017-10-16 DariusIII
 	* Chg: Update laravel/framework and phpunit to latest versions
 	* Fix: Fix path to jquery-goup in Gentele theme
