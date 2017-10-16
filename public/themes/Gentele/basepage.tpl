@@ -220,7 +220,7 @@
 <!-- pace -->
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/pace/pace.min.js"></script>
 <!-- scrollup -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-goup/jquery.goup.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-goup/dist/jquery.goup.min.js"></script>
 
 <!-- fancybox js -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/fancybox/dist/jquery.fancybox.js"></script>

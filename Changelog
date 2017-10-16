@@ -1,3 +1,5 @@
+2017-10-16 DariusIII
+	* Fix: Fix path to jquery-goup in Gentele theme
 2017-10-13 DariusIII
 	* Chg: Fix Console releases processing
 	* Chg: Update Console processConsolereleases function
