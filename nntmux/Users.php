@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\UserExcludedCategory;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
@@ -171,7 +172,7 @@ class Users
      */
     public function delUserCategoryExclusions($uid): void
     {
-        $this->pdo->queryExec(sprintf('DELETE FROM user_excluded_categories WHERE users_id = %d', $uid));
+        UserExcludedCategory::query()->where('users_id', $uid)->delete();
     }
 
     /**
@@ -987,7 +988,7 @@ class Users
         $this->delUserCategoryExclusions($uid);
         if (count($catids) > 0) {
             foreach ($catids as $catid) {
-                $this->pdo->queryInsert(sprintf('INSERT INTO user_excluded_categories (users_id, categories_id, created_at) VALUES (%d, %d, now())', $uid, $catid));
+                UserExcludedCategory::query()->insertGetId(['users_id' => $uid, 'categories_id' => $catid, 'created_at' => Carbon::now()]);
             }
         }
     }
@@ -1000,7 +1001,7 @@ class Users
     public function getRoleCategoryExclusion($role): array
     {
         $ret = [];
-        $categories = $this->pdo->query(sprintf('SELECT categories_id FROM role_excluded_categories WHERE role = %d', $role));
+        $categories = UserExcludedCategory::query()->where('role', $role)->get(['categories_id']);
         foreach ($categories as $category) {
             $ret[] = $category['categories_id'];
         }
@@ -1076,7 +1077,7 @@ class Users
      */
     public function delCategoryExclusion($uid, $catid): void
     {
-        $this->pdo->queryExec(sprintf('DELETE FROM user_excluded_categories WHERE users_id = %d AND categories_id = %d', $uid, $catid));
+        UserExcludedCategory::query()->where(['users_id'=> $uid, 'categories_id' => $catid])->delete();
     }
 
     /**

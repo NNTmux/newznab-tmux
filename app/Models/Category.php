@@ -35,4 +35,9 @@ class Category extends Model
     {
         return $this->hasMany(static::class, 'parentid');
     }
+
+    public function userExcludedCategory()
+    {
+        return $this->belongsTo('App\Models\UserExcludedCategory', 'categories_id');
+    }
 }

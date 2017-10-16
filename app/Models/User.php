@@ -22,20 +22,7 @@ class User extends Authenticatable
     /**
      * @var array
      */
-    protected $fillable = [
-        'username',
-        'password',
-        'email',
-        'user_roles_id',
-        'created_at',
-        'updated_at',
-        'host',
-        'rsstoken',
-        'invites',
-        'invitedby',
-        'userseed',
-        'notes',
-    ];
+    protected $guarded = [];
 
     /**
      * @var array
@@ -70,5 +57,10 @@ class User extends Authenticatable
     public function failedRelease()
     {
         return $this->hasMany('App\Models\DnzbFailure', 'users_id');
+    }
+
+    public function excludedCategory()
+    {
+        return $this->hasMany('App\Models\UserExcludedCategory', 'users_id');
     }
 }
