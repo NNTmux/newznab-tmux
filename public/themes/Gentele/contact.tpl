@@ -54,9 +54,8 @@
 										<textarea rows="7" name="comment" id="comment"
 												  class="form-control form-white"></textarea>
 													{$page->smarty->fetch('captcha.tpl')}
-													<button type="submit" value="submit" class="btn btn-primary m-t-20">
-														Send
-														message
+													<button type="submit"  class="btn btn-primary m-t-20">
+														Send message
 													</button>
 												</form>
 											</div>
