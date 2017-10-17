@@ -1002,7 +1002,7 @@ class Users
     public function getRoleCategoryExclusion($role): array
     {
         $ret = [];
-        $categories = RoleExcludedCategory::query()->where('role', $role)->get(['categories_id']);
+        $categories = RoleExcludedCategory::query()->where('user_roles_id', $role)->get(['categories_id']);
         foreach ($categories as $category) {
             $ret[] = $category['categories_id'];
         }
@@ -1309,7 +1309,7 @@ class Users
      */
     public function deleteRole($id)
     {
-        $res = $this->pdo->query(sprintf('SELECT id FROM users WHERE role = %d', $id));
+        $res = $this->pdo->query(sprintf('SELECT id FROM users WHERE user_roles_id = %d', $id));
         if (count($res) > 0) {
             $userids = [];
             foreach ($res as $user) {
