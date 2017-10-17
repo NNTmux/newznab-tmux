@@ -1,6 +1,5 @@
 <div id="menucontainer" xmlns="http://www.w3.org/1999/html">
 	<div class="collapse navbar-collapse nav navbar-nav top-menu">
-		{if $loggedin == "true"}
 			{if isset($userdata)}
 				{foreach $parentcatlist as $parentcat}
 					{if $parentcat.id == {$catClass::TV_ROOT}}
@@ -204,7 +203,8 @@
 					{/if}
 					{if $parentcat.id === "0"}
 						<li class="nav-parent">
-							<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" data-delay="30">
+							<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+							   data-delay="30">
 								<i class="fa fa-bolt"></i> Other<i class="fa fa-angle-down"></i></a>
 							<ul class="dropdown-menu">
 								<li><a href="{$smarty.const.WWW_TOP}/browse?t={$catClass::OTHER_ROOT}">Other</a></li>
@@ -238,8 +238,7 @@
 					</form>
 				</li>
 			</ul>
-			<!-- End If logged in -->
-		{/if}
+
 		<li class="nav-parent">
 			<ul class="nav navbar">
 				<li class="">

@@ -59,8 +59,9 @@
 				</div>
 				<div class="clearfix"></div>
 				<!-- menu profile quick info -->
+				{if $loggedin == "true"}
 				<div class="profile">
-					{if $loggedin == "true"}
+
 						<div class="profile_pic">
 							<img src="{$smarty.const.WWW_THEMES}/shared/images/userimage.png" alt="User Image"
 								 class="img-circle profile_img">
@@ -69,8 +70,8 @@
 							<span>Welcome,</span>
 							<h2>{$userdata.username}</h2>
 						</div>
-					{/if}
 				</div>
+				{/if}
 				<!-- /menu profile quick info -->
 				<br/>
 				<div class="clearfix"></div>
@@ -109,12 +110,11 @@
 								</li>
 							{/if}
 							<div class="clearfix"></div>
+							{if $loggedin == "true"}
 							<li><a><i class="fa fa-edit"></i> Articles & Links <span class="fa fa-chevron-down"></span></a>
+
 								<ul class="nav child_menu" style="display: none">
-									<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
-													class="fa fa-envelope-o"></i><span> Contact</span> <span
-													class="fa arrow"></span></a></li>
-									{if $loggedin == "true"}
+
 										<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="fa fa-forumbee"></i> Forum</a>
 										</li>
 										<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a>
@@ -123,16 +123,17 @@
 												Feeds</a></li>
 										<li><a href="{$smarty.const.WWW_TOP}/apihelp"><i class="fa fa-cloud"></i>
 												API</a></li>
-									{/if}
 								</ul>
 								<div class="clearfix"></div>
-								{if $loggedin == "true"}
 							<li><a href="{$smarty.const.WWW_TOP}/logout"><i
 											class="fa fa-unlock"></i><span> Sign Out</span></a></li>
 							{else}
 							<li><a href="{$smarty.const.WWW_TOP}/login"><i class="fa fa-lock"></i><span> Sign In</span></a>
 							</li>
 							{/if}
+							<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
+											class="fa fa-envelope-o"></i><span> Contact</span> <span
+											class="fa arrow"></span></a></li>
 						</ul>
 					</div>
 				</div>
@@ -140,6 +141,7 @@
 			</div>
 		</div>
 		<!-- top navigation -->
+		{if $loggedin == "true"}
 		<div class="top_nav">
 			<div class="nav_menu">
 				<nav class="" role="navigation">
@@ -150,6 +152,7 @@
 				</nav>
 			</div>
 		</div>
+		{/if}
 		<!-- /top navigation -->
 
 		<!-- page content -->
