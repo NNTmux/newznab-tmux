@@ -1276,7 +1276,7 @@ CREATE TABLE role_excluded_categories
     created_at     DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE INDEX ix_roleexcat_rolecat (role, categories_id)
+    UNIQUE INDEX ix_roleexcat_rolecat (user_roles_id, categories_id)
 )
     ENGINE = MyISAM
     DEFAULT CHARSET = utf8
