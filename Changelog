@@ -1,4 +1,5 @@
 2017-10-17 DariusIII
+	* Chg: Update composer.lock
 	* Fix: Fix wrong template used for password reset
 	* Fix: Wrong model used in getRoleCategoryExclusion function
 2017-10-16 DariusIII
