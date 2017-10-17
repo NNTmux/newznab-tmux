@@ -1,3 +1,5 @@
+2017-10-18 DariusIII
+	* Chg: Update laravel/framework to latest version
 2017-10-17 DariusIII
 	* Chg: Update RoleExcludedCategories and related models
 	* Fix: Fix sending of contact form when not logged in
