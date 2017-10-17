@@ -28,4 +28,9 @@ class UserRole extends Model
     {
         return $this->hasMany('App\Models\User', 'user_roles_id');
     }
+
+    public function roleExcludedCategory()
+    {
+        return $this->hasMany('App\Models\RoleExcludedCategory', 'user_roles_id');
+    }
 }

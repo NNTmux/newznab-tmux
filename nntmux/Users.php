@@ -1019,7 +1019,7 @@ class Users
         $this->delRoleCategoryExclusions($role);
         if (count($catids) > 0) {
             foreach ($catids as $catid) {
-                $this->pdo->queryInsert(sprintf('INSERT INTO role_excluded_categories (role, categories_id, created_at) VALUES (%d, %d, now())', $role, $catid));
+                RoleExcludedCategory::query()->insertGetId(['user_roles_id' => $role, 'categories_id' => $catid, 'created_at' => Carbon::now()]);
             }
         }
     }
@@ -1029,7 +1029,7 @@ class Users
      */
     public function delRoleCategoryExclusions($role): void
     {
-        $this->pdo->queryExec(sprintf('DELETE FROM role_excluded_categories WHERE role = %d', $role));
+        RoleExcludedCategory::query()->where('user_roles_id', $role)->delete();
     }
 
     /**

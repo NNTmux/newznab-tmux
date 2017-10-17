@@ -1,4 +1,5 @@
 2017-10-17 DariusIII
+	* Chg: Update RoleExcludedCategories and related models
 	* Fix: Fix sending of contact form when not logged in
 	* Chg: Update composer.lock
 	* Fix: Fix wrong template used for password reset

@@ -1271,7 +1271,7 @@ DROP TABLE IF EXISTS role_excluded_categories;
 CREATE TABLE role_excluded_categories
 (
     id              INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
-    role            INT(11) NOT NULL,
+    user_roles_id            INT(11) NOT NULL,
     categories_id   INT(11),
     created_at     DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
