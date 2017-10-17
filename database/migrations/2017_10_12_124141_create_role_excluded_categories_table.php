@@ -14,7 +14,7 @@ class CreateRoleExcludedCategoriesTable extends Migration
     {
         Schema::create('role_excluded_categories', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('role');
+            $table->integer('user_roles_id');
             $table->integer('categories_id')->nullable()->default(null);
             $table->timestamps();
             $table->unique(['role', 'categories_id'], 'ix_roleexcat_rolecat');
