@@ -85,9 +85,6 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\UserExcludedCategory', 'users_id');
     }
 
-    /**
-     *
-     */
     protected static function boot(): void
     {
         parent::boot();
