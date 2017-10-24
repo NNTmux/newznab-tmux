@@ -132,10 +132,10 @@
     "guzzlehttp/guzzle": "^6.3",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
-    "nzedb/Git.php": "dev-master",
     "laravel/framework": "^5.5",
     "laravel/tinker": "~1.0",
     "monolog/monolog": "^1.22",
+    "nzedb/Git.php": "dev-master",
     "php-http/guzzle6-adapter": "^1.1",
     "php-http/message": "^1.6",
     "php-tmdb/api": "~2.1",
@@ -143,6 +143,7 @@
     "ramsey/uuid": "^3.7",
     "roave/security-advisories": "dev-master",
     "smarty/smarty": "~3.1",
+    "spatie/laravel-fractal": "^5.2",
     "vlucas/phpdotenv": "^2.4",
     "yadakhov/insert-on-duplicate-key": "^1.2"
   },
@@ -169,6 +170,10 @@
     ],
     "post-update-cmd": [
       "nntmux\\build\\ComposerScripts::postUpdate"
+    ],
+    "post-autoload-dump": [
+      "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+      "@php tmux package:discover"
     ]
   },
   "suggest": {
