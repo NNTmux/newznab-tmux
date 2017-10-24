@@ -1,4 +1,5 @@
 2017-10-24 DariusIII
+	* Chg: Use AudioData model in API.php
 	* Chg: Add spatie/laravel-fractal for future API usage
 2017-10-20 DariusIII
 	* Chg: Update laravel/framework, fxp/composer-asset-plugin

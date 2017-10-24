@@ -21,6 +21,7 @@
 
 namespace nntmux\http;
 
+use App\Models\AudioData;
 use nntmux\Groups;
 use nntmux\Category;
 use nntmux\utility\Utility;
@@ -60,13 +61,8 @@ class API extends Capabilities
         if ($releases && count($releases)) {
             foreach ($releases as $key => $release) {
                 if (isset($release['id'])) {
-                    $language = $this->pdo->queryOneRow(
-                        "
-						SELECT audiolanguage
-						FROM audio_data
-						WHERE releases_id = {$release['id']}"
-                    );
-                    if ($language !== false) {
+                    $language = AudioData::query()->where('releases_id', $release['id'])->first(['audiolanguage']);
+                    if ($language !== null) {
                         $releases[$key]['searchname'] = $releases[$key]['searchname'].' '.$language['audiolanguage'];
                     }
                 }
