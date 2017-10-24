@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Zizaco\Entrust\Traits\EntrustUserTrait;
 
 class User extends Authenticatable
 {
     use Notifiable;
+    use EntrustUserTrait;
 
     /**
      * @var string
@@ -96,5 +98,21 @@ class User extends Authenticatable
             $user->download()->delete();
             $user->request()->delete();
         });
+    }
+
+    public function roles()
+    {
+    }
+
+    public function hasRole($name, $requireAll = false)
+    {
+    }
+
+    public function can($permission, $requireAll = false)
+    {
+    }
+
+    public function ability($roles, $permissions, $options = [])
+    {
     }
 }

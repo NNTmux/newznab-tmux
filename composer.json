@@ -145,7 +145,8 @@
     "smarty/smarty": "~3.1",
     "spatie/laravel-fractal": "^5.2",
     "vlucas/phpdotenv": "^2.4",
-    "yadakhov/insert-on-duplicate-key": "^1.2"
+    "yadakhov/insert-on-duplicate-key": "^1.2",
+    "zizaco/entrust": "5.2.x-dev"
   },
 
   "require-dev": {
