@@ -192,7 +192,6 @@ class Users
         UserRequest::query()->where('users_id', $userID)->delete();
     }
 
-
     public function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '')
     {
         $this->clearApiRequests(false);
