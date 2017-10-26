@@ -1042,9 +1042,11 @@ class Users
     public function getCategoryExclusion($userID): array
     {
         $ret = [];
-        $categories = $this->pdo->query(sprintf('SELECT categories_id FROM user_excluded_categories WHERE users_id = %d', $userID));
-        foreach ($categories as $category) {
-            $ret[] = $category['categories_id'];
+        $categories = User::query()->where('id', $userID)->first();
+        if ($categories !== null) {
+            foreach ($categories->excludedCategory as $category) {
+                $ret[] = $category['categories_id'];
+            }
         }
 
         return $ret;
@@ -1056,16 +1058,15 @@ class Users
      * @param int $userID ID of the user.
      *
      * @return array
+     * @throws \Exception
      */
     public function getCategoryExclusionNames($userID): array
     {
-        $data = $this->getCategoryExclusion($userID);
-        $category = new Category(['Settings' => $this->pdo]);
-        $categories = $category->getByIds($data);
+        $categories = UserExcludedCategory::with('category')->where('users_id', $userID)->get();
         $ret = [];
-        if ($categories !== false) {
+        if ($categories !== null) {
             foreach ($categories as $cat) {
-                $ret[] = $cat['title'];
+                $ret[] = $cat->category->title;
             }
         }
 

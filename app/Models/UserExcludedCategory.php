@@ -17,6 +17,6 @@ class UserExcludedCategory extends Model
 
     public function category()
     {
-        return $this->hasMany('App\Models\Category', 'categories_id');
+        return $this->belongsTo('App\Models\Category', 'categories_id');
     }
 }
