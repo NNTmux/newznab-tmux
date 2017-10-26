@@ -21,23 +21,29 @@ foreach ($variables as $key => $variable) {
     checkREQUEST($key);
 }
 
-$page->smarty->assign([
-		'username'          => $variables['username'],
-		'email'             => $variables['email'],
-		'host'              => $variables['host'],
-		'role'              => $variables['role'],
-		'role_ids'          => array_keys($roles),
-		'role_names'        => $roles,
-		'pagerquerysuffix'  => '#results',
-		'pagertotalitems'   => $page->users->getCount($variables['role']),
-		'pageroffset'       => $offset,
-		'pageritemsperpage' => ITEMS_PER_PAGE,
-		'pagerquerybase'    => WWW_TOP.'/user-list.php?ob='.$orderBy.$uSearch.'&offset=',
-		'userlist' => $page->users->getRange(
-			$offset, ITEMS_PER_PAGE, $orderBy, $variables['username'],
-			$variables['email'], $variables['host'], $variables['role'], true
-		),
-	]
+$page->smarty->assign(
+    [
+        'username'          => $variables['username'],
+        'email'             => $variables['email'],
+        'host'              => $variables['host'],
+        'role'              => $variables['role'],
+        'role_ids'          => array_keys($roles),
+        'role_names'        => $roles,
+        'pagerquerysuffix'  => '#results',
+        'pagertotalitems'   => $page->users->getCount($variables['role']),
+        'pageroffset'       => $offset,
+        'pageritemsperpage' => ITEMS_PER_PAGE,
+        'pagerquerybase'    => WWW_TOP.'/user-list.php?ob='.$orderBy.$uSearch.'&offset=',
+        'userlist' => $page->users->getRange(
+            $offset,
+            ITEMS_PER_PAGE,
+            $orderBy,
+            $variables['username'],
+            $variables['email'],
+            $variables['host'],
+            $variables['role']
+        ),
+    ]
 );
 
 $page->users->updateExpiredRoles('Role changed', 'Your role has expired and has been downgraded to user');

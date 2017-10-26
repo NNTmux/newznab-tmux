@@ -192,57 +192,35 @@ class Users
         UserRequest::query()->where('users_id', $userID)->delete();
     }
 
-    /**
-     * Get all users / extra data from other tables.
-     *
-     * @param        $start
-     * @param        $offset
-     * @param        $orderBy
-     * @param string $userName
-     * @param string $email
-     * @param string $host
-     * @param string $role
-     * @param bool   $apiRequests
-     *
-     * @return array
-     * @throws \Exception
-     */
-    public function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '', $apiRequests = false): array
+
+    public function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '')
     {
-        if ($apiRequests) {
-            $this->clearApiRequests(false);
-            $query = "
-				SELECT users.*, user_roles.name AS rolename, COUNT(user_requests.id) AS apirequests
-				FROM users
-				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
-				LEFT JOIN user_requests ON user_requests.users_id = users.id
-				WHERE users.id != 0 %s %s %s %s
-				AND email != 'sharing@nZEDb.com'
-				GROUP BY users.id
-				ORDER BY %s %s %s";
-        } else {
-            $query = '
-				SELECT users.*, user_roles.name AS rolename
-				FROM users
-				INNER JOIN user_roles ON user_roles.id = users.user_roles_id
-				WHERE 1=1 %s %s %s %s
-				ORDER BY %s %s %s';
-        }
+        $this->clearApiRequests(false);
 
         $order = $this->getBrowseOrder($orderBy);
 
-        return $this->pdo->query(
-            sprintf(
-                $query,
-                ($userName !== '' ? ('AND users.username '.$this->pdo->likeString($userName)) : ''),
-                ($email !== '' ? ('AND users.email '.$this->pdo->likeString($email)) : ''),
-                ($host !== '' ? ('AND users.host '.$this->pdo->likeString($host)) : ''),
-                ($role !== '' ? ('AND users.user_roles_id = '.$role) : ''),
-                $order[0],
-                $order[1],
-                ($start === false ? '' : ('LIMIT '.$offset.' OFFSET '.$start))
-            )
-        );
+        $users = User::query()->with('role', 'request')->where('id', '!=', 0)->groupBy('id')->orderBy($order[0], $order[1])->withCount('request as apirequests');
+        if ($userName !== '') {
+            $users->where('username', $userName);
+        }
+
+        if ($email !== '') {
+            $users->where('email', $email);
+        }
+
+        if ($host !== '') {
+            $users->where('host', $host);
+        }
+
+        if ($role !== '') {
+            $users->where('user_roles_id', $role);
+        }
+
+        if ($start !== false) {
+            $users->limit($offset)->offset($start);
+        }
+
+        return $users->get();
     }
 
     /**

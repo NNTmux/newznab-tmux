@@ -74,7 +74,7 @@
 		</tr>
 
 
-		{foreach from=$userlist item=user}
+		{foreach $userlist as $user}
 			<tr class="{cycle values=",alt"}">
 				<td><a title="Edit user" href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.id}">{$user.username}</a>
 				</td>
@@ -91,7 +91,7 @@
 								   href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.id}#notes"><img
 								src="{$smarty.const.WWW_THEMES}/shared/images/icons/{if $user.notes|count_characters > 0}note_edit.png{else}note_add.png{/if}"
 								alt=""/></a></td>
-				<td>{$user.rolename}</td>
+				<td>{$user->role->name}</td>
 				<td>{if !empty($user.rolechangedate)}{$user.rolechangedate}{/if}</td>
 				<td>{if $user.user_roles_id !="2"}<a class="confirm_action"
 										   href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">delete</a>{/if}

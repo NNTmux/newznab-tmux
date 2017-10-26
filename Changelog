@@ -1,4 +1,5 @@
 2017-10-26 DariusIII
+	* Chg: Use model relations for admin users list display
 	* Chg: Update Users class deleteRole function to use User model completely
 	* Chg: Update UserExcludedCategory, Category models and Users class to use their relationships.
 	* Chg: Update laravel/framework to 5.5.19
