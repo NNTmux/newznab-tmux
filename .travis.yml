@@ -29,14 +29,6 @@ addons:
       packages:
       - curl
 
-before_install:
-    - composer validate
-
-install:
-    - yes '' | pecl install imagick
-    # Install composer packages.
-    - composer install --prefer-dist
-
 before_script:
      # Create mysql database and user.
      - mysql -u root -e "SET GLOBAL innodb_file_per_table = 1;"
@@ -58,6 +50,14 @@ before_script:
      - sudo chmod -R 777 /home/travis/
      # Configure environment settings
      - cp .env.travis .env
+
+before_install:
+     - composer validate
+
+install:
+     - yes '' | pecl install imagick
+     # Install composer packages.
+     - composer install --prefer-dist
 
 script:
    phpunit
