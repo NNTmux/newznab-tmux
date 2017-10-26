@@ -1305,19 +1305,20 @@ class Users
 
     /**
      * @param $id
-     *
-     * @return bool|\PDOStatement
+     * @return mixed
      */
     public function deleteRole($id)
     {
-        $res = $this->pdo->query(sprintf('SELECT id FROM users WHERE user_roles_id = %d', $id));
+        $res = User::query()->where('user_roles_id', $id)->get(['id']);
         if (count($res) > 0) {
-            $userids = [];
+            $userIds = [];
             foreach ($res as $user) {
-                $userids[] = $user['id'];
+                $userIds[] = $user['id'];
             }
-            $defaultrole = $this->getDefaultRole();
-            $this->pdo->queryExec(sprintf('UPDATE users SET user_roles_id = %d WHERE id IN (%s)', $defaultrole['id'], implode(',', $userids)));
+            $defaultRole = $this->getDefaultRole();
+            if ($defaultRole !== null) {
+                User::query()->whereIn('id', $userIds)->update(['user_roles_id' => $defaultRole->id]);
+            }
         }
 
         return UserRole::query()->where('id', $id)->delete();
