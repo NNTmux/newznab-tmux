@@ -24,7 +24,7 @@
 					{$result.description}
 			</td>
 			<td class="less">{$result.last_updated|timeago} ago</td>
-			<td class="less">{$result.num_releases}</td>
+			<td class="less">{$result->release->count()}</td>
 		</tr>
 		{/if}
 	{/foreach}
