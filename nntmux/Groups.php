@@ -209,7 +209,7 @@ class Groups
      */
     public function getRange($start = false, $num = -1, $groupname = '', $active = -1)
     {
-        $groups = Group::query()->with('release.id')->groupBy(['id'])->orderBy('name');
+        $groups = Group::query()->groupBy(['id'])->orderBy('name');
 
         if ($groupname !== '') {
             $groups->where('name', 'LIKE', $groupname);
