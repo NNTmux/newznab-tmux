@@ -161,7 +161,7 @@ class Releases
     {
         return $this->pdo->query(
             sprintf(
-                "SELECT r.id, r.searchname, r.guid, r.totalpart, r.postdate, r.adddate, r.grabs, CONCAT(cp.title, ' > ', c.title) AS category_name
+                "SELECT r.id, r.searchname, r.size, r.guid, r.totalpart, r.postdate, r.adddate, r.grabs, CONCAT(cp.title, ' > ', c.title) AS category_name
 				FROM releases r
 				LEFT JOIN categories c ON c.id = r.categories_id
 				LEFT JOIN categories cp ON cp.id = c.parentid
