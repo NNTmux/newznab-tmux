@@ -27,7 +27,7 @@
 								</thead>
 								<tbody>
 								{foreach $results as $result}
-									{if $result.num_releases > 0}
+									{if $result->count() > 0}
 										<tr>
 											<td>
 												<a title="Browse releases from {$result.name|replace:"alt.binaries":"a.b"}"
