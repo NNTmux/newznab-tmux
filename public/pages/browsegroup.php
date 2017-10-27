@@ -8,7 +8,7 @@ use nntmux\Groups;
 
 $groups = new Groups(['Settings' => $page->settings]);
 
-$grouplist = $groups->getRange();
+$grouplist = $groups->getRange(false, false, '', true);
 $page->smarty->assign('results', $grouplist);
 
 $page->meta_title = 'Browse Groups';

@@ -1,3 +1,5 @@
+2017-10-27 DariusIII
+	* Chg: Update Groups class getRange function, remove releases count from browse groups page
 2017-10-26 DariusIII
 	* Chg: Update getid3
 	* Chg: Use model relations for admin users list display
