@@ -207,6 +207,7 @@ class Groups
      *
      * @return mixed
      */
+
     /**
      * Gets all groups and associated release counts.
      *
