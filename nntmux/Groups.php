@@ -205,8 +205,6 @@ class Groups
      * @param string $groupname The groupname we want if any
      * @param bool|int $active The status of the group we want if any
      * @return mixed
-     * @internal param int $num The limit of the query
-     * @internal param bool|int $start The offset of the query or false for no offset
      */
     public function getRange($offset = false, $limit = false, $groupname = '', $active = false)
     {
