@@ -1,8 +1,3 @@
-2017-10-27 DariusIII
-	* Fix: Fix groups browsing page in all themes
-	* Chg: Remove relationship loading from Groups class getRange function
-	* Fix: Fix releases count on admin group-list page
-	* Chg: Update Groups class getRange function
 2017-10-26 DariusIII
 	* Chg: Update getid3
 	* Chg: Use model relations for admin users list display

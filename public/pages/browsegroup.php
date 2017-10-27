@@ -9,10 +9,6 @@ use nntmux\Groups;
 $groups = new Groups(['Settings' => $page->settings]);
 
 $grouplist = $groups->getRange();
-foreach ($grouplist as $group) {
-    $group['num_releases'] = $group->release->count();
-}
-
 $page->smarty->assign('results', $grouplist);
 
 $page->meta_title = 'Browse Groups';

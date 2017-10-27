@@ -200,29 +200,41 @@ class Groups
     /**
      * Gets all groups and associated release counts.
      *
-     * @param bool $offset
-     * @param bool $limit
-     * @param string $groupname The groupname we want if any
-     * @param bool|int $active The status of the group we want if any
+     * @param bool|int $start     The offset of the query or false for no offset
+     * @param int      $num       The limit of the query
+     * @param string   $groupname The groupname we want if any
+     * @param int      $active    The status of the group we want if any
+     *
      * @return mixed
      */
-    public function getRange($offset = false, $limit = false, $groupname = '', $active = false)
+    public function getRange($start = false, $num = -1, $groupname = '', $active = -1)
     {
-        $groups = Group::query()->groupBy(['id'])->orderBy('name');
-
-        if ($groupname !== '') {
-            $groups->where('name', 'LIKE', $groupname);
-        }
-
-        if ($active === true) {
-            $groups->where('active', '=', 1);
-        }
-
-        if ($offset !== false) {
-            $groups->limit($limit)->offset($offset);
-        }
-
-        return $groups->get();
+        return $this->pdo->query(
+            sprintf(
+                '
+				SELECT g.*,
+				COALESCE(COUNT(r.id), 0) AS num_releases
+				FROM groups g
+				LEFT OUTER JOIN releases r ON r.groups_id = g.id
+				WHERE 1=1 %s %s
+				GROUP BY g.id
+				ORDER BY g.name ASC
+				%s',
+                (
+                    $groupname !== ''
+                    ?
+                    sprintf(
+                        'AND g.name %s',
+                        $this->pdo->likeString($groupname, true, true)
+                    )
+                    : ''
+                ),
+                $active > -1 ? sprintf('AND g.active = %d', $active) : '',
+                $start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start
+            ),
+            true,
+            NN_CACHE_EXPIRY_SHORT
+        );
     }
 
     /**
