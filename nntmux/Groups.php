@@ -209,32 +209,21 @@ class Groups
      */
     public function getRange($start = false, $num = -1, $groupname = '', $active = -1)
     {
-        return $this->pdo->query(
-            sprintf(
-                '
-				SELECT g.*,
-				COALESCE(COUNT(r.id), 0) AS num_releases
-				FROM groups g
-				LEFT OUTER JOIN releases r ON r.groups_id = g.id
-				WHERE 1=1 %s %s
-				GROUP BY g.id
-				ORDER BY g.name ASC
-				%s',
-                (
-                    $groupname !== ''
-                    ?
-                    sprintf(
-                        'AND g.name %s',
-                        $this->pdo->likeString($groupname, true, true)
-                    )
-                    : ''
-                ),
-                $active > -1 ? sprintf('AND g.active = %d', $active) : '',
-                $start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start
-            ),
-            true,
-            NN_CACHE_EXPIRY_SHORT
-        );
+        $groups = Group::query()->with('release')->groupBy(['id'])->orderBy('name');
+
+        if ($groupname !== '') {
+            $groups->where('name', 'LIKE', $groupname);
+        }
+
+        if ($active > -1) {
+            $groups->where('active', $active);
+        }
+
+        if ($start !== false) {
+            $groups->limit($num)->offset($start);
+        }
+
+        return $groups->get();
     }
 
     /**
