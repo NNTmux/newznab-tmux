@@ -7,9 +7,9 @@ use nntmux\Logger;
 $page = new AdminPage();
 $page->title = 'View Logs';
 
-$type = isset($_GET['t']) ? $_GET['t'] : 'all';
+$type = $_GET['t'] ?? 'all';
 $page->smarty->assign('type', $type);
-$offset = isset($_GET['offset']) ? $_GET['offset'] : 0;
+$offset = $_GET['offset'] ?? 0;
 
 $logPath = Logger::getDefaultLogPaths();
 $logPath = $logPath['LogPath'];
@@ -17,27 +17,27 @@ $logPath = $logPath['LogPath'];
 $regex = false;
 
 switch ($type) {
-	case 'info':
-		$regex = '/\[INFO\]/';
-		break;
-	case 'notice':
-		$regex = '/\[NOTICE\]/';
-		break;
-	case 'warning':
-		$regex = '/\[WARN\]/';
-		break;
-	case 'error':
-		$regex = '/\[ERROR\]/';
-		break;
-	case 'fatal':
-		$regex = '/\[FATAL\]/';
-		break;
-	case 'sql':
-		$regex = '/\[SQL\]/';
-		break;
-	case 'all':
-	default:
-		break;
+    case 'info':
+        $regex = '/\[INFO\]/';
+        break;
+    case 'notice':
+        $regex = '/\[NOTICE\]/';
+        break;
+    case 'warning':
+        $regex = '/\[WARN\]/';
+        break;
+    case 'error':
+        $regex = '/\[ERROR\]/';
+        break;
+    case 'fatal':
+        $regex = '/\[FATAL\]/';
+        break;
+    case 'sql':
+        $regex = '/\[SQL\]/';
+        break;
+    case 'all':
+    default:
+        break;
 }
 
 $data = $file = false;
@@ -67,11 +67,11 @@ if ($file !== false) {
 }
 
 $page->smarty->assign(
-	[
-		'data' => $data,
-		'types' => ['all', 'info', 'notice', 'warning', 'error', 'fatal', 'sql'],
-		'path'  => NN_WWW.'smarty.php',
-	]
+    [
+        'data' => $data,
+        'types' => ['all', 'info', 'notice', 'warning', 'error', 'fatal', 'sql'],
+        'path'  => NN_WWW.'smarty.php',
+    ]
 );
 
 $page->smarty->assign('pagertotalitems', $total);
