@@ -200,14 +200,15 @@ class Groups
     /**
      * Gets all groups and associated release counts.
      *
-     * @param bool|int $start     The offset of the query or false for no offset
-     * @param int      $num       The limit of the query
-     * @param string   $groupname The groupname we want if any
-     * @param int      $active    The status of the group we want if any
-     *
+     * @param bool $offset
+     * @param bool $limit
+     * @param string $groupname The groupname we want if any
+     * @param bool|int $active The status of the group we want if any
      * @return mixed
+     * @internal param int $num The limit of the query
+     * @internal param bool|int $start The offset of the query or false for no offset
      */
-    public function getRange($start = false, $num = -1, $groupname = '', $active = -1)
+    public function getRange($offset = false, $limit = false, $groupname = '', $active = false)
     {
         $groups = Group::query()->groupBy(['id'])->orderBy('name');
 
@@ -215,12 +216,12 @@ class Groups
             $groups->where('name', 'LIKE', $groupname);
         }
 
-        if ($active > -1) {
-            $groups->where('active', $active);
+        if ($active === true) {
+            $groups->where('active', '=', 1);
         }
 
-        if ($start !== false) {
-            $groups->limit($num)->offset($start);
+        if ($offset !== false) {
+            $groups->limit($limit)->offset($offset);
         }
 
         return $groups->get();
