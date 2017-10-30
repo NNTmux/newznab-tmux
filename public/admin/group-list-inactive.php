@@ -28,7 +28,7 @@ $page->smarty->assign('pagerquerybase', WWW_TOP.'/group-list-inactive.php?'.$gro
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$grouplist = $groups->getRange($offset, ITEMS_PER_PAGE, $gname, 0);
+$grouplist = $groups->getRange($offset, ITEMS_PER_PAGE, $gname);
 
 $page->smarty->assign('grouplist', $grouplist);
 
