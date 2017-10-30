@@ -241,7 +241,7 @@ class Users
             case 'host':
                 $orderField = 'host';
                 break;
-            case 'created_at':
+            case 'createdat':
                 $orderField = 'created_at';
                 break;
             case 'lastlogin':
