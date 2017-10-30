@@ -160,6 +160,7 @@ class Categorize extends Category
                         case $this->isHDTV():
                         case $this->isSDTV():
                         case $this->isPC():
+                        case $this->isSportTV():
                             break;
                         default:
                             return false;
