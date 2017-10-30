@@ -1,4 +1,5 @@
 2017-10-30 DariusIII
+	* Chg: Update getCategoryOthersGroup function to use already defined constant of other groups
 	* Fix: Fix user ordering by join date in admin users-list
 	* Fix: Fix display of active and inactive groups in admin group list page
 2017-10-27 DariusIII

@@ -192,17 +192,7 @@ class Category
     {
         return implode(
             ',',
-            [
-                self::BOOKS_UNKNOWN,
-                self::GAME_OTHER,
-                self::MOVIE_OTHER,
-                self::MUSIC_OTHER,
-                self::PC_PHONE_OTHER,
-                self::TV_OTHER,
-                self::OTHER_HASHED,
-                self::XXX_OTHER,
-                self::OTHER_MISC,
-            ]
+            self::OTHERS_GROUP
         );
     }
 
