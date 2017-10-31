@@ -193,8 +193,8 @@ class ReleaseComments
     public function getCommentsRange($start, $num)
     {
         $range = ReleaseComment::query()
-            ->select(['*', 'r.guid'])
-            ->leftJoin('releases as r', 'r.id', '=', 'release_comments.releases_id')
+            ->select(['release_comments.*', 'releases.guid'])
+            ->leftJoin('releases', 'releases.id', '=', 'release_comments.releases_id')
             ->orderBy('release_comments.created_at', 'desc');
         if ($start !== false) {
             $range->limit($num)->offset($start);
