@@ -15,12 +15,12 @@ class CreateReleaseCommentsTable extends Migration
         Schema::create('release_comments', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('releases_id')->unsigned()->index('ix_releasecomment_releases_id')->comment('FK to releases.id');
-            $table->string('text', 2000)->default('\'\'');
+            $table->string('text', 2000)->default('');
             $table->boolean('isvisible')->default(1);
             $table->boolean('issynced')->default(0);
             $table->string('gid', 32)->nullable()->default(null);
             $table->string('cid', 32)->nullable()->default(null);
-            $table->string('text_hash', 32)->default('\'\'');
+            $table->string('text_hash', 32)->default('');
             $table->string('username')->default('\'\'');
             $table->integer('users_id')->unsigned()->index('ix_releasecomment_userid');
             $table->timestamps();
@@ -29,7 +29,7 @@ class CreateReleaseCommentsTable extends Migration
             $table->string('shareid', 40)->default('\'\'');
             $table->string('siteid', 40)->default('\'\'');
             $table->bigInteger('sourceid')->unsigned()->nullable()->default(null);
-            $table->binary('nzb_guid', 16)->default('\'0$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$\'');
+            $table->binary('nzb_guid', 16)->default('0$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$');
             $table->unique(['text_hash', 'releases_id'], 'ix_release_comments_hash_releases_id');
         });
     }

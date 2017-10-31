@@ -85,6 +85,14 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\UserExcludedCategory', 'users_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function comment()
+    {
+        return $this->hasMany('App\Models\ReleaseComment', 'users_id');
+    }
+
     protected static function boot(): void
     {
         parent::boot();
