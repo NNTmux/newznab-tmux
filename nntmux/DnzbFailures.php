@@ -3,8 +3,8 @@
 namespace nntmux;
 
 use App\Models\Release;
-use Illuminate\Support\Facades\DB;
 use App\Models\DnzbFailure;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class DnzbFailures.
