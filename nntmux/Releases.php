@@ -666,7 +666,6 @@ class Releases
         $param1 = false;
         $param2 = $identifiers['g'];
 
-
         // Delete from DB.
         $query = $this->pdo->Prepare('CALL delete_release(:is_numeric, :identifier)');
         $query->bindParam(':is_numeric', $param1, \PDO::PARAM_BOOL);
