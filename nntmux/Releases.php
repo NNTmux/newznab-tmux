@@ -628,11 +628,9 @@ class Releases
      * Delete multiple releases, or a single by ID.
      *
      * @param array|int|string $list   Array of GUID or ID of releases to delete.
-     * @param bool             $isGUID Are the identifiers GUID or ID?
-     *
      * @throws \Exception
      */
-    public function deleteMultiple($list): voiddeleteMultiple
+    public function deleteMultiple($list): void
     {
         $list = (array) $list;
 
@@ -651,7 +649,7 @@ class Releases
      * @param NZB          $nzb
      * @param ReleaseImage $releaseImage
      */
-    public function deleteSingle($identifiers, $nzb, $releaseImage): void
+    public function deleteSingle($identifiers, $nzb, $releaseImage)
     {
         // Delete NZB from disk.
         $nzbPath = $nzb->NZBPath($identifiers['g']);
