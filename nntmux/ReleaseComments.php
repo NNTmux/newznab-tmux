@@ -185,12 +185,12 @@ class ReleaseComments
     /**
      * Get release_comments rows by limit.
      *
+     *
      * @param $start
      * @param $num
-     *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getCommentsRange($start, $num): array
+    public function getCommentsRange($start, $num)
     {
         $range = ReleaseComment::query()
             ->select(['release_comments.*', 'r.guid'])
