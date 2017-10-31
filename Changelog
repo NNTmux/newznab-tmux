@@ -1,4 +1,5 @@
 2017-10-31 DariusIII
+	* Chg: Update used construct for DnzbFailures class call
 	* Chg: Update release edit and deletion to use guid
 	* Chg: Change PHPDOC blocks to properly show return types
 	* Chg: Use only the guid for release deletion

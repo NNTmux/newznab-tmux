@@ -10,7 +10,7 @@ if (! $page->users->isLoggedIn()) {
 
 $movie = new XXX();
 $cat = new Category();
-$fail = new DnzbFailures(['Settings' => $page->settings]);
+$fail = new DnzbFailures();
 
 $moviecats = $cat->getChildren(Category::XXX_ROOT);
 $mtmp = [];

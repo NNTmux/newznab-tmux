@@ -25,7 +25,7 @@ if (isset($_GET['id'])) {
     $releases = new Releases(['Settings' => $page->settings]);
     $rc = new ReleaseComments;
     $re = new ReleaseExtra;
-    $df = new DnzbFailures(['Settings' => $page->settings]);
+    $df = new DnzbFailures();
     $data = $releases->getByGuid($_GET['id']);
     $user = $page->users->getById($page->users->currentUserId());
     $cpapi = $user['cp_api'];

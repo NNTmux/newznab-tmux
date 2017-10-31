@@ -10,7 +10,7 @@ use nntmux\DnzbFailures;
 
 $book = new Books(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
-$fail = new DnzbFailures(['Settings' => $page->settings]);
+$fail = new DnzbFailures();
 
 $boocats = $cat->getChildren(Category::BOOKS_ROOT);
 $btmp = [];

@@ -12,7 +12,7 @@ if (! $page->users->isLoggedIn()) {
 $music = new Music(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
-$fail = new DnzbFailures(['Settings' => $page->settings]);
+$fail = new DnzbFailures();
 
 $musiccats = $cat->getChildren(Category::MUSIC_ROOT);
 $mtmp = [];

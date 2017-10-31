@@ -6,7 +6,7 @@ use nntmux\DnzbFailures;
 
 $movie = new Movie(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
-$fail = new DnzbFailures(['Settings' => $page->settings]);
+$fail = new DnzbFailures();
 
 if (! $page->users->isLoggedIn()) {
     $page->show403();

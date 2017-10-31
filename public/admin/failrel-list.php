@@ -6,7 +6,7 @@ use nntmux\DnzbFailures;
 
 $page = new AdminPage();
 
-$failed = new DnzbFailures(['Settings' => $page->pdo]);
+$failed = new DnzbFailures();
 
 $page->title = 'Failed Releases List';
 

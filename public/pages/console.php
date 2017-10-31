@@ -12,7 +12,7 @@ use nntmux\DnzbFailures;
 $console = new Console(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
-$fail = new DnzbFailures(['Settings' => $page->settings]);
+$fail = new DnzbFailures();
 
 $concats = $cat->getChildren(Category::GAME_ROOT);
 $ctmp = [];
