@@ -36,8 +36,8 @@ if ($page->users->isLoggedIn()) {
 }
 
 if (isset($_GET['guid'], $uid, $rssToken) && is_numeric($uid)) {
-    $alt = (new DnzbFailures(['Settings' => $page->settings]))->getAlternate($_GET['guid'], $uid);
-    if ($alt === false) {
+    $alt = (new DnzbFailures())->getAlternate($_GET['guid'], $uid);
+    if ($alt === null) {
         header('X-DNZB-RCode: 404');
         header('X-DNZB-RText: No NZB found for alternate match.');
         $page->show404();
