@@ -1,4 +1,5 @@
 2017-10-31 DariusIII
+	* Chg: Change PHPDOC blocks to properly show return types
 	* Chg: Use only the guid for release deletion
 	* Chg: Update failed.php and DnzbFailures class, remove nntmux/db/DB usage from the class
 2017-10-30 DariusIII

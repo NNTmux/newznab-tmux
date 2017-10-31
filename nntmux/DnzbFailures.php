@@ -15,7 +15,7 @@ class DnzbFailures
      * @var array Class instances.
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
         //
     }
@@ -72,11 +72,10 @@ class DnzbFailures
     /**
      * Retrieve alternate release with same or similar searchname.
      *
-     * @param string $guid
-     * @param string $userid
      *
-     * @return string|array
-     * @throws \Exception
+     * @param $guid
+     * @param $userid
+     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
     public function getAlternate($guid, $userid)
     {
