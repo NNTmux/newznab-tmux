@@ -2,6 +2,9 @@
 
 namespace nntmux;
 
+use App\Models\Release;
+use App\Models\ReleaseComment;
+use App\Models\User;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Settings;
@@ -18,7 +21,9 @@ class ReleaseComments
 
     /**
      * ReleaseComments constructor.
+     *
      * @param null $settings
+     * @throws \Exception
      */
     public function __construct($settings = null)
     {
@@ -28,13 +33,13 @@ class ReleaseComments
     /**
      * Get a comment by id.
      *
-     * @param $id
      *
-     * @return array|bool
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getCommentById($id)
     {
-        return $this->pdo->queryOneRow(sprintf('SELECT * FROM release_comments WHERE id = %d', $id));
+        return ReleaseComment::query()->where('id', $id)->first();
     }
 
     /**
@@ -47,18 +52,6 @@ class ReleaseComments
     public function getCommentsByGid($gid): array
     {
         return $this->pdo->query(sprintf("SELECT rc.id, text, created_at, updated_at, sourceid, CASE WHEN sourceid = 0 THEN (SELECT username FROM users WHERE id = users_id) ELSE username END AS username, CASE WHEN sourceid = 0 THEN (SELECT user_roles_id FROM users WHERE id = users_id) ELSE '-1' END AS role, CASE WHEN sourceid =0 THEN (SELECT r.name AS rolename FROM users AS u LEFT JOIN user_roles AS r ON r.id = u.user_roles_id WHERE u.id = users_id) ELSE (SELECT description AS rolename FROM spotnabsources WHERE id = sourceid) END AS rolename FROM release_comments rc WHERE isvisible = 1  AND gid = %s AND (users_id IN (SELECT id FROM users) OR rc.username IS NOT NULL) ORDER BY created_at DESC LIMIT 100", $this->pdo->escapeString($gid)));
-    }
-
-    /**
-     * Get all comments for a release.GUID.
-     *
-     * @param $guid
-     *
-     * @return array
-     */
-    public function getCommentsByGuid($guid): array
-    {
-        return $this->pdo->query(sprintf('SELECT rc.id, text, created_at, updated_at, sourceid, CASE WHEN sourceid = 0 THEN (SELECT username FROM users WHERE id = users_id) ELSE username END AS username FROM release_comments rc LEFT JOIN releases r ON r.gid = rc.gid WHERE isvisible = 1 AND guid = %s AND (users_id IN (SELECT id FROM users) OR rc.username IS NOT NULL) ORDER BY created_at DESC LIMIT 100', $this->pdo->escapeString($guid)));
     }
 
     /**
@@ -111,7 +104,7 @@ class ReleaseComments
     {
         $res = $this->getCommentById($id);
         if ($res) {
-            $this->pdo->queryExec(sprintf('DELETE FROM release_comments WHERE id = %d', $id));
+            ReleaseComment::query()->where('id', $id)->delete();
             $this->updateReleaseCommentCount($res['gid']);
         }
     }
@@ -125,7 +118,10 @@ class ReleaseComments
     {
         $res = $this->getCommentById($id);
         if ($res) {
-            $this->pdo->queryExec(sprintf('DELETE rc.* FROM release_comments rc JOIN releases r ON r.gid = rc.gid WHERE r.id = %d', $id));
+            ReleaseComment::query()
+                ->join('releases as r', 'r.gid', '=', 'release_comments.gid')
+                ->where('releases.id', $id)
+                ->delete();
             $this->updateReleaseCommentCount($res['gid']);
         }
     }
@@ -150,39 +146,37 @@ class ReleaseComments
     /**
      * Add a release_comments row.
      *
+     *
      * @param $id
      * @param $gid
      * @param $text
      * @param $userid
      * @param $host
-     *
-     * @return bool|int
+     * @return int
      * @throws \Exception
      */
-    public function addComment($id, $gid, $text, $userid, $host)
+    public function addComment($id, $gid, $text, $userid, $host): int
     {
         if ((int) Settings::settingValue('..storeuserips') !== 1) {
             $host = '';
         }
 
-        $username = $this->pdo->queryOneRow(sprintf('SELECT username FROM users WHERE id = %d', $userid));
-        $username = ($username === false ? 'ANON' : $username['username']);
+        $username = User::query()->where('id', $userid)->first(['username']);
+        $username = ($username === null ? 'ANON' : $username['username']);
 
-        $comid = $this->pdo->queryInsert(
-            sprintf(
-                '
-				INSERT INTO release_comments (releases_id, gid, text, users_id, created_at, updated_at, host, username)
-				VALUES (%d, %s, %s, %d, %s, %s,  %s, %s)',
-                $id,
-                $this->pdo->escapeString($gid),
-                $this->pdo->escapeString($text),
-                $userid,
-                Carbon::now(),
-                Carbon::now(),
-                $this->pdo->escapeString($host),
-                $this->pdo->escapeString($username)
-            )
-        );
+        $comid = ReleaseComment::query()
+            ->insertGetId(
+                [
+                    'releases_id' => $id,
+                    'gid' => $gid,
+                    'text' => $text,
+                    'users_id' => $userid,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                    'host' => $host,
+                    'username' => $username
+                ]
+            );
         $this->updateReleaseCommentCount($id);
 
         return $comid;
@@ -198,16 +192,14 @@ class ReleaseComments
      */
     public function getCommentsRange($start, $num): array
     {
-        return $this->pdo->query(
-            sprintf(
-                '
-				SELECT rc.*, r.guid
-				FROM release_comments rc
-				LEFT JOIN releases r on r.id = rc.releases_id
-				ORDER BY rc.created_at DESC %s',
-                ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-            )
-        );
+        $range = ReleaseComment::query()
+            ->select(['release_comments.*', 'r.guid'])
+            ->leftJoin('releases as r', 'r.id', '=', 'release_comments.releases_id')
+            ->orderBy('release_comments.created_at', 'desc');
+        if ($start !== false) {
+            $range->limit($num)->offset($start);
+        }
+        return $range->get();
     }
 
     /**
@@ -217,41 +209,45 @@ class ReleaseComments
      */
     public function updateReleaseCommentCount($gid): void
     {
-        $this->pdo->queryExec(sprintf('UPDATE releases
-				SET comments = (SELECT count(id) FROM release_comments WHERE release_comments.gid = releases.gid AND isvisible = 1)
-				WHERE releases.gid = %s', $this->pdo->escapeString($gid)));
+        $commentCount = ReleaseComment::query()->where('gid', '=', 'releases.gid')->where('isvisible', '=', 1)->count(['id']);
+        Release::query()->where('gid', $gid)->update(['comments' => $commentCount]);
     }
 
     /**
      * Get a count of all comments for a user.
      *
      * @param $uid
-     * @return mixed
+     * @return int
      */
-    public function getCommentCountForUser($uid)
+    public function getCommentCountForUser($uid): int
     {
-        $res = $this->pdo->queryOneRow(sprintf('SELECT count(id) AS num FROM release_comments WHERE users_id = %d AND isvisible = 1', $uid));
+        $res = ReleaseComment::query()->where(['users_id' => $uid, 'isvisible' => 1])->count(['id']);
 
-        return $res['num'];
+        return $res;
     }
 
     /**
      * Get comments for a user by limit.
      *
+     *
      * @param $uid
      * @param $start
      * @param $num
-     *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getCommentsForUserRange($uid, $start, $num): array
+    public function getCommentsForUserRange($uid, $start, $num)
     {
-        if ($start === false) {
-            $limit = '';
-        } else {
-            $limit = ' LIMIT '.$start.','.$num;
+        $comments = ReleaseComment::query()
+            ->select(['release_comments.*', 'r.guid', 'r.searchname', 'u.username'])
+            ->join('releases as r', 'r.id', '=', 'release_comments.releases_id')
+            ->leftJoin('users as u', 'u.id', '=', 'release_comments.users_id')
+            ->where('users_id', $uid)
+            ->orderBy('created_at', 'desc');
+
+        if ($start !== false) {
+            $comments->limit($num)->offset($start);
         }
 
-        return $this->pdo->query(sprintf('SELECT release_comments.*, r.guid, r.searchname, users.username FROM release_comments INNER JOIN releases r ON r.id = release_comments.releases_id LEFT OUTER JOIN users ON users.id = release_comments.users_id WHERE users_id = %d ORDER BY release_comments.created_at DESC '.$limit, $uid));
+        return $comments->get();
     }
 }

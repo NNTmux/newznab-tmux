@@ -1,4 +1,5 @@
 2017-10-31 DariusIII
+	* Chg: Update ReleaseComments class to use ReleaseComment model
 	* Chg: Update ReleaseComment model and related relationships
 	* Chg: Update used construct for DnzbFailures class call
 	* Chg: Update release edit and deletion to use guid
