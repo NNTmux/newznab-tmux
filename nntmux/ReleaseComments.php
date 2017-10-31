@@ -2,12 +2,12 @@
 
 namespace nntmux;
 
-use App\Models\Release;
-use App\Models\ReleaseComment;
-use App\Models\User;
 use nntmux\db\DB;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Release;
 use App\Models\Settings;
+use App\Models\ReleaseComment;
 
 /**
  * This class handles storage and retrieval of release comments.
@@ -174,7 +174,7 @@ class ReleaseComments
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                     'host' => $host,
-                    'username' => $username
+                    'username' => $username,
                 ]
             );
         $this->updateReleaseCommentCount($id);
@@ -199,6 +199,7 @@ class ReleaseComments
         if ($start !== false) {
             $range->limit($num)->offset($start);
         }
+
         return $range->get();
     }
 
