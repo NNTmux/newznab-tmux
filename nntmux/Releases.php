@@ -632,25 +632,15 @@ class Releases
      *
      * @throws \Exception
      */
-    public function deleteMultiple($list, $isGUID = false): void
+    public function deleteMultiple($list): voiddeleteMultiple
     {
-        if (! is_array($list)) {
-            $list = [$list];
-        }
+        $list = (array) $list;
 
         $nzb = new NZB($this->pdo);
         $releaseImage = new ReleaseImage($this->pdo);
 
         foreach ($list as $identifier) {
-            if ($isGUID) {
-                $this->deleteSingle(['g' => $identifier, 'i' => false], $nzb, $releaseImage);
-            } else {
-                $release = $this->pdo->queryOneRow(sprintf('SELECT guid FROM releases WHERE id = %d', $identifier));
-                if ($release === false) {
-                    continue;
-                }
-                $this->deleteSingle(['g' => $release['guid'], 'i' => false], $nzb, $releaseImage);
-            }
+            $this->deleteSingle(['g' => $identifier, 'i' => false], $nzb, $releaseImage);
         }
     }
 
@@ -675,13 +665,9 @@ class Releases
         // Delete from sphinx.
         $this->sphinxSearch->deleteRelease($identifiers, $this->pdo);
 
-        if (isset($identifiers['i']) && $identifiers['i'] > 0) {
-            $param1 = true;
-            $param2 = $identifiers['i'];
-        } else {
-            $param1 = false;
-            $param2 = $identifiers['g'];
-        }
+        $param1 = false;
+        $param2 = $identifiers['g'];
+
 
         // Delete from DB.
         $query = $this->pdo->Prepare('CALL delete_release(:is_numeric, :identifier)');

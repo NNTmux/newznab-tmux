@@ -23,41 +23,32 @@ $page->smarty->assign('action', $action);
 $page->smarty->assign('idArr', $id);
 
 switch ($action) {
-	case 'doedit':
-	case 'edit':
-		$success = false;
-		if ($action === 'doedit') {
-		    $success = $releases->updateMulti(
-				$_POST['id'],
-				$_POST['category'],
-				$_POST['grabs'],
-				$_POST['videosid'],
-				$_POST['episodesid'],
-				$_POST['anidbid'],
-				$_POST['imdbid']);
-		}
-		$page->smarty->assign('release', $rel);
-		$page->smarty->assign('success', $success);
-		$page->smarty->assign('from', $_POST['from'] ?? '');
-		$page->smarty->assign('catlist', $category->getForSelect(false));
-		$page->content = $page->smarty->fetch('ajax_release-edit.tpl');
-		echo $page->content;
+    case 'doedit':
+    case 'edit':
+        $success = false;
+        if ($action === 'doedit') {
+            $success = $releases->updateMulti(
+                $_POST['id'],
+                $_POST['category'],
+                $_POST['grabs'],
+                $_POST['videosid'],
+                $_POST['episodesid'],
+                $_POST['anidbid'],
+                $_POST['imdbid']
+            );
+        }
+        $page->smarty->assign('release', $rel);
+        $page->smarty->assign('success', $success);
+        $page->smarty->assign('from', $_POST['from'] ?? '');
+        $page->smarty->assign('catlist', $category->getForSelect(false));
+        $page->content = $page->smarty->fetch('ajax_release-edit.tpl');
+        echo $page->content;
 
-		break;
-	case 'dodelete':
-		$is_guid = true;
-		if (is_array($_GET['id'])) {
-		    if (is_numeric($_GET['id'][0])) {
-		        $is_guid = false;
-		    }
-		} else {
-		    if (is_numeric($_GET['id'])) {
-		        $is_guid = false;
-		    }
-		}
-		$releases->deleteMultiple($_GET['id'], $is_guid);
-		break;
-	default:
-		$page->show404();
-		break;
+        break;
+    case 'dodelete':
+        $releases->deleteMultiple($_GET['id']);
+        break;
+    default:
+        $page->show404();
+        break;
 }

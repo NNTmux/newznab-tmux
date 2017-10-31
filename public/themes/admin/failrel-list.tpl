@@ -19,7 +19,7 @@
 
 		{foreach from=$releaselist item=release}
 			<tr class="{cycle values=",alt"}">
-				<td title="{$release.name}"><a href="{$smarty.const.WWW_TOP}/release-edit.php?id={$release.id}">{$release.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a></td>
+				<td title="{$release.name}"><a href="{$smarty.const.WWW_TOP}/release-edit.php?id={$release.guid}">{$release.searchname|escape:"htmlall"|wordwrap:75:"\n":true}</a></td>
 				<td class="less">{$release.category_name}</td>
 				<td class="less right">{$release.size|fsize_format:"MB"}</td>
 				<td class="less mid"><a href="release-files.php?id={$release.guid}">{$release.totalpart}</a></td>
@@ -28,7 +28,7 @@
 				<td class="less mid">{$release.grabs}</td>
 				<td>
 					{if $release.guid}<a href="{$smarty.const.WWW_TOP}/../details/{$release.guid}">view</a> |{/if}
-					<a href="{$smarty.const.WWW_TOP}/release-delete.php?id={$release.id}">delete</a></td>
+					<a href="{$smarty.const.WWW_TOP}/release-delete.php?id={$release.guid}">delete</a></td>
 			</tr>
 		{/foreach}
 
