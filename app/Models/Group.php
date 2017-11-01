@@ -23,6 +23,6 @@ class Group extends Model
 
     public function release()
     {
-        return $this->hasMany('App\Models\Release', 'groups_id');
+        return $this->hasMany(Release::class, 'groups_id');
     }
 }

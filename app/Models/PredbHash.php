@@ -36,6 +36,6 @@ class PredbHash extends Model
      */
     public function predb()
     {
-        return $this->belongsTo('App\Models\Predb', 'predb_id');
+        return $this->belongsTo(Predb::class, 'predb_id');
     }
 }

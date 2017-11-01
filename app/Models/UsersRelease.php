@@ -18,11 +18,11 @@ class UsersRelease extends Model
 
     public function user()
     {
-        return $this->belongsTo('\App\Models\User', 'users_id');
+        return $this->belongsTo(User::class, 'users_id');
     }
 
     public function release()
     {
-        return $this->belongsTo('App\Models\Release', 'releases_id');
+        return $this->belongsTo(Release::class, 'releases_id');
     }
 }

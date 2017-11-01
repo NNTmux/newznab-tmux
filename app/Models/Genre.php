@@ -22,6 +22,6 @@ class Genre extends Model
 
     public function music()
     {
-        return $this->hasMany('App\Models\MusicInfo', 'genres_id');
+        return $this->hasMany(MusicInfo::class, 'genres_id');
     }
 }

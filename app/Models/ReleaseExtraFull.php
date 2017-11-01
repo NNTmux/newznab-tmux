@@ -38,6 +38,6 @@ class ReleaseExtraFull extends Model
 
     public function release()
     {
-        return $this->belongsTo('App\Models\Release', 'releases_id');
+        return $this->belongsTo(Release::class, 'releases_id');
     }
 }

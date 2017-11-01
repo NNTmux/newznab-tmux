@@ -12,11 +12,11 @@ class RoleExcludedCategory extends Model
 
     public function role()
     {
-        return $this->belongsTo('App\Models\UserRole', 'user_roles_id');
+        return $this->belongsTo(UserRole::class, 'user_roles_id');
     }
 
     public function category()
     {
-        return $this->hasMany('App\Models\Category', 'categories_id');
+        return $this->hasMany(Category::class, 'categories_id');
     }
 }

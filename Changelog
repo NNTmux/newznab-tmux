@@ -1,4 +1,5 @@
 2017-11-01 DariusIII
+	* Chg: Update models
 	* Chg: Send 503 Service Unavailable header in showApiError function
 	* Chg: Further change some queries to ease unnecessary loading of releases table columns that are not used later
 	* Chg: Load only required columns from releases table for api searches

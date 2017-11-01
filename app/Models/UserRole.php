@@ -26,11 +26,11 @@ class UserRole extends Model
      */
     public function users()
     {
-        return $this->hasMany('App\Models\User', 'user_roles_id');
+        return $this->hasMany(User::class, 'user_roles_id');
     }
 
     public function roleExcludedCategory()
     {
-        return $this->hasMany('App\Models\RoleExcludedCategory', 'user_roles_id');
+        return $this->hasMany(RoleExcludedCategory::class, 'user_roles_id');
     }
 }

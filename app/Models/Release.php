@@ -26,7 +26,7 @@ class Release extends Model
      */
     public function group()
     {
-        return $this->belongsTo('App\Models\Group', 'groups_id');
+        return $this->belongsTo(Group::class, 'groups_id');
     }
 
     /**
@@ -34,7 +34,7 @@ class Release extends Model
      */
     public function download()
     {
-        return $this->hasMany('App\Models\UserDownload', 'releases_id');
+        return $this->hasMany(UserDownload::class, 'releases_id');
     }
 
     /**
@@ -42,12 +42,12 @@ class Release extends Model
      */
     public function userRelease()
     {
-        return $this->hasMany('App\Models\UsersRelease', 'releases_id');
+        return $this->hasMany(UsersRelease::class, 'releases_id');
     }
 
     public function file()
     {
-        return $this->hasMany('App\Models\ReleaseFile', 'releases_id');
+        return $this->hasMany(ReleaseFile::class, 'releases_id');
     }
 
     /**
@@ -55,7 +55,7 @@ class Release extends Model
      */
     public function category()
     {
-        return $this->belongsTo('App\Models\Category', 'categories_id');
+        return $this->belongsTo(Category::class, 'categories_id');
     }
 
     /**
@@ -63,7 +63,7 @@ class Release extends Model
      */
     public function predb()
     {
-        return $this->belongsTo('App\Models\Predb', 'predb_id');
+        return $this->belongsTo(Predb::class, 'predb_id');
     }
 
     /**
@@ -71,15 +71,15 @@ class Release extends Model
      */
     public function failed()
     {
-        return $this->hasMany('App\Models\DnzbFailure', 'release_id');
+        return $this->hasMany(DnzbFailure::class, 'release_id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function releaseExtra()
     {
-        return $this->hasOne('App\Models\Release', 'releases_id');
+        return $this->hasMany(ReleaseExtraFull::class, 'releases_id');
     }
 
     /**
@@ -87,7 +87,7 @@ class Release extends Model
      */
     public function nfo()
     {
-        return $this->hasOne('App\Models\ReleaseNfo', 'releases_id');
+        return $this->hasOne(ReleaseNfo::class, 'releases_id');
     }
 
     /**
@@ -95,6 +95,6 @@ class Release extends Model
      */
     public function comment()
     {
-        return $this->hasMany('App\Models\ReleaseComment', 'releases_id');
+        return $this->hasMany(ReleaseComment::class, 'releases_id');
     }
 }

@@ -34,7 +34,7 @@ class User extends Authenticatable
      */
     public function role()
     {
-        return $this->belongsTo('App\Models\UserRole', 'user_roles_id');
+        return $this->belongsTo(UserRole::class, 'user_roles_id');
     }
 
     /**
@@ -42,7 +42,7 @@ class User extends Authenticatable
      */
     public function request()
     {
-        return $this->hasMany('App\Models\UserRequest', 'users_id');
+        return $this->hasMany(UserRequest::class, 'users_id');
     }
 
     /**
@@ -50,7 +50,7 @@ class User extends Authenticatable
      */
     public function download()
     {
-        return $this->hasMany('App\Models\UserDownload', 'users_id');
+        return $this->hasMany(UserDownload::class, 'users_id');
     }
 
     /**
@@ -58,7 +58,7 @@ class User extends Authenticatable
      */
     public function release()
     {
-        return $this->hasMany('\App\Models\UsersRelease', 'users_id');
+        return $this->hasMany(UsersRelease::class, 'users_id');
     }
 
     /**
@@ -66,7 +66,7 @@ class User extends Authenticatable
      */
     public function invitation()
     {
-        return $this->hasMany('App\Models\Invitation', 'users_id');
+        return $this->hasMany(Invitation::class, 'users_id');
     }
 
     /**
@@ -74,7 +74,7 @@ class User extends Authenticatable
      */
     public function failedRelease()
     {
-        return $this->hasMany('App\Models\DnzbFailure', 'users_id');
+        return $this->hasMany(DnzbFailure::class, 'users_id');
     }
 
     /**
@@ -82,7 +82,7 @@ class User extends Authenticatable
      */
     public function excludedCategory()
     {
-        return $this->hasMany('App\Models\UserExcludedCategory', 'users_id');
+        return $this->hasMany(UserExcludedCategory::class, 'users_id');
     }
 
     /**
@@ -90,7 +90,7 @@ class User extends Authenticatable
      */
     public function comment()
     {
-        return $this->hasMany('App\Models\ReleaseComment', 'users_id');
+        return $this->hasMany(ReleaseComment::class, 'users_id');
     }
 
     protected static function boot(): void

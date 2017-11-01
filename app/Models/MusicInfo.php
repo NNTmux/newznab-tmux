@@ -27,6 +27,6 @@ class MusicInfo extends Model
 
     public function genre()
     {
-        return $this->belongsTo('App\Models\Genre', 'genres_id');
+        return $this->belongsTo(Genre::class, 'genres_id');
     }
 }

@@ -32,11 +32,11 @@ class Predb extends Model
 
     public function hash()
     {
-        return $this->hasMany('App\Models\PredbHash', 'predb_id');
+        return $this->hasMany(PredbHash::class, 'predb_id');
     }
 
     public function release()
     {
-        return $this->hasOne('App\Models\Release', 'predb_id');
+        return $this->hasMany(Release::class, 'predb_id');
     }
 }

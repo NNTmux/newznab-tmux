@@ -33,11 +33,11 @@ class AnidbTitle extends Model
 
     public function episode()
     {
-        return $this->hasMany('App\Models\AnidbEpisode', 'anidbid');
+        return $this->hasMany(AnidbEpisode::class, 'anidbid');
     }
 
     public function info()
     {
-        return $this->hasMany('App\Models\AnidbInfo', 'anidbid');
+        return $this->hasMany(AnidbInfo::class, 'anidbid');
     }
 }

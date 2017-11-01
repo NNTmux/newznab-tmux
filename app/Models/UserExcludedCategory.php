@@ -12,11 +12,11 @@ class UserExcludedCategory extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'users_id');
+        return $this->belongsTo(User::class, 'users_id');
     }
 
     public function category()
     {
-        return $this->belongsTo('App\Models\Category', 'categories_id');
+        return $this->belongsTo(Category::class, 'categories_id');
     }
 }

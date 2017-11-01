@@ -23,7 +23,7 @@ class Category extends Model
 
     public function releases()
     {
-        return $this->hasMany('App\Models\Release', 'categories_id');
+        return $this->hasMany(Release::class, 'categories_id');
     }
 
     public function parent()
@@ -38,11 +38,11 @@ class Category extends Model
 
     public function userExcludedCategory()
     {
-        return $this->hasMany('App\Models\UserExcludedCategory', 'categories_id');
+        return $this->hasMany(UserExcludedCategory::class, 'categories_id');
     }
 
     public function roleExcludedCategory()
     {
-        return $this->belongsTo('App\Models\RoleExcludedCategory', 'categories_id');
+        return $this->belongsTo(RoleExcludedCategory::class, 'categories_id');
     }
 }

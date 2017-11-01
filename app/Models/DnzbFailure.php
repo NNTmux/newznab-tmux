@@ -35,11 +35,11 @@ class DnzbFailure extends Model
 
     public function release()
     {
-        return $this->belongsTo('App\Models\Release', 'release_id');
+        return $this->belongsTo(Release::class, 'release_id');
     }
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'users_id');
+        return $this->belongsTo(User::class, 'users_id');
     }
 }
