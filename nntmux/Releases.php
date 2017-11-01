@@ -874,7 +874,7 @@ class Releases
         );
 
         $baseSql = sprintf(
-            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				df.failed AS failed,
@@ -1022,7 +1022,7 @@ class Releases
         );
 
         $baseSql = sprintf(
-            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid,
 				v.title, v.countries_id, v.started, v.tvdb, v.trakt,
 					v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
 				tvi.summary, tvi.publisher, tvi.image,
@@ -1092,7 +1092,7 @@ class Releases
         );
 
         $baseSql = sprintf(
-            "SELECT r.*,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -1155,7 +1155,7 @@ class Releases
         );
 
         $baseSql = sprintf(
-            "SELECT r.*,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid,
 				concat(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -1212,10 +1212,11 @@ class Releases
     /**
      * @param       $currentID
      * @param       $name
-     * @param int   $limit
+     * @param int $limit
      * @param array $excludedCats
      *
      * @return array
+     * @throws \Exception
      */
     public function searchSimilar($currentID, $name, $limit = 6, array $excludedCats = []): array
     {
@@ -1285,7 +1286,7 @@ class Releases
             $gSql = sprintf('r.guid = %s', $this->pdo->escapeString($guid));
         }
         $sql = sprintf(
-            "SELECT r.*,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				CONCAT(cp.id, ',', c.id) AS category_ids,
 				GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names,
@@ -1344,50 +1345,6 @@ class Releases
     }
 
     /**
-     * @param        $rageID
-     * @param string $series
-     * @param string $episode
-     *
-     * @return array|bool
-     */
-    public function getbyRageId($rageID, $series = '', $episode = '')
-    {
-        if ($series !== '') {
-            // Exclude four digit series, which will be the year 2010 etc.
-            if (is_numeric($series) && strlen($series) !== 4) {
-                $series = sprintf('S%02d', $series);
-            }
-
-            $series = sprintf(' AND UPPER(r.season) = UPPER(%s)', $this->pdo->escapeString($series));
-        }
-
-        if ($episode !== '') {
-            if (is_numeric($episode)) {
-                $episode = sprintf('E%02d', $episode);
-            }
-
-            $episode = sprintf(' AND UPPER(r.episode) = UPPER(%s)', $this->pdo->escapeString($episode));
-        }
-
-        return $this->pdo->queryOneRow(
-            sprintf(
-                "SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name,
-				g.name AS group_name
-				FROM releases PARTITION (tv) r
-				LEFT JOIN groups g ON g.id = r.groups_id
-				LEFT JOIN categories c ON c.id = r.categories_id
-				LEFT JOIN categories cp ON cp.id = c.parentid
-				WHERE r.passwordstatus %s
-				AND videos_id = %d %s %s",
-                $this->showPasswords,
-                $rageID,
-                $series,
-                $episode
-            )
-        );
-    }
-
-    /**
      * @param $videoId
      *
      * @return bool|\PDOStatement
@@ -1424,22 +1381,12 @@ class Releases
     }
 
     /**
-     * @param int $id
-     *
-     * @return array|bool
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getById($id)
     {
-        $qry = sprintf(
-            '
-				SELECT r.*, g.name AS group_name
-				FROM releases r
-				LEFT JOIN groups g ON g.id = r.groups_id
-				WHERE r.id = %d',
-            $id
-        );
-
-        return $this->pdo->queryOneRow($qry);
+        return Release::query()->where('id', $id)->first(['categories_id']);
     }
 
     /**
@@ -1465,9 +1412,7 @@ class Releases
     public function updateGrab($guid): void
     {
         if ($this->updateGrabs) {
-            $this->pdo->queryExec(
-                sprintf('UPDATE releases SET grabs = grabs + 1 WHERE guid = %s', $this->pdo->escapeString($guid))
-            );
+            Release::query()->where('guid', $guid)->increment('grabs');
         }
     }
 
