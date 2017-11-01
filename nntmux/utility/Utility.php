@@ -1050,6 +1050,7 @@ class Utility
         header('Content-type: text/xml');
         header('Content-Length: '.strlen($response));
         header('X-NNTmux: API ERROR ['.$errorCode.'] '.$errorText);
+        header('HTTP/1.1 503 Service Unavailable');
 
         exit($response);
     }
