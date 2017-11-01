@@ -874,7 +874,7 @@ class Releases
         );
 
         $baseSql = sprintf(
-            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid, r.nfostatus, r.haspreview,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid, r.nfostatus, r.haspreview, r.gid,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				df.failed AS failed,
@@ -1022,7 +1022,7 @@ class Releases
         );
 
         $baseSql = sprintf(
-            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid, r.nfostatus, r.haspreview,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid, r.nfostatus, r.haspreview, r.gid,
 				v.title, v.countries_id, v.started, v.tvdb, v.trakt,
 					v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
 				tvi.summary, tvi.publisher, tvi.image,
@@ -1092,7 +1092,7 @@ class Releases
         );
 
         $baseSql = sprintf(
-            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid, r.nfostatus, r.haspreview,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid, r.nfostatus, r.haspreview, r.gid,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -1155,7 +1155,7 @@ class Releases
         );
 
         $baseSql = sprintf(
-            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid, r.nfostatus, r.haspreview,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid, r.nfostatus, r.haspreview, r.gid,
 				concat(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				g.name AS group_name,
@@ -1286,7 +1286,7 @@ class Releases
             $gSql = sprintf('r.guid = %s', $this->pdo->escapeString($guid));
         }
         $sql = sprintf(
-            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid, r.nfostatus, r.haspreview,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus, r.imdbid, r.anidbid, r.nfostatus, r.haspreview, r.gid,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				CONCAT(cp.id, ',', c.id) AS category_ids,
 				GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names,
