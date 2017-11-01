@@ -874,7 +874,7 @@ class Releases
         );
 
         $baseSql = sprintf(
-            "SELECT r.*,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				df.failed AS failed,
@@ -1022,7 +1022,7 @@ class Releases
         );
 
         $baseSql = sprintf(
-            "SELECT r.*,
+            "SELECT r.id, r.searchname, r.size, r.fromname, r.adddate, r.groups_id, r.grabs, r.passwordstatus, r.guid, r.completion, r.categories_id, r.comments, r.postdate, r.totalpart, r.videos_id, r.tv_episodes_id, r.videostatus,
 				v.title, v.countries_id, v.started, v.tvdb, v.trakt,
 					v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
 				tvi.summary, tvi.publisher, tvi.image,

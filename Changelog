@@ -1,4 +1,5 @@
 2017-11-01 DariusIII
+	* Chg: Load only required columns from releases table for api searches
 	* Chg: Update composer.lock
 2017-10-31 DariusIII
 	* Chg: Update ReleaseComments class to use ReleaseComment model
