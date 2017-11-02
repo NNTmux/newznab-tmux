@@ -988,58 +988,76 @@ class Utility
      */
     public static function showApiError($errorCode = 900, $errorText = ''): void
     {
+        $errorHeader = 'HTTP 1.1 400 Bad Request';
         if ($errorText === '') {
             switch ($errorCode) {
                 case 100:
                     $errorText = 'Incorrect user credentials';
+                    $errorHeader = 'HTTP 1.1 401 Unauthorized';
                     break;
                 case 101:
                     $errorText = 'Account suspended';
+                    $errorHeader = 'HTTP 1.1 403 Forbidden';
                     break;
                 case 102:
                     $errorText = 'Insufficient privileges/not authorized';
+                    $errorHeader = 'HTTP 1.1 401 Unauthorized';
                     break;
                 case 103:
                     $errorText = 'Registration denied';
+                    $errorHeader = 'HTTP 1.1 403 Forbidden';
                     break;
                 case 104:
                     $errorText = 'Registrations are closed';
+                    $errorHeader = 'HTTP 1.1 403 Forbidden';
                     break;
                 case 105:
                     $errorText = 'Invalid registration (Email Address Taken)';
+                    $errorHeader = 'HTTP 1.1 403 Forbidden';
                     break;
                 case 106:
                     $errorText = 'Invalid registration (Email Address Bad Format)';
+                    $errorHeader = 'HTTP 1.1 403 Forbidden';
                     break;
                 case 107:
                     $errorText = 'Registration Failed (Data error)';
+                    $errorHeader = 'HTTP 1.1 400 Bad Request';
                     break;
                 case 200:
                     $errorText = 'Missing parameter';
+                    $errorHeader = 'HTTP 1.1 400 Bad Request';
                     break;
                 case 201:
                     $errorText = 'Incorrect parameter';
+                    $errorHeader = 'HTTP 1.1 400 Bad Request';
                     break;
                 case 202:
                     $errorText = 'No such function';
+                    $errorHeader = 'HTTP 1.1 404 Not Found';
                     break;
                 case 203:
                     $errorText = 'Function not available';
+                    $errorHeader = 'HTTP 1.1 400 Bad Request';
                     break;
                 case 300:
                     $errorText = 'No such item';
+                    $errorHeader = 'HTTP 1.1 404 Not Found';
                     break;
                 case 500:
                     $errorText = 'Request limit reached';
+                    $errorHeader = 'HTTP 1.1 429 Too Many Requests';
                     break;
                 case 501:
                     $errorText = 'Download limit reached';
+                    $errorHeader = 'HTTP 1.1 429 Too Many Requests';
                     break;
                 case 910:
                     $errorText = 'API disabled';
+                    $errorHeader = 'HTTP 1.1 401 Unauthorized';
                     break;
                 default:
                     $errorText = 'Unknown error';
+                    $errorHeader = 'HTTP 1.1 400 Bad Request';
                     break;
             }
         }
@@ -1050,7 +1068,7 @@ class Utility
         header('Content-type: text/xml');
         header('Content-Length: '.strlen($response));
         header('X-NNTmux: API ERROR ['.$errorCode.'] '.$errorText);
-        header('HTTP/1.1 503 Service Unavailable');
+        header($errorHeader);
 
         exit($response);
     }
