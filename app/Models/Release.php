@@ -97,4 +97,12 @@ class Release extends Model
     {
         return $this->hasMany(ReleaseComment::class, 'releases_id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function releaseGroup()
+    {
+        return $this->hasMany(ReleasesGroups::class, 'releases_id');
+    }
 }

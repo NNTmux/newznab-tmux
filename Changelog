@@ -1,3 +1,5 @@
+2017-11-02 DariusIII
+	* CHg: Update Release model and add back updated ReleasesGroups model
 2017-11-01 DariusIII
 	* Chg: Update models
 	* Chg: Send 503 Service Unavailable header in showApiError function
