@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Release;
 use nntmux\db\DB;
 
 class Regexes
@@ -12,7 +13,7 @@ class Regexes
     public $pdo;
 
     /**
-     * @var mixed The ID of the Regex inut string matched or the generic name
+     * @var mixed The ID of the Regex input string matched or the generic name
      */
     public $matchedRegex;
 
@@ -167,9 +168,10 @@ class Regexes
      *
      * @param string $groupName
      * @param string $regex
-     * @param int    $limit
+     * @param int $limit
      *
      * @return array
+     * @throws \Exception
      */
     public function testCollectionRegex($groupName, $regex, $limit): array
     {
@@ -236,13 +238,10 @@ class Regexes
     }
 
     /**
-     * Test a single release naming regex for a group name.
-     *
-     * @param string $groupName
-     * @param string $regex
-     * @param int    $displayLimit
-     * @param int    $queryLimit
-     *
+     * @param $groupName
+     * @param $regex
+     * @param $displayLimit
+     * @param $queryLimit
      * @return array
      * @throws \Exception
      */
@@ -255,16 +254,15 @@ class Regexes
             return [];
         }
 
-        $rows = $this->pdo->query(
-            sprintf(
-                'SELECT name, searchname, id FROM releases WHERE groups_id = %d %s',
-                $groupID,
-                (int) $queryLimit === 0 ? '' : sprintf('LIMIT %d', $queryLimit)
-            )
-        );
+        $rows = Release::query()->where('groups_id', $groupID)->select(['name', 'searchname', 'id']);
+        if ((int) $queryLimit !==0) {
+            $rows->limit($queryLimit);
+        }
+
+        $rows->get();
 
         $data = [];
-        if ($rows) {
+        if ($rows !== null) {
             $limit = 1;
             foreach ($rows as $row) {
                 $match = $this->_matchRegex($regex, $row['name']);

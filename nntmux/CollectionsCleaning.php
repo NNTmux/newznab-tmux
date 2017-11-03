@@ -74,17 +74,18 @@ class CollectionsCleaning
     public $subject = '';
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
     /**
-     * @var Regexes
+     * @var \nntmux\Regexes
      */
     protected $_regexes;
 
     /**
      * @param array $options Class instances.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
@@ -94,8 +95,8 @@ class CollectionsCleaning
         $this->e2 = self::REGEX_FILE_EXTENSIONS.self::REGEX_SUBJECT_SIZE.self::REGEX_END;
 
         $defaults = [
-			'Settings' => null,
-		];
+            'Settings' => null,
+        ];
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
@@ -120,20 +121,20 @@ class CollectionsCleaning
         $potentialString = $this->_regexes->tryRegex($subject, $groupName);
         if ($potentialString) {
             return [
-				'id'   => $this->_regexes->matchedRegex,
-				'name' => $potentialString,
-			];
+                'id'   => $this->_regexes->matchedRegex,
+                'name' => $potentialString,
+            ];
         }
 
         switch ($groupName) {
-			/*
-			case 'alt.binaries.this.is.an.example':
-				return $this->_example_method_name();
-			*/
-			case null:
-			default:
-				return $this->generic();
-		}
+            /*
+            case 'alt.binaries.this.is.an.example':
+                return $this->_example_method_name();
+            */
+            case null:
+            default:
+                return $this->generic();
+        }
     }
 
     /**
@@ -157,18 +158,18 @@ class CollectionsCleaning
             $cleanSubject = preg_replace('/AutoRarPar\d{1,5}|\(\d+\)( |  )yEnc|\d+(Amateur|Classic)| \d{4,}[a-z]{4,} |part\d+/i', ' ', $cleanSubject);
             // Multi spaces.
             return [
-				'id'   => self::REGEX_GENERIC_MATCH,
-				'name' => utf8_encode(trim(preg_replace('/\s\s+/', ' ', $cleanSubject))),
-			];
+                'id'   => self::REGEX_GENERIC_MATCH,
+                'name' => utf8_encode(trim(preg_replace('/\s\s+/', ' ', $cleanSubject))),
+            ];
         } // Music groups.
         else {
             // Try some music group regexes.
             $musicSubject = $this->musicSubject();
             if ($musicSubject !== false) {
                 return [
-					'id'   => self::REGEX_MUSIC_MATCH,
-					'name' => $musicSubject,
-				];
+                    'id'   => self::REGEX_MUSIC_MATCH,
+                    'name' => $musicSubject,
+                ];
                 // Parts/files
             } else {
                 $cleanSubject = preg_replace('/((( \(\d\d\) -|(\d\d)? - \d\d\.|\d{4} \d\d -) | - \d\d-| \d\d\. [a-z]).+| \d\d of \d\d| \dof\d)\.mp3"?|(\(|\[|\s)\d{1,4}(\/|(\s|_)of(\s|_)|-)\d{1,4}(\)|\]|\s|$|:)|\(\d{1,3}\|\d{1,3}\)|-\d{1,3}-\d{1,3}\.|\s\d{1,3}\sof\s\d{1,3}\.|\s\d{1,3}\/\d{1,3}|\d{1,3}of\d{1,3}\.|^\d{1,3}\/\d{1,3}\s|\d{1,3} - of \d{1,3}/i', ' ', $this->subject);
@@ -203,14 +204,14 @@ class CollectionsCleaning
                 $newName = preg_replace('/[a-z0-9]|'.$this->e0.'/i', '', $newName);
 
                 return [
-					'id'   => self::REGEX_MUSIC_MATCH,
-					'name' => $cleanSubject.$newName.$x,
-				];
+                    'id'   => self::REGEX_MUSIC_MATCH,
+                    'name' => $cleanSubject.$newName.$x,
+                ];
             } else {
                 return [
-					'id'   => self::REGEX_MUSIC_MATCH,
-					'name' => $cleanSubject,
-				];
+                    'id'   => self::REGEX_MUSIC_MATCH,
+                    'name' => $cleanSubject,
+                ];
             }
         }
     }
