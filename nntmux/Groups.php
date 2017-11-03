@@ -2,6 +2,9 @@
 
 namespace nntmux;
 
+use App\Models\MissedPart;
+use App\Models\Release;
+use Illuminate\Support\Facades\DB as DBFacade;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Group;
@@ -173,28 +176,17 @@ class Groups
      */
     public function getCount($groupname = '', $active = -1)
     {
-        $res = $this->pdo->query(
-            sprintf(
-                '
-				SELECT COUNT(g.id) AS num
-				FROM groups g
-				WHERE 1=1 %s %s',
-                (
-                    $groupname !== ''
-                    ?
-                    sprintf(
-                        'AND g.name %s',
-                        $this->pdo->likeString($groupname, true, true)
-                    )
-                    : ''
-                ),
-                ($active > -1 ? sprintf('AND g.active = %d', $active) : '')
-            ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
+        $res = Group::query();
 
-        return empty($res) ? 0 : $res[0]['num'];
+        if ($groupname !== '') {
+            $res->where('name', 'LIKE', '%' . $groupname . '%');
+        }
+
+        if ($active > -1) {
+            $res->where('active', $active);
+        }
+
+        return $res === null ? 0 : $res->count(['id']);
     }
 
     /**
@@ -222,7 +214,7 @@ class Groups
         $groups = Group::query()->groupBy(['id'])->orderBy('name');
 
         if ($groupname !== '') {
-            $groups->where('name', 'LIKE', $groupname);
+            $groups->where('name', 'LIKE', '%' . $groupname .'%');
         }
 
         if ($active === true) {
@@ -302,24 +294,6 @@ class Groups
     }
 
     /**
-     * Format numeric string when adding/updating groups.
-     *
-     * @param string $setting
-     * @param bool   $escape
-     *
-     * @return string|int
-     */
-    protected function formatNumberString($setting, $escape = true)
-    {
-        $setting = trim($setting);
-        if ($setting === 0 || ! is_numeric($setting)) {
-            $setting = 0;
-        }
-
-        return $escape ? $this->pdo->escapeString($setting) : (int) $setting;
-    }
-
-    /**
      * Delete a group.
      *
      * @param int|string $id ID of the group.
@@ -348,15 +322,10 @@ class Groups
         (new Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
 
         // Remove rows from part repair.
-        $this->pdo->queryExec(
-            "
-			DELETE mp
-			FROM missed_parts mp
-			WHERE mp.groups_id = {$id}"
-        );
+        MissedPart::query()->where('groups_id', $id)->delete();
 
         foreach ($this->cbpm as $tablePrefix) {
-            $this->pdo->queryExec(
+            DBFacade::unprepared(
                 "DROP TABLE IF EXISTS {$tablePrefix}_{$id}"
             );
         }
@@ -383,15 +352,15 @@ class Groups
     public function resetall(): bool
     {
         foreach ($this->cbpm as $tablePrefix) {
-            $this->pdo->queryExec("TRUNCATE TABLE {$tablePrefix}");
+            DBFacade::unprepared("TRUNCATE TABLE {$tablePrefix}");
         }
 
-        $groups = $this->pdo->queryDirect('SELECT id FROM groups');
+        $groups = Group::query()->select(['id'])->get();
 
         if ($groups instanceof \Traversable) {
             foreach ($groups as $group) {
                 foreach ($this->cbpm as $tablePrefix) {
-                    $this->pdo->queryExec("DROP TABLE IF EXISTS {$tablePrefix}_{$group['id']}");
+                    DBFacade::unprepared("DROP TABLE IF EXISTS {$tablePrefix}_{$group['id']}");
                 }
             }
         }
@@ -425,14 +394,13 @@ class Groups
             $this->reset($id);
         }
 
-        $res = $this->pdo->queryDirect(
-            sprintf(
-                '
-				SELECT r.id, r.guid
-				FROM releases r %s',
-                ($id === false ? '' : 'WHERE r.groups_id = '.$id)
-            )
-        );
+        $res = Release::query()->select(['id', 'guid']);
+
+        if ($id !== false) {
+            $res->where('groups_id', $id);
+        }
+
+        $res->get();
 
         if ($res instanceof \Traversable) {
             $releases = new Releases(['Settings' => $this->pdo, 'Groups' => $this]);
@@ -517,14 +485,13 @@ class Groups
      */
     public function updateGroupStatus($id, $column, $status = 0): string
     {
-        $this->pdo->queryExec(
-            "
-			UPDATE groups
-			SET {$column} = {$status}
-			WHERE id = {$id}"
+        Group::query()->where('id', $id)->update(
+            [
+                $column => $status
+            ]
         );
 
-        return "Group {$id}: {$column} has been ".(($status === 0) ? 'deactivated' : 'activated').'.';
+        return "Group {$id} has been ".(($status === 0) ? 'deactivated' : 'activated').'.';
     }
 
     /**
@@ -570,10 +537,9 @@ class Groups
     public function createNewTPGTables($groupID): bool
     {
         foreach ($this->cbpm as $tablePrefix) {
-            if ($this->pdo->queryExec(
-                    "CREATE TABLE IF NOT EXISTS {$tablePrefix}_{$groupID} LIKE {$tablePrefix}",
-                    true
-                ) === false
+            if (DBFacade::unprepared(
+                    "CREATE TABLE IF NOT EXISTS {$tablePrefix}_{$groupID} LIKE {$tablePrefix}"
+                ) === null
             ) {
                 return false;
             }
@@ -589,7 +555,7 @@ class Groups
      */
     public function disableIfNotExist($id): void
     {
-        $this->updateGroupStatus($id, 'active', 0);
+        $this->updateGroupStatus($id, 'active');
         ColorCLI::doEcho(
             ColorCLI::error(
                 'Group does not exist on server, disabling'

@@ -1,3 +1,5 @@
+2017-11-03 DariusIII
+	* Chg: Update Groups class and MissedPart model
 2017-11-02 DariusIII
 	* Chg: Update Utility class showApiError response headers
 	* Chg: Update Release model and add back updated ReleasesGroups model
