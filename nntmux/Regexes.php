@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Release;
 use nntmux\db\DB;
+use App\Models\Release;
 
 class Regexes
 {
@@ -255,7 +255,7 @@ class Regexes
         }
 
         $rows = Release::query()->where('groups_id', $groupID)->select(['name', 'searchname', 'id']);
-        if ((int) $queryLimit !==0) {
+        if ((int) $queryLimit !== 0) {
             $rows->limit($queryLimit);
         }
 
