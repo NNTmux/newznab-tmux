@@ -359,13 +359,7 @@ class Regexes
     protected function _matchRegex($regex, $subject): string
     {
         $returnString = '';
-        if (@preg_match($regex, $subject, $matches) === false) {
-            if (NN_LOGGING) {
-                $message = "Regex match failed - table: {$this->tableName}, regex: $regex";
-                $logger = new Logger();
-                $logger->log(__CLASS__, __METHOD__, $message, Logger::LOG_ERROR);
-            }
-        } elseif (count($matches) > 0) {
+        if (preg_match($regex, $subject, $matches) && count($matches) > 0) {
             // Sort the keys, the named key matches will be concatenated in this order.
             ksort($matches);
             foreach ($matches as $key => $value) {
