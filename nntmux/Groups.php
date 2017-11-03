@@ -2,12 +2,12 @@
 
 namespace nntmux;
 
-use App\Models\MissedPart;
-use App\Models\Release;
-use Illuminate\Support\Facades\DB as DBFacade;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Group;
+use App\Models\Release;
+use App\Models\MissedPart;
+use Illuminate\Support\Facades\DB as DBFacade;
 
 class Groups
 {
@@ -179,7 +179,7 @@ class Groups
         $res = Group::query();
 
         if ($groupname !== '') {
-            $res->where('name', 'LIKE', '%' . $groupname . '%');
+            $res->where('name', 'LIKE', '%'.$groupname.'%');
         }
 
         if ($active > -1) {
@@ -214,7 +214,7 @@ class Groups
         $groups = Group::query()->groupBy(['id'])->orderBy('name');
 
         if ($groupname !== '') {
-            $groups->where('name', 'LIKE', '%' . $groupname .'%');
+            $groups->where('name', 'LIKE', '%'.$groupname.'%');
         }
 
         if ($active === true) {
@@ -487,7 +487,7 @@ class Groups
     {
         Group::query()->where('id', $id)->update(
             [
-                $column => $status
+                $column => $status,
             ]
         );
 
