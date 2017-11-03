@@ -1,4 +1,5 @@
 2017-11-03 DariusIII
+	* Chg: Slightly change Binaries class
 	* Chg: Remove failed regexes logging from Regexes class
 	* Chg: Update CollectionsCleaning and Regexes classes
 	* Chg: Update Groups class and MissedPart model
