@@ -51,7 +51,7 @@ class Git extends \GitRepo
         $log = explode("\n", $this->log());
         foreach ($log as $line) {
             if (preg_match('#^commit#', $line)) {
-                ++$count;
+                $count++;
             }
         }
 

@@ -49,7 +49,7 @@ foreach ($itr as $filePath) {
             $releases->deleteSingle(['g' => $guid, 'i' => false], $nzb, $releaseImage);
             $moved++;
         }
-        ++$checked;
+        $checked++;
         echo "$checked / $moved\r";
     }
 }
@@ -65,12 +65,12 @@ if ($res instanceof \Traversable) {
     foreach ($res as $row) {
         $nzbpath = $nzb->getNZBPath($row['guid']);
         if (! is_file($nzbpath)) {
-            ++$deleted;
+            $deleted++;
             $releases->deleteSingle(['g' => $row['guid'], 'i' => $row['id']], $nzb, $releaseImage);
         } elseif ($row['nzbstatus'] != 1) {
             $pdo->queryExec(sprintf('UPDATE releases SET nzbstatus = 1 WHERE id = %d', $row['id']));
         }
-        ++$checked;
+        $checked++;
         echo "$checked / $deleted\r";
     }
 }
