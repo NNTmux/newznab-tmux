@@ -145,7 +145,7 @@ class OpCacheService
         $val = ['b', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         while (($size / 1024) > 1) {
             $size /= 1024;
-            ++$i;
+            $i++;
         }
 
         return sprintf(

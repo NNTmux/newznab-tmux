@@ -126,7 +126,7 @@ foreach ($data as $dir => $files) {
                     echo 'Skipping dump '.$match[2].
 						', as your minimum unix time argument is '.
 						$timematch.PHP_EOL;
-                    --$total;
+                    $total--;
                     continue;
                 }
 
