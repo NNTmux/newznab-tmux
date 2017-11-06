@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
 use nntmux\Tmux;
 use nntmux\db\DB;
@@ -73,7 +73,7 @@ $psTableRowCount = $pdo->Prepare($tblCount);
 
 while ($runVar['counts']['iterations'] > 0) {
 
-	//check the db connection
+    //check the db connection
     if ($pdo->ping(true) === false) {
         unset($pdo);
         $pdo = new DB();
@@ -85,7 +85,7 @@ while ($runVar['counts']['iterations'] > 0) {
     $runVar['timers']['query']['tmux_time'] = (time() - $timer01);
 
     $runVar['settings']['book_reqids'] = (! empty($runVar['settings']['book_reqids'])
-		? $runVar['settings']['book_reqids'] : Category::BOOKS_ROOT);
+        ? $runVar['settings']['book_reqids'] : Category::BOOKS_ROOT);
 
     //get usenet connection info
     $runVar['connections'] = $tOut->getConnectionsInfo($runVar['constants']);
@@ -96,23 +96,23 @@ while ($runVar['counts']['iterations'] > 0) {
     $runVar['scripts']['releases'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/releases.php";
 
     switch ((int) $runVar['settings']['binaries_run']) {
-		case 1:
-			$runVar['scripts']['binaries'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/binaries.php 0";
-			break;
-		case 2:
-			$runVar['scripts']['binaries'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/safe.php binaries";
-			break;
-		default:
-			$runVar['scripts']['binaries'] = 0;
-	}
+        case 1:
+            $runVar['scripts']['binaries'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/binaries.php 0";
+            break;
+        case 2:
+            $runVar['scripts']['binaries'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/safe.php binaries";
+            break;
+        default:
+            $runVar['scripts']['binaries'] = 0;
+    }
 
     switch ((int) $runVar['settings']['backfill']) {
-		case 1:
-			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/backfill.php";
-			break;
-		case 4:
-			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/safe.php backfill";
-	}
+        case 1:
+            $runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/backfill.php";
+            break;
+        case 4:
+            $runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/safe.php backfill";
+    }
 
     //get usenet connection counts
     unset($runVar['conncounts']);
@@ -153,15 +153,16 @@ while ($runVar['counts']['iterations'] > 0) {
 
         //This is subpartition compatible -- loops through all partitions and adds their total row counts instead of doing a slow query count
         $partitions = $pdo->queryDirect(
-			sprintf("
+            sprintf(
+                "
 				SELECT SUM(TABLE_ROWS) AS count, PARTITION_NAME AS category
 				FROM information_schema.PARTITIONS
 				WHERE TABLE_NAME = 'releases'
 				AND TABLE_SCHEMA = %s
 				GROUP BY PARTITION_NAME",
-				$pdo->escapeString($db_name)
-			)
-		);
+                $pdo->escapeString($db_name)
+            )
+        );
         foreach ($partitions as $partition) {
             $runVar['counts']['now'][$partition['category']] = $partition['count'];
         }
@@ -178,13 +179,13 @@ while ($runVar['counts']['iterations'] > 0) {
 
         $timer05 = time();
         $proc2qry = $tRun->proc_query(
-			2,
-			$runVar['settings']['book_reqids'],
-			$runVar['settings']['request_hours'],
-			$db_name,
-			$runVar['settings']['maxsize_pp'],
-			$runVar['settings']['minsize_pp']
-		);
+            2,
+            $runVar['settings']['book_reqids'],
+            $runVar['settings']['request_hours'],
+            $db_name,
+            $runVar['settings']['maxsize_pp'],
+            $runVar['settings']['minsize_pp']
+        );
         $proc2res = $pdo->queryOneRow(($proc2qry !== false ? $proc2qry : ''), $tRun->rand_bool($runVar['counts']['iterations']));
         $runVar['timers']['query']['proc2_time'] = (time() - $timer05);
         $runVar['timers']['query']['proc21_time'] = (time() - $timer01);
@@ -210,32 +211,32 @@ while ($runVar['counts']['iterations'] > 0) {
                     $stamp = 'UNIX_TIMESTAMP(MIN(dateadded))';
 
                     switch (true) {
-						case strpos($tbl, 'collections') !== false:
-							$runVar['counts']['now']['collections_table'] +=
-								getTableRowCount($psTableRowCount, $tbl);
-							$added = $pdo->queryOneRow(sprintf('SELECT %s AS dateadded FROM %s', $stamp, $tbl));
-							if (isset($added['dateadded']) && is_numeric($added['dateadded']) &&
-								$added['dateadded'] < $age
-							) {
-							    $age = $added['dateadded'];
-							}
-							break;
-						case strpos($tbl, 'binaries') !== false:
-							$runVar['counts']['now']['binaries_table'] +=
-								getTableRowCount($psTableRowCount, $tbl);
-							break;
-						// This case must come before the 'parts_' one.
-						case strpos($tbl, 'missed_parts') !== false:
-							$runVar['counts']['now']['missed_parts_table'] +=
-								getTableRowCount($psTableRowCount, $tbl);
+                        case strpos($tbl, 'collections') !== false:
+                            $runVar['counts']['now']['collections_table'] +=
+                                getTableRowCount($psTableRowCount, $tbl);
+                            $added = $pdo->queryOneRow(sprintf('SELECT %s AS dateadded FROM %s', $stamp, $tbl));
+                            if (isset($added['dateadded']) && is_numeric($added['dateadded']) &&
+                                $added['dateadded'] < $age
+                            ) {
+                                $age = $added['dateadded'];
+                            }
+                            break;
+                        case strpos($tbl, 'binaries') !== false:
+                            $runVar['counts']['now']['binaries_table'] +=
+                                getTableRowCount($psTableRowCount, $tbl);
+                            break;
+                        // This case must come before the 'parts_' one.
+                        case strpos($tbl, 'missed_parts') !== false:
+                            $runVar['counts']['now']['missed_parts_table'] +=
+                                getTableRowCount($psTableRowCount, $tbl);
 
-							break;
-						case strpos($tbl, 'parts') !== false:
-							$runVar['counts']['now']['parts_table'] +=
-								getTableRowCount($psTableRowCount, $tbl);
-							break;
-						default:
-					}
+                            break;
+                        case strpos($tbl, 'parts') !== false:
+                            $runVar['counts']['now']['parts_table'] +=
+                                getTableRowCount($psTableRowCount, $tbl);
+                            break;
+                        default:
+                    }
                 }
                 $runVar['timers']['newOld']['oldestcollection'] = $age;
 
@@ -285,7 +286,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
         foreach ($runVar['counts']['now'] as $key => $proc) {
 
-			//if key is a process type, add it to total_work
+            //if key is a process type, add it to total_work
             if (strpos($key, 'process') === 0) {
                 $runVar['counts']['now']['total_work'] += $proc;
             }
@@ -295,7 +296,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
             //calculate percentages -- if user has no releases, set 0 for each key or this will fail on divide by zero
             $runVar['counts']['percent'][$key] = ($runVar['counts']['now']['releases'] > 0
-				? sprintf('%02s', floor(($proc / $runVar['counts']['now']['releases']) * 100)) : 0);
+                ? sprintf('%02s', floor(($proc / $runVar['counts']['now']['releases']) * 100)) : 0);
         }
 
         $runVar['counts']['now']['total_work'] += $runVar['counts']['now']['work'];
@@ -310,21 +311,23 @@ while ($runVar['counts']['iterations'] > 0) {
     }
 
     //set kill switches
-    $runVar['killswitch']['pp'] = (($runVar['settings']['postprocess_kill'] < $runVar['counts']['now']['total_work']) && ($runVar['settings']['postprocess_kill'] != 0)
-		? true
-		: false
-	);
-    $runVar['killswitch']['coll'] = (($runVar['settings']['collections_kill'] < $runVar['counts']['now']['collections_table']) && ($runVar['settings']['collections_kill'] != 0)
-		? true
-		: false
-	);
+    $runVar['killswitch']['pp'] = (
+        ($runVar['settings']['postprocess_kill'] < $runVar['counts']['now']['total_work']) && ($runVar['settings']['postprocess_kill'] != 0)
+        ? true
+        : false
+    );
+    $runVar['killswitch']['coll'] = (
+        ($runVar['settings']['collections_kill'] < $runVar['counts']['now']['collections_table']) && ($runVar['settings']['collections_kill'] != 0)
+        ? true
+        : false
+    );
 
     $tOut->updateMonitorPane($runVar);
 
     //begin pane run execution
     if ($runVar['settings']['is_running'] === '1') {
 
-		//run main updating function(s)
+        //run main updating function(s)
         $tRun->runPane('main', $runVar);
 
         //run nzb-import
@@ -345,7 +348,7 @@ while ($runVar['counts']['iterations'] > 0) {
         //run these if complete sequential not set
         if ($runVar['constants']['sequential'] != 2) {
 
-			//fix names
+            //fix names
             $tRun->runPane('fixnames', $runVar);
 
             //dehash releases

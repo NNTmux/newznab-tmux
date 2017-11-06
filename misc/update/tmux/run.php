@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
 use nntmux\Tmux;
 use nntmux\db\DB;
@@ -46,10 +46,11 @@ $ran = 0;
 foreach ($tables as $row) {
     $tbl = $row['name'];
     if (preg_match('/(multigroup\_)?collections(_\d+)?/', $tbl)) {
-        $run = $pdo->queryExec('UPDATE '.$tbl.
-			' SET dateadded = now() WHERE dateadded < now() - INTERVAL '.
-			$delaytimet.' HOUR'
-		);
+        $run = $pdo->queryExec(
+            'UPDATE '.$tbl.
+            ' SET dateadded = now() WHERE dateadded < now() - INTERVAL '.
+            $delaytimet.' HOUR'
+        );
         if ($run !== false) {
             $ran += $run->rowCount();
         }
