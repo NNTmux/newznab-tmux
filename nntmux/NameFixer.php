@@ -1235,8 +1235,7 @@ class NameFixer
                 $pre = Predb::query()
                     ->where('filename', $this->_fileName)
                     ->orWhere('title', $this->_fileName)
-                    ->select(['id as predb_id', 'title', 'source'])
-                    ->get();
+                    ->get(['id as predb_id', 'title', 'source']);
             }
 
             if (! empty($pre)) {
