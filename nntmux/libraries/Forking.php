@@ -2,12 +2,12 @@
 
 namespace nntmux\libraries;
 
-use App\Models\Tmux;
-use Carbon\Carbon;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
+use Carbon\Carbon;
+use App\Models\Tmux;
 use nntmux\ColorCLI;
 use nntmux\RequestID;
 use App\Models\Settings;
