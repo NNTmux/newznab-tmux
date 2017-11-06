@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use App\Models\Predb;
+use App\Models\Release;
 use nntmux\db\DB;
 use nntmux\utility\Utility;
 use nntmux\processing\PostProcess;
@@ -1139,7 +1141,7 @@ class NameFixer
             $limit = 'LIMIT '.$args[1];
             $orderby = 'ORDER BY r.id DESC';
         } else {
-            $maxrelid = 0;
+            $maxRelId = 0;
             $orderby = 'ORDER BY r.id ASC';
             $limit = 'LIMIT 1000000';
         }
@@ -1164,7 +1166,7 @@ class NameFixer
 					r.predb_id = 0
 					GROUP BY r.id
 					%s %s",
-                    (isset($maxrelid) && $maxrelid > 0 ? "r.id > {$maxrelid} AND" : ''),
+                    (isset($maxRelId) && $maxRelId > 0 ? sprintf('r.id > %s AND', $maxRelId) : ''),
                     $orderby,
                     $limit
                 )
@@ -1184,8 +1186,8 @@ class NameFixer
                         if ($show === 0) {
                             $this->consoletools->overWritePrimary('Renamed Releases: ['.number_format($counted).'] '.$this->consoletools->percentString(++$counter, $total));
                         }
-                        if (isset($maxrelid) && $row['releases_id'] > $maxrelid) {
-                            $maxrelid = $row['releases_id'];
+                        if (isset($maxRelId) && $row['releases_id'] > $maxRelId) {
+                            $maxRelId = $row['releases_id'];
                         }
                     }
                     echo ColorCLI::header($n.'Renamed '.number_format($counted).' releases in '.$this->consoletools->convertTime(time() - $timestart).'.');
@@ -1196,7 +1198,7 @@ class NameFixer
             } else {
                 break;
             }
-        } while (isset($maxrelid));
+        } while (isset($maxRelId));
     }
 
     /**
@@ -1230,16 +1232,11 @@ class NameFixer
             }
 
             if ($this->_fileName !== '') {
-                $pre = $this->pdo->queryOneRow(
-                    sprintf(
-                        '
-							SELECT id AS predb_id, title, source
-							FROM predb
-							WHERE filename = %s
-							OR title = %1$s',
-                        $this->pdo->escapeString($this->_fileName)
-                    )
-                );
+                $pre = Predb::query()
+                    ->where('filename', $this->_fileName)
+                    ->orWhere('title', $this->_fileName)
+                    ->select(['id as predb_id', 'title', 'source'])
+                    ->get();
             }
 
             if (! empty($pre)) {
@@ -1439,8 +1436,8 @@ class NameFixer
         if (preg_match_all(self::PREDB_REGEX, $release['textstring'], $matches) && ! preg_match('/Source\s\:/i', $release['textstring'])) {
             foreach ($matches as $match) {
                 foreach ($match as $val) {
-                    $title = $this->pdo->queryOneRow('SELECT title, id from predb WHERE title = '.$this->pdo->escapeString(trim($val)));
-                    if ($title !== false) {
+                    $title = Predb::query()->where('title', trim($val))->select(['title', 'id'])->first();
+                    if ($title !== null) {
                         $this->updateRelease($release, $title['title'], $method = 'preDB: Match', $echo, $type, $namestatus, $show, $title['id']);
                         $preid = true;
                     }
@@ -1522,17 +1519,7 @@ class NameFixer
     public function _updateSingleColumn($column = '', $status = 0, $id = 0): void
     {
         if ((string) $column !== '' && (int) $id !== 0) {
-            $this->pdo->queryExec(
-                sprintf(
-                    '
-							UPDATE releases
-							SET %s = %d
-							WHERE id = %d',
-                    (string) $column,
-                    (int) $status,
-                    (int) $id
-                )
-            );
+            Release::query()->where('id', $id)->update([$column => $status]);
         }
     }
 

@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap.php';
 
+use App\Models\Predb;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
@@ -157,7 +158,7 @@ switch (true) {
                 $nameFixer->reset();
 
                 if ((int) $release['proc_hash16k'] === NameFixer::PROC_HASH16K_NONE && ! empty($release['hash'])) {
-                    echo ColorCLI::primaryOver('U');
+                    echo ColorCLI::primaryOver('H');
                     $nameFixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1);
                 }
                 // Not all gate requirements in query always set column status as PP Add check is in query
@@ -193,10 +194,6 @@ switch (true) {
                                 echo ColorCLI::primaryOver('f');
                                 $releaseFile['textstring'] = $fileName;
                                 $nameFixer->checkName($releaseFile, true, 'Filenames, ', 1, 1);
-                                if ($nameFixer->matched === false) {
-                                    echo ColorCLI::primaryOver('xf');
-                                    $nameFixer->xxxNameCheck($releaseFile, true, 'Filenames, ', 1, 1);
-                                }
                             }
                         }
                     }
@@ -224,9 +221,8 @@ switch (true) {
                             ]
                         );
                     }
-                    if ($nameFixer->hashCheck($release, true, 'PAR2 hash, ', 1, 1) === false) {
-                        $nzbcontents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], 1, 1);
-                    }
+
+                    $nzbcontents->checkPAR2($release['guid'], $release['releases_id'], $release['groups_id'], 1, 1);
                 }
 
                 // Not all gate requirements in query always set column status as PP Add check is in query
@@ -278,16 +274,7 @@ switch (true) {
                     $searched = $pre['searched'] - 1;
                     echo '.';
                 }
-                $pdo->queryExec(
-                    sprintf(
-                        '
-							UPDATE predb
-							SET searched = %d
-							WHERE id = %d',
-                        $searched,
-                        $pre['predb_id']
-                    )
-                );
+                Predb::query()->where('id', $pre['predb_id'])->update(['searched' => $searched]);
                 $nameFixer->checked++;
             }
         }
