@@ -27,10 +27,10 @@ define('NN_MISC', NN_ROOT.'misc'.DS);
 define('NN_UPDATE', NN_MISC.'update'.DS);
 
 // /misc/update/multiprocessing
-define('NN_MULTI', NN_UPDATE.'nix'.DS.'multiprocessing'.DS);
+define('NN_MULTI', NN_UPDATE.'multiprocessing'.DS);
 
 // /misc/update/tmux/
-define('NN_TMUX', NN_UPDATE.'nix'.DS.'tmux'.DS);
+define('NN_TMUX', NN_UPDATE.'tmux'.DS);
 
 // /misc/update/multiprocessing/
 define('NN_MULTIPROCESSING', NN_UPDATE.'multiprocessing'.DS);
