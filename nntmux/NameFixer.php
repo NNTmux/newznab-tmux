@@ -1235,11 +1235,10 @@ class NameFixer
                 $pre = Predb::query()
                     ->where('filename', $this->_fileName)
                     ->orWhere('title', $this->_fileName)
-                    ->select(['id as predb_id', 'title as title', 'source as source'])
-                    ->get();
+                    ->first(['id as predb_id', 'title', 'source']);
             }
 
-            if (! empty($pre)) {
+            if ($pre !== null) {
                 $release['filename'] = $this->_fileName;
                 if ($pre['title'] !== $release['searchname']) {
                     $this->updateRelease($release, $pre['title'], $method = 'file matched source: '.$pre['source'], $echo, 'PreDB file match, ', $namestatus, $show, $pre['predb_id']);
