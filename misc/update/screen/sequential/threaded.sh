@@ -40,7 +40,7 @@ export PYTHON="nice -n$niceness $PYTHON"
 
 if [[ $1 != "true" ]]
 then
-	$PHP ${NNTMUX_PATH}/nix/tmux/bin/resetdelaytime.php
+	$PHP ${NNTMUX_PATH}/tmux/bin/resetdelaytime.php
 fi
 
 loop=1
@@ -108,7 +108,7 @@ do
 	echo "--- Decrypt Hashes ---"
 	$PHP ${NNTMUX_PATH}/decrypt_hashes.php 10240
 #	echo "--- PreDB ---"
-#	$PHP ${NNTMUX_PATH}/nix/tmux/bin/postprocess_pre.php	# Post-Process PreDBs
+#	$PHP ${NNTMUX_PATH}/tmux/bin/postprocess_pre.php	# Post-Process PreDBs
 	echo "--- PREs ---"
 	$PHP ${NNTMUX_PATH}/match_prefiles.php 10240 show # Match PREs
 ## Post-Processing options
@@ -167,7 +167,7 @@ do
 ##	$PHP ${TEST_PATH}/fixReleaseNames.php 4 true all yes					#Threaded is faster but uses more load
 ##	$PHP ${TEST_PATH}/fixReleaseNames.php 2 true all yes					#decrypt_hashes.php is faster, but this uses filenames also and should be run after
 ##	$PHP ${TEST_PATH}/fixReleaseNames.php 8 true all yes					#This should only be run after all pp additional has been completed
-#	$PHP ${NNTMUX_PATH}/nix/tmux/bin/postprocess_pre.php						#This is better run in a dedicated screen instance, 24x7
+#	$PHP ${NNTMUX_PATH}/tmux/bin/postprocess_pre.php						#This is better run in a dedicated screen instance, 24x7
 #	$PYTHON -OOu ${THREADED_PATH}/postprocess_threaded.py nfo
 ##	$PHP ${NNTMUX_PATH}/requestid.php full									#This runs a local lookup only and is much faster, should be run before threaded
 #   $PYTHON -OOu ${THREADED_PATH}/requestid_threaded.py						#This is much slower for local lookup, but is faster for remote lookup
@@ -187,6 +187,6 @@ do
 	date2=`date +%s`
 	diff=$(($date2-$date1))
 	echo "=== Total Running Time: $(($diff / 60)) minutes and $(($diff % 60)) seconds ==="
-	$PHP ${NNTMUX_PATH}/nix/tmux/bin/showsleep.php $NNTMUX_SLEEP_TIME
+	$PHP ${NNTMUX_PATH}/tmux/bin/showsleep.php $NNTMUX_SLEEP_TIME
 #	sleep 2
 done
