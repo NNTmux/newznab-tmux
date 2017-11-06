@@ -2,6 +2,7 @@
 
 namespace nntmux\processing;
 
+use App\Models\Release;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
@@ -37,7 +38,7 @@ class ProcessReleases
     const FILE_COMPLETE = 1; // We have all the parts for the file (binaries table partcheck column).
 
     /**
-     * @var Groups
+     * @var \nntmux\Groups
      */
     public $groups;
 
@@ -72,37 +73,40 @@ class ProcessReleases
     public $echoCLI;
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
     /**
-     * @var ConsoleTools
+     * @var \nntmux\ConsoleTools
      */
     public $consoleTools;
 
     /**
-     * @var NZB
+     * @var \nntmux\NZB
      */
     public $nzb;
 
     /**
-     * @var ReleaseCleaning
+     * @var \nntmux\ReleaseCleaning
      */
     public $releaseCleaning;
 
     /**
-     * @var Releases
+     * @var \nntmux\Releases
      */
     public $releases;
 
     /**
-     * @var ReleaseImage
+     * @var \nntmux\ReleaseImage
      */
     public $releaseImage;
 
     /**
-     * @var array	List of table names to be using for method calls.
+     * List of table names to be using for method calls.
+     *
+     *
+     * @var array
      */
     protected $tables = [];
 
@@ -112,7 +116,10 @@ class ProcessReleases
     protected $fromNamesQuery;
 
     /**
-     * @var int Time (hours) to wait before delete a stuck/broken collection.
+     * Time (hours) to wait before delete a stuck/broken collection.
+     *
+     *
+     * @var int
      */
     private $collectionTimeout;
 
@@ -173,17 +180,18 @@ class ProcessReleases
      * @return int
      * @throws \Exception
      */
-    public function processReleases($categorize, $postProcess, $groupName, &$nntp, $echooutput)
+    public function processReleases($categorize, $postProcess, $groupName, &$nntp, $echooutput): int
     {
         $this->echoCLI = ($echooutput && NN_ECHOCLI);
         $groupID = '';
 
         if (! empty($groupName) && $groupName !== 'mgr') {
             $groupInfo = $this->groups->getByName($groupName);
-            $groupID = $groupInfo['id'];
+            if ($groupInfo !== null) {
+                $groupID = $groupInfo['id'];
+            }
         }
 
-        $processReleases = microtime(true);
         if ($this->echoCLI) {
             ColorCLI::doEcho(ColorCLI::header('Starting release update process ('.date('Y-m-d H:i:s').')'), true);
         }
@@ -291,16 +299,7 @@ class ProcessReleases
             $total = $releases->rowCount();
             foreach ($releases as $release) {
                 $catId = $cat->determineCategory($release['groups_id'], $release[$type], $release['fromname']);
-                $this->pdo->queryExec(
-                    sprintf(
-                        '
-						UPDATE releases
-						SET categories_id = %d, iscategorized = 1
-						WHERE id = %d',
-                        $catId,
-                        $release['id']
-                    )
-                );
+                Release::query()->where('id', $release['id'])->update(['categories_id' => $catId, 'iscategorized' => 1]);
                 $categorized++;
                 if ($this->echoCLI) {
                     $this->consoleTools->overWritePrimary(
@@ -318,6 +317,7 @@ class ProcessReleases
 
     /**
      * @param $groupID
+     * @throws \Exception
      */
     public function processIncompleteCollections($groupID): void
     {
@@ -432,7 +432,7 @@ class ProcessReleases
             $groupMinSizeSetting = $groupMinFilesSetting = 0;
 
             $groupMinimums = $this->groups->getByID($grpID['id']);
-            if ($groupMinimums !== false) {
+            if ($groupMinimums !== null) {
                 if (! empty($groupMinimums['minsizetoformrelease']) && $groupMinimums['minsizetoformrelease'] > 0) {
                     $groupMinSizeSetting = (int) $groupMinimums['minsizetoformrelease'];
                 }
