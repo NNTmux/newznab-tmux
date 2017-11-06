@@ -1141,7 +1141,6 @@ class NameFixer
             $limit = 'LIMIT '.$args[1];
             $orderby = 'ORDER BY r.id DESC';
         } else {
-            $maxRelId = 0;
             $orderby = 'ORDER BY r.id ASC';
             $limit = 'LIMIT 1000000';
         }
@@ -1149,11 +1148,10 @@ class NameFixer
         echo ColorCLI::header(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.date('g:i:s'));
         echo ColorCLI::primary('Matching predb filename to cleaned release_files.name.'.PHP_EOL);
 
-        do {
-            $counter = $counted = 0;
-            $timestart = time();
+        $counter = $counted = 0;
+        $timestart = time();
 
-            $query = $this->pdo->queryDirect(
+        $query = $this->pdo->queryDirect(
                 sprintf(
                     "
 					SELECT r.id AS releases_id, r.name, r.searchname,
@@ -1162,43 +1160,34 @@ class NameFixer
 					FROM releases r
 					INNER JOIN release_files rf ON r.id = rf.releases_id
 					AND rf.name IS NOT NULL
-					WHERE %s
-					r.predb_id = 0
+					WHERE r.predb_id = 0
 					GROUP BY r.id
 					%s %s",
-                    (isset($maxRelId) && $maxRelId > 0 ? sprintf('r.id > %s AND', $maxRelId) : ''),
                     $orderby,
                     $limit
                 )
             );
 
-            if ($query !== false) {
-                $total = $query->rowCount();
+        if ($query !== false) {
+            $total = $query->rowCount();
 
-                if ($total > 0 && $query instanceof \Traversable) {
-                    echo ColorCLI::header($n.number_format($total).' releases to process.');
+            if ($total > 0 && $query instanceof \Traversable) {
+                echo ColorCLI::header($n.number_format($total).' releases to process.');
 
-                    foreach ($query as $row) {
-                        $success = $this->matchPredbFiles($row, true, 1, true, $show);
-                        if ($success === 1) {
-                            $counted++;
-                        }
-                        if ($show === 0) {
-                            $this->consoletools->overWritePrimary('Renamed Releases: ['.number_format($counted).'] '.$this->consoletools->percentString(++$counter, $total));
-                        }
-                        if (isset($maxRelId) && $row['releases_id'] > $maxRelId) {
-                            $maxRelId = $row['releases_id'];
-                        }
+                foreach ($query as $row) {
+                    $success = $this->matchPredbFiles($row, true, 1, true, $show);
+                    if ($success === 1) {
+                        $counted++;
                     }
-                    echo ColorCLI::header($n.'Renamed '.number_format($counted).' releases in '.$this->consoletools->convertTime(time() - $timestart).'.');
-                } else {
-                    echo ColorCLI::info($n.'Nothing to do.');
-                    break;
+                    if ($show === 0) {
+                        $this->consoletools->overWritePrimary('Renamed Releases: ['.number_format($counted).'] '.$this->consoletools->percentString(++$counter, $total));
+                    }
                 }
+                echo ColorCLI::header($n.'Renamed '.number_format($counted).' releases in '.$this->consoletools->convertTime(time() - $timestart).'.');
             } else {
-                break;
+                echo ColorCLI::info($n.'Nothing to do.');
             }
-        } while (isset($maxRelId));
+        }
     }
 
     /**
