@@ -2,6 +2,8 @@
 
 namespace nntmux\libraries;
 
+use App\Models\Tmux;
+use Carbon\Carbon;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
@@ -24,6 +26,78 @@ class Forking extends \fork_daemon
     const OUTPUT_NONE = 0; // Don't display child output.
     const OUTPUT_REALTIME = 1; // Display child output in real time.
     const OUTPUT_SERIALLY = 2; // Display child output when child is done.
+
+    /**
+     * @var \nntmux\ColorCLI
+     */
+    public $_colorCLI;
+
+    /**
+     * @var int The type of output
+     */
+    protected $outputType;
+
+    /**
+     * Path to do not run folder.
+     *
+     * @var string
+     */
+    private $dnr_path;
+
+    /**
+     * Work to work on.
+     *
+     * @var array
+     */
+    private $work = [];
+
+    /**
+     * How much work do we have to do?
+     *
+     * @var int
+     */
+    public $_workCount = 0;
+
+    /**
+     * The type of work we want to work on.
+     *
+     * @var string
+     */
+    private $workType = '';
+
+    /**
+     * List of passed in options for the current work type.
+     *
+     * @var array
+     */
+    private $workTypeOptions = [];
+
+    /**
+     * Max amount of child processes to do work at a time.
+     *
+     * @var int
+     */
+    private $maxProcesses = 1;
+
+    /**
+     * Group used for safe backfill.
+     *
+     * @var string
+     */
+    private $safeBackfillGroup = '';
+
+    /**
+     * @var \nntmux\db\DB
+     */
+    public $pdo;
+
+    /**
+     * @var bool
+     */
+    private $processAdditional = false; // Should we process additional?
+    private $processNFO = false; // Should we process NFOs?
+    private $processMovies = false; // Should we process Movies?
+    private $processTV = false; // Should we process TV?
 
     /**
      * Setup required parent / self vars.
@@ -79,10 +153,11 @@ class Forking extends \fork_daemon
      * Setup the class to work on a type of work, then process the work.
      * Valid work types:.
      *
-     * @param string $type    The type of multiProcessing to do : backfill, binaries, releases, postprocess
-     * @param array  $options Array containing arguments for the type of work.
+     * @param string $type The type of multiProcessing to do : backfill, binaries, releases, postprocess
+     * @param array $options Array containing arguments for the type of work.
      *
      * @throws ForkingException
+     * @throws \Exception
      */
     public function processWorkType($type, array $options = [])
     {
@@ -165,7 +240,7 @@ class Forking extends \fork_daemon
                 break;
 
             case 'postProcess_mov':
-                $this->ppRenamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true ? true : false);
+                $this->ppRenamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true);
                 $maxProcesses = $this->postProcessMovMainMethod();
                 break;
 
@@ -178,7 +253,7 @@ class Forking extends \fork_daemon
                 break;
 
             case 'postProcess_tv':
-                $this->ppRenamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true ? true : false);
+                $this->ppRenamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true);
                 $maxProcesses = $this->postProcessTvMainMethod();
                 break;
 
@@ -271,7 +346,7 @@ class Forking extends \fork_daemon
      * @return int
      * @throws \Exception
      */
-    private function backfillMainMethod()
+    private function backfillMainMethod(): int
     {
         $this->register_child_run([0 => $this, 1 => 'backFillChildWorker']);
         // The option for backFill is for doing up to x articles. Else it's done by date.
@@ -286,10 +361,9 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * @param        $groups
-     * @param string $identifier
+     * @param $groups
      */
-    public function backFillChildWorker($groups, $identifier = '')
+    public function backFillChildWorker($groups)
     {
         foreach ($groups as $group) {
             $this->_executeCommand(
@@ -303,15 +377,18 @@ class Forking extends \fork_daemon
      * @return int
      * @throws \Exception
      */
-    private function safeBackfillMainMethod()
+    private function safeBackfillMainMethod(): int
     {
         $this->register_child_run([0 => $this, 1 => 'safeBackfillChildWorker']);
 
-        $run = $this->pdo->query("SELECT (SELECT value FROM tmux WHERE setting = 'backfill_qty') AS qty, (SELECT value FROM tmux WHERE setting = 'backfill') AS backfill, (SELECT value FROM tmux WHERE setting = 'backfill_order') AS orderby, (SELECT value FROM tmux WHERE setting = 'backfill_days') AS days, (SELECT value FROM settings WHERE setting = 'maxmssgs') AS maxmsgs");
+        $backfill_qty = Tmux::value('backfill_qty');
+        $backfill_order = Tmux::value('backfill_order');
+        $backfill_days = Tmux::value('backfill_days');
+        $maxmssgs = Tmux::value('maxmssgs');
         $threads = Settings::settingValue('..backfillthreads');
 
         $orderby = 'ORDER BY a.last_record ASC';
-        switch ((int) $run[0]['orderby']) {
+        switch ((int) $backfill_order) {
             case 1:
                 $orderby = 'ORDER BY first_record_postdate DESC';
                 break;
@@ -334,10 +411,11 @@ class Forking extends \fork_daemon
         }
 
         $backfilldays = '';
-        if ($run[0]['days'] == 1) {
-            $backfilldays = 'backfill_target';
-        } elseif ($run[0]['days'] == 2) {
-            $backfilldays = round(abs(strtotime(date('Y-m-d')) - strtotime(Settings::settingValue('..safebackfilldate'))) / 86400);
+        if ((int) $backfill_days === 1) {
+            $days = 'backfill_target';
+            $backfilldays = Carbon::now()->subDays($days);
+        } elseif ((int) $backfill_days === 2) {
+            $backfilldays = Settings::settingValue('..safebackfilldate');
         }
 
         $data = $this->pdo->queryOneRow(
@@ -351,7 +429,7 @@ class Forking extends \fork_daemon
 				WHERE g.first_record IS NOT NULL
 				AND g.first_record_postdate IS NOT NULL
 				AND g.backfill = 1
-				AND (NOW() - INTERVAL %s DAY) < g.first_record_postdate
+				AND %s < g.first_record_postdate
 				GROUP BY a.name, a.last_record, g.name, g.first_record
 				%s',
                 $backfilldays,
@@ -367,15 +445,15 @@ class Forking extends \fork_daemon
         }
 
         if ($count > 0) {
-            if ($count > ($run[0]['qty'] * $threads)) {
-                $geteach = ceil(($run[0]['qty'] * $threads) / $run[0]['maxmsgs']);
+            if ($count > ($backfill_qty * $threads)) {
+                $geteach = ceil(($backfill_qty * $threads) / $maxmssgs);
             } else {
-                $geteach = $count / $run[0]['maxmsgs'];
+                $geteach = $count / $maxmssgs;
             }
 
             $queue = [];
             for ($i = 0; $i <= $geteach - 1; $i++) {
-                $queue[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data['name'], $data['our_first'] - $i * $run[0]['maxmsgs'] - $run[0]['maxmsgs'], $data['our_first'] - $i * $run[0]['maxmsgs'] - 1, $i + 1);
+                $queue[$i] = sprintf('get_range  backfill  %s  %s  %s  %s', $data['name'], $data['our_first'] - $i * $maxmssgs - $maxmssgs, $data['our_first'] - $i * $maxmssgs - 1, $i + 1);
             }
             $this->work = $queue;
         }
@@ -455,7 +533,7 @@ class Forking extends \fork_daemon
             $i = 1;
             $queue = [];
             foreach ($groups as $group) {
-                if ($group['our_last'] == 0) {
+                if ((int) $group['our_last'] === 0) {
                     $queue[$i] = sprintf('update_group_headers  %s', $group['groupname']);
                     $i++;
                 } else {
@@ -659,10 +737,7 @@ class Forking extends \fork_daemon
             (Settings::settingValue('..maxsizetopostprocess') !== '') ? (int) Settings::settingValue('..maxsizetopostprocess') : 100;
         $this->ppAddMaxSize = ($this->ppAddMaxSize > 0 ? ('AND r.size < '.($this->ppAddMaxSize * 1073741824)) : '');
 
-        return
-        $this->pdo->queryOneRow(
-            sprintf(
-                '
+        return $this->pdo->queryOneRow(sprintf('
 					SELECT r.id
 					FROM releases r
 					LEFT JOIN categories c ON c.id = r.categories_id
@@ -671,12 +746,7 @@ class Forking extends \fork_daemon
 					AND r.haspreview = -1
 					AND c.disablepreview = 0
 					%s %s
-					LIMIT 1',
-                NZB::NZB_ADDED,
-                $this->ppAddMaxSize,
-                $this->ppAddMinSize
-            )
-        ) === false ? false : true;
+					LIMIT 1', NZB::NZB_ADDED, $this->ppAddMaxSize, $this->ppAddMinSize)) !== false;
     }
 
     /**
@@ -725,13 +795,7 @@ class Forking extends \fork_daemon
         if (Settings::settingValue('..lookupnfo') == 1) {
             $this->nfoQueryString = Nfo::NfoQueryString($this->pdo);
 
-            return
-            $this->pdo->queryOneRow(
-                sprintf(
-                    'SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1',
-                    $this->nfoQueryString
-                )
-            ) === false ? false : true;
+            return $this->pdo->queryOneRow(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) !== false;
         }
 
         return false;
@@ -772,22 +836,14 @@ class Forking extends \fork_daemon
     private function checkProcessMovies()
     {
         if (Settings::settingValue('..lookupimdb') > 0) {
-            return
-            $this->pdo->queryOneRow(
-                sprintf(
-                    '
+            return $this->pdo->queryOneRow(sprintf('
 						SELECT id
 						FROM releases
 						PARTITION (movies)
 						WHERE nzbstatus = %d
 						AND imdbid IS NULL
 						%s %s
-						LIMIT 1',
-                    NZB::NZB_ADDED,
-                    ((int) Settings::settingValue('..lookupimdb') === 2 ? 'AND isrenamed = 1' : ''),
-                    ($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
-                )
-            ) === false ? false : true;
+						LIMIT 1', NZB::NZB_ADDED, ((int) Settings::settingValue('..lookupimdb') === 2 ? 'AND isrenamed = 1' : ''), ($this->ppRenamedOnly ? 'AND isrenamed = 1' : ''))) !== false;
         }
 
         return false;
@@ -834,10 +890,7 @@ class Forking extends \fork_daemon
     private function checkProcessTV()
     {
         if (Settings::settingValue('..lookuptvrage') > 0) {
-            return
-            $this->pdo->queryOneRow(
-                sprintf(
-                    '
+            return $this->pdo->queryOneRow(sprintf('
 						SELECT id
 						FROM releases
 						PARTITION (tv)
@@ -845,12 +898,7 @@ class Forking extends \fork_daemon
 						AND size > 1048576
 						AND tv_episodes_id BETWEEN -2 AND 0
 						%s %s
-						LIMIT 1',
-                    NZB::NZB_ADDED,
-                    (int) Settings::settingValue('..lookuptvrage') === 2 ? 'AND isrenamed = 1' : '',
-                    $this->ppRenamedOnly ? 'AND isrenamed = 1' : ''
-                )
-            ) === false ? false : true;
+						LIMIT 1', NZB::NZB_ADDED, (int) Settings::settingValue('..lookuptvrage') === 2 ? 'AND isrenamed = 1' : '', $this->ppRenamedOnly ? 'AND isrenamed = 1' : '')) !== false;
         }
 
         return false;
@@ -1079,85 +1127,4 @@ class Forking extends \fork_daemon
             );
         }
     }
-
-    public function __destruct()
-    {
-        parent::__destruct();
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////// All class vars here /////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @var ColorCLI
-     */
-    public $_colorCLI;
-
-    /**
-     * @var int The type of output
-     */
-    protected $outputType;
-
-    /**
-     * Path to do not run folder.
-     *
-     * @var string
-     */
-    private $dnr_path;
-
-    /**
-     * Work to work on.
-     *
-     * @var array
-     */
-    private $work = [];
-
-    /**
-     * How much work do we have to do?
-     *
-     * @var int
-     */
-    public $_workCount = 0;
-
-    /**
-     * The type of work we want to work on.
-     *
-     * @var string
-     */
-    private $workType = '';
-
-    /**
-     * List of passed in options for the current work type.
-     *
-     * @var array
-     */
-    private $workTypeOptions = [];
-
-    /**
-     * Max amount of child processes to do work at a time.
-     *
-     * @var int
-     */
-    private $maxProcesses = 1;
-
-    /**
-     * Group used for safe backfill.
-     *
-     * @var string
-     */
-    private $safeBackfillGroup = '';
-
-    /**
-     * @var \nntmux\db\DB
-     */
-    public $pdo;
-
-    /**
-     * @var bool
-     */
-    private $processAdditional = false; // Should we process additional?
-    private $processNFO = false; // Should we process NFOs?
-    private $processMovies = false; // Should we process Movies?
-    private $processTV = false; // Should we process TV?
 }
