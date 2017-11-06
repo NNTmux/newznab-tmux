@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
+use nntmux\db\DB;
 use App\Models\Predb;
 use App\Models\Release;
-use nntmux\db\DB;
 use nntmux\utility\Utility;
 use nntmux\processing\PostProcess;
 
