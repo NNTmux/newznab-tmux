@@ -20,7 +20,7 @@
  */
 
 /* TODO better tune the queries for performance, including pre-fetching groups_id and other data for
-	faster inclusion in the main query.
+    faster inclusion in the main query.
 */
 require_once realpath(dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'bootstrap.php');
 
@@ -46,19 +46,19 @@ if (! is_writable(NN_RES)) {
 }
 
 if (! isset($argv[1]) || (! is_numeric($argv[1]) && $argv[1] !== 'progress') || ! isset($argv[2]) ||
-	! in_array($argv[2], ['local', 'remote']) || ! isset($argv[3]) ||
-	! in_array($argv[3], ['true', 'false'])
+    ! in_array($argv[2], ['local', 'remote']) || ! isset($argv[3]) ||
+    ! in_array($argv[3], ['true', 'false'])
 ) {
     exit('This script quickly imports the daily PreDB dumps.'.PHP_EOL.
-		'Argument 1: Enter the unix time of the patch to start at.'.PHP_EOL.
-		'You can find the unix time in the file name of the patch, it\'s the long number.'.
-		PHP_EOL.
-		'You can put in 0 to import all the daily PreDB dumps.'.PHP_EOL.
-		'You can put in progress to track progress of the imports and only import newer ones.'.
-		PHP_EOL.
-		'Argument 2: If your MySQL server is local, type local else type remote.'.PHP_EOL.
-		'Argument 3: Show output of queries or not, true | false'.PHP_EOL
-	);
+        'Argument 1: Enter the unix time of the patch to start at.'.PHP_EOL.
+        'You can find the unix time in the file name of the patch, it\'s the long number.'.
+        PHP_EOL.
+        'You can put in 0 to import all the daily PreDB dumps.'.PHP_EOL.
+        'You can put in progress to track progress of the imports and only import newer ones.'.
+        PHP_EOL.
+        'Argument 2: If your MySQL server is local, type local else type remote.'.PHP_EOL.
+        'Argument 3: Show output of queries or not, true | false'.PHP_EOL
+    );
 }
 if (NN_DEBUG) {
     echo "Parameter check completed\n";
@@ -76,7 +76,7 @@ $result = getDirListing($url);
 $dirs = json_decode($result, true);
 
 if (is_null($dirs) ||
-	(isset($dirs['message']) && substr($dirs['message'], 0, 27) == 'API rate limit exceeded for')) {
+    (isset($dirs['message']) && substr($dirs['message'], 0, 27) == 'API rate limit exceeded for')) {
     exit("Error: $result");
 }
 
@@ -116,16 +116,18 @@ $progress = $predb->progress(settings_array());
 foreach ($data as $dir => $files) {
     foreach ($files as $file) {
         //var_dump($file);
-        if (preg_match("#^https://raw\.githubusercontent\.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$#",
-			$file['download_url'])) {
+        if (preg_match(
+            "#^https://raw\.githubusercontent\.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$#",
+            $file['download_url']
+        )) {
             if (preg_match("#^$filePattern$#", $file['name'], $match)) {
                 $timematch = $progress['last'];
 
                 // Skip patches the user does not want.
                 if ($match[1] < $timematch) {
                     echo 'Skipping dump '.$match[2].
-						', as your minimum unix time argument is '.
-						$timematch.PHP_EOL;
+                        ', as your minimum unix time argument is '.
+                        $timematch.PHP_EOL;
                     $total--;
                     continue;
                 }
@@ -136,7 +138,7 @@ foreach ($data as $dir => $files) {
 
                 if (! $dump) {
                     echo "Error downloading dump {$match[2]} you can try manually importing it.".
-						PHP_EOL;
+                        PHP_EOL;
                     continue;
                 } else {
                     if (NN_DEBUG) {
@@ -163,7 +165,7 @@ foreach ($data as $dir => $files) {
                 $fetched = file_put_contents($dumpFile, $dump);
                 if (! $fetched) {
                     echo "Error storing dump file {$match[2]} in (".NN_RES.').'.
-						PHP_EOL;
+                        PHP_EOL;
                     continue;
                 }
 
@@ -181,12 +183,13 @@ foreach ($data as $dir => $files) {
 
                 // Import file into predb_imports
                 $predb->executeLoadData(
-					[
-						'fields' => '\\t\\t',
-						'lines'  => '\\r\\n',
-						'local'  => $local,
-						'path'   => $dumpFile,
-					]);
+                    [
+                        'fields' => '\\t\\t',
+                        'lines'  => '\\r\\n',
+                        'local'  => $local,
+                        'path'   => $dumpFile,
+                    ]
+                );
 
                 // Remove any titles where length <=8
                 if ($verbose === true) {
@@ -206,13 +209,16 @@ foreach ($data as $dir => $files) {
                 // Delete the dump.
                 unlink($dumpFile);
 
-                $progress = $predb->progress(settings_array($match[2] + 1, $progress),
-					['read' => false]);
-                echo sprintf("Successfully imported PreDB dump %d (%s), %d dumps remaining\n",
-					$match[2],
-					date('Y-m-d', $match[2]),
-					--$total
-				);
+                $progress = $predb->progress(
+                    settings_array($match[2] + 1, $progress),
+                    ['read' => false]
+                );
+                echo sprintf(
+                    "Successfully imported PreDB dump %d (%s), %d dumps remaining\n",
+                    $match[2],
+                    date('Y-m-d', $match[2]),
+                    --$total
+                );
             } else {
                 echo "Ignoring: {$file['download_url']}\n";
             }
@@ -242,13 +248,14 @@ function settings_array($last = null, $settings = null)
 function getDirListing($url)
 {
     $result = Utility::getUrl(
-		[
-			'url'            => $url,
-			'requestheaders' => [
-				'Content-Type: application/json',
-				'User-Agent: nZEDb',
-			],
-		]);
+        [
+            'url'            => $url,
+            'requestheaders' => [
+                'Content-Type: application/json',
+                'User-Agent: nZEDb',
+            ],
+        ]
+    );
 
     if ($result === false) {
         exit('Error connecting to GitHub, try again later?'.PHP_EOL);

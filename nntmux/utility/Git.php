@@ -32,10 +32,10 @@ class Git extends \GitRepo
     public function __construct(array $options = [])
     {
         $defaults = [
-			'create'		=> false,
-			'initialise'	=> false,
-			'filepath'		=> NN_ROOT,
-		];
+            'create'        => false,
+            'initialise'    => false,
+            'filepath'        => NN_ROOT,
+        ];
         $options += $defaults;
 
         parent::__construct($options['filepath'], $options['create'], $options['initialise']);
