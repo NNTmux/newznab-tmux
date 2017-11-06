@@ -229,7 +229,7 @@ class ProcessReleases
                 if ($this->echoCLI) {
                     ColorCLI::doEcho(ColorCLI::header('Process Releases -> Request ID Threaded lookup.'));
                 }
-                passthru("${DIR}update/nix/multiprocessing/requestid.php");
+                passthru("${DIR}update/multiprocessing/requestid.php");
                 if ($this->echoCLI) {
                     ColorCLI::doEcho(
                         ColorCLI::primary(

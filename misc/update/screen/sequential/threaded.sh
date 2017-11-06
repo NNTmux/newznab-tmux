@@ -30,7 +30,7 @@ export TEST_PATH="${NNTMUX_ROOT}/misc/testing/Releases"
 export DEV_PATH="${NNTMUX_ROOT}/misc/testing/Dev"
 export DB_PATH="${NNTMUX_ROOT}/misc/testing/DB"
 export THREADED_PATH="${NNTMUX_ROOT}/misc/update/python"
-export MULTI_PATH="${NNTMUX_ROOT}/misc/update/nix/multiprocessing"
+export MULTI_PATH="${NNTMUX_ROOT}/misc/update/multiprocessing"
 export NNTMUX_SLEEP_TIME="60" # in seconds
 
 command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=`command -v php`; }
@@ -99,7 +99,7 @@ do
 #
 ## NZB Import
 #	echo "--- Import ---"
-#	$PHP ${MULTI_PATH}/import.php					#NZB import - see /misc/update/nix/multiprocessing/import.php for required arguments.
+#	$PHP ${MULTI_PATH}/import.php					#NZB import - see /misc/update/multiprocessing/import.php for required arguments.
 #
 ## Release Processing
 	echo "--- Create Releases ---"

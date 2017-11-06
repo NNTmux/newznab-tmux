@@ -8,8 +8,8 @@ else
 fi
 
 export NNTMUX_PATH="${NNTMUX_ROOT}/misc/update"
-export HELP_PATH="${NNTMUX_ROOT}/misc/update/nix/screen/threaded"
-export THREAD_PATH="${NNTMUX_ROOT}/misc/update/nix/multiprocessing"
+export HELP_PATH="${NNTMUX_ROOT}/misc/update/screen/threaded"
+export THREAD_PATH="${NNTMUX_ROOT}/misc/update/multiprocessing"
 export TEST_PATH="${NNTMUX_ROOT}/misc/testing"
 
 command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=`command -v php`; }

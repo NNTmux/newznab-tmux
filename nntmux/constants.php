@@ -26,17 +26,14 @@ define('NN_MISC', NN_ROOT.'misc'.DS);
 // /misc/update/
 define('NN_UPDATE', NN_MISC.'update'.DS);
 
-// /misc/update/nix/
-define('NN_NIX', NN_UPDATE.'nix'.DS);
-
-// /misc/update/nix/multiprocessing
+// /misc/update/multiprocessing
 define('NN_MULTI', NN_UPDATE.'nix'.DS.'multiprocessing'.DS);
 
-// /misc/update/nix/tmux/
+// /misc/update/tmux/
 define('NN_TMUX', NN_UPDATE.'nix'.DS.'tmux'.DS);
 
-// /misc/update/nix/multiprocessing/
-define('NN_MULTIPROCESSING', NN_NIX.'multiprocessing'.DS);
+// /misc/update/multiprocessing/
+define('NN_MULTIPROCESSING', NN_UPDATE.'multiprocessing'.DS);
 
 // Refers to the web root for the Smarty lib
 define('NN_WWW', NN_ROOT.'public'.DS);

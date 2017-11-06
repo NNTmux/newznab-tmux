@@ -35,7 +35,7 @@ $show_time = (NN_DEBUG ? '/usr/bin/time' : '');
 $runVar['commands']['_php'] = $show_time." nice -n{$tmux_niceness} $PHP";
 $runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} $PHP";
 $runVar['commands']['_python'] = $show_time." nice -n{$tmux_niceness} $PYTHON";
-$runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/nix/tmux/bin/showsleep.php";
+$runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/tmux/bin/showsleep.php";
 
 //spawn IRCScraper as soon as possible
 $tRun->runPane('scraper', $runVar);
@@ -93,14 +93,14 @@ while ($runVar['counts']['iterations'] > 0) {
     $runVar['constants']['pre_lim'] = ($runVar['counts']['iterations'] > 1 ? '7' : '');
 
     //assign scripts
-    $runVar['scripts']['releases'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/releases.php";
+    $runVar['scripts']['releases'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/releases.php";
 
     switch ((int) $runVar['settings']['binaries_run']) {
 		case 1:
-			$runVar['scripts']['binaries'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/binaries.php 0";
+			$runVar['scripts']['binaries'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/binaries.php 0";
 			break;
 		case 2:
-			$runVar['scripts']['binaries'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/safe.php binaries";
+			$runVar['scripts']['binaries'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/safe.php binaries";
 			break;
 		default:
 			$runVar['scripts']['binaries'] = 0;
@@ -108,10 +108,10 @@ while ($runVar['counts']['iterations'] > 0) {
 
     switch ((int) $runVar['settings']['backfill']) {
 		case 1:
-			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/backfill.php";
+			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/backfill.php";
 			break;
 		case 4:
-			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/nix/multiprocessing/safe.php backfill";
+			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/safe.php backfill";
 	}
 
     //get usenet connection counts

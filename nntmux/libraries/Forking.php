@@ -313,7 +313,7 @@ class Forking extends \fork_daemon
             case 'safe_backfill':
             case 'safe_binaries':
                 $this->_executeCommand(
-                    PHP_BINARY.' '.NN_NIX.'tmux/bin/update_groups.php'
+                    PHP_BINARY.' '.NN_UPDATE.'tmux/bin/update_groups.php'
                 );
                 break;
         }
@@ -643,7 +643,7 @@ class Forking extends \fork_daemon
     {
         foreach ($guids as $guid) {
             $this->_executeCommand(
-                PHP_BINARY.' '.NN_NIX.'tmux/bin/groupfixrelnames.php "'.$guid.'"'.' true'
+                PHP_BINARY.' '.NN_UPDATE.'tmux/bin/groupfixrelnames.php "'.$guid.'"'.' true'
             );
         }
     }
