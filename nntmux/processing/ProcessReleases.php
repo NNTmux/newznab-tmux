@@ -2,7 +2,6 @@
 
 namespace nntmux\processing;
 
-use App\Models\Release;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
@@ -13,6 +12,7 @@ use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\Releases;
 use nntmux\Categorize;
+use App\Models\Release;
 use App\Models\Settings;
 use nntmux\ConsoleTools;
 use nntmux\ReleaseImage;
