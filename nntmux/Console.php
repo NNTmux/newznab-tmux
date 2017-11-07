@@ -100,23 +100,17 @@ class Console
         $this->sleeptime = (Settings::settingValue('..amazonsleep') !== '') ? (int) Settings::settingValue('..amazonsleep') : 1000;
         $this->imgSavePath = NN_COVERS.'console'.DS;
         $this->renamed = (int) Settings::settingValue('..lookupgames') === 2;
-        $this->catWhere = 'PARTITION (console)';
 
         $this->failCache = [];
     }
 
     /**
      * @param $id
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getConsoleInfo($id)
     {
-        return $this->pdo->queryOneRow(
-            sprintf(
-                'SELECT consoleinfo.*, genres.title AS genres FROM consoleinfo LEFT OUTER JOIN genres ON genres.id = consoleinfo.genres_id WHERE consoleinfo.id = %d',
-                $id
-            )
-        );
+        return ConsoleInfo::query()->where('id', $id)->select('consoleinfo.*', 'genres.title as genres')->leftJoin('genres', 'genres.id', '=', 'consoleinfo.id')->first();
     }
 
     /**
@@ -810,9 +804,10 @@ class Console
             return $query->where('isrenamed', '=', 1);
         })->limit($this->gameqty)->orderBy('postdate')->get(['searchname', 'id']);
 
-        if ($res instanceof \Traversable && $res->count() > 0) {
+        $releaseCount = $res->count();
+        if ($res instanceof \Traversable && $releaseCount > 0) {
             if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$res->count().' console release(s).'));
+                ColorCLI::doEcho(ColorCLI::header('Processing '.$releaseCount.' console release(s).'));
             }
 
             foreach ($res as $arr) {
@@ -864,18 +859,7 @@ class Console
                 }
 
                 // Update release.
-                $this->pdo->queryExec(
-                    sprintf(
-                        '
-								UPDATE releases
-								%s
-								SET consoleinfo_id = %d
-								WHERE id = %d',
-                        $this->catWhere,
-                        $gameId,
-                        $arr['id']
-                    )
-                );
+                Release::query()->where('id', $arr['id'])->update(['consoleinfo_id', $gameId]);
 
                 // Sleep to not flood amazon.
                 $diff = floor((microtime(true) - $startTime) * 1000000);
