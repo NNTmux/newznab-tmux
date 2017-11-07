@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Release;
 use nntmux\db\DB;
 use App\Models\Settings;
 use nntmux\utility\Utility;
@@ -15,34 +16,29 @@ use nntmux\processing\PostProcess;
 class NZBContents
 {
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
     /**
-     * @var NNTP
+     * @var \nntmux\NNTP
      */
     protected $nntp;
 
     /**
-     * @var Nfo
+     * @var \nntmux\Nfo
      */
     protected $nfo;
 
     /**
-     * @var PostProcess
+     * @var \nntmux\processing\PostProcess
      */
     protected $pp;
 
     /**
-     * @var NZB
+     * @var \nntmux\NZB
      */
     protected $nzb;
-
-    /**
-     * @var bool stdClass
-     */
-    protected $site;
 
     /**
      * @var bool
@@ -53,6 +49,10 @@ class NZBContents
      * @var bool
      */
     protected $echooutput;
+
+    /**
+     * @var bool
+     */
     protected $alternateNNTP;
 
     /**
@@ -73,13 +73,13 @@ class NZBContents
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Echo'        => false,
-			'NNTP'        => null,
-			'Nfo'         => null,
-			'NZB'         => null,
-			'Settings'    => null,
-			'PostProcess' => null,
-		];
+            'Echo'        => false,
+            'NNTP'        => null,
+            'Nfo'         => null,
+            'NZB'         => null,
+            'Settings'    => null,
+            'PostProcess' => null,
+        ];
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
@@ -87,13 +87,13 @@ class NZBContents
         $this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
         $this->nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
         $this->pp = (
-		$options['PostProcess'] instanceof PostProcess
-			? $options['PostProcess']
-			: new PostProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo, 'Settings' => $this->pdo])
-		);
+        $options['PostProcess'] instanceof PostProcess
+            ? $options['PostProcess']
+            : new PostProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo, 'Settings' => $this->pdo])
+        );
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
-        $this->lookuppar2 = (int) Settings::settingValue('..lookuppar2') === 1 ? true : false;
-        $this->alternateNNTP = (int) Settings::settingValue('..alternate_nntp') === 1 ? true : false;
+        $this->lookuppar2 = (int) Settings::settingValue('..lookuppar2') === 1;
+        $this->alternateNNTP = (int) Settings::settingValue('..alternate_nntp') === 1;
     }
 
     /**
@@ -103,12 +103,13 @@ class NZBContents
      *
      * @param string $guid
      * @param string $relID
-     * @param int    $groupID
+     * @param int $groupID
      * @param string $groupName
      *
      * @return bool
+     * @throws \Exception
      */
-    public function getNfoFromNZB($guid, $relID, $groupID, $groupName)
+    public function getNfoFromNZB($guid, $relID, $groupID, $groupName): bool
     {
         $fetchedBinary = false;
 
@@ -117,7 +118,7 @@ class NZBContents
             $fetchedBinary = $this->nntp->getMessages($groupName, $messageID['id'], $this->alternateNNTP);
             if ($this->nntp->isError($fetchedBinary)) {
                 // NFO download failed, increment attempts.
-                $this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = nfostatus - 1 WHERE id = %d', $relID));
+                Release::query()->where('id', $relID)->decrement('nfostatus');
                 if ($this->echooutput) {
                     echo 'f';
                 }
@@ -132,14 +133,14 @@ class NZBContents
                 if ($this->echooutput) {
                     echo '-';
                 }
-                $this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Nfo::NFO_NONFO, $relID));
+                Release::query()->where('id', $relID)->update(['nfostatus' => Nfo::NFO_NONFO]);
                 $fetchedBinary = false;
             }
         } else {
             if ($this->echooutput) {
                 echo '-';
             }
-            $this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Nfo::NFO_NONFO, $relID));
+            Release::query()->where('id', $relID)->update(['nfostatus' => Nfo::NFO_NONFO]);
         }
 
         return $fetchedBinary;
@@ -149,11 +150,12 @@ class NZBContents
      * Gets the completion from the NZB, optionally looks if there is an NFO/PAR2 file.
      *
      * @param string $guid
-     * @param int    $relID
-     * @param int    $groupID
-     * @param bool   $nfoCheck
+     * @param int $relID
+     * @param int $groupID
+     * @param bool $nfoCheck
      *
      * @return array|bool
+     * @throws \Exception
      */
     public function parseNZB($guid, $relID, $groupID, $nfoCheck = false)
     {
@@ -161,8 +163,8 @@ class NZBContents
         if ($nzbFile !== false) {
             $messageID = $hiddenID = '';
             $actualParts = $artificialParts = 0;
-            $foundPAR2 = $this->lookuppar2 === false ? true : false;
-            $foundNFO = $hiddenNFO = $nfoCheck === false ? true : false;
+            $foundPAR2 = $this->lookuppar2 === false;
+            $foundNFO = $hiddenNFO = $nfoCheck === false;
             $foundSRR = false;
 
             foreach ($nzbFile->file as $nzbcontents) {
@@ -184,10 +186,12 @@ class NZBContents
 
                 if ($foundNFO === false && $hiddenNFO === false) {
                     if (preg_match('/\(1\/1\)$/i', $subject) &&
-						! preg_match('/\.(apk|bat|bmp|cbr|cbz|cfg|css|csv|cue|db|dll|doc|epub|exe|gif|htm|ico|idx|ini'.
-							'|jpg|lit|log|m3u|mid|mobi|mp3|nib|nzb|odt|opf|otf|par|par2|pdf|psd|pps|png|ppt|r\d{2,4}'.
-							'|rar|sfv|srr|sub|srt|sql|rom|rtf|tif|torrent|ttf|txt|vb|vol\d+\+\d+|wps|xml|zip)/i',
-							$subject)) {
+                        ! preg_match(
+                            '/\.(apk|bat|bmp|cbr|cbz|cfg|css|csv|cue|db|dll|doc|epub|exe|gif|htm|ico|idx|ini'.
+                            '|jpg|lit|log|m3u|mid|mobi|mp3|nib|nzb|odt|opf|otf|par|par2|pdf|psd|pps|png|ppt|r\d{2,4}'.
+                            '|rar|sfv|srr|sub|srt|sql|rom|rtf|tif|torrent|ttf|txt|vb|vol\d+\+\d+|wps|xml|zip)/i',
+                            $subject
+                        )) {
                         $hiddenID = (string) $nzbcontents->segments->segment;
                         $hiddenNFO = true;
                     }
@@ -196,7 +200,7 @@ class NZBContents
                 if ($foundPAR2 === false) {
                     if (preg_match('/\.(par[&2" ]|\d{2,3}").+\(1\/1\)$/i', $subject)) {
                         if ($this->pp->parsePAR2((string) $nzbcontents->segments->segment, $relID, $groupID, $this->nntp, 1) === true) {
-                            $this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE id = %d', $relID));
+                            Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
                             $foundPAR2 = true;
                         }
                     }
@@ -212,7 +216,7 @@ class NZBContents
                 $completion = 100;
             }
 
-            $this->pdo->queryExec(sprintf('UPDATE releases SET completion = %d WHERE id = %d', $completion, $relID));
+            Release::query()->where('id', $relID)->update(['completion' => $completion]);
 
             if ($foundNFO === true && strlen($messageID) > 1) {
                 return ['hidden' => false, 'id' => $messageID];
@@ -248,13 +252,13 @@ class NZBContents
         if (! $nzbContents) {
             if ($this->echooutput) {
                 echo
-					PHP_EOL.
-					'Unable to decompress: '.
-					$nzbPath.
-					' - '.
-					fileperms($nzbPath).
-					' - may have bad file permissions, skipping.'.
-					PHP_EOL;
+                    PHP_EOL.
+                    'Unable to decompress: '.
+                    $nzbPath.
+                    ' - '.
+                    fileperms($nzbPath).
+                    ' - may have bad file permissions, skipping.'.
+                    PHP_EOL;
             }
 
             return false;
@@ -276,12 +280,13 @@ class NZBContents
      * Attempts to get the releasename from a par2 file.
      *
      * @param string $guid
-     * @param int    $relID
-     * @param int    $groupID
-     * @param int    $nameStatus
-     * @param int    $show
+     * @param int $relID
+     * @param int $groupID
+     * @param int $nameStatus
+     * @param int $show
      *
      * @return bool
+     * @throws \Exception
      */
     public function checkPAR2($guid, $relID, $groupID, $nameStatus, $show)
     {
@@ -289,14 +294,14 @@ class NZBContents
         if ($nzbFile !== false) {
             foreach ($nzbFile->file as $nzbContents) {
                 if ($nameStatus === 1 && $this->pp->parsePAR2((string) $nzbContents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)/i', (string) $nzbContents->attributes()->subject)) {
-                    $this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE id = %d', $relID));
+                    Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
 
                     return true;
                 }
             }
         }
         if ($nameStatus === 1) {
-            $this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE id = %d', $relID));
+            Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
         }
 
         return false;
