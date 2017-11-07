@@ -1,4 +1,5 @@
 2017-11-07 DariusIII
+	* Chg: Update NZB class
 	* Chg: Update NameFixer class
 	* Chg: Update NZBContents class to use Release model
 	* Chg: Update composer.lock

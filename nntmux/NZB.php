@@ -43,12 +43,12 @@ class NZB
     protected $groupID;
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
     /**
-     * @var Logger
+     * @var \nntmux\Logger
      */
     protected $debugging;
 
@@ -109,7 +109,7 @@ class NZB
         $this->pdo = ($pdo instanceof DB ? $pdo : new DB());
 
         $nzbSplitLevel = Settings::settingValue('..nzbsplitlevel');
-        $this->nzbSplitLevel = (empty($nzbSplitLevel) ? 1 : $nzbSplitLevel);
+        $this->nzbSplitLevel = $nzbSplitLevel ?? 1;
         $this->siteNzbPath = (string) Settings::settingValue('..nzbpath');
         if (substr($this->siteNzbPath, -1) !== DS) {
             $this->siteNzbPath .= DS;
