@@ -602,16 +602,16 @@
         },
         {
             "name": "bower-asset/fancybox",
-            "version": "v3.1.25",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fancyapps/fancybox.git",
-                "reference": "8d2d48da812375154fb801927783575157b7bd1f"
+                "reference": "cb73667298523e1261ebd2856f7ca959fd5b7d94"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/8d2d48da812375154fb801927783575157b7bd1f",
-                "reference": "8d2d48da812375154fb801927783575157b7bd1f",
+                "url": "https://api.github.com/repos/fancyapps/fancybox/zipball/cb73667298523e1261ebd2856f7ca959fd5b7d94",
+                "reference": "cb73667298523e1261ebd2856f7ca959fd5b7d94",
                 "shasum": ""
             },
             "require": {
@@ -637,7 +637,7 @@
                 "responsive",
                 "touch"
             ],
-            "time": "2017-09-18T15:58:32+00:00"
+            "time": "2017-11-06T15:34:05+00:00"
         },
         {
             "name": "bower-asset/fastclick",
@@ -4301,16 +4301,16 @@
         },
         {
             "name": "rtheunissen/guzzle-log-middleware",
-            "version": "v0.4.0",
+            "version": "v0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtheunissen/guzzle-log-middleware.git",
-                "reference": "7b6f2884b623091e58276500f38499f238d7d4e2"
+                "reference": "202f474456e5b4a62c09a91054b3942cab48ad74"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtheunissen/guzzle-log-middleware/zipball/7b6f2884b623091e58276500f38499f238d7d4e2",
-                "reference": "7b6f2884b623091e58276500f38499f238d7d4e2",
+                "url": "https://api.github.com/repos/rtheunissen/guzzle-log-middleware/zipball/202f474456e5b4a62c09a91054b3942cab48ad74",
+                "reference": "202f474456e5b4a62c09a91054b3942cab48ad74",
                 "shasum": ""
             },
             "require": {
@@ -4328,8 +4328,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Concat\\Http\\Middleware\\": "src/",
-                    "Concat\\Http\\Middleware\\Test\\": "tests/"
+                    "Concat\\Http\\Middleware\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -4350,7 +4349,7 @@
                 "middleware",
                 "psr7"
             ],
-            "time": "2015-06-16T06:35:18+00:00"
+            "time": "2017-11-06T19:17:52+00:00"
         },
         {
             "name": "smarty/smarty",
