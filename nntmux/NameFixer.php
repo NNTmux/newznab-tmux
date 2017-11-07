@@ -115,32 +115,32 @@ class NameFixer
     protected $fullall;
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
     /**
-     * @var ConsoleTools
+     * @var \nntmux\ConsoleTools
      */
     public $consoletools;
 
     /**
-     * @var Category
+     * @var \nntmux\Categorize
      */
     public $category;
 
     /**
-     * @var Utility
+     * @var \nntmux\utility\Utility
      */
     public $text;
 
     /**
-     * @var Groups
+     * @var \nntmux\Groups
      */
     public $_groups;
 
     /**
-     * @var SphinxSearch
+     * @var \nntmux\SphinxSearch
      */
     public $sphinx;
 
@@ -459,12 +459,13 @@ class NameFixer
     /**
      * Attempts to fix release names using the Par2 File.
      *
-     * @param int  $time 1: 24 hours, 2: no time limit
-     * @param int  $echo 1: change the name, anything else: preview of what could have been changed.
-     * @param int  $cats 1: other categories, 2: all categories
+     * @param int $time 1: 24 hours, 2: no time limit
+     * @param int $echo 1: change the name, anything else: preview of what could have been changed.
+     * @param int $cats 1: other categories, 2: all categories
      * @param      $nameStatus
      * @param      $show
      * @param NNTP $nntp
+     * @throws \Exception
      */
     public function fixNamesWithPar2($time, $echo, $cats, $nameStatus, $show, $nntp): void
     {
