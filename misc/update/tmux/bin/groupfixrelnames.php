@@ -21,7 +21,6 @@ if (! isset($argv[1])) {
     exit(ColorCLI::error('This script is not intended to be run manually, it is called from Multiprocessing.'));
 }
 $nameFixer = new NameFixer(['Settings' => $pdo]);
-$sorter = new MiscSorter(true, $pdo);
 $pieces = explode(' ', $argv[1]);
 $guidChar = $pieces[1];
 $maxPerRun = $pieces[2];
@@ -230,14 +229,6 @@ switch (true) {
 
                 if ($nameFixer->matched) {
                     continue;
-                }
-                $nameFixer->reset();
-
-                if ((int) $release['nfostatus'] === Nfo::NFO_FOUND && (int) $release['proc_sorter'] === MiscSorter::PROC_SORTER_NONE) {
-                    echo ColorCLI::primaryOver('S');
-                    $res = $sorter->nfosorter(null, $release['releases_id']);
-                    // All gate requirements in query, only set column status if it ran the routine
-                    $nameFixer->_updateSingleColumn('proc_sorter', MiscSorter::PROC_SORTER_DONE, $release['releases_id']);
                 }
             }
         }
