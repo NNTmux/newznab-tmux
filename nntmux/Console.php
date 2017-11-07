@@ -859,7 +859,7 @@ class Console
                 }
 
                 // Update release.
-                Release::query()->where('id', $arr['id'])->update(['consoleinfo_id', $gameId]);
+                Release::query()->where('id', $arr['id'])->update(['consoleinfo_id'=> $gameId]);
 
                 // Sleep to not flood amazon.
                 $diff = floor((microtime(true) - $startTime) * 1000000);
