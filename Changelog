@@ -1,4 +1,5 @@
 2017-11-08 DariusIII
+	* Chg: Update phpunit to latest version
 	* Chg: Add setting to treat all releases as mgr
 	* Chg: Update getConsoleInfo query to be more table specific because of the join
 2017-11-07 DariusIII
