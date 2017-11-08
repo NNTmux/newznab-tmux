@@ -2,6 +2,7 @@
 
 namespace nntmux\processing;
 
+use App\Models\ReleaseRegex;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
@@ -19,7 +20,6 @@ use nntmux\ReleaseImage;
 use nntmux\RequestIDWeb;
 use nntmux\RequestIDLocal;
 use nntmux\ReleaseCleaning;
-use App\Models\ReleaseRegexes;
 use App\Models\ReleasesGroups;
 use App\Models\MultigroupPosters;
 
@@ -692,13 +692,11 @@ class ProcessReleases
                         );
 
                         // Add the id of regex that matched the collection and release name to release_regexes table
-                        ReleaseRegexes::query()->insert(
-                            [
-                                'releases_id'            => $releaseID,
-                                'collection_regex_id'    => $collection['collection_regexes_id'],
-                                'naming_regex_id'        => $cleanedName['id'] ?? 0,
-                            ]
-                        );
+                        ReleaseRegex::insertIgnore([
+                            'releases_id'            => $releaseID,
+                            'collection_regex_id'    => $collection['collection_regexes_id'],
+                            'naming_regex_id'        => $cleanedName['id'] ?? 0,
+                        ]);
 
                         if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
                             foreach ($matches[1] as $grp) {

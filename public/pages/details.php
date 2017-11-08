@@ -15,7 +15,7 @@ use nntmux\DnzbFailures;
 use nntmux\ReleaseExtra;
 use nntmux\ReleaseFiles;
 use nntmux\ReleaseComments;
-use App\Models\ReleaseRegexes;
+use App\Models\ReleaseRegex;
 
 if (! $page->users->isLoggedIn()) {
     $page->show403();
@@ -30,7 +30,7 @@ if (isset($_GET['id'])) {
     $user = $page->users->getById($page->users->currentUserId());
     $cpapi = $user['cp_api'];
     $cpurl = $user['cp_url'];
-    $releaseRegex = ReleaseRegexes::query()->where('releases_id', '=', $data['id'])->first();
+    $releaseRegex = ReleaseRegex::query()->where('releases_id', '=', $data['id'])->first();
 
     if (! $data) {
         $page->show404();

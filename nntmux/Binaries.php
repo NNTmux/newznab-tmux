@@ -162,6 +162,11 @@ class Binaries
     protected $multiGroup;
 
     /**
+     * @var bool
+     */
+    protected $allAsMgr;
+
+    /**
      * @var string How long it took in seconds to download headers
      */
     protected $timeHeaders;
@@ -284,6 +289,7 @@ class Binaries
         $this->_partRepairLimit = Settings::settingValue('..maxpartrepair') !== '' ? (int) Settings::settingValue('..maxpartrepair') : 15000;
         $this->_partRepairMaxTries = (Settings::settingValue('..partrepairmaxtries') !== '' ? (int) Settings::settingValue('..partrepairmaxtries') : 3);
         $this->_showDroppedYEncParts = (int) Settings::settingValue('..showdroppedyencparts') === 1;
+        $this->allAsMgr = Settings::settingValue('..allasmgr') === 1;
 
         $this->blackList = $this->whiteList = [];
     }
@@ -388,7 +394,7 @@ class Binaries
                 $this->partRepair($groupMySQL);
 
                 $mgrPosters = $this->getMultiGroupPosters();
-                if (! empty($mgrPosters)) {
+                if ($this->allAsMgr === true || ! empty($mgrPosters)) {
                     $tableNames = ProcessReleasesMultiGroup::tableNames();
                     $this->partRepair($groupMySQL, $tableNames);
                 }
@@ -630,13 +636,18 @@ class Binaries
         // Check if MySQL tables exist, create if they do not, get their names at the same time.
         $this->tableNames = $this->_groups->getCBPTableNames($this->groupMySQL['id']);
 
-        $mgrPosters = $this->getMultiGroupPosters();
+        if ($this->allAsMgr === false) {
+            $mgrPosters = $this->getMultiGroupPosters();
 
-        if (! empty($mgrPosters)) {
-            $mgrActive = true;
-            $mgrPosters = array_flip(array_column($mgrPosters, 'poster'));
+            if (! empty($mgrPosters)) {
+                $mgrActive = true;
+                $mgrPosters = array_flip(array_column($mgrPosters, 'poster'));
+            } else {
+                $mgrActive = false;
+            }
         } else {
-            $mgrActive = false;
+            //Set MGR as active
+            $mgrActive = true;
         }
 
         $returnArray = $stdHeaders = $mgrHeaders = [];
@@ -771,7 +782,7 @@ class Binaries
             }
             $header['Bytes'] = (int) $header['Bytes'];
 
-            if ($mgrActive === true && array_key_exists($header['From'], $mgrPosters)) {
+            if ($this->allAsMgr === true || ($mgrActive === true && array_key_exists($header['From'], $mgrPosters))) {
                 $mgrHeaders[] = $header;
             } else {
                 $stdHeaders[] = $header;
