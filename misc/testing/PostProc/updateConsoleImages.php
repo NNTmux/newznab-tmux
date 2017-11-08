@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
+use nntmux\ColorCLI;
 use nntmux\db\DB;
 use App\Models\ConsoleInfo;
 
@@ -9,7 +10,7 @@ $pdo = new DB();
 $covers = $updated = $deleted = 0;
 
 if ($argc === 1 || $argv[1] !== 'true') {
-    exit($pdo->log->error("\nThis script will check all images in covers/console and compare to db->consoleinfo.\nTo run:\nphp $argv[0] true\n"));
+    exit(ColorCLI::error("\nThis script will check all images in covers/console and compare to db->consoleinfo.\nTo run:\nphp $argv[0] true\n"));
 }
 
 $path2covers = NN_COVERS.'console'.DS;
@@ -30,8 +31,8 @@ foreach ($itr as $filePath) {
                 $covers++;
             } else {
                 $run = ConsoleInfo::query()->where('id', $match[1])->value('id');
-                if ($run->count() === 0) {
-                    echo $pdo->log->info($filePath.' not found in db.');
+                if ($run === 0) {
+                    echo ColorCLI::info($filePath.' not found in db.');
                 }
             }
         }
