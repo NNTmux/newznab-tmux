@@ -2,7 +2,6 @@
 
 namespace nntmux\processing;
 
-use App\Models\ReleaseRegex;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
@@ -20,6 +19,7 @@ use nntmux\ReleaseImage;
 use nntmux\RequestIDWeb;
 use nntmux\RequestIDLocal;
 use nntmux\ReleaseCleaning;
+use App\Models\ReleaseRegex;
 use App\Models\ReleasesGroups;
 use App\Models\MultigroupPosters;
 
