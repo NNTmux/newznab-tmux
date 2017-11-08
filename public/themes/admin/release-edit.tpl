@@ -7,6 +7,7 @@
 				<td><label for="name">Original Name:</label></td>
 				<td>
 					<input type="hidden" name="id" value="{$release.id}"/>
+					<input type="hidden" name="guid" value="{$release.guid}"/>
 					<input id="name" class="long" name="name" value="{$release.name|escape:'htmlall'}"/>
 				</td>
 			</tr>
