@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
 
-use nntmux\ColorCLI;
 use nntmux\db\DB;
+use nntmux\ColorCLI;
 use App\Models\ConsoleInfo;
 
 $pdo = new DB();
