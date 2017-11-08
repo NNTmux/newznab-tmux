@@ -636,18 +636,13 @@ class Binaries
         // Check if MySQL tables exist, create if they do not, get their names at the same time.
         $this->tableNames = $this->_groups->getCBPTableNames($this->groupMySQL['id']);
 
-        if ($this->allAsMgr === false) {
-            $mgrPosters = $this->getMultiGroupPosters();
+        $mgrPosters = $this->getMultiGroupPosters();
 
-            if (! empty($mgrPosters)) {
-                $mgrActive = true;
-                $mgrPosters = array_flip(array_column($mgrPosters, 'poster'));
-            } else {
-                $mgrActive = false;
-            }
-        } else {
-            //Set MGR as active
+        if ($this->allAsMgr === true || ! empty($mgrPosters)) {
             $mgrActive = true;
+            $mgrPosters = ! empty($mgrPosters) ? array_flip(array_column($mgrPosters, 'poster')) : '';
+        } else {
+            $mgrActive = false;
         }
 
         $returnArray = $stdHeaders = $mgrHeaders = [];
