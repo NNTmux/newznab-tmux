@@ -782,10 +782,14 @@ class Binaries
             }
             $header['Bytes'] = (int) $header['Bytes'];
 
-            if ($this->allAsMgr === true || ($mgrActive === true && array_key_exists($header['From'], $mgrPosters))) {
-                $mgrHeaders[] = $header;
+            if ($this->allAsMgr === false) {
+                if ($mgrActive === true && array_key_exists($header['From'], $mgrPosters)) {
+                    $mgrHeaders[] = $header;
+                } else {
+                    $stdHeaders[] = $header;
+                }
             } else {
-                $stdHeaders[] = $header;
+                $mgrHeaders[] = $header;
             }
         }
 
