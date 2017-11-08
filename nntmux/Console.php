@@ -110,7 +110,7 @@ class Console
      */
     public function getConsoleInfo($id)
     {
-        return ConsoleInfo::query()->where('id', $id)->select('consoleinfo.*', 'genres.title as genres')->leftJoin('genres', 'genres.id', '=', 'consoleinfo.id')->first();
+        return ConsoleInfo::query()->where('consoleinfo.id', $id)->select('consoleinfo.*', 'genres.title as genres')->leftJoin('genres', 'genres.id', '=', 'consoleinfo.id')->first();
     }
 
     /**

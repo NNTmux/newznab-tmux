@@ -1,3 +1,5 @@
+2017-11-08 DariusIII
+	* Chg: Update getConsoleInfo query to be more table specific because of the join
 2017-11-07 DariusIII
 	* Chg: Possible fix for console releases processing
 	* Chg: Remove MiscSorter checks from groupfixrelnames
