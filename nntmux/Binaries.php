@@ -289,7 +289,7 @@ class Binaries
         $this->_partRepairLimit = Settings::settingValue('..maxpartrepair') !== '' ? (int) Settings::settingValue('..maxpartrepair') : 15000;
         $this->_partRepairMaxTries = (Settings::settingValue('..partrepairmaxtries') !== '' ? (int) Settings::settingValue('..partrepairmaxtries') : 3);
         $this->_showDroppedYEncParts = (int) Settings::settingValue('..showdroppedyencparts') === 1;
-        $this->allAsMgr = Settings::settingValue('..allasmgr') === 1;
+        $this->allAsMgr = (int) Settings::settingValue('..allasmgr') === 1;
 
         $this->blackList = $this->whiteList = [];
     }
@@ -636,18 +636,13 @@ class Binaries
         // Check if MySQL tables exist, create if they do not, get their names at the same time.
         $this->tableNames = $this->_groups->getCBPTableNames($this->groupMySQL['id']);
 
-        $mgrPosters = [];
+        $mgrPosters = $this->getMultiGroupPosters();
 
-        if ($this->allAsMgr === false) {
-            $mgrPosters = $this->getMultiGroupPosters();
-            if (! empty($mgrPosters)) {
-                $mgrActive = true;
-                $mgrPosters = array_flip(array_column($mgrPosters, 'poster'));
-            } else {
-                $mgrActive = false;
-            }
-        } else {
+        if ($this->allAsMgr === true || ! empty($mgrPosters)) {
             $mgrActive = true;
+            $mgrPosters = ! empty($mgrPosters) ? array_flip(array_column($mgrPosters, 'poster')) : '';
+        } else {
+            $mgrActive = false;
         }
 
         $returnArray = $stdHeaders = $mgrHeaders = [];
@@ -782,14 +777,10 @@ class Binaries
             }
             $header['Bytes'] = (int) $header['Bytes'];
 
-            if ($this->allAsMgr === false) {
-                if ($mgrActive === true && array_key_exists($header['From'], $mgrPosters)) {
-                    $mgrHeaders[] = $header;
-                } else {
-                    $stdHeaders[] = $header;
-                }
-            } else {
+            if ($this->allAsMgr === true || ($mgrActive === true && array_key_exists($header['From'], $mgrPosters))) {
                 $mgrHeaders[] = $header;
+            } else {
+                $stdHeaders[] = $header;
             }
         }
 
