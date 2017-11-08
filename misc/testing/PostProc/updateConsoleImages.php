@@ -22,8 +22,8 @@ foreach ($itr as $filePath) {
         if (isset($match[1])) {
             $run = ConsoleInfo::query()->where(
                 [
-                    ['cover' => 0],
-                    ['id' => $match[1]],
+                    'cover' => 0,
+                    'id' => $match[1],
                 ]
             )->update(['cover' => 1]);
             if ($run >= 1) {
