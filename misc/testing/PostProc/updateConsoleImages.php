@@ -30,7 +30,7 @@ foreach ($itr as $filePath) {
                 $covers++;
             } else {
                 $run = ConsoleInfo::query()->where('id', $match[1])->value('id');
-                if ($run->rowCount() === 0) {
+                if ($run->count() === 0) {
                     echo $pdo->log->info($filePath.' not found in db.');
                 }
             }
