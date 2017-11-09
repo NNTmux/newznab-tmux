@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
-use App\Models\Group;
 use nntmux\db\DB;
 use Carbon\Carbon;
+use App\Models\Group;
 use App\Models\Settings;
 use App\Models\BinaryBlacklist;
 use nntmux\processing\ProcessReleasesMultiGroup;
@@ -537,7 +537,7 @@ class Binaries
                                     'first_record' => $scanSummary['firstArticleNumber'],
                                     'first_record_postdate' => Carbon::createFromTimestamp(
                                         $groupMySQL['first_record_postdate']
-                                    )
+                                    ),
                                 ]
                             );
                     }
@@ -553,7 +553,7 @@ class Binaries
                             [
                                 'last_record' => $scanSummary['lastArticleNumber'],
                                 'last_record_postdate' => Carbon::createFromTimestamp($groupMySQL['lastArticleDate']),
-                                'last_updated' => Carbon::now()
+                                'last_updated' => Carbon::now(),
                             ]
                         );
                 } else {
@@ -563,7 +563,7 @@ class Binaries
                         ->update(
                             [
                                 'last_record' => $last,
-                                'last_updated' => Carbon::now()
+                                'last_updated' => Carbon::now(),
                             ]
                         );
                 }
@@ -1477,7 +1477,7 @@ class Binaries
             ColorCLI::doEcho(
                 ColorCLI::primary(
                     PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
-                    ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '. Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)) .'days.'
+                    ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
                 )
             );
         }
