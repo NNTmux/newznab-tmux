@@ -2110,6 +2110,8 @@ class NameFixer
                     $newName = $match[1];
                 } elseif (preg_match('/(.+)[\,](\sRMZ\.cr)?/i', $media, $match)) {
                     $newName = $match[1];
+                } else {
+                    $newName = $media;
                 }
             }
 
