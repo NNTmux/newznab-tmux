@@ -172,8 +172,7 @@
       "nntmux\\build\\ComposerScripts::postUpdate"
     ],
     "post-autoload-dump": [
-      "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-      "@php tmux package:discover"
+      "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump"
     ]
   },
   "suggest": {
