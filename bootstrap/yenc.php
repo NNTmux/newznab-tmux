@@ -18,7 +18,7 @@
  */
 use App\Models\Settings;
 
-if (defined('NN_INSTALLER') && NN_INSTALLER !== false) {
+if ((defined('NN_INSTALLER') && NN_INSTALLER !== false) || ! file_exists(NN_ROOT.'_install/install.lock')) {
     $adapter = 'Php';
 } else {
     switch (true) {
