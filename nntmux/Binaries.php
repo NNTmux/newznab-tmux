@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Group;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Settings;
@@ -406,17 +407,7 @@ class Binaries
         // Generate postdate for first record, for those that upgraded.
         if ($groupMySQL['first_record_postdate'] === null && (int) $groupMySQL['first_record'] !== 0) {
             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
-
-            $this->_pdo->queryExec(
-                sprintf(
-                    '
-					UPDATE groups
-					SET first_record_postdate = %s
-					WHERE id = %d',
-                    $this->_pdo->from_unixtime($groupMySQL['first_record_postdate']),
-                    $groupMySQL['id']
-                )
-            );
+            Group::query()->where('id', $groupMySQL['id'])->update(['first_record_postdate' => Carbon::createFromTimestamp($groupMySQL['first_record_postdate'])]);
         }
 
         // Get first article we want aka the oldest.
@@ -539,17 +530,16 @@ class Binaries
                             $groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
                         }
 
-                        $this->_pdo->queryExec(
-                            sprintf(
-                                '
-								UPDATE groups
-								SET first_record = %s, first_record_postdate = %s
-								WHERE id = %d',
-                                $scanSummary['firstArticleNumber'],
-                                $this->_pdo->from_unixtime($this->_pdo->escapeString($groupMySQL['first_record_postdate'])),
-                                $groupMySQL['id']
-                            )
-                        );
+                        Group::query()
+                            ->where('id', $groupMySQL['id'])
+                            ->update(
+                                [
+                                    'first_record' => $scanSummary['firstArticleNumber'],
+                                    'first_record_postdate' => Carbon::createFromTimestamp(
+                                        $groupMySQL['first_record_postdate']
+                                    )
+                                ]
+                            );
                     }
 
                     $scanSummary['lastArticleDate'] = (isset($scanSummary['lastArticleDate']) ? strtotime($scanSummary['lastArticleDate']) : false);
@@ -557,29 +547,25 @@ class Binaries
                         $scanSummary['lastArticleDate'] = $this->postdate($scanSummary['lastArticleNumber'], $groupNNTP);
                     }
 
-                    $this->_pdo->queryExec(
-                        sprintf(
-                            '
-							UPDATE groups
-							SET last_record = %s, last_record_postdate = %s, last_updated = NOW()
-							WHERE id = %d',
-                            $this->_pdo->escapeString($scanSummary['lastArticleNumber']),
-                            $this->_pdo->from_unixtime($scanSummary['lastArticleDate']),
-                            $groupMySQL['id']
-                        )
-                    );
+                    Group::query()
+                        ->where('id', $groupMySQL['id'])
+                        ->update(
+                            [
+                                'last_record' => $scanSummary['lastArticleNumber'],
+                                'last_record_postdate' => Carbon::createFromTimestamp($groupMySQL['lastArticleDate']),
+                                'last_updated' => Carbon::now()
+                            ]
+                        );
                 } else {
                     // If we didn't fetch headers, update the record still.
-                    $this->_pdo->queryExec(
-                        sprintf(
-                            '
-							UPDATE groups
-							SET last_record = %s, last_updated = NOW()
-							WHERE id = %d',
-                            $this->_pdo->escapeString($last),
-                            $groupMySQL['id']
-                        )
-                    );
+                    Group::query()
+                        ->where('id', $groupMySQL['id'])
+                        ->update(
+                            [
+                                'last_record' => $last,
+                                'last_updated' => Carbon::now()
+                            ]
+                        );
                 }
 
                 if ((int) $last === (int) $groupLast) {
@@ -1409,7 +1395,7 @@ class Binaries
      */
     public function daytopost($days, $data): string
     {
-        $goalTime = time() - (86400 * $days);
+        $goalTime = Carbon::now()->subDays($days)->timestamp;
         // The time we want = current unix time (ex. 1395699114) - minus 86400 (seconds in a day)
         // times days wanted. (ie 1395699114 - 2592000 (30days)) = 1393107114
 
@@ -1491,7 +1477,7 @@ class Binaries
             ColorCLI::doEcho(
                 ColorCLI::primary(
                     PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
-                    ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.round(($goalTime - $articleTime) / 60 / 60 / 24, 1).' days.'
+                    ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '. Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)) .'days.'
                 )
             );
         }
@@ -1502,13 +1488,13 @@ class Binaries
     /**
      * Convert unix time to days ago.
      *
-     * @param int $timestamp unix time
      *
-     * @return float
+     * @param $timestamp
+     * @return int
      */
     private function daysOld($timestamp)
     {
-        return round((time() - (! is_numeric($timestamp) ? strtotime($timestamp) : $timestamp)) / 86400, 1);
+        return Carbon::createFromTimestamp($timestamp)->diffInDays();
     }
 
     /**

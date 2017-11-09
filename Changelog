@@ -1,4 +1,5 @@
 2017-11-09 DariusIII
+	* Chg: Update Binaries class to use Group model
 	* Chg: Adjust some renaming
 2017-11-08 DariusIII
 	* Fix: Fix release-edit.php in admin area
