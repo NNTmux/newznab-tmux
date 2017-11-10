@@ -958,20 +958,6 @@ class Releases
             }
         }
 
-        if (preg_match('/^\d+$/', $series, $match)) {
-            $series = $match[0];
-            $series = ltrim($series, '0');
-        } elseif (preg_match('/^s0*/i', $series)) {
-            $series = preg_replace('/^s0*/i', '', $series);
-        }
-
-        if (preg_match('/^\d+$/', $episode, $match)) {
-            $episode = $match[0];
-            $episode = ltrim($episode, '0');
-        } elseif (preg_match('/^e0*/i', $episode)) {
-            $episode = preg_replace('/^e0*/i', '', $episode);
-        }
-
         if (count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
@@ -984,8 +970,8 @@ class Releases
 				WHERE (%s) %s %s %s
 				GROUP BY v.id",
                 implode(' OR ', $siteSQL),
-                ($series !== '' ? sprintf('AND tve.series = %d', (int) $series) : ''),
-                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) $episode) : ''),
+                ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
+                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
                 ($airdate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', $this->pdo->escapeString($airdate)) : '')
             );
             $show = $this->pdo->queryOneRow($showQry);
