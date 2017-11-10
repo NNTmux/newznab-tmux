@@ -384,7 +384,7 @@ class Forking extends \fork_daemon
         $backfill_qty = Tmux::value('backfill_qty');
         $backfill_order = Tmux::value('backfill_order');
         $backfill_days = Tmux::value('backfill_days');
-        $maxmssgs = Tmux::value('maxmssgs');
+        $maxmssgs = Settings::settingValue('maxmssgs');
         $threads = Settings::settingValue('..backfillthreads');
 
         $orderby = 'ORDER BY a.last_record ASC';
