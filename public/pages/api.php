@@ -173,7 +173,7 @@ switch ($function) {
         // Process season only queries or Season and Episode/Airdate queries
 
         $series = $_GET['season'] ?? '';
-        $episode = $_GET['ep']?? '';
+        $episode = $_GET['ep'] ?? '';
 
         if (preg_match('#^(19|20)\d{2}$#', $series, $year) && strpos($episode, '/') !== false) {
             $airdate = str_replace('/', '-', $year[0].'-'.$episode);
