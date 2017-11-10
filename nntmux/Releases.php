@@ -2,12 +2,12 @@
 
 namespace nntmux;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
+use Carbon\Carbon;
 use App\Models\Release;
 use App\Models\Settings;
 use nntmux\utility\Utility;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class Releases.
@@ -112,7 +112,7 @@ class Releases
                     'isrenamed' => $parameters['isrenamed'],
                     'iscategorized' => 1,
                     'reqidstatus' => $parameters['reqidstatus'],
-                    'predb_id' => $parameters['predb_id']
+                    'predb_id' => $parameters['predb_id'],
                 ]
             );
 
