@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use App\Models\Release;
 use App\Models\Settings;
@@ -89,30 +91,31 @@ class Releases
      */
     public function insertRelease(array $parameters = [])
     {
-        $parameters['id'] = $this->pdo->queryInsert(
-            sprintf(
-                'INSERT INTO releases
-					(name, searchname, totalpart, groups_id, adddate, guid, leftguid, postdate, fromname,
-					size, passwordstatus, haspreview, categories_id, nfostatus, nzbstatus,
-					isrenamed, iscategorized, reqidstatus, predb_id)
-				VALUES (%s, %s, %d, %d, NOW(), %s, LEFT(%s, 1), %s, %s, %s, %d, -1, %d, -1, %d, %d, 1, %d, %d)',
-                $parameters['name'],
-                $parameters['searchname'],
-                $parameters['totalpart'],
-                $parameters['groups_id'],
-                $parameters['guid'],
-                $parameters['guid'],
-                $parameters['postdate'],
-                $parameters['fromname'],
-                $parameters['size'],
-                $this->passwordStatus,
-                $parameters['categories_id'],
-                $parameters['nzbstatus'],
-                $parameters['isrenamed'],
-                $parameters['reqidstatus'],
-                $parameters['predb_id']
-            )
-        );
+        $parameters['id'] = Release::query()
+            ->insertGetId(
+                [
+                    'name' => $parameters['name'],
+                    'searchname' => $parameters['searchname'],
+                    'totalpart' => $parameters['totalpart'],
+                    'groups_id' => $parameters['groups_id'],
+                    'adddate' => Carbon::now(),
+                    'guid' => $parameters['guid'],
+                    'leftguid' => $parameters['guid'][0],
+                    'postdate' => $parameters['postdate'],
+                    'fromname' => $parameters['fromname'],
+                    'size' => $parameters['size'],
+                    'passwordstatus' => $this->passwordStatus,
+                    'haspreview' => -1,
+                    'categories_id' => $parameters['categories_id'],
+                    'nfostatus' => -1,
+                    'nzbstatus' => $parameters['nzbstatus'],
+                    'isrenamed' => $parameters['isrenamed'],
+                    'iscategorized' => 1,
+                    'reqidstatus' => $parameters['reqidstatus'],
+                    'predb_id' => $parameters['predb_id']
+                ]
+            );
+
         $this->sphinxSearch->insertRelease($parameters);
 
         return $parameters['id'];
@@ -615,13 +618,15 @@ class Releases
      */
     public function getCount(): int
     {
-        $res = $this->pdo->query(
-            'SELECT COUNT(id) AS num FROM releases',
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
+        if (Cache::has('count') === false) {
+            $res = Release::query()->count(['id']);
+            $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+            Cache::put($res, 'count', $expiresAt);
+        } else {
+            $res = Cache::get('count');
+        }
 
-        return empty($res) ? 0 : $res[0]['num'];
+        return $res ?? 0;
     }
 
     /**
