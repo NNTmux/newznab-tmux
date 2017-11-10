@@ -661,11 +661,11 @@ class ProcessReleases
                     $releaseID = $this->releases->insertRelease(
                         [
                             'name' => $cleanRelName,
-                            'searchname' => $this->pdo->escapeString(utf8_encode($cleanedName)),
+                            'searchname' => utf8_encode($cleanedName),
                             'totalpart' => $collection['totalfiles'],
                             'groups_id' => $collection['groups_id'],
-                            'guid' => $this->pdo->escapeString($this->releases->createGUID()),
-                            'postdate' => $this->pdo->escapeString($collection['date']),
+                            'guid' => $this->releases->createGUID(),
+                            'postdate' => $collection['date'],
                             'fromname' => $fromName,
                             'size' => $collection['filesize'],
                             'categories_id' => $categorize->determineCategory($collection['groups_id'], $cleanedName),
