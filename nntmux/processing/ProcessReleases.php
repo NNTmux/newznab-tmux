@@ -609,28 +609,17 @@ class ProcessReleases
                         str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection['subject'])
                     )
                 );
-                $fromName = $this->pdo->escapeString(
-                    utf8_encode(trim($collection['fromname'], "'"))
+                $fromName = utf8_encode(trim($collection['fromname'], "'")
                 );
 
                 // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
                 // A 1% variance in size is considered the same size when the subject and poster are the same
-                $dupeCheck = $this->pdo->queryOneRow(
-                    sprintf(
-                        "
-						SELECT SQL_NO_CACHE id
-						FROM releases
-						WHERE name = %s
-						AND fromname = %s
-						AND size BETWEEN '%s' AND '%s'",
-                        $cleanRelName,
-                        $fromName,
-                        $collection['filesize'] * .99,
-                        $collection['filesize'] * 1.01
-                    )
-                );
+                $dupeCheck = Release::query()
+                    ->where(['name' => $cleanRelName, 'fromname' => $fromName])
+                    ->whereBetween('size',[$collection['filesize'] * .99, $collection['filesize'] * 1.01])
+                    ->first(['id']);
 
-                if ($dupeCheck === false) {
+                if ($dupeCheck === null) {
                     $cleanedName = $this->releaseCleaning->releaseCleaner(
                         $collection['subject'],
                         $collection['fromname'],
