@@ -175,3 +175,4 @@ max	headers	iteration	1000000	The maximum number of headers that update binaries
 		userhostexclusion			userhostexclusion
 		siteseed			siteseed
 		showrecentforumposts			showrecentforumposts
+		allasmgr	1	Treat all releases as MGR	allasmgr
