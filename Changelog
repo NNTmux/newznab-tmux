@@ -1,4 +1,5 @@
 2017-11-10 DariusIII
+	* Chg: API page is accessible only with apikey
 	* Chg: Change checks for season and episode numbers in searchShows function
 2017-11-09 DariusIII
 	* Fix: Fix composer missing setting error on install when calling package auto discovery
