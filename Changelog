@@ -1,4 +1,5 @@
 2017-11-10 DariusIII
+	* Chg: Temporary change until i resolve the issue properly in admin/group-list page
 	* Fix: Fix querying wrong table for setting
 	* Chg: API page is accessible only with apikey
 	* Chg: Change checks for season and episode numbers in searchShows function
