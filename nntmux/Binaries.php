@@ -552,7 +552,7 @@ class Binaries
                         ->update(
                             [
                                 'last_record' => $scanSummary['lastArticleNumber'],
-                                'last_record_postdate' => Carbon::createFromTimestamp($groupMySQL['lastArticleDate']),
+                                'last_record_postdate' => Carbon::createFromTimestamp($scanSummary['lastArticleDate']),
                                 'last_updated' => Carbon::now(),
                             ]
                         );
