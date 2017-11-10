@@ -616,7 +616,7 @@ class ProcessReleases
                 // A 1% variance in size is considered the same size when the subject and poster are the same
                 $dupeCheck = Release::query()
                     ->where(['name' => $cleanRelName, 'fromname' => $fromName])
-                    ->whereBetween('size',[$collection['filesize'] * .99, $collection['filesize'] * 1.01])
+                    ->whereBetween('size', [$collection['filesize'] * .99, $collection['filesize'] * 1.01])
                     ->first(['id']);
 
                 if ($dupeCheck === null) {
