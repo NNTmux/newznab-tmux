@@ -178,9 +178,8 @@ switch ($function) {
                 $series = $_GET['season'];
                 $episode = $_GET['ep'];
             }
-        } elseif (! empty($_GET['season'])) {
+        } elseif (! empty($_GET['season']) && empty($_GET['ep'])) {
             $series = $_GET['season'];
-            $episode = (! empty($_GET['ep']) ? $_GET['ep'] : '');
         }
 
         $relData = $releases->searchShows(
