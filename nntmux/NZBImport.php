@@ -438,7 +438,7 @@ class NZBImport
             return false;
         }
 
-        if ($relID !== null) {
+        if ($relID === null) {
             $this->echoOut('ERROR: Problem inserting: '.$subject);
 
             return false;
