@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use App\Models\Group;
+use App\Models\Release;
 use nntmux\db\DB;
 use App\Models\Settings;
 use nntmux\utility\Utility;
@@ -18,12 +20,12 @@ class NZBImport
     protected $pdo;
 
     /**
-     * @var Binaries
+     * @var \nntmux\Binaries
      */
     protected $binaries;
 
     /**
-     * @var ReleaseCleaning
+     * @var \nntmux\ReleaseCleaning
      */
     protected $releaseCleaner;
 
@@ -38,7 +40,7 @@ class NZBImport
     protected $crossPostt;
 
     /**
-     * @var Categorize
+     * @var \nntmux\Categorize
      */
     protected $category;
 
@@ -72,7 +74,7 @@ class NZBImport
     public $echoCLI;
 
     /**
-     * @var NZB
+     * @var \nntmux\NZB
      */
     public $nzb;
 
@@ -88,6 +90,9 @@ class NZBImport
      */
     private $groups;
 
+    /**
+     * @var \nntmux\Releases
+     */
     private $releases;
 
     /**
@@ -131,6 +136,7 @@ class NZBImport
      * @param bool $deleteFailed Delete the NZB if failed importing?
      *
      * @return string|bool
+     * @throws \Exception
      */
     public function beginImport($filesToProcess, $useNzbName = false, $delete = true, $deleteFailed = true)
     {
@@ -199,12 +205,7 @@ class NZBImport
                         $this->echoOut('ERROR: Problem compressing NZB file to: '.$path);
 
                         // Remove the release.
-                        $this->pdo->queryExec(
-                            "
-							DELETE
-							FROM releases
-							WHERE guid = {$this->pdo->escapeString($this->relGuid)}"
-                        );
+                        Release::query()->where('guid', $this->relGuid)->delete();
 
                         if ($deleteFailed) {
                             @unlink($nzbFile);
@@ -257,8 +258,9 @@ class NZBImport
      * @param object $nzbXML Reference of simpleXmlObject with NZB contents.
      * @param bool|string $useNzbName Use the NZB file name as release name?
      * @return bool
+     * @throws \Exception
      */
-    protected function scanNZBFile(&$nzbXML, $useNzbName = false)
+    protected function scanNZBFile(&$nzbXML, $useNzbName = false): bool
     {
         $binary_names = [];
         $totalFiles = $totalSize = $groupID = 0;
@@ -379,8 +381,9 @@ class NZBImport
      * @param $nzbDetails
      *
      * @return bool
+     * @throws \Exception
      */
-    protected function insertNZB($nzbDetails)
+    protected function insertNZB($nzbDetails): bool
     {
         // Make up a GUID for the release.
         $this->relGuid = $this->releases->createGUID();
@@ -404,27 +407,14 @@ class NZBImport
             }
         }
 
-        $escapedSubject = $this->pdo->escapeString($subject);
-        $escapedFromName = $this->pdo->escapeString($nzbDetails['from']);
+        $escapedSubject = $subject;
+        $escapedFromName = $nzbDetails['from'];
 
         // Look for a duplicate on name, poster and size.
-        $dupeCheck = $this->pdo->queryOneRow(
-            sprintf(
-                '
-				SELECT id
-				FROM releases
-				WHERE name = %s
-				AND fromname = %s
-				AND size BETWEEN %s AND %s',
-                $escapedSubject,
-                $escapedFromName,
-                $this->pdo->escapeString($nzbDetails['totalSize'] * 0.99),
-                $this->pdo->escapeString($nzbDetails['totalSize'] * 1.01)
-            )
-        );
+        $dupeCheck = Release::query()->where(['name' => $escapedSubject, 'fromname' => $escapedFromName])->whereBetween('size', [$nzbDetails['totalSize'] * 0.99, $nzbDetails['totalSize'] * 1.01])->first(['id']);
 
-        if ($dupeCheck === false) {
-            $escapedSearchName = $this->pdo->escapeString($cleanName);
+        if ($dupeCheck === null) {
+            $escapedSearchName = $cleanName;
             // Insert the release into the DB.
             $relID = $this->releases->insertRelease(
                 [
@@ -432,10 +422,10 @@ class NZBImport
                     'searchname'    => $escapedSearchName,
                     'totalpart'        => $nzbDetails['totalFiles'],
                     'groups_id'        => $nzbDetails['groups_id'],
-                    'guid'            => $this->pdo->escapeString($this->relGuid),
-                    'postdate'        => $this->pdo->escapeString($nzbDetails['postDate']),
+                    'guid'            => $this->relGuid,
+                    'postdate'        => $nzbDetails['postDate'],
                     'fromname'        => $escapedFromName,
-                    'size'            => $this->pdo->escapeString($nzbDetails['totalSize']),
+                    'size'            => $nzbDetails['totalSize'],
                     'categories_id'    => $this->category->determineCategory($nzbDetails['groups_id'], $cleanName, $escapedFromName),
                     'isrenamed'        => $renamed,
                     'reqidstatus'    => 0,
@@ -448,7 +438,7 @@ class NZBImport
             return false;
         }
 
-        if (isset($relID) && $relID === false) {
+        if ($relID !== null) {
             $this->echoOut('ERROR: Problem inserting: '.$subject);
 
             return false;
@@ -462,14 +452,10 @@ class NZBImport
      *
      * @return bool
      */
-    protected function getAllGroups()
+    protected function getAllGroups(): bool
     {
         $this->allGroups = [];
-        $groups = $this->pdo->queryDirect(
-            '
-			SELECT id, name
-			FROM groups'
-        );
+        $groups = Group::query()->get(['id', 'name']);
 
         if ($groups instanceof \Traversable) {
             foreach ($groups as $group) {
@@ -491,7 +477,7 @@ class NZBImport
      *
      * @param string $message
      */
-    protected function echoOut($message)
+    protected function echoOut($message): void
     {
         if ($this->browser) {
             $this->retVal .= $message.'<br />';
@@ -503,13 +489,8 @@ class NZBImport
     /**
      * The function updates the NZB guid after there is no chance of deletion.
      */
-    protected function updateNzbGuid()
+    protected function updateNzbGuid(): void
     {
-        $this->pdo->queryExec(
-            "
-			UPDATE releases
-			SET nzb_guid = UNHEX({$this->pdo->escapeString($this->nzbGuid)})
-			WHERE guid = {$this->pdo->escapeString($this->relGuid)}"
-        );
+        Release::query()->where('guid', $this->relGuid)->update(['nzb_guid' => hex2bin($this->nzbGuid)]);
     }
 }
