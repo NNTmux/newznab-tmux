@@ -258,12 +258,6 @@ class Releases
      */
     public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): array
     {
-        $sql = Cache::get('browserange');
-
-        if ($sql !== null) {
-            return $sql;
-        }
-
         $orderBy = $this->getBrowseOrder($orderBy);
 
         $qry = sprintf(
@@ -305,13 +299,11 @@ class Releases
             $orderBy[1],
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
-        $sql = $this->pdo->query($qry);
+        $sql = $this->pdo->query($qry, true, NN_CACHE_EXPIRY_MEDIUM);
         if (\count($sql) > 0) {
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
             $sql[0]['_totalcount'] = $sql[0]['_totalrows'] = $possibleRows;
         }
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::put('browserange', $sql, $expiresAt);
 
         return $sql;
     }
@@ -856,10 +848,6 @@ class Releases
      */
     public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0): array
     {
-        $releases = Cache::get('search');
-        if ($releases !== null) {
-            return $releases;
-        }
 
         $sizeRange = [
             1 => 1,
@@ -961,12 +949,10 @@ class Releases
             $offset
         );
 
-        $releases = $this->pdo->query($sql);
+        $releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
         if (! empty($releases) && \count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::put('search', $releases, $expiresAt);
 
         return $releases;
     }
