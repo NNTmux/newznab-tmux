@@ -727,7 +727,7 @@
 			<td style="width:180px;"><label for="redis">redis:</label></td>
 			<td>
 				{html_radios id="redis" name='redis' values=$yesno_ids output=$yesno_names selected=$ftmux->redis separator='<br />'}
-				<div class="hint">redis-cli - Monitor your redis instance. The pane for this can not be created
+				<div class="hint">redis-stat - Monitor your redis instance statistics. The pane for this can not be created
 					after tmux starts.
 				</div>
 			</td>

@@ -139,7 +139,7 @@ function start_apps($tmux_session)
     }
 
     if ((int) $redis === 1 && command_exist('redis-cli')) {
-        exec("tmux new-window -t $tmux_session -n redis-cli 'printf \"\033]2;redis-cli\033\" && redis-cli monitor'");
+        exec("tmux new-window -t $tmux_session -n redis-stat 'printf \"\033]2;redis-stat\033\" && redis-stat --verbose --server=63790'");
     }
 
     if ((int) $showprocesslist === 1) {
