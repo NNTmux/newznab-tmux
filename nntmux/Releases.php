@@ -155,27 +155,46 @@ class Releases
     /**
      * Used for admin page release-list.
      *
+     *
      * @param $start
      * @param $num
-     *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getRange($start, $num): array
+    public function getRange($start, $num)
     {
-        return $this->pdo->query(
-            sprintf(
-                "SELECT r.id, r.name, r.searchname, r.size, r.guid, r.totalpart, r.postdate, r.adddate, r.grabs, CONCAT(cp.title, ' > ', c.title) AS category_name
-				FROM releases r
-				LEFT JOIN categories c ON c.id = r.categories_id
-				LEFT JOIN categories cp ON cp.id = c.parentid
-				WHERE r.nzbstatus = %d
-				ORDER BY r.postdate DESC %s",
-                NZB::NZB_ADDED,
-                ($start === false ? '' : 'LIMIT '.$num.' OFFSET '.$start)
-            ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
+        $range = Cache::get('releasesrange');
+        if ($range !== null) {
+            return $range;
+        }
+        $query = Release::query()
+            ->where('nzbstatus', '=', NZB::NZB_ADDED)
+            ->select(
+            [
+                'releases.id',
+                'releases.name',
+                'releases.searchname',
+                'releases.size',
+                'releases.guid',
+                'releases.totalpart',
+                'releases.postdate',
+                'releases.adddate',
+                'releases.grabs'
+            ]
+            )
+            ->selectRaw('CONCAT(cp.title, ' > ', c.title) AS category_name')
+            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->orderBy('releases.postdate', 'desc');
+        if ($start !== false) {
+            $query->limit($num)->offset($start);
+        }
+
+        $range = $query->get();
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::put($range, 'releasesrange', $expiresAt);
+
+        return $range;
     }
 
     /**
@@ -618,13 +637,13 @@ class Releases
      */
     public function getCount(): int
     {
-        if (Cache::has('count') === false) {
-            $res = Release::query()->count(['id']);
-            $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-            Cache::put($res, 'count', $expiresAt);
-        } else {
-            $res = Cache::get('count');
+        $res = Cache::get('count');
+        if ($res !== null) {
+            return $res;
         }
+        $res = Release::query()->count(['id']);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::put($res, 'count', $expiresAt);
 
         return $res ?? 0;
     }

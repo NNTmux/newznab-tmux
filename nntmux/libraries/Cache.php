@@ -19,9 +19,9 @@ class Cache
     const TYPE_APC = 3;
 
     /**
-     * @var \Memcached|\Redis
+     * @var \Memcached|null
      */
-    private $server = null;
+    private $server;
 
     /**
      * Are we connected to the cache server?
@@ -48,12 +48,12 @@ class Cache
     {
         if ($this->ping()) {
             switch (NN_CACHE_TYPE) {
-				case self::TYPE_REDIS:
-				case self::TYPE_MEMCACHED:
-					return $this->server->set($key, $data, $expiration);
-				case self::TYPE_APC:
-					return apc_add($key, $data, $expiration);
-			}
+                case self::TYPE_REDIS:
+                case self::TYPE_MEMCACHED:
+                    return $this->server->set($key, $data, $expiration);
+                case self::TYPE_APC:
+                    return apc_add($key, $data, $expiration);
+            }
         }
 
         return false;
@@ -71,14 +71,14 @@ class Cache
         if ($this->ping()) {
             $data = '';
             switch (NN_CACHE_TYPE) {
-				case self::TYPE_REDIS:
-				case self::TYPE_MEMCACHED:
-					$data = $this->server->get($key);
-					break;
-				case self::TYPE_APC:
-					$data = apc_fetch($key);
-					break;
-			}
+                case self::TYPE_REDIS:
+                case self::TYPE_MEMCACHED:
+                    $data = $this->server->get($key);
+                    break;
+                case self::TYPE_APC:
+                    $data = apc_fetch($key);
+                    break;
+            }
 
             return $data;
         }
@@ -97,12 +97,12 @@ class Cache
     {
         if ($this->ping()) {
             switch (NN_CACHE_TYPE) {
-				case self::TYPE_REDIS:
-				case self::TYPE_MEMCACHED:
-					return (bool) $this->server->delete($key);
-				case self::TYPE_APC:
-					return apc_delete($key);
-			}
+                case self::TYPE_REDIS:
+                case self::TYPE_MEMCACHED:
+                    return (bool) $this->server->delete($key);
+                case self::TYPE_APC:
+                    return apc_delete($key);
+            }
         }
 
         return false;
@@ -115,17 +115,17 @@ class Cache
     {
         if ($this->ping()) {
             switch (NN_CACHE_TYPE) {
-				case self::TYPE_REDIS:
-					$this->server->flushAll();
-					break;
-				case self::TYPE_MEMCACHED:
-					$this->server->flush();
-					break;
-				case self::TYPE_APC:
-					apc_clear_cache('user');
-					apc_clear_cache();
-					break;
-			}
+                case self::TYPE_REDIS:
+                    $this->server->flushAll();
+                    break;
+                case self::TYPE_MEMCACHED:
+                    $this->server->flush();
+                    break;
+                case self::TYPE_APC:
+                    apc_clear_cache('user');
+                    apc_clear_cache();
+                    break;
+            }
         }
     }
 
@@ -150,13 +150,13 @@ class Cache
     {
         if ($this->ping()) {
             switch (NN_CACHE_TYPE) {
-				case self::TYPE_REDIS:
-					return $this->server->info();
-				case self::TYPE_MEMCACHED:
-					return $this->server->getStats();
-				case self::TYPE_APC:
-					return apc_cache_info();
-			}
+                case self::TYPE_REDIS:
+                    return $this->server->info();
+                case self::TYPE_MEMCACHED:
+                    return $this->server->getStats();
+                case self::TYPE_APC:
+                    return apc_cache_info();
+            }
         }
 
         return [];
@@ -164,19 +164,21 @@ class Cache
 
     /**
      * Verify the user's cache settings, try to connect to the cache server.
+     *
+     * @throws \nntmux\libraries\CacheException
      */
     public function __construct()
     {
         if (! defined('NN_CACHE_HOSTS')) {
             throw new CacheException(
-				'The NN_CACHE_HOSTS is not defined! Define it in settings.php'
-			);
+                'The NN_CACHE_HOSTS is not defined! Define it in settings.php'
+            );
         }
 
         if (! defined('NN_CACHE_TIMEOUT')) {
             throw new CacheException(
-				'The NN_CACHE_TIMEOUT is not defined! Define it in settings.php, it is the time in seconds to time out from your cache server.'
-			);
+                'The NN_CACHE_TIMEOUT is not defined! Define it in settings.php, it is the time in seconds to time out from your cache server.'
+            );
         }
 
         $this->socketFile = false;
@@ -191,41 +193,41 @@ class Cache
 
         switch (NN_CACHE_TYPE) {
 
-			case self::TYPE_REDIS:
-				if (! extension_loaded('redis')) {
-				    throw new CacheException('The redis extension is not loaded!');
-				}
-				$this->server = new \Redis();
-				$this->connect();
-				if ($serializer) {
-				    $this->server->setOption(\Redis::OPT_SERIALIZER, $this->verifySerializer());
-				}
-				break;
+            case self::TYPE_REDIS:
+                if (! \extension_loaded('redis')) {
+                    throw new CacheException('The redis extension is not loaded!');
+                }
+                $this->server = new \Redis();
+                $this->connect();
+                if ($serializer) {
+                    $this->server->setOption(\Redis::OPT_SERIALIZER, $this->verifySerializer());
+                }
+                break;
 
-			case self::TYPE_MEMCACHED:
-				if (! extension_loaded('memcached')) {
-				    throw new CacheException('The memcached extension is not loaded!');
-				}
-				$this->server = new \Memcached();
-				if ($serializer) {
-				    $this->server->setOption(\Memcached::OPT_SERIALIZER, $this->verifySerializer());
-				}
-				$this->server->setOption(\Memcached::OPT_COMPRESSION, (defined('NN_CACHE_COMPRESSION') ? NN_CACHE_COMPRESSION : false));
-				$this->connect();
-				break;
+            case self::TYPE_MEMCACHED:
+                if (! \extension_loaded('memcached')) {
+                    throw new CacheException('The memcached extension is not loaded!');
+                }
+                $this->server = new \Memcached();
+                if ($serializer) {
+                    $this->server->setOption(\Memcached::OPT_SERIALIZER, $this->verifySerializer());
+                }
+                $this->server->setOption(\Memcached::OPT_COMPRESSION, (defined('NN_CACHE_COMPRESSION') ? NN_CACHE_COMPRESSION : false));
+                $this->connect();
+                break;
 
-			case self::TYPE_APC:
-				// Faster than checking if apcu or apc is loaded.
-				if (! function_exists('apc_add')) {
-				    throw new CacheException('The APCu extension is not loaded or enabled!');
-				}
-				$this->connect();
-				break;
+            case self::TYPE_APC:
+                // Faster than checking if apcu or apc is loaded.
+                if (! \function_exists('apc_add')) {
+                    throw new CacheException('The APCu extension is not loaded or enabled!');
+                }
+                $this->connect();
+                break;
 
-			case self::TYPE_DISABLED:
-			default:
-				break;
-		}
+            case self::TYPE_DISABLED:
+            default:
+                break;
+        }
     }
 
     /**
@@ -234,13 +236,13 @@ class Cache
     public function __destruct()
     {
         switch (NN_CACHE_TYPE) {
-			case self::TYPE_REDIS:
-				$this->server->close();
-				break;
-			case self::TYPE_MEMCACHED:
-				$this->server->quit();
-				break;
-		}
+            case self::TYPE_REDIS:
+                $this->server->close();
+                break;
+            case self::TYPE_MEMCACHED:
+                $this->server->quit();
+                break;
+        }
     }
 
     /**
@@ -252,36 +254,36 @@ class Cache
     {
         $this->connected = false;
         switch (NN_CACHE_TYPE) {
-			case self::TYPE_REDIS:
-				if ($this->socketFile === false) {
-				    $servers = unserialize(NN_CACHE_HOSTS);
-				    foreach ($servers as $server) {
-				        if ($this->server->connect($server['host'], $server['port'], (float) NN_CACHE_TIMEOUT) === false) {
-				            throw new CacheException('Error connecting to the Redis server!');
-				        } else {
-				            $this->connected = true;
-				        }
-				    }
-				} else {
-				    if ($this->server->connect(NN_CACHE_SOCKET_FILE) === false) {
-				        throw new CacheException('Error connecting to the Redis server!');
-				    } else {
-				        $this->connected = true;
-				    }
-				}
-				break;
-			case self::TYPE_MEMCACHED:
-				$params = ($this->socketFile === false ? unserialize(NN_CACHE_HOSTS) : [[NN_CACHE_SOCKET_FILE, 'port' => 0]]);
-				if ($this->server->addServers($params) === false) {
-				    throw new CacheException('Error connecting to the Memcached server!');
-				} else {
-				    $this->connected = true;
-				}
-				break;
-			case self::TYPE_APC:
-				$this->connected = true;
-				break;
-		}
+            case self::TYPE_REDIS:
+                if ($this->socketFile === false) {
+                    $servers = unserialize(NN_CACHE_HOSTS);
+                    foreach ($servers as $server) {
+                        if ($this->server->connect($server['host'], $server['port'], (float) NN_CACHE_TIMEOUT) === false) {
+                            throw new CacheException('Error connecting to the Redis server!');
+                        } else {
+                            $this->connected = true;
+                        }
+                    }
+                } else {
+                    if ($this->server->connect(NN_CACHE_SOCKET_FILE) === false) {
+                        throw new CacheException('Error connecting to the Redis server!');
+                    } else {
+                        $this->connected = true;
+                    }
+                }
+                break;
+            case self::TYPE_MEMCACHED:
+                $params = ($this->socketFile === false ? unserialize(NN_CACHE_HOSTS) : [[NN_CACHE_SOCKET_FILE, 'port' => 0]]);
+                if ($this->server->addServers($params) === false) {
+                    throw new CacheException('Error connecting to the Memcached server!');
+                } else {
+                    $this->connected = true;
+                }
+                break;
+            case self::TYPE_APC:
+                $this->connected = true;
+                break;
+        }
     }
 
     /**
@@ -295,28 +297,28 @@ class Cache
             return false;
         }
         switch (NN_CACHE_TYPE) {
-			case self::TYPE_REDIS:
-				try {
-				    return (bool) $this->server->ping();
-				} catch (\RedisException $error) {
-				    // nothing to see here, move along
-				}
-				break;
-			case self::TYPE_MEMCACHED:
-				$versions = $this->server->getVersion();
-				if ($versions) {
-				    foreach ($versions as $version) {
-				        if ($version != '255.255.255') {
-				            return true;
-				        }
-				    }
-				}
-				break;
-			case self::TYPE_APC:
-				return true;
-			default:
-				return false;
-		}
+            case self::TYPE_REDIS:
+                try {
+                    return (bool) $this->server->ping();
+                } catch (\RedisException $error) {
+                    // nothing to see here, move along
+                }
+                break;
+            case self::TYPE_MEMCACHED:
+                $versions = $this->server->getVersion();
+                if ($versions) {
+                    foreach ($versions as $version) {
+                        if ($version != '255.255.255') {
+                            return true;
+                        }
+                    }
+                }
+                break;
+            case self::TYPE_APC:
+                return true;
+            default:
+                return false;
+        }
         $this->connect();
 
         return $this->connected;
@@ -331,47 +333,48 @@ class Cache
     private function verifySerializer()
     {
         switch (NN_CACHE_SERIALIZER) {
-			case self::SERIALIZER_IGBINARY:
-				if (! extension_loaded('igbinary')) {
-				    throw new CacheException('Error: The igbinary extension is not loaded!');
-				}
+            case self::SERIALIZER_IGBINARY:
+                if (! \extension_loaded('igbinary')) {
+                    throw new CacheException('Error: The igbinary extension is not loaded!');
+                }
 
-				switch (NN_CACHE_TYPE) {
-					case self::TYPE_REDIS:
-						// If this is not defined, it means phpredis was not compiled with --enable-redis-igbinary
-						if (! defined('\Redis::SERIALIZER_IGBINARY')) {
-						    throw new CacheException('Error: phpredis was not compiled with igbinary support!');
-						}
+                switch (NN_CACHE_TYPE) {
+                    case self::TYPE_REDIS:
+                        // If this is not defined, it means phpredis was not compiled with --enable-redis-igbinary
+                        if (! \defined('\Redis::SERIALIZER_IGBINARY')) {
+                            throw new CacheException('Error: phpredis was not compiled with igbinary support!');
+                        }
 
-						return \Redis::SERIALIZER_IGBINARY;
-					case self::TYPE_MEMCACHED:
-						if (\Memcached::HAVE_IGBINARY > 0) {
-						    return \Memcached::SERIALIZER_IGBINARY;
-						}
-						throw new CacheException('Error: You have not compiled Memcached with igbinary support!');
-					case self::TYPE_APC: // Ignore - set by apc.serializer setting.
-					default:
-						return null;
-				}
+                        return \Redis::SERIALIZER_IGBINARY;
+                    case self::TYPE_MEMCACHED:
+                        if (\Memcached::HAVE_IGBINARY > 0) {
+                            return \Memcached::SERIALIZER_IGBINARY;
+                        }
+                        throw new CacheException('Error: You have not compiled Memcached with igbinary support!');
+                    case self::TYPE_APC: // Ignore - set by apc.serializer setting.
+                    default:
+                        return null;
+                }
 
-			case self::SERIALIZER_NONE:
-				// Only redis supports this.
-				if (NN_CACHE_TYPE != self::TYPE_REDIS) {
-				    throw new CacheException('Error: Disabled serialization is only available on Redis!');
-				}
+                // no break
+            case self::SERIALIZER_NONE:
+                // Only redis supports this.
+                if (NN_CACHE_TYPE != self::TYPE_REDIS) {
+                    throw new CacheException('Error: Disabled serialization is only available on Redis!');
+                }
 
-				return \Redis::SERIALIZER_NONE;
+                return \Redis::SERIALIZER_NONE;
 
-			case self::SERIALIZER_PHP:
-			default:
-				switch (NN_CACHE_TYPE) {
-					case self::TYPE_REDIS:
-						return \Redis::SERIALIZER_PHP;
-					case self::TYPE_MEMCACHED:
-						return \Memcached::SERIALIZER_PHP;
-					default:
-						return null;
-				}
-		}
+            case self::SERIALIZER_PHP:
+            default:
+                switch (NN_CACHE_TYPE) {
+                    case self::TYPE_REDIS:
+                        return \Redis::SERIALIZER_PHP;
+                    case self::TYPE_MEMCACHED:
+                        return \Memcached::SERIALIZER_PHP;
+                    default:
+                        return null;
+                }
+        }
     }
 }
