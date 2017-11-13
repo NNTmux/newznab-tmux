@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\ReleaseNfo;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Release;
@@ -1455,7 +1456,7 @@ class Releases
      */
     public function getReleaseNfo($id, $getNfoString = true)
     {
-        $nfo = Release::query()->where('id', $id)->whereNotNull('nfo')->select(['releases_id']);
+        $nfo = ReleaseNfo::query()->where('releases_id', $id)->whereNotNull('nfo')->select(['releases_id']);
         if ($getNfoString === true) {
             $nfo->selectRaw('UNCOMPRESS(nfo) AS nfo');
         }
