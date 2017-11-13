@@ -1,4 +1,5 @@
 2017-11-13 DariusIII
+	* Chg: Use models in some more queries and use Cache facade too
 	* Chg: Add Cache facade to some of the queries in Releases class
 	* Fix: Fix wrong atributes order for Cache facade
 	* Chg: Use Cache facade for getBrowseCount function

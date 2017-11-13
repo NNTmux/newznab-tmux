@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Category as CategoryModel;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Release;
@@ -138,18 +139,22 @@ class Releases
      */
     public function get(): array
     {
-        return $this->pdo->query(
-            sprintf(
-                'SELECT r.*, g.name AS group_name, c.title AS category_name
-				FROM releases r
-				LEFT JOIN categories c ON c.id = r.categories_id
-				LEFT JOIN groups g ON g.id = r.groups_id
-				WHERE r.nzbstatus = %d',
-                NZB::NZB_ADDED
-            ),
-            true,
-            NN_CACHE_EXPIRY_LONG
-        );
+        $result = Cache::get('releaseget');
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = Release::query()
+            ->where('nzbstatus', '=', NZB::NZB_ADDED)
+            ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
+            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
+            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
+            ->get();
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put('releaseget', $result, $expiresAt);
+
+        return $result;
     }
 
     /**
@@ -227,7 +232,7 @@ class Releases
                 ($groupName !== -1 ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
                 $this->category->getCategorySearch($cat),
                 ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
-                (count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
+                (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
             )
         );
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
@@ -300,7 +305,7 @@ class Releases
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
         $sql = $this->pdo->query($qry);
-        if (count($sql) > 0) {
+        if (\count($sql) > 0) {
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
             $sql[0]['_totalcount'] = $sql[0]['_totalrows'] = $possibleRows;
         }
@@ -319,7 +324,7 @@ class Releases
     public static function showPasswords(): ?string
     {
         $setting = Settings::settingValue('..showpasswordedrelease', true);
-        $setting = (isset($setting) && is_numeric($setting)) ? $setting : 10;
+        $setting = ($setting !== null && is_numeric($setting)) ? $setting : 10;
 
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
@@ -432,7 +437,7 @@ class Releases
     {
         if ($date !== '') {
             $dateParts = explode('/', $date);
-            if (count($dateParts) === 3) {
+            if (\count($dateParts) === 3) {
                 $date = sprintf(
                     ' AND postdate %s %s ',
                     ($from ? '>' : '<'),
@@ -455,9 +460,9 @@ class Releases
      */
     public function getEarliestUsenetPostDate()
     {
-        $row = $this->pdo->queryOneRow("SELECT DATE_FORMAT(min(postdate), '%d/%m/%Y') AS postdate FROM releases LIMIT 1");
+        $row = Release::query()->selectRaw("DATE_FORMAT(min(postdate), '%d/%m/%Y') AS postdate")->first();
 
-        return $row === false ? '01/01/2014' : $row['postdate'];
+        return $row === null ? '01/01/2014' : $row['postdate'];
     }
 
     /**
@@ -468,9 +473,9 @@ class Releases
      */
     public function getLatestUsenetPostDate()
     {
-        $row = $this->pdo->queryOneRow("SELECT DATE_FORMAT(max(postdate), '%d/%m/%Y') AS postdate FROM releases LIMIT 1");
+        $row = Release::query()->selectRaw("DATE_FORMAT(max(postdate), '%d/%m/%Y') AS postdate")->first();
 
-        return $row === false ? '01/01/2014' : $row['postdate'];
+        return $row === null ? '01/01/2014' : $row['postdate'];
     }
 
     /**
@@ -483,11 +488,10 @@ class Releases
      */
     public function getReleasedGroupsForSelect($blnIncludeAll = true): array
     {
-        $groups = $this->pdo->query(
-            'SELECT DISTINCT g.id, g.name
-			FROM releases r
-			LEFT JOIN groups g ON g.id = r.groups_id'
-        );
+        $groups = Release::query()
+            ->selectRaw('DISTINCT g.id, g.name')
+            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
+            ->get();
         $temp_array = [];
 
         if ($blnIncludeAll) {
@@ -515,19 +519,23 @@ class Releases
     public function getConcatenatedCategoryIDs()
     {
         if ($this->concatenatedCategoryIDsCache === null) {
-            $result = $this->pdo->query(
-                "SELECT CONCAT(cp.id, ',', c.id) AS category_ids
-				FROM categories c
-				LEFT JOIN categories cp ON cp.id = c.parentid
-				WHERE c.parentid IS NOT NULL
-				AND cp.id IS NOT NULL",
-                true,
-                NN_CACHE_EXPIRY_LONG
-            );
+            $this->concatenatedCategoryIDsCache = Cache::get('concatenatedcats');
+            if ($this->concatenatedCategoryIDsCache !== null) {
+                return $this->concatenatedCategoryIDsCache;
+            }
+
+            $result = CategoryModel::query()
+                ->whereNotNull('categories.parentid')
+                ->whereNotNull('cp.id')
+                ->selectRaw('CONCAT(cp.id, ", ", categories.id) AS category_ids')
+                ->leftJoin('categories as cp', 'cp.id', '=', 'categories.parentid')
+                ->get();
             if (isset($result[0]['category_ids'])) {
                 $this->concatenatedCategoryIDsCache = $result[0]['category_ids'];
             }
         }
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put('concatenatedcats', $this->concatenatedCategoryIDsCache, $expiresAt);
 
         return $this->concatenatedCategoryIDsCache;
     }
@@ -573,7 +581,7 @@ class Releases
 				ORDER BY %s %s %s",
                 $this->getConcatenatedCategoryIDs(),
                 $this->uSQL($userShows, 'videos_id'),
-                (count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
                 NZB::NZB_ADDED,
                 $this->showPasswords,
                 ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
@@ -606,7 +614,7 @@ class Releases
 				AND r.passwordstatus %s
 				%s',
                 $this->uSQL($userShows, 'videos_id'),
-                (count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
                 NZB::NZB_ADDED,
                 $this->showPasswords,
                 ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
@@ -634,7 +642,7 @@ class Releases
 				AND r.passwordstatus %s
 				%s',
                 $this->uSQL($userMovies, 'imdbid'),
-                (count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
                 NZB::NZB_ADDED,
                 $this->showPasswords,
                 ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
@@ -776,7 +784,7 @@ class Releases
      */
     public function updateMulti($guids, $category, $grabs, $videoId, $episodeId, $anidbId, $imdbId)
     {
-        if (! is_array($guids) || count($guids) < 1) {
+        if (! \is_array($guids) || \count($guids) < 1) {
             return false;
         }
 
@@ -807,7 +815,7 @@ class Releases
             $sql .= sprintf('OR (r.%s = %d', $type, $query[$type]);
             if ($query['categories'] !== '') {
                 $catsArr = explode('|', $query['categories']);
-                if (count($catsArr) > 1) {
+                if (\count($catsArr) > 1) {
                     $sql .= sprintf(' AND r.categories_id IN (%s)', implode(',', $catsArr));
                 } else {
                     $sql .= sprintf(' AND r.categories_id = %d', $catsArr[0]);
@@ -909,8 +917,8 @@ class Releases
             $catQuery,
             ((int) $daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
             ((int) $daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
-            (count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            (count($searchOptions) > 0 ? $this->releaseSearch->getSearchSQL($searchOptions) : ''),
+            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            (\count($searchOptions) > 0 ? $this->releaseSearch->getSearchSQL($searchOptions) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
 
@@ -953,7 +961,7 @@ class Releases
         );
 
         $releases = $this->pdo->query($sql);
-        if (! empty($releases) && count($releases)) {
+        if (! empty($releases) && \count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
@@ -998,7 +1006,7 @@ class Releases
         $siteSQL = [];
         $showSql = '';
 
-        if (is_array($siteIdArr)) {
+        if (\is_array($siteIdArr)) {
             foreach ($siteIdArr as $column => $Id) {
                 if ($Id > 0) {
                     $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
@@ -1006,7 +1014,7 @@ class Releases
             }
         }
 
-        if (count($siteSQL) > 0) {
+        if (\count($siteSQL) > 0) {
             // If we have show info, find the Episode ID/Video ID first to avoid table scans
             $showQry = sprintf(
                 "
@@ -1104,7 +1112,7 @@ class Releases
         );
 
         $releases = $this->pdo->query($sql);
-        if (! empty($releases) && count($releases)) {
+        if (! empty($releases) && \count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
@@ -1174,7 +1182,7 @@ class Releases
         );
         $releases = $this->pdo->query($sql);
 
-        if (! empty($releases) && count($releases)) {
+        if (! empty($releases) && \count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
@@ -1242,7 +1250,7 @@ class Releases
         );
         $releases = $this->pdo->query($sql);
 
-        if (! empty($releases) && count($releases)) {
+        if (! empty($releases) && \count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
@@ -1345,7 +1353,7 @@ class Releases
      */
     public function getByGuid($guid)
     {
-        if (is_array($guid)) {
+        if (\is_array($guid)) {
             $tempGuids = [];
             foreach ($guid as $identifier) {
                 $tempGuids[] = $this->pdo->escapeString($identifier);
@@ -1377,7 +1385,7 @@ class Releases
             $gSql
         );
 
-        return is_array($guid) ? $this->pdo->query($sql) : $this->pdo->queryOneRow($sql);
+        return \is_array($guid) ? $this->pdo->query($sql) : $this->pdo->queryOneRow($sql);
     }
 
     /**
@@ -1415,38 +1423,20 @@ class Releases
 
     /**
      * @param $videoId
-     *
-     * @return bool|\PDOStatement
+     * @return int
      */
-    public function removeVideoIdFromReleases($videoId)
+    public function removeVideoIdFromReleases($videoId): int
     {
-        return $this->pdo->queryExec(
-            sprintf(
-                '
-					UPDATE releases
-					SET videos_id = 0, tv_episodes_id = 0
-					WHERE videos_id = %d',
-                $videoId
-            )
-        );
+        return Release::query()->where('videos_id', $videoId)->update(['videos_id' => 0, 'tv_episodes_id' => 0]);
     }
 
     /**
      * @param $anidbID
-     *
-     * @return bool|\PDOStatement
+     * @return int
      */
     public function removeAnidbIdFromReleases($anidbID)
     {
-        return    $this->pdo->queryExec(
-            sprintf(
-                '
-						UPDATE releases
-						SET anidbid = -1
-						WHERE anidbid = %d',
-                $anidbID
-            )
-        );
+        return Release::query()->where('anidbid', $anidbID)->update(['anidbid' => -1]);
     }
 
     /**
