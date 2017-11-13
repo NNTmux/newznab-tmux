@@ -847,6 +847,11 @@ class Releases
      */
     public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0): array
     {
+        $releases = Cache::get('search');
+        if ($releases !== null) {
+            return $releases;
+        }
+
         $sizeRange = [
             1 => 1,
             2 => 2.5,
@@ -947,10 +952,12 @@ class Releases
             $offset
         );
 
-        $releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+        $releases = $this->pdo->query($sql);
         if (! empty($releases) && count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::put('search', $releases, $expiresAt);
 
         return $releases;
     }
@@ -983,6 +990,11 @@ class Releases
         $maxAge = -1,
         $minSize = 0
     ): array {
+        $releases = Cache::get('searchshows');
+        if ($releases !== null) {
+            return $releases;
+        }
+
         $siteSQL = [];
         $showSql = '';
 
@@ -1091,12 +1103,14 @@ class Releases
             $offset
         );
 
-        $releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+        $releases = $this->pdo->query($sql);
         if (! empty($releases) && count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
         }
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::put('searchshows', $releases, $expiresAt);
 
         return $releases;
     }
@@ -1113,6 +1127,11 @@ class Releases
      */
     public function searchbyAnidbId($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1): array
     {
+        $releases = Cache::get('searchanidb');
+        if ($releases !== null) {
+            return $releases;
+        }
+
         $whereSql = sprintf(
             '%s
 			WHERE r.passwordstatus %s
@@ -1153,11 +1172,13 @@ class Releases
             $limit,
             $offset
         );
-        $releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+        $releases = $this->pdo->query($sql);
 
         if (! empty($releases) && count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::put('searchanidb', $releases, $expiresAt);
 
         return $releases;
     }
@@ -1175,6 +1196,11 @@ class Releases
      */
     public function searchbyImdbId($imDbId, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
     {
+        $releases = Cache::get('searchimdbid');
+        if ($releases !== null) {
+            return $releases;
+        }
+
         $whereSql = sprintf(
             '%s
 			WHERE r.nzbstatus = %d
@@ -1214,11 +1240,13 @@ class Releases
             $limit,
             $offset
         );
-        $releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+        $releases = $this->pdo->query($sql);
 
         if (! empty($releases) && count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::put('searchimdbid', $releases, $expiresAt);
 
         return $releases;
     }
@@ -1232,15 +1260,20 @@ class Releases
      */
     private function getPagerCount($query): int
     {
+        $count = Cache::get('pagercount');
+        if ($count !== null) {
+            return $count;
+        }
         $count = $this->pdo->query(
                 sprintf(
                         'SELECT COUNT(z.id) AS count FROM (%s LIMIT %s) z',
                         preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query),
                         NN_MAX_PAGER_RESULTS
-                ),
-            true,
-            NN_CACHE_EXPIRY_SHORT
+                )
         );
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
+        Cache::put('pagercount', $count[0]['count'], $expiresAt);
 
         return $count[0]['count'] ?? 0;
     }
@@ -1426,20 +1459,17 @@ class Releases
     }
 
     /**
-     * @param int  $id
+     * @param $id
      * @param bool $getNfoString
-     *
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getReleaseNfo($id, $getNfoString = true)
     {
-        return $this->pdo->queryOneRow(
-            sprintf(
-                'SELECT releases_id %s FROM release_nfos WHERE releases_id = %d AND nfo IS NOT NULL',
-                $getNfoString ? ', UNCOMPRESS(nfo) AS nfo' : '',
-                $id
-            )
-        );
+        $nfo = Release::query()->where('releases_id', $id)->whereNotNull('nfo')->select(['releases_id']);
+        if ($getNfoString === true) {
+            $nfo->selectRaw('UNCOMPRESS(nfo) AS nfo');
+        }
+        return $nfo->first();
     }
 
     /**
@@ -1453,21 +1483,21 @@ class Releases
     }
 
     /**
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getTopDownloads(): array
+    public function getTopDownloads()
     {
-        return $this->pdo->query(
-            'SELECT id, searchname, guid, adddate, SUM(grabs) AS grabs
-			FROM releases
-			WHERE grabs > 0
-			GROUP BY id, searchname, adddate
-			HAVING SUM(grabs) > 0
-			ORDER BY grabs DESC
-			LIMIT 10',
-            true,
-            NN_CACHE_EXPIRY_LONG
-        );
+        $releases = Cache::get('topdownloads');
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = Release::query()->where('grabs', '>', 0)->select(['id', 'searchname', 'guid', 'adddate'])->selectRaw('SUM(grabs) as grabs')->groupBy(['id', 'searchname', 'adddate'])->havingRaw('SUM(grabs) > 0')->orderBy('grabs', 'desc')->limit(10)->get();
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put('topdownloads', $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
