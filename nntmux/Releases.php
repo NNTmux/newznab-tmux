@@ -2,11 +2,11 @@
 
 namespace nntmux;
 
-use App\Models\ReleaseNfo;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Models\ReleaseNfo;
 use nntmux\utility\Utility;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Category as CategoryModel;
