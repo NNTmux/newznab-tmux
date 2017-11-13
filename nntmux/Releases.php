@@ -217,7 +217,7 @@ class Releases
     {
         $count = Cache::get('browsecount');
         if ($count !== null) {
-            return $count ?? 0;
+            return $count[0]['count'] ?? 0;
         }
         $count = $this->pdo->query(
             sprintf(
@@ -237,7 +237,7 @@ class Releases
             )
         );
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
-        Cache::put('browsecount', $count[0]['count'], $expiresAt);
+        Cache::put('browsecount', $count, $expiresAt);
 
         return $count[0]['count'] ?? 0;
     }
@@ -311,7 +311,7 @@ class Releases
             $sql[0]['_totalcount'] = $sql[0]['_totalrows'] = $possibleRows;
         }
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::add('browserange', $sql, $expiresAt);
+        Cache::put('browserange', $sql, $expiresAt);
 
         return $sql;
     }
