@@ -1,4 +1,5 @@
 2017-11-13 DariusIII
+	* Fix: Fix wrong atributes order for Cache facade
 	* Chg: Use Cache facade for getBrowseCount function
 	* Chg: Change tool used from redis-cli monitor to redis-stat
 	* Chg: Update getRange and getCount functions.

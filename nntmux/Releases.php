@@ -192,7 +192,7 @@ class Releases
         $range = $query->get();
 
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::put($range, 'releasesrange', $expiresAt);
+        Cache::put('releasesrange', $range, $expiresAt);
 
         return $range;
     }
@@ -211,7 +211,7 @@ class Releases
     {
         $count = Cache::get('browsecount');
         if ($count !== null) {
-            return $count;
+            return $count ?? 0;
         }
         $count = $this->pdo->query(
             sprintf(
@@ -231,7 +231,7 @@ class Releases
             )
         );
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
-        Cache::put($count[0]['count'], 'browsecount', $expiresAt);
+        Cache::put('browsecount', $count[0]['count'], $expiresAt);
 
         return $count[0]['count'] ?? 0;
     }
@@ -252,6 +252,12 @@ class Releases
      */
     public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [], $groupName = -1, $minSize = 0): array
     {
+        $sql = Cache::get('browserange');
+
+        if ($sql !== null) {
+            return $sql;
+        }
+
         $orderBy = $this->getBrowseOrder($orderBy);
 
         $qry = sprintf(
@@ -286,18 +292,20 @@ class Releases
             $this->showPasswords,
             $this->category->getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
-            (count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
+            (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
             ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
             $orderBy[0],
             $orderBy[1],
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
-        $sql = $this->pdo->query($qry, true, NN_CACHE_EXPIRY_MEDIUM);
+        $sql = $this->pdo->query($qry);
         if (count($sql) > 0) {
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
             $sql[0]['_totalcount'] = $sql[0]['_totalrows'] = $possibleRows;
         }
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::add('browserange', $sql, $expiresAt);
 
         return $sql;
     }
@@ -647,7 +655,7 @@ class Releases
         }
         $res = Release::query()->count(['id']);
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::put($res, 'count', $expiresAt);
+        Cache::put('count', $res, $expiresAt);
 
         return $res ?? 0;
     }
