@@ -178,7 +178,7 @@ class Releases
                 'releases.totalpart',
                 'releases.postdate',
                 'releases.adddate',
-                'releases.grabs'
+                'releases.grabs',
             ]
             )
             ->selectRaw('CONCAT(cp.title, ' > ', c.title) AS category_name')
