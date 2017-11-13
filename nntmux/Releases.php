@@ -209,6 +209,10 @@ class Releases
      */
     public function getBrowseCount($cat, $maxAge = -1, array $excludedCats = [], $groupName = ''): int
     {
+        $count = Cache::get('browsecount');
+        if ($count !== null) {
+            return $count;
+        }
         $count = $this->pdo->query(
             sprintf(
                 'SELECT COUNT(r.id) AS count
@@ -224,10 +228,10 @@ class Releases
                 $this->category->getCategorySearch($cat),
                 ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
                 (count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
-            ),
-            true,
-            NN_CACHE_EXPIRY_SHORT
+            )
         );
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
+        Cache::put($count[0]['count'], 'browsecount', $expiresAt);
 
         return $count[0]['count'] ?? 0;
     }
