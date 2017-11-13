@@ -21,7 +21,7 @@ use GuzzleHttp\Exception\RequestException;
 class Movie
 {
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -45,7 +45,7 @@ class Movie
     protected $currentRelID = '';
 
     /**
-     * @var Logger
+     * @var \nntmux\Logger
      */
     protected $debugging;
 
@@ -92,7 +92,7 @@ class Movie
     protected $showPasswords;
 
     /**
-     * @var ReleaseImage
+     * @var \nntmux\ReleaseImage
      */
     protected $releaseImage;
 
@@ -102,7 +102,7 @@ class Movie
     protected $tmdbclient;
 
     /**
-     * @var Client
+     * @var \GuzzleHttp\Client
      */
     protected $client;
 
@@ -113,7 +113,7 @@ class Movie
     protected $lookuplanguage;
 
     /**
-     * @var FanartTV
+     * @var \nntmux\libraries\FanartTV
      */
     public $fanart;
 
@@ -158,7 +158,7 @@ class Movie
     public $catWhere;
 
     /**
-     * @var ApiToken
+     * @var \Tmdb\ApiToken
      */
     public $tmdbtoken;
 
@@ -200,8 +200,8 @@ class Movie
 
         $this->lookuplanguage = Settings::settingValue('indexer.categorise.imdblanguage') !== '' ? (string) Settings::settingValue('indexer.categorise.imdblanguage') : 'en';
 
-        $this->imdburl = Settings::settingValue('indexer.categorise.imdburl') === 0 ? false : true;
-        $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? Settings::settingValue('..maximdbprocessed') : 100;
+        $this->imdburl = (int) Settings::settingValue('indexer.categorise.imdburl') !== 0;
+        $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;
         $this->searchEngines = true;
         $this->showPasswords = Releases::showPasswords();
 
@@ -272,11 +272,12 @@ class Movie
      * @param array $excludedCats
      *
      * @return array|bool|\PDOStatement
+     * @throws \Exception
      */
     public function getMovieRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = [])
     {
         $catsrch = '';
-        if (count($cat) > 0 && $cat[0] !== -1) {
+        if (\count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
         }
 
@@ -305,7 +306,7 @@ class Movie
                                 ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
                                 : ''
                         ),
-                        (count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                        (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
                         $order[0],
                         $order[1],
                         ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
@@ -316,7 +317,7 @@ class Movie
 
         $movieIDs = $releaseIDs = false;
 
-        if (is_array($movies['result'])) {
+        if (\is_array($movies['result'])) {
             foreach ($movies['result'] as $movie => $id) {
                 $movieIDs[] = $id['imdbid'];
                 $releaseIDs[] = $id['grp_release_id'];
@@ -355,8 +356,8 @@ class Movie
 			AND r.id IN (%s) %s
 			GROUP BY m.imdbid
 			ORDER BY %s %s",
-                (is_array($movieIDs) ? implode(',', $movieIDs) : -1),
-                (is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+                (\is_array($movieIDs) ? implode(',', $movieIDs) : -1),
+                (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
                 (! empty($catsrch) ? $catsrch : ''),
                 $order[0],
                 $order[1]
@@ -539,10 +540,10 @@ class Movie
      */
     private function checkTraktValue($value): string
     {
-        if (is_array($value) && ! empty($value)) {
+        if (\is_array($value) && ! empty($value)) {
             $temp = '';
             foreach ($value as $val) {
-                if (! is_array($val) && ! is_object($val)) {
+                if (! \is_array($val) && ! \is_object($val)) {
                     $temp .= (string) $val;
                 }
             }
@@ -574,7 +575,7 @@ class Movie
      */
     public function update(array $values)
     {
-        if (! count($values)) {
+        if (! \count($values)) {
             return false;
         }
 
@@ -587,10 +588,10 @@ class Movie
         ];
         $found = 0;
         foreach ($values as $key => $value) {
-            if (! empty($value) && in_array($key, $validKeys, false)) {
+            if (! empty($value) && \in_array($key, $validKeys, false)) {
                 $found++;
                 $query[0] .= "$key, ";
-                if (in_array($key, ['genre', 'language'], false)) {
+                if (\in_array($key, ['genre', 'language'], false)) {
                     $value = substr($value, 0, 64);
                 }
                 $value = $this->pdo->escapeString($value);
@@ -726,28 +727,28 @@ class Movie
         }
 
         if ($this->checkVariable($imdb['director'])) {
-            $mov['director'] = is_array($imdb['director']) ? implode(', ', array_unique($imdb['director'])) : $imdb['director'];
+            $mov['director'] = \is_array($imdb['director']) ? implode(', ', array_unique($imdb['director'])) : $imdb['director'];
         } elseif ($this->checkVariable($omdb['director'])) {
-            $mov['director'] = is_array($omdb['director']) ? implode(', ', array_unique($omdb['director'])) : $omdb['director'];
+            $mov['director'] = \is_array($omdb['director']) ? implode(', ', array_unique($omdb['director'])) : $omdb['director'];
         }
 
         if ($this->checkVariable($imdb['actors'])) {
-            $mov['actors'] = is_array($imdb['actors']) ? implode(', ', array_unique($imdb['actors'])) : $imdb['actors'];
+            $mov['actors'] = \is_array($imdb['actors']) ? implode(', ', array_unique($imdb['actors'])) : $imdb['actors'];
         } elseif ($this->checkVariable($omdb['actors'])) {
-            $mov['actors'] = is_array($omdb['actors']) ? implode(', ', array_unique($omdb['actors'])) : $omdb['actors'];
+            $mov['actors'] = \is_array($omdb['actors']) ? implode(', ', array_unique($omdb['actors'])) : $omdb['actors'];
         }
 
         if ($this->checkVariable($imdb['language'])) {
-            $mov['language'] = is_array($imdb['language']) ? implode(', ', array_unique($imdb['language'])) : $imdb['language'];
+            $mov['language'] = \is_array($imdb['language']) ? implode(', ', array_unique($imdb['language'])) : $imdb['language'];
         } elseif ($this->checkVariable($omdb['language'])) {
-            $mov['language'] = is_array($imdb['language']) ? implode(', ', array_unique($omdb['language'])) : $omdb['language'];
+            $mov['language'] = \is_array($imdb['language']) ? implode(', ', array_unique($omdb['language'])) : $omdb['language'];
         }
 
-        if (is_array($mov['genre'])) {
+        if (\is_array($mov['genre'])) {
             $mov['genre'] = implode(', ', array_unique($mov['genre']));
         }
 
-        if (is_array($mov['type'])) {
+        if (\is_array($mov['type'])) {
             $mov['type'] = implode(', ', array_unique($mov['type']));
         }
 
@@ -1037,6 +1038,7 @@ class Movie
      * @param $imdbId
      *
      * @return bool|array
+     * @throws \Exception
      */
     protected function fetchTraktTVProperties($imdbId)
     {
@@ -1078,7 +1080,7 @@ class Movie
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
             $resp = $this->omdbApi->fetch('i', 'tt'.$imdbId);
 
-            if (is_object($resp) && $resp->message === 'OK' && $resp->data->Response !== 'False') {
+            if (\is_object($resp) && $resp->message === 'OK' && $resp->data->Response !== 'False') {
                 $ret = [
                     'title' => ! empty($resp->data->Title) ? $resp->data->Title : '',
                     'cover' => ! empty($resp->data->Poster) ? $resp->data->Poster : '',
@@ -1120,7 +1122,7 @@ class Movie
     public function doMovieUpdate($buffer, $service, $id, $processImdb = 1): string
     {
         $imdbID = false;
-        if (is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,7})/i', $buffer, $matches)) {
+        if (\is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,7})/i', $buffer, $matches)) {
             $imdbID = $matches['imdbid'];
         }
 
@@ -1149,9 +1151,10 @@ class Movie
     /**
      * Process releases with no IMDB id's.
      *
-     * @param string $groupID    (Optional) id of a group to work on.
-     * @param string $guidChar   (Optional) First letter of a release GUID to use to get work.
-     * @param int    $lookupIMDB (Optional) 0 Don't lookup IMDB, 1 lookup IMDB, 2 lookup IMDB on releases that were renamed.
+     * @param string $groupID (Optional) id of a group to work on.
+     * @param string $guidChar (Optional) First letter of a release GUID to use to get work.
+     * @param int $lookupIMDB (Optional) 0 Don't lookup IMDB, 1 lookup IMDB, 2 lookup IMDB on releases that were renamed.
+     * @throws \Exception
      */
     public function processMovieReleases($groupID = '', $guidChar = '', $lookupIMDB = 1): void
     {
@@ -1177,7 +1180,7 @@ class Movie
                 $this->movieqty
             )
         );
-        $movieCount = count($res);
+        $movieCount = \count($res);
 
         if ($movieCount > 0) {
             if ($this->traktTv === null) {
@@ -1225,7 +1228,7 @@ class Movie
                         $this->omdbApi = new OMDbAPI($this->omdbapikey);
                         $buffer = $this->omdbApi->search($omdbTitle, 'movie');
 
-                        if (is_object($buffer) && $buffer->message === 'OK' && $buffer->data->Response !== 'False') {
+                        if (\is_object($buffer) && $buffer->message === 'OK' && $buffer->data->Response !== 'False') {
                             $getIMDBid = $buffer->data->Search[0]->imdbID;
 
                             if (! empty($getIMDBid)) {
@@ -1366,11 +1369,7 @@ class Movie
             }
         }
 
-        if ($this->yahooLimit < 41 && $this->yahooSearch() === true) {
-            return true;
-        }
-
-        return false;
+        return $this->yahooLimit < 41 && $this->yahooSearch() === true;
     }
 
     /**
