@@ -724,6 +724,16 @@
 		</tr>
 
 		<tr>
+			<td style="width:180px;"><label for="redis">redis:</label></td>
+			<td>
+				{html_radios id="redis" name='redis' values=$yesno_ids output=$yesno_names selected=$ftmux->redis separator='<br />'}
+				<div class="hint">redis-cli - Monitor your redis instance. The pane for this can not be created
+					after tmux starts.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
 			<td style="width:180px;"><label for="showprocesslist">Show Process List:</label></td>
 			<td>
 				{html_radios id="showprocesslist" name='showprocesslist' values=$yesno_ids output=$yesno_names selected=$ftmux->showprocesslist separator='<br />'}

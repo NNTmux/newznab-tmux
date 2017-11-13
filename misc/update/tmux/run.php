@@ -94,7 +94,7 @@ function python_module_exist($module)
     $output = $returnCode = '';
     exec("python -c \"import $module\"", $output, $returnCode);
 
-    return (int) $returnCode === 0 ? true : false;
+    return (int) $returnCode === 0;
 }
 
 function start_apps($tmux_session)
@@ -109,6 +109,7 @@ function start_apps($tmux_session)
     $nmon = $tmux->nmon;
     $bwmng = $tmux->bwmng;
     $mytop = $tmux->mytop;
+    $redis = $tmux->redis;
     $showprocesslist = $tmux->showprocesslist;
     $processupdate = $tmux->processupdate;
     $console_bash = $tmux->console;
@@ -135,6 +136,10 @@ function start_apps($tmux_session)
 
     if ((int) $mytop === 1 && command_exist('mytop')) {
         exec("tmux new-window -t $tmux_session -n mytop 'printf \"\033]2;mytop\033\" && mytop -u'");
+    }
+
+    if ((int) $redis === 1 && command_exist('redis-cli')) {
+        exec("tmux new-window -t $tmux_session -n redis-cli 'printf \"\033]2;redis-cli\033\" && redis-cli monitor'");
     }
 
     if ((int) $showprocesslist === 1) {
