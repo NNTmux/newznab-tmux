@@ -2,8 +2,10 @@
 
 namespace nntmux;
 
+use Carbon\Carbon;
 use nntmux\db\DB;
 use App\Models\Category as CategoryModel;
+use Illuminate\Support\Facades\Cache as CacheFacade;
 
 /**
  * This class manages the site wide categories.
@@ -148,7 +150,7 @@ class Category
             // Reset the category to the first comma separated value in the string
             $cat[0] = $tmpcats[0];
             // Add the remaining categories in the string to the original array
-            foreach (array_slice($tmpcats, 1) as $tmpcat) {
+            foreach (\array_slice($tmpcats, 1) as $tmpcat) {
                 $cat[] = $tmpcat;
             }
         }
@@ -163,7 +165,7 @@ class Category
             }
         }
 
-        $catCount = count($categories);
+        $catCount = \count($categories);
 
         switch ($catCount) {
             //No category constraint
@@ -203,7 +205,7 @@ class Category
      */
     public static function getCategoryValue($category)
     {
-        return constant('self::'.$category);
+        return \constant('self::'.$category);
     }
 
     /**
@@ -282,8 +284,15 @@ class Category
      */
     public function getByIds($ids)
     {
-        if (count($ids) > 0) {
-            return CategoryModel::query()->whereIn('id', $ids)->get();
+        if (\count($ids) > 0) {
+            $catIds = CacheFacade::get('categoryids');
+            if ($catIds !== null) {
+                return $catIds;
+            }
+            $catIds = CategoryModel::query()->whereIn('id', $ids)->get();
+            $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+            CacheFacade::put('categoryids', $catIds, $expiresAt);
+            return $catIds;
         }
 
         return false;
@@ -352,11 +361,11 @@ class Category
         $ret = [];
 
         $exccatlist = '';
-        if (count($excludedcats) > 0 && count($roleexcludedcats) == 0) {
+        if (\count($excludedcats) > 0 && \count($roleexcludedcats) == 0) {
             $exccatlist = ' AND id NOT IN ('.implode(',', $excludedcats).')';
-        } elseif (count($excludedcats) > 0 && count($roleexcludedcats) > 0) {
+        } elseif (\count($excludedcats) > 0 && \count($roleexcludedcats) > 0) {
             $exccatlist = ' AND id NOT IN ('.implode(',', $excludedcats).','.implode(',', $roleexcludedcats).')';
-        } elseif (count($excludedcats) === 0 && count($roleexcludedcats) > 0) {
+        } elseif (\count($excludedcats) === 0 && \count($roleexcludedcats) > 0) {
             $exccatlist = ' AND id NOT IN ('.implode(',', $roleexcludedcats).')';
         }
 
@@ -365,6 +374,7 @@ class Category
             true,
             NN_CACHE_EXPIRY_LONG
         );
+
 
         foreach ($arr as $key => $val) {
             if ($val['id'] === '0') {
@@ -391,7 +401,7 @@ class Category
                 }
             }
 
-            if (count($subcatlist) > 0) {
+            if (\count($subcatlist) > 0) {
                 array_multisort($subcatnames, SORT_ASC, $subcatlist);
                 $ret[$key]['subcatlist'] = $subcatlist;
             } else {
