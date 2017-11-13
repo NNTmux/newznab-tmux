@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use Carbon\Carbon;
 use nntmux\db\DB;
+use Carbon\Carbon;
 use App\Models\Category as CategoryModel;
 use Illuminate\Support\Facades\Cache as CacheFacade;
 
@@ -292,6 +292,7 @@ class Category
             $catIds = CategoryModel::query()->whereIn('id', $ids)->get();
             $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
             CacheFacade::put('categoryids', $catIds, $expiresAt);
+
             return $catIds;
         }
 
@@ -374,7 +375,6 @@ class Category
             true,
             NN_CACHE_EXPIRY_LONG
         );
-
 
         foreach ($arr as $key => $val) {
             if ($val['id'] === '0') {
