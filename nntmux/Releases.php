@@ -1459,6 +1459,7 @@ class Releases
         if ($getNfoString === true) {
             $nfo->selectRaw('UNCOMPRESS(nfo) AS nfo');
         }
+
         return $nfo->first();
     }
 
