@@ -198,17 +198,17 @@ class Users
 
         $order = $this->getBrowseOrder($orderBy);
 
-        $users = User::query()->with('role', 'request')->where('id', '!=', 0)->groupBy('id')->orderBy($order[0], $order[1])->withCount('request as apirequests');
+        $users = User::query()->with('role', 'request')->where('id', '!=', 0)->groupBy(['id'])->orderBy($order[0], $order[1])->withCount('request as apirequests');
         if ($userName !== '') {
-            $users->where('username', $userName);
+            $users->where('username', 'LIKE', '%' . $userName . '%');
         }
 
         if ($email !== '') {
-            $users->where('email', $email);
+            $users->where('email', 'LIKE', '%' . $email . '%');
         }
 
         if ($host !== '') {
-            $users->where('host', $host);
+            $users->where('host', 'LIKE', '%' . $host . '%');
         }
 
         if ($role !== '') {
