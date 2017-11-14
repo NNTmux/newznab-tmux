@@ -1,4 +1,5 @@
 2017-11-14 DariusIII
+	* Fix: Fix missing SteamApps (deleted) model usage and use the properly named SteamApp model
 	* Chg: Update and use UserSerie model in related classes and pages
 	* Chg: Update rest of the queries in Releases class to use laravel Cache facade
 	* Chg: Update getPagerCount function caching

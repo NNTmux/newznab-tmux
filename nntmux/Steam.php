@@ -4,7 +4,7 @@ namespace nntmux;
 
 use nntmux\db\DB;
 use App\Models\Settings;
-use App\Models\SteamApps;
+use App\Models\SteamApp;
 use b3rs3rk\steamfront\Main;
 
 class Steam
@@ -166,10 +166,10 @@ class Steam
             foreach ($fullAppArray as $appsArray) {
                 foreach ($appsArray as $appArray) {
                     foreach ($appArray as $app) {
-                        $dupeCheck = SteamApps::query()->where('appid', '=', $app['appid'])->value('appid');
+                        $dupeCheck = SteamApp::query()->where('appid', '=', $app['appid'])->value('appid');
 
                         if ($dupeCheck === null) {
-                            SteamApps::query()->insert(['name' => $this->pdo->escapeString($app['name']), 'appid' => $app['appid']]);
+                            SteamApp::query()->insert(['name' => $this->pdo->escapeString($app['name']), 'appid' => $app['appid']]);
                             $inserted++;
                             if ($inserted % 500 === 0) {
                                 echo PHP_EOL.number_format($inserted).' apps inserted.'.PHP_EOL;
