@@ -1534,7 +1534,7 @@ class Releases
             ->join('releases as r', 'r.categories_id', '=', 'categories.id')
             ->groupBy('title')
             ->orderBy('count', 'desc')
-            ->toSql();
+            ->get();
 
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
         Cache::put('recentlyadded', $recent, $expiresAt);
