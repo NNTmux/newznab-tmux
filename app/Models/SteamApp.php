@@ -24,5 +24,5 @@ class SteamApp extends Model
     /**
      * @var array
      */
-    protected $guarded =[];
+    protected $guarded = [];
 }
