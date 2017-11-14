@@ -556,8 +556,7 @@ class Releases
     {
         $orderBy = $this->getBrowseOrder($orderBy);
 
-        return $this->pdo->query(
-            sprintf(
+        $sql = sprintf(
                 "SELECT r.*,
 					CONCAT(cp.title, '-', c.title) AS category_name,
 					%s AS category_ids,
@@ -588,10 +587,18 @@ class Releases
                 $orderBy[0],
                 $orderBy[1],
                 ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
-            ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
+            );
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = $this->pdo->query($sql);
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::put(md5($sql), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
@@ -1268,20 +1275,21 @@ class Releases
      */
     private function getPagerCount($query): int
     {
-        $count = Cache::get('pagercount');
-        if ($count !== null) {
-            return $count;
-        }
-        $count = $this->pdo->query(
-                sprintf(
+        $sql = sprintf(
                         'SELECT COUNT(z.id) AS count FROM (%s LIMIT %s) z',
                         preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query),
                         NN_MAX_PAGER_RESULTS
-                )
         );
 
+        $count = Cache::get(md5($sql));
+        if ($count !== null) {
+            return $count;
+        }
+
+        $count = $this->pdo->query($sql);
+
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
-        Cache::put('pagercount', $count[0]['count'], $expiresAt);
+        Cache::put(md5($sql), $count[0]['count'], $expiresAt);
 
         return $count[0]['count'] ?? 0;
     }
@@ -1343,7 +1351,7 @@ class Releases
      */
     public function getSimilarName($name): string
     {
-        return implode(' ', array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
+        return implode(' ', \array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
     }
 
     /**
