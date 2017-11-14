@@ -1,4 +1,5 @@
 2017-11-14 DariusIII
+	* Chg: Add back caching to getBrowseRange function
 	* Chg: Adjust caching of queries in searchShows function
 2017-11-13 DariusIII
 	* Chg: Update Category class

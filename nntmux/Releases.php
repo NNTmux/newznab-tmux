@@ -299,11 +299,18 @@ class Releases
             $orderBy[1],
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
-        $sql = $this->pdo->query($qry, true, NN_CACHE_EXPIRY_MEDIUM);
+
+        $releases = Cache::get(md5($qry));
+        if ($releases !== null) {
+            return $releases;
+        }
+        $sql = $this->pdo->query($qry);
         if (\count($sql) > 0) {
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
             $sql[0]['_totalcount'] = $sql[0]['_totalrows'] = $possibleRows;
         }
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::put(md5($qry), $sql, $expiresAt);
 
         return $sql;
     }
@@ -948,10 +955,18 @@ class Releases
             $offset
         );
 
-        $releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = $this->pdo->query($sql);
         if (! empty($releases) && \count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
     }
