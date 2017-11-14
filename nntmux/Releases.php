@@ -1516,7 +1516,6 @@ class Releases
         return $comments;
     }
 
-
     public function getRecentlyAdded()
     {
         $recent = Cache::get('recentlyadded');
