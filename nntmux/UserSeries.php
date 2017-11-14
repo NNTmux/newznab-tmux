@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
-use App\Models\UserSerie;
-use Carbon\Carbon;
 use nntmux\db\DB;
+use Carbon\Carbon;
+use App\Models\UserSerie;
 
 /**
  * Class UserSeries.
@@ -38,7 +38,7 @@ class UserSeries
                     'videos_id' => $videoId,
                     'categories' => ! empty($catID) ? implode('|', $catID) : 'NULL',
                     'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
+                    'updated_at' => Carbon::now(),
                 ]
             );
     }
