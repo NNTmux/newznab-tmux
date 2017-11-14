@@ -200,15 +200,15 @@ class Users
 
         $users = User::query()->with('role', 'request')->where('id', '!=', 0)->groupBy(['id'])->orderBy($order[0], $order[1])->withCount('request as apirequests');
         if ($userName !== '') {
-            $users->where('username', 'LIKE', '%' . $userName . '%');
+            $users->where('username', 'LIKE', '%'.$userName.'%');
         }
 
         if ($email !== '') {
-            $users->where('email', 'LIKE', '%' . $email . '%');
+            $users->where('email', 'LIKE', '%'.$email.'%');
         }
 
         if ($host !== '') {
-            $users->where('host', 'LIKE', '%' . $host . '%');
+            $users->where('host', 'LIKE', '%'.$host.'%');
         }
 
         if ($role !== '') {
