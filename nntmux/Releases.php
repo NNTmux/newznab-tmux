@@ -984,11 +984,6 @@ class Releases
         $maxAge = -1,
         $minSize = 0
     ): array {
-        $releases = Cache::get('searchshows');
-        if ($releases !== null) {
-            return $releases;
-        }
-
         $siteSQL = [];
         $showSql = '';
 
@@ -1096,6 +1091,10 @@ class Releases
             $limit,
             $offset
         );
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
 
         $releases = $this->pdo->query($sql);
         if (! empty($releases) && \count($releases)) {
@@ -1104,7 +1103,7 @@ class Releases
             );
         }
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::put('searchshows', $releases, $expiresAt);
+        Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
     }
