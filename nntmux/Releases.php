@@ -1500,9 +1500,9 @@ class Releases
     }
 
     /**
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getTopComments(): array
+    public function getTopComments()
     {
         $comments = Cache::get('topcomments');
         if ($comments !== null) {
@@ -1516,6 +1516,9 @@ class Releases
         return $comments;
     }
 
+    /**
+     * @return string
+     */
     public function getRecentlyAdded()
     {
         $recent = Cache::get('recentlyadded');
@@ -1542,9 +1545,10 @@ class Releases
     /**
      * Get all newest movies with coves for poster wall.
      *
-     * @return array
+     *
+     * @return array|bool
      */
-    public function getNewestMovies(): array
+    public function getNewestMovies()
     {
         $sql = sprintf(
             'SELECT r.imdbid, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1574,9 +1578,10 @@ class Releases
     /**
      * Get all newest xxx with covers for poster wall.
      *
-     * @return array
+     *
+     * @return array|bool
      */
-    public function getNewestXXX(): array
+    public function getNewestXXX()
     {
         $sql = sprintf(
             'SELECT r.xxxinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1605,9 +1610,10 @@ class Releases
     /**
      * Get all newest console games with covers for poster wall.
      *
-     * @return array
+     *
+     * @return array|bool
      */
-    public function getNewestConsole(): array
+    public function getNewestConsole()
     {
         $sql = sprintf(
             'SELECT r.consoleinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1637,9 +1643,10 @@ class Releases
     /**
      * Get all newest PC games with covers for poster wall.
      *
-     * @return array
+     *
+     * @return array|bool
      */
-    public function getNewestGames(): array
+    public function getNewestGames()
     {
         $sql = sprintf(
             'SELECT r.gamesinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1670,9 +1677,10 @@ class Releases
     /**
      * Get all newest music with covers for poster wall.
      *
-     * @return array
+     *
+     * @return array|bool
      */
-    public function getNewestMP3s(): array
+    public function getNewestMP3s()
     {
         $sql = sprintf(
             sprintf('SELECT r.musicinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1703,9 +1711,10 @@ class Releases
     /**
      * Get all newest books with covers for poster wall.
      *
-     * @return array
+     *
+     * @return array|bool
      */
-    public function getNewestBooks(): array
+    public function getNewestBooks()
     {
         $sql = sprintf(
             sprintf('SELECT r.bookinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1736,9 +1745,10 @@ class Releases
     /**
      * Get all newest TV with covers for poster wall.
      *
-     * @return array
+     *
+     * @return array|bool
      */
-    public function getNewestTV(): array
+    public function getNewestTV()
     {
         $sql = sprintf(
             'SELECT r.videos_id, r.guid, r.name, r.searchname, r.size, r.completion,
@@ -1771,9 +1781,10 @@ class Releases
     /**
      * Get all newest anime with covers for poster wall.
      *
-     * @return array
+     *
+     * @return array|bool
      */
-    public function getNewestAnime(): array
+    public function getNewestAnime()
     {
         $sql = sprintf(
             "SELECT r.anidbid, r.guid, r.name, r.searchname, r.size, r.completion,
