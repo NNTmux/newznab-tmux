@@ -215,12 +215,7 @@ class Releases
      */
     public function getBrowseCount($cat, $maxAge = -1, array $excludedCats = [], $groupName = ''): int
     {
-        $count = Cache::get('browsecount');
-        if ($count !== null) {
-            return $count[0]['count'] ?? 0;
-        }
-        $count = $this->pdo->query(
-            sprintf(
+        $sql = sprintf(
                 'SELECT COUNT(r.id) AS count
 				FROM releases r
 				%s
@@ -234,10 +229,14 @@ class Releases
                 $this->category->getCategorySearch($cat),
                 ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
                 (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
-            )
         );
+        $count = Cache::get(md5($sql));
+        if ($count !== null) {
+            return $count;
+        }
+        $count = $this->pdo->query($sql);
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
-        Cache::put('browsecount', $count, $expiresAt);
+        Cache::put(md5($sql), $count[0]['count'], $expiresAt);
 
         return $count[0]['count'] ?? 0;
     }
@@ -328,7 +327,7 @@ class Releases
 
         switch ($setting) {
             case 0: // Hide releases with a password or a potential password (Hide unprocessed releases).
-                return '= '.self::PASSWD_NONE;
+                return '='.self::PASSWD_NONE;
             case 1: // Show releases with no password or a potential password (Show unprocessed releases).
                 return '<= '.self::PASSWD_POTENTIAL;
             case 2: // Hide releases with a password or a potential password (Show unprocessed releases).
@@ -1142,11 +1141,6 @@ class Releases
      */
     public function searchbyAnidbId($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1): array
     {
-        $releases = Cache::get('searchanidb');
-        if ($releases !== null) {
-            return $releases;
-        }
-
         $whereSql = sprintf(
             '%s
 			WHERE r.passwordstatus %s
@@ -1187,13 +1181,18 @@ class Releases
             $limit,
             $offset
         );
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
         $releases = $this->pdo->query($sql);
 
         if (! empty($releases) && \count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::put('searchanidb', $releases, $expiresAt);
+        Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
     }
@@ -1211,11 +1210,6 @@ class Releases
      */
     public function searchbyImdbId($imDbId, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
     {
-        $releases = Cache::get('searchimdbid');
-        if ($releases !== null) {
-            return $releases;
-        }
-
         $whereSql = sprintf(
             '%s
 			WHERE r.nzbstatus = %d
@@ -1255,13 +1249,19 @@ class Releases
             $limit,
             $offset
         );
+
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
         $releases = $this->pdo->query($sql);
 
         if (! empty($releases) && \count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::put('searchimdbid', $releases, $expiresAt);
+        Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
     }
@@ -1504,35 +1504,40 @@ class Releases
      */
     public function getTopComments(): array
     {
-        return $this->pdo->query(
-            'SELECT id, guid, searchname, adddate, SUM(comments) AS comments
-			FROM releases
-			WHERE comments > 0
-			GROUP BY id, searchname, adddate
-			HAVING SUM(comments) > 0
-			ORDER BY comments DESC
-			LIMIT 10',
-            true,
-            NN_CACHE_EXPIRY_LONG
-        );
+        $comments = Cache::get('topcomments');
+        if ($comments !== null) {
+            return $comments;
+        }
+
+        $comments = Release::query()->where('comments', '>', 0)->select(['id', 'guid', 'searchname'])->selectRaw('SUM(comments) AS comments')->groupBy(['id', 'searchname', 'adddate'])->havingRaw('SUM(comments) > 0')->orderBy('comments', 'desc')->limit(10)->get();
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put('topcomments', $comments, $expiresAt);
+
+        return $comments;
     }
 
-    /**
-     * @return array
-     */
-    public function getRecentlyAdded(): array
+
+    public function getRecentlyAdded()
     {
-        return $this->pdo->query(
-                "SELECT CONCAT(cp.title, ' > ', categories.title) AS title, COUNT(r.id) AS count
-			FROM categories
-			INNER JOIN categories cp ON cp.id = categories.parentid
-			INNER JOIN releases r ON r.categories_id = categories.id
-			WHERE r.adddate > NOW() - INTERVAL 1 WEEK
-			GROUP BY CONCAT(cp.title, ' > ', categories.title)
-			ORDER BY count DESC",
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
+        $recent = Cache::get('recentlyadded');
+        if ($recent !== null) {
+            return $recent;
+        }
+
+        $recent = CategoryModel::query()
+            ->where('r.adddate', '>', Carbon::now()->subWeek())
+            ->selectRaw('CONCAT(cp.title, " > ", categories.title) as title')
+            ->selectRaw('COUNT(r.id) as count')
+            ->join('categories as cp', 'cp.id', '=', 'categories.parentid')
+            ->join('releases as r', 'r.categories_id', '=', 'categories.id')
+            ->groupBy('title')
+            ->orderBy('count', 'desc')
+            ->toSql();
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put('recentlyadded', $recent, $expiresAt);
+
+        return $recent;
     }
 
     /**
@@ -1542,7 +1547,7 @@ class Releases
      */
     public function getNewestMovies(): array
     {
-        return $this->pdo->query(
+        $sql = sprintf(
             'SELECT r.imdbid, r.guid, r.name, r.searchname, r.size, r.completion,
 				postdate, categories_id, comments, grabs,
 				m.cover
@@ -1552,10 +1557,19 @@ class Releases
 			AND m.cover = 1
 			AND r.id in (select max(id) from releases where imdbid > 0 group by imdbid)
 			ORDER BY r.postdate DESC
-			LIMIT 24',
-            true,
-            NN_CACHE_EXPIRY_LONG
+			LIMIT 24'
         );
+
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = $this->pdo->query($sql);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put(md5($sql), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
@@ -1565,7 +1579,7 @@ class Releases
      */
     public function getNewestXXX(): array
     {
-        return $this->pdo->query(
+        $sql = sprintf(
             'SELECT r.xxxinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				xxx.cover, xxx.title
@@ -1575,10 +1589,18 @@ class Releases
 			AND xxx.cover = 1
 			AND r.id in (select max(id) from releases where xxxinfo_id > 0 group by xxxinfo_id)
 			ORDER BY r.postdate DESC
-			LIMIT 20',
-            true,
-            NN_CACHE_EXPIRY_LONG
+			LIMIT 20'
         );
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = $this->pdo->query($sql);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put(md5($sql), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
@@ -1588,7 +1610,7 @@ class Releases
      */
     public function getNewestConsole(): array
     {
-        return $this->pdo->query(
+        $sql = sprintf(
             'SELECT r.consoleinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				con.cover
@@ -1596,10 +1618,21 @@ class Releases
 			INNER JOIN consoleinfo con ON r.consoleinfo_id = con.id
 			WHERE con.id > 0
 			AND con.cover > 0
-			AND r.id in (select max(id) from releases where consoleinfo_id > 0 group by consoleinfo_id)
+			AND r.id IN (SELECT max(id) FROM releases WHERE consoleinfo_id > 0 GROUP BY consoleinfo_id)
 			ORDER BY r.postdate DESC
 			LIMIT 35'
         );
+
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = $this->pdo->query($sql);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put(md5($sql), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
@@ -1609,7 +1642,7 @@ class Releases
      */
     public function getNewestGames(): array
     {
-        return $this->pdo->query(
+        $sql = sprintf(
             'SELECT r.gamesinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				gi.cover
@@ -1620,10 +1653,19 @@ class Releases
 			AND gi.cover > 0
 			AND r.id in (select max(id) from releases where gamesinfo_id > 0 group by gamesinfo_id)
 			ORDER BY r.postdate DESC
-			LIMIT 24',
-            true,
-            NN_CACHE_EXPIRY_LONG
+			LIMIT 24'
         );
+
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = $this->pdo->query($sql);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put(md5($sql), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
@@ -1633,7 +1675,7 @@ class Releases
      */
     public function getNewestMP3s(): array
     {
-        return $this->pdo->query(
+        $sql = sprintf(
             sprintf('SELECT r.musicinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				m.cover
@@ -1644,10 +1686,19 @@ class Releases
 			OR r.categories_id != %d
 			AND r.id in (select max(id) from releases where musicinfo_id > 0 group by musicinfo_id)
 			ORDER BY r.postdate DESC
-			LIMIT 24', Category::MUSIC_AUDIOBOOK),
-            true,
-            NN_CACHE_EXPIRY_LONG
+			LIMIT 24', Category::MUSIC_AUDIOBOOK)
         );
+
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = $this->pdo->query($sql);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put(md5($sql), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
@@ -1657,7 +1708,7 @@ class Releases
      */
     public function getNewestBooks(): array
     {
-        return $this->pdo->query(
+        $sql = sprintf(
             sprintf('SELECT r.bookinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				b.url,	b.cover, b.title as booktitle, b.author
@@ -1668,10 +1719,19 @@ class Releases
 			AND b.cover > 0
 			AND r.id in (select max(id) from releases where bookinfo_id > 0 group by bookinfo_id)
 			ORDER BY r.postdate DESC
-			LIMIT 24', Category::MUSIC_AUDIOBOOK),
-            true,
-            NN_CACHE_EXPIRY_LONG
+			LIMIT 24', Category::MUSIC_AUDIOBOOK)
         );
+
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = $this->pdo->query($sql);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put(md5($sql), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
@@ -1681,7 +1741,7 @@ class Releases
      */
     public function getNewestTV(): array
     {
-        return $this->pdo->query(
+        $sql = sprintf(
             'SELECT r.videos_id, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs,
 				v.id AS tvid, v.title AS tvtitle, v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
@@ -1694,10 +1754,19 @@ class Releases
 			AND tvi.image = 1
 			AND r.id in (select max(id) from releases where videos_id > 0 group by videos_id)
 			ORDER BY r.postdate DESC
-			LIMIT 24',
-            true,
-            NN_CACHE_EXPIRY_LONG
+			LIMIT 24'
         );
+
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = $this->pdo->query($sql);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put(md5($sql), $releases, $expiresAt);
+
+        return $releases;
     }
 
     /**
@@ -1707,7 +1776,7 @@ class Releases
      */
     public function getNewestAnime(): array
     {
-        return $this->pdo->query(
+        $sql = sprintf(
             "SELECT r.anidbid, r.guid, r.name, r.searchname, r.size, r.completion,
 				r.postdate, r.categories_id, r.comments, r.grabs, at.title
 			FROM releases r
@@ -1720,9 +1789,18 @@ class Releases
 			AND r.id IN (SELECT MAX(id) FROM releases WHERE anidbid > 0 GROUP BY anidbid)
 			GROUP BY r.id
 			ORDER BY r.postdate DESC
-			LIMIT 24",
-            true,
-            NN_CACHE_EXPIRY_LONG
+			LIMIT 24"
         );
+
+        $releases = Cache::get(md5($sql));
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = $this->pdo->query($sql);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put(md5($sql), $releases, $expiresAt);
+
+        return $releases;
     }
 }
