@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use App\Models\UserSerie;
+use Carbon\Carbon;
 use nntmux\db\DB;
 
 /**
@@ -12,153 +14,110 @@ use nntmux\db\DB;
 class UserSeries
 {
     /**
-     * @var \nntmux\db\DB
+     * UserSeries constructor.
      */
-    public $pdo;
-
-    /**
-     * @param array $options Class instances.
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
     }
 
     /**
      * When a user wants to add a show to "my shows" insert it into the user series table.
      *
-     * @param int   $uID    ID of user.
-     * @param int   $videoId Video ID of tv show.
-     * @param array $catID  List of category ID's
      *
-     * @return bool|int
+     * @param $userId
+     * @param $videoId
+     * @param array $catID
+     * @return int
      */
-    public function addShow($uID, $videoId, $catID = [])
+    public function addShow($userId, $videoId, array $catID = []): int
     {
-        return $this->pdo->queryInsert(
-            sprintf(
-                'INSERT INTO user_series (users_id, videos_id, categories, created_at) VALUES (%d, %d, %s, NOW())',
-                $uID,
-                $videoId,
-                (! empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : 'NULL')
-            )
-        );
+        return UserSerie::query()
+            ->insertGetId(
+                [
+                    'users_id' => $userId,
+                    'videos_id' => $videoId,
+                    'categories' => ! empty($catID) ? implode('|', $catID) : 'NULL',
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]
+            );
     }
 
     /**
      * Get all the user's "my shows".
      *
-     * @param int $uID ID of user.
      *
-     * @return array
+     * @param $userId
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getShows($uID)
+    public function getShows($userId)
     {
-        return $this->pdo->query(
-            sprintf(
-                '
-				SELECT us.*, v.title
-				FROM user_series us
-				INNER JOIN videos v ON v.id = us.videos_id
-				WHERE users_id = %d
-				ORDER BY v.title ASC',
-                $uID
-            )
-        );
+        return UserSerie::query()
+            ->where('user_series.users_id', $userId)
+            ->select(['user_series.*', 'v.title'])
+            ->join('videos as v', 'v.id', '=', 'user_series.videos_id')
+            ->orderBy('v.title')
+            ->get();
     }
 
     /**
      * Delete a tv show from the user's "my shows".
      *
-     * @param int $uID    ID of user.
+     * @param int $userId    ID of user.
      * @param int $videoId ID of tv show.
      */
-    public function delShow($uID, $videoId)
+    public function delShow($userId, $videoId): void
     {
-        $this->pdo->queryExec(
-            sprintf(
-                'DELETE FROM user_series WHERE users_id = %d AND videos_id = %d',
-                $uID,
-                $videoId
-            )
-        );
+        UserSerie::query()->where(['users_id' => $userId, 'videos_id' => $videoId])->delete();
     }
 
     /**
      * Get tv show information for a user.
      *
-     * @param int $uID    ID of the user.
-     * @param int $videoId ID of the TV show.
      *
-     * @return array|bool
+     * @param $userId
+     * @param $videoId
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
-    public function getShow($uID, $videoId)
+    public function getShow($userId, $videoId)
     {
-        return $this->pdo->queryOneRow(
-            sprintf(
-                '
-				SELECT us.*, v.title
-				FROM user_series us
-				LEFT OUTER JOIN videos v ON v.id = us.videos_id
-				WHERE us.users_id = %d
-				AND us.videos_id = %d',
-                $uID,
-                $videoId
-            )
-        );
+        return UserSerie::query()
+            ->where(['user_series.users_id' => $userId, 'user_series.videos_id' => $videoId])
+            ->select(['user_series.*', 'v.title'])
+            ->leftJoin('videos as v', 'v.id', '=', 'user_series.videos_id')->first();
     }
 
     /**
      * Delete all shows from the user's "my shows".
      *
-     * @param int $uID ID of the user.
+     *
+     * @param $userId
      */
-    public function delShowForUser($uID)
+    public function delShowForUser($userId): void
     {
-        $this->pdo->queryExec(
-            sprintf(
-                'DELETE FROM user_series WHERE users_id = %d',
-                $uID
-            )
-        );
+        UserSerie::query()->where('users_id', $userId)->delete();
     }
 
     /**
      * Delete TV shows from all user's "my shows" that match a TV id.
      *
-     * @param int $videoId The ID of the TV show.
+     *
+     * @param $videoId
      */
-    public function delShowForSeries($videoId)
+    public function delShowForSeries($videoId): void
     {
-        $this->pdo->queryExec(
-            sprintf(
-                'DELETE FROM user_series WHERE videos_id = %d',
-                $videoId
-            )
-        );
+        UserSerie::query()->where('videos_id', $videoId)->delete();
     }
 
     /**
      * Update a TV show category ID for a user's "my show" TV show.
      *
-     * @param int   $uID    ID of the user.
+     * @param int   $userId    ID of the user.
      * @param int $videoId ID of the TV show.
      * @param array $catID  List of category ID's.
      */
-    public function updateShow($uID, $videoId, $catID = [])
+    public function updateShow($userId, $videoId, array $catID = []): void
     {
-        $this->pdo->queryExec(
-            sprintf(
-                'UPDATE user_series SET categories = %s WHERE users_id = %d AND videos_id = %d',
-                (! empty($catID) ? $this->pdo->escapeString(implode('|', $catID)) : 'NULL'),
-                $uID,
-                $videoId
-            )
-        );
+        UserSerie::query()->where(['users_id' => $userId, 'videos_id' => $videoId])->update(['categories' =>  ! empty($catID) ? implode('|', $catID) : 'NULL']);
     }
 }

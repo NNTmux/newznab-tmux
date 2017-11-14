@@ -64,6 +64,14 @@ class User extends Authenticatable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
+    public function series()
+    {
+        return $this->hasMany(UserSerie::class, 'users_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function invitation()
     {
         return $this->hasMany(Invitation::class, 'users_id');
