@@ -25,14 +25,12 @@ use nntmux\libraries\CacheException;
 class DB extends \PDO
 {
     /**
-     * @var bool Is this a Command Line Interface instance.
-     *
-     * This needs to be revisited when moving to li3. Web pages do not need this class so it shouldn't be included by default.
+     * @var bool
      */
     public $cli;
 
     /**
-     * @var object Instance of \nntmux\ConsoleTools class.
+     * @var mixed
      */
     public $ct;
 
@@ -55,7 +53,7 @@ class DB extends \PDO
     protected $_debug;
 
     /**
-     * @var object Class instance debugging.
+     * @var \nntmux\Logger
      */
     private $debugging;
 
@@ -80,9 +78,9 @@ class DB extends \PDO
     private $opts;
 
     /**
-     * @var null|\nntmux\libraries\Cache
+     * @var \nntmux\libraries\Cache
      */
-    private $cacheServer = null;
+    private $cacheServer;
 
     /**
      * @var bool Should we cache the results of the query method?
@@ -139,7 +137,7 @@ class DB extends \PDO
             $this->initialiseDatabase();
         }
 
-        $this->cacheEnabled = defined('NN_CACHE_TYPE') && (NN_CACHE_TYPE > 0);
+        $this->cacheEnabled = \defined('NN_CACHE_TYPE') && (NN_CACHE_TYPE > 0);
 
         if ($this->cacheEnabled) {
             try {
@@ -166,11 +164,11 @@ class DB extends \PDO
             $this->fetchDbVersion();
         }
 
-        if (defined('NN_SQL_DELETE_LOW_PRIORITY') && NN_SQL_DELETE_LOW_PRIORITY) {
+        if (\defined('NN_SQL_DELETE_LOW_PRIORITY') && NN_SQL_DELETE_LOW_PRIORITY) {
             $this->DELETE_LOW_PRIORITY = ' LOW_PRIORITY ';
         }
 
-        if (defined('NN_SQL_DELETE_QUICK') && NN_SQL_DELETE_QUICK) {
+        if (\defined('NN_SQL_DELETE_QUICK') && NN_SQL_DELETE_QUICK) {
             $this->DELETE_QUICK = ' QUICK ';
         }
     }
@@ -280,7 +278,7 @@ class DB extends \PDO
 
             // Check for dotted quad - if exists compare against local IP number(s)
             if (preg_match('#^\d+\.\d+\.\d+\.\d+$#', $this->opts['dbhost'])) {
-                if (in_array($this->opts['dbhost'], $ips[1], false)) {
+                if (\in_array($this->opts['dbhost'], $ips[1], false)) {
                     $local = true;
                 }
             }
@@ -331,7 +329,6 @@ class DB extends \PDO
                 }
 
                 if ($found) {
-                    var_dump($this->getTableList());
                     throw new \RuntimeException("Could not drop your old database: '{$this->opts['dbname']}'", 2);
                 }
                 $this->pdo->exec("CREATE DATABASE `{$this->opts['dbname']}`  DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci");
@@ -372,7 +369,7 @@ class DB extends \PDO
             $this->debugging->log(__CLASS__, $method, $error, $severity);
 
             echo
-            $this->cli ? $this->log->error($error).PHP_EOL : '<div class="error">'.$error.'</div>';
+            $this->cli ? ColorCLI::error($error).PHP_EOL : '<div class="error">'.$error.'</div>';
         }
 
         if ($exit) {
@@ -445,7 +442,7 @@ class DB extends \PDO
         $error = '';
         while ($i < 11) {
             $result = $this->queryExecHelper($query, true);
-            if (is_array($result) && isset($result['deadlock'])) {
+            if (\is_array($result) && isset($result['deadlock'])) {
                 $error = $result['message'];
                 if ($result['deadlock'] === true) {
                     $this->echoError(
@@ -510,7 +507,7 @@ class DB extends \PDO
         $error = '';
         while ($i < 11) {
             $result = $this->queryExecHelper($query);
-            if (is_array($result) && isset($result['deadlock'])) {
+            if (\is_array($result) && isset($result['deadlock'])) {
                 $error = $result['message'];
                 if ($result['deadlock'] === true) {
                     $this->echoError('A Deadlock or lock wait timeout has occurred, sleeping. ('.($i - 1).')', 'queryExec', 4);
@@ -540,6 +537,7 @@ class DB extends \PDO
      * @param $query
      * @param bool $insert
      * @return array|\PDOStatement|string
+     * @throws \RuntimeException
      */
     protected function queryExecHelper($query, $insert = false)
     {
@@ -585,9 +583,10 @@ class DB extends \PDO
      *        you may enable query buffering by setting the PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.'
      *
      * @param string $query
-     * @param bool   $silent Whether to skip echoing errors to the console.
+     * @param bool $silent Whether to skip echoing errors to the console.
      *
      * @return bool|int|\PDOStatement
+     * @throws \RuntimeException
      */
     public function exec($query, $silent = false)
     {
@@ -759,10 +758,11 @@ class DB extends \PDO
     /**
      * Query without returning an empty array like our function query(). http://php.net/manual/en/pdo.query.php.
      *
-     * @param string $query  The query to run.
-     * @param bool   $ignore Ignore errors, do not log them?
+     * @param string $query The query to run.
+     * @param bool $ignore Ignore errors, do not log them?
      *
      * @return bool|\PDOStatement
+     * @throws \RuntimeException
      */
     public function queryDirect($query, $ignore = false)
     {
@@ -852,29 +852,30 @@ class DB extends \PDO
         }
 
         $rows = $this->query($query);
-        if (! $rows || count($rows) === 0) {
+        if (! $rows || \count($rows) === 0) {
             $rows = false;
         }
 
-        return is_array($rows) ? $rows[0] : $rows;
+        return \is_array($rows) ? $rows[0] : $rows;
     }
 
     /**
      * Optimises/repairs tables on mysql.
      *
-     * @param bool   $admin    If we are on web, don't echo.
-     * @param string $type     'full' | '' Force optimize of all tables.
+     * @param bool $admin If we are on web, don't echo.
+     * @param string $type 'full' | '' Force optimize of all tables.
      *                         'space'     Optimise tables with 5% or more free space.
      *                         'analyze'   Analyze tables to rebuild statistics.
-     * @param bool|string  $local     Only analyze local tables. Good if running replication.
+     * @param bool|string $local Only analyze local tables. Good if running replication.
      * @param array $tableList (optional) Names of tables to analyze.
      *
      * @return int Quantity optimized/analyzed
+     * @throws \RuntimeException
      */
     public function optimise($admin = false, $type = '', $local = false, $tableList = [])
     {
         $tableAnd = '';
-        if (count($tableList)) {
+        if (\count($tableList)) {
             foreach ($tableList as $tableName) {
                 $tableAnd .= ($this->escapeString($tableName).',');
             }
@@ -941,7 +942,7 @@ class DB extends \PDO
     {
         $message = $type.' ('.$tables.')';
         if ($web === false) {
-            echo $this->log->primary($message);
+            echo ColorCLI::primary($message);
         }
         if ($this->_debug) {
             $this->debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_INFO);
@@ -1008,7 +1009,7 @@ class DB extends \PDO
     public function rowsToArray(array $rows)
     {
         foreach ($rows as $row) {
-            if (is_array($row)) {
+            if (\is_array($row)) {
                 $this->rowToArray($row);
             }
         }
@@ -1183,7 +1184,7 @@ class DB extends \PDO
             if ($this->_debug) {
                 $this->debugging->log(__CLASS__, __FUNCTION__, $e->getMessage(), Logger::LOG_INFO);
             }
-            echo $this->log->error("\n".$e->getMessage());
+            echo ColorCLI::error("\n".$e->getMessage());
             $PDOstatement = false;
         }
 
@@ -1207,7 +1208,7 @@ class DB extends \PDO
                 if ($this->_debug) {
                     $this->debugging->log(__CLASS__, __FUNCTION__, $e->getMessage(), Logger::LOG_INFO);
                 }
-                echo $this->log->error("\n".$e->getMessage());
+                echo ColorCLI::error("\n".$e->getMessage());
                 $result = false;
             }
         }
