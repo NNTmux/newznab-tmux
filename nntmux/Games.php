@@ -2,11 +2,11 @@
 
 namespace nntmux;
 
-use App\Models\GamesInfo;
-use App\Models\Genre;
-use Carbon\Carbon;
 use nntmux\db\DB;
+use Carbon\Carbon;
+use App\Models\Genre;
 use App\Models\Settings;
+use App\Models\GamesInfo;
 use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
 
@@ -430,7 +430,7 @@ class Games
                     'esrb' => $esrb,
                     'cover' => $cover,
                     'trailer' => $trailerUrl,
-                    'genres_id' =>$genreID
+                    'genres_id' =>$genreID,
                 ]
             );
     }
@@ -650,7 +650,7 @@ class Games
                             'trailer' => $game['trailer'],
                             'classused' => $game['classused'],
                             'created_at' => Carbon::now(),
-                            'updated_at' => Carbon::now()
+                            'updated_at' => Carbon::now(),
                         ]
                     );
             } else {
@@ -670,7 +670,7 @@ class Games
                             'cover' => $game['cover'],
                             'backdrop' => $game['backdrop'],
                             'trailer' => $game['trailer'],
-                            'classused' => $game['classused']
+                            'classused' => $game['classused'],
                         ]
                     );
             }
