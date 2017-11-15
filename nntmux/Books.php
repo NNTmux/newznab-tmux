@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use Carbon\Carbon;
@@ -94,7 +95,7 @@ class Books
         $this->sleeptime = Settings::settingValue('..amazonsleep') !== '' ? (int) Settings::settingValue('..amazonsleep') : 1000;
         $this->imgSavePath = NN_COVERS.'book'.DS;
         $result = Settings::settingValue('..book_reqids');
-        $this->bookreqids = empty($result) ? Category::BOOKS_EBOOK : $result;
+        $this->bookreqids = $result ?? Category::BOOKS_EBOOK;
         $this->renamed = (int) Settings::settingValue('..lookupbooks') === 2 ? 'AND isrenamed = 1' : '';
 
         $this->failCache = [];
@@ -152,7 +153,7 @@ class Books
         $browseby = $this->getBrowseBy();
 
         $catsrch = '';
-        if (count($cat) > 0 && $cat[0] !== -1) {
+        if (\count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
         }
 
@@ -162,14 +163,13 @@ class Books
         }
 
         $exccatlist = '';
-        if (count($excludedcats) > 0) {
+        if (\count($excludedcats) > 0) {
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
         }
 
         $order = $this->getBookOrder($orderby);
 
-        $books = $this->pdo->queryCalc(
-                sprintf(
+        $booksql = sprintf(
                     "
 				SELECT SQL_CALC_FOUND_ROWS boo.id,
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
@@ -190,14 +190,19 @@ class Books
                         $order[0],
                         $order[1],
                         ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-                ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
         );
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $bookscache = Cache::get(md5($booksql));
+        if ($bookscache !== null) {
+            $books = $bookscache;
+        } else {
+            $books = $this->pdo->queryCalc($booksql);
+            Cache::put(md5($booksql, $books, $expiresAt));
+        }
 
         $bookIDs = $releaseIDs = false;
 
-        if (is_array($books['result'])) {
+        if (\is_array($books['result'])) {
             foreach ($books['result'] as $book => $id) {
                 $bookIDs[] = $id['id'];
                 $releaseIDs[] = $id['grp_release_id'];
@@ -235,16 +240,21 @@ class Books
 			%s
 			GROUP BY boo.id
 			ORDER BY %s %s",
-                (is_array($bookIDs) ? implode(',', $bookIDs) : -1),
-                (is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+                (\is_array($bookIDs) ? implode(',', $bookIDs) : -1),
+                (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
                 $catsrch,
                 $order[0],
                 $order[1]
         );
-        $return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+        $return = Cache::get(md5($sql));
+        if ($return !== null) {
+            return $return;
+        }
+        $return = $this->pdo->query($sql);
         if (! empty($return)) {
             $return[0]['_totalcount'] = $books['total'] ?? 0;
         }
+        Cache::put(md5($sql), $return, $expiresAt);
 
         return $return;
     }

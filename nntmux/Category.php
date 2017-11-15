@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Category as CategoryModel;
@@ -370,11 +371,15 @@ class Category
             $exccatlist = ' AND id NOT IN ('.implode(',', $roleexcludedcats).')';
         }
 
-        $arr = $this->pdo->query(
-            sprintf('SELECT * FROM categories WHERE status = %d %s', self::STATUS_ACTIVE, $exccatlist),
-            true,
-            NN_CACHE_EXPIRY_LONG
-        );
+        $sql = sprintf('SELECT * FROM categories WHERE status = %d %s', self::STATUS_ACTIVE, $exccatlist);
+        $arrsql = Cache::get(md5($sql));
+        if ($arrsql !== null) {
+            $arr = $arrsql;
+        } else {
+            $arr = $this->pdo->query($sql);
+            $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+            Cache::put(md5($sql), $arr, $expiresAt);
+        }
 
         foreach ($arr as $key => $val) {
             if ($val['id'] === '0') {
