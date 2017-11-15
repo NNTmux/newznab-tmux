@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Category as CategoryModel;
 use Illuminate\Support\Facades\Cache as CacheFacade;
 
