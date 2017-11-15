@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use App\Models\Genre;
 
@@ -40,7 +42,15 @@ class Genres
      */
     public function getGenres($type = '', $activeonly = false): array
     {
-        return $this->pdo->query($this->getListQuery($type, $activeonly), true, NN_CACHE_EXPIRY_LONG);
+        $sql = $this->getListQuery($type, $activeonly);
+        $genres = Cache::get(md5($sql));
+        if ($genres !== null) {
+            return $genres;
+        }
+        $genres = $this->pdo->query($sql);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put(md5($sql), $genres, $expiresAt);
+        return $genres;
     }
 
     /**
@@ -169,6 +179,15 @@ class Genres
      */
     public function getDisabledIDs(): array
     {
-        return $this->pdo->query('SELECT id FROM genres WHERE disabled = 1', true, NN_CACHE_EXPIRY_LONG);
+        $cats = Cache::get('disabledcats');
+        if ($cats !== null) {
+            $disabled = $cats;
+        } else {
+            $disabled = Genre::query()->where('disabled', '=', 1)->get(['id']);
+            $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+            Cache::put('disabledcats', $disabled, $expiresAt);
+        }
+
+        return $disabled;
     }
 }
