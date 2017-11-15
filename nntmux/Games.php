@@ -2,6 +2,9 @@
 
 namespace nntmux;
 
+use App\Models\GamesInfo;
+use App\Models\Genre;
+use Carbon\Carbon;
 use nntmux\db\DB;
 use App\Models\Settings;
 use DBorsatto\GiantBomb\Client;
@@ -122,7 +125,7 @@ class Games
         $this->publicKey = Settings::settingValue('APIs..giantbombkey');
         $this->gameQty = Settings::settingValue('..maxgamesprocessed') !== '' ? (int) Settings::settingValue('..maxgamesprocessed') : 150;
         $this->imgSavePath = NN_COVERS.'games'.DS;
-        $this->renamed = Settings::settingValue('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
+        $this->renamed = (int) Settings::settingValue('..lookupgames') === 2 ? 'AND isrenamed = 1' : '';
         $this->matchPercentage = 60;
         $this->maxHitRequest = false;
         $this->catWhere = 'AND categories_id = '.Category::PC_GAMES.' ';
@@ -134,21 +137,11 @@ class Games
 
     /**
      * @param $id
-     *
-     * @return array|bool
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getGamesInfoById($id)
     {
-        return $this->pdo->queryOneRow(
-            sprintf(
-                '
-				SELECT gi.*, g.title AS genres
-				FROM gamesinfo gi
-				LEFT OUTER JOIN genres g ON g.id = gi.genres_id
-				WHERE gi.id = %d',
-                $id
-            )
-        );
+        return GamesInfo::query()->where('gamesinfo.id', $id)->leftJoin('genres as g', 'g.id', '=', 'gamesinfo.genres_id')->select(['gamesinfo.*', 'g.title as genres'])->first();
     }
 
     /**
@@ -164,13 +157,7 @@ class Games
             return $bestMatch;
         }
 
-        $results = $this->pdo->queryDirect(
-            "
-			SELECT *
-			FROM gamesinfo
-			WHERE MATCH(title) AGAINST({$this->pdo->escapeString($title)})
-			LIMIT 20"
-        );
+        $results = GamesInfo::query()->whereRaw('MATCH(title) AGAINST(?)', $title)->limit(20)->get();
 
         if ($results instanceof \Traversable) {
             $bestMatchPct = 0;
@@ -217,9 +204,9 @@ class Games
      */
     public function getCount(): int
     {
-        $res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM gamesinfo');
+        $res = GamesInfo::query()->count(['id']);
 
-        return $res === false ? 0 : $res['num'];
+        return $res ?? 0;
     }
 
     /**
@@ -238,7 +225,7 @@ class Games
         $browseBy = $this->getBrowseBy();
 
         $catsrch = '';
-        if (count($cat) > 0 && $cat[0] !== -1) {
+        if (\count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
         }
 
@@ -247,7 +234,7 @@ class Games
         }
 
         $exccatlist = '';
-        if (count($excludedCats) > 0) {
+        if (\count($excludedCats) > 0) {
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
         }
 
@@ -282,7 +269,7 @@ class Games
 
         $gameIDs = $releaseIDs = false;
 
-        if (is_array($games['result'])) {
+        if (\is_array($games['result'])) {
             foreach ($games['result'] as $game => $id) {
                 $gameIDs[] = $id['id'];
                 $releaseIDs[] = $id['grp_release_id'];
@@ -431,25 +418,21 @@ class Games
      */
     public function update($id, $title, $asin, $url, $publisher, $releaseDate, $esrb, $cover, $trailerUrl, $genreID): void
     {
-        $this->pdo->queryExec(
-            sprintf(
-                '
-				UPDATE gamesinfo
-				SET title = %s, asin = %s, url = %s, publisher = %s,
-					releasedate = %s, esrb = %s, cover = %d, trailer = %s, genres_id = %d, updated_at = NOW()
-				WHERE id = %d',
-                $this->pdo->escapeString($title),
-                $this->pdo->escapeString($asin),
-                $this->pdo->escapeString($url),
-                $this->pdo->escapeString($publisher),
-                $this->pdo->escapeString($releaseDate),
-                $this->pdo->escapeString($esrb),
-                $cover,
-                $this->pdo->escapeString($trailerUrl),
-                $genreID,
-                $id
-            )
-        );
+        GamesInfo::query()
+            ->where('id', $id)
+            ->update(
+                [
+                    'title' => $title,
+                    'asin' => $asin,
+                    'url' => $url,
+                    'publisher' => $publisher,
+                    'releasedate' => $releaseDate,
+                    'esrb' => $esrb,
+                    'cover' => $cover,
+                    'trailer' => $trailerUrl,
+                    'genres_id' =>$genreID
+                ]
+            );
     }
 
     /**
@@ -512,7 +495,7 @@ class Games
 
                 if (! empty($this->_gameResults['releasedate'])) {
                     $dateReleased = $this->_gameResults['releasedate'];
-                    $date = \DateTime::createFromFormat('M j, Y', $dateReleased);
+                    $date = Carbon::createFromFormat('M j, Y', $dateReleased);
                     if ($date instanceof \DateTime) {
                         $game['releasedate'] = (string) $date->format('Y-m-d');
                     }
@@ -535,7 +518,7 @@ class Games
                 $this->_classUsed = 'GiantBomb';
                 $result = $this->giantBomb->search($gameInfo['title'], 'Game');
 
-                if (! is_object($result)) {
+                if (! \is_object($result)) {
                     foreach ($result as $res) {
                         similar_text(strtolower($gameInfo['title']), strtolower($res->name), $percent1);
                         similar_text(strtolower($gameInfo['title']), strtolower($res->aliases), $percent2);
@@ -577,7 +560,7 @@ class Games
 
                         if ($this->_gameResults->original_release_date !== '') {
                             $dateReleased = $this->_gameResults->original_release_date;
-                            $date = \DateTime::createFromFormat('Y-m-d H:i:s', $dateReleased);
+                            $date = Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased);
                             if ($date instanceof \DateTime) {
                                 $game['releasedate'] = (string) $date->format('Y-m-d');
                             }
@@ -639,41 +622,57 @@ class Games
             $genreName = 'Unknown';
         }
 
-        if (in_array(strtolower($genreName), $genreAssoc, false)) {
+        if (\in_array(strtolower($genreName), $genreAssoc, false)) {
             $genreKey = array_search(strtolower($genreName), $genreAssoc, false);
         } else {
-            $genreKey = $this->pdo->queryInsert(
-                sprintf(
-                    '
-					INSERT INTO genres (title, type)
-					VALUES (%s, %d)',
-                    $this->pdo->escapeString($genreName),
-                    Genres::GAME_TYPE
-                )
-            );
+            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::GAME_TYPE]);
         }
 
         $game['gamesgenre'] = $genreName;
         $game['gamesgenreID'] = $genreKey;
 
         if (! empty($game['asin'])) {
-            $check = $this->pdo->queryOneRow(sprintf('
-				SELECT id
-				FROM gamesinfo
-				WHERE asin = %s', $this->pdo->escapeString($game['asin'])));
-            if ($check === false) {
-                $gamesId = $this->pdo->queryInsert(sprintf('
-					INSERT INTO gamesinfo
-						(title, asin, url, publisher, genres_id, esrb, releasedate, review, cover, backdrop, trailer, classused, created_at, updated_at)
-					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %d, %d, %s, %s, NOW(), NOW())', $this->pdo->escapeString($game['title']), $this->pdo->escapeString($game['asin']), $this->pdo->escapeString($game['url']), $this->pdo->escapeString($game['publisher']), ($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']), $this->pdo->escapeString($game['esrb']), ($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'), $this->pdo->escapeString(substr($game['review'], 0, 3000)), $game['cover'], $game['backdrop'], $this->pdo->escapeString($game['trailer']), $this->pdo->escapeString($game['classused'])));
+            $check = GamesInfo::query()->where('asin', $game['asin'])->first();
+            if ($check === null) {
+                $gamesId = GamesInfo::query()
+                    ->insertGetId(
+                        [
+                            'title' => $game['title'],
+                            'asin' => $game['asin'],
+                            'url' => $game['url'],
+                            'publisher' => $game['publisher'],
+                            'genres_id' => $game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID'],
+                            'esrb' => $game['esrb'],
+                            'releasedate' => $game['releasedate'] !== '' ? $game['releasedate'] : 'null',
+                            'review' => substr($game['review'], 0, 3000),
+                            'cover' => $game['cover'],
+                            'backdrop' => $game['backdrop'],
+                            'trailer' => $game['trailer'],
+                            'classused' => $game['classused'],
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now()
+                        ]
+                    );
             } else {
                 $gamesId = $check['id'];
-                $this->pdo->queryExec(sprintf('
-					UPDATE gamesinfo
-					SET
-						title = %s, asin = %s, url = %s, publisher = %s, genres_id = %s,
-						esrb = %s, releasedate = %s, review = %s, cover = %d, backdrop = %d, trailer = %s, classused = %s, updated_at = NOW()
-					WHERE id = %d', $this->pdo->escapeString($game['title']), $this->pdo->escapeString($game['asin']), $this->pdo->escapeString($game['url']), $this->pdo->escapeString($game['publisher']), ($game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID']), $this->pdo->escapeString($game['esrb']), ($game['releasedate'] !== '' ? $this->pdo->escapeString($game['releasedate']) : 'null'), $this->pdo->escapeString(substr($game['review'], 0, 3000)), $game['cover'], $game['backdrop'], $this->pdo->escapeString($game['trailer']), $this->pdo->escapeString($game['classused']), $gamesId));
+                GamesInfo::query()
+                    ->where('id', $gamesId)
+                    ->update(
+                        [
+                            'title' => $game['title'],
+                            'asin' => $game['asin'],
+                            'url' => $game['url'],
+                            'publisher' => $game['publisher'],
+                            'genres_id' => $game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID'],
+                            'esrb' => $game['esrb'],
+                            'releasedate' => $game['releasedate'] !== '' ? $game['releasedate'] : 'null',
+                            'review' => substr($game['review'], 0, 3000),
+                            'cover' => $game['cover'],
+                            'backdrop' => $game['backdrop'],
+                            'trailer' => $game['trailer'],
+                            'classused' => $game['classused']
+                        ]
+                    );
             }
         }
 
@@ -859,7 +858,7 @@ class Games
         $genreName = '';
         $a = str_replace('-', ' ', $genre);
         $tmpGenre = explode(',', $a);
-        if (is_array($tmpGenre)) {
+        if (\is_array($tmpGenre)) {
             foreach ($tmpGenre as $tg) {
                 $genreMatch = $this->matchGenreName(ucwords($tg));
                 if ($genreMatch !== false) {
