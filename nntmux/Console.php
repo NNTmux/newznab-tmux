@@ -156,12 +156,12 @@ class Console
         $browseby = $this->getBrowseBy();
 
         $catsrch = '';
-        if (count($cat) > 0 && (int) $cat[0] !== -1) {
+        if (\count($cat) > 0 && (int) $cat[0] !== -1) {
             $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
         }
 
         $exccatlist = '';
-        if (count($excludedcats) > 0) {
+        if (\count($excludedcats) > 0) {
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
         }
 
@@ -196,7 +196,7 @@ class Console
 
         $consoleIDs = $releaseIDs = false;
 
-        if (is_array($consoles['result'])) {
+        if (\is_array($consoles['result'])) {
             foreach ($consoles['result'] as $console => $id) {
                 $consoleIDs[] = $id['id'];
                 $releaseIDs[] = $id['grp_release_id'];
@@ -237,8 +237,8 @@ class Console
 				%s
 				GROUP BY con.id
 				ORDER BY %s %s",
-                        (is_array($consoleIDs) ? implode(',', $consoleIDs) : -1),
-                        (is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+                        (\is_array($consoleIDs) ? implode(',', $consoleIDs) : -1),
+                        (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
                         $catsrch,
                         $order[0],
                         $order[1]
@@ -593,7 +593,7 @@ class Console
     {
         $genreassoc = $this->_loadGenres();
 
-        if (in_array(strtolower($genreName), $genreassoc, false)) {
+        if (\in_array(strtolower($genreName), $genreassoc, false)) {
             $genreKey = array_search(strtolower($genreName), $genreassoc, false);
         } else {
             $genreKey = $this->pdo->queryInsert(
@@ -831,7 +831,7 @@ class Console
                     // Check for existing console entry.
                     $gameCheck = $this->getConsoleInfoByName($gameInfo['title'], $gameInfo['platform']);
 
-                    if ($gameCheck === null && in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
+                    if ($gameCheck === null && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
                             ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.').PHP_EOL);
