@@ -38,9 +38,9 @@ class Genres
     /**
      * @param string $type
      * @param bool $activeonly
-     * @return array
+     * @return array|bool
      */
-    public function getGenres($type = '', $activeonly = false): array
+    public function getGenres($type = '', $activeonly = false)
     {
         $sql = $this->getListQuery($type, $activeonly);
         $genres = Cache::get(md5($sql));
@@ -102,9 +102,9 @@ class Genres
      * @param bool $activeonly
      * @param $start
      * @param $num
-     * @return array
+     * @return array|bool
      */
-    public function getRange($type = '', $activeonly = false, $start, $num): array
+    public function getRange($type = '', $activeonly = false, $start, $num)
     {
         $sql = $this->getListQuery($type, $activeonly);
         $sql .= ' LIMIT '.$num.' OFFSET '.$start;
@@ -168,7 +168,7 @@ class Genres
     /**
      * @param $id
      * @param $disabled
-     * @return bool|\PDOStatement
+     * @return int
      */
     public function update($id, $disabled)
     {
@@ -176,9 +176,9 @@ class Genres
     }
 
     /**
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getDisabledIDs(): array
+    public function getDisabledIDs()
     {
         $cats = Cache::get('disabledcats');
         if ($cats !== null) {
