@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use GuzzleHttp\Client;
@@ -121,7 +122,7 @@ class Console
     public function getConsoleInfoByName($title, $platform)
     {
         //only used to get a count of words
-        $searchwords = $searchsql = '';
+        $searchWords = $searchsql = '';
 
         $title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
         $title = preg_replace('/[^\w ]+/', '', $title);
@@ -133,27 +134,27 @@ class Console
             $word = trim(rtrim(trim($word), '-'));
             if ($word !== '' && $word !== '-') {
                 $word = '+'.$word;
-                $searchwords .= sprintf('%s ', $word);
+                $searchWords .= sprintf('%s ', $word);
             }
         }
-        $searchwords = trim($searchwords);
+        $searchWords = trim($searchWords);
 
-        return ConsoleInfo::query()->whereRaw('MATCH(title, platform) AGAINST(? IN BOOLEAN MODE) AND platform = ?', [$searchwords, $platform])->first();
+        return ConsoleInfo::query()->whereRaw('MATCH(title, platform) AGAINST(? IN BOOLEAN MODE) AND platform = ?', [$searchWords, $platform])->first();
     }
 
     /**
      * @param       $cat
      * @param       $start
      * @param       $num
-     * @param       $orderby
+     * @param       $orderBy
      * @param array $excludedcats
      *
      * @return array
      * @throws \Exception
      */
-    public function getConsoleRange($cat, $start, $num, $orderby, array $excludedcats = []): array
+    public function getConsoleRange($cat, $start, $num, $orderBy, array $excludedcats = []): array
     {
-        $browseby = $this->getBrowseBy();
+        $browseBy = $this->getBrowseBy();
 
         $catsrch = '';
         if (\count($cat) > 0 && (int) $cat[0] !== -1) {
@@ -165,10 +166,9 @@ class Console
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
         }
 
-        $order = $this->getConsoleOrder($orderby);
+        $order = $this->getConsoleOrder($orderBy);
 
-        $consoles = $this->pdo->queryCalc(
-                sprintf(
+        $calcSql = sprintf(
                     "
 					SELECT SQL_CALC_FOUND_ROWS
 						con.id,
@@ -183,16 +183,22 @@ class Console
 					GROUP BY con.id
 					ORDER BY %s %s %s",
                         Releases::showPasswords(),
-                        $browseby,
+                        $browseBy,
                         $catsrch,
                         $exccatlist,
                         $order[0],
                         $order[1],
                         ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-                ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
+                );
+
+        $cached = Cache::get(md5($calcSql));
+        if ($cached !== null) {
+            $consoles = $cached;
+        } else {
+            $consoles = $this->pdo->queryCalc($calcSql);
+            $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+            Cache::put(md5($calcSql), $consoles, $expiresAt);
+        }
 
         $consoleIDs = $releaseIDs = false;
 
@@ -203,8 +209,7 @@ class Console
             }
         }
 
-        $return = $this->pdo->query(
-                sprintf(
+        $sql = sprintf(
                     "
 				SELECT
 					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
@@ -242,24 +247,31 @@ class Console
                         $catsrch,
                         $order[0],
                         $order[1]
-                ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
+                );
+
+        $return = Cache::get(md5($sql));
+        if ($return !== null) {
+            return $return;
+        }
+
+        $return = $this->pdo->query($sql);
         if (! empty($return)) {
             $return[0]['_totalcount'] = $consoles['total'] ?? 0;
         }
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put(md5($sql), $return, $expiresAt);
 
         return $return;
     }
 
     /**
-     * @param $orderby
+     * @param $orderBy
      * @return array
      */
-    public function getConsoleOrder($orderby): array
+    public function getConsoleOrder($orderBy): array
     {
-        $order = ($orderby === '') ? 'r.postdate' : $orderby;
+        $order = ($orderBy === '') ? 'r.postdate' : $orderBy;
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
             case 'title':
@@ -314,16 +326,16 @@ class Console
      */
     public function getBrowseBy(): string
     {
-        $browseby = ' ';
+        $browseBy = ' ';
         $browsebyArr = $this->getBrowseByOptions();
         foreach ($browsebyArr as $bbk => $bbv) {
             if (isset($_REQUEST[$bbk]) && ! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseby .= 'AND con.'.$bbv.' '.$this->pdo->likeString($bbs);
+                $browseBy .= 'AND con.'.$bbv.' '.$this->pdo->likeString($bbs);
             }
         }
 
-        return $browseby;
+        return $browseBy;
     }
 
     /**
