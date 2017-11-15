@@ -2,10 +2,10 @@
 
 namespace nntmux;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
+use Carbon\Carbon;
 use App\Models\Genre;
+use Illuminate\Support\Facades\Cache;
 
 class Genres
 {
@@ -50,6 +50,7 @@ class Genres
         $genres = $this->pdo->query($sql);
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
         Cache::put(md5($sql), $genres, $expiresAt);
+
         return $genres;
     }
 
