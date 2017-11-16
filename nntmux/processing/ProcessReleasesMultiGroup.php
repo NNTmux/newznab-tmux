@@ -3,7 +3,7 @@
 namespace nntmux\processing;
 
 use nntmux\NZBMultiGroup;
-use App\Models\MultigroupPosters;
+use App\Models\MultigroupPoster;
 
 class ProcessReleasesMultiGroup extends ProcessReleases
 {
@@ -42,7 +42,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
      */
     public static function isMultiGroup($fromName): bool
     {
-        $poster = MultigroupPosters::query()->where('poster', '=', $fromName)->first();
+        $poster = MultigroupPoster::query()->where('poster', '=', $fromName)->first();
 
         return empty($poster) ? false : true;
     }
@@ -67,10 +67,10 @@ class ProcessReleasesMultiGroup extends ProcessReleases
     public static function tableNames(): array
     {
         return [
-			'cname' => 'multigroup_collections',
-			'bname' => 'multigroup_binaries',
-			'pname' => 'multigroup_parts',
-			'prname' => 'multigroup_missed_parts',
-		];
+            'cname' => 'multigroup_collections',
+            'bname' => 'multigroup_binaries',
+            'pname' => 'multigroup_parts',
+            'prname' => 'multigroup_missed_parts',
+        ];
     }
 }

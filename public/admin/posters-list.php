@@ -2,22 +2,22 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Models\MultigroupPosters;
+use App\Models\MultigroupPoster;
 
 $page = new AdminPage();
 
-$posters = MultigroupPosters::all('id', 'poster')->sortBy('poster');
+$posters = MultigroupPoster::all('id', 'poster')->sortBy('poster');
 
 $postersCheck = $posters->first();
 
 $poster = isset($_REQUEST['poster']) && ! empty($_REQUEST['poster']) ? $_REQUEST['poster'] : '';
 
 $page->smarty->assign(
-	[
-		'poster' => $poster,
-		'posters' => $posters,
-		'check' => $postersCheck,
-	]
+    [
+        'poster' => $poster,
+        'posters' => $posters,
+        'check' => $postersCheck,
+    ]
 );
 
 $page->title = 'MultiGroup Posters List';

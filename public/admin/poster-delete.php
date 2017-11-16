@@ -2,12 +2,12 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Models\MultigroupPosters;
+use App\Models\MultigroupPoster;
 
 $page = new AdminPage();
 
 if (isset($_GET['id'])) {
-    MultigroupPosters::query()->where('id', '=', $_GET['id'])->delete();
+    MultigroupPoster::query()->where('id', '=', $_GET['id'])->delete();
 }
 
 if (isset($_GET['from'])) {

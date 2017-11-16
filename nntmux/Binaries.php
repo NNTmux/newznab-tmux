@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use App\Models\MultigroupPoster;
+use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Group;
@@ -1787,16 +1789,21 @@ class Binaries
     /**
      * Returns all multigroup poster entries from the database.
      *
-     * @return array
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    protected function getMultiGroupPosters(): array
+    protected function getMultiGroupPosters()
     {
-        return $this->_pdo->query(
-            '
-			SELECT poster
-			FROM multigroup_posters',
-            true,
-            NN_CACHE_EXPIRY_SHORT
-        );
+        $query = MultigroupPoster::query()->select(['poster']);
+        $poster = Cache::get(md5($query));
+        if ($poster !== null) {
+            return $poster;
+        }
+
+        $poster = $query->get();
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
+        Cache::put(md5($query), $poster, $expiresAt);
+
+        return $poster;
     }
 }

@@ -21,15 +21,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MultigroupPosters extends Model
+class MultigroupPoster extends Model
 {
-    protected $table = 'multigroup_posters';
+    /**
+     * @var array
+     */
+    protected $guarded = [];
 
-    protected $fillable = ['id', 'poster'];
-
+    /**
+     * @var bool
+     */
     public $dateFormat = false;
 
+    /**
+     * @var bool
+     */
     public $timestamps = false;
+
+    /**
+     * @var bool
+     */
+    public $incrementing = false;
 
     /**
      * @return string

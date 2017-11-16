@@ -21,7 +21,7 @@ use nntmux\RequestIDLocal;
 use nntmux\ReleaseCleaning;
 use App\Models\ReleaseRegex;
 use App\Models\ReleasesGroups;
-use App\Models\MultigroupPosters;
+use App\Models\MultigroupPoster;
 
 class ProcessReleases
 {
@@ -556,7 +556,7 @@ class ProcessReleases
      */
     protected function formFromNamesQuery(): void
     {
-        $posters = MultigroupPosters::commaSeparatedList();
+        $posters = MultigroupPoster::commaSeparatedList();
         $this->fromNamesQuery = sprintf("AND r.fromname NOT IN('%s')", $posters);
     }
 
@@ -609,7 +609,8 @@ class ProcessReleases
                         str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection['subject'])
                     )
                 );
-                $fromName = utf8_encode(trim($collection['fromname'], "'")
+                $fromName = utf8_encode(
+                    trim($collection['fromname'], "'")
                 );
 
                 // Look for duplicates, duplicates match on releases.name, releases.fromname and releases.size
