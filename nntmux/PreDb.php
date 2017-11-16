@@ -58,6 +58,7 @@ class PreDb
      * Attempts to match PreDB titles to releases.
      *
      * @param $dateLimit
+     * @throws \RuntimeException
      */
     public function checkPre($dateLimit = false): void
     {
@@ -163,7 +164,7 @@ class PreDb
     {
         if ($search !== '') {
             $search = explode(' ', trim($search));
-            if (count($search) > 1) {
+            if (\count($search) > 1) {
                 $search = "LIKE '%".implode("%' AND title LIKE '%", $search)."%'";
             } else {
                 $search = "LIKE '%".$search[0]."%'";
