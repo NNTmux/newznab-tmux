@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use Tmdb\ApiToken;
 use aharen\OMDbAPI;
@@ -231,37 +233,6 @@ class Movie
     }
 
     /**
-     * Get info for multiple IMDB id's.
-     *
-     * @param array $imdbIDs
-     *
-     * @return array
-     */
-    public function getMovieInfoMultiImdb($imdbIDs): array
-    {
-        return $this->pdo->query(
-            sprintf(
-                '
-				SELECT DISTINCT movieinfo.*, releases.imdbid AS relimdb
-				FROM movieinfo
-				LEFT OUTER JOIN releases ON releases.imdbid = movieinfo.imdbid
-				WHERE movieinfo.imdbid IN (%s)',
-                str_replace(
-                    ',,',
-                    ',',
-                    str_replace(
-                        ['(,', ' ,', ', )', ',)'],
-                        '',
-                        implode(',', $imdbIDs)
-                    )
-                )
-            ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
-    }
-
-    /**
      * Get movie releases with covers for movie browse page.
      *
      * @param       $cat
@@ -282,8 +253,9 @@ class Movie
         }
 
         $order = $this->getMovieOrder($orderBy);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
 
-        $movies = $this->pdo->queryCalc(
+        $moviesSql =
                 sprintf(
                     "
 					SELECT SQL_CALC_FOUND_ROWS
@@ -310,10 +282,14 @@ class Movie
                         $order[0],
                         $order[1],
                         ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-                ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
+                );
+        $movieCache = Cache::get(md5($moviesSql));
+        if ($movieCache !== null) {
+            $movies = $movieCache;
+        } else {
+            $movies = $this->pdo->queryCalc($moviesSql);
+            Cache::put(md5($moviesSql), $movies, $expiresAt);
+        }
 
         $movieIDs = $releaseIDs = false;
 
@@ -362,10 +338,16 @@ class Movie
                 $order[0],
                 $order[1]
         );
-        $return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+        $return = Cache::get(md5($sql));
+        if ($return !== null) {
+            return $return;
+        }
+        $return = $this->pdo->query($sql);
         if (! empty($return)) {
             $return[0]['_totalcount'] = $movies['total'] ?? 0;
         }
+
+        Cache::put(md5($sql), $return, $expiresAt);
 
         return $return;
     }
