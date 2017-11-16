@@ -2,9 +2,8 @@
 
 namespace nntmux;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
+use Carbon\Carbon;
 use Tmdb\ApiToken;
 use aharen\OMDbAPI;
 use GuzzleHttp\Client;
@@ -15,6 +14,7 @@ use nntmux\libraries\FanartTV;
 use Tmdb\Client as TmdbClient;
 use nntmux\processing\tv\TraktTv;
 use Tmdb\Exception\TmdbApiException;
+use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
 
 /**
