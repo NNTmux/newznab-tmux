@@ -267,7 +267,7 @@ class XXX
             $return[0]['_totalcount'] = $xxxmovies['total'] ?? 0;
         }
 
-        Cache::put(md5($sq), $return, $expiresAt);
+        Cache::put(md5($sql), $return, $expiresAt);
 
         return $return;
     }
