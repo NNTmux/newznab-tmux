@@ -58,7 +58,7 @@ class API extends Capabilities
      */
     public function addLanguage(&$releases)
     {
-        if ($releases && count($releases)) {
+        if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {
                 if (isset($release['id'])) {
                     $language = AudioData::query()->where('releases_id', $release['id'])->first(['audiolanguage']);
@@ -113,7 +113,9 @@ class API extends Capabilities
 
     /**
      * Verify groupName parameter.
+     *
      * @return mixed
+     * @throws \Exception
      */
     public function group()
     {
@@ -168,14 +170,12 @@ class API extends Capabilities
     }
 
     /**
-     * Inject the coverurl.
-     *
-     * @param          $releases
+     * @param $releases
      * @param callable $getCoverURL
      */
     public function addCoverURL(&$releases, callable $getCoverURL)
     {
-        if ($releases && count($releases)) {
+        if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {
                 $coverURL = $getCoverURL($release);
                 $releases[$key]['coverurl'] = $coverURL;
