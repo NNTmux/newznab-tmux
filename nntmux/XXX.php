@@ -2,6 +2,9 @@
 
 namespace nntmux;
 
+use App\Models\Release;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use App\Models\Genre;
 use App\Models\XxxInfo;
@@ -18,7 +21,7 @@ use nntmux\processing\adult\Hotmovies;
 class XXX
 {
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -37,7 +40,7 @@ class XXX
     protected $currentTitle = '';
 
     /**
-     * @var Logger
+     * @var \nntmux\Logger
      */
     protected $debugging;
 
@@ -57,12 +60,18 @@ class XXX
     protected $imgSavePath;
 
     /**
-     * @var ReleaseImage
+     * @var \nntmux\ReleaseImage
      */
     protected $releaseImage;
 
+    /**
+     * @var
+     */
     protected $currentRelID;
 
+    /**
+     * @var int|null|string
+     */
     protected $movieqty;
 
     /**
@@ -132,7 +141,7 @@ class XXX
     }
 
     /**
-     * Get movie releases with covers for xxx browse page.
+     * Get XXX releases with covers for xxx browse page.
      *
      * @param       $cat
      * @param       $start
@@ -142,17 +151,20 @@ class XXX
      * @param array $excludedCats
      *
      * @return array
+     * @throws \Exception
      */
     public function getXXXRange($cat, $start, $num, $orderBy, $maxAge = -1, array $excludedCats = []): array
     {
         $catsrch = '';
-        if (count($cat) > 0 && $cat[0] !== -1) {
+        if (\count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
         }
 
         $order = $this->getXXXOrder($orderBy);
 
-        $xxxmovies = $this->pdo->queryCalc(
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+
+        $xxxmoviesSql =
             sprintf(
                 "
 				SELECT SQL_CALC_FOUND_ROWS
@@ -174,18 +186,23 @@ class XXX
                     ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
                     : ''
                 ),
-                (count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
                 $order[0],
                 $order[1],
                 ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-            ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
+           );
+
+        $xxxmoviesCache = Cache::get(md5($xxxmoviesSql));
+        if ($xxxmoviesCache !== null) {
+            $xxxmovies = $xxxmoviesCache;
+        } else {
+            $xxxmovies = $this->pdo->queryCalc($xxxmoviesSql);
+            Cache::put(md5($xxxmoviesSql), $xxxmovies, $expiresAt);
+        }
 
         $xxxIDs = $releaseIDs = false;
 
-        if (is_array($xxxmovies['result'])) {
+        if (\is_array($xxxmovies['result'])) {
             foreach ($xxxmovies['result'] as $xxx => $id) {
                 $xxxIDs[] = $id['id'];
                 $releaseIDs[] = $id['grp_release_id'];
@@ -227,7 +244,7 @@ class XXX
 			%s %s %s %s
 			GROUP BY xxx.id
 			ORDER BY %s %s",
-            (is_array($xxxIDs) ? implode(',', $xxxIDs) : -1),
+            (\is_array($xxxIDs) ? implode(',', $xxxIDs) : -1),
             $this->showPasswords,
             $this->getBrowseBy(),
             $catsrch,
@@ -236,14 +253,21 @@ class XXX
                 ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
                 : ''
             ),
-            (count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             $order[0],
             $order[1]
         );
-        $return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+        $return = Cache::get(md5($sql));
+        if ($return !== null) {
+            return $return;
+        }
+
+        $return = $this->pdo->query($sql);
         if (! empty($return)) {
             $return[0]['_totalcount'] = $xxxmovies['total'] ?? 0;
         }
+
+        Cache::put(md5($sq), $return, $expiresAt);
 
         return $return;
     }
@@ -412,7 +436,7 @@ class XXX
     {
         $ret = null;
 
-        if (! is_array($arr)) {
+        if (! \is_array($arr)) {
             $res = Genre::query()->where('title', $arr)->first(['id']);
             if ($res !== null) {
                 return $res['id'];
@@ -659,7 +683,7 @@ class XXX
                 $this->movieqty
             )
         );
-        $movieCount = count($res);
+        $movieCount = \count($res);
 
         if ($movieCount > 0) {
             if ($this->echooutput) {
@@ -691,7 +715,10 @@ class XXX
                 } else {
                     ColorCLI::doEcho('.', true);
                 }
-                $this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE id = %d %s', $idcheck, $arr['id'], $this->catWhere));
+                Release::query()
+                    ->where('id', $arr['id'])
+                    ->whereIn('categories_id', [Category::XXX_DVD, Category::XXX_WMV, Category::XXX_XVID, Category::XXX_X264, Category::XXX_SD, Category::XXX_CLIPHD, Category::XXX_CLIPSD, Category::XXX_WEBDL])
+                    ->update(['xxxinfo_id' => $idcheck]);
             }
         } elseif ($this->echooutput) {
             ColorCLI::doEcho(ColorCLI::header('No xxx releases to process.'));
@@ -740,7 +767,7 @@ class XXX
             $name = trim(preg_replace('/(brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)$/i', '', $name));
 
             // Check if the name is long enough and not just numbers and not file (d) of (d) and does not contain Episodes and any dated 00.00.00 which are site rips..
-            if (strlen($name) > 5 && ! preg_match('/^\d+$/', $name) && ! preg_match('/( File \d+ of \d+|\d+.\d+.\d+)/', $name) && ! preg_match('/(E\d+)/', $name) && ! preg_match('/\d\d\.\d\d.\d\d/', $name)) {
+            if (\strlen($name) > 5 && ! preg_match('/^\d+$/', $name) && ! preg_match('/( File \d+ of \d+|\d+.\d+.\d+)/', $name) && ! preg_match('/(E\d+)/', $name) && ! preg_match('/\d\d\.\d\d.\d\d/', $name)) {
                 $this->currentTitle = $name;
 
                 return true;
