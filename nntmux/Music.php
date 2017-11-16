@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use Carbon\Carbon;
@@ -92,7 +93,7 @@ class Music
         $this->musicqty = Settings::settingValue('..maxmusicprocessed') !== '' ? (int) Settings::settingValue('..maxmusicprocessed') : 150;
         $this->sleeptime = Settings::settingValue('..amazonsleep') !== '' ? (int) Settings::settingValue('..amazonsleep') : 1000;
         $this->imgSavePath = NN_COVERS.'music'.DS;
-        $this->renamed = Settings::settingValue('..lookupmusic') === 2;
+        $this->renamed = (int) Settings::settingValue('..lookupmusic') === 2;
 
         $this->failCache = [];
     }
@@ -149,18 +150,19 @@ class Music
         $browseby = $this->getBrowseBy();
 
         $catsrch = '';
-        if (count($cat) > 0 && $cat[0] != -1) {
+        if (\count($cat) > 0 && (int) $cat[0] !== -1) {
             $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
         }
 
         $exccatlist = '';
-        if (count($excludedcats) > 0) {
+        if (\count($excludedcats) > 0) {
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
         }
 
         $order = $this->getMusicOrder($orderby);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
 
-        $music = $this->pdo->queryCalc(
+        $musicSql =
                 sprintf(
                     "
 				SELECT SQL_CALC_FOUND_ROWS
@@ -182,14 +184,18 @@ class Music
                         $order[0],
                         $order[1],
                         ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-                ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
+                );
+        $musicCache = Cache::get(md5($musicSql));
+        if ($musicCache !== null) {
+            $music = $musicCache;
+        } else {
+            $music = $this->pdo->queryCalc($musicSql);
+            Cache::put(md5($musicSql), $music, $expiresAt);
+        }
 
         $musicIDs = $releaseIDs = false;
 
-        if (is_array($music['result'])) {
+        if (\is_array($music['result'])) {
             foreach ($music['result'] as $mus => $id) {
                 $musicIDs[] = $id['id'];
                 $releaseIDs[] = $id['grp_release_id'];
@@ -227,16 +233,22 @@ class Music
 			%s
 			GROUP BY m.id
 			ORDER BY %s %s",
-                (is_array($musicIDs) ? implode(',', $musicIDs) : -1),
-                (is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+                (\is_array($musicIDs) ? implode(',', $musicIDs) : -1),
+                (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
                 $catsrch,
                 $order[0],
                 $order[1]
         );
-        $return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+
+        $return = Cache::get(md5($sql));
+        if ($return !== null) {
+            return $return;
+        }
+        $return = $this->pdo->query($sql);
         if (! empty($return)) {
             $return[0]['_totalcount'] = $music['total'] ?? 0;
         }
+        Cache::put(md5($sql), $return, $expiresAt);
 
         return $return;
     }
@@ -248,7 +260,7 @@ class Music
      */
     public function getMusicOrder($orderby): array
     {
-        $order = ($orderby == '') ? 'r.postdate' : $orderby;
+        $order = ($orderby === '') ? 'r.postdate' : $orderby;
         $orderArr = explode('_', $order);
         switch ($orderArr[0]) {
             case 'artist':
@@ -439,7 +451,7 @@ class Music
         if (isset($amaz->Items->Item->Tracks)) {
             $tmpTracks = (array) $amaz->Items->Item->Tracks->Disc;
             $tracks = $tmpTracks['Track'];
-            $mus['tracks'] = (is_array($tracks) && ! empty($tracks)) ? implode('|', $tracks) : '';
+            $mus['tracks'] = (\is_array($tracks) && ! empty($tracks)) ? implode('|', $tracks) : '';
         }
 
         similar_text($mus['artist'].' '.$mus['title'], $title, $titlepercent);
@@ -467,7 +479,7 @@ class Music
                 }
             }
 
-            if (in_array(strtolower($genreName), $genreassoc, false)) {
+            if (\in_array(strtolower($genreName), $genreassoc, false)) {
                 $genreKey = array_search(strtolower($genreName), $genreassoc, false);
             } else {
                 $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
@@ -631,7 +643,7 @@ class Music
             }
         }
         if ($response === false) {
-            throw new \Exception('Could not connect to Amazon');
+            throw new \RuntimeException('Could not connect to Amazon');
         } else {
             if (isset($response->Items->Item->ItemAttributes->Title)) {
                 return $response;
@@ -673,7 +685,7 @@ class Music
                     // Do a local lookup first
                     $musicCheck = $this->getMusicInfoByName('', $album['name']);
 
-                    if ($musicCheck === null && in_array($album['name'].$album['year'], $this->failCache, false)) {
+                    if ($musicCheck === null && \in_array($album['name'].$album['year'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
                             ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.').PHP_EOL);
