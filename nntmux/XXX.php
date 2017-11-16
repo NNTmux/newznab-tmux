@@ -2,17 +2,17 @@
 
 namespace nntmux;
 
-use App\Models\Release;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
+use Carbon\Carbon;
 use App\Models\Genre;
+use App\Models\Release;
 use App\Models\XxxInfo;
 use App\Models\Settings;
 use nntmux\processing\adult\ADE;
 use nntmux\processing\adult\ADM;
 use nntmux\processing\adult\AEBN;
 use nntmux\processing\adult\Popporn;
+use Illuminate\Support\Facades\Cache;
 use nntmux\processing\adult\Hotmovies;
 
 /**
