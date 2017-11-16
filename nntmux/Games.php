@@ -2,7 +2,6 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Genre;
@@ -10,6 +9,7 @@ use App\Models\Settings;
 use App\Models\GamesInfo;
 use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
+use Illuminate\Support\Facades\Cache;
 
 class Games
 {
