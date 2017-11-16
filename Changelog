@@ -1,4 +1,5 @@
 2017-11-16 DariusIII
+	* Chg: Use Cache facade in Games class
 	* Chg: Update Movie class, use Cache facade
 	* Chg: Update API class
 	* Chg: Rename and update MultigroupPosters class

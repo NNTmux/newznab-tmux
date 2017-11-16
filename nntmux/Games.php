@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Genre;
@@ -141,7 +142,11 @@ class Games
      */
     public function getGamesInfoById($id)
     {
-        return GamesInfo::query()->where('gamesinfo.id', $id)->leftJoin('genres as g', 'g.id', '=', 'gamesinfo.genres_id')->select(['gamesinfo.*', 'g.title as genres'])->first();
+        return GamesInfo::query()
+            ->where('gamesinfo.id', $id)
+            ->leftJoin('genres as g', 'g.id', '=', 'gamesinfo.genres_id')
+            ->select(['gamesinfo.*', 'g.title as genres'])
+            ->first();
     }
 
     /**
@@ -157,7 +162,10 @@ class Games
             return $bestMatch;
         }
 
-        $results = GamesInfo::query()->whereRaw('MATCH(title) AGAINST(?)', $title)->limit(20)->get();
+        $results = GamesInfo::query()
+            ->whereRaw('MATCH(title) AGAINST(?)', $title)
+            ->limit(20)
+            ->get();
 
         if ($results instanceof \Traversable) {
             $bestMatchPct = 0;
@@ -240,7 +248,7 @@ class Games
 
         $order = $this->getGamesOrder($orderBy);
 
-        $games = $this->pdo->queryCalc(
+        $gamesSql =
                 sprintf(
                     "
 				SELECT SQL_CALC_FOUND_ROWS gi.id,
@@ -262,10 +270,16 @@ class Games
                         $order[0],
                         $order[1],
                         ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-                ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
         );
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $gamesCache = Cache::get(md5($gamesSql));
+        if ($gamesCache !== null) {
+            $games = $gamesCache;
+        } else {
+            $games = $this->pdo->queryCalc($gamesSql);
+            Cache::put(md5($gamesSql), $games, $expiresAt);
+        }
 
         $gameIDs = $releaseIDs = false;
 
@@ -276,7 +290,7 @@ class Games
             }
         }
 
-        $return = $this->pdo->query(
+        $returnSql =
                 sprintf(
                     "
 				SELECT
@@ -306,18 +320,22 @@ class Games
 				%s
 				GROUP BY gi.id
 				ORDER BY %s %s",
-                        (is_array($gameIDs) ? implode(',', $gameIDs) : -1),
-                        (is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+                        (\is_array($gameIDs) ? implode(',', $gameIDs) : -1),
+                        (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
                         $catsrch,
                         $order[0],
                         $order[1]
-                ),
-            true,
-            NN_CACHE_EXPIRY_MEDIUM
-        );
+                );
+        $return = Cache::get(md5($returnSql));
+        if ($return !== null) {
+            return $return;
+        }
+
+        $return = $this->pdo->query($returnSql);
         if (! empty($return)) {
             $return[0]['_totalcount'] = $games['total'] ?? 0;
         }
+        Cache::put(md5($returnSql), $return, $expiresAt);
 
         return $return;
     }
