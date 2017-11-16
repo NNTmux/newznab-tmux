@@ -2,13 +2,13 @@
 
 namespace nntmux;
 
-use App\Models\MultigroupPoster;
-use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Group;
 use App\Models\Settings;
 use App\Models\BinaryBlacklist;
+use App\Models\MultigroupPoster;
+use Illuminate\Support\Facades\Cache;
 use nntmux\processing\ProcessReleasesMultiGroup;
 
 /**
