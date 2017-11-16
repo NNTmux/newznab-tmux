@@ -1794,15 +1794,14 @@ class Binaries
      */
     protected function getMultiGroupPosters()
     {
-        $query = MultigroupPoster::query()->select(['poster']);
-        $poster = Cache::get(md5($query));
+        $poster = Cache::get('mgrposter');
         if ($poster !== null) {
             return $poster;
         }
 
-        $poster = $query->get();
+        $poster = MultigroupPoster::query()->get(['poster'])->toArray();
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
-        Cache::put(md5($query), $poster, $expiresAt);
+        Cache::put('mgrposter', $poster, $expiresAt);
 
         return $poster;
     }
