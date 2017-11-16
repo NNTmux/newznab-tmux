@@ -2,7 +2,6 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use Carbon\Carbon;
@@ -13,6 +12,7 @@ use App\Models\Settings;
 use App\Models\MusicInfo;
 use ApaiIO\Operations\Search;
 use ApaiIO\Request\GuzzleRequest;
+use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
 use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
 
