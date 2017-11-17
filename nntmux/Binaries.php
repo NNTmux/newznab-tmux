@@ -27,47 +27,42 @@ class Binaries
     const BLACKLIST_FIELD_MESSAGEID = 3;
 
     /**
-     * Cache of black list regexes.
-     *
      * @var array
      */
     public $blackList = [];
 
     /**
-     * Cache of white list regexes.
      * @var array
      */
     public $whiteList = [];
 
     /**
-     * How many headers do we download per loop?
-     *
      * @var int
      */
     public $messageBuffer;
 
     /**
-     * @var ColorCLI
+     * @var \nntmux\ColorCLI
      */
     protected $_colorCLI;
 
     /**
-     * @var CollectionsCleaning
+     * @var \nntmux\CollectionsCleaning
      */
     protected $_collectionsCleaning;
 
     /**
-     * @var Logger
+     * @var \nntmux\Logger
      */
     protected $_debugging;
 
     /**
-     * @var Groups
+     * @var \nntmux\Groups
      */
     protected $_groups;
 
     /**
-     * @var NNTP
+     * @var \nntmux\NNTP
      */
     protected $_nntp;
 
@@ -86,7 +81,7 @@ class Binaries
     protected $_partRepair;
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     protected $_pdo;
 
@@ -309,7 +304,7 @@ class Binaries
     {
         $groups = $this->_groups->getActive();
 
-        $groupCount = count($groups);
+        $groupCount = \count($groups);
         if ($groupCount > 0) {
             $counter = 1;
             $allTime = microtime(true);
@@ -695,7 +690,7 @@ class Binaries
         $this->timeHeaders = number_format($this->startCleaning - $this->startLoop, 2);
 
         // Check if we got headers.
-        $msgCount = count($headers);
+        $msgCount = \count($headers);
 
         if ($msgCount < 1) {
             return $returnArray;
@@ -719,7 +714,7 @@ class Binaries
 
             // If set we are running in partRepair mode.
             if ($partRepair === true && $missingParts !== null) {
-                if (! in_array($header['Number'], $missingParts, false)) {
+                if (! \in_array($header['Number'], $missingParts, false)) {
                     // If article isn't one that is missing skip it.
                     continue;
                 }
@@ -802,13 +797,13 @@ class Binaries
         // End of inserting.
         $this->timeInsert = number_format($this->startPR - $this->startUpdate, 2);
 
-        if ($partRepair && count($headersRepaired) > 0) {
+        if ($partRepair && \count($headersRepaired) > 0) {
             $this->removeRepairedParts($headersRepaired, $this->tableNames['prname'], $this->groupMySQL['id']);
         }
         unset($headersRepaired);
 
         if ($this->addToPartRepair) {
-            $notInsertedCount = count($this->headersNotInserted);
+            $notInsertedCount = \count($this->headersNotInserted);
             if ($notInsertedCount > 0) {
                 $this->addMissingParts($this->headersNotInserted, $this->tableNames['prname'], $this->groupMySQL['id']);
 
@@ -822,10 +817,10 @@ class Binaries
             unset($this->headersNotInserted);
 
             // Check if we have any missing headers.
-            if (($this->last - $this->first - $this->notYEnc - $this->headersBlackListed + 1) > count($this->headersReceived)) {
+            if (($this->last - $this->first - $this->notYEnc - $this->headersBlackListed + 1) > \count($this->headersReceived)) {
                 $rangeNotReceived = array_merge($rangeNotReceived, array_diff(range($this->first, $this->last), $this->headersReceived));
             }
-            $notReceivedCount = count($rangeNotReceived);
+            $notReceivedCount = \count($rangeNotReceived);
             if ($notReceivedCount > 0) {
                 $this->addMissingParts($rangeNotReceived, $this->tableNames['prname'], $this->groupMySQL['id']);
 
@@ -1018,16 +1013,16 @@ class Binaries
         $binariesQuery = rtrim($binariesQuery, ',').$binariesEnd;
 
         // Check if we got any binaries. If we did, try to insert them.
-        if (strlen($binariesCheck.$binariesEnd) === strlen($binariesQuery) ? true : $this->_pdo->queryExec($binariesQuery)) {
+        if (\strlen($binariesCheck.$binariesEnd) === \strlen($binariesQuery) ? true : $this->_pdo->queryExec($binariesQuery)) {
             if ($this->_debug) {
                 ColorCLI::doEcho(
                     ColorCLI::debug(
-                        'Sending '.round(strlen($partsQuery) / 1024, 2).
+                        'Sending '.round(\strlen($partsQuery) / 1024, 2).
                         ' KB of'.($this->multiGroup ? ' MGR' : '').' parts to MySQL'
                     )
                 );
             }
-            if (strlen($partsQuery) === strlen($partsCheck) ? true : $this->_pdo->queryExec(rtrim($partsQuery, ','))) {
+            if (\strlen($partsQuery) === \strlen($partsCheck) ? true : $this->_pdo->queryExec(rtrim($partsQuery, ','))) {
                 $this->_pdo->Commit();
             } else {
                 if ($this->addToPartRepair) {
@@ -1094,7 +1089,7 @@ class Binaries
     {
         ColorCLI::doEcho(
             ColorCLI::primary(
-                'Received '.count($this->headersReceived).
+                'Received '.\count($this->headersReceived).
                 ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
                 $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
             )
@@ -1173,7 +1168,7 @@ class Binaries
             )
         );
 
-        $missingCount = count($missingParts);
+        $missingCount = \count($missingParts);
         if ($missingCount > 0) {
             if ($this->_echoCLI) {
                 ColorCLI::doEcho(
@@ -1332,7 +1327,7 @@ class Binaries
             $header = $this->_nntp->getXOVER($currentPost);
             if (! $this->_nntp->isError($header)) {
                 // Check if the date is set.
-                if (isset($header[0]['Date']) && strlen($header[0]['Date']) > 0) {
+                if (isset($header[0]['Date']) && \strlen($header[0]['Date']) > 0) {
                     $date = $header[0]['Date'];
                     break;
                 }
