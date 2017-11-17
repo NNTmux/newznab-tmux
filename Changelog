@@ -1,4 +1,5 @@
 2017-11-17 DariusIII
+	* Chg: Rename tmux back to artisan
 	* Fix: Fix typo in Books class
 	* Chg: Update simfony components
 2017-11-16 DariusIII
