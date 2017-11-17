@@ -197,7 +197,7 @@ class Books
             $books = $bookscache;
         } else {
             $books = $this->pdo->queryCalc($booksql);
-            Cache::put(md5($booksql, $books, $expiresAt));
+            Cache::put(md5($booksql), $books, $expiresAt);
         }
 
         $bookIDs = $releaseIDs = false;
