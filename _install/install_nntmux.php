@@ -250,7 +250,7 @@ if (! $error) {
 if (! $error) {
     @file_put_contents(NN_ROOT.'_install/install.lock', '');
     ColorCLI::doEcho(ColorCLI::header('Generating application key'));
-    passthru('php '.NN_ROOT.'tmux key:generate');
+    passthru('php '.NN_ROOT.'artisan key:generate');
     ColorCLI::doEcho(ColorCLI::alternate('NNTmux installation completed successfully'));
     exit();
 }
