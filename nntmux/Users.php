@@ -272,15 +272,33 @@ class Users
     }
 
     /**
-     * @param string|int $role
-     *
-     * @return mixed
+     * @param string $role
+     * @param string $username
+     * @param string $host
+     * @param string $email
+     * @return int
      */
-    public function getCount($role = '')
+    public function getCount($role = '', $username = '', $host = '', $email = '')
     {
-        $res = $this->pdo->queryOneRow(sprintf("SELECT COUNT(id) as num FROM users WHERE email != 'sharing@nZEDb.com' %s", $role !== '' ? sprintf('AND user_roles_id = %d', $role) : ''));
+        $res = User::query()->where('email', '!=', 'sharing@nZEDb.com');
 
-        return $res['num'];
+        if ($role !== '') {
+            $res->where('user_roles_id', $role);
+        }
+
+        if ($username !== '') {
+            $res->where('username', 'LIKE', '%'.$username.'%');
+        }
+
+        if ($host !== '') {
+            $res->where('host', 'LIKE', '%'.$host.'%');
+        }
+
+        if ($email !== '') {
+            $res->where('email', 'LIKE', '%'.$email.'%');
+        }
+
+        return $res->count(['id']);
     }
 
     /**

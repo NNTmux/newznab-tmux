@@ -1,5 +1,6 @@
 2017-11-17 DariusIII
-	* CHg: Update Binaries with opcode optimizations
+	* Chg: Update Users class getCount function to take into account rest of the options in user-list page
+	* Chg: Update Binaries with opcode optimizations
 	* Chg: Rename tmux back to artisan
 	* Fix: Fix typo in Books class
 	* Chg: Update simfony components

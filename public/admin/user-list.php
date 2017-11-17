@@ -30,7 +30,7 @@ $page->smarty->assign(
         'role_ids'          => array_keys($roles),
         'role_names'        => $roles,
         'pagerquerysuffix'  => '#results',
-        'pagertotalitems'   => $page->users->getCount($variables['role']),
+        'pagertotalitems'   => $page->users->getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']),
         'pageroffset'       => $offset,
         'pageritemsperpage' => ITEMS_PER_PAGE,
         'pagerquerybase'    => WWW_TOP.'/user-list.php?ob='.$orderBy.$uSearch.'&offset=',
