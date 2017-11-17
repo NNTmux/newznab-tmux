@@ -162,7 +162,7 @@
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ],
     "post-create-project-cmd": [
-      "@php tmux key:generate"
+      "@php artisan key:generate"
     ],
     "post-install-cmd": [
       "nntmux\\build\\ComposerScripts::postInstall",
@@ -173,7 +173,7 @@
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-      "@php tmux package:discover"
+      "@php artisan package:discover"
     ]
   },
   "suggest": {
