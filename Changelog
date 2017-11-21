@@ -1,4 +1,5 @@
 2017-11-21 DariusIII
+	* Chg: Enable some of the opcode optimizations in NNTP class
 	* Fix: Fix display of role name in profile page in all the themes
 	* Chg: Add Geary class to support mycelium gear BTC payment gateway
 	* Chg: Update Users class
