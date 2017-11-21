@@ -57,7 +57,7 @@
 															</tr>
 															<tr>
 																<th width="200">Role</th>
-																<td>{$user.rolename}</td>
+																<td>{$user->role->name}</td>
 															</tr>
 															{if !empty($user.rolechangedate)}
 																<tr>

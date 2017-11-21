@@ -1,4 +1,5 @@
 2017-11-21 DariusIII
+	* Fix: Fix display of role name in profile page in all the themes
 	* Chg: Add Geary class to support mycelium gear BTC payment gateway
 	* Chg: Update Users class
 2017-11-20 DariusIII
