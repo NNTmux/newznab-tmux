@@ -1,7 +1,8 @@
 <?php
+
 namespace nntmux\libraries;
 
-/**
+/*
  * Geary PHP API
  *
  * Access all API features of https://gear.mycelium.com
@@ -28,6 +29,7 @@ if (! \function_exists('getAllHeaders')) {
                 $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
             }
         }
+
         return $headers;
     }
 }
@@ -51,11 +53,11 @@ class Geary
     }
 
     /**
-     * Create Order
+     * Create Order.
      *
      * Create a new gateway order
      *
-     * @param double $amount Amount determines the amount to be paid for this
+     * @param float $amount Amount determines the amount to be paid for this
      *                           order. The amount should be in the currency you
      *                           have previously set for the gateway. If the
      *                           gateway currency is BTC, then the amount is
@@ -71,24 +73,24 @@ class Geary
         $params = [
             'amount' => $amount,
             'keychain_id' => $keychain_id,
-            'callback_data' => $callback_data
+            'callback_data' => $callback_data,
         ];
 
         $data = [
             'request_uri' => $request,
             'request_method' => 'POST',
-            'params' => $params
+            'params' => $params,
         ];
 
         return $this->send_signed_request($data);
     }
 
     /**
-     * Cancel Order
+     * Cancel Order.
      *
      * Cancel existing gateway order
      *
-     * @param integer $id     Id is an existing order ID or payment ID
+     * @param int $id     Id is an existing order ID or payment ID
      * @return mixed
      */
     public function cancel_order($id)
@@ -98,18 +100,18 @@ class Geary
         $data = [
             'request_uri' => $request,
             'request_method' => 'POST',
-            'params' => "$id/cancel"
+            'params' => "$id/cancel",
         ];
 
         return $this->send_signed_request($data);
     }
 
     /**
-     * Check Order
+     * Check Order.
      *
      * Check existing gateway order status
      *
-     * @param integer $payment_id     Id is an existing payment ID
+     * @param int $payment_id     Id is an existing payment ID
      * @return mixed
      */
     public function check_order($payment_id)
@@ -119,14 +121,14 @@ class Geary
         $data = [
             'request_uri' => $request_uri,
             'request_method' => 'GET',
-            'params' => $payment_id
+            'params' => $payment_id,
         ];
 
         return $this->send_signed_request($data);
     }
 
     /**
-     * Check Order Callback
+     * Check Order Callback.
      *
      * Check for any order status changes via callback URL
      *
@@ -144,8 +146,8 @@ class Geary
             $_GET['after_payment_redirect_to'] = urlencode($after_payment_redirect_to);
         }
 
-        $constant_digest = hash('sha512', $nonce . $body, true);
-        $payload = $_SERVER['REQUEST_METHOD'] . $request_path . $constant_digest;
+        $constant_digest = hash('sha512', $nonce.$body, true);
+        $payload = $_SERVER['REQUEST_METHOD'].$request_path.$constant_digest;
         $raw_signature = hash_hmac('sha512', $payload, $this->gateway_secret, true);
         $signature = base64_encode($raw_signature);
 
@@ -166,11 +168,11 @@ class Geary
     }
 
     /**
-     * Order Websocket Link
+     * Order Websocket Link.
      *
      * Get an order link for status monitoring via websocket
      *
-     * @param integer $id     Id is an existing order ID
+     * @param int $id     Id is an existing order ID
      * @return string
      */
     public function order_websocket_link($id): string
@@ -179,7 +181,7 @@ class Geary
     }
 
     /**
-     * Get Last Keychain Id
+     * Get Last Keychain Id.
      *
      * Get a last keychain id for a specific gateway
      *
@@ -192,14 +194,14 @@ class Geary
         $data = [
             'request_uri' => $request_uri,
             'request_method' => 'GET',
-            'params' => null
+            'params' => null,
         ];
 
         return $this->send_signed_request($data);
     }
 
     /**
-     *Curl Error
+     *Curl Error.
      *
      * Output curl error if possible
      *
@@ -219,7 +221,7 @@ class Geary
     }
 
     /**
-     * Endpoint
+     * Endpoint.
      *
      * Construct an endpoint URL
      *
@@ -232,7 +234,7 @@ class Geary
     }
 
     /**
-     * Get Params
+     * Get Params.
      *
      * Construct URL parameters
      *
@@ -257,7 +259,7 @@ class Geary
     }
 
     /**
-     * Get Header
+     * Get Header.
      *
      * Get single data from header
      *
@@ -280,7 +282,7 @@ class Geary
     }
 
     /**
-     * Prepare Header
+     * Prepare Header.
      *
      * Add data to header for authentication purpose
      *
@@ -290,24 +292,24 @@ class Geary
     private function prepare_header($data): array
     {
         $params = $data['params'];
-        $params_query = ! \is_array($params) ? "/$params" : '?' . http_build_query($params);
+        $params_query = ! \is_array($params) ? "/$params" : '?'.http_build_query($params);
 
         $nonce = (int) round(microtime(true) * 1000);
         $body = '';
 
-        $nonce_hash = hash('sha512', (string) $nonce . $body, true);
-        $payload = $data['request_method'] . $data['request_uri'] . $params_query . $nonce_hash;
+        $nonce_hash = hash('sha512', (string) $nonce.$body, true);
+        $payload = $data['request_method'].$data['request_uri'].$params_query.$nonce_hash;
         $raw_signature = hash_hmac('sha512', $payload, $this->gateway_secret, true);
         $signature = base64_encode($raw_signature);
 
         return [
-            'X-Nonce: ' . $nonce,
-            'X-Signature: ' . $signature
+            'X-Nonce: '.$nonce,
+            'X-Signature: '.$signature,
         ];
     }
 
     /**
-     * Send Signed Request
+     * Send Signed Request.
      *
      * Send a signed HTTP request
      *
@@ -317,18 +319,18 @@ class Geary
     private function send_signed_request($data)
     {
         $ch = curl_init();
-        $url = self::API_URL . $data['request_uri'];
+        $url = self::API_URL.$data['request_uri'];
 
         $headers = $this->prepare_header($data);
         $params = $this->get_params($data['params']);
 
         $curl_data = [
-            CURLOPT_URL             => $url . $params,
+            CURLOPT_URL             => $url.$params,
             CURLOPT_RETURNTRANSFER  => true,
             CURLOPT_HTTPHEADER      => $headers,
             CURLOPT_SSL_VERIFYPEER  => true,
             CURLOPT_CONNECTTIMEOUT  => self::CONNECT_TIMEOUT,
-            CURLOPT_POST            => $data['request_method'] === 'POST'
+            CURLOPT_POST            => $data['request_method'] === 'POST',
         ];
 
         curl_setopt_array($ch, $curl_data);
@@ -342,6 +344,7 @@ class Geary
 
             return false;
         }
+
         return json_decode($result);
     }
 }
