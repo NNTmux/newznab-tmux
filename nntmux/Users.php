@@ -437,27 +437,21 @@ class Users
     /**
      * @param int $uid
      * @param int $role
-     *
      * @return int
      */
     public function updateUserRole(int $uid, int $role): int
     {
-        User::query()->where('id', $uid)->update(['user_roles_id' => $role]);
-
-        return self::SUCCESS;
+        return User::query()->where('id', $uid)->update(['user_roles_id' => $role]);
     }
 
     /**
      * @param $uid
      * @param $date
-     *
      * @return int
      */
     public function updateUserRoleChangeDate($uid, $date): int
     {
-        User::query()->where('id', $uid)->update(['rolechangedate' => $date]);
-
-        return self::SUCCESS;
+        return User::query()->where('id', $uid)->update(['rolechangedate' => $date]);
     }
 
     /**
