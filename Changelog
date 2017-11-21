@@ -1,4 +1,5 @@
 2017-11-21 DariusIII
+	* Chg: Add Geary class to support mycelium gear BTC payment gateway
 	* Chg: Update Users class
 2017-11-20 DariusIII
 	* Chg: Update composer.lock with new versions of libraries used
