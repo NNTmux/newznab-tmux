@@ -45,7 +45,7 @@ $pdo = new DB();
 $users = $pdo->query('SELECT id, username, email, password FROM users');
 $update = $pdo->Prepare('UPDATE users SET password = :password WHERE id = :id');
 
-$Users = new Users(['Settings' => $pdo]);
+$Users = new Users();
 
 foreach ($users as $user) {
     if (needUpdate($user)) {

@@ -144,7 +144,7 @@ class BasePage
 
         $this->page = $_GET['page'] ?? 'content';
 
-        $this->users = new Users(['Settings' => $this->pdo]);
+        $this->users = new Users();
         if ($this->users->isLoggedIn()) {
             $this->setUserPreferences();
         } else {

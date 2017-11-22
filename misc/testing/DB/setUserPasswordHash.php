@@ -15,12 +15,12 @@ $pdo = new DB();
 
 if ($argc < 3) {
     exit(
-		$pdo->log->error(
-			'Not enough parameters!'.PHP_EOL.
-			'Argument 1: New password.'.PHP_EOL.
-			'Argument 2: ID or username of the user.'.PHP_EOL
-		)
-	);
+        $pdo->log->error(
+            'Not enough parameters!'.PHP_EOL.
+            'Argument 1: New password.'.PHP_EOL.
+            'Argument 2: ID or username of the user.'.PHP_EOL
+        )
+    );
 }
 
 $password = $argv[1];
@@ -31,24 +31,25 @@ if (is_numeric($password)) {
 
 $field = (is_numeric($identifier) ? 'id' : 'username');
 $user = $pdo->queryOneRow(
-	sprintf(
-		'SELECT id, username FROM users WHERE %s = %s',
-		$field,
-		(is_numeric($identifier) ? $identifier : $pdo->escapeString($identifier))
-	)
+    sprintf(
+        'SELECT id, username FROM users WHERE %s = %s',
+        $field,
+        (is_numeric($identifier) ? $identifier : $pdo->escapeString($identifier))
+    )
 );
 
 if ($user !== false) {
-    $users = new Users(['Settings' => $pdo]);
+    $users = new Users();
     $hash = $users->hashPassword($password);
     $result = false;
     if ($hash !== false) {
         $hash = $pdo->queryExec(
-			sprintf(
-				'UPDATE users SET password = %s WHERE id = %d',
-				$hash, $user['id']
-			)
-		);
+            sprintf(
+                'UPDATE users SET password = %s WHERE id = %d',
+                $hash,
+                $user['id']
+            )
+        );
     }
 
     if ($result === false || $hash === false) {
