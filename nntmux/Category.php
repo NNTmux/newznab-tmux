@@ -17,84 +17,84 @@ class Category
      * Category constants.
      * Do NOT use the values, as they may change, always use the constant - that's what it's for.
      */
-    const OTHER_MISC = '0010';
-    const OTHER_HASHED = '0020';
-    const GAME_NDS = '1010';
-    const GAME_PSP = '1020';
-    const GAME_WII = '1030';
-    const GAME_XBOX = '1040';
-    const GAME_XBOX360 = '1050';
-    const GAME_WIIWARE = '1060';
-    const GAME_XBOX360DLC = '1070';
-    const GAME_PS3 = '1080';
-    const GAME_OTHER = '1999';
-    const GAME_3DS = '1110';
-    const GAME_PSVITA = '1120';
-    const GAME_WIIU = '1130';
-    const GAME_XBOXONE = '1140';
-    const GAME_PS4 = '1180';
-    const MOVIE_FOREIGN = '2010';
-    const MOVIE_OTHER = '2999';
-    const MOVIE_SD = '2030';
-    const MOVIE_HD = '2040';
-    const MOVIE_UHD = '2045';
-    const MOVIE_3D = '2050';
-    const MOVIE_BLURAY = '2060';
-    const MOVIE_DVD = '2070';
-    const MOVIE_WEBDL = '2080';
-    const MUSIC_MP3 = '3010';
-    const MUSIC_VIDEO = '3020';
-    const MUSIC_AUDIOBOOK = '3030';
-    const MUSIC_LOSSLESS = '3040';
-    const MUSIC_OTHER = '3999';
-    const MUSIC_FOREIGN = '3060';
-    const PC_0DAY = '4010';
-    const PC_ISO = '4020';
-    const PC_MAC = '4030';
-    const PC_PHONE_OTHER = '4040';
-    const PC_GAMES = '4050';
-    const PC_PHONE_IOS = '4060';
-    const PC_PHONE_ANDROID = '4070';
-    const TV_WEBDL = '5010';
-    const TV_FOREIGN = '5020';
-    const TV_SD = '5030';
-    const TV_HD = '5040';
-    const TV_UHD = '5045';
-    const TV_OTHER = '5999';
-    const TV_SPORT = '5060';
-    const TV_ANIME = '5070';
-    const TV_DOCU = '5080';
-    const XXX_DVD = '6010';
-    const XXX_WMV = '6020';
-    const XXX_XVID = '6030';
-    const XXX_X264 = '6040';
-    const XXX_CLIPHD = '6041';
-    const XXX_CLIPSD = '6042';
-    const XXX_UHD = '6045';
-    const XXX_PACK = '6050';
-    const XXX_IMAGESET = '6060';
-    const XXX_OTHER = '6999';
-    const XXX_SD = '6080';
-    const XXX_WEBDL = '6090';
-    const BOOKS_MAGAZINES = '7010';
-    const BOOKS_EBOOK = '7020';
-    const BOOKS_COMICS = '7030';
-    const BOOKS_TECHNICAL = '7040';
-    const BOOKS_FOREIGN = '7060';
-    const BOOKS_UNKNOWN = '7999';
-    const OTHER_ROOT = '0000';
-    const GAME_ROOT = '1000';
-    const MOVIE_ROOT = '2000';
-    const MUSIC_ROOT = '3000';
-    const PC_ROOT = '4000';
-    const TV_ROOT = '5000';
-    const XXX_ROOT = '6000';
-    const BOOKS_ROOT = '7000';
-    const STATUS_INACTIVE = 0;
-    const STATUS_ACTIVE = 1;
-    const STATUS_DISABLED = 2;
+    public const OTHER_MISC = '0010';
+    public const OTHER_HASHED = '0020';
+    public const GAME_NDS = '1010';
+    public const GAME_PSP = '1020';
+    public const GAME_WII = '1030';
+    public const GAME_XBOX = '1040';
+    public const GAME_XBOX360 = '1050';
+    public const GAME_WIIWARE = '1060';
+    public const GAME_XBOX360DLC = '1070';
+    public const GAME_PS3 = '1080';
+    public const GAME_OTHER = '1999';
+    public const GAME_3DS = '1110';
+    public const GAME_PSVITA = '1120';
+    public const GAME_WIIU = '1130';
+    public const GAME_XBOXONE = '1140';
+    public const GAME_PS4 = '1180';
+    public const MOVIE_FOREIGN = '2010';
+    public const MOVIE_OTHER = '2999';
+    public const MOVIE_SD = '2030';
+    public const MOVIE_HD = '2040';
+    public const MOVIE_UHD = '2045';
+    public const MOVIE_3D = '2050';
+    public const MOVIE_BLURAY = '2060';
+    public const MOVIE_DVD = '2070';
+    public const MOVIE_WEBDL = '2080';
+    public const MUSIC_MP3 = '3010';
+    public const MUSIC_VIDEO = '3020';
+    public const MUSIC_AUDIOBOOK = '3030';
+    public const MUSIC_LOSSLESS = '3040';
+    public const MUSIC_OTHER = '3999';
+    public const MUSIC_FOREIGN = '3060';
+    public const PC_0DAY = '4010';
+    public const PC_ISO = '4020';
+    public const PC_MAC = '4030';
+    public const PC_PHONE_OTHER = '4040';
+    public const PC_GAMES = '4050';
+    public const PC_PHONE_IOS = '4060';
+    public const PC_PHONE_ANDROID = '4070';
+    public const TV_WEBDL = '5010';
+    public const TV_FOREIGN = '5020';
+    public const TV_SD = '5030';
+    public const TV_HD = '5040';
+    public const TV_UHD = '5045';
+    public const TV_OTHER = '5999';
+    public const TV_SPORT = '5060';
+    public const TV_ANIME = '5070';
+    public const TV_DOCU = '5080';
+    public const XXX_DVD = '6010';
+    public const XXX_WMV = '6020';
+    public const XXX_XVID = '6030';
+    public const XXX_X264 = '6040';
+    public const XXX_CLIPHD = '6041';
+    public const XXX_CLIPSD = '6042';
+    public const XXX_UHD = '6045';
+    public const XXX_PACK = '6050';
+    public const XXX_IMAGESET = '6060';
+    public const XXX_OTHER = '6999';
+    public const XXX_SD = '6080';
+    public const XXX_WEBDL = '6090';
+    public const BOOKS_MAGAZINES = '7010';
+    public const BOOKS_EBOOK = '7020';
+    public const BOOKS_COMICS = '7030';
+    public const BOOKS_TECHNICAL = '7040';
+    public const BOOKS_FOREIGN = '7060';
+    public const BOOKS_UNKNOWN = '7999';
+    public const OTHER_ROOT = '0000';
+    public const GAME_ROOT = '1000';
+    public const MOVIE_ROOT = '2000';
+    public const MUSIC_ROOT = '3000';
+    public const PC_ROOT = '4000';
+    public const TV_ROOT = '5000';
+    public const XXX_ROOT = '6000';
+    public const BOOKS_ROOT = '7000';
+    public const STATUS_INACTIVE = 0;
+    public const STATUS_ACTIVE = 1;
+    public const STATUS_DISABLED = 2;
 
-    const OTHERS_GROUP =
+    public const OTHERS_GROUP =
         [
             self::BOOKS_UNKNOWN,
             self::GAME_OTHER,
@@ -114,7 +114,7 @@ class Category
     protected $tmpCat = self::OTHER_MISC;
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -250,7 +250,9 @@ class Category
      */
     public function getEnabledParentNames()
     {
-        return CategoryModel::query()->where(['parentid' => null, 'status' => 1])->get(['title']);
+        return CategoryModel::query()
+            ->where(['parentid' => null, 'status' => 1])
+            ->get(['title']);
     }
 
     /**
@@ -261,7 +263,10 @@ class Category
      */
     public function getDisabledIDs()
     {
-        return CategoryModel::query()->where('status', '=', 2)->orWhere(['status' => 2, 'parentid' => null])->get(['id']);
+        return CategoryModel::query()
+            ->where('status', '=', 2)
+            ->orWhere(['status' => 2, 'parentid' => null])
+            ->get(['id']);
     }
 
     /**
@@ -273,7 +278,10 @@ class Category
      */
     public function getById($id)
     {
-        return CategoryModel::query()->with('parent')->where('id', $id)->first();
+        return CategoryModel::query()
+            ->with('parent')
+            ->where('id', $id)
+            ->first();
     }
 
     /**
@@ -352,26 +360,26 @@ class Category
     }
 
     /**
-     * @param array $excludedcats
+     * @param array $excludedCats
      *
-     * @param array $roleexcludedcats
+     * @param array $roleExcludedCats
      *
      * @return array
      */
-    public function getForMenu(array $excludedcats = [], array $roleexcludedcats = []): array
+    public function getForMenu(array $excludedCats = [], array $roleExcludedCats = []): array
     {
         $ret = [];
 
-        $exccatlist = '';
-        if (\count($excludedcats) > 0 && \count($roleexcludedcats) == 0) {
-            $exccatlist = ' AND id NOT IN ('.implode(',', $excludedcats).')';
-        } elseif (\count($excludedcats) > 0 && \count($roleexcludedcats) > 0) {
-            $exccatlist = ' AND id NOT IN ('.implode(',', $excludedcats).','.implode(',', $roleexcludedcats).')';
-        } elseif (\count($excludedcats) === 0 && \count($roleexcludedcats) > 0) {
-            $exccatlist = ' AND id NOT IN ('.implode(',', $roleexcludedcats).')';
+        $excCatList = '';
+        if (\count($excludedCats) > 0 && \count($roleExcludedCats) === 0) {
+            $excCatList = ' AND id NOT IN ('.implode(',', $excludedCats).')';
+        } elseif (\count($excludedCats) > 0 && \count($roleExcludedCats) > 0) {
+            $excCatList = ' AND id NOT IN ('.implode(',', $excludedCats).','.implode(',', $roleExcludedCats).')';
+        } elseif (\count($excludedCats) === 0 && \count($roleExcludedCats) > 0) {
+            $excCatList = ' AND id NOT IN ('.implode(',', $roleExcludedCats).')';
         }
 
-        $sql = sprintf('SELECT * FROM categories WHERE status = %d %s', self::STATUS_ACTIVE, $exccatlist);
+        $sql = sprintf('SELECT * FROM categories WHERE status = %d %s', self::STATUS_ACTIVE, $excCatList);
         $arrsql = Cache::get(md5($sql));
         if ($arrsql !== null) {
             $arr = $arrsql;
@@ -441,22 +449,22 @@ class Category
     }
 
     /**
-     * @param bool $activeonly
-     * @param array $excludedcats
+     * @param bool $activeOnly
+     * @param array $excludedCats
      * @return string|static
      */
-    public function getCategories($activeonly = false, array $excludedcats = [])
+    public function getCategories($activeOnly = false, array $excludedCats = [])
     {
         return $this->pdo->query(
             "SELECT c.id, CONCAT(cp.title, ' > ',c.title) AS title, cp.id AS parentid, c.status
 			FROM categories c
 			INNER JOIN categories cp ON cp.id = c.parentid ".
             (
-                $activeonly ?
+                $activeOnly ?
                 sprintf(
                     ' WHERE c.status = %d %s ',
                     self::STATUS_ACTIVE,
-                    (count($excludedcats) > 0 ? ' AND c.id NOT IN ('.implode(',', $excludedcats).')' : '')
+                    (\count($excludedCats) > 0 ? ' AND c.id NOT IN ('.implode(',', $excludedCats).')' : '')
                 ) : ''
             ).
             ' ORDER BY c.id'

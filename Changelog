@@ -1,4 +1,5 @@
 2017-11-22 DariusIII
+	* Chg: Update Category class
 	* Chg: Update Users class, remove useless stat functions and related stats
 2017-11-21 DariusIII
 	* Chg: Enable some of the opcode optimizations in NNTP class
