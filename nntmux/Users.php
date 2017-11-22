@@ -2,7 +2,6 @@
 
 namespace nntmux;
 
-use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Release;
@@ -23,26 +22,23 @@ use Illuminate\Support\Facades\Password;
 
 class Users
 {
-    const ERR_SIGNUP_BADUNAME = -1;
-    const ERR_SIGNUP_BADPASS = -2;
-    const ERR_SIGNUP_BADEMAIL = -3;
-    const ERR_SIGNUP_UNAMEINUSE = -4;
-    const ERR_SIGNUP_EMAILINUSE = -5;
-    const ERR_SIGNUP_BADINVITECODE = -6;
-    const ERR_SIGNUP_BADCAPTCHA = -7;
-    const SUCCESS = 1;
+    public const ERR_SIGNUP_BADUNAME = -1;
+    public const ERR_SIGNUP_BADPASS = -2;
+    public const ERR_SIGNUP_BADEMAIL = -3;
+    public const ERR_SIGNUP_UNAMEINUSE = -4;
+    public const ERR_SIGNUP_EMAILINUSE = -5;
+    public const ERR_SIGNUP_BADINVITECODE = -6;
+    public const ERR_SIGNUP_BADCAPTCHA = -7;
+    public const SUCCESS = 1;
 
-    const ROLE_GUEST = 0;
-    const ROLE_USER = 1;
-    const ROLE_ADMIN = 2;
-    const ROLE_DISABLED = 3;
-    const ROLE_MODERATOR = 4;
+    public const ROLE_GUEST = 0;
+    public const ROLE_USER = 1;
+    public const ROLE_ADMIN = 2;
+    public const ROLE_DISABLED = 3;
+    public const ROLE_MODERATOR = 4;
 
-    const DEFAULT_INVITES = 1;
-    const DEFAULT_INVITE_EXPIRY_DAYS = 7;
-
-    const SALTLEN = 4;
-    const SHA1LEN = 40;
+    public const DEFAULT_INVITES = 1;
+    public const DEFAULT_INVITE_EXPIRY_DAYS = 7;
 
     /**
      * @var int
@@ -52,19 +48,9 @@ class Users
     /**
      * Users SELECT queue type.
      */
-    const QUEUE_NONE = 0;
-    const QUEUE_SABNZBD = 1;
-    const QUEUE_NZBGET = 2;
-
-    /**
-     * @var DB
-     */
-    private $pdo;
-
-    /**
-     * @var \Carbon\Carbon
-     */
-    private $carbon;
+    public const QUEUE_NONE = 0;
+    public const QUEUE_SABNZBD = 1;
+    public const QUEUE_NZBGET = 2;
 
     /**
      * @param array $options Class instances.
@@ -72,16 +58,6 @@ class Users
      */
     public function __construct(array $options = [])
     {
-        $defaults = [
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
-        $this->pdo = $options['Settings'] instanceof DB ? $options['Settings'] : new DB();
-
-        $this->password_hash_cost = defined('NN_PASSWORD_HASH_COST') ? NN_PASSWORD_HASH_COST : 11;
-
-        $this->carbon = new Carbon();
     }
 
     /**
@@ -137,6 +113,7 @@ class Users
 
     /**
      * @param $id
+     * @throws \Exception
      */
     public function delete($id): void
     {
@@ -192,6 +169,17 @@ class Users
         UserRequest::query()->where('users_id', $userID)->delete();
     }
 
+    /**
+     * @param $start
+     * @param $offset
+     * @param $orderBy
+     * @param string $userName
+     * @param string $email
+     * @param string $host
+     * @param string $role
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @throws \Exception
+     */
     public function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '')
     {
         $this->clearApiRequests(false);
@@ -713,7 +701,7 @@ class Users
      */
     public function isValidPassword(string $password): bool
     {
-        return strlen($password) > 5;
+        return \strlen($password) > 5;
     }
 
     /**
@@ -771,6 +759,7 @@ class Users
      * @param int $invitedBy
      *
      * @return bool|int
+     * @throws \Exception
      */
     public function add($userName, $password, $email, $role, $notes, $host, $invites = self::DEFAULT_INVITES, $invitedBy = 0)
     {
@@ -850,12 +839,11 @@ class Users
      */
     public function updateSiteAccessed($userID, $host = ''): void
     {
-        $this->pdo->queryExec(
-            sprintf(
-                'UPDATE users SET lastlogin = NOW() %s WHERE id = %d',
-                ($host === '' ? '' : (', host = '.$this->pdo->escapeString($host))),
-                $userID
-            )
+        User::query()->where('id', $userID)->update(
+            [
+                'lastlogin' => Carbon::now(),
+                'host' => $host,
+            ]
         );
     }
 
@@ -1098,70 +1086,19 @@ class Users
     }
 
     /**
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getTopGrabbers(): array
+    public function getTopGrabbers()
     {
-        return $this->pdo->query(
-            'SELECT id, username, SUM(grabs) as grabs FROM users
-							GROUP BY id, username
-							HAVING SUM(grabs) > 0
-							ORDER BY grabs DESC
-							LIMIT 10'
-        );
+        return User::query()->selectRaw('id, username, SUM(grabs) as grabs')->groupBy(['id', 'username'])->having('grabs', '>', 0)->orderBy('grabs', 'desc')->limit(10)->get();
     }
 
     /**
-     * Get list of user signups by month.
-     *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getUsersByMonth(): array
+    public function getUsersByMonth()
     {
-        return $this->pdo->query(
-            "
-			SELECT DATE_FORMAT(created_at, '%M %Y') AS mth, COUNT(id) AS num
-			FROM users
-			WHERE created_at IS NOT NULL AND created_at != '0000-00-00 00:00:00'
-			GROUP BY mth
-			ORDER BY created_at DESC"
-        );
-    }
-
-    /**
-     * @return array
-     * @throws \Exception
-     */
-    public function getUsersByHostHash(): array
-    {
-        $ipsql = "('-1')";
-
-        if (Settings::settingValue('..userhostexclusion') !== '') {
-            $ipsql = '';
-            $ips = explode(',', Settings::settingValue('..userhostexclusion'));
-            foreach ($ips as $ip) {
-                $ipsql .= $this->pdo->escapeString($this->getHostHash($ip, Settings::settingValue('..siteseed'))).',';
-            }
-            $ipsql = '('.$ipsql." '-1')";
-        }
-
-        $sql = sprintf(
-            "SELECT hosthash, group_concat(users_id) AS user_string, group_concat(username) AS user_names
-							FROM
-							(
-							SELECT hosthash, users_id, username FROM user_downloads LEFT OUTER JOIN users ON users.id = user_downloads.users_id WHERE hosthash IS NOT NULL AND hosthash NOT IN %s GROUP BY hosthash, users_id
-							union distinct
-							SELECT hosthash, users_id, username FROM user_requests LEFT OUTER JOIN users on users.id = user_requests.users_id WHERE hosthash IS NOT NULL AND hosthash NOT IN %s GROUP BY hosthash, users_id
-							) x
-							GROUP BY hosthash
-							HAVING CAST((LENGTH(group_concat(users_id)) - LENGTH(REPLACE(group_concat(users_id), ',', ''))) / LENGTH(',') AS UNSIGNED) < 9
-							ORDER BY CAST((LENGTH(group_concat(users_id)) - LENGTH(REPLACE(group_concat(users_id), ',', ''))) / LENGTH(',') AS UNSIGNED) DESC
-							limit 10",
-            $ipsql,
-            $ipsql
-        );
-
-        return $this->pdo->query($sql);
+        return User::query()->whereNotNull('created_at')->where('created_at', '!=', '0000-00-00 00:00:00')->selectRaw("DATE_FORMAT(created_at, '%M %Y') as mth, COUNT(id) as num")->groupBy(['mth'])->orderBy('created_at', 'desc')->get();
     }
 
     /**
@@ -1181,42 +1118,11 @@ class Users
     }
 
     /**
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getUsersByRole(): array
+    public function getUsersByRole()
     {
-        return $this->pdo->query(
-            'SELECT ur.name, COUNT(u.id) as num FROM users u
-							INNER JOIN user_roles ur ON ur.id = u.user_roles_id
-							GROUP BY ur.name
-							ORDER BY COUNT(u.id) DESC'
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function getLoginCountsByMonth(): array
-    {
-        return $this->pdo->query(
-            "SELECT 'Login' as type,
-			sum(case when lastlogin > curdate() - INTERVAL 1 DAY then 1 else 0 end) as 1day,
-			sum(case when lastlogin > curdate() - INTERVAL 7 DAY AND lastlogin < curdate() - INTERVAL 1 DAY then 1 else 0 end) as 7day,
-			sum(case when lastlogin > curdate() - INTERVAL 1 MONTH AND lastlogin < curdate() - INTERVAL 7 DAY then 1 else 0 end) as 1month,
-			sum(case when lastlogin > curdate() - INTERVAL 3 MONTH AND lastlogin < curdate() - INTERVAL 1 MONTH then 1 else 0 end) as 3month,
-			sum(case when lastlogin > curdate() - INTERVAL 6 MONTH AND lastlogin < curdate() - INTERVAL 3 MONTH then 1 else 0 end) as 6month,
-			sum(case when lastlogin < curdate() - INTERVAL 6 MONTH then 1 else 0 end) as 12month
-			FROM users
-			union
-			SELECT 'Api' as type,
-			sum(case when apiaccess > curdate() - INTERVAL 1 DAY then 1 else 0 end) as 1day,
-			sum(case when apiaccess > curdate() - INTERVAL 7 DAY AND apiaccess < curdate() - INTERVAL 1 DAY then 1 else 0 end) as 7day,
-			sum(case when apiaccess > curdate() - INTERVAL 1 MONTH AND apiaccess < curdate() - INTERVAL 7 DAY then 1 else 0 end) as 1month,
-			sum(case when apiaccess > curdate() - INTERVAL 3 MONTH AND apiaccess < curdate() - INTERVAL 1 MONTH then 1 else 0 end) as 3month,
-			sum(case when apiaccess > curdate() - INTERVAL 6 MONTH AND apiaccess < curdate() - INTERVAL 3 MONTH then 1 else 0 end) as 6month,
-			sum(case when apiaccess < curdate() - INTERVAL 6 MONTH then 1 else 0 end) as 12month
-			FROM users"
-        );
+        return UserRole::query()->select(['name'])->withCount('users')->groupBy(['name'])->having('users_count', '>', 0)->orderBy('users_count', 'desc')->get();
     }
 
     /**

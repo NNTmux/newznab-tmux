@@ -31,11 +31,5 @@ $page->smarty->assign('usersbyrole', $usersbyrole);
 $page->smarty->assign('totusers', 0);
 $page->smarty->assign('totrusers', 0);
 
-$usersbyhosthash = $users->getUsersByHostHash();
-$page->smarty->assign('usersbyhosthash', $usersbyhosthash);
-
-$loginsbymonth = $users->getLoginCountsByMonth();
-$page->smarty->assign('loginsbymonth', $loginsbymonth);
-
 $page->content = $page->smarty->fetch('site-stats.tpl');
 $page->render();

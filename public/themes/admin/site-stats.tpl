@@ -51,72 +51,13 @@
 	</tr>
 
 	{foreach from=$usersbyrole item=result}
-		{assign var="totrusers" value=$totrusers+$result.num}
+		{assign var="totrusers" value=$totrusers+$result.users_count}
 		<tr class="{cycle values=",alt"}">
 			<td width="75%">{$result.name}</td>
-			<td>{$result.num}</td>
+			<td>{$result.users_count}</td>
 		</tr>
 	{/foreach}
 	<tr><td><strong>Total</strong></td><td><strong>{$totrusers}</strong></td></tr>
-</table>
-
-<br/><br/>
-
-<h2>Users by Hosthash</h2>
-
-<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
-	<tr>
-		<th>Hosthash</th>
-		<th>User IDs (Edit)</th>
-		<th>User Names (Profiles)</th>
-	</tr>
-
-	{foreach from=$usersbyhosthash item=result}
-		<tr class="{cycle values=",alt"}">
-
-			<td width="25%">{$result.hosthash}</td>
-			<td>
-			{assign var="usersplits" value=","|explode:$result.user_string}
-			{foreach from=$usersplits item=usersplit}
-				<a href="{$smarty.const.WWW_TOP}/user-edit.php?id={$usersplit}">{$usersplit}</a>
-			{/foreach}
-			</td>
-			<td>
-			{assign var="usernsplits" value=","|explode:$result.user_names}
-			{foreach from=$usernsplits item=usernsplit}
-				<a href="{$smarty.const.WWW_TOP}/../profile?name={$usernsplit}">{$usernsplit}</a>
-			{/foreach}
-			</td>
-		</tr>
-	{/foreach}
-</table>
-
-<br/><br/>
-
-<h2>Access by Date</h2>
-
-<table style="width:100%;margin-top:10px;" class="data table table-striped responsive-utilities jambo-table Sortable">
-	<tr>
-		<th>Type</th>
-		<th>Last Day</th>
-		<th>2-7 Days</th>
-		<th>8-30 Days</th>
-		<th>1-3 Months</th>
-		<th>3-6 Months</th>
-		<th>+6 Months</th>
-	</tr>
-
-	{foreach from=$loginsbymonth item=result}
-		<tr class="{cycle values=",alt"}">
-			<td width="75%">{$result.type}</td>
-			<td>{$result.1day}</td>
-			<td>{$result.7day}</td>
-			<td>{$result.1month}</td>
-			<td>{$result.3month}</td>
-			<td>{$result.6month}</td>
-			<td>{$result.12month}</td>
-		</tr>
-	{/foreach}
 </table>
 
 <br/><br/>
