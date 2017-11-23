@@ -18,51 +18,44 @@ use nntmux\processing\PostProcess;
 class Nfo
 {
     /**
-     * Instance of class Settings.
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
     /**
-     * How many nfo's to process per run.
      * @var int
      */
     private $nzbs;
 
     /**
-     * Max NFO size to process.
-     * @var string|int
+     * @var string
      */
     private $maxsize;
 
     /**
-     * Max amount of times to retry to download a Nfo.
-     * @var string|int
+     * @var int
      */
     private $maxRetries;
 
     /**
-     * Min NFO size to process.
-     * @var string|int
+     * @var string
      */
     private $minsize;
 
     /**
-     * Path to temporarily store files.
      * @var string
      */
     private $tmpPath;
 
     /**
-     * Echo to cli?
      * @var bool
      */
     protected $echo;
 
-    const NFO_FAILED = -9; // We failed to get a NFO after admin set max retries.
-    const NFO_UNPROC = -1; // Release has not been processed yet.
-    const NFO_NONFO = 0; // Release has no NFO.
-    const NFO_FOUND = 1; // Release has an NFO.
+    public const NFO_FAILED = -9; // We failed to get a NFO after admin set max retries.
+    public const NFO_UNPROC = -1; // Release has not been processed yet.
+    public const NFO_NONFO = 0; // Release has no NFO.
+    public const NFO_FOUND = 1; // Release has an NFO.
 
     /**
      * Default constructor.
@@ -81,10 +74,6 @@ class Nfo
         $this->echo = ($options['Echo'] && NN_ECHOCLI);
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->nzbs = Settings::settingValue('..maxnfoprocessed') !== '' ? (int) Settings::settingValue('..maxnfoprocessed') : 100;
-        $this->maxsize = Settings::settingValue('..maxsizetoprocessnfo') !== '' ? (int) Settings::settingValue('..maxsizetoprocessnfo') : 100;
-        $this->maxsize = $this->maxsize > 0 ? ('AND size < '.($this->maxsize * 1073741824)) : '';
-        $this->minsize = Settings::settingValue('..minsizetoprocessnfo') !== '' ? (int) Settings::settingValue('..minsizetoprocessnfo') : 100;
-        $this->minsize = $this->minsize > 0 ? ('AND size > '.($this->minsize * 1048576)) : '';
         $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : self::NFO_UNPROC;
         $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
         $this->tmpPath = (string) Settings::settingValue('..tmpunrarpath');
@@ -147,7 +136,7 @@ class Nfo
         }
 
         // Make sure it's not too big or small, size needs to be at least 12 bytes for header checking. Ignore common file types.
-        $size = strlen($possibleNFO);
+        $size = \strlen($possibleNFO);
         if ($size < 65535 &&
             $size > 11 &&
             ! preg_match(
@@ -303,7 +292,7 @@ class Nfo
                 $this->nzbs
             )
         );
-        $nfoCount = count($res);
+        $nfoCount = \count($res);
 
         if ($nfoCount > 0) {
             ColorCLI::doEcho(
