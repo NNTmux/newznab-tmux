@@ -1,4 +1,5 @@
 2017-11-23 DariusIII
+	* Chg: Remove bootstrap.php from nntmux folder and add its contents to bootstrap/autoload.php
 	* Chg: Optimize autoloder
 2017-11-22 DariusIII
 	* Chg: Update Category class
