@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\processing\tv\TraktTv;
 
@@ -9,7 +9,7 @@ $trakt = new TraktTv();
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
 
-	// Test if your Trakt API key and configuration are working
+    // Test if your Trakt API key and configuration are working
     // If it works you should get a printed array of the show/season/episode entered
 
     // Search for a show

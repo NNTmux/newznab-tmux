@@ -1,7 +1,7 @@
 <?php
 
 // TODO: bunch of if/elses need converting to switches
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 use nntmux\Groups;
@@ -27,16 +27,16 @@ $pdo = new DB();
 
 if (! (isset($argv[1]) && ($argv[1] == 'all' || $argv[1] == 'full' || $argv[1] == 'predb_id' || is_numeric($argv[1])))) {
     exit($pdo->log->error(
-		"\nThis script will attempt to rename releases using regexes first from ReleaseCleaning.php and then from this file.\n"
-		."An optional last argument, show, will display the release name changes.\n\n"
-		."php $argv[0] full                    ...: To process all releases not previously renamed.\n"
-		."php $argv[0] 2                       ...: To process all releases added in the previous 2 hours not previously renamed.\n"
-		."php $argv[0] all                     ...: To process all releases.\n"
-		."php $argv[0] full 155                ...: To process all releases in groupid 155 not previously renamed.\n"
-		."php $argv[0] all 155                 ...: To process all releases in groupid 155.\n"
-		."php $argv[0] all '(155, 140)'        ...: To process all releases in group_ids 155 and 140.\n"
-		."php $argv[0] predb_id                   ...: To process all releases where not matched to predb.\n"
-	));
+        "\nThis script will attempt to rename releases using regexes first from ReleaseCleaning.php and then from this file.\n"
+        ."An optional last argument, show, will display the release name changes.\n\n"
+        ."php $argv[0] full                    ...: To process all releases not previously renamed.\n"
+        ."php $argv[0] 2                       ...: To process all releases added in the previous 2 hours not previously renamed.\n"
+        ."php $argv[0] all                     ...: To process all releases.\n"
+        ."php $argv[0] full 155                ...: To process all releases in groupid 155 not previously renamed.\n"
+        ."php $argv[0] all 155                 ...: To process all releases in groupid 155.\n"
+        ."php $argv[0] all '(155, 140)'        ...: To process all releases in group_ids 155 and 140.\n"
+        ."php $argv[0] predb_id                   ...: To process all releases where not matched to predb.\n"
+    ));
 }
 preName($argv, $argc);
 
@@ -95,9 +95,9 @@ function preName($argv, $argc)
     }
     resetSearchnames();
     echo $pdo->log->header(
-		'SELECT id, name, searchname, fromname, size, groups_id, categories_id FROM releases'.$why.$what.
-		$where.";\n"
-	);
+        'SELECT id, name, searchname, fromname, size, groups_id, categories_id FROM releases'.$why.$what.
+        $where.";\n"
+    );
     $res = $pdo->queryDirect('SELECT id, name, searchname, fromname, size, groups_id, categories_id FROM releases'.$why.$what.$where);
     $total = $res->rowCount();
     if ($total > 0) {
@@ -135,10 +135,11 @@ function preName($argv, $argc)
                         $files = $rf->get($row['id']);
                         foreach ($files as $f) {
                             if (preg_match(
-								'/^(?P<title>.+?)(\\[\w\[\]\(\). -]+)?\.(pdf|htm(l)?|epub|mobi|azw|tif|doc(x)?|lit|txt|rtf|opf|fb2|prc|djvu|cb[rz])/', $f['name'],
-								$match
-							)
-							) {
+                                '/^(?P<title>.+?)(\\[\w\[\]\(\). -]+)?\.(pdf|htm(l)?|epub|mobi|azw|tif|doc(x)?|lit|txt|rtf|opf|fb2|prc|djvu|cb[rz])/',
+                                $f['name'],
+                                $match
+                            )
+                            ) {
                                 $cleanName = $match['title'];
                                 break;
                             }
@@ -159,18 +160,24 @@ function preName($argv, $argc)
                         $determinedcat = $category->determineCategory($row['groups_id'], $cleanName);
                         if ($propername == true) {
                             $pdo->queryExec(
-								sprintf(
-									'UPDATE releases SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL, consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, '
-									.'iscategorized = 1, isrenamed = 1, searchname = %s, categories_id = %d, predb_id = '.$preid.' WHERE id = %d', $pdo->escapeString($cleanName), $determinedcat, $row['id']
-								)
-							);
+                                sprintf(
+                                    'UPDATE releases SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL, consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, '
+                                    .'iscategorized = 1, isrenamed = 1, searchname = %s, categories_id = %d, predb_id = '.$preid.' WHERE id = %d',
+                                    $pdo->escapeString($cleanName),
+                                    $determinedcat,
+                                    $row['id']
+                                )
+                            );
                         } else {
                             $pdo->queryExec(
-								sprintf(
-									'UPDATE releases SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL, consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL,  '
-									.'iscategorized = 1, searchname = %s, categories_id = %d, predb_id = '.$preid.' WHERE id = %d', $pdo->escapeString($cleanName), $determinedcat, $row['id']
-								)
-							);
+                                sprintf(
+                                    'UPDATE releases SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL, consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL,  '
+                                    .'iscategorized = 1, searchname = %s, categories_id = %d, predb_id = '.$preid.' WHERE id = %d',
+                                    $pdo->escapeString($cleanName),
+                                    $determinedcat,
+                                    $row['id']
+                                )
+                            );
                         }
                         if ($increment === true) {
                             $internal++;
@@ -185,16 +192,17 @@ function preName($argv, $argc)
                             $oldcatname = $category->getNameByID($row['categories_id']);
                             $newcatname = $category->getNameByID($determinedcat);
 
-                            NameFixer::echoChangedReleaseName([
-									'new_name'     => $cleanName,
-									'old_name'     => $row['searchname'],
-									'new_category' => $newcatname,
-									'old_category' => $oldcatname,
-									'group'        => $groupname,
-									'releases_id'   => $row['id'],
-									'method'       => 'misc/testing/Various/renametopre.php',
-								]
-							);
+                            NameFixer::echoChangedReleaseName(
+                                [
+                                    'new_name'     => $cleanName,
+                                    'old_name'     => $row['searchname'],
+                                    'new_category' => $newcatname,
+                                    'old_category' => $oldcatname,
+                                    'group'        => $groupname,
+                                    'releases_id'   => $row['id'],
+                                    'method'       => 'misc/testing/Various/renametopre.php',
+                                ]
+                            );
                         }
                     }
                 } elseif ($show === 3 && preg_match('/^\[?\d*\].+?yEnc/i', $row['name'])) {
@@ -252,18 +260,18 @@ function resetSearchnames()
     global $pdo;
     echo $pdo->log->header('Resetting blank searchnames.');
     $bad = $pdo->queryDirect(
-		'UPDATE releases SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL, consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, '
-		."predb_id = 0, searchname = name, isrenamed = 0, iscategorized = 0 WHERE searchname = ''"
-	);
+        'UPDATE releases SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL, consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, '
+        ."predb_id = 0, searchname = name, isrenamed = 0, iscategorized = 0 WHERE searchname = ''"
+    );
     $tot = $bad->rowCount();
     if ($tot > 0) {
         echo $pdo->log->primary(number_format($tot).' Releases had no searchname.');
     }
     echo $pdo->log->header('Resetting searchnames that are 8 characters or less.');
     $run = $pdo->queryDirect(
-		'UPDATE releases SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL, consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, '
-		.'predb_id = 0, searchname = name, isrenamed = 0, iscategorized = 0 WHERE LENGTH(searchname) <= 8 AND LENGTH(name) > 8'
-	);
+        'UPDATE releases SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL, consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, '
+        .'predb_id = 0, searchname = name, isrenamed = 0, iscategorized = 0 WHERE LENGTH(searchname) <= 8 AND LENGTH(name) > 8'
+    );
     $total = $run->rowCount();
     if ($total > 0) {
         echo $pdo->log->primary(number_format($total).' Releases had searchnames that were 8 characters or less.');

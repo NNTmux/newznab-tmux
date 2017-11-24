@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\NZB;
 use nntmux\db\DB;
@@ -29,9 +29,11 @@ foreach ($objects as $filestoprocess => $nzbFile) {
         continue;
     }
 
-    $newFileName = $nzb->getNZBPath(str_replace('.nzb.gz', '', $nzbFile->getBasename()),
-									$newLevel,
-									true);
+    $newFileName = $nzb->getNZBPath(
+        str_replace('.nzb.gz', '', $nzbFile->getBasename()),
+                                    $newLevel,
+                                    true
+    );
     if ($newFileName != $nzbFile) {
         rename($nzbFile, $newFileName);
         chmod($newFileName, 0777);

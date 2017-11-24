@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 
@@ -8,21 +8,21 @@ $pdo = new DB();
 
 if ($argc === 1 || ! is_numeric($argv[1])) {
     exit($pdo->log->error("\nThis script will show table data, index and free space used. The argument needed is numeric.\n\n"
-		."php $argv[0] 1      ...: To show all tables with data + index space used greater than 1MB or free space greater than 1MB.\n"
-		."php $argv[0] .01    ...: To show all tables with data + index space used greater than .01MB or free space greater than .01MB.\n"));
+        ."php $argv[0] 1      ...: To show all tables with data + index space used greater than 1MB or free space greater than 1MB.\n"
+        ."php $argv[0] .01    ...: To show all tables with data + index space used greater than .01MB or free space greater than .01MB.\n"));
 }
 passthru('clear');
 $data = $index = $total = $free = 0;
 
 $table_data = "SELECT TABLE_NAME AS 'Table', TABLE_ROWS AS 'Rows', "
-	."ENGINE AS 'engine', "
-	."CREATE_OPTIONS AS 'format', "
-	."((DATA_LENGTH) / POWER(1024,2)) AS 'data', "
-	."((INDEX_LENGTH) / POWER(1024,2)) AS 'index', "
-	."((DATA_FREE) / POWER(1024,2)) AS 'free', "
-	."((DATA_LENGTH + INDEX_LENGTH) / POWER(1024,2)) AS 'total' "
-	."FROM information_schema.TABLES WHERE information_schema.TABLES.table_schema = '".env('DB_NAME')."' "
-	.'ORDER BY (DATA_LENGTH + INDEX_LENGTH) DESC';
+    ."ENGINE AS 'engine', "
+    ."CREATE_OPTIONS AS 'format', "
+    ."((DATA_LENGTH) / POWER(1024,2)) AS 'data', "
+    ."((INDEX_LENGTH) / POWER(1024,2)) AS 'index', "
+    ."((DATA_FREE) / POWER(1024,2)) AS 'free', "
+    ."((DATA_LENGTH + INDEX_LENGTH) / POWER(1024,2)) AS 'total' "
+    ."FROM information_schema.TABLES WHERE information_schema.TABLES.table_schema = '".env('DB_NAME')."' "
+    .'ORDER BY (DATA_LENGTH + INDEX_LENGTH) DESC';
 
 $run = $pdo->queryDirect($table_data);
 
@@ -45,16 +45,16 @@ printf($mask, 'Table Name', 'Engine', 'Row_Format', 'Data Size', 'Index Size', '
 printf($mask, '', '', '', number_format($data, 2).' MB', number_format($index, 2).' MB', number_format($free, 2).' MB', number_format($total, 2).' MB');
 
 $myisam = $pdo->queryOneRow('SELECT CONCAT(ROUND(KBS/POWER(1024,IF(pw<0,0,IF(pw>3,0,pw)))+0.49999), '
-	."SUBSTR(' KMG',IF(pw<0,0,IF(pw>3,0,pw))+1,1)) recommended_key_buffer_size "
-	.'FROM (SELECT SUM(index_length) KBS '
-	.'FROM information_schema.tables '
-	."WHERE engine='MyISAM' AND table_schema NOT IN ('information_schema','mysql')) A, (SELECT 3 pw) B;", false);
+    ."SUBSTR(' KMG',IF(pw<0,0,IF(pw>3,0,pw))+1,1)) recommended_key_buffer_size "
+    .'FROM (SELECT SUM(index_length) KBS '
+    .'FROM information_schema.tables '
+    ."WHERE engine='MyISAM' AND table_schema NOT IN ('information_schema','mysql')) A, (SELECT 3 pw) B;", false);
 
 $innodb = $pdo->queryOneRow('SELECT CONCAT(ROUND(KBS/POWER(1024,IF(pw<0,0,IF(pw>3,0,pw)))+0.49999), '
-	."SUBSTR(' KMG',IF(pw<0,0,IF(pw>3,0,pw))+1,1)) recommended_innodb_buffer_pool_size "
-	.'FROM (SELECT SUM(index_length) KBS '
-	.'FROM information_schema.tables '
-	."WHERE engine='InnoDB') A,(SELECT 3 pw) B;", false);
+    ."SUBSTR(' KMG',IF(pw<0,0,IF(pw>3,0,pw))+1,1)) recommended_innodb_buffer_pool_size "
+    .'FROM (SELECT SUM(index_length) KBS '
+    .'FROM information_schema.tables '
+    ."WHERE engine='InnoDB') A,(SELECT 3 pw) B;", false);
 
 $a = $myisam['recommended_key_buffer_size'];
 if ($myisam['recommended_key_buffer_size'] === null) {

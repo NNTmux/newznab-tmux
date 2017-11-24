@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 use nntmux\Groups;
@@ -10,8 +10,8 @@ $pdo = new DB();
 
 if (! isset($argv[1]) || $argv[1] != 'true') {
     exit($pdo->log->error("\nThis script will move all collections, binaries, parts into tables per group.\n\n"
-			."php $argv[0] true                ...: To process all parts and leave the parts/binaries/collections tables intact.\n"
-			."php $argv[0] true truncate       ...: To process all parts and truncate parts/binaries/collections tables after completed.\n"));
+            ."php $argv[0] true                ...: To process all parts and leave the parts/binaries/collections tables intact.\n"
+            ."php $argv[0] true truncate       ...: To process all parts and truncate parts/binaries/collections tables after completed.\n"));
 }
 
 $start = time();
@@ -43,26 +43,26 @@ if ($collections_rows instanceof \Traversable) {
         echo $pdo->log->header("Processing ${groupName}");
         //collection
         $pdo->queryExec('INSERT IGNORE INTO collections_'.$row['groups_id'].' (subject, fromname, date, xref, totalfiles, groups_id, collectionhash, dateadded, filecheck, filesize, releaseid) '
-			."SELECT subject, fromname, date, xref, totalfiles, groups_id, collectionhash, dateadded, filecheck, filesize, releaseid FROM collections WHERE groups_id = ${row['groups_id']}");
+            ."SELECT subject, fromname, date, xref, totalfiles, groups_id, collectionhash, dateadded, filecheck, filesize, releaseid FROM collections WHERE groups_id = ${row['groups_id']}");
         $collections = $pdo->queryOneRow('SELECT COUNT(*) AS cnt FROM collections where groups_id = '.$row['groups_id']);
         $ncollections = $pdo->queryOneRow('SELECT COUNT(*) AS cnt FROM collections_'.$row['groups_id']);
         echo $pdo->log->primary("Group ${groupName}, Collections = ${collections['cnt']} [${ncollections['cnt']}]");
 
         //binaries
         $pdo->queryExec("INSERT IGNORE INTO binaries_${row['groups_id']} (name, filenumber, totalparts, currentparts, binaryhash, partcheck, partsize, collections_id) "
-			.'SELECT name, filenumber, totalparts, currentparts, binaryhash, partcheck, partsize, n.id FROM binaries b '
-			.'INNER JOIN collections c ON b.collections_id = c.id '
-			."INNER JOIN collections_${row['groups_id']} n ON c.collectionhash = n.collectionhash AND c.groups_id = ${row['groups_id']}");
+            .'SELECT name, filenumber, totalparts, currentparts, binaryhash, partcheck, partsize, n.id FROM binaries b '
+            .'INNER JOIN collections c ON b.collections_id = c.id '
+            ."INNER JOIN collections_${row['groups_id']} n ON c.collectionhash = n.collectionhash AND c.groups_id = ${row['groups_id']}");
         $binaries = $pdo->queryOneRow("SELECT COUNT(*) AS cnt FROM binaries b INNER JOIN collections c ON  b.collections_id = c.id where c.groups_id = ${row['groups_id']}");
         $nbinaries = $pdo->queryOneRow("SELECT COUNT(*) AS cnt FROM binaries_${row['groups_id']}");
         echo $pdo->log->primary("Group ${groupName}, Binaries = ${binaries['cnt']} [${nbinaries['cnt']}]");
 
         //parts
         $pdo->queryExec("INSERT IGNORE INTO parts_${row['groups_id']} (messageid, number, partnumber, size, binaries_id, collections_id) "
-			.'SELECT messageid, number, partnumber, size, n.id, c.id FROM parts p '
-			.'INNER JOIN binaries b ON p.binaries_id = b.id '
-			."INNER JOIN binaries_${row['groups_id']} n ON b.binaryhash = n.binaryhash "
-			."INNER JOIN collections_${row['groups_id']} c on c.id = n.collections_id AND c.groups_id = ${row['groups_id']}");
+            .'SELECT messageid, number, partnumber, size, n.id, c.id FROM parts p '
+            .'INNER JOIN binaries b ON p.binaries_id = b.id '
+            ."INNER JOIN binaries_${row['groups_id']} n ON b.binaryhash = n.binaryhash "
+            ."INNER JOIN collections_${row['groups_id']} c on c.id = n.collections_id AND c.groups_id = ${row['groups_id']}");
         $parts = $pdo->queryOneRow("SELECT COUNT(*) AS cnt FROM parts p INNER JOIN binaries b ON p.binaries_id = b.id INNER JOIN collections c ON b.collections_id = c.id WHERE c.groups_id = ${row['groups_id']}");
         $nparts = $pdo->queryOneRow("SELECT COUNT(*) AS cnt FROM parts_${row['groups_id']}");
         echo $pdo->log->primary("Group ${groupName}, Parts = ${parts['cnt']} [${nparts['cnt']}]\n");

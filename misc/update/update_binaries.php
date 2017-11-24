@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\NNTP;
 use nntmux\db\DB;
@@ -27,10 +27,12 @@ if (isset($argv[1]) && ! is_numeric($argv[1])) {
     $grp = new Groups(['Settings' => $pdo]);
     $group = $grp->getByName($groupName);
     if (is_array($group)) {
-        $binaries->updateGroup($group,
-			(isset($argv[2]) && is_numeric($argv[2]) && $argv[2] > 0 ? $argv[2] : $maxHeaders));
+        $binaries->updateGroup(
+            $group,
+            (isset($argv[2]) && is_numeric($argv[2]) && $argv[2] > 0 ? $argv[2] : $maxHeaders)
+        );
     }
 } else {
     $binaries->updateAllGroups((isset($argv[1]) && is_numeric($argv[1]) && $argv[1] > 0 ? $argv[1] :
-		$maxHeaders));
+        $maxHeaders));
 }

@@ -18,7 +18,7 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 use App\Models\Settings;
@@ -42,12 +42,16 @@ if ($tables instanceof \Traversable) {
         echo "Updating table binaries{$table['suffix']}".PHP_EOL;
         $pdo->queryExec(sprintf($query1, $table['suffix']), true);
         $pdo->queryExec(sprintf($query2, $table['suffix']), true);
-        $pdo->queryExec(sprintf($query3,
-								$table['suffix'],
-								$table['suffix'],
-								$table['suffix'],
-								$table['suffix']),
-						true);
+        $pdo->queryExec(
+            sprintf(
+            $query3,
+                                $table['suffix'],
+                                $table['suffix'],
+                                $table['suffix'],
+                                $table['suffix']
+        ),
+                        true
+        );
         $pdo->queryExec(sprintf($query4, $table['suffix']), true);
     }
     echo 'All done!'.PHP_EOL;

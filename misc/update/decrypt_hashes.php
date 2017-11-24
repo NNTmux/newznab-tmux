@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 use nntmux\NameFixer;
@@ -10,12 +10,12 @@ $pdo = new DB();
 
 if (! isset($argv[1]) || ($argv[1] != 'all' && $argv[1] != 'full' && ! is_numeric($argv[1]))) {
     exit($pdo->log->error(
-		"\nThis script tries to match hashes of the releases.name or releases.searchname to predb hashes.\n"
-		."To display the changes, use 'show' as the second argument.\n\n"
-		."php decrypt_hashes.php 1000		...: to limit to 1000 sorted by newest postdate.\n"
-		."php decrypt_hashes.php full 		...: to run on full database.\n"
-		."php decrypt_hashes.php all 		...: to run on all hashed releases(including previously renamed).\n"
-	));
+        "\nThis script tries to match hashes of the releases.name or releases.searchname to predb hashes.\n"
+        ."To display the changes, use 'show' as the second argument.\n\n"
+        ."php decrypt_hashes.php 1000		...: to limit to 1000 sorted by newest postdate.\n"
+        ."php decrypt_hashes.php full 		...: to run on full database.\n"
+        ."php decrypt_hashes.php all 		...: to run on all hashed releases(including previously renamed).\n"
+    ));
 }
 
 echo $pdo->log->header("\nDecrypt Hashes (${argv[1]}) Started at ".date('g:i:s'));

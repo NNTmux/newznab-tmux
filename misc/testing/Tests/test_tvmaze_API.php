@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\processing\tv\TVMaze;
 
@@ -9,7 +9,7 @@ $tvmaze = new TVMaze();
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
 
-	// Test if your TVMaze API configuration is working
+    // Test if your TVMaze API configuration is working
     // If it works you should get a var dumped array of the show/season/episode entered
 
     $season = (int) $argv[2];

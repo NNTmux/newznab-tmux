@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 use nntmux\ColorCLI;
@@ -165,28 +165,28 @@ if (isset($argv[1]) && isset($argv[2]) && $argv[2] == 'fmyisam') {
     }
 } else {
     exit($cli->error(
-		"\nThis script will convert your tables to a new engine/format. Only tables not meeting the new engine/format will be converted.\n"
-		."A comparison of these, excluding TokuDB, https://github.com/nZEDb/nZEDb/wiki/MySQL-Storage-Engine-Comparison\n\n"
-		."php convert_mysql_tables.php dmyisam                                        ...: Converts all the tables to Myisam Dynamic. This is the default and is recommended where ram is limited.\n"
-		."php convert_mysql_tables.php fmyisam                                        ...: Converts all the tables to Myisam Fixed. This can be faster, but to fully convert all tables requires changing varchar columns to char.\n"
-		."                                                                                 This will use much more space than dynamic.\n"
-		."php convert_mysql_tables.php dinnodb                                        ...: Converts all the tables to InnoDB Dynamic. This is recommended when the total data and indexes can fit into the innodb_buffer_pool.\n"
-		."                                                                                 NB if your innodb version < 5.6 bookinfo / consoleinfo / musicinfo / release_search_data will not be converted as fulltext indexes are not supported.\n"
-		."php convert_mysql_tables.php cinnodb                                        ...: Converts all the tables to InnoDB Compressed. All tables except releasenfo will be converted to Compressed row format.\n"
-		."                                                                                 This is recommended when the total data and indexes can not fit into the innodb_buffer_pool using DYNAMIC row format.\n"
-		."                                                                                 NB if your innodb version < 5.6 bookinfo / consoleinfo / musicinfo / release_search_data will not be converted as fulltext indexes are not supported.\n"
-		."php convert_mysql_tables.php cinnodb-noparts                                ...: Converts all the tables to InnoDB Compressed. All tables except parts and releasenfo will be converted to Compressed row format.\n"
-		."                                                                                 Alls parts* will be converted to MyISAM Dynamic. This is recommended when using Table Per Group.\n"
-		."                                                                                 NB if your innodb version < 5.6 bookinfo / consoleinfo / musicinfo / release_search_data will not be converted as fulltext indexes are not supported.\n"
-		."php convert_mysql_tables.php collections                                    ...: Converts collections, binaries, parts to MyIsam.\n"
-		."php convert_mysql_tables.php mariadb-tokudb                                 ...: Converts all the tables to MariaDB Tokutek DB. Use this is you installed mariadb-tokudb-engine. \n"
-		."                                                                                 The TokuDB engine needs to be activated first.\n"
-		."                                                                                 https://mariadb.com/kb/en/how-to-enable-tokudb-in-mariadb/\n"
-		."                                                                                 NB release_search_data will not be converted as tokudb does not support fulltext indexes.\n"
-		."php convert_mysql_tables.php tokudb                                         ...: Converts all the tables to Tokutek DB. Use this if you downloaded and installed the TokuDB binaries.\n"
-		."                                                                                 http://www.tokutek.com/resources/support/gadownloads/\n"
-		."                                                                                 NB release_search_data will not be converted as tokudb does not support fulltext indexes.\n"
-		."php convert_mysql_tables.php table [ fmyisam, dmyisam, dinnodb, cinnodb ]   ...: Converts 1 table to Engine, row_format specified.\n"
-		."                                                                                 NB if converting to innodb and your innodb version < 5.6 release_search_data will not be converted as fulltext indexes are not supported.\n"
-	));
+        "\nThis script will convert your tables to a new engine/format. Only tables not meeting the new engine/format will be converted.\n"
+        ."A comparison of these, excluding TokuDB, https://github.com/nZEDb/nZEDb/wiki/MySQL-Storage-Engine-Comparison\n\n"
+        ."php convert_mysql_tables.php dmyisam                                        ...: Converts all the tables to Myisam Dynamic. This is the default and is recommended where ram is limited.\n"
+        ."php convert_mysql_tables.php fmyisam                                        ...: Converts all the tables to Myisam Fixed. This can be faster, but to fully convert all tables requires changing varchar columns to char.\n"
+        ."                                                                                 This will use much more space than dynamic.\n"
+        ."php convert_mysql_tables.php dinnodb                                        ...: Converts all the tables to InnoDB Dynamic. This is recommended when the total data and indexes can fit into the innodb_buffer_pool.\n"
+        ."                                                                                 NB if your innodb version < 5.6 bookinfo / consoleinfo / musicinfo / release_search_data will not be converted as fulltext indexes are not supported.\n"
+        ."php convert_mysql_tables.php cinnodb                                        ...: Converts all the tables to InnoDB Compressed. All tables except releasenfo will be converted to Compressed row format.\n"
+        ."                                                                                 This is recommended when the total data and indexes can not fit into the innodb_buffer_pool using DYNAMIC row format.\n"
+        ."                                                                                 NB if your innodb version < 5.6 bookinfo / consoleinfo / musicinfo / release_search_data will not be converted as fulltext indexes are not supported.\n"
+        ."php convert_mysql_tables.php cinnodb-noparts                                ...: Converts all the tables to InnoDB Compressed. All tables except parts and releasenfo will be converted to Compressed row format.\n"
+        ."                                                                                 Alls parts* will be converted to MyISAM Dynamic. This is recommended when using Table Per Group.\n"
+        ."                                                                                 NB if your innodb version < 5.6 bookinfo / consoleinfo / musicinfo / release_search_data will not be converted as fulltext indexes are not supported.\n"
+        ."php convert_mysql_tables.php collections                                    ...: Converts collections, binaries, parts to MyIsam.\n"
+        ."php convert_mysql_tables.php mariadb-tokudb                                 ...: Converts all the tables to MariaDB Tokutek DB. Use this is you installed mariadb-tokudb-engine. \n"
+        ."                                                                                 The TokuDB engine needs to be activated first.\n"
+        ."                                                                                 https://mariadb.com/kb/en/how-to-enable-tokudb-in-mariadb/\n"
+        ."                                                                                 NB release_search_data will not be converted as tokudb does not support fulltext indexes.\n"
+        ."php convert_mysql_tables.php tokudb                                         ...: Converts all the tables to Tokutek DB. Use this if you downloaded and installed the TokuDB binaries.\n"
+        ."                                                                                 http://www.tokutek.com/resources/support/gadownloads/\n"
+        ."                                                                                 NB release_search_data will not be converted as tokudb does not support fulltext indexes.\n"
+        ."php convert_mysql_tables.php table [ fmyisam, dmyisam, dinnodb, cinnodb ]   ...: Converts 1 table to Engine, row_format specified.\n"
+        ."                                                                                 NB if converting to innodb and your innodb version < 5.6 release_search_data will not be converted as fulltext indexes are not supported.\n"
+    ));
 }

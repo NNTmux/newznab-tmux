@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 use nntmux\Category;
@@ -12,15 +12,15 @@ $pdo = new DB();
 
 if (! (isset($argv[1]) && ($argv[1] === 'all' || $argv[1] === 'misc' || preg_match('/\([\d, ]+\)/', $argv[1]) || is_numeric($argv[1])))) {
     exit(ColorCLI::error(
-		"\nThis script will attempt to re-categorize releases and is useful if changes have been made to Category.php.\n"
-		."No updates will be done unless the category changes\n"
-		."An optional last argument, test, will display the number of category changes that would be made\n"
-		."but will not update the database.\n\n"
-		."php $argv[0] all                     ...: To process all releases.\n"
-		."php $argv[0] misc                    ...: To process all releases in misc categories.\n"
-		."php $argv[0] 155                     ...: To process all releases in groupid 155.\n"
-		."php $argv[0] '(155, 140)'            ...: To process all releases in groupids 155 and 140.\n"
-	));
+        "\nThis script will attempt to re-categorize releases and is useful if changes have been made to Category.php.\n"
+        ."No updates will be done unless the category changes\n"
+        ."An optional last argument, test, will display the number of category changes that would be made\n"
+        ."but will not update the database.\n\n"
+        ."php $argv[0] all                     ...: To process all releases.\n"
+        ."php $argv[0] misc                    ...: To process all releases in misc categories.\n"
+        ."php $argv[0] 155                     ...: To process all releases in groupid 155.\n"
+        ."php $argv[0] '(155, 140)'            ...: To process all releases in groupids 155 and 140.\n"
+    ));
 }
 
 reCategorize($argv);
@@ -61,7 +61,7 @@ function reCategorize($argv)
         echo ColorCLI::header('Finished re-categorizing '.number_format($chgcount).' releases in '.$time.' , using the searchname.'.PHP_EOL);
     } else {
         echo ColorCLI::header('Finished re-categorizing in '.$time.' , using the searchname.'.PHP_EOL
-			.'This would have changed '.number_format($chgcount).' releases but no updates were done.'.PHP_EOL);
+            .'This would have changed '.number_format($chgcount).' releases but no updates were done.'.PHP_EOL);
     }
 }
 
@@ -83,7 +83,8 @@ function categorizeRelease($where, $update = true, $echooutput = false)
             if ((int) $rowrel['categories_id'] !== $catId) {
                 if ($update === true) {
                     $pdo->queryExec(
-						sprintf('
+                        sprintf(
+                            '
 							UPDATE releases
 							SET iscategorized = 1,
 								videos_id = 0,
@@ -97,10 +98,10 @@ function categorizeRelease($where, $update = true, $echooutput = false)
 								xxxinfo_id = 0,
 								categories_id = %d
 							WHERE id = %d',
-							$catId,
-							$rowrel['id']
-						)
-					);
+                            $catId,
+                            $rowrel['id']
+                        )
+                    );
                 }
                 $chgcount++;
             }

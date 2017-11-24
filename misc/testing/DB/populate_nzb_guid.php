@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\NZB;
 use nntmux\db\DB;
@@ -19,8 +19,8 @@ if (isset($argv[1])) {
     create_guids($argv[1], $del);
 } else {
     exit($cli->error("\nThis script updates all releases with the guid (md5 hash of the first message-id) from the nzb file.\n\n"
-			."php $argv[0] true         ...: To create missing nzb_guids.\n"
-			."php $argv[0] true delete  ...: To create missing nzb_guids and delete invalid nzbs and releases.\n"));
+            ."php $argv[0] true         ...: To create missing nzb_guids.\n"
+            ."php $argv[0] true delete  ...: To create missing nzb_guids and delete invalid nzbs and releases.\n"));
 }
 
 function create_guids($live, $delete = false)

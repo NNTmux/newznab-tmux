@@ -18,7 +18,7 @@
  * @author niel
  * @copyright 2015 nZEDb
  */
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DbUpdate;
 use nntmux\utility\Git;

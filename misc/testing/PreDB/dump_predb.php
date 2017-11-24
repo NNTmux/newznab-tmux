@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 
@@ -112,9 +112,9 @@ SQL_INSERT;
     $pdo->queryExec('TRUNCATE TABLE predb_imports');
 } else {
     exit($pdo->log->error("\nThis script can export or import a predb dump file. You may use the full path, or a relative path.\n"
-		."For importing, the script insert new rows and update existing matched rows. For databases not on the local system, use remote, else use local.\n"
-		."For exporting, the path must be writeable by mysql, any existing file[predb_dump.csv] will be
+        ."For importing, the script insert new rows and update existing matched rows. For databases not on the local system, use remote, else use local.\n"
+        ."For exporting, the path must be writeable by mysql, any existing file[predb_dump.csv] will be
 					overwritten.\n\n"
-		."php dump_predb.php export /path/to/write/to                     ...: To export.\n"
-		."php dump_predb.php [remote | local] /path/to/filename           ...: To import.\n"));
+        ."php dump_predb.php export /path/to/write/to                     ...: To export.\n"
+        ."php dump_predb.php [remote | local] /path/to/filename           ...: To import.\n"));
 }

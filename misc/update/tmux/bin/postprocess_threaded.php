@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\NNTP;
 use nntmux\Tmux;

@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 passthru('clear');
 
@@ -8,7 +8,7 @@ $pdo = new nntmux\db\DB();
 
 if (! isset($argv[1]) || (isset($argv[1]) && $argv[1] !== 'true')) {
     exit($pdo->log->error("\nThis script renames all table columns to lowercase, it can be dangerous. Please BACKUP your database before running this script.\n"
-					."php rename_to_lower.php true      ...: To rename all table columns to lowercase.\n"));
+                    ."php rename_to_lower.php true      ...: To rename all table columns to lowercase.\n"));
 }
 
 echo $pdo->log->warning('This script renames all table colums to lowercase.');

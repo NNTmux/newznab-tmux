@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 // Test if your giantbomb key is working.
 
@@ -17,9 +17,9 @@ $resultsfound = 0;
 $e = null;
 try {
     $fields = [
-		'deck', 'description', 'original_game_rating', 'api_detail_url', 'image', 'genres', 'name',
-		'platforms', 'publishers', 'original_release_date', 'reviews', 'site_detail_url',
-	];
+        'deck', 'description', 'original_game_rating', 'api_detail_url', 'image', 'genres', 'name',
+        'platforms', 'publishers', 'original_release_date', 'reviews', 'site_detail_url',
+    ];
     $result = $obj->search($searchgame, $fields, 1);
     $result = json_decode(json_encode($result), true);
     if ($result['number_of_total_results'] != 0) {

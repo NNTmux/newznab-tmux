@@ -22,7 +22,7 @@
 /* TODO better tune the queries for performance, including pre-fetching groups_id and other data for
     faster inclusion in the main query.
 */
-require_once realpath(dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'bootstrap.php');
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\PreDb;
 use nntmux\utility\Utility;

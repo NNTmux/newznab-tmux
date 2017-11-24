@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 
@@ -42,9 +42,10 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'drop')) {
     $delcount = $pdo->queryDirect('DELETE FROM releases WHERE nzbstatus = 0');
     echo $pdo->log->primary($delcount->rowCount().' releases had no nzb, deleted.');
 } else {
-    exit($pdo->log->error("\nThis script removes releases with no NZBs, resets all groups, truncates or drops(tpg) \n"
-		."article tables. All other releases are left alone.\n"
-		."php $argv[0] [true, drop]   ...: To reset all groups and truncate/drop the tables.\n"
-	)
-	);
+    exit($pdo->log->error(
+        "\nThis script removes releases with no NZBs, resets all groups, truncates or drops(tpg) \n"
+        ."article tables. All other releases are left alone.\n"
+        ."php $argv[0] [true, drop]   ...: To reset all groups and truncate/drop the tables.\n"
+    )
+    );
 }

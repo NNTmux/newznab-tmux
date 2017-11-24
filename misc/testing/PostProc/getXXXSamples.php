@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 use nntmux\Category;
@@ -51,6 +51,6 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     echo $pdo->log->header('Total releases missing samples that '.$couldbe.'their samples updated = '.number_format($counterfixed));
 } else {
     exit($pdo->log->header("\nThis script checks if XXX release samples actually exist on disk.\n\n"
-		."php $argv[0] check   ...: Dry run, displays missing samples.\n"
-		."php $argv[0] true    ...: Update XXX releases missing samples.\n"));
+        ."php $argv[0] check   ...: Dry run, displays missing samples.\n"
+        ."php $argv[0] true    ...: Update XXX releases missing samples.\n"));
 }

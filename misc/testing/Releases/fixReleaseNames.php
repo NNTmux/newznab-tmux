@@ -7,7 +7,7 @@
  * there is another script called resetRelnameStatus.php
  */
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\NNTP;
 use nntmux\db\DB;

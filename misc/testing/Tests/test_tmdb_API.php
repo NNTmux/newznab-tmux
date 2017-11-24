@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\processing\tv\TMDB;
 
@@ -8,7 +8,7 @@ $tmdb = new TMDB();
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
 
-	// Test if your TMDB API configuration is working
+    // Test if your TMDB API configuration is working
     // If it works you should get a var dumped array of the show/season/episode entered
 
     $season = (int) $argv[2];
@@ -21,10 +21,10 @@ if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
     // Use the first show found (highest match) and get the requested season/episode from $argv
     if (! empty($series) && $series['total_results'] > 0) {
         $seriesAppends = [
-			'networks' => $tmdb->client->getTvApi()->getTvshow($series['results'][0]['id'])['networks'],
-			'alternative_titles' => $tmdb->client->getTvApi()->getAlternativeTitles($series['results'][0]['id']),
-			'external_ids' => $tmdb->client->getTvApi()->getExternalIds($series['results'][0]['id']),
-		];
+            'networks' => $tmdb->client->getTvApi()->getTvshow($series['results'][0]['id'])['networks'],
+            'alternative_titles' => $tmdb->client->getTvApi()->getAlternativeTitles($series['results'][0]['id']),
+            'external_ids' => $tmdb->client->getTvApi()->getExternalIds($series['results'][0]['id']),
+        ];
         print_r($seriesAppends);
         if ($seriesAppends) {
             $series['results'][0]['networks'] = $seriesAppends['networks'];

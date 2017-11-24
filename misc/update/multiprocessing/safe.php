@@ -9,7 +9,7 @@ if (! isset($argv[1]) || ! in_array($argv[1], ['backfill', 'binaries'])) {
 }
 
 declare(ticks=1);
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\libraries\Forking;
 

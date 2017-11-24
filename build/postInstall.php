@@ -16,7 +16,7 @@
  * @author    niel
  * @copyright 2016 nZEDb
  */
-require_once '..'.DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once '..'.DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 $updates = NN_CONFIGS.'updates.json';
 if (! file_exists($updates)) {

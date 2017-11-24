@@ -1,7 +1,7 @@
 <?php
 
 declare(ticks=1);
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use nntmux\libraries\Forking;
 
 // Check if argument 1 is numeric, which is to limit article count.

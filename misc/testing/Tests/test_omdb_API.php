@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use aharen\OMDbAPI;
 use nntmux\ColorCLI;
@@ -9,7 +9,7 @@ $omdb = new OMDbAPI();
 
 if (! empty($argv[1]) && ! empty($argv[2]) && ($argv[2] !== 'series' || $argv[2] !== 'movie')) {
 
-	// Test if your OMDb API key and configuration are working
+    // Test if your OMDb API key and configuration are working
     // If it works you should get a printed array of the show entered
 
     // Search for a show

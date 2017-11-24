@@ -3,7 +3,7 @@
 if (! defined('NN_INSTALLER')) {
     define('NN_INSTALLER', true);
 }
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 include_once dirname(__DIR__).DIRECTORY_SEPARATOR.'nntmux'.DIRECTORY_SEPARATOR.'constants.php';
 
 use nntmux\db\DB;

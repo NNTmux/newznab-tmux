@@ -2,7 +2,7 @@
 
 //This script will update all records in the consoleinfo table
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 use nntmux\Console;
@@ -13,12 +13,13 @@ $pdo = new DB();
 $console = new Console(['Echo' => true, 'Settings' => $pdo]);
 
 $res = $pdo->queryDirect(
-	sprintf(
-		'SELECT searchname, id FROM releases WHERE consoleinfo_id IS NULL AND categories_id
+    sprintf(
+        'SELECT searchname, id FROM releases WHERE consoleinfo_id IS NULL AND categories_id
 				BETWEEN %s AND %s ORDER BY id DESC',
-		Category::GAME_ROOT,
-		Category::GAME_OTHER
-	));
+        Category::GAME_ROOT,
+        Category::GAME_OTHER
+    )
+);
 if ($res instanceof \Traversable) {
     echo $pdo->log->header('Updating console info for '.number_format($res->rowCount()).' releases.');
 

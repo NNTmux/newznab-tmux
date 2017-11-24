@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 
@@ -25,11 +25,17 @@ try {
             var_dump($newDb, $newDb->getPDO());
 
             // Insert some data
-            $sql = sprintf("
+            $sql = sprintf(
+                "
                 INSERT INTO `testdata`
                 (`id` ,`field1` ,`field2` ,`field3` ,`field4`)
                 VALUES
-                ('%s', '%s', '%s', '%s', '%s')", $i, $i, $i, $i, $i
+                ('%s', '%s', '%s', '%s', '%s')",
+                $i,
+                $i,
+                $i,
+                $i,
+                $i
             );
             $newDb->exec($sql);
 

@@ -34,11 +34,11 @@ class YencServiceProvider extends ServiceProvider
     public static function config(array $options = [])
     {
         $defaults = [
-			['name' => [
-				'default' => 'Php',
-				],
-			],
-		];
+            ['name' => [
+                'default' => 'Php',
+                ],
+            ],
+        ];
 
         $options += $defaults;
 

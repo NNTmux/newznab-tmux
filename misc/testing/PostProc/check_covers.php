@@ -3,7 +3,7 @@
 // --------------------------------------------------------------
 //          Scan for releases missing previews on disk
 // --------------------------------------------------------------
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 use nntmux\Movie;
@@ -55,9 +55,9 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     echo ColorCLI::header('Total releases missing covers that '.$couldbe.'their covers fixed = '.number_format($counterfixed));
 } else {
     exit(ColorCLI::header("\nThis script checks if release covers actually exist on disk.\n\n"
-		."Releases without covers may be reset for post-processing, thus regenerating them and related meta data.\n\n"
-		."Useful for recovery after filesystem corruption, or as an alternative re-postprocessing tool.\n\n"
-		."Optional LIMIT parameter restricts number of releases to be reset.\n\n"
-		."php $argv[0] check [LIMIT]  ...: Dry run, displays missing covers.\n"
-		."php $argv[0] true  [LIMIT]  ...: Re-process releases missing covers.\n"));
+        ."Releases without covers may be reset for post-processing, thus regenerating them and related meta data.\n\n"
+        ."Useful for recovery after filesystem corruption, or as an alternative re-postprocessing tool.\n\n"
+        ."Optional LIMIT parameter restricts number of releases to be reset.\n\n"
+        ."php $argv[0] check [LIMIT]  ...: Dry run, displays missing covers.\n"
+        ."php $argv[0] true  [LIMIT]  ...: Re-process releases missing covers.\n"));
 }

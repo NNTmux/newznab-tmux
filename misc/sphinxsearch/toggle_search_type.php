@@ -1,28 +1,28 @@
 <?php
 
-require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 use nntmux\ReleaseSearch;
 
 if (! isset($argv[1]) || ! in_array($argv[1], ['sphinx', 'standard'])) {
     exit('Argument1 (required) is the method of search you would like to optimize for.  Choices are sphinx or standard.'.PHP_EOL.
-		'Argument2 (optional) is the storage engine and row_format you would like the release_search_data table to use. If not entered it will be left default.'.PHP_EOL.
-		'Choices are (c|d)(myisam|innodb) (Compressed|Dynamic)(MyISAM|InnoDB) entered like dinnodb.  This argument has no effect if optimizing for Sphinx.'.PHP_EOL.
-		'Please stop all processing scripts before running this script.'.PHP_EOL);
+        'Argument2 (optional) is the storage engine and row_format you would like the release_search_data table to use. If not entered it will be left default.'.PHP_EOL.
+        'Choices are (c|d)(myisam|innodb) (Compressed|Dynamic)(MyISAM|InnoDB) entered like dinnodb.  This argument has no effect if optimizing for Sphinx.'.PHP_EOL.
+        'Please stop all processing scripts before running this script.'.PHP_EOL);
 }
 
 switch ($argv[1]) {
-	case 'sphinx':
-		if (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX) {
-		    optimizeForSphinx(new DB());
-		} else {
-		    echo PHP_EOL.$pdo->log->error('Error, NN_RELEASE_SEARCH_TYPE in www/settings.php must be set to SPHINX to optimize for Sphinx!'.PHP_EOL);
-		}
-		break;
-	case 'standard':
-		revertToStandard(new DB());
-		break;
+    case 'sphinx':
+        if (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX) {
+            optimizeForSphinx(new DB());
+        } else {
+            echo PHP_EOL.$pdo->log->error('Error, NN_RELEASE_SEARCH_TYPE in www/settings.php must be set to SPHINX to optimize for Sphinx!'.PHP_EOL);
+        }
+        break;
+    case 'standard':
+        revertToStandard(new DB());
+        break;
 }
 
 // Optimize database usage for Sphinx full-text
@@ -44,25 +44,26 @@ function revertToStandard($pdo)
 
     if (isset($argv[2]) && in_array($argv[2], ['cinnodb', 'dinnodb', 'cmyisam', 'dmyisam'])) {
         switch ($argv[2]) {
-			case 'cinnnodb':
-				$engFormat = 'ENGINE = InnoDB ROW_FORMAT = Compressed';
-				break;
-			case 'dinnodb':
-				$engFormat = 'ENGINE = InnoDB ROW_FORMAT = Dynamic';
-				break;
-			case 'cmyisam':
-				$engFormat = 'ENGINE = MyISAM ROW_FORMAT = Compressed';
-				break;
-			case 'dmyisam':
-				$engFormat = 'ENGINE = MyISAM ROW_FORMAT = Dynamic';
-				break;
-		}
+            case 'cinnnodb':
+                $engFormat = 'ENGINE = InnoDB ROW_FORMAT = Compressed';
+                break;
+            case 'dinnodb':
+                $engFormat = 'ENGINE = InnoDB ROW_FORMAT = Dynamic';
+                break;
+            case 'cmyisam':
+                $engFormat = 'ENGINE = MyISAM ROW_FORMAT = Compressed';
+                break;
+            case 'dmyisam':
+                $engFormat = 'ENGINE = MyISAM ROW_FORMAT = Dynamic';
+                break;
+        }
     }
 
     echo PHP_EOL.$pdo->log->info('Dropping old table data and recreating fresh from schema. (Quick)'.PHP_EOL);
     $pdo->queryExec('DROP TABLE IF EXISTS release_search_data');
     $pdo->queryExec(
-			sprintf("
+            sprintf(
+                "
 				CREATE TABLE release_search_data (
 					id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 					releases_id INT(11) UNSIGNED NOT NULL,
@@ -81,9 +82,9 @@ function revertToStandard($pdo)
 				DEFAULT CHARSET = utf8
 				COLLATE = utf8_unicode_ci
 				AUTO_INCREMENT = 1",
-				$engFormat
-			)
-	);
+                $engFormat
+            )
+    );
 
     echo $pdo->log->info('Populating the releasearch table with initial data. (Slow)'.PHP_EOL);
     $pdo->queryInsert('INSERT INTO release_search_data (releases_id, guid, name, searchname, fromname)
@@ -93,7 +94,8 @@ function revertToStandard($pdo)
 
     dropSearchTriggers($pdo);
 
-    $pdo->exec('
+    $pdo->exec(
+        '
 				CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW
 					BEGIN
 						INSERT INTO release_search_data (releases_id, guid, name, searchname, fromname)
@@ -124,7 +126,7 @@ function revertToStandard($pdo)
 						DELETE FROM release_search_data
 						WHERE releases_id = OLD.id;
 					END;'
-	);
+    );
     echo $pdo->log->header('Standard search should once again be available.'.PHP_EOL);
 }
 

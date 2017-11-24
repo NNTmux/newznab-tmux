@@ -6,7 +6,7 @@
  *
  * It will start the tmux server and monitoring scripts if needed.
  */
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\Tmux;
 use nntmux\ColorCLI;

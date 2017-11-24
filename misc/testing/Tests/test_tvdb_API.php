@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap.php';
+require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\processing\tv\TVDB;
 use Adrenth\Thetvdb\Exception\UnauthorizedException;
@@ -13,7 +13,7 @@ $tvdb = new TVDB();
 
 if (isset($argv[1]) && ! empty($argv[1]) && isset($argv[2]) && is_numeric($argv[2]) && isset($argv[3]) && is_numeric($argv[3])) {
 
-	// Test if your TvDB API key and configuration are working
+    // Test if your TvDB API key and configuration are working
     // If it works you should get a var dumped array of the show/season/episode entered
 
     $season = (int) $argv[2];
@@ -70,6 +70,6 @@ if (isset($argv[1]) && ! empty($argv[1]) && isset($argv[2]) && is_numeric($argv[
     }
 } else {
     exit($c->error('Invalid arguments. This script requires a text string (show name) followed by a season and episode number.'.PHP_EOL.
-		'You can also optionally supply "YYYY" "MM" "DD" arguments instead of season/episode for an airdate lookup.')
-	);
+        'You can also optionally supply "YYYY" "MM" "DD" arguments instead of season/episode for an airdate lookup.')
+    );
 }
