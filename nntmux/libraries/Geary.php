@@ -62,17 +62,14 @@ class Geary
      *                           have previously set for the gateway. If the
      *                           gateway currency is BTC, then the amount is
      *                           normally in satoshis
-     * @param int $keychain_id Keychain id is used to generate an address for
-     *                           the next order.
      * @param $callback_data
      * @return mixed
      */
-    public function create_order($amount, $keychain_id, $callback_data)
+    public function create_order($amount, $callback_data)
     {
         $request = $this->endpoint('orders');
         $params = [
             'amount' => $amount,
-            'keychain_id' => $keychain_id,
             'callback_data' => $callback_data,
         ];
 
