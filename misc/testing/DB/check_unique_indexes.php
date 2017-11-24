@@ -9,9 +9,9 @@ $pdo = new DB();
 if (! isset($argv[1])) {
     if ($argv[1] !== 'test' || $argv[1] !== 'alter') {
         exit($pdo->log->error("\nThis script will scan nntmux_fi_schema.sql for all UNIQUE INDEXES.\n"
-						."It will verify that you have them. If you do not, you can choose to run manually or allow the script to run them.\n\n"
-						."php $argv[0] test      ...: To verify all unique indexes.\n"
-						."php $argv[0] alter     ...: To add missing unique indexes.\n"));
+                        ."It will verify that you have them. If you do not, you can choose to run manually or allow the script to run them.\n\n"
+                        ."php $argv[0] test      ...: To verify all unique indexes.\n"
+                        ."php $argv[0] alter     ...: To add missing unique indexes.\n"));
     }
 }
 

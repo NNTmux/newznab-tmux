@@ -12,7 +12,7 @@ $pdo = new DB();
 $game = new Games(['Echo' => true, 'Settings' => $pdo]);
 
 $res = $pdo->query(
-	sprintf('SELECT id, title FROM gamesinfo WHERE cover = 0 ORDER BY id DESC LIMIT 100')
+    sprintf('SELECT id, title FROM gamesinfo WHERE cover = 0 ORDER BY id DESC LIMIT 100')
 );
 $total = count($res);
 if ($total > 0) {

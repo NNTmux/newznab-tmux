@@ -1,4 +1,5 @@
 2017-11-24 DariusIII
+	* Chg: Remove bootstrap.php
 	* Chg: Use bootstrap/autoload.php instead the bootstrap.php in root of install
 	* Chg: Update whoops library
 2017-11-23 DariusIII

@@ -16,12 +16,12 @@ $client = new \GuzzleHttp\Client();
 $request = new \ApaiIO\Request\GuzzleRequest($client);
 
 $conf
-	->setCountry('com')
-	->setAccessKey($pubkey)
-	->setSecretKey($privkey)
-	->setAssociateTag($asstag)
-	->setRequest($request)
-	->setResponseTransformer(new \ApaiIO\ResponseTransformer\XmlToSimpleXmlObject());
+    ->setCountry('com')
+    ->setAccessKey($pubkey)
+    ->setSecretKey($privkey)
+    ->setAssociateTag($asstag)
+    ->setRequest($request)
+    ->setResponseTransformer(new \ApaiIO\ResponseTransformer\XmlToSimpleXmlObject());
 
 $search = new Search();
 $search->setCategory('VideoGames');

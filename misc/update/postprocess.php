@@ -13,53 +13,53 @@ $pdo = new DB();
  * whether or not those methods of operation require NNTP.
  **/
 $args = [
-	'additional' => true,
-	'all'        => true,
-	'allinf'     => true,
-	'amazon'     => false,
-	'anime'      => false,
-	'book'       => false,
-	'console'    => false,
-	'games'      => false,
-	'movies'     => false,
-	'music'      => false,
-	'nfo'        => true,
-	'pre'        => true,
-	'sharing'    => true,
-	'spotnab'    => true,
-	'tv'         => false,
-	'tvdb'       => false,
-	'xxx'        => false,
+    'additional' => true,
+    'all'        => true,
+    'allinf'     => true,
+    'amazon'     => false,
+    'anime'      => false,
+    'book'       => false,
+    'console'    => false,
+    'games'      => false,
+    'movies'     => false,
+    'music'      => false,
+    'nfo'        => true,
+    'pre'        => true,
+    'sharing'    => true,
+    'spotnab'    => true,
+    'tv'         => false,
+    'tvdb'       => false,
+    'xxx'        => false,
 ];
 
 $bool = [
-	'true',
-	'false',
+    'true',
+    'false',
 ];
 
 if (! isset($argv[1]) || ! in_array($argv[1], $args, false) || ! isset($argv[2]) || ! in_array($argv[2], $bool, false)) {
     exit(
-	\nntmux\ColorCLI::error(
-		"\nIncorrect arguments.\n"
-		."The second argument (true/false) determines wether to echo or not.\n\n"
-		."php postprocess.php all true         ...: Does all the types of post processing.\n"
-		."php postprocess.php pre true         ...: Processes all Predb sites.\n"
-		."php postprocess.php nfo true         ...: Processes NFO files.\n"
-		."php postprocess.php movies true      ...: Processes movies.\n"
-		."php postprocess.php music true       ...: Processes music.\n"
-		."php postprocess.php console true     ...: Processes console games.\n"
-		."php postprocess.php games true       ...: Processes games.\n"
-		."php postprocess.php book true        ...: Processes books.\n"
-		."php postprocess.php anime true       ...: Processes anime.\n"
-		."php postprocess.php tv true          ...: Processes tv.\n"
-		."php postprocess.php xxx true         ...: Processes xxx.\n"
-		."php postprocess.php additional true  ...: Processes previews/mediainfo/etc...\n"
-		."php postprocess.php sharing true     ...: Processes uploading/downloading comments.\n"
-		."php postprocess.php spotnab true     ...: Processes uploading/downloading comments from spotnab.\n"
-		."php postprocess.php allinf true      ...: Does all the types of post processing on a loop, sleeping 15 seconds between.\n"
-		."php postprocess.php amazon true      ...: Does all the amazon (books/console/games/music/xxx).\n"
-	)
-	);
+    \nntmux\ColorCLI::error(
+        "\nIncorrect arguments.\n"
+        ."The second argument (true/false) determines wether to echo or not.\n\n"
+        ."php postprocess.php all true         ...: Does all the types of post processing.\n"
+        ."php postprocess.php pre true         ...: Processes all Predb sites.\n"
+        ."php postprocess.php nfo true         ...: Processes NFO files.\n"
+        ."php postprocess.php movies true      ...: Processes movies.\n"
+        ."php postprocess.php music true       ...: Processes music.\n"
+        ."php postprocess.php console true     ...: Processes console games.\n"
+        ."php postprocess.php games true       ...: Processes games.\n"
+        ."php postprocess.php book true        ...: Processes books.\n"
+        ."php postprocess.php anime true       ...: Processes anime.\n"
+        ."php postprocess.php tv true          ...: Processes tv.\n"
+        ."php postprocess.php xxx true         ...: Processes xxx.\n"
+        ."php postprocess.php additional true  ...: Processes previews/mediainfo/etc...\n"
+        ."php postprocess.php sharing true     ...: Processes uploading/downloading comments.\n"
+        ."php postprocess.php spotnab true     ...: Processes uploading/downloading comments from spotnab.\n"
+        ."php postprocess.php allinf true      ...: Does all the types of post processing on a loop, sleeping 15 seconds between.\n"
+        ."php postprocess.php amazon true      ...: Does all the amazon (books/console/games/music/xxx).\n"
+    )
+    );
 }
 
 $nntp = null;
@@ -76,61 +76,61 @@ $charArray = ['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '
 
 switch ($argv[1]) {
 
-	case 'all':
-		$postProcess->processAll($nntp);
-		break;
-	case 'allinf':
-		$i = 1;
-		while ($i = 1) {
-		    $postProcess->processAll($nntp);
-		    sleep(15);
-		}
-		break;
-	case 'additional':
-		$postProcess->processAdditional($nntp, '', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
-		break;
-	case 'amazon':
-		$postProcess->processBooks();
-		$postProcess->processConsoles();
-		$postProcess->processGames();
-		$postProcess->processMusic();
-		$postProcess->processXXX();
-		break;
-	case 'anime':
-		$postProcess->processAnime();
-		break;
-	case 'book':
-		$postProcess->processBooks();
-		break;
-	case 'console':
-		$postProcess->processConsoles();
-		break;
-	case 'games':
-		$postProcess->processGames();
-		break;
-	case 'nfo':
-		$postProcess->processNfos($nntp, '', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
-		break;
-	case 'movies':
-		$postProcess->processMovies('', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
-		break;
-	case 'music':
-		$postProcess->processMusic();
-		break;
-	case 'pre':
-		break;
-	case 'sharing':
-		$postProcess->processSharing($nntp);
-		break;
-	case 'spotnab':
-		$postProcess->processSpotnab();
-		break;
-	case 'tv':
-		$postProcess->processTv('', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
-		break;
-	case 'xxx':
-		$postProcess->processXXX();
-		break;
-	default:
-		exit;
+    case 'all':
+        $postProcess->processAll($nntp);
+        break;
+    case 'allinf':
+        $i = 1;
+        while ($i = 1) {
+            $postProcess->processAll($nntp);
+            sleep(15);
+        }
+        break;
+    case 'additional':
+        $postProcess->processAdditional($nntp, '', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
+        break;
+    case 'amazon':
+        $postProcess->processBooks();
+        $postProcess->processConsoles();
+        $postProcess->processGames();
+        $postProcess->processMusic();
+        $postProcess->processXXX();
+        break;
+    case 'anime':
+        $postProcess->processAnime();
+        break;
+    case 'book':
+        $postProcess->processBooks();
+        break;
+    case 'console':
+        $postProcess->processConsoles();
+        break;
+    case 'games':
+        $postProcess->processGames();
+        break;
+    case 'nfo':
+        $postProcess->processNfos($nntp, '', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
+        break;
+    case 'movies':
+        $postProcess->processMovies('', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
+        break;
+    case 'music':
+        $postProcess->processMusic();
+        break;
+    case 'pre':
+        break;
+    case 'sharing':
+        $postProcess->processSharing($nntp);
+        break;
+    case 'spotnab':
+        $postProcess->processSpotnab();
+        break;
+    case 'tv':
+        $postProcess->processTv('', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
+        break;
+    case 'xxx':
+        $postProcess->processXXX();
+        break;
+    default:
+        exit;
 }

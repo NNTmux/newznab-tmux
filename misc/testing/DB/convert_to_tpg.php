@@ -14,13 +14,14 @@ $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 $DoPartRepair = (Settings::settingValue('..partrepair') == '0') ? false : true;
 
 if ((! isset($argv[1])) || $argv[1] != 'true') {
-    exit($pdo->log->error("\nMandatory argument missing\n\n"
-		."This script will allow you to move from single collections/binaries/parts tables to TPG without having to run reset_truncate.\n"
-		."Please STOP all update scripts before running this script.\n\n"
-		."Use the following options to run:\n"
-		."php $argv[0] true             ...: Convert c/b/p to tpg leaving current collections/binaries/parts tables in-tact.\n"
-		."php $argv[0] true delete      ...: Convert c/b/p to tpg and TRUNCATE current collections/binaries/parts tables.\n"
-	));
+    exit($pdo->log->error(
+        "\nMandatory argument missing\n\n"
+        ."This script will allow you to move from single collections/binaries/parts tables to TPG without having to run reset_truncate.\n"
+        ."Please STOP all update scripts before running this script.\n\n"
+        ."Use the following options to run:\n"
+        ."php $argv[0] true             ...: Convert c/b/p to tpg leaving current collections/binaries/parts tables in-tact.\n"
+        ."php $argv[0] true delete      ...: Convert c/b/p to tpg and TRUNCATE current collections/binaries/parts tables.\n"
+    ));
 }
 
 $clen = $pdo->queryOneRow('SELECT COUNT(*) AS total FROM collections;');
