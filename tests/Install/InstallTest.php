@@ -13,8 +13,8 @@
 
 namespace tests;
 
-require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap.php';
-include_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
+require_once \dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php';
+include_once \dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
 
 use App\Extensions\util\Versions;
 use nntmux\config\Configure;
@@ -39,8 +39,8 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 
 	public function testFullInstall()
 	{
-		if (!defined('NN_INSTALLER')) {
-			define('NN_INSTALLER', true);
+		if (! \defined('NN_INSTALLER')) {
+			\define('NN_INSTALLER', true);
 		}
 
 		$this->config = new Configure('install');
