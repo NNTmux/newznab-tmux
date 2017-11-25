@@ -4,7 +4,7 @@ if (!isset($argv[1])) {
 	exit('This script is not intended to be run manually.' . PHP_EOL);
 }
 
-require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap.php';
+require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php';
 
 use App\Models\Settings;
 use \nntmux\db\DB;
