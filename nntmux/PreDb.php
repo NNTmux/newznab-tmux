@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Release;
@@ -162,29 +163,43 @@ class PreDb
 
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
         if ($search === '') {
-            $count = PredbModel::remember($expiresAt)->count();
+            $check = Cache::get('predbcount');
+            if ($check !== null) {
+                $count = $check;
+            } else {
+                $count = PredbModel::count();
+                Cache::put('predbcount', $count, $expiresAt);
+            }
         } else {
-            $count = PredbModel::query()->where(function ($query) use ($search) {
-                for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
-                    $query->where('title', 'like', '%'.$search[$i].'%');
-                }
-            })->remember($expiresAt)->count('id');
+            $check = Cache::get('predbcount');
+            if ($check !== null) {
+                $count = $check;
+            } else {
+                $count = PredbModel::query()->where(function ($query) use ($search) {
+                    for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
+                        $query->where('title', 'like', '%'.$search[$i].'%');
+                    }
+                })->count('id');
+                Cache::put('predbcount', $count, $expiresAt);
+            }
         }
 
-        $sql = PredbModel::query()
-            ->leftJoin('releases', 'predb.id', '=', 'releases.predb_id')
-            ->orderBy('predb.predate', 'desc')
-            ->limit($offset2)
-            ->offset($offset);
-        if ($search !== '') {
-            $sql->where(function ($query) use ($search) {
-                for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
-                    $query->where('title', 'like', '%'.$search[$i].'%');
-                }
-            });
-        }
+        $check = Cache::get('predb');
+        if ($check !== null) {
+            $parr = $check;
+        } else {
+            $sql = PredbModel::query()->leftJoin('releases', 'predb.id', '=', 'releases.predb_id')->orderBy('predb.predate', 'desc')->limit($offset2)->offset($offset);
+            if ($search !== '') {
+                $sql->where(function ($query) use ($search) {
+                    for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
+                        $query->where('title', 'like', '%'.$search[$i].'%');
+                    }
+                });
+            }
 
-        $parr = $sql->remember($expiresAt)->get();
+            $parr = $sql->get();
+            Cache::put('predb', $parr, $expiresAt);
+        }
 
         return ['arr' => $parr, 'count' => $count ?? 0];
     }
