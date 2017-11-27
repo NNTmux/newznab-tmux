@@ -166,22 +166,25 @@ class PreDb
         } else {
             $count = PredbModel::query()->where(function ($query) use ($search) {
                 for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
-                    $query->orwhere('title', 'like', '%'.$search[$i].'%');
+                    $query->where('title', 'like', '%'.$search[$i].'%');
                 }
             })->remember($expiresAt)->count('id');
         }
 
-        $parr = PredbModel::query()
-            ->where(function ($query) use ($search) {
-                for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
-                    $query->orwhere('title', 'like', '%'.$search[$i].'%');
-                }
-            })
+        $sql = PredbModel::query()
             ->leftJoin('releases', 'predb.id', '=', 'releases.predb_id')
             ->orderBy('predb.predate', 'desc')
             ->limit($offset2)
-            ->offset($offset)
-        ->remember($expiresAt)->get();
+            ->offset($offset);
+        if ($search !== '') {
+            $sql->where(function ($query) use ($search) {
+                for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
+                    $query->where('title', 'like', '%'.$search[$i].'%');
+                }
+            });
+        }
+
+        $parr = $sql->remember($expiresAt)->get();
 
         return ['arr' => $parr, 'count' => $count ?? 0];
     }
