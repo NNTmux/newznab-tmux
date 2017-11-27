@@ -1,3 +1,5 @@
+2017-11-27 DariusIII
+	* Chg: Update phpunit components to latest versions
 2017-11-25 DariusIII
 	* Chg: Update Geary class, remove keychain_id from create_order, mycelium sets it automatically
 2017-11-24 DariusIII
