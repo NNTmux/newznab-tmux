@@ -193,12 +193,12 @@ class PreDb
                 }
             });
         }
-        $check = Cache::get(md5(implode(',', $search)));
+        $check = Cache::get(md5($offset.$offset2.implode(',', $search)));
         if ($check !== null) {
             $parr = $check;
         } else {
             $parr = $sql->get();
-            Cache::put(md5(implode(',', $search)), $parr, $expiresAt);
+            Cache::put(md5($offset.$offset2.implode(',', $search)), $parr, $expiresAt);
         }
 
         return ['arr' => $parr, 'count' => $count ?? 0];
