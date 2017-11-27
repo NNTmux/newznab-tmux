@@ -193,7 +193,7 @@ class PreDb
                 }
             });
         }
-        $check = Cache::get(md5(implode(',', $search));
+        $check = Cache::get(md5(implode(',', $search)));
         if ($check !== null) {
             $parr = $check;
         } else {
