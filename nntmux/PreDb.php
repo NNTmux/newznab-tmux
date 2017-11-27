@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
-use App\Models\Release;
-use Carbon\Carbon;
 use nntmux\db\DB;
+use Carbon\Carbon;
+use App\Models\Release;
 use App\Models\Predb as PredbModel;
 
 /**
@@ -166,7 +166,7 @@ class PreDb
         } else {
             $count = PredbModel::query()->where(function ($query) use ($search) {
                 for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
-                    $query->orwhere('title', 'like', '%' . $search[$i] .'%');
+                    $query->orwhere('title', 'like', '%'.$search[$i].'%');
                 }
             })->remember($expiresAt)->count('id');
         }
@@ -174,7 +174,7 @@ class PreDb
         $parr = PredbModel::query()
             ->where(function ($query) use ($search) {
                 for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
-                    $query->orwhere('title', 'like', '%' . $search[$i] .'%');
+                    $query->orwhere('title', 'like', '%'.$search[$i].'%');
                 }
             })
             ->leftJoin('releases', 'predb.id', '=', 'releases.predb_id')
