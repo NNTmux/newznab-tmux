@@ -2,11 +2,11 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Facades\Cache;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Release;
 use App\Models\Predb as PredbModel;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class for inserting names/categories etc from PreDB sources into the DB,
