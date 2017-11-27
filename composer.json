@@ -145,6 +145,7 @@
     "smarty/smarty": "~3.1",
     "spatie/laravel-fractal": "^5.2",
     "vlucas/phpdotenv": "^2.4",
+    "watson/rememberable": "^2.0",
     "yadakhov/insert-on-duplicate-key": "^1.2"
   },
 
