@@ -1,4 +1,5 @@
 2017-11-27 DariusIII
+	* Chg: Update laravel/framework to latest version
 	* Chg: Update NameFixer class
 	* Chg: Use $search parameter to create key for cache
 	* Chg: Switch to Cache facade in Predb
