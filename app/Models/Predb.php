@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Watson\Rememberable\Rememberable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -11,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Predb extends Model
 {
-    use Rememberable;
 
     /**
      * @var string
