@@ -149,11 +149,11 @@ class PreDb
     /**
      * Get all PRE's in the DB.
      *
-     * @param int    $offset  OFFSET
-     * @param int    $offset2 LIMIT
-     * @param string|array $search  Optional title search.
      *
-     * @return array The row count and the query results.
+     * @param $offset
+     * @param $offset2
+     * @param string|array $search
+     * @return array
      */
     public function getAll($offset, $offset2, $search = ''): array
     {
@@ -171,34 +171,34 @@ class PreDb
                 Cache::put('predbcount', $count, $expiresAt);
             }
         } else {
-            $check = Cache::get('predbcount');
+            $sql = PredbModel::query()->where(function ($query) use ($search) {
+                for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
+                    $query->where('title', 'like', '%'.$search[$i].'%');
+                }
+            });
+            $check = Cache::get(md5($sql));
             if ($check !== null) {
                 $count = $check;
             } else {
-                $count = PredbModel::query()->where(function ($query) use ($search) {
-                    for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
-                        $query->where('title', 'like', '%'.$search[$i].'%');
-                    }
-                })->count('id');
-                Cache::put('predbcount', $count, $expiresAt);
+                $count = $sql->count('id');
+                Cache::put(md5($sql), $count, $expiresAt);
             }
         }
 
-        $check = Cache::get('predb');
+        $sql = PredbModel::query()->leftJoin('releases', 'predb.id', '=', 'releases.predb_id')->orderBy('predb.predate', 'desc')->limit($offset2)->offset($offset);
+        if ($search !== '') {
+            $sql->where(function ($query) use ($search) {
+                for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
+                    $query->where('title', 'like', '%'.$search[$i].'%');
+                }
+            });
+        }
+        $check = Cache::get(md5($sql));
         if ($check !== null) {
             $parr = $check;
         } else {
-            $sql = PredbModel::query()->leftJoin('releases', 'predb.id', '=', 'releases.predb_id')->orderBy('predb.predate', 'desc')->limit($offset2)->offset($offset);
-            if ($search !== '') {
-                $sql->where(function ($query) use ($search) {
-                    for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
-                        $query->where('title', 'like', '%'.$search[$i].'%');
-                    }
-                });
-            }
-
             $parr = $sql->get();
-            Cache::put('predb', $parr, $expiresAt);
+            Cache::put(md5($sql), $parr, $expiresAt);
         }
 
         return ['arr' => $parr, 'count' => $count ?? 0];
