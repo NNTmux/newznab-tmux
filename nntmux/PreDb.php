@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use App\Models\Release;
+use Carbon\Carbon;
 use nntmux\db\DB;
 use App\Models\Predb as PredbModel;
 
@@ -14,15 +16,15 @@ use App\Models\Predb as PredbModel;
 class PreDb
 {
     // Nuke status.
-    const PRE_NONUKE = 0; // Pre is not nuked.
-    const PRE_UNNUKED = 1; // Pre was un nuked.
-    const PRE_NUKED = 2; // Pre is nuked.
-    const PRE_MODNUKE = 3; // Nuke reason was modified.
-    const PRE_RENUKED = 4; // Pre was re nuked.
-    const PRE_OLDNUKE = 5; // Pre is nuked for being old.
+    public const PRE_NONUKE = 0; // Pre is not nuked.
+    public const PRE_UNNUKED = 1; // Pre was un nuked.
+    public const PRE_NUKED = 2; // Pre is nuked.
+    public const PRE_MODNUKE = 3; // Nuke reason was modified.
+    public const PRE_RENUKED = 4; // Pre was re nuked.
+    public const PRE_OLDNUKE = 5; // Pre is nuked for being old.
 
     /**
-     * @var bool stdClass
+     * @var
      */
     protected $site;
 
@@ -66,36 +68,28 @@ class PreDb
 
         $consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
         $updated = 0;
-        $datesql = '';
 
         if ($this->echooutput) {
             echo ColorCLI::header('Querying DB for release search names not matched with PreDB titles.');
         }
 
+        $query = PredbModel::query()
+            ->where('releases.predb_id', '<', 1)
+            ->join('releases', 'predb.title', '=', 'releases.searchname')
+            ->select(['predb.id as predb_id', 'releases.id as releases_id']);
         if ($this->dateLimit !== false && is_numeric($this->dateLimit)) {
-            $datesql = sprintf('AND adddate > (NOW() - INTERVAL %d DAY)', $this->dateLimit);
+            $query->where('adddate', '>', Carbon::now()->subDays($this->dateLimit));
         }
 
-        $res = $this->pdo->queryDirect(
-            sprintf(
-                '
-				SELECT p.id AS predb_id, r.id AS releases_id
-				FROM predb p
-				INNER JOIN releases r ON p.title = r.searchname
-				WHERE r.predb_id < 1 %s',
-                $datesql
-            )
-        );
+        $res = $query->get();
 
-        if ($res !== false) {
-            $total = $res->rowCount();
+        if ($res !== null) {
+            $total = \count($res);
             echo ColorCLI::primary(number_format($total).' releases to match.');
 
             if ($res instanceof \Traversable) {
                 foreach ($res as $row) {
-                    $this->pdo->queryExec(
-                        sprintf('UPDATE releases SET predb_id = %d WHERE id = %d', $row['predb_id'], $row['releases_id'])
-                    );
+                    Release::query()->where('id', $row['releases_id'])->update(['predb_id' => $row['predb_id']]);
 
                     if ($this->echooutput) {
                         $consoleTools->overWritePrimary(
@@ -164,51 +158,32 @@ class PreDb
     {
         if ($search !== '') {
             $search = explode(' ', trim($search));
-            if (\count($search) > 1) {
-                $search = "LIKE '%".implode("%' AND title LIKE '%", $search)."%'";
-            } else {
-                $search = "LIKE '%".$search[0]."%'";
-            }
-            $search = 'WHERE title '.$search;
         }
 
-        $count = $this->getCount($search);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        if ($search === '') {
+            $count = PredbModel::remember($expiresAt)->count();
+        } else {
+            $count = PredbModel::query()->where(function ($query) use ($search) {
+                for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
+                    $query->orwhere('title', 'like', '%' . $search[$i] .'%');
+                }
+            })->remember($expiresAt)->count('id');
+        }
 
-        $sql = sprintf(
-            '
-			SELECT p.*, r.guid
-			FROM predb p
-			LEFT OUTER JOIN releases r ON p.id = r.predb_id %s
-			ORDER BY p.predate DESC
-			LIMIT %d
-			OFFSET %d',
-                $search,
-                $offset2,
-                $offset
-        );
-        $parr = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+        $parr = PredbModel::query()
+            ->where(function ($query) use ($search) {
+                for ($i = 0, $iMax = \count($search); $i < $iMax; $i++) {
+                    $query->orwhere('title', 'like', '%' . $search[$i] .'%');
+                }
+            })
+            ->leftJoin('releases', 'predb.id', '=', 'releases.predb_id')
+            ->orderBy('predb.predate', 'desc')
+            ->limit($offset2)
+            ->offset($offset)
+        ->remember($expiresAt)->get();
 
-        return ['arr' => $parr, 'count' => $count];
-    }
-
-    /**
-     * Get count of all PRE's.
-     *
-     * @param string $search
-     *
-     * @return int
-     */
-    public function getCount($search = ''): int
-    {
-        $count = $this->pdo->query(
-            "
-			SELECT COUNT(id) AS cnt
-			FROM predb {$search}",
-                true,
-                NN_CACHE_EXPIRY_MEDIUM
-        );
-
-        return $count === false ? 0 : $count[0]['cnt'];
+        return ['arr' => $parr, 'count' => $count ?? 0];
     }
 
     /**

@@ -1,4 +1,5 @@
 2017-11-27 DariusIII
+	* Chg: Use Rememberable trait in Predb model
 	* Chg: Add watson/remembarable trait for future usage
 	* Chg: Update ReleaseCleaning to use Predb model
 	* Chg: Update phpunit components to latest versions

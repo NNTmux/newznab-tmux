@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Watson\Rememberable\Rememberable;
 
 /**
  * @property mixed $release
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Predb extends Model
 {
+    use Rememberable;
+
     /**
      * @var string
      */
