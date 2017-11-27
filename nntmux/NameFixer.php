@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use Carbon\Carbon;
 use nntmux\db\DB;
 use App\Models\Predb;
 use App\Models\Release;
@@ -13,21 +14,21 @@ use nntmux\processing\PostProcess;
  */
 class NameFixer
 {
-    const PREDB_REGEX = '/([\w\(\)]+[\s\._-]([\w\(\)]+[\s\._-])+[\w\(\)]+-\w+)/';
+    public const PREDB_REGEX = '/([\w\(\)]+[\s\._-]([\w\(\)]+[\s\._-])+[\w\(\)]+-\w+)/';
 
     // Constants for name fixing status
-    const PROC_NFO_NONE = 0;
-    const PROC_NFO_DONE = 1;
-    const PROC_FILES_NONE = 0;
-    const PROC_FILES_DONE = 1;
-    const PROC_PAR2_NONE = 0;
-    const PROC_PAR2_DONE = 1;
-    const PROC_UID_NONE = 0;
-    const PROC_UID_DONE = 1;
-    const PROC_HASH16K_NONE = 0;
-    const PROC_HASH16K_DONE = 1;
-    const PROC_SRR_NONE = 0;
-    const PROC_SRR_DONE = 1;
+    public const PROC_NFO_NONE = 0;
+    public const PROC_NFO_DONE = 1;
+    public const PROC_FILES_NONE = 0;
+    public const PROC_FILES_DONE = 1;
+    public const PROC_PAR2_NONE = 0;
+    public const PROC_PAR2_DONE = 1;
+    public const PROC_UID_NONE = 0;
+    public const PROC_UID_DONE = 1;
+    public const PROC_HASH16K_NONE = 0;
+    public const PROC_HASH16K_DONE = 1;
+    public const PROC_SRR_NONE = 0;
+    public const PROC_SRR_DONE = 1;
 
     // Constants for overall rename status
     const IS_RENAMED_NONE = 0;
@@ -742,13 +743,14 @@ class NameFixer
     }
 
     /**
-     * @param int    $time  1: 24 hours, 2: no time limit
-     * @param int    $cats  1: other categories, 2: all categories
+     * @param int $time 1: 24 hours, 2: no time limit
+     * @param int $cats 1: other categories, 2: all categories
      * @param string $query Query to execute.
      *
      * @param string $limit limit defined by maxperrun
      *
      * @return bool|\PDOStatement False on failure, PDOStatement with query results on success.
+     * @throws \RuntimeException
      */
     protected function _getReleases($time, $cats, $query, $limit = '')
     {
@@ -839,14 +841,15 @@ class NameFixer
     /**
      * Update the release with the new information.
      *
-     * @param array   $release
-     * @param string  $name
-     * @param string  $method
+     * @param array $release
+     * @param string $name
+     * @param string $method
      * @param bool $echo
-     * @param string  $type
-     * @param int     $nameStatus
-     * @param int     $show
-     * @param int     $preId
+     * @param string $type
+     * @param int $nameStatus
+     * @param int $show
+     * @param int $preId
+     * @throws \Exception
      */
     public function updateRelease($release, $name, $method, $echo, $type, int $nameStatus, int $show, int $preId = 0): void
     {
@@ -1030,6 +1033,7 @@ class NameFixer
 
     /**
      * Match a PreDB title to a release name or searchname using an exact full-text match.
+     *
      * @param $pre
      * @param $echo
      * @param $namestatus
@@ -1037,6 +1041,7 @@ class NameFixer
      * @param $show
      *
      * @return int
+     * @throws \Exception
      */
     public function matchPredbFT($pre, $echo, $namestatus, $echooutput, $show): int
     {
@@ -1094,7 +1099,7 @@ class NameFixer
     {
         $join = '';
 
-        if (strlen($preTitle) >= 15 && preg_match(self::PREDB_REGEX, $preTitle)) {
+        if (\strlen($preTitle) >= 15 && preg_match(self::PREDB_REGEX, $preTitle)) {
             switch (NN_RELEASE_SEARCH_TYPE) {
                 case ReleaseSearch::SPHINX:
                     $titlematch = SphinxSearch::escapeString($preTitle);
@@ -1146,7 +1151,7 @@ class NameFixer
             $limit = 'LIMIT 1000000';
         }
 
-        echo ColorCLI::header(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.date('g:i:s'));
+        echo ColorCLI::header(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.Carbon::now()->format('Y-m-d'));
         echo ColorCLI::primary('Matching predb filename to cleaned release_files.name.'.PHP_EOL);
 
         $counter = $counted = 0;
@@ -1201,6 +1206,7 @@ class NameFixer
      * @param int $show
      *
      * @return int
+     * @throws \Exception
      */
     public function matchPredbFiles($release, $echo, $namestatus, $echooutput, $show): int
     {
@@ -1255,7 +1261,7 @@ class NameFixer
         // first strip all non-printing chars  from filename
         $this->_fileName = Utility::stripNonPrintingChars($this->_fileName);
 
-        if (strlen($this->_fileName) > 0 && strpos($this->_fileName, '.') !== 0) {
+        if (\strlen($this->_fileName) > 0 && strpos($this->_fileName, '.') !== 0) {
             switch (true) {
 
                 case strpos($this->_fileName, '.') !== false:
@@ -1293,7 +1299,7 @@ class NameFixer
     /**
      * Match a Hash from the predb to a release.
      *
-     * @param string  $hash
+     * @param string $hash
      * @param         $release
      * @param         $echo
      * @param         $namestatus
@@ -1301,6 +1307,7 @@ class NameFixer
      * @param         $show
      *
      * @return int
+     * @throws \Exception
      */
     public function matchPredbHash($hash, $release, $echo, $namestatus, $echooutput, $show): int
     {
@@ -1308,7 +1315,7 @@ class NameFixer
         $this->matched = false;
 
         // Determine MD5 or SHA1
-        if (strlen($hash) === 40) {
+        if (\strlen($hash) === 40) {
             $hashtype = 'SHA1, ';
         } else {
             $hashtype = 'MD5, ';
@@ -1412,12 +1419,13 @@ class NameFixer
      *
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
      * @param bool $preid
      *
      * @return bool
+     * @throws \Exception
      */
     public function checkName($release, $echo, $type, $namestatus, $show, $preid = false): bool
     {
@@ -1517,9 +1525,10 @@ class NameFixer
      *
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
+     * @throws \Exception
      */
     public function tvCheck($release, $echo, $type, $namestatus, $show): void
     {
@@ -1549,9 +1558,10 @@ class NameFixer
      *
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
+     * @throws \Exception
      */
     public function movieCheck($release, $echo, $type, $namestatus, $show): void
     {
@@ -1593,9 +1603,10 @@ class NameFixer
      *
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
+     * @throws \Exception
      */
     public function gameCheck($release, $echo, $type, $namestatus, $show): void
     {
@@ -1621,9 +1632,10 @@ class NameFixer
      *
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
+     * @throws \Exception
      */
     public function appCheck($release, $echo, $type, $namestatus, $show): void
     {
@@ -1647,9 +1659,10 @@ class NameFixer
      *
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
+     * @throws \Exception
      */
     public function nfoCheckTV($release, $echo, $type, $namestatus, $show): void
     {
@@ -1669,9 +1682,10 @@ class NameFixer
      *
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
+     * @throws \Exception
      */
     public function nfoCheckMov($release, $echo, $type, $namestatus, $show): void
     {
@@ -1691,9 +1705,10 @@ class NameFixer
     /**
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
+     * @throws \Exception
      */
     public function nfoCheckMus($release, $echo, $type, $namestatus, $show): void
     {
@@ -1710,9 +1725,10 @@ class NameFixer
      *
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
+     * @throws \Exception
      */
     public function nfoCheckTY($release, $echo, $type, $namestatus, $show): void
     {
@@ -1881,9 +1897,10 @@ class NameFixer
      *
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
+     * @throws \Exception
      */
     public function nfoCheckG($release, $echo, $type, $namestatus, $show): void
     {
@@ -1909,9 +1926,10 @@ class NameFixer
      *
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
+     * @throws \Exception
      */
     public function nfoCheckMisc($release, $echo, $type, $namestatus, $show): void
     {
@@ -1948,11 +1966,12 @@ class NameFixer
      *
      * @param         $release
      * @param bool $echo
-     * @param string  $type
+     * @param string $type
      * @param         $namestatus
      * @param         $show
      *
      * @return bool
+     * @throws \Exception
      */
     public function fileCheck($release, $echo, $type, $namestatus, $show): bool
     {
@@ -2043,13 +2062,14 @@ class NameFixer
     /**
      * Look for a name based on mediainfo xml Unique_ID.
      *
-     * @param array   $release The release to be matched
+     * @param array $release The release to be matched
      * @param bool $echo Should we show CLI output
-     * @param string  $type The rename type
-     * @param int     $namestatus Should we rename the release if match is found
-     * @param int     $show Should we show the rename results
+     * @param string $type The rename type
+     * @param int $namestatus Should we rename the release if match is found
+     * @param int $show Should we show the rename results
      *
      * @return bool Whether or not we matched the release
+     * @throws \Exception
      */
     public function uidCheck($release, $echo, $type, $namestatus, $show): bool
     {
@@ -2093,13 +2113,14 @@ class NameFixer
     /**
      * Look for a name based on mediainfo xml Unique_ID.
      *
-     * @param array   $release The release to be matched
+     * @param array $release The release to be matched
      * @param bool $echo Should we show CLI output
-     * @param string  $type The rename type
-     * @param int     $namestatus Should we rename the release if match is found
-     * @param int     $show Should we show the rename results
+     * @param string $type The rename type
+     * @param int $namestatus Should we rename the release if match is found
+     * @param int $show Should we show the rename results
      *
      * @return bool Whether or not we matched the release
+     * @throws \Exception
      */
     public function mediaMovieNameCheck($release, $echo, $type, $namestatus, $show): bool
     {
@@ -2129,13 +2150,15 @@ class NameFixer
     /**
      * Look for a name based on xxx release filename.
      *
-     * @param array   $release The release to be matched
+     * @param array $release The release to be matched
      * @param bool $echo Should we show CLI output
-     * @param string  $type The rename type
-     * @param int     $namestatus Should we rename the release if match is found
-     * @param int     $show Should we show the rename results
+     * @param string $type The rename type
+     * @param int $namestatus Should we rename the release if match is found
+     * @param int $show Should we show the rename results
      *
      * @return bool Whether or not we matched the release
+     * @throws \Exception
+     * @throws \RuntimeException
      */
     public function xxxNameCheck($release, $echo, $type, $namestatus, $show): bool
     {
@@ -2182,13 +2205,15 @@ class NameFixer
     /**
      * Look for a name based on .srr release files extension.
      *
-     * @param array   $release The release to be matched
+     * @param array $release The release to be matched
      * @param bool $echo Should we show CLI output
-     * @param string  $type The rename type
-     * @param int     $namestatus Should we rename the release if match is found
-     * @param int     $show Should we show the rename results
+     * @param string $type The rename type
+     * @param int $namestatus Should we rename the release if match is found
+     * @param int $show Should we show the rename results
      *
      * @return bool Whether or not we matched the release
+     * @throws \Exception
+     * @throws \RuntimeException
      */
     public function srrNameCheck($release, $echo, $type, $namestatus, $show): bool
     {
@@ -2235,13 +2260,15 @@ class NameFixer
     /**
      * Look for a name based on par2 hash_16K block.
      *
-     * @param array   $release The release to be matched
+     * @param array $release The release to be matched
      * @param bool $echo Should we show CLI output
-     * @param string  $type The rename type
-     * @param int     $namestatus Should we rename the release if match is found
-     * @param int     $show Should we show the rename results
+     * @param string $type The rename type
+     * @param int $namestatus Should we rename the release if match is found
+     * @param int $show Should we show the rename results
      *
      * @return bool Whether or not we matched the release
+     * @throws \Exception
+     * @throws \RuntimeException
      */
     public function hashCheck($release, $echo, $type, $namestatus, $show): bool
     {
