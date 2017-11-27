@@ -176,12 +176,12 @@ class PreDb
                     $query->where('title', 'like', '%'.$search[$i].'%');
                 }
             });
-            $check = Cache::get(md5($search));
+            $check = Cache::get(md5(implode(',', $search)));
             if ($check !== null) {
                 $count = $check;
             } else {
                 $count = $sql->count('id');
-                Cache::put(md5($search), $count, $expiresAt);
+                Cache::put(md5(implode(',', $search)), $count, $expiresAt);
             }
         }
 
@@ -193,12 +193,12 @@ class PreDb
                 }
             });
         }
-        $check = Cache::get(md5($search));
+        $check = Cache::get(md5(implode(',', $search));
         if ($check !== null) {
             $parr = $check;
         } else {
             $parr = $sql->get();
-            Cache::put(md5($search), $parr, $expiresAt);
+            Cache::put(md5(implode(',', $search)), $parr, $expiresAt);
         }
 
         return ['arr' => $parr, 'count' => $count ?? 0];
