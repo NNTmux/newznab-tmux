@@ -2,35 +2,22 @@
 
 namespace nntmux;
 
-use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Forumpost;
 
 class Forum
 {
     /**
-     * @var DB
+     * Forum constructor.
      */
-    public $pdo;
-
-    /**
-     * @param array $options Class instances.
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
     }
 
     /**
      * Add post to forum.
      *
-     * @param     $parentid
+     * @param     $parentId
      * @param     $userid
      * @param     $subject
      * @param     $message
@@ -40,25 +27,25 @@ class Forum
      *
      * @return bool|int
      */
-    public function add($parentid, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0)
+    public function add($parentId, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0)
     {
         if ($message === '') {
             return -1;
         }
 
-        if ($parentid !== 0) {
-            $par = $this->getParent($parentid);
+        if ($parentId !== 0) {
+            $par = $this->getParent($parentId);
             if ($par === false) {
                 return -1;
             }
 
-            Forumpost::query()->where('id', $parentid)->increment('replies', 1, ['updated_at' => Carbon::now()]);
+            Forumpost::query()->where('id', $parentId)->increment('replies', 1, ['updated_at' => Carbon::now()]);
         }
 
         return Forumpost::query()->insertGetId(
             [
              'forumid' => 1,
-             'parentid' => $parentid,
+             'parentid' => $parentId,
              'users_id' => $userid,
              'subject' => $subject,
              'message' => $message,
@@ -74,51 +61,45 @@ class Forum
     /**
      * Get parent of the forum post.
      *
-     * @param $parent
      *
-     * @return array|bool
+     * @param $parent
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getParent($parent)
     {
-        return $this->pdo->queryOneRow(
-            sprintf(
-                'SELECT f.*, u.username FROM forumpost f LEFT OUTER JOIN users u ON u.id = f.users_id WHERE f.id = %d',
-                $parent
-            )
-        );
+        return Forumpost::query()
+            ->where('forumpost.id', $parent)
+            ->select(['forumpost.*', 'users.username'])
+            ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
+            ->first();
     }
 
     /**
      * Get forum posts for a parent category.
      *
-     * @param $parent
      *
-     * @return array
+     * @param $parent
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getPosts($parent): array
+    public function getPosts($parent)
     {
-        return $this->pdo->query(
-            sprintf(
-                '
-				SELECT f.*, u.username, ur.name AS rolename
-				FROM forumpost f
-				LEFT OUTER JOIN users u ON u.id = f.users_id
-				LEFT JOIN user_roles ur ON ur.id = u.user_roles_id
-				WHERE f.id = %d OR f.parentid = %d
-				ORDER BY f.created_at ASC
-				LIMIT 250',
-                $parent,
-                $parent
-            )
-        );
+        return Forumpost::query()
+            ->where('forumpost.id', $parent)
+            ->orWhere('forumpost.parentid', $parent)
+            ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
+            ->leftJoin('user_roles', 'user_roles.id', '=', 'users.user_roles_id')
+            ->orderBy('forumpost.created_at')
+            ->limit(250)
+            ->select(['forumpost.*', 'users.username', 'user_roles.name as rolename'])
+            ->get();
     }
 
     /**
      * Get post from forum.
      *
-     * @param $id
      *
-     * @return array|bool
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getPost($id)
     {
@@ -140,25 +121,24 @@ class Forum
     /**
      * Get browse range for forum.
      *
+     *
      * @param $start
      * @param $num
-     *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getBrowseRange($start, $num): array
+    public function getBrowseRange($start, $num)
     {
-        return $this->pdo->query(
-            sprintf(
-                '
-				SELECT f.*, u.username, ur.name AS rolename
-				FROM forumpost f
-				LEFT OUTER JOIN users u ON u.id = f.users_id
-				LEFT JOIN user_roles ur ON ur.id = u.user_roles_id
-				WHERE f.parentid = 0
-				ORDER BY f.updated_at DESC %s',
-                ($start === false ? '' : (' LIMIT '.$num.' OFFSET '.$start))
-            )
-        );
+        $range = Forumpost::query()
+            ->where('forumpost.parentid', '=', 0)
+            ->leftJoin('users', 'users.id', '=', 'forupost.users_id')
+            ->leftJoin('user_roles', 'user_roles.id', '=', 'users.user_roles_id')
+            ->select(['forumpost.*', 'users.username', 'user_roles.name as rolename'])
+            ->orderBy('forumpost.updated_at', 'desc');
+        if ($start !== false) {
+            $range->limit($num)->offset($start);
+        }
+
+        return $range->get();
     }
 
     /**
@@ -212,29 +192,28 @@ class Forum
         return $res === false ? 0 : $res;
     }
 
+
     /**
      * Get range of posts for user.
+     *
      *
      * @param $uid
      * @param $start
      * @param $num
-     *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getForUserRange($uid, $start, $num): array
+    public function getForUserRange($uid, $start, $num)
     {
-        return $this->pdo->query(
-            sprintf(
-                '
-				SELECT forumpost.*, users.username
-				FROM forumpost
-				LEFT OUTER JOIN users ON users.id = forumpost.users_id
-				WHERE users_id = %d
-				ORDER BY forumpost.created_at DESC %s',
-                ($start === false ? '' : (' LIMIT '.$num.' OFFSET '.$start)),
-                $uid
-            )
-        );
+        $range = Forumpost::query()
+            ->where('forumpost.users_id', $uid)
+            ->select(['forumpost.*', 'users.username'])
+            ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
+            ->orderBy('forumpost.created_at', 'desc');
+        if ($start  !== false) {
+            $range->limit($num)->offset($start);
+        }
+
+        return $range->get();
     }
 
     /**
