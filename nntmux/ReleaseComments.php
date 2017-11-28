@@ -62,10 +62,10 @@ class ReleaseComments
     public function getCommentCount($refdate = null, $localOnly = null)
     {
         if ($refdate !== null) {
-            if (is_string($refdate)) {
+            if (\is_string($refdate)) {
                 // ensure we're in the right format
                 $refdate = date('Y-m-d H:i:s', strtotime($refdate));
-            } elseif (is_int($refdate)) {
+            } elseif (\is_int($refdate)) {
                 // ensure we're in the right format
                 $refdate = date('Y-m-d H:i:s', $refdate);
             } else {
@@ -86,7 +86,7 @@ class ReleaseComments
 
         $clause[] = $localOnly === true ? 'sourceid = 0' : 'sourceid != 0';
 
-        if (count($clause)) {
+        if (\count($clause)) {
             $q .= ' WHERE '.implode('AND ', $clause);
         }
 
