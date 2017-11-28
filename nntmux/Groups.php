@@ -64,7 +64,7 @@ class Groups
 
         $temp_array[-1] = '--Please Select--';
 
-        if (is_object($groups)) {
+        if (\is_object($groups)) {
             foreach ($groups as $group) {
                 $temp_array[$group['name']] = $group['name'];
             }
@@ -149,7 +149,7 @@ class Groups
     {
         $res = Group::query()->where('id', $id)->first(['name']);
 
-        return $res->name ?? '';
+        return $res !== null ? $res->name : '';
     }
 
     /**
@@ -466,7 +466,7 @@ class Groups
                 }
             }
 
-            if (count($ret) === 0) {
+            if (\count($ret) === 0) {
                 $ret = 'No groups found with your regex, try again!';
             }
         }
