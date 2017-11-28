@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
-use App\Models\ParHash;
 use nntmux\db\DB;
 use Carbon\Carbon;
+use App\Models\ParHash;
 use App\Models\ReleaseFile;
 
 /**
