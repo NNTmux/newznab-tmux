@@ -13,24 +13,24 @@ class SABnzbd
     /**
      * Type of site integration.
      */
-    const INTEGRATION_TYPE_NONE = 0;
-    const INTEGRATION_TYPE_SITEWIDE = 1;
-    const INTEGRATION_TYPE_USER = 2;
+    public const INTEGRATION_TYPE_NONE = 0;
+    public const INTEGRATION_TYPE_SITEWIDE = 1;
+    public const INTEGRATION_TYPE_USER = 2;
 
     /**
      * Type of SAB API key.
      */
-    const API_TYPE_NZB = 1;
-    const API_TYPE_FULL = 2;
+    public const API_TYPE_NZB = 1;
+    public const API_TYPE_FULL = 2;
 
     /**
      * Priority to send the NZB to SAB.
      */
-    const PRIORITY_PAUSED = -2;
-    const PRIORITY_LOW = -1;
-    const PRIORITY_NORMAL = 0;
-    const PRIORITY_HIGH = 1; // Sab is completely disabled - no user can use it.
-    const PRIORITY_FORCE = 2; // Sab is enabled, 1 remote SAB server for the whole site.
+    public const PRIORITY_PAUSED = -2;
+    public const PRIORITY_LOW = -1;
+    public const PRIORITY_NORMAL = 0;
+    public const PRIORITY_HIGH = 1; // Sab is completely disabled - no user can use it.
+    public const PRIORITY_FORCE = 2; // Sab is enabled, 1 remote SAB server for the whole site.
 
     /**
      * URL to the SAB server.
@@ -85,6 +85,8 @@ class SABnzbd
      */
     protected $serverurl = '';
 
+    private $client;
+
     /**
      * Construct.
      *
@@ -94,7 +96,7 @@ class SABnzbd
      */
     public function __construct(&$page)
     {
-        $this->uid = $page->userdata['id'];
+        $this->uid = $page->users->currentUserId();
         $this->rsstoken = $page->userdata['rsstoken'];
         $this->serverurl = $page->serverurl;
         $this->client = new Client(['verify' => false]);
