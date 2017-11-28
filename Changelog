@@ -1,4 +1,5 @@
 2017-11-28 DariusIII
+	* Chg: Update NZBMultiGroup code style
 	* Chg: Update ReleaseFiles class
 	* Fix: Fix an error in Sabnzbd class when looking for user id
 	* Chg: Update Groups class

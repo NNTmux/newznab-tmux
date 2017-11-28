@@ -30,10 +30,10 @@ class NZBMultiGroup extends NZB
     public function initiateForWrite($groupID)
     {
         $this->_tableNames = [
-			'cName' => 'multigroup_collections',
-			'bName' => 'multigroup_binaries',
-			'pName' => 'multigroup_parts',
-		];
+            'cName' => 'multigroup_collections',
+            'bName' => 'multigroup_binaries',
+            'pName' => 'multigroup_parts',
+        ];
 
         $this->setQueries();
     }
