@@ -69,7 +69,9 @@ class SABnzbd
 
     /**
      * ID of the current user, to send to SAB when downloading a NZB.
-     * @var string
+     *
+     *
+     * @var int|string
      */
     protected $uid = '';
 
