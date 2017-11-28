@@ -192,7 +192,6 @@ class Forum
         return $res === false ? 0 : $res;
     }
 
-
     /**
      * Get range of posts for user.
      *
@@ -209,7 +208,7 @@ class Forum
             ->select(['forumpost.*', 'users.username'])
             ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
             ->orderBy('forumpost.created_at', 'desc');
-        if ($start  !== false) {
+        if ($start !== false) {
             $range->limit($num)->offset($start);
         }
 
