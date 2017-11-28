@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\ParHash;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\ReleaseFile;
@@ -96,17 +97,8 @@ class ReleaseFiles
                 ]
             );
 
-            if (strlen($hash) === 32) {
-                $this->pdo->queryExec(
-                    sprintf(
-                        '
-						INSERT INTO par_hashes
-						(releases_id, hash)
-						VALUES (%d, %s)',
-                        $id,
-                        $this->pdo->escapeString($hash)
-                    )
-                );
+            if (\strlen($hash) === 32) {
+                ParHash::query()->insert(['releases_id' => $id, 'hash' => $hash]);
             }
             $this->sphinxSearch->updateRelease($id, $this->pdo);
         }
