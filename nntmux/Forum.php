@@ -130,7 +130,7 @@ class Forum
     {
         $range = Forumpost::query()
             ->where('forumpost.parentid', '=', 0)
-            ->leftJoin('users', 'users.id', '=', 'forupost.users_id')
+            ->leftJoin('users', 'users.id', '=', 'forumpost.users_id')
             ->leftJoin('user_roles', 'user_roles.id', '=', 'users.user_roles_id')
             ->select(['forumpost.*', 'users.username', 'user_roles.name as rolename'])
             ->orderBy('forumpost.updated_at', 'desc');
