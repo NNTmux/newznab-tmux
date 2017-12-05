@@ -1312,6 +1312,8 @@ CREATE TABLE user_roles (
   isdefault        TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   canpreview       TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   hideads          TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  donation         INT(10) NOT NULL DEFAULT '0',
+  addyears         INT(2) NOT NULL DEFAULT '0',
   PRIMARY KEY (id)
 )
   ENGINE          = InnoDB

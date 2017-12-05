@@ -26,6 +26,8 @@ switch ($page->page) {
     case 'books':
     case 'browse':
     case 'browsegroup':
+    case 'btc_payment':
+    case 'btc_payment_callback':
     case 'cart':
     case 'console':
     case 'consolemodal':
