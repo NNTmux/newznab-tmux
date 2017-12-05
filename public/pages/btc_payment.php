@@ -23,8 +23,9 @@ switch ($action) {
     case 'submit':
         $price = $_POST['price'];
         $role = $_POST['role'];
+        $roleName = $_POST['rolename'];
         $addYears = $_POST['addyears'];
-        $data = ['user_id' => $userId, 'username' => $user->username,'price' => $price, 'role' => $role, 'addyears' => $addYears];
+        $data = ['user_id' => $userId, 'username' => $user->username,'price' => $price, 'role' => $role, 'rolename' => $roleName, 'addyears' => $addYears];
         $keychain_id = random_int(0, 19);
         $callback_data = json_encode($data);
 
