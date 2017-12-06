@@ -1,3 +1,5 @@
+2017-12-06 DariusIII
+	* Chg: Add support for BTC donations through Mycelium Gear
 2017-12-04 DariusIII
 	* Chg: Update mysqltuner.pl to latest version
 	* Chg: Update composer lock file
