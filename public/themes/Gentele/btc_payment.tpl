@@ -21,7 +21,7 @@
 					<input type="hidden" name="role" value="{$donate->id}">
 					<input type="hidden" name="rolename" value="{$donate->name}">
 					<input type="hidden" name="addyears" value="{$donate->addyears}">
-					<input type="submit" class="btn btn-primary" value="Pay by BTC">
+					<input type="submit" class="btn btn-primary" value="Pay with BTC">
 				</td>
 			</form>
 		{/foreach}
