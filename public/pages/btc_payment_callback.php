@@ -1,7 +1,7 @@
 <?php
-use nntmux\libraries\Geary;
 
 use nntmux\Users;
+use nntmux\libraries\Geary;
 
 $gateway_id = env('MYCELIUM_GATEWAY_ID');
 $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');

@@ -9,7 +9,6 @@ if (! $page->users->isLoggedIn()) {
     $page->show403();
 }
 
-
 $gateway_id = env('MYCELIUM_GATEWAY_ID');
 $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');
 
@@ -25,7 +24,7 @@ switch ($action) {
         $role = $_POST['role'];
         $roleName = $_POST['rolename'];
         $addYears = $_POST['addyears'];
-        $data = ['user_id' => $userId, 'username' => $user->username,'price' => $price, 'role' => $role, 'rolename' => $roleName, 'addyears' => $addYears];
+        $data = ['user_id' => $userId, 'username' => $user->username, 'price' => $price, 'role' => $role, 'rolename' => $roleName, 'addyears' => $addYears];
         $keychain_id = random_int(0, 19);
         $callback_data = json_encode($data);
 
@@ -34,8 +33,8 @@ switch ($action) {
 
         if ($order->payment_id) {
             // Redirect to a payment gateway
-            $url = 'https://gateway.gear.mycelium.com/pay/'. $order->payment_id;
-            header('Location: ' . $url);
+            $url = 'https://gateway.gear.mycelium.com/pay/'.$order->payment_id;
+            header('Location: '.$url);
             die();
         }
         break;
@@ -44,7 +43,6 @@ switch ($action) {
         $userId = $page->users->currentUserId();
         break;
 }
-
 
 $page->title = 'Become a supporter';
 $page->meta_title = 'Become a supporter';
