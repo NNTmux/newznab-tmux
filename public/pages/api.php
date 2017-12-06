@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\UserRole;
 use nntmux\http\API;
 use nntmux\Releases;
 use App\Models\Settings;
+use App\Models\UserRole;
 use nntmux\utility\Utility;
 
 // API functions.
