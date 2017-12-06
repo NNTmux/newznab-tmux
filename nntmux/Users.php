@@ -1153,7 +1153,7 @@ class Users
      *
      * @return false|int|string
      */
-    public function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $hideads)
+    public function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $hideads, $donation, $addYear)
     {
         return UserRole::query()->insertGetId(
             [
@@ -1163,6 +1163,8 @@ class Users
                 'defaultinvites' => $defaultinvites,
                 'canpreview' => $canpreview,
                 'hideads' => $hideads,
+                'donation' => $donation,
+                'addyears' => $addYear,
             ]
         );
     }
@@ -1179,7 +1181,7 @@ class Users
      *
      * @return int
      */
-    public function updateRole($id, $name, $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $hideads)
+    public function updateRole($id, $name, $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $hideads, $donation, $addYear)
     {
         if ((int) $isdefault === 1) {
             UserRole::query()->update(['isdefault' => 0]);
@@ -1194,6 +1196,8 @@ class Users
                 'isdefault' => $isdefault,
                 'canpreview' => $canpreview,
                 'hideads' => $hideads,
+                'donation' => $donation,
+                'addyears' => $addYear,
             ]
         );
     }

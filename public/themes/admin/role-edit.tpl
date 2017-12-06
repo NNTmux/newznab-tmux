@@ -53,6 +53,18 @@
 		<div class="hint">Whether ad's are hidden</div>
 	</td>
 </tr>
+	<tr>
+		<td>Donation amount:</td>
+		<td>
+			<input name="donation" type="text" value="{$role.donation}" />
+		</td>
+	</tr>
+	<tr>
+		<td>Years Added:</td>
+		<td>
+			<input name="addyears" type="text" value="{$role.addyears}" />
+		</td>
+	</tr>
 
 {if $role.id != ''}
 <tr>

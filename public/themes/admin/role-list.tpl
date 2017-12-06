@@ -10,6 +10,8 @@
 		<th>invites</th>
 		<th>can preview</th>
 		<th>hide ads</th>
+		<th>donation</th>
+		<th>add years</th>
 		<th>default roles</th>
 		<th>options</th>
 	</tr>
@@ -23,6 +25,8 @@
 		<td>{$role.defaultinvites}</td>
 		<td>{if $role.canpreview == 1}Yes{else}No{/if}</td>
 		<td>{if $role.hideads == 1}Yes{else}No{/if}</td>
+		<td>{$role.donation}</td>
+		<td>{$role.addyears}</td>
 		<td>{if $role.isdefault=="1"}Yes{else}No{/if}</td>
 		<td><a href="{$smarty.const.WWW_TOP}/role-edit.php?id={$role.id}">edit</a>&nbsp;{if $role.id>"3"}<a class="confirm_action" href="{$smarty.const.WWW_TOP}/role-delete.php?id={$role.id}">delete</a>{/if}</td>
 	</tr>
