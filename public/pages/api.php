@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserRole;
 use nntmux\http\API;
 use nntmux\Releases;
 use App\Models\Settings;
@@ -315,7 +316,7 @@ switch ($function) {
         $username = $page->users->generateUsername($_GET['email']);
         $password = $page->users->generatePassword();
         // Register.
-        $userDefault = $page->users->getDefaultRole();
+        $userDefault = UserRole::getDefaultRole();
         $uid = $page->users->signup(
             $username,
             $password,

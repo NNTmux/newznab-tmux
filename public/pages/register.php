@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserRole;
 use nntmux\Users;
 use nntmux\Captcha;
 use App\Models\Settings;
@@ -47,7 +48,7 @@ if ($showRegister === 1) {
                         $error = 'Password Mismatch';
                     } else {
                         // Get the default user role.
-                        $userDefault = $page->users->getDefaultRole();
+                        $userDefault = UserRole::getDefaultRole();
 
                         $ret = $page->users->signup(
                             $userName,

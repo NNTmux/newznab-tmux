@@ -23,7 +23,7 @@ $user = [
 $action = $_REQUEST['action'] ?? 'view';
 
 //get the user roles
-$userRoles = $users->getRoles();
+$userRoles = UserRole::getRoles();
 $roles = [];
 $defaultRole = Users::ROLE_USER;
 $defaultInvites = Users::DEFAULT_INVITES;

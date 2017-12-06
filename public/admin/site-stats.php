@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+use App\Models\UserRole;
 use nntmux\Users;
 use nntmux\Releases;
 
@@ -26,7 +27,7 @@ $page->smarty->assign('recent', $recent);
 $usersbymonth = $users->getUsersByMonth();
 $page->smarty->assign('usersbymonth', $usersbymonth);
 
-$usersbyrole = $users->getUsersByRole();
+$usersbyrole = UserRole::getUsersByRole();
 $page->smarty->assign('usersbyrole', $usersbyrole);
 $page->smarty->assign('totusers', 0);
 $page->smarty->assign('totrusers', 0);

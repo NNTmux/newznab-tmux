@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\UserRole;
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 $page = new AdminPage();
@@ -7,7 +9,7 @@ $page = new AdminPage();
 $page->title = 'User List';
 
 $roles = [];
-foreach ($page->users->getRoles() as $userRole) {
+foreach (UserRole::getRoles() as $userRole) {
     $roles[$userRole['id']] = $userRole['name'];
 }
 

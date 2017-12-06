@@ -2,13 +2,14 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+use App\Models\UserRole;
 use nntmux\Category;
 
 $category = new Category();
 $page = new AdminPage();
 
 // Get the user roles.
-$userRoles = $page->users->getRoles();
+$userRoles = UserRole::getRoles();
 $roles = [];
 foreach ($userRoles as $userRole) {
     $roles[$userRole['id']] = $userRole['name'];
@@ -33,12 +34,12 @@ switch ($_REQUEST['action'] ?? 'view') {
 
 	case 'submit':
 		if ($_POST['id'] === '') {
-		    $role = $page->users->addRole($_POST['name'], $_POST['apirequests'], $_POST['downloadrequests'],
+		    $role = UserRole::addRole($_POST['name'], $_POST['apirequests'], $_POST['downloadrequests'],
 				$_POST['defaultinvites'], $_POST['canpreview'], $_POST['hideads'], $_POST['donation'], $_POST['addyears']
 			);
 		    header('Location:'.WWW_TOP.'/role-list.php');
 		} else {
-		    $role = $page->users->updateRole($_POST['id'], $_POST['name'], $_POST['apirequests'],
+		    $role = UserRole::updateRole($_POST['id'], $_POST['name'], $_POST['apirequests'],
 				$_POST['downloadrequests'], $_POST['defaultinvites'], $_POST['isdefault'], $_POST['canpreview'], $_POST['hideads'], $_POST['donation'], $_POST['addyears']
 			);
 		    header('Location:'.WWW_TOP.'/role-list.php');
@@ -53,7 +54,7 @@ switch ($_REQUEST['action'] ?? 'view') {
 	default:
 		if (isset($_GET['id'])) {
 		    $page->title = 'User Roles Edit';
-		    $role = $page->users->getRoleById($_GET['id']);
+		    $role = UserRole::getRoleById($_GET['id']);
 		    $page->smarty->assign('role', $role);
 		    $page->smarty->assign('roleexccat', $page->users->getRoleCategoryExclusion($_GET['id']));
 		}
