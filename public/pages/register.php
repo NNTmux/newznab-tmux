@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\UserRole;
 use nntmux\Users;
 use nntmux\Captcha;
 use App\Models\Settings;
+use App\Models\UserRole;
 use nntmux\utility\Utility;
 
 if ($page->users->isLoggedIn()) {
