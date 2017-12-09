@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\UserRequest;
 use nntmux\http\API;
 use nntmux\Releases;
 use App\Models\Settings;
 use App\Models\UserRole;
+use App\Models\UserRequest;
 use nntmux\utility\Utility;
 
 // API functions.

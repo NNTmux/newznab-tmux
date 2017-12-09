@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\UserRequest;
 use nntmux\Category;
 use nntmux\http\RSS;
 use App\Models\Settings;
+use App\Models\UserRequest;
 use nntmux\utility\Utility;
 
 $category = new Category(['Settings' => $page->settings]);

@@ -4,8 +4,8 @@ if (! $page->users->isLoggedIn()) {
     $page->show403();
 }
 
-use App\Models\UsersRelease;
 use nntmux\Releases;
+use App\Models\UsersRelease;
 
 if (isset($_GET['add'])) {
     $releases = new Releases(['Settings' => $page->settings]);
@@ -27,7 +27,7 @@ if (isset($_GET['add'])) {
     }
 
     if ($ids !== null) {
-       UsersRelease::delCartByGuid($ids, $page->users->currentUserId());
+        UsersRelease::delCartByGuid($ids, $page->users->currentUserId());
     }
 
     if (! isset($_POST['delete'])) {

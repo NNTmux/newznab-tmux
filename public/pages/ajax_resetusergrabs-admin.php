@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\UserRequest;
 use nntmux\Users;
+use App\Models\UserRequest;
 
 $page = new AdminPage();
 $u = new Users();

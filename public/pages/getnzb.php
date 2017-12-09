@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\UsersRelease;
 use nntmux\NZB;
 use nntmux\Releases;
 use App\Models\Settings;
 use nntmux\utility\Utility;
+use App\Models\UsersRelease;
 
 $uid = 0;
 
