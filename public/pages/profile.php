@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserRequest;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\Settings;
@@ -51,7 +52,7 @@ if (! isset($data['style']) || $data['style'] === 'None') {
 $offset = $_REQUEST['offset'] ?? 0;
 $page->smarty->assign(
     [
-        'apirequests'       => $page->users->getApiRequests($userID),
+        'apirequests'       => UserRequest::getApiRequests($userID),
         'grabstoday'        => $page->users->getDownloadRequests($userID),
         'userinvitedby'     => $data['invitedby'] !== '' ? $page->users->getById($data['invitedby']) : '',
         'user'              => $data,

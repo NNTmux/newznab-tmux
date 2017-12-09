@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UsersRelease;
 use nntmux\NZB;
 use nntmux\Releases;
 use App\Models\Settings;
@@ -77,7 +78,7 @@ if (isset($_GET['zip']) && $_GET['zip'] === '1') {
             $page->users->addDownloadRequest($uid, $guid);
 
             if (isset($_GET['del']) && (int) $_GET['del'] === 1) {
-                $page->users->delCartByUserAndRelease($guid, $uid);
+                UsersRelease::delCartByUserAndRelease($guid, $uid);
             }
         }
 
@@ -100,7 +101,7 @@ if ($relData) {
     $page->users->addDownloadRequest($uid, $relData['id']);
     $page->users->incrementGrabs($uid);
     if (isset($_GET['del']) && (int) $_GET['del'] === 1) {
-        $page->users->delCartByUserAndRelease($_GET['id'], $uid);
+        UsersRelease::delCartByUserAndRelease($_GET['id'], $uid);
     }
 } else {
     Utility::showApiError(300, 'Release not found!');

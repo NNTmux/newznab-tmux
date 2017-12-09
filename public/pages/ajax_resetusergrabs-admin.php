@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserRequest;
 use nntmux\Users;
 
 $page = new AdminPage();
@@ -13,7 +14,7 @@ switch ($action) {
 		$u->delDownloadRequests($id);
 	break;
 	case 'api':
-		$u->delApiRequests($id);
+		UserRequest::delApiRequests($id);
 	break;
 	default:
 		$page->show404();

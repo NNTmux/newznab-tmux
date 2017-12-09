@@ -4,6 +4,7 @@ if (! $page->users->isLoggedIn()) {
     $page->show403();
 }
 
+use App\Models\UsersRelease;
 use nntmux\Releases;
 
 if (isset($_GET['add'])) {
@@ -16,7 +17,7 @@ if (isset($_GET['add'])) {
     }
 
     foreach ($data as $d) {
-        $page->users->addCart($page->users->currentUserId(), $d['id']);
+        UsersRelease::addCart($page->users->currentUserId(), $d['id']);
     }
 } elseif (isset($_REQUEST['delete'])) {
     if (isset($_GET['delete']) && ! empty($_GET['delete'])) {
@@ -26,7 +27,7 @@ if (isset($_GET['add'])) {
     }
 
     if ($ids !== null) {
-        $page->users->delCartByGuid($ids, $page->users->currentUserId());
+       UsersRelease::delCartByGuid($ids, $page->users->currentUserId());
     }
 
     if (! isset($_POST['delete'])) {
@@ -39,7 +40,7 @@ if (isset($_GET['add'])) {
     $page->meta_keywords = 'search,add,to,cart,download,basket,nzb,description,details';
     $page->meta_description = 'Manage Your Download Basket';
 
-    $results = $page->users->getCart($page->users->currentUserId());
+    $results = UsersRelease::getCart($page->users->currentUserId());
     $page->smarty->assign('results', $results);
 
     $page->content = $page->smarty->fetch('cart.tpl');

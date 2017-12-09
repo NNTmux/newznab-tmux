@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserRequest;
 use nntmux\http\API;
 use nntmux\Releases;
 use App\Models\Settings;
@@ -80,7 +81,7 @@ if ($function !== 'c' && $function !== 'r') {
 // Record user access to the api, if its been called by a user (i.e. capabilities request do not require a user to be logged in or key provided).
 if ($uid !== '') {
     $page->users->updateApiAccessed($uid);
-    $apiRequests = $page->users->getApiRequests($uid);
+    $apiRequests = UserRequest::getApiRequests($uid);
     if ($apiRequests > $maxRequests) {
         Utility::showApiError(500, 'Request limit reached ('.$apiRequests.'/'.$maxRequests.')');
     }
@@ -106,7 +107,7 @@ switch ($function) {
         $api->verifyEmptyParameter('q');
         $maxAge = $api->maxAge();
         $groupName = $api->group();
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
         $categoryID = $api->categoryID();
         $limit = $api->limit();
 
@@ -159,7 +160,7 @@ switch ($function) {
         $api->verifyEmptyParameter('season');
         $api->verifyEmptyParameter('ep');
         $maxAge = $api->maxAge();
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
         $siteIdArr = [
             'id'     => $_GET['vid'] ?? '0',
@@ -202,7 +203,7 @@ switch ($function) {
         $api->verifyEmptyParameter('q');
         $api->verifyEmptyParameter('imdbid');
         $maxAge = $api->maxAge();
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
         $imdbId = ($_GET['imdbid'] ?? '-1');
 
@@ -230,7 +231,7 @@ switch ($function) {
     // Get NZB.
     case 'g':
         $api->verifyEmptyParameter('g');
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
         $relData = $releases->getByGuid($_GET['id']);
         if ($relData) {
             header(
@@ -255,7 +256,7 @@ switch ($function) {
             Utility::showApiError(200, 'Missing parameter (id is required for single release details)');
         }
 
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
         $data = $releases->getByGuid($_GET['id']);
 
         $relData = [];
@@ -271,7 +272,7 @@ switch ($function) {
             Utility::showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
         }
 
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
         $rel = $releases->getByGuid($_GET['id']);
         $data = $releases->getReleaseNfo($rel['id']);
 

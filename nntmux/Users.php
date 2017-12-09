@@ -116,10 +116,10 @@ class Users
      */
     public function delete($id): void
     {
-        $this->delCartForUser($id);
+        UsersRelease::delCartForUser($id);
         $this->delUserCategoryExclusions($id);
         $this->delDownloadRequests($id);
-        $this->delApiRequests($id);
+        UserRequest::delApiRequests($id);
 
         $rc = new ReleaseComments();
         $rc->deleteCommentsForUser($id);
@@ -139,14 +139,6 @@ class Users
     /**
      * @param $uid
      */
-    public function delCartForUser($uid): void
-    {
-        UsersRelease::query()->where('users_id', $uid)->delete();
-    }
-
-    /**
-     * @param $uid
-     */
     public function delUserCategoryExclusions($uid): void
     {
         UserExcludedCategory::query()->where('users_id', $uid)->delete();
@@ -158,14 +150,6 @@ class Users
     public function delDownloadRequests($userID): void
     {
         UserDownload::query()->where('users_id', $userID)->delete();
-    }
-
-    /**
-     * @param $userID
-     */
-    public function delApiRequests($userID): void
-    {
-        UserRequest::query()->where('users_id', $userID)->delete();
     }
 
     /**
@@ -181,7 +165,7 @@ class Users
      */
     public function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '')
     {
-        $this->clearApiRequests(false);
+        UserRequest::clearApiRequests(false);
 
         $order = $this->getBrowseOrder($orderBy);
 
@@ -889,72 +873,7 @@ class Users
         User::query()->where('id', $uid)->update(['apiaccess' => date('Y-m-d h:m:s')]);
     }
 
-    /**
-     * @param $uid
-     * @param $releaseid
-     * @return int
-     */
-    public function addCart($uid, $releaseid): int
-    {
-        return UsersRelease::query()->insertGetId(
-            [
-                'users_id' => $uid,
-                'releases_id' => $releaseid,
-                'created_at' => Carbon::now(),
-            ]
-        );
-    }
 
-    /**
-     * @param $uid
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
-     */
-    public function getCart($uid)
-    {
-        return UsersRelease::query()->with('release')->where(['users_id' => $uid])->get();
-    }
-
-    /**
-     * @param $guids
-     * @param $userID
-     * @return bool|mixed
-     */
-    public function delCartByGuid($guids, $userID)
-    {
-        if (! is_array($guids)) {
-            return false;
-        }
-
-        $del = [];
-        foreach ($guids as $guid) {
-            $rel = Release::query()->where('guid', $guid)->first(['id']);
-            if ($rel !== null) {
-                $del[] = $rel['id'];
-            }
-        }
-
-        return UsersRelease::query()->whereIn('releases_id', $del)->where('users_id', $userID)->delete();
-    }
-
-    /**
-     * @param $guid
-     * @param $uid
-     */
-    public function delCartByUserAndRelease($guid, $uid): void
-    {
-        $rel = Release::query()->where('guid', $guid)->first(['id']);
-        if ($rel) {
-            UsersRelease::query()->where(['users_id' => $uid, 'releases_id' => $rel['id']])->delete();
-        }
-    }
-
-    /**
-     * @param $rid
-     */
-    public function delCartForRelease($rid): void
-    {
-        UsersRelease::query()->where('releases_id', $rid)->delete();
-    }
 
     /**
      * @param       $uid
@@ -1116,52 +1035,11 @@ class Users
         return self::hashSHA1($siteseed.$host.$siteseed);
     }
 
-    /**
-     * Get the quantity of API requests in the last day for the users_id.
-     *
-     * @param int $userID
-     *
-     * @return int
-     * @throws \Exception
-     */
-    public function getApiRequests($userID): int
-    {
-        // Clear old requests.
-        $this->clearApiRequests($userID);
-        $requests = UserRequest::query()->where('users_id', $userID)->count('id');
 
-        return ! $requests ? 0 : $requests;
-    }
 
-    /**
-     * If a user accesses the API, log it.
-     *
-     * @param int    $userID  ID of the user.
-     * @param string $request The API request.
-     */
-    public function addApiRequest($userID, $request): void
-    {
-        UserRequest::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp'=> Carbon::now()]);
-    }
 
-    /**
-     * Delete api requests older than a day.
-     *
-     * @param int|bool $userID
-     *                   int The users ID.
-     *                   bool false do all user ID's..
-     *
-     * @return void
-     * @throws \Exception
-     */
-    protected function clearApiRequests($userID): void
-    {
-        if ($userID === false) {
-            UserRequest::query()->where('timestamp', '<', Carbon::now()->subDay())->delete();
-        } else {
-            UserRequest::query()->where('users_id', $userID)->where('timestamp', '<', Carbon::now()->subDay())->delete();
-        }
-    }
+
+
 
     /**
      * deletes old rows FROM the user_requests and user_downloads tables.

@@ -1,4 +1,6 @@
-2017-15-08 DariusIII
+2017-12-09 DariusIII
+	* Chg: Move some of the functions to their related models
+2017-12-08 DariusIII
 	* Chg: Update laravel/framework and simfony components to latest versions
 2017-12-07 DariusIII
 	* Chg: Move users role related functions from Users class To UserRole model

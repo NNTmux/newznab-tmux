@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserRequest;
 use nntmux\Category;
 use nntmux\http\RSS;
 use App\Models\Settings;
@@ -81,10 +82,10 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
         }
     }
 
-    if ($page->users->getApiRequests($uid) > $maxRequests) {
+    if (UserRequest::getApiRequests($uid) > $maxRequests) {
         Utility::showApiError(500, 'You have reached your daily limit for API requests!');
     } else {
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
     }
 
     // Valid or logged in user, get them the requested feed.
