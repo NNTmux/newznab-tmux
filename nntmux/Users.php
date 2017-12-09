@@ -873,8 +873,6 @@ class Users
         User::query()->where('id', $uid)->update(['apiaccess' => date('Y-m-d h:m:s')]);
     }
 
-
-
     /**
      * @param       $uid
      * @param array $catids
@@ -1034,12 +1032,6 @@ class Users
 
         return self::hashSHA1($siteseed.$host.$siteseed);
     }
-
-
-
-
-
-
 
     /**
      * deletes old rows FROM the user_requests and user_downloads tables.

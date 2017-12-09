@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\UserRequest;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\Settings;
+use App\Models\UserRequest;
 use nntmux\ReleaseComments;
 
 if (! $page->users->isLoggedIn()) {
