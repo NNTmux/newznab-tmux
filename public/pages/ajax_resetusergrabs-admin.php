@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\UserDownload;
 use nntmux\Users;
 use App\Models\UserRequest;
+use App\Models\UserDownload;
 
 $page = new AdminPage();
 $u = new Users();

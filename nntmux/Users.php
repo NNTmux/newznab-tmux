@@ -1044,8 +1044,6 @@ class Users
         UserDownload::query()->where('timestamp', '<', Carbon::now()->subDays($days))->delete();
     }
 
-
-
     /**
      * Checks if a user is a specific role.
      *

@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\UserDownload;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\Settings;
 use App\Models\UserRequest;
 use nntmux\ReleaseComments;
+use App\Models\UserDownload;
 
 if (! $page->users->isLoggedIn()) {
     $page->show403();
