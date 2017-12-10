@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserDownload;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\Settings;
@@ -36,7 +37,7 @@ if ($privileged || ! $privateProfiles) {
     }
 }
 
-$downloadlist = $page->users->getDownloadRequestsForUser($userID);
+$downloadlist = UserDownload::getDownloadRequestsForUser($userID);
 $page->smarty->assign('downloadlist', $downloadlist);
 
 $data = $page->users->getById($userID);
@@ -53,7 +54,7 @@ $offset = $_REQUEST['offset'] ?? 0;
 $page->smarty->assign(
     [
         'apirequests'       => UserRequest::getApiRequests($userID),
-        'grabstoday'        => $page->users->getDownloadRequests($userID),
+        'grabstoday'        => UserDownload::getDownloadRequests($userID),
         'userinvitedby'     => $data['invitedby'] !== '' ? $page->users->getById($data['invitedby']) : '',
         'user'              => $data,
         'privateprofiles'   => $privateProfiles,

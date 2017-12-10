@@ -118,7 +118,7 @@ class Users
     {
         UsersRelease::delCartForUser($id);
         $this->delUserCategoryExclusions($id);
-        $this->delDownloadRequests($id);
+        UserDownload::delDownloadRequests($id);
         UserRequest::delApiRequests($id);
 
         $rc = new ReleaseComments();
@@ -142,14 +142,6 @@ class Users
     public function delUserCategoryExclusions($uid): void
     {
         UserExcludedCategory::query()->where('users_id', $uid)->delete();
-    }
-
-    /**
-     * @param $userID
-     */
-    public function delDownloadRequests($userID): void
-    {
-        UserDownload::query()->where('users_id', $userID)->delete();
     }
 
     /**
@@ -1052,60 +1044,7 @@ class Users
         UserDownload::query()->where('timestamp', '<', Carbon::now()->subDays($days))->delete();
     }
 
-    /**
-     * Get the COUNT of how many NZB's the user has downloaded in the past day.
-     *
-     * @param int $userID
-     *
-     * @return int
-     */
-    public function getDownloadRequests($userID): int
-    {
-        // Clear old requests.
-        UserDownload::query()->where('users_id', $userID)->where('timestamp', '<', Carbon::now()->subDay())->delete();
-        $value = UserDownload::query()->where('users_id', $userID)->where('timestamp', '>', Carbon::now()->subDay())->count('id');
 
-        return $value === false ? 0 : $value;
-    }
-
-    /**
-     * @param $userID
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
-     */
-    public function getDownloadRequestsForUser($userID)
-    {
-        return UserDownload::query()->where('users_id', $userID)->with('release')->orderBy('timestamp', 'DESC')->get();
-    }
-
-    /**
-     * If a user downloads a NZB, log it.
-     *
-     * @param int $userID id of the user.
-     *
-     * @param     $releaseID
-     *
-     * @return bool|int
-     */
-    public function addDownloadRequest($userID, $releaseID)
-    {
-        return UserDownload::query()
-            ->insertGetId(
-                [
-                    'users_id' => $userID,
-                    'releases_id' => $releaseID,
-                    'timestamp' => Carbon::now(),
-                ]
-            );
-    }
-
-    /**
-     * @param int $releaseID
-     * @return mixed
-     */
-    public function delDownloadRequestsForRelease(int $releaseID)
-    {
-        return UserDownload::query()->where('releases_id', $releaseID)->delete();
-    }
 
     /**
      * Checks if a user is a specific role.

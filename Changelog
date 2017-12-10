@@ -1,3 +1,5 @@
+2017-12-10 DariusIII
+	* Chg: Move download related functions to UserDownload model from Users class
 2017-12-09 DariusIII
 	* Chg: Move some of the functions to their related models
 2017-12-08 DariusIII

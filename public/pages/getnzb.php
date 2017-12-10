@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserDownload;
 use nntmux\NZB;
 use nntmux\Releases;
 use App\Models\Settings;
@@ -50,7 +51,7 @@ if ((int) Settings::settingValue('..storeuserips') === 1) {
 }
 
 // Check download limit on user role.
-$requests = $page->users->getDownloadRequests($uid);
+$requests = UserDownload::getDownloadRequests($uid);
 if ($requests > $maxDownloads) {
     Utility::showApiError(501);
 }
@@ -75,7 +76,7 @@ if (isset($_GET['zip']) && $_GET['zip'] === '1') {
         $page->users->incrementGrabs($uid, count($guids));
         foreach ($guids as $guid) {
             $rel->updateGrab($guid);
-            $page->users->addDownloadRequest($uid, $guid);
+            UserDownload::addDownloadRequest($uid, $guid);
 
             if (isset($_GET['del']) && (int) $_GET['del'] === 1) {
                 UsersRelease::delCartByUserAndRelease($guid, $uid);
@@ -98,7 +99,7 @@ if (! file_exists($nzbPath)) {
 $relData = $rel->getByGuid($_GET['id']);
 if ($relData) {
     $rel->updateGrab($_GET['id']);
-    $page->users->addDownloadRequest($uid, $relData['id']);
+    UserDownload::addDownloadRequest($uid, $relData['id']);
     $page->users->incrementGrabs($uid);
     if (isset($_GET['del']) && (int) $_GET['del'] === 1) {
         UsersRelease::delCartByUserAndRelease($_GET['id'], $uid);
