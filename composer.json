@@ -130,6 +130,7 @@
     "fxp/composer-asset-plugin": "~1.1",
     "google/recaptcha": "~1.1",
     "guzzlehttp/guzzle": "^6.3",
+    "intervention/image": "^2.4",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
     "laravel/framework": "^5.5",
