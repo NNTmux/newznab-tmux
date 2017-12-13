@@ -1,3 +1,5 @@
+2017-12-13 DariusIII
+	* Chg: Update laravel/framework and rest of the libraries to their latest versions
 2017-12-10 DariusIII
 	* Chg: Move download related functions to UserDownload model from Users class
 2017-12-09 DariusIII
