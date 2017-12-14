@@ -2,11 +2,11 @@
 
 namespace nntmux;
 
+use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\ImageException;
 use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Exception\NotWritableException;
-use Intervention\Image\ImageManager;
 
 /**
  * Resize/save/delete images to disk.
