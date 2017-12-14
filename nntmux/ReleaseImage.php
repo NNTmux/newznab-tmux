@@ -3,10 +3,10 @@
 namespace nntmux;
 
 use GuzzleHttp\Client;
+use Intervention\Image\Image;
 use Intervention\Image\Exception\ImageException;
 use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Exception\NotWritableException;
-use Intervention\Image\Image;
 
 /**
  * Resize/save/delete images to disk.
@@ -87,7 +87,7 @@ class ReleaseImage
     protected function fetchImage($imgLoc)
     {
         try {
-            $img =  (new Image)->make($imgLoc);
+            $img = (new Image)->make($imgLoc);
         } catch (NotReadableException $e) {
             if ($e->getCode() === 404) {
                 ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
