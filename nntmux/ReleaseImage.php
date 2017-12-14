@@ -2,7 +2,7 @@
 
 namespace nntmux;
 
-use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Image;
 use Intervention\Image\Exception\ImageException;
 use Intervention\Image\Exception\NotReadableException;
@@ -51,33 +51,15 @@ class ReleaseImage
     public $vidSavePath;
 
     /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
      * ReleaseImage constructor.
      */
     public function __construct()
     {
-        $this->client = new Client();
-        // Creates the NN_COVERS constant
-        //                                                       Table    |  Column
-        $this->audSavePath = NN_COVERS.'audiosample'.DS; // releases    guid
-        $this->imgSavePath = NN_COVERS.'preview'.DS; // releases    guid
-        $this->jpgSavePath = NN_COVERS.'sample'.DS; // releases    guid
-        $this->movieImgSavePath = NN_COVERS.'movies'.DS; // releases    imdbid
-        $this->vidSavePath = NN_COVERS.'video'.DS; // releases    guid
-
-        /* For reference. *
-        $this->anidbImgPath   = NN_COVERS . 'anime'       . DS; // anidb       anidbid | used in populate_anidb.php, not anidb.php
-        $this->bookImgPath    = NN_COVERS . 'book'        . DS; // bookinfo    id
-        $this->consoleImgPath = NN_COVERS . 'console'     . DS; // consoleinfo id
-        $this->musicImgPath   = NN_COVERS . 'music'       . DS; // musicinfo   id
-        $this->tvRageImgPath  = NN_COVERS . 'tvrage'      . DS; // tvrage      id (not rageid)
-
-        $this->audioImgPath   = NN_COVERS . 'audio'       . DS; // unused folder, music folder already exists.
-        **/
+        $this->audSavePath = NN_COVERS.'audiosample'.DS;
+        $this->imgSavePath = NN_COVERS.'preview'.DS;
+        $this->jpgSavePath = NN_COVERS.'sample'.DS;
+        $this->movieImgSavePath = NN_COVERS.'movies'.DS;
+        $this->vidSavePath = NN_COVERS.'video'.DS;
     }
 
     /**
@@ -165,20 +147,10 @@ class ReleaseImage
      *
      * @return void
      */
-    public function delete($guid)
+    public function delete($guid): void
     {
         $thumb = $guid.'_thumb.jpg';
 
-        // Audiosample folder.
-        @unlink($this->audSavePath.$guid.'.ogg');
-
-        // Preview folder.
-        @unlink($this->imgSavePath.$thumb);
-
-        // Sample folder.
-        @unlink($this->jpgSavePath.$thumb);
-
-        // Video folder.
-        @unlink($this->vidSavePath.$guid.'.ogv');
+        Storage::delete($this->audSavePath.$guid.'.ogg', $this->imgSavePath.$thumb, $this->jpgSavePath.$thumb, $this->vidSavePath.$guid.'.ogv');
     }
 }
