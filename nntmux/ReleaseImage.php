@@ -2,11 +2,11 @@
 
 namespace nntmux;
 
-use Intervention\Image\Image;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\ImageException;
 use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Exception\NotWritableException;
+use Intervention\Image\ImageManager;
 
 /**
  * Resize/save/delete images to disk.
@@ -69,7 +69,7 @@ class ReleaseImage
     protected function fetchImage($imgLoc)
     {
         try {
-            $img = (new Image)->make($imgLoc);
+            $img = (new ImageManager())->make($imgLoc);
         } catch (NotReadableException $e) {
             if ($e->getCode() === 404) {
                 ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
