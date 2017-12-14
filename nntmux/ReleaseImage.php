@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Image;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\ImageException;
 use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Exception\NotWritableException;
