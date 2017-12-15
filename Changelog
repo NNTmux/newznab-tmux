@@ -1,4 +1,5 @@
 2017-12-15 DariusIII
+	* Chg: Update TVDB class
 	* Chg: Update TVmaze class again
 	* Chg: Optimize TVMaze class
 	* Chg: Update XXX class, remove debugging as laravel is handling it now
