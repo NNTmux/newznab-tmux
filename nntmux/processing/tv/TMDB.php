@@ -95,7 +95,7 @@ class TMDB extends TV
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TMDB);
 
-        $tvcount = $res->rowCount();
+        $tvcount = \count($res);
         $lookupSetting = true;
 
         if ($this->echooutput && $tvcount > 0) {

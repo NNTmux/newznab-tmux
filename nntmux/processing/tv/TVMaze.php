@@ -64,7 +64,7 @@ class TVMaze extends TV
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVMAZE);
 
-        $tvCount = $res->rowCount();
+        $tvCount = \count($res);
 
         if ($this->echooutput && $tvCount > 0) {
             echo ColorCLI::header('Processing TVMaze lookup for '.number_format($tvCount).' release(s).');

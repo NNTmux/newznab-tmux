@@ -1,4 +1,5 @@
 2017-12-15 DariusIII
+	* Chg: Use count instead of rowCount in TV related classes
 	* Chg: Update mysql-ddl, TV class and related models
 	* Chg: Update TVDB class
 	* Chg: Update TVmaze class again
