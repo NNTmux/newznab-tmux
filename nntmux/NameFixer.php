@@ -1650,10 +1650,6 @@ class NameFixer
         }
     }
 
-    /*
-     * Just for NFOS.
-     */
-
     /**
      * TV.
      *
