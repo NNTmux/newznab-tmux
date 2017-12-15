@@ -87,7 +87,7 @@ class TVDB extends TV
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVDB);
 
-        $tvCount = $res->rowCount();
+        $tvCount = \count($res);
 
         if ($this->echooutput && $tvCount > 0) {
             echo ColorCLI::header('Processing TVDB lookup for '.number_format($tvCount).' release(s).');
