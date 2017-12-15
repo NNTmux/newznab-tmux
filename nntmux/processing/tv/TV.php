@@ -2,13 +2,13 @@
 
 namespace nntmux\processing\tv;
 
-use App\Models\Release;
-use App\Models\TvEpisode;
-use App\Models\TvInfo;
-use App\Models\Video;
 use nntmux\Category;
 use nntmux\ColorCLI;
+use App\Models\Video;
+use App\Models\TvInfo;
+use App\Models\Release;
 use App\Models\Settings;
+use App\Models\TvEpisode;
 use nntmux\utility\Country;
 use nntmux\utility\Utility;
 use nntmux\processing\Videos;
@@ -135,7 +135,7 @@ abstract class TV extends Videos
     abstract protected function formatEpisodeInfo($episode): array;
 
     /**
-     * Retrieve releases for TV processing
+     * Retrieve releases for TV processing.
      *
      *
      * @param string $groupID
@@ -285,7 +285,7 @@ abstract class TV extends Videos
                     'se_complete' => $episode['se_complete'],
                     'title' => $episode['title'],
                     'firstaired' => $episode['firstaired'] !== '' ? $episode['firstaired'] : null,
-                    'summary' => $episode['summary']
+                    'summary' => $episode['summary'],
                 ],
                 ['se_complete'=> $episode['se_complete']]
             );
@@ -442,7 +442,7 @@ abstract class TV extends Videos
         $count = TvEpisode::query()
             ->where('videos_id', $videoId)->count(['id']);
 
-        return ($count !== null && $count > 0);
+        return $count !== null && $count > 0;
     }
 
     /**
