@@ -277,7 +277,7 @@ abstract class TV extends Videos
         $episodeId = $this->getBySeasonEp($videoId, $episode['series'], $episode['episode'], $episode['firstaired']);
 
         if ($episodeId === false) {
-            $episodeId = TvEpisode::insertOnDuplicateKey(
+            $episodeId = TvEpisode::insertIgnore(
                 [
                     'videos_id' => $videoId,
                     'series' => $episode['series'],
@@ -286,8 +286,7 @@ abstract class TV extends Videos
                     'title' => $episode['title'],
                     'firstaired' => $episode['firstaired'] !== '' ? $episode['firstaired'] : null,
                     'summary' => $episode['summary'],
-                ],
-                ['se_complete'=> $episode['se_complete']]
+                ]
             );
         }
 
