@@ -14,7 +14,7 @@ class ReleaseRemover
     /**
      * @const New line.
      */
-    const N = PHP_EOL;
+    private const N = PHP_EOL;
 
     /**
      * @var string
@@ -29,7 +29,7 @@ class ReleaseRemover
     protected $browser;
 
     /**
-     * @var ConsoleTools
+     * @var \nntmux\ConsoleTools
      */
     protected $consoleTools;
 
@@ -73,7 +73,7 @@ class ReleaseRemover
     protected $method = '';
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     protected $pdo;
 
@@ -85,7 +85,7 @@ class ReleaseRemover
     protected $query;
 
     /**
-     * @var Releases
+     * @var \nntmux\Releases
      */
     protected $releases;
 
@@ -104,9 +104,14 @@ class ReleaseRemover
     protected $timeStart;
 
     /**
-     * @var NZB
+     * @var \nntmux\NZB
      */
     private $nzb;
+
+    /**
+     * @var \nntmux\ReleaseImage
+     */
+    private $releaseImage;
 
     /**
      * Construct.
@@ -724,7 +729,7 @@ class ReleaseRemover
             )
         );
 
-        if (count($regexList) > 0) {
+        if (\count($regexList) > 0) {
             foreach ($regexList as $regex) {
                 $regexSQL = $ftMatch = $regexMatch = $opTypeName = '';
                 $dbRegex = $this->pdo->escapeString($regex['regex']);
@@ -766,7 +771,7 @@ class ReleaseRemover
                         $this->pdo->escapeString($regex['groupname'])
                     );
 
-                    $groupIDCount = count($groupIDs);
+                    $groupIDCount = \count($groupIDs);
                     if ($groupIDCount === 0) {
                         continue;
                     } elseif ($groupIDCount === 1) {
@@ -853,7 +858,7 @@ class ReleaseRemover
             )
         );
 
-        if (count($allRegex) > 0) {
+        if (\count($allRegex) > 0) {
             foreach ($allRegex as $regex) {
                 $dbRegex = $this->pdo->escapeString($regex['regex']);
 
@@ -874,7 +879,7 @@ class ReleaseRemover
                         'SELECT id FROM groups WHERE name REGEXP '.
                         $this->pdo->escapeString($regex['groupname'])
                     );
-                    $groupIDCount = count($groupIDs);
+                    $groupIDCount = \count($groupIDs);
                     if ($groupIDCount === 0) {
                         continue;
                     } elseif ($groupIDCount === 1) {
@@ -1043,7 +1048,7 @@ class ReleaseRemover
     {
         // Run the query, check if it picked up anything.
         $result = $this->pdo->query($this->cleanSpaces($this->query));
-        if (count($result) <= 0) {
+        if (\count($result) <= 0) {
             $this->error = '';
             if ($this->method === 'userCriteria') {
                 $this->error = 'No releases were found to delete, try changing your criteria.';
@@ -1074,7 +1079,7 @@ class ReleaseRemover
 
         $this->error = 'Invalid argument supplied: '.$argument.self::N;
         $args = explode('=', $argument);
-        if (count($args) === 3) {
+        if (\count($args) === 3) {
             $args[0] = $this->cleanSpaces($args[0]);
             $args[1] = $this->cleanSpaces($args[1]);
             $args[2] = $this->cleanSpaces($args[2]);
@@ -1135,7 +1140,7 @@ class ReleaseRemover
                             return ' AND groups_id = '.$group['id'];
                         case 'like':
                             $groups = $this->pdo->query('SELECT id FROM groups WHERE name '.$this->formatLike($args[2], 'name'));
-                            if (count($groups) === 0) {
+                            if (\count($groups) === 0) {
                                 $this->error = 'No groups were found with this pattern in your database: '.$args[2].PHP_EOL;
                                 break;
                             }
@@ -1281,7 +1286,7 @@ class ReleaseRemover
     protected function formatLike($string, $type)
     {
         $newString = explode(' ', $string);
-        if (count($newString) > 1) {
+        if (\count($newString) > 1) {
             $string = implode("%' AND {$type} LIKE '%", array_unique($newString));
         }
 
