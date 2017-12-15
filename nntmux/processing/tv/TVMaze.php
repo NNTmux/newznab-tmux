@@ -267,6 +267,7 @@ class TVMaze extends TV
     {
         $return = false;
         $highestMatch = 0;
+        $highest = null;
 
         foreach ($shows as $show) {
             if ($this->checkRequiredAttr($show, 'tvmazeS')) {
@@ -333,17 +334,17 @@ class TVMaze extends TV
      * @param int $tvMazeId
      * @param int $season
      * @param int $episode
-     * @param string  $airdate
+     * @param string  $airDate
      * @param int $videoId
      *
      * @return array|false
      */
-    protected function getEpisodeInfo($tvMazeId, $season, $episode, $airdate = '', $videoId = 0)
+    protected function getEpisodeInfo($tvMazeId, $season, $episode, $airDate = '', $videoId = 0)
     {
         $return = $response = false;
 
-        if ($airdate !== '') {
-            $response = $this->client->getEpisodesByAirdate($tvMazeId, $airdate);
+        if ($airDate !== '') {
+            $response = $this->client->getEpisodesByAirdate($tvMazeId, $airDate);
         } elseif ($videoId > 0) {
             $response = $this->client->getEpisodesByShowID($tvMazeId);
         } else {
@@ -362,7 +363,7 @@ class TVMaze extends TV
             foreach ($response as $singleEpisode) {
                 if ($this->checkRequiredAttr($singleEpisode, 'tvmazeE')) {
                     // If this is an airdate lookup and it matches the airdate, set a return
-                    if ($airdate !== '' && $airdate === $singleEpisode->airdate) {
+                    if ($airDate !== '' && $airDate === $singleEpisode->airdate) {
                         $return = $this->formatEpisodeInfo($singleEpisode);
                     } else {
                         // Insert the episode
