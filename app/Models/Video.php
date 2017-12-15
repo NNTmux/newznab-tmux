@@ -6,5 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Video extends Model
 {
-    //
+    /**
+     * @var bool
+     */
+    protected $dateFormat = false;
+
+    /**
+     * @var array
+     */
+    protected $guarded = [];
+
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
 }

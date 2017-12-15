@@ -300,7 +300,7 @@ CREATE TABLE countries (
   UNIQUE KEY code3 (iso3),
   UNIQUE KEY country (country)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC;
@@ -366,7 +366,7 @@ CREATE TABLE gamesinfo (
   INDEX         ix_title (title),
   FULLTEXT INDEX ix_title_ft (title)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -872,7 +872,7 @@ CREATE TABLE release_unique (
   uniqueid BINARY(16)  NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' COMMENT 'Unique_ID from mediainfo.',
   PRIMARY KEY (releases_id, uniqueid)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -1066,7 +1066,7 @@ CREATE TABLE spotnabsources
   lastarticle BIGINT(20) unsigned DEFAULT '0' NOT NULL,
   dateadded DATETIME
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
@@ -1112,7 +1112,7 @@ CREATE TABLE tv_episodes (
   PRIMARY KEY (id),
   UNIQUE KEY (videos_id, series, episode, firstaired)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT  = 1;
@@ -1127,7 +1127,7 @@ CREATE TABLE tv_info (
   PRIMARY KEY          (videos_id),
   KEY ix_tv_info_image (image)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -1261,7 +1261,7 @@ CREATE TABLE role_excluded_categories
     PRIMARY KEY (id),
     UNIQUE INDEX ix_roleexcat_rolecat (user_roles_id, categories_id)
 )
-    ENGINE = MyISAM
+    ENGINE = InnoDB
     DEFAULT CHARSET = utf8
     COLLATE = utf8_unicode_ci
     AUTO_INCREMENT = 1;
@@ -1387,7 +1387,7 @@ CREATE TABLE videos (
   KEY            ix_videos_tvrage (tvrage),
   KEY            ix_videos_type_source (type, source)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 10000000;
@@ -1398,7 +1398,7 @@ CREATE TABLE videos_aliases (
   title VARCHAR(180) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'AKA of the video.',
   PRIMARY KEY (videos_id, title)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT  = 10000000;
