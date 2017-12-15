@@ -372,7 +372,7 @@ class Music
     public function updateMusicInfo($title, $year, $amazdata = null): bool
     {
         $gen = new Genres(['Settings' => $this->pdo]);
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
         $titlepercent = 0;
 
         $mus = [];

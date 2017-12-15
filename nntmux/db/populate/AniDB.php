@@ -587,7 +587,7 @@ class AniDB
         }
 
         if (! empty($picture) && ! file_exists($this->imgSavePath.$anidbId.'.jpg')) {
-            (new ReleaseImage($this->pdo))->saveImage(
+            (new ReleaseImage())->saveImage(
                 $anidbId,
                 'http://img7.anidb.net/pics/anime/'.$picture,
                 $this->imgSavePath

@@ -83,8 +83,8 @@ class TVMaze extends TV
                     if (in_array($release['cleanname'], $this->titleCache, false)) {
                         if ($this->echooutput) {
                             echo ColorCLI::headerOver('Title: ').
-									ColorCLI::warningOver($release['cleanname']).
-									ColorCLI::header(' already failed lookup for this site.  Skipping.');
+                                    ColorCLI::warningOver($release['cleanname']).
+                                    ColorCLI::header(' already failed lookup for this site.  Skipping.');
                         }
                         $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                         continue;
@@ -101,8 +101,8 @@ class TVMaze extends TV
                         // If lookups are allowed lets try to get it.
                         if ($this->echooutput) {
                             echo ColorCLI::primaryOver('Checking TVMaze for previously failed title: ').
-									ColorCLI::headerOver($release['cleanname']).
-									ColorCLI::primary('.');
+                                    ColorCLI::headerOver($release['cleanname']).
+                                    ColorCLI::primary('.');
                         }
 
                         // Get the show from TVMaze
@@ -127,8 +127,8 @@ class TVMaze extends TV
                     } else {
                         if ($this->echooutput) {
                             echo ColorCLI::primaryOver('Found local TVMaze match for: ').
-									ColorCLI::headerOver($release['cleanname']).
-									ColorCLI::primary('.  Attempting episode lookup!');
+                                    ColorCLI::headerOver($release['cleanname']).
+                                    ColorCLI::primary('.  Attempting episode lookup!');
                         }
                         $tvmazeid = $this->getSiteIDFromVideoID('tvmaze', $videoId);
                     }
@@ -158,11 +158,11 @@ class TVMaze extends TV
                         if ($episode === false) {
                             // Send the request for the episode to TVMaze
                             $tvmazeEpisode = $this->getEpisodeInfo(
-									$tvmazeid,
-									$seasonNo,
-									$episodeNo,
-									$release['airdate']
-							);
+                                    $tvmazeid,
+                                    $seasonNo,
+                                    $episodeNo,
+                                    $release['airdate']
+                            );
 
                             if ($tvmazeEpisode) {
                                 $episode = $this->addEpisode($videoId, $tvmazeEpisode);
@@ -313,7 +313,7 @@ class TVMaze extends TV
      */
     public function getPoster($videoId, $showId = 0): int
     {
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         // Try to get the Poster
         $hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath, '', '');
@@ -388,22 +388,22 @@ class TVMaze extends TV
         $this->posterUrl = (string) ($show->mediumImage ?? '');
 
         return [
-			'type'      => parent::TYPE_TV,
-			'title'     => (string) $show->name,
-			'summary'   => (string) $show->summary,
-			'started'   => (string) $show->premiered,
-			'publisher' => (string) $show->network,
-			'country'   => (string) $show->country,
-			'source'    => parent::SOURCE_TVMAZE,
-			'imdb'      => 0,
-			'tvdb'      => (int) ($show->externalIDs['thetvdb'] ?? 0),
-			'tvmaze'    => (int) $show->id,
-			'trakt'     => 0,
-			'tvrage'    => (int) ($show->externalIDs['tvrage'] ?? 0),
-			'tmdb'      => 0,
-			'aliases'   => ! empty($show->akas) ? (array) $show->akas : '',
-			'localzone' => "''",
-		];
+            'type'      => parent::TYPE_TV,
+            'title'     => (string) $show->name,
+            'summary'   => (string) $show->summary,
+            'started'   => (string) $show->premiered,
+            'publisher' => (string) $show->network,
+            'country'   => (string) $show->country,
+            'source'    => parent::SOURCE_TVMAZE,
+            'imdb'      => 0,
+            'tvdb'      => (int) ($show->externalIDs['thetvdb'] ?? 0),
+            'tvmaze'    => (int) $show->id,
+            'trakt'     => 0,
+            'tvrage'    => (int) ($show->externalIDs['tvrage'] ?? 0),
+            'tmdb'      => 0,
+            'aliases'   => ! empty($show->akas) ? (array) $show->akas : '',
+            'localzone' => "''",
+        ];
     }
 
     /**
@@ -417,12 +417,12 @@ class TVMaze extends TV
     protected function formatEpisodeInfo($episode): array
     {
         return [
-			'title'       => (string) $episode->name,
-			'series'      => (int) $episode->season,
-			'episode'     => (int) $episode->number,
-			'se_complete' => 'S'.sprintf('%02d', $episode->season).'E'.sprintf('%02d', $episode->number),
-			'firstaired'  => (string) $episode->airdate,
-			'summary'     => (string) $episode->summary,
-		];
+            'title'       => (string) $episode->name,
+            'series'      => (int) $episode->season,
+            'episode'     => (int) $episode->number,
+            'se_complete' => 'S'.sprintf('%02d', $episode->season).'E'.sprintf('%02d', $episode->number),
+            'firstaired'  => (string) $episode->airdate,
+            'summary'     => (string) $episode->summary,
+        ];
     }
 }

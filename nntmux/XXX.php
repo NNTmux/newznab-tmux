@@ -101,7 +101,7 @@ class XXX
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
+        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
 
         $this->movieqty = (Settings::settingValue('..maxxxxprocessed') !== '') ? Settings::settingValue('..maxxxxprocessed') : 100;
         $this->showPasswords = Releases::showPasswords();

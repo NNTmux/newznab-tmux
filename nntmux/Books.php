@@ -565,7 +565,7 @@ class Books
      */
     public function updateBookInfo($bookInfo = '', $amazdata = null)
     {
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         $book = [];
         $bookId = -2;

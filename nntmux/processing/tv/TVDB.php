@@ -326,7 +326,7 @@ class TVDB extends TV
      */
     public function getPoster($videoId, $showId): int
     {
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         // Try to get the Poster
         $hascover = $ri->saveImage($videoId, sprintf($this->posterUrl, $showId), $this->imgSavePath, '', '');

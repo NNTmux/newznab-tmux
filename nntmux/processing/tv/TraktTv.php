@@ -268,7 +268,7 @@ class TraktTv extends TV
     public function getPoster($videoId, $siteId): int
     {
         $hascover = 0;
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         if ($this->posterUrl !== '') {
             // Try to get the Poster

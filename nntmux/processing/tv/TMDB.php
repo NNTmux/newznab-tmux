@@ -316,7 +316,7 @@ class TMDB extends TV
      */
     public function getPoster($videoId, $showId = 0): int
     {
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         // Try to get the Poster
         $hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);

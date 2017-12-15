@@ -185,7 +185,7 @@ class Movie
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
+        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
         $this->client = new Client();
         $this->tmdbtoken = new ApiToken(Settings::settingValue('APIs..tmdbkey'));
         $this->tmdbclient = new TmdbClient(

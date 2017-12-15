@@ -150,7 +150,7 @@ class SpotNab
     {
         $this->_pdo = new DB();
         $this->_nntp = new NNTP(['Settings' => $this->_pdo]);
-        $this->releaseImage = new ReleaseImage($this->_pdo);
+        $this->releaseImage = new ReleaseImage();
         $this->nzb = new NZB($this->_pdo);
         $this->releases = new Releases(['Settings' => $this->_pdo]);
 

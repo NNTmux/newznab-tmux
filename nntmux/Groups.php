@@ -405,7 +405,7 @@ class Groups
         if ($res instanceof \Traversable) {
             $releases = new Releases(['Settings' => $this->pdo, 'Groups' => $this]);
             $nzb = new NZB($this->pdo);
-            $releaseImage = new ReleaseImage($this->pdo);
+            $releaseImage = new ReleaseImage();
             foreach ($res as $row) {
                 $releases->deleteSingle(
                     [

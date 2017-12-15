@@ -685,7 +685,7 @@ class Releases
         $list = (array) $list;
 
         $nzb = new NZB($this->pdo);
-        $releaseImage = new ReleaseImage($this->pdo);
+        $releaseImage = new ReleaseImage();
 
         foreach ($list as $identifier) {
             $this->deleteSingle(['g' => $identifier, 'i' => false], $nzb, $releaseImage);

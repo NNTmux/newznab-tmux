@@ -468,7 +468,7 @@ class Games
         //wait 10 seconds before proceeding (steam api limit)
         sleep(10);
         $gen = new Genres(['Settings' => $this->pdo]);
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         $game = [];
 

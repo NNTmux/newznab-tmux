@@ -715,7 +715,7 @@ class Console
      */
     protected function _updateConsoleTable(array $con = [])
     {
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         $check = ConsoleInfo::query()->where('asin', $con['asin'])->first(['id']);
 
