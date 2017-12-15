@@ -25,17 +25,17 @@ use App\Models\MultigroupPoster;
 
 class ProcessReleases
 {
-    const COLLFC_DEFAULT = 0; // Collection has default filecheck status
-    const COLLFC_COMPCOLL = 1; // Collection is a complete collection
-    const COLLFC_COMPPART = 2; // Collection is a complete collection and has all parts available
-    const COLLFC_SIZED = 3; // Collection has been calculated for total size
-    const COLLFC_INSERTED = 4; // Collection has been inserted into releases
-    const COLLFC_DELETE = 5; // Collection is ready for deletion
-    const COLLFC_TEMPCOMP = 15; // Collection is complete and being checked for complete parts
-    const COLLFC_ZEROPART = 16; // Collection has a 00/0XX designator (temporary)
+    public const COLLFC_DEFAULT = 0; // Collection has default filecheck status
+    public const COLLFC_COMPCOLL = 1; // Collection is a complete collection
+    public const COLLFC_COMPPART = 2; // Collection is a complete collection and has all parts available
+    public const COLLFC_SIZED = 3; // Collection has been calculated for total size
+    public const COLLFC_INSERTED = 4; // Collection has been inserted into releases
+    public const COLLFC_DELETE = 5; // Collection is ready for deletion
+    public const COLLFC_TEMPCOMP = 15; // Collection is complete and being checked for complete parts
+    public const COLLFC_ZEROPART = 16; // Collection has a 00/0XX designator (temporary)
 
-    const FILE_INCOMPLETE = 0; // We don't have all the parts yet for the file (binaries table partcheck column).
-    const FILE_COMPLETE = 1; // We have all the parts for the file (binaries table partcheck column).
+    public const FILE_INCOMPLETE = 0; // We don't have all the parts yet for the file (binaries table partcheck column).
+    public const FILE_COMPLETE = 1; // We have all the parts for the file (binaries table partcheck column).
 
     /**
      * @var \nntmux\Groups
@@ -160,7 +160,6 @@ class ProcessReleases
         $this->releaseCreationLimit = ($dummy !== '' ? (int) $dummy : 1000);
         $dummy = Settings::settingValue('..completionpercent');
         $this->completion = ($dummy !== '' ? (int) $dummy : 0);
-        $this->processRequestIDs = (int) Settings::settingValue('lookup_reqids');
         if ($this->completion > 100) {
             $this->completion = 100;
             echo ColorCLI::error(PHP_EOL.'You have an invalid setting for completion. It cannot be higher than 100.');
@@ -211,7 +210,7 @@ class ProcessReleases
         $this->processCollectionSizes($groupID);
         $this->deleteUnwantedCollections($groupID);
 
-        $DIR = NN_MISC;
+        //$DIR = NN_MISC;
 
         $totalReleasesAdded = 0;
         do {
@@ -219,7 +218,8 @@ class ProcessReleases
             $totalReleasesAdded += $releasesCount['added'];
 
             $nzbFilesAdded = $this->createNZBs($groupID);
-            if ($this->processRequestIDs === 0) {
+            // requestid lookups disabled because they are no longer being posted
+            /*if ($this->processRequestIDs === 0) {
                 $this->processRequestIDs($groupID, 5000, true);
             } elseif ($this->processRequestIDs === 1) {
                 $this->processRequestIDs($groupID, 5000, true);
@@ -238,7 +238,7 @@ class ProcessReleases
                         )
                     );
                 }
-            }
+            } */
 
             $this->categorizeReleases($categorize, $groupID);
             $this->postProcessReleases($postProcess, $nntp);

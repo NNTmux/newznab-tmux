@@ -1,4 +1,5 @@
 2017-12-15 DariusIII
+	* Chg: Disable requestid lookups in ProcessReleases class
 	* Chg: Do some small optimizations in ReleaseRemover
 	* Chg: Update simfony components and jpinkney/tvmaze-php-api to their latest versions
 	* Chg: Use count instead of rowCount in TV related classes
