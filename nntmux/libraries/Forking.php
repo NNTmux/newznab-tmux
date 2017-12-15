@@ -23,9 +23,9 @@ use nntmux\processing\PostProcess;
  */
 class Forking extends \fork_daemon
 {
-    const OUTPUT_NONE = 0; // Don't display child output.
-    const OUTPUT_REALTIME = 1; // Display child output in real time.
-    const OUTPUT_SERIALLY = 2; // Display child output when child is done.
+    private const OUTPUT_NONE = 0; // Don't display child output.
+    private const OUTPUT_REALTIME = 1; // Display child output in real time.
+    private const OUTPUT_SERIALLY = 2; // Display child output when child is done.
 
     /**
      * @var \nntmux\ColorCLI
@@ -110,16 +110,16 @@ class Forking extends \fork_daemon
 
         $this->register_logging(
             [0 => $this, 1 => 'logger'],
-            (defined('NN_MULTIPROCESSING_LOG_TYPE') ? NN_MULTIPROCESSING_LOG_TYPE : \fork_daemon::LOG_LEVEL_INFO)
+            (\defined('NN_MULTIPROCESSING_LOG_TYPE') ? NN_MULTIPROCESSING_LOG_TYPE : \fork_daemon::LOG_LEVEL_INFO)
         );
 
-        if (defined('NN_MULTIPROCESSING_MAX_CHILD_WORK')) {
+        if (\defined('NN_MULTIPROCESSING_MAX_CHILD_WORK')) {
             $this->max_work_per_child_set(NN_MULTIPROCESSING_MAX_CHILD_WORK);
         } else {
             $this->max_work_per_child_set(1);
         }
 
-        if (defined('NN_MULTIPROCESSING_MAX_CHILD_TIME')) {
+        if (\defined('NN_MULTIPROCESSING_MAX_CHILD_TIME')) {
             $this->child_max_run_time_set(NN_MULTIPROCESSING_MAX_CHILD_TIME);
         } else {
             $this->child_max_run_time_set(1800);
@@ -128,7 +128,7 @@ class Forking extends \fork_daemon
         // Use a single exit method for all children, makes things easier.
         $this->register_parent_child_exit([0 => $this, 1 => 'childExit']);
 
-        if (defined('NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE')) {
+        if (\defined('NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE')) {
             switch (NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE) {
                 case 0:
                     $this->outputType = self::OUTPUT_NONE;
@@ -156,7 +156,6 @@ class Forking extends \fork_daemon
      * @param string $type The type of multiProcessing to do : backfill, binaries, releases, postprocess
      * @param array $options Array containing arguments for the type of work.
      *
-     * @throws ForkingException
      * @throws \Exception
      */
     public function processWorkType($type, array $options = [])
@@ -282,7 +281,7 @@ class Forking extends \fork_daemon
      */
     private function processWork()
     {
-        $this->_workCount = count($this->work);
+        $this->_workCount = \count($this->work);
         if ($this->_workCount > 0) {
             if (NN_ECHOCLI) {
                 ColorCLI::doEcho(
@@ -327,12 +326,12 @@ class Forking extends \fork_daemon
         switch ($this->workType) {
             case 'releases':
                 $this->_executeCommand(
-                    $this->dnr_path.'releases  '.count($this->work).'_"'
+                    $this->dnr_path.'releases  '.\count($this->work).'_"'
                 );
                 break;
             case 'update_per_group':
                 $this->_executeCommand(
-                    $this->dnr_path.'releases  '.count($this->work).'_"'
+                    $this->dnr_path.'releases  '.\count($this->work).'_"'
                 );
                 break;
         }
@@ -616,7 +615,7 @@ class Forking extends \fork_daemon
                 )
             );
             if ($preCount['num'] > 0) {
-                $leftguids = array_slice($leftguids, 0, (int) ceil($preCount['num'] / $maxperrun));
+                $leftguids = \array_slice($leftguids, 0, (int) ceil($preCount['num'] / $maxperrun));
             } else {
                 $leftguids = [];
             }
@@ -792,7 +791,7 @@ class Forking extends \fork_daemon
      */
     private function checkProcessNfo()
     {
-        if (Settings::settingValue('..lookupnfo') == 1) {
+        if ((int) Settings::settingValue('..lookupnfo') === 1) {
             $this->nfoQueryString = Nfo::NfoQueryString($this->pdo);
 
             return $this->pdo->queryOneRow(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) !== false;
@@ -946,7 +945,7 @@ class Forking extends \fork_daemon
     private function processSharing()
     {
         $sharing = $this->pdo->queryOneRow('SELECT enabled FROM sharing');
-        if ($sharing !== false && $sharing['enabled'] == 1) {
+        if ($sharing !== false && (int) $sharing['enabled'] === 1) {
             $nntp = new NNTP(['Settings' => $this->pdo]);
             if ((int) (Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
                 (new PostProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]))->processSharing($nntp);
@@ -1076,7 +1075,7 @@ class Forking extends \fork_daemon
     private function setMaxProcesses($maxProcesses)
     {
         // Check if override setting is on.
-        if (defined('NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE') && NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE > 0) {
+        if (\defined('NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE') && NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE > 0) {
             $maxProcesses = NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE;
         }
 

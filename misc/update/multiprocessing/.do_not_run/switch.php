@@ -173,8 +173,8 @@ switch ($options[1]) {
 			}
 			$releases->deletedReleasesByGroup();
 			$releases->deleteReleases();
-			$releases->processRequestIDs('', (5000 * $groupCount), true);
-			$releases->processRequestIDs('', (1000 * $groupCount), false);
+			//$releases->processRequestIDs('', (5000 * $groupCount), true);
+			//$releases->processRequestIDs('', (1000 * $groupCount), false);
 			$releases->categorizeReleases(2);
 		}
 		break;

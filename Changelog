@@ -1,4 +1,5 @@
 2017-12-15 DariusIII
+	* Chg: Update switch.php and Forking class
 	* Chg: Disable requestid lookups in ProcessReleases class
 	* Chg: Do some small optimizations in ReleaseRemover
 	* Chg: Update simfony components and jpinkney/tvmaze-php-api to their latest versions
