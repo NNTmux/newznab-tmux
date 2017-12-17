@@ -17,10 +17,10 @@ use App\Models\Category as CategoryModel;
 class Releases
 {
     // RAR/ZIP Passworded indicator.
-    const PASSWD_NONE = 0; // No password.
-    const PASSWD_POTENTIAL = 1; // Might have a password.
-    const BAD_FILE = 2; // Possibly broken RAR/ZIP.
-    const PASSWD_RAR = 10; // Definitely passworded.
+    public const PASSWD_NONE = 0; // No password.
+    public const PASSWD_POTENTIAL = 1; // Might have a password.
+    public const BAD_FILE = 2; // Possibly broken RAR/ZIP.
+    public const PASSWD_RAR = 10; // Definitely passworded.
 
     /**
      * @var \nntmux\db\DB
@@ -130,8 +130,8 @@ class Releases
     public function createGUID(): string
     {
         $data = openssl_random_pseudo_bytes(16);
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // set version to 0100
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
+        $data[6] = \chr(\ord($data[6]) & 0x0f | 0x40);    // set version to 0100
+        $data[8] = \chr(\ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 
@@ -1355,8 +1355,7 @@ class Releases
     }
 
     /**
-     * @param array|string $guid
-     *
+     * @param $guid
      * @return array|bool
      */
     public function getByGuid($guid)
@@ -1397,10 +1396,7 @@ class Releases
     }
 
     /**
-     * Writes a zip file of an array of release guids directly to the stream.
-     *
-     * @param $guids
-     *
+     * @param array $guids
      * @return string
      * @throws \Exception
      */
@@ -1442,7 +1438,7 @@ class Releases
      * @param $anidbID
      * @return int
      */
-    public function removeAnidbIdFromReleases($anidbID)
+    public function removeAnidbIdFromReleases($anidbID): int
     {
         return Release::query()->where('anidbid', $anidbID)->update(['anidbid' => -1]);
     }
@@ -1519,7 +1515,7 @@ class Releases
     /**
      * @return string
      */
-    public function getRecentlyAdded()
+    public function getRecentlyAdded(): string
     {
         $recent = Cache::get('recentlyadded');
         if ($recent !== null) {
