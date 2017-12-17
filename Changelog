@@ -1,3 +1,5 @@
+2017-12-17 DariusIII
+	* Chg: Update phpunit to latest version
 2017-12-15 DariusIII
 	* Chg: Update switch.php and Forking class
 	* Chg: Disable requestid lookups in ProcessReleases class
