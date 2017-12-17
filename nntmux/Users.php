@@ -4,7 +4,6 @@ namespace nntmux;
 
 use Carbon\Carbon;
 use App\Models\User;
-use App\Models\Release;
 use App\Mail\SendInvite;
 use App\Models\Settings;
 use App\Models\Invitation;
@@ -872,7 +871,7 @@ class Users
     public function addCategoryExclusions($uid, array $catids): void
     {
         $this->delUserCategoryExclusions($uid);
-        if (count($catids) > 0) {
+        if (\count($catids) > 0) {
             foreach ($catids as $catid) {
                 UserExcludedCategory::query()->insertGetId(['users_id' => $uid, 'categories_id' => $catid, 'created_at' => Carbon::now()]);
             }
@@ -902,7 +901,7 @@ class Users
     public function addRoleCategoryExclusions($role, array $catids): void
     {
         $this->delRoleCategoryExclusions($role);
-        if (count($catids) > 0) {
+        if (\count($catids) > 0) {
             foreach ($catids as $catid) {
                 RoleExcludedCategory::query()->insertGetId(['user_roles_id' => $role, 'categories_id' => $catid, 'created_at' => Carbon::now()]);
             }
