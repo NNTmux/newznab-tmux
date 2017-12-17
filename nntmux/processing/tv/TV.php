@@ -277,7 +277,7 @@ abstract class TV extends Videos
         $episodeId = $this->getBySeasonEp($videoId, $episode['series'], $episode['episode'], $episode['firstaired']);
 
         if ($episodeId === false) {
-            $episodeId = TvEpisode::insertIgnore(
+            $episodeId = TvEpisode::query()->insert(
                 [
                     'videos_id' => $videoId,
                     'series' => $episode['series'],
