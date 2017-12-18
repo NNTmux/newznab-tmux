@@ -121,31 +121,6 @@ class TmuxRun extends Tmux
                         break;
                 }
                 break;
-            case 2:
-                switch ($cmdParam) {
-                    case 'amazon':
-                        $this->_runAmazonFull($runVar);
-                        break;
-                    case 'import':
-                        $this->_runNZBImport($runVar);
-                        break;
-                    case 'main':
-                        $this->_runMainFull($runVar);
-                        break;
-                    case 'notrunning':
-                        $this->_notRunningFull($runVar);
-                        break;
-                    case 'scraper':
-                        $this->_runIRCScraper(2, $runVar);
-                        break;
-                    case 'sharing':
-                        $this->_runSharing(3, $runVar);
-                        break;
-                    case 'updatetv':
-                        $this->_runUpdateTvFull($runVar);
-                        break;
-                }
-                break;
         }
     }
 
@@ -676,18 +651,6 @@ class TmuxRun extends Tmux
             $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
             shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:0.2 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][2]} has been disabled/terminated by Exceeding Limits\"'");
         }
-    }
-
-    /**
-     * @param $runVar
-     */
-    protected function _runMainFull(&$runVar)
-    {
-        $log = $this->writelog($runVar['panes']['zero'][2]);
-        shell_exec(
-            "tmux respawnp -t{$runVar['constants']['tmux_session']}:0.2 ' \
-				{$runVar['paths']['misc']}update/screen/sequential/user_threaded.sh true $log; date +\"{$this->_dateFormat}\"' 2>&1 1> /dev/null"
-        );
     }
 
     /**

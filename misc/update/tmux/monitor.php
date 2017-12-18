@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use nntmux\ColorCLI;
 use nntmux\Tmux;
 use nntmux\db\DB;
 use nntmux\TmuxRun;
@@ -58,7 +59,7 @@ $runVar['timers']['query']['tpg1_time'] = 0;
 // Analyze release table if not using innoDB (innoDB uses online analysis)
 $engine = $pdo->queryOneRow(sprintf("SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'releases'", $pdo->escapeString($db_name)));
 if (! in_array($engine['engine'], ['InnoDB', 'TokuDB'], false)) {
-    printf($pdo->log->info(PHP_EOL.'Analyzing your tables to refresh your indexes.'));
+    printf(ColorCLI::info(PHP_EOL.'Analyzing your tables to refresh your indexes.'));
     $pdo->optimise(false, 'analyze', false, ['releases']);
     Utility::clearScreen();
 }
@@ -118,17 +119,17 @@ while ($runVar['counts']['iterations'] > 0) {
     unset($runVar['conncounts']);
     $runVar['conncounts'] = $tOut->getUSPConnections('primary', $runVar['connections']);
 
-    if ($runVar['constants']['alternate_nntp'] == 1) {
+    if ((int) $runVar['constants']['alternate_nntp'] === 1) {
         $runVar['conncounts'] += $tOut->getUSPConnections('alternate', $runVar['connections']);
     }
 
     //run queries only after time exceeded, these queries can take awhile
-    if ($runVar['counts']['iterations'] == 1 || (time() - $runVar['timers']['timer2'] >= $runVar['settings']['monitor'] && $runVar['settings']['is_running'] == 1)) {
+    if ((int) $runVar['counts']['iterations'] === 1 || (time() - $runVar['timers']['timer2'] >= $runVar['settings']['monitor'] && $runVar['settings']['is_running'] == 1)) {
         $runVar['counts']['proc1'] = $runVar['counts']['proc2'] = $runVar['counts']['proc3'] = $splitqry = $newOldqry = false;
         $runVar['counts']['now']['total_work'] = 0;
-        $runVar['modsettings']['fix_crap'] = explode(', ', ($runVar['settings']['fix_crap']));
+        $runVar['modsettings']['fix_crap'] = explode(', ', $runVar['settings']['fix_crap']);
 
-        echo $pdo->log->info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
+        echo ColorCLI::info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
         $timer02 = time();
 
         $splitqry = $newOldqry = '';
@@ -271,16 +272,16 @@ while ($runVar['counts']['iterations'] > 0) {
 
         // Zero out any post proc counts when that type of pp has been turned off
         foreach ($runVar['settings'] as $settingkey => $setting) {
-            if (strpos($settingkey, 'process') == 0 && $setting == 0) {
+            if ((int) $setting === 0 && (int) strpos($settingkey, 'process') === 0) {
                 $runVar['counts']['now'][$settingkey] = $runVar['counts']['start'][$settingkey] = 0;
             }
-            if ($settingkey == 'fix_names' && $setting == 0) {
+            if ($settingkey === 'fix_names' && (int) $setting === 0) {
                 $runVar['counts']['now']['processrenames'] = $runVar['counts']['start']['processrenames'] = 0;
             }
         }
 
         //set initial start postproc values from work queries -- this is used to determine diff variables
-        if ($runVar['counts']['iterations'] == 1) {
+        if ((int) $runVar['counts']['iterations'] === 1) {
             $runVar['counts']['start'] = $runVar['counts']['now'];
         }
 
@@ -302,7 +303,7 @@ while ($runVar['counts']['iterations'] > 0) {
         $runVar['counts']['now']['total_work'] += $runVar['counts']['now']['work'];
 
         // Set initial total work count for diff
-        if ($runVar['counts']['iterations'] == 1) {
+        if ((int) $runVar['counts']['iterations'] === 1) {
             $runVar['counts']['start']['total_work'] = $runVar['counts']['now']['total_work'];
         }
 
@@ -311,16 +312,8 @@ while ($runVar['counts']['iterations'] > 0) {
     }
 
     //set kill switches
-    $runVar['killswitch']['pp'] = (
-        ($runVar['settings']['postprocess_kill'] < $runVar['counts']['now']['total_work']) && ($runVar['settings']['postprocess_kill'] != 0)
-        ? true
-        : false
-    );
-    $runVar['killswitch']['coll'] = (
-        ($runVar['settings']['collections_kill'] < $runVar['counts']['now']['collections_table']) && ($runVar['settings']['collections_kill'] != 0)
-        ? true
-        : false
-    );
+    $runVar['killswitch']['pp'] = (($runVar['settings']['postprocess_kill'] < $runVar['counts']['now']['total_work']) && ((int) $runVar['settings']['postprocess_kill'] !== 0));
+    $runVar['killswitch']['coll'] = (($runVar['settings']['collections_kill'] < $runVar['counts']['now']['collections_table']) && ((int) $runVar['settings']['collections_kill'] !== 0));
 
     $tOut->updateMonitorPane($runVar);
 
@@ -346,7 +339,7 @@ while ($runVar['counts']['iterations'] > 0) {
         $tRun->runPane('updatetv', $runVar);
 
         //run these if complete sequential not set
-        if ($runVar['constants']['sequential'] != 2) {
+        if ((int) $runVar['constants']['sequential'] !== 2) {
 
             //fix names
             $tRun->runPane('fixnames', $runVar);
@@ -363,12 +356,12 @@ while ($runVar['counts']['iterations'] > 0) {
             //run postprocess_releases non amazon
             $tRun->runPane('nonamazon', $runVar);
         }
-    } elseif ($runVar['settings']['is_running'] === '0') {
+    } elseif ((int) $runVar['settings']['is_running'] === 0) {
         $tRun->runPane('notrunning', $runVar);
     }
 
     $exit = Settings::settingValue('tmux.running.exit');
-    if ($exit == 0) {
+    if ((int) $exit === 0) {
         $runVar['counts']['iterations']++;
         sleep(10);
     } else {
@@ -377,11 +370,9 @@ while ($runVar['counts']['iterations'] > 0) {
     }
 }
 
-// TODO add code here to handle all panes shutting down before closing.
-
 function errorOnSQL($pdo)
 {
-    echo $pdo->log->error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
+    echo ColorCLI::error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
     exit;
 }
 

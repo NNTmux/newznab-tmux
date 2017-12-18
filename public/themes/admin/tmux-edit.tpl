@@ -142,7 +142,7 @@
 			<td style="width:180px;"><label for="sequential">Run Sequential:</label></td>
 			<td>
 				{html_options style="width:180px;" class="siteeditstyle" id="sequential" name='sequential' values=$sequential_ids output=$sequential_names selected=$ftmux->sequential}
-				<div class="hint">Basic Sequential runs update_binaries, backfill and update releases_sequentially.<br/>Changing
+				<div class="hint">Sequential runs update_binaries, backfill and update releases_sequentially.<br/>Changing
 					requires restart.
 				</div>
 			</td>
