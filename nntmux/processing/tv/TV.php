@@ -221,12 +221,12 @@ abstract class TV extends Videos
             if ($show[$column] > 0) {
                 $videoId = $this->getVideoIDFromSiteID($column, $show[$column]);
             }
-            if ($videoId !== false) {
+            if ($videoId !== null) {
                 break;
             }
         }
 
-        if ($videoId === false) {
+        if ($videoId === null) {
             // Insert the Show
             $videoId = Video::query()->insertGetId(
                 [
@@ -262,7 +262,7 @@ abstract class TV extends Videos
             $this->update($videoId, $show);
         }
 
-        return (int) $videoId;
+        return $videoId;
     }
 
     /**
