@@ -49,7 +49,7 @@ class Sharing
     protected $pdo;
 
     /**
-     * @var NNTP
+     * @var \nntmux\NNTP
      */
     protected $nntp;
 
@@ -65,12 +65,13 @@ class Sharing
      *
      * @const
      */
-    const group = 'alt.binaries.zines';
+    private const group = 'alt.binaries.zines';
 
     /**
      * Construct.
      *
      * @param array $options Class instances.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
@@ -102,25 +103,27 @@ class Sharing
         unset($check);
 
         // Convert to bool to speed up checking.
-        $this->siteSettings['hide_users'] = ($this->siteSettings['hide_users'] == 1 ? true : false);
-        $this->siteSettings['auto_enable'] = ($this->siteSettings['auto_enable'] == 1 ? true : false);
-        $this->siteSettings['posting'] = ($this->siteSettings['posting'] == 1 ? true : false);
-        $this->siteSettings['fetching'] = ($this->siteSettings['fetching'] == 1 ? true : false);
-        $this->siteSettings['enabled'] = ($this->siteSettings['enabled'] == 1 ? true : false);
-        $this->siteSettings['start_position'] = ($this->siteSettings['start_position'] == 1 ? true : false);
+        $this->siteSettings['hide_users'] = (int) $this->siteSettings['hide_users'] === 1;
+        $this->siteSettings['auto_enable'] = (int) $this->siteSettings['auto_enable'] === 1;
+        $this->siteSettings['posting'] = (int) $this->siteSettings['posting'] === 1;
+        $this->siteSettings['fetching'] = (int) $this->siteSettings['fetching'] === 1;
+        $this->siteSettings['enabled'] = (int) $this->siteSettings['enabled'] === 1;
+        $this->siteSettings['start_position'] = (int) $this->siteSettings['start_position'] === 1;
     }
 
     /**
      * Main method.
+     *
+     * @throws \Exception
      */
-    public function start()
+    public function start(): void
     {
         // Admin has disabled sharing so return.
         if ($this->siteSettings['enabled'] === false) {
             return;
         }
 
-        if (is_null($this->nntp)) {
+        if ($this->nntp === null) {
             $this->nntp = new NNTP();
             $this->nntp->doConnect();
         }
@@ -511,11 +514,12 @@ class Sharing
      * Fetch a comment and insert it.
      *
      * @param string $messageID Message-ID for the article.
-     * @param string $siteID    id of the site.
+     * @param string $siteID id of the site.
      *
      * @return bool
+     * @throws \Exception
      */
-    protected function insertNewComment(&$messageID, &$siteID)
+    protected function insertNewComment(&$messageID, &$siteID): bool
     {
         // Get the article body.
         $body = $this->nntp->getMessages(self::group, $messageID);
@@ -557,7 +561,7 @@ class Sharing
                 $this->pdo->escapeString($body['RID']),
                 $this->pdo->escapeString($body['RID']),
                 $this->pdo->escapeString($siteID),
-                $this->pdo->escapeString((substr($body['USER'], 0, 3) === 'sn-' ? 'SH_ANON' : 'SH_'.$body['USER']))
+                $this->pdo->escapeString((strpos($body['USER'] === 0, 'sn-') ? 'SH_ANON' : 'SH_'.$body['USER']))
             )
         )
         ) {

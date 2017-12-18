@@ -26,7 +26,6 @@ $args = [
     'nfo'        => true,
     'pre'        => true,
     'sharing'    => true,
-    'spotnab'    => true,
     'tv'         => false,
     'tvdb'       => false,
     'xxx'        => false,
@@ -55,7 +54,6 @@ if (! isset($argv[1]) || ! in_array($argv[1], $args, false) || ! isset($argv[2])
         ."php postprocess.php xxx true         ...: Processes xxx.\n"
         ."php postprocess.php additional true  ...: Processes previews/mediainfo/etc...\n"
         ."php postprocess.php sharing true     ...: Processes uploading/downloading comments.\n"
-        ."php postprocess.php spotnab true     ...: Processes uploading/downloading comments from spotnab.\n"
         ."php postprocess.php allinf true      ...: Does all the types of post processing on a loop, sleeping 15 seconds between.\n"
         ."php postprocess.php amazon true      ...: Does all the amazon (books/console/games/music/xxx).\n"
     )
@@ -70,7 +68,7 @@ if ($args[$argv[1]] === true) {
     }
 }
 
-$postProcess = new PostProcess(['Settings' => $pdo, 'Echo' => $argv[2] === 'true' ? true : false]);
+$postProcess = new PostProcess(['Settings' => $pdo, 'Echo' => $argv[2] === 'true']);
 
 $charArray = ['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
@@ -121,9 +119,6 @@ switch ($argv[1]) {
         break;
     case 'sharing':
         $postProcess->processSharing($nntp);
-        break;
-    case 'spotnab':
-        $postProcess->processSpotnab();
         break;
     case 'tv':
         $postProcess->processTv('', (isset($argv[3]) && in_array($argv[3], $charArray, false) ? $argv[3] : ''));
