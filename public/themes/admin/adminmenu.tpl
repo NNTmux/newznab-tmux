@@ -88,8 +88,6 @@
 			<li><a><i class="fa fa-comments"></i><span> Comments & Sharing</span><span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu" style="display: none">
 					<li><a href="{$smarty.const.WWW_TOP}/comments-list.php">View Comments</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/spotnab-list.php">View Spotnab Sources</a></li>
-					<li><a href="{$smarty.const.WWW_TOP}/spotnab-edit.php?action=add">Add Spotnab Sources</a></li>
 					<li><a href="{$smarty.const.WWW_TOP}/sharing.php">Comment Sharing Settings</a></li>
 				</ul>
 			</li>
