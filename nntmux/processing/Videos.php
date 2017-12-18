@@ -21,12 +21,12 @@
 
 namespace nntmux\processing;
 
+use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Video;
 use App\Models\TvInfo;
 use App\Models\VideoAlias;
 use Illuminate\Support\Facades\Cache;
-use nntmux\db\DB;
 
 /**
  * Parent class for TV/Film and any similar classes to inherit from.
