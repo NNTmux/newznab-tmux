@@ -9,6 +9,7 @@ class VideoAlias extends Model
 {
     use InsertOnDuplicateKey;
 
+    protected $table = 'videos_aliases';
     /**
      * @var bool
      */

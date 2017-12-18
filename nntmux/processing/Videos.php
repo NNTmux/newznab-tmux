@@ -217,7 +217,7 @@ abstract class Videos
             // Try for an alias
             if ($return === false) {
                 $sql = Video::query()
-                    ->join('videos_aliases', 'videos.id', '=', 'video_aliases.videos_id')
+                    ->join('videos_aliases', 'videos.id', '=', 'videos_aliases.videos_id')
                     ->where(['videos.title' => $title, 'videos.type' => $type]);
                 if ($source > 0) {
                     $sql->where('videos.source', $source);
@@ -253,8 +253,8 @@ abstract class Videos
             // Try for an alias
             if ($return === null) {
                 $sql = Video::query()
-                    ->join('video_aliases', 'videos.id', '=', 'video_aliases.videos_id')
-                    ->where('video_aliases.title', '=', rtrim($title, '%'))
+                    ->join('videos_aliases', 'videos.id', '=', 'videos_aliases.videos_id')
+                    ->where('videos_aliases.title', '=', rtrim($title, '%'))
                     ->where('type', $type);
                 if ($source > 0) {
                     $sql->where('videos.source', $source);
