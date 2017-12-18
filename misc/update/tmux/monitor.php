@@ -2,11 +2,11 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\ColorCLI;
 use nntmux\Tmux;
 use nntmux\db\DB;
 use nntmux\TmuxRun;
 use nntmux\Category;
+use nntmux\ColorCLI;
 use nntmux\TmuxOutput;
 use App\Models\Settings;
 use nntmux\utility\Utility;
