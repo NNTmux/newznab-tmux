@@ -21,10 +21,10 @@
 
 namespace nntmux\processing;
 
-use App\Models\TvInfo;
-use App\Models\Video;
-use App\Models\VideoAlias;
 use Carbon\Carbon;
+use App\Models\Video;
+use App\Models\TvInfo;
+use App\Models\VideoAlias;
 use Illuminate\Support\Facades\Cache;
 
 /**
