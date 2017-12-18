@@ -1513,9 +1513,9 @@ class Releases
     }
 
     /**
-     * @return string
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getRecentlyAdded(): string
+    public function getRecentlyAdded()
     {
         $recent = Cache::get('recentlyadded');
         if ($recent !== null) {
