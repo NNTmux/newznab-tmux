@@ -1,4 +1,5 @@
 2017-12-18 DariusIII
+	* CHg: Update Nfo class and mysql-ddl (declare ROW_FORMAT for xxxinfo and release_nfos tables as COMPRESSED)
 	* Chg: Remove complete sequential mode
 	* Chg: Remove screen scripts completely, they were not maintaned and not up-to-date
 	* Chg: Remove requestid lookup settings from site edit

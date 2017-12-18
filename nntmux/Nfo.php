@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use Illuminate\Support\Facades\DB as DBFacade;
 use nntmux\db\DB;
 use App\Models\Release;
 use App\Models\Settings;
@@ -205,7 +206,7 @@ class Nfo
             $check = ReleaseNfo::query()->where('releases_id', $release['id'])->first(['releases_id']);
 
             if ($check === null) {
-                ReleaseNfo::query()->insertGetId(['releases_id' => $release['id'], 'nfo' =>"\x1f\x8b\x08\x00".gzcompress($nfo)]);
+                ReleaseNfo::query()->insertGetId(['releases_id' => $release['id'], 'nfo' => DBFacade::raw(COMPRESS($nfo))]);
             }
 
             Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FOUND]);
@@ -349,7 +350,7 @@ class Nfo
 
                     $ckReleaseId = ReleaseNfo::query()->where('releases_id', $arr['id'])->first(['releases_id']);
                     if ($ckReleaseId === null) {
-                        ReleaseNfo::query()->insertGetId(['releases_id' => $arr['id'], 'nfo' =>"\x1f\x8b\x08\x00".gzcompress($fetchedBinary)]);
+                        ReleaseNfo::query()->insertGetId(['releases_id' => $arr['id'], 'nfo' => DBFacade::raw(COMPRESS($fetchedBinary))]);
                     }
                     Release::query()->where('id', $arr['id'])->update(['nfostatus' => self::NFO_FOUND]);
                     $ret++;

@@ -936,7 +936,7 @@ CREATE TABLE release_nfos (
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC;
+  ROW_FORMAT      = COMPRESSED;
 
 
 DROP TABLE IF EXISTS release_search_data;
@@ -1427,7 +1427,7 @@ CREATE TABLE         xxxinfo (
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
+  ROW_FORMAT      = COMPRESSED
   AUTO_INCREMENT  = 1;
 
 DROP TABLE IF EXISTS multigroup_binaries;
