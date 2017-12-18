@@ -155,17 +155,6 @@ site	main	style	Gentele	The theme folder which will be loaded for css and images
 site	main	userselstyle	0	Users can select their theme?	userselstyle
 site	main	tandc	<p>All information within this database is indexed by an automated process, without any human intervention. It is obtained from global Usenet newsgroups over which this site has no control. We cannot prevent that you might find obscene or objectionable material by using this service. If you do come across obscene, incorrect or objectionable results, let us know by using the contact form.</p>	Text displayed in the terms and conditions page.	tandc
 site	main	title	NNTmux	Displayed around the site and contact form as the name for the site.	title
-site	spotnab	spotnabautoenable	0	Enable spotnab automatically?	spotnabautoenable
-site	spotnab	spotnabbroadcast	0	Broadcast spotnab info?	spotnabbroadcast
-site	spotnab	spotnabdiscover	0	Spotnab discovery enabled?	spotnabdiscover
-site	spotnab	spotnabemail		Email used for spotnab	spotnabemail
-site	spotnab	spotnabgroup	alt.binaries.backup	Group used for spotnab	spotnabgroup
-site	spotnab	spotnablastarticle			spotnablastarticle
-site	spotnab	spotnabpost	0		spotnabpost
-site	spotnab	spotnabprivacy	0		spotnabprivacy
-site	spotnab	spotnabsiteprvkey		spotnabsiteprvkey
-site	spotnab	spotnabsitepubkey		spotnabsitepubkey
-site	spotnab	spotnabuser			spotnabuser
 site	trailers	trailers_display	1	Display trailers on the details page?	trailers_display
 site	trailers	trailers_size_x	480	Width of the displayed trailer. 480 by default.	trailers_size_x
 site	trailers	trailers_size_y	345	Height of the displayed trailer. 345 by default.	trailers_size_y
