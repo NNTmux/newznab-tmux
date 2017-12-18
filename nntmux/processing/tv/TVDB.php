@@ -46,7 +46,10 @@ class TVDB extends TV
     private $local;
 
     /**
-     * @param array $options Class instances / Echo to cli?
+     * TVDB constructor.
+     *
+     * @param array $options
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {

@@ -26,6 +26,7 @@ use App\Models\Video;
 use App\Models\TvInfo;
 use App\Models\VideoAlias;
 use Illuminate\Support\Facades\Cache;
+use nntmux\db\DB;
 
 /**
  * Parent class for TV/Film and any similar classes to inherit from.
@@ -37,6 +38,10 @@ abstract class Videos
     protected const TYPE_FILM = 1; // Type of video is a Film/Movie
     protected const TYPE_ANIME = 2; // Type of video is a Anime
 
+    /**
+     * @var \nntmux\db\DB
+     */
+    protected $pdo;
     /**
      * @var bool
      */
@@ -60,6 +65,7 @@ abstract class Videos
         ];
         $options += $defaults;
 
+        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
         $this->titleCache = [];
     }
@@ -119,7 +125,7 @@ abstract class Videos
     protected function getVideoIDFromSiteID($siteColumn, $siteID)
     {
         if (\in_array($siteColumn, self::$sites, false)) {
-            $result = Video::query()->where($siteColumn, $siteID)->first(['id']);
+            $result = Video::query()->where($siteColumn, '=', $siteID)->first(['id']);
 
             return $result !== null ? (int) $result['id'] : false;
         }
