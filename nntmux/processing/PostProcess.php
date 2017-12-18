@@ -2,6 +2,9 @@
 
 namespace nntmux\processing;
 
+use App\Models\Release;
+use App\Models\ReleaseFile;
+use Illuminate\Support\Carbon;
 use nntmux\Nfo;
 use nntmux\XXX;
 use nntmux\NNTP;
@@ -14,13 +17,10 @@ use nntmux\Groups;
 use nntmux\Logger;
 use nntmux\Console;
 use nntmux\Sharing;
-use nntmux\SpotNab;
 use nntmux\Category;
-use nntmux\ColorCLI;
 use nntmux\NameFixer;
 use App\Models\Settings;
 use nntmux\ReleaseFiles;
-use dariusiii\rarinfo\SrrInfo;
 use nntmux\processing\tv\TMDB;
 use nntmux\processing\tv\TVDB;
 use dariusiii\rarinfo\Par2Info;
@@ -32,30 +32,27 @@ use nntmux\processing\post\ProcessAdditional;
 class PostProcess
 {
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
     /**
-     * Class instance of debugging.
-     *
-     * @var Logger
+     * @var \nntmux\Logger
      */
     protected $debugging;
 
     /**
-     * Instance of NameFixer.
-     * @var NameFixer
+     * @var \nntmux\NameFixer
      */
     protected $nameFixer;
 
     /**
-     * @var Par2Info
+     * @var \dariusiii\rarinfo\Par2Info
      */
     protected $_par2Info;
 
     /**
-     * @var SrrInfo
+     * @var
      */
     protected $_srrInfo;
 
@@ -78,17 +75,17 @@ class PostProcess
     private $echooutput;
 
     /**
-     * @var Groups
+     * @var \nntmux\Groups
      */
     private $groups;
 
     /**
-     * @var Nfo
+     * @var \nntmux\Nfo
      */
     private $Nfo;
 
     /**
-     * @var ReleaseFiles
+     * @var \nntmux\ReleaseFiles
      */
     private $releaseFiles;
 
@@ -102,14 +99,14 @@ class PostProcess
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Echo'         => true,
-			'Logger'       => null,
-			'Groups'       => null,
-			'NameFixer'    => null,
-			'Nfo'          => null,
-			'ReleaseFiles' => null,
-			'Settings'     => null,
-		];
+            'Echo'         => true,
+            'Logger'       => null,
+            'Groups'       => null,
+            'NameFixer'    => null,
+            'Nfo'          => null,
+            'ReleaseFiles' => null,
+            'Settings'     => null,
+        ];
         $options += $defaults;
 
         // Various.
@@ -142,7 +139,6 @@ class PostProcess
         $this->processAdditional($nntp);
         $this->processNfos($nntp);
         $this->processSharing($nntp);
-        $this->processSpotnab();
         $this->processMovies();
         $this->processMusic();
         $this->processConsoles();
@@ -154,9 +150,10 @@ class PostProcess
     }
 
     /**
-     * Lookup anidb if enabled - always run before tvrage.
+     * Lookup anidb if enabled
      *
-     * @return void
+     *
+     * @throws \Exception
      */
     public function processAnime(): void
     {
@@ -179,9 +176,7 @@ class PostProcess
     }
 
     /**
-     * Lookup console games if enabled.
-     *
-     * @return void
+     * @throws \Exception
      */
     public function processConsoles(): void
     {
@@ -191,9 +186,6 @@ class PostProcess
     }
 
     /**
-     * Lookup games if enabled.
-     *
-     * @return void
      * @throws \Exception
      */
     public function processGames(): void
@@ -223,9 +215,7 @@ class PostProcess
     }
 
     /**
-     * Lookup music if enabled.
-     *
-     * @return void
+     * @throws \Exception
      */
     public function processMusic(): void
     {
@@ -284,27 +274,6 @@ class PostProcess
     }
 
     /**
-     * Process Global IDs.
-     */
-    public function processSpotnab(): void
-    {
-        $spotnab = new SpotNab();
-        $processed = $spotnab->processGID();
-        if ($processed > 0) {
-            if ($this->echooutput) {
-                ColorCLI::doEcho(
-					ColorCLI::primary('Updating GID in releases table '.$processed.' release(s) updated')
-				);
-            }
-        }
-        $spotnab->auto_post_discovery();
-        $spotnab->fetch_discovery();
-        $spotnab->fetch();
-        $spotnab->post();
-        $spotnab->auto_clean();
-    }
-
-    /**
      * Lookup xxx if enabled.
      *
      * @throws \Exception
@@ -352,23 +321,17 @@ class PostProcess
             return false;
         }
 
-        $query = $this->pdo->queryOneRow(
-			sprintf('
-				SELECT id, groups_id, categories_id, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, id AS releases_id
-				FROM releases
-				WHERE isrenamed = 0
-				AND id = %d',
-				$relID
-			)
-		);
+        $query = Release::query()
+            ->where(['isrenamed' => 0, 'id' => $relID])
+            ->first(['id', 'groups_id', 'categories_id', 'name', 'searchname', 'postdate', 'id as releases_id']);
 
-        if ($query === false) {
+        if ($query === null) {
             return false;
         }
 
         // Only get a new name if the category is OTHER.
         $foundName = true;
-        if (in_array((int) $query['categories_id'], Category::OTHERS_GROUP, false)) {
+        if (\in_array((int) $query['categories_id'], Category::OTHERS_GROUP, false)) {
             $foundName = false;
         }
 
@@ -386,7 +349,7 @@ class PostProcess
 
         // Get the file list from Par2Info.
         $files = $this->_par2Info->getFileList();
-        if ($files !== false && count($files) > 0) {
+        if ($files !== false && \count($files) > 0) {
             $filesAdded = 0;
 
             // Loop through the files.
@@ -402,21 +365,10 @@ class PostProcess
 
                 if ($this->addpar2) {
                     // Add to release files.
-                    if ($filesAdded < 11 &&
-						$this->pdo->queryOneRow(
-							sprintf('
-								SELECT releases_id
-								FROM release_files
-								WHERE releases_id = %d
-								AND name = %s',
-								$relID,
-								$this->pdo->escapeString($file['name'])
-							)
-						) === false
-					) {
+                    if ($filesAdded < 11 && ReleaseFile::query()->where(['releases_id' => $relID, 'name' => $file['name']])->first(['releases_id'])=== null) {
 
-						// Try to add the files to the DB.
-                        if ($this->releaseFiles->add($relID, $file['name'], $file['hash_16K'], $file['size'], $query['post_date'], 0)) {
+                        // Try to add the files to the DB.
+                        if ($this->releaseFiles->add($relID, $file['name'], $file['hash_16K'], $file['size'], Carbon::createFromDate($query['postdate'])->timestamp, 0)) {
                             $filesAdded++;
                         }
                     }
@@ -435,18 +387,10 @@ class PostProcess
 
             // If we found some files.
             if ($filesAdded > 0) {
-                $this->debugging->log(get_class(), __FUNCTION__, 'Added '.$filesAdded.' release_files from PAR2 for '.$query['searchname'], Logger::LOG_INFO);
+                $this->debugging->log(__CLASS__, __FUNCTION__, 'Added '.$filesAdded.' release_files from PAR2 for '.$query['searchname'], Logger::LOG_INFO);
 
                 // Update the file count with the new file count + old file count.
-                $this->pdo->queryExec(
-					sprintf('
-						UPDATE releases
-						SET rarinnerfilecount = rarinnerfilecount + %d
-						WHERE id = %d',
-						$filesAdded,
-						$relID
-					)
-				);
+                Release::query()->where('id', $relID)->increment('rarinnerfilecount', $filesAdded);
             }
             if ($foundName === true) {
                 return true;

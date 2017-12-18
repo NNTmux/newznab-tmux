@@ -12,7 +12,7 @@ use App\Models\Tmux as TmuxModel;
 class Tmux
 {
     /**
-     * @var DB
+     * @var \nntmux\db\DB|null
      */
     public $pdo;
 
@@ -25,6 +25,7 @@ class Tmux
      * Tmux constructor.
      *
      * @param DB|null $pdo
+     * @throws \Exception
      */
     public function __construct(DB $pdo = null)
     {
@@ -50,7 +51,7 @@ class Tmux
 
         $sql = $sqlKeys = [];
         foreach ($form as $settingK => $settingV) {
-            if (is_array($settingV)) {
+            if (\is_array($settingV)) {
                 $settingV = implode(', ', $settingV);
             }
             $sql[] = sprintf('WHEN %s THEN %s', $this->pdo->escapeString($settingK), $this->pdo->escapeString($settingV));
@@ -111,16 +112,16 @@ class Tmux
     public function getUSPConnections($which, $connections)
     {
         switch ($which) {
-			case 'alternate':
-				$ip = 'ip_a';
-				$port = 'port_a';
-				break;
-			case 'primary':
-			default:
-				$ip = 'ip';
-				$port = 'port';
-				break;
-		}
+            case 'alternate':
+                $ip = 'ip_a';
+                $port = 'port_a';
+                break;
+            case 'primary':
+            default:
+                $ip = 'ip';
+                $port = 'port';
+                break;
+        }
 
         $runVar['conncounts'][$which]['active'] = $runVar['conncounts'][$which]['total'] = 0;
 
@@ -152,29 +153,29 @@ class Tmux
     {
         $panes = ['zero' => '', 'one' => '', 'two' => ''];
         switch ($constants['sequential']) {
-			case 0:
-				$panes_win_1 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:0 -F '#{pane_title}'`");
-				$panes['zero'] = str_replace("\n", '', explode(' ', $panes_win_1));
-				$panes_win_2 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:1 -F '#{pane_title}'`");
-				$panes['one'] = str_replace("\n", '', explode(' ', $panes_win_2));
-				$panes_win_3 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:2 -F '#{pane_title}'`");
-				$panes['two'] = str_replace("\n", '', explode(' ', $panes_win_3));
-				break;
-			case 1:
-				$panes_win_1 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:0 -F '#{pane_title}'`");
-				$panes['zero'] = str_replace("\n", '', explode(' ', $panes_win_1));
-				$panes_win_2 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:1 -F '#{pane_title}'`");
-				$panes['one'] = str_replace("\n", '', explode(' ', $panes_win_2));
-				$panes_win_3 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:2 -F '#{pane_title}'`");
-				$panes['two'] = str_replace("\n", '', explode(' ', $panes_win_3));
-				break;
-			case 2:
-				$panes_win_1 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:0 -F '#{pane_title}'`");
-				$panes['zero'] = str_replace("\n", '', explode(' ', $panes_win_1));
-				$panes_win_2 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:1 -F '#{pane_title}'`");
-				$panes['one'] = str_replace("\n", '', explode(' ', $panes_win_2));
-				break;
-		}
+            case 0:
+                $panes_win_1 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:0 -F '#{pane_title}'`");
+                $panes['zero'] = str_replace("\n", '', explode(' ', $panes_win_1));
+                $panes_win_2 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:1 -F '#{pane_title}'`");
+                $panes['one'] = str_replace("\n", '', explode(' ', $panes_win_2));
+                $panes_win_3 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:2 -F '#{pane_title}'`");
+                $panes['two'] = str_replace("\n", '', explode(' ', $panes_win_3));
+                break;
+            case 1:
+                $panes_win_1 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:0 -F '#{pane_title}'`");
+                $panes['zero'] = str_replace("\n", '', explode(' ', $panes_win_1));
+                $panes_win_2 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:1 -F '#{pane_title}'`");
+                $panes['one'] = str_replace("\n", '', explode(' ', $panes_win_2));
+                $panes_win_3 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:2 -F '#{pane_title}'`");
+                $panes['two'] = str_replace("\n", '', explode(' ', $panes_win_3));
+                break;
+            case 2:
+                $panes_win_1 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:0 -F '#{pane_title}'`");
+                $panes['zero'] = str_replace("\n", '', explode(' ', $panes_win_1));
+                $panes_win_2 = shell_exec("echo `tmux list-panes -t {$constants['tmux_session']}:1 -F '#{pane_title}'`");
+                $panes['one'] = str_replace("\n", '', explode(' ', $panes_win_2));
+                break;
+        }
 
         return $panes;
     }
@@ -188,16 +189,16 @@ class Tmux
         $settstr = 'SELECT value FROM settings WHERE setting =';
 
         $sql = sprintf(
-			"SELECT
+            "SELECT
 					(%1\$s 'sequential') AS sequential,
 					(%1\$s 'tmux_session') AS tmux_session,
 					(%1\$s 'run_ircscraper') AS run_ircscraper,
 					(%2\$s 'sqlpatch') AS sqlpatch,
 					(%2\$s 'alternate_nntp') AS alternate_nntp,
 					(%2\$s 'delaytime') AS delaytime",
-			$tmuxstr,
-			$settstr
-		);
+            $tmuxstr,
+            $settstr
+        );
 
         return $sql;
     }
@@ -211,7 +212,7 @@ class Tmux
         $settstr = 'SELECT value FROM settings WHERE setting =';
 
         $sql = sprintf(
-			"SELECT
+            "SELECT
 					(%1\$s 'monitor_delay') AS monitor,
 					(%1\$s 'binaries') AS binaries_run,
 					(%1\$s 'backfill') AS backfill,
@@ -272,9 +273,9 @@ class Tmux
 					(%2\$s 'request_hours') AS request_hours,
 					(%2\$s 'maxsizetopostprocess') AS maxsize_pp,
 					(%2\$s 'minsizetopostprocess') AS minsize_pp",
-			$tmuxstr,
-			$settstr
-		);
+            $tmuxstr,
+            $settstr
+        );
 
         return $sql;
     }
@@ -322,8 +323,6 @@ class Tmux
     {
         return TmuxModel::query()->where('setting', '=', $setting)->update(['value' => $value]);
     }
-
-    //get microtime
 
     /**
      * @return float
@@ -474,8 +473,9 @@ class Tmux
     public function proc_query($qry, $bookreqids, $request_hours, $db_name, $ppmax = '', $ppmin = '')
     {
         switch ((int) $qry) {
-			case 1:
-				return sprintf('
+            case 1:
+                return sprintf(
+                    '
 					SELECT
 					SUM(IF(nzbstatus = %d AND categories_id BETWEEN %d AND %d AND categories_id != %d AND videos_id = 0 AND tv_episodes_id BETWEEN -3 AND 0 AND size > 1048576,1,0)) AS processtv,
 					SUM(IF(nzbstatus = %1$d AND categories_id = %d AND anidbid IS NULL,1,0)) AS processanime,
@@ -496,55 +496,55 @@ class Tmux
 					SUM(IF(predb_id > 0,1,0)) AS predb_matched,
 					COUNT(DISTINCT(predb_id)) AS distinct_predb_matched
 					FROM releases r',
-					NZB::NZB_ADDED,
-					Category::TV_ROOT,
-					Category::TV_OTHER,
-					Category::TV_ANIME,
-					Category::TV_ANIME,
-					Category::MOVIE_ROOT,
-					Category::MOVIE_OTHER,
-					Category::MUSIC_MP3,
-					Category::MUSIC_LOSSLESS,
-					Category::MUSIC_OTHER,
-					Category::GAME_ROOT,
-					Category::GAME_OTHER,
-					$bookreqids,
-					Category::PC_GAMES,
-					Category::XXX_ROOT,
-					Category::XXX_X264,
-					Nfo::NfoQueryString(),
-					NameFixer::IS_RENAMED_NONE,
-					Nfo::NFO_UNPROC,
-					Nfo::NFO_FOUND,
-					NameFixer::PROC_NFO_NONE,
-					NameFixer::PROC_FILES_NONE,
-					NameFixer::PROC_UID_NONE,
-					NameFixer::PROC_HASH16K_NONE,
-					NameFixer::PROC_SRR_NONE,
-					NameFixer::PROC_PAR2_NONE,
-					MiscSorter::PROC_SORTER_NONE,
-					Category::getCategoryOthersGroup(),
-					NameFixer::IS_RENAMED_DONE,
-					RequestID::IS_REQID_TRUE,
-					RequestID::REQID_UPROC,
-					RequestID::REQID_NOLL,
-					RequestID::REQID_NONE,
-					RequestID::REQID_FOUND,
-					$request_hours
-				);
+                    NZB::NZB_ADDED,
+                    Category::TV_ROOT,
+                    Category::TV_OTHER,
+                    Category::TV_ANIME,
+                    Category::TV_ANIME,
+                    Category::MOVIE_ROOT,
+                    Category::MOVIE_OTHER,
+                    Category::MUSIC_MP3,
+                    Category::MUSIC_LOSSLESS,
+                    Category::MUSIC_OTHER,
+                    Category::GAME_ROOT,
+                    Category::GAME_OTHER,
+                    $bookreqids,
+                    Category::PC_GAMES,
+                    Category::XXX_ROOT,
+                    Category::XXX_X264,
+                    Nfo::NfoQueryString(),
+                    NameFixer::IS_RENAMED_NONE,
+                    Nfo::NFO_UNPROC,
+                    Nfo::NFO_FOUND,
+                    NameFixer::PROC_NFO_NONE,
+                    NameFixer::PROC_FILES_NONE,
+                    NameFixer::PROC_UID_NONE,
+                    NameFixer::PROC_HASH16K_NONE,
+                    NameFixer::PROC_SRR_NONE,
+                    NameFixer::PROC_PAR2_NONE,
+                    MiscSorter::PROC_SORTER_NONE,
+                    Category::getCategoryOthersGroup(),
+                    NameFixer::IS_RENAMED_DONE,
+                    RequestID::IS_REQID_TRUE,
+                    RequestID::REQID_UPROC,
+                    RequestID::REQID_NOLL,
+                    RequestID::REQID_NONE,
+                    RequestID::REQID_FOUND,
+                    $request_hours
+                );
 
-			case 2:
-				$ppminString = $ppmaxString = '';
-				if (is_numeric($ppmax) && ! empty($ppmax)) {
-				    $ppmax *= 1073741824;
-				    $ppmaxString = "AND r.size < {$ppmax}";
-				}
-				if (is_numeric($ppmin) && ! empty($ppmin)) {
-				    $ppmin *= 1048576;
-				    $ppminString = "AND r.size > {$ppmin}";
-				}
+            case 2:
+                $ppminString = $ppmaxString = '';
+                if (is_numeric($ppmax) && ! empty($ppmax)) {
+                    $ppmax *= 1073741824;
+                    $ppmaxString = "AND r.size < {$ppmax}";
+                }
+                if (is_numeric($ppmin) && ! empty($ppmin)) {
+                    $ppmin *= 1048576;
+                    $ppminString = "AND r.size > {$ppmin}";
+                }
 
-				return "SELECT
+                return "SELECT
 					(SELECT COUNT(r.id) FROM releases r
 						LEFT JOIN categories c ON c.id = r.categories_id
 						WHERE r.nzbstatus = 1
@@ -557,8 +557,9 @@ class Tmux
 					(SELECT COUNT(id) FROM groups WHERE active = 1) AS active_groups,
 					(SELECT COUNT(id) FROM groups WHERE name IS NOT NULL) AS all_groups";
 
-			case 4:
-				return sprintf("
+            case 4:
+                return sprintf(
+                    "
 					SELECT
 					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'predb' AND TABLE_SCHEMA = %1\$s) AS predb,
 					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'missed_parts' AND TABLE_SCHEMA = %1\$s) AS missed_parts_table,
@@ -571,17 +572,17 @@ class Tmux
 					) AS backfill_groups_days,
 					(SELECT COUNT(id) FROM groups WHERE first_record IS NOT NULL AND backfill = 1 AND (now() - INTERVAL datediff(curdate(),
 					(SELECT VALUE FROM settings WHERE setting = 'safebackfilldate')) DAY) < first_record_postdate) AS backfill_groups_date",
-					$this->pdo->escapeString($db_name)
-				);
-			case 6:
-				return 'SELECT
+                    $this->pdo->escapeString($db_name)
+                );
+            case 6:
+                return 'SELECT
 					(SELECT searchname FROM releases ORDER BY id DESC LIMIT 1) AS newestrelname,
 					(SELECT UNIX_TIMESTAMP(MIN(dateadded)) FROM collections) AS oldestcollection,
 					(SELECT UNIX_TIMESTAMP(MAX(predate)) FROM predb) AS newestpre,
 					(SELECT UNIX_TIMESTAMP(adddate) FROM releases ORDER BY id DESC LIMIT 1) AS newestrelease';
-			default:
-				return false;
-		}
+            default:
+                return false;
+        }
     }
 
     /**
@@ -633,17 +634,19 @@ class Tmux
      * Retrieves and returns ALL collections, binaries, parts, and missed parts table names from the Db.
      *
      * @return bool|\PDOStatement
+     * @throws \RuntimeException
      */
     public function cbpmTableQuery()
     {
         $regstr = '^(multigroup_)?(collections|binaries|parts|missed_parts)(_[0-9]+)?$';
 
-        return $this->pdo->queryDirect("
+        return $this->pdo->queryDirect(
+            "
 			SELECT TABLE_NAME AS name
       		FROM information_schema.TABLES
       		WHERE TABLE_SCHEMA = (SELECT DATABASE())
 			AND TABLE_NAME REGEXP {$this->pdo->escapeString($regstr)}
 			ORDER BY TABLE_NAME ASC"
-		);
+        );
     }
 }
