@@ -126,11 +126,9 @@ abstract class Videos
     {
         if (\in_array($siteColumn, self::$sites, false)) {
             $result = Video::query()->where($siteColumn, '=', $siteID)->first(['id']);
-
-            return $result !== null ? (int) $result['id'] : false;
         }
 
-        return false;
+        return $result !== null ? $result->id : false;
     }
 
     /**
