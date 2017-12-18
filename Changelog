@@ -1,4 +1,5 @@
 2017-12-18 DariusIII
+	* Chg: Remove requestid lookup settings from site edit
 	* Chg: Remove spotnab from nntmux, update PostProcess class
 	* Fix: Fix site stats display error
 	* Chg: Update Video and VideoAlias models, update Videos class
