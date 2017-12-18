@@ -20,4 +20,9 @@ class Video extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    public function alias()
+    {
+        return $this->hasMany(VideoAlias::class, 'videos_id');
+    }
 }

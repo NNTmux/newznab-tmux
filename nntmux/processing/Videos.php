@@ -21,7 +21,11 @@
 
 namespace nntmux\processing;
 
-use nntmux\db\DB;
+use App\Models\TvInfo;
+use App\Models\Video;
+use App\Models\VideoAlias;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Parent class for TV/Film and any similar classes to inherit from.
@@ -29,14 +33,9 @@ use nntmux\db\DB;
 abstract class Videos
 {
     // Video Type Identifiers
-	const TYPE_TV = 0; // Type of video is a TV Programme/Show
-	const TYPE_FILM = 1; // Type of video is a Film/Movie
-	const TYPE_ANIME = 2; // Type of video is a Anime
-
-    /**
-     * @var DB
-     */
-    public $pdo;
+    protected const TYPE_TV = 0; // Type of video is a TV Programme/Show
+    protected const TYPE_FILM = 1; // Type of video is a Film/Movie
+    protected const TYPE_ANIME = 2; // Type of video is a Anime
 
     /**
      * @var bool
@@ -56,16 +55,12 @@ abstract class Videos
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Echo'     => false,
-			'Settings' => null,
-		];
+            'Echo'     => false,
+            'Settings' => null,
+        ];
         $options += $defaults;
 
-        // Sets the default timezone for this script (and its children).
-        //date_default_timezone_set('UTC'); TODO: Make this a DTO instead and use as needed
-
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->titleCache = [];
     }
 
@@ -90,10 +85,10 @@ abstract class Videos
      */
     protected function getSiteIDFromVideoID($siteColumn, $videoID)
     {
-        if (in_array($siteColumn, self::$sites, false)) {
-            $result = $this->pdo->queryOneRow(sprintf('SELECT %s FROM videos WHERE id = %d', $siteColumn, $videoID));
+        if (\in_array($siteColumn, self::$sites, false)) {
+            $result = Video::query()->where('id', $videoID)->first([$siteColumn]);
 
-            return $result[$siteColumn] ?? false;
+            return $result !== null ? $result[$siteColumn] : false;
         }
 
         return false;
@@ -108,25 +103,25 @@ abstract class Videos
      */
     protected function getLocalZoneFromVideoID($videoID): string
     {
-        $result = $this->pdo->queryOneRow(sprintf('SELECT localzone FROM tv_info WHERE videos_id = %d', $videoID));
+        $result = TvInfo::query()->where('videos_id', $videoID)->first(['localzone']);
 
-        return $result['localzone'] ?? '';
+        return $result !== null ? $result['localzone'] : '';
     }
 
     /**
      * Get video info from a Site ID and column.
      *
-     * @param string	$siteColumn
-     * @param int	$siteID
      *
-     * @return int|false	False if invalid site, or ID not found; video.id value otherwise.
+     * @param $siteColumn
+     * @param $siteID
+     * @return bool|int
      */
     protected function getVideoIDFromSiteID($siteColumn, $siteID)
     {
-        if (in_array($siteColumn, self::$sites, false)) {
-            $result = $this->pdo->queryOneRow(sprintf('SELECT id FROM videos WHERE %s = %d', $siteColumn, $siteID));
+        if (\in_array($siteColumn, self::$sites, false)) {
+            $result = Video::query()->where($siteColumn, $siteID)->first(['id']);
 
-            return isset($result['id']) ? (int) $result['id'] : false;
+            return $result !== null ? (int) $result['id'] : false;
         }
 
         return false;
@@ -190,7 +185,7 @@ abstract class Videos
         // example release name :Zorro 1990, tvrage name Zorro (1990)
         // Only search if the title contains more than one word to prevent incorrect matches
         $pieces = explode(' ', $title);
-        if (count($pieces) > 1) {
+        if (\count($pieces) > 1) {
             $title2 = '%';
             foreach ($pieces as $piece) {
                 $title2 .= str_replace(["'", '!'], '', $piece).'%';
@@ -205,43 +200,29 @@ abstract class Videos
     }
 
     /**
-     * Supplementary function for getByTitle that queries for exact match.
-     *
-     * @param        $title
-     * @param        $type
-     * @param int    $source
-     *
-     * @return array|false
+     * @param $title
+     * @param $type
+     * @param int $source
+     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
      */
     public function getTitleExact($title, $type, $source = 0)
     {
         $return = false;
         if (! empty($title)) {
-            $return = $this->pdo->queryOneRow(
-				sprintf('
-					SELECT v.id
-					FROM videos v
-					WHERE v.title = %1$s
-					AND v.type = %2$d %3$s',
-					$this->pdo->escapeString($title),
-					$type,
-					($source > 0 ? 'AND v.source = '.$source : '')
-				)
-			);
+            $sql = Video::query()->where(['title' => $title, 'type' => $type]);
+            if ($source > 0) {
+                $sql->where('source', $source);
+            }
+            $return = $sql->first(['id']);
             // Try for an alias
             if ($return === false) {
-                $return = $this->pdo->queryOneRow(
-					sprintf('
-						SELECT v.id
-						FROM videos v
-						INNER JOIN videos_aliases va ON v.id = va.videos_id
-						WHERE va.title = %1$s
-						AND v.type = %2$d %3$s',
-						$this->pdo->escapeString($title),
-						$type,
-						($source > 0 ? 'AND v.source = '.$source : '')
-					)
-				);
+                $sql = Video::query()
+                    ->join('videos_aliases', 'videos.id', '=', 'video_aliases.videos_id')
+                    ->where(['videos.title' => $title, 'videos.type' => $type]);
+                if ($source > 0) {
+                    $sql->where('videos.source', $source);
+                }
+                $return = $sql->first(['videos.id']);
             }
         }
 
@@ -262,31 +243,23 @@ abstract class Videos
         $return = false;
 
         if (! empty($title)) {
-            $return = $this->pdo->queryOneRow(
-				sprintf('
-					SELECT v.id
-					FROM videos v
-					WHERE v.title %s
-					AND type = %d %s',
-					$this->pdo->likeString(rtrim($title, '%'), false, false),
-					$type,
-					($source > 0 ? 'AND v.source = '.$source : '')
-				)
-			);
+            $sql = Video::query()
+                ->where('title', 'LIKE', rtrim($title, '%'))
+                ->where('type', $type);
+            if ($source > 0) {
+                $sql->where('source', $source);
+            }
+            $return = $sql->first(['id']);
             // Try for an alias
-            if ($return === false) {
-                $return = $this->pdo->queryOneRow(
-					sprintf('
-						SELECT v.id
-						FROM videos v
-						INNER JOIN videos_aliases va ON v.id = va.videos_id
-						WHERE va.title %s
-						AND type = %d %s',
-						$this->pdo->likeString(rtrim($title, '%'), false, false),
-						$type,
-						($source > 0 ? 'AND v.source = '.$source : '')
-					)
-				);
+            if ($return === null) {
+                $sql = Video::query()
+                    ->join('video_aliases', 'videos.id', '=', 'video_aliases.videos_id')
+                    ->where('video_aliases.title', '=', rtrim($title, '%'))
+                    ->where('type', $type);
+                if ($source > 0) {
+                    $sql->where('videos.source', $source);
+                }
+                $return = $sql->first(['videos.id']);
             }
         }
 
@@ -304,22 +277,14 @@ abstract class Videos
         if (! empty($aliases) && $videoId > 0) {
             foreach ($aliases as $key => $title) {
                 // Check for tvmaze style aka
-                if (is_array($title) && ! empty($title['name'])) {
+                if (\is_array($title) && ! empty($title['name'])) {
                     $title = $title['name'];
                 }
                 // Check if we have the AKA already
                 $check = $this->getAliases(0, $title);
 
                 if ($check === false) {
-                    $this->pdo->queryInsert(
-						sprintf('
-							INSERT IGNORE INTO videos_aliases
-							(videos_id, title)
-							VALUES (%d, %s)',
-							$videoId,
-							$this->pdo->escapeString($title)
-						)
-					);
+                    VideoAlias::insertIgnore(['videos_id' => $videoId, 'title' => $title]);
                 }
             }
         }
@@ -336,20 +301,22 @@ abstract class Videos
     public function getAliases($videoId = 0, $alias = '')
     {
         $return = false;
-        $sql = '';
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
 
-        if ($videoId > 0) {
-            $sql = 'videos_id = '.$videoId;
-        } elseif ($alias !== '') {
-            $sql = 'title = '.$this->pdo->escapeString($alias);
-        }
-
-        if ($sql !== '') {
-            $return = $this->pdo->query('
-				SELECT *
-				FROM videos_aliases
-				WHERE '.$sql, true, NN_CACHE_EXPIRY_MEDIUM
-			);
+        if ($videoId > 0 || $alias !== '') {
+            $aliasCache = Cache::get(md5($videoId.$alias));
+            if ($aliasCache !== null) {
+                $return = $aliasCache;
+            } else {
+                $sql = VideoAlias::query();
+                if ($videoId > 0) {
+                    $sql->where('videos_id', $videoId);
+                } elseif ($alias !== '') {
+                    $sql->where('title', $alias);
+                }
+                $return = $sql->get();
+                Cache::put(md5($videoId.$alias), $return, $expiresAt);
+            }
         }
 
         return empty($return) ? false : $return;
