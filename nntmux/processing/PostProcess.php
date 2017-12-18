@@ -2,9 +2,6 @@
 
 namespace nntmux\processing;
 
-use App\Models\Release;
-use App\Models\ReleaseFile;
-use Illuminate\Support\Carbon;
 use nntmux\Nfo;
 use nntmux\XXX;
 use nntmux\NNTP;
@@ -19,8 +16,11 @@ use nntmux\Console;
 use nntmux\Sharing;
 use nntmux\Category;
 use nntmux\NameFixer;
+use App\Models\Release;
 use App\Models\Settings;
 use nntmux\ReleaseFiles;
+use App\Models\ReleaseFile;
+use Illuminate\Support\Carbon;
 use nntmux\processing\tv\TMDB;
 use nntmux\processing\tv\TVDB;
 use dariusiii\rarinfo\Par2Info;
@@ -150,7 +150,7 @@ class PostProcess
     }
 
     /**
-     * Lookup anidb if enabled
+     * Lookup anidb if enabled.
      *
      *
      * @throws \Exception
@@ -365,7 +365,7 @@ class PostProcess
 
                 if ($this->addpar2) {
                     // Add to release files.
-                    if ($filesAdded < 11 && ReleaseFile::query()->where(['releases_id' => $relID, 'name' => $file['name']])->first(['releases_id'])=== null) {
+                    if ($filesAdded < 11 && ReleaseFile::query()->where(['releases_id' => $relID, 'name' => $file['name']])->first(['releases_id']) === null) {
 
                         // Try to add the files to the DB.
                         if ($this->releaseFiles->add($relID, $file['name'], $file['hash_16K'], $file['size'], Carbon::createFromDate($query['postdate'])->timestamp, 0)) {
