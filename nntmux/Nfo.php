@@ -10,7 +10,6 @@ use nntmux\utility\Utility;
 use dariusiii\rarinfo\SfvInfo;
 use dariusiii\rarinfo\Par2Info;
 use nntmux\processing\PostProcess;
-use Illuminate\Support\Facades\DB as DBFacade;
 
 /**
  * Class Nfo
