@@ -519,7 +519,7 @@ class Tmux
                     NameFixer::PROC_PAR2_NONE,
                     MiscSorter::PROC_SORTER_NONE,
                     Category::getCategoryOthersGroup(),
-                    NameFixer::IS_RENAMED_DONE,
+                    NameFixer::IS_RENAMED_DONE
                 );
 
             case 2:
