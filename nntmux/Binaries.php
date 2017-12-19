@@ -16,15 +16,15 @@ use nntmux\processing\ProcessReleasesMultiGroup;
  */
 class Binaries
 {
-    const OPTYPE_BLACKLIST = 1;
-    const OPTYPE_WHITELIST = 2;
+    public const OPTYPE_BLACKLIST = 1;
+    public const OPTYPE_WHITELIST = 2;
 
-    const BLACKLIST_DISABLED = 0;
-    const BLACKLIST_ENABLED = 1;
+    public const BLACKLIST_DISABLED = 0;
+    public const BLACKLIST_ENABLED = 1;
 
-    const BLACKLIST_FIELD_SUBJECT = 1;
-    const BLACKLIST_FIELD_FROM = 2;
-    const BLACKLIST_FIELD_MESSAGEID = 3;
+    public const BLACKLIST_FIELD_SUBJECT = 1;
+    public const BLACKLIST_FIELD_FROM = 2;
+    public const BLACKLIST_FIELD_MESSAGEID = 3;
 
     /**
      * @var array
@@ -266,16 +266,6 @@ class Binaries
         $this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
         $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
         $this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof CollectionsCleaning ? $options['CollectionsCleaning'] : new CollectionsCleaning(['Settings' => $this->_pdo]));
-
-        $this->_debug = (NN_DEBUG || NN_LOGGING);
-
-        if ($this->_debug) {
-            try {
-                $this->_debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->_colorCLI]));
-            } catch (LoggerException $error) {
-                $this->_debug = false;
-            }
-        }
 
         $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ?
             (int) Settings::settingValue('..maxmssgs') : 20000;
@@ -1213,7 +1203,7 @@ class Binaries
                 $partList = $range['partlist'];
 
                 if ($this->_echoCLI) {
-                    echo chr(random_int(45, 46)).PHP_EOL;
+                    echo \chr(random_int(45, 46)).PHP_EOL;
                 }
 
                 // Get article headers from newsgroup.
@@ -1489,7 +1479,7 @@ class Binaries
      * @param $timestamp
      * @return int
      */
-    private function daysOld($timestamp)
+    private function daysOld($timestamp): int
     {
         return Carbon::createFromTimestamp($timestamp)->diffInDays();
     }
