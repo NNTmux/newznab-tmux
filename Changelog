@@ -1,3 +1,5 @@
+2017-12-20 DariusIII
+	* Chg: Add foreign keys to mysql-ddl.sql
 2017-12-19 DariusIII
 	* Chg: Update Books class
 	* Chg: Update Binaries class
