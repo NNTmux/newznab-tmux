@@ -1,4 +1,5 @@
 2017-12-19 DariusIII
+	* Chg: Update laravel/framework and laravel/tinker to latest versions
 	* Chg: Update ColorCLI class
 	* Fix: Possible fix for blank searchname on mediainfo moviename rename
 	* Chg: Remove code that handles requestids
