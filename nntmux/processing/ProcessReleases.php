@@ -16,8 +16,6 @@ use App\Models\Release;
 use App\Models\Settings;
 use nntmux\ConsoleTools;
 use nntmux\ReleaseImage;
-use nntmux\RequestIDWeb;
-use nntmux\RequestIDLocal;
 use nntmux\ReleaseCleaning;
 use App\Models\ReleaseRegex;
 use App\Models\ReleasesGroups;
@@ -61,11 +59,6 @@ class ProcessReleases
      * @var int
      */
     public $completion;
-
-    /**
-     * @var int
-     */
-    public $processRequestIDs;
 
     /**
      * @var bool
@@ -210,35 +203,12 @@ class ProcessReleases
         $this->processCollectionSizes($groupID);
         $this->deleteUnwantedCollections($groupID);
 
-        //$DIR = NN_MISC;
-
         $totalReleasesAdded = 0;
         do {
             $releasesCount = $this->createReleases($groupID);
             $totalReleasesAdded += $releasesCount['added'];
 
             $nzbFilesAdded = $this->createNZBs($groupID);
-            // requestid lookups disabled because they are no longer being posted
-            /*if ($this->processRequestIDs === 0) {
-                $this->processRequestIDs($groupID, 5000, true);
-            } elseif ($this->processRequestIDs === 1) {
-                $this->processRequestIDs($groupID, 5000, true);
-                $this->processRequestIDs($groupID, 1000, false);
-            } elseif ($this->processRequestIDs === 2) {
-                $requestIDTime = time();
-                if ($this->echoCLI) {
-                    ColorCLI::doEcho(ColorCLI::header('Process Releases -> Request ID Threaded lookup.'));
-                }
-                passthru("${DIR}update/multiprocessing/requestid.php");
-                if ($this->echoCLI) {
-                    ColorCLI::doEcho(
-                        ColorCLI::primary(
-                            "\nReleases updated in ".
-                            $this->consoleTools->convertTime(time() - $requestIDTime)
-                        )
-                    );
-                }
-            } */
 
             $this->categorizeReleases($categorize, $groupID);
             $this->postProcessReleases($postProcess, $nntp);
@@ -628,14 +598,13 @@ class ProcessReleases
                         $collection['gname']
                     );
 
-                    if (is_array($cleanedName)) {
+                    if (\is_array($cleanedName)) {
                         $properName = $cleanedName['properlynamed'];
                         $preID = $cleanerName['predb'] ?? false;
-                        $isReqID = $cleanerName['requestid'] ?? false;
                         $cleanedName = $cleanedName['cleansubject'];
                     } else {
                         $properName = true;
-                        $isReqID = $preID = false;
+                        $preID = false;
                     }
 
                     if ($preID === false && $cleanedName !== '') {
@@ -660,7 +629,6 @@ class ProcessReleases
                             'size' => $collection['filesize'],
                             'categories_id' => $categorize->determineCategory($collection['groups_id'], $cleanedName),
                             'isrenamed' => $properName === true ? 1 : 0,
-                            'reqidstatus' => $isReqID === true ? 1 : 0,
                             'predb_id' => $preID === false ? 0 : $preID,
                             'nzbstatus' => NZB::NZB_NONE,
                         ]
@@ -780,6 +748,7 @@ class ProcessReleases
      * @param int|string $groupID (optional)
      *
      * @return int
+     * @throws \RuntimeException
      */
     public function createNZBs($groupID): int
     {
@@ -834,70 +803,6 @@ class ProcessReleases
         }
 
         return $nzbCount;
-    }
-
-    /**
-     * Process RequestID's.
-     *
-     * @param int|string $groupID
-     * @param int        $limit
-     * @param bool       $local
-     *
-     * @void
-     * @throws \Exception
-     */
-    public function processRequestIDs($groupID = '', $limit = 5000, $local = true): void
-    {
-        if ($local === false && (int) Settings::settingValue('..lookup_reqids') === 0) {
-            return;
-        }
-
-        $startTime = time();
-        if ($this->echoCLI) {
-            ColorCLI::doEcho(
-                ColorCLI::header(
-                    sprintf(
-                        'Process Releases -> Request ID %s lookup -- limit %s',
-                        ($local === true ? 'local' : 'web'),
-                        $limit
-                    )
-                )
-            );
-        }
-
-        if ($local === true) {
-            $foundRequestIDs = (
-            new RequestIDLocal(
-                [
-                    'Echo'         => $this->echoCLI,
-                    'ConsoleTools' => $this->consoleTools,
-                    'Groups'       => $this->groups,
-                    'Settings'     => $this->pdo,
-                ]
-            )
-            )->lookupRequestIDs(['GroupID' => $groupID, 'limit' => $limit, 'time' => 168]);
-        } else {
-            $foundRequestIDs = (
-            new RequestIDWeb(
-                [
-                    'Echo'         => $this->echoCLI,
-                    'ConsoleTools' => $this->consoleTools,
-                    'Groups'       => $this->groups,
-                    'Settings'     => $this->pdo,
-                ]
-            )
-            )->lookupRequestIDs(['GroupID' => $groupID, 'limit' => $limit, 'time' => 168]);
-        }
-        if ($this->echoCLI) {
-            ColorCLI::doEcho(
-                ColorCLI::primary(
-                    number_format($foundRequestIDs).
-                    ' releases updated in '.
-                    $this->consoleTools->convertTime(time() - $startTime)
-                ),
-                true
-            );
-        }
     }
 
     /**
@@ -1377,7 +1282,7 @@ class ProcessReleases
 
         // Disabled categories.
         $disabledCategories = $category->getDisabledIDs();
-        if (count($disabledCategories) > 0) {
+        if (\count($disabledCategories) > 0) {
             foreach ($disabledCategories as $disabledCategory) {
                 $releases = $this->pdo->queryDirect(
                     sprintf('SELECT SQL_NO_CACHE id, guid FROM releases WHERE categories_id = %d', (int) $disabledCategory['id'])
@@ -1428,7 +1333,7 @@ class ProcessReleases
 
         // Disabled music genres.
         $genrelist = $genres->getDisabledIDs();
-        if (count($genrelist) > 0) {
+        if (\count($genrelist) > 0) {
             foreach ($genrelist as $genre) {
                 $releases = $this->pdo->queryDirect(
                     sprintf(
@@ -1821,7 +1726,7 @@ class ProcessReleases
                 $where
             )
         );
-        if ($this->echoCLI && is_object($obj) && $obj->rowCount()) {
+        if ($this->echoCLI && \is_object($obj) && $obj->rowCount()) {
             ColorCLI::doEcho(
                 ColorCLI::primary('Deleted '.$obj->rowCount().' broken/stuck collections.')
             );

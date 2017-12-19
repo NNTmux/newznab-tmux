@@ -1,4 +1,5 @@
 2017-12-19 DariusIII
+	* Chg: Remove code that handles requestids
 	* Chg: Update ParHash model and query in ReleaseFiles
 	* Chg: Possible fix for Carbon error
 2017-12-18 DariusIII

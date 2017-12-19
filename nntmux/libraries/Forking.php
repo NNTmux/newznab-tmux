@@ -9,7 +9,6 @@ use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Tmux;
 use nntmux\ColorCLI;
-use nntmux\RequestID;
 use App\Models\Settings;
 use nntmux\processing\PostProcess;
 
@@ -254,10 +253,6 @@ class Forking extends \fork_daemon
             case 'postProcess_tv':
                 $this->ppRenamedOnly = (isset($this->workTypeOptions[0]) && $this->workTypeOptions[0] === true);
                 $maxProcesses = $this->postProcessTvMainMethod();
-                break;
-
-            case 'request_id':
-                $maxProcesses = $this->requestIDMainMethod();
                 break;
 
             case 'safe_backfill':
@@ -971,36 +966,6 @@ class Forking extends \fork_daemon
         $postProcess->processGames();
         $postProcess->processMusic();
         $postProcess->processXXX();
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////// All requestID code goes here ////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @return null|string
-     * @throws \Exception
-     */
-    private function requestIDMainMethod()
-    {
-        $this->register_child_run([0 => $this, 1 => 'requestIDChildWorker']);
-        $this->work = $this->pdo->query(
-            sprintf(
-                '
-				SELECT DISTINCT(g.id)
-				FROM groups g
-				INNER JOIN releases r ON r.groups_id = g.id
-				WHERE (g.active = 1 OR g.backfill = 1)
-				AND r.nzbstatus = %d
-				AND r.predb_id = 0
-				AND r.isrequestid = 1
-				AND r.reqidstatus = %d',
-                NZB::NZB_ADDED,
-                RequestID::REQID_UPROC
-            )
-        );
-
-        return (int) Settings::settingValue('..reqidthreads');
     }
 
     /**

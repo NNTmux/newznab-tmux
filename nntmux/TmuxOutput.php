@@ -250,20 +250,6 @@ class TmuxOutput extends Tmux
         );
         $buffer .= sprintf(
             $this->tmpMasks[4],
-            'RequestID',
-            sprintf(
-                '%s(%s)',
-                number_format($this->runVar['counts']['now']['requestid_inprogress']),
-                $this->runVar['counts']['diff']['requestid_inprogress']
-            ),
-            sprintf(
-                '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['requestid_matched']),
-                $this->runVar['counts']['percent']['requestid_matched']
-            )
-        );
-        $buffer .= sprintf(
-            $this->tmpMasks[4],
             'Renames',
             sprintf(
                 '%s(%s)',

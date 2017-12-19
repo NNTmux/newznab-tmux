@@ -17,7 +17,6 @@ use nntmux\Groups;
 use nntmux\Nfo;
 use nntmux\NNTP;
 use nntmux\processing\ProcessReleasesMultiGroup;
-use nntmux\RequestIDLocal;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
 // The type of process we want to do: $options[1] => (string): releases
@@ -176,14 +175,6 @@ switch ($options[1]) {
 			//$releases->processRequestIDs('', (5000 * $groupCount), true);
 			//$releases->processRequestIDs('', (1000 * $groupCount), false);
 			$releases->categorizeReleases(2);
-		}
-		break;
-
-	// Process all local requestid for a single group.
-	// $options[2] => (int)groupid, group to work on
-	case 'requestid':
-		if (is_numeric($options[2])) {
-			(new RequestIDLocal(['Echo' => true]))->lookupRequestIDs(['GroupID' => $options[2], 'limit' => 5000]);
 		}
 		break;
 

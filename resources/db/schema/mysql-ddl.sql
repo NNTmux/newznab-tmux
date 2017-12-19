@@ -758,7 +758,6 @@ CREATE TABLE         releases (
   iscategorized     TINYINT(1)                     NOT NULL DEFAULT '0',
   isrenamed         TINYINT(1)                     NOT NULL DEFAULT '0',
   ishashed          TINYINT(1)                     NOT NULL DEFAULT '0',
-  isrequestid       TINYINT(1)                     NOT NULL DEFAULT '0',
   proc_pp           TINYINT(1)                     NOT NULL DEFAULT '0',
   proc_sorter       TINYINT(1)                     NOT NULL DEFAULT '0',
   proc_par2         TINYINT(1)                     NOT NULL DEFAULT '0',
@@ -789,8 +788,7 @@ processed',
   INDEX ix_releases_haspreview_passwordstatus (haspreview,passwordstatus),
   INDEX ix_releases_passwordstatus            (passwordstatus),
   INDEX ix_releases_nfostatus                 (nfostatus,size),
-  INDEX ix_releases_dehashstatus              (dehashstatus,ishashed),
-  INDEX ix_releases_reqidstatus               (adddate,reqidstatus,isrequestid)
+  INDEX ix_releases_dehashstatus              (dehashstatus,ishashed)
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -1445,8 +1443,6 @@ CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW
   BEGIN
     IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}'
       THEN SET NEW.ishashed = 1;
-    ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\s?\\['
-      THEN SET NEW.isrequestid = 1;
     END IF;
   END; $$
 
@@ -1454,8 +1450,6 @@ CREATE TRIGGER check_update BEFORE UPDATE ON releases FOR EACH ROW
   BEGIN
     IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}'
       THEN SET NEW.ishashed = 1;
-    ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\s?\\['
-      THEN SET NEW.isrequestid = 1;
     END IF;
   END; $$
 

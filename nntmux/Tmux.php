@@ -269,8 +269,6 @@ class Tmux
 					(%2\$s 'nzbthreads') AS nzbthreads,
 					(%2\$s 'tmpunrarpath') AS tmpunrar,
 					(%2\$s 'compressedheaders') AS compressed,
-					(%2\$s 'book_reqids') AS book_reqids,
-					(%2\$s 'request_hours') AS request_hours,
 					(%2\$s 'maxsizetopostprocess') AS maxsize_pp,
 					(%2\$s 'minsizetopostprocess') AS minsize_pp",
             $tmuxstr,
@@ -462,7 +460,6 @@ class Tmux
     /**
      * @param        $qry
      * @param        $bookreqids
-     * @param int    $request_hours
      * @param string $db_name
      * @param string $ppmax
      * @param string $ppmin
@@ -470,7 +467,7 @@ class Tmux
      * @return bool|string
      * @throws \Exception
      */
-    public function proc_query($qry, $bookreqids, $request_hours, $db_name, $ppmax = '', $ppmin = '')
+    public function proc_query($qry, $bookreqids, $db_name, $ppmax = '', $ppmin = '')
     {
         switch ((int) $qry) {
             case 1:
@@ -491,8 +488,6 @@ class Tmux
 							OR (ishashed = 1 AND dehashstatus BETWEEN -6 AND 0)) AND categories_id IN (%s),1,0)) AS processrenames,
 					SUM(IF(isrenamed = %d,1,0)) AS renamed,
 					SUM(IF(nzbstatus = %1$d AND nfostatus = %20$d,1,0)) AS nfo,
-					SUM(IF(nzbstatus = %1$d AND isrequestid = %d AND predb_id = 0 AND ((reqidstatus = %d) OR (reqidstatus = %d) OR (reqidstatus = %d AND adddate > NOW() - INTERVAL %s HOUR)),1,0)) AS requestid_inprogress,
-					SUM(IF(predb_id > 0 AND nzbstatus = %1$d AND isrequestid = %28$d AND reqidstatus = %d,1,0)) AS requestid_matched,
 					SUM(IF(predb_id > 0,1,0)) AS predb_matched,
 					COUNT(DISTINCT(predb_id)) AS distinct_predb_matched
 					FROM releases r',
@@ -525,12 +520,6 @@ class Tmux
                     MiscSorter::PROC_SORTER_NONE,
                     Category::getCategoryOthersGroup(),
                     NameFixer::IS_RENAMED_DONE,
-                    RequestID::IS_REQID_TRUE,
-                    RequestID::REQID_UPROC,
-                    RequestID::REQID_NOLL,
-                    RequestID::REQID_NONE,
-                    RequestID::REQID_FOUND,
-                    $request_hours
                 );
 
             case 2:
@@ -623,7 +612,7 @@ class Tmux
     /**
      * @throws \RuntimeException
      */
-    public function startRunning()
+    public function startRunning(): void
     {
         if ($this->isRunning() === false) {
             TmuxModel::query()->where('setting', '=', 'running')->update(['value' => 1]);

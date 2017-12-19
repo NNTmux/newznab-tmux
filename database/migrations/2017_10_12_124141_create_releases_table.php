@@ -54,7 +54,6 @@ class CreateReleasesTable extends Migration
             $table->boolean('iscategorized')->default(0);
             $table->boolean('isrenamed')->default(0);
             $table->boolean('ishashed')->default(0);
-            $table->boolean('isrequestid')->default(0);
             $table->boolean('proc_pp')->default(0);
             $table->boolean('proc_sorter')->default(0);
             $table->boolean('proc_par2')->default(0);
@@ -74,7 +73,6 @@ hash16k processed');
             $table->index(['haspreview', 'passwordstatus'], 'ix_releases_haspreview_passwordstatus');
             $table->index(['nfostatus', 'size'], 'ix_releases_nfostatus');
             $table->index(['dehashstatus', 'ishashed'], 'ix_releases_dehashstatus');
-            $table->index(['adddate', 'reqidstatus', 'isrequestid'], 'ix_releases_reqidstatus');
         });
     }
 
