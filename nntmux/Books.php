@@ -402,9 +402,9 @@ class Books
             $bookids = explode(', ', $this->bookreqids);
         }
 
-        $total = count($bookids);
+        $total = \count($bookids);
         if ($total > 0) {
-            for ($i = 0; $i < $total; $i++) {
+            foreach ($bookids as $i => $iValue) {
                 $this->processBookReleasesHelper(
                     $this->pdo->queryDirect(
                         sprintf('
@@ -459,7 +459,7 @@ class Books
                     // Do a local lookup first
                     $bookCheck = $this->getBookInfoByName($bookInfo);
 
-                    if ($bookCheck === false && in_array($bookInfo, $this->failCache, false)) {
+                    if ($bookCheck === false && \in_array($bookInfo, $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
                             ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.').PHP_EOL);
