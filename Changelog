@@ -1,4 +1,5 @@
 2017-12-19 DariusIII
+	* Chg: Update ParHash model and query in ReleaseFiles
 	* Chg: Possible fix for Carbon error
 2017-12-18 DariusIII
 	* CHg: Update Nfo class and mysql-ddl (declare ROW_FORMAT for xxxinfo and release_nfos tables as COMPRESSED)

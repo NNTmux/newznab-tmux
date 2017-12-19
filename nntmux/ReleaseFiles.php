@@ -98,7 +98,7 @@ class ReleaseFiles
             );
 
             if (\strlen($hash) === 32) {
-                ParHash::query()->insert(['releases_id' => $id, 'hash' => $hash]);
+                ParHash::insertIgnore(['releases_id' => $id, 'hash' => $hash]);
             }
             $this->sphinxSearch->updateRelease($id, $this->pdo);
         }
