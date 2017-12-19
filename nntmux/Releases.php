@@ -113,7 +113,6 @@ class Releases
                     'nzbstatus' => $parameters['nzbstatus'],
                     'isrenamed' => $parameters['isrenamed'],
                     'iscategorized' => 1,
-                    'reqidstatus' => $parameters['reqidstatus'],
                     'predb_id' => $parameters['predb_id'],
                 ]
             );
