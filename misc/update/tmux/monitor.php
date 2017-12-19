@@ -173,7 +173,7 @@ while ($runVar['counts']['iterations'] > 0) {
         $runVar['timers']['query']['init1_time'] = (time() - $timer01);
 
         $timer04 = time();
-        $proc1qry = $tRun->proc_query(1, $runVar['settings']['book_reqids'], $runVar['settings']['request_hours'], $db_name);
+        $proc1qry = $tRun->proc_query(1, $runVar['settings']['book_reqids'], $db_name);
         $proc1res = $pdo->queryOneRow(($proc1qry !== false ? $proc1qry : ''), $tRun->rand_bool($runVar['counts']['iterations']));
         $runVar['timers']['query']['proc1_time'] = (time() - $timer04);
         $runVar['timers']['query']['proc11_time'] = (time() - $timer01);
@@ -182,7 +182,6 @@ while ($runVar['counts']['iterations'] > 0) {
         $proc2qry = $tRun->proc_query(
             2,
             $runVar['settings']['book_reqids'],
-            $runVar['settings']['request_hours'],
             $db_name,
             $runVar['settings']['maxsize_pp'],
             $runVar['settings']['minsize_pp']
