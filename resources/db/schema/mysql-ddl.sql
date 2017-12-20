@@ -110,7 +110,18 @@ processed',
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1;
+  AUTO_INCREMENT  = 1
+
+  PARTITION BY RANGE (categories_id) (
+    PARTITION misc    VALUES LESS THAN (1000),
+    PARTITION console VALUES LESS THAN (2000),
+    PARTITION movies  VALUES LESS THAN (3000),
+    PARTITION audio   VALUES LESS THAN (4000),
+    PARTITION pc      VALUES LESS THAN (5000),
+    PARTITION tv      VALUES LESS THAN (6000),
+    PARTITION xxx     VALUES LESS THAN (7000),
+    PARTITION books   VALUES LESS THAN (8000)
+  );
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
@@ -251,8 +262,6 @@ CREATE TABLE audio_data (
   audiolanguage    VARCHAR(50) DEFAULT NULL,
   audiotitle       VARCHAR(50) DEFAULT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_releases_ad FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_releaseaudio_releaseid_audioid (releases_id, audioid)
 )
   ENGINE          = InnoDB
@@ -448,8 +457,6 @@ CREATE TABLE dnzb_failures (
   users_id      INT(11) UNSIGNED  NOT NULL,
   failed      INT UNSIGNED      NOT NULL DEFAULT '0',
   PRIMARY KEY (release_id, users_id),
-  CONSTRAINT FK_releases_df FOREIGN KEY (release_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT FK_users_df FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
@@ -757,9 +764,7 @@ DROP TABLE IF EXISTS par_hashes;
 CREATE TABLE par_hashes (
   releases_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to releases.id',
   hash VARCHAR(32) NOT NULL COMMENT 'hash_16k block of par2',
-  PRIMARY KEY (releases_id, hash),
-  CONSTRAINT FK_releases_ph FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (releases_id, hash)
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -884,8 +889,6 @@ CREATE TABLE release_comments (
   sourceid    BIGINT(20)       UNSIGNED,
   nzb_guid    BINARY(16)       NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
   PRIMARY KEY (id),
-  CONSTRAINT FK_releases_rc FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT FK_users_rc FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_release_comments_hash_releases_id(text_hash, releases_id),
@@ -904,9 +907,7 @@ CREATE TABLE releases_groups (
   COMMENT 'FK to releases.id',
   groups_id   INT(11) UNSIGNED NOT NULL DEFAULT '0'
   COMMENT 'FK to groups.id',
-  PRIMARY KEY (releases_id, groups_id),
-  CONSTRAINT FK_releases_rg FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (releases_id, groups_id)
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -918,9 +919,7 @@ CREATE TABLE release_regexes (
   releases_id           INT(11) UNSIGNED    NOT NULL DEFAULT '0',
   collection_regex_id   INT(11) NOT NULL DEFAULT '0',
   naming_regex_id       INT(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (releases_id, collection_regex_id, naming_regex_id),
-  CONSTRAINT FK_releases_rr FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (releases_id, collection_regex_id, naming_regex_id)
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -932,9 +931,7 @@ DROP TABLE IF EXISTS release_unique;
 CREATE TABLE release_unique (
   releases_id   INT(11) UNSIGNED  NOT NULL COMMENT 'FK to releases.id.',
   uniqueid BINARY(16)  NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' COMMENT 'Unique_ID from mediainfo.',
-  PRIMARY KEY (releases_id, uniqueid),
-  CONSTRAINT FK_releases_ru FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (releases_id, uniqueid)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -945,9 +942,7 @@ DROP TABLE IF EXISTS releaseextrafull;
 CREATE TABLE releaseextrafull (
   releases_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to releases.id',
   mediainfo   TEXT NULL,
-  PRIMARY KEY (releases_id),
-  CONSTRAINT FK_releases_ref FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (releases_id)
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -965,8 +960,6 @@ CREATE TABLE release_files (
   updated_at DATETIME NOT NULL,
   passworded tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (releases_id, name),
-  CONSTRAINT FK_releases_rf FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   KEY ix_releasefiles_ishashed (ishashed)
 )
   ENGINE          = InnoDB
@@ -999,9 +992,7 @@ DROP TABLE IF EXISTS release_nfos;
 CREATE TABLE release_nfos (
   releases_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to releases.id',
   nfo       BLOB             NULL DEFAULT NULL,
-  PRIMARY KEY (releases_id),
-  CONSTRAINT FK_releases_rn FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (releases_id)
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -1018,8 +1009,6 @@ CREATE TABLE release_search_data (
   searchname VARCHAR(255)     NOT NULL DEFAULT '',
   fromname   VARCHAR(255)     NULL,
   PRIMARY KEY                                        (id),
-  CONSTRAINT FK_releases_rsd FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   FULLTEXT INDEX ix_releasesearch_name_ft (name),
   FULLTEXT INDEX ix_releasesearch_searchname_ft (searchname),
   FULLTEXT INDEX ix_releasesearch_fromname_ft (fromname),
@@ -1040,8 +1029,6 @@ CREATE TABLE release_subtitles (
   subsid       INT(2)      UNSIGNED NOT NULL,
   subslanguage VARCHAR(50) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_releases_rs FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_releasesubs_releases_id_subsid (releases_id, subsid)
 )
   ENGINE          = InnoDB
@@ -1233,8 +1220,6 @@ CREATE TABLE users_releases (
   created_at DATETIME         NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_releases_ur FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT FK_users_ur FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_usercart_userrelease (users_id, releases_id)
@@ -1254,8 +1239,6 @@ CREATE TABLE user_downloads (
   timestamp   DATETIME          NOT NULL,
   releases_id INT(11) UNSIGNED           NOT NULL COMMENT 'FK to releases.id',
   PRIMARY KEY (id),
-  CONSTRAINT FK_releases_ud FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT FK_users_ud FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   KEY userid    (users_id),
@@ -1396,9 +1379,7 @@ CREATE TABLE video_data (
   videoaspect     VARCHAR(10) DEFAULT NULL,
   videoframerate  FLOAT(7, 4) DEFAULT NULL,
   videolibrary    VARCHAR(50) DEFAULT NULL,
-  PRIMARY KEY (releases_id),
-  CONSTRAINT FK_releases_vd FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (releases_id)
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
