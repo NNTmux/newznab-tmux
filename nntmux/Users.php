@@ -11,7 +11,6 @@ use App\Mail\AccountChange;
 use App\Models\UserRequest;
 use nntmux\utility\Utility;
 use App\Models\UserDownload;
-use App\Models\UsersRelease;
 use App\Models\RoleExcludedCategory;
 use App\Models\UserExcludedCategory;
 use Illuminate\Support\Facades\Hash;
@@ -115,23 +114,6 @@ class Users
      */
     public function delete($id): void
     {
-        UsersRelease::delCartForUser($id);
-        $this->delUserCategoryExclusions($id);
-        UserDownload::delDownloadRequests($id);
-        UserRequest::delApiRequests($id);
-
-        $rc = new ReleaseComments();
-        $rc->deleteCommentsForUser($id);
-
-        $um = new UserMovies();
-        $um->delMovieForUser($id);
-
-        $us = new UserSeries();
-        $us->delShowForUser($id);
-
-        $forum = new Forum();
-        $forum->deleteUser($id);
-
         User::query()->where('id', $id)->delete();
     }
 
