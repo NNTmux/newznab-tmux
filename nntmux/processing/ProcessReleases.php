@@ -426,7 +426,7 @@ class ProcessReleases
                 $deleteQuery = $this->pdo->queryExec(
                     sprintf(
                         '
-						DELETE FROM %s c
+						DELETE c FROM %s c
 						WHERE c.filecheck = %d
 						AND c.filesize > 0
 						AND GREATEST(%d, %d) > 0
@@ -447,7 +447,7 @@ class ProcessReleases
                     $deleteQuery = $this->pdo->queryExec(
                         sprintf(
                             '
-							DELETE FROM %s c
+							DELETE c FROM %s c
 							WHERE c.filecheck = %d
 							AND c.filesize > %d',
                             $this->tables['cname'],
@@ -464,7 +464,7 @@ class ProcessReleases
                     $deleteQuery = $this->pdo->queryExec(
                         sprintf(
                             '
-						DELETE FROM %s c
+						DELETE c FROM %s c
 						WHERE c.filecheck = %d
 						AND GREATEST(%d, %d) > 0
 						AND c.totalfiles < GREATEST(%d, %d)',
