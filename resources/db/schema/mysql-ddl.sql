@@ -1,3 +1,168 @@
+DROP TABLE IF EXISTS collections;
+CREATE TABLE         collections (
+  id             INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
+  subject        VARCHAR(255)        NOT NULL DEFAULT '',
+  fromname       VARCHAR(255)        NOT NULL DEFAULT '',
+  date           DATETIME            DEFAULT NULL,
+  xref           VARCHAR(2000)        NOT NULL DEFAULT '',
+  totalfiles     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  groups_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  collectionhash VARCHAR(255)        NOT NULL DEFAULT '0',
+  collection_regexes_id INT SIGNED NOT NULL DEFAULT '0' COMMENT 'FK to collection_regexes.id',
+  dateadded      DATETIME            DEFAULT NULL,
+  added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  filecheck      TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  filesize       BIGINT UNSIGNED     NOT NULL DEFAULT '0',
+  releases_id      INT                 NULL,
+  noise          CHAR(32)            NOT NULL DEFAULT '',
+  PRIMARY KEY                               (id),
+  INDEX        fromname                     (fromname),
+  INDEX        date                         (date),
+  INDEX        groups_id                     (groups_id),
+  INDEX        ix_collection_filecheck      (filecheck),
+  INDEX        ix_collection_dateadded      (dateadded),
+  INDEX        ix_collection_releaseid      (releases_id),
+  UNIQUE INDEX ix_collection_collectionhash (collectionhash)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1;
+
+
+DROP TABLE IF EXISTS releases;
+CREATE TABLE         releases (
+  id                INT(11) UNSIGNED               NOT NULL AUTO_INCREMENT,
+  name              VARCHAR(255)                   NOT NULL DEFAULT '',
+  searchname        VARCHAR(255)                   NOT NULL DEFAULT '',
+  totalpart         INT                            DEFAULT '0',
+  groups_id         INT(11) UNSIGNED               NOT NULL DEFAULT '0' COMMENT 'FK to groups.id',
+  size              BIGINT UNSIGNED                NOT NULL DEFAULT '0',
+  postdate          DATETIME                       DEFAULT NULL,
+  adddate           DATETIME                       DEFAULT NULL,
+  updatetime        TIMESTAMP                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  gid               VARCHAR(32)                    NULL,
+  guid              VARCHAR(40)                    NOT NULL,
+  leftguid          CHAR(1)                        NOT NULL COMMENT 'The first letter of the release guid',
+  fromname          VARCHAR(255)                   NULL,
+  completion        FLOAT                          NOT NULL DEFAULT '0',
+  categories_id     INT                            NOT NULL DEFAULT '0010',
+  videos_id         MEDIUMINT(11) UNSIGNED         NOT NULL DEFAULT '0' COMMENT 'FK to videos.id of the parent series.',
+  tv_episodes_id    MEDIUMINT(11) SIGNED           NOT NULL DEFAULT '0' COMMENT 'FK to tv_episodes.id for the episode.',
+  imdbid            MEDIUMINT(7) UNSIGNED ZEROFILL NULL,
+  xxxinfo_id        INT SIGNED                     NOT NULL DEFAULT '0',
+  musicinfo_id      INT(11) SIGNED               NULL COMMENT 'FK to musicinfo.id',
+  consoleinfo_id    INT(11) SIGNED               NULL COMMENT 'FK to consoleinfo.id',
+  gamesinfo_id      INT SIGNED                     NOT NULL DEFAULT '0',
+  bookinfo_id       INT(11) SIGNED               NULL COMMENT 'FK to bookinfo.id',
+  anidbid           INT                            NULL COMMENT 'FK to anidb_titles.anidbid',
+  predb_id          INT(11) UNSIGNED               NOT NULL DEFAULT '0' COMMENT 'FK to predb.id',
+  grabs             INT UNSIGNED                   NOT NULL DEFAULT '0',
+  comments          INT                            NOT NULL DEFAULT '0',
+  passwordstatus    TINYINT                        NOT NULL DEFAULT '0',
+  rarinnerfilecount INT                            NOT NULL DEFAULT '0',
+  haspreview        TINYINT                        NOT NULL DEFAULT '0',
+  nfostatus         TINYINT                        NOT NULL DEFAULT '0',
+  jpgstatus         TINYINT(1)                     NOT NULL DEFAULT '0',
+  videostatus       TINYINT(1)                     NOT NULL DEFAULT '0',
+  audiostatus       TINYINT(1)                     NOT NULL DEFAULT '0',
+  dehashstatus      TINYINT(1)                     NOT NULL DEFAULT '0',
+  reqidstatus       TINYINT(1)                     NOT NULL DEFAULT '0',
+  nzb_guid          BINARY(16)                     NULL,
+  nzbstatus         TINYINT(1)                     NOT NULL DEFAULT '0',
+  iscategorized     TINYINT(1)                     NOT NULL DEFAULT '0',
+  isrenamed         TINYINT(1)                     NOT NULL DEFAULT '0',
+  ishashed          TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_pp           TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_sorter       TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_par2         TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_nfo          TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_files        TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_uid          TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_srr          TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been srr
+processed',
+  proc_hash16k      TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been hash16k
+processed',
+  PRIMARY KEY                                 (id, categories_id),
+  INDEX ix_releases_name                      (name),
+  INDEX ix_releases_groupsid                  (groups_id,passwordstatus),
+  INDEX ix_releases_postdate_searchname       (postdate,searchname),
+  INDEX ix_releases_guid                      (guid),
+  INDEX ix_releases_leftguid                  (leftguid ASC, predb_id),
+  INDEX ix_releases_nzb_guid                  (nzb_guid),
+  INDEX ix_releases_videos_id                 (videos_id),
+  INDEX ix_releases_tv_episodes_id            (tv_episodes_id),
+  INDEX ix_releases_imdbid                    (imdbid),
+  INDEX ix_releases_xxxinfo_id                (xxxinfo_id),
+  INDEX ix_releases_musicinfo_id              (musicinfo_id,passwordstatus),
+  INDEX ix_releases_consoleinfo_id            (consoleinfo_id),
+  INDEX ix_releases_gamesinfo_id              (gamesinfo_id),
+  INDEX ix_releases_bookinfo_id               (bookinfo_id),
+  INDEX ix_releases_anidbid                   (anidbid),
+  INDEX ix_releases_predb_id_searchname       (predb_id,searchname),
+  INDEX ix_releases_haspreview_passwordstatus (haspreview,passwordstatus),
+  INDEX ix_releases_passwordstatus            (passwordstatus),
+  INDEX ix_releases_nfostatus                 (nfostatus,size),
+  INDEX ix_releases_dehashstatus              (dehashstatus,ishashed)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1;
+
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+  id             INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
+  username       VARCHAR(50)      NOT NULL,
+  firstname      VARCHAR(255)              DEFAULT NULL,
+  lastname       VARCHAR(255)              DEFAULT NULL,
+  email          VARCHAR(255)     NOT NULL,
+  password       VARCHAR(255)     NOT NULL,
+  user_roles_id  INT              NOT NULL DEFAULT '1' COMMENT 'FK to user_roles.id',
+  host           VARCHAR(40)      NULL,
+  grabs          INT              NOT NULL DEFAULT '0',
+  rsstoken       VARCHAR(64)      NOT NULL,
+  created_at    DATETIME         NOT NULL,
+  updated_at    DATETIME         NOT NULL,
+  resetguid      VARCHAR(50)      NULL,
+  lastlogin      DATETIME                  DEFAULT NULL,
+  apiaccess      DATETIME                  DEFAULT NULL,
+  invites        INT              NOT NULL DEFAULT '0',
+  invitedby      INT              NULL,
+  movieview      INT              NOT NULL DEFAULT '1',
+  xxxview        INT              NOT NULL DEFAULT '1',
+  musicview      INT              NOT NULL DEFAULT '1',
+  consoleview    INT              NOT NULL DEFAULT '1',
+  bookview       INT              NOT NULL DEFAULT '1',
+  gameview       INT              NOT NULL DEFAULT 1,
+  saburl         VARCHAR(255)     NULL     DEFAULT NULL,
+  sabapikey      VARCHAR(255)     NULL     DEFAULT NULL,
+  sabapikeytype  TINYINT(1)       NULL     DEFAULT NULL,
+  sabpriority    TINYINT(1)       NULL     DEFAULT NULL,
+  queuetype      TINYINT(1)       NOT NULL DEFAULT '1' COMMENT 'Type of queue, Sab or NZBGet',
+  nzbgeturl      VARCHAR(255)     NULL     DEFAULT NULL,
+  nzbgetusername VARCHAR(255)     NULL     DEFAULT NULL,
+  nzbgetpassword VARCHAR(255)     NULL     DEFAULT NULL,
+  nzbvortex_api_key VARCHAR(10)   NULL     DEFAULT NULL ,
+  nzbvortex_server_url VARCHAR(255) NULL   DEFAULT NULL,
+  userseed       VARCHAR(50)      NOT NULL,
+  notes          VARCHAR(255)     NOT NULL,
+  cp_url         VARCHAR(255)     NULL     DEFAULT NULL,
+  cp_api         VARCHAR(255)     NULL     DEFAULT NULL,
+  style          VARCHAR(255)     NULL     DEFAULT NULL,
+  rolechangedate DATETIME         NULL     DEFAULT NULL COMMENT 'When does the role expire',
+  PRIMARY KEY (id),
+  INDEX ix_user_roles (user_roles_id)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1;
+
+
 DROP TABLE IF EXISTS anidb_episodes;
 CREATE TABLE anidb_episodes (
   anidbid       INT(10) UNSIGNED        NOT NULL
@@ -86,7 +251,7 @@ CREATE TABLE audio_data (
   audiolanguage    VARCHAR(50) DEFAULT NULL,
   audiotitle       VARCHAR(50) DEFAULT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
+  CONSTRAINT FK_releases_ad FOREIGN KEY (releases_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_releaseaudio_releaseid_audioid (releases_id, audioid)
 )
@@ -215,39 +380,6 @@ CREATE TABLE category_regexes (
   AUTO_INCREMENT  = 100000;
 
 
-DROP TABLE IF EXISTS collections;
-CREATE TABLE         collections (
-  id             INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
-  subject        VARCHAR(255)        NOT NULL DEFAULT '',
-  fromname       VARCHAR(255)        NOT NULL DEFAULT '',
-  date           DATETIME            DEFAULT NULL,
-  xref           VARCHAR(2000)        NOT NULL DEFAULT '',
-  totalfiles     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  groups_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  collectionhash VARCHAR(255)        NOT NULL DEFAULT '0',
-  collection_regexes_id INT SIGNED NOT NULL DEFAULT '0' COMMENT 'FK to collection_regexes.id',
-  dateadded      DATETIME            DEFAULT NULL,
-  added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  filecheck      TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
-  filesize       BIGINT UNSIGNED     NOT NULL DEFAULT '0',
-  releases_id      INT                 NULL,
-  noise          CHAR(32)            NOT NULL DEFAULT '',
-  PRIMARY KEY                               (id),
-  INDEX        fromname                     (fromname),
-  INDEX        date                         (date),
-  INDEX        groups_id                     (groups_id),
-  INDEX        ix_collection_filecheck      (filecheck),
-  INDEX        ix_collection_dateadded      (dateadded),
-  INDEX        ix_collection_releaseid      (releases_id),
-  UNIQUE INDEX ix_collection_collectionhash (collectionhash)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1;
-
-
 DROP TABLE IF EXISTS collection_regexes;
 CREATE TABLE collection_regexes (
   id          INT UNSIGNED        NOT NULL AUTO_INCREMENT,
@@ -316,9 +448,9 @@ CREATE TABLE dnzb_failures (
   users_id      INT(11) UNSIGNED  NOT NULL,
   failed      INT UNSIGNED      NOT NULL DEFAULT '0',
   PRIMARY KEY (release_id, users_id),
-  CONSTRAINT FK_releases FOREIGN KEY (release_id)
+  CONSTRAINT FK_releases_df FOREIGN KEY (release_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT FK_users FOREIGN KEY (users_id)
+  CONSTRAINT FK_users_df FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE          = InnoDB
@@ -340,7 +472,7 @@ CREATE TABLE forumpost (
   created_at DATETIME            NOT NULL,
   updated_at DATETIME            NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_users FOREIGN KEY (users_id)
+  CONSTRAINT FK_users_fp FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   KEY parentid    (parentid),
   KEY userid      (users_id),
@@ -431,7 +563,7 @@ CREATE TABLE invitations (
   created_at DATETIME         NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_users FOREIGN KEY (users_id)
+  CONSTRAINT FK_users_inv FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE          = InnoDB
@@ -623,10 +755,10 @@ CREATE TABLE content (
 
 DROP TABLE IF EXISTS par_hashes;
 CREATE TABLE par_hashes (
-  releases_id INT(11) NOT NULL COMMENT 'FK to releases.id',
+  releases_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to releases.id',
   hash VARCHAR(32) NOT NULL COMMENT 'hash_16k block of par2',
   PRIMARY KEY (releases_id, hash),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
+  CONSTRAINT FK_releases_ph FOREIGN KEY (releases_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE          = InnoDB
@@ -731,98 +863,6 @@ CREATE TABLE predb_imports (
   ROW_FORMAT      = DYNAMIC;
 
 
-DROP TABLE IF EXISTS releases;
-CREATE TABLE         releases (
-  id                INT(11) UNSIGNED               NOT NULL AUTO_INCREMENT,
-  name              VARCHAR(255)                   NOT NULL DEFAULT '',
-  searchname        VARCHAR(255)                   NOT NULL DEFAULT '',
-  totalpart         INT                            DEFAULT '0',
-  groups_id         INT(11) UNSIGNED               NOT NULL DEFAULT '0' COMMENT 'FK to groups.id',
-  size              BIGINT UNSIGNED                NOT NULL DEFAULT '0',
-  postdate          DATETIME                       DEFAULT NULL,
-  adddate           DATETIME                       DEFAULT NULL,
-  updatetime        TIMESTAMP                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  gid               VARCHAR(32)                    NULL,
-  guid              VARCHAR(40)                    NOT NULL,
-  leftguid          CHAR(1)                        NOT NULL COMMENT 'The first letter of the release guid',
-  fromname          VARCHAR(255)                   NULL,
-  completion        FLOAT                          NOT NULL DEFAULT '0',
-  categories_id     INT                            NOT NULL DEFAULT '0010',
-  videos_id         MEDIUMINT(11) UNSIGNED         NOT NULL DEFAULT '0' COMMENT 'FK to videos.id of the parent series.',
-  tv_episodes_id    MEDIUMINT(11) SIGNED           NOT NULL DEFAULT '0' COMMENT 'FK to tv_episodes.id for the episode.',
-  imdbid            MEDIUMINT(7) UNSIGNED ZEROFILL NULL,
-  xxxinfo_id        INT SIGNED                     NOT NULL DEFAULT '0',
-  musicinfo_id      INT(11) SIGNED               NULL COMMENT 'FK to musicinfo.id',
-  consoleinfo_id    INT(11) SIGNED               NULL COMMENT 'FK to consoleinfo.id',
-  gamesinfo_id      INT SIGNED                     NOT NULL DEFAULT '0',
-  bookinfo_id       INT(11) SIGNED               NULL COMMENT 'FK to bookinfo.id',
-  anidbid           INT                            NULL COMMENT 'FK to anidb_titles.anidbid',
-  predb_id          INT(11) UNSIGNED               NOT NULL DEFAULT '0' COMMENT 'FK to predb.id',
-  grabs             INT UNSIGNED                   NOT NULL DEFAULT '0',
-  comments          INT                            NOT NULL DEFAULT '0',
-  passwordstatus    TINYINT                        NOT NULL DEFAULT '0',
-  rarinnerfilecount INT                            NOT NULL DEFAULT '0',
-  haspreview        TINYINT                        NOT NULL DEFAULT '0',
-  nfostatus         TINYINT                        NOT NULL DEFAULT '0',
-  jpgstatus         TINYINT(1)                     NOT NULL DEFAULT '0',
-  videostatus       TINYINT(1)                     NOT NULL DEFAULT '0',
-  audiostatus       TINYINT(1)                     NOT NULL DEFAULT '0',
-  dehashstatus      TINYINT(1)                     NOT NULL DEFAULT '0',
-  reqidstatus       TINYINT(1)                     NOT NULL DEFAULT '0',
-  nzb_guid          BINARY(16)                     NULL,
-  nzbstatus         TINYINT(1)                     NOT NULL DEFAULT '0',
-  iscategorized     TINYINT(1)                     NOT NULL DEFAULT '0',
-  isrenamed         TINYINT(1)                     NOT NULL DEFAULT '0',
-  ishashed          TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_pp           TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_sorter       TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_par2         TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_nfo          TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_files        TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_uid          TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_srr          TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been srr
-processed',
-  proc_hash16k      TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been hash16k
-processed',
-  PRIMARY KEY                                 (id, categories_id),
-  INDEX ix_releases_name                      (name),
-  INDEX ix_releases_groupsid                  (groups_id,passwordstatus),
-  INDEX ix_releases_postdate_searchname       (postdate,searchname),
-  INDEX ix_releases_guid                      (guid),
-  INDEX ix_releases_leftguid                  (leftguid ASC, predb_id),
-  INDEX ix_releases_nzb_guid                  (nzb_guid),
-  INDEX ix_releases_videos_id                 (videos_id),
-  INDEX ix_releases_tv_episodes_id            (tv_episodes_id),
-  INDEX ix_releases_imdbid                    (imdbid),
-  INDEX ix_releases_xxxinfo_id                (xxxinfo_id),
-  INDEX ix_releases_musicinfo_id              (musicinfo_id,passwordstatus),
-  INDEX ix_releases_consoleinfo_id            (consoleinfo_id),
-  INDEX ix_releases_gamesinfo_id              (gamesinfo_id),
-  INDEX ix_releases_bookinfo_id               (bookinfo_id),
-  INDEX ix_releases_anidbid                   (anidbid),
-  INDEX ix_releases_predb_id_searchname       (predb_id,searchname),
-  INDEX ix_releases_haspreview_passwordstatus (haspreview,passwordstatus),
-  INDEX ix_releases_passwordstatus            (passwordstatus),
-  INDEX ix_releases_nfostatus                 (nfostatus,size),
-  INDEX ix_releases_dehashstatus              (dehashstatus,ishashed)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1
-  PARTITION BY RANGE (categories_id) (
-    PARTITION misc    VALUES LESS THAN (1000),
-    PARTITION console VALUES LESS THAN (2000),
-    PARTITION movies  VALUES LESS THAN (3000),
-    PARTITION audio   VALUES LESS THAN (4000),
-    PARTITION pc      VALUES LESS THAN (5000),
-    PARTITION tv      VALUES LESS THAN (6000),
-    PARTITION xxx     VALUES LESS THAN (7000),
-    PARTITION books   VALUES LESS THAN (8000)
-  );
-
-
 DROP TABLE IF EXISTS release_comments;
 CREATE TABLE release_comments (
   id          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -844,9 +884,9 @@ CREATE TABLE release_comments (
   sourceid    BIGINT(20)       UNSIGNED,
   nzb_guid    BINARY(16)       NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
   PRIMARY KEY (id),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
+  CONSTRAINT FK_releases_rc FOREIGN KEY (releases_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT FK_users FOREIGN KEY (users_id)
+  CONSTRAINT FK_users_rc FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_release_comments_hash_releases_id(text_hash, releases_id),
   INDEX ix_releasecomment_releases_id (releases_id),
@@ -865,8 +905,8 @@ CREATE TABLE releases_groups (
   groups_id   INT(11) UNSIGNED NOT NULL DEFAULT '0'
   COMMENT 'FK to groups.id',
   PRIMARY KEY (releases_id, groups_id),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT FK_releases_rg FOREIGN KEY (releases_id)
+  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -879,7 +919,7 @@ CREATE TABLE release_regexes (
   collection_regex_id   INT(11) NOT NULL DEFAULT '0',
   naming_regex_id       INT(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (releases_id, collection_regex_id, naming_regex_id),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
+  CONSTRAINT FK_releases_rr FOREIGN KEY (releases_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE          = InnoDB
@@ -893,8 +933,8 @@ CREATE TABLE release_unique (
   releases_id   INT(11) UNSIGNED  NOT NULL COMMENT 'FK to releases.id.',
   uniqueid BINARY(16)  NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' COMMENT 'Unique_ID from mediainfo.',
   PRIMARY KEY (releases_id, uniqueid),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT FK_releases_ru FOREIGN KEY (releases_id)
+  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -906,7 +946,7 @@ CREATE TABLE releaseextrafull (
   releases_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to releases.id',
   mediainfo   TEXT NULL,
   PRIMARY KEY (releases_id),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
+  CONSTRAINT FK_releases_ref FOREIGN KEY (releases_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE          = InnoDB
@@ -925,7 +965,7 @@ CREATE TABLE release_files (
   updated_at DATETIME NOT NULL,
   passworded tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (releases_id, name),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
+  CONSTRAINT FK_releases_rf FOREIGN KEY (releases_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   KEY ix_releasefiles_ishashed (ishashed)
 )
@@ -960,8 +1000,8 @@ CREATE TABLE release_nfos (
   releases_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to releases.id',
   nfo       BLOB             NULL DEFAULT NULL,
   PRIMARY KEY (releases_id),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
-  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT FK_releases_rn FOREIGN KEY (releases_id)
+  REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -978,7 +1018,7 @@ CREATE TABLE release_search_data (
   searchname VARCHAR(255)     NOT NULL DEFAULT '',
   fromname   VARCHAR(255)     NULL,
   PRIMARY KEY                                        (id),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
+  CONSTRAINT FK_releases_rsd FOREIGN KEY (releases_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   FULLTEXT INDEX ix_releasesearch_name_ft (name),
   FULLTEXT INDEX ix_releasesearch_searchname_ft (searchname),
@@ -1000,7 +1040,7 @@ CREATE TABLE release_subtitles (
   subsid       INT(2)      UNSIGNED NOT NULL,
   subslanguage VARCHAR(50) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
+  CONSTRAINT FK_releases_rs FOREIGN KEY (releases_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_releasesubs_releases_id_subsid (releases_id, subsid)
 )
@@ -1182,68 +1222,20 @@ CREATE TABLE upcoming_releases (
   AUTO_INCREMENT  = 1;
 
 
-DROP TABLE IF EXISTS users;
-CREATE TABLE users (
-  id             INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
-  username       VARCHAR(50)      NOT NULL,
-  firstname      VARCHAR(255)              DEFAULT NULL,
-  lastname       VARCHAR(255)              DEFAULT NULL,
-  email          VARCHAR(255)     NOT NULL,
-  password       VARCHAR(255)     NOT NULL,
-  user_roles_id  INT              NOT NULL DEFAULT '1' COMMENT 'FK to user_roles.id',
-  host           VARCHAR(40)      NULL,
-  grabs          INT              NOT NULL DEFAULT '0',
-  rsstoken       VARCHAR(64)      NOT NULL,
-  created_at    DATETIME         NOT NULL,
-  updated_at    DATETIME         NOT NULL,
-  resetguid      VARCHAR(50)      NULL,
-  lastlogin      DATETIME                  DEFAULT NULL,
-  apiaccess      DATETIME                  DEFAULT NULL,
-  invites        INT              NOT NULL DEFAULT '0',
-  invitedby      INT              NULL,
-  movieview      INT              NOT NULL DEFAULT '1',
-  xxxview        INT              NOT NULL DEFAULT '1',
-  musicview      INT              NOT NULL DEFAULT '1',
-  consoleview    INT              NOT NULL DEFAULT '1',
-  bookview       INT              NOT NULL DEFAULT '1',
-  gameview       INT              NOT NULL DEFAULT 1,
-  saburl         VARCHAR(255)     NULL     DEFAULT NULL,
-  sabapikey      VARCHAR(255)     NULL     DEFAULT NULL,
-  sabapikeytype  TINYINT(1)       NULL     DEFAULT NULL,
-  sabpriority    TINYINT(1)       NULL     DEFAULT NULL,
-  queuetype      TINYINT(1)       NOT NULL DEFAULT '1' COMMENT 'Type of queue, Sab or NZBGet',
-  nzbgeturl      VARCHAR(255)     NULL     DEFAULT NULL,
-  nzbgetusername VARCHAR(255)     NULL     DEFAULT NULL,
-  nzbgetpassword VARCHAR(255)     NULL     DEFAULT NULL,
-  nzbvortex_api_key VARCHAR(10)   NULL     DEFAULT NULL ,
-  nzbvortex_server_url VARCHAR(255) NULL   DEFAULT NULL,
-  userseed       VARCHAR(50)      NOT NULL,
-  notes          VARCHAR(255)     NOT NULL,
-  cp_url         VARCHAR(255)     NULL     DEFAULT NULL,
-  cp_api         VARCHAR(255)     NULL     DEFAULT NULL,
-  style          VARCHAR(255)     NULL     DEFAULT NULL,
-  rolechangedate DATETIME         NULL     DEFAULT NULL COMMENT 'When does the role expire',
-  PRIMARY KEY (id),
-  INDEX ix_user_roles (user_roles_id)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1;
+
 
 
 DROP TABLE IF EXISTS users_releases;
 CREATE TABLE users_releases (
   id          INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
-  users_id INT(16) UNSIGNED    NOT NULL,
-  releases_id   INT              NOT NULL COMMENT 'FK to releases.id',
+  users_id INT(1) UNSIGNED    NOT NULL,
+  releases_id   INT(11) UNSIGNED              NOT NULL COMMENT 'FK to releases.id',
   created_at DATETIME         NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
+  CONSTRAINT FK_releases_ur FOREIGN KEY (releases_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT FK_users FOREIGN KEY (users_id)
+  CONSTRAINT FK_users_ur FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_usercart_userrelease (users_id, releases_id)
 )
@@ -1260,11 +1252,11 @@ CREATE TABLE user_downloads (
   users_id    INT(16) UNSIGNED  NOT NULL,
   hosthash    VARCHAR(50)       NOT NULL DEFAULT '',
   timestamp   DATETIME          NOT NULL,
-  releases_id INT(11)           NOT NULL COMMENT 'FK to releases.id',
+  releases_id INT(11) UNSIGNED           NOT NULL COMMENT 'FK to releases.id',
   PRIMARY KEY (id),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
+  CONSTRAINT FK_releases_ud FOREIGN KEY (releases_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT FK_users FOREIGN KEY (users_id)
+  CONSTRAINT FK_users_ud FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   KEY userid    (users_id),
   KEY timestamp (timestamp)
@@ -1284,7 +1276,7 @@ CREATE TABLE user_excluded_categories (
   created_at DATETIME         NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_users FOREIGN KEY (users_id)
+  CONSTRAINT FK_users_uec FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_userexcat_usercat (users_id, categories_id)
 )
@@ -1319,7 +1311,7 @@ CREATE TABLE user_movies (
   created_at DATETIME                       NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_users FOREIGN KEY (users_id)
+  CONSTRAINT FK_users_um FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   INDEX ix_usermovies_userid (users_id, imdbid)
 )
@@ -1338,7 +1330,7 @@ CREATE TABLE user_requests (
   request   VARCHAR(255)     NOT NULL,
   timestamp DATETIME         NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_users FOREIGN KEY (users_id)
+  CONSTRAINT FK_users_urq FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   KEY userid    (users_id),
   KEY timestamp (timestamp)
@@ -1380,7 +1372,7 @@ CREATE TABLE user_series (
   created_at DATETIME         NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_users FOREIGN KEY (users_id)
+  CONSTRAINT FK_users_us FOREIGN KEY (users_id)
   REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   INDEX ix_userseries_videos_id (users_id, videos_id)
 )
@@ -1405,7 +1397,7 @@ CREATE TABLE video_data (
   videoframerate  FLOAT(7, 4) DEFAULT NULL,
   videolibrary    VARCHAR(50) DEFAULT NULL,
   PRIMARY KEY (releases_id),
-  CONSTRAINT FK_releases FOREIGN KEY (releases_id)
+  CONSTRAINT FK_releases_vd FOREIGN KEY (releases_id)
   REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE          = InnoDB
