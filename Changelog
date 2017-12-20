@@ -1,4 +1,5 @@
 2017-12-20 DariusIII
+	* Fix: Update _install/install_nntmux.php to ignore foreign keys on install
 	* Fix: Fix mysql-ddl.sql
 	* Chg: Add foreign keys to mysql-ddl.sql
 2017-12-19 DariusIII

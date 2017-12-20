@@ -96,6 +96,7 @@ if (! $error) {
             'db'     => $pdo,
         ]
     );
+    $pdo->exec('SET FOREIGN_KEY_CHECKS=0;');
 
     try {
         $DbSetup->processSQLFile(); // Setup default schema
@@ -251,6 +252,7 @@ if (! $error) {
     @file_put_contents(NN_ROOT.'_install/install.lock', '');
     ColorCLI::doEcho(ColorCLI::header('Generating application key'));
     passthru('php '.NN_ROOT.'artisan key:generate');
+    $pdo->exec('SET FOREIGN_KEY_CHECKS=1;');
     ColorCLI::doEcho(ColorCLI::alternate('NNTmux installation completed successfully'));
     exit();
 }
