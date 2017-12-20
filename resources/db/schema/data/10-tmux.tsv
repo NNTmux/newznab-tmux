@@ -74,3 +74,4 @@ run_sharing	0
 sharing_timer	60
 import_count	50000
 debuginfo	0
+redis	0
