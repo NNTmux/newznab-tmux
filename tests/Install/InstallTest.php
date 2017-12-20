@@ -124,6 +124,7 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 					'db'     => $pdo,
 				]
 			);
+            $pdo->exec('SET FOREIGN_KEY_CHECKS=0;');
 
 			try {
 				$DbSetup->processSQLFile(); // Setup default schema
@@ -293,6 +294,7 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 		if (!$error) {
 			@file_put_contents(NN_ROOT . '_install/install.lock', '');
 			$message = 'NNTmux installation completed successfully';
+            $pdo->exec('SET FOREIGN_KEY_CHECKS=1;');
 			echo $message . PHP_EOL;
 		} else {
 			$message = 'NNTmux installation failed. Please fix reported problems and run this script again';
