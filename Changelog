@@ -1,4 +1,5 @@
 2017-12-20 DariusIII
+	* Fix: Update patches and mysql-ddl.sql
 	* Fix: Add missing redis setting into 10-tmux.tsv
 	* Chg: Add foreign keys to (multigroup_)binaries,(multigroup_)parts and adjust ProcessReleases class accordingly
 	* Chg: Remove migrations for now, they will be created again in future

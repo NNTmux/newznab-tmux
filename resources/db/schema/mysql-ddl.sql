@@ -879,7 +879,7 @@ CREATE TABLE release_comments (
   cid         VARCHAR(32)      NULL,
   text_hash   VARCHAR(32)      NOT NULL DEFAULT '',
   username    VARCHAR(255)     NOT NULL DEFAULT '',
-  users_id     INT(11) UNSIGNED NOT NULL,
+  users_id     INT(16) UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL,
   updated_at DATETIME NOT NULL,
   host        VARCHAR(15)      NULL,
@@ -1456,13 +1456,63 @@ CREATE TABLE         xxxinfo (
   AUTO_INCREMENT  = 1;
 
 DROP TABLE IF EXISTS multigroup_binaries;
-CREATE TABLE multigroup_binaries LIKE binaries;
+CREATE TABLE multigroup_binaries (
+  id            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  name          VARCHAR(1000)       NOT NULL DEFAULT '',
+  collections_id INT(11) UNSIGNED    NOT NULL DEFAULT 0,
+  filenumber    INT UNSIGNED        NOT NULL DEFAULT '0',
+  totalparts    INT(11) UNSIGNED    NOT NULL DEFAULT 0,
+  currentparts  INT UNSIGNED        NOT NULL DEFAULT 0,
+  binaryhash    BINARY(16)          NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
+  partcheck     TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+  partsize      BIGINT UNSIGNED     NOT NULL DEFAULT 0,
+  PRIMARY KEY (id),
+  CONSTRAINT FK_MGR_Collections FOREIGN KEY (collections_id)
+  REFERENCES multigroup_collections(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  UNIQUE INDEX ix_binaries_binaryhash (binaryhash),
+  INDEX ix_binaries_partcheck  (partcheck),
+  INDEX ix_binaries_collection (collections_id)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1;
 
 DROP TABLE IF EXISTS multigroup_parts;
-CREATE TABLE multigroup_parts LIKE parts;
+CREATE TABLE multigroup_parts (
+  binaries_id      BIGINT(20) UNSIGNED                      NOT NULL DEFAULT '0',
+  messageid     VARCHAR(255)        CHARACTER SET latin1 NOT NULL DEFAULT '',
+  number        BIGINT UNSIGNED                          NOT NULL DEFAULT '0',
+  partnumber    MEDIUMINT UNSIGNED                       NOT NULL DEFAULT '0',
+  size          MEDIUMINT UNSIGNED                       NOT NULL DEFAULT '0',
+  PRIMARY KEY (binaries_id,number),
+  CONSTRAINT FK_MGR_binaries FOREIGN KEY (binaries_id)
+  REFERENCES multigroup_binaries(id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1;
 
 DROP TABLE IF EXISTS multigroup_missed_parts;
-CREATE TABLE multigroup_missed_parts LIKE missed_parts;
+CREATE TABLE multigroup_missed_parts (
+  id       INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
+  numberid BIGINT UNSIGNED  NOT NULL,
+  groups_id INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to groups.id',
+  attempts TINYINT(1)       NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  INDEX ix_missed_parts_attempts                  (attempts),
+  INDEX ix_missed_parts_groupid_attempts          (groups_id, attempts),
+  INDEX ix_missed_parts_numberid_groupsid_attempts (numberid, groups_id, attempts),
+  UNIQUE INDEX ix_missed_parts_numberid_groupsid          (numberid, groups_id)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1;
 
 
 DELIMITER $$
