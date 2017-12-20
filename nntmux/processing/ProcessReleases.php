@@ -426,16 +426,12 @@ class ProcessReleases
                 $deleteQuery = $this->pdo->queryExec(
                     sprintf(
                         '
-						DELETE c, b, p FROM %s c
-						LEFT JOIN %s b ON c.id = b.collections_id
-						LEFT JOIN %s p ON b.id = p.binaries_id
+						DELETE FROM %s c
 						WHERE c.filecheck = %d
 						AND c.filesize > 0
 						AND GREATEST(%d, %d) > 0
 						AND c.filesize < GREATEST(%d, %d)',
                         $this->tables['cname'],
-                        $this->tables['bname'],
-                        $this->tables['pname'],
                         self::COLLFC_SIZED,
                         $groupMinSizeSetting,
                         $minSizeSetting,
@@ -451,14 +447,10 @@ class ProcessReleases
                     $deleteQuery = $this->pdo->queryExec(
                         sprintf(
                             '
-							DELETE c, b, p FROM %s c
-							LEFT JOIN %s b ON c.id = b.collections_id
-							LEFT JOIN %s p ON b.id = p.binaries_id
+							DELETE FROM %s c
 							WHERE c.filecheck = %d
 							AND c.filesize > %d',
                             $this->tables['cname'],
-                            $this->tables['bname'],
-                            $this->tables['pname'],
                             self::COLLFC_SIZED,
                             $maxSizeSetting
                         )
@@ -472,15 +464,11 @@ class ProcessReleases
                     $deleteQuery = $this->pdo->queryExec(
                         sprintf(
                             '
-						DELETE c, b, p FROM %s c
-						LEFT JOIN %s b ON c.id = b.collections_id
-						LEFT JOIN %s p ON b.id = p.binaries_id
+						DELETE FROM %s c
 						WHERE c.filecheck = %d
 						AND GREATEST(%d, %d) > 0
 						AND c.totalfiles < GREATEST(%d, %d)',
                             $this->tables['cname'],
-                            $this->tables['bname'],
-                            $this->tables['pname'],
                             self::COLLFC_SIZED,
                             $groupMinFilesSetting,
                             $minFilesSetting,
@@ -709,14 +697,10 @@ class ProcessReleases
                     $this->pdo->queryExec(
                         sprintf(
                             '
-							DELETE c, b, p
+							DELETE
 							FROM %s c
-							INNER JOIN %s b ON c.id = b.collections_id
-							STRAIGHT_JOIN %s p ON b.id = p.binaries_id
 							WHERE c.collectionhash = %s',
                             $this->tables['cname'],
-                            $this->tables['bname'],
-                            $this->tables['pname'],
                             $this->pdo->escapeString($collection['collectionhash'])
                         )
                     );
