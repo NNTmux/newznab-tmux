@@ -2,7 +2,6 @@
 
 namespace nntmux\processing\post;
 
-use App\Models\Release;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
@@ -13,6 +12,7 @@ use nntmux\ColorCLI;
 use nntmux\Releases;
 use nntmux\NameFixer;
 use nntmux\Categorize;
+use App\Models\Release;
 use App\Models\Settings;
 use nntmux\ReleaseExtra;
 use nntmux\ReleaseFiles;
@@ -888,7 +888,7 @@ class ProcessAdditional
 
             // Look for a video sample, make sure it's not an image.
             if ($this->_processThumbnails === true &&
-                empty($this->_sampleMessageIDs) && stripos($this->_currentNZBFile['title'], "sample") !== false &&
+                empty($this->_sampleMessageIDs) && stripos($this->_currentNZBFile['title'], 'sample') !== false &&
                 ! preg_match('/\.jpe?g/i', $this->_currentNZBFile['title'])
             ) {
                 if (isset($this->_currentNZBFile['segments'])) {
