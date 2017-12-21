@@ -454,7 +454,7 @@ CREATE TABLE countries (
 DROP TABLE IF EXISTS dnzb_failures;
 CREATE TABLE dnzb_failures (
   release_id   INT(11) UNSIGNED  NOT NULL,
-  users_id      INT(11) UNSIGNED  NOT NULL,
+  users_id      INT(16) UNSIGNED  NOT NULL,
   failed      INT UNSIGNED      NOT NULL DEFAULT '0',
   PRIMARY KEY (release_id, users_id),
   CONSTRAINT FK_users_df FOREIGN KEY (users_id)
@@ -470,7 +470,7 @@ CREATE TABLE forumpost (
   id          INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
   forumid     INT(11)             NOT NULL DEFAULT '1',
   parentid    INT(11)             NOT NULL DEFAULT '0',
-  users_id INT(11) UNSIGNED    NOT NULL,
+  users_id    INT(16) UNSIGNED    NOT NULL,
   subject     VARCHAR(255)        NOT NULL,
   message     TEXT                NOT NULL,
   locked      TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
@@ -566,7 +566,7 @@ DROP TABLE IF EXISTS invitations;
 CREATE TABLE invitations (
   id          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   guid        VARCHAR(50)      NOT NULL,
-  users_id INT(11) UNSIGNED NOT NULL,
+  users_id INT(16) UNSIGNED NOT NULL,
   created_at DATETIME         NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
@@ -1209,13 +1209,10 @@ CREATE TABLE upcoming_releases (
   AUTO_INCREMENT  = 1;
 
 
-
-
-
 DROP TABLE IF EXISTS users_releases;
 CREATE TABLE users_releases (
   id          INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
-  users_id INT(1) UNSIGNED    NOT NULL,
+  users_id INT(16) UNSIGNED    NOT NULL,
   releases_id   INT(11) UNSIGNED              NOT NULL COMMENT 'FK to releases.id',
   created_at DATETIME         NOT NULL,
   updated_at DATETIME NOT NULL,
