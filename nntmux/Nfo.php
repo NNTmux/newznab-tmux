@@ -30,7 +30,7 @@ class Nfo
     /**
      * @var string
      */
-    private $maxsize;
+    protected $maxsize;
 
     /**
      * @var int
@@ -40,7 +40,7 @@ class Nfo
     /**
      * @var string
      */
-    private $minsize;
+    protected $minsize;
 
     /**
      * @var string
@@ -214,7 +214,7 @@ class Nfo
                 $release['completion'] = 0;
             }
 
-            if ((int) $release['completion'] === 0) {
+            if ($release['completion'] === 0) {
                 $nzbContents = new NZBContents(
                     [
                         'Echo' => $this->echo,
@@ -273,25 +273,39 @@ class Nfo
      */
     public function processNfoFiles($nntp, $groupID = '', $guidChar = '', $processImdb = 1, $processTv = 1): int
     {
+        $maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
+        $minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
+        $dummy = (int) Settings::settingValue('..maxnforetries');
+        $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
         $ret = 0;
         $guidCharQuery = ($guidChar === '' ? '' : 'AND r.leftguid = '.$this->pdo->escapeString($guidChar));
         $groupIDQuery = ($groupID === '' ? '' : 'AND r.groups_id = '.$groupID);
         $optionsQuery = self::NfoQueryString();
 
-        $res = $this->pdo->query(
-            sprintf(
-                '
-				SELECT r.id, r.guid, r.groups_id, r.name
-				FROM releases r
-				WHERE 1=1 %s %s %s
-				ORDER BY r.nfostatus ASC, r.postdate DESC
-				LIMIT %d',
-                $optionsQuery,
-                $guidCharQuery,
-                $groupIDQuery,
-                $this->nzbs
-            )
-        );
+        $qry = Release::query()
+            ->select(['id', 'guid', 'groups_id', 'name'])
+            ->where('nzbstatus', '=', NZB::NZB_ADDED)
+            ->whereBetween('nfostatus', [$maxRetries < -8 ? -8 : $maxRetries, self::NFO_UNPROC])
+            ->orderBy('nfostatus')
+            ->orderByDesc('postdate')
+            ->limit($this->nzbs);
+        if ($guidChar !== '') {
+            $qry->where('leftguid', $guidChar);
+        }
+        if ($groupID !== '') {
+            $qry->where('groups_id', $groupID);
+        }
+
+        if ($maxSize > 0) {
+            $qry->where('size', '<', $maxSize * 1073741824);
+        }
+
+        if ($minSize >0) {
+            $qry->where('size', '>', $minSize * 1048576);
+        }
+
+        $res = $qry->get();
+
         $nfoCount = \count($res);
 
         if ($nfoCount > 0) {
