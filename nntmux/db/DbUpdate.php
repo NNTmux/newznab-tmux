@@ -94,7 +94,7 @@ class DbUpdate
         ];
         $options += $defaults;
 
-        $show = (Utility::isCLI() || NN_DEBUG);
+        $show = Utility::isCLI();
 
         $files = empty($options['files']) ? Utility::getDirFiles($options) : $options['files'];
         natsort($files);
@@ -343,9 +343,6 @@ class DbUpdate
                     // Check for non default delimiters ($$ for example).
                     if (preg_match('#^\s*DELIMITER\s+(?P<delimiter>.+)\s*$#i', $line, $matches)) {
                         $delimiter = $matches['delimiter'];
-                        if (NN_DEBUG) {
-                            echo ColorCLI::debug("DEBUG: Delimiter switched to $delimiter");
-                        }
                         if ($delimiter !== $options['delimiter']) {
                             continue;
                         }

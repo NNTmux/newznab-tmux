@@ -123,17 +123,6 @@ class NZB
             'NZB downloaded from %s',
             Settings::settingValue('site.main.title')
         );
-
-        $this->_debug = (NN_DEBUG || NN_LOGGING);
-
-        if (NN_DEBUG || NN_LOGGING) {
-            $this->_debug = true;
-            try {
-                $this->debugging = new Logger(['ColorCLI' => $this->pdo->log]);
-            } catch (LoggerException $error) {
-                $this->_debug = false;
-            }
-        }
     }
 
     /**

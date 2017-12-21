@@ -32,10 +32,7 @@ $PHP = 'php';
 $PYTHON = ($tRun->command_exist('python3') ? 'python3 -OOu' : 'python -OOu');
 
 //assign shell commands
-$show_time = (NN_DEBUG ? '/usr/bin/time' : '');
-$runVar['commands']['_php'] = $show_time." nice -n{$tmux_niceness} $PHP";
 $runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} $PHP";
-$runVar['commands']['_python'] = $show_time." nice -n{$tmux_niceness} $PYTHON";
 $runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/tmux/bin/showsleep.php";
 
 //spawn IRCScraper as soon as possible

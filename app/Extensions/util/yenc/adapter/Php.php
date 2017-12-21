@@ -19,8 +19,6 @@
 
 namespace App\Extensions\util\yenc\adapter;
 
-use nntmux\Logger;
-
 /**
  * Class Php.
  */
@@ -50,10 +48,6 @@ class Php
         // Make sure the header and trailer file sizes match up.
         if ($headerSize != $trailerSize) {
             $message = 'Header and trailer file sizes do not match. This is a violation of the yEnc specification.';
-            if (NN_LOGGING || NN_DEBUG) {
-                (new Logger())->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-            }
-
             throw new \RuntimeException($message);
         }
 
@@ -71,9 +65,6 @@ class Php
         // Make sure the decoded file size is the same as the size specified in the header.
         if (strlen($decoded) != $headerSize) {
             $message = 'Header file size ('.$headerSize.') and actual file size ('.strlen($decoded).') do not match. The file is probably corrupt.';
-            if (NN_LOGGING || NN_DEBUG) {
-                (new Logger())->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-            }
 
             throw new \RuntimeException($message);
         }
@@ -81,9 +72,6 @@ class Php
         // Check the CRC value
         if ($crc !== '' && (strtolower($crc) !== strtolower(sprintf('%04X', crc32($decoded))))) {
             $message = 'CRC32 checksums do not match. The file is probably corrupt.';
-            if (NN_LOGGING || NN_DEBUG) {
-                (new Logger())->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-            }
 
             throw new \RuntimeException($message);
         }
@@ -146,9 +134,6 @@ class Php
 
         if ($lineLength < 1) {
             $message = $lineLength.' is not a valid line length.';
-            if (NN_LOGGING || NN_DEBUG) {
-                (new Logger())->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-            }
 
             throw new \RuntimeException($message);
         }

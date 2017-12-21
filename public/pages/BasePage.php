@@ -131,7 +131,7 @@ class BasePage
                 SMARTY_DIR.'plugins/',
             ]
         );
-        $this->smarty->error_reporting = (NN_DEBUG ? E_ALL : E_ALL - E_NOTICE);
+        $this->smarty->error_reporting = E_ALL - E_NOTICE;
 
         if (isset($_SERVER['SERVER_NAME'])) {
             $this->serverurl = (

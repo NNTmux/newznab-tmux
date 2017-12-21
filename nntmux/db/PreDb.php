@@ -27,15 +27,15 @@ class PreDb extends DB
      * @var array Prepared Statement objects
      */
     protected $ps = [
-		'AddGroups'		=> null,
-		'DeleteShort' 	=> null,
-		'Export'		=> null,
-		'Import' 		=> null,
-		'Insert'		=> null,
-		'LoadData' 		=> null,
-		'Truncate'		=> null,
-		'UpdateGroupID'	=> null,
-	];
+        'AddGroups'        => null,
+        'DeleteShort'    => null,
+        'Export'        => null,
+        'Import'        => null,
+        'Insert'        => null,
+        'LoadData'        => null,
+        'Truncate'        => null,
+        'UpdateGroupID'    => null,
+    ];
 
     public function __construct(array $options = [])
     {
@@ -79,13 +79,13 @@ class PreDb extends DB
     public function executeExport(array $options = null)
     {
         $defaults = [
-			'enclosedby'	=> '',
-			'fields'		=> '\t',
-			'limit'			=> 0,
-			'lines'			=> '\r\n',    // use Windows style endings so that text can contain \n
-			'local'			=> false,
-			'path'			=> null,
-		];
+            'enclosedby'    => '',
+            'fields'        => '\t',
+            'limit'            => 0,
+            'lines'            => '\r\n',    // use Windows style endings so that text can contain \n
+            'local'            => false,
+            'path'            => null,
+        ];
         $options += $defaults;
 
         if (empty($options['path'])) {
@@ -105,9 +105,6 @@ SELECT title, nfo, size, files, filename, nuked, nukereason, category, predate, 
 	FIELDS TERMINATED BY '{$options['fields']}' $enclosedby
 	LINES TERMINATED BY '{$options['lines']}';
 SQL_EXPORT;
-        if (NN_DEBUG) {
-            echo "$sql\n";
-        }
 
         return $this->queryDirect($sql);
     }
@@ -124,8 +121,8 @@ SQL_EXPORT;
     public function executeLoadData(array $options = null)
     {
         $defaults = [
-			'path'		=> null,
-		];
+            'path'        => null,
+        ];
         $options += $defaults;
 
         if (empty($options['path'])) {
@@ -180,9 +177,9 @@ SQL_EXPORT;
     public function progress($settings = null, array $options = [])
     {
         $defaults = [
-			'path'	=> NN_ROOT.'cli'.DS.'data'.DS.'predb_progress.txt',
-			'read'	=> true,
-		];
+            'path'    => NN_ROOT.'cli'.DS.'data'.DS.'predb_progress.txt',
+            'read'    => true,
+        ];
         $options += $defaults;
 
         if (! $options['read'] || ! is_file($options['path'])) {
@@ -263,12 +260,12 @@ SQL_INSERT;
     {
         $enclosedby = '';
         $defaults = [
-			'enclosedby'	=> "'",
-			'fields'		=> '\t',
-			'lines'			=> '\r\n',    // Windows' style EOL to allow \n to be used in text.
-			'local'			=> false,
-			'optional'		=> true,
-		];
+            'enclosedby'    => "'",
+            'fields'        => '\t',
+            'lines'            => '\r\n',    // Windows' style EOL to allow \n to be used in text.
+            'local'            => false,
+            'optional'        => true,
+        ];
         $options += $defaults;
 
         $local = $options['local'] === false ? 'LOCAL' : '';
@@ -283,9 +280,6 @@ LOAD DATA $local INFILE :path
   LINES TERMINATED BY '{$options['lines']}'
   (title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, groupname);
 SQL_LOAD_DATA;
-        if (NN_DEBUG) {
-            echo "$sql\n";
-        }
 
         $this->prepareSQLStatement($sql, 'LoadData');
     }

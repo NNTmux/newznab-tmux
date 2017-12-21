@@ -28,9 +28,6 @@ use nntmux\db\PreDb;
 use nntmux\utility\Utility;
 
 if (! Utility::isWin()) {
-    if (NN_DEBUG) {
-        echo "Checking resource path\n";
-    }
     $canExeRead = Utility::canExecuteRead(NN_RES);
     if (is_string($canExeRead)) {
         exit($canExeRead);
@@ -38,9 +35,6 @@ if (! Utility::isWin()) {
     unset($canExeRead);
 }
 
-if (NN_DEBUG) {
-    echo "Checking directory is writable\n";
-}
 if (! is_writable(NN_RES)) {
     exit('The ('.NN_RES.') folder must be writable.'.PHP_EOL);
 }
@@ -60,16 +54,9 @@ if (! isset($argv[1]) || (! is_numeric($argv[1]) && $argv[1] !== 'progress') || 
         'Argument 3: Show output of queries or not, true | false'.PHP_EOL
     );
 }
-if (NN_DEBUG) {
-    echo "Parameter check completed\n";
-}
 
 $url = 'https://api.github.com/repos/nZEDb/nZEDbPre_Dumps/contents/dumps/';
 $filePattern = '(?P<filename>(?P<stamp>\d+)_predb_dump\.csv\.gz)';
-
-if (NN_DEBUG) {
-    echo "Fetching predb_dump directory list from GitHub\n";
-}
 
 $result = getDirListing($url);
 
@@ -80,20 +67,12 @@ if (is_null($dirs) ||
     exit("Error: $result");
 }
 
-if (NN_DEBUG) {
-    echo "Fetching predb_dump lists from GitHub\n";
-}
-
 foreach ($dirs as $dir) {
     if ($dir['name'] == '0README.txt') {
         continue;
     }
 
     $result = getDirListing($url.$dir['name'].'/');
-
-    if (NN_DEBUG) {
-        echo "Extracting filenames from list.\n";
-    }
 
     $temp = json_decode($result, true);
     if (is_null($temp)) {
@@ -140,10 +119,6 @@ foreach ($data as $dir => $files) {
                     echo "Error downloading dump {$match[2]} you can try manually importing it.".
                         PHP_EOL;
                     continue;
-                } else {
-                    if (NN_DEBUG) {
-                        echo "Dump {$match[2]} downloaded\n";
-                    }
                 }
 
                 // Make sure we didn't get an HTML page.
@@ -221,10 +196,6 @@ foreach ($data as $dir => $files) {
                 );
             } else {
                 echo "Ignoring: {$file['download_url']}\n";
-            }
-        } else {
-            if (NN_DEBUG) {
-                echo "^https://raw.githubusercontent.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$\n {$file['download_url']}\n";
             }
         }
     }

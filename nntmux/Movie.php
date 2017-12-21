@@ -207,20 +207,10 @@ class Movie
         $this->searchEngines = true;
         $this->showPasswords = Releases::showPasswords();
 
-        $this->debug = NN_DEBUG;
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI && $this->pdo->cli);
         $this->imgSavePath = NN_COVERS.'movies'.DS;
         $this->service = '';
         $this->catWhere = 'PARTITION (movies)';
-
-        if (NN_DEBUG || NN_LOGGING) {
-            $this->debug = true;
-            try {
-                $this->debugging = new Logger();
-            } catch (LoggerException $error) {
-                $this->_debug = false;
-            }
-        }
     }
 
     /**
@@ -842,20 +832,6 @@ class Movie
             // Check the similarity.
             similar_text($this->currentTitle, $ret['title'], $percent);
             if ($percent < 40) {
-                if ($this->debug) {
-                    $this->debugging->log(
-                        __CLASS__,
-                        __FUNCTION__,
-                        'Found ('.
-                        $ret['title'].
-                        ') from TMDB, but it\'s only '.
-                        $percent.
-                        '% similar to ('.
-                        $this->currentTitle.')',
-                        Logger::LOG_INFO
-                    );
-                }
-
                 return false;
             }
         }
@@ -973,19 +949,6 @@ class Movie
                 // Check the similarity.
                 similar_text($this->currentTitle, $ret['title'], $percent);
                 if ($percent < 40) {
-                    if ($this->debug) {
-                        $this->debugging->log(
-                            __CLASS__,
-                            __FUNCTION__,
-                            'Found ('.
-                            $ret['title'].
-                            ') from IMDB, but it\'s only '.
-                            $percent.
-                            '% similar to ('.
-                            $this->currentTitle.')',
-                            Logger::LOG_INFO
-                        );
-                    }
 
                     return false;
                 }
@@ -1544,9 +1507,6 @@ class Movie
             $name = trim(preg_replace('/\s{2,}/', ' ', $name));
             // Check if the name is long enough and not just numbers.
             if (strlen($name) > 4 && ! preg_match('/^\d+$/', $name)) {
-                if ($this->debug && $this->echooutput) {
-                    ColorCLI::doEcho("DB name: {$releaseName}", true);
-                }
                 $this->currentTitle = $name;
                 $this->currentYear = ($year === '' ? false : $year);
 

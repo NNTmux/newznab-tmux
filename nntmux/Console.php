@@ -447,10 +447,6 @@ class Console
         similar_text(strtolower($gameInfo['title']), strtolower($con['title']), $titlepercent);
         similar_text(strtolower($gameInfo['platform']), strtolower($con['platform']), $platformpercent);
 
-        if (NN_DEBUG) {
-            echo PHP_EOL."Matched: Title Percentage 1: $titlepercent% between ".$gameInfo['title'].' and '.$con['title'].PHP_EOL;
-        }
-
         // Since Wii Ware games and XBLA have inconsistent original platforms, as long as title is 50% its ok.
         if (preg_match('/wiiware|xbla/i', trim($gameInfo['platform'])) && $titlepercent >= 50) {
             $titlepercent = 100;
@@ -466,11 +462,6 @@ class Console
         if ($titlepercent < 70) {
             $gameInfo['title'] .= ' - '.$gameInfo['platform'];
             similar_text(strtolower($gameInfo['title']), strtolower($con['title']), $titlepercent);
-        }
-
-        if (NN_DEBUG) {
-            echo "Matched: Title Percentage 2: $titlepercent% between ".$gameInfo['title'].' and '.$con['title'].PHP_EOL;
-            echo "Matched: Platform Percentage: $platformpercent% between ".$gameInfo['platform'].' and '.$con['platform'].PHP_EOL;
         }
 
         // Platform must equal 100%.

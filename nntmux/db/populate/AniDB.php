@@ -467,14 +467,6 @@ class AniDB
                     );
                 } else {
                     $this->updateAniChildTables($AniDBAPIArray, $anidb['anidbid']);
-                    if (NN_DEBUG) {
-                        ColorCLI::doEcho(
-                            ColorCLI::headerOver(
-                                'Added/Updated AniDB ID: '.$anidb['anidbid']
-                            ),
-                            true
-                        );
-                    }
                 }
                 sleep(random_int(120, 240));
             }
@@ -500,14 +492,6 @@ class AniDB
                 );
             } else {
                 $this->updateAniChildTables($AniDBAPIArray, $anidbId);
-                if (NN_DEBUG) {
-                    ColorCLI::doEcho(
-                        ColorCLI::headerOver(
-                            'Added/Updated AniDB ID: '.$anidbId
-                        ),
-                        true
-                    );
-                }
             }
         }
     }

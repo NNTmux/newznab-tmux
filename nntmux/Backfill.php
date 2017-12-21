@@ -106,15 +106,6 @@ class Backfill
             ? $options['NNTP'] : new NNTP(['Settings' => $this->pdo])
         );
 
-        $this->_debug = (NN_LOGGING || NN_DEBUG);
-        if ($this->_debug) {
-            try {
-                $this->_debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
-            } catch (LoggerException $error) {
-                $this->_debug = false;
-            }
-        }
-
         $this->_compressedHeaders = (int) Settings::settingValue('..compressedheaders') === 1;
         $this->_safeBackFillDate = Settings::settingValue('..safebackfilldate') !== '' ? (string) Settings::settingValue('safebackfilldate') : '2008-08-14';
         $this->_safePartRepair = (int) Settings::settingValue('..safepartrepair') === 1 ? 'update' : 'backfill';
@@ -153,9 +144,6 @@ class Backfill
                 ' group(s) - Using compression? '.
                 ($this->_compressedHeaders ? 'Yes' : 'No')
             );
-            if ($this->_debug) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $dMessage, Logger::LOG_INFO);
-            }
 
             if ($this->_echoCLI) {
                 ColorCLI::doEcho(ColorCLI::header($dMessage), true);
@@ -173,9 +161,6 @@ class Backfill
             foreach ($res as $groupArr) {
                 if ($groupName === '') {
                     $dMessage = 'Starting group '.$counter.' of '.$groupCount;
-                    if ($this->_debug) {
-                        $this->_debugging->log(__CLASS__, __FUNCTION__, $dMessage, Logger::LOG_INFO);
-                    }
 
                     if ($this->_echoCLI) {
                         ColorCLI::doEcho(ColorCLI::header($dMessage), true);
@@ -186,18 +171,12 @@ class Backfill
             }
 
             $dMessage = 'Backfilling completed in '.number_format(microtime(true) - $allTime, 2).' seconds.';
-            if ($this->_debug) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $dMessage, Logger::LOG_INFO);
-            }
 
             if ($this->_echoCLI) {
                 ColorCLI::doEcho(ColorCLI::primary($dMessage));
             }
         } else {
             $dMessage = 'No groups specified. Ensure groups are added to database for updating.';
-            if ($this->_debug) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $dMessage, Logger::LOG_FATAL);
-            }
 
             if ($this->_echoCLI) {
                 ColorCLI::doEcho(ColorCLI::warning($dMessage), true);
@@ -230,9 +209,6 @@ class Backfill
                 'You need to run update_binaries on '.
                 $groupName.
                 '. Otherwise the group is dead, you must disable it.';
-            if ($this->_debug) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $dMessage, Logger::LOG_ERROR);
-            }
 
             if ($this->_echoCLI) {
                 ColorCLI::doEcho(ColorCLI::error($dMessage));
@@ -278,9 +254,6 @@ class Backfill
                 $groupName.
                 ($this->_disableBackfillGroup ? ', disabling backfill on it.' :
                 ', skipping it, consider disabling backfill on it.');
-            if ($this->_debug) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $dMessage, Logger::LOG_NOTICE);
-            }
 
             if ($this->_disableBackfillGroup) {
                 $this->_groups->updateGroupStatus($groupArr['id'], 'backfill', 0);
@@ -417,9 +390,6 @@ class Backfill
                 'No groups to backfill, they are all at the target date '.
                 $this->_safeBackFillDate.
                 ', or you have not enabled them to be backfilled in the groups page.'.PHP_EOL;
-            if ($this->_debug) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $dMessage, Logger::LOG_FATAL);
-            }
             exit($dMessage);
         }
         $this->backfillAllGroups($groupname['name'], $articles);

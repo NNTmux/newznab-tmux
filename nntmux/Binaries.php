@@ -302,7 +302,6 @@ class Binaries
             $this->log(
                 'Updating: '.$groupCount.' group(s) - Using compression? '.($this->_compressedHeaders ? 'Yes' : 'No'),
                 __FUNCTION__,
-                Logger::LOG_INFO,
                 'header'
             );
 
@@ -311,7 +310,6 @@ class Binaries
                 $this->log(
                     'Starting group '.$counter.' of '.$groupCount,
                     __FUNCTION__,
-                    Logger::LOG_INFO,
                     'header'
                 );
                 $this->updateGroup($group, $maxHeaders);
@@ -321,14 +319,12 @@ class Binaries
             $this->log(
                 'Updating completed in '.number_format(microtime(true) - $allTime, 2).' seconds.',
                 __FUNCTION__,
-                Logger::LOG_INFO,
                 'primary'
             );
         } else {
             $this->log(
                 'No groups specified. Ensure groups are added to NNTmux\'s database for updating.',
                 __FUNCTION__,
-                Logger::LOG_NOTICE,
                 'warning'
             );
         }
@@ -665,7 +661,6 @@ class Binaries
                 $this->log(
                     "Code {$headers->code}: $message\nSkipping group: {$this->groupMySQL['name']}",
                     __FUNCTION__,
-                    Logger::LOG_WARNING,
                     'error'
                 );
 
@@ -800,7 +795,6 @@ class Binaries
                 $this->log(
                     $notInsertedCount.' articles failed to insert!',
                     __FUNCTION__,
-                    Logger::LOG_WARNING,
                     'warning'
                 );
             }
@@ -1353,21 +1347,6 @@ class Binaries
             $date = strtotime($date);
         }
 
-        if ($this->_debug) {
-            $this->_debugging->log(
-                __CLASS__,
-                __FUNCTION__,
-                'Article ('.
-                $post.
-                "'s) date is (".
-                $date.
-                ') ('.
-                $this->daysOld($date).
-                ' days old)',
-                Logger::LOG_INFO
-            );
-        }
-
         return $date;
     }
 
@@ -1735,17 +1714,13 @@ class Binaries
      * @param int    $level   Logger severity level constant.
      * @param string $color   ColorCLI method name.
      */
-    private function log($message, $method, $level, $color): void
+    private function log($message, $method, $color): void
     {
         if ($this->_echoCLI) {
             ColorCLI::doEcho(
                 ColorCLI::$color($message.' ['.__CLASS__."::$method]"),
                 true
             );
-        }
-
-        if ($this->_debug) {
-            $this->_debugging->log(__CLASS__, $method, $message, $level);
         }
     }
 

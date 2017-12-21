@@ -2,13 +2,11 @@
 
 namespace nntmux\db;
 
-use nntmux\Logger;
 use nntmux\ColorCLI;
 use Ramsey\Uuid\Uuid;
 use App\Models\Settings;
 use nntmux\ConsoleTools;
 use nntmux\libraries\Cache;
-use nntmux\LoggerException;
 use nntmux\utility\Utility;
 use nntmux\libraries\CacheException;
 
@@ -151,15 +149,6 @@ class DB extends \PDO
         $this->ct = $this->opts['ct'];
         $this->log = $this->opts['log'];
 
-        $this->_debug = (NN_DEBUG || NN_LOGGING);
-        if ($this->_debug) {
-            try {
-                $this->debugging = new Logger(['ColorCLI' => $this->log]);
-            } catch (LoggerException $error) {
-                $this->_debug = false;
-            }
-        }
-
         if ($this->opts['checkVersion']) {
             $this->fetchDbVersion();
         }
@@ -234,22 +223,6 @@ class DB extends \PDO
         }
 
         return $result->fetchAll(\PDO::FETCH_ASSOC);
-    }
-
-    public function debugDisable()
-    {
-        unset($this->debugging);
-        $this->_debug = false;
-    }
-
-    public function debugEnable()
-    {
-        $this->_debug = true;
-        try {
-            $this->debugging = new Logger(['ColorCLI' => $this->log]);
-        } catch (LoggerException $error) {
-            $this->_debug = false;
-        }
     }
 
     public function getTableList()
@@ -463,10 +436,6 @@ class DB extends \PDO
                 return $result;
             }
         }
-        if ($this->_debug) {
-            $this->echoError($error, 'queryInsert', 4);
-            $this->debugging->log(__CLASS__, __FUNCTION__, $query, Logger::LOG_SQL);
-        }
 
         return false;
     }
@@ -522,10 +491,6 @@ class DB extends \PDO
             } else {
                 return $result;
             }
-        }
-        if ($silent === false && $this->_debug) {
-            $this->echoError($error, 'queryExec', 4);
-            $this->debugging->log(__CLASS__, __FUNCTION__, $query, Logger::LOG_SQL);
         }
 
         return false;
@@ -613,9 +578,6 @@ class DB extends \PDO
             } elseif (! $silent) {
                 $this->echoError($e->getMessage(), 'Exec', 4, false);
 
-                if ($this->_debug) {
-                    $this->debugging->log(__CLASS__, __FUNCTION__, $query, Logger::LOG_SQL);
-                }
             }
 
             return false;
@@ -789,9 +751,6 @@ class DB extends \PDO
             } else {
                 if ($ignore === false) {
                     $this->echoError($e->getMessage(), 'queryDirect', 4, false);
-                    if ($this->_debug) {
-                        $this->debugging->log(__CLASS__, __FUNCTION__, $query, Logger::LOG_SQL);
-                    }
                 }
                 $result = false;
             }
@@ -943,9 +902,6 @@ class DB extends \PDO
         $message = $type.' ('.$tables.')';
         if ($web === false) {
             echo ColorCLI::primary($message);
-        }
-        if ($this->_debug) {
-            $this->debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_INFO);
         }
     }
 
@@ -1181,9 +1137,6 @@ class DB extends \PDO
         try {
             $PDOstatement = $this->pdo->prepare($query, $options);
         } catch (\PDOException $e) {
-            if ($this->_debug) {
-                $this->debugging->log(__CLASS__, __FUNCTION__, $e->getMessage(), Logger::LOG_INFO);
-            }
             echo ColorCLI::error("\n".$e->getMessage());
             $PDOstatement = false;
         }
@@ -1205,9 +1158,6 @@ class DB extends \PDO
             try {
                 $result = $this->pdo->getAttribute($attribute);
             } catch (\PDOException $e) {
-                if ($this->_debug) {
-                    $this->debugging->log(__CLASS__, __FUNCTION__, $e->getMessage(), Logger::LOG_INFO);
-                }
                 echo ColorCLI::error("\n".$e->getMessage());
                 $result = false;
             }

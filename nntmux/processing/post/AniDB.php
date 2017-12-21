@@ -177,12 +177,6 @@ class AniDB
         ) {
             $matches['epno'] = 1;
         } else {
-            if (NN_DEBUG) {
-                ColorCLI::doEcho(
-                    PHP_EOL."Could not parse searchname {$cleanName}.",
-                    true
-                );
-            }
             $this->status = self::PROC_EXTFAIL;
         }
 
@@ -274,12 +268,6 @@ class AniDB
 
                 $matched = true;
             } else {
-                if (NN_DEBUG) {
-                    ColorCLI::doEcho(
-                        PHP_EOL.'Could not match searchname:'.$release['searchname'],
-                        true
-                    );
-                }
                 $this->status = self::PROC_NOMATCH;
             }
         }

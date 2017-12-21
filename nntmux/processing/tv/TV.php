@@ -483,9 +483,6 @@ abstract class TV extends Videos
                 return $showInfo;
             }
         }
-        if (NN_DEBUG) {
-            ColorCLI::doEcho('Failed to parse release: '.$relname, true);
-        }
 
         return false;
     }
@@ -695,10 +692,6 @@ abstract class TV extends Videos
     public function checkMatch($ourName, $scrapeName, $probability)
     {
         similar_text($ourName, $scrapeName, $matchpct);
-
-        if (NN_DEBUG) {
-            echo PHP_EOL.sprintf('Match Percentage: %d percent between %s and %s', $matchpct, $ourName, $scrapeName).PHP_EOL;
-        }
 
         if ($matchpct >= $probability) {
             return $matchpct;

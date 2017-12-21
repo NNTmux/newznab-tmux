@@ -99,7 +99,7 @@ class Configure
                 if (is_file($settings_file)) {
                     require_once $settings_file;
                     if (PHP_SAPI === 'cli') {
-                        $current_settings_file_version = 6; // Update this when updating settings.example.php
+                        $current_settings_file_version = 7; // Update this when updating settings.example.php
                         if (! defined('NN_SETTINGS_FILE_VERSION') ||
                             NN_SETTINGS_FILE_VERSION !== $current_settings_file_version
                         ) {
@@ -113,22 +113,12 @@ class Configure
                     define('ITEMS_PER_PAGE', '50');
                     define('ITEMS_PER_COVER_PAGE', '20');
                     define('NN_ECHOCLI', true);
-                    define('NN_DEBUG', false);
-                    define('NN_LOGGING', false);
-                    define('NN_LOGINFO', false);
-                    define('NN_LOGNOTICE', false);
-                    define('NN_LOGWARNING', false);
-                    define('NN_LOGERROR', false);
-                    define('NN_LOGFATAL', false);
-                    define('NN_LOGQUERIES', false);
-                    define('NN_LOGAUTOLOADER', false);
                     define('NN_QUERY_STRIP_WHITESPACE', false);
                     define('NN_RENAME_PAR2', true);
                     define('NN_RENAME_MUSIC_MEDIAINFO', true);
                     define('NN_CACHE_EXPIRY_SHORT', 300);
                     define('NN_CACHE_EXPIRY_MEDIUM', 600);
                     define('NN_CACHE_EXPIRY_LONG', 900);
-                    define('NN_PREINFO_OPEN', false);
                     define('NN_FLOOD_CHECK', false);
                     define('NN_FLOOD_WAIT_TIME', 5);
                     define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
