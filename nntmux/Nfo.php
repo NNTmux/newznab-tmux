@@ -300,7 +300,7 @@ class Nfo
             $qry->where('size', '<', $maxSize * 1073741824);
         }
 
-        if ($minSize >0) {
+        if ($minSize > 0) {
             $qry->where('size', '>', $minSize * 1048576);
         }
 
