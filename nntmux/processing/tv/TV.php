@@ -3,7 +3,6 @@
 namespace nntmux\processing\tv;
 
 use nntmux\Category;
-use nntmux\ColorCLI;
 use App\Models\Video;
 use App\Models\TvInfo;
 use App\Models\Release;

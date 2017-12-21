@@ -949,7 +949,6 @@ class Movie
                 // Check the similarity.
                 similar_text($this->currentTitle, $ret['title'], $percent);
                 if ($percent < 40) {
-
                     return false;
                 }
             }

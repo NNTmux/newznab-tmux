@@ -633,7 +633,6 @@ class NNTP extends \Net_NNTP_Client
             $summary = $this->selectGroup($groupName);
             // If there was an error selecting the group, return PEAR error object.
             if ($this->isError($summary)) {
-
                 return $summary;
             }
         }
@@ -648,7 +647,6 @@ class NNTP extends \Net_NNTP_Client
         $article = parent::getArticle($identifier);
         // If there was an error downloading the article, return a PEAR error object.
         if ($this->isError($article)) {
-
             return $article;
         }
 
@@ -712,7 +710,6 @@ class NNTP extends \Net_NNTP_Client
             $summary = $this->selectGroup($groupName);
             // Return PEAR error object on failure.
             if ($this->isError($summary)) {
-
                 return $summary;
             }
         }
@@ -727,7 +724,6 @@ class NNTP extends \Net_NNTP_Client
         $header = parent::getHeader($identifier);
         // If we failed, return PEAR error object.
         if ($this->isError($header)) {
-
             return $header;
         }
 
@@ -836,7 +832,6 @@ class NNTP extends \Net_NNTP_Client
         $nntp->doQuit();
         // Try reconnecting. This uses another round of max retries.
         if ($nntp->doConnect($comp) !== true) {
-
             return $this->throwError('Unable to reconnect to usenet!');
         }
 
@@ -1122,7 +1117,6 @@ class NNTP extends \Net_NNTP_Client
             $summary = $this->selectGroup($groupName);
             // If there was an error selecting the group, return PEAR error object.
             if ($this->isError($summary)) {
-
                 return $summary;
             }
         }

@@ -577,7 +577,6 @@ class DB extends \PDO
                 }
             } elseif (! $silent) {
                 $this->echoError($e->getMessage(), 'Exec', 4, false);
-
             }
 
             return false;
