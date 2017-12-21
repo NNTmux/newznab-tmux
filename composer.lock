@@ -143,16 +143,16 @@
         },
         {
             "name": "barracudanetworks/forkdaemon-php",
-            "version": "v1.0.10",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barracudanetworks/forkdaemon-php.git",
-                "reference": "6675af59d017afc3bbb32af1c0844353f1b7666a"
+                "reference": "98307c172debec0ea982ef369634292d84bd5b2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barracudanetworks/forkdaemon-php/zipball/6675af59d017afc3bbb32af1c0844353f1b7666a",
-                "reference": "6675af59d017afc3bbb32af1c0844353f1b7666a",
+                "url": "https://api.github.com/repos/barracudanetworks/forkdaemon-php/zipball/98307c172debec0ea982ef369634292d84bd5b2a",
+                "reference": "98307c172debec0ea982ef369634292d84bd5b2a",
                 "shasum": ""
             },
             "require": {
@@ -175,7 +175,7 @@
                 "forking",
                 "php"
             ],
-            "time": "2017-03-28T17:06:09+00:00"
+            "time": "2017-12-18T15:52:48+00:00"
         },
         {
             "name": "bower-asset/animate.css",
@@ -2948,16 +2948,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.5.26",
+            "version": "v5.5.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "d7e6a7aab600c5cfae595ea22074ac3c536cbc28"
+                "reference": "b4fb6eeb227b7327b4ca7f92263b693ec9ac9875"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/d7e6a7aab600c5cfae595ea22074ac3c536cbc28",
-                "reference": "d7e6a7aab600c5cfae595ea22074ac3c536cbc28",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/b4fb6eeb227b7327b4ca7f92263b693ec9ac9875",
+                "reference": "b4fb6eeb227b7327b4ca7f92263b693ec9ac9875",
                 "shasum": ""
             },
             "require": {
@@ -3078,7 +3078,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2017-12-18T14:15:59+00:00"
+            "time": "2017-12-20T15:43:48+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -5920,16 +5920,16 @@
         },
         {
             "name": "watson/rememberable",
-            "version": "2.0.3",
+            "version": "2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dwightwatson/rememberable.git",
-                "reference": "3e07db60fe86bc471a11589fb06b60bd0e59de71"
+                "reference": "8718614835370f67f58d86387a26bfc315fa9a8b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dwightwatson/rememberable/zipball/3e07db60fe86bc471a11589fb06b60bd0e59de71",
-                "reference": "3e07db60fe86bc471a11589fb06b60bd0e59de71",
+                "url": "https://api.github.com/repos/dwightwatson/rememberable/zipball/8718614835370f67f58d86387a26bfc315fa9a8b",
+                "reference": "8718614835370f67f58d86387a26bfc315fa9a8b",
                 "shasum": ""
             },
             "require": {
@@ -5964,7 +5964,7 @@
                 "laravel",
                 "remember"
             ],
-            "time": "2017-08-24T12:27:32+00:00"
+            "time": "2017-12-21T01:09:18+00:00"
         },
         {
             "name": "yadakhov/insert-on-duplicate-key",
