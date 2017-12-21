@@ -889,8 +889,6 @@ CREATE TABLE release_comments (
   sourceid    BIGINT(20)       UNSIGNED,
   nzb_guid    BINARY(16)       NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
   PRIMARY KEY (id),
-  CONSTRAINT FK_users_rc FOREIGN KEY (users_id)
-  REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_release_comments_hash_releases_id(text_hash, releases_id),
   INDEX ix_releasecomment_releases_id (releases_id),
   INDEX ix_releasecomment_userid    (users_id)
