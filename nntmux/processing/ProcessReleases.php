@@ -562,11 +562,7 @@ class ProcessReleases
             $preDB = new PreDb(['Echo' => $this->echoCLI, 'Settings' => $this->pdo]);
 
             foreach ($collections as $collection) {
-                $cleanRelName = $this->pdo->escapeString(
-                    utf8_encode(
-                        str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection['subject'])
-                    )
-                );
+                $cleanRelName = utf8_encode(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection['subject']));
                 $fromName = utf8_encode(
                     trim($collection['fromname'], "'")
                 );
@@ -697,7 +693,7 @@ class ProcessReleases
                     $this->pdo->queryExec(
                         sprintf(
                             '
-							DELETE
+							DELETE c
 							FROM %s c
 							WHERE c.collectionhash = %s',
                             $this->tables['cname'],
@@ -877,14 +873,10 @@ class ProcessReleases
         $deleteQuery = $this->pdo->queryExec(
             sprintf(
                 '
-				DELETE c, b, p
+				DELETE c
 				FROM %s c
-				LEFT JOIN %s b ON c.id = b.collections_id
-				LEFT JOIN %s p ON b.id = p.binaries_id
 				WHERE (c.dateadded < NOW() - INTERVAL %d HOUR)',
                 $this->tables['cname'],
-                $this->tables['bname'],
-                $this->tables['pname'],
                 Settings::settingValue('..partretentionhours')
             )
         );
@@ -1036,14 +1028,10 @@ class ProcessReleases
                 $this->pdo->queryExec(
                     sprintf(
                         '
-						DELETE c, b, p
+						DELETE c
 						FROM %s c
-						LEFT JOIN %s b ON(c.id=b.collections_id)
-						LEFT JOIN %s p ON(b.id=p.binaries_id)
 						WHERE c.id = %d',
                         $this->tables['cname'],
-                        $this->tables['bname'],
-                        $this->tables['pname'],
                         $collection['id']
                     )
                 );
@@ -1696,16 +1684,12 @@ class ProcessReleases
         $obj = $this->pdo->queryExec(
             sprintf(
                 "
-                DELETE c, b, p FROM %s c
-                LEFT JOIN %s b ON (c.id=b.collections_id)
-                LEFT JOIN %s p ON (b.id=p.binaries_id)
+                DELETE c FROM %s c
                 WHERE
                     c.added <
                     DATE_SUB({$this->pdo->escapeString($lastRun)}, INTERVAL %d HOUR)
                 %s",
                 $this->tables['cname'],
-                $this->tables['bname'],
-                $this->tables['pname'],
                 $this->collectionTimeout,
                 $where
             )

@@ -1,3 +1,5 @@
+2017-12-21 DariusIII
+	* Chg: Update ProcessReleases collections/binaries/parts tables handling
 2017-12-20 DariusIII
 	* Fix: Update patches and mysql-ddl.sql
 	* Fix: Add missing redis setting into 10-tmux.tsv
