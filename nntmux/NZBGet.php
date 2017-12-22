@@ -105,8 +105,8 @@ class NZBGet
     {
         $relData = $this->releases->getByGuid($guid);
 
-        $string = Utility::unzipGzipFile($this->nzb->NZBPath($guid));
-        $string = ($string === false ? '' : $string);
+        $gzipFile = Utility::unzipGzipFile($this->nzb->NZBPath($guid));
+        $string = $gzipFile === false ? '' : $gzipFile;
 
         $header =
             '<?xml version="1.0"?>
