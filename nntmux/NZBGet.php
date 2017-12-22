@@ -36,7 +36,7 @@ class NZBGet
      * Full URL (containing password/username/etc).
      * @var string|bool
      */
-    protected $fullURL = '';
+    protected $fullUrl = '';
 
     /**
      * User id.
@@ -57,17 +57,17 @@ class NZBGet
     protected $serverurl = '';
 
     /**
-     * @var Releases
+     * @var \nntmux\Releases
      */
-    protected $Releases;
+    protected $releases;
 
     /**
-     * @var NZB
+     * @var \nntmux\NZB
      */
-    protected $NZB;
+    protected $nzb;
 
     /**
-     * @var Client
+     * @var \GuzzleHttp\Client
      */
     protected $client;
 
@@ -76,6 +76,7 @@ class NZBGet
      * Set up full URL.
      *
      * @var \BasePage
+     * @throws \Exception
      */
     public function __construct(&$page)
     {
@@ -89,29 +90,26 @@ class NZBGet
             $this->password = (empty($page->userdata['nzbgetpassword']) ? '' : $page->userdata['nzbgetpassword']);
         }
 
-        $this->fullURL = $this->verifyURL($this->url);
-        $this->Releases = new Releases();
+        $this->fullUrl = $this->verifyURL($this->url);
+        $this->releases = new Releases();
         $this->pdo = new DB();
-        $this->NZB = new NZB($this->pdo);
+        $this->nzb = new NZB($this->pdo);
         $this->client = new Client();
     }
 
     /**
-     * Send a NZB to NZBGet.
-     *
-     * @param string $guid Release identifier.
-     *
-     * @return bool|mixed
+     * @param $guid
+     * @return \GuzzleHttp\Psr7\Request
      */
     public function sendNZBToNZBGet($guid)
     {
-        $relData = $this->Releases->getByGuid($guid);
+        $relData = $this->releases->getByGuid($guid);
 
-        $string = Utility::unzipGzipFile($this->NZB->NZBPath($guid));
+        $string = Utility::unzipGzipFile($this->nzb->NZBPath($guid));
         $string = ($string === false ? '' : $string);
 
         $header =
-			'<?xml version="1.0"?>
+            '<?xml version="1.0"?>
 			<methodCall>
 				<methodName>append</methodName>
 				<params>
@@ -130,13 +128,13 @@ class NZBGet
 					<param>
 						<value>
 							<string>'.
-			base64_encode($string).
-			'</string>
+            base64_encode($string).
+            '</string>
 						</value>
 					</param>
 				</params>
 			</methodCall>';
-        new Request('POST', $this->fullURL.'append', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
+        return new Request('POST', $this->fullUrl.'append', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
     }
 
     /**
@@ -148,10 +146,10 @@ class NZBGet
      */
     public function sendURLToNZBGet($guid)
     {
-        $reldata = $this->Releases->getByGuid($guid);
+        $reldata = $this->releases->getByGuid($guid);
 
         $header =
-			'<?xml version="1.0"?>
+            '<?xml version="1.0"?>
 			<methodCall>
 				<methodName>appendurl</methodName>
 				<params>
@@ -170,20 +168,20 @@ class NZBGet
 					<param>
 						<value>
 							<string>'.
-			$this->serverurl.
-			'getnzb/'.
-			$guid.
-			'%26i%3D'.
-			$this->uid.
-			'%26r%3D'.
-			$this->rsstoken
-			.
-			'</string>
+            $this->serverurl.
+            'getnzb/'.
+            $guid.
+            '%26i%3D'.
+            $this->uid.
+            '%26r%3D'.
+            $this->rsstoken
+            .
+            '</string>
 						</value>
 					</param>
 				</params>
 			</methodCall>';
-        new Request('POST', $this->fullURL.'append', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
+        return new Request('POST', $this->fullUrl.'append', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
     }
 
     /**
@@ -194,7 +192,7 @@ class NZBGet
     public function pauseAll()
     {
         $header =
-			'<?xml version="1.0"?>
+            '<?xml version="1.0"?>
 			<methodCall>
 				<methodName>pausedownload2</methodName>
 				<params>
@@ -203,7 +201,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-        new Request('POST', $this->fullURL.'pausedownload2', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
+        new Request('POST', $this->fullUrl.'pausedownload2', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
     }
 
     /**
@@ -214,7 +212,7 @@ class NZBGet
     public function resumeAll()
     {
         $header =
-			'<?xml version="1.0"?>
+            '<?xml version="1.0"?>
 			<methodCall>
 				<methodName>resumedownload2</methodName>
 				<params>
@@ -223,7 +221,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-        new Request('POST', $this->fullURL.'resumedownload2', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
+        new Request('POST', $this->fullUrl.'resumedownload2', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
     }
 
     /**
@@ -234,7 +232,7 @@ class NZBGet
     public function pauseFromQueue($id)
     {
         $header =
-			'<?xml version="1.0"?>
+            '<?xml version="1.0"?>
 			<methodCall>
 				<methodName>editqueue</methodName>
 				<params>
@@ -256,7 +254,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-        new Request('POST', $this->fullURL.'editqueue', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
+        new Request('POST', $this->fullUrl.'editqueue', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
     }
 
     /**
@@ -267,7 +265,7 @@ class NZBGet
     public function resumeFromQueue($id)
     {
         $header =
-			'<?xml version="1.0"?>
+            '<?xml version="1.0"?>
 			<methodCall>
 				<methodName>editqueue</methodName>
 				<params>
@@ -289,7 +287,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-        new Request('POST', $this->fullURL.'editqueue', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
+        new Request('POST', $this->fullUrl.'editqueue', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
     }
 
     /**
@@ -300,7 +298,7 @@ class NZBGet
     public function delFromQueue($id)
     {
         $header =
-			'<?xml version="1.0"?>
+            '<?xml version="1.0"?>
 			<methodCall>
 				<methodName>editqueue</methodName>
 				<params>
@@ -322,7 +320,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-        new Request('POST', $this->fullURL.'editqueue', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
+        new Request('POST', $this->fullUrl.'editqueue', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
     }
 
     /**
@@ -330,12 +328,12 @@ class NZBGet
      *
      * @param int $limit The speed to limit it to.
      *
-     * @return bool
+     * @return void
      */
     public function rate($limit)
     {
         $header =
-			'<?xml version="1.0"?>
+            '<?xml version="1.0"?>
 			<methodCall>
 				<methodName>rate</methodName>
 				<params>
@@ -344,17 +342,18 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-        new Request('POST', $this->fullURL.'rate', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
+        new Request('POST', $this->fullUrl.'rate', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
     }
 
     /**
      * Get all items in download queue.
      *
      * @return array|bool
+     * @throws \RuntimeException
      */
     public function getQueue()
     {
-        $data = $this->client->get($this->fullURL.'listgroups')->getBody()->getContents();
+        $data = $this->client->get($this->fullUrl.'listgroups')->getBody()->getContents();
         $retVal = false;
         if ($data) {
             $xml = simplexml_load_string($data);
@@ -365,7 +364,7 @@ class NZBGet
                     foreach ($value->struct->member as $member) {
                         $value = (array) $member->value;
                         $value = array_shift($value);
-                        if (! is_object($value)) {
+                        if (! \is_object($value)) {
                             $retVal[$i][(string) $member->name] = $value;
                         }
                     }
@@ -381,10 +380,11 @@ class NZBGet
      * Request for current status (summary) information. Parts of informations returned by this method can be printed by command "nzbget -L".
      *
      * @return array|bool The status.
+     * @throws \RuntimeException
      */
     public function status()
     {
-        $data = $this->client->get($this->fullURL.'status')->getBody()->getContents();
+        $data = $this->client->get($this->fullUrl.'status')->getBody()->getContents();
         $retVal = false;
         if ($data) {
             $xml = simplexml_load_string($data);
@@ -392,7 +392,7 @@ class NZBGet
                 foreach ($xml->params->param->value->struct->member as $member) {
                     $value = (array) $member->value;
                     $value = array_shift($value);
-                    if (! is_object($value)) {
+                    if (! \is_object($value)) {
                         $retVal[(string) $member->name] = $value;
                     }
                 }
@@ -412,18 +412,9 @@ class NZBGet
     public function verifyURL($url)
     {
         if (preg_match('/(?P<protocol>https?):\/\/(?P<url>.+?)(:(?P<port>\d+\/)|\/)$/i', $url, $matches)) {
-            return
-				$matches['protocol'].
-				'://'.
-				$this->userName.
-				':'.
-				$this->password.
-				'@'.
-				$matches['url'].
-				(isset($matches['port']) ? ':'.$matches['port'] : (substr($matches['url'], -1) === '/' ? '' : '/')).
-				'xmlrpc/';
-        } else {
-            return false;
+            return $matches['protocol'].'://'.$this->userName.':'.$this->password.'@'.$matches['url'].(isset($matches['port']) ? ':'.$matches['port'] : (substr($matches['url'], -1) === '/' ? '' : '/')).'xmlrpc/';
         }
+
+        return false;
     }
 }
