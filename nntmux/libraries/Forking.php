@@ -856,7 +856,7 @@ class Forking extends \fork_daemon
                 $qry->where('size', '>', $this->minSize * 1048576);
             }
 
-            $this->work = $qry->get();
+            $this->work = $qry->get()->toArray();
 
             $maxProcesses = (int) Settings::settingValue('..nfothreads');
         }
