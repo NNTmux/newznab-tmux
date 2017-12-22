@@ -98,18 +98,16 @@ class NZBContents
 
     /**
      * Look for an .nfo file in the NZB, return the NFO message id.
-     * Gets the NZB completion.
-     * Looks for PAR2 files in the NZB.
      *
-     * @param string $guid
-     * @param string $relID
-     * @param int $groupID
-     * @param string $groupName
      *
-     * @return bool
+     * @param $guid
+     * @param $relID
+     * @param $groupID
+     * @param $groupName
+     * @return bool|mixed
      * @throws \Exception
      */
-    public function getNfoFromNZB($guid, $relID, $groupID, $groupName): bool
+    public function getNfoFromNZB($guid, $relID, $groupID, $groupName)
     {
         $fetchedBinary = false;
 

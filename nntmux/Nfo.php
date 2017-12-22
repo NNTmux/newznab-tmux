@@ -71,8 +71,8 @@ class Nfo
             'Settings' => null,
         ];
         $options += $defaults;
-        $this->echo = ($options['Echo'] && NN_ECHOCLI);
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->echo = $options['Echo'] && NN_ECHOCLI;
+        $this->pdo = $options['Settings'] instanceof DB ? $options['Settings'] : new DB();
         $this->nzbs = Settings::settingValue('..maxnfoprocessed') !== '' ? (int) Settings::settingValue('..maxnfoprocessed') : 100;
         $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : self::NFO_UNPROC;
         $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
@@ -234,32 +234,6 @@ class Nfo
     }
 
     /**
-     * Get a string like this:
-     * "AND r.nzbstatus = 1 AND r.nfostatus BETWEEN -8 AND -1 AND r.size < 1073741824 AND r.size > 1048576"
-     * To use in a query.
-     *
-     * @return string
-     * @throws \Exception
-     * @static
-     */
-    public static function NfoQueryString(): string
-    {
-        $maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
-        $minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
-        $dummy = (int) Settings::settingValue('..maxnforetries');
-        $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
-
-        return sprintf(
-            'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
-            NZB::NZB_ADDED,
-            ($maxRetries < -8 ? -8 : $maxRetries),
-            self::NFO_UNPROC,
-            ($maxSize > 0 ? ('AND r.size < '.($maxSize * 1073741824)) : ''),
-            ($minSize > 0 ? ('AND r.size > '.($minSize * 1048576)) : '')
-        );
-    }
-
-    /**
      * Attempt to find NFO files inside the NZB's of releases.
      *
      * @param        $nntp
@@ -278,9 +252,6 @@ class Nfo
         $dummy = (int) Settings::settingValue('..maxnforetries');
         $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
         $ret = 0;
-        $guidCharQuery = ($guidChar === '' ? '' : 'AND r.leftguid = '.$this->pdo->escapeString($guidChar));
-        $groupIDQuery = ($groupID === '' ? '' : 'AND r.groups_id = '.$groupID);
-        $optionsQuery = self::NfoQueryString();
 
         $qry = Release::query()
             ->select(['id', 'guid', 'groups_id', 'name'])
@@ -289,6 +260,7 @@ class Nfo
             ->orderBy('nfostatus')
             ->orderByDesc('postdate')
             ->limit($this->nzbs);
+
         if ($guidChar !== '') {
             $qry->where('leftguid', $guidChar);
         }
@@ -300,7 +272,7 @@ class Nfo
             $qry->where('size', '<', $maxSize * 1073741824);
         }
 
-        if ($minSize >0) {
+        if ($minSize > 0) {
             $qry->where('size', '>', $minSize * 1048576);
         }
 
@@ -322,19 +294,29 @@ class Nfo
 
             if ($this->echo) {
                 // Get count of releases per nfo status
-                $nfoStats = $this->pdo->queryDirect(
-                    sprintf(
-                        '
-						SELECT r.nfostatus AS status, COUNT(r.id) AS count
-						FROM releases r
-						WHERE 1=1 %s %s %s
-						GROUP BY r.nfostatus
-						ORDER BY r.nfostatus ASC',
-                        $optionsQuery,
-                        $guidCharQuery,
-                        $groupIDQuery
-                    )
-                );
+                $qry = Release::query()
+                    ->select(['nfostatus as status'])
+                    ->selectRaw('COUNT(id) as count')
+                    ->groupBy('nfostatus')
+                    ->orderBy('nfostatus');
+
+                if ($guidChar !== '') {
+                    $qry->where('leftguid', $guidChar);
+                }
+                if ($groupID !== '') {
+                    $qry->where('groups_id', $groupID);
+                }
+
+                if ($maxSize > 0) {
+                    $qry->where('size', '<', $maxSize * 1073741824);
+                }
+
+                if ($minSize > 0) {
+                    $qry->where('size', '>', $minSize * 1048576);
+                }
+
+                $nfoStats = $qry->get();
+
                 if ($nfoStats instanceof \Traversable) {
                     $outString = PHP_EOL.'Available to process';
                     foreach ($nfoStats as $row) {
@@ -378,19 +360,20 @@ class Nfo
         }
 
         // Remove nfo that we cant fetch after 5 attempts.
-        $releases = $this->pdo->queryDirect(
-            sprintf(
-                'SELECT r.id
-				FROM releases r
-				WHERE r.nzbstatus = %d
-				AND r.nfostatus < %d AND r.nfostatus > %d %s %s',
-                NZB::NZB_ADDED,
-                $this->maxRetries,
-                self::NFO_FAILED,
-                $groupIDQuery,
-                $guidCharQuery
-            )
-        );
+        $qry = Release::query()
+            ->select(['id'])
+            ->where('nzbstatus', NZB::NZB_ADDED)
+            ->where('nfostatus', '<', $this->maxRetries)
+            ->where('nfostatus', '>', self::NFO_FAILED);
+
+        if ($guidChar !== '') {
+            $qry->where('leftguid', $guidChar);
+        }
+        if ($groupID !== '') {
+            $qry->where('groups_id', $groupID);
+        }
+
+        $releases = $qry->get();
 
         if ($releases instanceof \Traversable) {
             foreach ($releases as $release) {
