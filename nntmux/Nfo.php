@@ -412,6 +412,7 @@ class Nfo
         $minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
         $dummy = (int) Settings::settingValue('..maxnforetries');
         $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
+
         return sprintf(
             'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
             NZB::NZB_ADDED,
