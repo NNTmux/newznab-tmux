@@ -4,7 +4,6 @@ namespace nntmux;
 
 class Sites
 {
-
     /**
      * @var \app\extensions\util\Versions|bool
      */
