@@ -27,8 +27,6 @@ class Sites
             $obj->{$row['setting']} = $row['value'];
         }
 
-        $obj->{'version'} = $this->version();
-
         return $obj;
     }
 
