@@ -601,37 +601,6 @@ function ajax_binaryblacklist_delete(id)
 	});
 }
 
-
-/**
- * ajax_welcome_msg()
- *
- * @param bln        flag
- */
-function ajax_welcome_msg(bln)
-{
-    // no caching of results
-	var _action = (bln ? 1 : 0);
-	$.ajax({
-	  url       : WWW_TOP + '/ajax_welcome_msg.php?rand=' + $.now(),
-	  data      : { action: _action},
-	  dataType  : "html",
-	  success   : function(data)
-	  {
-		if (bln)
-		{
-		  $('div#adminhome').hide();
-		  $('div#adminwelcome').show('fast', function() {});
-		}
-		else
-		{
-		  $('div#adminwelcome').hide();
-		  $('div#adminhome').show('fast', function() {});
-		}
-	  },
-	  error: function(xhr,err,e) { alert( "Error in ajax_welcome_msg: " + err ); }
-	});
-}
-
 /**
  * ajax_category_regex_delete()
  *
