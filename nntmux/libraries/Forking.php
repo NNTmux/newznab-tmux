@@ -2,7 +2,6 @@
 
 namespace nntmux\libraries;
 
-use App\Models\Release;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
@@ -10,6 +9,7 @@ use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Tmux;
 use nntmux\ColorCLI;
+use App\Models\Release;
 use App\Models\Settings;
 use nntmux\processing\PostProcess;
 
