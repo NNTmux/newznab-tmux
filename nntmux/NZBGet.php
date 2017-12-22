@@ -134,6 +134,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
+
         return new Request('POST', $this->fullUrl.'append', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
     }
 
@@ -181,6 +182,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
+
         return new Request('POST', $this->fullUrl.'append', ['Content-Type' => 'text/xml; charset=UTF8'], $header);
     }
 
