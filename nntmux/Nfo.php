@@ -396,4 +396,29 @@ class Nfo
 
         return $ret;
     }
+
+    /**
+     * Get a string like this:
+     * "AND r.nzbstatus = 1 AND r.nfostatus BETWEEN -8 AND -1 AND r.size < 1073741824 AND r.size > 1048576"
+     * To use in a query.
+     *
+     * @return string
+     * @throws \Exception
+     * @static
+     */
+    public static function NfoQueryString(): string
+    {
+        $maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
+        $minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
+        $dummy = (int) Settings::settingValue('..maxnforetries');
+        $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
+        return sprintf(
+            'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
+            NZB::NZB_ADDED,
+            ($maxRetries < -8 ? -8 : $maxRetries),
+            self::NFO_UNPROC,
+            ($maxSize > 0 ? ('AND r.size < '.($maxSize * 1073741824)) : ''),
+            ($minSize > 0 ? ('AND r.size > '.($minSize * 1048576)) : '')
+        );
+    }
 }

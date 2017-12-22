@@ -2,6 +2,7 @@
 
 namespace nntmux\libraries;
 
+use App\Models\Release;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
@@ -91,6 +92,26 @@ class Forking extends \fork_daemon
     public $pdo;
 
     /**
+     * @var int
+     */
+    protected $maxSize;
+
+    /**
+     * @var int
+     */
+    protected $minSize;
+
+    /**
+     * @var int
+     */
+    protected $maxRetries;
+
+    /**
+     * @var int
+     */
+    protected $dummy;
+
+    /**
      * @var bool
      */
     private $processAdditional = false; // Should we process additional?
@@ -100,6 +121,8 @@ class Forking extends \fork_daemon
 
     /**
      * Setup required parent / self vars.
+     *
+     * @throws \Exception
      */
     public function __construct()
     {
@@ -146,6 +169,11 @@ class Forking extends \fork_daemon
         }
 
         $this->dnr_path = PHP_BINARY.' '.NN_MULTIPROCESSING.'.do_not_run'.DS.'switch.php "php  ';
+
+        $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
+        $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
+        $this->dummy = (int) Settings::settingValue('..maxnforetries');
+        $this->maxRetries = ($this->dummy >= 0 ? -($this->dummy + 1) : Nfo::NFO_UNPROC);
     }
 
     /**
@@ -777,19 +805,28 @@ class Forking extends \fork_daemon
         return $maxProcesses;
     }
 
-    private $nfoQueryString = '';
-
     /**
      * Check if we should process NFO's.
      * @return bool
      * @throws \Exception
      */
-    private function checkProcessNfo()
+    private function checkProcessNfo(): bool
     {
         if ((int) Settings::settingValue('..lookupnfo') === 1) {
-            $this->nfoQueryString = Nfo::NfoQueryString($this->pdo);
+            $qry = Release::query()
+                ->whereBetween('nfostatus', [$this->maxRetries < -8 ? -8 : $this->maxRetries, Nfo::NFO_UNPROC])
+                ->select(['id'])
+                ->limit(1);
 
-            return $this->pdo->queryOneRow(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) !== false;
+            if ($this->maxSize > 0) {
+                $qry->where('size', '<', $this->maxSize * 1073741824);
+            }
+
+            if ($this->minSize > 0) {
+                $qry->where('size', '>', $this->minSize * 1048576);
+            }
+
+            return $qry->first() !== null;
         }
 
         return false;
@@ -805,17 +842,22 @@ class Forking extends \fork_daemon
         if ($this->checkProcessNfo() === true) {
             $this->processNFO = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
-            $this->work = $this->pdo->query(
-                sprintf(
-                    '
-					SELECT leftguid AS id
-					FROM releases r
-					WHERE 1=1 %s
-					GROUP BY leftguid
-					LIMIT 16',
-                    $this->nfoQueryString
-                )
-            );
+            $qry = Release::query()
+                ->whereBetween('nfostatus', [$this->maxRetries < -8 ? -8 : $this->maxRetries, Nfo::NFO_UNPROC])
+                ->select(['leftguid as id'])
+                ->groupBy(['leftguid'])
+                ->limit(16);
+
+            if ($this->maxSize > 0) {
+                $qry->where('size', '<', $this->maxSize * 1073741824);
+            }
+
+            if ($this->minSize > 0) {
+                $qry->where('size', '>', $this->minSize * 1048576);
+            }
+
+            $this->work = $qry->get();
+
             $maxProcesses = (int) Settings::settingValue('..nfothreads');
         }
 
