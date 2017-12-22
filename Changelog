@@ -1,4 +1,5 @@
 2017-12-22 DariusIII
+	* Chg: Allow logins by username or email
 	* Chg: Update SABnzbd and NZBGet classes
 	* Chg: Update Forking class, add nfoQueryString function back to Nfo class (tmux still needs it)
 	* Chg: Update Nfo and NZBContents classes

@@ -14,7 +14,7 @@
 				  {$error}
 			</div>
 		{/if}
-		<input class="col-md-12" type="text" id="username prependedInput" value="{$username}" name="username" placeholder="Username" style="margin-bottom:5px;"><br />
+		<input class="col-md-12" type="text" id="username prependedInput" value="{$username}" name="username" placeholder="Username or email" style="margin-bottom:5px;"><br />
 		<input class="col-md-12" id="password" name="password" type="password" placeholder="Password" style="margin-bottom:20px;"><br />
 		<input id="rememberme" {if $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox"/> <span class="help-inline" style="vertical-align:sub;">Remember me </span>
 			<div class="pull-right"><a href="{$serverroot}forgottenpassword" class="text-center">I forgot my password</a></div>

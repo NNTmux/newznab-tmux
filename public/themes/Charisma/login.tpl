@@ -48,7 +48,7 @@
 						<div class="input-group input-group-lg">
 							<span class="input-group-addon"><i class="glyphicon glyphicon-user red"></i></span>
 							<input id="username" name="username" type="text" class="form-control"
-								   placeholder="Username">
+								   placeholder="Username or email">
 						</div>
 						<div class="clearfix"></div>
 						<br>

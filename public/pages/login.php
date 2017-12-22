@@ -18,8 +18,11 @@ if (! $page->users->isLoggedIn()) {
         if (Utility::checkCsrfToken() === true) {
             $logging = new Logging(['Settings' => $page->settings]);
             $res = $page->users->getByUsername($username);
+            if ($res === null) {
+                $res = $page->users->getByEmail($username);
+            }
 
-            if ($res) {
+            if ($res !== null) {
                 $dis = $page->users->isDisabled($username);
                 if ($dis) {
                     $page->smarty->assign('error', 'Your account has been disabled.');
@@ -34,11 +37,11 @@ if (! $page->users->isLoggedIn()) {
                     }
                     die();
                 } else {
-                    $page->smarty->assign('error', 'Incorrect username or password.');
+                    $page->smarty->assign('error', 'Incorrect username/email or password.');
                     $logging->LogBadPasswd($username, $_SERVER['REMOTE_ADDR']);
                 }
             } else {
-                $page->smarty->assign('error', 'Incorrect username or password.');
+                $page->smarty->assign('error', 'Incorrect username/email or password.');
                 $logging->LogBadPasswd($username, $_SERVER['REMOTE_ADDR']);
             }
         } else {
