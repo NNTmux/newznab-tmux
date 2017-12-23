@@ -1527,7 +1527,7 @@ class Releases
             ->selectRaw('COUNT(r.id) as count')
             ->join('categories as cp', 'cp.id', '=', 'categories.parentid')
             ->join('releases as r', 'r.categories_id', '=', 'categories.id')
-            ->groupBy('title')
+            ->groupBy(['title'])
             ->orderBy('count', 'desc')
             ->get();
 

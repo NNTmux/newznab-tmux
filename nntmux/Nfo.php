@@ -297,7 +297,7 @@ class Nfo
                 $qry = Release::query()
                     ->select(['nfostatus as status'])
                     ->selectRaw('COUNT(id) as count')
-                    ->groupBy('nfostatus')
+                    ->groupBy(['nfostatus'])
                     ->orderBy('nfostatus');
 
                 if ($guidChar !== '') {

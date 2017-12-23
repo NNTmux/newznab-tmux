@@ -53,7 +53,7 @@ class Users
      * @param array $options Class instances.
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
     }
 
@@ -91,7 +91,7 @@ class Users
      */
     public function get(): array
     {
-        return User::all()->all();
+        return User::all()->toArray();
     }
 
     /**
