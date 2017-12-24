@@ -13,9 +13,6 @@
 	<dt>Capabilities <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api?t=caps">?t=caps</a></span></dt>
 	<dd>Reports the capabilities if the server. Includes information about the server name, available search categories and version number of the newznab protocol being used.<br>Capabilities does not require any credentials in order to be ran.</dd>
 	<br>
-	<dt>Register <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api?t=register&amp;email=user@example.com">?t=register&amp;email=user@example.com</a></span></dt>
-	<dd>Registers a new user account. Does not require any credentials in order to be ran.<br>Returns either the registered username and password if successful or an error code.</dd>
-	<br>
 	<dt>Search <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api?t=search&amp;q=linux">?t=search&amp;q=linux</a></span></dt>
 	<dd>Returns a list of nzbs matching a query. You can also  filter by site category by including a comma separated list of categories as follows <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api?t=search&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}">?t=search&amp;cat={$catClass::GAME_ROOT},{$catClass::MOVIE_ROOT}</a></span>. Include <span style="font-family:courier;">&amp;extended=1</span> to return extended information in the search results.</dd>
 	<br>

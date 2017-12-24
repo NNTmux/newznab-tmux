@@ -9,6 +9,7 @@ use App\Models\Settings;
 use App\Models\Invitation;
 use App\Mail\AccountChange;
 use App\Models\UserRequest;
+use Illuminate\Support\Str;
 use nntmux\utility\Utility;
 use App\Models\UserDownload;
 use App\Models\RoleExcludedCategory;
@@ -565,20 +566,14 @@ class Users
     }
 
     /**
-     * Create a random username.
+     * Generate a random username.
      *
-     * @param string $email
      *
      * @return string
      */
-    public function generateUsername($email): string
+    public function generateUsername(): string
     {
-        $string = '';
-        if (preg_match('/[A-Za-z0-9]+/', $email, $matches)) {
-            $string = $matches[0];
-        }
-
-        return 'u'.substr(md5(uniqid('', true)), 0, 7).$string;
+        return Str::random();
     }
 
     /**
@@ -586,7 +581,7 @@ class Users
      */
     public function generatePassword(): string
     {
-        return str_random(8);
+        return Str::random(8);
     }
 
     /**

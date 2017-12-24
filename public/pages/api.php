@@ -41,10 +41,6 @@ if (isset($_GET['t'])) {
         case 'info':
             $function = 'n';
             break;
-        case 'r':
-        case 'register':
-            $function = 'r';
-            break;
         default:
             Utility::showApiError(202, 'No such function ('.$_GET['t'].')');
     }
@@ -296,46 +292,5 @@ switch ($function) {
     // Capabilities request.
     case 'c':
         $api->output([], $params, $outputXML, $offset, 'caps');
-        break;
-    // Register request.
-    case 'r':
-        $api->verifyEmptyParameter('email');
-
-        if (! in_array((int) Settings::settingValue('..registerstatus'), [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_API_ONLY], false)) {
-            Utility::showApiError(104);
-        }
-        // Check email is valid format.
-        if (! $page->users->isValidEmail($_GET['email'])) {
-            Utility::showApiError(106);
-        }
-        // Check email isn't taken.
-        $ret = $page->users->getByEmail($_GET['email']);
-        if (isset($ret['id'])) {
-            Utility::showApiError(105);
-        }
-        // Create username/pass and register.
-        $username = $page->users->generateUsername($_GET['email']);
-        $password = $page->users->generatePassword();
-        // Register.
-        $userDefault = UserRole::getDefaultRole();
-        $uid = $page->users->signup(
-            $username,
-            $password,
-            $_GET['email'],
-            $_SERVER['REMOTE_ADDR'],
-            $userDefault['id'],
-            $userDefault['defaultinvites']
-        );
-        // Check if it succeeded.
-        $userData = $page->users->getById($uid);
-        if (empty($userData)) {
-            Utility::showApiError(107);
-        }
-
-        $params['username'] = $username;
-        $params['password'] = $password;
-        $params['token'] = $userData['rsstoken'];
-
-        $api->output([], $params, true, $offset, 'reg');
         break;
 }
