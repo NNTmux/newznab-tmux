@@ -23,10 +23,6 @@ switch (Settings::settingValue('apps.sabnzbplus.integrationtype')) {
 		    $queue = new NZBGet($page);
 		}
 		break;
-	case SABnzbd::INTEGRATION_TYPE_SITEWIDE:
-		$queueType = 'Sabnzbd';
-		$queue = new SABnzbd($page);
-		break;
 	case SABnzbd::INTEGRATION_TYPE_USER:
 		switch ((int) $userData['queuetype']) {
 			case 1:

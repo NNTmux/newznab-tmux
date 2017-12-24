@@ -14,7 +14,6 @@ class SABnzbd
      * Type of site integration.
      */
     public const INTEGRATION_TYPE_NONE = 0;
-    public const INTEGRATION_TYPE_SITEWIDE = 1;
     public const INTEGRATION_TYPE_USER = 2;
 
     /**
@@ -127,18 +126,6 @@ class SABnzbd
                         $this->integratedBool = false;
                         break;
                 }
-                break;
-
-            case self::INTEGRATION_TYPE_SITEWIDE:
-                if ((Settings::settingValue('apps.sabnzbplus.apikey') !== '') && (Settings::settingValue('apps.sabnzbplus.url')
-                        !== '')) {
-                    $this->url = Settings::settingValue('apps.sabnzbplus.url');
-                    $this->apikey = Settings::settingValue('apps.sabnzbplus.apikey');
-                    $this->priority = Settings::settingValue('apps.sabnzbplus.priority');
-                    $this->apikeytype = Settings::settingValue('apps.sabnzbplus.apikeytype');
-                }
-                $this->integrated = self::INTEGRATION_TYPE_SITEWIDE;
-                $this->integratedBool = true;
                 break;
 
             case self::INTEGRATION_TYPE_NONE:

@@ -39,11 +39,6 @@ class Users
     public const DEFAULT_INVITE_EXPIRY_DAYS = 7;
 
     /**
-     * @var int
-     */
-    public $password_hash_cost;
-
-    /**
      * Users SELECT queue type.
      */
     public const QUEUE_NONE = 0;
@@ -51,8 +46,7 @@ class Users
     public const QUEUE_NZBGET = 2;
 
     /**
-     * @param array $options Class instances.
-     * @throws \Exception
+     * Users constructor.
      */
     public function __construct()
     {

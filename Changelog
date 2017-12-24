@@ -1,4 +1,5 @@
 2017-12-24 DariusIII
+	* Chg: Remove sitewide sab/nzbget integration
 	* Chg: Remove user registration through API
 2017-12-23 DariusIII
 	* Fix: Fix wrong groupBy parameters

@@ -121,11 +121,8 @@ apps		lamepath		The path to the lame binary. Used for audio manipulation. Use fo
 apps		unrarpath		The path to an unrar binary, used in deep password detection and media info grabbing. Use forward slashes in windows c:/path/to/unrar.exe	unrarpath
 apps		timeoutpath		The path to the timeout binary. This is used to limit the amount of time unrar/7zip/mediainfo/ffmpeg/avconv can run. You can the time limit in the process additional section. You can leave this empty to disable this. Use forward slashes in windows c:/path/to/timeout.exe	timeoutpath
 apps		yydecoderpath		Path to yydecode, this will decode yEnc articles. On ubuntu/debian you can get yydecode in the getdeb repository. Compiling yydecode from source is easy/fast also. Use forward slashes in windows c:/path/to/yydecode.exe	yydecoderpath
-apps	sabnzbplus	apikey		The Api key of the SAB installation. Can be the full api key or the nzb api key (as of SAB 0.6)	sabapikey
-apps	sabnzbplus	apikeytype	1	Select the type of api key you entered in the above setting	sabapikeytype
-apps	sabnzbplus	integrationtype	2	Whether to allow integration with a SAB install and if so what type of integration. <br/>Setting this to integrated also disables NZBGet from being selectable to the user.	sabintegrationtype
-apps	sabnzbplus	priority	0	Set the priority level for NZBs that are added to your queue	sabpriority
-apps	sabnzbplus	url		The url of the SAB installation, for example: http://localhost:8080/sabnzbd/	saburl
+apps	sabnzbplus	integrationtype	2	Whether to allow integration with a SAB install or not.	sabintegrationtype
+
 indexer	categorise	categorizeforeign	1	This only works if the above is set to english. Whether to send foreign movies/tv to foreign sections or not. If set to true they will go in foreign categories.	categorizeforeign
 indexer	categorise	catwebdl	0	Whether to send WEB-DL to the WEB-DL section or not. If set to true they will go in WEB-DL category, false will send them in HD TV.<br/>This will also make them inaccessible to Sickbeard and possibly Couchpotato.	catwebdl
 indexer	categorise	imdblanguage	en	Which language to lookup when sending requests to IMDB/Tmdb. (If akas.imdb.com is set, imdb still returns the original titles.)	imdblanguage
