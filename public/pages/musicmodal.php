@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use nntmux\Music;
+use App\Models\User;
 
 $music = new Music;
 

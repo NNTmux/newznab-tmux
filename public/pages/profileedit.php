@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\User;
-use App\Models\UserExcludedCategory;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
+use App\Models\User;
 use nntmux\Category;
 use App\Models\Settings;
 use nntmux\utility\Utility;
+use App\Models\UserExcludedCategory;
 
 $category = new Category;
 $sab = new SABnzbd($page);

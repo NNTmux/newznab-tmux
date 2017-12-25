@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use nntmux\Videos;
+use App\Models\User;
 use nntmux\Releases;
 
 if (! User::isLoggedIn()) {

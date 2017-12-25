@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use nntmux\Books;
+use App\Models\User;
 
 $b = new Books;
 

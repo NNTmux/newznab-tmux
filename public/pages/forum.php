@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use nntmux\Forum;
+use App\Models\User;
 use App\Models\Settings;
 
 $forum = new Forum;
