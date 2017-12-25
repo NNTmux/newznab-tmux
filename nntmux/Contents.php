@@ -2,17 +2,18 @@
 
 namespace nntmux;
 
+use App\Models\User;
 use nntmux\db\DB;
 use App\Models\Content;
 
 class Contents
 {
-    const TYPEUSEFUL = 1;
-    const TYPEARTICLE = 2;
-    const TYPEINDEX = 3;
+    protected const TYPEUSEFUL = 1;
+    protected const TYPEARTICLE = 2;
+    protected const TYPEINDEX = 3;
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -165,7 +166,7 @@ class Contents
             $content->url = '/'.$content->url;
         }
 
-        if (substr($content->url, strlen($content->url) - 1) !== '/') {
+        if (substr($content->url, \strlen($content->url) - 1) !== '/') {
             $content->url .= '/';
         }
 
@@ -331,7 +332,7 @@ class Contents
      */
     public function data_getByID($id, $role)
     {
-        if ($role === Users::ROLE_ADMIN) {
+        if ($role === User::ROLE_ADMIN) {
             $role = '';
         } else {
             $role = sprintf('AND (role = %d OR role = 0)', $role);
@@ -378,7 +379,7 @@ class Contents
      */
     public function data_getForMenuByTypeAndRole($id, $role): array
     {
-        if ($role === Users::ROLE_ADMIN) {
+        if ($role === User::ROLE_ADMIN) {
             $role = '';
         } else {
             $role = sprintf('AND (role = %d OR role = 0)', $role);
