@@ -6,8 +6,8 @@ if (! defined('NN_INSTALLER')) {
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 include_once dirname(__DIR__).DIRECTORY_SEPARATOR.'nntmux'.DIRECTORY_SEPARATOR.'constants.php';
 
-use App\Models\User;
 use nntmux\db\DB;
+use App\Models\User;
 use nntmux\ColorCLI;
 use nntmux\db\DbUpdate;
 use nntmux\config\Configure;
