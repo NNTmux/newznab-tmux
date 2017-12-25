@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use nntmux\NZBGet;
+use App\Models\User;
 use nntmux\utility\Utility;
 
 if (! User::isLoggedIn()) {

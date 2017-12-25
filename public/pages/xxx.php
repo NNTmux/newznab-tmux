@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use nntmux\XXX;
+use App\Models\User;
 use nntmux\Category;
 use nntmux\DnzbFailures;
 

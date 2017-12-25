@@ -1,11 +1,12 @@
 <?php
-use App\Models\User;
+
+use nntmux\Groups;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-use nntmux\Groups;
+use App\Models\User;
 
 $groups = new Groups(['Settings' => $page->settings]);
 

@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\User;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
+use App\Models\User;
 use App\Models\Settings;
 
 if (! User::isLoggedIn()) {

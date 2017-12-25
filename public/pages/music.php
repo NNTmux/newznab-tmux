@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\User;
 use nntmux\Music;
 use nntmux\Genres;
+use App\Models\User;
 use nntmux\Category;
 use nntmux\DnzbFailures;
 
