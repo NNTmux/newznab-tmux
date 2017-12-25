@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\User;
 use nntmux\Menu;
 use nntmux\Forum;
+use App\Models\User;
 use nntmux\Category;
 use nntmux\Contents;
 use App\Models\Settings;
