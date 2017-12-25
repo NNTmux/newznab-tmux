@@ -2,18 +2,17 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+use App\Models\User;
 use nntmux\NZB;
 use nntmux\db\DB;
-use nntmux\Users;
 use nntmux\Releases;
 
 $page = new AdminPage;
-$users = new Users;
 $releases = new Releases;
 $pdo = new DB();
 $nzb = new NZB($pdo);
 
-if (! $users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 

@@ -2,6 +2,9 @@
 
 namespace nntmux;
 
+use App\Models\User;
+use Page;
+
 final class NZBVortex
 {
     protected $nonce = null;
@@ -9,7 +12,7 @@ final class NZBVortex
 
     public function __construct()
     {
-        if (is_null($this->session)) {
+        if (null === $this->session) {
             $this->getNonce();
             $this->login();
         }
@@ -72,17 +75,18 @@ final class NZBVortex
 
     /**
      * add NZB to queue.
+     *
      * @param string $nzb
      * @return void
+     * @throws \Exception
      */
     public function addQueue($nzb = '')
     {
         if (! empty($nzb)) {
             $page = new Page;
-            $user = new Users;
 
             $host = $page->serverurl;
-            $data = $user->getById($user->currentUserId());
+            $data = User::getById(User::currentUserId());
             $url = sprintf('%sgetnzb/%s.nzb&i=%s&r=%s', $host, $nzb, $data['id'], $data['rsstoken']);
 
             $params = [
@@ -96,10 +100,12 @@ final class NZBVortex
 
     /**
      * resume NZB.
+     *
      * @param int $id
      * @return void
+     * @throws \Exception
      */
-    public function resume($id = 0)
+    public function resume($id = 0): void
     {
         if ($id > 0) {
             // /nzb/(id)/resume
@@ -110,8 +116,10 @@ final class NZBVortex
 
     /**
      * pause NZB.
+     *
      * @param int $id
      * @return void
+     * @throws \Exception
      */
     public function pause($id = 0)
     {
@@ -124,8 +132,10 @@ final class NZBVortex
 
     /**
      * move NZB up in queue.
+     *
      * @param int $id
      * @return void
+     * @throws \Exception
      */
     public function moveUp($id = 0)
     {
@@ -138,8 +148,10 @@ final class NZBVortex
 
     /**
      * move NZB down in queue.
+     *
      * @param int $id
      * @return void
+     * @throws \Exception
      */
     public function moveDown($id = 0)
     {
@@ -152,8 +164,10 @@ final class NZBVortex
 
     /**
      * move NZB to bottom of queue.
+     *
      * @param int $id
      * @return void
+     * @throws \Exception
      */
     public function moveBottom($id = 0)
     {
@@ -166,8 +180,10 @@ final class NZBVortex
 
     /**
      * Remove a (ﬁnished/unﬁnished) NZB from queue and delete files.
+     *
      * @param int $id
      * @return void
+     * @throws \Exception
      */
     public function delete($id = 0)
     {
@@ -180,8 +196,10 @@ final class NZBVortex
 
     /**
      * move NZB to top of queue.
+     *
      * @param int $id
      * @return void
+     * @throws \Exception
      */
     public function moveTop($id = 0)
     {
@@ -194,8 +212,10 @@ final class NZBVortex
 
     /**
      * get filelist for nzb.
+     *
      * @param int $id
      * @return array|bool
+     * @throws \Exception
      */
     public function getFilelist($id = 0)
     {
@@ -212,7 +232,9 @@ final class NZBVortex
 
     /**
      * get /auth/nonce.
+     *
      * @return void
+     * @throws \Exception
      */
     protected function getNonce()
     {
@@ -222,11 +244,11 @@ final class NZBVortex
 
     /**
      * @return void
+     * @throws \Exception
      */
     protected function login()
     {
-        $user = new Users();
-        $data = $user->getById($user->currentUserId());
+        $data = User::getById(User::currentUserId());
         $cnonce = generateUuid();
         $hash = hash('sha256', sprintf('%s:%s:%s', $this->nonce, $cnonce, $data['nzbvortex_api_key']), true);
         $hash = base64_encode($hash);
@@ -258,8 +280,7 @@ final class NZBVortex
      */
     protected function sendRequest($path, $params = [])
     {
-        $user = new Users;
-        $data = $user->getById($user->currentUserId());
+        $data = User::getById(User::currentUserId());
 
         $url = sprintf('%s/api', $data['nzbvortex_server_url']);
         $params = http_build_query($params);
@@ -283,7 +304,7 @@ final class NZBVortex
 
         switch ($status) {
             case 0:
-                throw new \Exception(sprintf('Unable to connect. Is NZBVortex running? Is your API key correct? Is something blocking ports? (Err: %s)', $error));
+                throw new \RuntimeException(sprintf('Unable to connect. Is NZBVortex running? Is your API key correct? Is something blocking ports? (Err: %s)', $error));
                 break;
 
             case 200:
@@ -291,11 +312,11 @@ final class NZBVortex
                 break;
 
             case 403:
-                throw new \Exception('Unable to login. Is your API key correct?');
+                throw new \RuntimeException('Unable to login. Is your API key correct?');
                 break;
 
             default:
-                throw new \Exception(sprintf('%s (%s): %s', $path, $status, $response['result']));
+                throw new \RuntimeException(sprintf('%s (%s): %s', $path, $status, $response['result']));
                 break;
         }
     }

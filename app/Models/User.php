@@ -385,7 +385,7 @@ class User extends Authenticatable
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      * @throws \Exception
      */
-    public function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '')
+    public static function getRange($start, $offset, $orderBy, $userName = '', $email = '', $host = '', $role = '')
     {
         UserRequest::clearApiRequests(false);
 
@@ -872,7 +872,7 @@ class User extends Authenticatable
     /**
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
      */
-    public function getUsersByMonth()
+    public static function getUsersByMonth()
     {
         return self::query()->whereNotNull('created_at')->where('created_at', '!=', '0000-00-00 00:00:00')->selectRaw("DATE_FORMAT(created_at, '%M %Y') as mth, COUNT(id) as num")->groupBy(['mth'])->orderBy('created_at', 'desc')->get();
     }

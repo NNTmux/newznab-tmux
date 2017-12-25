@@ -2,12 +2,9 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Users;
 use App\Models\UserRole;
 
 $page = new AdminPage();
-
-$users = new Users();
 
 $page->title = 'User Role List';
 

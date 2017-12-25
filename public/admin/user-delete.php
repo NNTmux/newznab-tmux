@@ -2,13 +2,11 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Users;
 use App\Models\User;
 
 $page = new AdminPage();
 
 if (isset($_GET['id'])) {
-    $users = new Users();
     User::deleteUser($_GET['id']);
 }
 

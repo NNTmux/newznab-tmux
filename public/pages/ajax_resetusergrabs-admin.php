@@ -1,11 +1,9 @@
 <?php
 
-use nntmux\Users;
 use App\Models\UserRequest;
 use App\Models\UserDownload;
 
 $page = new AdminPage();
-$u = new Users();
 
 $action = $_REQUEST['action'] ?? '';
 $id = $_REQUEST['id'] ?? '';
