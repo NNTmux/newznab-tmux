@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\User;
+use nntmux\Books;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-use nntmux\Books;
+use App\Models\User;
 use nntmux\Category;
 use nntmux\DnzbFailures;
 

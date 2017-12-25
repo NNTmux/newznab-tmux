@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use nntmux\SABnzbd;
+use App\Models\User;
 
 if (! User::isLoggedIn()) {
     $page->show403();

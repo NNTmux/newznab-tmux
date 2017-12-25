@@ -1,13 +1,13 @@
 <?php
 
-use App\Models\User;
+use nntmux\Genres;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-use nntmux\Genres;
 use nntmux\Console;
+use App\Models\User;
 use nntmux\Category;
 use nntmux\DnzbFailures;
 

@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
@@ -10,6 +9,7 @@ use nntmux\Music;
 use nntmux\PreDb;
 use nntmux\Videos;
 use nntmux\Console;
+use App\Models\User;
 use nntmux\Releases;
 use App\Models\Settings;
 use nntmux\DnzbFailures;

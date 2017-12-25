@@ -2,8 +2,8 @@
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Models\Settings;
 use App\Models\User;
+use App\Models\Settings;
 
 $page = new Page;
 

@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\User;
 use nntmux\NZB;
 use nntmux\db\DB;
+use App\Models\User;
 use nntmux\Releases;
 
 $releases = new Releases;
