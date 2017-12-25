@@ -2,7 +2,6 @@
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'smarty.php';
 
-
 $page = new Page;
 
 if ($app->isDownForMaintenance()) {

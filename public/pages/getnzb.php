@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use nntmux\NZB;
+use App\Models\User;
 use nntmux\Releases;
 use App\Models\Settings;
 use nntmux\utility\Utility;
