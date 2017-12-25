@@ -110,13 +110,11 @@ class Settings extends Model
     }
 
     /**
-     * @param Command $console
-     *
+     * @param $console
      * @return bool
      * @throws \Exception
-     * @throws \InvalidArgumentException
      */
-    public static function hasAllEntries($console)
+    public static function hasAllEntries($console): bool
     {
         $filepath = Utility::pathCombine(['db', 'schema', 'data', '10-settings.tsv'], NN_RES);
         if (! file_exists($filepath)) {
@@ -125,7 +123,6 @@ class Settings extends Model
         $settings = file($filepath);
 
         if (! \is_array($settings)) {
-            var_dump($settings);
             throw new \InvalidArgumentException('Settings is not an array!');
         }
 
@@ -140,7 +137,7 @@ class Settings extends Model
             $result = true;
             foreach ($settings as $line) {
                 $message = '';
-                list($setting['section'], $setting['subsection'], $setting['name']) =
+                [$setting['section'], $setting['subsection'], $setting['name']] =
                     explode("\t", $line);
 
                 $value = self::settingValue(
@@ -175,14 +172,14 @@ class Settings extends Model
      * @return array
      * @throws \RuntimeException
      */
-    public static function toTree($excludeUnsectioned = true)
+    public static function toTree($excludeUnsectioned = true): array
     {
         $results = self::query()->get()->all();
 
         $tree = [];
         if (\is_array($results)) {
             foreach ($results as $result) {
-                if (! empty($result['section']) || ! $excludeUnsectioned) {
+                if (! $excludeUnsectioned || ! empty($result['section'])) {
                     $tree[$result['section']][$result['subsection']][$result['name']] =
                         ['value' => $result['value'], 'hint' => $result['hint']];
                 }
