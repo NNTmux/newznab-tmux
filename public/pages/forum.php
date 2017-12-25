@@ -1,16 +1,17 @@
 <?php
 
+use App\Models\User;
 use nntmux\Forum;
 use App\Models\Settings;
 
 $forum = new Forum;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 if (! empty($_POST['addMessage']) && ! empty($_POST['addSubject']) && $page->isPostBack()) {
-    $forum->add(0, $page->users->currentUserId(), $_POST['addSubject'], $_POST['addMessage']);
+    $forum->add(0, User::currentUserId(), $_POST['addSubject'], $_POST['addMessage']);
     header('Location:'.WWW_TOP.'/forum');
     die();
 }

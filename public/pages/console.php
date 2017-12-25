@@ -1,6 +1,8 @@
 <?php
 
-if (! $page->users->isLoggedIn()) {
+use App\Models\User;
+
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 

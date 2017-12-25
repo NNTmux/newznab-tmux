@@ -1,10 +1,11 @@
 <?php
 
+use App\Models\User;
 use nntmux\Books;
 
 $b = new Books;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 

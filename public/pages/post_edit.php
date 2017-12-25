@@ -1,8 +1,9 @@
 <?php
 
+use App\Models\User;
 use nntmux\Forum;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 $forum = new Forum();
@@ -10,7 +11,7 @@ $id = $_GET['id'] + 0;
 
 if (isset($id) && ! empty($_POST['addMessage'])) {
     $parent = $forum->getPost($id);
-    $forum->editPost($id, $_POST['addMessage'], $page->users->currentUserId());
+    $forum->editPost($id, $_POST['addMessage'], User::currentUserId());
     if ($parent['parentid'] != 0) {
         header('Location:'.WWW_TOP.'/forumpost/'.$parent['parentid'].'#last');
     } else {

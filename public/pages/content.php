@@ -1,11 +1,12 @@
 <?php
 
+use App\Models\User;
 use nntmux\Contents;
 
 $contents = new Contents(['Settings' => $page->settings]);
 
 $role = 0;
-if (! empty($page->userdata) && $page->users->isLoggedIn()) {
+if (! empty($page->userdata) && User::isLoggedIn()) {
     $role = $page->userdata['role'];
 }
 

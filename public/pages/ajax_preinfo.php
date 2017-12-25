@@ -1,8 +1,9 @@
 <?php
 
+use App\Models\User;
 use nntmux\PreDb;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 

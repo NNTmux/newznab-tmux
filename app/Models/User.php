@@ -940,7 +940,7 @@ class User extends Authenticatable
      * @param $emailTo
      * @return string
      */
-    public function sendInvite($serverUrl, $uid, $emailTo): string
+    public static function sendInvite($serverUrl, $uid, $emailTo): string
     {
         $token = self::hashSHA1(uniqid('', true));
         $url = $serverUrl.'register?invitecode='.$token;

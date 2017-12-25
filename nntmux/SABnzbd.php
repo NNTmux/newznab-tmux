@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\User;
 use GuzzleHttp\Client;
 use App\Models\Settings;
 
@@ -97,7 +98,7 @@ class SABnzbd
      */
     public function __construct(&$page)
     {
-        $this->uid = $page->users->currentUserId();
+        $this->uid = User::currentUserId();
         $this->rsstoken = $page->userdata['rsstoken'];
         $this->serverurl = $page->serverurl;
         $this->client = new Client(['verify' => false]);

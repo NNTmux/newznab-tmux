@@ -1,11 +1,12 @@
 <?php
 
+use App\Models\User;
 use App\Models\Settings;
 use nntmux\DnzbFailures;
 
 // Page is accessible only by the rss token, or logged in users.
-if ($page->users->isLoggedIn()) {
-    $uid = $page->users->currentUserId();
+if (User::isLoggedIn()) {
+    $uid = User::currentUserId();
     $rssToken = $page->userdata['rsstoken'];
 } else {
     if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
@@ -14,7 +15,7 @@ if ($page->users->isLoggedIn()) {
             header('X-DNZB-RText: Bad request, please supply all parameters!');
             $page->show403();
         } else {
-            $res = $page->users->getByRssToken($_GET['rsstoken']);
+            $res = User::getByRssToken($_GET['rsstoken']);
         }
     } else {
         if (! isset($_GET['userid']) || ! isset($_GET['rsstoken'])) {
@@ -22,7 +23,7 @@ if ($page->users->isLoggedIn()) {
             header('X-DNZB-RText: Bad request, please supply all parameters!');
             $page->show403();
         } else {
-            $res = $page->users->getByIdAndRssToken($_GET['userid'], $_GET['rsstoken']);
+            $res = User::getByIdAndRssToken($_GET['userid'], $_GET['rsstoken']);
         }
     }
     if (! isset($res)) {

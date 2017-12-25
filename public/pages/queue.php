@@ -1,14 +1,15 @@
 <?php
 
+use App\Models\User;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\Settings;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$userData = $page->users->getById($page->users->currentUserId());
+$userData = User::getById(User::currentUserId());
 if (! $userData) {
     $page->show404();
 }
@@ -77,7 +78,7 @@ if ($queue !== null) {
     }
 }
 
-$page->smarty->assign(['queueType' => $queueType, 'error' => $error, 'user', $page->users]);
+$page->smarty->assign(['queueType' => $queueType, 'error' => $error, 'user', User::class]);
 $page->title = 'Your '.$queueType.' Download Queue';
 $page->meta_title = 'View'.$queueType.' Queue';
 $page->meta_keywords = 'view,'.strtolower($queueType).',queue';

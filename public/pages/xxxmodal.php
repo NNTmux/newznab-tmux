@@ -1,8 +1,9 @@
 <?php
 
+use App\Models\User;
 use nntmux\XXX;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 

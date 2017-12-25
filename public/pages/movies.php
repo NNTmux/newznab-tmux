@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use nntmux\Movie;
 use nntmux\Category;
 use nntmux\DnzbFailures;
@@ -8,7 +9,7 @@ $movie = new Movie(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $fail = new DnzbFailures();
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
@@ -23,7 +24,7 @@ if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
     $category = $_REQUEST['t'] + 0;
 }
 
-$user = $page->users->getById($page->users->currentUserId());
+$user = User::getById(User::currentUserId());
 $cpapi = $user['cp_api'];
 $cpurl = $user['cp_url'];
 $page->smarty->assign('cpapi', $cpapi);

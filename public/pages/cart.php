@@ -1,6 +1,8 @@
 <?php
 
-if (! $page->users->isLoggedIn()) {
+use App\Models\User;
+
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
@@ -17,7 +19,7 @@ if (isset($_GET['add'])) {
     }
 
     foreach ($data as $d) {
-        UsersRelease::addCart($page->users->currentUserId(), $d['id']);
+        UsersRelease::addCart(User::currentUserId(), $d['id']);
     }
 } elseif (isset($_REQUEST['delete'])) {
     if (isset($_GET['delete']) && ! empty($_GET['delete'])) {
@@ -27,7 +29,7 @@ if (isset($_GET['add'])) {
     }
 
     if ($ids !== null) {
-        UsersRelease::delCartByGuid($ids, $page->users->currentUserId());
+        UsersRelease::delCartByGuid($ids, User::currentUserId());
     }
 
     if (! isset($_POST['delete'])) {
@@ -40,7 +42,7 @@ if (isset($_GET['add'])) {
     $page->meta_keywords = 'search,add,to,cart,download,basket,nzb,description,details';
     $page->meta_description = 'Manage Your Download Basket';
 
-    $results = UsersRelease::getCart($page->users->currentUserId());
+    $results = UsersRelease::getCart(User::currentUserId());
     $page->smarty->assign('results', $results);
 
     $page->content = $page->smarty->fetch('cart.tpl');

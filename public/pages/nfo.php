@@ -1,11 +1,12 @@
 <?php
 
+use App\Models\User;
 use nntmux\Releases;
 use nntmux\utility\Utility;
 
 $releases = new Releases;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
@@ -17,7 +18,7 @@ use nntmux\ReleaseFiles;
 use nntmux\ReleaseComments;
 use App\Models\ReleaseRegex;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
@@ -27,7 +28,7 @@ if (isset($_GET['id'])) {
     $re = new ReleaseExtra;
     $df = new DnzbFailures();
     $data = $releases->getByGuid($_GET['id']);
-    $user = $page->users->getById($page->users->currentUserId());
+    $user = User::getById(User::currentUserId());
     $cpapi = $user['cp_api'];
     $cpurl = $user['cp_url'];
     $releaseRegex = ReleaseRegex::query()->where('releases_id', '=', $data['id'])->first();
@@ -37,7 +38,7 @@ if (isset($_GET['id'])) {
     }
 
     if ($page->isPostBack()) {
-        $rc->addComment($data['id'], $data['gid'], $_POST['txtAddComment'], $page->users->currentUserId(), $_SERVER['REMOTE_ADDR']);
+        $rc->addComment($data['id'], $data['gid'], $_POST['txtAddComment'], User::currentUserId(), $_SERVER['REMOTE_ADDR']);
     }
 
     $nfo = $releases->getReleaseNfo($data['id']);

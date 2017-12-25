@@ -1,10 +1,11 @@
 <?php
 
+use App\Models\User;
 use nntmux\XXX;
 use nntmux\Category;
 use nntmux\DnzbFailures;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 

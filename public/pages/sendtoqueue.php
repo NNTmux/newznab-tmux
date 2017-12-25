@@ -1,9 +1,10 @@
 <?php
 
+use App\Models\User;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
@@ -11,7 +12,7 @@ if (empty($_GET['id'])) {
     $page->show404();
 }
 
-$user = $page->users->getById($page->users->currentUserId());
+$user = User::getById(User::currentUserId());
 if ($user['queuetype'] != 2) {
     $sab = new SABnzbd($page);
     if (empty($sab->url)) {

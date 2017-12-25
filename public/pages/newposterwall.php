@@ -1,12 +1,13 @@
 <?php
 
-if (! $page->users->isLoggedIn()) {
-    $page->show403();
-}
-
+use App\Models\User;
 use nntmux\Category;
 use nntmux\Contents;
 use nntmux\Releases;
+
+if (! User::isLoggedIn()) {
+    $page->show403();
+}
 
 $releases = new Releases(['Settings' => $page->settings]);
 $contents = new Contents(['Settings' => $page->settings]);
@@ -57,7 +58,7 @@ if (! $error) {
 			$getnewestmovies = $releases->getNewestMovies();
 			$page->smarty->assign('newest', $getnewestmovies);
 
-			$user = $page->users->getById($page->users->currentUserId());
+			$user = User::getById(User::currentUserId());
 			$page->smarty->assign('cpapi', $user['cp_api']);
 			$page->smarty->assign('cpurl', $user['cp_url']);
 			$page->smarty->assign('goto', 'movies');

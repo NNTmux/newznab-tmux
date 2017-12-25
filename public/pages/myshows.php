@@ -1,12 +1,13 @@
 <?php
 
+use App\Models\User;
 use nntmux\Videos;
 use nntmux\Category;
 use nntmux\Releases;
 use nntmux\UserSeries;
 use App\Models\Settings;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
@@ -24,7 +25,7 @@ if (isset($_REQUEST['from'])) {
 
 switch ($action) {
     case 'delete':
-        $show = $us->getShow($page->users->currentUserId(), $videoId);
+        $show = $us->getShow(User::currentUserId(), $videoId);
         if (isset($_REQUEST['from'])) {
             header('Location:'.WWW_TOP.$_REQUEST['from']);
         } else {
@@ -33,13 +34,13 @@ switch ($action) {
         if (! $show) {
             $page->show404('Not subscribed');
         } else {
-            $us->delShow($page->users->currentUserId(), $videoId);
+            $us->delShow(User::currentUserId(), $videoId);
         }
 
         break;
     case 'add':
     case 'doadd':
-        $show = $us->getShow($page->users->currentUserId(), $videoId);
+        $show = $us->getShow(User::currentUserId(), $videoId);
         if ($show) {
             $page->show404('Already subscribed');
         } else {
@@ -51,7 +52,7 @@ switch ($action) {
 
         if ($action === 'doadd') {
             $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
-            $us->addShow($page->users->currentUserId(), $videoId, $category);
+            $us->addShow(User::currentUserId(), $videoId, $category);
             if (isset($_REQUEST['from'])) {
                 header('Location:'.WWW_TOP.$_REQUEST['from']);
             } else {
@@ -80,7 +81,7 @@ switch ($action) {
         break;
     case 'edit':
     case 'doedit':
-        $show = $us->getShow($page->users->currentUserId(), $videoId);
+        $show = $us->getShow(User::currentUserId(), $videoId);
 
         if (! $show) {
             $page->show404();
@@ -88,7 +89,7 @@ switch ($action) {
 
         if ($action === 'doedit') {
             $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
-            $us->updateShow($page->users->currentUserId(), $videoId, $category);
+            $us->updateShow(User::currentUserId(), $videoId, $category);
             if (isset($_REQUEST['from'])) {
                 header('Location:'.WWW_TOP.$_REQUEST['from']);
             } else {
@@ -120,7 +121,7 @@ switch ($action) {
         $page->meta_keywords = 'search,add,to,cart,nzb,description,details';
         $page->meta_description = 'Browse Your Shows';
 
-        $shows = $us->getShows($page->users->currentUserId());
+        $shows = $us->getShows(User::currentUserId());
 
         $releases = new Releases(['Settings' => $page->settings]);
         $browsecount = $releases->getShowsCount($shows, -1, $page->userdata['categoryexclusions']);
@@ -168,7 +169,7 @@ switch ($action) {
             $categories[$c['id']] = $c['title'];
         }
 
-        $shows = $us->getShows($page->users->currentUserId());
+        $shows = $us->getShows(User::currentUserId());
         $results = [];
         foreach ($shows as $showk => $show) {
             $showcats = explode('|', $show['categories']);

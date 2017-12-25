@@ -5,7 +5,6 @@ require_once NN_LIB.'utility'.DS.'SmartyUtils.php';
 use App\Models\RoleExcludedCategory;
 use App\Models\User;
 use nntmux\db\DB;
-use nntmux\Users;
 use nntmux\SABnzbd;
 use App\Models\Settings;
 
@@ -15,11 +14,6 @@ class BasePage
      * @var \App\Models\Settings|null
      */
     public $settings = null;
-
-    /**
-     * @var \nntmux\Users|null
-     */
-    public $users = null;
 
     /**
      * @var null|\Smarty
@@ -146,7 +140,6 @@ class BasePage
 
         $this->page = $_GET['page'] ?? 'content';
 
-        $this->users = new Users();
         if (User::isLoggedIn()) {
             $this->setUserPreferences();
         } else {

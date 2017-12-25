@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use nntmux\NZB;
 use nntmux\db\DB;
 use nntmux\Releases;
@@ -8,7 +9,7 @@ $releases = new Releases;
 $pdo = new DB();
 $nzb = new NZB($pdo);
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 

@@ -2,7 +2,6 @@
 
 use App\Models\User;
 use App\Models\UserExcludedCategory;
-use nntmux\Users;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use nntmux\Category;
@@ -12,7 +11,6 @@ use nntmux\utility\Utility;
 $category = new Category;
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
-$page->users = new Users();
 
 if (! User::isLoggedIn()) {
     $page->show403();

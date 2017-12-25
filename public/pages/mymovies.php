@@ -1,12 +1,13 @@
 <?php
 
+use App\Models\User;
 use nntmux\Movie;
 use nntmux\Category;
 use nntmux\Releases;
 use nntmux\UserMovies;
 use App\Models\Settings;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
@@ -24,7 +25,7 @@ if (isset($_REQUEST['from'])) {
 
 switch ($action) {
 	case 'delete':
-		$movie = $um->getMovie($page->users->currentUserId(), $imdbid);
+		$movie = $um->getMovie(User::currentUserId(), $imdbid);
 		if (isset($_REQUEST['from'])) {
 		    header('Location:'.WWW_TOP.$_REQUEST['from']);
 		} else {
@@ -33,13 +34,13 @@ switch ($action) {
 		if (! $movie) {
 		    $page->show404('Not subscribed');
 		} else {
-		    $um->delMovie($page->users->currentUserId(), $imdbid);
+		    $um->delMovie(User::currentUserId(), $imdbid);
 		}
 
 		break;
 	case 'add':
 	case 'doadd':
-		$movie = $um->getMovie($page->users->currentUserId(), $imdbid);
+		$movie = $um->getMovie(User::currentUserId(), $imdbid);
 		if ($movie) {
 		    $page->show404('Already subscribed');
 		} else {
@@ -51,7 +52,7 @@ switch ($action) {
 
 		if ($action == 'doadd') {
 		    $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
-		    $um->addMovie($page->users->currentUserId(), $imdbid, $category);
+		    $um->addMovie(User::currentUserId(), $imdbid, $category);
 		    if (isset($_REQUEST['from'])) {
 		        header('Location:'.WWW_TOP.$_REQUEST['from']);
 		    } else {
@@ -80,7 +81,7 @@ switch ($action) {
 		break;
 	case 'edit':
 	case 'doedit':
-		$movie = $um->getMovie($page->users->currentUserId(), $imdbid);
+		$movie = $um->getMovie(User::currentUserId(), $imdbid);
 
 		if (! $movie) {
 		    $page->show404();
@@ -88,7 +89,7 @@ switch ($action) {
 
 		if ($action == 'doedit') {
 		    $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
-		    $um->updateMovie($page->users->currentUserId(), $imdbid, $category);
+		    $um->updateMovie(User::currentUserId(), $imdbid, $category);
 		    if (isset($_REQUEST['from'])) {
 		        header('Location:'.WWW_TOP.$_REQUEST['from']);
 		    } else {
@@ -120,7 +121,7 @@ switch ($action) {
 		$page->meta_keywords = 'search,add,to,cart,nzb,description,details';
 		$page->meta_description = 'Browse Your Shows';
 
-		$movies = $um->getMovies($page->users->currentUserId());
+		$movies = $um->getMovies(User::currentUserId());
 
 		$releases = new Releases(['Settings' => $page->settings]);
 		$browsecount = $releases->getMovieCount($movies, -1, $page->userdata['categoryexclusions']);
@@ -169,7 +170,7 @@ switch ($action) {
 		    $categories[$c['id']] = $c['title'];
 		}
 
-		$movies = $um->getMovies($page->users->currentUserId());
+		$movies = $um->getMovies(User::currentUserId());
 		$results = [];
 		foreach ($movies as $moviek => $movie) {
 		    $showcats = explode('|', $movie['categories']);

@@ -1,11 +1,12 @@
 <?php
 
+use App\Models\User;
 use nntmux\Games;
 use nntmux\Genres;
 use nntmux\Category;
 use nntmux\DnzbFailures;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 

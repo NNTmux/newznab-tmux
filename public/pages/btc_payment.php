@@ -1,19 +1,20 @@
 <?php
 
+use App\Models\User;
 use App\Models\UserRole;
 use nntmux\libraries\Geary;
 
 $page = new Page();
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 $gateway_id = env('MYCELIUM_GATEWAY_ID');
 $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');
 
-$userId = $page->users->currentUserId();
-$user = (new \nntmux\Users())->getById($userId);
+$userId = User::currentUserId();
+$user = User::getById($userId);
 $action = $_REQUEST['action'] ?? 'view';
 $donation = UserRole::query()->where('donation', '>', 0)->get(['id', 'name', 'donation', 'addyears']);
 $page->smarty->assign('donation', $donation);
@@ -40,7 +41,7 @@ switch ($action) {
         break;
     case 'view':
     default:
-        $userId = $page->users->currentUserId();
+        $userId = User::currentUserId();
         break;
 }
 

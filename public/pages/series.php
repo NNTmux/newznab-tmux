@@ -1,18 +1,19 @@
 <?php
 
+use App\Models\User;
 use nntmux\Videos;
 use nntmux\Category;
 use nntmux\Releases;
 use nntmux\UserSeries;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 $releases = new Releases(['Settings' => $page->settings]);
 $tvshow = new Videos(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
-$us = new UserSeries(['Settings' => $page->settings]);
+$us = new UserSeries();
 
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     $category = -1;
@@ -31,7 +32,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     } elseif (! $rel) {
         $page->smarty->assign('nodata', 'No releases for this series.');
     } else {
-        $myshows = $us->getShow($page->users->currentUserId(), $show['id']);
+        $myshows = $us->getShow(User::currentUserId(), $show['id']);
 
         // Sort releases by season, episode, date posted.
         $series = $episode = $posted = [];
@@ -92,7 +93,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
         $letter = '';
     }
 
-    $masterserieslist = $tvshow->getSeriesList($page->users->currentUserId(), $letter, $showname);
+    $masterserieslist = $tvshow->getSeriesList(User::currentUserId(), $letter, $showname);
 
     $page->title = 'Series List';
     $page->meta_title = 'View Series List';
