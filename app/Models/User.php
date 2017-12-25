@@ -712,7 +712,7 @@ class User extends Authenticatable
      * @return bool|int
      * @throws \Exception
      */
-    public static function add($userName, $password, $email, $role, $notes, $host, $invites = self::DEFAULT_INVITES, $invitedBy = 0)
+    public static function add($userName, $password, $email, $role, $notes, $host, $invites = Invitation::DEFAULT_INVITES, $invitedBy = 0)
     {
         $password = self::hashPassword($password);
         if (! $password) {
