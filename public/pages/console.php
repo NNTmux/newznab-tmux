@@ -1,15 +1,14 @@
 <?php
 
 use nntmux\Genres;
-
-if (! User::isLoggedIn()) {
-    $page->show403();
-}
-
 use nntmux\Console;
 use App\Models\User;
 use nntmux\Category;
 use nntmux\DnzbFailures;
+
+if (! User::isLoggedIn()) {
+    $page->show403();
+}
 
 $console = new Console(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
