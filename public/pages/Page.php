@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\User;
 use nntmux\Menu;
 use nntmux\Forum;
-use nntmux\Users;
 use nntmux\Category;
 use nntmux\Contents;
 use App\Models\Settings;
@@ -30,7 +30,7 @@ class Page extends BasePage
             ]
         );
 
-        $role = Users::ROLE_GUEST;
+        $role = User::ROLE_GUEST;
         if (! empty($this->userdata)) {
             $role = $this->userdata['user_roles_id'];
         }
