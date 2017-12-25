@@ -135,12 +135,11 @@ $page->smarty->assign('sabsetting_selected', ($sab->checkCookie() === true ? 2 :
 switch ($sab->integrated) {
     case SABnzbd::INTEGRATION_TYPE_USER:
         $queueTypes = ['None', 'Sabnzbd', 'NZBGet'];
-        $queueTypeIDs = [Users::QUEUE_NONE, Users::QUEUE_SABNZBD, Users::QUEUE_NZBGET];
+        $queueTypeIDs = [User::QUEUE_NONE, User::QUEUE_SABNZBD, User::QUEUE_NZBGET];
         break;
-    case SABnzbd::INTEGRATION_TYPE_SITEWIDE:
     case SABnzbd::INTEGRATION_TYPE_NONE:
         $queueTypes = ['None', 'NZBGet'];
-        $queueTypeIDs = [Users::QUEUE_NONE, Users::QUEUE_NZBGET];
+        $queueTypeIDs = [User::QUEUE_NONE, User::QUEUE_NZBGET];
         break;
 }
 
