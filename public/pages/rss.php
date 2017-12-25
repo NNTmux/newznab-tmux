@@ -15,11 +15,7 @@ $offset = 0;
 if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
     // User has to either be logged in, or using rsskey.
     if (! User::isLoggedIn()) {
-        if ((int) Settings::settingValue('..registerstatus') !== Settings::REGISTER_STATUS_API_ONLY) {
-            Utility::showApiError(100);
-        } else {
-            header('Location: '.Settings::settingValue('site.main.code'));
-        }
+        header('Location: '.Settings::settingValue('site.main.code'));
     }
 
     $page->title = 'Rss Info';
@@ -59,15 +55,11 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
         $rssToken = $page->userdata['rsstoken'];
         $maxRequests = $page->userdata->role->apirequests;
     } else {
-        if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
-            $res = User::getById(0);
-        } else {
-            if (! isset($_GET['i']) || ! isset($_GET['r'])) {
-                Utility::showApiError(100, 'Both the User ID and API key are required for viewing the RSS!');
-            }
-
-            $res = User::getByIdAndRssToken($_GET['i'], $_GET['r']);
+        if (! isset($_GET['i']) || ! isset($_GET['r'])) {
+            Utility::showApiError(100, 'Both the User ID and API key are required for viewing the RSS!');
         }
+
+        $res = User::getByIdAndRssToken($_GET['i'], $_GET['r']);
 
         if (! $res) {
             Utility::showApiError(100);

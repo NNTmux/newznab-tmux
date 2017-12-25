@@ -2,8 +2,6 @@
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Models\User;
-use App\Models\Settings;
 
 $page = new Page;
 
@@ -67,12 +65,6 @@ switch ($page->page) {
     case 'upcoming':
     case 'xxx':
     case 'xxxmodal':
-        // Don't show these pages if it's an API-only site.
-        if (! User::isLoggedIn() && (int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
-            header('Location: '.Settings::settingValue('site.main.code'));
-            break;
-        }
-        // no break
     case 'api':
     case 'failed':
     case 'getnzb':

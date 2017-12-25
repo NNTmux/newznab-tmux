@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use nntmux\NZB;
 use nntmux\Releases;
 use App\Models\Settings;
@@ -18,18 +19,15 @@ if (User::isLoggedIn()) {
         Utility::showApiError(101);
     }
 } else {
-    if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
-        $res = User::getById(0);
-    } else {
-        if (! isset($_GET['i']) || ! isset($_GET['r'])) {
-            Utility::showApiError(200);
-        }
-
-        $res = User::getByIdAndRssToken($_GET['i'], $_GET['r']);
-        if (! $res) {
-            Utility::showApiError(100);
-        }
+    if (! isset($_GET['i']) || ! isset($_GET['r'])) {
+        Utility::showApiError(200);
     }
+
+    $res = User::getByIdAndRssToken($_GET['i'], $_GET['r']);
+    if (! $res) {
+        Utility::showApiError(100);
+    }
+
     $uid = $res['id'];
     $rssToken = $res['rsstoken'];
     $maxDownloads = $res->role->downloadrequests;
