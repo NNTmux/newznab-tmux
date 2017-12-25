@@ -2,12 +2,12 @@
 
 require_once NN_LIB.'utility'.DS.'SmartyUtils.php';
 
-use App\Models\RoleExcludedCategory;
-use App\Models\User;
 use nntmux\db\DB;
 use nntmux\Users;
 use nntmux\SABnzbd;
+use App\Models\User;
 use App\Models\Settings;
+use App\Models\RoleExcludedCategory;
 
 class BasePage
 {

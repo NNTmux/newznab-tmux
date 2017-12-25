@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Models\RoleExcludedCategory;
 use nntmux\Category;
 use App\Models\UserRole;
+use App\Models\RoleExcludedCategory;
 
 $category = new Category();
 $page = new AdminPage();
