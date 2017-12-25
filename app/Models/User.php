@@ -389,7 +389,7 @@ class User extends Authenticatable
     {
         UserRequest::clearApiRequests(false);
 
-        $order = (new Users())->getBrowseOrder($orderBy);
+        $order = getUserBrowseOrder($orderBy);
 
         $users = self::query()->with('role', 'request')->where('id', '!=', 0)->groupBy(['id'])->orderBy($order[0], $order[1])->withCount('request as apirequests');
         if ($userName !== '') {

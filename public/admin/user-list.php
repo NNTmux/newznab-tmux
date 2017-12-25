@@ -15,7 +15,7 @@ foreach (UserRole::getRoles() as $userRole) {
 }
 
 $offset = $_REQUEST['offset'] ?? 0;
-$ordering = $page->users->getBrowseOrdering();
+$ordering = getUserBrowseOrdering();
 $orderBy = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
 
 $variables = ['username' => '', 'email' => '', 'host' => '', 'role' => ''];
