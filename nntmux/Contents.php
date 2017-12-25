@@ -8,9 +8,9 @@ use App\Models\Content;
 
 class Contents
 {
-    protected const TYPEUSEFUL = 1;
-    protected const TYPEARTICLE = 2;
-    protected const TYPEINDEX = 3;
+    public const TYPEUSEFUL = 1;
+    public const TYPEARTICLE = 2;
+    public const TYPEINDEX = 3;
 
     /**
      * @var \nntmux\db\DB
