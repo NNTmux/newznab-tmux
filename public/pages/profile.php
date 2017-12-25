@@ -1,13 +1,13 @@
 <?php
 
-use App\Models\User;
-use App\Models\UserExcludedCategory;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
+use App\Models\User;
 use App\Models\Settings;
 use App\Models\UserRequest;
 use nntmux\ReleaseComments;
 use App\Models\UserDownload;
+use App\Models\UserExcludedCategory;
 
 if (! User::isLoggedIn()) {
     $page->show403();

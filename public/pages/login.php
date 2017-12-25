@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\User;
 use nntmux\Captcha;
 use nntmux\Logging;
+use App\Models\User;
 use App\Models\Settings;
 use nntmux\utility\Utility;
 

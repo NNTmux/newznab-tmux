@@ -153,7 +153,7 @@ if (! function_exists('makeFieldLinks')) {
                 'role_asc',
                 'role_desc',
                 'rolechangedate_asc',
-                'rolechangedate_desc'
+                'rolechangedate_desc',
             ];
         }
     }

@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use nntmux\Captcha;
+use App\Models\User;
 use App\Mail\PasswordReset;
 use App\Mail\ForgottenPassword;
 use Illuminate\Support\Facades\Mail;

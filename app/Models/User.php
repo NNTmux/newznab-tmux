@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use App\Mail\AccountChange;
+use nntmux\Users;
 use App\Mail\SendInvite;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Mail\AccountChange;
+use Illuminate\Support\Str;
+use nntmux\utility\Utility;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
-use nntmux\Users;
-use nntmux\utility\Utility;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {

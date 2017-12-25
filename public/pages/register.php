@@ -1,11 +1,10 @@
 <?php
 
-use App\Models\Invitation;
-use App\Models\User;
-use nntmux\Users;
 use nntmux\Captcha;
+use App\Models\User;
 use App\Models\Settings;
 use App\Models\UserRole;
+use App\Models\Invitation;
 use nntmux\utility\Utility;
 
 if (User::isLoggedIn()) {
