@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\User;
 use Page;
+use App\Models\User;
 
 final class NZBVortex
 {
