@@ -26,7 +26,7 @@ class AdminPage extends BasePage
             ]
         );
 
-        if (! isset($this->userdata['user_roles_id']) || (int) $this->userdata['user_roles_id'] !== User::ROLE_ADMIN || ! $this->users->isLoggedIn()) {
+        if (! isset($this->userdata['user_roles_id']) || (int) $this->userdata['user_roles_id'] !== User::ROLE_ADMIN || ! User::isLoggedIn()) {
             $this->show403(true);
         }
 
