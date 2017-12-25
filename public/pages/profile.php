@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+use App\Models\UserExcludedCategory;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\Settings;
@@ -7,7 +9,7 @@ use App\Models\UserRequest;
 use nntmux\ReleaseComments;
 use App\Models\UserDownload;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
@@ -15,8 +17,8 @@ $rc = new ReleaseComments;
 $sab = new SABnzbd($page);
 $nzbget = new NZBGet($page);
 
-$userID = $page->users->currentUserId();
-$privileged = $page->users->isAdmin($userID) || $page->users->isModerator($userID);
+$userID = User::currentUserId();
+$privileged = User::isAdmin($userID) || User::isModerator($userID);
 $privateProfiles = (int) Settings::settingValue('..privateprofiles') === 1;
 $publicView = false;
 
@@ -26,7 +28,7 @@ if ($privileged || ! $privateProfiles) {
 
     // If both 'id' and 'name' are specified, 'id' should take precedence.
     if ($altID === false && $altUsername !== false) {
-        $user = $page->users->getByUsername($altUsername);
+        $user = User::getByUsername($altUsername);
         if ($user) {
             $altID = $user['id'];
             $userID = $altID;
@@ -40,7 +42,7 @@ if ($privileged || ! $privateProfiles) {
 $downloadlist = UserDownload::getDownloadRequestsForUser($userID);
 $page->smarty->assign('downloadlist', $downloadlist);
 
-$data = $page->users->getById($userID);
+$data = User::getById($userID);
 if (! $data) {
     $page->show404();
 }
@@ -55,7 +57,7 @@ $page->smarty->assign(
     [
         'apirequests'       => UserRequest::getApiRequests($userID),
         'grabstoday'        => UserDownload::getDownloadRequests($userID),
-        'userinvitedby'     => $data['invitedby'] !== '' ? $page->users->getById($data['invitedby']) : '',
+        'userinvitedby'     => $data['invitedby'] !== '' ? User::getById($data['invitedby']) : '',
         'user'              => $data,
         'privateprofiles'   => $privateProfiles,
         'publicview'        => $publicView,
@@ -83,7 +85,7 @@ $page->smarty->assign(
     [
         'pager'         => $page->smarty->fetch('pager.tpl'),
         'commentslist'  => $rc->getCommentsForUserRange($userID, $offset, ITEMS_PER_PAGE),
-        'exccats'       => implode(',', $page->users->getCategoryExclusionNames($userID)),
+        'exccats'       => implode(',', UserExcludedCategory::getCategoryExclusionNames($userID)),
         'saburl'        => $sab->url,
         'sabapikey'     => $sab->apikey,
         'sabapikeytype' => $sab->apikeytype !== '' ? $sabApiKeyTypes[$sab->apikeytype] : '',

@@ -1,11 +1,12 @@
 <?php
 
+use App\Models\User;
 use nntmux\Captcha;
 use App\Mail\PasswordReset;
 use App\Mail\ForgottenPassword;
 use Illuminate\Support\Facades\Mail;
 
-if ($page->users->isLoggedIn()) {
+if (User::isLoggedIn()) {
     header('Location: '.WWW_TOP.'/');
 }
 
@@ -21,7 +22,7 @@ switch ($action) {
             break;
         }
 
-        $ret = $page->users->getByPassResetGuid($_REQUEST['guid']);
+        $ret = User::getByPassResetGuid($_REQUEST['guid']);
         if (! $ret) {
             $page->smarty->assign('error', 'Bad reset code provided.');
             break;
@@ -30,9 +31,9 @@ switch ($action) {
         //
         // reset the password, inform the user, send out the email
         //
-        $page->users->updatePassResetGuid($ret['id'], '');
-        $newpass = $page->users->generatePassword();
-        $page->users->updatePassword($ret['id'], $newpass);
+        User::updatePassResetGuid($ret['id'], '');
+        $newpass = User::generatePassword();
+        User::updatePassword($ret['id'], $newpass);
 
         $to = $ret['email'];
         $onscreen = 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.';
@@ -53,11 +54,7 @@ switch ($action) {
                 //
                 // Check users exists and send an email
                 //
-                if (! empty($rssToken)) {
-                    $ret = $page->users->getByRssToken($rssToken);
-                } else {
-                    $ret = $page->users->getByEmail($email);
-                }
+                $ret = ! empty($rssToken) ? User::getByRssToken($rssToken) : User::getByEmail($email);
                 if ($ret === null) {
                     $page->smarty->assign('error', 'The email or apikey are not recognised.');
                     $sent = true;
@@ -67,7 +64,7 @@ switch ($action) {
                 // Generate a forgottenpassword guid, store it in the user table
                 //
                 $guid = md5(uniqid('', false));
-                $page->users->updatePassResetGuid($ret['id'], $guid);
+                User::updatePassResetGuid($ret['id'], $guid);
                 //
                 // Send the email
                 //

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use nntmux\http\API;
 use nntmux\Releases;
 use App\Models\Settings;
@@ -58,24 +59,24 @@ if ($function !== 'c' && $function !== 'r') {
         Utility::showApiError(200, 'Missing parameter (apikey)');
     } else {
         $apiKey = $_GET['apikey'];
-        $res = $page->users->getByRssToken($apiKey);
+        $res = User::getByRssToken($apiKey);
         if ($res === null) {
             Utility::showApiError(100, 'Incorrect user credentials (wrong API key)');
         }
     }
 
-    if ($page->users->isDisabled($res['username'])) {
+    if (User::isDisabled($res['username'])) {
         Utility::showApiError(101);
     }
 
     $uid = $res['id'];
-    $catExclusions = $page->users->getCategoryExclusion($uid);
+    $catExclusions = User::getCategoryExclusion($uid);
     $maxRequests = $res->role->apirequests;
 }
 
 // Record user access to the api, if its been called by a user (i.e. capabilities request do not require a user to be logged in or key provided).
 if ($uid !== '') {
-    $page->users->updateApiAccessed($uid);
+    User::updateApiAccessed($uid);
     $apiRequests = UserRequest::getApiRequests($uid);
     if ($apiRequests > $maxRequests) {
         Utility::showApiError(500, 'Request limit reached ('.$apiRequests.'/'.$maxRequests.')');

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use nntmux\Captcha;
 use nntmux\Logging;
 use App\Models\Settings;
@@ -9,7 +10,7 @@ $page->smarty->assign(['error' => '', 'username' => '', 'rememberme' => '']);
 
 $captcha = new Captcha($page);
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     if (! isset($_POST['username'], $_POST['password'])) {
         $page->smarty->assign('error', 'Please enter your username and password.');
     } elseif ($captcha->getError() === false) {
@@ -17,18 +18,18 @@ if (! $page->users->isLoggedIn()) {
         $page->smarty->assign('username', $username);
         if (Utility::checkCsrfToken() === true) {
             $logging = new Logging(['Settings' => $page->settings]);
-            $res = $page->users->getByUsername($username);
+            $res = User::getByUsername($username);
             if ($res === null) {
-                $res = $page->users->getByEmail($username);
+                $res = User::getByEmail($username);
             }
 
             if ($res !== null) {
-                $dis = $page->users->isDisabled($username);
+                $dis = User::isDisabled($username);
                 if ($dis) {
                     $page->smarty->assign('error', 'Your account has been disabled.');
-                } elseif ($page->users->checkPassword($_POST['password'], $res['password'], $res['id'])) {
+                } elseif (User::checkPassword($_POST['password'], $res['password'], $res['id'])) {
                     $rememberMe = (isset($_POST['rememberme']) && $_POST['rememberme'] === 'on');
-                    $page->users->login($res['id'], $_SERVER['REMOTE_ADDR'], $rememberMe);
+                    User::login($res['id'], $_SERVER['REMOTE_ADDR'], $rememberMe);
 
                     if (isset($_POST['redirect']) && $_POST['redirect'] !== '') {
                         header('Location: '.$_POST['redirect']);

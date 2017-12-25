@@ -17,11 +17,11 @@ require_once \dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.ph
 include_once \dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
 
 use App\Extensions\util\Versions;
+use App\Models\User;
 use nntmux\config\Configure;
 use nntmux\db\DB;
 use nntmux\db\DbUpdate;
 use nntmux\ColorCLI;
-use nntmux\Users;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 /**
@@ -204,21 +204,20 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 		);
 		$capsule->bootEloquent();
 
-		$user = new Users();
-		if (!$user->isValidUsername(env('ADMIN_USER'))) {
+		if (!User::isValidUsername(env('ADMIN_USER'))) {
 			$error = true;
 		} else {
-			$usrCheck = $user->getByUsername(env('ADMIN_USER'));
+			$usrCheck = User::getByUsername(env('ADMIN_USER'));
 			if ($usrCheck) {
 				$error = true;
 			}
 		}
-		if (!$user->isValidEmail(env('ADMIN_EMAIL'))) {
+		if (!User::isValidEmail(env('ADMIN_EMAIL'))) {
 			$error = true;
 		}
 
 		if (!$error) {
-			$adminCheck = $user->add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '');
+			$adminCheck = User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '');
 			if (!is_numeric($adminCheck)) {
 				$error = true;
 			}

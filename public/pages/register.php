@@ -1,19 +1,21 @@
 <?php
 
+use App\Models\Invitation;
+use App\Models\User;
 use nntmux\Users;
 use nntmux\Captcha;
 use App\Models\Settings;
 use App\Models\UserRole;
 use nntmux\utility\Utility;
 
-if ($page->users->isLoggedIn()) {
+if (User::isLoggedIn()) {
     header('Location: '.WWW_TOP.'/');
 }
 
 $error = $userName = $password = $confirmPassword = $email = $inviteCode = $inviteCodeQuery = '';
 $showRegister = 1;
 
-if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED || (int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
+if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
     $error = 'Registrations are currently disabled.';
     $showRegister = 0;
 } elseif (Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE && (! isset($_REQUEST['invitecode']) || empty($_REQUEST['invitecode']))) {
@@ -50,7 +52,7 @@ if ($showRegister === 1) {
                         // Get the default user role.
                         $userDefault = UserRole::getDefaultRole();
 
-                        $ret = $page->users->signup(
+                        $ret = User::signup(
                             $userName,
                             $password,
                             $email,
@@ -62,26 +64,26 @@ if ($showRegister === 1) {
                         );
 
                         if ($ret > 0) {
-                            $page->users->login($ret, $_SERVER['REMOTE_ADDR']);
+                            User::login($ret, $_SERVER['REMOTE_ADDR']);
                             header('Location: '.WWW_TOP.'/');
                         } else {
                             switch ($ret) {
-                                case Users::ERR_SIGNUP_BADUNAME:
+                                case User::ERR_SIGNUP_BADUNAME:
                                     $error = 'Your username must be at least five characters.';
                                     break;
-                                case Users::ERR_SIGNUP_BADPASS:
+                                case User::ERR_SIGNUP_BADPASS:
                                     $error = 'Your password must be longer than eight characters.';
                                     break;
-                                case Users::ERR_SIGNUP_BADEMAIL:
+                                case User::ERR_SIGNUP_BADEMAIL:
                                     $error = 'Your email is not a valid format.';
                                     break;
-                                case Users::ERR_SIGNUP_UNAMEINUSE:
+                                case User::ERR_SIGNUP_UNAMEINUSE:
                                     $error = 'Sorry, the username is already taken.';
                                     break;
-                                case Users::ERR_SIGNUP_EMAILINUSE:
+                                case User::ERR_SIGNUP_EMAILINUSE:
                                     $error = 'Sorry, the email is already in use.';
                                     break;
-                                case Users::ERR_SIGNUP_BADINVITECODE:
+                                case User::ERR_SIGNUP_BADINVITECODE:
                                     $error = 'Sorry, the invite code is old or has been used.';
                                     break;
                                 default:
@@ -99,9 +101,9 @@ if ($showRegister === 1) {
             $inviteCode = $_GET['invitecode'] ?? null;
             if (isset($inviteCode)) {
                 // See if it is a valid invite.
-                $invite = $page->users->getInvite($inviteCode);
+                $invite = Invitation::getInvite($inviteCode);
                 if (! $invite) {
-                    $error = sprintf('Bad or invite code older than %d days.', Users::DEFAULT_INVITE_EXPIRY_DAYS);
+                    $error = sprintf('Bad or invite code older than %d days.', Invitation::DEFAULT_INVITE_EXPIRY_DAYS);
                     $showRegister = 0;
                 } else {
                     $inviteCode = $invite['guid'];

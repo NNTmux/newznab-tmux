@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+use App\Models\UserExcludedCategory;
 use nntmux\Users;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
@@ -12,14 +14,14 @@ $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
 $page->users = new Users();
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 $action = $_REQUEST['action'] ?? 'view';
 
-$userid = $page->users->currentUserId();
-$data = $page->users->getById($userid);
+$userid = User::currentUserId();
+$data = User::getById($userid);
 if (! $data) {
     $page->show404();
 }
@@ -28,7 +30,7 @@ $errorStr = '';
 
 switch ($action) {
     case 'newapikey':
-        $page->users->updateRssKey($userid);
+        User::updateRssKey($userid);
         header('Location: profileedit');
         break;
     case 'clearcookies':
@@ -44,14 +46,14 @@ switch ($action) {
 
         if ($_POST['password'] !== '' && $_POST['password'] !== $_POST['confirmpassword']) {
             $errorStr = 'Password Mismatch';
-        } elseif ($_POST['password'] !== '' && ! $page->users->isValidPassword($_POST['password'])) {
+        } elseif ($_POST['password'] !== '' && ! User::isValidPassword($_POST['password'])) {
             $errorStr = 'Your password must be longer than five characters.';
         } elseif (! empty($_POST['nzbgeturl']) && $nzbGet->verifyURL($_POST['nzbgeturl']) === false) {
             $errorStr = 'The NZBGet URL you entered is invalid!';
-        } elseif (! $page->users->isValidEmail($_POST['email'])) {
+        } elseif (! User::isValidEmail($_POST['email'])) {
             $errorStr = 'Your email is not a valid format.';
         } else {
-            $res = $page->users->getByEmail($_POST['email']);
+            $res = User::getByEmail($_POST['email']);
             if ($res && (int) $res['id'] !== (int) $userid) {
                 $errorStr = 'Sorry, the email is already in use.';
             } elseif ((empty($_POST['saburl']) && ! empty($_POST['sabapikey'])) || (! empty($_POST['saburl']) && empty($_POST['sabapikey']))) {
@@ -62,7 +64,7 @@ switch ($action) {
                     $_POST['saburl'] = $_POST['sabapikey'] = $_POST['sabpriority'] = $_POST['sabapikeytype'] = false;
                 }
 
-                $page->users->update(
+                User::updateUser(
                     $userid,
                     $data['username'],
                     $_POST['email'],
@@ -92,10 +94,10 @@ switch ($action) {
                 );
 
                 $_POST['exccat'] = (! isset($_POST['exccat']) || ! is_array($_POST['exccat'])) ? [] : $_POST['exccat'];
-                $page->users->addCategoryExclusions($userid, $_POST['exccat']);
+                UserExcludedCategory::addCategoryExclusions($userid, $_POST['exccat']);
 
                 if ($_POST['password'] !== '') {
-                    $page->users->updatePassword($userid, $_POST['password']);
+                    User::updatePassword($userid, $_POST['password']);
                 }
 
                 header('Location:'.WWW_TOP.'/profile');
@@ -115,7 +117,7 @@ if ((int) Settings::settingValue('site.main.userselstyle') === 1) {
 
 $page->smarty->assign('error', $errorStr);
 $page->smarty->assign('user', $data);
-$page->smarty->assign('userexccat', $page->users->getCategoryExclusion($userid));
+$page->smarty->assign('userexccat', User::getCategoryExclusion($userid));
 
 $page->smarty->assign('saburl_selected', $sab->url);
 $page->smarty->assign('sabapikey_selected', $sab->apikey);

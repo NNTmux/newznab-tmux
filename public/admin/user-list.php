@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use App\Models\UserRole;
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
@@ -32,11 +33,11 @@ $page->smarty->assign(
         'role_ids'          => array_keys($roles),
         'role_names'        => $roles,
         'pagerquerysuffix'  => '#results',
-        'pagertotalitems'   => $page->users->getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']),
+        'pagertotalitems'   => User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']),
         'pageroffset'       => $offset,
         'pageritemsperpage' => ITEMS_PER_PAGE,
         'pagerquerybase'    => WWW_TOP.'/user-list.php?ob='.$orderBy.$uSearch.'&offset=',
-        'userlist' => $page->users->getRange(
+        'userlist' => User::getRange(
             $offset,
             ITEMS_PER_PAGE,
             $orderBy,
@@ -48,7 +49,7 @@ $page->smarty->assign(
     ]
 );
 
-$page->users->updateExpiredRoles('Role changed', 'Your role has expired and has been downgraded to user');
+User::updateExpiredRoles('Role changed', 'Your role has expired and has been downgraded to user');
 
 foreach ($ordering as $orderType) {
     $page->smarty->assign('orderby'.$orderType, WWW_TOP.'/user-list.php?ob='.$orderType.'&offset=0');

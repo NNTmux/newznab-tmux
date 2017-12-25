@@ -74,4 +74,87 @@ if (! function_exists('makeFieldLinks')) {
 
         return implode(', ', $newArr);
     }
+
+    if (! function_exists('getUserBrowseOrder')) {
+        /**
+         * @param string $orderBy
+         *
+         * @return array
+         */
+        function getUserBrowseOrder($orderBy): array
+        {
+            $order = ($orderBy === '' ? 'username_desc' : $orderBy);
+            $orderArr = explode('_', $order);
+            switch ($orderArr[0]) {
+                case 'username':
+                    $orderField = 'username';
+                    break;
+                case 'email':
+                    $orderField = 'email';
+                    break;
+                case 'host':
+                    $orderField = 'host';
+                    break;
+                case 'createdat':
+                    $orderField = 'created_at';
+                    break;
+                case 'lastlogin':
+                    $orderField = 'lastlogin';
+                    break;
+                case 'apiaccess':
+                    $orderField = 'apiaccess';
+                    break;
+                case 'apirequests':
+                    $orderField = 'apirequests';
+                    break;
+                case 'grabs':
+                    $orderField = 'grabs';
+                    break;
+                case 'user_roles_id':
+                    $orderField = 'users_role_id';
+                    break;
+                case 'rolechangedate':
+                    $orderField = 'rolechangedate';
+                    break;
+                default:
+                    $orderField = 'username';
+                    break;
+            }
+            $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
+
+            return [$orderField, $orderSort];
+        }
+    }
+
+    if (! function_exists('getUserBrowseOrdering')) {
+
+        /**
+         * @return array
+         */
+        function getUserBrowseOrdering(): array
+        {
+            return [
+                'username_asc',
+                'username_desc',
+                'email_asc',
+                'email_desc',
+                'host_asc',
+                'host_desc',
+                'createdat_asc',
+                'createdat_desc',
+                'lastlogin_asc',
+                'lastlogin_desc',
+                'apiaccess_asc',
+                'apiaccess_desc',
+                'apirequests_asc',
+                'apirequests_desc',
+                'grabs_asc',
+                'grabs_desc',
+                'role_asc',
+                'role_desc',
+                'rolechangedate_asc',
+                'rolechangedate_desc'
+            ];
+        }
+    }
 }

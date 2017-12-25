@@ -6,8 +6,8 @@ if (! defined('NN_INSTALLER')) {
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 include_once dirname(__DIR__).DIRECTORY_SEPARATOR.'nntmux'.DIRECTORY_SEPARATOR.'constants.php';
 
+use App\Models\User;
 use nntmux\db\DB;
-use nntmux\Users;
 use nntmux\ColorCLI;
 use nntmux\db\DbUpdate;
 use nntmux\config\Configure;
@@ -168,21 +168,20 @@ if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') =
     ]);
 $capsule->bootEloquent();
 
-$user = new Users();
-if (! $user->isValidUsername(env('ADMIN_USER'))) {
+if (! User::isValidUsername(env('ADMIN_USER'))) {
     $error = true;
 } else {
-    $usrCheck = $user->getByUsername(env('ADMIN_USER'));
+    $usrCheck = User::getByUsername(env('ADMIN_USER'));
     if ($usrCheck) {
         $error = true;
     }
 }
-if (! $user->isValidEmail(env('ADMIN_EMAIL'))) {
+if (! User::isValidEmail(env('ADMIN_EMAIL'))) {
     $error = true;
 }
 
 if (! $error) {
-    $adminCheck = $user->add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '');
+    $adminCheck = User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '');
     if (! is_numeric($adminCheck)) {
         $error = true;
     }

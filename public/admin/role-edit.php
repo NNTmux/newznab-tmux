@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+use App\Models\RoleExcludedCategory;
 use nntmux\Category;
 use App\Models\UserRole;
 
@@ -61,7 +62,7 @@ switch ($_REQUEST['action'] ?? 'view') {
             header('Location:'.WWW_TOP.'/role-list.php');
 
             $_POST['exccat'] = (! isset($_POST['exccat']) || ! is_array($_POST['exccat'])) ? [] : $_POST['exccat'];
-            $page->users->addRoleCategoryExclusions($_POST['id'], $_POST['exccat']);
+            RoleExcludedCategory::addRoleCategoryExclusions($_POST['id'], $_POST['exccat']);
         }
         $page->smarty->assign('role', $role);
         break;
@@ -72,7 +73,7 @@ switch ($_REQUEST['action'] ?? 'view') {
             $page->title = 'User Roles Edit';
             $role = UserRole::getRoleById($_GET['id']);
             $page->smarty->assign('role', $role);
-            $page->smarty->assign('roleexccat', $page->users->getRoleCategoryExclusion($_GET['id']));
+            $page->smarty->assign('roleexccat', RoleExcludedCategory::getRoleCategoryExclusion($_GET['id']));
         }
         break;
 }
