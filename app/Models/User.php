@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use nntmux\Users;
 use App\Mail\SendInvite;
 use App\Mail\AccountChange;
 use Illuminate\Support\Str;

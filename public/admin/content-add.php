@@ -2,7 +2,6 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Users;
 use App\Models\User;
 use nntmux\Contents;
 
