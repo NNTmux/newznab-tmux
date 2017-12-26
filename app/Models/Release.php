@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
 use nntmux\SphinxSearch;
+use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class Release extends Model
 {
