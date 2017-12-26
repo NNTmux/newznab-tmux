@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Models\Release;
 use nntmux\Category;
 use nntmux\Releases;
+use App\Models\Release;
 
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->pdo]);
