@@ -813,10 +813,12 @@ class Forking extends \fork_daemon
     private function checkProcessNfo(): bool
     {
         if ((int) Settings::settingValue('..lookupnfo') === 1) {
+            if ($this->maxRetries < -8) {
+                $this->maxRetries = -8;
+            }
+
             $qry = Release::query()
-                ->whereBetween('nfostatus', [$this->maxRetries < -8 ? -8 : $this->maxRetries, Nfo::NFO_UNPROC])
-                ->select(['id'])
-                ->limit(1);
+                ->whereBetween('nfostatus', [$this->maxRetries, Nfo::NFO_UNPROC]);
 
             if ($this->maxSize > 0) {
                 $qry->where('size', '<', $this->maxSize * 1073741824);
@@ -826,7 +828,7 @@ class Forking extends \fork_daemon
                 $qry->where('size', '>', $this->minSize * 1048576);
             }
 
-            return $qry->first() !== null;
+            return $qry->first(['id']) !== null;
         }
 
         return false;
