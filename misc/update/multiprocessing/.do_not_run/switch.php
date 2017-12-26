@@ -7,6 +7,7 @@ if (!isset($argv[1])) {
 require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php';
 
 use App\Models\Settings;
+use App\Models\Tmux;
 use \nntmux\db\DB;
 use \nntmux\processing\PostProcess;
 use \nntmux\processing\ProcessReleases;
@@ -30,7 +31,7 @@ switch ($options[1]) {
 	case 'backfill':
 		if (in_array((int)$options[3], [1, 2], false)) {
 			$pdo = new DB();
-			$value = $pdo->queryOneRow("SELECT value FROM tmux WHERE setting = 'backfill_qty'");
+			$value = Tmux::value('backfill_qty');
 			if ($value !== false) {
 				$nntp = nntp($pdo);
 				(new Backfill())->backfillAllGroups($options[2], ($options[3] === 1 ? '' : $value['value']));
@@ -252,7 +253,7 @@ switch ($options[1]) {
 	case 'pp_movie':
 		if (charCheck($options[2])) {
 			$pdo = new DB();
-			(new PostProcess(['Settings' => $pdo]))->processMovies('', $options[2], (isset($options[3]) ? $options[3] : ''));
+			(new PostProcess(['Settings' => $pdo]))->processMovies('', $options[2], $options[3] ?? '');
 		}
 		break;
 
@@ -273,11 +274,12 @@ switch ($options[1]) {
  * Create / process releases for a groupID.
  *
  * @param ProcessReleases|ProcessReleasesMultiGroup $releases
- * @param int             $groupID
+ * @param int $groupID
+ * @throws \Exception
  */
 function processReleases($releases, $groupID)
 {
-	$releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') != '' ? (int)Settings::settingValue('..maxnzbsprocessed') : 1000);
+	$releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') !== '' ? (int)Settings::settingValue('..maxnzbsprocessed') : 1000);
 	$releases->processIncompleteCollections($groupID);
 	$releases->processCollectionSizes($groupID);
 	$releases->deleteUnwantedCollections($groupID);
@@ -327,9 +329,10 @@ function collectionCheck(&$pdo, $groupID)
  * Connect to usenet, return NNTP object.
  *
  * @param DB $pdo
- * @param bool               $alternate Use alternate NNTP provider.
+ * @param bool $alternate Use alternate NNTP provider.
  *
  * @return NNTP
+ * @throws \Exception
  */
 function &nntp(&$pdo, $alternate = false)
 {

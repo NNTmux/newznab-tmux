@@ -717,23 +717,23 @@ class Forking extends \fork_daemon
     /**
      * Only 1 exit method is used for post process, since they are all similar.
      *
-     * @param        $groups
+     *
+     * @param array $groups
      * @param string $identifier
      */
     public function postProcessChildWorker($groups, $identifier = '')
     {
+        $type = '';
+        if ($this->processAdditional) {
+            $type = 'pp_additional  ';
+        } elseif ($this->processNFO) {
+            $type = 'pp_nfo  ';
+        } elseif ($this->processMovies) {
+            $type = 'pp_movie  ';
+        } elseif ($this->processTV) {
+            $type = 'pp_tv  ';
+        }
         foreach ($groups as $group) {
-            $type = '';
-            if ($this->processAdditional) {
-                $type = 'pp_additional  ';
-            } elseif ($this->processNFO) {
-                $type = 'pp_nfo  ';
-            } elseif ($this->processMovies) {
-                $type = 'pp_movie  ';
-            } elseif ($this->processTV) {
-                $type = 'pp_tv  ';
-            }
-
             if ($type !== '') {
                 $this->_executeCommand(
                     $this->dnr_path.$type.$group['id'].(isset($group['renamed']) ? ('  '.$group['renamed']) : '').'"'
