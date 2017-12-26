@@ -58,11 +58,12 @@ class ReleaseFiles
      * @param $id
      *
      * @return bool|\PDOStatement
+     * @throws \Exception
      */
     public function delete($id)
     {
         $res = ReleaseFile::query()->where('releases_id', $id)->delete();
-        $this->sphinxSearch->updateRelease($id, $this->pdo);
+        $this->sphinxSearch->updateRelease($id);
 
         return $res;
     }
@@ -70,14 +71,15 @@ class ReleaseFiles
     /**
      * Add new files for a release ID.
      *
-     * @param int    $id          The ID of the release.
-     * @param string $name        Name of the file.
-     * @param string $hash        hash_16k of par2
+     * @param int $id The ID of the release.
+     * @param string $name Name of the file.
+     * @param string $hash hash_16k of par2
      * @param int $size Size of the file.
-     * @param int    $createdTime Unix time the file was created.
-     * @param int    $hasPassword Does it have a password (see Releases class constants)?
+     * @param int $createdTime Unix time the file was created.
+     * @param int $hasPassword Does it have a password (see Releases class constants)?
      *
      * @return mixed
+     * @throws \Exception
      */
     public function add($id, $name, $hash = '', $size, $createdTime, $hasPassword)
     {
@@ -100,7 +102,7 @@ class ReleaseFiles
             if (\strlen($hash) === 32) {
                 ParHash::insertIgnore(['releases_id' => $id, 'hash' => $hash]);
             }
-            $this->sphinxSearch->updateRelease($id, $this->pdo);
+            $this->sphinxSearch->updateRelease($id);
         }
 
         return $insert;

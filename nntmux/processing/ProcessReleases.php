@@ -601,7 +601,7 @@ class ProcessReleases
                         }
                     }
 
-                    $releaseID = $this->releases->insertRelease(
+                    $releaseID = Release::insertRelease(
                         [
                             'name' => $cleanRelName,
                             'searchname' => utf8_encode($cleanedName),

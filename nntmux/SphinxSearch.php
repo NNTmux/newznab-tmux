@@ -28,13 +28,13 @@ class SphinxSearch
                 define('NN_SPHINXQL_SOCK_FILE', '');
             }
             $this->sphinxQL = new DB(
-				[
-					'dbname' => '',
-					'dbport' => NN_SPHINXQL_PORT,
-					'dbhost' => NN_SPHINXQL_HOST_NAME,
-					'dbsock' => NN_SPHINXQL_SOCK_FILE,
-				]
-			);
+                [
+                    'dbname' => '',
+                    'dbport' => NN_SPHINXQL_PORT,
+                    'dbhost' => NN_SPHINXQL_HOST_NAME,
+                    'dbsock' => NN_SPHINXQL_SOCK_FILE,
+                ]
+            );
         }
     }
 
@@ -46,15 +46,15 @@ class SphinxSearch
     {
         if ($this->sphinxQL !== null && $parameters['id']) {
             $this->sphinxQL->queryExec(
-				sprintf(
-					'REPLACE INTO releases_rt (id, name, searchname, fromname, filename) VALUES (%d, %s, %s, %s, %s)',
-					$parameters['id'],
-					$this->sphinxQL->escapeString($parameters['name']),
-					$this->sphinxQL->escapeString($parameters['searchname']),
-					$this->sphinxQL->escapeString($parameters['fromname']),
-					empty($parameters['filename']) ? "''" : $this->sphinxQL->escapeString($parameters['filename'])
-				)
-			);
+                sprintf(
+                    'REPLACE INTO releases_rt (id, name, searchname, fromname, filename) VALUES (%d, %s, %s, %s, %s)',
+                    $parameters['id'],
+                    $this->sphinxQL->escapeString($parameters['name']),
+                    $this->sphinxQL->escapeString($parameters['searchname']),
+                    $this->sphinxQL->escapeString($parameters['fromname']),
+                    empty($parameters['filename']) ? "''" : $this->sphinxQL->escapeString($parameters['filename'])
+                )
+            );
         }
     }
 
@@ -68,8 +68,8 @@ class SphinxSearch
         if ($this->sphinxQL !== null) {
             if ($identifiers['i'] === false) {
                 $identifiers['i'] = $pdo->queryOneRow(
-					sprintf('SELECT id FROM releases WHERE guid = %s', $pdo->escapeString($identifiers['g']))
-				);
+                    sprintf('SELECT id FROM releases WHERE guid = %s', $pdo->escapeString($identifiers['g']))
+                );
                 if ($identifiers['i'] !== false) {
                     $identifiers['i'] = $identifiers['i']['id'];
                 }
@@ -88,15 +88,15 @@ class SphinxSearch
     public static function escapeString($string)
     {
         $from = [
-			'\\', '(', ')', '|', '---', '--', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', "'",
-			"\x00", "\n", "\r", "\x1a",
-		];
+            '\\', '(', ')', '|', '---', '--', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', "'",
+            "\x00", "\n", "\r", "\x1a",
+        ];
         $to = [
-			'\\\\\\\\', '\\\\\\\\(', '\\\\\\\\)', '\\\\\\\\|', '-', '-', '\\\\\\\\-', '\\\\\\\\!',
-			'\\\\\\\\@', '\\\\\\\\~',
-			'\\\\\\\\"', '\\\\\\\\&', '\\\\\\\\/', '\\\\\\\\^', '\\\\\\\\$', '\\\\\\\\=', "\\'",
-			'\\x00', '\\n', '\\r', '\\x1a',
-		];
+            '\\\\\\\\', '\\\\\\\\(', '\\\\\\\\)', '\\\\\\\\|', '-', '-', '\\\\\\\\-', '\\\\\\\\!',
+            '\\\\\\\\@', '\\\\\\\\~',
+            '\\\\\\\\"', '\\\\\\\\&', '\\\\\\\\/', '\\\\\\\\^', '\\\\\\\\$', '\\\\\\\\=', "\\'",
+            '\\x00', '\\n', '\\r', '\\x1a',
+        ];
 
         return str_replace($from, $to, $string);
     }
@@ -105,21 +105,23 @@ class SphinxSearch
      * Update Sphinx Relases index for given releases_id.
      *
      * @param int $releaseID
-     * @param DB $pdo
+     * @throws \Exception
      */
-    public function updateRelease($releaseID, DB $pdo): void
+    public function updateRelease($releaseID): void
     {
         if ($this->sphinxQL !== null) {
+            $pdo = new DB();
             $new = $pdo->queryOneRow(
-						sprintf('
+                        sprintf(
+                            '
 							SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
 							FROM releases r
 							LEFT JOIN release_files rf ON (r.id=rf.releases_id)
 							WHERE r.id = %d
 							GROUP BY r.id LIMIT 1',
-							$releaseID
-						)
-			);
+                            $releaseID
+                        )
+            );
             if ($new !== false) {
                 $this->insertRelease($new);
             }

@@ -77,49 +77,10 @@ class Releases
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
         $this->updateGrabs = ((int) Settings::settingValue('..grabstatus') !== 0);
-        $this->passwordStatus = ((int) Settings::settingValue('..checkpasswordedrar') === 1 ? -1 : 0);
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch($this->pdo);
         $this->category = new Category(['Settings' => $this->pdo]);
         $this->showPasswords = self::showPasswords();
-    }
-
-    /**
-     * Insert a single release returning the ID on success or false on failure.
-     *
-     * @param array $parameters Insert parameters, must be escaped if string.
-     *
-     * @return bool|int
-     */
-    public function insertRelease(array $parameters = [])
-    {
-        $parameters['id'] = Release::query()
-            ->insertGetId(
-                [
-                    'name' => $parameters['name'],
-                    'searchname' => $parameters['searchname'],
-                    'totalpart' => $parameters['totalpart'],
-                    'groups_id' => $parameters['groups_id'],
-                    'adddate' => Carbon::now(),
-                    'guid' => $parameters['guid'],
-                    'leftguid' => $parameters['guid'][0],
-                    'postdate' => $parameters['postdate'],
-                    'fromname' => $parameters['fromname'],
-                    'size' => $parameters['size'],
-                    'passwordstatus' => $this->passwordStatus,
-                    'haspreview' => -1,
-                    'categories_id' => $parameters['categories_id'],
-                    'nfostatus' => -1,
-                    'nzbstatus' => $parameters['nzbstatus'],
-                    'isrenamed' => $parameters['isrenamed'],
-                    'iscategorized' => 1,
-                    'predb_id' => $parameters['predb_id'],
-                ]
-            );
-
-        $this->sphinxSearch->insertRelease($parameters);
-
-        return $parameters['id'];
     }
 
     /**
@@ -721,60 +682,6 @@ class Releases
         $query->bindParam(':identifier', $param2);
 
         $query->execute();
-    }
-
-    /**
-     * Used for release edit page on site.
-     *
-     * @param int    $ID
-     * @param string $name
-     * @param string $searchName
-     * @param string $fromName
-     * @param int    $categoryID
-     * @param int    $parts
-     * @param int    $grabs
-     * @param int    $size
-     * @param string $postedDate
-     * @param string $addedDate
-     * @param        $videoId
-     * @param        $episodeId
-     * @param int    $imDbID
-     * @param int    $aniDbID
-     */
-    public function update(
-        $ID,
-        $name,
-        $searchName,
-        $fromName,
-        $categoryID,
-        $parts,
-        $grabs,
-        $size,
-        $postedDate,
-        $addedDate,
-        $videoId,
-        $episodeId,
-        $imDbID,
-        $aniDbID
-    ): void {
-        Release::query()->where('id', $ID)->update(
-            [
-                'name' => $name,
-                'searchname' => $searchName,
-                'fromname' => $fromName,
-                'categories_id' => $categoryID,
-                'totalpart' => $parts,
-                'grabs' => $grabs,
-                'size' => $size,
-                'postdate' => $postedDate,
-                'adddate' => $addedDate,
-                'videos_id' => $videoId,
-                'tv_episodes_id' => $episodeId,
-                'imdbid' => $imDbID,
-                'anidbid' => $aniDbID,
-            ]
-        );
-        $this->sphinxSearch->updateRelease($ID, $this->pdo);
     }
 
     /**

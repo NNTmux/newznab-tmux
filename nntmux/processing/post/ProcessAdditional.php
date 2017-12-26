@@ -1131,6 +1131,7 @@ class ProcessAdditional
      * Get a list of all files in the compressed file, add the file info to the DB.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function _processCompressedFileList()
     {
@@ -1187,7 +1188,7 @@ class ProcessAdditional
             $this->_addFileInfo($file);
         }
         if ($this->_addedFileInfo > 0) {
-            $this->sphinx->updateRelease($this->_release['id'], $this->pdo);
+            $this->sphinx->updateRelease($this->_release['id']);
         }
 
         return $this->_totalFileInfo > 0;
@@ -1788,7 +1789,7 @@ class ProcessAdditional
                                             $this->_release['id']
                                         )
                                     );
-                                    $this->sphinx->updateRelease($this->_release['id'], $this->pdo);
+                                    $this->sphinx->updateRelease($this->_release['id']);
 
                                     // Echo the changed name.
                                     if ($this->_echoCLI) {

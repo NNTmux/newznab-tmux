@@ -416,7 +416,7 @@ class NZBImport
         if ($dupeCheck === null) {
             $escapedSearchName = $cleanName;
             // Insert the release into the DB.
-            $relID = $this->releases->insertRelease(
+            $relID = Release::insertRelease(
                 [
                     'name'            => $escapedSubject,
                     'searchname'    => $escapedSearchName,

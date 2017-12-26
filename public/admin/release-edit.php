@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+use App\Models\Release;
 use nntmux\Category;
 use nntmux\Releases;
 
@@ -15,7 +16,7 @@ $action = ($_REQUEST['action'] ?? 'view');
 
 switch ($action) {
     case 'submit':
-        $releases->update(
+        Release::updateRelease(
             $_POST['id'],
             $_POST['name'],
             $_POST['searchname'],
