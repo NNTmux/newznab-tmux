@@ -24,173 +24,173 @@ if (isset($_REQUEST['from'])) {
 }
 
 switch ($action) {
-	case 'delete':
-		$movie = $um->getMovie(User::currentUserId(), $imdbid);
-		if (isset($_REQUEST['from'])) {
-		    header('Location:'.WWW_TOP.$_REQUEST['from']);
-		} else {
-		    header('Location:'.WWW_TOP.'/mymovies');
-		}
-		if (! $movie) {
-		    $page->show404('Not subscribed');
-		} else {
-		    $um->delMovie(User::currentUserId(), $imdbid);
-		}
+    case 'delete':
+        $movie = $um->getMovie(User::currentUserId(), $imdbid);
+        if (isset($_REQUEST['from'])) {
+            header('Location:'.WWW_TOP.$_REQUEST['from']);
+        } else {
+            header('Location:'.WWW_TOP.'/mymovies');
+        }
+        if (! $movie) {
+            $page->show404('Not subscribed');
+        } else {
+            $um->delMovie(User::currentUserId(), $imdbid);
+        }
 
-		break;
-	case 'add':
-	case 'doadd':
-		$movie = $um->getMovie(User::currentUserId(), $imdbid);
-		if ($movie) {
-		    $page->show404('Already subscribed');
-		} else {
-		    $movie = $mv->getMovieInfo($imdbid);
-		    if (! $movie) {
-		        $page->show404('No matching movie.');
-		    }
-		}
+        break;
+    case 'add':
+    case 'doadd':
+        $movie = $um->getMovie(User::currentUserId(), $imdbid);
+        if ($movie) {
+            $page->show404('Already subscribed');
+        } else {
+            $movie = $mv->getMovieInfo($imdbid);
+            if (! $movie) {
+                $page->show404('No matching movie.');
+            }
+        }
 
-		if ($action == 'doadd') {
-		    $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
-		    $um->addMovie(User::currentUserId(), $imdbid, $category);
-		    if (isset($_REQUEST['from'])) {
-		        header('Location:'.WWW_TOP.$_REQUEST['from']);
-		    } else {
-		        header('Location:'.WWW_TOP.'/mymovies');
-		    }
-		} else {
-		    $cat = new Category(['Settings' => $page->settings]);
-		    $tmpcats = $cat->getChildren(Category::MOVIE_ROOT);
-		    $categories = [];
-		    foreach ($tmpcats as $c) {
-		        // If MOVIE WEB-DL categorization is disabled, don't include it as an option
-		        if (Settings::settingValue('indexer.categorise.catwebdl') == 0 && $c['id'] == Category::MOVIE_WEBDL) {
-		            continue;
-		        }
-		        $categories[$c['id']] = $c['title'];
-		    }
-		    $page->smarty->assign('type', 'add');
-		    $page->smarty->assign('cat_ids', array_keys($categories));
-		    $page->smarty->assign('cat_names', $categories);
-		    $page->smarty->assign('cat_selected', []);
-		    $page->smarty->assign('imdbid', $imdbid);
-		    $page->smarty->assign('movie', $movie);
-		    $page->content = $page->smarty->fetch('mymovies-add.tpl');
-		    $page->render();
-		}
-		break;
-	case 'edit':
-	case 'doedit':
-		$movie = $um->getMovie(User::currentUserId(), $imdbid);
+        if ($action == 'doadd') {
+            $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
+            $um->addMovie(User::currentUserId(), $imdbid, $category);
+            if (isset($_REQUEST['from'])) {
+                header('Location:'.WWW_TOP.$_REQUEST['from']);
+            } else {
+                header('Location:'.WWW_TOP.'/mymovies');
+            }
+        } else {
+            $cat = new Category(['Settings' => $page->settings]);
+            $tmpcats = $cat->getChildren(Category::MOVIE_ROOT);
+            $categories = [];
+            foreach ($tmpcats as $c) {
+                // If MOVIE WEB-DL categorization is disabled, don't include it as an option
+                if (Settings::settingValue('indexer.categorise.catwebdl') == 0 && $c['id'] == Category::MOVIE_WEBDL) {
+                    continue;
+                }
+                $categories[$c['id']] = $c['title'];
+            }
+            $page->smarty->assign('type', 'add');
+            $page->smarty->assign('cat_ids', array_keys($categories));
+            $page->smarty->assign('cat_names', $categories);
+            $page->smarty->assign('cat_selected', []);
+            $page->smarty->assign('imdbid', $imdbid);
+            $page->smarty->assign('movie', $movie);
+            $page->content = $page->smarty->fetch('mymovies-add.tpl');
+            $page->render();
+        }
+        break;
+    case 'edit':
+    case 'doedit':
+        $movie = $um->getMovie(User::currentUserId(), $imdbid);
 
-		if (! $movie) {
-		    $page->show404();
-		}
+        if (! $movie) {
+            $page->show404();
+        }
 
-		if ($action == 'doedit') {
-		    $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
-		    $um->updateMovie(User::currentUserId(), $imdbid, $category);
-		    if (isset($_REQUEST['from'])) {
-		        header('Location:'.WWW_TOP.$_REQUEST['from']);
-		    } else {
-		        header('Location:'.WWW_TOP.'/mymovies');
-		    }
-		} else {
-		    $cat = new Category(['Settings' => $page->settings]);
+        if ($action == 'doedit') {
+            $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
+            $um->updateMovie(User::currentUserId(), $imdbid, $category);
+            if (isset($_REQUEST['from'])) {
+                header('Location:'.WWW_TOP.$_REQUEST['from']);
+            } else {
+                header('Location:'.WWW_TOP.'/mymovies');
+            }
+        } else {
+            $cat = new Category(['Settings' => $page->settings]);
 
-		    $tmpcats = $cat->getChildren(Category::MOVIE_ROOT);
-		    $categories = [];
-		    foreach ($tmpcats as $c) {
-		        $categories[$c['id']] = $c['title'];
-		    }
+            $tmpcats = $cat->getChildren(Category::MOVIE_ROOT);
+            $categories = [];
+            foreach ($tmpcats as $c) {
+                $categories[$c['id']] = $c['title'];
+            }
 
-		    $page->smarty->assign('type', 'edit');
-		    $page->smarty->assign('cat_ids', array_keys($categories));
-		    $page->smarty->assign('cat_names', $categories);
-		    $page->smarty->assign('cat_selected', explode('|', $movie['categories']));
-		    $page->smarty->assign('imdbid', $imdbid);
-		    $page->smarty->assign('movie', $movie);
-		    $page->content = $page->smarty->fetch('mymovies-add.tpl');
-		    $page->render();
-		}
-		break;
-	case 'browse':
+            $page->smarty->assign('type', 'edit');
+            $page->smarty->assign('cat_ids', array_keys($categories));
+            $page->smarty->assign('cat_names', $categories);
+            $page->smarty->assign('cat_selected', explode('|', $movie['categories']));
+            $page->smarty->assign('imdbid', $imdbid);
+            $page->smarty->assign('movie', $movie);
+            $page->content = $page->smarty->fetch('mymovies-add.tpl');
+            $page->render();
+        }
+        break;
+    case 'browse':
 
-		$page->title = 'Browse My Shows';
-		$page->meta_title = 'My Shows';
-		$page->meta_keywords = 'search,add,to,cart,nzb,description,details';
-		$page->meta_description = 'Browse Your Shows';
+        $page->title = 'Browse My Shows';
+        $page->meta_title = 'My Shows';
+        $page->meta_keywords = 'search,add,to,cart,nzb,description,details';
+        $page->meta_description = 'Browse Your Shows';
 
-		$movies = $um->getMovies(User::currentUserId());
+        $movies = $um->getMovies(User::currentUserId());
 
-		$releases = new Releases(['Settings' => $page->settings]);
-		$browsecount = $releases->getMovieCount($movies, -1, $page->userdata['categoryexclusions']);
+        $releases = new Releases(['Settings' => $page->settings]);
+        $browsecount = $releases->getMovieCount($movies, -1, $page->userdata['categoryexclusions']);
 
-		$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
-		$ordering = $releases->getBrowseOrdering();
-		$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST['ob'] : '';
+        $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+        $ordering = $releases->getBrowseOrdering();
+        $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST['ob'] : '';
 
-		$results = [];
-		$results = $mv->getMovieRange($movies, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata['categoryexclusions']);
+        $results = [];
+        $results = $mv->getMovieRange($movies, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata['categoryexclusions']);
 
-		$page->smarty->assign('pagertotalitems', $browsecount);
-		$page->smarty->assign('pageroffset', $offset);
-		$page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
-		$page->smarty->assign('pagerquerybase', WWW_TOP.'/mymovies/browse?ob='.$orderby.'&amp;offset=');
-		$page->smarty->assign('pagerquerysuffix', '#results');
-		$page->smarty->assign('covgroup', '');
+        $page->smarty->assign('pagertotalitems', $browsecount);
+        $page->smarty->assign('pageroffset', $offset);
+        $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
+        $page->smarty->assign('pagerquerybase', WWW_TOP.'/mymovies/browse?ob='.$orderby.'&amp;offset=');
+        $page->smarty->assign('pagerquerysuffix', '#results');
+        $page->smarty->assign('covgroup', '');
 
-		$pager = $page->smarty->fetch('pager.tpl');
-		$page->smarty->assign('pager', $pager);
+        $pager = $page->smarty->fetch('pager.tpl');
+        $page->smarty->assign('pager', $pager);
 
-		foreach ($ordering as $ordertype) {
-		    $page->smarty->assign('orderby'.$ordertype, WWW_TOP.'/mymovies/browse?ob='.$ordertype.'&amp;offset=0');
-		}
+        foreach ($ordering as $ordertype) {
+            $page->smarty->assign('orderby'.$ordertype, WWW_TOP.'/mymovies/browse?ob='.$ordertype.'&amp;offset=0');
+        }
 
-		$page->smarty->assign('lastvisit', $page->userdata['lastlogin']);
+        $page->smarty->assign('lastvisit', $page->userdata['lastlogin']);
 
-		$page->smarty->assign('results', $results);
+        $page->smarty->assign('results', $results);
 
-		$page->smarty->assign('movies', true);
+        $page->smarty->assign('movies', true);
 
-		$page->content = $page->smarty->fetch('browse.tpl');
-		$page->render();
-		break;
-	default:
+        $page->content = $page->smarty->fetch('browse.tpl');
+        $page->render();
+        break;
+    default:
 
-		$page->title = 'My Movies';
-		$page->meta_title = 'My Movies';
-		$page->meta_keywords = 'search,add,to,cart,nzb,description,details';
-		$page->meta_description = 'Manage Your Movies';
+        $page->title = 'My Movies';
+        $page->meta_title = 'My Movies';
+        $page->meta_keywords = 'search,add,to,cart,nzb,description,details';
+        $page->meta_description = 'Manage Your Movies';
 
-		$cat = new Category(['Settings' => $page->settings]);
-		$tmpcats = $cat->getChildren(Category::MOVIE_ROOT);
-		$categories = [];
-		foreach ($tmpcats as $c) {
-		    $categories[$c['id']] = $c['title'];
-		}
+        $cat = new Category(['Settings' => $page->settings]);
+        $tmpcats = $cat->getChildren(Category::MOVIE_ROOT);
+        $categories = [];
+        foreach ($tmpcats as $c) {
+            $categories[$c['id']] = $c['title'];
+        }
 
-		$movies = $um->getMovies(User::currentUserId());
-		$results = [];
-		foreach ($movies as $moviek => $movie) {
-		    $showcats = explode('|', $movie['categories']);
-		    if (is_array($showcats) && sizeof($showcats) > 0) {
-		        $catarr = [];
-		        foreach ($showcats as $scat) {
-		            if (! empty($scat)) {
-		                $catarr[] = $categories[$scat];
-		            }
-		        }
-		        $movie['categoryNames'] = implode(', ', $catarr);
-		    } else {
-		        $movie['categoryNames'] = '';
-		    }
+        $movies = $um->getMovies(User::currentUserId());
+        $results = [];
+        foreach ($movies as $moviek => $movie) {
+            $showcats = explode('|', $movie['categories']);
+            if (is_array($showcats) && sizeof($showcats) > 0) {
+                $catarr = [];
+                foreach ($showcats as $scat) {
+                    if (! empty($scat)) {
+                        $catarr[] = $categories[$scat];
+                    }
+                }
+                $movie['categoryNames'] = implode(', ', $catarr);
+            } else {
+                $movie['categoryNames'] = '';
+            }
 
-		    $results[$moviek] = $movie;
-		}
-		$page->smarty->assign('movies', $results);
+            $results[$moviek] = $movie;
+        }
+        $page->smarty->assign('movies', $results);
 
-		$page->content = $page->smarty->fetch('mymovies.tpl');
-		$page->render();
-		break;
+        $page->content = $page->smarty->fetch('mymovies.tpl');
+        $page->render();
+        break;
 }

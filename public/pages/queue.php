@@ -18,24 +18,24 @@ $page->smarty->assign('user', $userData);
 $queueType = $error = '';
 $queue = null;
 switch (Settings::settingValue('apps.sabnzbplus.integrationtype')) {
-	case SABnzbd::INTEGRATION_TYPE_NONE:
-		if ($userData['queuetype'] === 2) {
-		    $queueType = 'NZBGet';
-		    $queue = new NZBGet($page);
-		}
-		break;
-	case SABnzbd::INTEGRATION_TYPE_USER:
-		switch ((int) $userData['queuetype']) {
-			case 1:
-				$queueType = 'Sabnzbd';
-				$queue = new SABnzbd($page);
-				break;
-			case 2:
-				$queueType = 'NZBGet';
-				$queue = new NZBGet($page);
-				break;
-		}
-		break;
+    case SABnzbd::INTEGRATION_TYPE_NONE:
+        if ($userData['queuetype'] === 2) {
+            $queueType = 'NZBGet';
+            $queue = new NZBGet($page);
+        }
+        break;
+    case SABnzbd::INTEGRATION_TYPE_USER:
+        switch ((int) $userData['queuetype']) {
+            case 1:
+                $queueType = 'Sabnzbd';
+                $queue = new SABnzbd($page);
+                break;
+            case 2:
+                $queueType = 'NZBGet';
+                $queue = new NZBGet($page);
+                break;
+        }
+        break;
 }
 
 if ($queue !== null) {

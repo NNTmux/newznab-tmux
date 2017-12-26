@@ -21,22 +21,22 @@ if (! $predata) {
     if (isset($predata['nuked'])) {
         $nuked = '';
         switch ($predata['nuked']) {
-			case PreDb::PRE_NUKED:
-				$nuked = 'NUKED';
-				break;
-			case PreDb::PRE_MODNUKE:
-				$nuked = 'MODNUKED';
-				break;
-			case PreDb::PRE_OLDNUKE:
-				$nuked = 'OLDNUKE';
-				break;
-			case PreDb::PRE_RENUKED:
-				$nuked = 'RENUKE';
-				break;
-			case PreDb::PRE_UNNUKED:
-				$nuked = 'UNNUKED';
-				break;
-		}
+            case PreDb::PRE_NUKED:
+                $nuked = 'NUKED';
+                break;
+            case PreDb::PRE_MODNUKE:
+                $nuked = 'MODNUKED';
+                break;
+            case PreDb::PRE_OLDNUKE:
+                $nuked = 'OLDNUKE';
+                break;
+            case PreDb::PRE_RENUKED:
+                $nuked = 'RENUKE';
+                break;
+            case PreDb::PRE_UNNUKED:
+                $nuked = 'UNNUKED';
+                break;
+        }
         if ($nuked !== '') {
             echo '<tr><th>'.$nuked.':</th><td>'.htmlentities($predata['nukereason'] ?? '', ENT_QUOTES)."</td></tr>\n";
         }
