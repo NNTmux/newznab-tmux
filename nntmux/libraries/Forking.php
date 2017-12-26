@@ -780,7 +780,7 @@ class Forking extends \fork_daemon
         $maxProcesses = 1;
         if ($this->checkProcessAdditional() === true) {
             $this->processAdditional = true;
-            $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
+            $this->register_child_run('postProcessChildWorker');
             $this->work = $this->pdo->query(
                 sprintf(
                     '
@@ -815,8 +815,7 @@ class Forking extends \fork_daemon
         if ((int) Settings::settingValue('..lookupnfo') === 1) {
             $qry = Release::query()
                 ->whereBetween('nfostatus', [$this->maxRetries < -8 ? -8 : $this->maxRetries, Nfo::NFO_UNPROC])
-                ->select(['id'])
-                ->limit(1);
+                ->select(['id']);
 
             if ($this->maxSize > 0) {
                 $qry->where('size', '<', $this->maxSize * 1073741824);
@@ -841,7 +840,7 @@ class Forking extends \fork_daemon
         $maxProcesses = 1;
         if ($this->checkProcessNfo() === true) {
             $this->processNFO = true;
-            $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
+            $this->register_child_run('postProcessChildWorker');
             $qry = Release::query()
                 ->whereBetween('nfostatus', [$this->maxRetries < -8 ? -8 : $this->maxRetries, Nfo::NFO_UNPROC])
                 ->select(['leftguid as id'])
@@ -894,7 +893,7 @@ class Forking extends \fork_daemon
         $maxProcesses = 1;
         if ($this->checkProcessMovies() === true) {
             $this->processMovies = true;
-            $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
+            $this->register_child_run('postProcessChildWorker');
             $this->work = $this->pdo->query(
                 sprintf(
                     '
@@ -949,7 +948,7 @@ class Forking extends \fork_daemon
         $maxProcesses = 1;
         if ($this->checkProcessTV() === true) {
             $this->processTV = true;
-            $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
+            $this->register_child_run('postProcessChildWorker');
             $this->work = $this->pdo->query(
                 sprintf(
                     '

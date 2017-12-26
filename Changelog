@@ -1,3 +1,5 @@
+2017-12-26 DariusIII
+	* Chg: Update Forking class, fix register_child_run function parameters
 2017-12-25 DariusIII
 	* Chg: Move getBrowseOrder and getBrowseOrdering for users into helpers.php as getUserBrowseOrder and getuserBrowseOrdering
 	* Chg: Remove Users class and use models in its place
