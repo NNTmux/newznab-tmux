@@ -32,6 +32,7 @@ $PHP = 'php';
 $PYTHON = ($tRun->command_exist('python3') ? 'python3 -OOu' : 'python -OOu');
 
 //assign shell commands
+$runVar['commands']['_php'] = " nice -n{$tmux_niceness} $PHP";
 $runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} $PHP";
 $runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/tmux/bin/showsleep.php";
 

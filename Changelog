@@ -1,4 +1,5 @@
 2017-12-26 DariusIII
+	* Fix: Add back command removed by mistake to monitor.php
 	* Chg: Update switch.php and add imdb and tv lookup settings to procesNfoFiles function call
 	* Fix: Fix used groupBy query builder function syntax
 	* Chg: Change order of query parts in processNfoFiles function
