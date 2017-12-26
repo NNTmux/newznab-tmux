@@ -70,7 +70,6 @@
     "ext-gd": "*",
     "ext-hash": "*",
     "ext-iconv": "*",
-    "ext-imagick": "*",
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-mcrypt": "*",
@@ -179,6 +178,8 @@
     ]
   },
   "suggest": {
+    "ext-gd": "to use GD library based image processing.",
+    "ext-imagick": "to use Imagick based image processing.",
     "ext-xdebug": "For developement work",
     "ext-yenc": "PHP7 yEnc decoding extension"
   },
