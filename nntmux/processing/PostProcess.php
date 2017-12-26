@@ -243,6 +243,7 @@ class PostProcess
      * Process comments.
      *
      * @param NNTP $nntp
+     * @throws \Exception
      */
     public function processSharing(&$nntp): void
     {

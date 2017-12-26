@@ -844,9 +844,7 @@ class Forking extends \fork_daemon
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $qry = Release::query()
                 ->whereBetween('nfostatus', [$this->maxRetries < -8 ? -8 : $this->maxRetries, Nfo::NFO_UNPROC])
-                ->select(['leftguid as id'])
-                ->groupBy(['leftguid'])
-                ->limit(16);
+                ->selectRaw('leftguid as id');
 
             if ($this->maxSize > 0) {
                 $qry->where('size', '<', $this->maxSize * 1073741824);
@@ -856,7 +854,7 @@ class Forking extends \fork_daemon
                 $qry->where('size', '>', $this->minSize * 1048576);
             }
 
-            $this->work = $qry->get()->toArray();
+            $this->work = $qry->groupBy(['leftguid'])->limit(16)->get()->toArray();
 
             $maxProcesses = (int) Settings::settingValue('..nfothreads');
         }
