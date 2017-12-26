@@ -1,4 +1,5 @@
 2017-12-26 DariusIII
+	* Chg: Use collection count method to get query rows count
 	* Chg: Remove unused use statement for Users class
 	* Chg: Update Forking class, fix register_child_run function parameters
 2017-12-25 DariusIII

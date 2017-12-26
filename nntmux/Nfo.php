@@ -278,7 +278,7 @@ class Nfo
 
         $res = $qry->get();
 
-        $nfoCount = \count($res);
+        $nfoCount = $res->count();
 
         if ($nfoCount > 0) {
             ColorCLI::doEcho(
@@ -296,7 +296,6 @@ class Nfo
                 // Get count of releases per nfo status
                 $qry = Release::query()
                     ->select(['nfostatus as status'])
-                    ->selectRaw('COUNT(id) as count')
                     ->groupBy(['nfostatus'])
                     ->orderBy('nfostatus');
 
@@ -320,7 +319,7 @@ class Nfo
                 if ($nfoStats instanceof \Traversable) {
                     $outString = PHP_EOL.'Available to process';
                     foreach ($nfoStats as $row) {
-                        $outString .= ', '.$row['status'].' = '.number_format($row['count']);
+                        $outString .= ', '.$row['status'].' = '.number_format($row->count('id'));
                     }
                     ColorCLI::doEcho(ColorCLI::header($outString.'.'));
                 }
