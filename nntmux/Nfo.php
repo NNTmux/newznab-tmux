@@ -253,13 +253,14 @@ class Nfo
         $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
         $ret = 0;
 
+        if ($maxRetries < -8) {
+            $maxRetries = -8;
+        }
+
         $qry = Release::query()
             ->select(['id', 'guid', 'groups_id', 'name'])
             ->where('nzbstatus', '=', NZB::NZB_ADDED)
-            ->whereBetween('nfostatus', [$maxRetries < -8 ? -8 : $maxRetries, self::NFO_UNPROC])
-            ->orderBy('nfostatus')
-            ->orderByDesc('postdate')
-            ->limit($this->nzbs);
+            ->whereBetween('nfostatus', [$maxRetries, self::NFO_UNPROC]);
 
         if ($guidChar !== '') {
             $qry->where('leftguid', $guidChar);
@@ -276,7 +277,11 @@ class Nfo
             $qry->where('size', '>', $minSize * 1048576);
         }
 
-        $res = $qry->get();
+        $res = $qry
+            ->orderBy('nfostatus')
+            ->orderBy('postdate', 'desc')
+            ->limit($this->nzbs)
+            ->get();
 
         $nfoCount = $res->count();
 
