@@ -841,16 +841,17 @@ class Forking extends \fork_daemon
     private function postProcessNfoMainMethod()
     {
         $maxProcesses = 1;
-        if ($this->maxRetries < -8) {
-            $this->maxRetries = -8;
-        }
 
         if ($this->checkProcessNfo() === true) {
+            if ($this->maxRetries < -8) {
+                $this->maxRetries = -8;
+            }
+
             $this->processNFO = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $qry = Release::query()
                 ->whereBetween('nfostatus', [$this->maxRetries, Nfo::NFO_UNPROC])
-                ->selectRaw('leftguid as id');
+                ->select(['leftguid as id']);
 
             if ($this->maxSize > 0) {
                 $qry->where('size', '<', $this->maxSize * 1073741824);
