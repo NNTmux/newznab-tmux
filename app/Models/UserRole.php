@@ -39,7 +39,7 @@ class UserRole extends Model
      */
     public static function getUsersByRole()
     {
-        return self::query()->select(['name'])->withCount('users')->groupBy(['name'])->having('users_count', '>', 0)->orderBy('users_count', 'desc')->get();
+        return self::query()->select(['name'])->withCount('users')->groupBy('name')->having('users_count', '>', 0)->orderBy('users_count', 'desc')->get();
     }
 
     /**

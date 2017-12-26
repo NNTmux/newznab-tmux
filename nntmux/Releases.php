@@ -1486,7 +1486,15 @@ class Releases
             return $releases;
         }
 
-        $releases = Release::query()->where('grabs', '>', 0)->select(['id', 'searchname', 'guid', 'adddate'])->selectRaw('SUM(grabs) as grabs')->groupBy(['id', 'searchname', 'adddate'])->havingRaw('SUM(grabs) > 0')->orderBy('grabs', 'desc')->limit(10)->get();
+        $releases = Release::query()
+            ->where('grabs', '>', 0)
+            ->select(['id', 'searchname', 'guid', 'adddate'])
+            ->selectRaw('SUM(grabs) as grabs')
+            ->groupBy('id', 'searchname', 'adddate')
+            ->havingRaw('SUM(grabs) > 0')
+            ->orderBy('grabs', 'desc')
+            ->limit(10)
+            ->get();
 
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
         Cache::put('topdownloads', $releases, $expiresAt);
@@ -1504,7 +1512,15 @@ class Releases
             return $comments;
         }
 
-        $comments = Release::query()->where('comments', '>', 0)->select(['id', 'guid', 'searchname'])->selectRaw('SUM(comments) AS comments')->groupBy(['id', 'searchname', 'adddate'])->havingRaw('SUM(comments) > 0')->orderBy('comments', 'desc')->limit(10)->get();
+        $comments = Release::query()
+            ->where('comments', '>', 0)
+            ->select(['id', 'guid', 'searchname'])
+            ->selectRaw('SUM(comments) AS comments')
+            ->groupBy('id', 'searchname', 'adddate')
+            ->havingRaw('SUM(comments) > 0')
+            ->orderBy('comments', 'desc')
+            ->limit(10)
+            ->get();
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
         Cache::put('topcomments', $comments, $expiresAt);
 
@@ -1527,7 +1543,7 @@ class Releases
             ->selectRaw('COUNT(r.id) as count')
             ->join('categories as cp', 'cp.id', '=', 'categories.parentid')
             ->join('releases as r', 'r.categories_id', '=', 'categories.id')
-            ->groupBy(['title'])
+            ->groupBy('title')
             ->orderBy('count', 'desc')
             ->get();
 

@@ -211,7 +211,7 @@ class Groups
      */
     public function getRange($offset = false, $limit = false, $groupname = '', $active = false)
     {
-        $groups = Group::query()->groupBy(['id'])->orderBy('name');
+        $groups = Group::query()->groupBy('id')->orderBy('name');
 
         if ($groupname !== '') {
             $groups->where('name', 'LIKE', '%'.$groupname.'%');

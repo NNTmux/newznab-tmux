@@ -390,7 +390,7 @@ class User extends Authenticatable
 
         $order = getUserBrowseOrder($orderBy);
 
-        $users = self::query()->with('role', 'request')->where('id', '!=', 0)->groupBy(['id'])->orderBy($order[0], $order[1])->withCount('request as apirequests');
+        $users = self::query()->with('role', 'request')->where('id', '!=', 0)->groupBy('id')->orderBy($order[0], $order[1])->withCount('request as apirequests');
         if ($userName !== '') {
             $users->where('username', 'LIKE', '%'.$userName.'%');
         }
@@ -865,7 +865,7 @@ class User extends Authenticatable
      */
     public static function getTopGrabbers()
     {
-        return self::query()->selectRaw('id, username, SUM(grabs) as grabs')->groupBy(['id', 'username'])->having('grabs', '>', 0)->orderBy('grabs', 'desc')->limit(10)->get();
+        return self::query()->selectRaw('id, username, SUM(grabs) as grabs')->groupBy('id', 'username')->having('grabs', '>', 0)->orderBy('grabs', 'desc')->limit(10)->get();
     }
 
     /**
