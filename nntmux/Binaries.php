@@ -357,7 +357,8 @@ class Binaries
         $groupNNTP = $this->_nntp->selectGroup($groupMySQL['name']);
         if ($this->_nntp->isError($groupNNTP)) {
             $groupNNTP = $this->_nntp->dataError($this->_nntp, $groupMySQL['name']);
-            if ($groupNNTP->code === 411) {
+
+            if (isset($groupNNTP['code']) && (int) $groupNNTP['code'] === 411) {
                 $this->_groups->disableIfNotExist($groupMySQL['id']);
             }
             if ($this->_nntp->isError($groupNNTP)) {
