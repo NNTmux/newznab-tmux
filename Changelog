@@ -1,4 +1,5 @@
 2017-12-27 DariusIII
+	* Fix: Fix nfo related queries in Forking class
 	* Chg: Add check for existence of error code in Binaries class
 	* Fix: Fix getByGuid function query
 	* Chg: Move more functions from Releases class to appropriate models and helpers.php

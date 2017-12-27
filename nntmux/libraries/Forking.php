@@ -806,7 +806,6 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * Check if we should process NFO's.
      * @return bool
      * @throws \Exception
      */
@@ -818,6 +817,7 @@ class Forking extends \fork_daemon
             }
 
             $qry = Release::query()
+                ->where('nzbstatus', '=', NZB::NZB_ADDED)
                 ->whereBetween('nfostatus', [$this->maxRetries, Nfo::NFO_UNPROC]);
 
             if ($this->maxSize > 0) {
@@ -835,7 +835,7 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * @return int|null|string
+     * @return int
      * @throws \Exception
      */
     private function postProcessNfoMainMethod()
@@ -850,6 +850,7 @@ class Forking extends \fork_daemon
             $this->processNFO = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $qry = Release::query()
+                ->where('nzbstatus', '=', NZB::NZB_ADDED)
                 ->whereBetween('nfostatus', [$this->maxRetries, Nfo::NFO_UNPROC])
                 ->select(['leftguid as id']);
 
@@ -870,11 +871,10 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * Check if we should process Movies.
      * @return bool
      * @throws \Exception
      */
-    private function checkProcessMovies()
+    private function checkProcessMovies(): bool
     {
         if (Settings::settingValue('..lookupimdb') > 0) {
             return $this->pdo->queryOneRow(sprintf('
@@ -891,10 +891,10 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * @return int|null|string
+     * @return int
      * @throws \Exception
      */
-    private function postProcessMovMainMethod()
+    private function postProcessMovMainMethod(): int
     {
         $maxProcesses = 1;
         if ($this->checkProcessMovies() === true) {
@@ -946,7 +946,7 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * @return int|null|string
+     * @return int
      * @throws \Exception
      */
     private function postProcessTvMainMethod()
@@ -1031,7 +1031,7 @@ class Forking extends \fork_daemon
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @return null|string
+     * @return int
      * @throws \Exception
      */
     private function updatePerGroupMainMethod()
