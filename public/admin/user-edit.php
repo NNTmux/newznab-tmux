@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+use App\Models\Invitation;
 use App\Models\User;
 use App\Models\UserRole;
 use App\Mail\AccountChange;
@@ -25,7 +26,7 @@ $action = $_REQUEST['action'] ?? 'view';
 $userRoles = UserRole::getRoles();
 $roles = [];
 $defaultRole = User::ROLE_USER;
-$defaultInvites = User::DEFAULT_INVITES;
+$defaultInvites = Invitation::DEFAULT_INVITES;
 foreach ($userRoles as $r) {
     $roles[$r['id']] = $r['name'];
     if ($r['isdefault'] === 1) {
