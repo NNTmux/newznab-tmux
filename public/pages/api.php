@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Release;
 use App\Models\User;
 use nntmux\http\API;
 use nntmux\Releases;
+use App\Models\Release;
 use App\Models\Settings;
 use App\Models\ReleaseNfo;
 use App\Models\UserRequest;

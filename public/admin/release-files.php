@@ -2,11 +2,11 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Models\Release;
-use App\Models\Settings;
 use nntmux\NZB;
 use nntmux\db\DB;
 use App\Models\User;
+use App\Models\Release;
+use App\Models\Settings;
 
 $page = new AdminPage;
 $pdo = new DB();

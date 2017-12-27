@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
-use App\Models\Release;
 use nntmux\db\DB;
 use GuzzleHttp\Client;
+use App\Models\Release;
 use nntmux\utility\Utility;
 use GuzzleHttp\Psr7\Request;
 

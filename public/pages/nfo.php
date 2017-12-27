@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Release;
 use App\Models\User;
+use App\Models\Release;
 use App\Models\ReleaseNfo;
 use nntmux\utility\Utility;
 

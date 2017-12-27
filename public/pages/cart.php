@@ -1,13 +1,13 @@
 <?php
 
-use App\Models\Release;
 use App\Models\User;
+use nntmux\Releases;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-use nntmux\Releases;
+use App\Models\Release;
 use App\Models\UsersRelease;
 
 if (isset($_GET['add'])) {
