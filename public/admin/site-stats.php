@@ -2,25 +2,25 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+use App\Models\Category;
+use App\Models\Release;
 use App\Models\User;
-use nntmux\Releases;
 use App\Models\UserRole;
 
 $page = new AdminPage();
-$releases = new Releases();
 
 $page->title = 'Site Stats';
 
 $topgrabs = User::getTopGrabbers();
 $page->smarty->assign('topgrabs', $topgrabs);
 
-$topdownloads = $releases->getTopDownloads();
+$topdownloads = Release::getTopDownloads();
 $page->smarty->assign('topdownloads', $topdownloads);
 
-$topcomments = $releases->getTopComments();
+$topcomments = Release::getTopComments();
 $page->smarty->assign('topcomments', $topcomments);
 
-$recent = $releases->getRecentlyAdded();
+$recent = Category::getRecentlyAdded();
 $page->smarty->assign('recent', $recent);
 
 $usersbymonth = User::getUsersByMonth();

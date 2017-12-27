@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ReleaseNfo;
 use App\Models\User;
 use nntmux\http\API;
 use nntmux\Releases;
@@ -270,7 +271,7 @@ switch ($function) {
 
         UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
         $rel = $releases->getByGuid($_GET['id']);
-        $data = $releases->getReleaseNfo($rel['id']);
+        $data = ReleaseNfo::getReleaseNfo($rel['id']);
 
         if ($rel !== false && ! empty($rel)) {
             if ($data !== false) {

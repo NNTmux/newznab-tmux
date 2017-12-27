@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Cache;
 use nntmux\SphinxSearch;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -208,5 +209,74 @@ class Release extends Model
     public static function getCatByRelId($id)
     {
         return self::query()->where('id', $id)->first(['categories_id']);
+    }
+
+    /**
+     * @param $videoId
+     * @return int
+     */
+    public static function removeVideoIdFromReleases($videoId): int
+    {
+        return self::query()->where('videos_id', $videoId)->update(['videos_id' => 0, 'tv_episodes_id' => 0]);
+    }
+
+    /**
+     * @param $anidbID
+     * @return int
+     */
+    public static function removeAnidbIdFromReleases($anidbID): int
+    {
+        return self::query()->where('anidbid', $anidbID)->update(['anidbid' => -1]);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     */
+    public static function getTopDownloads()
+    {
+        $releases = Cache::get('topdownloads');
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $releases = self::query()
+            ->where('grabs', '>', 0)
+            ->select(['id', 'searchname', 'guid', 'adddate'])
+            ->selectRaw('SUM(grabs) as grabs')
+            ->groupBy('id', 'searchname', 'adddate')
+            ->havingRaw('SUM(grabs) > 0')
+            ->orderBy('grabs', 'desc')
+            ->limit(10)
+            ->get();
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put('topdownloads', $releases, $expiresAt);
+
+        return $releases;
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     */
+    public static function getTopComments()
+    {
+        $comments = Cache::get('topcomments');
+        if ($comments !== null) {
+            return $comments;
+        }
+
+        $comments = self::query()
+            ->where('comments', '>', 0)
+            ->select(['id', 'guid', 'searchname'])
+            ->selectRaw('SUM(comments) AS comments')
+            ->groupBy('id', 'searchname', 'adddate')
+            ->havingRaw('SUM(comments) > 0')
+            ->orderBy('comments', 'desc')
+            ->limit(10)
+            ->get();
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put('topcomments', $comments, $expiresAt);
+
+        return $comments;
     }
 }

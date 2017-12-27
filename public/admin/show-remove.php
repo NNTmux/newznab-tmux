@@ -2,15 +2,14 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Releases;
+use App\Models\Release;
 
 $page = new AdminPage();
-$releases = new Releases(['Settings' => $page->pdo]);
 
 $success = false;
 
 if (isset($_GET['id'])) {
-    $success = $releases->removeVideoIdFromReleases($_GET['id']);
+    $success = Release::removeVideoIdFromReleases($_GET['id']);
     $page->smarty->assign('videoid', $_GET['id']);
 }
 

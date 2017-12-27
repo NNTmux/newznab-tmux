@@ -27,4 +27,19 @@ class ReleaseNfo extends Model
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
+
+    /**
+     * @param $id
+     * @param bool $getNfoString
+     * @return \Illuminate\Database\Eloquent\Model|null|static
+     */
+    public static function getReleaseNfo($id, $getNfoString = true)
+    {
+        $nfo = self::query()->where('releases_id', $id)->whereNotNull('nfo')->select(['releases_id']);
+        if ($getNfoString === true) {
+            $nfo->selectRaw('UNCOMPRESS(nfo) AS nfo');
+        }
+
+        return $nfo->first();
+    }
 }

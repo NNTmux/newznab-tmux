@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class Category extends Model
 {
@@ -44,5 +46,31 @@ class Category extends Model
     public function roleExcludedCategory()
     {
         return $this->belongsTo(RoleExcludedCategory::class, 'categories_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     */
+    public static function getRecentlyAdded()
+    {
+        $recent = Cache::get('recentlyadded');
+        if ($recent !== null) {
+            return $recent;
+        }
+
+        $recent = self::query()
+            ->where('r.adddate', '>', Carbon::now()->subWeek())
+            ->selectRaw('CONCAT(cp.title, " > ", categories.title) as title')
+            ->selectRaw('COUNT(r.id) as count')
+            ->join('categories as cp', 'cp.id', '=', 'categories.parentid')
+            ->join('releases as r', 'r.categories_id', '=', 'categories.id')
+            ->groupBy('title')
+            ->orderBy('count', 'desc')
+            ->get();
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put('recentlyadded', $recent, $expiresAt);
+
+        return $recent;
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ReleaseNfo;
 use App\Models\User;
 use nntmux\Releases;
 use nntmux\utility\Utility;
@@ -17,7 +18,7 @@ if (isset($_GET['id'])) {
         $page->show404();
     }
 
-    $nfo = $releases->getReleaseNfo($rel['id']);
+    $nfo = ReleaseNfo::getReleaseNfo($rel['id']);
     $nfo['nfoUTF'] = Utility::cp437toUTF($nfo['nfo']);
 
     $page->smarty->assign('rel', $rel);

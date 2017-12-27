@@ -2,15 +2,14 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Releases;
+use App\Models\Release;
 
 $page = new AdminPage();
-$releases = new Releases(['Settings' => $page->pdo]);
 
 $success = false;
 
 if (isset($_GET['id'])) {
-    $success = $releases->removeAnidbIdFromReleases($_GET['id']);
+    $success = Release::removeAnidbIdFromReleases($_GET['id']);
     $page->smarty->assign('anidbid', $_GET['id']);
 }
 $page->smarty->assign('success', $success);

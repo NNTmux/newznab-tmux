@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ReleaseNfo;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
@@ -41,7 +42,7 @@ if (isset($_GET['id'])) {
         $rc->addComment($data['id'], $data['gid'], $_POST['txtAddComment'], User::currentUserId(), $_SERVER['REMOTE_ADDR']);
     }
 
-    $nfo = $releases->getReleaseNfo($data['id']);
+    $nfo = ReleaseNfo::getReleaseNfo($data['id']);
     $reVideo = $re->getVideo($data['id']);
     $reAudio = $re->getAudio($data['id']);
     $reSubs = $re->getSubs($data['id']);
