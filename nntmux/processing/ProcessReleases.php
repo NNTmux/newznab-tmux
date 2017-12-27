@@ -607,7 +607,7 @@ class ProcessReleases
                             'searchname' => utf8_encode($cleanedName),
                             'totalpart' => $collection['totalfiles'],
                             'groups_id' => $collection['groups_id'],
-                            'guid' => $this->releases->createGUID(),
+                            'guid' => createGUID(),
                             'postdate' => $collection['date'],
                             'fromname' => $fromName,
                             'size' => $collection['filesize'],

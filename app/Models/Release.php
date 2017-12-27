@@ -151,37 +151,24 @@ class Release extends Model
     /**
      * Used for release edit page on site.
      *
-     * @param int    $ID
+     * @param int $ID
      * @param string $name
      * @param string $searchName
      * @param string $fromName
-     * @param int    $categoryID
-     * @param int    $parts
-     * @param int    $grabs
-     * @param int    $size
+     * @param int $categoryID
+     * @param int $parts
+     * @param int $grabs
+     * @param int $size
      * @param string $postedDate
      * @param string $addedDate
      * @param        $videoId
      * @param        $episodeId
-     * @param int    $imDbID
-     * @param int    $aniDbID
+     * @param int $imDbID
+     * @param int $aniDbID
+     * @throws \Exception
      */
-    public static function updateRelease(
-        $ID,
-        $name,
-        $searchName,
-        $fromName,
-        $categoryID,
-        $parts,
-        $grabs,
-        $size,
-        $postedDate,
-        $addedDate,
-        $videoId,
-        $episodeId,
-        $imDbID,
-        $aniDbID
-    ): void {
+    public static function updateRelease($ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbID, $aniDbID): void
+    {
         self::query()->where('id', $ID)->update(
             [
                 'name' => $name,

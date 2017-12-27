@@ -386,7 +386,7 @@ class NZBImport
     protected function insertNZB($nzbDetails): bool
     {
         // Make up a GUID for the release.
-        $this->relGuid = $this->releases->createGUID();
+        $this->relGuid = createGUID();
 
         // Remove part count from subject.
         $partLess = preg_replace('/(\(\d+\/\d+\))*$/', 'yEnc', $nzbDetails['subject']);
