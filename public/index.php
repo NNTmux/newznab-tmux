@@ -46,7 +46,6 @@ switch ($page->page) {
     case 'myshows':
     case 'mymovies':
     case 'mymoviesedit':
-    case 'newposterwall':
     case 'nfo':
     case 'nzbgetqueuedata':
     case 'post_edit':
