@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Release;
 use nntmux\Videos;
 use App\Models\User;
 use nntmux\Releases;
+use App\Models\Release;
 
 if (! User::isLoggedIn()) {
     $page->show403();

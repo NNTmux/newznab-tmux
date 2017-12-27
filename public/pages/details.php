@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Release;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
@@ -12,6 +11,7 @@ use nntmux\Videos;
 use nntmux\Console;
 use App\Models\User;
 use nntmux\Releases;
+use App\Models\Release;
 use App\Models\Settings;
 use nntmux\DnzbFailures;
 use nntmux\ReleaseExtra;
