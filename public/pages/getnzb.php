@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Release;
 use nntmux\NZB;
 use App\Models\User;
 use nntmux\Releases;
@@ -73,7 +74,7 @@ if (isset($_GET['zip']) && $_GET['zip'] === '1') {
     if (strlen($zip) > 0) {
         User::incrementGrabs($uid, count($guids));
         foreach ($guids as $guid) {
-            $rel->updateGrab($guid);
+            Release::updateGrab($guid);
             UserDownload::addDownloadRequest($uid, $guid);
 
             if (isset($_GET['del']) && (int) $_GET['del'] === 1) {
@@ -96,7 +97,7 @@ if (! file_exists($nzbPath)) {
 
 $relData = $rel->getByGuid($_GET['id']);
 if ($relData) {
-    $rel->updateGrab($_GET['id']);
+    Release::updateGrab($_GET['id']);
     UserDownload::addDownloadRequest($uid, $relData['id']);
     User::incrementGrabs($uid);
     if (isset($_GET['del']) && (int) $_GET['del'] === 1) {

@@ -1,4 +1,5 @@
 2017-12-27 DariusIII
+	* Chg: Move updateGrab, getById functions from Releases class to Release model (rename getById to getCatByRelId)
 	* Chg: Move createGUID function to helpers.php
 	* Chg: Update laravel/framework and nikic/php-parser to latest versions
 2017-12-26 DariusIII

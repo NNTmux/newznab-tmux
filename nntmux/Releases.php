@@ -33,11 +33,6 @@ class Releases
     public $groups;
 
     /**
-     * @var bool
-     */
-    public $updateGrabs;
-
-    /**
      * @var \nntmux\ReleaseSearch
      */
     public $releaseSearch;
@@ -76,7 +71,6 @@ class Releases
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
-        $this->updateGrabs = ((int) Settings::settingValue('..grabstatus') !== 0);
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch($this->pdo);
         $this->category = new Category(['Settings' => $this->pdo]);
@@ -1200,7 +1194,7 @@ class Releases
     public function searchSimilar($currentID, $name, $limit = 6, array $excludedCats = []): array
     {
         // Get the category for the parent of this release.
-        $currRow = $this->getById($currentID);
+        $currRow = Release::getCatByRelId($currentID);
         $catRow = (new Category(['Settings' => $this->pdo]))->getById($currRow['categories_id']);
         $parentCat = $catRow['parentid'];
 
@@ -1339,15 +1333,6 @@ class Releases
 
     /**
      * @param $id
-     * @return \Illuminate\Database\Eloquent\Model|null|static
-     */
-    public function getById($id)
-    {
-        return Release::query()->where('id', $id)->first(['categories_id']);
-    }
-
-    /**
-     * @param $id
      * @param bool $getNfoString
      * @return \Illuminate\Database\Eloquent\Model|null|static
      */
@@ -1359,16 +1344,6 @@ class Releases
         }
 
         return $nfo->first();
-    }
-
-    /**
-     * @param string $guid
-     */
-    public function updateGrab($guid): void
-    {
-        if ($this->updateGrabs) {
-            Release::query()->where('guid', $guid)->increment('grabs');
-        }
     }
 
     /**

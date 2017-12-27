@@ -188,4 +188,25 @@ class Release extends Model
         );
         (new SphinxSearch())->updateRelease($ID);
     }
+
+    /**
+     * @param string $guid
+     * @throws \Exception
+     */
+    public static function updateGrab($guid): void
+    {
+        $updateGrabs = ((int) Settings::settingValue('..grabstatus') !== 0);
+        if ($updateGrabs) {
+            self::query()->where('guid', $guid)->increment('grabs');
+        }
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Model|null|static
+     */
+    public static function getCatByRelId($id)
+    {
+        return self::query()->where('id', $id)->first(['categories_id']);
+    }
 }
