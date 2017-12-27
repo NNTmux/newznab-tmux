@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\ReleaseNfo;
 use App\Models\User;
 use nntmux\http\API;
 use nntmux\Releases;
 use App\Models\Settings;
+use App\Models\ReleaseNfo;
 use App\Models\UserRequest;
 use nntmux\utility\Utility;
 
