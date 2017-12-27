@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Models\Category;
-use App\Models\Release;
 use App\Models\User;
+use App\Models\Release;
+use App\Models\Category;
 use App\Models\UserRole;
 
 $page = new AdminPage();

@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\ReleaseNfo;
 use App\Models\User;
 use nntmux\Releases;
+use App\Models\ReleaseNfo;
 use nntmux\utility\Utility;
 
 $releases = new Releases;
