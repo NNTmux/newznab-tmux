@@ -33,7 +33,7 @@ switch ($action) {
             $_POST['anidbid']
         );
 
-        $release = $releases->getByGuid($_POST['guid']);
+        $release = Release::getByGuid($_POST['guid']);
         $page->smarty->assign('release', $release);
 
         header('Location:'.WWW_TOP.'/../details/'.$release['guid']);
@@ -43,7 +43,7 @@ switch ($action) {
     default:
         $page->title = 'Release Edit';
         $id = $_GET['id'];
-        $release = $releases->getByGuid($id);
+        $release = Release::getByGuid($id);
         $page->smarty->assign('release', $release);
         break;
 }

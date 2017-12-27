@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Release;
 use nntmux\Category;
 use nntmux\Releases;
 
@@ -14,7 +15,7 @@ $action = $_REQUEST['action'] ?? '';
 if (isset($_REQUEST['id']) && is_array($_REQUEST['id'])) {
     $id = $_REQUEST['id'];
     //Get info for first guid to populate form
-    $rel = $releases->getByGuid($_REQUEST['id'][0]);
+    $rel = Release::getByGuid($_REQUEST['id'][0]);
 } else {
     $id = $rel = '';
 }

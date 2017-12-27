@@ -1,11 +1,10 @@
 <?php
 
+use App\Models\Release;
 use nntmux\NZB;
 use nntmux\db\DB;
 use App\Models\User;
-use nntmux\Releases;
 
-$releases = new Releases;
 $pdo = new DB();
 $nzb = new NZB($pdo);
 
@@ -14,7 +13,7 @@ if (! User::isLoggedIn()) {
 }
 
 if (isset($_GET['id'])) {
-    $rel = $releases->getByGuid($_GET['id']);
+    $rel = Release::getByGuid($_GET['id']);
     if (! $rel) {
         $page->show404();
     }

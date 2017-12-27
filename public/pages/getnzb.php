@@ -95,7 +95,7 @@ if (! file_exists($nzbPath)) {
     Utility::showApiError(300, 'NZB file not found!');
 }
 
-$relData = $rel->getByGuid($_GET['id']);
+$relData = Release::getByGuid($_GET['id']);
 if ($relData) {
     Release::updateGrab($_GET['id']);
     UserDownload::addDownloadRequest($uid, $relData['id']);

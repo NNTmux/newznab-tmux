@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Release;
 use nntmux\Videos;
 use App\Models\User;
 use nntmux\Releases;
@@ -13,7 +14,7 @@ if (! isset($_REQUEST['id'])) {
 }
 
 $r = new Releases();
-$rel = $r->getByGuid($_REQUEST['id']);
+$rel = Release::getByGuid($_REQUEST['id']);
 
 if (! $rel) {
     echo 'No tv info';

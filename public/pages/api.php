@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Release;
 use App\Models\User;
 use nntmux\http\API;
 use nntmux\Releases;
@@ -229,7 +230,7 @@ switch ($function) {
     case 'g':
         $api->verifyEmptyParameter('g');
         UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $relData = $releases->getByGuid($_GET['id']);
+        $relData = Release::getByGuid($_GET['id']);
         if ($relData) {
             header(
                 'Location:'.
@@ -254,7 +255,7 @@ switch ($function) {
         }
 
         UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $data = $releases->getByGuid($_GET['id']);
+        $data = Release::getByGuid($_GET['id']);
 
         $relData = [];
         if ($data) {
@@ -270,7 +271,7 @@ switch ($function) {
         }
 
         UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $rel = $releases->getByGuid($_GET['id']);
+        $rel = Release::getByGuid($_GET['id']);
         $data = ReleaseNfo::getReleaseNfo($rel['id']);
 
         if ($rel !== false && ! empty($rel)) {

@@ -1112,7 +1112,7 @@ class Releases
         $parentCat = $catRow['parentid'];
 
         $results = $this->search(
-            $this->getSimilarName($name),
+            getSimilarName($name),
             -1,
             -1,
             -1,
@@ -1146,57 +1146,6 @@ class Releases
     }
 
     /**
-     * @param string $name
-     *
-     * @return string
-     */
-    public function getSimilarName($name): string
-    {
-        return implode(' ', \array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
-    }
-
-    /**
-     * @param $guid
-     * @return array|bool
-     */
-    public function getByGuid($guid)
-    {
-        if (\is_array($guid)) {
-            $tempGuids = [];
-            foreach ($guid as $identifier) {
-                $tempGuids[] = $this->pdo->escapeString($identifier);
-            }
-            $gSql = sprintf('r.guid IN (%s)', implode(',', $tempGuids));
-        } else {
-            $gSql = sprintf('r.guid = %s', $this->pdo->escapeString($guid));
-        }
-        $sql = sprintf(
-            "SELECT r.*,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
-				GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names,
-				g.name AS group_name,
-				v.title AS showtitle, v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.source,
-				tvi.summary, tvi.image,
-				tve.title, tve.firstaired, tve.se_complete
-				FROM releases r
-			LEFT JOIN groups g ON g.id = r.groups_id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id
-			LEFT OUTER JOIN tv_info tvi ON r.videos_id = tvi.videos_id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT OUTER JOIN releases_groups rg ON r.id = rg.releases_id
-			LEFT OUTER JOIN groups g2 ON rg.groups_id = g2.id
-			WHERE %s
-			GROUP BY r.id",
-            $gSql
-        );
-
-        return \is_array($guid) ? $this->pdo->query($sql) : $this->pdo->queryOneRow($sql);
-    }
-
-    /**
      * @param array $guids
      * @return string
      * @throws \Exception
@@ -1214,7 +1163,7 @@ class Releases
 
                 if ($nzbContents) {
                     $filename = $guid;
-                    $r = $this->getByGuid($guid);
+                    $r = Release::getByGuid($guid);
                     if ($r) {
                         $filename = $r['searchname'];
                     }

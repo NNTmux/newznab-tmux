@@ -1,18 +1,16 @@
 <?php
 
+use App\Models\Release;
 use App\Models\User;
-use nntmux\Releases;
 use App\Models\ReleaseNfo;
 use nntmux\utility\Utility;
-
-$releases = new Releases;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 if (isset($_GET['id'])) {
-    $rel = $releases->getByGuid($_GET['id']);
+    $rel = Release::getByGuid($_GET['id']);
 
     if (! $rel) {
         $page->show404();

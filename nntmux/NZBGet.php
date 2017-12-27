@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Release;
 use nntmux\db\DB;
 use GuzzleHttp\Client;
 use nntmux\utility\Utility;
@@ -103,7 +104,7 @@ class NZBGet
      */
     public function sendNZBToNZBGet($guid)
     {
-        $relData = $this->releases->getByGuid($guid);
+        $relData = Release::getByGuid($guid);
 
         $gzipFile = Utility::unzipGzipFile($this->nzb->NZBPath($guid));
         $string = $gzipFile === false ? '' : $gzipFile;
@@ -147,7 +148,7 @@ class NZBGet
      */
     public function sendURLToNZBGet($guid)
     {
-        $reldata = $this->releases->getByGuid($guid);
+        $reldata = Release::getByGuid($guid);
 
         $header =
             '<?xml version="1.0"?>

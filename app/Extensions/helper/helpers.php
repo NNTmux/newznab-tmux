@@ -173,4 +173,16 @@ if (! function_exists('makeFieldLinks')) {
             return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
         }
     }
+
+    if (! function_exists('getSimilarName')) {
+        /**
+         * @param string $name
+         *
+         * @return string
+         */
+        function getSimilarName($name): string
+        {
+            return implode(' ', \array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
+        }
+    }
 }

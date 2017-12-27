@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Release;
 use App\Models\User;
 
 if (! User::isLoggedIn()) {
@@ -12,7 +13,7 @@ use App\Models\UsersRelease;
 if (isset($_GET['add'])) {
     $releases = new Releases(['Settings' => $page->settings]);
     $guids = explode(',', $_GET['add']);
-    $data = $releases->getByGuid($guids);
+    $data = Release::getByGuid($guids);
 
     if (! $data) {
         $page->show404();

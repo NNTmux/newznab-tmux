@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Release;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
@@ -28,7 +29,7 @@ if (isset($_GET['id'])) {
     $rc = new ReleaseComments;
     $re = new ReleaseExtra;
     $df = new DnzbFailures();
-    $data = $releases->getByGuid($_GET['id']);
+    $data = Release::getByGuid($_GET['id']);
     $user = User::getById(User::currentUserId());
     $cpapi = $user['cp_api'];
     $cpurl = $user['cp_url'];
@@ -154,7 +155,7 @@ if (isset($_GET['id'])) {
     $page->smarty->assign('book', $book);
     $page->smarty->assign('predb', $pre);
     $page->smarty->assign('comments', $comments);
-    $page->smarty->assign('searchname', $releases->getSimilarName($data['searchname']));
+    $page->smarty->assign('searchname', getSimilarName($data['searchname']));
     $page->smarty->assign('similars', $similars);
     $page->smarty->assign('privateprofiles', (int) Settings::settingValue('..privateprofiles') === 1);
     $page->smarty->assign('failed', $failed);
