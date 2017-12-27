@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\Cache;
+use nntmux\NZB;
 use nntmux\SphinxSearch;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -278,5 +279,91 @@ class Release extends Model
         Cache::put('topcomments', $comments, $expiresAt);
 
         return $comments;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getReleases(): array
+    {
+        $result = Cache::get('releaseget');
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = self::query()
+            ->where('nzbstatus', '=', NZB::NZB_ADDED)
+            ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
+            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
+            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
+            ->get();
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        Cache::put('releaseget', $result, $expiresAt);
+
+        return $result;
+    }
+
+    /**
+     * Used for admin page release-list.
+     *
+     *
+     * @param $start
+     * @param $num
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     */
+    public static function getReleasesRange($start, $num)
+    {
+        $range = Cache::get(md5($start.$num));
+        if ($range !== null) {
+            return $range;
+        }
+        $query = self::query()
+            ->where('nzbstatus', '=', NZB::NZB_ADDED)
+            ->select(
+                [
+                    'releases.id',
+                    'releases.name',
+                    'releases.searchname',
+                    'releases.size',
+                    'releases.guid',
+                    'releases.totalpart',
+                    'releases.postdate',
+                    'releases.adddate',
+                    'releases.grabs',
+                ]
+            )
+            ->selectRaw('CONCAT(cp.title, ' > ', c.title) AS category_name')
+            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->orderBy('releases.postdate', 'desc');
+        if ($start !== false) {
+            $query->limit($num)->offset($start);
+        }
+
+        $range = $query->get();
+
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::put(md5($start.$num), $range, $expiresAt);
+
+        return $range;
+    }
+
+    /**
+     * Get count for admin release list page.
+     *
+     * @return int
+     */
+    public static function getReleasesCount(): int
+    {
+        $res = Cache::get('count');
+        if ($res !== null) {
+            return $res;
+        }
+        $res = self::query()->count(['id']);
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        Cache::put('count', $res, $expiresAt);
+
+        return $res ?? 0;
     }
 }

@@ -77,74 +77,6 @@ class Releases
     }
 
     /**
-     * @return array
-     */
-    public function get(): array
-    {
-        $result = Cache::get('releaseget');
-        if ($result !== null) {
-            return $result;
-        }
-
-        $result = Release::query()
-            ->where('nzbstatus', '=', NZB::NZB_ADDED)
-            ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
-            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
-            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
-            ->get();
-
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put('releaseget', $result, $expiresAt);
-
-        return $result;
-    }
-
-    /**
-     * Used for admin page release-list.
-     *
-     *
-     * @param $start
-     * @param $num
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
-     */
-    public function getRange($start, $num)
-    {
-        $range = Cache::get('releasesrange');
-        if ($range !== null) {
-            return $range;
-        }
-        $query = Release::query()
-            ->where('nzbstatus', '=', NZB::NZB_ADDED)
-            ->select(
-            [
-                'releases.id',
-                'releases.name',
-                'releases.searchname',
-                'releases.size',
-                'releases.guid',
-                'releases.totalpart',
-                'releases.postdate',
-                'releases.adddate',
-                'releases.grabs',
-            ]
-            )
-            ->selectRaw('CONCAT(cp.title, ' > ', c.title) AS category_name')
-            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->orderBy('releases.postdate', 'desc');
-        if ($start !== false) {
-            $query->limit($num)->offset($start);
-        }
-
-        $range = $query->get();
-
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::put('releasesrange', $range, $expiresAt);
-
-        return $range;
-    }
-
-    /**
      * Used for pager on browse page.
      *
      * @param array  $cat
@@ -595,24 +527,6 @@ class Releases
                 ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
             )
         );
-    }
-
-    /**
-     * Get count for admin release list page.
-     *
-     * @return int
-     */
-    public function getCount(): int
-    {
-        $res = Cache::get('count');
-        if ($res !== null) {
-            return $res;
-        }
-        $res = Release::query()->count(['id']);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::put('count', $res, $expiresAt);
-
-        return $res ?? 0;
     }
 
     /**

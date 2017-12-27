@@ -1,4 +1,5 @@
 2017-12-27 DariusIII
+	* Chg: Move some more functions from Releases class to appropriate models
 	* Chg: Remove newposterwall feature
 	* Chg: Move more functions from Releases to appropriate models
 	* Chg: Move updateGrab, getById functions from Releases class to Release model (rename getById to getCatByRelId)
