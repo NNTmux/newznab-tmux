@@ -84,8 +84,6 @@
 								<li><a><i class="fa fa-home"></i><span> Browse</span> <span
 												class="fa fa-chevron-down"></span></a>
 									<ul class="nav child_menu" style="display: none">
-										<li><a href="{$smarty.const.WWW_TOP}/newposterwall"><i
-														class="fa fa-fire"></i><span> New Releases</span></a></li>
 										<li><a href="{$smarty.const.WWW_TOP}/console"><i
 														class="fa fa-gamepad"></i><span> Console</span></a></li>
 										<li><a href="{$smarty.const.WWW_TOP}/movies"><i

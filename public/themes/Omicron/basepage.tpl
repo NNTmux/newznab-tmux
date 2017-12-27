@@ -204,8 +204,6 @@
 					<li class="treeview">
 						<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
 						<ul class="treeview-menu">
-							<li><a href="{$smarty.const.WWW_TOP}/newposterwall"><i
-											class="fa fa-fire"></i><span> New Releases</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/console"><i
 											class="fa fa-gamepad"></i><span> Console</span></a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/movies"><i

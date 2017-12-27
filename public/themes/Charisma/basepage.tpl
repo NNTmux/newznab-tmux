@@ -92,8 +92,6 @@
 							<li class="accordion">
 								<a href="#"><i class="zmdi zmdi-view-list-alt"></i><span> Browse</span></a>
 								<ul class="nav nav-pills nav-stacked">
-									<li><a href="{$smarty.const.WWW_TOP}/newposterwall"><i
-													class="zmdi zmdi-fire"></i><span> New Releases</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/console"><i
 													class="zmdi zmdi-xbox"></i><span> Console</span></a></li>
 									<li><a href="{$smarty.const.WWW_TOP}/movies"><i
