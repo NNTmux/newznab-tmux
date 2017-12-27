@@ -1,4 +1,5 @@
 2017-12-27 DariusIII
+	* Fix: Fix loading of User model in browsegroup page
 	* Chg: Move some more functions from Releases class to appropriate models
 	* Chg: Remove newposterwall feature
 	* Chg: Move more functions from Releases to appropriate models
