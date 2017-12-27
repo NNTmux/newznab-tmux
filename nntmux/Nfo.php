@@ -302,6 +302,8 @@ class Nfo
                 $qry = Release::query()
                     ->select(['nfostatus as status'])
                     ->selectRaw('COUNT(id) as count')
+                    ->where('nzbstatus', '=', NZB::NZB_ADDED)
+                    ->whereBetween('nfostatus', [$maxRetries, self::NFO_UNPROC])
                     ->groupBy('nfostatus')
                     ->orderBy('nfostatus');
 
