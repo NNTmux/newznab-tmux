@@ -374,13 +374,14 @@ class Release extends Model
     public static function getByGuid($guid)
     {
         $sql = self::query()
-            ->select(['releases.*, g.name as group_name, v.title as showtitle, v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.source, tvi.summary, tvi.image, tve.title, tve.firstaired, tve.se_complete'])
+            ->select(['releases.*', 'g.name as group_name', 'v.title as showtitle', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.source', 'tvi.summary', 'tvi.image', 'tve.title', 'tve.firstaired', 'tve.se_complete'])
             ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names")
             ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
             ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
             ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
             ->leftJoin('videos as v', 'v.id', '=', 'releases.videos_id')
-            ->leftJoin('tv_info as tvi', 'tve.id', '=', 'releases.tv_episodes_id')
+            ->leftJoin('tv_info as tvi', 'tvi.videos_id', '=', 'releases.videos_id')
+            ->leftJoin('tv_episodes as tve', 'tve.id', '=', 'releases.tv_episodes_id')
             ->leftJoin('releases_groups as rg', 'rg.releases_id', '=', 'releases.id')
             ->leftJoin('groups as g2', 'rg.groups_id', '=', 'g2.id');
 
@@ -394,6 +395,6 @@ class Release extends Model
             $sql->where('releases.guid', '=', $guid);
         }
 
-        return \is_array($guid) ? $sql->groupBy(['releases.id'])->get() : $sql->groupBy(['releases.id'])->first();
+        return \is_array($guid) ? $sql->groupBy('releases.id')->get() : $sql->groupBy('releases.id')->first();
     }
 }

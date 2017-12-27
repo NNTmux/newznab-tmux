@@ -1,4 +1,5 @@
 2017-12-27 DariusIII
+	* Fix: Fix getByGuid function query
 	* Chg: Move more functions from Releases class to appropriate models and helpers.php
 	* Fix: Fix loading of User model in browsegroup page
 	* Chg: Move some more functions from Releases class to appropriate models
