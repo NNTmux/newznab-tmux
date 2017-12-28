@@ -1,4 +1,5 @@
 2017-12-28 DariusIII
+	* Chg: Remove unused DnzbFailures class use statements
 	* Chg: Remove DnzbFailures class and move its functions into appropriate models
 	* Chg: Remove nntmux\ReleaseFiles class and use ReleaseFile model
 2017-12-27 DariusIII

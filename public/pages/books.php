@@ -3,7 +3,6 @@
 use nntmux\Books;
 use App\Models\User;
 use nntmux\Category;
-use nntmux\DnzbFailures;
 
 if (! User::isLoggedIn()) {
     $page->show403();
@@ -11,7 +10,6 @@ if (! User::isLoggedIn()) {
 
 $book = new Books(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
-$fail = new DnzbFailures();
 
 $boocats = $cat->getChildren(Category::BOOKS_ROOT);
 $btmp = [];

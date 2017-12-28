@@ -4,7 +4,6 @@ use nntmux\Genres;
 use nntmux\Console;
 use App\Models\User;
 use nntmux\Category;
-use nntmux\DnzbFailures;
 
 if (! User::isLoggedIn()) {
     $page->show403();
@@ -13,7 +12,6 @@ if (! User::isLoggedIn()) {
 $console = new Console(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
-$fail = new DnzbFailures();
 
 $concats = $cat->getChildren(Category::GAME_ROOT);
 $ctmp = [];

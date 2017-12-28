@@ -3,7 +3,6 @@
 use nntmux\XXX;
 use App\Models\User;
 use nntmux\Category;
-use nntmux\DnzbFailures;
 
 if (! User::isLoggedIn()) {
     $page->show403();
@@ -11,7 +10,6 @@ if (! User::isLoggedIn()) {
 
 $movie = new XXX();
 $cat = new Category();
-$fail = new DnzbFailures();
 
 $moviecats = $cat->getChildren(Category::XXX_ROOT);
 $mtmp = [];

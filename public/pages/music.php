@@ -4,7 +4,6 @@ use nntmux\Music;
 use nntmux\Genres;
 use App\Models\User;
 use nntmux\Category;
-use nntmux\DnzbFailures;
 
 if (! User::isLoggedIn()) {
     $page->show403();
@@ -13,7 +12,6 @@ if (! User::isLoggedIn()) {
 $music = new Music(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
-$fail = new DnzbFailures();
 
 $musiccats = $cat->getChildren(Category::MUSIC_ROOT);
 $mtmp = [];

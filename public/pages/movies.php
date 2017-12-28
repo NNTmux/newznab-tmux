@@ -3,11 +3,9 @@
 use nntmux\Movie;
 use App\Models\User;
 use nntmux\Category;
-use nntmux\DnzbFailures;
 
 $movie = new Movie(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
-$fail = new DnzbFailures();
 
 if (! User::isLoggedIn()) {
     $page->show403();
