@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Release;
 use App\Models\User;
+use App\Models\Release;
 
 // Page is accessible only by the rss token, or logged in users.
 if (User::isLoggedIn()) {
