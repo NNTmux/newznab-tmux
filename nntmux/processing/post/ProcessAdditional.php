@@ -2,7 +2,6 @@
 
 namespace nntmux\processing\post;
 
-use App\Models\ReleaseFile;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
@@ -18,6 +17,7 @@ use App\Models\Settings;
 use nntmux\ReleaseExtra;
 use nntmux\ReleaseImage;
 use nntmux\SphinxSearch;
+use App\Models\ReleaseFile;
 use nntmux\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
 use dariusiii\rarinfo\ArchiveInfo;
@@ -1214,7 +1214,7 @@ class ProcessAdditional
              * Also make sure we don't add too many files, some releases have 100's of files, like PS3 releases.
              */
             if ($this->_addedFileInfo < 11 && ReleaseFile::query()->where(['releases_id' => $this->_release['id'], 'name' => $file['name'], 'size' => $file
-                ['size']])->first() === null) {
+                ['size'], ])->first() === null) {
                 if (ReleaseFile::addReleaseFiles($this->_release['id'], $file['name'], '', $file['size'], $file['date'], $file['pass'])) {
                     $this->_addedFileInfo++;
 
