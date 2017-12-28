@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\ReleaseFile;
 use App\Models\User;
+use App\Models\ReleaseFile;
 
 if (! User::isLoggedIn()) {
     $page->show403();

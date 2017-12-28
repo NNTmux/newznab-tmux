@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\ReleaseFile;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
@@ -17,6 +16,7 @@ use App\Models\Settings;
 use nntmux\DnzbFailures;
 use nntmux\ReleaseExtra;
 use App\Models\ReleaseNfo;
+use App\Models\ReleaseFile;
 use nntmux\ReleaseComments;
 use App\Models\ReleaseRegex;
 
