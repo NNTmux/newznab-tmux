@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use nntmux\NZB;
 use nntmux\SphinxSearch;
 use Illuminate\Support\Carbon;
@@ -396,5 +397,57 @@ class Release extends Model
         }
 
         return \is_array($guid) ? $sql->groupBy('releases.id')->get() : $sql->groupBy('releases.id')->first();
+    }
+
+    /**
+     * Get a range of releases. used in admin manage list.
+     *
+     *
+     * @param $start
+     * @param $num
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     */
+    public static function getFailedRange($start, $num)
+    {
+        $failedList = self::query()
+            ->select(['name', 'searchname', 'size', 'guid', 'totalpart', 'postdate', 'adddate', 'grabs', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name")])
+            ->rightJoin('dnzb_failures', 'dnzb_failures.release_id', '=', 'releases.id')
+            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
+            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
+            ->orderBy('postdate', 'desc');
+        if ($start !== false) {
+            $failedList->limit($num)->offset($start);
+        }
+
+        return $failedList->get();
+    }
+
+    /**
+     * Retrieve alternate release with same or similar searchname.
+     *
+     *
+     * @param $guid
+     * @param $userid
+     * @return bool|\Illuminate\Database\Eloquent\Model|null|static
+     */
+    public static function getAlternate($guid, $userid)
+    {
+        $rel = self::query()->where('guid', $guid)->first(['id', 'searchname', 'categories_id']);
+
+        if ($rel === null) {
+            return false;
+        }
+        DnzbFailure::insertIgnore(['release_id' => $rel['id'], 'users_id' => $userid, 'failed' => 1]);
+
+        $alternate = self::query()
+            ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')
+            ->where('searchname', 'LIKE', $rel['searchname'])
+            ->where('df.release_id', '=', null)
+            ->where('categories_id', $rel['categories_id'])
+            ->where('id', $rel['id'])
+            ->orderBy('postdate', 'desc')
+            ->first(['guid']);
+
+        return $alternate;
     }
 }

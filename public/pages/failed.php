@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\Release;
 use App\Models\User;
-use nntmux\DnzbFailures;
 
 // Page is accessible only by the rss token, or logged in users.
 if (User::isLoggedIn()) {
@@ -26,7 +26,7 @@ if (User::isLoggedIn()) {
 }
 
 if (isset($_GET['guid'], $uid, $rssToken) && is_numeric($uid)) {
-    $alt = (new DnzbFailures())->getAlternate($_GET['guid'], $uid);
+    $alt = Release::getAlternate($_GET['guid'], $uid);
     if ($alt === null) {
         header('X-DNZB-RCode: 404');
         header('X-DNZB-RText: No NZB found for alternate match.');

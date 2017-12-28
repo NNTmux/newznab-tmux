@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\DnzbFailure;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
@@ -13,7 +14,6 @@ use App\Models\User;
 use nntmux\Releases;
 use App\Models\Release;
 use App\Models\Settings;
-use nntmux\DnzbFailures;
 use nntmux\ReleaseExtra;
 use App\Models\ReleaseNfo;
 use App\Models\ReleaseFile;
@@ -28,7 +28,6 @@ if (isset($_GET['id'])) {
     $releases = new Releases(['Settings' => $page->settings]);
     $rc = new ReleaseComments;
     $re = new ReleaseExtra;
-    $df = new DnzbFailures();
     $data = Release::getByGuid($_GET['id']);
     $user = User::getById(User::currentUserId());
     $cpapi = $user['cp_api'];
@@ -54,7 +53,7 @@ if (isset($_GET['id'])) {
         6,
         $page->userdata['categoryexclusions']
     );
-    $failed = $df->getFailedCount($data['id']);
+    $failed = DnzbFailure::getFailedCount($data['id']);
 
     $showInfo = '';
     if ($data['videos_id'] > 0) {
