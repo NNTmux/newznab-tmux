@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\ReleaseFile;
 use App\Models\User;
-use nntmux\ReleaseFiles;
 
 if (! User::isLoggedIn()) {
     $page->show403();
@@ -11,8 +11,7 @@ if (! isset($_REQUEST['id'])) {
     $page->show404();
 }
 
-$rf = new ReleaseFiles();
-$files = $rf->getByGuid($_REQUEST['id']);
+$files = ReleaseFile::getByGuid($_REQUEST['id']);
 
 if (count($files) === 0) {
     echo 'No files';

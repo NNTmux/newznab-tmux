@@ -1,3 +1,5 @@
+2017-12-28 DariusIII
+	* Chg: Remove nntmux\ReleaseFiles class and use ReleaseFile model
 2017-12-27 DariusIII
 	* Chg: Remove links to newposterwall from all themes
 	* Fix: Fix $nfoStats query

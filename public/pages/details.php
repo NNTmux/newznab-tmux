@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ReleaseFile;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
@@ -15,7 +16,6 @@ use App\Models\Release;
 use App\Models\Settings;
 use nntmux\DnzbFailures;
 use nntmux\ReleaseExtra;
-use nntmux\ReleaseFiles;
 use App\Models\ReleaseNfo;
 use nntmux\ReleaseComments;
 use App\Models\ReleaseRegex;
@@ -136,8 +136,7 @@ if (isset($_GET['id'])) {
     $preDb = new PreDb();
     $pre = $preDb->getForRelease($data['predb_id']);
 
-    $rf = new ReleaseFiles;
-    $releasefiles = $rf->get($data['id']);
+    $releasefiles = ReleaseFile::getReleaseFiles($data['id']);
 
     $page->smarty->assign('releasefiles', $releasefiles);
     $page->smarty->assign('release', $data);

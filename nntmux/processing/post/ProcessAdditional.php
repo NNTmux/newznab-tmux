@@ -2,6 +2,7 @@
 
 namespace nntmux\processing\post;
 
+use App\Models\ReleaseFile;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
@@ -15,7 +16,6 @@ use nntmux\Categorize;
 use App\Models\Release;
 use App\Models\Settings;
 use nntmux\ReleaseExtra;
-use nntmux\ReleaseFiles;
 use nntmux\ReleaseImage;
 use nntmux\SphinxSearch;
 use nntmux\utility\Utility;
@@ -169,11 +169,6 @@ class ProcessAdditional
      * @var \nntmux\NNTP
      */
     protected $_nntp;
-
-    /**
-     * @var \nntmux\ReleaseFiles
-     */
-    protected $_releaseFiles;
 
     /**
      * @var \nntmux\Categorize
@@ -395,7 +390,6 @@ class ProcessAdditional
             'NNTP'         => null,
             'NZB'          => null,
             'ReleaseExtra' => null,
-            'ReleaseFiles' => null,
             'ReleaseImage' => null,
             'Settings'     => null,
             'SphinxSearch' => null,
@@ -410,7 +404,6 @@ class ProcessAdditional
         $this->_nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
         $this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
         $this->_archiveInfo = new ArchiveInfo();
-        $this->_releaseFiles = ($options['ReleaseFiles'] instanceof ReleaseFiles ? $options['ReleaseFiles'] : new ReleaseFiles($this->pdo));
         $this->_categorize = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
         $this->_nameFixer = ($options['NameFixer'] instanceof NameFixer ? $options['NameFixer'] : new NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => $this->_groups, 'Settings' => $this->pdo, 'Categorize' => $this->_categorize]));
         $this->_releaseExtra = ($options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra($this->pdo));
@@ -519,7 +512,9 @@ class ProcessAdditional
     /**
      * @param string $groupID
      * @param string $guidChar
+     * @throws \RuntimeException
      * @throws \nntmux\processing\post\ProcessAdditionalException
+     * @throws \Exception
      */
     public function start($groupID = '', $guidChar = '')
     {
@@ -672,6 +667,9 @@ class ProcessAdditional
 
     /**
      * Loop through the releases, processing them 1 at a time.
+     *
+     * @throws \RuntimeException
+     * @throws \Exception
      */
     protected function _processReleases()
     {
@@ -762,7 +760,7 @@ class ProcessAdditional
                 $this->_recursivePathDelete($file, $ignoredFolders);
             }
 
-            if (\in_array($path, $ignoredFolders)) {
+            if (\in_array($path, $ignoredFolders, false)) {
                 return;
             }
 
@@ -983,7 +981,9 @@ class ProcessAdditional
             // TODO change this to max calculated size, as segments vary in size greatly.
             if ($downloaded >= $this->_maximumRarSegments) {
                 break;
-            } elseif ($failed >= $this->_maximumRarPasswordChecks) {
+            }
+
+            if ($failed >= $this->_maximumRarPasswordChecks) {
                 break;
             }
 
@@ -1011,7 +1011,7 @@ class ProcessAdditional
                 $segment = (string) $nzbFile['segments'][$i];
                 if (! $this->_reverse) {
                     $this->_triedCompressedMids[] = $segment;
-                } elseif (\in_array($segment, $this->_triedCompressedMids)) {
+                } elseif (\in_array($segment, $this->_triedCompressedMids, false)) {
                     // We already downloaded this file.
                     continue 2;
                 }
@@ -1058,6 +1058,7 @@ class ProcessAdditional
      * @param string $compressedData
      *
      * @return bool
+     * @throws \Exception
      */
     protected function _processCompressedData(&$compressedData)
     {
@@ -1133,7 +1134,7 @@ class ProcessAdditional
      * @return bool
      * @throws \Exception
      */
-    protected function _processCompressedFileList()
+    protected function _processCompressedFileList(): bool
     {
         // Get a list of files inside the Compressed file.
         $files = $this->_archiveInfo->getArchiveFileList();
@@ -1174,7 +1175,7 @@ class ProcessAdditional
 
                 if ($this->_extractUsingRarInfo === true) {
                     // Extract files from the rar.
-                    if (isset($file['compressed']) && $file['compressed'] == 0) {
+                    if (isset($file['compressed']) && (int) $file['compressed'] === 0) {
                         @file_put_contents(
                             $this->tmpPath.random_int(10, 999999).'_'.$fileName,
                             $this->_archiveInfo->getFileData($file['name'], $file['source'])
@@ -1198,7 +1199,7 @@ class ProcessAdditional
      * @param $file
      * @throws \Exception
      */
-    protected function _addFileInfo(&$file)
+    protected function _addFileInfo(&$file): void
     {
         // Don't add rar/zip files to the DB.
         if (! isset($file['error']) && isset($file['source']) &&
@@ -1212,21 +1213,9 @@ class ProcessAdditional
             /* Check if we already have the file or not.
              * Also make sure we don't add too many files, some releases have 100's of files, like PS3 releases.
              */
-            if ($this->_addedFileInfo < 11 &&
-                $this->pdo->queryOneRow(
-                    sprintf(
-                        '
-						SELECT releases_id FROM release_files
-						WHERE releases_id = %d
-						AND name = %s
-						AND size = %d',
-                        $this->_release['id'],
-                        $this->pdo->escapeString($file['name']),
-                        $file['size']
-                    )
-                ) === false
-            ) {
-                if ($this->_releaseFiles->add($this->_release['id'], $file['name'], '', $file['size'], $file['date'], $file['pass'])) {
+            if ($this->_addedFileInfo < 11 && ReleaseFile::query()->where(['releases_id' => $this->_release['id'], 'name' => $file['name'], 'size' => $file
+                ['size']])->first() === null) {
+                if (ReleaseFile::addReleaseFiles($this->_release['id'], $file['name'], '', $file['size'], $file['date'], $file['pass'])) {
                     $this->_addedFileInfo++;
 
                     if ($this->_echoCLI) {
@@ -1612,19 +1601,11 @@ class ProcessAdditional
         }
 
         // Get the amount of files we found inside the RAR/ZIP files.
-        $releaseFiles = $this->pdo->queryOneRow(
-            sprintf(
-                '
-				SELECT COUNT(release_files.releases_id) AS count,
-				SUM(release_files.size) AS size
-				FROM release_files
-				WHERE releases_id = %d',
-                $this->_release['id']
-            )
-        );
 
-        if ($releaseFiles === false) {
-            $releaseFiles['count'] = $releaseFiles['size'] = 0;
+        $releaseFilesCount = ReleaseFile::query()->where('releases_id', $this->_release['id'])->count('releases_id');
+
+        if ($releaseFilesCount === null) {
+            $releaseFilesCount = 0;
         }
 
         $this->_passwordStatus = max($this->_passwordStatus);
@@ -1635,12 +1616,12 @@ class ProcessAdditional
         }
 
         // If we failed to get anything from the RAR/ZIPs, decrement the passwordstatus, if the rar/zip has no password.
-        if ($this->_releaseHasPassword === false && $this->_NZBHasCompressedFile && $releaseFiles['count'] == 0) {
+        if ($this->_releaseHasPassword === false && $this->_NZBHasCompressedFile && $releaseFilesCount === 0) {
             $query = sprintf(
                 'UPDATE releases
 				SET passwordstatus = passwordstatus - 1, rarinnerfilecount = %d %s %s %s
 				WHERE id = %d',
-                $releaseFiles['count'],
+                $releaseFilesCount,
                 $iSQL,
                 $vSQL,
                 $jSQL,
@@ -1653,7 +1634,7 @@ class ProcessAdditional
 				SET passwordstatus = %d, rarinnerfilecount = %d %s %s %s
 				WHERE id = %d',
                 ($this->_processPasswords === true ? $this->_passwordStatus : Releases::PASSWD_NONE),
-                $releaseFiles['count'],
+                $releaseFilesCount,
                 $iSQL,
                 $vSQL,
                 $jSQL,
@@ -2219,18 +2200,11 @@ class ProcessAdditional
 
             // Add to release files.
             if ($this->_addPAR2Files) {
-                if ($filesAdded < 11 &&
-                    $this->pdo->queryOneRow(
-                        sprintf(
-                            'SELECT releases_id FROM release_files WHERE releases_id = %d AND name = %s',
-                            $this->_release['id'],
-                            $this->pdo->escapeString($file['name'])
-                        )
-                    ) === false
+                if ($filesAdded < 11 && ReleaseFile::query()->where(['releases_id' => $this->_release['id'], 'name' => $file['name']])->first() === null
                 ) {
 
                     // Try to add the files to the DB.
-                    if ($this->_releaseFiles->add($this->_release['id'], $file['name'], $file['hash_16K'], $file['size'], $releaseInfo['postdate'], 0)) {
+                    if (ReleaseFile::addReleaseFiles($this->_release['id'], $file['name'], $file['hash_16K'], $file['size'], $releaseInfo['postdate'], 0)) {
                         $filesAdded++;
                     }
                 }
@@ -2324,8 +2298,8 @@ class ProcessAdditional
     /**
      * Comparison function for uSort, for sorting NZB files.
      *
-     * @param array $a
-     * @param array $b
+     * @param array|null|string $a
+     * @param array|null|string $b
      *
      * @return int
      */

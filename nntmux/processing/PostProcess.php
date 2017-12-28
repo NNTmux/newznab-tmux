@@ -17,7 +17,6 @@ use nntmux\Category;
 use nntmux\NameFixer;
 use App\Models\Release;
 use App\Models\Settings;
-use nntmux\ReleaseFiles;
 use App\Models\ReleaseFile;
 use Illuminate\Support\Carbon;
 use nntmux\processing\tv\TMDB;
@@ -34,11 +33,6 @@ class PostProcess
      * @var \nntmux\db\DB
      */
     public $pdo;
-
-    /**
-     * @var \nntmux\Logger
-     */
-    protected $debugging;
 
     /**
      * @var \nntmux\NameFixer
@@ -84,11 +78,6 @@ class PostProcess
     private $Nfo;
 
     /**
-     * @var \nntmux\ReleaseFiles
-     */
-    private $releaseFiles;
-
-    /**
      * Constructor.
      *
      * @param array $options Pass in class instances.
@@ -117,7 +106,6 @@ class PostProcess
         $this->_par2Info = new Par2Info();
         $this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
         $this->Nfo = (($options['Nfo'] instanceof Nfo) ? $options['Nfo'] : new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
-        $this->releaseFiles = (($options['ReleaseFiles'] instanceof ReleaseFiles) ? $options['ReleaseFiles'] : new ReleaseFiles($this->pdo));
 
         // Site settings.
         $this->addpar2 = (int) Settings::settingValue('..addpar2') !== 0;
@@ -289,15 +277,16 @@ class PostProcess
      *
      * @note Called externally by tmux/bin/update_per_group and update/postprocess.php
      *
-     * @param NNTP       $nntp    Class NNTP
-     * @param int|string $groupID  (Optional) ID of a group to work on.
-     * @param string     $guidChar (Optional) First char of release GUID, can be used to select work.
+     * @param NNTP $nntp Class NNTP
+     * @param int|string $groupID (Optional) ID of a group to work on.
+     * @param string $guidChar (Optional) First char of release GUID, can be used to select work.
      *
      * @return void
+     * @throws \Exception
      */
     public function processAdditional(&$nntp, $groupID = '', $guidChar = ''): void
     {
-        (new ProcessAdditional(['Echo' => $this->echooutput, 'NNTP' => $nntp, 'Settings' => $this->pdo, 'Groups' => $this->groups, 'NameFixer' => $this->nameFixer, 'Nfo' => $this->Nfo, 'ReleaseFiles' => $this->releaseFiles]))->start($groupID, $guidChar);
+        (new ProcessAdditional(['Echo' => $this->echooutput, 'NNTP' => $nntp, 'Settings' => $this->pdo, 'Groups' => $this->groups, 'NameFixer' => $this->nameFixer, 'Nfo' => $this->Nfo]))->start($groupID, $guidChar);
     }
 
     /**
@@ -364,10 +353,10 @@ class PostProcess
 
                 if ($this->addpar2) {
                     // Add to release files.
-                    if ($filesAdded < 11 && ReleaseFile::query()->where(['releases_id' => $relID, 'name' => $file['name']])->first(['releases_id']) === null) {
+                    if ($filesAdded < 11 && ReleaseFile::query()->where(['releases_id' => $relID, 'name' => $file['name']])->first() === null) {
 
                         // Try to add the files to the DB.
-                        if ($this->releaseFiles->add($relID, $file['name'], $file['hash_16K'], $file['size'], Carbon::createFromFormat('Y-m-d H:i:s', $query['postdate'])->timestamp, 0)) {
+                        if (ReleaseFile::addReleaseFiles($relID, $file['name'], $file['hash_16K'], $file['size'], Carbon::createFromFormat('Y-m-d H:i:s', $query['postdate']), 0)) {
                             $filesAdded++;
                         }
                     }
