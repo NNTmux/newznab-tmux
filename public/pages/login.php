@@ -8,7 +8,7 @@ use Arcanedev\NoCaptcha\NoCaptcha;
 
 $page->smarty->assign(['error' => '', 'username' => '', 'rememberme' => '']);
 
-$secret  = env('RECAPTCHA_SECRETKEY');
+$secret = env('RECAPTCHA_SECRETKEY');
 $sitekey = env('RECAPTCHA_SITEKEY');
 
 $captcha = new NoCaptcha($secret, $sitekey);
