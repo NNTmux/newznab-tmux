@@ -2,7 +2,6 @@
 
 namespace nntmux;
 
-use app\models\Settings;
 use ReCaptcha\ReCaptcha;
 
 class Captcha
