@@ -55,6 +55,10 @@ class Settings extends Model
 
     public const ERR_BAD_YYDECODER_PATH = -10;
 
+    public const ERR_BADLAMEPATH = -11;
+
+    public const ERR_SABCOMPLETEPATH = -12;
+
     /**
      * @var Command
      */
@@ -87,7 +91,7 @@ class Settings extends Model
     /**
      * @var array
      */
-    protected $fillable = ['section', 'subsection', 'name', 'value', 'hint', 'setting'];
+    protected $guarded = [];
 
     /**
      * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes.

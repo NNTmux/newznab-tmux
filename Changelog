@@ -1,3 +1,5 @@
+2018-01-03 DariusIIi
+	* Chg: Update Settings model and site-edit.php(replace deprecated create_function with anonymous function)
 2017-12-29 DariusIII
 	* Chg: Update constants defintions in Captcha class
 2017-12-28 DariusIII

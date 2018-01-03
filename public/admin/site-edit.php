@@ -40,9 +40,9 @@ switch ($action) {
                 $error = 'Deep password check requires a valid path to unrar binary';
             } elseif ($ret === Settings::ERR_BADTMPUNRARPATH) {
                 $error = 'The temp unrar path is not a valid directory';
-            } elseif ($ret === Sites::ERR_BADLAMEPATH) {
+            } elseif ($ret === Settings::ERR_BADLAMEPATH) {
                 $error = 'The lame path is not a valid directory';
-            } elseif ($ret === Sites::ERR_SABCOMPLETEPATH) {
+            } elseif ($ret === Settings::ERR_SABCOMPLETEPATH) {
                 $error = 'The sab complete path is not a valid directory';
             }
         }
@@ -147,7 +147,9 @@ foreach ($result as $bookcategory) {
 }
 
 // convert from a string array to an int array as we want to use int
-$book_reqids_ids = array_map(create_function('$value', 'return (int)$value;'), $book_reqids_ids);
+$book_reqids_ids = array_map(function ($value) {
+    return (int)$value;
+}, $book_reqids_ids);
 $page->smarty->assign('book_reqids_ids', $book_reqids_ids);
 $page->smarty->assign('book_reqids_names', $book_reqids_names);
 
@@ -155,7 +157,9 @@ $page->smarty->assign('book_reqids_names', $book_reqids_names);
 $books_selected = explode(',', Settings::settingValue('..book_reqids'));
 
 // convert from a string array to an int array
-$books_selected = array_map(create_function('$value', 'return (int)$value;'), $books_selected);
+$books_selected = array_map(function ($value) {
+    return (int)$value;
+}, $books_selected);
 $page->smarty->assign('book_reqids_selected', $books_selected);
 
 $page->smarty->assign('themelist', Utility::getThemesList());
