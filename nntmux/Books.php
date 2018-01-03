@@ -135,7 +135,7 @@ class Books
         }
         $searchWords = trim($searchWords);
 
-        return BookInfo::query()->whereRaw('MATCH(author, title) AGAINST(? IN BOOLEAN MODE)', $searchWords)->first();
+        return BookInfo::query()->whereRaw('MATCH(author, title) AGAINST(? IN BOOLEAN MODE)', [$searchWords])->first();
     }
 
     /**

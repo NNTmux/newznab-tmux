@@ -1,4 +1,5 @@
 2018-01-03 DariusIII
+	* Chg: Update Books class
 	* Fix: Fix left join in getConsoleInfo query
 	* Chg: Update psy/psych to latest version
 	* Fix: Fix max headers iteration and 7zippath entries in site edit (closes issue #222)
