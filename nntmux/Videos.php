@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Video;
 use nntmux\db\DB;
+use App\Models\Video;
 
 /**
  * Class Videos -- functions for site interaction.
