@@ -1,4 +1,5 @@
 2018-01-03 DariusIIi
+	* Fix: Fix max headers iteration and 7zippath entries in site edit (closes issue #222)
 	* Chg: Update Settings model and site-edit.php(replace deprecated create_function with anonymous function)
 2017-12-29 DariusIII
 	* Chg: Update constants defintions in Captcha class
