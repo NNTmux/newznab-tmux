@@ -148,7 +148,7 @@ foreach ($result as $bookcategory) {
 
 // convert from a string array to an int array as we want to use int
 $book_reqids_ids = array_map(function ($value) {
-    return (int)$value;
+    return (int) $value;
 }, $book_reqids_ids);
 $page->smarty->assign('book_reqids_ids', $book_reqids_ids);
 $page->smarty->assign('book_reqids_names', $book_reqids_names);
@@ -158,7 +158,7 @@ $books_selected = explode(',', Settings::settingValue('..book_reqids'));
 
 // convert from a string array to an int array
 $books_selected = array_map(function ($value) {
-    return (int)$value;
+    return (int) $value;
 }, $books_selected);
 $page->smarty->assign('book_reqids_selected', $books_selected);
 
