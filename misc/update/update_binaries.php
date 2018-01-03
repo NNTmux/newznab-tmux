@@ -11,7 +11,7 @@ use App\Models\Settings;
 
 $pdo = new DB();
 
-$maxHeaders = (int) Settings::settingValue('max.headers.iteration') ?: 1000000;
+$maxHeaders = (int) Settings::settingValue('..max_headers_iteration') ?: 1000000;
 
 // Create the connection here and pass
 $nntp = new NNTP(['Settings' => $pdo]);

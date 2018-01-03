@@ -538,7 +538,7 @@ class Forking extends \fork_daemon
     {
         $this->register_child_run([0 => $this, 1 => 'safeBinariesChildWorker']);
 
-        $maxheaders = Settings::settingValue('max.headers.iteration') ?: 1000000;
+        $maxheaders = Settings::settingValue('..max_headers_iteration') ?: 1000000;
         $maxmssgs = Settings::settingValue('..maxmssgs');
         $threads = Settings::settingValue('..binarythreads');
 
