@@ -426,9 +426,9 @@ class ProcessAdditional
             $clients += [ArchiveInfo::TYPE_RAR => Settings::settingValue('apps..unrarpath')];
             $this->_unrarPath = Settings::settingValue('apps..unrarpath');
         }
-        if (Settings::settingValue('apps..7zippath') !== '') {
-            $clients += [ArchiveInfo::TYPE_ZIP => Settings::settingValue('apps..7zippath')];
-            $this->_7zipPath = Settings::settingValue('apps..7zippath');
+        if (Settings::settingValue('apps..zippath') !== '') {
+            $clients += [ArchiveInfo::TYPE_ZIP => Settings::settingValue('apps..zippath')];
+            $this->_7zipPath = Settings::settingValue('apps..zippath');
         }
         $this->_archiveInfo->setExternalClients($clients);
 
