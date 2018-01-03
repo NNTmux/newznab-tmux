@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Video;
 use nntmux\db\DB;
 
 /**
@@ -11,99 +12,77 @@ class Videos
 {
     /**
      * @param array $options
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
         $defaults = [
-			'Echo'         => false,
-			'Logger'       => null,
-			'Settings'     => null,
-		];
+            'Echo'         => false,
+            'Logger'       => null,
+            'Settings'     => null,
+        ];
         $options += $defaults;
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = $options['Settings'] instanceof DB ? $options['Settings'] : new DB();
         $this->catWhere = 'r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
     }
 
     /**
      * Get info from tables for the provided ID.
      *
-     * @param $id
      *
-     * @return array
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Model|null|static
      */
     public function getByVideoID($id)
     {
-        return $this->pdo->queryOneRow(
-			sprintf('
-					SELECT v.*, tvi.summary, tvi.publisher, tvi.image
-					FROM videos v
-					INNER JOIN tv_info tvi ON v.id = tvi.videos_id
-					WHERE id = %d',
-					$id
-			)
-		);
+        return Video::query()
+            ->where('videos.id', $id)
+            ->join('tv_info', 'videos.id', '=', 'tv_info.videos_id')
+            ->first(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image']);
     }
 
     /**
      * Retrieves a range of all shows for the show-edit admin list.
      *
-     * @param        $start
-     * @param        $num
-     * @param string $showname
      *
+     * @param $start
+     * @param $num
+     * @param string $showname
      * @return array
      */
     public function getRange($start, $num, $showname = '')
     {
-        if ($start === false) {
-            $limit = '';
-        } else {
-            $limit = 'LIMIT '.$num.' OFFSET '.$start;
+        $sql = Video::query()
+            ->select(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image'])
+            ->join('tv_info', 'videos.id', '=', 'tv_info.videos_id');
+
+        if ($showname !== '') {
+            $sql->where('videos.title', 'like', '%'.$showname.'%');
         }
 
-        $rsql = '';
-        if ($showname != '') {
-            $rsql .= sprintf('AND v.title LIKE %s ', $this->pdo->escapeString('%'.$showname.'%'));
+        if ($start !== false) {
+            $sql->limit($num)->offset($start);
         }
 
-        return $this->pdo->query(
-			sprintf('
-						SELECT v.*,
-							tvi.summary, tvi.publisher, tvi.image
-						FROM videos v
-						INNER JOIN tv_info tvi ON v.id = tvi.videos_id
-						WHERE 1=1 %s
-						ORDER BY v.id ASC %s',
-				$rsql,
-				$limit
-			)
-		);
+        return $sql->get()->toArray();
     }
 
     /**
      * Returns a count of all shows -- usually used by pager.
      *
-     * @param string $showname
      *
-     * @return mixed
+     * @param string $showname
+     * @return int
      */
-    public function getCount($showname = '')
+    public function getCount($showname = ''): int
     {
-        $rsql = '';
-        if ($showname != '') {
-            $rsql .= sprintf('AND v.title LIKE %s ', $this->pdo->escapeString('%'.$showname.'%'));
-        }
-        $res = $this->pdo->queryOneRow(
-			sprintf('
-						SELECT COUNT(v.id) AS num
-						FROM videos v
-						INNER JOIN tv_info tvi ON v.id = tvi.videos_id
-						WHERE 1=1 %s',
-				$rsql
-			)
-		);
+        $res = Video::query()->join('tv_info', 'videos.id', '=', 'tv_info.videos_id');
 
-        return $res['num'];
+        if ($showname !== '') {
+            $res->where('videos.title', 'like', '%'.$showname.'%');
+        }
+
+        return $res->count('videos.id');
     }
 
     /**
@@ -118,19 +97,20 @@ class Videos
     public function getSeriesList($uid, $letter = '', $showname = '')
     {
         $rsql = '';
-        if ($letter != '') {
-            if ($letter == '0-9') {
+        if ($letter !== '') {
+            if ($letter === '0-9') {
                 $letter = '[0-9]';
             }
 
             $rsql .= sprintf('AND v.title REGEXP %s', $this->pdo->escapeString('^'.$letter));
         }
         $tsql = '';
-        if ($showname != '') {
-            $tsql .= sprintf('AND v.title LIKE %s', $this->pdo->escapeString('%'.$showname.'%'));
+        if ($showname !== '') {
+            $tsql .= sprintf('AND v.title %s', $this->pdo->likeString($showname));
         }
 
-        $qry = sprintf('
+        $qry = sprintf(
+            '
 			SELECT v.* FROM
 				(SELECT v.*,
 					tve.firstaired AS prevdate, tve.title AS previnfo,
@@ -148,14 +128,12 @@ class Videos
 			WHERE %s
 			GROUP BY v.id
 			ORDER BY v.title ASC',
-			$uid,
-			$rsql,
-			$tsql,
-			$this->catWhere
-		);
+            $uid,
+            $rsql,
+            $tsql,
+            $this->catWhere
+        );
 
-        $sql = $this->pdo->query($qry);
-
-        return $sql;
+        return $this->pdo->query($qry);
     }
 }
