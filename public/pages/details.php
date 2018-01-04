@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Video;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
@@ -7,7 +8,6 @@ use nntmux\Games;
 use nntmux\Movie;
 use nntmux\Music;
 use nntmux\PreDb;
-use nntmux\Videos;
 use nntmux\Console;
 use App\Models\User;
 use nntmux\Releases;
@@ -57,7 +57,7 @@ if (isset($_GET['id'])) {
 
     $showInfo = '';
     if ($data['videos_id'] > 0) {
-        $showInfo = (new Videos())->getByVideoID($data['videos_id']);
+        $showInfo = Video::getByVideoID($data['videos_id']);
     }
 
     $mov = '';

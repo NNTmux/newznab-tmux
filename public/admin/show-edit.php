@@ -1,13 +1,13 @@
 <?php
 
+use App\Models\Video;
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 require_once NN_WWW.'pages/smartyTV.php';
 
-use nntmux\Videos;
 
 $page = new AdminPage();
 $tv = new smartyTV(['Settings' => $page->pdo]);
-$video = new Videos();
 
 switch ($_REQUEST['action'] ?? 'view') {
     case 'submit':
@@ -26,7 +26,7 @@ switch ($_REQUEST['action'] ?? 'view') {
     default:
         if (isset($_GET['id'])) {
             $page->title = 'TV Show Edit';
-            $show = $video->getByVideoID($_GET['id']);
+            $show = Video::getByVideoID($_GET['id']);
         }
         break;
 }

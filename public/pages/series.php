@@ -1,7 +1,7 @@
 <?php
 
-use nntmux\Videos;
 use App\Models\User;
+use App\Models\Video;
 use nntmux\Category;
 use nntmux\Releases;
 use nntmux\UserSeries;
@@ -11,7 +11,6 @@ if (! User::isLoggedIn()) {
 }
 
 $releases = new Releases(['Settings' => $page->settings]);
-$tvshow = new Videos();
 $cat = new Category(['Settings' => $page->settings]);
 $us = new UserSeries();
 
@@ -25,7 +24,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     $catarray[] = $category;
 
     $rel = $releases->searchShows(['id' => $_GET['id']], '', '', '', 0, 1000, '', $catarray, -1);
-    $show = $tvshow->getByVideoID($_GET['id']);
+    $show = Video::getByVideoID($_GET['id']);
 
     if (! $show) {
         $page->smarty->assign('nodata', 'No video information for this series.');
@@ -93,7 +92,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
         $letter = '';
     }
 
-    $masterserieslist = $tvshow->getSeriesList(User::currentUserId(), $letter, $showname);
+    $masterserieslist = Video::getSeriesList(User::currentUserId(), $letter, $showname);
 
     $page->title = 'Series List';
     $page->meta_title = 'View Series List';

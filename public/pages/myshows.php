@@ -1,7 +1,7 @@
 <?php
 
-use nntmux\Videos;
 use App\Models\User;
+use App\Models\Video;
 use nntmux\Category;
 use nntmux\Releases;
 use nntmux\UserSeries;
@@ -12,7 +12,6 @@ if (! User::isLoggedIn()) {
 }
 
 $us = new UserSeries();
-$tv = new Videos();
 
 $action = $_REQUEST['id'] ?? '';
 $videoId = $_REQUEST['subpage'] ?? '';
@@ -44,7 +43,7 @@ switch ($action) {
         if ($show) {
             $page->show404('Already subscribed');
         } else {
-            $show = $tv->getByVideoID($videoId);
+            $show = Video::getByVideoID($videoId);
             if (! $show) {
                 $page->show404('No matching show.');
             }

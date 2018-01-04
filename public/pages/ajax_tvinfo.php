@@ -1,7 +1,7 @@
 <?php
 
-use nntmux\Videos;
 use App\Models\User;
+use App\Models\Video;
 use nntmux\Releases;
 use App\Models\Release;
 
@@ -25,8 +25,7 @@ if (! $rel) {
     echo '</ul>';
 
     if (isset($rel['videos_id']) && $rel['videos_id'] > 0) {
-        $t = new Videos();
-        $show = $t->getByVideoID($rel['videos_id']);
+        $show = Video::getByVideoID($rel['videos_id']);
         if (count($show) > 0 && (int) $show['image'] !== 0) {
             echo '<img class="shadow" src="/covers/tvshows/'.$show['id'].'.jpg" width="180"/>';
         }
