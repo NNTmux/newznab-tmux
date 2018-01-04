@@ -12,7 +12,7 @@ if (! User::isLoggedIn()) {
 }
 
 $us = new UserSeries();
-$tv = new Videos(['Settings' => $page->settings]);
+$tv = new Videos();
 
 $action = $_REQUEST['id'] ?? '';
 $videoId = $_REQUEST['subpage'] ?? '';

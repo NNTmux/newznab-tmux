@@ -57,7 +57,7 @@ if (isset($_GET['id'])) {
 
     $showInfo = '';
     if ($data['videos_id'] > 0) {
-        $showInfo = (new Videos(['Settings' => $page->settings]))->getByVideoID($data['videos_id']);
+        $showInfo = (new Videos())->getByVideoID($data['videos_id']);
     }
 
     $mov = '';

@@ -11,7 +11,7 @@ if (! User::isLoggedIn()) {
 }
 
 $releases = new Releases(['Settings' => $page->settings]);
-$tvshow = new Videos(['Settings' => $page->settings]);
+$tvshow = new Videos();
 $cat = new Category(['Settings' => $page->settings]);
 $us = new UserSeries();
 

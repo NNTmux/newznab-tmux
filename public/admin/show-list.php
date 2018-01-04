@@ -5,7 +5,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use nntmux\Videos;
 
 $page = new AdminPage();
-$tv = new Videos(['Settings' => $page->pdo]);
+$tv = new Videos();
 
 $page->title = 'TV Shows List';
 

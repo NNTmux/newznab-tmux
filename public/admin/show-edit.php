@@ -7,7 +7,7 @@ use nntmux\Videos;
 
 $page = new AdminPage();
 $tv = new smartyTV(['Settings' => $page->pdo]);
-$video = new Videos(['Settings' => $page->pdo]);
+$video = new Videos();
 
 switch ($_REQUEST['action'] ?? 'view') {
     case 'submit':
