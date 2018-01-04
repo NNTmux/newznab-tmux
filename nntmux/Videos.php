@@ -3,6 +3,7 @@
 namespace nntmux;
 
 use Illuminate\Support\Carbon;
+use nntmux\db\DB;
 use App\Models\Video;
 
 /**
@@ -11,10 +12,19 @@ use App\Models\Video;
 class Videos
 {
     /**
-     * Videos constructor.
+     * @param array $options
+     * @throws \Exception
      */
-    public function __construct()
+    public function __construct(array $options = [])
     {
+        $defaults = [
+            'Echo'         => false,
+            'Logger'       => null,
+            'Settings'     => null,
+        ];
+        $options += $defaults;
+        $this->pdo = $options['Settings'] instanceof DB ? $options['Settings'] : new DB();
+        $this->catWhere = 'r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
     }
 
     /**
@@ -85,7 +95,7 @@ class Videos
      *
      * @return array
      */
-    public function getSeriesList($uid, $letter = '', $showname = ''): array
+    public function getSeriesList($uid, $letter = '', $showname = '')
     {
         if ($letter !== '') {
             if ($letter === '0-9') {
@@ -97,10 +107,11 @@ class Videos
             ->select(['videos.*', 'tve.firstaired as prevdate', 'tve.title as previnfo', 'tvi.publisher', 'us.id as userseriesid'])
             ->join('tv_info as tvi', 'videos.id', '=', 'tvi.videos_id')
             ->join('tv_episodes as tve', 'videos.id', '=', 'tve.videos_id')
-            ->leftJoin('user_series as us', 'videos.id', '=', 'us.videos_id')
+            ->leftJoin('user_series as us', function ($join) use ($uid) {
+                $join->on('videos.id', '=', 'us.videos_id')->where('us.users_id', '=', $uid);
+            })
             ->whereBetween('r.categories_id', [Category::TV_ROOT, Category::TV_OTHER])
             ->where('tve.firstaired', '<', Carbon::now())
-            ->where('us.users_id', '=', $uid)
             ->leftJoin('releases as r', 'r.videos_id', '=', 'videos.id')
             ->orderBy('videos.title')
             ->orderByDesc('tve.firstaired')
