@@ -35,7 +35,7 @@ class Video extends Model
      * @param $id
      * @return array
      */
-    public static function getByVideoID($id)
+    public static function getByVideoID($id): array
     {
         return self::query()
             ->where('videos.id', $id)
@@ -97,7 +97,7 @@ class Video extends Model
      *
      * @return array
      */
-    public static function getSeriesList($uid, $letter = '', $showname = '')
+    public static function getSeriesList($uid, $letter = '', $showname = ''): array
     {
         if ($letter !== '') {
             if ($letter === '0-9') {
