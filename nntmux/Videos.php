@@ -11,19 +11,12 @@ use Illuminate\Support\Carbon;
 class Videos
 {
     /**
+     * Videos constructor.
+     *
      * @param array $options
-     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
-        $defaults = [
-            'Echo'         => false,
-            'Logger'       => null,
-            'Settings'     => null,
-        ];
-        $options += $defaults;
-        $this->pdo = $options['Settings'] instanceof DB ? $options['Settings'] : new DB();
-        $this->catWhere = 'r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
     }
 
     /**
