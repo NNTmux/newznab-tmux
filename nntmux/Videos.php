@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Carbon;
 use App\Models\Video;
+use Illuminate\Support\Carbon;
 
 /**
  * Class Videos -- functions for site interaction.
