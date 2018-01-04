@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\User;
-use App\Models\Video;
 use nntmux\Category;
 use nntmux\Releases;
+use App\Models\Video;
 use nntmux\UserSeries;
 
 if (! User::isLoggedIn()) {
