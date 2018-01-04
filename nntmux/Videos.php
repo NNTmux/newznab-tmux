@@ -2,7 +2,7 @@
 
 namespace nntmux;
 
-use nntmux\db\DB;
+use Illuminate\Support\Carbon;
 use App\Models\Video;
 
 /**
@@ -11,19 +11,10 @@ use App\Models\Video;
 class Videos
 {
     /**
-     * @param array $options
-     * @throws \Exception
+     * Videos constructor.
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo'         => false,
-            'Logger'       => null,
-            'Settings'     => null,
-        ];
-        $options += $defaults;
-        $this->pdo = $options['Settings'] instanceof DB ? $options['Settings'] : new DB();
-        $this->catWhere = 'r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
     }
 
     /**
@@ -50,7 +41,7 @@ class Videos
      * @param string $showname
      * @return array
      */
-    public function getRange($start, $num, $showname = '')
+    public function getRange($start, $num, $showname = ''): array
     {
         $sql = Video::query()
             ->select(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image'])
@@ -94,46 +85,35 @@ class Videos
      *
      * @return array
      */
-    public function getSeriesList($uid, $letter = '', $showname = '')
+    public function getSeriesList($uid, $letter = '', $showname = ''): array
     {
-        $rsql = '';
         if ($letter !== '') {
             if ($letter === '0-9') {
                 $letter = '[0-9]';
             }
-
-            $rsql .= sprintf('AND v.title REGEXP %s', $this->pdo->escapeString('^'.$letter));
         }
-        $tsql = '';
+
+        $qry = Video::query()
+            ->select(['videos.*', 'tve.firstaired as prevdate', 'tve.title as previnfo', 'tvi.publisher', 'us.id as userseriesid'])
+            ->join('tv_info as tvi', 'videos.id', '=', 'tvi.videos_id')
+            ->join('tv_episodes as tve', 'videos.id', '=', 'tve.videos_id')
+            ->leftJoin('user_series as us', 'videos.id', '=', 'us.videos_id')
+            ->whereBetween('r.categories_id', [Category::TV_ROOT, Category::TV_OTHER])
+            ->where('tve.firstaired', '<', Carbon::now())
+            ->where('us.users_id', '=', $uid)
+            ->leftJoin('releases as r', 'r.videos_id', '=', 'videos.id')
+            ->orderBy('videos.title')
+            ->orderByDesc('tve.firstaired')
+            ->groupBy(['videos.id']);
+
+        if ($letter !== '') {
+            $qry->whereRaw('videos.title REGEXP ?', ['^'.$letter]);
+        }
+
         if ($showname !== '') {
-            $tsql .= sprintf('AND v.title %s', $this->pdo->likeString($showname));
+            $qry->where('videos.title', 'like', '%'.$showname.'%');
         }
 
-        $qry = sprintf(
-            '
-			SELECT v.* FROM
-				(SELECT v.*,
-					tve.firstaired AS prevdate, tve.title AS previnfo,
-					tvi.publisher,
-					us.id AS userseriesid
-				FROM videos v
-				INNER JOIN tv_info tvi ON v.id = tvi.videos_id
-				INNER JOIN tv_episodes tve ON v.id = tve.videos_id
-				LEFT OUTER JOIN user_series us ON v.id = us.videos_id AND us.users_id = %d
-				WHERE 1=1
-				AND tve.firstaired <= NOW()
-				%s %s
-				ORDER BY tve.firstaired DESC) v
-			STRAIGHT_JOIN releases r ON r.videos_id = v.id
-			WHERE %s
-			GROUP BY v.id
-			ORDER BY v.title ASC',
-            $uid,
-            $rsql,
-            $tsql,
-            $this->catWhere
-        );
-
-        return $this->pdo->query($qry);
+        return $qry->get()->toArray();
     }
 }
