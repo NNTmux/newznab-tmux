@@ -1,12 +1,12 @@
 <?php
 
+use App\Models\Predb;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
 use nntmux\Games;
 use nntmux\Movie;
 use nntmux\Music;
-use nntmux\PreDb;
 use nntmux\Console;
 use App\Models\User;
 use nntmux\Releases;
@@ -132,8 +132,7 @@ if (isset($_GET['id'])) {
         $AniDBAPIArray = $AniDB->getAnimeInfo($data['anidbid']);
     }
 
-    $preDb = new PreDb();
-    $pre = $preDb->getForRelease($data['predb_id']);
+    $pre = Predb::getForRelease($data['predb_id']);
 
     $releasefiles = ReleaseFile::getReleaseFiles($data['id']);
 

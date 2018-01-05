@@ -2,10 +2,10 @@
 
 namespace nntmux\processing;
 
+use App\Models\Predb;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
-use nntmux\PreDb;
 use nntmux\Genres;
 use nntmux\Groups;
 use nntmux\Category;
@@ -559,7 +559,6 @@ class ProcessReleases
         }
 
         if ($collections instanceof \Traversable) {
-            $preDB = new PreDb(['Echo' => $this->echoCLI, 'Settings' => $this->pdo]);
 
             foreach ($collections as $collection) {
                 $cleanRelName = utf8_encode(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection['subject']));
@@ -593,7 +592,7 @@ class ProcessReleases
 
                     if ($preID === false && $cleanedName !== '') {
                         // try to match the cleaned searchname to predb title or filename here
-                        $preMatch = $preDB->matchPre($cleanedName);
+                        $preMatch = Predb::matchPre($cleanedName);
                         if ($preMatch !== false) {
                             $cleanedName = $preMatch['title'];
                             $preID = $preMatch['predb_id'];
