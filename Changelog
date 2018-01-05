@@ -1,3 +1,5 @@
+2018-01-05 DariusIII
+	* Chg: Add foreign key to videos_aliases table that references videos table
 2018-01-04 DariusIII
 	* Chg: Remove nntmux/Videos class and move its functions into Video model
 	* Chg: Update nntmux/Videos class to completely use query builder
