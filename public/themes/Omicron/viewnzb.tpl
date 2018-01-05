@@ -348,7 +348,7 @@
 																{if !empty($movie.rtrating)}
 																	<tr>
 																		<th width="140">RottenTomatoes score</th>
-																		<td>{if $movie.rtrating} == ''} N/A{/if}{$movie.rtrating}</td>
+																		<td>{$movie.rtrating}</td>
 																	</tr>
 																{/if}
 																{/if}
