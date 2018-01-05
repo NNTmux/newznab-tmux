@@ -1,4 +1,5 @@
 2018-01-05 DariusIII
+	* Chg: Update Forking and postprocess.php
 	* Chg: Update Movie class and add missing rtrating column to movieinfo table in mysql-ddl.sql
 	* Chg: Update nntmux/AniDB class
 	* Chg: Add foreign key to videos_aliases table that references videos table

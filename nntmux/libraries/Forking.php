@@ -862,7 +862,7 @@ class Forking extends \fork_daemon
                 $qry->where('size', '>', $this->minSize * 1048576);
             }
 
-            $this->work = $qry->groupBy('leftguid')->limit(16)->get()->toArray();
+            $this->work = $qry->groupBy('id')->limit(16)->get()->toArray();
 
             $maxProcesses = (int) Settings::settingValue('..nfothreads');
         }
