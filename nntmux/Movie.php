@@ -47,16 +47,6 @@ class Movie
     protected $currentRelID = '';
 
     /**
-     * @var \nntmux\Logger
-     */
-    protected $debugging;
-
-    /**
-     * @var bool
-     */
-    protected $debug;
-
-    /**
      * Use search engines to find IMDB id's.
      * @var bool
      */
@@ -165,9 +155,14 @@ class Movie
     public $tmdbtoken;
 
     /**
-     * @var bool
+     * @var null|TraktTv
      */
-    public $_debug;
+    public $traktTv;
+
+    /**
+     * @var OMDbAPI|null
+     */
+    public $omdbApi;
 
     /**
      * @param array $options Class instances / Echo to CLI.
@@ -406,16 +401,6 @@ class Movie
     }
 
     /**
-     * @var null|TraktTv
-     */
-    public $traktTv = null;
-
-    /**
-     * @var OMDbAPI|null
-     */
-    public $omdbApi = null;
-
-    /**
      * Get trailer using IMDB Id.
      *
      * @param int $imdbID
@@ -534,7 +519,7 @@ class Movie
     {
         return [
             'actors', 'backdrop', 'cover', 'director', 'genre', 'imdbid', 'language',
-            'plot', 'rating', 'tagline', 'title', 'tmdbid', 'trailer', 'type', 'year',
+            'plot', 'rating', 'rtrating', 'tagline', 'title', 'tmdbid', 'trailer', 'type', 'year',
         ];
     }
 
@@ -599,6 +584,7 @@ class Movie
      * @param string $variable1
      * @param string $variable2
      * @param string $variable3
+     * @param $variable4
      *
      * @return array|string
      */
@@ -626,11 +612,12 @@ class Movie
      * @param $imdbId
      *
      * @return bool
+     * @throws \Exception
      */
     public function updateMovieInfo($imdbId): bool
     {
         if ($this->echooutput && $this->service !== '') {
-            ColorCLI::doEcho(ColorCLI::primary('Fetching IMDB info from TMDB and/or Trakt using IMDB id: '.$imdbId));
+            ColorCLI::doEcho(ColorCLI::primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB using IMDB id: '.$imdbId));
         }
 
         // Check TMDB for IMDB info.
@@ -1056,12 +1043,13 @@ class Movie
     /**
      * Update a release with a IMDB id.
      *
-     * @param string $buffer       Data to parse a IMDB id/Trakt Id from.
-     * @param string $service      Method that called this method.
-     * @param int    $id           id of the release.
-     * @param int    $processImdb  To get IMDB info on this IMDB id or not.
+     * @param string $buffer Data to parse a IMDB id/Trakt Id from.
+     * @param string $service Method that called this method.
+     * @param int $id id of the release.
+     * @param int $processImdb To get IMDB info on this IMDB id or not.
      *
      * @return string
+     * @throws \Exception
      */
     public function doMovieUpdate($buffer, $service, $id, $processImdb = 1): string
     {
@@ -1320,6 +1308,7 @@ class Movie
      * Try to find a IMDB id on google.com.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function googleSearch(): bool
     {
@@ -1369,6 +1358,7 @@ class Movie
      * Try to find a IMDB id on bing.com.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function bingSearch(): bool
     {
@@ -1413,6 +1403,7 @@ class Movie
      * Try to find a IMDB id on yahoo.com.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function yahooSearch(): bool
     {
@@ -1505,7 +1496,7 @@ class Movie
             // Finally remove multiple spaces and trim leading spaces.
             $name = trim(preg_replace('/\s{2,}/', ' ', $name));
             // Check if the name is long enough and not just numbers.
-            if (strlen($name) > 4 && ! preg_match('/^\d+$/', $name)) {
+            if (\strlen($name) > 4 && ! preg_match('/^\d+$/', $name)) {
                 $this->currentTitle = $name;
                 $this->currentYear = ($year === '' ? false : $year);
 

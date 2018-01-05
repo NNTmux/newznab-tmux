@@ -642,6 +642,7 @@ CREATE TABLE movieinfo (
   title       VARCHAR(255)                   NOT NULL DEFAULT '',
   tagline     VARCHAR(1024)                  NOT NULL DEFAULT '',
   rating      VARCHAR(4)                     NOT NULL DEFAULT '',
+  rtrating    VARCHAR(10)                    NOT NULL DEFAULT '' COMMENT 'RottenTomatoes rating score',
   plot        VARCHAR(1024)                  NOT NULL DEFAULT '',
   year        VARCHAR(4)                     NOT NULL DEFAULT '',
   genre       VARCHAR(64)                    NOT NULL DEFAULT '',
