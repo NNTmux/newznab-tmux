@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Predb;
 use nntmux\db\DB;
+use App\Models\Predb;
 
 /**
  * Class IRCScraper.
