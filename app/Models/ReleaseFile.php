@@ -21,7 +21,7 @@ class ReleaseFile extends Model
     /**
      * @var string
      */
-    protected $primaryKey = ['releases_id', 'name'];
+    protected $primaryKey = 'releases_id';
 
     public function release()
     {
