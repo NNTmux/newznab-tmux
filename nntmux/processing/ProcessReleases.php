@@ -2,7 +2,6 @@
 
 namespace nntmux\processing;
 
-use App\Models\Predb;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
@@ -11,6 +10,7 @@ use nntmux\Groups;
 use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\Releases;
+use App\Models\Predb;
 use nntmux\Categorize;
 use App\Models\Release;
 use App\Models\Settings;
@@ -559,7 +559,6 @@ class ProcessReleases
         }
 
         if ($collections instanceof \Traversable) {
-
             foreach ($collections as $collection) {
                 $cleanRelName = utf8_encode(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection['subject']));
                 $fromName = utf8_encode(
