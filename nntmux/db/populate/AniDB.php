@@ -2,13 +2,13 @@
 
 namespace nntmux\db\populate;
 
-use App\Models\AnidbInfo;
-use App\Models\AnidbTitle;
-use Illuminate\Support\Carbon;
 use nntmux\ColorCLI;
 use App\Models\Settings;
 use nntmux\ReleaseImage;
+use App\Models\AnidbInfo;
+use App\Models\AnidbTitle;
 use App\Models\AnidbEpisode;
+use Illuminate\Support\Carbon;
 
 class AniDB
 {
