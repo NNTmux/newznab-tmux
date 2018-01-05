@@ -1,4 +1,5 @@
 2018-01-05 DariusIII
+	* Chg: Update nntmux/AniDB class
 	* Chg: Add foreign key to videos_aliases table that references videos table
 2018-01-04 DariusIII
 	* Chg: Remove nntmux/Videos class and move its functions into Video model
