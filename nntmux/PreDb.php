@@ -67,7 +67,7 @@ class PreDb
     {
         $this->dateLimit = $dateLimit;
 
-        $consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
+        $consoleTools = new ConsoleTools();
         $updated = 0;
 
         if ($this->echooutput) {

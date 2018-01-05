@@ -27,7 +27,7 @@ function getPreName($argv)
 {
     global $pdo;
     $timestart = time();
-    $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
+    $consoletools = new ConsoleTools();
     $namefixer = new NameFixer(['Settings' => $pdo, 'ConsoleTools' => $consoletools]);
 
     $res = false;

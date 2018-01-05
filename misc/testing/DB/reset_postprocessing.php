@@ -9,7 +9,7 @@ use nntmux\ConsoleTools;
 
 $category = new Category();
 $pdo = new DB();
-$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
+$consoletools = new ConsoleTools();
 $ran = false;
 
 if (isset($argv[1], $argv[2]) && $argv[1] === 'all' && $argv[2] === 'true') {

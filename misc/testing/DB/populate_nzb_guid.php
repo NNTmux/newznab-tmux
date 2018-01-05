@@ -26,7 +26,7 @@ if (isset($argv[1])) {
 function create_guids($live, $delete = false)
 {
     $pdo = new DB();
-    $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
+    $consoletools = new ConsoleTools();
     $timestart = time();
     $relcount = $deleted = $total = 0;
 

@@ -172,7 +172,7 @@ class NameFixer
         $this->fullall = '';
         $this->_fileName = '';
         $this->done = $this->matched = false;
-        $this->consoletools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools(['ColorCLI' => $this->pdo->log]));
+        $this->consoletools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
         $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
         $this->text = ($options['Misc'] instanceof Utility ? $options['Misc'] : new Utility());
         $this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));

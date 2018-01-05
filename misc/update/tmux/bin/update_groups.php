@@ -9,7 +9,7 @@ use nntmux\ConsoleTools;
 
 $start = time();
 $pdo = new DB();
-$consoleTools = new ConsoleTools(['ColorCLI' => $pdo->log]);
+$consoleTools = new ConsoleTools();
 
 // Create the connection here and pass
 $nntp = new NNTP(['Settings' => $pdo]);
