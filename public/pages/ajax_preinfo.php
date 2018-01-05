@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Predb;
 use App\Models\User;
+use App\Models\Predb;
 
 if (! User::isLoggedIn()) {
     $page->show403();
