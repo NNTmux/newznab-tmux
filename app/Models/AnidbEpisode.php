@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Yadakhov\InsertOnDuplicateKey;
 
 class AnidbEpisode extends Model
 {
+    use InsertOnDuplicateKey;
+
     /**
      * @var bool
      */
