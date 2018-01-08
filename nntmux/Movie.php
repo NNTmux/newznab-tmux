@@ -1479,9 +1479,9 @@ class Movie
             $name = $matches['name'];
             $year = $matches['year'];
 
-        /* If we didn't find a year, try to get a name anyways.
-         * Try to look for a title before the $followingList and after anything but a-z0-9 two times or more (-[ for example)
-         */
+            /* If we didn't find a year, try to get a name anyways.
+             * Try to look for a title before the $followingList and after anything but a-z0-9 two times or more (-[ for example)
+             */
         } elseif (preg_match('/([^\w]{2,})?(?P<name>[\w .-]+?)'.$followingList.'/i', $releaseName, $matches)) {
             $name = $matches['name'];
         }

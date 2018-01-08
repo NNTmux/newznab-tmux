@@ -351,7 +351,7 @@ class Sharing
             // If the user picked to start from the oldest, get the oldest.
             if ($this->siteSettings['start_position'] === true) {
                 $this->siteSettings['last_article'] = $ourOldest = $group['first'];
-            // Else get the newest.
+                // Else get the newest.
             } else {
                 $this->siteSettings['last_article'] = $ourOldest = (string) ($group['last'] - $this->siteSettings['max_download']);
                 if ($ourOldest < $group['first']) {
