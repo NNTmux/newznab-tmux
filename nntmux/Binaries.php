@@ -1694,25 +1694,10 @@ class Binaries
     }
 
     /**
-     * Delete all Collections/Binaries/Parts for a group ID.
-     *
-     * @param int $groupID The ID of the group.
-     *
-     * @note A trigger automatically deletes the parts/binaries.
-     *
-     * @return void
-     */
-    public function purgeGroup($groupID): void
-    {
-        $this->_pdo->queryExec(sprintf('DELETE c FROM collections c WHERE c.groups_id = %d', $groupID));
-    }
-
-    /**
      * Log / Echo message.
      *
      * @param string $message Message to log.
      * @param string $method  Method that called this.
-     * @param int    $level   Logger severity level constant.
      * @param string $color   ColorCLI method name.
      */
     private function log($message, $method, $color): void

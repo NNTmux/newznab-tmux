@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Settings;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Group;
@@ -29,6 +30,11 @@ class Groups
     protected $cbpm;
 
     /**
+     * @var bool
+     */
+    protected $allasmgr;
+
+    /**
      * @var array
      */
     protected $cbppTableNames;
@@ -50,6 +56,7 @@ class Groups
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
         $this->cbpm = ['collections', 'binaries', 'parts', 'missed_parts'];
+        $this->allasmgr = (int) Settings::settingValue('..allassmgr') === 1;
     }
 
     /**
@@ -189,16 +196,6 @@ class Groups
         return $res === null ? 0 : $res->count(['id']);
     }
 
-    /**
-     * Gets all groups and associated release counts.
-     *
-     * @param bool|int $start     The offset of the query or false for no offset
-     * @param int      $num       The limit of the query
-     * @param string   $groupname The groupname we want if any
-     * @param int      $active    The status of the group we want if any
-     *
-     * @return mixed
-     */
 
     /**
      * Gets all groups and associated release counts.
@@ -318,9 +315,6 @@ class Groups
      */
     public function reset($id): bool
     {
-        // Remove rows from collections / binaries / parts.
-        (new Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
-
         // Remove rows from part repair.
         MissedPart::query()->where('groups_id', $id)->delete();
 
@@ -501,6 +495,7 @@ class Groups
      * @param int $groupID ID of the group.
      *
      * @return array The table names.
+     * @throws \Exception
      */
     public function getCBPTableNames($groupID): array
     {
@@ -511,7 +506,7 @@ class Groups
             return $this->cbppTableNames[$groupKey];
         }
 
-        if (NN_ECHOCLI && $this->createNewTPGTables($groupID) === false) {
+        if (NN_ECHOCLI && $this->allasmgr === false && $this->createNewTPGTables($groupID) === false) {
             exit('There is a problem creating new TPG tables for this group ID: '.$groupID.PHP_EOL);
         }
 
