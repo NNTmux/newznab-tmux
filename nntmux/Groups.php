@@ -56,7 +56,7 @@ class Groups
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
         $this->cbpm = ['collections', 'binaries', 'parts', 'missed_parts'];
-        $this->allasmgr = (int) Settings::settingValue('..allassmgr') === 1;
+        $this->allasmgr = (int) Settings::settingValue('..allasmgr') === 1;
     }
 
     /**
