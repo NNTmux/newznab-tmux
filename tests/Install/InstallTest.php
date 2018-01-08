@@ -14,7 +14,6 @@
 namespace tests;
 
 require_once \dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php';
-include_once \dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'nntmux' . DIRECTORY_SEPARATOR . 'constants.php';
 
 use App\Extensions\util\Versions;
 use App\Models\User;
