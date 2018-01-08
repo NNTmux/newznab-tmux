@@ -2,11 +2,11 @@
 
 namespace nntmux;
 
-use App\Models\Settings;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Group;
 use App\Models\Release;
+use App\Models\Settings;
 use App\Models\MissedPart;
 use Illuminate\Support\Facades\DB as DBFacade;
 
@@ -195,7 +195,6 @@ class Groups
 
         return $res === null ? 0 : $res->count(['id']);
     }
-
 
     /**
      * Gets all groups and associated release counts.
