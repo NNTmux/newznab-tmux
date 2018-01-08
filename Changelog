@@ -1,4 +1,5 @@
 2018-01-08 DariusIII
+	* Fix: Fix path loading in smarty.php
 	* Chg: Update files that use constants.php
 	* Chg: Move constants.php to bootstrap folder, config folder was a bad place
 	* Chg: Move constants.php to config folder
