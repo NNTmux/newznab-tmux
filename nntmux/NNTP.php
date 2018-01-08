@@ -211,7 +211,7 @@ class NNTP extends \Net_NNTP_Client
                 if ($userName === '') {
                     $authenticated = true;
 
-                // Try to authenticate to usenet.
+                    // Try to authenticate to usenet.
                 } else {
                     $ret2 = $this->authenticate($userName, $password);
 
@@ -799,7 +799,7 @@ class NNTP extends \Net_NNTP_Client
         if ($yEnc) {
             $bin = $compress ? gzdeflate($body, 4) : $body;
             $body = Yenc::encode($bin, $subject);
-        // If not yEnc, then check if the body is 510+ chars, split it at 510 chars and separate with \r\n
+            // If not yEnc, then check if the body is 510+ chars, split it at 510 chars and separate with \r\n
         } else {
             $body = $this->_splitLines($body, $compress);
         }
