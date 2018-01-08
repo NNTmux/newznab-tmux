@@ -1,7 +1,7 @@
 <?php
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'constants.php';
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap'.DIRECTORY_SEPARATOR.'constants.php';
 require __DIR__.DIRECTORY_SEPARATOR.'app.php';
 
 use Dotenv\Dotenv;

@@ -1,4 +1,5 @@
 2018-01-08 DariusIII
+	* Chg: Move constants.php to bootstrap folder, config folder was a bad place
 	* Chg: Move constants.php to config folder
 	* Chg: Update simfony components
 2018-01-05 DariusIII
