@@ -72,7 +72,6 @@
     "ext-iconv": "*",
     "ext-json": "*",
     "ext-mbstring": "*",
-    "ext-mcrypt": "*",
     "ext-mysqlnd": "*",
     "ext-openssl": "*",
     "ext-pcre": "*",
