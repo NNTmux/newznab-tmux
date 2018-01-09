@@ -182,7 +182,7 @@ class User extends Authenticatable
      * @param string $email
      * @return int
      */
-    public static function getCount($role = '', $username = '', $host = '', $email = '')
+    public static function getCount($role = '', $username = '', $host = '', $email = ''): int
     {
         $res = self::query()->where('email', '!=', 'sharing@nZEDb.com');
 
@@ -482,11 +482,8 @@ class User extends Authenticatable
     }
 
     /**
-     * Hash a password using crypt.
-     *
-     * @param string $password
-     *
-     * @return string|bool
+     * @param $password
+     * @return mixed
      */
     public static function hashPassword($password)
     {
@@ -598,11 +595,51 @@ class User extends Authenticatable
     }
 
     /**
-     * @return string
+     * Generate a stron password
+     *
+     *
+     * @param int $length
+     * @param bool $add_dashes
+     * @param string $available_sets
+     * @return bool|string
      */
-    public static function generatePassword(): string
+    public static function generatePassword($length = 15, $add_dashes = false, $available_sets = 'luds')
     {
-        return Str::random(8);
+        $sets = [];
+        if (strpos($available_sets, 'l') !== false) {
+            $sets[] = 'abcdefghjkmnpqrstuvwxyz';
+        }
+        if (strpos($available_sets, 'u') !== false) {
+            $sets[] = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+        }
+        if (strpos($available_sets, 'd') !== false) {
+            $sets[] = '23456789';
+        }
+        if (strpos($available_sets, 's') !== false) {
+            $sets[] = '!@#$%&*?';
+        }
+        $all = '';
+        $password = '';
+        foreach ($sets as $set) {
+            $password .= $set[random_int(0, \count(str_split($set))-1)];
+            $all .= $set;
+        }
+        $all = str_split($all);
+        for ($i = 0; $i < $length - \count($sets); $i++) {
+            $password .= $all[random_int(0, \count($all) - 1)];
+        }
+        $password = str_shuffle($password);
+        if (! $add_dashes) {
+            return $password;
+        }
+        $dash_len = floor(sqrt($length));
+        $dash_str = '';
+        while (\strlen($password) > $dash_len) {
+            $dash_str .= substr($password, 0, $dash_len) . '-';
+            $password = substr($password, $dash_len);
+        }
+        $dash_str .= $password;
+        return $dash_str;
     }
 
     /**
@@ -667,13 +704,12 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $password
-     *
+     * @param string $password
      * @return bool
      */
-    public static function isValidPassword(string $password): bool
+    public static function isValidPassword(string $password)
     {
-        return \strlen($password) > 5;
+        return \strlen($password) > 8 && preg_match("#[0-9]+#", $password) && preg_match("#[A-Z]+#", $password) && preg_match("#[a-z]+#", $password);
     }
 
     /**

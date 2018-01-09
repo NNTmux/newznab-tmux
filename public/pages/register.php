@@ -71,7 +71,7 @@ if ($showRegister === 1) {
                                     $error = 'Your username must be at least five characters.';
                                     break;
                                 case User::ERR_SIGNUP_BADPASS:
-                                    $error = 'Your password must be longer than eight characters.';
+                                    $error = 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
                                     break;
                                 case User::ERR_SIGNUP_BADEMAIL:
                                     $error = 'Your email is not a valid format.';

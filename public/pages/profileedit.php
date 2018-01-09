@@ -45,7 +45,7 @@ switch ($action) {
         if ($_POST['password'] !== '' && $_POST['password'] !== $_POST['confirmpassword']) {
             $errorStr = 'Password Mismatch';
         } elseif ($_POST['password'] !== '' && ! User::isValidPassword($_POST['password'])) {
-            $errorStr = 'Your password must be longer than five characters.';
+            $errorStr = 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
         } elseif (! empty($_POST['nzbgeturl']) && $nzbGet->verifyURL($_POST['nzbgeturl']) === false) {
             $errorStr = 'The NZBGet URL you entered is invalid!';
         } elseif (! User::isValidEmail($_POST['email'])) {

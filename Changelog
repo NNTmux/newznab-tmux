@@ -1,4 +1,5 @@
 2018-01-09 DariusIII
+	* Chg: Update isValidPassword and generatePassword functions to check for and generate stronger passwords
 	* Chg: Add php7.2 to travis tests
 	* Chg: Start switching to php7.2, remove mcrypt extension requirement from composer.json
 	* Chg: Remove config/nntmux.php
