@@ -1,3 +1,5 @@
+2018-01-09 DariusIII
+	* Chg: Remove config/nntmux.php
 2018-01-08 DariusIII
 	* Chg: Update Groups and Binaries classes
 	* Fix: Fix nfo query in Forking class (use leftguid for grouping)
