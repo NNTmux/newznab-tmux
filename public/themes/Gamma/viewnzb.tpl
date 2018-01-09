@@ -4,7 +4,7 @@
 <div id="content">
 	<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
 		<li class="active"><a href="#info" data-toggle="tab">Info</a></li>
-		{if $reVideo.releases_id|@count > 0 || $reAudio|@count > 0}
+		{if isset($reVideo.releases_id) || isset($reAudio)}
 			<li><a href="#mediainfo" data-toggle="tab">Media info</a></li>
 		{/if}
 		{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
@@ -399,7 +399,7 @@
 			</dl>
 		</div>
 		<div class="tab-pane" id="mediainfo">
-			{if $reVideo.releases_id|@count > 0 || $reAudio|@count > 0}
+			{if isset($reVideo.releases_id) || isset($reAudio)}
 				<td style="padding:0;">
 					<table style="width:100%;" class="innerdata highlight table">
 						<tr>

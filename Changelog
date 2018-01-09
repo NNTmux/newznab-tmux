@@ -1,4 +1,5 @@
 2018-01-09 DariusIII
+	* Fix: Temporary fix for PHP7.2 countable arrays/objects problem
 	* Chg: Update ReleaseExtra class
 	* Chg: Update NZBContents class
 	* Chg: Update isValidPassword and generatePassword functions to check for and generate stronger passwords
