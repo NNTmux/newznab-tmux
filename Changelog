@@ -1,4 +1,5 @@
 2018-01-09 DariusIII
+	* Chg: Update ReleaseExtra class
 	* Chg: Update NZBContents class
 	* Chg: Update isValidPassword and generatePassword functions to check for and generate stronger passwords
 	* Chg: Add php7.2 to travis tests
