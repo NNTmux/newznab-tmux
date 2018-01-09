@@ -2844,12 +2844,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/JPinkney/TVMaze-PHP-API-Wrapper.git",
-                "reference": "b354b08c3dab8fed47ff6798844a7727c1b7a137"
+                "reference": "174429341ef2009a42f77743faa342726d7d8467"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JPinkney/TVMaze-PHP-API-Wrapper/zipball/b354b08c3dab8fed47ff6798844a7727c1b7a137",
-                "reference": "b354b08c3dab8fed47ff6798844a7727c1b7a137",
+                "url": "https://api.github.com/repos/JPinkney/TVMaze-PHP-API-Wrapper/zipball/174429341ef2009a42f77743faa342726d7d8467",
+                "reference": "174429341ef2009a42f77743faa342726d7d8467",
                 "shasum": ""
             },
             "type": "library",
@@ -2869,7 +2869,7 @@
                 }
             ],
             "description": "TVMaze-API-Wrapper",
-            "time": "2017-12-15T14:10:22+00:00"
+            "time": "2018-01-09T14:46:56+00:00"
         },
         {
             "name": "kevinrob/guzzle-cache-middleware",
