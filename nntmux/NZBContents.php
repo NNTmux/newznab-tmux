@@ -147,11 +147,11 @@ class NZBContents
     /**
      * Gets the completion from the NZB, optionally looks if there is an NFO/PAR2 file.
      *
-     * @param string $guid
-     * @param int $relID
-     * @param int $groupID
-     * @param bool $nfoCheck
      *
+     * @param $guid
+     * @param $relID
+     * @param $groupID
+     * @param bool $nfoCheck
      * @return array|bool
      * @throws \Exception
      */
@@ -163,7 +163,6 @@ class NZBContents
             $actualParts = $artificialParts = 0;
             $foundPAR2 = $this->lookuppar2 === false;
             $foundNFO = $hiddenNFO = $nfoCheck === false;
-            $foundSRR = false;
 
             foreach ($nzbFile->file as $nzbcontents) {
                 foreach ($nzbcontents->segments->segment as $segment) {
@@ -216,11 +215,11 @@ class NZBContents
 
             Release::query()->where('id', $relID)->update(['completion' => $completion]);
 
-            if ($foundNFO === true && strlen($messageID) > 1) {
+            if ($foundNFO === true && \strlen($messageID) > 1) {
                 return ['hidden' => false, 'id' => $messageID];
             }
 
-            if ($hiddenNFO === true && strlen($hiddenID) > 1) {
+            if ($hiddenNFO === true && \strlen($hiddenID) > 1) {
                 return ['hidden' => true, 'id' => $hiddenID];
             }
         }
@@ -229,11 +228,8 @@ class NZBContents
     }
 
     /**
-     * Decompress a NZB, load it into simplexml and return.
-     *
-     * @param string $guid Release guid.
-     *
-     * @return bool SimpleXMLElement
+     * @param $guid
+     * @return bool|\SimpleXMLElement
      */
     public function LoadNZB($guid)
     {
@@ -286,7 +282,7 @@ class NZBContents
      * @return bool
      * @throws \Exception
      */
-    public function checkPAR2($guid, $relID, $groupID, $nameStatus, $show)
+    public function checkPAR2($guid, $relID, $groupID, $nameStatus, $show): bool
     {
         $nzbFile = $this->LoadNZB($guid);
         if ($nzbFile !== false) {
