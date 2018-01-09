@@ -595,7 +595,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Generate a stron password
+     * Generate a stron password.
      *
      *
      * @param int $length
@@ -621,7 +621,7 @@ class User extends Authenticatable
         $all = '';
         $password = '';
         foreach ($sets as $set) {
-            $password .= $set[random_int(0, \count(str_split($set))-1)];
+            $password .= $set[random_int(0, \count(str_split($set)) - 1)];
             $all .= $set;
         }
         $all = str_split($all);
@@ -635,10 +635,11 @@ class User extends Authenticatable
         $dash_len = floor(sqrt($length));
         $dash_str = '';
         while (\strlen($password) > $dash_len) {
-            $dash_str .= substr($password, 0, $dash_len) . '-';
+            $dash_str .= substr($password, 0, $dash_len).'-';
             $password = substr($password, $dash_len);
         }
         $dash_str .= $password;
+
         return $dash_str;
     }
 
@@ -709,7 +710,7 @@ class User extends Authenticatable
      */
     public static function isValidPassword(string $password)
     {
-        return \strlen($password) > 8 && preg_match("#[0-9]+#", $password) && preg_match("#[A-Z]+#", $password) && preg_match("#[a-z]+#", $password);
+        return \strlen($password) > 8 && preg_match('#[0-9]+#', $password) && preg_match('#[A-Z]+#', $password) && preg_match('#[a-z]+#', $password);
     }
 
     /**
