@@ -1,16 +1,16 @@
 <?php
 
+use App\Models\Menu;
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Menu;
 
 $page = new AdminPage();
 
-$menu = new Menu();
 
 $page->title = 'Menu List';
 
-$menulist = $menu->getAll();
+$menulist = Menu::getAll();
 $page->smarty->assign('menulist', $menulist);
 
 $page->content = $page->smarty->fetch('menu-list.tpl');

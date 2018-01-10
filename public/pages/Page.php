@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\Menu;
+use App\Models\Menu;
 use App\Models\User;
 use nntmux\Category;
 use nntmux\Contents;
@@ -36,8 +36,7 @@ class Page extends BasePage
         }
 
         $content = new Contents(['Settings' => $this->settings]);
-        $menu = new Menu($this->settings);
-        $this->smarty->assign('menulist', $menu->get($role, $this->serverurl));
+        $this->smarty->assign('menulist', Menu::getMenu($role, $this->serverurl));
         $this->smarty->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
         $this->smarty->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
         if ($this->userdata !== null) {
