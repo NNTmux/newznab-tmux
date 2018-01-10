@@ -1,8 +1,8 @@
 <?php
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\Menu;
-
 
 $page = new AdminPage();
 

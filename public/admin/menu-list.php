@@ -4,9 +4,7 @@ use App\Models\Menu;
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
 $page = new AdminPage();
-
 
 $page->title = 'Menu List';
 
