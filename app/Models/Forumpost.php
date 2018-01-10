@@ -23,19 +23,16 @@ class Forumpost extends Model
     protected $guarded = [];
 
     /**
-     * Add post to forum.
-     *
-     * @param     $parentId
-     * @param     $userid
-     * @param     $subject
-     * @param     $message
+     * @param $parentId
+     * @param $userid
+     * @param $subject
+     * @param $message
      * @param int $locked
      * @param int $sticky
      * @param int $replies
-     *
-     * @return bool|int
+     * @return int
      */
-    public static function add($parentId, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0)
+    public static function add($parentId, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0): int
     {
         if ($message === '') {
             return -1;
@@ -123,7 +120,7 @@ class Forumpost extends Model
     {
         $res = self::query()->count('id');
 
-        return $res === false ? 0 : $res;
+        return $res ?? 0;
     }
 
     /**
@@ -187,17 +184,14 @@ class Forumpost extends Model
     }
 
     /**
-     * Get count of posts for user.
-     *
      * @param $uid
-     *
      * @return int
      */
     public static function getCountForUser($uid): int
     {
         $res = self::query()->where('users_id', $uid)->count('id');
 
-        return $res === false ? 0 : $res;
+        return $res ?? 0;
     }
 
     /**
