@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Cache;
 
 class Games
 {
-    const GAME_MATCH_PERCENTAGE = 85;
+    protected const GAME_MATCH_PERCENTAGE = 85;
 
-    const GAMES_TITLE_PARSE_REGEX =
+    protected const GAMES_TITLE_PARSE_REGEX =
         '#(?P<title>[\w\s\.]+)(-(?P<relgrp>FLT|RELOADED|SKIDROW|PROPHET|RAZOR1911|CORE|REFLEX))?\s?(\s*(\(?('.
         '(?P<reltype>PROPER|MULTI\d|RETAIL|CRACK(FIX)?|ISO|(RE)?(RIP|PACK))|(?P<year>(19|20)\d{2})|V\s?'.
         '(?P<version>(\d+\.)+\d+)|(-\s)?(?P=relgrp))\)?)\s?)*\s?(\.\w{2,4})?#i';
