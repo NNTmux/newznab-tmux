@@ -1,3 +1,5 @@
+2018-01-10 DariusIII
+	* Chg: Update doctrine/inflector to latest version
 2018-01-09 DariusIII
 	* Chg: Update jpinkney/tvmaze-api-wrapper to latest
 	* Fix: Temporary fix for PHP7.2 countable arrays/objects problem
