@@ -13,12 +13,12 @@ use GuzzleHttp\Exception\RequestException;
  */
 class TraktAPI
 {
-    const API_URL = 'https://api.trakt.tv/';
+    protected const API_URL = 'https://api.trakt.tv/';
 
     /**
-     * @var array	List of site IDs that trakt,tv supports. Only trakt is guaranteed to exist.
+     * @var array
      */
-    private $types = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvrage'];
+    private static $types = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvrage'];
 
     /**
      * List of headers to send to Trakt.tv when making a request.
@@ -29,12 +29,12 @@ class TraktAPI
     private $requestHeaders;
 
     /**
-     * @var Client
+     * @var \GuzzleHttp\Client
      */
     protected $client;
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     protected $pdo;
 
@@ -43,6 +43,7 @@ class TraktAPI
      *
      *
      * @param $headers
+     * @throws \Exception
      */
     public function __construct($headers)
     {
@@ -70,21 +71,21 @@ class TraktAPI
     public function episodeSummary($id, $season = '', $ep = '', $type = 'min')
     {
         switch ($type) {
-			case 'aliases':
-			case 'full':
-			case 'images':
-			case 'full,images':
-			case 'full,images,aliases':
-				$extended = $type;
-				break;
-			default:
-				$extended = 'min';
-		}
+            case 'aliases':
+            case 'full':
+            case 'images':
+            case 'full,images':
+            case 'full,images,aliases':
+                $extended = $type;
+                break;
+            default:
+                $extended = 'min';
+        }
 
         $url = self::API_URL."shows/{$id}/seasons/{$season}/episodes/{$ep}";
 
         $array = $this->getJsonArray($url, $extended);
-        if (! is_array($array)) {
+        if (! \is_array($array)) {
             return false;
         }
 
@@ -100,8 +101,8 @@ class TraktAPI
     public function getBoxOffice()
     {
         $array = $this->getJsonArray(
-				self::API_URL.'movies/boxoffice'
-		);
+                self::API_URL.'movies/boxoffice'
+        );
         if (! $array) {
             return false;
         }
@@ -121,8 +122,8 @@ class TraktAPI
     public function getCalendar($start = '', $days = 7)
     {
         $array = $this->getJsonArray(
-				self::API_URL.'calendars/all/shows/'.$start.'/'.$days
-		);
+                self::API_URL.'calendars/all/shows/'.$start.'/'.$days
+        );
         if (! $array) {
             return false;
         }
@@ -151,14 +152,16 @@ class TraktAPI
             $extendedString = '?extended='.$extended;
         }
 
+        $json = '';
+
         if (! empty($this->requestHeaders)) {
             try {
                 $json = $this->client->get(
-					$URI.$extendedString,
-					[
-						'headers' => $this->requestHeaders,
-					]
-				)->getBody()->getContents();
+                    $URI.$extendedString,
+                    [
+                        'headers' => $this->requestHeaders,
+                    ]
+                )->getBody()->getContents();
             } catch (RequestException $e) {
                 if ($e->hasResponse()) {
                     if ($e->getCode() === 404) {
@@ -175,9 +178,9 @@ class TraktAPI
                 ColorCLI::doEcho(ColorCLI::notice('Unknown error occurred!'));
             }
 
-            if (isset($json) && $json !== false) {
+            if ($json !== null && $json !== false) {
                 $json = json_decode($json, true);
-                if (! is_array($json) || (isset($json['status']) && $json['status'] === 'failure')) {
+                if (! \is_array($json) || (isset($json['status']) && $json['status'] === 'failure')) {
                     return false;
                 }
 
@@ -205,56 +208,53 @@ class TraktAPI
     public function movieSummary($movie = '', $type = 'imdbID')
     {
         switch ($type) {
-			case 'full':
-			case 'images':
-			case 'full,images':
-				$extended = $type;
-				break;
-			case 'imdbID':
-			default:
-				$extended = 'min';
-		}
-        $array = $this->getJsonArray(self::API_URL.'movies/'.$this->slugify($movie), $extended);
+            case 'full':
+            case 'images':
+            case 'full,images':
+                $extended = $type;
+                break;
+            case 'imdbID':
+            default:
+                $extended = 'min';
+        }
+        $array = $this->getJsonArray(self::API_URL.'movies/'.str_slug($movie), $extended);
         if (! $array) {
             return false;
-        } else {
-            if ($type === 'imdbID' && isset($array['ids']['imdb'])) {
-                return $array['ids']['imdb'];
-            }
+        }
+        if ($type === 'imdbID' && isset($array['ids']['imdb'])) {
+            return $array['ids']['imdb'];
         }
 
         return $array;
     }
 
     /**
-     * Search for entry using on of the supported site IDs.
-     *
-     * @param int	$id		The ID to look for.
-     * @param string	$site	One of the supported sites ('imdb', 'tmdb', 'trakt', 'tvdb', 'tvrage')
-     * @param int	$type	videos.type flag (-1 for episodes).
-     *
-     * @return bool
+     * @param int|string $id
+     * @param string $site
+     * @param int|string $type
+     * @return array|false|null
      */
     public function searchId($id, $site = 'trakt', $type = 0)
     {
-        if (! in_array($site, $this->types) || ! ctype_digit($id)) {
+        if (! \in_array($site, self::$types, false) || ! ctype_digit($id)) {
             return null;
-        } elseif ($site == 'imdb') {
+        }
+        if ($site === 'imdb') {
             $id = 'tt'.$id;
         }
 
         switch (true) {
-			case $site == 'trakt' && ($type == 0 || $type == 2):
-				$type = $site.'-show';
-				break;
-			case $site == 'trakt' && $type == 1:
-				$type = $site.'-movie';
-				break;
-			case $site == 'trakt' && $type == -1:
-				$type = $site.'-episode';
-				break;
-			default:
-		}
+            case $site === 'trakt' && ($type === 0 || $type === 2):
+                $type = $site.'-show';
+                break;
+            case $site === 'trakt' && $type === 1:
+                $type = $site.'-movie';
+                break;
+            case $site === 'trakt' && $type === -1:
+                $type = $site.'-episode';
+                break;
+            default:
+        }
 
         $url = self::API_URL."search?id_type=$type&id=$id";
 
@@ -275,8 +275,8 @@ class TraktAPI
     public function showSearch($show = '', $type = 'show')
     {
         $searchUrl = self::API_URL.'search?query='.
-				str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $show)).
-				'&type='.$type;
+                str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $show)).
+                '&type='.$type;
 
         return $this->getJsonArray($searchUrl, '');
     }
@@ -299,19 +299,19 @@ class TraktAPI
         if (empty($show)) {
             return null;
         }
-        $showUrl = self::API_URL.'shows/'.$this->slugify($show);
+        $showUrl = self::API_URL.'shows/'.str_slug($show);
 
         switch ($type) {
-			case 'images':
-			case 'full,images':
-				$extended = $type;
-				break;
-			case 'full':
-				$extended = 'full';
-				break;
-			default:
-				$extended = '';
-		}
+            case 'images':
+            case 'full,images':
+                $extended = $type;
+                break;
+            case 'full':
+                $extended = 'full';
+                break;
+            default:
+                $extended = '';
+        }
 
         return $this->getJsonArray($showUrl, $extended);
     }
