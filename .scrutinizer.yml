@@ -20,6 +20,8 @@ build:
             version: '7.1.6'
             ini:
                 memory_limit:     "4096M"
+    tests:
+        override: [php-scrutinizer-run]
 checks:
     php:
         code_rating: true
@@ -56,5 +58,3 @@ tools:
     php_code_sniffer:
       config:
         standard: PSR2
-tests:
-    override: [php-scrutinizer-run]
