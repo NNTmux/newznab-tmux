@@ -1,4 +1,5 @@
 2018-01-10 DariusIII
+	* Chg: Add missing DatabaseSeeder class
 	* Chg: Remove nntmux/Menu class and use Menu model
 	* Chg: Update Forumpost model
 	* Chg: Remove nntmux/Forum.php and use Forumpost model

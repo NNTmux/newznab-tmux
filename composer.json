@@ -17,7 +17,8 @@
       "public/pages/",
       "libs/PEAR/Net_NNTP/NNTP/",
       "libs/",
-      "database/factories"
+      "database/factories",
+      "database/seeds"
     ]
   },
   "config": {
