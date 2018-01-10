@@ -56,3 +56,5 @@ tools:
     php_code_sniffer:
       config:
         standard: PSR2
+tests:
+    override: [php-scrutinizer-run]
