@@ -1,4 +1,5 @@
 2018-01-10 DariusIII
+	* Chg: Remove nntmux/Forum.php and use Forumpost model
 	* Chg: Update scrutinizer config
 	* Chg: Use laravels str_slug helper to create slugs in TraktAPI class
 	* Fix: Properly fix mediainfo display (PHP7.2 countable array/object error)

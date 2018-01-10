@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\Forum;
+use App\Models\Forumpost;
 use App\Models\User;
 use App\Models\Settings;
 
@@ -10,14 +10,13 @@ if (! User::isLoggedIn()) {
 
 $id = $_GET['id'] + 0;
 
-$forum = new Forum();
 if (! empty($_POST['addMessage']) && $page->isPostBack()) {
-    $forum->add($id, User::currentUserId(), '', $_POST['addMessage']);
+    Forumpost::add($id, User::currentUserId(), '', $_POST['addMessage']);
     header('Location:'.WWW_TOP.'/forumpost/'.$id.'#last');
     die();
 }
 
-$results = $forum->getPosts($id);
+$results = Forumpost::getPosts($id);
 if (count($results) === 0) {
     header('Location:'.WWW_TOP.'/forum');
     die();

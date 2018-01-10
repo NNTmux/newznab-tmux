@@ -1,17 +1,15 @@
 <?php
 
-use nntmux\Forum;
+use App\Models\Forumpost;
 use App\Models\User;
 use App\Models\Settings;
-
-$forum = new Forum;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 if (! empty($_POST['addMessage']) && ! empty($_POST['addSubject']) && $page->isPostBack()) {
-    $forum->add(0, User::currentUserId(), $_POST['addSubject'], $_POST['addMessage']);
+    Forumpost::add(0, User::currentUserId(), $_POST['addSubject'], $_POST['addMessage']);
     header('Location:'.WWW_TOP.'/forum');
     die();
 }
@@ -27,22 +25,22 @@ if (! empty($_GET['unlock'])) {
 }
 
 if ($lock !== null) {
-    $forum->lockUnlockTopic($lock, 1);
+    Forumpost::lockUnlockTopic($lock, 1);
     header('Location:'.WWW_TOP.'/forum');
     die();
 }
 
 if ($unlock !== null) {
-    $forum->lockUnlockTopic($unlock, 0);
+    Forumpost::lockUnlockTopic($unlock, 0);
     header('Location:'.WWW_TOP.'/forum');
     die();
 }
 
-$browsecount = $forum->getBrowseCount();
+$browsecount = Forumpost::getBrowseCount();
 
 $offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? $_REQUEST['offset'] : 0;
 
-$results = $forum->getBrowseRange($offset, ITEMS_PER_PAGE);
+$results = Forumpost::getBrowseRange($offset, ITEMS_PER_PAGE);
 
 $page->smarty->assign('pagertotalitems', $browsecount);
 $page->smarty->assign('pageroffset', $offset);

@@ -1,25 +1,24 @@
 <?php
 
-use nntmux\Forum;
+use App\Models\Forumpost;
 use App\Models\User;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
-$forum = new Forum();
 $id = $_GET['id'] + 0;
 
 if (isset($id) && ! empty($_POST['addMessage'])) {
-    $parent = $forum->getPost($id);
-    $forum->editPost($id, $_POST['addMessage'], User::currentUserId());
-    if ($parent['parentid'] != 0) {
+    $parent = Forumpost::getPost($id);
+    Forumpost::editPost($id, $_POST['addMessage'], User::currentUserId());
+    if ((int) $parent['parentid'] !== 0) {
         header('Location:'.WWW_TOP.'/forumpost/'.$parent['parentid'].'#last');
     } else {
         header('Location:'.WWW_TOP.'/forumpost/'.$id);
     }
 }
 
-$result = $forum->getPost($id);
+$result = Forumpost::getPost($id);
 
 $page->meta_title = 'Edit forum Post';
 $page->meta_keywords = 'edit, view,forum,post,thread';
