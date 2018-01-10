@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\Forumpost;
 use nntmux\Menu;
 use App\Models\User;
 use nntmux\Category;
 use nntmux\Contents;
 use App\Models\Settings;
+use App\Models\Forumpost;
 
 /**
  * This class represents every normal user page in the site.

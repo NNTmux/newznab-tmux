@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Forumpost;
 use App\Models\User;
 use App\Models\Settings;
+use App\Models\Forumpost;
 
 if (! User::isLoggedIn()) {
     $page->show403();
