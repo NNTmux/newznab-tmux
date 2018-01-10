@@ -1,4 +1,5 @@
 2018-01-10 DariusIII
+	* Fix: Properly fix mediainfo display (PHP7.2 countable array/object error)
 	* Chg: Update doctrine/inflector to latest version
 2018-01-09 DariusIII
 	* Chg: Update jpinkney/tvmaze-api-wrapper to latest

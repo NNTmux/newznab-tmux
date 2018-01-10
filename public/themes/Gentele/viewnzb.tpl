@@ -159,7 +159,7 @@
 								{if ($release.haspreview == 1 && $userdata.canpreview == 1) || ($release.haspreview == 2 && $userdata.canpreview == 1)}
 									<li role="presentation"><a href="#pane7" data-toggle="tab">Preview</a></li>
 								{/if}
-								{if isset($reVideo.releases_id) || isset($reAudio)}
+								{if $reVideo != false || $reAudio != false}
 									<li role="presentation"><a href="#pane8" data-toggle="tab">MediaInfo</a></li>
 								{/if}
 								{if isset($xxx.backdrop) && $xxx.backdrop == 1}
@@ -685,7 +685,7 @@
 										 data-target="#modal-image"/>
 								</div>
 							{/if}
-							{if isset($reVideo.releases_id) || isset($reAudio)}
+							{if $reVideo != false || $reAudio != false}
 								<div id="pane8" class="tab-pane">
 									<table style="width:100%;" class="data table table-striped responsive-utilities jambo-table">
 										<tr>

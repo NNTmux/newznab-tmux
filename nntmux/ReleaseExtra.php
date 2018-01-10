@@ -79,22 +79,32 @@ class ReleaseExtra
 
     /**
      * @param $id
-     *
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return array|bool
      */
     public function getVideo($id)
     {
-        return VideoData::query()->where('releases_id', $id)->first();
+        $result = VideoData::query()->where('releases_id', $id)->first();
+
+        if ($result !== null) {
+            return $result->toArray();
+        }
+
+        return false;
     }
 
     /**
      * @param $id
-     *
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return array|bool
      */
     public function getAudio($id)
     {
-        return AudioData::query()->where('releases_id', $id)->orderBy('audioid')->get();
+        $result = AudioData::query()->where('releases_id', $id)->orderBy('audioid')->get();
+
+        if ($result !== null) {
+            return $result->toArray();
+        }
+
+        return false;
     }
 
     /**
@@ -132,7 +142,9 @@ class ReleaseExtra
                         INNER JOIN releases r ON r.id = video_data.releases_id
                         WHERE r.guid = %s
                         GROUP BY r.id",
-                $this->pdo->escapeString($guid)));
+                $this->pdo->escapeString($guid)
+            )
+        );
     }
 
     /**
