@@ -5,7 +5,7 @@ build:
           - 'composer install --no-interaction --prefer-source --no-scripts --ignore-platform-reqs'
         before:
           - cp .env.scrutinizer .env
-          - sudo apt-get install mariadb-server-10.2
+          - sudo apt-get install mariadb-server
           - mysql -u root -e "SET GLOBAL innodb_file_per_table = 1;"
           - mysql -u root -e "SET GLOBAL innodb_file_format = 'BARRACUDA';"
           - mysql -u root -e "SET GLOBAL innodb_large_prefix = 1;"
