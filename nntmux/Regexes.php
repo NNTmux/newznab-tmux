@@ -2,13 +2,14 @@
 
 namespace nntmux;
 
+use App\Models\Category;
 use nntmux\db\DB;
 use App\Models\Release;
 
 class Regexes
 {
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -44,7 +45,7 @@ class Regexes
         ];
         $options += $defaults;
 
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->pdo = new DB();
         $this->tableName = $options['Table_Name'];
     }
 
@@ -132,7 +133,7 @@ class Regexes
     }
 
     /**
-     * Get the count of regex in the DB.
+     * Get the \count of regex in the DB.
      *
      * @param string $group_regex Optional, keyword to find a group.
      *
@@ -142,13 +143,13 @@ class Regexes
     {
         $query = $this->pdo->queryOneRow(
             sprintf(
-                'SELECT COUNT(id) AS count FROM %s %s',
+                'SELECT COUNT(id) AS \count FROM %s %s',
                 $this->tableName,
                 $this->_groupQueryString($group_regex)
             )
         );
 
-        return (int) $query['count'];
+        return (int) $query['\count'];
     }
 
     /**
@@ -205,7 +206,7 @@ class Regexes
                     ksort($matches);
                     $string = $string2 = '';
                     foreach ($matches as $key => $match) {
-                        if (! is_int($key)) {
+                        if (! \is_int($key)) {
                             $string .= $match;
                             $string2 .= '<br/>'.$key.': '.$match;
                         }
@@ -225,7 +226,7 @@ class Regexes
                     ];
 
                     if ($limit > 0) {
-                        if (count($hashes) > $limit) {
+                        if (\count($hashes) > $limit) {
                             break;
                         }
                         $hashes[$newCollectionHash] = '';
@@ -333,7 +334,7 @@ class Regexes
         // Get all regex from DB which match the current group name. Cache them for 15 minutes. #CACHEDQUERY#
         $this->_regexCache[$groupName]['regex'] = $this->pdo->query(
             sprintf(
-                'SELECT r.id, r.regex%s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
+                'SELECT r.id, r.regex %s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
                 ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
                 $this->tableName,
                 $this->pdo->escapeString($groupName)
@@ -359,7 +360,7 @@ class Regexes
     protected function _matchRegex($regex, $subject): string
     {
         $returnString = '';
-        if (preg_match($regex, $subject, $matches) && count($matches) > 0) {
+        if (preg_match($regex, $subject, $matches) && \count($matches) > 0) {
             // Sort the keys, the named key matches will be concatenated in this order.
             ksort($matches);
             foreach ($matches as $key => $value) {
@@ -367,7 +368,7 @@ class Regexes
                     case 'collection_regexes': // Put this at the top since it's the most important for performance.
                     case 'release_naming_regexes':
                         // Ignore non-named capture groups. Only named capture groups are important.
-                        if (is_int($key) || preg_match('#reqid|parts#i', $key)) {
+                        if (\is_int($key) || preg_match('#reqid|parts#i', $key)) {
                             continue 2;
                         }
                         $returnString .= $value; // Concatenate the string to return.

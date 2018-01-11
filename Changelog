@@ -1,4 +1,5 @@
 2018-01-11 DariusIII
+	* Chg: Update Categorize and Regexes classes
 	* Chg: Remove nntmux/Category class and move its functions into Category model
 	* Fix: Fix missing Carbon class use statament
 2018-01-10 DariusIII
