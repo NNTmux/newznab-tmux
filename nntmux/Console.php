@@ -21,8 +21,8 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
  */
 class Console
 {
-    const CONS_UPROC = 0; // Release has not been processed.
-    const CONS_NTFND = -2;
+    public const CONS_UPROC = 0; // Release has not been processed.
+    public const CONS_NTFND = -2;
 
     /**
      * @var \nntmux\db\DB
