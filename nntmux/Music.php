@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
+use Illuminate\Support\Carbon;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
-use Carbon\Carbon;
 use App\Models\Genre;
 use GuzzleHttp\Client;
 use App\Models\Release;

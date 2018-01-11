@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
+use Illuminate\Support\Carbon;
 use nntmux\db\DB;
-use Carbon\Carbon;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\Category;

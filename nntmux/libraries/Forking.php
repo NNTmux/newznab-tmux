@@ -2,11 +2,11 @@
 
 namespace nntmux\libraries;
 
+use Illuminate\Support\Carbon;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
-use Carbon\Carbon;
 use App\Models\Tmux;
 use nntmux\ColorCLI;
 use App\Models\Release;

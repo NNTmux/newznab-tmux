@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
+use Illuminate\Support\Carbon;
 use nntmux\db\DB;
-use Carbon\Carbon;
 use App\Models\Group;
 use App\Models\Settings;
 use App\Models\BinaryBlacklist;

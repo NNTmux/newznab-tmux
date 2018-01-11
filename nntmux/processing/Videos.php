@@ -21,8 +21,8 @@
 
 namespace nntmux\processing;
 
+use Illuminate\Support\Carbon;
 use nntmux\db\DB;
-use Carbon\Carbon;
 use App\Models\Video;
 use App\Models\TvInfo;
 use App\Models\VideoAlias;
