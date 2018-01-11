@@ -2,11 +2,11 @@
 
 namespace nntmux;
 
-use App\Models\Category;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Predb;
 use App\Models\Release;
+use App\Models\Category;
 use nntmux\utility\Utility;
 use nntmux\processing\PostProcess;
 
