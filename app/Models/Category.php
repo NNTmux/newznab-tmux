@@ -108,6 +108,7 @@ class Category extends Model
      */
     protected $tmpCat = self::OTHER_MISC;
 
+    protected $table = 'categories';
     /**
      * @var bool
      */
