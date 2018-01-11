@@ -45,7 +45,7 @@ class Regexes
         ];
         $options += $defaults;
 
-        $this->pdo = new DB();
+        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->tableName = $options['Table_Name'];
     }
 
