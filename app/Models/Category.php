@@ -439,13 +439,13 @@ class Category extends Model
         if ($arrsql !== null) {
             $arr = $arrsql;
         } else {
-            $arr = $sql->get();
+            $arr = $sql->get()->toArray();
             $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
             Cache::put(md5(implode(',', $excludedCats).implode(',', $roleExcludedCats)), $arr, $expiresAt);
         }
 
         foreach ($arr as $key => $val) {
-            if ($val['id'] === '0') {
+            if ($val['id'] === self::OTHER_ROOT) {
                 $item = $arr[$key];
                 unset($arr[$key]);
                 $arr[] = $item;

@@ -180,7 +180,7 @@
 						</ul>
 					</li>
 				{/if}
-				{if $parentcat.id === "0"}
+				{if $parentcat.id == {$catClass::OTHER_ROOT}}
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true" data-delay="30">
 							<i class="fa fa-bolt"></i> Other<i class="fa fa-angle-down"></i></a>
