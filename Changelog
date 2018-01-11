@@ -1,4 +1,5 @@
 2018-01-11 DariusIII
+	* Chg: Update Steam class
 	* Fix: Fix NameFixer Category model usage
 	* Chg: Use UserMovie model, remove nntmux\UserMovies class
 	* Chg: Use UserSerie model, remove nntmux/UserSeries class
