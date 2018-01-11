@@ -2,7 +2,6 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Carbon;
 use nntmux\db\DB;
 use Tmdb\ApiToken;
 use aharen\OMDbAPI;
@@ -11,6 +10,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MovieInfo;
 use nntmux\utility\Utility;
+use Illuminate\Support\Carbon;
 use nntmux\libraries\FanartTV;
 use Tmdb\Client as TmdbClient;
 use nntmux\processing\tv\TraktTv;

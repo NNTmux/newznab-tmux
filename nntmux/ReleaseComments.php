@@ -2,12 +2,12 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Carbon;
 use nntmux\db\DB;
 use App\Models\User;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\ReleaseComment;
+use Illuminate\Support\Carbon;
 
 /**
  * This class handles storage and retrieval of release comments.
