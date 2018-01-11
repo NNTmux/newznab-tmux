@@ -2,10 +2,10 @@
 
 namespace nntmux;
 
-use App\Models\Category;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Genre;
+use App\Models\Category;
 use Illuminate\Support\Facades\Cache;
 
 class Genres
