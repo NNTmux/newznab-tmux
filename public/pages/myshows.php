@@ -1,11 +1,11 @@
 <?php
 
 use App\Models\User;
-use App\Models\UserSerie;
 use nntmux\Releases;
 use App\Models\Video;
 use App\Models\Category;
 use App\Models\Settings;
+use App\Models\UserSerie;
 
 if (! User::isLoggedIn()) {
     $page->show403();
