@@ -1,3 +1,5 @@
+2018-01-11 DariusIII
+	* Fix: Fix missing Carbon class use statament
 2018-01-10 DariusIII
 	* Chg: Add missing DatabaseSeeder class
 	* Chg: Remove nntmux/Menu class and use Menu model
