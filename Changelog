@@ -1,4 +1,5 @@
 2018-01-11 DariusIII
+	* Chg: Update ReleaseFile model
 	* Chg: Update Console class
 	* Chg: Declare categories table name in Category model
 	* Chg: Update Steam class

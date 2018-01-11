@@ -85,13 +85,13 @@ class ReleaseFile extends Model
     {
         $insert = 0;
 
-        $duplicateCheck = self::query()->where(['releases_id' => $id, 'name' => utf8_encode($name)])->first();
+        $duplicateCheck = self::query()->where(['releases_id' => $id, 'name' => $name])->first();
 
         if ($duplicateCheck === null) {
             $insert = self::query()->insertGetId(
                 [
                     'releases_id' => $id,
-                    'name' => utf8_encode($name),
+                    'name' => $name,
                     'size' => $size,
                     'created_at' => $createdTime,
                     'updated_at' => Carbon::now(),
