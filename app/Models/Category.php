@@ -506,7 +506,7 @@ class Category extends Model
     /**
      * @param bool $activeOnly
      * @param array $excludedCats
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return array
      */
     public static function getCategories($activeOnly = false, array $excludedCats = [])
     {
