@@ -5,10 +5,10 @@ namespace nntmux;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Release;
+use App\Models\Category;
 use App\Models\Settings;
 use nntmux\utility\Utility;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Category;
 
 /**
  * Class Releases.

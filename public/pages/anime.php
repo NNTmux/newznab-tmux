@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Category;
 use nntmux\AniDB;
 use App\Models\User;
 use nntmux\Releases;
+use App\Models\Category;
 
 if (! User::isLoggedIn()) {
     $page->show403();

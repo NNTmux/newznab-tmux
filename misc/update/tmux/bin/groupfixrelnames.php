@@ -2,7 +2,6 @@
 
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Category;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
@@ -12,6 +11,7 @@ use App\Models\Predb;
 use nntmux\NameFixer;
 use nntmux\MiscSorter;
 use nntmux\NZBContents;
+use App\Models\Category;
 use App\Models\Settings;
 use nntmux\processing\PostProcess;
 

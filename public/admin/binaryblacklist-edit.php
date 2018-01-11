@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Models\Category;
 use nntmux\Binaries;
+use App\Models\Category;
 
 $page = new AdminPage();
 $bin = new Binaries(['Settings' => $page->pdo]);

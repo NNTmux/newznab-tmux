@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Category;
 use nntmux\Books;
 use App\Models\User;
+use App\Models\Category;
 
 if (! User::isLoggedIn()) {
     $page->show403();

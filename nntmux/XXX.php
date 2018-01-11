@@ -2,12 +2,12 @@
 
 namespace nntmux;
 
-use App\Models\Category;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\XxxInfo;
+use App\Models\Category;
 use App\Models\Settings;
 use nntmux\processing\adult\ADE;
 use nntmux\processing\adult\ADM;

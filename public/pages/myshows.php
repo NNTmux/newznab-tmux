@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\Category;
 use App\Models\User;
 use nntmux\Releases;
 use App\Models\Video;
 use nntmux\UserSeries;
+use App\Models\Category;
 use App\Models\Settings;
 
 if (! User::isLoggedIn()) {
@@ -94,7 +94,6 @@ switch ($action) {
                 header('Location:'.WWW_TOP.'/myshows');
             }
         } else {
-
             $tmpcats = Category::getChildren(Category::TV_ROOT);
             $categories = [];
             foreach ($tmpcats as $c) {

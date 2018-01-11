@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Category;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\User;
+use App\Models\Category;
 use App\Models\Settings;
 use nntmux\utility\Utility;
 use App\Models\UserExcludedCategory;

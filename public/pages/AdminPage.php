@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Category;
 use App\Models\User;
+use App\Models\Category;
 
 /**
  * All admin pages implement this class. Enforces admin role for requesting user.

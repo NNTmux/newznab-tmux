@@ -4,7 +4,6 @@ use App\Models\Category;
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
 $page = new AdminPage();
 $id = 0;
 
