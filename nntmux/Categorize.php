@@ -3,6 +3,7 @@
 namespace nntmux;
 
 use App\Models\Category;
+use App\Models\Group;
 use App\Models\Settings;
 
 /**
@@ -41,7 +42,7 @@ class Categorize extends Category
     public $groupid;
 
     /**
-     * @var Regexes
+     * @var \nntmux\Regexes
      */
     public $regexes;
 
@@ -111,8 +112,8 @@ class Categorize extends Category
     private function groupName(): string
     {
         if (! isset($this->groups[$this->groupid])) {
-            $group = $this->pdo->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE id = %d', $this->groupid));
-            $this->groups[$this->groupid] = ($group === false ? false : $group['name']);
+            $group = Group::query()->where('id', $this->groupid)->first(['name']);
+            $this->groups[$this->groupid] = ($group === null ? false : $group['name']);
         }
 
         return $this->groups[$this->groupid];
