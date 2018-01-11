@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Category;
 use App\Models\Group;
+use App\Models\Category;
 use App\Models\Settings;
 
 /**
