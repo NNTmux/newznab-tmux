@@ -1,16 +1,15 @@
 <?php
 
 use App\Models\User;
+use App\Models\UserSerie;
 use nntmux\Releases;
 use App\Models\Video;
-use nntmux\UserSeries;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 $releases = new Releases(['Settings' => $page->settings]);
-$us = new UserSeries();
 
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     $category = -1;
@@ -29,7 +28,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     } elseif (! $rel) {
         $page->smarty->assign('nodata', 'No releases for this series.');
     } else {
-        $myshows = $us->getShow(User::currentUserId(), $show['id']);
+        $myshows = UserSerie::getShow(User::currentUserId(), $show['id']);
 
         // Sort releases by season, episode, date posted.
         $series = $episode = $posted = [];

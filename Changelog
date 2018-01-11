@@ -1,4 +1,5 @@
 2018-01-11 DariusIII
+	* Chg: Use UserSerie model, remove nntmux/UserSeries class
 	* Chg: Update Categorize class groupName function
 	* Chg: Update headermenu.tpl and Category model
 	* Chg: Update Releases and Genres classes
