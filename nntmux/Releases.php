@@ -52,11 +52,6 @@ class Releases
     public $passwordStatus;
 
     /**
-     * @var \nntmux\Category
-     */
-    public $category;
-
-    /**
      * @var array Class instances.
      * @throws \Exception
      */
