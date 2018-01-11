@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Category;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Predb;
