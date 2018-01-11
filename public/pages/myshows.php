@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\Category;
 use App\Models\User;
-use nntmux\Category;
 use nntmux\Releases;
 use App\Models\Video;
 use nntmux\UserSeries;
@@ -58,8 +58,7 @@ switch ($action) {
                 header('Location:'.WWW_TOP.'/myshows');
             }
         } else {
-            $cat = new Category(['Settings' => $page->settings]);
-            $tmpcats = $cat->getChildren(Category::TV_ROOT);
+            $tmpcats = Category::getChildren(Category::TV_ROOT);
             $categories = [];
             foreach ($tmpcats as $c) {
                 // If TV WEB-DL categorization is disabled, don't include it as an option
@@ -95,9 +94,8 @@ switch ($action) {
                 header('Location:'.WWW_TOP.'/myshows');
             }
         } else {
-            $cat = new Category(['Settings' => $page->settings]);
 
-            $tmpcats = $cat->getChildren(Category::TV_ROOT);
+            $tmpcats = Category::getChildren(Category::TV_ROOT);
             $categories = [];
             foreach ($tmpcats as $c) {
                 $categories[$c['id']] = $c['title'];
@@ -161,8 +159,7 @@ switch ($action) {
         $page->meta_keywords = 'search,add,to,cart,nzb,description,details';
         $page->meta_description = 'Manage Your Shows';
 
-        $cat = new Category(['Settings' => $page->settings]);
-        $tmpcats = $cat->getChildren(Category::TV_ROOT);
+        $tmpcats = Category::getChildren(Category::TV_ROOT);
         $categories = [];
         foreach ($tmpcats as $c) {
             $categories[$c['id']] = $c['title'];

@@ -2,12 +2,11 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Models\Category;
 use nntmux\db\DB;
-use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\ConsoleTools;
 
-$category = new Category();
 $pdo = new DB();
 $consoletools = new ConsoleTools();
 $ran = false;

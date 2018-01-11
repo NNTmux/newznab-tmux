@@ -1,19 +1,18 @@
 <?php
 
+use App\Models\Category;
 use nntmux\Music;
 use nntmux\Genres;
 use App\Models\User;
-use nntmux\Category;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 $music = new Music(['Settings' => $page->settings]);
-$cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
 
-$musiccats = $cat->getChildren(Category::MUSIC_ROOT);
+$musiccats = Category::getChildren(Category::MUSIC_ROOT);
 $mtmp = [];
 foreach ($musiccats as $mcat) {
     $mtmp[$mcat['id']] = $mcat;
@@ -77,7 +76,7 @@ $page->smarty->assign('pager', $pager);
 if ($category == -1) {
     $page->smarty->assign('catname', 'All');
 } else {
-    $cdata = $cat->getById($category);
+    $cdata = Category::getById($category);
     if ($cdata) {
         $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
     } else {

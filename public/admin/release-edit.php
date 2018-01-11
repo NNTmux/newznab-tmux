@@ -2,13 +2,12 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Category;
+use App\Models\Category;
 use nntmux\Releases;
 use App\Models\Release;
 
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->pdo]);
-$category = new Category(['Settings' => $page->pdo]);
 $id = 0;
 
 // Set the current action.
@@ -50,7 +49,7 @@ switch ($action) {
 
 $page->smarty->assign('yesno_ids', [1, 0]);
 $page->smarty->assign('yesno_names', ['Yes', 'No']);
-$page->smarty->assign('catlist', $category->getForSelect(false));
+$page->smarty->assign('catlist', Category::getForSelect(false));
 
 $page->content = $page->smarty->fetch('release-edit.tpl');
 $page->render();

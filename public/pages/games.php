@@ -1,19 +1,18 @@
 <?php
 
+use App\Models\Category;
 use nntmux\Games;
 use nntmux\Genres;
 use App\Models\User;
-use nntmux\Category;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 $games = new Games(['Settings' => $page->settings]);
-$cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
 
-$concats = $cat->getChildren(Category::PC_ROOT);
+$concats = Category::getChildren(Category::PC_ROOT);
 $ctmp = [];
 foreach ($concats as $ccat) {
     $ctmp[$ccat['id']] = $ccat;
@@ -85,7 +84,7 @@ $page->smarty->assign('pager', $pager);
 if ($category == -1) {
     $page->smarty->assign('catname', 'All');
 } else {
-    $cdata = $cat->getById($category);
+    $cdata = Category::getById($category);
     if ($cdata) {
         $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
     } else {

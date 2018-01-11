@@ -1,12 +1,11 @@
 <?php
 
-use nntmux\Category;
+use App\Models\Category;
 use nntmux\Releases;
 use App\Models\Release;
 
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->settings]);
-$category = new Category(['Settings' => $page->settings]);
 
 // Set the current action.
 $action = $_REQUEST['action'] ?? '';
@@ -41,7 +40,7 @@ switch ($action) {
         $page->smarty->assign('release', $rel);
         $page->smarty->assign('success', $success);
         $page->smarty->assign('from', $_POST['from'] ?? '');
-        $page->smarty->assign('catlist', $category->getForSelect(false));
+        $page->smarty->assign('catlist', Category::getForSelect(false));
         $page->content = $page->smarty->fetch('ajax_release-edit.tpl');
         echo $page->content;
 

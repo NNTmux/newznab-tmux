@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Category;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use App\Models\Genre;
@@ -234,7 +235,7 @@ class Games
 
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat);
         }
 
         if ($maxAge > 0) {

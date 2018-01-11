@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Category;
 use nntmux\AniDB;
 use App\Models\User;
-use nntmux\Category;
 use nntmux\Releases;
 
 if (! User::isLoggedIn()) {

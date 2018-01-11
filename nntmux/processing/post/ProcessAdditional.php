@@ -2,12 +2,12 @@
 
 namespace nntmux\processing\post;
 
+use App\Models\Category;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
 use nntmux\Groups;
-use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\Releases;
 use nntmux\NameFixer;

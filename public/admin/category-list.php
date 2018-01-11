@@ -1,16 +1,16 @@
 <?php
 
+use App\Models\Category;
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Category;
 
 $page = new AdminPage();
 
-$category = new Category();
 
 $page->title = 'Category List';
 
-$categorylist = $category->getFlat();
+$categorylist = Category::getFlat();
 
 $page->smarty->assign('categorylist', $categorylist);
 

@@ -21,8 +21,8 @@
 
 namespace nntmux\http;
 
+use App\Models\Category;
 use nntmux\Groups;
-use nntmux\Category;
 use App\Models\AudioData;
 use nntmux\utility\Utility;
 

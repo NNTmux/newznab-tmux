@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Category;
 use nntmux\Movie;
 use App\Models\User;
-use nntmux\Category;
 use nntmux\Releases;
 use nntmux\UserMovies;
 use App\Models\Settings;
@@ -14,8 +14,8 @@ if (! User::isLoggedIn()) {
 $um = new UserMovies(['Settings' => $page->settings]);
 $mv = new Movie(['Settings' => $page->settings]);
 
-$action = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
-$imdbid = isset($_REQUEST['subpage']) ? $_REQUEST['subpage'] : '';
+$action = $_REQUEST['id'] ?? '';
+$imdbid = $_REQUEST['subpage'] ?? '';
 
 if (isset($_REQUEST['from'])) {
     $page->smarty->assign('from', WWW_TOP.$_REQUEST['from']);
@@ -50,7 +50,7 @@ switch ($action) {
             }
         }
 
-        if ($action == 'doadd') {
+        if ($action === 'doadd') {
             $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
             $um->addMovie(User::currentUserId(), $imdbid, $category);
             if (isset($_REQUEST['from'])) {
@@ -59,12 +59,11 @@ switch ($action) {
                 header('Location:'.WWW_TOP.'/mymovies');
             }
         } else {
-            $cat = new Category(['Settings' => $page->settings]);
-            $tmpcats = $cat->getChildren(Category::MOVIE_ROOT);
+            $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
             $categories = [];
             foreach ($tmpcats as $c) {
                 // If MOVIE WEB-DL categorization is disabled, don't include it as an option
-                if (Settings::settingValue('indexer.categorise.catwebdl') == 0 && $c['id'] == Category::MOVIE_WEBDL) {
+                if ((int) Settings::settingValue('indexer.categorise.catwebdl') === 0 && (int) $c['id'] === Category::MOVIE_WEBDL) {
                     continue;
                 }
                 $categories[$c['id']] = $c['title'];
@@ -87,7 +86,7 @@ switch ($action) {
             $page->show404();
         }
 
-        if ($action == 'doedit') {
+        if ($action === 'doedit') {
             $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
             $um->updateMovie(User::currentUserId(), $imdbid, $category);
             if (isset($_REQUEST['from'])) {
@@ -96,9 +95,8 @@ switch ($action) {
                 header('Location:'.WWW_TOP.'/mymovies');
             }
         } else {
-            $cat = new Category(['Settings' => $page->settings]);
 
-            $tmpcats = $cat->getChildren(Category::MOVIE_ROOT);
+            $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
             $categories = [];
             foreach ($tmpcats as $c) {
                 $categories[$c['id']] = $c['title'];
@@ -128,9 +126,8 @@ switch ($action) {
 
         $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
         $ordering = $releases->getBrowseOrdering();
-        $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST['ob'] : '';
+        $orderby = isset($_REQUEST['ob']) && \in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
 
-        $results = [];
         $results = $mv->getMovieRange($movies, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata['categoryexclusions']);
 
         $page->smarty->assign('pagertotalitems', $browsecount);
@@ -163,8 +160,7 @@ switch ($action) {
         $page->meta_keywords = 'search,add,to,cart,nzb,description,details';
         $page->meta_description = 'Manage Your Movies';
 
-        $cat = new Category(['Settings' => $page->settings]);
-        $tmpcats = $cat->getChildren(Category::MOVIE_ROOT);
+        $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
         $categories = [];
         foreach ($tmpcats as $c) {
             $categories[$c['id']] = $c['title'];
@@ -174,7 +170,7 @@ switch ($action) {
         $results = [];
         foreach ($movies as $moviek => $movie) {
             $showcats = explode('|', $movie['categories']);
-            if (is_array($showcats) && sizeof($showcats) > 0) {
+            if (is_array($showcats) && count($showcats) > 0) {
                 $catarr = [];
                 foreach ($showcats as $scat) {
                     if (! empty($scat)) {

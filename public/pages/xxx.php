@@ -1,17 +1,16 @@
 <?php
 
+use App\Models\Category;
 use nntmux\XXX;
 use App\Models\User;
-use nntmux\Category;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 $movie = new XXX();
-$cat = new Category();
 
-$moviecats = $cat->getChildren(Category::XXX_ROOT);
+$moviecats = Category::getChildren(Category::XXX_ROOT);
 $mtmp = [];
 foreach ($moviecats as $mcat) {
     $mtmp[$mcat['id']] = $mcat;
@@ -66,7 +65,7 @@ $page->smarty->assign('pager', $pager);
 if ((int) $category === -1) {
     $page->smarty->assign('catname', 'All');
 } else {
-    $cdata = $cat->getById($category);
+    $cdata = Category::getById($category);
     if ($cdata) {
         $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
     } else {

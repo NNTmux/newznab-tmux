@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Category;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use GuzzleHttp\Client;
@@ -158,7 +159,7 @@ class Console
 
         $catsrch = '';
         if (\count($cat) > 0 && (int) $cat[0] !== -1) {
-            $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat);
         }
 
         $exccatlist = '';

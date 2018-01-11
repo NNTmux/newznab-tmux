@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\Category;
 use App\Models\User;
-use nntmux\Category;
 
 /**
  * All admin pages implement this class. Enforces admin role for requesting user.
@@ -30,8 +30,7 @@ class AdminPage extends BasePage
             $this->show403(true);
         }
 
-        $category = new Category();
-        $this->smarty->assign('catClass', $category);
+        $this->smarty->assign('catClass', Category::class);
     }
 
     /**

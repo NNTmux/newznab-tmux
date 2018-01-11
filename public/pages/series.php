@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\User;
-use nntmux\Category;
 use nntmux\Releases;
 use App\Models\Video;
 use nntmux\UserSeries;
@@ -11,7 +10,6 @@ if (! User::isLoggedIn()) {
 }
 
 $releases = new Releases(['Settings' => $page->settings]);
-$cat = new Category(['Settings' => $page->settings]);
 $us = new UserSeries();
 
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {

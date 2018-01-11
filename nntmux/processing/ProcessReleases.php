@@ -2,12 +2,12 @@
 
 namespace nntmux\processing;
 
+use App\Models\Category;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
 use nntmux\Genres;
 use nntmux\Groups;
-use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\Releases;
 use App\Models\Predb;
@@ -1164,7 +1164,6 @@ class ProcessReleases
     public function deleteReleases(): void
     {
         $startTime = time();
-        $category = new Category(['Settings' => $this->pdo]);
         $genres = new Genres(['Settings' => $this->pdo]);
         $passwordDeleted = $duplicateDeleted = $retentionDeleted = $completionDeleted = $disabledCategoryDeleted = 0;
         $disabledGenreDeleted = $miscRetentionDeleted = $miscHashedDeleted = $categoryMinSizeDeleted = 0;
@@ -1251,7 +1250,7 @@ class ProcessReleases
         }
 
         // Disabled categories.
-        $disabledCategories = $category->getDisabledIDs();
+        $disabledCategories = Category::getDisabledIDs();
         if (\count($disabledCategories) > 0) {
             foreach ($disabledCategories as $disabledCategory) {
                 $releases = $this->pdo->queryDirect(

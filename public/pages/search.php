@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Category;
 use nntmux\Groups;
 use App\Models\User;
-use nntmux\Category;
 use nntmux\Releases;
 use nntmux\ReleaseSearch;
 
@@ -203,7 +203,7 @@ $page->smarty->assign(
         ],
         'results' => $results, 'sadvanced' => $searchType !== 'basic',
         'grouplist' => $groups->getGroupsForSelect(),
-        'catlist' => (new Category(['Settings' => $page->settings]))->getForSelect(),
+        'catlist' => Category::getForSelect(),
         'search_description' => $search_description,
         'pager' => $page->smarty->fetch('pager.tpl'),
     ]

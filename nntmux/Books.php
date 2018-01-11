@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Category;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use Carbon\Carbon;
@@ -154,7 +155,7 @@ class Books
 
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat);
         }
 
         $maxage = '';

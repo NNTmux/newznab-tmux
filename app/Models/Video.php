@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use nntmux\Category;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 

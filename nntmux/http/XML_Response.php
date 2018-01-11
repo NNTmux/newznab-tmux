@@ -21,7 +21,7 @@
 
 namespace nntmux\http;
 
-use nntmux\Category;
+use App\Models\Category;
 use nntmux\Utility\Utility;
 
 /**

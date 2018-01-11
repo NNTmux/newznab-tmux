@@ -1,14 +1,13 @@
 <?php
 
+use App\Models\Category;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\User;
-use nntmux\Category;
 use App\Models\Settings;
 use nntmux\utility\Utility;
 use App\Models\UserExcludedCategory;
 
-$category = new Category;
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
 
@@ -157,7 +156,7 @@ $page->meta_description = 'Edit User Profile for '.$data['username'];
 $page->smarty->assign('cp_url_selected', $data['cp_url']);
 $page->smarty->assign('cp_api_selected', $data['cp_api']);
 
-$page->smarty->assign('catlist', $category->getForSelect(false));
+$page->smarty->assign('catlist', Category::getForSelect(false));
 
 $page->content = $page->smarty->fetch('profileedit.tpl');
 $page->render();

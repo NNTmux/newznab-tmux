@@ -8,7 +8,7 @@ use App\Models\Release;
 use App\Models\Settings;
 use nntmux\utility\Utility;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Category as CategoryModel;
+use App\Models\Category;
 
 /**
  * Class Releases.
@@ -72,7 +72,6 @@ class Releases
         $this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch($this->pdo);
-        $this->category = new Category(['Settings' => $this->pdo]);
         $this->showPasswords = self::showPasswords();
     }
 
@@ -99,7 +98,7 @@ class Releases
                 NZB::NZB_ADDED,
                 $this->showPasswords,
                 ($groupName !== -1 ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
-                $this->category->getCategorySearch($cat),
+                Category::getCategorySearch($cat),
                 ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
                 (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
         );
@@ -162,7 +161,7 @@ class Releases
 			ORDER BY %8\$s %9\$s",
             NZB::NZB_ADDED,
             $this->showPasswords,
-            $this->category->getCategorySearch($cat),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
             ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
@@ -396,7 +395,7 @@ class Releases
                 return $this->concatenatedCategoryIDsCache;
             }
 
-            $result = CategoryModel::query()
+            $result = Category::query()
                 ->whereNotNull('categories.parentid')
                 ->whereNotNull('cp.id')
                 ->selectRaw('CONCAT(cp.id, ", ", categories.id) AS category_ids')
@@ -700,7 +699,7 @@ class Releases
 
         $catQuery = '';
         if ($type === 'basic') {
-            $catQuery = $this->category->getCategorySearch($cat);
+            $catQuery = Category::getCategorySearch($cat);
         } elseif ($type === 'advanced' && (int) $cat[0] !== -1) {
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
@@ -875,7 +874,7 @@ class Releases
             $this->showPasswords,
             $showSql,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-            $this->category->getCategorySearch($cat),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
@@ -952,7 +951,7 @@ class Releases
             NZB::NZB_ADDED,
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-            $this->category->getCategorySearch($cat),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
         );
 
@@ -1021,7 +1020,7 @@ class Releases
             $this->showPasswords,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
             (($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
-            $this->category->getCategorySearch($cat),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
@@ -1108,7 +1107,7 @@ class Releases
     {
         // Get the category for the parent of this release.
         $currRow = Release::getCatByRelId($currentID);
-        $catRow = (new Category(['Settings' => $this->pdo]))->getById($currRow['categories_id']);
+        $catRow = Category::getById($currRow['categories_id']);
         $parentCat = $catRow['parentid'];
 
         $results = $this->search(

@@ -21,8 +21,8 @@
 
 namespace nntmux\http;
 
+use App\Models\Category;
 use nntmux\db\DB;
-use nntmux\Category;
 use App\Models\Settings;
 use nntmux\utility\Utility;
 use App\Extensions\util\Versions;
@@ -33,7 +33,7 @@ use App\Extensions\util\Versions;
 abstract class Capabilities
 {
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -157,7 +157,7 @@ abstract class Capabilities
                 'audio-search' => ['available' => 'no',  'supportedParams' => ''],
             ],
             'categories' => $this->type === 'caps'
-                    ? (new Category(['Settings' => $this->pdo]))->getForMenu()
+                    ? Category::getForMenu()
                     : null,
         ];
     }

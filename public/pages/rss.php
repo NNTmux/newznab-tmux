@@ -1,13 +1,12 @@
 <?php
 
+use App\Models\Category;
 use App\Models\User;
-use nntmux\Category;
 use nntmux\http\RSS;
 use App\Models\Settings;
 use App\Models\UserRequest;
 use nntmux\utility\Utility;
 
-$category = new Category(['Settings' => $page->settings]);
 $rss = new RSS(['Settings' => $page->settings]);
 $offset = 0;
 
@@ -40,8 +39,8 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
 
     $page->smarty->assign(
         [
-            'categorylist'       => $category->getCategories(true, $page->userdata['categoryexclusions']),
-            'parentcategorylist' => $category->getForMenu($page->userdata['categoryexclusions']),
+            'categorylist'       => Category::getCategories(true, $page->userdata['categoryexclusions']),
+            'parentcategorylist' => Category::getForMenu($page->userdata['categoryexclusions']),
         ]
     );
 

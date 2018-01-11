@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Category;
 use App\Models\Menu;
 use App\Models\User;
-use nntmux\Category;
 use nntmux\Contents;
 use App\Models\Settings;
 use App\Models\Forumpost;
@@ -47,15 +47,14 @@ class Page extends BasePage
         $this->smarty->assign('useful_menu', $this->smarty->fetch('usefullinksmenu.tpl'));
         $this->smarty->assign('article_menu', $this->smarty->fetch('articlesmenu.tpl'));
 
-        $category = new Category(['Settings' => $content->pdo]);
         if (! empty($this->userdata)) {
-            $parentcatlist = $category->getForMenu($this->userdata['categoryexclusions'], $this->userdata['rolecategoryexclusions']);
+            $parentcatlist = Category::getForMenu($this->userdata['categoryexclusions'], $this->userdata['rolecategoryexclusions']);
         } else {
-            $parentcatlist = $category->getForMenu();
+            $parentcatlist = Category::getForMenu();
         }
 
         $this->smarty->assign('parentcatlist', $parentcatlist);
-        $this->smarty->assign('catClass', $category);
+        $this->smarty->assign('catClass', Category::class);
         $searchStr = '';
         if ($this->page == 'search' && isset($_REQUEST['id'])) {
             $searchStr = (string) $_REQUEST['id'];

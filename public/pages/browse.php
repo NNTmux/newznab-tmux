@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\Category;
 use App\Models\User;
-use nntmux\Category;
 use nntmux\Releases;
 
 $releases = new Releases(['Settings' => $page->settings]);
@@ -50,8 +50,7 @@ $covgroup = '';
 if ($category === -1 && (int) $grp === -1) {
     $page->smarty->assign('catname', 'All');
 } elseif ((int) $category !== -1 && (int) $grp === -1) {
-    $cat = new Category(['Settings' => $releases->pdo]);
-    $cdata = $cat->getById($category);
+    $cdata = Category::getById($category);
     if ($cdata) {
         $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
         if ($cdata['parentid'] === Category::GAME_ROOT || $cdata['id'] === Category::GAME_ROOT) {

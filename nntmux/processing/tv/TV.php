@@ -2,7 +2,7 @@
 
 namespace nntmux\processing\tv;
 
-use nntmux\Category;
+use App\Models\Category;
 use App\Models\Video;
 use App\Models\TvInfo;
 use App\Models\Release;
