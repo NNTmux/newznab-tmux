@@ -2,9 +2,9 @@
 
 namespace nntmux;
 
-use App\Models\Category;
 use nntmux\db\DB;
 use App\Models\Release;
+use App\Models\Category;
 
 class Regexes
 {
