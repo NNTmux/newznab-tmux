@@ -2,13 +2,13 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Carbon;
 use nntmux\db\DB;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\XxxInfo;
 use App\Models\Category;
 use App\Models\Settings;
+use Illuminate\Support\Carbon;
 use nntmux\processing\adult\ADE;
 use nntmux\processing\adult\ADM;
 use nntmux\processing\adult\AEBN;

@@ -2,12 +2,12 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Carbon;
 use nntmux\db\DB;
 use App\Models\Group;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\MissedPart;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB as DBFacade;
 
 class Groups

@@ -2,12 +2,12 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Carbon;
 use nntmux\db\DB;
 use App\Models\Genre;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\GamesInfo;
+use Illuminate\Support\Carbon;
 use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
 use Illuminate\Support\Facades\Cache;

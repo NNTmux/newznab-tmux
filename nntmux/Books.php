@@ -2,7 +2,6 @@
 
 namespace nntmux;
 
-use Illuminate\Support\Carbon;
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use GuzzleHttp\Client;
@@ -11,6 +10,7 @@ use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Settings;
 use ApaiIO\Operations\Search;
+use Illuminate\Support\Carbon;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
