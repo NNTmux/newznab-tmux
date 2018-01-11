@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Category;
 use nntmux\Releases;
 use App\Models\Release;
+use App\Models\Category;
 
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->settings]);

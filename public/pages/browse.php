@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Category;
 use App\Models\User;
 use nntmux\Releases;
+use App\Models\Category;
 
 $releases = new Releases(['Settings' => $page->settings]);
 

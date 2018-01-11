@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Category;
 use nntmux\Groups;
 use App\Models\User;
 use nntmux\Releases;
+use App\Models\Category;
 use nntmux\ReleaseSearch;
 
 if (! User::isLoggedIn()) {

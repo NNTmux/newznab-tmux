@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Category;
 use nntmux\Genres;
 use nntmux\Console;
 use App\Models\User;
+use App\Models\Category;
 
 if (! User::isLoggedIn()) {
     $page->show403();

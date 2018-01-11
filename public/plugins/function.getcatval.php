@@ -16,7 +16,6 @@
  * @author    niel
  * @copyright 2016 nZEDb
  */
-
 use App\Models\Category;
 
 /**

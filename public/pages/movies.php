@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Category;
 use nntmux\Movie;
 use App\Models\User;
+use App\Models\Category;
 
 $movie = new Movie(['Settings' => $page->settings]);
 

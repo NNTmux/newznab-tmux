@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\Category;
 use nntmux\Movie;
 use App\Models\User;
 use nntmux\Releases;
 use nntmux\UserMovies;
+use App\Models\Category;
 use App\Models\Settings;
 
 if (! User::isLoggedIn()) {
@@ -95,7 +95,6 @@ switch ($action) {
                 header('Location:'.WWW_TOP.'/mymovies');
             }
         } else {
-
             $tmpcats = Category::getChildren(Category::MOVIE_ROOT);
             $categories = [];
             foreach ($tmpcats as $c) {

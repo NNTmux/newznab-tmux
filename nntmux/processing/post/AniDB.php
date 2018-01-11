@@ -2,10 +2,10 @@
 
 namespace nntmux\processing\post;
 
-use App\Models\Category;
 use nntmux\NZB;
 use nntmux\db\DB;
 use nntmux\ColorCLI;
+use App\Models\Category;
 use App\Models\Settings;
 use App\Models\AnidbEpisode;
 use nntmux\db\populate\AniDB as PaDb;

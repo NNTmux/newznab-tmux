@@ -21,8 +21,8 @@
 
 namespace nntmux\http;
 
-use App\Models\Category;
 use nntmux\db\DB;
+use App\Models\Category;
 use App\Models\Settings;
 use nntmux\utility\Utility;
 use App\Extensions\util\Versions;

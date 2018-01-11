@@ -2,12 +2,12 @@
 
 namespace nntmux;
 
-use App\Models\Category;
 use nntmux\db\DB;
 use Carbon\Carbon;
 use Tmdb\ApiToken;
 use aharen\OMDbAPI;
 use GuzzleHttp\Client;
+use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MovieInfo;
 use nntmux\utility\Utility;

@@ -2,9 +2,9 @@
 
 namespace nntmux\http;
 
-use App\Models\Category;
 use nntmux\NZB;
 use nntmux\Releases;
+use App\Models\Category;
 
 /**
  * Class RSS -- contains specific functions for RSS.

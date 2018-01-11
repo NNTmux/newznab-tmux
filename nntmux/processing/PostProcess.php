@@ -2,7 +2,6 @@
 
 namespace nntmux\processing;
 
-use App\Models\Category;
 use nntmux\Nfo;
 use nntmux\XXX;
 use nntmux\NNTP;
@@ -16,6 +15,7 @@ use nntmux\Console;
 use nntmux\Sharing;
 use nntmux\NameFixer;
 use App\Models\Release;
+use App\Models\Category;
 use App\Models\Settings;
 use App\Models\ReleaseFile;
 use Illuminate\Support\Carbon;
