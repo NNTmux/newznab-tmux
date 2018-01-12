@@ -102,7 +102,6 @@ class NZB
     {
         $defaults = [
             'Settings' => null,
-            'Groups'   => null,
         ];
         $options += $defaults;
 
