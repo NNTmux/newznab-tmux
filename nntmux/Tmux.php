@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Category;
 use nntmux\db\DB;
+use App\Models\Category;
 use App\Extensions\util\Versions;
 use App\Models\Tmux as TmuxModel;
 
