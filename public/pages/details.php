@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\ReleaseComment;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
@@ -19,6 +18,7 @@ use App\Models\ReleaseNfo;
 use App\Models\DnzbFailure;
 use App\Models\ReleaseFile;
 use App\Models\ReleaseRegex;
+use App\Models\ReleaseComment;
 
 if (! User::isLoggedIn()) {
     $page->show403();

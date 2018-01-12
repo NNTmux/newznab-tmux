@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Models\ReleaseComment;
 use nntmux\db\DB;
 use nntmux\Sharing;
+use App\Models\ReleaseComment;
 
 // Login check.
 $admin = new AdminPage;
