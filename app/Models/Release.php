@@ -4,11 +4,11 @@ namespace App\Models;
 
 use nntmux\NZB;
 use nntmux\SphinxSearch;
+use Sofa\Eloquence\Eloquence;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
-use Sofa\Eloquence\Eloquence;
 
 class Release extends Model
 {
