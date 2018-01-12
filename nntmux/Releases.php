@@ -533,7 +533,7 @@ class Releases
     {
         $list = (array) $list;
 
-        $nzb = new NZB($this->pdo);
+        $nzb = new NZB();
         $releaseImage = new ReleaseImage();
 
         foreach ($list as $identifier) {
@@ -1146,7 +1146,7 @@ class Releases
      */
     public function getZipped($guids): string
     {
-        $nzb = new NZB($this->pdo);
+        $nzb = new NZB();
         $zipFile = new \ZipFile();
 
         foreach ($guids as $guid) {

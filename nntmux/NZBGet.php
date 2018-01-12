@@ -94,7 +94,7 @@ class NZBGet
         $this->fullUrl = $this->verifyURL($this->url);
         $this->releases = new Releases();
         $this->pdo = new DB();
-        $this->nzb = new NZB($this->pdo);
+        $this->nzb = new NZB();
         $this->client = new Client();
     }
 

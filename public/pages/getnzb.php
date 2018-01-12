@@ -90,7 +90,7 @@ if (isset($_GET['zip']) && $_GET['zip'] === '1') {
     }
 }
 
-$nzbPath = (new NZB($page->settings))->getNZBPath($_GET['id']);
+$nzbPath = (new NZB())->getNZBPath($_GET['id']);
 if (! file_exists($nzbPath)) {
     Utility::showApiError(300, 'NZB file not found!');
 }

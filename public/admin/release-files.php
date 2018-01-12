@@ -10,7 +10,7 @@ use App\Models\Settings;
 
 $page = new AdminPage;
 $pdo = new DB();
-$nzb = new NZB($pdo);
+$nzb = new NZB();
 
 if (! User::isLoggedIn()) {
     $page->show403();

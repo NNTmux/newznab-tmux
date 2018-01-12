@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\Release;
 
 $pdo = new DB();
-$nzb = new NZB($pdo);
+$nzb = new NZB();
 
 if (! User::isLoggedIn()) {
     $page->show403();

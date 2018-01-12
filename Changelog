@@ -1,4 +1,5 @@
 2018-01-12 DariusIII
+	* Chg: Change NZB class call options
 	* Fix: Fix wrong column name in ReleaseComment model
 	* Chg: Update composer.lock
 	* Chg: Remove nntmux/ReleaseComments class and use ReleaseComment model

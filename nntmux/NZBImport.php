@@ -119,7 +119,7 @@ class NZBImport
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->binaries = ($options['Binaries'] instanceof Binaries ? $options['Binaries'] : new Binaries(['Settings' => $this->pdo, 'Echo' => $this->echoCLI]));
         $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
-        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
+        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->releaseCleaner = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning($this->pdo));
         $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['settings' => $this->pdo]));
         $this->groups = new Groups(['Settings' => $this->pdo]);

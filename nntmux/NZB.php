@@ -48,11 +48,6 @@ class NZB
     public $pdo;
 
     /**
-     * @var \nntmux\Logger
-     */
-    protected $debugging;
-
-    /**
      * @var bool
      */
     protected $_debug = false;
@@ -98,15 +93,20 @@ class NZB
     protected $_siteCommentString;
 
     /**
-     * Default constructor.
+     * NZB constructor.
      *
-     * @param \nntmux\db\DB $pdo
-     *
+     * @param array $options
      * @throws \Exception
      */
-    public function __construct(&$pdo)
+    public function __construct(array $options = [])
     {
-        $this->pdo = ($pdo instanceof DB ? $pdo : new DB());
+        $defaults = [
+            'Settings' => null,
+            'Groups'   => null,
+        ];
+        $options += $defaults;
+
+        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
         $nzbSplitLevel = Settings::settingValue('..nzbsplitlevel');
         $this->nzbSplitLevel = $nzbSplitLevel ?? 1;

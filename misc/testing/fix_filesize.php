@@ -13,7 +13,7 @@ use nntmux\db\DB;
 use App\Models\Settings;
 
 $pdo = new DB;
-$nzb = new NZB($pdo);
+$nzb = new NZB();
 
 $items = $pdo->query('SELECT id,guid FROM releases WHERE size = 0');
 $total = count($items);

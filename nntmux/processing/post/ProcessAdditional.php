@@ -401,7 +401,7 @@ class ProcessAdditional
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 
-        $this->_nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
+        $this->_nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
         $this->_archiveInfo = new ArchiveInfo();
         $this->_categorize = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));

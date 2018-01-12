@@ -11,7 +11,7 @@ if (! isset($argv[1]) || ! isset($argv[2])) {
 }
 
 $pdo = new DB();
-$nzb = new NZB($pdo);
+$nzb = new NZB();
 $consoleTools = new ConsoleTools();
 
 $newLevel = $argv[1];

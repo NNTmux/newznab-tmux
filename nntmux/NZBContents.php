@@ -91,7 +91,7 @@ class NZBContents
             ? $options['PostProcess']
             : new PostProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo, 'Settings' => $this->pdo])
         );
-        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
+        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->lookuppar2 = (int) Settings::settingValue('..lookuppar2') === 1;
         $this->alternateNNTP = (int) Settings::settingValue('..alternate_nntp') === 1;
     }
