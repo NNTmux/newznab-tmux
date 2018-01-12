@@ -51,7 +51,7 @@ class ReleaseComment extends Model
      */
     public static function getComments($id)
     {
-        return self::query()->where('releases_id', $id)->orderBy('createddate', 'desc')->get();
+        return self::query()->where('releases_id', $id)->orderBy('created_at', 'desc')->get();
     }
 
     /**
