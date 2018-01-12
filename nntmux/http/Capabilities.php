@@ -107,7 +107,7 @@ abstract class Capabilities
         if ($response === false) {
             Utility::showApiError(201);
         } else {
-            header('Content-Length: '.strlen($response));
+            header('Content-Length: '.\strlen($response));
             echo $response;
         }
     }

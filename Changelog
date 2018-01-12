@@ -1,4 +1,5 @@
 2018-01-12 DariusIII
+	* Chg: Update Capabilities class
 	* Chg: Update composer.json and .lock files
 	* Chg: Update NZBMultiGroup class
 	* Chg: Update Groups class
