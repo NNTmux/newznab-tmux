@@ -33,7 +33,7 @@ exec('tmux list-session', $session);
 $session = shell_exec("tmux list-session | grep $tmux_session");
 // Kill the placeholder
 exec('tmux kill-session -t placeholder');
-if (!empty($session)) {
+if (! empty($session)) {
     exit(ColorCLI::error("tmux session: '".$tmux_session."' is already running, aborting.\n"));
 }
 
