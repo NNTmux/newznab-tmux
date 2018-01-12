@@ -62,6 +62,7 @@ class Groups
     /**
      * Returns an associative array of groups for list selection.
      *
+     *
      * @return array
      */
     public function getGroupsForSelect(): array
@@ -71,11 +72,11 @@ class Groups
 
         $temp_array[-1] = '--Please Select--';
 
-        if (\is_object($groups)) {
-            foreach ($groups as $group) {
-                $temp_array[$group['name']] = $group['name'];
-            }
-        }
+        $grouped = $groups->mapToGroups(function ($group, $key) {
+            return [$group['name']];
+        });
+
+        $temp_array += array_collapse($grouped->toArray());
 
         return $temp_array;
     }
@@ -396,8 +397,8 @@ class Groups
         $res->get();
 
         if ($res instanceof \Traversable) {
-            $releases = new Releases(['Settings' => $this->pdo, 'Groups' => $this]);
-            $nzb = new NZB($this->pdo);
+            $releases = new Releases(['Groups' => $this]);
+            $nzb = new NZB();
             $releaseImage = new ReleaseImage();
             foreach ($res as $row) {
                 $releases->deleteSingle(
