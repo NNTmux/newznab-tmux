@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ReleaseComment;
 use nntmux\XXX;
 use nntmux\AniDB;
 use nntmux\Books;
@@ -17,7 +18,6 @@ use nntmux\ReleaseExtra;
 use App\Models\ReleaseNfo;
 use App\Models\DnzbFailure;
 use App\Models\ReleaseFile;
-use nntmux\ReleaseComments;
 use App\Models\ReleaseRegex;
 
 if (! User::isLoggedIn()) {
@@ -26,7 +26,6 @@ if (! User::isLoggedIn()) {
 
 if (isset($_GET['id'])) {
     $releases = new Releases(['Settings' => $page->settings]);
-    $rc = new ReleaseComments;
     $re = new ReleaseExtra;
     $data = Release::getByGuid($_GET['id']);
     $user = User::getById(User::currentUserId());
@@ -39,14 +38,14 @@ if (isset($_GET['id'])) {
     }
 
     if ($page->isPostBack()) {
-        $rc->addComment($data['id'], $data['gid'], $_POST['txtAddComment'], User::currentUserId(), $_SERVER['REMOTE_ADDR']);
+        ReleaseComment::addComment($data['id'], $data['gid'], $_POST['txtAddComment'], User::currentUserId(), $_SERVER['REMOTE_ADDR']);
     }
 
     $nfo = ReleaseNfo::getReleaseNfo($data['id']);
     $reVideo = $re->getVideo($data['id']);
     $reAudio = $re->getAudio($data['id']);
     $reSubs = $re->getSubs($data['id']);
-    $comments = $rc->getCommentsByGid($data['gid']);
+    $comments = ReleaseComment::getComments($data['id']);
     $similars = $releases->searchSimilar(
         $data['id'],
         $data['searchname'],

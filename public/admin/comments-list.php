@@ -1,16 +1,15 @@
 <?php
 
+use App\Models\ReleaseComment;
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\ReleaseComments;
 
 $page = new AdminPage();
 
-$releases = new ReleaseComments($page->pdo);
-
 $page->title = 'Comments List';
 
-$commentcount = $releases->getCommentCount();
+$commentcount = ReleaseComment::getCommentCount();
 $offset = $_REQUEST['offset'] ?? 0;
 $page->smarty->assign([
         'pagertotalitems' => $commentcount,

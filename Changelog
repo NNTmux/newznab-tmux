@@ -1,4 +1,5 @@
 2018-01-12 DariusIII
+	* Chg: Remove nntmux/ReleaseComments class and use ReleaseComment model
 	* Chg: Change how tmux sessions are checked, as count on non-countable array/object does not work in PHP7.2
 2018-01-11 DariusIII
 	* Chg: Use Carbon facade and not Carbon directly
