@@ -36,7 +36,7 @@ exec('tmux new-session -ds placeholder 2>/dev/null');
 $session = shell_exec("tmux list-session | grep $tmux_session");
 // Kill the placeholder
 exec('tmux kill-session -t placeholder');
-if (count($session) === 0) {
+if (empty($session)) {
     echo ColorCLI::info("Starting the tmux server and monitor script.\n");
     passthru("php $path/run.php");
 }
