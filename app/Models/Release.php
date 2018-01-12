@@ -8,9 +8,12 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use Sofa\Eloquence\Eloquence;
 
 class Release extends Model
 {
+    use Eloquence;
+
     /**
      * @var bool
      */
@@ -109,6 +112,22 @@ class Release extends Model
     public function releaseGroup()
     {
         return $this->hasMany(ReleasesGroups::class, 'releases_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function video()
+    {
+        return $this->belongsTo(Video::class, 'videos_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function episode()
+    {
+        return $this->belongsTo(TvEpisode::class, 'tv_episodes_id');
     }
 
     /**

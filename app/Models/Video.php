@@ -22,9 +22,28 @@ class Video extends Model
      */
     public $timestamps = false;
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function alias()
     {
         return $this->hasMany(VideoAlias::class, 'videos_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function release()
+    {
+        return $this->hasMany(Release::class, 'videos_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function episode()
+    {
+        return $this->hasMany(TvEpisode::class, 'videos_id');
     }
 
     /**
