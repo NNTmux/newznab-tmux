@@ -1,4 +1,5 @@
 2018-01-12 DariusIII
+	* Chg: Small update to XML_Response class
 	* Chg: Update Capabilities class
 	* Chg: Update composer.json and .lock files
 	* Chg: Update NZBMultiGroup class

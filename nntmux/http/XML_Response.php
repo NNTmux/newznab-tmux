@@ -356,7 +356,7 @@ class XML_Response
      */
     public function includeReleases(): void
     {
-        if (is_array($this->releases) && ! empty($this->releases)) {
+        if (\is_array($this->releases) && ! empty($this->releases)) {
             foreach ($this->releases as $this->release) {
                 $this->xml->startElement('item');
                 $this->includeReleaseMain();
@@ -635,7 +635,7 @@ class XML_Response
 			</li>\n";
         if ($r['mu_tracks'] !== '') {
             $tracks = explode('|', $r['mu_tracks']);
-            if (count($tracks) > 0) {
+            if (\count($tracks) > 0) {
                 foreach ($tracks as $track) {
                     $track = trim($track);
                     $tData .= "<li>{$track}</li>";
