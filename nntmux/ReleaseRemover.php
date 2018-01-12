@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Category;
 use nntmux\db\DB;
+use App\Models\Category;
 
 /**
  * Handles removing of various unwanted releases.
