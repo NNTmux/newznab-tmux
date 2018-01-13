@@ -1446,6 +1446,9 @@ class Movie
             )->getBody()->getContents();
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
+                if ($e->getCode() === 999) {
+                    ColorCLI::doEcho(ColorCLI::notice('Banned from Yahoo search'));
+                }
                 if ($e->getCode() === 404) {
                     ColorCLI::doEcho(ColorCLI::notice('Data not available on Yahoo search'));
                 } elseif ($e->getCode() === 503) {
