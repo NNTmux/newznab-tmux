@@ -4,7 +4,6 @@ namespace App\Models;
 
 use nntmux\NZB;
 use nntmux\SphinxSearch;
-use Sofa\Eloquence\Eloquence;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -12,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Release extends Model
 {
-    use Eloquence;
 
     /**
      * @var bool
