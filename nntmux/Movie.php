@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Release;
 use nntmux\db\DB;
 use Tmdb\ApiToken;
 use aharen\OMDbAPI;
@@ -80,6 +81,13 @@ class Movie
     protected $yahooLimit = 0;
 
     /**
+     * How many times have we hit duckduckgo this session.
+     *
+     * @var int
+     */
+    protected $duckduckgoLimit = 0;
+
+    /**
      * @var string
      */
     protected $showPasswords;
@@ -146,11 +154,6 @@ class Movie
     public $service;
 
     /**
-     * @var array|bool|int|string
-     */
-    public $catWhere;
-
-    /**
      * @var \Tmdb\ApiToken
      */
     public $tmdbtoken;
@@ -206,7 +209,6 @@ class Movie
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI && $this->pdo->cli);
         $this->imgSavePath = NN_COVERS.'movies'.DS;
         $this->service = '';
-        $this->catWhere = 'PARTITION (movies)';
     }
 
     /**
@@ -1065,14 +1067,14 @@ class Movie
                 ColorCLI::doEcho(ColorCLI::headerOver($service.' found IMDBid: ').ColorCLI::primary('tt'.$imdbID));
             }
 
-            $this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE id = %d', $this->pdo->escapeString($imdbID), $id));
+            Release::query()->where('id', $id)->update(['imdbid' => $imdbID]);
 
             // If set, scan for imdb info.
             if ($processImdb === 1) {
                 $movCheck = $this->getMovieInfo($imdbID);
                 if ($movCheck === false || (isset($movCheck['updated_at']) && (time() - strtotime($movCheck['updated_at'])) > 2592000)) {
                     if ($this->updateMovieInfo($imdbID) === false) {
-                        $this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $id));
+                        Release::query()->where('id', $id)->update(['imdbid' => 0000000]);
                     }
                 }
             }
@@ -1084,9 +1086,10 @@ class Movie
     /**
      * Process releases with no IMDB id's.
      *
-     * @param string $groupID (Optional) id of a group to work on.
-     * @param string $guidChar (Optional) First letter of a release GUID to use to get work.
-     * @param int $lookupIMDB (Optional) 0 Don't lookup IMDB, 1 lookup IMDB, 2 lookup IMDB on releases that were renamed.
+     *
+     * @param string $groupID
+     * @param string $guidChar
+     * @param int $lookupIMDB
      * @throws \Exception
      */
     public function processMovieReleases($groupID = '', $guidChar = '', $lookupIMDB = 1): void
@@ -1096,23 +1099,21 @@ class Movie
         }
 
         // Get all releases without an IMDB id.
-        $res = $this->pdo->query(
-            sprintf(
-                '
-				SELECT searchname, id
-				FROM releases
-				%s
-				WHERE imdbid IS NULL
-				AND nzbstatus = 1
-				%s %s %s
-				LIMIT %d',
-                $this->catWhere,
-                ($groupID === '' ? '' : ('AND groups_id = '.$groupID)),
-                ($guidChar === '' ? '' : 'AND leftguid = '.$this->pdo->escapeString($guidChar)),
-                ($lookupIMDB === 2 ? 'AND isrenamed = 1' : ''),
-                $this->movieqty
-            )
-        );
+        $sql = Release::query()->whereNull('imdbid')->where('nzbstatus', '=', 1);
+        if ($groupID !== '') {
+            $sql->where('groupid', $groupID);
+        }
+
+        if ($guidChar !== '') {
+            $sql->where('leftguid', $guidChar);
+        }
+
+        if ((int) $lookupIMDB === 2) {
+            $sql->where('isrenamed', '=', 1);
+        }
+
+        $res = $sql->limit($this->movieqty)->get(['searchname', 'id'])->toArray();
+
         $movieCount = \count($res);
 
         if ($movieCount > 0) {
@@ -1128,7 +1129,7 @@ class Movie
                 // Try to get a name/year.
                 if ($this->parseMovieSearchName($arr['searchname']) === false) {
                     //We didn't find a name, so set to all 0's so we don't parse again.
-                    $this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $arr['id']));
+                    Release::query()->where('id', $arr['id'])->update(['imdbid' => 0000000]);
                     continue;
                 }
                 $this->currentRelID = $arr['id'];
@@ -1199,7 +1200,7 @@ class Movie
 
                 // We failed to get an IMDB id from all sources.
                 if ($movieUpdated === false) {
-                    $this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $arr['id']));
+                    Release::query()->where('id', $arr['id'])->update(['imdbid' => 0000000]);
                 }
             }
         }
@@ -1293,11 +1294,20 @@ class Movie
      * Try to get an IMDB id from search engines.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function imdbIDFromEngines(): bool
     {
         if ($this->googleLimit < 41 && (time() - $this->googleBan) > 600) {
             if ($this->googleSearch() === true) {
+                return true;
+            }
+        } elseif ($this->duckduckgoLimit < 41) {
+            if ($this->duckduckgoSearch() === true) {
+                return true;
+            }
+        } elseif ($this->bingLimit < 41) {
+            if ($this->bingSearch() === true) {
                 return true;
             }
         }
@@ -1452,6 +1462,47 @@ class Movie
             $this->yahooLimit++;
 
             if ($this->doMovieUpdate($buffer, 'Yahoo.com', $this->currentRelID) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Try to find a IMDB id on bing.com.
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    protected function duckduckgoSearch(): bool
+    {
+        try {
+            $buffer = $this->client->get(
+                'https://duckduckgo.com/html?q='.
+                urlencode(
+                    $this->currentTitle.
+                    ' imdb'
+                )
+            )->getBody()->getContents();
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                if ($e->getCode() === 404) {
+                    ColorCLI::doEcho(ColorCLI::notice('Data not available on DuckDuckGo search'));
+                } elseif ($e->getCode() === 503) {
+                    ColorCLI::doEcho(ColorCLI::notice('DuckDuckGo search service unavailable'));
+                } else {
+                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from DuckDuckGo search , http error reported: '.$e->getCode()));
+                }
+            }
+        } catch (\RuntimeException $e) {
+            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()));
+        }
+
+        if (! empty($buffer)) {
+            $this->duckduckgoLimit++;
+
+            if ($this->doMovieUpdate($buffer, 'duckduckgo.com', $this->currentRelID) !== false) {
                 return true;
             }
         }

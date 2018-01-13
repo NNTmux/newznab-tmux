@@ -1,4 +1,5 @@
 2018-01-13 DariusIII
+	* Chg: Add duckduckgo search to Movie class, use Release model where applicable
 	* Chg: Remove Sofa/Eloquence
 2018-01-12 DariusIII
 	* Chg: Add Sofa/Eloquence, update models
