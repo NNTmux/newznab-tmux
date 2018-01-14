@@ -1099,7 +1099,10 @@ class Movie
         }
 
         // Get all releases without an IMDB id.
-        $sql = Release::query()->whereNull('imdbid')->where('nzbstatus', '=', 1);
+        $sql = Release::query()
+            ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
+            ->whereNull('imdbid')
+            ->where('nzbstatus', '=', 1);
         if ($groupID !== '') {
             $sql->where('groupid', $groupID);
         }

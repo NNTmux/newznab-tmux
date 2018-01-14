@@ -1,3 +1,5 @@
+2018-01-14 DariusIII
+	* Fix: Fix processMovieReleases query
 2018-01-13 DariusIII
 	* Chg: Add duckduckgo search to Movie class, use Release model where applicable
 	* Chg: Remove Sofa/Eloquence
