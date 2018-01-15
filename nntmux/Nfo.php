@@ -373,15 +373,14 @@ class Nfo
 
         $releases = $qry->get(['id']);
 
-        if ($releases instanceof \Traversable) {
-            foreach ($releases as $release) {
-                // remove any releasenfo for failed
-                ReleaseNfo::query()->where('releases_id', $release['id'])->delete();
+        foreach ($releases as $release) {
+            // remove any releasenfo for failed
+            ReleaseNfo::query()->where('releases_id', $release['id'])->delete();
 
-                // set release.nfostatus to failed
-                Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FAILED]);
-            }
+            // set release.nfostatus to failed
+            Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FAILED]);
         }
+
 
         if ($this->echo) {
             if ($nfoCount > 0) {
