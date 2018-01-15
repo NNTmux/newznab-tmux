@@ -817,9 +817,10 @@ class Forking extends \fork_daemon
     {
         if ((int) Settings::settingValue('..lookupnfo') === 1) {
             $this->nfoQueryString = Nfo::NfoQueryString($this->pdo);
-            return ($this->pdo->queryOneRow(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) !== false
-            );
+
+            return $this->pdo->queryOneRow(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) !== false;
         }
+
         return false;
     }
 
@@ -845,6 +846,7 @@ class Forking extends \fork_daemon
             );
             $maxProcesses = Settings::settingValue('..nfothreads');
         }
+
         return $maxProcesses;
     }
 
