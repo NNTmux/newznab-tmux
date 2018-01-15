@@ -1,4 +1,5 @@
 2018-01-15 DariusIII
+	* Chg: Update Nfo processing
 	* Chg: Update maxSize and minSize parameters handling
 	* Chg: Remove Traversable check as $release is always traversable
 	* Chg: Remove options from Nfo class, adjust other files accordingly

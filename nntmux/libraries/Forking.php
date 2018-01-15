@@ -172,8 +172,8 @@ class Forking extends \fork_daemon
 
         $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
-        $this->dummy = (int) Settings::settingValue('..maxnforetries');
-        $this->maxRetries = ($this->dummy >= 0 ? -($this->dummy + 1) : Nfo::NFO_UNPROC);
+        $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : Nfo::NFO_UNPROC;
+        $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
     }
 
     /**
@@ -812,9 +812,6 @@ class Forking extends \fork_daemon
     private function checkProcessNfo(): bool
     {
         if ((int) Settings::settingValue('..lookupnfo') === 1) {
-            if ($this->maxRetries < -8) {
-                $this->maxRetries = -8;
-            }
 
             $qry = Release::query()
                 ->where('nzbstatus', '=', NZB::NZB_ADDED)
@@ -843,9 +840,6 @@ class Forking extends \fork_daemon
         $maxProcesses = 1;
 
         if ($this->checkProcessNfo() === true) {
-            if ($this->maxRetries < -8) {
-                $this->maxRetries = -8;
-            }
 
             $this->processNFO = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);

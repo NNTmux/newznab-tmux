@@ -66,9 +66,10 @@ class Nfo
         $this->echo = NN_ECHOCLI;
         $this->nzbs = Settings::settingValue('..maxnfoprocessed') !== '' ? (int) Settings::settingValue('..maxnfoprocessed') : 100;
         $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : self::NFO_UNPROC;
+        $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
         $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
-        $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
+
         $this->tmpPath = (string) Settings::settingValue('..tmpunrarpath');
         if (! preg_match('/[\/\\\\]$/', $this->tmpPath)) {
             $this->tmpPath .= DS;
@@ -267,7 +268,7 @@ class Nfo
             ->limit($this->nzbs)
             ->get(['id', 'guid', 'groups_id', 'name']);
 
-        $nfoCount = \count($res);
+        $nfoCount = $res->count();
 
         if ($nfoCount > 0) {
             ColorCLI::doEcho(
