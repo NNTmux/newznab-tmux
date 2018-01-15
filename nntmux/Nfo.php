@@ -267,7 +267,7 @@ class Nfo
             ->limit($this->nzbs)
             ->get(['id', 'guid', 'groups_id', 'name']);
 
-        $nfoCount = $res->count();
+        $nfoCount = \count($res);
 
         if ($nfoCount > 0) {
             ColorCLI::doEcho(
