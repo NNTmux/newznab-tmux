@@ -294,6 +294,7 @@ class Nfo
                 $qry = Release::query()
                     ->where('nzbstatus', '=', NZB::NZB_ADDED)
                     ->whereBetween('nfostatus', [$maxRetries, self::NFO_UNPROC])
+                    ->select('nfostatus as status')
                     ->selectRaw('COUNT(id) as count')
                     ->groupBy('nfostatus')
                     ->orderBy('nfostatus');
@@ -313,7 +314,7 @@ class Nfo
                     $qry->where('size', '>', $minSize * 1048576);
                 }
 
-                $nfoStats = $qry->get(['nfostatus as status']);
+                $nfoStats = $qry->get();
 
                 if ($nfoStats instanceof \Traversable) {
                     $outString = PHP_EOL.'Available to process';
