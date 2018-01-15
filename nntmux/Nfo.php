@@ -381,7 +381,6 @@ class Nfo
             Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FAILED]);
         }
 
-
         if ($this->echo) {
             if ($nfoCount > 0) {
                 echo PHP_EOL;
