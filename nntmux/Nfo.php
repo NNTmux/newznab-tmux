@@ -250,7 +250,7 @@ class Nfo
         $maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
         $dummy = (int) Settings::settingValue('..maxnforetries');
-        $maxRetries = ($dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC);
+        $maxRetries = $dummy >= 0 ? -($dummy + 1): self::NFO_UNPROC;
         $ret = 0;
 
         if ($maxRetries < -8) {
@@ -258,7 +258,6 @@ class Nfo
         }
 
         $qry = Release::query()
-            ->select(['id', 'guid', 'groups_id', 'name'])
             ->where('nzbstatus', '=', NZB::NZB_ADDED)
             ->whereBetween('nfostatus', [$maxRetries, self::NFO_UNPROC]);
 
@@ -281,7 +280,7 @@ class Nfo
             ->orderBy('nfostatus')
             ->orderBy('postdate', 'desc')
             ->limit($this->nzbs)
-            ->get();
+            ->get(['id', 'guid', 'groups_id', 'name']);
 
         $nfoCount = $res->count();
 
@@ -300,10 +299,9 @@ class Nfo
             if ($this->echo) {
                 // Get count of releases per nfo status
                 $qry = Release::query()
-                    ->select(['nfostatus as status'])
-                    ->selectRaw('COUNT(id) as count')
                     ->where('nzbstatus', '=', NZB::NZB_ADDED)
                     ->whereBetween('nfostatus', [$maxRetries, self::NFO_UNPROC])
+                    ->selectRaw('COUNT(id) as count')
                     ->groupBy('nfostatus')
                     ->orderBy('nfostatus');
 
@@ -322,12 +320,12 @@ class Nfo
                     $qry->where('size', '>', $minSize * 1048576);
                 }
 
-                $nfoStats = $qry->get();
+                $nfoStats = $qry->get(['nfostatus']);
 
                 if ($nfoStats instanceof \Traversable) {
                     $outString = PHP_EOL.'Available to process';
                     foreach ($nfoStats as $row) {
-                        $outString .= ', '.$row['status'].' = '.number_format($row['count']);
+                        $outString .= ', '.$row['nfostatus'].' = '.number_format($row['count']);
                     }
                     ColorCLI::doEcho(ColorCLI::header($outString.'.'));
                 }
@@ -368,7 +366,6 @@ class Nfo
 
         // Remove nfo that we cant fetch after 5 attempts.
         $qry = Release::query()
-            ->select(['id'])
             ->where('nzbstatus', NZB::NZB_ADDED)
             ->where('nfostatus', '<', $this->maxRetries)
             ->where('nfostatus', '>', self::NFO_FAILED);
@@ -380,7 +377,7 @@ class Nfo
             $qry->where('groups_id', $groupID);
         }
 
-        $releases = $qry->get();
+        $releases = $qry->get(['id']);
 
         if ($releases instanceof \Traversable) {
             foreach ($releases as $release) {

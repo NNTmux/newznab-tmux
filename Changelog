@@ -1,3 +1,5 @@
+2018-01-15 DariusIII
+	* Chg: Update Nfo class processNfoFiles function
 2018-01-14 DariusIII
 	* Chg: Update ramsey/uuid to latest version
 	* Fix: Fix processMovieReleases query
