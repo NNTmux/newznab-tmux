@@ -812,7 +812,6 @@ class Forking extends \fork_daemon
     private function checkProcessNfo(): bool
     {
         if ((int) Settings::settingValue('..lookupnfo') === 1) {
-
             $qry = Release::query()
                 ->where('nzbstatus', '=', NZB::NZB_ADDED)
                 ->whereBetween('nfostatus', [$this->maxRetries, Nfo::NFO_UNPROC]);
@@ -840,7 +839,6 @@ class Forking extends \fork_daemon
         $maxProcesses = 1;
 
         if ($this->checkProcessNfo() === true) {
-
             $this->processNFO = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $qry = Release::query()
