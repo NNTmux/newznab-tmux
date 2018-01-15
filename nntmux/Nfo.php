@@ -2,7 +2,6 @@
 
 namespace nntmux;
 
-use nntmux\db\DB;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\ReleaseNfo;
