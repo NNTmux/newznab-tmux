@@ -296,7 +296,7 @@ class Nfo
                     ->whereBetween('nfostatus', [$maxRetries, self::NFO_UNPROC])
                     ->select('nfostatus as status')
                     ->selectRaw('COUNT(id) as count')
-                    ->groupBy('nfostatus')
+                    ->groupBy(['nfostatus'])
                     ->orderBy('nfostatus');
 
                 if ($guidChar !== '') {
