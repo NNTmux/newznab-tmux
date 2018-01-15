@@ -1,4 +1,5 @@
 2018-01-15 DariusIII
+	* Chg: Update ReleaseFile addReleaseFiles function $duplicateCheck query
 	* Chg: Revert Forking class nfo processing to older version
 	* Chg: Update Nfo processing
 	* Chg: Update maxSize and minSize parameters handling

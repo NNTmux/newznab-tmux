@@ -85,7 +85,7 @@ class ReleaseFile extends Model
     {
         $insert = 0;
 
-        $duplicateCheck = self::query()->where(['releases_id' => $id, 'name' => $name])->first();
+        $duplicateCheck = self::query()->where('releases_id', $id)->where('name', $name)->first();
 
         if ($duplicateCheck === null) {
             $insert = self::query()->insertGetId(
