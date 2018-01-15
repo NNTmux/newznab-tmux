@@ -27,9 +27,9 @@ class Nfo
     private $nzbs;
 
     /**
-     * @var string
+     * @var int
      */
-    protected $maxsize;
+    protected $maxSize;
 
     /**
      * @var int
@@ -37,9 +37,9 @@ class Nfo
     private $maxRetries;
 
     /**
-     * @var string
+     * @var int
      */
-    protected $minsize;
+    protected $minSize;
 
     /**
      * @var string
@@ -59,8 +59,6 @@ class Nfo
     /**
      * Default constructor.
      *
-     * @param array $options Class instance / echo to cli.
-     *
      * @throws \Exception
      */
     public function __construct()
@@ -68,6 +66,8 @@ class Nfo
         $this->echo = NN_ECHOCLI;
         $this->nzbs = Settings::settingValue('..maxnfoprocessed') !== '' ? (int) Settings::settingValue('..maxnfoprocessed') : 100;
         $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : self::NFO_UNPROC;
+        $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
+        $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
         $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
         $this->tmpPath = (string) Settings::settingValue('..tmpunrarpath');
         if (! preg_match('/[\/\\\\]$/', $this->tmpPath)) {
@@ -240,19 +240,11 @@ class Nfo
      */
     public function processNfoFiles($nntp, $groupID = '', $guidChar = '', $processImdb = 1, $processTv = 1): int
     {
-        $maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
-        $minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
-        $dummy = (int) Settings::settingValue('..maxnforetries');
-        $maxRetries = $dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC;
         $ret = 0;
-
-        if ($maxRetries < -8) {
-            $maxRetries = -8;
-        }
 
         $qry = Release::query()
             ->where('nzbstatus', '=', NZB::NZB_ADDED)
-            ->whereBetween('nfostatus', [$maxRetries, self::NFO_UNPROC]);
+            ->whereBetween('nfostatus', [$this->maxRetries, self::NFO_UNPROC]);
 
         if ($guidChar !== '') {
             $qry->where('leftguid', $guidChar);
@@ -261,12 +253,12 @@ class Nfo
             $qry->where('groups_id', $groupID);
         }
 
-        if ($maxSize > 0) {
-            $qry->where('size', '<', $maxSize * 1073741824);
+        if ($this->maxSize > 0) {
+            $qry->where('size', '<', $this->maxSize * 1073741824);
         }
 
-        if ($minSize > 0) {
-            $qry->where('size', '>', $minSize * 1048576);
+        if ($this->minSize > 0) {
+            $qry->where('size', '>', $this->minSize * 1048576);
         }
 
         $res = $qry
@@ -293,7 +285,7 @@ class Nfo
                 // Get count of releases per nfo status
                 $qry = Release::query()
                     ->where('nzbstatus', '=', NZB::NZB_ADDED)
-                    ->whereBetween('nfostatus', [$maxRetries, self::NFO_UNPROC])
+                    ->whereBetween('nfostatus', [$this->maxRetries, self::NFO_UNPROC])
                     ->select('nfostatus as status')
                     ->selectRaw('COUNT(id) as count')
                     ->groupBy(['nfostatus'])
@@ -306,12 +298,12 @@ class Nfo
                     $qry->where('groups_id', $groupID);
                 }
 
-                if ($maxSize > 0) {
-                    $qry->where('size', '<', $maxSize * 1073741824);
+                if ($this->maxSize > 0) {
+                    $qry->where('size', '<', $this->maxSize * 1073741824);
                 }
 
-                if ($minSize > 0) {
-                    $qry->where('size', '>', $minSize * 1048576);
+                if ($this->minSize > 0) {
+                    $qry->where('size', '>', $this->minSize * 1048576);
                 }
 
                 $nfoStats = $qry->get();
