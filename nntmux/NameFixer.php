@@ -512,7 +512,7 @@ class NameFixer
                 $this->_totalReleases = $total;
 
                 echo ColorCLI::primary(number_format($total).' releases to process.');
-                $Nfo = new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
+                $Nfo = new Nfo();
                 $nzbContents = new NZBContents(
                     [
                         'Echo'        => $this->echooutput,

@@ -64,15 +64,9 @@ class Nfo
      *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo'     => false,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-        $this->echo = $options['Echo'] && NN_ECHOCLI;
-        $this->pdo = $options['Settings'] instanceof DB ? $options['Settings'] : new DB();
+        $this->echo = NN_ECHOCLI;
         $this->nzbs = Settings::settingValue('..maxnfoprocessed') !== '' ? (int) Settings::settingValue('..maxnfoprocessed') : 100;
         $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : self::NFO_UNPROC;
         $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
@@ -220,8 +214,8 @@ class Nfo
                         'Echo' => $this->echo,
                         'NNTP' => $nntp,
                         'Nfo'  => $this,
-                        'Settings'   => $this->pdo,
-                        'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this]),
+                        'Settings'   => null,
+                        'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this]),
                     ]
                 );
                 $nzbContents->parseNZB($release['guid'], $release['id'], $release['groups_id']);
@@ -331,17 +325,17 @@ class Nfo
                 }
             }
 
-            $groups = new Groups(['Settings' => $this->pdo]);
+            $groups = new Groups();
             $nzbContents = new NZBContents(
                 [
                     'Echo' => $this->echo,
                     'NNTP' => $nntp,
                     'Nfo' => $this,
-                    'Settings' => $this->pdo,
-                    'PostProcess' => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this, 'Settings' => $this->pdo]),
+                    'Settings' => null,
+                    'PostProcess' => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this]),
                 ]
             );
-            $movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);
+            $movie = new Movie(['Echo' => $this->echo]);
 
             foreach ($res as $arr) {
                 $fetchedBinary = $nzbContents->getNfoFromNZB($arr['guid'], $arr['id'], $arr['groups_id'], $groups->getNameByID($arr['groups_id']));
@@ -358,7 +352,7 @@ class Nfo
 
                     // If set scan for tv info.
                     if ($processTv === 1) {
-                        (new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo]))->processTv($groupID, $guidChar, $processTv);
+                        (new PostProcess(['Echo' => $this->echo]))->processTv($groupID, $guidChar, $processTv);
                     }
                 }
             }

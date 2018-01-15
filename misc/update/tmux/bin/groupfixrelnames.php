@@ -212,7 +212,7 @@ switch (true) {
                         if (((int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
                             ColorCLI::error('Unable to connect to usenet.');
                         }
-                        $Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);
+                        $Nfo = new Nfo();
                         $nzbcontents = new NZBContents(
                             [
                                 'Echo'        => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,
