@@ -805,21 +805,29 @@ class Forking extends \fork_daemon
         return $maxProcesses;
     }
 
-    private $nfoQueryString = '';
-
     /**
-     * Check if we should process NFO's.
-     *
      * @return bool
      * @throws \Exception
      */
-    private function checkProcessNfo()
+    private function checkProcessNfo(): bool
     {
         if ((int) Settings::settingValue('..lookupnfo') === 1) {
-            $this->nfoQueryString = Nfo::NfoQueryString($this->pdo);
-            return ($this->pdo->queryOneRow(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) !== false
-            );
+
+            $qry = Release::query()
+                ->where('nzbstatus', '=', NZB::NZB_ADDED)
+                ->whereBetween('nfostatus', [$this->maxRetries, Nfo::NFO_UNPROC]);
+
+            if ($this->maxSize > 0) {
+                $qry->where('size', '<', $this->maxSize * 1073741824);
+            }
+
+            if ($this->minSize > 0) {
+                $qry->where('size', '>', $this->minSize * 1048576);
+            }
+
+            return $qry->limit(1)->first(['id']) !== null;
         }
+
         return false;
     }
 
@@ -830,21 +838,27 @@ class Forking extends \fork_daemon
     private function postProcessNfoMainMethod()
     {
         $maxProcesses = 1;
+
         if ($this->checkProcessNfo() === true) {
             $this->processNFO = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
-            $this->work = $this->pdo->query(
-                sprintf('
-					SELECT leftguid AS id
-					FROM releases r
-					WHERE 1=1 %s
-					GROUP BY leftguid
-					LIMIT 16',
-                    $this->nfoQueryString
-                )
-            );
-            $maxProcesses = Settings::settingValue('..nfothreads');
+            $qry = Release::query()
+                ->where('nzbstatus', '=', NZB::NZB_ADDED)
+                ->whereBetween('nfostatus', [$this->maxRetries, Nfo::NFO_UNPROC]);
+
+            if ($this->maxSize > 0) {
+                $qry->where('size', '<', $this->maxSize * 1073741824);
+            }
+
+            if ($this->minSize > 0) {
+                $qry->where('size', '>', $this->minSize * 1048576);
+            }
+
+            $this->work = $qry->select(['leftguid as id'])->limit(16)->get()->toArray();
+
+            $maxProcesses = (int) Settings::settingValue('..nfothreads');
         }
+
         return $maxProcesses;
     }
 
