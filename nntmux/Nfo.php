@@ -250,7 +250,7 @@ class Nfo
         $maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
         $minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
         $dummy = (int) Settings::settingValue('..maxnforetries');
-        $maxRetries = $dummy >= 0 ? -($dummy + 1): self::NFO_UNPROC;
+        $maxRetries = $dummy >= 0 ? -($dummy + 1) : self::NFO_UNPROC;
         $ret = 0;
 
         if ($maxRetries < -8) {
