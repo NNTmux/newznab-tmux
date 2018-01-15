@@ -314,12 +314,12 @@ class Nfo
                     $qry->where('size', '>', $minSize * 1048576);
                 }
 
-                $nfoStats = $qry->get(['nfostatus']);
+                $nfoStats = $qry->get(['nfostatus as status']);
 
                 if ($nfoStats instanceof \Traversable) {
                     $outString = PHP_EOL.'Available to process';
                     foreach ($nfoStats as $row) {
-                        $outString .= ', '.$row['nfostatus'].' = '.number_format($row['count']);
+                        $outString .= ', '.$row['status'].' = '.number_format($row['count']);
                     }
                     ColorCLI::doEcho(ColorCLI::header($outString.'.'));
                 }
