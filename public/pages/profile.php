@@ -1,11 +1,11 @@
 <?php
 
+use App\Models\ReleaseComment;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\User;
 use App\Models\Settings;
 use App\Models\UserRequest;
-use nntmux\ReleaseComments;
 use App\Models\UserDownload;
 use App\Models\UserExcludedCategory;
 
@@ -13,7 +13,6 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$rc = new ReleaseComments;
 $sab = new SABnzbd($page);
 $nzbget = new NZBGet($page);
 
@@ -62,7 +61,7 @@ $page->smarty->assign(
         'privateprofiles'   => $privateProfiles,
         'publicview'        => $publicView,
         'privileged'        => $privileged,
-        'pagertotalitems'   => $rc->getCommentCountForUser($userID),
+        'pagertotalitems'   => ReleaseComment::getCommentCountForUser($userID),
         'pageroffset'       => $offset,
         'pageritemsperpage' => ITEMS_PER_PAGE,
         'pagerquerybase'    => '/profile?id='.$userID.'&offset=',
@@ -84,7 +83,7 @@ $sabSettings = [1 => 'Site', 2 => 'Cookie'];
 $page->smarty->assign(
     [
         'pager'         => $page->smarty->fetch('pager.tpl'),
-        'commentslist'  => $rc->getCommentsForUserRange($userID, $offset, ITEMS_PER_PAGE),
+        'commentslist'  => ReleaseComment::getCommentsForUserRange($userID, $offset, ITEMS_PER_PAGE),
         'exccats'       => implode(',', UserExcludedCategory::getCategoryExclusionNames($userID)),
         'saburl'        => $sab->url,
         'sabapikey'     => $sab->apikey,

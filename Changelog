@@ -1,4 +1,5 @@
 2018-01-16 DariusIII
+	* Fix: Fix ReleaseComment error in profile page
 	* Chg: Update laravel/framework to version 5.5.29 and spatie/fractalistic to latest
 2018-01-15 DariusIII
 	* Chg: Update ReleaseFile addReleaseFiles function $duplicateCheck query
