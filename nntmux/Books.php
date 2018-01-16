@@ -140,12 +140,11 @@ class Books
     }
 
     /**
-     * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderby
+     * @param $cat
+     * @param $start
+     * @param $num
+     * @param $orderby
      * @param array $excludedcats
-     *
      * @return array
      * @throws \Exception
      */
@@ -407,16 +406,12 @@ class Books
         if ($total > 0) {
             foreach ($bookids as $i => $iValue) {
                 $this->processBookReleasesHelper(
-                    $this->pdo->queryDirect(
-                        sprintf('
-						SELECT searchname, id, categories_id
-						FROM releases
-						WHERE nzbstatus = 1 %s
-						AND bookinfo_id IS NULL
-						AND categories_id in (%s)
-						ORDER BY postdate
-						DESC LIMIT %d', $this->renamed, $bookids[$i], $this->bookqty)
-                    ),
+                    Release::query()->where('nzbstatus', '=', NZB::NZB_ADDED)
+                        ->whereNull('bookinfo_id')
+                        ->whereIn('categories_id', $bookids[$i])
+                    ->orderBy('postdate', 'desc')
+                    ->limit($this->bookqty)
+                    ->get(['searchname', 'id', 'categories_id']),
                     $bookids[$i]
                 );
             }
@@ -424,19 +419,15 @@ class Books
     }
 
     /**
-     * Process book releases.
-     *
-     * @param \PDOStatement $res        Array containing unprocessed book SQL data set.
-     * @param int                $categoryID The category id.
-     *
-     * @void
+     * @param $res
+     * @param $categoryID
      * @throws \Exception
      */
     protected function processBookReleasesHelper($res, $categoryID): void
     {
-        if ($res instanceof \Traversable && $res->rowCount() > 0) {
+        if ($res instanceof \Traversable && $res->count() > 0) {
             if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::header("\nProcessing ".$res->rowCount().' book release(s) for categories id '.$categoryID));
+                ColorCLI::doEcho(ColorCLI::header("\nProcessing ".$res->count().' book release(s) for categories id '.$categoryID));
             }
 
             $bookId = -2;
@@ -473,7 +464,7 @@ class Books
                             $this->failCache[] = $bookInfo;
                         }
                     } else {
-                        if (! empty($bookCheck)) {
+                        if ($bookCheck !== null) {
                             $bookId = $bookCheck['id'];
                         }
                     }
