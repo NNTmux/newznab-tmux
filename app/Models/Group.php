@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use nntmux\NZB;
+use nntmux\NNTP;
+use nntmux\ColorCLI;
+use nntmux\Releases;
+use nntmux\ReleaseImage;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use nntmux\ColorCLI;
-use nntmux\NNTP;
-use nntmux\NZB;
-use nntmux\ReleaseImage;
-use nntmux\Releases;
+use Illuminate\Database\Eloquent\Model;
 
 class Group extends Model
 {
@@ -42,7 +42,6 @@ class Group extends Model
      * @var bool
      */
     protected static $allasmgr = (int) Settings::settingValue('..allasmgr') === 1;
-
 
     public function release()
     {

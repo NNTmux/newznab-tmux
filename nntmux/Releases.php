@@ -2,8 +2,8 @@
 
 namespace nntmux;
 
-use App\Models\Group;
 use nntmux\db\DB;
+use App\Models\Group;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
