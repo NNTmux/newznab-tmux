@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\Group;
 use nntmux\db\DB;
 use nntmux\Regexes;
 use nntmux\Sharing;
 use nntmux\Binaries;
+use App\Models\Group;
 use App\Models\ReleaseComment;
 
 // This script waits for ajax queries from the web.

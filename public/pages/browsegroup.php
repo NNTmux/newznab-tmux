@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Group;
 use App\Models\User;
+use App\Models\Group;
 
 if (! User::isLoggedIn()) {
     $page->show403();

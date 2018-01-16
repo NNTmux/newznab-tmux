@@ -2,13 +2,13 @@
 
 namespace nntmux\processing;
 
-use App\Models\Group;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
 use nntmux\Genres;
 use nntmux\ColorCLI;
 use nntmux\Releases;
+use App\Models\Group;
 use App\Models\Predb;
 use nntmux\Categorize;
 use App\Models\Release;

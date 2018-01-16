@@ -2,13 +2,13 @@
 
 namespace nntmux\processing\post;
 
-use App\Models\Group;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
 use nntmux\ColorCLI;
 use nntmux\Releases;
+use App\Models\Group;
 use nntmux\NameFixer;
 use nntmux\Categorize;
 use App\Models\Release;
