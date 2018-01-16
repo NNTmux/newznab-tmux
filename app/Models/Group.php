@@ -41,8 +41,22 @@ class Group extends Model
     /**
      * @var bool
      */
-    protected static $allasmgr = (int) Settings::settingValue('..allasmgr') === 1;
+    protected $allasmgr;
 
+    /**
+     * Group constructor.
+     *
+     * @throws \Exception
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->allasmgr = (int) Settings::settingValue('..allasmgr') === 1;
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function release()
     {
         return $this->hasMany(Release::class, 'groups_id');
@@ -486,7 +500,7 @@ class Group extends Model
      * @return array The table names.
      * @throws \Exception
      */
-    public static function getCBPTableNames($groupID): array
+    public function getCBPTableNames($groupID): array
     {
         $groupKey = $groupID;
 
@@ -495,7 +509,7 @@ class Group extends Model
             return self::$cbppTableNames[$groupKey];
         }
 
-        if (NN_ECHOCLI && self::$allasmgr === false && self::createNewTPGTables($groupID) === false) {
+        if (NN_ECHOCLI && $this->allasmgr === false && self::createNewTPGTables($groupID) === false) {
             exit('There is a problem creating new TPG tables for this group ID: '.$groupID.PHP_EOL);
         }
 

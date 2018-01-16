@@ -1,4 +1,5 @@
 2018-01-16 DariusIII
+	* Fix: Fix getCBPTableNames function calls
 	* Fix: Fix call to Releases
 	* Chg: Use Group model and remove nntmux\Groups class
 	* Chg: Update Books class processBookReleases function

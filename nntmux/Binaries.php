@@ -593,7 +593,7 @@ class Binaries
         $this->notYEnc = $this->headersBlackListed = 0;
 
         // Check if MySQL tables exist, create if they do not, get their names at the same time.
-        $this->tableNames = Group::getCBPTableNames($this->groupMySQL['id']);
+        $this->tableNames = (new Group())->getCBPTableNames($this->groupMySQL['id']);
 
         $mgrPosters = $this->getMultiGroupPosters();
 
@@ -761,7 +761,7 @@ class Binaries
 
         // Standard headers go second so we can switch tableNames back and do part repair to standard group tables
         if (! empty($stdHeaders)) {
-            $this->tableNames = Group::getCBPTableNames($this->groupMySQL['id']);
+            $this->tableNames = (new Group())->getCBPTableNames($this->groupMySQL['id']);
             $this->storeHeaders($stdHeaders, false);
         }
         unset($stdHeaders);
@@ -1126,7 +1126,7 @@ class Binaries
         $tableNames = $tables;
 
         if ($tableNames === '') {
-            $tableNames = Group::getCBPTableNames($groupArr['id']);
+            $tableNames = (new Group())->getCBPTableNames($groupArr['id']);
         }
         // Get all parts in partrepair table.
         $missingParts = $this->_pdo->query(
@@ -1267,7 +1267,7 @@ class Binaries
         $groupID = Group::getIDByName($groupData['group']);
         $group = [];
         if ($groupID !== '') {
-            $group = Group::getCBPTableNames($groupID);
+            $group = (new Group())->getCBPTableNames($groupID);
         }
 
         $currentPost = $post;

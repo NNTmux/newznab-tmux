@@ -493,12 +493,11 @@ class ProcessReleases
 
     /**
      * @param $groupID
-     *
-     * @void
+     * @throws \Exception
      */
     protected function initiateTableNames($groupID): void
     {
-        $this->tables = Group::getCBPTableNames($groupID);
+        $this->tables = (new Group())->getCBPTableNames($groupID);
     }
 
     /**
