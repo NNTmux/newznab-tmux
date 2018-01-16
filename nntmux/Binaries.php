@@ -399,7 +399,7 @@ class Binaries
             // We will use this to subtract so we leave articles for the next time (in case the server doesn't have them yet)
             $leaveOver = $this->messageBuffer;
 
-        // If this is not a new group, go from our newest to the servers newest.
+            // If this is not a new group, go from our newest to the servers newest.
         } else {
             // Set our oldest wanted to our newest local article.
             $first = $groupMySQL['last_record'];
@@ -890,6 +890,12 @@ class Binaries
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
+                    $random = openssl_random_pseudo_bytes(16, $isSourceStrong);
+
+                    if ($isSourceStrong === false || $random === false) {
+                        throw new \RuntimeException('IV generation failed');
+                    }
+
                     $collectionID = $this->_pdo->queryInsert(
                         sprintf(
                             "
@@ -907,7 +913,7 @@ class Binaries
                             sha1($this->header['CollectionKey']),
                             $collMatch['id'],
                             $xref,
-                            bin2hex(openssl_random_pseudo_bytes(16))
+                            bin2hex($random)
                         )
                     );
 
