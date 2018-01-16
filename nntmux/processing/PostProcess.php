@@ -98,7 +98,7 @@ class PostProcess
         // Class instances.
         $this->pdo = (($options['Settings'] instanceof DB) ? $options['Settings'] : new DB());
         $this->_par2Info = new Par2Info();
-        $this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
+        $this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => null]));
         $this->Nfo = (($options['Nfo'] instanceof Nfo) ? $options['Nfo'] : new Nfo());
 
         // Site settings.
