@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Group;
 use App\Models\User;
 use nntmux\Releases;
+use App\Models\Group;
 use App\Models\Category;
 use nntmux\ReleaseSearch;
 

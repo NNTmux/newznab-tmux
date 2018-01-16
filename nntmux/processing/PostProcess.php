@@ -2,7 +2,6 @@
 
 namespace nntmux\processing;
 
-use App\Models\Group;
 use nntmux\Nfo;
 use nntmux\XXX;
 use nntmux\NNTP;
@@ -13,6 +12,7 @@ use nntmux\Movie;
 use nntmux\Music;
 use nntmux\Console;
 use nntmux\Sharing;
+use App\Models\Group;
 use nntmux\NameFixer;
 use App\Models\Release;
 use App\Models\Category;
