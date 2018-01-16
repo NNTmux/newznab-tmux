@@ -1,4 +1,5 @@
 2018-01-16 DariusIII
+	* Chg: Update laravel/framework to version 5.5.31
 	* Chg: Add check for openssl_pseudo_bytes IV generation
 	* Fix: Fix getCBPTableNames function calls
 	* Fix: Fix call to Releases
