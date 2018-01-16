@@ -6,6 +6,7 @@ if (!isset($argv[1])) {
 
 require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php';
 
+use App\Models\Group;
 use App\Models\Settings;
 use App\Models\Tmux;
 use \nntmux\db\DB;
@@ -14,7 +15,6 @@ use \nntmux\processing\ProcessReleases;
 use \nntmux\processing\post\ProcessAdditional;
 use nntmux\Backfill;
 use nntmux\Binaries;
-use nntmux\Groups;
 use nntmux\Nfo;
 use nntmux\NNTP;
 use nntmux\processing\ProcessReleasesMultiGroup;
@@ -69,14 +69,13 @@ switch ($options[1]) {
 	case 'get_range':
 		$pdo = new DB();
 		$nntp = nntp($pdo);
-		$groups = new Groups();
-		$groupMySQL = $groups->getByName($options[3]);
+		$groupMySQL = Group::getByName($options[3]);
 		if ($nntp->isError($nntp->selectGroup($groupMySQL['name']))) {
 			if ($nntp->isError($nntp->dataError($nntp, $groupMySQL['name']))) {
 				return;
 			}
 		}
-		$binaries = new Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => $groups]);
+		$binaries = new Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => null]);
 		$return = $binaries->scan($groupMySQL, $options[4], $options[5], (Settings::settingValue('..safepartrepair') == 1 ? 'update' : 'backfill'));
 		if (empty($return)) {
 			exit();
@@ -133,8 +132,7 @@ switch ($options[1]) {
 	 */
 	case 'part_repair':
 		$pdo = new DB();
-		$groups = new Groups(['Settings' => $pdo]);
-		$groupMySQL = $groups->getByName($options[2]);
+		$groupMySQL = Group::getByName($options[2]);
 		$nntp = nntp($pdo);
 		// Select group, here, only once
 		$data = $nntp->selectGroup($groupMySQL['name']);
@@ -143,7 +141,7 @@ switch ($options[1]) {
 				exit();
 			}
 		}
-		(new Binaries(['NNTP' => $nntp, 'Groups' => $groups, 'Settings' => $pdo]))->partRepair($groupMySQL);
+		(new Binaries(['NNTP' => $nntp, 'Settings' => $pdo]))->partRepair($groupMySQL);
 		break;
 
 	// Process releases.
@@ -186,9 +184,8 @@ switch ($options[1]) {
 	case 'update_group_headers':
 		$pdo = new DB();
 		$nntp = nntp($pdo);
-		$groups = new Groups();
-		$groupMySQL = $groups->getByName($options[2]);
-		(new Binaries(['NNTP' => $nntp, 'Groups' => $groups, 'Settings' => $pdo]))->updateGroup($groupMySQL);
+		$groupMySQL = Group::getByName($options[2]);
+		(new Binaries(['NNTP' => $nntp, 'Settings' => $pdo]))->updateGroup($groupMySQL);
 		break;
 
 

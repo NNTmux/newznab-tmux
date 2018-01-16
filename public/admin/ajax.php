@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\Group;
 use nntmux\db\DB;
-use nntmux\Groups;
 use nntmux\Regexes;
 use nntmux\Sharing;
 use nntmux\Binaries;
@@ -46,42 +46,42 @@ switch ($_GET['action']) {
 
     case 'group_edit_purge_all':
         session_write_close();
-        (new Groups($settings))->purge();
+        Group::purge();
         echo 'All groups purged.';
         break;
 
     case 'group_edit_reset_all':
-        (new Groups($settings))->resetall();
+        Group::resetall();
         echo 'All groups reset.';
         break;
 
     case 'group_edit_purge_single':
         $id = (int) $_GET['group_id'];
         session_write_close();
-        (new Groups($settings))->purge($id);
+        Group::purge($id);
         echo "Group $id purged.";
         break;
 
     case 'group_edit_reset_single':
         $id = (int) $_GET['group_id'];
         session_write_close();
-        (new Groups($settings))->reset($id);
+        Group::reset($id);
         echo "Group $id reset.";
         break;
 
     case 'group_edit_delete_single':
         $id = (int) $_GET['group_id'];
         session_write_close();
-        (new Groups($settings))->delete($id);
+        Group::deleteGroup($id);
         echo "Group $id deleted.";
         break;
 
     case 'toggle_group_active_status':
-        print (new Groups($settings))->updateGroupStatus((int) $_GET['group_id'], 'active', (isset($_GET['group_status']) ? (int) $_GET['group_status'] : 0));
+        print Group::updateGroupStatus((int) $_GET['group_id'], 'active', (isset($_GET['group_status']) ? (int) $_GET['group_status'] : 0));
         break;
 
     case 'toggle_group_backfill_status':
-        print (new Groups($settings))->updateGroupStatus(
+        print Group::updateGroupStatus(
             (int) $_GET['group_id'],
             'backfill',
             (isset($_GET['backfill_status']) ? (int) $_GET['backfill_status'] : 0)

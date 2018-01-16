@@ -2,11 +2,11 @@
 
 namespace nntmux\processing\post;
 
+use App\Models\Group;
 use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
-use nntmux\Groups;
 use nntmux\ColorCLI;
 use nntmux\Releases;
 use nntmux\NameFixer;
@@ -69,11 +69,6 @@ class ProcessAdditional
      * @var array
      */
     protected $_nzbContents;
-
-    /**
-     * @var \nntmux\Groups
-     */
-    protected $_groups;
 
     /**
      * @var \dariusiii\rarinfo\Par2Info
@@ -402,10 +397,9 @@ class ProcessAdditional
         $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 
         $this->_nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
-        $this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
         $this->_archiveInfo = new ArchiveInfo();
         $this->_categorize = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
-        $this->_nameFixer = ($options['NameFixer'] instanceof NameFixer ? $options['NameFixer'] : new NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => $this->_groups, 'Settings' => $this->pdo, 'Categorize' => $this->_categorize]));
+        $this->_nameFixer = ($options['NameFixer'] instanceof NameFixer ? $options['NameFixer'] : new NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => null, 'Settings' => $this->pdo, 'Categorize' => $this->_categorize]));
         $this->_releaseExtra = ($options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra($this->pdo));
         $this->_releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
         $this->_par2Info = new Par2Info();
@@ -2363,7 +2357,7 @@ class ProcessAdditional
         $this->_passwordStatus = [Releases::PASSWD_NONE];
         $this->_releaseHasPassword = false;
 
-        $this->_releaseGroupName = $this->_groups->getNameByID($this->_release['groups_id']);
+        $this->_releaseGroupName = Group::getNameByID($this->_release['groups_id']);
 
         $this->_releaseHasNoNFO = false;
         // Make sure we don't already have an nfo.

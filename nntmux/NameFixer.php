@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Group;
 use nntmux\db\DB;
 use App\Models\Predb;
 use App\Models\Release;
@@ -176,7 +177,6 @@ class NameFixer
         $this->consoletools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
         $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
         $this->text = ($options['Misc'] instanceof Utility ? $options['Misc'] : new Utility());
-        $this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
         $this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
     }
 
@@ -893,9 +893,9 @@ class NameFixer
                 $newName = preg_replace(['/^[-=_\.:\s]+/', '/[-=_\.:\s]+$/'], '', $newName[0]);
 
                 if ($this->echooutput === true && $show === 1) {
-                    $groupName = $this->_groups->getNameByID($release['groups_id']);
-                    $oldCatName = $this->category->getNameByID($release['categories_id']);
-                    $newCatName = $this->category->getNameByID($determinedCategory);
+                    $groupName = Group::getNameByID($release['groups_id']);
+                    $oldCatName = Category::getNameByID($release['categories_id']);
+                    $newCatName = Category::getNameByID($determinedCategory);
 
                     if ($type === 'PAR2, ') {
                         echo PHP_EOL;

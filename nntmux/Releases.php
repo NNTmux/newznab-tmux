@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Group;
 use nntmux\db\DB;
 use App\Models\Release;
 use App\Models\Category;
@@ -25,11 +26,6 @@ class Releases
      * @var \nntmux\db\DB
      */
     public $pdo;
-
-    /**
-     * @var \nntmux\Groups
-     */
-    public $groups;
 
     /**
      * @var \nntmux\ReleaseSearch
@@ -64,7 +60,6 @@ class Releases
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch($this->pdo);
         $this->showPasswords = self::showPasswords();
@@ -705,7 +700,7 @@ class Releases
             $this->showPasswords,
             NZB::NZB_ADDED,
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', $this->groups->getIDByName($groupName)) : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
             (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(string) (104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
             (array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < '.(string) (104857600 * (int) $sizeRange[$sizeTo]).' ' : ''),
             ((int) $hasNfo !== 0 ? ' AND r.nfostatus = 1 ' : ''),

@@ -2,6 +2,7 @@
 
 namespace nntmux\processing;
 
+use App\Models\Group;
 use nntmux\Nfo;
 use nntmux\XXX;
 use nntmux\NNTP;
@@ -10,7 +11,6 @@ use nntmux\db\DB;
 use nntmux\Games;
 use nntmux\Movie;
 use nntmux\Music;
-use nntmux\Groups;
 use nntmux\Console;
 use nntmux\Sharing;
 use nntmux\NameFixer;
@@ -68,11 +68,6 @@ class PostProcess
     private $echooutput;
 
     /**
-     * @var \nntmux\Groups
-     */
-    private $groups;
-
-    /**
      * @var \nntmux\Nfo
      */
     private $Nfo;
@@ -102,7 +97,6 @@ class PostProcess
 
         // Class instances.
         $this->pdo = (($options['Settings'] instanceof DB) ? $options['Settings'] : new DB());
-        $this->groups = (($options['Groups'] instanceof Groups) ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
         $this->_par2Info = new Par2Info();
         $this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
         $this->Nfo = (($options['Nfo'] instanceof Nfo) ? $options['Nfo'] : new Nfo());
@@ -324,7 +318,7 @@ class PostProcess
         }
 
         // Get the PAR2 file.
-        $par2 = $nntp->getMessages($this->groups->getNameByID($groupID), $messageID, $this->alternateNNTP);
+        $par2 = $nntp->getMessages(Group::getNameByID($groupID), $messageID, $this->alternateNNTP);
         if ($nntp->isError($par2)) {
             return false;
         }

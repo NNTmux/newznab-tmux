@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Models\Group;
 use nntmux\NNTP;
 use nntmux\db\DB;
-use nntmux\Groups;
 use nntmux\Binaries;
 use nntmux\ColorCLI;
 use App\Models\Settings;
@@ -24,8 +24,7 @@ if (isset($argv[1]) && ! is_numeric($argv[1])) {
     $groupName = $argv[1];
     echo ColorCLI::header("Updating group: $groupName");
 
-    $grp = new Groups(['Settings' => $pdo]);
-    $group = $grp->getByName($groupName);
+    $group = Group::getByName($groupName);
     if (is_array($group)) {
         $binaries->updateGroup(
             $group,

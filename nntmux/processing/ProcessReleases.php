@@ -2,11 +2,11 @@
 
 namespace nntmux\processing;
 
+use App\Models\Group;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
 use nntmux\Genres;
-use nntmux\Groups;
 use nntmux\ColorCLI;
 use nntmux\Releases;
 use App\Models\Predb;
@@ -34,11 +34,6 @@ class ProcessReleases
 
     public const FILE_INCOMPLETE = 0; // We don't have all the parts yet for the file (binaries table partcheck column).
     public const FILE_COMPLETE = 1; // We have all the parts for the file (binaries table partcheck column).
-
-    /**
-     * @var \nntmux\Groups
-     */
-    public $groups;
 
     /**
      * @var int
@@ -139,7 +134,6 @@ class ProcessReleases
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
-        $this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->releaseCleaning = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning($this->pdo));
         $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo, 'Groups' => $this->groups]));
@@ -178,7 +172,7 @@ class ProcessReleases
         $groupID = '';
 
         if (! empty($groupName) && $groupName !== 'mgr') {
-            $groupInfo = $this->groups->getByName($groupName);
+            $groupInfo = Group::getByName($groupName);
             if ($groupInfo !== null) {
                 $groupID = $groupInfo['id'];
             }
@@ -390,7 +384,7 @@ class ProcessReleases
             );
         }
 
-        $groupID === '' ? $groupIDs = $this->groups->getActiveIDs() : $groupIDs = [['id' => $groupID]];
+        $groupID === '' ? $groupIDs = Group::getActiveIDs() : $groupIDs = [['id' => $groupID]];
 
         $minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
@@ -401,7 +395,7 @@ class ProcessReleases
         foreach ($groupIDs as $grpID) {
             $groupMinSizeSetting = $groupMinFilesSetting = 0;
 
-            $groupMinimums = $this->groups->getByID($grpID['id']);
+            $groupMinimums = Group::getGroupByID($grpID['id']);
             if ($groupMinimums !== null) {
                 if (! empty($groupMinimums['minsizetoformrelease']) && $groupMinimums['minsizetoformrelease'] > 0) {
                     $groupMinSizeSetting = (int) $groupMinimums['minsizetoformrelease'];
@@ -504,7 +498,7 @@ class ProcessReleases
      */
     protected function initiateTableNames($groupID): void
     {
-        $this->tables = $this->groups->getCBPTableNames($groupID);
+        $this->tables = Group::getCBPTableNames($groupID);
     }
 
     /**
@@ -641,12 +635,12 @@ class ProcessReleases
                         if (preg_match_all('#(\S+):\S+#', $collection['xref'], $matches)) {
                             foreach ($matches[1] as $grp) {
                                 //check if the group name is in a valid format
-                                $grpTmp = $this->groups->isValidGroup($grp);
+                                $grpTmp = Group::isValidGroup($grp);
                                 if ($grpTmp !== false) {
                                     //check if the group already exists in database
-                                    $xrefGrpID = $this->groups->getIDByName($grpTmp);
+                                    $xrefGrpID = Group::getIDByName($grpTmp);
                                     if ($xrefGrpID === '') {
-                                        $xrefGrpID = $this->groups->add(
+                                        $xrefGrpID = Group::add(
                                             [
                                                 'name'                  => $grpTmp,
                                                 'description'           => 'Added by Release processing',
@@ -1069,7 +1063,7 @@ class ProcessReleases
             echo ColorCLI::header('Process Releases -> Delete releases smaller/larger than minimum size/file count from group/site setting.');
         }
 
-        $groupID === '' ? $groupIDs = $this->groups->getActiveIDs() : $groupIDs = [['id' => $groupID]];
+        $groupID === '' ? $groupIDs = Group::getActiveIDs() : $groupIDs = [['id' => $groupID]];
 
         $maxSizeSetting = Settings::settingValue('.release.maxsizetoformrelease');
         $minSizeSetting = Settings::settingValue('.release.minsizetoformrelease');

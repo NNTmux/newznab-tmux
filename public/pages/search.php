@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\Groups;
+use App\Models\Group;
 use App\Models\User;
 use nntmux\Releases;
 use App\Models\Category;
@@ -10,7 +10,6 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$groups = new Groups(['Settings' => $page->settings]);
 $releases = new Releases(['Groups' => $groups, 'Settings' => $page->settings]);
 
 $page->meta_title = 'Search Nzbs';
@@ -202,7 +201,7 @@ $page->smarty->assign(
             6  => '3GB', 7  => '4GB', 8  => '8GB', 9  => '16GB', 10 => '32GB', 11 => '64GB',
         ],
         'results' => $results, 'sadvanced' => $searchType !== 'basic',
-        'grouplist' => $groups->getGroupsForSelect(),
+        'grouplist' => Group::getGroupsForSelect(),
         'catlist' => Category::getForSelect(),
         'search_description' => $search_description,
         'pager' => $page->smarty->fetch('pager.tpl'),

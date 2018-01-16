@@ -2,6 +2,7 @@
 
 namespace nntmux;
 
+use App\Models\Group;
 use nntmux\db\DB;
 use App\Models\Release;
 use App\Models\Category;
@@ -176,14 +177,13 @@ class Regexes
      */
     public function testCollectionRegex($groupName, $regex, $limit): array
     {
-        $groups = new Groups(['Settings' => $this->pdo]);
-        $groupID = $groups->getIDByName($groupName);
+        $groupID = Group::getIDByName($groupName);
 
         if (! $groupID) {
             return [];
         }
 
-        $tableNames = $groups->getCBPTableNames($groupID);
+        $tableNames = Group::getCBPTableNames($groupID);
 
         $rows = $this->pdo->query(
             sprintf(
@@ -248,8 +248,7 @@ class Regexes
      */
     public function testReleaseNamingRegex($groupName, $regex, $displayLimit, $queryLimit): array
     {
-        $groups = new Groups(['Settings' => $this->pdo]);
-        $groupID = $groups->getIDByName($groupName);
+        $groupID = Group::getIDByName($groupName);
 
         if (! $groupID) {
             return [];

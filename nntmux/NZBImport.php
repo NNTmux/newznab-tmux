@@ -84,13 +84,6 @@ class NZBImport
     protected $nzbGuid;
 
     /**
-     * Access point to add new groups.
-     *
-     * @var Groups
-     */
-    private $groups;
-
-    /**
      * @var \nntmux\Releases
      */
     private $releases;
@@ -122,7 +115,6 @@ class NZBImport
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->releaseCleaner = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning($this->pdo));
         $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['settings' => $this->pdo]));
-        $this->groups = new Groups(['Settings' => $this->pdo]);
 
         $this->crossPostt = Settings::settingValue('..crossposttime') !== '' ? Settings::settingValue('..crossposttime') : 2;
         $this->browser = $options['Browser'];
@@ -299,9 +291,9 @@ class NZBImport
                             $groupName = $group;
                         }
                     } else {
-                        $group = $this->groups->isValidGroup($group);
+                        $group = Group::isValidGroup($group);
                         if ($group !== false) {
-                            $groupID = $this->groups->add([
+                            $groupID = Group::addGroup([
                                 'name' => $group,
                                 'description' => 'Added by NZBimport script.',
                                 'backfill_target' => 1,

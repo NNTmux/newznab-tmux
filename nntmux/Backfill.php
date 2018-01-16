@@ -2,44 +2,24 @@
 
 namespace nntmux;
 
+use App\Models\Group;
 use nntmux\db\DB;
 use App\Models\Settings;
 
 class Backfill
 {
     /**
-     * Instance of class Settings.
-     *
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
     /**
-     * @var Binaries
+     * @var
      */
     protected $_binaries;
 
     /**
-     * Instance of class ColorCLI.
-     *
-     * @var ColorCLI
-     */
-    protected $_colorCLI;
-
-    /**
-     * Instance of class debugging.
-     *
-     * @var Logger
-     */
-    protected $_debugging;
-
-    /**
-     * @var Groups
-     */
-    protected $_groups;
-
-    /**
-     * @var NNTP
+     * @var \nntmux\NNTP
      */
     protected $_nntp;
     /**
@@ -100,7 +80,6 @@ class Backfill
         $this->_echoCLI = ($options['Echo'] && NN_ECHOCLI);
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
         $this->_nntp = (
             $options['NNTP'] instanceof NNTP
             ? $options['NNTP'] : new NNTP(['Settings' => $this->pdo])
@@ -126,12 +105,12 @@ class Backfill
     {
         $res = [];
         if ($groupName !== '') {
-            $grp = $this->_groups->getByName($groupName);
+            $grp = Group::getByName($groupName);
             if ($grp) {
                 $res = [$grp];
             }
         } else {
-            $res = $this->_groups->getActiveBackfill($type);
+            $res = Group::getActiveBackfill($type);
         }
 
         $groupCount = count($res);
@@ -256,7 +235,7 @@ class Backfill
                 ', skipping it, consider disabling backfill on it.');
 
             if ($this->_disableBackfillGroup) {
-                $this->_groups->updateGroupStatus($groupArr['id'], 'backfill', 0);
+                Group::updateGroupStatus($groupArr['id'], 'backfill', 0);
             }
 
             if ($this->_echoCLI) {

@@ -52,16 +52,6 @@ class Binaries
     protected $_collectionsCleaning;
 
     /**
-     * @var \nntmux\Logger
-     */
-    protected $_debugging;
-
-    /**
-     * @var \nntmux\Groups
-     */
-    protected $_groups;
-
-    /**
      * @var \nntmux\NNTP
      */
     protected $_nntp;
@@ -262,7 +252,6 @@ class Binaries
         $this->_echoCLI = ($options['Echo'] && NN_ECHOCLI);
 
         $this->_pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->_pdo]));
         $this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
         $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
         $this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof CollectionsCleaning ? $options['CollectionsCleaning'] : new CollectionsCleaning(['Settings' => $this->_pdo]));
@@ -292,7 +281,7 @@ class Binaries
      */
     public function updateAllGroups($maxHeaders = 100000): void
     {
-        $groups = $this->_groups->getActive();
+        $groups = Group::getActive();
 
         $groupCount = \count($groups);
         if ($groupCount > 0) {
@@ -359,7 +348,7 @@ class Binaries
             $groupNNTP = $this->_nntp->dataError($this->_nntp, $groupMySQL['name']);
 
             if (isset($groupNNTP['code']) && (int) $groupNNTP['code'] === 411) {
-                $this->_groups->disableIfNotExist($groupMySQL['id']);
+                Group::disableIfNotExist($groupMySQL['id']);
             }
             if ($this->_nntp->isError($groupNNTP)) {
                 return;
@@ -604,7 +593,7 @@ class Binaries
         $this->notYEnc = $this->headersBlackListed = 0;
 
         // Check if MySQL tables exist, create if they do not, get their names at the same time.
-        $this->tableNames = $this->_groups->getCBPTableNames($this->groupMySQL['id']);
+        $this->tableNames = Group::getCBPTableNames($this->groupMySQL['id']);
 
         $mgrPosters = $this->getMultiGroupPosters();
 
@@ -772,7 +761,7 @@ class Binaries
 
         // Standard headers go second so we can switch tableNames back and do part repair to standard group tables
         if (! empty($stdHeaders)) {
-            $this->tableNames = $this->_groups->getCBPTableNames($this->groupMySQL['id']);
+            $this->tableNames = Group::getCBPTableNames($this->groupMySQL['id']);
             $this->storeHeaders($stdHeaders, false);
         }
         unset($stdHeaders);
@@ -1137,7 +1126,7 @@ class Binaries
         $tableNames = $tables;
 
         if ($tableNames === '') {
-            $tableNames = $this->_groups->getCBPTableNames($groupArr['id']);
+            $tableNames = Group::getCBPTableNames($groupArr['id']);
         }
         // Get all parts in partrepair table.
         $missingParts = $this->_pdo->query(
@@ -1275,10 +1264,10 @@ class Binaries
     public function postdate($post, array $groupData): int
     {
         // Set table names
-        $groupID = $this->_groups->getIDByName($groupData['group']);
+        $groupID = Group::getIDByName($groupData['group']);
         $group = [];
         if ($groupID !== '') {
-            $group = $this->_groups->getCBPTableNames($groupID);
+            $group = Group::getCBPTableNames($groupID);
         }
 
         $currentPost = $post;
