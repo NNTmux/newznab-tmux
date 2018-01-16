@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\ReleaseComment;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\User;
 use App\Models\Settings;
 use App\Models\UserRequest;
 use App\Models\UserDownload;
+use App\Models\ReleaseComment;
 use App\Models\UserExcludedCategory;
 
 if (! User::isLoggedIn()) {
