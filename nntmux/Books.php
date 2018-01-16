@@ -408,7 +408,7 @@ class Books
                 $this->processBookReleasesHelper(
                     Release::query()->where('nzbstatus', '=', NZB::NZB_ADDED)
                         ->whereNull('bookinfo_id')
-                        ->whereIn('categories_id', $bookids[$i])
+                        ->whereIn('categories_id', [$bookids[$i]])
                     ->orderBy('postdate', 'desc')
                     ->limit($this->bookqty)
                     ->get(['searchname', 'id', 'categories_id']),
