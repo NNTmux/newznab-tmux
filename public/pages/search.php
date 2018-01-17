@@ -10,7 +10,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$releases = new Releases(['Groups' => $groups, 'Settings' => $page->settings]);
+$releases = new Releases(['Groups' => null, 'Settings' => $page->settings]);
 
 $page->meta_title = 'Search Nzbs';
 $page->meta_keywords = 'search,nzb,description,details';
@@ -82,7 +82,7 @@ if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && ! isset($_REQUEST
     $page->smarty->assign(
         [
             'lastvisit' => $page->userdata['lastlogin'],
-            'pagertotalitems' => (count($results) > 0 ? $results[0]['_totalrows'] : 0),
+            'pagertotalitems' => \count($results) > 0 ? $results[0]['_totalrows'] : 0,
             'pageroffset' => $offset,
             'pageritemsperpage' => ITEMS_PER_PAGE,
             'pagerquerysuffix' => '#results',
@@ -150,7 +150,7 @@ if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQU
     $page->smarty->assign(
         [
             'lastvisit' => $page->userdata['lastlogin'],
-            'pagertotalitems' => count($results) > 0 ? $results[0]['_totalrows'] : 0,
+            'pagertotalitems' => \count($results) > 0 ? $results[0]['_totalrows'] : 0,
             'pageroffset' => $offset,
             'pageritemsperpage' => ITEMS_PER_PAGE,
             'pagerquerysuffix' => '#results',
@@ -159,9 +159,6 @@ if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQU
     );
 }
 
-$ft1 = $page->pdo->checkIndex('releases', 'ix_releases_name_searchname_ft');
-$ft2 = $page->pdo->checkIndex('releases', 'ix_releases_name_ft');
-$ft3 = $page->pdo->checkIndex('releases', 'ix_releases_searchname_ft');
 switch (NN_RELEASE_SEARCH_TYPE) {
     case ReleaseSearch::FULLTEXT:
         $search_description =
