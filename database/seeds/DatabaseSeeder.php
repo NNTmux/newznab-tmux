@@ -1,4 +1,6 @@
 <?php
+
+use Bhuvidya\Countries\CountriesSeeder;
 use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
@@ -11,5 +13,6 @@ class DatabaseSeeder extends Seeder
     {
         // $this->call(UsersTableSeeder::class);
         $this->call(UserRolesTableSeeder::class);
+        $this->call(CountriesSeeder::class);
     }
 }
