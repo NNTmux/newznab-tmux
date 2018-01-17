@@ -1,4 +1,5 @@
 2018-01-17 DariusIII
+	* Chg: Remove Guest user role
 	* Chg: Update SmartyUtils class
 	* Chg: Update Country class
 	* Chg: Remove countries table as we will use new package with migration and seeding to populate it
