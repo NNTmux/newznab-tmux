@@ -16,7 +16,7 @@ class CreateCategoriesTable extends Migration {
 		{
 			$table->increments('id');
 			$table->string('title');
-			$table->integer('parentid')->nullable()->default('NULL')->index('ix_categories_parentid');
+			$table->integer('parentid')->nullable()->index('ix_categories_parentid');
 			$table->integer('status')->default(1)->index('ix_categories_status');
 			$table->string('description')->nullable()->default('NULL');
 			$table->boolean('disablepreview')->default(0);
