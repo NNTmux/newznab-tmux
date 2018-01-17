@@ -1,4 +1,5 @@
 2018-01-17 DariusIII
+	* Fix: Fix installation test
 	* Chg: Update newznab_api_specification.txt to version 0.6-NNTmux
 	* Chg: Add categories table migration and seed
 	* Chg: Change other categories id's
