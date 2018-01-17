@@ -38,9 +38,9 @@ class Country
      */
     public static function countryCode($country)
     {
-        if (! is_array($country) && strlen($country) > 2) {
+        if (\strlen($country) > 2) {
             $code = CountryModel::query()->where('country', $country)->first(['id']);
-            if (isset($code['id'])) {
+            if ($code !== null && isset($code['id'])) {
                 return $code['id'];
             }
         }

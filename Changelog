@@ -1,4 +1,5 @@
 2018-01-17 DariusIII
+	* Chg: Update Country.php
 	* Chg: Remove $maxage parameter as it is not used in Books class
 	* Chg: Update webpack.mix.js and package.json
 	* Fix: Fix error in search related to removed groups class
