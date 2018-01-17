@@ -12,8 +12,8 @@ class Category extends Model
      * Category constants.
      * Do NOT use the values, as they may change, always use the constant - that's what it's for.
      */
-    public const OTHER_MISC = '0010';
-    public const OTHER_HASHED = '0020';
+    public const OTHER_MISC = '10';
+    public const OTHER_HASHED = '20';
     public const GAME_NDS = '1010';
     public const GAME_PSP = '1020';
     public const GAME_WII = '1030';
@@ -77,7 +77,7 @@ class Category extends Model
     public const BOOKS_TECHNICAL = '7040';
     public const BOOKS_FOREIGN = '7060';
     public const BOOKS_UNKNOWN = '7999';
-    public const OTHER_ROOT = '0000';
+    public const OTHER_ROOT = '1';
     public const GAME_ROOT = '1000';
     public const MOVIE_ROOT = '2000';
     public const MUSIC_ROOT = '3000';
