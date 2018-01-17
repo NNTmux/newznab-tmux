@@ -1,4 +1,5 @@
 2018-01-17 DariusIII
+	* Chg: Update webpack.mix.js and package.json
 	* Fix: Fix error in search related to removed groups class
 2018-01-16 DariusIII
 	* Chg: Update laravel/framework to version 5.5.31
