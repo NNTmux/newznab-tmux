@@ -88,6 +88,7 @@
     "aharen/omdbapi": "^2.0",
     "b3rs3rk/steamfront": "dev-master",
     "barracudanetworks/forkdaemon-php": "~1.0",
+    "bhuvidya/laravel-countries": "^1.0",
     "bower-asset/DataTables": "~1.10.11",
     "bower-asset/animate.css": "~3.5.1",
     "bower-asset/autosize": "~3.0.15",

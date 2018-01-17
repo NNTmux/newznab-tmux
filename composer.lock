@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d7da0fc2ac58ac07f8d4daf0e2c5c042",
+    "content-hash": "7c2a9bd19d99bf4adda8e61da789850d",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -176,6 +176,58 @@
                 "php"
             ],
             "time": "2017-12-18T15:52:48+00:00"
+        },
+        {
+            "name": "bhuvidya/laravel-countries",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bhuvidya/laravel-countries.git",
+                "reference": "abdd08d8df43c25d98a8640e20cbdb01c0c492b6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/abdd08d8df43c25d98a8640e20cbdb01c0c492b6",
+                "reference": "abdd08d8df43c25d98a8640e20cbdb01c0c492b6",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "~5.5.0",
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Bhuvidya\\Countries\\CountriesServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bhuvidya\\Countries\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "bhu Boue vidya",
+                    "email": "bhuvidya@gmail.com",
+                    "role": "developer"
+                }
+            ],
+            "description": "Laravel Countries is a bundle for Laravel, providing Almost ISO 3166_2, 3166_3, currency, Capital and more for all countries. Bug kudos to Christoph Kempen, on whose work this package is heavily based (webpatser/laravel-countries).",
+            "homepage": "https://github.com/bhuvidya/laravel-countries",
+            "keywords": [
+                "countries",
+                "iso_3166_2",
+                "iso_3166_3",
+                "laravel"
+            ],
+            "time": "2017-11-30T09:17:13+00:00"
         },
         {
             "name": "bower-asset/animate.css",

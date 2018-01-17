@@ -435,22 +435,6 @@ CREATE TABLE consoleinfo (
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
 
-
-DROP TABLE IF EXISTS countries;
-CREATE TABLE countries (
-  id      CHAR(2) COLLATE utf8_unicode_ci NOT NULL COMMENT '2 character code.',
-  iso3    CHAR(3) COLLATE utf8_unicode_ci NOT NULL COMMENT '3 character code.',
-  country VARCHAR(180) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name of the country.',
-  PRIMARY KEY (id),
-  UNIQUE KEY code3 (iso3),
-  UNIQUE KEY country (country)
-)
-  ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC;
-
-
 DROP TABLE IF EXISTS dnzb_failures;
 CREATE TABLE dnzb_failures (
   release_id   INT(11) UNSIGNED  NOT NULL,
