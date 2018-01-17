@@ -157,11 +157,6 @@ class Books
             $catsrch = Category::getCategorySearch($cat);
         }
 
-        $maxage = '';
-        if ($maxage > 0) {
-            $maxage = sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage);
-        }
-
         $exccatlist = '';
         if (\count($excludedcats) > 0) {
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedcats).')';
@@ -179,13 +174,12 @@ class Books
 				AND boo.cover = 1
 				AND boo.title != ''
 				AND r.passwordstatus %s
-				%s %s %s %s
+				%s %s %s
 				GROUP BY boo.id
 				ORDER BY %s %s %s",
                         Releases::showPasswords(),
                         $browseby,
                         $catsrch,
-                        $maxage,
                         $exccatlist,
                         $order[0],
                         $order[1],
