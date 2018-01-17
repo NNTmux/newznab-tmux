@@ -346,27 +346,6 @@ CREATE TABLE bookinfo (
   AUTO_INCREMENT  = 1;
 
 
-DROP TABLE IF EXISTS categories;
-CREATE TABLE categories (
-  id             INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
-  title          VARCHAR(255)     NOT NULL,
-  parentid       INT              NULL,
-  status         INT              NOT NULL DEFAULT '1',
-  description    VARCHAR(255)     NULL,
-  disablepreview TINYINT(1)       NOT NULL DEFAULT '0',
-  minsizetoformrelease BIGINT UNSIGNED NOT NULL DEFAULT '0',
-  maxsizetoformrelease BIGINT UNSIGNED NOT NULL DEFAULT '0',
-  PRIMARY KEY (id),
-  INDEX ix_categories_status   (status),
-  INDEX ix_categories_parentid (parentid)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
-
-
 DROP TABLE IF EXISTS category_regexes;
 CREATE TABLE category_regexes (
   id          INT UNSIGNED        NOT NULL AUTO_INCREMENT,
