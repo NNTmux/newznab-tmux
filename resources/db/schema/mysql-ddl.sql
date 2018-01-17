@@ -1305,27 +1305,6 @@ CREATE TABLE user_requests (
   AUTO_INCREMENT  = 1;
 
 
-DROP TABLE IF EXISTS user_roles;
-CREATE TABLE user_roles (
-  id               INT(10)             NOT NULL AUTO_INCREMENT,
-  name             VARCHAR(32)         NOT NULL,
-  apirequests      INT(10) UNSIGNED    NOT NULL,
-  downloadrequests INT(10) UNSIGNED    NOT NULL,
-  defaultinvites   INT(10) UNSIGNED    NOT NULL,
-  isdefault        TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  canpreview       TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  hideads          TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  donation         INT(10) NOT NULL DEFAULT '0',
-  addyears         INT(2) NOT NULL DEFAULT '0',
-  PRIMARY KEY (id)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 4;
-
-
 DROP TABLE IF EXISTS user_series;
 CREATE TABLE user_series (
   id          INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
