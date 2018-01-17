@@ -1,4 +1,5 @@
 2018-01-17 DariusIII
+	* Chg: Add user_roles migration and seed
 	* Chg: Remove Guest user role
 	* Chg: Update SmartyUtils class
 	* Chg: Update Country class
