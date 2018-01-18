@@ -46,17 +46,6 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 
 		$pdo = new DB();
 		$error = false;
-
-		if (file_exists(NN_ROOT . '_install/install.lock')) {
-			ColorCLI::doEcho(ColorCLI::notice('Installation is locked. If you want to reinstall NNTmux, please remove install.lock file from _install folder. ' . PHP_EOL . ColorCLI::warning('This will wipe your database!')));
-			exit();
-		}
-
-		// Check if user selected right DB type.
-		if (env('DB_SYSTEM') !== 'mysql') {
-			ColorCLI::doEcho(ColorCLI::error('Invalid database system. Must be: mysql ; Not: ' . env('DB_SYSTEM')));
-			$error = true;
-		} else {
 			// Connect to the SQL server.
 			try {
 				// HAS to be DB because settings table does not exist yet.
@@ -73,11 +62,9 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 						'dbuser'       => env('DB_USER'),
 					]
 				);
-				$dbConnCheck = true;
 			} catch (\PDOException $e) {
 				ColorCLI::doEcho(ColorCLI::error('Unable to connect to MySQL server.'));
 				$error = true;
-				$dbConnCheck = false;
 			} catch (\RuntimeException $e) {
 				switch ($e->getCode()) {
 					case 1:
@@ -92,7 +79,6 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 			}
 
 			// Check if the MySQL version is correct.
-			$goodVersion = false;
 			if (!$error) {
 				try {
 					$goodVersion = $pdo->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION);
@@ -113,7 +99,6 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 					);
 				}
 			}
-		}
 
 // Start inserting data into the DB.
 		if (!$error) {
@@ -128,7 +113,6 @@ class InstallTest extends \PHPUnit\Framework\TestCase
             $DbSetup->processSQLFile(); // Setup default schema
             //Insert admin user into database
             if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') === '') {
-                $error = true;
                 ColorCLI::doEcho(ColorCLI::error('Admin user data cannot be empty! Please edit .env file and fill in admin user details and run this script again!'));
                 exit();
             }
@@ -142,7 +126,6 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 				$dbInstallWorked = false;
 				$reschk = $pdo->query('SELECT COUNT(id) AS num FROM tmux');
 				if ($reschk === false) {
-					$dbCreateCheck = false;
 					$error = true;
 					ColorCLI::doEcho(ColorCLI::warningOver('Could not select data from your database, check that tables and data are properly created/inserted.'));
 				} else {
@@ -172,7 +155,6 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 						echo $message . PHP_EOL;
 					}
 				} else {
-					$dbCreateCheck = false;
 					$error = true;
 					ColorCLI::doEcho(ColorCLI::warning('Could not select data from your database.'));
 				}
@@ -180,8 +162,6 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 		}
 
 		if (!$error) {
-			$doCheck = true;
-
 			$covers_path = NN_RES . 'covers' . DS;
 			$nzb_path = NN_RES . 'nzb' . DS;
 			$tmp_path = NN_RES . 'tmp' . DS;
@@ -195,7 +175,7 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 				echo $message . PHP_EOL;
 			}
 
-			$lastchar = substr($nzb_path, strlen($nzb_path) - 1);
+			$lastchar = substr($nzb_path, \strlen($nzb_path) - 1);
 			if ($lastchar !== '/') {
 				$nzb_path .= '/';
 			}
@@ -215,7 +195,7 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 				echo $message . PHP_EOL;
 			}
 
-			$lastchar = substr($unrar_path, strlen($unrar_path) - 1);
+			$lastchar = substr($unrar_path, \strlen($unrar_path) - 1);
 			if ($lastchar !== '/') {
 				$unrar_path .= '/';
 			}
@@ -227,7 +207,7 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 				echo $message . PHP_EOL;
 			}
 
-			$lastchar = substr($covers_path, strlen($covers_path) - 1);
+			$lastchar = substr($covers_path, \strlen($covers_path) - 1);
 			if ($lastchar !== '/') {
 				$covers_path .= '/';
 			}
