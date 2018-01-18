@@ -108,7 +108,6 @@ if (! $error) {
     passthru('php '.NN_ROOT.'artisan migrate');
     passthru('php '.NN_ROOT.'artisan db:seed');
 
-
     if (! $error) {
         // Check one of the standard tables was created and has data.
         $dbInstallWorked = false;
