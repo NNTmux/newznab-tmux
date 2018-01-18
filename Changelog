@@ -1,4 +1,5 @@
 2018-01-18 DariusIII
+	* Chg: Update scrutinizer config
 	* Chg: Change installation, remove tsv files and related tables, use migrations and seeding for them
 2018-01-17 DariusIII
 	* Fix: Fix installation test
