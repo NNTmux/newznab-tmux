@@ -12,8 +12,6 @@ build:
           - mysql -u root -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"
           - mysql -u root -e "GRANT FILE ON *.* TO 'TEST'@'localhost';"
           - mysql -u TEST -pTEST TEST < resources/db/schema/mysql-ddl.sql
-          - php artisan migrate
-          - php artisan db:seed
     environment:
         memcached: true
         mysql: 5.6
