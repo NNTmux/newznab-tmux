@@ -49,7 +49,6 @@ before_script:
      - mysql -u root -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"
      - mysql -u root -e "GRANT FILE ON *.* TO 'TEST'@'localhost';"
      - mysql -u TEST -pTEST TEST < resources/db/schema/mysql-ddl.sql
-     - mysql --local-infile=1 -u TEST -pTEST -e "LOAD DATA LOCAL INFILE 'resources/db/schema/data/10-settings.tsv' IGNORE INTO TABLE TEST.settings FIELDS TERMINATED BY '\t' OPTIONALLY ENCLOSED BY '\'' LINES TERMINATED BY '\n' IGNORE 1 LINES (section,subsection,name,value,hint,setting);"
      # Disable apparmor.
      - if service apparmor status; then service apparmor stop; update-rc.d -f apparmor remove; service apparmor teardown; fi
      # Change MySQL settings.

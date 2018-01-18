@@ -11,7 +11,6 @@ use nntmux\ColorCLI;
 use nntmux\db\DbUpdate;
 use nntmux\config\Configure;
 use App\Extensions\util\Versions;
-use Illuminate\Database\Capsule\Manager as Capsule;
 
 $config = new Configure('install');
 
@@ -97,15 +96,18 @@ if (! $error) {
     );
     $pdo->exec('SET FOREIGN_KEY_CHECKS=0;');
 
-    try {
-        $DbSetup->processSQLFile(); // Setup default schema
-        ColorCLI::doEcho(ColorCLI::header('Migrating tables and populating them'));
-        passthru('php '.NN_ROOT.'artisan migrate');
-        passthru('php '.NN_ROOT.'artisan db:seed');
-    } catch (\RuntimeException $err) {
+    $DbSetup->processSQLFile(); // Setup default schema
+    //Insert admin user into database
+    if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') === '') {
         $error = true;
-        ColorCLI::doEcho(ColorCLI::error('Error ('.$err->getMessage().')'));
+        ColorCLI::doEcho(ColorCLI::error('Admin user data cannot be empty! Please edit .env file and fill in admin user details and run this script again!'));
+        exit();
     }
+    $pdo->queryExec(sprintf('INSERT INTO users (username, email, password, user_roles_id, created_at) VALUES (%s, %s, %s, 2, NOW())', $pdo->escapeString(env('ADMIN_USER')), $pdo->escapeString(env('ADMIN_EMAIL')), $pdo->escapeString(User::hashPassword(env('ADMIN_PASS')))));
+    ColorCLI::doEcho(ColorCLI::header('Migrating tables and populating them'));
+    passthru('php '.NN_ROOT.'artisan migrate');
+    passthru('php '.NN_ROOT.'artisan db:seed');
+
 
     if (! $error) {
         // Check one of the standard tables was created and has data.
@@ -128,7 +130,7 @@ if (! $error) {
         if ($dbInstallWorked) {
             $updateSettings = false;
             if ($patch > 0) {
-                $updateSettings = $pdo->exec(
+                $updateSettings = $pdo->queryExec(
                     "UPDATE settings SET value = '$patch' WHERE section = '' AND subsection = '' AND name = 'sqlpatch'"
                 );
             }
@@ -144,47 +146,6 @@ if (! $error) {
             $error = true;
             ColorCLI::doEcho(ColorCLI::warning('Could not select data from your database.'));
         }
-    }
-}
-//Insert admin user into database
-if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') === '') {
-    $error = true;
-    ColorCLI::doEcho(ColorCLI::error('Admin user data cannot be empty! Please edit .env file and fill in admin user details and run this script again!'));
-    exit();
-}
-
-    $capsule = new Capsule;
-    // Same as database configuration file of Laravel.
-    $capsule->addConnection([
-        'driver' => env('DB_SYSTEM'),
-        'host' => env('DB_HOST', '127.0.0.1'),
-        'port' => env('DB_PORT', '3306'),
-        'database' => env('DB_NAME', 'nntmux'),
-        'username' => env('DB_USER', 'root'),
-        'password' => env('DB_PASSWORD', ''),
-        'unix_socket' => env('DB_SOCKET', ''),
-        'charset' => 'utf8',
-        'collation' => 'utf8_unicode_ci',
-        'strict' => false,
-    ]);
-$capsule->bootEloquent();
-
-if (! User::isValidUsername(env('ADMIN_USER'))) {
-    $error = true;
-} else {
-    $usrCheck = User::getByUsername(env('ADMIN_USER'));
-    if ($usrCheck) {
-        $error = true;
-    }
-}
-if (! User::isValidEmail(env('ADMIN_EMAIL'))) {
-    $error = true;
-}
-
-if (! $error) {
-    $adminCheck = User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '');
-    if (! is_numeric($adminCheck)) {
-        $error = true;
     }
 }
 
