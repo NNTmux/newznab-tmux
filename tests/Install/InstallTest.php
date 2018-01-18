@@ -21,7 +21,6 @@ use nntmux\config\Configure;
 use nntmux\db\DB;
 use nntmux\db\DbUpdate;
 use nntmux\ColorCLI;
-use Illuminate\Database\Capsule\Manager as Capsule;
 
 /**
  * Class InstallTest
