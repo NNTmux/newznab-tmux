@@ -1,3 +1,5 @@
+2018-01-18 DariusIII
+	* Chg: Change installation, remove tsv files and related tables, use migrations and seeding for them
 2018-01-17 DariusIII
 	* Fix: Fix installation test
 	* Chg: Update newznab_api_specification.txt to version 0.6-NNTmux

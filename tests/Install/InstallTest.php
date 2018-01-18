@@ -125,13 +125,15 @@ class InstallTest extends \PHPUnit\Framework\TestCase
 			);
             $pdo->exec('SET FOREIGN_KEY_CHECKS=0;');
 
-			try {
-				$DbSetup->processSQLFile(); // Setup default schema
-				$DbSetup->loadTables(); // Load default data files
-			} catch (\PDOException $err) {
-				$error = true;
-				ColorCLI::doEcho(ColorCLI::error('Error inserting: (' . $err->getMessage() . ')'));
-			}
+            try {
+                $DbSetup->processSQLFile(); // Setup default schema
+                ColorCLI::doEcho(ColorCLI::header('Migrating tables and populating them'));
+                passthru('php '.NN_ROOT.'artisan migrate');
+                passthru('php '.NN_ROOT.'artisan db:seed');
+            } catch (\RuntimeException $err){
+                $error = true;
+                ColorCLI::doEcho(ColorCLI::error('Error (' . $err->getMessage() . ')'));
+            }
 
 			if (!$error) {
 				// Check one of the standard tables was created and has data.

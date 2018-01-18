@@ -1,2 +1,0 @@
-id, group_regex, regex, status, description, ordinal, categories_id
-1	^alt\\.binaries\\.sony\\.psvita$	/.*/ 	1		50	1120

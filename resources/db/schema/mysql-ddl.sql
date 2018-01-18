@@ -295,28 +295,6 @@ CREATE TABLE binaries (
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
 
-
-DROP TABLE IF EXISTS binaryblacklist;
-CREATE TABLE binaryblacklist (
-  id            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  groupname     VARCHAR(255)     NULL,
-  regex         VARCHAR(2000)    NOT NULL,
-  msgcol        INT(11) UNSIGNED NOT NULL DEFAULT '1',
-  optype        INT(11) UNSIGNED NOT NULL DEFAULT '1',
-  status        INT(11) UNSIGNED NOT NULL DEFAULT '1',
-  description   VARCHAR(1000) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci    NULL,
-  last_activity	DATE             NULL,
-  PRIMARY KEY (id),
-  INDEX ix_binaryblacklist_groupname (groupname),
-  INDEX ix_binaryblacklist_status    (status)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
-
-
 DROP TABLE IF EXISTS bookinfo;
 CREATE TABLE bookinfo (
   id          INT(10) UNSIGNED    NOT NULL AUTO_INCREMENT,
@@ -344,49 +322,6 @@ CREATE TABLE bookinfo (
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
-
-
-DROP TABLE IF EXISTS category_regexes;
-CREATE TABLE category_regexes (
-  id          INT UNSIGNED        NOT NULL AUTO_INCREMENT,
-  group_regex VARCHAR(255)        NOT NULL DEFAULT ''     COMMENT 'This is a regex to match against usenet groups',
-  regex       VARCHAR(5000)       NOT NULL DEFAULT ''     COMMENT 'Regex used to match a release name to categorize it',
-  status      TINYINT(1) UNSIGNED NOT NULL DEFAULT '1'    COMMENT '1=ON 0=OFF',
-  description VARCHAR(1000)       NOT NULL DEFAULT ''     COMMENT 'Optional extra details on this regex',
-  ordinal     INT SIGNED          NOT NULL DEFAULT '0'    COMMENT 'Order to run the regex in',
-  categories_id SMALLINT UNSIGNED   NOT NULL DEFAULT '0010' COMMENT 'Which categories id to put the release in',
-  PRIMARY KEY (id),
-  INDEX ix_category_regexes_group_regex (group_regex),
-  INDEX ix_category_regexes_status      (status),
-  INDEX ix_category_regexes_ordinal     (ordinal),
-  INDEX ix_category_regexes_categories_id (categories_id)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 100000;
-
-
-DROP TABLE IF EXISTS collection_regexes;
-CREATE TABLE collection_regexes (
-  id          INT UNSIGNED        NOT NULL AUTO_INCREMENT,
-  group_regex VARCHAR(255)        NOT NULL DEFAULT ''  COMMENT 'This is a regex to match against usenet groups',
-  regex       VARCHAR(5000)       NOT NULL DEFAULT ''  COMMENT 'Regex used for collection grouping',
-  status      TINYINT(1) UNSIGNED NOT NULL DEFAULT '1' COMMENT '1=ON 0=OFF',
-  description VARCHAR(1000)       CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Optional extra details on this regex',
-  ordinal     INT SIGNED          NOT NULL DEFAULT '0' COMMENT 'Order to run the regex in',
-  PRIMARY KEY (id),
-  INDEX ix_collection_regexes_group_regex (group_regex),
-  INDEX ix_collection_regexes_status      (status),
-  INDEX ix_collection_regexes_ordinal     (ordinal)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 100000;
-
 
 DROP TABLE IF EXISTS consoleinfo;
 CREATE TABLE consoleinfo (
@@ -428,34 +363,6 @@ CREATE TABLE dnzb_failures (
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC;
 
-DROP TABLE IF EXISTS forumpost;
-CREATE TABLE forumpost (
-  id          INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
-  forumid     INT(11)             NOT NULL DEFAULT '1',
-  parentid    INT(11)             NOT NULL DEFAULT '0',
-  users_id    INT(16) UNSIGNED    NOT NULL,
-  subject     VARCHAR(255)        NOT NULL,
-  message     TEXT                NOT NULL,
-  locked      TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  sticky      TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  replies     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  created_at DATETIME            NOT NULL,
-  updated_at DATETIME            NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT FK_users_fp FOREIGN KEY (users_id)
-  REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  KEY parentid    (parentid),
-  KEY userid      (users_id),
-  KEY created_at (created_at),
-  KEY updated_at (updated_at)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1;
-
-
 DROP TABLE IF EXISTS gamesinfo;
 CREATE TABLE gamesinfo (
   id          INT(10) UNSIGNED    NOT NULL AUTO_INCREMENT,
@@ -482,48 +389,6 @@ CREATE TABLE gamesinfo (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
-
-
-DROP TABLE IF EXISTS genres;
-CREATE TABLE genres (
-  id       INT(11)      NOT NULL AUTO_INCREMENT,
-  title    VARCHAR(255) NOT NULL,
-  type     INT(4) DEFAULT NULL,
-  disabled TINYINT(1)   NOT NULL DEFAULT '0',
-  PRIMARY KEY (id)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
-
-
-DROP TABLE IF EXISTS groups;
-CREATE TABLE groups (
-  id                    INT(11)         NOT NULL AUTO_INCREMENT,
-  name                  VARCHAR(255)    NOT NULL DEFAULT '',
-  backfill_target       INT(4)          NOT NULL DEFAULT '1',
-  first_record          BIGINT UNSIGNED NOT NULL DEFAULT '0',
-  first_record_postdate DATETIME                 DEFAULT NULL,
-  last_record           BIGINT UNSIGNED NOT NULL DEFAULT '0',
-  last_record_postdate  DATETIME                 DEFAULT NULL,
-  last_updated          DATETIME                 DEFAULT NULL,
-  minfilestoformrelease INT(4)          NULL,
-  minsizetoformrelease  BIGINT          NULL,
-  active                TINYINT(1)      NOT NULL DEFAULT '0',
-  backfill              TINYINT(1)      NOT NULL DEFAULT '0',
-  description           VARCHAR(255)    NULL     DEFAULT '',
-  PRIMARY KEY (id),
-  KEY active                  (active),
-  UNIQUE INDEX ix_groups_name (name)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
-
 
 DROP TABLE IF EXISTS invitations;
 CREATE TABLE invitations (
@@ -556,26 +421,6 @@ CREATE TABLE logging (
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
-
-
-DROP TABLE IF EXISTS menu;
-CREATE TABLE menu (
-  id        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  href      VARCHAR(2000)    NOT NULL DEFAULT '',
-  title     VARCHAR(2000)    NOT NULL DEFAULT '',
-  newwindow INT(1) UNSIGNED  NOT NULL DEFAULT '0',
-  tooltip   VARCHAR(2000)    NOT NULL DEFAULT '',
-  role      INT(11) UNSIGNED NOT NULL,
-  ordinal   INT(11) UNSIGNED NOT NULL,
-  menueval  VARCHAR(2000)    NOT NULL DEFAULT '',
-  PRIMARY KEY (id),
-  INDEX ix_role_ordinal (role, ordinal)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
 
 
 DROP TABLE IF EXISTS missed_parts;
@@ -700,28 +545,6 @@ CREATE TABLE multigroup_posters (
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
-
-
-DROP TABLE IF EXISTS content;
-CREATE TABLE content (
-  id              INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  title           VARCHAR(255)    NOT NULL,
-  url             VARCHAR(2000)   NULL,
-  body            TEXT            NULL,
-  metadescription VARCHAR(1000)   NOT NULL,
-  metakeywords    VARCHAR(1000)   NOT NULL,
-  contenttype     INT             NOT NULL,
-  showinmenu      INT             NOT NULL,
-  status          INT             NOT NULL,
-  ordinal         INT             NULL,
-  role            INT             NOT NULL DEFAULT '0',
-  INDEX ix_showinmenu_status_contenttype_role (showinmenu, status, contenttype, role)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
 
 
 DROP TABLE IF EXISTS par_hashes;
@@ -929,27 +752,6 @@ CREATE TABLE release_files (
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC;
 
-
-DROP TABLE IF EXISTS release_naming_regexes;
-CREATE TABLE release_naming_regexes (
-  id          INT UNSIGNED        NOT NULL AUTO_INCREMENT,
-  group_regex VARCHAR(255)        NOT NULL DEFAULT ''  COMMENT 'This is a regex to match against usenet groups',
-  regex       VARCHAR(5000)       CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT ''  COMMENT 'Regex used for extracting name from subject',
-  status      TINYINT(1) UNSIGNED NOT NULL DEFAULT '1' COMMENT '1=ON 0=OFF',
-  description VARCHAR(1000)       CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT ''  COMMENT 'Optional extra details on this regex',
-  ordinal     INT SIGNED          NOT NULL DEFAULT '0' COMMENT 'Order to run the regex in',
-  PRIMARY KEY (id),
-  INDEX ix_release_naming_regexes_group_regex (group_regex),
-  INDEX ix_release_naming_regexes_status      (status),
-  INDEX ix_release_naming_regexes_ordinal     (ordinal)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 100000;
-
-
 DROP TABLE IF EXISTS release_nfos;
 CREATE TABLE release_nfos (
   releases_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to releases.id',
@@ -998,23 +800,6 @@ CREATE TABLE release_subtitles (
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
-
-
-DROP TABLE IF EXISTS settings;
-CREATE TABLE settings (
-  section    VARCHAR(25)   NOT NULL DEFAULT '',
-  subsection VARCHAR(25)   NOT NULL DEFAULT '',
-  name       VARCHAR(25)   NOT NULL DEFAULT '',
-  value      VARCHAR(1000) NOT NULL DEFAULT '',
-  hint       TEXT          NOT NULL,
-  setting    VARCHAR(64)   NOT NULL DEFAULT '',
-  PRIMARY KEY (section, subsection, name),
-  UNIQUE KEY ui_settings_setting (setting)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC;
 
 
 DROP TABLE IF EXISTS sharing;
@@ -1074,27 +859,6 @@ CREATE TABLE short_groups (
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
 
-DROP TABLE IF EXISTS spotnabsources;
-CREATE TABLE spotnabsources
-(
-  id BIGINT(20) unsigned PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  username VARCHAR(64) DEFAULT 'nntp' NOT NULL,
-  useremail VARCHAR(128) DEFAULT 'spot@nntp.com' NOT NULL,
-  usenetgroup VARCHAR(64) DEFAULT 'alt.binaries.backup' NOT NULL,
-  publickey VARCHAR(512) NOT NULL,
-  active TINYINT(1) DEFAULT '0' NOT NULL,
-  description VARCHAR(255) DEFAULT '',
-  lastupdate DATETIME,
-  lastbroadcast DATETIME,
-  lastarticle BIGINT(20) unsigned DEFAULT '0' NOT NULL,
-  dateadded DATETIME
-)
-  ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci
-  AUTO_INCREMENT = 1;
-CREATE UNIQUE INDEX spotnabsources_ix1 ON spotnabsources (username, useremail, usenetgroup);
-
 DROP TABLE IF EXISTS steam_apps;
 CREATE TABLE steam_apps (
   name         VARCHAR(255)        NOT NULL DEFAULT '' COMMENT 'Steam application name',
@@ -1106,21 +870,6 @@ CREATE TABLE steam_apps (
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC;
-
-DROP TABLE IF EXISTS tmux;
-CREATE TABLE tmux (
-  id          INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  setting     VARCHAR(64)      NOT NULL,
-  value       VARCHAR(19000)            DEFAULT NULL,
-  updated_at TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (id),
-  UNIQUE INDEX ix_tmux_setting (setting)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1;
 
 DROP TABLE IF EXISTS tv_episodes;
 CREATE TABLE tv_episodes (

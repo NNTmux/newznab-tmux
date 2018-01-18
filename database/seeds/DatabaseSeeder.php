@@ -15,5 +15,16 @@ class DatabaseSeeder extends Seeder
         $this->call(UserRolesTableSeeder::class);
         $this->call(CountriesSeeder::class);
         $this->call(CategoriesTableSeeder::class);
+        $this->call(CategoryRegexesTableSeeder::class);
+        $this->call(CollectionRegexesTableSeeder::class);
+        $this->call(BinaryblacklistTableSeeder::class);
+        $this->call(ContentTableSeeder::class);
+        $this->call(ForumpostTableSeeder::class);
+        $this->call(GenresTableSeeder::class);
+        $this->call(GroupsTableSeeder::class);
+        $this->call(MenuTableSeeder::class);
+        $this->call(ReleaseNamingRegexesTableSeeder::class);
+        $this->call(SettingsTableSeeder::class);
+        $this->call(TmuxTableSeeder::class);
     }
 }
