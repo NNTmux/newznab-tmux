@@ -1,4 +1,5 @@
 2018-01-20 DariusIII
+	* Chg: Update composer.json license to conform with new standard
 	* Chg: Remove seeding of forumposts
 2018-01-18 DariusIII
 	* Chg: Update laravel/framework to version 5.5.32

@@ -51,7 +51,7 @@
     "Laravel",
     "Eloquent"
   ],
-  "license": "GPL-3.0",
+  "license": "GPL-3.0-only",
   "name": "nntmux/newznab-tmux",
   "non-feature-branches": [
     "latest-.*"
