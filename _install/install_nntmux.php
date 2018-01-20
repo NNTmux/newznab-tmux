@@ -5,13 +5,13 @@ if (! defined('NN_INSTALLER')) {
 }
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Settings;
 use App\Models\Tmux;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use nntmux\ColorCLI;
+use App\Models\Settings;
 use nntmux\config\Configure;
 use App\Extensions\util\Versions;
+use Illuminate\Support\Facades\DB;
 
 $config = new Configure('install');
 
@@ -68,7 +68,6 @@ if (! $error) {
 
     User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '', '', '');
 
-
     if (! $error) {
         // Check one of the standard tables was created and has data.
         $dbInstallWorked = false;
@@ -78,9 +77,9 @@ if (! $error) {
             $error = true;
             ColorCLI::doEcho(ColorCLI::warningOver('Could not select data from your database, check that tables and data are properly created/inserted.'));
         } else {
-                if ($reschk > 0) {
-                    $dbInstallWorked = true;
-                }
+            if ($reschk > 0) {
+                $dbInstallWorked = true;
+            }
         }
         $ver = new Versions();
         $patch = $ver->getSQLPatchFromFile();
@@ -153,9 +152,9 @@ if (! $error) {
     }
 
     if (! $error) {
-        $sql1 = Settings::query()->where('setting', '=','nzbpath')->update(['value' => $nzb_path]);
-        $sql2 = Settings::query()->where('setting', '=','tmpunrarpath')->update(['value' => $unrar_path]);
-        $sql3 = Settings::query()->where('setting', '=','coverspath')->update(['value' => $covers_path]);
+        $sql1 = Settings::query()->where('setting', '=', 'nzbpath')->update(['value' => $nzb_path]);
+        $sql2 = Settings::query()->where('setting', '=', 'tmpunrarpath')->update(['value' => $unrar_path]);
+        $sql3 = Settings::query()->where('setting', '=', 'coverspath')->update(['value' => $covers_path]);
         if ($sql1 === null || $sql2 === null || $sql3 === null) {
             $error = true;
         } else {
