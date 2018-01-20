@@ -20,9 +20,9 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
 use nntmux\utility\Utility;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 /**
