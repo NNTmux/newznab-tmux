@@ -5,16 +5,17 @@ if (! defined('NN_INSTALLER')) {
 }
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
+use App\Models\Settings;
+use App\Models\Tmux;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use nntmux\ColorCLI;
-use nntmux\db\DbUpdate;
 use nntmux\config\Configure;
 use App\Extensions\util\Versions;
 
 $config = new Configure('install');
 
-$pdo = new DB();
+$pdo = DB::connection()->getPdo();
 $error = false;
 
 if (file_exists(NN_ROOT.'_install/install.lock')) {
@@ -27,45 +28,11 @@ if (env('DB_SYSTEM') !== 'mysql') {
     ColorCLI::doEcho(ColorCLI::error('Invalid database system. Must be: mysql ; Not: '.env('DB_SYSTEM')));
     $error = true;
 } else {
-    // Connect to the SQL server.
-    try {
-        // HAS to be DB because settings table does not exist yet.
-        $pdo = new DB(
-            [
-                'checkVersion' => true,
-                'createDb'     => true,
-                'dbhost'       => env('DB_HOST'),
-                'dbname'       => env('DB_NAME'),
-                'dbpass'       => env('DB_PASSWORD'),
-                'dbport'       => env('PORT'),
-                'dbsock'       => env('DB_SOCKET'),
-                'dbtype'       => env('DB_SYSTEM'),
-                'dbuser'       => env('DB_USER'),
-            ]
-        );
-        $dbConnCheck = true;
-    } catch (\PDOException $e) {
-        ColorCLI::doEcho(ColorCLI::error('Unable to connect to MySQL server.'));
-        $error = true;
-        $dbConnCheck = false;
-    } catch (\RuntimeException $e) {
-        switch ($e->getCode()) {
-            case 1:
-            case 2:
-            case 3:
-                $error = true;
-                ColorCLI::doEcho(ColorCLI::alternate($e->getMessage()));
-                break;
-            default:
-                throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
     // Check if the MySQL version is correct.
     $goodVersion = false;
     if (! $error) {
         try {
-            $goodVersion = $pdo->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION);
+            $goodVersion = (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION);
         } catch (\PDOException $e) {
             $goodVersion = false;
             $error = true;
@@ -88,50 +55,39 @@ if (env('DB_SYSTEM') !== 'mysql') {
 
 // Start inserting data into the DB.
 if (! $error) {
-    $DbSetup = new DbUpdate(
-        [
-            'backup' => false,
-            'db'     => $pdo,
-        ]
-    );
     $pdo->exec('SET FOREIGN_KEY_CHECKS=0;');
-
-    $DbSetup->processSQLFile(); // Setup default schema
+    ColorCLI::doEcho(ColorCLI::header('Migrating tables and populating them'));
+    passthru('php '.NN_ROOT.'artisan migrate');
+    passthru('php '.NN_ROOT.'artisan db:seed');
     //Insert admin user into database
     if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') === '') {
         $error = true;
         ColorCLI::doEcho(ColorCLI::error('Admin user data cannot be empty! Please edit .env file and fill in admin user details and run this script again!'));
         exit();
     }
-    $pdo->queryExec(sprintf('INSERT INTO users (username, email, password, user_roles_id, created_at) VALUES (%s, %s, %s, 2, NOW())', $pdo->escapeString(env('ADMIN_USER')), $pdo->escapeString(env('ADMIN_EMAIL')), $pdo->escapeString(User::hashPassword(env('ADMIN_PASS')))));
-    ColorCLI::doEcho(ColorCLI::header('Migrating tables and populating them'));
-    passthru('php '.NN_ROOT.'artisan migrate');
-    passthru('php '.NN_ROOT.'artisan db:seed');
+
+    User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '', '', '');
+
 
     if (! $error) {
         // Check one of the standard tables was created and has data.
         $dbInstallWorked = false;
-        $reschk = $pdo->query('SELECT COUNT(id) AS num FROM tmux');
-        if ($reschk === false) {
+        $reschk = Tmux::query()->count(['id']);
+        if ($reschk === null) {
             $dbCreateCheck = false;
             $error = true;
             ColorCLI::doEcho(ColorCLI::warningOver('Could not select data from your database, check that tables and data are properly created/inserted.'));
         } else {
-            foreach ($reschk as $row) {
-                if ($row['num'] > 0) {
+                if ($reschk > 0) {
                     $dbInstallWorked = true;
-                    break;
                 }
-            }
         }
         $ver = new Versions();
         $patch = $ver->getSQLPatchFromFile();
         if ($dbInstallWorked) {
             $updateSettings = false;
             if ($patch > 0) {
-                $updateSettings = $pdo->queryExec(
-                    "UPDATE settings SET value = '$patch' WHERE section = '' AND subsection = '' AND name = 'sqlpatch'"
-                );
+                $updateSettings = Settings::query()->where(['section' => '', 'subsection' => '', 'name' => 'sqlpatch'])->update(['value' => $patch]);
             }
             // If it all worked, continue the install process.
             if ($updateSettings) {
@@ -197,10 +153,10 @@ if (! $error) {
     }
 
     if (! $error) {
-        $sql1 = sprintf("UPDATE settings SET value = %s WHERE setting = 'nzbpath'", $pdo->escapeString($nzb_path));
-        $sql2 = sprintf("UPDATE settings SET value = %s WHERE setting = 'tmpunrarpath'", $pdo->escapeString($unrar_path));
-        $sql3 = sprintf("UPDATE settings SET value = %s WHERE setting = 'coverspath'", $pdo->escapeString($covers_path));
-        if ($pdo->queryExec($sql1) === false || $pdo->queryExec($sql2) === false || $pdo->queryExec($sql3) === false) {
+        $sql1 = Settings::query()->where('setting', '=','nzbpath')->update(['value' => $nzb_path]);
+        $sql2 = Settings::query()->where('setting', '=','tmpunrarpath')->update(['value' => $unrar_path]);
+        $sql3 = Settings::query()->where('setting', '=','coverspath')->update(['value' => $covers_path]);
+        if ($sql1 === null || $sql2 === null || $sql3 === null) {
             $error = true;
         } else {
             ColorCLI::doEcho(ColorCLI::info('Settings table updated successfully'));

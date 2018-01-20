@@ -20,6 +20,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use nntmux\utility\Utility;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
@@ -92,6 +93,8 @@ class Settings extends Model
      * @var array
      */
     protected $guarded = [];
+
+    private $dbVersion;
 
     /**
      * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes.
@@ -274,5 +277,44 @@ class Settings extends Model
         }
 
         return $result;
+    }
+
+    /**
+     * Returns the stored Db version string.
+     *
+     * @return string
+     */
+    public function getDbVersion(): string
+    {
+        return $this->dbVersion;
+    }
+
+    /**
+     * @param string $requiredVersion The minimum version to compare against
+     *
+     * @return bool|null       TRUE if Db version is greater than or eaqual to $requiredVersion,
+     * false if not, and null if the version isn't available to check against.
+     */
+    public function isDbVersionAtLeast($requiredVersion): ?bool
+    {
+        $this->fetchDbVersion();
+        if (empty($this->dbVersion)) {
+            return null;
+        }
+
+        return version_compare($requiredVersion, $this->dbVersion, '<=');
+    }
+
+    /**
+     * Performs the fetch from the Db server and stores the resulting Major.Minor.Version number.
+     */
+    private function fetchDbVersion()
+    {
+        $pdo = DB::connection()->getPdo();
+        $result = $pdo->exec('SELECT VERSION() AS version');
+        if (! empty($result)) {
+            $dummy = explode('-', $result['version'], 2);
+            $this->dbVersion = $dummy[0];
+        }
     }
 }
