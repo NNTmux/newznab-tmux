@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
         $this->call(CollectionRegexesTableSeeder::class);
         $this->call(BinaryblacklistTableSeeder::class);
         $this->call(ContentTableSeeder::class);
-        $this->call(ForumpostTableSeeder::class);
         $this->call(GenresTableSeeder::class);
         $this->call(GroupsTableSeeder::class);
         $this->call(MenuTableSeeder::class);
