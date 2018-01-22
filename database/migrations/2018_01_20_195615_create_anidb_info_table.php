@@ -18,7 +18,7 @@ class CreateAnidbInfoTable extends Migration {
 			$table->string('type', 32)->nullable();
 			$table->date('startdate')->nullable();
 			$table->date('enddate')->nullable();
-			$table->timestamp('updated')->default('current_timestamp()');
+			$table->timestamp('updated')->useCurrent();
 			$table->string('related', 1024)->nullable();
 			$table->string('similar', 1024)->nullable();
 			$table->string('creators', 1024)->nullable();

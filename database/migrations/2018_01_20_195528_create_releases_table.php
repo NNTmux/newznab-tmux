@@ -22,7 +22,7 @@ class CreateReleasesTable extends Migration {
 			$table->bigInteger('size')->unsigned()->default(0);
 			$table->dateTime('postdate')->nullable();
 			$table->dateTime('adddate')->nullable();
-			$table->timestamp('updatetime')->default('current_timestamp()');
+			$table->timestamp('updatetime')->useCurrent();
 			$table->string('gid', 32)->nullable();
 			$table->string('guid', 40)->index('ix_releases_guid');
 			$table->char('leftguid', 1)->comment('The first letter of the release guid');

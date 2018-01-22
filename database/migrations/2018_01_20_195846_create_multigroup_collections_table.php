@@ -24,7 +24,7 @@ class CreateMultigroupCollectionsTable extends Migration {
 			$table->string('collectionhash')->default('0')->unique('ix_collection_collectionhash');
 			$table->integer('collection_regexes_id')->default(0)->comment('FK to collection_regexes.id');
 			$table->dateTime('dateadded')->nullable()->index('ix_collection_dateadded');
-			$table->timestamp('added')->default('current_timestamp()');
+			$table->timestamp('added')->useCurrent();
 			$table->boolean('filecheck')->default(0)->index('ix_collection_filecheck');
 			$table->bigInteger('filesize')->unsigned()->default(0);
 			$table->integer('releases_id')->nullable()->index('ix_collection_releaseid');
