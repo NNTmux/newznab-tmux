@@ -15,8 +15,8 @@ class CreateReleasesTable extends Migration {
 		Schema::create('releases', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('name')->default('\'\'')->index('ix_releases_name');
-			$table->string('searchname')->default('\'\'');
+			$table->string('name')->default('')->index('ix_releases_name');
+			$table->string('searchname')->default('');
 			$table->integer('totalpart')->nullable()->default(0);
 			$table->integer('groups_id')->unsigned()->default(0)->comment('FK to groups.id');
 			$table->bigInteger('size')->unsigned()->default(0);

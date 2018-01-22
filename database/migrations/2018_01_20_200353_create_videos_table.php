@@ -17,7 +17,7 @@ class CreateVideosTable extends Migration {
 			$table->increments('id')->comment('Show ID to be used in other tables as reference ');
 			$table->boolean('type')->default(0)->comment('0 = TV, 1 = Film, 2 = Anime');
 			$table->string('title', 180)->comment('Name of the video.');
-			$table->char('countries_id', 2)->default('\'\'')->comment('Two character country code (FK to countries table).');
+			$table->char('countries_id', 2)->default('')->comment('Two character country code (FK to countries table).');
 			$table->dateTime('started')->comment('Date (UTC) of production\'s first airing.');
 			$table->integer('anidb')->unsigned()->default(0)->comment('ID number for anidb site');
 			$table->integer('imdb')->unsigned()->default(0)->index('ix_videos_imdb')->comment('ID number for IMDB site (without the \'tt\' prefix).');

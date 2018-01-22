@@ -15,7 +15,7 @@ class CreateMultigroupBinariesTable extends Migration {
 		Schema::create('multigroup_binaries', function(Blueprint $table)
 		{
 			$table->bigInteger('id', true)->unsigned();
-			$table->string('name', 1000)->default('\'\'');
+			$table->string('name', 1000)->default('');
 			$table->integer('collections_id')->unsigned()->default(0)->index('ix_binaries_collection');
 			$table->integer('filenumber')->unsigned()->default(0);
 			$table->integer('totalparts')->unsigned()->default(0);

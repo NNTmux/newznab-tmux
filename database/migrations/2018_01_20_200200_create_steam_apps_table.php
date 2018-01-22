@@ -14,7 +14,7 @@ class CreateSteamAppsTable extends Migration {
 	{
 		Schema::create('steam_apps', function(Blueprint $table)
 		{
-			$table->string('name')->default('\'\'')->index('ix_name_ft')->comment('Steam application name');
+			$table->string('name')->default('')->index('ix_name_ft')->comment('Steam application name');
 			$table->integer('appid')->unsigned()->comment('Steam application id');
 			$table->primary(['appid','name']);
 		});

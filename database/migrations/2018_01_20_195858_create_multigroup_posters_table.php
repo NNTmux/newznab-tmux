@@ -15,7 +15,7 @@ class CreateMultigroupPostersTable extends Migration {
 		Schema::create('multigroup_posters', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('poster')->default('\'\'')->unique('poster');
+			$table->string('poster')->default('')->unique('poster');
 		});
 	}
 

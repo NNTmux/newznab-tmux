@@ -25,7 +25,7 @@ class CreateGamesinfoTable extends Migration {
 			$table->string('review', 3000)->nullable();
 			$table->boolean('cover')->default(0);
 			$table->boolean('backdrop')->default(0);
-			$table->string('trailer', 1000)->default('\'\'');
+			$table->string('trailer', 1000)->default('');
 			$table->string('classused', 10)->default('\'steam\'');
 			$table->timestamps();
 		});

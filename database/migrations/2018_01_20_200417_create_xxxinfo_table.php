@@ -25,7 +25,7 @@ class CreateXxxinfoTable extends Migration {
 			$table->text('productinfo', 65535)->nullable();
 			$table->text('trailers', 65535)->nullable();
 			$table->string('directurl', 2000);
-			$table->string('classused', 20)->default('\'\'');
+			$table->string('classused', 20)->default('');
 			$table->boolean('cover')->default(0);
 			$table->boolean('backdrop')->default(0);
 			$table->timestamps();

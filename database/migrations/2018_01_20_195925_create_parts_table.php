@@ -15,7 +15,7 @@ class CreatePartsTable extends Migration {
 		Schema::create('parts', function(Blueprint $table)
 		{
 			$table->bigInteger('binaries_id')->unsigned()->default(0);
-			$table->string('messageid')->default('\'\'');
+			$table->string('messageid')->default('');
 			$table->bigInteger('number')->unsigned()->default(0);
 			$table->integer('partnumber')->unsigned()->default(0);
 			$table->integer('size')->unsigned()->default(0);

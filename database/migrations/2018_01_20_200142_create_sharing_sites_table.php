@@ -15,8 +15,8 @@ class CreateSharingSitesTable extends Migration {
 		Schema::create('sharing_sites', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('site_name')->default('\'\'');
-			$table->string('site_guid', 40)->default('\'\'');
+			$table->string('site_name')->default('');
+			$table->string('site_guid', 40)->default('');
 			$table->dateTime('last_time')->nullable();
 			$table->dateTime('first_time')->nullable();
 			$table->boolean('enabled')->default(0);

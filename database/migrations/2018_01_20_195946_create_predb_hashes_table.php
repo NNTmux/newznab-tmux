@@ -15,7 +15,7 @@ class CreatePredbHashesTable extends Migration {
 		Schema::create('predb_hashes', function(Blueprint $table)
 		{
 			$table->integer('predb_id')->unsigned()->default(0)->comment('id, of the predb entry, this hash belongs to');
-			$table->binary('hash', 40)->default('\'\'')->primary();
+			$table->binary('hash', 40)->default('')->primary();
 		});
 	}
 

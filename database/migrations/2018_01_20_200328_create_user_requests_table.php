@@ -16,7 +16,7 @@ class CreateUserRequestsTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('users_id')->unsigned()->index('userid');
-			$table->string('hosthash', 50)->default('\'\'');
+			$table->string('hosthash', 50)->default('');
 			$table->string('request');
 			$table->dateTime('timestamp')->index('timestamp');
 		});
