@@ -65,7 +65,7 @@ class CreateReleasesTable extends Migration {
 processed');
 			$table->boolean('proc_hash16k')->default(0)->comment('Has the release been hash16k
 processed');
-			$table->primary(['id','categories_id']);
+			$table->primary(['guid','categories_id']);
 			$table->index(['groups_id','passwordstatus'], 'ix_releases_groupsid');
 			$table->index(['postdate','searchname'], 'ix_releases_postdate_searchname');
 			$table->index(['leftguid','predb_id'], 'ix_releases_leftguid');
