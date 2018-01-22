@@ -15,7 +15,7 @@ class CreateGroupsTable extends Migration {
 		Schema::create('groups', function(Blueprint $table)
 		{
 			$table->integer('id', true);
-			$table->string('name', 255)->default('\'\'')->unique('ix_groups_name');
+			$table->string('name', 255)->default('')->unique('ix_groups_name');
 			$table->integer('backfill_target')->default(1);
 			$table->bigInteger('first_record')->unsigned()->default(0);
 			$table->dateTime('first_record_postdate')->nullable();
@@ -26,7 +26,7 @@ class CreateGroupsTable extends Migration {
 			$table->bigInteger('minsizetoformrelease')->nullable();
 			$table->boolean('active')->default(0)->index('active');
 			$table->boolean('backfill')->default(0);
-			$table->string('description')->nullable()->default('\'\'');
+			$table->string('description')->nullable()->default('');
 		});
 
 		DB::unprepared('ALTER TABLE groups AUTO_INCREMENT 1000001');

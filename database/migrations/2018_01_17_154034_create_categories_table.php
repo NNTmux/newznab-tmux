@@ -18,7 +18,7 @@ class CreateCategoriesTable extends Migration {
 			$table->string('title');
 			$table->integer('parentid')->nullable()->index('ix_categories_parentid');
 			$table->integer('status')->default(1)->index('ix_categories_status');
-			$table->string('description')->nullable()->default('NULL');
+			$table->string('description')->nullable();
 			$table->boolean('disablepreview')->default(0);
 			$table->bigInteger('minsizetoformrelease')->unsigned()->default(0);
 			$table->bigInteger('maxsizetoformrelease')->unsigned()->default(0);

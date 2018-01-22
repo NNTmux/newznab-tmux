@@ -24,6 +24,7 @@ class CreateForumpostTable extends Migration {
 			$table->boolean('sticky')->default(0);
 			$table->integer('replies')->unsigned()->default(0);
 			$table->timestamps();
+            $table->foreign('users_id', 'FK_users_fp')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 
@@ -35,7 +36,7 @@ class CreateForumpostTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('forumpost');
+	    Schema::drop('forumpost');
 	}
 
 }
