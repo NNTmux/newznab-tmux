@@ -310,10 +310,10 @@ class Settings extends Model
      */
     private function fetchDbVersion()
     {
-        $pdo = DB::connection()->getPdo();
-        $result = $pdo->exec('SELECT VERSION() AS version');
+        $result = DB::select('SELECT VERSION() AS version');
+
         if (! empty($result)) {
-            $dummy = explode('-', $result['version'], 2);
+            $dummy = explode('-', $result[0]->version, 2);
             $this->dbVersion = $dummy[0];
         }
     }

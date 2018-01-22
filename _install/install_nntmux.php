@@ -7,8 +7,8 @@ use nntmux\ColorCLI;
 use App\Models\Settings;
 use App\Extensions\util\Versions;
 
-if (! defined('NN_INSTALLER')) {
-    define('NN_INSTALLER', true);
+if (! \defined('NN_INSTALLER')) {
+    \define('NN_INSTALLER', true);
 }
 
 $error = false;
@@ -18,16 +18,22 @@ if (file_exists(NN_ROOT.'_install/install.lock')) {
     exit();
 }
 
+if (! $error) {
 // Check if user selected right DB type.
-if (env('DB_SYSTEM') !== 'mysql') {
-    ColorCLI::doEcho(ColorCLI::error('Invalid database system. Must be: mysql ; Not: '.env('DB_SYSTEM')));
+    if (env('DB_SYSTEM') !== 'mysql') {
+        ColorCLI::doEcho(ColorCLI::error('Invalid database system. Must be: mysql ; Not: '.env('DB_SYSTEM')));
+        $error = true;
+    }
+}
+
+if (!(new Settings())->isDbVersionAtLeast(NN_MINIMUM_MARIA_VERSION) || !(new Settings())->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION)) {
+    ColorCLI::doEcho(ColorCLI::error('Version of MariaDB used is lower than required version: ' . NN_MINIMUM_MARIA_VERSION));
     $error = true;
 }
 // Start inserting data into the DB.
 if (! $error) {
     ColorCLI::doEcho(ColorCLI::header('Migrating tables and populating them'));
-    passthru('php '.NN_ROOT.'artisan migrate:fresh');
-    passthru('php '.NN_ROOT.'artisan db:seed');
+    passthru('php '.NN_ROOT.'artisan migrate:fresh --seed');
 }
     // Check one of the standard tables was created and has data.
     $ver = new Versions();
