@@ -19,15 +19,15 @@ if (file_exists(NN_ROOT.'_install/install.lock')) {
 }
 
 if (! $error) {
-// Check if user selected right DB type.
+    // Check if user selected right DB type.
     if (env('DB_SYSTEM') !== 'mysql') {
         ColorCLI::doEcho(ColorCLI::error('Invalid database system. Must be: mysql ; Not: '.env('DB_SYSTEM')));
         $error = true;
     }
 }
 
-if (!(new Settings())->isDbVersionAtLeast(NN_MINIMUM_MARIA_VERSION) || !(new Settings())->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION)) {
-    ColorCLI::doEcho(ColorCLI::error('Version of MariaDB used is lower than required version: ' . NN_MINIMUM_MARIA_VERSION));
+if (! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MARIA_VERSION) || ! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION)) {
+    ColorCLI::doEcho(ColorCLI::error('Version of MariaDB used is lower than required version: '.NN_MINIMUM_MARIA_VERSION));
     $error = true;
 }
 // Start inserting data into the DB.
