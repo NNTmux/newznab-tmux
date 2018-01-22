@@ -50,7 +50,7 @@ class CreateReleasesTable extends Migration {
 			$table->boolean('audiostatus')->default(0);
 			$table->boolean('dehashstatus')->default(0);
 			$table->boolean('reqidstatus')->default(0);
-			$table->binary('nzb_guid', 16)->nullable()->index('ix_releases_nzb_guid');
+			$table->binary('nzb_guid')->lenght(16)->nullable();
 			$table->boolean('nzbstatus')->default(0);
 			$table->boolean('iscategorized')->default(0);
 			$table->boolean('isrenamed')->default(0);
