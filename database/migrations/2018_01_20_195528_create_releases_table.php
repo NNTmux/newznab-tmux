@@ -74,7 +74,7 @@ processed');
             $table->index(['dehashstatus','ishashed'], 'ix_releases_dehashstatus');
         });
 
-        DB::unprepared('ALTER TABLE releases ADD PRIMARY KEY (id, categories_id)');
+        DB::unprepared('ALTER TABLE releases DROP PRIMARY KEY , ADD PRIMARY KEY (id, categories_id)');
         DB::unprepared('ALTER TABLE releases PARTITION BY RANGE (categories_id) (
     PARTITION misc    VALUES LESS THAN (1000),
     PARTITION console VALUES LESS THAN (2000),
