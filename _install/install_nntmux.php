@@ -1,21 +1,16 @@
 <?php
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
+
+use App\Models\User;
+use nntmux\ColorCLI;
+use App\Models\Settings;
+use App\Extensions\util\Versions;
 
 if (! defined('NN_INSTALLER')) {
     define('NN_INSTALLER', true);
 }
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Tmux;
-use App\Models\User;
-use nntmux\ColorCLI;
-use App\Models\Settings;
-use nntmux\config\Configure;
-use App\Extensions\util\Versions;
-use Illuminate\Support\Facades\DB;
 
-$config = new Configure('install');
-
-$pdo = DB::connection()->getPdo();
 $error = false;
 
 if (file_exists(NN_ROOT.'_install/install.lock')) {
@@ -27,81 +22,27 @@ if (file_exists(NN_ROOT.'_install/install.lock')) {
 if (env('DB_SYSTEM') !== 'mysql') {
     ColorCLI::doEcho(ColorCLI::error('Invalid database system. Must be: mysql ; Not: '.env('DB_SYSTEM')));
     $error = true;
-} else {
-    // Check if the MySQL version is correct.
-    $goodVersion = false;
-    if (! $error) {
-        try {
-            $goodVersion = (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION);
-        } catch (\PDOException $e) {
-            $goodVersion = false;
-            $error = true;
-            ColorCLI::doEcho(ColorCLI::error('Could not get version from MySQL server.'));
-        }
-
-        if ($goodVersion === false) {
-            $error = true;
-            ColorCLI::doEcho(
-                ColorCLI::error(
-                'You are using an unsupported version of '.
-                env('DB_SYSTEM').
-                ' the minimum allowed version is '.
-                NN_MINIMUM_MYSQL_VERSION
-            )
-            );
-        }
-    }
 }
-
 // Start inserting data into the DB.
 if (! $error) {
-    $pdo->exec('SET FOREIGN_KEY_CHECKS=0;');
     ColorCLI::doEcho(ColorCLI::header('Migrating tables and populating them'));
-    passthru('php '.NN_ROOT.'artisan migrate');
+    passthru('php '.NN_ROOT.'artisan migrate:fresh');
     passthru('php '.NN_ROOT.'artisan db:seed');
-    //Insert admin user into database
-    if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') === '') {
-        $error = true;
-        ColorCLI::doEcho(ColorCLI::error('Admin user data cannot be empty! Please edit .env file and fill in admin user details and run this script again!'));
-        exit();
-    }
-
-    User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '', '', '');
-
-    if (! $error) {
-        // Check one of the standard tables was created and has data.
-        $dbInstallWorked = false;
-        $reschk = Tmux::query()->count(['id']);
-        if ($reschk === null) {
-            $dbCreateCheck = false;
-            $error = true;
-            ColorCLI::doEcho(ColorCLI::warningOver('Could not select data from your database, check that tables and data are properly created/inserted.'));
-        } else {
-            if ($reschk > 0) {
-                $dbInstallWorked = true;
-            }
-        }
-        $ver = new Versions();
-        $patch = $ver->getSQLPatchFromFile();
-        if ($dbInstallWorked) {
-            $updateSettings = false;
-            if ($patch > 0) {
-                $updateSettings = Settings::query()->where(['section' => '', 'subsection' => '', 'name' => 'sqlpatch'])->update(['value' => $patch]);
-            }
-            // If it all worked, continue the install process.
-            if ($updateSettings) {
-                ColorCLI::doEcho(ColorCLI::info('Database updated successfully'));
-            } else {
-                $error = true;
-                ColorCLI::doEcho(ColorCLI::error('Could not update sqlpatch to '.$patch.' for your database.'));
-            }
-        } else {
-            $dbCreateCheck = false;
-            $error = true;
-            ColorCLI::doEcho(ColorCLI::warning('Could not select data from your database.'));
-        }
-    }
 }
+    // Check one of the standard tables was created and has data.
+    $ver = new Versions();
+    $patch = $ver->getSQLPatchFromFile();
+    $updateSettings = false;
+    if ($patch > 0) {
+        $updateSettings = Settings::query()->where(['section' => '', 'subsection' => '', 'name' => 'sqlpatch'])->update(['value' => $patch]);
+    }
+    // If it all worked, continue the install process.
+    if ($updateSettings === 0) {
+        ColorCLI::doEcho(ColorCLI::info('Database updated successfully'));
+    } else {
+        $error = true;
+        ColorCLI::doEcho(ColorCLI::error('Could not update sqlpatch to '.$patch.' for your database.'));
+    }
 
 if (! $error) {
     $doCheck = true;
@@ -164,10 +105,22 @@ if (! $error) {
 }
 
 if (! $error) {
+    //Insert admin user into database
+    if (env('ADMIN_USER') === '' || env('ADMIN_PASS') === '' || env('ADMIN_EMAIL') === '') {
+        $error = true;
+        ColorCLI::doEcho(ColorCLI::error('Admin user data cannot be empty! Please edit .env file and fill in admin user details and run this script again!'));
+        exit();
+    }
+
+    ColorCLI::doEcho(ColorCLI::header('Adding admin user to database'));
+    try {
+        User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '', '', '');
+    } catch (Exception $e) {
+        ColorCLI::doEcho(ColorCLI::error('Unable to add admin user!'));
+    }
     @file_put_contents(NN_ROOT.'_install/install.lock', '');
     ColorCLI::doEcho(ColorCLI::header('Generating application key'));
     passthru('php '.NN_ROOT.'artisan key:generate');
-    $pdo->exec('SET FOREIGN_KEY_CHECKS=1;');
     ColorCLI::doEcho(ColorCLI::alternate('NNTmux installation completed successfully'));
     exit();
 }
