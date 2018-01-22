@@ -34,6 +34,7 @@ before_install:
     - composer validate
 
 install:
+    - travis_wait mvn install
     - yes '' | pecl install imagick
     # Configure environment settings
     - cp .env.travis .env
