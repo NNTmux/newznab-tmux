@@ -15,9 +15,10 @@ class CreateReleaseUniqueTable extends Migration {
 		Schema::create('release_unique', function(Blueprint $table)
 		{
 			$table->integer('releases_id')->unsigned()->comment('FK to releases.id.');
-			$table->binary('uniqueid', 16)->default('0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0')->comment('Unique_ID from mediainfo.');
-			$table->primary(['releases_id','uniqueid']);
 		});
+
+		DB::unprepared("ALTER TABLE release_unique ADD COLUMN uniqueid BINARY(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' COMMENT 'Unique_ID from mediainfo.'");
+		DB::unprepared('ALTER TABLE release_unique ADD PRIMARY KEY (releases_id, uniqueid)');
 	}
 
 

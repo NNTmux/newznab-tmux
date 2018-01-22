@@ -20,11 +20,13 @@ class CreateBinariesTable extends Migration {
 			$table->integer('filenumber')->unsigned()->default(0);
 			$table->integer('totalparts')->unsigned()->default(0);
 			$table->integer('currentparts')->unsigned()->default(0);
-			$table->binary('binaryhash')->default('0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0');
 			$table->boolean('partcheck')->default(0)->index('ix_binaries_partcheck');
 			$table->bigInteger('partsize')->unsigned()->default(0);
             $table->foreign('collections_id', 'FK_Collections')->references('id')->on('collections')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
+
+        DB::unprepared("ALTER TABLE binaries ADD COLUMN binaryhash BINARY(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'");
+        DB::unprepared('ALTER TABLE binaries ADD UNIQUE INDEX ix_binaries_binaryhash (binaryhash)');
 	}
 
 
