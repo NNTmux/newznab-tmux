@@ -1,4 +1,5 @@
 <?php
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\User;
@@ -9,7 +10,6 @@ use App\Extensions\util\Versions;
 if (! defined('NN_INSTALLER')) {
     define('NN_INSTALLER', true);
 }
-
 
 $error = false;
 
