@@ -19,6 +19,7 @@ class CreateUserRequestsTable extends Migration {
 			$table->string('hosthash', 50)->default('');
 			$table->string('request');
 			$table->dateTime('timestamp')->index('timestamp');
+            $table->foreign('users_id', 'FK_users_urq')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

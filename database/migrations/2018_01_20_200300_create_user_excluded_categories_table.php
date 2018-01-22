@@ -19,6 +19,7 @@ class CreateUserExcludedCategoriesTable extends Migration {
 			$table->integer('categories_id');
 			$table->timestamps();
 			$table->unique(['users_id','categories_id'], 'ix_userexcat_usercat');
+            $table->foreign('users_id', 'FK_users_uec')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

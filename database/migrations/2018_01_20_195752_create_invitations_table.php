@@ -18,6 +18,7 @@ class CreateInvitationsTable extends Migration {
 			$table->string('guid', 50);
 			$table->integer('users_id')->unsigned()->index('FK_users_inv');
 			$table->timestamps();
+            $table->foreign('users_id', 'FK_users_inv')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

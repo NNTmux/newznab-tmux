@@ -20,6 +20,7 @@ class CreatePartsTable extends Migration {
 			$table->integer('partnumber')->unsigned()->default(0);
 			$table->integer('size')->unsigned()->default(0);
 			$table->primary(['binaries_id','number']);
+            $table->foreign('binaries_id', 'FK_binaries')->references('id')->on('binaries')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

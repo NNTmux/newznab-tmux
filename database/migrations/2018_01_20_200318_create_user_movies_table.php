@@ -20,6 +20,7 @@ class CreateUserMoviesTable extends Migration {
 			$table->string('categories', 64)->nullable()->comment('List of categories for user movies');
 			$table->timestamps();
 			$table->index(['users_id','imdbid'], 'ix_usermovies_userid');
+            $table->foreign('users_id', 'FK_users_um')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

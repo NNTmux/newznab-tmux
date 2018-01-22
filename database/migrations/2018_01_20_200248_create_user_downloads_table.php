@@ -19,6 +19,7 @@ class CreateUserDownloadsTable extends Migration {
 			$table->string('hosthash', 50)->default('');
 			$table->dateTime('timestamp')->index('timestamp');
 			$table->integer('releases_id')->unsigned()->comment('FK to releases.id');
+            $table->foreign('users_id', 'FK_users_ud')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

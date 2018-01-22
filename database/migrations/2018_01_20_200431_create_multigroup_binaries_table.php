@@ -20,9 +20,10 @@ class CreateMultigroupBinariesTable extends Migration {
 			$table->integer('filenumber')->unsigned()->default(0);
 			$table->integer('totalparts')->unsigned()->default(0);
 			$table->integer('currentparts')->unsigned()->default(0);
-			$table->binary('binaryhash', 16)->default('\'0$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$\'')->unique('ix_binaries_binaryhash');
+			$table->binary('binaryhash', 16)->default('0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0');
 			$table->boolean('partcheck')->default(0)->index('ix_binaries_partcheck');
 			$table->bigInteger('partsize')->unsigned()->default(0);
+            $table->foreign('collections_id', 'FK_MGR_Collections')->references('id')->on('multigroup_collections')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 
