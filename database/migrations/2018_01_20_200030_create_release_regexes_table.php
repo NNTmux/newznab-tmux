@@ -17,7 +17,7 @@ class CreateReleaseRegexesTable extends Migration {
 			$table->integer('releases_id')->unsigned()->default(0);
 			$table->integer('collection_regex_id')->default(0);
 			$table->integer('naming_regex_id')->default(0);
-			$table->primary(['releases_id','collection_regex_id','naming_regex_id']);
+			$table->primary(['releases_id','collection_regex_id','naming_regex_id'], 'ix_rel_coll_name_reg_id');
 		});
 	}
 
