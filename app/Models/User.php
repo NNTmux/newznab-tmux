@@ -755,6 +755,12 @@ class User extends Authenticatable
             return false;
         }
 
+        if (NN_INSTALLER === true) {
+            $storeips = '';
+        } else {
+            $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
+        }
+
         return self::query()->insertGetId(
             [
                 'username' => $userName,
@@ -762,7 +768,7 @@ class User extends Authenticatable
                 'email' => $email,
                 'user_roles_id' => $role,
                 'created_at' => Carbon::now(),
-                'host' => (int) Settings::settingValue('..storeuserips') === 1 ? $host : '',
+                'host' => $storeips,
                 'rsstoken' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
                 'invitedby' => (int) $invitedBy === 0 ? 'NULL' : $invitedBy,

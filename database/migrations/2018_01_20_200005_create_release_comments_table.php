@@ -30,7 +30,7 @@ class CreateReleaseCommentsTable extends Migration {
 			$table->string('shareid', 40)->default('');
 			$table->string('siteid', 40)->default('');
 			$table->bigInteger('sourceid')->unsigned()->nullable();
-			$table->binary('nzb_guid', 16)->default('\'0$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$\'');
+			$table->binary('nzb_guid')->default('0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0');
 			$table->unique(['text_hash','releases_id'], 'ix_release_comments_hash_releases_id');
 		});
 	}

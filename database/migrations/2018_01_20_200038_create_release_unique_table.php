@@ -15,7 +15,7 @@ class CreateReleaseUniqueTable extends Migration {
 		Schema::create('release_unique', function(Blueprint $table)
 		{
 			$table->integer('releases_id')->unsigned()->comment('FK to releases.id.');
-			$table->binary('uniqueid', 16)->default('\'0$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$$UP$\'')->comment('Unique_ID from mediainfo.');
+			$table->binary('uniqueid', 16)->default('0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0')->comment('Unique_ID from mediainfo.');
 			$table->primary(['releases_id','uniqueid']);
 		});
 	}

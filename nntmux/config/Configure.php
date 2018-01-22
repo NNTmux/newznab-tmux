@@ -79,7 +79,7 @@ class Configure
         } else {
             $file = NN_CONFIGS.$filename.'.php';
         }
-        if (! file_exists($file) && $throwException) {
+        if ($throwException && ! file_exists($file)) {
             $errorCode = (int) ($filename === '.env');
             throw new \RuntimeException(
                 "Unable to load configuration file '$file'. Make sure it has been created and contains correct settings.",
