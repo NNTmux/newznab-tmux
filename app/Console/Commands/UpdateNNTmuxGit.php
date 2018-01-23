@@ -41,7 +41,7 @@ class UpdateNNTmuxGit extends Command
      */
     public function handle()
     {
-        /**
+        /*
          * TODO Add check to determine if the indexer or other scripts are running. Hopefully also prevent web access.
         **/
 
