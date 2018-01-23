@@ -24,6 +24,7 @@
 */
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use nntmux\ColorCLI;
 use nntmux\db\PreDb;
 use nntmux\utility\Utility;
 
@@ -40,8 +41,8 @@ if (! is_writable(NN_RES)) {
 }
 
 if (! isset($argv[1]) || (! is_numeric($argv[1]) && $argv[1] !== 'progress') || ! isset($argv[2]) ||
-    ! in_array($argv[2], ['local', 'remote']) || ! isset($argv[3]) ||
-    ! in_array($argv[3], ['true', 'false'])
+    ! \in_array($argv[2], ['local', 'remote'], false) || ! isset($argv[3]) ||
+    ! \in_array($argv[3], ['true', 'false'], false)
 ) {
     exit('This script quickly imports the daily PreDB dumps.'.PHP_EOL.
         'Argument 1: Enter the unix time of the patch to start at.'.PHP_EOL.
@@ -62,20 +63,19 @@ $result = getDirListing($url);
 
 $dirs = json_decode($result, true);
 
-if (is_null($dirs) ||
-    (isset($dirs['message']) && substr($dirs['message'], 0, 27) == 'API rate limit exceeded for')) {
+if ($dirs === null || (isset($dirs['message']) && strpos($dirs['message'], 'API rate limit exceeded for') === 0)) {
     exit("Error: $result");
 }
 
 foreach ($dirs as $dir) {
-    if ($dir['name'] == '0README.txt') {
+    if ($dir['name'] === '0README.txt') {
         continue;
     }
 
     $result = getDirListing($url.$dir['name'].'/');
 
     $temp = json_decode($result, true);
-    if (is_null($temp)) {
+    if ($temp === null) {
         exit("Error: $result");
     }
 
@@ -95,10 +95,7 @@ $progress = $predb->progress(settings_array());
 foreach ($data as $dir => $files) {
     foreach ($files as $file) {
         //var_dump($file);
-        if (preg_match(
-            "#^https://raw\.githubusercontent\.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$#",
-            $file['download_url']
-        )) {
+        if (preg_match("#^https://raw\.githubusercontent\.com/nZEDb/nZEDbPre_Dumps/master/dumps/$dir/$filePattern$#", $file['download_url'])) {
             if (preg_match("#^$filePattern$#", $file['name'], $match)) {
                 $timematch = $progress['last'];
 
@@ -150,7 +147,7 @@ foreach ($data as $dir => $files) {
                 $verbose = $argv[3] === true;
 
                 if ($verbose) {
-                    echo $predb->log->info('Clearing import table');
+                    ColorCLI::doEcho(ColorCLI::info('Clearing import table'));
                 }
 
                 // Truncate to clear any old data
@@ -168,7 +165,7 @@ foreach ($data as $dir => $files) {
 
                 // Remove any titles where length <=8
                 if ($verbose === true) {
-                    echo $predb->log->info('Deleting any records where title <=8 from Temporary Table');
+                    ColorCLI::doEcho(ColorCLI::info('Deleting any records where title <=8 from Temporary Table'));
                 }
                 $predb->executeDeleteShort();
 
@@ -178,7 +175,7 @@ foreach ($data as $dir => $files) {
                 // Fill the groups_id
                 $predb->executeUpdateGroupID();
 
-                echo $predb->log->info('Inserting records from temporary table into predb table');
+                ColorCLI::doEcho(ColorCLI::info('Inserting records from temporary table into predb table'));
                 $predb->executeInsert();
 
                 // Delete the dump.
