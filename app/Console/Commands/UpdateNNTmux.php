@@ -72,9 +72,10 @@ class UpdateNNTmux extends Command
             if ($cleared) {
                 $this->output->writeln('<comment>The Smarty compiled template cache has been cleaned for you</comment>');
             } else {
-                $this->output->writeln('<comment>You should clear your Smarty compiled template cache at: '.
-					NN_RES.'smarty'.DS.'templates_c</comment>'
-				);
+                $this->output->writeln(
+                    '<comment>You should clear your Smarty compiled template cache at: '.
+                    NN_RES.'smarty'.DS.'templates_c</comment>'
+                );
             }
         } catch (\Exception $e) {
             $this->error($e->getMessage());

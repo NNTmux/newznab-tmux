@@ -1,4 +1,5 @@
 2018-01-23 DariusIII
+	* Chg: Use artisan console to install nntmux, remove the install script from _install folder
 	* Chg: Update chosen to latest version
 2018-01-20 DariusIII
 	* Chg: Update composer.json license to conform with new standard

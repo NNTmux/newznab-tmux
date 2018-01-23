@@ -41,10 +41,12 @@ class UpdateNNTmuxGit extends Command
      */
     public function handle()
     {
-        // TODO Add check to determine if the indexer or other scripts are running. Hopefully
-        // also prevent web access.
+        /**
+         * TODO Add check to determine if the indexer or other scripts are running. Hopefully also prevent web access.
+        **/
+
         $this->initialiseGit();
-        if (! in_array($this->git->getBranch(), $this->git->getBranchesMain(), false)) {
+        if (! \in_array($this->git->getBranch(), $this->git->getBranchesMain(), false)) {
             $this->error('Not on the stable or dev branch! Refusing to update repository');
 
             return;
