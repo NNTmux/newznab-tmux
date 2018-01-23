@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Extensions\util\Versions;
-use App\Models\Settings;
 use App\Models\User;
+use App\Models\Settings;
 use Illuminate\Console\Command;
+use App\Extensions\util\Versions;
 use Symfony\Component\Process\Process;
 
 class InstallNntmux extends Command
@@ -55,7 +55,7 @@ class InstallNntmux extends Command
         }
 
         if (! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MARIA_VERSION) || ! (new Settings())->isDbVersionAtLeast(NN_MINIMUM_MYSQL_VERSION)) {
-            $this->error('Version of MariaDB/MySQL used is lower than required version: '.NN_MINIMUM_MARIA_VERSION. PHP_EOL .' Please update your install of Mariadb/MySQL');
+            $this->error('Version of MariaDB/MySQL used is lower than required version: '.NN_MINIMUM_MARIA_VERSION.PHP_EOL.' Please update your install of Mariadb/MySQL');
             $error = true;
         }
 
@@ -133,10 +133,12 @@ class InstallNntmux extends Command
         // If it all worked, continue the install process.
         if ($updateSettings === 0) {
             $this->info('Database updated successfully');
+
             return true;
         }
 
         $this->error('Could not update sqlpatch to '.$patch.' for your database.');
+
         return false;
     }
 
@@ -154,6 +156,7 @@ class InstallNntmux extends Command
         $nzbPathCheck = is_writable($nzb_path);
         if ($nzbPathCheck === false) {
             $this->warn($nzb_path.' is not writable. Please fix folder permissions');
+
             return false;
         }
 
@@ -172,6 +175,7 @@ class InstallNntmux extends Command
         $unrarPathCheck = is_writable($unrar_path);
         if ($unrarPathCheck === false) {
             $this->warn($unrar_path.' is not writable. Please fix folder permissions');
+
             return false;
         }
 
@@ -183,6 +187,7 @@ class InstallNntmux extends Command
         $coversPathCheck = is_writable($covers_path);
         if ($coversPathCheck === false) {
             $this->warn($covers_path.' is not writable. Please fix folder permissions');
+
             return false;
         }
 
@@ -194,7 +199,7 @@ class InstallNntmux extends Command
         return [
             'nzb_path' => $nzb_path,
             'covers_path' => $covers_path,
-            'unrar_path' => $unrar_path
+            'unrar_path' => $unrar_path,
         ];
     }
 
@@ -213,6 +218,7 @@ class InstallNntmux extends Command
             User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '', '', '');
         } catch (\Exception $e) {
             $this->error('Unable to add admin user!');
+
             return false;
         }
 
