@@ -6,11 +6,14 @@ use nntmux\db\DB;
 
 $pdo = new DB();
 
+
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'drop')) {
     $pdo->queryExec('UPDATE groups SET first_record = 0, first_record_postdate = NULL, last_record = 0, last_record_postdate = NULL, last_updated = NULL');
     echo $pdo->log->primary('Reseting all groups completed.');
+    $pdo->exec('SET FOREIGN_KEY_CHECKS = 0;');
 
     $arr = ['parts', 'missed_parts', 'binaries', 'collections', 'multigroup_parts', 'multigroup_missed_parts', 'multigroup_binaries', 'multigroup_collections'];
+
     foreach ($arr as &$value) {
         $rel = $pdo->queryExec("TRUNCATE TABLE $value");
         if ($rel !== false) {
@@ -41,6 +44,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'drop')) {
 
     $delcount = $pdo->queryDirect('DELETE FROM releases WHERE nzbstatus = 0');
     echo $pdo->log->primary($delcount->rowCount().' releases had no nzb, deleted.');
+    $pdo->exec('SET FOREIGN_KEY_CHECKS = 1;');
 } else {
     exit($pdo->log->error(
         "\nThis script removes releases with no NZBs, resets all groups, truncates or drops(tpg) \n"

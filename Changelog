@@ -1,4 +1,5 @@
 2018-01-24 DariusIII
+	* Chg: Update reset_truncate.php to be able to truncate tables (turn off foreign key checks)
 	* Fix: Fix wrong function call when adding groups in ProcessReleases class
 	* CHg: Update composer.json
 	* Chg: Update DbUpdate class, remove unused code and optimize some of the functions used
