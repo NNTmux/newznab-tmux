@@ -1,3 +1,5 @@
+2018-01-24 DariusIII
+	* Chg: Update DbUpdate class, remove unused code and optimize some of the functions used
 2018-01-23 DariusIII
 	* Chg: Update predb_import_daily_batch.php
 	* Chg: Use artisan console to install nntmux, remove the install script from _install folder

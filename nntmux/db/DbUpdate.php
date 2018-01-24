@@ -31,12 +31,12 @@ class DbUpdate
     public $backedup;
 
     /**
-     * @var DB    Instance variable for DB object.
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
     /**
-     * @var Git instance
+     * @var mixed
      */
     public $git;
 
@@ -47,10 +47,13 @@ class DbUpdate
     public $log;
 
     /**
-     * @var object    Instance object for sites/settings class.
+     * @var
      */
     public $settings;
 
+    /**
+     * @var string
+     */
     protected $_DbSystem;
 
     /**
@@ -63,6 +66,12 @@ class DbUpdate
      */
     private $backup;
 
+    /**
+     * DbUpdate constructor.
+     *
+     * @param array $options
+     * @throws \Exception
+     */
     public function __construct(array $options = [])
     {
         $options += [
@@ -81,84 +90,6 @@ class DbUpdate
     }
 
     /**
-     * @param array $options
-     */
-    public function loadTables(array $options = []): void
-    {
-        $defaults = [
-            'enclosedby'    => null,
-            'ext'    => 'tsv',
-            'files'    => [],
-            'path'    => NN_RES.'db'.DS.'schema'.DS.'data',
-            'regex'    => '#^'.Utility::PATH_REGEX.'(?P<order>\d+)-(?P<table>\w+)\.tsv$#',
-        ];
-        $options += $defaults;
-
-        $show = Utility::isCLI();
-
-        $files = empty($options['files']) ? Utility::getDirFiles($options) : $options['files'];
-        natsort($files);
-        $local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
-        $enclosedby = empty($options['enclosedby']) ? '' : 'OPTIONALLY ENCLOSED BY "'.
-            $options['enclosedby'].'"';
-        $sql = 'LOAD DATA '.
-            $local.'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" '.$enclosedby.'LINES TERMINATED BY "\n" IGNORE 1 LINES (%s)';
-        foreach ($files as $file) {
-            if ($show === true) {
-                echo "File: $file\n";
-            }
-
-            if (is_readable($file)) {
-                if (preg_match($options['regex'], $file, $matches)) {
-                    $table = $matches['table'];
-                    // Get the first line of the file which holds the columns used.
-                    $handle = @fopen($file, 'rb');
-                    if (is_resource($handle)) {
-                        $line = fgets($handle);
-                        fclose($handle);
-                        if ($line === false) {
-                            echo "FAILED reading first line of '$file'\n";
-                            continue;
-                        }
-                        $fields = trim($line);
-
-                        if ($show === true) {
-                            ColorCLI::doEcho(ColorCLI::info('Inserting data into table: '.$table));
-                        }
-                        if (Utility::isWin()) {
-                            $file = str_replace('\\', '\/', $file);
-                        }
-                        $this->pdo->exec("SET @@session.sql_mode =
-    											CASE WHEN @@session.sql_mode NOT LIKE '%NO_AUTO_VALUE_ON_ZERO%'
-        											THEN CASE WHEN LENGTH(@@session.sql_mode)>0
-            											THEN CONCAT_WS(',',@@session.sql_mode,'NO_AUTO_VALUE_ON_ZERO')
-            											ELSE 'NO_AUTO_VALUE_ON_ZERO'
-        											END
-        											ELSE @@session.sql_mode
-    											END;");
-                        $this->pdo->queryExec(sprintf($sql, $file, $table, $fields));
-                        if ($table !== 'settings') {
-                            $success = $this->pdo->query(sprintf('SELECT COUNT(id) AS num FROM %s', $table));
-                            if (empty($success[0]['num'])) {
-                                ColorCLI::doEcho(ColorCLI::error('Failed to insert data into table: '.$table));
-                            } else {
-                                ColorCLI::doEcho(ColorCLI::notice('Successfully inserted data into '.$table.' table'));
-                            }
-                        }
-                    } else {
-                        exit("Failed to open file: '$file'\n");
-                    }
-                } else {
-                    echo "Incorrectly formatted filename '$file' (should match ".
-                        str_replace('#', '', $options['regex'])."\n";
-                }
-            } else {
-                echo $this->log->error("  Unable to read file: '$file'");
-            }
-        }
-    }
-
-    /**
      * Takes new files in the correct format from the patches directory and turns them into proper patches.
      *
      * The files should be name as '+x~<table>.sql' where x is a number starting at 1 for your first
@@ -173,7 +104,6 @@ class DbUpdate
     public function newPatches(array $options = []): void
     {
         $defaults = [
-            'data'    => NN_RES.'db'.DS.'schema'.DS.'data'.DS,
             'ext'    => 'sql',
             'path'    => NN_RES.'db'.DS.'patches'.DS.$this->_DbSystem,
             'regex'    => '#^'.Utility::PATH_REGEX.'\+(?P<order>\d+)~(?P<table>\w+)\.sql$#',
@@ -186,7 +116,7 @@ class DbUpdate
         echo $this->log->primaryOver('Looking for new patches...');
         $files = Utility::getDirFiles($options);
 
-        $count = count($files);
+        $count = \count($files);
         echo $this->log->header(" $count found");
         if ($count > 0) {
             echo $this->log->header('Processing...');
@@ -198,7 +128,7 @@ class DbUpdate
                     $this->log->error("$file does not match the pattern {$options['regex']}\nPlease fix this before continuing");
                 } else {
                     echo $this->log->header('Processing patch file: '.$file);
-                    $this->splitSQL($file, ['local' => $local, 'data' => $options['data']]);
+                    $this->splitSQL($file, ['local' => $local]);
                     $current = Settings::settingValue('..sqlpatch');
                     $current++;
                     Settings::query()->where('setting', '=', 'sqlpatch')->update(['value' => $current]);
@@ -220,12 +150,12 @@ class DbUpdate
      *
      * @return int
      * @throws \RuntimeException
+     * @throws \Exception
      */
     public function processPatches(array $options = []): int
     {
         $patched = 0;
         $defaults = [
-            'data'    => NN_RES.'db'.DS.'schema'.DS.'data'.DS,
             'ext'    => 'sql',
             'path'    => NN_RES.'db'.DS.'patches'.DS.$this->_DbSystem,
             'regex'    => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
@@ -240,10 +170,9 @@ class DbUpdate
 
         $files = empty($options['files']) ? Utility::getDirFiles($options) : $options['files'];
 
-        if (count($files)) {
+        if (\count($files)) {
             natsort($files);
             $local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
-            $data = $options['data'];
             echo $this->log->primary('Looking for unprocessed patches...');
             foreach ($files as $file) {
                 $setPatch = false;
@@ -268,7 +197,7 @@ class DbUpdate
                     if (! $this->backedUp && $options['safe']) {
                         $this->_backupDb();
                     }
-                    $this->splitSQL($file, ['local' => $local, 'data' => $data]);
+                    $this->splitSQL($file, ['local' => $local]);
                     if ($setPatch) {
                         Settings::query()->where('setting', '=', 'sqlpatch')->update(['value' => $patch]);
                     }
@@ -287,28 +216,12 @@ class DbUpdate
     }
 
     /**
-     * @param array $options
-     */
-    public function processSQLFile(array $options = []): void
-    {
-        $defaults = [
-            'filepath' => NN_RES.'db'.DS.'schema'.DS.$this->_DbSystem.'-ddl.sql',
-        ];
-        $options += $defaults;
-
-        $sql = file_get_contents($options['filepath']);
-        $sql = str_replace(['DELIMITER $$', 'DELIMITER ;', '$$'], '', $sql);
-        $this->pdo->exec($sql);
-    }
-
-    /**
      * @param       $file
      * @param array $options
      */
     public function splitSQL($file, array $options = []): void
     {
         $defaults = [
-            'data'        => null,
             'delimiter'    => ';',
             'local'        => null,
         ];
@@ -323,7 +236,7 @@ class DbUpdate
         if (is_file($file)) {
             $file = fopen($file, 'r, b');
 
-            if (is_resource($file)) {
+            if (\is_resource($file)) {
                 $query = [];
 
                 $delimiter = $options['delimiter'];
@@ -365,9 +278,6 @@ class DbUpdate
                         if ($options['local'] !== null) {
                             $query = str_replace('{:local:}', $options['local'], $query);
                         }
-                        if (! empty($options['data'])) {
-                            $query = str_replace('{:data:}', $options['data'], $query);
-                        }
 
                         try {
                             $qry = $this->pdo->Prepare($query);
@@ -385,8 +295,8 @@ class DbUpdate
                             );
 
                             if (
-                                in_array($e->errorInfo[1], [1091, 1060, 1061, 1071, 1146], false) ||
-                                in_array($e->errorInfo[0], [23505, 42701, 42703, '42P07', '42P16'], false)
+                                \in_array($e->errorInfo[1], [1091, 1060, 1061, 1071, 1146], false) ||
+                                \in_array($e->errorInfo[0], [23505, 42701, 42703, '42P07', '42P16'], false)
                             ) {
                                 if ($e->errorInfo[1] === 1060) {
                                     echo $this->log->warning(
@@ -420,7 +330,7 @@ class DbUpdate
                         flush();
                     }
 
-                    if (is_string($query) === true) {
+                    if (\is_string($query) === true) {
                         $query = [];
                     }
                 }
@@ -428,50 +338,6 @@ class DbUpdate
         }
     }
 
-    /**
-     * @param array $options
-     */
-    public function updateSchemaData(array $options = []): void
-    {
-        $changed = false;
-        $default = [
-            'file'    => '10-settings.tsv',
-            'path'    => 'resources'.DS.'db'.DS.'schema'.DS.'data'.DS,
-            'regex'    => '#^(?P<section>.*)\t(?P<subsection>.*)\t(?P<name>.*)\t(?P<value>.*)\t(?P<hint>.*)\t(?P<setting>.*)$#',
-            'value'    => function (array $matches) {
-                return "{$matches['section']}\t{$matches['subsection']}\t{$matches['name']}\t{$matches['value']}\t{$matches['hint']}\t{$matches['setting']}";
-            }, // WARNING: leaving this empty will blank not remove lines.
-        ];
-        $options += $default;
-
-        $file = [];
-        $filespec = Utility::trailingSlash($options['path']).$options['path'];
-        if (file_exists($filespec) && ($file = file($filespec, FILE_IGNORE_NEW_LINES))) {
-            $count = count($file);
-            $index = 0;
-            while ($index < $count) {
-                if (preg_match($options['regex'], $file[$index], $matches)) {
-                    if (VERBOSE) {
-                        echo $this->log->primary('Matched: '.$file[$index]);
-                    }
-                    $index++;
-
-                    if (is_callable($options['value'])) {
-                        $file[$index] = $options['value']($matches);
-                    } else {
-                        $file[$index] = $options['value'];
-                    }
-                    $changed = true;
-                }
-            }
-        }
-
-        if ($changed) {
-            if (file_put_contents($filespec, implode("\n", $file)) === false) {
-                echo $this->log->error('Error writing file to disc!!');
-            }
-        }
-    }
 
     protected function _backupDb(): void
     {
