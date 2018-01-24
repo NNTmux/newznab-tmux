@@ -639,7 +639,7 @@ class ProcessReleases
                                     //check if the group already exists in database
                                     $xrefGrpID = Group::getIDByName($grpTmp);
                                     if ($xrefGrpID === '') {
-                                        $xrefGrpID = Group::add(
+                                        $xrefGrpID = Group::addGroup(
                                             [
                                                 'name'                  => $grpTmp,
                                                 'description'           => 'Added by Release processing',
