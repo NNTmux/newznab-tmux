@@ -338,7 +338,6 @@ class DbUpdate
         }
     }
 
-
     protected function _backupDb(): void
     {
         $PHP = 'php';
