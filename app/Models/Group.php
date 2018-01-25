@@ -203,13 +203,14 @@ class Group extends Model
     /**
      * Gets all groups and associated release counts.
      *
+     *
      * @param bool $offset
      * @param bool $limit
-     * @param string $groupname The groupname we want if any
-     * @param bool|int $active The status of the group we want if any
-     * @return mixed
+     * @param string $groupname
+     * @param null|bool $active
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public static function getGroupsRange($offset = false, $limit = false, $groupname = '', $active = false)
+    public static function getGroupsRange($offset = false, $limit = false, $groupname = '', $active = null)
     {
         $groups = self::query()->groupBy('id')->orderBy('name');
 
@@ -219,6 +220,8 @@ class Group extends Model
 
         if ($active === true) {
             $groups->where('active', '=', 1);
+        } elseif ($active === false) {
+            $groups->where('active', '=', 0);
         }
 
         if ($offset !== false) {

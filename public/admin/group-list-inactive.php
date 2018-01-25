@@ -22,12 +22,12 @@ $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
 $page->smarty->assign('pagerquerysuffix', '#results');
 
-$groupsearch = $gname != '' ? 'groupname='.$gname.'&amp;' : '';
+$groupsearch = $gname !== '' ? 'groupname='.$gname.'&amp;' : '';
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/group-list-inactive.php?'.$groupsearch.'offset=');
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$grouplist = Group::getGroupsRange($offset, ITEMS_PER_PAGE, $gname);
+$grouplist = Group::getGroupsRange($offset, ITEMS_PER_PAGE, $gname, false);
 
 $page->smarty->assign('grouplist', $grouplist);
 

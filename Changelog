@@ -1,3 +1,5 @@
+2018-01-25 DariusIII
+	* Fix: Fix display of active/inactive groups in admin group list
 2018-01-24 DariusIII
 	* Chg: Update reset_truncate.php to be able to truncate tables (turn off foreign key checks)
 	* Fix: Fix wrong function call when adding groups in ProcessReleases class
