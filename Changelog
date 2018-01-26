@@ -1,3 +1,5 @@
+2018-01-26 DariusIII
+	* Chg: Use artisan console to reset database, update reset_truncate script to use Eloquent and query builder
 2018-01-25 DariusIII
 	* Fix: Fix display of active/inactive groups in admin group list
 2018-01-24 DariusIII
