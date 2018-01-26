@@ -1,4 +1,5 @@
 2018-01-26 DariusIII
+	* Chg: Try to prevent Carbon date errors when postdate is, for some weird reason, null
 	* Chg: Fix wrong NN_INSTALLER constant usage in User model
 	* Chg: Update nikic/php-parser to latest version
 	* Chg: Use artisan console to reset database, update reset_truncate script to use Eloquent and query builder
