@@ -755,7 +755,7 @@ class User extends Authenticatable
             return false;
         }
 
-        if (\defined(NN_INSTALLER)) {
+        if (\defined('NN_INSTALLER')) {
             $storeips = '';
         } else {
             $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
