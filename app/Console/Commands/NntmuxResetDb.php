@@ -4,11 +4,11 @@ namespace App\Console\Commands;
 
 use App\Models\Group;
 use App\Models\Settings;
-use Illuminate\Console\Command;
+use nntmux\SphinxSearch;
 use Illuminate\Support\Carbon;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use nntmux\SphinxSearch;
 
 class NntmuxResetDb extends Command
 {
@@ -41,7 +41,6 @@ class NntmuxResetDb extends Command
      */
     public function handle()
     {
-
         if ($this->confirm('This script removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?')) {
             $timestart = Carbon::now();
 
@@ -50,7 +49,7 @@ class NntmuxResetDb extends Command
                 'first_record_postdate' => null,
                 'last_record' => 0,
                 'last_record_postdate' => null,
-                'last_updated' => null
+                'last_updated' => null,
             ]);
             $this->info('Reseting all groups completed.');
 
