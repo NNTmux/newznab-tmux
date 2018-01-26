@@ -6,8 +6,8 @@ build:
           - mysql -u root -e "SET GLOBAL innodb_file_per_table = 1;"
           - mysql -u root -e "SET GLOBAL innodb_file_format = BARRACUDA;"
           - mysql -u root -e "SET GLOBAL innodb_large_prefix = 1;"
-          - mysql -u root -e "CREATE DATABASE TEST;"
-          - mysql -u root -e "GRANT ALL ON TEST.* TO 'TEST'@'localhost' IDENTIFIED BY 'TEST';"
+          - mysql -u root -e "CREATE DATABASE scrutinizer;"
+          - mysql -u root -e "GRANT ALL ON scrutinizer.* TO 'root'@'localhost';"
         before:
           - cp .env.scrutinizer .env
     environment:
