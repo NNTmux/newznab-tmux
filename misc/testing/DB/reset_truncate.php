@@ -2,10 +2,10 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use nntmux\ColorCLI;
 use App\Models\Group;
 use App\Models\Release;
 use Illuminate\Support\Facades\DB;
-use nntmux\ColorCLI;
 
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'drop')) {
     Group::query()->update(['first_record' => 0, 'first_record_postdate' => null, 'last_record' => 0, 'last_record_postdate' => null, 'last_updated' => null]);
@@ -38,7 +38,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'drop')) {
             } else {
                 $rel = DB::unprepared("TRUNCATE TABLE $tbl");
                 DB::commit();
-                if ($rel ===true) {
+                if ($rel === true) {
                     echo ColorCLI::primary("Truncating $tbl completed.");
                 }
             }
@@ -53,7 +53,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'drop')) {
     ColorCLI::doEcho(ColorCLI::error(
         'This script removes releases with no NZBs, resets all groups, truncates or drops(tpg)
         article tables. All other releases are left alone.
-        php '. $argv[0].' [true, drop]   ...: To reset all groups and truncate/drop the tables.'
+        php '.$argv[0].' [true, drop]   ...: To reset all groups and truncate/drop the tables.'
     )
     );
     exit;
