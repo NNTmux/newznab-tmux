@@ -890,11 +890,7 @@ class Binaries
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
 
-                    $random = openssl_random_pseudo_bytes(16, $isSourceStrong);
-
-                    if ($isSourceStrong === false || $random === false) {
-                        throw new \RuntimeException('IV generation failed');
-                    }
+                    $random = random_bytes(16);
 
                     $collectionID = $this->_pdo->queryInsert(
                         sprintf(

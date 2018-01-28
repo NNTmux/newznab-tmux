@@ -1,3 +1,5 @@
+2018-01-28 DariusIII
+	* Chg: Replace openssl_random_pseudo_bytes with random_bytes
 2018-01-26 DariusIII
 	* Chg: Update phpdocumentor to latest version
 	* Chg: Try to prevent Carbon date errors when postdate is, for some weird reason, null
