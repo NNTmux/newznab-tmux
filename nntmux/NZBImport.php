@@ -483,6 +483,6 @@ class NZBImport
      */
     protected function updateNzbGuid(): void
     {
-        Release::query()->where('guid', $this->relGuid)->update(['nzb_guid' => hex2bin($this->nzbGuid)]);
+        Release::query()->where('guid', $this->relGuid)->update(['nzb_guid' => sodium_hex2bin($this->nzbGuid)]);
     }
 }

@@ -911,7 +911,7 @@ class Binaries
                             Carbon::now()->toDateTimeString(),
                             $xref,
                             Carbon::now()->toDateTimeString(),
-                            bin2hex($random)
+                            sodium_bin2hex($random)
                         )
                     );
 

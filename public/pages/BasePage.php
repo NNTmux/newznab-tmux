@@ -104,7 +104,7 @@ class BasePage
             session_set_cookie_params(0, '/', '', $this->https, true);
             session_start();
             if (empty($_SESSION['token'])) {
-                $_SESSION['token'] = bin2hex(random_bytes(32));
+                $_SESSION['token'] = sodium_bin2hex(random_bytes(32));
             }
             $this->token = $_SESSION['token'];
         }

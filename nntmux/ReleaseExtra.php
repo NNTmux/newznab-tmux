@@ -371,7 +371,7 @@ class ReleaseExtra
             ->orWhere(
                 [
                     'releases_id' => $releaseID,
-                    'uniqueid' => hex2bin($uniqueid),
+                    'uniqueid' => sodium_hex2bin($uniqueid),
                 ]
             )->first(['releases_id']);
         if ($dupecheck === null) {
@@ -379,7 +379,7 @@ class ReleaseExtra
                 ->insert(
                     [
                         'releases_id' => $releaseID,
-                        'uniqueid' => hex2bin($uniqueid),
+                        'uniqueid' => sodium_hex2bin($uniqueid),
                     ]
                 );
         }
