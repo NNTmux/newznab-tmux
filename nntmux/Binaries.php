@@ -884,7 +884,7 @@ class Binaries
                     $this->header['Date'] = (is_numeric($this->header['Date']) ? $this->header['Date'] : strtotime($this->header['Date']));
 
                     // Get the current unixtime from PHP.
-                    $now = Carbon::now();
+                    $now = Carbon::now()->toDateTimeString();
 
                     $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->escapeString(substr($this->header['Xref'], 2, 255))) : '');
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
@@ -908,9 +908,9 @@ class Binaries
                             $fileCount[3],
                             sha1($this->header['CollectionKey']),
                             $collMatch['id'],
-                            Carbon::now(),
+                            Carbon::now()->toDateTimeString(),
                             $xref,
-                            Carbon::now(),
+                            Carbon::now()->toDateTimeString(),
                             bin2hex($random)
                         )
                     );
