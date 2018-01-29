@@ -135,6 +135,7 @@
     "joshpinkney/tv-maze-php-api": "dev-master",
     "laravel/framework": "^5.5",
     "laravel/tinker": "~1.0",
+    "mayconbordin/l5-fixtures": "dev-master",
     "monolog/monolog": "^1.22",
     "nzedb/Git.php": "dev-master",
     "php-http/guzzle6-adapter": "^1.1",
