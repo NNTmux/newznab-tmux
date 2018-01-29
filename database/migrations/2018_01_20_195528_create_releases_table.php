@@ -75,16 +75,6 @@ processed');
         });
 
         DB::unprepared('ALTER TABLE releases DROP PRIMARY KEY , ADD PRIMARY KEY (id, categories_id)');
-        DB::unprepared('ALTER TABLE releases PARTITION BY RANGE (categories_id) (
-    PARTITION misc    VALUES LESS THAN (1000),
-    PARTITION console VALUES LESS THAN (2000),
-    PARTITION movies  VALUES LESS THAN (3000),
-    PARTITION audio   VALUES LESS THAN (4000),
-    PARTITION pc      VALUES LESS THAN (5000),
-    PARTITION tv      VALUES LESS THAN (6000),
-    PARTITION xxx     VALUES LESS THAN (7000),
-    PARTITION books   VALUES LESS THAN (8000)
-  );');
         DB::unprepared('ALTER TABLE releases ADD COLUMN nzb_guid BINARY(16) NULL');
         DB::unprepared('ALTER TABLE releases ADD INDEX ix_releases_nzb_guid (nzb_guid)');
     }

@@ -112,17 +112,6 @@ processed',
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1
 
-  PARTITION BY RANGE (categories_id) (
-    PARTITION misc    VALUES LESS THAN (1000),
-    PARTITION console VALUES LESS THAN (2000),
-    PARTITION movies  VALUES LESS THAN (3000),
-    PARTITION audio   VALUES LESS THAN (4000),
-    PARTITION pc      VALUES LESS THAN (5000),
-    PARTITION tv      VALUES LESS THAN (6000),
-    PARTITION xxx     VALUES LESS THAN (7000),
-    PARTITION books   VALUES LESS THAN (8000)
-  );
-
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id             INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -1319,34 +1308,14 @@ CREATE PROCEDURE delete_release(IN is_numeric BOOLEAN, IN identifier VARCHAR(40)
 
     IF is_numeric IS TRUE
     THEN
-      DELETE r, rn, rc, uc, rf, ra, rs, rv, re, df, rg
+      DELETE r
       FROM releases r
-        LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-        LEFT OUTER JOIN release_comments rc ON rc.releases_id = r.id
-        LEFT OUTER JOIN users_releases uc ON uc.releases_id = r.id
-        LEFT OUTER JOIN release_files rf ON rf.releases_id = r.id
-        LEFT OUTER JOIN audio_data ra ON ra.releases_id = r.id
-        LEFT OUTER JOIN release_subtitles rs ON rs.releases_id = r.id
-        LEFT OUTER JOIN video_data rv ON rv.releases_id = r.id
-        LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
-        LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-        LEFT OUTER JOIN releases_groups rg ON rg.releases_id = r.id
       WHERE r.id = identifier;
 
     ELSEIF is_numeric IS FALSE
     THEN
-      DELETE r, rn, rc, uc, rf, ra, rs, rv, re, df, rg
+      DELETE r
       FROM releases r
-        LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-        LEFT OUTER JOIN release_comments rc ON rc.releases_id = r.id
-        LEFT OUTER JOIN users_releases uc ON uc.releases_id = r.id
-        LEFT OUTER JOIN release_files rf ON rf.releases_id = r.id
-        LEFT OUTER JOIN audio_data ra ON ra.releases_id = r.id
-        LEFT OUTER JOIN release_subtitles rs ON rs.releases_id = r.id
-        LEFT OUTER JOIN video_data rv ON rv.releases_id = r.id
-        LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
-        LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-        LEFT OUTER JOIN releases_groups rg ON rg.releases_id = r.id
       WHERE r.guid = identifier;
 
     ELSE LEAVE main;
