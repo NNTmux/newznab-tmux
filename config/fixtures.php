@@ -10,7 +10,7 @@ return [
     | The path to where you store your fixtures.
     |
     */
-    'location' => realpath(base_path()) . '/database/fixtures',
+    'location' => realpath(base_path()).'/database/fixtures',
 
     /*
     |--------------------------------------------------------------------------

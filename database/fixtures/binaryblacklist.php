@@ -1,8 +1,7 @@
 <?php
 
 return [
-            0 =>
-                array (
+            0 => [
                     'id' => 1,
                     'groupname' => 'alt\\.binaries\\..*',
                     'regex' => '(brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)[\\)]?( \\-)?[ \\-\\.]((19|20)\\d\\d|(480|720|1080)(i|p)|3d|5\\.1|dts|ac3|truehd|(bd|dvd|hd|sat|vhs|web)\\.?rip|(bd.)?(h|x).?2?64|divx|xvid|bluray|svcd|board|custom|"|(d|h|p|s)d?v?tv|m?dvd(-|sc)?r|int(ernal)?|nzb|par2|\\b(((dc|ld|md|ml|dl|hr|se)[.])|(anime\\.)|(fs|ws)|dsr|pal|ntsc|iso|complete|cracked|ebook|extended|dirfix|festival|proper|game|limited|read.?nfo|real|rerip|repack|remastered|retail|samplefix|scan|screener|theatrical|uncut|unrated|incl|winall)\\b|doku|doc|dub|sub|\\(uncut\\))',
@@ -10,10 +9,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Blacklists non-english releases.',
-                    'last_activity' => NULL,
-                ),
-            1 =>
-                array (
+                    'last_activity' => null,
+                ],
+            1 => [
                     'id' => 2,
                     'groupname' => 'alt\\.binaries\\..*',
                     'regex' => '[ -.](bl|cz|de|es|fr|ger|heb|hu|hun|ita|ko|kor|nl|pl|se)[ -.]((19|20)\\d\\d|(480|720|1080)(i|p)|(bd|dvd.?|sat|vhs)?rip?|(bd|dl)mux|( -.)?(dub|sub)(ed|bed)?|complete|convert|(d|h|p|s)d?tv|dirfix|docu|dual|dvbs|dvdscr|eng|(h|x).?2?64|int(ernal)?|pal|proper|repack|xbox)',
@@ -21,10 +19,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Blacklists non-english abbreviated releases.',
-                    'last_activity' => NULL,
-                ),
-            2 =>
-                array (
+                    'last_activity' => null,
+                ],
+            2 => [
                     'id' => 3,
                     'groupname' => 'alt\\.binaries\\..*',
                     'regex' => '[ -.]((19|20)\\d\\d|(bd|dvd.?|sat|vhs)?rip?|custom|divx|dts)[ -.](bl|cz|de|es|fr|ger|heb|hu|ita|ko|kor|nl|pl|se)[ -.]',
@@ -32,10 +29,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Blacklists non-english abbreviated (reversed) releases.',
-                    'last_activity' => NULL,
-                ),
-            3 =>
-                array (
+                    'last_activity' => null,
+                ],
+            3 => [
                     'id' => 4,
                     'groupname' => 'alt\\.binaries\\..*',
                     'regex' => '[ -.](chinese.subbed|dksubs|fansubs?|finsub|hebdub|hebsub|korsub|norsub|nordicsubs|nl( -.)?sub(ed|bed|s)?|nlvlaams|pldub|plsub|slosinh|swesub|truefrench|vost(fr)?)[ -.]',
@@ -43,10 +39,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Blacklists non-english subtitled releases.',
-                    'last_activity' => NULL,
-                ),
-            4 =>
-                array (
+                    'last_activity' => null,
+                ],
+            4 => [
                     'id' => 5,
                     'groupname' => 'alt\\.binaries\\..*',
                     'regex' => '[ -._](4u\\.nl|nov[ a]+rip|realco|videomann|vost)[ -._]',
@@ -54,10 +49,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Blacklists non-english (release group specific) releases.',
-                    'last_activity' => NULL,
-                ),
-            5 =>
-                array (
+                    'last_activity' => null,
+                ],
+            5 => [
                     'id' => 6,
                     'groupname' => 'alt\\.binaries\\..*',
                     'regex' => '[ -.]((bd|dl)mux|doku|\\[foreign\\]|seizoen|staffel)[ -.]',
@@ -65,10 +59,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Blacklists non-english (lang specific) releases.',
-                    'last_activity' => NULL,
-                ),
-            6 =>
-                array (
+                    'last_activity' => null,
+                ],
+            6 => [
                     'id' => 7,
                     'groupname' => 'alt\\.binaries\\..*',
                     'regex' => '[ -.](imageset|pictureset|xxx)[ -.]',
@@ -76,10 +69,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Blacklists porn releases.',
-                    'last_activity' => NULL,
-                ),
-            7 =>
-                array (
+                    'last_activity' => null,
+                ],
+            7 => [
                     'id' => 8,
                     'groupname' => 'alt\\.binaries\\..*',
                     'regex' => 'hdnectar|nzbcave',
@@ -87,10 +79,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Bad releases.',
-                    'last_activity' => NULL,
-                ),
-            8 =>
-                array (
+                    'last_activity' => null,
+                ],
+            8 => [
                     'id' => 9,
                     'groupname' => 'alt\\.binaries\\..*',
                     'regex' => 'Passworded',
@@ -98,10 +89,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Removes passworded releases.',
-                    'last_activity' => NULL,
-                ),
-            9 =>
-                array (
+                    'last_activity' => null,
+                ],
+            9 => [
                     'id' => 10,
                     'groupname' => 'alt\\.binaries\\.(boneless|movies\\.divx)',
                     'regex' => '((Frkz|info)@XviD2?|x?VIDZ?@pwrpst|movies@movies?)\\.net|(hsv\\.stoned@hotmail|unequal87@gmail|ilove@movies)\\.com',
@@ -109,10 +99,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Virus codec posters.',
-                    'last_activity' => NULL,
-                ),
-            10 =>
-                array (
+                    'last_activity' => null,
+                ],
+            10 => [
                     'id' => 11,
                     'groupname' => 'alt\\.binaries\\.tun',
                     'regex' => '\\[PRiVATE\\]\\s+[a-z0-9]+ ',
@@ -120,10 +109,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Passworded/Encrypted junk.',
-                    'last_activity' => NULL,
-                ),
-            11 =>
-                array (
+                    'last_activity' => null,
+                ],
+            11 => [
                     'id' => 12,
                     'groupname' => '^alt\\.binaries\\.teevee$',
                     'regex' => '^\\[KoreanTV\\] ',
@@ -131,10 +119,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Blocks posts by koreantv.',
-                    'last_activity' => NULL,
-                ),
-            12 =>
-                array (
+                    'last_activity' => null,
+                ],
+            12 => [
                     'id' => 13,
                     'groupname' => '^alt\\.binaries\\.(kenpsx|frogs)$',
                     'regex' => '^\\s*([a-f0-9]{16})\\s\\[\\d+\\/\\d+\\]\\s-\\s\\"\\1\\"\\s+yEnc$',
@@ -142,10 +129,9 @@ return [
                     'optype' => 1,
                     'status' => 0,
                     'description' => 'Block 16 character hash floods in kenpsx frogs.',
-                    'last_activity' => NULL,
-                ),
-            13 =>
-                array (
+                    'last_activity' => null,
+                ],
+            13 => [
                     'id' => 14,
                     'groupname' => '^alt\\.binaries\\.multimedia\\.korean$',
                     'regex' => 'TESTMAN',
@@ -153,10 +139,9 @@ return [
                     'optype' => 1,
                     'status' => 1,
                     'description' => 'Posts by TESTMAN (jpegs)',
-                    'last_activity' => NULL,
-                ),
-            14 =>
-                array (
+                    'last_activity' => null,
+                ],
+            14 => [
                     'id' => 15,
                     'groupname' => '^alt\\.binaries\\.multimedia\\.korean$',
                     'regex' => '^yEnc ".+torrent"$',
@@ -164,10 +149,9 @@ return [
                     'optype' => 1,
                     'status' => 1,
                     'description' => 'torrent uploads ::: yEnc "SBS ÃÃÂ±Ã¢Â°Â¡Â¿Ã¤.E690.120916.HDTV.H264.720p-KOR.avi.torrent"',
-                    'last_activity' => NULL,
-                ),
-            15 =>
-                array (
+                    'last_activity' => null,
+                ],
+            15 => [
                     'id' => 16,
                     'groupname' => '^korea\\.binaries\\.movies$',
                     'regex' => '^.[?(Kornet|SK|xpeed|KT)]?',
@@ -175,10 +159,9 @@ return [
                     'optype' => 1,
                     'status' => 1,
                     'description' => 'Incomplete releases',
-                    'last_activity' => NULL,
-                ),
-            16 =>
-                array (
+                    'last_activity' => null,
+                ],
+            16 => [
                     'id' => 17,
                     'groupname' => '^korea\\.binaries\\.movies$',
                     'regex' => '^(top@top.t \\(top\\)|shit@xxxxxxxxaa.com \\(shit\\)|none@nonemail.com \\(none\\))$',
@@ -186,10 +169,9 @@ return [
                     'optype' => 1,
                     'status' => 1,
                     'description' => 'incomplete cryptic releases',
-                    'last_activity' => NULL,
-                ),
-            17 =>
-                array (
+                    'last_activity' => null,
+                ],
+            17 => [
                     'id' => 18,
                     'groupname' => '^korea\\.binaries\\.movies$',
                     'regex' => '^filzilla6@web\\.de \\(Baruth\\)$',
@@ -197,6 +179,6 @@ return [
                     'optype' => 1,
                     'status' => 1,
                     'description' => 'Virus Poster',
-                    'last_activity' => NULL,
-                ),
+                    'last_activity' => null,
+                ],
    ];
