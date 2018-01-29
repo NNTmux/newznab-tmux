@@ -1,4 +1,5 @@
 2018-01-29 DariusIII
+	* Chg: Add fixtures command to artisan, add binaryblacklist fixture
 	* Chg: Update symfony components, add mayconbordin/l5-fixtures package
 	* Fix: Fix error on details page when there are comments for the release
 	* Chg: Update migration files to include foreign keys
