@@ -21,6 +21,7 @@ class CreateReleaseFilesTable extends Migration {
 			$table->timestamps();
 			$table->boolean('passworded')->default(0);
 			$table->primary(['releases_id','name']);
+            $table->foreign('releases_id', 'FK_rf_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

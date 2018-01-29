@@ -16,6 +16,7 @@ class CreateReleaseextrafullTable extends Migration {
 		{
 			$table->integer('releases_id')->unsigned()->primary()->comment('FK to releases.id');
 			$table->text('mediainfo', 65535)->nullable();
+            $table->foreign('releases_id', 'FK_ref_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

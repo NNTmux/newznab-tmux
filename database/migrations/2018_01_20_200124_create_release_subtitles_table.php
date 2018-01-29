@@ -19,6 +19,7 @@ class CreateReleaseSubtitlesTable extends Migration {
 			$table->integer('subsid')->unsigned();
 			$table->string('subslanguage', 50);
 			$table->unique(['releases_id','subsid'], 'ix_releasesubs_releases_id_subsid');
+            $table->foreign('releases_id', 'FK_rs_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

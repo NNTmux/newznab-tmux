@@ -16,6 +16,7 @@ class CreateReleaseNfosTable extends Migration {
 		{
 			$table->integer('releases_id')->unsigned()->primary()->comment('FK to releases.id');
 			$table->binary('nfo', 65535)->nullable();
+            $table->foreign('releases_id', 'FK_rn_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

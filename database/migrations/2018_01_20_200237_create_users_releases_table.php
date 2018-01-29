@@ -20,6 +20,7 @@ class CreateUsersReleasesTable extends Migration {
 			$table->timestamps();
 			$table->unique(['users_id','releases_id'], 'ix_usercart_userrelease');
             $table->foreign('users_id', 'FK_users_ur')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
+            $table->foreign('releases_id', 'FK_ur_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

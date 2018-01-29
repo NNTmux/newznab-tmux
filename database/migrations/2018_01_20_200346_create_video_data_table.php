@@ -25,6 +25,7 @@ class CreateVideoDataTable extends Migration {
 			$table->string('videoaspect', 10)->nullable();
 			$table->float('videoframerate', 7, 4)->nullable();
 			$table->string('videolibrary', 50)->nullable();
+            $table->foreign('releases_id', 'FK_vd_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

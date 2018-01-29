@@ -17,6 +17,7 @@ class CreateParHashesTable extends Migration {
 			$table->integer('releases_id')->unsigned()->comment('FK to releases.id');
 			$table->string('hash', 32)->comment('hash_16k block of par2');
 			$table->primary(['releases_id','hash']);
+            $table->foreign('releases_id', 'FK_ph_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

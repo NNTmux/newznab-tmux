@@ -27,6 +27,7 @@ class CreateAudioDataTable extends Migration {
 			$table->string('audiolanguage', 50)->nullable();
 			$table->string('audiotitle', 50)->nullable();
 			$table->unique(['releases_id','audioid'], 'ix_releaseaudio_releaseid_audioid');
+            $table->foreign('releases_id', 'FK_ad_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 
