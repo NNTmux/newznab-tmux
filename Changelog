@@ -1,4 +1,5 @@
 2018-01-29 DariusIII
+	* Chg: Check for null release date in games
 	* Fix: Fix viewing of comments list in admin area
 	* Chg: Remove PHP7.1 tests from travis
 	* Fix: Fix adding of new cbpr after the latest changes

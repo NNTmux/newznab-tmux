@@ -579,7 +579,7 @@ class Games
 
                         if ($this->_gameResults->original_release_date !== '') {
                             $dateReleased = $this->_gameResults->original_release_date;
-                            $date = Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased);
+                            $date = $dateReleased !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased): Carbon::now();
                             if ($date instanceof \DateTime) {
                                 $game['releasedate'] = (string) $date->format('Y-m-d');
                             }
