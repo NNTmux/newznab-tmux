@@ -860,8 +860,8 @@ class Forking extends \fork_daemon
             return $this->pdo->queryOneRow(sprintf('
 						SELECT id
 						FROM releases
-						PARTITION (movies)
-						WHERE nzbstatus = %d
+						WHERE categories_id BETWEEN 5000 AND 5999
+						AND nzbstatus = %d
 						AND imdbid IS NULL
 						%s %s
 						LIMIT 1', NZB::NZB_ADDED, ((int) Settings::settingValue('..lookupimdb') === 2 ? 'AND isrenamed = 1' : ''), ($this->ppRenamedOnly ? 'AND isrenamed = 1' : ''))) !== false;
@@ -885,8 +885,8 @@ class Forking extends \fork_daemon
                     '
 					SELECT leftguid AS id, %d AS renamed
 					FROM releases
-					PARTITION (movies)
-					WHERE nzbstatus = %d
+					WHERE categories_id BETWEEN 5000 AND 5999
+					AND nzbstatus = %d
 					AND imdbid IS NULL
 					%s %s
 					GROUP BY leftguid
@@ -914,8 +914,8 @@ class Forking extends \fork_daemon
             return $this->pdo->queryOneRow(sprintf('
 						SELECT id
 						FROM releases
-						PARTITION (tv)
-						WHERE nzbstatus = %d
+						WHERE categories_id BETWEEN 3000 AND 53999
+						AND nzbstatus = %d
 						AND size > 1048576
 						AND tv_episodes_id BETWEEN -2 AND 0
 						%s %s
@@ -940,8 +940,8 @@ class Forking extends \fork_daemon
                     '
 					SELECT leftguid AS id, %d AS renamed
 					FROM releases
-					PARTITION (tv)
-					WHERE nzbstatus = %d
+					WHERE categories_id BETWEEN 3000 AND 3999
+					AND nzbstatus = %d
 					AND tv_episodes_id BETWEEN -2 AND 0
 					AND size > 1048576
 					%s %s

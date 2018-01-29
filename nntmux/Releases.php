@@ -425,7 +425,7 @@ class Releases
 					rn.releases_id AS nfoid, re.releases_id AS reid,
 					tve.firstaired,
 					(SELECT df.failed) AS failed
-				FROM releases PARTITION (tv) r
+				FROM releases r
 				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 				LEFT JOIN groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
@@ -433,7 +433,7 @@ class Releases
 				LEFT JOIN categories c ON c.id = r.categories_id
 				LEFT JOIN categories cp ON cp.id = c.parentid
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-				WHERE %s %s
+				WHERE r.categories_id BETWEEN 5000 AND 5999 %s %s
 				AND r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s
@@ -476,8 +476,8 @@ class Releases
         return $this->getPagerCount(
             sprintf(
                 'SELECT r.id
-				FROM releases PARTITION (tv) r
-				WHERE %s %s
+				FROM releases r
+				WHERE r.categories_id BETWEEN 5000 AND 5999 %s %s
 				AND r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s',
@@ -504,8 +504,8 @@ class Releases
         return $this->getPagerCount(
             sprintf(
                 'SELECT r.id
-				FROM releases PARTITION (movies) r
-				WHERE %s %s
+				FROM releases r
+				WHERE r.categories_id BETWEEN 3000 AND 3999 %s %s
 				AND r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s',
@@ -880,7 +880,7 @@ class Releases
 				g.name AS group_name,
 				rn.releases_id AS nfoid,
 				re.releases_id AS reid
-			FROM releases PARTITION (tv) r
+			FROM releases r
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id AND v.type = 0
 			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
@@ -1021,11 +1021,12 @@ class Releases
 				%s AS category_ids,
 				g.name AS group_name,
 				rn.releases_id AS nfoid
-			FROM releases PARTITION (movies) r
+			FROM releases r
 			LEFT JOIN groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+			WHERE r.categories_id BETWEEN 5000 AND 5999
 			%s",
             $this->getConcatenatedCategoryIDs(),
             $whereSql

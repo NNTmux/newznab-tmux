@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Models\Release;
 use nntmux\Tmux;
 use nntmux\db\DB;
 use nntmux\TmuxRun;
@@ -150,22 +151,23 @@ while ($runVar['counts']['iterations'] > 0) {
 
         $timer03 = time();
 
-        //This is subpartition compatible -- loops through all partitions and adds their total row counts instead of doing a slow query count
-        $partitions = $pdo->queryDirect(
-            sprintf(
-                "
-				SELECT SUM(TABLE_ROWS) AS count, PARTITION_NAME AS category
-				FROM information_schema.PARTITIONS
-				WHERE TABLE_NAME = 'releases'
-				AND TABLE_SCHEMA = %s
-				GROUP BY PARTITION_NAME",
-                $pdo->escapeString($db_name)
-            )
-        );
-        foreach ($partitions as $partition) {
-            $runVar['counts']['now'][$partition['category']] = $partition['count'];
-        }
-        unset($partitions);
+        $tvCount = Release::query()->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])->count(['id']);
+        $movieCount = Release::query()->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])->count(['id']);
+        $audioCount = Release::query()->whereBetween('categories_id', [Category::MUSIC_ROOT, Category::MUSIC_OTHER])->count(['id']);
+        $bookCount = Release::query()->whereBetween('categories_id', [Category::BOOKS_ROOT, Category::BOOKS_UNKNOWN])->count(['id']);
+        $consoleCount = Release::query()->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->count(['id']);
+        $pcCount = Release::query()->whereBetween('categories_id', [Category::PC_ROOT, Category::PC_PHONE_ANDROID])->count(['id']);
+        $xxxCount = Release::query()->whereBetween('categories_id', [Category::XXX_ROOT, Category::XXX_OTHER])->count(['id']);
+        $miscCount = Release::query()->whereBetween('categories_id', [Category::OTHER_ROOT, Category::OTHER_HASHED])->count(['id']);
+
+        $runVar['counts']['now']['audio'] = $audioCount;
+        $runVar['counts']['now']['books'] = $bookCount;
+        $runVar['counts']['now']['console'] = $consoleCount;
+        $runVar['counts']['now']['misc'] = $miscCount;
+        $runVar['counts']['now']['movies'] = $movieCount;
+        $runVar['counts']['now']['pc'] = $pcCount;
+        $runVar['counts']['now']['tv'] = $tvCount;
+        $runVar['counts']['now']['xxx'] = $xxxCount;
 
         $runVar['timers']['query']['init_time'] = (time() - $timer03);
         $runVar['timers']['query']['init1_time'] = (time() - $timer01);
