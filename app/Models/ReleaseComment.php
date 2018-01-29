@@ -47,11 +47,11 @@ class ReleaseComment extends Model
 
     /**
      * @param $id
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return array
      */
     public static function getComments($id)
     {
-        return self::query()->where('releases_id', $id)->orderBy('created_at', 'desc')->get();
+        return self::query()->where('releases_id', $id)->orderBy('created_at', 'desc')->get()->toArray();
     }
 
     /**
