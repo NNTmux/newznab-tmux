@@ -1,6 +1,6 @@
 # Alter tables related to releases table to add foreign keys to them
 
-# Alter tables related to releases table to add foreign keys to them
+SET FOREIGN_KEY_CHECKS = 0;
 
 ALTER TABLE audio_data ADD CONSTRAINT FK_ad_releases FOREIGN KEY (releases_id) REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE par_hashes ADD CONSTRAINT FK_ph_releases FOREIGN KEY (releases_id) REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -16,14 +16,4 @@ ALTER TABLE users_releases ADD CONSTRAINT FK_ur_releases FOREIGN KEY (releases_i
 ALTER TABLE video_data ADD CONSTRAINT FK_vd_releases FOREIGN KEY (releases_id) REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE dnzb_failures ADD CONSTRAINT FK_df_releases FOREIGN KEY (release_id) REFERENCES releases(id) ON DELETE CASCADE ON UPDATE CASCADE;
 
-
-
-
-
-
-
-
-
-
-
-
+SET FOREIGN_KEY_CHECKS = 1;
