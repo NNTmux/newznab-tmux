@@ -1,3 +1,5 @@
+2018-01-29 DariusIII
+	* Fix: Fix adding of new cbpr after the latest changes
 2018-01-28 DariusIII
 	* Chg: Make PHP7.2 lowest supported version, use sodium for bin2hex and hex2bin operations
 	* Chg: Update theleague/flysystem to latest version

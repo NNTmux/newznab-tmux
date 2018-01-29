@@ -884,7 +884,7 @@ class Binaries
                     $this->header['Date'] = (is_numeric($this->header['Date']) ? $this->header['Date'] : strtotime($this->header['Date']));
 
                     // Get the current unixtime from PHP.
-                    $now = Carbon::now()->toDateTimeString();
+                    $now = Carbon::now()->timestamp;
 
                     $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->escapeString(substr($this->header['Xref'], 2, 255))) : '');
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
@@ -897,8 +897,8 @@ class Binaries
                             "
 							INSERT INTO %s (subject, fromname, date, xref, groups_id,
 								totalfiles, collectionhash, collection_regexes_id, dateadded)
-							VALUES (%s, %s, %s, %s, %d, %d, '%s', %d, %s)
-							ON DUPLICATE KEY UPDATE %s dateadded = '%s', noise = '%s'",
+							VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %d, %d, '%s', %d, NOW())
+							ON DUPLICATE KEY UPDATE %s dateadded = NOW(), noise = '%s'",
                             $this->tableNames['cname'],
                             $this->_pdo->escapeString(substr(utf8_encode($this->header['matches'][1]), 0, 255)),
                             $this->_pdo->escapeString(utf8_encode($this->header['From'])),
@@ -908,9 +908,7 @@ class Binaries
                             $fileCount[3],
                             sha1($this->header['CollectionKey']),
                             $collMatch['id'],
-                            Carbon::now()->toDateTimeString(),
                             $xref,
-                            Carbon::now()->toDateTimeString(),
                             sodium_bin2hex($random)
                         )
                     );
