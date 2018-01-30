@@ -2,7 +2,7 @@ build:
     dependencies:
         # Overwrites inferred commands
         override:
-          - composer install --prefer-dist
+          - composer install --prefer-source
 
         before:
           - cp .env.scrutinizer .env
@@ -15,6 +15,10 @@ build:
                 memory_limit:     "1024M"
     tests:
        override: [php-scrutinizer-run]
+                command: 'vendor/bin/phpunit --coverage-clover=coverage'
+                    coverage:
+                        file: 'coverage'
+                        format: 'clover'
 checks:
     php:
         code_rating: true
@@ -48,6 +52,7 @@ filter:
 tools:
     sensiolabs_security_checker: true
     php_analyzer: true
+    php_cs_fixer: true
     php_code_sniffer:
       config:
         standard: PSR2
