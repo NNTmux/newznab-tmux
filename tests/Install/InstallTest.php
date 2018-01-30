@@ -52,7 +52,7 @@ class InstallTest extends \PHPUnit\Framework\TestCase
             $updateSettings = Settings::query()->where(['section' => '', 'subsection' => '', 'name' => 'sqlpatch'])->update(['value' => $patch]);
         }
         // If it all worked, continue the install process.
-        if ($updateSettings === 0) {
+        if ($updateSettings !== false) {
             $message = 'Database updated successfully';
         } else {
             $error = true;
