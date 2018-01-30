@@ -79,15 +79,37 @@ class InstallNntmux extends Command
                     }
                 }
                 $this->info('Migrating tables and seeding them with initial data');
-                $process = new Process('php artisan migrate:fresh --seed');
-                $process->setTimeout(600);
-                $process->run(function ($type, $buffer) {
-                    if (Process::ERR === $type) {
-                        echo 'ERR > '.$buffer;
-                    } else {
-                        echo $buffer;
-                    }
-                });
+                if (env('APP_ENV') !== 'production') {
+                    $process = new Process('php artisan migrate:fresh --seed');
+                    $process->setTimeout(600);
+                    $process->run(function ($type, $buffer) {
+                        if (Process::ERR === $type) {
+                            echo 'ERR > '.$buffer;
+                        } else {
+                            echo $buffer;
+                        }
+                    });
+                } else {
+                    $process = new Process('php artisan migrate:fresh --force');
+                    $process->setTimeout(600);
+                    $process->run(function ($type, $buffer) {
+                        if (Process::ERR === $type) {
+                            echo 'ERR > '.$buffer;
+                        } else {
+                            echo $buffer;
+                        }
+                    });
+
+                    $process2 = new Process('php artisan fixtures:up');
+                    $process2->setTimeout(600);
+                    $process2->run(function ($type, $buffer) {
+                        if (Process::ERR === $type) {
+                            echo 'ERR > '.$buffer;
+                        } else {
+                            echo $buffer;
+                        }
+                    });
+                }
 
                 if ($this->updatePatch()) {
                     $paths = $this->updatePaths();
@@ -106,7 +128,15 @@ class InstallNntmux extends Command
                 if (! $error && $this->addAdminUser()) {
                     @file_put_contents(NN_ROOT.'_install/install.lock', '');
                     $this->info('Generating application key');
-                    $this->call('key:generate');
+                    $process = new Process('php artisan key:generate --force');
+                    $process->setTimeout(600);
+                    $process->run(function ($type, $buffer) {
+                        if (Process::ERR === $type) {
+                            echo 'ERR > '.$buffer;
+                        } else {
+                            echo $buffer;
+                        }
+                    });
                     $this->info('NNTmux installation completed successfully');
                     exit();
                 }
@@ -130,8 +160,9 @@ class InstallNntmux extends Command
         if ($patch > 0) {
             $updateSettings = Settings::query()->where(['section' => '', 'subsection' => '', 'name' => 'sqlpatch'])->update(['value' => $patch]);
         }
+
         // If it all worked, continue the install process.
-        if ($updateSettings === 0) {
+        if ($updateSettings !== false) {
             $this->info('Database updated successfully');
 
             return true;

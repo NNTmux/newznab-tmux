@@ -1,4 +1,5 @@
 2018-01-30 DariusIII
+	* Chg: Use fixtures to populate tables when nntmux is in production, adapt install process
 	* Fix: Fix reference to wrong column in dnzb_failures migration foreign key creation
 2018-01-29 DariusIII
 	* Chg: Add fixtures command to artisan, add binaryblacklist fixture

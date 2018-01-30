@@ -12,7 +12,7 @@ class FixturesDown extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'fixtures:down';
 
     /**
      * The console command description.
@@ -36,6 +36,10 @@ class FixturesDown extends Command
      */
     public function handle()
     {
-        FixturesFacade::down();
+        if ($this->confirm('This command will truncate(empty) your tables. Should we continue?')) {
+            FixturesFacade::down();
+        } else {
+            $this->info('Command execution stopped');
+        }
     }
 }

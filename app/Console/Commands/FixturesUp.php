@@ -37,6 +37,7 @@ class FixturesUp extends Command
      */
     public function handle()
     {
+        $this->info('Populating tables...');
         FixturesFacade::up();
     }
 }
