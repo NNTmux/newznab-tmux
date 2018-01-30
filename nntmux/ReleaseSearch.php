@@ -6,9 +6,9 @@ use nntmux\db\DB;
 
 class ReleaseSearch
 {
-    const FULLTEXT = 0;
-    const LIKE = 1;
-    const SPHINX = 2;
+    public const FULLTEXT = 0;
+    public const LIKE = 1;
+    public const SPHINX = 2;
 
     /***
      * @var DB
@@ -28,7 +28,16 @@ class ReleaseSearch
     private $fullTextJoinString;
 
     /**
-     * @param DB $settings
+     * @var string
+     */
+    private $sphinxQueryOpt;
+
+    /**
+     * ReleaseSearch constructor.
+     *
+     * @param \nntmux\db\DB $settings
+     *
+     * @throws \Exception
      */
     public function __construct(DB $settings)
     {
@@ -46,7 +55,7 @@ class ReleaseSearch
         }
 
         $this->sphinxQueryOpt = ';limit=10000;maxmatches=10000;sort=relevance;mode=extended';
-        $this->pdo = ($settings instanceof DB ? $settings : new DB());
+        $this->pdo = $settings instanceof DB ? $settings : new DB();
     }
 
     /**
@@ -104,9 +113,9 @@ class ReleaseSearch
             // At least 1 search term needs to be mandatory.
             $words = explode(' ', (! preg_match('/[+!^]/', $searchString) ? '+' : '').$searchString);
             foreach ($words as $word) {
-                $word = str_replace("'", "\\'", str_replace(['!', '^'], '+', trim($word, "\n\t\r\0\x0B- ")));
+                $word = str_replace(['!', '^', "'"], ['+', '+', "'"], trim($word, "\n\t\r\0\x0B- "));
 
-                if ($word !== '' && $word !== '-' && strlen($word) > 1) {
+                if ($word !== '' && $word !== '-' && \strlen($word) > 1) {
                     $searchWords .= ($word.' ');
                 }
             }
@@ -128,7 +137,7 @@ class ReleaseSearch
      *
      * @return string
      */
-    private function likeSQL()
+    private function likeSQL(): string
     {
         $return = '';
         foreach ($this->searchOptions as $columnName => $searchString) {
@@ -157,7 +166,7 @@ class ReleaseSearch
      *
      * @return string
      */
-    private function sphinxSQL()
+    private function sphinxSQL(): string
     {
         $searchQuery = $fullReturn = '';
 
