@@ -1,4 +1,5 @@
 2018-01-30 DariusIII
+	* Chg: Update .styleci.yml to exclude database/fixtures folder from checks
 	* Chg: Update Tmux and TmuxOutput classes
 	* Fix: Fix missing use statement for Category model in AniDB class
 	* Chg: Use fixtures to populate tables when nntmux is in production, adapt install process
