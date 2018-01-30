@@ -58,7 +58,7 @@ class TmuxOutput extends Tmux
             $buffer .= $this->_getMonitor();
         }
 
-        if ((int)$runVar['settings']['show_query'] === 1) {
+        if ((int) $runVar['settings']['show_query'] === 1) {
             $buffer .= $this->_getQueries();
         }
 
