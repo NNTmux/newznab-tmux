@@ -19,7 +19,7 @@ class CreateDnzbFailuresTable extends Migration {
 			$table->integer('failed')->unsigned()->default(0);
 			$table->primary(['release_id','users_id']);
             $table->foreign('users_id', 'FK_users_df')->references('id')->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->foreign('releases_id', 'FK_df_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
+            $table->foreign('release_id', 'FK_df_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}
 

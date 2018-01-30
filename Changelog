@@ -1,3 +1,5 @@
+2018-01-30 DariusIII
+	* Fix: Fix reference to wrong column in dnzb_failures migration foreign key creation
 2018-01-29 DariusIII
 	* Chg: Add fixtures command to artisan, add binaryblacklist fixture
 	* Chg: Update symfony components, add mayconbordin/l5-fixtures package
