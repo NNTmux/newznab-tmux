@@ -5,6 +5,7 @@ namespace nntmux;
 use App\Models\User;
 use GuzzleHttp\Client;
 use App\Models\Settings;
+use Illuminate\Support\Carbon;
 
 /**
  * Class SABnzbd.
@@ -319,10 +320,10 @@ class SABnzbd
      */
     public function setCookie($host, $apikey, $priority, $apitype)
     {
-        setcookie('sabnzbd_'.$this->uid.'__host', $host, time() + 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__apikey', $apikey, time() + 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__priority', $priority, time() + 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__apitype', $apitype, time() + 2592000);
+        setcookie('sabnzbd_'.$this->uid.'__host', $host, Carbon::now()->addDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apikey', $apikey, Carbon::now()->addDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__priority', $priority, Carbon::now()->addDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apitype', $apitype, Carbon::now()->addDays(30)->timestamp);
     }
 
     /**
@@ -330,9 +331,9 @@ class SABnzbd
      */
     public function unsetCookie()
     {
-        setcookie('sabnzbd_'.$this->uid.'__host', '', time() - 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__apikey', '', time() - 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__priority', '', time() - 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__apitype', '', time() - 2592000);
+        setcookie('sabnzbd_'.$this->uid.'__host', '', Carbon::now()->subDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apikey', '', Carbon::now()->subDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__priority', '', Carbon::now()->subDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apitype', '', Carbon::now()->subDays(30)->timestamp);
     }
 }

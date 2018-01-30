@@ -1,4 +1,5 @@
 2018-01-30 DariusIII
+	* Chg: Use Carbon in SABnzbd class in set and unset cookies
 	* Chg: Update ReleaseSearch class
 	* Chg: Update .styleci.yml to exclude database/fixtures folder from checks
 	* Chg: Update Tmux and TmuxOutput classes
