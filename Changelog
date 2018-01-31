@@ -1,3 +1,5 @@
+2018-01-31 DariusIII
+	* Chg: Update composer.lock
 2018-01-30 DariusIII
 	* Chg: Update laravel/framework to version 5.5.33
 	* Chg: Use Carbon in SABnzbd class in set and unset cookies
