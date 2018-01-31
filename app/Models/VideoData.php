@@ -34,17 +34,5 @@ class VideoData extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-		'releases_id',
-		'containerformat',
-		'overallbitrate',
-		'videoduration',
-		'videoformat',
-		'videocodec',
-		'videowidth',
-		'videoheight',
-		'videoaspect',
-		'videoframerate',
-		'videolibrary',
-	];
+    protected $guarded = [];
 }

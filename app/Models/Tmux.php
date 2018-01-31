@@ -24,7 +24,7 @@ class Tmux extends Model
     /**
      * @var array
      */
-    protected $fillable = ['setting', 'value'];
+    protected $guarded = [];
 
     /**
      * @param string $setting

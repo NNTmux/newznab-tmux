@@ -20,7 +20,7 @@ class UserDownload extends Model
     /**
      * @var array
      */
-    protected $fillable = ['id', 'users_id', 'releases_id', 'hosthash', 'timestamp'];
+    protected $guarded = [];
 
     public function user()
     {
