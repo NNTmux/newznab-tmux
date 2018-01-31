@@ -40,17 +40,17 @@ checks:
 
 filter:
     excluded_paths:
-      - "vendor/"
-      - "libs/"
-      - "resources/"
-      - "storage/"
-      - "public/themes/"
-      - "public/plugins/"
-      - "database/"
-      - "config/"
-      - "bootstrap/"
-      - "docs/"
-      - "tests/"
+      - "vendor/*"
+      - "libs/*"
+      - "resources/*"
+      - "storage/*"
+      - "public/themes/*"
+      - "public/plugins/*"
+      - "database/*"
+      - "config/*"
+      - "bootstrap/*"
+      - "docs/*"
+      - "tests/*"
 tools:
     sensiolabs_security_checker: true
     php_analyzer: true
