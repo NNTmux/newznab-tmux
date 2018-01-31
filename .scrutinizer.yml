@@ -14,7 +14,7 @@ build:
             ini:
                 memory_limit:     "1024M"
     tests:
-        override: [php-scrutinizer-run]
+        override:
             command: 'vendor/bin/phpunit --coverage-clover=coverage'
             coverage:
                 file: 'coverage'
