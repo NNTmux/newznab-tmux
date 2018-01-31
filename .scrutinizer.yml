@@ -15,11 +15,12 @@ build:
                 memory_limit:     "1024M"
     tests:
         override:
-            -
-                command: 'vendor/bin/phpunit --coverage-clover=clover-file'
-                   coverage:
-                       file: 'clover-file'
-                       format: 'clover'
+              -
+                command: 'vendor/bin/phpunit --coverage-clover=coverage_file'
+                coverage:
+                  file: 'coverage_file'
+                  format: 'clover'
+              - command: 'php-scrutinizer-run'
 checks:
     php:
         code_rating: true
