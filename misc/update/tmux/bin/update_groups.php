@@ -2,13 +2,13 @@
 
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use nntmux\NNTP;
+use nntmux\ColorCLI;
 use App\Models\Group;
+use nntmux\ConsoleTools;
 use App\Models\ShortGroup;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use nntmux\NNTP;
-use nntmux\ColorCLI;
-use nntmux\ConsoleTools;
 
 $start = time();
 $consoleTools = new ConsoleTools();

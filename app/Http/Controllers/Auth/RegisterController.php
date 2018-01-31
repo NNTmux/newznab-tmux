@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use nntmux\utility\Utility;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use nntmux\utility\Utility;
 
 class RegisterController extends Controller
 {
