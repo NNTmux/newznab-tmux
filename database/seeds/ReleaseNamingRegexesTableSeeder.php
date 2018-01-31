@@ -10384,7 +10384,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             array (
                 'id' => 1152,
                 'group_regex' => '^alt\\.binaries\\.cores$',
-            'regex' => '/^(?P<match0>.+?) - \\[\\d+/d+] - ".+?" yEnc$/',
+            'regex' => '/^(?P<match0>.+?) - \\[\\d+\\/\\d+] - ".+?" yEnc$/',
                 'status' => 1,
                 'description' => 'Gracepoint S01E04 Episode Four 1080p WEB-DL DD51 H 264 CtrlHD - [52/52] - "Gracepoint S01E04 Episode Four 1080p WEB-DL DD51 H 264 CtrlHD.vol511+021.par2" yEnc',
                 'ordinal' => 110,
@@ -10393,7 +10393,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             array (
                 'id' => 1153,
                 'group_regex' => '^alt\\.binaries\\.howard-stern$',
-            'regex' => '/^.+? \\[\\d+/d+] "(?P<match0>.+?).(mp3|nzb).*?" yEnc$/',
+            'regex' => '/^.+? \\[\\d+\\/\\d+] "(?P<match0>.+?).(mp3|nzb).*?" yEnc$/',
                 'status' => 1,
                 'description' => 'Artie Lange ArtieQuitter Podcast [2/9] "ArtieQuiterPodcast_2015-11-05_161_CF_128k.mp3.par2" yEnc',
                 'ordinal' => 5,

@@ -9213,7 +9213,7 @@ return [
     1151 => [
         'id' => 1152,
         'group_regex' => '^alt\\.binaries\\.cores$',
-        'regex' => '/^(?P<match0>.+?) - \\[\\d+/d+] - ".+?" yEnc$/',
+        'regex' => '/^(?P<match0>.+?) - \\[\\d+\\/\\d+] - ".+?" yEnc$/',
         'status' => 1,
         'description' => 'Gracepoint S01E04 Episode Four 1080p WEB-DL DD51 H 264 CtrlHD - [52/52] - "Gracepoint S01E04 Episode Four 1080p WEB-DL DD51 H 264 CtrlHD.vol511+021.par2" yEnc',
         'ordinal' => 110,
