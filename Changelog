@@ -1,4 +1,5 @@
 2018-01-31 DariusIII
+	* Fix: Fix count of regexes for pager in Regexes class
 	* Chg: Add option to fixtures up/down commands to specifiy which table fixtures to truncate or add
 	* Chg: Update some faulty regexes
 	* Chg: Update composer.lock

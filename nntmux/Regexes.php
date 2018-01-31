@@ -134,7 +134,7 @@ class Regexes
     }
 
     /**
-     * Get the \count of regex in the DB.
+     * Get the count of regex in the DB.
      *
      * @param string $group_regex Optional, keyword to find a group.
      *
@@ -144,13 +144,13 @@ class Regexes
     {
         $query = $this->pdo->queryOneRow(
             sprintf(
-                'SELECT COUNT(id) AS \count FROM %s %s',
+                'SELECT COUNT(id) AS count FROM %s %s',
                 $this->tableName,
                 $this->_groupQueryString($group_regex)
             )
         );
 
-        return (int) $query['\count'];
+        return (int) $query['count'];
     }
 
     /**
