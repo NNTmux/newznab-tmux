@@ -4,6 +4,7 @@
 	{if !$publicview}
 		<li style="vertical-align:text-bottom;"><a href="{$smarty.const.WWW_TOP}/profileedit" class="btn btn-small btn-warning">Edit</a></li>
 	{/if}
+	<li style="vertical-align:text-bottom;"><a class="btn btn-warning confirm_action" href="{$smarty.const.WWW_TOP}profile_delete?id={$user.id}">Delete your account</a></li>
 </ul>
 <table class="data table" width="100%">
 	<tr>

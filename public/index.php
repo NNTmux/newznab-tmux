@@ -51,6 +51,7 @@ switch ($page->page) {
     case 'post_edit':
     case 'profile':
     case 'profileedit':
+    case 'profile_delete':
     case 'queue':
     case 'register':
     case 'sabqueuedata':
