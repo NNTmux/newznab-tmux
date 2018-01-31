@@ -14,6 +14,9 @@ build:
             ini:
                 memory_limit:     "1024M"
     tests:
+        before:
+              - chmod -R 777 storage/
+              - chmod -R 777 bootstrap/cache
         override:
               -
                 command: 'vendor/bin/phpunit --coverage-clover=coverage_file'
