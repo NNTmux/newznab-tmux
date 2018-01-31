@@ -13,14 +13,14 @@ class FixturesUp extends Command
      *
      * @var string
      */
-    protected $signature = 'fixtures:up';
+    protected $signature = 'fixtures:up {type}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Apply database fixtures';
+    protected $description = 'Apply database fixtures to all tables or just to select ones';
 
     /**
      * Create a new command instance.
@@ -38,6 +38,6 @@ class FixturesUp extends Command
     public function handle()
     {
         $this->info('Populating tables...');
-        FixturesFacade::up();
+        FixturesFacade::up($this->argument('type'));
     }
 }
