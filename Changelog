@@ -1,4 +1,5 @@
 2018-02-01 DariusIII
+	* Chg: Update phpunit and symfony components
 	* Chg: Do not allow admins to delete their profiles from profile page
 	* Chg: Add check for users when deleting profile so they do not delete another users profile
 	* Chg: Remove occurences of ROLE_GUEST as that role is removed
