@@ -760,13 +760,12 @@ class User extends Authenticatable
             $storeips = (int) Settings::settingValue('..storeuserips') === 1 ? $host : '';
         }
 
-        return self::query()->insertGetId(
+        return self::create(
             [
                 'username' => $userName,
                 'password' => $password,
                 'email' => $email,
                 'user_roles_id' => $role,
-                'created_at' => Carbon::now(),
                 'host' => $storeips,
                 'rsstoken' => md5(Password::getRepository()->createNewToken()),
                 'invites' => $invites,
@@ -774,7 +773,7 @@ class User extends Authenticatable
                 'userseed' => md5(Utility::generateUuid()),
                 'notes' => $notes,
             ]
-        );
+        )->id;
     }
 
     /**

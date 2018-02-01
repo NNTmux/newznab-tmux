@@ -1,4 +1,5 @@
 2018-02-01 DariusIII
+	* Chg: Use create method when adding users
 	* Chg: Send email to admins so they know user account has been deleted
 	* Chg: Update phpunit and symfony components
 	* Chg: Do not allow admins to delete their profiles from profile page
