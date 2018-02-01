@@ -1,10 +1,12 @@
 <div class="col-md-8">
 <ul class="inline">
 	<li><h2>Profile for {$user.username|escape:"htmlall"}</h2></li>
-	{if !$publicview}
+	{if isset($isadmin) || !$publicview}
 		<li style="vertical-align:text-bottom;"><a href="{$smarty.const.WWW_TOP}/profileedit" class="btn btn-small btn-warning">Edit</a></li>
 	{/if}
-	<li style="vertical-align:text-bottom;"><a class="btn btn-warning confirm_action" href="{$smarty.const.WWW_TOP}profile_delete?id={$user.id}">Delete your account</a></li>
+	{if !isset($isadmin)}
+		<li style="vertical-align:text-bottom;"><a class="btn btn-warning confirm_action" href="{$smarty.const.WWW_TOP}profile_delete?id={$user.id}">Delete your account</a></li>
+	{/if}
 </ul>
 <table class="data table" width="100%">
 	<tr>

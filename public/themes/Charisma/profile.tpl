@@ -243,7 +243,9 @@
 									<a class="btn btn-primary" href="{$smarty.const.WWW_TOP}profileedit">Edit
 										Profile</a>
 								{/if}
-							<a class="btn btn-warning confirm_action" href="{$smarty.const.WWW_TOP}profile_delete?id={$user.id}">Delete your account</a>
+								{if !isset($isadmin)}
+									<a class="btn btn-warning confirm_action" href="{$smarty.const.WWW_TOP}profile_delete?id={$user.id}">Delete your account</a>
+								{/if}
 							</div>
 						</div>
 					</div>
