@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use nntmux\utility\Utility;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
@@ -50,7 +52,7 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'username' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
     }
 
@@ -60,12 +62,15 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \App\Models\User
      */
-    protected function create(array $data)
+    protected function create(array $data): User
     {
         return User::create([
-            'usernamename' => $data['username'],
+            'username' => $data['username'],
             'email' => $data['email'],
-            'password' => bcrypt($data['password']),
+            'password' => User::hashPassword($data['password']),
+            'user_roles_id' => User::ROLE_USER,
+            'rsstoken' => md5(Password::getRepository()->createNewToken()),
+            'userseed' => md5(Utility::generateUuid()),
         ]);
     }
 }

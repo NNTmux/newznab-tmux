@@ -1,5 +1,6 @@
 2018-01-31 DariusIII
 	* Chg: Add option to users to delete their account from profile page
+	* Chg: Various small changes to Models, RegisterController and update_groups.php
 	* Fix: Fix count of regexes for pager in Regexes class
 	* Chg: Add option to fixtures up/down commands to specifiy which table fixtures to truncate or add
 	* Chg: Update some faulty regexes
