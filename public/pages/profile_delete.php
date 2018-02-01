@@ -1,6 +1,9 @@
 <?php
 
+use App\Mail\AccountDeleted;
+use App\Models\Settings;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 if (! User::isLoggedIn()) {
     $page->show403();
@@ -9,6 +12,7 @@ if (! User::isLoggedIn()) {
 $userId = $_GET['id'];
 
 if ($userId !== null && $page->userdata->role->id !== User::ROLE_ADMIN && (int) $userId === User::currentUserId()) {
+    Mail::to(Settings::settingValue('site.main.email'))->send(new AccountDeleted($userId));
     User::logout();
     User::deleteUser($userId);
     header('Location: '.WWW_TOP.'/');
