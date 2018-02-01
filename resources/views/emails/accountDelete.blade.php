@@ -5,5 +5,5 @@
 @endsection
 
 @section('content')
-    {{ $username }} has deleted his/hers account from {{ $site }}.
+    User <b>{{ $username }}</b> has deleted his/hers account from {{ $site }}.
 @endsection
