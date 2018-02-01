@@ -278,6 +278,14 @@ class BasePage
     }
 
     /**
+     * Show 503 page.
+     */
+    public function showBadBoy(): void
+    {
+        die(view('errors.badboy'));
+    }
+
+    /**
      * Show maintenance page.
      */
     public function showMaintenance(): void

@@ -8,8 +8,10 @@ if (! User::isLoggedIn()) {
 
 $userId = $_GET['id'];
 
-if ($userId !== null) {
+if ($userId !== null && (int) $userId === User::currentUserId()) {
     User::logout();
     User::deleteUser($userId);
     header('Location: '.WWW_TOP.'/');
+} else {
+    $page->showBadBoy();
 }
