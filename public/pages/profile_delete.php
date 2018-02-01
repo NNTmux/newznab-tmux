@@ -1,8 +1,8 @@
 <?php
 
-use App\Mail\AccountDeleted;
-use App\Models\Settings;
 use App\Models\User;
+use App\Models\Settings;
+use App\Mail\AccountDeleted;
 use Illuminate\Support\Facades\Mail;
 
 if (! User::isLoggedIn()) {
