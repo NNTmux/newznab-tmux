@@ -30,10 +30,6 @@ class Menu extends Model
     {
         $sql = self::query()->where('role', '<=', $role)->orderBy('ordinal');
 
-        if ($role !== User::ROLE_GUEST) {
-            $sql->where('role', '!=', User::ROLE_GUEST);
-        }
-
         if ($role !== User::ROLE_ADMIN) {
             $sql->where('role', '!=', User::ROLE_ADMIN);
         }

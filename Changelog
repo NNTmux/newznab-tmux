@@ -1,3 +1,5 @@
+2018-02-01 DariusIII
+	* Chg: Remove occurences of ROLE_GUEST as that role is removed
 2018-01-31 DariusIII
 	* Chg: Add option to users to delete their account from profile page
 	* Chg: Various small changes to Models, RegisterController and update_groups.php
