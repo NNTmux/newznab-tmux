@@ -8,10 +8,12 @@ if (! User::isLoggedIn()) {
 
 $userId = $_GET['id'];
 
-if ($userId !== null && (int) $userId === User::currentUserId()) {
+if ($userId !== null && $page->userdata->role->id !== User::ROLE_ADMIN && (int) $userId === User::currentUserId()) {
     User::logout();
     User::deleteUser($userId);
     header('Location: '.WWW_TOP.'/');
+} elseif ($page->userdata->role->id === User::ROLE_ADMIN) {
+    header('Location: '.WWW_TOP.'profile');
 } else {
     $page->showBadBoy();
 }

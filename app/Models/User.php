@@ -546,7 +546,7 @@ class User extends Authenticatable
     {
         $result = self::find($id);
 
-        if (empty($result)) {
+        if ($result === null) {
             return false;
         }
 
