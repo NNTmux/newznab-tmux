@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use nntmux\SphinxSearch;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class ReleaseFile extends Model
