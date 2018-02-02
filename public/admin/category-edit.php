@@ -21,7 +21,7 @@ switch ($action) {
 			if (isset($_GET['id'])) {
 			    $page->title = 'Category Edit';
 			    $id = $_GET['id'];
-			    $cat = Category::getById($id);
+			    $cat = Category::find($id);
 			    $page->smarty->assign('category', $cat);
 			}
 		break;

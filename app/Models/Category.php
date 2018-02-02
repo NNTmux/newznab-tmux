@@ -326,21 +326,6 @@ class Category extends Model
     }
 
     /**
-     * Get a category row by its id.
-     *
-     *
-     * @param $id
-     * @return \Illuminate\Database\Eloquent\Model|null|static
-     */
-    public static function getById($id)
-    {
-        return self::query()
-            ->with('parent')
-            ->where('id', $id)
-            ->first();
-    }
-
-    /**
      * Get multiple categories.
      *
      * @param array $ids

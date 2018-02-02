@@ -1098,7 +1098,7 @@ class Releases
     {
         // Get the category for the parent of this release.
         $currRow = Release::getCatByRelId($currentID);
-        $catRow = Category::getById($currRow['categories_id']);
+        $catRow = Category::find($currRow['categories_id']);
         $parentCat = $catRow['parentid'];
 
         $results = $this->search(

@@ -65,7 +65,7 @@ $page->smarty->assign('pager', $pager);
 if ((int) $category === -1) {
     $page->smarty->assign('catname', 'All');
 } else {
-    $cdata = Category::getById($category);
+    $cdata = Category::find($category);
     if ($cdata) {
         $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
     } else {

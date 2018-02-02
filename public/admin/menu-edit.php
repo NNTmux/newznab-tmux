@@ -37,7 +37,7 @@ switch ($action) {
         ];
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
-            $menuRow = Menu::getById($id);
+            $menuRow = Menu::find($id);
         }
         $page->title = 'Menu Edit';
         $page->smarty->assign('menu', $menuRow);
