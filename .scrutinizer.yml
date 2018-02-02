@@ -12,6 +12,15 @@ filter:
       - "docs/*"
       - "tests/*"
 
+build:
+    tests:
+        override:
+            -
+                command: 'vendor/bin/phpunit --coverage-clover=coverage'
+                coverage:
+                    file: 'coverage'
+                    format: 'clover'
+
 checks:
     php:
         code_rating: true
