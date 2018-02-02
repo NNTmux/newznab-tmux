@@ -47,7 +47,7 @@ class Forumpost extends Model
             self::query()->where('id', $parentId)->increment('replies', 1, ['updated_at' => Carbon::now()]);
         }
 
-        return self::query()->insertGetId(
+        return self::create(
             [
                 'forumid' => 1,
                 'parentid' => $parentId,
@@ -57,10 +57,8 @@ class Forumpost extends Model
                 'locked' => $locked,
                 'sticky' => $sticky,
                 'replies' => $replies,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
             ]
-        );
+        )->id;
     }
 
     /**
