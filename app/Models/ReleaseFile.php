@@ -82,7 +82,6 @@ class ReleaseFile extends Model
      */
     public static function addReleaseFiles($id, $name, $hash = '', $size, $createdTime, $hasPassword): int
     {
-
         $duplicateCheck = self::query()->where('releases_id', $id)->where('name', utf8_encode($name))->first();
 
         if ($duplicateCheck === null) {
