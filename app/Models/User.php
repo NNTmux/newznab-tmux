@@ -529,12 +529,12 @@ class User extends Authenticatable
      */
     public static function getByIdAndRssToken($userID, $rssToken)
     {
-        $user = self::getById($userID);
-        if ($user === false) {
+        $user = self::query()->where('id', '=', $userID, true)->where('rsstoken', '=', $rssToken)->get();
+        if ($user === null) {
             return false;
         }
 
-        return $user->rsstoken !== $rssToken ? false : $user;
+        return $user;
     }
 
     /**
@@ -788,7 +788,7 @@ class User extends Authenticatable
             return true;
         }
         if (isset($_COOKIE['uid'], $_COOKIE['idh'])) {
-            $u = self::getById($_COOKIE['uid']);
+            $u = self::find($_COOKIE['uid']);
 
             if ((int) $u['user_roles_id'] !== self::ROLE_DISABLED && $_COOKIE['idh'] === self::hashSHA1($u['userseed'].$_COOKIE['uid'])) {
                 self::login($_COOKIE['uid'], $_SERVER['REMOTE_ADDR']);
@@ -845,7 +845,7 @@ class User extends Authenticatable
      */
     public static function setCookies($userID): void
     {
-        $user = self::getById($userID);
+        $user = self::find($userID);
         $secure_cookie = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? '1' : '0');
         setcookie('uid', $userID, time() + 2592000, '/', null, $secure_cookie, true);
         setcookie('idh', self::hashSHA1($user['userseed'].$userID), time() + 2592000, '/', null, $secure_cookie, true);

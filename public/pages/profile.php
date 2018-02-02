@@ -41,7 +41,7 @@ if ($privileged || ! $privateProfiles) {
 $downloadlist = UserDownload::getDownloadRequestsForUser($userID);
 $page->smarty->assign('downloadlist', $downloadlist);
 
-$data = User::getById($userID);
+$data = User::find($userID);
 if (! $data) {
     $page->show404();
 }
@@ -56,7 +56,7 @@ $page->smarty->assign(
     [
         'apirequests'       => UserRequest::getApiRequests($userID),
         'grabstoday'        => UserDownload::getDownloadRequests($userID),
-        'userinvitedby'     => $data['invitedby'] !== '' ? User::getById($data['invitedby']) : '',
+        'userinvitedby'     => $data['invitedby'] !== '' ? User::find($data['invitedby']) : '',
         'user'              => $data,
         'privateprofiles'   => $privateProfiles,
         'publicview'        => $publicView,

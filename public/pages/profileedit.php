@@ -18,7 +18,7 @@ if (! User::isLoggedIn()) {
 $action = $_REQUEST['action'] ?? 'view';
 
 $userid = User::currentUserId();
-$data = User::getById($userid);
+$data = User::find($userid);
 if (! $data) {
     $page->show404();
 }

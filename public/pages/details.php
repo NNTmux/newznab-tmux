@@ -28,7 +28,7 @@ if (isset($_GET['id'])) {
     $releases = new Releases(['Settings' => $page->settings]);
     $re = new ReleaseExtra;
     $data = Release::getByGuid($_GET['id']);
-    $user = User::getById(User::currentUserId());
+    $user = User::find(User::currentUserId());
     $cpapi = $user['cp_api'];
     $cpurl = $user['cp_url'];
     $releaseRegex = ReleaseRegex::query()->where('releases_id', '=', $data['id'])->first();

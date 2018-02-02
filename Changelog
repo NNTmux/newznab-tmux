@@ -1,3 +1,5 @@
+2018-02-02 DariusIII
+	* Chg: Use replace getById user lookup with User model find built in function(does the same thing as custom function)
 2018-02-01 DariusIII
 	* Chg: Update sebastian/comparator to latest version
 	* Chg: Use create method when adding users

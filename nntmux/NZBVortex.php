@@ -86,7 +86,7 @@ final class NZBVortex
             $page = new Page;
 
             $host = $page->serverurl;
-            $data = User::getById(User::currentUserId());
+            $data = User::find(User::currentUserId());
             $url = sprintf('%sgetnzb/%s.nzb&i=%s&r=%s', $host, $nzb, $data['id'], $data['rsstoken']);
 
             $params = [
@@ -248,7 +248,7 @@ final class NZBVortex
      */
     protected function login()
     {
-        $data = User::getById(User::currentUserId());
+        $data = User::find(User::currentUserId());
         $cnonce = generateUuid();
         $hash = hash('sha256', sprintf('%s:%s:%s', $this->nonce, $cnonce, $data['nzbvortex_api_key']), true);
         $hash = base64_encode($hash);
@@ -261,11 +261,11 @@ final class NZBVortex
 
         $response = $this->sendRequest('auth/login', $params);
 
-        if ('successful' == $response['loginResult']) {
+        if ('successful' === $response['loginResult']) {
             $this->session = $response['sessionID'];
         }
 
-        if ('failed' == $response['loginResult']) {
+        if ('failed' === $response['loginResult']) {
         }
     }
 
@@ -280,7 +280,7 @@ final class NZBVortex
      */
     protected function sendRequest($path, $params = [])
     {
-        $data = User::getById(User::currentUserId());
+        $data = User::find(User::currentUserId());
 
         $url = sprintf('%s/api', $data['nzbvortex_server_url']);
         $params = http_build_query($params);

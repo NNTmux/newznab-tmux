@@ -114,7 +114,7 @@ switch ($action) {
     if (isset($_GET['id'])) {
         $page->title = 'User Edit';
         $id = $_GET['id'];
-        $user = User::getById($id);
+        $user = User::find($id);
 
         $page->smarty->assign('user', $user);
     }

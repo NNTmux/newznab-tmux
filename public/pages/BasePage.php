@@ -334,9 +334,12 @@ class BasePage
         $this->smarty->display($this->page_template);
     }
 
+    /**
+     * @throws \Exception
+     */
     protected function setUserPreferences(): void
     {
-        $this->userdata = User::getById(User::currentUserId());
+        $this->userdata = User::find(User::currentUserId());
         $this->userdata['categoryexclusions'] = User::getCategoryExclusion(User::currentUserId());
         $this->userdata['rolecategoryexclusions'] = RoleExcludedCategory::getRoleCategoryExclusion($this->userdata['user_roles_id']);
 

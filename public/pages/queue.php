@@ -9,7 +9,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$userData = User::getById(User::currentUserId());
+$userData = User::find(User::currentUserId());
 if (! $userData) {
     $page->show404();
 }

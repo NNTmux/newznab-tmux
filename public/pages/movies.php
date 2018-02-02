@@ -21,7 +21,7 @@ if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
     $category = $_REQUEST['t'] + 0;
 }
 
-$user = User::getById(User::currentUserId());
+$user = User::find(User::currentUserId());
 $cpapi = $user['cp_api'];
 $cpurl = $user['cp_url'];
 $page->smarty->assign('cpapi', $cpapi);

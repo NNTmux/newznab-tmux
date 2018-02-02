@@ -12,8 +12,8 @@ if (empty($_GET['id'])) {
     $page->show404();
 }
 
-$user = User::getById(User::currentUserId());
-if ($user['queuetype'] != 2) {
+$user = User::find(User::currentUserId());
+if ((int) $user['queuetype'] !== 2) {
     $sab = new SABnzbd($page);
     if (empty($sab->url)) {
         $page->show404();
@@ -22,7 +22,7 @@ if ($user['queuetype'] != 2) {
         $page->show404();
     }
     $sab->sendToSab($_GET['id']);
-} elseif ($user['queuetype'] == 2) {
+} elseif ((int) $user['queuetype'] === 2) {
     $nzbget = new NZBGet($page);
     $nzbget->sendURLToNZBGet($_GET['id']);
 }
