@@ -155,6 +155,7 @@
     "filp/whoops": "~2.0",
     "fzaninotto/faker": "~1.4",
     "mockery/mockery": "0.9.*",
+    "nunomaduro/collision": "^1.1",
     "orangehill/iseed": "^2.5",
     "phpunit/phpunit": "^6.5",
     "xethron/migrations-generator": "^2.0"

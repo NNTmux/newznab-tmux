@@ -1,4 +1,5 @@
 2018-02-02 DariusIII
+	* Chg: Add nunomaduro/collision for console debugging in dev environment
 	* Chg: Change addReleaseFiles function return logic
 	* Chg: Replace insertGetId method with Model::create
 	* Chg: Replace all of getById functions with Model::find
