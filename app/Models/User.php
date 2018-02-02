@@ -529,28 +529,12 @@ class User extends Authenticatable
      */
     public static function getByIdAndRssToken($userID, $rssToken)
     {
-        $user = self::query()->where('id', '=', $userID, true)->where('rsstoken', '=', $rssToken)->get();
+        $user = self::query()->where(['id' => $userID, 'rsstoken' => $rssToken])->first();
         if ($user === null) {
             return false;
         }
 
-        return $user;
-    }
-
-    /**
-     * @param $id
-     *
-     * @return array|bool
-     */
-    public static function getById($id)
-    {
-        $result = self::find($id);
-
-        if ($result === null) {
-            return false;
-        }
-
-        return $result;
+        return $user->toArray();
     }
 
     /**
