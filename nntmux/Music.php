@@ -483,7 +483,7 @@ class Music
             if (\in_array(strtolower($genreName), $genreassoc, false)) {
                 $genreKey = array_search(strtolower($genreName), $genreassoc, false);
             } else {
-                $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
+                $genreKey = Genre::create(['title' => $genreName, 'type' => Genres::MUSIC_TYPE])->id;
             }
         }
         $mus['musicgenre'] = $genreName;
@@ -491,7 +491,7 @@ class Music
 
         $check = MusicInfo::query()->where('asin', $mus['asin'])->first(['id']);
         if ($check === null) {
-            $musicId = MusicInfo::query()->insertGetId(
+            $musicId = MusicInfo::create(
                 [
                     'title' => $mus['title'],
                     'asin' =>$mus['asin'],
@@ -505,10 +505,8 @@ class Music
                     'genres_id' => (int) $mus['musicgenres_id'] === -1 ? 'null' : $mus['musicgenres_id'],
                     'tracks' => $mus['tracks'],
                     'cover' => $mus['cover'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
                 ]
-            );
+            )->id;
         } else {
             $musicId = $check['id'];
             MusicInfo::query()->where('id', $musicId)->update(

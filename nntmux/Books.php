@@ -630,7 +630,7 @@ class Books
 
         $check = BookInfo::query()->where('asin', $book['asin'])->first();
         if ($check === null) {
-            $bookId = BookInfo::query()->insertGetId(
+            $bookId = BookInfo::create(
                 [
                     'title' => $book['title'],
                     'author' => $book['author'],
@@ -645,10 +645,8 @@ class Books
                     'overview' =>$book['overview'],
                     'genre' => $book['genre'],
                     'cover' => $book['cover'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
                 ]
-            );
+            )->id;
         } else {
             if ($check !== null) {
                 $bookId = $check['id'];

@@ -88,16 +88,15 @@ class ReleaseFile extends Model
         $duplicateCheck = self::query()->where('releases_id', $id)->where('name', utf8_encode($name))->first();
 
         if ($duplicateCheck === null) {
-            $insert = self::query()->insertGetId(
+            $insert = self::create(
                 [
                     'releases_id' => $id,
                     'name' => utf8_encode($name),
                     'size' => $size,
                     'created_at' => $createdTime,
-                    'updated_at' => Carbon::now(),
                     'passworded' => $hasPassword,
                 ]
-            );
+            )->id;
 
             if (\strlen($hash) === 32) {
                 ParHash::insertIgnore(['releases_id' => $id, 'hash' => $hash]);

@@ -42,13 +42,12 @@ class UsersRelease extends Model
      */
     public static function addCart($uid, $releaseid): int
     {
-        return self::query()->insertGetId(
+        return self::create(
             [
                 'users_id' => $uid,
                 'releases_id' => $releaseid,
-                'created_at' => Carbon::now(),
             ]
-        );
+        )->id;
     }
 
     /**

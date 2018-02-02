@@ -36,7 +36,7 @@ class Invitation extends Model
      */
     public static function addInvite(int $uid, string $inviteToken)
     {
-        self::query()->insertGetId(['guid' => $inviteToken, 'users_id' => $uid, 'created_at' => Carbon::now()]);
+        self::create(['guid' => $inviteToken, 'users_id' => $uid]);
     }
 
     /**

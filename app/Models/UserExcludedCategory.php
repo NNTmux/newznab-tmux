@@ -50,7 +50,7 @@ class UserExcludedCategory extends Model
         self::delUserCategoryExclusions($uid);
         if (\count($catids) > 0) {
             foreach ($catids as $catid) {
-                self::query()->insertGetId(['users_id' => $uid, 'categories_id' => $catid, 'created_at' => Carbon::now()]);
+                self::create(['users_id' => $uid, 'categories_id' => $catid]);
             }
         }
     }

@@ -73,7 +73,7 @@ class UserRole extends Model
      */
     public static function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $hideads, $donation, $addYear): int
     {
-        return self::query()->insertGetId(
+        return self::create(
             [
                 'name' => $name,
                 'apirequests' => $apirequests,
@@ -84,7 +84,7 @@ class UserRole extends Model
                 'donation' => $donation,
                 'addyears' => $addYear,
             ]
-        );
+        )->id;
     }
 
     /**

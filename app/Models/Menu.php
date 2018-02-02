@@ -81,7 +81,7 @@ class Menu extends Model
      */
     public static function addMenu($menu)
     {
-        return self::query()->insertGetId(
+        return self::create(
             [
                 'href' => $menu['href'],
                 'title' => $menu['title'],
@@ -91,7 +91,7 @@ class Menu extends Model
                 'menueval' => $menu['menueval'],
                 'newwindow' => $menu['newwindow'],
             ]
-        );
+        )->id;
     }
 
     /**

@@ -227,7 +227,7 @@ abstract class TV extends Videos
 
         if ($videoId === null) {
             // Insert the Show
-            $videoId = Video::query()->insertGetId(
+            $videoId = Video::create(
                 [
                     'type' => $show['type'],
                     'title' => $show['title'],
@@ -241,7 +241,7 @@ abstract class TV extends Videos
                     'imdb' => $show['imdb'],
                     'tmdb' => $show['tmdb'],
                 ]
-            );
+            )->id;
             // Insert the supplementary show info
             TvInfo::query()
                 ->insert(

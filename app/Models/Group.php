@@ -281,7 +281,7 @@ class Group extends Model
      */
     public static function addGroup($group): bool
     {
-        return self::query()->insertGetId(
+        return self::create(
             [
                 'name' => trim($group['name']),
                 'description' => isset($group['description']) ? trim($group['description']) : '',
@@ -293,7 +293,7 @@ class Group extends Model
                 'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ? null : $group['minsizetoformrelease'],
                 'minfilestoformrelease' => $group['minfilestoformrelease'] === '' ? null : $group['minfilestoformrelease'],
             ]
-        );
+        )->id;
     }
 
     /**

@@ -46,7 +46,7 @@ class RoleExcludedCategory extends Model
         self::delRoleCategoryExclusions($role);
         if (\count($catids) > 0) {
             foreach ($catids as $catid) {
-                self::query()->insertGetId(['user_roles_id' => $role, 'categories_id' => $catid, 'created_at' => Carbon::now()]);
+                self::create(['user_roles_id' => $role, 'categories_id' => $catid]);
             }
         }
     }

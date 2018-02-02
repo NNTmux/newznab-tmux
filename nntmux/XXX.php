@@ -440,7 +440,7 @@ class XXX
     {
         $res = '';
         if ($genre !== null) {
-            $res = Genre::query()->insertGetId(['title' => $genre, 'type' => Category::XXX_ROOT, 'disabled' => 0]);
+            $res = Genre::create(['title' => $genre, 'type' => Category::XXX_ROOT, 'disabled' => 0]);
         }
 
         return $res;
@@ -598,7 +598,7 @@ class XXX
 
         // Insert New XXX Information
         if ($check === null) {
-            $xxxID = XxxInfo::query()->insertGetId(
+            $xxxID = XxxInfo::create(
                 [
                     'title' => $mov['title'],
                     'tagline' => $mov['tagline'],
@@ -612,7 +612,7 @@ class XXX
                     'directurl' => $mov['directurl'],
                     'classused' => $mov['classused'],
                 ]
-            );
+            )->id;
             // Update BoxCover.
             if (! empty($mov['cover'])) {
                 $cover = $this->releaseImage->saveImage($xxxID.'-cover', $mov['cover'], $this->imgSavePath);
