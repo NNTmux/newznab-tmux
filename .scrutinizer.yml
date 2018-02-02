@@ -1,9 +1,19 @@
+filter:
+    excluded_paths:
+      - "vendor/*"
+      - "libs/*"
+      - "resources/*"
+      - "storage/*"
+      - "public/themes/*"
+      - "public/plugins/*"
+      - "database/*"
+      - "config/*"
+      - "bootstrap/*"
+      - "docs/*"
+      - "tests/*"
+
 build:
     dependencies:
-        # Overwrites inferred commands
-        override:
-          - composer install --prefer-source
-
         before:
           - cp .env.scrutinizer .env
     environment:
@@ -16,14 +26,13 @@ build:
     tests:
         before:
               - chmod -R 777 storage/
-              - chmod -R 777 bootstrap/cache
+              - chmod -R 777 bootstrap/cache/
         override:
               -
                 command: 'vendor/bin/phpunit --coverage-clover=coverage_file'
                 coverage:
                   file: 'coverage_file'
                   format: 'clover'
-              - command: 'php-scrutinizer-run'
 checks:
     php:
         code_rating: true
@@ -41,19 +50,6 @@ checks:
         fix_identation_4spaces: true
         fix_doc_comments: true
 
-filter:
-    excluded_paths:
-      - "vendor/*"
-      - "libs/*"
-      - "resources/*"
-      - "storage/*"
-      - "public/themes/*"
-      - "public/plugins/*"
-      - "database/*"
-      - "config/*"
-      - "bootstrap/*"
-      - "docs/*"
-      - "tests/*"
 tools:
     sensiolabs_security_checker: true
     php_analyzer: true
