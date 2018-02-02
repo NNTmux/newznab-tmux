@@ -71,12 +71,13 @@ class ReleaseFile extends Model
      * Add new files for a release ID.
      *
      *
-     * @param $id
-     * @param $name
+     * @param        $id
+     * @param        $name
      * @param string $hash
-     * @param $size
-     * @param $createdTime
-     * @param $hasPassword
+     * @param        $size
+     * @param        $createdTime
+     * @param        $hasPassword
+     *
      * @return int
      * @throws \Exception
      */
