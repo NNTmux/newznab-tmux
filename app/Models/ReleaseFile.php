@@ -82,7 +82,6 @@ class ReleaseFile extends Model
      */
     public static function addReleaseFiles($id, $name, $hash = '', $size, $createdTime, $hasPassword): int
     {
-        $insert = 0;
 
         $duplicateCheck = self::query()->where('releases_id', $id)->where('name', utf8_encode($name))->first();
 
@@ -103,6 +102,6 @@ class ReleaseFile extends Model
             (new SphinxSearch())->updateRelease($id);
         }
 
-        return $insert;
+        return $insert ?? 0;
     }
 }
