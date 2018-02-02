@@ -12,27 +12,6 @@ filter:
       - "docs/*"
       - "tests/*"
 
-build:
-    dependencies:
-        before:
-          - cp .env.scrutinizer .env
-    environment:
-        redis: true
-        mysql: 5.7
-        php:
-            version: '7.2.0'
-            ini:
-                memory_limit:     "1024M"
-    tests:
-        before:
-              - chmod -R 777 storage/
-              - chmod -R 777 bootstrap/cache/
-        override:
-              -
-                command: 'vendor/bin/phpunit --coverage-clover=coverage_file'
-                coverage:
-                  file: 'coverage_file'
-                  format: 'clover'
 checks:
     php:
         code_rating: true
