@@ -529,7 +529,7 @@ class User extends Authenticatable
             return false;
         }
 
-        return $user->toArray();
+        return $user;
     }
 
     /**
