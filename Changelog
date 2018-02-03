@@ -1,3 +1,5 @@
+2018-02-03 DariusIII
+	* Fix: Remove hidden column declaration in User model that caused errors in getnzb and rss
 2018-02-02 DariusIII
 	* Chg: Update phpunit.xml
 	* Chg: Add nunomaduro/collision for console debugging in dev environment

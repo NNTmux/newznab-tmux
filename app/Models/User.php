@@ -54,11 +54,6 @@ class User extends Authenticatable
     protected $guarded = [];
 
     /**
-     * @var array
-     */
-    protected $hidden = ['password', 'rsstoken'];
-
-    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function role()
