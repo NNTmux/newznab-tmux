@@ -308,10 +308,7 @@
 
 				<dt>Files</dt>
 				<dd><a title="View file list" href="{$smarty.const.WWW_TOP}/filelist/{$release.guid}">{$release.totalpart}</a> <i class="fa fa-file"></i></dd>
-
-				{if $releasefiles|@count > 0}
-
-					<dt>Rar Contains</dt>
+				<dt>Rar Contains</dt>
 					<dd>
 						<table style="width:100%;" class="innerdata highlight table tabel-striped">
 							<tr>
@@ -330,7 +327,6 @@
 							{/foreach}
 						</table>
 					</dd>
-				{/if}
 				<dl>
 					<dt> Grabs</dt>
 					<dd>{$release.grabs}

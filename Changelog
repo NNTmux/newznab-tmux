@@ -1,3 +1,5 @@
+2018-02-04 DariusIII
+	* Fix: Fix error on details page in Gamma theme
 2018-02-03 DariusIII
 	* Fix: Remove hidden column declaration in User model that caused errors in getnzb and rss
 2018-02-02 DariusIII
