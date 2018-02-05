@@ -1,16 +1,16 @@
 <?php
 
-use nntmux\Groups;
-use nntmux\Category;
+use App\Models\User;
 use nntmux\Releases;
+use App\Models\Group;
+use App\Models\Category;
 use nntmux\ReleaseSearch;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$groups = new Groups(['Settings' => $page->settings]);
-$releases = new Releases(['Groups' => $groups, 'Settings' => $page->settings]);
+$releases = new Releases(['Groups' => null, 'Settings' => $page->settings]);
 
 $page->meta_title = 'Search Nzbs';
 $page->meta_keywords = 'search,nzb,description,details';
@@ -82,7 +82,7 @@ if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && ! isset($_REQUEST
     $page->smarty->assign(
         [
             'lastvisit' => $page->userdata['lastlogin'],
-            'pagertotalitems' => (count($results) > 0 ? $results[0]['_totalrows'] : 0),
+            'pagertotalitems' => \count($results) > 0 ? $results[0]['_totalrows'] : 0,
             'pageroffset' => $offset,
             'pageritemsperpage' => ITEMS_PER_PAGE,
             'pagerquerysuffix' => '#results',
@@ -150,7 +150,7 @@ if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQU
     $page->smarty->assign(
         [
             'lastvisit' => $page->userdata['lastlogin'],
-            'pagertotalitems' => count($results) > 0 ? $results[0]['_totalrows'] : 0,
+            'pagertotalitems' => \count($results) > 0 ? $results[0]['_totalrows'] : 0,
             'pageroffset' => $offset,
             'pageritemsperpage' => ITEMS_PER_PAGE,
             'pagerquerysuffix' => '#results',
@@ -159,9 +159,6 @@ if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQU
     );
 }
 
-$ft1 = $page->pdo->checkIndex('releases', 'ix_releases_name_searchname_ft');
-$ft2 = $page->pdo->checkIndex('releases', 'ix_releases_name_ft');
-$ft3 = $page->pdo->checkIndex('releases', 'ix_releases_searchname_ft');
 switch (NN_RELEASE_SEARCH_TYPE) {
     case ReleaseSearch::FULLTEXT:
         $search_description =
@@ -201,8 +198,8 @@ $page->smarty->assign(
             6  => '3GB', 7  => '4GB', 8  => '8GB', 9  => '16GB', 10 => '32GB', 11 => '64GB',
         ],
         'results' => $results, 'sadvanced' => $searchType !== 'basic',
-        'grouplist' => $groups->getGroupsForSelect(),
-        'catlist' => (new Category(['Settings' => $page->settings]))->getForSelect(),
+        'grouplist' => Group::getGroupsForSelect(),
+        'catlist' => Category::getForSelect(),
         'search_description' => $search_description,
         'pager' => $page->smarty->fetch('pager.tpl'),
     ]

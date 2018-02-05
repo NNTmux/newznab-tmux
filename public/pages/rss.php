@@ -1,23 +1,20 @@
 <?php
 
-use nntmux\Category;
+use App\Models\User;
 use nntmux\http\RSS;
+use App\Models\Category;
 use App\Models\Settings;
+use App\Models\UserRequest;
 use nntmux\utility\Utility;
 
-$category = new Category(['Settings' => $page->settings]);
 $rss = new RSS(['Settings' => $page->settings]);
 $offset = 0;
 
 // If no content id provided then show user the rss selection page.
 if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
     // User has to either be logged in, or using rsskey.
-    if (! $page->users->isLoggedIn()) {
-        if ((int) Settings::settingValue('..registerstatus') !== Settings::REGISTER_STATUS_API_ONLY) {
-            Utility::showApiError(100);
-        } else {
-            header('Location: '.Settings::settingValue('site.main.code'));
-        }
+    if (! User::isLoggedIn()) {
+        header('Location: '.Settings::settingValue('site.main.code'));
     }
 
     $page->title = 'Rss Info';
@@ -42,8 +39,8 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
 
     $page->smarty->assign(
         [
-            'categorylist'       => $category->getCategories(true, $page->userdata['categoryexclusions']),
-            'parentcategorylist' => $category->getForMenu($page->userdata['categoryexclusions']),
+            'categorylist'       => Category::getCategories(true, $page->userdata['categoryexclusions']),
+            'parentcategorylist' => Category::getForMenu($page->userdata['categoryexclusions']),
         ]
     );
 
@@ -52,20 +49,16 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
 } else {
     $rssToken = $uid = -1;
     // User requested a feed, ensure either logged in or passing a valid token.
-    if ($page->users->isLoggedIn()) {
+    if (User::isLoggedIn()) {
         $uid = $page->userdata['id'];
         $rssToken = $page->userdata['rsstoken'];
         $maxRequests = $page->userdata->role->apirequests;
     } else {
-        if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
-            $res = $page->users->getById(0);
-        } else {
-            if (! isset($_GET['i']) || ! isset($_GET['r'])) {
-                Utility::showApiError(100, 'Both the User ID and API key are required for viewing the RSS!');
-            }
-
-            $res = $page->users->getByIdAndRssToken($_GET['i'], $_GET['r']);
+        if (! isset($_GET['i']) || ! isset($_GET['r'])) {
+            Utility::showApiError(100, 'Both the User ID and API key are required for viewing the RSS!');
         }
+
+        $res = User::getByIdAndRssToken($_GET['i'], $_GET['r']);
 
         if (! $res) {
             Utility::showApiError(100);
@@ -76,15 +69,15 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
         $maxRequests = $res->role->apirequests;
         $username = $res['username'];
 
-        if ($page->users->isDisabled($username)) {
+        if (User::isDisabled($username)) {
             Utility::showApiError(101);
         }
     }
 
-    if ($page->users->getApiRequests($uid) > $maxRequests) {
+    if (UserRequest::getApiRequests($uid) > $maxRequests) {
         Utility::showApiError(500, 'You have reached your daily limit for API requests!');
     } else {
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
     }
 
     // Valid or logged in user, get them the requested feed.
@@ -111,9 +104,9 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
         ];
 
     if ((int) $userCat === -3) {
-        $relData = $rss->getShowsRss($userNum, $uid, $page->users->getCategoryExclusion($uid), $userAirDate);
+        $relData = $rss->getShowsRss($userNum, $uid, User::getCategoryExclusion($uid), $userAirDate);
     } elseif ((int) $userCat === -4) {
-        $relData = $rss->getMyMoviesRss($userNum, $uid, $page->users->getCategoryExclusion($uid));
+        $relData = $rss->getMyMoviesRss($userNum, $uid, User::getCategoryExclusion($uid));
     } else {
         $relData = $rss->getRss(explode(',', $userCat), $userNum, $userShow, $userAnidb, $uid, $userAirDate);
     }

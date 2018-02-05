@@ -4,7 +4,7 @@
 <div id="content">
 	<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
 		<li class="active"><a href="#info" data-toggle="tab">Info</a></li>
-		{if $reVideo.releases_id|@count > 0 || $reAudio|@count > 0}
+		{if $reVideo != false || $reAudio != false}
 			<li><a href="#mediainfo" data-toggle="tab">Media info</a></li>
 		{/if}
 		{if $release.jpgstatus == 1 && $userdata.canpreview == 1}
@@ -84,7 +84,7 @@
 					<dd><strong>{if $movie.rating == ''}N/A{/if}{$movie.rating}/10</strong></dd>
 					{if !empty($movie.rtrating)}
 					<dt>RottenTomatoes score</dt>
-						<dd>{if $movie.rtrating} == ''} N/A{/if}{$movie.rtrating}</dd>
+						<dd>{$movie.rtrating}</dd>
 					{/if}
 					{if $movie.tagline != ''}
 						<dt>Tagline</dt>
@@ -308,10 +308,7 @@
 
 				<dt>Files</dt>
 				<dd><a title="View file list" href="{$smarty.const.WWW_TOP}/filelist/{$release.guid}">{$release.totalpart}</a> <i class="fa fa-file"></i></dd>
-
-				{if $releasefiles|@count > 0}
-
-					<dt>Rar Contains</dt>
+				<dt>Rar Contains</dt>
 					<dd>
 						<table style="width:100%;" class="innerdata highlight table tabel-striped">
 							<tr>
@@ -330,7 +327,6 @@
 							{/foreach}
 						</table>
 					</dd>
-				{/if}
 				<dl>
 					<dt> Grabs</dt>
 					<dd>{$release.grabs}
@@ -399,7 +395,7 @@
 			</dl>
 		</div>
 		<div class="tab-pane" id="mediainfo">
-			{if $reVideo.releases_id|@count > 0 || $reAudio|@count > 0}
+			{if $reVideo != false || $reAudio != false}
 				<td style="padding:0;">
 					<table style="width:100%;" class="innerdata highlight table">
 						<tr>

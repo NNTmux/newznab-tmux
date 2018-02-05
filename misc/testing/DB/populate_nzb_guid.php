@@ -26,7 +26,7 @@ if (isset($argv[1])) {
 function create_guids($live, $delete = false)
 {
     $pdo = new DB();
-    $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
+    $consoletools = new ConsoleTools();
     $timestart = time();
     $relcount = $deleted = $total = 0;
 
@@ -42,8 +42,8 @@ function create_guids($live, $delete = false)
     if ($total > 0) {
         echo $pdo->log->header('Creating nzb_guids for '.number_format($total).' releases.');
         $releases = new Releases(['Settings' => $pdo]);
-        $nzb = new NZB($pdo);
-        $releaseImage = new ReleaseImage($pdo);
+        $nzb = new NZB();
+        $releaseImage = new ReleaseImage();
         $reccnt = 0;
         if ($relrecs instanceof \Traversable) {
             foreach ($relrecs as $relrec) {

@@ -6,11 +6,11 @@ use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
-use Carbon\Carbon;
 use App\Models\Tmux;
 use nntmux\ColorCLI;
-use nntmux\RequestID;
+use App\Models\Release;
 use App\Models\Settings;
+use Illuminate\Support\Carbon;
 use nntmux\processing\PostProcess;
 
 /**
@@ -23,9 +23,9 @@ use nntmux\processing\PostProcess;
  */
 class Forking extends \fork_daemon
 {
-    const OUTPUT_NONE = 0; // Don't display child output.
-    const OUTPUT_REALTIME = 1; // Display child output in real time.
-    const OUTPUT_SERIALLY = 2; // Display child output when child is done.
+    private const OUTPUT_NONE = 0; // Don't display child output.
+    private const OUTPUT_REALTIME = 1; // Display child output in real time.
+    private const OUTPUT_SERIALLY = 2; // Display child output when child is done.
 
     /**
      * @var \nntmux\ColorCLI
@@ -92,6 +92,26 @@ class Forking extends \fork_daemon
     public $pdo;
 
     /**
+     * @var int
+     */
+    protected $maxSize;
+
+    /**
+     * @var int
+     */
+    protected $minSize;
+
+    /**
+     * @var int
+     */
+    protected $maxRetries;
+
+    /**
+     * @var int
+     */
+    protected $dummy;
+
+    /**
      * @var bool
      */
     private $processAdditional = false; // Should we process additional?
@@ -101,6 +121,8 @@ class Forking extends \fork_daemon
 
     /**
      * Setup required parent / self vars.
+     *
+     * @throws \Exception
      */
     public function __construct()
     {
@@ -110,16 +132,16 @@ class Forking extends \fork_daemon
 
         $this->register_logging(
             [0 => $this, 1 => 'logger'],
-            (defined('NN_MULTIPROCESSING_LOG_TYPE') ? NN_MULTIPROCESSING_LOG_TYPE : \fork_daemon::LOG_LEVEL_INFO)
+            (\defined('NN_MULTIPROCESSING_LOG_TYPE') ? NN_MULTIPROCESSING_LOG_TYPE : \fork_daemon::LOG_LEVEL_INFO)
         );
 
-        if (defined('NN_MULTIPROCESSING_MAX_CHILD_WORK')) {
+        if (\defined('NN_MULTIPROCESSING_MAX_CHILD_WORK')) {
             $this->max_work_per_child_set(NN_MULTIPROCESSING_MAX_CHILD_WORK);
         } else {
             $this->max_work_per_child_set(1);
         }
 
-        if (defined('NN_MULTIPROCESSING_MAX_CHILD_TIME')) {
+        if (\defined('NN_MULTIPROCESSING_MAX_CHILD_TIME')) {
             $this->child_max_run_time_set(NN_MULTIPROCESSING_MAX_CHILD_TIME);
         } else {
             $this->child_max_run_time_set(1800);
@@ -128,7 +150,7 @@ class Forking extends \fork_daemon
         // Use a single exit method for all children, makes things easier.
         $this->register_parent_child_exit([0 => $this, 1 => 'childExit']);
 
-        if (defined('NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE')) {
+        if (\defined('NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE')) {
             switch (NN_MULTIPROCESSING_CHILD_OUTPUT_TYPE) {
                 case 0:
                     $this->outputType = self::OUTPUT_NONE;
@@ -147,6 +169,11 @@ class Forking extends \fork_daemon
         }
 
         $this->dnr_path = PHP_BINARY.' '.NN_MULTIPROCESSING.'.do_not_run'.DS.'switch.php "php  ';
+
+        $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
+        $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
+        $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : Nfo::NFO_UNPROC;
+        $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
     }
 
     /**
@@ -156,7 +183,6 @@ class Forking extends \fork_daemon
      * @param string $type The type of multiProcessing to do : backfill, binaries, releases, postprocess
      * @param array $options Array containing arguments for the type of work.
      *
-     * @throws ForkingException
      * @throws \Exception
      */
     public function processWorkType($type, array $options = [])
@@ -257,10 +283,6 @@ class Forking extends \fork_daemon
                 $maxProcesses = $this->postProcessTvMainMethod();
                 break;
 
-            case 'request_id':
-                $maxProcesses = $this->requestIDMainMethod();
-                break;
-
             case 'safe_backfill':
                 $maxProcesses = $this->safeBackfillMainMethod();
                 break;
@@ -282,7 +304,7 @@ class Forking extends \fork_daemon
      */
     private function processWork()
     {
-        $this->_workCount = count($this->work);
+        $this->_workCount = \count($this->work);
         if ($this->_workCount > 0) {
             if (NN_ECHOCLI) {
                 ColorCLI::doEcho(
@@ -327,12 +349,12 @@ class Forking extends \fork_daemon
         switch ($this->workType) {
             case 'releases':
                 $this->_executeCommand(
-                    $this->dnr_path.'releases  '.count($this->work).'_"'
+                    $this->dnr_path.'releases  '.\count($this->work).'_"'
                 );
                 break;
             case 'update_per_group':
                 $this->_executeCommand(
-                    $this->dnr_path.'releases  '.count($this->work).'_"'
+                    $this->dnr_path.'releases  '.\count($this->work).'_"'
                 );
                 break;
         }
@@ -516,7 +538,7 @@ class Forking extends \fork_daemon
     {
         $this->register_child_run([0 => $this, 1 => 'safeBinariesChildWorker']);
 
-        $maxheaders = Settings::settingValue('max.headers.iteration') ?: 1000000;
+        $maxheaders = Settings::settingValue('..max_headers_iteration') ?: 1000000;
         $maxmssgs = Settings::settingValue('..maxmssgs');
         $threads = Settings::settingValue('..binarythreads');
 
@@ -616,7 +638,7 @@ class Forking extends \fork_daemon
                 )
             );
             if ($preCount['num'] > 0) {
-                $leftguids = array_slice($leftguids, 0, (int) ceil($preCount['num'] / $maxperrun));
+                $leftguids = \array_slice($leftguids, 0, (int) ceil($preCount['num'] / $maxperrun));
             } else {
                 $leftguids = [];
             }
@@ -695,23 +717,23 @@ class Forking extends \fork_daemon
     /**
      * Only 1 exit method is used for post process, since they are all similar.
      *
-     * @param        $groups
+     *
+     * @param array $groups
      * @param string $identifier
      */
     public function postProcessChildWorker($groups, $identifier = '')
     {
+        $type = '';
+        if ($this->processAdditional) {
+            $type = 'pp_additional  ';
+        } elseif ($this->processNFO) {
+            $type = 'pp_nfo  ';
+        } elseif ($this->processMovies) {
+            $type = 'pp_movie  ';
+        } elseif ($this->processTV) {
+            $type = 'pp_tv  ';
+        }
         foreach ($groups as $group) {
-            $type = '';
-            if ($this->processAdditional) {
-                $type = 'pp_additional  ';
-            } elseif ($this->processNFO) {
-                $type = 'pp_nfo  ';
-            } elseif ($this->processMovies) {
-                $type = 'pp_movie  ';
-            } elseif ($this->processTV) {
-                $type = 'pp_tv  ';
-            }
-
             if ($type !== '') {
                 $this->_executeCommand(
                     $this->dnr_path.$type.$group['id'].(isset($group['renamed']) ? ('  '.$group['renamed']) : '').'"'
@@ -787,12 +809,13 @@ class Forking extends \fork_daemon
 
     /**
      * Check if we should process NFO's.
+     *
      * @return bool
      * @throws \Exception
      */
-    private function checkProcessNfo()
+    private function checkProcessNfo(): bool
     {
-        if (Settings::settingValue('..lookupnfo') == 1) {
+        if ((int) Settings::settingValue('..lookupnfo') === 1) {
             $this->nfoQueryString = Nfo::NfoQueryString($this->pdo);
 
             return $this->pdo->queryOneRow(sprintf('SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1', $this->nfoQueryString)) !== false;
@@ -802,18 +825,17 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * @return int|null|string
+     * @return int
      * @throws \Exception
      */
-    private function postProcessNfoMainMethod()
+    private function postProcessNfoMainMethod(): int
     {
         $maxProcesses = 1;
         if ($this->checkProcessNfo() === true) {
             $this->processNFO = true;
             $this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
             $this->work = $this->pdo->query(
-                sprintf(
-                    '
+                sprintf('
 					SELECT leftguid AS id
 					FROM releases r
 					WHERE 1=1 %s
@@ -822,25 +844,24 @@ class Forking extends \fork_daemon
                     $this->nfoQueryString
                 )
             );
-            $maxProcesses = (int) Settings::settingValue('..nfothreads');
+            $maxProcesses = Settings::settingValue('..nfothreads');
         }
 
         return $maxProcesses;
     }
 
     /**
-     * Check if we should process Movies.
      * @return bool
      * @throws \Exception
      */
-    private function checkProcessMovies()
+    private function checkProcessMovies(): bool
     {
         if (Settings::settingValue('..lookupimdb') > 0) {
             return $this->pdo->queryOneRow(sprintf('
 						SELECT id
 						FROM releases
-						PARTITION (movies)
-						WHERE nzbstatus = %d
+						WHERE categories_id BETWEEN 5000 AND 5999
+						AND nzbstatus = %d
 						AND imdbid IS NULL
 						%s %s
 						LIMIT 1', NZB::NZB_ADDED, ((int) Settings::settingValue('..lookupimdb') === 2 ? 'AND isrenamed = 1' : ''), ($this->ppRenamedOnly ? 'AND isrenamed = 1' : ''))) !== false;
@@ -850,10 +871,10 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * @return int|null|string
+     * @return int
      * @throws \Exception
      */
-    private function postProcessMovMainMethod()
+    private function postProcessMovMainMethod(): int
     {
         $maxProcesses = 1;
         if ($this->checkProcessMovies() === true) {
@@ -864,8 +885,8 @@ class Forking extends \fork_daemon
                     '
 					SELECT leftguid AS id, %d AS renamed
 					FROM releases
-					PARTITION (movies)
-					WHERE nzbstatus = %d
+					WHERE categories_id BETWEEN 5000 AND 5999
+					AND nzbstatus = %d
 					AND imdbid IS NULL
 					%s %s
 					GROUP BY leftguid
@@ -893,8 +914,8 @@ class Forking extends \fork_daemon
             return $this->pdo->queryOneRow(sprintf('
 						SELECT id
 						FROM releases
-						PARTITION (tv)
-						WHERE nzbstatus = %d
+						WHERE categories_id BETWEEN 3000 AND 53999
+						AND nzbstatus = %d
 						AND size > 1048576
 						AND tv_episodes_id BETWEEN -2 AND 0
 						%s %s
@@ -905,7 +926,7 @@ class Forking extends \fork_daemon
     }
 
     /**
-     * @return int|null|string
+     * @return int
      * @throws \Exception
      */
     private function postProcessTvMainMethod()
@@ -919,8 +940,8 @@ class Forking extends \fork_daemon
                     '
 					SELECT leftguid AS id, %d AS renamed
 					FROM releases
-					PARTITION (tv)
-					WHERE nzbstatus = %d
+					WHERE categories_id BETWEEN 3000 AND 3999
+					AND nzbstatus = %d
 					AND tv_episodes_id BETWEEN -2 AND 0
 					AND size > 1048576
 					%s %s
@@ -946,7 +967,7 @@ class Forking extends \fork_daemon
     private function processSharing()
     {
         $sharing = $this->pdo->queryOneRow('SELECT enabled FROM sharing');
-        if ($sharing !== false && $sharing['enabled'] == 1) {
+        if ($sharing !== false && (int) $sharing['enabled'] === 1) {
             $nntp = new NNTP(['Settings' => $this->pdo]);
             if ((int) (Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
                 (new PostProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]))->processSharing($nntp);
@@ -974,36 +995,6 @@ class Forking extends \fork_daemon
         $postProcess->processXXX();
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////// All requestID code goes here ////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * @return null|string
-     * @throws \Exception
-     */
-    private function requestIDMainMethod()
-    {
-        $this->register_child_run([0 => $this, 1 => 'requestIDChildWorker']);
-        $this->work = $this->pdo->query(
-            sprintf(
-                '
-				SELECT DISTINCT(g.id)
-				FROM groups g
-				INNER JOIN releases r ON r.groups_id = g.id
-				WHERE (g.active = 1 OR g.backfill = 1)
-				AND r.nzbstatus = %d
-				AND r.predb_id = 0
-				AND r.isrequestid = 1
-				AND r.reqidstatus = %d',
-                NZB::NZB_ADDED,
-                RequestID::REQID_UPROC
-            )
-        );
-
-        return (int) Settings::settingValue('..reqidthreads');
-    }
-
     /**
      * @param        $groups
      * @param string $identifier
@@ -1020,7 +1011,7 @@ class Forking extends \fork_daemon
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @return null|string
+     * @return int
      * @throws \Exception
      */
     private function updatePerGroupMainMethod()
@@ -1076,7 +1067,7 @@ class Forking extends \fork_daemon
     private function setMaxProcesses($maxProcesses)
     {
         // Check if override setting is on.
-        if (defined('NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE') && NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE > 0) {
+        if (\defined('NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE') && NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE > 0) {
             $maxProcesses = NN_MULTIPROCESSING_MAX_CHILDREN_OVERRIDE;
         }
 

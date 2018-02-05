@@ -16,9 +16,9 @@
  *
  * @note    Developers: When updating settings.example.php, up this version
  *                   and $current_settings_file_version in nntmux\config\Configure.php
- * @version 5
+ * @version 7
  */
-define('NN_SETTINGS_FILE_VERSION', 6);
+define('NN_SETTINGS_FILE_VERSION', 7);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// Web Settings //////////////////////////////////////////////////////////
@@ -50,13 +50,6 @@ define('ITEMS_PER_COVER_PAGE', '20');
 define('NN_MAX_PAGER_RESULTS', '125000');
 
 /*
- * If the PRE API page (preinfo) is open to the public or only accessible by registered / api users.
- *
- * @default false
- */
-define('NN_PREINFO_OPEN', false);
-
-/*
  * Whether to check if a person is trying to send too many requests in a given amount of time,
  * lock out the person of the site for a amount of time.
  *
@@ -78,16 +71,6 @@ define('NN_FLOOD_WAIT_TIME', 5);
  * @default 5
  */
 define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
-
-/*
- * The higher this number, the more secure the password algorithm for the website will be, at the cost
- * of server resources.
- * To find a good number for your server, run the misc/testing/Various/find_password_hash_cost.php script.
- *
- * @note    It is not recommended to set this under 11.
- * @default 11
- */
-define('NN_PASSWORD_HASH_COST', 11);
 
 /*
  * The type of search system to use on the site.
@@ -246,136 +229,6 @@ define('NN_CACHE_EXPIRY_MEDIUM', 600);
 define('NN_CACHE_EXPIRY_LONG', 900);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////// Log Settings //////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
- * Display debug messages on console or web page.
- *
- * @default false
- */
-define('NN_DEBUG', false);
-
-/*
- * Log debug messages to newznab/resources/debug.log
- *
- * @default false
- */
-define('NN_LOGGING', false);
-
-/*
- * var_dump missing autoloader files.
- *
- * @note    Dev setting.
- * @default false
- */
-define('NN_LOGAUTOLOADER', false);
-
-/*
- * How many log files to keep in the log folder.
- *
- * @default 20
- */
-define('NN_LOGGING_MAX_LOGS', 20);
-
-/*
- * How large can the log files be in MegaBytes before we create a new one? The old files are compressed.
- *
- * @default 30
- */
-define('NN_LOGGING_MAX_SIZE', 30);
-
-/*
- * The folder to put the log files in. Put quotes, example : '/var/log/NN/'
- * The default is in the NN root folder /resources/logs/
- *
- * @example '/var/log/NN/'
- * @default NN_LOGS
- */
-define('NN_LOGGING_LOG_FOLDER', NN_LOGS);
-
-/*
- * The name of the log file.
- * Must be alphanumeric (a-z 0-9) and contain no file extensions.
- *
- * @default 'newznab'
- */
-define('NN_LOGGING_LOG_NAME', 'nntmux');
-
-/*
- * Display memory usage in log file and debug message output?
- *
- * @default true
- */
-define('NN_LOGGING_LOG_MEMORY_USAGE', true);
-
-/*
- * Display CPU load in log file and debug message output?
- *
- * @default true
- */
-define('NN_LOGGING_LOG_CPU_LOAD', true);
-
-/*
- * Display running time in log file and debug message output?
- *
- * @default true
- */
-define('NN_LOGGING_LOG_RUNNING_TIME', true);
-
-/*
- * Display resource usage in log file and debug message output?
- *
- * @default false
- */
-define('NN_LOGGING_LOG_RESOURCE_USAGE', false);
-
-/*********************************************************************************
- * The following options require either NN_DEBUG OR NN_LOGGING to be true: *
- *********************************************************************************/
-
-/*
- * Log and/or echo debug Info messages.
- *
- * @default false
- */
-define('NN_LOGINFO', false);
-
-/*
- * Log and/or echo debug Notice messages.
- *
- * @default false
- */
-define('NN_LOGNOTICE', false);
-
-/*
- * Log and/or echo debug Warning messages.
- *
- * @default false
- */
-define('NN_LOGWARNING', false);
-
-/*
- * Log and/or echo debug Error messages.
- *
- * @default false
- */
-define('NN_LOGERROR', false);
-
-/*
- * Log and/or echo debug Fatal messages.
- *
- * @default false
- */
-define('NN_LOGFATAL', false);
-
-/*
- * Log and/or echo debug failed SQL queries.
- *
- * @default false
- */
-define('NN_LOGQUERIES', false);
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// SQL Settings //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -473,6 +326,7 @@ if (extension_loaded('xdebug')) {
  * //////////////////////////////////////////////// Change log ////////////////////////////////////////////////////////////
  * ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  *
+ * 2017-12-21       v7  Remove custom logging settings, Laravel is handling errors now
  * 2017-10-11       v6  Remove settings for PHP web/CLI SAPI's as these are now handled by Laravel
  * 2015-08-26       v4  Add settings for PHP web/CLI SAPI's.
  *                        Add settings for Xdebug.

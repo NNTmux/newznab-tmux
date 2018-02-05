@@ -4,11 +4,11 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\Sites;
 use nntmux\SABnzbd;
-use nntmux\Category;
+use App\Models\Category;
 use App\Models\Settings;
 use nntmux\utility\Utility;
+use App\Models\Category as CategoryModel;
 
-$category = new Category();
 $page = new AdminPage();
 $sites = new Sites();
 $id = 0;
@@ -39,9 +39,9 @@ switch ($action) {
                 $error = 'Deep password check requires a valid path to unrar binary';
             } elseif ($ret === Settings::ERR_BADTMPUNRARPATH) {
                 $error = 'The temp unrar path is not a valid directory';
-            } elseif ($ret === Sites::ERR_BADLAMEPATH) {
+            } elseif ($ret === Settings::ERR_BADLAMEPATH) {
                 $error = 'The lame path is not a valid directory';
-            } elseif ($ret === Sites::ERR_SABCOMPLETEPATH) {
+            } elseif ($ret === Settings::ERR_SABCOMPLETEPATH) {
                 $error = 'The sab complete path is not a valid directory';
             }
         }
@@ -92,21 +92,13 @@ $page->smarty->assign(
     ]
 );
 
-$page->smarty->assign('sabintegrationtype_ids', [SABnzbd::INTEGRATION_TYPE_USER, SABnzbd::INTEGRATION_TYPE_SITEWIDE, SABnzbd::INTEGRATION_TYPE_NONE]);
-$page->smarty->assign('sabintegrationtype_names', ['User', 'Site-wide', 'None (Off)']);
-
-$page->smarty->assign('sabapikeytype_ids', [SABnzbd::API_TYPE_NZB, SABnzbd::API_TYPE_FULL]);
-$page->smarty->assign('sabapikeytype_names', ['Nzb Api Key', 'Full Api Key']);
-
-$page->smarty->assign('sabpriority_ids', [SABnzbd::PRIORITY_FORCE, SABnzbd::PRIORITY_HIGH, SABnzbd::PRIORITY_NORMAL, SABnzbd::PRIORITY_LOW]);
-$page->smarty->assign('sabpriority_names', ['Force', 'High', 'Normal', 'Low']);
-
-$page->smarty->assign('curlproxytype_names', ['', 'HTTP', 'SOCKS5']);
+$page->smarty->assign('sabintegrationtype_ids', [SABnzbd::INTEGRATION_TYPE_USER, SABnzbd::INTEGRATION_TYPE_NONE]);
+$page->smarty->assign('sabintegrationtype_names', ['User', 'None (Off)']);
 
 $page->smarty->assign('newgroupscan_names', ['Days', 'Posts']);
 
-$page->smarty->assign('registerstatus_ids', [Settings::REGISTER_STATUS_API_ONLY, Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_INVITE, Settings::REGISTER_STATUS_CLOSED]);
-$page->smarty->assign('registerstatus_names', ['API Only', 'Open', 'Invite', 'Closed']);
+$page->smarty->assign('registerstatus_ids', [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_INVITE, Settings::REGISTER_STATUS_CLOSED]);
+$page->smarty->assign('registerstatus_names', ['Open', 'Invite', 'Closed']);
 
 $page->smarty->assign('passworded_ids', [0, 1, 2]);
 $page->smarty->assign('passworded_names', [
@@ -115,8 +107,6 @@ $page->smarty->assign('passworded_names', [
     'Show non-passworded and potentially passworded (*no)',
     'Show everything (*no)',
 ]);
-
-$page->smarty->assign('sphinxrebuildfreqday_days', ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']);
 
 $page->smarty->assign('lookuplanguage_iso', ['en', 'de', 'es', 'fr', 'it', 'nl', 'pt', 'sv']);
 $page->smarty->assign('lookuplanguage_names', ['English', 'Deutsch', 'Español', 'Français', 'Italiano', 'Nederlands', 'Português', 'Svenska']);
@@ -145,7 +135,7 @@ $page->smarty->assign('lookup_reqids_names', ['Disabled', 'Lookup Request IDs', 
 $page->smarty->assign('coversPath', NN_COVERS);
 
 // return a list of audiobooks, mags, ebooks, technical and foreign books
-$result = $page->pdo->query("SELECT id, title FROM categories WHERE id IN ({$category->getCategoryValue('MUSIC_AUDIOBOOK')}, {$category->getCategoryValue('BOOKS_MAGAZINES')}, {$category->getCategoryValue('BOOKS_TECHNICAL')}, {$category->getCategoryValue('BOOKS_FOREIGN')})");
+$result = CategoryModel::query()->whereIn('id', [Category::MUSIC_AUDIOBOOK, Category::BOOKS_MAGAZINES, Category::BOOKS_TECHNICAL, Category::BOOKS_FOREIGN])->get(['id', 'title']);
 
 // setup the display lists for these categories, this could have been static, but then if names changed they would be wrong
 $book_reqids_ids = [];
@@ -156,7 +146,9 @@ foreach ($result as $bookcategory) {
 }
 
 // convert from a string array to an int array as we want to use int
-$book_reqids_ids = array_map(create_function('$value', 'return (int)$value;'), $book_reqids_ids);
+$book_reqids_ids = array_map(function ($value) {
+    return (int) $value;
+}, $book_reqids_ids);
 $page->smarty->assign('book_reqids_ids', $book_reqids_ids);
 $page->smarty->assign('book_reqids_names', $book_reqids_names);
 
@@ -164,7 +156,9 @@ $page->smarty->assign('book_reqids_names', $book_reqids_names);
 $books_selected = explode(',', Settings::settingValue('..book_reqids'));
 
 // convert from a string array to an int array
-$books_selected = array_map(create_function('$value', 'return (int)$value;'), $books_selected);
+$books_selected = array_map(function ($value) {
+    return (int) $value;
+}, $books_selected);
 $page->smarty->assign('book_reqids_selected', $books_selected);
 
 $page->smarty->assign('themelist', Utility::getThemesList());

@@ -2,16 +2,17 @@
 
 namespace nntmux\db\populate;
 
-use nntmux\db\DB;
-use Carbon\Carbon;
 use nntmux\ColorCLI;
 use App\Models\Settings;
 use nntmux\ReleaseImage;
+use App\Models\AnidbInfo;
+use App\Models\AnidbTitle;
 use App\Models\AnidbEpisode;
+use Illuminate\Support\Carbon;
 
 class AniDB
 {
-    const CLIENT_VERSION = 2;
+    private const CLIENT_VERSION = 2;
 
     /**
      * Whether or not to echo message output.
@@ -24,17 +25,6 @@ class AniDB
      * @var string
      */
     public $imgSavePath;
-
-    /**
-     * @var DB
-     */
-    public $pdo;
-
-    /**
-     * The AniDB ID we are looking up.
-     * @var bool
-     */
-    private $anidbId;
 
     /**
      * The name of the nZEDb client for AniDB lookups.
@@ -74,7 +64,6 @@ class AniDB
         $options += $defaults;
 
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
         $anidbupdint = Settings::settingValue('APIs.AniDB.max_update_frequency');
         $lastupdated = Settings::settingValue('APIs.AniDB.last_full_update');
@@ -119,21 +108,7 @@ class AniDB
      */
     private function checkDuplicateDbEntry($id, $type, $lang, $title)
     {
-        return $this->pdo->queryOneRow(
-            sprintf(
-                '
-				SELECT anidbid
-				FROM anidb_titles
-				WHERE anidbid = %d
-				AND type = %s
-				AND lang = %s
-				AND title = %s',
-                $id,
-                $this->pdo->escapeString($type),
-                $this->pdo->escapeString($lang),
-                $this->pdo->escapeString($title)
-            )
-        );
+        return AnidbTitle::query()->where(['anidbid' => $id, 'type' => $type, 'lang' => $lang, 'title' => $title])->first(['anidbid'])->toArray();
     }
 
     /**
@@ -160,10 +135,7 @@ class AniDB
             echo 'AniDB: Error getting response.'.PHP_EOL;
         } elseif (preg_match('/\<error\>Banned\<\/error\>/', $apiresponse)) {
             $this->banned = true;
-            Settings::update(
-                ['value' => time()],
-                ['section' => 'APIs', 'subsection' => 'AniDB', 'name' => 'banned']
-            );
+            Settings::query()->where(['section' => 'APIs', 'subsection' => 'AniDB', 'name' => 'banned'])->update(['value' => time()]);
         } elseif (preg_match('/\<error\>Anime not found\<\/error\>/', $apiresponse)) {
             echo "AniDB   : Anime not yet on site. Remove until next update.\n";
         } elseif ($AniDBAPIXML = new \SimpleXMLElement($apiresponse)) {
@@ -187,7 +159,7 @@ class AniDB
                         foreach ($episode->title as $title) {
                             $xmlAttribs = $title->attributes('xml', true);
                             // only english, x-jat imploded episode titles for now
-                            if (in_array($xmlAttribs->lang, ['en', 'x-jat'], false)) {
+                            if (\in_array($xmlAttribs->lang, ['en', 'x-jat'], false)) {
                                 $titleArray[] = $title[0];
                             }
                         }
@@ -234,7 +206,7 @@ class AniDB
         $property = $property ?? 'name';
         $temp = '';
 
-        if (is_object($element) && ! empty($element)) {
+        if (\is_object($element) && ! empty($element)) {
             $result = $children === true ? $element->children() : $element;
             foreach ($result as $entry) {
                 $temp .= (string) $entry->$property.', ';
@@ -247,6 +219,7 @@ class AniDB
     /**
      * Requests and returns the API data from AniDB.
      *
+     * @param $anidbId
      * @return string
      */
     private function getAniDbResponse($anidbId): string
@@ -287,18 +260,7 @@ class AniDB
         $check = $this->checkDuplicateDbEntry($id, $type, $lang, $title);
 
         if ($check === false) {
-            $this->pdo->queryInsert(
-                sprintf(
-                    '
-					INSERT IGNORE INTO anidb_titles
-					(anidbid, type, lang, title)
-					VALUES (%d, %s, %s, %s)',
-                    $id,
-                    $this->pdo->escapeString($type),
-                    $this->pdo->escapeString($lang),
-                    $this->pdo->escapeString($title)
-                )
-            );
+            AnidbTitle::insertIgnore(['anidbid' => $id, 'type' => $type, 'lang' => $lang, 'title' => $title]);
         } else {
             echo ColorCLI::warning("Duplicate: $id");
         }
@@ -313,29 +275,24 @@ class AniDB
      */
     private function insertAniDBInfoEps(array $AniDBInfoArray = [], $anidbId): string
     {
-        $this->pdo->queryInsert(
-            sprintf(
-                '
-				INSERT INTO anidb_info
-				(
-					anidbid, type, startdate, enddate, related, similar, creators,
-					description, rating, picture, categories, characters, updated
-				)
-				VALUES (%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())',
-                $anidbId,
-                $this->pdo->escapeString($AniDBInfoArray['type']),
-                $this->pdo->escapeString($AniDBInfoArray['startdate']),
-                $this->pdo->escapeString($AniDBInfoArray['enddate']),
-                $this->pdo->escapeString($AniDBInfoArray['related']),
-                $this->pdo->escapeString($AniDBInfoArray['similar']),
-                $this->pdo->escapeString($AniDBInfoArray['creators']),
-                $this->pdo->escapeString($AniDBInfoArray['description']),
-                $this->pdo->escapeString($AniDBInfoArray['rating']),
-                $this->pdo->escapeString($AniDBInfoArray['picture']),
-                $this->pdo->escapeString($AniDBInfoArray['categories']),
-                $this->pdo->escapeString($AniDBInfoArray['characters'])
-            )
-        );
+        AnidbInfo::query()
+            ->insert(
+                [
+                    'anidbid' => $anidbId,
+                    'type' => $AniDBInfoArray['type'],
+                    'startdate' => $AniDBInfoArray['startdate'],
+                    'enddate' => $AniDBInfoArray['enddate'],
+                    'related' => $AniDBInfoArray['enddate'],
+                    'similar' => $AniDBInfoArray['similar'],
+                    'creators' => $AniDBInfoArray['creators'],
+                    'description' => $AniDBInfoArray['description'],
+                    'rating' => $AniDBInfoArray['rating'],
+                    'picture' => $AniDBInfoArray['picture'],
+                    'categories' => $AniDBInfoArray['categories'],
+                    'characters' => $AniDBInfoArray['characters'],
+                    'updated' => Carbon::now(),
+                ]
+            );
         if (! empty($AniDBInfoArray['epsarr'])) {
             $this->insertAniDBEpisodes($AniDBInfoArray['epsarr'], $anidbId);
         }
@@ -352,7 +309,7 @@ class AniDB
     {
         if (! empty($episodeArr)) {
             foreach ($episodeArr as $episode) {
-                AnidbEpisode::query()->updateOrCreate(
+                AnidbEpisode::insertIgnore(
                     [
                         'anidbid' => $anidbId,
                         'episodeid' => $episode['episode_id'],
@@ -437,14 +394,12 @@ class AniDB
     private function populateInfoTable($anidbId = '')
     {
         if (empty($anidbId)) {
-            $anidbIds = $this->pdo->query(
-                sprintf(
-                'SELECT DISTINCT at.anidbid
-					FROM anidb_titles at
-					LEFT JOIN anidb_info ai ON ai.anidbid = at.anidbid
-                    WHERE ai.updated IS NULL'
-                )
-            );
+            $anidbIds = AnidbTitle::query()
+                ->selectRaw('DISTINCT anidb_titles.anidbid')
+                ->leftJoin('anidb_info as ai', 'ai.anidbid', '=', 'anidb_titles.anidbid')
+                ->whereNull('ai.updated')
+                ->get();
+
             foreach ($anidbIds as $anidb) {
                 $AniDBAPIArray = $this->getAniDbAPI($anidb['anidbid']);
 
@@ -467,14 +422,6 @@ class AniDB
                     );
                 } else {
                     $this->updateAniChildTables($AniDBAPIArray, $anidb['anidbid']);
-                    if (NN_DEBUG) {
-                        ColorCLI::doEcho(
-                            ColorCLI::headerOver(
-                                'Added/Updated AniDB ID: '.$anidb['anidbid']
-                            ),
-                            true
-                        );
-                    }
                 }
                 sleep(random_int(120, 240));
             }
@@ -500,14 +447,6 @@ class AniDB
                 );
             } else {
                 $this->updateAniChildTables($AniDBAPIArray, $anidbId);
-                if (NN_DEBUG) {
-                    ColorCLI::doEcho(
-                        ColorCLI::headerOver(
-                            'Added/Updated AniDB ID: '.$anidbId
-                        ),
-                        true
-                    );
-                }
             }
         }
     }
@@ -517,10 +456,7 @@ class AniDB
      */
     private function setLastUpdated(): void
     {
-        (new Settings)->update(
-            ['value' => time()],
-            ['section' => 'APIs', 'subsection' => 'AniDB', 'name' => 'last_full_update']
-        );
+        Settings::query()->where(['section' => 'APIs', 'subsection' => 'AniDB', 'name' => 'last_full_update'])->update(['value' => time()]);
     }
 
     /**
@@ -532,29 +468,24 @@ class AniDB
      */
     private function updateAniDBInfoEps(array $AniDBInfoArray = [], $anidbId): string
     {
-        $this->pdo->queryExec(
-            sprintf(
-                '
-				UPDATE anidb_info
-				SET type = %s, startdate = %s, enddate = %s, related = %s,
-					similar = %s, creators = %s, description = %s,
-					rating = %s, picture = %s, categories = %s, characters = %s,
-					updated = NOW()
-				WHERE anidbid = %d',
-                $this->pdo->escapeString($AniDBInfoArray['type']),
-                $this->pdo->escapeString($AniDBInfoArray['startdate']),
-                $this->pdo->escapeString($AniDBInfoArray['enddate']),
-                $this->pdo->escapeString($AniDBInfoArray['related']),
-                $this->pdo->escapeString($AniDBInfoArray['similar']),
-                $this->pdo->escapeString($AniDBInfoArray['creators']),
-                $this->pdo->escapeString($AniDBInfoArray['description']),
-                $this->pdo->escapeString($AniDBInfoArray['rating']),
-                $this->pdo->escapeString($AniDBInfoArray['picture']),
-                $this->pdo->escapeString($AniDBInfoArray['categories']),
-                $this->pdo->escapeString($AniDBInfoArray['characters']),
-                $anidbId
-            )
-        );
+        AnidbInfo::query()
+            ->where('anidbid', $anidbId)
+            ->update(
+                [
+                    'type' => $AniDBInfoArray['type'],
+                    'startdate' => $AniDBInfoArray['startdate'],
+                    'enddate' => $AniDBInfoArray['enddate'],
+                    'related' => $AniDBInfoArray['enddate'],
+                    'similar' => $AniDBInfoArray['similar'],
+                    'creators' => $AniDBInfoArray['creators'],
+                    'description' => $AniDBInfoArray['description'],
+                    'rating' => $AniDBInfoArray['rating'],
+                    'picture' => $AniDBInfoArray['picture'],
+                    'categories' => $AniDBInfoArray['categories'],
+                    'characters' => $AniDBInfoArray['characters'],
+                    'updated' => Carbon::now(),
+                ]
+            );
         if (! empty($AniDBInfoArray['epsarr'])) {
             $this->insertAniDBEpisodes($AniDBInfoArray['epsarr'], $anidbId);
         }
@@ -570,24 +501,16 @@ class AniDB
      */
     private function updateAniChildTables(array $AniDBInfoArray = [], $anidbId): void
     {
-        $check = $this->pdo->queryOneRow(
-            sprintf(
-                '
-				SELECT ai.anidbid AS info
-				FROM anidb_info ai
-				WHERE ai.anidbid = %d',
-                $anidbId
-            )
-        );
+        $check = AnidbInfo::query()->where('anidbid', $anidbId)->first(['anidbid']);
 
-        if ($check === false) {
+        if ($check === null) {
             $picture = $this->insertAniDBInfoEps($AniDBInfoArray, $anidbId);
         } else {
             $picture = $this->updateAniDBInfoEps($AniDBInfoArray, $anidbId);
         }
 
         if (! empty($picture) && ! file_exists($this->imgSavePath.$anidbId.'.jpg')) {
-            (new ReleaseImage($this->pdo))->saveImage(
+            (new ReleaseImage())->saveImage(
                 $anidbId,
                 'http://img7.anidb.net/pics/anime/'.$picture,
                 $this->imgSavePath

@@ -2,8 +2,6 @@
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'smarty.php';
 
-use App\Models\Settings;
-
 $page = new Page;
 
 if ($app->isDownForMaintenance()) {
@@ -26,6 +24,8 @@ switch ($page->page) {
     case 'books':
     case 'browse':
     case 'browsegroup':
+    case 'btc_payment':
+    case 'btc_payment_callback':
     case 'cart':
     case 'console':
     case 'consolemodal':
@@ -46,12 +46,12 @@ switch ($page->page) {
     case 'myshows':
     case 'mymovies':
     case 'mymoviesedit':
-    case 'newposterwall':
     case 'nfo':
     case 'nzbgetqueuedata':
     case 'post_edit':
     case 'profile':
     case 'profileedit':
+    case 'profile_delete':
     case 'queue':
     case 'register':
     case 'sabqueuedata':
@@ -64,12 +64,6 @@ switch ($page->page) {
     case 'upcoming':
     case 'xxx':
     case 'xxxmodal':
-        // Don't show these pages if it's an API-only site.
-        if (! $page->users->isLoggedIn() && (int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
-            header('Location: '.Settings::settingValue('site.main.code'));
-            break;
-        }
-        // no break
     case 'api':
     case 'failed':
     case 'getnzb':

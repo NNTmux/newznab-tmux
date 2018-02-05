@@ -4,27 +4,21 @@ use Illuminate\Database\Seeder;
 
 class UserRolesTableSeeder extends Seeder
 {
+
     /**
-     * Auto generated seed file.
+     * Auto generated seed file
      *
      * @return void
      */
     public function run()
     {
+
+
         \DB::table('user_roles')->delete();
 
-        \DB::table('user_roles')->insert([
-            0 => [
-                'id' => 0,
-                'name' => 'Guest',
-                'apirequests' => 0,
-                'downloadrequests' => 0,
-                'defaultinvites' => 0,
-                'isdefault' => 0,
-                'canpreview' => 0,
-                'hideads' => 0,
-            ],
-            1 => [
+        \DB::table('user_roles')->insert(array (
+            0 =>
+            array (
                 'id' => 1,
                 'name' => 'User',
                 'apirequests' => 10,
@@ -33,8 +27,11 @@ class UserRolesTableSeeder extends Seeder
                 'isdefault' => 1,
                 'canpreview' => 0,
                 'hideads' => 0,
-            ],
-            2 => [
+                'donation' => 0,
+                'addyears' => 0,
+            ),
+            1 =>
+            array (
                 'id' => 2,
                 'name' => 'Admin',
                 'apirequests' => 1000,
@@ -43,8 +40,11 @@ class UserRolesTableSeeder extends Seeder
                 'isdefault' => 0,
                 'canpreview' => 1,
                 'hideads' => 0,
-            ],
-            3 => [
+                'donation' => 0,
+                'addyears' => 0,
+            ),
+            2 =>
+            array (
                 'id' => 3,
                 'name' => 'Disabled',
                 'apirequests' => 0,
@@ -53,8 +53,11 @@ class UserRolesTableSeeder extends Seeder
                 'isdefault' => 0,
                 'canpreview' => 0,
                 'hideads' => 0,
-            ],
-            4 => [
+                'donation' => 0,
+                'addyears' => 0,
+            ),
+            3 =>
+            array (
                 'id' => 4,
                 'name' => 'Moderator',
                 'apirequests' => 1000,
@@ -63,8 +66,11 @@ class UserRolesTableSeeder extends Seeder
                 'isdefault' => 0,
                 'canpreview' => 1,
                 'hideads' => 0,
-            ],
-            5 => [
+                'donation' => 0,
+                'addyears' => 0,
+            ),
+            4 =>
+            array (
                 'id' => 5,
                 'name' => 'Friend',
                 'apirequests' => 100,
@@ -73,7 +79,11 @@ class UserRolesTableSeeder extends Seeder
                 'isdefault' => 0,
                 'canpreview' => 1,
                 'hideads' => 0,
-            ],
-        ]);
+                'donation' => 0,
+                'addyears' => 0,
+            ),
+        ));
+
+
     }
 }

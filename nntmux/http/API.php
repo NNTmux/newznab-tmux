@@ -21,8 +21,8 @@
 
 namespace nntmux\http;
 
-use nntmux\Groups;
-use nntmux\Category;
+use App\Models\Group;
+use App\Models\Category;
 use App\Models\AudioData;
 use nntmux\utility\Utility;
 
@@ -121,7 +121,7 @@ class API extends Capabilities
     {
         $groupName = -1;
         if (isset($this->getRequest['group'])) {
-            $group = (new Groups())->isValidGroup($this->getRequest['group']);
+            $group = Group::isValidGroup($this->getRequest['group']);
             if ($group !== false) {
                 $groupName = $group;
             }

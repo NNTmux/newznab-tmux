@@ -41,6 +41,7 @@ class UpdateNNTmuxComposer extends Command
      * Execute the console command.
      *
      * @return mixed
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
      * @throws \Symfony\Component\Process\Exception\LogicException
      */
     public function handle()
@@ -62,7 +63,7 @@ class UpdateNNTmuxComposer extends Command
     {
         $this->initialiseGit();
         $command = 'composer install';
-        if (in_array($this->gitBranch, $this->git->getBranchesStable(), false)) {
+        if (\in_array($this->gitBranch, $this->git->getBranchesStable(), false)) {
             $command .= ' --prefer-dist --no-dev';
         } else {
             $command .= ' --prefer-source';

@@ -4,7 +4,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use nntmux\db\DB;
 use nntmux\Sharing;
-use nntmux\ReleaseComments;
+use App\Models\ReleaseComment;
 
 // Login check.
 $admin = new AdminPage;
@@ -74,9 +74,8 @@ if (isset($_GET['site_ID']) && isset($_GET['site_status'])) {
         $ids = $db->query(sprintf('SELECT id FROM release_comments WHERE siteid = %s', $db->escapeString($guid['site_guid'])));
         $total = count($ids);
         if ($total > 0) {
-            $rc = new ReleaseComments();
             foreach ($ids as $id) {
-                $rc->deleteComment($id['id']);
+                ReleaseComment::deleteComment($id['id']);
             }
         }
         $db->queryExec(sprintf('UPDATE sharing_sites SET comments = 0 WHERE id = %d', $_GET['purge_site']));

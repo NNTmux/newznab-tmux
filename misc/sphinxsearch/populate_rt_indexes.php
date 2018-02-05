@@ -6,9 +6,10 @@ use nntmux\db\DB;
 use nntmux\SphinxSearch;
 use nntmux\ReleaseSearch;
 
-if (NN_RELEASE_SEARCH_TYPE != ReleaseSearch::SPHINX) {
+if (NN_RELEASE_SEARCH_TYPE !== ReleaseSearch::SPHINX) {
     exit('Error, NN_RELEASE_SEARCH_TYPE in nntmux/config/settings.php must be set to SPHINX!'.PHP_EOL);
-} elseif (! isset($argv[1]) || ! in_array($argv[1], ['releases_rt'])) {
+}
+if (! isset($argv[1]) || $argv[1] !== 'releases_rt') {
     exit(
             "Argument 1 is the index name, releases_rt are the only supported ones currently.\n".
             "Argument 2 is optional, max number of rows to send to sphinx at a time, 10,000 is the default if not set.\n".
@@ -26,28 +27,24 @@ function populate_rt($table, $max)
 {
     $pdo = new DB();
 
-    switch ($table) {
-        case 'releases_rt':
-            $pdo->queryDirect('SET SESSION group_concat_max_len=8192');
-            $query = (
-            'SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
+    if ($table === 'releases_rt') {
+        $pdo->queryDirect('SET SESSION group_concat_max_len=16384');
+        $query = 'SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
 				FROM releases r
 				LEFT JOIN release_files rf ON(r.id=rf.releases_id)
 				WHERE r.id > %d
 				GROUP BY r.id
 				ORDER BY r.id ASC
-				LIMIT %d'
-            );
-            $rtvalues = '(id, name, searchname, fromname, filename)';
-            $totals = $pdo->queryOneRow('SELECT COUNT(id) AS c, MIN(id) AS min FROM releases');
-            if (! $totals) {
-                exit("Could not get database information for releases table.\n");
-            }
-            $total = $totals['c'];
-            $minId = $totals['min'];
-            break;
-        default:
-            exit();
+				LIMIT %d';
+        $rtvalues = '(id, name, searchname, fromname, filename)';
+        $totals = $pdo->queryOneRow('SELECT COUNT(id) AS c, MIN(id) AS min FROM releases');
+        if (! $totals) {
+            exit("Could not get database information for releases table.\n");
+        }
+        $total = $totals['c'];
+        $minId = $totals['min'];
+    } else {
+        exit();
     }
 
     $sphinx = new SphinxSearch();

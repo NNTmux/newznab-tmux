@@ -2,13 +2,14 @@
 
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
+use App\Models\User;
 use App\Models\Settings;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$userData = $page->users->getById($page->users->currentUserId());
+$userData = User::find(User::currentUserId());
 if (! $userData) {
     $page->show404();
 }
@@ -17,28 +18,24 @@ $page->smarty->assign('user', $userData);
 $queueType = $error = '';
 $queue = null;
 switch (Settings::settingValue('apps.sabnzbplus.integrationtype')) {
-	case SABnzbd::INTEGRATION_TYPE_NONE:
-		if ($userData['queuetype'] === 2) {
-		    $queueType = 'NZBGet';
-		    $queue = new NZBGet($page);
-		}
-		break;
-	case SABnzbd::INTEGRATION_TYPE_SITEWIDE:
-		$queueType = 'Sabnzbd';
-		$queue = new SABnzbd($page);
-		break;
-	case SABnzbd::INTEGRATION_TYPE_USER:
-		switch ((int) $userData['queuetype']) {
-			case 1:
-				$queueType = 'Sabnzbd';
-				$queue = new SABnzbd($page);
-				break;
-			case 2:
-				$queueType = 'NZBGet';
-				$queue = new NZBGet($page);
-				break;
-		}
-		break;
+    case SABnzbd::INTEGRATION_TYPE_NONE:
+        if ($userData['queuetype'] === 2) {
+            $queueType = 'NZBGet';
+            $queue = new NZBGet($page);
+        }
+        break;
+    case SABnzbd::INTEGRATION_TYPE_USER:
+        switch ((int) $userData['queuetype']) {
+            case 1:
+                $queueType = 'Sabnzbd';
+                $queue = new SABnzbd($page);
+                break;
+            case 2:
+                $queueType = 'NZBGet';
+                $queue = new NZBGet($page);
+                break;
+        }
+        break;
 }
 
 if ($queue !== null) {
@@ -81,7 +78,7 @@ if ($queue !== null) {
     }
 }
 
-$page->smarty->assign(['queueType' => $queueType, 'error' => $error, 'user', $page->users]);
+$page->smarty->assign(['queueType' => $queueType, 'error' => $error, 'user', User::class]);
 $page->title = 'Your '.$queueType.' Download Queue';
 $page->meta_title = 'View'.$queueType.' Queue';
 $page->meta_keywords = 'view,'.strtolower($queueType).',queue';

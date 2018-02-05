@@ -96,7 +96,7 @@
 
 	{foreach from=$recent item=result}
 		<tr class="{cycle values=",alt"}">
-			<td width="75%">{$result.title}</td>
+			<td width="75%">{$result->title}</td>
 			<td>{$result.count}</td>
 		</tr>
 	{/foreach}

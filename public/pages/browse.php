@@ -1,11 +1,12 @@
 <?php
 
-use nntmux\Category;
+use App\Models\User;
 use nntmux\Releases;
+use App\Models\Category;
 
 $releases = new Releases(['Settings' => $page->settings]);
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
@@ -46,11 +47,10 @@ $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
 $covgroup = '';
-if ($category === -1 && (int) $grp === -1) {
+if ((int) $category === -1 && (int) $grp === -1) {
     $page->smarty->assign('catname', 'All');
 } elseif ((int) $category !== -1 && (int) $grp === -1) {
-    $cat = new Category(['Settings' => $releases->pdo]);
-    $cdata = $cat->getById($category);
+    $cdata = Category::find($category);
     if ($cdata) {
         $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
         if ($cdata['parentid'] === Category::GAME_ROOT || $cdata['id'] === Category::GAME_ROOT) {

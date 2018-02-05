@@ -10,7 +10,7 @@ class Sitemap
     public $priority = '';
     public $changefreq = '';
 
-    public function Sitemap($t, $n, $l, $p, $c)
+    public function __construct($t, $n, $l, $p, $c)
     {
         $this->type = $t;
         $this->name = $n;

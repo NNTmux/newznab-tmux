@@ -74,4 +74,115 @@ if (! function_exists('makeFieldLinks')) {
 
         return implode(', ', $newArr);
     }
+
+    if (! function_exists('getUserBrowseOrder')) {
+        /**
+         * @param string $orderBy
+         *
+         * @return array
+         */
+        function getUserBrowseOrder($orderBy): array
+        {
+            $order = ($orderBy === '' ? 'username_desc' : $orderBy);
+            $orderArr = explode('_', $order);
+            switch ($orderArr[0]) {
+                case 'username':
+                    $orderField = 'username';
+                    break;
+                case 'email':
+                    $orderField = 'email';
+                    break;
+                case 'host':
+                    $orderField = 'host';
+                    break;
+                case 'createdat':
+                    $orderField = 'created_at';
+                    break;
+                case 'lastlogin':
+                    $orderField = 'lastlogin';
+                    break;
+                case 'apiaccess':
+                    $orderField = 'apiaccess';
+                    break;
+                case 'apirequests':
+                    $orderField = 'apirequests';
+                    break;
+                case 'grabs':
+                    $orderField = 'grabs';
+                    break;
+                case 'user_roles_id':
+                    $orderField = 'users_role_id';
+                    break;
+                case 'rolechangedate':
+                    $orderField = 'rolechangedate';
+                    break;
+                default:
+                    $orderField = 'username';
+                    break;
+            }
+            $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
+
+            return [$orderField, $orderSort];
+        }
+    }
+
+    if (! function_exists('getUserBrowseOrdering')) {
+
+        /**
+         * @return array
+         */
+        function getUserBrowseOrdering(): array
+        {
+            return [
+                'username_asc',
+                'username_desc',
+                'email_asc',
+                'email_desc',
+                'host_asc',
+                'host_desc',
+                'createdat_asc',
+                'createdat_desc',
+                'lastlogin_asc',
+                'lastlogin_desc',
+                'apiaccess_asc',
+                'apiaccess_desc',
+                'apirequests_asc',
+                'apirequests_desc',
+                'grabs_asc',
+                'grabs_desc',
+                'role_asc',
+                'role_desc',
+                'rolechangedate_asc',
+                'rolechangedate_desc',
+            ];
+        }
+    }
+
+    if (! function_exists('createGUID')) {
+        /**
+         * Create a GUID for a release.
+         *
+         * @return string
+         */
+        function createGUID(): string
+        {
+            $data = random_bytes(16);
+            $data[6] = \chr(\ord($data[6]) & 0x0f | 0x40);    // set version to 0100
+            $data[8] = \chr(\ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
+
+            return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(sodium_bin2hex($data), 4));
+        }
+    }
+
+    if (! function_exists('getSimilarName')) {
+        /**
+         * @param string $name
+         *
+         * @return string
+         */
+        function getSimilarName($name): string
+        {
+            return implode(' ', \array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
+        }
+    }
 }

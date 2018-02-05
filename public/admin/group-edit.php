@@ -2,10 +2,9 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Groups;
+use App\Models\Group;
 
 $page = new AdminPage();
-$groups = new Groups(['Settings' => $page->pdo]);
 $id = 0;
 
 // Set the current action.
@@ -28,13 +27,13 @@ switch ($action) {
     case 'submit':
         if ($_POST['id'] === '') {
             // Add a new group.
-            $_POST['name'] = $groups->isValidGroup($_POST['name']);
+            $_POST['name'] = Group::isValidGroup($_POST['name']);
             if ($_POST['name'] !== false) {
-                $groups->add($_POST);
+                Group::addGroup($_POST);
             }
         } else {
             // Update an existing group.
-            $groups->update($_POST);
+            Group::updateGroup($_POST);
         }
         header('Location:'.WWW_TOP.'/group-list.php');
         break;
@@ -44,7 +43,7 @@ switch ($action) {
         if (isset($_GET['id'])) {
             $page->title = 'Newsgroup Edit';
             $id = $_GET['id'];
-            $group = $groups->getByID($id);
+            $group = Group::getGroupByID($id);
         } else {
             $page->title = 'Newsgroup Add';
         }

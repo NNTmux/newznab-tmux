@@ -8,7 +8,7 @@ namespace nntmux;
 class ConsoleTools
 {
     /**
-     * @var ColorCLI
+     * @var \nntmux\ColorCLI
      */
     public $cli;
 
@@ -18,19 +18,10 @@ class ConsoleTools
     public $lastMessageLength;
 
     /**
-     * Construct.
-     *
-     * @param array $options
+     * ConsoleTools constructor.
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-			'ColorCLI' => null,
-		];
-        $options += $defaults;
-
-        $this->cli = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
-
         $this->lastMessageLength = 0;
     }
 
@@ -44,11 +35,11 @@ class ConsoleTools
             $this->lastMessageLength = 0;
         }
 
-        echo str_repeat(chr(8), $this->lastMessageLength);
+        echo str_repeat(\chr(8), $this->lastMessageLength);
         echo str_repeat(' ', $this->lastMessageLength);
-        echo str_repeat(chr(8), $this->lastMessageLength);
+        echo str_repeat(\chr(8), $this->lastMessageLength);
 
-        $this->lastMessageLength = strlen($message);
+        $this->lastMessageLength = \strlen($message);
         echo ColorCLI::headerOver($message);
     }
 
@@ -62,11 +53,11 @@ class ConsoleTools
             $this->lastMessageLength = 0;
         }
 
-        echo str_repeat(chr(8), $this->lastMessageLength);
+        echo str_repeat(\chr(8), $this->lastMessageLength);
         echo str_repeat(' ', $this->lastMessageLength);
-        echo str_repeat(chr(8), $this->lastMessageLength);
+        echo str_repeat(\chr(8), $this->lastMessageLength);
 
-        $this->lastMessageLength = strlen($message);
+        $this->lastMessageLength = \strlen($message);
         echo ColorCLI::primaryOver($message);
     }
 
@@ -80,11 +71,11 @@ class ConsoleTools
             $this->lastMessageLength = 0;
         }
 
-        echo str_repeat(chr(8), $this->lastMessageLength);
+        echo str_repeat(\chr(8), $this->lastMessageLength);
         echo str_repeat(' ', $this->lastMessageLength);
-        echo str_repeat(chr(8), $this->lastMessageLength);
+        echo str_repeat(\chr(8), $this->lastMessageLength);
 
-        $this->lastMessageLength = strlen($message);
+        $this->lastMessageLength = \strlen($message);
         echo $message;
     }
 
@@ -94,7 +85,7 @@ class ConsoleTools
     public function appendWrite($message): void
     {
         echo $message;
-        $this->lastMessageLength += strlen($message);
+        $this->lastMessageLength += \strlen($message);
     }
 
     /**
@@ -106,7 +97,7 @@ class ConsoleTools
     public function percentString($cur, $total): string
     {
         $percent = 100 * $cur / $total;
-        $formatString = '% '.strlen($total).'d/%d (% 2d%%)';
+        $formatString = '% '.\strlen($total).'d/%d (% 2d%%)';
 
         return sprintf($formatString, $cur, $total, $percent);
     }
@@ -122,7 +113,7 @@ class ConsoleTools
     {
         $percent1 = 100 * ($first - 1) / $total;
         $percent2 = 100 * $last / $total;
-        $formatString = '% '.strlen($total).'d-% '.strlen($total).'d/%d (% 2d%%-% 3d%%)';
+        $formatString = '% '.\strlen($total).'d-% '.\strlen($total).'d/%d (% 2d%%-% 3d%%)';
 
         return sprintf($formatString, $first, $last, $total, $percent1, $percent2);
     }

@@ -1,3 +1,300 @@
+2018-02-04 DariusIII
+	* Fix: Fix error on details page in Gamma theme
+2018-02-03 DariusIII
+	* Fix: Remove hidden column declaration in User model that caused errors in getnzb and rss
+2018-02-02 DariusIII
+	* Chg: Update phpunit.xml
+	* Chg: Add nunomaduro/collision for console debugging in dev environment
+	* Chg: Change addReleaseFiles function return logic
+	* Chg: Replace insertGetId method with Model::create
+	* Chg: Replace all of getById functions with Model::find
+	* Fix: Fix getByIdAndRssToken function
+	* Chg: Use replace getById user lookup with User model find built in function(does the same thing as custom function)
+2018-02-01 DariusIII
+	* Chg: Update sebastian/comparator to latest version
+	* Chg: Use create method when adding users
+	* Chg: Send email to admins so they know user account has been deleted
+	* Chg: Update phpunit and symfony components
+	* Chg: Do not allow admins to delete their profiles from profile page
+	* Chg: Add check for users when deleting profile so they do not delete another users profile
+	* Chg: Remove occurences of ROLE_GUEST as that role is removed
+2018-01-31 DariusIII
+	* Chg: Add option to users to delete their account from profile page
+	* Chg: Various small changes to Models, RegisterController and update_groups.php
+	* Fix: Fix count of regexes for pager in Regexes class
+	* Chg: Add option to fixtures up/down commands to specifiy which table fixtures to truncate or add
+	* Chg: Update some faulty regexes
+	* Chg: Update composer.lock
+2018-01-30 DariusIII
+	* Chg: Update laravel/framework to version 5.5.33
+	* Chg: Use Carbon in SABnzbd class in set and unset cookies
+	* Chg: Update ReleaseSearch class
+	* Chg: Update .styleci.yml to exclude database/fixtures folder from checks
+	* Chg: Update Tmux and TmuxOutput classes
+	* Fix: Fix missing use statement for Category model in AniDB class
+	* Chg: Use fixtures to populate tables when nntmux is in production, adapt install process
+	* Fix: Fix reference to wrong column in dnzb_failures migration foreign key creation
+2018-01-29 DariusIII
+	* Chg: Add fixtures command to artisan, add binaryblacklist fixture
+	* Chg: Update symfony components, add mayconbordin/l5-fixtures package
+	* Fix: Fix error on details page when there are comments for the release
+	* Chg: Update migration files to include foreign keys
+	* Chg: Remove partitions from releases table, add foreign keys, update usage
+	* Chg: Check for null release date in games
+	* Fix: Fix viewing of comments list in admin area
+	* Chg: Remove PHP7.1 tests from travis
+	* Fix: Fix adding of new cbpr after the latest changes
+2018-01-28 DariusIII
+	* Chg: Make PHP7.2 lowest supported version, use sodium for bin2hex and hex2bin operations
+	* Chg: Update theleague/flysystem to latest version
+	* Chg: Replace time() with Carbon to prevent time conversion from unixtime
+	* Chg: Replace openssl_random_pseudo_bytes with random_bytes
+2018-01-26 DariusIII
+	* Chg: Update phpdocumentor to latest version
+	* Chg: Try to prevent Carbon date errors when postdate is, for some weird reason, null
+	* Chg: Fix wrong NN_INSTALLER constant usage in User model
+	* Chg: Update nikic/php-parser to latest version
+	* Chg: Use artisan console to reset database, update reset_truncate script to use Eloquent and query builder
+2018-01-25 DariusIII
+	* Fix: Fix display of active/inactive groups in admin group list
+2018-01-24 DariusIII
+	* Chg: Update reset_truncate.php to be able to truncate tables (turn off foreign key checks)
+	* Fix: Fix wrong function call when adding groups in ProcessReleases class
+	* CHg: Update composer.json
+	* Chg: Update DbUpdate class, remove unused code and optimize some of the functions used
+2018-01-23 DariusIII
+	* Chg: Update predb_import_daily_batch.php
+	* Chg: Use artisan console to install nntmux, remove the install script from _install folder
+	* Chg: Update chosen to latest version
+2018-01-20 DariusIII
+	* Chg: Update composer.json license to conform with new standard
+	* Chg: Remove seeding of forumposts
+2018-01-18 DariusIII
+	* Chg: Update laravel/framework to version 5.5.32
+	* Fix: Fix installation and tests
+	* Chg: Update scrutinizer config
+	* Chg: Change installation, remove tsv files and related tables, use migrations and seeding for them
+2018-01-17 DariusIII
+	* Fix: Fix installation test
+	* Chg: Update newznab_api_specification.txt to version 0.6-NNTmux
+	* Chg: Add categories table migration and seed
+	* Chg: Change other categories id's
+	* Chg: Update DatabaseSeeder with CountriesSeeder
+	* Chg: Update  mysql-ddl.sql and mysql-data.sql
+	* Chg: Add user_roles migration and seed
+	* Chg: Remove Guest user role
+	* Chg: Update SmartyUtils class
+	* Chg: Update Country class
+	* Chg: Remove countries table as we will use new package with migration and seeding to populate it
+	* Chg: Update Country.php
+	* Chg: Remove $maxage parameter as it is not used in Books class
+	* Chg: Update webpack.mix.js and package.json
+	* Fix: Fix error in search related to removed groups class
+2018-01-16 DariusIII
+	* Chg: Update laravel/framework to version 5.5.31
+	* Chg: Add check for openssl_pseudo_bytes IV generation
+	* Fix: Fix getCBPTableNames function calls
+	* Fix: Fix call to Releases
+	* Chg: Use Group model and remove nntmux\Groups class
+	* Chg: Update Books class processBookReleases function
+	* Fix: Fix ReleaseComment error in profile page
+	* Chg: Update laravel/framework to version 5.5.29 and spatie/fractalistic to latest
+2018-01-15 DariusIII
+	* Chg: Update ReleaseFile addReleaseFiles function $duplicateCheck query
+	* Chg: Revert Forking class nfo processing to older version
+	* Chg: Update Nfo processing
+	* Chg: Update maxSize and minSize parameters handling
+	* Chg: Remove Traversable check as $release is always traversable
+	* Chg: Remove options from Nfo class, adjust other files accordingly
+	* Chg: Update Nfo class processNfoFiles function
+2018-01-14 DariusIII
+	* Chg: Update ramsey/uuid to latest version
+	* Fix: Fix processMovieReleases query
+2018-01-13 DariusIII
+	* Chg: Add duckduckgo search to Movie class, use Release model where applicable
+	* Chg: Remove Sofa/Eloquence
+2018-01-12 DariusIII
+	* Chg: Add Sofa/Eloquence, update models
+	* Chg: Small update to XML_Response class
+	* Chg: Update Capabilities class
+	* Chg: Update composer.json and .lock files
+	* Chg: Update NZBMultiGroup class
+	* Chg: Update Groups class
+	* Chg: Change NZB class call options
+	* Fix: Fix wrong column name in ReleaseComment model
+	* Chg: Update composer.lock
+	* Chg: Remove nntmux/ReleaseComments class and use ReleaseComment model
+	* Chg: Change how tmux sessions are checked, as count on non-countable array/object does not work in PHP7.2
+2018-01-11 DariusIII
+	* Chg: Use Carbon facade and not Carbon directly
+	* Chg: Update ReleaseFile model
+	* Chg: Update Console class
+	* Chg: Declare categories table name in Category model
+	* Chg: Update Steam class
+	* Fix: Fix NameFixer Category model usage
+	* Chg: Use UserMovie model, remove nntmux\UserMovies class
+	* Chg: Use UserSerie model, remove nntmux/UserSeries class
+	* Chg: Update Categorize class groupName function
+	* Chg: Update headermenu.tpl and Category model
+	* Chg: Update Releases and Genres classes
+	* Chg: Update Categorize and Regexes classes
+	* Chg: Remove nntmux/Category class and move its functions into Category model
+	* Fix: Fix missing Carbon class use statament
+2018-01-10 DariusIII
+	* Chg: Add missing DatabaseSeeder class
+	* Chg: Remove nntmux/Menu class and use Menu model
+	* Chg: Update Forumpost model
+	* Chg: Remove nntmux/Forum.php and use Forumpost model
+	* Chg: Update scrutinizer config
+	* Chg: Use laravels str_slug helper to create slugs in TraktAPI class
+	* Fix: Properly fix mediainfo display (PHP7.2 countable array/object error)
+	* Chg: Update doctrine/inflector to latest version
+2018-01-09 DariusIII
+	* Chg: Update jpinkney/tvmaze-api-wrapper to latest
+	* Fix: Temporary fix for PHP7.2 countable arrays/objects problem
+	* Chg: Update ReleaseExtra class
+	* Chg: Update NZBContents class
+	* Chg: Update isValidPassword and generatePassword functions to check for and generate stronger passwords
+	* Chg: Add php7.2 to travis tests
+	* Chg: Start switching to php7.2, remove mcrypt extension requirement from composer.json
+	* Chg: Remove config/nntmux.php
+2018-01-08 DariusIII
+	* Chg: Update Groups and Binaries classes
+	* Fix: Fix nfo query in Forking class (use leftguid for grouping)
+	* Fix: Fix path loading in smarty.php
+	* Chg: Update files that use constants.php
+	* Chg: Move constants.php to bootstrap folder, config folder was a bad place
+	* Chg: Move constants.php to config folder
+	* Chg: Update simfony components
+2018-01-05 DariusIII
+	* Chg: Update ReleaseFile model
+	* Chg: Fix display issues of RT ratings in all themes
+	* Chg: Update Anidb related classes and models
+	* Chg: Remove nntmux/PreDb class and move its functions into Predb model
+	* Chg: Update ConsoleTools class and related scripts
+	* Chg: Update Forking and postprocess.php
+	* Chg: Update Movie class and add missing rtrating column to movieinfo table in mysql-ddl.sql
+	* Chg: Update nntmux/AniDB class
+	* Chg: Add foreign key to videos_aliases table that references videos table
+2018-01-04 DariusIII
+	* Chg: Remove nntmux/Videos class and move its functions into Video model
+	* Chg: Update nntmux/Videos class to completely use query builder
+2018-01-03 DariusIII
+	* Chg: Update nntmux/Videos class
+	* Fix: Fix setting name for zippath in ProcessAdditional class
+	* Chg: Update Books class
+	* Fix: Fix left join in getConsoleInfo query
+	* Chg: Update psy/psych to latest version
+	* Fix: Fix max headers iteration and 7zippath entries in site edit (closes issue #222)
+	* Chg: Update Settings model and site-edit.php(replace deprecated create_function with anonymous function)
+2017-12-29 DariusIII
+	* Chg: Update constants defintions in Captcha class
+2017-12-28 DariusIII
+	* Chg: Update populate_rt_indexes.php
+	* Chg: Remove unused DnzbFailures class use statements
+	* Chg: Remove DnzbFailures class and move its functions into appropriate models
+	* Chg: Remove nntmux\ReleaseFiles class and use ReleaseFile model
+2017-12-27 DariusIII
+	* Chg: Remove links to newposterwall from all themes
+	* Fix: Fix $nfoStats query
+	* Fix: Fix nfo related queries in Forking class
+	* Chg: Add check for existence of error code in Binaries class
+	* Fix: Fix getByGuid function query
+	* Chg: Move more functions from Releases class to appropriate models and helpers.php
+	* Fix: Fix loading of User model in browsegroup page
+	* Chg: Move some more functions from Releases class to appropriate models
+	* Chg: Remove newposterwall feature
+	* Chg: Move more functions from Releases to appropriate models
+	* Chg: Move updateGrab, getById functions from Releases class to Release model (rename getById to getCatByRelId)
+	* Chg: Move createGUID function to helpers.php
+	* Chg: Update laravel/framework and nikic/php-parser to latest versions
+2017-12-26 DariusIII
+	* Chg: Start moving functions from Releases class to Release model
+	* Chg: Update composer.json and .lock files
+	* Fix: Add back command removed by mistake to monitor.php
+	* Chg: Update switch.php and add imdb and tv lookup settings to procesNfoFiles function call
+	* Fix: Fix used groupBy query builder function syntax
+	* Chg: Change order of query parts in processNfoFiles function
+	* Chg: Use collection count method to get query rows count
+	* Chg: Remove unused use statement for Users class
+	* Chg: Update Forking class, fix register_child_run function parameters
+2017-12-25 DariusIII
+	* Chg: Move getBrowseOrder and getBrowseOrdering for users into helpers.php as getUserBrowseOrder and getuserBrowseOrdering
+	* Chg: Remove Users class and use models in its place
+	* Chg: Update Settings model
+2017-12-24 DariusIII
+	* Chg: Remove sitewide sab/nzbget integration
+	* Chg: Remove user registration through API
+2017-12-23 DariusIII
+	* Fix: Fix wrong groupBy parameters
+2017-12-22 DariusIII
+	* Chg: Allow logins by username or email
+	* Chg: Update SABnzbd and NZBGet classes
+	* Chg: Update Forking class, add nfoQueryString function back to Nfo class (tmux still needs it)
+	* Chg: Update Nfo and NZBContents classes
+2017-12-21 DariusIII
+	* Chg: Update Nfo class
+	* Chg: Update ProcessAdditional class
+	* Chg: Remove custom logging from nntmux, laravel handles errors now
+	* Chg: Update laravel/framework and watson/rememberable to their latest versions
+	* Fix: Fix users_id column length in all tables
+	* Chg: Update ProcessReleases collections/binaries/parts tables handling
+2017-12-20 DariusIII
+	* Fix: Update patches and mysql-ddl.sql
+	* Fix: Add missing redis setting into 10-tmux.tsv
+	* Chg: Add foreign keys to (multigroup_)binaries,(multigroup_)parts and adjust ProcessReleases class accordingly
+	* Chg: Remove migrations for now, they will be created again in future
+	* Chg: Use FK to delete user related data, add patch
+	* Fix: Update _install/install_nntmux.php to ignore foreign keys on install
+	* Fix: Fix mysql-ddl.sql
+	* Chg: Add foreign keys to mysql-ddl.sql
+2017-12-19 DariusIII
+	* Chg: Update Books class
+	* Chg: Update Binaries class
+	* Chg: Update laravel/framework and laravel/tinker to latest versions
+	* Chg: Update ColorCLI class
+	* Fix: Possible fix for blank searchname on mediainfo moviename rename
+	* Chg: Remove code that handles requestids
+	* Chg: Update ParHash model and query in ReleaseFiles
+	* Chg: Possible fix for Carbon error
+2017-12-18 DariusIII
+	* CHg: Update Nfo class and mysql-ddl (declare ROW_FORMAT for xxxinfo and release_nfos tables as COMPRESSED)
+	* Chg: Remove complete sequential mode
+	* Chg: Remove screen scripts completely, they were not maintaned and not up-to-date
+	* Chg: Remove requestid lookup settings from site edit
+	* Chg: Remove spotnab from nntmux, update PostProcess class
+	* Fix: Fix site stats display error
+	* Chg: Update Video and VideoAlias models, update Videos class
+2017-12-17 DariusIII
+	* Chg: Update Releases class
+	* Chg: Update TV class
+	* Chg: Update Users class
+	* Chg: Update Cache class
+	* Chg: Update phpunit to latest version
+2017-12-15 DariusIII
+	* Chg: Update switch.php and Forking class
+	* Chg: Disable requestid lookups in ProcessReleases class
+	* Chg: Do some small optimizations in ReleaseRemover
+	* Chg: Update simfony components and jpinkney/tvmaze-php-api to their latest versions
+	* Chg: Use count instead of rowCount in TV related classes
+	* Chg: Update mysql-ddl, TV class and related models
+	* Chg: Update TVDB class
+	* Chg: Update TVmaze class again
+	* Chg: Optimize TVMaze class
+	* Chg: Update XXX class, remove debugging as laravel is handling it now
+	* Chg: Update call to ReleaseImage, remove $(this->)pdo from it
+2017-12-13 DariusIII
+	* Chg: Update laravel/framework and rest of the libraries to their latest versions
+2017-12-10 DariusIII
+	* Chg: Move download related functions to UserDownload model from Users class
+2017-12-09 DariusIII
+	* Chg: Move some of the functions to their related models
+2017-12-08 DariusIII
+	* Chg: Update laravel/framework and simfony components to latest versions
+2017-12-07 DariusIII
+	* Chg: Move users role related functions from Users class To UserRole model
+2017-12-06 DariusIII
+	* Chg: Add support for BTC donations through Mycelium Gear
 2017-12-04 DariusIII
 	* Chg: Update mysqltuner.pl to latest version
 	* Chg: Update composer lock file

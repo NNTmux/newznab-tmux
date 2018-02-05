@@ -1,18 +1,16 @@
 <?php
 
 use nntmux\XXX;
-use nntmux\Category;
-use nntmux\DnzbFailures;
+use App\Models\User;
+use App\Models\Category;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 $movie = new XXX();
-$cat = new Category();
-$fail = new DnzbFailures();
 
-$moviecats = $cat->getChildren(Category::XXX_ROOT);
+$moviecats = Category::getChildren(Category::XXX_ROOT);
 $mtmp = [];
 foreach ($moviecats as $mcat) {
     $mtmp[$mcat['id']] = $mcat;
@@ -67,7 +65,7 @@ $page->smarty->assign('pager', $pager);
 if ((int) $category === -1) {
     $page->smarty->assign('catname', 'All');
 } else {
-    $cdata = $cat->getById($category);
+    $cdata = Category::find($category);
     if ($cdata) {
         $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
     } else {

@@ -9,17 +9,17 @@ namespace nntmux\libraries;
  */
 class Cache
 {
-    const SERIALIZER_PHP = 0;
-    const SERIALIZER_IGBINARY = 1;
-    const SERIALIZER_NONE = 2;
+    private const SERIALIZER_PHP = 0;
+    private const SERIALIZER_IGBINARY = 1;
+    private const SERIALIZER_NONE = 2;
 
-    const TYPE_DISABLED = 0;
-    const TYPE_MEMCACHED = 1;
-    const TYPE_REDIS = 2;
-    const TYPE_APC = 3;
+    private const TYPE_DISABLED = 0;
+    private const TYPE_MEMCACHED = 1;
+    private const TYPE_REDIS = 2;
+    private const TYPE_APC = 3;
 
     /**
-     * @var \Memcached|null
+     * @var \Memcached
      */
     private $server;
 
@@ -38,13 +38,14 @@ class Cache
     /**
      * Store data on the cache server.
      *
-     * @param string       $key        Key we can use to retrieve the data.
-     * @param string|array $data       Data to store on the cache server.
-     * @param int          $expiration Time before the data expires on the cache server.
      *
-     * @return bool Success/Failure.
+     * @param $key
+     * @param $data
+     * @param $expiration
+     * @return bool
+     * @throws \nntmux\libraries\CacheException
      */
-    public function set($key, $data, $expiration)
+    public function set($key, $data, $expiration): bool
     {
         if ($this->ping()) {
             switch (NN_CACHE_TYPE) {
@@ -62,9 +63,10 @@ class Cache
     /**
      * Attempt to retrieve a value from the cache server, if not set it.
      *
-     * @param string $key Key we can use to retrieve the data.
      *
-     * @return bool|string False on failure or String, data belonging to the key.
+     * @param $key
+     * @return bool|mixed|string
+     * @throws \nntmux\libraries\CacheException
      */
     public function get($key)
     {
@@ -89,9 +91,10 @@ class Cache
     /**
      * Delete data tied to a key on the cache server.
      *
-     * @param string $key Key we can use to retrieve the data.
      *
-     * @return bool True if deleted, false if not.
+     * @param $key
+     * @return bool|string[]
+     * @throws \nntmux\libraries\CacheException
      */
     public function delete($key)
     {
@@ -110,6 +113,9 @@ class Cache
 
     /**
      * Flush all data from the cache server?
+     *
+     *
+     * @throws \nntmux\libraries\CacheException
      */
     public function flush()
     {
@@ -144,7 +150,9 @@ class Cache
     /**
      * Get cache server statistics.
      *
-     * @return array
+     *
+     * @return array|bool
+     * @throws \nntmux\libraries\CacheException
      */
     public function serverStatistics()
     {
@@ -169,25 +177,25 @@ class Cache
      */
     public function __construct()
     {
-        if (! defined('NN_CACHE_HOSTS')) {
+        if (! \defined('NN_CACHE_HOSTS')) {
             throw new CacheException(
                 'The NN_CACHE_HOSTS is not defined! Define it in settings.php'
             );
         }
 
-        if (! defined('NN_CACHE_TIMEOUT')) {
+        if (! \defined('NN_CACHE_TIMEOUT')) {
             throw new CacheException(
                 'The NN_CACHE_TIMEOUT is not defined! Define it in settings.php, it is the time in seconds to time out from your cache server.'
             );
         }
 
         $this->socketFile = false;
-        if (defined('NN_CACHE_SOCKET_FILE') && NN_CACHE_SOCKET_FILE != '') {
+        if (\defined('NN_CACHE_SOCKET_FILE') && NN_CACHE_SOCKET_FILE != '') {
             $this->socketFile = true;
         }
 
         $serializer = false;
-        if (defined('NN_CACHE_SERIALIZER')) {
+        if (\defined('NN_CACHE_SERIALIZER')) {
             $serializer = true;
         }
 
@@ -289,7 +297,9 @@ class Cache
     /**
      * Check if we are still connected to the cache server, reconnect if not.
      *
+     *
      * @return bool
+     * @throws \nntmux\libraries\CacheException
      */
     private function ping()
     {
@@ -359,7 +369,7 @@ class Cache
                 // no break
             case self::SERIALIZER_NONE:
                 // Only redis supports this.
-                if (NN_CACHE_TYPE != self::TYPE_REDIS) {
+                if (NN_CACHE_TYPE !== self::TYPE_REDIS) {
                     throw new CacheException('Error: Disabled serialization is only available on Redis!');
                 }
 

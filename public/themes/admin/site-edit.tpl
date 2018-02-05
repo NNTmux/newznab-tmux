@@ -379,97 +379,10 @@
 				<td style="width:160px;"><label for="sabintegrationtype">Integration Type</label>:</td>
 				<td>
 					{html_radios id="sabintegrationtype" name='sabintegrationtype' values=$sabintegrationtype_ids output=$sabintegrationtype_names selected=$site->integrationtype separator='<br />'}
-					<div class="hint">Whether to allow integration with a SAB/NZBGet install and if so what type of integration<br/></div>
-				</td>
-			</tr>
-
-			<tr>
-				<td><label for="sabcompletedir">Download Complete Path</label>:</td>
-				<td>
-					<input id="sabcompletedir" class="long" name="sabcompletedir" type="text" value="{$site->sabcompletedir}" />
-					<div class="hint">The downloads/complete folder for a local sab install, for example: /var/www/sab/downloads/complete</div>
-				</td>
-			</tr>
-
-			<tr>
-				<td><label for="sabvdir">Download Complete Vdir URL</label>:</td>
-				<td>
-					<input id="sabvdir" class="long" name="sabvdir" type="text" value="{$site->sabvdir}" />
-					<div class="hint">A url to a hosted virtual directory pointing to the sab downloads/complete folder, e.g. http://server/complete</div>
+					<div class="hint">Whether to allow integration with a SAB/NZBGet install or not<br/></div>
 				</td>
 			</tr>
 		</table>
-
-		<fieldset>
-			<legend>SABnzbd</legend>
-			<table class="data table table-striped responsive-utilities jambo-table">
-
-				<tr>
-					<td><label for="saburl">SABnzbd Url</label>:</td>
-					<td>
-						<input id="saburl" class="long" name="saburl" type="text" value="{$site->saburl}" />
-						<div class="hint">The url of the SAB installation, for example: http://localhost:8080/sabnzbd/</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="sabapikey">SABnzbd Api Key</label>:</td>
-					<td>
-						<input id="sabapikey" class="long" name="sabapikey" type="text" value="{$site->sabapikey}" />
-						<div class="hint">The Api key of the SAB installation. Can be the full api key or the nzb api key (as of SAB 0.6)</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="sabapikeytype">Api Key Type</label>:</td>
-					<td>
-						{html_radios id="sabapikeytype" name='sabapikeytype' values=$sabapikeytype_ids output=$sabapikeytype_names selected=$site->sabapikeytype separator='<br />'}
-						<div class="hint">Select the type of api key you entered in the above setting</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="sabpriority">Priority Level</label>:</td>
-					<td>
-						{html_options id="sabpriority" name='sabpriority' values=$sabpriority_ids output=$sabpriority_names selected=$site->sabpriority}
-						<div class="hint">Set the priority level for NZBs that are added to your queue</div>
-					</td>
-				</tr>
-
-			</table>
-		</fieldset>
-
-
-		<fieldset>
-			<legend>NZBGet</legend>
-			<table class="input data table table-striped responsive-utilities jambo-table">
-
-				<tr>
-					<td><label for="nzbgeturl">NZBGet Url</label>:</td>
-					<td>
-						<input id="nzbgeturl" class="long" name="nzbgeturl" type="text" value="{$site->nzbgeturl}" />
-						<div class="hint">The url of the NZBGet installation, for example: http://localhost:6789/</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="nzbgetusername">NZBGet Username</label>:</td>
-					<td>
-						<input id="nzbgetusername" class="long" name="nzbgetusername" type="text" value="{$site->nzbgetusername}" />
-						<div class="hint">The NZBGet ControlUsername e.g. nzbget</div>
-					</td>
-				</tr>
-
-				<tr>
-					<td><label for="nzbgetpassword">NZBGet Password</label>:</td>
-					<td>
-						<input id="nzbgetpassword" class="long" name="nzbgetpassword" type="text" value="{$site->nzbgetpassword}" />
-						<div class="hint">The NZBGet ControlPassword e.g. tegbzn6789</div>
-					</td>
-				</tr>
-
-			</table>
-		</fieldset>
 
 	</fieldset>
 
@@ -795,91 +708,6 @@
 </fieldset>
 
 <fieldset>
-<legend>Spotnab Settings</legend>
-<table class="input data table table-striped responsive-utilities jambo-table">
-
-<tr>
-	<td><label for="spotnabpost">Enable Posting</label>:</td>
-	<td>
-		{html_radios id="spotnabpost" name='spotnabpost' values=$yesno_ids output=$yesno_names selected=$site->spotnabpost separator='<br />'}
-		<div class="hint">If enabled, encrypted comments from this site will be uploaded using the spotnab protocol. These will be shared with others participating Newznab sites. Set up Spotnab sources <a href="spotnab-list.php">here</a> or use Auto Discovery.</div>
-	</td>
-</tr>
-
-<tr>
-	<td style="width:160px;"><label for="spotnabbroadcast">Broadcast Source</label>:</td>
-	<td>
-		{html_radios id="spotnabbroadcast" name='spotnabbroadcast' values=$yesno_ids output=$yesno_names selected=$site->spotnabbroadcast separator='<br />'}
-		<div class="hint">If enabled, a broadcast packet will be uploaded every month, so that other participating Newznab sites can automatically subscribe to your comments.</div>
-	</td>
-</tr>
-
-<tr>
-	<td style="width:160px;"><label for="spotnabdiscover">Auto Discovery</label>:</td>
-	<td>
-		{html_radios id="spotnabdiscover" name='spotnabdiscover' values=$yesno_ids output=$yesno_names selected=$site->spotnabdiscover separator='<br />'}
-		<div class="hint">If enabled, other participating Newznab sites will be added automatically (as inactive) to your <a href="spotnab-list.php">sources list</a>.</div>
-	</td>
-</tr>
-
-<tr>
-	<td style="width:160px;"><label for="spotnabprivacy">Enable Privacy</label>:</td>
-	<td>
-		{html_radios id="spotnabprivacy" name='spotnabprivacy' values=$yesno_ids output=$yesno_names selected=$site->spotnabprivacy separator='<br />'}
-		<div class="hint">If enabled, uploaded comments use a unique (made up) username.</div>
-	</td>
-</tr>
-
-<tr>
-	<td style="width:160px;"><label for="spotnabautoenable">Source Auto Enable</label>:</td>
-	<td>
-		{html_radios id="spotnabautoenable" name='spotnabautoenable' values=$yesno_ids output=$yesno_names selected=$site->spotnabautoenable separator='<br />'}
-		<div class="hint">If enabled, newly discovered Spotnab sources will be enabled by default.</div>
-	</td>
-</tr>
-
-<tr>
-	<td><label for="spotnabuser">Username</label>:</td>
-	<td>
-		<input name="spotnabuser" type="text" value="{$site->spotnabuser}" />
-		<div class="hint">The username part used for posting. eg nntp</div>
-	</td>
-</tr>
-<tr>
-	<td><label for="spotnabemail">E-mail</label>:</td>
-	<td>
-		<input name="spotnabemail" type="text" value="{$site->spotnabemail}" />
-		<div class="hint">The email part used for posting. eg spot@nntp.com</div>
-	</td>
-</tr>
-<tr>
-	<td><label for="spotnabgroup">Usenet Group</label>:</td>
-	<td>
-		<input name="spotnabgroup" type="text" value="{$site->spotnabgroup}" />
-		<div class="hint">The group where posts are uploaded. eg alt.binaries.backup</div>
-	</td>
-</tr>
-
-<tr>
-  <td style="width:130px;"><label for="spotnabsitepubkey">Public Key</label>:</td>
-  <td>
-	<textarea name="spotnabsitepubkey">{$site->spotnabsitepubkey|escape:html}</textarea>
-	<div class="hint">Public key other sites will use to decrypt comments.</div>
-  </td>
-</tr>
-
-<tr>
-  <td style="width:130px;"><label for="spotnabsiteprvkey">Private Key:<br><u>Do Not Share This</u></label></td>
-  <td>
-	<textarea name="spotnabsiteprvkey">{$site->spotnabsiteprvkey|escape:html}</textarea>
-	<div class="hint">Private key used to encrypt comments before uploading.</div>
-  </td>
-</tr>
-
-</table>
-</fieldset>
-
-<fieldset>
 	<legend>IMDB.com URL</legend>
 	<table class="input data table table-striped responsive-utilities jambo-table">
 		<tr>
@@ -1100,34 +928,6 @@
 			</tr>
 		</table>
 	</fieldset>
-<fieldset id="site_requidset">
-	<legend>RequestID Settings</legend>
-	<table class="input data table table-striped responsive-utilities jambo-table">
-		<tr>
-			<td style="width:180px;"><label for="lookup_reqids">Lookup Request IDs:</label></td>
-			<td>
-				{html_options style="width:180px;" id="lookup_reqids" name='lookup_reqids' values=$lookup_reqids_ids output=$lookup_reqids_names selected=$site->lookup_reqids}
-				<div class="hint">Whether to attempt to lookup Request IDs using the Request id link below. This will rename your releases to proper PreDB names.</div>
-			</td>
-		</tr>
-		<tr>
-			<td style="width:180px;"><label for="request_url">Request id Link:</label></td>
-			<td>
-				<input id="request_url" class="long" name="request_url" type="text" value="{$site->request_url}"/>
-				<div class="hint">Optional URL to lookup Request IDs. [REQUEST_ID] gets replaced with the request id from the
-					post. [GROUP_NM] Gets replaced with the group name.
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td style="width:180px;"><label for="request_hours">Max hours to recheck Request IDs:</label></td>
-			<td>
-				<input id="request_hours" class="short" name="request_hours" type="text" value="{$site->request_hours}"/>
-				<div class="hint">The maximum hours after a release is added to recheck for a Request id match.</div>
-			</td>
-		</tr>
-	</table>
-</fieldset>
 
 <fieldset>
 	<legend>Advanced - Postprocessing Settings</legend>

@@ -17,8 +17,8 @@
       "public/pages/",
       "libs/PEAR/Net_NNTP/NNTP/",
       "libs/",
-      "database/seeds",
-      "database/factories"
+      "database/factories",
+      "database/seeds"
     ]
   },
   "config": {
@@ -51,7 +51,7 @@
     "Laravel",
     "Eloquent"
   ],
-  "license": "GPL-3.0",
+  "license": "GPL-3.0-only",
   "name": "nntmux/newznab-tmux",
   "non-feature-branches": [
     "latest-.*"
@@ -63,7 +63,7 @@
     }
   ],
   "require": {
-    "php": ">=7.1.0",
+    "php": ">=7.2.0",
     "ext-ctype": "*",
     "ext-curl": "*",
     "ext-exif": "*",
@@ -71,10 +71,8 @@
     "ext-gd": "*",
     "ext-hash": "*",
     "ext-iconv": "*",
-    "ext-imagick": "*",
     "ext-json": "*",
     "ext-mbstring": "*",
-    "ext-mcrypt": "*",
     "ext-mysqlnd": "*",
     "ext-openssl": "*",
     "ext-pcre": "*",
@@ -90,6 +88,7 @@
     "aharen/omdbapi": "^2.0",
     "b3rs3rk/steamfront": "dev-master",
     "barracudanetworks/forkdaemon-php": "~1.0",
+    "bhuvidya/laravel-countries": "^1.0",
     "bower-asset/DataTables": "~1.10.11",
     "bower-asset/animate.css": "~3.5.1",
     "bower-asset/autosize": "~3.0.15",
@@ -130,10 +129,13 @@
     "fxp/composer-asset-plugin": "~1.1",
     "google/recaptcha": "~1.1",
     "guzzlehttp/guzzle": "^6.3",
+    "intervention/image": "^2.4",
+    "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
     "laravel/framework": "^5.5",
     "laravel/tinker": "~1.0",
+    "mayconbordin/l5-fixtures": "dev-master",
     "monolog/monolog": "^1.22",
     "nzedb/Git.php": "dev-master",
     "php-http/guzzle6-adapter": "^1.1",
@@ -143,7 +145,7 @@
     "ramsey/uuid": "^3.7",
     "roave/security-advisories": "dev-master",
     "smarty/smarty": "~3.1",
-    "spatie/laravel-fractal": "^5.2",
+    "spatie/laravel-fractal": "^5.3",
     "vlucas/phpdotenv": "^2.4",
     "watson/rememberable": "^2.0",
     "yadakhov/insert-on-duplicate-key": "^1.2"
@@ -153,8 +155,9 @@
     "filp/whoops": "~2.0",
     "fzaninotto/faker": "~1.4",
     "mockery/mockery": "0.9.*",
+    "nunomaduro/collision": "^1.1",
     "orangehill/iseed": "^2.5",
-    "phpunit/phpunit": "^6.1",
+    "phpunit/phpunit": "^6.5",
     "xethron/migrations-generator": "^2.0"
   },
 
@@ -178,6 +181,8 @@
     ]
   },
   "suggest": {
+    "ext-gd": "to use GD library based image processing.",
+    "ext-imagick": "to use Imagick based image processing.",
     "ext-xdebug": "For developement work",
     "ext-yenc": "PHP7 yEnc decoding extension"
   },

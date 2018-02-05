@@ -25,9 +25,9 @@ $path2preview = NN_COVERS.'preview'.DS;
 
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     $releases = new Releases(['Settings' => $pdo]);
-    $nzb = new NZB($pdo);
-    $releaseImage = new ReleaseImage($pdo);
-    $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
+    $nzb = new NZB();
+    $releaseImage = new ReleaseImage();
+    $consoletools = new ConsoleTools();
     $couldbe = $argv[1] === 'true' ? $couldbe = 'were ' : 'could be ';
     $limit = $counterfixed = 0;
     if (isset($argv[2]) && is_numeric($argv[2])) {

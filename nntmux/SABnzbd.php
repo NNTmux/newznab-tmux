@@ -2,8 +2,10 @@
 
 namespace nntmux;
 
+use App\Models\User;
 use GuzzleHttp\Client;
 use App\Models\Settings;
+use Illuminate\Support\Carbon;
 
 /**
  * Class SABnzbd.
@@ -14,7 +16,6 @@ class SABnzbd
      * Type of site integration.
      */
     public const INTEGRATION_TYPE_NONE = 0;
-    public const INTEGRATION_TYPE_SITEWIDE = 1;
     public const INTEGRATION_TYPE_USER = 2;
 
     /**
@@ -98,7 +99,7 @@ class SABnzbd
      */
     public function __construct(&$page)
     {
-        $this->uid = $page->users->currentUserId();
+        $this->uid = User::currentUserId();
         $this->rsstoken = $page->userdata['rsstoken'];
         $this->serverurl = $page->serverurl;
         $this->client = new Client(['verify' => false]);
@@ -129,18 +130,6 @@ class SABnzbd
                 }
                 break;
 
-            case self::INTEGRATION_TYPE_SITEWIDE:
-                if ((Settings::settingValue('apps.sabnzbplus.apikey') !== '') && (Settings::settingValue('apps.sabnzbplus.url')
-                        !== '')) {
-                    $this->url = Settings::settingValue('apps.sabnzbplus.url');
-                    $this->apikey = Settings::settingValue('apps.sabnzbplus.apikey');
-                    $this->priority = Settings::settingValue('apps.sabnzbplus.priority');
-                    $this->apikeytype = Settings::settingValue('apps.sabnzbplus.apikeytype');
-                }
-                $this->integrated = self::INTEGRATION_TYPE_SITEWIDE;
-                $this->integratedBool = true;
-                break;
-
             case self::INTEGRATION_TYPE_NONE:
                 $this->integrated = self::INTEGRATION_TYPE_NONE;
                 // This is for nzbget.
@@ -166,13 +155,11 @@ class SABnzbd
     }
 
     /**
-     * Send a release to SAB.
-     *
-     * @param string $guid Release identifier.
-     *
-     * @return bool|mixed
+     * @param $guid
+     * @return string
+     * @throws \RuntimeException
      */
-    public function sendToSab($guid)
+    public function sendToSab($guid): string
     {
         return $this->client->post(
                 $this->url.
@@ -190,47 +177,43 @@ class SABnzbd
                         '&r='.
                         $this->rsstoken
                     )
-        );
+        )->getBody()->getContents();
     }
 
     /**
-     * Get JSON representation of the full SAB queue.
-     *
-     * @return bool|mixed
+     * @return string
+     * @throws \RuntimeException
      */
-    public function getAdvQueue()
+    public function getAdvQueue(): string
     {
         return $this->client->get(
                     $this->url.
                     'api?mode=queue&start=START&limit=LIMIT&output=json&apikey='.
                     $this->apikey
 
-        );
+        )->getBody()->getContents();
     }
 
     /**
-     * Get JSON representation of SAB history.
-     *
-     * @return bool|mixed
+     * @return string
+     * @throws \RuntimeException
      */
-    public function getHistory()
+    public function getHistory(): string
     {
         return $this->client->get(
             $this->url.
             'api?mode=history&start=START&limit=LIMIT&category=CATEGORY&search=SEARCH&failed_only=0&output=json&apikey='.
             $this->apikey
 
-        );
+        )->getBody()->getContents();
     }
 
     /**
-     * Delete a single NZB from the SAB queue.
-     *
-     * @param int $id
-     *
-     * @return bool|mixed
+     * @param $id
+     * @return string
+     * @throws \RuntimeException
      */
-    public function delFromQueue($id)
+    public function delFromQueue($id): string
     {
         return $this->client->get(
         $this->url.
@@ -238,17 +221,15 @@ class SABnzbd
             $id.
             '&apikey='.
             $this->apikey
-        );
+        )->getBody()->getContents();
     }
 
     /**
-     * Pause a single NZB in the SAB queue.
-     *
-     * @param int $id
-     *
-     * @return bool|mixed
+     * @param $id
+     * @return string
+     * @throws \RuntimeException
      */
-    public function pauseFromQueue($id)
+    public function pauseFromQueue($id): string
     {
         return $this->client->get(
         $this->url.
@@ -256,15 +237,13 @@ class SABnzbd
             $id.
             '&apikey='.
             $this->apikey
-        );
+        )->getBody()->getContents();
     }
 
     /**
-     * Resume a single NZB in the SAB queue.
-     *
-     * @param int $id
-     *
-     * @return bool|mixed
+     * @param $id
+     * @return string
+     * @throws \RuntimeException
      */
     public function resumeFromQueue($id)
     {
@@ -274,37 +253,37 @@ class SABnzbd
             $id.
         '&apikey='.
             $this->apikey
-        );
+        )->getBody()->getContents();
     }
 
     /**
-     * Pause all NZB's in the SAB queue.
-     *
-     * @return bool|mixed
+     * @return string
+     * @throws \RuntimeException
      */
-    public function pauseAll()
+    public function pauseAll(): string
     {
         return $this->client->get(
         $this->url.
         'api?mode=pause'.
         '&apikey='.
             $this->apikey
-        );
+        )->getBody()->getContents();
     }
 
     /**
      * Resume all NZB's in the SAB queue.
      *
-     * @return bool|mixed
+     * @return string
+     * @throws \RuntimeException
      */
-    public function resumeAll()
+    public function resumeAll(): string
     {
         return $this->client->get(
         $this->url.
         'api?mode=resume'.
         '&apikey='.
             $this->apikey
-        );
+        )->getBody()->getContents();
     }
 
     /**
@@ -341,10 +320,10 @@ class SABnzbd
      */
     public function setCookie($host, $apikey, $priority, $apitype)
     {
-        setcookie('sabnzbd_'.$this->uid.'__host', $host, time() + 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__apikey', $apikey, time() + 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__priority', $priority, time() + 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__apitype', $apitype, time() + 2592000);
+        setcookie('sabnzbd_'.$this->uid.'__host', $host, Carbon::now()->addDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apikey', $apikey, Carbon::now()->addDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__priority', $priority, Carbon::now()->addDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apitype', $apitype, Carbon::now()->addDays(30)->timestamp);
     }
 
     /**
@@ -352,9 +331,9 @@ class SABnzbd
      */
     public function unsetCookie()
     {
-        setcookie('sabnzbd_'.$this->uid.'__host', '', time() - 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__apikey', '', time() - 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__priority', '', time() - 2592000);
-        setcookie('sabnzbd_'.$this->uid.'__apitype', '', time() - 2592000);
+        setcookie('sabnzbd_'.$this->uid.'__host', '', Carbon::now()->subDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apikey', '', Carbon::now()->subDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__priority', '', Carbon::now()->subDays(30)->timestamp);
+        setcookie('sabnzbd_'.$this->uid.'__apitype', '', Carbon::now()->subDays(30)->timestamp);
     }
 }

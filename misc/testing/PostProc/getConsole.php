@@ -6,9 +6,8 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
 use nntmux\Console;
-use nntmux\Category;
+use App\Models\Category;
 
-$category = new Category();
 $pdo = new DB();
 $console = new Console(['Echo' => true, 'Settings' => $pdo]);
 

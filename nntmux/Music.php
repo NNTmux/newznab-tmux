@@ -4,13 +4,14 @@ namespace nntmux;
 
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
-use Carbon\Carbon;
 use App\Models\Genre;
 use GuzzleHttp\Client;
 use App\Models\Release;
+use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MusicInfo;
 use ApaiIO\Operations\Search;
+use Illuminate\Support\Carbon;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
@@ -151,7 +152,7 @@ class Music
 
         $catsrch = '';
         if (\count($cat) > 0 && (int) $cat[0] !== -1) {
-            $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat);
         }
 
         $exccatlist = '';
@@ -372,7 +373,7 @@ class Music
     public function updateMusicInfo($title, $year, $amazdata = null): bool
     {
         $gen = new Genres(['Settings' => $this->pdo]);
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
         $titlepercent = 0;
 
         $mus = [];
@@ -482,7 +483,7 @@ class Music
             if (\in_array(strtolower($genreName), $genreassoc, false)) {
                 $genreKey = array_search(strtolower($genreName), $genreassoc, false);
             } else {
-                $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
+                $genreKey = Genre::create(['title' => $genreName, 'type' => Genres::MUSIC_TYPE])->id;
             }
         }
         $mus['musicgenre'] = $genreName;
@@ -490,7 +491,7 @@ class Music
 
         $check = MusicInfo::query()->where('asin', $mus['asin'])->first(['id']);
         if ($check === null) {
-            $musicId = MusicInfo::query()->insertGetId(
+            $musicId = MusicInfo::create(
                 [
                     'title' => $mus['title'],
                     'asin' =>$mus['asin'],
@@ -504,10 +505,8 @@ class Music
                     'genres_id' => (int) $mus['musicgenres_id'] === -1 ? 'null' : $mus['musicgenres_id'],
                     'tracks' => $mus['tracks'],
                     'cover' => $mus['cover'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
                 ]
-            );
+            )->id;
         } else {
             $musicId = $check['id'];
             MusicInfo::query()->where('id', $musicId)->update(

@@ -1,20 +1,19 @@
 <?php
 
+use App\Models\Predb;
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\PreDb;
-
 $page = new AdminPage();
-$predb = new PreDb();
 
 $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
 
 if (isset($_REQUEST['presearch'])) {
     $lastSearch = $_REQUEST['presearch'];
-    $parr = $predb->getAll($offset, ITEMS_PER_PAGE, $_REQUEST['presearch']);
+    $parr = Predb::getAll($offset, ITEMS_PER_PAGE, $_REQUEST['presearch']);
 } else {
     $lastSearch = '';
-    $parr = $predb->getAll($offset, ITEMS_PER_PAGE);
+    $parr = Predb::getAll($offset, ITEMS_PER_PAGE);
 }
 
 $page->smarty->assign('pagertotalitems', $parr['count']);

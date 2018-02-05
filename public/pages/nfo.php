@@ -1,22 +1,22 @@
 <?php
 
-use nntmux\Releases;
+use App\Models\User;
+use App\Models\Release;
+use App\Models\ReleaseNfo;
 use nntmux\utility\Utility;
 
-$releases = new Releases;
-
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 if (isset($_GET['id'])) {
-    $rel = $releases->getByGuid($_GET['id']);
+    $rel = Release::getByGuid($_GET['id']);
 
     if (! $rel) {
         $page->show404();
     }
 
-    $nfo = $releases->getReleaseNfo($rel['id']);
+    $nfo = ReleaseNfo::getReleaseNfo($rel['id']);
     $nfo['nfoUTF'] = Utility::cp437toUTF($nfo['nfo']);
 
     $page->smarty->assign('rel', $rel);

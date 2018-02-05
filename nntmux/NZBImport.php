@@ -84,13 +84,6 @@ class NZBImport
     protected $nzbGuid;
 
     /**
-     * Access point to add new groups.
-     *
-     * @var Groups
-     */
-    private $groups;
-
-    /**
      * @var \nntmux\Releases
      */
     private $releases;
@@ -119,10 +112,9 @@ class NZBImport
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->binaries = ($options['Binaries'] instanceof Binaries ? $options['Binaries'] : new Binaries(['Settings' => $this->pdo, 'Echo' => $this->echoCLI]));
         $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
-        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
+        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
         $this->releaseCleaner = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning($this->pdo));
         $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['settings' => $this->pdo]));
-        $this->groups = new Groups(['Settings' => $this->pdo]);
 
         $this->crossPostt = Settings::settingValue('..crossposttime') !== '' ? Settings::settingValue('..crossposttime') : 2;
         $this->browser = $options['Browser'];
@@ -299,9 +291,9 @@ class NZBImport
                             $groupName = $group;
                         }
                     } else {
-                        $group = $this->groups->isValidGroup($group);
+                        $group = Group::isValidGroup($group);
                         if ($group !== false) {
-                            $groupID = $this->groups->add([
+                            $groupID = Group::addGroup([
                                 'name' => $group,
                                 'description' => 'Added by NZBimport script.',
                                 'backfill_target' => 1,
@@ -386,7 +378,7 @@ class NZBImport
     protected function insertNZB($nzbDetails): bool
     {
         // Make up a GUID for the release.
-        $this->relGuid = $this->releases->createGUID();
+        $this->relGuid = createGUID();
 
         // Remove part count from subject.
         $partLess = preg_replace('/(\(\d+\/\d+\))*$/', 'yEnc', $nzbDetails['subject']);
@@ -416,7 +408,7 @@ class NZBImport
         if ($dupeCheck === null) {
             $escapedSearchName = $cleanName;
             // Insert the release into the DB.
-            $relID = $this->releases->insertRelease(
+            $relID = Release::insertRelease(
                 [
                     'name'            => $escapedSubject,
                     'searchname'    => $escapedSearchName,
@@ -491,6 +483,6 @@ class NZBImport
      */
     protected function updateNzbGuid(): void
     {
-        Release::query()->where('guid', $this->relGuid)->update(['nzb_guid' => hex2bin($this->nzbGuid)]);
+        Release::query()->where('guid', $this->relGuid)->update(['nzb_guid' => sodium_hex2bin($this->nzbGuid)]);
     }
 }

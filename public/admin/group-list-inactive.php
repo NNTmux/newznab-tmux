@@ -2,17 +2,16 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Groups;
+use App\Models\Group;
 
 $page = new AdminPage();
-$groups = new Groups(['Settings' => $page->pdo]);
 
 $gname = '';
 if (! empty($_REQUEST['groupname'])) {
     $gname = $_REQUEST['groupname'];
 }
 
-$groupcount = $groups->getCount($gname, 0);
+$groupcount = Group::getGroupsCount($gname, 0);
 
 $offset = $_REQUEST['offset'] ?? 0;
 $groupname = ! empty($_REQUEST['groupname']) ? $_REQUEST['groupname'] : '';
@@ -23,12 +22,12 @@ $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
 $page->smarty->assign('pagerquerysuffix', '#results');
 
-$groupsearch = $gname != '' ? 'groupname='.$gname.'&amp;' : '';
+$groupsearch = $gname !== '' ? 'groupname='.$gname.'&amp;' : '';
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/group-list-inactive.php?'.$groupsearch.'offset=');
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$grouplist = $groups->getRange($offset, ITEMS_PER_PAGE, $gname);
+$grouplist = Group::getGroupsRange($offset, ITEMS_PER_PAGE, $gname, false);
 
 $page->smarty->assign('grouplist', $grouplist);
 

@@ -2,20 +2,20 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Users;
+use App\Models\User;
 use App\Models\UserRole;
+use App\Models\Invitation;
 use App\Mail\AccountChange;
 use Illuminate\Support\Facades\Mail;
 
 $page = new AdminPage();
-$users = new Users();
 
 $user = [
     'id' => '',
     'username' => '',
     'email' => '',
     'password' => '',
-    'role' => Users::ROLE_USER,
+    'role' => User::ROLE_USER,
     'notes' => '',
 ];
 
@@ -23,10 +23,10 @@ $user = [
 $action = $_REQUEST['action'] ?? 'view';
 
 //get the user roles
-$userRoles = $users->getRoles();
+$userRoles = UserRole::getRoles();
 $roles = [];
-$defaultRole = Users::ROLE_USER;
-$defaultInvites = Users::DEFAULT_INVITES;
+$defaultRole = User::ROLE_USER;
+$defaultInvites = Invitation::DEFAULT_INVITES;
 foreach ($userRoles as $r) {
     $roles[$r['id']] = $r['name'];
     if ($r['isdefault'] === 1) {
@@ -58,15 +58,15 @@ switch ($action) {
                     $invites = $role['defaultinvites'];
                 }
             }
-            $ret = $users->signup($_POST['username'], $_POST['password'], $_POST['email'], '', $_POST['role'], $_POST['notes'], $invites, '', true);
+            $ret = User::signup($_POST['username'], $_POST['password'], $_POST['email'], '', $_POST['role'], $_POST['notes'], $invites, '', true);
             $page->smarty->assign('role', $_POST['role']);
         } else {
-            $ret = $users->update($_POST['id'], $_POST['username'], $_POST['email'], $_POST['grabs'], $_POST['role'], $_POST['notes'], $_POST['invites'], (isset($_POST['movieview']) ? 1 : 0), (isset($_POST['musicview']) ? 1 : 0), (isset($_POST['gameview']) ? 1 : 0), (isset($_POST['xxxview']) ? 1 : 0), (isset($_POST['consoleview']) ? 1 : 0), (isset($_POST['bookview']) ? 1 : 0));
+            $ret = User::updateUser($_POST['id'], $_POST['username'], $_POST['email'], $_POST['grabs'], $_POST['role'], $_POST['notes'], $_POST['invites'], (isset($_POST['movieview']) ? 1 : 0), (isset($_POST['musicview']) ? 1 : 0), (isset($_POST['gameview']) ? 1 : 0), (isset($_POST['xxxview']) ? 1 : 0), (isset($_POST['consoleview']) ? 1 : 0), (isset($_POST['bookview']) ? 1 : 0));
             if ($_POST['password'] !== '') {
-                $users->updatePassword($_POST['id'], $_POST['password']);
+                User::updatePassword($_POST['id'], $_POST['password']);
             }
             if ($_POST['rolechangedate'] !== '') {
-                $users->updateUserRoleChangeDate($_POST['id'], $_POST['rolechangedate']);
+                User::updateUserRoleChangeDate($_POST['id'], $_POST['rolechangedate']);
             }
             if ($_POST['role'] !== '') {
                 $newRole = UserRole::query()->where('id', $_POST['role'])->value('name');
@@ -79,19 +79,19 @@ switch ($action) {
             header('Location:'.WWW_TOP.'/user-list.php');
         } else {
             switch ($ret) {
-                case Users::ERR_SIGNUP_BADUNAME:
+                case User::ERR_SIGNUP_BADUNAME:
                     $page->smarty->assign('error', 'Bad username. Try a better one.');
                     break;
-                case Users::ERR_SIGNUP_BADPASS:
+                case User::ERR_SIGNUP_BADPASS:
                     $page->smarty->assign('error', 'Bad password. Try a longer one.');
                     break;
-                case Users::ERR_SIGNUP_BADEMAIL:
+                case User::ERR_SIGNUP_BADEMAIL:
                     $page->smarty->assign('error', 'Bad email.');
                     break;
-                case Users::ERR_SIGNUP_UNAMEINUSE:
+                case User::ERR_SIGNUP_UNAMEINUSE:
                     $page->smarty->assign('error', 'Username in use.');
                     break;
-                case Users::ERR_SIGNUP_EMAILINUSE:
+                case User::ERR_SIGNUP_EMAILINUSE:
                     $page->smarty->assign('error', 'Email in use.');
                     break;
                 default:
@@ -114,7 +114,7 @@ switch ($action) {
     if (isset($_GET['id'])) {
         $page->title = 'User Edit';
         $id = $_GET['id'];
-        $user = $users->getById($id);
+        $user = User::find($id);
 
         $page->smarty->assign('user', $user);
     }

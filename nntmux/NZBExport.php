@@ -44,6 +44,7 @@ class NZBExport
 
     /**
      * @param array $options Class instances / various options.
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
@@ -60,7 +61,7 @@ class NZBExport
         $this->echoCLI = (! $this->browser && NN_ECHOCLI && $options['Echo']);
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Setting'] : new DB());
         $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
-        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
+        $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
     }
 
     /**

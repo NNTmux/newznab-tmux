@@ -3,13 +3,13 @@
 namespace nntmux;
 
 use nntmux\db\DB;
-use Carbon\Carbon;
+use App\Models\Group;
 use App\Models\Release;
+use App\Models\Category;
 use App\Models\Settings;
-use App\Models\ReleaseNfo;
 use nntmux\utility\Utility;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Category as CategoryModel;
 
 /**
  * Class Releases.
@@ -17,25 +17,15 @@ use App\Models\Category as CategoryModel;
 class Releases
 {
     // RAR/ZIP Passworded indicator.
-    const PASSWD_NONE = 0; // No password.
-    const PASSWD_POTENTIAL = 1; // Might have a password.
-    const BAD_FILE = 2; // Possibly broken RAR/ZIP.
-    const PASSWD_RAR = 10; // Definitely passworded.
+    public const PASSWD_NONE = 0; // No password.
+    public const PASSWD_POTENTIAL = 1; // Might have a password.
+    public const BAD_FILE = 2; // Possibly broken RAR/ZIP.
+    public const PASSWD_RAR = 10; // Definitely passworded.
 
     /**
      * @var \nntmux\db\DB
      */
     public $pdo;
-
-    /**
-     * @var \nntmux\Groups
-     */
-    public $groups;
-
-    /**
-     * @var bool
-     */
-    public $updateGrabs;
 
     /**
      * @var \nntmux\ReleaseSearch
@@ -58,11 +48,6 @@ class Releases
     public $passwordStatus;
 
     /**
-     * @var \nntmux\Category
-     */
-    public $category;
-
-    /**
      * @var array Class instances.
      * @throws \Exception
      */
@@ -75,132 +60,9 @@ class Releases
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
-        $this->updateGrabs = ((int) Settings::settingValue('..grabstatus') !== 0);
-        $this->passwordStatus = ((int) Settings::settingValue('..checkpasswordedrar') === 1 ? -1 : 0);
         $this->sphinxSearch = new SphinxSearch();
         $this->releaseSearch = new ReleaseSearch($this->pdo);
-        $this->category = new Category(['Settings' => $this->pdo]);
         $this->showPasswords = self::showPasswords();
-    }
-
-    /**
-     * Insert a single release returning the ID on success or false on failure.
-     *
-     * @param array $parameters Insert parameters, must be escaped if string.
-     *
-     * @return bool|int
-     */
-    public function insertRelease(array $parameters = [])
-    {
-        $parameters['id'] = Release::query()
-            ->insertGetId(
-                [
-                    'name' => $parameters['name'],
-                    'searchname' => $parameters['searchname'],
-                    'totalpart' => $parameters['totalpart'],
-                    'groups_id' => $parameters['groups_id'],
-                    'adddate' => Carbon::now(),
-                    'guid' => $parameters['guid'],
-                    'leftguid' => $parameters['guid'][0],
-                    'postdate' => $parameters['postdate'],
-                    'fromname' => $parameters['fromname'],
-                    'size' => $parameters['size'],
-                    'passwordstatus' => $this->passwordStatus,
-                    'haspreview' => -1,
-                    'categories_id' => $parameters['categories_id'],
-                    'nfostatus' => -1,
-                    'nzbstatus' => $parameters['nzbstatus'],
-                    'isrenamed' => $parameters['isrenamed'],
-                    'iscategorized' => 1,
-                    'reqidstatus' => $parameters['reqidstatus'],
-                    'predb_id' => $parameters['predb_id'],
-                ]
-            );
-
-        $this->sphinxSearch->insertRelease($parameters);
-
-        return $parameters['id'];
-    }
-
-    /**
-     * Create a GUID for a release.
-     * @return string
-     */
-    public function createGUID(): string
-    {
-        $data = openssl_random_pseudo_bytes(16);
-        $data[6] = chr(ord($data[6]) & 0x0f | 0x40);    // set version to 0100
-        $data[8] = chr(ord($data[8]) & 0x3f | 0x80);    // set bits 6-7 to 10
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-    }
-
-    /**
-     * @return array
-     */
-    public function get(): array
-    {
-        $result = Cache::get('releaseget');
-        if ($result !== null) {
-            return $result;
-        }
-
-        $result = Release::query()
-            ->where('nzbstatus', '=', NZB::NZB_ADDED)
-            ->select(['releases.*', 'g.name as group_name', 'c.title as category_name'])
-            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
-            ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
-            ->get();
-
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put('releaseget', $result, $expiresAt);
-
-        return $result;
-    }
-
-    /**
-     * Used for admin page release-list.
-     *
-     *
-     * @param $start
-     * @param $num
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
-     */
-    public function getRange($start, $num)
-    {
-        $range = Cache::get('releasesrange');
-        if ($range !== null) {
-            return $range;
-        }
-        $query = Release::query()
-            ->where('nzbstatus', '=', NZB::NZB_ADDED)
-            ->select(
-            [
-                'releases.id',
-                'releases.name',
-                'releases.searchname',
-                'releases.size',
-                'releases.guid',
-                'releases.totalpart',
-                'releases.postdate',
-                'releases.adddate',
-                'releases.grabs',
-            ]
-            )
-            ->selectRaw('CONCAT(cp.title, ' > ', c.title) AS category_name')
-            ->leftJoin('categories as c', 'c.id', '=', 'releases.categories_id')
-            ->leftJoin('categories as cp', 'cp.id', '=', 'c.parentid')
-            ->orderBy('releases.postdate', 'desc');
-        if ($start !== false) {
-            $query->limit($num)->offset($start);
-        }
-
-        $range = $query->get();
-
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::put('releasesrange', $range, $expiresAt);
-
-        return $range;
     }
 
     /**
@@ -226,7 +88,7 @@ class Releases
                 NZB::NZB_ADDED,
                 $this->showPasswords,
                 ($groupName !== -1 ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
-                $this->category->getCategorySearch($cat),
+                Category::getCategorySearch($cat),
                 ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
                 (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
         );
@@ -289,7 +151,7 @@ class Releases
 			ORDER BY %8\$s %9\$s",
             NZB::NZB_ADDED,
             $this->showPasswords,
-            $this->category->getCategorySearch($cat),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
             ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
@@ -523,7 +385,7 @@ class Releases
                 return $this->concatenatedCategoryIDsCache;
             }
 
-            $result = CategoryModel::query()
+            $result = Category::query()
                 ->whereNotNull('categories.parentid')
                 ->whereNotNull('cp.id')
                 ->selectRaw('CONCAT(cp.id, ", ", categories.id) AS category_ids')
@@ -563,7 +425,7 @@ class Releases
 					rn.releases_id AS nfoid, re.releases_id AS reid,
 					tve.firstaired,
 					(SELECT df.failed) AS failed
-				FROM releases PARTITION (tv) r
+				FROM releases r
 				LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 				LEFT JOIN groups g ON g.id = r.groups_id
 				LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
@@ -571,7 +433,7 @@ class Releases
 				LEFT JOIN categories c ON c.id = r.categories_id
 				LEFT JOIN categories cp ON cp.id = c.parentid
 				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-				WHERE %s %s
+				WHERE r.categories_id BETWEEN 5000 AND 5999 %s %s
 				AND r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s
@@ -614,8 +476,8 @@ class Releases
         return $this->getPagerCount(
             sprintf(
                 'SELECT r.id
-				FROM releases PARTITION (tv) r
-				WHERE %s %s
+				FROM releases r
+				WHERE r.categories_id BETWEEN 5000 AND 5999 %s %s
 				AND r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s',
@@ -642,8 +504,8 @@ class Releases
         return $this->getPagerCount(
             sprintf(
                 'SELECT r.id
-				FROM releases PARTITION (movies) r
-				WHERE %s %s
+				FROM releases r
+				WHERE r.categories_id BETWEEN 3000 AND 3999 %s %s
 				AND r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s',
@@ -657,24 +519,6 @@ class Releases
     }
 
     /**
-     * Get count for admin release list page.
-     *
-     * @return int
-     */
-    public function getCount(): int
-    {
-        $res = Cache::get('count');
-        if ($res !== null) {
-            return $res;
-        }
-        $res = Release::query()->count(['id']);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
-        Cache::put('count', $res, $expiresAt);
-
-        return $res ?? 0;
-    }
-
-    /**
      * Delete multiple releases, or a single by ID.
      *
      * @param array|int|string $list   Array of GUID or ID of releases to delete.
@@ -684,8 +528,8 @@ class Releases
     {
         $list = (array) $list;
 
-        $nzb = new NZB($this->pdo);
-        $releaseImage = new ReleaseImage($this->pdo);
+        $nzb = new NZB();
+        $releaseImage = new ReleaseImage();
 
         foreach ($list as $identifier) {
             $this->deleteSingle(['g' => $identifier, 'i' => false], $nzb, $releaseImage);
@@ -722,60 +566,6 @@ class Releases
         $query->bindParam(':identifier', $param2);
 
         $query->execute();
-    }
-
-    /**
-     * Used for release edit page on site.
-     *
-     * @param int    $ID
-     * @param string $name
-     * @param string $searchName
-     * @param string $fromName
-     * @param int    $categoryID
-     * @param int    $parts
-     * @param int    $grabs
-     * @param int    $size
-     * @param string $postedDate
-     * @param string $addedDate
-     * @param        $videoId
-     * @param        $episodeId
-     * @param int    $imDbID
-     * @param int    $aniDbID
-     */
-    public function update(
-        $ID,
-        $name,
-        $searchName,
-        $fromName,
-        $categoryID,
-        $parts,
-        $grabs,
-        $size,
-        $postedDate,
-        $addedDate,
-        $videoId,
-        $episodeId,
-        $imDbID,
-        $aniDbID
-    ): void {
-        Release::query()->where('id', $ID)->update(
-            [
-                'name' => $name,
-                'searchname' => $searchName,
-                'fromname' => $fromName,
-                'categories_id' => $categoryID,
-                'totalpart' => $parts,
-                'grabs' => $grabs,
-                'size' => $size,
-                'postdate' => $postedDate,
-                'adddate' => $addedDate,
-                'videos_id' => $videoId,
-                'tv_episodes_id' => $episodeId,
-                'imdbid' => $imDbID,
-                'anidbid' => $aniDbID,
-            ]
-        );
-        $this->sphinxSearch->updateRelease($ID, $this->pdo);
     }
 
     /**
@@ -899,7 +689,7 @@ class Releases
 
         $catQuery = '';
         if ($type === 'basic') {
-            $catQuery = $this->category->getCategorySearch($cat);
+            $catQuery = Category::getCategorySearch($cat);
         } elseif ($type === 'advanced' && (int) $cat[0] !== -1) {
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
@@ -910,7 +700,7 @@ class Releases
             $this->showPasswords,
             NZB::NZB_ADDED,
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', $this->groups->getIDByName($groupName)) : ''),
+            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
             (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(string) (104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
             (array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < '.(string) (104857600 * (int) $sizeRange[$sizeTo]).' ' : ''),
             ((int) $hasNfo !== 0 ? ' AND r.nfostatus = 1 ' : ''),
@@ -1074,7 +864,7 @@ class Releases
             $this->showPasswords,
             $showSql,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-            $this->category->getCategorySearch($cat),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
@@ -1090,7 +880,7 @@ class Releases
 				g.name AS group_name,
 				rn.releases_id AS nfoid,
 				re.releases_id AS reid
-			FROM releases PARTITION (tv) r
+			FROM releases r
 			LEFT OUTER JOIN videos v ON r.videos_id = v.id AND v.type = 0
 			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
@@ -1151,7 +941,7 @@ class Releases
             NZB::NZB_ADDED,
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-            $this->category->getCategorySearch($cat),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
         );
 
@@ -1220,7 +1010,7 @@ class Releases
             $this->showPasswords,
             ($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
             (($imDbId !== -1 && is_numeric($imDbId)) ? sprintf(' AND imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
-            $this->category->getCategorySearch($cat),
+            Category::getCategorySearch($cat),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')
         );
@@ -1231,11 +1021,12 @@ class Releases
 				%s AS category_ids,
 				g.name AS group_name,
 				rn.releases_id AS nfoid
-			FROM releases PARTITION (movies) r
+			FROM releases r
 			LEFT JOIN groups g ON g.id = r.groups_id
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+			WHERE r.categories_id BETWEEN 5000 AND 5999
 			%s",
             $this->getConcatenatedCategoryIDs(),
             $whereSql
@@ -1306,12 +1097,12 @@ class Releases
     public function searchSimilar($currentID, $name, $limit = 6, array $excludedCats = []): array
     {
         // Get the category for the parent of this release.
-        $currRow = $this->getById($currentID);
-        $catRow = (new Category(['Settings' => $this->pdo]))->getById($currRow['categories_id']);
+        $currRow = Release::getCatByRelId($currentID);
+        $catRow = Category::find($currRow['categories_id']);
         $parentCat = $catRow['parentid'];
 
         $results = $this->search(
-            $this->getSimilarName($name),
+            getSimilarName($name),
             -1,
             -1,
             -1,
@@ -1345,68 +1136,13 @@ class Releases
     }
 
     /**
-     * @param string $name
-     *
-     * @return string
-     */
-    public function getSimilarName($name): string
-    {
-        return implode(' ', \array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
-    }
-
-    /**
-     * @param array|string $guid
-     *
-     * @return array|bool
-     */
-    public function getByGuid($guid)
-    {
-        if (\is_array($guid)) {
-            $tempGuids = [];
-            foreach ($guid as $identifier) {
-                $tempGuids[] = $this->pdo->escapeString($identifier);
-            }
-            $gSql = sprintf('r.guid IN (%s)', implode(',', $tempGuids));
-        } else {
-            $gSql = sprintf('r.guid = %s', $this->pdo->escapeString($guid));
-        }
-        $sql = sprintf(
-            "SELECT r.*,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
-				GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names,
-				g.name AS group_name,
-				v.title AS showtitle, v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.source,
-				tvi.summary, tvi.image,
-				tve.title, tve.firstaired, tve.se_complete
-				FROM releases r
-			LEFT JOIN groups g ON g.id = r.groups_id
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN categories cp ON cp.id = c.parentid
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id
-			LEFT OUTER JOIN tv_info tvi ON r.videos_id = tvi.videos_id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT OUTER JOIN releases_groups rg ON r.id = rg.releases_id
-			LEFT OUTER JOIN groups g2 ON rg.groups_id = g2.id
-			WHERE %s
-			GROUP BY r.id",
-            $gSql
-        );
-
-        return \is_array($guid) ? $this->pdo->query($sql) : $this->pdo->queryOneRow($sql);
-    }
-
-    /**
-     * Writes a zip file of an array of release guids directly to the stream.
-     *
-     * @param $guids
-     *
+     * @param array $guids
      * @return string
      * @throws \Exception
      */
     public function getZipped($guids): string
     {
-        $nzb = new NZB($this->pdo);
+        $nzb = new NZB();
         $zipFile = new \ZipFile();
 
         foreach ($guids as $guid) {
@@ -1417,7 +1153,7 @@ class Releases
 
                 if ($nzbContents) {
                     $filename = $guid;
-                    $r = $this->getByGuid($guid);
+                    $r = Release::getByGuid($guid);
                     if ($r) {
                         $filename = $r['searchname'];
                     }
@@ -1427,390 +1163,5 @@ class Releases
         }
 
         return $zipFile->file();
-    }
-
-    /**
-     * @param $videoId
-     * @return int
-     */
-    public function removeVideoIdFromReleases($videoId): int
-    {
-        return Release::query()->where('videos_id', $videoId)->update(['videos_id' => 0, 'tv_episodes_id' => 0]);
-    }
-
-    /**
-     * @param $anidbID
-     * @return int
-     */
-    public function removeAnidbIdFromReleases($anidbID)
-    {
-        return Release::query()->where('anidbid', $anidbID)->update(['anidbid' => -1]);
-    }
-
-    /**
-     * @param $id
-     * @return \Illuminate\Database\Eloquent\Model|null|static
-     */
-    public function getById($id)
-    {
-        return Release::query()->where('id', $id)->first(['categories_id']);
-    }
-
-    /**
-     * @param $id
-     * @param bool $getNfoString
-     * @return \Illuminate\Database\Eloquent\Model|null|static
-     */
-    public function getReleaseNfo($id, $getNfoString = true)
-    {
-        $nfo = ReleaseNfo::query()->where('releases_id', $id)->whereNotNull('nfo')->select(['releases_id']);
-        if ($getNfoString === true) {
-            $nfo->selectRaw('UNCOMPRESS(nfo) AS nfo');
-        }
-
-        return $nfo->first();
-    }
-
-    /**
-     * @param string $guid
-     */
-    public function updateGrab($guid): void
-    {
-        if ($this->updateGrabs) {
-            Release::query()->where('guid', $guid)->increment('grabs');
-        }
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
-     */
-    public function getTopDownloads()
-    {
-        $releases = Cache::get('topdownloads');
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = Release::query()->where('grabs', '>', 0)->select(['id', 'searchname', 'guid', 'adddate'])->selectRaw('SUM(grabs) as grabs')->groupBy(['id', 'searchname', 'adddate'])->havingRaw('SUM(grabs) > 0')->orderBy('grabs', 'desc')->limit(10)->get();
-
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put('topdownloads', $releases, $expiresAt);
-
-        return $releases;
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
-     */
-    public function getTopComments()
-    {
-        $comments = Cache::get('topcomments');
-        if ($comments !== null) {
-            return $comments;
-        }
-
-        $comments = Release::query()->where('comments', '>', 0)->select(['id', 'guid', 'searchname'])->selectRaw('SUM(comments) AS comments')->groupBy(['id', 'searchname', 'adddate'])->havingRaw('SUM(comments) > 0')->orderBy('comments', 'desc')->limit(10)->get();
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put('topcomments', $comments, $expiresAt);
-
-        return $comments;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRecentlyAdded()
-    {
-        $recent = Cache::get('recentlyadded');
-        if ($recent !== null) {
-            return $recent;
-        }
-
-        $recent = CategoryModel::query()
-            ->where('r.adddate', '>', Carbon::now()->subWeek())
-            ->selectRaw('CONCAT(cp.title, " > ", categories.title) as title')
-            ->selectRaw('COUNT(r.id) as count')
-            ->join('categories as cp', 'cp.id', '=', 'categories.parentid')
-            ->join('releases as r', 'r.categories_id', '=', 'categories.id')
-            ->groupBy('title')
-            ->orderBy('count', 'desc')
-            ->get();
-
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put('recentlyadded', $recent, $expiresAt);
-
-        return $recent;
-    }
-
-    /**
-     * Get all newest movies with coves for poster wall.
-     *
-     *
-     * @return array|bool
-     */
-    public function getNewestMovies()
-    {
-        $sql = sprintf(
-            'SELECT r.imdbid, r.guid, r.name, r.searchname, r.size, r.completion,
-				postdate, categories_id, comments, grabs,
-				m.cover
-			FROM releases PARTITION (movies) r
-			INNER JOIN movieinfo m USING (imdbid)
-			WHERE m.imdbid > 0
-			AND m.cover = 1
-			AND r.id in (select max(id) from releases where imdbid > 0 group by imdbid)
-			ORDER BY r.postdate DESC
-			LIMIT 24'
-        );
-
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put(md5($sql), $releases, $expiresAt);
-
-        return $releases;
-    }
-
-    /**
-     * Get all newest xxx with covers for poster wall.
-     *
-     *
-     * @return array|bool
-     */
-    public function getNewestXXX()
-    {
-        $sql = sprintf(
-            'SELECT r.xxxinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categories_id, r.comments, r.grabs,
-				xxx.cover, xxx.title
-			FROM releases PARTITION (xxx) r
-			INNER JOIN xxxinfo xxx ON r.xxxinfo_id = xxx.id
-			WHERE xxx.id > 0
-			AND xxx.cover = 1
-			AND r.id in (select max(id) from releases where xxxinfo_id > 0 group by xxxinfo_id)
-			ORDER BY r.postdate DESC
-			LIMIT 20'
-        );
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put(md5($sql), $releases, $expiresAt);
-
-        return $releases;
-    }
-
-    /**
-     * Get all newest console games with covers for poster wall.
-     *
-     *
-     * @return array|bool
-     */
-    public function getNewestConsole()
-    {
-        $sql = sprintf(
-            'SELECT r.consoleinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categories_id, r.comments, r.grabs,
-				con.cover
-			FROM releases PARTITION (console) r
-			INNER JOIN consoleinfo con ON r.consoleinfo_id = con.id
-			WHERE con.id > 0
-			AND con.cover > 0
-			AND r.id IN (SELECT max(id) FROM releases WHERE consoleinfo_id > 0 GROUP BY consoleinfo_id)
-			ORDER BY r.postdate DESC
-			LIMIT 35'
-        );
-
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put(md5($sql), $releases, $expiresAt);
-
-        return $releases;
-    }
-
-    /**
-     * Get all newest PC games with covers for poster wall.
-     *
-     *
-     * @return array|bool
-     */
-    public function getNewestGames()
-    {
-        $sql = sprintf(
-            'SELECT r.gamesinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categories_id, r.comments, r.grabs,
-				gi.cover
-			FROM releases r
-			INNER JOIN gamesinfo gi ON r.gamesinfo_id = gi.id
-			WHERE r.categories_id = 4050
-			AND gi.id > 0
-			AND gi.cover > 0
-			AND r.id in (select max(id) from releases where gamesinfo_id > 0 group by gamesinfo_id)
-			ORDER BY r.postdate DESC
-			LIMIT 24'
-        );
-
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put(md5($sql), $releases, $expiresAt);
-
-        return $releases;
-    }
-
-    /**
-     * Get all newest music with covers for poster wall.
-     *
-     *
-     * @return array|bool
-     */
-    public function getNewestMP3s()
-    {
-        $sql = sprintf(
-            sprintf('SELECT r.musicinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categories_id, r.comments, r.grabs,
-				m.cover
-			FROM releases PARTITION (audio) r
-			INNER JOIN musicinfo m ON r.musicinfo_id = m.id
-			WHERE m.id > 0
-			AND m.cover > 0
-			OR r.categories_id != %d
-			AND r.id in (select max(id) from releases where musicinfo_id > 0 group by musicinfo_id)
-			ORDER BY r.postdate DESC
-			LIMIT 24', Category::MUSIC_AUDIOBOOK)
-        );
-
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put(md5($sql), $releases, $expiresAt);
-
-        return $releases;
-    }
-
-    /**
-     * Get all newest books with covers for poster wall.
-     *
-     *
-     * @return array|bool
-     */
-    public function getNewestBooks()
-    {
-        $sql = sprintf(
-            sprintf('SELECT r.bookinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categories_id, r.comments, r.grabs,
-				b.url,	b.cover, b.title as booktitle, b.author
-			FROM releases PARTITION (books) r
-			INNER JOIN bookinfo b ON r.bookinfo_id = b.id
-			WHERE b.id > 0
-			OR r.categories_id = %d
-			AND b.cover > 0
-			AND r.id in (select max(id) from releases where bookinfo_id > 0 group by bookinfo_id)
-			ORDER BY r.postdate DESC
-			LIMIT 24', Category::MUSIC_AUDIOBOOK)
-        );
-
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put(md5($sql), $releases, $expiresAt);
-
-        return $releases;
-    }
-
-    /**
-     * Get all newest TV with covers for poster wall.
-     *
-     *
-     * @return array|bool
-     */
-    public function getNewestTV()
-    {
-        $sql = sprintf(
-            'SELECT r.videos_id, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categories_id, r.comments, r.grabs,
-				v.id AS tvid, v.title AS tvtitle, v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
-				tvi.image
-			FROM releases PARTITION (tv) r
-			INNER JOIN videos v ON r.videos_id = v.id
-			INNER JOIN tv_info tvi ON r.videos_id = tvi.videos_id
-			WHERE v.id > 0
-			AND v.type = 0
-			AND tvi.image = 1
-			AND r.id in (select max(id) from releases where videos_id > 0 group by videos_id)
-			ORDER BY r.postdate DESC
-			LIMIT 24'
-        );
-
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put(md5($sql), $releases, $expiresAt);
-
-        return $releases;
-    }
-
-    /**
-     * Get all newest anime with covers for poster wall.
-     *
-     *
-     * @return array|bool
-     */
-    public function getNewestAnime()
-    {
-        $sql = sprintf(
-            "SELECT r.anidbid, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categories_id, r.comments, r.grabs, at.title
-			FROM releases r
-			INNER JOIN anidb_titles at USING (anidbid)
-			INNER JOIN anidb_info ai USING (anidbid)
-			WHERE r.categories_id = 5070
-			AND at.anidbid > 0
-			AND at.lang = 'en'
-			AND ai.picture != ''
-			AND r.id IN (SELECT MAX(id) FROM releases WHERE anidbid > 0 GROUP BY anidbid)
-			GROUP BY r.id
-			ORDER BY r.postdate DESC
-			LIMIT 24"
-        );
-
-        $releases = Cache::get(md5($sql));
-        if ($releases !== null) {
-            return $releases;
-        }
-
-        $releases = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        Cache::put(md5($sql), $releases, $expiresAt);
-
-        return $releases;
     }
 }

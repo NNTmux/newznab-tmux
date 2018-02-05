@@ -2,12 +2,12 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Category;
 use nntmux\Releases;
+use App\Models\Release;
+use App\Models\Category;
 
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->pdo]);
-$category = new Category(['Settings' => $page->pdo]);
 $id = 0;
 
 // Set the current action.
@@ -15,7 +15,7 @@ $action = ($_REQUEST['action'] ?? 'view');
 
 switch ($action) {
     case 'submit':
-        $releases->update(
+        Release::updateRelease(
             $_POST['id'],
             $_POST['name'],
             $_POST['searchname'],
@@ -32,7 +32,7 @@ switch ($action) {
             $_POST['anidbid']
         );
 
-        $release = $releases->getByGuid($_POST['guid']);
+        $release = Release::getByGuid($_POST['guid']);
         $page->smarty->assign('release', $release);
 
         header('Location:'.WWW_TOP.'/../details/'.$release['guid']);
@@ -42,14 +42,14 @@ switch ($action) {
     default:
         $page->title = 'Release Edit';
         $id = $_GET['id'];
-        $release = $releases->getByGuid($id);
+        $release = Release::getByGuid($id);
         $page->smarty->assign('release', $release);
         break;
 }
 
 $page->smarty->assign('yesno_ids', [1, 0]);
 $page->smarty->assign('yesno_names', ['Yes', 'No']);
-$page->smarty->assign('catlist', $category->getForSelect(false));
+$page->smarty->assign('catlist', Category::getForSelect(false));
 
 $page->content = $page->smarty->fetch('release-edit.tpl');
 $page->render();

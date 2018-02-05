@@ -9,7 +9,7 @@ use b3rs3rk\steamfront\Main;
 
 class Steam
 {
-    const STEAM_MATCH_PERCENTAGE = 90;
+    private const STEAM_MATCH_PERCENTAGE = 90;
 
     /**
      * @var string The parsed game name from searchname
@@ -22,7 +22,7 @@ class Steam
     protected $steamGameID;
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     protected $pdo;
 
@@ -32,7 +32,7 @@ class Steam
     protected $lastUpdate;
 
     /**
-     * @var Main
+     * @var \b3rs3rk\steamfront\Main
      */
     protected $steamFront;
 
@@ -112,13 +112,7 @@ class Steam
 
         $this->populateSteamAppsTable();
 
-        $results = $this->pdo->queryDirect(
-            "
-			SELECT name, appid
-			FROM steam_apps
-			WHERE MATCH(name) AGAINST({$this->pdo->escapeString($searchTerm)})
-			LIMIT 20"
-        );
+        $results = SteamApp::query()->whereRaw('MATCH(name) AGAINST(?)', [$searchTerm])->limit(20)->get(['name', 'appid']);
 
         if ($results instanceof \Traversable) {
             $bestMatchPct = 0;
@@ -166,10 +160,10 @@ class Steam
             foreach ($fullAppArray as $appsArray) {
                 foreach ($appsArray as $appArray) {
                     foreach ($appArray as $app) {
-                        $dupeCheck = SteamApp::query()->where('appid', '=', $app['appid'])->value('appid');
+                        $dupeCheck = SteamApp::query()->where('appid', '=', $app['appid'])->first(['appid']);
 
                         if ($dupeCheck === null) {
-                            SteamApp::query()->insert(['name' => $this->pdo->escapeString($app['name']), 'appid' => $app['appid']]);
+                            SteamApp::query()->insert(['name' => $app['name'], 'appid' => $app['appid']]);
                             $inserted++;
                             if ($inserted % 500 === 0) {
                                 echo PHP_EOL.number_format($inserted).' apps inserted.'.PHP_EOL;

@@ -1,17 +1,15 @@
 <?php
 
-use nntmux\Videos;
-use nntmux\Category;
+use App\Models\User;
 use nntmux\Releases;
-use nntmux\UserSeries;
+use App\Models\Video;
+use App\Models\Category;
 use App\Models\Settings;
+use App\Models\UserSerie;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
-
-$us = new UserSeries();
-$tv = new Videos(['Settings' => $page->settings]);
 
 $action = $_REQUEST['id'] ?? '';
 $videoId = $_REQUEST['subpage'] ?? '';
@@ -24,7 +22,7 @@ if (isset($_REQUEST['from'])) {
 
 switch ($action) {
     case 'delete':
-        $show = $us->getShow($page->users->currentUserId(), $videoId);
+        $show = UserSerie::getShow(User::currentUserId(), $videoId);
         if (isset($_REQUEST['from'])) {
             header('Location:'.WWW_TOP.$_REQUEST['from']);
         } else {
@@ -33,17 +31,17 @@ switch ($action) {
         if (! $show) {
             $page->show404('Not subscribed');
         } else {
-            $us->delShow($page->users->currentUserId(), $videoId);
+            UserSerie::delShow(User::currentUserId(), $videoId);
         }
 
         break;
     case 'add':
     case 'doadd':
-        $show = $us->getShow($page->users->currentUserId(), $videoId);
+        $show = UserSerie::getShow(User::currentUserId(), $videoId);
         if ($show) {
             $page->show404('Already subscribed');
         } else {
-            $show = $tv->getByVideoID($videoId);
+            $show = Video::getByVideoID($videoId);
             if (! $show) {
                 $page->show404('No matching show.');
             }
@@ -51,15 +49,14 @@ switch ($action) {
 
         if ($action === 'doadd') {
             $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
-            $us->addShow($page->users->currentUserId(), $videoId, $category);
+            UserSerie::addShow(User::currentUserId(), $videoId, $category);
             if (isset($_REQUEST['from'])) {
                 header('Location:'.WWW_TOP.$_REQUEST['from']);
             } else {
                 header('Location:'.WWW_TOP.'/myshows');
             }
         } else {
-            $cat = new Category(['Settings' => $page->settings]);
-            $tmpcats = $cat->getChildren(Category::TV_ROOT);
+            $tmpcats = Category::getChildren(Category::TV_ROOT);
             $categories = [];
             foreach ($tmpcats as $c) {
                 // If TV WEB-DL categorization is disabled, don't include it as an option
@@ -80,7 +77,7 @@ switch ($action) {
         break;
     case 'edit':
     case 'doedit':
-        $show = $us->getShow($page->users->currentUserId(), $videoId);
+        $show = UserSerie::getShow(User::currentUserId(), $videoId);
 
         if (! $show) {
             $page->show404();
@@ -88,16 +85,14 @@ switch ($action) {
 
         if ($action === 'doedit') {
             $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
-            $us->updateShow($page->users->currentUserId(), $videoId, $category);
+            UserSerie::updateShow(User::currentUserId(), $videoId, $category);
             if (isset($_REQUEST['from'])) {
                 header('Location:'.WWW_TOP.$_REQUEST['from']);
             } else {
                 header('Location:'.WWW_TOP.'/myshows');
             }
         } else {
-            $cat = new Category(['Settings' => $page->settings]);
-
-            $tmpcats = $cat->getChildren(Category::TV_ROOT);
+            $tmpcats = Category::getChildren(Category::TV_ROOT);
             $categories = [];
             foreach ($tmpcats as $c) {
                 $categories[$c['id']] = $c['title'];
@@ -120,7 +115,7 @@ switch ($action) {
         $page->meta_keywords = 'search,add,to,cart,nzb,description,details';
         $page->meta_description = 'Browse Your Shows';
 
-        $shows = $us->getShows($page->users->currentUserId());
+        $shows = UserSerie::getShows(User::currentUserId());
 
         $releases = new Releases(['Settings' => $page->settings]);
         $browsecount = $releases->getShowsCount($shows, -1, $page->userdata['categoryexclusions']);
@@ -161,14 +156,13 @@ switch ($action) {
         $page->meta_keywords = 'search,add,to,cart,nzb,description,details';
         $page->meta_description = 'Manage Your Shows';
 
-        $cat = new Category(['Settings' => $page->settings]);
-        $tmpcats = $cat->getChildren(Category::TV_ROOT);
+        $tmpcats = Category::getChildren(Category::TV_ROOT);
         $categories = [];
         foreach ($tmpcats as $c) {
             $categories[$c['id']] = $c['title'];
         }
 
-        $shows = $us->getShows($page->users->currentUserId());
+        $shows = UserSerie::getShows(User::currentUserId());
         $results = [];
         foreach ($shows as $showk => $show) {
             $showcats = explode('|', $show['categories']);

@@ -4,12 +4,13 @@ namespace nntmux;
 
 use nntmux\db\DB;
 use ApaiIO\ApaiIO;
-use Carbon\Carbon;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\BookInfo;
+use App\Models\Category;
 use App\Models\Settings;
 use ApaiIO\Operations\Search;
+use Illuminate\Support\Carbon;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
@@ -135,16 +136,15 @@ class Books
         }
         $searchWords = trim($searchWords);
 
-        return BookInfo::query()->whereRaw('MATCH(author, title) AGAINST(? IN BOOLEAN MODE)', $searchWords)->first();
+        return BookInfo::query()->whereRaw('MATCH(author, title) AGAINST(? IN BOOLEAN MODE)', [$searchWords])->first();
     }
 
     /**
-     * @param       $cat
-     * @param       $start
-     * @param       $num
-     * @param       $orderby
+     * @param $cat
+     * @param $start
+     * @param $num
+     * @param $orderby
      * @param array $excludedcats
-     *
      * @return array
      * @throws \Exception
      */
@@ -154,12 +154,7 @@ class Books
 
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
-        }
-
-        $maxage = '';
-        if ($maxage > 0) {
-            $maxage = sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage);
+            $catsrch = Category::getCategorySearch($cat);
         }
 
         $exccatlist = '';
@@ -179,13 +174,12 @@ class Books
 				AND boo.cover = 1
 				AND boo.title != ''
 				AND r.passwordstatus %s
-				%s %s %s %s
+				%s %s %s
 				GROUP BY boo.id
 				ORDER BY %s %s %s",
                         Releases::showPasswords(),
                         $browseby,
                         $catsrch,
-                        $maxage,
                         $exccatlist,
                         $order[0],
                         $order[1],
@@ -402,20 +396,16 @@ class Books
             $bookids = explode(', ', $this->bookreqids);
         }
 
-        $total = count($bookids);
+        $total = \count($bookids);
         if ($total > 0) {
-            for ($i = 0; $i < $total; $i++) {
+            foreach ($bookids as $i => $iValue) {
                 $this->processBookReleasesHelper(
-                    $this->pdo->queryDirect(
-                        sprintf('
-						SELECT searchname, id, categories_id
-						FROM releases
-						WHERE nzbstatus = 1 %s
-						AND bookinfo_id IS NULL
-						AND categories_id in (%s)
-						ORDER BY postdate
-						DESC LIMIT %d', $this->renamed, $bookids[$i], $this->bookqty)
-                    ),
+                    Release::query()->where('nzbstatus', '=', NZB::NZB_ADDED)
+                        ->whereNull('bookinfo_id')
+                        ->whereIn('categories_id', [$bookids[$i]])
+                    ->orderBy('postdate', 'desc')
+                    ->limit($this->bookqty)
+                    ->get(['searchname', 'id', 'categories_id']),
                     $bookids[$i]
                 );
             }
@@ -423,19 +413,15 @@ class Books
     }
 
     /**
-     * Process book releases.
-     *
-     * @param \PDOStatement $res        Array containing unprocessed book SQL data set.
-     * @param int                $categoryID The category id.
-     *
-     * @void
+     * @param $res
+     * @param $categoryID
      * @throws \Exception
      */
     protected function processBookReleasesHelper($res, $categoryID): void
     {
-        if ($res instanceof \Traversable && $res->rowCount() > 0) {
+        if ($res instanceof \Traversable && $res->count() > 0) {
             if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::header("\nProcessing ".$res->rowCount().' book release(s) for categories id '.$categoryID));
+                ColorCLI::doEcho(ColorCLI::header("\nProcessing ".$res->count().' book release(s) for categories id '.$categoryID));
             }
 
             $bookId = -2;
@@ -459,7 +445,7 @@ class Books
                     // Do a local lookup first
                     $bookCheck = $this->getBookInfoByName($bookInfo);
 
-                    if ($bookCheck === false && in_array($bookInfo, $this->failCache, false)) {
+                    if ($bookCheck === false && \in_array($bookInfo, $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
                             ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.').PHP_EOL);
@@ -472,7 +458,7 @@ class Books
                             $this->failCache[] = $bookInfo;
                         }
                     } else {
-                        if (! empty($bookCheck)) {
+                        if ($bookCheck !== null) {
                             $bookId = $bookCheck['id'];
                         }
                     }
@@ -565,7 +551,7 @@ class Books
      */
     public function updateBookInfo($bookInfo = '', $amazdata = null)
     {
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         $book = [];
         $bookId = -2;
@@ -644,7 +630,7 @@ class Books
 
         $check = BookInfo::query()->where('asin', $book['asin'])->first();
         if ($check === null) {
-            $bookId = BookInfo::query()->insertGetId(
+            $bookId = BookInfo::create(
                 [
                     'title' => $book['title'],
                     'author' => $book['author'],
@@ -659,10 +645,8 @@ class Books
                     'overview' =>$book['overview'],
                     'genre' => $book['genre'],
                     'cover' => $book['cover'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
                 ]
-            );
+            )->id;
         } else {
             if ($check !== null) {
                 $bookId = $check['id'];

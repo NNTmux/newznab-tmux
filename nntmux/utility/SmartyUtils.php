@@ -18,7 +18,7 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
-use nntmux\Category;
+use App\Models\Category;
 
 /**
  * Returns the value of the specified Category constant.
@@ -44,11 +44,11 @@ function release_flag($text, $page)
     $code = $language = '';
 
     switch (true) {
-        case preg_match('/Arabic/i', $text):
+        case stripos($text, 'Arabic') !== false:
             $code = 'pk';
             $language = 'Arabic';
             break;
-        case preg_match('/Cantonese/i', $text):
+        case stripos($text, 'Cantonese') !== false:
             $code = 'tw';
             $language = 'Cantonese';
             break;
@@ -60,11 +60,11 @@ function release_flag($text, $page)
             $code = 'cz';
             $language = 'Czech';
             break;
-        case preg_match('/Danish/i', $text):
+        case stripos($text, 'Danish') !== false:
             $code = 'dk';
             $language = 'Danish';
             break;
-        case preg_match('/Finnish/i', $text):
+        case stripos($text, 'Finnish') !== false:
             $code = 'fi';
             $language = 'Finnish';
             break;
@@ -108,23 +108,23 @@ function release_flag($text, $page)
             $code = 'kr';
             $language = 'Korean';
             break;
-        case preg_match('/Norwegian/i', $text):
+        case stripos($text, 'Norwegian') !== false:
             $code = 'no';
             $language = 'Norwegian';
             break;
-        case preg_match('/Polish/i', $text):
+        case stripos($text, 'Polish') !== false:
             $code = 'pl';
             $language = 'Polish';
             break;
-        case preg_match('/Portugese/i', $text):
+        case stripos($text, 'Portuguese') !== false:
             $code = 'pt';
             $language = 'Portugese';
             break;
-        case preg_match('/Romanian/i', $text):
+        case stripos($text, 'Romanian') !== false:
             $code = 'ro';
             $language = 'Romanian';
             break;
-        case preg_match('/Spanish/i', $text):
+        case stripos($text, 'Spanish') !== false:
             $code = 'es';
             $language = 'Spanish';
             break;
@@ -140,34 +140,36 @@ function release_flag($text, $page)
             $code = 'th';
             $language = 'Thai';
             break;
-        case preg_match('/Turkish/i', $text):
+        case stripos($text, 'Turkish') !== false:
             $code = 'tr';
             $language = 'Turkish';
             break;
-        case preg_match('/Russian/i', $text):
+        case stripos($text, 'Russian') !== false:
             $code = 'ru';
             $language = 'Russian';
             break;
-        case preg_match('/Vietnamese/i', $text):
+        case stripos($text, 'Vietnamese') !== false:
             $code = 'vn';
             $language = 'Vietnamese';
             break;
     }
 
-    if ($code !== '' && $page == 'browse') {
+    if ($code !== '' && $page === 'browse') {
         $www = WWW_TOP;
-        if (! in_array(substr($www, -1), ['\\', '/'])) {
+        if (! in_array(substr($www, -1), ['\\', '/'], false)) {
             $www .= DS;
         }
 
         return
             '<img title="'.$language.'" alt="'.$language.'" src="'.$www.'themes/shared/images/flags/'.$code.'.png"/>';
-    } elseif ($page == 'search') {
-        if ($code == '') {
+    }
+
+    if ($page === 'search') {
+        if ($code === '') {
             return false;
-        } else {
-            return $code;
         }
+
+        return $code;
     }
 
     return '';

@@ -1,7 +1,7 @@
                                     newznab Usenet Searching Web API
 
-                                                v0.5
-                                             2015-10-24
+                                                v0.6-NNTmux
+                                             2017-01-17
 
 Authors:
 ensi     ensisoft@gmail.com
@@ -585,9 +585,9 @@ newznab-tmux https://github.com/NNTmux/newznab-tmux
 
    Categories                           Category Name
 
-   0000                                 Other                           All of Other
-   0010                                 Other/Misc                      Anything that could not get categorized
-   0020                                 Other/Hashed                    Anything with a hashed name
+   1                                   Other                            All of Other
+   10                                  Other/Misc                       Anything that could not get categorized
+   20                                  Other/Hashed                     Anything with a hashed name
    1000                                 Console                         All of console
    1010                                 Console/NDS                     Nintendo DS
    1020                                 Console/PSP                     Sony Playstation Portable
@@ -641,6 +641,8 @@ newznab-tmux https://github.com/NNTmux/newznab-tmux
    6020                                 XXX/WMV                         WMV rips
    6030                                 XXX/XviD                        dvdrips
    6040                                 XXX/x264                        HD Porn
+   6041                                 XXX/HD Clips                    HD Clips Porn
+   6042                                 XXX/SD Clips                    SD Clips Porn
    6050                                 XXX/Other                       Misc Porn
    6060                                 XXX/Imageset                    Sets of porn images
    6999                                 XXX/Packs                       Packs of multiple porn videos

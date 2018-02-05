@@ -38,10 +38,10 @@ class Country
      */
     public static function countryCode($country)
     {
-        if (! is_array($country) && strlen($country) > 2) {
-            $code = CountryModel::query()->where('country', $country)->first(['id']);
-            if (isset($code['id'])) {
-                return $code['id'];
+        if (\strlen($country) > 2) {
+            $code = CountryModel::query()->where('full_name', $country)->orWhere('name', $country)->first(['iso_3166_2']);
+            if ($code !== null && isset($code['iso_3166_2'])) {
+                return $code['iso_3166_2'];
             }
         }
 

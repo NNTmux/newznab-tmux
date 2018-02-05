@@ -3,11 +3,12 @@
 namespace nntmux;
 
 use nntmux\db\DB;
-use Carbon\Carbon;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\XxxInfo;
+use App\Models\Category;
 use App\Models\Settings;
+use Illuminate\Support\Carbon;
 use nntmux\processing\adult\ADE;
 use nntmux\processing\adult\ADM;
 use nntmux\processing\adult\AEBN;
@@ -38,16 +39,6 @@ class XXX
      * @var string
      */
     protected $currentTitle = '';
-
-    /**
-     * @var \nntmux\Logger
-     */
-    protected $debugging;
-
-    /**
-     * @var bool
-     */
-    protected $debug;
 
     /**
      * @var bool
@@ -101,32 +92,13 @@ class XXX
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
+        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
 
-        $this->movieqty = (Settings::settingValue('..maxxxxprocessed') !== '') ? Settings::settingValue('..maxxxxprocessed') : 100;
+        $this->movieqty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
         $this->showPasswords = Releases::showPasswords();
-        $this->debug = NN_DEBUG;
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
         $this->imgSavePath = NN_COVERS.'xxx'.DS;
         $this->cookie = NN_TMP.'xxx.cookie';
-        $this->catWhere = 'AND categories_id IN ('.
-            Category::XXX_DVD.', '.
-            Category::XXX_WMV.', '.
-            Category::XXX_XVID.', '.
-            Category::XXX_X264.', '.
-            Category::XXX_SD.', '.
-            Category::XXX_CLIPHD.', '.
-            Category::XXX_CLIPSD.', '.
-            Category::XXX_WEBDL.') ';
-
-        if (NN_DEBUG || NN_LOGGING) {
-            $this->debug = true;
-            try {
-                $this->debugging = new Logger();
-            } catch (LoggerException $error) {
-                $this->debug = false;
-            }
-        }
     }
 
     /**
@@ -157,7 +129,7 @@ class XXX
     {
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat);
         }
 
         $order = $this->getXXXOrder($orderBy);
@@ -468,7 +440,7 @@ class XXX
     {
         $res = '';
         if ($genre !== null) {
-            $res = Genre::query()->insertGetId(['title' => $genre, 'type' => Category::XXX_ROOT, 'disabled' => 0]);
+            $res = Genre::create(['title' => $genre, 'type' => Category::XXX_ROOT, 'disabled' => 0]);
         }
 
         return $res;
@@ -626,7 +598,7 @@ class XXX
 
         // Insert New XXX Information
         if ($check === null) {
-            $xxxID = XxxInfo::query()->insertGetId(
+            $xxxID = XxxInfo::create(
                 [
                     'title' => $mov['title'],
                     'tagline' => $mov['tagline'],
@@ -640,7 +612,7 @@ class XXX
                     'directurl' => $mov['directurl'],
                     'classused' => $mov['classused'],
                 ]
-            );
+            )->id;
             // Update BoxCover.
             if (! empty($mov['cover'])) {
                 $cover = $this->releaseImage->saveImage($xxxID.'-cover', $mov['cover'], $this->imgSavePath);
@@ -670,19 +642,24 @@ class XXX
      */
     public function processXXXReleases(): void
     {
-        $res = $this->pdo->query(
-            sprintf(
-            '
-				SELECT r.searchname, r.id
-				FROM releases r
-				WHERE r.nzbstatus = 1
-				AND r.xxxinfo_id = 0
-				%s
-				LIMIT %d',
-                $this->catWhere,
-                $this->movieqty
+        $res = Release::query()
+            ->where(['nzbstatus' => 1, 'xxxinfo_id' => 0])
+            ->whereIn(
+                'categories_id',
+            [
+                Category::XXX_DVD,
+                Category::XXX_WMV,
+                Category::XXX_XVID,
+                Category::XXX_X264,
+                Category::XXX_SD,
+                Category::XXX_CLIPHD,
+                Category::XXX_CLIPSD,
+                Category::XXX_WEBDL,
+            ]
             )
-        );
+            ->limit($this->movieqty)
+            ->get(['searchname', 'id']);
+
         $movieCount = \count($res);
 
         if ($movieCount > 0) {
@@ -699,9 +676,6 @@ class XXX
                     $check = $this->checkXXXInfoExists($this->currentTitle);
                     if ($check === null) {
                         $this->currentRelID = $arr['id'];
-                        if ($this->debug && $this->echooutput) {
-                            ColorCLI::doEcho('DB name: '.$arr['searchname'], true);
-                        }
                         if ($this->echooutput) {
                             ColorCLI::doEcho(ColorCLI::primaryOver('Looking up: ').ColorCLI::headerOver($this->currentTitle), true);
                         }

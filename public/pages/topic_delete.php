@@ -1,14 +1,14 @@
 <?php
 
-use nntmux\Forum;
+use App\Models\User;
+use App\Models\Forumpost;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
-$forum = new Forum();
 $id = $_GET['id'] + 0;
 
 if (isset($id)) {
-    $forum->deleteParent($id);
+    Forumpost::deleteParent($id);
     header('Location:'.WWW_TOP.'/forum');
 }

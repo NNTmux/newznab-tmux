@@ -2,18 +2,18 @@
 
 use nntmux\NZB;
 use nntmux\db\DB;
-use nntmux\Releases;
+use App\Models\User;
+use App\Models\Release;
 
-$releases = new Releases;
 $pdo = new DB();
-$nzb = new NZB($pdo);
+$nzb = new NZB();
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 if (isset($_GET['id'])) {
-    $rel = $releases->getByGuid($_GET['id']);
+    $rel = Release::getByGuid($_GET['id']);
     if (! $rel) {
         $page->show404();
     }

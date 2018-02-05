@@ -3,9 +3,9 @@
 namespace nntmux;
 
 use nntmux\db\DB;
-use Carbon\Carbon;
 use App\Models\Group;
 use App\Models\Settings;
+use Illuminate\Support\Carbon;
 use App\Models\BinaryBlacklist;
 use App\Models\MultigroupPoster;
 use Illuminate\Support\Facades\Cache;
@@ -16,15 +16,15 @@ use nntmux\processing\ProcessReleasesMultiGroup;
  */
 class Binaries
 {
-    const OPTYPE_BLACKLIST = 1;
-    const OPTYPE_WHITELIST = 2;
+    public const OPTYPE_BLACKLIST = 1;
+    public const OPTYPE_WHITELIST = 2;
 
-    const BLACKLIST_DISABLED = 0;
-    const BLACKLIST_ENABLED = 1;
+    public const BLACKLIST_DISABLED = 0;
+    public const BLACKLIST_ENABLED = 1;
 
-    const BLACKLIST_FIELD_SUBJECT = 1;
-    const BLACKLIST_FIELD_FROM = 2;
-    const BLACKLIST_FIELD_MESSAGEID = 3;
+    public const BLACKLIST_FIELD_SUBJECT = 1;
+    public const BLACKLIST_FIELD_FROM = 2;
+    public const BLACKLIST_FIELD_MESSAGEID = 3;
 
     /**
      * @var array
@@ -50,16 +50,6 @@ class Binaries
      * @var \nntmux\CollectionsCleaning
      */
     protected $_collectionsCleaning;
-
-    /**
-     * @var \nntmux\Logger
-     */
-    protected $_debugging;
-
-    /**
-     * @var \nntmux\Groups
-     */
-    protected $_groups;
 
     /**
      * @var \nntmux\NNTP
@@ -262,20 +252,9 @@ class Binaries
         $this->_echoCLI = ($options['Echo'] && NN_ECHOCLI);
 
         $this->_pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->_pdo]));
         $this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
         $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
         $this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof CollectionsCleaning ? $options['CollectionsCleaning'] : new CollectionsCleaning(['Settings' => $this->_pdo]));
-
-        $this->_debug = (NN_DEBUG || NN_LOGGING);
-
-        if ($this->_debug) {
-            try {
-                $this->_debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->_colorCLI]));
-            } catch (LoggerException $error) {
-                $this->_debug = false;
-            }
-        }
 
         $this->messageBuffer = Settings::settingValue('..maxmssgs') !== '' ?
             (int) Settings::settingValue('..maxmssgs') : 20000;
@@ -302,7 +281,7 @@ class Binaries
      */
     public function updateAllGroups($maxHeaders = 100000): void
     {
-        $groups = $this->_groups->getActive();
+        $groups = Group::getActive();
 
         $groupCount = \count($groups);
         if ($groupCount > 0) {
@@ -312,7 +291,6 @@ class Binaries
             $this->log(
                 'Updating: '.$groupCount.' group(s) - Using compression? '.($this->_compressedHeaders ? 'Yes' : 'No'),
                 __FUNCTION__,
-                Logger::LOG_INFO,
                 'header'
             );
 
@@ -321,7 +299,6 @@ class Binaries
                 $this->log(
                     'Starting group '.$counter.' of '.$groupCount,
                     __FUNCTION__,
-                    Logger::LOG_INFO,
                     'header'
                 );
                 $this->updateGroup($group, $maxHeaders);
@@ -331,14 +308,12 @@ class Binaries
             $this->log(
                 'Updating completed in '.number_format(microtime(true) - $allTime, 2).' seconds.',
                 __FUNCTION__,
-                Logger::LOG_INFO,
                 'primary'
             );
         } else {
             $this->log(
                 'No groups specified. Ensure groups are added to NNTmux\'s database for updating.',
                 __FUNCTION__,
-                Logger::LOG_NOTICE,
                 'warning'
             );
         }
@@ -371,8 +346,9 @@ class Binaries
         $groupNNTP = $this->_nntp->selectGroup($groupMySQL['name']);
         if ($this->_nntp->isError($groupNNTP)) {
             $groupNNTP = $this->_nntp->dataError($this->_nntp, $groupMySQL['name']);
-            if ($groupNNTP->code === 411) {
-                $this->_groups->disableIfNotExist($groupMySQL['id']);
+
+            if (isset($groupNNTP['code']) && (int) $groupNNTP['code'] === 411) {
+                Group::disableIfNotExist($groupMySQL['id']);
             }
             if ($this->_nntp->isError($groupNNTP)) {
                 return;
@@ -423,7 +399,7 @@ class Binaries
             // We will use this to subtract so we leave articles for the next time (in case the server doesn't have them yet)
             $leaveOver = $this->messageBuffer;
 
-            // If this is not a new group, go from our newest to the servers newest.
+        // If this is not a new group, go from our newest to the servers newest.
         } else {
             // Set our oldest wanted to our newest local article.
             $first = $groupMySQL['last_record'];
@@ -617,7 +593,7 @@ class Binaries
         $this->notYEnc = $this->headersBlackListed = 0;
 
         // Check if MySQL tables exist, create if they do not, get their names at the same time.
-        $this->tableNames = $this->_groups->getCBPTableNames($this->groupMySQL['id']);
+        $this->tableNames = (new Group())->getCBPTableNames($this->groupMySQL['id']);
 
         $mgrPosters = $this->getMultiGroupPosters();
 
@@ -675,7 +651,6 @@ class Binaries
                 $this->log(
                     "Code {$headers->code}: $message\nSkipping group: {$this->groupMySQL['name']}",
                     __FUNCTION__,
-                    Logger::LOG_WARNING,
                     'error'
                 );
 
@@ -786,7 +761,7 @@ class Binaries
 
         // Standard headers go second so we can switch tableNames back and do part repair to standard group tables
         if (! empty($stdHeaders)) {
-            $this->tableNames = $this->_groups->getCBPTableNames($this->groupMySQL['id']);
+            $this->tableNames = (new Group())->getCBPTableNames($this->groupMySQL['id']);
             $this->storeHeaders($stdHeaders, false);
         }
         unset($stdHeaders);
@@ -810,7 +785,6 @@ class Binaries
                 $this->log(
                     $notInsertedCount.' articles failed to insert!',
                     __FUNCTION__,
-                    Logger::LOG_WARNING,
                     'warning'
                 );
             }
@@ -910,11 +884,13 @@ class Binaries
                     $this->header['Date'] = (is_numeric($this->header['Date']) ? $this->header['Date'] : strtotime($this->header['Date']));
 
                     // Get the current unixtime from PHP.
-                    $now = time();
+                    $now = Carbon::now()->timestamp;
 
                     $xref = ($this->multiGroup === true ? sprintf('xref = CONCAT(xref, "\\n"%s ),', $this->_pdo->escapeString(substr($this->header['Xref'], 2, 255))) : '');
                     $date = $this->header['Date'] > $now ? $now : $this->header['Date'];
                     $unixtime = is_numeric($this->header['Date']) ? $date : $now;
+
+                    $random = random_bytes(16);
 
                     $collectionID = $this->_pdo->queryInsert(
                         sprintf(
@@ -933,7 +909,7 @@ class Binaries
                             sha1($this->header['CollectionKey']),
                             $collMatch['id'],
                             $xref,
-                            bin2hex(openssl_random_pseudo_bytes(16))
+                            sodium_bin2hex($random)
                         )
                     );
 
@@ -1152,7 +1128,7 @@ class Binaries
         $tableNames = $tables;
 
         if ($tableNames === '') {
-            $tableNames = $this->_groups->getCBPTableNames($groupArr['id']);
+            $tableNames = (new Group())->getCBPTableNames($groupArr['id']);
         }
         // Get all parts in partrepair table.
         $missingParts = $this->_pdo->query(
@@ -1213,7 +1189,7 @@ class Binaries
                 $partList = $range['partlist'];
 
                 if ($this->_echoCLI) {
-                    echo chr(random_int(45, 46)).PHP_EOL;
+                    echo \chr(random_int(45, 46)).PHP_EOL;
                 }
 
                 // Get article headers from newsgroup.
@@ -1290,10 +1266,10 @@ class Binaries
     public function postdate($post, array $groupData): int
     {
         // Set table names
-        $groupID = $this->_groups->getIDByName($groupData['group']);
+        $groupID = Group::getIDByName($groupData['group']);
         $group = [];
         if ($groupID !== '') {
-            $group = $this->_groups->getCBPTableNames($groupID);
+            $group = (new Group())->getCBPTableNames($groupID);
         }
 
         $currentPost = $post;
@@ -1361,21 +1337,6 @@ class Binaries
             $date = time();
         } else {
             $date = strtotime($date);
-        }
-
-        if ($this->_debug) {
-            $this->_debugging->log(
-                __CLASS__,
-                __FUNCTION__,
-                'Article ('.
-                $post.
-                "'s) date is (".
-                $date.
-                ') ('.
-                $this->daysOld($date).
-                ' days old)',
-                Logger::LOG_INFO
-            );
         }
 
         return $date;
@@ -1489,7 +1450,7 @@ class Binaries
      * @param $timestamp
      * @return int
      */
-    private function daysOld($timestamp)
+    private function daysOld($timestamp): int
     {
         return Carbon::createFromTimestamp($timestamp)->diffInDays();
     }
@@ -1724,38 +1685,19 @@ class Binaries
     }
 
     /**
-     * Delete all Collections/Binaries/Parts for a group ID.
-     *
-     * @param int $groupID The ID of the group.
-     *
-     * @note A trigger automatically deletes the parts/binaries.
-     *
-     * @return void
-     */
-    public function purgeGroup($groupID): void
-    {
-        $this->_pdo->queryExec(sprintf('DELETE c FROM collections c WHERE c.groups_id = %d', $groupID));
-    }
-
-    /**
      * Log / Echo message.
      *
      * @param string $message Message to log.
      * @param string $method  Method that called this.
-     * @param int    $level   Logger severity level constant.
      * @param string $color   ColorCLI method name.
      */
-    private function log($message, $method, $level, $color): void
+    private function log($message, $method, $color): void
     {
         if ($this->_echoCLI) {
             ColorCLI::doEcho(
                 ColorCLI::$color($message.' ['.__CLASS__."::$method]"),
                 true
             );
-        }
-
-        if ($this->_debug) {
-            $this->_debugging->log(__CLASS__, $method, $message, $level);
         }
     }
 

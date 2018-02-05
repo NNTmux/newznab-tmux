@@ -1,29 +1,19 @@
 <?php
 
-use App\Models\Settings;
-use nntmux\DnzbFailures;
+use App\Models\User;
+use App\Models\Release;
 
 // Page is accessible only by the rss token, or logged in users.
-if ($page->users->isLoggedIn()) {
-    $uid = $page->users->currentUserId();
+if (User::isLoggedIn()) {
+    $uid = User::currentUserId();
     $rssToken = $page->userdata['rsstoken'];
 } else {
-    if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
-        if (! isset($_GET['rsstoken'])) {
-            header('X-DNZB-RCode: 400');
-            header('X-DNZB-RText: Bad request, please supply all parameters!');
-            $page->show403();
-        } else {
-            $res = $page->users->getByRssToken($_GET['rsstoken']);
-        }
+    if (! isset($_GET['userid']) || ! isset($_GET['rsstoken'])) {
+        header('X-DNZB-RCode: 400');
+        header('X-DNZB-RText: Bad request, please supply all parameters!');
+        $page->show403();
     } else {
-        if (! isset($_GET['userid']) || ! isset($_GET['rsstoken'])) {
-            header('X-DNZB-RCode: 400');
-            header('X-DNZB-RText: Bad request, please supply all parameters!');
-            $page->show403();
-        } else {
-            $res = $page->users->getByIdAndRssToken($_GET['userid'], $_GET['rsstoken']);
-        }
+        $res = User::getByIdAndRssToken($_GET['userid'], $_GET['rsstoken']);
     }
     if (! isset($res)) {
         header('X-DNZB-RCode: 401');
@@ -36,7 +26,7 @@ if ($page->users->isLoggedIn()) {
 }
 
 if (isset($_GET['guid'], $uid, $rssToken) && is_numeric($uid)) {
-    $alt = (new DnzbFailures())->getAlternate($_GET['guid'], $uid);
+    $alt = Release::getAlternate($_GET['guid'], $uid);
     if ($alt === null) {
         header('X-DNZB-RCode: 404');
         header('X-DNZB-RText: No NZB found for alternate match.');

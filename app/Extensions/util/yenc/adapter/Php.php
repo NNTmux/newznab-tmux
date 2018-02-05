@@ -19,8 +19,6 @@
 
 namespace App\Extensions\util\yenc\adapter;
 
-use nntmux\Logger;
-
 /**
  * Class Php.
  */
@@ -30,9 +28,11 @@ class Php
     {
         $crc = '';
         // Extract the yEnc string itself.
-        if (preg_match('/=ybegin.*size=([^ $]+).*\\r\\n(.*)\\r\\n=yend.*size=([^ $\\r\\n]+)(.*)/ims',
-			$text,
-			$encoded)) {
+        if (preg_match(
+            '/=ybegin.*size=([^ $]+).*\\r\\n(.*)\\r\\n=yend.*size=([^ $\\r\\n]+)(.*)/ims',
+            $text,
+            $encoded
+        )) {
             if (preg_match('/crc32=([^ $\\r\\n]+)/ims', $encoded[4], $trailer)) {
                 $crc = trim($trailer[1]);
             }
@@ -50,10 +50,6 @@ class Php
         // Make sure the header and trailer file sizes match up.
         if ($headerSize != $trailerSize) {
             $message = 'Header and trailer file sizes do not match. This is a violation of the yEnc specification.';
-            if (NN_LOGGING || NN_DEBUG) {
-                (new Logger())->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-            }
-
             throw new \RuntimeException($message);
         }
 
@@ -62,18 +58,15 @@ class Php
         $encodedLength = strlen($encoded);
         for ($chr = 0; $chr < $encodedLength; $chr++) {
             $decoded .= (
-				$encoded[$chr] == '=' ?
-					chr((ord($encoded[$chr]) - 42) % 256) :
-					chr((((ord($encoded[++$chr]) - 64) % 256) - 42) % 256)
-			);
+                $encoded[$chr] == '=' ?
+                    chr((ord($encoded[$chr]) - 42) % 256) :
+                    chr((((ord($encoded[++$chr]) - 64) % 256) - 42) % 256)
+            );
         }
 
         // Make sure the decoded file size is the same as the size specified in the header.
         if (strlen($decoded) != $headerSize) {
             $message = 'Header file size ('.$headerSize.') and actual file size ('.strlen($decoded).') do not match. The file is probably corrupt.';
-            if (NN_LOGGING || NN_DEBUG) {
-                (new Logger())->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-            }
 
             throw new \RuntimeException($message);
         }
@@ -81,9 +74,6 @@ class Php
         // Check the CRC value
         if ($crc !== '' && (strtolower($crc) !== strtolower(sprintf('%04X', crc32($decoded))))) {
             $message = 'CRC32 checksums do not match. The file is probably corrupt.';
-            if (NN_LOGGING || NN_DEBUG) {
-                (new Logger())->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-            }
 
             throw new \RuntimeException($message);
         }
@@ -103,29 +93,31 @@ class Php
         if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $text, $input)) {
             $text = '';
             $input =
-				trim(
-					preg_replace(
-						'/\r\n/im',
-						'',
-						preg_replace(
-							'/(^=yEnd.*)/im',
-							'',
-							preg_replace(
-								'/(^=yPart.*\\r\\n)/im',
-								'',
-								preg_replace('/(^=yBegin.*\\r\\n)/im', '', $input[1], 1),
-								1),
-							1)
-					)
-				);
+                trim(
+                    preg_replace(
+                        '/\r\n/im',
+                        '',
+                        preg_replace(
+                            '/(^=yEnd.*)/im',
+                            '',
+                            preg_replace(
+                                '/(^=yPart.*\\r\\n)/im',
+                                '',
+                                preg_replace('/(^=yBegin.*\\r\\n)/im', '', $input[1], 1),
+                                1
+                            ),
+                            1
+                        )
+                    )
+                );
 
             $length = strlen($input);
             for ($chr = 0; $chr < $length; $chr++) {
                 $text .= (
-					$input[$chr] == '=' ?
-						chr((((ord($input[++$chr]) - 64) % 256) - 42) % 256) :
-						chr((ord($input[$chr]) - 42) % 256)
-				);
+                    $input[$chr] == '=' ?
+                        chr((((ord($input[++$chr]) - 64) % 256) - 42) % 256) :
+                        chr((ord($input[$chr]) - 42) % 256)
+                );
             }
         }
 
@@ -146,9 +138,6 @@ class Php
 
         if ($lineLength < 1) {
             $message = $lineLength.' is not a valid line length.';
-            if (NN_LOGGING || NN_DEBUG) {
-                (new Logger())->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-            }
 
             throw new \RuntimeException($message);
         }
@@ -161,29 +150,29 @@ class Php
 
             // Escape NULL, TAB, LF, CR, space, . and = characters.
             switch ($value) {
-				case 0:
-				case 10:
-				case 13:
-				case 61:
-					$encoded .= ('='.chr(($value + 64) % 256));
-					break;
-				default:
-					$encoded .= chr($value);
-					break;
-			}
+                case 0:
+                case 10:
+                case 13:
+                case 61:
+                    $encoded .= ('='.chr(($value + 64) % 256));
+                    break;
+                default:
+                    $encoded .= chr($value);
+                    break;
+            }
         }
 
         $encoded =
-			'=ybegin line='.
-			$lineLength.
-			' size='.
-			$stringLength.
-			' name='.
-			trim($filename).
-			"\r\n".
-			trim(chunk_split($encoded, $lineLength)).
-			"\r\n=yend size=".
-			$stringLength;
+            '=ybegin line='.
+            $lineLength.
+            ' size='.
+            $stringLength.
+            ' name='.
+            trim($filename).
+            "\r\n".
+            trim(chunk_split($encoded, $lineLength)).
+            "\r\n=yend size=".
+            $stringLength;
 
         // Add a CRC32 checksum if desired.
         if ($crc32 === true) {

@@ -24,8 +24,8 @@ if (! is_dir($dir) && ! mkdir($dir)) {
 }
 
 $releases = new Releases(['Settings' => $pdo]);
-$nzb = new NZB($pdo);
-$releaseImage = new ReleaseImage($pdo);
+$nzb = new NZB();
+$releaseImage = new ReleaseImage();
 
 $timestart = date('r');
 $checked = $moved = 0;

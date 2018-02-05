@@ -2,28 +2,28 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Menu;
+use App\Models\Menu;
+use App\Models\UserRole;
 
 $page = new AdminPage();
-$menu = new Menu($page->pdo);
 $id = 0;
 
 // Get the user roles.
-$userroles = $page->users->getRoles();
+$userroles = UserRole::getRoles();
 $roles = [];
 foreach ($userroles as $r) {
     $roles[$r['id']] = $r['name'];
 }
 
 // set the current action
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = $_REQUEST['action'] ?? 'view';
 
 switch ($action) {
     case 'submit':
-        if ($_POST['id'] == '') {
-            $menu->add($_POST);
+        if ($_POST['id'] === '') {
+            \App\Models\Menu::addMenu($_POST);
         } else {
-            $ret = $menu->update($_POST);
+            $ret = Menu::updateMenu($_POST);
         }
 
         header('Location:'.WWW_TOP.'/menu-list.php');
@@ -37,7 +37,7 @@ switch ($action) {
         ];
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
-            $menuRow = $menu->getByID($id);
+            $menuRow = Menu::find($id);
         }
         $page->title = 'Menu Edit';
         $page->smarty->assign('menu', $menuRow);

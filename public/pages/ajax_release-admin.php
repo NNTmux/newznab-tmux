@@ -1,11 +1,11 @@
 <?php
 
-use nntmux\Category;
 use nntmux\Releases;
+use App\Models\Release;
+use App\Models\Category;
 
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->settings]);
-$category = new Category(['Settings' => $page->settings]);
 
 // Set the current action.
 $action = $_REQUEST['action'] ?? '';
@@ -14,7 +14,7 @@ $action = $_REQUEST['action'] ?? '';
 if (isset($_REQUEST['id']) && is_array($_REQUEST['id'])) {
     $id = $_REQUEST['id'];
     //Get info for first guid to populate form
-    $rel = $releases->getByGuid($_REQUEST['id'][0]);
+    $rel = Release::getByGuid($_REQUEST['id'][0]);
 } else {
     $id = $rel = '';
 }
@@ -40,7 +40,7 @@ switch ($action) {
         $page->smarty->assign('release', $rel);
         $page->smarty->assign('success', $success);
         $page->smarty->assign('from', $_POST['from'] ?? '');
-        $page->smarty->assign('catlist', $category->getForSelect(false));
+        $page->smarty->assign('catlist', Category::getForSelect(false));
         $page->content = $page->smarty->fetch('ajax_release-edit.tpl');
         echo $page->content;
 

@@ -6,18 +6,18 @@ if (!isset($argv[1])) {
 
 require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php';
 
+use App\Models\Group;
 use App\Models\Settings;
+use App\Models\Tmux;
 use \nntmux\db\DB;
 use \nntmux\processing\PostProcess;
 use \nntmux\processing\ProcessReleases;
 use \nntmux\processing\post\ProcessAdditional;
 use nntmux\Backfill;
 use nntmux\Binaries;
-use nntmux\Groups;
 use nntmux\Nfo;
 use nntmux\NNTP;
 use nntmux\processing\ProcessReleasesMultiGroup;
-use nntmux\RequestIDLocal;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
 // The type of process we want to do: $options[1] => (string): releases
@@ -31,7 +31,7 @@ switch ($options[1]) {
 	case 'backfill':
 		if (in_array((int)$options[3], [1, 2], false)) {
 			$pdo = new DB();
-			$value = $pdo->queryOneRow("SELECT value FROM tmux WHERE setting = 'backfill_qty'");
+			$value = Tmux::value('backfill_qty');
 			if ($value !== false) {
 				$nntp = nntp($pdo);
 				(new Backfill())->backfillAllGroups($options[2], ($options[3] === 1 ? '' : $value['value']));
@@ -69,14 +69,13 @@ switch ($options[1]) {
 	case 'get_range':
 		$pdo = new DB();
 		$nntp = nntp($pdo);
-		$groups = new Groups();
-		$groupMySQL = $groups->getByName($options[3]);
+		$groupMySQL = Group::getByName($options[3]);
 		if ($nntp->isError($nntp->selectGroup($groupMySQL['name']))) {
 			if ($nntp->isError($nntp->dataError($nntp, $groupMySQL['name']))) {
 				return;
 			}
 		}
-		$binaries = new Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => $groups]);
+		$binaries = new Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => null]);
 		$return = $binaries->scan($groupMySQL, $options[4], $options[5], (Settings::settingValue('..safepartrepair') == 1 ? 'update' : 'backfill'));
 		if (empty($return)) {
 			exit();
@@ -133,8 +132,7 @@ switch ($options[1]) {
 	 */
 	case 'part_repair':
 		$pdo = new DB();
-		$groups = new Groups(['Settings' => $pdo]);
-		$groupMySQL = $groups->getByName($options[2]);
+		$groupMySQL = Group::getByName($options[2]);
 		$nntp = nntp($pdo);
 		// Select group, here, only once
 		$data = $nntp->selectGroup($groupMySQL['name']);
@@ -143,7 +141,7 @@ switch ($options[1]) {
 				exit();
 			}
 		}
-		(new Binaries(['NNTP' => $nntp, 'Groups' => $groups, 'Settings' => $pdo]))->partRepair($groupMySQL);
+		(new Binaries(['NNTP' => $nntp, 'Settings' => $pdo]))->partRepair($groupMySQL);
 		break;
 
 	// Process releases.
@@ -173,17 +171,9 @@ switch ($options[1]) {
 			}
 			$releases->deletedReleasesByGroup();
 			$releases->deleteReleases();
-			$releases->processRequestIDs('', (5000 * $groupCount), true);
-			$releases->processRequestIDs('', (1000 * $groupCount), false);
+			//$releases->processRequestIDs('', (5000 * $groupCount), true);
+			//$releases->processRequestIDs('', (1000 * $groupCount), false);
 			$releases->categorizeReleases(2);
-		}
-		break;
-
-	// Process all local requestid for a single group.
-	// $options[2] => (int)groupid, group to work on
-	case 'requestid':
-		if (is_numeric($options[2])) {
-			(new RequestIDLocal(['Echo' => true]))->lookupRequestIDs(['GroupID' => $options[2], 'limit' => 5000]);
 		}
 		break;
 
@@ -194,9 +184,8 @@ switch ($options[1]) {
 	case 'update_group_headers':
 		$pdo = new DB();
 		$nntp = nntp($pdo);
-		$groups = new Groups();
-		$groupMySQL = $groups->getByName($options[2]);
-		(new Binaries(['NNTP' => $nntp, 'Groups' => $groups, 'Settings' => $pdo]))->updateGroup($groupMySQL);
+		$groupMySQL = Group::getByName($options[2]);
+		(new Binaries(['NNTP' => $nntp, 'Settings' => $pdo]))->updateGroup($groupMySQL);
 		break;
 
 
@@ -230,7 +219,7 @@ switch ($options[1]) {
 
 			// Post process the releases.
 			(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start($options[2]);
-			(new Nfo(['Echo' => true, 'Settings' => $pdo]))->processNfoFiles($nntp, $options[2]);
+			(new Nfo())->processNfoFiles($nntp, $options[2], '', (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
 
 		}
 		break;
@@ -246,7 +235,7 @@ switch ($options[1]) {
 			$nntp = nntp($pdo, true);
 
 			if ($options[1] === 'pp_nfo') {
-				(new Nfo(['Echo' => true, 'Settings' => $pdo]))->processNfoFiles($nntp, '', $options[2]);
+				(new Nfo())->processNfoFiles($nntp, '', $options[2], (int) Settings::settingValue('..lookupimdb'), (int) Settings::settingValue('..lookuptvrage'));
 			} else {
 				(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start('', $options[2]);
 			}
@@ -261,7 +250,7 @@ switch ($options[1]) {
 	case 'pp_movie':
 		if (charCheck($options[2])) {
 			$pdo = new DB();
-			(new PostProcess(['Settings' => $pdo]))->processMovies('', $options[2], (isset($options[3]) ? $options[3] : ''));
+			(new PostProcess(['Settings' => $pdo]))->processMovies('', $options[2], $options[3] ?? '');
 		}
 		break;
 
@@ -282,11 +271,12 @@ switch ($options[1]) {
  * Create / process releases for a groupID.
  *
  * @param ProcessReleases|ProcessReleasesMultiGroup $releases
- * @param int             $groupID
+ * @param int $groupID
+ * @throws \Exception
  */
 function processReleases($releases, $groupID)
 {
-	$releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') != '' ? (int)Settings::settingValue('..maxnzbsprocessed') : 1000);
+	$releaseCreationLimit = (Settings::settingValue('..maxnzbsprocessed') !== '' ? (int)Settings::settingValue('..maxnzbsprocessed') : 1000);
 	$releases->processIncompleteCollections($groupID);
 	$releases->processCollectionSizes($groupID);
 	$releases->deleteUnwantedCollections($groupID);
@@ -336,9 +326,10 @@ function collectionCheck(&$pdo, $groupID)
  * Connect to usenet, return NNTP object.
  *
  * @param DB $pdo
- * @param bool               $alternate Use alternate NNTP provider.
+ * @param bool $alternate Use alternate NNTP provider.
  *
  * @return NNTP
+ * @throws \Exception
  */
 function &nntp(&$pdo, $alternate = false)
 {

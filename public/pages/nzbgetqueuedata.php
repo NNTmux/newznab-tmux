@@ -1,9 +1,10 @@
 <?php
 
 use nntmux\NZBGet;
+use App\Models\User;
 use nntmux\utility\Utility;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
@@ -18,7 +19,7 @@ if ($data !== false) {
 
         if ($status !== false) {
             $output .=
-			"<div class='container text-center' style='display:block;'>
+            "<div class='container text-center' style='display:block;'>
 				<div style='width:16.666666667%;float:left;'><b>Avg Speed:</b><br /> ".Utility::bytesToSizeString($status['AverageDownloadRate'], 2)."/s </div>
 				<div style='width:16.666666667%;float:left;'><b>Speed:</b><br /> ".Utility::bytesToSizeString($status['DownloadRate'], 2)."/s </div>
 				<div style='width:16.666666667%;float:left;'><b>Limit:</b><br /> ".Utility::bytesToSizeString($status['DownloadLimit'], 2)."/s </div>
@@ -30,7 +31,7 @@ if ($data !== false) {
 
         $count = 1;
         $output .=
-			"<table class='table table-striped table-condensed table-highlight data'>
+            "<table class='table table-striped table-condensed table-highlight data'>
 				<thead>
 					<tr >
 						<th style='width=10px;text-align:center;'>#</th>
@@ -48,21 +49,21 @@ if ($data !== false) {
 
         foreach ($data as $item) {
             $output .=
-				'<tr>'.
-				"<td style='text-align:center;width:10px'>".$count.'</td>'.
-				"<td style='text-align:left;'>".$item['NZBName'].'</td>'.
-				"<td style='text-align:center;'>".$item['FileSizeMB'].' MB</td>'.
-				"<td style='text-align:center;'>".$item['RemainingSizeMB'].' MB</td>'.
-				"<td style='text-align:center;'>".($item['FileSizeMB'] == 0 ? 0 : round(100 - ($item['RemainingSizeMB'] / $item['FileSizeMB']) * 100)).'%</td>'.
-				"<td style='text-align:center;'>".($item['ActiveDownloads'] > 0 ? 'Downloading' : 'Paused').'</td>'.
-				"<td style='text-align:center;'><a  onclick=\"return confirm('Are you sure?');\" href='?del=".$item['LastID']."'>Delete</a></td>".
-				"<td style='text-align:center;'><a href='?pause=".$item['LastID']."'>Pause</a></td>".
-				"<td style='text-align:center;'><a href='?resume=".$item['LastID']."'>Resume</a></td>".
-				'</tr>';
+                '<tr>'.
+                "<td style='text-align:center;width:10px'>".$count.'</td>'.
+                "<td style='text-align:left;'>".$item['NZBName'].'</td>'.
+                "<td style='text-align:center;'>".$item['FileSizeMB'].' MB</td>'.
+                "<td style='text-align:center;'>".$item['RemainingSizeMB'].' MB</td>'.
+                "<td style='text-align:center;'>".($item['FileSizeMB'] == 0 ? 0 : round(100 - ($item['RemainingSizeMB'] / $item['FileSizeMB']) * 100)).'%</td>'.
+                "<td style='text-align:center;'>".($item['ActiveDownloads'] > 0 ? 'Downloading' : 'Paused').'</td>'.
+                "<td style='text-align:center;'><a  onclick=\"return confirm('Are you sure?');\" href='?del=".$item['LastID']."'>Delete</a></td>".
+                "<td style='text-align:center;'><a href='?pause=".$item['LastID']."'>Pause</a></td>".
+                "<td style='text-align:center;'><a href='?resume=".$item['LastID']."'>Resume</a></td>".
+                '</tr>';
             $count++;
         }
         $output .=
-			'</tbody>
+            '</tbody>
 		</table>';
     } else {
         $output .= "<br /><br /><p style='text-align:center;'>The queue is currently empty.</p>";

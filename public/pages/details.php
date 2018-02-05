@@ -6,28 +6,29 @@ use nntmux\Books;
 use nntmux\Games;
 use nntmux\Movie;
 use nntmux\Music;
-use nntmux\PreDb;
-use nntmux\Videos;
 use nntmux\Console;
+use App\Models\User;
 use nntmux\Releases;
+use App\Models\Predb;
+use App\Models\Video;
+use App\Models\Release;
 use App\Models\Settings;
-use nntmux\DnzbFailures;
 use nntmux\ReleaseExtra;
-use nntmux\ReleaseFiles;
-use nntmux\ReleaseComments;
+use App\Models\ReleaseNfo;
+use App\Models\DnzbFailure;
+use App\Models\ReleaseFile;
 use App\Models\ReleaseRegex;
+use App\Models\ReleaseComment;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 if (isset($_GET['id'])) {
     $releases = new Releases(['Settings' => $page->settings]);
-    $rc = new ReleaseComments;
     $re = new ReleaseExtra;
-    $df = new DnzbFailures();
-    $data = $releases->getByGuid($_GET['id']);
-    $user = $page->users->getById($page->users->currentUserId());
+    $data = Release::getByGuid($_GET['id']);
+    $user = User::find(User::currentUserId());
     $cpapi = $user['cp_api'];
     $cpurl = $user['cp_url'];
     $releaseRegex = ReleaseRegex::query()->where('releases_id', '=', $data['id'])->first();
@@ -37,25 +38,25 @@ if (isset($_GET['id'])) {
     }
 
     if ($page->isPostBack()) {
-        $rc->addComment($data['id'], $data['gid'], $_POST['txtAddComment'], $page->users->currentUserId(), $_SERVER['REMOTE_ADDR']);
+        ReleaseComment::addComment($data['id'], $data['gid'], $_POST['txtAddComment'], User::currentUserId(), $_SERVER['REMOTE_ADDR']);
     }
 
-    $nfo = $releases->getReleaseNfo($data['id']);
+    $nfo = ReleaseNfo::getReleaseNfo($data['id']);
     $reVideo = $re->getVideo($data['id']);
     $reAudio = $re->getAudio($data['id']);
     $reSubs = $re->getSubs($data['id']);
-    $comments = $rc->getCommentsByGid($data['gid']);
+    $comments = ReleaseComment::getComments($data['id']);
     $similars = $releases->searchSimilar(
         $data['id'],
         $data['searchname'],
         6,
         $page->userdata['categoryexclusions']
     );
-    $failed = $df->getFailedCount($data['id']);
+    $failed = DnzbFailure::getFailedCount($data['id']);
 
     $showInfo = '';
     if ($data['videos_id'] > 0) {
-        $showInfo = (new Videos(['Settings' => $page->settings]))->getByVideoID($data['videos_id']);
+        $showInfo = Video::getByVideoID($data['videos_id']);
     }
 
     $mov = '';
@@ -130,11 +131,9 @@ if (isset($_GET['id'])) {
         $AniDBAPIArray = $AniDB->getAnimeInfo($data['anidbid']);
     }
 
-    $preDb = new PreDb();
-    $pre = $preDb->getForRelease($data['predb_id']);
+    $pre = Predb::getForRelease($data['predb_id']);
 
-    $rf = new ReleaseFiles;
-    $releasefiles = $rf->get($data['id']);
+    $releasefiles = ReleaseFile::getReleaseFiles($data['id']);
 
     $page->smarty->assign('releasefiles', $releasefiles);
     $page->smarty->assign('release', $data);
@@ -152,7 +151,7 @@ if (isset($_GET['id'])) {
     $page->smarty->assign('book', $book);
     $page->smarty->assign('predb', $pre);
     $page->smarty->assign('comments', $comments);
-    $page->smarty->assign('searchname', $releases->getSimilarName($data['searchname']));
+    $page->smarty->assign('searchname', getSimilarName($data['searchname']));
     $page->smarty->assign('similars', $similars);
     $page->smarty->assign('privateprofiles', (int) Settings::settingValue('..privateprofiles') === 1);
     $page->smarty->assign('failed', $failed);

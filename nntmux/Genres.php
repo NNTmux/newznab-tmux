@@ -3,18 +3,19 @@
 namespace nntmux;
 
 use nntmux\db\DB;
-use Carbon\Carbon;
 use App\Models\Genre;
+use App\Models\Category;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class Genres
 {
-    const CONSOLE_TYPE = Category::GAME_ROOT;
-    const MUSIC_TYPE = Category::MUSIC_ROOT;
-    const GAME_TYPE = Category::PC_ROOT;
+    public const CONSOLE_TYPE = Category::GAME_ROOT;
+    public const MUSIC_TYPE = Category::MUSIC_ROOT;
+    public const GAME_TYPE = Category::PC_ROOT;
 
-    const STATUS_ENABLED = 0;
-    const STATUS_DISABLED = 1;
+    public const STATUS_ENABLED = 0;
+    public const STATUS_DISABLED = 1;
 
     /**
      * @var \nntmux\db\DB;

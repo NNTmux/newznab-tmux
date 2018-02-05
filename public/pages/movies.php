@@ -1,18 +1,16 @@
 <?php
 
 use nntmux\Movie;
-use nntmux\Category;
-use nntmux\DnzbFailures;
+use App\Models\User;
+use App\Models\Category;
 
 $movie = new Movie(['Settings' => $page->settings]);
-$cat = new Category(['Settings' => $page->settings]);
-$fail = new DnzbFailures();
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$moviecats = $cat->getChildren(Category::MOVIE_ROOT);
+$moviecats = Category::getChildren(Category::MOVIE_ROOT);
 $mtmp = [];
 foreach ($moviecats as $mcat) {
     $mtmp[$mcat['id']] = $mcat;
@@ -23,7 +21,7 @@ if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
     $category = $_REQUEST['t'] + 0;
 }
 
-$user = $page->users->getById($page->users->currentUserId());
+$user = User::find(User::currentUserId());
 $cpapi = $user['cp_api'];
 $cpurl = $user['cp_url'];
 $page->smarty->assign('cpapi', $cpapi);
@@ -88,11 +86,10 @@ $page->smarty->assign('pagerquerysuffix', '#results');
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-if ($category == -1) {
+if ((int) $category === -1) {
     $page->smarty->assign('catname', 'All');
 } else {
-    $cat = new Category();
-    $cdata = $cat->getById($category);
+    $cdata = Category::find($category);
     if ($cdata) {
         $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
     } else {

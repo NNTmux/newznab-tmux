@@ -3,6 +3,7 @@
 namespace nntmux;
 
 use nntmux\db\DB;
+use App\Models\Predb;
 
 /**
  * Class IRCScraper.
@@ -241,19 +242,19 @@ class IRCScraper extends IRCClient
             if (isset($matches['nuked'])) {
                 switch ($matches['nuked']) {
                     case 'NUKED':
-                        $this->_curPre['nuked'] = PreDb::PRE_NUKED;
+                        $this->_curPre['nuked'] = Predb::PRE_NUKED;
                         break;
                     case 'UNNUKED':
-                        $this->_curPre['nuked'] = PreDb::PRE_UNNUKED;
+                        $this->_curPre['nuked'] = Predb::PRE_UNNUKED;
                         break;
                     case 'MODNUKED':
-                        $this->_curPre['nuked'] = PreDb::PRE_MODNUKE;
+                        $this->_curPre['nuked'] = Predb::PRE_MODNUKE;
                         break;
                     case 'RENUKED':
-                        $this->_curPre['nuked'] = PreDb::PRE_RENUKED;
+                        $this->_curPre['nuked'] = Predb::PRE_RENUKED;
                         break;
                     case 'OLDNUKE':
-                        $this->_curPre['nuked'] = PreDb::PRE_OLDNUKE;
+                        $this->_curPre['nuked'] = Predb::PRE_OLDNUKE;
                         break;
                 }
                 $this->_curPre['reason'] = (isset($matches['reason']) ? substr($matches['reason'], 0, 255) : '');
@@ -379,19 +380,19 @@ class IRCScraper extends IRCClient
             $nukeString = '';
             if ($this->_nuked !== false) {
                 switch ((int) $this->_curPre['nuked']) {
-                    case PreDb::PRE_NUKED:
+                    case Predb::PRE_NUKED:
                         $nukeString = '[ NUKED ] ';
                         break;
-                    case PreDb::PRE_UNNUKED:
+                    case Predb::PRE_UNNUKED:
                         $nukeString = '[UNNUKED] ';
                         break;
-                    case PreDb::PRE_MODNUKE:
+                    case Predb::PRE_MODNUKE:
                         $nukeString = '[MODNUKE] ';
                         break;
-                    case PreDb::PRE_OLDNUKE:
+                    case Predb::PRE_OLDNUKE:
                         $nukeString = '[OLDNUKE] ';
                         break;
-                    case PreDb::PRE_RENUKED:
+                    case Predb::PRE_RENUKED:
                         $nukeString = '[RENUKED] ';
                         break;
                     default:

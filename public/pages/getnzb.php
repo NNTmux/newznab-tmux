@@ -1,37 +1,38 @@
 <?php
 
 use nntmux\NZB;
+use App\Models\User;
 use nntmux\Releases;
+use App\Models\Release;
 use App\Models\Settings;
 use nntmux\utility\Utility;
+use App\Models\UserDownload;
+use App\Models\UsersRelease;
 
 $uid = 0;
 
 // Page is accessible only by the rss token, or logged in users.
-if ($page->users->isLoggedIn()) {
-    $uid = $page->users->currentUserId();
+if (User::isLoggedIn()) {
+    $uid = User::currentUserId();
     $maxDownloads = $page->userdata->role->downloadrequests;
     $rssToken = $page->userdata['rsstoken'];
-    if ($page->users->isDisabled($page->userdata['username'])) {
+    if (User::isDisabled($page->userdata['username'])) {
         Utility::showApiError(101);
     }
 } else {
-    if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_API_ONLY) {
-        $res = $page->users->getById(0);
-    } else {
-        if (! isset($_GET['i']) || ! isset($_GET['r'])) {
-            Utility::showApiError(200);
-        }
-
-        $res = $page->users->getByIdAndRssToken($_GET['i'], $_GET['r']);
-        if (! $res) {
-            Utility::showApiError(100);
-        }
+    if (! isset($_GET['i']) || ! isset($_GET['r'])) {
+        Utility::showApiError(200);
     }
+
+    $res = User::getByIdAndRssToken($_GET['i'], $_GET['r']);
+    if (! $res) {
+        Utility::showApiError(100);
+    }
+
     $uid = $res['id'];
     $rssToken = $res['rsstoken'];
     $maxDownloads = $res->role->downloadrequests;
-    if ($page->users->isDisabled($res['username'])) {
+    if (User::isDisabled($res['username'])) {
         Utility::showApiError(101);
     }
 }
@@ -45,11 +46,11 @@ if (isset($_GET['id'])) {
 //
 $hosthash = '';
 if ((int) Settings::settingValue('..storeuserips') === 1) {
-    $hosthash = $page->users->getHostHash($_SERVER['REMOTE_ADDR'], Settings::settingValue('..siteseed'));
+    $hosthash = User::getHostHash($_SERVER['REMOTE_ADDR'], Settings::settingValue('..siteseed'));
 }
 
 // Check download limit on user role.
-$requests = $page->users->getDownloadRequests($uid);
+$requests = UserDownload::getDownloadRequests($uid);
 if ($requests > $maxDownloads) {
     Utility::showApiError(501);
 }
@@ -71,13 +72,13 @@ if (isset($_GET['zip']) && $_GET['zip'] === '1') {
 
     $zip = $rel->getZipped($guids);
     if (strlen($zip) > 0) {
-        $page->users->incrementGrabs($uid, count($guids));
+        User::incrementGrabs($uid, count($guids));
         foreach ($guids as $guid) {
-            $rel->updateGrab($guid);
-            $page->users->addDownloadRequest($uid, $guid);
+            Release::updateGrab($guid);
+            UserDownload::addDownloadRequest($uid, $guid);
 
             if (isset($_GET['del']) && (int) $_GET['del'] === 1) {
-                $page->users->delCartByUserAndRelease($guid, $uid);
+                UsersRelease::delCartByUserAndRelease($guid, $uid);
             }
         }
 
@@ -89,18 +90,18 @@ if (isset($_GET['zip']) && $_GET['zip'] === '1') {
     }
 }
 
-$nzbPath = (new NZB($page->settings))->getNZBPath($_GET['id']);
+$nzbPath = (new NZB())->getNZBPath($_GET['id']);
 if (! file_exists($nzbPath)) {
     Utility::showApiError(300, 'NZB file not found!');
 }
 
-$relData = $rel->getByGuid($_GET['id']);
+$relData = Release::getByGuid($_GET['id']);
 if ($relData) {
-    $rel->updateGrab($_GET['id']);
-    $page->users->addDownloadRequest($uid, $relData['id']);
-    $page->users->incrementGrabs($uid);
+    Release::updateGrab($_GET['id']);
+    UserDownload::addDownloadRequest($uid, $relData['id']);
+    User::incrementGrabs($uid);
     if (isset($_GET['del']) && (int) $_GET['del'] === 1) {
-        $page->users->delCartByUserAndRelease($_GET['id'], $uid);
+        UsersRelease::delCartByUserAndRelease($_GET['id'], $uid);
     }
 } else {
     Utility::showApiError(300, 'Release not found!');

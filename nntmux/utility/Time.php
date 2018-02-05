@@ -21,7 +21,7 @@
 
 namespace nntmux\utility;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 /**
  * Class Time -- functions for working with time string and DTOs.

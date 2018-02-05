@@ -40,6 +40,7 @@ class UpdateNNTmuxDB extends Command
      * Execute the console command.
      *
      * @return mixed
+     * @throws \RuntimeException
      */
     public function handle()
     {

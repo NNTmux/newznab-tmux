@@ -5,8 +5,10 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use nntmux\Tmux;
 use nntmux\db\DB;
 use nntmux\TmuxRun;
-use nntmux\Category;
+use nntmux\ColorCLI;
 use nntmux\TmuxOutput;
+use App\Models\Release;
+use App\Models\Category;
 use App\Models\Settings;
 use nntmux\utility\Utility;
 
@@ -31,10 +33,8 @@ $PHP = 'php';
 $PYTHON = ($tRun->command_exist('python3') ? 'python3 -OOu' : 'python -OOu');
 
 //assign shell commands
-$show_time = (NN_DEBUG ? '/usr/bin/time' : '');
-$runVar['commands']['_php'] = $show_time." nice -n{$tmux_niceness} $PHP";
+$runVar['commands']['_php'] = " nice -n{$tmux_niceness} $PHP";
 $runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} $PHP";
-$runVar['commands']['_python'] = $show_time." nice -n{$tmux_niceness} $PYTHON";
 $runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/tmux/bin/showsleep.php";
 
 //spawn IRCScraper as soon as possible
@@ -58,7 +58,7 @@ $runVar['timers']['query']['tpg1_time'] = 0;
 // Analyze release table if not using innoDB (innoDB uses online analysis)
 $engine = $pdo->queryOneRow(sprintf("SELECT ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'releases'", $pdo->escapeString($db_name)));
 if (! in_array($engine['engine'], ['InnoDB', 'TokuDB'], false)) {
-    printf($pdo->log->info(PHP_EOL.'Analyzing your tables to refresh your indexes.'));
+    printf(ColorCLI::info(PHP_EOL.'Analyzing your tables to refresh your indexes.'));
     $pdo->optimise(false, 'analyze', false, ['releases']);
     Utility::clearScreen();
 }
@@ -118,17 +118,17 @@ while ($runVar['counts']['iterations'] > 0) {
     unset($runVar['conncounts']);
     $runVar['conncounts'] = $tOut->getUSPConnections('primary', $runVar['connections']);
 
-    if ($runVar['constants']['alternate_nntp'] == 1) {
+    if ((int) $runVar['constants']['alternate_nntp'] === 1) {
         $runVar['conncounts'] += $tOut->getUSPConnections('alternate', $runVar['connections']);
     }
 
     //run queries only after time exceeded, these queries can take awhile
-    if ($runVar['counts']['iterations'] == 1 || (time() - $runVar['timers']['timer2'] >= $runVar['settings']['monitor'] && $runVar['settings']['is_running'] == 1)) {
+    if ((int) $runVar['counts']['iterations'] === 1 || (time() - $runVar['timers']['timer2'] >= $runVar['settings']['monitor'] && $runVar['settings']['is_running'] == 1)) {
         $runVar['counts']['proc1'] = $runVar['counts']['proc2'] = $runVar['counts']['proc3'] = $splitqry = $newOldqry = false;
         $runVar['counts']['now']['total_work'] = 0;
-        $runVar['modsettings']['fix_crap'] = explode(', ', ($runVar['settings']['fix_crap']));
+        $runVar['modsettings']['fix_crap'] = explode(', ', $runVar['settings']['fix_crap']);
 
-        echo $pdo->log->info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
+        echo ColorCLI::info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
         $timer02 = time();
 
         $splitqry = $newOldqry = '';
@@ -151,28 +151,29 @@ while ($runVar['counts']['iterations'] > 0) {
 
         $timer03 = time();
 
-        //This is subpartition compatible -- loops through all partitions and adds their total row counts instead of doing a slow query count
-        $partitions = $pdo->queryDirect(
-            sprintf(
-                "
-				SELECT SUM(TABLE_ROWS) AS count, PARTITION_NAME AS category
-				FROM information_schema.PARTITIONS
-				WHERE TABLE_NAME = 'releases'
-				AND TABLE_SCHEMA = %s
-				GROUP BY PARTITION_NAME",
-                $pdo->escapeString($db_name)
-            )
-        );
-        foreach ($partitions as $partition) {
-            $runVar['counts']['now'][$partition['category']] = $partition['count'];
-        }
-        unset($partitions);
+        $tvCount = Release::query()->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])->count(['id']);
+        $movieCount = Release::query()->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])->count(['id']);
+        $audioCount = Release::query()->whereBetween('categories_id', [Category::MUSIC_ROOT, Category::MUSIC_OTHER])->count(['id']);
+        $bookCount = Release::query()->whereBetween('categories_id', [Category::BOOKS_ROOT, Category::BOOKS_UNKNOWN])->count(['id']);
+        $consoleCount = Release::query()->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->count(['id']);
+        $pcCount = Release::query()->whereBetween('categories_id', [Category::PC_ROOT, Category::PC_PHONE_ANDROID])->count(['id']);
+        $xxxCount = Release::query()->whereBetween('categories_id', [Category::XXX_ROOT, Category::XXX_OTHER])->count(['id']);
+        $miscCount = Release::query()->whereBetween('categories_id', [Category::OTHER_ROOT, Category::OTHER_HASHED])->count(['id']);
+
+        $runVar['counts']['now']['audio'] = $audioCount;
+        $runVar['counts']['now']['books'] = $bookCount;
+        $runVar['counts']['now']['console'] = $consoleCount;
+        $runVar['counts']['now']['misc'] = $miscCount;
+        $runVar['counts']['now']['movies'] = $movieCount;
+        $runVar['counts']['now']['pc'] = $pcCount;
+        $runVar['counts']['now']['tv'] = $tvCount;
+        $runVar['counts']['now']['xxx'] = $xxxCount;
 
         $runVar['timers']['query']['init_time'] = (time() - $timer03);
         $runVar['timers']['query']['init1_time'] = (time() - $timer01);
 
         $timer04 = time();
-        $proc1qry = $tRun->proc_query(1, $runVar['settings']['book_reqids'], $runVar['settings']['request_hours'], $db_name);
+        $proc1qry = $tRun->proc_query(1, $runVar['settings']['book_reqids'], $db_name);
         $proc1res = $pdo->queryOneRow(($proc1qry !== false ? $proc1qry : ''), $tRun->rand_bool($runVar['counts']['iterations']));
         $runVar['timers']['query']['proc1_time'] = (time() - $timer04);
         $runVar['timers']['query']['proc11_time'] = (time() - $timer01);
@@ -181,7 +182,6 @@ while ($runVar['counts']['iterations'] > 0) {
         $proc2qry = $tRun->proc_query(
             2,
             $runVar['settings']['book_reqids'],
-            $runVar['settings']['request_hours'],
             $db_name,
             $runVar['settings']['maxsize_pp'],
             $runVar['settings']['minsize_pp']
@@ -271,16 +271,16 @@ while ($runVar['counts']['iterations'] > 0) {
 
         // Zero out any post proc counts when that type of pp has been turned off
         foreach ($runVar['settings'] as $settingkey => $setting) {
-            if (strpos($settingkey, 'process') == 0 && $setting == 0) {
+            if ((int) $setting === 0 && (int) strpos($settingkey, 'process') === 0) {
                 $runVar['counts']['now'][$settingkey] = $runVar['counts']['start'][$settingkey] = 0;
             }
-            if ($settingkey == 'fix_names' && $setting == 0) {
+            if ($settingkey === 'fix_names' && (int) $setting === 0) {
                 $runVar['counts']['now']['processrenames'] = $runVar['counts']['start']['processrenames'] = 0;
             }
         }
 
         //set initial start postproc values from work queries -- this is used to determine diff variables
-        if ($runVar['counts']['iterations'] == 1) {
+        if ((int) $runVar['counts']['iterations'] === 1) {
             $runVar['counts']['start'] = $runVar['counts']['now'];
         }
 
@@ -302,7 +302,7 @@ while ($runVar['counts']['iterations'] > 0) {
         $runVar['counts']['now']['total_work'] += $runVar['counts']['now']['work'];
 
         // Set initial total work count for diff
-        if ($runVar['counts']['iterations'] == 1) {
+        if ((int) $runVar['counts']['iterations'] === 1) {
             $runVar['counts']['start']['total_work'] = $runVar['counts']['now']['total_work'];
         }
 
@@ -311,16 +311,8 @@ while ($runVar['counts']['iterations'] > 0) {
     }
 
     //set kill switches
-    $runVar['killswitch']['pp'] = (
-        ($runVar['settings']['postprocess_kill'] < $runVar['counts']['now']['total_work']) && ($runVar['settings']['postprocess_kill'] != 0)
-        ? true
-        : false
-    );
-    $runVar['killswitch']['coll'] = (
-        ($runVar['settings']['collections_kill'] < $runVar['counts']['now']['collections_table']) && ($runVar['settings']['collections_kill'] != 0)
-        ? true
-        : false
-    );
+    $runVar['killswitch']['pp'] = (($runVar['settings']['postprocess_kill'] < $runVar['counts']['now']['total_work']) && ((int) $runVar['settings']['postprocess_kill'] !== 0));
+    $runVar['killswitch']['coll'] = (($runVar['settings']['collections_kill'] < $runVar['counts']['now']['collections_table']) && ((int) $runVar['settings']['collections_kill'] !== 0));
 
     $tOut->updateMonitorPane($runVar);
 
@@ -346,7 +338,7 @@ while ($runVar['counts']['iterations'] > 0) {
         $tRun->runPane('updatetv', $runVar);
 
         //run these if complete sequential not set
-        if ($runVar['constants']['sequential'] != 2) {
+        if ((int) $runVar['constants']['sequential'] !== 2) {
 
             //fix names
             $tRun->runPane('fixnames', $runVar);
@@ -363,12 +355,12 @@ while ($runVar['counts']['iterations'] > 0) {
             //run postprocess_releases non amazon
             $tRun->runPane('nonamazon', $runVar);
         }
-    } elseif ($runVar['settings']['is_running'] === '0') {
+    } elseif ((int) $runVar['settings']['is_running'] === 0) {
         $tRun->runPane('notrunning', $runVar);
     }
 
     $exit = Settings::settingValue('tmux.running.exit');
-    if ($exit == 0) {
+    if ((int) $exit === 0) {
         $runVar['counts']['iterations']++;
         sleep(10);
     } else {
@@ -377,11 +369,9 @@ while ($runVar['counts']['iterations'] > 0) {
     }
 }
 
-// TODO add code here to handle all panes shutting down before closing.
-
 function errorOnSQL($pdo)
 {
-    echo $pdo->log->error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
+    echo ColorCLI::error(PHP_EOL.'Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again.'.PHP_EOL);
     exit;
 }
 

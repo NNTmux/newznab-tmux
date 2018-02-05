@@ -95,7 +95,7 @@ class TMDB extends TV
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TMDB);
 
-        $tvcount = $res->rowCount();
+        $tvcount = \count($res);
         $lookupSetting = true;
 
         if ($this->echooutput && $tvcount > 0) {
@@ -316,7 +316,7 @@ class TMDB extends TV
      */
     public function getPoster($videoId, $showId = 0): int
     {
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         // Try to get the Poster
         $hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);

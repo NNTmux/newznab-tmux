@@ -102,15 +102,6 @@ class NNTP extends \Net_NNTP_Client
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
-        $this->_debugBool = (NN_LOGGING || NN_DEBUG);
-        if ($this->_debugBool) {
-            try {
-                $this->_debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
-            } catch (LoggerException $error) {
-                $this->_debugBool = false;
-            }
-        }
-
         $this->_nntpRetries = Settings::settingValue('..nntpretries') !== '' ? (int) Settings::settingValue('..nntpretries') : 0 + 1;
     }
 
@@ -209,9 +200,6 @@ class NNTP extends \Net_NNTP_Client
                     $enc.
                     ': '.
                     $cError;
-                if ($this->_debugBool) {
-                    $this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_ERROR);
-                }
 
                 return $this->throwError(ColorCLI::error($message));
             }
@@ -223,7 +211,7 @@ class NNTP extends \Net_NNTP_Client
                 if ($userName === '') {
                     $authenticated = true;
 
-                    // Try to authenticate to usenet.
+                // Try to authenticate to usenet.
                 } else {
                     $ret2 = $this->authenticate($userName, $password);
 
@@ -251,9 +239,6 @@ class NNTP extends \Net_NNTP_Client
                             ' - '.
                             $userName.
                             ' ('.$aError.')';
-                        if ($this->_debugBool) {
-                            $this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_ERROR);
-                        }
 
                         return $this->throwError(ColorCLI::error($message));
                     }
@@ -265,9 +250,6 @@ class NNTP extends \Net_NNTP_Client
                 // Check if we should use compression on the connection.
                 if ($compression === false || (int) Settings::settingValue('..compressedheaders') === 0) {
                     $this->_compressionSupported = false;
-                }
-                if ($this->_debugBool) {
-                    $this->_debugging->log(__CLASS__, __FUNCTION__, 'Connected to '.$this->_currentServer.'.', Logger::LOG_INFO);
                 }
 
                 return true;
@@ -282,9 +264,6 @@ class NNTP extends \Net_NNTP_Client
         }
         // If we somehow got out of the loop, return an error.
         $message = 'Unable to connect to '.$this->_currentServer.$enc;
-        if ($this->_debugBool) {
-            $this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_ERROR);
-        }
 
         return $this->throwError(ColorCLI::error($message));
     }
@@ -303,9 +282,6 @@ class NNTP extends \Net_NNTP_Client
 
         // Check if we are connected to usenet.
         if ($force === true || parent::_isConnected(false)) {
-            if ($this->_debugBool) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, 'Disconnecting from '.$this->_currentServer, Logger::LOG_INFO);
-            }
             // Disconnect from usenet.
             return parent::disconnect();
         }
@@ -591,9 +567,6 @@ class NNTP extends \Net_NNTP_Client
                                 if ($body !== '') {
                                     return $body;
                                 }
-                                if ($this->_debugBool) {
-                                    $this->_debugging->log(__CLASS__, __FUNCTION__, $newBody->getMessage(), Logger::LOG_NOTICE);
-                                }
                                 // Return the error.
                                 return $newBody;
                             }
@@ -623,9 +596,6 @@ class NNTP extends \Net_NNTP_Client
             // Else return an error.
         } else {
             $message = 'Wrong Identifier type, array, int or string accepted. This type of var was passed: '.gettype($identifiers);
-            if ($this->_debugBool) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_WARNING);
-            }
 
             return $this->throwError(ColorCLI::error($message));
         }
@@ -663,10 +633,6 @@ class NNTP extends \Net_NNTP_Client
             $summary = $this->selectGroup($groupName);
             // If there was an error selecting the group, return PEAR error object.
             if ($this->isError($summary)) {
-                if ($this->_debugBool) {
-                    $this->_debugging->log(__CLASS__, __FUNCTION__, $summary->getMessage(), Logger::LOG_NOTICE);
-                }
-
                 return $summary;
             }
         }
@@ -681,10 +647,6 @@ class NNTP extends \Net_NNTP_Client
         $article = parent::getArticle($identifier);
         // If there was an error downloading the article, return a PEAR error object.
         if ($this->isError($article)) {
-            if ($this->_debugBool) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $article->getMessage(), Logger::LOG_NOTICE);
-            }
-
             return $article;
         }
 
@@ -748,10 +710,6 @@ class NNTP extends \Net_NNTP_Client
             $summary = $this->selectGroup($groupName);
             // Return PEAR error object on failure.
             if ($this->isError($summary)) {
-                if ($this->_debugBool) {
-                    $this->_debugging->log(__CLASS__, __FUNCTION__, $summary->getMessage(), Logger::LOG_NOTICE);
-                }
-
                 return $summary;
             }
         }
@@ -766,10 +724,6 @@ class NNTP extends \Net_NNTP_Client
         $header = parent::getHeader($identifier);
         // If we failed, return PEAR error object.
         if ($this->isError($header)) {
-            if ($this->_debugBool) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $header->getMessage(), Logger::LOG_NOTICE);
-            }
-
             return $header;
         }
 
@@ -814,9 +768,6 @@ class NNTP extends \Net_NNTP_Client
     {
         if (! $this->_postingAllowed) {
             $message = 'You do not have the right to post articles on server '.$this->_currentServer;
-            if ($this->_debugBool) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-            }
 
             return $this->throwError(ColorCLI::error($message));
         }
@@ -829,18 +780,12 @@ class NNTP extends \Net_NNTP_Client
         // Throw errors if subject or from are more than 510 chars.
         if (\strlen($subject) > 510) {
             $message = 'Max length of subject is 510 chars.';
-            if ($this->_debugBool) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_WARNING);
-            }
 
             return $this->throwError(ColorCLI::error($message));
         }
 
         if (\strlen($from) > 510) {
             $message = 'Max length of from is 510 chars.';
-            if ($this->_debugBool) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_WARNING);
-            }
 
             return $this->throwError(ColorCLI::error($message));
         }
@@ -854,7 +799,7 @@ class NNTP extends \Net_NNTP_Client
         if ($yEnc) {
             $bin = $compress ? gzdeflate($body, 4) : $body;
             $body = Yenc::encode($bin, $subject);
-            // If not yEnc, then check if the body is 510+ chars, split it at 510 chars and separate with \r\n
+        // If not yEnc, then check if the body is 510+ chars, split it at 510 chars and separate with \r\n
         } else {
             $body = $this->_splitLines($body, $compress);
         }
@@ -887,10 +832,6 @@ class NNTP extends \Net_NNTP_Client
         $nntp->doQuit();
         // Try reconnecting. This uses another round of max retries.
         if ($nntp->doConnect($comp) !== true) {
-            if ($this->_debugBool) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, 'Unable to reconnect to usenet!', Logger::LOG_NOTICE);
-            }
-
             return $this->throwError('Unable to reconnect to usenet!');
         }
 
@@ -898,9 +839,6 @@ class NNTP extends \Net_NNTP_Client
         $data = $nntp->selectGroup($group);
         if ($this->isError($data)) {
             $message = "Code {$data->code}: {$data->message}\nSkipping group: {$group}";
-            if ($this->_debugBool) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-            }
 
             if ($this->_echo) {
                 ColorCLI::doEcho(ColorCLI::error($message), true);
@@ -980,9 +918,6 @@ class NNTP extends \Net_NNTP_Client
 
         // Check if it's good.
         if ($this->isError($response)) {
-            if ($this->_debugBool) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $response->getMessage(), Logger::LOG_NOTICE);
-            }
             $this->_compressionSupported = false;
 
             return $response;
@@ -996,9 +931,7 @@ class NNTP extends \Net_NNTP_Client
                 }
             }
             $msg = "Sent 'XFEATURE COMPRESS GZIP' to server, got '$response: ".$this->_currentStatusResponse()."'";
-            if ($this->_debugBool) {
-                $this->_debugging->log(__CLASS__, __FUNCTION__, $msg, Logger::LOG_NOTICE);
-            }
+
             $this->_compressionSupported = false;
 
             return false;
@@ -1095,9 +1028,7 @@ class NNTP extends \Net_NNTP_Client
                         return $deComp;
                     }
                     $message = 'Decompression of OVER headers failed.';
-                    if ($this->_debugBool) {
-                        $this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-                    }
+
                     $message = $this->throwError(ColorCLI::error($message), 1000);
 
                     return $message;
@@ -1117,9 +1048,7 @@ class NNTP extends \Net_NNTP_Client
                 // If wet got nothing again, return error.
                 if (empty($buffer)) {
                     $message = 'Error fetching data from usenet server while downloading OVER headers.';
-                    if ($this->_debugBool) {
-                        $this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-                    }
+
                     $message = $this->throwError(ColorCLI::error($message), 1000);
 
                     return $message;
@@ -1137,9 +1066,6 @@ class NNTP extends \Net_NNTP_Client
         }
 
         $message = 'Unspecified error while downloading OVER headers.';
-        if ($this->_debugBool) {
-            $this->_debugging->log(__CLASS__, __FUNCTION__, $message, Logger::LOG_NOTICE);
-        }
         $message = $this->throwError(ColorCLI::error($message), 1000);
 
         return $message;
@@ -1191,10 +1117,6 @@ class NNTP extends \Net_NNTP_Client
             $summary = $this->selectGroup($groupName);
             // If there was an error selecting the group, return PEAR error object.
             if ($this->isError($summary)) {
-                if ($this->_debugBool) {
-                    $this->_debugging->log(__CLASS__, __FUNCTION__, $summary->getMessage(), Logger::LOG_WARNING);
-                }
-
                 return $summary;
             }
         }
@@ -1228,14 +1150,6 @@ class NNTP extends \Net_NNTP_Client
 
                 // Check if the line terminates the text response.
                 if ($line === ".\r\n") {
-                    if ($this->_debugBool) {
-                        $this->_debugging->log(
-                            __CLASS__,
-                            __FUNCTION__,
-                            'Fetched body for article '.$identifier,
-                            Logger::LOG_INFO
-                        );
-                    }
 
                     // Attempt to yEnc decode and return the body.
                     return Yenc::decodeIgnore($body);

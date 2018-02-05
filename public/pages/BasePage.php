@@ -3,24 +3,20 @@
 require_once NN_LIB.'utility'.DS.'SmartyUtils.php';
 
 use nntmux\db\DB;
-use nntmux\Users;
 use nntmux\SABnzbd;
+use App\Models\User;
 use App\Models\Settings;
+use App\Models\RoleExcludedCategory;
 
 class BasePage
 {
     /**
-     * @var DB
+     * @var \App\Models\Settings|null
      */
     public $settings = null;
 
     /**
-     * @var Users
-     */
-    public $users = null;
-
-    /**
-     * @var Smarty
+     * @var null|\Smarty
      */
     public $smarty = null;
 
@@ -108,7 +104,7 @@ class BasePage
             session_set_cookie_params(0, '/', '', $this->https, true);
             session_start();
             if (empty($_SESSION['token'])) {
-                $_SESSION['token'] = bin2hex(random_bytes(32));
+                $_SESSION['token'] = sodium_bin2hex(random_bytes(32));
             }
             $this->token = $_SESSION['token'];
         }
@@ -131,7 +127,7 @@ class BasePage
                 SMARTY_DIR.'plugins/',
             ]
         );
-        $this->smarty->error_reporting = (NN_DEBUG ? E_ALL : E_ALL - E_NOTICE);
+        $this->smarty->error_reporting = E_ALL - E_NOTICE;
 
         if (isset($_SERVER['SERVER_NAME'])) {
             $this->serverurl = (
@@ -144,8 +140,7 @@ class BasePage
 
         $this->page = $_GET['page'] ?? 'content';
 
-        $this->users = new Users();
-        if ($this->users->isLoggedIn()) {
+        if (User::isLoggedIn()) {
             $this->setUserPreferences();
         } else {
             $this->theme = $this->getSettingValue('site.main.style');
@@ -283,6 +278,14 @@ class BasePage
     }
 
     /**
+     * Show 503 page.
+     */
+    public function showBadBoy(): void
+    {
+        die(view('errors.badboy'));
+    }
+
+    /**
      * Show maintenance page.
      */
     public function showMaintenance(): void
@@ -331,11 +334,14 @@ class BasePage
         $this->smarty->display($this->page_template);
     }
 
+    /**
+     * @throws \Exception
+     */
     protected function setUserPreferences(): void
     {
-        $this->userdata = $this->users->getById($this->users->currentUserId());
-        $this->userdata['categoryexclusions'] = $this->users->getCategoryExclusion($this->users->currentUserId());
-        $this->userdata['rolecategoryexclusions'] = $this->users->getRoleCategoryExclusion($this->userdata['user_roles_id']);
+        $this->userdata = User::find(User::currentUserId());
+        $this->userdata['categoryexclusions'] = User::getCategoryExclusion(User::currentUserId());
+        $this->userdata['rolecategoryexclusions'] = RoleExcludedCategory::getRoleCategoryExclusion($this->userdata['user_roles_id']);
 
         // Change the theme to user's selected theme if they selected one, else use the admin one.
         if ((int) Settings::settingValue('site.main.userselstyle') === 1) {
@@ -351,7 +357,7 @@ class BasePage
         if ((strtotime($this->userdata['now']) - 900) >
             strtotime($this->userdata['lastlogin'])
         ) {
-            $this->users->updateSiteAccessed($this->userdata['id']);
+            User::updateSiteAccessed($this->userdata['id']);
         }
 
         $this->smarty->assign('userdata', $this->userdata);
@@ -369,10 +375,10 @@ class BasePage
             $this->smarty->assign('sabapikeytype', $sab->apikeytype);
         }
         switch ((int) $this->userdata['user_roles_id']) {
-            case Users::ROLE_ADMIN:
+            case User::ROLE_ADMIN:
                 $this->smarty->assign('isadmin', 'true');
                 break;
-            case Users::ROLE_MODERATOR:
+            case User::ROLE_MODERATOR:
                 $this->smarty->assign('ismod', 'true');
         }
     }

@@ -2,18 +2,17 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Groups;
+use App\Models\Group;
 
 $page = new AdminPage();
 
 // set the current action
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = $_REQUEST['action'] ?? 'view';
 
 switch ($action) {
 	case 'submit':
 		if (isset($_POST['groupfilter']) && ! empty($_POST['groupfilter'])) {
-		    $groups = new Groups;
-		    $msgs = $groups->addBulk($_POST['groupfilter'], $_POST['active'], $_POST['backfill']);
+		    $msgs = Group::addBulk($_POST['groupfilter'], $_POST['active'], $_POST['backfill']);
 		}
 		break;
 	default:

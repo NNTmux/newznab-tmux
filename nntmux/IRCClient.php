@@ -347,7 +347,7 @@ class IRCClient
                     $this->_remote_host_received = $matches[1];
                     break;
 
-                    // We got 464, which means we need to send a password.
+                // We got 464, which means we need to send a password.
                 } elseif ($matches[2] == 464) {
                     // Before the lower check, set the password : username:password
                     $tempPass = $userName.':'.$password;
@@ -408,17 +408,18 @@ class IRCClient
                 }
 
                 // Check for a channel message.
-            } elseif (preg_match('/^:(?P<nickname>.+?)\!.+?\s+PRIVMSG\s+(?P<channel>#.+?)\s+:\s*(?P<message>.+?)\s*$/',
-				$this->_stripControlCharacters($this->_buffer),
-				$matches
-			)
-			) {
+            } elseif (preg_match(
+                '/^:(?P<nickname>.+?)\!.+?\s+PRIVMSG\s+(?P<channel>#.+?)\s+:\s*(?P<message>.+?)\s*$/',
+                $this->_stripControlCharacters($this->_buffer),
+                $matches
+            )
+            ) {
                 $this->_channelData =
-					[
-						'nickname' => $matches['nickname'],
-						'channel'  => $matches['channel'],
-						'message'  => $matches['message'],
-					];
+                    [
+                        'nickname' => $matches['nickname'],
+                        'channel'  => $matches['channel'],
+                        'message'  => $matches['message'],
+                    ];
 
                 $this->processChannelMessages();
             }
@@ -565,7 +566,7 @@ class IRCClient
             // http://www.php.net/manual/en/function.fwrite.php#96951 | fwrite can return 0 causing an infinite loop.
             if ($fWrite === false || $fWrite <= 0) {
 
-				// If it failed, try a second time.
+                // If it failed, try a second time.
                 $fWrite = $this->_writeSocketChar(substr($command, $written));
                 if ($fWrite === false || $fWrite <= 0) {
                     echo 'ERROR: Could no write to socket! (the IRC server might have closed the connection)'.PHP_EOL;
@@ -602,13 +603,13 @@ class IRCClient
         $this->_closeStream();
 
         $socket = stream_socket_client(
-			$this->_remote_socket_string,
-			$error_number,
-			$error_string,
-			$this->_remote_connection_timeout,
-			STREAM_CLIENT_CONNECT,
-			stream_context_create(Utility::streamSslContextOptions(true))
-		);
+            $this->_remote_socket_string,
+            $error_number,
+            $error_string,
+            $this->_remote_connection_timeout,
+            STREAM_CLIENT_CONNECT,
+            stream_context_create(Utility::streamSslContextOptions(true))
+        );
 
         if ($socket === false) {
             echo 'ERROR: '.$error_string.' ('.$error_number.')'.PHP_EOL;
@@ -647,16 +648,16 @@ class IRCClient
     protected function _stripControlCharacters($text)
     {
         return preg_replace(
-			[
-				'/(\x03(?:\d{1,2}(?:,\d{1,2})?)?)/', // Color code
-				'/\x02/', // Bold
-				'/\x0F/', // Escaped
-				'/\x16/', // Italic
-				'/\x1F/', // Underline
-				'/\x12/', // Device control 2
-			],
-			'',
-			$text
-		);
+            [
+                '/(\x03(?:\d{1,2}(?:,\d{1,2})?)?)/', // Color code
+                '/\x02/', // Bold
+                '/\x0F/', // Escaped
+                '/\x16/', // Italic
+                '/\x1F/', // Underline
+                '/\x12/', // Device control 2
+            ],
+            '',
+            $text
+        );
     }
 }

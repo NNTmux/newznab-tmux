@@ -154,7 +154,7 @@
 			</ul>
 		</li>
 	{/if}
-		{if $parentcat.id === "0"}
+		{if $parentcat.id == {$catClass::OTHER_ROOT}}
 			<li class="dropdown">
 				<a id="dropOther" class="dropdown-hover" data-hover="dropdown" href="#">Other <b class="caret"></b></a>
 				<ul class="dropdown-menu" role="menu" aria-labelledby="dropOther">

@@ -1,22 +1,22 @@
 <?php
 
-use nntmux\Forum;
+use App\Models\User;
 use App\Models\Settings;
+use App\Models\Forumpost;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 $id = $_GET['id'] + 0;
 
-$forum = new Forum();
 if (! empty($_POST['addMessage']) && $page->isPostBack()) {
-    $forum->add($id, $page->users->currentUserId(), '', $_POST['addMessage']);
+    Forumpost::add($id, User::currentUserId(), '', $_POST['addMessage']);
     header('Location:'.WWW_TOP.'/forumpost/'.$id.'#last');
     die();
 }
 
-$results = $forum->getPosts($id);
+$results = Forumpost::getPosts($id);
 if (count($results) === 0) {
     header('Location:'.WWW_TOP.'/forum');
     die();

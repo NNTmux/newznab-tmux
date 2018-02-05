@@ -17,7 +17,7 @@
 					<input type="hidden" name="redirect" value="{$redirect|escape:"htmlall"}"/>
 				{/if}
 				<div class="form-group has-feedback">
-					<input id="username" name="username" type="text" class="form-control" placeholder="Username"/>
+					<input id="username" name="username" type="text" class="form-control" placeholder="Username or email"/>
 					<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
 				</div>
 				<div class="form-group has-feedback">

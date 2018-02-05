@@ -3,9 +3,9 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
-use nntmux\Category;
 use nntmux\ColorCLI;
 use nntmux\Categorize;
+use App\Models\Category;
 use nntmux\ConsoleTools;
 
 $pdo = new DB();
@@ -55,7 +55,7 @@ function reCategorize($argv)
     } else {
         $chgcount = categorizeRelease('', $update, true);
     }
-    $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
+    $consoletools = new ConsoleTools();
     $time = $consoletools->convertTime(time() - $timestart);
     if ($update === true) {
         echo ColorCLI::header('Finished re-categorizing '.number_format($chgcount).' releases in '.$time.' , using the searchname.'.PHP_EOL);
@@ -72,7 +72,7 @@ function categorizeRelease($where, $update = true, $echooutput = false)
     global $pdo;
     $cat = new Categorize(['Settings' => $pdo]);
     $pdo->log = new ColorCLI();
-    $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
+    $consoletools = new ConsoleTools();
     $relcount = $chgcount = 0;
     echo ColorCLI::primary('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);
     $resrel = $pdo->queryDirect('SELECT id, searchname, fromname, groups_id, categories_id FROM releases '.$where);

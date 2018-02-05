@@ -16,7 +16,7 @@
  * @author    niel
  * @copyright 2016 nZEDb
  */
-use nntmux\Category;
+use App\Models\Category;
 
 /**
  * Returns the value of the specified Category constant.

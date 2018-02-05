@@ -1,8 +1,9 @@
 <?php
 
-use nntmux\PreDb;
+use App\Models\User;
+use App\Models\Predb;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
@@ -10,8 +11,7 @@ if (! isset($_REQUEST['id'])) {
     $page->show404();
 }
 
-$pre = new PreDb(['Settings' => $page->settings]);
-$predata = $pre->getOne($_REQUEST['id']);
+$predata = Predb::getOne($_REQUEST['id']);
 
 if (! $predata) {
     echo 'No pre info';
@@ -20,22 +20,22 @@ if (! $predata) {
     if (isset($predata['nuked'])) {
         $nuked = '';
         switch ($predata['nuked']) {
-			case PreDb::PRE_NUKED:
-				$nuked = 'NUKED';
-				break;
-			case PreDb::PRE_MODNUKE:
-				$nuked = 'MODNUKED';
-				break;
-			case PreDb::PRE_OLDNUKE:
-				$nuked = 'OLDNUKE';
-				break;
-			case PreDb::PRE_RENUKED:
-				$nuked = 'RENUKE';
-				break;
-			case PreDb::PRE_UNNUKED:
-				$nuked = 'UNNUKED';
-				break;
-		}
+            case Predb::PRE_NUKED:
+                $nuked = 'NUKED';
+                break;
+            case Predb::PRE_MODNUKE:
+                $nuked = 'MODNUKED';
+                break;
+            case Predb::PRE_OLDNUKE:
+                $nuked = 'OLDNUKE';
+                break;
+            case Predb::PRE_RENUKED:
+                $nuked = 'RENUKE';
+                break;
+            case Predb::PRE_UNNUKED:
+                $nuked = 'UNNUKED';
+                break;
+        }
         if ($nuked !== '') {
             echo '<tr><th>'.$nuked.':</th><td>'.htmlentities($predata['nukereason'] ?? '', ENT_QUOTES)."</td></tr>\n";
         }

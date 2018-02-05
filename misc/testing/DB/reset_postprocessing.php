@@ -3,13 +3,12 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
-use nntmux\Category;
 use nntmux\ColorCLI;
+use App\Models\Category;
 use nntmux\ConsoleTools;
 
-$category = new Category();
 $pdo = new DB();
-$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
+$consoletools = new ConsoleTools();
 $ran = false;
 
 if (isset($argv[1], $argv[2]) && $argv[1] === 'all' && $argv[2] === 'true') {

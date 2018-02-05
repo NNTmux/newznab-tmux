@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
 class AnidbTitle extends Model
 {
+    use InsertOnDuplicateKey;
+
     /**
      * @var string
      */

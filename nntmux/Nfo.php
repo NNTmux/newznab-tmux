@@ -2,7 +2,7 @@
 
 namespace nntmux;
 
-use nntmux\db\DB;
+use App\Models\Group;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\ReleaseNfo;
@@ -28,9 +28,9 @@ class Nfo
     private $nzbs;
 
     /**
-     * @var string
+     * @var int
      */
-    private $maxsize;
+    protected $maxSize;
 
     /**
      * @var int
@@ -38,9 +38,9 @@ class Nfo
     private $maxRetries;
 
     /**
-     * @var string
+     * @var int
      */
-    private $minsize;
+    protected $minSize;
 
     /**
      * @var string
@@ -60,22 +60,17 @@ class Nfo
     /**
      * Default constructor.
      *
-     * @param array $options Class instance / echo to cli.
-     *
      * @throws \Exception
      */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Echo'     => false,
-            'Settings' => null,
-        ];
-        $options += $defaults;
-        $this->echo = ($options['Echo'] && NN_ECHOCLI);
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+        $this->echo = NN_ECHOCLI;
         $this->nzbs = Settings::settingValue('..maxnfoprocessed') !== '' ? (int) Settings::settingValue('..maxnfoprocessed') : 100;
         $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : self::NFO_UNPROC;
         $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;
+        $this->maxSize = (int) Settings::settingValue('..maxsizetoprocessnfo');
+        $this->minSize = (int) Settings::settingValue('..minsizetoprocessnfo');
+
         $this->tmpPath = (string) Settings::settingValue('..tmpunrarpath');
         if (! preg_match('/[\/\\\\]$/', $this->tmpPath)) {
             $this->tmpPath .= DS;
@@ -205,7 +200,7 @@ class Nfo
             $check = ReleaseNfo::query()->where('releases_id', $release['id'])->first(['releases_id']);
 
             if ($check === null) {
-                ReleaseNfo::query()->insertGetId(['releases_id' => $release['id'], 'nfo' =>"\x1f\x8b\x08\x00".gzcompress($nfo)]);
+                ReleaseNfo::create(['releases_id' => $release['id'], 'nfo' => "\x1f\x8b\x08\x00".gzcompress($nfo)]);
             }
 
             Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FOUND]);
@@ -214,14 +209,14 @@ class Nfo
                 $release['completion'] = 0;
             }
 
-            if ((int) $release['completion'] === 0) {
+            if ($release['completion'] === 0) {
                 $nzbContents = new NZBContents(
                     [
                         'Echo' => $this->echo,
                         'NNTP' => $nntp,
                         'Nfo'  => $this,
-                        'Settings'   => $this->pdo,
-                        'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this]),
+                        'Settings'   => null,
+                        'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this]),
                     ]
                 );
                 $nzbContents->parseNZB($release['guid'], $release['id'], $release['groups_id']);
@@ -231,6 +226,164 @@ class Nfo
         }
 
         return false;
+    }
+
+    /**
+     * Attempt to find NFO files inside the NZB's of releases.
+     *
+     * @param        $nntp
+     * @param string $groupID     (optional) Group ID.
+     * @param string $guidChar    (optional) First character of the release GUID (used for multi-processing).
+     * @param int    $processImdb (optional) Attempt to find IMDB id's in the NZB?
+     * @param int    $processTv   (optional) Attempt to find Tv id's in the NZB?
+     *
+     * @return int How many NFO's were processed?
+     * @throws \Exception
+     */
+    public function processNfoFiles($nntp, $groupID = '', $guidChar = '', $processImdb = 1, $processTv = 1): int
+    {
+        $ret = 0;
+
+        $qry = Release::query()
+            ->where('nzbstatus', '=', NZB::NZB_ADDED)
+            ->whereBetween('nfostatus', [$this->maxRetries, self::NFO_UNPROC]);
+
+        if ($guidChar !== '') {
+            $qry->where('leftguid', $guidChar);
+        }
+        if ($groupID !== '') {
+            $qry->where('groups_id', $groupID);
+        }
+
+        if ($this->maxSize > 0) {
+            $qry->where('size', '<', $this->maxSize * 1073741824);
+        }
+
+        if ($this->minSize > 0) {
+            $qry->where('size', '>', $this->minSize * 1048576);
+        }
+
+        $res = $qry
+            ->orderBy('nfostatus')
+            ->orderBy('postdate', 'desc')
+            ->limit($this->nzbs)
+            ->get(['id', 'guid', 'groups_id', 'name']);
+
+        $nfoCount = $res->count();
+
+        if ($nfoCount > 0) {
+            ColorCLI::doEcho(
+                ColorCLI::primary(
+                    PHP_EOL.
+                    ($guidChar === '' ? '' : '['.$guidChar.'] ').
+                    ($groupID === '' ? '' : '['.$groupID.'] ').
+                    'Processing '.$nfoCount.
+                    ' NFO(s), starting at '.$this->nzbs.
+                    ' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
+                )
+            );
+
+            if ($this->echo) {
+                // Get count of releases per nfo status
+                $qry = Release::query()
+                    ->where('nzbstatus', '=', NZB::NZB_ADDED)
+                    ->whereBetween('nfostatus', [$this->maxRetries, self::NFO_UNPROC])
+                    ->select('nfostatus as status')
+                    ->selectRaw('COUNT(id) as count')
+                    ->groupBy(['nfostatus'])
+                    ->orderBy('nfostatus');
+
+                if ($guidChar !== '') {
+                    $qry->where('leftguid', $guidChar);
+                }
+                if ($groupID !== '') {
+                    $qry->where('groups_id', $groupID);
+                }
+
+                if ($this->maxSize > 0) {
+                    $qry->where('size', '<', $this->maxSize * 1073741824);
+                }
+
+                if ($this->minSize > 0) {
+                    $qry->where('size', '>', $this->minSize * 1048576);
+                }
+
+                $nfoStats = $qry->get();
+
+                if ($nfoStats instanceof \Traversable) {
+                    $outString = PHP_EOL.'Available to process';
+                    foreach ($nfoStats as $row) {
+                        $outString .= ', '.$row['status'].' = '.number_format($row['count']);
+                    }
+                    ColorCLI::doEcho(ColorCLI::header($outString.'.'));
+                }
+            }
+
+            $nzbContents = new NZBContents(
+                [
+                    'Echo' => $this->echo,
+                    'NNTP' => $nntp,
+                    'Nfo' => $this,
+                    'Settings' => null,
+                    'PostProcess' => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this]),
+                ]
+            );
+            $movie = new Movie(['Echo' => $this->echo]);
+
+            foreach ($res as $arr) {
+                $fetchedBinary = $nzbContents->getNfoFromNZB($arr['guid'], $arr['id'], $arr['groups_id'], Group::getNameByID($arr['groups_id']));
+                if ($fetchedBinary !== false) {
+                    // Insert nfo into database.
+
+                    $ckReleaseId = ReleaseNfo::query()->where('releases_id', $arr['id'])->first(['releases_id']);
+                    if ($ckReleaseId === null) {
+                        ReleaseNfo::create(['releases_id' => $arr['id'], 'nfo' => "\x1f\x8b\x08\x00".gzcompress($fetchedBinary)]);
+                    }
+                    Release::query()->where('id', $arr['id'])->update(['nfostatus' => self::NFO_FOUND]);
+                    $ret++;
+                    $movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb);
+
+                    // If set scan for tv info.
+                    if ($processTv === 1) {
+                        (new PostProcess(['Echo' => $this->echo]))->processTv($groupID, $guidChar, $processTv);
+                    }
+                }
+            }
+        }
+
+        // Remove nfo that we cant fetch after 5 attempts.
+        $qry = Release::query()
+            ->where('nzbstatus', NZB::NZB_ADDED)
+            ->where('nfostatus', '<', $this->maxRetries)
+            ->where('nfostatus', '>', self::NFO_FAILED);
+
+        if ($guidChar !== '') {
+            $qry->where('leftguid', $guidChar);
+        }
+        if ($groupID !== '') {
+            $qry->where('groups_id', $groupID);
+        }
+
+        $releases = $qry->get(['id']);
+
+        foreach ($releases as $release) {
+            // remove any releasenfo for failed
+            ReleaseNfo::query()->where('releases_id', $release['id'])->delete();
+
+            // set release.nfostatus to failed
+            Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FAILED]);
+        }
+
+        if ($this->echo) {
+            if ($nfoCount > 0) {
+                echo PHP_EOL;
+            }
+            if ($ret > 0) {
+                ColorCLI::doEcho($ret.' NFO file(s) found/processed.', true);
+            }
+        }
+
+        return $ret;
     }
 
     /**
@@ -257,146 +410,5 @@ class Nfo
             ($maxSize > 0 ? ('AND r.size < '.($maxSize * 1073741824)) : ''),
             ($minSize > 0 ? ('AND r.size > '.($minSize * 1048576)) : '')
         );
-    }
-
-    /**
-     * Attempt to find NFO files inside the NZB's of releases.
-     *
-     * @param        $nntp
-     * @param string $groupID     (optional) Group ID.
-     * @param string $guidChar    (optional) First character of the release GUID (used for multi-processing).
-     * @param int    $processImdb (optional) Attempt to find IMDB id's in the NZB?
-     * @param int    $processTv   (optional) Attempt to find Tv id's in the NZB?
-     *
-     * @return int How many NFO's were processed?
-     * @throws \Exception
-     */
-    public function processNfoFiles($nntp, $groupID = '', $guidChar = '', $processImdb = 1, $processTv = 1): int
-    {
-        $ret = 0;
-        $guidCharQuery = ($guidChar === '' ? '' : 'AND r.leftguid = '.$this->pdo->escapeString($guidChar));
-        $groupIDQuery = ($groupID === '' ? '' : 'AND r.groups_id = '.$groupID);
-        $optionsQuery = self::NfoQueryString();
-
-        $res = $this->pdo->query(
-            sprintf(
-                '
-				SELECT r.id, r.guid, r.groups_id, r.name
-				FROM releases r
-				WHERE 1=1 %s %s %s
-				ORDER BY r.nfostatus ASC, r.postdate DESC
-				LIMIT %d',
-                $optionsQuery,
-                $guidCharQuery,
-                $groupIDQuery,
-                $this->nzbs
-            )
-        );
-        $nfoCount = \count($res);
-
-        if ($nfoCount > 0) {
-            ColorCLI::doEcho(
-                ColorCLI::primary(
-                    PHP_EOL.
-                    ($guidChar === '' ? '' : '['.$guidChar.'] ').
-                    ($groupID === '' ? '' : '['.$groupID.'] ').
-                    'Processing '.$nfoCount.
-                    ' NFO(s), starting at '.$this->nzbs.
-                    ' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
-                )
-            );
-
-            if ($this->echo) {
-                // Get count of releases per nfo status
-                $nfoStats = $this->pdo->queryDirect(
-                    sprintf(
-                        '
-						SELECT r.nfostatus AS status, COUNT(r.id) AS count
-						FROM releases r
-						WHERE 1=1 %s %s %s
-						GROUP BY r.nfostatus
-						ORDER BY r.nfostatus ASC',
-                        $optionsQuery,
-                        $guidCharQuery,
-                        $groupIDQuery
-                    )
-                );
-                if ($nfoStats instanceof \Traversable) {
-                    $outString = PHP_EOL.'Available to process';
-                    foreach ($nfoStats as $row) {
-                        $outString .= ', '.$row['status'].' = '.number_format($row['count']);
-                    }
-                    ColorCLI::doEcho(ColorCLI::header($outString.'.'));
-                }
-            }
-
-            $groups = new Groups(['Settings' => $this->pdo]);
-            $nzbContents = new NZBContents(
-                [
-                    'Echo' => $this->echo,
-                    'NNTP' => $nntp,
-                    'Nfo' => $this,
-                    'Settings' => $this->pdo,
-                    'PostProcess' => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this, 'Settings' => $this->pdo]),
-                ]
-            );
-            $movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);
-
-            foreach ($res as $arr) {
-                $fetchedBinary = $nzbContents->getNfoFromNZB($arr['guid'], $arr['id'], $arr['groups_id'], $groups->getNameByID($arr['groups_id']));
-                if ($fetchedBinary !== false) {
-                    // Insert nfo into database.
-
-                    $ckReleaseId = ReleaseNfo::query()->where('releases_id', $arr['id'])->first(['releases_id']);
-                    if ($ckReleaseId === null) {
-                        ReleaseNfo::query()->insertGetId(['releases_id' => $arr['id'], 'nfo' =>"\x1f\x8b\x08\x00".gzcompress($fetchedBinary)]);
-                    }
-                    Release::query()->where('id', $arr['id'])->update(['nfostatus' => self::NFO_FOUND]);
-                    $ret++;
-                    $movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb);
-
-                    // If set scan for tv info.
-                    if ($processTv === 1) {
-                        (new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo]))->processTv($groupID, $guidChar, $processTv);
-                    }
-                }
-            }
-        }
-
-        // Remove nfo that we cant fetch after 5 attempts.
-        $releases = $this->pdo->queryDirect(
-            sprintf(
-                'SELECT r.id
-				FROM releases r
-				WHERE r.nzbstatus = %d
-				AND r.nfostatus < %d AND r.nfostatus > %d %s %s',
-                NZB::NZB_ADDED,
-                $this->maxRetries,
-                self::NFO_FAILED,
-                $groupIDQuery,
-                $guidCharQuery
-            )
-        );
-
-        if ($releases instanceof \Traversable) {
-            foreach ($releases as $release) {
-                // remove any releasenfo for failed
-                ReleaseNfo::query()->where('releases_id', $release['id'])->delete();
-
-                // set release.nfostatus to failed
-                Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FAILED]);
-            }
-        }
-
-        if ($this->echo) {
-            if ($nfoCount > 0) {
-                echo PHP_EOL;
-            }
-            if ($ret > 0) {
-                ColorCLI::doEcho($ret.' NFO file(s) found/processed.', true);
-            }
-        }
-
-        return $ret;
     }
 }

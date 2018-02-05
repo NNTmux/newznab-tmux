@@ -3,13 +3,15 @@
 namespace nntmux;
 
 use nntmux\db\DB;
-use Carbon\Carbon;
 use Tmdb\ApiToken;
 use aharen\OMDbAPI;
 use GuzzleHttp\Client;
+use App\Models\Release;
+use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MovieInfo;
 use nntmux\utility\Utility;
+use Illuminate\Support\Carbon;
 use nntmux\libraries\FanartTV;
 use Tmdb\Client as TmdbClient;
 use nntmux\processing\tv\TraktTv;
@@ -47,16 +49,6 @@ class Movie
     protected $currentRelID = '';
 
     /**
-     * @var \nntmux\Logger
-     */
-    protected $debugging;
-
-    /**
-     * @var bool
-     */
-    protected $debug;
-
-    /**
      * Use search engines to find IMDB id's.
      * @var bool
      */
@@ -87,6 +79,13 @@ class Movie
      * @var int
      */
     protected $yahooLimit = 0;
+
+    /**
+     * How many times have we hit duckduckgo this session.
+     *
+     * @var int
+     */
+    protected $duckduckgoLimit = 0;
 
     /**
      * @var string
@@ -155,19 +154,19 @@ class Movie
     public $service;
 
     /**
-     * @var array|bool|int|string
-     */
-    public $catWhere;
-
-    /**
      * @var \Tmdb\ApiToken
      */
     public $tmdbtoken;
 
     /**
-     * @var bool
+     * @var null|TraktTv
      */
-    public $_debug;
+    public $traktTv;
+
+    /**
+     * @var OMDbAPI|null
+     */
+    public $omdbApi;
 
     /**
      * @param array $options Class instances / Echo to CLI.
@@ -185,7 +184,7 @@ class Movie
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
+        $this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage());
         $this->client = new Client();
         $this->tmdbtoken = new ApiToken(Settings::settingValue('APIs..tmdbkey'));
         $this->tmdbclient = new TmdbClient(
@@ -207,20 +206,9 @@ class Movie
         $this->searchEngines = true;
         $this->showPasswords = Releases::showPasswords();
 
-        $this->debug = NN_DEBUG;
         $this->echooutput = ($options['Echo'] && NN_ECHOCLI && $this->pdo->cli);
         $this->imgSavePath = NN_COVERS.'movies'.DS;
         $this->service = '';
-        $this->catWhere = 'PARTITION (movies)';
-
-        if (NN_DEBUG || NN_LOGGING) {
-            $this->debug = true;
-            try {
-                $this->debugging = new Logger();
-            } catch (LoggerException $error) {
-                $this->_debug = false;
-            }
-        }
     }
 
     /**
@@ -249,7 +237,7 @@ class Movie
     {
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat);
         }
 
         $order = $this->getMovieOrder($orderBy);
@@ -416,16 +404,6 @@ class Movie
     }
 
     /**
-     * @var null|TraktTv
-     */
-    public $traktTv = null;
-
-    /**
-     * @var OMDbAPI|null
-     */
-    public $omdbApi = null;
-
-    /**
      * Get trailer using IMDB Id.
      *
      * @param int $imdbID
@@ -544,7 +522,7 @@ class Movie
     {
         return [
             'actors', 'backdrop', 'cover', 'director', 'genre', 'imdbid', 'language',
-            'plot', 'rating', 'tagline', 'title', 'tmdbid', 'trailer', 'type', 'year',
+            'plot', 'rating', 'rtrating', 'tagline', 'title', 'tmdbid', 'trailer', 'type', 'year',
         ];
     }
 
@@ -609,6 +587,7 @@ class Movie
      * @param string $variable1
      * @param string $variable2
      * @param string $variable3
+     * @param $variable4
      *
      * @return array|string
      */
@@ -636,11 +615,12 @@ class Movie
      * @param $imdbId
      *
      * @return bool
+     * @throws \Exception
      */
     public function updateMovieInfo($imdbId): bool
     {
         if ($this->echooutput && $this->service !== '') {
-            ColorCLI::doEcho(ColorCLI::primary('Fetching IMDB info from TMDB and/or Trakt using IMDB id: '.$imdbId));
+            ColorCLI::doEcho(ColorCLI::primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB using IMDB id: '.$imdbId));
         }
 
         // Check TMDB for IMDB info.
@@ -842,20 +822,6 @@ class Movie
             // Check the similarity.
             similar_text($this->currentTitle, $ret['title'], $percent);
             if ($percent < 40) {
-                if ($this->debug) {
-                    $this->debugging->log(
-                        __CLASS__,
-                        __FUNCTION__,
-                        'Found ('.
-                        $ret['title'].
-                        ') from TMDB, but it\'s only '.
-                        $percent.
-                        '% similar to ('.
-                        $this->currentTitle.')',
-                        Logger::LOG_INFO
-                    );
-                }
-
                 return false;
             }
         }
@@ -973,20 +939,6 @@ class Movie
                 // Check the similarity.
                 similar_text($this->currentTitle, $ret['title'], $percent);
                 if ($percent < 40) {
-                    if ($this->debug) {
-                        $this->debugging->log(
-                            __CLASS__,
-                            __FUNCTION__,
-                            'Found ('.
-                            $ret['title'].
-                            ') from IMDB, but it\'s only '.
-                            $percent.
-                            '% similar to ('.
-                            $this->currentTitle.')',
-                            Logger::LOG_INFO
-                        );
-                    }
-
                     return false;
                 }
             }
@@ -1094,12 +1046,13 @@ class Movie
     /**
      * Update a release with a IMDB id.
      *
-     * @param string $buffer       Data to parse a IMDB id/Trakt Id from.
-     * @param string $service      Method that called this method.
-     * @param int    $id           id of the release.
-     * @param int    $processImdb  To get IMDB info on this IMDB id or not.
+     * @param string $buffer Data to parse a IMDB id/Trakt Id from.
+     * @param string $service Method that called this method.
+     * @param int $id id of the release.
+     * @param int $processImdb To get IMDB info on this IMDB id or not.
      *
      * @return string
+     * @throws \Exception
      */
     public function doMovieUpdate($buffer, $service, $id, $processImdb = 1): string
     {
@@ -1114,14 +1067,14 @@ class Movie
                 ColorCLI::doEcho(ColorCLI::headerOver($service.' found IMDBid: ').ColorCLI::primary('tt'.$imdbID));
             }
 
-            $this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE id = %d', $this->pdo->escapeString($imdbID), $id));
+            Release::query()->where('id', $id)->update(['imdbid' => $imdbID]);
 
             // If set, scan for imdb info.
             if ($processImdb === 1) {
                 $movCheck = $this->getMovieInfo($imdbID);
                 if ($movCheck === false || (isset($movCheck['updated_at']) && (time() - strtotime($movCheck['updated_at'])) > 2592000)) {
                     if ($this->updateMovieInfo($imdbID) === false) {
-                        $this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $id));
+                        Release::query()->where('id', $id)->update(['imdbid' => 0000000]);
                     }
                 }
             }
@@ -1133,9 +1086,10 @@ class Movie
     /**
      * Process releases with no IMDB id's.
      *
-     * @param string $groupID (Optional) id of a group to work on.
-     * @param string $guidChar (Optional) First letter of a release GUID to use to get work.
-     * @param int $lookupIMDB (Optional) 0 Don't lookup IMDB, 1 lookup IMDB, 2 lookup IMDB on releases that were renamed.
+     *
+     * @param string $groupID
+     * @param string $guidChar
+     * @param int $lookupIMDB
      * @throws \Exception
      */
     public function processMovieReleases($groupID = '', $guidChar = '', $lookupIMDB = 1): void
@@ -1145,23 +1099,24 @@ class Movie
         }
 
         // Get all releases without an IMDB id.
-        $res = $this->pdo->query(
-            sprintf(
-                '
-				SELECT searchname, id
-				FROM releases
-				%s
-				WHERE imdbid IS NULL
-				AND nzbstatus = 1
-				%s %s %s
-				LIMIT %d',
-                $this->catWhere,
-                ($groupID === '' ? '' : ('AND groups_id = '.$groupID)),
-                ($guidChar === '' ? '' : 'AND leftguid = '.$this->pdo->escapeString($guidChar)),
-                ($lookupIMDB === 2 ? 'AND isrenamed = 1' : ''),
-                $this->movieqty
-            )
-        );
+        $sql = Release::query()
+            ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
+            ->whereNull('imdbid')
+            ->where('nzbstatus', '=', 1);
+        if ($groupID !== '') {
+            $sql->where('groupid', $groupID);
+        }
+
+        if ($guidChar !== '') {
+            $sql->where('leftguid', $guidChar);
+        }
+
+        if ((int) $lookupIMDB === 2) {
+            $sql->where('isrenamed', '=', 1);
+        }
+
+        $res = $sql->limit($this->movieqty)->get(['searchname', 'id'])->toArray();
+
         $movieCount = \count($res);
 
         if ($movieCount > 0) {
@@ -1177,7 +1132,7 @@ class Movie
                 // Try to get a name/year.
                 if ($this->parseMovieSearchName($arr['searchname']) === false) {
                     //We didn't find a name, so set to all 0's so we don't parse again.
-                    $this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $arr['id']));
+                    Release::query()->where('id', $arr['id'])->update(['imdbid' => 0000000]);
                     continue;
                 }
                 $this->currentRelID = $arr['id'];
@@ -1248,7 +1203,7 @@ class Movie
 
                 // We failed to get an IMDB id from all sources.
                 if ($movieUpdated === false) {
-                    $this->pdo->queryExec(sprintf('UPDATE releases %s SET imdbid = 0000000 WHERE id = %d', $this->catWhere, $arr['id']));
+                    Release::query()->where('id', $arr['id'])->update(['imdbid' => 0000000]);
                 }
             }
         }
@@ -1342,11 +1297,20 @@ class Movie
      * Try to get an IMDB id from search engines.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function imdbIDFromEngines(): bool
     {
         if ($this->googleLimit < 41 && (time() - $this->googleBan) > 600) {
             if ($this->googleSearch() === true) {
+                return true;
+            }
+        } elseif ($this->duckduckgoLimit < 41) {
+            if ($this->duckduckgoSearch() === true) {
+                return true;
+            }
+        } elseif ($this->bingLimit < 41) {
+            if ($this->bingSearch() === true) {
                 return true;
             }
         }
@@ -1358,6 +1322,7 @@ class Movie
      * Try to find a IMDB id on google.com.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function googleSearch(): bool
     {
@@ -1407,6 +1372,7 @@ class Movie
      * Try to find a IMDB id on bing.com.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function bingSearch(): bool
     {
@@ -1451,6 +1417,7 @@ class Movie
      * Try to find a IMDB id on yahoo.com.
      *
      * @return bool
+     * @throws \Exception
      */
     protected function yahooSearch(): bool
     {
@@ -1482,7 +1449,9 @@ class Movie
             )->getBody()->getContents();
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
-                if ($e->getCode() === 404) {
+                if ($e->getCode() === 999) {
+                    ColorCLI::doEcho(ColorCLI::notice('Banned from Yahoo search'));
+                } elseif ($e->getCode() === 404) {
                     ColorCLI::doEcho(ColorCLI::notice('Data not available on Yahoo search'));
                 } elseif ($e->getCode() === 503) {
                     ColorCLI::doEcho(ColorCLI::notice('Yahoo search service unavailable'));
@@ -1498,6 +1467,47 @@ class Movie
             $this->yahooLimit++;
 
             if ($this->doMovieUpdate($buffer, 'Yahoo.com', $this->currentRelID) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Try to find a IMDB id on bing.com.
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    protected function duckduckgoSearch(): bool
+    {
+        try {
+            $buffer = $this->client->get(
+                'https://duckduckgo.com/html?q='.
+                urlencode(
+                    $this->currentTitle.
+                    ' imdb'
+                )
+            )->getBody()->getContents();
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                if ($e->getCode() === 404) {
+                    ColorCLI::doEcho(ColorCLI::notice('Data not available on DuckDuckGo search'));
+                } elseif ($e->getCode() === 503) {
+                    ColorCLI::doEcho(ColorCLI::notice('DuckDuckGo search service unavailable'));
+                } else {
+                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from DuckDuckGo search , http error reported: '.$e->getCode()));
+                }
+            }
+        } catch (\RuntimeException $e) {
+            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()));
+        }
+
+        if (! empty($buffer)) {
+            $this->duckduckgoLimit++;
+
+            if ($this->doMovieUpdate($buffer, 'duckduckgo.com', $this->currentRelID) !== false) {
                 return true;
             }
         }
@@ -1526,9 +1536,9 @@ class Movie
             $name = $matches['name'];
             $year = $matches['year'];
 
-            /* If we didn't find a year, try to get a name anyways.
-             * Try to look for a title before the $followingList and after anything but a-z0-9 two times or more (-[ for example)
-             */
+        /* If we didn't find a year, try to get a name anyways.
+         * Try to look for a title before the $followingList and after anything but a-z0-9 two times or more (-[ for example)
+         */
         } elseif (preg_match('/([^\w]{2,})?(?P<name>[\w .-]+?)'.$followingList.'/i', $releaseName, $matches)) {
             $name = $matches['name'];
         }
@@ -1543,10 +1553,7 @@ class Movie
             // Finally remove multiple spaces and trim leading spaces.
             $name = trim(preg_replace('/\s{2,}/', ' ', $name));
             // Check if the name is long enough and not just numbers.
-            if (strlen($name) > 4 && ! preg_match('/^\d+$/', $name)) {
-                if ($this->debug && $this->echooutput) {
-                    ColorCLI::doEcho("DB name: {$releaseName}", true);
-                }
+            if (\strlen($name) > 4 && ! preg_match('/^\d+$/', $name)) {
                 $this->currentTitle = $name;
                 $this->currentYear = ($year === '' ? false : $year);
 

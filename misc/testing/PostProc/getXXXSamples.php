@@ -3,7 +3,7 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use nntmux\db\DB;
-use nntmux\Category;
+use App\Models\Category;
 use nntmux\ReleaseImage;
 
 $pdo = new DB();
@@ -11,7 +11,7 @@ $pdo = new DB();
 $path2cover = NN_COVERS.'samples'.DS;
 
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
-    $releaseImage = new ReleaseImage($pdo);
+    $releaseImage = new ReleaseImage();
     $couldbe = $argv[1] === 'true' ? $couldbe = 'had ' : 'could have ';
     $limit = $counterfixed = 0;
     if (isset($argv[2]) && is_numeric($argv[2])) {

@@ -6,6 +6,7 @@ use nntmux\db\DB;
 use ApaiIO\ApaiIO;
 use GuzzleHttp\Client;
 use App\Models\Release;
+use App\Models\Category;
 use App\Models\Settings;
 use App\Models\ConsoleInfo;
 use ApaiIO\Operations\Search;
@@ -20,8 +21,8 @@ use ApaiIO\ResponseTransformer\XmlToSimpleXmlObject;
  */
 class Console
 {
-    const CONS_UPROC = 0; // Release has not been processed.
-    const CONS_NTFND = -2;
+    public const CONS_UPROC = 0; // Release has not been processed.
+    public const CONS_NTFND = -2;
 
     /**
      * @var \nntmux\db\DB
@@ -111,7 +112,7 @@ class Console
      */
     public function getConsoleInfo($id)
     {
-        return ConsoleInfo::query()->where('consoleinfo.id', $id)->select('consoleinfo.*', 'genres.title as genres')->leftJoin('genres', 'genres.id', '=', 'consoleinfo.id')->first();
+        return ConsoleInfo::query()->where('consoleinfo.id', $id)->select('consoleinfo.*', 'genres.title as genres')->leftJoin('genres', 'genres.id', '=', 'consoleinfo.genres_id')->first();
     }
 
     /**
@@ -158,7 +159,7 @@ class Console
 
         $catsrch = '';
         if (\count($cat) > 0 && (int) $cat[0] !== -1) {
-            $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat);
         }
 
         $exccatlist = '';
@@ -447,10 +448,6 @@ class Console
         similar_text(strtolower($gameInfo['title']), strtolower($con['title']), $titlepercent);
         similar_text(strtolower($gameInfo['platform']), strtolower($con['platform']), $platformpercent);
 
-        if (NN_DEBUG) {
-            echo PHP_EOL."Matched: Title Percentage 1: $titlepercent% between ".$gameInfo['title'].' and '.$con['title'].PHP_EOL;
-        }
-
         // Since Wii Ware games and XBLA have inconsistent original platforms, as long as title is 50% its ok.
         if (preg_match('/wiiware|xbla/i', trim($gameInfo['platform'])) && $titlepercent >= 50) {
             $titlepercent = 100;
@@ -466,11 +463,6 @@ class Console
         if ($titlepercent < 70) {
             $gameInfo['title'] .= ' - '.$gameInfo['platform'];
             similar_text(strtolower($gameInfo['title']), strtolower($con['title']), $titlepercent);
-        }
-
-        if (NN_DEBUG) {
-            echo "Matched: Title Percentage 2: $titlepercent% between ".$gameInfo['title'].' and '.$con['title'].PHP_EOL;
-            echo "Matched: Platform Percentage: $platformpercent% between ".$gameInfo['platform'].' and '.$con['platform'].PHP_EOL;
         }
 
         // Platform must equal 100%.
@@ -600,6 +592,7 @@ class Console
     /**
      * @param $genreName
      * @return false|int|string
+     * @throws \Exception
      */
     protected function _getGenreKey($genreName)
     {
@@ -715,7 +708,7 @@ class Console
      */
     protected function _updateConsoleTable(array $con = [])
     {
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         $check = ConsoleInfo::query()->where('asin', $con['asin'])->first(['id']);
 

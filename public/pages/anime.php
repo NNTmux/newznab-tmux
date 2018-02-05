@@ -1,10 +1,11 @@
 <?php
 
 use nntmux\AniDB;
-use nntmux\Category;
+use App\Models\User;
 use nntmux\Releases;
+use App\Models\Category;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
@@ -13,7 +14,7 @@ $aniDB = new AniDB(['Settings' => $page->settings]);
 
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 
-	// force the category to TV_ANIME as it should be for anime, as $catarray was NULL and we know the category for sure for anime
+    // force the category to TV_ANIME as it should be for anime, as $catarray was NULL and we know the category for sure for anime
     $aniDbReleases = $releases->searchbyAnidbId($_GET['id'], 0, 1000, '', [Category::TV_ANIME], -1);
     $aniDbInfo = $aniDB->getAnimeInfo($_GET['id']);
 
@@ -27,22 +28,22 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
         $page->smarty->assign('anidb', $aniDbInfo);
         $page->smarty->assign('animeEpisodeTitles', $aniDbReleases);
         $page->smarty->assign(
-			[
-				'animeAnidbid'     => $aniDbInfo['anidbid'],
-				'animeTitle'       => $aniDbInfo['title'],
-				'animeType'        => $aniDbInfo['type'],
-				'animePicture'     => $aniDbInfo['picture'],
-				'animeStartDate'   => $aniDbInfo['startdate'],
-				'animeEndDate'     => $aniDbInfo['enddate'],
-				'animeDescription' => $aniDbInfo['description'],
-				'animeRating'      => $aniDbInfo['rating'],
-				'animeRelated'     => $aniDbInfo['related'],
-				'animeSimilar'     => $aniDbInfo['similar'],
-				'animeCategories'  => $aniDbInfo['categories'],
-				'animeCreators'    => $aniDbInfo['creators'],
-				'animeCharacters'  => $aniDbInfo['characters'],
-			]
-		);
+            [
+                'animeAnidbid'     => $aniDbInfo['anidbid'],
+                'animeTitle'       => $aniDbInfo['title'],
+                'animeType'        => $aniDbInfo['type'],
+                'animePicture'     => $aniDbInfo['picture'],
+                'animeStartDate'   => $aniDbInfo['startdate'],
+                'animeEndDate'     => $aniDbInfo['enddate'],
+                'animeDescription' => $aniDbInfo['description'],
+                'animeRating'      => $aniDbInfo['rating'],
+                'animeRelated'     => $aniDbInfo['related'],
+                'animeSimilar'     => $aniDbInfo['similar'],
+                'animeCategories'  => $aniDbInfo['categories'],
+                'animeCreators'    => $aniDbInfo['creators'],
+                'animeCharacters'  => $aniDbInfo['characters'],
+            ]
+        );
 
         $page->smarty->assign('nodata', '');
 
@@ -55,12 +56,12 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     $page->render();
 } else {
     $letter = (isset($_GET['id']) && preg_match('/^(0\-9|[A-Z])$/i', $_GET['id'])) ?
-		$_GET['id'] :
-		'0-9';
+        $_GET['id'] :
+        '0-9';
 
     $animeTitle = (isset($_GET['title']) && ! empty($_GET['title'])) ?
-		$_GET['title'] :
-		'';
+        $_GET['title'] :
+        '';
 
     if ($animeTitle !== '' && ! isset($_GET['id'])) {
         $letter = '';

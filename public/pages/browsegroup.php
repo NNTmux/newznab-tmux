@@ -1,14 +1,13 @@
 <?php
 
-if (! $page->users->isLoggedIn()) {
+use App\Models\User;
+use App\Models\Group;
+
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-use nntmux\Groups;
-
-$groups = new Groups(['Settings' => $page->settings]);
-
-$grouplist = $groups->getRange(false, false, '', true);
+$grouplist = Group::getGroupsRange(false, false, '', true);
 $page->smarty->assign('results', $grouplist);
 
 $page->meta_title = 'Browse Groups';

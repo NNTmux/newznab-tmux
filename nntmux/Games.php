@@ -3,19 +3,20 @@
 namespace nntmux;
 
 use nntmux\db\DB;
-use Carbon\Carbon;
 use App\Models\Genre;
+use App\Models\Category;
 use App\Models\Settings;
 use App\Models\GamesInfo;
+use Illuminate\Support\Carbon;
 use DBorsatto\GiantBomb\Client;
 use DBorsatto\GiantBomb\Config;
 use Illuminate\Support\Facades\Cache;
 
 class Games
 {
-    const GAME_MATCH_PERCENTAGE = 85;
+    protected const GAME_MATCH_PERCENTAGE = 85;
 
-    const GAMES_TITLE_PARSE_REGEX =
+    protected const GAMES_TITLE_PARSE_REGEX =
         '#(?P<title>[\w\s\.]+)(-(?P<relgrp>FLT|RELOADED|SKIDROW|PROPHET|RAZOR1911|CORE|REFLEX))?\s?(\s*(\(?('.
         '(?P<reltype>PROPER|MULTI\d|RETAIL|CRACK(FIX)?|ISO|(RE)?(RIP|PACK))|(?P<year>(19|20)\d{2})|V\s?'.
         '(?P<version>(\d+\.)+\d+)|(-\s)?(?P=relgrp))\)?)\s?)*\s?(\.\w{2,4})?#i';
@@ -234,7 +235,7 @@ class Games
 
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
-            $catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+            $catsrch = Category::getCategorySearch($cat);
         }
 
         if ($maxAge > 0) {
@@ -468,7 +469,7 @@ class Games
         //wait 10 seconds before proceeding (steam api limit)
         sleep(10);
         $gen = new Genres(['Settings' => $this->pdo]);
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         $game = [];
 
@@ -578,7 +579,7 @@ class Games
 
                         if ($this->_gameResults->original_release_date !== '') {
                             $dateReleased = $this->_gameResults->original_release_date;
-                            $date = Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased);
+                            $date = $dateReleased !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $dateReleased) : Carbon::now();
                             if ($date instanceof \DateTime) {
                                 $game['releasedate'] = (string) $date->format('Y-m-d');
                             }
@@ -643,7 +644,7 @@ class Games
         if (\in_array(strtolower($genreName), $genreAssoc, false)) {
             $genreKey = array_search(strtolower($genreName), $genreAssoc, false);
         } else {
-            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::GAME_TYPE]);
+            $genreKey = Genre::create(['title' => $genreName, 'type' => Genres::GAME_TYPE])->id;
         }
 
         $game['gamesgenre'] = $genreName;

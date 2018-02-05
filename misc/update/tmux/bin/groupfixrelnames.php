@@ -6,12 +6,12 @@ use nntmux\Nfo;
 use nntmux\NZB;
 use nntmux\NNTP;
 use nntmux\db\DB;
-use nntmux\Category;
 use nntmux\ColorCLI;
 use App\Models\Predb;
 use nntmux\NameFixer;
 use nntmux\MiscSorter;
 use nntmux\NZBContents;
+use App\Models\Category;
 use App\Models\Settings;
 use nntmux\processing\PostProcess;
 
@@ -212,7 +212,7 @@ switch (true) {
                         if (((int) Settings::settingValue('..alternate_nntp') === 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
                             ColorCLI::error('Unable to connect to usenet.');
                         }
-                        $Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);
+                        $Nfo = new Nfo();
                         $nzbcontents = new NZBContents(
                             [
                                 'Echo'        => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,

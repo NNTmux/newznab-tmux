@@ -4,18 +4,18 @@ namespace nntmux\processing\post;
 
 use nntmux\NZB;
 use nntmux\db\DB;
-use nntmux\Category;
 use nntmux\ColorCLI;
+use App\Models\Category;
 use App\Models\Settings;
 use App\Models\AnidbEpisode;
 use nntmux\db\populate\AniDB as PaDb;
 
 class AniDB
 {
-    const PROC_EXTFAIL = -1; // Release Anime title/episode # could not be extracted from searchname
-    const PROC_NOMATCH = -2; // AniDB ID was not found in anidb table using extracted title/episode #
+    protected const PROC_EXTFAIL = -1; // Release Anime title/episode # could not be extracted from searchname
+    protected const PROC_NOMATCH = -2; // AniDB ID was not found in anidb table using extracted title/episode #
 
-    const REGEX_NOFORN = 'English|Japanese|German|Danish|Flemish|Dutch|French|Swe(dish|sub)|Deutsch|Norwegian';
+    protected const REGEX_NOFORN = 'English|Japanese|German|Danish|Flemish|Dutch|French|Swe(dish|sub)|Deutsch|Norwegian';
 
     /**
      * @var bool Whether or not to echo messages to CLI
@@ -23,12 +23,12 @@ class AniDB
     public $echooutput;
 
     /**
-     * @var PaDb
+     * @var
      */
     public $padb;
 
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -166,7 +166,7 @@ class AniDB
         )
         ) {
             $matches['epno'] = (int) $matches['epno'];
-            if (in_array($matches['epno'], ['Movie', 'OVA'], false)) {
+            if (\in_array($matches['epno'], ['Movie', 'OVA'], false)) {
                 $matches['epno'] = 1;
             }
         } elseif (preg_match(
@@ -177,12 +177,6 @@ class AniDB
         ) {
             $matches['epno'] = 1;
         } else {
-            if (NN_DEBUG) {
-                ColorCLI::doEcho(
-                    PHP_EOL."Could not parse searchname {$cleanName}.",
-                    true
-                );
-            }
             $this->status = self::PROC_EXTFAIL;
         }
 
@@ -230,7 +224,7 @@ class AniDB
         // clean up the release name to ensure we get a good chance at getting a valid title
         $cleanArr = $this->extractTitleEpisode($release['searchname']);
 
-        if (is_array($cleanArr) && isset($cleanArr['title']) && is_numeric($cleanArr['epno'])) {
+        if (\is_array($cleanArr) && isset($cleanArr['title']) && is_numeric($cleanArr['epno'])) {
             echo ColorCLI::header(PHP_EOL.'Looking Up: ').
                 ColorCLI::primary('   Title: '.$cleanArr['title'].PHP_EOL.
                     '   Episode: '.$cleanArr['epno']);
@@ -274,12 +268,6 @@ class AniDB
 
                 $matched = true;
             } else {
-                if (NN_DEBUG) {
-                    ColorCLI::doEcho(
-                        PHP_EOL.'Could not match searchname:'.$release['searchname'],
-                        true
-                    );
-                }
                 $this->status = self::PROC_NOMATCH;
             }
         }

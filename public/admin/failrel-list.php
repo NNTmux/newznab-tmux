@@ -2,15 +2,14 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\DnzbFailures;
+use App\Models\Release;
+use App\Models\DnzbFailure;
 
 $page = new AdminPage();
 
-$failed = new DnzbFailures();
-
 $page->title = 'Failed Releases List';
 
-$frelcount = $failed->getCount();
+$frelcount = DnzbFailure::getCount();
 
 $offset = $_REQUEST['offset'] ?? 0;
 $page->smarty->assign(
@@ -25,7 +24,7 @@ $page->smarty->assign(
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$frellist = $failed->getFailedRange($offset, ITEMS_PER_PAGE);
+$frellist = Release::getFailedRange($offset, ITEMS_PER_PAGE);
 $page->smarty->assign('releaselist', $frellist);
 
 $page->content = $page->smarty->fetch('failrel-list.tpl');

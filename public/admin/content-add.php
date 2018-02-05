@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Users;
+use App\Models\User;
 use nntmux\Contents;
 
 $page = new AdminPage();
@@ -53,7 +53,7 @@ switch ($action) {
             $page->title = 'Content Edit';
             $id = $_GET['id'];
 
-            $content = $contents->getByID($id, Users::ROLE_ADMIN);
+            $content = $contents->getByID($id, User::ROLE_ADMIN);
         }
         break;
 }

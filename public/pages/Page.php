@@ -1,11 +1,11 @@
 <?php
 
-use nntmux\Menu;
-use nntmux\Forum;
-use nntmux\Users;
-use nntmux\Category;
+use App\Models\Menu;
+use App\Models\User;
 use nntmux\Contents;
+use App\Models\Category;
 use App\Models\Settings;
+use App\Models\Forumpost;
 
 /**
  * This class represents every normal user page in the site.
@@ -30,34 +30,31 @@ class Page extends BasePage
             ]
         );
 
-        $role = Users::ROLE_GUEST;
+        $role = User::ROLE_USER;
         if (! empty($this->userdata)) {
             $role = $this->userdata['user_roles_id'];
         }
 
         $content = new Contents(['Settings' => $this->settings]);
-        $f = new Forum();
-        $menu = new Menu($this->settings);
-        $this->smarty->assign('menulist', $menu->get($role, $this->serverurl));
+        $this->smarty->assign('menulist', Menu::getMenu($role, $this->serverurl));
         $this->smarty->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
         $this->smarty->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
         if ($this->userdata !== null) {
-            $this->smarty->assign('recentforumpostslist', $f->getPosts(Settings::settingValue('..showrecentforumposts')));
+            $this->smarty->assign('recentforumpostslist', Forumpost::getPosts(Settings::settingValue('..showrecentforumposts')));
         }
 
         $this->smarty->assign('main_menu', $this->smarty->fetch('mainmenu.tpl'));
         $this->smarty->assign('useful_menu', $this->smarty->fetch('usefullinksmenu.tpl'));
         $this->smarty->assign('article_menu', $this->smarty->fetch('articlesmenu.tpl'));
 
-        $category = new Category(['Settings' => $content->pdo]);
         if (! empty($this->userdata)) {
-            $parentcatlist = $category->getForMenu($this->userdata['categoryexclusions'], $this->userdata['rolecategoryexclusions']);
+            $parentcatlist = Category::getForMenu($this->userdata['categoryexclusions'], $this->userdata['rolecategoryexclusions']);
         } else {
-            $parentcatlist = $category->getForMenu();
+            $parentcatlist = Category::getForMenu();
         }
 
         $this->smarty->assign('parentcatlist', $parentcatlist);
-        $this->smarty->assign('catClass', $category);
+        $this->smarty->assign('catClass', Category::class);
         $searchStr = '';
         if ($this->page == 'search' && isset($_REQUEST['id'])) {
             $searchStr = (string) $_REQUEST['id'];

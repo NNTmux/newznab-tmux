@@ -15,7 +15,7 @@ use nntmux\libraries\TraktAPI;
  */
 class TraktTv extends TV
 {
-    const MATCH_PROBABILITY = 75;
+    private const MATCH_PROBABILITY = 75;
 
     /**
      * Client for Trakt API.
@@ -100,7 +100,7 @@ class TraktTv extends TV
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TRAKT);
 
-        $tvcount = $res->rowCount();
+        $tvcount = \count($res);
 
         if ($this->echooutput && $tvcount > 1) {
             echo ColorCLI::header('Processing TRAKT lookup for '.number_format($tvcount).' release(s).');
@@ -113,8 +113,8 @@ class TraktTv extends TV
 
                 // Clean the show name for better match probability
                 $release = $this->parseInfo($row['searchname']);
-                if (is_array($release) && $release['name'] !== '') {
-                    if (in_array($release['cleanname'], $this->titleCache, false)) {
+                if (\is_array($release) && $release['name'] !== '') {
+                    if (\in_array($release['cleanname'], $this->titleCache, false)) {
                         if ($this->echooutput) {
                             echo ColorCLI::headerOver('Title: ').
                                     ColorCLI::warningOver($release['cleanname']).
@@ -146,7 +146,7 @@ class TraktTv extends TV
                         // Get the show from TRAKT
                         $traktShow = $this->getShowInfo((string) $release['cleanname']);
 
-                        if (is_array($traktShow)) {
+                        if (\is_array($traktShow)) {
                             $videoId = $this->add($traktShow);
                             $traktid = (int) $traktShow['trakt'];
                         }
@@ -244,7 +244,7 @@ class TraktTv extends TV
 
         sleep(1);
 
-        if (is_array($response)) {
+        if (\is_array($response)) {
             if ($this->checkRequiredAttr($response, 'traktE')) {
                 $return = $this->formatEpisodeInfo($response);
             }
@@ -268,7 +268,7 @@ class TraktTv extends TV
     public function getPoster($videoId, $siteId): int
     {
         $hascover = 0;
-        $ri = new ReleaseImage($this->pdo);
+        $ri = new ReleaseImage();
 
         if ($this->posterUrl !== '') {
             // Try to get the Poster
@@ -291,7 +291,7 @@ class TraktTv extends TV
     /**
      * Retrieve info of TV programme from site using it's API.
      *
-     * @param string $name Title of programme to look up. Usually a cleaned up version from releases table.
+     * @param string|null|array $name Title of programme to look up. Usually a cleaned up version from releases table.
      *
      * @return array|false    False on failure, an array of information fields otherwise.
      */
@@ -299,6 +299,7 @@ class TraktTv extends TV
     {
         $return = $response = false;
         $highestMatch = 0;
+        $highest = null;
 
         // Trakt does NOT like shows with the year in them even without the parentheses
         // Do this for the API Search only as a local lookup should require it
@@ -308,7 +309,7 @@ class TraktTv extends TV
 
         sleep(1);
 
-        if (is_array($response)) {
+        if (\is_array($response)) {
             foreach ($response as $show) {
 
                 // Check for exact title match first and then terminate if found
@@ -326,7 +327,7 @@ class TraktTv extends TV
                     $highest = $show;
                 }
             }
-            if (isset($highest)) {
+            if ($highest !== null) {
                 $fullShow = $this->client->showSummary($highest['show']['ids']['trakt'], 'full');
                 if ($this->checkRequiredAttr($fullShow, 'traktS')) {
                     $return = $this->formatShowInfo($fullShow);

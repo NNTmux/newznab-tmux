@@ -3,11 +3,12 @@
 namespace nntmux;
 
 use nntmux\db\DB;
+use App\Models\Category;
 
 class AniDB
 {
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -56,7 +57,7 @@ class AniDB
 				SET title = %s, type = %s, startdate = %s, enddate = %s,
 					related = %s, similar = %s, creators = %s, description = %s, rating = %s,
 					categories = %s, characters = %s, epnos = %s, airdates = %s,
-					episodetitles = %s, unixtime = %d WHERE anidbid = %d',
+					episodetitles = %s WHERE anidbid = %d',
                 $this->pdo->escapeString($title),
                 $this->pdo->escapeString($type),
                 $this->pdo->escapeString($startdate),
@@ -71,7 +72,6 @@ class AniDB
                 $this->pdo->escapeString($epnos),
                 $this->pdo->escapeString($airdates),
                 $this->pdo->escapeString($episodetitles),
-                time(),
                 $anidbID
             )
         );
@@ -103,6 +103,7 @@ class AniDB
      * @param string $letter
      * @param string $animetitle
      * @return array|bool
+     * @throws \RuntimeException
      */
     public function getAnimeList($letter = '', $animetitle = '')
     {

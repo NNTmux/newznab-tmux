@@ -22,7 +22,7 @@
 namespace nntmux\http;
 
 use nntmux\db\DB;
-use nntmux\Category;
+use App\Models\Category;
 use App\Models\Settings;
 use nntmux\utility\Utility;
 use App\Extensions\util\Versions;
@@ -33,7 +33,7 @@ use App\Extensions\util\Versions;
 abstract class Capabilities
 {
     /**
-     * @var DB
+     * @var \nntmux\db\DB
      */
     public $pdo;
 
@@ -107,7 +107,7 @@ abstract class Capabilities
         if ($response === false) {
             Utility::showApiError(201);
         } else {
-            header('Content-Length: '.strlen($response));
+            header('Content-Length: '.\strlen($response));
             echo $response;
         }
     }
@@ -157,7 +157,7 @@ abstract class Capabilities
                 'audio-search' => ['available' => 'no',  'supportedParams' => ''],
             ],
             'categories' => $this->type === 'caps'
-                    ? (new Category(['Settings' => $this->pdo]))->getForMenu()
+                    ? Category::getForMenu()
                     : null,
         ];
     }

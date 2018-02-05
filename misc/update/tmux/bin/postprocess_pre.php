@@ -1,7 +1,7 @@
 <?php
 
+use App\Models\Predb;
+
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\PreDb;
-
-(new PreDb(['Echo' => true]))->checkPre((isset($argv[1]) && is_numeric($argv[1]) ? $argv[1] : false));
+Predb::checkPre((isset($argv[1]) && is_numeric($argv[1]) ? $argv[1] : false));

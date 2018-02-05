@@ -1,8 +1,12 @@
 <?php
 
+use App\Models\User;
 use nntmux\http\API;
 use nntmux\Releases;
+use App\Models\Release;
 use App\Models\Settings;
+use App\Models\ReleaseNfo;
+use App\Models\UserRequest;
 use nntmux\utility\Utility;
 
 // API functions.
@@ -39,10 +43,6 @@ if (isset($_GET['t'])) {
         case 'info':
             $function = 'n';
             break;
-        case 'r':
-        case 'register':
-            $function = 'r';
-            break;
         default:
             Utility::showApiError(202, 'No such function ('.$_GET['t'].')');
     }
@@ -61,25 +61,25 @@ if ($function !== 'c' && $function !== 'r') {
         Utility::showApiError(200, 'Missing parameter (apikey)');
     } else {
         $apiKey = $_GET['apikey'];
-        $res = $page->users->getByRssToken($apiKey);
+        $res = User::getByRssToken($apiKey);
         if ($res === null) {
             Utility::showApiError(100, 'Incorrect user credentials (wrong API key)');
         }
     }
 
-    if ($page->users->isDisabled($res['username'])) {
+    if (User::isDisabled($res['username'])) {
         Utility::showApiError(101);
     }
 
     $uid = $res['id'];
-    $catExclusions = $page->users->getCategoryExclusion($uid);
+    $catExclusions = User::getCategoryExclusion($uid);
     $maxRequests = $res->role->apirequests;
 }
 
 // Record user access to the api, if its been called by a user (i.e. capabilities request do not require a user to be logged in or key provided).
 if ($uid !== '') {
-    $page->users->updateApiAccessed($uid);
-    $apiRequests = $page->users->getApiRequests($uid);
+    User::updateApiAccessed($uid);
+    $apiRequests = UserRequest::getApiRequests($uid);
     if ($apiRequests > $maxRequests) {
         Utility::showApiError(500, 'Request limit reached ('.$apiRequests.'/'.$maxRequests.')');
     }
@@ -105,7 +105,7 @@ switch ($function) {
         $api->verifyEmptyParameter('q');
         $maxAge = $api->maxAge();
         $groupName = $api->group();
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
         $categoryID = $api->categoryID();
         $limit = $api->limit();
 
@@ -158,7 +158,7 @@ switch ($function) {
         $api->verifyEmptyParameter('season');
         $api->verifyEmptyParameter('ep');
         $maxAge = $api->maxAge();
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
         $siteIdArr = [
             'id'     => $_GET['vid'] ?? '0',
@@ -201,7 +201,7 @@ switch ($function) {
         $api->verifyEmptyParameter('q');
         $api->verifyEmptyParameter('imdbid');
         $maxAge = $api->maxAge();
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
         $imdbId = ($_GET['imdbid'] ?? '-1');
 
@@ -229,8 +229,8 @@ switch ($function) {
     // Get NZB.
     case 'g':
         $api->verifyEmptyParameter('g');
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $relData = $releases->getByGuid($_GET['id']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        $relData = Release::getByGuid($_GET['id']);
         if ($relData) {
             header(
                 'Location:'.
@@ -254,8 +254,8 @@ switch ($function) {
             Utility::showApiError(200, 'Missing parameter (id is required for single release details)');
         }
 
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $data = $releases->getByGuid($_GET['id']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        $data = Release::getByGuid($_GET['id']);
 
         $relData = [];
         if ($data) {
@@ -270,9 +270,9 @@ switch ($function) {
             Utility::showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
         }
 
-        $page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $rel = $releases->getByGuid($_GET['id']);
-        $data = $releases->getReleaseNfo($rel['id']);
+        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        $rel = Release::getByGuid($_GET['id']);
+        $data = ReleaseNfo::getReleaseNfo($rel['id']);
 
         if ($rel !== false && ! empty($rel)) {
             if ($data !== false) {
@@ -294,46 +294,5 @@ switch ($function) {
     // Capabilities request.
     case 'c':
         $api->output([], $params, $outputXML, $offset, 'caps');
-        break;
-    // Register request.
-    case 'r':
-        $api->verifyEmptyParameter('email');
-
-        if (! in_array((int) Settings::settingValue('..registerstatus'), [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_API_ONLY], false)) {
-            Utility::showApiError(104);
-        }
-        // Check email is valid format.
-        if (! $page->users->isValidEmail($_GET['email'])) {
-            Utility::showApiError(106);
-        }
-        // Check email isn't taken.
-        $ret = $page->users->getByEmail($_GET['email']);
-        if (isset($ret['id'])) {
-            Utility::showApiError(105);
-        }
-        // Create username/pass and register.
-        $username = $page->users->generateUsername($_GET['email']);
-        $password = $page->users->generatePassword();
-        // Register.
-        $userDefault = $page->users->getDefaultRole();
-        $uid = $page->users->signup(
-            $username,
-            $password,
-            $_GET['email'],
-            $_SERVER['REMOTE_ADDR'],
-            $userDefault['id'],
-            $userDefault['defaultinvites']
-        );
-        // Check if it succeeded.
-        $userData = $page->users->getById($uid);
-        if (empty($userData)) {
-            Utility::showApiError(107);
-        }
-
-        $params['username'] = $username;
-        $params['password'] = $password;
-        $params['token'] = $userData['rsstoken'];
-
-        $api->output([], $params, true, $offset, 'reg');
         break;
 }

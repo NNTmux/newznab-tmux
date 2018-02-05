@@ -1,3 +1,168 @@
+DROP TABLE IF EXISTS collections;
+CREATE TABLE         collections (
+  id             INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
+  subject        VARCHAR(255)        NOT NULL DEFAULT '',
+  fromname       VARCHAR(255)        NOT NULL DEFAULT '',
+  date           DATETIME            DEFAULT NULL,
+  xref           VARCHAR(2000)        NOT NULL DEFAULT '',
+  totalfiles     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  groups_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
+  collectionhash VARCHAR(255)        NOT NULL DEFAULT '0',
+  collection_regexes_id INT SIGNED NOT NULL DEFAULT '0' COMMENT 'FK to collection_regexes.id',
+  dateadded      DATETIME            DEFAULT NULL,
+  added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  filecheck      TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  filesize       BIGINT UNSIGNED     NOT NULL DEFAULT '0',
+  releases_id      INT                 NULL,
+  noise          CHAR(32)            NOT NULL DEFAULT '',
+  PRIMARY KEY                               (id),
+  INDEX        fromname                     (fromname),
+  INDEX        date                         (date),
+  INDEX        groups_id                     (groups_id),
+  INDEX        ix_collection_filecheck      (filecheck),
+  INDEX        ix_collection_dateadded      (dateadded),
+  INDEX        ix_collection_releaseid      (releases_id),
+  UNIQUE INDEX ix_collection_collectionhash (collectionhash)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1;
+
+
+DROP TABLE IF EXISTS releases;
+CREATE TABLE         releases (
+  id                INT(11) UNSIGNED               NOT NULL AUTO_INCREMENT,
+  name              VARCHAR(255)                   NOT NULL DEFAULT '',
+  searchname        VARCHAR(255)                   NOT NULL DEFAULT '',
+  totalpart         INT                            DEFAULT '0',
+  groups_id         INT(11) UNSIGNED               NOT NULL DEFAULT '0' COMMENT 'FK to groups.id',
+  size              BIGINT UNSIGNED                NOT NULL DEFAULT '0',
+  postdate          DATETIME                       DEFAULT NULL,
+  adddate           DATETIME                       DEFAULT NULL,
+  updatetime        TIMESTAMP                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  gid               VARCHAR(32)                    NULL,
+  guid              VARCHAR(40)                    NOT NULL,
+  leftguid          CHAR(1)                        NOT NULL COMMENT 'The first letter of the release guid',
+  fromname          VARCHAR(255)                   NULL,
+  completion        FLOAT                          NOT NULL DEFAULT '0',
+  categories_id     INT                            NOT NULL DEFAULT '0010',
+  videos_id         MEDIUMINT(11) UNSIGNED         NOT NULL DEFAULT '0' COMMENT 'FK to videos.id of the parent series.',
+  tv_episodes_id    MEDIUMINT(11) SIGNED           NOT NULL DEFAULT '0' COMMENT 'FK to tv_episodes.id for the episode.',
+  imdbid            MEDIUMINT(7) UNSIGNED ZEROFILL NULL,
+  xxxinfo_id        INT SIGNED                     NOT NULL DEFAULT '0',
+  musicinfo_id      INT(11) SIGNED               NULL COMMENT 'FK to musicinfo.id',
+  consoleinfo_id    INT(11) SIGNED               NULL COMMENT 'FK to consoleinfo.id',
+  gamesinfo_id      INT SIGNED                     NOT NULL DEFAULT '0',
+  bookinfo_id       INT(11) SIGNED               NULL COMMENT 'FK to bookinfo.id',
+  anidbid           INT                            NULL COMMENT 'FK to anidb_titles.anidbid',
+  predb_id          INT(11) UNSIGNED               NOT NULL DEFAULT '0' COMMENT 'FK to predb.id',
+  grabs             INT UNSIGNED                   NOT NULL DEFAULT '0',
+  comments          INT                            NOT NULL DEFAULT '0',
+  passwordstatus    TINYINT                        NOT NULL DEFAULT '0',
+  rarinnerfilecount INT                            NOT NULL DEFAULT '0',
+  haspreview        TINYINT                        NOT NULL DEFAULT '0',
+  nfostatus         TINYINT                        NOT NULL DEFAULT '0',
+  jpgstatus         TINYINT(1)                     NOT NULL DEFAULT '0',
+  videostatus       TINYINT(1)                     NOT NULL DEFAULT '0',
+  audiostatus       TINYINT(1)                     NOT NULL DEFAULT '0',
+  dehashstatus      TINYINT(1)                     NOT NULL DEFAULT '0',
+  reqidstatus       TINYINT(1)                     NOT NULL DEFAULT '0',
+  nzb_guid          BINARY(16)                     NULL,
+  nzbstatus         TINYINT(1)                     NOT NULL DEFAULT '0',
+  iscategorized     TINYINT(1)                     NOT NULL DEFAULT '0',
+  isrenamed         TINYINT(1)                     NOT NULL DEFAULT '0',
+  ishashed          TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_pp           TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_sorter       TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_par2         TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_nfo          TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_files        TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_uid          TINYINT(1)                     NOT NULL DEFAULT '0',
+  proc_srr          TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been srr
+processed',
+  proc_hash16k      TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been hash16k
+processed',
+  PRIMARY KEY                                 (id, categories_id),
+  INDEX ix_releases_name                      (name),
+  INDEX ix_releases_groupsid                  (groups_id,passwordstatus),
+  INDEX ix_releases_postdate_searchname       (postdate,searchname),
+  INDEX ix_releases_guid                      (guid),
+  INDEX ix_releases_leftguid                  (leftguid ASC, predb_id),
+  INDEX ix_releases_nzb_guid                  (nzb_guid),
+  INDEX ix_releases_videos_id                 (videos_id),
+  INDEX ix_releases_tv_episodes_id            (tv_episodes_id),
+  INDEX ix_releases_imdbid                    (imdbid),
+  INDEX ix_releases_xxxinfo_id                (xxxinfo_id),
+  INDEX ix_releases_musicinfo_id              (musicinfo_id,passwordstatus),
+  INDEX ix_releases_consoleinfo_id            (consoleinfo_id),
+  INDEX ix_releases_gamesinfo_id              (gamesinfo_id),
+  INDEX ix_releases_bookinfo_id               (bookinfo_id),
+  INDEX ix_releases_anidbid                   (anidbid),
+  INDEX ix_releases_predb_id_searchname       (predb_id,searchname),
+  INDEX ix_releases_haspreview_passwordstatus (haspreview,passwordstatus),
+  INDEX ix_releases_passwordstatus            (passwordstatus),
+  INDEX ix_releases_nfostatus                 (nfostatus,size),
+  INDEX ix_releases_dehashstatus              (dehashstatus,ishashed)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1
+
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+  id             INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
+  username       VARCHAR(50)      NOT NULL,
+  firstname      VARCHAR(255)              DEFAULT NULL,
+  lastname       VARCHAR(255)              DEFAULT NULL,
+  email          VARCHAR(255)     NOT NULL,
+  password       VARCHAR(255)     NOT NULL,
+  user_roles_id  INT              NOT NULL DEFAULT '1' COMMENT 'FK to user_roles.id',
+  host           VARCHAR(40)      NULL,
+  grabs          INT              NOT NULL DEFAULT '0',
+  rsstoken       VARCHAR(64)      NOT NULL,
+  created_at    DATETIME         NOT NULL,
+  updated_at    DATETIME         NOT NULL,
+  resetguid      VARCHAR(50)      NULL,
+  lastlogin      DATETIME                  DEFAULT NULL,
+  apiaccess      DATETIME                  DEFAULT NULL,
+  invites        INT              NOT NULL DEFAULT '0',
+  invitedby      INT              NULL,
+  movieview      INT              NOT NULL DEFAULT '1',
+  xxxview        INT              NOT NULL DEFAULT '1',
+  musicview      INT              NOT NULL DEFAULT '1',
+  consoleview    INT              NOT NULL DEFAULT '1',
+  bookview       INT              NOT NULL DEFAULT '1',
+  gameview       INT              NOT NULL DEFAULT 1,
+  saburl         VARCHAR(255)     NULL     DEFAULT NULL,
+  sabapikey      VARCHAR(255)     NULL     DEFAULT NULL,
+  sabapikeytype  TINYINT(1)       NULL     DEFAULT NULL,
+  sabpriority    TINYINT(1)       NULL     DEFAULT NULL,
+  queuetype      TINYINT(1)       NOT NULL DEFAULT '1' COMMENT 'Type of queue, Sab or NZBGet',
+  nzbgeturl      VARCHAR(255)     NULL     DEFAULT NULL,
+  nzbgetusername VARCHAR(255)     NULL     DEFAULT NULL,
+  nzbgetpassword VARCHAR(255)     NULL     DEFAULT NULL,
+  nzbvortex_api_key VARCHAR(10)   NULL     DEFAULT NULL ,
+  nzbvortex_server_url VARCHAR(255) NULL   DEFAULT NULL,
+  userseed       VARCHAR(50)      NOT NULL,
+  notes          VARCHAR(255)     NOT NULL,
+  cp_url         VARCHAR(255)     NULL     DEFAULT NULL,
+  cp_api         VARCHAR(255)     NULL     DEFAULT NULL,
+  style          VARCHAR(255)     NULL     DEFAULT NULL,
+  rolechangedate DATETIME         NULL     DEFAULT NULL COMMENT 'When does the role expire',
+  PRIMARY KEY (id),
+  INDEX ix_user_roles (user_roles_id)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1;
+
+
 DROP TABLE IF EXISTS anidb_episodes;
 CREATE TABLE anidb_episodes (
   anidbid       INT(10) UNSIGNED        NOT NULL
@@ -107,6 +272,8 @@ CREATE TABLE binaries (
   partcheck     TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
   partsize      BIGINT UNSIGNED     NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
+  CONSTRAINT FK_Collections FOREIGN KEY (collections_id)
+  REFERENCES collections(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_binaries_binaryhash (binaryhash),
   INDEX ix_binaries_partcheck  (partcheck),
   INDEX ix_binaries_collection (collections_id)
@@ -116,28 +283,6 @@ CREATE TABLE binaries (
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
-
-
-DROP TABLE IF EXISTS binaryblacklist;
-CREATE TABLE binaryblacklist (
-  id            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  groupname     VARCHAR(255)     NULL,
-  regex         VARCHAR(2000)    NOT NULL,
-  msgcol        INT(11) UNSIGNED NOT NULL DEFAULT '1',
-  optype        INT(11) UNSIGNED NOT NULL DEFAULT '1',
-  status        INT(11) UNSIGNED NOT NULL DEFAULT '1',
-  description   VARCHAR(1000) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci    NULL,
-  last_activity	DATE             NULL,
-  PRIMARY KEY (id),
-  INDEX ix_binaryblacklist_groupname (groupname),
-  INDEX ix_binaryblacklist_status    (status)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
-
 
 DROP TABLE IF EXISTS bookinfo;
 CREATE TABLE bookinfo (
@@ -167,103 +312,6 @@ CREATE TABLE bookinfo (
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
 
-
-DROP TABLE IF EXISTS categories;
-CREATE TABLE categories (
-  id             INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
-  title          VARCHAR(255)     NOT NULL,
-  parentid       INT              NULL,
-  status         INT              NOT NULL DEFAULT '1',
-  description    VARCHAR(255)     NULL,
-  disablepreview TINYINT(1)       NOT NULL DEFAULT '0',
-  minsizetoformrelease BIGINT UNSIGNED NOT NULL DEFAULT '0',
-  maxsizetoformrelease BIGINT UNSIGNED NOT NULL DEFAULT '0',
-  PRIMARY KEY (id),
-  INDEX ix_categories_status   (status),
-  INDEX ix_categories_parentid (parentid)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
-
-
-DROP TABLE IF EXISTS category_regexes;
-CREATE TABLE category_regexes (
-  id          INT UNSIGNED        NOT NULL AUTO_INCREMENT,
-  group_regex VARCHAR(255)        NOT NULL DEFAULT ''     COMMENT 'This is a regex to match against usenet groups',
-  regex       VARCHAR(5000)       NOT NULL DEFAULT ''     COMMENT 'Regex used to match a release name to categorize it',
-  status      TINYINT(1) UNSIGNED NOT NULL DEFAULT '1'    COMMENT '1=ON 0=OFF',
-  description VARCHAR(1000)       NOT NULL DEFAULT ''     COMMENT 'Optional extra details on this regex',
-  ordinal     INT SIGNED          NOT NULL DEFAULT '0'    COMMENT 'Order to run the regex in',
-  categories_id SMALLINT UNSIGNED   NOT NULL DEFAULT '0010' COMMENT 'Which categories id to put the release in',
-  PRIMARY KEY (id),
-  INDEX ix_category_regexes_group_regex (group_regex),
-  INDEX ix_category_regexes_status      (status),
-  INDEX ix_category_regexes_ordinal     (ordinal),
-  INDEX ix_category_regexes_categories_id (categories_id)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 100000;
-
-
-DROP TABLE IF EXISTS collections;
-CREATE TABLE         collections (
-  id             INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
-  subject        VARCHAR(255)        NOT NULL DEFAULT '',
-  fromname       VARCHAR(255)        NOT NULL DEFAULT '',
-  date           DATETIME            DEFAULT NULL,
-  xref           VARCHAR(2000)        NOT NULL DEFAULT '',
-  totalfiles     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  groups_id       INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  collectionhash VARCHAR(255)        NOT NULL DEFAULT '0',
-  collection_regexes_id INT SIGNED NOT NULL DEFAULT '0' COMMENT 'FK to collection_regexes.id',
-  dateadded      DATETIME            DEFAULT NULL,
-  added          TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  filecheck      TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
-  filesize       BIGINT UNSIGNED     NOT NULL DEFAULT '0',
-  releases_id      INT                 NULL,
-  noise          CHAR(32)            NOT NULL DEFAULT '',
-  PRIMARY KEY                               (id),
-  INDEX        fromname                     (fromname),
-  INDEX        date                         (date),
-  INDEX        groups_id                     (groups_id),
-  INDEX        ix_collection_filecheck      (filecheck),
-  INDEX        ix_collection_dateadded      (dateadded),
-  INDEX        ix_collection_releaseid      (releases_id),
-  UNIQUE INDEX ix_collection_collectionhash (collectionhash)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1;
-
-
-DROP TABLE IF EXISTS collection_regexes;
-CREATE TABLE collection_regexes (
-  id          INT UNSIGNED        NOT NULL AUTO_INCREMENT,
-  group_regex VARCHAR(255)        NOT NULL DEFAULT ''  COMMENT 'This is a regex to match against usenet groups',
-  regex       VARCHAR(5000)       NOT NULL DEFAULT ''  COMMENT 'Regex used for collection grouping',
-  status      TINYINT(1) UNSIGNED NOT NULL DEFAULT '1' COMMENT '1=ON 0=OFF',
-  description VARCHAR(1000)       CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Optional extra details on this regex',
-  ordinal     INT SIGNED          NOT NULL DEFAULT '0' COMMENT 'Order to run the regex in',
-  PRIMARY KEY (id),
-  INDEX ix_collection_regexes_group_regex (group_regex),
-  INDEX ix_collection_regexes_status      (status),
-  INDEX ix_collection_regexes_ordinal     (ordinal)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 100000;
-
-
 DROP TABLE IF EXISTS consoleinfo;
 CREATE TABLE consoleinfo (
   id          INT(10) UNSIGNED    NOT NULL AUTO_INCREMENT,
@@ -290,59 +338,19 @@ CREATE TABLE consoleinfo (
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
 
-
-DROP TABLE IF EXISTS countries;
-CREATE TABLE countries (
-  id      CHAR(2) COLLATE utf8_unicode_ci NOT NULL COMMENT '2 character code.',
-  iso3    CHAR(3) COLLATE utf8_unicode_ci NOT NULL COMMENT '3 character code.',
-  country VARCHAR(180) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name of the country.',
-  PRIMARY KEY (id),
-  UNIQUE KEY code3 (iso3),
-  UNIQUE KEY country (country)
-)
-  ENGINE = MyISAM
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC;
-
-
 DROP TABLE IF EXISTS dnzb_failures;
 CREATE TABLE dnzb_failures (
   release_id   INT(11) UNSIGNED  NOT NULL,
-  users_id      INT(11) UNSIGNED  NOT NULL,
+  users_id      INT(16) UNSIGNED  NOT NULL,
   failed      INT UNSIGNED      NOT NULL DEFAULT '0',
-  PRIMARY KEY (release_id, users_id)
+  PRIMARY KEY (release_id, users_id),
+  CONSTRAINT FK_users_df FOREIGN KEY (users_id)
+  REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC;
-
-DROP TABLE IF EXISTS forumpost;
-CREATE TABLE forumpost (
-  id          INT(11) UNSIGNED    NOT NULL AUTO_INCREMENT,
-  forumid     INT(11)             NOT NULL DEFAULT '1',
-  parentid    INT(11)             NOT NULL DEFAULT '0',
-  users_id INT(11) UNSIGNED    NOT NULL,
-  subject     VARCHAR(255)        NOT NULL,
-  message     TEXT                NOT NULL,
-  locked      TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  sticky      TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  replies     INT(11) UNSIGNED    NOT NULL DEFAULT '0',
-  created_at DATETIME            NOT NULL,
-  updated_at DATETIME            NOT NULL,
-  PRIMARY KEY (id),
-  KEY parentid    (parentid),
-  KEY userid      (users_id),
-  KEY created_at (created_at),
-  KEY updated_at (updated_at)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1;
-
 
 DROP TABLE IF EXISTS gamesinfo;
 CREATE TABLE gamesinfo (
@@ -366,61 +374,21 @@ CREATE TABLE gamesinfo (
   INDEX         ix_title (title),
   FULLTEXT INDEX ix_title_ft (title)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 1;
-
-
-DROP TABLE IF EXISTS genres;
-CREATE TABLE genres (
-  id       INT(11)      NOT NULL AUTO_INCREMENT,
-  title    VARCHAR(255) NOT NULL,
-  type     INT(4) DEFAULT NULL,
-  disabled TINYINT(1)   NOT NULL DEFAULT '0',
-  PRIMARY KEY (id)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
-
-
-DROP TABLE IF EXISTS groups;
-CREATE TABLE groups (
-  id                    INT(11)         NOT NULL AUTO_INCREMENT,
-  name                  VARCHAR(255)    NOT NULL DEFAULT '',
-  backfill_target       INT(4)          NOT NULL DEFAULT '1',
-  first_record          BIGINT UNSIGNED NOT NULL DEFAULT '0',
-  first_record_postdate DATETIME                 DEFAULT NULL,
-  last_record           BIGINT UNSIGNED NOT NULL DEFAULT '0',
-  last_record_postdate  DATETIME                 DEFAULT NULL,
-  last_updated          DATETIME                 DEFAULT NULL,
-  minfilestoformrelease INT(4)          NULL,
-  minsizetoformrelease  BIGINT          NULL,
-  active                TINYINT(1)      NOT NULL DEFAULT '0',
-  backfill              TINYINT(1)      NOT NULL DEFAULT '0',
-  description           VARCHAR(255)    NULL     DEFAULT '',
-  PRIMARY KEY (id),
-  KEY active                  (active),
-  UNIQUE INDEX ix_groups_name (name)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
-
 
 DROP TABLE IF EXISTS invitations;
 CREATE TABLE invitations (
   id          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   guid        VARCHAR(50)      NOT NULL,
-  users_id INT(11) UNSIGNED NOT NULL,
+  users_id INT(16) UNSIGNED NOT NULL,
   created_at DATETIME         NOT NULL,
   updated_at DATETIME NOT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT FK_users_inv FOREIGN KEY (users_id)
+  REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -442,26 +410,6 @@ CREATE TABLE logging (
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
-
-
-DROP TABLE IF EXISTS menu;
-CREATE TABLE menu (
-  id        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  href      VARCHAR(2000)    NOT NULL DEFAULT '',
-  title     VARCHAR(2000)    NOT NULL DEFAULT '',
-  newwindow INT(1) UNSIGNED  NOT NULL DEFAULT '0',
-  tooltip   VARCHAR(2000)    NOT NULL DEFAULT '',
-  role      INT(11) UNSIGNED NOT NULL,
-  ordinal   INT(11) UNSIGNED NOT NULL,
-  menueval  VARCHAR(2000)    NOT NULL DEFAULT '',
-  PRIMARY KEY (id),
-  INDEX ix_role_ordinal (role, ordinal)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
 
 
 DROP TABLE IF EXISTS missed_parts;
@@ -491,6 +439,7 @@ CREATE TABLE movieinfo (
   title       VARCHAR(255)                   NOT NULL DEFAULT '',
   tagline     VARCHAR(1024)                  NOT NULL DEFAULT '',
   rating      VARCHAR(4)                     NOT NULL DEFAULT '',
+  rtrating    VARCHAR(10)                    NOT NULL DEFAULT '' COMMENT 'RottenTomatoes rating score',
   plot        VARCHAR(1024)                  NOT NULL DEFAULT '',
   year        VARCHAR(4)                     NOT NULL DEFAULT '',
   genre       VARCHAR(64)                    NOT NULL DEFAULT '',
@@ -587,31 +536,9 @@ CREATE TABLE multigroup_posters (
   AUTO_INCREMENT  = 1;
 
 
-DROP TABLE IF EXISTS content;
-CREATE TABLE content (
-  id              INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  title           VARCHAR(255)    NOT NULL,
-  url             VARCHAR(2000)   NULL,
-  body            TEXT            NULL,
-  metadescription VARCHAR(1000)   NOT NULL,
-  metakeywords    VARCHAR(1000)   NOT NULL,
-  contenttype     INT             NOT NULL,
-  showinmenu      INT             NOT NULL,
-  status          INT             NOT NULL,
-  ordinal         INT             NULL,
-  role            INT             NOT NULL DEFAULT '0',
-  INDEX ix_showinmenu_status_contenttype_role (showinmenu, status, contenttype, role)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1000001;
-
-
 DROP TABLE IF EXISTS par_hashes;
 CREATE TABLE par_hashes (
-  releases_id INT(11) NOT NULL COMMENT 'FK to releases.id',
+  releases_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to releases.id',
   hash VARCHAR(32) NOT NULL COMMENT 'hash_16k block of par2',
   PRIMARY KEY (releases_id, hash)
 )
@@ -622,12 +549,14 @@ CREATE TABLE par_hashes (
 
 DROP TABLE IF EXISTS parts;
 CREATE TABLE parts (
-  binaries_id      BIGINT(20) UNSIGNED                      NOT NULL DEFAULT '0',
+  binaries_id      BIGINT(20) UNSIGNED                   NOT NULL DEFAULT '0',
   messageid     VARCHAR(255)        CHARACTER SET latin1 NOT NULL DEFAULT '',
   number        BIGINT UNSIGNED                          NOT NULL DEFAULT '0',
   partnumber    MEDIUMINT UNSIGNED                       NOT NULL DEFAULT '0',
   size          MEDIUMINT UNSIGNED                       NOT NULL DEFAULT '0',
-  PRIMARY KEY (binaries_id,number)
+  PRIMARY KEY (binaries_id,number),
+  CONSTRAINT FK_binaries FOREIGN KEY (binaries_id)
+  REFERENCES binaries(id) ON DELETE CASCADE ON UPDATE CASCADE
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -715,100 +644,6 @@ CREATE TABLE predb_imports (
   ROW_FORMAT      = DYNAMIC;
 
 
-DROP TABLE IF EXISTS releases;
-CREATE TABLE         releases (
-  id                INT(11) UNSIGNED               NOT NULL AUTO_INCREMENT,
-  name              VARCHAR(255)                   NOT NULL DEFAULT '',
-  searchname        VARCHAR(255)                   NOT NULL DEFAULT '',
-  totalpart         INT                            DEFAULT '0',
-  groups_id         INT(11) UNSIGNED               NOT NULL DEFAULT '0' COMMENT 'FK to groups.id',
-  size              BIGINT UNSIGNED                NOT NULL DEFAULT '0',
-  postdate          DATETIME                       DEFAULT NULL,
-  adddate           DATETIME                       DEFAULT NULL,
-  updatetime        TIMESTAMP                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  gid               VARCHAR(32)                    NULL,
-  guid              VARCHAR(40)                    NOT NULL,
-  leftguid          CHAR(1)                        NOT NULL COMMENT 'The first letter of the release guid',
-  fromname          VARCHAR(255)                   NULL,
-  completion        FLOAT                          NOT NULL DEFAULT '0',
-  categories_id     INT                            NOT NULL DEFAULT '0010',
-  videos_id         MEDIUMINT(11) UNSIGNED         NOT NULL DEFAULT '0' COMMENT 'FK to videos.id of the parent series.',
-  tv_episodes_id    MEDIUMINT(11) SIGNED           NOT NULL DEFAULT '0' COMMENT 'FK to tv_episodes.id for the episode.',
-  imdbid            MEDIUMINT(7) UNSIGNED ZEROFILL NULL,
-  xxxinfo_id        INT SIGNED                     NOT NULL DEFAULT '0',
-  musicinfo_id      INT(11) SIGNED               NULL COMMENT 'FK to musicinfo.id',
-  consoleinfo_id    INT(11) SIGNED               NULL COMMENT 'FK to consoleinfo.id',
-  gamesinfo_id      INT SIGNED                     NOT NULL DEFAULT '0',
-  bookinfo_id       INT(11) SIGNED               NULL COMMENT 'FK to bookinfo.id',
-  anidbid           INT                            NULL COMMENT 'FK to anidb_titles.anidbid',
-  predb_id          INT(11) UNSIGNED               NOT NULL DEFAULT '0' COMMENT 'FK to predb.id',
-  grabs             INT UNSIGNED                   NOT NULL DEFAULT '0',
-  comments          INT                            NOT NULL DEFAULT '0',
-  passwordstatus    TINYINT                        NOT NULL DEFAULT '0',
-  rarinnerfilecount INT                            NOT NULL DEFAULT '0',
-  haspreview        TINYINT                        NOT NULL DEFAULT '0',
-  nfostatus         TINYINT                        NOT NULL DEFAULT '0',
-  jpgstatus         TINYINT(1)                     NOT NULL DEFAULT '0',
-  videostatus       TINYINT(1)                     NOT NULL DEFAULT '0',
-  audiostatus       TINYINT(1)                     NOT NULL DEFAULT '0',
-  dehashstatus      TINYINT(1)                     NOT NULL DEFAULT '0',
-  reqidstatus       TINYINT(1)                     NOT NULL DEFAULT '0',
-  nzb_guid          BINARY(16)                     NULL,
-  nzbstatus         TINYINT(1)                     NOT NULL DEFAULT '0',
-  iscategorized     TINYINT(1)                     NOT NULL DEFAULT '0',
-  isrenamed         TINYINT(1)                     NOT NULL DEFAULT '0',
-  ishashed          TINYINT(1)                     NOT NULL DEFAULT '0',
-  isrequestid       TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_pp           TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_sorter       TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_par2         TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_nfo          TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_files        TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_uid          TINYINT(1)                     NOT NULL DEFAULT '0',
-  proc_srr          TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been srr
-processed',
-  proc_hash16k      TINYINT(1)                     NOT NULL DEFAULT '0' COMMENT 'Has the release been hash16k
-processed',
-  PRIMARY KEY                                 (id, categories_id),
-  INDEX ix_releases_name                      (name),
-  INDEX ix_releases_groupsid                  (groups_id,passwordstatus),
-  INDEX ix_releases_postdate_searchname       (postdate,searchname),
-  INDEX ix_releases_guid                      (guid),
-  INDEX ix_releases_leftguid                  (leftguid ASC, predb_id),
-  INDEX ix_releases_nzb_guid                  (nzb_guid),
-  INDEX ix_releases_videos_id                 (videos_id),
-  INDEX ix_releases_tv_episodes_id            (tv_episodes_id),
-  INDEX ix_releases_imdbid                    (imdbid),
-  INDEX ix_releases_xxxinfo_id                (xxxinfo_id),
-  INDEX ix_releases_musicinfo_id              (musicinfo_id,passwordstatus),
-  INDEX ix_releases_consoleinfo_id            (consoleinfo_id),
-  INDEX ix_releases_gamesinfo_id              (gamesinfo_id),
-  INDEX ix_releases_bookinfo_id               (bookinfo_id),
-  INDEX ix_releases_anidbid                   (anidbid),
-  INDEX ix_releases_predb_id_searchname       (predb_id,searchname),
-  INDEX ix_releases_haspreview_passwordstatus (haspreview,passwordstatus),
-  INDEX ix_releases_passwordstatus            (passwordstatus),
-  INDEX ix_releases_nfostatus                 (nfostatus,size),
-  INDEX ix_releases_dehashstatus              (dehashstatus,ishashed),
-  INDEX ix_releases_reqidstatus               (adddate,reqidstatus,isrequestid)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1
-  PARTITION BY RANGE (categories_id) (
-    PARTITION misc    VALUES LESS THAN (1000),
-    PARTITION console VALUES LESS THAN (2000),
-    PARTITION movies  VALUES LESS THAN (3000),
-    PARTITION audio   VALUES LESS THAN (4000),
-    PARTITION pc      VALUES LESS THAN (5000),
-    PARTITION tv      VALUES LESS THAN (6000),
-    PARTITION xxx     VALUES LESS THAN (7000),
-    PARTITION books   VALUES LESS THAN (8000)
-  );
-
-
 DROP TABLE IF EXISTS release_comments;
 CREATE TABLE release_comments (
   id          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -820,7 +655,7 @@ CREATE TABLE release_comments (
   cid         VARCHAR(32)      NULL,
   text_hash   VARCHAR(32)      NOT NULL DEFAULT '',
   username    VARCHAR(255)     NOT NULL DEFAULT '',
-  users_id     INT(11) UNSIGNED NOT NULL,
+  users_id     INT(16) UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL,
   updated_at DATETIME NOT NULL,
   host        VARCHAR(15)      NULL,
@@ -872,7 +707,7 @@ CREATE TABLE release_unique (
   uniqueid BINARY(16)  NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0' COMMENT 'Unique_ID from mediainfo.',
   PRIMARY KEY (releases_id, uniqueid)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -906,27 +741,6 @@ CREATE TABLE release_files (
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC;
 
-
-DROP TABLE IF EXISTS release_naming_regexes;
-CREATE TABLE release_naming_regexes (
-  id          INT UNSIGNED        NOT NULL AUTO_INCREMENT,
-  group_regex VARCHAR(255)        NOT NULL DEFAULT ''  COMMENT 'This is a regex to match against usenet groups',
-  regex       VARCHAR(5000)       CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT ''  COMMENT 'Regex used for extracting name from subject',
-  status      TINYINT(1) UNSIGNED NOT NULL DEFAULT '1' COMMENT '1=ON 0=OFF',
-  description VARCHAR(1000)       CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT ''  COMMENT 'Optional extra details on this regex',
-  ordinal     INT SIGNED          NOT NULL DEFAULT '0' COMMENT 'Order to run the regex in',
-  PRIMARY KEY (id),
-  INDEX ix_release_naming_regexes_group_regex (group_regex),
-  INDEX ix_release_naming_regexes_status      (status),
-  INDEX ix_release_naming_regexes_ordinal     (ordinal)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 100000;
-
-
 DROP TABLE IF EXISTS release_nfos;
 CREATE TABLE release_nfos (
   releases_id INT(11) UNSIGNED NOT NULL COMMENT 'FK to releases.id',
@@ -936,7 +750,7 @@ CREATE TABLE release_nfos (
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC;
+  ROW_FORMAT      = COMPRESSED;
 
 
 DROP TABLE IF EXISTS release_search_data;
@@ -975,23 +789,6 @@ CREATE TABLE release_subtitles (
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
-
-
-DROP TABLE IF EXISTS settings;
-CREATE TABLE settings (
-  section    VARCHAR(25)   NOT NULL DEFAULT '',
-  subsection VARCHAR(25)   NOT NULL DEFAULT '',
-  name       VARCHAR(25)   NOT NULL DEFAULT '',
-  value      VARCHAR(1000) NOT NULL DEFAULT '',
-  hint       TEXT          NOT NULL,
-  setting    VARCHAR(64)   NOT NULL DEFAULT '',
-  PRIMARY KEY (section, subsection, name),
-  UNIQUE KEY ui_settings_setting (setting)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC;
 
 
 DROP TABLE IF EXISTS sharing;
@@ -1051,27 +848,6 @@ CREATE TABLE short_groups (
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
 
-DROP TABLE IF EXISTS spotnabsources;
-CREATE TABLE spotnabsources
-(
-  id BIGINT(20) unsigned PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  username VARCHAR(64) DEFAULT 'nntp' NOT NULL,
-  useremail VARCHAR(128) DEFAULT 'spot@nntp.com' NOT NULL,
-  usenetgroup VARCHAR(64) DEFAULT 'alt.binaries.backup' NOT NULL,
-  publickey VARCHAR(512) NOT NULL,
-  active TINYINT(1) DEFAULT '0' NOT NULL,
-  description VARCHAR(255) DEFAULT '',
-  lastupdate DATETIME,
-  lastbroadcast DATETIME,
-  lastarticle BIGINT(20) unsigned DEFAULT '0' NOT NULL,
-  dateadded DATETIME
-)
-  ENGINE = MyISAM
-  DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci
-  AUTO_INCREMENT = 1;
-CREATE UNIQUE INDEX spotnabsources_ix1 ON spotnabsources (username, useremail, usenetgroup);
-
 DROP TABLE IF EXISTS steam_apps;
 CREATE TABLE steam_apps (
   name         VARCHAR(255)        NOT NULL DEFAULT '' COMMENT 'Steam application name',
@@ -1083,21 +859,6 @@ CREATE TABLE steam_apps (
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC;
-
-DROP TABLE IF EXISTS tmux;
-CREATE TABLE tmux (
-  id          INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  setting     VARCHAR(64)      NOT NULL,
-  value       VARCHAR(19000)            DEFAULT NULL,
-  updated_at TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (id),
-  UNIQUE INDEX ix_tmux_setting (setting)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1;
 
 DROP TABLE IF EXISTS tv_episodes;
 CREATE TABLE tv_episodes (
@@ -1112,7 +873,7 @@ CREATE TABLE tv_episodes (
   PRIMARY KEY (id),
   UNIQUE KEY (videos_id, series, episode, firstaired)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT  = 1;
@@ -1127,7 +888,7 @@ CREATE TABLE tv_info (
   PRIMARY KEY          (videos_id),
   KEY ix_tv_info_image (image)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
@@ -1148,65 +909,16 @@ CREATE TABLE upcoming_releases (
   AUTO_INCREMENT  = 1;
 
 
-DROP TABLE IF EXISTS users;
-CREATE TABLE users (
-  id             INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
-  username       VARCHAR(50)      NOT NULL,
-  firstname      VARCHAR(255)              DEFAULT NULL,
-  lastname       VARCHAR(255)              DEFAULT NULL,
-  email          VARCHAR(255)     NOT NULL,
-  password       VARCHAR(255)     NOT NULL,
-  user_roles_id  INT              NOT NULL DEFAULT '1' COMMENT 'FK to user_roles.id',
-  host           VARCHAR(40)      NULL,
-  grabs          INT              NOT NULL DEFAULT '0',
-  rsstoken       VARCHAR(64)      NOT NULL,
-  created_at    DATETIME         NOT NULL,
-  updated_at    DATETIME         NOT NULL,
-  resetguid      VARCHAR(50)      NULL,
-  lastlogin      DATETIME                  DEFAULT NULL,
-  apiaccess      DATETIME                  DEFAULT NULL,
-  invites        INT              NOT NULL DEFAULT '0',
-  invitedby      INT              NULL,
-  movieview      INT              NOT NULL DEFAULT '1',
-  xxxview        INT              NOT NULL DEFAULT '1',
-  musicview      INT              NOT NULL DEFAULT '1',
-  consoleview    INT              NOT NULL DEFAULT '1',
-  bookview       INT              NOT NULL DEFAULT '1',
-  gameview       INT              NOT NULL DEFAULT 1,
-  saburl         VARCHAR(255)     NULL     DEFAULT NULL,
-  sabapikey      VARCHAR(255)     NULL     DEFAULT NULL,
-  sabapikeytype  TINYINT(1)       NULL     DEFAULT NULL,
-  sabpriority    TINYINT(1)       NULL     DEFAULT NULL,
-  queuetype      TINYINT(1)       NOT NULL DEFAULT '1' COMMENT 'Type of queue, Sab or NZBGet',
-  nzbgeturl      VARCHAR(255)     NULL     DEFAULT NULL,
-  nzbgetusername VARCHAR(255)     NULL     DEFAULT NULL,
-  nzbgetpassword VARCHAR(255)     NULL     DEFAULT NULL,
-  nzbvortex_api_key VARCHAR(10)   NULL     DEFAULT NULL ,
-  nzbvortex_server_url VARCHAR(255) NULL   DEFAULT NULL,
-  userseed       VARCHAR(50)      NOT NULL,
-  notes          VARCHAR(255)     NOT NULL,
-  cp_url         VARCHAR(255)     NULL     DEFAULT NULL,
-  cp_api         VARCHAR(255)     NULL     DEFAULT NULL,
-  style          VARCHAR(255)     NULL     DEFAULT NULL,
-  rolechangedate DATETIME         NULL     DEFAULT NULL COMMENT 'When does the role expire',
-  PRIMARY KEY (id),
-  INDEX ix_user_roles (user_roles_id)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 1;
-
-
 DROP TABLE IF EXISTS users_releases;
 CREATE TABLE users_releases (
   id          INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
   users_id INT(16) UNSIGNED    NOT NULL,
-  releases_id   INT              NOT NULL COMMENT 'FK to releases.id',
+  releases_id   INT(11) UNSIGNED              NOT NULL COMMENT 'FK to releases.id',
   created_at DATETIME         NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
+  CONSTRAINT FK_users_ur FOREIGN KEY (users_id)
+  REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_usercart_userrelease (users_id, releases_id)
 )
   ENGINE          = InnoDB
@@ -1222,8 +934,10 @@ CREATE TABLE user_downloads (
   users_id    INT(16) UNSIGNED  NOT NULL,
   hosthash    VARCHAR(50)       NOT NULL DEFAULT '',
   timestamp   DATETIME          NOT NULL,
-  releases_id INT(11)           NOT NULL COMMENT 'FK to releases.id',
+  releases_id INT(11) UNSIGNED           NOT NULL COMMENT 'FK to releases.id',
   PRIMARY KEY (id),
+  CONSTRAINT FK_users_ud FOREIGN KEY (users_id)
+  REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   KEY userid    (users_id),
   KEY timestamp (timestamp)
 )
@@ -1242,6 +956,8 @@ CREATE TABLE user_excluded_categories (
   created_at DATETIME         NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
+  CONSTRAINT FK_users_uec FOREIGN KEY (users_id)
+  REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE INDEX ix_userexcat_usercat (users_id, categories_id)
 )
   ENGINE          = InnoDB
@@ -1261,7 +977,7 @@ CREATE TABLE role_excluded_categories
     PRIMARY KEY (id),
     UNIQUE INDEX ix_roleexcat_rolecat (user_roles_id, categories_id)
 )
-    ENGINE = MyISAM
+    ENGINE = InnoDB
     DEFAULT CHARSET = utf8
     COLLATE = utf8_unicode_ci
     AUTO_INCREMENT = 1;
@@ -1275,6 +991,8 @@ CREATE TABLE user_movies (
   created_at DATETIME                       NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
+  CONSTRAINT FK_users_um FOREIGN KEY (users_id)
+  REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   INDEX ix_usermovies_userid (users_id, imdbid)
 )
   ENGINE          = InnoDB
@@ -1292,6 +1010,8 @@ CREATE TABLE user_requests (
   request   VARCHAR(255)     NOT NULL,
   timestamp DATETIME         NOT NULL,
   PRIMARY KEY (id),
+  CONSTRAINT FK_users_urq FOREIGN KEY (users_id)
+  REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   KEY userid    (users_id),
   KEY timestamp (timestamp)
 )
@@ -1300,25 +1020,6 @@ CREATE TABLE user_requests (
   COLLATE         = utf8_unicode_ci
   ROW_FORMAT      = DYNAMIC
   AUTO_INCREMENT  = 1;
-
-
-DROP TABLE IF EXISTS user_roles;
-CREATE TABLE user_roles (
-  id               INT(10)             NOT NULL AUTO_INCREMENT,
-  name             VARCHAR(32)         NOT NULL,
-  apirequests      INT(10) UNSIGNED    NOT NULL,
-  downloadrequests INT(10) UNSIGNED    NOT NULL,
-  defaultinvites   INT(10) UNSIGNED    NOT NULL,
-  isdefault        TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  canpreview       TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  hideads          TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  PRIMARY KEY (id)
-)
-  ENGINE          = InnoDB
-  DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
-  AUTO_INCREMENT  = 4;
 
 
 DROP TABLE IF EXISTS user_series;
@@ -1330,6 +1031,8 @@ CREATE TABLE user_series (
   created_at DATETIME         NOT NULL,
   updated_at DATETIME NOT NULL,
   PRIMARY KEY (id),
+  CONSTRAINT FK_users_us FOREIGN KEY (users_id)
+  REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
   INDEX ix_userseries_videos_id (users_id, videos_id)
 )
   ENGINE          = InnoDB
@@ -1385,7 +1088,7 @@ CREATE TABLE videos (
   KEY            ix_videos_tvrage (tvrage),
   KEY            ix_videos_type_source (type, source)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT = 10000000;
@@ -1396,7 +1099,7 @@ CREATE TABLE videos_aliases (
   title VARCHAR(180) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'AKA of the video.',
   PRIMARY KEY (videos_id, title)
 )
-  ENGINE = MyISAM
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
   AUTO_INCREMENT  = 10000000;
@@ -1425,17 +1128,67 @@ CREATE TABLE         xxxinfo (
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
-  ROW_FORMAT      = DYNAMIC
+  ROW_FORMAT      = COMPRESSED
   AUTO_INCREMENT  = 1;
 
 DROP TABLE IF EXISTS multigroup_binaries;
-CREATE TABLE multigroup_binaries LIKE binaries;
+CREATE TABLE multigroup_binaries (
+  id            BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  name          VARCHAR(1000)       NOT NULL DEFAULT '',
+  collections_id INT(11) UNSIGNED    NOT NULL DEFAULT 0,
+  filenumber    INT UNSIGNED        NOT NULL DEFAULT '0',
+  totalparts    INT(11) UNSIGNED    NOT NULL DEFAULT 0,
+  currentparts  INT UNSIGNED        NOT NULL DEFAULT 0,
+  binaryhash    BINARY(16)          NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
+  partcheck     TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+  partsize      BIGINT UNSIGNED     NOT NULL DEFAULT 0,
+  PRIMARY KEY (id),
+  CONSTRAINT FK_MGR_Collections FOREIGN KEY (collections_id)
+  REFERENCES multigroup_collections(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  UNIQUE INDEX ix_binaries_binaryhash (binaryhash),
+  INDEX ix_binaries_partcheck  (partcheck),
+  INDEX ix_binaries_collection (collections_id)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1;
 
 DROP TABLE IF EXISTS multigroup_parts;
-CREATE TABLE multigroup_parts LIKE parts;
+CREATE TABLE multigroup_parts (
+  binaries_id      BIGINT(20) UNSIGNED                      NOT NULL DEFAULT '0',
+  messageid     VARCHAR(255)        CHARACTER SET latin1 NOT NULL DEFAULT '',
+  number        BIGINT UNSIGNED                          NOT NULL DEFAULT '0',
+  partnumber    MEDIUMINT UNSIGNED                       NOT NULL DEFAULT '0',
+  size          MEDIUMINT UNSIGNED                       NOT NULL DEFAULT '0',
+  PRIMARY KEY (binaries_id,number),
+  CONSTRAINT FK_MGR_binaries FOREIGN KEY (binaries_id)
+  REFERENCES multigroup_binaries(id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1;
 
 DROP TABLE IF EXISTS multigroup_missed_parts;
-CREATE TABLE multigroup_missed_parts LIKE missed_parts;
+CREATE TABLE multigroup_missed_parts (
+  id       INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
+  numberid BIGINT UNSIGNED  NOT NULL,
+  groups_id INT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to groups.id',
+  attempts TINYINT(1)       NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  INDEX ix_missed_parts_attempts                  (attempts),
+  INDEX ix_missed_parts_groupid_attempts          (groups_id, attempts),
+  INDEX ix_missed_parts_numberid_groupsid_attempts (numberid, groups_id, attempts),
+  UNIQUE INDEX ix_missed_parts_numberid_groupsid          (numberid, groups_id)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  ROW_FORMAT      = DYNAMIC
+  AUTO_INCREMENT  = 1;
 
 
 DELIMITER $$
@@ -1443,8 +1196,6 @@ CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW
   BEGIN
     IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}'
       THEN SET NEW.ishashed = 1;
-    ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\s?\\['
-      THEN SET NEW.isrequestid = 1;
     END IF;
   END; $$
 
@@ -1452,8 +1203,6 @@ CREATE TRIGGER check_update BEFORE UPDATE ON releases FOR EACH ROW
   BEGIN
     IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}'
       THEN SET NEW.ishashed = 1;
-    ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\s?\\['
-      THEN SET NEW.isrequestid = 1;
     END IF;
   END; $$
 
@@ -1559,34 +1308,14 @@ CREATE PROCEDURE delete_release(IN is_numeric BOOLEAN, IN identifier VARCHAR(40)
 
     IF is_numeric IS TRUE
     THEN
-      DELETE r, rn, rc, uc, rf, ra, rs, rv, re, df, rg
+      DELETE r
       FROM releases r
-        LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-        LEFT OUTER JOIN release_comments rc ON rc.releases_id = r.id
-        LEFT OUTER JOIN users_releases uc ON uc.releases_id = r.id
-        LEFT OUTER JOIN release_files rf ON rf.releases_id = r.id
-        LEFT OUTER JOIN audio_data ra ON ra.releases_id = r.id
-        LEFT OUTER JOIN release_subtitles rs ON rs.releases_id = r.id
-        LEFT OUTER JOIN video_data rv ON rv.releases_id = r.id
-        LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
-        LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-        LEFT OUTER JOIN releases_groups rg ON rg.releases_id = r.id
       WHERE r.id = identifier;
 
     ELSEIF is_numeric IS FALSE
     THEN
-      DELETE r, rn, rc, uc, rf, ra, rs, rv, re, df, rg
+      DELETE r
       FROM releases r
-        LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-        LEFT OUTER JOIN release_comments rc ON rc.releases_id = r.id
-        LEFT OUTER JOIN users_releases uc ON uc.releases_id = r.id
-        LEFT OUTER JOIN release_files rf ON rf.releases_id = r.id
-        LEFT OUTER JOIN audio_data ra ON ra.releases_id = r.id
-        LEFT OUTER JOIN release_subtitles rs ON rs.releases_id = r.id
-        LEFT OUTER JOIN video_data rv ON rv.releases_id = r.id
-        LEFT OUTER JOIN releaseextrafull re ON re.releases_id = r.id
-        LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-        LEFT OUTER JOIN releases_groups rg ON rg.releases_id = r.id
       WHERE r.guid = identifier;
 
     ELSE LEAVE main;

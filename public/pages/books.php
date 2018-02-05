@@ -1,18 +1,16 @@
 <?php
 
-if (! $page->users->isLoggedIn()) {
+use nntmux\Books;
+use App\Models\User;
+use App\Models\Category;
+
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-use nntmux\Books;
-use nntmux\Category;
-use nntmux\DnzbFailures;
-
 $book = new Books(['Settings' => $page->settings]);
-$cat = new Category(['Settings' => $page->settings]);
-$fail = new DnzbFailures();
 
-$boocats = $cat->getChildren(Category::BOOKS_ROOT);
+$boocats = Category::getChildren(Category::BOOKS_ROOT);
 $btmp = [];
 foreach ($boocats as $bcat) {
     $btmp[$bcat['id']] = $bcat;
@@ -67,7 +65,7 @@ $page->smarty->assign('pager', $pager);
 if ((int) $category === -1) {
     $page->smarty->assign('catname', 'All');
 } else {
-    $cdata = $cat->getById($category);
+    $cdata = Category::find($category);
     if ($cdata) {
         $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
     } else {

@@ -9,16 +9,13 @@ namespace nntmux;
 class NZBMultiGroup extends NZB
 {
     /**
-     * Default constructor.
-     *
-     *
-     * @param $pdo
+     * NZBMultiGroup constructor.
      *
      * @throws \Exception
      */
-    public function __construct(&$pdo)
+    public function __construct()
     {
-        parent::__construct($pdo);
+        parent::__construct();
     }
 
     /**

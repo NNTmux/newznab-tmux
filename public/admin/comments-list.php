@@ -1,16 +1,14 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+use App\Models\ReleaseComment;
 
-use nntmux\ReleaseComments;
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 $page = new AdminPage();
 
-$releases = new ReleaseComments($page->pdo);
-
 $page->title = 'Comments List';
 
-$commentcount = $releases->getCommentCount();
+$commentcount = ReleaseComment::getCommentCount();
 $offset = $_REQUEST['offset'] ?? 0;
 $page->smarty->assign([
         'pagertotalitems' => $commentcount,
@@ -21,7 +19,7 @@ $page->smarty->assign([
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$commentslist = $releases->getCommentsRange($offset, ITEMS_PER_PAGE);
+$commentslist = ReleaseComment::getCommentsRange($offset, ITEMS_PER_PAGE);
 $page->smarty->assign('commentslist', $commentslist);
 
 $page->content = $page->smarty->fetch('comments-list.tpl');

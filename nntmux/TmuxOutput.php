@@ -36,6 +36,8 @@ class TmuxOutput extends Tmux
      * TmuxOutput constructor.
      *
      * @param \nntmux\db\DB|null $pdo
+     *
+     * @throws \Exception
      */
     public function __construct(DB $pdo = null)
     {
@@ -56,7 +58,7 @@ class TmuxOutput extends Tmux
             $buffer .= $this->_getMonitor();
         }
 
-        if ($runVar['settings']['show_query'] == 1) {
+        if ((int) $runVar['settings']['show_query'] === 1) {
             $buffer .= $this->_getQueries();
         }
 
@@ -70,7 +72,7 @@ class TmuxOutput extends Tmux
         $buffer = sprintf($this->tmpMasks[3], 'Groups', 'Active', 'Backfill');
         $buffer .= $this->_getSeparator();
 
-        if ($this->runVar['settings']['backfilldays'] == '1') {
+        if ($this->runVar['settings']['backfilldays'] === '1') {
             $buffer .= sprintf(
                 $this->tmpMasks[4],
                 'Activated',
@@ -107,7 +109,7 @@ class TmuxOutput extends Tmux
 
     protected function _getFormatMasks($compressed)
     {
-        $index = ($compressed == 1 ? '2.1' : '2.0');
+        $index = ((int) $compressed === 1 ? '2.1' : '2.0');
 
         return [
             1 => &$this->_colourMasks[1],
@@ -121,7 +123,7 @@ class TmuxOutput extends Tmux
     protected function _getHeader()
     {
         $buffer = '';
-        $state = ($this->runVar['settings']['is_running'] == 1) ? 'Running' : 'Disabled';
+        $state = ((int) $this->runVar['settings']['is_running'] === 1) ? 'Running' : 'Disabled';
         $version = $this->_vers->versions->git->tag;
 
         $buffer .= sprintf(
@@ -200,7 +202,7 @@ class TmuxOutput extends Tmux
             number_format($this->runVar['counts']['now']['missed_parts_table'])
         );
 
-        if (($this->runVar['settings']['post'] == '1' || $this->runVar['settings']['post'] == '3') && $this->runVar['constants']['sequential'] != 2) {
+        if (((int) $this->runVar['settings']['post'] === 1 || (int) $this->runVar['settings']['post'] === 3) && (int) $this->runVar['constants']['sequential'] !== 2) {
             $buffer .= sprintf(
                 $this->tmpMasks[1],
                 'Postprocess:',
@@ -246,20 +248,6 @@ class TmuxOutput extends Tmux
                 '%s(%d%%)',
                 number_format($this->runVar['counts']['now']['predb_matched']),
                 $this->runVar['counts']['percent']['predb_matched']
-            )
-        );
-        $buffer .= sprintf(
-            $this->tmpMasks[4],
-            'RequestID',
-            sprintf(
-                '%s(%s)',
-                number_format($this->runVar['counts']['now']['requestid_inprogress']),
-                $this->runVar['counts']['diff']['requestid_inprogress']
-            ),
-            sprintf(
-                '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['requestid_matched']),
-                $this->runVar['counts']['percent']['requestid_matched']
             )
         );
         $buffer .= sprintf(
@@ -426,17 +414,17 @@ class TmuxOutput extends Tmux
         $monitor_path_a = $this->runVar['settings']['monitor_path_a'];
         $monitor_path_b = $this->runVar['settings']['monitor_path_b'];
 
-        if (((isset($monitor_path)) && (file_exists($monitor_path)))
-            || ((isset($monitor_path_a)) && (file_exists($monitor_path_a)))
-            || ((isset($monitor_path_b)) && (file_exists($monitor_path_b)))) {
+        if ((isset($monitor_path) && file_exists($monitor_path))
+            || (isset($monitor_path_a) && file_exists($monitor_path_a))
+            || (isset($monitor_path_b) && file_exists($monitor_path_b))) {
             $buffer .= "\n";
             $buffer .= sprintf($this->tmpMasks[3], 'File System', 'Used', 'Free');
             $buffer .= $this->_getSeparator();
 
-            if (isset($monitor_path) && $monitor_path != '' && file_exists($monitor_path)) {
+            if (isset($monitor_path) && $monitor_path !== '' && file_exists($monitor_path)) {
                 $disk_use = $this->decodeSize(disk_total_space($monitor_path) - disk_free_space($monitor_path));
                 $disk_free = $this->decodeSize(disk_free_space($monitor_path));
-                if (basename($monitor_path) == '') {
+                if (basename($monitor_path) === '') {
                     $show = '/';
                 } else {
                     $show = basename($monitor_path);
@@ -444,10 +432,10 @@ class TmuxOutput extends Tmux
                 $buffer .= sprintf($this->tmpMasks[4], $show, $disk_use, $disk_free);
             }
 
-            if (isset($monitor_path_a) && $monitor_path_a != '' && file_exists($monitor_path_a)) {
+            if (isset($monitor_path_a) && $monitor_path_a !== '' && file_exists($monitor_path_a)) {
                 $disk_use = $this->decodeSize(disk_total_space($monitor_path_a) - disk_free_space($monitor_path_a));
                 $disk_free = $this->decodeSize(disk_free_space($monitor_path_a));
-                if (basename($monitor_path_a) == '') {
+                if (basename($monitor_path_a) === '') {
                     $show = '/';
                 } else {
                     $show = basename($monitor_path_a);
@@ -455,10 +443,10 @@ class TmuxOutput extends Tmux
                 $buffer .= sprintf($this->tmpMasks[4], $show, $disk_use, $disk_free);
             }
 
-            if (isset($monitor_path_b) && $monitor_path_b != '' && file_exists($monitor_path_b)) {
+            if (isset($monitor_path_b) && $monitor_path_b !== '' && file_exists($monitor_path_b)) {
                 $disk_use = $this->decodeSize(disk_total_space($monitor_path_b) - disk_free_space($monitor_path_b));
                 $disk_free = $this->decodeSize(disk_free_space($monitor_path_b));
-                if (basename($monitor_path_b) == '') {
+                if (basename($monitor_path_b) === '') {
                     $show = '/';
                 } else {
                     $show = basename($monitor_path_b);

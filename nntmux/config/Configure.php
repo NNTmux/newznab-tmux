@@ -79,7 +79,7 @@ class Configure
         } else {
             $file = NN_CONFIGS.$filename.'.php';
         }
-        if (! file_exists($file) && $throwException) {
+        if ($throwException && ! file_exists($file)) {
             $errorCode = (int) ($filename === '.env');
             throw new \RuntimeException(
                 "Unable to load configuration file '$file'. Make sure it has been created and contains correct settings.",
@@ -99,8 +99,8 @@ class Configure
                 if (is_file($settings_file)) {
                     require_once $settings_file;
                     if (PHP_SAPI === 'cli') {
-                        $current_settings_file_version = 6; // Update this when updating settings.example.php
-                        if (! defined('NN_SETTINGS_FILE_VERSION') ||
+                        $current_settings_file_version = 7; // Update this when updating settings.example.php
+                        if (! \defined('NN_SETTINGS_FILE_VERSION') ||
                             NN_SETTINGS_FILE_VERSION !== $current_settings_file_version
                         ) {
                             echo "\033[0;31mNotice: Your $settings_file file is either out of date or you have not updated".
@@ -109,32 +109,22 @@ class Configure
                         }
                         unset($current_settings_file_version);
                     }
-                } elseif (! defined('ITEMS_PER_PAGE')) {
-                    define('ITEMS_PER_PAGE', '50');
-                    define('ITEMS_PER_COVER_PAGE', '20');
-                    define('NN_ECHOCLI', true);
-                    define('NN_DEBUG', false);
-                    define('NN_LOGGING', false);
-                    define('NN_LOGINFO', false);
-                    define('NN_LOGNOTICE', false);
-                    define('NN_LOGWARNING', false);
-                    define('NN_LOGERROR', false);
-                    define('NN_LOGFATAL', false);
-                    define('NN_LOGQUERIES', false);
-                    define('NN_LOGAUTOLOADER', false);
-                    define('NN_QUERY_STRIP_WHITESPACE', false);
-                    define('NN_RENAME_PAR2', true);
-                    define('NN_RENAME_MUSIC_MEDIAINFO', true);
-                    define('NN_CACHE_EXPIRY_SHORT', 300);
-                    define('NN_CACHE_EXPIRY_MEDIUM', 600);
-                    define('NN_CACHE_EXPIRY_LONG', 900);
-                    define('NN_PREINFO_OPEN', false);
-                    define('NN_FLOOD_CHECK', false);
-                    define('NN_FLOOD_WAIT_TIME', 5);
-                    define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
-                    define('NN_USE_SQL_TRANSACTIONS', true);
-                    define('NN_RELEASE_SEARCH_TYPE', 0);
-                    define('NN_MAX_PAGER_RESULTS', '125000');
+                } elseif (! \defined('ITEMS_PER_PAGE')) {
+                    \define('ITEMS_PER_PAGE', '50');
+                    \define('ITEMS_PER_COVER_PAGE', '20');
+                    \define('NN_ECHOCLI', true);
+                    \define('NN_QUERY_STRIP_WHITESPACE', false);
+                    \define('NN_RENAME_PAR2', true);
+                    \define('NN_RENAME_MUSIC_MEDIAINFO', true);
+                    \define('NN_CACHE_EXPIRY_SHORT', 300);
+                    \define('NN_CACHE_EXPIRY_MEDIUM', 600);
+                    \define('NN_CACHE_EXPIRY_LONG', 900);
+                    \define('NN_FLOOD_CHECK', false);
+                    \define('NN_FLOOD_WAIT_TIME', 5);
+                    \define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
+                    \define('NN_USE_SQL_TRANSACTIONS', true);
+                    \define('NN_RELEASE_SEARCH_TYPE', 0);
+                    \define('NN_MAX_PAGER_RESULTS', '125000');
                 }
                 unset($settings_file);
                 break;
@@ -144,12 +134,12 @@ class Configure
     private function defaultSSL()
     {
         // Check if they updated config.php for the openssl changes. Only check 1 to save speed.
-        if (! defined('NN_SSL_VERIFY_PEER')) {
-            define('NN_SSL_CAFILE', '');
-            define('NN_SSL_CAPATH', '');
-            define('NN_SSL_VERIFY_PEER', '0');
-            define('NN_SSL_VERIFY_HOST', '0');
-            define('NN_SSL_ALLOW_SELF_SIGNED', '1');
+        if (! \defined('NN_SSL_VERIFY_PEER')) {
+            \define('NN_SSL_CAFILE', '');
+            \define('NN_SSL_CAPATH', '');
+            \define('NN_SSL_VERIFY_PEER', '0');
+            \define('NN_SSL_VERIFY_HOST', '0');
+            \define('NN_SSL_ALLOW_SELF_SIGNED', '1');
         }
     }
 }

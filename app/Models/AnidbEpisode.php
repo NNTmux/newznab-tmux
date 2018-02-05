@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Yadakhov\InsertOnDuplicateKey;
 use Illuminate\Database\Eloquent\Model;
 
 class AnidbEpisode extends Model
 {
+    use InsertOnDuplicateKey;
+
     /**
      * @var bool
      */

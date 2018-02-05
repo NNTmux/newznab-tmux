@@ -1,7 +1,7 @@
 <?php
 
-use nntmux\Users;
-use nntmux\Category;
+use App\Models\User;
+use App\Models\Category;
 
 /**
  * All admin pages implement this class. Enforces admin role for requesting user.
@@ -26,12 +26,11 @@ class AdminPage extends BasePage
             ]
         );
 
-        if (! isset($this->userdata['user_roles_id']) || (int) $this->userdata['user_roles_id'] !== Users::ROLE_ADMIN || ! $this->users->isLoggedIn()) {
+        if (! isset($this->userdata['user_roles_id']) || (int) $this->userdata['user_roles_id'] !== User::ROLE_ADMIN || ! User::isLoggedIn()) {
             $this->show403(true);
         }
 
-        $category = new Category();
-        $this->smarty->assign('catClass', $category);
+        $this->smarty->assign('catClass', Category::class);
     }
 
     /**

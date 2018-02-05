@@ -16,3 +16,4 @@ finder:
       - "resources"
       - "database/migrations"
       - "database/seeds"
+      - "database/fixtures"

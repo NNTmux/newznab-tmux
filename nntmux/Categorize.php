@@ -2,6 +2,8 @@
 
 namespace nntmux;
 
+use App\Models\Group;
+use App\Models\Category;
 use App\Models\Settings;
 
 /**
@@ -40,7 +42,7 @@ class Categorize extends Category
     public $groupid;
 
     /**
-     * @var Regexes
+     * @var \nntmux\Regexes
      */
     public $regexes;
 
@@ -56,7 +58,7 @@ class Categorize extends Category
         parent::__construct($options);
         $this->categorizeForeign = (int) Settings::settingValue('indexer.categorise.categorizeforeign');
         $this->catWebDL = (int) Settings::settingValue('indexer.categorise.catwebdl');
-        $this->regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'category_regexes']);
+        $this->regexes = new Regexes(['Table_Name' => 'category_regexes']);
     }
 
     /**
@@ -64,11 +66,12 @@ class Categorize extends Category
      * Then work out which category is applicable for either a group or a binary.
      * Returns Category::OTHER_MISC if no category is appropriate.
      *
-     * @param string     $releaseName The name to parse.
-     * @param string     $poster Name of the release poster to parse
-     * @param int|string $groupID     The groups_id.
+     * @param string $releaseName The name to parse.
+     * @param string $poster Name of the release poster to parse
+     * @param int|string $groupID The groups_id.
      *
      * @return int The categories_id.
+     * @throws \Exception
      */
     public function determineCategory($groupID, $releaseName = '', $poster = ''): int
     {
@@ -109,8 +112,8 @@ class Categorize extends Category
     private function groupName(): string
     {
         if (! isset($this->groups[$this->groupid])) {
-            $group = $this->pdo->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE id = %d', $this->groupid));
-            $this->groups[$this->groupid] = ($group === false ? false : $group['name']);
+            $group = Group::query()->where('id', $this->groupid)->first(['name']);
+            $this->groups[$this->groupid] = ($group === null ? false : $group['name']);
         }
 
         return $this->groups[$this->groupid];
@@ -563,7 +566,9 @@ class Categorize extends Category
 
     /**
      * Try database regexes against a group / release name.
+     *
      * @return bool
+     * @throws \Exception
      */
     public function databaseRegex(): bool
     {

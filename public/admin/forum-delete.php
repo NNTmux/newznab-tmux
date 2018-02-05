@@ -1,14 +1,13 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+use App\Models\Forumpost;
 
-use nntmux\Forum;
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 $page = new AdminPage();
 
 if (isset($_GET['id'])) {
-    $forum = new Forum();
-    $forum->deletePost($_GET['id']);
+    Forumpost::deletePost($_GET['id']);
 }
 
 if (isset($_GET['from'])) {

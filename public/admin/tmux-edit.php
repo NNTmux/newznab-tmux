@@ -12,20 +12,20 @@ $id = 0;
 $action = $_REQUEST['action'] ?? 'view';
 
 switch ($action) {
-	case 'submit':
-		$error = '';
-		$ret = $tmux->update($_POST);
-		$page->title = 'Tmux Settings Edit';
-		$settings = $tmux->get();
-		$page->smarty->assign('ftmux', $settings);
-		break;
+    case 'submit':
+        $error = '';
+        $ret = $tmux->update($_POST);
+        $page->title = 'Tmux Settings Edit';
+        $settings = $tmux->get();
+        $page->smarty->assign('ftmux', $settings);
+        break;
 
-	case 'view':
-	default:
-		$page->title = 'Tmux Settings Edit';
-		$settings = $tmux->get();
-		$page->smarty->assign('ftmux', $settings);
-		break;
+    case 'view':
+    default:
+        $page->title = 'Tmux Settings Edit';
+        $settings = $tmux->get();
+        $page->smarty->assign('ftmux', $settings);
+        break;
 }
 
 $page->smarty->assign('yesno_ids', [1, 0]);
@@ -49,8 +49,8 @@ $page->smarty->assign('fix_crap_radio_ids', ['Disabled', 'All', 'Custom']);
 $page->smarty->assign('fix_crap_radio_names', ['Disabled', 'All', 'Custom']);
 $page->smarty->assign('fix_crap_check_ids', ['blacklist', 'blfiles', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size', 'huge', 'nzb', 'codec']);
 $page->smarty->assign('fix_crap_check_names', ['blacklist', 'blfiles', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size', 'huge', 'nzb', 'codec']);
-$page->smarty->assign('sequential_ids', [0, 1, 2]);
-$page->smarty->assign('sequential_names', ['Disabled', 'Basic Sequential', 'Complete Sequential']);
+$page->smarty->assign('sequential_ids', [0, 1]);
+$page->smarty->assign('sequential_names', ['Disabled', 'Enabled']);
 $page->smarty->assign('binaries_ids', [0, 1, 2]);
 $page->smarty->assign('binaries_names', ['Disabled', 'Simple Threaded Update', 'Complete Threaded Update']);
 $page->smarty->assign('lookup_reqids_ids', [0, 1, 2]);

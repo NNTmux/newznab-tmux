@@ -1,14 +1,14 @@
 <?php
 
-use App\Models\Settings;
+use App\Models\User;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 if (isset($_GET['action'], $_GET['emailto']) && (int) $_GET['action'] === 1) {
     $emailto = $_GET['emailto'];
-    $ret = $page->users->sendInvite(Settings::settingValue('site.main.title'), Settings::settingValue('site.main.email'), $page->serverurl, $page->users->currentUserId(), $emailto);
+    $ret = User::sendInvite($page->serverurl, User::currentUserId(), $emailto);
     if (! $ret) {
         echo 'Invite not sent.';
     } else {

@@ -2,19 +2,22 @@
 
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
+use App\Models\User;
 use App\Models\Settings;
-use nntmux\ReleaseComments;
+use App\Models\UserRequest;
+use App\Models\UserDownload;
+use App\Models\ReleaseComment;
+use App\Models\UserExcludedCategory;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$rc = new ReleaseComments;
 $sab = new SABnzbd($page);
 $nzbget = new NZBGet($page);
 
-$userID = $page->users->currentUserId();
-$privileged = $page->users->isAdmin($userID) || $page->users->isModerator($userID);
+$userID = User::currentUserId();
+$privileged = User::isAdmin($userID) || User::isModerator($userID);
 $privateProfiles = (int) Settings::settingValue('..privateprofiles') === 1;
 $publicView = false;
 
@@ -24,7 +27,7 @@ if ($privileged || ! $privateProfiles) {
 
     // If both 'id' and 'name' are specified, 'id' should take precedence.
     if ($altID === false && $altUsername !== false) {
-        $user = $page->users->getByUsername($altUsername);
+        $user = User::getByUsername($altUsername);
         if ($user) {
             $altID = $user['id'];
             $userID = $altID;
@@ -35,10 +38,10 @@ if ($privileged || ! $privateProfiles) {
     }
 }
 
-$downloadlist = $page->users->getDownloadRequestsForUser($userID);
+$downloadlist = UserDownload::getDownloadRequestsForUser($userID);
 $page->smarty->assign('downloadlist', $downloadlist);
 
-$data = $page->users->getById($userID);
+$data = User::find($userID);
 if (! $data) {
     $page->show404();
 }
@@ -51,14 +54,14 @@ if (! isset($data['style']) || $data['style'] === 'None') {
 $offset = $_REQUEST['offset'] ?? 0;
 $page->smarty->assign(
     [
-        'apirequests'       => $page->users->getApiRequests($userID),
-        'grabstoday'        => $page->users->getDownloadRequests($userID),
-        'userinvitedby'     => $data['invitedby'] !== '' ? $page->users->getById($data['invitedby']) : '',
+        'apirequests'       => UserRequest::getApiRequests($userID),
+        'grabstoday'        => UserDownload::getDownloadRequests($userID),
+        'userinvitedby'     => $data['invitedby'] !== '' ? User::find($data['invitedby']) : '',
         'user'              => $data,
         'privateprofiles'   => $privateProfiles,
         'publicview'        => $publicView,
         'privileged'        => $privileged,
-        'pagertotalitems'   => $rc->getCommentCountForUser($userID),
+        'pagertotalitems'   => ReleaseComment::getCommentCountForUser($userID),
         'pageroffset'       => $offset,
         'pageritemsperpage' => ITEMS_PER_PAGE,
         'pagerquerybase'    => '/profile?id='.$userID.'&offset=',
@@ -80,8 +83,8 @@ $sabSettings = [1 => 'Site', 2 => 'Cookie'];
 $page->smarty->assign(
     [
         'pager'         => $page->smarty->fetch('pager.tpl'),
-        'commentslist'  => $rc->getCommentsForUserRange($userID, $offset, ITEMS_PER_PAGE),
-        'exccats'       => implode(',', $page->users->getCategoryExclusionNames($userID)),
+        'commentslist'  => ReleaseComment::getCommentsForUserRange($userID, $offset, ITEMS_PER_PAGE),
+        'exccats'       => implode(',', UserExcludedCategory::getCategoryExclusionNames($userID)),
         'saburl'        => $sab->url,
         'sabapikey'     => $sab->apikey,
         'sabapikeytype' => $sab->apikeytype !== '' ? $sabApiKeyTypes[$sab->apikeytype] : '',

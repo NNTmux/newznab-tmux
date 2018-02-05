@@ -2,19 +2,17 @@
 
 use nntmux\Games;
 use nntmux\Genres;
-use nntmux\Category;
-use nntmux\DnzbFailures;
+use App\Models\User;
+use App\Models\Category;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 
 $games = new Games(['Settings' => $page->settings]);
-$cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
-$fail = new DnzbFailures();
 
-$concats = $cat->getChildren(Category::PC_ROOT);
+$concats = Category::getChildren(Category::PC_ROOT);
 $ctmp = [];
 foreach ($concats as $ccat) {
     $ctmp[$ccat['id']] = $ccat;
@@ -83,10 +81,10 @@ $page->smarty->assign('pagerquerysuffix', '#results');
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-if ($category == -1) {
+if ((int) $category === -1) {
     $page->smarty->assign('catname', 'All');
 } else {
-    $cdata = $cat->getById($category);
+    $cdata = Category::find($category);
     if ($cdata) {
         $page->smarty->assign('catname', $cdata->parent !== null ? $cdata->parent->title.' > '.$cdata->title : $cdata->title);
     } else {

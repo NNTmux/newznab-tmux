@@ -22,6 +22,7 @@ namespace App\Models;
 
 use nntmux\utility\Utility;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -29,33 +30,35 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Settings extends Model
 {
-    const REGISTER_STATUS_OPEN = 0;
+    public const REGISTER_STATUS_OPEN = 0;
 
-    const REGISTER_STATUS_INVITE = 1;
+    public const REGISTER_STATUS_INVITE = 1;
 
-    const REGISTER_STATUS_CLOSED = 2;
+    public const REGISTER_STATUS_CLOSED = 2;
 
-    const REGISTER_STATUS_API_ONLY = 3;
+    public const ERR_BADUNRARPATH = -1;
 
-    const ERR_BADUNRARPATH = -1;
+    public const ERR_BADFFMPEGPATH = -2;
 
-    const ERR_BADFFMPEGPATH = -2;
+    public const ERR_BADMEDIAINFOPATH = -3;
 
-    const ERR_BADMEDIAINFOPATH = -3;
+    public const ERR_BADNZBPATH = -4;
 
-    const ERR_BADNZBPATH = -4;
+    public const ERR_DEEPNOUNRAR = -5;
 
-    const ERR_DEEPNOUNRAR = -5;
+    public const ERR_BADTMPUNRARPATH = -6;
 
-    const ERR_BADTMPUNRARPATH = -6;
+    public const ERR_BADNZBPATH_UNREADABLE = -7;
 
-    const ERR_BADNZBPATH_UNREADABLE = -7;
+    public const ERR_BADNZBPATH_UNSET = -8;
 
-    const ERR_BADNZBPATH_UNSET = -8;
+    public const ERR_BAD_COVERS_PATH = -9;
 
-    const ERR_BAD_COVERS_PATH = -9;
+    public const ERR_BAD_YYDECODER_PATH = -10;
 
-    const ERR_BAD_YYDECODER_PATH = -10;
+    public const ERR_BADLAMEPATH = -11;
+
+    public const ERR_SABCOMPLETEPATH = -12;
 
     /**
      * @var Command
@@ -89,7 +92,9 @@ class Settings extends Model
     /**
      * @var array
      */
-    protected $fillable = ['section', 'subsection', 'name', 'value', 'hint', 'setting'];
+    protected $guarded = [];
+
+    private $dbVersion;
 
     /**
      * Adapted from https://laravel.io/forum/01-15-2016-overriding-eloquent-attributes.
@@ -112,13 +117,11 @@ class Settings extends Model
     }
 
     /**
-     * @param Command $console
-     *
+     * @param $console
      * @return bool
      * @throws \Exception
-     * @throws \InvalidArgumentException
      */
-    public static function hasAllEntries($console)
+    public static function hasAllEntries($console): bool
     {
         $filepath = Utility::pathCombine(['db', 'schema', 'data', '10-settings.tsv'], NN_RES);
         if (! file_exists($filepath)) {
@@ -126,8 +129,7 @@ class Settings extends Model
         }
         $settings = file($filepath);
 
-        if (! is_array($settings)) {
-            var_dump($settings);
+        if (! \is_array($settings)) {
             throw new \InvalidArgumentException('Settings is not an array!');
         }
 
@@ -142,7 +144,7 @@ class Settings extends Model
             $result = true;
             foreach ($settings as $line) {
                 $message = '';
-                list($setting['section'], $setting['subsection'], $setting['name']) =
+                [$setting['section'], $setting['subsection'], $setting['name']] =
                     explode("\t", $line);
 
                 $value = self::settingValue(
@@ -177,14 +179,14 @@ class Settings extends Model
      * @return array
      * @throws \RuntimeException
      */
-    public static function toTree($excludeUnsectioned = true)
+    public static function toTree($excludeUnsectioned = true): array
     {
         $results = self::query()->get()->all();
 
         $tree = [];
-        if (is_array($results)) {
+        if (\is_array($results)) {
             foreach ($results as $result) {
-                if (! empty($result['section']) || ! $excludeUnsectioned) {
+                if (! $excludeUnsectioned || ! empty($result['section'])) {
                     $tree[$result['section']][$result['subsection']][$result['name']] =
                         ['value' => $result['value'], 'hint' => $result['hint']];
                 }
@@ -209,9 +211,9 @@ class Settings extends Model
      */
     public static function settingToArray($setting)
     {
-        if (! is_array($setting)) {
+        if (! \is_array($setting)) {
             $setting = self::dottedToArray($setting);
-        } elseif (count($setting) === 1) {
+        } elseif (\count($setting) === 1) {
             $setting = self::dottedToArray($setting[0]);
         }
 
@@ -255,9 +257,9 @@ class Settings extends Model
     protected static function dottedToArray($setting)
     {
         $result = [];
-        if (is_string($setting)) {
+        if (\is_string($setting)) {
             $array = explode('.', $setting);
-            $count = count($array);
+            $count = \count($array);
             if ($count > 3) {
                 return false;
             }
@@ -275,5 +277,44 @@ class Settings extends Model
         }
 
         return $result;
+    }
+
+    /**
+     * Returns the stored Db version string.
+     *
+     * @return string
+     */
+    public function getDbVersion(): string
+    {
+        return $this->dbVersion;
+    }
+
+    /**
+     * @param string $requiredVersion The minimum version to compare against
+     *
+     * @return bool|null       TRUE if Db version is greater than or eaqual to $requiredVersion,
+     * false if not, and null if the version isn't available to check against.
+     */
+    public function isDbVersionAtLeast($requiredVersion): ?bool
+    {
+        $this->fetchDbVersion();
+        if (empty($this->dbVersion)) {
+            return null;
+        }
+
+        return version_compare($requiredVersion, $this->dbVersion, '<=');
+    }
+
+    /**
+     * Performs the fetch from the Db server and stores the resulting Major.Minor.Version number.
+     */
+    private function fetchDbVersion()
+    {
+        $result = DB::select('SELECT VERSION() AS version');
+
+        if (! empty($result)) {
+            $dummy = explode('-', $result[0]->version, 2);
+            $this->dbVersion = $dummy[0];
+        }
     }
 }

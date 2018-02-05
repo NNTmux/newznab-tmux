@@ -1,10 +1,11 @@
 <?php
 
 use nntmux\Music;
+use App\Models\User;
 
 $music = new Music;
 
-if (! $page->users->isLoggedIn()) {
+if (! User::isLoggedIn()) {
     $page->show403();
 }
 

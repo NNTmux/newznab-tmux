@@ -3,8 +3,8 @@
 namespace nntmux\http;
 
 use nntmux\NZB;
-use nntmux\Category;
 use nntmux\Releases;
+use App\Models\Category;
 
 /**
  * Class RSS -- contains specific functions for RSS.
@@ -58,7 +58,7 @@ class RSS extends Capabilities
                     $userID
                 );
             } elseif ((int) $cat[0] !== -1) {
-                $catSearch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+                $catSearch = Category::getCategorySearch($cat);
             }
         }
 
