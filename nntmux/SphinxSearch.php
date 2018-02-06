@@ -83,7 +83,7 @@ class SphinxSearch
     }
 
     /**
-     * Escapes characters that are treated as special operators by the query language parser
+     * Escapes characters that are treated as special operators by the query language parser.
      *
      * @param string $string unescaped string
      *
@@ -92,7 +92,7 @@ class SphinxSearch
     public function escapeString($string): string
     {
         $from = ['\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '='];
-        $to   = ['\\\\', '\(', '\)', '\|', '\-', '\!', '\@', '\~', '\"', '\&', '\/', '\^', '\$', '\='];
+        $to = ['\\\\', '\(', '\)', '\|', '\-', '\!', '\@', '\~', '\"', '\&', '\/', '\^', '\$', '\='];
 
         return str_replace($from, $to, $string);
     }
