@@ -14,6 +14,8 @@ class SphinxSearch
 
     /**
      * Establish connection to SphinxQL.
+     *
+     * @throws \Exception
      */
     public function __construct()
     {
@@ -49,10 +51,10 @@ class SphinxSearch
                 sprintf(
                     'REPLACE INTO releases_rt (id, name, searchname, fromname, filename) VALUES (%d, %s, %s, %s, %s)',
                     $parameters['id'],
-                    $this->sphinxQL->escapeString($parameters['name']),
-                    $this->sphinxQL->escapeString($parameters['searchname']),
-                    $this->sphinxQL->escapeString($parameters['fromname']),
-                    empty($parameters['filename']) ? "''" : $this->sphinxQL->escapeString($parameters['filename'])
+                    $this->escapeString($parameters['name']),
+                    $this->escapeString($parameters['searchname']),
+                    $this->escapeString($parameters['fromname']),
+                    empty($parameters['filename']) ? "''" : $this->escapeString($parameters['filename'])
                 )
             );
         }
@@ -81,22 +83,16 @@ class SphinxSearch
     }
 
     /**
-     * @param $string
+     * Escapes characters that are treated as special operators by the query language parser
      *
-     * @return mixed
+     * @param string $string unescaped string
+     *
+     * @return string Escaped string.
      */
-    public static function escapeString($string)
+    public function escapeString($string): string
     {
-        $from = [
-            '\\', '(', ')', '|', '---', '--', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', "'",
-            "\x00", "\n", "\r", "\x1a",
-        ];
-        $to = [
-            '\\\\\\\\', '\\\\\\\\(', '\\\\\\\\)', '\\\\\\\\|', '-', '-', '\\\\\\\\-', '\\\\\\\\!',
-            '\\\\\\\\@', '\\\\\\\\~',
-            '\\\\\\\\"', '\\\\\\\\&', '\\\\\\\\/', '\\\\\\\\^', '\\\\\\\\$', '\\\\\\\\=', "\\'",
-            '\\x00', '\\n', '\\r', '\\x1a',
-        ];
+        $from = ['\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '='];
+        $to   = ['\\\\', '\(', '\)', '\|', '\-', '\!', '\@', '\~', '\"', '\&', '\/', '\^', '\$', '\='];
 
         return str_replace($from, $to, $string);
     }
