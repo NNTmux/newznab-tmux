@@ -8,6 +8,22 @@ use Mayconbordin\L5Fixtures\FixturesFacade;
 class FixturesDown extends Command
 {
     /**
+     * @var array
+     */
+    private static $allowedTables = [
+        'binaryblacklist',
+        'categories',
+        'category_regexes',
+        'collection_regexes',
+        'content',
+        'groups',
+        'menu',
+        'release_naming_regexes',
+        'settings',
+        'tmux',
+        'user_roles',
+    ];
+    /**
      * The name and signature of the console command.
      *
      * @var string
@@ -19,7 +35,20 @@ class FixturesDown extends Command
      *
      * @var string
      */
-    protected $description = 'Truncate(empty) all tables or just select ones';
+    protected $description = 'Truncate(empty) all tables or just select ones.
+    Tables that are supported are :
+    all <= Populates all the tables listed below
+    binaryblacklist
+    categories
+    category_regexes
+    collection_regexes
+    content
+    groups
+    menu
+    release_naming_regexes
+    settings
+    tmux
+    user_roles';
 
     /**
      * Create a new command instance.
@@ -37,7 +66,12 @@ class FixturesDown extends Command
     public function handle()
     {
         if ($this->confirm('This command will truncate(empty) your tables. Should we continue?')) {
-            FixturesFacade::down($this->argument('type'));
+            $this->info('Truncating ' .$this->argument('type') . ' table(s)');
+            if ($this->argument('type') === 'all') {
+                FixturesFacade::down();
+            } elseif (\in_array($this->argument('type'), self::$allowedTables, false)) {
+                FixturesFacade::down($this->argument('type'));
+            }
         } else {
             $this->info('Command execution stopped');
         }

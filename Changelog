@@ -1,3 +1,5 @@
+2018-02-06 DariusIII
+	* Fix: Update installation console commands to fix missing type error when using fixtures in production
 2018-02-04 DariusIII
 	* Fix: Fix error on details page in Gamma theme
 2018-02-03 DariusIII

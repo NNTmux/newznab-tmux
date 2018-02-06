@@ -9,6 +9,22 @@ use Mayconbordin\L5Fixtures\FixturesFacade;
 class FixturesUp extends Command
 {
     /**
+     * @var array
+     */
+    private static $allowedTables = [
+      'binaryblacklist',
+      'categories',
+      'category_regexes',
+      'collection_regexes',
+      'content',
+      'groups',
+      'menu',
+      'release_naming_regexes',
+      'settings',
+      'tmux',
+      'user_roles',
+    ];
+    /**
      * The name and signature of the console command.
      *
      * @var string
@@ -20,7 +36,20 @@ class FixturesUp extends Command
      *
      * @var string
      */
-    protected $description = 'Apply database fixtures to all tables or just to select ones';
+    protected $description = 'Apply database fixtures to all tables or just to select ones.
+    Tables that are supported are :
+    all <= Populates all the tables listed below
+    binaryblacklist
+    categories
+    category_regexes
+    collection_regexes
+    content
+    groups
+    menu
+    release_naming_regexes
+    settings
+    tmux
+    user_roles';
 
     /**
      * Create a new command instance.
@@ -37,7 +66,12 @@ class FixturesUp extends Command
      */
     public function handle()
     {
-        $this->info('Populating tables...');
-        FixturesFacade::up($this->argument('type'));
+        $this->info('Populating ' .$this->argument('type') . ' table(s)');
+
+        if ($this->argument('type') === 'all') {
+            FixturesFacade::up();
+        } elseif (\in_array($this->argument('type'), self::$allowedTables, false)) {
+            FixturesFacade::up($this->argument('type'));
+        }
     }
 }

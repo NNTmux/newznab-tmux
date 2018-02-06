@@ -100,7 +100,7 @@ class InstallNntmux extends Command
                         }
                     });
 
-                    $process2 = new Process('php artisan fixtures:up');
+                    $process2 = new Process('php artisan fixtures:up all');
                     $process2->setTimeout(600);
                     $process2->run(function ($type, $buffer) {
                         if (Process::ERR === $type) {
