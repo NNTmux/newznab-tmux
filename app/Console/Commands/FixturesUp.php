@@ -66,7 +66,7 @@ class FixturesUp extends Command
      */
     public function handle()
     {
-        $this->info('Populating ' .$this->argument('type') . ' table(s)');
+        $this->info('Populating '.$this->argument('type').' table(s)');
 
         if ($this->argument('type') === 'all') {
             FixturesFacade::up();

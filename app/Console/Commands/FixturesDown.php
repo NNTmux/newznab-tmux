@@ -66,7 +66,7 @@ class FixturesDown extends Command
     public function handle()
     {
         if ($this->confirm('This command will truncate(empty) your tables. Should we continue?')) {
-            $this->info('Truncating ' .$this->argument('type') . ' table(s)');
+            $this->info('Truncating '.$this->argument('type').' table(s)');
             if ($this->argument('type') === 'all') {
                 FixturesFacade::down();
             } elseif (\in_array($this->argument('type'), self::$allowedTables, false)) {
