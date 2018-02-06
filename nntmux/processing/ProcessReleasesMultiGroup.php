@@ -22,7 +22,7 @@ class ProcessReleasesMultiGroup extends ProcessReleases
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->nzb = new NZBMultiGroup($this->pdo);
+        $this->nzb = new NZBMultiGroup();
     }
 
     /**
