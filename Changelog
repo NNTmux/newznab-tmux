@@ -1,4 +1,5 @@
 2018-02-06 DariusIII
+	* Chg: Update laravel/framework to version 5.5.34
 	* Chg: Update ProcessReleasesMultiGroup class
 	* Chg: Update SphinxSearch class
 	* Fix: Update installation console commands to fix missing type error when using fixtures in production
