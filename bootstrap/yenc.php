@@ -16,7 +16,6 @@
  * @author    niel
  * @copyright 2016 nZEDb
  */
-use App\Models\Settings;
 
 if ((defined('NN_INSTALLER') && NN_INSTALLER !== false) || ! file_exists(NN_ROOT.'_install/install.lock')) {
     $adapter = 'Php';
