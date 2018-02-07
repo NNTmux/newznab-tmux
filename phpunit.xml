@@ -11,7 +11,4 @@
     <testsuite name="Installation Test">
         <directory suffix="Test.php">./tests/Install</directory>
     </testsuite>
-    <listeners>
-        <listener class="NunoMaduro\Collision\Adapters\Phpunit\Listener" />
-    </listeners>
 </phpunit>
