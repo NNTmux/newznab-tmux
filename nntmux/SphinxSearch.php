@@ -51,10 +51,10 @@ class SphinxSearch
                 sprintf(
                     'REPLACE INTO releases_rt (id, name, searchname, fromname, filename) VALUES (%d, %s, %s, %s, %s)',
                     $parameters['id'],
-                    $this->escapeString($parameters['name']),
-                    $this->escapeString($parameters['searchname']),
-                    $this->escapeString($parameters['fromname']),
-                    empty($parameters['filename']) ? "''" : $this->escapeString($parameters['filename'])
+                    self::escapeString($parameters['name']),
+                    self::escapeString($parameters['searchname']),
+                    self::escapeString($parameters['fromname']),
+                    empty($parameters['filename']) ? "''" : self::escapeString($parameters['filename'])
                 )
             );
         }
@@ -89,7 +89,7 @@ class SphinxSearch
      *
      * @return string Escaped string.
      */
-    public function escapeString($string): string
+    public static function escapeString($string): string
     {
         $from = ['\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '='];
         $to = ['\\\\', '\(', '\)', '\|', '\-', '\!', '\@', '\~', '\"', '\&', '\/', '\^', '\$', '\='];
