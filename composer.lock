@@ -6570,16 +6570,16 @@
         },
         {
             "name": "nunomaduro/collision",
-            "version": "v1.1.21",
+            "version": "v1.1.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/collision.git",
-                "reference": "80f46ba5646ede4c6f6071e48a4b476a6b5c740f"
+                "reference": "236609bd5a067587f600bc55c5d683b840798b22"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/80f46ba5646ede4c6f6071e48a4b476a6b5c740f",
-                "reference": "80f46ba5646ede4c6f6071e48a4b476a6b5c740f",
+                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/236609bd5a067587f600bc55c5d683b840798b22",
+                "reference": "236609bd5a067587f600bc55c5d683b840798b22",
                 "shasum": ""
             },
             "require": {
@@ -6627,7 +6627,7 @@
                 "php",
                 "symfony"
             ],
-            "time": "2018-01-18T22:43:42+00:00"
+            "time": "2018-02-07T10:42:20+00:00"
         },
         {
             "name": "orangehill/iseed",
