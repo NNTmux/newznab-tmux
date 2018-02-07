@@ -543,7 +543,7 @@ class Releases
      * @param NZB          $nzb
      * @param ReleaseImage $releaseImage
      */
-    public function deleteSingle($identifiers, $nzb, $releaseImage)
+    public function deleteSingle($identifiers, $nzb, $releaseImage): void
     {
         // Delete NZB from disk.
         $nzbPath = $nzb->NZBPath($identifiers['g']);
@@ -557,15 +557,8 @@ class Releases
         // Delete from sphinx.
         $this->sphinxSearch->deleteRelease($identifiers, $this->pdo);
 
-        $param1 = false;
-        $param2 = $identifiers['g'];
-
         // Delete from DB.
-        $query = $this->pdo->Prepare('CALL delete_release(:is_numeric, :identifier)');
-        $query->bindParam(':is_numeric', $param1, \PDO::PARAM_BOOL);
-        $query->bindParam(':identifier', $param2);
-
-        $query->execute();
+        Release::query()->where('guid', $identifiers['g'])->delete();
     }
 
     /**

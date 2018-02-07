@@ -1,4 +1,5 @@
 2018-02-07 DariusIII
+	* Chg: Do not use delete_release stored procedure anymore to delete releases, FK's do it
 	* Chg: Remove yydecode setting check from yenc, will be dropped at later date
 2018-02-06 DariusIII
 	* Chg: Update nunomaduro/collision to version 1.1.22
