@@ -40,9 +40,6 @@ if ((defined('NN_INSTALLER') && NN_INSTALLER !== false) || ! file_exists(NN_ROOT
             );
 
             // no break
-        case Settings::settingValue('apps..yydecoderpath', true) !== null:
-            $adapter = 'Ydecode';
-            break;
         default:
             $adapter = 'Php';
     }
