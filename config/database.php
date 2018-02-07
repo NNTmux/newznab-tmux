@@ -91,6 +91,15 @@ return [
             'strict'      => false,
         ],
 
+        'sphinx' => [
+            'driver'      => 'mysql',
+            'host'        => '127.0.0.1',
+            'port'        => 9306,
+            'database'    => '',
+            'unix_socket' => '',
+            'charset'     => 'utf8',
+        ],
+
     ],
 
     /*
