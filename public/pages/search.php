@@ -4,7 +4,6 @@ use App\Models\User;
 use nntmux\Releases;
 use App\Models\Group;
 use App\Models\Category;
-use nntmux\ReleaseSearch;
 
 if (! User::isLoggedIn()) {
     $page->show403();
@@ -158,8 +157,6 @@ if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQU
         ]
     );
 }
-
-
 
 $search_description =
             'Sphinx Search Rules:<br />
