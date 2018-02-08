@@ -555,7 +555,7 @@ class Releases
         $releaseImage->delete($identifiers['g']);
 
         // Delete from sphinx.
-        $this->sphinxSearch->deleteRelease($identifiers, $this->pdo);
+        $this->sphinxSearch->deleteRelease($identifiers);
 
         // Delete from DB.
         Release::query()->where('guid', $identifiers['g'])->delete();
