@@ -684,7 +684,7 @@ class Releases
         $catQuery = '';
         if ($type === 'basic') {
             $catQuery = Category::getCategorySearch($cat);
-        } elseif ($type === 'advanced' && !empty($cat)) {
+        } elseif ($type === 'advanced' && ! empty($cat)) {
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
 
