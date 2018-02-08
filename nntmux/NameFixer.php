@@ -138,11 +138,6 @@ class NameFixer
     public $text;
 
     /**
-     * @var \nntmux\Groups
-     */
-    public $_groups;
-
-    /**
      * @var \nntmux\SphinxSearch
      */
     public $sphinx;
