@@ -28,7 +28,8 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'name' => 'NNTmux',
+            'channels' => ['daily'],
         ],
         'single' => [
             'driver' => 'single',
