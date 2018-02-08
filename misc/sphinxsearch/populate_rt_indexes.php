@@ -3,8 +3,8 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Release;
-use Illuminate\Support\Facades\DB;
 use nntmux\SphinxSearch;
+use Illuminate\Support\Facades\DB;
 
 if (! isset($argv[1]) || $argv[1] !== 'releases_rt') {
     exit(
@@ -47,7 +47,7 @@ function populate_rt($table, $max)
     $string = sprintf('REPLACE INTO %s %s VALUES ', $table, $rtvalues);
 
     $lastId = $minId - 1;
-    echo "[Starting to populate sphinx RT index $table with $total releases.]" . PHP_EOL;
+    echo "[Starting to populate sphinx RT index $table with $total releases.]".PHP_EOL;
     for ($i = $minId; $i <= ($total + $max + $minId); $i += $max) {
         $rows = DB::select(sprintf($query, $lastId, $max));
         DB::commit();
