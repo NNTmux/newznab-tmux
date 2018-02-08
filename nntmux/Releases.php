@@ -620,29 +620,29 @@ class Releases
     /**
      * Function for searching on the site (by subject, searchname or advanced).
      *
+     *
      * @param string $searchName
      * @param string $usenetName
      * @param string $posterName
      * @param string $fileName
-     * @param string|int $groupName
-     * @param int $sizeFrom
-     * @param int $sizeTo
-     * @param int $hasNfo
-     * @param int $hasComments
-     * @param int $daysNew
-     * @param int $daysOld
+     * @param string $groupName
+     * @param string|int $sizeFrom
+     * @param string|int $sizeTo
+     * @param bool $hasNfo
+     * @param bool $hasComments
+     * @param string|int $daysNew
+     * @param string|int $daysOld
      * @param int $offset
      * @param int $limit
      * @param string|array $orderBy
-     * @param int $maxAge
-     * @param int|array $excludedCats
+     * @param string|int $maxAge
+     * @param array $excludedCats
      * @param string $type
      * @param array $cat
-     *
      * @param int $minSize
      * @return array
      */
-    public function search($searchName, $usenetName, $posterName, $fileName, $groupName, $sizeFrom, $sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000, $orderBy = '', $maxAge = -1, array $excludedCats = [], $type = 'basic', array $cat = [-1], $minSize = 0): array
+    public function search($searchName = '', $usenetName = '', $posterName = '', $fileName = '', $groupName = '', $sizeFrom = '', $sizeTo = '', $hasNfo = false, $hasComments = false, $daysNew = '', $daysOld = '', $offset = 0, $limit = 1000, $orderBy = '', $maxAge = '', array $excludedCats = [], $type = 'basic', array $cat = [], $minSize = 0): array
     {
         $sizeRange = [
             1 => 1,
@@ -659,31 +659,32 @@ class Releases
         ];
 
         if ($orderBy === '') {
-            $orderBy = [];
-            $orderBy[0] = 'postdate ';
-            $orderBy[1] = 'desc ';
+            $orderBy = [
+            'postdate ',
+            'desc ',
+        ];
         } else {
             $orderBy = $this->getBrowseOrder($orderBy);
         }
 
         $searchOptions = [];
-        if ($searchName !== -1) {
+        if ($searchName !== '') {
             $searchOptions['searchname'] = $searchName;
         }
-        if ($usenetName !== -1) {
+        if ($usenetName !== '') {
             $searchOptions['name'] = $usenetName;
         }
-        if ($posterName !== -1) {
+        if ($posterName !== '') {
             $searchOptions['fromname'] = $posterName;
         }
-        if ($fileName !== -1) {
+        if ($fileName !== '') {
             $searchOptions['filename'] = $fileName;
         }
 
         $catQuery = '';
         if ($type === 'basic') {
             $catQuery = Category::getCategorySearch($cat);
-        } elseif ($type === 'advanced' && (int) $cat[0] !== -1) {
+        } elseif ($type === 'advanced' && !empty($cat)) {
             $catQuery = sprintf('AND r.categories_id = %d', $cat[0]);
         }
 
@@ -693,14 +694,14 @@ class Releases
             $this->showPasswords,
             NZB::NZB_ADDED,
             ($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-            ((int) $groupName !== -1 ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
+            ((int) $groupName !== '' ? sprintf(' AND r.groups_id = %d ', Group::getIDByName($groupName)) : ''),
             (array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > '.(string) (104857600 * (int) $sizeRange[$sizeFrom]).' ' : ''),
             (array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < '.(string) (104857600 * (int) $sizeRange[$sizeTo]).' ' : ''),
-            ((int) $hasNfo !== 0 ? ' AND r.nfostatus = 1 ' : ''),
-            ((int) $hasComments !== 0 ? ' AND r.comments > 0 ' : ''),
+            ($hasNfo !== false ? ' AND r.nfostatus = 1 ' : ''),
+            ($hasComments !== false ? ' AND r.comments > 0 ' : ''),
             $catQuery,
-            ((int) $daysNew !== -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
-            ((int) $daysOld !== -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
+            ($daysNew !== '' ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
+            ($daysOld !== '' ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
             (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             (\count($searchOptions) > 0 ? $this->releaseSearch->getSearchSQL($searchOptions) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : '')

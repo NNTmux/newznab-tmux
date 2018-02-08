@@ -201,19 +201,8 @@ class Category extends Model
     {
         $categories = [];
 
-        // If multiple categories were sent in a single array position, slice and add them
-        if (strpos($cat[0], ',') !== false) {
-            $tmpcats = explode(',', $cat[0]);
-            // Reset the category to the first comma separated value in the string
-            $cat[0] = $tmpcats[0];
-            // Add the remaining categories in the string to the original array
-            foreach (\array_slice($tmpcats, 1) as $tmpcat) {
-                $cat[] = $tmpcat;
-            }
-        }
-
         foreach ($cat as $category) {
-            if ($category !== -1 && self::isParent($category)) {
+            if ($category !== '' && self::isParent($category)) {
                 foreach (self::getChildren($category) as $child) {
                     $categories[] = $child['id'];
                 }
@@ -231,7 +220,7 @@ class Category extends Model
                 break;
             // One category constraint
             case 1:
-                $catsrch = $categories[0] !== -1 ? ' AND r.categories_id = '.$categories[0] : '';
+                $catsrch = $categories[0] !== '' ? ' AND r.categories_id = '.$categories[0] : '';
                 break;
             // Multiple category constraints
             default:

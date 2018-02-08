@@ -46,7 +46,7 @@ if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && ! isset($_REQUEST
             break;
     }
 
-    $categoryID[] = -1;
+    $categoryID = [];
     if (isset($_REQUEST['t'])) {
         $categoryID = explode(',', $_REQUEST['t']);
     }
@@ -59,20 +59,20 @@ if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && ! isset($_REQUEST
 
     $results = $releases->search(
         $searchString,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        -1,
-        0,
-        0,
-        -1,
-        -1,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        false,
+        false,
+        '',
+        '',
         $offset,
         ITEMS_PER_PAGE,
         $orderBy,
-        -1,
+        '',
         $page->userdata['categoryexclusions'],
         'basic',
         $categoryID
@@ -126,24 +126,24 @@ if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQU
     }
 
     $results = $releases->search(
-        ($searchVars['searchadvr'] === '' ? -1 : $searchVars['searchadvr']),
-        ($searchVars['searchadvsubject'] === '' ? -1 : $searchVars['searchadvsubject']),
-        ($searchVars['searchadvposter'] === '' ? -1 : $searchVars['searchadvposter']),
-        ($searchVars['searchadvfilename'] === '' ? -1 : $searchVars['searchadvfilename']),
+        $searchVars['searchadvr'],
+        $searchVars['searchadvsubject'],
+        $searchVars['searchadvposter'],
+        $searchVars['searchadvfilename'],
         $searchVars['searchadvgroups'],
         $searchVars['searchadvsizefrom'],
         $searchVars['searchadvsizeto'],
         $searchVars['searchadvhasnfo'],
         $searchVars['searchadvhascomments'],
-        ($searchVars['searchadvdaysnew'] === '' ? -1 : $searchVars['searchadvdaysnew']),
-        ($searchVars['searchadvdaysold'] === '' ? -1 : $searchVars['searchadvdaysold']),
+        $searchVars['searchadvdaysnew'],
+        $searchVars['searchadvdaysold'],
         $offset,
         ITEMS_PER_PAGE,
         $orderBy,
-        -1,
+        '',
         $page->userdata['categoryexclusions'],
         'advanced',
-        [$searchVars['searchadvcat'] === '' ? -1 : $searchVars['searchadvcat']]
+        [$searchVars['searchadvcat']]
     );
 
     $page->smarty->assign(
@@ -177,7 +177,7 @@ You can combine some of these rules, but not all.<br />';
 $page->smarty->assign(
     [
         'sizelist' => [
-            -1 => '--Select--', 1  => '100MB', 2  => '250MB', 3  => '500MB', 4  => '1GB', 5  => '2GB',
+            '' => '--Select--', 1  => '100MB', 2  => '250MB', 3  => '500MB', 4  => '1GB', 5  => '2GB',
             6  => '3GB', 7  => '4GB', 8  => '8GB', 9  => '16GB', 10 => '32GB', 11 => '64GB',
         ],
         'results' => $results, 'sadvanced' => $searchType !== 'basic',
