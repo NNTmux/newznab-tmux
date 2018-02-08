@@ -1,4 +1,5 @@
 2018-02-08 DariusIII
+	* Chg: Remove Logging class, as it is deprecated
 	* Chg: Adjust variables for sphinx in NameFixer class
 	* Chg: Remove extra argumnet for sphinxsearch deletRelease function
 	* Chg: Update logging configuration

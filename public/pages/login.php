@@ -1,7 +1,6 @@
 <?php
 
 use nntmux\Captcha;
-use nntmux\Logging;
 use App\Models\User;
 use App\Models\Settings;
 use nntmux\utility\Utility;
@@ -17,7 +16,6 @@ if (! User::isLoggedIn()) {
         $username = htmlspecialchars($_POST['username']);
         $page->smarty->assign('username', $username);
         if (Utility::checkCsrfToken() === true) {
-            $logging = new Logging(['Settings' => $page->settings]);
             $res = User::getByUsername($username);
             if ($res === null) {
                 $res = User::getByEmail($username);
@@ -39,11 +37,9 @@ if (! User::isLoggedIn()) {
                     die();
                 } else {
                     $page->smarty->assign('error', 'Incorrect username/email or password.');
-                    $logging->LogBadPasswd($username, $_SERVER['REMOTE_ADDR']);
                 }
             } else {
                 $page->smarty->assign('error', 'Incorrect username/email or password.');
-                $logging->LogBadPasswd($username, $_SERVER['REMOTE_ADDR']);
             }
         } else {
             $page->showTokenError();
