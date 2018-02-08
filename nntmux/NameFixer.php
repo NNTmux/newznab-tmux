@@ -1114,9 +1114,8 @@ class NameFixer
         $join = '';
 
         if (\strlen($preTitle) >= 15 && preg_match(self::PREDB_REGEX, $preTitle)) {
-
-                    $titlematch = SphinxSearch::escapeString($preTitle);
-                    $join .= sprintf(
+            $titlematch = SphinxSearch::escapeString($preTitle);
+            $join .= sprintf(
                         'INNER JOIN releases_se rse ON rse.id = r.id
 						WHERE rse.query = "@(name,searchname,filename) %s;mode=extended"',
                         $titlematch

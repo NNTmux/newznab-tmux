@@ -738,9 +738,7 @@ class ReleaseRemover
                 if ($this->crapTime === '') {
                     $regexMatch = $this->extractSrchFromRegx($dbRegex);
                     if ($regexMatch !== '') {
-                                $ftMatch = sprintf('rse.query = "@(name,searchname) %s;limit=1000000;maxmatches=1000000;mode=any" AND', str_replace('|', ' ', str_replace('"', '', $regexMatch)));
-
-
+                        $ftMatch = sprintf('rse.query = "@(name,searchname) %s;limit=1000000;maxmatches=1000000;mode=any" AND', str_replace('|', ' ', str_replace('"', '', $regexMatch)));
                     }
                 }
 

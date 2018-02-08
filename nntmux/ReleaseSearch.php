@@ -61,6 +61,7 @@ class ReleaseSearch
         if ($forceLike) {
             return $this->likeSQL();
         }
+
         return $this->sphinxSQL();
     }
 

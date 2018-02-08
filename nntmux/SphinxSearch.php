@@ -3,9 +3,9 @@
 namespace nntmux;
 
 use App\Models\Release;
-use Foolz\SphinxQL\Drivers\Pdo\Connection;
 use Foolz\SphinxQL\Helper;
 use Foolz\SphinxQL\SphinxQL;
+use Foolz\SphinxQL\Drivers\Pdo\Connection;
 
 class SphinxSearch
 {
