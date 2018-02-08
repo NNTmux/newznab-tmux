@@ -92,7 +92,7 @@ class NntmuxResetDb extends Command
             DB::commit();
             $this->info('Truncating completed.');
 
-            (new SphinxSearch())->truncateRTIndex('releases_rt');
+            (new SphinxSearch())->truncateRTIndex();
 
             $this->info('Deleting nzbfiles subfolders.');
             $files = File::allfiles(Settings::settingValue('..nzbpath'));

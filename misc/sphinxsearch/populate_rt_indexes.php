@@ -2,13 +2,10 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
+use App\Models\Release;
 use nntmux\SphinxSearch;
-use nntmux\ReleaseSearch;
+use Illuminate\Support\Facades\DB;
 
-if (NN_RELEASE_SEARCH_TYPE !== ReleaseSearch::SPHINX) {
-    exit('Error, NN_RELEASE_SEARCH_TYPE in nntmux/config/settings.php must be set to SPHINX!'.PHP_EOL);
-}
 if (! isset($argv[1]) || $argv[1] !== 'releases_rt') {
     exit(
             "Argument 1 is the index name, releases_rt are the only supported ones currently.\n".
@@ -25,10 +22,9 @@ if (! isset($argv[1]) || $argv[1] !== 'releases_rt') {
 // Bulk insert releases into sphinx RT index.
 function populate_rt($table, $max)
 {
-    $pdo = new DB();
-
     if ($table === 'releases_rt') {
-        $pdo->queryDirect('SET SESSION group_concat_max_len=16384');
+        DB::unprepared('SET SESSION group_concat_max_len=16384;');
+        DB::commit();
         $query = 'SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
 				FROM releases r
 				LEFT JOIN release_files rf ON(r.id=rf.releases_id)
@@ -36,8 +32,8 @@ function populate_rt($table, $max)
 				GROUP BY r.id
 				ORDER BY r.id ASC
 				LIMIT %d';
-        $rtvalues = '(id, name, searchname, fromname, filename)';
-        $totals = $pdo->queryOneRow('SELECT COUNT(id) AS c, MIN(id) AS min FROM releases');
+
+        $totals = Release::query()->selectRaw('COUNT(id) AS c, MIN(id) AS min')->first();
         if (! $totals) {
             exit("Could not get database information for releases table.\n");
         }
@@ -48,30 +44,31 @@ function populate_rt($table, $max)
     }
 
     $sphinx = new SphinxSearch();
-    $string = sprintf('REPLACE INTO %s %s VALUES ', $table, $rtvalues);
 
     $lastId = $minId - 1;
-    echo "[Starting to populate sphinx RT index $table with $total releases.]\n";
+    echo "[Starting to populate sphinx RT index $table with $total releases.]".PHP_EOL;
     for ($i = $minId; $i <= ($total + $max + $minId); $i += $max) {
-        $rows = $pdo->queryDirect(sprintf($query, $lastId, $max));
+        $rows = DB::select(sprintf($query, $lastId, $max));
+        DB::commit();
         if (! $rows) {
             continue;
         }
 
         $tempString = '';
         foreach ($rows as $row) {
-            if ($row['id'] > $lastId) {
-                $lastId = $row['id'];
+            if ($row->id > $lastId) {
+                $lastId = $row->id;
             }
             switch ($table) {
                 case 'releases_rt':
-                    $tempString .= sprintf(
-                            '(%d,%s,%s,%s,%s),',
-                            $row['id'],
-                            $sphinx->sphinxQL->escapeString($row['name']),
-                            $sphinx->sphinxQL->escapeString($row['searchname']),
-                            $sphinx->sphinxQL->escapeString($row['fromname']),
-                            $sphinx->sphinxQL->escapeString($row['filename'])
+                    $sphinx->insertRelease(
+                        [
+                            'id' => $row->id,
+                            'name' => $row->name,
+                            'searchname' => $row->searchname,
+                            'fromname' => $row->fromname,
+                            'filename' => $row->filename,
+                        ]
                     );
                     break;
             }
@@ -79,7 +76,6 @@ function populate_rt($table, $max)
         if (! $tempString) {
             continue;
         }
-        $sphinx->sphinxQL->queryExec($string.rtrim($tempString, ','));
         echo '.';
     }
     echo "\n[Done]\n";

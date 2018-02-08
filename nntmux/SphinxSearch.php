@@ -2,15 +2,27 @@
 
 namespace nntmux;
 
-use nntmux\db\DB;
+use App\Models\Release;
+use Foolz\SphinxQL\Helper;
+use Foolz\SphinxQL\SphinxQL;
+use Foolz\SphinxQL\Drivers\Pdo\Connection;
 
 class SphinxSearch
 {
     /**
-     * SphinxQL connection.
-     * @var DB
+     * @var \Foolz\SphinxQL\SphinxQL
      */
-    public $sphinxQL = null;
+    public $sphinxQL;
+
+    /**
+     * @var \Foolz\SphinxQL\Drivers\Pdo\Connection
+     */
+    protected $connection;
+
+    /**
+     * @var \Illuminate\Config\Repository|mixed
+     */
+    protected $index;
 
     /**
      * Establish connection to SphinxQL.
@@ -19,25 +31,10 @@ class SphinxSearch
      */
     public function __construct()
     {
-        if (NN_RELEASE_SEARCH_TYPE === ReleaseSearch::SPHINX) {
-            if (! defined('NN_SPHINXQL_HOST_NAME')) {
-                define('NN_SPHINXQL_HOST_NAME', '0');
-            }
-            if (! defined('NN_SPHINXQL_PORT')) {
-                define('NN_SPHINXQL_PORT', 9306);
-            }
-            if (! defined('NN_SPHINXQL_SOCK_FILE')) {
-                define('NN_SPHINXQL_SOCK_FILE', '');
-            }
-            $this->sphinxQL = new DB(
-                [
-                    'dbname' => '',
-                    'dbport' => NN_SPHINXQL_PORT,
-                    'dbhost' => NN_SPHINXQL_HOST_NAME,
-                    'dbsock' => NN_SPHINXQL_SOCK_FILE,
-                ]
-            );
-        }
+        $this->connection = new Connection();
+        $this->connection->setParams(['host' => config('sphinxsearch.host'), 'port' => config('sphinxsearch.port')]);
+        $this->sphinxQL = SphinxQL::create($this->connection);
+        $this->index = config('sphinxsearch.index');
     }
 
     /**
@@ -47,38 +44,28 @@ class SphinxSearch
     public function insertRelease($parameters): void
     {
         if ($this->sphinxQL !== null && $parameters['id']) {
-            $this->sphinxQL->queryExec(
-                sprintf(
-                    'REPLACE INTO releases_rt (id, name, searchname, fromname, filename) VALUES (%d, %s, %s, %s, %s)',
-                    $parameters['id'],
-                    self::escapeString($parameters['name']),
-                    self::escapeString($parameters['searchname']),
-                    self::escapeString($parameters['fromname']),
-                    empty($parameters['filename']) ? "''" : self::escapeString($parameters['filename'])
-                )
-            );
+            $this->sphinxQL
+                ->replace()
+                ->into($this->index)
+                ->set(['id' => $parameters['id'], 'name' => $parameters['name'], 'searchname' => $parameters['searchname'], 'fromname' => $parameters['fromname'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']])
+                ->execute();
         }
     }
 
     /**
      * Delete release from Sphinx RT tables.
      * @param array $identifiers ['g' => Release GUID(mandatory), 'id' => ReleaseID(optional, pass false)]
-     * @param DB $pdo
      */
-    public function deleteRelease($identifiers, DB $pdo): void
+    public function deleteRelease($identifiers): void
     {
-        if ($this->sphinxQL !== null) {
-            if ($identifiers['i'] === false) {
-                $identifiers['i'] = $pdo->queryOneRow(
-                    sprintf('SELECT id FROM releases WHERE guid = %s', $pdo->escapeString($identifiers['g']))
-                );
-                if ($identifiers['i'] !== false) {
-                    $identifiers['i'] = $identifiers['i']['id'];
-                }
+        if ($identifiers['i'] === false) {
+            $identifiers['i'] = Release::query()->where('guid', $identifiers['g'])->first(['id']);
+            if ($identifiers['i'] !== null) {
+                $identifiers['i'] = $identifiers['i']['id'];
             }
-            if ($identifiers['i'] !== false) {
-                $this->sphinxQL->queryExec(sprintf('DELETE FROM releases_rt WHERE id = %d', $identifiers['i']));
-            }
+        }
+        if ($identifiers['i'] !== false) {
+            $this->sphinxQL->delete()->from([$this->index])->where('id', '=', $identifiers['i']);
         }
     }
 
@@ -105,45 +92,33 @@ class SphinxSearch
      */
     public function updateRelease($releaseID): void
     {
-        if ($this->sphinxQL !== null) {
-            $pdo = new DB();
-            $new = $pdo->queryOneRow(
-                        sprintf(
-                            '
-							SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
-							FROM releases r
-							LEFT JOIN release_files rf ON (r.id=rf.releases_id)
-							WHERE r.id = %d
-							GROUP BY r.id LIMIT 1',
-                            $releaseID
-                        )
-            );
-            if ($new !== false) {
-                $this->insertRelease($new);
-            }
+        $new = Release::query()
+                ->where('releases.id', $releaseID)
+                ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
+                ->select(['releases.id', 'releases.name', 'releases.searchname', 'releases.fromname'])
+                ->selectRaw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename')
+                ->groupBy('releases.id')
+                ->first();
+
+        if ($new !== null) {
+            $this->insertRelease($new);
         }
     }
 
     /**
-     * Truncate a RT index.
-     * @param string $indexName
+     * Truncate the RT index.
      */
-    public function truncateRTIndex($indexName): void
+    public function truncateRTIndex(): void
     {
-        if ($this->sphinxQL !== null) {
-            $this->sphinxQL->queryExec(sprintf('TRUNCATE RTINDEX %s', $indexName));
-        }
+        Helper::create($this->connection)->truncateRtIndex($this->index);
     }
 
     /**
-     * Optimize a RT index.
-     * @param string $indexName
+     * Optimize the RT index.
      */
-    public function optimizeRTIndex($indexName): void
+    public function optimizeRTIndex(): void
     {
-        if ($this->sphinxQL !== null) {
-            $this->sphinxQL->queryExec(sprintf('FLUSH RTINDEX %s', $indexName));
-            $this->sphinxQL->queryExec(sprintf('OPTIMIZE INDEX %s', $indexName));
-        }
+        Helper::create($this->connection)->flushRtIndex($this->index);
+        Helper::create($this->connection)->optimizeIndex($this->index);
     }
 }
