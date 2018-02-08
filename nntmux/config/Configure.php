@@ -99,7 +99,7 @@ class Configure
                 if (is_file($settings_file)) {
                     require_once $settings_file;
                     if (PHP_SAPI === 'cli') {
-                        $current_settings_file_version = 7; // Update this when updating settings.example.php
+                        $current_settings_file_version = 8; // Update this when updating settings.example.php
                         if (! \defined('NN_SETTINGS_FILE_VERSION') ||
                             NN_SETTINGS_FILE_VERSION !== $current_settings_file_version
                         ) {
