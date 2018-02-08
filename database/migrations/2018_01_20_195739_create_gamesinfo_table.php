@@ -15,7 +15,7 @@ class CreateGamesinfoTable extends Migration {
 		Schema::create('gamesinfo', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('title')->index('ix_title_ft');
+			$table->string('title');
 			$table->string('asin', 128)->nullable()->unique('ix_gamesinfo_asin');
 			$table->string('url', 1000)->nullable();
 			$table->string('publisher')->nullable();
@@ -29,6 +29,8 @@ class CreateGamesinfoTable extends Migration {
 			$table->string('classused', 10)->default('steam');
 			$table->timestamps();
 		});
+
+        DB::statement('ALTER TABLE gamesinfo ADD FULLTEXT ix_title_ft(title)');
 	}
 
 
