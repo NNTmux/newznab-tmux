@@ -41,19 +41,7 @@ class ReleaseSearch
      */
     public function __construct(DB $settings)
     {
-        switch (NN_RELEASE_SEARCH_TYPE) {
-            case self::LIKE:
-                $this->fullTextJoinString = '';
-                break;
-            case self::SPHINX:
-                $this->fullTextJoinString = 'INNER JOIN releases_se rse ON rse.id = r.id';
-                break;
-            case self::FULLTEXT:
-            default:
-            $this->fullTextJoinString = 'INNER JOIN release_search_data rs on rs.releases_id = r.id';
-                break;
-        }
-
+        $this->fullTextJoinString = 'INNER JOIN releases_se rse ON rse.id = r.id';
         $this->sphinxQueryOpt = ';limit=10000;maxmatches=10000;sort=relevance;mode=extended';
         $this->pdo = $settings instanceof DB ? $settings : new DB();
     }
@@ -73,21 +61,7 @@ class ReleaseSearch
         if ($forceLike) {
             return $this->likeSQL();
         }
-
-        switch (NN_RELEASE_SEARCH_TYPE) {
-            case self::LIKE:
-                $SQL = $this->likeSQL();
-                break;
-            case self::SPHINX:
-                $SQL = $this->sphinxSQL();
-                break;
-            case self::FULLTEXT:
-            default:
-                $SQL = $this->fullTextSQL();
-                break;
-        }
-
-        return $SQL;
+        return $this->sphinxSQL();
     }
 
     /**
@@ -97,39 +71,6 @@ class ReleaseSearch
     public function getFullTextJoinString(): string
     {
         return $this->fullTextJoinString;
-    }
-
-    /**
-     * Create SQL sub-query for full text searching.
-     *
-     * @return string
-     */
-    private function fullTextSQL(): string
-    {
-        $return = '';
-        foreach ($this->searchOptions as $columnName => $searchString) {
-            $searchWords = '';
-
-            // At least 1 search term needs to be mandatory.
-            $words = explode(' ', (! preg_match('/[+!^]/', $searchString) ? '+' : '').$searchString);
-            foreach ($words as $word) {
-                $word = str_replace(['!', '^', "'"], ['+', '+', "'"], trim($word, "\n\t\r\0\x0B- "));
-
-                if ($word !== '' && $word !== '-' && \strlen($word) > 1) {
-                    $searchWords .= ($word.' ');
-                }
-            }
-            $searchWords = trim($searchWords);
-            if ($searchWords !== '') {
-                $return .= sprintf(" AND MATCH(rs.%s) AGAINST('%s' IN BOOLEAN MODE)", $columnName, $searchWords);
-            }
-        }
-        // If we didn't get anything, try the LIKE method.
-        if ($return === '') {
-            return $this->likeSQL();
-        }
-
-        return $return;
     }
 
     /**

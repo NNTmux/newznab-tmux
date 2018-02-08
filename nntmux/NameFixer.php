@@ -1114,32 +1114,13 @@ class NameFixer
         $join = '';
 
         if (\strlen($preTitle) >= 15 && preg_match(self::PREDB_REGEX, $preTitle)) {
-            switch (NN_RELEASE_SEARCH_TYPE) {
-                case ReleaseSearch::SPHINX:
+
                     $titlematch = SphinxSearch::escapeString($preTitle);
                     $join .= sprintf(
                         'INNER JOIN releases_se rse ON rse.id = r.id
 						WHERE rse.query = "@(name,searchname,filename) %s;mode=extended"',
                         $titlematch
                     );
-                    break;
-                case ReleaseSearch::FULLTEXT:
-                    //Remove all non-printable chars from PreDB title
-                    preg_match_all('#[a-zA-Z0-9]{3,}#', $preTitle, $matches, PREG_PATTERN_ORDER);
-                    $titlematch = '+'.implode(' +', $matches[0]);
-                    $join .= sprintf(
-                        "INNER JOIN release_search_data rs ON rs.releases_id = r.id
-						WHERE
-							(MATCH (rs.name) AGAINST ('%1\$s' IN BOOLEAN MODE)
-							OR MATCH (rs.searchname) AGAINST ('%1\$s' IN BOOLEAN MODE))",
-                        $titlematch
-                    );
-                    break;
-                case ReleaseSearch::LIKE:
-                    // Do not add a JOIN for FT, let the query run in LIKE mode only (slow)
-                    $join .= 'WHERE 1=1 ';
-                    break;
-            }
         }
 
         return $join;

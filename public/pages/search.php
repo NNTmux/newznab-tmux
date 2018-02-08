@@ -159,21 +159,9 @@ if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQU
     );
 }
 
-switch (NN_RELEASE_SEARCH_TYPE) {
-    case ReleaseSearch::FULLTEXT:
-        $search_description =
-            'MySQL Full Text Search Rules:<br />
-A leading exclamation point(! in place of +) indicates that this word must be present in each row that is returned.<br />
-A leading minus sign indicates that this word must not be present in any of the rows that are returned.<br />
-By default (when neither + nor - is specified) the word is optional, but the rows that contain it are rated higher.<br />
-See <a target="_blank" href=\'http://dev.mysql.com/doc/refman/5.0/en/fulltext-boolean.html\'>docs</a> for more operators.';
-        break;
-    case ReleaseSearch::LIKE:
-        $search_description = 'Include ^ to indicate search must start with term, -- to exclude words.';
-        break;
-    case ReleaseSearch::SPHINX:
-    default:
-        $search_description =
+
+
+$search_description =
             'Sphinx Search Rules:<br />
 The search is case insensitive.<br />
 All words must be separated by spaces.
@@ -188,8 +176,6 @@ Putting a * after a word will do a partial word search. ie: fish* will match fis
 If your search is only words seperated by spaces, all those words will be mandatory, the order of the words is not important.<br />
 You can enclose words using paranthesis. ie: (^game*|^dex*)s03*(x264<&lt;nogrp$)<br />
 You can combine some of these rules, but not all.<br />';
-        break;
-}
 
 $page->smarty->assign(
     [

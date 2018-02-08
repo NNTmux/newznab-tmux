@@ -1,21 +1,16 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
+
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
-use nntmux\ReleaseSearch;
-
-if (NN_RELEASE_SEARCH_TYPE != ReleaseSearch::SPHINX) {
-    exit('Error, NN_RELEASE_SEARCH_TYPE in nntmux/config/settings.php must be set to SPHINX!'.PHP_EOL);
-}
-
 $sphinxConnection = '';
-if ($argc == 3 && is_numeric($argv[2])) {
+if ($argc === 3 && is_numeric($argv[2])) {
     $sphinxConnection = sprintf('sphinx://%s:%d/', $argv[1], $argv[2]);
-} elseif ($argc == 2) {
+} elseif ($argc === 2) {
     // Checks that argv[1] exists AND that there are no other arguments, which would be an error.
     $socket = preg_replace('#^(?:unix://)?(.*)$#', '$1', $argv[1]);
-    if (substr($socket, 0, 1) == '/') {
+    if ($socket[0] === '/') {
         // Make sure the socket path is fully qualified (and using correct separator).
         $sphinxConnection = sprintf('unix://%s:', $socket);
     }
@@ -43,8 +38,10 @@ $tables = [];
 $tables['releases_se'] = sprintf($tableSQL_releases, $sphinxConnection);
 
 foreach ($tables as $table => $query) {
-    $pdo->queryExec(sprintf('DROP TABLE IF EXISTS %s', $table));
-    $pdo->queryExec($query);
+    DB::unprepared("DROP TABLE IF EXISTS $table;");
+    DB::commit();
+    DB::unprepared($query);
+    DB::commit();
 }
 
 echo 'All done! If you messed up your sphinx connection info, you can rerun this script.'.PHP_EOL;

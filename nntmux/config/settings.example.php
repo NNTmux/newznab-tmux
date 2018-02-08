@@ -18,7 +18,7 @@
  *                   and $current_settings_file_version in nntmux\config\Configure.php
  * @version 7
  */
-define('NN_SETTINGS_FILE_VERSION', 7);
+define('NN_SETTINGS_FILE_VERSION', 8);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// Web Settings //////////////////////////////////////////////////////////
@@ -71,44 +71,6 @@ define('NN_FLOOD_WAIT_TIME', 5);
  * @default 5
  */
 define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
-
-/*
- * The type of search system to use on the site.
- *
- * 0 = The default system, which uses fulltext indexing (very fast but search results can be unexpected).
- * 1 = The old search system from newznab classic (much slower but produces better search results).
- * 2 = Search using sphinx real time index, see misc/sphinxsearch/README.md for installation details.
- *
- * @default 0
- */
-define('NN_RELEASE_SEARCH_TYPE', 0);
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////// Sphinx Settings ////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*
- * This is the hostname to use when connecting to the SphinxQL server,
- *
- * @note    Using localhost / 127.0.0.1 has caused me issues and only 0 worked on my local server.
- * @note    See misc/sphinxsearch/README.md for installation details.
- * @default '0'
- */
-define('NN_SPHINXQL_HOST_NAME', '0');
-
-/*
- * This is the port to the SphinxQL server.
- *
- * @default 9306
- */
-define('NN_SPHINXQL_PORT', 9306);
-
-/*
- * This is the (optional) location to the SphinxQL server socket file, if you set the "listen" setting to a sock file.
- *
- * @default ''
- */
-define('NN_SPHINXQL_SOCK_FILE', '');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// CLI Settings //////////////////////////////////////////////////////////
@@ -326,6 +288,7 @@ if (extension_loaded('xdebug')) {
  * //////////////////////////////////////////////// Change log ////////////////////////////////////////////////////////////
  * ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  *
+ *2018-02-08        v8  Remove search settings, sphinx is the only supported search engine
  * 2017-12-21       v7  Remove custom logging settings, Laravel is handling errors now
  * 2017-10-11       v6  Remove settings for PHP web/CLI SAPI's as these are now handled by Laravel
  * 2015-08-26       v4  Add settings for PHP web/CLI SAPI's.

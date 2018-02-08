@@ -123,7 +123,6 @@ class Configure
                     \define('NN_FLOOD_WAIT_TIME', 5);
                     \define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
                     \define('NN_USE_SQL_TRANSACTIONS', true);
-                    \define('NN_RELEASE_SEARCH_TYPE', 0);
                     \define('NN_MAX_PAGER_RESULTS', '125000');
                 }
                 unset($settings_file);

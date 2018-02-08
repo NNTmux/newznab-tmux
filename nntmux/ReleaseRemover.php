@@ -738,14 +738,9 @@ class ReleaseRemover
                 if ($this->crapTime === '') {
                     $regexMatch = $this->extractSrchFromRegx($dbRegex);
                     if ($regexMatch !== '') {
-                        switch (NN_RELEASE_SEARCH_TYPE) {
-                            case ReleaseSearch::SPHINX:
                                 $ftMatch = sprintf('rse.query = "@(name,searchname) %s;limit=1000000;maxmatches=1000000;mode=any" AND', str_replace('|', ' ', str_replace('"', '', $regexMatch)));
-                                break;
-                            case ReleaseSearch::FULLTEXT:
-                                $ftMatch = sprintf("(MATCH (rs.name) AGAINST ('%1\$s') OR MATCH (rs.searchname) AGAINST ('%1\$s')) AND", str_replace('|', ' ', $regexMatch));
-                                break;
-                        }
+
+
                     }
                 }
 
@@ -811,7 +806,7 @@ class ReleaseRemover
                 );
 
                 if ($opTypeName === 'Subject') {
-                    $join = (NN_RELEASE_SEARCH_TYPE === ReleaseSearch::SPHINX ? 'INNER JOIN releases_se rse ON rse.id = r.id' : 'INNER JOIN release_search_data rs ON rs.releases_id = r.id');
+                    $join = 'INNER JOIN releases_se rse ON rse.id = r.id';
                 } else {
                     $join = '';
                 }
