@@ -32,7 +32,7 @@ function populate_rt($table, $max)
 				GROUP BY r.id
 				ORDER BY r.id ASC
 				LIMIT %d';
-        $rtvalues = '(id, name, searchname, fromname, filename)';
+
         $totals = Release::query()->selectRaw('COUNT(id) AS c, MIN(id) AS min')->first();
         if (! $totals) {
             exit("Could not get database information for releases table.\n");
