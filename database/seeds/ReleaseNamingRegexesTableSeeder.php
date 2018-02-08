@@ -309,7 +309,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             array (
                 'id' => 33,
             'group_regex' => '^alt\\.binaries\\.(multimedia\\.|)(anime|cartoons)\\.?(highspeed|repost)?$',
-            'regex' => '/^[[(]d+/d+[])] - " ?(?P<match0>.+?) ?[. ](7z|avi|md5|mkv|mp4|nzb|par|vol)t?d+.+yEnc$/',
+            'regex' => '/^[[(]\\d+\\/\\d+[])] - " ?(?P<match0>.+?) ?[. ](7z|avi|md5|mkv|mp4|nzb|par|vol)t?\\d+.+yEnc$/',
                 'status' => 1,
                 'description' => '//[01/17] - "[neko-raws] Niji-iro Days 02 [BD][1080p][FLAC][768CC18E]v2.par2" - 590,59 MB yEnc',
                 'ordinal' => 5,
@@ -318,7 +318,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             array (
                 'id' => 34,
             'group_regex' => '^alt\\.binaries\\.(multimedia\\.|)(anime|cartoons)\\.?(highspeed|repost)?$',
-            'regex' => '/^.+" ?[ .-]?(?P<match0>.+?) ?[ .](7z|avi|md5|mkv|mp4|nzb|par|vol)t?d?+.+yEnc$/',
+            'regex' => '/^.+\\" ?[ .-]?(?P<match0>.+?) ?[ .](7z|avi|md5|mkv|mp4|nzb|par|vol)t?\\d?+.+yEnc$/',
                 'status' => 1,
                 'description' => '//[SpaceFish] Galilei Donna - Batch [BD][720p][MP4][AAC] [1/7] - "[SpaceFish] Galilei Donna - 07 [BD][720p][AAC] mp4" yEnc',
                 'ordinal' => 10,
@@ -327,7 +327,7 @@ class ReleaseNamingRegexesTableSeeder extends Seeder
             array (
                 'id' => 35,
             'group_regex' => '^alt\\.binaries\\.(multimedia\\.|)(anime|cartoons)\\.?(highspeed|repost)?$',
-            'regex' => '/^.+" ?[ .-]?(?P<match0>.+?) ?[ .](7z|avi|md5|mkv|mp4|nfo|nzb|par|vol)t?d?+.+[[(]d+/d+[])]$/',
+            'regex' => '/^.+\\" ?[ .-]?(?P<match0>.+?) ?[ .](7z|avi|md5|mkv|mp4|nfo|nzb|par|vol)t?\\d?+.+[[(]\\d+\\/\\d+[])]$/',
                 'status' => 1,
             'description' => '//My Hero Academia Textless Opening Song \'THE DAY\' (BD AVC 1080p FLAC) [6D660059] - "My Hero Academia Textless Opening Song \'THE DAY\' (BD AVC 1080p FLAC) [6D660059] nfo" yEnc (01/35)',
                 'ordinal' => 15,
