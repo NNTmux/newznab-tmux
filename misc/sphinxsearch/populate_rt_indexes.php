@@ -44,7 +44,6 @@ function populate_rt($table, $max)
     }
 
     $sphinx = new SphinxSearch();
-    $string = sprintf('REPLACE INTO %s %s VALUES ', $table, $rtvalues);
 
     $lastId = $minId - 1;
     echo "[Starting to populate sphinx RT index $table with $total releases.]".PHP_EOL;
@@ -57,18 +56,19 @@ function populate_rt($table, $max)
 
         $tempString = '';
         foreach ($rows as $row) {
-            if ($row['id'] > $lastId) {
-                $lastId = $row['id'];
+            if ($row->id > $lastId) {
+                $lastId = $row->id;
             }
             switch ($table) {
                 case 'releases_rt':
-                    $tempString .= sprintf(
-                            '(%d,%s,%s,%s,%s),',
-                            $row['id'],
-                            $sphinx::escapeString($row['name']),
-                            $sphinx::escapeString($row['searchname']),
-                            $sphinx::escapeString($row['fromname']),
-                            $sphinx::escapeString($row['filename'])
+                    $sphinx->insertRelease(
+                        [
+                            'id' => $row->id,
+                            'name' => $row->name,
+                            'searchname' => $row->searchname,
+                            'fromname' => $row->fromname,
+                            'filename' => $row->filename,
+                        ]
                     );
                     break;
             }
@@ -76,8 +76,6 @@ function populate_rt($table, $max)
         if (! $tempString) {
             continue;
         }
-        DB::unprepared($string.rtrim($tempString, ','));
-        DB::commit();
         echo '.';
     }
     echo "\n[Done]\n";
