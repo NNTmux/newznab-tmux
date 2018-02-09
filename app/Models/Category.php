@@ -297,12 +297,12 @@ class Category extends Model
     public static function getChildren($categoryId)
     {
         $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
-        $children = Cache::get('children');
+        $children = Cache::get(md5($categoryId));
         if ($children !== null) {
             return $children;
         }
         $children = self::find($categoryId)->children;
-        Cache::put('children', $children, $expiresAt);
+        Cache::put(md5($categoryId), $children, $expiresAt);
 
         return $children;
     }

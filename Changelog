@@ -1,4 +1,5 @@
 2018-02-09 DariusIII
+	* Chg: Use categoryid to cache root category children
 	* Chg: Update TraktTv class
 	* Chg: Remove functions from Utility class, use same functions from laravel helpers, update generateUuid function
 	* Chg: Add moontoast/math library
