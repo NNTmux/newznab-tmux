@@ -22,7 +22,7 @@ class SphinxSearch
     /**
      * @var \Illuminate\Config\Repository|mixed
      */
-    protected $index;
+    protected $config;
 
     /**
      * Establish connection to SphinxQL.
@@ -32,9 +32,9 @@ class SphinxSearch
     public function __construct()
     {
         $this->connection = new Connection();
-        $this->connection->setParams(['host' => config('sphinxsearch.host'), 'port' => config('sphinxsearch.port')]);
+        $this->config = config('sphinxsearch');
+        $this->connection->setParams(['host' => $this->config['host'], 'port' => $this->config['port']]);
         $this->sphinxQL = SphinxQL::create($this->connection);
-        $this->index = config('sphinxsearch.index');
     }
 
     /**
@@ -46,7 +46,7 @@ class SphinxSearch
         if ($this->sphinxQL !== null && $parameters['id']) {
             $this->sphinxQL
                 ->replace()
-                ->into($this->index)
+                ->into($this->config['index'])
                 ->set(['id' => $parameters['id'], 'name' => $parameters['name'], 'searchname' => $parameters['searchname'], 'fromname' => $parameters['fromname'], 'filename' => empty($parameters['filename']) ? "''" : $parameters['filename']])
                 ->execute();
         }
@@ -65,7 +65,7 @@ class SphinxSearch
             }
         }
         if ($identifiers['i'] !== false) {
-            $this->sphinxQL->delete()->from([$this->index])->where('id', '=', $identifiers['i']);
+            $this->sphinxQL->delete()->from([$this->config['index']])->where('id', '=', $identifiers['i']);
         }
     }
 
@@ -110,7 +110,7 @@ class SphinxSearch
      */
     public function truncateRTIndex(): void
     {
-        Helper::create($this->connection)->truncateRtIndex($this->index);
+        Helper::create($this->connection)->truncateRtIndex($this->config['index']);
     }
 
     /**
@@ -118,7 +118,7 @@ class SphinxSearch
      */
     public function optimizeRTIndex(): void
     {
-        Helper::create($this->connection)->flushRtIndex($this->index);
-        Helper::create($this->connection)->optimizeIndex($this->index);
+        Helper::create($this->connection)->flushRtIndex($this->config['index']);
+        Helper::create($this->connection)->optimizeIndex($this->config['index']);
     }
 }
