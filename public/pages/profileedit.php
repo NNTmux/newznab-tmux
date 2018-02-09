@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\User;
@@ -37,7 +38,7 @@ switch ($action) {
     case 'submit':
 
         $data['email'] = $_POST['email'];
-        if (isset($_POST['saburl']) && ! Utility::endsWith($_POST['saburl'], '/') && strlen(trim($_POST['saburl'])) > 0) {
+        if (isset($_POST['saburl']) && ! ends_with($_POST['saburl'], '/') && strlen(trim($_POST['saburl'])) > 0) {
             $_POST['saburl'] .= '/';
         }
 

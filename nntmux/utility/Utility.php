@@ -2,9 +2,9 @@
 
 namespace nntmux\utility;
 
+use Illuminate\Support\Str;
 use nntmux\db\DB;
 use nntmux\ColorCLI;
-use Ramsey\Uuid\Uuid;
 use App\Models\Settings;
 use App\Extensions\util\Versions;
 
@@ -16,9 +16,9 @@ class Utility
     /**
      *  Regex for detecting multi-platform path. Use it where needed so it can be updated in one location as required characters get added.
      */
-    const PATH_REGEX = '(?P<drive>[A-Za-z]:|)(?P<path>[/\w.-]+|)';
+    public const PATH_REGEX = '(?P<drive>[A-Za-z]:|)(?P<path>[/\w.-]+|)';
 
-    const VERSION_REGEX = '#(?P<all>v(?P<digits>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<revision>\d+)(?:\.(?P<fix>\d+))?)(?:-(?P<suffix>(?:RC\d+|dev)))?)#';
+    public const VERSION_REGEX = '#(?P<all>v(?P<digits>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<revision>\d+)(?:\.(?P<fix>\d+))?)(?:-(?P<suffix>(?:RC\d+|dev)))?)#';
 
     /**
      * Checks all levels of the supplied path are readable and executable by current user.
@@ -95,8 +95,8 @@ class Utility
     public static function cutStringUsingLast($character, $string, $side, $keep_character = true): string
     {
         $offset = ($keep_character ? 1 : 0);
-        $whole_length = strlen($string);
-        $right_length = (strlen(strrchr($string, $character)) - 1);
+        $whole_length = \strlen($string);
+        $right_length = (\strlen(strrchr($string, $character)) - 1);
         $left_length = ($whole_length - $right_length - 1);
         switch ($side) {
             case 'left':
@@ -171,7 +171,7 @@ class Utility
         $themelist[] = 'None';
         foreach ($themes as $theme) {
             if (strpos($theme, '.') === false &&
-                is_dir(NN_THEMES.$theme) && ! in_array($theme, $ignoredThemes, false)
+                is_dir(NN_THEMES.$theme) && ! \in_array($theme, $ignoredThemes, false)
             ) {
                 $themelist[] = $theme;
             }
@@ -229,9 +229,9 @@ class Utility
     {
         $gzipped = null;
         if (($fp = fopen($filename, 'rb')) !== false) {
-            if (@fread($fp, 2) == "\x1F\x8B") { // this is a gzip'd file
+            if (@fread($fp, 2) === "\x1F\x8B") { // this is a gzip'd file
                 fseek($fp, -4, SEEK_END);
-                if (strlen($datum = @fread($fp, 4)) == 4) {
+                if (\strlen($datum = @fread($fp, 4)) === 4) {
                     $gzipped = $datum;
                 }
             }
@@ -242,19 +242,13 @@ class Utility
     }
 
     /**
-     * @param DB|null $pdo
-     *
      * @return bool
      * @throws \Exception
-     * @throws \RuntimeException
      */
-    public static function isPatched(DB $pdo = null): bool
+    public static function isPatched(): bool
     {
         $versions = self::getValidVersionsFile();
 
-        if (! ($pdo instanceof DB)) {
-            $pdo = new DB();
-        }
         $patch = Settings::settingValue('..sqlpatch');
         $ver = $versions->versions->sql->file;
 
@@ -331,7 +325,7 @@ class Utility
      */
     public static function trailingSlash($path): string
     {
-        if (substr($path, strlen($path) - 1) !== '/') {
+        if (substr($path, \strlen($path) - 1) !== '/') {
             $path .= '/';
         }
 
@@ -372,22 +366,25 @@ class Utility
         return $string === '' ? false : $string;
     }
 
-    public static function setCoversConstant($path)
+    /**
+     * @param $path
+     */
+    public static function setCoversConstant($path): void
     {
-        if (! defined('NN_COVERS')) {
+        if (! \defined('NN_COVERS')) {
             switch (true) {
-                case substr($path, 0, 1) == '/' ||
-                    substr($path, 1, 1) == ':' ||
-                    substr($path, 0, 1) == '\\':
-                    define('NN_COVERS', self::trailingSlash($path));
+                case $path[0] === '/' ||
+                    $path[1] === ':' ||
+                    $path[0] === '\\':
+                    \define('NN_COVERS', self::trailingSlash($path));
                     break;
-                case strlen($path) > 0 && substr($path, 0, 1) != '/' && substr($path, 1, 1) != ':' &&
-                    substr($path, 0, 1) != '\\':
-                    define('NN_COVERS', realpath(NN_ROOT.self::trailingSlash($path)));
+                case \strlen($path) > 0 && $path[0] !== '/' && $path[1] !== ':' &&
+                    $path[0] !== '\\':
+                    \define('NN_COVERS', realpath(NN_ROOT.self::trailingSlash($path)));
                     break;
                 case empty($path): // Default to resources location.
                 default:
-                    define('NN_COVERS', NN_RES.'covers'.DS);
+                    \define('NN_COVERS', NN_RES.'covers'.DS);
             }
         }
     }
@@ -514,7 +511,7 @@ class Utility
                 $options['language'] = 'en';
         }
         $header[] = 'Accept-Language: '.$options['language'];
-        if (is_array($options['requestheaders'])) {
+        if (\is_array($options['requestheaders'])) {
             $header += $options['requestheaders'];
         }
 
@@ -598,7 +595,7 @@ class Utility
         $fileSpecTemplate = '%s/%s%s';
         $fileSpec = '';
 
-        if (! empty($options['id']) && in_array(
+        if (! empty($options['id']) && \in_array(
             $options['type'],
                 ['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'],
             false
@@ -671,11 +668,11 @@ class Utility
                     //only entry with this key
                     //test if tags of this type should always be arrays, no matter the element count
                     $tagsArray[$childTagName] =
-                        in_array($childTagName, $options['alwaysArray'], false) || ! $options['autoArray']
+                        \in_array($childTagName, $options['alwaysArray'], false) || ! $options['autoArray']
                             ? [$childProperties] : $childProperties;
                 } elseif (
-                    is_array($tagsArray[$childTagName]) && array_keys($tagsArray[$childTagName])
-                    === range(0, count($tagsArray[$childTagName]) - 1)
+                    \is_array($tagsArray[$childTagName]) && array_keys($tagsArray[$childTagName])
+                    === range(0, \count($tagsArray[$childTagName]) - 1)
                 ) {
                     //key already exists and is integer indexed array
                     $tagsArray[$childTagName][] = $childProperties;
@@ -719,8 +716,8 @@ class Utility
             $magicSwitch = empty($magicPath) ? '' : " -m $magicPath";
             $output = self::runCmd('file'.$magicSwitch.' -b "'.$path.'"');
 
-            if (is_array($output)) {
-                switch (count($output)) {
+            if (\is_array($output)) {
+                switch (\count($output)) {
                     case 0:
                         $output = '';
                         break;
@@ -754,7 +751,7 @@ class Utility
      */
     public function checkStatus($code)
     {
-        return ($code === 0) ? true : false;
+        return $code === 0;
     }
 
     /**
@@ -811,17 +808,17 @@ class Utility
         $arrData = [];
 
         // If input is object, convert into array.
-        if (is_object($arrObjData)) {
+        if (\is_object($arrObjData)) {
             $arrObjData = get_object_vars($arrObjData);
         }
 
-        if (is_array($arrObjData)) {
+        if (\is_array($arrObjData)) {
             foreach ($arrObjData as $index => $value) {
                 // Recursive call.
-                if (is_object($value) || is_array($value)) {
+                if (\is_object($value) || \is_array($value)) {
                     $value = self::objectsIntoArray($value, $arrSkipIndices);
                 }
-                if (in_array($index, $arrSkipIndices, false)) {
+                if (\in_array($index, $arrSkipIndices, false)) {
                     continue;
                 }
                 $arrData[$index] = $value;
@@ -878,20 +875,7 @@ class Utility
      */
     public static function generateUuid(): string
     {
-        return Uuid::uuid4()->toString();
-    }
-
-    public static function startsWith($haystack, $needle)
-    {
-        return strpos($haystack, $needle) === 0;
-    }
-
-    public static function endsWith($haystack, $needle)
-    {
-        $length = strlen($needle);
-        $start = $length * -1;
-
-        return substr($haystack, $start) === $needle;
+        return Str::uuid()->toString();
     }
 
     public static function responseXmlToObject($input)
@@ -911,12 +895,12 @@ class Utility
      */
     public static function encodeAsUTF8($data)
     {
-        if (is_array($data)) {
+        if (\is_array($data)) {
             foreach ($data as $key => $value) {
                 $data[$key] = self::encodeAsUTF8($value);
             }
         } else {
-            if (is_string($data)) {
+            if (\is_string($data)) {
                 return utf8_encode($data);
             }
         }
