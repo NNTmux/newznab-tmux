@@ -1,4 +1,5 @@
 2018-02-09 DariusIII
+	* Chg: Add caching to Category model getChildren function
 	* Chg: Simplify install test, we don't need covers check and admin user
 	* Chg: Update SphinxSearch class
 	* Chg: Add patch to remove now unused triggers

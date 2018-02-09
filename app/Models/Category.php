@@ -291,12 +291,19 @@ class Category extends Model
      * Get children of a parent category.
      *
      *
-     * @param $cid
+     * @param $categoryId
      * @return mixed
      */
-    public static function getChildren($cid)
+    public static function getChildren($categoryId)
     {
-        return self::find($cid)->children;
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        $children = Cache::get('children');
+        if ($children !== null) {
+            return $children;
+        }
+        $children = self::find($categoryId)->children;
+        Cache::put('children', $children, $expiresAt);
+        return $children;
     }
 
     /**
