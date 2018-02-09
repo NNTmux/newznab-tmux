@@ -1,4 +1,5 @@
 2018-02-09 DariusIII
+	* Chg: Add patch to remove now unused triggers
 	* Fix: Fix migrations, add patch to remove old and insert new fulltext indexes
 	* Chg: Remove release_search_data table migration as that table is not used anymore. Remove db conversion script.
 	* Chg: Update migrations to properly create fulltext indexes
