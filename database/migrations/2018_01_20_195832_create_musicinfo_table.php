@@ -28,7 +28,6 @@ class CreateMusicinfoTable extends Migration {
 			$table->string('tracks', 3000)->nullable();
 			$table->boolean('cover')->default(0);
 			$table->timestamps();
-			$table->index(['artist','title'], 'ix_musicinfo_artist_title_ft');
 		});
         DB::unprepared('ALTER TABLE musicinfo ADD FULLTEXT ix_musicinfo_artist_title_ft (artist, title)');
 	}
