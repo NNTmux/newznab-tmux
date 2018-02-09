@@ -303,6 +303,7 @@ class Category extends Model
         }
         $children = self::find($categoryId)->children;
         Cache::put('children', $children, $expiresAt);
+
         return $children;
     }
 
