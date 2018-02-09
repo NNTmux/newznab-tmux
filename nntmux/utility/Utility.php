@@ -366,6 +366,9 @@ class Utility
         return $string === '' ? false : $string;
     }
 
+    /**
+     * @param $path
+     */
     public static function setCoversConstant($path)
     {
         if (! \defined('NN_COVERS')) {
@@ -382,7 +385,7 @@ class Utility
                 case empty($path): // Default to resources location.
                 default:
                     \define('NN_COVERS', NN_RES.'covers'.DS);
-            }``
+            }
         }
     }
 
