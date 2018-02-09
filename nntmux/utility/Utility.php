@@ -366,26 +366,23 @@ class Utility
         return $string === '' ? false : $string;
     }
 
-    /**
-     * @param $path
-     */
-    public static function setCoversConstant($path): void
+    public static function setCoversConstant($path)
     {
         if (! \defined('NN_COVERS')) {
             switch (true) {
-                case $path[0] === '/' ||
-                    $path[1] === ':' ||
-                    $path[0] === '\\':
+                case substr($path, 0, 1) === '/' ||
+                    substr($path, 1, 1) === ':' ||
+                    substr($path, 0, 1) === '\\':
                     \define('NN_COVERS', self::trailingSlash($path));
                     break;
-                case \strlen($path) > 0 && $path[0] !== '/' && $path[1] !== ':' &&
-                    $path[0] !== '\\':
+                case strlen($path) > 0 && substr($path, 0, 1) !== '/' && substr($path, 1, 1) !== ':' &&
+                    substr($path, 0, 1) !== '\\':
                     \define('NN_COVERS', realpath(NN_ROOT.self::trailingSlash($path)));
                     break;
                 case empty($path): // Default to resources location.
                 default:
                     \define('NN_COVERS', NN_RES.'covers'.DS);
-            }
+            }``
         }
     }
 
