@@ -26,10 +26,11 @@ class CreatePredbTable extends Migration {
 			$table->boolean('nuked')->default(0)->comment('Is this pre nuked? 0 no 2 yes 1 un nuked 3 mod nuked');
 			$table->string('nukereason')->nullable()->comment('If this pre is nuked, what is the reason?');
 			$table->string('files', 50)->nullable()->comment('How many files does this pre have ?');
-			$table->string('filename')->default('')->index('ft_predb_filename');
+			$table->string('filename')->default('');
 			$table->boolean('searched')->default(0)->index('ix_predb_searched');
 			$table->index(['requestid','groups_id'], 'ix_predb_requestid');
 		});
+        DB::statement('ALTER TABLE predb ADD FULLTEXT ft_predb_filename (filename)');
 	}
 
 

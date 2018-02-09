@@ -17,9 +17,9 @@ class CreateReleaseSearchDataTable extends Migration {
 			$table->increments('id');
 			$table->integer('releases_id')->unsigned()->index('ix_releasesearch_releases_id')->comment('FK to releases.id');
 			$table->string('guid', 50)->index('ix_releasesearch_guid');
-			$table->string('name')->default('')->index('ix_releasesearch_name_ft');
-			$table->string('searchname')->default('')->index('ix_releasesearch_searchname_ft');
-			$table->string('fromname')->nullable()->index('ix_releasesearch_fromname_ft');
+			$table->string('name')->default('');
+			$table->string('searchname')->default('');
+			$table->string('fromname')->nullable();
             $table->foreign('releases_id', 'FK_rsd_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
 	}

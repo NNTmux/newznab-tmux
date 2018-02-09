@@ -27,8 +27,8 @@ class CreateConsoleinfoTable extends Migration {
 			$table->string('review', 3000)->nullable();
 			$table->boolean('cover')->default(0);
 			$table->timestamps();
-			$table->index(['title','platform'], 'ix_consoleinfo_title_platform_ft');
 		});
+        DB::statement('ALTER TABLE consoleinfo ADD FULLTEXT ix_consoleinfo_title_platform_ft (title, platform)');
 	}
 
 

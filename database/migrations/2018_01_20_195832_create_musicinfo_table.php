@@ -30,6 +30,7 @@ class CreateMusicinfoTable extends Migration {
 			$table->timestamps();
 			$table->index(['artist','title'], 'ix_musicinfo_artist_title_ft');
 		});
+        DB::statement('ALTER TABLE musicinfo ADD FULLTEXT ix_musicinfo_artist_title_ft (artist, title)');
 	}
 
 

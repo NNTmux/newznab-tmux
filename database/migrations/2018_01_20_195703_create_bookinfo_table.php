@@ -29,8 +29,8 @@ class CreateBookinfoTable extends Migration {
 			$table->string('genre');
 			$table->boolean('cover')->default(0);
 			$table->timestamps();
-			$table->index(['author','title'], 'ix_bookinfo_author_title_ft');
 		});
+        DB::statement('ALTER TABLE bookinfo ADD FULLTEXT ix_bookinfo_author_title_ft (author, title)');
 	}
 
 
