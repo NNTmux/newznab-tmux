@@ -373,13 +373,13 @@ class Utility
     {
         if (! \defined('NN_COVERS')) {
             switch (true) {
-                case substr($path, 0, 1) === '/' ||
-                    substr($path, 1, 1) === ':' ||
-                    substr($path, 0, 1) === '\\':
+                case substr($path, 0, 1) == '/' ||
+                    substr($path, 1, 1) == ':' ||
+                    substr($path, 0, 1) == '\\':
                     \define('NN_COVERS', self::trailingSlash($path));
                     break;
-                case strlen($path) > 0 && substr($path, 0, 1) !== '/' && substr($path, 1, 1) !== ':' &&
-                    substr($path, 0, 1) !== '\\':
+                case strlen($path) > 0 && substr($path, 0, 1) != '/' && substr($path, 1, 1) != ':' &&
+                    substr($path, 0, 1) != '\\':
                     \define('NN_COVERS', realpath(NN_ROOT.self::trailingSlash($path)));
                     break;
                 case empty($path): // Default to resources location.
