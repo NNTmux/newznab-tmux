@@ -2,10 +2,10 @@
 
 namespace nntmux\utility;
 
-use Illuminate\Support\Str;
 use nntmux\db\DB;
 use nntmux\ColorCLI;
 use App\Models\Settings;
+use Illuminate\Support\Str;
 use App\Extensions\util\Versions;
 
 /**

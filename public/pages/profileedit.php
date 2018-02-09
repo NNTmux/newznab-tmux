@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
 use nntmux\NZBGet;
 use nntmux\SABnzbd;
 use App\Models\User;
