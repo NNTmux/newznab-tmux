@@ -230,8 +230,8 @@ switch ($function) {
     case 'g':
         $api->verifyEmptyParameter('g');
         UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $relData = Release::getByGuid($_GET['id']);
-        if ($relData) {
+        $relData = Release::checkGuidForApi($_GET['id']);
+        if ($relData !== false) {
             header(
                 'Location:'.
                 WWW_TOP.
@@ -240,7 +240,7 @@ switch ($function) {
                 '&r='.
                 $apiKey.
                 '&id='.
-                $relData['guid'].
+                $_GET['id'].
                 ((isset($_GET['del']) && $_GET['del'] === '1') ? '&del=1' : '')
             );
         } else {
@@ -251,7 +251,7 @@ switch ($function) {
     // Get individual NZB details.
     case 'd':
         if (! isset($_GET['id'])) {
-            Utility::showApiError(200, 'Missing parameter (id is required for single release details)');
+            Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
         }
 
         UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
@@ -261,6 +261,7 @@ switch ($function) {
         if ($data) {
             $relData[] = $data;
         }
+
         $api->output($relData, $params, $outputXML, $offset, 'api');
         break;
 
@@ -271,11 +272,11 @@ switch ($function) {
         }
 
         UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $rel = Release::getByGuid($_GET['id']);
+        $rel = Release::query()->where('id', $_GET['id'])->first(['id', 'searchname']);
         $data = ReleaseNfo::getReleaseNfo($rel['id']);
 
-        if ($rel !== false && ! empty($rel)) {
-            if ($data !== false) {
+        if ($rel !== null) {
+            if ($data !== null) {
                 if (isset($_GET['o']) && $_GET['o'] === 'file') {
                     header('Content-type: application/octet-stream');
                     header("Content-disposition: attachment; filename={$rel['searchname']}.nfo");

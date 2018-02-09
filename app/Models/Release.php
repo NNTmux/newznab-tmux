@@ -390,6 +390,12 @@ class Release extends Model
      */
     public static function getByGuid($guid)
     {
+        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
+        $cached = \is_array($guid) ? md5(implode(',', $guid)) : md5($guid);
+        $result = Cache::get($cached);
+        if ($result !== null) {
+            return $result;
+        }
         $sql = self::query()
             ->select(['releases.*', 'g.name as group_name', 'v.title as showtitle', 'v.tvdb', 'v.trakt', 'v.tvrage', 'v.tvmaze', 'v.source', 'tvi.summary', 'tvi.image', 'tve.title', 'tve.firstaired', 'tve.se_complete'])
             ->selectRaw("CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,GROUP_CONCAT(g2.name ORDER BY g2.name ASC SEPARATOR ',') AS group_names")
@@ -412,7 +418,10 @@ class Release extends Model
             $sql->where('releases.guid', '=', $guid);
         }
 
-        return \is_array($guid) ? $sql->groupBy('releases.id')->get() : $sql->groupBy('releases.id')->first();
+        $result = \is_array($guid) ? $sql->groupBy('releases.id')->get() : $sql->groupBy('releases.id')->first();
+        Cache::put($cached, $result, $expiresAt);
+
+        return $result;
     }
 
     /**
@@ -465,5 +474,16 @@ class Release extends Model
             ->first(['guid']);
 
         return $alternate;
+    }
+
+    /**
+     * @param $guid
+     * @return bool
+     */
+    public static function checkGuidForApi($guid): bool
+    {
+        $check = self::query()->where('guid', $guid)->first();
+
+        return $check !== null;
     }
 }
