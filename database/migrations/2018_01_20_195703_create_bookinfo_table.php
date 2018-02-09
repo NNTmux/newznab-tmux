@@ -30,7 +30,7 @@ class CreateBookinfoTable extends Migration {
 			$table->boolean('cover')->default(0);
 			$table->timestamps();
 		});
-        DB::statement('ALTER TABLE bookinfo ADD FULLTEXT ix_bookinfo_author_title_ft (author, title)');
+        DB::unprepared('ALTER TABLE bookinfo ADD FULLTEXT ix_bookinfo_author_title_ft (author, title)');
 	}
 
 
