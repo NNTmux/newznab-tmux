@@ -60,68 +60,6 @@ class InstallTest extends \PHPUnit\Framework\TestCase
         }
 
         if (! $error) {
-
-            $covers_path = NN_RES.'covers'.DS;
-            $nzb_path = NN_RES.'nzb'.DS;
-            $tmp_path = NN_RES.'tmp'.DS;
-            $unrar_path = $tmp_path.'unrar'.DS;
-
-            $nzbPathCheck = is_writable($nzb_path);
-            if ($nzbPathCheck === false) {
-                $error = true;
-                $message = $nzb_path.' is not writable. Please fix folder permissions';
-            }
-
-            $lastchar = substr($nzb_path, \strlen($nzb_path) - 1);
-            if ($lastchar !== '/') {
-                $nzb_path .= '/';
-            }
-
-            if (! file_exists($unrar_path)) {
-                if (! @mkdir($unrar_path) && ! is_dir($unrar_path)) {
-                    throw new \RuntimeException('Unable to create '.$unrar_path.' folder');
-                }
-            }
-            $unrarPathCheck = is_writable($unrar_path);
-            if ($unrarPathCheck === false) {
-                $error = true;
-                $message = $unrar_path.' is not writable. Please fix folder permissions';
-            }
-
-            $lastchar = substr($unrar_path, \strlen($unrar_path) - 1);
-            if ($lastchar !== '/') {
-                $unrar_path .= '/';
-            }
-
-            $coversPathCheck = is_writable($covers_path);
-            if ($coversPathCheck === false) {
-                $error = true;
-                $message = $covers_path.' is not writable. Please fix folder permissions';
-            }
-
-            $lastchar = substr($covers_path, \strlen($covers_path) - 1);
-            if ($lastchar !== '/') {
-                $covers_path .= '/';
-            }
-
-            if (! $error) {
-                $sql1 = Settings::query()->where('setting', '=', 'nzbpath')->update(['value' => $nzb_path]);
-                $sql2 = Settings::query()->where('setting', '=', 'tmpunrarpath')->update(['value' => $unrar_path]);
-                $sql3 = Settings::query()->where('setting', '=', 'coverspath')->update(['value' => $covers_path]);
-                if ($sql1 === null || $sql2 === null || $sql3 === null) {
-                    $error = true;
-                } else {
-                    $message = 'Settings table updated successfully';
-                }
-            }
-        }
-
-        if (! $error) {
-
-           User::add(env('ADMIN_USER'), env('ADMIN_PASS'), env('ADMIN_EMAIL'), 2, '', '', '', '');
-
-            @file_put_contents(NN_ROOT.'_install/install.lock', '');
-            passthru('php '.NN_ROOT.'artisan key:generate');
             $message = 'NNTmux installation completed successfully';
         }
 		$this->assertEquals('NNTmux installation completed successfully', $message, 'Test Failed');

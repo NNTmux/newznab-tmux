@@ -1,4 +1,5 @@
 2018-02-09 DariusIII
+	* Chg: Simplify install test, we don't need covers check and admin user
 	* Chg: Update SphinxSearch class
 	* Chg: Add patch to remove now unused triggers
 	* Fix: Fix migrations, add patch to remove old and insert new fulltext indexes
