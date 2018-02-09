@@ -1,4 +1,5 @@
 2018-02-09 DariusIII
+	* Chg: Update laravel/framework to version 5.6.2
 	* Chg: Add caching to Category model getChildren function
 	* Chg: Simplify install test, we don't need covers check and admin user
 	* Chg: Update SphinxSearch class
