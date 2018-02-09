@@ -44,6 +44,9 @@ class NntmuxResetDb extends Command
         if ($this->confirm('This script removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups. Are you sure you want reset the DB?')) {
             $timestart = Carbon::now();
 
+            DB::unprepared('SET FOREIGN_KEY_CHECKS = 0;');
+            DB::commit();
+
             Group::query()->update([
                 'first_record' => 0,
                 'first_record_postdate' => null,
@@ -85,8 +88,6 @@ class NntmuxResetDb extends Command
                 }
             }
             unset($value);
-            DB::unprepared('SET FOREIGN_KEY_CHECKS = 0;');
-            DB::commit();
             $this->info('Truncating binaries, collections, missed_parts and parts tables...');
             DB::unprepared("CALL loop_cbpm('truncate')");
             DB::commit();
