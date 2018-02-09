@@ -1,4 +1,5 @@
 2018-02-09 DariusIII
+	* Chg: Remove release_search_data table migration as that table is not used anymore. Remove db conversion script.
 	* Chg: Update migrations to properly create fulltext indexes
 	* Mrg: Merge PR #380 by nightah - Properly escape release_naming_regexes 33-35
 2018-02-08 DariusIII
