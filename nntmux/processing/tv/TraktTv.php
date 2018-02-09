@@ -18,34 +18,14 @@ class TraktTv extends TV
     private const MATCH_PROBABILITY = 75;
 
     /**
-     * Client for Trakt API.
-     *
-     * @var TraktAPI
+     * @var \nntmux\libraries\TraktAPI
      */
     public $client;
 
     /**
-     * Utility to convert Time.
-     *
-     * @var Time
+     * @var
      */
     public $time;
-
-    /**
-     * The Trakt.tv API v2 Client ID (SHA256 hash - 64 characters long string). Used for movie and tv lookups.
-     * Create one here: https://trakt.tv/oauth/applications/new.
-     *
-     * @var array|bool|string
-     */
-    private $clientId;
-
-    /**
-     * List of headers to send to Trakt.tv when making a request.
-     *
-     * @see http://docs.trakt.apiary.io/#introduction/required-headers
-     * @var array
-     */
-    private $requestHeaders;
 
     /**
      * The URL to grab the TV poster.
@@ -77,14 +57,14 @@ class TraktTv extends TV
     public function __construct(array $options = [])
     {
         parent::__construct($options);
-        $this->clientId = Settings::settingValue('APIs..trakttvclientkey');
-        $this->requestHeaders = [
+        $clientId = Settings::settingValue('APIs..trakttvclientkey');
+        $requestHeaders = [
                 'Content-Type' => 'application/json',
                 'trakt-api-version' => 2,
-                'trakt-api-key' => $this->clientId,
+                'trakt-api-key' => $clientId,
                 'Content-Length' => 0,
         ];
-        $this->client = new TraktAPI($this->requestHeaders);
+        $this->client = new TraktAPI($requestHeaders);
     }
 
     /**
@@ -328,7 +308,7 @@ class TraktTv extends TV
                 }
             }
             if ($highest !== null) {
-                $fullShow = $this->client->showSummary($highest['show']['ids']['trakt'], 'full');
+                $fullShow = $this->client->showSummary($highest['show']['ids']['trakt']);
                 if ($this->checkRequiredAttr($fullShow, 'traktS')) {
                     $return = $this->formatShowInfo($fullShow);
                 }
@@ -361,12 +341,12 @@ class TraktTv extends TV
                 'publisher' => (string) $show['network'],
                 'country'   => (string) $show['country'],
                 'source'    => parent::SOURCE_TRAKT,
-                'imdb'      => (int) ($imdb['imdbid'] ?? 0),
-                'tvdb'      => (int) ($show['ids']['tvdb'] ?? 0),
+                'imdb'      => $imdb['imdbid'] ?? 0,
+                'tvdb'      => $show['ids']['tvdb'] ?? 0,
                 'trakt'     => (int) $show['ids']['trakt'],
-                'tvrage'    => (int) ($show['ids']['tvrage'] ?? 0),
+                'tvrage'    => $show['ids']['tvrage'] ?? 0,
                 'tvmaze'    => 0,
-                'tmdb'      => (int) ($show['ids']['tmdb'] ?? 0),
+                'tmdb'      => $show['ids']['tmdb'] ?? 0,
                 'aliases'   => isset($show['aliases']) && ! empty($show['aliases']) ? (array) $show['aliases'] : '',
                 'localzone' => $this->localizedTZ,
         ];
