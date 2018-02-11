@@ -24,7 +24,7 @@ class Release extends Model
     /**
      * @var array
      */
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
