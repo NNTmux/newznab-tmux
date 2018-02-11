@@ -179,20 +179,20 @@
         },
         {
             "name": "bhuvidya/laravel-countries",
-            "version": "v1.0.1",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bhuvidya/laravel-countries.git",
-                "reference": "f11b8563233a844d7f69590e579f82d34e9c248e"
+                "reference": "6eda702c6d8710cc96a52397b89eb42ca4d20730"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/f11b8563233a844d7f69590e579f82d34e9c248e",
-                "reference": "f11b8563233a844d7f69590e579f82d34e9c248e",
+                "url": "https://api.github.com/repos/bhuvidya/laravel-countries/zipball/6eda702c6d8710cc96a52397b89eb42ca4d20730",
+                "reference": "6eda702c6d8710cc96a52397b89eb42ca4d20730",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "~5.1",
+                "illuminate/support": "^5.5.0",
                 "php": ">=7.0.0"
             },
             "type": "library",
@@ -217,12 +217,6 @@
                     "name": "bhu Boue vidya",
                     "email": "bhuvidya@gmail.com",
                     "role": "developer"
-                },
-                {
-                    "name": "Christoph Kempen",
-                    "email": "christoph@downsized.nl",
-                    "homepage": "http://downsized.nl/",
-                    "role": "original developer"
                 }
             ],
             "description": "Laravel Countries is a bundle for Laravel, providing Almost ISO 3166_2, 3166_3, currency, Capital and more for all countries. Bug kudos to Christoph Kempen, on whose work this package is heavily based (webpatser/laravel-countries).",
@@ -233,7 +227,7 @@
                 "iso_3166_3",
                 "laravel"
             ],
-            "time": "2017-11-30T01:06:24+00:00"
+            "time": "2018-02-10T23:09:24+00:00"
         },
         {
             "name": "bower-asset/animate.css",

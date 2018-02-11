@@ -1,3 +1,5 @@
+2018-02-11 DariusIII
+	* Chg: Update laravel-countries to version 1.0.3
 2018-02-10 DariusIII
 	* Chg: Update resetdb artisan command
 	* Chg: Potentialy speedup api by changing used functions/queries
