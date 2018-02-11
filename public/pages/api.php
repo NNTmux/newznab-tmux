@@ -272,7 +272,7 @@ switch ($function) {
         }
 
         UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $rel = Release::query()->where('id', $_GET['id'])->first(['id', 'searchname']);
+        $rel = Release::query()->where('guid', $_GET['id'])->first(['id', 'searchname']);
         $data = ReleaseNfo::getReleaseNfo($rel['id']);
 
         if ($rel !== null) {
