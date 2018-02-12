@@ -995,7 +995,8 @@ class Releases
     {
         $whereSql = sprintf(
             '%s
-			WHERE r.nzbstatus = %d
+            WHERE r.categories_id BETWEEN " . Category::MOVIE_ROOT . " AND " . Category::MOVIE_OTHER . "
+			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
 			%s %s %s %s %s',
             ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
@@ -1019,7 +1020,6 @@ class Releases
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			WHERE r.categories_id BETWEEN 2000 AND 2999
 			%s",
             $this->getConcatenatedCategoryIDs(),
             $whereSql
