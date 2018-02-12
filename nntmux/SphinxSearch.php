@@ -25,6 +25,11 @@ class SphinxSearch
     protected $config;
 
     /**
+     * @var \Foolz\SphinxQL\Helper
+     */
+    protected $helper;
+
+    /**
      * Establish connection to SphinxQL.
      *
      * @throws \Exception
@@ -35,6 +40,7 @@ class SphinxSearch
         $this->config = config('sphinxsearch');
         $this->connection->setParams(['host' => $this->config['host'], 'port' => $this->config['port']]);
         $this->sphinxQL = SphinxQL::create($this->connection);
+        $this->helper = Helper::create($this->connection);
     }
 
     /**
@@ -110,7 +116,7 @@ class SphinxSearch
      */
     public function truncateRTIndex(): void
     {
-        Helper::create($this->connection)->truncateRtIndex($this->config['index']);
+        $this->helper->truncateRtIndex($this->config['index']);
     }
 
     /**
@@ -118,7 +124,7 @@ class SphinxSearch
      */
     public function optimizeRTIndex(): void
     {
-        Helper::create($this->connection)->flushRtIndex($this->config['index']);
-        Helper::create($this->connection)->optimizeIndex($this->config['index']);
+        $this->helper->flushRtIndex($this->config['index']);
+        $this->helper->optimizeIndex($this->config['index']);
     }
 }
