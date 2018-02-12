@@ -203,7 +203,7 @@ switch ($function) {
         $maxAge = $api->maxAge();
         UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
-        $imdbId = ($_GET['imdbid'] ?? '-1');
+        $imdbId = ($_GET['imdbid'] ?? -1);
 
         $relData = $releases->searchbyImdbId(
             $imdbId,
