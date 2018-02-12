@@ -89,6 +89,7 @@ return [
             'charset'     => 'utf8',
             'collation'   => 'utf8_unicode_ci',
             'strict'      => false,
+            'engine'      => 'InnoDB ROW_FORMAT=DYNAMIC',
         ],
 
         'sphinx' => [
