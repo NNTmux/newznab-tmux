@@ -1019,7 +1019,7 @@ class Releases
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN categories cp ON cp.id = c.parentid
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			WHERE r.categories_id BETWEEN 5000 AND 5999
+			WHERE r.categories_id BETWEEN 2000 AND 2999
 			%s",
             $this->getConcatenatedCategoryIDs(),
             $whereSql
