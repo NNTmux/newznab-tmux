@@ -30,10 +30,11 @@ class CreateReleaseCommentsTable extends Migration {
 			$table->string('shareid', 40)->default('');
 			$table->string('siteid', 40)->default('');
 			$table->bigInteger('sourceid')->unsigned()->nullable();
-			$table->binary('nzb_guid')->default('0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0');
 			$table->unique(['text_hash','releases_id'], 'ix_release_comments_hash_releases_id');
             $table->foreign('releases_id', 'FK_rc_releases')->references('id')->on('releases')->onUpdate('CASCADE')->onDelete('CASCADE');
 		});
+
+        DB::unprepared("ALTER TABLE release_comments ADD COLUMN nzb_guid BINARY(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'");
 	}
 
 

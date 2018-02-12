@@ -1,3 +1,5 @@
+2018-02-12 DariusIII
+	* Chg: Update release_comments migration
 2018-02-11 DariusIII
 	* Chg: Update Release model
 	* Fix: Fix wrong column used to fetch NFO for a release in api
