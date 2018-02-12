@@ -1,4 +1,5 @@
 2018-02-12 DariusIII
+	* Chg: Update composer.json, remove ext-yenc suggestion and add ext-bcmath as required
 	* Chg: Update database.php nntmux configuration to include engine definition
 	* Chg: Update phpspec/prophecy to version 1.7.4
 	* Chg: Update release_comments migration
