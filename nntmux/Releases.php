@@ -620,10 +620,10 @@ class Releases
     /**
      * Function for searching on the site (by subject, searchname or advanced).
      *
-     * @param string $searchName
-     * @param string $usenetName
-     * @param string $posterName
-     * @param string $fileName
+     * @param string|int $searchName
+     * @param string|int $usenetName
+     * @param string|int $posterName
+     * @param string|int $fileName
      * @param string|int $groupName
      * @param int $sizeFrom
      * @param int $sizeTo
