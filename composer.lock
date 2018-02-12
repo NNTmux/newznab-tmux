@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d46783ef703047cdb1e1685d86d30c77",
+    "content-hash": "5423fe220bd86ed71ba99bc94fe087c7",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -2244,16 +2244,16 @@
         },
         {
             "name": "exeu/apai-io",
-            "version": "2.1.0",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Exeu/apai-io.git",
-                "reference": "fb171b5654c8a24a075976fc927f488a2ea0c15b"
+                "reference": "ba5bb754f59f744e927a3bdf4b339fa2a0afb44f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Exeu/apai-io/zipball/fb171b5654c8a24a075976fc927f488a2ea0c15b",
-                "reference": "fb171b5654c8a24a075976fc927f488a2ea0c15b",
+                "url": "https://api.github.com/repos/Exeu/apai-io/zipball/ba5bb754f59f744e927a3bdf4b339fa2a0afb44f",
+                "reference": "ba5bb754f59f744e927a3bdf4b339fa2a0afb44f",
                 "shasum": ""
             },
             "require": {
@@ -2294,7 +2294,7 @@
                 "products",
                 "rest"
             ],
-            "time": "2017-02-24T10:12:27+00:00"
+            "time": "2018-02-12T10:44:56+00:00"
         },
         {
             "name": "fideloper/proxy",
@@ -8280,5 +8280,7 @@
         "ext-xmlwriter": "*",
         "ext-zlib": "*"
     },
-    "platform-dev": []
+    "platform-dev": {
+        "ext-bcmath": "*"
+    }
 }
