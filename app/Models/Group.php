@@ -292,6 +292,8 @@ class Group extends Model
                 'backfill' => $group['backfill'] ?? 0,
                 'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ? null : $group['minsizetoformrelease'],
                 'minfilestoformrelease' => $group['minfilestoformrelease'] === '' ? null : $group['minfilestoformrelease'],
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]
         );
     }
