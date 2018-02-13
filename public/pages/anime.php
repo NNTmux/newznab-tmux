@@ -15,7 +15,7 @@ $aniDB = new AniDB(['Settings' => $page->settings]);
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 
     // force the category to TV_ANIME as it should be for anime, as $catarray was NULL and we know the category for sure for anime
-    $aniDbReleases = $releases->searchbyAnidbId($_GET['id'], 0, 1000, '', [Category::TV_ANIME], -1);
+    $aniDbReleases = $releases->animeSearch($_GET['id'], 0, 1000, '', [Category::TV_ANIME], -1);
     $aniDbInfo = $aniDB->getAnimeInfo($_GET['id']);
 
     if (! $releases && ! $aniDbInfo) {

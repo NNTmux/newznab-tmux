@@ -776,7 +776,7 @@ class Releases
      *
      * @return array
      */
-    public function searchShows(
+    public function tvSearch(
         array $siteIdArr = [],
         $series = '',
         $episode = '',
@@ -922,7 +922,7 @@ class Releases
      *
      * @return array
      */
-    public function searchbyAnidbId($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1): array
+    public function animeSearch($aniDbID, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1): array
     {
         $whereSql = sprintf(
             '%s
@@ -991,7 +991,7 @@ class Releases
      *
      * @return array
      */
-    public function searchbyImdbId($imDbId, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
+    public function moviesSearch($imDbId, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
     {
         $whereSql = sprintf(
             '%s

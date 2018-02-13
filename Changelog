@@ -1,4 +1,5 @@
 2018-02-13 DariusIII
+	* Chg: Rename search functions to be more descriptive (ie. searchByImdbId searches for movies even without imdbid, so renamed to moviesSearch)
 	* Chg: Use insertGetId again in addGroup function
 	* Chg: Update phpunit to version 7.0.1
 2018-02-12 DariusIII

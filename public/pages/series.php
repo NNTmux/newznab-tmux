@@ -20,7 +20,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     $catarray = [];
     $catarray[] = $category;
 
-    $rel = $releases->searchShows(['id' => $_GET['id']], '', '', '', 0, 1000, '', $catarray, -1);
+    $rel = $releases->tvSearch(['id' => $_GET['id']], '', '', '', 0, 1000, '', $catarray, -1);
     $show = Video::getByVideoID($_GET['id']);
 
     if (! $show) {

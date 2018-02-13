@@ -179,7 +179,7 @@ switch ($function) {
             $airdate = str_replace('/', '-', $year[0].'-'.$episode);
         }
 
-        $relData = $releases->searchShows(
+        $relData = $releases->tvSearch(
             $siteIdArr,
             $series,
             $episode,
@@ -205,7 +205,7 @@ switch ($function) {
 
         $imdbId = ($_GET['imdbid'] ?? -1);
 
-        $relData = $releases->searchbyImdbId(
+        $relData = $releases->moviesSearch(
             $imdbId,
             $offset,
             $api->limit(),
