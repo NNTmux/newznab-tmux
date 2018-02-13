@@ -1,4 +1,5 @@
 2018-02-13 DariusIII
+	* Chg: Use insertGetId again in addGroup function
 	* Chg: Update phpunit to version 7.0.1
 2018-02-12 DariusIII
 	* Chg: Create local variable for Helper class in SphinxSearch
