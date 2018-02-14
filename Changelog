@@ -1,4 +1,5 @@
 2018-02-14 DariusIII
+	* Chg: Update Versions class
 	* Chg: Update informational messages output
 	* Chg: Rename nntmux namespace and folder to Blacklight
 	* Fix: Fix echoing of cli messages (most of them)

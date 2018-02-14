@@ -28,9 +28,9 @@ class Versions extends Collection
     /**
      * These constants are bitwise for checking what has changed.
      */
-    const UPDATED_GIT_TAG = 1;
-    const UPDATED_SQL_DB_PATCH = 2;
-    const UPDATED_SQL_FILE_LAST = 4;
+    protected const UPDATED_GIT_TAG = 1;
+    protected const UPDATED_SQL_DB_PATCH = 2;
+    protected const UPDATED_SQL_FILE_LAST = 4;
 
     /**
      * @var int Bitwise mask of elements that have been changed.
@@ -60,16 +60,21 @@ class Versions extends Collection
     public function __construct(array $config = [])
     {
         $defaults = [
-			'git'	=> null,
-			'path'	=> NN_VERSIONS,
-		];
+            'git'	=> null,
+            'path'	=> NN_VERSIONS,
+        ];
         $config += $defaults;
 
         $this->_config = $config;
         parent::__construct($config + $defaults);
     }
 
-    public function checkGitTag($update = false)
+    /**
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \RuntimeException
+     */
+    public function checkGitTag(): void
     {
         $this->checkGitTagInFile();
     }
@@ -81,6 +86,9 @@ class Versions extends Collection
      * @param bool $update
      *
      * @return false|string version string if matched or false.
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \RuntimeException
      */
     public function checkGitTagInFile($update = false)
     {
@@ -90,13 +98,14 @@ class Versions extends Collection
         if ($result !== false) {
             if (! $this->git->isStable($this->git->getBranch())) {
                 $this->loadXMLFile();
-                $result = preg_match(Utility::VERSION_REGEX, $this->versions->git->tag->__toString(),
-					$matches) ? $matches['digits'] : false;
-                if ($result !== false) {
-                    if (version_compare($matches['digits'], '0.0.0', '!=')) {
-                        $this->versions->git->tag = '0.0.0-dev';
-                        $this->changes |= self::UPDATED_GIT_TAG;
-                    }
+                $result = preg_match(
+                    Utility::VERSION_REGEX,
+                    $this->versions->git->tag->__toString(),
+                    $matches
+                ) ? $matches['digits'] : false;
+                if ($result !== false && version_compare($matches['digits'], '0.0.0', '!=')) {
+                    $this->versions->git->tag = '0.0.0-dev';
+                    $this->changes |= self::UPDATED_GIT_TAG;
                 }
 
                 $result = $this->versions->git->tag;
@@ -108,12 +117,19 @@ class Versions extends Collection
         return $result;
     }
 
+    /**
+     * @param array $options
+     * @return bool|\SimpleXMLElement
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \RuntimeException
+     */
     public function checkGitTagsAreEqual(array $options = [])
     {
         $options += [
-			'update' => true,
-			'verbose' => true,
-		];
+            'update' => true,
+            'verbose' => true,
+        ];
 
         $this->loadXMLFile();
         $latestTag = $this->git->tagLatest();
@@ -128,16 +144,18 @@ class Versions extends Collection
                 $this->changes |= self::UPDATED_GIT_TAG;
 
                 return $this->versions->git->tag;
-            } else { // They're NOT the same but we were told not to update.
+            }  // They're NOT the same but we were told not to update.
                 if ($options['verbose'] === true) {
                     echo "Current tag version $latestTag, skipping update!".PHP_EOL;
                 }
 
                 return false;
-            }
-        } else { // They're the same so return true
-            return true;
+
         }
+
+        // They're the same so return true
+            return true;
+
     }
 
     /**
@@ -146,6 +164,8 @@ class Versions extends Collection
      * @param bool $verbose
      *
      * @return bool|string The new database sqlpatch version, or false.
+     * @throws \RuntimeException
+     * @throws \Exception
      */
     public function checkSQLDb($verbose = true)
     {
@@ -163,7 +183,11 @@ class Versions extends Collection
         return $this->isChanged(self::UPDATED_SQL_DB_PATCH) ? $patch : false;
     }
 
-    public function checkSQLFileLatest($verbose = true)
+    /**
+     * @param bool $verbose
+     * @throws \RuntimeException
+     */
+    public function checkSQLFileLatest($verbose = true): void
     {
         $this->loadXMLFile();
         $lastFile = $this->getSQLPatchLast();
@@ -177,35 +201,54 @@ class Versions extends Collection
         }
     }
 
-    public function getGitBranch()
+    /**
+     * @return string
+     */
+    public function getGitBranch(): string
     {
         $this->initialiseGit();
 
         return $this->git->getBranch();
     }
 
-    public function getGitHeadHash()
+    /**
+     * @return string
+     */
+    public function getGitHeadHash(): string
     {
         $this->initialiseGit();
 
         return $this->git->getHeadHash();
     }
 
-    public function getGitTagInFile()
+    /**
+     * @return null|string
+     * @throws \RuntimeException
+     */
+    public function getGitTagInFile(): ?string
     {
         $this->loadXMLFile();
 
         return ($this->versions === null) ? null : $this->versions->git->tag->__toString();
     }
 
-    public function getGitTagInRepo()
+    /**
+     * @return string
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     */
+    public function getGitTagInRepo(): string
     {
         $this->initialiseGit();
 
         return $this->git->tagLatest();
     }
 
-    public function getSQLPatchFromDB()
+    /**
+     * @return null|string
+     * @throws \Exception
+     */
+    public function getSQLPatchFromDB(): ?string
     {
         $dbVersion = Settings::settingValue('..sqlpatch', true);
 
@@ -216,6 +259,10 @@ class Versions extends Collection
         return $dbVersion;
     }
 
+    /**
+     * @return null|string
+     * @throws \RuntimeException
+     */
     public function getSQLPatchFromFile()
     {
         $this->loadXMLFile();
@@ -223,29 +270,41 @@ class Versions extends Collection
         return ($this->versions === null) ? null : $this->versions->sql->file->__toString();
     }
 
+    /**
+     * @return bool|int
+     */
     public function getSQLPatchLast()
     {
         $options = [
-			'data'  => NN_RES.'db'.DS.'schema'.DS.'data'.DS,
-			'ext'   => 'sql',
-			'path'  => NN_RES.'db'.DS.'patches'.DS.'mysql',
-			'regex' => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
-			'safe'  => true,
-		];
+            'data'  => NN_RES.'db'.DS.'schema'.DS.'data'.DS,
+            'ext'   => 'sql',
+            'path'  => NN_RES.'db'.DS.'patches'.DS.'mysql',
+            'regex' => '#^'.Utility::PATH_REGEX.'(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
+            'safe'  => true,
+        ];
         $files = Utility::getDirFiles($options);
         natsort($files);
 
         return preg_match($options['regex'], end($files), $matches) ? (int) $matches['patch'] : false;
     }
 
-    public function getTagVersion()
+    /**
+     * @return string
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     */
+    public function getTagVersion(): string
     {
         $this->deprecated(__METHOD__, 'getGitTagInRepo');
 
         return $this->getGitTagInRepo();
     }
 
-    public function getValidVersionsFile()
+    /**
+     * @return \simpleXMLElement
+     * @throws \RuntimeException
+     */
+    public function getValidVersionsFile(): \simpleXMLElement
     {
         $this->loadXMLFile();
 
@@ -257,12 +316,15 @@ class Versions extends Collection
      *
      * @return bool True if the XML has been changed.
      */
-    public function hasChanged()
+    public function hasChanged(): bool
     {
         return $this->changes !== 0;
     }
 
-    public function save($verbose = true)
+    /**
+     * @param bool $verbose
+     */
+    public function save($verbose = true): void
     {
         if ($this->hasChanged()) {
             if ($verbose === true && $this->changes > 0) {
@@ -285,28 +347,42 @@ class Versions extends Collection
         }
     }
 
-    protected function error($message)
+    /**
+     * @param $message
+     */
+    protected function error($message): void
     {
         // TODO handle console error message.
     }
 
-    protected function initialiseGit()
+    /**
+     *
+     */
+    protected function initialiseGit(): void
     {
         if (! ($this->git instanceof Git)) {
             $this->git = new Git();
         }
     }
 
-    protected function isChanged($property)
+    /**
+     * @param $property
+     * @return bool
+     */
+    protected function isChanged($property): bool
     {
         return ($this->changes & $property) === $property;
     }
 
-    protected function loadXMLFile()
+    /**
+     *
+     * @throws \RuntimeException
+     */
+    protected function loadXMLFile(): void
     {
-        if (empty($this->versions)) {
+        if ($this->versions === null) {
             $temp = libxml_use_internal_errors(true);
-            $this->xml = simplexml_load_file($this->_config['path']);
+            $this->xml = simplexml_load_string(file_get_contents($this->_config['path']));
             libxml_use_internal_errors($temp);
 
             if ($this->xml === false) {
@@ -320,25 +396,35 @@ class Versions extends Collection
                 if ($vers[0]->count() === 0) {
                     $this->error("Your versions XML file ({$this->_config['path']}) does not contain version info, try updating from git.");
                     throw new \RuntimeException("Failed to find versions node in XML file '{$this->_config['path']}'");
-                } else {
-                    $this->versions = &$this->xml->versions; // Create a convenience shortcut
                 }
+
+                $this->versions = &$this->xml->versions; // Create a convenience shortcut
+
             } else {
                 throw new \RuntimeException("No elements in file!\n");
             }
         }
     }
 
-    protected function _init()
+    /**
+     *
+     */
+    protected function _init(): void
     {
         if ($this->_config['git'] instanceof Git) {
             $this->git = &$this->_config['git'];
         }
     }
 
-    private function deprecated($methodOld, $methodUse)
+    /**
+     * @param $methodOld
+     * @param $methodUse
+     */
+    private function deprecated($methodOld, $methodUse): void
     {
-        trigger_error("This method ($methodOld) is deprecated. Please use '$methodUse' instead.",
-			E_USER_NOTICE);
+        trigger_error(
+            "This method ($methodOld) is deprecated. Please use '$methodUse' instead.",
+            E_USER_NOTICE
+        );
     }
 }
