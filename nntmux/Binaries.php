@@ -1089,8 +1089,7 @@ class Binaries
                 ColorCLI::alternateOver(number_format($currentMicroTime - $this->startPR, 2).'s').
                 ColorCLI::primaryOver(' for part repair, ').
                 ColorCLI::alternateOver(number_format($currentMicroTime - $this->startLoop, 2).'s').
-                ColorCLI::primary(' total.')
-            , true);
+                ColorCLI::primary(' total.'), true);
         }
     }
 
