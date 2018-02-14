@@ -19,13 +19,13 @@ if ($nntp->doConnect() !== true) {
     exit(ColorCLI::error('Unable to connect to usenet.'));
 }
 
-echo ColorCLI::header('Getting first/last for all your active groups.');
+ColorCLI::doEcho(ColorCLI::header('Getting first/last for all your active groups.'), true);
 $data = $nntp->getGroups();
 if ($nntp->isError($data)) {
     exit(ColorCLI::error('Failed to getGroups() from nntp server.'));
 }
 
-echo ColorCLI::header('Inserting new values into short_groups table.');
+ColorCLI::doEcho(ColorCLI::header('Inserting new values into short_groups table.'), true);
 
 DB::unprepared('TRUNCATE TABLE short_groups');
 DB::commit();
@@ -43,10 +43,10 @@ foreach ($data as $newgroup) {
                 'updated' => Carbon::now(),
             ]
         );
-        echo ColorCLI::primary('Updated '.$newgroup['group']);
+        ColorCLI::doEcho(ColorCLI::primary('Updated '.$newgroup['group']), true);
     }
 }
-echo ColorCLI::header('Running time: '.$consoleTools->convertTimer(time() - $start));
+ColorCLI::doEcho(ColorCLI::header('Running time: '.$consoleTools->convertTimer(time() - $start)), true);
 
 function myInArray($array, $value, $key)
 {
