@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Genres;
-use nntmux\Console;
+use Blacklight\Genres;
+use Blacklight\Console;
 
 $page = new AdminPage();
 $console = new Console(['Settings' => $page->pdo]);

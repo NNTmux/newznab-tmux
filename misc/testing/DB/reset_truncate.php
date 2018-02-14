@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\ColorCLI;
+use Blacklight\ColorCLI;
 use App\Models\Group;
 use App\Models\Release;
 use Illuminate\Support\Facades\DB;

@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
+use Blacklight\db\DB;
 
 //	This script can dump all tables or just collections/binaries/parts/partrepair/groups.
 

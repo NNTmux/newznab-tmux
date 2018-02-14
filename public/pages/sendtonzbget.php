@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\NZBGet;
+use Blacklight\NZBGet;
 use App\Models\User;
 
 if (! User::isLoggedIn()) {

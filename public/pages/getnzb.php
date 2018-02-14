@@ -1,11 +1,11 @@
 <?php
 
-use nntmux\NZB;
+use Blacklight\NZB;
 use App\Models\User;
-use nntmux\Releases;
+use Blacklight\Releases;
 use App\Models\Release;
 use App\Models\Settings;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
 

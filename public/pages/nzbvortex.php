@@ -5,7 +5,7 @@ use App\Models\User;
 if (! User::isLoggedIn()) {
     $page->show403();
 }
-use nntmux\NZBVortex;
+use Blacklight\NZBVortex;
 
 try {
     if (isset($_GET['isAjax'])) {

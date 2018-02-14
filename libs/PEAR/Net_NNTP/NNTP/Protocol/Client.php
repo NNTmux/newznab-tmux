@@ -514,7 +514,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		$socket = stream_socket_client(
 			$transport . '://' . $host . ':' . $port,
 			$errorNumber, $errorString, $timeout, STREAM_CLIENT_CONNECT,
-			stream_context_create(nntmux\utility\Utility::streamSslContextOptions())
+			stream_context_create(Blacklight\utility\Utility::streamSslContextOptions())
 		);
 
 		if ($socket === false) {

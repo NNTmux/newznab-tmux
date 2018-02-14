@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
-use nntmux\Movie;
+use Blacklight\db\DB;
+use Blacklight\Movie;
 
 $db = new DB();
 $movie = new Movie(['Echo' => true, 'Settings' => $pdo]);

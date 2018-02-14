@@ -2,13 +2,13 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\NZB;
-use nntmux\db\DB;
-use nntmux\ColorCLI;
-use nntmux\Releases;
-use nntmux\ConsoleTools;
-use nntmux\ReleaseImage;
-use nntmux\utility\Utility;
+use Blacklight\NZB;
+use Blacklight\db\DB;
+use Blacklight\ColorCLI;
+use Blacklight\Releases;
+use Blacklight\ConsoleTools;
+use Blacklight\ReleaseImage;
+use Blacklight\utility\Utility;
 
 $cli = new ColorCLI();
 if (isset($argv[1])) {

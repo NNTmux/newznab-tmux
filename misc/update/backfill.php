@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\NNTP;
-use nntmux\db\DB;
-use nntmux\Backfill;
+use Blacklight\NNTP;
+use Blacklight\db\DB;
+use Blacklight\Backfill;
 
 $pdo = new DB();
 
@@ -33,7 +33,7 @@ if (isset($argv[1]) && $argv[1] === 'all' && ! isset($argv[2])) {
     $backfill = new Backfill(['NNTP' => $nntp, 'Settings' => $pdo]);
     $backfill->safeBackfill($argv[2]);
 } else {
-    exit(\nntmux\ColorCLI::error("\nWrong set of arguments.\n"
+    exit(\Blacklight\ColorCLI::error("\nWrong set of arguments.\n"
             .'php backfill.php safe 200000		 ...: Backfill an active group alphabetically, x articles, the script stops,'."\n"
             .'					 ...: if the group has reached reached 2012-06-24, the next group will backfill.'."\n"
             .'php backfill.php alph 200000 		 ...: Backfills all groups (sorted alphabetically) by number of articles'."\n"

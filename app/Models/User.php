@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Mail\SendInvite;
 use App\Mail\AccountChange;
 use Illuminate\Support\Str;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;

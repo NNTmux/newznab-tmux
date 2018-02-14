@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use nntmux\Contents;
+use Blacklight\Contents;
 
 $contents = new Contents(['Settings' => $page->settings]);
 

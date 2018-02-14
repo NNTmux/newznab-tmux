@@ -2,13 +2,13 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\processing\tv\TVDB;
+use Blacklight\processing\tv\TVDB;
 use Adrenth\Thetvdb\Exception\UnauthorizedException;
 use Adrenth\Thetvdb\Exception\RequestFailedException;
 use Adrenth\Thetvdb\Exception\InvalidArgumentException;
 use Adrenth\Thetvdb\Exception\InvalidJsonInResponseException;
 
-$c = new nntmux\ColorCLI();
+$c = new Blacklight\ColorCLI();
 $tvdb = new TVDB();
 
 if (isset($argv[1]) && ! empty($argv[1]) && isset($argv[2]) && is_numeric($argv[2]) && isset($argv[3]) && is_numeric($argv[3])) {

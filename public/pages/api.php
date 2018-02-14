@@ -1,12 +1,12 @@
 <?php
 
 use App\Models\User;
-use nntmux\http\API;
-use nntmux\Releases;
+use Blacklight\http\API;
+use Blacklight\Releases;
 use App\Models\Release;
 use App\Models\ReleaseNfo;
 use App\Models\UserRequest;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 
 // API functions.
 $function = 's';

@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use nntmux\Releases;
+use Blacklight\Releases;
 use App\Models\Video;
 use App\Models\Category;
 use App\Models\Settings;

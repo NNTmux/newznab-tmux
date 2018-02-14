@@ -9,10 +9,10 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\NNTP;
-use nntmux\db\DB;
-use nntmux\ColorCLI;
-use nntmux\NameFixer;
+use Blacklight\NNTP;
+use Blacklight\db\DB;
+use Blacklight\ColorCLI;
+use Blacklight\NameFixer;
 use App\Models\Settings;
 
 $pdo = new DB();

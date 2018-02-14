@@ -1,11 +1,11 @@
 <?php
 
-use nntmux\NZBGet;
-use nntmux\SABnzbd;
+use Blacklight\NZBGet;
+use Blacklight\SABnzbd;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\Settings;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 use App\Models\UserExcludedCategory;
 
 $sab = new SABnzbd($page);

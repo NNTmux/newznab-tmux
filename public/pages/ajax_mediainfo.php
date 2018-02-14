@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use nntmux\ReleaseExtra;
+use Blacklight\ReleaseExtra;
 
 if (! User::isLoggedIn()) {
     $page->show403();

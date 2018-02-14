@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\Captcha;
+use Blacklight\Captcha;
 use App\Mail\ContactUs;
 use App\Models\Settings;
 use Illuminate\Support\Facades\Mail;

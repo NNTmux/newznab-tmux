@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
-use nntmux\SphinxSearch;
-use nntmux\ReleaseCleaning;
+use Blacklight\db\DB;
+use Blacklight\SphinxSearch;
+use Blacklight\ReleaseCleaning;
 
 $message =
     'Shows old searchname vs new searchname for releases in a group using the releaseCleaning class. (Good for testing new regex)'.

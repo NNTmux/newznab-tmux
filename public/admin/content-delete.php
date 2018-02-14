@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Contents;
+use Blacklight\Contents;
 
 $page = new AdminPage();
 

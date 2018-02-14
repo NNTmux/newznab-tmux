@@ -2,15 +2,15 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\Tmux;
-use nntmux\db\DB;
-use nntmux\TmuxRun;
-use nntmux\ColorCLI;
-use nntmux\TmuxOutput;
+use Blacklight\Tmux;
+use Blacklight\db\DB;
+use Blacklight\TmuxRun;
+use Blacklight\ColorCLI;
+use Blacklight\TmuxOutput;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 
 $pdo = new DB();
 $tMain = new Tmux($pdo);

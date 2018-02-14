@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
-use nntmux\ColorCLI;
+use Blacklight\db\DB;
+use Blacklight\ColorCLI;
 
 $pdo = new DB();
 $c = new ColorCLI();

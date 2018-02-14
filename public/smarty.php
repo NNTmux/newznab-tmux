@@ -20,7 +20,7 @@
  */
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap'.DIRECTORY_SEPARATOR.'autoload.php';
 
-use nntmux\config\Configure;
+use Blacklight\config\Configure;
 
 try {
     $config = new Configure('smarty');

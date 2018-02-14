@@ -2,11 +2,11 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Sites;
-use nntmux\SABnzbd;
+use Blacklight\Sites;
+use Blacklight\SABnzbd;
 use App\Models\Category;
 use App\Models\Settings;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 use App\Models\Category as CategoryModel;
 
 $page = new AdminPage();

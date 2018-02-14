@@ -3,7 +3,7 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use aharen\OMDbAPI;
-use nntmux\ColorCLI;
+use Blacklight\ColorCLI;
 
 $omdb = new OMDbAPI();
 

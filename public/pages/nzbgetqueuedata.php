@@ -1,8 +1,8 @@
 <?php
 
-use nntmux\NZBGet;
+use Blacklight\NZBGet;
 use App\Models\User;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 
 if (! User::isLoggedIn()) {
     $page->show403();

@@ -1,7 +1,7 @@
 <?php
 
-use nntmux\Music;
-use nntmux\Genres;
+use Blacklight\Music;
+use Blacklight\Genres;
 use App\Models\User;
 use App\Models\Category;
 

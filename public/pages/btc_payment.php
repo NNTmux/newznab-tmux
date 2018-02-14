@@ -2,7 +2,7 @@
 
 use App\Models\User;
 use App\Models\UserRole;
-use nntmux\libraries\Geary;
+use Blacklight\libraries\Geary;
 
 $page = new Page();
 

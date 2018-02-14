@@ -16,10 +16,10 @@ test.php
 /.idea/
 /vendor/*
 /app/resources/tmp/*
-/nntmux/config/settings.php
-/nntmux/config/ircscraper_settings.php
-/nntmux/config/ircscraper.php
-/nntmux/config/opensssl.php
+/Blacklight/config/settings.php
+/Blacklight/config/ircscraper_settings.php
+/Blacklight/config/ircscraper.php
+/Blacklight/config/opensssl.php
 
 /libraries/*
 /nbproject/
@@ -27,5 +27,5 @@ test.php
 /resources/covers/*
 /resources/nzb/*
 /resources/tmp/*
-/templates_c/*
+/resources/smarty/templates_c/*
 /public/themes/shared/assets

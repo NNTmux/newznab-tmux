@@ -24,9 +24,9 @@
 */
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\ColorCLI;
-use nntmux\db\PreDb;
-use nntmux\utility\Utility;
+use Blacklight\ColorCLI;
+use Blacklight\db\PreDb;
+use Blacklight\utility\Utility;
 
 if (! Utility::isWin()) {
     $canExeRead = Utility::canExecuteRead(NN_RES);

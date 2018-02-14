@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\ColorCLI;
-use nntmux\ReleaseRemover;
+use Blacklight\ColorCLI;
+use Blacklight\ReleaseRemover;
 
 // New line for CLI.
 $n = PHP_EOL;

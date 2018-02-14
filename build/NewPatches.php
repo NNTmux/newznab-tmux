@@ -20,9 +20,9 @@
  */
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DbUpdate;
-use nntmux\utility\Git;
-use nntmux\utility\Utility;
+use Blacklight\db\DbUpdate;
+use Blacklight\utility\Git;
+use Blacklight\utility\Utility;
 
 if (! Utility::isCLI()) {
     exit;

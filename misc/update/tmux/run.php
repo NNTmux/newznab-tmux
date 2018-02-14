@@ -2,11 +2,11 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\Tmux;
-use nntmux\db\DB;
-use nntmux\ColorCLI;
+use Blacklight\Tmux;
+use Blacklight\db\DB;
+use Blacklight\ColorCLI;
 use App\Models\Settings;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 
 $pdo = new DB();
 $DIR = NN_TMUX;
@@ -186,7 +186,7 @@ function window_optimize($tmux_session)
 
 function window_sharing($tmux_session)
 {
-    $pdo = new nntmux\db\DB();
+    $pdo = new Blacklight\db\DB();
     $sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
     $t = new Tmux();
     $tmux = $t->get();

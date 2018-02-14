@@ -20,7 +20,7 @@
  */
 require_once '../../nntmux/processing/tv/TV.php';
 
-use nntmux\processing\tv\TV;
+use Blacklight\processing\tv\TV;
 
 class smartyTV extends TV
 {

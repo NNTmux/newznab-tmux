@@ -10,7 +10,7 @@
       "app/Extensions/helper/helpers.php"
     ],
     "psr-4": {
-      "nntmux\\": "nntmux/",
+      "Blacklight\\": "Blacklight/",
       "App\\": "app/"
     },
     "classmap": [
@@ -173,11 +173,11 @@
       "@php artisan key:generate"
     ],
     "post-install-cmd": [
-      "nntmux\\build\\ComposerScripts::postInstall",
-      "nntmux\\build\\ComposerScripts::postInstallCmd"
+      "Blacklight\\build\\ComposerScripts::postInstall",
+      "Blacklight\\build\\ComposerScripts::postInstallCmd"
     ],
     "post-update-cmd": [
-      "nntmux\\build\\ComposerScripts::postUpdate"
+      "Blacklight\\build\\ComposerScripts::postUpdate"
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

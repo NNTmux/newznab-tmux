@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use nntmux\libraries\Geary;
+use Blacklight\libraries\Geary;
 
 $gateway_id = env('MYCELIUM_GATEWAY_ID');
 $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');

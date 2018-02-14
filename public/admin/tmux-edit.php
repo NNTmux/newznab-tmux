@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Tmux;
+use Blacklight\Tmux;
 
 $page = new AdminPage();
 $tmux = new Tmux();

@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
-use nntmux\utility\Utility;
+use Blacklight\db\DB;
+use Blacklight\utility\Utility;
 
 $pdo = new DB();
 $covers = $updated = $deleted = 0;

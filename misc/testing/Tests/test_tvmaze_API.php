@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\processing\tv\TVMaze;
+use Blacklight\processing\tv\TVMaze;
 
-$c = new nntmux\ColorCLI();
+$c = new Blacklight\ColorCLI();
 $tvmaze = new TVMaze();
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {

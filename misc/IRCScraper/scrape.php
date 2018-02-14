@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\IRCScraper;
+use Blacklight\IRCScraper;
 
 if (! defined('IRC_SCRAPER_CONFIG')) {
     define('IRC_SCRAPER_CONFIG', NN_CONFIGS.'ircscraper_settings.php');

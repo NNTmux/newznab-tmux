@@ -1,7 +1,7 @@
 <?php
 
-use nntmux\NZBGet;
-use nntmux\SABnzbd;
+use Blacklight\NZBGet;
+use Blacklight\SABnzbd;
 use App\Models\User;
 
 if (! User::isLoggedIn()) {

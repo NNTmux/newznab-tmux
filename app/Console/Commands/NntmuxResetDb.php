@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Group;
 use App\Models\Settings;
-use nntmux\SphinxSearch;
+use Blacklight\SphinxSearch;
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;

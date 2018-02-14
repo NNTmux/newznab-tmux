@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use nntmux\SphinxSearch;
+use Blacklight\SphinxSearch;
 use Illuminate\Database\Eloquent\Model;
 
 class ReleaseFile extends Model

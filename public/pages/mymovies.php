@@ -1,8 +1,8 @@
 <?php
 
-use nntmux\Movie;
+use Blacklight\Movie;
 use App\Models\User;
-use nntmux\Releases;
+use Blacklight\Releases;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserMovie;

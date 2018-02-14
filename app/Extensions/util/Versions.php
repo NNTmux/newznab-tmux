@@ -20,7 +20,7 @@
 namespace App\Extensions\util;
 
 use App\Models\Settings;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 use Illuminate\Database\Eloquent\Collection;
 
 class Versions extends Collection

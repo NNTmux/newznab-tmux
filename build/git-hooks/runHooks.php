@@ -22,7 +22,7 @@ define('GIT_PRE_COMMIT', true);
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\utility\Git;
+use Blacklight\utility\Git;
 use App\Extensions\util\Versions;
 
 echo "Running pre-commit hooks\n";
@@ -30,7 +30,7 @@ echo "Running pre-commit hooks\n";
 $error = false;
 
 // TODO Add code here to check permissions on staged files.
-//$files = file(NN_ROOT . 'nntmux/build/git-hooks'), FILE_IGNORE_NEW_LINES);
+//$files = file(NN_ROOT . 'Blacklight/build/git-hooks'), FILE_IGNORE_NEW_LINES);
 //foreach ($files as $file) {
 //	echo "Filename: $file\n";
 //}

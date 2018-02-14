@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Music;
-use nntmux\Genres;
+use Blacklight\Music;
+use Blacklight\Genres;
 
 $page = new AdminPage();
 $music = new Music();

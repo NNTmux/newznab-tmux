@@ -1,11 +1,11 @@
 <?php
 
-use nntmux\Captcha;
+use Blacklight\Captcha;
 use App\Models\User;
 use App\Models\Settings;
 use App\Models\UserRole;
 use App\Models\Invitation;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 
 if (User::isLoggedIn()) {
     header('Location: '.WWW_TOP.'/');

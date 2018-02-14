@@ -3,7 +3,7 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\User;
-use nntmux\Contents;
+use Blacklight\Contents;
 
 $page = new AdminPage();
 $contents = new Contents(['Settings' => $page->pdo]);

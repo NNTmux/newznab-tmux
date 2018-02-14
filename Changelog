@@ -1,4 +1,5 @@
 2018-02-14 DariusIII
+	* Chg: Rename nntmux namespace and folder to Blacklight
 	* Fix: Fix echoing of cli messages (most of them)
 	* Chg: Update echoing of informational messages in update_groups.php
 	* Chg: Update ColorCLI class

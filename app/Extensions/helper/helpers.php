@@ -1,8 +1,8 @@
 <?php
 
-use nntmux\XXX;
+use Blacklight\XXX;
 use Colors\Color;
-use nntmux\ColorCLI;
+use Blacklight\ColorCLI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;

@@ -1,11 +1,11 @@
 <?php
 
 use App\Models\User;
-use nntmux\http\RSS;
+use Blacklight\http\RSS;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserRequest;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 
 $rss = new RSS(['Settings' => $page->settings]);
 $offset = 0;

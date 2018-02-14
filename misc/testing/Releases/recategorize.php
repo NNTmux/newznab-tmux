@@ -2,11 +2,11 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
-use nntmux\ColorCLI;
-use nntmux\Categorize;
+use Blacklight\db\DB;
+use Blacklight\ColorCLI;
+use Blacklight\Categorize;
 use App\Models\Category;
-use nntmux\ConsoleTools;
+use Blacklight\ConsoleTools;
 
 $pdo = new DB();
 

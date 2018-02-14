@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\Movie;
+use Blacklight\Movie;
 use App\Models\User;
 
 $movie = new Movie;

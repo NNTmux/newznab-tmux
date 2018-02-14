@@ -2,12 +2,12 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\NZB;
-use nntmux\db\DB;
-use nntmux\Releases;
+use Blacklight\NZB;
+use Blacklight\db\DB;
+use Blacklight\Releases;
 use App\Models\Settings;
-use nntmux\ReleaseImage;
-use nntmux\utility\Utility;
+use Blacklight\ReleaseImage;
+use Blacklight\utility\Utility;
 
 $pdo = new DB();
 

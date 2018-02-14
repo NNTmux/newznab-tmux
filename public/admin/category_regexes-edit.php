@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Regexes;
+use Blacklight\Regexes;
 use App\Models\Category;
 
 $page = new AdminPage();

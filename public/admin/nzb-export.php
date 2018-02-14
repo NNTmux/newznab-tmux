@@ -2,10 +2,10 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Releases;
-use nntmux\NZBExport;
+use Blacklight\Releases;
+use Blacklight\NZBExport;
 
-if (\nntmux\utility\Utility::isCLI()) {
+if (\Blacklight\utility\Utility::isCLI()) {
     exit('This script is only for exporting from the web, use the script in misc/testing'.
         PHP_EOL);
 }

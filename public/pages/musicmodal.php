@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\Music;
+use Blacklight\Music;
 use App\Models\User;
 
 $music = new Music;

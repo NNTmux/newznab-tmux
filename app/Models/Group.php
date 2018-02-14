@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use nntmux\NZB;
-use nntmux\NNTP;
-use nntmux\ColorCLI;
-use nntmux\Releases;
-use nntmux\ReleaseImage;
+use Blacklight\NZB;
+use Blacklight\NNTP;
+use Blacklight\ColorCLI;
+use Blacklight\Releases;
+use Blacklight\ReleaseImage;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;

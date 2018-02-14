@@ -1,9 +1,9 @@
 <?php
 
-use nntmux\db\DB;
-use nntmux\Regexes;
-use nntmux\Sharing;
-use nntmux\Binaries;
+use Blacklight\db\DB;
+use Blacklight\Regexes;
+use Blacklight\Sharing;
+use Blacklight\Binaries;
 use App\Models\Group;
 use App\Models\ReleaseComment;
 

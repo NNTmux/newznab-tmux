@@ -9,15 +9,15 @@ require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php
 use App\Models\Group;
 use App\Models\Settings;
 use App\Models\Tmux;
-use \nntmux\db\DB;
-use \nntmux\processing\PostProcess;
-use \nntmux\processing\ProcessReleases;
-use \nntmux\processing\post\ProcessAdditional;
-use nntmux\Backfill;
-use nntmux\Binaries;
-use nntmux\Nfo;
-use nntmux\NNTP;
-use nntmux\processing\ProcessReleasesMultiGroup;
+use \Blacklight\db\DB;
+use \Blacklight\processing\PostProcess;
+use \Blacklight\processing\ProcessReleases;
+use \Blacklight\processing\post\ProcessAdditional;
+use Blacklight\Backfill;
+use Blacklight\Binaries;
+use Blacklight\Nfo;
+use Blacklight\NNTP;
+use Blacklight\processing\ProcessReleasesMultiGroup;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
 // The type of process we want to do: $options[1] => (string): releases
@@ -308,7 +308,7 @@ function charCheck($char)
 /**
  * Check if the group should be processed.
  *
- * @param \nntmux\db\DB $pdo
+ * @param \Blacklight\db\DB $pdo
  * @param int                $groupID
  */
 function collectionCheck(&$pdo, $groupID)

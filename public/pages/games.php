@@ -1,7 +1,7 @@
 <?php
 
-use nntmux\Games;
-use nntmux\Genres;
+use Blacklight\Games;
+use Blacklight\Genres;
 use App\Models\User;
 use App\Models\Category;
 

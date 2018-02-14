@@ -1,7 +1,7 @@
 <?php
 
-use nntmux\NZB;
-use nntmux\db\DB;
+use Blacklight\NZB;
+use Blacklight\db\DB;
 use App\Models\User;
 use App\Models\Release;
 

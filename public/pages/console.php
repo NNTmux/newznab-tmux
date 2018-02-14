@@ -1,7 +1,7 @@
 <?php
 
-use nntmux\Genres;
-use nntmux\Console;
+use Blacklight\Genres;
+use Blacklight\Console;
 use App\Models\User;
 use App\Models\Category;
 

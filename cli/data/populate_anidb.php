@@ -4,9 +4,9 @@
 */
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
-use nntmux\ColorCLI;
-use nntmux\db\populate\AniDB;
+use Blacklight\db\DB;
+use Blacklight\ColorCLI;
+use Blacklight\db\populate\AniDB;
 
 $pdo = new DB();
 

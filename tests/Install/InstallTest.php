@@ -18,8 +18,8 @@ require_once \dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.ph
 use App\Extensions\util\Versions;
 use App\Models\Settings;
 use App\Models\User;
-use nntmux\config\Configure;
-use nntmux\ColorCLI;
+use Blacklight\config\Configure;
+use Blacklight\ColorCLI;
 
 /**
  * Class InstallTest

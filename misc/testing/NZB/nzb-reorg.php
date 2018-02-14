@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\NZB;
-use nntmux\db\DB;
-use nntmux\ConsoleTools;
+use Blacklight\NZB;
+use Blacklight\db\DB;
+use Blacklight\ConsoleTools;
 
 if (! isset($argv[1]) || ! isset($argv[2])) {
     exit("ERROR: You must supply the level you want to reorganize it to, and the source directory  (You would use: 3 .../newznab/resources/nzb/ to move it to 3 levels deep)\n");

@@ -1,6 +1,6 @@
 <?php
 
-// YOU SHOULD NOT EDIT ANYTHING IN THIS FILE, COPY .../ntmux/config/settings.example.php TO .../nntmux/config/settings.php AND EDIT THAT FILE!
+// YOU SHOULD NOT EDIT ANYTHING IN THIS FILE, COPY .../ntmux/config/settings.example.php TO .../Blacklight/config/settings.php AND EDIT THAT FILE!
 
 define('NN_MINIMUM_PHP_VERSION', '7.2.0');
 define('NN_MINIMUM_MYSQL_VERSION', '5.6');
@@ -12,7 +12,7 @@ define('DS', DIRECTORY_SEPARATOR);
 define('NN_ROOT', realpath(dirname(__DIR__)).DS);
 
 // Used to refer to the main lib class files.
-define('NN_LIB', NN_ROOT.'nntmux'.DS);
+define('NN_LIB', NN_ROOT.'Blacklight'.DS);
 define('NN_CORE', NN_LIB);
 
 define('NN_CONFIGS', NN_CORE.'config'.DS);

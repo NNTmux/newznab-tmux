@@ -2,10 +2,10 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\NNTP;
-use nntmux\db\DB;
+use Blacklight\NNTP;
+use Blacklight\db\DB;
 use App\Models\Settings;
-use nntmux\processing\PostProcess;
+use Blacklight\processing\PostProcess;
 
 $pdo = new DB();
 /**
@@ -38,7 +38,7 @@ $bool = [
 
 if (! isset($argv[1]) || ! in_array($argv[1], $args, false) || ! isset($argv[2]) || ! in_array($argv[2], $bool, false)) {
     exit(
-    \nntmux\ColorCLI::error(
+    \Blacklight\ColorCLI::error(
         "\nIncorrect arguments.\n"
         ."The second argument (true/false) determines wether to echo or not.\n\n"
         ."php postprocess.php all true         ...: Does all the types of post processing.\n"

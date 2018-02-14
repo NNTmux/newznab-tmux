@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\ColorCLI;
-use nntmux\NameFixer;
+use Blacklight\ColorCLI;
+use Blacklight\NameFixer;
 
 if (! isset($argv[1]) && ($argv[1] !== 'full' || ! is_numeric($argv[1]))) {
     exit(

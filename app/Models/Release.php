@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use nntmux\NZB;
-use nntmux\SphinxSearch;
+use Blacklight\NZB;
+use Blacklight\SphinxSearch;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;

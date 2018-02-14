@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\processing\tv\TMDB;
+use Blacklight\processing\tv\TMDB;
 
 $tmdb = new TMDB();
 
@@ -47,11 +47,11 @@ if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
                 }
             }
         } else {
-            exit(\nntmux\ColorCLI::error('Invalid episode data returned from TMDB API.'));
+            exit(\Blacklight\ColorCLI::error('Invalid episode data returned from TMDB API.'));
         }
     } else {
-        exit(\nntmux\ColorCLI::error('Invalid show data returned from TMDB API.'));
+        exit(\Blacklight\ColorCLI::error('Invalid show data returned from TMDB API.'));
     }
 } else {
-    exit(\nntmux\ColorCLI::error('Invalid arguments.  This script requires a text string (show name) followed by a season and episode number.'));
+    exit(\Blacklight\ColorCLI::error('Invalid arguments.  This script requires a text string (show name) followed by a season and episode number.'));
 }

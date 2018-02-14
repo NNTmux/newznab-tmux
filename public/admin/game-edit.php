@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Games;
-use nntmux\Genres;
+use Blacklight\Games;
+use Blacklight\Genres;
 
 $page = new AdminPage();
 $games = new Games(['Settings' => $page->pdo]);

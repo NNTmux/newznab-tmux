@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\SABnzbd;
+use Blacklight\SABnzbd;
 use App\Models\User;
 
 if (! User::isLoggedIn()) {

@@ -3,8 +3,8 @@
 /* This script deletes releases that match certain criteria, type php removeCrapReleases.php false for details. */
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\ColorCLI;
-use nntmux\ReleaseRemover;
+use Blacklight\ColorCLI;
+use Blacklight\ReleaseRemover;
 
 $cli = new ColorCLI();
 

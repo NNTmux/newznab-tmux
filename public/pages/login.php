@@ -1,9 +1,9 @@
 <?php
 
-use nntmux\Captcha;
+use Blacklight\Captcha;
 use App\Models\User;
 use App\Models\Settings;
-use nntmux\utility\Utility;
+use Blacklight\utility\Utility;
 
 $page->smarty->assign(['error' => '', 'username' => '', 'rememberme' => '']);
 

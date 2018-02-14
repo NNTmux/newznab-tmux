@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Binaries;
+use Blacklight\Binaries;
 
 // login check
 $admin = new AdminPage;

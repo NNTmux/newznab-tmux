@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Regexes;
-use nntmux\Binaries;
+use Blacklight\Regexes;
+use Blacklight\Binaries;
 
 // Login Check
 $admin = new AdminPage;

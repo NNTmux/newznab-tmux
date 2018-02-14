@@ -1,7 +1,7 @@
 <?php
 
-use nntmux\Sitemap;
-use nntmux\Contents;
+use Blacklight\Sitemap;
+use Blacklight\Contents;
 use App\Models\Settings;
 
 $te = $page->smarty;

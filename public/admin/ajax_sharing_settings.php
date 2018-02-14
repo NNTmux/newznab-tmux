@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\db\DB;
-use nntmux\Sharing;
+use Blacklight\db\DB;
+use Blacklight\Sharing;
 use App\Models\ReleaseComment;
 
 // Login check.

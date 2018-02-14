@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use nntmux\Releases;
+use Blacklight\Releases;
 use App\Models\Group;
 use App\Models\Category;
 

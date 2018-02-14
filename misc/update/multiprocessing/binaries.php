@@ -7,6 +7,6 @@ if (! isset($argv[1]) || ! is_numeric($argv[1])) {
 }
 declare(ticks=1);
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
-use nntmux\libraries\Forking;
+use Blacklight\libraries\Forking;
 
 (new Forking())->processWorkType('binaries', [0 => $argv[1]]);

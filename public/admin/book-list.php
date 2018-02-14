@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Books;
-use nntmux\utility\Utility;
+use Blacklight\Books;
+use Blacklight\utility\Utility;
 
 $page = new AdminPage();
 

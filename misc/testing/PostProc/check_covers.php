@@ -5,10 +5,10 @@
 // --------------------------------------------------------------
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
-use nntmux\Movie;
-use nntmux\ColorCLI;
-use nntmux\utility\Utility;
+use Blacklight\db\DB;
+use Blacklight\Movie;
+use Blacklight\ColorCLI;
+use Blacklight\utility\Utility;
 
 $pdo = new DB();
 $movie = new Movie(['Echo' => true, 'Settings' => $pdo]);

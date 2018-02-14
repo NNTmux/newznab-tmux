@@ -7,7 +7,7 @@ if (PHP_SAPI === 'cli') {
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\NZBImport;
+use Blacklight\NZBImport;
 
 $page = new AdminPage();
 

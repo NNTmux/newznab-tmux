@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\Releases;
+use Blacklight\Releases;
 use App\Models\Release;
 use App\Models\Category;
 

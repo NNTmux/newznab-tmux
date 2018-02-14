@@ -4,8 +4,8 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 // Test if your giantbomb key is working.
 
-use nntmux\db\DB;
-use nntmux\ColorCLI;
+use Blacklight\db\DB;
+use Blacklight\ColorCLI;
 
 $giantbombkey = (new DB())->getSetting('giantbombkey');
 $cli = new ColorCLI();

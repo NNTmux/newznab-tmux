@@ -4,9 +4,9 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\db\DB;
-use nntmux\Games;
-use nntmux\ColorCLI;
+use Blacklight\db\DB;
+use Blacklight\Games;
+use Blacklight\ColorCLI;
 
 $pdo = new DB();
 $game = new Games(['Echo' => true, 'Settings' => $pdo]);

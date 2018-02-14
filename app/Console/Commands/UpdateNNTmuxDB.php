@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use nntmux\db\DbUpdate;
+use Blacklight\db\DbUpdate;
 use App\Extensions\util\Git;
 use Illuminate\Console\Command;
 use App\Extensions\util\Versions;

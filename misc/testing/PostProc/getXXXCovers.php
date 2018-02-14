@@ -3,9 +3,9 @@
 //This script will update all records in the xxxinfo table where there is no cover
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\XXX;
-use nntmux\db\DB;
-use nntmux\ColorCLI;
+use Blacklight\XXX;
+use Blacklight\db\DB;
+use Blacklight\ColorCLI;
 
 $pdo = new DB();
 $movie = new XXX();

@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\http\RSS;
+use Blacklight\http\RSS;
 
 $rss = new RSS(['Settings' => $page->settings]);
 

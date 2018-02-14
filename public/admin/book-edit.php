@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Books;
-use nntmux\Genres;
+use Blacklight\Books;
+use Blacklight\Genres;
 
 $page = new AdminPage();
 $book = new Books();

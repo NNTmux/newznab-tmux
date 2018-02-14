@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\Console;
+use Blacklight\Console;
 use App\Models\User;
 
 if (! User::isLoggedIn()) {

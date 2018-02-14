@@ -3,7 +3,7 @@
 declare(ticks=1);
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\libraries\ForkingImportNZB;
+use Blacklight\libraries\ForkingImportNZB;
 
 if (! isset($argv[1]) || ! is_dir($argv[1])) {
     exit(

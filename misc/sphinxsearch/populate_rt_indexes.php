@@ -3,7 +3,7 @@
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Release;
-use nntmux\SphinxSearch;
+use Blacklight\SphinxSearch;
 use Illuminate\Support\Facades\DB;
 
 if (! isset($argv[1]) || $argv[1] !== 'releases_rt') {

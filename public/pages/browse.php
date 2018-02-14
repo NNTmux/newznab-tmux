@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use nntmux\Releases;
+use Blacklight\Releases;
 use App\Models\Category;
 
 $releases = new Releases(['Settings' => $page->settings]);

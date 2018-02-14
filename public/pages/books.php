@@ -1,6 +1,6 @@
 <?php
 
-use nntmux\Books;
+use Blacklight\Books;
 use App\Models\User;
 use App\Models\Category;
 

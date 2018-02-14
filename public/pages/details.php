@@ -1,19 +1,19 @@
 <?php
 
-use nntmux\XXX;
-use nntmux\AniDB;
-use nntmux\Books;
-use nntmux\Games;
-use nntmux\Movie;
-use nntmux\Music;
-use nntmux\Console;
+use Blacklight\XXX;
+use Blacklight\AniDB;
+use Blacklight\Books;
+use Blacklight\Games;
+use Blacklight\Movie;
+use Blacklight\Music;
+use Blacklight\Console;
 use App\Models\User;
-use nntmux\Releases;
+use Blacklight\Releases;
 use App\Models\Predb;
 use App\Models\Video;
 use App\Models\Release;
 use App\Models\Settings;
-use nntmux\ReleaseExtra;
+use Blacklight\ReleaseExtra;
 use App\Models\ReleaseNfo;
 use App\Models\DnzbFailure;
 use App\Models\ReleaseFile;

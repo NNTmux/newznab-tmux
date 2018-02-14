@@ -3,7 +3,7 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\MultigroupPoster;
-use nntmux\processing\ProcessReleasesMultiGroup;
+use Blacklight\processing\ProcessReleasesMultiGroup;
 
 $page = new AdminPage();
 $relPosters = new ProcessReleasesMultiGroup(['Settings' => $page->pdo]);

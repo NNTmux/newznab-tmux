@@ -2,18 +2,18 @@
 
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\Nfo;
-use nntmux\NZB;
-use nntmux\NNTP;
-use nntmux\db\DB;
-use nntmux\ColorCLI;
+use Blacklight\Nfo;
+use Blacklight\NZB;
+use Blacklight\NNTP;
+use Blacklight\db\DB;
+use Blacklight\ColorCLI;
 use App\Models\Predb;
-use nntmux\NameFixer;
-use nntmux\MiscSorter;
-use nntmux\NZBContents;
+use Blacklight\NameFixer;
+use Blacklight\MiscSorter;
+use Blacklight\NZBContents;
 use App\Models\Category;
 use App\Models\Settings;
-use nntmux\processing\PostProcess;
+use Blacklight\processing\PostProcess;
 
 $pdo = new DB();
 

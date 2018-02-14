@@ -2,7 +2,7 @@
 
 use App\Models\Menu;
 use App\Models\User;
-use nntmux\Contents;
+use Blacklight\Contents;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\Forumpost;

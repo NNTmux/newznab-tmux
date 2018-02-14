@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Releases;
+use Blacklight\Releases;
 use App\Models\Release;
 use App\Models\Category;
 

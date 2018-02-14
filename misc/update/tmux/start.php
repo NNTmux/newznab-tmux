@@ -8,8 +8,8 @@
  */
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\Tmux;
-use nntmux\ColorCLI;
+use Blacklight\Tmux;
+use Blacklight\ColorCLI;
 
 // Ensure compatible tmux version is installed $tmux_version == "tmux 2.1\n" || $tmux_version == "tmux 2.2\n"
 if (`which tmux`) {

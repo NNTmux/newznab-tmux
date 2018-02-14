@@ -8,8 +8,8 @@ Author: lordgnu <lordgnu@me.com>
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\NZB;
-use nntmux\db\DB;
+use Blacklight\NZB;
+use Blacklight\db\DB;
 use App\Models\Settings;
 
 $pdo = new DB;

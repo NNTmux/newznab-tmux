@@ -5,8 +5,8 @@ require_once 'constants.php';
 require __DIR__.DIRECTORY_SEPARATOR.'app.php';
 
 use Dotenv\Dotenv;
-use nntmux\utility\Utility;
-use nntmux\config\Configure;
+use Blacklight\utility\Utility;
+use Blacklight\config\Configure;
 
 $dotenv = new Dotenv(dirname(__DIR__, 1));
 $dotenv->load();

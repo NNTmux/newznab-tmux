@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\Movie;
+use Blacklight\Movie;
 
 $page = new AdminPage();
 $movie = new Movie();

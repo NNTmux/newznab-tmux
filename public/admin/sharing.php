@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use nntmux\db\DB;
+use Blacklight\db\DB;
 
 $page = new AdminPage();
 $page->title = 'Sharing Settings';

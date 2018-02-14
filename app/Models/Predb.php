@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use nntmux\ColorCLI;
-use nntmux\ConsoleTools;
+use Blacklight\ColorCLI;
+use Blacklight\ConsoleTools;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;

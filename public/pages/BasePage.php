@@ -2,8 +2,8 @@
 
 require_once NN_LIB.'utility'.DS.'SmartyUtils.php';
 
-use nntmux\db\DB;
-use nntmux\SABnzbd;
+use Blacklight\db\DB;
+use Blacklight\SABnzbd;
 use App\Models\User;
 use App\Models\Settings;
 use App\Models\RoleExcludedCategory;
@@ -70,7 +70,7 @@ class BasePage
     /**
      * Public access to Captcha object for error checking.
      *
-     * @var \nntmux\Captcha
+     * @var \Blacklight\Captcha
      */
     public $captcha;
 
@@ -87,7 +87,7 @@ class BasePage
     public $token;
 
     /**
-     * @var \nntmux\db\DB
+     * @var \Blacklight\db\DB
      */
     public $pdo;
 

@@ -3,9 +3,9 @@
 // To troubleshoot what's actually on usenet.
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\NNTP;
-use nntmux\Binaries;
-use nntmux\ColorCLI;
+use Blacklight\NNTP;
+use Blacklight\Binaries;
+use Blacklight\ColorCLI;
 
 $cli = new ColorCLI();
 

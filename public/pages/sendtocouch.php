@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use nntmux\CouchPotato;
+use Blacklight\CouchPotato;
 
 if (! User::isLoggedIn()) {
     $page->show403();
