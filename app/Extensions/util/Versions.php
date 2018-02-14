@@ -145,17 +145,15 @@ class Versions extends Collection
 
                 return $this->versions->git->tag;
             }  // They're NOT the same but we were told not to update.
-                if ($options['verbose'] === true) {
-                    echo "Current tag version $latestTag, skipping update!".PHP_EOL;
-                }
+            if ($options['verbose'] === true) {
+                echo "Current tag version $latestTag, skipping update!".PHP_EOL;
+            }
 
-                return false;
-
+            return false;
         }
 
         // They're the same so return true
-            return true;
-
+        return true;
     }
 
     /**
@@ -355,9 +353,6 @@ class Versions extends Collection
         // TODO handle console error message.
     }
 
-    /**
-     *
-     */
     protected function initialiseGit(): void
     {
         if (! ($this->git instanceof Git)) {
@@ -375,7 +370,6 @@ class Versions extends Collection
     }
 
     /**
-     *
      * @throws \RuntimeException
      */
     protected function loadXMLFile(): void
@@ -399,16 +393,12 @@ class Versions extends Collection
                 }
 
                 $this->versions = &$this->xml->versions; // Create a convenience shortcut
-
             } else {
                 throw new \RuntimeException("No elements in file!\n");
             }
         }
     }
 
-    /**
-     *
-     */
     protected function _init(): void
     {
         if ($this->_config['git'] instanceof Git) {
