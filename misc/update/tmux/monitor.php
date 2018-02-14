@@ -4,12 +4,12 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\Tmux;
 use Blacklight\db\DB;
-use Blacklight\TmuxRun;
-use Blacklight\ColorCLI;
-use Blacklight\TmuxOutput;
 use App\Models\Release;
+use Blacklight\TmuxRun;
 use App\Models\Category;
 use App\Models\Settings;
+use Blacklight\ColorCLI;
+use Blacklight\TmuxOutput;
 use Blacklight\utility\Utility;
 
 $pdo = new DB();

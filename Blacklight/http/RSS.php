@@ -3,8 +3,8 @@
 namespace Blacklight\http;
 
 use Blacklight\NZB;
-use Blacklight\Releases;
 use App\Models\Category;
+use Blacklight\Releases;
 
 /**
  * Class RSS -- contains specific functions for RSS.

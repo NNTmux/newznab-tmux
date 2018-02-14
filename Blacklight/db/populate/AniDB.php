@@ -2,12 +2,12 @@
 
 namespace Blacklight\db\populate;
 
-use Blacklight\ColorCLI;
 use App\Models\Settings;
-use Blacklight\ReleaseImage;
+use Blacklight\ColorCLI;
 use App\Models\AnidbInfo;
 use App\Models\AnidbTitle;
 use App\Models\AnidbEpisode;
+use Blacklight\ReleaseImage;
 use Illuminate\Support\Carbon;
 
 class AniDB

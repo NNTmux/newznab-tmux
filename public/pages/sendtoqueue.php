@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
-use App\Models\User;
 
 if (! User::isLoggedIn()) {
     $page->show403();

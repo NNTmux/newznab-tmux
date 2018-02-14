@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\User;
 use Blacklight\Genres;
 use Blacklight\Console;
-use App\Models\User;
 use App\Models\Category;
 
 if (! User::isLoggedIn()) {

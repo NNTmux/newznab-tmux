@@ -5,9 +5,9 @@ namespace Blacklight;
 use Blacklight\db\DB;
 use App\Models\AudioData;
 use App\Models\VideoData;
-use Blacklight\utility\Utility;
 use App\Models\ReleaseUnique;
 use App\Models\ReleaseSubtitle;
+use Blacklight\utility\Utility;
 use App\Models\ReleaseExtraFull;
 
 class ReleaseExtra

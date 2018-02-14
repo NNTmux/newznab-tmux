@@ -1,7 +1,7 @@
 <?php
 
-use Blacklight\Books;
 use App\Models\User;
+use Blacklight\Books;
 
 $b = new Books;
 

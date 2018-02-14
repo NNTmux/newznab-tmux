@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use ApaiIO\ApaiIO;
+use Blacklight\db\DB;
 use App\Models\Settings;
 use ApaiIO\Operations\Lookup;
 use ApaiIO\Configuration\GenericConfiguration;

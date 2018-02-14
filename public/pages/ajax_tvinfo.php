@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\User;
-use Blacklight\Releases;
 use App\Models\Video;
 use App\Models\Release;
+use Blacklight\Releases;
 
 if (! User::isLoggedIn()) {
     $page->show403();

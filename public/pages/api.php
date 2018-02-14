@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\User;
+use App\Models\Release;
 use Blacklight\http\API;
 use Blacklight\Releases;
-use App\Models\Release;
 use App\Models\ReleaseNfo;
 use App\Models\UserRequest;
 use Blacklight\utility\Utility;

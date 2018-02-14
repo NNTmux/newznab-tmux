@@ -2,9 +2,9 @@
 
 namespace Blacklight\db;
 
-use Blacklight\ColorCLI;
 use Ramsey\Uuid\Uuid;
 use App\Models\Settings;
+use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 use Blacklight\libraries\Cache;
 use Blacklight\utility\Utility;

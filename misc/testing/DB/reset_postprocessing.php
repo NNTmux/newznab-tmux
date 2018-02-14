@@ -3,8 +3,8 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\db\DB;
-use Blacklight\ColorCLI;
 use App\Models\Category;
+use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 
 $pdo = new DB();

@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\User;
+use Blacklight\db\DB;
 use App\Models\Content;
 
 class Contents

@@ -1,7 +1,7 @@
 <?php
 
-use Blacklight\NZBGet;
 use App\Models\User;
+use Blacklight\NZBGet;
 
 if (! User::isLoggedIn()) {
     $page->show403();

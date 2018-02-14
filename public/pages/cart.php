@@ -1,13 +1,13 @@
 <?php
 
 use App\Models\User;
-use Blacklight\Releases;
+use App\Models\Release;
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-use App\Models\Release;
+use Blacklight\Releases;
 use App\Models\UsersRelease;
 
 if (isset($_GET['add'])) {

@@ -1,7 +1,7 @@
 <?php
 
-use Blacklight\Music;
 use App\Models\User;
+use Blacklight\Music;
 
 $music = new Music;
 

@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use Blacklight\Binaries;
 use App\Models\Category;
+use Blacklight\Binaries;
 
 $page = new AdminPage();
 $bin = new Binaries(['Settings' => $page->pdo]);

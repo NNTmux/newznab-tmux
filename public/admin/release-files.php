@@ -3,8 +3,8 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\NZB;
-use Blacklight\db\DB;
 use App\Models\User;
+use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Settings;
 

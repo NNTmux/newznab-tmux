@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use ApaiIO\ApaiIO;
 use App\Models\Genre;
+use Blacklight\db\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
 use App\Models\Category;

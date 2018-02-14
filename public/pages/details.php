@@ -1,23 +1,23 @@
 <?php
 
 use Blacklight\XXX;
+use App\Models\User;
+use App\Models\Predb;
+use App\Models\Video;
 use Blacklight\AniDB;
 use Blacklight\Books;
 use Blacklight\Games;
 use Blacklight\Movie;
 use Blacklight\Music;
-use Blacklight\Console;
-use App\Models\User;
-use Blacklight\Releases;
-use App\Models\Predb;
-use App\Models\Video;
 use App\Models\Release;
+use Blacklight\Console;
 use App\Models\Settings;
-use Blacklight\ReleaseExtra;
+use Blacklight\Releases;
 use App\Models\ReleaseNfo;
 use App\Models\DnzbFailure;
 use App\Models\ReleaseFile;
 use App\Models\ReleaseRegex;
+use Blacklight\ReleaseExtra;
 use App\Models\ReleaseComment;
 
 if (! User::isLoggedIn()) {

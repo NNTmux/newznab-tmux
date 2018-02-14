@@ -3,8 +3,8 @@
 namespace Blacklight\utility;
 
 use Blacklight\db\DB;
-use Blacklight\ColorCLI;
 use App\Models\Settings;
+use Blacklight\ColorCLI;
 use Illuminate\Support\Str;
 use App\Extensions\util\Versions;
 

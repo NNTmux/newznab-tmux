@@ -1,7 +1,7 @@
 <?php
 
-use Blacklight\Captcha;
 use App\Mail\ContactUs;
+use Blacklight\Captcha;
 use App\Models\Settings;
 use Illuminate\Support\Facades\Mail;
 

@@ -21,8 +21,8 @@
 
 namespace Blacklight\processing;
 
-use Blacklight\db\DB;
 use App\Models\Video;
+use Blacklight\db\DB;
 use App\Models\TvInfo;
 use App\Models\VideoAlias;
 use Illuminate\Support\Carbon;
