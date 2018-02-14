@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use nntmux\ColorCLI;
 use nntmux\db\DB;
+use nntmux\ColorCLI;
 use nntmux\NameFixer;
 use nntmux\ConsoleTools;
 
