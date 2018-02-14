@@ -2,9 +2,6 @@
 
 namespace nntmux;
 
-// Original taken from https://gist.github.com/donatj/1315354 by Jesse Donat.
-// Modified by ThePeePs.
-
 class ColorCLI
 {
     /**
