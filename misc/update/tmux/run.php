@@ -38,7 +38,7 @@ if (! empty($session)) {
 }
 
 //reset collections dateadded to now if dateadded > delay time check
-echo ColorCLI::header('Resetting expired collections dateadded to now. This could take a minute or two. Really.');
+ColorCLI::doEcho(ColorCLI::header('Resetting expired collections dateadded to now. This could take a minute or two. Really.'), true);
 
 $sql = 'SHOW table status';
 $tables = $pdo->queryDirect($sql);
@@ -56,7 +56,7 @@ foreach ($tables as $row) {
         }
     }
 }
-echo ColorCLI::primary(number_format($ran).' collections reset.');
+ColorCLI::doEcho(ColorCLI::primary(number_format($ran).' collections reset.'), true);
 sleep(2);
 
 function writelog($pane)

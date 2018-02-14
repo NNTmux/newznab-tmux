@@ -600,7 +600,7 @@ class Tmux
         if ($this->isRunning() === true) {
             TmuxModel::query()->where('setting', '=', 'running')->update(['value' => 0]);
             $sleep = $this->get()->monitor_delay;
-            echo ColorCLI::header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown');
+            ColorCLI::doEcho(ColorCLI::header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown'), true);
             sleep($sleep);
 
             return true;
