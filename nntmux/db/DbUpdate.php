@@ -21,7 +21,6 @@
 
 namespace nntmux\db;
 
-use Colors\Color;
 use nntmux\ColorCLI;
 use nntmux\utility\Git;
 use App\Models\Settings;
@@ -120,7 +119,7 @@ class DbUpdate
         $count = \count($files);
         ColorCLI::doEcho(ColorCLI::header(" $count found"), true);
         if ($count > 0) {
-            ColorCLI::doEcho(ColorCLI::header('Processing...'),true);
+            ColorCLI::doEcho(ColorCLI::header('Processing...'), true);
             natsort($files);
             $local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
 
