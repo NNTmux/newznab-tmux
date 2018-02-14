@@ -1,4 +1,5 @@
 2018-02-14 DariusIII
+	* Chg: Update ColorCLI class
 	* Chg: Update API and RSS classes
 	* Chg: Remove unused Settings use statement from api page
 	* Fix: Fix moviesSearch $whereSql query

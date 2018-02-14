@@ -134,6 +134,7 @@
     "intervention/imagecache": "^2.3",
     "james-heinrich/getid3": "1.9.*",
     "joshpinkney/tv-maze-php-api": "dev-master",
+    "kevinlebrun/colors.php": "^1.0",
     "laravel/framework": "5.6.*",
     "laravel/tinker": "~1.0",
     "mayconbordin/l5-fixtures": "dev-master",

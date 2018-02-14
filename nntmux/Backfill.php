@@ -277,8 +277,7 @@ class Backfill
         while ($done === false) {
             if ($this->_echoCLI) {
                 ColorCLI::doEcho(
-                    ColorCLI::set256('Yellow').
-                    PHP_EOL.'Getting '.
+                    color('Getting '.
                     number_format($last - $first + 1).
                     ' articles from '.
                     $groupName.
@@ -286,10 +285,7 @@ class Backfill
                     $left.
                     ' group(s) left. ('.
                     number_format($first - $targetpost).
-                    ' articles in queue).'.
-                    ColorCLI::rsetColor(),
-                    true
-                );
+                    ' articles in queue')->fg('yellow'), true);
             }
 
             flush();
