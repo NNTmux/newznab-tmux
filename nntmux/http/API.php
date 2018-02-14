@@ -56,7 +56,7 @@ class API extends Capabilities
      * Add language from media info XML to release search names (Used by API).
      * @param array $releases
      */
-    public function addLanguage(&$releases)
+    public function addLanguage(&$releases): void
     {
         if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {
@@ -162,7 +162,7 @@ class API extends Capabilities
      * Check if a parameter is empty.
      * @param string $parameter
      */
-    public function verifyEmptyParameter($parameter)
+    public function verifyEmptyParameter($parameter): void
     {
         if (isset($this->getRequest[$parameter]) && $this->getRequest[$parameter] === '') {
             Utility::showApiError(201, 'Incorrect parameter ('.$parameter.' must not be empty)');
@@ -173,7 +173,7 @@ class API extends Capabilities
      * @param $releases
      * @param callable $getCoverURL
      */
-    public function addCoverURL(&$releases, callable $getCoverURL)
+    public function addCoverURL(&$releases, callable $getCoverURL): void
     {
         if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {

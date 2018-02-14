@@ -51,7 +51,7 @@ class RSS extends Capabilities
 
         $catLimit = 'AND r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
 
-        if (count($cat)) {
+        if (\count($cat)) {
             if ((int) $cat[0] === -2) {
                 $cartSearch = sprintf(
                     'INNER JOIN users_releases ON users_releases.users_id = %d AND users_releases.releases_id = r.id',
@@ -153,7 +153,7 @@ class RSS extends Capabilities
                     ),
                     'videos_id'
                 ),
-                (count($excludedCats) ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                (\count($excludedCats) ? 'AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
                 ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
                 NZB::NZB_ADDED,
                 Category::TV_ROOT,
@@ -208,7 +208,7 @@ class RSS extends Capabilities
                     ),
                     'imdbid'
                 ),
-                (count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
+                (\count($excludedCats) ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
                 NZB::NZB_ADDED,
                 Category::MOVIE_ROOT,
                 Category::MOVIE_OTHER,
