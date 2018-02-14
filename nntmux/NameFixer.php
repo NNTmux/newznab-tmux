@@ -1141,8 +1141,8 @@ class NameFixer
             $limit = 'LIMIT 1000000';
         }
 
-        echo ColorCLI::header(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.Carbon::now()->format('Y-m-d'));
-        echo ColorCLI::primary('Matching predb filename to cleaned release_files.name.'.PHP_EOL);
+        ColorCLI::doEcho(ColorCLI::header(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.Carbon::now()->format('Y-m-d')), true);
+        ColorCLI::doEcho(ColorCLI::primary('Matching predb filename to cleaned release_files.name.'), true);
 
         $counter = $counted = 0;
         $timestart = time();

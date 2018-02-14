@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use nntmux\ColorCLI;
 use nntmux\db\DB;
 use nntmux\NameFixer;
 use nntmux\ConsoleTools;
@@ -18,8 +19,8 @@ if (! isset($argv[1]) || ($argv[1] != 'all' && $argv[1] != 'full' && ! is_numeri
     ));
 }
 
-echo $pdo->log->header("\nDecrypt Hashes (${argv[1]}) Started at ".date('g:i:s'));
-echo $pdo->log->primary('Matching predb hashes to hash(releases.name or releases.searchname)');
+ColorCLI::doEcho(ColorCLI::header("Decrypt Hashes (${argv[1]}) Started at ".date('g:i:s')), true);
+ColorCLI::doEcho(ColorCLI::primary('Matching predb hashes to hash(releases.name or releases.searchname)'), true);
 
 getPreName($argv);
 
