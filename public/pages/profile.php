@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\User;
 use Blacklight\NZBGet;
 use Blacklight\SABnzbd;
-use App\Models\User;
 use App\Models\Settings;
 use App\Models\UserRequest;
 use App\Models\UserDownload;

@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\User;
-use Blacklight\Releases;
 use App\Models\Group;
 use App\Models\Category;
+use Blacklight\Releases;
 
 if (! User::isLoggedIn()) {
     $page->show403();

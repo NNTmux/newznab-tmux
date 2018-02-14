@@ -1,7 +1,7 @@
 <?php
 
-use Blacklight\NZBGet;
 use App\Models\User;
+use Blacklight\NZBGet;
 use Blacklight\utility\Utility;
 
 if (! User::isLoggedIn()) {

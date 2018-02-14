@@ -2,9 +2,9 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\ColorCLI;
 use App\Models\Group;
 use App\Models\Release;
+use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\DB;
 
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'drop')) {

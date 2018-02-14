@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Predb;
+use Blacklight\db\DB;
 
 /**
  * Class IRCScraper.

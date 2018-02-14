@@ -1,10 +1,10 @@
 <?php
 
-use Blacklight\Movie;
 use App\Models\User;
-use Blacklight\Releases;
+use Blacklight\Movie;
 use App\Models\Category;
 use App\Models\Settings;
+use Blacklight\Releases;
 use App\Models\UserMovie;
 
 if (! User::isLoggedIn()) {

@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Genre;
+use Blacklight\db\DB;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\GamesInfo;

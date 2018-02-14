@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Group;
+use Blacklight\db\DB;
 use App\Models\Settings;
 
 class Backfill

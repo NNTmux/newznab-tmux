@@ -1,8 +1,8 @@
 <?php
 
-use Blacklight\Releases;
 use App\Models\Release;
 use App\Models\Category;
+use Blacklight\Releases;
 
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->settings]);

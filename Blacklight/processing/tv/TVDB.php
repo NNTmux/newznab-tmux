@@ -3,8 +3,8 @@
 namespace Blacklight\processing\tv;
 
 use Blacklight\ColorCLI;
-use Blacklight\ReleaseImage;
 use Adrenth\Thetvdb\Client;
+use Blacklight\ReleaseImage;
 use Adrenth\Thetvdb\Exception\UnauthorizedException;
 use Adrenth\Thetvdb\Exception\CouldNotLoginException;
 use Adrenth\Thetvdb\Exception\RequestFailedException;

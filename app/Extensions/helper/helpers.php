@@ -1,9 +1,9 @@
 <?php
 
-use Blacklight\XXX;
 use Colors\Color;
-use Blacklight\ColorCLI;
+use Blacklight\XXX;
 use GuzzleHttp\Client;
+use Blacklight\ColorCLI;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\RequestException;

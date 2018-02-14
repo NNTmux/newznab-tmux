@@ -1,9 +1,9 @@
 <?php
 
-use Blacklight\AniDB;
 use App\Models\User;
-use Blacklight\Releases;
+use Blacklight\AniDB;
 use App\Models\Category;
+use Blacklight\Releases;
 
 if (! User::isLoggedIn()) {
     $page->show403();

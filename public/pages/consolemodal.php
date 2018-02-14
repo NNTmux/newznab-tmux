@@ -1,7 +1,7 @@
 <?php
 
-use Blacklight\Console;
 use App\Models\User;
+use Blacklight\Console;
 
 if (! User::isLoggedIn()) {
     $page->show403();

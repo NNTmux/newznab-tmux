@@ -1,7 +1,7 @@
 <?php
 
-use Blacklight\Captcha;
 use App\Models\User;
+use Blacklight\Captcha;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
 

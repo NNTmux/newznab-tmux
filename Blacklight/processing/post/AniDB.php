@@ -4,9 +4,9 @@ namespace Blacklight\processing\post;
 
 use Blacklight\NZB;
 use Blacklight\db\DB;
-use Blacklight\ColorCLI;
 use App\Models\Category;
 use App\Models\Settings;
+use Blacklight\ColorCLI;
 use App\Models\AnidbEpisode;
 use Blacklight\db\populate\AniDB as PaDb;
 

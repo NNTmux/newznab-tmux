@@ -1,8 +1,8 @@
 <?php
 
 use Blacklight\Sitemap;
-use Blacklight\Contents;
 use App\Models\Settings;
+use Blacklight\Contents;
 
 $te = $page->smarty;
 

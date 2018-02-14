@@ -21,9 +21,9 @@
 
 namespace Blacklight\db;
 
+use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\utility\Git;
-use App\Models\Settings;
 use Blacklight\utility\Utility;
 
 class DbUpdate

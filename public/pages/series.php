@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\User;
-use Blacklight\Releases;
 use App\Models\Video;
+use Blacklight\Releases;
 use App\Models\UserSerie;
 
 if (! User::isLoggedIn()) {

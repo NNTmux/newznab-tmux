@@ -4,21 +4,21 @@ namespace Blacklight\processing;
 
 use Blacklight\NZB;
 use Blacklight\NNTP;
-use Blacklight\db\DB;
-use Blacklight\Genres;
-use Blacklight\ColorCLI;
-use Blacklight\Releases;
 use App\Models\Group;
 use App\Models\Predb;
-use Blacklight\Categorize;
+use Blacklight\db\DB;
+use Blacklight\Genres;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
+use Blacklight\ColorCLI;
+use Blacklight\Releases;
+use Blacklight\Categorize;
+use App\Models\ReleaseRegex;
 use Blacklight\ConsoleTools;
 use Blacklight\ReleaseImage;
-use Blacklight\ReleaseCleaning;
-use App\Models\ReleaseRegex;
 use App\Models\ReleasesGroups;
+use Blacklight\ReleaseCleaning;
 use App\Models\MultigroupPoster;
 
 class ProcessReleases

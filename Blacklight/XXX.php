@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Genre;
+use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\XxxInfo;
 use App\Models\Category;
@@ -12,8 +12,8 @@ use Illuminate\Support\Carbon;
 use Blacklight\processing\adult\ADE;
 use Blacklight\processing\adult\ADM;
 use Blacklight\processing\adult\AEBN;
-use Blacklight\processing\adult\Popporn;
 use Illuminate\Support\Facades\Cache;
+use Blacklight\processing\adult\Popporn;
 use Blacklight\processing\adult\Hotmovies;
 
 /**

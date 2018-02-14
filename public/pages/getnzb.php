@@ -2,12 +2,12 @@
 
 use Blacklight\NZB;
 use App\Models\User;
-use Blacklight\Releases;
 use App\Models\Release;
 use App\Models\Settings;
-use Blacklight\utility\Utility;
+use Blacklight\Releases;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
+use Blacklight\utility\Utility;
 
 $uid = 0;
 

@@ -3,8 +3,8 @@
 namespace Blacklight\libraries;
 
 use Blacklight\db\DB;
-use Blacklight\ColorCLI;
 use GuzzleHttp\Client;
+use Blacklight\ColorCLI;
 use GuzzleHttp\Exception\RequestException;
 
 /**

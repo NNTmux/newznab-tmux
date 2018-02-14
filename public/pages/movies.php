@@ -1,7 +1,7 @@
 <?php
 
-use Blacklight\Movie;
 use App\Models\User;
+use Blacklight\Movie;
 use App\Models\Category;
 
 $movie = new Movie(['Settings' => $page->settings]);

@@ -3,10 +3,10 @@
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\NNTP;
-use Blacklight\ColorCLI;
 use App\Models\Group;
-use Blacklight\ConsoleTools;
+use Blacklight\ColorCLI;
 use App\Models\ShortGroup;
+use Blacklight\ConsoleTools;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 

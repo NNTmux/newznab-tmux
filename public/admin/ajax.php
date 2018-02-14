@@ -1,10 +1,10 @@
 <?php
 
+use App\Models\Group;
 use Blacklight\db\DB;
 use Blacklight\Regexes;
 use Blacklight\Sharing;
 use Blacklight\Binaries;
-use App\Models\Group;
 use App\Models\ReleaseComment;
 
 // This script waits for ajax queries from the web.

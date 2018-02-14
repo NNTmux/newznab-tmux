@@ -2,13 +2,13 @@
 
 namespace Blacklight;
 
-use Blacklight\db\DB;
 use App\Models\Group;
 use App\Models\Predb;
+use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Category;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Carbon;
+use Blacklight\utility\Utility;
 use Blacklight\processing\PostProcess;
 
 /**
