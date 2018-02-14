@@ -628,8 +628,7 @@ class XXX
 
         if ($this->echooutput) {
             ColorCLI::doEcho(
-                ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: '.ColorCLI::primary($mov['title'])))
-            , true);
+                ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: '.ColorCLI::primary($mov['title']))), true);
         }
 
         return $xxxID;
