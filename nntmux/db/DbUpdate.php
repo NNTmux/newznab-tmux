@@ -21,6 +21,7 @@
 
 namespace nntmux\db;
 
+use Colors\Color;
 use nntmux\ColorCLI;
 use nntmux\utility\Git;
 use App\Models\Settings;
@@ -113,21 +114,21 @@ class DbUpdate
 
         $this->processPatches(['safe' => $options['safe']]); // Make sure we are completely up to date!
 
-        echo $this->log->primaryOver('Looking for new patches...');
+        ColorCLI::doEcho(Color::primaryOver('Looking for new patches...'), true);
         $files = Utility::getDirFiles($options);
 
         $count = \count($files);
-        echo $this->log->header(" $count found");
+        ColorCLI::doEcho(ColorCLI::header(" $count found"), true);
         if ($count > 0) {
-            echo $this->log->header('Processing...');
+            ColorCLI::doEcho(ColorCLI::header('Processing...'),true);
             natsort($files);
             $local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
 
             foreach ($files as $file) {
                 if (! preg_match($options['regex'], $file, $matches)) {
-                    $this->log->error("$file does not match the pattern {$options['regex']}\nPlease fix this before continuing");
+                    ColorCLI::error("$file does not match the pattern {$options['regex']}\nPlease fix this before continuing");
                 } else {
-                    echo $this->log->header('Processing patch file: '.$file);
+                    ColorCLI::doEcho(ColorCLI::header('Processing patch file: '.$file), true);
                     $this->splitSQL($file, ['local' => $local]);
                     $current = Settings::settingValue('..sqlpatch');
                     $current++;
@@ -173,7 +174,7 @@ class DbUpdate
         if (\count($files)) {
             natsort($files);
             $local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
-            echo $this->log->primary('Looking for unprocessed patches...');
+            ColorCLI::doEcho(ColorCLI::primary('Looking for unprocessed patches...'), true);
             foreach ($files as $file) {
                 $setPatch = false;
                 $fp = fopen($file, 'r');
@@ -193,7 +194,7 @@ class DbUpdate
                     throw new \RuntimeException('No patch information available, stopping!!');
                 }
                 if ($patch > $currentVersion) {
-                    echo $this->log->header('Processing patch file: '.$file);
+                    ColorCLI::doEcho(ColorCLI::header('Processing patch file: '.$file), true);
                     if (! $this->backedUp && $options['safe']) {
                         $this->_backupDb();
                     }
@@ -205,11 +206,11 @@ class DbUpdate
                 }
             }
         } else {
-            exit($this->log->error("\nHave you changed the path to the patches folder, or do you have the right permissions?\n"));
+            exit(ColorCLI::error("\nHave you changed the path to the patches folder, or do you have the right permissions?\n"));
         }
 
         if ($patched === 0) {
-            echo $this->log->info("Nothing to patch, you are already on version $currentVersion");
+            ColorCLI::doEcho(ColorCLI::info("Nothing to patch, you are already on version $currentVersion"), true);
         }
 
         return $patched;
@@ -282,7 +283,7 @@ class DbUpdate
                         try {
                             $qry = $this->pdo->Prepare($query);
                             $qry->execute();
-                            echo $this->log->alternateOver('SUCCESS: ').$this->log->primary($query);
+                            ColorCLI::doEcho(ColorCLI::alternateOver('SUCCESS: ').ColorCLI::primary($query), true);
                         } catch (\PDOException $e) {
                             // Log the problem and the query.
                             file_put_contents(
@@ -299,27 +300,27 @@ class DbUpdate
                                 \in_array($e->errorInfo[0], [23505, 42701, 42703, '42P07', '42P16'], false)
                             ) {
                                 if ($e->errorInfo[1] === 1060) {
-                                    echo $this->log->warning(
+                                    ColorCLI::doEcho(ColorCLI::warning(
                                         "$query The column already exists - No need to worry \{".
                                         $e->errorInfo[1]."}.\n"
-                                    );
+                                    ), true);
                                 } else {
-                                    echo $this->log->warning(
+                                    ColorCLI::doEcho(ColorCLI::warning(
                                         "$query Skipped - No need to worry \{".
                                         $e->errorInfo[1]."}.\n"
-                                    );
+                                    ), true);
                                 }
                             } else {
                                 if (preg_match('/ALTER IGNORE/i', $query)) {
                                     $this->pdo->queryExec('SET SESSION old_alter_table = 1');
                                     try {
                                         $this->pdo->exec($query);
-                                        echo $this->log->alternateOver('SUCCESS: ').$this->log->primary($query);
+                                        ColorCLI::doEcho(ColorCLI::alternateOver('SUCCESS: ').ColorCLI::primary($query));
                                     } catch (\PDOException $e) {
-                                        exit($this->log->error("$query Failed \{".$e->errorInfo[1]."}\n\t".$e->errorInfo[2]));
+                                        exit(ColorCLI::error("$query Failed \{".$e->errorInfo[1]."}\n\t".$e->errorInfo[2]));
                                     }
                                 } else {
-                                    exit($this->log->error("$query Failed \{".$e->errorInfo[1]."}\n\t".$e->errorInfo[2]));
+                                    exit(ColorCLI::error("$query Failed \{".$e->errorInfo[1]."}\n\t".$e->errorInfo[2]));
                                 }
                             }
                         }
