@@ -50,10 +50,10 @@ class ForkingImportNZB extends Forking
         }
 
         if (NN_ECHOCLI) {
-            echo ColorCLI::header(
+            ColorCLI::doEcho(ColorCLI::header(
 				'Multi-processing started at '.date(DATE_RFC2822).' with '.$this->_workCount.
 				' job(s) to do using a max of '.$maxProcesses.' child process(es).'
-			);
+			), true);
         }
 
         $this->deleteComplete = $deleteComplete;
