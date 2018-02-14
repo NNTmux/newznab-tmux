@@ -1,3 +1,5 @@
+2018-02-14 DariusIII
+	* Fix: Fix moviesSearch $whereSql query
 2018-02-13 DariusIII
 	* Chg: Rename search functions to be more descriptive (ie. searchByImdbId searches for movies even without imdbid, so renamed to moviesSearch)
 	* Chg: Use insertGetId again in addGroup function

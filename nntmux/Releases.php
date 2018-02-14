@@ -994,11 +994,11 @@ class Releases
     public function moviesSearch($imDbId, $offset = 0, $limit = 100, $name = '', array $cat = [-1], $maxAge = -1, $minSize = 0): array
     {
         $whereSql = sprintf(
-            '%s
+            "%s
             WHERE r.categories_id BETWEEN " . Category::MOVIE_ROOT . " AND " . Category::MOVIE_OTHER . "
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
-			%s %s %s %s %s',
+			%s %s %s %s %s",
             ($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
             NZB::NZB_ADDED,
             $this->showPasswords,
