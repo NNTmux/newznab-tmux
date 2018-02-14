@@ -114,7 +114,7 @@ class DbUpdate
 
         $this->processPatches(['safe' => $options['safe']]); // Make sure we are completely up to date!
 
-        ColorCLI::doEcho(ColorCLI::primaryOver('Looking for new patches...'), true);
+        ColorCLI::doEcho(ColorCLI::primaryOver('Looking for new patches...'));
         $files = Utility::getDirFiles($options);
 
         $count = \count($files);
