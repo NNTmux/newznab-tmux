@@ -995,7 +995,7 @@ class Binaries
                     ColorCLI::debug(
                         'Sending '.round(\strlen($partsQuery) / 1024, 2).
                         ' KB of'.($this->multiGroup ? ' MGR' : '').' parts to MySQL'
-                    )
+                    ), true
                 );
             }
             if (\strlen($partsQuery) === \strlen($partsCheck) ? true : $this->_pdo->queryExec(rtrim($partsQuery, ','))) {
@@ -1068,7 +1068,7 @@ class Binaries
                 'Received '.\count($this->headersReceived).
                 ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
                 $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
-            )
+            ), true
         );
     }
 
@@ -1090,7 +1090,7 @@ class Binaries
                 ColorCLI::primaryOver(' for part repair, ').
                 ColorCLI::alternateOver(number_format($currentMicroTime - $this->startLoop, 2).'s').
                 ColorCLI::primary(' total.')
-            );
+            , true);
         }
     }
 
@@ -1328,7 +1328,7 @@ class Binaries
             $currentPost = $tempPost;
 
             if ($this->_debug) {
-                ColorCLI::doEcho(ColorCLI::debug('Postdate retried '.$attempts.' time(s).'));
+                ColorCLI::doEcho(ColorCLI::debug('Postdate retried '.$attempts.' time(s).'), true);
             }
         } while ($attempts++ <= 20);
 
@@ -1375,7 +1375,7 @@ class Binaries
             ColorCLI::doEcho(
                 ColorCLI::primary(
                     'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
-                )
+                ), true
             );
         }
 
@@ -1436,7 +1436,7 @@ class Binaries
                 ColorCLI::primary(
                     PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
                     ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.Carbon::createFromTimestamp($goalTime)->diffInDays(Carbon::createFromTimestamp($articleTime)).'days.'
-                )
+                ), true
             );
         }
 

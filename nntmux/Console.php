@@ -420,7 +420,7 @@ class Console
                             ColorCLI::alternateOver('   Platform: ').
                             ColorCLI::primary($con['platform']).
                             ColorCLI::alternateOver('   Genre: ').
-                            ColorCLI::primary($con['consolegenre'])
+                            ColorCLI::primary($con['consolegenre']), true
                         );
                     }
                 }
@@ -812,7 +812,7 @@ class Console
         $releaseCount = $res->count();
         if ($res instanceof \Traversable && $releaseCount > 0) {
             if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$releaseCount.' console release(s).'));
+                ColorCLI::doEcho(ColorCLI::header('Processing '.$releaseCount.' console release(s).'), true);
             }
 
             foreach ($res as $arr) {
@@ -829,7 +829,7 @@ class Console
                                 $gameInfo['title'].
                                 ' ('.
                                 $gameInfo['platform'].')'
-                            )
+                            ), true
                         );
                     }
 
@@ -839,7 +839,7 @@ class Console
                     if ($gameCheck === null && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.').PHP_EOL);
+                            ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.'), true);
                         }
                         $gameId = -2;
                     } elseif ($gameCheck === null) {
@@ -853,8 +853,7 @@ class Console
                         if ($this->echooutput) {
                             ColorCLI::doEcho(
                                 ColorCLI::headerOver('Found Local: ').
-                                ColorCLI::primary("{$gameCheck['title']} - {$gameCheck['platform']}").
-                                PHP_EOL
+                                ColorCLI::primary("{$gameCheck['title']} - {$gameCheck['platform']}"), true
                             );
                         }
                         $gameId = $gameCheck['id'];
@@ -873,7 +872,7 @@ class Console
                 }
             }
         } elseif ($this->echooutput) {
-            ColorCLI::doEcho(ColorCLI::header('No console releases to process.'));
+            ColorCLI::doEcho(ColorCLI::header('No console releases to process.'), true);
         }
     }
 

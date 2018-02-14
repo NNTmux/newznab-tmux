@@ -620,7 +620,7 @@ class Movie
     public function updateMovieInfo($imdbId): bool
     {
         if ($this->echooutput && $this->service !== '') {
-            ColorCLI::doEcho(ColorCLI::primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB using IMDB id: '.$imdbId));
+            ColorCLI::doEcho(ColorCLI::primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB using IMDB id: '.$imdbId), true);
         }
 
         // Check TMDB for IMDB info.
@@ -744,7 +744,7 @@ class Movie
                     $mov['year'].
                     ') - '.
                     $mov['imdbid']
-                )
+                ), true
             );
         }
 
@@ -905,15 +905,15 @@ class Movie
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 if ($e->getCode() === 404) {
-                    ColorCLI::doEcho(ColorCLI::notice('Data not available on IMDB server'));
+                    ColorCLI::doEcho(ColorCLI::notice('Data not available on IMDB server'), true);
                 } elseif ($e->getCode() === 503) {
-                    ColorCLI::doEcho(ColorCLI::notice('IMDB service unavailable'));
+                    ColorCLI::doEcho(ColorCLI::notice('IMDB service unavailable'), true);
                 } else {
-                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from IMDB, http error reported: '.$e->getCode()));
+                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from IMDB, http error reported: '.$e->getCode()), true);
                 }
             }
         } catch (\RuntimeException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()));
+            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
         }
 
         if (isset($buffer) && $buffer !== false) {
@@ -1064,7 +1064,7 @@ class Movie
         if ($imdbID !== false) {
             $this->service = $service;
             if ($this->echooutput && $this->service !== '') {
-                ColorCLI::doEcho(ColorCLI::headerOver($service.' found IMDBid: ').ColorCLI::primary('tt'.$imdbID));
+                ColorCLI::doEcho(ColorCLI::headerOver($service.' found IMDBid: ').ColorCLI::primary('tt'.$imdbID), true);
             }
 
             Release::query()->where('id', $id)->update(['imdbid' => $imdbID]);
@@ -1124,7 +1124,7 @@ class Movie
                 $this->traktTv = new TraktTv(['Settings' => $this->pdo]);
             }
             if ($this->echooutput && $movieCount > 1) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$movieCount.' movie releases.'));
+                ColorCLI::doEcho(ColorCLI::header('Processing '.$movieCount.' movie releases.'), true);
             }
 
             // Loop over releases.
@@ -1341,15 +1341,15 @@ class Movie
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 if ($e->getCode() === 404) {
-                    ColorCLI::doEcho(ColorCLI::notice('Data not available on Google search'));
+                    ColorCLI::doEcho(ColorCLI::notice('Data not available on Google search'), true);
                 } elseif ($e->getCode() === 503) {
-                    ColorCLI::doEcho(ColorCLI::notice('Google service unavailable'));
+                    ColorCLI::doEcho(ColorCLI::notice('Google service unavailable'), true);
                 } else {
-                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Google, http error reported: '.$e->getCode()));
+                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Google, http error reported: '.$e->getCode()), true);
                 }
             }
         } catch (\RuntimeException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()));
+            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
         }
 
         // Make sure we got some data.
@@ -1391,15 +1391,15 @@ class Movie
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 if ($e->getCode() === 404) {
-                    ColorCLI::doEcho(ColorCLI::notice('Data not available on Bing search'));
+                    ColorCLI::doEcho(ColorCLI::notice('Data not available on Bing search'), true);
                 } elseif ($e->getCode() === 503) {
-                    ColorCLI::doEcho(ColorCLI::notice('Bing search service unavailable'));
+                    ColorCLI::doEcho(ColorCLI::notice('Bing search service unavailable'), true);
                 } else {
-                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Bing search , http error reported: '.$e->getCode()));
+                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Bing search , http error reported: '.$e->getCode()), true);
                 }
             }
         } catch (\RuntimeException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()));
+            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
         }
 
         if (! empty($buffer)) {
@@ -1450,17 +1450,17 @@ class Movie
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 if ($e->getCode() === 999) {
-                    ColorCLI::doEcho(ColorCLI::notice('Banned from Yahoo search'));
+                    ColorCLI::doEcho(ColorCLI::notice('Banned from Yahoo search'), true);
                 } elseif ($e->getCode() === 404) {
-                    ColorCLI::doEcho(ColorCLI::notice('Data not available on Yahoo search'));
+                    ColorCLI::doEcho(ColorCLI::notice('Data not available on Yahoo search'), true);
                 } elseif ($e->getCode() === 503) {
-                    ColorCLI::doEcho(ColorCLI::notice('Yahoo search service unavailable'));
+                    ColorCLI::doEcho(ColorCLI::notice('Yahoo search service unavailable'), true);
                 } else {
-                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Yahoo search, http error reported: '.$e->getCode()));
+                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Yahoo search, http error reported: '.$e->getCode()), true);
                 }
             }
         } catch (\RuntimeException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()));
+            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
         }
 
         if (! empty($buffer)) {
@@ -1493,15 +1493,15 @@ class Movie
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 if ($e->getCode() === 404) {
-                    ColorCLI::doEcho(ColorCLI::notice('Data not available on DuckDuckGo search'));
+                    ColorCLI::doEcho(ColorCLI::notice('Data not available on DuckDuckGo search'), true);
                 } elseif ($e->getCode() === 503) {
-                    ColorCLI::doEcho(ColorCLI::notice('DuckDuckGo search service unavailable'));
+                    ColorCLI::doEcho(ColorCLI::notice('DuckDuckGo search service unavailable'), true);
                 } else {
-                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from DuckDuckGo search , http error reported: '.$e->getCode()));
+                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from DuckDuckGo search , http error reported: '.$e->getCode()), true);
                 }
             }
         } catch (\RuntimeException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()));
+            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
         }
 
         if (! empty($buffer)) {

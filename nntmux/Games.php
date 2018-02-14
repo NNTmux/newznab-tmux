@@ -589,12 +589,12 @@ class Games
                             $game['review'] = (string) $this->_gameResults->deck;
                         }
                     } else {
-                        ColorCLI::doEcho(ColorCLI::notice('GiantBomb returned no valid results'));
+                        ColorCLI::doEcho(ColorCLI::notice('GiantBomb returned no valid results'), true);
 
                         return false;
                     }
                 } else {
-                    ColorCLI::doEcho(ColorCLI::notice('GiantBomb found no valid results'));
+                    ColorCLI::doEcho(ColorCLI::notice('GiantBomb found no valid results'), true);
 
                     return false;
                 }
@@ -702,7 +702,7 @@ class Games
                     ColorCLI::alternateOver('   Title:    ').
                     ColorCLI::primary($game['title']).
                     ColorCLI::alternateOver('   Source:   ').
-                    ColorCLI::primary($this->_classUsed)
+                    ColorCLI::primary($this->_classUsed), true
                 );
             }
             if ($game['cover'] === 1) {
@@ -715,7 +715,7 @@ class Games
             if ($this->echoOutput) {
                 ColorCLI::doEcho(
                     ColorCLI::headerOver('Nothing to update: ').
-                    ColorCLI::primary($game['title'].' (PC)')
+                    ColorCLI::primary($game['title'].' (PC)'), true
                 );
             }
         }
@@ -747,7 +747,7 @@ class Games
 
         if ($res instanceof \Traversable && $res->rowCount() > 0) {
             if ($this->echoOutput) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$res->rowCount().' games release(s).'));
+                ColorCLI::doEcho(ColorCLI::header('Processing '.$res->rowCount().' games release(s).'), true);
             }
 
             foreach ($res as $arr) {
@@ -760,7 +760,7 @@ class Games
                     if ($this->echoOutput) {
                         ColorCLI::doEcho(
                             ColorCLI::headerOver('Looking up: ').
-                            ColorCLI::primary($gameInfo['title'].' (PC)')
+                            ColorCLI::primary($gameInfo['title'].' (PC)'), true
                         );
                     }
 
@@ -793,7 +793,7 @@ class Games
             }
         } else {
             if ($this->echoOutput) {
-                ColorCLI::doEcho(ColorCLI::header('No games releases to process.'));
+                ColorCLI::doEcho(ColorCLI::header('No games releases to process.'), true);
             }
         }
     }

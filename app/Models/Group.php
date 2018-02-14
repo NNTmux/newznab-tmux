@@ -560,7 +560,7 @@ class Group extends Model
         ColorCLI::doEcho(
             ColorCLI::error(
                 'Group does not exist on server, disabling'
-            )
+            ), true
         );
     }
 }

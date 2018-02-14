@@ -217,7 +217,7 @@ class Forking extends \fork_daemon
                 ColorCLI::header(
                     'Multi-processing for '.$this->workType.' finished in '.(microtime(true) - $startTime).
                     ' seconds at '.date(DATE_RFC2822).'.'.PHP_EOL
-                )
+                ), true
             );
         }
     }
@@ -311,7 +311,7 @@ class Forking extends \fork_daemon
                     ColorCLI::header(
                         'Multi-processing started at '.date(DATE_RFC2822).' for '.$this->workType.' with '.$this->_workCount.
                         ' job(s) to do using a max of '.$this->maxProcesses.' child process(es).'
-                    )
+                    ), true
                 );
             }
 
@@ -320,7 +320,7 @@ class Forking extends \fork_daemon
         } else {
             if (NN_ECHOCLI) {
                 ColorCLI::doEcho(
-                    ColorCLI::header('No work to do!')
+                    ColorCLI::header('No work to do!'), true
                 );
             }
         }
@@ -1114,7 +1114,7 @@ class Forking extends \fork_daemon
                     'Process ID #'.$pid.' has completed.'.PHP_EOL.
                     'There are '.($this->forked_children_count - 1).' process(es) still active with '.
                     (--$this->_workCount).' job(s) left in the queue.'.PHP_EOL
-                )
+                ), true
             );
         }
     }

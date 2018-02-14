@@ -54,7 +54,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'drop')) {
         'This script removes releases with no NZBs, resets all groups, truncates or drops(tpg)
         article tables. All other releases are left alone.
         php '.$argv[0].' [true, drop]   ...: To reset all groups and truncate/drop the tables.'
-    )
+    ), true
     );
     exit;
 }

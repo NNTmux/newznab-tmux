@@ -86,7 +86,7 @@ class Steam
         }
 
         if ($res === false) {
-            ColorCLI::doEcho(ColorCLI::notice('Steam did not return game data'));
+            ColorCLI::doEcho(ColorCLI::notice('Steam did not return game data'), true);
         }
 
         return false;
@@ -105,7 +105,7 @@ class Steam
         $bestMatch = false;
 
         if (empty($searchTerm)) {
-            ColorCLI::doEcho(ColorCLI::notice('Search term cannot be empty'));
+            ColorCLI::doEcho(ColorCLI::notice('Search term cannot be empty'), true);
 
             return $bestMatch;
         }
@@ -136,7 +136,7 @@ class Steam
             }
         }
         if ($bestMatch === false) {
-            ColorCLI::doEcho(ColorCLI::notice('Steam search returned no valid results'));
+            ColorCLI::doEcho(ColorCLI::notice('Steam search returned no valid results'), true);
         }
 
         return $bestMatch;

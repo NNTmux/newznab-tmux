@@ -280,7 +280,7 @@ class Nfo
                     'Processing '.$nfoCount.
                     ' NFO(s), starting at '.$this->nzbs.
                     ' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
-                )
+                ), true
             );
 
             if ($this->echo) {
@@ -315,7 +315,7 @@ class Nfo
                     foreach ($nfoStats as $row) {
                         $outString .= ', '.$row['status'].' = '.number_format($row['count']);
                     }
-                    ColorCLI::doEcho(ColorCLI::header($outString.'.'));
+                    ColorCLI::doEcho(ColorCLI::header($outString.'.'), true);
                 }
             }
 

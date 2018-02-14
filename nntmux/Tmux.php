@@ -605,7 +605,7 @@ class Tmux
 
             return true;
         }
-        ColorCLI::doEcho(ColorCLI::info('Tmux scripts are not running!'));
+        ColorCLI::doEcho(ColorCLI::info('Tmux scripts are not running!'), true);
 
         return false;
     }

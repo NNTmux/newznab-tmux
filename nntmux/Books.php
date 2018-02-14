@@ -421,7 +421,7 @@ class Books
     {
         if ($res instanceof \Traversable && $res->count() > 0) {
             if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::header("\nProcessing ".$res->count().' book release(s) for categories id '.$categoryID));
+                ColorCLI::doEcho(ColorCLI::header("\nProcessing ".$res->count().' book release(s) for categories id '.$categoryID), true);
             }
 
             $bookId = -2;
@@ -439,7 +439,7 @@ class Books
 
                 if ($bookInfo !== false) {
                     if ($this->echooutput) {
-                        ColorCLI::doEcho(ColorCLI::headerOver('Looking up: ').ColorCLI::primary($bookInfo));
+                        ColorCLI::doEcho(ColorCLI::headerOver('Looking up: ').ColorCLI::primary($bookInfo), true);
                     }
 
                     // Do a local lookup first
@@ -448,7 +448,7 @@ class Books
                     if ($bookCheck === false && \in_array($bookInfo, $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.').PHP_EOL);
+                            ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.'), true);
                         }
                         $bookId = -2;
                     } elseif ($bookCheck === false) {
@@ -478,7 +478,7 @@ class Books
                 }
             }
         } elseif ($this->echooutput) {
-            ColorCLI::doEcho(ColorCLI::header('No book releases to process for categories id '.$categoryID));
+            ColorCLI::doEcho(ColorCLI::header('No book releases to process for categories id '.$categoryID), true);
         }
     }
 
@@ -506,7 +506,7 @@ class Books
             if (preg_match('/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O(c|k)tober|November|De(c|z)ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i', $releasename)) {
                 if ($this->echooutput) {
                     ColorCLI::doEcho(
-                        ColorCLI::headerOver('Changing category to misc books: ').ColorCLI::primary($releasename)
+                        ColorCLI::headerOver('Changing category to misc books: ').ColorCLI::primary($releasename), true
                     );
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_UNKNOWN]);
@@ -517,7 +517,7 @@ class Books
             if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun( |e|$)|Jul( |y|$)|Aug( |ust|$)|Sep( |tember|$)|O(c|k)t( |ober|$)|Nov( |ember|$)|De(c|z)( |ember|$))/ui', $releasename) && ! preg_match('/Part \d+/i', $releasename)) {
                 if ($this->echooutput) {
                     ColorCLI::doEcho(
-                        ColorCLI::headerOver('Changing category to magazines: ').ColorCLI::primary($releasename)
+                        ColorCLI::headerOver('Changing category to magazines: ').ColorCLI::primary($releasename), true
                     );
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_MAGAZINES]);
@@ -672,13 +672,13 @@ class Books
 
         if ($bookId && $bookId !== -2) {
             if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::header('Added/updated book: '));
+                ColorCLI::doEcho(ColorCLI::header('Added/updated book: '), true);
                 if ($book['author'] !== '') {
-                    ColorCLI::doEcho(ColorCLI::alternateOver('   Author: ').ColorCLI::primary($book['author']));
+                    ColorCLI::doEcho(ColorCLI::alternateOver('   Author: ').ColorCLI::primary($book['author']), true);
                 }
                 echo ColorCLI::alternateOver('   Title: ').ColorCLI::primary(' '.$book['title']);
                 if ($book['genre'] !== 'null') {
-                    ColorCLI::doEcho(ColorCLI::alternateOver('   Genre: ').ColorCLI::primary(' '.$book['genre']));
+                    ColorCLI::doEcho(ColorCLI::alternateOver('   Genre: ').ColorCLI::primary(' '.$book['genre']), true);
                 }
             }
 
@@ -689,7 +689,7 @@ class Books
                     ColorCLI::header('Nothing to update: ').
                     ColorCLI::header($book['author'].
                         ' - '.
-                        $book['title'])
+                        $book['title']), true
                 );
             }
         }

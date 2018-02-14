@@ -152,7 +152,7 @@ class Backfill
             $dMessage = 'Backfilling completed in '.number_format(microtime(true) - $allTime, 2).' seconds.';
 
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(ColorCLI::primary($dMessage));
+                ColorCLI::doEcho(ColorCLI::primary($dMessage), true);
             }
         } else {
             $dMessage = 'No groups specified. Ensure groups are added to database for updating.';
@@ -190,7 +190,7 @@ class Backfill
                 '. Otherwise the group is dead, you must disable it.';
 
             if ($this->_echoCLI) {
-                ColorCLI::doEcho(ColorCLI::error($dMessage));
+                ColorCLI::doEcho(ColorCLI::error($dMessage), true);
             }
 
             return;
@@ -259,7 +259,7 @@ class Backfill
                     '. Our oldest article is article '.
                     number_format($groupArr['first_record']).
                     '.'
-                )
+                ), true
             );
         }
 

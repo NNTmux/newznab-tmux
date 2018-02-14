@@ -30,15 +30,15 @@ if (! function_exists('getRawHtml')) {
         } catch (RequestException $e) {
             if ($e->hasResponse()) {
                 if ($e->getCode() === 404) {
-                    ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
+                    ColorCLI::doEcho(ColorCLI::notice('Data not available on server'), true);
                 } elseif ($e->getCode() === 503) {
-                    ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
+                    ColorCLI::doEcho(ColorCLI::notice('Service unavailable'), true);
                 } else {
-                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from server, http error reported: '.$e->getCode()));
+                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from server, http error reported: '.$e->getCode()), true);
                 }
             }
         } catch (\RuntimeException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()));
+            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
         }
 
         return $response;
@@ -51,7 +51,9 @@ if (! function_exists('makeFieldLinks')) {
      * @param $data
      * @param $field
      * @param $type
+     *
      * @return string
+     * @throws \Exception
      */
     function makeFieldLinks($data, $field, $type)
     {

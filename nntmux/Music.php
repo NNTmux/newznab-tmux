@@ -536,7 +536,7 @@ class Music
                     ColorCLI::alternateOver('   Title:  ').
                     ColorCLI::primary($mus['title']).
                     ColorCLI::alternateOver('   Year:   ').
-                    ColorCLI::primary($mus['year'])
+                    ColorCLI::primary($mus['year']), true
                 );
             }
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
@@ -555,7 +555,7 @@ class Music
                         ' ('.
                         $mus['year'].
                         ')'
-                    )
+                    ), true
                 );
             }
         }
@@ -666,7 +666,7 @@ class Music
                 ColorCLI::doEcho(
                     ColorCLI::header(
                         'Processing '.$res->count().' music release(s).'
-                    )
+                    ), true
                 );
             }
 
@@ -678,7 +678,7 @@ class Music
                     $newname = $album['name'].' ('.$album['year'].')';
 
                     if ($this->echooutput) {
-                        ColorCLI::doEcho(ColorCLI::headerOver('Looking up: ').ColorCLI::primary($newname));
+                        ColorCLI::doEcho(ColorCLI::headerOver('Looking up: ').ColorCLI::primary($newname), true);
                     }
 
                     // Do a local lookup first
@@ -687,7 +687,7 @@ class Music
                     if ($musicCheck === null && \in_array($album['name'].$album['year'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.').PHP_EOL);
+                            ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.'), true);
                         }
                         $albumId = -2;
                     } elseif ($musicCheck === null && $local === false) {
@@ -719,7 +719,7 @@ class Music
             }
         } else {
             if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::header('No music releases to process.'));
+                ColorCLI::doEcho(ColorCLI::header('No music releases to process.'), true);
             }
         }
     }

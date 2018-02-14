@@ -494,14 +494,14 @@ class XXX
         $this->whichclass = 'aebn';
         $mov = new AEBN();
         $mov->cookie = $this->cookie;
-        ColorCLI::doEcho(ColorCLI::info('Checking AEBN for movie info'));
+        ColorCLI::doEcho(ColorCLI::info('Checking AEBN for movie info'), true);
         $res = $mov->processSite($movie);
 
         if ($res === false) {
             $this->whichclass = 'pop';
             $mov = new Popporn();
             $mov->cookie = $this->cookie;
-            ColorCLI::doEcho(ColorCLI::info('Checking PopPorn for movie info'));
+            ColorCLI::doEcho(ColorCLI::info('Checking PopPorn for movie info'), true);
             $res = $mov->processSite($movie);
         }
 
@@ -509,14 +509,14 @@ class XXX
             $this->whichclass = 'adm';
             $mov = new ADM();
             $mov->cookie = $this->cookie;
-            ColorCLI::doEcho(ColorCLI::info('Checking ADM for movie info'));
+            ColorCLI::doEcho(ColorCLI::info('Checking ADM for movie info'), true);
             $res = $mov->processSite($movie);
         }
 
         if ($res === false) {
             $this->whichclass = 'ade';
             $mov = new ADE();
-            ColorCLI::doEcho(ColorCLI::info('Checking ADE for movie info'));
+            ColorCLI::doEcho(ColorCLI::info('Checking ADE for movie info'), true);
             $res = $mov->processSite($movie);
         }
 
@@ -524,7 +524,7 @@ class XXX
             $this->whichclass = 'hotm';
             $mov = new Hotmovies();
             $mov->cookie = $this->cookie;
-            ColorCLI::doEcho(ColorCLI::info('Checking HotMovies for movie info'));
+            ColorCLI::doEcho(ColorCLI::info('Checking HotMovies for movie info'), true);
             $res = $mov->processSite($movie);
         }
 
@@ -550,7 +550,7 @@ class XXX
                     default:
                         $fromstr = '';
                 }
-                ColorCLI::doEcho(ColorCLI::primary('Fetching XXX info from: '.$fromstr));
+                ColorCLI::doEcho(ColorCLI::primary('Fetching XXX info from: '.$fromstr), true);
             }
             $res = $mov->getAll();
         } else {
@@ -629,7 +629,7 @@ class XXX
         if ($this->echooutput) {
             ColorCLI::doEcho(
                 ColorCLI::headerOver(($xxxID !== false ? 'Added/updated XXX movie: '.ColorCLI::primary($mov['title']) : 'Nothing to update for XXX movie: '.ColorCLI::primary($mov['title'])))
-            );
+            , true);
         }
 
         return $xxxID;
@@ -664,7 +664,7 @@ class XXX
 
         if ($movieCount > 0) {
             if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::header('Processing '.$movieCount.' XXX releases.'));
+                ColorCLI::doEcho(ColorCLI::header('Processing '.$movieCount.' XXX releases.'), true);
             }
 
             // Loop over releases.
@@ -695,7 +695,7 @@ class XXX
                     ->update(['xxxinfo_id' => $idcheck]);
             }
         } elseif ($this->echooutput) {
-            ColorCLI::doEcho(ColorCLI::header('No xxx releases to process.'));
+            ColorCLI::doEcho(ColorCLI::header('No xxx releases to process.'), true);
         }
     }
 

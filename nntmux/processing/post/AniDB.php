@@ -263,7 +263,7 @@ class AniDB
                     ColorCLI::alternateOver('   Episode #: ').
                     ColorCLI::primary($cleanArr['epno']).
                     ColorCLI::alternateOver('   Episode Title: ').
-                    ColorCLI::primary($updatedAni['episode_title'])
+                    ColorCLI::primary($updatedAni['episode_title']), true
                 );
 
                 $matched = true;

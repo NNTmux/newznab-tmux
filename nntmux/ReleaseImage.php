@@ -72,16 +72,16 @@ class ReleaseImage
             $img = (new ImageManager())->make($imgLoc);
         } catch (NotReadableException $e) {
             if ($e->getCode() === 404) {
-                ColorCLI::doEcho(ColorCLI::notice('Data not available on server'));
+                ColorCLI::doEcho(ColorCLI::notice('Data not available on server'), true);
             } elseif ($e->getCode() === 503) {
-                ColorCLI::doEcho(ColorCLI::notice('Service unavailable'));
+                ColorCLI::doEcho(ColorCLI::notice('Service unavailable'), true);
             } else {
-                ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, server responded with code: '.$e->getCode()));
+                ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, server responded with code: '.$e->getCode()), true);
             }
 
             return false;
         } catch (ImageException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getCode()));
+            ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getCode()), true);
 
             return false;
         }

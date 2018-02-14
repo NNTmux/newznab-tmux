@@ -333,7 +333,7 @@ class ProcessReleases
         $this->initiateTableNames($groupID);
 
         if ($this->echoCLI) {
-            ColorCLI::doEcho(ColorCLI::header('Process Releases -> Calculating collection sizes (in bytes).'));
+            ColorCLI::doEcho(ColorCLI::header('Process Releases -> Calculating collection sizes (in bytes).'), true);
         }
         // Get the total size in bytes of the collection for collections where filecheck = 2.
         $checked = $this->pdo->queryExec(
@@ -360,7 +360,7 @@ class ProcessReleases
             ColorCLI::doEcho(
                 ColorCLI::primary(
                     $checked->rowCount().' collections set to filecheck = 3(size calculated)'
-                )
+                ), true
             );
             ColorCLI::doEcho(ColorCLI::primary($this->consoleTools->convertTime(time() - $startTime)), true);
         }
@@ -380,7 +380,7 @@ class ProcessReleases
             ColorCLI::doEcho(
                 ColorCLI::header(
                     'Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting.'
-                )
+                ), true
             );
         }
 
@@ -526,7 +526,7 @@ class ProcessReleases
         $returnCount = $duplicate = 0;
 
         if ($this->echoCLI) {
-            ColorCLI::doEcho(ColorCLI::header('Process Releases -> Create releases from complete collections.'));
+            ColorCLI::doEcho(ColorCLI::header('Process Releases -> Create releases from complete collections.'), true);
         }
 
         $this->pdo->ping(true);
@@ -727,7 +727,7 @@ class ProcessReleases
         $this->formFromNamesQuery();
 
         if ($this->echoCLI) {
-            ColorCLI::doEcho(ColorCLI::header('Process Releases -> Create the NZB, delete collections/binaries/parts.'));
+            ColorCLI::doEcho(ColorCLI::header('Process Releases -> Create the NZB, delete collections/binaries/parts.'), true);
         }
 
         $releases = $this->pdo->queryDirect(
@@ -769,7 +769,7 @@ class ProcessReleases
                     number_format($nzbCount).' NZBs created/Collections deleted in '.
                     $totalTime.' seconds.'.PHP_EOL.
                     'Total time: '.ColorCLI::primary($this->consoleTools->convertTime($totalTime)).PHP_EOL
-                )
+                ), true
             );
         }
 
@@ -832,7 +832,7 @@ class ProcessReleases
                     ColorCLI::info(
                         "\nPost-processing is not running inside the Process Releases class.\n".
                         'If you are using tmux or screen they might have their own scripts running Post-processing.'
-                    )
+                    ), true
                 );
             }
         }
@@ -1039,7 +1039,7 @@ class ProcessReleases
                     number_format($deletedCount).
                     ' parts/binaries/collection rows in '.
                     $this->consoleTools->convertTime($fourthQuery - $startTime).PHP_EOL
-                )
+                ), true
             );
         }
     }
@@ -1163,7 +1163,7 @@ class ProcessReleases
 
         // Delete old releases and finished collections.
         if ($this->echoCLI) {
-            ColorCLI::doEcho(ColorCLI::header('Process Releases -> Delete old releases and passworded releases.'));
+            ColorCLI::doEcho(ColorCLI::header('Process Releases -> Delete old releases and passworded releases.'), true);
         }
 
         // Releases past retention.
@@ -1387,7 +1387,7 @@ class ProcessReleases
                         ? ', '.number_format($completionDeleted).' under '.$this->completion.'% completion.'
                         : '.'
                     )
-                )
+                ), true
             );
 
             $totalDeleted = (
@@ -1400,7 +1400,7 @@ class ProcessReleases
                     ColorCLI::primary(
                         'Removed '.number_format($totalDeleted).' releases in '.
                         $this->consoleTools->convertTime(time() - $startTime)
-                    )
+                    ), true
                 );
             }
         }
@@ -1686,7 +1686,7 @@ class ProcessReleases
         );
         if ($this->echoCLI && \is_object($obj) && $obj->rowCount()) {
             ColorCLI::doEcho(
-                ColorCLI::primary('Deleted '.$obj->rowCount().' broken/stuck collections.')
+                ColorCLI::primary('Deleted '.$obj->rowCount().' broken/stuck collections.'), true
             );
         }
     }
