@@ -14,7 +14,7 @@ class ColorCLI
      */
     public static function debug($str)
     {
-        return color('Debug: ' .$str)->light_gray() . PHP_EOL;
+        return color('Debug: '.$str)->light_gray().PHP_EOL;
     }
 
     /**
@@ -23,7 +23,7 @@ class ColorCLI
      */
     public static function info($str): string
     {
-        return color('Info: ' .$str)->fg('magenta');
+        return color('Info: '.$str)->fg('magenta');
     }
 
     /**
@@ -32,7 +32,7 @@ class ColorCLI
      */
     public static function notice($str): string
     {
-        return color('Notice: ' .$str)->blue();
+        return color('Notice: '.$str)->blue();
     }
 
     /**
@@ -41,7 +41,7 @@ class ColorCLI
      */
     public static function warning($str): string
     {
-        return color('Warning: ' .$str)->fg('yellow');
+        return color('Warning: '.$str)->fg('yellow');
     }
 
     /**
@@ -50,7 +50,7 @@ class ColorCLI
      */
     public static function error($str): string
     {
-        return color('Error: ' . $str)->fg('red');
+        return color('Error: '.$str)->fg('red');
     }
 
     /**

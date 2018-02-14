@@ -1,7 +1,7 @@
 <?php
 
-use Colors\Color;
 use nntmux\XXX;
+use Colors\Color;
 use nntmux\ColorCLI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
