@@ -896,8 +896,8 @@ class NameFixer
                         echo PHP_EOL;
                     }
 
-                    echo
-                        ColorCLI::headerOver(PHP_EOL.'New name:  ').
+                    ColorCLI::doEcho(
+                        ColorCLI::headerOver('New name:  ').
                         ColorCLI::primary(substr($newName, 0, 299)).
                         ColorCLI::headerOver('Old name:  ').
                         ColorCLI::primary($release['searchname']).
@@ -912,11 +912,11 @@ class NameFixer
                         ColorCLI::headerOver('Method:    ').
                         ColorCLI::primary($type.$method).
                         ColorCLI::headerOver('Releases ID: ').
-                        ColorCLI::primary($release['releases_id']);
+                        ColorCLI::primary($release['releases_id']), true);
                     if (! empty($release['filename'])) {
-                        echo
+                        ColorCLI::doEcho(
                             ColorCLI::headerOver('Filename:  ').
-                            ColorCLI::primary($release['filename']);
+                            ColorCLI::primary($release['filename']), true);
                     }
 
                     if ($type !== 'PAR2, ') {
