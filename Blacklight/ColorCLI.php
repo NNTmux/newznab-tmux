@@ -2,6 +2,8 @@
 
 namespace Blacklight;
 
+use Colors\Color;
+
 class ColorCLI
 {
     /**
@@ -83,7 +85,7 @@ class ColorCLI
      */
     public static function tmuxOrange($str): string
     {
-        return color($str)->yellow()->dark();
+        return "\033[38;5;" . color("$str\033[0m\n")->yellow()->dark();
     }
 
     /**
