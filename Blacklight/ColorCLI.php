@@ -85,7 +85,7 @@ class ColorCLI
      */
     public static function tmuxOrange($str): string
     {
-        return "\033[38;5;" . color("$str\033[0m\n")->yellow()->dark();
+        return "\033[38;5;".color("$str\033[0m\n")->yellow()->dark();
     }
 
     /**
