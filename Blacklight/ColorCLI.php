@@ -58,7 +58,7 @@ class ColorCLI
      */
     public static function primary($str): string
     {
-        return color($str)->green();
+        return color($str)->green().PHP_EOL;
     }
 
     /**
@@ -67,7 +67,7 @@ class ColorCLI
      */
     public static function header($str): string
     {
-        return color($str)->yellow();
+        return color($str)->yellow().PHP_EOL;
     }
 
     /**
@@ -76,7 +76,7 @@ class ColorCLI
      */
     public static function alternate($str): string
     {
-        return color($str)->magenta()->dark()->bold();
+        return color($str)->magenta()->dark()->bold().PHP_EOL;
     }
 
     /**
@@ -85,7 +85,7 @@ class ColorCLI
      */
     public static function tmuxOrange($str): string
     {
-        return "\033[38;5;".color("$str\033[0m\n")->yellow()->dark();
+        return color($str)->yellow()->dark().PHP_EOL;
     }
 
     /**
