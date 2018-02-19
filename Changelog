@@ -1,4 +1,5 @@
 2018-02-19 DariusIII
+	* Chg: Update phpspec/prophecy to latest version
 	* Chg: Remove unused variable $colors from run.php
 	* Chg: Remove defunct Tmux model
 	* Fix: Fix issues from previous commit
