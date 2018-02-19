@@ -8,6 +8,7 @@
  */
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Models\Settings;
 use Blacklight\Tmux;
 use Blacklight\ColorCLI;
 

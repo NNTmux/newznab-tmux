@@ -6,7 +6,6 @@ use App\Models\Settings;
 use Blacklight\db\DB;
 use App\Models\Category;
 use App\Extensions\util\Versions;
-use App\Models\Tmux as TmuxModel;
 
 /**
  * Class Tmux.
@@ -36,53 +35,11 @@ class Tmux
 
     /**
      * @return string
+     * @throws \RuntimeException
      */
     public function version(): string
     {
         return (new Versions())->getGitTagInFile();
-    }
-
-    /**
-     * @param $form
-     *
-     * @return \stdClass
-     */
-    public function update($form): \stdClass
-    {
-        $tmux = $this->row2Object($form);
-
-        $sql = $sqlKeys = [];
-        foreach ($form as $settingK => $settingV) {
-            if (\is_array($settingV)) {
-                $settingV = implode(', ', $settingV);
-            }
-            $sql[] = sprintf('WHEN %s THEN %s', $this->pdo->escapeString($settingK), $this->pdo->escapeString($settingV));
-            $sqlKeys[] = $this->pdo->escapeString($settingK);
-        }
-
-        $this->pdo->queryExec(sprintf('UPDATE tmux SET value = CASE setting %s END WHERE setting IN (%s)', implode(' ', $sql), implode(', ', $sqlKeys)));
-
-        return $tmux;
-    }
-
-    /**
-     * @param string $setting
-     *
-     * @return bool|\stdClass
-     */
-    public function get($setting = '')
-    {
-        if ($setting === '') {
-            $rows = TmuxModel::all();
-        } else {
-            $rows = TmuxModel::query()->where('setting', $setting)->get();
-        }
-
-        if ($rows === false) {
-            return false;
-        }
-
-        return $this->rows2Object($rows);
     }
 
     /**
@@ -187,7 +144,6 @@ class Tmux
      */
     public function getConstantSettings(): string
     {
-        $tmuxstr = 'SELECT value FROM tmux WHERE setting =';
         $settstr = 'SELECT value FROM settings WHERE setting =';
 
         $sql = sprintf(
@@ -195,10 +151,9 @@ class Tmux
 					(%1\$s 'sequential') AS sequential,
 					(%1\$s 'tmux_session') AS tmux_session,
 					(%1\$s 'run_ircscraper') AS run_ircscraper,
-					(%2\$s 'sqlpatch') AS sqlpatch,
-					(%2\$s 'alternate_nntp') AS alternate_nntp,
-					(%2\$s 'delaytime') AS delaytime",
-            $tmuxstr,
+					(%1\$s 'sqlpatch') AS sqlpatch,
+					(%1\$s 'alternate_nntp') AS alternate_nntp,
+					(%1\$s 'delaytime') AS delaytime",
             $settstr
         );
 
@@ -210,7 +165,6 @@ class Tmux
      */
     public function getMonitorSettings(): string
     {
-        $tmuxstr = 'SELECT value FROM tmux WHERE setting =';
         $settstr = 'SELECT value FROM settings WHERE setting =';
 
         $sql = sprintf(
@@ -259,21 +213,20 @@ class Tmux
 					(%1\$s 'running') AS is_running,
 					(%1\$s 'run_sharing') AS run_sharing,
 					(%1\$s 'sharing_timer') AS sharing_timer,
-					(%2\$s 'lookupbooks') AS processbooks,
-					(%2\$s 'lookupmusic') AS processmusic,
-					(%2\$s 'lookupgames') AS processgames,
-					(%2\$s 'lookupxxx') AS processxxx,
-					(%2\$s 'lookupimdb') AS processmovies,
-					(%2\$s 'lookuptvrage') AS processtvrage,
-					(%2\$s 'lookupanidb') AS processanime,
-					(%2\$s 'lookupnfo') AS processnfo,
-					(%2\$s 'lookuppar2') AS processpar2,
-					(%2\$s 'nzbthreads') AS nzbthreads,
-					(%2\$s 'tmpunrarpath') AS tmpunrar,
-					(%2\$s 'compressedheaders') AS compressed,
-					(%2\$s 'maxsizetopostprocess') AS maxsize_pp,
-					(%2\$s 'minsizetopostprocess') AS minsize_pp",
-            $tmuxstr,
+					(%1\$s 'lookupbooks') AS processbooks,
+					(%1\$s 'lookupmusic') AS processmusic,
+					(%1\$s 'lookupgames') AS processgames,
+					(%1\$s 'lookupxxx') AS processxxx,
+					(%1\$s 'lookupimdb') AS processmovies,
+					(%1\$s 'lookuptvrage') AS processtvrage,
+					(%1\$s 'lookupanidb') AS processanime,
+					(%1\$s 'lookupnfo') AS processnfo,
+					(%1\$s 'lookuppar2') AS processpar2,
+					(%1\$s 'nzbthreads') AS nzbthreads,
+					(%1\$s 'tmpunrarpath') AS tmpunrar,
+					(%1\$s 'compressedheaders') AS compressed,
+					(%1\$s 'maxsizetopostprocess') AS maxsize_pp,
+					(%1\$s 'minsizetopostprocess') AS minsize_pp",
             $settstr
         );
 
@@ -297,21 +250,6 @@ class Tmux
         return $obj;
     }
 
-    /**
-     * @param $row
-     *
-     * @return \stdClass
-     */
-    public function row2Object($row): \stdClass
-    {
-        $obj = new \stdClass;
-        $rowKeys = array_keys($row);
-        foreach ($rowKeys as $key) {
-            $obj->{$key} = $row[$key];
-        }
-
-        return $obj;
-    }
 
     /**
      * @param $setting
@@ -321,7 +259,7 @@ class Tmux
      */
     public function updateItem($setting, $value)
     {
-        return TmuxModel::query()->where('setting', '=', $setting)->update(['value' => $value]);
+        return Settings::query()->where('setting', '=', $setting)->update(['value' => $value]);
     }
 
     /**
@@ -363,8 +301,7 @@ class Tmux
     {
         $path = NN_LOGS;
         $getdate = gmdate('Ymd');
-        $tmux = $this->get();
-        $logs = $tmux->write_logs ?? 0;
+        $logs = Settings::settingValue('site.tmux.write_logs') ?? 0;
         if ($logs === 1) {
             return "2>&1 | tee -a $path/$pane-$getdate.log";
         }
@@ -403,11 +340,11 @@ class Tmux
      * @param int $chance
      *
      * @return bool
+     * @throws \Exception
      */
     public function rand_bool($loop, $chance = 60): bool
     {
-        $tmux = $this->get();
-        $usecache = $tmux->usecache ?? 0;
+        $usecache = Settings::settingValue('site.tmux.usecache', true) ?? 0;
         if ($loop === 1 || $usecache === 0) {
             return false;
         }
@@ -591,16 +528,14 @@ class Tmux
     }
 
     /**
-     * Check if Tmux is running, if it is, stop it.
-     *
-     * @return bool true if scripts were running, false otherwise.
-     * @throws \RuntimeException
+     * @return bool
+     * @throws \Exception
      */
     public function stopIfRunning(): bool
     {
         if ($this->isRunning() === true) {
             Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->update(['value' => 0]);
-            $sleep = $this->get()->monitor_delay;
+            $sleep = Settings::settingValue('site.tmux.monitor_delay');
             ColorCLI::doEcho(ColorCLI::header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown'), true);
             sleep($sleep);
 
