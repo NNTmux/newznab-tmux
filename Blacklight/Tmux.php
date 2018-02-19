@@ -250,7 +250,6 @@ class Tmux
         return $obj;
     }
 
-
     /**
      * @param $setting
      * @param $value
