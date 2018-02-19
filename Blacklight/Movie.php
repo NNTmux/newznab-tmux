@@ -14,7 +14,6 @@ use Illuminate\Support\Carbon;
 use Tmdb\Client as TmdbClient;
 use Blacklight\utility\Utility;
 use Blacklight\libraries\FanartTV;
-use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
@@ -24,7 +23,6 @@ use GuzzleHttp\Exception\RequestException;
  */
 class Movie
 {
-
     protected const MATCH_PERCENT = 75;
 
     /**
@@ -479,6 +477,7 @@ class Movie
                 $cover = $this->releaseImage->saveImage($imdbid.'-cover', $link, $this->imgSavePath);
             }
         }
+
         return $this->update([
             'genres'   => $this->checkTraktValue($data['genres']),
             'imdbid'   => $this->checkTraktValue($imdbid),
@@ -1208,7 +1207,6 @@ class Movie
                                 $movieUpdated = false;
                             }
                         }
-
                     } else {
                         $movieUpdated = false;
                     }
