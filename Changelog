@@ -1,4 +1,5 @@
 2018-02-19 DariusIII
+	* Chg: Update Movie class, add check for movie imdbid from The Movie DataBase
 	* Chg: Update phpspec/prophecy to latest version
 	* Chg: Remove unused variable $colors from run.php
 	* Chg: Remove defunct Tmux model

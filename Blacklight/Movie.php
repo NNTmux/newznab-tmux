@@ -24,6 +24,9 @@ use GuzzleHttp\Exception\RequestException;
  */
 class Movie
 {
+
+    protected const MATCH_PERCENT = 75;
+
     /**
      * @var \Blacklight\db\DB
      */
@@ -476,7 +479,7 @@ class Movie
                 $cover = $this->releaseImage->saveImage($imdbid.'-cover', $link, $this->imgSavePath);
             }
         }
-        $this->update([
+        return $this->update([
             'genres'   => $this->checkTraktValue($data['genres']),
             'imdbid'   => $this->checkTraktValue($imdbid),
             'language' => $this->checkTraktValue($data['language']),
@@ -807,13 +810,9 @@ class Movie
      */
     public function fetchTMDBProperties($imdbId, $text = false)
     {
-        $lookupId = ($text === false ? 'tt'.$imdbId : $imdbId);
+        $lookupId = $text === false ? 'tt'.$imdbId : $imdbId;
 
-        try {
-            $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId);
-        } catch (TmdbApiException $e) {
-            return false;
-        }
+        $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId);
 
         $ret = [];
         $ret['title'] = $tmdbLookup['original_title'];
@@ -821,14 +820,14 @@ class Movie
         if ($this->currentTitle !== '') {
             // Check the similarity.
             similar_text($this->currentTitle, $ret['title'], $percent);
-            if ($percent < 40) {
+            if ($percent < self::MATCH_PERCENT) {
                 return false;
             }
         }
 
         $ret['tmdbid'] = $tmdbLookup['id'];
         $ImdbID = str_replace('tt', '', $tmdbLookup['imdb_id']);
-        $ret['imdb_id'] = $ImdbID;
+        $ret['imdbid'] = $ImdbID;
         $vote = $tmdbLookup['vote_average'];
         if (isset($vote)) {
             $ret['rating'] = ($vote === 0) ? '' : $vote;
@@ -938,7 +937,7 @@ class Movie
             if ($this->currentTitle !== '' && isset($ret['title'])) {
                 // Check the similarity.
                 similar_text($this->currentTitle, $ret['title'], $percent);
-                if ($percent < 40) {
+                if ($percent < self::MATCH_PERCENT) {
                     return false;
                 }
             }
@@ -1189,6 +1188,29 @@ class Movie
                                 $movieUpdated = true;
                             }
                         }
+                    }
+                }
+
+                // Check on The Movie Database.
+                if ($movieUpdated === false) {
+                    $data = $this->tmdbclient->getSearchApi()->searchMovies($movieName);
+                    if (! empty($data['results'])) {
+                        foreach ($data['results'] as $result) {
+                            if (! empty($result['id'])) {
+                                $ret = $this->fetchTMDBProperties($result['id']);
+                                if ($ret !== false) {
+                                    $imdbID = $this->doMovieUpdate($ret['imdbid'], 'TMDB', $arr['id']);
+                                    if ($imdbID !== false) {
+                                        $movieUpdated = true;
+                                    }
+                                }
+                            } else {
+                                $movieUpdated = false;
+                            }
+                        }
+
+                    } else {
+                        $movieUpdated = false;
                     }
                 }
 
