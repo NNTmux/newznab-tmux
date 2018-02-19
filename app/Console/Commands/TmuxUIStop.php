@@ -34,13 +34,7 @@ class TmuxUIStop extends Command
     }
 
     /**
-     * Execute the console command.
-     *
-     * @return mixed
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \RuntimeException
+     * @throws \Exception
      */
     public function handle()
     {
