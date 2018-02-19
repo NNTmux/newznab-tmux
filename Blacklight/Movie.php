@@ -845,7 +845,7 @@ class Movie
             $ret['year'] = date('Y', strtotime($released));
         }
         $genresa = $tmdbLookup['genres'];
-        if (! empty($genresa) && count($genresa) > 0) {
+        if (! empty($genresa) && \count($genresa) > 0) {
             $genres = [];
             foreach ($genresa as $genre) {
                 $genres[] = $genre['name'];
@@ -1197,11 +1197,14 @@ class Movie
                     if (! empty($data['results'])) {
                         foreach ($data['results'] as $result) {
                             if (! empty($result['id'])) {
-                                $ret = $this->fetchTMDBProperties($result['id']);
-                                if ($ret !== false) {
-                                    $imdbID = $this->doMovieUpdate($ret['imdbid'], 'TMDB', $arr['id']);
-                                    if ($imdbID !== false) {
-                                        $movieUpdated = true;
+                                similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
+                                if ($percent > 80) {
+                                    $ret = $this->fetchTMDBProperties($result['id']);
+                                    if ($ret !== false) {
+                                        $imdbID = $this->doMovieUpdate($ret['imdbid'], 'TMDB', $arr['id']);
+                                        if ($imdbID !== false) {
+                                            $movieUpdated = true;
+                                        }
                                     }
                                 }
                             } else {
