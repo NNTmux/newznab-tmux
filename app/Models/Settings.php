@@ -23,8 +23,8 @@ namespace App\Models;
 use Blacklight\utility\Utility;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;
 use Yadakhov\InsertOnDuplicateKey;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Settings - model for settings table.
