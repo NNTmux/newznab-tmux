@@ -4,10 +4,8 @@ namespace Blacklight\libraries;
 
 use Blacklight\Nfo;
 use Blacklight\NZB;
-use App\Models\Tmux;
 use Blacklight\NNTP;
 use Blacklight\db\DB;
-use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Illuminate\Support\Carbon;

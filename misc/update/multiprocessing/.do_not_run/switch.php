@@ -8,7 +8,6 @@ require_once dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.php
 
 use App\Models\Group;
 use App\Models\Settings;
-use App\Models\Tmux;
 use \Blacklight\db\DB;
 use \Blacklight\processing\PostProcess;
 use \Blacklight\processing\ProcessReleases;
