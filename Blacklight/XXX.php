@@ -96,7 +96,7 @@ class XXX
 
         $this->movieqty = Settings::settingValue('..maxxxxprocessed') !== '' ? (int) Settings::settingValue('..maxxxxprocessed') : 100;
         $this->showPasswords = Releases::showPasswords();
-        $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
+        $this->echooutput = ($options['Echo'] && env('echocli', true));
         $this->imgSavePath = NN_COVERS.'xxx'.DS;
         $this->cookie = NN_TMP.'xxx.cookie';
     }

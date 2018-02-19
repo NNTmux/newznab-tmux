@@ -143,7 +143,7 @@ class ReleaseRemover
         $this->error = '';
         $this->ignoreUserCheck = false;
         $this->browser = $options['Browser'];
-        $this->echoCLI = (! $this->browser && NN_ECHOCLI && $options['Echo']);
+        $this->echoCLI = (! $this->browser && env('echocli', true) && $options['Echo']);
     }
 
     /**

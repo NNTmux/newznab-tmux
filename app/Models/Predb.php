@@ -63,7 +63,7 @@ class Predb extends Model
         $consoleTools = new ConsoleTools();
         $updated = 0;
 
-        if (NN_ECHOCLI) {
+        if (env('echocli', true)) {
             echo ColorCLI::header('Querying DB for release search names not matched with PreDB titles.');
         }
 
@@ -85,18 +85,18 @@ class Predb extends Model
                 foreach ($res as $row) {
                     Release::query()->where('id', $row['releases_id'])->update(['predb_id' => $row['predb_id']]);
 
-                    if (NN_ECHOCLI) {
+                    if (env('echocli', true)) {
                         $consoleTools->overWritePrimary(
                             'Matching up preDB titles with release searchnames: '.$consoleTools->percentString(++$updated, $total)
                         );
                     }
                 }
-                if (NN_ECHOCLI) {
+                if (env('echocli', true)) {
                     echo PHP_EOL;
                 }
             }
 
-            if (NN_ECHOCLI) {
+            if (env('echocli', true)) {
                 echo ColorCLI::header(
                     'Matched '.number_format(($updated > 0) ? $updated : 0).' PreDB titles to release search names.'
                 );

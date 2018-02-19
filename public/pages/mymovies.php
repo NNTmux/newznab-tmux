@@ -126,11 +126,11 @@ switch ($action) {
         $ordering = $releases->getBrowseOrdering();
         $orderby = isset($_REQUEST['ob']) && \in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
 
-        $results = $mv->getMovieRange($movies, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata['categoryexclusions']);
+        $results = $mv->getMovieRange($movies, $offset, env('ITEMS_PER_PAGE', 50), $orderby, -1, $page->userdata['categoryexclusions']);
 
         $page->smarty->assign('pagertotalitems', $browsecount);
         $page->smarty->assign('pageroffset', $offset);
-        $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
+        $page->smarty->assign('pageritemsperpage', env('ITEMS_PER_PAGE', 50));
         $page->smarty->assign('pagerquerybase', WWW_TOP.'/mymovies/browse?ob='.$orderby.'&amp;offset=');
         $page->smarty->assign('pagerquerysuffix', '#results');
         $page->smarty->assign('covgroup', '');

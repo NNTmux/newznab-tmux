@@ -17,14 +17,14 @@ $page->smarty->assign([
     'pagertotalitems' => $gameCount,
     'pagerquerysuffix'  => '#results',
     'pageroffset' => $offset,
-    'pageritemsperpage' => ITEMS_PER_PAGE,
+    'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
     'pagerquerybase' => WWW_TOP.'/game-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$gamelist = $game->getRange($offset, ITEMS_PER_PAGE);
+$gamelist = $game->getRange($offset, env('ITEMS_PER_PAGE', 50));
 
 $page->smarty->assign('gamelist', $gamelist);
 

@@ -10,15 +10,15 @@ $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_R
 
 if (isset($_REQUEST['presearch'])) {
     $lastSearch = $_REQUEST['presearch'];
-    $parr = Predb::getAll($offset, ITEMS_PER_PAGE, $_REQUEST['presearch']);
+    $parr = Predb::getAll($offset, env('ITEMS_PER_PAGE', 50), $_REQUEST['presearch']);
 } else {
     $lastSearch = '';
-    $parr = Predb::getAll($offset, ITEMS_PER_PAGE);
+    $parr = Predb::getAll($offset, env('ITEMS_PER_PAGE', 50));
 }
 
 $page->smarty->assign('pagertotalitems', $parr['count']);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
+$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_PAGE', 50));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/predb.php?offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 $page->smarty->assign('lastSearch', $lastSearch);

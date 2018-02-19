@@ -34,7 +34,7 @@ $ordering = $games->getGamesOrdering();
 $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
 
 $results = $games2 = [];
-$results = $games->getGamesRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, '', $page->userdata['categoryexclusions']);
+$results = $games->getGamesRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, '', $page->userdata['categoryexclusions']);
 $maxwords = 50;
 foreach ($results as $result) {
     if (! empty($result['review'])) {
@@ -74,7 +74,7 @@ $browseby_link = '&amp;title='.$title.'&amp;year='.$year;
 
 $page->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', ITEMS_PER_COVER_PAGE);
+$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_COVER_PAGE', 20));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/games?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 

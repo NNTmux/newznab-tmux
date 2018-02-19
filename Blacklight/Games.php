@@ -120,7 +120,7 @@ class Games
             'Settings' => null,
         ];
         $options += $defaults;
-        $this->echoOutput = ($options['Echo'] && NN_ECHOCLI);
+        $this->echoOutput = ($options['Echo'] && env('echocli', true));
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 

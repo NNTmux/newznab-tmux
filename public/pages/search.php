@@ -53,7 +53,7 @@ if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && ! isset($_REQUEST
     foreach ($releases->getBrowseOrdering() as $orderType) {
         $page->smarty->assign(
             'orderby'.$orderType,
-            WWW_TOP.'/search/'.htmlentities($searchString).'?t='.implode(',', $categoryID).'&amp;ob='.$orderType
+            WWW_TOP.'/search/'.htmlentities($searchString, ENT_QUOTES | ENT_HTML5).'?t='.implode(',', $categoryID).'&amp;ob='.$orderType
         );
     }
 
@@ -70,7 +70,7 @@ if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && ! isset($_REQUEST
         -1,
         -1,
         $offset,
-        ITEMS_PER_PAGE,
+        env('ITEMS_PER_PAGE', 50),
         $orderBy,
         -1,
         $page->userdata['categoryexclusions'],
@@ -83,9 +83,9 @@ if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && ! isset($_REQUEST
             'lastvisit' => $page->userdata['lastlogin'],
             'pagertotalitems' => \count($results) > 0 ? $results[0]['_totalrows'] : 0,
             'pageroffset' => $offset,
-            'pageritemsperpage' => ITEMS_PER_PAGE,
+            'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
             'pagerquerysuffix' => '#results',
-            'pagerquerybase' => WWW_TOP.'/search/'.htmlentities($searchString).'?t='.
+            'pagerquerybase' => WWW_TOP.'/search/'.htmlentities($searchString, ENT_QUOTES | ENT_HTML5).'?t='.
                 implode(',', $categoryID).'&amp;ob='.$orderBy.'&amp;offset=',
             'category' => $categoryID,
         ]
@@ -114,7 +114,7 @@ foreach ($searchVars as $searchVarKey => $searchVar) {
 if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQUEST['subject']) && $searchType !== 'basic') {
     $orderByString = '';
     foreach ($searchVars as $searchVarKey => $searchVar) {
-        $orderByString .= "&$searchVarKey=".htmlentities($searchVar);
+        $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);
     }
     $orderByString = ltrim($orderByString, '&');
 
@@ -138,7 +138,7 @@ if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQU
         ($searchVars['searchadvdaysnew'] === '' ? -1 : $searchVars['searchadvdaysnew']),
         ($searchVars['searchadvdaysold'] === '' ? -1 : $searchVars['searchadvdaysold']),
         $offset,
-        ITEMS_PER_PAGE,
+        env('ITEMS_PER_PAGE', 50),
         $orderBy,
         -1,
         $page->userdata['categoryexclusions'],
@@ -151,7 +151,7 @@ if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQU
             'lastvisit' => $page->userdata['lastlogin'],
             'pagertotalitems' => \count($results) > 0 ? $results[0]['_totalrows'] : 0,
             'pageroffset' => $offset,
-            'pageritemsperpage' => ITEMS_PER_PAGE,
+            'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
             'pagerquerysuffix' => '#results',
             'pagerquerybase' => WWW_TOP.'/search?'.$orderByString.'&search_type=adv&ob='.$orderBy.'&offset=',
         ]

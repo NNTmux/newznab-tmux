@@ -11,14 +11,14 @@ $page->title = 'Collections Regex List';
 
 $group = (isset($_REQUEST['group']) && ! empty($_REQUEST['group']) ? $_REQUEST['group'] : '');
 $offset = $_REQUEST['offset'] ?? 0;
-$regex = $regexes->getRegex($group, ITEMS_PER_PAGE, $offset);
+$regex = $regexes->getRegex($group, env('ITEMS_PER_PAGE', 50), $offset);
 $page->smarty->assign(
     [
         'group'             => $group,
         'regex'             => $regex,
         'pagertotalitems'   => $regexes->getCount($group),
         'pageroffset'       => $offset,
-        'pageritemsperpage' => ITEMS_PER_PAGE,
+        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
         'pagerquerybase'    => WWW_TOP.'/collection_regexes-list.php?'.$group.'offset=',
         'pagerquerysuffix'  => '',
     ]

@@ -1,3 +1,5 @@
+2018-02-19 DariusIII
+	* Chg: Move web and cli settings from settings to .env file (settings.php will be obsoleted very soon)
 2018-02-17 DariusIII
 	* Chg: Update ColorCLI class
 2018-02-16 DariusIII

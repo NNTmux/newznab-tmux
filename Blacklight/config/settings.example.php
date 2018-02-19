@@ -21,82 +21,6 @@
 define('NN_SETTINGS_FILE_VERSION', 8);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////// Web Settings //////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
- * How many releases to show per page in list view.
- *
- * @default '50'
- */
-define('ITEMS_PER_PAGE', '50');
-
-/*
- * How many releases to show per page in cover view.
- *
- * @default '20'
- */
-define('ITEMS_PER_COVER_PAGE', '20');
-
-/*
- * How many releases maximum to display in total on browse/search/etc.
- * If you have ITEMS_PER_PAGE set to 50, and NN_MAX_PAGER_RESULTS set to 125000, you would get a maximum of
- * 2,500 pages of results in searches/browse.
- *
- * @note    This setting can speed up browsing releases tremendously if you have millions of releases and you keep it
- * a relatively low value.
- *
- * @default '125000'
- */
-define('NN_MAX_PAGER_RESULTS', '125000');
-
-/*
- * Whether to check if a person is trying to send too many requests in a given amount of time,
- * lock out the person of the site for a amount of time.
- *
- * @default false
- */
-define('NN_FLOOD_CHECK', false);
-
-/*
- * How many seconds should the person be locked out of the site.
- *
- * @default 5
- */
-define('NN_FLOOD_WAIT_TIME', 5);
-
-/*
- * How many requests in a second can a person send to the site max before being locked out for
- * NN_FLOOD_WAIT_TIME seconds.
- *
- * @default 5
- */
-define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////// CLI Settings //////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
- * Display text to console(terminal) output.
- *
- * @default true
- */
-define('NN_ECHOCLI', true);
-
-/*
- * Rename releases using PAR2 files (if they match on PRE titles)?
- *
- * @default true
- */
-define('NN_RENAME_PAR2', true);
-
-/*
- * Rename music releases using media info from the MP3/FLAC/etc tags (names are created using info found in the tags)?
- *
- * @default true
- */
-define('NN_RENAME_MUSIC_MEDIAINFO', true);
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////// Cache Settings /////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -213,30 +137,6 @@ define('NN_QUERY_STRIP_WHITESPACE', false);
  */
 define('NN_USE_SQL_TRANSACTIONS', true);
 
-/*
- * Allows the use of LOW_PRIORITY in certain DELETE queries.
- * This prevents table locks by deleting only when no SELECT queries are active on the table.
- * This works on MyISAM/ARIA, not INNODB.
- *
- * @note    Does not cause any errors or warnings if enabled on INNODB.
- * @link    https://dev.mysql.com/doc/refman/5.7/en/delete.html
- * @default false
- * @version 1
- */
-define('NN_SQL_DELETE_LOW_PRIORITY', false);
-
-/*
- * Allows the use QUICK in certain DELETE queries.
- * This makes DELETE queries faster on MyISAM/ARIA tables by not merging index leaves.
- * Only supported on MyISAM/ARIA
- *
- * @note    Does not cause any errors or warnings if enabled on INNODB.
- * @link    https://dev.mysql.com/doc/refman/5.7/en/delete.html
- * @default false
- * @version 1
- */
-define('NN_SQL_DELETE_QUICK', false);
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////// PHP Xdebug Settings //////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -288,7 +188,8 @@ if (extension_loaded('xdebug')) {
  * //////////////////////////////////////////////// Change log ////////////////////////////////////////////////////////////
  * ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  *
- *2018-02-08        v8  Remove search settings, sphinx is the only supported search engine
+ * 2018-02-19       v9  Move web and cli settings to .env file
+ * 2018-02-08       v8  Remove search settings, sphinx is the only supported search engine
  * 2017-12-21       v7  Remove custom logging settings, Laravel is handling errors now
  * 2017-10-11       v6  Remove settings for PHP web/CLI SAPI's as these are now handled by Laravel
  * 2015-08-26       v4  Add settings for PHP web/CLI SAPI's.

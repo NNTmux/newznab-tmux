@@ -63,7 +63,7 @@ $page->smarty->assign(
         'privileged'        => $privileged,
         'pagertotalitems'   => ReleaseComment::getCommentCountForUser($userID),
         'pageroffset'       => $offset,
-        'pageritemsperpage' => ITEMS_PER_PAGE,
+        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
         'pagerquerybase'    => '/profile?id='.$userID.'&offset=',
         'pagerquerysuffix'  => '#comments',
     ]
@@ -83,7 +83,7 @@ $sabSettings = [1 => 'Site', 2 => 'Cookie'];
 $page->smarty->assign(
     [
         'pager'         => $page->smarty->fetch('pager.tpl'),
-        'commentslist'  => ReleaseComment::getCommentsForUserRange($userID, $offset, ITEMS_PER_PAGE),
+        'commentslist'  => ReleaseComment::getCommentsForUserRange($userID, $offset, env('ITEMS_PER_PAGE', 50)),
         'exccats'       => implode(',', UserExcludedCategory::getCategoryExclusionNames($userID)),
         'saburl'        => $sab->url,
         'sabapikey'     => $sab->apikey,

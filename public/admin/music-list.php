@@ -19,14 +19,14 @@ $page->smarty->assign([
 	'pagertotalitems' => $musCount,
 	'pagerquerysuffix'  => '#results',
 	'pageroffset' => $offset,
-	'pageritemsperpage' => ITEMS_PER_PAGE,
+	'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
 	'pagerquerybase' => WWW_TOP.'/music-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$musicList = Utility::getRange('musicinfo', $offset, ITEMS_PER_PAGE);
+$musicList = Utility::getRange('musicinfo', $offset, env('ITEMS_PER_PAGE', 50));
 
 $page->smarty->assign('musiclist', $musicList);
 

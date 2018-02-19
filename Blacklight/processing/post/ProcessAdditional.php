@@ -391,7 +391,7 @@ class ProcessAdditional
         ];
         $options += $defaults;
 
-        $this->_echoCLI = ($options['Echo'] && NN_ECHOCLI && (strtolower(PHP_SAPI) === 'cli'));
+        $this->_echoCLI = ($options['Echo'] && env('echocli', true) && (strtolower(PHP_SAPI) === 'cli'));
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
@@ -1731,7 +1731,7 @@ class ProcessAdditional
                     if (isset($arrXml['File']['track'])) {
                         foreach ($arrXml['File']['track'] as $track) {
                             if (isset($track['Album']) && isset($track['Performer'])) {
-                                if (NN_RENAME_MUSIC_MEDIAINFO && (int) $this->_release['predb_id'] === 0) {
+                                if (env('RENAME_MUSIC_MEDIAINFO', true) && (int) $this->_release['predb_id'] === 0) {
                                     // Make the extension upper case.
                                     $ext = strtoupper($fileExtension);
 
@@ -2168,7 +2168,7 @@ class ProcessAdditional
 
         // Only get a new name if the category is OTHER.
         $foundName = true;
-        if (NN_RENAME_PAR2 &&
+        if (env('RENAME_PAR2', true) &&
             $releaseInfo['proc_pp'] === 0 &&
             \in_array(
                 (int) $this->_release['categories_id'],

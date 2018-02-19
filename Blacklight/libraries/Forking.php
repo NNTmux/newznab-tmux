@@ -212,7 +212,7 @@ class Forking extends \fork_daemon
         // Process extra work that should not be forked and done after.
         $this->processEndWork();
 
-        if (NN_ECHOCLI) {
+        if (env('echocli', true)) {
             ColorCLI::doEcho(
                 ColorCLI::header(
                     'Multi-processing for '.$this->workType.' finished in '.(microtime(true) - $startTime).
@@ -306,7 +306,7 @@ class Forking extends \fork_daemon
     {
         $this->_workCount = \count($this->work);
         if ($this->_workCount > 0) {
-            if (NN_ECHOCLI) {
+            if (env('echocli', true)) {
                 ColorCLI::doEcho(
                     ColorCLI::header(
                         'Multi-processing started at '.date(DATE_RFC2822).' for '.$this->workType.' with '.$this->_workCount.
@@ -318,7 +318,7 @@ class Forking extends \fork_daemon
             $this->addwork($this->work);
             $this->process_work(true);
         } else {
-            if (NN_ECHOCLI) {
+            if (env('echocli', true)) {
                 ColorCLI::doEcho(
                     ColorCLI::header('No work to do!'), true
                 );
@@ -1095,7 +1095,7 @@ class Forking extends \fork_daemon
      */
     public function logger($message)
     {
-        if (NN_ECHOCLI) {
+        if (env('echocli', true)) {
             echo $message.PHP_EOL;
         }
     }
@@ -1108,7 +1108,7 @@ class Forking extends \fork_daemon
      */
     public function childExit($pid, $identifier = '')
     {
-        if (NN_ECHOCLI) {
+        if (env('echocli', true)) {
             ColorCLI::doEcho(
                 ColorCLI::header(
                     'Process ID #'.$pid.' has completed.'.PHP_EOL.

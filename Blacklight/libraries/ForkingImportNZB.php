@@ -49,7 +49,7 @@ class ForkingImportNZB extends Forking
             exit();
         }
 
-        if (NN_ECHOCLI) {
+        if (env('echocli', true)) {
             ColorCLI::doEcho(ColorCLI::header(
 				'Multi-processing started at '.date(DATE_RFC2822).' with '.$this->_workCount.
 				' job(s) to do using a max of '.$maxProcesses.' child process(es).'
@@ -67,7 +67,7 @@ class ForkingImportNZB extends Forking
         $this->addwork($directories);
         $this->process_work(true);
 
-        if (NN_ECHOCLI) {
+        if (env('echocli', true)) {
             ColorCLI::doEcho(
 				ColorCLI::header(
 					'Multi-processing for import finished in '.(microtime(true) - $startTime).

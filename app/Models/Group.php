@@ -512,7 +512,7 @@ class Group extends Model
             return self::$cbppTableNames[$groupKey];
         }
 
-        if (NN_ECHOCLI && $this->allasmgr === false && self::createNewTPGTables($groupID) === false) {
+        if (env('echocli', true) && $this->allasmgr === false && self::createNewTPGTables($groupID) === false) {
             exit('There is a problem creating new TPG tables for this group ID: '.$groupID.PHP_EOL);
         }
 

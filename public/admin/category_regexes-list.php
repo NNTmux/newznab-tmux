@@ -11,7 +11,7 @@ $page->title = 'Category Regex List';
 
 $group = isset($_REQUEST['group']) && ! empty($_REQUEST['group']) ? $_REQUEST['group'] : '';
 $offset = ($_REQUEST['offset'] ?? 0);
-$regex = $regexes->getRegex($group, ITEMS_PER_PAGE, $offset);
+$regex = $regexes->getRegex($group, env('ITEMS_PER_PAGE', 50), $offset);
 
 $page->smarty->assign(
     [
@@ -19,7 +19,7 @@ $page->smarty->assign(
         'pagertotalitems'   => $regexes->getCount($group),
         'pagerquerysuffix'  => '',
         'pageroffset'       => $offset,
-        'pageritemsperpage' => ITEMS_PER_PAGE,
+        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
         'regex'             => $regex,
         'pagerquerybase'    => WWW_TOP.'/category_regexes-list.php?'.$group.'offset=',
     ]

@@ -98,7 +98,7 @@ class NNTP extends \Net_NNTP_Client
 
         parent::__construct();
 
-        $this->_echo = ($options['Echo'] && NN_ECHOCLI);
+        $this->_echo = ($options['Echo'] && env('echocli', true));
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 

@@ -249,7 +249,7 @@ class Binaries
         ];
         $options += $defaults;
 
-        $this->_echoCLI = ($options['Echo'] && NN_ECHOCLI);
+        $this->_echoCLI = ($options['Echo'] && env('echocli', true));
 
         $this->_pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());

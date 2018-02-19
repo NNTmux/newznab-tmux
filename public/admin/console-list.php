@@ -18,14 +18,14 @@ $page->smarty->assign([
     'pagertotalitems' => $conCount,
     'pagerquerysuffix'  => '#results',
     'pageroffset' => $offset,
-    'pageritemsperpage' => ITEMS_PER_PAGE,
+    'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
     'pagerquerybase' => WWW_TOP.'/console-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$consoleList = Utility::getRange('consoleinfo', $offset, ITEMS_PER_PAGE);
+$consoleList = Utility::getRange('consoleinfo', $offset, env('ITEMS_PER_PAGE', 50));
 
 $page->smarty->assign('consolelist', $consoleList);
 

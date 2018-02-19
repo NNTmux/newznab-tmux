@@ -66,7 +66,7 @@ abstract class Videos
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
+        $this->echooutput = ($options['Echo'] && env('echocli', true));
         $this->titleCache = [];
     }
 

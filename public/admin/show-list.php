@@ -14,10 +14,10 @@ $offset = $_REQUEST['offset'] ?? 0;
 $page->smarty->assign(
     [
         'showname'          => $tvshowname,
-        'tvshowlist'        => Video::getRange($offset, ITEMS_PER_PAGE, $tvshowname),
+        'tvshowlist'        => Video::getRange($offset, env('ITEMS_PER_PAGE', 50), $tvshowname),
         'pagertotalitems'   => Video::getCount($tvshowname),
         'pageroffset'       => $offset,
-        'pageritemsperpage' => ITEMS_PER_PAGE,
+        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
         'pagerquerysuffix'  => '',
         'pagerquerybase'    => WWW_TOP.'/show-list.php?'.
     ($tvshowname !== '' ? 'showname='.$tvshowname.'&amp;' : '').'&offset=',

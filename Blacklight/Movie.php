@@ -206,7 +206,7 @@ class Movie
         $this->searchEngines = true;
         $this->showPasswords = Releases::showPasswords();
 
-        $this->echooutput = ($options['Echo'] && NN_ECHOCLI && $this->pdo->cli);
+        $this->echooutput = ($options['Echo'] && env('echocli', true) && $this->pdo->cli);
         $this->imgSavePath = NN_COVERS.'movies'.DS;
         $this->service = '';
     }

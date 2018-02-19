@@ -19,14 +19,14 @@ $page->smarty->assign([
 	'pagertotalitems' => $bookCount,
 	'pagerquerysuffix'  => '#results',
 	'pageroffset' => $offset,
-	'pageritemsperpage' => ITEMS_PER_PAGE,
+	'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
 	'pagerquerybase' => WWW_TOP.'/book-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$bookList = Utility::getRange('bookinfo', $offset, ITEMS_PER_PAGE);
+$bookList = Utility::getRange('bookinfo', $offset, env('ITEMS_PER_PAGE', 50));
 
 $page->smarty->assign('booklist', $bookList);
 

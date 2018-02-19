@@ -93,7 +93,7 @@ class PostProcess
         $options += $defaults;
 
         // Various.
-        $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
+        $this->echooutput = ($options['Echo'] && env('echocli', true));
 
         // Class instances.
         $this->pdo = (($options['Settings'] instanceof DB) ? $options['Settings'] : new DB());

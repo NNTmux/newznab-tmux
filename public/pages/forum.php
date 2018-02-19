@@ -40,11 +40,11 @@ $browsecount = Forumpost::getBrowseCount();
 
 $offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? $_REQUEST['offset'] : 0;
 
-$results = Forumpost::getBrowseRange($offset, ITEMS_PER_PAGE);
+$results = Forumpost::getBrowseRange($offset, env('ITEMS_PER_PAGE', 50));
 
 $page->smarty->assign('pagertotalitems', $browsecount);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
+$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_PAGE', 50));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/forum?offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 $page->smarty->assign('privateprofiles', (int) Settings::settingValue('..privateprofiles') === 1);

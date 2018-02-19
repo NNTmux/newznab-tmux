@@ -63,7 +63,7 @@ class AniDB
         ];
         $options += $defaults;
 
-        $this->echooutput = ($options['Echo'] && NN_ECHOCLI);
+        $this->echooutput = ($options['Echo'] && env('echocli', true));
 
         $anidbupdint = Settings::settingValue('APIs.AniDB.max_update_frequency');
         $lastupdated = Settings::settingValue('APIs.AniDB.last_full_update');

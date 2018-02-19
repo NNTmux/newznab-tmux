@@ -13,13 +13,13 @@ $offset = $_REQUEST['offset'] ?? 0;
 $page->smarty->assign([
         'pagertotalitems' => $commentcount,
         'pageroffset' => $offset,
-        'pageritemsperpage' => ITEMS_PER_PAGE,
+        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
         'pagerquerybase' => WWW_TOP.'/comments-list.php?offset=',
         'pagerquerysuffix' => '', ]);
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$commentslist = ReleaseComment::getCommentsRange($offset, ITEMS_PER_PAGE);
+$commentslist = ReleaseComment::getCommentsRange($offset, env('ITEMS_PER_PAGE', 50));
 $page->smarty->assign('commentslist', $commentslist);
 
 $page->content = $page->smarty->fetch('comments-list.tpl');

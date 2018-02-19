@@ -35,11 +35,11 @@ $page->smarty->assign(
         'pagerquerysuffix'  => '#results',
         'pagertotalitems'   => User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']),
         'pageroffset'       => $offset,
-        'pageritemsperpage' => ITEMS_PER_PAGE,
+        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
         'pagerquerybase'    => WWW_TOP.'/user-list.php?ob='.$orderBy.$uSearch.'&offset=',
         'userlist' => User::getRange(
             $offset,
-            ITEMS_PER_PAGE,
+            env('ITEMS_PER_PAGE', 50),
             $orderBy,
             $variables['username'],
             $variables['email'],

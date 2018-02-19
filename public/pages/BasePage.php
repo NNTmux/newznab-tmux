@@ -109,7 +109,7 @@ class BasePage
             $this->token = $_SESSION['token'];
         }
 
-        if (NN_FLOOD_CHECK) {
+        if (env('FLOOD_CHECK', false)) {
             $this->floodCheck();
         }
 
@@ -175,7 +175,7 @@ class BasePage
      */
     public function floodCheck(): void
     {
-        $waitTime = (NN_FLOOD_WAIT_TIME < 1 ? 5 : NN_FLOOD_WAIT_TIME);
+        $waitTime = (env('FLOOD_WAIT_TIME', 5) < 1 ? 5 : env('FLOOD_WAIT_TIME', 5));
         // Check if this is not from CLI.
         if (empty($argc)) {
             // If flood wait set, the user must wait x seconds until they can access a page.
@@ -187,7 +187,7 @@ class BasePage
                     $_SESSION['flood_check_hits'] = 1;
                     $_SESSION['flood_check_time'] = microtime(true);
                 } else {
-                    if ($_SESSION['flood_check_hits'] >= (NN_FLOOD_MAX_REQUESTS_PER_SECOND < 1 ? 5 : NN_FLOOD_MAX_REQUESTS_PER_SECOND)) {
+                    if ($_SESSION['flood_check_hits'] >= (env('FLOOD_MAX_REQUESTS_PER_SECOND', 5) < 1 ? 5 : env('FLOOD_MAX_REQUESTS_PER_SECOND', 5))) {
                         if ($_SESSION['flood_check_time'] + 1 > microtime(true)) {
                             $_SESSION['flood_wait_until'] = microtime(true) + $waitTime;
                             unset($_SESSION['flood_check_hits']);

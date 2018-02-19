@@ -1062,7 +1062,7 @@ class Releases
         $sql = sprintf(
                         'SELECT COUNT(z.id) AS count FROM (%s LIMIT %s) z',
                         preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query),
-                        NN_MAX_PAGER_RESULTS
+                        env('MAX_PAGER_RESULTS', 125000)
         );
 
         $count = Cache::get(md5($sql));

@@ -77,7 +77,7 @@ class Backfill
         ];
         $options += $defaults;
 
-        $this->_echoCLI = ($options['Echo'] && NN_ECHOCLI);
+        $this->_echoCLI = ($options['Echo'] && env('echocli', true));
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->_nntp = (

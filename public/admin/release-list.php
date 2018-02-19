@@ -16,14 +16,14 @@ $page->smarty->assign([
     'pagertotalitems' => $releasecount,
     'pagerquerysuffix'  => '#results',
     'pageroffset' => $offset,
-    'pageritemsperpage' => ITEMS_PER_PAGE,
+    'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
     'pagerquerybase' => WWW_TOP.'/release-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$releaselist = Release::getReleasesRange($offset, ITEMS_PER_PAGE);
+$releaselist = Release::getReleasesRange($offset, env('ITEMS_PER_PAGE', 50));
 $page->smarty->assign('releaselist', $releaselist);
 
 $page->content = $page->smarty->fetch('release-list.tpl');
