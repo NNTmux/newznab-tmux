@@ -812,58 +812,62 @@ class Movie
         $lookupId = $text === false ? 'tt'.$imdbId : $imdbId;
 
         $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId);
+        if ($tmdbLookup['total_results'] > 0) {
 
-        $ret = [];
-        $ret['title'] = $tmdbLookup['original_title'];
+            $ret = [];
+            $ret['title'] = $tmdbLookup['title'];
 
-        if ($this->currentTitle !== '') {
-            // Check the similarity.
-            similar_text($this->currentTitle, $ret['title'], $percent);
-            if ($percent < self::MATCH_PERCENT) {
-                return false;
+            if ($this->currentTitle !== '') {
+                // Check the similarity.
+                similar_text($this->currentTitle, $ret['title'], $percent);
+                if ($percent < self::MATCH_PERCENT) {
+                    return false;
+                }
             }
-        }
 
-        $ret['tmdbid'] = $tmdbLookup['id'];
-        $ImdbID = str_replace('tt', '', $tmdbLookup['imdb_id']);
-        $ret['imdbid'] = $ImdbID;
-        $vote = $tmdbLookup['vote_average'];
-        if (isset($vote)) {
-            $ret['rating'] = ($vote === 0) ? '' : $vote;
-        }
-        $overview = $tmdbLookup['overview'];
-        if (! empty($overview)) {
-            $ret['plot'] = $overview;
-        }
-        $tagline = $tmdbLookup['tagline'];
-        if (! empty($tagline)) {
-            $ret['tagline'] = $tagline;
-        }
-        $released = $tmdbLookup['release_date'];
-        if (! empty($released)) {
-            $ret['year'] = date('Y', strtotime($released));
-        }
-        $genresa = $tmdbLookup['genres'];
-        if (! empty($genresa) && \count($genresa) > 0) {
-            $genres = [];
-            foreach ($genresa as $genre) {
-                $genres[] = $genre['name'];
+            $ret['tmdbid'] = $tmdbLookup['id'];
+            $ImdbID = str_replace('tt', '', $tmdbLookup['imdb_id']);
+            $ret['imdbid'] = $ImdbID;
+            $vote = $tmdbLookup['vote_average'];
+            if (isset($vote)) {
+                $ret['rating'] = ($vote === 0) ? '' : $vote;
             }
-            $ret['genre'] = $genres;
-        }
-        $posterp = $tmdbLookup['poster_path'];
-        if (! empty($posterp)) {
-            $ret['cover'] = 'http://image.tmdb.org/t/p/w185'.$posterp;
-        }
-        $backdrop = $tmdbLookup['backdrop_path'];
-        if (! empty($backdrop)) {
-            $ret['backdrop'] = 'http://image.tmdb.org/t/p/original'.$backdrop;
-        }
-        if ($this->echooutput) {
-            ColorCLI::doEcho(ColorCLI::primaryOver('TMDb Found ').ColorCLI::headerOver($ret['title']), true);
+            $overview = $tmdbLookup['overview'];
+            if (! empty($overview)) {
+                $ret['plot'] = $overview;
+            }
+            $tagline = $tmdbLookup['tagline'];
+            if (! empty($tagline)) {
+                $ret['tagline'] = $tagline;
+            }
+            $released = $tmdbLookup['release_date'];
+            if (! empty($released)) {
+                $ret['year'] = date('Y', strtotime($released));
+            }
+            $genresa = $tmdbLookup['genres'];
+            if (! empty($genresa) && \count($genresa) > 0) {
+                $genres = [];
+                foreach ($genresa as $genre) {
+                    $genres[] = $genre['name'];
+                }
+                $ret['genre'] = $genres;
+            }
+            $posterp = $tmdbLookup['poster_path'];
+            if (! empty($posterp)) {
+                $ret['cover'] = 'http://image.tmdb.org/t/p/w185'.$posterp;
+            }
+            $backdrop = $tmdbLookup['backdrop_path'];
+            if (! empty($backdrop)) {
+                $ret['backdrop'] = 'http://image.tmdb.org/t/p/original'.$backdrop;
+            }
+            if ($this->echooutput) {
+                ColorCLI::doEcho(ColorCLI::primaryOver('TMDb Found ').ColorCLI::headerOver($ret['title']), true);
+            }
+
+            return $ret;
         }
 
-        return $ret;
+        return false;
     }
 
     /**
@@ -1192,23 +1196,27 @@ class Movie
 
                 // Check on The Movie Database.
                 if ($movieUpdated === false) {
-                    $data = $this->tmdbclient->getSearchApi()->searchMovies($movieName);
-                    if (! empty($data['results'])) {
-                        foreach ($data['results'] as $result) {
-                            if (! empty($result['id'])) {
-                                similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
-                                if ($percent > 80) {
-                                    $ret = $this->fetchTMDBProperties($result['id']);
-                                    if ($ret !== false) {
-                                        $imdbID = $this->doMovieUpdate($ret['imdbid'], 'TMDB', $arr['id']);
-                                        if ($imdbID !== false) {
-                                            $movieUpdated = true;
+                    $data = $this->tmdbclient->getSearchApi()->searchMovies($this->currentTitle);
+                    if ($data['total_results'] > 0) {
+                        if (! empty($data['results'])) {
+                            foreach ($data['results'] as $result) {
+                                if (! empty($result['id'])) {
+                                    similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
+                                    if ($percent > 80) {
+                                        $ret = $this->fetchTMDBProperties($result['id']);
+                                        if ($ret !== false) {
+                                            $imdbID = $this->doMovieUpdate($ret['imdbid'], 'TMDB', $arr['id']);
+                                            if ($imdbID !== false) {
+                                                $movieUpdated = true;
+                                            }
                                         }
                                     }
+                                } else {
+                                    $movieUpdated = false;
                                 }
-                            } else {
-                                $movieUpdated = false;
                             }
+                        } else {
+                            $movieUpdated = false;
                         }
                     } else {
                         $movieUpdated = false;
