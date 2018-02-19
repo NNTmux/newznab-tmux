@@ -11,11 +11,10 @@ use Blacklight\utility\Utility;
 $pdo = new DB();
 $DIR = NN_TMUX;
 $patch = Settings::settingValue('..sqlpatch');
-$import = Settings::settingValue('site.tmux.import') ?? 0;
-$tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
-$seq = Settings::settingValue('site.tmux.sequential') ?? 0;
-$powerline = Settings::settingValue('site.tmux.powerline') ?? 0;
-$colors = Settings::settingValue('site.tmux.colors') ?? 0;
+$import = Settings::settingValue('site.tmux.import', true) ?? 0;
+$tmux_session = Settings::settingValue('site.tmux.tmux_session', true) ?? 0;
+$seq = Settings::settingValue('site.tmux.sequential', true) ?? 0;
+$powerline = Settings::settingValue('site.tmux.powerline', true) ?? 0;
 $delaytimet = Settings::settingValue('..delaytime');
 $delaytimet = $delaytimet ? (int) $delaytimet : 2;
 

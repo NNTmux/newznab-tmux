@@ -1,4 +1,5 @@
 2018-02-19 DariusIII
+	* Chg: Remove unused variable $colors from run.php
 	* Chg: Remove defunct Tmux model
 	* Fix: Fix issues from previous commit
 	* Chg: Merge tmux settings into settings table
