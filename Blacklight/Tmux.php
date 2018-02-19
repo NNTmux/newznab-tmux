@@ -2,9 +2,9 @@
 
 namespace Blacklight;
 
-use App\Models\Settings;
 use Blacklight\db\DB;
 use App\Models\Category;
+use App\Models\Settings;
 use App\Extensions\util\Versions;
 use App\Models\Tmux as TmuxModel;
 
