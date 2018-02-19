@@ -10,14 +10,12 @@ use Blacklight\utility\Utility;
 
 $pdo = new DB();
 $DIR = NN_TMUX;
-$t = new Tmux();
-$tmux = $t->get();
 $patch = Settings::settingValue('..sqlpatch');
-$import = $tmux->import ?? 0;
-$tmux_session = $tmux->tmux_session ?? 0;
-$seq = $tmux->sequential ?? 0;
-$powerline = $tmux->powerline ?? 0;
-$colors = $tmux->colors ?? 0;
+$import = Settings::settingValue('site.tmux.import') ?? 0;
+$tmux_session = Settings::settingValue('site.tmux.tmux_session') ?? 0;
+$seq = Settings::settingValue('site.tmux.sequential') ?? 0;
+$powerline = Settings::settingValue('site.tmux.powerline') ?? 0;
+$colors = Settings::settingValue('site.tmux.colors') ?? 0;
 $delaytimet = Settings::settingValue('..delaytime');
 $delaytimet = $delaytimet ? (int) $delaytimet : 2;
 
@@ -63,8 +61,7 @@ function writelog($pane)
 {
     $path = NN_RES.'logs';
     $getdate = gmdate('Ymd');
-    $tmux = new Tmux();
-    $logs = $tmux->get()->write_logs;
+    $logs = Settings::settingValue('site.tmux.write_logs');
     if ((int) $logs === 1) {
         return "2>&1 | tee -a $path/$pane-$getdate.log";
     }
@@ -99,20 +96,18 @@ function python_module_exist($module)
 
 function start_apps($tmux_session)
 {
-    $t = new Tmux();
-    $tmux = $t->get();
-    $htop = $tmux->htop;
-    $vnstat = $tmux->vnstat;
-    $vnstat_args = $tmux->vnstat_args;
-    $tcptrack = $tmux->tcptrack;
-    $tcptrack_args = $tmux->tcptrack_args;
-    $nmon = $tmux->nmon;
-    $bwmng = $tmux->bwmng;
-    $mytop = $tmux->mytop;
-    $redis = $tmux->redis;
-    $showprocesslist = $tmux->showprocesslist;
-    $processupdate = $tmux->processupdate;
-    $console_bash = $tmux->console;
+    $htop = Settings::settingValue('site.tmux.htop');
+    $vnstat = Settings::settingValue('site.tmux.vnstat');
+    $vnstat_args = Settings::settingValue('site.tmux.vnstat_args');
+    $tcptrack = Settings::settingValue('site.tmux.tcptrack');
+    $tcptrack_args = Settings::settingValue('site.tmux.tcptrack_args');
+    $nmon = Settings::settingValue('site.tmux.nmon');
+    $bwmng = Settings::settingValue('site.tmux.bwmng');
+    $mytop = Settings::settingValue('site.tmux.mytop');
+    $redis = Settings::settingValue('site.tmux.redis');
+    $showprocesslist = Settings::settingValue('site.tmux.showprocesslist');
+    $processupdate = Settings::settingValue('site.tmux.processupdate');
+    $console_bash = Settings::settingValue('site.tmux.console');
 
     if ((int) $htop === 1 && command_exist('htop')) {
         exec("tmux new-window -t $tmux_session -n htop 'printf \"\033]2;htop\033\" && htop'");
@@ -188,9 +183,7 @@ function window_sharing($tmux_session)
 {
     $pdo = new Blacklight\db\DB();
     $sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
-    $t = new Tmux();
-    $tmux = $t->get();
-    $tmux_share = $tmux->run_sharing ?? 0;
+    $tmux_share = Settings::settingValue('site.tmux.run_sharing') ?? 0;
 
     if ($tmux_share && (int) $sharing['enabled'] === 1 && ((int) $sharing['posting'] === 1 || (int) $sharing['fetching'] === 1)) {
         exec("tmux new-window -t $tmux_session -n Sharing 'printf \"\033]2;comment_sharing\033\"'");

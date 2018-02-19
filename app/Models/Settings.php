@@ -24,12 +24,14 @@ use Blacklight\utility\Utility;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Yadakhov\InsertOnDuplicateKey;
 
 /**
  * Settings - model for settings table.
  */
 class Settings extends Model
 {
+    use InsertOnDuplicateKey;
     public const REGISTER_STATUS_OPEN = 0;
 
     public const REGISTER_STATUS_INVITE = 1;

@@ -23,9 +23,8 @@ $runVar['paths']['scraper'] = NN_MISC.'IRCScraper'.DS.'scrape.php';
 
 $db_name = env('DB_NAME');
 $dbtype = env('DB_SYSTEM');
-$tmux = $tRun->get('niceness');
 
-$tmux_niceness = $tmux->niceness ?? 2;
+$tmux_niceness = Settings::settingValue('site.tmux.niceness') ?? 2;
 
 $runVar['constants'] = $pdo->queryOneRow($tRun->getConstantSettings());
 

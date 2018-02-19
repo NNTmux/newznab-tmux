@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+use App\Models\Settings;
 use Blacklight\Tmux;
 
 $page = new AdminPage();
@@ -14,17 +15,15 @@ $action = $_REQUEST['action'] ?? 'view';
 switch ($action) {
     case 'submit':
         $error = '';
-        $ret = $tmux->update($_POST);
+        $ret = (new Settings())->update($_POST);
         $page->title = 'Tmux Settings Edit';
-        $settings = $tmux->get();
-        $page->smarty->assign('ftmux', $settings);
+        $page->smarty->assign('site', $page->settings);
         break;
 
     case 'view':
     default:
         $page->title = 'Tmux Settings Edit';
-        $settings = $tmux->get();
-        $page->smarty->assign('ftmux', $settings);
+        $page->smarty->assign('site', $page->settings);
         break;
 }
 

@@ -403,9 +403,9 @@ class Forking extends \fork_daemon
     {
         $this->register_child_run([0 => $this, 1 => 'safeBackfillChildWorker']);
 
-        $backfill_qty = Tmux::value('backfill_qty');
-        $backfill_order = Tmux::value('backfill_order');
-        $backfill_days = Tmux::value('backfill_days');
+        $backfill_qty = Settings::settingValue('site.tmux.backfill_qty');
+        $backfill_order = Settings::settingValue('site.tmux.backfill_order');
+        $backfill_days = Settings::settingValue('site.tmux.backfill_days');
         $maxmssgs = Settings::settingValue('maxmssgs');
         $threads = Settings::settingValue('..backfillthreads');
 

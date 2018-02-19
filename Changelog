@@ -1,4 +1,5 @@
 2018-02-19 DariusIII
+	* Chg: Merge tmux settings into settings table
 	* Chg: Move web and cli settings from settings to .env file (settings.php will be obsoleted very soon)
 2018-02-17 DariusIII
 	* Chg: Update ColorCLI class

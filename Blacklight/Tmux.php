@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use App\Models\Settings;
 use Blacklight\db\DB;
 use App\Models\Category;
 use App\Extensions\util\Versions;
@@ -581,12 +582,12 @@ class Tmux
      */
     public function isRunning(): bool
     {
-        $running = $this->get()->running;
-        if ($running === false) {
+        $running = Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->first(['value']);
+        if ($running === null) {
             throw new \RuntimeException('Tmux\\\'s running flag was not found in the database.'.PHP_EOL.'Please check the tables are correctly setup.'.PHP_EOL);
         }
 
-        return ! ((int) $running === 0);
+        return ! ((int) $running->value === 0);
     }
 
     /**
@@ -598,7 +599,7 @@ class Tmux
     public function stopIfRunning(): bool
     {
         if ($this->isRunning() === true) {
-            TmuxModel::query()->where('setting', '=', 'running')->update(['value' => 0]);
+            Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->update(['value' => 0]);
             $sleep = $this->get()->monitor_delay;
             ColorCLI::doEcho(ColorCLI::header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown'), true);
             sleep($sleep);
@@ -616,7 +617,7 @@ class Tmux
     public function startRunning(): void
     {
         if ($this->isRunning() === false) {
-            TmuxModel::query()->where('setting', '=', 'running')->update(['value' => 1]);
+            Settings::query()->where(['section' => 'site', 'subsection' => 'tmux', 'setting' => 'running'])->update(['value' => 1]);
         }
     }
 

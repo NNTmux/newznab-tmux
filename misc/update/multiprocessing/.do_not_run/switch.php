@@ -31,7 +31,7 @@ switch ($options[1]) {
 	case 'backfill':
 		if (in_array((int)$options[3], [1, 2], false)) {
 			$pdo = new DB();
-			$value = Tmux::value('backfill_qty');
+			$value = Settings::settingValue('site.tmux.backfill_qty');
 			if ($value !== false) {
 				$nntp = nntp($pdo);
 				(new Backfill())->backfillAllGroups($options[2], ($options[3] === 1 ? '' : $value['value']));
