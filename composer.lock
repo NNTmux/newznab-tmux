@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d00f64380b608bd890689322c9808827",
+    "content-hash": "13972b063b08821a3a3de11eb9792f11",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -2685,6 +2685,42 @@
                 "url"
             ],
             "time": "2017-03-20T17:10:46+00:00"
+        },
+        {
+            "name": "imdbphp/imdbphp",
+            "version": "v5.2.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tboothman/imdbphp.git",
+                "reference": "b9c7a2a3e45d9c33673d6b2829e8fa5424ce4a82"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/b9c7a2a3e45d9c33673d6b2829e8fa5424ce4a82",
+                "reference": "b9c7a2a3e45d9c33673d6b2829e8fa5424ce4a82",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">5.3",
+                "psr/log": "~1.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9",
+                "phpunit/phpunit": "~3.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Imdb\\": "src/Imdb"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Library for retrieving film and tv information from IMDb",
+            "time": "2018-02-05T16:42:28+00:00"
         },
         {
             "name": "intervention/image",

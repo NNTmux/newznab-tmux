@@ -18,6 +18,10 @@ use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
+use Imdb\Title;
+use Imdb\Config;
+use Imdb\TitleSearch;
+use Imdb\TitleSearchAdvanced;
 
 /**
  * Class Movie.
@@ -171,6 +175,11 @@ class Movie
     public $omdbApi;
 
     /**
+     * @var \Imdb\Config
+     */
+    private $config;
+
+    /**
      * @param array $options Class instances / Echo to CLI.
      * @throws \Exception
      */
@@ -205,6 +214,8 @@ class Movie
         }
 
         $this->lookuplanguage = Settings::settingValue('indexer.categorise.imdblanguage') !== '' ? (string) Settings::settingValue('indexer.categorise.imdblanguage') : 'en';
+        $this->config = new Config();
+        $this->config->language = $this->lookuplanguage;
 
         $this->imdburl = (int) Settings::settingValue('indexer.categorise.imdburl') !== 0;
         $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;
@@ -850,7 +861,7 @@ class Movie
             }
             $released = $tmdbLookup['release_date'];
             if (! empty($released)) {
-                $ret['year'] = date('Y', strtotime($released));
+                $ret['year'] = Carbon::parse($released)->year;
             }
             $genresa = $tmdbLookup['genres'];
             if (! empty($genresa) && \count($genresa) > 0) {
@@ -882,92 +893,25 @@ class Movie
      * @param $imdbId
      *
      * @return array|bool
-     * @throws \Exception
      */
-    protected function fetchIMDBProperties($imdbId)
+    public function fetchIMDBProperties($imdbId)
     {
-        $imdb_regex = [
-            'title' => '/<title>(.*?)\s?\(.*?<\/title>/i',
-            'tagline' => '/taglines:<\/h4>\s([^<]+)/i',
-            'plot' => '/<p itemprop="description">\s*?(.*?)\s*?<\/p>/i',
-            'rating' => '/"ratingValue">([\d.]+)<\/span>/i',
-            'year' => '/<title>.*?\(.*?(\d{4}).*?<\/title>/i',
-            'cover' => '/<link rel=\'image_src\' href="(http:\/\/ia\.media-imdb\.com.+\.jpg)">/',
-        ];
+        $result = new Title($imdbId, $this->config);
+        if ($result !== null) {
+            $ret = [
+                'title' => $result->title(),
+                'tagline' => $result->tagline(),
+                'plot' => $result->plot_split()[0]['plot'],
+                'rating' => $result->rating(),
+                'year' => $result->year(),
+                'cover' => $result->photo(),
+                'genre' => $result->genre(),
+                'language' => $result->language(),
+                'type' => $result->movietype(),
+            ];
 
-        $imdb_regex_multi = [
-            'genre' => '/href="\/genre\/(.*?)\?/i',
-            'language' => '/<a href="\/language\/.+?\'url\'>(.+?)<\/a>/s',
-            'type' => '/<meta property=\'og\:type\' content=\"(.+)\" \/>/i',
-        ];
-
-        try {
-            $buffer =
-                $this->client->get(
-                    'http://'.($this->imdburl === false ? 'www' : 'akas').'.imdb.com/title/tt'.$imdbId.'/',
-                    ['headers' => [
-                        'Accept-Language' => (Settings::settingValue('indexer.categorise.imdblanguage') !== '') ? Settings::settingValue('indexer.categorise.imdblanguage') : 'en',
-                        'useragent'       => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) '.
-                            'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar',
-                    ],
-                    ]
-                )->getBody()->getContents();
-        } catch (RequestException $e) {
-            if ($e->hasResponse()) {
-                if ($e->getCode() === 404) {
-                    ColorCLI::doEcho(ColorCLI::notice('Data not available on IMDB server'), true);
-                } elseif ($e->getCode() === 503) {
-                    ColorCLI::doEcho(ColorCLI::notice('IMDB service unavailable'), true);
-                } else {
-                    ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from IMDB, http error reported: '.$e->getCode()), true);
-                }
-            }
-        } catch (\RuntimeException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
-        }
-
-        if (isset($buffer) && $buffer !== false) {
-            $ret = [];
-            foreach ($imdb_regex as $field => $regex) {
-                if (preg_match($regex, $buffer, $matches)) {
-                    $match = $matches[1];
-                    $match1 = strip_tags(trim(rtrim($match)));
-                    $ret[$field] = $match1;
-                }
-            }
-
-            $matches = [];
-            foreach ($imdb_regex_multi as $field => $regex) {
-                if (preg_match_all($regex, $buffer, $matches)) {
-                    $match2 = $matches[1];
-                    $match3 = array_map('trim', $match2);
-                    $ret[$field] = $match3;
-                }
-            }
-
-            if ($this->currentTitle !== '' && isset($ret['title'])) {
-                // Check the similarity.
-                similar_text($this->currentTitle, $ret['title'], $percent);
-                if ($percent < self::MATCH_PERCENT) {
-                    return false;
-                }
-            }
-
-            // Actors.
-            if (preg_match('/<table class="cast_list">(.+?)<\/table>/s', $buffer, $hit)) {
-                if (preg_match_all('/<span class="itemprop" itemprop="name">\s*(.+?)\s*<\/span>/i', $hit[0], $results, PREG_PATTERN_ORDER)) {
-                    $ret['actors'] = $results[1];
-                }
-            }
-
-            // Directors.
-            if (preg_match('/itemprop="directors?".+?<\/div>/s', $buffer, $hit)) {
-                if (preg_match_all('/"name">(.*?)<\/span>/is', $hit[0], $results, PREG_PATTERN_ORDER)) {
-                    $ret['director'] = $results[1];
-                }
-            }
-            if ($this->echooutput && isset($ret['title'])) {
-                ColorCLI::doEcho(ColorCLI::headerOver('IMDb Found ').ColorCLI::primaryOver($ret['title']), true);
+            if ($this->echooutput && $result->title() !== null) {
+                ColorCLI::doEcho(ColorCLI::headerOver('IMDb Found ').ColorCLI::primaryOver($result->title()), true);
             }
 
             return $ret;
