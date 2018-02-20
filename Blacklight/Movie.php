@@ -1204,9 +1204,10 @@ class Movie
                                     if ($percent > 80) {
                                         $ret = $this->fetchTMDBProperties($result['id'], true);
                                         if ($ret !== false) {
-                                            $imdbID = $this->doMovieUpdate($ret['imdbid'], 'TMDB', $arr['id']);
+                                            $imdbID = $this->doMovieUpdate('tt'.$ret['imdbid'], 'TMDB', $arr['id']);
                                             if ($imdbID !== false) {
                                                 $movieUpdated = true;
+                                                break;
                                             }
                                         }
                                     }
