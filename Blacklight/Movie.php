@@ -1202,7 +1202,7 @@ class Movie
                                 if (! empty($result['id'])) {
                                     similar_text($this->currentYear, Carbon::parse($result['release_date'])->year, $percent);
                                     if ($percent > 80) {
-                                        $ret = $this->fetchTMDBProperties($result['id']);
+                                        $ret = $this->fetchTMDBProperties($result['id'], true);
                                         if ($ret !== false) {
                                             $imdbID = $this->doMovieUpdate($ret['imdbid'], 'TMDB', $arr['id']);
                                             if ($imdbID !== false) {

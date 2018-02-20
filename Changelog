@@ -1,4 +1,5 @@
 2018-02-20 DariusIII
+	* Chg: Use tmdbid for movie matching in one of the movie searches
 	* Chg: Update TMDB movie processing
 2018-02-19 DariusIII
 	* Chg: Update Movie class
