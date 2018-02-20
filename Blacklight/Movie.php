@@ -17,6 +17,7 @@ use Blacklight\libraries\FanartTV;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
+use Tmdb\Exception\TmdbApiException;
 
 /**
  * Class Movie.
@@ -199,6 +200,9 @@ class Movie
         $this->fanartapikey = Settings::settingValue('APIs..fanarttvkey');
         $this->fanart = new FanartTV($this->fanartapikey);
         $this->omdbapikey = Settings::settingValue('APIs..omdbkey');
+        if ($this->omdbapikey !== null) {
+            $this->omdbApi = new OMDbAPI($this->omdbapikey);
+        }
 
         $this->lookuplanguage = Settings::settingValue('indexer.categorise.imdblanguage') !== '' ? (string) Settings::settingValue('indexer.categorise.imdblanguage') : 'en';
 
@@ -802,6 +806,7 @@ class Movie
     /**
      * Fetch info for IMDB id from TMDB.
      *
+     *
      * @param      $imdbId
      * @param bool $text
      *
@@ -809,9 +814,14 @@ class Movie
      */
     public function fetchTMDBProperties($imdbId, $text = false)
     {
-        $lookupId = $text === false ? 'tt'.$imdbId : $imdbId;
+        $lookupId = $text === false && \strlen($imdbId) === 7 ? 'tt'.$imdbId : $imdbId;
 
-        $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId);
+        try {
+            $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId);
+        } catch (TmdbApiException $error) {
+            echo $error->getMessage();
+
+        }
         if (! empty($tmdbLookup)) {
             $ret = [];
             $ret['title'] = $tmdbLookup['title'];
@@ -1011,8 +1021,7 @@ class Movie
      */
     protected function fetchOmdbAPIProperties($imdbId)
     {
-        if ($this->omdbapikey !== '' && $this->omdbApi === null) {
-            $this->omdbApi = new OMDbAPI($this->omdbapikey);
+        if ($this->omdbapikey !== null) {
             $resp = $this->omdbApi->fetch('i', 'tt'.$imdbId);
 
             if (\is_object($resp) && $resp->message === 'OK' && $resp->data->Response !== 'False') {
@@ -1159,14 +1168,13 @@ class Movie
                     }
                 }
 
-                // Check OMDbAPI
+                // Check on OMDbAPI
                 if ($movieUpdated === false) {
                     $omdbTitle = strtolower(str_replace(' ', '_', $this->currentTitle));
-                    if ($this->omdbapikey !== '' && $this->omdbApi === null) {
-                        $this->omdbApi = new OMDbAPI($this->omdbapikey);
+                    if ($this->omdbapikey !== null) {
                         $buffer = $this->omdbApi->search($omdbTitle, 'movie');
 
-                        if (\is_object($buffer) && $buffer->message === 'OK' && $buffer->data->Response !== 'False') {
+                        if (\is_object($buffer) && $buffer->message === 'OK' && $buffer->data->Response === 'True') {
                             $getIMDBid = $buffer->data->Search[0]->imdbID;
 
                             if (! empty($getIMDBid)) {
@@ -1207,7 +1215,6 @@ class Movie
                                             $imdbID = $this->doMovieUpdate('tt'.$ret['imdbid'], 'TMDB', $arr['id']);
                                             if ($imdbID !== false) {
                                                 $movieUpdated = true;
-                                                break;
                                             }
                                         }
                                     }
