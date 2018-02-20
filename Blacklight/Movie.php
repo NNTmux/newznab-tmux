@@ -812,7 +812,7 @@ class Movie
         $lookupId = $text === false ? 'tt'.$imdbId : $imdbId;
 
         $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId);
-        if ($tmdbLookup['total_results'] > 0) {
+        if (! empty($tmdbLookup)) {
             $ret = [];
             $ret['title'] = $tmdbLookup['title'];
 
