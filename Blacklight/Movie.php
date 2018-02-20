@@ -819,7 +819,7 @@ class Movie
         try {
             $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId);
         } catch (TmdbApiException $error) {
-            echo $error->getMessage();
+            echo $error->getMessage().PHP_EOL;
         }
         if (! empty($tmdbLookup)) {
             $ret = [];
