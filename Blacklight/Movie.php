@@ -14,10 +14,10 @@ use Illuminate\Support\Carbon;
 use Tmdb\Client as TmdbClient;
 use Blacklight\utility\Utility;
 use Blacklight\libraries\FanartTV;
+use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
-use Tmdb\Exception\TmdbApiException;
 
 /**
  * Class Movie.
@@ -820,7 +820,6 @@ class Movie
             $tmdbLookup = $this->tmdbclient->getMoviesApi()->getMovie($lookupId);
         } catch (TmdbApiException $error) {
             echo $error->getMessage();
-
         }
         if (! empty($tmdbLookup)) {
             $ret = [];
