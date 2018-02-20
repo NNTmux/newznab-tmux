@@ -1,4 +1,5 @@
 2018-02-20 DariusIII
+	* Chg: Update TMDB class
 	* Chg: Check for imdbid string lenghth in fetchTMDBProperties function
 	* Chg: One more tmdb movie processing change
 	* Fix: Fix undefined index error on TMDB movie lookup

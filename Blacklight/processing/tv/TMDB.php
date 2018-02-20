@@ -13,7 +13,7 @@ use Tmdb\Repository\ConfigurationRepository;
 
 class TMDB extends TV
 {
-    const MATCH_PROBABILITY = 75;
+    protected const MATCH_PROBABILITY = 75;
 
     /**
      * @var string The URL for the image for poster
@@ -112,8 +112,8 @@ class TMDB extends TV
                 // Clean the show name for better match probability
                 $release = $this->parseInfo($row['searchname']);
 
-                if (is_array($release) && $release['name'] !== '') {
-                    if (in_array($release['cleanname'], $this->titleCache, false)) {
+                if (\is_array($release) && $release['name'] !== '') {
+                    if (\in_array($release['cleanname'], $this->titleCache, false)) {
                         if ($this->echooutput) {
                             echo ColorCLI::headerOver('Title: ').
                                     ColorCLI::warningOver($release['cleanname']).
@@ -142,7 +142,7 @@ class TMDB extends TV
                         // Get the show from TMDB
                         $tmdbShow = $this->getShowInfo((string) $release['cleanname']);
 
-                        if (is_array($tmdbShow)) {
+                        if (\is_array($tmdbShow)) {
                             // Check if we have the TMDB ID already, if we do use that Video ID
                             $dupeCheck = $this->getVideoIDFromSiteID('tvdb', $tmdbShow['tvdb']);
                             if ($dupeCheck === false) {
@@ -244,7 +244,7 @@ class TMDB extends TV
 
         sleep(1);
 
-        if (is_array($response) && ! empty($response['results'])) {
+        if (\is_array($response) && ! empty($response['results'])) {
             $return = $this->matchShowInfo($response['results'], $cleanName);
         }
 
@@ -293,7 +293,7 @@ class TMDB extends TV
                 return false;
             }
 
-            if ($showAlternativeTitles !== null && is_array($showAlternativeTitles)) {
+            if ($showAlternativeTitles !== null && \is_array($showAlternativeTitles)) {
                 foreach ($showAlternativeTitles as $aka) {
                     $highest['alternative_titles'][] = $aka['title'];
                 }
@@ -354,7 +354,7 @@ class TMDB extends TV
         sleep(1);
 
         //Handle Single Episode Lookups
-        if (is_array($response) && $this->checkRequiredAttr($response, 'tmdbE')) {
+        if (\is_array($response) && $this->checkRequiredAttr($response, 'tmdbE')) {
             $return = $this->formatEpisodeInfo($response);
         }
 
