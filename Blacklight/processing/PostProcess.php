@@ -280,7 +280,7 @@ class PostProcess
      */
     public function processAdditional(&$nntp, $groupID = '', $guidChar = ''): void
     {
-        (new ProcessAdditional(['Echo' => $this->echooutput, 'NNTP' => $nntp, 'Settings' => $this->pdo, 'Groups' => $this->groups, 'NameFixer' => $this->nameFixer, 'Nfo' => $this->Nfo]))->start($groupID, $guidChar);
+        (new ProcessAdditional(['Echo' => $this->echooutput, 'NNTP' => $nntp, 'Settings' => $this->pdo, 'NameFixer' => $this->nameFixer, 'Nfo' => $this->Nfo]))->start($groupID, $guidChar);
     }
 
     /**

@@ -129,7 +129,7 @@ class Backfill
             }
 
             $this->_binaries = new Binaries(
-                ['NNTP' => $this->_nntp, 'Echo' => $this->_echoCLI, 'Settings' => $this->pdo, 'Groups' => $this->_groups]
+                ['NNTP' => $this->_nntp, 'Echo' => $this->_echoCLI, 'Settings' => $this->pdo]
             );
 
             if ($articles !== '' && ! is_numeric($articles)) {

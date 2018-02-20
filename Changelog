@@ -1,4 +1,5 @@
 2018-02-20 DariusIII
+	* FIx: Remove references to groups from PostpProcess and Backfill (fixes issue #398)
 	* Chg: Add imdbphp/imdbphp package and use it to fetch imdb movie data
 	* Chg: Update TMDB class
 	* Chg: Check for imdbid string lenghth in fetchTMDBProperties function
