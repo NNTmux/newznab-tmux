@@ -9,7 +9,7 @@ use Blacklight\ColorCLI;
 
 $movie = new Movie(['Echo' => true]);
 
-$movies = MovieInfo::query()->where('cover', '=', 0)->orderBy('year', 'asc')->orderBy('id', 'desc')->get('imdbid');
+$movies = MovieInfo::query()->where('cover', '=', 0)->orderBy('year', 'asc')->orderBy('id', 'desc')->get(['imdbid']);
 $count = $movies->count();
 if ($count > 0) {
     if ($movies instanceof \Traversable) {
