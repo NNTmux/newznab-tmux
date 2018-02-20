@@ -25,8 +25,6 @@ abstract class Movies extends Videos
     protected const SOURCE_IMDB = 3;   // Scrape source was IMDB
     protected const SOURCE_OMDB = 4;   // Scrape source was OMDB
 
-
-
     // Processing signifiers
     protected const PROCESS_TMDB = 0;   // Process TMDB First
     protected const PROCESS_TRAKT = -1;   // Process Trakt Second
