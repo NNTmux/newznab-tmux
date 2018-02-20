@@ -2,6 +2,8 @@
 
 namespace Blacklight;
 
+use Imdb\Title;
+use Imdb\Config;
 use Tmdb\ApiToken;
 use aharen\OMDbAPI;
 use Blacklight\db\DB;
@@ -18,10 +20,6 @@ use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
-use Imdb\Title;
-use Imdb\Config;
-use Imdb\TitleSearch;
-use Imdb\TitleSearchAdvanced;
 
 /**
  * Class Movie.
