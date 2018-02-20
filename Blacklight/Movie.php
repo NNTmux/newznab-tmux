@@ -1055,7 +1055,7 @@ class Movie
             ->whereNull('imdbid')
             ->where('nzbstatus', '=', 1);
         if ($groupID !== '') {
-            $sql->where('groupid', $groupID);
+            $sql->where('groups_id', $groupID);
         }
 
         if ($guidChar !== '') {
@@ -1100,7 +1100,7 @@ class Movie
                 $movieUpdated = false;
 
                 // Check local DB.
-                $getIMDBid = $this->localIMDBsearch();
+                $getIMDBid = $this->localIMDBSearch();
 
                 if ($getIMDBid !== false) {
                     $imdbID = $this->doMovieUpdate('tt'.$getIMDBid, 'Local DB', $arr['id']);
@@ -1189,87 +1189,22 @@ class Movie
     }
 
     /**
-     * Try to fetch an IMDB id locally.
-     *
-     * @return int|bool   Int, the imdbid when true, Bool when false.
+     * @return bool|mixed
      */
-    protected function localIMDBsearch()
+    protected function localIMDBSearch()
     {
-        $query = 'SELECT imdbid FROM movieinfo';
-        $andYearIn = '';
-
         //If we found a year, try looking in a 4 year range.
+        $check = MovieInfo::query()
+            ->where('title', 'LIKE', '%'.$this->currentTitle.'%' );
+
         if ($this->currentYear !== false) {
-            $start = (int) $this->currentYear - 2;
-            $end = (int) $this->currentYear + 2;
-            $andYearIn = 'AND year IN (';
-            while ($start < $end) {
-                $andYearIn .= $start.',';
-                $start++;
-            }
-            $andYearIn .= $end.')';
+            $start = Carbon::parse($this->currentYear)->subYears(2)->year;
+            $end = Carbon::parse($this->currentYear)->addYears(2)->year;
+            $check->whereBetween('year', [$start, $end]);
         }
-        $IMDBCheck = $this->pdo->queryOneRow(
-            sprintf('%s WHERE title %s %s', $query, $this->pdo->likeString($this->currentTitle), $andYearIn)
-        );
+        $IMDBCheck = $check->first(['imdbid']);
 
-        // Look by %word%word%word% etc..
-        if ($IMDBCheck === false) {
-            $pieces = explode(' ', $this->currentTitle);
-            $tempTitle = '%';
-            foreach ($pieces as $piece) {
-                $tempTitle .= str_replace(["'", '!', '"'], '', $piece).'%';
-            }
-            $IMDBCheck = $this->pdo->queryOneRow(
-                sprintf(
-                    "%s WHERE replace(replace(title, \"'\", ''), '!', '') %s %s",
-                    $query,
-                    $this->pdo->likeString($tempTitle),
-                    $andYearIn
-                )
-            );
-        }
-
-        // Try replacing er with re ?
-        if ($IMDBCheck === false) {
-            $tempTitle = str_replace('er', 're', $this->currentTitle);
-            if ($tempTitle !== $this->currentTitle) {
-                $IMDBCheck = $this->pdo->queryOneRow(
-                    sprintf(
-                        '%s WHERE title %s %s',
-                        $query,
-                        $this->pdo->likeString($tempTitle),
-                        $andYearIn
-                    )
-                );
-
-                // Final check if everything else failed.
-                if ($IMDBCheck === false) {
-                    $pieces = explode(' ', $tempTitle);
-                    $tempTitle = '%';
-                    foreach ($pieces as $piece) {
-                        $tempTitle .= str_replace(["'", '!', '"'], '', $piece).'%';
-                    }
-                    $IMDBCheck = $this->pdo->queryOneRow(
-                        sprintf(
-                            "%s WHERE replace(replace(replace(title, \"'\", ''), '!', ''), '\"', '') %s %s",
-                            $query,
-                            $this->pdo->likeString($tempTitle),
-                            $andYearIn
-                        )
-                    );
-                }
-            }
-        }
-
-        return
-        $IMDBCheck === false
-            ? false
-            : (
-                is_numeric($IMDBCheck['imdbid'])
-                ? (int) $IMDBCheck['imdbid']
-                : false
-            );
+        return $IMDBCheck === null ? false : $IMDBCheck->imdbid;
     }
 
     /**
