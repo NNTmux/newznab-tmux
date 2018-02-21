@@ -190,6 +190,11 @@ class Movie
     protected $helper;
 
     /**
+     * @var \Tmdb\Model\Configuration
+     */
+    protected $tmdbconfig;
+
+    /**
      * @param array $options Class instances / Echo to CLI.
      * @throws \Exception
      */
@@ -217,8 +222,8 @@ class Movie
         ]
         );
         $this->configRepository = new ConfigurationRepository($this->tmdbclient);
-        $this->config = $this->configRepository->load();
-        $this->helper = new ImageHelper($this->config);
+        $this->tmdbconfig = $this->configRepository->load();
+        $this->helper = new ImageHelper($this->tmdbconfig);
         $this->fanartapikey = Settings::settingValue('APIs..fanarttvkey');
         $this->fanart = new FanartTV($this->fanartapikey);
         $this->omdbapikey = Settings::settingValue('APIs..omdbkey');
