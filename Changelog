@@ -1,4 +1,5 @@
 2018-02-21 DariusIII
+	* Chg: Use Tmdb/ImageHelper to retrieve poster/backdrop URL's
 	* Chg: Use array_get to retrieve plot from plot_split array
 2018-02-20 DariusIII
 	* Chg: Simplify localIMDBSearch function

@@ -20,6 +20,8 @@ use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
+use Tmdb\Helper\ImageHelper;
+use Tmdb\Repository\ConfigurationRepository;
 
 /**
  * Class Movie.
@@ -178,6 +180,16 @@ class Movie
     private $config;
 
     /**
+     * @var \Tmdb\Repository\ConfigurationRepository
+     */
+    protected $configRepository;
+
+    /**
+     * @var \Tmdb\Helper\ImageHelper
+     */
+    protected $helper;
+
+    /**
      * @param array $options Class instances / Echo to CLI.
      * @throws \Exception
      */
@@ -204,6 +216,9 @@ class Movie
             ],
         ]
         );
+        $this->configRepository = new ConfigurationRepository($this->tmdbclient);
+        $this->config = $this->configRepository->load();
+        $this->helper = new ImageHelper($this->config);
         $this->fanartapikey = Settings::settingValue('APIs..fanarttvkey');
         $this->fanart = new FanartTV($this->fanartapikey);
         $this->omdbapikey = Settings::settingValue('APIs..omdbkey');
@@ -871,11 +886,11 @@ class Movie
             }
             $posterp = $tmdbLookup['poster_path'];
             if (! empty($posterp)) {
-                $ret['cover'] = 'http://image.tmdb.org/t/p/w185'.$posterp;
+                $ret['cover'] = 'https:'.$this->helper->getUrl($posterp);
             }
             $backdrop = $tmdbLookup['backdrop_path'];
             if (! empty($backdrop)) {
-                $ret['backdrop'] = 'http://image.tmdb.org/t/p/original'.$backdrop;
+                $ret['backdrop'] = 'https:'.$this->helper->getUrl($backdrop);
             }
             if ($this->echooutput) {
                 ColorCLI::doEcho(ColorCLI::primaryOver('TMDb Found ').ColorCLI::headerOver($ret['title']), true);
