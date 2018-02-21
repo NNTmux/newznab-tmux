@@ -5,7 +5,6 @@ use Blacklight\Movie;
 use App\Models\Category;
 use Illuminate\Support\Carbon;
 
-
 if (! User::isLoggedIn()) {
     $page->show403();
 }
