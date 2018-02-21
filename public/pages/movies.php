@@ -3,12 +3,14 @@
 use App\Models\User;
 use Blacklight\Movie;
 use App\Models\Category;
+use Illuminate\Support\Carbon;
 
-$movie = new Movie(['Settings' => $page->settings]);
 
 if (! User::isLoggedIn()) {
     $page->show403();
 }
+
+$movie = new Movie(['Settings' => $page->settings]);
 
 $moviecats = Category::getChildren(Category::MOVIE_ROOT);
 $mtmp = [];
@@ -37,9 +39,9 @@ $page->smarty->assign('category', $category);
 
 $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
 $ordering = $movie->getMovieOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST['ob'] : '';
+$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
 
-$results = $movies = [];
+$movies = [];
 $results = $movie->getMovieRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, -1, $page->userdata['categoryexclusions']);
 foreach ($results as $result) {
     $result['genre'] = makeFieldLinks($result, 'genre', 'movies');
@@ -69,7 +71,7 @@ $genre = (isset($_REQUEST['genre']) && in_array($_REQUEST['genre'], $genres, fal
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
-$years = range(1903, (date('Y') + 1));
+$years = range(1903, Carbon::now()->addYear()->year);
 rsort($years);
 $year = (isset($_REQUEST['year']) && in_array($_REQUEST['year'], $years, false)) ? $_REQUEST['year'] : '';
 $page->smarty->assign('years', $years);
