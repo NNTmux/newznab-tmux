@@ -899,7 +899,7 @@ class Movie
             $ret = [
                 'title' => $result->title(),
                 'tagline' => $result->tagline(),
-                'plot' => $result->plot_split()[0]['plot'],
+                'plot' => array_get($result->plot_split(), '0.plot'),
                 'rating' => $result->rating(),
                 'year' => $result->year(),
                 'cover' => $result->photo(),
