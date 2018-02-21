@@ -12,6 +12,7 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\MovieInfo;
+use Tmdb\Helper\ImageHelper;
 use Illuminate\Support\Carbon;
 use Tmdb\Client as TmdbClient;
 use Blacklight\utility\Utility;
@@ -20,7 +21,6 @@ use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
-use Tmdb\Helper\ImageHelper;
 use Tmdb\Repository\ConfigurationRepository;
 
 /**
