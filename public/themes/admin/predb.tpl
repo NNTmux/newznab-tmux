@@ -7,7 +7,7 @@
 				   value="{$lastSearch|escape:'html'}">
 			<span class="input-group-btn">
 			<button type="submit" value="Go" class="btn btn-default">
-				<i class="fa fa-search"></i>
+				<i class="fab fa-searchengin"></i>
 			</button>
 		</span>
 		</div>

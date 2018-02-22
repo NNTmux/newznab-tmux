@@ -233,7 +233,7 @@
 						<input class="form-control" id="headsearch" name="search"
 							   value="{if $header_menu_search == ""}{else}{$header_menu_search|escape:"htmlall"}{/if}"
 							   placeholder="Search" type="text"/>
-						<button id="headsearch_go" type="submit" class="btn btn-success"><i class="fa fa-search"></i>
+						<button id="headsearch_go" type="submit" class="btn btn-success"><i class="fab fa-searchengin"></i>
 						</button>
 					</form>
 				</li>
