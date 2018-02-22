@@ -924,7 +924,13 @@ class Movie
      */
     public function fetchIMDBProperties($imdbId)
     {
-        $result = new Title($imdbId, $this->config);
+        $result = null;
+
+        try {
+            $result = new Title($imdbId, $this->config);
+        } catch (\HttpException $e) {
+            echo $e->getMessage().PHP_EOL;
+        }
         if ($result !== null) {
             similar_text($this->currentTitle, $result->title(), $percent);
             if ($percent > self::MATCH_PERCENT) {
