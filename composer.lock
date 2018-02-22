@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "13972b063b08821a3a3de11eb9792f11",
+    "content-hash": "7187fa86d885704763fb2400be914368",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -757,40 +757,19 @@
         },
         {
             "name": "bower-asset/font-awesome",
-            "version": "v4.7.0",
+            "version": "5.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "a8386aae19e200ddb0f6845b5feeee5eb7013687"
+                "reference": "0a4935e849b1ae1360d03b84eaf84a4a205e9ebb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/a8386aae19e200ddb0f6845b5feeee5eb7013687",
-                "reference": "a8386aae19e200ddb0f6845b5feeee5eb7013687",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/0a4935e849b1ae1360d03b84eaf84a4a205e9ebb",
+                "reference": "0a4935e849b1ae1360d03b84eaf84a4a205e9ebb",
                 "shasum": ""
             },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "less/font-awesome.less",
-                    "scss/font-awesome.scss"
-                ],
-                "bower-asset-ignore": [
-                    "*/.*",
-                    "*.json",
-                    "src",
-                    "*.yml",
-                    "Gemfile",
-                    "Gemfile.lock",
-                    "*.md"
-                ]
-            },
-            "license": [
-                "OFL-1.1",
-                "MIT",
-                "CC-BY-3.0"
-            ],
-            "description": "Font Awesome"
+            "type": "bower-asset-library"
         },
         {
             "name": "bower-asset/html5shiv",

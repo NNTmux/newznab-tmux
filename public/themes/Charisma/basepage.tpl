@@ -45,6 +45,8 @@
 	<!-- flexboxgrid -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/flexboxgrid/dist/flexboxgrid.min.css" rel="stylesheet"
 		  type="text/css"/>
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/svg-with-js/css/fa-svg-with-js.css" rel="stylesheet"
+		  type="text/css"/>
 	<!-- Material design Icons -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet"
 		  type="text/css"/>
@@ -234,5 +236,8 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.nonblock.js"></script>
 <!-- materializecss js -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/materialize/dist/js/materialize.min.js"></script
+<!--font-awesome-->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/svg-with-js/js/fa-v4-shims.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/svg-with-js/js/fontawesome-all.js"></script>
 </body>
 </html>
