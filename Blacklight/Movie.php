@@ -853,12 +853,10 @@ class Movie
             echo $error->getMessage().PHP_EOL;
         }
         if (! empty($tmdbLookup)) {
-            $ret = [];
-            $ret['title'] = $tmdbLookup['title'];
 
             if ($this->currentTitle !== '') {
                 // Check the similarity.
-                similar_text($this->currentTitle, $ret['title'], $percent);
+                similar_text($this->currentTitle, $tmdbLookup['title'], $percent);
                 if ($percent < self::MATCH_PERCENT) {
                     return false;
                 }
@@ -866,11 +864,16 @@ class Movie
 
             if ($this->currentYear !== '') {
                 // Check the similarity.
-                similar_text($this->currentYear, Carbon::parse($ret['release_date'])->year, $percent);
+                similar_text($this->currentYear, Carbon::parse($tmdbLookup['release_date'])->year, $percent);
                 if ($percent < self::YEAR_MATCH_PERCENT) {
                     return false;
                 }
             }
+
+            $ret = [];
+            $ret['title'] = $tmdbLookup['title'];
+
+
 
             $ret['tmdbid'] = $tmdbLookup['id'];
             $ImdbID = str_replace('tt', '', $tmdbLookup['imdb_id']);
