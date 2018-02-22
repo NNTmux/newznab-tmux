@@ -25,7 +25,8 @@
 		  type="text/css"/>
 	<!-- bootstrap datepicker CSS
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" /> -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/svg-with-js/css/fa-svg-with-js.css" rel="stylesheet"
+		  type="text/css"/>
 		  type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.css" rel="stylesheet"
 		  type="text/css"/>
@@ -127,6 +128,9 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/custom.js"></script>
 <!-- pace -->
 <script src="{$smarty.const.WWW_THEMES}/shared/assets/pace/pace.min.js"></script>
+<!--font-awesome-->
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/svg-with-js/js/fa-v4-shims.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/svg-with-js/js/fontawesome-all.js"></script>
 
 </body>
 
