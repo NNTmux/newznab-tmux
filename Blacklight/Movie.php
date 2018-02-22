@@ -853,7 +853,6 @@ class Movie
             echo $error->getMessage().PHP_EOL;
         }
         if (! empty($tmdbLookup)) {
-
             if ($this->currentTitle !== '') {
                 // Check the similarity.
                 similar_text($this->currentTitle, $tmdbLookup['title'], $percent);
@@ -872,8 +871,6 @@ class Movie
 
             $ret = [];
             $ret['title'] = $tmdbLookup['title'];
-
-
 
             $ret['tmdbid'] = $tmdbLookup['id'];
             $ImdbID = str_replace('tt', '', $tmdbLookup['imdb_id']);
