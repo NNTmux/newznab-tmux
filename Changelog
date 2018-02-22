@@ -1,4 +1,5 @@
 2018-02-22 DariusIII
+	* Chg: Update laravel/framework to version 5.6.5
 	* Chg: Add try catch block to imdb information fetching
 	* Chg: Update admin theme with new font-awesome
 	* Chg: Try to prevent bad title and year matches if wrong imdbid/tmdbid is used in fetching movie info from imdb/trakt/omdb/tmdb
