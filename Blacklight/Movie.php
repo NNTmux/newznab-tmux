@@ -927,7 +927,7 @@ class Movie
     public function fetchIMDBProperties($imdbId)
     {
         $result = new Title($imdbId, $this->config);
-        if (!empty($result->title())) {
+        if (! empty($result->title())) {
             similar_text($this->currentTitle, $result->title(), $percent);
             if ($percent > self::MATCH_PERCENT) {
                 similar_text($this->currentYear, $result->year(), $percent);
