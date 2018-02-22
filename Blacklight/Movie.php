@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use Imdb\Exception\Http;
 use Imdb\Title;
 use Imdb\Config;
 use Tmdb\ApiToken;
@@ -928,7 +929,7 @@ class Movie
 
         try {
             $result = new Title($imdbId, $this->config);
-        } catch (\HttpException $e) {
+        } catch (Http $e) {
             echo $e->getMessage().PHP_EOL;
         }
         if ($result !== null) {
