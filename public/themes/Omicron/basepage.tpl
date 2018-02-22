@@ -198,8 +198,7 @@
 				<ul class="sidebar-menu">
 					<li class="header">Main</li>
 					<!-- Optionally, you can add icons to the links -->
-					<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
-									class="fa arrow"></span></a></li>
+					<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</a></li>
 					{if $loggedin == "true"}
 					<li class="treeview">
 						<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
@@ -227,8 +226,7 @@
 						<a href="#"><i class="fa fa-list-ol"></i><span> Articles & Links</span></a>
 						<ul class="treeview-menu">
 							<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
-											class="fa fa-envelope-o"></i><span> Contact</span> <span
-											class="fa arrow"></span></a></li>
+											class="far fa-envelope"></i><span> Contact</span>
 							{if $loggedin == "true"}
 							<li><a href="{$smarty.const.WWW_TOP}/forum"><i class="fa fa-forumbee"></i> Forum</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/search"><i class="fa fa-search"></i> Search</a></li>

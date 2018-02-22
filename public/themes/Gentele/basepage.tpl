@@ -130,8 +130,7 @@
 							</li>
 							{/if}
 							<li><a href="{$smarty.const.WWW_TOP}/contact-us"><i
-											class="fa fa-envelope-o"></i><span> Contact</span> <span
-											class="fa arrow"></span></a></li>
+											class="far fa-envelope"></i><span> Contact</span></a></li>
 						</ul>
 					</div>
 				</div>
@@ -168,7 +167,7 @@
 					<div class="copyright-info">
 						<strong>Copyright &copy; {$smarty.now|date_format:"%Y"} <a
 									href="https://github.com/NNTmux/">newznab-tmux</a>.</strong> This software is
-						open source, released under the GPL license
+						open source, released under the GPL license, proudly powered by <i class="fab fa-laravel fa-2x"></i> Laravel
 					</div>
 					<div class="clearfix"></div>
 				</footer>
