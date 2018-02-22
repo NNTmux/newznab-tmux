@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Imdb\Exception\Http;
 use Imdb\Title;
 use Imdb\Config;
 use Tmdb\ApiToken;
@@ -237,6 +236,7 @@ class Movie
         $this->lookuplanguage = Settings::settingValue('indexer.categorise.imdblanguage') !== '' ? (string) Settings::settingValue('indexer.categorise.imdblanguage') : 'en';
         $this->config = new Config();
         $this->config->language = $this->lookuplanguage;
+        $this->config->throwHttpExceptions = false;
 
         $this->imdburl = (int) Settings::settingValue('indexer.categorise.imdburl') !== 0;
         $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;
@@ -925,14 +925,8 @@ class Movie
      */
     public function fetchIMDBProperties($imdbId)
     {
-        $result = null;
-
-        try {
-            $result = new Title($imdbId, $this->config);
-        } catch (Http $e) {
-            echo $e->getMessage().PHP_EOL;
-        }
-        if ($result !== null) {
+        $result = new Title($imdbId, $this->config);
+        if (!empty($result->title())) {
             similar_text($this->currentTitle, $result->title(), $percent);
             if ($percent > self::MATCH_PERCENT) {
                 similar_text($this->currentYear, $result->year(), $percent);
@@ -949,7 +943,7 @@ class Movie
                         'type' => $result->movietype(),
                     ];
 
-                    if ($this->echooutput && $result->title() !== null) {
+                    if ($this->echooutput) {
                         ColorCLI::doEcho(ColorCLI::headerOver('IMDb Found ').ColorCLI::primaryOver($result->title()), true);
                     }
 
