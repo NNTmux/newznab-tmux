@@ -30,6 +30,8 @@ class Movie
 {
     protected const MATCH_PERCENT = 75;
 
+    protected const YEAR_MATCH_PERCENT = 80;
+
     /**
      * @var \Blacklight\db\DB
      */
@@ -862,6 +864,14 @@ class Movie
                 }
             }
 
+            if ($this->currentYear !== '') {
+                // Check the similarity.
+                similar_text($this->currentYear, Carbon::parse($ret['release_date'])->year, $percent);
+                if ($percent < self::YEAR_MATCH_PERCENT) {
+                    return false;
+                }
+            }
+
             $ret['tmdbid'] = $tmdbLookup['id'];
             $ImdbID = str_replace('tt', '', $tmdbLookup['imdb_id']);
             $ret['imdbid'] = $ImdbID;
@@ -916,23 +926,33 @@ class Movie
     {
         $result = new Title($imdbId, $this->config);
         if ($result !== null) {
-            $ret = [
-                'title' => $result->title(),
-                'tagline' => $result->tagline(),
-                'plot' => array_get($result->plot_split(), '0.plot'),
-                'rating' => $result->rating(),
-                'year' => $result->year(),
-                'cover' => $result->photo(),
-                'genre' => $result->genre(),
-                'language' => $result->language(),
-                'type' => $result->movietype(),
-            ];
+            similar_text($this->currentTitle, $result->title(), $percent);
+            if ($percent > self::MATCH_PERCENT) {
+                similar_text($this->currentYear, $result->year(), $percent);
+                if ($percent >= self::YEAR_MATCH_PERCENT) {
+                    $ret = [
+                        'title' => $result->title(),
+                        'tagline' => $result->tagline(),
+                        'plot' => array_get($result->plot_split(), '0.plot'),
+                        'rating' => $result->rating(),
+                        'year' => $result->year(),
+                        'cover' => $result->photo(),
+                        'genre' => $result->genre(),
+                        'language' => $result->language(),
+                        'type' => $result->movietype(),
+                    ];
 
-            if ($this->echooutput && $result->title() !== null) {
-                ColorCLI::doEcho(ColorCLI::headerOver('IMDb Found ').ColorCLI::primaryOver($result->title()), true);
+                    if ($this->echooutput && $result->title() !== null) {
+                        ColorCLI::doEcho(ColorCLI::headerOver('IMDb Found ').ColorCLI::primaryOver($result->title()), true);
+                    }
+
+                    return $ret;
+                }
+
+                return false;
             }
 
-            return $ret;
+            return false;
         }
 
         return false;
@@ -953,21 +973,31 @@ class Movie
         }
         $resp = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
         if ($resp !== false) {
-            $ret = [];
-            if (isset($resp['ids']['trakt'])) {
-                $ret['id'] = $resp['ids']['trakt'];
-            }
+            similar_text($this->currentTitle, $resp['title'], $percent);
+            if ($percent > self::MATCH_PERCENT) {
+                similar_text($this->currentYear, $resp['year'], $percent);
+                if ($percent >= self::YEAR_MATCH_PERCENT) {
+                    $ret = [];
+                    if (isset($resp['ids']['trakt'])) {
+                        $ret['id'] = $resp['ids']['trakt'];
+                    }
 
-            if (isset($resp['title'])) {
-                $ret['title'] = $resp['title'];
-            } else {
+                    if (isset($resp['title'])) {
+                        $ret['title'] = $resp['title'];
+                    } else {
+                        return false;
+                    }
+                    if ($this->echooutput) {
+                        ColorCLI::doEcho(ColorCLI::alternateOver('Trakt Found ').ColorCLI::headerOver($ret['title']), true);
+                    }
+
+                    return $ret;
+                }
+
                 return false;
             }
-            if ($this->echooutput) {
-                ColorCLI::doEcho(ColorCLI::alternateOver('Trakt Found ').ColorCLI::headerOver($ret['title']), true);
-            }
 
-            return $ret;
+            return false;
         }
 
         return false;
@@ -986,26 +1016,36 @@ class Movie
             $resp = $this->omdbApi->fetch('i', 'tt'.$imdbId);
 
             if (\is_object($resp) && $resp->message === 'OK' && $resp->data->Response !== 'False') {
-                $ret = [
-                    'title' => ! empty($resp->data->Title) ? $resp->data->Title : '',
-                    'cover' => ! empty($resp->data->Poster) ? $resp->data->Poster : '',
-                    'genre' => ! empty($resp->data->Genre) ? $resp->data->Genre : '',
-                    'year'  => ! empty($resp->data->Year) ? $resp->data->Year : '',
-                    'plot'  => ! empty($resp->data->Plot) ? $resp->data->Plot : '',
-                    'rating'  => ! empty($resp->data->imdbRating) ? $resp->data->imdbRating : '',
-                    'rtRating' => ! empty($resp->data->Ratings[1]->Value) ? $resp->data->Ratings[1]->Value : '',
-                    'tagline' => ! empty($resp->data->Tagline) ? $resp->data->Tagline : '',
-                    'director' => ! empty($resp->data->Director) ? $resp->data->Director : '',
-                    'actors'   => ! empty($resp->data->Actors) ? $resp->data->Actors : '',
-                    'language' => ! empty($resp->data->Language) ? $resp->data->Language : '',
-                    'boxOffice' => ! empty($resp->data->BoxOffice) ? $resp->data->BoxOffice : '',
-                ];
+                similar_text($this->currentTitle, $resp->data->Title, $percent);
+                if ($percent > self::MATCH_PERCENT) {
+                    similar_text($this->currentYear, $resp->data->Year, $percent);
+                    if ($percent >= self::YEAR_MATCH_PERCENT) {
+                        $ret = [
+                            'title' => ! empty($resp->data->Title) ? $resp->data->Title : '',
+                            'cover' => ! empty($resp->data->Poster) ? $resp->data->Poster : '',
+                            'genre' => ! empty($resp->data->Genre) ? $resp->data->Genre : '',
+                            'year' => ! empty($resp->data->Year) ? $resp->data->Year : '',
+                            'plot' => ! empty($resp->data->Plot) ? $resp->data->Plot : '',
+                            'rating' => ! empty($resp->data->imdbRating) ? $resp->data->imdbRating : '',
+                            'rtRating' => ! empty($resp->data->Ratings[1]->Value) ? $resp->data->Ratings[1]->Value : '',
+                            'tagline' => ! empty($resp->data->Tagline) ? $resp->data->Tagline : '',
+                            'director' => ! empty($resp->data->Director) ? $resp->data->Director : '',
+                            'actors' => ! empty($resp->data->Actors) ? $resp->data->Actors : '',
+                            'language' => ! empty($resp->data->Language) ? $resp->data->Language : '',
+                            'boxOffice' => ! empty($resp->data->BoxOffice) ? $resp->data->BoxOffice : '',
+                        ];
 
-                if ($this->echooutput) {
-                    ColorCLI::doEcho(ColorCLI::alternateOver('OMDbAPI Found ').ColorCLI::headerOver($ret['title']), true);
+                        if ($this->echooutput) {
+                            ColorCLI::doEcho(ColorCLI::alternateOver('OMDbAPI Found ').ColorCLI::headerOver($ret['title']), true);
+                        }
+
+                        return $ret;
+                    }
+
+                    return false;
                 }
 
-                return $ret;
+                return false;
             }
 
             return false;
