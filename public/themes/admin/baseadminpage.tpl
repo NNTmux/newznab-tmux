@@ -23,10 +23,7 @@
 	<!-- Bootstrap core CSS -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
-	<!-- bootstrap datepicker CSS
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" /> -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/svg-with-js/css/fa-svg-with-js.css" rel="stylesheet"
-		  type="text/css"/>
 		  type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.css" rel="stylesheet"
 		  type="text/css"/>
