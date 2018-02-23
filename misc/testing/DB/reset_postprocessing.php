@@ -329,21 +329,21 @@ if ($ran === false) {
             '\nThis script will reset postprocessing per category. It can also truncate the associated tables.'
             .'\nTo reset only those that have previously failed, those without covers, samples, previews, etc. use the '
             .'second argument false.\n'
-            .'To reset even those previously post processed, use the second argument true.\n'
-            .'To truncate the associated table, use the third argument truncate.\n\n'
-            .'php reset_postprocessing.php consoles true    ...: To reset all consoles.\n'
-            .'php reset_postprocessing.php games true       ...: To reset all games.\n'
-            .'php reset_postprocessing.php movies true      ...: To reset all movies.\n'
-            .'php reset_postprocessing.php music true       ...: To reset all music.\n'
-            .'php reset_postprocessing.php misc true        ...: To reset all misc.\n'
-            .'php reset_postprocessing.php tv true          ...: To reset all tv.\n'
-            .'php reset_postprocessing.php anime true       ...: To reset all anime.\n'
-            .'php reset_postprocessing.php books true       ...: To reset all books.\n'
-            .'php reset_postprocessing.php xxx true         ...: To reset all xxx.\n'
-            .'php reset_postprocessing.php nfos true        ...: To reset all nfos.\n'
-            .'php reset_postprocessing.php all true         ...: To reset everything.\n'
+            .'To reset even those previously post processed, use the second argument true.'.PHP_EOL
+            .'To truncate the associated table, use the third argument truncate.'.PHP_EOL.PHP_EOL
+            .'php reset_postprocessing.php consoles true    ...: To reset all consoles.'.PHP_EOL
+            .'php reset_postprocessing.php games true       ...: To reset all games.'.PHP_EOL
+            .'php reset_postprocessing.php movies true      ...: To reset all movies.'.PHP_EOL
+            .'php reset_postprocessing.php music true       ...: To reset all music.'.PHP_EOL
+            .'php reset_postprocessing.php misc true        ...: To reset all misc.'.PHP_EOL
+            .'php reset_postprocessing.php tv true          ...: To reset all tv.'.PHP_EOL
+            .'php reset_postprocessing.php anime true       ...: To reset all anime.'.PHP_EOL
+            .'php reset_postprocessing.php books true       ...: To reset all books.'.PHP_EOL
+            .'php reset_postprocessing.php xxx true         ...: To reset all xxx.'.PHP_EOL
+            .'php reset_postprocessing.php nfos true        ...: To reset all nfos.'.PHP_EOL
+            .'php reset_postprocessing.php all true         ...: To reset everything.'.PHP_EOL
         )
     );
-} else {
-    echo PHP_EOL;
 }
+echo PHP_EOL;
+
