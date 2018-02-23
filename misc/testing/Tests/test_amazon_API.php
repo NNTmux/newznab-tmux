@@ -33,4 +33,4 @@ $apaiIo = new ApaiIO($conf);
 
 $response = $apaiIo->runOperation($search);
 
-var_dump($response);
+dd($response);

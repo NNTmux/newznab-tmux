@@ -1,4 +1,5 @@
 2018-02-23 DariusIII
+	* Chg: Update test_amazon_api script
 	* Fix: Fix reset_postprocessing.php message line endings on error/info
 	* Chg: Make mysql default search driver for laravel scout
 	* Chg: Use laravel scout to search fulltext indexes
