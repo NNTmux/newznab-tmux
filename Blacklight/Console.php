@@ -3,6 +3,7 @@
 namespace Blacklight;
 
 use ApaiIO\ApaiIO;
+use ApaiIO\Configuration\Country;
 use Blacklight\db\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
@@ -773,7 +774,7 @@ class Console
 
         try {
             $conf
-                ->setCountry('com')
+                ->setCountry(Country::INTERNATIONAL)
                 ->setAccessKey($this->pubkey)
                 ->setSecretKey($this->privkey)
                 ->setAssociateTag($this->asstag)
