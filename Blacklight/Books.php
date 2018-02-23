@@ -377,8 +377,8 @@ class Books
         }
 
         if (isset($response->Items->Item->ItemAttributes->Title)) {
+            ColorCLI::doEcho(ColorCLI::info('Found matching title: '.$response->Items->Item->ItemAttributes->Title), true);
 
-            ColorCLI::doEcho(ColorCLI::info('Found matching title: ' . $response->Items->Item->ItemAttributes->Title), true);
             return $response;
         }
 
@@ -563,8 +563,7 @@ class Books
 
         $amaz = false;
         if ($bookInfo !== '') {
-
-            ColorCLI::doEcho(ColorCLI::info('Fetching data from Amazon for ' . $bookInfo), true);
+            ColorCLI::doEcho(ColorCLI::info('Fetching data from Amazon for '.$bookInfo), true);
 
             $amaz = $this->fetchAmazonProperties($bookInfo);
         } elseif ($amazdata !== null) {
