@@ -3,6 +3,7 @@
 namespace Blacklight;
 
 use ApaiIO\ApaiIO;
+use App\Models\Genre;
 use Blacklight\db\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
@@ -125,12 +126,11 @@ class Console
     public function getConsoleInfoByName($title, $platform)
     {
         //only used to get a count of words
-        $searchWords = $searchsql = '';
+        $searchWords = '';
 
         $title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
         $title = preg_replace('/[^\w ]+/', '', $title);
-        $title = trim(preg_replace('/\s\s+/i', ' ', $title));
-        $title = trim($title);
+        $title = trim(trim(preg_replace('/\s\s+/i', ' ', $title)));
         $words = explode(' ', $title);
 
         foreach ($words as $word) {
@@ -542,7 +542,9 @@ class Console
 
     /**
      * @param $amaz
+     *
      * @return array
+     * @throws \Exception
      */
     protected function _matchGenre($amaz): array
     {
@@ -592,6 +594,7 @@ class Console
 
     /**
      * @param $genreName
+     *
      * @return false|int|string
      * @throws \Exception
      */
@@ -602,15 +605,7 @@ class Console
         if (\in_array(strtolower($genreName), $genreassoc, false)) {
             $genreKey = array_search(strtolower($genreName), $genreassoc, false);
         } else {
-            $genreKey = $this->pdo->queryInsert(
-                sprintf(
-                    '
-							INSERT INTO genres (title, type)
-							VALUES (%s, %d)',
-                    $this->pdo->escapeString($genreName),
-                    Genres::CONSOLE_TYPE
-                )
-            );
+            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::CONSOLE_TYPE]);
         }
 
         return $genreKey;
@@ -650,6 +645,7 @@ class Console
                 $platform = 'Xbox 360';
                 break;
             case 'XBOXONE':
+            case 'XBOX ONE':
                 $platform = 'Xbox One';
                 break;
             case 'DSi':
@@ -711,7 +707,7 @@ class Console
     {
         $ri = new ReleaseImage();
 
-        $check = ConsoleInfo::query()->where('asin', $con['asin'])->first(['id']);
+        $check = ConsoleInfo::query()->where('asin', $con['asin'])->first();
 
         if ($check === null) {
             $consoleId = ConsoleInfo::query()

@@ -1,4 +1,5 @@
 2018-02-23 DariusIII
+	* Chg: Update _getGenreKey function
 	* Chg: Make Console amazon updates more informative
 	* Chg: Use Country constant for amazon lookups
 	* Chg: Update Console class
