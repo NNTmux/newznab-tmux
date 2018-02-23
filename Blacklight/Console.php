@@ -806,6 +806,7 @@ class Console
         }
 
         ColorCLI::doEcho(ColorCLI::info('Could not find match on Amazon'), true);
+
         return false;
     }
 
