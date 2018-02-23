@@ -1,4 +1,5 @@
 2018-02-23 DariusIII
+	* Chg: Update Console class
 	* Fix: Fix fetching Book data from amazon
 	* Chg: Make fetching data for books more informative
 	* Chg: Update test_amazon_api script

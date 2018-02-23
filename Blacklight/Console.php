@@ -384,6 +384,7 @@ class Console
     {
         $consoleId = self::CONS_NTFND;
 
+        ColorCLI::doEcho(ColorCLI::info('Fetching data from Amazon'), true);
         $amaz = $this->fetchAmazonProperties($gameInfo['title'], $gameInfo['node']);
 
         if ($amaz) {
@@ -412,18 +413,16 @@ class Console
 
                 $consoleId = $this->_updateConsoleTable($con);
 
-                if ($this->echooutput) {
-                    if ($consoleId !== -2) {
-                        ColorCLI::doEcho(
-                            ColorCLI::header('Added/updated game: ').
-                            ColorCLI::alternateOver('   Title:    ').
-                            ColorCLI::primary($con['title']).
-                            ColorCLI::alternateOver('   Platform: ').
-                            ColorCLI::primary($con['platform']).
-                            ColorCLI::alternateOver('   Genre: ').
-                            ColorCLI::primary($con['consolegenre']), true
-                        );
-                    }
+                if ($this->echooutput && $consoleId !== -2) {
+                    ColorCLI::doEcho(
+                        ColorCLI::header('Added/updated game: ').
+                        ColorCLI::alternateOver('   Title:    ').
+                        ColorCLI::primary($con['title']).
+                        ColorCLI::alternateOver('   Platform: ').
+                        ColorCLI::primary($con['platform']).
+                        ColorCLI::alternateOver('   Genre: ').
+                        ColorCLI::primary($con['consolegenre']), true
+                    );
                 }
             }
         }
@@ -804,11 +803,16 @@ class Console
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function processConsoleReleases(): void
     {
-        $res = Release::query()->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->where(['nzbstatus' => NZB::NZB_ADDED, 'consoleinfo_id' => null])->when($this->renamed === true, function ($query) {
-            return $query->where('isrenamed', '=', 1);
-        })->limit($this->gameqty)->orderBy('postdate')->get(['searchname', 'id']);
+        $query = Release::query()->select(['searchname', 'id'])->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->where('nzbstatus', '=',NZB::NZB_ADDED)->whereNull('consoleinfo_id');
+        if ($this->renamed === true) {
+            $query->where('isrenamed', '=', 1);
+        }
+        $res = $query->limit($this->gameqty)->orderBy('postdate')->get();
 
         $releaseCount = $res->count();
         if ($res instanceof \Traversable && $releaseCount > 0) {
