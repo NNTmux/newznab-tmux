@@ -385,7 +385,6 @@ class Console
     {
         $consoleId = self::CONS_NTFND;
 
-        ColorCLI::doEcho(ColorCLI::info('Fetching data from Amazon'), true);
         $amaz = $this->fetchAmazonProperties($gameInfo['title'], $gameInfo['node']);
 
         if ($amaz) {
@@ -422,7 +421,8 @@ class Console
                         ColorCLI::alternateOver('   Platform: ').
                         ColorCLI::primary($con['platform']).
                         ColorCLI::alternateOver('   Genre: ').
-                        ColorCLI::primary($con['consolegenre']), true
+                        ColorCLI::primary($con['consolegenre']),
+                        true
                     );
                 }
             }
@@ -792,16 +792,21 @@ class Console
 
         $apaiIo = new ApaiIO($conf);
 
+        ColorCLI::doEcho(ColorCLI::info('Trying to find info on Amazon'), true);
         $response = $apaiIo->runOperation($search);
+
         if ($response === false) {
             throw new \RuntimeException('Could not connect to Amazon');
-        } else {
-            if (isset($response->Items->Item->ItemAttributes->Title)) {
-                return $response;
-            } else {
-                return false;
-            }
         }
+
+        if (isset($response->Items->Item->ItemAttributes->Title)) {
+            ColorCLI::doEcho(ColorCLI::info('Found matching info on Amazon: '.$response->Items->Item->ItemAttributes->Title), true);
+
+            return $response;
+        }
+
+        ColorCLI::doEcho(ColorCLI::info('Could not find match on Amazon'), true);
+        return false;
     }
 
     /**
@@ -835,7 +840,8 @@ class Console
                                 $gameInfo['title'].
                                 ' ('.
                                 $gameInfo['platform'].')'
-                            ), true
+                            ),
+                            true
                         );
                     }
 
@@ -859,7 +865,8 @@ class Console
                         if ($this->echooutput) {
                             ColorCLI::doEcho(
                                 ColorCLI::headerOver('Found Local: ').
-                                ColorCLI::primary("{$gameCheck['title']} - {$gameCheck['platform']}"), true
+                                ColorCLI::primary("{$gameCheck['title']} - {$gameCheck['platform']}"),
+                                true
                             );
                         }
                         $gameId = $gameCheck['id'];
