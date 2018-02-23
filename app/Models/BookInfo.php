@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use Illuminate\Database\Eloquent\Model;
 
 class BookInfo extends Model
 {
@@ -36,7 +36,6 @@ class BookInfo extends Model
      */
     public function toSearchableArray()
     {
-
         return [
             'author'=> $this->author,
             'title' => $this->title,

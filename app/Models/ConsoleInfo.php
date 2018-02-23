@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use Illuminate\Database\Eloquent\Model;
 
 class ConsoleInfo extends Model
 {
-   use Searchable;
+    use Searchable;
     /**
      * @var string
      */
@@ -33,7 +33,6 @@ class ConsoleInfo extends Model
      */
     public function toSearchableArray()
     {
-
         return [
             'title'=> $this->title,
             'platform' => $this->platform,

@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
+use Laravel\Scout\Searchable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
 
 /**
  * @property mixed $release
@@ -15,7 +15,7 @@ use Laravel\Scout\Searchable;
  */
 class Predb extends Model
 {
-   use Searchable;
+    use Searchable;
 
     // Nuke status.
     public const PRE_NONUKE = 0; // Pre is not nuked.
