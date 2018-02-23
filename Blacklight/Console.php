@@ -3,7 +3,6 @@
 namespace Blacklight;
 
 use ApaiIO\ApaiIO;
-use ApaiIO\Configuration\Country;
 use Blacklight\db\DB;
 use GuzzleHttp\Client;
 use App\Models\Release;
@@ -12,6 +11,7 @@ use App\Models\Settings;
 use App\Models\ConsoleInfo;
 use ApaiIO\Operations\Search;
 use Illuminate\Support\Carbon;
+use ApaiIO\Configuration\Country;
 use ApaiIO\Request\GuzzleRequest;
 use Illuminate\Support\Facades\Cache;
 use ApaiIO\Configuration\GenericConfiguration;
