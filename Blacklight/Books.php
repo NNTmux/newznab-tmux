@@ -381,6 +381,7 @@ class Books
             ColorCLI::doEcho(ColorCLI::info('Found matching title: ' . $response->Items->Item->ItemAttributes->Title), true);
             return $response;
         }
+
         ColorCLI::doEcho(ColorCLI::notice('Could not find a match on Amazon!'), true);
 
         return false;
@@ -562,11 +563,9 @@ class Books
 
         $amaz = false;
         if ($bookInfo !== '') {
-<<<<<<< HEAD
+
             ColorCLI::doEcho(ColorCLI::info('Fetching data from Amazon for ' . $bookInfo), true);
-=======
-            ColorCLI::doEcho(ColorCLI::info('Fetching data from Amazon for '.$bookInfo));
->>>>>>> 04880914c9921cc7d3138ba79f5f6f35b07dada0
+
             $amaz = $this->fetchAmazonProperties($bookInfo);
         } elseif ($amazdata !== null) {
             $amaz = $amazdata;
