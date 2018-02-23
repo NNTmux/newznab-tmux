@@ -1,4 +1,5 @@
 2018-02-23 DariusIII
+	* Fix: Fix fetching Book data from amazon
 	* Chg: Make fetching data for books more informative
 	* Chg: Update test_amazon_api script
 	* Fix: Fix reset_postprocessing.php message line endings on error/info

@@ -377,10 +377,10 @@ class Books
         }
 
         if (isset($response->Items->Item->ItemAttributes->Title)) {
-            ColorCLI::doEcho(ColorCLI::info('Found matching title: ' . $response->Items->Item->ItemAttributes->Title));
+            ColorCLI::doEcho(ColorCLI::info('Found matching title: ' . $response->Items->Item->ItemAttributes->Title), true);
             return $response;
         }
-        ColorCLI::doEcho(ColorCLI::notice('Could not find a match on Amazon!'));
+        ColorCLI::doEcho(ColorCLI::notice('Could not find a match on Amazon!'), true);
         return false;
     }
 
@@ -453,7 +453,7 @@ class Books
                             ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.'), true);
                         }
                         $bookId = -2;
-                    } elseif ($bookCheck !== null) {
+                    } elseif ($bookCheck === null) {
                         $bookId = $this->updateBookInfo($bookInfo);
                         $usedAmazon = true;
                         if ($bookId === -2) {
@@ -560,7 +560,7 @@ class Books
 
         $amaz = false;
         if ($bookInfo !== '') {
-            ColorCLI::doEcho(ColorCLI::info('Fetching data from Amazon for ' . $bookInfo));
+            ColorCLI::doEcho(ColorCLI::info('Fetching data from Amazon for ' . $bookInfo), true);
             $amaz = $this->fetchAmazonProperties($bookInfo);
         } elseif ($amazdata !== null) {
             $amaz = $amazdata;
