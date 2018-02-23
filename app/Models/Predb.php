@@ -7,6 +7,7 @@ use Blacklight\ConsoleTools;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 /**
  * @property mixed $release
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Predb extends Model
 {
+   use Searchable;
+
     // Nuke status.
     public const PRE_NONUKE = 0; // Pre is not nuked.
     public const PRE_UNNUKED = 1; // Pre was un nuked.
@@ -220,5 +223,23 @@ class Predb extends Model
     public static function getOne($preID)
     {
         return self::query()->where('id', $preID)->first();
+    }
+
+    /**
+     * @return string
+     */
+    public function searchableAs()
+    {
+        return 'ft_predb_filename';
+    }
+
+    /**
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return [
+            'filename' => $this->filename,
+        ];
     }
 }

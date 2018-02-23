@@ -114,7 +114,8 @@ class Books
 
     /**
      * @param $title
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     *
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function getBookInfoByName($title)
     {
@@ -136,7 +137,7 @@ class Books
         }
         $searchWords = trim($searchWords);
 
-        return BookInfo::query()->whereRaw('MATCH(author, title) AGAINST(? IN BOOLEAN MODE)', [$searchWords])->first();
+        return BookInfo::search($searchWords)->first();
     }
 
     /**
@@ -445,13 +446,13 @@ class Books
                     // Do a local lookup first
                     $bookCheck = $this->getBookInfoByName($bookInfo);
 
-                    if ($bookCheck === false && \in_array($bookInfo, $this->failCache, false)) {
+                    if ($bookCheck === null && \in_array($bookInfo, $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
                             ColorCLI::doEcho(ColorCLI::headerOver('Cached previous failure. Skipping.'), true);
                         }
                         $bookId = -2;
-                    } elseif ($bookCheck === false) {
+                    } elseif ($bookCheck !== null) {
                         $bookId = $this->updateBookInfo($bookInfo);
                         $usedAmazon = true;
                         if ($bookId === -2) {

@@ -163,10 +163,7 @@ class Games
             return $bestMatch;
         }
 
-        $results = GamesInfo::query()
-            ->whereRaw('MATCH(title) AGAINST(?)', $title)
-            ->limit(20)
-            ->get();
+        $results = GamesInfo::search($title)->get();
 
         if ($results instanceof \Traversable) {
             $bestMatchPct = 0;

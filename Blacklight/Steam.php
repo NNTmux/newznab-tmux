@@ -112,7 +112,7 @@ class Steam
 
         $this->populateSteamAppsTable();
 
-        $results = SteamApp::query()->whereRaw('MATCH(name) AGAINST(?)', [$searchTerm])->limit(20)->get(['name', 'appid']);
+        $results = SteamApp::search($searchTerm)->get();
 
         if ($results instanceof \Traversable) {
             $bestMatchPct = 0;

@@ -118,7 +118,8 @@ class Console
     /**
      * @param $title
      * @param $platform
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     *
+     * @return \Illuminate\Database\Eloquent\Model
      */
     public function getConsoleInfoByName($title, $platform)
     {
@@ -140,7 +141,7 @@ class Console
         }
         $searchWords = trim($searchWords);
 
-        return ConsoleInfo::query()->whereRaw('MATCH(title, platform) AGAINST(? IN BOOLEAN MODE) AND platform = ?', [$searchWords, $platform])->first();
+        return ConsoleInfo::search($searchWords, $platform)->first();
     }
 
     /**

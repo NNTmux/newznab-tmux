@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class SteamApp extends Model
 {
+    use Searchable;
     /**
      * @var bool
      */
@@ -25,4 +27,22 @@ class SteamApp extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * @return string
+     */
+    public function searchableAs()
+    {
+        return 'ix_name_ft';
+    }
+
+    /**
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return [
+            'name' => $this->name,
+        ];
+    }
 }

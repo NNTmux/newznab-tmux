@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class ConsoleInfo extends Model
 {
+   use Searchable;
     /**
      * @var string
      */
@@ -20,4 +22,21 @@ class ConsoleInfo extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public function searchableAs()
+    {
+        return 'ix_consoleinfo_title_platform_ft';
+    }
+
+    /**
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+
+        return [
+            'title'=> $this->title,
+            'platform' => $this->platform,
+        ];
+    }
 }

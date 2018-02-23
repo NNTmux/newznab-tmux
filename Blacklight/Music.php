@@ -133,7 +133,7 @@ class Music
         }
         $searchwords = trim($searchwords);
 
-        return MusicInfo::query()->whereRaw('MATCH(artist, title) AGAINST(? IN BOOLEAN MODE)', $searchwords)->first();
+        return MusicInfo::search($searchwords)->first();
     }
 
     /**

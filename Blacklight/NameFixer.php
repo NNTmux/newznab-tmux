@@ -1208,7 +1208,7 @@ class NameFixer
             $this->_cleanMatchFiles();
             $preMatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w-.]+[\w]$/i', $this->_fileName, $match);
             if ($preMatch) {
-                $result = $this->pdo->queryOneRow(sprintf("SELECT filename AS filename FROM predb WHERE MATCH(filename) AGAINST ('$match[0]' IN BOOLEAN MODE)"));
+                $result = Predb::search($match[0])->first();
                 $preFTmatch = preg_match('/(\d{2}\.\d{2}\.\d{2})+[\w-.]+[\w]$/i', $result['filename'], $match1);
                 if ($preFTmatch) {
                     if ($match[0] === $match1[0]) {

@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class BookInfo extends Model
 {
+    use Searchable;
     /**
      * @var string
      */
@@ -20,4 +22,24 @@ class BookInfo extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * @return string
+     */
+    public function searchableAs()
+    {
+        return 'ix_bookinfo_author_title_ft';
+    }
+
+    /**
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+
+        return [
+            'author'=> $this->author,
+            'title' => $this->title,
+        ];
+    }
 }
