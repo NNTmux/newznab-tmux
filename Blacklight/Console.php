@@ -808,7 +808,7 @@ class Console
      */
     public function processConsoleReleases(): void
     {
-        $query = Release::query()->select(['searchname', 'id'])->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->where('nzbstatus', '=',NZB::NZB_ADDED)->whereNull('consoleinfo_id');
+        $query = Release::query()->select(['searchname', 'id'])->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])->where('nzbstatus', '=', NZB::NZB_ADDED)->whereNull('consoleinfo_id');
         if ($this->renamed === true) {
             $query->where('isrenamed', '=', 1);
         }
