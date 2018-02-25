@@ -1,3 +1,5 @@
+2018-02-26 DariusIII
+	* Chg: Update imdbphp/imdbphp and add htmlpurifier
 2018-02-23 DariusIII
 	* Chg: Update _getGenreKey function
 	* Chg: Make Console amazon updates more informative
