@@ -15,5 +15,8 @@
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./Blacklight</directory>
         </whitelist>
+        <exclude>
+            <directory suffix=".php">./Blacklight/config</directory>
+        </exclude>
     </filter>
 </phpunit>
