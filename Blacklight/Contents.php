@@ -371,6 +371,5 @@ class Contents
         }
 
         return $query->get()->toArray();
-
     }
 }
