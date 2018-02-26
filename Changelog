@@ -1,4 +1,5 @@
 2018-02-26 DariusIII
+	* Chg: Manage single and double quotes in htmlspecialchars on login page
 	* Chg: Update Contents class, use Content model in remaining functions
 	* Chg: Exclude Blacklight/config folder from code coverage test
 	* Fix: Fix Music postprocessing

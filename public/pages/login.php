@@ -13,7 +13,7 @@ if (! User::isLoggedIn()) {
     if (! isset($_POST['username'], $_POST['password'])) {
         $page->smarty->assign('error', 'Please enter your username and password.');
     } elseif ($captcha->getError() === false) {
-        $username = htmlspecialchars($_POST['username']);
+        $username = htmlspecialchars($_POST['username'], ENT_QUOTES | ENT_HTML5);
         $page->smarty->assign('username', $username);
         if (Utility::checkCsrfToken() === true) {
             $res = User::getByUsername($username);
