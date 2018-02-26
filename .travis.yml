@@ -33,10 +33,10 @@ before_install:
     - composer validate
 
 install:
-    - yes '' | pecl install imagick
     # Configure environment settings
     - cp .env.travis .env
     # Install composer packages.
+    - composer global require hirak/prestissimo
     - composer install --prefer-dist
 
 before_script:
@@ -58,4 +58,4 @@ before_script:
 
 
 script:
-   travis_wait ./vendor/bin/phpunit
+   - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
