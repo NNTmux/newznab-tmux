@@ -1,4 +1,5 @@
 2018-02-26 DariusIII
+	* Chg: Update composer add requirement for -intl php extension
 	* Chg: Update .travis.yml config
 	* Chg: Update phpunit to version 7.0.2
 	* Chg: Update imdbphp/imdbphp and add htmlpurifier

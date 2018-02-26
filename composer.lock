@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "a19ba13a302fc3ddfc1f17b32ae2390b",
+    "content-hash": "f0d71fd4f05161390219a996d39dce8b",
     "packages": [
         {
             "name": "adrenth/thetvdb2",
@@ -8350,6 +8350,7 @@
         "ext-gd": "*",
         "ext-hash": "*",
         "ext-iconv": "*",
+        "ext-intl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-mysqlnd": "*",
