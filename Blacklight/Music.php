@@ -652,7 +652,7 @@ class Music
             }
         }
 
-                return false;
+        return false;
     }
 
     /**
