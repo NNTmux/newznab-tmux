@@ -400,7 +400,6 @@ class Console
                 $con['substr'] = $gameInfo['title'];
             }
 
-
             if ($this->_matchConToGameInfo($gameInfo, $con) === true) {
                 $con += $this->_setConAfterMatch($amaz);
                 $con += $this->_matchGenre($amaz);
@@ -806,7 +805,6 @@ class Console
 
                 return $response;
             }
-
         }
 
         ColorCLI::doEcho(ColorCLI::info('Could not find match on Amazon'), true);
