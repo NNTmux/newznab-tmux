@@ -11,4 +11,9 @@
     <testsuite name="Installation Test">
         <directory suffix="Test.php">./tests/Install</directory>
     </testsuite>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./Blacklight</directory>
+        </whitelist>
+    </filter>
 </phpunit>

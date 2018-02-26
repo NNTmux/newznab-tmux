@@ -24,6 +24,5 @@ class DatabaseSeeder extends Seeder
         $this->call(MenuTableSeeder::class);
         $this->call(ReleaseNamingRegexesTableSeeder::class);
         $this->call(SettingsTableSeeder::class);
-        $this->call(TmuxTableSeeder::class);
     }
 }
