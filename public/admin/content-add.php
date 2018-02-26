@@ -6,7 +6,7 @@ use App\Models\User;
 use Blacklight\Contents;
 
 $page = new AdminPage();
-$contents = new Contents(['Settings' => $page->pdo]);
+$contents = new Contents();
 $id = 0;
 
 // Set the current action.

@@ -3,7 +3,7 @@
 use App\Models\User;
 use Blacklight\Contents;
 
-$contents = new Contents(['Settings' => $page->settings]);
+$contents = new Contents();
 
 $role = 0;
 if (! empty($page->userdata) && User::isLoggedIn()) {

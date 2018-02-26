@@ -5,7 +5,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use Blacklight\Contents;
 
 $page = new AdminPage();
-$contents = new Contents(['Settings' => $page->pdo]);
+$contents = new Contents();
 $contentlist = $contents->getAll();
 $page->smarty->assign('contentlist', $contentlist);
 

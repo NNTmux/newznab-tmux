@@ -3,7 +3,6 @@
 namespace Blacklight;
 
 use App\Models\User;
-use Blacklight\db\DB;
 use App\Models\Content;
 
 class Contents
@@ -13,22 +12,10 @@ class Contents
     public const TYPEINDEX = 3;
 
     /**
-     * @var \Blacklight\db\DB
+     * Contents constructor.
      */
-    public $pdo;
-
-    /**
-     * @param array $options Class instances.
-     * @throws \Exception
-     */
-    public function __construct(array $options = [])
+    public function __construct()
     {
-        $defaults = [
-            'Settings' => null,
-        ];
-        $options += $defaults;
-
-        $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
     }
 
     /**
@@ -328,17 +315,16 @@ class Contents
      * @param $id
      * @param $role
      *
-     * @return array|bool
+     * @return array
      */
     public function data_getByID($id, $role)
     {
-        if ($role === User::ROLE_ADMIN) {
-            $role = '';
-        } else {
-            $role = sprintf('AND (role = %d OR role = 0)', $role);
+        $query = Content::query()->where('id', $id);
+        if ($role !== User::ROLE_ADMIN) {
+            $query->where('role', $role)->orWhere('role', '=', 0);
         }
 
-        return $this->pdo->queryOneRow(sprintf('SELECT * FROM content WHERE id = %d %s', $id, $role));
+        return $query->get()->toArray();
     }
 
     /**
@@ -379,12 +365,12 @@ class Contents
      */
     public function data_getForMenuByTypeAndRole($id, $role): array
     {
-        if ($role === User::ROLE_ADMIN) {
-            $role = '';
-        } else {
-            $role = sprintf('AND (role = %d OR role = 0)', $role);
+        $query = Content::query()->where('showinmenu', '=', 1)->where('contenttype', $id)->where('status', '=', 1);
+        if ($role !== User::ROLE_ADMIN) {
+            $query->where('role', $role)->orWhere('role', '=', 0);
         }
 
-        return $this->pdo->query(sprintf('SELECT * FROM content WHERE showinmenu = 1 AND status = 1 AND contenttype = %d %s ', $id, $role));
+        return $query->get()->toArray();
+
     }
 }

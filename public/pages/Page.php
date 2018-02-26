@@ -35,7 +35,7 @@ class Page extends BasePage
             $role = $this->userdata['user_roles_id'];
         }
 
-        $content = new Contents(['Settings' => $this->settings]);
+        $content = new Contents();
         $this->smarty->assign('menulist', Menu::getMenu($role, $this->serverurl));
         $this->smarty->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
         $this->smarty->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
