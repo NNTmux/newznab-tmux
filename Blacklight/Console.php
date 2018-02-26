@@ -26,6 +26,8 @@ class Console
     public const CONS_UPROC = 0; // Release has not been processed.
     public const CONS_NTFND = -2;
 
+    protected const MATCH_PERCENT = 60;
+
     /**
      * @var \Blacklight\db\DB
      */
@@ -398,12 +400,13 @@ class Console
                 $con['substr'] = $gameInfo['title'];
             }
 
+
             if ($this->_matchConToGameInfo($gameInfo, $con) === true) {
                 $con += $this->_setConAfterMatch($amaz);
                 $con += $this->_matchGenre($amaz);
 
                 // Set covers properties
-                $con['coverurl'] = (string) $amaz->Items->Item->LargeImage->URL;
+                $con['coverurl'] = (string) $amaz->LargeImage->URL;
 
                 if ($con['coverurl'] !== '') {
                     $con['cover'] = 1;
@@ -467,7 +470,8 @@ class Console
         }
 
         // Platform must equal 100%.
-        if ($platformpercent === 100 && $titlepercent >= 70) {
+
+        if ((int) $platformpercent === 100 && (int) $titlepercent >= 70) {
             $matched = true;
         }
 
@@ -482,7 +486,7 @@ class Console
     protected function _setConBeforeMatch($amaz, $gameInfo): array
     {
         $con = [];
-        $con['platform'] = (string) $amaz->Items->Item->ItemAttributes->Platform;
+        $con['platform'] = (string) $amaz->ItemAttributes->Platform;
         if (empty($con['platform'])) {
             $con['platform'] = $gameInfo['platform'];
         }
@@ -491,7 +495,7 @@ class Console
             $con['platform'] = 'SNES';
         }
 
-        $con['title'] = (string) $amaz->Items->Item->ItemAttributes->Title;
+        $con['title'] = (string) $amaz->ItemAttributes->Title;
         if (empty($con['title'])) {
             $con['title'] = $gameInfo['title'];
         }
@@ -510,19 +514,19 @@ class Console
     protected function _setConAfterMatch($amaz): array
     {
         $con = [];
-        $con['asin'] = (string) $amaz->Items->Item->ASIN;
+        $con['asin'] = (string) $amaz->ASIN;
 
-        $con['url'] = (string) $amaz->Items->Item->DetailPageURL;
+        $con['url'] = (string) $amaz->DetailPageURL;
         $con['url'] = str_replace('%26tag%3Dws', '%26tag%3Dopensourceins%2D21', $con['url']);
 
-        $con['salesrank'] = (string) $amaz->Items->Item->SalesRank;
+        $con['salesrank'] = (string) $amaz->SalesRank;
         if ($con['salesrank'] === '') {
             $con['salesrank'] = 'null';
         }
 
-        $con['publisher'] = (string) $amaz->Items->Item->ItemAttributes->Publisher;
-        $con['esrb'] = (string) $amaz->Items->Item->ItemAttributes->ESRBAgeRating;
-        $con['releasedate'] = (string) $amaz->Items->Item->ItemAttributes->ReleaseDate;
+        $con['publisher'] = (string) $amaz->ItemAttributes->Publisher;
+        $con['esrb'] = (string) $amaz->ItemAttributes->ESRBAgeRating;
+        $con['releasedate'] = (string) $amaz->ItemAttributes->ReleaseDate;
 
         if (! isset($con['releasedate'])) {
             $con['releasedate'] = '';
@@ -533,8 +537,8 @@ class Console
         }
 
         $con['review'] = '';
-        if (isset($amaz->Items->Item->EditorialReviews)) {
-            $con['review'] = trim(strip_tags((string) $amaz->Items->Item->EditorialReviews->EditorialReview->Content));
+        if (isset($amaz->EditorialReviews)) {
+            $con['review'] = trim(strip_tags((string) $amaz->EditorialReviews->EditorialReview->Content));
         }
 
         return $con;
@@ -550,10 +554,10 @@ class Console
     {
         $genreName = '';
 
-        if (isset($amaz->Items->Item->BrowseNodes)) {
+        if (isset($amaz->BrowseNodes)) {
             //had issues getting this out of the browsenodes obj
             //workaround is to get the xml and load that into its own obj
-            $amazGenresXml = $amaz->Items->Item->BrowseNodes->asXml();
+            $amazGenresXml = $amaz->BrowseNodes->asXml();
             $amazGenresObj = simplexml_load_string($amazGenresXml);
             $amazGenres = $amazGenresObj->xpath('//Name');
 
@@ -569,8 +573,8 @@ class Console
             }
         }
 
-        if ($genreName === '' && isset($amaz->Items->Item->ItemAttributes->Genre)) {
-            $a = (string) $amaz->Items->Item->ItemAttributes->Genre;
+        if ($genreName === '' && isset($amaz->ItemAttributes->Genre)) {
+            $a = (string) $amaz->ItemAttributes->Genre;
             $b = str_replace('-', ' ', $a);
             $tmpGenre = explode(' ', $b);
 
@@ -789,16 +793,20 @@ class Console
         $apaiIo = new ApaiIO($conf);
 
         ColorCLI::doEcho(ColorCLI::info('Trying to find info on Amazon'), true);
-        $response = $apaiIo->runOperation($search);
+        $responses = $apaiIo->runOperation($search);
 
-        if ($response === false) {
+        if ($responses === false) {
             throw new \RuntimeException('Could not connect to Amazon');
         }
 
-        if (isset($response->Items->Item->ItemAttributes->Title)) {
-            ColorCLI::doEcho(ColorCLI::info('Found matching info on Amazon: '.$response->Items->Item->ItemAttributes->Title), true);
+        foreach ($responses->Items->Item as $response) {
+            similar_text($title, $response->ItemAttributes->Title, $percent);
+            if ($percent > self::MATCH_PERCENT && isset($response->ItemAttributes->Title)) {
+                ColorCLI::doEcho(ColorCLI::info('Found matching info on Amazon: '.$response->ItemAttributes->Title), true);
 
-            return $response;
+                return $response;
+            }
+
         }
 
         ColorCLI::doEcho(ColorCLI::info('Could not find match on Amazon'), true);
