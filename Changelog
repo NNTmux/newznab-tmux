@@ -1,4 +1,5 @@
 2018-02-26 DariusIII
+	* Fix: Fix Music postprocessing
 	* Fix: Fix Console games processing
 	* Chg: Update phpunit.xml and remove TmuxTableSeeder from DatabaseSeeder class
 	* Chg: Update composer add requirement for -intl php extension
