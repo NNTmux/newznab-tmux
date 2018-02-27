@@ -68,7 +68,7 @@ $page->smarty->assign([
 	]
 );
 
-if (isset($_GET['type']) && $_GET['type'] == 'xml') {
+if ($page->request->has('type') && $page->request->input('type') === 'xml') {
     echo $page->smarty->fetch('sitemap-xml.tpl');
 } else {
     $page->title = Settings::settingValue('site.main.title').' site map';

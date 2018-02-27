@@ -21,10 +21,10 @@ $page->smarty->assign('donation', $donation);
 
 switch ($action) {
     case 'submit':
-        $price = $_POST['price'];
-        $role = $_POST['role'];
-        $roleName = $_POST['rolename'];
-        $addYears = $_POST['addyears'];
+        $price = $page->request->input('price');
+        $role = $page->request->input('role');
+        $roleName = $page->request->input('rolename');
+        $addYears = $page->request->input('addyears');
         $data = ['user_id' => $userId, 'username' => $user->username, 'price' => $price, 'role' => $role, 'rolename' => $roleName, 'addyears' => $addYears];
         $keychain_id = random_int(0, 19);
         $callback_data = json_encode($data);

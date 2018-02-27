@@ -17,7 +17,7 @@ foreach ($moviecats as $mcat) {
     $mtmp[$mcat['id']] = $mcat;
 }
 
-$category = (isset($_GET['imdb']) ? -1 : Category::MOVIE_ROOT);
+$category = $page->request->has('imdb') ? -1 : Category::MOVIE_ROOT;
 if ($page->request->has('t') && array_key_exists($page->request->input('t'), $mtmp)) {
     $category = $page->request->input('t') + 0;
 }
@@ -108,7 +108,7 @@ $page->meta_title = 'Browse Nzbs';
 $page->meta_keywords = 'browse,nzb,description,details';
 $page->meta_description = 'Browse for Nzbs';
 
-if (isset($_GET['imdb'])) {
+if ($page->request->has('imdb')) {
     $page->content = $page->smarty->fetch('viewmoviefull.tpl');
 } else {
     $page->content = $page->smarty->fetch('movies.tpl');

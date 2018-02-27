@@ -11,7 +11,7 @@ $rss = new RSS(['Settings' => $page->settings]);
 $offset = 0;
 
 // If no content id provided then show user the rss selection page.
-if (! $page->request->has('t') && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
+if (! $page->request->has('t') && ! $page->request->has('show') && ! $page->request->has('anidb')) {
     // User has to either be logged in, or using rsskey.
     if (! User::isLoggedIn()) {
         header('Location: '.Settings::settingValue('site.main.code'));
@@ -82,22 +82,22 @@ if (! $page->request->has('t') && ! isset($_GET['show']) && ! isset($_GET['anidb
 
     // Valid or logged in user, get them the requested feed.
     $userShow = $userAnidb = -1;
-    if (isset($_GET['show'])) {
-        $userShow = ((int) $_GET['show'] === 0 ? -1 : $_GET['show'] + 0);
-    } elseif (isset($_GET['anidb'])) {
-        $userAnidb = ((int) $_GET['anidb'] === 0 ? -1 : $_GET['anidb'] + 0);
+    if ($page->request->has('show')) {
+        $userShow = ((int) $page->request->input('show') === 0 ? -1 : $page->request->input('show') + 0);
+    } elseif ($page->request->has('anidb')) {
+        $userAnidb = ((int) $page->request->input('anidb') === 0 ? -1 : $page->request->input('snidb') + 0);
     }
 
-    $outputXML = (! (isset($_GET['o']) && $_GET['o'] === 'json'));
+    $outputXML = (! ($page->request->has('o') && $page->request->input('o') === 'json'));
 
-    $userCat = ($page->request->has('t') ? ((int) $_GET['t'] === 0 ? -1 : $_GET['t']) : -1);
-    $userNum = (isset($_GET['num']) && is_numeric($_GET['num']) ? abs($_GET['num']) : 100);
-    $userAirDate = (isset($_GET['airdate']) && is_numeric($_GET['airdate']) ? abs($_GET['airdate']) : -1);
+    $userCat = ($page->request->has('t') ? ((int) $page->request->input('t') === 0 ? -1 : $page->request->input('t')) : -1);
+    $userNum = ($page->request->has('num') && is_numeric($page->request->input('num')) ? abs($page->request->input('num')) : 100);
+    $userAirDate = $page->request->has('airdate') && is_numeric($page->request->input('airdate')) ? abs($page->request->input('airdate')) : -1;
 
     $params =
         [
-            'dl'       => isset($_GET['dl']) && $_GET['dl'] === '1' ? '1' : '0',
-            'del'      => isset($_GET['del']) && $_GET['del'] === '1' ? '1' : '0',
+            'dl'       => $page->request->has('dl') && $page->request->input('dl') === '1' ? '1' : '0',
+            'del'      => $page->request->has('del') && $page->request->input('del') === '1' ? '1' : '0',
             'extended' => 1,
             'uid'      => $uid,
             'token'    => $rssToken,

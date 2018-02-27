@@ -28,7 +28,7 @@ if ($page->request->has('id')) {
     $page->meta_description = 'View Nfo File';
 
     $modal = false;
-    if (isset($_GET['modal'])) {
+    if ($page->request->has('modal')) {
         $modal = true;
         $page->smarty->assign('modal', true);
     }

@@ -1,4 +1,5 @@
 2018-02-27 DariusIII
+	* Chg: Update pages for laravel request usage
 	* Fix: Fix isset usage on $request
 	* Chg: Move more pages to Request usage
 	* Chg: Start moving to use Illuminate\Http\Request in pages

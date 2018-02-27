@@ -23,7 +23,7 @@ $publicView = false;
 
 if ($privileged || ! $privateProfiles) {
     $altID = ($page->request->has('id') && (int) $page->request->input('id') >= 0) ? (int) $page->request->input('id') : false;
-    $altUsername = (isset($_GET['name']) && strlen($_GET['name']) > 0) ? $_GET['name'] : false;
+    $altUsername = ($page->request->has('name') && strlen($page->request->input('name')) > 0) ? $page->request->input('name') : false;
 
     // If both 'id' and 'name' are specified, 'id' should take precedence.
     if ($altID === false && $altUsername !== false) {

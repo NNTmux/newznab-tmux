@@ -38,7 +38,7 @@ if ($page->request->has('id')) {
     }
 
     if ($page->isPostBack()) {
-        ReleaseComment::addComment($data['id'], $data['gid'], $_POST['txtAddComment'], User::currentUserId(), $_SERVER['REMOTE_ADDR']);
+        ReleaseComment::addComment($data['id'], $data['gid'], $page->request->input('txtAddComment'), User::currentUserId(), $_SERVER['REMOTE_ADDR']);
     }
 
     $nfo = ReleaseNfo::getReleaseNfo($data['id']);

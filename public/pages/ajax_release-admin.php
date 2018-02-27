@@ -28,18 +28,18 @@ switch ($action) {
         $success = false;
         if ($action === 'doedit') {
             $success = $releases->updateMulti(
-                $_POST['id'],
-                $_POST['category'],
-                $_POST['grabs'],
-                $_POST['videosid'],
-                $_POST['episodesid'],
-                $_POST['anidbid'],
-                $_POST['imdbid']
+                $page->request->input('id'),
+                $page->request->input('category'),
+                $page->request->input('grabs'),
+                $page->request->input('videosid'),
+                $page->request->input('episodesid'),
+                $page->request->input('anidbid'),
+                $page->request->input('imdbid')
             );
         }
         $page->smarty->assign('release', $rel);
         $page->smarty->assign('success', $success);
-        $page->smarty->assign('from', $_POST['from'] ?? '');
+        $page->smarty->assign('from', $page->request->input('from') ?? '');
         $page->smarty->assign('catlist', Category::getForSelect(false));
         $page->content = $page->smarty->fetch('ajax_release-edit.tpl');
         echo $page->content;

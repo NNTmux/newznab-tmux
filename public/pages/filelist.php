@@ -40,7 +40,7 @@ if ($page->request->has('id')) {
     $page->meta_description = 'View Nzb File List';
 
     $modal = false;
-    if (isset($_GET['modal'])) {
+    if ($page->request->has('modal')) {
         $modal = true;
         $page->smarty->assign('modal', true);
     }

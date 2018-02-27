@@ -10,10 +10,10 @@ $page->smarty->assign(['error' => '', 'username' => '', 'rememberme' => '']);
 $captcha = new Captcha($page);
 
 if (! User::isLoggedIn()) {
-    if (! isset($_POST['username'], $_POST['password'])) {
+    if (! $page->request->has('username') && ! $page->request->has('password')) {
         $page->smarty->assign('error', 'Please enter your username and password.');
     } elseif ($captcha->getError() === false) {
-        $username = htmlspecialchars($_POST['username'], ENT_QUOTES | ENT_HTML5);
+        $username = htmlspecialchars($page->request->input('username'), ENT_QUOTES | ENT_HTML5);
         $page->smarty->assign('username', $username);
         if (Utility::checkCsrfToken() === true) {
             $res = User::getByUsername($username);
@@ -25,12 +25,12 @@ if (! User::isLoggedIn()) {
                 $dis = User::isDisabled($username);
                 if ($dis) {
                     $page->smarty->assign('error', 'Your account has been disabled.');
-                } elseif (User::checkPassword($_POST['password'], $res['password'], $res['id'])) {
-                    $rememberMe = (isset($_POST['rememberme']) && $_POST['rememberme'] === 'on');
+                } elseif (User::checkPassword($page->request->input('password'), $res['password'], $res['id'])) {
+                    $rememberMe = ($page->request->has('rememberme') && $page->request->input('rememberme') === 'on');
                     User::login($res['id'], $_SERVER['REMOTE_ADDR'], $rememberMe);
 
-                    if (isset($_POST['redirect']) && $_POST['redirect'] !== '') {
-                        header('Location: '.$_POST['redirect']);
+                    if ($page->request->has('redirect') && $page->request->input('redirect') !== '') {
+                        header('Location: '.$page->request->input('redirect'));
                     } else {
                         header('Location: '.WWW_TOP.Settings::settingValue('site.main.home_link'));
                     }
@@ -49,7 +49,7 @@ if (! User::isLoggedIn()) {
     header('Location: '.WWW_TOP.Settings::settingValue('site.main.home_link'));
 }
 
-$page->smarty->assign('redirect', $_GET['redirect'] ?? '');
+$page->smarty->assign('redirect', $page->request->input('redirect') ?? '');
 $page->smarty->assign('csrf_token', $page->token);
 $page->meta_title = 'Login';
 $page->meta_keywords = 'Login';

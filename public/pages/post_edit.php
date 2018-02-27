@@ -8,9 +8,9 @@ if (! User::isLoggedIn()) {
 }
 $id = $page->request->input('id') + 0;
 
-if (isset($id) && ! empty($_POST['addMessage'])) {
+if (isset($id) && ! empty($page->request->input('addMessage'))) {
     $parent = Forumpost::getPost($id);
-    Forumpost::editPost($id, $_POST['addMessage'], User::currentUserId());
+    Forumpost::editPost($id, $page->request->input('addMessage'), User::currentUserId());
     if ((int) $parent['parentid'] !== 0) {
         header('Location:'.WWW_TOP.'/forumpost/'.$parent['parentid'].'#last');
     } else {

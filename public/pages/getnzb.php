@@ -39,7 +39,7 @@ if (User::isLoggedIn()) {
 
 // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
 if ($page->request->has('id')) {
-    $page->request->merge([str_ireplace('.nzb', '', $page->request->input('id'))]);
+    $page->request->merge(['id' => str_ireplace('.nzb', '', $page->request->input('id'))]);
 }
 //
 // A hash of the users ip to record against the download
@@ -60,7 +60,7 @@ if (! $page->request->has('id')) {
 }
 
 // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
-$page->request->merge([str_ireplace('.nzb', '', $page->request->input('id'))]);
+$page->request->merge(['id' => str_ireplace('.nzb', '', $page->request->input('id'))]);
 
 $rel = new Releases(['Settings' => $page->settings]);
 // User requested a zip of guid,guid,guid releases.

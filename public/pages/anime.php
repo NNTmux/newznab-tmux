@@ -59,9 +59,7 @@ if ($page->request->has('id') && ctype_digit($page->request->input('id'))) {
         $page->request->input('id') :
         '0-9';
 
-    $animeTitle = (isset($_GET['title']) && ! empty($_GET['title'])) ?
-        $_GET['title'] :
-        '';
+    $animeTitle = ($page->request->has('title') && ! empty($page->request->input('title'))) ? $page->request->input('title') : '';
 
     if ($animeTitle !== '' && ! $page->request->has('id')) {
         $letter = '';

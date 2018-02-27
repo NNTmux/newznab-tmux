@@ -17,8 +17,9 @@ if ($page->request->has('useremail')) {
         $email = $page->request->input('useremail');
         $mailTo = Settings::settingValue('site.main.email');
         $mailBody = "Values submitted from contact form:\n";
+        $request = $page->request->all();
 
-        foreach ($_POST as $key => $value) {
+        foreach ($request as $key => $value) {
             if ($key !== 'submit') {
                 $mailBody .= "$key : $value<br />\r\n";
             }

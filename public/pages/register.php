@@ -36,12 +36,12 @@ if ($showRegister === 1) {
         case 'submit':
             if ($captcha->getError() === false) {
                 if (Utility::checkCsrfToken() === true) {
-                    $userName = $_POST['username'];
-                    $password = $_POST['password'];
-                    $confirmPassword = $_POST['confirmpassword'];
-                    $email = $_POST['email'];
-                    if (! empty($_REQUEST['invitecode'])) {
-                        $inviteCode = $_REQUEST['invitecode'];
+                    $userName = $page->request->input('username');
+                    $password = $page->request->input('password');
+                    $confirmPassword = $page->request->input('confirmpassword');
+                    $email = $page->request->input('email');
+                    if (! empty($page->request->input('invitecode'))) {
+                        $inviteCode = $page->request->input('invitecode');
                     }
 
                     // Check uname/email isn't in use, password valid. If all good create new user account and redirect back to home page.
@@ -97,7 +97,7 @@ if ($showRegister === 1) {
             }
             break;
         case 'view': {
-            $inviteCode = $_GET['invitecode'] ?? null;
+            $inviteCode = $page->request->input('invitecode') ?? null;
             if (isset($inviteCode)) {
                 // See if it is a valid invite.
                 $invite = Invitation::getInvite($inviteCode);

@@ -24,7 +24,7 @@ if ($page->request->has('id') && ctype_digit($page->request->input('id'))) {
     $page->smarty->registerPlugin('modifier', 'ss', 'stripslashes');
 
     $modal = false;
-    if (isset($_GET['modal'])) {
+    if ($page->request->has('modal')) {
         $modal = true;
         $page->smarty->assign('modal', true);
     }

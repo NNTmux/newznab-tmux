@@ -36,65 +36,64 @@ switch ($action) {
         break;
     case 'submit':
 
-        $data['email'] = $_POST['email'];
-        if (isset($_POST['saburl']) && ! ends_with($_POST['saburl'], '/') && strlen(trim($_POST['saburl'])) > 0) {
-            $_POST['saburl'] .= '/';
+        $data['email'] = $page->request->input('email');
+        if ($page->request->has('saburl') && ! ends_with($page->request->input('saburl'), '/') && strlen(trim($page->request->input('saburl'))) > 0) {
+            $page->request->merge(['saburl' => $page->request->input('saburl') . '/']);
         }
 
-        if ($_POST['password'] !== '' && $_POST['password'] !== $_POST['confirmpassword']) {
+        if ($page->request->input('password') !== '' && $page->request->input('password') !== $page->request->input('confirmpassword')) {
             $errorStr = 'Password Mismatch';
-        } elseif ($_POST['password'] !== '' && ! User::isValidPassword($_POST['password'])) {
+        } elseif ($page->request->input('password') !== '' && ! User::isValidPassword($page->request->input('password'))) {
             $errorStr = 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
-        } elseif (! empty($_POST['nzbgeturl']) && $nzbGet->verifyURL($_POST['nzbgeturl']) === false) {
+        } elseif (! empty($page->request->input('nzbgeturl')) && $nzbGet->verifyURL($page->request->input('nzbgeturl')) === false) {
             $errorStr = 'The NZBGet URL you entered is invalid!';
-        } elseif (! User::isValidEmail($_POST['email'])) {
+        } elseif (! User::isValidEmail($page->request->input('email'))) {
             $errorStr = 'Your email is not a valid format.';
         } else {
-            $res = User::getByEmail($_POST['email']);
+            $res = User::getByEmail($page->request->input('email'));
             if ($res && (int) $res['id'] !== (int) $userid) {
                 $errorStr = 'Sorry, the email is already in use.';
-            } elseif ((empty($_POST['saburl']) && ! empty($_POST['sabapikey'])) || (! empty($_POST['saburl']) && empty($_POST['sabapikey']))) {
+            } elseif ((empty($page->request->input('saburl')) && ! empty($page->request->input('sabapikey'))) || (! empty($page->request->input('saburl')) && empty($page->request->input('sabapikey')))) {
                 $errorStr = 'Insert a SABnzdb URL and API key.';
             } else {
-                if (isset($_POST['sabsetting']) && $_POST['sabsetting'] == 2) {
-                    $sab->setCookie($_POST['saburl'], $_POST['sabapikey'], $_POST['sabpriority'], $_POST['sabapikeytype']);
-                    $_POST['saburl'] = $_POST['sabapikey'] = $_POST['sabpriority'] = $_POST['sabapikeytype'] = false;
+                if ($page->request->has('sasetting') && $page->request->input('sabsetting') === 2) {
+                    $sab->setCookie($page->request->input('saburl'), $page->request->input('sabapikey'), $page->request->input('sabpriority'), $page->request->input('sabapikeytype'));
                 }
 
                 User::updateUser(
                     $userid,
                     $data['username'],
-                    $_POST['email'],
+                    $page->request->input('email'),
                     $data['grabs'],
                     $data['user_roles_id'],
                     $data['notes'],
                     $data['invites'],
-                    (isset($_POST['movieview']) ? 1 : 0),
-                    (isset($_POST['musicview']) ? 1 : 0),
-                    (isset($_POST['gameview']) ? 1 : 0),
-                    (isset($_POST['xxxview']) ? 1 : 0),
-                    (isset($_POST['consoleview']) ? 1 : 0),
-                    (isset($_POST['bookview']) ? 1 : 0),
-                    $_POST['queuetypeids'],
-                    $_POST['nzbgeturl'] ?? '',
-                    $_POST['nzbgetusername'] ?? '',
-                    $_POST['nzbgetpassword'] ?? '',
-                    (isset($_POST['saburl']) ? Utility::trailingSlash($_POST['saburl']) : ''),
-                    $_POST['sabapikey'] ?? '',
-                    $_POST['sabpriority'] ?? '',
-                    $_POST['sabapikeytype'] ?? '',
-                    $_POST['nzbvortex_server_url'] ?? '',
-                    $_POST['nzbvortex_api_key'] ?? '',
-                    $_POST['cp_url'] ?? '',
-                    $_POST['cp_api'] ?? '',
-                    (int) Settings::settingValue('site.main.userselstyle') === 1 ? $_POST['style'] : 'None'
+                    $page->request->has('movieview') ? 1 : 0,
+                    $page->request->has('musicview') ? 1 : 0,
+                    $page->request->has('gameview') ? 1 : 0,
+                    $page->request->has('xxxview') ? 1 : 0,
+                    $page->request->has('consoleview') ? 1 : 0,
+                    $page->request->has('bookview') ? 1 : 0,
+                    $page->request->input('queuetypeids'),
+                    $page->request->input('nzbgeturl') ?? '',
+                    $page->request->input('nzbgetusername') ?? '',
+                    $page->request->input('nzbgetpassword') ?? '',
+                    $page->request->has('saburl') ? Utility::trailingSlash($page->request->input('saburl')) : '',
+                    $page->request->input('sabapikey') ?? '',
+                    $page->request->input('sabpriority') ?? '',
+                    $page->request->input('sabapikeytype') ?? '',
+                    $page->request->input('nzbvortex_server_url') ?? '',
+                    $page->request->input('nzbvortex_api_key') ?? '',
+                    $page->request->input('cp_url') ?? '',
+                    $page->request->input('cp_api') ?? '',
+                    (int) Settings::settingValue('site.main.userselstyle') === 1 ? $page->request->input('style') : 'None'
                 );
 
-                $_POST['exccat'] = (! isset($_POST['exccat']) || ! is_array($_POST['exccat'])) ? [] : $_POST['exccat'];
-                UserExcludedCategory::addCategoryExclusions($userid, $_POST['exccat']);
+                $page->request->merge(['exccat' => (! $page->request->has('exccat') || ! is_array($page->request->input('exccat'))) ? [] : $page->request->input('exccat')]);
+                UserExcludedCategory::addCategoryExclusions($userid, $page->request->input('exccat'));
 
-                if ($_POST['password'] !== '') {
-                    User::updatePassword($userid, $_POST['password']);
+                if ($page->request->input('password') !== '') {
+                    User::updatePassword($userid, $page->request->input('password'));
                 }
 
                 header('Location:'.WWW_TOP.'/profile');

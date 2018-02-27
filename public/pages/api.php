@@ -11,7 +11,7 @@ use Blacklight\utility\Utility;
 // API functions.
 $function = 's';
 if ($page->request->has('t')) {
-    switch ($_GET['t']) {
+    switch ($page->request->input('t')) {
         case 'd':
         case 'details':
             $function = 'd';

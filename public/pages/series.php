@@ -20,7 +20,7 @@ if ($page->request->has('id') && ctype_digit($page->request->input('id'))) {
     $catarray = [];
     $catarray[] = $category;
 
-    $rel = $releases->tvSearch(['id' => $_GET['id']], '', '', '', 0, 1000, '', $catarray, -1);
+    $rel = $releases->tvSearch(['id' => $page->request->input('id')], '', '', '', 0, 1000, '', $catarray, -1);
     $show = Video::getByVideoID($page->request->input('id'));
 
     if (! $show) {
@@ -83,7 +83,7 @@ if ($page->request->has('id') && ctype_digit($page->request->input('id'))) {
 } else {
     $letter = ($page->request->has('id') && preg_match('/^(0\-9|[A-Z])$/i', $page->request->input('id'))) ? $page->request->input('id') : '0-9';
 
-    $showname = (isset($_GET['title']) && ! empty($_GET['title'])) ? $_GET['title'] : '';
+    $showname = ($page->request->has('title') && ! empty($page->request->input('title'))) ? $page->request->input('title') : '';
 
     if ($showname !== '' && ! $page->request->has('id')) {
         $letter = '';
