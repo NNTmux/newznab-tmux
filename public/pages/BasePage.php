@@ -6,8 +6,8 @@ use App\Models\User;
 use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
-use App\Models\RoleExcludedCategory;
 use Illuminate\Http\Request;
+use App\Models\RoleExcludedCategory;
 
 class BasePage
 {
