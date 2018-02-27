@@ -33,8 +33,6 @@
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
 	<!-- Custom styling plus plugins -->
-	<!-- Newposterwall -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/custom.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/flat/green.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/qtip2-main/dist/jquery.qtip.min.css" type="text/css"
@@ -54,7 +52,7 @@
 		<div class="col-md-3 left_col">
 			<div class="left_col scroll-view">
 				<div class="navbar nav_title" style="border: 0;">
-					<a href="{$site->home_link}" class="site_title"><i class="fa fa-superpowers"></i>
+					<a href="{$site->home_link}" class="site_title"><i class="fab fa-phoenix-framework"></i>
 						<span>{$site->title}</span></a>
 				</div>
 				<div class="clearfix"></div>

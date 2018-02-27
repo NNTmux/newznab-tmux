@@ -32,8 +32,6 @@
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
 	<!-- Custom styling plus plugins -->
-	<!-- Newposterwall -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/css/posterwall.css" rel="stylesheet" type="text/css" media="screen"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/custom.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/flat/green.css" rel="stylesheet">
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->

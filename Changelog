@@ -1,4 +1,5 @@
 2018-02-27 DariusIII
+	* Chg: Remove references to newposterwall
 	* Fix: Fix date parsing for game releases
 	* Chg: Update font-awesome to version 5.0.7
 2018-02-26 DariusIII
