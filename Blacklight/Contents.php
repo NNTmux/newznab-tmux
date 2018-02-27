@@ -192,7 +192,6 @@ class Contents
      */
     public function update($form)
     {
-
         $this->data_update($form);
 
         return $form;
