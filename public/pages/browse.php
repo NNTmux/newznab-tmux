@@ -11,13 +11,13 @@ if (! User::isLoggedIn()) {
 }
 
 $category = -1;
-if (isset($page->request->input('t'))) {
+if ($page->request->has('t')) {
     $category = $page->request->input('t');
 }
 
 $grp = -1;
-if (isset($_REQUEST['g'])) {
-    $grp = is_numeric($_REQUEST['g']) ? -1 : $_REQUEST['g'];
+if ($page->request->has('g')) {
+    $grp = is_numeric($page->request->input('g')) ? -1 : $page->request->input('g');
 }
 
 $catarray = [];
