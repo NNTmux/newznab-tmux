@@ -1,3 +1,5 @@
+2018-02-27 DariusIII
+	* Chg: Update font-awesome to version 5.0.7
 2018-02-26 DariusIII
 	* Chg: Manage single and double quotes in htmlspecialchars on login page
 	* Chg: Update Contents class, use Content model in remaining functions
