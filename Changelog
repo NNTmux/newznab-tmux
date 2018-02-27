@@ -1,4 +1,5 @@
 2018-02-27 DariusIII
+	* Fix: Fix content manipulation in admin area
 	* Chg: Update updating procedure, it will automatically stop tmux, kill tmux session, bring site down to maintenance mode, update and bring site up and start tmux, if it was running
 	* Chg: Update details page, possible fix for bad trailer link
 	* Chg: Revert to insertGetId function usage in Games class
