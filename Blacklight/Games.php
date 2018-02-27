@@ -641,7 +641,7 @@ class Games
         if (\in_array(strtolower($genreName), $genreAssoc, false)) {
             $genreKey = array_search(strtolower($genreName), $genreAssoc, false);
         } else {
-            $genreKey = Genre::create(['title' => $genreName, 'type' => Genres::GAME_TYPE])->id;
+            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::GAME_TYPE]);
         }
 
         $game['gamesgenre'] = $genreName;
