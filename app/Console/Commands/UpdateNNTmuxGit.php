@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Extensions\util\Git;
+use Blacklight\Tmux;
 use Illuminate\Console\Command;
 
 class UpdateNNTmuxGit extends Command
@@ -35,15 +36,10 @@ class UpdateNNTmuxGit extends Command
     }
 
     /**
-     * Execute the console command.
-     *
-     * @return mixed
+     * @throws \Exception
      */
     public function handle()
     {
-        /*
-         * TODO Add check to determine if the indexer or other scripts are running. Hopefully also prevent web access.
-        **/
 
         $this->initialiseGit();
         if (! \in_array($this->git->getBranch(), $this->git->getBranchesMain(), false)) {
@@ -52,7 +48,21 @@ class UpdateNNTmuxGit extends Command
             return;
         }
 
+        $wasRunning = false;
+
+        if ((new Tmux())->isRunning() === true) {
+            $wasRunning = true;
+            $this->call('tmux-ui:stop', ['type' => true]);
+        }
+        $this->call('down');
+
         $this->info($this->git->gitPull());
+
+        $this->call('up');
+        if ($wasRunning === true) {
+            $this->call('tmux-ui:start');
+        }
+
     }
 
     protected function initialiseGit()
