@@ -511,9 +511,9 @@ class Games
 
                 if (! empty($this->_gameResults['releasedate'])) {
                     $dateReleased = $this->_gameResults['releasedate'];
-                    $date = Carbon::createFromFormat('M j, Y', $dateReleased);
+                    $date = Carbon::createFromFormat('M j, Y', Carbon::parse($dateReleased)->toFormattedDateString());
                     if ($date instanceof \DateTime) {
-                        $game['releasedate'] = (string) $date->format('Y-m-d');
+                        $game['releasedate'] = $date->format('Y-m-d');
                     }
                 }
 
