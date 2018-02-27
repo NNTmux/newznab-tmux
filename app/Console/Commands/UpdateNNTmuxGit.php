@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Extensions\util\Git;
 use Blacklight\Tmux;
+use App\Extensions\util\Git;
 use Illuminate\Console\Command;
 
 class UpdateNNTmuxGit extends Command
@@ -40,7 +40,6 @@ class UpdateNNTmuxGit extends Command
      */
     public function handle()
     {
-
         $this->initialiseGit();
         if (! \in_array($this->git->getBranch(), $this->git->getBranchesMain(), false)) {
             $this->error('Not on the stable or dev branch! Refusing to update repository');
@@ -62,7 +61,6 @@ class UpdateNNTmuxGit extends Command
         if ($wasRunning === true) {
             $this->call('tmux-ui:start');
         }
-
     }
 
     protected function initialiseGit()
