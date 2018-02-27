@@ -38,7 +38,7 @@ switch ($action) {
 
         $data['email'] = $page->request->input('email');
         if ($page->request->has('saburl') && ! ends_with($page->request->input('saburl'), '/') && strlen(trim($page->request->input('saburl'))) > 0) {
-            $page->request->merge(['saburl' => $page->request->input('saburl') . '/']);
+            $page->request->merge(['saburl' => $page->request->input('saburl').'/']);
         }
 
         if ($page->request->input('password') !== '' && $page->request->input('password') !== $page->request->input('confirmpassword')) {
