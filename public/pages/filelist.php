@@ -12,7 +12,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($page->request->input('id'))) {
+if ($page->request->has('id')) {
     $rel = Release::getByGuid($page->request->input('id'));
     if (! $rel) {
         $page->show404();

@@ -85,7 +85,7 @@ if ($page->request->has('id') && ctype_digit($page->request->input('id'))) {
 
     $showname = (isset($_GET['title']) && ! empty($_GET['title'])) ? $_GET['title'] : '';
 
-    if ($showname !== '' && ! isset($page->request->input('id'))) {
+    if ($showname !== '' && ! $page->request->has('id')) {
         $letter = '';
     }
 

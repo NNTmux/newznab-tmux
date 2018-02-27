@@ -1,4 +1,5 @@
 2018-02-27 DariusIII
+	* Fix: Fix isset usage on $request
 	* Chg: Move more pages to Request usage
 	* Chg: Start moving to use Illuminate\Http\Request in pages
 	* Fix: Fix content manipulation in admin area

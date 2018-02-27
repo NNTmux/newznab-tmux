@@ -47,7 +47,7 @@ if (($page->request->has('id') || isset($_REQUEST['subject'])) && ! isset($_REQU
     }
 
     $categoryID[] = -1;
-    if (isset($page->request->input('t'))) {
+    if ($page->request->has('t')) {
         $categoryID = explode(',', $page->request->input('t'));
     }
     foreach ($releases->getBrowseOrdering() as $orderType) {

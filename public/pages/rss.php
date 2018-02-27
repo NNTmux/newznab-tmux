@@ -54,7 +54,7 @@ if (! $page->request->has('t') && ! isset($_GET['show']) && ! isset($_GET['anidb
         $rssToken = $page->userdata['rsstoken'];
         $maxRequests = $page->userdata->role->apirequests;
     } else {
-        if (! $page->request->has('i') || ! isset($page->request->input('r'))) {
+        if (! $page->request->has('i') || ! $page->request->has('r')) {
             Utility::showApiError(100, 'Both the User ID and API key are required for viewing the RSS!');
         }
 

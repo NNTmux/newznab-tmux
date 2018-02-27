@@ -7,7 +7,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (! isset($page->request->input('id'))) {
+if (! $page->request->has('id')) {
     $page->show404();
 }
 
