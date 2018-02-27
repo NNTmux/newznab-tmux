@@ -5,8 +5,8 @@ use App\Models\UserDownload;
 
 $page = new AdminPage();
 
-$action = $_REQUEST['action'] ?? '';
-$id = $_REQUEST['id'] ?? '';
+$action = $page->request->input('action') ?? '';
+$id = $page->request->input('id') ?? '';
 
 switch ($action) {
     case 'grabs':

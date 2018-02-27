@@ -16,8 +16,8 @@ foreach ($boocats as $bcat) {
     $btmp[$bcat['id']] = $bcat;
 }
 $category = Category::BOOKS_ROOT;
-if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $btmp)) {
-    $category = $_REQUEST['t'] + 0;
+if ($page->request->has('t') && array_key_exists($page->request->input('t'), $btmp)) {
+    $category = $page->request->input('t') + 0;
 }
 
 $catarray = [];
@@ -26,9 +26,9 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $btmp);
 $page->smarty->assign('category', $category);
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
 $ordering = $book->getBookOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
 
 $books = [];
 $results = $book->getBookRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, $page->userdata['categoryexclusions']);
@@ -45,10 +45,10 @@ foreach ($results as $result) {
     $books[] = $result;
 }
 
-$author = (isset($_REQUEST['author']) && ! empty($_REQUEST['author'])) ? stripslashes($_REQUEST['author']) : '';
+$author = ($page->request->has('author') && ! empty($page->request->input('author'))) ? stripslashes($page->request->input('author')) : '';
 $page->smarty->assign('author', $author);
 
-$title = (isset($_REQUEST['title']) && ! empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
+$title = ($page->request->has('title') && ! empty($page->request->input('title'))) ? stripslashes($page->request->input('title')) : '';
 $page->smarty->assign('title', $title);
 
 $browseby_link = '&amp;title='.$title.'&amp;author='.$author;

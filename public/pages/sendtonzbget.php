@@ -7,7 +7,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (empty($_GET['id'])) {
+if (empty($page->request->input('id'))) {
     $page->show404();
 }
 
@@ -25,6 +25,6 @@ if (empty($nzbget->password)) {
     $page->show404();
 }
 
-$guid = $_GET['id'];
+$guid = $page->request->input('id');
 
 $nzbget->sendURLToNZBGet($guid);

@@ -9,8 +9,8 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['id'])) {
-    $rel = Release::getByGuid($_GET['id']);
+if (isset($page->request->input('id'))) {
+    $rel = Release::getByGuid($page->request->input('id'));
 
     if (! $rel) {
         $page->show404();

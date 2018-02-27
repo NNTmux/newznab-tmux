@@ -9,8 +9,8 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
-    $mus = $music->getMusicInfo($_GET['id']);
+if ($page->request->has('id') && ctype_digit($page->request->input('id'))) {
+    $mus = $music->getMusicInfo($page->request->input('id'));
 
     if (! $mus) {
         $page->show404();

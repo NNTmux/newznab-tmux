@@ -9,8 +9,8 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
-    $mov = $movie->getMovieInfo($_GET['id']);
+if ($page->request->has('id') && ctype_digit($page->request->input('id'))) {
+    $mov = $movie->getMovieInfo($page->request->input('id'));
 
     if (! $mov) {
         $page->show404();

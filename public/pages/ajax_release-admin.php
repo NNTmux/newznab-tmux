@@ -8,13 +8,13 @@ $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->settings]);
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? '';
+$action = $page->request->input('action') ?? '';
 
 // Request is for id, but guid is actually being provided
-if (isset($_REQUEST['id']) && is_array($_REQUEST['id'])) {
-    $id = $_REQUEST['id'];
+if ($page->request->has('id') && is_array($page->request->input('id'))) {
+    $id = $page->request->input('id');
     //Get info for first guid to populate form
-    $rel = Release::getByGuid($_REQUEST['id'][0]);
+    $rel = Release::getByGuid($page->request->input('id')[0]);
 } else {
     $id = $rel = '';
 }
@@ -46,7 +46,7 @@ switch ($action) {
 
         break;
     case 'dodelete':
-        $releases->deleteMultiple($_GET['id']);
+        $releases->deleteMultiple($page->request->input('id'));
         break;
     default:
         $page->show404();

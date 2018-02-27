@@ -8,12 +8,12 @@ if (User::isLoggedIn()) {
     $uid = User::currentUserId();
     $rssToken = $page->userdata['rsstoken'];
 } else {
-    if (! isset($_GET['userid']) || ! isset($_GET['rsstoken'])) {
+    if (! $page->request->has('userid') || ! $page->request->has('rsstoken')) {
         header('X-DNZB-RCode: 400');
         header('X-DNZB-RText: Bad request, please supply all parameters!');
         $page->show403();
     } else {
-        $res = User::getByIdAndRssToken($_GET['userid'], $_GET['rsstoken']);
+        $res = User::getByIdAndRssToken($page->request->input('userid'), $page->request->input('rsstoken'));
     }
     if (! isset($res)) {
         header('X-DNZB-RCode: 401');
@@ -25,8 +25,8 @@ if (User::isLoggedIn()) {
     }
 }
 
-if (isset($_GET['guid'], $uid, $rssToken) && is_numeric($uid)) {
-    $alt = Release::getAlternate($_GET['guid'], $uid);
+if (isset($uid, $rssToken) && is_numeric($uid) && $page->request->has('guid')) {
+    $alt = Release::getAlternate($page->request->input('guid'), $uid);
     if ($alt === null) {
         header('X-DNZB-RCode: 404');
         header('X-DNZB-RText: No NZB found for alternate match.');

@@ -12,13 +12,13 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['id'])) {
-    $rel = Release::getByGuid($_GET['id']);
+if (isset($page->request->input('id'))) {
+    $rel = Release::getByGuid($page->request->input('id'));
     if (! $rel) {
         $page->show404();
     }
 
-    $nzbpath = $nzb->NZBPath($_GET['id']);
+    $nzbpath = $nzb->NZBPath($page->request->input('id'));
 
     if (! file_exists($nzbpath)) {
         $page->show404();

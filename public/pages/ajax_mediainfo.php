@@ -7,12 +7,12 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (! isset($_REQUEST['id'])) {
+if (! isset($page->request->input('id'))) {
     $page->show404();
 }
 
 $re = new ReleaseExtra($page->settings);
-$redata = $re->getBriefByGuid($_REQUEST['id']);
+$redata = $re->getBriefByGuid($page->request->input('id'));
 
 if (! $redata) {
     echo 'No media info';

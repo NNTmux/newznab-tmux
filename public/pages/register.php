@@ -23,7 +23,7 @@ if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STAT
 }
 
 if ($showRegister === 1) {
-    $action = $_REQUEST['action'] ?? 'view';
+    $action = $page->request->input('action') ?? 'view';
 
     //Be sure to persist the invite code in the event of multiple form submissions. (errors)
     if (isset($_REQUEST['invitecode'])) {

@@ -10,9 +10,9 @@ if (! User::isLoggedIn()) {
 use Blacklight\Releases;
 use App\Models\UsersRelease;
 
-if (isset($_GET['add'])) {
+if ($page->request->has('add')) {
     $releases = new Releases(['Settings' => $page->settings]);
-    $guids = explode(',', $_GET['add']);
+    $guids = explode(',', $page->request->input('add'));
     $data = Release::getByGuid($guids);
 
     if (! $data) {
@@ -22,18 +22,18 @@ if (isset($_GET['add'])) {
     foreach ($data as $d) {
         UsersRelease::addCart(User::currentUserId(), $d['id']);
     }
-} elseif (isset($_REQUEST['delete'])) {
-    if (isset($_GET['delete']) && ! empty($_GET['delete'])) {
-        $ids = [$_GET['delete']];
-    } elseif (isset($_POST['delete']) && is_array($_POST['delete'])) {
-        $ids = $_POST['delete'];
+} elseif ($page->request->has('delete')) {
+    if ($page->request->has('delete') && ! empty($page->request->input('delete'))) {
+        $ids = [$page->request->input('delete')];
+    } elseif ($page->request->has('delete') && is_array($page->request->input('delete'))) {
+        $ids = $page->request->input('delete');
     }
 
     if ($ids !== null) {
         UsersRelease::delCartByGuid($ids, User::currentUserId());
     }
 
-    if (! isset($_POST['delete'])) {
+    if (! $page->request->has('delete')) {
         header('Location: '.WWW_TOP.'/cart');
     }
 

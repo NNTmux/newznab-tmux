@@ -18,8 +18,8 @@ foreach ($concats as $ccat) {
     $ctmp[$ccat['id']] = $ccat;
 }
 $category = Category::PC_GAMES;
-if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $ctmp)) {
-    $category = $_REQUEST['t'] + 0;
+if ($page->request->has('t') && array_key_exists($page->request->input('t'), $ctmp)) {
+    $category = $page->request->input('t') + 0;
 }
 
 $catarray = [];
@@ -28,10 +28,10 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $ctmp);
 $page->smarty->assign('category', $category);
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
 $ordering = $games->getGamesOrdering();
 
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
 
 $results = $games2 = [];
 $results = $games->getGamesRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, '', $page->userdata['categoryexclusions']);
@@ -51,7 +51,7 @@ foreach ($results as $result) {
     $games2[] = $result;
 }
 
-$title = (isset($_REQUEST['title']) && ! empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
+$title = ($page->request->has('title') && ! empty($page->request->input('title'))) ? stripslashes($page->request->input('title')) : '';
 $page->smarty->assign('title', $title);
 
 $genres = $gen->getGenres(Genres::GAME_TYPE, true);
@@ -62,11 +62,11 @@ foreach ($genres as $gn) {
 
 $years = range(1903, date('Y') + 1);
 rsort($years);
-$year = (isset($_REQUEST['year']) && in_array($_REQUEST['year'], $years, false)) ? $_REQUEST['year'] : '';
+$year = ($page->request->has('year') && in_array($page->request->input('year'), $years, false)) ? $page->request->input('year') : '';
 $page->smarty->assign('years', $years);
 $page->smarty->assign('year', $year);
 
-$genre = (isset($_REQUEST['genre']) && array_key_exists($_REQUEST['genre'], $tmpgnr)) ? $_REQUEST['genre'] : '';
+$genre = ($page->request->has('genre') && array_key_exists($page->request->input('genre'), $tmpgnr)) ? $page->request->input('genre') : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 

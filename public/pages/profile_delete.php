@@ -9,7 +9,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$userId = $_GET['id'];
+$userId = $page->request->input('id');
 
 if ($userId !== null && $page->userdata->role->id !== User::ROLE_ADMIN && (int) $userId === User::currentUserId()) {
     Mail::to(Settings::settingValue('site.main.email'))->send(new AccountDeleted($userId));

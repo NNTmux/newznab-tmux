@@ -10,19 +10,19 @@ if (User::isLoggedIn()) {
     header('Location: '.WWW_TOP.'/');
 }
 
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 
 $captcha = new Captcha($page);
 $email = $rssToken = $sent = $confirmed = '';
 
 switch ($action) {
     case 'reset':
-        if (! isset($_REQUEST['guid'])) {
+        if (! $page->request->has('guid')) {
             $page->smarty->assign('error', 'No reset code provided.');
             break;
         }
 
-        $ret = User::getByPassResetGuid($_REQUEST['guid']);
+        $ret = User::getByPassResetGuid($page->request->input('guid'));
         if (! $ret) {
             $page->smarty->assign('error', 'Bad reset code provided.');
             break;
@@ -46,8 +46,8 @@ switch ($action) {
     case 'submit':
 
         if ($captcha->getError() === false) {
-            $email = $_POST['email'] ?? '';
-            $rssToken = $_POST['apikey'] ?? '';
+            $email = $page->request->input('email') ?? '';
+            $rssToken = $page->request->input('apikey') ?? '';
             if (empty($email) && empty($rssToken)) {
                 $page->smarty->assign('error', 'Missing parameter(email and/or apikey to send password reset');
             } else {

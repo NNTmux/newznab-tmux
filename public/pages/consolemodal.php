@@ -7,9 +7,9 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
+if ($page->request->has('id') && ctype_digit($page->request->input('id'))) {
     $console = new Console(['Settings' => $page->settings]);
-    $con = $console->getConsoleInfo($_GET['id']);
+    $con = $console->getConsoleInfo($page->request->input('id'));
     if (! $con) {
         $page->show404();
     }

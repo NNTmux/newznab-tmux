@@ -18,8 +18,8 @@ foreach ($moviecats as $mcat) {
 }
 
 $category = (isset($_GET['imdb']) ? -1 : Category::MOVIE_ROOT);
-if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
-    $category = $_REQUEST['t'] + 0;
+if ($page->request->has('t') && array_key_exists($page->request->input('t'), $mtmp)) {
+    $category = $page->request->input('t') + 0;
 }
 
 $user = User::find(User::currentUserId());
@@ -36,9 +36,9 @@ if ($category != -1) {
 $page->smarty->assign('catlist', $mtmp);
 $page->smarty->assign('category', $category);
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
 $ordering = $movie->getMovieOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
 
 $movies = [];
 $results = $movie->getMovieRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, -1, $page->userdata['categoryexclusions']);
@@ -51,13 +51,13 @@ foreach ($results as $result) {
     $movies[] = $result;
 }
 
-$title = (isset($_REQUEST['title']) && ! empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
+$title = ($page->request->has('title') && ! empty($page->request->input('title'))) ? stripslashes($page->request->input('title')) : '';
 $page->smarty->assign('title', $title);
 
-$actors = (isset($_REQUEST['actors']) && ! empty($_REQUEST['actors'])) ? stripslashes($_REQUEST['actors']) : '';
+$actors = ($page->request->has('actors') && ! empty($page->request->input('actors'))) ? stripslashes($page->request->input('actors')) : '';
 $page->smarty->assign('actors', $actors);
 
-$director = (isset($_REQUEST['director']) && ! empty($_REQUEST['director'])) ? stripslashes($_REQUEST['director']) : '';
+$director = ($page->request->has('director') && ! empty($page->request->input('director'))) ? stripslashes($page->request->input('director')) : '';
 $page->smarty->assign('director', $director);
 
 $ratings = range(1, 9);
@@ -66,13 +66,13 @@ $page->smarty->assign('ratings', $ratings);
 $page->smarty->assign('rating', $rating);
 
 $genres = $movie->getGenres();
-$genre = (isset($_REQUEST['genre']) && in_array($_REQUEST['genre'], $genres, false)) ? $_REQUEST['genre'] : '';
+$genre = ($page->request->has('genre') && in_array($page->request->input('genre'), $genres, false)) ? $page->request->input('genre') : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
 $years = range(1903, Carbon::now()->addYear()->year);
 rsort($years);
-$year = (isset($_REQUEST['year']) && in_array($_REQUEST['year'], $years, false)) ? $_REQUEST['year'] : '';
+$year = ($page->request->has('year') && in_array($page->request->input('year'), $years, false)) ? $page->request->input('year') : '';
 $page->smarty->assign('years', $years);
 $page->smarty->assign('year', $year);
 

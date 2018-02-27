@@ -23,8 +23,8 @@ if (isset($_REQUEST['search_type']) && $_REQUEST['search_type'] === 'adv') {
 }
 
 $ordering = $releases->getBrowseOrdering();
-$orderBy = (isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '');
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$orderBy = ($page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '');
+$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
 
 $page->smarty->assign(
     [
@@ -33,22 +33,22 @@ $page->smarty->assign(
     ]
 );
 
-if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && ! isset($_REQUEST['searchadvr']) && $searchType === 'basic') {
+if (($page->request->has('id') || isset($_REQUEST['subject'])) && ! isset($_REQUEST['searchadvr']) && $searchType === 'basic') {
     $searchString = '';
     switch (true) {
         case isset($_REQUEST['subject']):
             $searchString = (string) $_REQUEST['subject'];
             $page->smarty->assign('subject', $searchString);
             break;
-        case isset($_REQUEST['id']):
-            $searchString = (string) $_REQUEST['id'];
+        case $page->request->has('id'):
+            $searchString = (string) $page->request->input('id');
             $page->smarty->assign('search', $searchString);
             break;
     }
 
     $categoryID[] = -1;
-    if (isset($_REQUEST['t'])) {
-        $categoryID = explode(',', $_REQUEST['t']);
+    if (isset($page->request->input('t'))) {
+        $categoryID = explode(',', $page->request->input('t'));
     }
     foreach ($releases->getBrowseOrdering() as $orderType) {
         $page->smarty->assign(
@@ -111,7 +111,7 @@ foreach ($searchVars as $searchVarKey => $searchVar) {
     $page->smarty->assign($searchVarKey, $searchVars[$searchVarKey]);
 }
 
-if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQUEST['subject']) && $searchType !== 'basic') {
+if (isset($_REQUEST['searchadvr']) && ! $page->request->has('id') && ! isset($_REQUEST['subject']) && $searchType !== 'basic') {
     $orderByString = '';
     foreach ($searchVars as $searchVarKey => $searchVar) {
         $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);

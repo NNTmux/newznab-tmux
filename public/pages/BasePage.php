@@ -123,7 +123,7 @@ class BasePage
         $this->settings = new Settings();
         $this->pdo = new DB();
         $this->smarty = new Smarty();
-        $this->request = Request::capture();
+        $this->request = (new Request())::capture();
 
         $this->smarty->setCompileDir(NN_SMARTY_TEMPLATES);
         $this->smarty->setConfigDir(NN_SMARTY_CONFIGS);
@@ -270,7 +270,7 @@ class BasePage
             'Location: '.
             ($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).
             '/login?redirect='.
-            urlencode($_SERVER['REQUEST_URI'])
+            urlencode($page->request->getRequestUri())
         );
         exit();
     }

@@ -18,8 +18,8 @@ foreach ($musiccats as $mcat) {
     $mtmp[$mcat['id']] = $mcat;
 }
 $category = Category::MUSIC_ROOT;
-if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
-    $category = $_REQUEST['t'] + 0;
+if ($page->request->has('t') && array_key_exists($page->request->input('t'), $mtmp)) {
+    $category = $page->request->input('t') + 0;
 }
 
 $catarray = [];
@@ -28,9 +28,9 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $mtmp);
 $page->smarty->assign('category', $category);
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
 $ordering = $music->getMusicOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST['ob'] : '';
+$orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering) ? $page->request->input('ob') : '';
 
 $results = $musics = [];
 $results = $music->getMusicRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, $page->userdata['categoryexclusions']);
@@ -38,7 +38,7 @@ $results = $music->getMusicRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE',
 $artist = (isset($_REQUEST['artist']) && ! empty($_REQUEST['artist'])) ? stripslashes($_REQUEST['artist']) : '';
 $page->smarty->assign('artist', $artist);
 
-$title = (isset($_REQUEST['title']) && ! empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
+$title = ($page->request->has('title') && ! empty($page->request->input('title'))) ? stripslashes($page->request->input('title')) : '';
 $page->smarty->assign('title', $title);
 
 $genres = $gen->getGenres(Genres::MUSIC_TYPE, true);
@@ -52,13 +52,13 @@ foreach ($results as $result) {
     $musics[] = $result;
 }
 
-$genre = (isset($_REQUEST['genre']) && array_key_exists($_REQUEST['genre'], $tmpgnr)) ? $_REQUEST['genre'] : '';
+$genre = ($page->request->has('genre') && array_key_exists($page->request->input('genre'), $tmpgnr)) ? $page->request->input('genre') : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
 $years = range(1950, (date('Y') + 1));
 rsort($years);
-$year = (isset($_REQUEST['year']) && in_array($_REQUEST['year'], $years)) ? $_REQUEST['year'] : '';
+$year = ($page->request->has('year') && in_array($page->request->input('year'), $years)) ? $page->request->input('year') : '';
 $page->smarty->assign('years', $years);
 $page->smarty->assign('year', $year);
 

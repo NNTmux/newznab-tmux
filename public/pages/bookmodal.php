@@ -9,8 +9,8 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
-    $book = $b->getBookInfo($_GET['id']);
+if ($page->request->has('id') && ctype_digit($page->request->input('id'))) {
+    $book = $b->getBookInfo($page->request->input('id'));
     if (! $book) {
         $page->show404();
     }

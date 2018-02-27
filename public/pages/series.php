@@ -11,17 +11,17 @@ if (! User::isLoggedIn()) {
 
 $releases = new Releases(['Settings' => $page->settings]);
 
-if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
+if ($page->request->has('id') && ctype_digit($page->request->input('id'))) {
     $category = -1;
-    if (isset($_REQUEST['t']) && ctype_digit($_REQUEST['t'])) {
-        $category = $_REQUEST['t'];
+    if ($page->request->has('t') && ctype_digit($page->request->input('t'))) {
+        $category = $page->request->input('t');
     }
 
     $catarray = [];
     $catarray[] = $category;
 
     $rel = $releases->tvSearch(['id' => $_GET['id']], '', '', '', 0, 1000, '', $catarray, -1);
-    $show = Video::getByVideoID($_GET['id']);
+    $show = Video::getByVideoID($page->request->input('id'));
 
     if (! $show) {
         $page->smarty->assign('nodata', 'No video information for this series.');
@@ -81,11 +81,11 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     $page->content = $page->smarty->fetch('viewseries.tpl');
     $page->render();
 } else {
-    $letter = (isset($_GET['id']) && preg_match('/^(0\-9|[A-Z])$/i', $_GET['id'])) ? $_GET['id'] : '0-9';
+    $letter = ($page->request->has('id') && preg_match('/^(0\-9|[A-Z])$/i', $page->request->input('id'))) ? $page->request->input('id') : '0-9';
 
     $showname = (isset($_GET['title']) && ! empty($_GET['title'])) ? $_GET['title'] : '';
 
-    if ($showname !== '' && ! isset($_GET['id'])) {
+    if ($showname !== '' && ! isset($page->request->input('id'))) {
         $letter = '';
     }
 

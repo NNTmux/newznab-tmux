@@ -9,12 +9,12 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (! isset($_REQUEST['id'])) {
+if (! isset($page->request->input('id'))) {
     $page->show404();
 }
 
 $r = new Releases();
-$rel = Release::getByGuid($_REQUEST['id']);
+$rel = Release::getByGuid($page->request->input('id'));
 
 if (! $rel) {
     echo 'No tv info';

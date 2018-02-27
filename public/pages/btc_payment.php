@@ -15,7 +15,7 @@ $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');
 
 $userId = User::currentUserId();
 $user = User::find($userId);
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 $donation = UserRole::query()->where('donation', '>', 0)->get(['id', 'name', 'donation', 'addyears']);
 $page->smarty->assign('donation', $donation);
 

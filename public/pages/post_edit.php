@@ -6,7 +6,7 @@ use App\Models\Forumpost;
 if (! User::isLoggedIn()) {
     $page->show403();
 }
-$id = $_GET['id'] + 0;
+$id = $page->request->input('id') + 0;
 
 if (isset($id) && ! empty($_POST['addMessage'])) {
     $parent = Forumpost::getPost($id);

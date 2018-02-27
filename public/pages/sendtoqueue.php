@@ -8,7 +8,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (empty($_GET['id'])) {
+if (empty($page->request->input('id'))) {
     $page->show404();
 }
 
@@ -21,8 +21,8 @@ if ((int) $user['queuetype'] !== 2) {
     if (empty($sab->apikey)) {
         $page->show404();
     }
-    $sab->sendToSab($_GET['id']);
+    $sab->sendToSab($page->request->input('id'));
 } elseif ((int) $user['queuetype'] === 2) {
     $nzbget = new NZBGet($page);
-    $nzbget->sendURLToNZBGet($_GET['id']);
+    $nzbget->sendURLToNZBGet($page->request->input('id'));
 }

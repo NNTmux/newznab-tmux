@@ -24,10 +24,10 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['id'])) {
+if ($page->request->has('id')) {
     $releases = new Releases(['Settings' => $page->settings]);
     $re = new ReleaseExtra;
-    $data = Release::getByGuid($_GET['id']);
+    $data = Release::getByGuid($page->request->input('id'));
     $user = User::find(User::currentUserId());
     $cpapi = $user['cp_api'];
     $cpurl = $user['cp_url'];

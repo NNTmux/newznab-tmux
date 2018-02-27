@@ -7,11 +7,11 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (! isset($_REQUEST['id'])) {
+if (! $page->request->has('id')) {
     $page->show404();
 }
 
-$files = ReleaseFile::getByGuid($_REQUEST['id']);
+$files = ReleaseFile::getByGuid($page->request->input('id'));
 
 if (count($files) === 0) {
     echo 'No files';

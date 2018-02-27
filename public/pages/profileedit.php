@@ -15,7 +15,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 
 $userid = User::currentUserId();
 $data = User::find($userid);

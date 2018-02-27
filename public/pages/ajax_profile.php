@@ -6,8 +6,8 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['action'], $_GET['emailto']) && (int) $_GET['action'] === 1) {
-    $emailto = $_GET['emailto'];
+if ($page->request->has('action') && $page->request->has('emailto') && (int) $page->request->input('action') === 1) {
+    $emailto = $page->request->input('emalto');
     $ret = User::sendInvite($page->serverurl, User::currentUserId(), $emailto);
     if (! $ret) {
         echo 'Invite not sent.';

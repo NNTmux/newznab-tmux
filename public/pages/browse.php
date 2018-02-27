@@ -11,8 +11,8 @@ if (! User::isLoggedIn()) {
 }
 
 $category = -1;
-if (isset($_REQUEST['t'])) {
-    $category = $_REQUEST['t'];
+if (isset($page->request->input('t'))) {
+    $category = $page->request->input('t');
 }
 
 $grp = -1;
@@ -25,9 +25,9 @@ $catarray[] = $category;
 
 $page->smarty->assign('category', $category);
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
 $ordering = $releases->getBrowseOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
 
 $results = $releases->getBrowseRange($catarray, $offset, env('ITEMS_PER_PAGE', 50), $orderby, -1, $page->userdata['categoryexclusions'], $grp);
 

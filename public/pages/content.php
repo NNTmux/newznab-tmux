@@ -27,8 +27,8 @@ if (! empty($page->userdata) && User::isLoggedIn()) {
 $page->smarty->assign('admin', (($role === 2 || $role === 4) ? 'true' : 'false'));
 
 $contentId = 0;
-if (! empty($_GET['id'])) {
-    $contentId = $_GET['id'];
+if (! empty($page->request->input('id'))) {
+    $contentId = $page->request->input('id');
 }
 
 $request = false;

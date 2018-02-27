@@ -22,7 +22,7 @@ $privateProfiles = (int) Settings::settingValue('..privateprofiles') === 1;
 $publicView = false;
 
 if ($privileged || ! $privateProfiles) {
-    $altID = (isset($_GET['id']) && (int) $_GET['id'] >= 0) ? (int) $_GET['id'] : false;
+    $altID = ($page->request->has('id') && (int) $page->request->input('id') >= 0) ? (int) $page->request->input('id') : false;
     $altUsername = (isset($_GET['name']) && strlen($_GET['name']) > 0) ? $_GET['name'] : false;
 
     // If both 'id' and 'name' are specified, 'id' should take precedence.
@@ -51,7 +51,7 @@ if (! isset($data['style']) || $data['style'] === 'None') {
     $data['style'] = 'Using the admin selected theme.';
 }
 
-$offset = $_REQUEST['offset'] ?? 0;
+$offset = $page->request->input('offset') ?? 0;
 $page->smarty->assign(
     [
         'apirequests'       => UserRequest::getApiRequests($userID),

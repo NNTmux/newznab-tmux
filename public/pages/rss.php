@@ -11,7 +11,7 @@ $rss = new RSS(['Settings' => $page->settings]);
 $offset = 0;
 
 // If no content id provided then show user the rss selection page.
-if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
+if (! $page->request->has('t') && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
     // User has to either be logged in, or using rsskey.
     if (! User::isLoggedIn()) {
         header('Location: '.Settings::settingValue('site.main.code'));
@@ -54,11 +54,11 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
         $rssToken = $page->userdata['rsstoken'];
         $maxRequests = $page->userdata->role->apirequests;
     } else {
-        if (! isset($_GET['i']) || ! isset($_GET['r'])) {
+        if (! $page->request->has('i') || ! isset($page->request->input('r'))) {
             Utility::showApiError(100, 'Both the User ID and API key are required for viewing the RSS!');
         }
 
-        $res = User::getByIdAndRssToken($_GET['i'], $_GET['r']);
+        $res = User::getByIdAndRssToken($page->request->input('i'), $page->request->input('r'));
 
         if (! $res) {
             Utility::showApiError(100);
@@ -77,7 +77,7 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
     if (UserRequest::getApiRequests($uid) > $maxRequests) {
         Utility::showApiError(500, 'You have reached your daily limit for API requests!');
     } else {
-        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, $page->request->getRequestUri());
     }
 
     // Valid or logged in user, get them the requested feed.
@@ -90,7 +90,7 @@ if (! isset($_GET['t']) && ! isset($_GET['show']) && ! isset($_GET['anidb'])) {
 
     $outputXML = (! (isset($_GET['o']) && $_GET['o'] === 'json'));
 
-    $userCat = (isset($_GET['t']) ? ((int) $_GET['t'] === 0 ? -1 : $_GET['t']) : -1);
+    $userCat = ($page->request->has('t') ? ((int) $_GET['t'] === 0 ? -1 : $_GET['t']) : -1);
     $userNum = (isset($_GET['num']) && is_numeric($_GET['num']) ? abs($_GET['num']) : 100);
     $userAirDate = (isset($_GET['airdate']) && is_numeric($_GET['airdate']) ? abs($_GET['airdate']) : -1);
 

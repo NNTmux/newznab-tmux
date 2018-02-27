@@ -7,9 +7,9 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['modal']) && isset($_GET['id']) && ctype_digit($_GET['id'])) {
+if (isset($_GET['modal']) && $page->request->has('id') && ctype_digit($page->request->input('id'))) {
     $movie = new XXX(['Settings' => $page->settings]);
-    $mov = $movie->getXXXInfo($_GET['id']);
+    $mov = $movie->getXXXInfo($page->request->input('id'));
 
     if (! $mov) {
         $page->show404();

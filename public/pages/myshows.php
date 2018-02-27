@@ -11,7 +11,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$action = $_REQUEST['id'] ?? '';
+$action = $page->request->input('id') ?? '';
 $videoId = $_REQUEST['subpage'] ?? '';
 
 if (isset($_REQUEST['from'])) {
@@ -120,9 +120,9 @@ switch ($action) {
         $releases = new Releases(['Settings' => $page->settings]);
         $browsecount = $releases->getShowsCount($shows, -1, $page->userdata['categoryexclusions']);
 
-        $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+        $offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
         $ordering = $releases->getBrowseOrdering();
-        $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+        $orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
 
         $results = $releases->getShowsRange($shows, $offset, env('ITEMS_PER_PAGE', 50), $orderby, -1, $page->userdata['categoryexclusions']);
 

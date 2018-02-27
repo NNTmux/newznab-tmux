@@ -8,20 +8,20 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (! empty($_POST['addMessage']) && ! empty($_POST['addSubject']) && $page->isPostBack()) {
-    Forumpost::add(0, User::currentUserId(), $_POST['addSubject'], $_POST['addMessage']);
+if (! empty($page->request->input('addMessage')) && ! empty($page->request->input('addSubject')) && $page->isPostBack()) {
+    Forumpost::add(0, User::currentUserId(), $page->request->input('addSubject'), $page->request->input('addMessage'));
     header('Location:'.WWW_TOP.'/forum');
     die();
 }
 
 $lock = $unlock = null;
 
-if (! empty($_GET['lock'])) {
-    $lock = $_GET['lock'];
+if (! empty($page->request->input('lock'))) {
+    $lock = $page->request->input('lock');
 }
 
-if (! empty($_GET['unlock'])) {
-    $unlock = $_GET['unlock'];
+if (! empty($page->request->input('unlock'))) {
+    $unlock = $page->request->input('unlock');
 }
 
 if ($lock !== null) {
@@ -38,7 +38,7 @@ if ($unlock !== null) {
 
 $browsecount = Forumpost::getBrowseCount();
 
-$offset = isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset']) ? $_REQUEST['offset'] : 0;
+$offset = $page->request->has('offset') && ctype_digit($page->request->input('offset')) ? $page->request->input('offset') : 0;
 
 $results = Forumpost::getBrowseRange($offset, env('ITEMS_PER_PAGE', 50));
 
