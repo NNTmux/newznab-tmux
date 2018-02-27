@@ -56,13 +56,13 @@ class Page extends BasePage
         $this->smarty->assign('parentcatlist', $parentcatlist);
         $this->smarty->assign('catClass', Category::class);
         $searchStr = '';
-        if ($this->page == 'search' && isset($_REQUEST['id'])) {
-            $searchStr = (string) $_REQUEST['id'];
+        if ($this->page === 'search' && $this->request->has('id')) {
+            $searchStr = $this->request->input('id');
         }
         $this->smarty->assign('header_menu_search', $searchStr);
 
-        if (isset($_REQUEST['t'])) {
-            $this->smarty->assign('header_menu_cat', $_REQUEST['t']);
+        if ($this->request->has('t')) {
+            $this->smarty->assign('header_menu_cat', $this->request->input('t'));
         } else {
             $this->smarty->assign('header_menu_cat', '');
         }

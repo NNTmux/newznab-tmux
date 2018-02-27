@@ -10,9 +10,9 @@ $contents = new Contents();
 $id = 0;
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 
-$content = (object) [
+$content = [
     'id' => '',
     'title' => '',
     'url' => '',
@@ -30,28 +30,28 @@ $content = (object) [
 switch ($action) {
     case 'add':
         $page->title = 'Content Add';
-        $content->showinmenu = '1';
-        $content->status = '1';
-        $content->contenttype = '2';
+        $content['showinmenu'] = '1';
+        $content['status'] = '1';
+        $content['contenttype'] = '2';
         break;
 
     case 'submit':
         // Validate and add or update.
         $returnid = 0;
-        if (! isset($_POST['id']) || $_POST['id'] === '') {
-            $returnid = $contents->add($_POST);
+        if (! $page->request->has('id')) {
+            $returnid = $contents->add($page->request->all());
         } else {
-            $content = $contents->update($_POST);
-            $returnid = $content->id;
+            $content = $contents->update($page->request->all());
+            $returnid = $content['id'];
         }
         header('Location:content-add.php?id='.$returnid);
         break;
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if ($page->request->has('id')) {
             $page->title = 'Content Edit';
-            $id = $_GET['id'];
+            $id = $page->request->input('id');
 
             $content = $contents->getByID($id, User::ROLE_ADMIN);
         }
