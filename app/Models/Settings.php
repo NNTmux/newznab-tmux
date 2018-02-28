@@ -330,8 +330,7 @@ class Settings extends Model
      */
     public static function settingsUpdate(array $data = [])
     {
-        foreach ($data as $key => $value)
-        {
+        foreach ($data as $key => $value) {
             self::query()->where('setting', $key)->update(['value' => $value]);
         }
     }
