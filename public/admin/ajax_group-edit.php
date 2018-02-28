@@ -36,7 +36,6 @@ if ($page->request->has('action') && $page->request->input('action') === 2) {
         $status = $page->request->has('group_status') ? (int) $page->request->input('group_status') : 0;
         echo Group::updateGroupStatus($id, 'active', $status);
 
-
         $status = $page->request->has('backfill_status') ? (int) $page->request->input('backfill_status') : 0;
         echo Group::updateGroupStatus($id, 'backfill', $status);
     }
