@@ -96,7 +96,7 @@ if (! file_exists($nzbPath)) {
 }
 
 $relData = Release::getByGuid($page->request->input('id'));
-if ($relData) {
+if ($relData !== null) {
     Release::updateGrab($page->request->input('id'));
     UserDownload::addDownloadRequest($uid, $relData['id']);
     User::incrementGrabs($uid);
