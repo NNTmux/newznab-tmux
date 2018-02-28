@@ -104,7 +104,6 @@ class BasePage
      */
     public function __construct()
     {
-
         if (session_id() === '') {
             session_set_cookie_params(0, '/', '', $this->https, true);
             session_start();
