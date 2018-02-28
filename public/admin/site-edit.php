@@ -14,18 +14,18 @@ $sites = new Sites();
 $id = 0;
 
 // set the current action
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
 
-        if (! empty($_POST['book_reqids'])) {
+        if (! empty($page->request->input('book_reqids'))) {
             // book_reqids is an array it needs to be a comma separated string, make it so.
-            $_POST['book_reqids'] = is_array($_POST['book_reqids']) ?
-                implode(', ', $_POST['book_reqids']) : $_POST['book_reqids'];
+            $page->request->merge(['book_reqids' => is_array($page->request->input('book_reqids'))]) ?
+                implode(', ', $page->request->input('book_reqids')) : $page->request->input('book_reqids');
         }
         $error = '';
-        $ret = $page->pdo->settingsUpdate($_POST);
+        $ret = $page->pdo->settingsUpdate($page->request->all());
         if (is_int($ret)) {
             if ($ret === Settings::ERR_BADUNRARPATH) {
                 $error = 'The unrar path does not point to a valid binary';
@@ -52,7 +52,7 @@ switch ($action) {
             header('Location:'.WWW_TOP.'/site-edit.php?id='.$returnid);
         } else {
             $page->smarty->assign('error', $error);
-            $site = $sites->row2Object($_POST);
+            $site = $sites->row2Object($page->request->all());
             $page->smarty->assign('site', $site);
         }
 

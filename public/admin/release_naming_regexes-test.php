@@ -8,10 +8,10 @@ $page = new AdminPage();
 
 $page->title = 'Release Naming Regex Test';
 
-$group = trim(isset($_POST['group']) && ! empty($_POST['group']) ? $_POST['group'] : '');
-$regex = trim(isset($_POST['regex']) && ! empty($_POST['regex']) ? $_POST['regex'] : '');
-$showLimit = (isset($_POST['showlimit']) && is_numeric($_POST['showlimit']) ? $_POST['showlimit'] : 250);
-$queryLimit = (isset($_POST['querylimit']) && is_numeric($_POST['querylimit']) ? $_POST['querylimit'] : 100000);
+$group = trim($page->request->has('group') && ! empty($page->request->input('group')) ? $page->request->input('group') : '');
+$regex = trim($page->request->has('regex') && ! empty($page->request->input('regex')) ? $page->request->input('regex') : '');
+$showLimit = ($page->request->has('showlimit') && is_numeric($page->request->input('showlimit')) ? $page->request->input('showlimit') : 250);
+$queryLimit = ($page->request->has('querylimit') && is_numeric($page->request->input('querylimit')) ? $page->request->input('querylimit') : 100000);
 $page->smarty->assign(['group' => $group, 'regex' => $regex, 'showlimit' => $showLimit, 'querylimit' => $queryLimit]);
 
 if ($group && $regex) {

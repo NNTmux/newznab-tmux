@@ -9,33 +9,33 @@ $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'release_naming_regexes']);
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
-        if ($_POST['group_regex'] === '') {
+        if ($page->request->input('group_regex') === '') {
             $page->smarty->assign('error', 'Group regex must not be empty!');
             break;
         }
 
-        if ($_POST['regex'] === '') {
+        if ($page->request->input('regex') === '') {
             $page->smarty->assign('error', 'Regex cannot be empty');
             break;
         }
 
-        if ($_POST['description'] === '') {
-            $_POST['description'] = '';
+        if ($page->request->input('description') === '') {
+            $page->request->merge(['description' => '']);
         }
 
-        if (! is_numeric($_POST['ordinal']) || $_POST['ordinal'] < 0) {
+        if (! is_numeric($page->request->input('ordinal')) || $page->request->input('ordinal') < 0) {
             $page->smarty->assign('error', 'Ordinal must be a number, 0 or higher.');
             break;
         }
 
-        if ($_POST['id'] === '') {
-            $regex = $regexes->addRegex($_POST);
+        if ($page->request->input('id') === '') {
+            $regex = $regexes->addRegex($page->request->all());
         } else {
-            $regex = $regexes->updateRegex($_POST);
+            $regex = $regexes->updateRegex($page->request->all());
         }
 
         header('Location:'.WWW_TOP.'/release_naming_regexes-list.php');
@@ -43,9 +43,9 @@ switch ($action) {
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if ($page->request->has('id')) {
             $page->title = 'Release Naming Regex Edit';
-            $id = $_GET['id'];
+            $id = $page->request->input('id');
             $regex = $regexes->getRegexByID($id);
         } else {
             $page->title = 'Release Naming Regex Add';

@@ -9,7 +9,7 @@ $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'category_regexes']);
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 
 $regex = [
     'id' => '',
@@ -24,25 +24,25 @@ $page->smarty->assign('regex', $regex);
 
 switch ($action) {
     case 'submit':
-        if ($_POST['group_regex'] === '') {
+        if ($page->request->input('group_regex') === '') {
             $page->smarty->assign('error', 'Group regex must not be empty!');
             break;
         }
 
-        if ($_POST['regex'] === '') {
+        if ($page->request->input('regex') === '') {
             $page->smarty->assign('error', 'Regex cannot be empty');
             break;
         }
 
-        if (! is_numeric($_POST['ordinal']) || $_POST['ordinal'] < 0) {
+        if (! is_numeric($page->request->input('ordinal')) || $page->request->input('ordinal') < 0) {
             $page->smarty->assign('error', 'Ordinal must be a number, 0 or higher.');
             break;
         }
 
-        if ($_POST['id'] === '') {
-            $regexes->addRegex($_POST);
+        if ($page->request->input('id') === '') {
+            $regexes->addRegex($page->request->all());
         } else {
-            $regexes->updateRegex($_POST);
+            $regexes->updateRegex($page->request->all());
         }
 
         header('Location:'.WWW_TOP.'/category_regexes-list.php');
@@ -50,9 +50,9 @@ switch ($action) {
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if ($page->request->has('id')) {
             $page->title = 'Category Regex Edit';
-            $id = $_GET['id'];
+            $id = $page->request->input('id');
             $regex = $regexes->getRegexByID($id);
         } else {
             $page->title = 'Category Regex Add';

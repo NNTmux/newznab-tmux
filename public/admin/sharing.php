@@ -9,7 +9,7 @@ $page->title = 'Sharing Settings';
 
 $db = new DB();
 
-$offset = $_GET['offset'] ?? 0;
+$offset = $page->request->input('offset') ?? 0;
 
 $allSites = $db->query(sprintf('SELECT * FROM sharing_sites ORDER BY id LIMIT %d OFFSET %d', 25, $offset));
 if (count($allSites) === 0) {
@@ -18,24 +18,24 @@ if (count($allSites) === 0) {
 
 $ourSite = $db->queryOneRow('SELECT * FROM sharing');
 
-if (! empty($_POST)) {
-    if (! empty($_POST['sharing_name']) && ! preg_match('/\s+/', $_POST['sharing_name']) && strlen($_POST['sharing_name']) < 255) {
-        $site_name = trim($_POST['sharing_name']);
+if (! empty($page->request->all())) {
+    if (! empty($page->request->input('sharing_name')) && ! preg_match('/\s+/', $page->request->input('sharing_name')) && strlen($page->request->input('sharing_name')) < 255) {
+        $site_name = trim($page->request->input('sharing_name'));
     } else {
         $site_name = $ourSite['site_name'];
     }
-    if (! empty($_POST['sharing_maxpush']) && is_numeric($_POST['sharing_maxpush'])) {
-        $max_push = trim($_POST['sharing_maxpush']);
+    if (! empty($page->request->input('sharing_maxpush')) && is_numeric($page->request->input('sharing_maxpush'))) {
+        $max_push = trim($page->request->input('sharing_maxpush'));
     } else {
         $max_push = $ourSite['max_push'];
     }
-    if (! empty($_POST['sharing_maxpull']) && is_numeric($_POST['sharing_maxpush'])) {
-        $max_pull = trim($_POST['sharing_maxpull']);
+    if (! empty($page->request->input('sharing_maxpoll')) && is_numeric($page->request->input('sharing_maxpush'))) {
+        $max_pull = trim($page->request->input('sharing_maxpoll'));
     } else {
         $max_pull = $ourSite['max_pull'];
     }
-    if (! empty($_POST['sharing_maxdownload']) && is_numeric($_POST['sharing_maxdownload'])) {
-        $max_download = trim($_POST['sharing_maxdownload']);
+    if (! empty($page->request->input('sharing_maxdownload')) && is_numeric($page->request->input('sharing_maxdownload'))) {
+        $max_download = trim($page->request->input('sharing_maxdownload'));
     } else {
         $max_download = $ourSite['max_download'];
     }

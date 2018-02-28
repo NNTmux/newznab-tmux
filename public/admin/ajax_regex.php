@@ -12,7 +12,7 @@ if (! $page->request->has('action')) {
     exit();
 }
 
-switch ($_GET['action']) {
+switch ($page->request->input('action')) {
     case 1:
         $id = (int) $page->request->input('col_id');
         (new Regexes(['Settings' => $page->settings]))->deleteRegex($id);

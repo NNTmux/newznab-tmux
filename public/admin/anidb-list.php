@@ -11,13 +11,13 @@ $AniDB = new AniDB();
 $page->title = 'AniDB List';
 
 $aname = '';
-if (isset($_REQUEST['animetitle']) && ! empty($_REQUEST['animetitle'])) {
-    $aname = $_REQUEST['animetitle'];
+if ($page->request->has('animetitle') && ! empty($page->request->input('animetitle'))) {
+    $aname = $page->request->input('animetitle');
 }
 
 $animecount = $AniDB->getAnimeCount($aname);
 
-$offset = $_REQUEST['offset'] ?? 0;
+$offset = $page->request->input('offset') ?? 0;
 $asearch = ($aname !== '') ? 'animetitle='.$aname.'&amp;' : '';
 
 $page->smarty->assign('pagertotalitems', $animecount);

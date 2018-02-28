@@ -7,14 +7,14 @@ use App\Models\Group;
 $page = new AdminPage();
 
 $gname = '';
-if (! empty($_REQUEST['groupname'])) {
-    $gname = $_REQUEST['groupname'];
+if (! empty($page->request->input('groupname'))) {
+    $gname = $page->request->input('groupname');
 }
 
 $groupcount = Group::getGroupsCount($gname, 1);
 
-$offset = $_REQUEST['offset'] ?? 0;
-$groupname = ! empty($_REQUEST['groupname']) ? $_REQUEST['groupname'] : '';
+$offset = $page->request->input('offset') ?? 0;
+$groupname = ! empty($page->request->input('groupname')) ? $page->request->input('groupname') : '';
 
 $page->smarty->assign('groupname', $groupname);
 $page->smarty->assign('pagertotalitems', $groupcount);
@@ -22,7 +22,7 @@ $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', env('ITEMS_PER_PAGE', 50));
 $page->smarty->assign('pagerquerysuffix', '#results');
 
-$groupsearch = $gname != '' ? 'groupname='.$gname.'&amp;' : '';
+$groupsearch = $gname !== '' ? 'groupname='.$gname.'&amp;' : '';
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/group-list-active.php?'.$groupsearch.'offset=');
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);

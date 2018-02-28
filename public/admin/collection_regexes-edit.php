@@ -10,31 +10,31 @@ $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'collection_re
 $error = '';
 $regex = ['id' => '', 'regex' => '', 'description' => '', 'group_regex' => '', 'ordinal' => '', 'status' => 1];
 
-switch ($_REQUEST['action'] ?? 'view') {
+switch ($page->request->input('action') ?? 'view') {
     case 'submit':
-        if ($_POST['group_regex'] === '') {
+        if ($page->request->input('group_regex') === '') {
             $error = 'Group regex must not be empty!';
             break;
         }
 
-        if ($_POST['regex'] === '') {
+        if ($page->request->input('regex') === '') {
             $error = 'Regex cannot be empty';
             break;
         }
 
-        if ($_POST['description'] === '') {
-            $_POST['description'] = '';
+        if ($page->request->input('description') === '') {
+            $page->request->input('description') = '';
         }
 
-        if (! is_numeric($_POST['ordinal']) || $_POST['ordinal'] < 0) {
+        if (! is_numeric($page->request->input('ordinal')) || $page->request->input('ordinal') < 0) {
             $error = 'Ordinal must be a number, 0 or higher.';
             break;
         }
 
-        if ($_POST['id'] === '') {
-            $regexes->addRegex($_POST);
+        if ($page->request->input('id') === '') {
+            $regexes->addRegex($page->request->all());
         } else {
-            $regexes->updateRegex($_POST);
+            $regexes->updateRegex($page->request->all());
         }
 
         header('Location:'.WWW_TOP.'/collection_regexes-list.php');
@@ -42,9 +42,9 @@ switch ($_REQUEST['action'] ?? 'view') {
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if ($page->request->has('id')) {
             $page->title = 'Collections Regex Edit';
-            $regex = $regexes->getRegexByID($_GET['id']);
+            $regex = $regexes->getRegexByID($page->request->input('id'));
         } else {
             $page->title = 'Collections Regex Add';
             $regex += ['status' => 1];

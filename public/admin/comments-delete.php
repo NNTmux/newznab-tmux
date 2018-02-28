@@ -6,9 +6,9 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 $page = new AdminPage();
 
-if (isset($_GET['id'])) {
-    ReleaseComment::deleteComment($_GET['id']);
+if ($page->request->has('id')) {
+    ReleaseComment::deleteComment($page->request->input('id'));
 }
 
-$referrer = $_SERVER['HTTP_REFERER'];
+$referrer = $page->request->server('HTTP_REFERER');
 header('Location: '.$referrer);

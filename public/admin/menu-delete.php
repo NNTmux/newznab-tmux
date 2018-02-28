@@ -6,9 +6,9 @@ use App\Models\Menu;
 
 $page = new AdminPage();
 
-if (isset($_GET['id'])) {
-    Menu::deleteMenu($_GET['id']);
+if ($page->request->has('id')) {
+    Menu::deleteMenu($page->request->input('id'));
 }
 
-$referrer = $_SERVER['HTTP_REFERER'];
+$referrer = $page->request->server('HTTP_REFERER');
 header('Location: '.$referrer);

@@ -18,7 +18,7 @@ if ($page->isPostBack()) {
     // Get the list of NZB files from php /tmp folder if nzb files were uploaded.
     if (isset($_FILES['uploadedfiles'])) {
         foreach ($_FILES['uploadedfiles']['error'] as $key => $error) {
-            if ($error == UPLOAD_ERR_OK) {
+            if ($error === UPLOAD_ERR_OK) {
                 $tmp_name = $_FILES['uploadedfiles']['tmp_name'][$key];
                 $name = $_FILES['uploadedfiles']['name'][$key];
                 $filesToProcess[] = $tmp_name;
@@ -27,13 +27,13 @@ if ($page->isPostBack()) {
     } else {
 
         // Check if the user wants to use the file name as the release name.
-        $useNzbName = (isset($_POST['usefilename']) && $_POST['usefilename'] == 'on') ? true : false;
+        $useNzbName = ($page->request->has('usefilename') && $page->request->input('usefilename') === 'on');
 
         // Check if the user wants to delete the NZB file when done importing.
-        $deleteNZB = (isset($_POST['deleteNZB']) && $_POST['deleteNZB'] == 'on') ? true : false;
+        $deleteNZB = ($page->request->has('deleteNZB') && $page->request->input('deleteNZB') === 'on');
 
         // Get the path the user set in the browser if he put one.
-        $path = (isset($_POST['folder']) ? $_POST['folder'] : '');
+        $path = ($page->request->has('folder') ? $page->request->input('folder') : '');
         if (substr($path, strlen($path) - 1) !== DS) {
             $path .= DS;
         }

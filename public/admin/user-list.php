@@ -14,9 +14,9 @@ foreach (UserRole::getRoles() as $userRole) {
     $roles[$userRole['id']] = $userRole['name'];
 }
 
-$offset = $_REQUEST['offset'] ?? 0;
+$offset = $page->request->input('offset') ?? 0;
 $ordering = getUserBrowseOrdering();
-$orderBy = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderBy = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
 
 $variables = ['username' => '', 'email' => '', 'host' => '', 'role' => ''];
 $uSearch = '';

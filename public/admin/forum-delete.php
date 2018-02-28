@@ -6,13 +6,13 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 $page = new AdminPage();
 
-if (isset($_GET['id'])) {
-    Forumpost::deletePost($_GET['id']);
+if ($page->request->has('id')) {
+    Forumpost::deletePost($page->request->input('id'));
 }
 
-if (isset($_GET['from'])) {
-    $referrer = $_GET['from'];
+if ($page->request->has('from')) {
+    $referrer = $page->request->input('from');
 } else {
-    $referrer = $_SERVER['HTTP_REFERER'];
+    $referrer = $page->request->server('HTTP_REFERER');
 }
 header('Location: '.$referrer);

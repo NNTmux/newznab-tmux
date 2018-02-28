@@ -9,8 +9,8 @@ $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'category_rege
 
 $page->title = 'Category Regex List';
 
-$group = isset($_REQUEST['group']) && ! empty($_REQUEST['group']) ? $_REQUEST['group'] : '';
-$offset = ($_REQUEST['offset'] ?? 0);
+$group = $page->request->has('group') && ! empty($page->request->input('group')) ? $page->request->input('group') : '';
+$offset = ($page->request->input('offset') ?? 0);
 $regex = $regexes->getRegex($group, env('ITEMS_PER_PAGE', 50), $offset);
 
 $page->smarty->assign(

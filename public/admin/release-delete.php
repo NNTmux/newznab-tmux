@@ -6,11 +6,11 @@ use Blacklight\Releases;
 
 $page = new AdminPage();
 
-if (isset($_GET['id'])) {
+if ($page->request->has('id')) {
     $releases = new Releases(['Settings' => $page->pdo]);
-    $releases->deleteMultiple($_GET['id']);
+    $releases->deleteMultiple($page->request->input('id'));
 }
 
-$referrer = $_SERVER['HTTP_REFERER'];
+$referrer = $page->request->server('HTTP_REFERER');
 
 header('Location: '.$referrer);

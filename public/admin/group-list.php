@@ -6,8 +6,8 @@ use App\Models\Group;
 
 $page = new AdminPage();
 
-$groupName = $_REQUEST['groupname'] ?? '';
-$offset = $_REQUEST['offset'] ?? 0;
+$groupName = $page->request->input('groupname') ?? '';
+$offset = $page->request->input('offset') ?? 0;
 
 $page->smarty->assign(
     [

@@ -6,11 +6,11 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 $page = new AdminPage();
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
 
-if (isset($_REQUEST['presearch'])) {
-    $lastSearch = $_REQUEST['presearch'];
-    $parr = Predb::getAll($offset, env('ITEMS_PER_PAGE', 50), $_REQUEST['presearch']);
+if ($page->request->has('presearch')) {
+    $lastSearch = $page->request->input('presearch');
+    $parr = Predb::getAll($offset, env('ITEMS_PER_PAGE', 50), $page->request->input('presearch'));
 } else {
     $lastSearch = '';
     $parr = Predb::getAll($offset, env('ITEMS_PER_PAGE', 50));

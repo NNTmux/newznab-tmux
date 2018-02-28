@@ -9,30 +9,30 @@ $AniDB = new AniDB(['Settings' => $page->pdo]);
 $id = 0;
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
         $AniDB->updateTitle(
-            $_POST['anidbid'],
-                $_POST['title'],
-                $_POST['type'],
-                $_POST['startdate'],
-                $_POST['enddate'],
-                $_POST['related'],
-                $_POST['similar'],
-                $_POST['creators'],
-                $_POST['description'],
-                $_POST['rating'],
-                $_POST['categories'],
-                $_POST['characters'],
-                $_POST['epnos'],
-                $_POST['airdates'],
-                $_POST['episodetitles']
+            $page->request->input('anidbid'),
+                $page->request->input('title'),
+                $page->request->input('type'),
+                $page->request->input('startdate'),
+                $page->request->input('enddate'),
+                $page->request->input('related'),
+                $page->request->input('similar'),
+                $page->request->input('creators'),
+                $page->request->input('description'),
+                $page->request->input('rating'),
+                $page->request->input('categories'),
+                $page->request->input('characters'),
+                $page->request->input('epnos'),
+                $page->request->input('airdates'),
+            $page->request->input('episodetitles')
         );
 
-        if (! empty($_POST['from'])) {
-            header('Location:'.$_POST['from']);
+        if (! empty($page->request->input('from'))) {
+            header('Location:'.$page->request->input('from'));
             exit;
         }
 
@@ -41,9 +41,9 @@ switch ($action) {
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if ($page->request->has('id')) {
             $page->title = 'AniDB Edit';
-            $AniDBAPIArray = $AniDB->getAnimeInfo($_GET['id']);
+            $AniDBAPIArray = $AniDB->getAnimeInfo($page->request->input('id'));
             $page->smarty->assign('anime', $AniDBAPIArray);
         }
         break;

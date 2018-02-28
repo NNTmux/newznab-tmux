@@ -8,9 +8,9 @@ $page = new AdminPage();
 
 $page->title = 'Collections Regex Test';
 
-$group = trim(isset($_POST['group']) && ! empty($_POST['group']) ? $_POST['group'] : '');
-$regex = trim(isset($_POST['regex']) && ! empty($_POST['regex']) ? $_POST['regex'] : '');
-$limit = (isset($_POST['limit']) && is_numeric($_POST['limit']) ? $_POST['limit'] : 50);
+$group = trim($page->request->has('group') && ! empty($page->request->input('group')) ? $page->request->input('group') : '');
+$regex = trim($page->request->has('regex') && ! empty($page->request->input('regex')) ? $page->request->input('regex') : '');
+$limit = ($page->request->has('limit') && is_numeric($page->request->input('limit')) ? $page->request->input('limit') : 50);
 $page->smarty->assign(['group' => $group, 'regex' => $regex, 'limit' => $limit]);
 
 if ($group && $regex) {

@@ -10,7 +10,7 @@ $posters = MultigroupPoster::all('id', 'poster')->sortBy('poster');
 
 $postersCheck = $posters->first();
 
-$poster = isset($_REQUEST['poster']) && ! empty($_REQUEST['poster']) ? $_REQUEST['poster'] : '';
+$poster = $page->request->has('poster') && ! empty($page->request->input('poster')) ? $page->request->input('poster') : '';
 
 $page->smarty->assign(
     [

@@ -10,32 +10,32 @@ $bin = new Binaries(['Settings' => $page->pdo]);
 $error = '';
 $regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1, 'status' => 1, 'optype' => 1];
 
-switch ($_REQUEST['action'] ?? 'view') {
+switch ($page->request->input('action') ?? 'view') {
     case 'submit':
-        if ($_POST['groupname'] === '') {
+        if ($page->request->input('groupname') === '') {
             $error = 'Group must be a valid usenet group';
             break;
         }
 
-        if ($_POST['regex'] === '') {
+        if ($page->request->input('regex') === '') {
             $error = 'Regex cannot be empty';
             break;
         }
 
-        if ($_POST['id'] === '') {
-            $bin->addBlacklist($_POST);
+        if ($page->request->input('id') === '') {
+            $bin->addBlacklist($page->request->all());
         } else {
-            $bin->updateBlacklist($_POST);
+            $bin->updateBlacklist($page->request->all());
         }
 
         header('Location:'.WWW_TOP.'/binaryblacklist-list.php');
         break;
 
     case 'addtest':
-        if (isset($_GET['regex'], $_GET['groupname'])) {
+        if ($page->request->has('regex') && $page->request->has('groupname')) {
             $regex += [
-                    'groupname' => $_GET['groupname'],
-                    'regex'     => $_GET['regex'],
+                    'groupname' => $page->request->input('groupname'),
+                    'regex'     => $page->request->input('regex'),
                     'ordinal'   => 1,
                     'status'    => 1,
             ];
@@ -44,9 +44,9 @@ switch ($_REQUEST['action'] ?? 'view') {
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if ($page->request->has('id')) {
             $page->title = 'Binary Black/Whitelist Edit';
-            $regex = $bin->getBlacklistByID($_GET['id']);
+            $regex = $bin->getBlacklistByID($page->request->input('id'));
         } else {
             $page->title = 'Binary Black/Whitelist Add';
             $regex += [

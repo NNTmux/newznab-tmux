@@ -6,13 +6,13 @@ use App\Models\MultigroupPoster;
 
 $page = new AdminPage();
 
-if (isset($_GET['id'])) {
-    MultigroupPoster::query()->where('id', '=', $_GET['id'])->delete();
+if ($page->request->has('id')) {
+    MultigroupPoster::query()->where('id', '=', $page->request->input('id'))->delete();
 }
 
-if (isset($_GET['from'])) {
-    $referrer = $_GET['from'];
+if ($page->request->has('from')) {
+    $referrer = $page->request->input('from');
 } else {
-    $referrer = $_SERVER['HTTP_REFERER'];
+    $referrer = $page->request->server('HTTP_REFERER');
 }
 header('Location: '.$referrer);

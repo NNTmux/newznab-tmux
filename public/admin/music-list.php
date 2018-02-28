@@ -13,7 +13,7 @@ $page->title = 'Music List';
 
 $musCount = Utility::getCount('musicinfo');
 
-$offset = $_REQUEST['offset'] ?? 0;
+$offset = $page->request->input('offset') ?? 0;
 
 $page->smarty->assign([
 	'pagertotalitems' => $musCount,

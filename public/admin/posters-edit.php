@@ -9,16 +9,16 @@ $page = new AdminPage();
 $relPosters = new ProcessReleasesMultiGroup(['Settings' => $page->pdo]);
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
-        if ($_POST['id'] === '') {
+        if ($page->request->input('id') === '') {
             // Add a new mg poster.
-            $poster = MultigroupPoster::query()->create(['poster' => $_POST['poster']]);
+            $poster = MultigroupPoster::query()->create(['poster' => $page->request->input('poster')]);
         } else {
             // Update an existing mg poster.
-            $poster = MultigroupPoster::query()->where('id', '=', $_POST['id'])->update(['poster' => $_POST['poster']]);
+            $poster = MultigroupPoster::query()->where('id', '=', $page->request->input('id'))->update(['poster' => $page->request->input('poster')]);
         }
 
         header('Location:'.WWW_TOP.'/posters-list.php');
@@ -26,9 +26,9 @@ switch ($action) {
 
     case 'view':
     default:
-        if (! empty($_GET['id'])) {
+        if (! empty($page->request->input('id'))) {
             $page->title = 'MultiGroup Poster Edit';
-            $poster = MultigroupPoster::query()->where('id', '=', $_GET['id'])->firstOrFail();
+            $poster = MultigroupPoster::query()->where('id', '=', $page->request->input('id'))->firstOrFail();
         } else {
             $page->title = 'MultiGroup Poster Add';
             $poster = '';

@@ -8,7 +8,7 @@ $page = new AdminPage();
 $id = 0;
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 
 $group = [
     'id'                    => '',
@@ -25,24 +25,24 @@ $group = [
 
 switch ($action) {
     case 'submit':
-        if ($_POST['id'] === '') {
+        if ($page->request->input('id') === '') {
             // Add a new group.
-            $_POST['name'] = Group::isValidGroup($_POST['name']);
-            if ($_POST['name'] !== false) {
-                Group::addGroup($_POST);
+            $page->request->merge(['name' => Group::isValidGroup($page->request->input('name'))]);
+            if ($page->request->input('name') !== false) {
+                Group::addGroup($page->request->all());
             }
         } else {
             // Update an existing group.
-            Group::updateGroup($_POST);
+            Group::updateGroup($page->request->all());
         }
         header('Location:'.WWW_TOP.'/group-list.php');
         break;
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if ($page->request->has('id')) {
             $page->title = 'Newsgroup Edit';
-            $id = $_GET['id'];
+            $id = $page->request->input('id');
             $group = Group::getGroupByID($id);
         } else {
             $page->title = 'Newsgroup Add';

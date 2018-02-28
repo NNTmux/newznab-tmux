@@ -4,6 +4,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\Books;
 use Blacklight\Genres;
+use Illuminate\Support\Carbon;
 
 $page = new AdminPage();
 $book = new Books();
@@ -11,10 +12,10 @@ $gen = new Genres();
 $id = 0;
 
 // set the current action
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = $page->request->input('action') ?? 'view';
 
-if (isset($_REQUEST['id'])) {
-    $id = $_REQUEST['id'];
+if ($page->request->has('id')) {
+    $id = $page->request->input('id');
     $b = $book->getBookInfo($id);
 
     if (! $b) {
@@ -33,9 +34,9 @@ if (isset($_REQUEST['id'])) {
 			    }
 			}
 
-			$_POST['cover'] = (file_exists($coverLoc)) ? 1 : 0;
-			$_POST['publishdate'] = (empty($_POST['publishdate']) || ! strtotime($_POST['publishdate'])) ? $con['publishdate'] : date('Y-m-d H:i:s', strtotime($_POST['publishdate']));
-			$book->update($id, $_POST['title'], $_POST['asin'], $_POST['url'], $_POST['author'], $_POST['publisher'], $_POST['publishdate'], $_POST['cover']);
+			$page->request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
+			$page->request->merge(['publishdate' => (empty($page->request->input('publishdate')) || ! strtotime($page->request->input('publishdate'))) ? $con['publishdate'] : Carbon::parse($page->request->input('publishdate'))->timestamp]);
+			$book->update($id, $page->request->input('title'), $page->request->input('asin'), $page->request->input('url'), $page->request->input('author'), $page->request->input('publisher'), $page->request->input('publishdate'), $page->request->input('cover'));
 
 			header('Location:'.WWW_TOP.'/book-list.php');
 	        die();

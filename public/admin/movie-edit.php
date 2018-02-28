@@ -9,10 +9,10 @@ $movie = new Movie();
 $id = 0;
 
 // set the current action
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = $page->request->input('action') ?? 'view';
 
-if (isset($_REQUEST['id'])) {
-    $id = $_REQUEST['id'];
+if ($page->request->has('id')) {
+    $id = $page->request->input('id');
     $mov = $movie->getMovieInfo($id);
 
     if (! $mov) {
@@ -40,22 +40,22 @@ if (isset($_REQUEST['id'])) {
 			    }
 			}
 
-			$_POST['cover'] = (file_exists($coverLoc)) ? 1 : 0;
-			$_POST['backdrop'] = (file_exists($backdropLoc)) ? 1 : 0;
+			$page->request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
+			$page->request->merge(['backdrop' => file_exists($backdropLoc) ? 1 : 0]);
 
 			$movie->update([
-				'actors'   => $_POST['actors'],
-				'backdrop' => $_POST['backdrop'],
-				'cover'    => $_POST['cover'],
-				'director' => $_POST['director'],
-				'genre'    => $_POST['genre'],
+				'actors'   => $page->request->input('actors'),
+				'backdrop' => $page->request->input('backdrop'),
+				'cover'    => $page->request->input('cover'),
+				'director' => $page->request->input('director'),
+				'genre'    => $page->request->input('genre'),
 				'imdbid'   => $id,
-				'language' => $_POST['language'],
-				'plot'     => $_POST['plot'],
-				'rating'   => $_POST['rating'],
-				'tagline'  => $_POST['tagline'],
-				'title'    => $_POST['title'],
-				'year'     => $_POST['year'],
+				'language' => $page->request->input('language'),
+				'plot'     => $page->request->input('plot'),
+				'rating'   => $page->request->input('rating'),
+				'tagline'  => $page->request->input('tagline'),
+				'title'    => $page->request->input('title'),
+				'year'     => $page->request->input('year'),
 			]);
 
 			header('Location:'.WWW_TOP.'/movie-list.php');

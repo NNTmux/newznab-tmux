@@ -6,13 +6,13 @@ use App\Models\User;
 
 $page = new AdminPage();
 
-if (isset($_GET['id'])) {
-    User::deleteUser($_GET['id']);
+if ($page->request->has('id')) {
+    User::deleteUser($page->request->input('id'));
 }
 
-if (isset($_GET['redir'])) {
-    header('Location: '.$_GET['redir']);
+if ($page->request->has('redir')) {
+    header('Location: '.$page->request->input('redir'));
 } else {
-    $referrer = $_SERVER['HTTP_REFERER'];
+    $referrer = $page->request->server('HTTP_REFERER');
     header('Location: '.$referrer);
 }

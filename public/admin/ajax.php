@@ -78,7 +78,7 @@ switch ($page->request->input('action')) {
         break;
 
     case 'toggle_group_active_status':
-        print Group::updateGroupStatus((int) $page->request->input('group_id'), 'active', ($page->request->has('group_status') ? (int) $_GET['group_status'] : 0));
+        print Group::updateGroupStatus((int) $page->request->input('group_id'), 'active', ($page->request->has('group_status') ? (int) $page->request->input('group_status') : 0));
         break;
 
     case 'toggle_group_backfill_status':

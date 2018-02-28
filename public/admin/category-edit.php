@@ -8,19 +8,19 @@ $page = new AdminPage();
 $id = 0;
 
 // set the current action
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
-		$ret = Category::updateCategory($_POST['id'], $_POST['status'], $_POST['description'],
-			$_POST['disablepreview'], $_POST['minsizetoformrelease'], $_POST['maxsizetoformrelease']);
+		$ret = Category::updateCategory($page->request->input('id'), $page->request->input('status'), $page->request->input('description'),
+			$page->request->input('disablepreview'), $page->request->input('minsizetoformrelease'), $page->request->input('maxsizetoformrelease'));
 		header('Location:'.WWW_TOP.'/category-list.php');
 		break;
     case 'view':
     default:
-			if (isset($_GET['id'])) {
+			if ($page->request->has('id')) {
 			    $page->title = 'Category Edit';
-			    $id = $_GET['id'];
+			    $id = $page->request->input('id');
 			    $cat = Category::find($id);
 			    $page->smarty->assign('category', $cat);
 			}

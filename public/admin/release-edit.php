@@ -11,28 +11,28 @@ $releases = new Releases(['Settings' => $page->pdo]);
 $id = 0;
 
 // Set the current action.
-$action = ($_REQUEST['action'] ?? 'view');
+$action = ($page->request->input('action') ?? 'view');
 
 switch ($action) {
     case 'submit':
         Release::updateRelease(
-            $_POST['id'],
-            $_POST['name'],
-            $_POST['searchname'],
-            $_POST['fromname'],
-            $_POST['category'],
-            $_POST['totalpart'],
-            $_POST['grabs'],
-            $_POST['size'],
-            $_POST['postdate'],
-            $_POST['adddate'],
-            $_POST['videos_id'],
-            $_POST['tv_episodes_id'],
-            $_POST['imdbid'],
-            $_POST['anidbid']
+            $page->request->input('id'),
+            $page->request->input('name'),
+            $page->request->input('searchname'),
+            $page->request->input('fromname'),
+            $page->request->input('category'),
+            $page->request->input('totalpart'),
+            $page->request->input('grabs'),
+            $page->request->input('size'),
+            $page->request->input('postdate'),
+            $page->request->input('adddate'),
+            $page->request->input('videos_id'),
+            $page->request->input('tv_episodes_id'),
+            $page->request->input('imdbid'),
+            $page->request->input('anidbid')
         );
 
-        $release = Release::getByGuid($_POST['guid']);
+        $release = Release::getByGuid($page->request->input('guid'));
         $page->smarty->assign('release', $release);
 
         header('Location:'.WWW_TOP.'/../details/'.$release['guid']);
@@ -41,7 +41,7 @@ switch ($action) {
     case 'view':
     default:
         $page->title = 'Release Edit';
-        $id = $_GET['id'];
+        $id = $page->request->input('id');
         $release = Release::getByGuid($id);
         $page->smarty->assign('release', $release);
         break;

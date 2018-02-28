@@ -10,12 +10,12 @@ $tmux = new Tmux();
 $id = 0;
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? 'view';
+$action = $page->request->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
         $error = '';
-        $ret = $page->pdo->settingsUpdate($_POST);
+        $ret = $page->pdo->settingsUpdate($page->request->all());
         $page->title = 'Tmux Settings Edit';
         $page->smarty->assign('site', $page->settings);
         break;

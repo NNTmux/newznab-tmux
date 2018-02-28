@@ -8,9 +8,9 @@ $page = new AdminPage();
 
 $success = false;
 
-if (isset($_GET['id'])) {
-    $success = Release::removeVideoIdFromReleases($_GET['id']);
-    $page->smarty->assign('videoid', $_GET['id']);
+if ($page->request->has('id')) {
+    $success = Release::removeVideoIdFromReleases($page->request->input('id'));
+    $page->smarty->assign('videoid', $page->request->input('id'));
 }
 
 $page->smarty->assign('success', $success);

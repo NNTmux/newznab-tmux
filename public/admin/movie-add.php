@@ -10,11 +10,11 @@ $id = 0;
 
 $page->title = 'Movie Add';
 
-if (isset($_REQUEST['id']) && ctype_digit($_REQUEST['id']) && strlen($_REQUEST['id']) == 7) {
-    $id = $_REQUEST['id'];
+if ($page->request->has('id') && ctype_digit($page->request->input('id')) && strlen($page->request->input('id')) === 7) {
+    $id = $page->request->input('id');
 
     $movCheck = $movie->getMovieInfo($id);
-    if (! $movCheck || (isset($_REQUEST['update']) && $_REQUEST['update'] == 1)) {
+    if (! $movCheck || ($page->request->has('update') && $page->request->input('update') === 1)) {
         if ($movie->updateMovieInfo($id)) {
             header('Location:'.WWW_TOP.'/movie-list.php');
             die();

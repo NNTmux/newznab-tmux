@@ -15,7 +15,7 @@ foreach ($userRoles as $userRole) {
     $roles[$userRole['id']] = $userRole['name'];
 }
 
-switch ($_REQUEST['action'] ?? 'view') {
+switch ($page->request->input('action') ?? 'view') {
     case 'add':
         $page->title = 'User Roles Add';
         $role = [
@@ -33,46 +33,46 @@ switch ($_REQUEST['action'] ?? 'view') {
         break;
 
     case 'submit':
-        if ($_POST['id'] === '') {
+        if ($page->request->input('id') === '') {
             $role = UserRole::addRole(
-                $_POST['name'],
-                $_POST['apirequests'],
-                $_POST['downloadrequests'],
-                $_POST['defaultinvites'],
-                $_POST['canpreview'],
-                $_POST['hideads'],
-                $_POST['donation'],
-                $_POST['addyears']
+                $page->request->input('name'),
+                $page->request->input('apirequests'),
+                $page->request->input('downloadrequests'),
+                $page->request->input('defaultinvites'),
+                $page->request->input('canpreview'),
+                $page->request->input('hideads'),
+                $page->request->input('donation'),
+                $page->request->input('addyears')
             );
             header('Location:'.WWW_TOP.'/role-list.php');
         } else {
             $role = UserRole::updateRole(
-                $_POST['id'],
-                $_POST['name'],
-                $_POST['apirequests'],
-                $_POST['downloadrequests'],
-                $_POST['defaultinvites'],
-                $_POST['isdefault'],
-                $_POST['canpreview'],
-                $_POST['hideads'],
-                $_POST['donation'],
-                $_POST['addyears']
+                $page->request->input('id'),
+                $page->request->input('name'),
+                $page->request->input('apirequests'),
+                $page->request->input('downloadrequests'),
+                $page->request->input('defaultinvites'),
+                $page->request->input('isdefault'),
+                $page->request->input('canpreview'),
+                $page->request->input('hideads'),
+                $page->request->input('donation'),
+                $page->request->input('addyears')
             );
             header('Location:'.WWW_TOP.'/role-list.php');
 
-            $_POST['exccat'] = (! isset($_POST['exccat']) || ! is_array($_POST['exccat'])) ? [] : $_POST['exccat'];
-            RoleExcludedCategory::addRoleCategoryExclusions($_POST['id'], $_POST['exccat']);
+            $page->request->merge(['exccat' => (! $page->request->has('exccat') || ! is_array($page->request->input('exccat'))) ? [] : $page->request->input('exccat')]);
+            RoleExcludedCategory::addRoleCategoryExclusions($page->request->input('id'), $page->request->input('exccat'));
         }
         $page->smarty->assign('role', $role);
         break;
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if ($page->request->has('id')) {
             $page->title = 'User Roles Edit';
-            $role = UserRole::getRoleById($_GET['id']);
+            $role = UserRole::getRoleById($page->request->input('id'));
             $page->smarty->assign('role', $role);
-            $page->smarty->assign('roleexccat', RoleExcludedCategory::getRoleCategoryExclusion($_GET['id']));
+            $page->smarty->assign('roleexccat', RoleExcludedCategory::getRoleCategoryExclusion($page->request->input('id')));
         }
         break;
 }
