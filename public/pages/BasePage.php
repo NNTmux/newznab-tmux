@@ -104,7 +104,6 @@ class BasePage
      */
     public function __construct()
     {
-        $this->https = $this->request->server('HTTPS') !== null && $this->request->server('HTTPS') === 'on';
 
         if (session_id() === '') {
             session_set_cookie_params(0, '/', '', $this->https, true);
@@ -135,6 +134,8 @@ class BasePage
             ]
         );
         $this->smarty->error_reporting = E_ALL - E_NOTICE;
+
+        $this->https = $this->request->server('HTTPS') !== null && $this->request->server('HTTPS') === 'on';
 
         if ($this->request->server('SERVER_NAME')) {
             $this->serverurl = (
