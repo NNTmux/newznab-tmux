@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
 class Settings extends Model
 {
     use InsertOnDuplicateKey;
+
     public const REGISTER_STATUS_OPEN = 0;
 
     public const REGISTER_STATUS_INVITE = 1;
@@ -331,7 +332,7 @@ class Settings extends Model
     public static function settingsUpdate(array $data = [])
     {
         foreach ($data as $key => $value) {
-            self::query()->where('setting', $key)->update(['value' => $value]);
+            self::query()->where('setting', $key)->update(['value' => \is_array($value) ? implode(', ', $value) : $value]);
         }
     }
 }
