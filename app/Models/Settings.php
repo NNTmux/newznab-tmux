@@ -256,6 +256,11 @@ class Settings extends Model
         return $value;
     }
 
+    /**
+     * @param $setting
+     *
+     * @return array|bool
+     */
     protected static function dottedToArray($setting)
     {
         $result = [];
@@ -317,6 +322,17 @@ class Settings extends Model
         if (! empty($result)) {
             $dummy = explode('-', $result[0]->version, 2);
             $this->dbVersion = $dummy[0];
+        }
+    }
+
+    /**
+     * @param array $data
+     */
+    public static function settingsUpdate(array $data = [])
+    {
+        foreach ($data as $key => $value)
+        {
+            self::query()->where('setting', $key)->update(['value' => $value]);
         }
     }
 }

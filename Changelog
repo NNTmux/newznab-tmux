@@ -1,4 +1,5 @@
 2018-02-28 DariusIII
+	* Chg: Update Settings model and tmux-edit page to handle page updates
 	* Chg: Final batch of changes in request usage
 	* Fix: Fix ajax errors in admin area changed files
 	* Chg: Start using Request in admin pages

@@ -15,7 +15,7 @@ $action = $page->request->input('action') ?? 'view';
 switch ($action) {
     case 'submit':
         $error = '';
-        $ret = $page->pdo->settingsUpdate($page->request->all());
+        $ret = Settings::settingsUpdate($page->request->all());
         $page->title = 'Tmux Settings Edit';
         $page->smarty->assign('site', $page->settings);
         break;
