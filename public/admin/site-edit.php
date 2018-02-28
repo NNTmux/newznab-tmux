@@ -25,7 +25,7 @@ switch ($action) {
                 implode(', ', $page->request->input('book_reqids')) : $page->request->input('book_reqids');
         }
         $error = '';
-        $ret = $page->pdo->settingsUpdate($page->request->all());
+        $ret = Settings::settingsUpdate($page->request->all());
         if (is_int($ret)) {
             if ($ret === Settings::ERR_BADUNRARPATH) {
                 $error = 'The unrar path does not point to a valid binary';
