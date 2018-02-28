@@ -9,16 +9,18 @@ use App\Models\ReleaseComment;
 
 // This script waits for ajax queries from the web.
 
-if (! $page->request->has('action')) {
-    exit();
-}
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 // Make sure the user is an admin and logged in.
-$admin = new AdminPage;
+$page = new AdminPage;
 $pdo = new DB();
 
-$settings = ['Settings' => $admin->settings];
+if (! $page->request->has('action')) {
+    exit();
+}
+
+$settings = ['Settings' => $page->settings];
 switch ($page->request->input('action')) {
     case 'binary_blacklist_delete':
         $id = (int) $page->request->input('row_id');
@@ -28,19 +30,19 @@ switch ($page->request->input('action')) {
 
     case 'category_regex_delete':
         $id = (int) $page->request->input('row_id');
-        (new Regexes(['Settings' => $admin->settings, 'Table_Name' => 'category_regexes']))->deleteRegex($id);
+        (new Regexes(['Settings' => $page->settings, 'Table_Name' => 'category_regexes']))->deleteRegex($id);
         echo "Regex $id deleted.";
         break;
 
     case 'collection_regex_delete':
         $id = (int) $page->request->input('row_id');
-        (new Regexes(['Settings' => $admin->settings, 'Table_Name' => 'collection_regexes']))->deleteRegex($id);
+        (new Regexes(['Settings' => $page->settings, 'Table_Name' => 'collection_regexes']))->deleteRegex($id);
         echo "Regex $id deleted.";
         break;
 
     case 'release_naming_regex_delete':
         $id = (int) $page->request->input('row_id');
-        (new Regexes(['Settings' => $admin->settings, 'Table_Name' => 'release_naming_regexes']))->deleteRegex($id);
+        (new Regexes(['Settings' => $page->settings, 'Table_Name' => 'release_naming_regexes']))->deleteRegex($id);
         echo "Regex $id deleted.";
         break;
 
@@ -106,7 +108,7 @@ switch ($page->request->input('action')) {
     case 'sharing_reset_settings':
         $guid = $pdo->queryOneRow('SELECT site_guid FROM sharing');
         $guid = ($guid === false ? '' : $guid['site_guid']);
-        (new Sharing(['Settings' => $admin->settings]))->initSettings($guid);
+        (new Sharing(['Settings' => $page->settings]))->initSettings($guid);
         echo 'Re-initiated sharing settings!';
         break;
 

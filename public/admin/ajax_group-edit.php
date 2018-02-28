@@ -4,7 +4,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\Group;
 
-$admin = new AdminPage;
+$page = new AdminPage;
 
 // session_write_close(); allows the admin to use the site while the ajax request is being processed.
 if ($page->request->has('action') && $page->request->input('action') === 2) {

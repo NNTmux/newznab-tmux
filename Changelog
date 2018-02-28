@@ -1,4 +1,5 @@
 2018-02-28 DariusIII
+	* Fix: Fix ajax errors in admin area changed files
 	* Chg: Start using Request in admin pages
 	* Chg: Update BasePage for more Request usage
 	* Chg: More changes for Request usage

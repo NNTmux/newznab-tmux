@@ -7,7 +7,7 @@ use Blacklight\Sharing;
 use App\Models\ReleaseComment;
 
 // Login check.
-$admin = new AdminPage;
+$page = new AdminPage;
 $db = new DB();
 
 if ($page->request->has('site_ID') && $page->request->has('site_status')) {
@@ -64,7 +64,7 @@ if ($page->request->has('site_ID') && $page->request->has('site_status')) {
 } elseif ($page->request->has('reset_settings')) {
     $guid = $db->queryOneRow('SELECT site_guid FROM sharing');
     $guid = ($guid === false ? '' : $guid['site_guid']);
-    (new Sharing(['Settings' => $admin->settings]))->initSettings($guid);
+    (new Sharing(['Settings' => $page->settings]))->initSettings($guid);
     echo 'Re-initiated sharing settings!';
 } elseif ($page->request->has('purge_site')) {
     $guid = $db->queryOneRow(sprintf('SELECT site_guid FROM sharing_sites WHERE id = %d', $page->request->input('purge_site')));
