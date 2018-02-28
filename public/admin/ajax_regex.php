@@ -8,20 +8,20 @@ use Blacklight\Binaries;
 // Login Check
 $admin = new AdminPage;
 
-if (! isset($_GET['action'])) {
+if (! $page->request->has('action')) {
     exit();
 }
 
 switch ($_GET['action']) {
-	case 1:
-		$id = (int) $_GET['col_id'];
-		(new Regexes(['Settings' => $admin->settings]))->deleteRegex($id);
-		echo "Regex $id deleted.";
-		break;
+    case 1:
+        $id = (int) $page->request->input('col_id');
+        (new Regexes(['Settings' => $admin->settings]))->deleteRegex($id);
+        echo "Regex $id deleted.";
+        break;
 
-	case 2:
-		$id = (int) $_GET['bin_id'];
-		(new Binaries(['Settings' => $admin->settings]))->deleteBlacklist($id);
-		echo "Blacklist $id deleted.";
-		break;
+    case 2:
+        $id = (int) $page->request->input('bin_id');
+        (new Binaries(['Settings' => $admin->settings]))->deleteBlacklist($id);
+        echo "Blacklist $id deleted.";
+        break;
 }

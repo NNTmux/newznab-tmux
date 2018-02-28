@@ -8,8 +8,8 @@ use Blacklight\ReleaseRegex;
 $admin = new AdminPage;
 $regex = new ReleaseRegex();
 
-if (isset($_GET['action']) && $_GET['action'] == '2') {
-    $id = (int) $_GET['regex_id'];
+if ($page->request->has('action') && $page->request->input('action') === '2') {
+    $id = (int) $page->request->input('regex_id');
     $regex->delete($id);
     echo "Regex $id deleted.";
 }
