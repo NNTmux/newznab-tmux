@@ -12,10 +12,10 @@ if (! User::isLoggedIn()) {
 }
 
 $action = $page->request->input('id') ?? '';
-$videoId = $_REQUEST['subpage'] ?? '';
+$videoId = $page->request->input('subpage') ?? '';
 
-if (isset($_REQUEST['from'])) {
-    $page->smarty->assign('from', WWW_TOP.$_REQUEST['from']);
+if ($page->request->has('from')) {
+    $page->smarty->assign('from', WWW_TOP.$page->request->input('from'));
 } else {
     $page->smarty->assign('from', WWW_TOP.'/myshows');
 }
@@ -23,8 +23,8 @@ if (isset($_REQUEST['from'])) {
 switch ($action) {
     case 'delete':
         $show = UserSerie::getShow(User::currentUserId(), $videoId);
-        if (isset($_REQUEST['from'])) {
-            header('Location:'.WWW_TOP.$_REQUEST['from']);
+        if ($page->request->has('from')) {
+            header('Location:'.WWW_TOP.$page->request->input('from'));
         } else {
             header('Location:'.WWW_TOP.'/myshows');
         }
@@ -48,10 +48,10 @@ switch ($action) {
         }
 
         if ($action === 'doadd') {
-            $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
+            $category = ($page->request->has('category') && is_array($page->request->input('category')) && ! empty($page->request->input('category'))) ? $page->request->input('category') : [];
             UserSerie::addShow(User::currentUserId(), $videoId, $category);
-            if (isset($_REQUEST['from'])) {
-                header('Location:'.WWW_TOP.$_REQUEST['from']);
+            if ($page->request->has('from')) {
+                header('Location:'.WWW_TOP.$page->request->input('from'));
             } else {
                 header('Location:'.WWW_TOP.'/myshows');
             }
@@ -84,10 +84,10 @@ switch ($action) {
         }
 
         if ($action === 'doedit') {
-            $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
+            $category = ($page->request->has('category') && is_array($page->request->input('category')) && ! empty($page->request->input('category'))) ? $page->request->input('category') : [];
             UserSerie::updateShow(User::currentUserId(), $videoId, $category);
-            if (isset($_REQUEST['from'])) {
-                header('Location:'.WWW_TOP.$_REQUEST['from']);
+            if ($page->request->has('from')) {
+                header('Location:'.WWW_TOP.$page->request->input('from'));
             } else {
                 header('Location:'.WWW_TOP.'/myshows');
             }

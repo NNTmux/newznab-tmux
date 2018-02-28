@@ -14,10 +14,10 @@ if (! User::isLoggedIn()) {
 $mv = new Movie(['Settings' => $page->settings]);
 
 $action = $page->request->input('id') ?? '';
-$imdbid = $_REQUEST['subpage'] ?? '';
+$imdbid = $page->request->input('subpage') ?? '';
 
-if (isset($_REQUEST['from'])) {
-    $page->smarty->assign('from', WWW_TOP.$_REQUEST['from']);
+if ($page->request->has('from')) {
+    $page->smarty->assign('from', WWW_TOP.$page->request->input('from'));
 } else {
     $page->smarty->assign('from', WWW_TOP.'/mymovies');
 }
@@ -25,8 +25,8 @@ if (isset($_REQUEST['from'])) {
 switch ($action) {
     case 'delete':
         $movie = UserMovie::getMovie(User::currentUserId(), $imdbid);
-        if (isset($_REQUEST['from'])) {
-            header('Location:'.WWW_TOP.$_REQUEST['from']);
+        if ($page->request->has('from')) {
+            header('Location:'.WWW_TOP.$page->request->input('from'));
         } else {
             header('Location:'.WWW_TOP.'/mymovies');
         }
@@ -50,10 +50,10 @@ switch ($action) {
         }
 
         if ($action === 'doadd') {
-            $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
+            $category = ($page->request->has('category') && is_array($page->request->input('category')) && ! empty($page->request->input('category'))) ? $page->request->input('category') : [];
             UserMovie::addMovie(User::currentUserId(), $imdbid, $category);
-            if (isset($_REQUEST['from'])) {
-                header('Location:'.WWW_TOP.$_REQUEST['from']);
+            if ($page->request->has('from')) {
+                header('Location:'.WWW_TOP.$page->request->input('from'));
             } else {
                 header('Location:'.WWW_TOP.'/mymovies');
             }
@@ -86,10 +86,10 @@ switch ($action) {
         }
 
         if ($action === 'doedit') {
-            $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
+            $category = ($page->request->has('category') && is_array($page->request->input('category')) && ! empty($page->request->input('category'))) ? $page->request->input('category') : [];
             UserMovie::updateMovie(User::currentUserId(), $imdbid, $category);
-            if (isset($_REQUEST['from'])) {
-                header('Location:'.WWW_TOP.$_REQUEST['from']);
+            if ($page->request->has('from')) {
+                header('Location:'.WWW_TOP.$page->request->input('from'));
             } else {
                 header('Location:'.WWW_TOP.'/mymovies');
             }

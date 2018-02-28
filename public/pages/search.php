@@ -18,7 +18,7 @@ $page->meta_description = 'Search for Nzbs';
 $results = [];
 
 $searchType = 'basic';
-if (isset($_REQUEST['search_type']) && $_REQUEST['search_type'] === 'adv') {
+if ($page->request->has('search_type') && $page->request->input('search_type') === 'adv') {
     $searchType = 'advanced';
 }
 
@@ -33,11 +33,11 @@ $page->smarty->assign(
     ]
 );
 
-if (($page->request->has('id') || isset($_REQUEST['subject'])) && ! isset($_REQUEST['searchadvr']) && $searchType === 'basic') {
+if (($page->request->has('id') || $page->request->has('subject')) && ! $page->request->has('searchadvr') && $searchType === 'basic') {
     $searchString = '';
     switch (true) {
-        case isset($_REQUEST['subject']):
-            $searchString = (string) $_REQUEST['subject'];
+        case $page->request->has('subject'):
+            $searchString = (string) $page->request->input('subject');
             $page->smarty->assign('subject', $searchString);
             break;
         case $page->request->has('id'):
@@ -100,7 +100,7 @@ $searchVars = [
 ];
 
 foreach ($searchVars as $searchVarKey => $searchVar) {
-    $searchVars[$searchVarKey] = (isset($_REQUEST[$searchVarKey]) ? (string) $_REQUEST[$searchVarKey] : '');
+    $searchVars[$searchVarKey] = ($page->request->has($searchVarKey) ? (string) $page->request->input($searchVarKey) : '');
 }
 
 $searchVars['selectedgroup'] = $searchVars['searchadvgroups'];
@@ -111,7 +111,7 @@ foreach ($searchVars as $searchVarKey => $searchVar) {
     $page->smarty->assign($searchVarKey, $searchVars[$searchVarKey]);
 }
 
-if (isset($_REQUEST['searchadvr']) && ! $page->request->has('id') && ! isset($_REQUEST['subject']) && $searchType !== 'basic') {
+if ($page->request->has('searchadvr') && ! $page->request->has('id') && ! $page->request->has('subject') && $searchType !== 'basic') {
     $orderByString = '';
     foreach ($searchVars as $searchVarKey => $searchVar) {
         $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);

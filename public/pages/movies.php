@@ -61,7 +61,7 @@ $director = ($page->request->has('director') && ! empty($page->request->input('d
 $page->smarty->assign('director', $director);
 
 $ratings = range(1, 9);
-$rating = (isset($_REQUEST['rating']) && in_array($_REQUEST['rating'], $ratings, false)) ? $_REQUEST['rating'] : '';
+$rating = ($page->request->has('rating') && in_array($page->request->input('rating'), $ratings, false)) ? $page->request->input('rating') : '';
 $page->smarty->assign('ratings', $ratings);
 $page->smarty->assign('rating', $rating);
 

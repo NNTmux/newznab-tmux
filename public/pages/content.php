@@ -32,8 +32,8 @@ if (! empty($page->request->input('id'))) {
 }
 
 $request = false;
-if (! empty($_REQUEST['page'])) {
-    $request = $_REQUEST['page'];
+if (! empty($page->request->input('page'))) {
+    $request = $page->request->input('page');
 }
 
 if ($contentId === 0 && $request === 'content') {

@@ -35,7 +35,7 @@ $orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $o
 $results = $musics = [];
 $results = $music->getMusicRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, $page->userdata['categoryexclusions']);
 
-$artist = (isset($_REQUEST['artist']) && ! empty($_REQUEST['artist'])) ? stripslashes($_REQUEST['artist']) : '';
+$artist = ($page->request->has('artist') && ! empty($page->request->input('artist'))) ? stripslashes($page->request->input('artist')) : '';
 $page->smarty->assign('artist', $artist);
 
 $title = ($page->request->has('title') && ! empty($page->request->input('title'))) ? stripslashes($page->request->input('title')) : '';

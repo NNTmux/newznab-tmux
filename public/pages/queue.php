@@ -54,23 +54,23 @@ if ($queue !== null) {
     }
 
     if ($error === '') {
-        if (isset($_REQUEST['del'])) {
-            $queue->delFromQueue($_REQUEST['del']);
+        if ($page->request->has('del')) {
+            $queue->delFromQueue($page->request->input('del'));
         }
 
-        if (isset($_REQUEST['pause'])) {
-            $queue->pauseFromQueue($_REQUEST['pause']);
+        if ($page->request->has('pause')) {
+            $queue->pauseFromQueue($page->request->input('pause'));
         }
 
-        if (isset($_REQUEST['resume'])) {
-            $queue->resumeFromQueue($_REQUEST['resume']);
+        if ($page->request->has('resume')) {
+            $queue->resumeFromQueue($page->request->input('resume'));
         }
 
-        if (isset($_REQUEST['pall'])) {
+        if ($page->request->has('pall')) {
             $queue->pauseAll();
         }
 
-        if (isset($_REQUEST['rall'])) {
+        if ($page->request->has('rall')) {
             $queue->resumeAll();
         }
 

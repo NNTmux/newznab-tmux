@@ -27,7 +27,7 @@ if (! User::isLoggedIn()) {
                     $page->smarty->assign('error', 'Your account has been disabled.');
                 } elseif (User::checkPassword($page->request->input('password'), $res['password'], $res['id'])) {
                     $rememberMe = ($page->request->has('rememberme') && $page->request->input('rememberme') === 'on');
-                    User::login($res['id'], $_SERVER['REMOTE_ADDR'], $rememberMe);
+                    User::login($res['id'], $page->request->id(), $rememberMe);
 
                     if ($page->request->has('redirect') && $page->request->input('redirect') !== '') {
                         header('Location: '.$page->request->input('redirect'));

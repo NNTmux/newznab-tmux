@@ -17,7 +17,7 @@ $showRegister = 1;
 if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
     $error = 'Registrations are currently disabled.';
     $showRegister = 0;
-} elseif (Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE && (! isset($_REQUEST['invitecode']) || empty($_REQUEST['invitecode']))) {
+} elseif (Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE && (! $page->request->has('invitecode') || empty($page->request->input('invitecode')))) {
     $error = 'Registrations are currently invite only.';
     $showRegister = 0;
 }
@@ -26,8 +26,8 @@ if ($showRegister === 1) {
     $action = $page->request->input('action') ?? 'view';
 
     //Be sure to persist the invite code in the event of multiple form submissions. (errors)
-    if (isset($_REQUEST['invitecode'])) {
-        $inviteCodeQuery = '&invitecode='.$_REQUEST['invitecode'];
+    if ($page->request->has('invitecode')) {
+        $inviteCodeQuery = '&invitecode='.$page->request->input('invitecode');
     }
 
     $captcha = new Captcha($page);
@@ -55,7 +55,7 @@ if ($showRegister === 1) {
                             $userName,
                             $password,
                             $email,
-                            $_SERVER['REMOTE_ADDR'],
+                            $page->request->id(),
                             $userDefault['id'],
                             '',
                             $userDefault['defaultinvites'],
@@ -63,7 +63,7 @@ if ($showRegister === 1) {
                         );
 
                         if ($ret > 0) {
-                            User::login($ret, $_SERVER['REMOTE_ADDR']);
+                            User::login($ret, $page->request->id());
                             header('Location: '.WWW_TOP.'/');
                         } else {
                             switch ($ret) {

@@ -46,7 +46,7 @@ if ($page->request->has('id')) {
 //
 $hosthash = '';
 if ((int) Settings::settingValue('..storeuserips') === 1) {
-    $hosthash = User::getHostHash($_SERVER['REMOTE_ADDR'], Settings::settingValue('..siteseed'));
+    $hosthash = User::getHostHash($page->request->id(), Settings::settingValue('..siteseed'));
 }
 
 // Check download limit on user role.
