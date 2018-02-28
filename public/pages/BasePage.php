@@ -270,7 +270,7 @@ class BasePage
             'Location: '.
             ($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).
             '/login?redirect='.
-            urlencode($page->request->getRequestUri())
+            urlencode($this->request->getRequestUri())
         );
         exit();
     }
