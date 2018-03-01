@@ -134,7 +134,7 @@ class BasePage
         );
         $this->smarty->error_reporting = E_ALL - E_NOTICE;
 
-        $this->https = $this->request->server('HTTPS') !== null && $this->request->server('HTTPS') === 'on';
+        $this->https = $this->request->secure();
 
         if ($this->request->server('SERVER_NAME')) {
             $this->serverurl = (

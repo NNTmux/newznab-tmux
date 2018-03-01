@@ -1,4 +1,5 @@
 2018-03-01 DariusIII
+	* Chg: Update Basepage to use request secure site check
 	* Fix: Fix bulk adding of groups
 	* Fix: Fix typo in request function used (id()->ip())
 2018-02-28 DariusIII
