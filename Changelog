@@ -1,4 +1,5 @@
 2018-03-01 DariusIII
+	* Chg: Instantiate Request class as soon as possible
 	* Fix: Fix updating of site settings
 	* Chg: Update Basepage to use request secure site check
 	* Fix: Fix bulk adding of groups
