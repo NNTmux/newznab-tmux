@@ -103,7 +103,6 @@ class BasePage
      */
     public function __construct()
     {
-
         if (! session()->isStarted()) {
             session()->start();
             /*if (!session()->has('_token')) {

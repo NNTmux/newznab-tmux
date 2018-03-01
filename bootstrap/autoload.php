@@ -26,5 +26,5 @@ if (! defined('HAS_WHICH')) {
 new Configure('indexer');
 
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-$response = $app->handle( $request = Illuminate\Http\Request::capture());
+$response = $app->handle($request = Illuminate\Http\Request::capture());
 require_once __DIR__.DIRECTORY_SEPARATOR.'yenc.php';
