@@ -10,11 +10,11 @@ $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'release_namin
 $page->title = 'Release Naming Regex List';
 
 $group = '';
-if ($page->request->has('group') && ! empty($page->request->input('group'))) {
-    $group = $page->request->input('group');
+if (request()->has('group') && ! empty(request()->input('group'))) {
+    $group = request()->input('group');
 }
 
-$offset = $page->request->input('offset') ?? 0;
+$offset = request()->input('offset') ?? 0;
 $regex = $regexes->getRegex($group, env('ITEMS_PER_PAGE', 50), $offset);
 $page->smarty->assign('regex', $regex);
 

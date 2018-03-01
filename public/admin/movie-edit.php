@@ -9,10 +9,10 @@ $movie = new Movie();
 $id = 0;
 
 // set the current action
-$action = $page->request->input('action') ?? 'view';
+$action = request()->input('action') ?? 'view';
 
-if ($page->request->has('id')) {
-    $id = $page->request->input('id');
+if (request()->has('id')) {
+    $id = request()->input('id');
     $mov = $movie->getMovieInfo($id);
 
     if (! $mov) {
@@ -40,22 +40,22 @@ if ($page->request->has('id')) {
 			    }
 			}
 
-			$page->request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
-			$page->request->merge(['backdrop' => file_exists($backdropLoc) ? 1 : 0]);
+			request()->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
+			request()->merge(['backdrop' => file_exists($backdropLoc) ? 1 : 0]);
 
 			$movie->update([
-				'actors'   => $page->request->input('actors'),
-				'backdrop' => $page->request->input('backdrop'),
-				'cover'    => $page->request->input('cover'),
-				'director' => $page->request->input('director'),
-				'genre'    => $page->request->input('genre'),
+				'actors'   => request()->input('actors'),
+				'backdrop' => request()->input('backdrop'),
+				'cover'    => request()->input('cover'),
+				'director' => request()->input('director'),
+				'genre'    => request()->input('genre'),
 				'imdbid'   => $id,
-				'language' => $page->request->input('language'),
-				'plot'     => $page->request->input('plot'),
-				'rating'   => $page->request->input('rating'),
-				'tagline'  => $page->request->input('tagline'),
-				'title'    => $page->request->input('title'),
-				'year'     => $page->request->input('year'),
+				'language' => request()->input('language'),
+				'plot'     => request()->input('plot'),
+				'rating'   => request()->input('rating'),
+				'tagline'  => request()->input('tagline'),
+				'title'    => request()->input('title'),
+				'year'     => request()->input('year'),
 			]);
 
 			header('Location:'.WWW_TOP.'/movie-list.php');

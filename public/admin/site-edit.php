@@ -14,16 +14,16 @@ $sites = new Sites();
 $id = 0;
 
 // set the current action
-$action = $page->request->input('action') ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
 
-        if (! $page->request->has('book_reqids')) {
-            $page->request->merge(['book_reqids' => []]);
+        if (! request()->has('book_reqids')) {
+            request()->merge(['book_reqids' => []]);
         }
         $error = '';
-        $ret = Settings::settingsUpdate($page->request->all());
+        $ret = Settings::settingsUpdate(request()->all());
         if (is_int($ret)) {
             if ($ret === Settings::ERR_BADUNRARPATH) {
                 $error = 'The unrar path does not point to a valid binary';
@@ -50,7 +50,7 @@ switch ($action) {
             header('Location:'.WWW_TOP.'/site-edit.php?id='.$returnid);
         } else {
             $page->smarty->assign('error', $error);
-            $site = $sites->row2Object($page->request->all());
+            $site = $sites->row2Object(request()->all());
             $page->smarty->assign('site', $site);
         }
 

@@ -54,23 +54,23 @@ if ($queue !== null) {
     }
 
     if ($error === '') {
-        if ($page->request->has('del')) {
-            $queue->delFromQueue($page->request->input('del'));
+        if (request()->has('del')) {
+            $queue->delFromQueue(request()->input('del'));
         }
 
-        if ($page->request->has('pause')) {
-            $queue->pauseFromQueue($page->request->input('pause'));
+        if (request()->has('pause')) {
+            $queue->pauseFromQueue(request()->input('pause'));
         }
 
-        if ($page->request->has('resume')) {
-            $queue->resumeFromQueue($page->request->input('resume'));
+        if (request()->has('resume')) {
+            $queue->resumeFromQueue(request()->input('resume'));
         }
 
-        if ($page->request->has('pall')) {
+        if (request()->has('pall')) {
             $queue->pauseAll();
         }
 
-        if ($page->request->has('rall')) {
+        if (request()->has('rall')) {
             $queue->resumeAll();
         }
 

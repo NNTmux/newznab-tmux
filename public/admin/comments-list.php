@@ -9,7 +9,7 @@ $page = new AdminPage();
 $page->title = 'Comments List';
 
 $commentcount = ReleaseComment::getCommentCount();
-$offset = $page->request->input('offset') ?? 0;
+$offset = request()->input('offset') ?? 0;
 $page->smarty->assign([
         'pagertotalitems' => $commentcount,
         'pageroffset' => $offset,

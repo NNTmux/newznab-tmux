@@ -18,8 +18,8 @@ foreach ($musiccats as $mcat) {
     $mtmp[$mcat['id']] = $mcat;
 }
 $category = Category::MUSIC_ROOT;
-if ($page->request->has('t') && array_key_exists($page->request->input('t'), $mtmp)) {
-    $category = $page->request->input('t') + 0;
+if (request()->has('t') && array_key_exists(request()->input('t'), $mtmp)) {
+    $category = request()->input('t') + 0;
 }
 
 $catarray = [];
@@ -28,17 +28,17 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $mtmp);
 $page->smarty->assign('category', $category);
 
-$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
+$offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 $ordering = $music->getMusicOrdering();
-$orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering) ? $page->request->input('ob') : '';
+$orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering) ? request()->input('ob') : '';
 
 $results = $musics = [];
 $results = $music->getMusicRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, $page->userdata['categoryexclusions']);
 
-$artist = ($page->request->has('artist') && ! empty($page->request->input('artist'))) ? stripslashes($page->request->input('artist')) : '';
+$artist = (request()->has('artist') && ! empty(request()->input('artist'))) ? stripslashes(request()->input('artist')) : '';
 $page->smarty->assign('artist', $artist);
 
-$title = ($page->request->has('title') && ! empty($page->request->input('title'))) ? stripslashes($page->request->input('title')) : '';
+$title = (request()->has('title') && ! empty(request()->input('title'))) ? stripslashes(request()->input('title')) : '';
 $page->smarty->assign('title', $title);
 
 $genres = $gen->getGenres(Genres::MUSIC_TYPE, true);
@@ -52,13 +52,13 @@ foreach ($results as $result) {
     $musics[] = $result;
 }
 
-$genre = ($page->request->has('genre') && array_key_exists($page->request->input('genre'), $tmpgnr)) ? $page->request->input('genre') : '';
+$genre = (request()->has('genre') && array_key_exists(request()->input('genre'), $tmpgnr)) ? request()->input('genre') : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
 $years = range(1950, (date('Y') + 1));
 rsort($years);
-$year = ($page->request->has('year') && in_array($page->request->input('year'), $years)) ? $page->request->input('year') : '';
+$year = (request()->has('year') && in_array(request()->input('year'), $years)) ? request()->input('year') : '';
 $page->smarty->assign('years', $years);
 $page->smarty->assign('year', $year);
 

@@ -7,12 +7,12 @@ use App\Models\Group;
 $page = new AdminPage();
 
 // set the current action
-$action = $page->request->input('action') ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 switch ($action) {
 	case 'submit':
-		if ($page->request->has('groupfilter') && ! empty($page->request->input('groupfilter'))) {
-		    $msgs = Group::addBulk($page->request->input('groupfilter'), $page->request->input('active'), $page->request->input('backfill'));
+		if (request()->has('groupfilter') && ! empty(request()->input('groupfilter'))) {
+		    $msgs = Group::addBulk(request()->input('groupfilter'), request()->input('active'), request()->input('backfill'));
 		}
 		break;
 	default:

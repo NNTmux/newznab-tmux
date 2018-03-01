@@ -12,10 +12,10 @@ $gen = new Genres();
 $id = 0;
 
 // set the current action
-$action = $page->request->input('action') ?? 'view';
+$action = request()->input('action') ?? 'view';
 
-if ($page->request->has('id')) {
-    $id = $page->request->input('id');
+if (request()->has('id')) {
+    $id = request()->input('id');
     $b = $book->getBookInfo($id);
 
     if (! $b) {
@@ -34,9 +34,9 @@ if ($page->request->has('id')) {
 			    }
 			}
 
-			$page->request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
-			$page->request->merge(['publishdate' => (empty($page->request->input('publishdate')) || ! strtotime($page->request->input('publishdate'))) ? $con['publishdate'] : Carbon::parse($page->request->input('publishdate'))->timestamp]);
-			$book->update($id, $page->request->input('title'), $page->request->input('asin'), $page->request->input('url'), $page->request->input('author'), $page->request->input('publisher'), $page->request->input('publishdate'), $page->request->input('cover'));
+			request()->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
+			request()->merge(['publishdate' => (empty(request()->input('publishdate')) || ! strtotime(request()->input('publishdate'))) ? $con['publishdate'] : Carbon::parse(request()->input('publishdate'))->timestamp]);
+			$book->update($id, request()->input('title'), request()->input('asin'), request()->input('url'), request()->input('author'), request()->input('publisher'), request()->input('publishdate'), request()->input('cover'));
 
 			header('Location:'.WWW_TOP.'/book-list.php');
 	        die();

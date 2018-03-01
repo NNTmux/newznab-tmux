@@ -15,7 +15,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$action = $page->request->input('action') ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 $userid = User::currentUserId();
 $data = User::find($userid);
@@ -36,64 +36,64 @@ switch ($action) {
         break;
     case 'submit':
 
-        $data['email'] = $page->request->input('email');
-        if ($page->request->has('saburl') && ! ends_with($page->request->input('saburl'), '/') && strlen(trim($page->request->input('saburl'))) > 0) {
-            $page->request->merge(['saburl' => $page->request->input('saburl').'/']);
+        $data['email'] = request()->input('email');
+        if (request()->has('saburl') && ! ends_with(request()->input('saburl'), '/') && strlen(trim(request()->input('saburl'))) > 0) {
+            request()->merge(['saburl' => request()->input('saburl').'/']);
         }
 
-        if ($page->request->input('password') !== '' && $page->request->input('password') !== $page->request->input('confirmpassword')) {
+        if (request()->input('password') !== '' && request()->input('password') !== request()->input('confirmpassword')) {
             $errorStr = 'Password Mismatch';
-        } elseif ($page->request->input('password') !== '' && ! User::isValidPassword($page->request->input('password'))) {
+        } elseif (request()->input('password') !== '' && ! User::isValidPassword(request()->input('password'))) {
             $errorStr = 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
-        } elseif (! empty($page->request->input('nzbgeturl')) && $nzbGet->verifyURL($page->request->input('nzbgeturl')) === false) {
+        } elseif (! empty(request()->input('nzbgeturl')) && $nzbGet->verifyURL(request()->input('nzbgeturl')) === false) {
             $errorStr = 'The NZBGet URL you entered is invalid!';
-        } elseif (! User::isValidEmail($page->request->input('email'))) {
+        } elseif (! User::isValidEmail(request()->input('email'))) {
             $errorStr = 'Your email is not a valid format.';
         } else {
-            $res = User::getByEmail($page->request->input('email'));
+            $res = User::getByEmail(request()->input('email'));
             if ($res && (int) $res['id'] !== (int) $userid) {
                 $errorStr = 'Sorry, the email is already in use.';
-            } elseif ((empty($page->request->input('saburl')) && ! empty($page->request->input('sabapikey'))) || (! empty($page->request->input('saburl')) && empty($page->request->input('sabapikey')))) {
+            } elseif ((empty(request()->input('saburl')) && ! empty(request()->input('sabapikey'))) || (! empty(request()->input('saburl')) && empty(request()->input('sabapikey')))) {
                 $errorStr = 'Insert a SABnzdb URL and API key.';
             } else {
-                if ($page->request->has('sasetting') && $page->request->input('sabsetting') === 2) {
-                    $sab->setCookie($page->request->input('saburl'), $page->request->input('sabapikey'), $page->request->input('sabpriority'), $page->request->input('sabapikeytype'));
+                if (request()->has('sasetting') && request()->input('sabsetting') === 2) {
+                    $sab->setCookie(request()->input('saburl'), request()->input('sabapikey'), request()->input('sabpriority'), request()->input('sabapikeytype'));
                 }
 
                 User::updateUser(
                     $userid,
                     $data['username'],
-                    $page->request->input('email'),
+                    request()->input('email'),
                     $data['grabs'],
                     $data['user_roles_id'],
                     $data['notes'],
                     $data['invites'],
-                    $page->request->has('movieview') ? 1 : 0,
-                    $page->request->has('musicview') ? 1 : 0,
-                    $page->request->has('gameview') ? 1 : 0,
-                    $page->request->has('xxxview') ? 1 : 0,
-                    $page->request->has('consoleview') ? 1 : 0,
-                    $page->request->has('bookview') ? 1 : 0,
-                    $page->request->input('queuetypeids'),
-                    $page->request->input('nzbgeturl') ?? '',
-                    $page->request->input('nzbgetusername') ?? '',
-                    $page->request->input('nzbgetpassword') ?? '',
-                    $page->request->has('saburl') ? Utility::trailingSlash($page->request->input('saburl')) : '',
-                    $page->request->input('sabapikey') ?? '',
-                    $page->request->input('sabpriority') ?? '',
-                    $page->request->input('sabapikeytype') ?? '',
-                    $page->request->input('nzbvortex_server_url') ?? '',
-                    $page->request->input('nzbvortex_api_key') ?? '',
-                    $page->request->input('cp_url') ?? '',
-                    $page->request->input('cp_api') ?? '',
-                    (int) Settings::settingValue('site.main.userselstyle') === 1 ? $page->request->input('style') : 'None'
+                    request()->has('movieview') ? 1 : 0,
+                    request()->has('musicview') ? 1 : 0,
+                    request()->has('gameview') ? 1 : 0,
+                    request()->has('xxxview') ? 1 : 0,
+                    request()->has('consoleview') ? 1 : 0,
+                    request()->has('bookview') ? 1 : 0,
+                    request()->input('queuetypeids'),
+                    request()->input('nzbgeturl') ?? '',
+                    request()->input('nzbgetusername') ?? '',
+                    request()->input('nzbgetpassword') ?? '',
+                    request()->has('saburl') ? Utility::trailingSlash(request()->input('saburl')) : '',
+                    request()->input('sabapikey') ?? '',
+                    request()->input('sabpriority') ?? '',
+                    request()->input('sabapikeytype') ?? '',
+                    request()->input('nzbvortex_server_url') ?? '',
+                    request()->input('nzbvortex_api_key') ?? '',
+                    request()->input('cp_url') ?? '',
+                    request()->input('cp_api') ?? '',
+                    (int) Settings::settingValue('site.main.userselstyle') === 1 ? request()->input('style') : 'None'
                 );
 
-                $page->request->merge(['exccat' => (! $page->request->has('exccat') || ! is_array($page->request->input('exccat'))) ? [] : $page->request->input('exccat')]);
-                UserExcludedCategory::addCategoryExclusions($userid, $page->request->input('exccat'));
+                request()->merge(['exccat' => (! request()->has('exccat') || ! is_array(request()->input('exccat'))) ? [] : request()->input('exccat')]);
+                UserExcludedCategory::addCategoryExclusions($userid, request()->input('exccat'));
 
-                if ($page->request->input('password') !== '') {
-                    User::updatePassword($userid, $page->request->input('password'));
+                if (request()->input('password') !== '') {
+                    User::updatePassword($userid, request()->input('password'));
                 }
 
                 header('Location:'.WWW_TOP.'/profile');

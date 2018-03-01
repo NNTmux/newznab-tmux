@@ -13,11 +13,11 @@ if (! User::isLoggedIn()) {
 
 $mv = new Movie(['Settings' => $page->settings]);
 
-$action = $page->request->input('id') ?? '';
-$imdbid = $page->request->input('subpage') ?? '';
+$action = request()->input('id') ?? '';
+$imdbid = request()->input('subpage') ?? '';
 
-if ($page->request->has('from')) {
-    $page->smarty->assign('from', WWW_TOP.$page->request->input('from'));
+if (request()->has('from')) {
+    $page->smarty->assign('from', WWW_TOP.request()->input('from'));
 } else {
     $page->smarty->assign('from', WWW_TOP.'/mymovies');
 }
@@ -25,8 +25,8 @@ if ($page->request->has('from')) {
 switch ($action) {
     case 'delete':
         $movie = UserMovie::getMovie(User::currentUserId(), $imdbid);
-        if ($page->request->has('from')) {
-            header('Location:'.WWW_TOP.$page->request->input('from'));
+        if (request()->has('from')) {
+            header('Location:'.WWW_TOP.request()->input('from'));
         } else {
             header('Location:'.WWW_TOP.'/mymovies');
         }
@@ -50,10 +50,10 @@ switch ($action) {
         }
 
         if ($action === 'doadd') {
-            $category = ($page->request->has('category') && is_array($page->request->input('category')) && ! empty($page->request->input('category'))) ? $page->request->input('category') : [];
+            $category = (request()->has('category') && is_array(request()->input('category')) && ! empty(request()->input('category'))) ? request()->input('category') : [];
             UserMovie::addMovie(User::currentUserId(), $imdbid, $category);
-            if ($page->request->has('from')) {
-                header('Location:'.WWW_TOP.$page->request->input('from'));
+            if (request()->has('from')) {
+                header('Location:'.WWW_TOP.request()->input('from'));
             } else {
                 header('Location:'.WWW_TOP.'/mymovies');
             }
@@ -86,10 +86,10 @@ switch ($action) {
         }
 
         if ($action === 'doedit') {
-            $category = ($page->request->has('category') && is_array($page->request->input('category')) && ! empty($page->request->input('category'))) ? $page->request->input('category') : [];
+            $category = (request()->has('category') && is_array(request()->input('category')) && ! empty(request()->input('category'))) ? request()->input('category') : [];
             UserMovie::updateMovie(User::currentUserId(), $imdbid, $category);
-            if ($page->request->has('from')) {
-                header('Location:'.WWW_TOP.$page->request->input('from'));
+            if (request()->has('from')) {
+                header('Location:'.WWW_TOP.request()->input('from'));
             } else {
                 header('Location:'.WWW_TOP.'/mymovies');
             }
@@ -122,9 +122,9 @@ switch ($action) {
         $releases = new Releases(['Settings' => $page->settings]);
         $browsecount = $releases->getMovieCount($movies, -1, $page->userdata['categoryexclusions']);
 
-        $offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
+        $offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
         $ordering = $releases->getBrowseOrdering();
-        $orderby = $page->request->has('ob') && \in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
+        $orderby = request()->has('ob') && \in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
         $results = $mv->getMovieRange($movies, $offset, env('ITEMS_PER_PAGE', 50), $orderby, -1, $page->userdata['categoryexclusions']);
 

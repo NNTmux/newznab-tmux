@@ -27,13 +27,13 @@ if ($page->isPostBack()) {
     } else {
 
         // Check if the user wants to use the file name as the release name.
-        $useNzbName = ($page->request->has('usefilename') && $page->request->input('usefilename') === 'on');
+        $useNzbName = (request()->has('usefilename') && request()->input('usefilename') === 'on');
 
         // Check if the user wants to delete the NZB file when done importing.
-        $deleteNZB = ($page->request->has('deleteNZB') && $page->request->input('deleteNZB') === 'on');
+        $deleteNZB = (request()->has('deleteNZB') && request()->input('deleteNZB') === 'on');
 
         // Get the path the user set in the browser if he put one.
-        $path = ($page->request->has('folder') ? $page->request->input('folder') : '');
+        $path = (request()->has('folder') ? request()->input('folder') : '');
         if (substr($path, strlen($path) - 1) !== DS) {
             $path .= DS;
         }

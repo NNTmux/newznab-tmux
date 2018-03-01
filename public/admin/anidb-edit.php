@@ -9,30 +9,30 @@ $AniDB = new AniDB(['Settings' => $page->pdo]);
 $id = 0;
 
 // Set the current action.
-$action = $page->request->input('action') ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
         $AniDB->updateTitle(
-            $page->request->input('anidbid'),
-                $page->request->input('title'),
-                $page->request->input('type'),
-                $page->request->input('startdate'),
-                $page->request->input('enddate'),
-                $page->request->input('related'),
-                $page->request->input('similar'),
-                $page->request->input('creators'),
-                $page->request->input('description'),
-                $page->request->input('rating'),
-                $page->request->input('categories'),
-                $page->request->input('characters'),
-                $page->request->input('epnos'),
-                $page->request->input('airdates'),
-            $page->request->input('episodetitles')
+            request()->input('anidbid'),
+                request()->input('title'),
+                request()->input('type'),
+                request()->input('startdate'),
+                request()->input('enddate'),
+                request()->input('related'),
+                request()->input('similar'),
+                request()->input('creators'),
+                request()->input('description'),
+                request()->input('rating'),
+                request()->input('categories'),
+                request()->input('characters'),
+                request()->input('epnos'),
+                request()->input('airdates'),
+            request()->input('episodetitles')
         );
 
-        if (! empty($page->request->input('from'))) {
-            header('Location:'.$page->request->input('from'));
+        if (! empty(request()->input('from'))) {
+            header('Location:'.request()->input('from'));
             exit;
         }
 
@@ -41,9 +41,9 @@ switch ($action) {
 
     case 'view':
     default:
-        if ($page->request->has('id')) {
+        if (request()->has('id')) {
             $page->title = 'AniDB Edit';
-            $AniDBAPIArray = $AniDB->getAnimeInfo($page->request->input('id'));
+            $AniDBAPIArray = $AniDB->getAnimeInfo(request()->input('id'));
             $page->smarty->assign('anime', $AniDBAPIArray);
         }
         break;

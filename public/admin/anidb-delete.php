@@ -6,10 +6,10 @@ use Blacklight\AniDB;
 
 $page = new AdminPage();
 
-if ($page->request->has('id')) {
+if (request()->has('id')) {
     $AniDB = new AniDB();
-    $AniDB->deleteTitle($page->request->input('id'));
+    $AniDB->deleteTitle(request()->input('id'));
 }
 
-$referrer = $page->request->server('HTTP_REFERER');
+$referrer = request()->server('HTTP_REFERER');
 header('Location: '.$referrer);

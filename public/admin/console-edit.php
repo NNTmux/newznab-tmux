@@ -12,10 +12,10 @@ $gen = new Genres();
 $id = 0;
 
 // set the current action
-$action = $page->request->input('action') ?? 'view';
+$action = request()->input('action') ?? 'view';
 
-if ($page->request->has('id')) {
-    $id = $page->request->input('id');
+if (request()->has('id')) {
+    $id = request()->input('id');
     $con = $console->getConsoleInfo($id);
 
     if (! $con) {
@@ -34,11 +34,11 @@ if ($page->request->has('id')) {
                 }
             }
 
-            $page->request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
-            $page->request->merge(['salesrank' => (empty($page->request->input('salesrank')) || ! ctype_digit($page->request->input('salesrank'))) ? 'null' : $page->request->input('salesrank')]);
-            $page->request->merge(['releasedate' => (empty($page->request->input('releasedate')) || ! strtotime($page->request->input('releasedate'))) ? $con['releasedate'] : Carbon::parse($page->request->input('releasedate'))->timestamp]);
+            request()->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
+            request()->merge(['salesrank' => (empty(request()->input('salesrank')) || ! ctype_digit(request()->input('salesrank'))) ? 'null' : request()->input('salesrank')]);
+            request()->merge(['releasedate' => (empty(request()->input('releasedate')) || ! strtotime(request()->input('releasedate'))) ? $con['releasedate'] : Carbon::parse(request()->input('releasedate'))->timestamp]);
 
-            $console->update($id, $page->request->input('title'), $page->request->input('asin'), $page->request->input('url'), $page->request->input('salesrank'), $page->request->input('platform'), $page->request->input('publisher'), $page->request->input('releasedate'), $page->request->input('esrb'), $page->request->input('cover'), $page->request->input('genre'));
+            $console->update($id, request()->input('title'), request()->input('asin'), request()->input('url'), request()->input('salesrank'), request()->input('platform'), request()->input('publisher'), request()->input('releasedate'), request()->input('esrb'), request()->input('cover'), request()->input('genre'));
 
             header('Location:'.WWW_TOP.'/console-list.php');
             die();

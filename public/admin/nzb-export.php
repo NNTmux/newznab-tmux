@@ -16,11 +16,11 @@ $rel = new Releases(['Settings' => $page->pdo]);
 if ($page->isPostBack()) {
     $retVal = $path = '';
 
-    $path = $page->request->input('folder');
-    $postFrom = ($page->request->input('postfrom') ?? '');
-    $postTo = ($page->request->input('postto') ?? '');
-    $group = ($page->request->input('group') === '-1' ? 0 : (int) $page->request->input('group'));
-    $gzip = ($page->request->input('gzip') === '1');
+    $path = request()->input('folder');
+    $postFrom = (request()->input('postfrom') ?? '');
+    $postTo = (request()->input('postto') ?? '');
+    $group = (request()->input('group') === '-1' ? 0 : (int) request()->input('group'));
+    $gzip = (request()->input('gzip') === '1');
 
     if ($path !== '') {
         $NE = new NZBExport([
@@ -46,8 +46,8 @@ if ($page->isPostBack()) {
             'output'   => $retVal,
             'fromdate' => $postFrom,
             'todate'   => $postTo,
-            'group'    => $page->request->input('group'),
-            'gzip'     => $page->request->input('gzip'),
+            'group'    => request()->input('group'),
+            'gzip'     => request()->input('gzip'),
         ]
     );
 } else {

@@ -12,7 +12,7 @@ $page->title = 'Console List';
 
 $conCount = Utility::getCount('consoleinfo');
 
-$offset = $page->request->input('offset') ?? 0;
+$offset = request()->input('offset') ?? 0;
 
 $page->smarty->assign([
     'pagertotalitems' => $conCount,

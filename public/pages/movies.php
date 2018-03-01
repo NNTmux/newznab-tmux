@@ -17,9 +17,9 @@ foreach ($moviecats as $mcat) {
     $mtmp[$mcat['id']] = $mcat;
 }
 
-$category = $page->request->has('imdb') ? -1 : Category::MOVIE_ROOT;
-if ($page->request->has('t') && array_key_exists($page->request->input('t'), $mtmp)) {
-    $category = $page->request->input('t') + 0;
+$category = request()->has('imdb') ? -1 : Category::MOVIE_ROOT;
+if (request()->has('t') && array_key_exists(request()->input('t'), $mtmp)) {
+    $category = request()->input('t') + 0;
 }
 
 $user = User::find(User::currentUserId());
@@ -36,9 +36,9 @@ if ($category != -1) {
 $page->smarty->assign('catlist', $mtmp);
 $page->smarty->assign('category', $category);
 
-$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
+$offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 $ordering = $movie->getMovieOrdering();
-$orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
+$orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $movies = [];
 $results = $movie->getMovieRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, -1, $page->userdata['categoryexclusions']);
@@ -51,28 +51,28 @@ foreach ($results as $result) {
     $movies[] = $result;
 }
 
-$title = ($page->request->has('title') && ! empty($page->request->input('title'))) ? stripslashes($page->request->input('title')) : '';
+$title = (request()->has('title') && ! empty(request()->input('title'))) ? stripslashes(request()->input('title')) : '';
 $page->smarty->assign('title', $title);
 
-$actors = ($page->request->has('actors') && ! empty($page->request->input('actors'))) ? stripslashes($page->request->input('actors')) : '';
+$actors = (request()->has('actors') && ! empty(request()->input('actors'))) ? stripslashes(request()->input('actors')) : '';
 $page->smarty->assign('actors', $actors);
 
-$director = ($page->request->has('director') && ! empty($page->request->input('director'))) ? stripslashes($page->request->input('director')) : '';
+$director = (request()->has('director') && ! empty(request()->input('director'))) ? stripslashes(request()->input('director')) : '';
 $page->smarty->assign('director', $director);
 
 $ratings = range(1, 9);
-$rating = ($page->request->has('rating') && in_array($page->request->input('rating'), $ratings, false)) ? $page->request->input('rating') : '';
+$rating = (request()->has('rating') && in_array(request()->input('rating'), $ratings, false)) ? request()->input('rating') : '';
 $page->smarty->assign('ratings', $ratings);
 $page->smarty->assign('rating', $rating);
 
 $genres = $movie->getGenres();
-$genre = ($page->request->has('genre') && in_array($page->request->input('genre'), $genres, false)) ? $page->request->input('genre') : '';
+$genre = (request()->has('genre') && in_array(request()->input('genre'), $genres, false)) ? request()->input('genre') : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
 $years = range(1903, Carbon::now()->addYear()->year);
 rsort($years);
-$year = ($page->request->has('year') && in_array($page->request->input('year'), $years, false)) ? $page->request->input('year') : '';
+$year = (request()->has('year') && in_array(request()->input('year'), $years, false)) ? request()->input('year') : '';
 $page->smarty->assign('years', $years);
 $page->smarty->assign('year', $year);
 
@@ -108,7 +108,7 @@ $page->meta_title = 'Browse Nzbs';
 $page->meta_keywords = 'browse,nzb,description,details';
 $page->meta_description = 'Browse for Nzbs';
 
-if ($page->request->has('imdb')) {
+if (request()->has('imdb')) {
     $page->content = $page->smarty->fetch('viewmoviefull.tpl');
 } else {
     $page->content = $page->smarty->fetch('movies.tpl');

@@ -5,9 +5,9 @@ require_once NN_WWW.'pages/smartyTV.php';
 
 $page = new AdminPage();
 
-if ($page->request->has('id')) {
-    (new smartyTV(['Settings' => $page->pdo]))->delete($page->request->input('id'));
+if (request()->has('id')) {
+    (new smartyTV(['Settings' => $page->pdo]))->delete(request()->input('id'));
 }
 
-$referrer = $page->request->server('HTTP_REFERER');
+$referrer = request()->server('HTTP_REFERER');
 header('Location: '.$referrer);

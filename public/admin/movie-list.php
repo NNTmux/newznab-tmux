@@ -12,7 +12,7 @@ $page->title = 'Movie List';
 
 $movCount = Utility::getCount('movieinfo');
 
-$offset = $page->request->input('offset') ?? 0;
+$offset = request()->input('offset') ?? 0;
 
 $page->smarty->assign([
     'pagertotalitems' => $movCount,

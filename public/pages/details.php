@@ -24,10 +24,10 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if ($page->request->has('id')) {
+if (request()->has('id')) {
     $releases = new Releases(['Settings' => $page->settings]);
     $re = new ReleaseExtra;
-    $data = Release::getByGuid($page->request->input('id'));
+    $data = Release::getByGuid(request()->input('id'));
     $user = User::find(User::currentUserId());
     $cpapi = $user['cp_api'];
     $cpurl = $user['cp_url'];
@@ -38,7 +38,7 @@ if ($page->request->has('id')) {
     }
 
     if ($page->isPostBack()) {
-        ReleaseComment::addComment($data['id'], $data['gid'], $page->request->input('txtAddComment'), User::currentUserId(), $page->request->id());
+        ReleaseComment::addComment($data['id'], $data['gid'], request()->input('txtAddComment'), User::currentUserId(), request()->id());
     }
 
     $nfo = ReleaseNfo::getReleaseNfo($data['id']);

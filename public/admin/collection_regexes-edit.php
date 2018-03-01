@@ -10,31 +10,31 @@ $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'collection_re
 $error = '';
 $regex = ['id' => '', 'regex' => '', 'description' => '', 'group_regex' => '', 'ordinal' => '', 'status' => 1];
 
-switch ($page->request->input('action') ?? 'view') {
+switch (request()->input('action') ?? 'view') {
     case 'submit':
-        if ($page->request->input('group_regex') === '') {
+        if (request()->input('group_regex') === '') {
             $error = 'Group regex must not be empty!';
             break;
         }
 
-        if ($page->request->input('regex') === '') {
+        if (request()->input('regex') === '') {
             $error = 'Regex cannot be empty';
             break;
         }
 
-        if ($page->request->input('description') === '') {
-            $page->request->input('description') = '';
+        if (request()->input('description') === '') {
+            request()->input('description') = '';
         }
 
-        if (! is_numeric($page->request->input('ordinal')) || $page->request->input('ordinal') < 0) {
+        if (! is_numeric(request()->input('ordinal')) || request()->input('ordinal') < 0) {
             $error = 'Ordinal must be a number, 0 or higher.';
             break;
         }
 
-        if ($page->request->input('id') === '') {
-            $regexes->addRegex($page->request->all());
+        if (request()->input('id') === '') {
+            $regexes->addRegex(request()->all());
         } else {
-            $regexes->updateRegex($page->request->all());
+            $regexes->updateRegex(request()->all());
         }
 
         header('Location:'.WWW_TOP.'/collection_regexes-list.php');
@@ -42,9 +42,9 @@ switch ($page->request->input('action') ?? 'view') {
 
     case 'view':
     default:
-        if ($page->request->has('id')) {
+        if (request()->has('id')) {
             $page->title = 'Collections Regex Edit';
-            $regex = $regexes->getRegexByID($page->request->input('id'));
+            $regex = $regexes->getRegexByID(request()->input('id'));
         } else {
             $page->title = 'Collections Regex Add';
             $regex += ['status' => 1];

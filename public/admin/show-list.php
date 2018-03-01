@@ -8,8 +8,8 @@ $page = new AdminPage();
 
 $page->title = 'TV Shows List';
 
-$tvshowname = ($page->request->has('showname') && ! empty($page->request->input('showname')) ? $page->request->input('showname') : '');
-$offset = $page->request->input('offset') ?? 0;
+$tvshowname = (request()->has('showname') && ! empty(request()->input('showname')) ? request()->input('showname') : '');
+$offset = request()->input('offset') ?? 0;
 
 $page->smarty->assign(
     [

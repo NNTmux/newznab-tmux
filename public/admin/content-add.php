@@ -10,7 +10,7 @@ $contents = new Contents();
 $id = 0;
 
 // Set the current action.
-$action = $page->request->input('action') ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 $content = [
     'id' => '',
@@ -38,10 +38,10 @@ switch ($action) {
     case 'submit':
         // Validate and add or update.
         $returnid = 0;
-        if (! $page->request->has('id')) {
-            $returnid = $contents->add($page->request->all());
+        if (! request()->has('id')) {
+            $returnid = $contents->add(request()->all());
         } else {
-            $content = $contents->update($page->request->all());
+            $content = $contents->update(request()->all());
             $returnid = $content['id'];
         }
         header('Location:content-add.php?id='.$returnid);
@@ -49,9 +49,9 @@ switch ($action) {
 
     case 'view':
     default:
-        if ($page->request->has('id')) {
+        if (request()->has('id')) {
             $page->title = 'Content Edit';
-            $id = $page->request->input('id');
+            $id = request()->input('id');
 
             $content = $contents->getByID($id, User::ROLE_ADMIN);
         }

@@ -8,13 +8,13 @@ require_once NN_WWW.'pages/smartyTV.php';
 $page = new AdminPage();
 $tv = new smartyTV(['Settings' => $page->pdo]);
 
-switch ($page->request->input('action') ?? 'view') {
+switch (request()->input('action') ?? 'view') {
     case 'submit':
         //TODO: Use a function that allows overwrites
         //$tv->update($_POST["id"], $_POST["title"],$_POST["summary"], $_POST['countries_id']);
 
-        if ($page->request->has('from') && ! empty($page->request->input('from'))) {
-            header('Location:'.$page->request->input('from'));
+        if (request()->has('from') && ! empty(request()->input('from'))) {
+            header('Location:'.request()->input('from'));
             exit;
         }
 
@@ -23,9 +23,9 @@ switch ($page->request->input('action') ?? 'view') {
 
     case 'view':
     default:
-        if ($page->request->has('id')) {
+        if (request()->has('id')) {
             $page->title = 'TV Show Edit';
-            $show = Video::getByVideoID($page->request->input('id'));
+            $show = Video::getByVideoID(request()->input('id'));
         }
         break;
 }

@@ -11,7 +11,7 @@ $rss = new RSS(['Settings' => $page->settings]);
 $offset = 0;
 
 // If no content id provided then show user the rss selection page.
-if (! $page->request->has('t') && ! $page->request->has('show') && ! $page->request->has('anidb')) {
+if (! request()->has('t') && ! request()->has('show') && ! request()->has('anidb')) {
     // User has to either be logged in, or using rsskey.
     if (! User::isLoggedIn()) {
         header('Location: '.Settings::settingValue('site.main.code'));
@@ -54,11 +54,11 @@ if (! $page->request->has('t') && ! $page->request->has('show') && ! $page->requ
         $rssToken = $page->userdata['rsstoken'];
         $maxRequests = $page->userdata->role->apirequests;
     } else {
-        if (! $page->request->has('i') || ! $page->request->has('r')) {
+        if (! request()->has('i') || ! request()->has('r')) {
             Utility::showApiError(100, 'Both the User ID and API key are required for viewing the RSS!');
         }
 
-        $res = User::getByIdAndRssToken($page->request->input('i'), $page->request->input('r'));
+        $res = User::getByIdAndRssToken(request()->input('i'), request()->input('r'));
 
         if (! $res) {
             Utility::showApiError(100);
@@ -77,27 +77,27 @@ if (! $page->request->has('t') && ! $page->request->has('show') && ! $page->requ
     if (UserRequest::getApiRequests($uid) > $maxRequests) {
         Utility::showApiError(500, 'You have reached your daily limit for API requests!');
     } else {
-        UserRequest::addApiRequest($uid, $page->request->getRequestUri());
+        UserRequest::addApiRequest($uid, request()->getRequestUri());
     }
 
     // Valid or logged in user, get them the requested feed.
     $userShow = $userAnidb = -1;
-    if ($page->request->has('show')) {
-        $userShow = ((int) $page->request->input('show') === 0 ? -1 : $page->request->input('show') + 0);
-    } elseif ($page->request->has('anidb')) {
-        $userAnidb = ((int) $page->request->input('anidb') === 0 ? -1 : $page->request->input('snidb') + 0);
+    if (request()->has('show')) {
+        $userShow = ((int) request()->input('show') === 0 ? -1 : request()->input('show') + 0);
+    } elseif (request()->has('anidb')) {
+        $userAnidb = ((int) request()->input('anidb') === 0 ? -1 : request()->input('snidb') + 0);
     }
 
-    $outputXML = (! ($page->request->has('o') && $page->request->input('o') === 'json'));
+    $outputXML = (! (request()->has('o') && request()->input('o') === 'json'));
 
-    $userCat = ($page->request->has('t') ? ((int) $page->request->input('t') === 0 ? -1 : $page->request->input('t')) : -1);
-    $userNum = ($page->request->has('num') && is_numeric($page->request->input('num')) ? abs($page->request->input('num')) : 100);
-    $userAirDate = $page->request->has('airdate') && is_numeric($page->request->input('airdate')) ? abs($page->request->input('airdate')) : -1;
+    $userCat = (request()->has('t') ? ((int) request()->input('t') === 0 ? -1 : request()->input('t')) : -1);
+    $userNum = (request()->has('num') && is_numeric(request()->input('num')) ? abs(request()->input('num')) : 100);
+    $userAirDate = request()->has('airdate') && is_numeric(request()->input('airdate')) ? abs(request()->input('airdate')) : -1;
 
     $params =
         [
-            'dl'       => $page->request->has('dl') && $page->request->input('dl') === '1' ? '1' : '0',
-            'del'      => $page->request->has('del') && $page->request->input('del') === '1' ? '1' : '0',
+            'dl'       => request()->has('dl') && request()->input('dl') === '1' ? '1' : '0',
+            'del'      => request()->has('del') && request()->input('del') === '1' ? '1' : '0',
             'extended' => 1,
             'uid'      => $uid,
             'token'    => $rssToken,

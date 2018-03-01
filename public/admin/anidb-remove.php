@@ -8,9 +8,9 @@ $page = new AdminPage();
 
 $success = false;
 
-if ($page->request->has('id')) {
-    $success = Release::removeAnidbIdFromReleases($page->request->input('id'));
-    $page->smarty->assign('anidbid', $page->request->input('id'));
+if (request()->has('id')) {
+    $success = Release::removeAnidbIdFromReleases(request()->input('id'));
+    $page->smarty->assign('anidbid', request()->input('id'));
 }
 $page->smarty->assign('success', $success);
 

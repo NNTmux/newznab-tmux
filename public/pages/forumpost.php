@@ -8,10 +8,10 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$id = $page->request->input('id') + 0;
+$id = request()->input('id') + 0;
 
-if (! empty($page->request->input('addMessage')) && $page->isPostBack()) {
-    Forumpost::add($id, User::currentUserId(), '', $page->request->input('addMessage'));
+if (! empty(request()->input('addMessage')) && $page->isPostBack()) {
+    Forumpost::add($id, User::currentUserId(), '', request()->input('addMessage'));
     header('Location:'.WWW_TOP.'/forumpost/'.$id.'#last');
     die();
 }

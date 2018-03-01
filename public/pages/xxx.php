@@ -16,8 +16,8 @@ foreach ($moviecats as $mcat) {
     $mtmp[$mcat['id']] = $mcat;
 }
 $category = Category::XXX_ROOT;
-if ($page->request->has('t') && array_key_exists($page->request->input('t'), $mtmp)) {
-    $category = $page->request->input('t') + 0;
+if (request()->has('t') && array_key_exists(request()->input('t'), $mtmp)) {
+    $category = request()->input('t') + 0;
 }
 $catarray = [];
 $catarray[] = $category;
@@ -25,9 +25,9 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $mtmp);
 $page->smarty->assign('category', $category);
 
-$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
+$offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 $ordering = $movie->getXXXOrdering();
-$orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
+$orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $movies = [];
 $results = $movie->getXXXRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, -1, $page->userdata['categoryexclusions']);
@@ -37,17 +37,17 @@ foreach ($results as $result) {
     $result['director'] = makeFieldLinks($result, 'director', 'xxx');
     $movies[] = $result;
 }
-$title = ($page->request->has('title') && ! empty($page->request->input('title'))) ? stripslashes($page->request->input('title')) : '';
+$title = (request()->has('title') && ! empty(request()->input('title'))) ? stripslashes(request()->input('title')) : '';
 $page->smarty->assign('title', stripslashes($title));
 
-$actors = ($page->request->has('actors') && ! empty($page->request->input('actors'))) ? stripslashes($page->request->input('actors')) : '';
+$actors = (request()->has('actors') && ! empty(request()->input('actors'))) ? stripslashes(request()->input('actors')) : '';
 $page->smarty->assign('actors', $actors);
 
-$director = ($page->request->has('director') && ! empty($page->request->input('director'))) ? stripslashes($page->request->input('director')) : '';
+$director = (request()->has('director') && ! empty(request()->input('director'))) ? stripslashes(request()->input('director')) : '';
 $page->smarty->assign('director', $director);
 
 $genres = $movie->getAllGenres(true);
-$genre = ($page->request->has('genre') && in_array($page->request->input('genre'), $genres, false)) ? $page->request->input('genre') : '';
+$genre = (request()->has('genre') && in_array(request()->input('genre'), $genres, false)) ? request()->input('genre') : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
@@ -83,7 +83,7 @@ $page->meta_title = 'Browse XXX';
 $page->meta_keywords = 'browse,xxx,nzb,description,details';
 $page->meta_description = 'Browse for XXX Movies';
 
-if ($page->request->has('id')) {
+if (request()->has('id')) {
     $page->content = $page->smarty->fetch('viewxxxfull.tpl');
 } else {
     $page->content = $page->smarty->fetch('xxx.tpl');

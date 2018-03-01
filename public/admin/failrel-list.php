@@ -11,7 +11,7 @@ $page->title = 'Failed Releases List';
 
 $frelcount = DnzbFailure::getCount();
 
-$offset = $page->request->input('offset') ?? 0;
+$offset = request()->input('offset') ?? 0;
 $page->smarty->assign(
     [
         'pagertotalitems'   => $frelcount,
