@@ -55,7 +55,7 @@ if ($showRegister === 1) {
                             $userName,
                             $password,
                             $email,
-                            $page->request->id(),
+                            $page->request->ip(),
                             $userDefault['id'],
                             '',
                             $userDefault['defaultinvites'],
