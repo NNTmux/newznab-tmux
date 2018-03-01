@@ -62,13 +62,13 @@ switch ($action) {
             $page->smarty->assign('role', request()->input('role'));
         } else {
             $ret = User::updateUser(request()->input('id'), request()->input('username'), request()->input('email'), request()->input('grabs'), request()->input('role'), request()->input('notes'), request()->input('invites'), (request()->has('movieview') ? 1 : 0), (request()->has('musicview') ? 1 : 0), (request()->has('gameview') ? 1 : 0), (request()->has('xxxview') ? 1 : 0), (request()->has('consoleview') ? 1 : 0), (request()->has('bookview') ? 1 : 0));
-            if (request()->input('password') !== '') {
+            if (request()->input('password') !== null) {
                 User::updatePassword(request()->input('id'), request()->input('password'));
             }
-            if (request()->input('rolechangedate') !== '') {
+            if (request()->input('rolechangedate') !== null) {
                 User::updateUserRoleChangeDate(request()->input('id'), request()->input('rolechangedate'));
             }
-            if (request()->input('role') !== '') {
+            if (request()->input('role') !== null) {
                 $newRole = UserRole::query()->where('id', request()->input('role'))->value('name');
                 $email = request()->input('email') ?? request()->input('email');
                 Mail::to($email)->send(new AccountChange(request()->input('id')));
