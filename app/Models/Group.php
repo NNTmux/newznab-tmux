@@ -290,8 +290,8 @@ class Group extends Model
                 'last_record' => $group['last_record'] ?? 0,
                 'active' => $group['active'] ?? 0,
                 'backfill' => $group['backfill'] ?? 0,
-                'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ? null : $group['minsizetoformrelease'],
-                'minfilestoformrelease' => $group['minfilestoformrelease'] === '' ? null : $group['minfilestoformrelease'],
+                'minsizetoformrelease' => $group['minsizetoformrelease'] ?? null,
+                'minfilestoformrelease' => $group['minfilestoformrelease'] ?? null,
             ]
         );
     }
