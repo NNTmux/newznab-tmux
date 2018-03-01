@@ -6,7 +6,6 @@ use App\Models\User;
 use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
-use Illuminate\Http\Request;
 use App\Models\RoleExcludedCategory;
 
 class BasePage
@@ -93,11 +92,6 @@ class BasePage
     public $pdo;
 
     /**
-     * @var static
-     */
-    public $request;
-
-    /**
      * Set up session / smarty / user variables.
      *
      * @throws \Exception
@@ -121,7 +115,6 @@ class BasePage
         $this->settings = new Settings();
         $this->pdo = new DB();
         $this->smarty = new Smarty();
-        $this->request = (new Request())::capture();
 
         $this->smarty->setCompileDir(NN_SMARTY_TEMPLATES);
         $this->smarty->setConfigDir(NN_SMARTY_CONFIGS);
@@ -134,18 +127,18 @@ class BasePage
         );
         $this->smarty->error_reporting = E_ALL - E_NOTICE;
 
-        $this->https = $this->request->secure();
+        $this->https = request()->secure();
 
-        if ($this->request->server('SERVER_NAME')) {
+        if (request()->server('SERVER_NAME')) {
             $this->serverurl = (
-                ($this->https === true ? 'https://' : 'http://').$this->request->server('SERVER_NAME').
-                (((int) $this->request->server('SERVER_PORT') !== 80 && (int) $this->request->server('SERVER_PORT') !== 443) ? ':'.$this->request->server('SERVER_PORT') : '').
+                ($this->https === true ? 'https://' : 'http://').request()->server('SERVER_NAME').
+                (((int) request()->server('SERVER_PORT') !== 80 && (int) request()->server('SERVER_PORT') !== 443) ? ':'.request()->server('SERVER_PORT') : '').
                 WWW_TOP.'/'
             );
             $this->smarty->assign('serverroot', $this->serverurl);
         }
 
-        $this->page = $this->request->input('page') ?? 'content';
+        $this->page = request()->input('page') ?? 'content';
 
         if (User::isLoggedIn()) {
             $this->setUserPreferences();
@@ -247,7 +240,7 @@ class BasePage
      */
     public function isPostBack()
     {
-        return $this->request->isMethod('POST');
+        return request()->isMethod('POST');
     }
 
     /**
@@ -270,7 +263,7 @@ class BasePage
             'Location: '.
             ($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).
             '/login?redirect='.
-            urlencode($this->request->getRequestUri())
+            urlencode(request()->getRequestUri())
         );
         exit();
     }
