@@ -19,10 +19,8 @@ $action = $page->request->input('action') ?? 'view';
 switch ($action) {
     case 'submit':
 
-        if (! empty($page->request->input('book_reqids'))) {
-            // book_reqids is an array it needs to be a comma separated string, make it so.
-            $page->request->merge(['book_reqids' => is_array($page->request->input('book_reqids'))]) ?
-                implode(', ', $page->request->input('book_reqids')) : $page->request->input('book_reqids');
+        if (! $page->request->has('book_reqids')) {
+            $page->request->merge(['book_reqids' => []]);
         }
         $error = '';
         $ret = Settings::settingsUpdate($page->request->all());
