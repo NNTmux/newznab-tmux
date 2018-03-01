@@ -9,8 +9,8 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if ($page->request->has('id')) {
-    $rel = Release::getByGuid($page->request->input('id'));
+if (\request()->has('id')) {
+    $rel = Release::getByGuid(\request()->input('id'));
 
     if (! $rel) {
         $page->show404();
@@ -28,7 +28,7 @@ if ($page->request->has('id')) {
     $page->meta_description = 'View Nfo File';
 
     $modal = false;
-    if ($page->request->has('modal')) {
+    if (\request()->has('modal')) {
         $modal = true;
         $page->smarty->assign('modal', true);
     }

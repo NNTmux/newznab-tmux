@@ -11,13 +11,13 @@ if (! User::isLoggedIn()) {
 }
 
 $category = -1;
-if ($page->request->has('t')) {
-    $category = $page->request->input('t');
+if (\request()->has('t')) {
+    $category = \request()->input('t');
 }
 
 $grp = -1;
-if ($page->request->has('g')) {
-    $grp = is_numeric($page->request->input('g')) ? -1 : $page->request->input('g');
+if (\request()->has('g')) {
+    $grp = is_numeric(\request()->input('g')) ? -1 : \request()->input('g');
 }
 
 $catarray = [];
@@ -25,9 +25,9 @@ $catarray[] = $category;
 
 $page->smarty->assign('category', $category);
 
-$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
+$offset = (\request()->has('offset') && ctype_digit(\request()->input('offset'))) ? \request()->input('offset') : 0;
 $ordering = $releases->getBrowseOrdering();
-$orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
+$orderby = \request()->has('ob') && in_array(\request()->input('ob'), $ordering, false) ? \request()->input('ob') : '';
 
 $results = $releases->getBrowseRange($catarray, $offset, env('ITEMS_PER_PAGE', 50), $orderby, -1, $page->userdata['categoryexclusions'], $grp);
 

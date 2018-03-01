@@ -11,7 +11,7 @@ $page->title = 'Game List';
 
 $gameCount = $game->getCount();
 
-$offset = $page->request->input('offset') ?? 0;
+$offset = \request()->input('offset') ?? 0;
 
 $page->smarty->assign([
     'pagertotalitems' => $gameCount,

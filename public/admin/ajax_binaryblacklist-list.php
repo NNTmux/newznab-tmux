@@ -8,8 +8,8 @@ use Blacklight\Binaries;
 $page = new AdminPage;
 $bin = new Binaries();
 
-if ($page->request->has('action') && $page->request->input('action') === '2') {
-    $id = (int) $page->request->input('bin_id');
+if (\request()->has('action') && \request()->input('action') === '2') {
+    $id = (int) \request()->input('bin_id');
     $bin->deleteBlacklist($id);
     echo "Blacklist $id deleted.";
 }

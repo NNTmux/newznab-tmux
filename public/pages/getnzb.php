@@ -20,11 +20,11 @@ if (User::isLoggedIn()) {
         Utility::showApiError(101);
     }
 } else {
-    if (! $page->request->has('i') || ! $page->request->has('r')) {
+    if (! \request()->has('i') || ! \request()->has('r')) {
         Utility::showApiError(200);
     }
 
-    $res = User::getByIdAndRssToken($page->request->input('i'), $page->request->input('r'));
+    $res = User::getByIdAndRssToken(\request()->input('i'), \request()->input('r'));
     if (! $res) {
         Utility::showApiError(100);
     }
@@ -38,15 +38,15 @@ if (User::isLoggedIn()) {
 }
 
 // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
-if ($page->request->has('id')) {
-    $page->request->merge(['id' => str_ireplace('.nzb', '', $page->request->input('id'))]);
+if (\request()->has('id')) {
+    \request()->merge(['id' => str_ireplace('.nzb', '', \request()->input('id'))]);
 }
 //
 // A hash of the users ip to record against the download
 //
 $hosthash = '';
 if ((int) Settings::settingValue('..storeuserips') === 1) {
-    $hosthash = User::getHostHash($page->request->ip(), Settings::settingValue('..siteseed'));
+    $hosthash = User::getHostHash(\request()->ip(), Settings::settingValue('..siteseed'));
 }
 
 // Check download limit on user role.
@@ -55,17 +55,17 @@ if ($requests > $maxDownloads) {
     Utility::showApiError(501);
 }
 
-if (! $page->request->has('id')) {
+if (! \request()->has('id')) {
     Utility::showApiError(200, 'Parameter id is required');
 }
 
 // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
-$page->request->merge(['id' => str_ireplace('.nzb', '', $page->request->input('id'))]);
+\request()->merge(['id' => str_ireplace('.nzb', '', \request()->input('id'))]);
 
 $rel = new Releases(['Settings' => $page->settings]);
 // User requested a zip of guid,guid,guid releases.
-if ($page->request->has('zip') && $page->request->input('zip') === '1') {
-    $guids = explode(',', $page->request->input('id'));
+if (\request()->has('zip') && \request()->input('zip') === '1') {
+    $guids = explode(',', \request()->input('id'));
     if ($requests['num'] + count($guids) > $maxDownloads) {
         Utility::showApiError(501);
     }
@@ -77,7 +77,7 @@ if ($page->request->has('zip') && $page->request->input('zip') === '1') {
             Release::updateGrab($guid);
             UserDownload::addDownloadRequest($uid, $guid);
 
-            if ($page->request->has('del') && (int) $page->request->input('del') === 1) {
+            if (\request()->has('del') && (int) \request()->input('del') === 1) {
                 UsersRelease::delCartByUserAndRelease($guid, $uid);
             }
         }
@@ -90,18 +90,18 @@ if ($page->request->has('zip') && $page->request->input('zip') === '1') {
     }
 }
 
-$nzbPath = (new NZB())->getNZBPath($page->request->input('id'));
+$nzbPath = (new NZB())->getNZBPath(\request()->input('id'));
 if (! file_exists($nzbPath)) {
     Utility::showApiError(300, 'NZB file not found!');
 }
 
-$relData = Release::getByGuid($page->request->input('id'));
+$relData = Release::getByGuid(\request()->input('id'));
 if ($relData !== null) {
-    Release::updateGrab($page->request->input('id'));
+    Release::updateGrab(\request()->input('id'));
     UserDownload::addDownloadRequest($uid, $relData['id']);
     User::incrementGrabs($uid);
-    if ($page->request->has('del') && (int) $page->request->input('del') === 1) {
-        UsersRelease::delCartByUserAndRelease($page->request->input('id'), $uid);
+    if (\request()->has('del') && (int) \request()->input('del') === 1) {
+        UsersRelease::delCartByUserAndRelease(\request()->input('id'), $uid);
     }
 } else {
     Utility::showApiError(300, 'Release not found!');
@@ -121,9 +121,9 @@ header('Content-Length: '.ob_get_length());
 header('Content-Type: application/x-nzb');
 header('Expires: '.date('r', time() + 31536000));
 // Set X-DNZB header data.
-header('X-DNZB-Failure: '.$page->serverurl.'failed/'.'?guid='.$page->request->input('id').'&userid='.$uid.'&rsstoken='.$rssToken);
+header('X-DNZB-Failure: '.$page->serverurl.'failed/'.'?guid='.\request()->input('id').'&userid='.$uid.'&rsstoken='.$rssToken);
 header('X-DNZB-Category: '.$relData['category_name']);
-header('X-DNZB-Details: '.$page->serverurl.'details/'.$page->request->input('id'));
+header('X-DNZB-Details: '.$page->serverurl.'details/'.\request()->input('id'));
 if (! empty($relData['imdbid']) && $relData['imdbid'] > 0) {
     header('X-DNZB-MoreInfo: http://www.imdb.com/title/tt'.$relData['imdbid']);
 } elseif (! empty($relData['tvdb']) && $relData['tvdb'] > 0) {
@@ -131,7 +131,7 @@ if (! empty($relData['imdbid']) && $relData['imdbid'] > 0) {
 }
 header('X-DNZB-Name: '.$cleanName);
 if ((int) $relData['nfostatus'] === 1) {
-    header('X-DNZB-NFO: '.$page->serverurl.'nfo/'.$page->request->input('id'));
+    header('X-DNZB-NFO: '.$page->serverurl.'nfo/'.\request()->input('id'));
 }
 header('X-DNZB-RCode: 200');
 header('X-DNZB-RText: OK, NZB content follows.');

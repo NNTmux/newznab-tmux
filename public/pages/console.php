@@ -18,8 +18,8 @@ foreach ($concats as $ccat) {
     $ctmp[$ccat['id']] = $ccat;
 }
 $category = Category::GAME_ROOT;
-if ($page->request->has('t') && array_key_exists($page->request->input('t'), $ctmp)) {
-    $category = $page->request->input('t') + 0;
+if (\request()->has('t') && array_key_exists(\request()->input('t'), $ctmp)) {
+    $category = \request()->input('t') + 0;
 }
 
 $catarray = [];
@@ -28,9 +28,9 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $ctmp);
 $page->smarty->assign('category', $category);
 
-$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
+$offset = (\request()->has('offset') && ctype_digit(\request()->input('offset'))) ? \request()->input('offset') : 0;
 $ordering = $console->getConsoleOrdering();
-$orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
+$orderby = \request()->has('ob') && in_array(\request()->input('ob'), $ordering, false) ? \request()->input('ob') : '';
 
 $consoles = [];
 $results = $console->getConsoleRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, $page->userdata['categoryexclusions']);
@@ -47,10 +47,10 @@ foreach ($results as $result) {
     $consoles[] = $result;
 }
 
-$platform = ($page->request->has('platform') && ! empty($page->request->input('platform'))) ? stripslashes($page->request->input('platform')) : '';
+$platform = (\request()->has('platform') && ! empty(\request()->input('platform'))) ? stripslashes(\request()->input('platform')) : '';
 $page->smarty->assign('platform', $platform);
 
-$title = ($page->request->has('title') && ! empty($page->request->input('title'))) ? stripslashes($page->request->input('title')) : '';
+$title = (\request()->has('title') && ! empty(\request()->input('title'))) ? stripslashes(\request()->input('title')) : '';
 $page->smarty->assign('title', $title);
 
 $genres = $gen->getGenres(Genres::CONSOLE_TYPE, true);
@@ -58,7 +58,7 @@ $tmpgnr = [];
 foreach ($genres as $gn) {
     $tmpgnr[$gn['id']] = $gn['title'];
 }
-$genre = ($page->request->has('genre') && array_key_exists($page->request->input('genre'), $tmpgnr)) ? $page->request->input('genre') : '';
+$genre = (\request()->has('genre') && array_key_exists(\request()->input('genre'), $tmpgnr)) ? \request()->input('genre') : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 

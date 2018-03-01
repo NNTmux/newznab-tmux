@@ -10,7 +10,7 @@ $page->title = 'Release List';
 
 $releasecount = Release::getReleasesCount();
 
-$offset = $page->request->input('offset') ?? 0;
+$offset = \request()->input('offset') ?? 0;
 
 $page->smarty->assign([
     'pagertotalitems' => $releasecount,

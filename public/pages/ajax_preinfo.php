@@ -7,11 +7,11 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (! $page->request->has('id')) {
+if (! \request()->has('id')) {
     $page->show404();
 }
 
-$predata = Predb::getOne($page->request->input('id'));
+$predata = Predb::getOne(\request()->input('id'));
 
 if (! $predata) {
     echo 'No pre info';

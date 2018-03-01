@@ -6,10 +6,10 @@ use Blacklight\Contents;
 
 $page = new AdminPage();
 
-if ($page->request->has('id')) {
+if (\request()->has('id')) {
     $contents = new Contents();
-    $contents->delete($page->request->input('id'));
+    $contents->delete(\request()->input('id'));
 }
 
-$referrer = $page->request->server('HTTP_REFERER');
+$referrer = \request()->server('HTTP_REFERER');
 header('Location: '.$referrer);

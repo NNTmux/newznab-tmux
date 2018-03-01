@@ -16,14 +16,14 @@ foreach ($userroles as $r) {
 }
 
 // set the current action
-$action = $page->request->input('action') ?? 'view';
+$action = \request()->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
-        if ($page->request->input('id') === '') {
-            \App\Models\Menu::addMenu($page->request->all());
+        if (\request()->input('id') === '') {
+            \App\Models\Menu::addMenu(\request()->all());
         } else {
-            $ret = Menu::updateMenu($page->request->all());
+            $ret = Menu::updateMenu(\request()->all());
         }
 
         header('Location:'.WWW_TOP.'/menu-list.php');
@@ -35,8 +35,8 @@ switch ($action) {
             'id' => '', 'title' => '', 'href' => '', 'tooltip' => '',
             'menueval' => '', 'role' => 0, 'ordinal' => 0, 'newwindow' => 0,
         ];
-        if ($page->request->has('id')) {
-            $id = $page->request->input('id');
+        if (\request()->has('id')) {
+            $id = \request()->input('id');
             $menuRow = Menu::find($id);
         }
         $page->title = 'Menu Edit';

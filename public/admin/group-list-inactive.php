@@ -7,14 +7,14 @@ use App\Models\Group;
 $page = new AdminPage();
 
 $gname = '';
-if (! empty($page->request->input('groupname'))) {
-    $gname = $page->request->input('groupname');
+if (! empty(\request()->input('groupname'))) {
+    $gname = \request()->input('groupname');
 }
 
 $groupcount = Group::getGroupsCount($gname, 0);
 
-$offset = $page->request->input('offset') ?? 0;
-$groupname = ! empty($page->request->input('groupname')) ? $page->request->input('groupname') : '';
+$offset = \request()->input('offset') ?? 0;
+$groupname = ! empty(\request()->input('groupname')) ? \request()->input('groupname') : '';
 
 $page->smarty->assign('groupname', $groupname);
 $page->smarty->assign('pagertotalitems', $groupcount);

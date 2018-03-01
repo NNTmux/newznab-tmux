@@ -11,11 +11,11 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-$action = $page->request->input('id') ?? '';
-$videoId = $page->request->input('subpage') ?? '';
+$action = \request()->input('id') ?? '';
+$videoId = \request()->input('subpage') ?? '';
 
-if ($page->request->has('from')) {
-    $page->smarty->assign('from', WWW_TOP.$page->request->input('from'));
+if (\request()->has('from')) {
+    $page->smarty->assign('from', WWW_TOP.\request()->input('from'));
 } else {
     $page->smarty->assign('from', WWW_TOP.'/myshows');
 }
@@ -23,8 +23,8 @@ if ($page->request->has('from')) {
 switch ($action) {
     case 'delete':
         $show = UserSerie::getShow(User::currentUserId(), $videoId);
-        if ($page->request->has('from')) {
-            header('Location:'.WWW_TOP.$page->request->input('from'));
+        if (\request()->has('from')) {
+            header('Location:'.WWW_TOP.\request()->input('from'));
         } else {
             header('Location:'.WWW_TOP.'/myshows');
         }
@@ -48,10 +48,10 @@ switch ($action) {
         }
 
         if ($action === 'doadd') {
-            $category = ($page->request->has('category') && is_array($page->request->input('category')) && ! empty($page->request->input('category'))) ? $page->request->input('category') : [];
+            $category = (\request()->has('category') && is_array(\request()->input('category')) && ! empty(\request()->input('category'))) ? \request()->input('category') : [];
             UserSerie::addShow(User::currentUserId(), $videoId, $category);
-            if ($page->request->has('from')) {
-                header('Location:'.WWW_TOP.$page->request->input('from'));
+            if (\request()->has('from')) {
+                header('Location:'.WWW_TOP.\request()->input('from'));
             } else {
                 header('Location:'.WWW_TOP.'/myshows');
             }
@@ -84,10 +84,10 @@ switch ($action) {
         }
 
         if ($action === 'doedit') {
-            $category = ($page->request->has('category') && is_array($page->request->input('category')) && ! empty($page->request->input('category'))) ? $page->request->input('category') : [];
+            $category = (\request()->has('category') && is_array(\request()->input('category')) && ! empty(\request()->input('category'))) ? \request()->input('category') : [];
             UserSerie::updateShow(User::currentUserId(), $videoId, $category);
-            if ($page->request->has('from')) {
-                header('Location:'.WWW_TOP.$page->request->input('from'));
+            if (\request()->has('from')) {
+                header('Location:'.WWW_TOP.\request()->input('from'));
             } else {
                 header('Location:'.WWW_TOP.'/myshows');
             }
@@ -120,9 +120,9 @@ switch ($action) {
         $releases = new Releases(['Settings' => $page->settings]);
         $browsecount = $releases->getShowsCount($shows, -1, $page->userdata['categoryexclusions']);
 
-        $offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
+        $offset = (\request()->has('offset') && ctype_digit(\request()->input('offset'))) ? \request()->input('offset') : 0;
         $ordering = $releases->getBrowseOrdering();
-        $orderby = $page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '';
+        $orderby = \request()->has('ob') && in_array(\request()->input('ob'), $ordering, false) ? \request()->input('ob') : '';
 
         $results = $releases->getShowsRange($shows, $offset, env('ITEMS_PER_PAGE', 50), $orderby, -1, $page->userdata['categoryexclusions']);
 

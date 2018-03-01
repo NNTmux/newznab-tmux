@@ -9,7 +9,7 @@ $page->title = 'Sharing Settings';
 
 $db = new DB();
 
-$offset = $page->request->input('offset') ?? 0;
+$offset = \request()->input('offset') ?? 0;
 
 $allSites = $db->query(sprintf('SELECT * FROM sharing_sites ORDER BY id LIMIT %d OFFSET %d', 25, $offset));
 if (count($allSites) === 0) {
@@ -18,24 +18,24 @@ if (count($allSites) === 0) {
 
 $ourSite = $db->queryOneRow('SELECT * FROM sharing');
 
-if (! empty($page->request->all())) {
-    if (! empty($page->request->input('sharing_name')) && ! preg_match('/\s+/', $page->request->input('sharing_name')) && strlen($page->request->input('sharing_name')) < 255) {
-        $site_name = trim($page->request->input('sharing_name'));
+if (! empty(\request()->all())) {
+    if (! empty(\request()->input('sharing_name')) && ! preg_match('/\s+/', \request()->input('sharing_name')) && strlen(\request()->input('sharing_name')) < 255) {
+        $site_name = trim(\request()->input('sharing_name'));
     } else {
         $site_name = $ourSite['site_name'];
     }
-    if (! empty($page->request->input('sharing_maxpush')) && is_numeric($page->request->input('sharing_maxpush'))) {
-        $max_push = trim($page->request->input('sharing_maxpush'));
+    if (! empty(\request()->input('sharing_maxpush')) && is_numeric(\request()->input('sharing_maxpush'))) {
+        $max_push = trim(\request()->input('sharing_maxpush'));
     } else {
         $max_push = $ourSite['max_push'];
     }
-    if (! empty($page->request->input('sharing_maxpoll')) && is_numeric($page->request->input('sharing_maxpush'))) {
-        $max_pull = trim($page->request->input('sharing_maxpoll'));
+    if (! empty(\request()->input('sharing_maxpoll')) && is_numeric(\request()->input('sharing_maxpush'))) {
+        $max_pull = trim(\request()->input('sharing_maxpoll'));
     } else {
         $max_pull = $ourSite['max_pull'];
     }
-    if (! empty($page->request->input('sharing_maxdownload')) && is_numeric($page->request->input('sharing_maxdownload'))) {
-        $max_download = trim($page->request->input('sharing_maxdownload'));
+    if (! empty(\request()->input('sharing_maxdownload')) && is_numeric(\request()->input('sharing_maxdownload'))) {
+        $max_download = trim(\request()->input('sharing_maxdownload'));
     } else {
         $max_download = $ourSite['max_download'];
     }

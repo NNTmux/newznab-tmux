@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Mail\SendInvite;
 use App\Mail\AccountChange;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Blacklight\utility\Utility;
@@ -763,18 +764,7 @@ class User extends Authenticatable
      */
     public static function isLoggedIn(): bool
     {
-        if (isset($_SESSION['uid'])) {
-            return true;
-        }
-        if (isset($_COOKIE['uid'], $_COOKIE['idh'])) {
-            $u = self::find($_COOKIE['uid']);
-
-            if ((int) $u['user_roles_id'] !== self::ROLE_DISABLED && $_COOKIE['idh'] === self::hashSHA1($u['userseed'].$_COOKIE['uid'])) {
-                self::login($_COOKIE['uid'], $_SERVER['REMOTE_ADDR']);
-            }
-        }
-
-        return isset($_SESSION['uid']);
+        return Auth::check();
     }
 
     /**
@@ -788,7 +778,9 @@ class User extends Authenticatable
      */
     public static function login($userID, $host = '', $remember = false): void
     {
-        $_SESSION['uid'] = $userID;
+        Auth::loginUsingId($userID, $remember);
+
+        dd(Auth::check());
 
         if ((int) Settings::settingValue('..storeuserips') !== 1) {
             $host = '';

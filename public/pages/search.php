@@ -18,13 +18,13 @@ $page->meta_description = 'Search for Nzbs';
 $results = [];
 
 $searchType = 'basic';
-if ($page->request->has('search_type') && $page->request->input('search_type') === 'adv') {
+if (\request()->has('search_type') && \request()->input('search_type') === 'adv') {
     $searchType = 'advanced';
 }
 
 $ordering = $releases->getBrowseOrdering();
-$orderBy = ($page->request->has('ob') && in_array($page->request->input('ob'), $ordering, false) ? $page->request->input('ob') : '');
-$offset = ($page->request->has('offset') && ctype_digit($page->request->input('offset'))) ? $page->request->input('offset') : 0;
+$orderBy = (\request()->has('ob') && in_array(\request()->input('ob'), $ordering, false) ? \request()->input('ob') : '');
+$offset = (\request()->has('offset') && ctype_digit(\request()->input('offset'))) ? \request()->input('offset') : 0;
 
 $page->smarty->assign(
     [
@@ -33,22 +33,22 @@ $page->smarty->assign(
     ]
 );
 
-if (($page->request->has('id') || $page->request->has('subject')) && ! $page->request->has('searchadvr') && $searchType === 'basic') {
+if ((\request()->has('id') || \request()->has('subject')) && ! \request()->has('searchadvr') && $searchType === 'basic') {
     $searchString = '';
     switch (true) {
-        case $page->request->has('subject'):
-            $searchString = (string) $page->request->input('subject');
+        case \request()->has('subject'):
+            $searchString = (string) \request()->input('subject');
             $page->smarty->assign('subject', $searchString);
             break;
-        case $page->request->has('id'):
-            $searchString = (string) $page->request->input('id');
+        case \request()->has('id'):
+            $searchString = (string) \request()->input('id');
             $page->smarty->assign('search', $searchString);
             break;
     }
 
     $categoryID[] = -1;
-    if ($page->request->has('t')) {
-        $categoryID = explode(',', $page->request->input('t'));
+    if (\request()->has('t')) {
+        $categoryID = explode(',', \request()->input('t'));
     }
     foreach ($releases->getBrowseOrdering() as $orderType) {
         $page->smarty->assign(
@@ -100,7 +100,7 @@ $searchVars = [
 ];
 
 foreach ($searchVars as $searchVarKey => $searchVar) {
-    $searchVars[$searchVarKey] = ($page->request->has($searchVarKey) ? (string) $page->request->input($searchVarKey) : '');
+    $searchVars[$searchVarKey] = (\request()->has($searchVarKey) ? (string) \request()->input($searchVarKey) : '');
 }
 
 $searchVars['selectedgroup'] = $searchVars['searchadvgroups'];
@@ -111,7 +111,7 @@ foreach ($searchVars as $searchVarKey => $searchVar) {
     $page->smarty->assign($searchVarKey, $searchVars[$searchVarKey]);
 }
 
-if ($page->request->has('searchadvr') && ! $page->request->has('id') && ! $page->request->has('subject') && $searchType !== 'basic') {
+if (\request()->has('searchadvr') && ! \request()->has('id') && ! \request()->has('subject') && $searchType !== 'basic') {
     $orderByString = '';
     foreach ($searchVars as $searchVarKey => $searchVar) {
         $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);

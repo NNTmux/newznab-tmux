@@ -9,8 +9,8 @@ $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'collection_re
 
 $page->title = 'Collections Regex List';
 
-$group = ($page->request->has('group') && ! empty($page->request->input('group')) ? $page->request->input('group') : '');
-$offset = $page->request->input('offset') ?? 0;
+$group = (\request()->has('group') && ! empty(\request()->input('group')) ? \request()->input('group') : '');
+$offset = \request()->input('offset') ?? 0;
 $regex = $regexes->getRegex($group, env('ITEMS_PER_PAGE', 50), $offset);
 $page->smarty->assign(
     [

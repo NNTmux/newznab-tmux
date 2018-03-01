@@ -10,32 +10,32 @@ $bin = new Binaries(['Settings' => $page->pdo]);
 $error = '';
 $regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1, 'status' => 1, 'optype' => 1];
 
-switch ($page->request->input('action') ?? 'view') {
+switch (\request()->input('action') ?? 'view') {
     case 'submit':
-        if ($page->request->input('groupname') === '') {
+        if (\request()->input('groupname') === '') {
             $error = 'Group must be a valid usenet group';
             break;
         }
 
-        if ($page->request->input('regex') === '') {
+        if (\request()->input('regex') === '') {
             $error = 'Regex cannot be empty';
             break;
         }
 
-        if ($page->request->input('id') === '') {
-            $bin->addBlacklist($page->request->all());
+        if (\request()->input('id') === '') {
+            $bin->addBlacklist(\request()->all());
         } else {
-            $bin->updateBlacklist($page->request->all());
+            $bin->updateBlacklist(\request()->all());
         }
 
         header('Location:'.WWW_TOP.'/binaryblacklist-list.php');
         break;
 
     case 'addtest':
-        if ($page->request->has('regex') && $page->request->has('groupname')) {
+        if (\request()->has('regex') && \request()->has('groupname')) {
             $regex += [
-                    'groupname' => $page->request->input('groupname'),
-                    'regex'     => $page->request->input('regex'),
+                    'groupname' => \request()->input('groupname'),
+                    'regex'     => \request()->input('regex'),
                     'ordinal'   => 1,
                     'status'    => 1,
             ];
@@ -44,9 +44,9 @@ switch ($page->request->input('action') ?? 'view') {
 
     case 'view':
     default:
-        if ($page->request->has('id')) {
+        if (\request()->has('id')) {
             $page->title = 'Binary Black/Whitelist Edit';
-            $regex = $bin->getBlacklistByID($page->request->input('id'));
+            $regex = $bin->getBlacklistByID(\request()->input('id'));
         } else {
             $page->title = 'Binary Black/Whitelist Add';
             $regex += [

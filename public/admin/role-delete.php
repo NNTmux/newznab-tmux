@@ -6,9 +6,9 @@ use App\Models\UserRole;
 
 $page = new AdminPage();
 
-if ($page->request->has('id')) {
-    UserRole::deleteRole($page->request->input('id'));
+if (\request()->has('id')) {
+    UserRole::deleteRole(\request()->input('id'));
 }
 
-$referrer = $page->request->server('HTTP_REFERER');
+$referrer = \request()->server('HTTP_REFERER');
 header('Location: '.$referrer);

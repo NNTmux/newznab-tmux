@@ -6,7 +6,6 @@ use App\Models\User;
 use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
-use Illuminate\Http\Request;
 use App\Models\RoleExcludedCategory;
 
 class BasePage
@@ -104,24 +103,28 @@ class BasePage
      */
     public function __construct()
     {
-        if (session_id() === '') {
-            session_set_cookie_params(0, '/', '', $this->https, true);
-            session_start();
-            if (empty($_SESSION['token'])) {
-                $_SESSION['token'] = sodium_bin2hex(random_bytes(32));
+
+        if (! session()->isStarted()) {
+            session()->start();
+            /*if (!session()->has('_token')) {
+                session()->push('_token', sodium_bin2hex(random_bytes(32)));
             }
-            $this->token = $_SESSION['token'];
+            $this->token = session('_token');*/
         }
+
+        //dd(session('_token'), request('_token'), session()->all(), request()->all());
 
         if (env('FLOOD_CHECK', false)) {
             $this->floodCheck();
         }
 
+        //dd(session('id'));
+
         // Buffer settings/DB connection.
         $this->settings = new Settings();
         $this->pdo = new DB();
         $this->smarty = new Smarty();
-        $this->request = (new Request())::capture();
+        //\request() = (new Request())::capture();
 
         $this->smarty->setCompileDir(NN_SMARTY_TEMPLATES);
         $this->smarty->setConfigDir(NN_SMARTY_CONFIGS);
@@ -134,20 +137,20 @@ class BasePage
         );
         $this->smarty->error_reporting = E_ALL - E_NOTICE;
 
-        $this->https = $this->request->server('HTTPS') !== null && $this->request->server('HTTPS') === 'on';
+        $this->https = \request()->secure();
 
-        if ($this->request->server('SERVER_NAME')) {
+        if (\request()->server('SERVER_NAME')) {
             $this->serverurl = (
-                ($this->https === true ? 'https://' : 'http://').$this->request->server('SERVER_NAME').
-                (((int) $this->request->server('SERVER_PORT') !== 80 && (int) $this->request->server('SERVER_PORT') !== 443) ? ':'.$this->request->server('SERVER_PORT') : '').
+                ($this->https === true ? 'https://' : 'http://').\request()->server('SERVER_NAME').
+                (((int) \request()->server('SERVER_PORT') !== 80 && (int) \request()->server('SERVER_PORT') !== 443) ? ':'.\request()->server('SERVER_PORT') : '').
                 WWW_TOP.'/'
             );
             $this->smarty->assign('serverroot', $this->serverurl);
         }
 
-        $this->page = $this->request->input('page') ?? 'content';
+        $this->page = \request()->input('page') ?? 'content';
 
-        if (User::isLoggedIn()) {
+        if (\Illuminate\Support\Facades\Auth::check()) {
             $this->setUserPreferences();
         } else {
             $this->theme = $this->getSettingValue('site.main.style');
@@ -247,7 +250,7 @@ class BasePage
      */
     public function isPostBack()
     {
-        return $this->request->isMethod('POST');
+        return \request()->isMethod('POST');
     }
 
     /**
@@ -270,7 +273,7 @@ class BasePage
             'Location: '.
             ($from_admin ? str_replace('/admin', '', WWW_TOP) : WWW_TOP).
             '/login?redirect='.
-            urlencode($this->request->getRequestUri())
+            urlencode(\request()->getRequestUri())
         );
         exit();
     }

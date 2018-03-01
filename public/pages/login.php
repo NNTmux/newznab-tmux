@@ -9,13 +9,12 @@ $page->smarty->assign(['error' => '', 'username' => '', 'rememberme' => '']);
 
 $captcha = new Captcha($page);
 
-if (! User::isLoggedIn()) {
-    if (! $page->request->has('username') && ! $page->request->has('password')) {
+if (! \Illuminate\Support\Facades\Auth::check()) {
+    if (! \request()->has('username') && ! \request()->has('password')) {
         $page->smarty->assign('error', 'Please enter your username and password.');
     } elseif ($captcha->getError() === false) {
-        $username = htmlspecialchars($page->request->input('username'), ENT_QUOTES | ENT_HTML5);
+        $username = htmlspecialchars(\request()->input('username'), ENT_QUOTES | ENT_HTML5);
         $page->smarty->assign('username', $username);
-        if (Utility::checkCsrfToken() === true) {
             $res = User::getByUsername($username);
             if ($res === null) {
                 $res = User::getByEmail($username);
@@ -25,12 +24,12 @@ if (! User::isLoggedIn()) {
                 $dis = User::isDisabled($username);
                 if ($dis) {
                     $page->smarty->assign('error', 'Your account has been disabled.');
-                } elseif (User::checkPassword($page->request->input('password'), $res['password'], $res['id'])) {
-                    $rememberMe = ($page->request->has('rememberme') && $page->request->input('rememberme') === 'on');
-                    User::login($res['id'], $page->request->ip(), $rememberMe);
+                } elseif (User::checkPassword(\request()->input('password'), $res['password'], $res['id'])) {
+                    $rememberMe = (\request()->has('rememberme') && \request()->input('rememberme') === 'on');
+                    User::login($res['id'], \request()->ip(), $rememberMe);
 
-                    if ($page->request->has('redirect') && $page->request->input('redirect') !== '') {
-                        header('Location: '.$page->request->input('redirect'));
+                    if (\request()->has('redirect') && \request()->input('redirect') !== '') {
+                        header('Location: '.\request()->input('redirect'));
                     } else {
                         header('Location: '.WWW_TOP.Settings::settingValue('site.main.home_link'));
                     }
@@ -41,15 +40,12 @@ if (! User::isLoggedIn()) {
             } else {
                 $page->smarty->assign('error', 'Incorrect username/email or password.');
             }
-        } else {
-            $page->showTokenError();
-        }
     }
 } else {
     header('Location: '.WWW_TOP.Settings::settingValue('site.main.home_link'));
 }
 
-$page->smarty->assign('redirect', $page->request->input('redirect') ?? '');
+$page->smarty->assign('redirect', \request()->input('redirect') ?? '');
 $page->smarty->assign('csrf_token', $page->token);
 $page->meta_title = 'Login';
 $page->meta_keywords = 'Login';

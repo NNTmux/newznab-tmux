@@ -27,13 +27,13 @@ if (! empty($page->userdata) && User::isLoggedIn()) {
 $page->smarty->assign('admin', (($role === 2 || $role === 4) ? 'true' : 'false'));
 
 $contentId = 0;
-if (! empty($page->request->input('id'))) {
-    $contentId = $page->request->input('id');
+if (! empty(\request()->input('id'))) {
+    $contentId = \request()->input('id');
 }
 
 $request = false;
-if (! empty($page->request->input('page'))) {
-    $request = $page->request->input('page');
+if (! empty(\request()->input('page'))) {
+    $request = \request()->input('page');
 }
 
 if ($contentId === 0 && $request === 'content') {

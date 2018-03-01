@@ -1088,11 +1088,12 @@ class Utility
     }
 
     /**
-     * @param string $tableName
+     * @param $tableName
      * @param $start
      * @param $num
      *
      * @return array
+     * @throws \Exception
      */
     public static function getRange($tableName, $start, $num): array
     {
@@ -1109,9 +1110,10 @@ class Utility
     }
 
     /**
-     * @param string $tableName
+     * @param $tableName
      *
      * @return int
+     * @throws \Exception
      */
     public static function getCount($tableName): int
     {
@@ -1126,6 +1128,6 @@ class Utility
      */
     public static function checkCsrfToken(): bool
     {
-        return ! empty($_POST['_token']) && hash_equals($_SESSION['token'], $_POST['_token']);
+        return ! empty(\request('_token')) && hash_equals(session('_token'), \request('_token'));
     }
 }

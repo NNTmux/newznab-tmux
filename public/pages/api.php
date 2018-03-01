@@ -10,8 +10,8 @@ use Blacklight\utility\Utility;
 
 // API functions.
 $function = 's';
-if ($page->request->has('t')) {
-    switch ($page->request->input('t')) {
+if (\request()->has('t')) {
+    switch (\request()->input('t')) {
         case 'd':
         case 'details':
             $function = 'd';
@@ -43,7 +43,7 @@ if ($page->request->has('t')) {
             $function = 'n';
             break;
         default:
-            Utility::showApiError(202, 'No such function ('.$page->request->input('t').')');
+            Utility::showApiError(202, 'No such function ('.\request()->input('t').')');
     }
 } else {
     Utility::showApiError(200, 'Missing parameter (t)');
@@ -56,10 +56,10 @@ $maxRequests = 0;
 // Page is accessible only by the apikey
 
 if ($function !== 'c' && $function !== 'r') {
-    if (! $page->request->has('apikey')) {
+    if (! \request()->has('apikey')) {
         Utility::showApiError(200, 'Missing parameter (apikey)');
     } else {
-        $apiKey = $page->request->input('apikey');
+        $apiKey = \request()->input('apikey');
         $res = User::getByRssToken($apiKey);
         if ($res === null) {
             Utility::showApiError(100, 'Incorrect user credentials (wrong API key)');
@@ -88,13 +88,13 @@ $releases = new Releases(['Settings' => $page->settings]);
 $api = new API(['Settings' => $page->settings, 'Request' => $_GET]);
 
 // Set Query Parameters based on Request objects
-$outputXML = ! ($page->request->has('o') && $page->request->input('o') === 'json');
-$minSize = ($page->request->has('minsize') && $page->request->input('minsize') > 0 ? $page->request->input('minsize') : 0);
+$outputXML = ! (\request()->has('o') && \request()->input('o') === 'json');
+$minSize = (\request()->has('minsize') && \request()->input('minsize') > 0 ? \request()->input('minsize') : 0);
 $offset = $api->offset();
 
 // Set API Parameters based on Request objects
-$params['extended'] = ($page->request->has('extended') && (int) $page->request->input('extended') === 1 ? '1' : '0');
-$params['del'] = ($page->request->has('del') && (int) $page->request->input('del') === 1 ? '1' : '0');
+$params['extended'] = (\request()->has('extended') && (int) \request()->input('extended') === 1 ? '1' : '0');
+$params['del'] = (\request()->has('del') && (int) \request()->input('del') === 1 ? '1' : '0');
 $params['uid'] = $uid;
 $params['token'] = $apiKey;
 
@@ -104,13 +104,13 @@ switch ($function) {
         $api->verifyEmptyParameter('q');
         $maxAge = $api->maxAge();
         $groupName = $api->group();
-        UserRequest::addApiRequest($uid, $page->request->getRequestUri());
+        UserRequest::addApiRequest($uid, \request()->getRequestUri());
         $categoryID = $api->categoryID();
         $limit = $api->limit();
 
-        if ($page->request->has('q')) {
+        if (\request()->has('q')) {
             $relData = $releases->search(
-                $page->request->input('q'),
+                \request()->input('q'),
                 -1,
                 -1,
                 -1,
@@ -157,22 +157,22 @@ switch ($function) {
         $api->verifyEmptyParameter('season');
         $api->verifyEmptyParameter('ep');
         $maxAge = $api->maxAge();
-        UserRequest::addApiRequest($uid, $page->request->getRequestUri());
+        UserRequest::addApiRequest($uid, \request()->getRequestUri());
 
         $siteIdArr = [
-            'id'     => $page->request->input('vid') ?? '0',
-            'tvdb'   => $page->request->input('tvdbid') ?? '0',
-            'trakt'  => $page->request->input('traktid') ?? '0',
-            'tvrage' => $page->request->input('rid') ?? '0',
-            'tvmaze' => $page->request->input('tvmazeid') ?? '0',
-            'imdb'   => $page->request->input('imdbid') ?? '0',
-            'tmdb'   => $page->request->input('tmdbid') ?? '0',
+            'id'     => \request()->input('vid') ?? '0',
+            'tvdb'   => \request()->input('tvdbid') ?? '0',
+            'trakt'  => \request()->input('traktid') ?? '0',
+            'tvrage' => \request()->input('rid') ?? '0',
+            'tvmaze' => \request()->input('tvmazeid') ?? '0',
+            'imdb'   => \request()->input('imdbid') ?? '0',
+            'tmdb'   => \request()->input('tmdbid') ?? '0',
         ];
 
         // Process season only queries or Season and Episode/Airdate queries
 
-        $series = $page->request->input('season') ?? '';
-        $episode = $page->request->input('ep') ?? '';
+        $series = \request()->input('season') ?? '';
+        $episode = \request()->input('ep') ?? '';
 
         if (preg_match('#^(19|20)\d{2}$#', $series, $year) && strpos($episode, '/') !== false) {
             $airdate = str_replace('/', '-', $year[0].'-'.$episode);
@@ -185,7 +185,7 @@ switch ($function) {
             $airdate ?? '',
             $offset,
             $api->limit(),
-            $page->request->input('q') ?? '',
+            \request()->input('q') ?? '',
             $api->categoryID(),
             $maxAge,
             $minSize
@@ -200,15 +200,15 @@ switch ($function) {
         $api->verifyEmptyParameter('q');
         $api->verifyEmptyParameter('imdbid');
         $maxAge = $api->maxAge();
-        UserRequest::addApiRequest($uid, $page->request->getRequestUri());
+        UserRequest::addApiRequest($uid, \request()->getRequestUri());
 
-        $imdbId = ($page->request->input('imdbid') ?? -1);
+        $imdbId = (\request()->input('imdbid') ?? -1);
 
         $relData = $releases->moviesSearch(
             $imdbId,
             $offset,
             $api->limit(),
-            $page->request->input('q') ?? '',
+            \request()->input('q') ?? '',
             $api->categoryID(),
             $maxAge,
             $minSize
@@ -228,8 +228,8 @@ switch ($function) {
     // Get NZB.
     case 'g':
         $api->verifyEmptyParameter('g');
-        UserRequest::addApiRequest($uid, $page->request->getRequestUri());
-        $relData = Release::checkGuidForApi($page->request->input('id'));
+        UserRequest::addApiRequest($uid, \request()->getRequestUri());
+        $relData = Release::checkGuidForApi(\request()->input('id'));
         if ($relData !== false) {
             header(
                 'Location:'.
@@ -239,8 +239,8 @@ switch ($function) {
                 '&r='.
                 $apiKey.
                 '&id='.
-                $page->request->input('id').
-                (($page->request->has('del') && $page->request->input('del') === '1') ? '&del=1' : '')
+                \request()->input('id').
+                ((\request()->has('del') && \request()->input('del') === '1') ? '&del=1' : '')
             );
         } else {
             Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
@@ -249,12 +249,12 @@ switch ($function) {
 
     // Get individual NZB details.
     case 'd':
-        if (! $page->request->has('id')) {
+        if (! \request()->has('id')) {
             Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
         }
 
-        UserRequest::addApiRequest($uid, $page->request->getRequestUri());
-        $data = Release::getByGuid($page->request->input('id'));
+        UserRequest::addApiRequest($uid, \request()->getRequestUri());
+        $data = Release::getByGuid(\request()->input('id'));
 
         $relData = [];
         if ($data) {
@@ -266,17 +266,17 @@ switch ($function) {
 
     // Get an NFO file for an individual release.
     case 'n':
-        if (! $page->request->has('id')) {
+        if (! \request()->has('id')) {
             Utility::showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
         }
 
-        UserRequest::addApiRequest($uid, $page->request->getRequestUri());
-        $rel = Release::query()->where('guid', $page->request->input('id'))->first(['id', 'searchname']);
+        UserRequest::addApiRequest($uid, \request()->getRequestUri());
+        $rel = Release::query()->where('guid', \request()->input('id'))->first(['id', 'searchname']);
         $data = ReleaseNfo::getReleaseNfo($rel['id']);
 
         if ($rel !== null) {
             if ($data !== null) {
-                if ($page->request->has('o') && $page->request->input('o') === 'file') {
+                if (\request()->has('o') && \request()->input('o') === 'file') {
                     header('Content-type: application/octet-stream');
                     header("Content-disposition: attachment; filename={$rel['searchname']}.nfo");
                     exit($data['nfo']);
