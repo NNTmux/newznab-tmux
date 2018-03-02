@@ -167,17 +167,6 @@ class BasePage
         $this->smarty->assign('page', $this);
     }
 
-    /**
-     * Unquotes quoted strings recursively in an array.
-     *
-     * @param $array
-     */
-    private function stripSlashes(array &$array)
-    {
-        foreach ($array as $key => $value) {
-            $array[$key] = (is_array($value) ? array_map('stripslashes', $value) : stripslashes($value));
-        }
-    }
 
     /**
      * Check if the user is flooding.

@@ -1,4 +1,5 @@
 2018-03-02 DariusIII
+	* Chg: Remove unused stripSlashes function from basepage
 	* Fix: Fix editing of user profiles
 	* Chg: Update CSRF token handling
 	* Chg: Update font-awesome to version 5.0.8
