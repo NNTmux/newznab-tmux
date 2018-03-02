@@ -167,7 +167,6 @@ class BasePage
         $this->smarty->assign('page', $this);
     }
 
-
     /**
      * Check if the user is flooding.
      */
