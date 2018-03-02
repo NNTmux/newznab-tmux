@@ -757,16 +757,16 @@
         },
         {
             "name": "bower-asset/font-awesome",
-            "version": "5.0.7",
+            "version": "5.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "9e3da0854fdd1ad847440243a231690b427dab3f"
+                "reference": "31281606f5205b0191c17c3b4d2d56e1ddbb2dc6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/9e3da0854fdd1ad847440243a231690b427dab3f",
-                "reference": "9e3da0854fdd1ad847440243a231690b427dab3f",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/31281606f5205b0191c17c3b4d2d56e1ddbb2dc6",
+                "reference": "31281606f5205b0191c17c3b4d2d56e1ddbb2dc6",
                 "shasum": ""
             },
             "type": "bower-asset-library"
