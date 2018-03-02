@@ -41,9 +41,9 @@ switch ($action) {
             request()->merge(['saburl' => request()->input('saburl').'/']);
         }
 
-        if (request()->input('password') !== '' && request()->input('password') !== request()->input('confirmpassword')) {
+        if (request()->input('password') !== null && request()->input('password') !== request()->input('confirmpassword')) {
             $errorStr = 'Password Mismatch';
-        } elseif (request()->input('password') !== '' && ! User::isValidPassword(request()->input('password'))) {
+        } elseif (request()->input('password') !== null && ! User::isValidPassword(request()->input('password'))) {
             $errorStr = 'Your password must be longer than eight characters, have at least 1 number, at least 1 capital and at least one lowercase letter';
         } elseif (! empty(request()->input('nzbgeturl')) && $nzbGet->verifyURL(request()->input('nzbgeturl')) === false) {
             $errorStr = 'The NZBGet URL you entered is invalid!';
@@ -51,7 +51,7 @@ switch ($action) {
             $errorStr = 'Your email is not a valid format.';
         } else {
             $res = User::getByEmail(request()->input('email'));
-            if ($res && (int) $res['id'] !== (int) $userid) {
+            if ($res && (int) $res['id'] !== $userid) {
                 $errorStr = 'Sorry, the email is already in use.';
             } elseif ((empty(request()->input('saburl')) && ! empty(request()->input('sabapikey'))) || (! empty(request()->input('saburl')) && empty(request()->input('sabapikey')))) {
                 $errorStr = 'Insert a SABnzdb URL and API key.';
@@ -92,7 +92,7 @@ switch ($action) {
                 request()->merge(['exccat' => (! request()->has('exccat') || ! is_array(request()->input('exccat'))) ? [] : request()->input('exccat')]);
                 UserExcludedCategory::addCategoryExclusions($userid, request()->input('exccat'));
 
-                if (request()->input('password') !== '') {
+                if (request()->input('password') !== null) {
                     User::updatePassword($userid, request()->input('password'));
                 }
 
