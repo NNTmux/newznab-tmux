@@ -23,6 +23,7 @@
 							</li>
 						</ul>
 						<form action="profileedit?action=submit" method="post">
+							<input type="hidden" name="_token" value="{$csrf_token}">
 							<div class="tab-content">
 								<div class="tab-pane fade active in" id="tab2_1">
 									<table cellpadding="0" cellspacing="0" width="100%">

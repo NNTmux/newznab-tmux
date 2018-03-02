@@ -825,7 +825,7 @@ class User extends Authenticatable
     public static function setCookies($userID): void
     {
         $user = self::find($userID);
-        $secure_cookie = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? '1' : '0');
+        $secure_cookie = request()->secure();
         setcookie('uid', $userID, time() + 2592000, '/', null, $secure_cookie, true);
         setcookie('idh', self::hashSHA1($user['userseed'].$userID), time() + 2592000, '/', null, $secure_cookie, true);
     }

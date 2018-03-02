@@ -7,6 +7,7 @@ use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
 use App\Models\RoleExcludedCategory;
+use Illuminate\Support\Carbon;
 
 class BasePage
 {
@@ -99,12 +100,18 @@ class BasePage
     public function __construct()
     {
         if (session_id() === '') {
-            session_set_cookie_params(0, '/', '', $this->https, true);
             session_start();
-            if (empty($_SESSION['token'])) {
-                $_SESSION['token'] = sodium_bin2hex(random_bytes(32));
+
+            $lifetime = Carbon::now()->addMinutes(config('session.lifetime'))->timestamp;
+            $domain = config('session.domain');
+            $http_only = config('session.http_only');
+            $secure = request()->secure();
+
+            if (empty($_SESSION['_token'])) {
+                $_SESSION['_token'] = sodium_bin2hex(random_bytes(32));
             }
-            $this->token = $_SESSION['token'];
+            setcookie('XSRF-TOKEN', $_SESSION['_token'], $lifetime, '/', $domain, $secure, false);
+            setcookie(config('session.cookie'), $_SESSION['_token'], $lifetime, '/', $domain, $secure, $http_only);
         }
 
         if (env('FLOOD_CHECK', false)) {
@@ -137,6 +144,8 @@ class BasePage
             );
             $this->smarty->assign('serverroot', $this->serverurl);
         }
+
+        $this->smarty->assign('csrf_token', $_SESSION['_token']);
 
         $this->page = request()->input('page') ?? 'content';
 
@@ -299,7 +308,7 @@ class BasePage
      */
     public function showTokenError(): void
     {
-        header('HTTP/1.1 503 Service Temporarily Unavailable');
+        header('HTTP/1.1 419 Token Mismatch Error');
         die(view('errors.tokenError'));
     }
 

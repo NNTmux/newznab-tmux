@@ -35,7 +35,7 @@ if ($showRegister === 1) {
     switch ($action) {
         case 'submit':
             if ($captcha->getError() === false) {
-                if (Utility::checkCsrfToken() === true) {
+                if (Utility::checkCSRFToken() === true) {
                     $userName = request()->input('username');
                     $password = request()->input('password');
                     $confirmPassword = request()->input('confirmpassword');

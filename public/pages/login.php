@@ -15,7 +15,7 @@ if (! User::isLoggedIn()) {
     } elseif ($captcha->getError() === false) {
         $username = htmlspecialchars(request()->input('username'), ENT_QUOTES | ENT_HTML5);
         $page->smarty->assign('username', $username);
-        if (Utility::checkCsrfToken() === true) {
+        if (Utility::checkCSRFToken() === true) {
             $res = User::getByUsername($username);
             if ($res === null) {
                 $res = User::getByEmail($username);
@@ -50,7 +50,6 @@ if (! User::isLoggedIn()) {
 }
 
 $page->smarty->assign('redirect', request()->input('redirect') ?? '');
-$page->smarty->assign('csrf_token', $page->token);
 $page->meta_title = 'Login';
 $page->meta_keywords = 'Login';
 $page->meta_description = 'Login';

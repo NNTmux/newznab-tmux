@@ -11,6 +11,7 @@
 {/if}
 
 <form class="form-horizontal" action="profileedit?action=submit" method="post">
+	<input type="hidden" name="_token" value="{$csrf_token}">
 	<fieldset>
 		<div class="control-group">
 			<label class="control-label">Username</label>
