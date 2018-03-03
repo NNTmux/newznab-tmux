@@ -31,7 +31,7 @@ $ordering = $book->getBookOrdering();
 $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $books = [];
-$results = $book->getBookRange($catarray, $offset, config('nntmux.items_per_cover_page', $orderby, $page->userdata['categoryexclusions']);
+$results = $book->getBookRange($catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $page->userdata['categoryexclusions']);
 
 $maxwords = 50;
 foreach ($results as $result) {
@@ -55,7 +55,7 @@ $browseby_link = '&amp;title='.$title.'&amp;author='.$author;
 
 $page->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page');
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page'));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/books?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 

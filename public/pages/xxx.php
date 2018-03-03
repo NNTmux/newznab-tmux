@@ -30,7 +30,7 @@ $ordering = $movie->getXXXOrdering();
 $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $movies = [];
-$results = $movie->getXXXRange($catarray, $offset, config('nntmux.items_per_cover_page', $orderby, -1, $page->userdata['categoryexclusions']);
+$results = $movie->getXXXRange($catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $page->userdata['categoryexclusions']);
 foreach ($results as $result) {
     $result['genre'] = makeFieldLinks($result, 'genre', 'xxx');
     $result['actors'] = makeFieldLinks($result, 'actors', 'xxx');
@@ -55,7 +55,7 @@ $browseby_link = '&amp;title='.$title.'&amp;actors='.$actors.'&amp;director='.$d
 
 $page->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page');
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page'));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/xxx?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 
