@@ -159,7 +159,7 @@ class NameFixer
         ];
         $options += $defaults;
 
-        $this->echooutput = ($options['Echo'] && env('echocli', true));
+        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
         $this->relid = $this->fixed = $this->checked = 0;
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->othercats = implode(',', Category::OTHERS_GROUP);

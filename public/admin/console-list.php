@@ -18,14 +18,14 @@ $page->smarty->assign([
     'pagertotalitems' => $conCount,
     'pagerquerysuffix'  => '#results',
     'pageroffset' => $offset,
-    'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+    'pageritemsperpage' => config('nntmux.items_per_page',
     'pagerquerybase' => WWW_TOP.'/console-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$consoleList = Utility::getRange('consoleinfo', $offset, env('ITEMS_PER_PAGE', 50));
+$consoleList = Utility::getRange('consoleinfo', $offset, config('nntmux.items_per_page');
 
 $page->smarty->assign('consolelist', $consoleList);
 

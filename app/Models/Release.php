@@ -267,7 +267,7 @@ class Release extends Model
             ->limit(10)
             ->get();
 
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put('topdownloads', $releases, $expiresAt);
 
         return $releases;
@@ -292,7 +292,7 @@ class Release extends Model
             ->orderBy('comments', 'desc')
             ->limit(10)
             ->get();
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put('topcomments', $comments, $expiresAt);
 
         return $comments;
@@ -315,7 +315,7 @@ class Release extends Model
             ->leftJoin('groups as g', 'g.id', '=', 'releases.groups_id')
             ->get();
 
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put('releaseget', $result, $expiresAt);
 
         return $result;
@@ -360,7 +360,7 @@ class Release extends Model
 
         $range = $query->get();
 
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($start.$num), $range, $expiresAt);
 
         return $range;
@@ -378,7 +378,7 @@ class Release extends Model
             return $res;
         }
         $res = self::query()->count(['id']);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put('count', $res, $expiresAt);
 
         return $res ?? 0;
@@ -390,7 +390,7 @@ class Release extends Model
      */
     public static function getByGuid($guid)
     {
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_short'));
         $cached = \is_array($guid) ? md5(implode(',', $guid)) : md5($guid);
         $result = Cache::get($cached);
         if ($result !== null) {

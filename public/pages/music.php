@@ -33,7 +33,7 @@ $ordering = $music->getMusicOrdering();
 $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering) ? request()->input('ob') : '';
 
 $results = $musics = [];
-$results = $music->getMusicRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, $page->userdata['categoryexclusions']);
+$results = $music->getMusicRange($catarray, $offset, config('nntmux.items_per_cover_page', $orderby, $page->userdata['categoryexclusions']);
 
 $artist = (request()->has('artist') && ! empty(request()->input('artist'))) ? stripslashes(request()->input('artist')) : '';
 $page->smarty->assign('artist', $artist);
@@ -66,7 +66,7 @@ $browseby_link = '&amp;title='.$title.'&amp;artist='.$artist.'&amp;genre='.$genr
 
 $page->smarty->assign('pagertotalitems', isset($results[0]['_totalcount']) ? $results[0]['_totalcount'] : 0);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_COVER_PAGE', 20));
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page');
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/music?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 

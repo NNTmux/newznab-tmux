@@ -34,7 +34,7 @@ $ordering = $games->getGamesOrdering();
 $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $results = $games2 = [];
-$results = $games->getGamesRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, '', $page->userdata['categoryexclusions']);
+$results = $games->getGamesRange($catarray, $offset, config('nntmux.items_per_cover_page', $orderby, '', $page->userdata['categoryexclusions']);
 $maxwords = 50;
 foreach ($results as $result) {
     if (! empty($result['review'])) {
@@ -74,7 +74,7 @@ $browseby_link = '&amp;title='.$title.'&amp;year='.$year;
 
 $page->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_COVER_PAGE', 20));
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page');
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/games?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 

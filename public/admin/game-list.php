@@ -17,14 +17,14 @@ $page->smarty->assign([
     'pagertotalitems' => $gameCount,
     'pagerquerysuffix'  => '#results',
     'pageroffset' => $offset,
-    'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+    'pageritemsperpage' => config('nntmux.items_per_page',
     'pagerquerybase' => WWW_TOP.'/game-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$gamelist = $game->getRange($offset, env('ITEMS_PER_PAGE', 50));
+$gamelist = $game->getRange($offset, config('nntmux.items_per_page');
 
 $page->smarty->assign('gamelist', $gamelist);
 

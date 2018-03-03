@@ -65,7 +65,7 @@ class MiscSorter
      */
     public function __construct($echooutput = false, &$pdo)
     {
-        $this->echooutput = (env('echocli', true) && $echooutput);
+        $this->echooutput = (config('nntmux.echocli') && $echooutput);
 
         $this->pdo = ($pdo instanceof DB ? $pdo : new DB());
         $this->movie = new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);

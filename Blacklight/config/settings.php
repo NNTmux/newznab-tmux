@@ -224,9 +224,9 @@ define('NN_CACHE_SERIALIZER', 0);
  *
  * @defaults 300/600/900
  */
-define('NN_CACHE_EXPIRY_SHORT', 300);
-define('NN_CACHE_EXPIRY_MEDIUM', 600);
-define('NN_CACHE_EXPIRY_LONG', 900);
+define('config('nntmux.cache_expiry_short')', 300);
+define('config('nntmux.cache_expiry_medium')', 600);
+define('config('nntmux.cache_expiry_long')', 900);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// SQL Settings //////////////////////////////////////////////////////////

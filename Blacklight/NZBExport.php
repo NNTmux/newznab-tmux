@@ -58,7 +58,7 @@ class NZBExport
         $options += $defaults;
 
         $this->browser = $options['Browser'];
-        $this->echoCLI = (! $this->browser && env('echocli', true) && $options['Echo']);
+        $this->echoCLI = (! $this->browser && config('nntmux.echocli') && $options['Echo']);
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Setting'] : new DB());
         $this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
         $this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());

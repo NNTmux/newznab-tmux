@@ -130,7 +130,7 @@ class ProcessReleases
         ];
         $options += $defaults;
 
-        $this->echoCLI = ($options['Echo'] && env('echocli', true));
+        $this->echoCLI = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools());
@@ -168,7 +168,7 @@ class ProcessReleases
      */
     public function processReleases($categorize, $postProcess, $groupName, &$nntp, $echooutput): int
     {
-        $this->echoCLI = ($echooutput && env('echocli', true));
+        $this->echoCLI = ($echooutput && config('nntmux.echocli'));
         $groupID = '';
 
         if (! empty($groupName) && $groupName !== 'mgr') {

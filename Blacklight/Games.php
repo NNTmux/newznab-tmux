@@ -120,7 +120,7 @@ class Games
             'Settings' => null,
         ];
         $options += $defaults;
-        $this->echoOutput = ($options['Echo'] && env('echocli', true));
+        $this->echoOutput = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
@@ -270,7 +270,7 @@ class Games
                         ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         $gamesCache = Cache::get(md5($gamesSql));
         if ($gamesCache !== null) {
             $games = $gamesCache;

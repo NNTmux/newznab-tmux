@@ -1,3 +1,5 @@
+2018-03-03 DariusIII
+	* Chg: Upgrade nntmux configuration method
 2018-03-02 DariusIII
 	* Chg: Remove unused stripSlashes function from basepage
 	* Fix: Fix editing of user profiles

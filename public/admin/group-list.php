@@ -14,10 +14,10 @@ $page->smarty->assign(
         'groupname' => $groupName,
         'pagertotalitems' => Group::getGroupsCount($groupName, -1),
         'pageroffset' => $offset,
-        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+        'pageritemsperpage' => config('nntmux.items_per_page',
         'pagerquerybase' => WWW_TOP.'/group-list.php?'.(($groupName !== '') ? "groupname=$groupName" : '').'&offset=',
         'pagerquerysuffix' => '',
-        'grouplist' => Group::getGroupsRange($offset, env('ITEMS_PER_PAGE', 50), $groupName),
+        'grouplist' => Group::getGroupsRange($offset, config('nntmux.items_per_page', $groupName),
     ]
 );
 $page->smarty->assign('pager', $page->smarty->fetch('pager.tpl'));

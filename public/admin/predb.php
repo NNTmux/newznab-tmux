@@ -10,15 +10,15 @@ $offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) 
 
 if (request()->has('presearch')) {
     $lastSearch = request()->input('presearch');
-    $parr = Predb::getAll($offset, env('ITEMS_PER_PAGE', 50), request()->input('presearch'));
+    $parr = Predb::getAll($offset, config('nntmux.items_per_page', request()->input('presearch'));
 } else {
     $lastSearch = '';
-    $parr = Predb::getAll($offset, env('ITEMS_PER_PAGE', 50));
+    $parr = Predb::getAll($offset, config('nntmux.items_per_page');
 }
 
 $page->smarty->assign('pagertotalitems', $parr['count']);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_PAGE', 50));
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_page');
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/predb.php?offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 $page->smarty->assign('lastSearch', $lastSearch);

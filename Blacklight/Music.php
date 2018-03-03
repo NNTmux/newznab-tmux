@@ -86,7 +86,7 @@ class Music
         ];
         $options += $defaults;
 
-        $this->echooutput = ($options['Echo'] && env('echocli', true));
+        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
@@ -162,7 +162,7 @@ class Music
         }
 
         $order = $this->getMusicOrder($orderby);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
 
         $musicSql =
                 sprintf(

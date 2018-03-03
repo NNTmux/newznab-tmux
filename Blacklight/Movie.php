@@ -244,7 +244,7 @@ class Movie
         $this->searchEngines = true;
         $this->showPasswords = Releases::showPasswords();
 
-        $this->echooutput = ($options['Echo'] && env('echocli', true) && $this->pdo->cli);
+        $this->echooutput = ($options['Echo'] && config('nntmux.echocli') && $this->pdo->cli);
         $this->imgSavePath = NN_COVERS.'movies'.DS;
         $this->service = '';
     }
@@ -279,7 +279,7 @@ class Movie
         }
 
         $order = $this->getMovieOrder($orderBy);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
 
         $moviesSql =
                 sprintf(

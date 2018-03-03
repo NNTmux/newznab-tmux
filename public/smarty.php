@@ -20,19 +20,6 @@
  */
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap'.DIRECTORY_SEPARATOR.'autoload.php';
 
-use Blacklight\config\Configure;
-
-try {
-    $config = new Configure('smarty');
-} catch (\RuntimeException $e) {
-    if ((int) $e->getCode() === 1) {
-        if (is_dir('install')) {
-            header('Location: install');
-            exit();
-        }
-    }
-}
-
 if (function_exists('ini_set') && function_exists('ini_get')) {
     ini_set('include_path', NN_WWW.PATH_SEPARATOR.ini_get('include_path'));
 }

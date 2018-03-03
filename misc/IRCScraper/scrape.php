@@ -4,23 +4,6 @@ require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use Blacklight\IRCScraper;
 
-if (! defined('IRC_SCRAPER_CONFIG')) {
-    define('IRC_SCRAPER_CONFIG', NN_CONFIGS.'ircscraper_settings.php');
-}
-
-switch (true) {
-    case is_file(IRC_SCRAPER_CONFIG):
-        break;
-    case is_file(NN_ROOT.'misc/testing/IRCScraper/settings.php'):
-        rename(NN_ROOT.'misc/testing/IRCScraper/settings.php', IRC_SCRAPER_CONFIG);
-        break;
-    default:
-        exit(
-            'Copy '.NN_CONFIGS.'ircscraper_settings_example.php to '.
-            IRC_SCRAPER_CONFIG.' and change the settings.'.PHP_EOL
-        );
-}
-
 if (! isset($argv[1]) || $argv[1] !== 'true') {
     exit(
         'Argument 1: (required) false|true  ; false prints this help screen, true runs the scraper.'.PHP_EOL.
@@ -34,14 +17,8 @@ if (! isset($argv[1]) || $argv[1] !== 'true') {
     );
 }
 
-require_once IRC_SCRAPER_CONFIG;
-
-if (! defined('SCRAPE_IRC_NICKNAME')) {
-    exit('ERROR! You must update settings.php using settings_example.php.');
-}
-
-if (SCRAPE_IRC_NICKNAME === '') {
-    exit('ERROR! You must put a username in settings.php'.PHP_EOL);
+if (config('irc_settings.scrape_irc_username') === '') {
+    exit('ERROR! You must put a username in config/irc_settings.php'.PHP_EOL);
 }
 
 $silent = (isset($argv[2]) && $argv[2] === 'true');

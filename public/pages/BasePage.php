@@ -114,7 +114,7 @@ class BasePage
             setcookie(config('session.cookie'), $_SESSION['_token'], $lifetime, '/', $domain, $secure, $http_only);
         }
 
-        if (env('FLOOD_CHECK', false)) {
+        if (config('nntmux.flood_check')) {
             $this->floodCheck();
         }
 
@@ -172,7 +172,7 @@ class BasePage
      */
     public function floodCheck(): void
     {
-        $waitTime = (env('FLOOD_WAIT_TIME', 5) < 1 ? 5 : env('FLOOD_WAIT_TIME', 5));
+        $waitTime = (config('nntmux.flood_wait_time') < 1 ? 5 : config('nntmux.flood_wait_time'));
         // Check if this is not from CLI.
         if (empty($argc)) {
             // If flood wait set, the user must wait x seconds until they can access a page.
@@ -184,7 +184,7 @@ class BasePage
                     $_SESSION['flood_check_hits'] = 1;
                     $_SESSION['flood_check_time'] = microtime(true);
                 } else {
-                    if ($_SESSION['flood_check_hits'] >= (env('FLOOD_MAX_REQUESTS_PER_SECOND', 5) < 1 ? 5 : env('FLOOD_MAX_REQUESTS_PER_SECOND', 5))) {
+                    if ($_SESSION['flood_check_hits'] >= (config('nntmux.flood_max_requests_per_second') < 1 ? 5 : config('nntmux.flood_max_requests_per_second'))) {
                         if ($_SESSION['flood_check_time'] + 1 > microtime(true)) {
                             $_SESSION['flood_wait_until'] = microtime(true) + $waitTime;
                             unset($_SESSION['flood_check_hits']);

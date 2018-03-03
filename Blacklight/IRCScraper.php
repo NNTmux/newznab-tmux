@@ -72,9 +72,9 @@ class IRCScraper extends IRCClient
      */
     public function __construct(&$silent, &$debug)
     {
-        if (defined('SCRAPE_IRC_SOURCE_IGNORE')) {
+        if (config('irc_settings.scrape_irc_source_ignore')) {
             $this->_ignoredChannels = unserialize(
-                SCRAPE_IRC_SOURCE_IGNORE,
+                config('irc_settings.scrape_irc_source_ignore'),
                 ['allowed_classes' => ['#a.b.cd.image',
                                                                                   '#a.b.console.ps3',
                                                                                   '#a.b.dvd',
@@ -124,12 +124,12 @@ class IRCScraper extends IRCClient
         }
 
         $this->_categoryIgnoreRegex = false;
-        if (defined('SCRAPE_IRC_CATEGORY_IGNORE') && SCRAPE_IRC_CATEGORY_IGNORE !== '') {
-            $this->_categoryIgnoreRegex = SCRAPE_IRC_CATEGORY_IGNORE;
+        if (config('irc_settings.scrape_irc_category_ignore') !== '') {
+            $this->_categoryIgnoreRegex = config('irc_settings.scrape_irc_category_ignore');
         }
 
         $this->_titleIgnoreRegex = false;
-        if (defined('SCRAPE_IRC_TITLE_IGNORE') && SCRAPE_IRC_TITLE_IGNORE !== '') {
+        if (config('irc_settings.scrape_irc_title_ignore') !== '') {
             $this->_titleIgnoreRegex = SCRAPE_IRC_TITLE_IGNORE;
         }
 
@@ -153,28 +153,28 @@ class IRCScraper extends IRCClient
     {
 
         // Connect to IRC.
-        if ($this->connect(SCRAPE_IRC_SERVER, SCRAPE_IRC_PORT, SCRAPE_IRC_TLS) === false) {
+        if ($this->connect(config('irc_settings.scrape_irc_server'), config('irc_settings.scrape_irc_port'), config('irc_settings.scrape_irc_tls')) === false) {
             exit(
                 'Error connecting to ('.
-                SCRAPE_IRC_SERVER.
+                config('irc_settings.scrape_irc_server').
                 ':'.
-                SCRAPE_IRC_PORT.
+                config('irc_settings.scrape_irc_port').
                 '). Please verify your server information and try again.'.
                 PHP_EOL
             );
         }
 
         // Login to IRC.
-        if ($this->login(SCRAPE_IRC_NICKNAME, SCRAPE_IRC_REALNAME, SCRAPE_IRC_USERNAME, SCRAPE_IRC_PASSWORD) === false) {
+        if ($this->login(config('irc_settings.scrape_irc_nickname'), config('irc_settings.scrape_irc_realname'), config('irc_settings.scrape_irc_username'), config('irc_settings.scrape_irc_password')) === false) {
             exit('Error logging in to: ('.
-                SCRAPE_IRC_SERVER.':'.SCRAPE_IRC_PORT.') nickname: ('.SCRAPE_IRC_NICKNAME.
+                config('irc_settings.scrape_irc_server').':'.config('irc_settings.scrape_irc_port').') nickname: ('.config('irc_settings.scrape_irc_nickname').
                 '). Verify your connection information, you might also be banned from this server or there might have been a connection issue.'.
                 PHP_EOL
             );
         }
 
         // Join channels.
-        $channels = defined('SCRAPE_IRC_CHANNELS') ? unserialize(SCRAPE_IRC_CHANNELS, ['allowed_classes' => ['#PreNNTmux', '#nZEDbPRE']]) : ['#PreNNTmux' => null];
+        $channels = config('irc_settings.scrape_irc_channels') ? unserialize(config('irc_settings.scrape_irc_channels'), ['allowed_classes' => ['#PreNNTmux', '#nZEDbPRE']]) : ['#PreNNTmux' => null];
         $this->joinChannels($channels);
 
         if (! $this->_silent) {
@@ -182,11 +182,11 @@ class IRCScraper extends IRCClient
                 '['.
                 date('r').
                 '] [Scraping of IRC channels for ('.
-                SCRAPE_IRC_SERVER.
+                config('irc_settings.scrape_irc_server').
                 ':'.
-                SCRAPE_IRC_PORT.
+                config('irc_settings.scrape_irc_port').
                 ') ('.
-                SCRAPE_IRC_NICKNAME.
+                config('irc_settings.scrape_irc_nickname').
                 ') started.]'.
                 PHP_EOL;
         }

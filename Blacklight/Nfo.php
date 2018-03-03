@@ -64,7 +64,7 @@ class Nfo
      */
     public function __construct()
     {
-        $this->echo = env('echocli', true);
+        $this->echo = config('nntmux.echocli');
         $this->nzbs = Settings::settingValue('..maxnfoprocessed') !== '' ? (int) Settings::settingValue('..maxnfoprocessed') : 100;
         $this->maxRetries = (int) Settings::settingValue('..maxnforetries') >= 0 ? -((int) Settings::settingValue('..maxnforetries') + 1) : self::NFO_UNPROC;
         $this->maxRetries = $this->maxRetries < -8 ? -8 : $this->maxRetries;

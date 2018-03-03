@@ -29,7 +29,7 @@ $offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) 
 $ordering = $releases->getBrowseOrdering();
 $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
-$results = $releases->getBrowseRange($catarray, $offset, env('ITEMS_PER_PAGE', 50), $orderby, -1, $page->userdata['categoryexclusions'], $grp);
+$results = $releases->getBrowseRange($catarray, $offset, config('nntmux.items_per_page', $orderby, -1, $page->userdata['categoryexclusions'], $grp);
 
 $browsecount = $results[0]['_totalcount'] ?? 0;
 
@@ -37,7 +37,7 @@ $page->smarty->assign(
     [
         'pagertotalitems' => $browsecount,
         'pageroffset'=> $offset,
-        'pageritemsperpage'=> env('ITEMS_PER_PAGE', 50),
+        'pageritemsperpage'=> config('nntmux.items_per_page',
         'pagerquerybase' => WWW_TOP.'/browse?t='.$category.'&amp;g='.$grp.'&amp;ob='.$orderby.'&amp;offset=',
         'pagerquerysuffix' => '#results',
     ]

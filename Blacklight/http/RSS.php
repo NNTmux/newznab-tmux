@@ -103,7 +103,7 @@ class RSS extends Capabilities
                 ' LIMIT 0,'.($offset > 100 ? 100 : $offset)
             ),
             true,
-            NN_CACHE_EXPIRY_MEDIUM
+            config('nntmux.cache_expiry_medium')
         );
 
         return $sql;
@@ -162,7 +162,7 @@ class RSS extends Capabilities
                 ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
             ),
             true,
-            NN_CACHE_EXPIRY_MEDIUM
+            config('nntmux.cache_expiry_medium')
         );
     }
 
@@ -216,7 +216,7 @@ class RSS extends Capabilities
                 ' LIMIT '.($limit > 100 ? 100 : $limit).' OFFSET 0'
             ),
             true,
-            NN_CACHE_EXPIRY_MEDIUM
+            config('nntmux.cache_expiry_medium')
         );
     }
 
