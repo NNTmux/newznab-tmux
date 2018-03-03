@@ -1,6 +1,7 @@
 <?php
 
 $username = '';
+
 return [
     /***********************************************************************************************************************
      * You can use this to set the NICKNAME=>REALNAME and USERNAME below.
@@ -73,8 +74,7 @@ return [
  * This is a list of all the channels we fetch PRE's from.
  **********************************************************************************************************************/
 
-    'scrape_irc_channels' =>
-    serialize(
+    'scrape_irc_channels' => serialize(
         [
             //'#Channel'                => 'Password',
             '#PreNNTmux'                => null,
@@ -87,8 +87,7 @@ return [
  * If you want to ignore a source=>change it from false to true.
  **********************************************************************************************************************/
 
-    'scrape_irc_source_ignore' =>
-    serialize(
+    'scrape_irc_source_ignore' => serialize(
         [
             '#a.b.cd.image'               => false,
             '#a.b.console.ps3'            => false,
