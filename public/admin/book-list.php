@@ -19,14 +19,14 @@ $page->smarty->assign([
 	'pagertotalitems' => $bookCount,
 	'pagerquerysuffix'  => '#results',
 	'pageroffset' => $offset,
-	'pageritemsperpage' => config('nntmux.items_per_page',
+	'pageritemsperpage' => config('nntmux.items_per_page'),
 	'pagerquerybase' => WWW_TOP.'/book-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$bookList = Utility::getRange('bookinfo', $offset, config('nntmux.items_per_page');
+$bookList = Utility::getRange('bookinfo', $offset, config('nntmux.items_per_page'));
 
 $page->smarty->assign('booklist', $bookList);
 

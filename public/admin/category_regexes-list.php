@@ -11,7 +11,7 @@ $page->title = 'Category Regex List';
 
 $group = request()->has('group') && ! empty(request()->input('group')) ? request()->input('group') : '';
 $offset = (request()->input('offset') ?? 0);
-$regex = $regexes->getRegex($group, config('nntmux.items_per_page', $offset);
+$regex = $regexes->getRegex($group, config('nntmux.items_per_page'), $offset);
 
 $page->smarty->assign(
     [
@@ -19,7 +19,7 @@ $page->smarty->assign(
         'pagertotalitems'   => $regexes->getCount($group),
         'pagerquerysuffix'  => '',
         'pageroffset'       => $offset,
-        'pageritemsperpage' => config('nntmux.items_per_page',
+        'pageritemsperpage' => config('nntmux.items_per_page'),
         'regex'             => $regex,
         'pagerquerybase'    => WWW_TOP.'/category_regexes-list.php?'.$group.'offset=',
     ]

@@ -35,11 +35,11 @@ $page->smarty->assign(
         'pagerquerysuffix'  => '#results',
         'pagertotalitems'   => User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']),
         'pageroffset'       => $offset,
-        'pageritemsperpage' => config('nntmux.items_per_page',
+        'pageritemsperpage' => config('nntmux.items_per_page'),
         'pagerquerybase'    => WWW_TOP.'/user-list.php?ob='.$orderBy.$uSearch.'&offset=',
         'userlist' => User::getRange(
             $offset,
-            config('nntmux.items_per_page',
+            config('nntmux.items_per_page'),
             $orderBy,
             $variables['username'],
             $variables['email'],

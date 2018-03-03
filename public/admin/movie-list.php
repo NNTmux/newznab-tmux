@@ -18,13 +18,13 @@ $page->smarty->assign([
     'pagertotalitems' => $movCount,
     'pagerquerysuffix'  => '#results',
     'pageroffset' => $offset,
-    'pageritemsperpage' => config('nntmux.items_per_page',
+    'pageritemsperpage' => config('nntmux.items_per_page'),
     'pagerquerybase' => WWW_TOP.'/movie-list.php?offset=',
 ]);
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$movieList = Utility::getRange('movieinfo', $offset, config('nntmux.items_per_page');
+$movieList = Utility::getRange('movieinfo', $offset, config('nntmux.items_per_page'));
 $page->smarty->assign('movielist', $movieList);
 
 $page->content = $page->smarty->fetch('movie-list.tpl');

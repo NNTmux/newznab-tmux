@@ -15,13 +15,13 @@ if (request()->has('group') && ! empty(request()->input('group'))) {
 }
 
 $offset = request()->input('offset') ?? 0;
-$regex = $regexes->getRegex($group, config('nntmux.items_per_page', $offset);
+$regex = $regexes->getRegex($group, config('nntmux.items_per_page'), $offset);
 $page->smarty->assign('regex', $regex);
 
 $count = $regexes->getCount($group);
 $page->smarty->assign('pagertotalitems', $count);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_page');
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_page'));
 $page->smarty->assign('pagerquerysuffix', '');
 
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/release_naming_regexes-list.php?'.$group.'offset=');

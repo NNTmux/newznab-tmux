@@ -40,11 +40,11 @@ $browsecount = Forumpost::getBrowseCount();
 
 $offset = request()->has('offset') && ctype_digit(request()->input('offset')) ? request()->input('offset') : 0;
 
-$results = Forumpost::getBrowseRange($offset, config('nntmux.items_per_page');
+$results = Forumpost::getBrowseRange($offset, config('nntmux.items_per_page'));
 
 $page->smarty->assign('pagertotalitems', $browsecount);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_page');
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_page'));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/forum?offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 $page->smarty->assign('privateprofiles', (int) Settings::settingValue('..privateprofiles') === 1);

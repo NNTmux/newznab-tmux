@@ -11,14 +11,14 @@ $page->title = 'Collections Regex List';
 
 $group = (request()->has('group') && ! empty(request()->input('group')) ? request()->input('group') : '');
 $offset = request()->input('offset') ?? 0;
-$regex = $regexes->getRegex($group, config('nntmux.items_per_page', $offset);
+$regex = $regexes->getRegex($group, config('nntmux.items_per_page'), $offset);
 $page->smarty->assign(
     [
         'group'             => $group,
         'regex'             => $regex,
         'pagertotalitems'   => $regexes->getCount($group),
         'pageroffset'       => $offset,
-        'pageritemsperpage' => config('nntmux.items_per_page',
+        'pageritemsperpage' => config('nntmux.items_per_page'),
         'pagerquerybase'    => WWW_TOP.'/collection_regexes-list.php?'.$group.'offset=',
         'pagerquerysuffix'  => '',
     ]

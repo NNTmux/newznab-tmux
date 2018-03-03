@@ -14,10 +14,10 @@ $offset = request()->input('offset') ?? 0;
 $page->smarty->assign(
     [
         'showname'          => $tvshowname,
-        'tvshowlist'        => Video::getRange($offset, config('nntmux.items_per_page', $tvshowname),
+        'tvshowlist'        => Video::getRange($offset, config('nntmux.items_per_page'), $tvshowname),
         'pagertotalitems'   => Video::getCount($tvshowname),
         'pageroffset'       => $offset,
-        'pageritemsperpage' => config('nntmux.items_per_page',
+        'pageritemsperpage' => config('nntmux.items_per_page'),
         'pagerquerysuffix'  => '',
         'pagerquerybase'    => WWW_TOP.'/show-list.php?'.
     ($tvshowname !== '' ? 'showname='.$tvshowname.'&amp;' : '').'&offset=',

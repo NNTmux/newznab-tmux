@@ -124,11 +124,11 @@ switch ($action) {
         $ordering = $releases->getBrowseOrdering();
         $orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
-        $results = $releases->getShowsRange($shows, $offset, config('nntmux.items_per_page', $orderby, -1, $page->userdata['categoryexclusions']);
+        $results = $releases->getShowsRange($shows, $offset, config('nntmux.items_per_page'), $orderby, -1, $page->userdata['categoryexclusions']);
 
         $page->smarty->assign('pagertotalitems', $browsecount);
         $page->smarty->assign('pageroffset', $offset);
-        $page->smarty->assign('pageritemsperpage', config('nntmux.items_per_page');
+        $page->smarty->assign('pageritemsperpage', config('nntmux.items_per_page'));
         $page->smarty->assign('pagerquerybase', WWW_TOP.'/myshows/browse?ob='.$orderby.'&amp;offset=');
         $page->smarty->assign('pagerquerysuffix', '#results');
         $page->smarty->assign('covgroup', '');
