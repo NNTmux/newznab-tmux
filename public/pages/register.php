@@ -63,7 +63,7 @@ if ($showRegister === 1) {
                         );
 
                         if ($ret > 0) {
-                            User::login($ret, request()->id());
+                            User::login($ret, request()->ip());
                             header('Location: '.WWW_TOP.'/');
                         } else {
                             switch ($ret) {
@@ -122,7 +122,6 @@ $page->smarty->assign(
         'invite_code_query' => Utility::htmlfmt($inviteCodeQuery),
         'showregister'      => $showRegister,
         'error'             => $error,
-        'csrf_token'        => $page->token,
     ]
 );
 $page->meta_title = 'Register';
