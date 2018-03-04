@@ -1,4 +1,5 @@
 2018-03-04 DariusIII
+	* Fix: Fix ssl options check
 	* Fix: Fix new user registration once again
 2018-03-03 DariusIII
 	* Chg: Upgrade nntmux configuration method
