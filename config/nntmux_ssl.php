@@ -1,4 +1,5 @@
 <?php
+
 return [
     'ssl_cafile' => '',
     'ssl_capath' => '',
