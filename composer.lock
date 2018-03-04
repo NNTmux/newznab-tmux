@@ -2281,12 +2281,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "c1167edbf1e542bb926601276821a0b255686e6a"
+                "reference": "3cb77da11d4eb3420a7f720ece66df91588fe433"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/c1167edbf1e542bb926601276821a0b255686e6a",
-                "reference": "c1167edbf1e542bb926601276821a0b255686e6a",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/3cb77da11d4eb3420a7f720ece66df91588fe433",
+                "reference": "3cb77da11d4eb3420a7f720ece66df91588fe433",
                 "shasum": ""
             },
             "require": {
@@ -2320,7 +2320,7 @@
             "keywords": [
                 "html"
             ],
-            "time": "2018-02-23T02:36:54+00:00"
+            "time": "2018-03-04T18:22:03+00:00"
         },
         {
             "name": "fideloper/proxy",
