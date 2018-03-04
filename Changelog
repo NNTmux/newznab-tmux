@@ -1,4 +1,5 @@
 2018-03-04 DariusIII
+	* Chg: Add ytake/laravel-smarty for future usage
 	* Chg: Update ezyang/htmlpurifier
 	* Fix: Fix ssl options check
 	* Fix: Fix new user registration once again
