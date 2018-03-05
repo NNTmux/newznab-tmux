@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\ImageException;
@@ -79,9 +80,12 @@ class ReleaseImage
                 ColorCLI::doEcho(ColorCLI::notice('Unable to fetch image: '.$e->getMessage()), true);
             }
 
+            Log::warning($e->getMessage());
+
             return false;
         } catch (ImageException $e) {
             ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getMessage()), true);
+            Log::error($e->getMessage());
 
             return false;
         }
