@@ -1,6 +1,6 @@
 <?php
 
-$username = '';
+$username = env('SCRAPE_IRC_USERNAME', '');
 
 return [
     /***********************************************************************************************************************
@@ -21,13 +21,13 @@ return [
  * This is the port to the IRC server.
  * @note If you want use SSL/TLS=>use a corresponding port (6697 or 7001 for example)=>and set SCRAPE_IRC_TLS to true.
  **********************************************************************************************************************/
-'scrape_irc_port' => '6667',
+'scrape_irc_port' => env('SCRAPE_IRC_PORT', 6667),
 
 /***********************************************************************************************************************
  * If you want to use SSL/TLS encryption on the IRC server=>set this to true.
  * @note Make sure you use a valid SSL/TLS port in SCRAPE_IRC_PORT.
  **********************************************************************************************************************/
-'scrape_irc_tls' => false,
+'scrape_irc_tls' => env('SCRAPE_IRC_TLS', false),
 
 /***********************************************************************************************************************
  * This is the nick name visible in IRC channels.
@@ -50,7 +50,7 @@ return [
  * @note Put your password between quotes: 'mypassword'
  * @note If you are using ZNC and having issues=>try 'username:password' or 'username/network:<password>'
  **********************************************************************************************************************/
-'scrape_irc_password' => false,
+'scrape_irc_password' => env('SCRAPE_IRC_PASSWORD', false),
 
 /***********************************************************************************************************************
  * This is an optional field you can use for ignoring categories.

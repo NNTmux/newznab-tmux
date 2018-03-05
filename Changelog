@@ -1,4 +1,5 @@
 2018-03-05 DariusIII
+	* Chg: Update ssl and irc settings handling
 	* Chg: Update config settings handling
 	* Chg: Remove last of the python requirements
 2018-03-04 DariusIII
