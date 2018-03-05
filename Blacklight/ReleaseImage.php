@@ -76,12 +76,12 @@ class ReleaseImage
             } elseif ($e->getCode() === 503) {
                 ColorCLI::doEcho(ColorCLI::notice('Service unavailable'), true);
             } else {
-                ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data, server responded with code: '.$e->getCode()), true);
+                ColorCLI::doEcho(ColorCLI::notice('Unable to fetch image: '.$e->getMessage()), true);
             }
 
             return false;
         } catch (ImageException $e) {
-            ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getCode()), true);
+            ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getMessage()), true);
 
             return false;
         }
