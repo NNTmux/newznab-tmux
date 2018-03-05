@@ -2281,12 +2281,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "3cb77da11d4eb3420a7f720ece66df91588fe433"
+                "reference": "89b3fe431e422fd06ce71ced8cfbd5a56c22b344"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/3cb77da11d4eb3420a7f720ece66df91588fe433",
-                "reference": "3cb77da11d4eb3420a7f720ece66df91588fe433",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/89b3fe431e422fd06ce71ced8cfbd5a56c22b344",
+                "reference": "89b3fe431e422fd06ce71ced8cfbd5a56c22b344",
                 "shasum": ""
             },
             "require": {
@@ -2320,7 +2320,7 @@
             "keywords": [
                 "html"
             ],
-            "time": "2018-03-04T18:22:03+00:00"
+            "time": "2018-03-05T00:16:11+00:00"
         },
         {
             "name": "fideloper/proxy",
@@ -4554,16 +4554,16 @@
         },
         {
             "name": "psr/simple-cache",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/simple-cache.git",
-                "reference": "753fa598e8f3b9966c886fe13f370baa45ef0e24"
+                "reference": "408d5eafb83c57f6365a3ca330ff23aa4a5fa39b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/753fa598e8f3b9966c886fe13f370baa45ef0e24",
-                "reference": "753fa598e8f3b9966c886fe13f370baa45ef0e24",
+                "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/408d5eafb83c57f6365a3ca330ff23aa4a5fa39b",
+                "reference": "408d5eafb83c57f6365a3ca330ff23aa4a5fa39b",
                 "shasum": ""
             },
             "require": {
@@ -4598,7 +4598,7 @@
                 "psr-16",
                 "simple-cache"
             ],
-            "time": "2017-01-02T13:31:39+00:00"
+            "time": "2017-10-23T01:57:42+00:00"
         },
         {
             "name": "psy/psysh",

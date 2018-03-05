@@ -1,4 +1,5 @@
 2018-03-05 DariusIII
+	* Chg: Update htmlpurifier to latest version
 	* Chg: Fix bad logic in additional postprocessing settings check
 	* Chg: Log error messages from ReleaseImage
 	* Chg: Update error message on failed image fetching in ReleaseImage class
