@@ -74,7 +74,7 @@ class UpdateNNTmux extends Command
             } else {
                 $this->output->writeln(
                     '<comment>You should clear your Smarty compiled template cache at: '.
-                    config('ytake-laravel-smarty.compile_path') .'</comment>'
+                    config('ytake-laravel-smarty.compile_path').'</comment>'
                 );
             }
         } catch (\Exception $e) {
