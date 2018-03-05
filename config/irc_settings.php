@@ -15,7 +15,7 @@ return [
  * The IRC server to connect to.
  * @note If you have issues connecting=>head to https://www.synirc.net/servers and try another server.
  **********************************************************************************************************************/
-'scrape_irc_server' => 'irc.synirc.net',
+'scrape_irc_server' => env('SCRAPE_IRC_SERVER', 'irc.synirc.net'),
 
 /***********************************************************************************************************************
  * This is the port to the IRC server.
