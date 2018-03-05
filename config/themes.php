@@ -11,7 +11,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'themes_path' => null, // eg: base_path('resources/themes')
+    'themes_path' => 'public/themes', // eg: base_path('resources/themes')
 
 	/*
 	|--------------------------------------------------------------------------
@@ -58,6 +58,31 @@ return [
 	*/
 
 	'themes' => [
+	    'Charisma' => [
+	        'extends' => null,
+            'views-path' => 'Charisma',
+            'asset-path' => 'public/themes/shared/assets'
+        ],
+        'Gamma' => [
+            'extends' => null,
+            'views-path' => 'Gamma',
+            'asset-path' => 'public/themes/shared/assets'
+        ],
+        'Gentele' => [
+            'extends' => null,
+            'views-path' => 'Gentele',
+            'asset-path' => 'public/themes/shared/assets'
+        ],
+        'Omicron' => [
+            'extends' => null,
+            'views-path' => 'Omicron',
+            'asset-path' => 'public/themes/shared/assets'
+        ],
+        'admin' => [
+            'extends' => null,
+            'views-path' => 'admin',
+            'asset-path' => 'public/themes/shared/assets'
+        ],
 
                 // Add your themes here. These settings will override theme.json settings defined for each theme
 
