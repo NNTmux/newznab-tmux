@@ -1,3 +1,5 @@
+2018-03-05 DariusIII
+	* Chg: Remove last of the python requirements
 2018-03-04 DariusIII
 	* Chg: Add ytake/laravel-smarty for future usage
 	* Chg: Update ezyang/htmlpurifier

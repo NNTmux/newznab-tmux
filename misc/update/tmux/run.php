@@ -76,7 +76,7 @@ function command_exist($cmd)
 }
 
 //check for apps
-$apps = ['time', 'tmux', 'nice', 'python', 'tee'];
+$apps = ['time', 'tmux', 'nice', 'tee'];
 foreach ($apps as &$value) {
     if (! command_exist($value)) {
         exit(ColorCLI::error('Tmux scripts require '.$value.' but its not installed. Aborting.'.PHP_EOL));
@@ -84,14 +84,6 @@ foreach ($apps as &$value) {
 }
 
 unset($value);
-
-function python_module_exist($module)
-{
-    $output = $returnCode = '';
-    exec("python -c \"import $module\"", $output, $returnCode);
-
-    return (int) $returnCode === 0;
-}
 
 function start_apps($tmux_session)
 {

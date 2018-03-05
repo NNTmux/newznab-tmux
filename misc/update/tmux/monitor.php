@@ -21,15 +21,14 @@ $runVar['paths']['misc'] = NN_MISC;
 $runVar['paths']['cli'] = NN_ROOT.'cli/';
 $runVar['paths']['scraper'] = NN_MISC.'IRCScraper'.DS.'scrape.php';
 
-$db_name = env('DB_NAME');
-$dbtype = env('DB_SYSTEM');
+$db_name = env('DB_NAME', 'nntmux');
+$dbtype = env('DB_SYSTEM', 'mysql');
 
 $tmux_niceness = Settings::settingValue('site.tmux.niceness') ?? 2;
 
 $runVar['constants'] = $pdo->queryOneRow($tRun->getConstantSettings());
 
 $PHP = 'php';
-$PYTHON = ($tRun->command_exist('python3') ? 'python3 -OOu' : 'python -OOu');
 
 //assign shell commands
 $runVar['commands']['_php'] = " nice -n{$tmux_niceness} $PHP";
