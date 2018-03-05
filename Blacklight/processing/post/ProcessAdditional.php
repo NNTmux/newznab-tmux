@@ -469,18 +469,18 @@ class ProcessAdditional
 
         $this->_ffMPEGDuration = Settings::settingValue('..ffmpeg_duration') !== '' ? (int) Settings::settingValue('..ffmpeg_duration') : 5;
 
-        $this->_addPAR2Files = (int) Settings::settingValue('..addpar2') === 0;
+        $this->_addPAR2Files = (int) Settings::settingValue('..addpar2') !== 0;
 
         if (! Settings::settingValue('apps..ffmpegpath')) {
             $this->_processAudioSample = $this->_processThumbnails = $this->_processVideo = false;
         } else {
-            $this->_processAudioSample = (int) Settings::settingValue('..saveaudiopreview') === 0;
-            $this->_processThumbnails = (int) Settings::settingValue('..processthumbnails') === 0;
+            $this->_processAudioSample = (int) Settings::settingValue('..saveaudiopreview') !== 0;
+            $this->_processThumbnails = (int) Settings::settingValue('..processthumbnails') !== 0;
             $this->_processVideo = (int) Settings::settingValue('..processvideos') !== 0;
         }
 
-        $this->_processJPGSample = (int) Settings::settingValue('..processjpg') === 0;
-        $this->_processMediaInfo = Settings::settingValue('apps..mediainfopath') === '';
+        $this->_processJPGSample = (int) Settings::settingValue('..processjpg') !== 0;
+        $this->_processMediaInfo = Settings::settingValue('apps..mediainfopath') !== '';
         $this->_processAudioInfo = $this->_processMediaInfo;
         $this->_processPasswords = (
             ((int) Settings::settingValue('..checkpasswordedrar') !== 0) &&
