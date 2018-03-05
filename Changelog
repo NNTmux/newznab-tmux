@@ -1,4 +1,5 @@
 2018-03-05 DariusIII
+	* Chg: Update smarty config
 	* Chg: Update laravel smarty configuration
 	* Chg: Update themes.php configuration file
 	* Chg: Add laravel-theme support for future usage
