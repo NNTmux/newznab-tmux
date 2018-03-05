@@ -1,4 +1,5 @@
 2018-03-05 DariusIII
+	* Chg: Update smarty themes/assets handling
 	* Chg: Move plugins and themes to resources folder
 	* Chg: Update smarty config
 	* Chg: Update laravel smarty configuration

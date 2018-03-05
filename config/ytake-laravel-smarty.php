@@ -42,22 +42,22 @@ return [
     'right_delimiter'                     => '}',
 
     // path info
-    'template_path'                       => base_path().'/resources/views/themes',
+    'template_path'                       => base_path().'/resources/views/themes/',
 
     // smarty cache directory
-    'cache_path'                          => storage_path().'/framework/smarty/cache',
+    'cache_path'                          => storage_path().'/framework/smarty/cache/',
 
     // smarty template compiler
-    'compile_path'                        => storage_path().'/framework/smarty/templates_c',
+    'compile_path'                        => storage_path().'/framework/smarty/templates_c/',
 
     // smarty plugins
     'plugins_paths'                       => [
-        base_path().'/resources/smarty/plugins',
+        base_path().'/resources/smarty/plugins/',
     ],
 
     // smarty configure
     'config_paths'                        => [
-        base_path().'/resources/smarty/config',
+        base_path().'/resources/smarty/config/',
     ],
 
     /*

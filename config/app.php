@@ -164,7 +164,6 @@ return [
         Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
         Orangehill\Iseed\IseedServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
-        Igaster\LaravelTheme\themeServiceProvider::class,
 
     ],
 

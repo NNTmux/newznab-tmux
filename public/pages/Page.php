@@ -24,9 +24,9 @@ class Page extends BasePage
         // Tell Smarty which directories to use for templates
         $this->smarty->setTemplateDir(
             [
-                'user'        => NN_THEMES.$this->theme,
-                'shared'    => NN_THEMES.'shared',
-                'default'    => NN_THEMES.'Gentele',
+                'user'        => config('ytake-laravel-smarty.template_path'). $this->theme,
+                'shared'    => config('ytake-laravel-smarty.template_path').'shared',
+                'default'    => config('ytake-laravel-smarty.template_path').'Gentele',
             ]
         );
 
