@@ -7,8 +7,8 @@ use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
-use App\Models\RoleExcludedCategory;
 use Ytake\LaravelSmarty\Smarty;
+use App\Models\RoleExcludedCategory;
 
 class BasePage
 {
