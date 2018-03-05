@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'items_per_page' => env('ITEMS_PER_PAGE',50),
-    'items_per_cover_page' => env('ITEMS_PER_COVER_PAGE',20),
+    'items_per_page' => env('ITEMS_PER_PAGE', 50),
+    'items_per_cover_page' => env('ITEMS_PER_COVER_PAGE', 20),
     'max_pager_results' => env('MAX_PAGER_RESULTS', 125000),
     'flood_check' => env('FLOOD_CHECK', false),
     'flood_wait_time' => env('FLOOD_WAIT_TIME', 5),
