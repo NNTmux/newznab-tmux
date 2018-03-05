@@ -1,4 +1,5 @@
 2018-03-05 DariusIII
+	* Fix: Fix TV shows lookups
 	* Chg: Add irc server setting to env.example file
 	* Chg: Update ssl and irc settings handling
 	* Chg: Update config settings handling
