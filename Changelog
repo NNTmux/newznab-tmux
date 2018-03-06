@@ -1,4 +1,5 @@
 2018-03-06 DariusIII
+	* Chg: Remove igaster/laravel theme for now, update symfony components
 	* Chg: Update ytake smarty config
 2018-03-05 DariusIII
 	* Chg: Update laravel smarty configuration

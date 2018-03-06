@@ -132,7 +132,6 @@
     "fxp/composer-asset-plugin": "~1.1",
     "google/recaptcha": "~1.1",
     "guzzlehttp/guzzle": "^6.3",
-    "igaster/laravel-theme": "^2.0",
     "imdbphp/imdbphp": "^5.2",
     "intervention/image": "^2.4",
     "intervention/imagecache": "^2.3",
