@@ -8,6 +8,7 @@ use Blacklight\SABnzbd;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
 use App\Models\RoleExcludedCategory;
+use Ytake\LaravelSmarty\Smarty;
 
 class BasePage
 {
@@ -17,9 +18,9 @@ class BasePage
     public $settings = null;
 
     /**
-     * @var null|\Smarty
+     * @var \Ytake\LaravelSmarty\Smarty
      */
-    public $smarty = null;
+    public $smarty;
 
     public $title = '';
     public $content = '';
@@ -123,15 +124,12 @@ class BasePage
         $this->pdo = new DB();
         $this->smarty = new Smarty();
 
-        $this->smarty->setCompileDir(NN_SMARTY_TEMPLATES);
-        $this->smarty->setConfigDir(NN_SMARTY_CONFIGS);
-        $this->smarty->setCacheDir(NN_SMARTY_CACHE);
-        $this->smarty->setPluginsDir(
-            [
-                NN_WWW.'plugins/',
-                SMARTY_DIR.'plugins/',
-            ]
-        );
+        $this->smarty->setCompileDir(config('ytake-laravel-smarty.compile_path'));
+        $this->smarty->setConfigDir(array_get(config('ytake-laravel-smarty'),'config_paths'));
+        $this->smarty->setCacheDir(config('ytake-laravel-smarty.cache_path'));
+        foreach (array_get(config('ytake-laravel-smarty'), 'plugins_paths', []) as $plugins) {
+            $this->smarty->addPluginsDir($plugins);
+        }
         $this->smarty->error_reporting = E_ALL - E_NOTICE;
 
         $this->https = request()->secure();
