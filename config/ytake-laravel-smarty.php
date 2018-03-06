@@ -45,10 +45,10 @@ return [
     'template_path'                       => base_path().'/public/themes',
 
     // smarty cache directory
-    'cache_path'                          => storage_path().'/resources/smarty/cache',
+    'cache_path'                          => storage_path().'/framework/smarty/cache',
 
     // smarty template compiler
-    'compile_path'                        => storage_path().'/resources/smarty/templates_c',
+    'compile_path'                        => storage_path().'/framework/smarty/templates_c',
 
     // smarty plugins
     'plugins_paths'                       => [
@@ -57,7 +57,7 @@ return [
 
     // smarty configure
     'config_paths'                        => [
-        base_path().'/resources/smarty/configs',
+        base_path().'/resources/smarty/config',
     ],
 
     /*
