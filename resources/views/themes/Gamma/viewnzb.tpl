@@ -371,7 +371,7 @@
 						{/if}
 					{/if}
 					{if $weHasVortex}
-						<a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#" title="Send to my NZBVortex"><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/vortex/bigsmile.png"/></a>
+						<a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#" title="Send to my NZBVortex"><img src="{$smarty.const.WWW_TOP}/shared/images/icons/vortex/bigsmile.png"/></a>
 					{/if}
 				</dd>
 

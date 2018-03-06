@@ -10,7 +10,7 @@ use Blacklight\http\AdminPage;
 
 // This script waits for ajax queries from the web.
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 // Make sure the user is an admin and logged in.
 $pdo = new DB();

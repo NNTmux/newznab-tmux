@@ -100,7 +100,7 @@
 								   class="modal_xxx thumbnail" rel="viewxxx">
 									{if $result.cover == 1}
 										<img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg" width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
-									{else} <img class="shadow img-polaroid" src="{$smarty.const.WWW_THEMES}/shared/images/no-cover.png" width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
+									{else} <img class="shadow img-polaroid" src="{$smarty.const.WWW_TOP}/shared/images/no-cover.png" width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
 									{/if}
 								</a>
 							</h4>
@@ -113,7 +113,7 @@
 												name="viewade{$result.title}"
 												title="View AdultdvdEmpire page"
 										><img
-													src="{$smarty.const.WWW_THEMES}/shared/images/icons/ade.png"
+													src="{$smarty.const.WWW_TOP}/shared/images/icons/ade.png"
 													width="100"></a>
 									{/if}
 									{if $result.classused == "adm"}
@@ -123,7 +123,7 @@
 												name="viewadm{$result.title}"
 												title="View AdultDVDMarketplace page"
 										><img
-													src="{$smarty.const.WWW_THEMES}/shared/images/icons/adm.png"
+													src="{$smarty.const.WWW_TOP}/shared/images/icons/adm.png"
 													width="100"></a>
 									{/if}
 									{if $result.classused == "aebn"}
@@ -132,7 +132,7 @@
 												href="{$site->dereferrer_link}{$result.directurl}"
 												name="viewaebn{$result.title}"
 												title="View AEBN page"
-										><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/aebn.png"
+										><img src="{$smarty.const.WWW_TOP}/shared/images/icons/aebn.png"
 											  width="100"></a>
 									{/if}
 									{if $result.classused == "hotm"}
@@ -141,7 +141,7 @@
 												href="{$site->dereferrer_link}{$result.directurl}"
 												name="viewhm{$result.title}"
 												title="View HotMovies page"
-										><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/hotmovies.png"
+										><img src="{$smarty.const.WWW_TOP}/shared/images/icons/hotmovies.png"
 											  width="100"></a>
 									{/if}
 									{if $result.classused == "pop"}
@@ -150,7 +150,7 @@
 												href="{$site->dereferrer_link}{$result.directurl}"
 												name="viewpop{$result.id}"
 												title="View Popporn page"
-										><img src="{$smarty.const.WWW_THEMES}/shared/images/icons/popporn.png"
+										><img src="{$smarty.const.WWW_TOP}/shared/images/icons/popporn.png"
 											  width="100"></a>
 									{/if}
 								</div>
@@ -257,7 +257,7 @@
 													<li>
 														<a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#"
 														   title="Send to NZBVortex">
-															<img src="{$smarty.const.WWW_THEMES}/shared/images/icons/vortex/bigsmile.png">
+															<img src="{$smarty.const.WWW_TOP}/shared/images/icons/vortex/bigsmile.png">
 														</a>
 													</li>
 												{/if}

@@ -49,14 +49,14 @@
 	<!-- Material design Icons -->
 	<link href="{$smarty.const.WWW_ASSETS}/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet"
 		  type="text/css"/>
-	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.css" type="text/css" media="screen"/>
+	<link href="{$smarty.const.WWW_TOP}/shared/css/jquery.qtip.css" type="text/css" media="screen"/>
 	<!-- Normalize.css -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
+	<link href="{$smarty.const.WWW_TOP}/shared/css/normalize.css" rel="stylesheet" type="text/css">
 	<link href="{$smarty.const.WWW_ASSETS}/icheck/skins/square/blue.css" rel="stylesheet">
 	<!-- Materializecss css -->
 	<link href="{$smarty.const.WWW_ASSETS}/materialize/dist/css/materialize.min.css" type="text/css" media="screen"/>
 	<!-- The fav icon -->
-	<link rel="shortcut icon" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico">
+	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/shared/images/favicon.ico">
 </head>
 <body>
 <!-- topbar starts -->
@@ -216,9 +216,9 @@
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/charisma.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
 <script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip2.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/functions.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/jquery.qtip2.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/sorttable.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/functions.js"></script>
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>

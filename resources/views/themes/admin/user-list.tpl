@@ -89,7 +89,7 @@
 				<td class="mid">{$user.invites}</td>
 				<td class="mid"><a title="{if $user.notes|count_characters > 0}View{else}Add{/if} Notes"
 								   href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.id}#notes"><img
-								src="{$smarty.const.WWW_THEMES}/shared/images/icons/{if $user.notes|count_characters > 0}note_edit.png{else}note_add.png{/if}"
+								src="{$smarty.const.WWW_TOP}/../shared/images/icons/{if $user.notes|count_characters > 0}note_edit.png{else}note_add.png{/if}"
 								alt=""/></a></td>
 				<td>{$user->role->name}</td>
 				<td>{if !empty($user.rolechangedate)}{$user.rolechangedate}{/if}</td>

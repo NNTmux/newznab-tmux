@@ -8,4 +8,4 @@
 		<li><a {if $menu.newwindow == "1"}class="external" target="null"{/if} title="{$content.title}" href="{$smarty.const.WWW_TOP}/content/{$content.id}{$content.url}">{$content.title}</a></li>
 	{/foreach}
 </li>
-<br><br><img src="{$smarty.const.WWW_THEMES}/shared/images/tmux_logo.png"/>
+<br><br><img src="{$smarty.const.WWW_TOP}/shared/images/tmux_logo.png"/>
