@@ -164,7 +164,6 @@ return [
         Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
         Orangehill\Iseed\IseedServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
-        Igaster\LaravelTheme\themeServiceProvider::class,
 
     ],
 
@@ -215,7 +214,6 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-        'Theme' => Igaster\LaravelTheme\Facades\Theme::class,
 
     ],
 
