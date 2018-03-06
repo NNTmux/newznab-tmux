@@ -2,7 +2,6 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
 use Blacklight\Releases;
 use Blacklight\NZBExport;
 
@@ -10,7 +9,6 @@ if (\Blacklight\utility\Utility::isCLI()) {
     exit('This script is only for exporting from the web, use the script in misc/testing'.
         PHP_EOL);
 }
-
 
 $rel = new Releases(['Settings' => $page->pdo]);
 

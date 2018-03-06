@@ -5,8 +5,6 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use App\Models\User;
 use Blacklight\Contents;
 
-
-
 $contents = new Contents();
 $id = 0;
 

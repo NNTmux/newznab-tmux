@@ -2,10 +2,7 @@
 
 use App\Models\Category;
 
-
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
-
-
 
 $page->title = 'Category List';
 

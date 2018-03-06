@@ -4,9 +4,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\Games;
 use Blacklight\Genres;
-
 use Illuminate\Support\Carbon;
-
 
 $games = new Games(['Settings' => $page->pdo]);
 $gen = new Genres(['Settings' => $page->pdo]);

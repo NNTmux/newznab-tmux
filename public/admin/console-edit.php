@@ -4,9 +4,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\Genres;
 use Blacklight\Console;
-
 use Illuminate\Support\Carbon;
-
 
 $console = new Console(['Settings' => $page->pdo]);
 $gen = new Genres();

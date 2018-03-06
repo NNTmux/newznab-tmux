@@ -7,10 +7,7 @@ if (PHP_SAPI === 'cli') {
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
 use Blacklight\NZBImport;
-
-
 
 $filesToProcess = [];
 if ($page->isPostBack()) {

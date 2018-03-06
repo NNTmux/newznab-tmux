@@ -5,8 +5,6 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use App\Models\Category;
 use Blacklight\Binaries;
 
-
-
 $bin = new Binaries(['Settings' => $page->pdo]);
 $error = '';
 $regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1, 'status' => 1, 'optype' => 1];

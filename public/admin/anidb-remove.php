@@ -4,9 +4,6 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\Release;
 
-
-
-
 $success = false;
 
 if (request()->has('id')) {

@@ -3,9 +3,7 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\Console;
-
 use Blacklight\utility\Utility;
-
 
 $con = new Console(['Settings' => $page->pdo]);
 

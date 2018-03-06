@@ -4,9 +4,6 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\MultigroupPoster;
 
-
-
-
 $posters = MultigroupPoster::all('id', 'poster')->sortBy('poster');
 
 $postersCheck = $posters->first();

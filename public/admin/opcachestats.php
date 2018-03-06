@@ -3,10 +3,7 @@
 
 /* #newznab-tmux */
 
-
-
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
-
 
 $NNURL = $page->serverurl;
 /* #newznab-tmux */

@@ -6,10 +6,7 @@ use App\Models\User;
 use App\Models\UserRole;
 use App\Models\Invitation;
 use App\Mail\AccountChange;
-
 use Illuminate\Support\Facades\Mail;
-
-
 
 $user = [
     'id' => '',
