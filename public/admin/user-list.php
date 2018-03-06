@@ -2,7 +2,6 @@
 
 use App\Models\User;
 use App\Models\UserRole;
-
 use Blacklight\http\AdminPage;
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';

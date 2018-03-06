@@ -1,4 +1,5 @@
 2018-03-06 DariusIII
+	* Chg: Update Captcha class
 	* Chg: Update admin area pages
 	* Chg: Move BasePage, AdminPage and Page to Blacklight\http
 	* Chg: Update BasePage class
