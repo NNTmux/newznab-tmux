@@ -1,4 +1,5 @@
 2018-03-06 DariusIII
+	* Chg: Define WWW_ASSETS smarty constant
 	* Chg: Move assets to public/assets folder, update .gitignore
 	* Chg: Move themes to resources/views/themes folder
 	* Chg: Update Captcha class

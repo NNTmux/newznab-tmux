@@ -32,3 +32,4 @@ if (strlen($www_top) === 1) {
 // Used everywhere an href is output, includes the full path to the NNTmux install.
 define('WWW_TOP', $www_top);
 define('WWW_THEMES', '/themes');
+define('WWW_ASSETS', base_path(). '/public/assets');
