@@ -53,6 +53,7 @@ return [
     // smarty plugins
     'plugins_paths'                       => [
         base_path().'/resources/smarty/plugins',
+        SMARTY_PLUGINS_DIR,
     ],
 
     // smarty configure
