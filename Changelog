@@ -1,4 +1,5 @@
 2018-03-06 DariusIII
+	* Chg: Add cache and templates_c folders to storage/framework/smarty folder
 	* Chg: Add plugins folder to resources/smarty, update ytake smarty config
 	* Chg: Update config/app.php
 	* Chg: Remove igaster/laravel theme for now, update symfony components
