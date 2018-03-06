@@ -18,4 +18,4 @@ test.php
 /resources/covers/*
 /resources/nzb/*
 /resources/tmp/*
-/public/themes/shared/assets
+/public/assets/
