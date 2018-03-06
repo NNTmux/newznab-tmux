@@ -54,6 +54,7 @@ return [
     'plugins_paths'                       => [
         base_path().'/resources/smarty/plugins',
         base_path().'/vendor/smarty/libs/plugins',
+        base_path().'/public/plugins',
     ],
 
     // smarty configure
