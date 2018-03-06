@@ -7,10 +7,10 @@ if (PHP_SAPI === 'cli') {
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
+use Blacklight\http\AdminPage;
 use Blacklight\NZBImport;
 
-
+$page = new AdminPage();
 
 $filesToProcess = [];
 if ($page->isPostBack()) {

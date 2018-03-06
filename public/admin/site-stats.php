@@ -6,9 +6,9 @@ use App\Models\User;
 use App\Models\Release;
 use App\Models\Category;
 use App\Models\UserRole;
+use Blacklight\http\AdminPage;
 
-
-
+$page = new AdminPage();
 
 $page->title = 'Site Stats';
 

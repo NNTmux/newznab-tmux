@@ -3,8 +3,9 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\Contents;
+use Blacklight\http\AdminPage;
 
-
+$page = new AdminPage();
 
 $contents = new Contents();
 $contentlist = $contents->getAll();

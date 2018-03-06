@@ -1,11 +1,11 @@
 <?php
 
 use App\Models\Category;
-
+use Blacklight\http\AdminPage;
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
+$page = new AdminPage();
 $id = 0;
 
 // set the current action

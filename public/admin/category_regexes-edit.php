@@ -2,11 +2,11 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
+use Blacklight\http\AdminPage;
 use Blacklight\Regexes;
 use App\Models\Category;
 
-
+$page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'category_regexes']);
 
 // Set the current action.

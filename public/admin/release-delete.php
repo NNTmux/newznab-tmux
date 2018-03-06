@@ -5,8 +5,6 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\Releases;
 
-
-
 if (request()->has('id')) {
     $releases = new Releases(['Settings' => $page->pdo]);
     $releases->deleteMultiple(request()->input('id'));

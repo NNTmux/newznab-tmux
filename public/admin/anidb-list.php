@@ -3,12 +3,10 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\AniDB;
-
-
-
+use Blacklight\http\AdminPage;
 
 $AniDB = new AniDB();
-
+$page = new AdminPage();
 $page->title = 'AniDB List';
 
 $aname = '';

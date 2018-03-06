@@ -1,12 +1,12 @@
 <?php
 
 use App\Models\Video;
-
+use Blacklight\http\AdminPage;
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 require_once NN_WWW.'pages/smartyTV.php';
 
-
+$page = new AdminPage();
 $tv = new smartyTV(['Settings' => $page->pdo]);
 
 switch (request()->input('action') ?? 'view') {

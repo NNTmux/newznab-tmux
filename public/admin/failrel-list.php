@@ -4,9 +4,9 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\Release;
 use App\Models\DnzbFailure;
+use Blacklight\http\AdminPage;
 
-
-
+$page = new AdminPage();
 
 $page->title = 'Failed Releases List';
 

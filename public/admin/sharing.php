@@ -3,8 +3,9 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\db\DB;
+use Blacklight\http\AdminPage;
 
-
+$page = new AdminPage();
 
 $page->title = 'Sharing Settings';
 

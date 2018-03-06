@@ -3,9 +3,9 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\Group;
+use Blacklight\http\AdminPage;
 
-
-
+$page = new AdminPage();
 
 // set the current action
 $action = request()->input('action') ?? 'view';

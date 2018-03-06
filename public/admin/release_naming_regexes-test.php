@@ -2,11 +2,10 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
+use Blacklight\http\AdminPage;
 use Blacklight\Regexes;
 
-
-
+$page = new AdminPage();
 $page->title = 'Release Naming Regex Test';
 
 $group = trim(request()->has('group') && ! empty(request()->input('group')) ? request()->input('group') : '');

@@ -2,14 +2,14 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
+use Blacklight\http\AdminPage;
 use Blacklight\Sites;
 use Blacklight\SABnzbd;
 use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\utility\Utility;
-use App\Models\Category as CategoryModel;
 
+$page = new AdminPage();
 
 $sites = new Sites();
 $id = 0;
@@ -134,7 +134,7 @@ $page->smarty->assign('lookup_reqids_names', ['Disabled', 'Lookup Request IDs', 
 $page->smarty->assign('coversPath', NN_COVERS);
 
 // return a list of audiobooks, mags, ebooks, technical and foreign books
-$result = CategoryModel::query()->whereIn('id', [Category::MUSIC_AUDIOBOOK, Category::BOOKS_MAGAZINES, Category::BOOKS_TECHNICAL, Category::BOOKS_FOREIGN])->get(['id', 'title']);
+$result = Category::query()->whereIn('id', [Category::MUSIC_AUDIOBOOK, Category::BOOKS_MAGAZINES, Category::BOOKS_TECHNICAL, Category::BOOKS_FOREIGN])->get(['id', 'title']);
 
 // setup the display lists for these categories, this could have been static, but then if names changed they would be wrong
 $book_reqids_ids = [];

@@ -2,10 +2,10 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
+use Blacklight\http\AdminPage;
 use Blacklight\Regexes;
 
-
+$page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'category_regexes']);
 
 $page->title = 'Category Regex List';

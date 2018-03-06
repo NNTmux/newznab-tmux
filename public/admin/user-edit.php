@@ -7,9 +7,10 @@ use App\Models\UserRole;
 use App\Models\Invitation;
 use App\Mail\AccountChange;
 
+use Blacklight\http\AdminPage;
 use Illuminate\Support\Facades\Mail;
 
-
+$page = new AdminPage();
 
 $user = [
     'id' => '',

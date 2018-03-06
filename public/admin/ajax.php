@@ -3,6 +3,7 @@
 use App\Models\Group;
 use Blacklight\db\DB;
 
+use Blacklight\http\AdminPage;
 use Blacklight\Regexes;
 use Blacklight\Sharing;
 use Blacklight\Binaries;
@@ -14,6 +15,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 // Make sure the user is an admin and logged in.
 $pdo = new DB();
+$page = new AdminPage();
 
 if (! request()->has('action')) {
     exit();
