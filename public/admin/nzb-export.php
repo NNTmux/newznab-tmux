@@ -2,16 +2,14 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
-use Blacklight\http\AdminPage;
 use Blacklight\Releases;
 use Blacklight\NZBExport;
+use Blacklight\http\AdminPage;
 
 if (\Blacklight\utility\Utility::isCLI()) {
     exit('This script is only for exporting from the web, use the script in misc/testing'.
         PHP_EOL);
 }
-
 
 $page = new AdminPage();
 $rel = new Releases(['Settings' => $page->pdo]);

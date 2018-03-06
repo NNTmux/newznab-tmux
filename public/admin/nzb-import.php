@@ -7,8 +7,8 @@ if (PHP_SAPI === 'cli') {
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use Blacklight\http\AdminPage;
 use Blacklight\NZBImport;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 

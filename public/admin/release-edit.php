@@ -4,9 +4,8 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\Release;
 use App\Models\Category;
-
-use Blacklight\http\AdminPage;
 use Blacklight\Releases;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->pdo]);

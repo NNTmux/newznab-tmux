@@ -2,12 +2,11 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
-use Blacklight\http\AdminPage;
 use Blacklight\Sites;
 use Blacklight\SABnzbd;
 use App\Models\Category;
 use App\Models\Settings;
+use Blacklight\http\AdminPage;
 use Blacklight\utility\Utility;
 
 $page = new AdminPage();
