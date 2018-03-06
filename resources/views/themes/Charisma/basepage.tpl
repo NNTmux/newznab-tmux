@@ -28,33 +28,33 @@
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<meta name="csrf-token" content="{$csrf_token}">
 	<!-- The styles -->
-	<link id="bs-css" href="{$smarty.const.WWW_THEMES}/shared/assets/bootswatch/slate/bootstrap.min.css"
+	<link id="bs-css" href="{$smarty.const.WWW_ASSETS}/bootswatch/slate/bootstrap.min.css"
 		  rel="stylesheet">
 	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/charisma-app.css" rel="stylesheet">
-	<link href='{$smarty.const.WWW_THEMES}/shared/assets/chosen/chosen.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/shared/assets/colorbox/example3/colorbox.css'
+	<link href='{$smarty.const.WWW_ASSETS}/chosen/chosen.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_ASSETS}/colorbox/example3/colorbox.css'
 		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/shared/assets/responsive-tables-js/dist/responsivetables.css'
+	<link href='{$smarty.const.WWW_ASSETS}/responsive-tables-js/dist/responsivetables.css'
 		  rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.min.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.theme.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/jquery.iphone.toggle.css' rel='stylesheet'>
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/animate.css/animate.min.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
+	<link href="{$smarty.const.WWW_ASSETS}/animate.css/animate.min.css" rel="stylesheet">
 	<!-- flexboxgrid -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/flexboxgrid/dist/flexboxgrid.min.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_ASSETS}/flexboxgrid/dist/flexboxgrid.min.css" rel="stylesheet"
 		  type="text/css"/>
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/svg-with-js/css/fa-svg-with-js.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/css/fa-svg-with-js.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- Material design Icons -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_ASSETS}/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/jquery.qtip.css" type="text/css" media="screen"/>
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_THEMES}/shared/css/normalize.css" rel="stylesheet" type="text/css">
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/icheck/skins/square/blue.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_ASSETS}/icheck/skins/square/blue.css" rel="stylesheet">
 	<!-- Materializecss css -->
-	<link href="{$smarty.const.WWW_THEMES}/shared/assets/materialize/dist/css/materialize.min.css" type="text/css" media="screen"/>
+	<link href="{$smarty.const.WWW_ASSETS}/materialize/dist/css/materialize.min.css" type="text/css" media="screen"/>
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_THEMES}/shared/images/favicon.ico">
 </head>
@@ -178,65 +178,65 @@
 <!-- Scripts-->
 <!-- jQuery -->
 <!-- jQuery 3.1.0 -->
-<script src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
+<script src="{$smarty.const.WWW_ASSETS}/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
 <!-- jQuery migrate script -->
 <script type="text/javascript"
-		src="{$smarty.const.WWW_THEMES}/shared/assets/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
+		src="{$smarty.const.WWW_ASSETS}/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
 <script type="text/javascript"
-		src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-3.x/dist/js/bootstrap.min.js"></script>
+		src="{$smarty.const.WWW_ASSETS}/bootstrap-3.x/dist/js/bootstrap.min.js"></script>
 <!-- Bootstrap hover on mouseover script -->
 <script type="text/javascript"
-		src="{$smarty.const.WWW_THEMES}/shared/assets/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
+		src="{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 <!-- library for cookie management -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.cookie.js"></script>
 <!-- data table plugin -->
 <script type="text/javascript"
-		src='{$smarty.const.WWW_THEMES}/shared/assets/datatables/media/js/jquery.dataTables.min.js'></script>
+		src='{$smarty.const.WWW_ASSETS}/datatables/media/js/jquery.dataTables.min.js'></script>
 <!-- select or dropdown enhancer -->
 <script type="text/javascript"
-		src="{$smarty.const.WWW_THEMES}/shared/assets/chosen/chosen.jquery.js"></script>
+		src="{$smarty.const.WWW_ASSETS}/chosen/chosen.jquery.js"></script>
 <!-- plugin for gallery image view -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/colorbox/jquery.colorbox-min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js"></script>
 <!-- library for making tables responsive -->
 <script type="text/javascript"
-		src="{$smarty.const.WWW_THEMES}/shared/assets/responsive-tables-js/dist/responsivetables.js"></script>
+		src="{$smarty.const.WWW_ASSETS}/responsive-tables-js/dist/responsivetables.js"></script>
 <!-- for iOS style toggle switch -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.iphone.toggle.js"></script>
 <!-- icheck -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/icheck/icheck.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js"></script>
 <!-- autogrowing textarea plugin -->
 <script type="text/javascript"
 		src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.autogrow-textarea.js"></script>
 <!-- tinymce editor -->
 <script type="text/javascript"
-		src="{$smarty.const.WWW_THEMES}/shared/assets/tinymce-builded/js/tinymce/tinymce.min.js"></script>
+		src="{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js"></script>
 <!-- history.js for cross-browser state change on ajax -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.history.js"></script>
 <!-- Charisma functions -->
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/charisma.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/autosize/dist/autosize.min.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/jquery.qtip2.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/sorttable.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/js/functions.js"></script>
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
-<script src="{$smarty.const.WWW_THEMES}/shared/assets/html5shiv/dist/html5shiv.min.js"></script>
-<script src="{$smarty.const.WWW_THEMES}/shared/assets/respond/dest/respond.min.js"></script>
+<script src="{$smarty.const.WWW_ASSETS}/html5shiv/dist/html5shiv.min.js"></script>
+<script src="{$smarty.const.WWW_ASSETS}/respond/dest/respond.min.js"></script>
 <![endif]-->
 <!-- PNotify -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.animate.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.desktop.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.callbacks.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.buttons.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.confirm.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/pnotify/dist/pnotify.nonblock.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.animate.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.desktop.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.callbacks.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.buttons.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.confirm.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.nonblock.js"></script>
 <!-- materializecss js -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/materialize/dist/js/materialize.min.js"></script
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/materialize/dist/js/materialize.min.js"></script
 <!--font-awesome-->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/svg-with-js/js/fa-v4-shims.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/shared/assets/font-awesome/svg-with-js/js/fontawesome-all.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fa-v4-shims.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/font-awesome/svg-with-js/js/fontawesome-all.js"></script>
 </body>
 </html>
