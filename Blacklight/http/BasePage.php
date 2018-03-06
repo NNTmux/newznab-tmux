@@ -1,4 +1,5 @@
 <?php
+namespace Blacklight\http;
 
 require_once NN_LIB.'utility'.DS.'SmartyUtils.php';
 

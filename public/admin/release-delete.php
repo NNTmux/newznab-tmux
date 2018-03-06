@@ -2,9 +2,10 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+
 use Blacklight\Releases;
 
-$page = new AdminPage();
+
 
 if (request()->has('id')) {
     $releases = new Releases(['Settings' => $page->pdo]);

@@ -2,6 +2,7 @@
 
 use App\Models\Group;
 use Blacklight\db\DB;
+
 use Blacklight\Regexes;
 use Blacklight\Sharing;
 use Blacklight\Binaries;
@@ -12,7 +13,6 @@ use App\Models\ReleaseComment;
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 // Make sure the user is an admin and logged in.
-$page = new AdminPage;
 $pdo = new DB();
 
 if (! request()->has('action')) {

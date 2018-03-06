@@ -2,9 +2,10 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+
 use Blacklight\Movie;
 
-$page = new AdminPage();
+
 $movie = new Movie();
 $id = 0;
 

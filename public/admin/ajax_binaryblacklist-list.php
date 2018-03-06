@@ -4,6 +4,7 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\Binaries;
 
+
 // login check
 $page = new AdminPage;
 $bin = new Binaries();

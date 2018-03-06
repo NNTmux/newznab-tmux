@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+
 use Blacklight\Releases;
 use Blacklight\NZBExport;
 
@@ -10,7 +11,7 @@ if (\Blacklight\utility\Utility::isCLI()) {
         PHP_EOL);
 }
 
-$page = new AdminPage();
+
 $rel = new Releases(['Settings' => $page->pdo]);
 
 if ($page->isPostBack()) {

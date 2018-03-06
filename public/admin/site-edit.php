@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+
 use Blacklight\Sites;
 use Blacklight\SABnzbd;
 use App\Models\Category;
@@ -9,7 +10,7 @@ use App\Models\Settings;
 use Blacklight\utility\Utility;
 use App\Models\Category as CategoryModel;
 
-$page = new AdminPage();
+
 $sites = new Sites();
 $id = 0;
 

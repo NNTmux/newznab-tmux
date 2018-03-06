@@ -2,10 +2,11 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+
 use Blacklight\Regexes;
 use App\Models\Category;
 
-$page = new AdminPage();
+
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'collection_regexes']);
 $error = '';
 $regex = ['id' => '', 'regex' => '', 'description' => '', 'group_regex' => '', 'ordinal' => '', 'status' => 1];
@@ -23,7 +24,7 @@ switch (request()->input('action') ?? 'view') {
         }
 
         if (request()->input('description') === '') {
-            request()->input('description') = '';
+            request()->merge(['description' => '']);
         }
 
         if (! is_numeric(request()->input('ordinal')) || request()->input('ordinal') < 0) {

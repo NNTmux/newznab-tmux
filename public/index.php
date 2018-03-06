@@ -1,5 +1,7 @@
 <?php
 
+use Blacklight\http\Page;
+
 require_once __DIR__.DIRECTORY_SEPARATOR.'smarty.php';
 
 $page = new Page;

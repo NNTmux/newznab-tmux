@@ -4,7 +4,8 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\AniDB;
 
-$page = new AdminPage();
+
+
 $AniDB = new AniDB(['Settings' => $page->pdo]);
 $id = 0;
 

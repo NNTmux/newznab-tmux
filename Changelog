@@ -1,4 +1,5 @@
 2018-03-06 DariusIII
+	* Chg: Move BasePage, AdminPage and Page to Blacklight\http
 	* Chg: Update BasePage class
 	* Chg: Add cache and templates_c folders to storage/framework/smarty folder
 	* Chg: Add plugins folder to resources/smarty, update ytake smarty config

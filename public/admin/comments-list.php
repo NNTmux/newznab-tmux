@@ -2,9 +2,10 @@
 
 use App\Models\ReleaseComment;
 
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-$page = new AdminPage();
+
 
 $page->title = 'Comments List';
 

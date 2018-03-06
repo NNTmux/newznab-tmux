@@ -4,7 +4,8 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\Release;
 
-$page = new AdminPage();
+
+
 
 $page->title = 'Release List';
 

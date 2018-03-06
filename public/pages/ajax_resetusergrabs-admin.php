@@ -2,6 +2,7 @@
 
 use App\Models\UserRequest;
 use App\Models\UserDownload;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 

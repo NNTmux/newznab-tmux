@@ -2,9 +2,10 @@
 
 use App\Models\Video;
 
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-$page = new AdminPage();
+
 
 $page->title = 'TV Shows List';
 

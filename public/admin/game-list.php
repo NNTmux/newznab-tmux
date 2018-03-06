@@ -4,7 +4,8 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\Games;
 
-$page = new AdminPage();
+
+
 $game = new Games(['Settings' => $page->pdo]);
 
 $page->title = 'Game List';

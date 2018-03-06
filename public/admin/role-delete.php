@@ -4,7 +4,8 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\UserRole;
 
-$page = new AdminPage();
+
+
 
 if (request()->has('id')) {
     UserRole::deleteRole(request()->input('id'));

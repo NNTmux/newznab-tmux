@@ -2,9 +2,10 @@
 
 use App\Models\Predb;
 
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-$page = new AdminPage();
+
 
 $offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 

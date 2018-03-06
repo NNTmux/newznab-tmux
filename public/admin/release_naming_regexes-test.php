@@ -2,9 +2,10 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+
 use Blacklight\Regexes;
 
-$page = new AdminPage();
+
 
 $page->title = 'Release Naming Regex Test';
 

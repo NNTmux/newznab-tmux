@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\UserRole;
+use Blacklight\http\Page;
 use Blacklight\libraries\Geary;
 
 $page = new Page();

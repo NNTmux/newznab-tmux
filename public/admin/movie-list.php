@@ -2,10 +2,11 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+
 use Blacklight\Movie;
 use Blacklight\utility\Utility;
 
-$page = new AdminPage();
+
 $movie = new Movie(['Settings' => $page->pdo]);
 
 $page->title = 'Movie List';

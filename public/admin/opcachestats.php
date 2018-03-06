@@ -2,9 +2,12 @@
 // #newznab-tmux : Denotes modifications done for newznab-tmux integration.
 
 /* #newznab-tmux */
+
+
+
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-$page = new AdminPage();
+
 $NNURL = $page->serverurl;
 /* #newznab-tmux */
 

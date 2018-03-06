@@ -4,9 +4,10 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\Books;
 use Blacklight\Genres;
+
 use Illuminate\Support\Carbon;
 
-$page = new AdminPage();
+
 $book = new Books();
 $gen = new Genres();
 $id = 0;

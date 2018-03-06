@@ -6,7 +6,8 @@ use App\Models\Category;
 use App\Models\UserRole;
 use App\Models\RoleExcludedCategory;
 
-$page = new AdminPage();
+
+
 
 // Get the user roles.
 $userRoles = UserRole::getRoles();

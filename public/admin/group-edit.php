@@ -4,7 +4,8 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\Group;
 
-$page = new AdminPage();
+
+
 $id = 0;
 
 // Set the current action.
