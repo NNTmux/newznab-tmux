@@ -2,8 +2,8 @@
 
 namespace Blacklight;
 
-use Blacklight\http\Page;
 use ReCaptcha\ReCaptcha;
+use Blacklight\http\Page;
 
 class Captcha
 {
