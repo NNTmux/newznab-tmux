@@ -7,8 +7,8 @@ use Blacklight\db\DB;
 use Blacklight\SABnzbd;
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
-use App\Models\RoleExcludedCategory;
 use Ytake\LaravelSmarty\Smarty;
+use App\Models\RoleExcludedCategory;
 
 class BasePage
 {
@@ -125,7 +125,7 @@ class BasePage
         $this->smarty = new Smarty();
 
         $this->smarty->setCompileDir(config('ytake-laravel-smarty.compile_path'));
-        $this->smarty->setConfigDir(array_get(config('ytake-laravel-smarty'),'config_paths'));
+        $this->smarty->setConfigDir(array_get(config('ytake-laravel-smarty'), 'config_paths'));
         $this->smarty->setCacheDir(config('ytake-laravel-smarty.cache_path'));
         foreach (array_get(config('ytake-laravel-smarty'), 'plugins_paths', []) as $plugins) {
             $this->smarty->addPluginsDir($plugins);
