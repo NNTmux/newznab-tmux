@@ -6,7 +6,6 @@ use App\Models\Group;
 use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
-
 $gname = '';
 if (! empty(request()->input('groupname'))) {
     $gname = request()->input('groupname');

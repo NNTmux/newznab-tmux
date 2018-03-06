@@ -7,7 +7,6 @@ use Blacklight\Contents;
 use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
-
 $contents = new Contents();
 $id = 0;
 

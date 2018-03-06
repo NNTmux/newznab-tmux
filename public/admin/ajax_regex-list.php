@@ -2,11 +2,9 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use Blacklight\http\AdminPage;
 use Blacklight\ReleaseRegex;
 
 // login check
-$page = new AdminPage;
 $regex = new ReleaseRegex();
 
 if (request()->has('action') && request()->input('action') === '2') {

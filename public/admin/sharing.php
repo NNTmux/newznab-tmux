@@ -42,12 +42,16 @@ if (! empty(request()->all())) {
         $max_download = $ourSite['max_download'];
     }
     $db->queryExec(
-		sprintf('
+        sprintf(
+            '
 			UPDATE sharing
 			SET site_name = %s, max_push = %d, max_pull = %d, max_download = %d',
-			$db->escapeString($site_name), $max_push, $max_pull, $max_download
-		)
-	);
+            $db->escapeString($site_name),
+            $max_push,
+            $max_pull,
+            $max_download
+        )
+    );
     $ourSite = $db->queryOneRow('SELECT * FROM sharing');
 }
 

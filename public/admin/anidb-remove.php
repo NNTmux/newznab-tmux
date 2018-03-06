@@ -6,6 +6,7 @@ use App\Models\Release;
 use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
+
 $success = false;
 
 if (request()->has('id')) {

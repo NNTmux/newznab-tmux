@@ -7,7 +7,6 @@ use Blacklight\Music;
 use Blacklight\utility\Utility;
 
 $page = new AdminPage();
-
 $music = new Music();
 
 $page->title = 'Music List';

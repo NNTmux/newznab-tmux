@@ -4,7 +4,6 @@ use App\Models\Forumpost;
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
 if (request()->has('id')) {
     Forumpost::deletePost(request()->input('id'));
 }

@@ -2,6 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
+
 use Blacklight\http\AdminPage;
 use Blacklight\Sites;
 use Blacklight\SABnzbd;

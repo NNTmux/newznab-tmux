@@ -6,7 +6,6 @@ use Blacklight\Contents;
 use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
-
 $contents = new Contents();
 $contentlist = $contents->getAll();
 $page->smarty->assign('contentlist', $contentlist);

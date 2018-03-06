@@ -1,6 +1,6 @@
 <?php
-namespace Blacklight\http;
 
+namespace Blacklight\http;
 
 use App\Models\Menu;
 use App\Models\User;

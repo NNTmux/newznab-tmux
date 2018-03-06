@@ -7,7 +7,6 @@ use Blacklight\Tmux;
 use App\Models\Settings;
 
 $page = new AdminPage();
-
 $tmux = new Tmux();
 $id = 0;
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Blacklight\http;
 
 use App\Models\User;

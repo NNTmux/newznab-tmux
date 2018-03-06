@@ -8,6 +8,7 @@ use App\Models\RoleExcludedCategory;
 use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
+
 // Get the user roles.
 $userRoles = UserRole::getRoles();
 $roles = [];
