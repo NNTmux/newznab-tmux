@@ -2,9 +2,7 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
 use Blacklight\Movie;
-
 
 $movie = new Movie();
 $id = 0;

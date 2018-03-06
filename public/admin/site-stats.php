@@ -7,9 +7,6 @@ use App\Models\Release;
 use App\Models\Category;
 use App\Models\UserRole;
 
-
-
-
 $page->title = 'Site Stats';
 
 $topgrabs = User::getTopGrabbers();

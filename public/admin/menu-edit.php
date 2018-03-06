@@ -5,8 +5,6 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 use App\Models\Menu;
 use App\Models\UserRole;
 
-
-
 $id = 0;
 
 // Get the user roles.

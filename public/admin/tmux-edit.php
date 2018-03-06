@@ -2,10 +2,8 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
 use Blacklight\Tmux;
 use App\Models\Settings;
-
 
 $tmux = new Tmux();
 $id = 0;

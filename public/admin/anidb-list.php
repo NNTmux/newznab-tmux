@@ -4,9 +4,6 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\AniDB;
 
-
-
-
 $AniDB = new AniDB();
 
 $page->title = 'AniDB List';

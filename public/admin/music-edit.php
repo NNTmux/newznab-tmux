@@ -2,11 +2,9 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
 use Blacklight\Music;
 use Blacklight\Genres;
 use Illuminate\Support\Carbon;
-
 
 $music = new Music();
 $gen = new Genres();
