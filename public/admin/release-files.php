@@ -2,12 +2,12 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-use Blacklight\http\AdminPage;
 use Blacklight\NZB;
 use App\Models\User;
 use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Settings;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage;
 $pdo = new DB();

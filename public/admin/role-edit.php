@@ -4,8 +4,8 @@ require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use App\Models\Category;
 use App\Models\UserRole;
-use App\Models\RoleExcludedCategory;
 use Blacklight\http\AdminPage;
+use App\Models\RoleExcludedCategory;
 
 $page = new AdminPage();
 
