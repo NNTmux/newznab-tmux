@@ -2,10 +2,9 @@
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
-
-use Blacklight\http\AdminPage;
 use Blacklight\Regexes;
 use Blacklight\Binaries;
+use Blacklight\http\AdminPage;
 
 // Login Check
 $page = new AdminPage;

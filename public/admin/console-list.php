@@ -3,7 +3,6 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\Console;
-
 use Blacklight\http\AdminPage;
 use Blacklight\utility\Utility;
 

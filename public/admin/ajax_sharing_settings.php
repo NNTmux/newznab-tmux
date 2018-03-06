@@ -3,10 +3,9 @@
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
 
 use Blacklight\db\DB;
-use Blacklight\http\AdminPage;
-
 use Blacklight\Sharing;
 use App\Models\ReleaseComment;
+use Blacklight\http\AdminPage;
 
 // Login check.
 $page = new AdminPage;
