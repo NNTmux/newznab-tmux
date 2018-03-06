@@ -1,5 +1,7 @@
 <?php
 
+use Ytake\LaravelSmarty\Smarty;
+
 function load_plugin_dependency($filename)
 {
     global $smarty;
@@ -9,13 +11,13 @@ function load_plugin_dependency($filename)
     }
 
     switch (true) {
-        case is_string($smarty->plugins_dir) && is_dir($smarty->plugins_dir):
-            $plugins_dir = $smarty->plugins_dir;
+        case is_string($smarty->getPluginsDir()) && is_dir($smarty->getPluginsDir()):
+            $plugins_dir = $smarty->getPluginsDir();
             require_once $plugins_dir.DIRECTORY_SEPARATOR.$filename;
             break;
-        case is_array($smarty->plugins_dir):
+        case is_array($smarty->getPluginsDir()):
             $plugins_dir = '';
-            foreach ($smarty->plugins_dir as $dir) {
+            foreach ($smarty->getPluginsDir() as $dir) {
                 if (is_string($dir) && is_dir($dir)) {
                     $file = $dir.DIRECTORY_SEPARATOR.$filename;
                     if (file_exists($file) && is_readable($file)) {

@@ -22,9 +22,9 @@ class AdminPage extends BasePage
         // Tell Smarty which directories to use for templates
         $this->smarty->setTemplateDir(
             [
-                'admin'    => NN_THEMES.'admin',
-                'shared'    => NN_THEMES.'shared',
-                'default'    => NN_THEMES.'Gentele',
+                'admin'    => config('ytake-laravel-smarty.template_path').'/admin',
+                'shared'    => config('ytake-laravel-smarty.template_path').'/shared',
+                'default'    => config('ytake-laravel-smarty.template_path').'/admin',
             ]
         );
 

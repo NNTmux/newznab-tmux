@@ -18,13 +18,13 @@
  * @author niel
  * @copyright 2015 NN
  */
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'bootstrap'.DIRECTORY_SEPARATOR.'autoload.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap'.DIRECTORY_SEPARATOR.'autoload.php';
 
 if (function_exists('ini_set') && function_exists('ini_get')) {
     ini_set('include_path', NN_WWW.PATH_SEPARATOR.ini_get('include_path'));
 }
 
-$www_top = str_replace('\\', '/', dirname($_SERVER['PHP_SELF']));
+$www_top = str_replace('\\', '/', base_path(). '/public');
 if (strlen($www_top) === 1) {
     $www_top = '';
 }

@@ -6,6 +6,9 @@
  * Does exactly what the normal date_format plugin does - only it uses date() rather than strftime()
  * It also supports the various php date constants for doing things like rfc822 dates.
  */
+
+use Ytake\LaravelSmarty\Smarty;
+
 /**
  * Include the {@link shared.make_timestamp.php} plugin.
  */
@@ -14,12 +17,12 @@ if (! isset($smarty)) {
     $smarty = new Smarty();
 }
 switch (true) {
-    case is_string($smarty->plugins_dir) && is_dir($smarty->plugins_dir):
-        $plugins_dir = $smarty->plugins_dir;
+    case is_string($smarty->getPluginsDir()) && is_dir($smarty->getPluginsDir()):
+        $plugins_dir = $smarty->getPluginsDir();
         break;
-    case is_array($smarty->plugins_dir):
+    case is_array($smarty->getPluginsDir()):
         $plugins_dir = '';
-        foreach ($smarty->plugins_dir as $dir) {
+        foreach ($smarty->getPluginsDir() as $dir) {
             if (is_string($dir) && is_dir($dir)) {
                 $plugins_dir = $dir;
                 break;
