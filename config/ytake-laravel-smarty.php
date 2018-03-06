@@ -52,9 +52,10 @@ return [
 
     // smarty plugins
     'plugins_paths'                       => [
-        base_path().'/resources/smarty/plugins',
-        base_path().'/vendor/smarty/libs/plugins',
-        base_path().'/public/plugins',
+        base_path().'/public/plugins/',
+        base_path().'/vendor/smarty/libs/plugins/',
+        base_path().'/resources/smarty/plugins/',
+
     ],
 
     // smarty configure
@@ -66,7 +67,7 @@ return [
      * for develop true
      * for production false
      */
-    'force_compile'                       => env('SMARTY_FORCE_COMPILE', true),
+    'force_compile'                       => env('SMARTY_FORCE_COMPILE', false),
 
     // smarty cache driver "file", "memcached", "redis"
     'cache_driver'                        => env('SMARTY_CACHE_DRIVER', 'file'),
