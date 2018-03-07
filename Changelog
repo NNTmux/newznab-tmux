@@ -1,4 +1,5 @@
 2018-03-07 DariusIII
+	* Chg: Revert to insertGetId usage
 	* Fix: Fix details page in Gamma theme
 	* Fix: Move theme specific css/js to their own folder in assets
 	* Fix: Fix admin pages

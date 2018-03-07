@@ -200,7 +200,7 @@ class Nfo
             $check = ReleaseNfo::query()->where('releases_id', $release['id'])->first(['releases_id']);
 
             if ($check === null) {
-                ReleaseNfo::create(['releases_id' => $release['id'], 'nfo' => "\x1f\x8b\x08\x00".gzcompress($nfo)]);
+                ReleaseNfo::query()->insert(['releases_id' => $release['id'], 'nfo' => "\x1f\x8b\x08\x00".gzcompress($nfo)]);
             }
 
             Release::query()->where('id', $release['id'])->update(['nfostatus' => self::NFO_FOUND]);
@@ -337,7 +337,7 @@ class Nfo
 
                     $ckReleaseId = ReleaseNfo::query()->where('releases_id', $arr['id'])->first(['releases_id']);
                     if ($ckReleaseId === null) {
-                        ReleaseNfo::create(['releases_id' => $arr['id'], 'nfo' => "\x1f\x8b\x08\x00".gzcompress($fetchedBinary)]);
+                        ReleaseNfo::query()->insert(['releases_id' => $arr['id'], 'nfo' => "\x1f\x8b\x08\x00".gzcompress($fetchedBinary)]);
                     }
                     Release::query()->where('id', $arr['id'])->update(['nfostatus' => self::NFO_FOUND]);
                     $ret++;

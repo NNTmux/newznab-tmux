@@ -484,7 +484,7 @@ class Music
             if (\in_array(strtolower($genreName), $genreassoc, false)) {
                 $genreKey = array_search(strtolower($genreName), $genreassoc, false);
             } else {
-                $genreKey = Genre::create(['title' => $genreName, 'type' => Genres::MUSIC_TYPE])->id;
+                $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
             }
         }
         $mus['musicgenre'] = $genreName;
@@ -506,6 +506,8 @@ class Music
                     'genres_id' => (int) $mus['musicgenres_id'] === -1 ? 'null' : $mus['musicgenres_id'],
                     'tracks' => $mus['tracks'],
                     'cover' => $mus['cover'],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
                 ]
             );
         } else {
