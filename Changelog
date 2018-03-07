@@ -1,4 +1,5 @@
 2018-03-07 DariusIII
+	* Fix: Fix bad logic when checking for existing title
 	* Chg: Add check for existing title in TV class add function
 	* Fix: Fix wrong categories used in checkProcessTV function of Forking class
 	* Chg: Update Videos class getAliases function
