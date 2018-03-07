@@ -303,7 +303,7 @@ abstract class Videos
      *
      * @return \PDOStatement|false
      */
-    public function getAliases($videoId = 0, $alias = '')
+    public function getAliases($videoId, $alias = '')
     {
         $return = false;
         $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));

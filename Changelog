@@ -1,4 +1,5 @@
 2018-03-07 DariusIII
+	* Chg: Update Videos class getAliases function
 	* Chg: Revert to insertGetId usage
 	* Fix: Fix details page in Gamma theme
 	* Fix: Move theme specific css/js to their own folder in assets
