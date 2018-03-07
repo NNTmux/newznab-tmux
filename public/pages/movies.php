@@ -17,9 +17,9 @@ foreach ($moviecats as $mcat) {
     $mtmp[$mcat['id']] = $mcat;
 }
 
-$category = (isset($_GET['imdb']) ? -1 : Category::MOVIE_ROOT);
-if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
-    $category = $_REQUEST['t'] + 0;
+$category = request()->has('imdb') ? -1 : Category::MOVIE_ROOT;
+if (request()->has('t') && array_key_exists(request()->input('t'), $mtmp)) {
+    $category = request()->input('t') + 0;
 }
 
 $user = User::find(User::currentUserId());
@@ -36,12 +36,12 @@ if ($category != -1) {
 $page->smarty->assign('catlist', $mtmp);
 $page->smarty->assign('category', $category);
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 $ordering = $movie->getMovieOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $movies = [];
-$results = $movie->getMovieRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, -1, $page->userdata['categoryexclusions']);
+$results = $movie->getMovieRange($catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $page->userdata['categoryexclusions']);
 foreach ($results as $result) {
     $result['genre'] = makeFieldLinks($result, 'genre', 'movies');
     $result['actors'] = makeFieldLinks($result, 'actors', 'movies');
@@ -51,28 +51,28 @@ foreach ($results as $result) {
     $movies[] = $result;
 }
 
-$title = (isset($_REQUEST['title']) && ! empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
+$title = (request()->has('title') && ! empty(request()->input('title'))) ? stripslashes(request()->input('title')) : '';
 $page->smarty->assign('title', $title);
 
-$actors = (isset($_REQUEST['actors']) && ! empty($_REQUEST['actors'])) ? stripslashes($_REQUEST['actors']) : '';
+$actors = (request()->has('actors') && ! empty(request()->input('actors'))) ? stripslashes(request()->input('actors')) : '';
 $page->smarty->assign('actors', $actors);
 
-$director = (isset($_REQUEST['director']) && ! empty($_REQUEST['director'])) ? stripslashes($_REQUEST['director']) : '';
+$director = (request()->has('director') && ! empty(request()->input('director'))) ? stripslashes(request()->input('director')) : '';
 $page->smarty->assign('director', $director);
 
 $ratings = range(1, 9);
-$rating = (isset($_REQUEST['rating']) && in_array($_REQUEST['rating'], $ratings, false)) ? $_REQUEST['rating'] : '';
+$rating = (request()->has('rating') && in_array(request()->input('rating'), $ratings, false)) ? request()->input('rating') : '';
 $page->smarty->assign('ratings', $ratings);
 $page->smarty->assign('rating', $rating);
 
 $genres = $movie->getGenres();
-$genre = (isset($_REQUEST['genre']) && in_array($_REQUEST['genre'], $genres, false)) ? $_REQUEST['genre'] : '';
+$genre = (request()->has('genre') && in_array(request()->input('genre'), $genres, false)) ? request()->input('genre') : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
 $years = range(1903, Carbon::now()->addYear()->year);
 rsort($years);
-$year = (isset($_REQUEST['year']) && in_array($_REQUEST['year'], $years, false)) ? $_REQUEST['year'] : '';
+$year = (request()->has('year') && in_array(request()->input('year'), $years, false)) ? request()->input('year') : '';
 $page->smarty->assign('years', $years);
 $page->smarty->assign('year', $year);
 
@@ -80,7 +80,7 @@ $browseby_link = '&amp;title='.$title.'&amp;actors='.$actors.'&amp;director='.$d
 
 $page->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_COVER_PAGE', 20));
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page'));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/movies?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 
@@ -108,7 +108,7 @@ $page->meta_title = 'Browse Nzbs';
 $page->meta_keywords = 'browse,nzb,description,details';
 $page->meta_description = 'Browse for Nzbs';
 
-if (isset($_GET['imdb'])) {
+if (request()->has('imdb')) {
     $page->content = $page->smarty->fetch('viewmoviefull.tpl');
 } else {
     $page->content = $page->smarty->fetch('movies.tpl');

@@ -1,17 +1,17 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Regexes;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
-
 $page->title = 'Release Naming Regex Test';
 
-$group = trim(isset($_POST['group']) && ! empty($_POST['group']) ? $_POST['group'] : '');
-$regex = trim(isset($_POST['regex']) && ! empty($_POST['regex']) ? $_POST['regex'] : '');
-$showLimit = (isset($_POST['showlimit']) && is_numeric($_POST['showlimit']) ? $_POST['showlimit'] : 250);
-$queryLimit = (isset($_POST['querylimit']) && is_numeric($_POST['querylimit']) ? $_POST['querylimit'] : 100000);
+$group = trim(request()->has('group') && ! empty(request()->input('group')) ? request()->input('group') : '');
+$regex = trim(request()->has('regex') && ! empty(request()->input('regex')) ? request()->input('regex') : '');
+$showLimit = (request()->has('showlimit') && is_numeric(request()->input('showlimit')) ? request()->input('showlimit') : 250);
+$queryLimit = (request()->has('querylimit') && is_numeric(request()->input('querylimit')) ? request()->input('querylimit') : 100000);
 $page->smarty->assign(['group' => $group, 'regex' => $regex, 'showlimit' => $showLimit, 'querylimit' => $queryLimit]);
 
 if ($group && $regex) {

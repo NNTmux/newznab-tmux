@@ -1,9 +1,11 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Music;
 use Blacklight\Genres;
+use Blacklight\http\AdminPage;
+use Illuminate\Support\Carbon;
 
 $page = new AdminPage();
 $music = new Music();
@@ -11,10 +13,10 @@ $gen = new Genres();
 $id = 0;
 
 // set the current action
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = request()->input('action') ?? 'view';
 
-if (isset($_REQUEST['id'])) {
-    $id = $_REQUEST['id'];
+if (request()->has('id')) {
+    $id = request()->input('id');
     $mus = $music->getMusicInfo($id);
 
     if (! $mus) {
@@ -22,33 +24,33 @@ if (isset($_REQUEST['id'])) {
     }
 
     switch ($action) {
-	    case 'submit':
-	    	$coverLoc = WWW_DIR.'covers/music/'.$id.'.jpg';
+        case 'submit':
+            $coverLoc = WWW_DIR.'covers/music/'.$id.'.jpg';
 
-			if ($_FILES['cover']['size'] > 0) {
-			    $tmpName = $_FILES['cover']['tmp_name'];
-			    $file_info = getimagesize($tmpName);
-			    if (! empty($file_info)) {
-			        move_uploaded_file($_FILES['cover']['tmp_name'], $coverLoc);
-			    }
-			}
+            if ($_FILES['cover']['size'] > 0) {
+                $tmpName = $_FILES['cover']['tmp_name'];
+                $file_info = getimagesize($tmpName);
+                if (! empty($file_info)) {
+                    move_uploaded_file($_FILES['cover']['tmp_name'], $coverLoc);
+                }
+            }
 
-			$_POST['cover'] = (file_exists($coverLoc)) ? 1 : 0;
-			$_POST['salesrank'] = (empty($_POST['salesrank']) || ! ctype_digit($_POST['salesrank'])) ? 'null' : $_POST['salesrank'];
-			$_POST['releasedate'] = (empty($_POST['releasedate']) || ! strtotime($_POST['releasedate'])) ? $mus['releasedate'] : date('Y-m-d H:i:s', strtotime($_POST['releasedate']));
+            request()->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
+            request()->merge(['salesrank' => (empty(request()->input('salesrank')) || ! ctype_digit(request()->input('salesrank'))) ? 'null' : request()->input('salesrank')]);
+            request()->merge(['releasedate' => (empty(request()->input('releasedate')) || ! strtotime(request()->input('releasedate'))) ? $mus['releasedate'] : Carbon::parse(request()->input('releasedate'))->timestamp]);
 
-			$music->update($id, $_POST['title'], $_POST['asin'], $_POST['url'], $_POST['salesrank'], $_POST['artist'], $_POST['publisher'], $_POST['releasedate'], $_POST['year'], $_POST['tracks'], $_POST['cover'], $_POST['genre']);
+            $music->update($id, request()->input('title'), request()->input('asin'), request()->input('url'), request()->input('salesrank'), request()->input('artist'), request()->input('publisher'), request()->input('releasedate'), request()->input('year'), request()->input('tracks'), request()->input('cover'), request()->input('genre'));
 
-			header('Location:'.WWW_TOP.'/music-list.php');
-	        die();
-	    break;
-	    case 'view':
-	    default:
-			$page->title = 'Music Edit';
-			$page->smarty->assign('music', $mus);
-			$page->smarty->assign('genres', $gen->getGenres(Genres::MUSIC_TYPE));
-		break;
-	}
+            header('Location:'.WWW_TOP.'/music-list.php');
+            die();
+        break;
+        case 'view':
+        default:
+            $page->title = 'Music Edit';
+            $page->smarty->assign('music', $mus);
+            $page->smarty->assign('genres', $gen->getGenres(Genres::MUSIC_TYPE));
+        break;
+    }
 }
 
 $page->content = $page->smarty->fetch('music-edit.tpl');

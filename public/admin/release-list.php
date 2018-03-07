@@ -1,8 +1,9 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Release;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 
@@ -10,20 +11,20 @@ $page->title = 'Release List';
 
 $releasecount = Release::getReleasesCount();
 
-$offset = $_REQUEST['offset'] ?? 0;
+$offset = request()->input('offset') ?? 0;
 
 $page->smarty->assign([
     'pagertotalitems' => $releasecount,
     'pagerquerysuffix'  => '#results',
     'pageroffset' => $offset,
-    'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+    'pageritemsperpage' => config('nntmux.items_per_page'),
     'pagerquerybase' => WWW_TOP.'/release-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$releaselist = Release::getReleasesRange($offset, env('ITEMS_PER_PAGE', 50));
+$releaselist = Release::getReleasesRange($offset, config('nntmux.items_per_page'));
 $page->smarty->assign('releaselist', $releaselist);
 
 $page->content = $page->smarty->fetch('release-list.tpl');

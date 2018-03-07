@@ -1,11 +1,12 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\User;
 use App\Models\UserRole;
 use App\Models\Invitation;
 use App\Mail\AccountChange;
+use Blacklight\http\AdminPage;
 use Illuminate\Support\Facades\Mail;
 
 $page = new AdminPage();
@@ -20,7 +21,7 @@ $user = [
 ];
 
 // set the current action
-$action = $_REQUEST['action'] ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 //get the user roles
 $userRoles = UserRole::getRoles();
@@ -51,27 +52,27 @@ switch ($action) {
         $page->smarty->assign('user', $user);
         break;
     case 'submit':
-        if (empty($_POST['id'])) {
+        if (empty(request()->input('id'))) {
             $invites = $defaultInvites;
             foreach ($userRoles as $role) {
-                if ($role['id'] === $_POST['role']) {
+                if ($role['id'] === request()->input('role')) {
                     $invites = $role['defaultinvites'];
                 }
             }
-            $ret = User::signup($_POST['username'], $_POST['password'], $_POST['email'], '', $_POST['role'], $_POST['notes'], $invites, '', true);
-            $page->smarty->assign('role', $_POST['role']);
+            $ret = User::signup(request()->input('username'), request()->input('password'), request()->input('email'), '', request()->input('role'), request()->input('notes'), $invites, '', true);
+            $page->smarty->assign('role', request()->input('role'));
         } else {
-            $ret = User::updateUser($_POST['id'], $_POST['username'], $_POST['email'], $_POST['grabs'], $_POST['role'], $_POST['notes'], $_POST['invites'], (isset($_POST['movieview']) ? 1 : 0), (isset($_POST['musicview']) ? 1 : 0), (isset($_POST['gameview']) ? 1 : 0), (isset($_POST['xxxview']) ? 1 : 0), (isset($_POST['consoleview']) ? 1 : 0), (isset($_POST['bookview']) ? 1 : 0));
-            if ($_POST['password'] !== '') {
-                User::updatePassword($_POST['id'], $_POST['password']);
+            $ret = User::updateUser(request()->input('id'), request()->input('username'), request()->input('email'), request()->input('grabs'), request()->input('role'), request()->input('notes'), request()->input('invites'), (request()->has('movieview') ? 1 : 0), (request()->has('musicview') ? 1 : 0), (request()->has('gameview') ? 1 : 0), (request()->has('xxxview') ? 1 : 0), (request()->has('consoleview') ? 1 : 0), (request()->has('bookview') ? 1 : 0));
+            if (request()->input('password') !== null) {
+                User::updatePassword(request()->input('id'), request()->input('password'));
             }
-            if ($_POST['rolechangedate'] !== '') {
-                User::updateUserRoleChangeDate($_POST['id'], $_POST['rolechangedate']);
+            if (request()->input('rolechangedate') !== null) {
+                User::updateUserRoleChangeDate(request()->input('id'), request()->input('rolechangedate'));
             }
-            if ($_POST['role'] !== '') {
-                $newRole = UserRole::query()->where('id', $_POST['role'])->value('name');
-                $email = $_POST['email'] ?? $_GET['email'];
-                Mail::to($email)->send(new AccountChange($_POST['id']));
+            if (request()->input('role') !== null) {
+                $newRole = UserRole::query()->where('id', request()->input('role'))->value('name');
+                $email = request()->input('email') ?? request()->input('email');
+                Mail::to($email)->send(new AccountChange(request()->input('id')));
             }
         }
 
@@ -99,11 +100,11 @@ switch ($action) {
                     break;
             }
             $user += [
-                'id'        => $_POST['id'],
-                'username'  => $_POST['username'],
-                'email'     => $_POST['email'],
-                'role'      => $_POST['role'],
-                'notes'     => $_POST['notes'],
+                'id'        => request()->input('id'),
+                'username'  => request()->input('username'),
+                'email'     => request()->input('email'),
+                'role'      => request()->input('role'),
+                'notes'     => request()->input('notes'),
             ];
             $page->smarty->assign('user', $user);
         }
@@ -111,9 +112,9 @@ switch ($action) {
     case 'view':
     default:
 
-    if (isset($_GET['id'])) {
+    if (request()->has('id')) {
         $page->title = 'User Edit';
-        $id = $_GET['id'];
+        $id = request()->input('id');
         $user = User::find($id);
 
         $page->smarty->assign('user', $user);

@@ -167,12 +167,10 @@ class Utility
     public static function getThemesList(): array
     {
         $ignoredThemes = ['admin', 'shared'];
-        $themes = scandir(NN_THEMES, SCANDIR_SORT_ASCENDING);
+        $themes = scandir(base_path().'/resources/views/themes', SCANDIR_SORT_ASCENDING);
         $themelist[] = 'None';
         foreach ($themes as $theme) {
-            if (strpos($theme, '.') === false &&
-                is_dir(NN_THEMES.$theme) && ! \in_array($theme, $ignoredThemes, false)
-            ) {
+            if (strpos($theme, '.') === false && ! \in_array($theme, $ignoredThemes, false) && is_dir(base_path().'/resources/views/themes/'.$theme)) {
                 $themelist[] = $theme;
             }
         }
@@ -400,7 +398,7 @@ class Utility
      */
     public static function streamSslContextOptions($forceIgnore = false): array
     {
-        if (empty(NN_SSL_CAFILE) && empty(NN_SSL_CAPATH)) {
+        if (config('nntmux_ssl.ssl_cafile') === '' && config('nntmux_ssl.ssl_capath') === '') {
             $options = [
                 'verify_peer'       => false,
                 'verify_peer_name'  => false,
@@ -408,15 +406,15 @@ class Utility
             ];
         } else {
             $options = [
-                'verify_peer'       => $forceIgnore ? false : (bool) NN_SSL_VERIFY_PEER,
-                'verify_peer_name'  => $forceIgnore ? false : (bool) NN_SSL_VERIFY_HOST,
-                'allow_self_signed' => $forceIgnore ? true : (bool) NN_SSL_ALLOW_SELF_SIGNED,
+                'verify_peer'       => $forceIgnore ? false : config('nntmux_ssl.ssl_verify_peer'),
+                'verify_peer_name'  => $forceIgnore ? false : config('nntmux_ssl.ssl_verify_host'),
+                'allow_self_signed' => $forceIgnore ? true : config('nntmux_ssl.ssl_allow_self_signed'),
             ];
-            if (! empty(NN_SSL_CAFILE)) {
-                $options['cafile'] = NN_SSL_CAFILE;
+            if (config('nntmux_ssl.ssl_cafile') !== '') {
+                $options['cafile'] = config('nntmux_ssl.ssl_cafile');
             }
-            if (! empty(NN_SSL_CAPATH)) {
-                $options['capath'] = NN_SSL_CAPATH;
+            if (config('nntmux_ssl.ssl_capath') !== '') {
+                $options['capath'] = config('nntmux_ssl.ssl_capath');
             }
         }
         // If we set the transport to tls and the server falls back to ssl,
@@ -438,16 +436,16 @@ class Utility
     public static function curlSslContextOptions($verify = true): array
     {
         $options = [];
-        if ($verify && NN_SSL_VERIFY_HOST && (! empty(NN_SSL_CAFILE) || ! empty(NN_SSL_CAPATH))) {
+        if ($verify && config('nntmux_ssl.ssl_verify_host') && (! empty(config('nntmux_ssl.ssl_cafile')) || ! empty(config('nntmux_ssl.ssl_capath')))) {
             $options += [
-                CURLOPT_SSL_VERIFYPEER => (bool) NN_SSL_VERIFY_PEER,
-                CURLOPT_SSL_VERIFYHOST => NN_SSL_VERIFY_HOST ? 2 : 0,
+                CURLOPT_SSL_VERIFYPEER => (bool) config('nntmux_ssl.ssl_verify_peer'),
+                CURLOPT_SSL_VERIFYHOST => config('nntmux_ssl.ssl_verify_host') ? 2 : 0,
             ];
-            if (! empty(NN_SSL_CAFILE)) {
-                $options += [CURLOPT_CAINFO => NN_SSL_CAFILE];
+            if (! empty(config('nntmux_ssl.ssl_cafile'))) {
+                $options += [CURLOPT_CAINFO => config('nntmux_ssl.ssl_cafile')];
             }
-            if (! empty(NN_SSL_CAPATH)) {
-                $options += [CURLOPT_CAPATH => NN_SSL_CAPATH];
+            if (! empty(config('nntmux_ssl.ssl_capath'))) {
+                $options += [CURLOPT_CAPATH => config('nntmux_ssl.ssl_capath')];
             }
         } else {
             $options += [
@@ -1088,11 +1086,12 @@ class Utility
     }
 
     /**
-     * @param string $tableName
+     * @param $tableName
      * @param $start
      * @param $num
      *
      * @return array
+     * @throws \Exception
      */
     public static function getRange($tableName, $start, $num): array
     {
@@ -1109,9 +1108,10 @@ class Utility
     }
 
     /**
-     * @param string $tableName
+     * @param $tableName
      *
      * @return int
+     * @throws \Exception
      */
     public static function getCount($tableName): int
     {
@@ -1124,8 +1124,8 @@ class Utility
     /**
      * @return bool
      */
-    public static function checkCsrfToken(): bool
+    public static function checkCSRFToken(): bool
     {
-        return ! empty($_POST['_token']) && hash_equals($_SESSION['token'], $_POST['_token']);
+        return request()->has('_token') && hash_equals($_SESSION['_token'], request()->input('_token'));
     }
 }

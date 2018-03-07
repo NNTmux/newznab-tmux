@@ -6,7 +6,6 @@ require __DIR__.DIRECTORY_SEPARATOR.'app.php';
 
 use Dotenv\Dotenv;
 use Blacklight\utility\Utility;
-use Blacklight\config\Configure;
 
 $dotenv = new Dotenv(dirname(__DIR__, 1));
 $dotenv->load();
@@ -23,7 +22,6 @@ if (! defined('HAS_WHICH')) {
     define('HAS_WHICH', Utility::hasWhich() ? true : false);
 }
 
-new Configure('indexer');
-
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->handle(\Illuminate\Http\Request::capture());
 require_once __DIR__.DIRECTORY_SEPARATOR.'yenc.php';

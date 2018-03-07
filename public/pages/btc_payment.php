@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Models\UserRole;
+use Blacklight\http\Page;
 use Blacklight\libraries\Geary;
 
 $page = new Page();
@@ -15,16 +16,16 @@ $gateway_secret = env('MYCELIUM_GATEWAY_SECRET');
 
 $userId = User::currentUserId();
 $user = User::find($userId);
-$action = $_REQUEST['action'] ?? 'view';
+$action = request()->input('action') ?? 'view';
 $donation = UserRole::query()->where('donation', '>', 0)->get(['id', 'name', 'donation', 'addyears']);
 $page->smarty->assign('donation', $donation);
 
 switch ($action) {
     case 'submit':
-        $price = $_POST['price'];
-        $role = $_POST['role'];
-        $roleName = $_POST['rolename'];
-        $addYears = $_POST['addyears'];
+        $price = request()->input('price');
+        $role = request()->input('role');
+        $roleName = request()->input('rolename');
+        $addYears = request()->input('addyears');
         $data = ['user_id' => $userId, 'username' => $user->username, 'price' => $price, 'role' => $role, 'rolename' => $roleName, 'addyears' => $addYears];
         $keychain_id = random_int(0, 19);
         $callback_data = json_encode($data);

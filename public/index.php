@@ -1,6 +1,8 @@
 <?php
 
-require_once __DIR__.DIRECTORY_SEPARATOR.'smarty.php';
+use Blacklight\http\Page;
+
+require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 $page = new Page;
 

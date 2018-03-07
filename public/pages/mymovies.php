@@ -13,11 +13,11 @@ if (! User::isLoggedIn()) {
 
 $mv = new Movie(['Settings' => $page->settings]);
 
-$action = $_REQUEST['id'] ?? '';
-$imdbid = $_REQUEST['subpage'] ?? '';
+$action = request()->input('id') ?? '';
+$imdbid = request()->input('subpage') ?? '';
 
-if (isset($_REQUEST['from'])) {
-    $page->smarty->assign('from', WWW_TOP.$_REQUEST['from']);
+if (request()->has('from')) {
+    $page->smarty->assign('from', WWW_TOP.request()->input('from'));
 } else {
     $page->smarty->assign('from', WWW_TOP.'/mymovies');
 }
@@ -25,8 +25,8 @@ if (isset($_REQUEST['from'])) {
 switch ($action) {
     case 'delete':
         $movie = UserMovie::getMovie(User::currentUserId(), $imdbid);
-        if (isset($_REQUEST['from'])) {
-            header('Location:'.WWW_TOP.$_REQUEST['from']);
+        if (request()->has('from')) {
+            header('Location:'.WWW_TOP.request()->input('from'));
         } else {
             header('Location:'.WWW_TOP.'/mymovies');
         }
@@ -50,10 +50,10 @@ switch ($action) {
         }
 
         if ($action === 'doadd') {
-            $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
+            $category = (request()->has('category') && is_array(request()->input('category')) && ! empty(request()->input('category'))) ? request()->input('category') : [];
             UserMovie::addMovie(User::currentUserId(), $imdbid, $category);
-            if (isset($_REQUEST['from'])) {
-                header('Location:'.WWW_TOP.$_REQUEST['from']);
+            if (request()->has('from')) {
+                header('Location:'.WWW_TOP.request()->input('from'));
             } else {
                 header('Location:'.WWW_TOP.'/mymovies');
             }
@@ -86,10 +86,10 @@ switch ($action) {
         }
 
         if ($action === 'doedit') {
-            $category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && ! empty($_REQUEST['category'])) ? $_REQUEST['category'] : [];
+            $category = (request()->has('category') && is_array(request()->input('category')) && ! empty(request()->input('category'))) ? request()->input('category') : [];
             UserMovie::updateMovie(User::currentUserId(), $imdbid, $category);
-            if (isset($_REQUEST['from'])) {
-                header('Location:'.WWW_TOP.$_REQUEST['from']);
+            if (request()->has('from')) {
+                header('Location:'.WWW_TOP.request()->input('from'));
             } else {
                 header('Location:'.WWW_TOP.'/mymovies');
             }
@@ -122,15 +122,15 @@ switch ($action) {
         $releases = new Releases(['Settings' => $page->settings]);
         $browsecount = $releases->getMovieCount($movies, -1, $page->userdata['categoryexclusions']);
 
-        $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+        $offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
         $ordering = $releases->getBrowseOrdering();
-        $orderby = isset($_REQUEST['ob']) && \in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+        $orderby = request()->has('ob') && \in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
-        $results = $mv->getMovieRange($movies, $offset, env('ITEMS_PER_PAGE', 50), $orderby, -1, $page->userdata['categoryexclusions']);
+        $results = $mv->getMovieRange($movies, $offset, config('nntmux.items_per_page'), $orderby, -1, $page->userdata['categoryexclusions']);
 
         $page->smarty->assign('pagertotalitems', $browsecount);
         $page->smarty->assign('pageroffset', $offset);
-        $page->smarty->assign('pageritemsperpage', env('ITEMS_PER_PAGE', 50));
+        $page->smarty->assign('pageritemsperpage', config('nntmux.items_per_page'));
         $page->smarty->assign('pagerquerybase', WWW_TOP.'/mymovies/browse?ob='.$orderby.'&amp;offset=');
         $page->smarty->assign('pagerquerysuffix', '#results');
         $page->smarty->assign('covgroup', '');

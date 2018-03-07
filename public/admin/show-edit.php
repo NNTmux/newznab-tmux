@@ -1,20 +1,21 @@
 <?php
 
 use App\Models\Video;
+use Blacklight\http\AdminPage;
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 require_once NN_WWW.'pages/smartyTV.php';
 
 $page = new AdminPage();
 $tv = new smartyTV(['Settings' => $page->pdo]);
 
-switch ($_REQUEST['action'] ?? 'view') {
+switch (request()->input('action') ?? 'view') {
     case 'submit':
         //TODO: Use a function that allows overwrites
         //$tv->update($_POST["id"], $_POST["title"],$_POST["summary"], $_POST['countries_id']);
 
-        if (isset($_POST['from']) && ! empty($_POST['from'])) {
-            header('Location:'.$_POST['from']);
+        if (request()->has('from') && ! empty(request()->input('from'))) {
+            header('Location:'.request()->input('from'));
             exit;
         }
 
@@ -23,9 +24,9 @@ switch ($_REQUEST['action'] ?? 'view') {
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if (request()->has('id')) {
             $page->title = 'TV Show Edit';
-            $show = Video::getByVideoID($_GET['id']);
+            $show = Video::getByVideoID(request()->input('id'));
         }
         break;
 }

@@ -12,11 +12,11 @@ if (! User::isLoggedIn()) {
 $releases = new Releases(['Settings' => $page->settings]);
 $aniDB = new AniDB(['Settings' => $page->settings]);
 
-if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
+if (request()->has('id') && ctype_digit(request()->input('id'))) {
 
     // force the category to TV_ANIME as it should be for anime, as $catarray was NULL and we know the category for sure for anime
-    $aniDbReleases = $releases->animeSearch($_GET['id'], 0, 1000, '', [Category::TV_ANIME], -1);
-    $aniDbInfo = $aniDB->getAnimeInfo($_GET['id']);
+    $aniDbReleases = $releases->animeSearch(request()->input('id'), 0, 1000, '', [Category::TV_ANIME], -1);
+    $aniDbInfo = $aniDB->getAnimeInfo(request()->input('id'));
 
     if (! $releases && ! $aniDbInfo) {
         $page->show404();
@@ -55,15 +55,13 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     $page->content = $page->smarty->fetch('viewanime.tpl');
     $page->render();
 } else {
-    $letter = (isset($_GET['id']) && preg_match('/^(0\-9|[A-Z])$/i', $_GET['id'])) ?
-        $_GET['id'] :
+    $letter = (request()->has('id') && preg_match('/^(0\-9|[A-Z])$/i', request()->input('id'))) ?
+        request()->input('id') :
         '0-9';
 
-    $animeTitle = (isset($_GET['title']) && ! empty($_GET['title'])) ?
-        $_GET['title'] :
-        '';
+    $animeTitle = (request()->has('title') && ! empty(request()->input('title'))) ? request()->input('title') : '';
 
-    if ($animeTitle !== '' && ! isset($_GET['id'])) {
+    if ($animeTitle !== '' && ! request()->has('id')) {
         $letter = '';
     }
 

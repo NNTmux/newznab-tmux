@@ -25,12 +25,12 @@ class Contents
     {
         $arr = [];
         $rows = $this->data_get();
-        if ($rows === false) {
+        if ($rows === null) {
             return false;
         }
 
         foreach ($rows as $row) {
-            $arr[] = $this->row2Object($row);
+            $arr[] = $row;
         }
 
         return $arr;
@@ -43,12 +43,12 @@ class Contents
     {
         $arr = [];
         $rows = $this->data_getAll();
-        if ($rows === false) {
+        if ($rows === null) {
             return false;
         }
 
         foreach ($rows as $row) {
-            $arr[] = $this->row2Object($row);
+            $arr[] = $row;
         }
 
         return $arr;
@@ -63,12 +63,12 @@ class Contents
     {
         $arr = [];
         $rows = $this->data_getAllButFront();
-        if ($rows === false) {
+        if ($rows === null) {
             return false;
         }
 
         foreach ($rows as $row) {
-            $arr[] = $this->row2Object($row);
+            $arr[] = $row;
         }
 
         return $arr;
@@ -81,12 +81,12 @@ class Contents
     {
         $arr = [];
         $rows = $this->data_getFrontPage();
-        if ($rows === false) {
+        if ($rows === null) {
             return false;
         }
 
         foreach ($rows as $row) {
-            $arr[] = $this->row2Object($row);
+            $arr[] = $row;
         }
 
         return $arr;
@@ -107,39 +107,40 @@ class Contents
         }
 
         foreach ($rows as $row) {
-            $arr[] = $this->row2Object($row);
+            $arr[] = $row;
         }
 
         return $arr;
     }
 
     /**
-     * @return bool|Content
+     * @return \Blacklight\Contents|bool|\Illuminate\Database\Eloquent\Model|null|object
      */
     public function getIndex()
     {
         $row = $this->data_getIndex();
-        if ($row === false) {
+        if ($row === null) {
             return false;
         }
 
-        return $this->row2Object($row);
+        return $row;
     }
 
     /**
      * @param $id
      * @param $role
      *
-     * @return bool|Content
+     * @return bool|\Illuminate\Database\Eloquent\Collection|static[]
      */
     public function getByID($id, $role)
     {
         $row = $this->data_getByID($id, $role);
-        if ($row === false) {
+
+        if ($row === null) {
             return false;
         }
 
-        return $this->row2Object($row);
+        return array_first($row);
     }
 
     /**
@@ -149,12 +150,12 @@ class Contents
      */
     public function validate($content)
     {
-        if ($content->url !== '/') {
-            $content->url = '/'.$content->url;
+        if ($content['url'] !== '/') {
+            $content['url'] = '/'.$content['url'];
         }
 
-        if (substr($content->url, \strlen($content->url) - 1) !== '/') {
-            $content->url .= '/';
+        if (substr($content['url'], \strlen($content['url']) - 1) !== '/') {
+            $content['url'] .= '/';
         }
 
         return $content;
@@ -163,23 +164,21 @@ class Contents
     /**
      * @param $form
      *
-     * @return false|int|string
+     * @return int
      */
     public function add($form)
     {
-        $content = $this->row2Object($form);
-        $content = $this->validate($content);
-        if ($content->ordinal === 1) {
+        if ($form['ordinal'] === 1) {
             Content::query()->where('ordinal', '>', 0)->increment('ordinal');
         }
 
-        return $this->data_add($content);
+        return $this->data_add($form);
     }
 
     /**
      * @param $id
      *
-     * @return bool|\PDOStatement
+     * @return mixed
      */
     public function delete($id)
     {
@@ -193,40 +192,9 @@ class Contents
      */
     public function update($form)
     {
-        $content = $this->row2Object($form);
-        $content = $this->validate($content);
-        $this->data_update($content);
+        $this->data_update($form);
 
-        return $content;
-    }
-
-    /**
-     * @param        $row
-     * @param string $prefix
-     *
-     * @return Content
-     */
-    public function row2Object($row, $prefix = '')
-    {
-        $obj = new Content();
-        if (isset($row[$prefix.'id'])) {
-            $obj->id = $row[$prefix.'id'];
-        }
-        $obj->title = $row[$prefix.'title'];
-        $obj->url = $row[$prefix.'url'];
-        $obj->body = $row[$prefix.'body'];
-        $obj->metadescription = $row[$prefix.'metadescription'];
-        $obj->metakeywords = $row[$prefix.'metakeywords'];
-        $obj->contenttype = $row[$prefix.'contenttype'];
-        $obj->showinmenu = $row[$prefix.'showinmenu'];
-        $obj->status = $row[$prefix.'status'];
-        $obj->ordinal = $row[$prefix.'ordinal'];
-        if (isset($row[$prefix.'created_at'])) {
-            $obj->created_at = $row[$prefix.'created_at'];
-        }
-        $obj->role = $row[$prefix.'role'];
-
-        return $obj;
+        return $form;
     }
 
     /**
@@ -236,19 +204,19 @@ class Contents
     public function data_update($content): int
     {
         return Content::query()
-            ->where('id', $content->id)
+            ->where('id', $content['id'])
             ->update(
                 [
-                    'role' => $content->role,
-                    'title' => $content->title,
-                    'url' => $content->url,
-                    'body' => $content->body,
-                    'metadescription' => $content->metadescription,
-                    'metakeywords' => $content->metakeywords,
-                    'contenttype' => $content->contenttype,
-                    'showinmenu' => $content->showinmenu,
-                    'status' => $content->status,
-                    'ordinal' => $content->ordinal,
+                    'role' => $content['role'],
+                    'title' => $content['title'],
+                    'url' => $content['url'],
+                    'body' => $content['body'],
+                    'metadescription' => $content['metadescription'],
+                    'metakeywords' => $content['metakeywords'],
+                    'contenttype' => $content['contenttype'],
+                    'showinmenu' => $content['showinmenu'],
+                    'status' => $content['status'],
+                    'ordinal' => $content['ordinal'],
                 ]
             );
     }
@@ -256,66 +224,62 @@ class Contents
     /**
      * @param $content
      *
-     * @return false|int|string
+     * @return int
      */
     public function data_add($content)
     {
         return Content::query()
             ->insertGetId(
                 [
-                    'role' => $content->role,
-                    'title' => $content->title,
-                    'url' => $content->url,
-                    'body' => $content->body,
-                    'metadescription' => $content->metadescription,
-                    'metakeywords' => $content->metakeywords,
-                    'contenttype' => $content->contenttype,
-                    'showinmenu' => $content->showinmenu,
-                    'status' => $content->status,
-                    'ordinal' => $content->ordinal,
+                    'role' => $content['role'],
+                    'title' => $content['title'],
+                    'url' => $content['url'],
+                    'body' => $content['body'],
+                    'metadescription' => $content['metadescription'],
+                    'metakeywords' => $content['metakeywords'],
+                    'contenttype' => $content['contenttype'],
+                    'showinmenu' => $content['showinmenu'],
+                    'status' => $content['status'],
+                    'ordinal' => $content['ordinal'],
                 ]
             );
     }
 
     /**
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function data_get(): array
+    public function data_get()
     {
         return Content::query()
             ->where('status', '=', 1)
             ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
-            ->get()
-            ->all();
+            ->get();
     }
 
     /**
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function data_getAll(): array
+    public function data_getAll()
     {
-        return Content::query()->select()->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')->get()->all();
+        return Content::query()->select()->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')->get();
     }
 
     /**
-     * Get all but front page.
-     *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function data_getAllButFront(): array
+    public function data_getAllButFront()
     {
         return Content::query()
             ->where('id', '!=', 1)
             ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
-            ->get()
-            ->all();
+            ->get();
     }
 
     /**
      * @param $id
      * @param $role
      *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function data_getByID($id, $role)
     {
@@ -324,13 +288,13 @@ class Contents
             $query->where('role', $role)->orWhere('role', '=', 0);
         }
 
-        return $query->get()->toArray();
+        return $query->get();
     }
 
     /**
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function data_getFrontPage(): array
+    public function data_getFrontPage()
     {
         return Content::query()
             ->where(
@@ -340,12 +304,11 @@ class Contents
                 ]
             )
             ->orderByRaw('ordinal ASC, COALESCE(ordinal, 1000000), id')
-            ->get()
-            ->all();
+            ->get();
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * @return \Illuminate\Database\Eloquent\Model|null|object|static
      */
     public function data_getIndex()
     {
@@ -361,15 +324,15 @@ class Contents
      * @param $id
      * @param $role
      *
-     * @return array
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function data_getForMenuByTypeAndRole($id, $role): array
+    public function data_getForMenuByTypeAndRole($id, $role)
     {
         $query = Content::query()->where('showinmenu', '=', 1)->where('contenttype', $id)->where('status', '=', 1);
         if ($role !== User::ROLE_ADMIN) {
             $query->where('role', $role)->orWhere('role', '=', 0);
         }
 
-        return $query->get()->toArray();
+        return $query->get();
     }
 }

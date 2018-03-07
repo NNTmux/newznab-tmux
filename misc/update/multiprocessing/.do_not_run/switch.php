@@ -153,10 +153,6 @@ switch ($options[1]) {
 		//Runs function that are per group
 		if (is_numeric($options[2])) {
 
-			if ($options[0] === 'python') {
-				collectionCheck($pdo, $options[2]);
-			}
-
 			processReleases($releases, $options[2]);
 		} else {
 

@@ -5,9 +5,10 @@ if (PHP_SAPI === 'cli') {
     exit('This is a web only script, run misc/testing/nzb-import.php instead.');
 }
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\NZBImport;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 
@@ -18,7 +19,7 @@ if ($page->isPostBack()) {
     // Get the list of NZB files from php /tmp folder if nzb files were uploaded.
     if (isset($_FILES['uploadedfiles'])) {
         foreach ($_FILES['uploadedfiles']['error'] as $key => $error) {
-            if ($error == UPLOAD_ERR_OK) {
+            if ($error === UPLOAD_ERR_OK) {
                 $tmp_name = $_FILES['uploadedfiles']['tmp_name'][$key];
                 $name = $_FILES['uploadedfiles']['name'][$key];
                 $filesToProcess[] = $tmp_name;
@@ -27,13 +28,13 @@ if ($page->isPostBack()) {
     } else {
 
         // Check if the user wants to use the file name as the release name.
-        $useNzbName = (isset($_POST['usefilename']) && $_POST['usefilename'] == 'on') ? true : false;
+        $useNzbName = (request()->has('usefilename') && request()->input('usefilename') === 'on');
 
         // Check if the user wants to delete the NZB file when done importing.
-        $deleteNZB = (isset($_POST['deleteNZB']) && $_POST['deleteNZB'] == 'on') ? true : false;
+        $deleteNZB = (request()->has('deleteNZB') && request()->input('deleteNZB') === 'on');
 
         // Get the path the user set in the browser if he put one.
-        $path = (isset($_POST['folder']) ? $_POST['folder'] : '');
+        $path = (request()->has('folder') ? request()->input('folder') : '');
         if (substr($path, strlen($path) - 1) !== DS) {
             $path .= DS;
         }

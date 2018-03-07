@@ -2,15 +2,13 @@
 
 namespace Blacklight;
 
-use app\models\Settings;
 use ReCaptcha\ReCaptcha;
+use Blacklight\http\Page;
 
 class Captcha
 {
     /**
-     * Smarty $page.
-     *
-     * @var \Page
+     * @var \Blacklight\http\Page
      */
     private $page;
 
@@ -66,17 +64,15 @@ class Captcha
     public const RECAPTCHA_SETTING_ENABLED = 'APIs.recaptcha.enabled';
 
     /**
-     * Construct and decide whether to show the captcha or not.
+     * Captcha constructor.
      *
-     * @note Passing $page by reference to setup smarty vars easily.
+     * @param $page
      *
-     * @param \Page $page
-     * @throws \InvalidArgumentException
      * @throws \Exception
      */
     public function __construct(&$page)
     {
-        if (! $page instanceof \Page) {
+        if (! $page instanceof Page) {
             throw new \InvalidArgumentException('Invalid Page variable provided');
         }
         $this->page = $page;

@@ -11,13 +11,13 @@ if (! User::isLoggedIn()) {
 }
 
 $category = -1;
-if (isset($_REQUEST['t'])) {
-    $category = $_REQUEST['t'];
+if (request()->has('t')) {
+    $category = request()->input('t');
 }
 
 $grp = -1;
-if (isset($_REQUEST['g'])) {
-    $grp = is_numeric($_REQUEST['g']) ? -1 : $_REQUEST['g'];
+if (request()->has('g')) {
+    $grp = is_numeric(request()->input('g')) ? -1 : request()->input('g');
 }
 
 $catarray = [];
@@ -25,11 +25,11 @@ $catarray[] = $category;
 
 $page->smarty->assign('category', $category);
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 $ordering = $releases->getBrowseOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
-$results = $releases->getBrowseRange($catarray, $offset, env('ITEMS_PER_PAGE', 50), $orderby, -1, $page->userdata['categoryexclusions'], $grp);
+$results = $releases->getBrowseRange($catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $page->userdata['categoryexclusions'], $grp);
 
 $browsecount = $results[0]['_totalcount'] ?? 0;
 
@@ -37,7 +37,7 @@ $page->smarty->assign(
     [
         'pagertotalitems' => $browsecount,
         'pageroffset'=> $offset,
-        'pageritemsperpage'=> env('ITEMS_PER_PAGE', 50),
+        'pageritemsperpage'=> config('nntmux.items_per_page'),
         'pagerquerybase' => WWW_TOP.'/browse?t='.$category.'&amp;g='.$grp.'&amp;ob='.$orderby.'&amp;offset=',
         'pagerquerysuffix' => '#results',
     ]

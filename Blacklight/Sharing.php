@@ -310,7 +310,7 @@ class Sharing
                     )
                 );
             }
-            if (env('echocli', true)) {
+            if (config('nntmux.echocli')) {
                 echo "(Sharing) Matched $found  comments.".PHP_EOL;
             }
         }
@@ -375,7 +375,7 @@ class Sharing
             return;
         }
 
-        if (env('echocli', true)) {
+        if (config('nntmux.echocli')) {
             echo '(Sharing) Starting to fetch new comments.'.PHP_EOL;
         }
 
@@ -479,7 +479,7 @@ class Sharing
                             )
                         );
                         $found++;
-                        if (env('echocli', true)) {
+                        if (config('nntmux.echocli')) {
                             echo '.';
                             if ($found % 40 == 0) {
                                 echo '['.$found.']'.PHP_EOL;
@@ -501,7 +501,7 @@ class Sharing
             $this->pdo->queryExec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
         }
 
-        if (env('echocli', true)) {
+        if (config('nntmux.echocli')) {
             if ($found > 0) {
                 echo PHP_EOL.'(Sharing) Fetched '.$found.' new comments.'.PHP_EOL;
             } else {

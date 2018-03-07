@@ -391,7 +391,7 @@ class ProcessAdditional
         ];
         $options += $defaults;
 
-        $this->_echoCLI = ($options['Echo'] && env('echocli', true) && (strtolower(PHP_SAPI) === 'cli'));
+        $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli') && (strtolower(PHP_SAPI) === 'cli'));
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
@@ -469,18 +469,18 @@ class ProcessAdditional
 
         $this->_ffMPEGDuration = Settings::settingValue('..ffmpeg_duration') !== '' ? (int) Settings::settingValue('..ffmpeg_duration') : 5;
 
-        $this->_addPAR2Files = (int) Settings::settingValue('..addpar2') === 0;
+        $this->_addPAR2Files = (int) Settings::settingValue('..addpar2') !== 0;
 
         if (! Settings::settingValue('apps..ffmpegpath')) {
             $this->_processAudioSample = $this->_processThumbnails = $this->_processVideo = false;
         } else {
-            $this->_processAudioSample = (int) Settings::settingValue('..saveaudiopreview') === 0;
-            $this->_processThumbnails = (int) Settings::settingValue('..processthumbnails') === 0;
+            $this->_processAudioSample = (int) Settings::settingValue('..saveaudiopreview') !== 0;
+            $this->_processThumbnails = (int) Settings::settingValue('..processthumbnails') !== 0;
             $this->_processVideo = (int) Settings::settingValue('..processvideos') !== 0;
         }
 
-        $this->_processJPGSample = (int) Settings::settingValue('..processjpg') === 0;
-        $this->_processMediaInfo = Settings::settingValue('apps..mediainfopath') === '';
+        $this->_processJPGSample = (int) Settings::settingValue('..processjpg') !== 0;
+        $this->_processMediaInfo = Settings::settingValue('apps..mediainfopath') !== '';
         $this->_processAudioInfo = $this->_processMediaInfo;
         $this->_processPasswords = (
             ((int) Settings::settingValue('..checkpasswordedrar') !== 0) &&
@@ -1731,7 +1731,7 @@ class ProcessAdditional
                     if (isset($arrXml['File']['track'])) {
                         foreach ($arrXml['File']['track'] as $track) {
                             if (isset($track['Album']) && isset($track['Performer'])) {
-                                if (env('RENAME_MUSIC_MEDIAINFO', true) && (int) $this->_release['predb_id'] === 0) {
+                                if (config('nntmux.rename_music_mediainfo') && (int) $this->_release['predb_id'] === 0) {
                                     // Make the extension upper case.
                                     $ext = strtoupper($fileExtension);
 
@@ -2168,7 +2168,7 @@ class ProcessAdditional
 
         // Only get a new name if the category is OTHER.
         $foundName = true;
-        if (env('RENAME_PAR2', true) &&
+        if (config('nntmux.rename_par2') &&
             $releaseInfo['proc_pp'] === 0 &&
             \in_array(
                 (int) $this->_release['categories_id'],

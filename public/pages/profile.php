@@ -22,8 +22,8 @@ $privateProfiles = (int) Settings::settingValue('..privateprofiles') === 1;
 $publicView = false;
 
 if ($privileged || ! $privateProfiles) {
-    $altID = (isset($_GET['id']) && (int) $_GET['id'] >= 0) ? (int) $_GET['id'] : false;
-    $altUsername = (isset($_GET['name']) && strlen($_GET['name']) > 0) ? $_GET['name'] : false;
+    $altID = (request()->has('id') && (int) request()->input('id') >= 0) ? (int) request()->input('id') : false;
+    $altUsername = (request()->has('name') && strlen(request()->input('name')) > 0) ? request()->input('name') : false;
 
     // If both 'id' and 'name' are specified, 'id' should take precedence.
     if ($altID === false && $altUsername !== false) {
@@ -51,7 +51,7 @@ if (! isset($data['style']) || $data['style'] === 'None') {
     $data['style'] = 'Using the admin selected theme.';
 }
 
-$offset = $_REQUEST['offset'] ?? 0;
+$offset = request()->input('offset') ?? 0;
 $page->smarty->assign(
     [
         'apirequests'       => UserRequest::getApiRequests($userID),
@@ -63,7 +63,7 @@ $page->smarty->assign(
         'privileged'        => $privileged,
         'pagertotalitems'   => ReleaseComment::getCommentCountForUser($userID),
         'pageroffset'       => $offset,
-        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+        'pageritemsperpage' => config('nntmux.items_per_page'),
         'pagerquerybase'    => '/profile?id='.$userID.'&offset=',
         'pagerquerysuffix'  => '#comments',
     ]
@@ -83,7 +83,7 @@ $sabSettings = [1 => 'Site', 2 => 'Cookie'];
 $page->smarty->assign(
     [
         'pager'         => $page->smarty->fetch('pager.tpl'),
-        'commentslist'  => ReleaseComment::getCommentsForUserRange($userID, $offset, env('ITEMS_PER_PAGE', 50)),
+        'commentslist'  => ReleaseComment::getCommentsForUserRange($userID, $offset, config('nntmux.items_per_page')),
         'exccats'       => implode(',', UserExcludedCategory::getCategoryExclusionNames($userID)),
         'saburl'        => $sab->url,
         'sabapikey'     => $sab->apikey,

@@ -1,11 +1,11 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Binaries;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
-
 $bin = new Binaries();
 
 $page->title = 'Binary Black/Whitelist List';

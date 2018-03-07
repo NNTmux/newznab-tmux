@@ -1,18 +1,19 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\User;
 use Blacklight\Contents;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 $contents = new Contents();
 $id = 0;
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? 'view';
+$action = request()->input('action') ?? 'view';
 
-$content = (object) [
+$content = [
     'id' => '',
     'title' => '',
     'url' => '',
@@ -30,28 +31,28 @@ $content = (object) [
 switch ($action) {
     case 'add':
         $page->title = 'Content Add';
-        $content->showinmenu = '1';
-        $content->status = '1';
-        $content->contenttype = '2';
+        $content['showinmenu'] = '1';
+        $content['status'] = '1';
+        $content['contenttype'] = '2';
         break;
 
     case 'submit':
         // Validate and add or update.
         $returnid = 0;
-        if (! isset($_POST['id']) || $_POST['id'] === '') {
-            $returnid = $contents->add($_POST);
+        if (! request()->has('id')) {
+            $returnid = $contents->add(request()->all());
         } else {
-            $content = $contents->update($_POST);
-            $returnid = $content->id;
+            $content = $contents->update(request()->all());
+            $returnid = $content['id'];
         }
         header('Location:content-add.php?id='.$returnid);
         break;
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if (request()->has('id')) {
             $page->title = 'Content Edit';
-            $id = $_GET['id'];
+            $id = request()->input('id');
 
             $content = $contents->getByID($id, User::ROLE_ADMIN);
         }

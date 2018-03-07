@@ -1,8 +1,9 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Movie;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 $movie = new Movie(['Settings' => $page->pdo]);
@@ -10,11 +11,11 @@ $id = 0;
 
 $page->title = 'Movie Add';
 
-if (isset($_REQUEST['id']) && ctype_digit($_REQUEST['id']) && strlen($_REQUEST['id']) == 7) {
-    $id = $_REQUEST['id'];
+if (request()->has('id') && ctype_digit(request()->input('id')) && strlen(request()->input('id')) === 7) {
+    $id = request()->input('id');
 
     $movCheck = $movie->getMovieInfo($id);
-    if (! $movCheck || (isset($_REQUEST['update']) && $_REQUEST['update'] == 1)) {
+    if (! $movCheck || (request()->has('update') && request()->input('update') === 1)) {
         if ($movie->updateMovieInfo($id)) {
             header('Location:'.WWW_TOP.'/movie-list.php');
             die();

@@ -1,24 +1,25 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Regexes;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'collection_regexes']);
 
 $page->title = 'Collections Regex List';
 
-$group = (isset($_REQUEST['group']) && ! empty($_REQUEST['group']) ? $_REQUEST['group'] : '');
-$offset = $_REQUEST['offset'] ?? 0;
-$regex = $regexes->getRegex($group, env('ITEMS_PER_PAGE', 50), $offset);
+$group = (request()->has('group') && ! empty(request()->input('group')) ? request()->input('group') : '');
+$offset = request()->input('offset') ?? 0;
+$regex = $regexes->getRegex($group, config('nntmux.items_per_page'), $offset);
 $page->smarty->assign(
     [
         'group'             => $group,
         'regex'             => $regex,
         'pagertotalitems'   => $regexes->getCount($group),
         'pageroffset'       => $offset,
-        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+        'pageritemsperpage' => config('nntmux.items_per_page'),
         'pagerquerybase'    => WWW_TOP.'/collection_regexes-list.php?'.$group.'offset=',
         'pagerquerysuffix'  => '',
     ]

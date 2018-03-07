@@ -10,8 +10,8 @@ use Blacklight\utility\Utility;
 
 // API functions.
 $function = 's';
-if (isset($_GET['t'])) {
-    switch ($_GET['t']) {
+if (request()->has('t')) {
+    switch (request()->input('t')) {
         case 'd':
         case 'details':
             $function = 'd';
@@ -43,7 +43,7 @@ if (isset($_GET['t'])) {
             $function = 'n';
             break;
         default:
-            Utility::showApiError(202, 'No such function ('.$_GET['t'].')');
+            Utility::showApiError(202, 'No such function ('.request()->input('t').')');
     }
 } else {
     Utility::showApiError(200, 'Missing parameter (t)');
@@ -56,10 +56,10 @@ $maxRequests = 0;
 // Page is accessible only by the apikey
 
 if ($function !== 'c' && $function !== 'r') {
-    if (! isset($_GET['apikey'])) {
+    if (! request()->has('apikey')) {
         Utility::showApiError(200, 'Missing parameter (apikey)');
     } else {
-        $apiKey = $_GET['apikey'];
+        $apiKey = request()->input('apikey');
         $res = User::getByRssToken($apiKey);
         if ($res === null) {
             Utility::showApiError(100, 'Incorrect user credentials (wrong API key)');
@@ -88,13 +88,13 @@ $releases = new Releases(['Settings' => $page->settings]);
 $api = new API(['Settings' => $page->settings, 'Request' => $_GET]);
 
 // Set Query Parameters based on Request objects
-$outputXML = ! (isset($_GET['o']) && $_GET['o'] === 'json');
-$minSize = (isset($_GET['minsize']) && $_GET['minsize'] > 0 ? $_GET['minsize'] : 0);
+$outputXML = ! (request()->has('o') && request()->input('o') === 'json');
+$minSize = (request()->has('minsize') && request()->input('minsize') > 0 ? request()->input('minsize') : 0);
 $offset = $api->offset();
 
 // Set API Parameters based on Request objects
-$params['extended'] = (isset($_GET['extended']) && (int) $_GET['extended'] === 1 ? '1' : '0');
-$params['del'] = (isset($_GET['del']) && (int) $_GET['del'] === 1 ? '1' : '0');
+$params['extended'] = (request()->has('extended') && (int) request()->input('extended') === 1 ? '1' : '0');
+$params['del'] = (request()->has('del') && (int) request()->input('del') === 1 ? '1' : '0');
 $params['uid'] = $uid;
 $params['token'] = $apiKey;
 
@@ -104,13 +104,13 @@ switch ($function) {
         $api->verifyEmptyParameter('q');
         $maxAge = $api->maxAge();
         $groupName = $api->group();
-        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, request()->getRequestUri());
         $categoryID = $api->categoryID();
         $limit = $api->limit();
 
-        if (isset($_GET['q'])) {
+        if (request()->has('q')) {
             $relData = $releases->search(
-                $_GET['q'],
+                request()->input('q'),
                 -1,
                 -1,
                 -1,
@@ -157,22 +157,22 @@ switch ($function) {
         $api->verifyEmptyParameter('season');
         $api->verifyEmptyParameter('ep');
         $maxAge = $api->maxAge();
-        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, request()->getRequestUri());
 
         $siteIdArr = [
-            'id'     => $_GET['vid'] ?? '0',
-            'tvdb'   => $_GET['tvdbid'] ?? '0',
-            'trakt'  => $_GET['traktid'] ?? '0',
-            'tvrage' => $_GET['rid'] ?? '0',
-            'tvmaze' => $_GET['tvmazeid'] ?? '0',
-            'imdb'   => $_GET['imdbid'] ?? '0',
-            'tmdb'   => $_GET['tmdbid'] ?? '0',
+            'id'     => request()->input('vid') ?? '0',
+            'tvdb'   => request()->input('tvdbid') ?? '0',
+            'trakt'  => request()->input('traktid') ?? '0',
+            'tvrage' => request()->input('rid') ?? '0',
+            'tvmaze' => request()->input('tvmazeid') ?? '0',
+            'imdb'   => request()->input('imdbid') ?? '0',
+            'tmdb'   => request()->input('tmdbid') ?? '0',
         ];
 
         // Process season only queries or Season and Episode/Airdate queries
 
-        $series = $_GET['season'] ?? '';
-        $episode = $_GET['ep'] ?? '';
+        $series = request()->input('season') ?? '';
+        $episode = request()->input('ep') ?? '';
 
         if (preg_match('#^(19|20)\d{2}$#', $series, $year) && strpos($episode, '/') !== false) {
             $airdate = str_replace('/', '-', $year[0].'-'.$episode);
@@ -185,7 +185,7 @@ switch ($function) {
             $airdate ?? '',
             $offset,
             $api->limit(),
-            $_GET['q'] ?? '',
+            request()->input('q') ?? '',
             $api->categoryID(),
             $maxAge,
             $minSize
@@ -200,15 +200,15 @@ switch ($function) {
         $api->verifyEmptyParameter('q');
         $api->verifyEmptyParameter('imdbid');
         $maxAge = $api->maxAge();
-        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
+        UserRequest::addApiRequest($uid, request()->getRequestUri());
 
-        $imdbId = ($_GET['imdbid'] ?? -1);
+        $imdbId = (request()->input('imdbid') ?? -1);
 
         $relData = $releases->moviesSearch(
             $imdbId,
             $offset,
             $api->limit(),
-            $_GET['q'] ?? '',
+            request()->input('q') ?? '',
             $api->categoryID(),
             $maxAge,
             $minSize
@@ -228,8 +228,8 @@ switch ($function) {
     // Get NZB.
     case 'g':
         $api->verifyEmptyParameter('g');
-        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $relData = Release::checkGuidForApi($_GET['id']);
+        UserRequest::addApiRequest($uid, request()->getRequestUri());
+        $relData = Release::checkGuidForApi(request()->input('id'));
         if ($relData !== false) {
             header(
                 'Location:'.
@@ -239,8 +239,8 @@ switch ($function) {
                 '&r='.
                 $apiKey.
                 '&id='.
-                $_GET['id'].
-                ((isset($_GET['del']) && $_GET['del'] === '1') ? '&del=1' : '')
+                request()->input('id').
+                ((request()->has('del') && request()->input('del') === '1') ? '&del=1' : '')
             );
         } else {
             Utility::showApiError(300, 'No such item (the guid you provided has no release in our database)');
@@ -249,12 +249,12 @@ switch ($function) {
 
     // Get individual NZB details.
     case 'd':
-        if (! isset($_GET['id'])) {
+        if (! request()->has('id')) {
             Utility::showApiError(200, 'Missing parameter (guid is required for single release details)');
         }
 
-        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $data = Release::getByGuid($_GET['id']);
+        UserRequest::addApiRequest($uid, request()->getRequestUri());
+        $data = Release::getByGuid(request()->input('id'));
 
         $relData = [];
         if ($data) {
@@ -266,17 +266,17 @@ switch ($function) {
 
     // Get an NFO file for an individual release.
     case 'n':
-        if (! isset($_GET['id'])) {
+        if (! request()->has('id')) {
             Utility::showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
         }
 
-        UserRequest::addApiRequest($uid, $_SERVER['REQUEST_URI']);
-        $rel = Release::query()->where('guid', $_GET['id'])->first(['id', 'searchname']);
+        UserRequest::addApiRequest($uid, request()->getRequestUri());
+        $rel = Release::query()->where('guid', request()->input('id'))->first(['id', 'searchname']);
         $data = ReleaseNfo::getReleaseNfo($rel['id']);
 
         if ($rel !== null) {
             if ($data !== null) {
-                if (isset($_GET['o']) && $_GET['o'] === 'file') {
+                if (request()->has('o') && request()->input('o') === 'file') {
                     header('Content-type: application/octet-stream');
                     header("Content-disposition: attachment; filename={$rel['searchname']}.nfo");
                     exit($data['nfo']);

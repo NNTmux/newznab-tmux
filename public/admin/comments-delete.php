@@ -2,13 +2,11 @@
 
 use App\Models\ReleaseComment;
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
-$page = new AdminPage();
-
-if (isset($_GET['id'])) {
-    ReleaseComment::deleteComment($_GET['id']);
+if (request()->has('id')) {
+    ReleaseComment::deleteComment(request()->input('id'));
 }
 
-$referrer = $_SERVER['HTTP_REFERER'];
+$referrer = request()->server('HTTP_REFERER');
 header('Location: '.$referrer);

@@ -2,11 +2,12 @@
 
 use App\Models\UserRequest;
 use App\Models\UserDownload;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 
-$action = $_REQUEST['action'] ?? '';
-$id = $_REQUEST['id'] ?? '';
+$action = request()->input('action') ?? '';
+$id = request()->input('id') ?? '';
 
 switch ($action) {
     case 'grabs':

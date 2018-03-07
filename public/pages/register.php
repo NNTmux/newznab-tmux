@@ -17,17 +17,17 @@ $showRegister = 1;
 if ((int) Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
     $error = 'Registrations are currently disabled.';
     $showRegister = 0;
-} elseif (Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE && (! isset($_REQUEST['invitecode']) || empty($_REQUEST['invitecode']))) {
+} elseif (Settings::settingValue('..registerstatus') === Settings::REGISTER_STATUS_INVITE && (! request()->has('invitecode') || empty(request()->input('invitecode')))) {
     $error = 'Registrations are currently invite only.';
     $showRegister = 0;
 }
 
 if ($showRegister === 1) {
-    $action = $_REQUEST['action'] ?? 'view';
+    $action = request()->input('action') ?? 'view';
 
     //Be sure to persist the invite code in the event of multiple form submissions. (errors)
-    if (isset($_REQUEST['invitecode'])) {
-        $inviteCodeQuery = '&invitecode='.$_REQUEST['invitecode'];
+    if (request()->has('invitecode')) {
+        $inviteCodeQuery = '&invitecode='.request()->input('invitecode');
     }
 
     $captcha = new Captcha($page);
@@ -35,13 +35,13 @@ if ($showRegister === 1) {
     switch ($action) {
         case 'submit':
             if ($captcha->getError() === false) {
-                if (Utility::checkCsrfToken() === true) {
-                    $userName = $_POST['username'];
-                    $password = $_POST['password'];
-                    $confirmPassword = $_POST['confirmpassword'];
-                    $email = $_POST['email'];
-                    if (! empty($_REQUEST['invitecode'])) {
-                        $inviteCode = $_REQUEST['invitecode'];
+                if (Utility::checkCSRFToken() === true) {
+                    $userName = request()->input('username');
+                    $password = request()->input('password');
+                    $confirmPassword = request()->input('confirmpassword');
+                    $email = request()->input('email');
+                    if (! empty(request()->input('invitecode'))) {
+                        $inviteCode = request()->input('invitecode');
                     }
 
                     // Check uname/email isn't in use, password valid. If all good create new user account and redirect back to home page.
@@ -55,7 +55,7 @@ if ($showRegister === 1) {
                             $userName,
                             $password,
                             $email,
-                            $_SERVER['REMOTE_ADDR'],
+                            request()->ip(),
                             $userDefault['id'],
                             '',
                             $userDefault['defaultinvites'],
@@ -63,7 +63,7 @@ if ($showRegister === 1) {
                         );
 
                         if ($ret > 0) {
-                            User::login($ret, $_SERVER['REMOTE_ADDR']);
+                            User::login($ret, request()->ip());
                             header('Location: '.WWW_TOP.'/');
                         } else {
                             switch ($ret) {
@@ -97,7 +97,7 @@ if ($showRegister === 1) {
             }
             break;
         case 'view': {
-            $inviteCode = $_GET['invitecode'] ?? null;
+            $inviteCode = request()->input('invitecode') ?? null;
             if (isset($inviteCode)) {
                 // See if it is a valid invite.
                 $invite = Invitation::getInvite($inviteCode);
@@ -122,7 +122,6 @@ $page->smarty->assign(
         'invite_code_query' => Utility::htmlfmt($inviteCodeQuery),
         'showregister'      => $showRegister,
         'error'             => $error,
-        'csrf_token'        => $page->token,
     ]
 );
 $page->meta_title = 'Register';

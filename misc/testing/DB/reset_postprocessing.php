@@ -11,7 +11,7 @@ $pdo = new DB();
 $consoletools = new ConsoleTools();
 $ran = false;
 
-if (isset($argv[1], $argv[2]) && $argv[1] === 'all' && $argv[2] === 'true') {
+if ($argv[1] !== null && $argv[1] === 'all' && $argv[2] !== null && $argv[2] === 'true') {
     $ran = true;
     $where = '';
     if (isset($argv[3]) && $argv[3] === 'truncate') {
@@ -200,7 +200,7 @@ if (isset($argv[1]) && ($argv[1] === 'tv' || $argv[1] === 'all')) {
         $where = ' WHERE videos_id != 0 AND tv_episodes_id != 0 AND categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
     } else {
         echo ColorCLI::header('Resetting all failed TV postprocessing');
-        $where = ' WHERE tv_episodes_id < 0 AND categories_id BETWEEN '.Category::GAME_ROOT.' AND '.Category::GAME_OTHER;
+        $where = ' WHERE tv_episodes_id < 0 AND categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
     }
 
     $qry = $pdo->queryDirect('SELECT id FROM releases'.$where);

@@ -24,10 +24,10 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['id'])) {
+if (request()->has('id')) {
     $releases = new Releases(['Settings' => $page->settings]);
     $re = new ReleaseExtra;
-    $data = Release::getByGuid($_GET['id']);
+    $data = Release::getByGuid(request()->input('id'));
     $user = User::find(User::currentUserId());
     $cpapi = $user['cp_api'];
     $cpurl = $user['cp_url'];
@@ -38,7 +38,7 @@ if (isset($_GET['id'])) {
     }
 
     if ($page->isPostBack()) {
-        ReleaseComment::addComment($data['id'], $data['gid'], $_POST['txtAddComment'], User::currentUserId(), $_SERVER['REMOTE_ADDR']);
+        ReleaseComment::addComment($data['id'], $data['gid'], request()->input('txtAddComment'), User::currentUserId(), request()->id());
     }
 
     $nfo = ReleaseNfo::getReleaseNfo($data['id']);
@@ -72,7 +72,7 @@ if (isset($_GET['id'])) {
                 $trailer = empty($mov['trailer']) || $mov['trailer'] === '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer'];
                 if ($trailer) {
                     $mov['trailer'] = sprintf(
-                        '<iframe width=\"%d\" height=\"%d\" src=\"%s\"></iframe>',
+                        '<iframe width="%d" height="%d" src="%s"></iframe>',
                         Settings::settingValue('site.trailers.trailers_size_x'),
                         Settings::settingValue('site.trailers.trailers_size_y'),
                         $trailer

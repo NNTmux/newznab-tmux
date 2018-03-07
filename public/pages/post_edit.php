@@ -6,11 +6,11 @@ use App\Models\Forumpost;
 if (! User::isLoggedIn()) {
     $page->show403();
 }
-$id = $_GET['id'] + 0;
+$id = request()->input('id') + 0;
 
-if (isset($id) && ! empty($_POST['addMessage'])) {
+if (isset($id) && ! empty(request()->input('addMessage'))) {
     $parent = Forumpost::getPost($id);
-    Forumpost::editPost($id, $_POST['addMessage'], User::currentUserId());
+    Forumpost::editPost($id, request()->input('addMessage'), User::currentUserId());
     if ((int) $parent['parentid'] !== 0) {
         header('Location:'.WWW_TOP.'/forumpost/'.$parent['parentid'].'#last');
     } else {

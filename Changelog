@@ -1,4 +1,88 @@
+2018-03-07 DariusIII
+	* Fix: Fix bad logic when checking for existing title
+	* Chg: Add check for existing title in TV class add function
+	* Fix: Fix wrong categories used in checkProcessTV function of Forking class
+	* Chg: Update Videos class getAliases function
+	* Chg: Revert to insertGetId usage
+	* Fix: Fix details page in Gamma theme
+	* Fix: Move theme specific css/js to their own folder in assets
+	* Fix: Fix admin pages
+	* Chg: Move css/js/images into assets folder
+2018-03-06 DariusIII
+	* Chg: Update themes, move css/js/images to public folder, fix themes display
+	* Chg: Use WWW_ASSETS constant in themes
+	* Chg: Define WWW_ASSETS smarty constant
+	* Chg: Move assets to public/assets folder, update .gitignore
+	* Chg: Move themes to resources/views/themes folder
+	* Chg: Update Captcha class
+	* Chg: Update admin area pages
+	* Chg: Move BasePage, AdminPage and Page to Blacklight\http
+	* Chg: Update BasePage class
+	* Chg: Add cache and templates_c folders to storage/framework/smarty folder
+	* Chg: Add plugins folder to resources/smarty, update ytake smarty config
+	* Chg: Update config/app.php
+	* Chg: Remove igaster/laravel theme for now, update symfony components
+	* Chg: Update ytake smarty config
+2018-03-05 DariusIII
+	* Chg: Update laravel smarty configuration
+	* Chg: Update themes.php configuration file
+	* Chg: Add laravel-theme support for future usage
+	* Chg: Update htmlpurifier to latest version
+	* Chg: Fix bad logic in additional postprocessing settings check
+	* Chg: Log error messages from ReleaseImage
+	* Chg: Update error message on failed image fetching in ReleaseImage class
+	* Fix: Fix reset_postprocessing.php script
+	* Fix: Fix TV shows lookups
+	* Chg: Add irc server setting to env.example file
+	* Chg: Update ssl and irc settings handling
+	* Chg: Update config settings handling
+	* Chg: Remove last of the python requirements
+2018-03-04 DariusIII
+	* Chg: Add ytake/laravel-smarty for future usage
+	* Chg: Update ezyang/htmlpurifier
+	* Fix: Fix ssl options check
+	* Fix: Fix new user registration once again
+2018-03-03 DariusIII
+	* Chg: Upgrade nntmux configuration method
+2018-03-02 DariusIII
+	* Chg: Remove unused stripSlashes function from basepage
+	* Fix: Fix editing of user profiles
+	* Chg: Update CSRF token handling
+	* Chg: Update font-awesome to version 5.0.8
+2018-03-01 DariusIII
+	* Chg: Update symfony components, league/flysystem to latest versions
+	* Chg: Update rest of the pages to use request directly
+	* Chg: Update BasePage class to use request directly
+	* Chg: Instantiate Request class as soon as possible
+	* Fix: Fix updating of site settings
+	* Chg: Update Basepage to use request secure site check
+	* Fix: Fix bulk adding of groups
+	* Fix: Fix typo in request function used (id()->ip())
+2018-02-28 DariusIII
+	* Fix: Fix errors in BasePage and getnzb
+	* Chg: Update various libraries including laravel/framework to latest versions
+	* Fix: Fix update of tmux settings
+	* Chg: Update Settings model and tmux-edit page to handle page updates
+	* Chg: Final batch of changes in request usage
+	* Fix: Fix ajax errors in admin area changed files
+	* Chg: Start using Request in admin pages
+	* Chg: Update BasePage for more Request usage
+	* Chg: More changes for Request usage
+	* Chg: Update getnzb.php
+2018-02-27 DariusIII
+	* Chg: Update pages for laravel request usage
+	* Fix: Fix isset usage on $request
+	* Chg: Move more pages to Request usage
+	* Chg: Start moving to use Illuminate\Http\Request in pages
+	* Fix: Fix content manipulation in admin area
+	* Chg: Update updating procedure, it will automatically stop tmux, kill tmux session, bring site down to maintenance mode, update and bring site up and start tmux, if it was running
+	* Chg: Update details page, possible fix for bad trailer link
+	* Chg: Revert to insertGetId function usage in Games class
+	* Chg: Remove references to newposterwall
+	* Fix: Fix date parsing for game releases
+	* Chg: Update font-awesome to version 5.0.7
 2018-02-26 DariusIII
+	* Chg: Manage single and double quotes in htmlspecialchars on login page
 	* Chg: Update Contents class, use Content model in remaining functions
 	* Chg: Exclude Blacklight/config folder from code coverage test
 	* Fix: Fix Music postprocessing

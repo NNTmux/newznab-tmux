@@ -96,7 +96,7 @@ class Console
         ];
         $options += $defaults;
 
-        $this->echooutput = ($options['Echo'] && env('echocli', true));
+        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
@@ -201,7 +201,7 @@ class Console
             $consoles = $cached;
         } else {
             $consoles = $this->pdo->queryCalc($calcSql);
-            $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+            $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
             Cache::put(md5($calcSql), $consoles, $expiresAt);
         }
 
@@ -264,7 +264,7 @@ class Console
             $return[0]['_totalcount'] = $consoles['total'] ?? 0;
         }
 
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put(md5($sql), $return, $expiresAt);
 
         return $return;

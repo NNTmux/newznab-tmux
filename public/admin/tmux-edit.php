@@ -1,21 +1,22 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Tmux;
 use App\Models\Settings;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 $tmux = new Tmux();
 $id = 0;
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
         $error = '';
-        $ret = $page->pdo->settingsUpdate($_POST);
+        $ret = Settings::settingsUpdate(request()->all());
         $page->title = 'Tmux Settings Edit';
         $page->smarty->assign('site', $page->settings);
         break;

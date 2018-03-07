@@ -6,13 +6,12 @@ use Blacklight\ReleaseExtra;
 if (! User::isLoggedIn()) {
     $page->show403();
 }
-
-if (! isset($_REQUEST['id'])) {
+if (! request()->has('id')) {
     $page->show404();
 }
 
 $re = new ReleaseExtra($page->settings);
-$redata = $re->getBriefByGuid($_REQUEST['id']);
+$redata = $re->getBriefByGuid(request()->input('id'));
 
 if (! $redata) {
     echo 'No media info';

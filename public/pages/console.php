@@ -18,8 +18,8 @@ foreach ($concats as $ccat) {
     $ctmp[$ccat['id']] = $ccat;
 }
 $category = Category::GAME_ROOT;
-if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $ctmp)) {
-    $category = $_REQUEST['t'] + 0;
+if (request()->has('t') && array_key_exists(request()->input('t'), $ctmp)) {
+    $category = request()->input('t') + 0;
 }
 
 $catarray = [];
@@ -28,12 +28,12 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $ctmp);
 $page->smarty->assign('category', $category);
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 $ordering = $console->getConsoleOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $consoles = [];
-$results = $console->getConsoleRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, $page->userdata['categoryexclusions']);
+$results = $console->getConsoleRange($catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $page->userdata['categoryexclusions']);
 
 $maxwords = 50;
 foreach ($results as $result) {
@@ -47,10 +47,10 @@ foreach ($results as $result) {
     $consoles[] = $result;
 }
 
-$platform = (isset($_REQUEST['platform']) && ! empty($_REQUEST['platform'])) ? stripslashes($_REQUEST['platform']) : '';
+$platform = (request()->has('platform') && ! empty(request()->input('platform'))) ? stripslashes(request()->input('platform')) : '';
 $page->smarty->assign('platform', $platform);
 
-$title = (isset($_REQUEST['title']) && ! empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
+$title = (request()->has('title') && ! empty(request()->input('title'))) ? stripslashes(request()->input('title')) : '';
 $page->smarty->assign('title', $title);
 
 $genres = $gen->getGenres(Genres::CONSOLE_TYPE, true);
@@ -58,7 +58,7 @@ $tmpgnr = [];
 foreach ($genres as $gn) {
     $tmpgnr[$gn['id']] = $gn['title'];
 }
-$genre = (isset($_REQUEST['genre']) && array_key_exists($_REQUEST['genre'], $tmpgnr)) ? $_REQUEST['genre'] : '';
+$genre = (request()->has('genre') && array_key_exists(request()->input('genre'), $tmpgnr)) ? request()->input('genre') : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
@@ -66,7 +66,7 @@ $browseby_link = '&amp;title='.$title.'&amp;platform='.$platform;
 
 $page->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_COVER_PAGE', 20));
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page'));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/console?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 

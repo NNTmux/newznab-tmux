@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Ytake\LaravelSmarty\Smarty;
 
 class UpdateNNTmux extends Command
 {
@@ -66,15 +67,15 @@ class UpdateNNTmux extends Command
                 }
             }
 
-            $smarty = new \Smarty();
-            $smarty->setCompileDir(NN_SMARTY_TEMPLATES);
+            $smarty = new Smarty();
+            $smarty->setCompileDir(config('ytake-laravel-smarty.compile_path'));
             $cleared = $smarty->clearCompiledTemplate();
             if ($cleared) {
                 $this->output->writeln('<comment>The Smarty compiled template cache has been cleaned for you</comment>');
             } else {
                 $this->output->writeln(
                     '<comment>You should clear your Smarty compiled template cache at: '.
-                    NN_RES.'smarty'.DS.'templates_c</comment>'
+                    config('ytake-laravel-smarty.compile_path').'</comment>'
                 );
             }
         } catch (\Exception $e) {

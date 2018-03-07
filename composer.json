@@ -31,8 +31,8 @@
     "optimize-autoloader": true,
     "fxp-asset" : {
       "installer-paths": {
-        "npm-asset-library": "public/themes/shared/assets",
-        "bower-asset-library": "public/themes/shared/assets"
+        "npm-asset-library": "public/assets",
+        "bower-asset-library": "public/assets"
       }
     }
   },
@@ -154,7 +154,8 @@
     "vlucas/phpdotenv": "^2.4",
     "watson/rememberable": "^2.0",
     "yab/laravel-scout-mysql-driver": "^2.0",
-    "yadakhov/insert-on-duplicate-key": "^1.2"
+    "yadakhov/insert-on-duplicate-key": "^1.2",
+    "ytake/laravel-smarty": "^2.2"
   },
 
   "require-dev": {

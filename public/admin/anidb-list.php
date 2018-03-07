@@ -1,35 +1,33 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
-
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 use Blacklight\AniDB;
-
-$page = new AdminPage();
+use Blacklight\http\AdminPage;
 
 $AniDB = new AniDB();
-
+$page = new AdminPage();
 $page->title = 'AniDB List';
 
 $aname = '';
-if (isset($_REQUEST['animetitle']) && ! empty($_REQUEST['animetitle'])) {
-    $aname = $_REQUEST['animetitle'];
+if (request()->has('animetitle') && ! empty(request()->input('animetitle'))) {
+    $aname = request()->input('animetitle');
 }
 
 $animecount = $AniDB->getAnimeCount($aname);
 
-$offset = $_REQUEST['offset'] ?? 0;
+$offset = request()->input('offset') ?? 0;
 $asearch = ($aname !== '') ? 'animetitle='.$aname.'&amp;' : '';
 
 $page->smarty->assign('pagertotalitems', $animecount);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_PAGE', 50));
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_page'));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/anidb-list.php?'.$asearch.'&offset=');
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
 $page->smarty->assign('animetitle', $aname);
 
-$anidblist = $AniDB->getAnimeRange($offset, env('ITEMS_PER_PAGE', 50), $aname);
+$anidblist = $AniDB->getAnimeRange($offset, config('nntmux.items_per_page'), $aname);
 $page->smarty->assign('anidblist', $anidblist);
 
 $page->content = $page->smarty->fetch('anidb-list.tpl');

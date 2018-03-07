@@ -152,14 +152,6 @@ class DB extends \PDO
         if ($this->opts['checkVersion']) {
             $this->fetchDbVersion();
         }
-
-        if (\defined('NN_SQL_DELETE_LOW_PRIORITY') && NN_SQL_DELETE_LOW_PRIORITY) {
-            $this->DELETE_LOW_PRIORITY = ' LOW_PRIORITY ';
-        }
-
-        if (\defined('NN_SQL_DELETE_QUICK') && NN_SQL_DELETE_QUICK) {
-            $this->DELETE_QUICK = ' QUICK ';
-        }
     }
 
     public function __destruct()
@@ -911,11 +903,7 @@ class DB extends \PDO
      */
     public function beginTransaction(): bool
     {
-        if (NN_USE_SQL_TRANSACTIONS) {
-            return $this->pdo->beginTransaction();
-        }
-
-        return true;
+        return $this->pdo->beginTransaction();
     }
 
     /**
@@ -925,11 +913,7 @@ class DB extends \PDO
      */
     public function Commit(): bool
     {
-        if (NN_USE_SQL_TRANSACTIONS) {
-            return $this->pdo->commit();
-        }
-
-        return true;
+        return $this->pdo->commit();
     }
 
     /**
@@ -939,11 +923,7 @@ class DB extends \PDO
      */
     public function Rollback(): bool
     {
-        if (NN_USE_SQL_TRANSACTIONS) {
-            return $this->pdo->rollBack();
-        }
-
-        return true;
+        return $this->pdo->rollBack();
     }
 
     public function setCovers()
@@ -1213,10 +1193,6 @@ class DB extends \PDO
     {
         if (empty($query)) {
             return false;
-        }
-
-        if (NN_QUERY_STRIP_WHITESPACE) {
-            $query = Utility::collapseWhiteSpace($query);
         }
 
         return true;

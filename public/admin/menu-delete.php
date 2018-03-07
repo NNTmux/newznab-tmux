@@ -1,14 +1,12 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Menu;
 
-$page = new AdminPage();
-
-if (isset($_GET['id'])) {
-    Menu::deleteMenu($_GET['id']);
+if (request()->has('id')) {
+    Menu::deleteMenu(request()->input('id'));
 }
 
-$referrer = $_SERVER['HTTP_REFERER'];
+$referrer = request()->server('HTTP_REFERER');
 header('Location: '.$referrer);

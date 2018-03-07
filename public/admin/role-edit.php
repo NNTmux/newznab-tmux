@@ -1,9 +1,10 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Category;
 use App\Models\UserRole;
+use Blacklight\http\AdminPage;
 use App\Models\RoleExcludedCategory;
 
 $page = new AdminPage();
@@ -15,7 +16,7 @@ foreach ($userRoles as $userRole) {
     $roles[$userRole['id']] = $userRole['name'];
 }
 
-switch ($_REQUEST['action'] ?? 'view') {
+switch (request()->input('action') ?? 'view') {
     case 'add':
         $page->title = 'User Roles Add';
         $role = [
@@ -33,46 +34,46 @@ switch ($_REQUEST['action'] ?? 'view') {
         break;
 
     case 'submit':
-        if ($_POST['id'] === '') {
+        if (request()->input('id') === '') {
             $role = UserRole::addRole(
-                $_POST['name'],
-                $_POST['apirequests'],
-                $_POST['downloadrequests'],
-                $_POST['defaultinvites'],
-                $_POST['canpreview'],
-                $_POST['hideads'],
-                $_POST['donation'],
-                $_POST['addyears']
+                request()->input('name'),
+                request()->input('apirequests'),
+                request()->input('downloadrequests'),
+                request()->input('defaultinvites'),
+                request()->input('canpreview'),
+                request()->input('hideads'),
+                request()->input('donation'),
+                request()->input('addyears')
             );
             header('Location:'.WWW_TOP.'/role-list.php');
         } else {
             $role = UserRole::updateRole(
-                $_POST['id'],
-                $_POST['name'],
-                $_POST['apirequests'],
-                $_POST['downloadrequests'],
-                $_POST['defaultinvites'],
-                $_POST['isdefault'],
-                $_POST['canpreview'],
-                $_POST['hideads'],
-                $_POST['donation'],
-                $_POST['addyears']
+                request()->input('id'),
+                request()->input('name'),
+                request()->input('apirequests'),
+                request()->input('downloadrequests'),
+                request()->input('defaultinvites'),
+                request()->input('isdefault'),
+                request()->input('canpreview'),
+                request()->input('hideads'),
+                request()->input('donation'),
+                request()->input('addyears')
             );
             header('Location:'.WWW_TOP.'/role-list.php');
 
-            $_POST['exccat'] = (! isset($_POST['exccat']) || ! is_array($_POST['exccat'])) ? [] : $_POST['exccat'];
-            RoleExcludedCategory::addRoleCategoryExclusions($_POST['id'], $_POST['exccat']);
+            request()->merge(['exccat' => (! request()->has('exccat') || ! is_array(request()->input('exccat'))) ? [] : request()->input('exccat')]);
+            RoleExcludedCategory::addRoleCategoryExclusions(request()->input('id'), request()->input('exccat'));
         }
         $page->smarty->assign('role', $role);
         break;
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if (request()->has('id')) {
             $page->title = 'User Roles Edit';
-            $role = UserRole::getRoleById($_GET['id']);
+            $role = UserRole::getRoleById(request()->input('id'));
             $page->smarty->assign('role', $role);
-            $page->smarty->assign('roleexccat', RoleExcludedCategory::getRoleCategoryExclusion($_GET['id']));
+            $page->smarty->assign('roleexccat', RoleExcludedCategory::getRoleCategoryExclusion(request()->input('id')));
         }
         break;
 }

@@ -1,30 +1,37 @@
 <?php
 
 use App\Models\Category;
+use Blacklight\http\AdminPage;
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 $page = new AdminPage();
 $id = 0;
 
 // set the current action
-$action = $_REQUEST['action'] ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
-		$ret = Category::updateCategory($_POST['id'], $_POST['status'], $_POST['description'],
-			$_POST['disablepreview'], $_POST['minsizetoformrelease'], $_POST['maxsizetoformrelease']);
-		header('Location:'.WWW_TOP.'/category-list.php');
-		break;
+        $ret = Category::updateCategory(
+            request()->input('id'),
+            request()->input('status'),
+            request()->input('description'),
+            request()->input('disablepreview'),
+            request()->input('minsizetoformrelease'),
+            request()->input('maxsizetoformrelease')
+        );
+        header('Location:'.WWW_TOP.'/category-list.php');
+        break;
     case 'view':
     default:
-			if (isset($_GET['id'])) {
-			    $page->title = 'Category Edit';
-			    $id = $_GET['id'];
-			    $cat = Category::find($id);
-			    $page->smarty->assign('category', $cat);
-			}
-		break;
+            if (request()->has('id')) {
+                $page->title = 'Category Edit';
+                $id = request()->input('id');
+                $cat = Category::find($id);
+                $page->smarty->assign('category', $cat);
+            }
+        break;
 }
 
 $page->smarty->assign('status_ids', [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE]);

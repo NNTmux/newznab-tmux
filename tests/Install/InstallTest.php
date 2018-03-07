@@ -17,9 +17,6 @@ require_once \dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'bootstrap/autoload.ph
 
 use App\Extensions\util\Versions;
 use App\Models\Settings;
-use App\Models\User;
-use Blacklight\config\Configure;
-use Blacklight\ColorCLI;
 
 /**
  * Class InstallTest
@@ -28,10 +25,6 @@ use Blacklight\ColorCLI;
  */
 class InstallTest extends \PHPUnit\Framework\TestCase
 {
-	/**
-	 * @var Configure
-	 */
-	public $config;
 
 
 	public function testFullInstall()

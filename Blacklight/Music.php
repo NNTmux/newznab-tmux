@@ -86,7 +86,7 @@ class Music
         ];
         $options += $defaults;
 
-        $this->echooutput = ($options['Echo'] && env('echocli', true));
+        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->pubkey = Settings::settingValue('APIs..amazonpubkey');
@@ -162,7 +162,7 @@ class Music
         }
 
         $order = $this->getMusicOrder($orderby);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
 
         $musicSql =
                 sprintf(
@@ -484,7 +484,7 @@ class Music
             if (\in_array(strtolower($genreName), $genreassoc, false)) {
                 $genreKey = array_search(strtolower($genreName), $genreassoc, false);
             } else {
-                $genreKey = Genre::create(['title' => $genreName, 'type' => Genres::MUSIC_TYPE])->id;
+                $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
             }
         }
         $mus['musicgenre'] = $genreName;
@@ -506,6 +506,8 @@ class Music
                     'genres_id' => (int) $mus['musicgenres_id'] === -1 ? 'null' : $mus['musicgenres_id'],
                     'tracks' => $mus['tracks'],
                     'cover' => $mus['cover'],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
                 ]
             );
         } else {

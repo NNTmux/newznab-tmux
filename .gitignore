@@ -15,17 +15,13 @@ test.php
 
 /.idea/
 /vendor/*
-/app/resources/tmp/*
-/Blacklight/config/settings.php
-/Blacklight/config/ircscraper_settings.php
-/Blacklight/config/ircscraper.php
-/Blacklight/config/opensssl.php
-
-/libraries/*
-/nbproject/
-/nbproject/private/
 /resources/covers/*
 /resources/nzb/*
 /resources/tmp/*
-/resources/smarty/templates_c/*
-/public/themes/shared/assets
+/public/assets/*
+!/public/assets/js/
+!/public/assets/css/
+!/public/assets/images/
+!/public/assets/Charisma/
+!/public/assets/Gamma/
+!/public/assets/Omicron/

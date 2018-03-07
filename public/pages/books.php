@@ -16,8 +16,8 @@ foreach ($boocats as $bcat) {
     $btmp[$bcat['id']] = $bcat;
 }
 $category = Category::BOOKS_ROOT;
-if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $btmp)) {
-    $category = $_REQUEST['t'] + 0;
+if (request()->has('t') && array_key_exists(request()->input('t'), $btmp)) {
+    $category = request()->input('t') + 0;
 }
 
 $catarray = [];
@@ -26,12 +26,12 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $btmp);
 $page->smarty->assign('category', $category);
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 $ordering = $book->getBookOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $books = [];
-$results = $book->getBookRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, $page->userdata['categoryexclusions']);
+$results = $book->getBookRange($catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $page->userdata['categoryexclusions']);
 
 $maxwords = 50;
 foreach ($results as $result) {
@@ -45,17 +45,17 @@ foreach ($results as $result) {
     $books[] = $result;
 }
 
-$author = (isset($_REQUEST['author']) && ! empty($_REQUEST['author'])) ? stripslashes($_REQUEST['author']) : '';
+$author = (request()->has('author') && ! empty(request()->input('author'))) ? stripslashes(request()->input('author')) : '';
 $page->smarty->assign('author', $author);
 
-$title = (isset($_REQUEST['title']) && ! empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
+$title = (request()->has('title') && ! empty(request()->input('title'))) ? stripslashes(request()->input('title')) : '';
 $page->smarty->assign('title', $title);
 
 $browseby_link = '&amp;title='.$title.'&amp;author='.$author;
 
 $page->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_COVER_PAGE', 20));
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page'));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/books?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 

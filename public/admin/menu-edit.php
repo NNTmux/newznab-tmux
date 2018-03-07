@@ -1,11 +1,13 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Menu;
 use App\Models\UserRole;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
+
 $id = 0;
 
 // Get the user roles.
@@ -16,14 +18,14 @@ foreach ($userroles as $r) {
 }
 
 // set the current action
-$action = $_REQUEST['action'] ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
-        if ($_POST['id'] === '') {
-            \App\Models\Menu::addMenu($_POST);
+        if (request()->input('id') === '') {
+            \App\Models\Menu::addMenu(request()->all());
         } else {
-            $ret = Menu::updateMenu($_POST);
+            $ret = Menu::updateMenu(request()->all());
         }
 
         header('Location:'.WWW_TOP.'/menu-list.php');
@@ -35,8 +37,8 @@ switch ($action) {
             'id' => '', 'title' => '', 'href' => '', 'tooltip' => '',
             'menueval' => '', 'role' => 0, 'ordinal' => 0, 'newwindow' => 0,
         ];
-        if (isset($_GET['id'])) {
-            $id = $_GET['id'];
+        if (request()->has('id')) {
+            $id = request()->input('id');
             $menuRow = Menu::find($id);
         }
         $page->title = 'Menu Edit';

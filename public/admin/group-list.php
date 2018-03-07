@@ -1,23 +1,24 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Group;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 
-$groupName = $_REQUEST['groupname'] ?? '';
-$offset = $_REQUEST['offset'] ?? 0;
+$groupName = request()->input('groupname') ?? '';
+$offset = request()->input('offset') ?? 0;
 
 $page->smarty->assign(
     [
         'groupname' => $groupName,
         'pagertotalitems' => Group::getGroupsCount($groupName, -1),
         'pageroffset' => $offset,
-        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+        'pageritemsperpage' => config('nntmux.items_per_page'),
         'pagerquerybase' => WWW_TOP.'/group-list.php?'.(($groupName !== '') ? "groupname=$groupName" : '').'&offset=',
         'pagerquerysuffix' => '',
-        'grouplist' => Group::getGroupsRange($offset, env('ITEMS_PER_PAGE', 50), $groupName),
+        'grouplist' => Group::getGroupsRange($offset, config('nntmux.items_per_page'), $groupName),
     ]
 );
 $page->smarty->assign('pager', $page->smarty->fetch('pager.tpl'));

@@ -8,23 +8,24 @@ use Illuminate\Support\Facades\Mail;
 $captcha = new Captcha($page);
 $msg = '';
 
-if (isset($_POST['useremail'])) {
+if (request()->has('useremail')) {
     //
     // send the contact info and report back to user.
     //
 
     if ($captcha->getError() === false) {
-        $email = $_POST['useremail'];
+        $email = request()->input('useremail');
         $mailTo = Settings::settingValue('site.main.email');
         $mailBody = "Values submitted from contact form:\n";
+        $request = request()->all();
 
-        foreach ($_POST as $key => $value) {
+        foreach ($request as $key => $value) {
             if ($key !== 'submit') {
                 $mailBody .= "$key : $value<br />\r\n";
             }
         }
 
-        if (! preg_match("/\n/i", $_POST['useremail'])) {
+        if (! preg_match("/\n/i", request()->input('useremail'))) {
             Mail::to($mailTo)->send(new ContactUs($email, $mailBody));
         }
         $msg = "<h2 style='text-align:center;'>Thank you for getting in touch with ".Settings::settingValue('site.main.title').'.</h2>';

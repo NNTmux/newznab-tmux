@@ -7,7 +7,7 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (empty($_GET['id'])) {
+if (empty(request()->input('id'))) {
     $page->show404();
 }
 
@@ -21,6 +21,6 @@ if (empty($sab->apikey)) {
     $page->show404();
 }
 
-$guid = $_GET['id'];
+$guid = request()->input('id');
 
 $sab->sendToSab($guid);

@@ -290,8 +290,8 @@ class Group extends Model
                 'last_record' => $group['last_record'] ?? 0,
                 'active' => $group['active'] ?? 0,
                 'backfill' => $group['backfill'] ?? 0,
-                'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ? null : $group['minsizetoformrelease'],
-                'minfilestoformrelease' => $group['minfilestoformrelease'] === '' ? null : $group['minfilestoformrelease'],
+                'minsizetoformrelease' => $group['minsizetoformrelease'] ?? null,
+                'minfilestoformrelease' => $group['minfilestoformrelease'] ?? null,
             ]
         );
     }
@@ -512,7 +512,7 @@ class Group extends Model
             return self::$cbppTableNames[$groupKey];
         }
 
-        if (env('echocli', true) && $this->allasmgr === false && self::createNewTPGTables($groupID) === false) {
+        if (config('nntmux.echocli') && $this->allasmgr === false && self::createNewTPGTables($groupID) === false) {
             exit('There is a problem creating new TPG tables for this group ID: '.$groupID.PHP_EOL);
         }
 

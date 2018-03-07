@@ -1,17 +1,18 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Regexes;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'category_regexes']);
 
 $page->title = 'Category Regex List';
 
-$group = isset($_REQUEST['group']) && ! empty($_REQUEST['group']) ? $_REQUEST['group'] : '';
-$offset = ($_REQUEST['offset'] ?? 0);
-$regex = $regexes->getRegex($group, env('ITEMS_PER_PAGE', 50), $offset);
+$group = request()->has('group') && ! empty(request()->input('group')) ? request()->input('group') : '';
+$offset = (request()->input('offset') ?? 0);
+$regex = $regexes->getRegex($group, config('nntmux.items_per_page'), $offset);
 
 $page->smarty->assign(
     [
@@ -19,7 +20,7 @@ $page->smarty->assign(
         'pagertotalitems'   => $regexes->getCount($group),
         'pagerquerysuffix'  => '',
         'pageroffset'       => $offset,
-        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+        'pageritemsperpage' => config('nntmux.items_per_page'),
         'regex'             => $regex,
         'pagerquerybase'    => WWW_TOP.'/category_regexes-list.php?'.$group.'offset=',
     ]

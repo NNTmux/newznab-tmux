@@ -1,9 +1,10 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Releases;
 use Blacklight\NZBExport;
+use Blacklight\http\AdminPage;
 
 if (\Blacklight\utility\Utility::isCLI()) {
     exit('This script is only for exporting from the web, use the script in misc/testing'.
@@ -16,11 +17,11 @@ $rel = new Releases(['Settings' => $page->pdo]);
 if ($page->isPostBack()) {
     $retVal = $path = '';
 
-    $path = $_POST['folder'];
-    $postFrom = (isset($_POST['postfrom']) ? $_POST['postfrom'] : '');
-    $postTo = (isset($_POST['postto']) ? $_POST['postto'] : '');
-    $group = ($_POST['group'] === '-1' ? 0 : (int) $_POST['group']);
-    $gzip = ($_POST['gzip'] === '1' ? true : false);
+    $path = request()->input('folder');
+    $postFrom = (request()->input('postfrom') ?? '');
+    $postTo = (request()->input('postto') ?? '');
+    $group = (request()->input('group') === '-1' ? 0 : (int) request()->input('group'));
+    $gzip = (request()->input('gzip') === '1');
 
     if ($path !== '') {
         $NE = new NZBExport([
@@ -46,8 +47,8 @@ if ($page->isPostBack()) {
             'output'   => $retVal,
             'fromdate' => $postFrom,
             'todate'   => $postTo,
-            'group'    => $_POST['group'],
-            'gzip'     => $_POST['gzip'],
+            'group'    => request()->input('group'),
+            'gzip'     => request()->input('gzip'),
         ]
     );
 } else {

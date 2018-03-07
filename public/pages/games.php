@@ -18,8 +18,8 @@ foreach ($concats as $ccat) {
     $ctmp[$ccat['id']] = $ccat;
 }
 $category = Category::PC_GAMES;
-if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $ctmp)) {
-    $category = $_REQUEST['t'] + 0;
+if (request()->has('t') && array_key_exists(request()->input('t'), $ctmp)) {
+    $category = request()->input('t') + 0;
 }
 
 $catarray = [];
@@ -28,13 +28,13 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $ctmp);
 $page->smarty->assign('category', $category);
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 $ordering = $games->getGamesOrdering();
 
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $results = $games2 = [];
-$results = $games->getGamesRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, '', $page->userdata['categoryexclusions']);
+$results = $games->getGamesRange($catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, '', $page->userdata['categoryexclusions']);
 $maxwords = 50;
 foreach ($results as $result) {
     if (! empty($result['review'])) {
@@ -51,7 +51,7 @@ foreach ($results as $result) {
     $games2[] = $result;
 }
 
-$title = (isset($_REQUEST['title']) && ! empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
+$title = (request()->has('title') && ! empty(request()->input('title'))) ? stripslashes(request()->input('title')) : '';
 $page->smarty->assign('title', $title);
 
 $genres = $gen->getGenres(Genres::GAME_TYPE, true);
@@ -62,11 +62,11 @@ foreach ($genres as $gn) {
 
 $years = range(1903, date('Y') + 1);
 rsort($years);
-$year = (isset($_REQUEST['year']) && in_array($_REQUEST['year'], $years, false)) ? $_REQUEST['year'] : '';
+$year = (request()->has('year') && in_array(request()->input('year'), $years, false)) ? request()->input('year') : '';
 $page->smarty->assign('years', $years);
 $page->smarty->assign('year', $year);
 
-$genre = (isset($_REQUEST['genre']) && array_key_exists($_REQUEST['genre'], $tmpgnr)) ? $_REQUEST['genre'] : '';
+$genre = (request()->has('genre') && array_key_exists(request()->input('genre'), $tmpgnr)) ? request()->input('genre') : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
@@ -74,7 +74,7 @@ $browseby_link = '&amp;title='.$title.'&amp;year='.$year;
 
 $page->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_COVER_PAGE', 20));
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page'));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/games?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 

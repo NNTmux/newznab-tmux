@@ -7,9 +7,9 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['modal']) && isset($_GET['id']) && ctype_digit($_GET['id'])) {
+if (request()->has('modal') && request()->has('id') && ctype_digit(request()->input('id'))) {
     $movie = new XXX(['Settings' => $page->settings]);
-    $mov = $movie->getXXXInfo($_GET['id']);
+    $mov = $movie->getXXXInfo(request()->input('id'));
 
     if (! $mov) {
         $page->show404();
@@ -27,7 +27,7 @@ if (isset($_GET['modal']) && isset($_GET['id']) && ctype_digit($_GET['id'])) {
     $page->meta_description = '';
     $page->smarty->registerPlugin('modifier', 'ss', 'stripslashes');
 
-    if (isset($_GET['modal'])) {
+    if (request()->has('modal')) {
         $page->content = $page->smarty->fetch('viewxxx.tpl');
         $page->smarty->assign('modal', true);
         echo $page->content;

@@ -1,18 +1,19 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Group;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 
 // set the current action
-$action = $_REQUEST['action'] ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 switch ($action) {
 	case 'submit':
-		if (isset($_POST['groupfilter']) && ! empty($_POST['groupfilter'])) {
-		    $msgs = Group::addBulk($_POST['groupfilter'], $_POST['active'], $_POST['backfill']);
+		if (request()->has('groupfilter') && ! empty(request()->input('groupfilter'))) {
+		    $msgs = Group::addBulk(request()->input('groupfilter'), request()->input('active'), request()->input('backfill'));
 		}
 		break;
 	default:

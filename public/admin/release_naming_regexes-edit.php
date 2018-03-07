@@ -1,41 +1,42 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Regexes;
 use App\Models\Category;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'release_naming_regexes']);
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
-        if ($_POST['group_regex'] === '') {
+        if (request()->input('group_regex') === '') {
             $page->smarty->assign('error', 'Group regex must not be empty!');
             break;
         }
 
-        if ($_POST['regex'] === '') {
+        if (request()->input('regex') === '') {
             $page->smarty->assign('error', 'Regex cannot be empty');
             break;
         }
 
-        if ($_POST['description'] === '') {
-            $_POST['description'] = '';
+        if (request()->input('description') === '') {
+            request()->merge(['description' => '']);
         }
 
-        if (! is_numeric($_POST['ordinal']) || $_POST['ordinal'] < 0) {
+        if (! is_numeric(request()->input('ordinal')) || request()->input('ordinal') < 0) {
             $page->smarty->assign('error', 'Ordinal must be a number, 0 or higher.');
             break;
         }
 
-        if ($_POST['id'] === '') {
-            $regex = $regexes->addRegex($_POST);
+        if (request()->input('id') === '') {
+            $regex = $regexes->addRegex(request()->all());
         } else {
-            $regex = $regexes->updateRegex($_POST);
+            $regex = $regexes->updateRegex(request()->all());
         }
 
         header('Location:'.WWW_TOP.'/release_naming_regexes-list.php');
@@ -43,9 +44,9 @@ switch ($action) {
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if (request()->has('id')) {
             $page->title = 'Release Naming Regex Edit';
-            $id = $_GET['id'];
+            $id = request()->input('id');
             $regex = $regexes->getRegexByID($id);
         } else {
             $page->title = 'Release Naming Regex Add';

@@ -1,40 +1,41 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Regexes;
 use App\Models\Category;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->pdo, 'Table_Name' => 'collection_regexes']);
 $error = '';
 $regex = ['id' => '', 'regex' => '', 'description' => '', 'group_regex' => '', 'ordinal' => '', 'status' => 1];
 
-switch ($_REQUEST['action'] ?? 'view') {
+switch (request()->input('action') ?? 'view') {
     case 'submit':
-        if ($_POST['group_regex'] === '') {
+        if (request()->input('group_regex') === '') {
             $error = 'Group regex must not be empty!';
             break;
         }
 
-        if ($_POST['regex'] === '') {
+        if (request()->input('regex') === '') {
             $error = 'Regex cannot be empty';
             break;
         }
 
-        if ($_POST['description'] === '') {
-            $_POST['description'] = '';
+        if (request()->input('description') === '') {
+            request()->merge(['description' => '']);
         }
 
-        if (! is_numeric($_POST['ordinal']) || $_POST['ordinal'] < 0) {
+        if (! is_numeric(request()->input('ordinal')) || request()->input('ordinal') < 0) {
             $error = 'Ordinal must be a number, 0 or higher.';
             break;
         }
 
-        if ($_POST['id'] === '') {
-            $regexes->addRegex($_POST);
+        if (request()->input('id') === '') {
+            $regexes->addRegex(request()->all());
         } else {
-            $regexes->updateRegex($_POST);
+            $regexes->updateRegex(request()->all());
         }
 
         header('Location:'.WWW_TOP.'/collection_regexes-list.php');
@@ -42,9 +43,9 @@ switch ($_REQUEST['action'] ?? 'view') {
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if (request()->has('id')) {
             $page->title = 'Collections Regex Edit';
-            $regex = $regexes->getRegexByID($_GET['id']);
+            $regex = $regexes->getRegexByID(request()->input('id'));
         } else {
             $page->title = 'Collections Regex Add';
             $regex += ['status' => 1];

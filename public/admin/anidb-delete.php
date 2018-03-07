@@ -1,15 +1,13 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\AniDB;
 
-$page = new AdminPage();
-
-if (isset($_GET['id'])) {
+if (request()->has('id')) {
     $AniDB = new AniDB();
-    $AniDB->deleteTitle($_GET['id']);
+    $AniDB->deleteTitle(request()->input('id'));
 }
 
-$referrer = $_SERVER['HTTP_REFERER'];
+$referrer = request()->server('HTTP_REFERER');
 header('Location: '.$referrer);

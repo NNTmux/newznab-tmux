@@ -1,14 +1,16 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Group;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
+
 $id = 0;
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 $group = [
     'id'                    => '',
@@ -25,24 +27,24 @@ $group = [
 
 switch ($action) {
     case 'submit':
-        if ($_POST['id'] === '') {
+        if (request()->input('id') === '') {
             // Add a new group.
-            $_POST['name'] = Group::isValidGroup($_POST['name']);
-            if ($_POST['name'] !== false) {
-                Group::addGroup($_POST);
+            request()->merge(['name' => Group::isValidGroup(request()->input('name'))]);
+            if (request()->input('name') !== false) {
+                Group::addGroup(request()->all());
             }
         } else {
             // Update an existing group.
-            Group::updateGroup($_POST);
+            Group::updateGroup(request()->all());
         }
         header('Location:'.WWW_TOP.'/group-list.php');
         break;
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if (request()->has('id')) {
             $page->title = 'Newsgroup Edit';
-            $id = $_GET['id'];
+            $id = request()->input('id');
             $group = Group::getGroupByID($id);
         } else {
             $page->title = 'Newsgroup Add';

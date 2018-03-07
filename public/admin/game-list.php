@@ -1,8 +1,9 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Games;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 $game = new Games(['Settings' => $page->pdo]);
@@ -11,20 +12,20 @@ $page->title = 'Game List';
 
 $gameCount = $game->getCount();
 
-$offset = $_REQUEST['offset'] ?? 0;
+$offset = request()->input('offset') ?? 0;
 
 $page->smarty->assign([
     'pagertotalitems' => $gameCount,
     'pagerquerysuffix'  => '#results',
     'pageroffset' => $offset,
-    'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+    'pageritemsperpage' => config('nntmux.items_per_page'),
     'pagerquerybase' => WWW_TOP.'/game-list.php?offset=',
 ]);
 
 $pager = $page->smarty->fetch('pager.tpl');
 $page->smarty->assign('pager', $pager);
 
-$gamelist = $game->getRange($offset, env('ITEMS_PER_PAGE', 50));
+$gamelist = $game->getRange($offset, config('nntmux.items_per_page'));
 
 $page->smarty->assign('gamelist', $gamelist);
 

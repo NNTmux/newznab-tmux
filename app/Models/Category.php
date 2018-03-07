@@ -184,7 +184,7 @@ class Category extends Model
             ->orderBy('count', 'desc')
             ->get();
 
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put('recentlyadded', $recent, $expiresAt);
 
         return $recent;
@@ -296,7 +296,7 @@ class Category extends Model
      */
     public static function getChildren($categoryId)
     {
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         $children = Cache::get(md5($categoryId));
         if ($children !== null) {
             return $children;
@@ -348,7 +348,7 @@ class Category extends Model
                 return $catIds;
             }
             $catIds = self::query()->whereIn('id', $ids)->get();
-            $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+            $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
             Cache::put('categoryids', $catIds, $expiresAt);
 
             return $catIds;
@@ -434,7 +434,7 @@ class Category extends Model
             $arr = $arrsql;
         } else {
             $arr = $sql->get()->toArray();
-            $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+            $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
             Cache::put(md5(implode(',', $excludedCats).implode(',', $roleExcludedCats)), $arr, $expiresAt);
         }
 

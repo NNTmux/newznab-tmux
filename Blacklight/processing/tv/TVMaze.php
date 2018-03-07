@@ -28,9 +28,11 @@ class TVMaze extends TV
     public $posterUrl;
 
     /**
-     * Construct. Instantiate TVMaze Client Class.
+     * TVMaze constructor.
      *
-     * @param array $options Class instances.
+     * @param array $options
+     *
+     * @throws \Exception
      */
     public function __construct(array $options = [])
     {
@@ -263,7 +265,7 @@ class TVMaze extends TV
      *
      * @return array|bool
      */
-    private function matchShowInfo($shows, $cleanName)
+    private function matchShowInfo(array $shows, $cleanName)
     {
         $return = false;
         $highestMatch = 0;

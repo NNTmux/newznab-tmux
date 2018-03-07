@@ -1,27 +1,28 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Regexes;
 use Blacklight\Binaries;
+use Blacklight\http\AdminPage;
 
 // Login Check
-$admin = new AdminPage;
+$page = new AdminPage;
 
-if (! isset($_GET['action'])) {
+if (! request()->has('action')) {
     exit();
 }
 
-switch ($_GET['action']) {
-	case 1:
-		$id = (int) $_GET['col_id'];
-		(new Regexes(['Settings' => $admin->settings]))->deleteRegex($id);
-		echo "Regex $id deleted.";
-		break;
+switch (request()->input('action')) {
+    case 1:
+        $id = (int) request()->input('col_id');
+        (new Regexes(['Settings' => $page->settings]))->deleteRegex($id);
+        echo "Regex $id deleted.";
+        break;
 
-	case 2:
-		$id = (int) $_GET['bin_id'];
-		(new Binaries(['Settings' => $admin->settings]))->deleteBlacklist($id);
-		echo "Blacklist $id deleted.";
-		break;
+    case 2:
+        $id = (int) request()->input('bin_id');
+        (new Binaries(['Settings' => $page->settings]))->deleteBlacklist($id);
+        echo "Blacklist $id deleted.";
+        break;
 }

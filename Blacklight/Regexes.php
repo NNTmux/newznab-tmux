@@ -326,7 +326,7 @@ class Regexes
     protected function _fetchRegex($groupName): void
     {
         // Check if we need to do an initial cache or refresh our cache.
-        if (isset($this->_regexCache[$groupName]['ttl']) && (time() - $this->_regexCache[$groupName]['ttl']) < NN_CACHE_EXPIRY_LONG) {
+        if (isset($this->_regexCache[$groupName]['ttl']) && (time() - $this->_regexCache[$groupName]['ttl']) < config('nntmux.cache_expiry_long')) {
             return;
         }
 
@@ -339,7 +339,7 @@ class Regexes
                 $this->pdo->escapeString($groupName)
             ),
             true,
-            NN_CACHE_EXPIRY_LONG
+            config('nntmux.cache_expiry_long')
         );
         // Set the TTL.
         $this->_regexCache[$groupName]['ttl'] = time();

@@ -1,9 +1,11 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Genres;
 use Blacklight\Console;
+use Blacklight\http\AdminPage;
+use Illuminate\Support\Carbon;
 
 $page = new AdminPage();
 $console = new Console(['Settings' => $page->pdo]);
@@ -11,10 +13,10 @@ $gen = new Genres();
 $id = 0;
 
 // set the current action
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = request()->input('action') ?? 'view';
 
-if (isset($_REQUEST['id'])) {
-    $id = $_REQUEST['id'];
+if (request()->has('id')) {
+    $id = request()->input('id');
     $con = $console->getConsoleInfo($id);
 
     if (! $con) {
@@ -33,11 +35,11 @@ if (isset($_REQUEST['id'])) {
                 }
             }
 
-            $_POST['cover'] = (file_exists($coverLoc)) ? 1 : 0;
-            $_POST['salesrank'] = (empty($_POST['salesrank']) || ! ctype_digit($_POST['salesrank'])) ? 'null' : $_POST['salesrank'];
-            $_POST['releasedate'] = (empty($_POST['releasedate']) || ! strtotime($_POST['releasedate'])) ? $con['releasedate'] : date('Y-m-d H:i:s', strtotime($_POST['releasedate']));
+            request()->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
+            request()->merge(['salesrank' => (empty(request()->input('salesrank')) || ! ctype_digit(request()->input('salesrank'))) ? 'null' : request()->input('salesrank')]);
+            request()->merge(['releasedate' => (empty(request()->input('releasedate')) || ! strtotime(request()->input('releasedate'))) ? $con['releasedate'] : Carbon::parse(request()->input('releasedate'))->timestamp]);
 
-            $console->update($id, $_POST['title'], $_POST['asin'], $_POST['url'], $_POST['salesrank'], $_POST['platform'], $_POST['publisher'], $_POST['releasedate'], $_POST['esrb'], $_POST['cover'], $_POST['genre']);
+            $console->update($id, request()->input('title'), request()->input('asin'), request()->input('url'), request()->input('salesrank'), request()->input('platform'), request()->input('publisher'), request()->input('releasedate'), request()->input('esrb'), request()->input('cover'), request()->input('genre'));
 
             header('Location:'.WWW_TOP.'/console-list.php');
             die();

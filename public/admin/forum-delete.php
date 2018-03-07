@@ -2,17 +2,15 @@
 
 use App\Models\Forumpost;
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
-$page = new AdminPage();
-
-if (isset($_GET['id'])) {
-    Forumpost::deletePost($_GET['id']);
+if (request()->has('id')) {
+    Forumpost::deletePost(request()->input('id'));
 }
 
-if (isset($_GET['from'])) {
-    $referrer = $_GET['from'];
+if (request()->has('from')) {
+    $referrer = request()->input('from');
 } else {
-    $referrer = $_SERVER['HTTP_REFERER'];
+    $referrer = request()->server('HTTP_REFERER');
 }
 header('Location: '.$referrer);

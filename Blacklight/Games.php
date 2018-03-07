@@ -120,7 +120,7 @@ class Games
             'Settings' => null,
         ];
         $options += $defaults;
-        $this->echoOutput = ($options['Echo'] && env('echocli', true));
+        $this->echoOutput = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
@@ -270,7 +270,7 @@ class Games
                         ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         $gamesCache = Cache::get(md5($gamesSql));
         if ($gamesCache !== null) {
             $games = $gamesCache;
@@ -511,9 +511,9 @@ class Games
 
                 if (! empty($this->_gameResults['releasedate'])) {
                     $dateReleased = $this->_gameResults['releasedate'];
-                    $date = Carbon::createFromFormat('M j, Y', $dateReleased);
+                    $date = Carbon::createFromFormat('M j, Y', Carbon::parse($dateReleased)->toFormattedDateString());
                     if ($date instanceof \DateTime) {
-                        $game['releasedate'] = (string) $date->format('Y-m-d');
+                        $game['releasedate'] = $date->format('Y-m-d');
                     }
                 }
 
@@ -641,7 +641,7 @@ class Games
         if (\in_array(strtolower($genreName), $genreAssoc, false)) {
             $genreKey = array_search(strtolower($genreName), $genreAssoc, false);
         } else {
-            $genreKey = Genre::create(['title' => $genreName, 'type' => Genres::GAME_TYPE])->id;
+            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::GAME_TYPE]);
         }
 
         $game['gamesgenre'] = $genreName;

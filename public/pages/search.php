@@ -18,13 +18,13 @@ $page->meta_description = 'Search for Nzbs';
 $results = [];
 
 $searchType = 'basic';
-if (isset($_REQUEST['search_type']) && $_REQUEST['search_type'] === 'adv') {
+if (request()->has('search_type') && request()->input('search_type') === 'adv') {
     $searchType = 'advanced';
 }
 
 $ordering = $releases->getBrowseOrdering();
-$orderBy = (isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '');
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$orderBy = (request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '');
+$offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 
 $page->smarty->assign(
     [
@@ -33,22 +33,22 @@ $page->smarty->assign(
     ]
 );
 
-if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && ! isset($_REQUEST['searchadvr']) && $searchType === 'basic') {
+if ((request()->has('id') || request()->has('subject')) && ! request()->has('searchadvr') && $searchType === 'basic') {
     $searchString = '';
     switch (true) {
-        case isset($_REQUEST['subject']):
-            $searchString = (string) $_REQUEST['subject'];
+        case request()->has('subject'):
+            $searchString = (string) request()->input('subject');
             $page->smarty->assign('subject', $searchString);
             break;
-        case isset($_REQUEST['id']):
-            $searchString = (string) $_REQUEST['id'];
+        case request()->has('id'):
+            $searchString = (string) request()->input('id');
             $page->smarty->assign('search', $searchString);
             break;
     }
 
     $categoryID[] = -1;
-    if (isset($_REQUEST['t'])) {
-        $categoryID = explode(',', $_REQUEST['t']);
+    if (request()->has('t')) {
+        $categoryID = explode(',', request()->input('t'));
     }
     foreach ($releases->getBrowseOrdering() as $orderType) {
         $page->smarty->assign(
@@ -70,7 +70,7 @@ if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && ! isset($_REQUEST
         -1,
         -1,
         $offset,
-        env('ITEMS_PER_PAGE', 50),
+        config('nntmux.items_per_page'),
         $orderBy,
         -1,
         $page->userdata['categoryexclusions'],
@@ -83,7 +83,7 @@ if ((isset($_REQUEST['id']) || isset($_REQUEST['subject'])) && ! isset($_REQUEST
             'lastvisit' => $page->userdata['lastlogin'],
             'pagertotalitems' => \count($results) > 0 ? $results[0]['_totalrows'] : 0,
             'pageroffset' => $offset,
-            'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+            'pageritemsperpage' => config('nntmux.items_per_page'),
             'pagerquerysuffix' => '#results',
             'pagerquerybase' => WWW_TOP.'/search/'.htmlentities($searchString, ENT_QUOTES | ENT_HTML5).'?t='.
                 implode(',', $categoryID).'&amp;ob='.$orderBy.'&amp;offset=',
@@ -100,7 +100,7 @@ $searchVars = [
 ];
 
 foreach ($searchVars as $searchVarKey => $searchVar) {
-    $searchVars[$searchVarKey] = (isset($_REQUEST[$searchVarKey]) ? (string) $_REQUEST[$searchVarKey] : '');
+    $searchVars[$searchVarKey] = (request()->has($searchVarKey) ? (string) request()->input($searchVarKey) : '');
 }
 
 $searchVars['selectedgroup'] = $searchVars['searchadvgroups'];
@@ -111,7 +111,7 @@ foreach ($searchVars as $searchVarKey => $searchVar) {
     $page->smarty->assign($searchVarKey, $searchVars[$searchVarKey]);
 }
 
-if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQUEST['subject']) && $searchType !== 'basic') {
+if (request()->has('searchadvr') && ! request()->has('id') && ! request()->has('subject') && $searchType !== 'basic') {
     $orderByString = '';
     foreach ($searchVars as $searchVarKey => $searchVar) {
         $orderByString .= "&$searchVarKey=".htmlentities($searchVar, ENT_QUOTES | ENT_HTML5);
@@ -138,7 +138,7 @@ if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQU
         ($searchVars['searchadvdaysnew'] === '' ? -1 : $searchVars['searchadvdaysnew']),
         ($searchVars['searchadvdaysold'] === '' ? -1 : $searchVars['searchadvdaysold']),
         $offset,
-        env('ITEMS_PER_PAGE', 50),
+        config('nntmux.items_per_page'),
         $orderBy,
         -1,
         $page->userdata['categoryexclusions'],
@@ -151,7 +151,7 @@ if (isset($_REQUEST['searchadvr']) && ! isset($_REQUEST['id']) && ! isset($_REQU
             'lastvisit' => $page->userdata['lastlogin'],
             'pagertotalitems' => \count($results) > 0 ? $results[0]['_totalrows'] : 0,
             'pageroffset' => $offset,
-            'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+            'pageritemsperpage' => config('nntmux.items_per_page'),
             'pagerquerysuffix' => '#results',
             'pagerquerybase' => WWW_TOP.'/search?'.$orderByString.'&search_type=adv&ob='.$orderBy.'&offset=',
         ]

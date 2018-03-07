@@ -8,13 +8,13 @@ $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->settings]);
 
 // Set the current action.
-$action = $_REQUEST['action'] ?? '';
+$action = request()->input('action') ?? '';
 
 // Request is for id, but guid is actually being provided
-if (isset($_REQUEST['id']) && is_array($_REQUEST['id'])) {
-    $id = $_REQUEST['id'];
+if (request()->has('id') && is_array(request()->input('id'))) {
+    $id = request()->input('id');
     //Get info for first guid to populate form
-    $rel = Release::getByGuid($_REQUEST['id'][0]);
+    $rel = Release::getByGuid(request()->input('id')[0]);
 } else {
     $id = $rel = '';
 }
@@ -28,25 +28,25 @@ switch ($action) {
         $success = false;
         if ($action === 'doedit') {
             $success = $releases->updateMulti(
-                $_POST['id'],
-                $_POST['category'],
-                $_POST['grabs'],
-                $_POST['videosid'],
-                $_POST['episodesid'],
-                $_POST['anidbid'],
-                $_POST['imdbid']
+                request()->input('id'),
+                request()->input('category'),
+                request()->input('grabs'),
+                request()->input('videosid'),
+                request()->input('episodesid'),
+                request()->input('anidbid'),
+                request()->input('imdbid')
             );
         }
         $page->smarty->assign('release', $rel);
         $page->smarty->assign('success', $success);
-        $page->smarty->assign('from', $_POST['from'] ?? '');
+        $page->smarty->assign('from', request()->input('from') ?? '');
         $page->smarty->assign('catlist', Category::getForSelect(false));
         $page->content = $page->smarty->fetch('ajax_release-edit.tpl');
         echo $page->content;
 
         break;
     case 'dodelete':
-        $releases->deleteMultiple($_GET['id']);
+        $releases->deleteMultiple(request()->input('id'));
         break;
     default:
         $page->show404();

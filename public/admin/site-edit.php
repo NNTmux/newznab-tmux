@@ -1,31 +1,30 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\Sites;
 use Blacklight\SABnzbd;
 use App\Models\Category;
 use App\Models\Settings;
+use Blacklight\http\AdminPage;
 use Blacklight\utility\Utility;
-use App\Models\Category as CategoryModel;
 
 $page = new AdminPage();
+
 $sites = new Sites();
 $id = 0;
 
 // set the current action
-$action = $_REQUEST['action'] ?? 'view';
+$action = request()->input('action') ?? 'view';
 
 switch ($action) {
     case 'submit':
 
-        if (! empty($_POST['book_reqids'])) {
-            // book_reqids is an array it needs to be a comma separated string, make it so.
-            $_POST['book_reqids'] = is_array($_POST['book_reqids']) ?
-                implode(', ', $_POST['book_reqids']) : $_POST['book_reqids'];
+        if (! request()->has('book_reqids')) {
+            request()->merge(['book_reqids' => []]);
         }
         $error = '';
-        $ret = $page->pdo->settingsUpdate($_POST);
+        $ret = Settings::settingsUpdate(request()->all());
         if (is_int($ret)) {
             if ($ret === Settings::ERR_BADUNRARPATH) {
                 $error = 'The unrar path does not point to a valid binary';
@@ -52,7 +51,7 @@ switch ($action) {
             header('Location:'.WWW_TOP.'/site-edit.php?id='.$returnid);
         } else {
             $page->smarty->assign('error', $error);
-            $site = $sites->row2Object($_POST);
+            $site = $sites->row2Object(request()->all());
             $page->smarty->assign('site', $site);
         }
 
@@ -135,7 +134,7 @@ $page->smarty->assign('lookup_reqids_names', ['Disabled', 'Lookup Request IDs', 
 $page->smarty->assign('coversPath', NN_COVERS);
 
 // return a list of audiobooks, mags, ebooks, technical and foreign books
-$result = CategoryModel::query()->whereIn('id', [Category::MUSIC_AUDIOBOOK, Category::BOOKS_MAGAZINES, Category::BOOKS_TECHNICAL, Category::BOOKS_FOREIGN])->get(['id', 'title']);
+$result = Category::query()->whereIn('id', [Category::MUSIC_AUDIOBOOK, Category::BOOKS_MAGAZINES, Category::BOOKS_TECHNICAL, Category::BOOKS_FOREIGN])->get(['id', 'title']);
 
 // setup the display lists for these categories, this could have been static, but then if names changed they would be wrong
 $book_reqids_ids = [];

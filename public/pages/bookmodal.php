@@ -9,8 +9,8 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
-    $book = $b->getBookInfo($_GET['id']);
+if (request()->has('id') && ctype_digit(request()->input('id'))) {
+    $book = $b->getBookInfo(request()->input('id'));
     if (! $book) {
         $page->show404();
     }
@@ -24,7 +24,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
     $page->smarty->registerPlugin('modifier', 'ss', 'stripslashes');
 
     $modal = false;
-    if (isset($_GET['modal'])) {
+    if (request()->has('modal')) {
         $modal = true;
         $page->smarty->assign('modal', true);
     }

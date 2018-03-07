@@ -1,12 +1,13 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\NZB;
 use App\Models\User;
 use Blacklight\db\DB;
 use App\Models\Release;
 use App\Models\Settings;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage;
 $pdo = new DB();
@@ -16,13 +17,13 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['id'])) {
-    $rel = Release::getByGuid($_GET['id']);
+if (request()->has('id')) {
+    $rel = Release::getByGuid(request()->input('id'));
     if (! $rel) {
         $page->show404();
     }
 
-    $nzbpath = $nzb->getNZBPath($_GET['id'], Settings::settingValue('..nzbpath'));
+    $nzbpath = $nzb->getNZBPath(request()->input('id'), Settings::settingValue('..nzbpath'));
 
     if (! file_exists($nzbpath)) {
         $page->show404();

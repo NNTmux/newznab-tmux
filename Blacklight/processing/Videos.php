@@ -66,7 +66,7 @@ abstract class Videos
         $options += $defaults;
 
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-        $this->echooutput = ($options['Echo'] && env('echocli', true));
+        $this->echooutput = ($options['Echo'] && config('nntmux.echocli'));
         $this->titleCache = [];
     }
 
@@ -124,8 +124,9 @@ abstract class Videos
      */
     protected function getVideoIDFromSiteID($siteColumn, $siteID)
     {
+        $result = null;
         if (\in_array($siteColumn, self::$sites, false)) {
-            $result = Video::query()->where($siteColumn, '=', $siteID)->first(['id']);
+            $result = Video::query()->where($siteColumn, $siteID)->first(['id']);
         }
 
         return $result !== null ? $result->id : false;
@@ -302,10 +303,10 @@ abstract class Videos
      *
      * @return \PDOStatement|false
      */
-    public function getAliases($videoId = 0, $alias = '')
+    public function getAliases($videoId, $alias = '')
     {
         $return = false;
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
 
         if ($videoId > 0 || $alias !== '') {
             $aliasCache = Cache::get(md5($videoId.$alias));

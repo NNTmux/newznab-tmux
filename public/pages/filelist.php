@@ -12,13 +12,13 @@ if (! User::isLoggedIn()) {
     $page->show403();
 }
 
-if (isset($_GET['id'])) {
-    $rel = Release::getByGuid($_GET['id']);
+if (request()->has('id')) {
+    $rel = Release::getByGuid(request()->input('id'));
     if (! $rel) {
         $page->show404();
     }
 
-    $nzbpath = $nzb->NZBPath($_GET['id']);
+    $nzbpath = $nzb->NZBPath(request()->input('id'));
 
     if (! file_exists($nzbpath)) {
         $page->show404();
@@ -40,7 +40,7 @@ if (isset($_GET['id'])) {
     $page->meta_description = 'View Nzb File List';
 
     $modal = false;
-    if (isset($_GET['modal'])) {
+    if (request()->has('modal')) {
         $modal = true;
         $page->smarty->assign('modal', true);
     }

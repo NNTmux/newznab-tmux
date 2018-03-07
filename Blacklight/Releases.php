@@ -97,7 +97,7 @@ class Releases
             return $count;
         }
         $count = $this->pdo->query($sql);
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]['count'], $expiresAt);
 
         return $count[0]['count'] ?? 0;
@@ -170,7 +170,7 @@ class Releases
             $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
             $sql[0]['_totalcount'] = $sql[0]['_totalrows'] = $possibleRows;
         }
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($qry), $sql, $expiresAt);
 
         return $sql;
@@ -395,7 +395,7 @@ class Releases
                 $this->concatenatedCategoryIDsCache = $result[0]['category_ids'];
             }
         }
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_LONG);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_long'));
         Cache::put('concatenatedcats', $this->concatenatedCategoryIDsCache, $expiresAt);
 
         return $this->concatenatedCategoryIDsCache;
@@ -456,7 +456,7 @@ class Releases
 
         $releases = $this->pdo->query($sql);
 
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
@@ -754,7 +754,7 @@ class Releases
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
 
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
@@ -906,7 +906,7 @@ class Releases
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
             );
         }
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
@@ -974,7 +974,7 @@ class Releases
         if (! empty($releases) && \count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
@@ -1044,7 +1044,7 @@ class Releases
         if (! empty($releases) && \count($releases)) {
             $releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
         }
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_MEDIUM);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_medium'));
         Cache::put(md5($sql), $releases, $expiresAt);
 
         return $releases;
@@ -1062,7 +1062,7 @@ class Releases
         $sql = sprintf(
                         'SELECT COUNT(z.id) AS count FROM (%s LIMIT %s) z',
                         preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query),
-                        env('MAX_PAGER_RESULTS', 125000)
+                        config('nntmux.max_pager_results')
         );
 
         $count = Cache::get(md5($sql));
@@ -1072,7 +1072,7 @@ class Releases
 
         $count = $this->pdo->query($sql);
 
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_short'));
         Cache::put(md5($sql), $count[0]['count'], $expiresAt);
 
         return $count[0]['count'] ?? 0;

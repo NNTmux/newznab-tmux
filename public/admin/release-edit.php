@@ -1,38 +1,39 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Release;
 use App\Models\Category;
 use Blacklight\Releases;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->pdo]);
 $id = 0;
 
 // Set the current action.
-$action = ($_REQUEST['action'] ?? 'view');
+$action = (request()->input('action') ?? 'view');
 
 switch ($action) {
     case 'submit':
         Release::updateRelease(
-            $_POST['id'],
-            $_POST['name'],
-            $_POST['searchname'],
-            $_POST['fromname'],
-            $_POST['category'],
-            $_POST['totalpart'],
-            $_POST['grabs'],
-            $_POST['size'],
-            $_POST['postdate'],
-            $_POST['adddate'],
-            $_POST['videos_id'],
-            $_POST['tv_episodes_id'],
-            $_POST['imdbid'],
-            $_POST['anidbid']
+            request()->input('id'),
+            request()->input('name'),
+            request()->input('searchname'),
+            request()->input('fromname'),
+            request()->input('category'),
+            request()->input('totalpart'),
+            request()->input('grabs'),
+            request()->input('size'),
+            request()->input('postdate'),
+            request()->input('adddate'),
+            request()->input('videos_id'),
+            request()->input('tv_episodes_id'),
+            request()->input('imdbid'),
+            request()->input('anidbid')
         );
 
-        $release = Release::getByGuid($_POST['guid']);
+        $release = Release::getByGuid(request()->input('guid'));
         $page->smarty->assign('release', $release);
 
         header('Location:'.WWW_TOP.'/../details/'.$release['guid']);
@@ -41,7 +42,7 @@ switch ($action) {
     case 'view':
     default:
         $page->title = 'Release Edit';
-        $id = $_GET['id'];
+        $id = request()->input('id');
         $release = Release::getByGuid($id);
         $page->smarty->assign('release', $release);
         break;

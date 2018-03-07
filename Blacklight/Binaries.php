@@ -249,7 +249,7 @@ class Binaries
         ];
         $options += $defaults;
 
-        $this->_echoCLI = ($options['Echo'] && env('echocli', true));
+        $this->_echoCLI = ($options['Echo'] && config('nntmux.echocli'));
 
         $this->_pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
@@ -1736,7 +1736,7 @@ class Binaries
         }
 
         $poster = MultigroupPoster::query()->get(['poster'])->toArray();
-        $expiresAt = Carbon::now()->addSeconds(NN_CACHE_EXPIRY_SHORT);
+        $expiresAt = Carbon::now()->addSeconds(config('nntmux.cache_expiry_short'));
         Cache::put('mgrposter', $poster, $expiresAt);
 
         return $poster;

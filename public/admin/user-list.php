@@ -2,8 +2,9 @@
 
 use App\Models\User;
 use App\Models\UserRole;
+use Blacklight\http\AdminPage;
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 $page = new AdminPage();
 
@@ -14,9 +15,9 @@ foreach (UserRole::getRoles() as $userRole) {
     $roles[$userRole['id']] = $userRole['name'];
 }
 
-$offset = $_REQUEST['offset'] ?? 0;
+$offset = request()->input('offset') ?? 0;
 $ordering = getUserBrowseOrdering();
-$orderBy = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderBy = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $variables = ['username' => '', 'email' => '', 'host' => '', 'role' => ''];
 $uSearch = '';
@@ -35,11 +36,11 @@ $page->smarty->assign(
         'pagerquerysuffix'  => '#results',
         'pagertotalitems'   => User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']),
         'pageroffset'       => $offset,
-        'pageritemsperpage' => env('ITEMS_PER_PAGE', 50),
+        'pageritemsperpage' => config('nntmux.items_per_page'),
         'pagerquerybase'    => WWW_TOP.'/user-list.php?ob='.$orderBy.$uSearch.'&offset=',
         'userlist' => User::getRange(
             $offset,
-            env('ITEMS_PER_PAGE', 50),
+            config('nntmux.items_per_page'),
             $orderBy,
             $variables['username'],
             $variables['email'],

@@ -16,8 +16,8 @@ foreach ($moviecats as $mcat) {
     $mtmp[$mcat['id']] = $mcat;
 }
 $category = Category::XXX_ROOT;
-if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
-    $category = $_REQUEST['t'] + 0;
+if (request()->has('t') && array_key_exists(request()->input('t'), $mtmp)) {
+    $category = request()->input('t') + 0;
 }
 $catarray = [];
 $catarray[] = $category;
@@ -25,29 +25,29 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $mtmp);
 $page->smarty->assign('category', $category);
 
-$offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST['offset'] : 0;
+$offset = (request()->has('offset') && ctype_digit(request()->input('offset'))) ? request()->input('offset') : 0;
 $ordering = $movie->getXXXOrdering();
-$orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering, false) ? $_REQUEST['ob'] : '';
+$orderby = request()->has('ob') && in_array(request()->input('ob'), $ordering, false) ? request()->input('ob') : '';
 
 $movies = [];
-$results = $movie->getXXXRange($catarray, $offset, env('ITEMS_PER_COVER_PAGE', 20), $orderby, -1, $page->userdata['categoryexclusions']);
+$results = $movie->getXXXRange($catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $page->userdata['categoryexclusions']);
 foreach ($results as $result) {
     $result['genre'] = makeFieldLinks($result, 'genre', 'xxx');
     $result['actors'] = makeFieldLinks($result, 'actors', 'xxx');
     $result['director'] = makeFieldLinks($result, 'director', 'xxx');
     $movies[] = $result;
 }
-$title = (isset($_REQUEST['title']) && ! empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';
+$title = (request()->has('title') && ! empty(request()->input('title'))) ? stripslashes(request()->input('title')) : '';
 $page->smarty->assign('title', stripslashes($title));
 
-$actors = (isset($_REQUEST['actors']) && ! empty($_REQUEST['actors'])) ? stripslashes($_REQUEST['actors']) : '';
+$actors = (request()->has('actors') && ! empty(request()->input('actors'))) ? stripslashes(request()->input('actors')) : '';
 $page->smarty->assign('actors', $actors);
 
-$director = (isset($_REQUEST['director']) && ! empty($_REQUEST['director'])) ? stripslashes($_REQUEST['director']) : '';
+$director = (request()->has('director') && ! empty(request()->input('director'))) ? stripslashes(request()->input('director')) : '';
 $page->smarty->assign('director', $director);
 
 $genres = $movie->getAllGenres(true);
-$genre = (isset($_REQUEST['genre']) && in_array($_REQUEST['genre'], $genres, false)) ? $_REQUEST['genre'] : '';
+$genre = (request()->has('genre') && in_array(request()->input('genre'), $genres, false)) ? request()->input('genre') : '';
 $page->smarty->assign('genres', $genres);
 $page->smarty->assign('genre', $genre);
 
@@ -55,7 +55,7 @@ $browseby_link = '&amp;title='.$title.'&amp;actors='.$actors.'&amp;director='.$d
 
 $page->smarty->assign('pagertotalitems', $results[0]['_totalcount'] ?? 0);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', env('ITEMS_PER_COVER_PAGE', 20));
+$page->smarty->assign('pageritemsperpage', config('nntmux.items_per_cover_page'));
 $page->smarty->assign('pagerquerybase', WWW_TOP.'/xxx?t='.$category.$browseby_link.'&amp;ob='.$orderby.'&amp;offset=');
 $page->smarty->assign('pagerquerysuffix', '#results');
 
@@ -83,7 +83,7 @@ $page->meta_title = 'Browse XXX';
 $page->meta_keywords = 'browse,xxx,nzb,description,details';
 $page->meta_description = 'Browse for XXX Movies';
 
-if (isset($_GET['id'])) {
+if (request()->has('id')) {
     $page->content = $page->smarty->fetch('viewxxxfull.tpl');
 } else {
     $page->content = $page->smarty->fetch('xxx.tpl');

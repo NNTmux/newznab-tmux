@@ -140,7 +140,7 @@ class TraktTv extends TV
                         $this->localizedTZ = $this->getLocalZoneFromVideoID($videoId);
                     }
 
-                    if (is_numeric($videoId) && $videoId > 0 && is_numeric($traktid) && $traktid > 0) {
+                    if ((int) $videoId > 0 && (int) $traktid > 0) {
                         // Now that we have valid video and trakt ids, try to get the poster
                         //$this->getPoster($videoId, $traktid);
 

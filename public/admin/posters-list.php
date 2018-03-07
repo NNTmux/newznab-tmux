@@ -1,7 +1,8 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
+use Blacklight\http\AdminPage;
 use App\Models\MultigroupPoster;
 
 $page = new AdminPage();
@@ -10,7 +11,7 @@ $posters = MultigroupPoster::all('id', 'poster')->sortBy('poster');
 
 $postersCheck = $posters->first();
 
-$poster = isset($_REQUEST['poster']) && ! empty($_REQUEST['poster']) ? $_REQUEST['poster'] : '';
+$poster = request()->has('poster') && ! empty(request()->input('poster')) ? request()->input('poster') : '';
 
 $page->smarty->assign(
     [

@@ -108,7 +108,7 @@ class NZBImport
         ];
         $options += $defaults;
 
-        $this->echoCLI = (! $this->browser && env('echocli', true) && $options['Echo']);
+        $this->echoCLI = (! $this->browser && config('nntmux.echocli') && $options['Echo']);
         $this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
         $this->binaries = ($options['Binaries'] instanceof Binaries ? $options['Binaries'] : new Binaries(['Settings' => $this->pdo, 'Echo' => $this->echoCLI]));
         $this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));

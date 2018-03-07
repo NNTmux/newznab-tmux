@@ -1,41 +1,42 @@
 <?php
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use App\Models\Category;
 use Blacklight\Binaries;
+use Blacklight\http\AdminPage;
 
 $page = new AdminPage();
 $bin = new Binaries(['Settings' => $page->pdo]);
 $error = '';
 $regex = ['id' => '', 'groupname' => '', 'regex' => '', 'description' => '', 'msgcol' => 1, 'status' => 1, 'optype' => 1];
 
-switch ($_REQUEST['action'] ?? 'view') {
+switch (request()->input('action') ?? 'view') {
     case 'submit':
-        if ($_POST['groupname'] === '') {
+        if (request()->input('groupname') === '') {
             $error = 'Group must be a valid usenet group';
             break;
         }
 
-        if ($_POST['regex'] === '') {
+        if (request()->input('regex') === '') {
             $error = 'Regex cannot be empty';
             break;
         }
 
-        if ($_POST['id'] === '') {
-            $bin->addBlacklist($_POST);
+        if (request()->input('id') === '') {
+            $bin->addBlacklist(request()->all());
         } else {
-            $bin->updateBlacklist($_POST);
+            $bin->updateBlacklist(request()->all());
         }
 
         header('Location:'.WWW_TOP.'/binaryblacklist-list.php');
         break;
 
     case 'addtest':
-        if (isset($_GET['regex'], $_GET['groupname'])) {
+        if (request()->has('regex') && request()->has('groupname')) {
             $regex += [
-                    'groupname' => $_GET['groupname'],
-                    'regex'     => $_GET['regex'],
+                    'groupname' => request()->input('groupname'),
+                    'regex'     => request()->input('regex'),
                     'ordinal'   => 1,
                     'status'    => 1,
             ];
@@ -44,9 +45,9 @@ switch ($_REQUEST['action'] ?? 'view') {
 
     case 'view':
     default:
-        if (isset($_GET['id'])) {
+        if (request()->has('id')) {
             $page->title = 'Binary Black/Whitelist Edit';
-            $regex = $bin->getBlacklistByID($_GET['id']);
+            $regex = $bin->getBlacklistByID(request()->input('id'));
         } else {
             $page->title = 'Binary Black/Whitelist Add';
             $regex += [
