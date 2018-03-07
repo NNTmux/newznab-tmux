@@ -226,7 +226,7 @@ abstract class TV extends Videos
         }
 
         if ($videoId === false) {
-            $title = Video::query()->where('title', $show['title'])->first('title');
+            $title = Video::query()->where('title', $show['title'])->first(['title']);
             if ($title !== null) {
                 // Insert the Show
                 $videoId = Video::query()->insertGetId([
