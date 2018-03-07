@@ -217,7 +217,7 @@ abstract class TV extends Videos
         // Check if video already exists based on site ID info
         // if that fails be sure we're not inserting duplicates by checking the title
         foreach ($this->siteColumns as $column) {
-            if ($show[$column] > 0) {
+            if ((int) $show[$column] > 0) {
                 $videoId = $this->getVideoIDFromSiteID($column, $show[$column]);
             }
             if ($videoId !== false) {
@@ -226,35 +226,33 @@ abstract class TV extends Videos
         }
 
         if ($videoId === false) {
-            // Insert the Show
-            $videoId = Video::query()->insertGetId(
-                [
-                    'type' => $show['type'],
-                    'title' => $show['title'],
-                    'countries_id' => $show['country'] ?? '',
-                    'started' => $show['started'],
-                    'source' => $show['source'],
-                    'tvdb' => $show['tvdb'],
-                    'trakt' => $show['trakt'],
-                    'tvrage' => $show['tvrage'],
-                    'tvmaze' => $show['tvmaze'],
-                    'imdb' => $show['imdb'],
-                    'tmdb' => $show['tmdb'],
-                ]
-            );
-            // Insert the supplementary show info
-            TvInfo::query()
-                ->insert(
-                    [
-                        'videos_id' => $videoId,
-                        'summary' => $show['summary'],
-                        'publisher' => $show['publisher'],
-                        'localzone' => $show['localzone'],
-                    ]
-                );
-            // If we have AKAs\aliases, insert those as well
-            if (! empty($show['aliases'])) {
-                $this->addAliases($videoId, $show['aliases']);
+            $title = Video::query()->where('title', $show['title'])->first('title');
+            if ($title !== null) {
+                // Insert the Show
+                $videoId = Video::query()->insertGetId([
+                        'type' => $show['type'],
+                        'title' => $show['title'],
+                        'countries_id' => $show['country'] ?? '',
+                        'started' => $show['started'],
+                        'source' => $show['source'],
+                        'tvdb' => $show['tvdb'],
+                        'trakt' => $show['trakt'],
+                        'tvrage' => $show['tvrage'],
+                        'tvmaze' => $show['tvmaze'],
+                        'imdb' => $show['imdb'],
+                        'tmdb' => $show['tmdb'],
+                    ]);
+                // Insert the supplementary show info
+                TvInfo::query()->insert([
+                            'videos_id' => $videoId,
+                            'summary' => $show['summary'],
+                            'publisher' => $show['publisher'],
+                            'localzone' => $show['localzone'],
+                        ]);
+                // If we have AKAs\aliases, insert those as well
+                if (! empty($show['aliases'])) {
+                    $this->addAliases($videoId, $show['aliases']);
+                }
             }
         } else {
             // If a local match was found, just update missing video info
