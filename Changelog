@@ -1,4 +1,5 @@
 2018-03-07 DariusIII
+	* Fix: Fix wrong categories used in checkProcessTV function of Forking class
 	* Chg: Update Videos class getAliases function
 	* Chg: Revert to insertGetId usage
 	* Fix: Fix details page in Gamma theme

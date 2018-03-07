@@ -908,16 +908,16 @@ class Forking extends \fork_daemon
      */
     private function checkProcessTV()
     {
-        if (Settings::settingValue('..lookuptvrage') > 0) {
+        if ((int) Settings::settingValue('..lookuptvrage') > 0) {
             return $this->pdo->queryOneRow(sprintf('
 						SELECT id
 						FROM releases
-						WHERE categories_id BETWEEN 3000 AND 53999
+						WHERE categories_id BETWEEN 5000 AND 5999
 						AND nzbstatus = %d
 						AND size > 1048576
 						AND tv_episodes_id BETWEEN -2 AND 0
 						%s %s
-						LIMIT 1', NZB::NZB_ADDED, (int) Settings::settingValue('..lookuptvrage') === 2 ? 'AND isrenamed = 1' : '', $this->ppRenamedOnly ? 'AND isrenamed = 1' : '')) !== false;
+						', NZB::NZB_ADDED, (int) Settings::settingValue('..lookuptvrage') === 2 ? 'AND isrenamed = 1' : '', $this->ppRenamedOnly ? 'AND isrenamed = 1' : '')) !== false;
         }
 
         return false;
