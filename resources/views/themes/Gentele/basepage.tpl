@@ -32,9 +32,9 @@
 	<link href="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
 	<link href="{$smarty.const.WWW_ASSETS}/animate.css/animate.min.css" rel="stylesheet">
 	<!-- Normalize.css -->
-	<link href="{$smarty.const.WWW_TOP}/shared/css/normalize.css" rel="stylesheet" type="text/css">
+	<link href="{$smarty.const.WWW_ASSETS}/css/normalize.css" rel="stylesheet" type="text/css">
 	<!-- Custom styling plus plugins -->
-	<link href="{$smarty.const.WWW_TOP}/shared/css/custom.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_ASSETS}/css/custom.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_ASSETS}/icheck/skins/flat/green.css" rel="stylesheet">
 	<link href="{$smarty.const.WWW_ASSETS}/qtip2-main/dist/jquery.qtip.min.css" type="text/css"
 		  media="screen"/>
@@ -62,7 +62,7 @@
 				<div class="profile">
 
 						<div class="profile_pic">
-							<img src="{$smarty.const.WWW_TOP}/shared/images/userimage.png" alt="User Image"
+							<img src="{$smarty.const.WWW_ASSETS}/images/userimage.png" alt="User Image"
 								 class="img-circle profile_img">
 						</div>
 						<div class="profile_info">
@@ -200,11 +200,11 @@
 <!-- newznab default scripts, needed for stuff to work -->
 <script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/jquery.qtip2.js"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/sorttable.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.qtip2.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/sorttable.js"></script>
 <!-- Custom functions -->
-<script src="{$smarty.const.WWW_TOP}/shared/js/functions.js" type="text/javascript"></script>
-<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/custom.js"></script>
+<script src="{$smarty.const.WWW_ASSETS}/js/functions.js" type="text/javascript"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/custom.js"></script>
 
 <!-- PNotify -->
 <script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.js"></script>

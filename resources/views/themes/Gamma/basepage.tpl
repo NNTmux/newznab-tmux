@@ -30,16 +30,16 @@
 
 	<!-- FAVICON -->
 	<link rel="search" type="application/opensearchdescription+xml" href="/opensearch" title="{$site->title|escape}" />
-	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/shared/images/favicon.ico"/>
+	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_ASSETS}/images/favicon.ico"/>
 
 	<!-- Javascripts -->
 	<!-- jQuery 3.1.0 -->
 	<script src="{$smarty.const.WWW_ASSETS}/jquery-2.2.x/dist/jquery.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/jquery.qtip2.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.qtip2.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/sorttable.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/sorttable.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 	<!-- Added the Bootstrap JS -->
 	<script type="text/javascript"
@@ -48,7 +48,7 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/scripts/utils.js"></script>
 	<!-- Pines Notify -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/jquery.pnotify.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.pnotify.js"></script>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>

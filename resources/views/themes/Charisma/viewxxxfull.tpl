@@ -18,7 +18,7 @@
 				{else}
 					<img class="pull-right" style="margin-right:50px; max-height:278px;"
 						 alt="{$result.title|escape:"htmlall"} Logo"
-						 src="{$smarty.const.WWW_TOP}/shared/images/nomoviecover.jpg"/>
+						 src="{$smarty.const.WWW_ASSETS}/images/nomoviecover.jpg"/>
 				{/if}
 				<span class="h1" style="display:inline;">{$result.title|escape:"htmlall"}</span>
 				<h4>{if $result.genre != ''}{$result.genre|replace:"|":" / "}{/if}</h4>

@@ -30,10 +30,10 @@
 	<link href="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
 	<link href="{$smarty.const.WWW_ASSETS}/animate.css/animate.min.css" rel="stylesheet">
 	<!-- Qtip2 CSS -->
-	<link href="{$smarty.const.WWW_TOP}/shared/css/jquery.qtip.css" rel="stylesheet"
+	<link href="{$smarty.const.WWW_ASSETS}/css/jquery.qtip.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- Normalize.css -->
-	<link href="{$smarty.const.WWW_TOP}/shared/css/normalize.css" rel="stylesheet" type="text/css">
+	<link href="{$smarty.const.WWW_ASSETS}/css/normalize.css" rel="stylesheet" type="text/css">
 	<!-- Ionicons -->
 	<link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css"/>
 	<!-- Theme style -->
@@ -97,7 +97,7 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<!-- The user image in the navbar-->
 								{if $loggedin == "true"}
-								<img src="{$smarty.const.WWW_TOP}/shared/images/userimage.png"
+								<img src="{$smarty.const.WWW_ASSETS}/images/userimage.png"
 									 class="user-image" alt="User Image"/>
 								<!-- hidden-xs hides the username on small devices so only the image appears. -->
 								<span class="hidden-xs">{$userdata.username}</span>
@@ -105,7 +105,7 @@
 							<ul class="dropdown-menu">
 								<!-- The user image in the menu -->
 								<li class="user-header">
-									<img src="{$smarty.const.WWW_TOP}/shared/images/userimage.png"
+									<img src="{$smarty.const.WWW_ASSETS}/images/userimage.png"
 										 class="img-circle" alt="User Image"/>
 									<p>
 										{$userdata.username}
@@ -163,7 +163,7 @@
 				{if $loggedin == "true"}
 				<div class="user-panel">
 					<div class="pull-left image">
-						<img src="{$smarty.const.WWW_TOP}/shared/images/user-loggedin.png" class="img-circle"
+						<img src="{$smarty.const.WWW_ASSETS}/images/user-loggedin.png" class="img-circle"
 							 alt="User Image"/>
 					</div>
 					<div class="pull-left info">
@@ -291,10 +291,10 @@
 	<!-- newznab default scripts, needed for stuff to work -->
 	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/colorbox/jquery.colorbox-min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/jquery.qtip2.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/sorttable.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.qtip2.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/sorttable.js"></script>
 	<!-- Custom functions -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/shared/js/functions.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/functions.js"></script>
 	<!-- PNotify -->
 	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.animate.js"></script>

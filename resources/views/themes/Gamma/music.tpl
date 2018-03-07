@@ -181,7 +181,7 @@
 												{if $weHasVortex}
 													<li>
 														<a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#" title="Send to NZBVortex">
-															<img src="{$smarty.const.WWW_TOP}/shared/images/icons/vortex/bigsmile.png">
+															<img src="{$smarty.const.WWW_ASSETS}/images/icons/vortex/bigsmile.png">
 														</a>
 													</li>
 												{/if}

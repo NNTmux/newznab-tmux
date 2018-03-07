@@ -83,7 +83,7 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
 																class="cover img-responsive img-rounded"
-																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_TOP}/shared/images/no-cover.png{/if}"
+																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
 														<i class="zmdi zmdi-alarm" style="color: red"
@@ -96,7 +96,7 @@
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
 														><img
-																	src="{$smarty.const.WWW_TOP}/shared/images/icons/ade.png"
+																	src="{$smarty.const.WWW_ASSETS}/images/icons/ade.png"
 																	width="100"></a>
 													{/if}
 													{if $result.classused == "adm"}
@@ -106,7 +106,7 @@
 																name="viewadm{$result.title}"
 																title="View AdultDVDMarketplace page"
 														><img
-																	src="{$smarty.const.WWW_TOP}/shared/images/icons/adm.png"
+																	src="{$smarty.const.WWW_ASSETS}/images/icons/adm.png"
 																	width="100"></a>
 													{/if}
 													{if $result.classused == "aebn"}
@@ -115,7 +115,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewaebn{$result.title}"
 																title="View AEBN page"
-														><img src="{$smarty.const.WWW_TOP}/shared/images/icons/aebn.png"
+														><img src="{$smarty.const.WWW_ASSETS}/images/icons/aebn.png"
 															  width="100"></a>
 													{/if}
 													{if $result.classused == "hotm"}
@@ -124,7 +124,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewhm{$result.title}"
 																title="View HotMovies page"
-														><img src="{$smarty.const.WWW_TOP}/shared/images/icons/hotmovies.png"
+														><img src="{$smarty.const.WWW_ASSETS}/images/icons/hotmovies.png"
 															  width="100"></a>
 													{/if}
 													{if $result.classused == "pop"}
@@ -133,7 +133,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewpop{$result.id}"
 																title="View Popporn page"
-														><img src="{$smarty.const.WWW_TOP}/shared/images/icons/popporn.png"
+														><img src="{$smarty.const.WWW_ASSETS}/images/icons/popporn.png"
 															  width="100"></a>
 													{/if}
 													{if $mnfo[$m@index] > 0}<a
@@ -230,7 +230,7 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"><img
 																class="cover img-responsive img-rounded"
-																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_TOP}/shared/images/no-cover.png{/if}"
+																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="140" border="0"
 																alt="{$result.title|escape:"htmlall"}"/>{if !empty($mfailed[$m@index])}
 														<i class="zmdi zmdi-alarm" style="color: red"
@@ -243,7 +243,7 @@
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
 														><img
-																	src="{$smarty.const.WWW_TOP}/shared/images/icons/ade.png"
+																	src="{$smarty.const.WWW_ASSETS}/images/icons/ade.png"
 																	width="100"></a>
 													{/if}
 													{if $result.classused == "adm"}
@@ -253,7 +253,7 @@
 																name="viewadm{$result.title}"
 																title="View AdultDVDMarketplace page"
 														><img
-																	src="{$smarty.const.WWW_TOP}/shared/images/icons/adm.png"
+																	src="{$smarty.const.WWW_ASSETS}/images/icons/adm.png"
 																	width="100"></a>
 													{/if}
 													{if $result.classused == "aebn"}
@@ -262,7 +262,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewaebn{$result.title}"
 																title="View AEBN page"
-														><img src="{$smarty.const.WWW_TOP}/shared/images/icons/aebn.png"
+														><img src="{$smarty.const.WWW_ASSETS}/images/icons/aebn.png"
 															  width="100"></a>
 													{/if}
 													{if $result.classused == "hotm"}
@@ -271,7 +271,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewhm{$result.title}"
 																title="View HotMovies page"
-														><img src="{$smarty.const.WWW_TOP}/shared/images/icons/hotmovies.png"
+														><img src="{$smarty.const.WWW_ASSETS}/images/icons/hotmovies.png"
 															  width="100"></a>
 													{/if}
 													{if $result.classused == "pop"}
@@ -280,7 +280,7 @@
 																href="{$site->dereferrer_link}{$result.directurl}"
 																name="viewpop{$result.id}"
 																title="View Popporn page"
-														><img src="{$smarty.const.WWW_TOP}/shared/images/icons/popporn.png"
+														><img src="{$smarty.const.WWW_ASSETS}/images/icons/popporn.png"
 															  width="100"></a>
 													{/if}
 													{if $mnfo[$m@index] > 0}<a

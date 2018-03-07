@@ -86,7 +86,7 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover img-responsive img-rounded"
-																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}/shared/images/no-cover.png{/if}"
+																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed for some users"></i>{/if}</a>
 													<a target="_blank"
@@ -212,7 +212,7 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"><img
 																class="cover img-responsive img-rounded"
-																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}/shared/images/no-cover.png{/if}"
+																src="{if isset($result.cover) && $result.cover == 1}{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_ASSETS}/images/no-cover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/> {if !empty($mfailed[$m@index])} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}</a>
 													<a target="_blank"

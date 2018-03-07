@@ -220,15 +220,15 @@
 								{release_flag($result.searchname, browse)}
 								{if $result.passwordstatus == 1}
 									<img title="RAR/ZIP Possibly Passworded."
-										 src="{$smarty.const.WWW_TOP}/shared/images/icons/lock2.png"
+										 src="{$smarty.const.WWW_ASSETS}/images/icons/lock2.png"
 										 alt="RAR/ZIP Possibly Passworded.">
 								{elseif $result.passwordstatus == 2}
 									<img title="RAR/ZIP Possibly Damaged."
-										 src="{$smarty.const.WWW_TOP}/shared/images/icons/broken.png"
+										 src="{$smarty.const.WWW_ASSETS}/images/icons/broken.png"
 										 alt="RAR/ZIP Possibly Damaged.">
 								{elseif $result.passwordstatus == 10}
 									<img title="RAR/ZIP is Passworded."
-										 src="{$smarty.const.WWW_TOP}/shared/images/icons/lock.gif"
+										 src="{$smarty.const.WWW_ASSETS}/images/icons/lock.gif"
 										 alt="RAR/ZIP is Passworded.">
 								{/if}
 								{if $result.videostatus > 0}
@@ -312,7 +312,7 @@
 						   href="{$smarty.const.WWW_TOP}/filelist/{$result.guid}">{$result.totalpart}</a>
 						{if $result.rarinnerfilecount > 0}
 							<div class="rarfilelist">
-								<img src="{$smarty.const.WWW_TOP}/shared/images/icons/magnifier.png"
+								<img src="{$smarty.const.WWW_ASSETS}/images/icons/magnifier.png"
 									 alt="{$result.guid}">
 							</div>
 						{/if}

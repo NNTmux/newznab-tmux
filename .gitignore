@@ -18,4 +18,7 @@ test.php
 /resources/covers/*
 /resources/nzb/*
 /resources/tmp/*
-/public/assets/
+/public/assets/*
+!/public/assets/js/
+!/public/assets/css/
+!/public/assets/images/

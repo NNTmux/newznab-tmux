@@ -201,7 +201,7 @@
 				<i class="fa fa-lock"></i>
 				{/if}
 				{if isset($result.nuketype) && $result.nuketype != ''}
-				&nbsp;<img title="{$result.nuketype}" src="{$smarty.const.WWW_TOP}/shared/images/icons/nuke.png" width="10" height="10" alt="{$result.nuketype}" />
+				&nbsp;<img title="{$result.nuketype}" src="{$smarty.const.WWW_ASSETS}/images/icons/nuke.png" width="10" height="10" alt="{$result.nuketype}" />
 				{/if}
 				<div class="resextra">
 					<div class="btns">{strip}
@@ -283,7 +283,7 @@
                     {if $weHasVortex}
                         <li>
                             <a class="icon icon_nzb fa fa-cloud-downloadvortex" href="#" title="Send to NZBVortex">
-                                <img class="icon icon_nzb fa fa-cloud-downloadvortex" alt="Send to my NZBVortex" src="{$smarty.const.WWW_TOP}/shared/images/icons/vortex/bigsmile.png">
+                                <img class="icon icon_nzb fa fa-cloud-downloadvortex" alt="Send to my NZBVortex" src="{$smarty.const.WWW_ASSETS}/images/icons/vortex/bigsmile.png">
                             </a>
                         </li>
                     {/if}
