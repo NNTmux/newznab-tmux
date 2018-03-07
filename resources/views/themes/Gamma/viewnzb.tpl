@@ -292,7 +292,7 @@
 
 				<dt>Category</dt>
 				<dd><a title="Browse by {$release.category_name}" href="{$smarty.const.WWW_TOP}/browse?t={$release.categories_id}">{$release.category_name}</a></dd>
-				{if $nfo.releases_id|@count > 0}
+				{if !empty($nfo.nfo)}
 					<dt>Nfo</dt>
 					<dd><a href="{$smarty.const.WWW_TOP}/nfo/{$release.guid}" title="View Nfo">View Nfo</a></dd>
 				{/if}

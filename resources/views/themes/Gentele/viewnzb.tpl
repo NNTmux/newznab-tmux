@@ -612,7 +612,7 @@
 								<pre id="nfo">{$nfo.nfo}</pre>
 							</div>
 							<div id="pane4" class="tab-pane">
-								{if isset($similars) && $similars|@count > 1}
+								{if isset($similars)}
 									Similar:
 									<ul>
 										{foreach $similars as $similar}
