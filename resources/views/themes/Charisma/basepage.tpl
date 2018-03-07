@@ -30,15 +30,15 @@
 	<!-- The styles -->
 	<link id="bs-css" href="{$smarty.const.WWW_ASSETS}/bootswatch/slate/bootstrap.min.css"
 		  rel="stylesheet">
-	<link href="{$smarty.const.WWW_THEMES}/{$theme}/css/charisma-app.css" rel="stylesheet">
+	<link href="{$smarty.const.WWW_ASSETS}/{$theme}/css/charisma-app.css" rel="stylesheet">
 	<link href='{$smarty.const.WWW_ASSETS}/chosen/chosen.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_ASSETS}/colorbox/example3/colorbox.css'
 		  rel='stylesheet'>
 	<link href='{$smarty.const.WWW_ASSETS}/responsive-tables-js/dist/responsivetables.css'
 		  rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.min.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/elfinder.theme.css' rel='stylesheet'>
-	<link href='{$smarty.const.WWW_THEMES}/{$theme}/css/jquery.iphone.toggle.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_ASSETS}/{$theme}/css/elfinder.min.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_ASSETS}/{$theme}/css/elfinder.theme.css' rel='stylesheet'>
+	<link href='{$smarty.const.WWW_ASSETS}/{$theme}/css/jquery.iphone.toggle.css' rel='stylesheet'>
 	<link href="{$smarty.const.WWW_ASSETS}/pnotify/dist/pnotify.css" rel="stylesheet" type="text/css"/>
 	<link href="{$smarty.const.WWW_ASSETS}/animate.css/animate.min.css" rel="stylesheet">
 	<!-- flexboxgrid -->
@@ -188,7 +188,7 @@
 <script type="text/javascript"
 		src="{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 <!-- library for cookie management -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.cookie.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.cookie.js"></script>
 <!-- data table plugin -->
 <script type="text/javascript"
 		src='{$smarty.const.WWW_ASSETS}/datatables/media/js/jquery.dataTables.min.js'></script>
@@ -201,19 +201,19 @@
 <script type="text/javascript"
 		src="{$smarty.const.WWW_ASSETS}/responsive-tables-js/dist/responsivetables.js"></script>
 <!-- for iOS style toggle switch -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.iphone.toggle.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.iphone.toggle.js"></script>
 <!-- icheck -->
 <script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/icheck/icheck.min.js"></script>
 <!-- autogrowing textarea plugin -->
 <script type="text/javascript"
-		src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.autogrow-textarea.js"></script>
+		src="{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.autogrow-textarea.js"></script>
 <!-- tinymce editor -->
 <script type="text/javascript"
 		src="{$smarty.const.WWW_ASSETS}/tinymce-builded/js/tinymce/tinymce.min.js"></script>
 <!-- history.js for cross-browser state change on ajax -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/jquery.history.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/{$theme}/js/jquery.history.js"></script>
 <!-- Charisma functions -->
-<script type="text/javascript" src="{$smarty.const.WWW_THEMES}/{$theme}/js/charisma.js"></script>
+<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/{$theme}/js/charisma.js"></script>
 <!-- newznab default scripts, needed for stuff to work -->
 <script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/autosize/dist/autosize.min.js"></script>
 <script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/js/jquery.qtip2.js"></script>

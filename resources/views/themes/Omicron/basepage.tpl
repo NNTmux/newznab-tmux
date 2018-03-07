@@ -37,12 +37,12 @@
 	<!-- Ionicons -->
 	<link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css"/>
 	<!-- Theme style -->
-	<link href="{$smarty.const.WWW_THEMES}/{$theme}/dist/css/AdminLTE.css" rel="stylesheet" type="text/css"/>
+	<link href="{$smarty.const.WWW_ASSETS}/{$theme}/dist/css/AdminLTE.css" rel="stylesheet" type="text/css"/>
 	<!-- AdminLTE Skins. We have chosen the skin-blue for this starter
 		  page. However, you can choose any other skin. Make sure you
 		  apply the skin class to the body tag so the changes take effect.
 	-->
-	<link href="{$smarty.const.WWW_THEMES}/{$theme}/dist/css/skins/skin-blue.min.css" rel="stylesheet" type="text/css"/>
+	<link href="{$smarty.const.WWW_ASSETS}/{$theme}/dist/css/skins/skin-blue.min.css" rel="stylesheet" type="text/css"/>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
@@ -276,7 +276,7 @@
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_ASSETS}/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
 	<!-- AdminLTE App -->
-	<script src="{$smarty.const.WWW_THEMES}/{$theme}/dist/js/app.min.js" type="text/javascript"></script>
+	<script src="{$smarty.const.WWW_ASSETS}/{$theme}/dist/js/app.min.js" type="text/javascript"></script>
 	<!-- jQuery migrate script -->
 	<script type="text/javascript" src="{$smarty.const.WWW_ASSETS}/jquery-migrate-1.4.x/jquery-migrate.min.js"></script>
 	<!-- SlimScroll script -->
