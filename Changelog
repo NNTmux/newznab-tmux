@@ -1,4 +1,5 @@
 2018-03-07 DariusIII
+	* Fix: Fix admin pages
 	* Chg: Move css/js/images into assets folder
 2018-03-06 DariusIII
 	* Chg: Update themes, move css/js/images to public folder, fix themes display
