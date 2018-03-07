@@ -42,7 +42,7 @@ return [
     'right_delimiter'                     => '}',
 
     // path info
-    'template_path'                       => base_path().'/public/themes',
+    'template_path'                       => base_path().'/resources/views/themes',
 
     // smarty cache directory
     'cache_path'                          => storage_path().'/framework/smarty/cache',

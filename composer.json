@@ -31,8 +31,8 @@
     "optimize-autoloader": true,
     "fxp-asset" : {
       "installer-paths": {
-        "npm-asset-library": "public/themes/shared/assets",
-        "bower-asset-library": "public/themes/shared/assets"
+        "npm-asset-library": "public/assets",
+        "bower-asset-library": "public/assets"
       }
     }
   },

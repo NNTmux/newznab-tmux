@@ -1,4 +1,14 @@
+2018-03-07 DariusIII
+	* Fix: Fix details page in Gamma theme
+	* Fix: Move theme specific css/js to their own folder in assets
+	* Fix: Fix admin pages
+	* Chg: Move css/js/images into assets folder
 2018-03-06 DariusIII
+	* Chg: Update themes, move css/js/images to public folder, fix themes display
+	* Chg: Use WWW_ASSETS constant in themes
+	* Chg: Define WWW_ASSETS smarty constant
+	* Chg: Move assets to public/assets folder, update .gitignore
+	* Chg: Move themes to resources/views/themes folder
 	* Chg: Update Captcha class
 	* Chg: Update admin area pages
 	* Chg: Move BasePage, AdminPage and Page to Blacklight\http

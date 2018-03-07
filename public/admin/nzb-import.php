@@ -5,7 +5,7 @@ if (PHP_SAPI === 'cli') {
     exit('This is a web only script, run misc/testing/nzb-import.php instead.');
 }
 
-require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'smarty.php';
+require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'resources/views/themes/smarty.php';
 
 use Blacklight\NZBImport;
 use Blacklight\http\AdminPage;

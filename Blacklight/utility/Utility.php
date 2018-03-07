@@ -167,12 +167,10 @@ class Utility
     public static function getThemesList(): array
     {
         $ignoredThemes = ['admin', 'shared'];
-        $themes = scandir(NN_THEMES, SCANDIR_SORT_ASCENDING);
+        $themes = scandir(base_path().'/resources/views/themes', SCANDIR_SORT_ASCENDING);
         $themelist[] = 'None';
         foreach ($themes as $theme) {
-            if (strpos($theme, '.') === false &&
-                is_dir(NN_THEMES.$theme) && ! \in_array($theme, $ignoredThemes, false)
-            ) {
+            if (strpos($theme, '.') === false && ! \in_array($theme, $ignoredThemes, false) && is_dir(base_path().'/resources/views/themes/'.$theme)) {
                 $themelist[] = $theme;
             }
         }
