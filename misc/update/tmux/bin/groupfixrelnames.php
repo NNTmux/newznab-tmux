@@ -11,7 +11,6 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
-use Blacklight\MiscSorter;
 use Blacklight\NZBContents;
 use Blacklight\processing\PostProcess;
 use Illuminate\Support\Facades\DB as DBFacade;
