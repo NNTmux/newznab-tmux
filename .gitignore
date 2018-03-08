@@ -15,9 +15,9 @@ test.php
 
 /.idea/
 /vendor/*
-/resources/covers/*
 /resources/nzb/*
 /resources/tmp/*
+!/resources/tmp/unrar/
 /public/assets/*
 !/public/assets/js/
 !/public/assets/css/
