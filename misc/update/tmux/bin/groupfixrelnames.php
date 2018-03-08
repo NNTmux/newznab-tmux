@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
+use Blacklight\MiscSorter;
 use Blacklight\NZBContents;
 use Blacklight\processing\PostProcess;
 use Illuminate\Support\Facades\DB as DBFacade;
@@ -73,10 +74,6 @@ switch (true) {
 						OR r.proc_hash16k = %d
 						OR
 						(
-							r.nfostatus = %5\$d
-						)
-						OR
-						(
 							r.ishashed = 1
 							AND r.dehashstatus BETWEEN -6 AND 0
 						)
@@ -93,7 +90,6 @@ switch (true) {
                 NZB::NZB_ADDED,
                 NameFixer::IS_RENAMED_NONE,
                 Nfo::NFO_UNPROC,
-                Nfo::NFO_FOUND,
                 NameFixer::PROC_NFO_NONE,
                 NameFixer::PROC_FILES_NONE,
                 NameFixer::PROC_UID_NONE,
