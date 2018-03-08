@@ -155,13 +155,13 @@ function release_flag($text, $page)
     }
 
     if ($code !== '' && $page === 'browse') {
-        $www = WWW_THEMES;
+        $www = WWW_TOP;
         if (! in_array(substr($www, -1), ['\\', '/'], false)) {
             $www .= DS;
         }
 
         return
-            '<img title="'.$language.'" alt="'.$language.'" src="'.$www.'shared/images/flags/'.$code.'.png"/>';
+            '<img title="'.$language.'" alt="'.$language.'" src="'.$www.'assets/images/flags/'.$code.'.png"/>';
     }
 
     if ($page === 'search') {
