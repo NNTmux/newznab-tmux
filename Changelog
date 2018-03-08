@@ -1,4 +1,5 @@
 2018-03-08 DariusIII
+	* Chg: Add code coverage report
 	* Chg: Remove MiscSorter processed releases check from groupfixrelnames.php
 	* Chg: Update nntmux install command
 	* Chg: Update ytake-laravel-smarty.php

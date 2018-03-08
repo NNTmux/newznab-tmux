@@ -20,4 +20,7 @@
             <file>./Blacklight/config/settings.example.php></file>
         </exclude>
     </filter>
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
 </phpunit>
