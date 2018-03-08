@@ -11,9 +11,9 @@ use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
-use Blacklight\MiscSorter;
 use Blacklight\NZBContents;
 use Blacklight\processing\PostProcess;
+use Illuminate\Support\Facades\DB as DBFacade;
 
 $pdo = new DB();
 
@@ -22,16 +22,15 @@ if (! isset($argv[1])) {
 }
 $nameFixer = new NameFixer(['Settings' => $pdo]);
 $pieces = explode(' ', $argv[1]);
-$guidChar = $pieces[1];
-$maxPerRun = $pieces[2];
-$thread = $pieces[3];
+[$guidChar, $maxPerRun, $thread] = $pieces;
 
 switch (true) {
 
     case $pieces[0] === 'standard' && $guidChar !== null && $maxPerRun !== null && is_numeric($maxPerRun):
 
         // Allow for larger filename return sets
-        $pdo->queryExec('SET SESSION group_concat_max_len = 32768');
+        DBFacade::unprepared('SET SESSION group_concat_max_len = 32768');
+        DBFacade::commit();
 
         // Find releases to process.  We only want releases that have no PreDB match, have not been renamed, exist
         // in Other Categories, have already been PP Add/NFO processed, and haven't been fully fixRelName processed
@@ -75,7 +74,6 @@ switch (true) {
 						OR
 						(
 							r.nfostatus = %5\$d
-							AND r.proc_sorter = %d
 						)
 						OR
 						(
@@ -102,7 +100,6 @@ switch (true) {
                 NameFixer::PROC_PAR2_NONE,
                 NameFixer::PROC_SRR_NONE,
                 NameFixer::PROC_HASH16K_NONE,
-                MiscSorter::PROC_SORTER_NONE,
                 Category::getCategoryOthersGroup(),
                 $maxPerRun
             )
@@ -254,7 +251,7 @@ switch (true) {
         if ($pres instanceof \Traversable) {
             foreach ($pres as $pre) {
                 $nameFixer->done = $nameFixer->matched = false;
-                $ftmatched = $searched = 0;
+                $searched = 0;
                 $ftmatched = $nameFixer->matchPredbFT($pre, true, 1, true, 1);
                 if ($ftmatched > 0) {
                     $searched = 1;

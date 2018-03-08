@@ -1,4 +1,5 @@
 2018-03-08 DariusIII
+	* Chg: Remove MiscSorter processed releases check from groupfixrelnames.php
 	* Chg: Update nntmux install command
 	* Chg: Update ytake-laravel-smarty.php
 	* Chg: Uningnore folders and remove gitmodules file (unused because it is related to li3 we do not use anymore)
