@@ -89,6 +89,7 @@ switch (true) {
                 NZB::NZB_ADDED,
                 NameFixer::IS_RENAMED_NONE,
                 Nfo::NFO_UNPROC,
+                Nfo::NFO_FOUND,
                 NameFixer::PROC_NFO_NONE,
                 NameFixer::PROC_FILES_NONE,
                 NameFixer::PROC_UID_NONE,
