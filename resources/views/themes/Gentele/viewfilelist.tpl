@@ -15,7 +15,7 @@
 			<tr class="{cycle values=",alt"}">
 				<td width="20">{$smarty.foreach.iteration.index+1}</td>
 				<td>{$file.title|escape:'htmlall'}</td>
-				{assign var="icon" value='themes/shared/images/fileicons/'|cat:$file.ext|cat:".png"}
+				{assign var="icon" value='assets/images/fileicons/'|cat:$file.ext|cat:".png"}
 				{if $file.ext == "" || !is_file("$icon")}
 					{assign var="icon" value='file'}
 				{else}

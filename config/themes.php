@@ -11,7 +11,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'themes_path' => 'public/themes', // eg: base_path('resources/themes')
+    'themes_path' => 'resources/views/themes', // eg: base_path('resources/themes')
 
 	/*
 	|--------------------------------------------------------------------------
@@ -60,28 +60,28 @@ return [
 	'themes' => [
 	    'Charisma' => [
 	        'extends' => null,
-            'views-path' => 'Charisma',
-            'asset-path' => 'public/themes/shared/assets',
+            'views-path' => 'resources/views/themes/Charisma',
+            'asset-path' => 'public/assets/Charisma',
         ],
         'Gamma' => [
             'extends' => null,
-            'views-path' => 'Gamma',
-            'asset-path' => 'public/themes/shared/assets',
+            'views-path' => 'resources/views/themes/Gamma',
+            'asset-path' => 'public/assets/Gamma',
         ],
         'Gentele' => [
             'extends' => null,
-            'views-path' => 'Gentele',
-            'asset-path' => 'public/themes/shared/assets',
+            'views-path' => 'resources/views/themes/Gentele',
+            'asset-path' => 'public/assets',
         ],
         'Omicron' => [
             'extends' => null,
-            'views-path' => 'Omicron',
-            'asset-path' => 'public/themes/shared/assets',
+            'views-path' => 'resources/views/themes/Omicron',
+            'asset-path' => 'public/assets/Omicron',
         ],
         'admin' => [
             'extends' => null,
-            'views-path' => 'admin',
-            'asset-path' => 'public/themes/shared/assets',
+            'views-path' => 'resources/views/themes/admin',
+            'asset-path' => 'public/assets',
         ],
 
                 // Add your themes here. These settings will override theme.json settings defined for each theme

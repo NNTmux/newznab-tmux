@@ -333,7 +333,7 @@ class XML_Response
     protected function includeImage(): void
     {
         $this->xml->startElement('image');
-        $this->xml->writeAttribute('url', $this->server['server']['url'].'themes/shared/images/logo.png');
+        $this->xml->writeAttribute('url', $this->server['server']['url'].'assets/images/logo.png');
         $this->xml->writeAttribute('title', $this->server['server']['title']);
         $this->xml->writeAttribute('link', $this->server['server']['url']);
         $this->xml->writeAttribute(

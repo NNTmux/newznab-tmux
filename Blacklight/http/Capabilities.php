@@ -140,7 +140,7 @@ abstract class Capabilities
                 'email'      => Settings::settingValue('site.main.email'),
                 'meta'       => Settings::settingValue('site.main.metakeywords'),
                 'url'        => $serverroot,
-                'image'      => $serverroot.'themes/shared/images/tmux_logo.png',
+                'image'      => $serverroot.'assets/images/tmux_logo.png',
             ],
             'limits' => [
                 'max'     => 100,
