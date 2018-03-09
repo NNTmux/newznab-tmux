@@ -22,7 +22,9 @@ if (! isset($argv[1])) {
 }
 $nameFixer = new NameFixer(['Settings' => $pdo]);
 $pieces = explode(' ', $argv[1]);
-[$guidChar, $maxPerRun, $thread] = $pieces;
+$guidChar = $pieces[1];
+$maxPerRun = $pieces[2];
+$thread = $pieces[3];
 
 switch (true) {
 
