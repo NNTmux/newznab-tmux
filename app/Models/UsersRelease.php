@@ -41,12 +41,12 @@ class UsersRelease extends Model
      */
     public static function addCart($uid, $releaseid): int
     {
-        return self::create(
+        return self::query()->insertGetId(
             [
                 'users_id' => $uid,
                 'releases_id' => $releaseid,
             ]
-        )->id;
+        );
     }
 
     /**
@@ -77,7 +77,7 @@ class UsersRelease extends Model
             }
         }
 
-        return self::query()->whereIn('releases_id', $del)->where('users_id', $userID)->delete();
+        return self::query()->whereIn('releases_id', $del)->where('users_id', $userID)->delete() === 1;
     }
 
     /**

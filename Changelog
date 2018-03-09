@@ -1,4 +1,5 @@
 2018-03-09 DariusIII
+	* Chg: Return bool on deletion from cart in delCartByGuid function
 	* Chg: Use str_finish in SmartyUtils class
 	* Fix: Fix blank page on single release deletion from my download basket page (cart)
 	* Chg: Update .env.example
