@@ -24,13 +24,13 @@ if (request()->has('add')) {
     }
 } elseif (request()->has('delete')) {
     if (request()->has('delete') && ! empty(request()->input('delete'))) {
-        $ids = [request()->input('delete')];
+        $ids = (array) request()->input('delete');
     } elseif (request()->has('delete') && is_array(request()->input('delete'))) {
         $ids = request()->input('delete');
     }
 
-    if ($ids !== null) {
-        UsersRelease::delCartByGuid($ids, User::currentUserId());
+    if ($ids !== null && UsersRelease::delCartByGuid($ids, User::currentUserId())) {
+        header('Location: '.WWW_TOP.'/cart');
     }
 
     if (! request()->has('delete')) {
