@@ -1,4 +1,5 @@
 2018-03-09 DariusIII
+	* Chg: Update phpunit.xml
 	* Chg: Possible fix for code coverage report
 	* Chg: Update laravel/tinker to version 1.0.5
 2018-03-08 DariusIII
