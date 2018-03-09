@@ -2,19 +2,19 @@
 
 require_once dirname(__DIR__, 4).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use App\Models\Release;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\NNTP;
 use App\Models\Predb;
+use App\Models\Release;
 use App\Models\Category;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\NameFixer;
 use Blacklight\NZBContents;
-use Blacklight\processing\PostProcess;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Blacklight\processing\PostProcess;
 
 if (! isset($argv[1])) {
     exit(ColorCLI::error('This script is not intended to be run manually, it is called from Multiprocessing.'));
@@ -51,7 +51,7 @@ switch (true) {
                     'releases.dehashstatus',
                     'releases.nfostatus',
                     'releases.size as relsize',
-                    'releases.predb_id'
+                    'releases.predb_id',
                 ]
             )
             ->selectRaw('IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash')
@@ -81,7 +81,8 @@ switch (true) {
                     ->orWhere('releases.proc_hash16k', NameFixer::PROC_HASH16K_NONE)
                     ->orwhere('releases.isrenamed', '=', 1)
                     ->whereBetween('releases.dehashstatus', [-6, 0])
-                    ->orWhereRaw("releases.name REGEXP '[a-z0-9]{32,64}' AND re.mediainfo REGEXP '\<Movie_name\>'");})
+                    ->orWhereRaw("releases.name REGEXP '[a-z0-9]{32,64}' AND re.mediainfo REGEXP '\<Movie_name\>'");
+            })
             ->whereIn('releases.categories_id', Category::OTHERS_GROUP)
             ->groupBy('releases.id')
             ->orderByDesc('releases.id')
