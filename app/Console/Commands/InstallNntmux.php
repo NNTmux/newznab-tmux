@@ -43,10 +43,6 @@ class InstallNntmux extends Command
      */
     public function handle()
     {
-        if (! \defined('NN_INSTALLER')) {
-            \define('NN_INSTALLER', true);
-        }
-
         $error = false;
 
         if (env('DB_SYSTEM') !== 'mysql') {
@@ -126,7 +122,7 @@ class InstallNntmux extends Command
                 }
 
                 if (! $error && $this->addAdminUser()) {
-                    @file_put_contents(NN_ROOT.'_install/install.lock', '');
+                    @file_put_contents(base_path().'_install/install.lock', '');
                     $this->info('Generating application key');
                     $process = new Process('php artisan key:generate --force');
                     $process->setTimeout(600);
@@ -179,21 +175,16 @@ class InstallNntmux extends Command
      */
     protected function updatePaths()
     {
-        $covers_path = NN_RES.'covers'.DS;
-        $nzb_path = NN_RES.'nzb'.DS;
-        $tmp_path = NN_RES.'tmp'.DS;
-        $unrar_path = $tmp_path.'unrar'.DS;
+        $covers_path = base_path().'resources/covers/';
+        $nzb_path = base_path().'resources/nzb/';
+        $tmp_path = base_path().'resources/tmp/';
+        $unrar_path = $tmp_path.'unrar/';
 
         $nzbPathCheck = is_writable($nzb_path);
         if ($nzbPathCheck === false) {
             $this->warn($nzb_path.' is not writable. Please fix folder permissions');
 
             return false;
-        }
-
-        $lastChar = substr($nzb_path, \strlen($nzb_path) - 1);
-        if ($lastChar !== '/') {
-            $nzb_path .= '/';
         }
 
         if (! file_exists($unrar_path)) {
@@ -210,11 +201,6 @@ class InstallNntmux extends Command
             return false;
         }
 
-        $lastChar = substr($unrar_path, \strlen($unrar_path) - 1);
-        if ($lastChar !== '/') {
-            $unrar_path .= '/';
-        }
-
         $coversPathCheck = is_writable($covers_path);
         if ($coversPathCheck === false) {
             $this->warn($covers_path.' is not writable. Please fix folder permissions');
@@ -222,15 +208,10 @@ class InstallNntmux extends Command
             return false;
         }
 
-        $lastChar = substr($covers_path, \strlen($covers_path) - 1);
-        if ($lastChar !== '/') {
-            $covers_path .= '/';
-        }
-
         return [
-            'nzb_path' => $nzb_path,
-            'covers_path' => $covers_path,
-            'unrar_path' => $unrar_path,
+            'nzb_path' => str_finish($nzb_path, '/'),
+            'covers_path' => str_finish($covers_path, '/'),
+            'unrar_path' => str_finish($unrar_path, '/'),
         ];
     }
 

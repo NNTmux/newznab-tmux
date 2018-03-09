@@ -14,10 +14,10 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./Blacklight</directory>
+            <directory suffix=".php">./app</directory>
         </whitelist>
-        <exclude>
-            <directory suffix=".php">./Blacklight/config</directory>
-            <file>./Blacklight/config/settings.example.php></file>
-        </exclude>
     </filter>
+    <logging>
+        <log type="coverage-clover" target="/build/logs/clover.xml"/>
+    </logging>
 </phpunit>

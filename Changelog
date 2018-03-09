@@ -1,4 +1,16 @@
+2018-03-09 DariusIII
+	* Chg: Update groupfixrelnames query
+	* Chg: Revert change that was not tested in groupfixrelnames.php
+	* Chg: Update phpunit.xml
+	* Chg: Possible fix for code coverage report
+	* Chg: Update laravel/tinker to version 1.0.5
 2018-03-08 DariusIII
+	* Chg: Add code coverage report
+	* Chg: Remove MiscSorter processed releases check from groupfixrelnames.php
+	* Chg: Update nntmux install command
+	* Chg: Update ytake-laravel-smarty.php
+	* Chg: Uningnore folders and remove gitmodules file (unused because it is related to li3 we do not use anymore)
+	* Chg: Update erusev/parsedown to latest version
 	* Fix: Fix displaying of flag images
 2018-03-07 DariusIII
 	* Chg: Update laravel/framework to version 5.6.9 and laravel/tinker to version 1.0.4

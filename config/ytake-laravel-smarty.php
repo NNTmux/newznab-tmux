@@ -52,7 +52,6 @@ return [
 
     // smarty plugins
     'plugins_paths'                       => [
-        base_path().'/public/plugins/',
         base_path().'/vendor/smarty/libs/plugins/',
         base_path().'/resources/smarty/plugins/',
 

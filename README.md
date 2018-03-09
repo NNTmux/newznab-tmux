@@ -6,6 +6,7 @@
     <a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/v/stable.svg" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/nntmux/newznab-tmux"><img src="https://poser.pugx.org/nntmux/newznab-tmux/license.svg" alt="License"></a>
     <a href="https://styleci.io/repos/22602573"><img src="https://styleci.io/repos/22602573/shield?branch=dev" alt="StyleCI"></a>
+    <a href='https://coveralls.io/github/NNTmux/newznab-tmux?branch=0.x'><img src='https://coveralls.io/repos/github/NNTmux/newznab-tmux/badge.svg?branch=dev' alt='Coverage Status' /></a>
 </p>
 
 
