@@ -3445,16 +3445,16 @@
         },
         {
             "name": "laravel/tinker",
-            "version": "v1.0.4",
+            "version": "v1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/tinker.git",
-                "reference": "eb8d3cfb41b7f74fb0ef4724e459d44f4cbb35b8"
+                "reference": "94f6daf2131508cebd11cd6f8632ba586d7ecc41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/tinker/zipball/eb8d3cfb41b7f74fb0ef4724e459d44f4cbb35b8",
-                "reference": "eb8d3cfb41b7f74fb0ef4724e459d44f4cbb35b8",
+                "url": "https://api.github.com/repos/laravel/tinker/zipball/94f6daf2131508cebd11cd6f8632ba586d7ecc41",
+                "reference": "94f6daf2131508cebd11cd6f8632ba586d7ecc41",
                 "shasum": ""
             },
             "require": {
@@ -3504,7 +3504,7 @@
                 "laravel",
                 "psysh"
             ],
-            "time": "2018-03-06T13:48:07+00:00"
+            "time": "2018-03-06T17:34:36+00:00"
         },
         {
             "name": "league/csv",
