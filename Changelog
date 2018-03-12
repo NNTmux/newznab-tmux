@@ -1,4 +1,5 @@
 2018-03-12 DariusIII
+	* Chg: Remove searchengine checks for imdbid, they are unrealiable
 	* Chg: Update fetchTmdbProperties function to return empty values on failed data fetching
 	* Chg: Check for empty variables directly, skip using a function
 	* Fix: Remove code related to escapeString, laravel does not need it
