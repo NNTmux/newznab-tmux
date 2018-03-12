@@ -924,7 +924,7 @@ class NameFixer
                     }
                 }
 
-                $newTitle =substr($newName, 0, 299);
+                $newTitle = substr($newName, 0, 299);
 
                 if ($echo === true) {
                     if ($nameStatus === 1) {
