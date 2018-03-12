@@ -173,9 +173,13 @@ class TraktAPI
                     } else {
                         ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from TraktTV, server responded with code: '.$e->getCode()), true);
                     }
+
+                    return false;
                 }
             } catch (\RuntimeException $e) {
                 ColorCLI::doEcho(ColorCLI::notice('Unknown error occurred!'), true);
+
+                return false;
             }
 
             if ($json !== null && $json !== false) {
