@@ -3,6 +3,7 @@
 namespace Blacklight;
 
 use Illuminate\Support\Facades\Log;
+use Intervention\Image\Exception\NotFoundException;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\ImageException;
@@ -69,9 +70,10 @@ class ReleaseImage
      */
     protected function fetchImage($imgLoc)
     {
+        $img = false;
         try {
             $img = (new ImageManager())->make($imgLoc);
-        } catch (NotReadableException $e) {
+        } catch (NotFoundException $e) {
             if ($e->getCode() === 404) {
                 ColorCLI::doEcho(ColorCLI::notice('Data not available on server'), true);
             } elseif ($e->getCode() === 503) {
@@ -80,12 +82,11 @@ class ReleaseImage
                 ColorCLI::doEcho(ColorCLI::notice('Unable to fetch image: '.$e->getMessage()), true);
             }
 
-            Log::warning($e->getMessage());
-
             return false;
+        } catch (NotReadableException $e)  {
+            ColorCLI::doEcho(ColorCLI::notice($e->getMessage()));
         } catch (ImageException $e) {
             ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getMessage()), true);
-            Log::error($e->getMessage());
 
             return false;
         }
