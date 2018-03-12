@@ -924,7 +924,7 @@ class NameFixer
                     }
                 }
 
-                $newTitle = $this->pdo->escapeString(substr($newName, 0, 299));
+                $newTitle =substr($newName, 0, 299);
 
                 if ($echo === true) {
                     if ($nameStatus === 1) {
@@ -986,7 +986,7 @@ class NameFixer
                             ->update($updateColumns);
                         $this->sphinx->updateRelease($release['releases_id']);
                     } else {
-                        $newTitle = $this->pdo->escapeString(substr($newName, 0, 299));
+                        $newTitle = substr($newName, 0, 299);
 
                         Release::query()
                             ->where('id', $release['releases_id'])
