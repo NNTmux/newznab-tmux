@@ -611,13 +611,14 @@ class Movie
     /**
      * Check if a variable is set and not a empty string.
      *
+     *
      * @param $variable
      *
      * @return bool
      */
-    protected function checkVariable(&$variable): bool
+    protected function checkVariable($variable): bool
     {
-        return ! empty($variable) ? true : false;
+        return ! empty($variable);
     }
 
     /**
@@ -630,7 +631,7 @@ class Movie
      *
      * @return array|string
      */
-    protected function setVariables(&$variable1, &$variable2, &$variable3, &$variable4)
+    protected function setVariables($variable1, $variable2, $variable3, $variable4)
     {
         if ($this->checkVariable($variable1)) {
             return $variable1;
@@ -1323,9 +1324,13 @@ class Movie
                 } else {
                     ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Google, http error reported: '.$e->getCode()), true);
                 }
+
+                return false;
             }
         } catch (\RuntimeException $e) {
             ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
+
+            return false;
         }
 
         // Make sure we got some data.
@@ -1373,9 +1378,13 @@ class Movie
                 } else {
                     ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Bing search , http error reported: '.$e->getCode()), true);
                 }
+
+                return false;
             }
         } catch (\RuntimeException $e) {
             ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
+
+            return false;
         }
 
         if (! empty($buffer)) {
@@ -1434,9 +1443,13 @@ class Movie
                 } else {
                     ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from Yahoo search, http error reported: '.$e->getCode()), true);
                 }
+
+                return false;
             }
         } catch (\RuntimeException $e) {
             ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
+
+            return false;
         }
 
         if (! empty($buffer)) {
@@ -1475,9 +1488,13 @@ class Movie
                 } else {
                     ColorCLI::doEcho(ColorCLI::notice('Unable to fetch data from DuckDuckGo search , http error reported: '.$e->getCode()), true);
                 }
+
+                return false;
             }
         } catch (\RuntimeException $e) {
             ColorCLI::doEcho(ColorCLI::notice('Runtime error: '.$e->getCode()), true);
+
+            return false;
         }
 
         if (! empty($buffer)) {

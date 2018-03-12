@@ -1,4 +1,5 @@
 2018-03-12 DariusIII
+	* Chg: Try to prevent bad data from Movie processing
 	* Chg: Return false on failed data fetch from Trakt API
 	* Chg: Add return statement in NotReadableException of ReleaseImage class
 	* Fix: Fix missing type check in updateRelease function
