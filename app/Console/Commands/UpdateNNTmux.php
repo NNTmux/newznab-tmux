@@ -7,8 +7,6 @@ use Ytake\LaravelSmarty\Smarty;
 
 class UpdateNNTmux extends Command
 {
-    const UPDATES_FILE = NN_CONFIGS.'updates.json';
-
     /**
      * The name and signature of the console command.
      *

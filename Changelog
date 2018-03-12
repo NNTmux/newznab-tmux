@@ -1,4 +1,5 @@
 2018-03-12 DariusIII
+	* Chg: Remove reference to non used and non existing config folder
 	* Chg: Update config/logging with new options (bubble, permission and locking)
 2018-03-11 DariusIII
 	* Chg: Update laravel/scout to version 4.0.2
