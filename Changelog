@@ -1,4 +1,5 @@
 2018-03-12 DariusIII
+	* Fix: Fix missing type check in updateRelease function
 	* Fix: Fix the updateRelease function query in NameFixer class
 	* Chg: Remove echocli parameter from some of the functions in NameFixer as it was not used at all
 	* Chg: Update Forking class

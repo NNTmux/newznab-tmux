@@ -951,6 +951,7 @@ class NameFixer
                                 $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_sorter' => 1];
                                 break;
                             case 'UID, ':
+                            case 'Mediainfo, ':
                                 $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_uid' => 1];
                                 break;
                             case 'PAR2 hash, ':
@@ -986,20 +987,24 @@ class NameFixer
                         $this->sphinx->updateRelease($release['releases_id']);
                     } else {
                         $newTitle = $this->pdo->escapeString(substr($newName, 0, 299));
-                        $this->pdo->queryExec(
-                            sprintf(
-                                '
-								UPDATE releases
-								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL,
-									consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, predb_id = %d,
-									searchname = %s, iscategorized = 1, categories_id = %d
-								WHERE id = %d',
-                                $preId,
-                                $newTitle,
-                                $determinedCategory,
-                                $release['releases_id']
-                            )
-                        );
+
+                        Release::query()
+                            ->where('id', $release['releases_id'])
+                            ->update(
+                                [
+                                    'videos_id' => 0,
+                                    'tv_episodes_id' => 0,
+                                    'imdbid' => null,
+                                    'musicinfo_id' => null,
+                                    'consoleinfo_id' => null,
+                                    'bookinfo_id' => null,
+                                    'anidbid' => null,
+                                    'predb_id' => $preId,
+                                    'searchname' => $newTitle,
+                                    'categories_id' => $determinedCategory,
+                                    'iscategorized' => 1,
+                                ]
+                            );
                         $this->sphinx->updateRelease($release['releases_id']);
                     }
                 }
