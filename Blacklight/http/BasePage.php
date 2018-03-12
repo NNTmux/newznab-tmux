@@ -2,7 +2,7 @@
 
 namespace Blacklight\http;
 
-require_once NN_LIB.'utility'.DS.'SmartyUtils.php';
+require_once NN_LIB.'utility/SmartyUtils.php';
 
 use App\Models\User;
 use Blacklight\db\DB;
