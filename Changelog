@@ -1,4 +1,5 @@
 2018-03-12 DariusIII
+	* Chg: Update bootstrap/autoload and constants (change and remove non-used constants definitions)
 	* Chg: Update ReleaseImage class, try to catch more errors
 	* Chg: Remove reference to non used and non existing config folder
 	* Chg: Update config/logging with new options (bubble, permission and locking)

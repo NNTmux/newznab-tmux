@@ -1,8 +1,8 @@
 <?php
 
 require_once dirname(__DIR__).DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
-require_once 'constants.php';
 require __DIR__.DIRECTORY_SEPARATOR.'app.php';
+require_once 'constants.php';
 
 use Dotenv\Dotenv;
 use Blacklight\utility\Utility;
@@ -12,11 +12,7 @@ $dotenv->load();
 
 define('NNTMUX_START', microtime(true));
 
-define('NN_APP_PATH', dirname(__DIR__).DS.'app');
-
-if (! defined('NN_ROOT')) {
-    define('NN_ROOT', dirname(NN_APP_PATH, 2));
-}
+define('NN_APP_PATH', app_path());
 
 if (! defined('HAS_WHICH')) {
     define('HAS_WHICH', Utility::hasWhich() ? true : false);
