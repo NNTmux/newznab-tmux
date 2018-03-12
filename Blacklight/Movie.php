@@ -201,7 +201,6 @@ class Movie
 
         $this->imdburl = (int) Settings::settingValue('indexer.categorise.imdburl') !== 0;
         $this->movieqty = Settings::settingValue('..maximdbprocessed') !== '' ? (int) Settings::settingValue('..maximdbprocessed') : 100;
-        $this->searchEngines = true;
         $this->showPasswords = Releases::showPasswords();
 
         $this->echooutput = ($options['Echo'] && config('nntmux.echocli') && $this->pdo->cli);
