@@ -931,50 +931,52 @@ class NameFixer
                         $status = '';
                         switch ($type) {
                             case 'NFO, ':
-                                $status = 'isrenamed = 1, iscategorized = 1, proc_nfo = 1,';
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_nfo' => 1,];
                                 break;
                             case 'PAR2, ':
-                                $status = 'isrenamed = 1, iscategorized = 1, proc_par2 = 1,';
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_par2' => 1,];
                                 break;
                             case 'Filenames, ':
                             case 'file matched source: ':
-                                $status = 'isrenamed = 1, iscategorized = 1, proc_files = 1,';
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_files' => 1,];
                                 break;
                             case 'SHA1, ':
                             case 'MD5, ':
-                                $status = 'isrenamed = 1, iscategorized = 1, dehashstatus = 1,';
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'dehashstatus' => 1,];
                                 break;
                             case 'PreDB FT Exact, ':
-                                $status = 'isrenamed = 1, iscategorized = 1,';
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1,];
                                 break;
                             case 'sorter, ':
-                                $status = 'isrenamed = 1, iscategorized = 1, proc_sorter = 1,';
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_sorter' => 1,];
                                 break;
                             case 'UID, ':
-                                $status = 'isrenamed = 1, iscategorized = 1, proc_uid = 1,';
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_uid' => 1,];
                                 break;
                             case 'PAR2 hash, ':
-                                $status = 'isrenamed = 1, iscategorized = 1, proc_hash16k = 1,';
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_hash16k' => 1,];
                                 break;
                             case 'SRR, ':
-                                $status = 'isrenamed = 1, iscategorized = 1, proc_srr = 1,';
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_srr' => 1,];
                                 break;
                         }
-                        $this->pdo->queryExec(
-                            sprintf(
-                                '
-								UPDATE releases
-								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfo_id = NULL,
-									consoleinfo_id = NULL, bookinfo_id = NULL, anidbid = NULL, predb_id = %d,
-									searchname = %s, %s categories_id = %d
-								WHERE id = %d',
-                                $preId,
-                                $newTitle,
-                                $status,
-                                $determinedCategory,
-                                $release['releases_id']
-                            )
-                        );
+                        Release::query()
+                            ->where('id', $release['releases_id'])
+                            ->update(
+                                [
+                                    'videos_id' => 0,
+                                    'tv_episodes_id' => 0,
+                                    'imdbid' => null,
+                                    'musicinfo_id' => null,
+                                    'consoleinfo_id' => null,
+                                    'bookinfo_id' => null,
+                                    'anidbid' => null,
+                                    'predb_id' => $preId,
+                                    'searchname' => $newTitle,
+                                    'categories_id' => $determinedCategory,
+                                    $status
+                                ]
+                            );
                         $this->sphinx->updateRelease($release['releases_id']);
                     } else {
                         $newTitle = $this->pdo->escapeString(substr($newName, 0, 299));
@@ -1046,13 +1048,12 @@ class NameFixer
      * @param $pre
      * @param $echo
      * @param $namestatus
-     * @param $echooutput
      * @param $show
      *
      * @return int
      * @throws \Exception
      */
-    public function matchPredbFT($pre, $echo, $namestatus, $echooutput, $show): int
+    public function matchPredbFT($pre, $echo, $namestatus, $show): int
     {
         $matching = $total = 0;
 
@@ -1192,13 +1193,12 @@ class NameFixer
      * @param         $release
      * @param bool $echo
      * @param int $namestatus
-     * @param bool $echooutput
      * @param int $show
      *
      * @return int
      * @throws \Exception
      */
-    public function matchPredbFiles($release, $echo, $namestatus, $echooutput, $show): int
+    public function matchPredbFiles($release, $echo, $namestatus, $show): int
     {
         $matching = 0;
         $pre = false;
@@ -1293,13 +1293,12 @@ class NameFixer
      * @param         $release
      * @param         $echo
      * @param         $namestatus
-     * @param bool $echooutput
      * @param         $show
      *
      * @return int
      * @throws \Exception
      */
-    public function matchPredbHash($hash, $release, $echo, $namestatus, $echooutput, $show): int
+    public function matchPredbHash($hash, $release, $echo, $namestatus, $show): int
     {
         $matching = 0;
         $this->matched = false;
@@ -1386,9 +1385,9 @@ class NameFixer
         if ($res instanceof \Traversable) {
             foreach ($res as $row) {
                 if (preg_match('/[a-fA-F0-9]{32,40}/i', $row['name'], $matches)) {
-                    $updated += $this->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                    $updated += $this->matchPredbHash($matches[0], $row, $echo, $namestatus, $show);
                 } elseif (preg_match('/[a-fA-F0-9]{32,40}/i', $row['filename'], $matches)) {
-                    $updated += $this->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                    $updated += $this->matchPredbHash($matches[0], $row, $echo, $namestatus, $show);
                 }
                 if ($show === 2) {
                     ColorCLI::overWritePrimary('Renamed Releases: ['.number_format($updated).'] '.$this->consoletools->percentString($checked++, $total));
