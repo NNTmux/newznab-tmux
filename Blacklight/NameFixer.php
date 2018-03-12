@@ -789,7 +789,7 @@ class NameFixer
     /**
      * Echo the amount of releases that found a new name.
      *
-     * @param int    $echo 1: change the name, anything else: preview of what could have been changed.
+     * @param int|bool    $echo 1: change the name, anything else: preview of what could have been changed.
      * @param string $type The function type that found the name.
      */
     protected function _echoFoundCount($echo, $type): void
