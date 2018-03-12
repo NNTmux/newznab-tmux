@@ -871,14 +871,21 @@ class Movie
             $vote = $tmdbLookup['vote_average'];
             if ($vote !== null) {
                 $ret['rating'] = ((int) $vote === 0) ? '' : $vote;
+            } else {
+                $ret['rating'] = '';
             }
             $overview = $tmdbLookup['overview'];
             if (! empty($overview)) {
                 $ret['plot'] = $overview;
             }
+            else {
+                $ret['plot'] = '';
+            }
             $tagline = $tmdbLookup['tagline'];
             if (! empty($tagline)) {
                 $ret['tagline'] = $tagline;
+            } else {
+                $ret['tagline'] = '';
             }
             $released = $tmdbLookup['release_date'];
             if (! empty($released)) {
@@ -891,14 +898,20 @@ class Movie
                     $genres[] = $genre['name'];
                 }
                 $ret['genre'] = $genres;
+            } else {
+                $ret['genre'] = '';
             }
             $posterp = $tmdbLookup['poster_path'];
             if (! empty($posterp)) {
                 $ret['cover'] = 'https:'.$this->helper->getUrl($posterp);
+            } else {
+                $ret['cover'] = '';
             }
             $backdrop = $tmdbLookup['backdrop_path'];
             if (! empty($backdrop)) {
                 $ret['backdrop'] = 'https:'.$this->helper->getUrl($backdrop);
+            }else {
+                $ret['backdrop'] = '';
             }
             if ($this->echooutput) {
                 ColorCLI::doEcho(ColorCLI::primaryOver('TMDb Found ').ColorCLI::headerOver($ret['title']), true);

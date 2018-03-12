@@ -1,4 +1,5 @@
 2018-03-12 DariusIII
+	* Chg: Update fetchTmdbProperties function to return empty values on failed data fetching
 	* Chg: Check for empty variables directly, skip using a function
 	* Fix: Remove code related to escapeString, laravel does not need it
 	* Chg: Try to prevent bad data from Movie processing
