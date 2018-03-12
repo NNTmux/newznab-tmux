@@ -974,8 +974,7 @@ class NameFixer
                             'categories_id' => $determinedCategory,
                         ];
 
-
-                        if ($status !=='') {
+                        if ($status !== '') {
                             foreach ($status as $key => $stat) {
                                 $updateColumns = array_add($updateColumns, $key, $stat);
                             }
