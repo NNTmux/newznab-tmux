@@ -2,11 +2,10 @@
 
 namespace Blacklight;
 
-use Illuminate\Support\Facades\Log;
-use Intervention\Image\Exception\NotFoundException;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Exception\ImageException;
+use Intervention\Image\Exception\NotFoundException;
 use Intervention\Image\Exception\NotReadableException;
 use Intervention\Image\Exception\NotWritableException;
 
@@ -83,7 +82,7 @@ class ReleaseImage
             }
 
             return false;
-        } catch (NotReadableException $e)  {
+        } catch (NotReadableException $e) {
             ColorCLI::doEcho(ColorCLI::notice($e->getMessage()));
         } catch (ImageException $e) {
             ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getMessage()), true);
