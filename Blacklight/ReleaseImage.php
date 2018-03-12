@@ -69,7 +69,6 @@ class ReleaseImage
      */
     protected function fetchImage($imgLoc)
     {
-        $img = false;
         try {
             $img = (new ImageManager())->make($imgLoc);
         } catch (NotFoundException $e) {
@@ -84,6 +83,8 @@ class ReleaseImage
             return false;
         } catch (NotReadableException $e) {
             ColorCLI::doEcho(ColorCLI::notice($e->getMessage()), true);
+
+            return false;
         } catch (ImageException $e) {
             ColorCLI::doEcho(ColorCLI::notice('Image error: '.$e->getMessage()), true);
 
