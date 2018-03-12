@@ -975,8 +975,10 @@ class NameFixer
                         ];
 
 
-                        foreach ($status as $key => $stat) {
-                            $updateColumns = array_add($updateColumns, $key, $stat);
+                        if ($status !=='') {
+                            foreach ($status as $key => $stat) {
+                                $updateColumns = array_add($updateColumns, $key, $stat);
+                            }
                         }
 
                         Release::query()
