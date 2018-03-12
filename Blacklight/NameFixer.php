@@ -960,23 +960,28 @@ class NameFixer
                                 $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_srr' => 1];
                                 break;
                         }
+
+                        $updateColumns = [
+                            'videos_id' => 0,
+                            'tv_episodes_id' => 0,
+                            'imdbid' => null,
+                            'musicinfo_id' => null,
+                            'consoleinfo_id' => null,
+                            'bookinfo_id' => null,
+                            'anidbid' => null,
+                            'predb_id' => $preId,
+                            'searchname' => $newTitle,
+                            'categories_id' => $determinedCategory,
+                        ];
+
+
+                        foreach ($status as $key => $stat) {
+                            $updateColumns = array_add($updateColumns, $key, $stat);
+                        }
+
                         Release::query()
                             ->where('id', $release['releases_id'])
-                            ->update(
-                                [
-                                    'videos_id' => 0,
-                                    'tv_episodes_id' => 0,
-                                    'imdbid' => null,
-                                    'musicinfo_id' => null,
-                                    'consoleinfo_id' => null,
-                                    'bookinfo_id' => null,
-                                    'anidbid' => null,
-                                    'predb_id' => $preId,
-                                    'searchname' => $newTitle,
-                                    'categories_id' => $determinedCategory,
-                                    $status,
-                                ]
-                            );
+                            ->update($updateColumns);
                         $this->sphinx->updateRelease($release['releases_id']);
                     } else {
                         $newTitle = $this->pdo->escapeString(substr($newName, 0, 299));
