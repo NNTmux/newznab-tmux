@@ -931,33 +931,33 @@ class NameFixer
                         $status = '';
                         switch ($type) {
                             case 'NFO, ':
-                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_nfo' => 1,];
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_nfo' => 1];
                                 break;
                             case 'PAR2, ':
-                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_par2' => 1,];
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_par2' => 1];
                                 break;
                             case 'Filenames, ':
                             case 'file matched source: ':
-                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_files' => 1,];
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_files' => 1];
                                 break;
                             case 'SHA1, ':
                             case 'MD5, ':
-                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'dehashstatus' => 1,];
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'dehashstatus' => 1];
                                 break;
                             case 'PreDB FT Exact, ':
-                                $status = ['isrenamed' => 1, 'iscategorized' => 1,];
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1];
                                 break;
                             case 'sorter, ':
-                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_sorter' => 1,];
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_sorter' => 1];
                                 break;
                             case 'UID, ':
-                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_uid' => 1,];
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_uid' => 1];
                                 break;
                             case 'PAR2 hash, ':
-                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_hash16k' => 1,];
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_hash16k' => 1];
                                 break;
                             case 'SRR, ':
-                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_srr' => 1,];
+                                $status = ['isrenamed' => 1, 'iscategorized' => 1, 'proc_srr' => 1];
                                 break;
                         }
                         Release::query()
@@ -974,7 +974,7 @@ class NameFixer
                                     'predb_id' => $preId,
                                     'searchname' => $newTitle,
                                     'categories_id' => $determinedCategory,
-                                    $status
+                                    $status,
                                 ]
                             );
                         $this->sphinx->updateRelease($release['releases_id']);
