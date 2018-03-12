@@ -877,8 +877,7 @@ class Movie
             $overview = $tmdbLookup['overview'];
             if (! empty($overview)) {
                 $ret['plot'] = $overview;
-            }
-            else {
+            } else {
                 $ret['plot'] = '';
             }
             $tagline = $tmdbLookup['tagline'];
@@ -910,7 +909,7 @@ class Movie
             $backdrop = $tmdbLookup['backdrop_path'];
             if (! empty($backdrop)) {
                 $ret['backdrop'] = 'https:'.$this->helper->getUrl($backdrop);
-            }else {
+            } else {
                 $ret['backdrop'] = '';
             }
             if ($this->echooutput) {
