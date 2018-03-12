@@ -620,16 +620,16 @@ class Movie
      */
     protected function setVariables($variable1, $variable2, $variable3, $variable4)
     {
-        if (!empty($variable1)) {
+        if (! empty($variable1)) {
             return $variable1;
         }
-        if (!empty($variable2)) {
+        if (! empty($variable2)) {
             return $variable2;
         }
-        if (!empty($variable3)) {
+        if (! empty($variable3)) {
             return $variable3;
         }
-        if (!empty($variable4)) {
+        if (! empty($variable4)) {
             return $variable4;
         }
 
@@ -677,30 +677,30 @@ class Movie
         $mov['tmdbid'] = (! isset($tmdb['tmdbid']) || $tmdb['tmdbid'] === '') ? 0 : $tmdb['tmdbid'];
 
         // Prefer Fanart.tv cover over TMDB,TMDB over IMDB and IMDB over OMDB.
-        if (!empty($fanart['cover'])) {
+        if (! empty($fanart['cover'])) {
             $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $fanart['cover'], $this->imgSavePath);
-        } elseif (!empty($tmdb['cover'])) {
+        } elseif (! empty($tmdb['cover'])) {
             $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $tmdb['cover'], $this->imgSavePath);
-        } elseif (!empty($imdb['cover'])) {
+        } elseif (! empty($imdb['cover'])) {
             $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $imdb['cover'], $this->imgSavePath);
-        } elseif (!empty($omdb['cover'])) {
+        } elseif (! empty($omdb['cover'])) {
             $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $omdb['cover'], $this->imgSavePath);
         }
 
         // Backdrops.
-        if (!empty($fanart['backdrop'])) {
+        if (! empty($fanart['backdrop'])) {
             $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $fanart['backdrop'], $this->imgSavePath, 1920, 1024);
-        } elseif (!empty($tmdb['backdrop'])) {
+        } elseif (! empty($tmdb['backdrop'])) {
             $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $tmdb['backdrop'], $this->imgSavePath, 1920, 1024);
         }
 
         // Banner
-        if (!empty($fanart['banner'])) {
+        if (! empty($fanart['banner'])) {
             $mov['banner'] = $this->releaseImage->saveImage($imdbId.'-banner', $fanart['banner'], $this->imgSavePath);
         }
 
         //RottenTomatoes rating from OmdbAPI
-        if (!empty($omdb['rtRating'])) {
+        if (! empty($omdb['rtRating'])) {
             $mov['rtrating'] = $omdb['rtRating'];
         }
 
@@ -711,25 +711,25 @@ class Movie
         $mov['year'] = $this->setVariables($imdb['year'], $tmdb['year'], $trakt['year'], $omdb['year']);
         $mov['genre'] = $this->setVariables($imdb['genre'], $tmdb['genre'], $trakt['genres'], $omdb['genre']);
 
-        if (!empty($imdb['type'])) {
+        if (! empty($imdb['type'])) {
             $mov['type'] = $imdb['type'];
         }
 
-        if (!empty($imdb['director'])) {
+        if (! empty($imdb['director'])) {
             $mov['director'] = \is_array($imdb['director']) ? implode(', ', array_unique($imdb['director'])) : $imdb['director'];
-        } elseif (!empty($omdb['director'])) {
+        } elseif (! empty($omdb['director'])) {
             $mov['director'] = \is_array($omdb['director']) ? implode(', ', array_unique($omdb['director'])) : $omdb['director'];
         }
 
-        if (!empty($imdb['actors'])) {
+        if (! empty($imdb['actors'])) {
             $mov['actors'] = \is_array($imdb['actors']) ? implode(', ', array_unique($imdb['actors'])) : $imdb['actors'];
-        } elseif (!empty($omdb['actors'])) {
+        } elseif (! empty($omdb['actors'])) {
             $mov['actors'] = \is_array($omdb['actors']) ? implode(', ', array_unique($omdb['actors'])) : $omdb['actors'];
         }
 
-        if (!empty($imdb['language'])) {
+        if (! empty($imdb['language'])) {
             $mov['language'] = \is_array($imdb['language']) ? implode(', ', array_unique($imdb['language'])) : $imdb['language'];
-        } elseif (!empty($omdb['language'])) {
+        } elseif (! empty($omdb['language'])) {
             $mov['language'] = \is_array($imdb['language']) ? implode(', ', array_unique($omdb['language'])) : $omdb['language'];
         }
 
@@ -795,15 +795,15 @@ class Movie
                     return false;
                 }
                 $ret = [];
-                if (!empty($art['moviebackground'][0]['url'])) {
+                if (! empty($art['moviebackground'][0]['url'])) {
                     $ret['backdrop'] = $art['moviebackground'][0]['url'];
-                } elseif (!empty($art['moviethumb'][0]['url'])) {
+                } elseif (! empty($art['moviethumb'][0]['url'])) {
                     $ret['backdrop'] = $art['moviethumb'][0]['url'];
                 }
-                if (!empty($art['movieposter'][0]['url'])) {
+                if (! empty($art['movieposter'][0]['url'])) {
                     $ret['cover'] = $art['movieposter'][0]['url'];
                 }
-                if (!empty($art['moviebanner'][0]['url'])) {
+                if (! empty($art['moviebanner'][0]['url'])) {
                     $ret['banner'] = $art['moviebanner'][0]['url'];
                 }
 
