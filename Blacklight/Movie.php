@@ -890,6 +890,8 @@ class Movie
             $released = $tmdbLookup['release_date'];
             if (! empty($released)) {
                 $ret['year'] = Carbon::parse($released)->year;
+            } else {
+                $ret['year'] = '';
             }
             $genresa = $tmdbLookup['genres'];
             if (! empty($genresa) && \count($genresa) > 0) {
