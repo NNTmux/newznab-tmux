@@ -21,7 +21,6 @@ use Blacklight\libraries\FanartTV;
 use Tmdb\Exception\TmdbApiException;
 use Blacklight\processing\tv\TraktTv;
 use Illuminate\Support\Facades\Cache;
-use GuzzleHttp\Exception\RequestException;
 use Tmdb\Repository\ConfigurationRepository;
 
 /**
