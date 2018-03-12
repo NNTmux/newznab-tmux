@@ -1,4 +1,5 @@
 2018-03-12 DariusIII
+	* Chg: Update Forking class
 	* Chg: Update BasePage class
 	* Chg: Update bootstrap/autoload and constants (change and remove non-used constants definitions)
 	* Chg: Update ReleaseImage class, try to catch more errors
