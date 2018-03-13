@@ -1,7 +1,7 @@
 build:
     dependencies:
-       before:
-       override:
+        before:
+        override:
            - 'composer global require hirak/prestissimo'
            - 'composer install --no-interaction --prefer-source --no-scripts --ignore-platform-reqs'
     nodes:
