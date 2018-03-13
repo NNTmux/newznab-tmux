@@ -47,7 +47,7 @@ class CreateUsersTable extends Migration {
 			$table->string('nzbvortex_api_key', 10)->nullable();
 			$table->string('nzbvortex_server_url')->nullable();
 			$table->string('userseed', 50);
-			$table->string('notes');
+			$table->string('notes')->nullable();
 			$table->string('cp_url')->nullable();
 			$table->string('cp_api')->nullable();
 			$table->string('style')->nullable();
