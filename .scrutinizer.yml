@@ -1,10 +1,16 @@
+build:
+    nodes:
+        analysis:
+            tests:
+                override:
+                    - php-scrutinizer-run
 filter:
     excluded_paths:
       - "vendor/*"
       - "libs/*"
       - "resources/*"
       - "storage/*"
-      - "public/themes/*"
+      - "resources/views/themes/*"
       - "public/plugins/*"
       - "database/*"
       - "config/*"

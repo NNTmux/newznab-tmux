@@ -1,4 +1,5 @@
 2018-03-13 DariusIII
+	* Chg: Update .scrutinizer.yml to use new analisys engine
 	* Chg: Update processBookReleasesHelper function
 	* Chg: Update Movie class getBrowseBy function
 	* Fix: Fix call to updateExpiredRoles function
