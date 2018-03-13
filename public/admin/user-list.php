@@ -50,7 +50,7 @@ $page->smarty->assign(
     ]
 );
 
-User::updateExpiredRoles('Role changed', 'Your role has expired and has been downgraded to user');
+User::updateExpiredRoles();
 
 foreach ($ordering as $orderType) {
     $page->smarty->assign('orderby'.$orderType, WWW_TOP.'/user-list.php?ob='.$orderType.'&offset=0');

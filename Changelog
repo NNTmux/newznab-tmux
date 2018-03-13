@@ -1,4 +1,5 @@
 2018-03-13 DariusIII
+	* Fix: Fix call to updateExpiredRoles function
 	* Chg: Fix users table migration, make notes nullable
 	* Chg: Update fetchOmdbAPIProperties function - use null coalescing operator
 	* Chg: Update handling of data received from Trakt.tv in Movie class
