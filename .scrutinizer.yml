@@ -2,6 +2,7 @@ build:
     dependencies:
         before:
         override:
+           - 'cp .env.scrutinizer .env'
            - 'composer global require hirak/prestissimo'
            - 'composer install --no-interaction --prefer-source --no-scripts --ignore-platform-reqs'
     nodes:
