@@ -1,4 +1,5 @@
 2018-03-13 DariusIII
+	* Chg: Update processBookReleasesHelper function
 	* Chg: Update Movie class getBrowseBy function
 	* Fix: Fix call to updateExpiredRoles function
 	* Chg: Fix users table migration, make notes nullable

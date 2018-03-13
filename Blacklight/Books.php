@@ -421,11 +421,12 @@ class Books
     /**
      * @param $res
      * @param $categoryID
+     *
      * @throws \Exception
      */
     protected function processBookReleasesHelper($res, $categoryID): void
     {
-        if ($res instanceof \Traversable && $res->count() > 0) {
+        if ($res->count() > 0) {
             if ($this->echooutput) {
                 ColorCLI::doEcho(ColorCLI::header("\nProcessing ".$res->count().' book release(s) for categories id '.$categoryID), true);
             }
